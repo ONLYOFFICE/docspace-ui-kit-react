@@ -81,7 +81,8 @@
     "vite": "^6.1.0",
     "vitest": "^4.0.17",
     "@vitest/ui": "^4.0.17",
-    "serve": "^14.2.5"
+    "serve": "^14.2.5",
+    "lefthook": "^2.0.14"
   },
   "keywords": [
     "react",
