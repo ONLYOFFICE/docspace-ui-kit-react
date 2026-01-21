@@ -73,8 +73,8 @@ export const useTooltipControl = (
   contentString?: string,
 ) => {
   const [isReady, setIsReady] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const virtualAnchorRef = useRef<HTMLDivElement | null>(null);
   const anchorId = useRef<string>(
     `tooltip-${Math.floor(Math.random() * 1000000)}`,

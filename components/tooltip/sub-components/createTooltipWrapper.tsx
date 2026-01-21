@@ -63,7 +63,8 @@ export const createTooltipWrapper = <TProps extends object>(
         contentString,
       );
 
-      const isTestEnvironment = process.env.NODE_ENV === "test";
+      const isTestEnvironment =
+        typeof process !== "undefined" && process.env?.NODE_ENV === "test";
 
       if (isTestEnvironment && contentString) {
         return (
