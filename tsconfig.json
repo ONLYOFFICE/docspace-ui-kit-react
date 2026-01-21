@@ -27,6 +27,7 @@
   "include": [
     "index.ts",
     "components/**/*",
+    "ui/**/*",
     "themes/**/*",
     "types/**/*",
     "test/**/*"

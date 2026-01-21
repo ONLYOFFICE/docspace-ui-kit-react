@@ -24,45 +24,65 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type React from "react";
-
-export type LabelProps = {
-  /** Indicates if the field associated with this label is required */
-  isRequired?: boolean;
-
-  /** Indicates if the field associated with this label has an error state */
-  error?: boolean;
-
-  /** When true, sets the label to display inline */
-  isInline?: boolean;
-
-  /** Tooltip text shown on hover. Also used for accessibility */
-  title?: string;
-
-  /** When true, truncates text that overflows with an ellipsis */
-  truncate?: boolean;
-
-  /** HTML 'for' attribute that associates the label with a form control */
-  htmlFor?: string;
-
-  /** The label's text content. Can be a string or a React node */
-  text?: string | React.ReactNode;
-
-  /** CSS display property value */
+export type TextProps = {
+  /** Ref to access the DOM element or React component instance */
+  ref?: React.RefObject<HTMLDivElement | null>;
+  /** Sets the tag through which the component is rendered */
+  as?: React.ElementType;
+  /** Accepts the tag id */
+  tag?: string;
+  /** Sets background color */
+  backgroundColor?: string;
+  /** Specifies the text color */
+  color?: string;
+  /** Sets the 'display' property */
   display?: string;
-
-  /** Additional CSS class names */
+  /** Sets the font size */
+  fontSize?: string;
+  /** Sets the font weight */
+  fontWeight?: number | string;
+  /** Sets font weight value to bold */
+  isBold?: boolean;
+  /** Sets the 'display: inline-block' property */
+  isInline?: boolean;
+  /** Sets the font style to italic */
+  isItalic?: boolean;
+  /** Sets the line height */
+  lineHeight?: string;
+  /** Disables text selection */
+  noSelect?: boolean;
+  /** Sets the 'text-align' property */
+  textAlign?: "left" | "center" | "right" | "justify";
+  /** Title attribute for hover tooltip */
+  title?: string;
+  /** Sets the class name */
   className?: string;
-
+  /** Disables word wrapping */
+  truncate?: boolean;
   /** HTML id attribute */
   id?: string;
-
-  /** Custom CSS styles */
+  /** Additional inline styles */
   style?: React.CSSProperties;
-
-  /** Child elements to render inside the label */
+  /** Text direction */
+  dir?: "ltr" | "rtl" | "auto";
+  /** Child elements */
   children?: React.ReactNode;
-
-  /** Maximum width for the tooltip */
-  tooltipMaxWidth?: string;
+  /** Click event handler */
+  onClick?: (e: React.MouseEvent<Element>) => void;
+  /** For label association */
+  htmlFor?: string;
+  /** Visual style variant */
+  view?: string;
+  /** Link href */
+  href?: string;
+  /** Used as HTML `rel` property */
+  rel?: string;
+  /** Used as HTML `tabindex` property */
+  tabIndex?: number;
+  /** Used in container component */
+  containerWidth?: string;
+  /** Used in container component */
+  containerMinWidth?: string;
+  /** Test id */
+  dataTestId?: string;
 };

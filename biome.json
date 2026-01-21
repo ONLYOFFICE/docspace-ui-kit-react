@@ -140,6 +140,7 @@
         "noAutofocus": "off",
         "noLabelWithoutControl": "off",
         "noPositiveTabindex": "off",
+        "noStaticElementInteractions": "off",
         "useKeyWithClickEvents": "off",
         "useKeyWithMouseEvents": "off",
         "useValidAnchor": "off"

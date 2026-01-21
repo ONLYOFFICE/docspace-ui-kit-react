@@ -80,7 +80,9 @@ export const Default: Story = {
     </div>
   ),
   args: {
-    element: <div style={popupStyles}>This content is rendered in a portal</div>,
+    element: (
+      <div style={popupStyles}>This content is rendered in a portal</div>
+    ),
     visible: true,
   },
 };

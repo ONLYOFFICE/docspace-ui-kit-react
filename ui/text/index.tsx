@@ -24,61 +24,91 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Text } from "../text";
+import classNames from "classnames";
 
-import type { LabelProps } from "./Label.types";
-import { globalColors } from "../../themes";
+import styles from "./Text.module.scss";
+import type { TextProps } from "./Text.types";
 
-const Label = (props: LabelProps) => {
-  const {
-    isRequired = false,
-    error = false,
-    title,
-    truncate = false,
-    isInline = false,
-    htmlFor,
-    text,
-    display,
+export type { TextProps };
+
+const TextUi = ({
+  ref,
+  title,
+  tag,
+  as,
+  fontSize,
+  fontWeight,
+  color,
+  textAlign,
+  onClick,
+  dir,
+  children,
+  view,
+  isInline,
+  isBold,
+  isItalic,
+  lineHeight,
+  noSelect,
+  backgroundColor,
+  truncate,
+  className,
+  style,
+  dataTestId,
+  ...rest
+}: TextProps) => {
+  const elementType = !as && tag ? tag : as;
+  const isAutoDir = dir === "auto";
+  const dirProps = isAutoDir ? {} : { dir };
+
+  const textStyles = {
+    fontSize,
+    fontWeight: isBold ? 700 : fontWeight,
+    color,
+    textAlign,
+    lineHeight,
+    backgroundColor,
+    ...style,
+  };
+
+  const textClassName = classNames(
+    styles.text,
+    {
+      [styles.inline]: isInline,
+      [styles.italic]: isItalic,
+      [styles.bold]: isBold,
+      [styles.noSelect]: noSelect,
+      [styles.truncate]: truncate,
+    },
     className,
-    id,
-    style,
-    children,
-  } = props;
-  const errorProp = error ? { color: globalColors.lightErrorStatus } : {};
+  );
+
+  const Element = elementType || "p";
 
   return (
-    <Text
-      as="label"
-      id={id}
-      style={style}
-      htmlFor={htmlFor}
-      isInline={isInline}
-      display={display}
-      {...errorProp}
-      fontWeight={600}
-      truncate={truncate}
+    <Element
+      ref={ref}
       title={title}
-      className={className}
-      data-testid="label"
-      data-truncate={truncate}
-      data-inline={isInline}
-      data-error={error}
-      aria-required={isRequired}
-      aria-invalid={error}
+      data-testid={dataTestId ?? "text"}
+      onClick={onClick}
+      className={textClassName}
+      style={textStyles}
+      {...dirProps}
+      {...rest}
     >
-      {text}{" "}
-      {isRequired ? (
+      {isAutoDir ? (
         <span
-          style={{ color: globalColors.lightErrorStatus }}
-          aria-hidden="true"
-          data-testid="required-mark"
+          className={classNames(styles.autoDirSpan, {
+            [styles.tile]: view === "tile",
+          })}
+          dir="auto"
         >
-          *
+          {children}
         </span>
-      ) : null}{" "}
-      {children}
-    </Text>
+      ) : (
+        children
+      )}
+    </Element>
   );
 };
 
-export { Label };
+export { TextUi };
