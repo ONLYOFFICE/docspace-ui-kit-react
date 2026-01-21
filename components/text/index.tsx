@@ -29,4 +29,6 @@ import { TextUi } from "../../ui/text";
 import { withTooltip } from "../tooltip";
 
 const Text = withTooltip(TextUi);
+
+export * from "../../ui/text/Text.types";
 export { Text };
