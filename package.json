@@ -11,7 +11,8 @@
     "./components/*": "./components/*/index.ts",
     "./styles/*": "./styles/*",
     "./themes": "./themes/index.ts",
-    "./themes/*": "./themes/*"
+    "./themes/*": "./themes/*",
+    "./themes/globalColors": "./themes/globalColors.ts"
   },
   "files": [
     "dist"
