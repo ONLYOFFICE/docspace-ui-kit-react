@@ -24,8 +24,32 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./text";
+"use client";
 
-export * from "./label";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
-export * from "./portal";
+import type { PortalProps } from "./Portal.types";
+
+const Portal = ({ visible = true, element, appendTo = null }: PortalProps) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const domExists = !!(
+      typeof window !== "undefined" &&
+      typeof document !== "undefined" &&
+      window.document &&
+      window.document.createElement
+    );
+
+    if (domExists && !mounted && visible) {
+      setMounted(true);
+    }
+  }, [mounted, visible]);
+
+  return element && mounted
+    ? createPortal(element, appendTo || document.body)
+    : null;
+};
+
+export { Portal };

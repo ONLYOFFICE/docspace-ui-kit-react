@@ -24,8 +24,63 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./text";
+import React from "react";
 
-export * from "./label";
+import { Text } from "../text";
 
-export * from "./portal";
+import { LabelProps } from "./Label.types";
+import { globalColors } from "../../themes";
+
+const Label = (props: LabelProps) => {
+  const {
+    isRequired = false,
+    error = false,
+    title,
+    truncate = false,
+    isInline = false,
+    htmlFor,
+    text,
+    display,
+    className,
+    id,
+    style,
+    children,
+  } = props;
+  const errorProp = error ? { color: globalColors.lightErrorStatus } : {};
+
+  return (
+    <Text
+      as="label"
+      id={id}
+      style={style}
+      htmlFor={htmlFor}
+      isInline={isInline}
+      display={display}
+      {...errorProp}
+      fontWeight={600}
+      truncate={truncate}
+      title={title}
+      className={className}
+      data-testid="label"
+      data-truncate={truncate}
+      data-inline={isInline}
+      data-error={error}
+      aria-required={isRequired}
+      aria-invalid={error}
+    >
+      {text}{" "}
+      {isRequired ? (
+        <span
+          style={{ color: globalColors.lightErrorStatus }}
+          aria-hidden="true"
+          data-testid="required-mark"
+        >
+          *
+        </span>
+      ) : null}{" "}
+      {children}
+    </Text>
+  );
+};
+
+export { Label };

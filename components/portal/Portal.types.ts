@@ -24,8 +24,15 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./text";
+import type { ReactNode } from "react";
 
-export * from "./label";
+export type PortalProps = {
+  /** The React node to be rendered inside the portal */
+  element: ReactNode;
 
-export * from "./portal";
+  /** Whether the portal content should be visible. Defaults to true */
+  visible?: boolean;
+
+  /** The DOM element to append the portal to. Defaults to document.body */
+  appendTo?: HTMLElement | null;
+};

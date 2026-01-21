@@ -28,13 +28,11 @@
     "index.ts",
     "components/**/*",
     "themes/**/*",
-    "types/**/*"
+    "types/**/*",
+    "test/**/*"
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.stories.tsx"
+    "dist"
   ]
 }

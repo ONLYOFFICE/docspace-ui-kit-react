@@ -8,16 +8,6 @@ UI component library for DocSpace.
 pnpm add @docspace/ui-kit
 ```
 
-## Usage
-
-```tsx
-import { Text } from "@docspace/ui-kit";
-
-<Text fontSize="14px" isBold>
-  Hello World
-</Text>
-```
-
 ## Development
 
 ### Storybook
@@ -40,4 +30,6 @@ pnpm build
 
 ## Components
 
+- [Label](./components/label/README.md)
+- [Portal](./components/portal/README.md)
 - [Text](./components/text/README.md)
