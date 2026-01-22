@@ -30,7 +30,8 @@
     "ui/**/*",
     "themes/**/*",
     "types/**/*",
-    "test/**/*"
+    "test/**/*",
+    "assets/**/*"
   ],
   "exclude": [
     "node_modules",

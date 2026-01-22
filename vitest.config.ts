@@ -1,6 +1,15 @@
+import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  resolve: {
+    alias: [
+      {
+        find: /^(.*)\.react\.svg$/,
+        replacement: path.resolve(__dirname, "./test/__mocks__/svgMock.tsx"),
+      },
+    ],
+  },
   test: {
     environment: "jsdom",
     globals: true,

@@ -2,6 +2,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
+import svgr from "@svgr/rollup";
 import dts from "rollup-plugin-dts";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
 import postcss from "rollup-plugin-postcss";
@@ -52,6 +53,7 @@ export default [
 			resolve({
 				extensions: [".ts", ".tsx", ".js", ".jsx"],
 			}),
+			svgr(),
 			commonjs(),
 			typescript({
 				tsconfig: "./tsconfig.json",
@@ -64,7 +66,14 @@ export default [
 				},
 				inject: true,
 				minimize: true,
-				use: ["sass"],
+				use: [
+				[
+					"sass",
+					{
+						silenceDeprecations: ["legacy-js-api"],
+					},
+				],
+			],
 			}),
 			terser(terserOptions),
 		],
@@ -82,6 +91,6 @@ export default [
 				tsconfig: "./tsconfig.json",
 			}),
 		],
-		external: [/\.scss$/, /\.css$/],
+		external: [/\.scss$/, /\.css$/, /\.svg$/],
 	},
 ];

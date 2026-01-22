@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Label, Text, Link, Portal, Tooltip, TextInput, Loader } from "@docspace/ui-kit";
+import { Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -31,6 +31,7 @@ import { Portal } from "@docspace/ui-kit/components/portal";
 import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
 import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
 import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
+import { Checkbox } from "@docspace/ui-kit/components/checkbox";
 ```
 
 ### Import utilities
@@ -50,3 +51,4 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 | [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
 | [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
+| [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |

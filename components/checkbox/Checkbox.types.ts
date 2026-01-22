@@ -24,18 +24,37 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./label";
+import type React from "react";
 
-export * from "./portal";
+import type { TextProps } from "../text";
 
-export * from "./tooltip";
+type PickedTextProps = Pick<TextProps, "title" | "truncate">;
 
-export * from "./link";
+type PickedInputProps = Pick<
+	React.ComponentPropsWithoutRef<"input">,
+	"name" | "value" | "tabIndex" | "onChange"
+>;
 
-export * from "./text";
+type PickedLabelProps = Pick<
+	React.LabelHTMLAttributes<HTMLLabelElement>,
+	"id" | "style" | "className"
+>;
 
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./checkbox";
+export type CheckboxProps = PickedTextProps &
+	PickedInputProps &
+	PickedLabelProps & {
+		/** Label of the input */
+		label?: string;
+		/** Sets the checked state of the checkbox */
+		isChecked?: boolean;
+		/** The state is displayed as a rectangle in the checkbox when set to true */
+		isIndeterminate?: boolean;
+		/** Disables the Checkbox input */
+		isDisabled?: boolean;
+		/** Renders the help button */
+		helpButton?: React.ReactNode;
+		/** Notifies if the error occurs */
+		hasError?: boolean;
+		/** Test id for the checkbox */
+		dataTestId?: string;
+	};

@@ -30,7 +30,8 @@
 @use "../variables/colors" as *;
 
 
-:global(.light) {
+// Light theme variables mixin
+@mixin input-theme-variables-light {
   // Input colors
   --input-bg: #{$white};
   --input-color: #{$black};
@@ -94,8 +95,8 @@
   --text-input-placeholder-disabled-color: #{$gray-strong};
 }
 
-// Dark theme overrides
-:global(.dark) {
+// Dark theme variables mixin
+@mixin input-theme-variables-dark {
   --input-bg: #{$dark-gray-light};
   --input-color: #{$white};
   --input-border-color: #{$gray-dark-strong};
@@ -155,6 +156,12 @@
 
 
 @mixin common-input-color-styles {
+  @include input-theme-variables-light;
+
+  @at-root :global(.dark) #{&} {
+    @include input-theme-variables-dark;
+  }
+
   background-color: var(--input-bg);
   color: var(--input-color);
   caret-color: var(--input-color);
