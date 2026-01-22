@@ -24,14 +24,17 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./label";
+export enum InputType {
+	text = "text",
+	password = "password",
+	email = "email",
+	tel = "tel",
+	search = "search",
+	number = "number",
+}
 
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
+export enum InputSize {
+	base = "base",
+	middle = "middle",
+	large = "large",
+}

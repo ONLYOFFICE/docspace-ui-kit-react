@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Label, Text, Link, Portal, Tooltip } from "@docspace/ui-kit";
+import { Label, Text, Link, Portal, Tooltip, TextInput } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -29,6 +29,7 @@ import { Text } from "@docspace/ui-kit/components/text";
 import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
 import { Portal } from "@docspace/ui-kit/components/portal";
 import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
+import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
 ```
 
 ### Import utilities
@@ -46,3 +47,4 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
 | [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
+| [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |

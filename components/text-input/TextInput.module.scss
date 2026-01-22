@@ -1,0 +1,42 @@
+@use "../../styles/mixins";
+
+.textInput {
+  @include mixins.common-input-styles;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  display: flex;
+  flex: 1 1 0%;
+  outline: none;
+  overflow: hidden;
+  opacity: 1;
+  transition: all 0.2s ease 0s;
+  box-shadow: inset 0 0 0 30px var(--input-bg);
+  font-weight: normal;
+
+  &[type="search"]::-webkit-search-decoration,
+  &[type="search"]::-webkit-search-cancel-button,
+  &[type="search"]::-webkit-search-results-button,
+  &[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none !important;
+    margin: 0;
+    display: none;
+  }
+
+  &[type="search"]::-moz-search-cancel-button {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    margin: 0;
+    display: none;
+  }
+
+  &:disabled {
+    box-shadow: inset 0 0 0 30px var(--input-disabled-bg);
+  }
+
+  &[data-without-border="true"] {
+    border: none;
+  }
+}
