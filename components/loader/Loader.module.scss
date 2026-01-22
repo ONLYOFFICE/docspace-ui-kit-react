@@ -24,16 +24,46 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./label";
+@use "../../styles/variables/colors" as *;
 
-export * from "./portal";
 
-export * from "./tooltip";
+.loader, 
+.loaderTrack {
+  --loader-color: #{$loader-light};
+  --button-loader-track-primary: #{$white};
+  --button-loader-track-base: var(--color-scheme-main-buttons);
+}
 
-export * from "./link";
+:global(.dark) {
+  :local {
+    .loader, 
+    .loaderTrack {
+      --loader-color: #{$loader-dark};
+      --button-loader-track-primary: #{$white};
+      --button-loader-track-base: #{$white};
+      }
+  }
+}
 
-export * from "./text";
+.loader {
+  width: var(--loader-size, 40px);
+  height: var(--loader-size, 40px);
+  stroke: var(--loader-color);
+}
 
-export * from "./text-input";
+.loaderTrack {
+  width: var(--loader-size, 20px);
+  height: var(--loader-size, 20px);
 
-export * from "./loader";
+  &.primary {
+    color: var(--button-loader-track-primary);
+  }
+
+  &.base {
+    color: var(--button-loader-track-base);
+  }
+
+  &.disabled {
+    opacity: 0.6;
+  }
+}

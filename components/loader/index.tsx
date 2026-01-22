@@ -24,16 +24,59 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./label";
+import { Text } from "../text";
 
-export * from "./portal";
+import { Oval } from "./sub-components/Oval";
+import { DualRing } from "./sub-components/DualRing";
+import { Rombs } from "./sub-components/Rombs";
+import { Track } from "./sub-components/Track";
 
-export * from "./tooltip";
+import type { LoaderProps } from "./Loader.types";
+import { LoaderTypes } from "./Loader.enums";
 
-export * from "./link";
+export { LoaderTypes };
 
-export * from "./text";
+const Loader = ({ ...props }: LoaderProps) => {
+	const { type, color, size, label, className, style, id } = props;
 
-export * from "./text-input";
+	const svgRenderer = (t?: LoaderTypes) => {
+		switch (t) {
+			case LoaderTypes.oval:
+				return <Oval {...props} />;
+			case LoaderTypes.dualRing:
+				return <DualRing {...props} />;
+			case LoaderTypes.rombs:
+				return <Rombs {...props} />;
+			case LoaderTypes.track:
+				return <Track {...props} />;
+			default:
+				return (
+					<span style={{ ...style }}>
+						<Text color={color} fontSize={size}>
+							{label}
+						</Text>
+					</span>
+				);
+		}
+	};
 
-export * from "./loader";
+	return (
+		<div
+			aria-busy="true"
+			className={className}
+			style={style}
+			id={id}
+			data-testid="loader"
+		>
+			{svgRenderer(type)}
+		</div>
+	);
+};
+
+Loader.default = {
+	type: LoaderTypes.base,
+	size: "40px",
+	label: "Loading content, please wait.",
+};
+
+export { Loader };

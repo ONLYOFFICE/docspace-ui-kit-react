@@ -24,16 +24,36 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./label";
+import type React from "react";
 
-export * from "./portal";
+import classNames from "classnames";
 
-export * from "./tooltip";
+import styles from "./Rombs.module.scss";
 
-export * from "./link";
+const Rombs = ({ size = "40px" }: { size?: string }) => {
+	const style = {
+		"--loader-size": size,
+	} as React.CSSProperties;
 
-export * from "./text";
+	return (
+		<>
+			<div
+				data-testid="rombs-loader"
+				className={classNames(styles.rombsLoader, styles.blue)}
+				style={style}
+			/>
 
-export * from "./text-input";
+			<div
+				className={classNames(styles.rombsLoader, styles.green)}
+				style={style}
+			/>
 
-export * from "./loader";
+			<div
+				className={classNames(styles.rombsLoader, styles.red)}
+				style={style}
+			/>
+		</>
+	);
+};
+
+export { Rombs };
