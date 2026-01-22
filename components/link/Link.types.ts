@@ -24,8 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { LinkTarget, LinkType } from "../../components/link";
-import type { TextProps } from "../../components/text";
+import type { LinkTarget, LinkType } from "./Link.enums";
+import type { TextProps } from "../text";
 
 export type LinkProps = TextProps & {
   /** Used as HTML `href` property */
