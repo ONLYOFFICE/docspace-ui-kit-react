@@ -30,7 +30,7 @@
 @use "../variables/colors" as *;
 
 
-.light {
+:global(.light) {
   // Input colors
   --input-bg: #{$white};
   --input-color: #{$black};
@@ -95,7 +95,7 @@
 }
 
 // Dark theme overrides
-.dark {
+:global(.dark) {
   --input-bg: #{$dark-gray-light};
   --input-color: #{$white};
   --input-border-color: #{$gray-dark-strong};

@@ -1,12 +1,16 @@
 {
   "name": "@docspace/ui-kit",
-  "version": "0.0.1",
+  "version": "0.0.1223",
   "description": "DocSpace UI Component Library",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
-    ".": "./index.ts",
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
     "./components": "./components/index.ts",
     "./components/*": "./components/*/index.tsx",
     "./styles/*": "./styles/*",
