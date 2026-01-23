@@ -37,7 +37,7 @@ import throttle from "lodash/throttle";
 import classNames from "classnames";
 
 import { isTouchDevice } from "../../utils";
-import { useInterfaceDirection } from "../../hooks";
+import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 
 import { Scrollbar as CustomScrollbar } from "./custom-scrollbar";
 import styles from "./Scrollbar.module.scss";

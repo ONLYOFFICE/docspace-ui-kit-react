@@ -41,6 +41,7 @@ import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
 
 ```js
 import { ThemeProvider, useTheme } from "@docspace/ui-kit/context/ThemeContext";
+import { InterfaceDirectionProvider, useInterfaceDirection } from "@docspace/ui-kit/context/InterfaceDirectionContext";
 ```
 
 ### Import utilities
@@ -70,3 +71,4 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 | Context | Description |
 |---------|-------------|
 | [ThemeContext](./context/ThemeContext/README.md) | Theme management context with support for Base/Dark themes and custom color schemes |
+| [InterfaceDirectionContext](./context/InterfaceDirectionContext/README.md) | Interface direction context for managing LTR/RTL layout support |
