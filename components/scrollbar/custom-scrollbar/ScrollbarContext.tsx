@@ -23,23 +23,15 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+"use client";
+import * as React from "react";
 
-export * from "./button";
+// biome-ignore lint/suspicious/noExplicitAny: TODO fix
+export type ScrollbarContextValue = { parentScrollbar: any | null };
 
-export * from "./checkbox";
+const ScrollbarContext: React.Context<ScrollbarContextValue> =
+  React.createContext({
+    parentScrollbar: null,
+  } as ScrollbarContextValue);
 
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./scrollbar";
+export default ScrollbarContext;

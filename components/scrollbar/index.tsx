@@ -24,22 +24,17 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
+"use client";
 
-export * from "./checkbox";
+import { Scrollbar } from "./Scrollbar";
+import type { ScrollbarProps } from "./Scrollbar.types";
+import { type Scrollbar as ScrollbarType } from "./custom-scrollbar";
+import ScrollbarContext from "./custom-scrollbar/ScrollbarContext";
 
-export * from "./label";
+export type { ScrollbarProps };
 
-export * from "./portal";
+export type { ScrollbarType };
 
-export * from "./tooltip";
+export { Scrollbar };
 
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./scrollbar";
+export { ScrollbarContext };

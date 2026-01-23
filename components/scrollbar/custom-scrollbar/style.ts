@@ -24,22 +24,63 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
+import * as React from "react";
 
-export * from "./checkbox";
+export const style = {
+  holder: {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+  } as React.CSSProperties,
 
-export * from "./label";
+  wrapper: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  } as React.CSSProperties,
 
-export * from "./portal";
+  content: {
+    boxSizing: "border-box",
+  } as React.CSSProperties,
 
-export * from "./tooltip";
+  track: {
+    common: {
+      position: "absolute",
+      overflow: "hidden",
+      borderRadius: 4,
+      background: "rgba(0,0,0,.1)",
+      userSelect: "none",
+    } as React.CSSProperties,
+    x: {
+      height: 10,
+      width: "calc(100% - 20px)",
+      bottom: 0,
+      left: 10,
+    } as React.CSSProperties,
+    y: {
+      width: 10,
+      height: "calc(100% - 20px)",
+      top: 10,
+    } as React.CSSProperties,
+  },
 
-export * from "./link";
+  thumb: {
+    common: {
+      cursor: "pointer",
+      borderRadius: 4,
+      background: "rgba(0,0,0,.4)",
+    } as React.CSSProperties,
+    x: {
+      height: "100%",
+      width: 0,
+    } as React.CSSProperties,
+    y: {
+      width: "100%",
+      height: 0,
+    } as React.CSSProperties,
+  },
+};
 
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./scrollbar";
+export default style;
