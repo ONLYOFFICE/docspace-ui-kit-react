@@ -43,7 +43,7 @@
     "format:fix": "biome check --write .",
     "tsc": "tsc",
     "prepublishOnly": "pnpm run build",
-    "prepare": "lefthook install"
+    "prepare": "node -e \"if (!process.env.CI) { try { require('child_process').execSync('git --version', {stdio: 'ignore'}); require('child_process').execSync('lefthook install', {stdio: 'inherit'}); } catch (e) { console.error('Lefthook installation skipped:', e.message); } }\""
   },
   "peerDependencies": {
     "react": ">=18.0.0",
