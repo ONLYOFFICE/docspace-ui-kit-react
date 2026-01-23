@@ -24,24 +24,13 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
+import { TColorScheme } from "../../context/ThemeContext";
 
-export * from "./checkbox";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
+export type ThemeProviderProps = {
+  /** Applies a theme to all children components */
+  theme: Record<string, unknown>;
+  /** Applies a currentColorScheme to all children components */
+  currentColorScheme?: TColorScheme;
+  /** Child elements */
+  children: React.ReactNode;
+};
