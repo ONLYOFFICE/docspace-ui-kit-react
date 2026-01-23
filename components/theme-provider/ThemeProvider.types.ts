@@ -24,13 +24,13 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { TColorScheme } from "../../context/ThemeContext";
+import type { TColorScheme } from "../../context/ThemeContext";
 
 export type ThemeProviderProps = {
-  /** Applies a theme to all children components */
-  theme: Record<string, unknown>;
-  /** Applies a currentColorScheme to all children components */
-  currentColorScheme?: TColorScheme;
-  /** Child elements */
-  children: React.ReactNode;
+	/** Applies a theme to all children components */
+	theme: Record<string, unknown>;
+	/** Applies a currentColorScheme to all children components */
+	currentColorScheme?: TColorScheme;
+	/** Child elements */
+	children: React.ReactNode;
 };
