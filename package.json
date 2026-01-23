@@ -18,7 +18,9 @@
     "./themes/*": "./themes/*",
     "./themes/globalColors": "./themes/globalColors.ts",
     "./utils": "./utils/index.ts",
-    "./utils/*": "./utils/*/index.ts"
+    "./utils/*": "./utils/*/index.ts",
+    "./context": "./context/index.ts",
+    "./hooks": "./hooks/index.ts"
   },
   "files": [
     "dist"
