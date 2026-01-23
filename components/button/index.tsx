@@ -24,20 +24,11 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
+import { Button as ButtonBase } from "./Button";
+import { withTooltip } from "../tooltip";
+export type { ButtonProps } from "./Button.types";
+export { ButtonSize } from "./Button.enums";
 
-export * from "./checkbox";
+const Button = withTooltip(ButtonBase);
 
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
+export { Button };

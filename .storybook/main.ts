@@ -1,4 +1,5 @@
 import type { StorybookConfig } from "@storybook/react-vite";
+import svgr from "vite-plugin-svgr";
 
 const config: StorybookConfig = {
   stories: ["../components/**/*.stories.@(js|jsx|ts|tsx)"],
@@ -19,6 +20,25 @@ const config: StorybookConfig = {
 
   typescript: {
     reactDocgen: "react-docgen-typescript",
+  },
+
+  async viteFinal(config) {
+    config.plugins = config.plugins || [];
+
+    // Insert SVGR plugin before other plugins to handle SVG imports as React components
+    config.plugins.unshift(
+      svgr({
+        svgrOptions: {
+          exportType: "default",
+          ref: true,
+          svgo: false,
+          titleProp: true,
+        },
+        include: "**/*.svg",
+      }),
+    );
+
+    return config;
   },
 };
 

@@ -24,20 +24,9 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
-
-export * from "./checkbox";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
+export enum ButtonSize {
+  extraSmall = "extraSmall",
+  small = "small",
+  normal = "normal",
+  medium = "medium",
+}

@@ -30,7 +30,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Portal } from "./Portal";
 
 const meta: Meta<typeof Portal> = {
-  title: "Components/Portal",
+  title: "Components/UI/Portal",
   component: Portal,
   parameters: {
     docs: {

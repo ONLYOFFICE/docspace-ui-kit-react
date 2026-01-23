@@ -24,13 +24,12 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { Link, LinkTarget, LinkType } from "./index";
 
 const meta = {
-  title: "Components/Link",
+  title: "Components/Interactive Elements/Link",
   component: Link,
   parameters: {
     docs: {

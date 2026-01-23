@@ -33,72 +33,72 @@ import { InputSize, InputType } from "./TextInput.enums";
 import type { TextInputProps } from "./TextInput.types";
 
 const meta = {
-	title: "Form Controls/TextInput",
-	component: TextInput,
-	parameters: {
-		docs: {
-			description: {
-				component:
-					"Input field for single-line strings with various styling options and features including masking, scaling, and different states.",
-			},
-		},
-		design: {
-			type: "figma",
-			url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=633-3686&mode=dev",
-		},
-	},
-	argTypes: {
-		size: {
-			description: "Size variant of the input",
-			control: "select",
-			options: Object.values(InputSize),
-		},
-		type: {
-			description: "Type of the input field",
-			control: "select",
-			options: Object.values(InputType),
-		},
-		value: {
-			description: "Value of the input",
-			control: "text",
-		},
-		placeholder: {
-			description: "Placeholder text",
-			control: "text",
-		},
-		isDisabled: {
-			description: "Indicates that the field cannot be used",
-			control: "boolean",
-		},
-		isReadOnly: {
-			description: "Indicates that the field is read-only",
-			control: "boolean",
-		},
-		hasError: {
-			description: "Indicates the input has an error",
-			control: "boolean",
-		},
-		hasWarning: {
-			description: "Indicates the input has a warning",
-			control: "boolean",
-		},
-		scale: {
-			description: "Makes the input take full width",
-			control: "boolean",
-		},
-		withBorder: {
-			description: "Shows border around the input",
-			control: "boolean",
-		},
-		isBold: {
-			description: "Sets font weight to 600",
-			control: "boolean",
-		},
-		maxLength: {
-			description: "Maximum length of input value",
-			control: "number",
-		},
-	},
+  title: "Components/Form Controls/TextInput",
+  component: TextInput,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Input field for single-line strings with various styling options and features including masking, scaling, and different states.",
+      },
+    },
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=633-3686&mode=dev",
+    },
+  },
+  argTypes: {
+    size: {
+      description: "Size variant of the input",
+      control: "select",
+      options: Object.values(InputSize),
+    },
+    type: {
+      description: "Type of the input field",
+      control: "select",
+      options: Object.values(InputType),
+    },
+    value: {
+      description: "Value of the input",
+      control: "text",
+    },
+    placeholder: {
+      description: "Placeholder text",
+      control: "text",
+    },
+    isDisabled: {
+      description: "Indicates that the field cannot be used",
+      control: "boolean",
+    },
+    isReadOnly: {
+      description: "Indicates that the field is read-only",
+      control: "boolean",
+    },
+    hasError: {
+      description: "Indicates the input has an error",
+      control: "boolean",
+    },
+    hasWarning: {
+      description: "Indicates the input has a warning",
+      control: "boolean",
+    },
+    scale: {
+      description: "Makes the input take full width",
+      control: "boolean",
+    },
+    withBorder: {
+      description: "Shows border around the input",
+      control: "boolean",
+    },
+    isBold: {
+      description: "Sets font weight to 600",
+      control: "boolean",
+    },
+    maxLength: {
+      description: "Maximum length of input value",
+      control: "number",
+    },
+  },
 } satisfies Meta<typeof TextInput>;
 
 type Story = StoryObj<typeof TextInput>;
@@ -106,205 +106,205 @@ type Story = StoryObj<typeof TextInput>;
 export default meta;
 
 const Template = ({
-	onChange,
-	value,
-	type,
-	placeholder,
-	size,
-	isDisabled,
-	isReadOnly,
-	hasError,
-	hasWarning,
-	scale,
-	withBorder,
-	maxLength,
-	autoComplete,
-	tabIndex,
-	mask,
-	guide,
-	keepCharPositions,
+  onChange,
+  value,
+  type,
+  placeholder,
+  size,
+  isDisabled,
+  isReadOnly,
+  hasError,
+  hasWarning,
+  scale,
+  withBorder,
+  maxLength,
+  autoComplete,
+  tabIndex,
+  mask,
+  guide,
+  keepCharPositions,
 }: TextInputProps) => {
-	const [val, setValue] = useState(value);
+  const [val, setValue] = useState(value);
 
-	return (
-		<TextInput
-			type={type || InputType.text}
-			placeholder={placeholder || "Enter text here"}
-			value={val}
-			onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-				setValue(e.target.value);
-				onChange?.(e);
-			}}
-			size={size}
-			isDisabled={isDisabled}
-			isReadOnly={isReadOnly}
-			hasError={hasError}
-			hasWarning={hasWarning}
-			scale={scale}
-			withBorder={withBorder}
-			maxLength={maxLength}
-			autoComplete={autoComplete}
-			tabIndex={tabIndex}
-			mask={mask}
-			guide={guide}
-			keepCharPositions={keepCharPositions}
-		/>
-	);
+  return (
+    <TextInput
+      type={type || InputType.text}
+      placeholder={placeholder || "Enter text here"}
+      value={val}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value);
+        onChange?.(e);
+      }}
+      size={size}
+      isDisabled={isDisabled}
+      isReadOnly={isReadOnly}
+      hasError={hasError}
+      hasWarning={hasWarning}
+      scale={scale}
+      withBorder={withBorder}
+      maxLength={maxLength}
+      autoComplete={autoComplete}
+      tabIndex={tabIndex}
+      mask={mask}
+      guide={guide}
+      keepCharPositions={keepCharPositions}
+    />
+  );
 };
 
 export const Default: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		placeholder: "Enter text here",
-		maxLength: 255,
-		size: InputSize.base,
-		type: InputType.text,
-		isAutoFocussed: false,
-		isDisabled: false,
-		isReadOnly: false,
-		hasError: false,
-		hasWarning: false,
-		scale: false,
-		autoComplete: "off",
-		tabIndex: 1,
-		withBorder: true,
-		value: "",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    placeholder: "Enter text here",
+    maxLength: 255,
+    size: InputSize.base,
+    type: InputType.text,
+    isAutoFocussed: false,
+    isDisabled: false,
+    isReadOnly: false,
+    hasError: false,
+    hasWarning: false,
+    scale: false,
+    autoComplete: "off",
+    tabIndex: 1,
+    withBorder: true,
+    value: "",
+  },
 };
 
 export const WithMask: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		mask: [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/],
-		placeholder: "DD/MM/YYYY",
-		guide: true,
-		keepCharPositions: true,
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    mask: [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/],
+    placeholder: "DD/MM/YYYY",
+    guide: true,
+    keepCharPositions: true,
+  },
 };
 
 export const WithError: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		hasError: true,
-		value: "Invalid input",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    hasError: true,
+    value: "Invalid input",
+  },
 };
 
 export const WithWarning: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		hasWarning: true,
-		value: "Warning state",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    hasWarning: true,
+    value: "Warning state",
+  },
 };
 
 export const Disabled: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		isDisabled: true,
-		value: "Disabled input",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    isDisabled: true,
+    value: "Disabled input",
+  },
 };
 
 export const ReadOnly: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		isReadOnly: true,
-		value: "Read only input",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    isReadOnly: true,
+    value: "Read only input",
+  },
 };
 
 export const Password: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		type: InputType.password,
-		placeholder: "Enter password",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    type: InputType.password,
+    placeholder: "Enter password",
+  },
 };
 
 export const Scaled: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		scale: true,
-		value: "Scaled input",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    scale: true,
+    value: "Scaled input",
+  },
 };
 
 export const Large: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		size: InputSize.large,
-		placeholder: "Large input",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    size: InputSize.large,
+    placeholder: "Large input",
+  },
 };
 
 export const Middle: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		size: InputSize.middle,
-		placeholder: "Middle input",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    size: InputSize.middle,
+    placeholder: "Middle input",
+  },
 };
 
 export const Bold: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		isBold: true,
-		value: "Bold text input",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    isBold: true,
+    value: "Bold text input",
+  },
 };
 
 export const Email: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		type: InputType.email,
-		placeholder: "Enter email address",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    type: InputType.email,
+    placeholder: "Enter email address",
+  },
 };
 
 export const Tel: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		type: InputType.tel,
-		placeholder: "Enter phone number",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    type: InputType.tel,
+    placeholder: "Enter phone number",
+  },
 };
 
 export const Search: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		type: InputType.search,
-		placeholder: "Search...",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    type: InputType.search,
+    placeholder: "Search...",
+  },
 };
 
 export const NumberInput: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		type: InputType.number,
-		placeholder: "Enter number",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    type: InputType.number,
+    placeholder: "Enter number",
+  },
 };
 
 export const WithoutBorder: Story = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		withBorder: false,
-		value: "Input without border",
-	},
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    withBorder: false,
+    value: "Input without border",
+  },
 };

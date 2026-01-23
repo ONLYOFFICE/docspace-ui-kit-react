@@ -30,55 +30,55 @@ import type { CheckboxProps } from "./Checkbox.types";
 import { Checkbox } from ".";
 
 const meta = {
-	title: "Form Controls/Checkbox",
-	component: Checkbox,
-	parameters: {
-		docs: {
-			description: {
-				component:
-					"A customizable checkbox input component with support for checked, indeterminate, disabled, and error states.",
-			},
-		},
-	},
-	argTypes: {
-		onChange: {
-			action: "onChange",
-			description: "Callback fired when the checkbox state changes",
-		},
-		isChecked: {
-			control: { type: "boolean" },
-			description: "Controls the checked state of the checkbox",
-		},
-		isDisabled: {
-			control: { type: "boolean" },
-			description: "Disables the checkbox input",
-		},
-		isIndeterminate: {
-			control: { type: "boolean" },
-			description:
-				"Shows a rectangle instead of a checkmark (partial selection)",
-		},
-		label: {
-			control: { type: "text" },
-			description: "Text label displayed next to the checkbox",
-		},
-		hasError: {
-			control: { type: "boolean" },
-			description: "Displays the checkbox in an error state",
-		},
-		title: {
-			control: { type: "text" },
-			description: "Tooltip text shown on hover",
-		},
-		truncate: {
-			control: { type: "boolean" },
-			description: "Whether to truncate the label text if it overflows",
-		},
-		tabIndex: {
-			control: { type: "number" },
-			description: "Tab order of the checkbox",
-		},
-	},
+  title: "Components/Form Controls/Checkbox",
+  component: Checkbox,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "A customizable checkbox input component with support for checked, indeterminate, disabled, and error states.",
+      },
+    },
+  },
+  argTypes: {
+    onChange: {
+      action: "onChange",
+      description: "Callback fired when the checkbox state changes",
+    },
+    isChecked: {
+      control: { type: "boolean" },
+      description: "Controls the checked state of the checkbox",
+    },
+    isDisabled: {
+      control: { type: "boolean" },
+      description: "Disables the checkbox input",
+    },
+    isIndeterminate: {
+      control: { type: "boolean" },
+      description:
+        "Shows a rectangle instead of a checkmark (partial selection)",
+    },
+    label: {
+      control: { type: "text" },
+      description: "Text label displayed next to the checkbox",
+    },
+    hasError: {
+      control: { type: "boolean" },
+      description: "Displays the checkbox in an error state",
+    },
+    title: {
+      control: { type: "text" },
+      description: "Tooltip text shown on hover",
+    },
+    truncate: {
+      control: { type: "boolean" },
+      description: "Whether to truncate the label text if it overflows",
+    },
+    tabIndex: {
+      control: { type: "number" },
+      description: "Tab order of the checkbox",
+    },
+  },
 } satisfies Meta<typeof Checkbox>;
 
 type Story = StoryObj<typeof Checkbox>;
@@ -87,84 +87,84 @@ export default meta;
 const CheckboxTemplate = (args: CheckboxProps) => <Checkbox {...args} />;
 
 export const Default: Story = {
-	render: CheckboxTemplate,
-	args: {
-		label: "Checkbox",
-	},
+  render: CheckboxTemplate,
+  args: {
+    label: "Checkbox",
+  },
 };
 
 export const Checked: Story = {
-	render: CheckboxTemplate,
-	args: {
-		isChecked: true,
-		label: "Checked Checkbox",
-	},
+  render: CheckboxTemplate,
+  args: {
+    isChecked: true,
+    label: "Checked Checkbox",
+  },
 };
 
 export const Disabled: Story = {
-	render: CheckboxTemplate,
-	args: {
-		isDisabled: true,
-		label: "Disabled Checkbox",
-	},
+  render: CheckboxTemplate,
+  args: {
+    isDisabled: true,
+    label: "Disabled Checkbox",
+  },
 };
 
 export const DisabledChecked: Story = {
-	render: CheckboxTemplate,
-	args: {
-		isDisabled: true,
-		isChecked: true,
-		label: "Disabled Checked Checkbox",
-	},
+  render: CheckboxTemplate,
+  args: {
+    isDisabled: true,
+    isChecked: true,
+    label: "Disabled Checked Checkbox",
+  },
 };
 
 export const Indeterminate: Story = {
-	render: CheckboxTemplate,
-	args: {
-		isIndeterminate: true,
-		label: "Indeterminate Checkbox",
-	},
+  render: CheckboxTemplate,
+  args: {
+    isIndeterminate: true,
+    label: "Indeterminate Checkbox",
+  },
 };
 
 export const DisabledIndeterminate: Story = {
-	render: CheckboxTemplate,
-	args: {
-		isDisabled: true,
-		isIndeterminate: true,
-		label: "Disabled Indeterminate Checkbox",
-	},
+  render: CheckboxTemplate,
+  args: {
+    isDisabled: true,
+    isIndeterminate: true,
+    label: "Disabled Indeterminate Checkbox",
+  },
 };
 
 export const WithError: Story = {
-	render: CheckboxTemplate,
-	args: {
-		label: "Checkbox with Error",
-		hasError: true,
-	},
+  render: CheckboxTemplate,
+  args: {
+    label: "Checkbox with Error",
+    hasError: true,
+  },
 };
 
 export const CheckedWithError: Story = {
-	render: CheckboxTemplate,
-	args: {
-		label: "Checked Checkbox with Error",
-		isChecked: true,
-		hasError: true,
-	},
+  render: CheckboxTemplate,
+  args: {
+    label: "Checked Checkbox with Error",
+    isChecked: true,
+    hasError: true,
+  },
 };
 
 export const WithLongLabel: Story = {
-	render: CheckboxTemplate,
-	args: {
-		label:
-			"This is a very long label that might need to be truncated if the container is too small",
-		truncate: true,
-	},
+  render: CheckboxTemplate,
+  args: {
+    label:
+      "This is a very long label that might need to be truncated if the container is too small",
+    truncate: true,
+  },
 };
 
 export const WithTitle: Story = {
-	render: CheckboxTemplate,
-	args: {
-		label: "Hover me",
-		title: "This is a tooltip that appears on hover",
-	},
+  render: CheckboxTemplate,
+  args: {
+    label: "Hover me",
+    title: "This is a tooltip that appears on hover",
+  },
 };
