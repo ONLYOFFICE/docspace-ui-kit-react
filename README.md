@@ -18,12 +18,13 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox } from "@docspace/ui-kit";
+import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
 
 ```js
+import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
 import { Label } from "@docspace/ui-kit/components/label";
 import { Text } from "@docspace/ui-kit/components/text";
 import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
@@ -44,11 +45,12 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 
 | Component | Description |
 |-----------|-------------|
-| [Label](./components/label/README.md) | Form label with required indicator and tooltip support |
-| [Text](./components/text/README.md) | Typography component with various styling options |
-| [Link](./components/link/README.md) | Hyperlink component with page and action types |
-| [Portal](./components/portal/README.md) | Renders children into a different DOM node |
-| [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
-| [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |
-| [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
+| [Button](./components/button/README.md) | Versatile button component with primary/secondary variants, multiple sizes, loading states, and tooltip support |
 | [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |
+| [Label](./components/label/README.md) | Form label with required indicator and tooltip support |
+| [Link](./components/link/README.md) | Hyperlink component with page and action types |
+| [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
+| [Portal](./components/portal/README.md) | Renders children into a different DOM node |
+| [Text](./components/text/README.md) | Typography component with various styling options |
+| [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |
+| [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
