@@ -27,3 +27,5 @@
  */
 
 export * from "./InterfaceDirectionContext";
+
+export * from "./ThemeContext";

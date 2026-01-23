@@ -27,11 +27,15 @@
   "include": [
     "index.ts",
     "components/**/*",
+    "context/**/*",
+    "hooks/**/*",
     "ui/**/*",
     "themes/**/*",
     "types/**/*",
     "test/**/*",
-    "assets/**/*"
+    "assets/**/*",
+    "utils/**/*",
+    "styles/**/*"
   ],
   "exclude": [
     "node_modules",

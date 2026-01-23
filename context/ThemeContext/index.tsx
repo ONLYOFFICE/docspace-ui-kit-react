@@ -24,22 +24,50 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
+import { createContext, use, type ReactNode } from "react";
 
-export * from "./checkbox";
+export type TTheme = "Base" | "Dark";
 
-export * from "./label";
+type TThemeContextValue = {
+  theme: TTheme;
+  currentColorScheme?: TColorScheme;
+};
 
-export * from "./portal";
+type ThemeProviderProps = TThemeContextValue & {
+  children: ReactNode;
+};
 
-export * from "./tooltip";
+export type TColorScheme = {
+  id: number;
+  main: {
+    accent: string;
+    buttons: string;
+  };
+  name: string;
+  text: {
+    accent: string;
+    buttons: string;
+  };
+};
 
-export * from "./link";
+export const ThemeContext = createContext<TThemeContextValue>({
+  theme: "Base",
+});
 
-export * from "./text";
+export const ThemeContextProvider = ({
+  theme,
+  currentColorScheme,
+  children,
+}: ThemeProviderProps) => {
+  return (
+    <ThemeContext value={{ theme, currentColorScheme }}>
+      {children}
+    </ThemeContext>
+  );
+};
 
-export * from "./text-input";
+export const useTheme = () => {
+  const { theme, currentColorScheme } = use(ThemeContext);
 
-export * from "./loader";
-
-export * from "./theme-provider";
+  return { theme, isBase: theme === "Base", currentColorScheme };
+};

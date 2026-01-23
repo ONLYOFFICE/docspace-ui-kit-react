@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox } from "@docspace/ui-kit";
+import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -33,6 +33,13 @@ import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/compone
 import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
 import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
 import { Checkbox } from "@docspace/ui-kit/components/checkbox";
+import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
+```
+
+### Import contexts and hooks
+
+```js
+import { ThemeProvider, useTheme } from "@docspace/ui-kit/context/ThemeContext";
 ```
 
 ### Import utilities
@@ -53,4 +60,11 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
 | [Text](./components/text/README.md) | Typography component with various styling options |
 | [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |
+| [ThemeProvider](./components/theme-provider/README.md) | Provider component for theme management with styled-components integration |
 | [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
+
+## Contexts
+
+| Context | Description |
+|---------|-------------|
+| [ThemeContext](./context/ThemeContext/README.md) | Theme management context with support for Base/Dark themes and custom color schemes |
