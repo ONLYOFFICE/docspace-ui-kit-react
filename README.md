@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox } from "@docspace/ui-kit";
+import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, Scrollbar } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -33,6 +33,7 @@ import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/compone
 import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
 import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
 import { Checkbox } from "@docspace/ui-kit/components/checkbox";
+import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
 ```
 
 ### Import utilities
@@ -51,6 +52,7 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
+| [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
 | [Text](./components/text/README.md) | Typography component with various styling options |
 | [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |
 | [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
