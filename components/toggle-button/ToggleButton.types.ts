@@ -24,28 +24,42 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
+import type { TextProps } from "../text";
 
-export * from "./checkbox";
+type PickedTextProps = Pick<TextProps, "fontWeight" | "fontSize">;
 
-export * from "./label";
+type PickedHtmlElementProps = Pick<
+  React.HTMLAttributes<HTMLElement>,
+  "id" | "className" | "style"
+>;
 
-export * from "./portal";
+type PickedInputProps = Pick<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "name" | "onChange"
+>;
 
-export * from "./tooltip";
+/** Props for the toggle icon SVG component */
+export type ToggleIconProps = Pick<
+  ToggleButtonProps,
+  "isChecked" | "isLoading" | "noAnimation"
+>;
 
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
+/** Props for the main ToggleButton component */
+export type ToggleButtonProps = PickedTextProps &
+  PickedHtmlElementProps &
+  PickedInputProps & {
+    /** Label text to display next to the toggle */
+    label?: string;
+    /** Whether the toggle is in checked state */
+    isChecked?: boolean;
+    /** Whether the toggle is disabled */
+    isDisabled?: boolean;
+    /** Whether the toggle is in loading state */
+    isLoading?: boolean;
+    /** Whether animations are disabled */
+    noAnimation?: boolean;
+    /** Data test id for the toggle button */
+    dataTestId?: string;
+    /** Data tooltip id for the toggle button */
+    dataTooltipId?: string;
+  };
