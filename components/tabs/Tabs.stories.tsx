@@ -24,32 +24,65 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
+import { Meta, StoryObj } from "@storybook/react";
+import { useState } from "react";
+import { Tabs } from ".";
+import { data } from "./data";
+import { TabsProps, TTabItem } from "./Tabs.types";
+import { TabsTypes } from "./Tabs.enums";
 
-export * from "./checkbox";
+const meta = {
+  title: "Data display/Tabs",
+  component: Tabs,
+} satisfies Meta<typeof Tabs>;
+type Story = StoryObj<typeof meta>;
 
-export * from "./label";
+export default meta;
 
-export * from "./portal";
+const Wrapper = ({ children }: { children: React.ReactNode }) => (
+  <div
+    style={{
+      height: "170px",
+    }}
+  >
+    {children}
+  </div>
+);
 
-export * from "./tooltip";
+const Template = (args: TabsProps) => {
+  const { onSelect, selectedItemId, ...rest } = args;
+  const [selectedId, setSelectedId] = useState(selectedItemId);
 
-export * from "./link";
+  const handleSelect = (item: TTabItem) => {
+    setSelectedId(item.id);
+    onSelect?.(item);
+  };
 
-export * from "./text";
+  return (
+    <Wrapper>
+      <Tabs {...rest} selectedItemId={selectedId} onSelect={handleSelect} />
+      <div style={{ marginTop: "20px" }}>
+        Selected tab: {data.find((item) => item.id === selectedId)?.name}
+      </div>
+    </Wrapper>
+  );
+};
 
-export * from "./text-input";
+export const Default: Story = {
+  render: (args) => <Template {...args} />,
+  args: {
+    items: data,
+    selectedItemId: data[0].id,
+    onSelect: () => {},
+  },
+};
 
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./tabs";
+export const Secondary: Story = {
+  render: (args) => <Template {...args} />,
+  args: {
+    items: data,
+    type: TabsTypes.Secondary,
+    selectedItemId: data[0].id,
+    onSelect: () => {},
+  },
+};

@@ -18,38 +18,47 @@
 //
 // Pursuant to Section 7(b) of the License you must retain the original Product logo when
 // distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
+// trademark law for use of our trademarks.s
 //
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
+import { useEffect, useState, useRef, RefObject } from "react";
 
-export * from "./checkbox";
+import { ScrollbarType } from "@docspace/ui-kit/components/scrollbar";
 
-export * from "./label";
+export const useViewTab = (
+  containerRef: RefObject<ScrollbarType | null>,
+  tabRef: RefObject<HTMLDivElement | null>,
+  index: number,
+) => {
+  const [isViewTab, setIsViewTab] = useState<boolean>(true);
+  const observerRef = useRef<IntersectionObserver>(undefined);
 
-export * from "./portal";
+  useEffect(() => {
+    const container = containerRef.current?.scrollerElement;
+    const trackedElement = tabRef.current?.children[index];
+    if (!container || !trackedElement) return;
 
-export * from "./tooltip";
+    const observerCallback: IntersectionObserverCallback = ([entry]) => {
+      setIsViewTab(entry.isIntersecting);
+    };
 
-export * from "./link";
+    observerRef.current = new IntersectionObserver(observerCallback, {
+      root: container,
+      rootMargin: "4px",
+      threshold: 1,
+    });
 
-export * from "./text";
+    observerRef.current.observe(trackedElement);
 
-export * from "./text-input";
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.unobserve(trackedElement);
+      }
+    };
+  }, [containerRef, index, tabRef]);
 
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./tabs";
+  return isViewTab;
+};

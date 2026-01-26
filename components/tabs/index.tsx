@@ -24,32 +24,16 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
+import { TabsTypes } from "./Tabs.enums";
+import { SecondaryTabs } from "./SecondaryTabs";
+import { PrimaryTabs } from "./PrimaryTabs";
+import { type TTabItem, type TabsProps } from "./Tabs.types";
 
-export * from "./checkbox";
+const Tabs = (props: TabsProps) => {
+  if (props?.type === TabsTypes.Secondary) return <SecondaryTabs {...props} />;
+  return <PrimaryTabs {...props} />;
+};
 
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./tabs";
+export { Tabs };
+export { TabsTypes };
+export { TTabItem, TabsProps };
