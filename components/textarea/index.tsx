@@ -24,8 +24,6 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
-
-export * from "./uuid";
-
-export * from "./common-icons-style";
+export { Textarea } from "./Textarea";
+export type { TextareaProps } from "./Textarea.types";
+export { isJSON, beautifyJSON, jsonify } from "./Textarea.utils";
