@@ -45,6 +45,38 @@ import { TabItem } from "@docspace/ui-kit/components/tab-item";
   onSelect={handleTabSelect}
 />
 
+// Disabled tab
+<TabItem
+  label="Disabled Tab"
+  isActive={false}
+  isDisabled={true}
+  onSelect={handleTabSelect}
+/>
+
+// With custom data-testid
+<TabItem
+  label="Custom Test ID"
+  isActive={false}
+  dataTestId="custom-tab-item"
+  onSelect={handleTabSelect}
+/>
+
+// With multi-select enabled
+<TabItem
+  label="Multi-select Tab"
+  isActive={false}
+  withMultiSelect={true}
+  onSelect={handleTabSelect}
+/>
+
+// With lock last selection (prevents deselecting when active)
+<TabItem
+  label="Locked Tab"
+  isActive={true}
+  lockLastSelection={true}
+  onSelect={handleTabSelect}
+/>
+
 // Tab group example
 const TabGroup = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -73,12 +105,17 @@ const TabGroup = () => {
 
 ## Properties
 
-| Prop        | Type                                | Default | Description                                         |
-| ----------- | ----------------------------------- | ------- | --------------------------------------------------- |
-| `label`     | `string` \| `React.ReactNode`       | -       | Text or React node to display as the tab label      |
-| `isActive`  | `boolean`                           | `false` | When true, applies active styling to the tab        |
-| `onSelect`  | `(event: React.MouseEvent) => void` | -       | Callback function triggered when the tab is clicked |
-| `className` | `string`                            | -       | Optional CSS class name for custom styling          |
+| Prop                | Type                                | Default | Description                                                      |
+| ------------------- | ----------------------------------- | ------- | ---------------------------------------------------------------- |
+| `label`             | `string` \| `React.ReactNode`       | -       | Text or React node to display as the tab label                   |
+| `isActive`          | `boolean`                           | `false` | When true, applies active styling to the tab                     |
+| `onSelect`          | `(event: React.MouseEvent) => void` | -       | Callback function triggered when the tab is clicked              |
+| `isDisabled`        | `boolean`                           | -       | When true, disables the tab and prevents interaction             |
+| `className`         | `string`                            | -       | Optional CSS class name for custom styling                       |
+| `allowNoSelection`  | `boolean`                           | -       | Allows the tab to be deselected, resulting in no active tab      |
+| `withMultiSelect`   | `boolean`                           | `false` | Enables multi-select functionality                               |
+| `dataTestId`        | `string`                            | -       | Custom data-testid attribute for testing                         |
+| `lockLastSelection` | `boolean`                           | `false` | Prevents deselecting the tab when it's the last selected one     |
 
 ## Accessibility
 

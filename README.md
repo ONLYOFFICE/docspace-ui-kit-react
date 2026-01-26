@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, ToggleButton } from "@docspace/ui-kit";
+import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, TabItem, ToggleButton } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -34,6 +34,7 @@ import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/tex
 import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
 import { Checkbox } from "@docspace/ui-kit/components/checkbox";
 import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
+import { TabItem } from "@docspace/ui-kit/components/tab-item";
 import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
 import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
 ```
@@ -62,6 +63,7 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
+| [TabItem](./components/tab-item/README.md) | Tab navigation component with active states, multi-select, and disabled state support |
 | [Text](./components/text/README.md) | Typography component with various styling options |
 | [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |
 | [ThemeProvider](./components/theme-provider/README.md) | Provider component for theme management with styled-components integration |
