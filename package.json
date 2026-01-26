@@ -41,7 +41,9 @@
     "react-text-mask": "5.5.0",
     "react-tooltip": "5.28.0",
     "styled-components": "5.3.11",
-    "zoom-level": "2.5.0"
+    "zoom-level": "2.5.0",
+    "react-toastify": "10.0.6",
+    "react-device-detect": "2.2.3"
   },
   "devDependencies": {
     "@babel/core": "7.25.8",
