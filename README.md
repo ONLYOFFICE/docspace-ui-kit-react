@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar } from "@docspace/ui-kit";
+import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, ToggleButton } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -35,6 +35,7 @@ import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
 import { Checkbox } from "@docspace/ui-kit/components/checkbox";
 import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
 import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
+import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
 ```
 
 ### Import contexts and hooks
@@ -64,6 +65,7 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 | [Text](./components/text/README.md) | Typography component with various styling options |
 | [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |
 | [ThemeProvider](./components/theme-provider/README.md) | Provider component for theme management with styled-components integration |
+| [ToggleButton](./components/toggle-button/README.md) | Customizable toggle button with loading and disabled states |
 | [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
 
 ## Contexts
