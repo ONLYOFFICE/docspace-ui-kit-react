@@ -121,7 +121,14 @@ export const ThemeProvider = ({
         theme={theme.isBase ? "Base" : "Dark"}
         currentColorScheme={currentColorScheme}
       >
-        <Provider theme={{ ...theme, currentColorScheme } as DefaultTheme}>
+        <Provider
+          theme={
+            {
+              ...theme,
+              currentColorScheme,
+            } as DefaultTheme
+          }
+        >
           {children}
         </Provider>
       </CustomThemeProvider>

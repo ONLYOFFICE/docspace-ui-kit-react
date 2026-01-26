@@ -4,10 +4,12 @@ $font-size: 13px;
 
 .light {
   --background-color: #{$white};
+  --text-color:#{$black};
 }
 
 .dark {
   --background-color: #{$black};
+  --text-color:#{$white};
 }
 
 html,
