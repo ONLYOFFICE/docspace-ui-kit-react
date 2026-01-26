@@ -24,30 +24,60 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./button";
+@use "../../styles/mixins";
+@use "../../styles/variables/colors" as *;
 
-export * from "./checkbox";
+:global(.dark) {
+  .tabItem {
+    --tab-item-selected-background-color: #{$white};
+    --tab-item-selected-item-color: #{$black};
+    --tab-item-tag-border: 1px solid #{$gray-dark-strong};
+  }
+}
 
-export * from "./label";
+.tabItem {
+  --tab-item-selected-background-color: var(--accent-main, #{$light-blue-main});
+  --tab-item-selected-item-color: #{$white};
+  --tab-item-tag-border: 1px solid #{$gray-light-mid};
 
-export * from "./portal";
+  max-width: 100%;
 
-export * from "./tooltip";
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 
-export * from "./link";
+  border: var(--tab-item-tag-border);
+  border-radius: 16px;
 
-export * from "./text";
+  box-sizing: border-box;
 
-export * from "./text-input";
+  padding: 4px 16px;
 
-export * from "./loader";
+  cursor: pointer;
 
-export * from "./theme-provider";
+  &.active {
+    background: var(--tab-item-selected-background-color);
+    border-color: var(--tab-item-selected-background-color);
 
-export * from "./scrollbar";
+    &:hover {
+      background: var(--tab-item-selected-background-color);
+      border-color: var(--tab-item-selected-background-color);
+    }
+  }
 
-export * from "./icon-button";
+  &.disabled:not(&.active) {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 
-export * from "./toggle-button";
+  --webkit-tap-highlight-color: #{$tap-highlight};
+}
 
-export * from "./tab-item";
+.tabItemText {
+  height: 20px;
+
+  &.active {
+    font-weight: 600;
+    color: var(--tab-item-selected-item-color);
+  }
+}
