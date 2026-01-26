@@ -59,13 +59,36 @@ The TabItem component includes the following ARIA attributes for improved access
       description: "Whether the tab is currently active",
       control: "boolean",
     },
+    isDisabled: {
+      description:
+        "Determines if the tab is disabled and cannot be interacted with",
+      control: "boolean",
+    },
     onSelect: {
       description: "Callback function when tab is selected",
       action: "selected",
     },
+    allowNoSelection: {
+      description:
+        "Allows the tab to be deselected, resulting in no active tab",
+      control: "boolean",
+    },
+    withMultiSelect: {
+      description: "Enables multi-select functionality",
+      control: "boolean",
+    },
     className: {
       description: "Additional CSS class for the tab",
       control: "text",
+    },
+    dataTestId: {
+      description: "Custom data-testid attribute for testing",
+      control: "text",
+    },
+    lockLastSelection: {
+      description:
+        "Prevents deselecting the tab when it's the last selected one",
+      control: "boolean",
     },
   },
 } satisfies Meta<typeof TabItem>;
@@ -81,7 +104,6 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => {
         display: "flex",
         gap: "16px",
         padding: "16px",
-        backgroundColor: "#F8F9F9",
         borderRadius: "6px",
       }}
     >
@@ -113,6 +135,14 @@ export const WithReactNodeAsLabel: Story = {
       </div>
     ),
     isActive: false,
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    label: "Disabled Tab",
+    isActive: false,
+    isDisabled: true,
   },
 };
 
