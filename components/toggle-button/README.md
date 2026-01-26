@@ -5,7 +5,7 @@ A customizable toggle button component that supports various states and styling 
 ## Usage
 
 ```jsx
-import { ToggleButton } from "@docspace/components";
+import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
 
 const MyComponent = () => {
   const [isChecked, setIsChecked] = React.useState(false);
@@ -40,6 +40,8 @@ const MyComponent = () => {
 | onChange    | (e: ChangeEvent<HTMLInputElement>) => void | -    | Change event handler          |
 | fontWeight  | number                                  | -       | Label font weight              |
 | fontSize    | string                                  | -       | Label font size                |
+| dataTestId  | string                                  | -       | Test ID for the component      |
+| dataTooltipId | string                                | -       | Tooltip ID for the component   |
 
 ## Styling
 
