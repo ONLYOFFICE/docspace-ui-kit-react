@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider } from "@docspace/ui-kit";
+import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -33,6 +33,7 @@ import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/compone
 import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
 import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
 import { Checkbox } from "@docspace/ui-kit/components/checkbox";
+import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
 import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
 ```
 
@@ -40,6 +41,7 @@ import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
 
 ```js
 import { ThemeProvider, useTheme } from "@docspace/ui-kit/context/ThemeContext";
+import { InterfaceDirectionProvider, useInterfaceDirection } from "@docspace/ui-kit/context/InterfaceDirectionContext";
 ```
 
 ### Import utilities
@@ -58,6 +60,7 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
+| [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
 | [Text](./components/text/README.md) | Typography component with various styling options |
 | [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |
 | [ThemeProvider](./components/theme-provider/README.md) | Provider component for theme management with styled-components integration |
@@ -68,3 +71,4 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 | Context | Description |
 |---------|-------------|
 | [ThemeContext](./context/ThemeContext/README.md) | Theme management context with support for Base/Dark themes and custom color schemes |
+| [InterfaceDirectionContext](./context/InterfaceDirectionContext/README.md) | Interface direction context for managing LTR/RTL layout support |

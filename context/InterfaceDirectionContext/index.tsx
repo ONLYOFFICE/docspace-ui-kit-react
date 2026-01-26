@@ -25,25 +25,33 @@
  * content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
-import { createContext, type ReactNode } from "react";
+import { createContext, type ReactNode, use } from "react";
 
 export type TInterfaceDirection = "rtl" | "ltr";
 
 type InterfaceDirectionProviderProps = {
-	interfaceDirection: TInterfaceDirection;
-	children: ReactNode;
+  interfaceDirection: TInterfaceDirection;
+  children: ReactNode;
 };
 
 export const InterfaceDirectionContext =
-	createContext<TInterfaceDirection>("ltr");
+  createContext<TInterfaceDirection>("ltr");
 
 export const InterfaceDirectionProvider = ({
-	interfaceDirection,
-	children,
+  interfaceDirection,
+  children,
 }: InterfaceDirectionProviderProps) => {
-	return (
-		<InterfaceDirectionContext value={interfaceDirection}>
-			{children}
-		</InterfaceDirectionContext>
-	);
+  return (
+    <InterfaceDirectionContext value={interfaceDirection}>
+      {children}
+    </InterfaceDirectionContext>
+  );
+};
+
+export const useInterfaceDirection = () => {
+  const interfaceDirection = use(InterfaceDirectionContext);
+
+  const isRTL = interfaceDirection === "rtl";
+
+  return { interfaceDirection, isRTL };
 };
