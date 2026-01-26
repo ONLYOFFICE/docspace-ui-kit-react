@@ -103,4 +103,57 @@ describe("<TabItem />", () => {
     expect(screen.getByTestId("custom-label")).toBeInTheDocument();
     expect(screen.getByText("Custom Label")).toBeInTheDocument();
   });
+
+  it("does not call onSelect when disabled", () => {
+    render(<TabItem {...baseProps} isDisabled />);
+
+    const tabItem = screen.getByTestId("tab-item");
+    expect(tabItem).toHaveClass(styles.disabled);
+
+    fireEvent.click(tabItem);
+
+    expect(baseProps.onSelect).not.toHaveBeenCalled();
+  });
+
+  it("renders with custom dataTestId", () => {
+    render(<TabItem {...baseProps} dataTestId="custom-test-id" />);
+
+    const tabItem = screen.getByTestId("custom-test-id");
+    expect(tabItem).toBeInTheDocument();
+  });
+
+  it("does not change state when allowNoSelection is true", () => {
+    render(<TabItem {...baseProps} allowNoSelection />);
+
+    const tabItem = screen.getByTestId("tab-item");
+    expect(tabItem).not.toHaveClass(styles.active);
+
+    fireEvent.click(tabItem);
+
+    expect(tabItem).not.toHaveClass(styles.active);
+    expect(baseProps.onSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it("allows toggling when withMultiSelect is true", () => {
+    render(<TabItem {...baseProps} withMultiSelect />);
+
+    const tabItem = screen.getByTestId("tab-item");
+
+    fireEvent.click(tabItem);
+    expect(baseProps.onSelect).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(tabItem);
+    expect(baseProps.onSelect).toHaveBeenCalledTimes(2);
+  });
+
+  it("prevents deselection when lockLastSelection is true and tab is active", () => {
+    render(<TabItem {...baseProps} isActive lockLastSelection />);
+
+    const tabItem = screen.getByTestId("tab-item");
+    expect(tabItem).toHaveClass(styles.active);
+
+    fireEvent.click(tabItem);
+
+    expect(baseProps.onSelect).not.toHaveBeenCalled();
+  });
 });
