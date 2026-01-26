@@ -45,3 +45,5 @@ export * from "./loader";
 export * from "./theme-provider";
 
 export * from "./scrollbar";
+
+export * from "./icon-button";

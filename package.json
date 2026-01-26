@@ -1,6 +1,6 @@
 {
   "name": "@docspace/ui-kit",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "DocSpace UI Component Library",
   "private": "true",
   "scripts": {
@@ -96,5 +96,18 @@
     "type": "git",
     "url": "https://github.com/ONLYOFFICE/DocSpace-client.git",
     "directory": "libs/ui-kit"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js",
+    "types": "./dist/types/index.d.ts",
+    ".": {
+      "esm": "dist/esm/index.js",
+      "cjs": "dist/cjs/index.js",
+      "types": "dist/types/index.d.ts"
+    }
   }
 }
