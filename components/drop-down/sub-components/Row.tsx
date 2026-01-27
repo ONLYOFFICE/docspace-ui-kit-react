@@ -24,42 +24,33 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import { memo } from "react";
 
-export * from "./badge";
+import { DropDownItem } from "../../drop-down-item";
 
-export * from "./button";
+import type { RowProps } from "../DropDown.types";
 
-export * from "./backdrop";
+const Row = memo(({ data, index, style }: RowProps) => {
+  const { children, activedescendant, handleMouseMove } = data;
 
-export * from "./checkbox";
+  const option = Array.isArray(children) ? children[index] : null;
 
-export * from "./drop-down";
+  const optionStyle = option?.props?.style ?? {};
 
-export * from "./drop-down-item";
+  const newStyle = { ...style, ...optionStyle };
 
-export * from "./label";
+  return (
+    <DropDownItem
+      {...option?.props}
+      style={newStyle}
+      onMouseMove={() => {
+        handleMouseMove?.(index);
+      }}
+      isActiveDescendant={activedescendant === index}
+    />
+  );
+});
 
-export * from "./portal";
+Row.displayName = "Row";
 
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
+export { Row };

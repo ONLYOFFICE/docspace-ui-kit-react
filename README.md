@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, TabItem, ToggleButton } from "@docspace/ui-kit";
+import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, TabItem, ToggleButton, Badge, DropDownItem } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -37,6 +37,8 @@ import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
 import { TabItem } from "@docspace/ui-kit/components/tab-item";
 import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
 import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
+import { Badge } from "@docspace/ui-kit/components/badge";
+import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
 ```
 
 ### Import contexts and hooks
@@ -50,14 +52,19 @@ import { InterfaceDirectionProvider, useInterfaceDirection } from "@docspace/ui-
 
 ```js
 import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/utils";
+import commonIconsStyles, { IconSizeType, isIconSizeType } from "@docspace/ui-kit/utils/common-icons-style";
+import DomHelpers from "@docspace/ui-kit/utils/dom-helpers";
+import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 ```
 
 ## Components
 
 | Component | Description |
 |-----------|-------------|
+| [Badge](./components/badge/README.md) | Versatile badge for notifications, status markers, or interactive elements with various display modes |
 | [Button](./components/button/README.md) | Versatile button component with primary/secondary variants, multiple sizes, loading states, and tooltip support |
 | [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |
+| [DropDownItem](./components/drop-down-item/README.md) | Dropdown item for menus and lists with separator, header, submenu, and toggle support |
 | [Label](./components/label/README.md) | Form label with required indicator and tooltip support |
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
@@ -76,3 +83,13 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 |---------|-------------|
 | [ThemeContext](./context/ThemeContext/README.md) | Theme management context with support for Base/Dark themes and custom color schemes |
 | [InterfaceDirectionContext](./context/InterfaceDirectionContext/README.md) | Interface direction context for managing LTR/RTL layout support |
+
+## Utilities
+
+| Utility | Description |
+|---------|-------------|
+| [common-icons-style](./utils/common-icons-style/README.md) | Styled-components CSS helper for consistent icon sizing with `IconSizeType` enum |
+| [device](./utils/device/README.md) | Device detection utilities: `isMobile`, `isTablet`, `isDesktop`, `checkIsSSR` |
+| [dom-helpers](./utils/dom-helpers/README.md) | DOM utilities for viewport, element positioning, scrollbar width, and z-index management |
+| [use-click-outside](./utils/use-click-outside/README.md) | React hook for detecting clicks outside an element, useful for dropdowns and modals |
+| [uuid](./utils/uuid/README.md) | UUID v4 generation utility for unique identifiers |

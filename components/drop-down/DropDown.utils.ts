@@ -24,42 +24,55 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
 
-export * from "./badge";
+import { isTablet } from "../../utils";
 
-export * from "./button";
+const getItemHeight = (item: React.ReactElement) => {
+  const isTabletDevice = isTablet();
 
-export * from "./backdrop";
+  const height = (item?.props as { height?: number }).height ?? 32;
+  const heightTablet =
+    (item?.props as { heightTablet?: number }).heightTablet ?? 36;
 
-export * from "./checkbox";
+  if (item && (item.props as { isSeparator: boolean }).isSeparator) {
+    return isTabletDevice ? 16 : 12;
+  }
 
-export * from "./drop-down";
+  return isTabletDevice ? heightTablet : height;
+};
 
-export * from "./drop-down-item";
+const hideDisabledItems = (children: React.ReactNode) => {
+  if (React.Children.count(children) > 0) {
+    const enabledChildren = React.Children.map(children, (child) => {
+      const props =
+        child &&
+        React.isValidElement(child) &&
+        (child.props as { disabled?: boolean });
+      if (props && !props?.disabled) return child;
+    });
 
-export * from "./label";
+    const sizeEnabledChildren = enabledChildren?.length;
 
-export * from "./portal";
+    const cleanChildren = React.Children.map(
+      enabledChildren,
+      (child, index) => {
+        const props =
+          child &&
+          React.isValidElement(child) &&
+          (child.props as { isSeparator?: boolean });
+        if (props && !props?.isSeparator) return child;
+        if (
+          index !== 0 &&
+          sizeEnabledChildren &&
+          index !== sizeEnabledChildren - 1
+        )
+          return child;
+      },
+    );
 
-export * from "./tooltip";
+    return cleanChildren;
+  }
+};
 
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
+export { getItemHeight, hideDisabledItems };
