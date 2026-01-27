@@ -30,6 +30,8 @@ export * from "./button";
 
 export * from "./checkbox";
 
+export * from "./drop-down-item";
+
 export * from "./label";
 
 export * from "./portal";
