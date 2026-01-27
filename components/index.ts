@@ -63,3 +63,5 @@ export * from "./toggle-button";
 export * from "./tab-item";
 
 export * from "./toast";
+
+export * from "./textarea";

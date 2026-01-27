@@ -320,6 +320,8 @@ describe("<Avatar />", () => {
       render(
         <Avatar
           {...baseProps}
+          editing
+          hasAvatar
           noClick
           onChangeFile={onChangeFile}
           model={model}
@@ -368,6 +370,7 @@ describe("<Avatar />", () => {
       render(
         <Avatar
           {...baseProps}
+          editing
           hasAvatar={false}
           onChangeFile={onChangeFile}
           model={model}
