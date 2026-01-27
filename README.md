@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, TabItem, Tabs, ToggleButton, Badge, DropDownItem, Toast, toastr,Textarea } from "@docspace/ui-kit";
+import { Button, Label, Text, Heading, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, TabItem, Tabs, ToggleButton, Badge, DropDownItem, Toast, toastr, Textarea } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -27,6 +27,7 @@ import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox
 import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
 import { Label } from "@docspace/ui-kit/components/label";
 import { Text } from "@docspace/ui-kit/components/text";
+import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
 import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
 import { Portal } from "@docspace/ui-kit/components/portal";
 import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
@@ -68,6 +69,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [Button](./components/button/README.md) | Versatile button component with primary/secondary variants, multiple sizes, loading states, and tooltip support |
 | [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |
 | [DropDownItem](./components/drop-down-item/README.md) | Dropdown item for menus and lists with separator, header, submenu, and toggle support |
+| [Heading](./components/heading/README.md) | Heading text structured in levels with customizable sizes and types |
 | [Label](./components/label/README.md) | Form label with required indicator and tooltip support |
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
