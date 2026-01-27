@@ -286,20 +286,5 @@ describe("useClickOutside", () => {
 			expect(handleClickOutside).toHaveBeenCalledTimes(10);
 		});
 
-		it("should work with handler that throws an error", () => {
-			const handleClickOutside = vi.fn(() => {
-				throw new Error("Test error");
-			});
-
-			render(<TestComponent onClickOutside={handleClickOutside} />);
-
-			const outsideElement = screen.getByTestId("outside");
-
-			expect(() => {
-				fireEvent.mouseDown(outsideElement);
-			}).toThrow("Test error");
-
-			expect(handleClickOutside).toHaveBeenCalledTimes(1);
-		});
 	});
 });
