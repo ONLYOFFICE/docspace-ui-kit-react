@@ -24,40 +24,27 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./badge";
+import jsonBeautifier from "csvjson-json_beautifier";
 
-export * from "./button";
+export function isJSON(value: string): boolean {
+  if (typeof value !== "string") return false;
+  try {
+    const result = JSON.parse(value);
+    return typeof result === "object" && result !== null;
+  } catch {
+    return false;
+  }
+}
 
-export * from "./checkbox";
+export function beautifyJSON(jsonString: string) {
+  return jsonBeautifier(JSON.parse(jsonString), {
+    inlineShortArrays: true,
+  });
+}
 
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
+export function jsonify(value: string, isJSONField?: boolean) {
+  if (isJSONField && value && isJSON(value)) {
+    return beautifyJSON(value);
+  }
+  return value;
+}

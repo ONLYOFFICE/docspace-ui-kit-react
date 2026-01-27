@@ -24,40 +24,31 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./badge";
+import { ToastType } from "./Toast.enums";
 
-export * from "./button";
+export type ToastProps = {
+  /** Accepts class  */
+  className?: string;
+  /** Accepts id */
+  id?: string;
+  /** Accepts css style  */
+  style?: React.CSSProperties;
+  /** Title inside a toast */
+  title?: string;
+  /** Sets the color and icon of the toast */
+  type?: ToastType;
+  /** Any components or data inside a toast */
+  data?: React.ReactNode | string;
+  /** If false: toast disappeared after clicking on any area of toast. If true: toast disappeared after clicking on close button */
+  withCross?: boolean;
+  /** Time (in milliseconds) for showing your toast. Setting in 0 let you to show toast constantly until clicking on it */
+  timeout?: number;
 
-export * from "./checkbox";
+  isSSR?: boolean;
+};
 
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
+export type TData = {
+  response?: { data: { error: { message: string } } };
+  statusText?: string;
+  message?: string;
+};

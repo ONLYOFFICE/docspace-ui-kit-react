@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, TabItem, Tabs, ToggleButton } from "@docspace/ui-kit";
+import { Button, Label, Text, Link, Portal, Tooltip, TextInput, Textarea, Loader, Checkbox, ThemeProvider, Scrollbar, TabItem, Tabs, ToggleButton, Toast, toastr } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -31,6 +31,7 @@ import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
 import { Portal } from "@docspace/ui-kit/components/portal";
 import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
 import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
+import { Textarea } from "@docspace/ui-kit/components/textarea";
 import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
 import { Checkbox } from "@docspace/ui-kit/components/checkbox";
 import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
@@ -38,6 +39,7 @@ import { TabItem } from "@docspace/ui-kit/components/tab-item";
 import { Tabs, TabsTypes } from "@docspace/ui-kit/components/tabs";
 import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
 import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
+import { Toast, toastr } from "@docspace/ui-kit/components/toast";
 ```
 
 ### Import contexts and hooks
@@ -68,7 +70,9 @@ import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/util
 | [Tabs](./components/tabs/README.md) | Tab container component with primary/secondary themes, sticky positioning, and content management |
 | [Text](./components/text/README.md) | Typography component with various styling options |
 | [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |
+| [Textarea](./components/textarea/README.md) | Multi-line text input with JSON formatting, line numbers, and copy functionality |
 | [ThemeProvider](./components/theme-provider/README.md) | Provider component for theme management with styled-components integration |
+| [Toast](./components/toast/README.md) | Notification component with success, error, warning, and info variants |
 | [ToggleButton](./components/toggle-button/README.md) | Customizable toggle button with loading and disabled states |
 | [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
 
