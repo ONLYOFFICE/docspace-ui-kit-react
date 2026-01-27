@@ -24,52 +24,41 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import ContentLoader from "react-content-loader";
 
-export * from "./badge";
+import { LOADER_STYLE } from "../../constants";
+import type { CircleSkeletonProps } from "./Circle.types";
 
-export * from "./button";
+export type { CircleSkeletonProps };
 
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
+export const CircleSkeleton = ({
+  title = LOADER_STYLE.title,
+  x = "3",
+  y = "12",
+  radius = "12",
+  width = "100%",
+  height = "100%",
+  backgroundColor = LOADER_STYLE.backgroundColor,
+  foregroundColor = LOADER_STYLE.foregroundColor,
+  backgroundOpacity = LOADER_STYLE.backgroundOpacity,
+  foregroundOpacity = LOADER_STYLE.foregroundOpacity,
+  speed = LOADER_STYLE.speed,
+  animate = LOADER_STYLE.animate,
+  ...rest
+}: CircleSkeletonProps) => (
+  <ContentLoader
+    title={title}
+    width={width}
+    height={height}
+    backgroundColor={backgroundColor}
+    foregroundColor={foregroundColor}
+    backgroundOpacity={backgroundOpacity}
+    foregroundOpacity={foregroundOpacity}
+    speed={speed}
+    animate={animate}
+    {...rest}
+    data-testid="circle-skeleton"
+  >
+    <circle cx={x} cy={y} r={radius} />
+  </ContentLoader>
+);

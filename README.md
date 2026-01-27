@@ -18,7 +18,7 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Button, Label, Text, Heading, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, TabItem, Tabs, ToggleButton, Badge, DropDownItem, Toast, toastr, Textarea } from "@docspace/ui-kit";
+import { Button, Label, Text, Heading, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, TabItem, Tabs, ToggleButton, Badge, DropDownItem, Toast, toastr, Textarea, CircleSkeleton, RectangleSkeleton } from "@docspace/ui-kit";
 ```
 
 ### Import specific components
@@ -43,6 +43,8 @@ import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
 import { Badge } from "@docspace/ui-kit/components/badge";
 import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
 import { Toast, toastr } from "@docspace/ui-kit/components/toast";
+import { CircleSkeleton } from "@docspace/ui-kit/components/circle";
+import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
 ```
 
 ### Import contexts and hooks
@@ -68,12 +70,14 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [Badge](./components/badge/README.md) | Versatile badge for notifications, status markers, or interactive elements with various display modes |
 | [Button](./components/button/README.md) | Versatile button component with primary/secondary variants, multiple sizes, loading states, and tooltip support |
 | [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |
+| [CircleSkeleton](./components/circle/README.md) | Circular skeleton loader for avatar and icon placeholders |
 | [DropDownItem](./components/drop-down-item/README.md) | Dropdown item for menus and lists with separator, header, submenu, and toggle support |
 | [Heading](./components/heading/README.md) | Heading text structured in levels with customizable sizes and types |
 | [Label](./components/label/README.md) | Form label with required indicator and tooltip support |
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
+| [RectangleSkeleton](./components/rectangle/README.md) | Rectangular skeleton loader for text, buttons, and content placeholders |
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
 | [TabItem](./components/tab-item/README.md) | Tab navigation component with active states, multi-select, and disabled state support |
 | [Tabs](./components/tabs/README.md) | Tab container component with primary/secondary themes, sticky positioning, and content management |
