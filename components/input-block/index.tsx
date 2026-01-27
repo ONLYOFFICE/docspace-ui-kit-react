@@ -195,3 +195,4 @@ const InputBlock = React.memo(
 InputBlock.displayName = "InputBlock";
 
 export { InputBlock };
+export { type InputBlockProps };
