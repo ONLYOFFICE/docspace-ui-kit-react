@@ -26,13 +26,13 @@
 
 import { Meta, StoryObj } from "@storybook/react";
 
-import LogoUrl from "PUBLIC_DIR/images/logo/leftmenu.svg?url";
+import LogoUrl from "../../assets/mail.react.svg?url";
 
 import { MCPIconSize } from "./MCPIcon.enum";
 import { MCPIcon } from "./MCPIcon";
 
 const meta = {
-  title: "Base UI components/MCPIcon",
+  title: "Components/UI/MCPIcon",
   component: MCPIcon,
   parameters: {
     docs: {

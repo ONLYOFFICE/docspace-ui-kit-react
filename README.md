@@ -28,6 +28,7 @@ import {
   Label,
   Link,
   Loader,
+  MCPIcon,
   Portal,
   RectangleSkeleton,
   Scrollbar,
@@ -68,6 +69,7 @@ import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
 import { Toast, toastr } from "@docspace/ui-kit/components/toast";
 import { CircleSkeleton } from "@docspace/ui-kit/components/circle";
 import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
+import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
 ```
 
 ### Import contexts and hooks
@@ -99,6 +101,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [Label](./components/label/README.md) | Form label with required indicator and tooltip support |
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
+| [MCPIcon](./components/mcp-icon/README.md) | Icon component for MCP (Model Context Protocol) with image or text fallback |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
 | [RectangleSkeleton](./components/rectangle/README.md) | Rectangular skeleton loader for text, buttons, and content placeholders |
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |

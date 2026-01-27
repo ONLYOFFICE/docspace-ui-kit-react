@@ -73,3 +73,5 @@ export * from "./circle";
 export * from "./rectangle";
 
 export * from "./heading";
+
+export * from "./mcp-icon";
