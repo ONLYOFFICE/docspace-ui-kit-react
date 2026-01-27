@@ -5,7 +5,7 @@ A versatile input component that combines a text input with optional icon and ch
 ### Usage
 
 ```js
-import { InputBlock } from "@docspace/shared/components";
+import { InputBlock } from "@docspace/ui-kit/components/input-block";
 import SearchReactSvgUrl from "PUBLIC_DIR/images/search.react.svg?url";
 ```
 
@@ -75,7 +75,8 @@ const dateMask = [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/];
 | `hoverColor`          | `string`                     |    -     | -        | Icon hover color                                      |
 | `iconButtonClassName` | `string`                     |    -     | `""`     | Icon button class name                                |
 | `isIconFill`          | `boolean`                    |    -     | `false`  | Fill icon style                                       |
-| `size`                | `InputSize`                  |    -     | `base`   | Input size (`base`, `middle`, `big`, `huge`, `large`) |
+| `noIcon`              | `boolean`                    |    -     | `false`  | Hide icon                                             |
+| `size`                | `InputSize`                  |    -     | `base`   | Input size (`base`, `middle`, `large`)                |
 | `className`           | `string`                     |    -     | -        | Container class name                                  |
 | `style`               | `CSSProperties`              |    -     | -        | Container inline styles                               |
 | `onChange`            | `(e: ChangeEvent) => void`   |    -     | -        | Change event handler                                  |
@@ -86,13 +87,13 @@ const dateMask = [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/];
 | `onClick`             | `(e: MouseEvent) => void`    |    -     | -        | Click event handler                                   |
 | `children`            | `ReactNode`                  |    -     | -        | Child components                                      |
 | `forwardedRef`        | `Ref<HTMLInputElement>`      |    -     | -        | Forward ref to input element                          |
+| `testId`              | `string`                     |    -     | -        | Test identifier for testing                           |
+| `dataTestId`          | `string`                     |    -     | -        | Data test identifier for testing                      |
 
 ### Size Options
 
 The component supports the following sizes through the `size` prop:
 
-- `base` (default): 16px icon
-- `middle`: 18px icon
-- `big`: 21px icon
-- `huge`: 24px icon
-- `large`: 24px icon
+- `base` (default)
+- `middle`
+- `large`

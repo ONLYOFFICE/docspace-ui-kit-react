@@ -75,3 +75,5 @@ export * from "./rectangle";
 export * from "./heading";
 
 export * from "./mcp-icon";
+
+export * from "./input-block";
