@@ -18,7 +18,30 @@ pnpm add @docspace/ui-kit
 ### Import from main entry
 
 ```js
-import { Button, Label, Text, Heading, Link, Portal, Tooltip, TextInput, Loader, Checkbox, ThemeProvider, Scrollbar, TabItem, Tabs, ToggleButton, Badge, DropDownItem, Toast, toastr, Textarea, CircleSkeleton, RectangleSkeleton } from "@docspace/ui-kit";
+import {
+  Badge,
+  Button,
+  Checkbox,
+  CircleSkeleton,
+  DropDownItem,
+  Heading,
+  Label,
+  Link,
+  Loader,
+  Portal,
+  RectangleSkeleton,
+  Scrollbar,
+  TabItem,
+  Tabs,
+  Text,
+  TextInput,
+  Textarea,
+  ThemeProvider,
+  Toast,
+  toastr,
+  ToggleButton,
+  Tooltip,
+} from "@docspace/ui-kit";
 ```
 
 ### Import specific components
