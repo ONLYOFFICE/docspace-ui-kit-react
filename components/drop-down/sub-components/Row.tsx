@@ -1,5 +1,3 @@
-"use client";
-
 // (c) Copyright Ascensio System SIA 2009-2026
 //
 // This program is a free software product.
@@ -26,50 +24,33 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { createContext, use, type ReactNode } from "react";
+import { memo } from "react";
 
-export type TTheme = "Base" | "Dark";
+import { DropDownItem } from "../../drop-down-item";
 
-type TThemeContextValue = {
-  theme: TTheme;
-  currentColorScheme?: TColorScheme;
-};
+import type { RowProps } from "../DropDown.types";
 
-type ThemeProviderProps = TThemeContextValue & {
-  children: ReactNode;
-};
+const Row = memo(({ data, index, style }: RowProps) => {
+  const { children, activedescendant, handleMouseMove } = data;
 
-export type TColorScheme = {
-  id: number;
-  main: {
-    accent: string;
-    buttons: string;
-  };
-  name: string;
-  text: {
-    accent: string;
-    buttons: string;
-  };
-};
+  const option = Array.isArray(children) ? children[index] : null;
 
-export const ThemeContext = createContext<TThemeContextValue>({
-  theme: "Base",
+  const optionStyle = option?.props?.style ?? {};
+
+  const newStyle = { ...style, ...optionStyle };
+
+  return (
+    <DropDownItem
+      {...option?.props}
+      style={newStyle}
+      onMouseMove={() => {
+        handleMouseMove?.(index);
+      }}
+      isActiveDescendant={activedescendant === index}
+    />
+  );
 });
 
-export const ThemeContextProvider = ({
-  theme,
-  currentColorScheme,
-  children,
-}: ThemeProviderProps) => {
-  return (
-    <ThemeContext value={{ theme, currentColorScheme }}>
-      {children}
-    </ThemeContext>
-  );
-};
+Row.displayName = "Row";
 
-export const useTheme = () => {
-  const { theme, currentColorScheme } = use(ThemeContext);
-
-  return { theme, isBase: theme === "Base", currentColorScheme };
-};
+export { Row };

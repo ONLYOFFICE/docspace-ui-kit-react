@@ -1,5 +1,3 @@
-"use client";
-
 // (c) Copyright Ascensio System SIA 2009-2026
 //
 // This program is a free software product.
@@ -26,50 +24,4 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { createContext, use, type ReactNode } from "react";
-
-export type TTheme = "Base" | "Dark";
-
-type TThemeContextValue = {
-  theme: TTheme;
-  currentColorScheme?: TColorScheme;
-};
-
-type ThemeProviderProps = TThemeContextValue & {
-  children: ReactNode;
-};
-
-export type TColorScheme = {
-  id: number;
-  main: {
-    accent: string;
-    buttons: string;
-  };
-  name: string;
-  text: {
-    accent: string;
-    buttons: string;
-  };
-};
-
-export const ThemeContext = createContext<TThemeContextValue>({
-  theme: "Base",
-});
-
-export const ThemeContextProvider = ({
-  theme,
-  currentColorScheme,
-  children,
-}: ThemeProviderProps) => {
-  return (
-    <ThemeContext value={{ theme, currentColorScheme }}>
-      {children}
-    </ThemeContext>
-  );
-};
-
-export const useTheme = () => {
-  const { theme, currentColorScheme } = use(ThemeContext);
-
-  return { theme, isBase: theme === "Base", currentColorScheme };
-};
+export const DEFAULT_PARENT_HEIGHT = 42;

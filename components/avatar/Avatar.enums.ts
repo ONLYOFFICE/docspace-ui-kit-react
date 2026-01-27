@@ -1,5 +1,3 @@
-"use client";
-
 // (c) Copyright Ascensio System SIA 2009-2026
 //
 // This program is a free software product.
@@ -26,50 +24,26 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { createContext, use, type ReactNode } from "react";
+export enum AvatarRole {
+  owner = "owner",
+  admin = "admin",
+  guest = "guest",
+  user = "user",
+  manager = "manager",
+  collaborator = "collaborator",
+  none = "",
+}
 
-export type TTheme = "Base" | "Dark";
+export enum AvatarSize {
+  max = "max",
+  big = "big",
+  medium = "medium",
+  base = "base",
+  small = "small",
+  min = "min",
+}
 
-type TThemeContextValue = {
-  theme: TTheme;
-  currentColorScheme?: TColorScheme;
-};
-
-type ThemeProviderProps = TThemeContextValue & {
-  children: ReactNode;
-};
-
-export type TColorScheme = {
-  id: number;
-  main: {
-    accent: string;
-    buttons: string;
-  };
-  name: string;
-  text: {
-    accent: string;
-    buttons: string;
-  };
-};
-
-export const ThemeContext = createContext<TThemeContextValue>({
-  theme: "Base",
-});
-
-export const ThemeContextProvider = ({
-  theme,
-  currentColorScheme,
-  children,
-}: ThemeProviderProps) => {
-  return (
-    <ThemeContext value={{ theme, currentColorScheme }}>
-      {children}
-    </ThemeContext>
-  );
-};
-
-export const useTheme = () => {
-  const { theme, currentColorScheme } = use(ThemeContext);
-
-  return { theme, isBase: theme === "Base", currentColorScheme };
-};
+export enum AvatarActionKeys {
+  PROFILE_AVATAR_UPLOAD = "profile_avatar_upload",
+  PROFILE_AVATAR_DELETE = "profile_avatar_delete",
+}

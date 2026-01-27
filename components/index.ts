@@ -24,11 +24,17 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+export * from "./avatar";
+
 export * from "./badge";
 
 export * from "./button";
 
+export * from "./backdrop";
+
 export * from "./checkbox";
+
+export * from "./drop-down";
 
 export * from "./drop-down-item";
 

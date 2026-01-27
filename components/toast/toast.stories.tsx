@@ -31,11 +31,11 @@ import { Toast } from ".";
 import { toastr } from "./sub-components/Toastr";
 import { Button, ButtonSize } from "../button";
 import { Link, LinkType } from "../link";
-import { ToastProps } from "./Toast.types";
+import type { ToastProps } from "./Toast.types";
 import { ToastType } from "./Toast.enums";
 
 const meta: Meta<typeof Toast> = {
-  title: "Feedback components/Toast",
+  title: "components/Feedback components/Toast",
   component: Toast,
   tags: ["autodocs"],
   argTypes: {
