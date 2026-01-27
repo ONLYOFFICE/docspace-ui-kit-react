@@ -27,7 +27,7 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import NavLogoReactSvgUrl from "PUBLIC_DIR/images/nav.logo.react.svg?url";
+import NavLogoReactSvgUrl from "../../assets/settings.react.svg";
 
 import { DropDownItem } from ".";
 
