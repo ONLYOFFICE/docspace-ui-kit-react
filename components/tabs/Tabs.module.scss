@@ -1,4 +1,54 @@
-@use "@docspace/ui-kit/styles/variables";
+@use "../../styles/variables/colors" as *;
+
+:global(.dark) {
+  .tabs {
+    --accent-main: var(--color-scheme-main-accent, #{$light-blue-main});
+
+    --tabs-gradient-color: #{$black};
+    --tabs-line-color: #{$gray-dark-strong};
+
+    /* Primary tabs */
+    --tabs-text-color-primary: #{$dark-gray-dark};
+    --tabs-active-text-color-primary: #{$white};
+    --tabs-hover-text-color-primary: #{$white};
+    --tabs-pressed-text-color-primary: #{$gray-dark-text};
+    --tabs-background-color-primary: #{$black};
+
+    /* Secondary tabs */
+    --tabs-text-color-secondary: #{$dark-gray-dark};
+    --tabs-active-text-color-secondary: #{$white};
+    --tabs-background-color-secondary: #{$dark-gray-light};
+    --tabs-hover-background-color-secondary: #{$gray-dark-mid};
+    --tabs-pressed-background-color-secondary: #{$dark-gray-light};
+    --tabs-active-background-color-secondary: #{$black};
+    --tabs-hover-background-icon-color-secondary: #{$white};
+  }
+}
+
+.tabs {
+  --accent-main: var(--color-scheme-main-accent, #{$light-blue-main});
+
+  --tabs-gradient-color: #{$white};
+  --tabs-line-color: #{$gray-light-mid};
+
+  /* Primary tabs */
+  --tabs-text-color-primary: #{$light-gray-dark};
+  --tabs-active-text-color-primary: var(--accent-main, #{$black});
+  --tabs-hover-text-color-primary: #{$gray};
+  --tabs-pressed-text-color-primary: #{$gray-text};
+  --tabs-background-color-primary: #{$white};
+
+  /* Secondary tabs */
+  --tabs-text-color-secondary: #{$light-gray-dark};
+  --tabs-active-text-color-secondary: #{$black};
+  --tabs-background-color-secondary: #{$light-gray-hover};
+  --tabs-hover-background-color-secondary: #{$gray-light-mid};
+  --tabs-pressed-background-color-secondary: #{$gray-light-mid};
+  --tabs-active-background-color-secondary: #{$white};
+  --tabs-hover-background-icon-color-secondary: #{$black};
+
+  font-family: var(--font-family);
+}
 
 .stickyIndent {
   height: 20px;
@@ -72,10 +122,6 @@
   &.secondary {
     height: 36px;
   }
-}
-
-.tabs {
-  font-family: var(--font-family);
 }
 
 .scroll {
@@ -171,7 +217,6 @@
   gap: 4px;
 
   width: max-content;
-  height: inhert;
   font-weight: 600;
   line-height: 20px;
   cursor: pointer;

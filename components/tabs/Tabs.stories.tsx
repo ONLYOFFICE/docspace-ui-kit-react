@@ -32,7 +32,7 @@ import { TabsProps, TTabItem } from "./Tabs.types";
 import { TabsTypes } from "./Tabs.enums";
 
 const meta = {
-  title: "Data display/Tabs",
+  title: "Components/Data display/Tabs",
   component: Tabs,
 } satisfies Meta<typeof Tabs>;
 type Story = StoryObj<typeof meta>;
