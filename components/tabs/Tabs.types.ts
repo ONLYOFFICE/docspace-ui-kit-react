@@ -58,6 +58,7 @@ export type TabsProps = {
   className?: string;
   /** Sets a callback function that is triggered when the tab is selected. */
   onSelect?: (element: TTabItem) => void;
+  /** Disables sticky indent */
   withoutStickyIntend?: boolean;
   /** Accepts css style  */
   style?: React.CSSProperties;
@@ -69,7 +70,9 @@ export type TabsProps = {
   scaled?: boolean;
   /** Unique identifier for hotkey functionality */
   hotkeysId?: string;
+  /** Element id */
   id?: string;
+  /** Enables animation for tab transitions */
   withAnimation?: boolean;
 };
 

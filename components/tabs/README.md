@@ -84,7 +84,7 @@ const array_items = [
 | `scaled`               |       `boolean`        |    -     |   -    |     -     | Scales tabs to container width                                                                                                                                |
 | `hotkeysId`            |        `string`        |    -     |   -    |     -     | Unique identifier for hotkey functionality                                                                                                                    |
 | `id`                   |        `string`        |    -     |   -    |     -     | Element id                                                                                                                                                    |
-| `withAnimation`        |       `boolean`        |    -     |   -    |     -     | Enables animation                                                                                                                                             |
+| `withAnimation`        |       `boolean`        |    -     |   -    |     -     | Enables animation for tab transitions                                                                                                                         |
 
 ### Array Items Properties
 

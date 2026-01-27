@@ -125,4 +125,124 @@ describe("Tabs", () => {
     const stickyElement = container.querySelector(".sticky");
     expect(stickyElement).toHaveStyle({ top: "50px" });
   });
+
+  it("applies disabled state to tab", () => {
+    const itemsWithDisabled = [
+      arrayItems[0],
+      { ...arrayItems[1], isDisabled: true },
+    ];
+    const { container } = render(
+      <Tabs items={itemsWithDisabled} selectedItemId="tab0" />,
+    );
+    const disabledTab = container.querySelector(`.${styles.disabled}`);
+    expect(disabledTab).toBeInTheDocument();
+  });
+
+  it("calls onSelect when tab is clicked", () => {
+    const onSelectMock = vi.fn();
+    render(
+      <Tabs items={arrayItems} selectedItemId="tab0" onSelect={onSelectMock} />,
+    );
+    const tab = screen.getByTestId("tab1_tab");
+    tab.click();
+    expect(onSelectMock).toHaveBeenCalledWith(arrayItems[1]);
+  });
+
+  it("calls onClick when tab is clicked", () => {
+    const onClickMock = vi.fn();
+    const itemsWithOnClick = [
+      arrayItems[0],
+      { ...arrayItems[1], onClick: onClickMock },
+    ];
+    render(
+      <Tabs items={itemsWithOnClick} selectedItemId="tab0" />,
+    );
+    const tab = screen.getByTestId("tab1_tab");
+    tab.click();
+    expect(onClickMock).toHaveBeenCalled();
+  });
+
+  it("applies custom className", () => {
+    const { container } = render(
+      <Tabs
+        items={arrayItems}
+        selectedItemId="tab0"
+        className="custom-class"
+      />,
+    );
+    expect(container.querySelector(".custom-class")).toBeInTheDocument();
+  });
+
+  it("hides sticky indent when withoutStickyIntend is true", () => {
+    const { container } = render(
+      <Tabs items={arrayItems} selectedItemId="tab0" withoutStickyIntend />,
+    );
+    const stickyIndent = container.querySelector(".sticky-indent");
+    expect(stickyIndent).not.toBeInTheDocument();
+  });
+
+  it("shows sticky indent by default", () => {
+    const { container } = render(
+      <Tabs items={arrayItems} selectedItemId="tab0" />,
+    );
+    const stickyIndent = container.querySelector(".sticky-indent");
+    expect(stickyIndent).toBeInTheDocument();
+  });
+
+  it("renders icon in secondary tabs", () => {
+    const itemsWithIcon = [
+      { ...arrayItems[0], iconName: "test-icon.svg" },
+      arrayItems[1],
+    ];
+    const { container } = render(
+      <Tabs
+        items={itemsWithIcon}
+        type={TabsTypes.Secondary}
+        selectedItemId="tab0"
+      />,
+    );
+    const icon = container.querySelector(`.${styles.tabIcon}`);
+    expect(icon).toBeInTheDocument();
+  });
+
+  it("applies scaled styles for secondary tabs", () => {
+    const { container } = render(
+      <Tabs
+        items={arrayItems}
+        type={TabsTypes.Secondary}
+        selectedItemId="tab0"
+        scaled
+      />,
+    );
+    expect(container.querySelector(`.${styles.scaled}`)).toBeInTheDocument();
+  });
+
+  it("applies custom id to tabs", () => {
+    const { container } = render(
+      <Tabs items={arrayItems} selectedItemId="tab0" id="custom-tabs-id" />,
+    );
+    expect(container.querySelector("#custom-tabs-id")).toBeInTheDocument();
+  });
+
+  it("does not call onClick when clicking already selected tab", () => {
+    const onSelectMock = vi.fn();
+    render(
+      <Tabs items={arrayItems} selectedItemId="tab0" onSelect={onSelectMock} />,
+    );
+    const tab = screen.getByTestId("tab0_tab");
+    tab.click();
+    expect(onSelectMock).not.toHaveBeenCalled();
+  });
+
+  it("renders with layoutId for secondary tabs", () => {
+    const { container } = render(
+      <Tabs
+        items={arrayItems}
+        type={TabsTypes.Secondary}
+        selectedItemId="tab0"
+        layoutId="test-layout-id"
+      />,
+    );
+    expect(container.querySelector("#test-layout-id")).toBeInTheDocument();
+  });
 });
