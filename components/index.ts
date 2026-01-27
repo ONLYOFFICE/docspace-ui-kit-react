@@ -67,3 +67,5 @@ export * from "./toast";
 export * from "./textarea";
 
 export * from "./tabs";
+
+export * from "./heading";

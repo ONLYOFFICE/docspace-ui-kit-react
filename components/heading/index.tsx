@@ -25,12 +25,12 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { classNames } from "../../utils";
+import classNames from "classnames";
 
 import styles from "./Heading.module.scss";
 import { HeadingProps } from "./Heading.types";
 import { HeadingLevel, HeadingSize } from "./Heading.enums";
-import { withTooltip } from "@docspace/ui-kit/components/tooltip";
+import { withTooltip } from "../tooltip";
 
 export const HeadingPure = ({
   id,

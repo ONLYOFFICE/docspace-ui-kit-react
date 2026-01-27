@@ -1,7 +1,22 @@
-@use "@docspace/ui-kit/styles/variables";
-@use "@docspace/ui-kit/styles/mixins";
+@use "../../styles/variables/colors" as *;
+@use "../../styles/mixins";
+
+:global(.dark) {
+  .heading {
+    --heading-color: #{$white};
+  }
+}
 
 .heading {
+  --heading-font-weight: 600;
+  --heading-font-size-xlarge: 27px;
+  --heading-font-size-large: 23px;
+  --heading-font-size-medium: 21px;
+  --heading-font-size-small: 19px;
+  --heading-font-size-xsmall: 15px;
+
+  --heading-color: #{$black};
+
   @include mixins.common-text-styles;
 
   font-weight: var(--heading-font-weight);

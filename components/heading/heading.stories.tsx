@@ -31,7 +31,7 @@ import { Heading } from ".";
 import { HeadingLevel, HeadingSize } from "./Heading.enums";
 
 const meta: Meta<typeof Heading> = {
-  title: "Base UI Components/Heading",
+  title: "Components/UI/Heading",
   component: Heading,
   argTypes: {
     color: { control: "color" },

@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import type { TextProps } from "@docspace/ui-kit/components/text";
+import type { TextProps } from "../text";
 import type { HeadingLevel, HeadingSize } from "./Heading.enums";
 
 export type HeadingType = "header" | "menu" | "content";
