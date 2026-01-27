@@ -1,3 +1,5 @@
+"use client";
+
 // (c) Copyright Ascensio System SIA 2009-2026
 //
 // This program is a free software product.
@@ -48,11 +50,17 @@ import { type TGetTooltipContent, Tooltip } from "../tooltip";
 
 import styles from "./Avatar.module.scss";
 
-import type { AvatarProps } from "./Avatar.types";
+import type { AvatarProps, TAvatarModel } from "./Avatar.types";
 import { AvatarRole, AvatarSize, AvatarActionKeys } from "./Avatar.enums";
 import { getRoleIcon, Initials, EmptyIcon } from "./Avatar.utils";
 
-export { type AvatarProps, AvatarRole, AvatarSize, AvatarActionKeys };
+export {
+  type AvatarProps,
+  type TAvatarModel,
+  AvatarRole,
+  AvatarSize,
+  AvatarActionKeys,
+};
 
 const AvatarPure = ({
   size,

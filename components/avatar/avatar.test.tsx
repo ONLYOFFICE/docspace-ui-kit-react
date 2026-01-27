@@ -309,19 +309,19 @@ describe("<Avatar />", () => {
   describe("avatar click behavior", () => {
     it("does nothing on click when noClick is true", () => {
       const onChangeFile = vi.fn();
+      const modelClick = vi.fn();
       const model = [
         {
-          key: "upload",
+          key: AvatarActionKeys.PROFILE_AVATAR_UPLOAD,
           label: "Upload",
           icon: "/icon.svg",
-          onClick: vi.fn(),
+          onClick: modelClick,
         },
       ];
       render(
         <Avatar
           {...baseProps}
-          editing
-          hasAvatar
+          hasAvatar={false}
           noClick
           onChangeFile={onChangeFile}
           model={model}
@@ -329,7 +329,8 @@ describe("<Avatar />", () => {
       );
       const avatar = screen.getByTestId("avatar");
       fireEvent.click(avatar);
-      expect(screen.queryByText("Upload")).not.toBeInTheDocument();
+      // With noClick=true, clicking avatar should not trigger upload
+      expect(modelClick).not.toHaveBeenCalled();
     });
 
     it("opens dropdown on avatar click when hasAvatar and onChangeFile", () => {

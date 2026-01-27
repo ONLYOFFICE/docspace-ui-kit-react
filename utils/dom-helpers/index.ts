@@ -27,6 +27,8 @@
 /** biome-ignore-all lint/complexity/noThisInStatic: false */
 /** biome-ignore-all lint/complexity/noStaticOnlyClass: false */
 
+"use client";
+
 export default class DomHelpers {
   static calculatedScrollbarWidth: number | null = null;
 
