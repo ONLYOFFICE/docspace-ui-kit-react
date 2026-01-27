@@ -48,7 +48,8 @@
     "react-tooltip": "5.28.0",
     "react-window": "1.8.10",
     "styled-components": "5.3.11",
-    "zoom-level": "2.5.0"
+    "zoom-level": "2.5.0",
+    "react-content-loader": "7.0.2"
   },
   "devDependencies": {
     "@babel/core": "7.25.8",
