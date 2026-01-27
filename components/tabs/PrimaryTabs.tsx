@@ -48,6 +48,7 @@ const PrimaryTabs = (props: TabsProps) => {
     withoutStickyIntend = false,
     id,
     withAnimation,
+    className,
     ...rest
   } = props;
 
@@ -236,7 +237,7 @@ const PrimaryTabs = (props: TabsProps) => {
   );
 
   return (
-    <div className={classNames(styles.tabs, classes)} {...rest}>
+    <div className={classNames(styles.tabs, className, classes)} {...rest}>
       <div
         data-sticky
         className={classNames(styles.sticky, classes, "sticky")}
