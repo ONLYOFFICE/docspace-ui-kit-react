@@ -24,60 +24,43 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
-
-export * from "./aside";
-
-export * from "./add-button";
-
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
+export type AddButtonProps = {
+  /** Title text */
+  title?: string;
+  /** Sets a callback function that is triggered when the button is clicked */
+  onClick?: (e: React.MouseEvent) => void;
+  /** Sets the button to present a disabled state */
+  isDisabled?: boolean;
+  /** Attribute className  */
+  className?: string;
+  /** Accepts id */
+  id?: string;
+  /** Accepts css style */
+  style?: React.CSSProperties;
+  /** Specifies the icon name */
+  iconName?: string;
+  /** Change colors to accent */
+  isAction?: boolean;
+  /** Specifies the icon size */
+  iconSize?: number;
+  /** Label attribute for text */
+  label?: string;
+  /** Font size property */
+  fontSize?: string;
+  /** Title attribute for text */
+  titleText?: string;
+  /** Disables text selection */
+  noSelect?: boolean;
+  /** Text direction */
+  dir?: "ltr" | "rtl" | "auto";
+  /** Sets the line height */
+  lineHeight?: string;
+  /** Disables word wrapping */
+  truncate?: boolean;
+  /** Size  the icon container */
+  size?: string;
+  /** Test id */
+  testId?: string;
+  /** Shows loading state with spinner */
+  isLoading?: boolean;
+};

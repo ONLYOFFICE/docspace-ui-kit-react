@@ -99,6 +99,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [AsideHeader](./components/aside/aside-header/README.md) | Header component for aside panels with optional back/close buttons, custom icons, and loading states |
 | [Badge](./components/badge/README.md) | Versatile badge for notifications, status markers, or interactive elements with various display modes |
 | [Button](./components/button/README.md) | Versatile button component with primary/secondary variants, multiple sizes, loading states, and tooltip support |
+| [AddButton](./components/add-button/README.md) | Button component for adding items with optional label, loading state, and accent styling |
 | [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |
 | [CircleSkeleton](./components/circle/README.md) | Circular skeleton loader for avatar and icon placeholders |
 | [DropDownItem](./components/drop-down-item/README.md) | Dropdown item for menus and lists with separator, header, submenu, and toggle support |

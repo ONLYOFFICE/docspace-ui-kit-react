@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { AsideHeader } from ".";
 
 const meta: Meta<typeof AsideHeader> = {
-  title: "Base UI Components/AsideHeader",
+  title: "components/UI/AsideHeader",
   component: AsideHeader,
   parameters: {
     docs: {

@@ -30,7 +30,7 @@ import { Aside } from ".";
 import type { AsideProps } from "./Aside.types";
 
 const meta: Meta<typeof Aside> = {
-  title: "Base UI Components/Aside",
+  title: "components/Layout components/Aside",
   component: Aside,
   parameters: {
     docs: {

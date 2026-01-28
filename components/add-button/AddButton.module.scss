@@ -1,0 +1,199 @@
+@use "../../styles/variables/colors";
+
+.container {
+  display: flex;
+  align-items: center;
+
+  :global(.light) & {
+    --selector-add-button-text-disabled: #{colors.$gray-strong};
+  }
+
+  :global(.dark) & {
+    --selector-add-button-text-disabled: #{colors.$gray-dark-text};
+  }
+
+  .selectorText {
+    padding-inline-start: 8px;
+    cursor: pointer;
+  }
+
+  &.isDisabled {
+    .selectorText {
+      color: var(--selector-add-button-text-disabled);
+      cursor: default;
+    }
+  }
+
+  &.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.selectorButton {
+  display: inline-block;
+  background: var(--selector-add-button-background);
+  border: var(--selector-add-button-border);
+  box-sizing: var(--selector-add-button-box-sizing);
+  border-radius: var(--selector-add-button-border-radius);
+  height: var(--selector-add-button-height);
+  width: var(--selector-add-button-width);
+  padding: var(--selector-add-button-padding);
+  cursor: pointer;
+
+  :global(.light) & {
+    --selector-add-button-background: #{colors.$gray-light-mid};
+    --selector-add-button-hover-background: #{colors.$light-gray-selected};
+    --selector-add-button-active-background: #{colors.$gray-strong};
+    --selector-add-button-disabled-background: #{colors.$light-gray-hover};
+    --selector-add-button-icon-color: #{colors.$light-gray-dark};
+    --selector-add-button-icon-color-hover: #{colors.$light-gray-dark};
+    --selector-add-button-icon-color-active: #{colors.$light-gray-dark};
+    --selector-add-button-icon-color-disabled: #{colors.$gray};
+    --selector-add-button-border: none;
+    --selector-add-button-box-sizing: border-box;
+    --selector-add-button-border-radius: 3px;
+    --selector-add-button-height: 32px;
+    --selector-add-button-width: 32px;
+    --selector-add-button-padding: 10px;
+  }
+
+  :global(.dark) & {
+    --selector-add-button-background: #{colors.$gray-dark-mid};
+    --selector-add-button-hover-background: #{colors.$gray-dark-strong};
+    --selector-add-button-active-background: #{colors.$gray-dark-mid};
+    --selector-add-button-disabled-background: #{colors.$light-dark-gray-hover};
+    --selector-add-button-icon-color: #{colors.$dark-gray-dark};
+    --selector-add-button-icon-color-hover: #{colors.$white};
+    --selector-add-button-icon-color-active: #{colors.$gray-dark-pressed};
+    --selector-add-button-icon-color-disabled: #{colors.$gray-dark};
+    --selector-add-button-border: none;
+    --selector-add-button-box-sizing: border-box;
+    --selector-add-button-border-radius: 3px;
+    --selector-add-button-height: 32px;
+    --selector-add-button-width: 32px;
+    --selector-add-button-padding: 10px;
+  }
+
+  &.isLoading {
+    padding: 6px;
+  }
+
+  :global(.icon-button_svg) {
+    svg {
+      path {
+        fill: var(--selector-add-button-icon-color);
+      }
+    }
+  }
+
+  &:hover {
+    background: var(--selector-add-button-hover-background);
+
+    :global(.icon-button_svg) {
+      svg {
+        path {
+          fill: var(--selector-add-button-icon-color-hover);
+        }
+      }
+    }
+  }
+
+  &:active {
+    background: var(--selector-add-button-active-background);
+
+    :global(.icon-button_svg) {
+      svg {
+        path {
+          fill: var(--selector-add-button-icon-color-active);
+        }
+      }
+    }
+  }
+
+  -webkit-tap-highlight-color: #{colors.$tap-highlight};
+
+  &.isDisabled {
+    cursor: default;
+
+    :global(.icon-button_svg) {
+      svg {
+        path {
+          fill: var(--selector-add-button-icon-color);
+        }
+      }
+    }
+
+    &:hover {
+      background: var(--selector-add-button-background);
+
+      svg path {
+        fill: var(--selector-add-button-icon-color);
+      }
+    }
+
+    &:active {
+      background: var(--selector-add-button-background);
+
+      svg path {
+        fill: var(--selector-add-button-icon-color);
+      }
+    }
+  }
+
+  &.isAction {
+    background-color: var(--main-accent-button) !important;
+
+    :global(.icon-button_svg) {
+      svg {
+        path {
+          fill: var(--accent-main);
+        }
+      }
+    }
+
+    &:hover {
+      background-color: var(--main-accent-button);
+
+      &:not(.disabled) {
+        :global(.icon-button_svg) {
+          svg {
+            path {
+              fill: var(--accent-main);
+              opacity: 0.85;
+            }
+          }
+        }
+      }
+    }
+
+    &:active {
+      background-color: var(--main-accent-button);
+
+      :global(.icon-button_svg) {
+        svg {
+          path {
+            fill: var(--accent-main);
+            opacity: 1;
+            filter: brightness(90%);
+          }
+        }
+      }
+    }
+
+    div {
+      opacity: 1;
+    }
+  }
+
+  &.isDisabled {
+    cursor: default;
+
+    background: var(--selector-add-button-disabled-background) !important;
+
+    svg path {
+      fill: var(--selector-add-button-icon-color-disabled) !important;
+    }
+  }
+}
