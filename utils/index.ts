@@ -33,3 +33,7 @@ export * from "./common-icons-style";
 export * from "./use-click-outside";
 
 export { default as DomHelpers } from "./dom-helpers";
+
+export * from "./get-text-color";
+
+export * from "./trim-separator";

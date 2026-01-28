@@ -24,16 +24,19 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import { describe, it, expect } from "vitest";
+import { screen, render } from "@testing-library/react";
+import { ContextMenu } from ".";
+import styles from "./ContextMenu.module.scss";
 
-export * from "./themes";
+describe("<ContextMenu />", () => {
+	it("renders without error", () => {
+		render(<ContextMenu model={[]} />);
+		expect(screen.getByTestId("context-menu")).toBeInTheDocument();
+	});
 
-export * from "./utils";
-
-export * from "./context";
-
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
+	it("has base contextMenu class", () => {
+		render(<ContextMenu model={[]} />);
+		expect(screen.getByTestId("context-menu")).toHaveClass(styles.contextMenu);
+	});
+});

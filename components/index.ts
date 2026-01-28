@@ -81,3 +81,9 @@ export * from "./heading";
 export * from "./mcp-icon";
 
 export * from "./input-block";
+
+export * from "./room-icon";
+
+export * from "./context-menu";
+
+export * from "./combobox";

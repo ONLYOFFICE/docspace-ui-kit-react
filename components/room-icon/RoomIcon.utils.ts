@@ -24,16 +24,38 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import { checkIsSSR } from "../../utils";
 
-export * from "./themes";
+function removeSpecialSymbol(text: string): string {
+	return text.replace(/[-_[\]{}()*+!?.,&\\^$|#@%]/g, "");
+}
 
-export * from "./utils";
+function trim(text: string): string {
+	return text.replace(/\s+/g, " ").trim();
+}
 
-export * from "./context";
+function getFirstAndLastChar(text: string): string {
+	const [first, ...other] = text.split(" ");
 
-export * from "./enums";
+	return (first.at(0) ?? "") + (other.at(-1)?.at(0) ?? "");
+}
 
-export * from "./constants";
+function toUpperCase(text: string) {
+	return text.toUpperCase();
+}
 
-export * from "./types";
+export const getRoomTitle = (title: string) => {
+	const removeSpecSymbol = removeSpecialSymbol(title);
+	const trimText = trim(removeSpecSymbol);
+	const firstAndLastChar = getFirstAndLastChar(trimText);
+
+	return toUpperCase(firstAndLastChar);
+};
+
+export const encodeToBase64 = (value: string) => {
+	if (checkIsSSR()) {
+		return Buffer.from(value).toString("base64");
+	}
+
+	return window.btoa(value);
+};

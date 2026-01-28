@@ -24,16 +24,17 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
-
-export * from "./themes";
-
-export * from "./utils";
-
-export * from "./context";
-
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
+export enum ShareAccessRights {
+  None = 0,
+  FullAccess = 1,
+  ReadOnly = 2,
+  DenyAccess = 3,
+  Varies = 4,
+  Review = 5,
+  Comment = 6,
+  FormFilling = 7,
+  CustomFilter = 8,
+  RoomManager = 9,
+  Editing = 10,
+  Collaborator = 11,
+}

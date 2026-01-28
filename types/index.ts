@@ -26,3 +26,19 @@
 
 export type TDirectionX = "left" | "right";
 export type TDirectionY = "bottom" | "top" | "both";
+
+export type Nullable<T> = T | null;
+
+export type ICover = {
+	data: string;
+	id: string;
+};
+
+export type TLogo = {
+	cover?: ICover;
+	original: string;
+	large: string;
+	medium: string;
+	small: string;
+	color?: string;
+};
