@@ -24,16 +24,15 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+export type DialogSkeletonProps = {
+  isLarge: boolean;
+  withFooterBorder: boolean;
+};
 
-export * from "./themes";
-
-export * from "./utils";
-
-export * from "./context";
-
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
+export type DialogAsideSkeletonProps = {
+  isPanel: boolean;
+  withoutAside?: boolean;
+  withFooterBorder: boolean;
+  isInvitePanelLoader?: boolean;
+  onClose?: VoidFunction;
+};

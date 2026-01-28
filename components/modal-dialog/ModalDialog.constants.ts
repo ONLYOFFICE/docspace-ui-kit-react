@@ -24,16 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
-
-export * from "./themes";
-
-export * from "./utils";
-
-export * from "./context";
-
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
+export const MODAL_DIALOG_HEADER_NAME = "DialogHeader";
+export const MODAL_DIALOG_BODY_NAME = "DialogBody";
+export const MODAL_DIALOG_FOOTER_NAME = "DialogFooter";
+export const MODAL_DIALOG_CONTAINER_NAME = "DialogContainer";

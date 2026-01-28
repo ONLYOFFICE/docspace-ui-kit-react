@@ -31,6 +31,7 @@ import {
   Link,
   Loader,
   MCPIcon,
+  ModalDialog,
   Portal,
   RectangleSkeleton,
   Scrollbar,
@@ -57,6 +58,7 @@ import { Label } from "@docspace/ui-kit/components/label";
 import { Text } from "@docspace/ui-kit/components/text";
 import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
 import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
+import { ModalDialog, ModalDialogType } from "@docspace/ui-kit/components/modal-dialog";
 import { Portal } from "@docspace/ui-kit/components/portal";
 import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
 import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
@@ -70,11 +72,13 @@ import { Tabs, TabsTypes } from "@docspace/ui-kit/components/tabs";
 import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
 import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
 import { Badge } from "@docspace/ui-kit/components/badge";
+import { ContextMenu } from "@docspace/ui-kit/components/context-menu";
 import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
 import { Toast, toastr } from "@docspace/ui-kit/components/toast";
 import { CircleSkeleton } from "@docspace/ui-kit/components/circle";
 import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
 import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
+import { RoomIcon } from "@docspace/ui-kit/components/room-icon";
 ```
 
 ### Import contexts and hooks
@@ -104,14 +108,17 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [AddButton](./components/add-button/README.md) | Button component for adding items with optional label, loading state, and accent styling |
 | [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |
 | [CircleSkeleton](./components/circle/README.md) | Circular skeleton loader for avatar and icon placeholders |
+| [ContextMenu](./components/context-menu/README.md) | Context menu for displaying contextual actions with submenus, headers, toggles, and hotkeys |
 | [DropDownItem](./components/drop-down-item/README.md) | Dropdown item for menus and lists with separator, header, submenu, and toggle support |
 | [Heading](./components/heading/README.md) | Heading text structured in levels with customizable sizes and types |
 | [Label](./components/label/README.md) | Form label with required indicator and tooltip support |
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
 | [MCPIcon](./components/mcp-icon/README.md) | Icon component for MCP (Model Context Protocol) with image or text fallback |
+| [ModalDialog](./components/modal-dialog/README.md) | Versatile modal dialog component supporting both modal and aside (side panel) display types with keyboard shortcuts |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
 | [RectangleSkeleton](./components/rectangle/README.md) | Rectangular skeleton loader for text, buttons, and content placeholders |
+| [RoomIcon](./components/room-icon/README.md) | Room icon component with support for images, colors, badges, editing, and various states |
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
 | [SearchInput](./components/search-input/README.md) | Search input component with auto-refresh, clear button, and debounce support |
 | [TabItem](./components/tab-item/README.md) | Tab navigation component with active states, multi-select, and disabled state support |
@@ -138,5 +145,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [common-icons-style](./utils/common-icons-style/README.md) | Styled-components CSS helper for consistent icon sizing with `IconSizeType` enum |
 | [device](./utils/device/README.md) | Device detection utilities: `isMobile`, `isTablet`, `isDesktop`, `checkIsSSR` |
 | [dom-helpers](./utils/dom-helpers/README.md) | DOM utilities for viewport, element positioning, scrollbar width, and z-index management |
+| [get-text-color](./utils/get-text-color/README.md) | Determines optimal text color (black/white) for a background based on perceived brightness |
+| [trim-separator](./utils/trim-separator/README.md) | Cleans up context menu arrays by removing redundant separators and disabled items |
 | [use-click-outside](./utils/use-click-outside/README.md) | React hook for detecting clicks outside an element, useful for dropdowns and modals |
 | [uuid](./utils/uuid/README.md) | UUID v4 generation utility for unique identifiers |

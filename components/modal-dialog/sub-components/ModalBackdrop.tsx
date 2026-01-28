@@ -24,16 +24,25 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import classNames from "classnames";
 
-export * from "./themes";
+import { ModalDialogBackdropProps } from "../ModalDialog.types";
+import styles from "../ModalDialog.module.scss";
 
-export * from "./utils";
+const ModalBackdrop = ({
+  className,
+  zIndex,
+  children,
+}: ModalDialogBackdropProps) => {
+  return (
+    <div
+      style={{ zIndex }}
+      className={classNames(styles.modalBackdrop, className)}
+    >
+      {children}
+    </div>
+  );
+};
 
-export * from "./context";
-
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
+export { ModalBackdrop };

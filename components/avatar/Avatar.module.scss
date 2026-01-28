@@ -108,8 +108,14 @@
     height: 100% !important;
     margin: auto;
 
-    path {
+    &:not([data-is-default="true"]) path {
       fill: var(--avatar-image-container-svg-fill);
+    }
+
+    &[data-is-default="true"] {
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: 50%;
     }
   }
 }

@@ -24,16 +24,68 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import type { Nullable, TLogo } from "../../types";
+import type { ROOM_ACTION_KEYS } from "../../constants";
 
-export * from "./themes";
+type RoomIconDefault = {
+	title: string;
+	isArchive?: boolean;
+	size?: string;
+	radius?: string;
+	showDefault?: boolean;
+	imgClassName?: string;
+	className?: string;
+	dataTestId?: string;
+};
 
-export * from "./utils";
+export type TModel = { label: string; icon: string } & (
+	| {
+			key: string;
+			onClick: () => void;
+	  }
+	| {
+			key: typeof ROOM_ACTION_KEYS.CREATE_EDIT_ROOM_UPLOAD;
+			onClick: (ref?: React.RefObject<Nullable<HTMLInputElement>>) => void;
+	  }
+);
 
-export * from "./context";
+type RoomIconExpansion = {
+	hoverSrc?: string;
+	withEditing?: boolean;
+	onChangeFile?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	isEmptyIcon?: boolean;
+	dropDownManualX?: string;
+	model?: TModel[];
+	logo?: TLogo | string;
+	tooltipContent?: string;
+	tooltipId?: string;
+	isTemplate?: boolean;
+	dataTestId?: string;
+};
 
-export * from "./enums";
+type RoomIconColor = {
+	color: string;
+	imgClassName?: undefined;
+};
 
-export * from "./constants";
+type RoomIconImage = {
+	color?: string | undefined;
+	imgClassName?: string;
+};
 
-export * from "./types";
+type RoomIconBadge = {
+	badgeUrl?: string;
+	badgeIconNode?: React.ReactNode;
+	onBadgeClick?: () => void;
+};
+
+type RoomIconNonBadge = {
+	badgeUrl?: undefined;
+	badgeIconNode?: undefined;
+	onBadgeClick?: undefined;
+};
+
+export type RoomIconProps = RoomIconDefault &
+	RoomIconExpansion &
+	(RoomIconColor | RoomIconImage) &
+	(RoomIconBadge | RoomIconNonBadge);

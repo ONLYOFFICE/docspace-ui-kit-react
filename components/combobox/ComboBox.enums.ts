@@ -24,16 +24,15 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+export enum ComboBoxDisplayType {
+  default = "default",
+  toggle = "toggle",
+}
 
-export * from "./themes";
-
-export * from "./utils";
-
-export * from "./context";
-
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
+export enum ComboBoxSize {
+  base = "base",
+  middle = "middle",
+  big = "big",
+  huge = "huge",
+  content = "content",
+}

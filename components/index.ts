@@ -82,6 +82,14 @@ export * from "./mcp-icon";
 
 export * from "./input-block";
 
+export * from "./room-icon";
+
+export * from "./context-menu";
+
+export * from "./combobox";
+
 export * from "./search-input";
+
+export * from "./modal-dialog";
 
 export * from "./calendar";

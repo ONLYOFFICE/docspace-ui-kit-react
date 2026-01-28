@@ -24,16 +24,34 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import classNames from "classnames";
 
-export * from "./themes";
+import { ModalDialogFormWrapperProps } from "../ModalDialog.types";
+import styles from "../ModalDialog.module.scss";
 
-export * from "./utils";
+const FormWrapper = ({
+  withForm,
+  children,
+  className,
+  onSubmit,
+}: ModalDialogFormWrapperProps) => {
+  if (!withForm) return children;
 
-export * from "./context";
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-export * from "./enums";
+    onSubmit?.(event);
+  };
 
-export * from "./constants";
+  return (
+    <form
+      className={classNames(styles.formWrapper, className)}
+      onSubmit={handleSubmit}
+    >
+      {children}
+    </form>
+  );
+};
 
-export * from "./types";
+export { FormWrapper };
