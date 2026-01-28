@@ -1,0 +1,248 @@
+/*!
+ * (c) Copyright Ascensio System SIA 2009-2026
+ *
+ * This program is a free software product.
+ * You can redistribute it and/or modify it under the terms
+ * of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+ * Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+ * to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+ * any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+ * the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions of the Program must
+ * display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product logo when
+ * distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+ * trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+ * content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+ * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ */
+
+@use "../../../../styles/variables/colors" as *;
+@use "../../../../styles/mixins";
+
+:global(.dark) {
+  .dialogLoader {
+    --modal-dialog-header-border-color: #{$gray-dark-strong};
+  }
+}
+
+.dialogLoader {
+  --modal-dialog-header-border-color: #{$gray-light-mid};
+
+  height: auto;
+
+  width: 400px;
+
+  &[data-is-large="true"] {
+    width: 520px;
+  }
+
+  @include mixins.mobile {
+    width: 100%;
+  }
+
+  :global {
+    .dialog-loader-header {
+      border-bottom: 1px solid var(--modal-dialog-header-border-color);
+      padding: 12px 16px;
+    }
+
+    .dialog-loader-body {
+      padding: 12px 16px 8px;
+    }
+
+    .dialog-loader-footer {
+      display: flex;
+      gap: 10px;
+      padding: 16px;
+    }
+  }
+
+  &[data-with-footer-border="true"] {
+    :global {
+      .dialog-loader-footer {
+        border-top: 1px solid var(--modal-dialog-header-border-color);
+      }
+    }
+  }
+}
+
+.dialogAsideLoader {
+  :global {
+    .dialog-loader-header {
+      border-bottom: 1px solid var(--modal-dialog-header-border-color);
+      padding: 12px 16px;
+    }
+    .dialog-loader-body {
+      padding: 16px;
+    }
+
+    .dialog-loader-footer {
+      padding: 16px;
+      position: fixed;
+      bottom: 0;
+      width: calc(100% - 32px);
+    }
+  }
+
+  &[data-with-footer-border="true"] {
+    :global {
+      .dialog-loader-footer {
+        border-top: 1px solid var(--modal-dialog-header-border-color);
+      }
+    }
+  }
+
+  &[data-is-panel="true"] {
+    :global {
+      .dialog-loader-header {
+        padding: 12px 16px;
+        height: 53px;
+        border-bottom: 1px solid var(--modal-dialog-header-border-color);
+        box-sizing: border-box;
+      }
+
+      .dialog-loader-body {
+        padding: 16px;
+      }
+
+      .dialog-loader-footer {
+        padding: 12px 16px;
+        position: fixed;
+        bottom: 0;
+
+        height: 71px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+
+        box-sizing: border-box;
+
+        border-top: 1px solid var(--modal-dialog-header-border-color);
+      }
+    }
+  }
+}
+
+.dataReassignmentLoader {
+  :global {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .name {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+    }
+
+    .new-owner_header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-bottom: 12px;
+    }
+
+    .new-owner_add {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .description {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+}
+
+.dialogInviteLoader {
+  :global {
+    .dialog-loader-header {
+      padding: 12px 16px;
+      height: 53px;
+      border-bottom: 1px solid var(--modal-dialog-header-border-color);
+      box-sizing: border-box;
+    }
+
+    .dialog-loader-footer {
+      padding: 12px 16px;
+      position: fixed;
+      bottom: 0;
+
+      height: 71px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+
+      box-sizing: border-box;
+
+      border-top: 1px solid var(--modal-dialog-header-border-color);
+    }
+  }
+}
+
+.externalLinksLoader {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--modal-dialog-header-border-color);
+
+  :global {
+    .external-links-loader {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .check-box {
+      padding-top: 3px;
+    }
+  }
+}
+
+.inviteInputLoader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding: 20px 16px;
+}
+
+.invitePanelLoaderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.invitePanelLoaderFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 8px;
+}
