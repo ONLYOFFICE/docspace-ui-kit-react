@@ -28,15 +28,15 @@ import React from "react";
 import { isIOS, isMobileOnly, isSafari } from "react-device-detect";
 import classNames from "classnames";
 
-import { ASIDE_PADDING_AFTER_LAST_ITEM } from "../../../constants";
-import { DialogSkeleton, DialogAsideSkeleton } from "../../../skeletons";
-
-import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
-import { AsideHeader } from "@docspace/ui-kit/components/aside";
+import { DialogSkeleton, DialogAsideSkeleton } from "../../skeletons/dialog";
+import { Scrollbar } from "../../scrollbar";
+import { AsideHeader } from "../../aside";
 import styles from "../ModalDialog.module.scss";
 import { ModalBackdrop } from "./ModalBackdrop";
 import { FormWrapper } from "./FormWrapper";
 import { ModalSubComponentsProps } from "../ModalDialog.types";
+
+const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";
 
 const Modal = ({
   id,
