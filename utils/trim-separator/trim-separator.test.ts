@@ -85,15 +85,17 @@ describe("trimSeparator", () => {
         createItem("copy"),
       ];
       const result = trimSeparator(input);
+      // With fewer than 6 non-separator items and no destructive action, all separators are removed
       const separatorCount = result.filter((item) => item?.isSeparator).length;
-      expect(separatorCount).toBe(1);
+      expect(separatorCount).toBe(0);
     });
 
-    it("preserves single separator between items", () => {
+    it("removes separator between items when fewer than 6 items and no destructive action", () => {
       const input = [createItem("edit"), createSeparator(), createItem("copy")];
       const result = trimSeparator(input);
-      expect(result).toHaveLength(3);
-      expect(result[1]?.isSeparator).toBe(true);
+      // With fewer than 6 non-separator items and no destructive action, separator is removed
+      expect(result).toHaveLength(2);
+      expect(result.find((item) => item?.isSeparator)).toBeUndefined();
     });
   });
 

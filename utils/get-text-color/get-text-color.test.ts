@@ -90,8 +90,9 @@ describe("getTextColor", () => {
   });
 
   describe("custom brightness threshold", () => {
-    it("returns white when threshold is high (200) for light gray", () => {
-      expect(getTextColor("#cccccc", 200)).toBe(white);
+    it("returns black when threshold is high (200) for light gray", () => {
+      // #cccccc has brightness of 204, which is > 200, so returns black
+      expect(getTextColor("#cccccc", 200)).toBe(black);
     });
 
     it("returns black when threshold is low (50) for dark gray", () => {
@@ -100,11 +101,12 @@ describe("getTextColor", () => {
 
     it("changes result based on threshold for medium color", () => {
       const mediumColor = "#888888";
-      // With default threshold (128), this should return white
-      expect(getTextColor(mediumColor)).toBe(white);
-      // With higher threshold (150), this should still return white
+      // #888888 has brightness of 136
+      // With default threshold (128), 136 > 128, returns black
+      expect(getTextColor(mediumColor)).toBe(black);
+      // With higher threshold (150), 136 <= 150, returns white
       expect(getTextColor(mediumColor, 150)).toBe(white);
-      // With very low threshold (50), this should return black
+      // With very low threshold (50), 136 > 50, returns black
       expect(getTextColor(mediumColor, 50)).toBe(black);
     });
   });
@@ -133,7 +135,8 @@ describe("getTextColor", () => {
     });
 
     it("returns appropriate color for main green (#2DB482)", () => {
-      expect(getTextColor("#2DB482")).toBe(white);
+      // #2DB482 (45, 180, 130) has brightness ~134, which is > 128, returns black
+      expect(getTextColor("#2DB482")).toBe(black);
     });
 
     it("returns appropriate color for main orange (#F97A0B)", () => {

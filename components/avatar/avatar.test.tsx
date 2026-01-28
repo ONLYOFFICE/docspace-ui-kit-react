@@ -160,16 +160,16 @@ describe("<Avatar />", () => {
       render(
         <Avatar {...baseProps} source="" userName="" isDefaultSource />,
       );
-      const img = screen.getByRole("img");
-      expect(img).toHaveAttribute("data-is-default", "true");
+      const svg = screen.getByTestId("avatar").querySelector("svg[data-is-default='true']");
+      expect(svg).toBeInTheDocument();
     });
 
     it("marks image as default when source contains default_user_photo", () => {
       render(
         <Avatar {...baseProps} source="https://example.com/default_user_photo.png" />,
       );
-      const img = screen.getByRole("img");
-      expect(img).toHaveAttribute("data-is-default", "true");
+      const svg = screen.getByTestId("avatar").querySelector("svg[data-is-default='true']");
+      expect(svg).toBeInTheDocument();
     });
   });
 
