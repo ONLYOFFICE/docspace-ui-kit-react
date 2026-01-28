@@ -24,64 +24,57 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
+import moment from "moment";
+import classNames from "classnames";
+import { HeaderButtons } from "./HeaderButtons";
+import { YearsHeaderProps } from "../Calendar.types";
+import styles from "../Calendar.module.scss";
 
-export * from "./aside";
+export const YearsHeader = ({
+  observedDate,
+  setObservedDate,
+  minDate,
+  maxDate,
+  isMobile,
+}: YearsHeaderProps) => {
+  const selectedYear = observedDate.year();
+  const firstYear = selectedYear;
 
-export * from "./add-button";
+  const onLeftClick = () =>
+    setObservedDate((prevObservedDate) =>
+      prevObservedDate.clone().subtract(10, "year"),
+    );
 
-export * from "./badge";
+  const onRightClick = () =>
+    setObservedDate((prevObservedDate) =>
+      prevObservedDate.clone().add(10, "year"),
+    );
 
-export * from "./button";
+  const isLeftDisabled =
+    moment(`${firstYear - 1}`)
+      .endOf("year")
+      .endOf("month") < minDate;
+  const isRightDisabled = moment(`${firstYear + 10}`) > maxDate;
 
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./search-input";
-
-export * from "./calendar";
+  return (
+    <div className={styles.headerContainer}>
+      <h2
+        className={classNames(styles.title, "years-header", {
+          [styles.disabled]: true,
+        })}
+      >
+        {moment(firstYear, "YYYY").format("YYYY")}-
+        {moment(firstYear + 9, "YYYY").format("YYYY")}
+        <span className={styles.headerActionIcon} />
+      </h2>
+      <HeaderButtons
+        onLeftClick={onLeftClick}
+        onRightClick={onRightClick}
+        isLeftDisabled={isLeftDisabled}
+        isRightDisabled={isRightDisabled}
+        isMobile={isMobile}
+      />
+    </div>
+  );
+};

@@ -24,64 +24,16 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import moment from "moment";
 
-export * from "./aside";
+export const getCalendarYears = (observedDate: moment.Moment) => {
+  const years = [];
+  const selectedYear = observedDate.year();
+  const firstYear = selectedYear - 1;
 
-export * from "./add-button";
+  for (let i = firstYear; i <= firstYear + 15; i += 1) {
+    years.push(moment(i, "YYYY").format("YYYY"));
+  }
 
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./search-input";
-
-export * from "./calendar";
+  return years;
+};

@@ -24,64 +24,41 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
+import { DaysBody } from "./DaysBody";
+import { DaysHeader } from "./DaysHeader";
+import { DaysProps } from "../Calendar.types";
 
-export * from "./aside";
-
-export * from "./add-button";
-
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./search-input";
-
-export * from "./calendar";
+export const Days = ({
+  observedDate,
+  setObservedDate,
+  setSelectedScene,
+  handleDateChange,
+  selectedDate,
+  minDate,
+  maxDate,
+  isMobile,
+  isScroll,
+}: DaysProps) => {
+  return (
+    <>
+      <DaysHeader
+        observedDate={observedDate}
+        setObservedDate={setObservedDate}
+        setSelectedScene={setSelectedScene}
+        minDate={minDate}
+        maxDate={maxDate}
+        isMobile={isMobile}
+      />
+      <DaysBody
+        observedDate={observedDate}
+        handleDateChange={handleDateChange}
+        selectedDate={selectedDate}
+        minDate={minDate}
+        maxDate={maxDate}
+        isMobile={isMobile}
+        isScroll={isScroll}
+      />
+    </>
+  );
+};

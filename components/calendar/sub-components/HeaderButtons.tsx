@@ -24,64 +24,50 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
+import classNames from "classnames";
+import { HeaderButtonsProps } from "../Calendar.types";
+import styles from "../Calendar.module.scss";
 
-export * from "./aside";
+export const HeaderButtons = ({
+  onLeftClick,
+  onRightClick,
+  isLeftDisabled,
+  isRightDisabled,
+  isMobile,
+}: HeaderButtonsProps) => {
+  const marginSize = isMobile ? "12px" : "8px";
 
-export * from "./add-button";
+  return (
+    <div className={styles.buttonsContainer}>
+      <button
+        type="button"
+        className={classNames(styles.roundButton, "arrow-previous", {
+          [styles.disabled]: isLeftDisabled,
+        })}
+        style={{ marginInlineEnd: marginSize }}
+        onClick={onLeftClick}
+        disabled={isLeftDisabled}
+        aria-label="Previous"
+      >
+        <span
+          className={classNames(styles.arrowIcon, { [styles.prev]: true })}
+        />
+      </button>
 
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./search-input";
-
-export * from "./calendar";
+      <button
+        type="button"
+        className={classNames(styles.roundButton, "arrow-next", {
+          [styles.disabled]: isRightDisabled,
+        })}
+        onClick={onRightClick}
+        disabled={isRightDisabled}
+        aria-label="Next"
+      >
+        <span
+          className={classNames(styles.arrowIcon, { [styles.next]: true })}
+        />
+      </button>
+    </div>
+  );
+};

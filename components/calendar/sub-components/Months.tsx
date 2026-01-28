@@ -24,64 +24,42 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
+import { MonthsBody } from "./MonthsBody";
+import { MonthsHeader } from "./MonthsHeader";
 
-export * from "./aside";
+import { MonthsProps } from "../Calendar.types";
 
-export * from "./add-button";
-
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./search-input";
-
-export * from "./calendar";
+export const Months = ({
+  observedDate,
+  setObservedDate,
+  selectedDate,
+  setSelectedScene,
+  minDate,
+  maxDate,
+  isMobile,
+  isScroll,
+}: MonthsProps) => {
+  return (
+    <>
+      <MonthsHeader
+        observedDate={observedDate}
+        setObservedDate={setObservedDate}
+        setSelectedScene={setSelectedScene}
+        minDate={minDate}
+        maxDate={maxDate}
+        isMobile={isMobile}
+      />
+      <MonthsBody
+        observedDate={observedDate}
+        setObservedDate={setObservedDate}
+        setSelectedScene={setSelectedScene}
+        selectedDate={selectedDate}
+        minDate={minDate}
+        maxDate={maxDate}
+        isMobile={isMobile}
+        isScroll={isScroll}
+      />
+    </>
+  );
+};

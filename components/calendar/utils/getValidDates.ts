@@ -24,64 +24,50 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import moment from "moment";
 
-export * from "./aside";
+export const getValidDates = (
+  currentMinDate?: moment.Moment | Date,
+  currentMaxDate?: moment.Moment | Date,
+  minDate?: moment.Moment | Date,
+  maxDate?: moment.Moment | Date,
+) => {
+  if (!minDate) {
+    minDate = moment("01/01/1970", "DD/MM/YYYY");
+  }
+  if (!maxDate) {
+    maxDate = moment();
+    maxDate.add(10, "years");
+  }
 
-export * from "./add-button";
+  if (minDate >= maxDate) {
+    minDate = moment("01/01/1970", "DD/MM/YYYY");
+    maxDate = moment();
+    maxDate.add(10, "years");
+    console.error(
+      "The minimum date is farther than or same as the maximum date. minDate and maxDate are set to default",
+    );
+  }
+  minDate = moment(minDate);
+  maxDate = moment(maxDate);
 
-export * from "./badge";
+  if (!currentMinDate) {
+    currentMinDate = minDate;
+  }
+  if (!currentMaxDate) {
+    currentMaxDate = maxDate;
+  }
 
-export * from "./button";
+  let resultMinDate = moment(currentMinDate);
+  let resultMaxDate = moment(currentMaxDate);
 
-export * from "./backdrop";
+  resultMinDate = resultMinDate < minDate ? minDate : resultMinDate;
+  resultMaxDate = resultMaxDate > maxDate ? maxDate : resultMaxDate;
 
-export * from "./checkbox";
+  if (resultMinDate >= resultMaxDate) {
+    resultMinDate = minDate;
+    resultMaxDate = maxDate;
+  }
 
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./search-input";
-
-export * from "./calendar";
+  return [resultMinDate, resultMaxDate];
+};

@@ -24,64 +24,25 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import moment from "moment";
 
-export * from "./aside";
+export const getCalendarMonths = (observedDate: moment.Moment) => {
+  const months = moment
+    .monthsShort()
+    .map((month) => month[0].toUpperCase() + month.substring(1));
 
-export * from "./add-button";
+  const monthsObjs = months.map((month) => ({
+    key: `${observedDate.format("YYYY")}-${moment().month(month).format("M")}`,
+    value: month,
+  }));
 
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./search-input";
-
-export * from "./calendar";
+  for (let i = 0; i < 4; i += 1) {
+    monthsObjs.push({
+      key: `${observedDate.clone().add(1, "year").format("YYYY")}-${moment()
+        .month(months[i])
+        .format("M")}`,
+      value: monthsObjs[i].value,
+    });
+  }
+  return monthsObjs;
+};

@@ -24,64 +24,57 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
+import classNames from "classnames";
+import { HeaderButtons } from "./HeaderButtons";
+import { MonthsHeaderProps } from "../Calendar.types";
+import styles from "../Calendar.module.scss";
 
-export * from "./aside";
+export const MonthsHeader = ({
+  observedDate,
+  setObservedDate,
+  setSelectedScene,
+  minDate,
+  maxDate,
+  isMobile,
+}: MonthsHeaderProps) => {
+  const onTitleClick = () =>
+    setSelectedScene((prevSelectedScene) => prevSelectedScene + 1);
 
-export * from "./add-button";
+  const onLeftClick = () =>
+    setObservedDate((prevObservedDate) =>
+      prevObservedDate.clone().subtract(1, "year"),
+    );
 
-export * from "./badge";
+  const onRightClick = () =>
+    setObservedDate((prevObservedDate) =>
+      prevObservedDate.clone().add(1, "year"),
+    );
 
-export * from "./button";
+  const isLeftDisabled =
+    observedDate.clone().subtract(1, "year").endOf("year").endOf("month") <
+    minDate;
 
-export * from "./backdrop";
+  const isRightDisabled =
+    observedDate.clone().add(1, "year").startOf("year").startOf("month") >
+    maxDate;
 
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./search-input";
-
-export * from "./calendar";
+  return (
+    <div className={styles.headerContainer}>
+      <h2
+        className={classNames(styles.title, "months-header")}
+        onClick={onTitleClick}
+      >
+        {observedDate.format("YYYY")}
+        <span className={styles.headerActionIcon} />
+      </h2>
+      <HeaderButtons
+        onLeftClick={onLeftClick}
+        onRightClick={onRightClick}
+        isLeftDisabled={isLeftDisabled}
+        isRightDisabled={isRightDisabled}
+        isMobile={isMobile}
+      />
+    </div>
+  );
+};
