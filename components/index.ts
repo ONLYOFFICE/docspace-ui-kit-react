@@ -81,3 +81,5 @@ export * from "./heading";
 export * from "./mcp-icon";
 
 export * from "./input-block";
+
+export * from "./search-input";
