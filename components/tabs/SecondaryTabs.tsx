@@ -29,9 +29,9 @@ import classNames from "classnames";
 import { ReactSVG } from "react-svg";
 import { motion } from "framer-motion";
 import { isMobile } from "react-device-detect";
-import ArrowReactUrl from "../../assets/arrow.left.react.svg?url";
-import { type TTabItem, type TabsProps } from "./Tabs.types";
-import { Scrollbar, ScrollbarType } from "../scrollbar";
+import ArrowReactUrl from "../../assets/arrow.left.react.svg";
+import type { TTabItem, TabsProps } from "./Tabs.types";
+import { Scrollbar, type ScrollbarType } from "../scrollbar";
 import { Text } from "../text";
 import { IconButton } from "../icon-button";
 import {
@@ -324,7 +324,7 @@ const SecondaryTabs = (props: TabsProps) => {
             })}
             isFill
             onClick={onSelectPrev}
-            iconName={ArrowReactUrl}
+            iconNode={<ArrowReactUrl />}
           />
         ) : null}
 
@@ -362,7 +362,7 @@ const SecondaryTabs = (props: TabsProps) => {
             })}
             isFill
             onClick={onSelectNext}
-            iconName={ArrowReactUrl}
+            iconNode={<ArrowReactUrl />}
           />
         ) : null}
       </div>

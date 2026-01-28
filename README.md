@@ -19,6 +19,8 @@ pnpm add @docspace/ui-kit
 
 ```js
 import {
+  Aside,
+  AsideHeader,
   Badge,
   Button,
   Checkbox,
@@ -48,6 +50,7 @@ import {
 ### Import specific components
 
 ```js
+import { Aside, AsideHeader } from "@docspace/ui-kit/components/aside";
 import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
 import { Label } from "@docspace/ui-kit/components/label";
 import { Text } from "@docspace/ui-kit/components/text";
@@ -92,6 +95,8 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 
 | Component | Description |
 |-----------|-------------|
+| [Aside](./components/aside/README.md) | Sliding panel component for displaying side content like settings, details, or forms |
+| [AsideHeader](./components/aside/aside-header/README.md) | Header component for aside panels with optional back/close buttons, custom icons, and loading states |
 | [Badge](./components/badge/README.md) | Versatile badge for notifications, status markers, or interactive elements with various display modes |
 | [Button](./components/button/README.md) | Versatile button component with primary/secondary variants, multiple sizes, loading states, and tooltip support |
 | [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |

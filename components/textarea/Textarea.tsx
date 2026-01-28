@@ -29,13 +29,13 @@ import copy from "copy-to-clipboard";
 import classNames from "classnames";
 import TextareaAutosize from "react-autosize-textarea";
 
-import CopyIconUrl from "../../assets/icons/16/copy.react.svg?url";
+import CopyIconUrl from "../../assets/icons/16/copy.react.svg";
 
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 import { IconButton } from "../icon-button";
 import { Scrollbar } from "../scrollbar";
 import { jsonify, isJSON } from "./Textarea.utils";
-import { TextareaProps } from "./Textarea.types";
+import type { TextareaProps } from "./Textarea.types";
 import styles from "./Textarea.module.scss";
 
 const Textarea = ({
@@ -164,7 +164,7 @@ const Textarea = ({
         <IconButton
           className={`${styles.copyIconWrapper} ${classNameCopyIcon || ""}`}
           onClick={handleCopy}
-          iconName={CopyIconUrl}
+          iconNode={<CopyIconUrl />}
           size={16}
         />
       ) : null}
@@ -197,7 +197,7 @@ const Textarea = ({
             {numerationValue}
           </pre>
         ) : null}
-         {/*  @ts-expect-error: Passing pointer events causes a React warning - "Unknown event handler". TextareaAutosize types are outdated */}
+        {/*  @ts-expect-error: Passing pointer events causes a React warning - "Unknown event handler". TextareaAutosize types are outdated */}
         <TextareaAutosize
           id={id}
           className={classNames(styles.textarea, {
