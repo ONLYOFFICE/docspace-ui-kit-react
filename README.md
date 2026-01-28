@@ -36,6 +36,7 @@ import {
   RectangleSkeleton,
   Scrollbar,
   SearchInput,
+  StatusMessage,
   TabItem,
   Tabs,
   Text,
@@ -63,6 +64,7 @@ import { Portal } from "@docspace/ui-kit/components/portal";
 import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
 import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
 import { SearchInput } from "@docspace/ui-kit/components/search-input";
+import { StatusMessage } from "@docspace/ui-kit/components/status-message";
 import { Textarea } from "@docspace/ui-kit/components/textarea";
 import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
 import { Checkbox } from "@docspace/ui-kit/components/checkbox";
@@ -121,6 +123,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [RoomIcon](./components/room-icon/README.md) | Room icon component with support for images, colors, badges, editing, and various states |
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
 | [SearchInput](./components/search-input/README.md) | Search input component with auto-refresh, clear button, and debounce support |
+| [StatusMessage](./components/status-message/README.md) | Animated status message component for displaying error and warning messages |
 | [TabItem](./components/tab-item/README.md) | Tab navigation component with active states, multi-select, and disabled state support |
 | [Tabs](./components/tabs/README.md) | Tab container component with primary/secondary themes, sticky positioning, and content management |
 | [Text](./components/text/README.md) | Typography component with various styling options |

@@ -24,9 +24,32 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-@use "@docspace/ui-kit/styles/mixins";
+@use "../../styles/mixins";
+@use "../../styles/variables/colors" as *;
+
+:global(.dark) {
+  .body {
+    --toast-error-bg: #{$black};
+    --toast-box-shadow: 0px 16px 16px #{$popup-shadow};
+    --toast-error-border: 2px solid #{$dark-toast-warning};
+    --toastr-text-color: #{$dark-gray-dark};
+    --toastr-svg-error-color: #{$dark-toast-warning};
+    --toastr-svg-warning-color: #{$dark-toast-alert};
+    --toast-warning-bg: #{$black};
+    --toast-warning-border: 2px solid #{$dark-toast-alert};
+  }
+}
 
 .body {
+  --toast-error-bg: #{$light-toast-warning};
+  --toast-box-shadow: 0px 10px 16px -12px #{$popup-shadow};
+  --toast-error-border: none;
+  --toastr-text-color: #{$black};
+  --toastr-svg-error-color: #{$black};
+  --toastr-svg-warning-color: #{$black};
+  --toast-warning-bg: #{$light-toast-alert};
+  --toast-warning-border: none;
+
   box-sizing: border-box;
   width: 100%;
   max-width: 1200px;
@@ -51,16 +74,18 @@
     opacity: 0;
   }
 
-  svg {
-    path {
-      fill: var(--toastr-svg-error-color);
-    }
+  svg path {
+    fill: var(--toastr-svg-error-color);
   }
 }
 
 .warning {
   background: var(--toast-warning-bg);
   border: var(--toast-warning-border);
+
+  svg path {
+    fill: var(--toastr-svg-warning-color);
+  }
 }
 
 @keyframes SlideIn {

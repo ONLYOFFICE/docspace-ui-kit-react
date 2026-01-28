@@ -24,74 +24,46 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import type { Meta, StoryObj } from "@storybook/react";
 
-export * from "./aside";
+import StatusMessage from ".";
 
-export * from "./add-button";
+const meta: Meta<typeof StatusMessage> = {
+  title: "Components/UI/StatusMessage",
+  component: StatusMessage,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Component that displays status messages with animation support. Messages can be error or warning type.",
+      },
+    },
+  },
+  argTypes: {
+    message: {
+      control: "text",
+      description: "Message content to display",
+    },
+    isWarning: {
+      control: "boolean",
+      description: "Whether to display as warning style",
+    },
+  },
+};
 
-export * from "./badge";
+export default meta;
 
-export * from "./button";
+type Story = StoryObj<typeof StatusMessage>;
 
-export * from "./backdrop";
+export const Default: Story = {
+  args: {
+    message: "This is a status message",
+  },
+};
 
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./status-message";
+export const WarningMessage: Story = {
+  args: {
+    message: "This is a warning message",
+    isWarning: true,
+  },
+};
