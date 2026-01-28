@@ -228,3 +228,7 @@ ModalDialog.Container = Container;
 export { ModalDialog };
 
 export { ModalDialogType } from "./ModalDialog.enums";
+
+export { DialogAsideSkeleton } from "./sub-components/skeletons/Dialog.aside";
+export { DialogModalSkeleton } from "./sub-components/skeletons/Dialog.modal";
+export { DialogReassignmentSkeleton } from "./sub-components/skeletons/Dialog.reassignment";
