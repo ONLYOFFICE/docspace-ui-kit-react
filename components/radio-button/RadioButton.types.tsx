@@ -23,71 +23,51 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+import { TextProps } from "../text/Text.types";
 
-export * from "./avatar";
+export type RadioButtonOrientation = "horizontal" | "vertical";
 
-export * from "./aside";
+type PickedTextProps = Pick<TextProps, "fontSize" | "fontWeight">;
+type PickedInputProps = Pick<
+  React.ComponentProps<"input">,
+  "name" | "value" | "autoFocus" | "onChange"
+>;
+type PickedLabelProps = Pick<
+  React.ComponentProps<"label">,
+  "id" | "className" | "style"
+>;
 
-export * from "./add-button";
+export type RadioButtonProps = {
+  /** Used as HTML `checked` property for the `<input>` tag */
+  isChecked?: boolean;
 
-export * from "./badge";
+  /** Used as HTML `disabled` property for the `<input>` tag */
+  isDisabled?: boolean;
 
-export * from "./button";
+  /** Label text or node to display next to the radio button.
+   * If not provided, value will be used as label */
+  label?: React.ReactNode | string;
 
-export * from "./backdrop";
+  /** Callback fired when radio button is clicked */
+  onClick?: (
+    e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>,
+  ) => void;
 
-export * from "./checkbox";
+  /** Sets margin between radio buttons.
+   * For horizontal orientation, sets margin-inline-start.
+   * For vertical orientation, sets margin-block-end.
+   * @default "15px" */
+  spacing?: string;
 
-export * from "./drop-down";
+  /** Layout orientation of radio buttons when used in a group
+   * @default "vertical" */
+  orientation?: RadioButtonOrientation;
 
-export * from "./drop-down-item";
+  /** Additional CSS class for the input element */
+  classNameInput?: string;
 
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
+  /** Test ID for the radio button component */
+  testId?: string;
+} & PickedTextProps &
+  PickedInputProps &
+  PickedLabelProps;

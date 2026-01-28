@@ -24,70 +24,25 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
+import classNames from "classnames";
 
-export * from "./aside";
+import { ModalDialogBackdropProps } from "../ModalDialog.types";
+import styles from "../ModalDialog.module.scss";
 
-export * from "./add-button";
+const ModalBackdrop = ({
+  className,
+  zIndex,
+  children,
+}: ModalDialogBackdropProps) => {
+  return (
+    <div
+      style={{ zIndex }}
+      className={classNames(styles.modalBackdrop, className)}
+    >
+      {children}
+    </div>
+  );
+};
 
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
+export { ModalBackdrop };

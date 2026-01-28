@@ -23,71 +23,41 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+import { RadioButtonProps } from "../radio-button/RadioButton.types";
 
-export * from "./avatar";
+type PicketRadioButtonPropsForOption = Pick<
+  RadioButtonProps,
+  "id" | "label" | "autoFocus"
+>;
 
-export * from "./aside";
+export type TRadioButtonOption = {
+  value: string | number;
+  disabled?: boolean;
+  type?: "text" | "radio";
+  autoFocus?: boolean;
+  dataTestId?: string;
+} & PicketRadioButtonPropsForOption;
 
-export * from "./add-button";
+type PickedDivProps = Pick<
+  React.ComponentProps<"div">,
+  "className" | "style" | "id"
+>;
 
-export * from "./badge";
+type PicketRadioButtonProps = Pick<
+  RadioButtonProps,
+  "isDisabled" | "fontWeight" | "fontSize" | "name" | "spacing" | "orientation"
+>;
 
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
+export type RadioButtonGroupProps = {
+  /** Allows handling clicking events on `<RadioButton />` component */
+  onClick: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Array of objects, contains props for each `<RadioButton />` component */
+  options: TRadioButtonOption[];
+  /** Value of the selected radio button */
+  selected?: string | number;
+  /** Position of radio buttons  */
+  width?: string;
+  /** Data test id for the radio button group */
+  dataTestId?: string;
+} & PickedDivProps &
+  PicketRadioButtonProps;
