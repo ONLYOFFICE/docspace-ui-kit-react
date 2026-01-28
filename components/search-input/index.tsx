@@ -33,8 +33,8 @@ import React, {
 } from "react";
 import classNames from "classnames";
 
-import CrossIconReactSvg from "PUBLIC_DIR/images/icons/12/cross.react.svg";
-import SearchIconReactSvg from "PUBLIC_DIR/images/search.react.svg";
+import CrossIconReactSvg from "../../assets/icons/12/cross.react.svg";
+import SearchIconReactSvg from "../../assets/search.react.svg";
 
 import { useDebounce } from "../../hooks/useDebounce";
 
@@ -99,15 +99,6 @@ const SearchInput = ({
     afterClear.current = true;
     onClearSearch?.();
   }, [onClearSearch]);
-
-  // const handleBlur = useCallback(() => {
-  //   // Reset to the external value when focus is lost if they don't match
-  //   if (resetOnBlur && inputValue !== value) {
-  //     setInputValue(value);
-  //     console.log("handleBlur", value, inputValue);
-  //     prevValueRef.current = value;
-  //   }
-  // }, [inputValue, value, resetOnBlur]);
 
   useEffect(() => {
     if (prevValueRef.current !== value) {

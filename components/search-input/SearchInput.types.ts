@@ -26,7 +26,7 @@
 
 import React from "react";
 
-import { InputSize } from "@docspace/ui-kit/components/text-input";
+import { InputSize } from "../text-input";
 
 export type SearchInputProps = {
 	/** Used as HTML `id` property */
@@ -64,8 +64,6 @@ export type SearchInputProps = {
 	style?: React.CSSProperties;
 	/** The callback function that is called when the field is focused  */
 	onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
-	/** Determines whether the input should reset to the original value when focus is lost */
-	resetOnBlur?: boolean;
 	/** Added data-testid for testing  */
 	dataTestId?: string;
 	/** HTML tabindex property */

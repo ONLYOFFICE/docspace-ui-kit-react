@@ -5,7 +5,7 @@ A customizable search input component that provides various features like auto-r
 ## Usage
 
 ```js
-import { SearchInput } from "@docspace/shared/components";
+import { SearchInput } from "@docspace/ui-kit/components/search-input";
 ```
 
 ### Basic Example
@@ -47,6 +47,8 @@ The properties are organized into four categories:
 | `className`    |        `string`         |    -     | Accepts class                |
 | `style`        |     `CSSProperties`     |    -     | Accepts css style            |
 | `children`     |       `ReactNode`       |    -     | Child elements               |
+| `tabIndex`     |        `number`         |    -     | HTML tabindex property       |
+| `dataTestId`   |        `string`         |    -     | Added data-testid for testing |
 
 ### State Props
 
@@ -55,14 +57,14 @@ The properties are organized into four categories:
 | `value`      |  `string`   |    ✓     |                -                |    -    | Input value                              |
 | `isDisabled` |  `boolean`  |    -     |                -                | `false` | Indicates that the field cannot be used  |
 | `scale`      |  `boolean`  |    -     |                -                | `false` | Indicates that the input field has scale |
-| `size`       | `InputSize` |    ✓     | `base`, `middle`, `big`, `huge` | `base`  | Supported size of the input fields       |
+| `size`       | `InputSize` |    ✓     | `base`, `middle`, `large` | `base`  | Supported size of the input fields       |
 
 ### Behavior Props
 
 | Props             |   Type    | Required | Default | Description                             |
 | ----------------- | :-------: | :------: | :-----: | --------------------------------------- |
-| `refreshTimeout`  | `number`  |    -     |  `600`  | Sets the refresh timeout of the input   |
-| `autoRefresh`     | `boolean` |    -     | `false` | Sets the input to refresh automatically |
+| `refreshTimeout`  | `number`  |    -     | `1000`  | Sets the refresh timeout of the input   |
+| `autoRefresh`     | `boolean` |    -     | `true`  | Sets the input to refresh automatically |
 | `showClearButton` | `boolean` |    -     | `false` | Displays the Clear Button               |
 | `placeholder`     | `string`  |    -     |    -    | Placeholder text for the input          |
 
@@ -77,12 +79,11 @@ The properties are organized into four categories:
 
 ## Sizes
 
-The component supports four different sizes:
+The component supports three different sizes:
 
 - `base`: Default size
 - `middle`: Medium size
-- `big`: Large size
-- `huge`: Extra large size
+- `large`: Large size
 
 ## Features
 
@@ -97,10 +98,9 @@ The component supports four different sizes:
 ### With Different Sizes
 
 ```jsx
-<SearchInput size="base" value="Base size" />
-<SearchInput size="middle" value="Middle size" />
-<SearchInput size="big" value="Big size" />
-<SearchInput size="huge" value="Huge size" />
+<SearchInput size="base" value="Base size" onChange={handleChange} />
+<SearchInput size="middle" value="Middle size" onChange={handleChange} />
+<SearchInput size="large" value="Large size" onChange={handleChange} />
 ```
 
 ### With Auto-refresh and Clear Button

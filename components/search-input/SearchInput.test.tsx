@@ -29,7 +29,7 @@ import { describe, it, expect, vi } from "vitest";
 import { screen, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { InputSize } from "@docspace/ui-kit/components/text-input";
+import { InputSize } from "../text-input";
 import { SearchInput } from ".";
 
 const baseProps = {
@@ -152,5 +152,21 @@ describe("<SearchInput />", () => {
 
 		rerender(<SearchInput {...baseProps} value="updated" />);
 		expect(input).toHaveValue("updated");
+	});
+
+	it("clears input and calls onClearSearch when clear button is clicked", async () => {
+		const onClearSearch = vi.fn();
+		const { container } = render(
+			<SearchInput {...baseProps} value="test value" onClearSearch={onClearSearch} />,
+		);
+
+		const input = screen.getByTestId("text-input");
+		expect(input).toHaveValue("test value");
+
+		const clearButton = container.getElementsByClassName("search-cross")[0];
+		await userEvent.click(clearButton);
+
+		expect(input).toHaveValue("");
+		expect(onClearSearch).toHaveBeenCalledTimes(1);
 	});
 });
