@@ -28,7 +28,8 @@ import React from "react";
 import { isIOS, isMobileOnly, isSafari } from "react-device-detect";
 import classNames from "classnames";
 
-import { DialogSkeleton, DialogAsideSkeleton } from "../../skeletons/dialog";
+import { DialogModalSkeleton } from "./skeletons/Dialog.modal";
+import { DialogAsideSkeleton } from "./skeletons/Dialog.aside";
 import { Scrollbar } from "../../scrollbar";
 import { AsideHeader } from "../../aside";
 import styles from "../ModalDialog.module.scss";
@@ -222,7 +223,7 @@ const Modal = ({
             >
               {isLoading ? (
                 currentDisplayType === "modal" ? (
-                  <DialogSkeleton
+                  <DialogModalSkeleton
                     isLarge={isLarge}
                     withFooterBorder={withFooterBorder}
                   />

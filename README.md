@@ -31,6 +31,7 @@ import {
   Link,
   Loader,
   MCPIcon,
+  ModalDialog,
   Portal,
   RectangleSkeleton,
   Scrollbar,
@@ -57,6 +58,7 @@ import { Label } from "@docspace/ui-kit/components/label";
 import { Text } from "@docspace/ui-kit/components/text";
 import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
 import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
+import { ModalDialog, ModalDialogType } from "@docspace/ui-kit/components/modal-dialog";
 import { Portal } from "@docspace/ui-kit/components/portal";
 import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
 import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
@@ -110,6 +112,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
 | [MCPIcon](./components/mcp-icon/README.md) | Icon component for MCP (Model Context Protocol) with image or text fallback |
+| [ModalDialog](./components/modal-dialog/README.md) | Versatile modal dialog component supporting both modal and aside (side panel) display types with keyboard shortcuts |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
 | [RectangleSkeleton](./components/rectangle/README.md) | Rectangular skeleton loader for text, buttons, and content placeholders |
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |

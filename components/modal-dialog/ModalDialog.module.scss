@@ -23,10 +23,30 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-@use "../../styles/variables/colors";
+@use "../../styles/variables/colors" as *;
 @use "../../styles/mixins";
 
+:global(.dark) {
+  .modal {
+    --modal-dialog-bg-color: #{$black};
+    --modal-dialog-text-color: #{$white};
+    --modal-dialog-backdrop-bg-color: #{$blur-dark};
+    --modal-dialog-header-border-color: #{$gray-dark-strong};
+    --modal-dialog-link-underline-color: #{$dark-gray-dark};
+
+    --modal-dialog-content-transform-x: 100%;
+  }
+}
+
 .modal {
+  --modal-dialog-bg-color: #{$white};
+  --modal-dialog-text-color: #{$black};
+  --modal-dialog-backdrop-bg-color: #{$blur-light};
+  --modal-dialog-header-border-color: #{$gray-light-mid};
+  --modal-dialog-link-underline-color: #{$light-gray-dark};
+
+  --modal-dialog-content-transform-x: 100%;
+
   #create-text-input::-webkit-search-decoration,
   #create-text-input::-webkit-search-cancel-button,
   #create-text-input::-webkit-search-results-button,
