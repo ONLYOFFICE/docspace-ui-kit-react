@@ -24,76 +24,22 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
+import { describe, it, expect, vi } from "vitest";
+import { screen, render } from "@testing-library/react";
 
-export * from "./aside";
+import { SelectedItem } from ".";
 
-export * from "./add-button";
+const baseProps = {
+  label: "sample text",
+  onClose: () => vi.fn(),
+  propKey: "",
+};
 
-export * from "./badge";
+describe("<SelectedItem />", () => {
+  it("renders without error", () => {
+    render(<SelectedItem {...baseProps} />);
 
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
+    expect(screen.getByTestId("selected-item")).toBeInTheDocument();
+  });
+});

@@ -24,76 +24,43 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+type TLabel = string | React.ReactNode;
 
-export * from "./aside";
-
-export * from "./add-button";
-
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
+export interface SelectedItemProps {
+  /** Selected item text */
+  label: TLabel;
+  /** Sets the 'width: fit-content' property */
+  isInline?: boolean;
+  /** Sets a callback function that is triggered when the cross icon is clicked */
+  onClose: (
+    propKey: string | number,
+    label: TLabel,
+    group?: string,
+    e?: React.MouseEvent,
+  ) => void;
+  /** Sets a callback function that is triggered when the selected item is clicked */
+  onClick?: (
+    propKey: string | number,
+    label: TLabel,
+    group?: string,
+    e?: React.MouseEvent<HTMLElement>,
+  ) => void;
+  /** Sets the button to present a disabled state */
+  isDisabled?: boolean;
+  /** Accepts class  */
+  className?: string;
+  /** Accepts id */
+  id?: string;
+  /** Accepts css style */
+  style?: React.CSSProperties;
+  /** Accepts key to remove item */
+  propKey: string | number;
+  /** Accepts group key to remove item */
+  group?: string;
+  /** Passes ref to component */
+  forwardedRef?: React.RefObject<HTMLDivElement | null>;
+  classNameCloseButton?: string;
+  hideCross?: boolean;
+  title?: string;
+  dataTestId?: string;
+}

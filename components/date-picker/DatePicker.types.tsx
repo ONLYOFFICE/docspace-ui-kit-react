@@ -24,76 +24,37 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import moment from "moment";
 
-export * from "./aside";
+import type { Nullable } from "../../types";
 
-export * from "./add-button";
-
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
+export type DatePickerProps = {
+  /** Allows to change select date text */
+  selectDateText?: string;
+  /** Selected date */
+  initialDate?: Nullable<moment.Moment | Date | string>;
+  /** Allow you to handle changing events of component */
+  onChange: (d: null | moment.Moment) => void;
+  /** Allows to set classname */
+  className?: string;
+  /** Allows to set id */
+  id?: string;
+  /** Specifies min choosable calendar date */
+  minDate?: moment.Moment | Date;
+  /** Specifies max choosable calendar date */
+  maxDate?: moment.Moment | Date;
+  /** Specifies calendar locale */
+  locale: string;
+  /** Shows calendar icon in selected item */
+  showCalendarIcon?: boolean;
+  /** Allows to track date outside the component */
+  outerDate?: moment.Moment | null;
+  /** Allows to set first shown date in calendar */
+  openDate: moment.Moment | Date;
+  isMobile?: boolean;
+  hideCross?: boolean;
+  /** Automatically positions the calendar based on available space */
+  autoPosition?: boolean;
+  testId?: string;
+  useMaxTime?: boolean;
+};
