@@ -24,88 +24,36 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
+import { describe, it, expect } from "vitest";
+import { render } from "@testing-library/react";
 
-export * from "./aside";
+import { Tag } from ".";
 
-export * from "./add-button";
+const baseProps = {
+  tag: "script",
+  label: "Script",
+  isNewTag: false,
+  isDisabled: false,
+  onDelete: () => {},
+  onClick: () => {},
 
-export * from "./badge";
+  tagMaxWidth: "160px",
+};
 
-export * from "./button";
+describe("<Tag />", () => {
+  it("renders without error", () => {
+    const { getByTestId } = render(<Tag {...baseProps} />);
+    expect(getByTestId("tag_item")).toBeInTheDocument();
+  });
 
-export * from "./backdrop";
+  it("accepts id", () => {
+    const { getByTestId } = render(<Tag {...baseProps} id="testId" />);
+    expect(getByTestId("tag_item")).toHaveAttribute("id", "testId");
+  });
 
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
-
-export * from "./time-picker";
-
-export * from "./date-time-picker";
-
-export * from "./radio-button";
-
-export * from "./radio-button-group";
-
-export * from "./tag";
-
-export * from "./tags";
+  it("accepts className", () => {
+    const { getByTestId } = render(<Tag {...baseProps} className="test" />);
+    expect(getByTestId("tag_item")).toHaveClass("test");
+  });
+});

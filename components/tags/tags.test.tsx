@@ -24,88 +24,45 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
 
-export * from "./aside";
+import { Tags } from ".";
+import type { TagsProps } from "./Tags.types";
 
-export * from "./add-button";
+const baseProps: TagsProps = {
+  tags: ["tag1", "tag2"],
+  columnCount: 2,
+  onSelectTag: () => {},
+};
 
-export * from "./badge";
+describe("<Tags />", () => {
+  it("renders without error", () => {
+    render(<Tags {...baseProps} />);
+    expect(screen.getByTestId("tags")).toBeInTheDocument();
+    expect(screen.getByTestId("tags")).toHaveAttribute(
+      "aria-label",
+      "Tags container",
+    );
+  });
 
-export * from "./button";
+  it("renders with no tags", () => {
+    render(<Tags {...baseProps} tags={[]} />);
+    expect(screen.getByTestId("tags")).toBeEmptyDOMElement();
+  });
 
-export * from "./backdrop";
+  it("renders with a single tag", () => {
+    render(<Tags {...baseProps} tags={["tag1"]} />);
+    expect(screen.getByText("tag1")).toBeInTheDocument();
+  });
 
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
-
-export * from "./time-picker";
-
-export * from "./date-time-picker";
-
-export * from "./radio-button";
-
-export * from "./radio-button-group";
-
-export * from "./tag";
-
-export * from "./tags";
+  it("calls onSelectTag when a tag is clicked", () => {
+    const onSelectTagMock = vi.fn();
+    render(
+      <Tags {...baseProps} tags={["tag1"]} onSelectTag={onSelectTagMock} />,
+    );
+    screen.getByText("tag1").click();
+    expect(onSelectTagMock).toHaveBeenCalledTimes(1);
+  });
+});
