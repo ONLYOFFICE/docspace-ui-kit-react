@@ -24,25 +24,80 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export enum ShareAccessRights {
-  None = 0,
-  FullAccess = 1,
-  ReadOnly = 2,
-  DenyAccess = 3,
-  Varies = 4,
-  Review = 5,
-  Comment = 6,
-  FormFilling = 7,
-  CustomFilter = 8,
-  RoomManager = 9,
-  Editing = 10,
-  Collaborator = 11,
+@use "../../styles/variables";
+@use "../../styles/variables/colors";
+@use "../../styles/mixins";
+
+.selectors {
+  position: relative;
+  margin-top: 8px;
+  margin-bottom: 16px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+
+  .selectedItem {
+    margin-bottom: 0;
+    cursor: pointer;
+
+    &.hasError {
+      color: red;
+    }
+  }
 }
 
-export const enum ButtonKeys {
-  enter = "Enter",
-  numpadEnter = "NumpadEnter",
-  esc = "Escape",
-  tab = "Tab",
-  space = "Space",
+.timeCell {
+  :global(.light) & {
+    --date-picker-cell-background: #{colors.$gray-light-mid};
+    --date-picker-icon-color: #{colors.$light-gray-dark};
+  }
+
+  :global(.dark) & {
+    --date-picker-cell-background: #{colors.$gray-dark-mid};
+    --date-picker-icon-color: #{colors.$dark-gray-dark};
+  }
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  height: 32px;
+
+  background-color: var(--date-picker-cell-background);
+  border-radius: 3px;
+
+  padding: 6px 8px;
+
+  cursor: pointer;
+
+  .clockIcon {
+    width: 12px;
+    height: 12px;
+    padding-inline: 2px 10px;
+
+    path {
+      fill: var(--date-picker-icon-color);
+    }
+
+    circle {
+      fill: none;
+    }
+  }
+
+  &.hasError {
+    color: red;
+  }
+}
+
+.timePicker {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.timeSelector {
+  margin-inline-start: 4px;
+  display: inline-flex;
+  align-items: center;
 }

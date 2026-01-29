@@ -24,25 +24,31 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export enum ShareAccessRights {
-  None = 0,
-  FullAccess = 1,
-  ReadOnly = 2,
-  DenyAccess = 3,
-  Varies = 4,
-  Review = 5,
-  Comment = 6,
-  FormFilling = 7,
-  CustomFilter = 8,
-  RoomManager = 9,
-  Editing = 10,
-  Collaborator = 11,
-}
+import { Moment } from "moment";
 
-export const enum ButtonKeys {
-  enter = "Enter",
-  numpadEnter = "NumpadEnter",
-  esc = "Escape",
-  tab = "Tab",
-  space = "Space",
-}
+export type TimePickerProps = {
+  /** Initial time value */
+  initialTime?: object | string | Date | Moment;
+  /** Callback function when time changes */
+  onChange?: (date: Moment) => void;
+  /** Additional CSS class */
+  className?: string;
+  /** CSS class for input */
+  classNameInput?: string;
+  /** Whether the input has an error */
+  hasError?: boolean;
+  /** Tab index for keyboard navigation */
+  tabIndex?: number;
+  /** Callback function when input loses focus */
+  onBlur?: () => void;
+  /** Whether to focus the input on render */
+  focusOnRender?: boolean;
+  /** Forwarded ref */
+  forwardedRef?: React.RefObject<HTMLDivElement | null>;
+  /** Test id */
+  testId?: string;
+  /** Whether to use 12-hour time format (with AM/PM) instead of 24-hour format */
+  isTwelveHourFormat?: boolean;
+  /** The meridiem indicator (AM/PM) for 12-hour format */
+  meridiem?: string;
+};

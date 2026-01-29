@@ -24,25 +24,33 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export enum ShareAccessRights {
-  None = 0,
-  FullAccess = 1,
-  ReadOnly = 2,
-  DenyAccess = 3,
-  Varies = 4,
-  Review = 5,
-  Comment = 6,
-  FormFilling = 7,
-  CustomFilter = 8,
-  RoomManager = 9,
-  Editing = 10,
-  Collaborator = 11,
-}
+import moment from "moment";
 
-export const enum ButtonKeys {
-  enter = "Enter",
-  numpadEnter = "NumpadEnter",
-  esc = "Escape",
-  tab = "Tab",
-  space = "Space",
-}
+import type { Nullable } from "../../types";
+
+export type DateTimePickerProps = {
+  /** Date object */
+  initialDate?: Nullable<moment.Moment | Date | string>;
+  /** Select date text */
+  selectDateText: string;
+  /** Allows to set classname */
+  className: string;
+  /** Allows to set id */
+  id: string;
+  /** Allow you to handle changing events of component */
+  onChange: (d: null | moment.Moment) => void;
+  /** Specifies min choosable calendar date */
+  minDate?: moment.Moment | Date;
+  /** Specifies max choosable calendar date */
+  maxDate?: moment.Moment | Date;
+  /** Specifies calendar locale */
+  locale: string;
+  /** Indicates the input field has an error  */
+  hasError: boolean;
+  /** Allows to set first shown date in calendar */
+  openDate: moment.Moment | Date;
+  /** Allows to set data-testid */
+  dataTestId?: string;
+  hideCross?: boolean;
+  useMaxTime?: boolean;
+};
