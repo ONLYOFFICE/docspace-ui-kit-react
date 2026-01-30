@@ -28,7 +28,6 @@ import React, { useRef, useState, useEffect } from "react";
 import moment from "moment";
 import classNames from "classnames";
 
-import CalendarIconUrl from "../../assets/calendar.react.svg?url";
 import CalendarIcon from "../../assets/calendar.react.svg";
 
 import { Calendar } from "../calendar";
@@ -167,7 +166,7 @@ const DatePicker = (props: DatePickerProps) => {
           <AddButton
             title={selectDateText}
             className="add-delivery-date-button"
-            iconName={CalendarIconUrl}
+            iconNode={<CalendarIcon />}
             label={selectDateText}
             noSelect
           />

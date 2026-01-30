@@ -39,6 +39,8 @@ export type AddButtonProps = {
   style?: React.CSSProperties;
   /** Specifies the icon name */
   iconName?: string;
+  /** Specifies a custom icon node */
+  iconNode?: React.ReactNode;
   /** Change colors to accent */
   isAction?: boolean;
   /** Specifies the icon size */

@@ -117,3 +117,5 @@ export * from "./empty-screen-container";
 export * from "./empty-view";
 
 export * from "./slider";
+
+export * from "./help-button";
