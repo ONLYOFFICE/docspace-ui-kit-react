@@ -24,11 +24,10 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { screen, fireEvent, render } from "@testing-library/react";
 import { RoomIcon } from ".";
-import { TModel } from "./RoomIcon.types";
+import type { TModel } from "./RoomIcon.types";
 import styles from "./RoomIcon.module.scss";
 
 const mockImgSrc = "test-image.jpg";
