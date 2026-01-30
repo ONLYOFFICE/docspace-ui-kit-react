@@ -189,7 +189,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [Textarea](./components/textarea/README.md) | Multi-line text input with JSON formatting, line numbers, and copy functionality |
 | [ThemeProvider](./components/theme-provider/README.md) | Provider component for theme management with styled-components integration |
 | [TimePicker](./components/time-picker/README.md) | Time input component for selecting time values |
-| [Toast](./components/toast/README.md) | Notification component with success, error, warning, and info variants |
+| [Toast](./components/toast/README.md) | Notification component with success, error, warning, and info variants (see [Toast i18n Setup](#toast-i18n-setup)) |
 | [ToggleButton](./components/toggle-button/README.md) | Customizable toggle button with loading and disabled states |
 | [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
 
@@ -211,3 +211,73 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [trim-separator](./utils/trim-separator/README.md) | Cleans up context menu arrays by removing redundant separators and disabled items |
 | [use-click-outside](./utils/use-click-outside/README.md) | React hook for detecting clicks outside an element, useful for dropdowns and modals |
 | [uuid](./utils/uuid/README.md) | UUID v4 generation utility for unique identifiers |
+
+## Toast i18n Setup
+
+The Toast component supports automatic localized titles. When no title is provided to `toastr.success()`, `toastr.error()`, `toastr.warning()`, or `toastr.info()`, the component will attempt to get the title from `window.i18n`.
+
+### Setup
+
+Set up `window.i18n` with your translations:
+
+```typescript
+window.i18n = {
+  loaded: {
+    "en/Common.json": {
+      data: {
+        Done: "Done",
+        Warning: "Warning",
+        Alert: "Alert",
+        Info: "Info",
+      },
+    },
+    "ru/Common.json": {
+      data: {
+        Done: "Готово",
+        Warning: "Предупреждение",
+        Alert: "Внимание",
+        Info: "Информация",
+      },
+    },
+    // Add more languages as needed
+  },
+};
+```
+
+### Language Detection
+
+The component reads the language from the `asc_language` cookie. The language mapping:
+
+- `en-US`, `en-GB` → `en`
+- Other values are used as-is (e.g., `ru`, `de`, `fr`)
+
+### Default Title Keys
+
+| Toast Type | Default Title Key |
+|------------|-------------------|
+| `success`  | `Done`            |
+| `error`    | `Warning`         |
+| `warning`  | `Alert`           |
+| `info`     | `Info`            |
+
+### Usage
+
+```typescript
+import { toastr } from "@docspace/ui-kit";
+
+// With automatic i18n title (uses window.i18n)
+toastr.success("File saved successfully");
+
+// With custom title (overrides i18n)
+toastr.error("Something went wrong", "Custom Error Title");
+```
+
+### Using getTitle directly
+
+You can also import and use the `getTitle` utility:
+
+```typescript
+import { getTitle } from "@docspace/ui-kit/components/toast";
+
+const title = getTitle("Done"); // Returns localized "Done" or undefined
+```
