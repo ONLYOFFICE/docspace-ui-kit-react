@@ -24,37 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export enum ShareAccessRights {
-  None = 0,
-  FullAccess = 1,
-  ReadOnly = 2,
-  DenyAccess = 3,
-  Varies = 4,
-  Review = 5,
-  Comment = 6,
-  FormFilling = 7,
-  CustomFilter = 8,
-  RoomManager = 9,
-  Editing = 10,
-  Collaborator = 11,
-}
+import type { Meta, StoryObj } from "@storybook/react";
+import { RoomsType } from "../../enums";
 
-export enum ButtonKeys {
-  enter = "Enter",
-  numpadEnter = "NumpadEnter",
-  esc = "Escape",
-  tab = "Tab",
-  space = "Space",
-}
+import { RoomLogoPure } from "./RoomLogo";
 
-export enum RoomsType {
-  AIRoom = 9,
-  PublicRoom = 6,
-  FormRoom = 1,
-  // FillingFormsRoom= 1, //TODO: Restore when certs will be done
-  EditingRoom = 2,
-  // ReviewRoom: 3, //TODO: Restore when certs will be done
-  // ReadOnlyRoom: 4, //TODO: Restore when certs will be done
-  VirtualDataRoom = 8,
-  CustomRoom = 5,
-}
+const meta = {
+  title: "Base UI components/RoomLogo",
+  component: RoomLogoPure,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Room logo allow you display default room logo depend on type and private",
+      },
+    },
+  },
+} satisfies Meta<typeof RoomLogoPure>;
+type Story = StoryObj<typeof meta>;
+
+export default meta;
+
+export const Default: Story = {
+  args: {
+    type: RoomsType.CustomRoom,
+    isPrivacy: false,
+    isArchive: false,
+    withCheckbox: false,
+    isChecked: false,
+    isIndeterminate: false,
+    onChange: () => {},
+  },
+};

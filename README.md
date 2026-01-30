@@ -35,6 +35,8 @@ import {
   DateTimePicker,
   DropDown,
   DropDownItem,
+  EmptyScreenContainer,
+  EmptyView,
   Heading,
   IconButton,
   InputBlock,
@@ -48,6 +50,7 @@ import {
   RadioButtonGroup,
   RectangleSkeleton,
   RoomIcon,
+  RoomLogo,
   Scrollbar,
   SearchInput,
   SelectedItem,
@@ -85,6 +88,8 @@ import { DatePicker } from "@docspace/ui-kit/components/date-picker";
 import { DateTimePicker } from "@docspace/ui-kit/components/date-time-picker";
 import { DropDown } from "@docspace/ui-kit/components/drop-down";
 import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
+import { EmptyScreenContainer } from "@docspace/ui-kit/components/empty-screen-container";
+import { EmptyView } from "@docspace/ui-kit/components/empty-view";
 import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
 import { IconButton } from "@docspace/ui-kit/components/icon-button";
 import { InputBlock } from "@docspace/ui-kit/components/input-block";
@@ -98,6 +103,7 @@ import { RadioButton } from "@docspace/ui-kit/components/radio-button";
 import { RadioButtonGroup } from "@docspace/ui-kit/components/radio-button-group";
 import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
 import { RoomIcon } from "@docspace/ui-kit/components/room-icon";
+import { RoomLogo } from "@docspace/ui-kit/components/room-logo";
 import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
 import { SearchInput } from "@docspace/ui-kit/components/search-input";
 import { SelectedItem } from "@docspace/ui-kit/components/selected-item";
@@ -152,6 +158,8 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [DateTimePicker](./components/date-time-picker/README.md) | Combined date and time input component |
 | [DropDown](./components/drop-down/README.md) | Dropdown component for menus, options, and contextual content with auto-positioning |
 | [DropDownItem](./components/drop-down-item/README.md) | Dropdown item for menus and lists with separator, header, submenu, and toggle support |
+| [EmptyScreenContainer](./components/empty-screen-container/README.md) | Component for displaying empty states with image, text, and action buttons |
+| [EmptyView](./components/empty-view/README.md) | Empty state component with icon, title, description, and interactive options |
 | [Heading](./components/heading/README.md) | Heading text structured in levels with customizable sizes and types |
 | [IconButton](./components/icon-button/README.md) | Button component displaying an icon with hover, click, and disabled states |
 | [InputBlock](./components/input-block/README.md) | Input component combining text input with optional icon and children elements |
@@ -165,6 +173,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [RadioButtonGroup](./components/radio-button-group/README.md) | Group of radio buttons with horizontal/vertical layouts and text labels |
 | [RectangleSkeleton](./components/rectangle/README.md) | Rectangular skeleton loader for text, buttons, and content placeholders |
 | [RoomIcon](./components/room-icon/README.md) | Room icon component with support for images, colors, badges, editing, and various states |
+| [RoomLogo](./components/room-logo/README.md) | Room logo component displaying room type icons with archive, template, and checkbox support |
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
 | [SearchInput](./components/search-input/README.md) | Search input component with auto-refresh, clear button, and debounce support |
 | [SelectedItem](./components/selected-item/README.md) | Component for displaying selected items with remove functionality |
