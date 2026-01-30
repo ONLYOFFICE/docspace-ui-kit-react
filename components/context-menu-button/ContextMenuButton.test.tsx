@@ -24,37 +24,40 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export enum ShareAccessRights {
-  None = 0,
-  FullAccess = 1,
-  ReadOnly = 2,
-  DenyAccess = 3,
-  Varies = 4,
-  Review = 5,
-  Comment = 6,
-  FormFilling = 7,
-  CustomFilter = 8,
-  RoomManager = 9,
-  Editing = 10,
-  Collaborator = 11,
-}
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
 
-export enum ButtonKeys {
-  enter = "Enter",
-  numpadEnter = "NumpadEnter",
-  esc = "Escape",
-  tab = "Tab",
-  space = "Space",
-}
+import { globalColors } from "../../themes";
 
-export enum RoomsType {
-  AIRoom = 9,
-  PublicRoom = 6,
-  FormRoom = 1,
-  // FillingFormsRoom= 1, //TODO: Restore when certs will be done
-  EditingRoom = 2,
-  // ReviewRoom: 3, //TODO: Restore when certs will be done
-  // ReadOnlyRoom: 4, //TODO: Restore when certs will be done
-  VirtualDataRoom = 8,
-  CustomRoom = 5,
-}
+import VerticalDotsReactSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
+
+import type { ContextMenuModel } from "../context-menu";
+
+import { ContextMenuButton } from "./ContextMenuButton";
+import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
+
+const baseData = (): ContextMenuModel[] => [
+	{
+		key: "key",
+		label: "label",
+		onClick: vi.fn(),
+	},
+];
+
+const baseProps = {
+	title: "Actions",
+	iconName: VerticalDotsReactSvgUrl,
+	size: 16,
+	color: globalColors.gray,
+	getData: baseData,
+	isDisabled: false,
+	displayType: ContextMenuButtonDisplayType.dropdown,
+	data: baseData(),
+};
+
+describe("<ContextMenuButton />", () => {
+	it("renders without error", () => {
+		render(<ContextMenuButton {...baseProps} />);
+		expect(screen.getByTestId("context-menu-button")).toBeInTheDocument();
+	});
+});

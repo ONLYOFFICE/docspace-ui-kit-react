@@ -22,39 +22,25 @@
 //
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export enum ShareAccessRights {
-  None = 0,
-  FullAccess = 1,
-  ReadOnly = 2,
-  DenyAccess = 3,
-  Varies = 4,
-  Review = 5,
-  Comment = 6,
-  FormFilling = 7,
-  CustomFilter = 8,
-  RoomManager = 9,
-  Editing = 10,
-  Collaborator = 11,
-}
+import type {
+  EmptyViewButtonType,
+  EmptyViewLinkType,
+  EmptyViewOptionsType,
+} from "./EmptyView.types";
 
-export enum ButtonKeys {
-  enter = "Enter",
-  numpadEnter = "NumpadEnter",
-  esc = "Escape",
-  tab = "Tab",
-  space = "Space",
-}
+export const isEmptyLinkOptions = (
+  options: EmptyViewOptionsType[number],
+): options is EmptyViewLinkType => {
+  return typeof options === "object" && "to" in options;
+};
 
-export enum RoomsType {
-  AIRoom = 9,
-  PublicRoom = 6,
-  FormRoom = 1,
-  // FillingFormsRoom= 1, //TODO: Restore when certs will be done
-  EditingRoom = 2,
-  // ReviewRoom: 3, //TODO: Restore when certs will be done
-  // ReadOnlyRoom: 4, //TODO: Restore when certs will be done
-  VirtualDataRoom = 8,
-  CustomRoom = 5,
-}
+export const isEmptyButtonOption = (
+  option: EmptyViewOptionsType[number],
+): option is EmptyViewButtonType => {
+  return (
+    typeof option === "object" && "type" in option && option.type === "button"
+  );
+};

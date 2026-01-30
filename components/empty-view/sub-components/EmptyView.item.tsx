@@ -24,37 +24,63 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export enum ShareAccessRights {
-  None = 0,
-  FullAccess = 1,
-  ReadOnly = 2,
-  DenyAccess = 3,
-  Varies = 4,
-  Review = 5,
-  Comment = 6,
-  FormFilling = 7,
-  CustomFilter = 8,
-  RoomManager = 9,
-  Editing = 10,
-  Collaborator = 11,
-}
+import React from "react";
 
-export enum ButtonKeys {
-  enter = "Enter",
-  numpadEnter = "NumpadEnter",
-  esc = "Escape",
-  tab = "Tab",
-  space = "Space",
-}
+import ArrowIcon from "../../../assets/right.arrow.react.svg";
 
-export enum RoomsType {
-  AIRoom = 9,
-  PublicRoom = 6,
-  FormRoom = 1,
-  // FillingFormsRoom= 1, //TODO: Restore when certs will be done
-  EditingRoom = 2,
-  // ReviewRoom: 3, //TODO: Restore when certs will be done
-  // ReadOnlyRoom: 4, //TODO: Restore when certs will be done
-  VirtualDataRoom = 8,
-  CustomRoom = 5,
-}
+import { Text } from "../../text";
+import { ContextMenu, type ContextMenuRefType } from "../../context-menu";
+
+import styles from "../EmptyView.module.scss";
+import type { EmptyViewItemProps } from "../EmptyView.types";
+
+export const EmptyViewItem = ({
+  description,
+  icon,
+  title,
+  onClick,
+  disabled,
+  model,
+  id,
+}: EmptyViewItemProps) => {
+  const contextRef = React.useRef<ContextMenuRefType>(null);
+
+  if (disabled) return;
+
+  const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!model) return onClick?.(event);
+
+    contextRef.current?.show(event);
+  };
+
+  const elementProps = { className: styles.itemIcon };
+
+  return (
+    <div
+      id={id}
+      role="button"
+      tabIndex={0}
+      aria-label={title}
+      onClick={handleClick}
+      className={styles.itemWrapper}
+    >
+      <ContextMenu ref={contextRef} model={model ?? []} />
+      {React.cloneElement(icon, elementProps)}
+      <div className={styles.itemBody}>
+        <Text
+          as="h4"
+          fontWeight="600"
+          lineHeight="20px"
+          className={styles.itemHeader}
+          noSelect
+        >
+          {title}
+        </Text>
+        <Text as="p" fontSize="12px" className={styles.itemSubheading} noSelect>
+          {description}
+        </Text>
+      </div>
+      <ArrowIcon className={styles.arrowIcon} />
+    </div>
+  );
+};

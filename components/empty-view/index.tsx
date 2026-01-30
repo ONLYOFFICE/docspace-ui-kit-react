@@ -24,37 +24,59 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export enum ShareAccessRights {
-  None = 0,
-  FullAccess = 1,
-  ReadOnly = 2,
-  DenyAccess = 3,
-  Varies = 4,
-  Review = 5,
-  Comment = 6,
-  FormFilling = 7,
-  CustomFilter = 8,
-  RoomManager = 9,
-  Editing = 10,
-  Collaborator = 11,
-}
+import { Text } from "../text";
 
-export enum ButtonKeys {
-  enter = "Enter",
-  numpadEnter = "NumpadEnter",
-  esc = "Escape",
-  tab = "Tab",
-  space = "Space",
-}
+import EmptyViewOption from "./sub-components/EmptyView.option";
 
-export enum RoomsType {
-  AIRoom = 9,
-  PublicRoom = 6,
-  FormRoom = 1,
-  // FillingFormsRoom= 1, //TODO: Restore when certs will be done
-  EditingRoom = 2,
-  // ReviewRoom: 3, //TODO: Restore when certs will be done
-  // ReadOnlyRoom: 4, //TODO: Restore when certs will be done
-  VirtualDataRoom = 8,
-  CustomRoom = 5,
-}
+import styles from "./EmptyView.module.scss";
+import type { EmptyViewProps } from "./EmptyView.types";
+
+const EmptyView = ({
+  description,
+  icon,
+  options,
+  title,
+  LinkRouter,
+}: EmptyViewProps) => {
+  return (
+    <div className={styles.wrapper} data-testid="empty-view">
+      <div className={styles.header}>
+        {icon}
+        <Text
+          as="h3"
+          fontWeight="700"
+          lineHeight="22px"
+          className={styles.headerTitle}
+        >
+          {title}
+        </Text>
+        <Text as="p" fontSize="12px" className={styles.subheading}>
+          {description}
+        </Text>
+      </div>
+      {options ? (
+        <div className={styles.body} data-testid="empty-view-body">
+          {options.map((option) => (
+            <EmptyViewOption
+              key={option.key}
+              option={option}
+              LinkRouter={LinkRouter}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+export { EmptyView };
+export type {
+  EmptyViewButtonType,
+  EmptyViewItemType,
+  EmptyViewLinkType,
+  EmptyViewOptionsType,
+  EmptyViewProps,
+  LinkRouterProps,
+  PathObject,
+  To,
+} from "./EmptyView.types";

@@ -24,37 +24,55 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export enum ShareAccessRights {
-  None = 0,
-  FullAccess = 1,
-  ReadOnly = 2,
-  DenyAccess = 3,
-  Varies = 4,
-  Review = 5,
-  Comment = 6,
-  FormFilling = 7,
-  CustomFilter = 8,
-  RoomManager = 9,
-  Editing = 10,
-  Collaborator = 11,
+import type { Meta, StoryObj } from "@storybook/react";
+
+import VerticalDotsReactSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
+
+import { ContextMenuButton } from "./ContextMenuButton";
+import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
+
+const menuData = [
+  { key: "key1", label: "Option 1" },
+  { key: "key2", label: "Option 2" },
+];
+
+function getMenuData() {
+  return menuData;
 }
 
-export enum ButtonKeys {
-  enter = "Enter",
-  numpadEnter = "NumpadEnter",
-  esc = "Escape",
-  tab = "Tab",
-  space = "Space",
-}
+const meta = {
+  title: "components/Interactive elements/ContextMenuButton",
+  component: ContextMenuButton,
+  parameters: {
+    docs: {
+      description: {
+        component: `ContextMenuButton is used for displaying context menu actions on a list's item`,
+      },
+    },
+  },
+} satisfies Meta<typeof ContextMenuButton>;
 
-export enum RoomsType {
-  AIRoom = 9,
-  PublicRoom = 6,
-  FormRoom = 1,
-  // FillingFormsRoom= 1, //TODO: Restore when certs will be done
-  EditingRoom = 2,
-  // ReviewRoom: 3, //TODO: Restore when certs will be done
-  // ReadOnlyRoom: 4, //TODO: Restore when certs will be done
-  VirtualDataRoom = 8,
-  CustomRoom = 5,
-}
+type Story = StoryObj<typeof meta>;
+
+export default meta;
+
+export const Default: Story = {
+  render: (args) => (
+    <div style={{ height: "100px" }}>
+      <ContextMenuButton {...args} />
+    </div>
+  ),
+  args: {
+    title: "Actions",
+    displayType: ContextMenuButtonDisplayType.dropdown,
+    iconName: VerticalDotsReactSvgUrl,
+    size: 16,
+    directionX: "right",
+    directionY: "bottom",
+    fixedDirection: true,
+    isDisabled: false,
+    data: menuData,
+    usePortal: false,
+    getData: getMenuData,
+  },
+};
