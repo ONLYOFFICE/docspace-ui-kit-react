@@ -24,96 +24,43 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import type { TColorScheme } from "../../context/ThemeContext";
 
-export * from "./aside";
+export type SliderProps = {
+  /** Accepts id */
+  id?: string;
 
-export * from "./add-button";
+  /** Accepts class */
+  className?: string;
+  /** Sets the width of the input thumb */
+  thumbWidth?: string;
+  /** Sets the height of the input thumb */
+  thumbHeight?: string;
+  /** Sets the border width of the input thumb */
+  thumbBorderWidth?: string;
+  /** Sets the height of the runnableTrack for the input */
+  runnableTrackHeight?: string;
+  /** The change event is triggered when the elelment's value is modified */
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Determines min range value */
+  min: number;
+  /** Determines max range value */
+  max: number;
+  /** Specifies the increment/decrement step size */
+  step?: number;
+  /** Default input value */
+  value: number;
+  /** Sets the background color of the runnableTrack */
+  withPouring?: boolean;
+  /** Disables the input  */
+  isDisabled?: boolean;
+  /** Accepts css */
+  style?: React.CSSProperties;
+  /** Accepts dataTestId */
+  dataTestId?: string;
+};
 
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
-
-export * from "./time-picker";
-
-export * from "./date-time-picker";
-
-export * from "./radio-button";
-
-export * from "./radio-button-group";
-
-export * from "./tag";
-
-export * from "./tags";
-
-export * from "./context-menu-button";
-
-export * from "./empty-screen-container";
-
-export * from "./empty-view";
-
-export * from "./slider";
+export type SliderThemeProps = SliderProps & {
+  $currentColorScheme?: TColorScheme;
+  sizeProp?: string;
+};
