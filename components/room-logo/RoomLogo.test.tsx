@@ -83,37 +83,58 @@ describe("<RoomLogo />", () => {
   });
 
   describe("Room Types", () => {
-    const testRoomType = (type: RoomsType, expectedIconUrl: string) => {
-      it(`renders correct icon for ${RoomsType[type]} type`, () => {
+    const testRoomType = (type: RoomsType) => {
+      it(`renders icon for ${RoomsType[type]} type`, () => {
         render(<RoomLogo {...baseProps} type={type} />);
 
-        const icon = screen.getByAltText("room-logo") as HTMLImageElement;
-        expect(icon.src).toContain(expectedIconUrl);
+        const container = screen.getByTestId("room-logo");
+        const icon = container.querySelector(".room-logo_icon");
+        expect(icon).toBeInTheDocument();
       });
     };
 
-    testRoomType(RoomsType.EditingRoom, "test-file-stub");
-    testRoomType(RoomsType.CustomRoom, "test-file-stub");
-    testRoomType(RoomsType.PublicRoom, "test-file-stub");
-    testRoomType(RoomsType.FormRoom, "test-file-stub");
-    testRoomType(RoomsType.VirtualDataRoom, "test-file-stub");
+    testRoomType(RoomsType.EditingRoom);
+    testRoomType(RoomsType.CustomRoom);
+    testRoomType(RoomsType.PublicRoom);
+    testRoomType(RoomsType.FormRoom);
+    testRoomType(RoomsType.VirtualDataRoom);
   });
 
   describe("Special States", () => {
-    it("renders archive icon when isArchive is true", () => {
+    it("renders icon when isArchive is true", () => {
       render(<RoomLogo {...baseProps} isArchive />);
 
-      const icon = screen.getByAltText("room-logo") as HTMLImageElement;
-      expect(icon.src).toContain("test-file-stub");
+      const container = screen.getByTestId("room-logo");
+      const icon = container.querySelector(".room-logo_icon");
+      expect(icon).toBeInTheDocument();
     });
 
-    it("prioritizes archive over room type icon", () => {
+    it("renders icon when archive and room type are set", () => {
       render(
         <RoomLogo {...baseProps} isArchive type={RoomsType.EditingRoom} />,
       );
 
-      const icon = screen.getByAltText("room-logo") as HTMLImageElement;
-      expect(icon.src).toContain("test-file-stub");
+      const container = screen.getByTestId("room-logo");
+      const icon = container.querySelector(".room-logo_icon");
+      expect(icon).toBeInTheDocument();
+    });
+
+    it("renders icon when isTemplate is true", () => {
+      render(<RoomLogo {...baseProps} isTemplate />);
+
+      const container = screen.getByTestId("room-logo");
+      const icon = container.querySelector(".room-logo_icon");
+      expect(icon).toBeInTheDocument();
+    });
+
+    it("renders icon when isTemplateRoom is true", () => {
+      render(
+        <RoomLogo {...baseProps} isTemplateRoom type={RoomsType.FormRoom} />,
+      );
+
+      const container = screen.getByTestId("room-logo");
+      const icon = container.querySelector(".room-logo_icon");
+      expect(icon).toBeInTheDocument();
     });
   });
 });
