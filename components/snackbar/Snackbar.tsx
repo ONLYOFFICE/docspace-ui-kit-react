@@ -40,7 +40,7 @@ import styles from "./Snackbar.module.scss";
 
 declare global {
   interface Window {
-    snackbar?: BarConfig;
+    snackbar?: object;
   }
 }
 
