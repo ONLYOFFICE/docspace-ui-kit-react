@@ -27,12 +27,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import EmptySvg from "../../assets/empty.svg";
-import CrossSvg from "../../assets/icons/12/cross.react.svg";
 import type { EmptyViewProps, LinkRouterProps, To } from "./EmptyView.types";
 import styles from "./EmptyView.module.scss";
 
 import { EmptyView } from ".";
+
+const MockIcon = () => <svg data-testid="mock-icon" />;
 
 const toHref = (to: To): string => {
   if (typeof to === "string") return to;
@@ -47,7 +47,7 @@ const MockLinkRouter = ({ children, to, ...props }: LinkRouterProps) => (
 );
 
 const mockProps: EmptyViewProps = {
-  icon: <EmptySvg />,
+  icon: <MockIcon />,
   title: "Test Title",
   description: "Test Description",
   options: null,
@@ -58,7 +58,7 @@ const mockOptionsProps = {
   options: [
     {
       key: "test-action",
-      icon: <CrossSvg />,
+      icon: <MockIcon />,
       to: "/test",
       description: "Test Action",
       onClick: vi.fn(),
