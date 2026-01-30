@@ -28,7 +28,7 @@ import React from "react";
 import { ReactSVG } from "react-svg";
 import classNames from "classnames";
 
-import CrossIconReactSvgUrl from "../../assets/icons/12/cross.react.svg?url";
+import CrossIconReactSvgUrl from "../../assets/icons/12/cross.react.svg";
 
 import { DropDown } from "../drop-down";
 import { DropDownItem } from "../drop-down-item";
@@ -224,7 +224,7 @@ const TagPure = ({
           {isNewTag && !!onDelete ? (
             <IconButton
               className={styles.tagIcon}
-              iconName={CrossIconReactSvgUrl}
+              iconNode={<CrossIconReactSvgUrl />}
               size={12}
               onClick={onDeleteAction}
             />
