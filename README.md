@@ -21,27 +21,45 @@ pnpm add @docspace/ui-kit
 import {
   Aside,
   AsideHeader,
+  Avatar,
+  Backdrop,
   Badge,
   Button,
+  Calendar,
   Checkbox,
   CircleSkeleton,
+  ComboBox,
+  ContextMenu,
+  ContextMenuButton,
+  DatePicker,
+  DateTimePicker,
+  DropDown,
   DropDownItem,
   Heading,
+  IconButton,
+  InputBlock,
   Label,
   Link,
   Loader,
   MCPIcon,
   ModalDialog,
   Portal,
+  RadioButton,
+  RadioButtonGroup,
   RectangleSkeleton,
+  RoomIcon,
   Scrollbar,
   SearchInput,
+  SelectedItem,
   TabItem,
   Tabs,
+  Tag,
+  Tags,
   Text,
   TextInput,
   Textarea,
   ThemeProvider,
+  TimePicker,
   Toast,
   toastr,
   ToggleButton,
@@ -53,32 +71,48 @@ import {
 
 ```js
 import { Aside, AsideHeader } from "@docspace/ui-kit/components/aside";
+import { Avatar } from "@docspace/ui-kit/components/avatar";
+import { Backdrop } from "@docspace/ui-kit/components/backdrop";
+import { Badge } from "@docspace/ui-kit/components/badge";
 import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
-import { Label } from "@docspace/ui-kit/components/label";
-import { Text } from "@docspace/ui-kit/components/text";
+import { Calendar } from "@docspace/ui-kit/components/calendar";
+import { Checkbox } from "@docspace/ui-kit/components/checkbox";
+import { CircleSkeleton } from "@docspace/ui-kit/components/circle";
+import { ComboBox } from "@docspace/ui-kit/components/combobox";
+import { ContextMenu } from "@docspace/ui-kit/components/context-menu";
+import { ContextMenuButton, ContextMenuButtonDisplayType } from "@docspace/ui-kit/components/context-menu-button";
+import { DatePicker } from "@docspace/ui-kit/components/date-picker";
+import { DateTimePicker } from "@docspace/ui-kit/components/date-time-picker";
+import { DropDown } from "@docspace/ui-kit/components/drop-down";
+import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
 import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
+import { IconButton } from "@docspace/ui-kit/components/icon-button";
+import { InputBlock } from "@docspace/ui-kit/components/input-block";
+import { Label } from "@docspace/ui-kit/components/label";
 import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
+import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
+import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
 import { ModalDialog, ModalDialogType } from "@docspace/ui-kit/components/modal-dialog";
 import { Portal } from "@docspace/ui-kit/components/portal";
-import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
-import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
-import { SearchInput } from "@docspace/ui-kit/components/search-input";
-import { Textarea } from "@docspace/ui-kit/components/textarea";
-import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
-import { Checkbox } from "@docspace/ui-kit/components/checkbox";
+import { RadioButton } from "@docspace/ui-kit/components/radio-button";
+import { RadioButtonGroup } from "@docspace/ui-kit/components/radio-button-group";
+import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
+import { RoomIcon } from "@docspace/ui-kit/components/room-icon";
 import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
+import { SearchInput } from "@docspace/ui-kit/components/search-input";
+import { SelectedItem } from "@docspace/ui-kit/components/selected-item";
 import { TabItem } from "@docspace/ui-kit/components/tab-item";
 import { Tabs, TabsTypes } from "@docspace/ui-kit/components/tabs";
+import { Tag } from "@docspace/ui-kit/components/tag";
+import { Tags } from "@docspace/ui-kit/components/tags";
+import { Text } from "@docspace/ui-kit/components/text";
+import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
+import { Textarea } from "@docspace/ui-kit/components/textarea";
 import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
-import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
-import { Badge } from "@docspace/ui-kit/components/badge";
-import { ContextMenu } from "@docspace/ui-kit/components/context-menu";
-import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
+import { TimePicker } from "@docspace/ui-kit/components/time-picker";
 import { Toast, toastr } from "@docspace/ui-kit/components/toast";
-import { CircleSkeleton } from "@docspace/ui-kit/components/circle";
-import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
-import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
-import { RoomIcon } from "@docspace/ui-kit/components/room-icon";
+import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
+import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
 ```
 
 ### Import contexts and hooks
@@ -101,32 +135,48 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 
 | Component | Description |
 |-----------|-------------|
+| [AddButton](./components/add-button/README.md) | Button component for adding items with optional label, loading state, and accent styling |
 | [Aside](./components/aside/README.md) | Sliding panel component for displaying side content like settings, details, or forms |
 | [AsideHeader](./components/aside/aside-header/README.md) | Header component for aside panels with optional back/close buttons, custom icons, and loading states |
+| [Avatar](./components/avatar/README.md) | Component for displaying user or group avatars with images, initials, icons, and role indicators |
+| [Backdrop](./components/backdrop/README.md) | Customizable overlay for modals, dialogs, and aside components with touch support |
 | [Badge](./components/badge/README.md) | Versatile badge for notifications, status markers, or interactive elements with various display modes |
 | [Button](./components/button/README.md) | Versatile button component with primary/secondary variants, multiple sizes, loading states, and tooltip support |
-| [AddButton](./components/add-button/README.md) | Button component for adding items with optional label, loading state, and accent styling |
+| [Calendar](./components/calendar/README.md) | Custom calendar component for date selection |
 | [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |
 | [CircleSkeleton](./components/circle/README.md) | Circular skeleton loader for avatar and icon placeholders |
+| [ComboBox](./components/combobox/README.md) | Combo box combining text input with dropdown list, supporting search and custom styling |
 | [ContextMenu](./components/context-menu/README.md) | Context menu for displaying contextual actions with submenus, headers, toggles, and hotkeys |
+| [ContextMenuButton](./components/context-menu-button/README.md) | Button for displaying context menu actions on list items with dropdown support |
+| [DatePicker](./components/date-picker/README.md) | Date picker input component for selecting dates |
+| [DateTimePicker](./components/date-time-picker/README.md) | Combined date and time input component |
+| [DropDown](./components/drop-down/README.md) | Dropdown component for menus, options, and contextual content with auto-positioning |
 | [DropDownItem](./components/drop-down-item/README.md) | Dropdown item for menus and lists with separator, header, submenu, and toggle support |
 | [Heading](./components/heading/README.md) | Heading text structured in levels with customizable sizes and types |
+| [IconButton](./components/icon-button/README.md) | Button component displaying an icon with hover, click, and disabled states |
+| [InputBlock](./components/input-block/README.md) | Input component combining text input with optional icon and children elements |
 | [Label](./components/label/README.md) | Form label with required indicator and tooltip support |
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
 | [MCPIcon](./components/mcp-icon/README.md) | Icon component for MCP (Model Context Protocol) with image or text fallback |
 | [ModalDialog](./components/modal-dialog/README.md) | Versatile modal dialog component supporting both modal and aside (side panel) display types with keyboard shortcuts |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
+| [RadioButton](./components/radio-button/README.md) | Radio button component with customizable labels and styles |
+| [RadioButtonGroup](./components/radio-button-group/README.md) | Group of radio buttons with horizontal/vertical layouts and text labels |
 | [RectangleSkeleton](./components/rectangle/README.md) | Rectangular skeleton loader for text, buttons, and content placeholders |
 | [RoomIcon](./components/room-icon/README.md) | Room icon component with support for images, colors, badges, editing, and various states |
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
 | [SearchInput](./components/search-input/README.md) | Search input component with auto-refresh, clear button, and debounce support |
+| [SelectedItem](./components/selected-item/README.md) | Component for displaying selected items with remove functionality |
 | [TabItem](./components/tab-item/README.md) | Tab navigation component with active states, multi-select, and disabled state support |
 | [Tabs](./components/tabs/README.md) | Tab container component with primary/secondary themes, sticky positioning, and content management |
+| [Tag](./components/tag/README.md) | Tag component for displaying virtual room tags |
+| [Tags](./components/tags/README.md) | Container component for displaying multiple tags |
 | [Text](./components/text/README.md) | Typography component with various styling options |
 | [TextInput](./components/text-input/README.md) | Input field for single-line strings with masking support |
 | [Textarea](./components/textarea/README.md) | Multi-line text input with JSON formatting, line numbers, and copy functionality |
 | [ThemeProvider](./components/theme-provider/README.md) | Provider component for theme management with styled-components integration |
+| [TimePicker](./components/time-picker/README.md) | Time input component for selecting time values |
 | [Toast](./components/toast/README.md) | Notification component with success, error, warning, and info variants |
 | [ToggleButton](./components/toggle-button/README.md) | Customizable toggle button with loading and disabled states |
 | [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |

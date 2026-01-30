@@ -24,94 +24,63 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import React from "react";
 
-export * from "./aside";
+import ArrowIcon from "../../../assets/right.arrow.react.svg";
 
-export * from "./add-button";
+import { Text } from "../../text";
+import { ContextMenu, type ContextMenuRefType } from "../../context-menu";
 
-export * from "./badge";
+import styles from "../EmptyView.module.scss";
+import type { EmptyViewItemProps } from "../EmptyView.types";
 
-export * from "./button";
+export const EmptyViewItem = ({
+  description,
+  icon,
+  title,
+  onClick,
+  disabled,
+  model,
+  id,
+}: EmptyViewItemProps) => {
+  const contextRef = React.useRef<ContextMenuRefType>(null);
 
-export * from "./backdrop";
+  if (disabled) return;
 
-export * from "./checkbox";
+  const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!model) return onClick?.(event);
 
-export * from "./drop-down";
+    contextRef.current?.show(event);
+  };
 
-export * from "./drop-down-item";
+  const elementProps = { className: styles.itemIcon };
 
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
-
-export * from "./time-picker";
-
-export * from "./date-time-picker";
-
-export * from "./radio-button";
-
-export * from "./radio-button-group";
-
-export * from "./tag";
-
-export * from "./tags";
-
-export * from "./context-menu-button";
-
-export * from "./empty-screen-container";
-
-export * from "./empty-view";
+  return (
+    <div
+      id={id}
+      role="button"
+      tabIndex={0}
+      aria-label={title}
+      onClick={handleClick}
+      className={styles.itemWrapper}
+    >
+      <ContextMenu ref={contextRef} model={model ?? []} />
+      {React.cloneElement(icon, elementProps)}
+      <div className={styles.itemBody}>
+        <Text
+          as="h4"
+          fontWeight="600"
+          lineHeight="20px"
+          className={styles.itemHeader}
+          noSelect
+        >
+          {title}
+        </Text>
+        <Text as="p" fontSize="12px" className={styles.itemSubheading} noSelect>
+          {description}
+        </Text>
+      </div>
+      <ArrowIcon className={styles.arrowIcon} />
+    </div>
+  );
+};

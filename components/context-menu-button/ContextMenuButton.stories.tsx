@@ -24,94 +24,55 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import type { Meta, StoryObj } from "@storybook/react";
 
-export * from "./aside";
+import VerticalDotsReactSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
 
-export * from "./add-button";
+import { ContextMenuButton } from "./ContextMenuButton";
+import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
-export * from "./badge";
+const menuData = [
+  { key: "key1", label: "Option 1" },
+  { key: "key2", label: "Option 2" },
+];
 
-export * from "./button";
+function getMenuData() {
+  return menuData;
+}
 
-export * from "./backdrop";
+const meta = {
+  title: "components/Interactive elements/ContextMenuButton",
+  component: ContextMenuButton,
+  parameters: {
+    docs: {
+      description: {
+        component: `ContextMenuButton is used for displaying context menu actions on a list's item`,
+      },
+    },
+  },
+} satisfies Meta<typeof ContextMenuButton>;
 
-export * from "./checkbox";
+type Story = StoryObj<typeof meta>;
 
-export * from "./drop-down";
+export default meta;
 
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
-
-export * from "./time-picker";
-
-export * from "./date-time-picker";
-
-export * from "./radio-button";
-
-export * from "./radio-button-group";
-
-export * from "./tag";
-
-export * from "./tags";
-
-export * from "./context-menu-button";
-
-export * from "./empty-screen-container";
-
-export * from "./empty-view";
+export const Default: Story = {
+  render: (args) => (
+    <div style={{ height: "100px" }}>
+      <ContextMenuButton {...args} />
+    </div>
+  ),
+  args: {
+    title: "Actions",
+    displayType: ContextMenuButtonDisplayType.dropdown,
+    iconName: VerticalDotsReactSvgUrl,
+    size: 16,
+    directionX: "right",
+    directionY: "bottom",
+    fixedDirection: true,
+    isDisabled: false,
+    data: menuData,
+    usePortal: false,
+    getData: getMenuData,
+  },
+};

@@ -24,94 +24,31 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import type { CSSProperties, ReactNode } from "react";
 
-export * from "./aside";
-
-export * from "./add-button";
-
-export * from "./badge";
-
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
-
-export * from "./time-picker";
-
-export * from "./date-time-picker";
-
-export * from "./radio-button";
-
-export * from "./radio-button-group";
-
-export * from "./tag";
-
-export * from "./tags";
-
-export * from "./context-menu-button";
-
-export * from "./empty-screen-container";
-
-export * from "./empty-view";
+export type EmptyScreenContainerProps = {
+  /** URL source for the empty state image */
+  imageSrc: string;
+  /** Alternative text for the image for accessibility */
+  imageAlt: string;
+  /** Main header text displayed below the image */
+  headerText: string;
+  /** Optional subheading text displayed below the header */
+  subheadingText?: string;
+  /** Optional description text or React node displayed below the subheading */
+  descriptionText?: string | ReactNode;
+  /** Optional buttons or other interactive elements */
+  buttons?: ReactNode;
+  /** Additional CSS class name */
+  className?: string;
+  /** HTML id attribute */
+  id?: string;
+  /** Custom CSS styles for the container */
+  style?: CSSProperties;
+  /** Custom CSS styles for the image */
+  imageStyle?: CSSProperties;
+  /** Custom CSS styles for the buttons container */
+  buttonStyle?: CSSProperties;
+  /** Whether to display without filter styling */
+  withoutFilter?: boolean;
+};

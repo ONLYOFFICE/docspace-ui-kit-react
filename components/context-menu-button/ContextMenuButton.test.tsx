@@ -24,94 +24,40 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
 
-export * from "./aside";
+import { globalColors } from "../../themes";
 
-export * from "./add-button";
+import VerticalDotsReactSvgUrl from "../assets/icons/16/vertical-dots.react.svg?url";
 
-export * from "./badge";
+import type { ContextMenuModel } from "../context-menu";
 
-export * from "./button";
+import { ContextMenuButton } from "./ContextMenuButton";
+import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
-export * from "./backdrop";
+const baseData = (): ContextMenuModel[] => [
+	{
+		key: "key",
+		label: "label",
+		onClick: vi.fn(),
+	},
+];
 
-export * from "./checkbox";
+const baseProps = {
+	title: "Actions",
+	iconName: VerticalDotsReactSvgUrl,
+	size: 16,
+	color: globalColors.gray,
+	getData: baseData,
+	isDisabled: false,
+	displayType: ContextMenuButtonDisplayType.dropdown,
+	data: baseData(),
+};
 
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
-
-export * from "./time-picker";
-
-export * from "./date-time-picker";
-
-export * from "./radio-button";
-
-export * from "./radio-button-group";
-
-export * from "./tag";
-
-export * from "./tags";
-
-export * from "./context-menu-button";
-
-export * from "./empty-screen-container";
-
-export * from "./empty-view";
+describe("<ContextMenuButton />", () => {
+	it("renders without error", () => {
+		render(<ContextMenuButton {...baseProps} />);
+		expect(screen.getByTestId("context-menu-button")).toBeInTheDocument();
+	});
+});

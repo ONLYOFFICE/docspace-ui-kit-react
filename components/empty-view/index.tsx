@@ -24,94 +24,59 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./avatar";
+import { Text } from "../text";
 
-export * from "./aside";
+import EmptyViewOption from "./sub-components/EmptyView.option";
 
-export * from "./add-button";
+import styles from "./EmptyView.module.scss";
+import type { EmptyViewProps } from "./EmptyView.types";
 
-export * from "./badge";
+const EmptyView = ({
+  description,
+  icon,
+  options,
+  title,
+  LinkRouter,
+}: EmptyViewProps) => {
+  return (
+    <div className={styles.wrapper} data-testid="empty-view">
+      <div className={styles.header}>
+        {icon}
+        <Text
+          as="h3"
+          fontWeight="700"
+          lineHeight="22px"
+          className={styles.headerTitle}
+        >
+          {title}
+        </Text>
+        <Text as="p" fontSize="12px" className={styles.subheading}>
+          {description}
+        </Text>
+      </div>
+      {options ? (
+        <div className={styles.body} data-testid="empty-view-body">
+          {options.map((option) => (
+            <EmptyViewOption
+              key={option.key}
+              option={option}
+              LinkRouter={LinkRouter}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+};
 
-export * from "./button";
-
-export * from "./backdrop";
-
-export * from "./checkbox";
-
-export * from "./drop-down";
-
-export * from "./drop-down-item";
-
-export * from "./label";
-
-export * from "./portal";
-
-export * from "./tooltip";
-
-export * from "./link";
-
-export * from "./text";
-
-export * from "./text-input";
-
-export * from "./loader";
-
-export * from "./theme-provider";
-
-export * from "./scrollbar";
-
-export * from "./icon-button";
-
-export * from "./toggle-button";
-
-export * from "./tab-item";
-
-export * from "./toast";
-
-export * from "./textarea";
-
-export * from "./tabs";
-
-export * from "./circle";
-
-export * from "./rectangle";
-
-export * from "./heading";
-
-export * from "./mcp-icon";
-
-export * from "./input-block";
-
-export * from "./room-icon";
-
-export * from "./context-menu";
-
-export * from "./combobox";
-
-export * from "./search-input";
-
-export * from "./modal-dialog";
-
-export * from "./calendar";
-
-export * from "./selected-item";
-
-export * from "./date-picker";
-
-export * from "./time-picker";
-
-export * from "./date-time-picker";
-
-export * from "./radio-button";
-
-export * from "./radio-button-group";
-
-export * from "./tag";
-
-export * from "./tags";
-
-export * from "./context-menu-button";
-
-export * from "./empty-screen-container";
-
-export * from "./empty-view";
+export { EmptyView };
+export type {
+  EmptyViewButtonType,
+  EmptyViewItemType,
+  EmptyViewLinkType,
+  EmptyViewOptionsType,
+  EmptyViewProps,
+  LinkRouterProps,
+  PathObject,
+  To,
+} from "./EmptyView.types";
