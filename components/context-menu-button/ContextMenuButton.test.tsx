@@ -29,7 +29,7 @@ import { render, screen } from "@testing-library/react";
 
 import { globalColors } from "../../themes";
 
-import VerticalDotsReactSvgUrl from "../assets/icons/16/vertical-dots.react.svg?url";
+import VerticalDotsReactSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
 
 import type { ContextMenuModel } from "../context-menu";
 
