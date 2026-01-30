@@ -51,7 +51,7 @@ import { Textarea } from "@docspace/ui-kit/components/textarea";
 
 - **RTL Support**: Automatically handles right-to-left text direction
 - **JSON Formatting**: Beautifies JSON content when `isJSONField` is true
-- **Copy Functionality**: Provides a copy button when `enableCopy` is true
+- **Copy Functionality**: Provides a copy button when `enableCopy` is true (shows toast notification if `copyInfoText` is provided)
 - **Line Numbers**: Shows line numbers when `hasNumeration` is true
 - **Adaptive Height**: Supports various height modes (fixed, scaled, full)
 - **Accessibility**: Full keyboard navigation and screen reader support
@@ -68,3 +68,19 @@ The component uses SCSS modules for styling and supports theme customization thr
 - Custom scrollbar styling
 - Focus and error states
 - Disabled state styling
+
+### Toast i18n Configuration
+
+When using the copy functionality with `copyInfoText`, the component displays a success toast notification. The toast title is automatically localized if `window.i18n` is configured.
+
+See [Toast i18n Setup](../../README.md#toast-i18n-setup) for instructions on setting up `window.i18n` for localized toast titles.
+
+```jsx
+// Example with copy notification
+<Textarea
+  enableCopy
+  copyInfoText="Content was copied successfully!"
+  value={jsonContent}
+  isJSONField
+/>
+```

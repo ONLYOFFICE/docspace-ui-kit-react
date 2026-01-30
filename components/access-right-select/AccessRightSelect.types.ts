@@ -24,8 +24,54 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { Toast } from "./Toast";
-export { toastr, getTitle } from "./sub-components/Toastr";
-export { ToastType } from "./Toast.enums";
-export type { ToastProps, TData } from "./Toast.types";
+import type { TComboboxProps } from "../combobox";
 
+type PropsFromCombobox = Pick<
+	TComboboxProps,
+	| "className"
+	| "selectedOption"
+	| "advancedOptions"
+	| "scaled"
+	| "scaledOptions"
+	| "size"
+	| "manualWidth"
+	| "onSelect"
+	| "directionX"
+	| "directionY"
+	| "fixedDirection"
+	| "isAside"
+	| "manualY"
+	| "withoutBackground"
+	| "withBackground"
+	| "withBlur"
+	| "type"
+	| "noBorder"
+	| "isDisabled"
+	| "isMobileView"
+	| "shouldShowBackdrop"
+	| "dataTestId"
+	| "noSelect"
+	| "isLoading"
+	| "showDisabledItems"
+	| "withBackdrop"
+	| "title"
+	| "displaySelectedOption"
+>;
+
+export type AccessRightSelectProps = PropsFromCombobox & {
+	/** List of access options */
+	accessOptions: TComboboxProps["options"];
+	isSelectionDisabled?: boolean;
+	selectionErrorText?: React.ReactNode;
+	availableAccess?: number[];
+	topSpace?: number;
+	modernView?: boolean;
+	fillIcon?: boolean;
+	isDefaultMode?: boolean;
+	comboIcon?: string;
+	usePortalBackdrop?: boolean;
+	directionX?: string;
+	directionY?: string;
+	dataTestId?: string;
+	setIsOpenItemAccess?: React.Dispatch<React.SetStateAction<boolean>>;
+};
