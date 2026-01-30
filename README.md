@@ -46,6 +46,7 @@ import {
   MCPIcon,
   ModalDialog,
   Portal,
+  PublicRoomBar,
   RadioButton,
   RadioButtonGroup,
   RectangleSkeleton,
@@ -99,6 +100,7 @@ import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
 import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
 import { ModalDialog, ModalDialogType } from "@docspace/ui-kit/components/modal-dialog";
 import { Portal } from "@docspace/ui-kit/components/portal";
+import { PublicRoomBar } from "@docspace/ui-kit/components/public-room-bar";
 import { RadioButton } from "@docspace/ui-kit/components/radio-button";
 import { RadioButtonGroup } from "@docspace/ui-kit/components/radio-button-group";
 import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
@@ -169,6 +171,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [MCPIcon](./components/mcp-icon/README.md) | Icon component for MCP (Model Context Protocol) with image or text fallback |
 | [ModalDialog](./components/modal-dialog/README.md) | Versatile modal dialog component supporting both modal and aside (side panel) display types with keyboard shortcuts |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
+| [PublicRoomBar](./components/public-room-bar/README.md) | Information bar for public room notifications with header, body text, and close button |
 | [RadioButton](./components/radio-button/README.md) | Radio button component with customizable labels and styles |
 | [RadioButtonGroup](./components/radio-button-group/README.md) | Group of radio buttons with horizontal/vertical layouts and text labels |
 | [RectangleSkeleton](./components/rectangle/README.md) | Rectangular skeleton loader for text, buttons, and content placeholders |
