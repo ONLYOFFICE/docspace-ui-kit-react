@@ -29,13 +29,13 @@
 :global(.dark) {
   :local {
     .loaderContainer {
-      --app-loader-background-color: #{colors.$black};
+      --app-loader-background-color: #{$black};
     }
   }
 }
 
 .loaderContainer {
-  --app-loader-background-color: #{colors.$white};
+  --app-loader-background-color: #{$white};
 
   width: 100vw;
   height: 100vh;
