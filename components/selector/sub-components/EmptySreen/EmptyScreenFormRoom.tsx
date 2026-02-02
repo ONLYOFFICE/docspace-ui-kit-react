@@ -40,46 +40,47 @@ import styles from "../../Selector.module.scss";
 import type { EmptyScreenFormRoomProps } from "../../Selector.types";
 
 const EmptyScreenFormRoom = ({
-	onCreateClickAction,
-	createDefineRoomType,
+  onCreateClickAction,
+  createDefineRoomType,
 }: EmptyScreenFormRoomProps) => {
-	const { isBase } = useTheme();
+  const { isBase } = useTheme();
 
-	const FormRoomEmptyScreenImage = isBase
-		? FormRoomEmptyLightImage
-		: FormRoomEmptyDarkImage;
+  const FormRoomEmptyScreenImage = isBase
+    ? FormRoomEmptyLightImage
+    : FormRoomEmptyDarkImage;
 
-	const description =
-		createDefineRoomType === RoomsType.FormRoom
-			? getCommonTranslation("SelectorFormRoomEmptyScreenDescription") || ""
-			: getCommonTranslation("SelectorVDREmptyScreenDescription") || "";
+  const description =
+    createDefineRoomType === RoomsType.FormRoom
+      ? getCommonTranslation("SelectorFormRoomEmptyScreenDescription") || "" // t("SelectorFormRoomEmptyScreenDescription")
+      : getCommonTranslation("SelectorVDREmptyScreenDescription") || ""; // t("SelectorVDREmptyScreenDescription")
 
-	const buttonLabel =
-		createDefineRoomType === RoomsType.FormRoom
-			? getCommonTranslation("CreateFormFillingRoom") || ""
-			: getCommonTranslation("CreateVirtualDataRoom") || "";
+  const buttonLabel =
+    createDefineRoomType === RoomsType.FormRoom
+      ? getCommonTranslation("CreateFormFillingRoom") || ""
+      : getCommonTranslation("CreateVirtualDataRoom") || "";
 
-	return (
-		<section className={styles.newEmptyScreen}>
-			<FormRoomEmptyScreenImage className="empty-image" />
-			<Heading level={3} className="empty-header">
-				{getCommonTranslation("NoRoomsFound") || ""}
-			</Heading>
-			<Text className="empty-description">{description}</Text>
-			<div className="empty_button-wrapper" onClick={onCreateClickAction}>
-				<AddButton
-					isAction
-					iconSize={16}
-					className="empty-button"
-					iconNode={<Plus16ReactSvg />}
-					title={buttonLabel}
-					label={buttonLabel}
-					size="36px"
-					noSelect
-				/>
-			</div>
-		</section>
-	);
+  return (
+    <section className={styles.newEmptyScreen}>
+      <FormRoomEmptyScreenImage className="empty-image" />
+      <Heading level={3} className="empty-header">
+        {/* t("NoRoomsFound") */}
+        {getCommonTranslation("NoRoomsFound") || ""}
+      </Heading>
+      <Text className="empty-description">{description}</Text>
+      <div className="empty_button-wrapper" onClick={onCreateClickAction}>
+        <AddButton
+          isAction
+          iconSize={16}
+          className="empty-button"
+          iconNode={<Plus16ReactSvg />}
+          title={buttonLabel}
+          label={buttonLabel}
+          size="36px"
+          noSelect
+        />
+      </div>
+    </section>
+  );
 };
 
 export default EmptyScreenFormRoom;
