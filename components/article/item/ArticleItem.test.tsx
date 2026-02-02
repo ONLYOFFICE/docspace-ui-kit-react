@@ -29,7 +29,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import ArticleFolderReactSvgUrl from "PUBLIC_DIR/images/icons/16/catalog.folder.react.svg?url";
+import ArticleFolderReactSvgUrl from "../../../assets/icons/16/catalog.folder.react.svg?url";
 
 import { ArticleItem } from ".";
 
