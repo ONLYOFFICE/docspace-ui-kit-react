@@ -136,6 +136,14 @@ export const enum FolderType {
   AIAgents = 34,
 }
 
+export enum GuidanceRefKey {
+  Pdf = "pdf",
+  Ready = "ready",
+  Share = "share",
+  Uploading = "uploading",
+  MainButton = "mainButton",
+}
+
 /**
  * Enum for device type.
  * @readonly
