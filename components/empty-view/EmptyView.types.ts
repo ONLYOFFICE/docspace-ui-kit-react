@@ -1,26 +1,7 @@
 import type { ComponentType } from "react";
 
-import type { Nullable } from "../../types";
+import type { Nullable, LinkRouterProps, To } from "../../types";
 import type { ContextMenuModel } from "../context-menu";
-
-/** Path object compatible with react-router */
-export type PathObject = {
-  pathname?: string;
-  search?: string;
-  hash?: string;
-};
-
-/** Route target - string path or path object */
-export type To = string | PathObject;
-
-export type LinkRouterProps = {
-  id?: string;
-  className?: string;
-  to: To;
-  state?: unknown;
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
-  children?: React.ReactNode;
-};
 
 export type EmptyViewButtonType = {
   /** Unique identifier for the button */

@@ -76,7 +76,4 @@ export type {
   EmptyViewLinkType,
   EmptyViewOptionsType,
   EmptyViewProps,
-  LinkRouterProps,
-  PathObject,
-  To,
 } from "./EmptyView.types";

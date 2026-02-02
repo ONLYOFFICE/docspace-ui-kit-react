@@ -27,7 +27,8 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import type { EmptyViewProps, LinkRouterProps, To } from "./EmptyView.types";
+import type { EmptyViewProps } from "./EmptyView.types";
+import type { LinkRouterProps, To } from "../../types";
 import styles from "./EmptyView.module.scss";
 
 import { EmptyView } from ".";

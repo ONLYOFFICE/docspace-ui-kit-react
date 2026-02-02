@@ -203,3 +203,23 @@ export type TUser = {
   tfaAppEnabled?: boolean;
   sharedTo?: object;
 };
+
+/** Path object compatible with react-router */
+export type PathObject = {
+  pathname?: string;
+  search?: string;
+  hash?: string;
+};
+
+/** Route target - string path or path object */
+export type To = string | PathObject;
+
+export type LinkRouterProps = {
+  id?: string;
+  style?: React.CSSProperties;
+  className?: string;
+  to: To;
+  state?: unknown;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+  children?: React.ReactNode;
+};

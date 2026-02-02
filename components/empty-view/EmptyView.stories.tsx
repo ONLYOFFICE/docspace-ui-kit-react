@@ -30,7 +30,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 import EmptySvg from "../../assets/empty.svg";
 import CrossSvg from "../../assets/icons/12/cross.react.svg";
 import { EmptyView } from ".";
-import type { EmptyViewProps, LinkRouterProps, To } from "./EmptyView.types";
+import type { EmptyViewProps } from "./EmptyView.types";
+import type { LinkRouterProps, To } from "../../types";
 
 const toHref = (to: To): string => {
   if (typeof to === "string") return to;
