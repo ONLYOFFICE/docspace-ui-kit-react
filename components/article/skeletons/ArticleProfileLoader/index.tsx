@@ -24,28 +24,43 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { globalColors } from "../themes";
+import React from "react";
+import classNames from "classnames";
 
-export const LOADER_STYLE = Object.freeze({
-  title: "",
-  width: "100%",
-  height: "32",
-  backgroundColor: globalColors.darkBlack,
-  foregroundColor: globalColors.darkBlack,
-  backgroundOpacity: 0.1,
-  foregroundOpacity: 0.15,
-  borderRadius: "3",
-  radius: "3",
-  speed: 2,
-  animate: true,
-});
+import { RectangleSkeleton } from "../../../rectangle";
 
-export const ROOM_ACTION_KEYS = {
-  CREATE_EDIT_ROOM_UPLOAD: "create_edit_room_upload",
-  CREATE_EDIT_ROOM_DELETE: "create_edit_room_delete",
-  CREATE_EDIT_ROOM_CUSTOMIZE_COVER: "create_edit_room_customize_cover",
-} as const;
+import styles from "./ArticleProfileLoader.module.scss";
+import { ProfileLoaderProps } from "./ProfileLoader.types";
 
-export const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";
-
-export const LIVE_CHAT_LOCAL_STORAGE_KEY = "live_chat_state";
+export const ArticleProfileLoader = ({
+  id,
+  className,
+  style,
+  showText,
+}: ProfileLoaderProps) => {
+  return (
+    <div
+      id={id}
+      className={classNames(styles.container, className)}
+      style={style}
+      data-testid="article-profile-loader"
+      data-show-text={showText ? "true" : "false"}
+    >
+      <div className={styles.block}>
+        {showText ? (
+          <>
+            <RectangleSkeleton width="40px" height="40px" borderRadius="50%" />
+            <RectangleSkeleton width="131px" height="18px" className="title" />
+            <RectangleSkeleton
+              width="16px"
+              height="16px"
+              className="option-button"
+            />
+          </>
+        ) : (
+          <RectangleSkeleton width="32px" height="32px" borderRadius="50%" />
+        )}
+      </div>
+    </div>
+  );
+};

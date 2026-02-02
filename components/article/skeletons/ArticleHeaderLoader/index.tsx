@@ -24,28 +24,53 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { globalColors } from "../themes";
+import React from "react";
+import classNames from "classnames";
 
-export const LOADER_STYLE = Object.freeze({
-  title: "",
-  width: "100%",
-  height: "32",
-  backgroundColor: globalColors.darkBlack,
-  foregroundColor: globalColors.darkBlack,
-  backgroundOpacity: 0.1,
-  foregroundOpacity: 0.15,
-  borderRadius: "3",
-  radius: "3",
-  speed: 2,
-  animate: true,
-});
+import { RectangleSkeleton } from "../../../rectangle";
 
-export const ROOM_ACTION_KEYS = {
-  CREATE_EDIT_ROOM_UPLOAD: "create_edit_room_upload",
-  CREATE_EDIT_ROOM_DELETE: "create_edit_room_delete",
-  CREATE_EDIT_ROOM_CUSTOMIZE_COVER: "create_edit_room_customize_cover",
-} as const;
+import styles from "./ArticleHeaderLoader.module.scss";
+import { HeaderLoaderProps } from "./HeaderLoader.types";
 
-export const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";
-
-export const LIVE_CHAT_LOCAL_STORAGE_KEY = "live_chat_state";
+export const ArticleHeaderLoader = ({
+  id,
+  className,
+  style,
+  showText,
+  ...rest
+}: HeaderLoaderProps) => {
+  const {
+    title,
+    width,
+    height,
+    borderRadius,
+    backgroundColor,
+    foregroundColor,
+    backgroundOpacity,
+    foregroundOpacity,
+    speed,
+    animate,
+  } = rest;
+  return (
+    <div
+      id={id}
+      className={classNames(styles.header, className)}
+      style={style}
+      data-show-text={showText ? "true" : "false"}
+      data-testid="article-header-loader"
+    >
+      <RectangleSkeleton
+        title={title}
+        width={width}
+        height={height}
+        borderRadius={borderRadius}
+        backgroundColor={backgroundColor}
+        foregroundColor={foregroundColor}
+        backgroundOpacity={backgroundOpacity}
+        foregroundOpacity={foregroundOpacity}
+        speed={speed}
+        animate={animate}
+      />
+    </div>
+  );
+};

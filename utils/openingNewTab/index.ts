@@ -1,4 +1,4 @@
-// (c) Copyright Ascensio System SIA 2009-2026
+// (c) Copyright Ascensio System SIA 2010-2026
 //
 // This program is a free software product.
 // You can redistribute it and/or modify it under the terms
@@ -24,28 +24,59 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { globalColors } from "../themes";
+import { combineUrl } from "../combineUrl";
 
-export const LOADER_STYLE = Object.freeze({
-  title: "",
-  width: "100%",
-  height: "32",
-  backgroundColor: globalColors.darkBlack,
-  foregroundColor: globalColors.darkBlack,
-  backgroundOpacity: 0.1,
-  foregroundOpacity: 0.15,
-  borderRadius: "3",
-  radius: "3",
-  speed: 2,
-  animate: true,
-});
+declare global {
+  interface Window {
+    ClientConfig?: {
+      pdfViewerUrl: string;
+      wrongPortalNameUrl?: string;
+      api: {
+        origin?: string;
+        prefix?: string;
+      };
+      proxy: {
+        url?: string;
+      };
+      imageThumbnails?: boolean;
+      oauth2: {
+        origin: string;
+        secret: string;
+        apiSystem: string[];
+      };
+      editor?: {
+        requestClose: boolean;
+      };
+      firebase: {
+        fetchTimeoutMillis?: number;
+        minimumFetchIntervalMillis?: number;
+      };
+      campaigns?: string[];
+      isFrame?: boolean;
+      management: {
+        checkDomain?: boolean;
+      };
+      logs: {
+        enableLogs: boolean;
+        logsToConsole: boolean;
+      };
+      loaders: {
+        showLoader: boolean;
+        showLoaderTime: number;
+        loaderTime: number;
+      };
+    };
+  }
+}
 
-export const ROOM_ACTION_KEYS = {
-  CREATE_EDIT_ROOM_UPLOAD: "create_edit_room_upload",
-  CREATE_EDIT_ROOM_DELETE: "create_edit_room_delete",
-  CREATE_EDIT_ROOM_CUSTOMIZE_COVER: "create_edit_room_customize_cover",
-} as const;
+export const openingNewTab = (url: string, e?: React.MouseEvent) => {
+  if (e?.ctrlKey || e?.metaKey || e?.button === 1) {
+    const path = combineUrl(window.ClientConfig?.proxy?.url, url);
 
-export const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";
+    window.open(path, "_blank");
 
-export const LIVE_CHAT_LOCAL_STORAGE_KEY = "live_chat_state";
+    return true;
+  }
+
+  return false;
+};

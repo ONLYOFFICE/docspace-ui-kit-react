@@ -28,44 +28,75 @@
  * Gets a cookie value by name
  */
 export const getCookie = (name: string): string | undefined => {
-	if (typeof document === "undefined") return undefined;
+  if (typeof document === "undefined") return undefined;
 
-	const matches = document.cookie.match(
-		new RegExp(
-			`(?:^|; )${name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1")}=([^;]*)`,
-		),
-	);
-	return matches ? decodeURIComponent(matches[1]) : undefined;
+  const matches = document.cookie.match(
+    new RegExp(
+      `(?:^|; )${name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1")}=([^;]*)`,
+    ),
+  );
+  return matches ? decodeURIComponent(matches[1]) : undefined;
 };
 
 /**
  * Gets a translation from window.i18n for the Common namespace
  * Reads language from the asc_language cookie
  */
-export const getCommonTranslation = (key: string): string | undefined => {
-	if (typeof window === "undefined") return undefined;
+export const getCommonTranslation = (
+  key: string,
+  interpolation?: Record<string, string | number>,
+): string | undefined => {
+  if (typeof window === "undefined") return undefined;
 
-	const i18n = (
-		window as unknown as {
-			i18n?: {
-				loaded: Record<string, { data: Record<string, string> }>;
-			};
-		}
-	).i18n;
+  const i18n = (
+    window as unknown as {
+      i18n?: {
+        loaded: Record<string, { data: Record<string, string> }>;
+      };
+    }
+  ).i18n;
 
-	if (!i18n?.loaded) return undefined;
+  if (!i18n?.loaded) return undefined;
 
-	const cookieLang = getCookie("asc_language");
-	const lang =
-		cookieLang === "en-US" || cookieLang === "en-GB" ? "en" : cookieLang;
+  const cookieLang = getCookie("asc_language");
+  const lang =
+    cookieLang === "en-US" || cookieLang === "en-GB" ? "en" : cookieLang;
 
-	const commonKeys = Object.getOwnPropertyNames(i18n.loaded).filter(
-		(k) => k.indexOf(`${lang}/Common.json`) > -1,
-	);
+  const commonKeys = Object.getOwnPropertyNames(i18n.loaded).filter(
+    (k) => k.indexOf(`${lang}/Common.json`) > -1,
+  );
 
-	if (commonKeys.length === 0) return undefined;
+  if (commonKeys.length === 0) return undefined;
 
-	const i18nKey = commonKeys.length === 1 ? commonKeys[0] : commonKeys[1];
+  const i18nKey = commonKeys.length === 1 ? commonKeys[0] : commonKeys[1];
 
-	return i18n.loaded[i18nKey]?.data?.[key];
+  let translation = i18n.loaded[i18nKey]?.data?.[key];
+
+  if (translation && interpolation) {
+    Object.keys(interpolation).forEach((param) => {
+      translation = translation.replace(
+        new RegExp(`{{\\s*${param}\\s*}}`, "g"),
+        String(interpolation[param]),
+      );
+    });
+  }
+
+  return translation;
+};
+
+/**
+ * Checks if translations are loaded and ready to use
+ */
+export const getTranslationReady = () => {
+  if (typeof window === "undefined") return undefined;
+
+  const i18n = (
+    window as unknown as {
+      i18n?: {
+        loaded: Record<string, { data: Record<string, string> }>;
+      };
+    }
+  ).i18n;
+
+  return i18n?.loaded;
 };
