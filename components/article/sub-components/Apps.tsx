@@ -67,6 +67,7 @@ const ArticleApps = React.memo(
           lineHeight="12px"
           fontWeight={600}
         >
+          {/* t("Common:DownloadApps") */}
           {getCommonTranslation("DownloadApps")}
         </Text>
         <div className="download-app-list">
@@ -80,6 +81,9 @@ const ArticleApps = React.memo(
               title={getCommonTranslation("MobileWin", {
                 organizationName: logoText,
               })}
+              /* t("Common:MobileWin", {
+                organizationName: logoText,
+              }) */
             />
           ) : null}
 
@@ -93,6 +97,9 @@ const ArticleApps = React.memo(
               title={getCommonTranslation("MobileMac", {
                 organizationName: logoText,
               })}
+              /* t("Common:MobileMac", {
+                organizationName: logoText,
+              }) */
             />
           ) : null}
 
@@ -106,6 +113,9 @@ const ArticleApps = React.memo(
               title={getCommonTranslation("MobileLinux", {
                 organizationName: logoText,
               })}
+              /* t("Common:MobileLinux", {
+                organizationName: logoText,
+              }) */
             />
           ) : null}
 
@@ -119,6 +129,9 @@ const ArticleApps = React.memo(
               title={getCommonTranslation("MobileAndroid", {
                 organizationName: logoText,
               })}
+              /* t("Common:MobileAndroid", {
+                organizationName: logoText,
+              }) */
             />
           ) : null}
 
@@ -132,6 +145,9 @@ const ArticleApps = React.memo(
               title={getCommonTranslation("MobileIos", {
                 organizationName: logoText,
               })}
+              /* t("Common:MobileIos", {
+                organizationName: logoText,
+              }) */
             />
           ) : null}
         </div>

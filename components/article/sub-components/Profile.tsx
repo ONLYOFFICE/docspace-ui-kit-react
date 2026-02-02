@@ -111,7 +111,7 @@ const ArticleProfile = (props: ArticleProfileProps) => {
             id="user-avatar"
             size={avatarSize}
             role={AvatarRole.user}
-            source={user.avatar}
+            source={user?.avatar || ""}
             userName={user?.displayName || ""}
             onClick={onAvatarClick}
             dataTestId="profile_user_avatar"
