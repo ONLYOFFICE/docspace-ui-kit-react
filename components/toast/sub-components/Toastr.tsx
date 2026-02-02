@@ -36,6 +36,7 @@ import InfoToastReactSvg from "../../../assets/info.toast.react.svg";
 import CrossIconReactSvg from "../../../assets/icons/12/cross.react.svg";
 
 import { IconSizeType } from "../../../utils/common-icons-style";
+import { getCommonTranslation } from "../../../utils/i18n";
 
 import { Text } from "../../text";
 import { IconButton } from "../../icon-button";
@@ -47,16 +48,6 @@ import styles from "../Toast.module.scss";
 const DEFAULT_TIMEOUT = 5000;
 const MIN_TIMEOUT_THRESHOLD = 750;
 
-declare global {
-	interface Window {
-		i18n: {
-			loaded: {
-				[key: string]: { data: { [key: string]: string }; namespaces: string };
-			};
-		};
-	}
-}
-
 type TitleKey = "Done" | "Warning" | "Alert" | "Info";
 
 interface NotifyConfig {
@@ -65,43 +56,10 @@ interface NotifyConfig {
 }
 
 const TOAST_CONFIGS: Record<ToastType, NotifyConfig> = {
-	[ToastType.success]: { type: ToastType.success, defaultTitleKey: "Done" }, // t("Common:Done")
-	[ToastType.error]: { type: ToastType.error, defaultTitleKey: "Warning" }, // t("Common:Warning")
-	[ToastType.warning]: { type: ToastType.warning, defaultTitleKey: "Alert" }, // t("Common:Alert")
-	[ToastType.info]: { type: ToastType.info, defaultTitleKey: "Info" }, // t("Common:Info")
-};
-
-const getCookie = (name: string): string | undefined => {
-	if (typeof document === "undefined") return undefined;
-
-	const matches = document.cookie.match(
-		new RegExp(
-			`(?:^|; )${name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1")}=([^;]*)`,
-		),
-	);
-	return matches ? decodeURIComponent(matches[1]) : undefined;
-};
-
-const getTitle = (type: TitleKey): string | undefined => {
-	if (typeof window === "undefined") return undefined;
-
-	const i18n = window.i18n;
-
-	if (!i18n?.loaded) return undefined;
-
-	const cookieLang = getCookie("asc_language");
-	const lang =
-		cookieLang === "en-US" || cookieLang === "en-GB" ? "en" : cookieLang;
-
-	const commonKeys = Object.getOwnPropertyNames(i18n.loaded).filter(
-		(k) => k.indexOf(`${lang}/Common.json`) > -1,
-	);
-
-	if (commonKeys.length === 0) return undefined;
-
-	const key = commonKeys.length === 1 ? commonKeys[0] : commonKeys[1];
-
-	return i18n.loaded[key]?.data?.[type];
+	[ToastType.success]: { type: ToastType.success, defaultTitleKey: "Done" },
+	[ToastType.error]: { type: ToastType.error, defaultTitleKey: "Warning" },
+	[ToastType.warning]: { type: ToastType.warning, defaultTitleKey: "Alert" },
+	[ToastType.info]: { type: ToastType.info, defaultTitleKey: "Info" },
 };
 
 const Icon = ({ type, size }: { type: ToastType; size: IconSizeType }) => {
@@ -245,7 +203,7 @@ const createToastMethod =
 	) => {
 		const message = processErrorData(data);
 		const config = TOAST_CONFIGS[type];
-		const finalTitle = title || getTitle(config.defaultTitleKey) || "";
+		const finalTitle = title || getCommonTranslation(config.defaultTitleKey) || "";
 
 		return notify(
 			type,
@@ -266,4 +224,4 @@ const toastr = {
 	isActive: (id: Id) => toast.isActive(id),
 } as const;
 
-export { toastr, getTitle };
+export { toastr };

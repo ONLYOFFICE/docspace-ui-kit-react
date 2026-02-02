@@ -45,3 +45,5 @@ export const ROOM_ACTION_KEYS = {
 	CREATE_EDIT_ROOM_DELETE: "create_edit_room_delete",
 	CREATE_EDIT_ROOM_CUSTOMIZE_COVER: "create_edit_room_customize_cover",
 } as const;
+
+export const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";

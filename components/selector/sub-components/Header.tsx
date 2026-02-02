@@ -24,8 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { Toast } from "./Toast";
-export { toastr } from "./sub-components/Toastr";
-export { ToastType } from "./Toast.enums";
-export type { ToastProps, TData } from "./Toast.types";
+import React from "react";
 
+import { AsideHeader } from "../../aside";
+import type { HeaderProps } from "../Selector.types";
+
+const Header = React.memo(
+	({
+		onBackClick,
+		onCloseClick,
+		withoutBackButton,
+		headerLabel,
+		withoutBorder,
+		isCloseable,
+	}: HeaderProps) => {
+		return (
+			<AsideHeader
+				header={headerLabel}
+				isBackButton={
+					!withoutBackButton ? typeof withoutBackButton === "boolean" : false
+				}
+				onBackClick={onBackClick}
+				onCloseClick={onCloseClick}
+				withoutBorder={withoutBorder}
+				isCloseable={isCloseable}
+			/>
+		);
+	},
+);
+
+Header.displayName = "Header";
+
+export { Header };

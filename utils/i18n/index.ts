@@ -24,8 +24,48 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { Toast } from "./Toast";
-export { toastr } from "./sub-components/Toastr";
-export { ToastType } from "./Toast.enums";
-export type { ToastProps, TData } from "./Toast.types";
+/**
+ * Gets a cookie value by name
+ */
+export const getCookie = (name: string): string | undefined => {
+	if (typeof document === "undefined") return undefined;
 
+	const matches = document.cookie.match(
+		new RegExp(
+			`(?:^|; )${name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1")}=([^;]*)`,
+		),
+	);
+	return matches ? decodeURIComponent(matches[1]) : undefined;
+};
+
+/**
+ * Gets a translation from window.i18n for the Common namespace
+ * Reads language from the asc_language cookie
+ */
+export const getCommonTranslation = (key: string): string | undefined => {
+	if (typeof window === "undefined") return undefined;
+
+	const i18n = (
+		window as unknown as {
+			i18n?: {
+				loaded: Record<string, { data: Record<string, string> }>;
+			};
+		}
+	).i18n;
+
+	if (!i18n?.loaded) return undefined;
+
+	const cookieLang = getCookie("asc_language");
+	const lang =
+		cookieLang === "en-US" || cookieLang === "en-GB" ? "en" : cookieLang;
+
+	const commonKeys = Object.getOwnPropertyNames(i18n.loaded).filter(
+		(k) => k.indexOf(`${lang}/Common.json`) > -1,
+	);
+
+	if (commonKeys.length === 0) return undefined;
+
+	const i18nKey = commonKeys.length === 1 ? commonKeys[0] : commonKeys[1];
+
+	return i18n.loaded[i18nKey]?.data?.[key];
+};

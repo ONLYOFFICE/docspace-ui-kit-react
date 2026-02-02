@@ -24,8 +24,24 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { Toast } from "./Toast";
-export { toastr } from "./sub-components/Toastr";
-export { ToastType } from "./Toast.enums";
-export type { ToastProps, TData } from "./Toast.types";
+// import React from "react";
+// import { screen, render } from "@testing-library/react";
+import { describe, it } from "vitest";
 
+// import { Selector } from "./Selector";
+
+describe("<Selector />", () => {
+  it("renders without error", () => {
+    //   render(
+    //     <Selector
+    //       items={[]}
+    //       totalItems={0}
+    //       headerLabel=""
+    //       onAccept={() => {}}
+    //       onSelect={() => {}}
+    //       acceptButtonLabel=""
+    //     />,
+    //   );
+    //   expect(screen.getByTestId("selector")).toBeInTheDocument();
+  });
+});

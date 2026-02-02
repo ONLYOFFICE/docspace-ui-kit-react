@@ -24,8 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { Toast } from "./Toast";
-export { toastr } from "./sub-components/Toastr";
-export { ToastType } from "./Toast.enums";
-export type { ToastProps, TData } from "./Toast.types";
+import React from "react";
 
+import { ProvidersProps } from "../Selector.types";
+
+import { BreadCrumbsProvider } from "./BreadCrumbs";
+import { EmptyScreenProvider } from "./EmptyScreen";
+import { InfoBarProvider } from "./InfoBar";
+import { SearchProvider } from "./Search";
+import { SelectAllProvider } from "./SelectAll";
+import { TabsProvider } from "./Tabs";
+
+export const Providers = ({
+  children,
+  breadCrumbsProps,
+  emptyScreenProps,
+  infoBarProps,
+  searchProps,
+  selectAllProps,
+  tabsProps,
+}: { children: React.ReactNode } & ProvidersProps) => (
+  <BreadCrumbsProvider {...breadCrumbsProps}>
+    <EmptyScreenProvider {...emptyScreenProps}>
+      <InfoBarProvider {...infoBarProps}>
+        <SearchProvider {...searchProps}>
+          <SelectAllProvider {...selectAllProps}>
+            <TabsProvider {...tabsProps}>{children}</TabsProvider>
+          </SelectAllProvider>
+        </SearchProvider>
+      </InfoBarProvider>
+    </EmptyScreenProvider>
+  </BreadCrumbsProvider>
+);

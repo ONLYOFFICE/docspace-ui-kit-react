@@ -73,7 +73,7 @@ The component uses SCSS modules for styling and supports theme customization thr
 
 When using the copy functionality with `copyInfoText`, the component displays a success toast notification. The toast title is automatically localized if `window.i18n` is configured.
 
-See [Toast i18n Setup](../../README.md#toast-i18n-setup) for instructions on setting up `window.i18n` for localized toast titles.
+See [i18n Setup](../../README.md#i18n-setup) for instructions on setting up `window.i18n` for localized toast titles.
 
 ```jsx
 // Example with copy notification

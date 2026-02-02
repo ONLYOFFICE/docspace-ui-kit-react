@@ -42,3 +42,96 @@ export type TLogo = {
 	small: string;
 	color?: string;
 };
+
+export type MergeTypes<T, MergedType> = Omit<T, keyof MergedType> & MergedType;
+
+export type WithFlag<K extends string, V> =
+	| ({ [P in K]: true } & V)
+	| ({ [P in K]?: undefined } & Partial<Record<keyof V, undefined>>);
+
+// File security type
+export type TFileSecurity = {
+	Convert: boolean;
+	Copy: boolean;
+	CustomFilter: boolean;
+	Delete: boolean;
+	Download: boolean;
+	Duplicate: boolean;
+	Edit: boolean;
+	EditHistory: boolean;
+	FillForms: boolean;
+	Lock: boolean;
+	Move: boolean;
+	Read: boolean;
+	ReadHistory: boolean;
+	Rename: boolean;
+	Review: boolean;
+	SubmitToFormGallery: boolean;
+	StopFilling?: boolean;
+	ResetFilling?: boolean;
+	EditForm: boolean;
+	Comment: boolean;
+	CreateRoomFrom: boolean;
+	CopyLink: boolean;
+	Embed: boolean;
+	Vectorization: boolean;
+	AskAi?: boolean;
+};
+
+// Folder security type
+export type TFolderSecurity = {
+	Read: boolean;
+	Create: boolean;
+	Delete: boolean;
+	EditRoom: boolean;
+	Rename: boolean;
+	CopyTo: boolean;
+	Copy: boolean;
+	MoveTo: boolean;
+	Move: boolean;
+	Pin: boolean;
+	Mute: boolean;
+	EditAccess: boolean;
+	Duplicate: boolean;
+	Download: boolean;
+	CopySharedLink: boolean;
+	Reconnect: boolean;
+	CreateRoomFrom: boolean;
+	CopyLink: boolean;
+	Embed: boolean;
+	ChangeOwner: boolean;
+	IndexExport: boolean;
+};
+
+// Room security type
+export type TRoomSecurity = {
+	ChangeOwner: boolean;
+	CopyLink: boolean;
+	CreateRoomFrom: boolean;
+	Embed: boolean;
+	IndexExport: boolean;
+	Reconnect: boolean;
+	Read: boolean;
+	Create: boolean;
+	Delete: boolean;
+	EditRoom: boolean;
+	Rename: boolean;
+	CopyTo: boolean;
+	Copy: boolean;
+	MoveTo: boolean;
+	Move: boolean;
+	Pin: boolean;
+	Mute: boolean;
+	EditAccess: boolean;
+	Duplicate: boolean;
+	Download: boolean;
+	CopySharedLink: boolean;
+	UseChat: boolean;
+};
+
+// User group type
+export type TUserGroup = {
+	id: string;
+	manager: string;
+	name: string;
+};

@@ -24,8 +24,23 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { Toast } from "./Toast";
-export { toastr } from "./sub-components/Toastr";
-export { ToastType } from "./Toast.enums";
-export type { ToastProps, TData } from "./Toast.types";
+import { ReactNode, createContext } from "react";
 
+import { TSelectorEmptyScreen } from "../Selector.types";
+
+export const EmptyScreenContext = createContext<TSelectorEmptyScreen>({
+  emptyScreenImage: "",
+  emptyScreenHeader: "",
+  emptyScreenDescription: "",
+
+  searchEmptyScreenImage: "",
+  searchEmptyScreenHeader: "",
+  searchEmptyScreenDescription: "",
+});
+
+export const EmptyScreenProvider = ({
+  children,
+  ...rest
+}: TSelectorEmptyScreen & { children: ReactNode }) => {
+  return <EmptyScreenContext value={rest}>{children}</EmptyScreenContext>;
+};
