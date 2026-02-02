@@ -90,7 +90,7 @@ const ArticleLiveChat = ({
       zendeskAPI.addChanges("webWidget", "updateSettings", {
         launcher: {
           label: {
-            "*": getCommonTranslation("Support"),
+            "*": getCommonTranslation("Support"), // t("Common:Support"),
           },
           chatLabel: {
             "*": getCommonTranslation("Support"),
