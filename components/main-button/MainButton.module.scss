@@ -145,24 +145,23 @@
     margin: var(--main-button-svg-margin);
     height: var(--main-button-svg-height);
   }
-}
-
-.img {
-  svg {
-    padding-bottom: 1px;
-    path {
-      fill: var(--main-button-svg-fill);
+  .img {
+    svg {
+      padding-bottom: 1px;
+      path {
+        fill: var(--main-button-svg-fill);
+      }
     }
   }
-}
-
-.text {
-  display: inline;
-  font-size: var(--main-button-font-size);
-  font-weight: var(--main-button-font-weight);
-  color: var(--main-button-text-color);
-
-  .disabled & {
-    color: var(--main-button-text-color-disabled);
+  
+  .text {
+    display: inline;
+    font-size: var(--main-button-font-size);
+    font-weight: var(--main-button-font-weight);
+    color: var(--main-button-text-color);
+  
+    .disabled & {
+      color: var(--main-button-text-color-disabled);
+    }
   }
 }
