@@ -27,17 +27,17 @@
 @use "../../styles/variables";
 @use "../../styles/mixins";
 
-:global(.light) & {
-  --drag-and-drop-bg: #{variables.$dnd-color};
-  --drag-and-drop-accept-bg: #{$dnd-hover-color};
-}
-
-:global(.dark) & {
-  --drag-and-drop-bg: #{variables.$dnd-dark-color};
-  --drag-and-drop-accept-bg: #{variables.$dnd-dark-hover};
-}
-
 .dragAndDrop {
+  :global(.light) & {
+    --drag-and-drop-bg: #{variables.$dnd-color};
+    --drag-and-drop-accept-bg: #{variables.$dnd-hover-color};
+  }
+
+  :global(.dark) & {
+    --drag-and-drop-bg: #{variables.$dnd-dark-color};
+    --drag-and-drop-accept-bg: #{variables.$dnd-dark-hover};
+  }
+
   height: 100%;
   margin-inline-start: -2px;
   position: relative;
