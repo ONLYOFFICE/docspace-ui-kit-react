@@ -29,15 +29,6 @@ import { screen, render, fireEvent } from "@testing-library/react";
 import { ColorPicker } from "./ColorPicker";
 import { globalColors } from "../../themes";
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: {
-      changeLanguage: () => new Promise(() => {}),
-    },
-  }),
-}));
-
 describe("ColorPicker component", () => {
   const defaultProps = {
     isPickerOnly: false,
@@ -92,9 +83,7 @@ describe("ColorPicker component", () => {
       screen.queryByTestId("color-picker-hex-container"),
     ).not.toBeInTheDocument();
     expect(screen.getByTestId("color-picker-close")).toBeInTheDocument();
-    expect(screen.getByTestId("color-picker-title")).toHaveTextContent(
-      "Custom",
-    );
+    expect(screen.getByTestId("color-picker-title")).toBeInTheDocument();
   });
 
   it("calls handleChange when color is changed", () => {

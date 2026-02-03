@@ -28,7 +28,7 @@ import { useState } from "react";
 import { HexColorPicker, HexColorInput } from "react-colorful";
 import classNames from "classnames";
 
-import CrossIconSvgUrl from "PUBLIC_DIR/images/icons/16/cross.react.svg?url";
+import CrossIconSvg from "../../assets/icons/16/cross.react.svg";
 
 import { Button, ButtonSize } from "../button";
 import { Text } from "../text";
@@ -84,7 +84,7 @@ const ColorPicker = ({
               className={styles.tableHeaderIconButton}
               size={16}
               onClick={onClose}
-              iconName={CrossIconSvgUrl}
+              iconNode={<CrossIconSvg />}
               isFill
               data-testid="color-picker-close"
               aria-label="Close color picker"
