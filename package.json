@@ -46,6 +46,7 @@
     "react-countdown": "2.3.6",
     "react-device-detect": "2.2.3",
     "react-draggable": "4.4.6",
+    "react-dropzone": "^14.4.0",
     "react-hotkeys-hook": "^5.2.3",
     "react-svg": "16.1.34",
     "react-text-mask": "5.5.0",
