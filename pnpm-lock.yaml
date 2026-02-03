@@ -66,8 +66,8 @@ importers:
         specifier: 4.4.6
         version: 4.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react-dropzone:
-        specifier: ^14.4.0
-        version: 14.4.0(react@19.2.3)
+        specifier: 11.7.1
+        version: 11.7.1(react@19.2.3)
       react-hotkeys-hook:
         specifier: ^5.2.3
         version: 5.2.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -2423,9 +2423,9 @@ packages:
   fflate@0.8.2:
     resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
 
-  file-selector@2.1.2:
-    resolution: {integrity: sha512-QgXo+mXTe8ljeqUFaX3QVHc5osSItJ/Km+xpocx0aSqWGMSCf6qYs/VnzZgS864Pjn5iceMRFigeAV7AfTlaig==}
-    engines: {node: '>= 12'}
+  file-selector@0.4.0:
+    resolution: {integrity: sha512-iACCiXeMYOvZqlF1kTiYINzgepRBymz1wwjiuup9u9nayhb6g4fSwiyJ/6adli+EPwrWtpgQAh2PoS7HukEGEg==}
+    engines: {node: '>= 10'}
 
   find-up@5.0.0:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
@@ -3344,11 +3344,11 @@ packages:
       react: '>= 16.3.0'
       react-dom: '>= 16.3.0'
 
-  react-dropzone@14.4.0:
-    resolution: {integrity: sha512-8VvsHqg9WGAr+wAnP0oVErK5HOwAoTOzRsxLPzbBXrtXtFfukkxMyuvdI/lJ+5OxtsrzmvWE5Eoo3Y4hMsaxpA==}
+  react-dropzone@11.7.1:
+    resolution: {integrity: sha512-zxCMwhfPy1olUEbw3FLNPLhAm/HnaYH5aELIEglRbqabizKAdHs0h+WuyOpmA+v1JXn0++fpQDdNfUagWt5hJQ==}
     engines: {node: '>= 10.13'}
     peerDependencies:
-      react: '>= 16.8 || 18.0.0'
+      react: '>= 16.8'
 
   react-hotkeys-hook@5.2.3:
     resolution: {integrity: sha512-Q27F8EuImYJOVSXAjSQrQPj9cx4GSNY+WdSdk5tSNN085H8/a00W6LZp0PrytEDwF6iT0pGTJeVEDKPRpEK2Bg==}
@@ -6295,7 +6295,7 @@ snapshots:
 
   fflate@0.8.2: {}
 
-  file-selector@2.1.2:
+  file-selector@0.4.0:
     dependencies:
       tslib: 2.8.1
 
@@ -7144,10 +7144,10 @@ snapshots:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 
-  react-dropzone@14.4.0(react@19.2.3):
+  react-dropzone@11.7.1(react@19.2.3):
     dependencies:
       attr-accept: 2.2.5
-      file-selector: 2.1.2
+      file-selector: 0.4.0
       prop-types: 15.8.1
       react: 19.2.3
 
