@@ -123,3 +123,5 @@ export * from "./help-button";
 export * from "./field-container";
 
 export * from "./snackbar";
+
+export * from "./email-input";

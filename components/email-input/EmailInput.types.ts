@@ -24,22 +24,26 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import type { TextInputProps } from "../text-input";
+import type { EmailSettings } from "../../utils/email";
 
-export * from "./uuid";
+export type TValidate = {
+  value: string;
+  isValid: boolean;
+  errors?: string[];
+};
 
-export * from "./common-icons-style";
-
-export * from "./use-click-outside";
-
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
+export type EmailInputProps = Omit<
+  TextInputProps,
+  "type" | "onAnimationStart" | "testId"
+> & {
+  /** Email validation specific props */
+  customValidate?: (value: string) => TValidate;
+  emailSettings?: EmailSettings;
+  /** Validation callback */
+  onValidateInput?: (data: TValidate) => void;
+  /** Animation handler */
+  handleAnimationStart?: (e: React.AnimationEvent<HTMLInputElement>) => void;
+  /** Test id */
+  dataTestId?: string;
+};
