@@ -125,3 +125,5 @@ export * from "./field-container";
 export * from "./snackbar";
 
 export * from "./email-input";
+
+export * from "./loading-button";
