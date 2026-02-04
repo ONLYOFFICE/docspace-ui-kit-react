@@ -28,59 +28,66 @@ import { EmployeeType, RoomsType } from "../enums";
 import { getCommonTranslation } from "./i18n";
 
 export type TTranslation = (
-	key: string,
-	params?: Record<string, unknown>,
+  key: string,
+  params?: Record<string, unknown>,
 ) => string;
 
 const defaultTranslation: TTranslation = (key, params) => {
-	const keyParts = key.split(":");
-	const translationKey = keyParts.length > 1 ? keyParts[1] : key;
+  const keyParts = key.split(":");
+  const translationKey = keyParts.length > 1 ? keyParts[1] : key;
 
-	let result = getCommonTranslation(translationKey);
+  let result = getCommonTranslation(translationKey);
 
-	if (!result) return key;
+  if (!result) return key;
 
-	if (params) {
-		for (const [paramKey, paramValue] of Object.entries(params)) {
-			result = result.replace(
-				new RegExp(`{{${paramKey}}}`, "g"),
-				String(paramValue),
-			);
-		}
-	}
+  if (params) {
+    for (const [paramKey, paramValue] of Object.entries(params)) {
+      result = result.replace(
+        new RegExp(`{{${paramKey}}}`, "g"),
+        String(paramValue),
+      );
+    }
+  }
 
-	return result;
+  return result;
 };
 
-export const getUserTypeTranslation = (type: EmployeeType, t?: TTranslation) => {
-	const translate = t ?? defaultTranslation;
+export const getUserTypeTranslation = (
+  type: EmployeeType,
+  t?: TTranslation,
+) => {
+  const translate = t ?? defaultTranslation;
 
-	switch (type) {
-		case EmployeeType.Owner:
-			return translate("Common:Owner");
-		case EmployeeType.Admin:
-			return translate("Common:PortalAdmin", {
-				productName: translate("Common:ProductName"),
-			});
-		case EmployeeType.RoomAdmin:
-			return translate("Common:RoomAdmin");
-		case EmployeeType.User:
-			return translate("Common:User");
-		case EmployeeType.Guest:
-		default:
-			return translate("Common:Guest");
-	}
+  switch (type) {
+    case EmployeeType.Owner:
+      return translate("Common:Owner");
+    case EmployeeType.Admin:
+      return translate("Common:PortalAdmin", {
+        productName: translate("Common:ProductName"),
+      });
+    case EmployeeType.RoomAdmin:
+      return translate("Common:RoomAdmin");
+    case EmployeeType.User:
+      return translate("Common:User");
+    case EmployeeType.Guest:
+    default:
+      return translate("Common:Guest");
+  }
 };
 
 export const RoomsTypeValues = Object.values(RoomsType).filter(
-	(item): item is number =>
-		typeof item === "number" && item !== RoomsType.AIRoom,
+  (item): item is number =>
+    typeof item === "number" && item !== RoomsType.AIRoom,
 );
 
 export const RoomsTypes = RoomsTypeValues.reduce<Record<number, number>>(
-	(acc, current) => {
-		if (typeof current === "string") return { ...acc };
-		return { ...acc, [current]: current };
-	},
-	{},
+  (acc, current) => {
+    if (typeof current === "string") return { ...acc };
+    return { ...acc, [current]: current };
+  },
+  {},
 );
+
+export const isManagement = () => {
+  return window.location.pathname.includes("management");
+};
