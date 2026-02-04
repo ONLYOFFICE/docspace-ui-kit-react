@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@babel/runtime": "7.28.3",
+    "email-addresses": "5.0.0",
     "@floating-ui/dom": "1.6.13",
     "@types/node": "24.10.7",
     "@types/react-text-mask": "5.4.14",
