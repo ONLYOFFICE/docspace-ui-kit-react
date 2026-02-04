@@ -24,24 +24,24 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import React from "react";
+import { TNavigationLogoProps } from "../Navigation.types";
 
-export * from "./uuid";
+const NavigationLogo = ({
+  logo,
+  burgerLogo,
 
-export * from "./common-icons-style";
+  ...rest
+}: TNavigationLogoProps) => {
+  return (
+    <div {...rest}>
+      <img className="logo-icon_svg" alt="logo" src={logo} />
+      <div className="header-burger">
+        <img src={burgerLogo} alt="burger logo" />
+      </div>
+      <div className="header_separator" />
+    </div>
+  );
+};
 
-export * from "./use-click-outside";
-
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
+export default NavigationLogo;

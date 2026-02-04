@@ -24,24 +24,10 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import Navigation from "./Navigation";
 
-export * from "./uuid";
+import { TTitles, TNavigationItem } from "./Navigation.types";
 
-export * from "./common-icons-style";
+export type { TTitles, TNavigationItem };
 
-export * from "./use-click-outside";
-
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
+export default Navigation;

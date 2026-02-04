@@ -127,3 +127,5 @@ export * from "./snackbar";
 export * from "./email-input";
 
 export * from "./loading-button";
+
+export * from "./top-loading-indicator";

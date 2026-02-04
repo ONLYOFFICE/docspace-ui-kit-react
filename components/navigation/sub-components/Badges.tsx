@@ -24,24 +24,45 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import React from "react";
+import { ReactSVG } from "react-svg";
 
-export * from "./uuid";
+import { Text } from "../../text";
+import { Tooltip } from "../../tooltip";
+import { TBadgesProps } from "../Navigation.types";
 
-export * from "./common-icons-style";
+const Badges = ({
+  titleIcon,
+  isRootFolder,
+  titleIconTooltip,
+}: TBadgesProps) => {
+  const getContent = () => (
+    <Text fontSize="12px" fontWeight={400} noSelect>
+      {titleIconTooltip}
+    </Text>
+  );
 
-export * from "./use-click-outside";
+  return (
+    <>
+      {titleIcon && !isRootFolder ? (
+        <ReactSVG
+          style={{ height: 16 }}
+          data-tooltip-id="iconTooltip"
+          className="title-icon"
+          src={titleIcon}
+        />
+      ) : null}
 
-export { default as DomHelpers } from "./dom-helpers";
+      {titleIconTooltip ? (
+        <Tooltip
+          id="iconTooltip"
+          place="bottom"
+          getContent={getContent}
+          maxWidth="300px"
+        />
+      ) : null}
+    </>
+  );
+};
 
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
+export default React.memo(Badges);

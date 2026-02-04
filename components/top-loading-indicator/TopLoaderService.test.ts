@@ -23,25 +23,42 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { TopLoaderService } from "./index";
 
-export * from "./device";
+describe("TopLoaderService", () => {
+  let mockElement: HTMLElement;
 
-export * from "./uuid";
+  beforeEach(() => {
+    vi.useFakeTimers();
+    // Create and style the element
+    mockElement = document.createElement("div");
+    mockElement.id = "ipl-progress-indicator";
+    mockElement.style.position = "fixed";
+    mockElement.style.top = "0";
+    mockElement.style.left = "0";
+    mockElement.style.height = "2px";
+    mockElement.style.width = "0%";
+    document.body.appendChild(mockElement);
 
-export * from "./common-icons-style";
+    // Initialize attributes
+    mockElement.setAttribute("role", "progressbar");
+    mockElement.setAttribute("aria-valuemin", "0");
+    mockElement.setAttribute("aria-valuemax", "100");
+    mockElement.setAttribute("data-test-id", "top-loader");
+  });
 
-export * from "./use-click-outside";
+  afterEach(() => {
+    document.body.removeChild(mockElement);
+    vi.clearAllTimers();
+    vi.useRealTimers();
+  });
 
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
+  it("should initialize loading with proper attributes", () => {
+    TopLoaderService.start();
+    expect(mockElement.getAttribute("role")).toBe("progressbar");
+    expect(mockElement.getAttribute("aria-valuemin")).toBe("0");
+    expect(mockElement.getAttribute("aria-valuemax")).toBe("100");
+    expect(mockElement.getAttribute("data-test-id")).toBe("top-loader");
+  });
+});

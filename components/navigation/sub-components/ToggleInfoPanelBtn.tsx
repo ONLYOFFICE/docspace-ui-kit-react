@@ -24,24 +24,41 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import React from "react";
 
-export * from "./uuid";
+import PanelReactSvg from "../../../assets/panel.react.svg";
 
-export * from "./common-icons-style";
+import { IconButton } from "../../icon-button";
 
-export * from "./use-click-outside";
+import styles from "../Navigation.module.scss";
+import { TToggleInfoPanelButtonProps } from "../Navigation.types";
 
-export { default as DomHelpers } from "./dom-helpers";
+const ToggleInfoPanelButton = ({
+  toggleInfoPanel,
+  id,
+  titles,
+  isRootFolder,
+  isInfoPanelVisible,
+}: TToggleInfoPanelButtonProps) => {
+  return (
+    <div
+      className={styles.infoPanelToggleWrapper}
+      data-visible={isInfoPanelVisible ? "true" : "false"}
+      data-root-folder={isRootFolder ? "true" : "false"}
+    >
+      <div className="info-panel-toggle-bg">
+        <IconButton
+          id={id}
+          className="info-panel-toggle"
+          iconNode={<PanelReactSvg />}
+          size={16}
+          isFill
+          title={titles?.infoPanel}
+          onClick={toggleInfoPanel}
+        />
+      </div>
+    </div>
+  );
+};
 
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
+export default ToggleInfoPanelButton;
