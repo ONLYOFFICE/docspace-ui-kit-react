@@ -24,24 +24,39 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import React from "react";
+import Item from "./Item";
 
-export * from "./uuid";
+import { TRowData } from "../Navigation.types";
 
-export * from "./common-icons-style";
+const Row = React.memo(
+  ({
+    data,
+    index,
+    style,
+  }: {
+    data: TRowData;
+    index: number;
+    style: React.CSSProperties;
+  }) => {
+    const isRoot = index === data[0].length - 1;
+    return (
+      <Item
+        key={data[0][index].id}
+        id={data[0][index].id}
+        title={data[0][index].title}
+        isRootRoom={data[0][index].isRootRoom}
+        isRoot={isRoot}
+        isRootTemplates={data[0][index].isRootTemplates}
+        onClick={data[1]}
+        withLogo={data[2].withLogo}
+        currentDeviceType={data[2].currentDeviceType}
+        style={{ ...style }}
+      />
+    );
+  },
+);
 
-export * from "./use-click-outside";
+Row.displayName = "Row";
 
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
+export default Row;

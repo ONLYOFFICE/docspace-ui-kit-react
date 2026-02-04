@@ -24,24 +24,55 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import React from "react";
+import { Badge } from "../../badge";
 
-export * from "./uuid";
+import styles from "../Navigation.module.scss";
+import { TTextProps } from "../Navigation.types";
 
-export * from "./common-icons-style";
+import ArrowIcon from "./ArrowIcon";
+import Heading from "./Heading";
+import ExpanderIcon from "./ExpanderIcon";
 
-export * from "./use-click-outside";
+const Text = ({
+  title,
+  isOpen,
+  isRootFolder,
+  isRootFolderTitle,
+  onClick,
+  badgeLabel,
+  className,
+  ...rest
+}: TTextProps) => {
+  return (
+    <div
+      className={`${className} ${styles.textContainer}`}
+      onClick={onClick}
+      data-root-folder={isRootFolder}
+      data-root-folder-title={isRootFolderTitle}
+      {...rest}
+    >
+      <Heading title={title} truncate isRootFolderTitle={isRootFolderTitle}>
+        {title}
+      </Heading>
+      {badgeLabel ? (
+        <Badge
+          className={`${styles.titleBlockBadge} ${isRootFolderTitle ? styles.rootFolderTitle : ""}`}
+          label={badgeLabel}
+          fontSize="9px"
+          padding="2px 5px"
+          fontWeight={700}
+          borderRadius="50px"
+          noHover
+          isHovered={false}
+        />
+      ) : null}
+      {isRootFolderTitle ? <ArrowIcon /> : null}
+      {!isRootFolderTitle && !isRootFolder ? (
+        <ExpanderIcon isRotated={isOpen} />
+      ) : null}
+    </div>
+  );
+};
 
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
+export default React.memo(Text);

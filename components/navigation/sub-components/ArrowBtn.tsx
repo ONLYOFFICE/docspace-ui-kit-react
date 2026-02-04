@@ -24,24 +24,45 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import React from "react";
 
-export * from "./uuid";
+import ArrowPathReactSvg from "../../../assets/arrow.path.react.svg";
 
-export * from "./common-icons-style";
+import { IconButton } from "../../icon-button";
 
-export * from "./use-click-outside";
+import { TArrowButtonProps } from "../Navigation.types";
 
-export { default as DomHelpers } from "./dom-helpers";
+const ArrowButton = ({
+  isRootFolder,
+  showBackButton,
+  onBackToParentFolder,
+}: TArrowButtonProps) => {
+  if (showBackButton) {
+    return (
+      <div className="navigation-arrow-container">
+        <IconButton
+          iconNode={<ArrowPathReactSvg />}
+          size={17}
+          isFill
+          onClick={onBackToParentFolder}
+          className="arrow-button"
+        />
+      </div>
+    );
+  }
 
-export * from "./get-text-color";
+  return !isRootFolder ? (
+    <div className="navigation-arrow-container">
+      <IconButton
+        iconNode={<ArrowPathReactSvg />}
+        size={17}
+        isFill
+        onClick={onBackToParentFolder}
+        className="arrow-button"
+      />
+      <div className="navigation-header-separator" />
+    </div>
+  ) : null;
+};
 
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
+export default React.memo(ArrowButton);

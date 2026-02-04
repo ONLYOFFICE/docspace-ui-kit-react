@@ -24,24 +24,22 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import React from "react";
+import { TooltipContainer } from "../../tooltip";
+import styles from "../Navigation.module.scss";
 
-export * from "./uuid";
+const WarningComponent = ({ title }: { title?: React.ReactNode }) => {
+  const tooltip = typeof title === "string" ? title : undefined;
 
-export * from "./common-icons-style";
+  return (
+    <TooltipContainer
+      as="div"
+      className={`${styles.warningText}`}
+      title={tooltip}
+    >
+      <div className="warning-text">{title}</div>
+    </TooltipContainer>
+  );
+};
 
-export * from "./use-click-outside";
-
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
+export default WarningComponent;
