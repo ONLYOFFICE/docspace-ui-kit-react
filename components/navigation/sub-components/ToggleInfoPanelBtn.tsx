@@ -26,7 +26,7 @@
 
 import React from "react";
 
-import PanelReactSvgUrl from "PUBLIC_DIR/images/panel.react.svg?url";
+import PanelReactSvg from "../../../assets/panel.react.svg";
 
 import { IconButton } from "../../icon-button";
 
@@ -50,7 +50,7 @@ const ToggleInfoPanelButton = ({
         <IconButton
           id={id}
           className="info-panel-toggle"
-          iconName={PanelReactSvgUrl}
+          iconNode={<PanelReactSvg />}
           size={16}
           isFill
           title={titles?.infoPanel}
