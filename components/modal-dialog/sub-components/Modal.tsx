@@ -220,6 +220,7 @@ const Modal = ({
               ref={contentRef}
               style={{ marginBottom: contentMarginBottom }}
               className={contentClassName}
+              data-testid="modal-dialog"
             >
               {isLoading ? (
                 currentDisplayType === "modal" ? (

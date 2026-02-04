@@ -50,7 +50,7 @@ import type { TTabItem } from "../tabs";
 import type { SelectorAccessRightsMode } from "./Selector.enums";
 
 // header
-type THeaderBackButton =
+export type THeaderBackButton =
 	| {
 			onBackClick: () => void;
 			withoutBackButton: false;
