@@ -29,7 +29,7 @@
 import React, { useState } from "react";
 import { isMobileOnly } from "react-device-detect";
 import classNames from "classnames";
-import LightSmallLogo from "../..assets/lightsmall.svg";
+import LightSmallLogo from "../../assets/lightsmall.svg";
 
 import { size as deviceSize } from "../../utils";
 import { getLogoUrl } from "../../utils/getLogoUrl";
