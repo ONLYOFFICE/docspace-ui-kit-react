@@ -8,7 +8,7 @@ vi.mock("../../utils/common", () => ({
   isManagement: vi.fn(() => false),
 }));
 
-vi.mock("@docspace/ui-kit/context/ThemeContext", () => ({
+vi.mock("../../context/ThemeContext", () => ({
   useTheme: vi.fn(() => ({ isBase: true })),
 }));
 

@@ -24,10 +24,9 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import ArrowRightIcon from "PUBLIC_DIR/images/arrow.right.react.svg?url";
+import ArrowRightIcon from "../../assets/arrow.right.react.svg";
 
 import React from "react";
-import { ReactSVG } from "react-svg";
 import classNames from "classnames";
 
 import { Text } from "../text";
@@ -83,8 +82,7 @@ export const CategoryItem = ({
             fontWeight="700"
           />
         ) : null}
-        <ReactSVG
-          src={ArrowRightIcon}
+        <ArrowRightIcon
           className={classNames(styles.arrowIcon, "settings_unavailable")}
         />
       </div>
