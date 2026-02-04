@@ -50,6 +50,9 @@ importers:
       react-autosize-textarea:
         specifier: 7.1.0
         version: 7.1.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react-avatar-editor:
+        specifier: ^14.0.0
+        version: 14.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react-colorful:
         specifier: ^5.6.1
         version: 5.6.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -3299,6 +3302,12 @@ packages:
     peerDependencies:
       react: ^0.14.0 || ^15.0.0 || ^16.0.0
       react-dom: ^0.14.0 || ^15.0.0 || ^16.0.0
+
+  react-avatar-editor@14.0.0:
+    resolution: {integrity: sha512-NaQM3oo4u0a1/Njjutc2FjwKX35vQV+t6S8hovsbAlMpBN1ntIwP/g+Yr9eDIIfaNtRXL0AqboTnPmRxhD/i8A==}
+    peerDependencies:
+      react: ^0.14.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^0.14.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-colorful@5.6.1:
     resolution: {integrity: sha512-1exovf0uGTGyq5mXQT0zgQ80uvj2PCwvF8zY1RN9/vbJVSjSo3fsB/4L3ObbF7u70NduSiK4xu4Y6q1MHoUGEw==}
@@ -7089,6 +7098,11 @@ snapshots:
       autosize: 4.0.4
       line-height: 0.3.1
       prop-types: 15.8.1
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+
+  react-avatar-editor@14.0.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+    dependencies:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 
