@@ -110,6 +110,12 @@ export type SnackbarProps = {
    * Callback when close button is clicked.
    */
   onClose?: () => void;
+
+  skipBlur?: boolean;
+   /**
+   * Specifies additional information text next to the header.
+   */
+  additionalHeaderText?: string;
 };
 
 /**
