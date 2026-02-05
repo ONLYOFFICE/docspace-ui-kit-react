@@ -225,4 +225,10 @@ export type LinkRouterProps = {
 };
 
 export type ValueOf<T> = T[keyof T];
-export type TViewAs = "tile" | "table" | "row" | "settings" | "profile";
+export type TViewAs =
+  | "tile"
+  | "table"
+  | "row"
+  | "settings"
+  | "profile"
+  | "tileDynamicHeight";
