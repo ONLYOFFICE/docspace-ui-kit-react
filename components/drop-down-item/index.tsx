@@ -39,6 +39,7 @@ import { globalColors } from "../../themes";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 import { useTheme } from "../../context/ThemeContext";
 import { isTouchDevice } from "../../utils/device";
+import { getCommonTranslation } from "../../utils/i18n";
 
 import { ToggleButton } from "../toggle-button";
 import { Badge } from "../badge";
@@ -125,6 +126,9 @@ const DropDownItem = ({
 }: DropDownItemProps) => {
 	const { isRTL } = useInterfaceDirection();
 	const { isBase } = useTheme();
+
+	const resolvedBetaLabel = betaLabel || getCommonTranslation("BetaLabel") || "";
+	const resolvedPaidLabel = paidLabel || getCommonTranslation("Paid") || "";
 
 	const withDisabledTooltip = disabled && tooltip;
 
@@ -247,7 +251,7 @@ const DropDownItem = ({
 						isHovered={false}
 						borderRadius="50px"
 						backgroundColor={globalColors.mainPurple}
-						label={betaLabel || ""}
+						label={resolvedBetaLabel}
 					/>
 				</div>
 			) : null}
@@ -264,7 +268,7 @@ const DropDownItem = ({
 								? globalColors.favoritesStatus
 								: globalColors.favoriteStatusDark
 						}
-						label={badgeLabel || paidLabel || ""}
+						label={badgeLabel || resolvedPaidLabel}
 						isPaidBadge
 					/>
 				</div>

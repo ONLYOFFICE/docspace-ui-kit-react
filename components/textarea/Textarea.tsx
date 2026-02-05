@@ -34,6 +34,7 @@ import CopyIconUrl from "../../assets/icons/16/copy.react.svg";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 import { IconButton } from "../icon-button";
 import { Scrollbar } from "../scrollbar";
+import { toastr } from "../toast";
 import { jsonify, isJSON } from "./Textarea.utils";
 import type { TextareaProps } from "./Textarea.types";
 import styles from "./Textarea.module.scss";
@@ -67,6 +68,7 @@ const Textarea = ({
   dataTestId,
   onKeyDown,
   onCopy,
+  copyInfoText,
 }: TextareaProps) => {
   const { isRTL } = useInterfaceDirection();
 
@@ -114,11 +116,14 @@ const Textarea = ({
   const handleCopy = useCallback(() => {
     if (modifiedValue) {
       copy(modifiedValue);
+      if (copyInfoText) {
+        toastr.success(copyInfoText);
+      }
       if (onCopy) {
         onCopy(modifiedValue);
       }
     }
-  }, [modifiedValue, onCopy]);
+  }, [modifiedValue, onCopy, copyInfoText]);
 
   useEffect(() => {
     setIsError(hasError);

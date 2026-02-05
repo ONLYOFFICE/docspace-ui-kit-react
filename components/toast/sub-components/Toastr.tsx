@@ -27,7 +27,7 @@
 "use client";
 
 import React from "react";
-import { Id, toast, ToastPosition } from "react-toastify";
+import { type Id, toast, type ToastPosition } from "react-toastify";
 import classNames from "classnames";
 
 import CheckToastReactSvg from "../../../assets/check.toast.react.svg";
@@ -36,16 +36,31 @@ import InfoToastReactSvg from "../../../assets/info.toast.react.svg";
 import CrossIconReactSvg from "../../../assets/icons/12/cross.react.svg";
 
 import { IconSizeType } from "../../../utils/common-icons-style";
+import { getCommonTranslation } from "../../../utils/i18n";
 
 import { Text } from "../../text";
 import { IconButton } from "../../icon-button";
 
 import { ToastType } from "../Toast.enums";
-import { TData } from "../Toast.types";
+import type { TData } from "../Toast.types";
 import styles from "../Toast.module.scss";
 
 const DEFAULT_TIMEOUT = 5000;
 const MIN_TIMEOUT_THRESHOLD = 750;
+
+type TitleKey = "Done" | "Warning" | "Alert" | "Info";
+
+interface NotifyConfig {
+  type: ToastType;
+  defaultTitleKey: TitleKey;
+}
+
+const TOAST_CONFIGS: Record<ToastType, NotifyConfig> = {
+  [ToastType.success]: { type: ToastType.success, defaultTitleKey: "Done" },
+  [ToastType.error]: { type: ToastType.error, defaultTitleKey: "Warning" },
+  [ToastType.warning]: { type: ToastType.warning, defaultTitleKey: "Alert" }, // t("Alert")
+  [ToastType.info]: { type: ToastType.info, defaultTitleKey: "Info" },
+};
 
 const Icon = ({ type, size }: { type: ToastType; size: IconSizeType }) => {
   const iconMap = {
@@ -187,11 +202,14 @@ const createToastMethod =
     centerPosition?: boolean,
   ) => {
     const message = processErrorData(data);
+    const config = TOAST_CONFIGS[type];
+    const finalTitle =
+      title || getCommonTranslation(config.defaultTitleKey) || "";
 
     return notify(
       type,
       message,
-      title || "",
+      finalTitle,
       timeout ?? DEFAULT_TIMEOUT,
       withCross,
       centerPosition,

@@ -49,6 +49,7 @@ const AddButton = (props: AddButtonProps) => {
     id,
     style,
     iconName,
+    iconNode,
     onClick,
     iconSize = 12,
     size,
@@ -117,8 +118,8 @@ const AddButton = (props: AddButtonProps) => {
         ) : (
           <IconButton
             size={iconSize}
-            iconNode={<ActionsHeaderTouchReactSvgUrl />}
-            iconName={iconName}
+            iconNode={iconNode ?? <ActionsHeaderTouchReactSvgUrl />}
+            iconName={iconNode ? undefined : iconName}
             isFill
             isDisabled={isDisabled}
             isClickable={!isDisabled}
