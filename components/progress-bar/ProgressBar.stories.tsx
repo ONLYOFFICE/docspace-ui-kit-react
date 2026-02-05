@@ -97,20 +97,6 @@ export const Complete: Story = {
   },
 };
 
-// PreparationPortalProgress stories
-const preparationMeta: Meta<typeof PreparationPortalProgress> = {
-  title: "Components/Status components/PreparationPortalProgress",
-  component: PreparationPortalProgress,
-  parameters: {
-    docs: {
-      description: {
-        component: "Progress bar with text for preparation stage in portal.",
-      },
-    },
-  },
-  tags: ["autodocs"],
-};
-
 type PreparationStory = StoryObj<typeof PreparationPortalProgress>;
 
 export const PreparationPortal: PreparationStory = {
