@@ -108,6 +108,7 @@ describe("<EmailInput />", () => {
     for (const email of validEmails) {
       await user.clear(input);
       await user.type(input, email);
+      await user.tab();
 
       await waitFor(() => {
         expect(onValidateInput).toHaveBeenLastCalledWith(
