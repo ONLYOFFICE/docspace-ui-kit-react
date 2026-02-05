@@ -23,27 +23,16 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+@use "../../styles/variables/colors";
 
-export * from "./device";
-
-export * from "./uuid";
-
-export * from "./common-icons-style";
-
-export * from "./use-click-outside";
-
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./edge-scrolling";
+.selectionArea {
+  top: 0;
+  // doesn't require mirroring for RTL
+  left: 0;
+  position: fixed;
+  margin: 0;
+  display: none;
+  background: rgba(68, 170, 255, 0.5);
+  border: 1px solid #{colors.$light-second-main};
+  z-index: 1000;
+}

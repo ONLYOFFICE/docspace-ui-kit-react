@@ -24,26 +24,24 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+export const frames = (fn: () => void) => {
+  let frameId = -1;
+  let lock = false;
 
-export * from "./uuid";
+  const next = () => {
+    if (!lock) {
+      lock = true;
+      frameId = requestAnimationFrame(() => {
+        fn();
+        lock = false;
+      });
+    }
+  };
 
-export * from "./common-icons-style";
+  const cancel = () => {
+    cancelAnimationFrame(frameId);
+    lock = false;
+  };
 
-export * from "./use-click-outside";
-
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./edge-scrolling";
+  return { next, cancel };
+};
