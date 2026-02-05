@@ -330,7 +330,7 @@ describe("<PasswordInput />", () => {
 
     it("validates special characters requirement", async () => {
       const onValidateInput = vi.fn();
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null });
       render(
         <PasswordInput
           {...baseProps}
