@@ -24,26 +24,57 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import React from "react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { screen, render } from "@testing-library/react";
 
-export * from "./uuid";
+import type { TViewAs } from "../../types";
 
-export * from "./common-icons-style";
+import { SelectionArea } from ".";
 
-export * from "./use-click-outside";
+const mockOnMove = vi.fn();
 
-export { default as DomHelpers } from "./dom-helpers";
+const defaultProps = {
+  containerClass: "container-class",
+  selectableClass: "selectable-class",
+  scrollClass: "scroll-class",
+  viewAs: "tile" as TViewAs,
+  itemsContainerClass: "items-container",
+  isRooms: false,
+  folderHeaderHeight: 40,
+  countTilesInRow: 4,
+  defaultHeaderHeight: 48,
+  arrayTypes: [
+    {
+      type: "folders",
+      rowGap: 16,
+      itemHeight: 40,
+      countOfMissingTiles: 0,
+      rowCount: 2,
+    },
+    {
+      type: "files",
+      rowGap: 16,
+      itemHeight: 40,
+      countOfMissingTiles: 0,
+      rowCount: 2,
+    },
+  ],
+  itemClass: "item-class",
+  onMove: mockOnMove,
+};
 
-export * from "./get-text-color";
+const renderComponent = (props = {}) => {
+  return render(<SelectionArea {...defaultProps} {...props} />);
+};
 
-export * from "./trim-separator";
+describe("SelectionArea", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./edge-scrolling";
+  it("renders without crashing", () => {
+    renderComponent();
+    expect(screen.getByTestId("selection-area")).toBeInTheDocument();
+  });
+});

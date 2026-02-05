@@ -24,26 +24,47 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import type { TViewAs } from "../../types";
 
-export * from "./uuid";
+export type TOnMove = {
+  added: Element[];
+  removed: Element[];
+  clear?: boolean;
+};
 
-export * from "./common-icons-style";
+export type TArrayTypes = {
+  type: string;
+  rowGap?: number;
+  itemHeight: number;
+  countOfMissingTiles?: number;
+  rowCount?: number;
+};
 
-export * from "./use-click-outside";
-
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./edge-scrolling";
+export type SelectionAreaProps = {
+  /** Class name for the container element */
+  containerClass: string;
+  /** Class name for selectable elements */
+  selectableClass: string;
+  /** Callback function when selection changes */
+  onMove?: ({ added, removed, clear }: TOnMove) => void;
+  /** Class name for scrollable container */
+  scrollClass: string;
+  /** View type */
+  viewAs: TViewAs;
+  /** Class name for items container */
+  itemsContainerClass: string;
+  /** Flag indicating if this is for rooms */
+  isRooms?: boolean;
+  /** Height of folder header */
+  folderHeaderHeight?: number;
+  /** Array type configuration */
+  arrayTypes?: TArrayTypes[];
+  /** Class name for item elements */
+  itemClass: string;
+  /** Number of tiles in a row */
+  countTilesInRow?: number;
+  /** Default height of header */
+  defaultHeaderHeight?: number;
+  /** Callback function for mouse down event */
+  onMouseDown?: (event: MouseEvent) => void;
+};

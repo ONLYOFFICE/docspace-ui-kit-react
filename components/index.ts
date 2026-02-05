@@ -129,3 +129,5 @@ export * from "./email-input";
 export * from "./loading-button";
 
 export * from "./top-loading-indicator";
+
+export * from "./selection-area";
