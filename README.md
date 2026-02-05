@@ -55,6 +55,7 @@ import {
   Scrollbar,
   SearchInput,
   SelectedItem,
+  StatusMessage,
   TabItem,
   Tabs,
   Tag,
@@ -109,6 +110,7 @@ import { RoomLogo } from "@docspace/ui-kit/components/room-logo";
 import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
 import { SearchInput } from "@docspace/ui-kit/components/search-input";
 import { SelectedItem } from "@docspace/ui-kit/components/selected-item";
+import { StatusMessage } from "@docspace/ui-kit/components/status-message";
 import { TabItem } from "@docspace/ui-kit/components/tab-item";
 import { Tabs, TabsTypes } from "@docspace/ui-kit/components/tabs";
 import { Tag } from "@docspace/ui-kit/components/tag";
@@ -180,6 +182,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
 | [SearchInput](./components/search-input/README.md) | Search input component with auto-refresh, clear button, and debounce support |
 | [SelectedItem](./components/selected-item/README.md) | Component for displaying selected items with remove functionality |
+| [StatusMessage](./components/status-message/README.md) | Animated status message component for displaying error and warning messages |
 | [TabItem](./components/tab-item/README.md) | Tab navigation component with active states, multi-select, and disabled state support |
 | [Tabs](./components/tabs/README.md) | Tab container component with primary/secondary themes, sticky positioning, and content management |
 | [Tag](./components/tag/README.md) | Tag component for displaying virtual room tags |

@@ -131,3 +131,5 @@ export * from "./loading-button";
 export * from "./top-loading-indicator";
 
 export * from "./selection-area";
+
+export * from "./status-message";
