@@ -298,6 +298,7 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
           animationState !== "dropping" &&
           (dropTargetFolderName || lastKnownTitle) ? (
             <Text fontWeight={600} fontSize="14px">
+              {/* t("Common:DropToLocation", { folderName: dropTargetFolderName || lastKnownTitle }) */}
               {getCommonTranslation("DropToLocation", {
                 folderName: dropTargetFolderName! || lastKnownTitle!,
               })}
