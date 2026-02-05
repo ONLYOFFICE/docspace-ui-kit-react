@@ -223,3 +223,5 @@ export type LinkRouterProps = {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
   children?: React.ReactNode;
 };
+
+export type ValueOf<T> = T[keyof T];
