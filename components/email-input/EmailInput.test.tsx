@@ -26,9 +26,8 @@
 
 import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { screen, render } from "@testing-library/react";
+import { screen, render, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { waitFor } from "@testing-library/react";
 import { InputSize } from "../text-input";
 import type { EmailInputProps } from "./EmailInput.types";
 import { EmailInput } from ".";
@@ -90,7 +89,6 @@ describe("<EmailInput />", () => {
   });
 
   it("validates correct email formats", async () => {
-    const user = userEvent.setup();
     const onValidateInput = vi.fn();
 
     render(<EmailInput {...defaultProps} onValidateInput={onValidateInput} />);
@@ -106,9 +104,9 @@ describe("<EmailInput />", () => {
     const input = screen.getByTestId("email-input");
 
     for (const email of validEmails) {
-      await user.clear(input);
-      await user.type(input, email);
-      await user.tab();
+      onValidateInput.mockClear();
+
+      fireEvent.change(input, { target: { value: email } });
 
       await waitFor(() => {
         expect(onValidateInput).toHaveBeenLastCalledWith(
@@ -122,7 +120,6 @@ describe("<EmailInput />", () => {
   });
 
   it("validates incorrect email formats", async () => {
-    const user = userEvent.setup();
     const onValidateInput = vi.fn();
 
     render(<EmailInput {...defaultProps} onValidateInput={onValidateInput} />);
@@ -137,8 +134,9 @@ describe("<EmailInput />", () => {
     const input = screen.getByTestId("email-input");
 
     for (const email of invalidEmails) {
-      await user.clear(input);
-      await user.type(input, email);
+      onValidateInput.mockClear();
+
+      fireEvent.change(input, { target: { value: email } });
 
       await waitFor(() => {
         expect(onValidateInput).toHaveBeenLastCalledWith(
