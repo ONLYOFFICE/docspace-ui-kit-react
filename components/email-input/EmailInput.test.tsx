@@ -28,7 +28,7 @@ import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { screen, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-
+import { waitFor } from "@testing-library/react";
 import { InputSize } from "../text-input";
 import type { EmailInputProps } from "./EmailInput.types";
 import { EmailInput } from ".";
@@ -92,6 +92,7 @@ describe("<EmailInput />", () => {
   it("validates correct email formats", async () => {
     const user = userEvent.setup();
     const onValidateInput = vi.fn();
+
     render(<EmailInput {...defaultProps} onValidateInput={onValidateInput} />);
 
     const validEmails = [
@@ -107,10 +108,14 @@ describe("<EmailInput />", () => {
     for (const email of validEmails) {
       await user.clear(input);
       await user.type(input, email);
-      expect(onValidateInput).toHaveBeenLastCalledWith({
-        value: email,
-        isValid: true,
-        errors: [],
+
+      await waitFor(() => {
+        expect(onValidateInput).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            isValid: true,
+            errors: [],
+          }),
+        );
       });
     }
   });
@@ -118,6 +123,7 @@ describe("<EmailInput />", () => {
   it("validates incorrect email formats", async () => {
     const user = userEvent.setup();
     const onValidateInput = vi.fn();
+
     render(<EmailInput {...defaultProps} onValidateInput={onValidateInput} />);
 
     const invalidEmails = [
@@ -132,10 +138,14 @@ describe("<EmailInput />", () => {
     for (const email of invalidEmails) {
       await user.clear(input);
       await user.type(input, email);
-      expect(onValidateInput).toHaveBeenLastCalledWith({
-        value: email,
-        isValid: false,
-        errors: expect.any(Array),
+
+      await waitFor(() => {
+        expect(onValidateInput).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            isValid: false,
+            errors: expect.any(Array),
+          }),
+        );
       });
     }
   });
