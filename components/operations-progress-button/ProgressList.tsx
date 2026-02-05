@@ -44,7 +44,11 @@ interface ProgressListProps {
   onOpenPanel: () => void;
   operations: Operation[];
   panelOperations?: Operation[];
-  clearOperationsData?: (operationId: string | null, operation: string) => void;
+  clearOperationsData?: (
+    operationId: string | null,
+    operation: string,
+    operationItem?: Operation,
+  ) => void;
   clearPanelOperationsData?: (
     operationId: string | null,
     operation: string,
@@ -80,6 +84,14 @@ const getIcon = (icon: string): React.ReactNode => {
   }
 };
 
+const getOperationKey = (item: Operation) => {
+  if (item.id) return item.id;
+
+  return `${item.operation}-${item.items?.[0]?.operationId ?? ""}-${
+    item.completed
+  }`;
+};
+
 const ProgressList = ({
   operations,
   panelOperations,
@@ -99,7 +111,7 @@ const ProgressList = ({
     <div className="progress-container">
       {operations.map((item) => (
         <div
-          key={`${item.operation}-${item.items?.[0]?.operationId ?? ""}-${item.completed}`}
+          key={getOperationKey(item)}
           className="progress-list"
         >
           <ProgressBar
@@ -110,7 +122,9 @@ const ProgressList = ({
             icon={getIcon(item.operation)}
             onClickAction={() => {}}
             withoutProgress
-            onClearProgress={clearOperationsData}
+            onClearProgress={(operationId, operation) =>
+              clearOperationsData?.(operationId, operation, item)
+            }
             operation={item.operation}
           />
         </div>

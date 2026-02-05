@@ -80,7 +80,8 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
   componentDidMount() {
     const { onLoad } = this.props;
     onLoad?.();
-    window.addEventListener("blur", this.onClickIFrame);
+   const skipBlur = this.props.skipBlur ?? false;
+    if (!skipBlur) window.addEventListener("blur", this.onClickIFrame);
   }
 
   componentWillUnmount() {
@@ -134,7 +135,7 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
       htmlContent,
       style,
       countDownTime,
-      isCampaigns,
+      isCampaigns,additionalHeaderText,
       sectionWidth,
       opacity,
       backgroundImg,
@@ -207,7 +208,7 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
                   />
                 </div>
               ) : null}
-
+<div className={styles.headerContainer}>
               <Heading
                 size={HeadingSize.xsmall}
                 isInline
@@ -217,6 +218,17 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
               >
                 {headerText}
               </Heading>
+              {additionalHeaderText ? (
+                  <Text
+                    as="span"
+                    isInline
+                    fontSize="12px"
+                    data-testid="snackbar-additional-info"
+                  >
+                    {additionalHeaderText}
+                  </Text>
+                ) : null}
+              </div>
             </div>
             <div className={styles.textBody}>
               <Text

@@ -355,8 +355,20 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
     return <Text fontWeight={600}>{operationName}</Text>;
   };
 
+  const getIconUrl = () => {
+    if (isSeveralOperations && showSeveralOperationsIcon) {
+      return undefined;
+    }
+
+    const customIconUrl = operationsLength
+      ? operations[0].iconUrl
+      : panelOperations[0].iconUrl;
+
+    return customIconUrl;
+  };
+
   const onCancelOperation = () => {
-    cancelUpload?.();
+    cancelUpload?.(getCommonTranslation);
   };
 
   const disableOpenPanel =
@@ -432,6 +444,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
                   !panelOperationsLength || disableOpenPanel,
               })}
               icon={getIcons()}
+              iconUrl={getIconUrl()}
               alert={operationsAlert}
               completed={operationsCompleted}
               onClick={handleFloatingButtonClick}
