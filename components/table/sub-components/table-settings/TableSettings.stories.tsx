@@ -24,26 +24,67 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import type { Meta, StoryObj } from "@storybook/react";
 
-export * from "./uuid";
+import { SortByFieldName } from "../../../../enums";
 
-export * from "./common-icons-style";
+import { TableSettings } from "./TableSettings";
 
-export * from "./use-click-outside";
+const meta = {
+  title: "Components/Table/TableSettings",
+  component: TableSettings,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "TableSettings component for managing column visibility in tables",
+      },
+    },
+  },
+} satisfies Meta<typeof TableSettings>;
 
-export { default as DomHelpers } from "./dom-helpers";
+export default meta;
+type Story = StoryObj<typeof meta>;
 
-export * from "./get-text-color";
+export const Default: Story = {
+  args: {
+    columns: [
+      {
+        key: "name",
+        title: "Name",
+        enable: true,
+        sortBy: SortByFieldName.Name,
+        onChange: () => {},
+      },
+      {
+        key: "type",
+        title: "Type",
+        enable: true,
+        sortBy: SortByFieldName.Type,
+        onChange: () => {},
+      },
+      {
+        key: "modified",
+        title: "Modified",
+        enable: false,
+        sortBy: SortByFieldName.ModifiedDate,
+        onChange: () => {},
+      },
+      {
+        key: "owner",
+        title: "Owner",
+        enable: true,
+        sortBy: SortByFieldName.Author,
+        onChange: () => {},
+      },
+    ],
+    disableSettings: false,
+  },
+};
 
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./hasOwnProperty";
+export const Disabled: Story = {
+  args: {
+    ...Default.args,
+    disableSettings: true,
+  },
+};

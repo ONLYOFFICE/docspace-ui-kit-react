@@ -24,26 +24,23 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import React from "react";
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
 
-export * from "./uuid";
+import { TableCell } from "./TableCell";
 
-export * from "./common-icons-style";
+describe("<TableCell />", () => {
+  it("renders without errors", () => {
+    render(<TableCell>Cell</TableCell>);
 
-export * from "./use-click-outside";
+    expect(screen.getByTestId("table-cell")).toBeInTheDocument();
+  });
 
-export { default as DomHelpers } from "./dom-helpers";
+  it("pass value for DnD", () => {
+    const value = "DnD_Value";
+    render(<TableCell value={value}>Cell</TableCell>);
 
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./hasOwnProperty";
+    expect(screen.getByTestId("table-cell")).toHaveAttribute("value", value);
+  });
+});

@@ -220,3 +220,21 @@ export const enum ErrorKeys {
   ManyEmails = "ManyEmails",
   EmptyEmail = "EmptyEmail",
 }
+
+/**
+ * Enum for sort by field name
+ * @readonly
+ */
+export const enum SortByFieldName {
+  Name = "AZ",
+  ModifiedDate = "DateAndTime",
+  CreationDate = "DateAndTimeCreation",
+  Author = "Author",
+  Size = "Size",
+  Type = "Type",
+  Location = "Location",
+  Tags = "Tags",
+  RoomType = "roomType",
+  LastOpened = "LastOpened",
+  UsedSpace = "usedspace",
+}

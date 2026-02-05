@@ -24,26 +24,77 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import type { Meta, StoryObj } from "@storybook/react";
 
-export * from "./uuid";
+import { GroupMenuItem } from "./GroupMenuItem";
+import { TGroupMenuItem } from "../../Table.types";
 
-export * from "./common-icons-style";
+const meta = {
+  title: "Components/Table/GroupMenuItem",
+  component: GroupMenuItem,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "GroupMenuItem component for table group menu items with dropdown support",
+      },
+    },
+  },
+  argTypes: {
+    isBlocked: { control: "boolean" },
+  },
+} satisfies Meta<typeof GroupMenuItem>;
 
-export * from "./use-click-outside";
+export default meta;
+type Story = StoryObj<typeof GroupMenuItem>;
 
-export { default as DomHelpers } from "./dom-helpers";
+const createMenuItem = (
+  overrides: Partial<TGroupMenuItem> = {},
+): TGroupMenuItem => {
+  return {
+    label: "Menu Item",
+    disabled: false,
+    onClick: () => {},
+    iconUrl: "",
+    title: "Menu Item Title",
+    withDropDown: false,
+    options: [],
+    id: "group-menu-item",
+    ...overrides,
+  };
+};
 
-export * from "./get-text-color";
+export const Default: Story = {
+  args: {
+    item: createMenuItem(),
+    isBlocked: false,
+  },
+};
 
-export * from "./trim-separator";
+export const WithDropdown: Story = {
+  args: {
+    item: createMenuItem({
+      withDropDown: true,
+      options: [
+        {
+          key: "option-1",
+          label: "Option 1",
+          onClick: () => {},
+        },
+        {
+          key: "option-2",
+          label: "Option 2",
+          onClick: () => {},
+        },
+      ],
+    }),
+    isBlocked: false,
+  },
+};
 
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./hasOwnProperty";
+export const Blocked: Story = {
+  args: {
+    item: createMenuItem(),
+    isBlocked: true,
+  },
+};

@@ -24,26 +24,52 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+import React from "react";
+import classNames from "classnames";
+import equal from "fast-deep-equal/react";
 
-export * from "./uuid";
+import { TableCellProps } from "../../Table.types";
+import styles from "./TableCell.module.scss";
 
-export * from "./common-icons-style";
+const TableCell = React.memo((props: TableCellProps) => {
+  const {
+    className,
+    forwardedRef,
+    style,
+    checked,
+    hasAccess,
+    children,
+    value,
+    dataTestId,
+    documentTitle,
+  } = props;
 
-export * from "./use-click-outside";
+  const classes = classNames(
+    styles.tableCell,
+    className,
+    "table-container_cell",
+    {
+      [styles.checked]: checked,
+      [styles.hasAccess]: hasAccess,
+    },
+  );
 
-export { default as DomHelpers } from "./dom-helpers";
+  const cellTestId = dataTestId ?? "table-cell";
 
-export * from "./get-text-color";
+  return (
+    <div
+      data-testid={cellTestId}
+      className={classes}
+      ref={forwardedRef}
+      style={style}
+      // @ts-expect-error: value used by DnD and maybe somewhere else;
+      // TODO: Refactor logic to use data-value
+      value={value}
+      data-document-title={documentTitle}
+    >
+      {children}
+    </div>
+  );
+}, equal);
 
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./hasOwnProperty";
+export { TableCell };

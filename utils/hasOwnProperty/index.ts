@@ -24,26 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
-
-export * from "./uuid";
-
-export * from "./common-icons-style";
-
-export * from "./use-click-outside";
-
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./hasOwnProperty";
+export const hasOwnProperty = (obj: unknown, propertyName: string): boolean => {
+    if (!obj) return false;
+  
+    try {
+      // biome-ignore lint/suspicious/noPrototypeBuiltins: TODO fix
+      return Object.prototype.hasOwnProperty.call(obj, propertyName);
+    } catch {
+      return false;
+    }
+  };
+  
