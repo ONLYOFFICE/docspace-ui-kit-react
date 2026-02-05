@@ -71,7 +71,7 @@ const FileInputPure = ({
 
   const onDrop = (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) {
-      toastr.error(getCommonTranslation("Common:NotSupportedFormat"));
+      toastr.error(getCommonTranslation("NotSupportedFormat"));
       return;
     }
 

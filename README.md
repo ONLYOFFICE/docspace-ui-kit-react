@@ -37,6 +37,7 @@ import {
   DropDownItem,
   EmptyScreenContainer,
   EmptyView,
+  FileInput,
   Heading,
   IconButton,
   InputBlock,
@@ -92,6 +93,7 @@ import { DropDown } from "@docspace/ui-kit/components/drop-down";
 import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
 import { EmptyScreenContainer } from "@docspace/ui-kit/components/empty-screen-container";
 import { EmptyView } from "@docspace/ui-kit/components/empty-view";
+import { FileInput } from "@docspace/ui-kit/components/file-input";
 import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
 import { IconButton } from "@docspace/ui-kit/components/icon-button";
 import { InputBlock } from "@docspace/ui-kit/components/input-block";
@@ -164,6 +166,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [DropDownItem](./components/drop-down-item/README.md) | Dropdown item for menus and lists with separator, header, submenu, and toggle support |
 | [EmptyScreenContainer](./components/empty-screen-container/README.md) | Component for displaying empty states with image, text, and action buttons |
 | [EmptyView](./components/empty-view/README.md) | Empty state component with icon, title, description, and interactive options |
+| [FileInput](./components/file-input/README.md) | File entry field |
 | [Heading](./components/heading/README.md) | Heading text structured in levels with customizable sizes and types |
 | [IconButton](./components/icon-button/README.md) | Button component displaying an icon with hover, click, and disabled states |
 | [InputBlock](./components/input-block/README.md) | Input component combining text input with optional icon and children elements |
@@ -248,6 +251,8 @@ window.i18n = {
         SelectorVDREmptyScreenDescription: "Create a virtual data room...",
         CreateFormFillingRoom: "Create form filling room",
         CreateVirtualDataRoom: "Create virtual data room",
+        // FileInput
+        NotSupportedFormat: "Sorry, this file format isn't supported",
       },
     },
     "ru/Common.json": {
