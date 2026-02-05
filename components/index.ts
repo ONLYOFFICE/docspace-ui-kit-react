@@ -135,3 +135,5 @@ export * from "./selection-area";
 export * from "./status-message";
 
 export * from "./progress-bar";
+
+export * from "./file-input";
