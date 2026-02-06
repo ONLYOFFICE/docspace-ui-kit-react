@@ -26,10 +26,9 @@
 
 import type { Operation } from "../operations-progress-button/OperationsProgressButton.types";
 import { DeviceType } from "../../enums";
-import { TViewAs, TUser } from "../../types";
+import { TViewAs, TUser, TFile, TFolder } from "../../types";
 
 import { ContextMenuModel } from "../context-menu";
-import { TFile, TFolder } from "../../api/files/types";
 
 export type SubInfoPanelHeaderProps = {
   children: React.JSX.Element | null;
