@@ -26,9 +26,9 @@
 
 import { cnb } from "cnbuilder";
 import React from "react";
-import type {
+import {
   AxisDirection,
-  ElementPropsWithElementRefAndRenderer,
+  type ElementPropsWithElementRefAndRenderer,
 } from "./types";
 import { isFun, isUndef, renderDivWithRenderer } from "./util";
 
