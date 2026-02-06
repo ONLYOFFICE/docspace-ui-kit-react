@@ -41,7 +41,7 @@ import { toastr } from "../toast";
 import styles from "./FileInput.module.scss";
 
 import { FileInputProps } from "./FileInput.types";
-import { globalColors } from "../../themes";
+import { globalColors } from "../../providers/theme/themes";
 import { getCommonTranslation } from "../../utils";
 
 const FileInputPure = ({
