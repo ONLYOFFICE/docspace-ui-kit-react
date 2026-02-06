@@ -233,7 +233,10 @@ const SelectionArea = ({
 
     const selectableItems = document.getElementsByClassName(selectableClass);
 
-    const selectables = [...selectableItems, ...selectableNodes.current];
+    const selectables = [
+      ...Array.from(selectableItems),
+      ...Array.from(selectableNodes.current),
+    ];
 
     for (let i = 0; i < selectables.length; i += 1) {
       const node = selectables[i];

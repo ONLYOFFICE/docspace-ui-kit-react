@@ -34,7 +34,7 @@ import RightArrowIcon from "../../assets/icons/12/right-arrow.react.svg";
 import { Text } from "../text";
 import { IconButton } from "../icon-button";
 import { LoadingButton } from "../loading-button";
-import { globalColors } from "../../themes";
+import { globalColors } from "../../providers/theme";
 
 import styles from "./OperationsProgressButton.module.scss";
 import { ProgressBarMobileProps } from "./OperationsProgressButton.types";

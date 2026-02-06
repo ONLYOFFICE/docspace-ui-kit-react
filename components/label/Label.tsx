@@ -27,58 +27,58 @@
 import { Text } from "../text";
 
 import type { LabelProps } from "./Label.types";
-import { globalColors } from "../../themes";
+import { globalColors } from "../../providers/theme";
 
 const Label = (props: LabelProps) => {
-  const {
-    isRequired = false,
-    error = false,
-    title,
-    truncate = false,
-    isInline = false,
-    htmlFor,
-    text,
-    display,
-    className,
-    id,
-    style,
-    children,
-  } = props;
-  const errorProp = error ? { color: globalColors.lightErrorStatus } : {};
+	const {
+		isRequired = false,
+		error = false,
+		title,
+		truncate = false,
+		isInline = false,
+		htmlFor,
+		text,
+		display,
+		className,
+		id,
+		style,
+		children,
+	} = props;
+	const errorProp = error ? { color: globalColors.lightErrorStatus } : {};
 
-  return (
-    <Text
-      as="label"
-      id={id}
-      style={style}
-      htmlFor={htmlFor}
-      isInline={isInline}
-      display={display}
-      {...errorProp}
-      fontWeight={600}
-      truncate={truncate}
-      title={title}
-      className={className}
-      data-testid="label"
-      data-truncate={truncate}
-      data-inline={isInline}
-      data-error={error}
-      aria-required={isRequired}
-      aria-invalid={error}
-    >
-      {text}{" "}
-      {isRequired ? (
-        <span
-          style={{ color: globalColors.lightErrorStatus }}
-          aria-hidden="true"
-          data-testid="required-mark"
-        >
-          *
-        </span>
-      ) : null}{" "}
-      {children}
-    </Text>
-  );
+	return (
+		<Text
+			as="label"
+			id={id}
+			style={style}
+			htmlFor={htmlFor}
+			isInline={isInline}
+			display={display}
+			{...errorProp}
+			fontWeight={600}
+			truncate={truncate}
+			title={title}
+			className={className}
+			data-testid="label"
+			data-truncate={truncate}
+			data-inline={isInline}
+			data-error={error}
+			aria-required={isRequired}
+			aria-invalid={error}
+		>
+			{text}{" "}
+			{isRequired ? (
+				<span
+					style={{ color: globalColors.lightErrorStatus }}
+					aria-hidden="true"
+					data-testid="required-mark"
+				>
+					*
+				</span>
+			) : null}{" "}
+			{children}
+		</Text>
+	);
 };
 
 export { Label };

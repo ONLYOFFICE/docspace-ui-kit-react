@@ -232,3 +232,25 @@ export type TViewAs =
   | "settings"
   | "profile"
   | "tileDynamicHeight";
+
+declare global {
+  interface Window {
+    AscDesktopEditor?: {
+      execCommand: (key: string, value: string) => void;
+      cloudCryptoCommand: (
+        key: string,
+        value: unknown,
+        callback: unknown,
+      ) => void;
+      getViewportSettings?: () => {
+        widgetType: "window" | "tab";
+        captionHeight: number;
+      };
+      onViewportSettingsChanged?: VoidFunction;
+      attachEvent?: (listener: string, callback: VoidFunction) => void;
+    };
+    RendererProcessVariable?: {
+      theme?: { id: string; system: string; type: string; addlocal: string };
+    };
+  }
+}

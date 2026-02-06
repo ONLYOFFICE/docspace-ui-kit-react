@@ -27,7 +27,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { globalColors } from "../../themes";
+import { globalColors } from "../../providers/theme";
 
 import VerticalDotsReactSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
 
