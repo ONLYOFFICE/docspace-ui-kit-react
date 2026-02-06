@@ -26,7 +26,10 @@
 
 import { cnb } from "cnbuilder";
 import React from "react";
-import { AxisDirection, ElementPropsWithElementRefAndRenderer } from "./types";
+import type {
+  AxisDirection,
+  ElementPropsWithElementRefAndRenderer,
+} from "./types";
 import { isFun, isUndef, renderDivWithRenderer } from "./util";
 
 export interface ScrollbarTrackClickParameters {
@@ -106,11 +109,8 @@ class ScrollbarTrack extends React.Component<ScrollbarTrackProps, unknown> {
 
   public render(): React.ReactElement<unknown> | null {
     const {
-      // biome-ignore lint/correctness/noUnusedVariables: used in destructuring to exclude from props
       elementRef,
-
       axis,
-      // biome-ignore lint/correctness/noUnusedVariables: used in destructuring to exclude from props
       onClick,
 
       ...props
