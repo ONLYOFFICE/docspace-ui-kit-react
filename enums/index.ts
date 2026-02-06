@@ -284,3 +284,9 @@ export enum VectorizationStatus {
   Completed,
   Failed,
 }
+
+export const enum VDRIndexingAction {
+  HigherIndex = "HigherIndex",
+  LowerIndex = "LowerIndex",
+  MoveIndex = "MoveIndex",
+}
