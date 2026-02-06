@@ -28,7 +28,7 @@
 
 import classNames from "classnames";
 
-import ArrowReactSvgUrl from "../../../../../assets/arrow2.react.svg?url";
+import ArrowReactSvg from "../../../../../assets/arrow2.react.svg";
 
 import { IconButton } from "../../../../icon-button";
 import { IconSizeType } from "../../../../../utils";
@@ -59,7 +59,7 @@ export const IndexIconButtons = ({
             upIconClassName,
             commonIconClassName,
           )}
-          iconName={ArrowReactSvgUrl}
+          iconNode={<ArrowReactSvg />}
           size={IconSizeType.small}
         />
       </div>
@@ -71,7 +71,7 @@ export const IndexIconButtons = ({
             downIconClassName,
             commonIconClassName,
           )}
-          iconName={ArrowReactSvgUrl}
+          iconNode={<ArrowReactSvg />}
           size={IconSizeType.small}
         />
       </div>
