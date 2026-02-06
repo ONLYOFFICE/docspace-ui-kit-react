@@ -28,48 +28,39 @@
 
 import { createContext, use, type ReactNode } from "react";
 
+import type { CustomColorThemesSettingsItem } from "@onlyoffice/docspace-api-sdk";
+
 export type TTheme = "Base" | "Dark";
 
 type TThemeContextValue = {
-  theme: TTheme;
-  currentColorScheme?: TColorScheme;
+	theme: TTheme;
+	currentColorScheme?: TColorScheme;
 };
 
 type ThemeProviderProps = TThemeContextValue & {
-  children: ReactNode;
+	children: ReactNode;
 };
 
-export type TColorScheme = {
-  id: number;
-  main: {
-    accent: string;
-    buttons: string;
-  };
-  name: string;
-  text: {
-    accent: string;
-    buttons: string;
-  };
-};
+export type TColorScheme = CustomColorThemesSettingsItem;
 
 export const ThemeContext = createContext<TThemeContextValue>({
-  theme: "Base",
+	theme: "Base",
 });
 
 export const ThemeContextProvider = ({
-  theme,
-  currentColorScheme,
-  children,
+	theme,
+	currentColorScheme,
+	children,
 }: ThemeProviderProps) => {
-  return (
-    <ThemeContext value={{ theme, currentColorScheme }}>
-      {children}
-    </ThemeContext>
-  );
+	return (
+		<ThemeContext value={{ theme, currentColorScheme }}>
+			{children}
+		</ThemeContext>
+	);
 };
 
 export const useTheme = () => {
-  const { theme, currentColorScheme } = use(ThemeContext);
+	const { theme, currentColorScheme } = use(ThemeContext);
 
-  return { theme, isBase: theme === "Base", currentColorScheme };
+	return { theme, isBase: theme === "Base", currentColorScheme };
 };

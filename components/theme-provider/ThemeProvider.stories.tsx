@@ -26,7 +26,7 @@
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { globalColors } from "../../themes/globalColors";
+import { globalColors } from "../../providers/theme";
 import type { TColorScheme } from "../../context/ThemeContext";
 import { Button, ButtonSize } from "../button";
 import { Text } from "../text";

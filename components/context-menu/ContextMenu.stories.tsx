@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
-import { globalColors } from "../../themes";
+import { globalColors } from "../../providers/theme";
 
 import type {
 	ContextMenuProps,

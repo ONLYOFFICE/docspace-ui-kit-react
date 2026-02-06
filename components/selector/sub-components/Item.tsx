@@ -46,7 +46,7 @@ import NewItem from "./NewItem";
 import InputItem from "./InputItem";
 import styles from "../Selector.module.scss";
 import { useTheme } from "../../../context/ThemeContext";
-import { globalColors } from "../../../themes";
+import { globalColors } from "../../../providers/theme";
 
 const compareFunction = (prevProps: ItemProps, nextProps: ItemProps) => {
 	const prevData = prevProps.data;

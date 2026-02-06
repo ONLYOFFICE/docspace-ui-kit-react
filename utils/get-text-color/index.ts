@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 import hexRgb from "hex-rgb";
-import { globalColors } from "../../themes";
+import { globalColors } from "../../providers/theme";
 
 export const getTextColor = (color: string, brightnessDiff: number = 128) => {
 	const { black } = globalColors;

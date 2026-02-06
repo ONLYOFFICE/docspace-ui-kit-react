@@ -45,7 +45,7 @@ import {
 
 import { Selector } from "./Selector";
 import type { SelectorProps, TSelectorItem } from "./Selector.types";
-import { globalColors } from "../../themes";
+import { globalColors } from "../../providers/theme";
 import { EmployeeStatus, EmployeeType } from "../../enums";
 
 const meta = {

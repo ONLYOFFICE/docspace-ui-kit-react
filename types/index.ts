@@ -24,11 +24,18 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import {
+import type {
   ShareAccessRights,
   EmployeeStatus,
   EmployeeActivationStatus,
   ThemeKeys,
+  FileStatus,
+  FileType,
+  FolderType,
+  ShareRights,
+  FileFillingFormStatus,
+  VectorizationStatus,
+  RoomsType,
 } from "../enums";
 
 export type TDirectionX = "left" | "right";
@@ -225,3 +232,183 @@ export type LinkRouterProps = {
 };
 
 export type ValueOf<T> = T[keyof T];
+
+export type TViewAs =
+  | "tile"
+  | "table"
+  | "row"
+  | "settings"
+  | "profile"
+  | "tileDynamicHeight";
+
+declare global {
+  interface Window {
+    AscDesktopEditor?: {
+      execCommand: (key: string, value: string) => void;
+      cloudCryptoCommand: (
+        key: string,
+        value: unknown,
+        callback: unknown,
+      ) => void;
+      getViewportSettings?: () => {
+        widgetType: "window" | "tab";
+        captionHeight: number;
+      };
+      onViewportSettingsChanged?: VoidFunction;
+      attachEvent?: (listener: string, callback: VoidFunction) => void;
+    };
+    RendererProcessVariable?: {
+      theme?: { id: string; system: string; type: string; addlocal: string };
+    };
+  }
+}
+export type TShareSettings = {
+  ExternalLink?: number;
+  PrimaryExternalLink?: number;
+};
+
+export type TFileViewAccessibility = {
+  CanConvert: boolean;
+  CoAuhtoring: boolean;
+  ImageView: boolean;
+  MediaView: boolean;
+  MustConvert: boolean;
+  WebComment: boolean;
+  WebCustomFilterEditing: boolean;
+  WebEdit: boolean;
+  WebRestrictedEditing: boolean;
+  WebReview: boolean;
+  WebView: boolean;
+};
+
+export type TShareRightsType =
+  | "ExternalLink"
+  | "Group"
+  | "PrimaryExternalLink"
+  | "User";
+
+export type TAvailableShareRights = Partial<
+  Record<TShareRightsType, ShareRights[]>
+>;
+
+type TDimensions = {
+  width: number;
+  height: number;
+};
+
+export type TFile = {
+  isFile?: boolean;
+  access: ShareAccessRights;
+  canShare: boolean;
+  comment: string;
+  contentLength: string;
+  created: string;
+  createdBy: TCreatedBy;
+  denyDownload?: boolean;
+  denySharing?: boolean;
+  fileExst: string;
+  fileStatus: FileStatus;
+  fileType: FileType;
+  folderId: number;
+  id: number;
+  parentRoomType?: FolderType;
+  shareSettings?: TShareSettings;
+  mute: boolean;
+  parentShared?: boolean;
+  pureContentLength: number;
+  rootFolderId: number;
+  rootFolderType: FolderType;
+  security: TFileSecurity;
+  shared: boolean;
+  thumbnailStatus: number;
+  title: string;
+  updated: string;
+  updatedBy: TCreatedBy;
+  sharedBy?: TCreatedBy;
+  ownedBy?: TCreatedBy;
+  version: number;
+  versionGroup: number;
+  viewAccessibility: TFileViewAccessibility;
+  viewUrl: string;
+  webUrl: string;
+  shortWebUrl: string;
+  availableShareRights?: TAvailableShareRights;
+  providerId?: number;
+  providerKey?: string;
+  providerItem?: boolean;
+  thumbnailUrl?: string;
+  expired?: string;
+  isForm?: boolean;
+  isFolder?: boolean;
+  formFillingStatus?: FileFillingFormStatus;
+  startFilling?: boolean;
+  fileEntryType: number;
+  hasDraft?: boolean;
+  order?: string;
+  lockedBy?: string;
+  originId?: number;
+  originRoomId?: number;
+  originRoomTitle?: string;
+  originTitle?: string;
+  requestToken?: string;
+  isFavorite?: boolean;
+  vectorizationStatus?: VectorizationStatus;
+  expirationDate?: string;
+  sharedForUser?: boolean;
+  external?: boolean;
+  isLinkExpired?: boolean;
+  dimensions?: TDimensions;
+  editingBy?: Record<string, string>;
+  activeEditors?: Record<string, string>;
+};
+
+export type TPathParts = {
+  id: number;
+  title: string;
+  roomType?: RoomsType;
+  folderType?: FolderType;
+};
+
+export type TFolder = {
+  parentId: number;
+  filesCount: number;
+  foldersCount: number;
+  new: number;
+  mute: boolean;
+  pinned: boolean;
+  private: boolean;
+  id: number;
+  rootFolderId: number;
+  canShare: boolean;
+  security: TFolderSecurity;
+  title: string;
+  access: ShareAccessRights;
+  shared: boolean;
+  created: string;
+  createdBy: TCreatedBy;
+  updated: string;
+  updatedBy: TCreatedBy;
+  sharedBy?: TCreatedBy;
+  ownedBy?: TCreatedBy;
+  rootFolderType: FolderType;
+  isArchive?: boolean;
+  roomType?: RoomsType;
+  path?: TPathParts[];
+  type?: FolderType;
+  isFolder?: boolean;
+  indexing: boolean;
+  denyDownload: boolean;
+  fileEntryType: number;
+  parentShared?: boolean;
+  parentRoomType?: FolderType;
+  order?: string;
+  isRoom?: false;
+  rootRoomType?: RoomsType;
+  shareSettings?: TShareSettings;
+  availableShareRights?: TAvailableShareRights;
+  isFavorite?: boolean;
+  expirationDate?: string;
+  sharedForUser?: boolean;
+  isLinkExpired?: boolean;
+  external?: boolean;
+};

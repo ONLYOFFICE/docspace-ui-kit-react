@@ -32,7 +32,7 @@
 // import EyeReactSvgUrl from "PUBLIC_DIR/images/eye.react.svg?url";
 // import AccessNoneReactSvgUrl from "PUBLIC_DIR/images/access.none.react.svg?url";
 
-import { globalColors } from "../../themes";
+import { globalColors } from "../../providers/theme";
 
 import type { TOption } from "../combobox";
 
