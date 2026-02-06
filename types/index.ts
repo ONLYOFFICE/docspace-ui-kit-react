@@ -243,6 +243,7 @@ export type TViewAs =
 
 declare global {
   interface Window {
+    timezone: string;
     AscDesktopEditor?: {
       execCommand: (key: string, value: string) => void;
       cloudCryptoCommand: (
