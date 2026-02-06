@@ -4,7 +4,7 @@ import { useDarkMode } from "storybook-dark-mode";
 import { ThemeProvider } from "../components/theme-provider";
 import type { TColorScheme } from "../context/ThemeContext";
 
-import { globalColors } from "../themes/globalColors";
+import { globalColors } from "../providers/theme/themes/globalColors";
 
 import "./styles.css";
 
