@@ -1,69 +1,64 @@
 # RowContent
 
-Required for formatted output of elements inside Row
+Layout helper for the `Row` component. It arranges nested elements into a main section (title + icons) and multiple side sections, adapting to tablet layouts by turning the side sections into a stacked summary.
 
-### Usage
+## Import
 
-```js
+```ts
 import { RowContent } from "@docspace/ui-kit/components/rows";
-import SendClockReactSvg from "PUBLIC_DIR/images/send.clock.react.svg";
-import CatalogSpamReactSvg from "PUBLIC_DIR/images/icons/16/catalog.spam.react.svg";
 ```
 
-```jsx
+## Usage
+
+```tsx
 <RowContent>
-  <Link type="page" title="Demo" isBold={true} fontSize="15px" color="#333333">
-    Demo
+  <Link type="page" title="Acme Inc." isBold fontSize="15px">
+    Acme Inc.
   </Link>
   <>
-    <SendClockReactSvg size="small" isfill={true} color="#3B72A7" />
-    <CatalogSpamReactSvg size="small" isfill={true} color="#3B72A7" />
+    <SendClockReactSvg data-size={IconSizeType.small} />
+    <CatalogSpamReactSvg data-size={IconSizeType.small} />
   </>
-  <Link type="page" title="Demo" fontSize="12px" color="#A3A9AE">
-    Demo
+  <Link containerWidth="140px" type="action" title="Owner">
+    Owner
   </Link>
-  <Link
-    containerWidth="160px"
-    type="action"
-    title="Demo"
-    fontSize="12px"
-    color="#A3A9AE"
-  >
-    Demo
-  </Link>
-  <Link type="page" title="0 000 0000000" fontSize="12px" color="#A3A9AE">
-    0 000 0000000
-  </Link>
-  <Link
-    containerWidth="160px"
-    type="page"
-    title="demo@demo.com"
-    fontSize="12px"
-    color="#A3A9AE"
-  >
-    demo@demo.com
+  <Link containerWidth="200px" type="page" title="owner@acme.com">
+    owner@acme.com
   </Link>
 </RowContent>
 ```
 
-To correctly display components inside RowContent, you must specify them in a certain order.
+### Custom side layout
 
-The first and second specified components will be interpreted as Main elements.
-First will be MainTitle and second MainIcons.
-All subsequent components will be located on the right and are considered SideElements.
+```tsx
+<RowContent disableSideInfo sideColor="#A3A9AE" sectionWidth={420}>
+  <Text containerWidth="200px" title="Marketing" truncate>
+    Marketing
+  </Text>
+  <Badge type="warning">Pending</Badge>
+  <Link containerWidth="180px" type="page" title="+1 202 555 0142">
+    +1 202 555 0142
+  </Link>
+</RowContent>
+```
 
-**_Consider location of components in advance, since when viewing in tablet mode, the markup will shift SideElements to second line._**
+## Layout rules
 
-Each not main child can take containerWidth property for task of width of child's container.
+1. `children[0]` is treated as the **main title** block.
+2. `children[1]` is rendered next to the title as the **icon slot** (optional).
+3. Further children become **side sections**; each may define `containerWidth` / `containerMinWidth` props that RowContent forwards to the surrounding wrapper.
+4. Unless `disableSideInfo` is set, a condensed side-info summary is generated for tablet view by calling `getSideInfo`.
 
-### Properties
+## Props
 
-| Props             |      Type      | Required | Values | Default | Description                            |
-| ----------------- | :------------: | :------: | :----: | :-----: | -------------------------------------- |
-| `children`        |     `node`     |    ✅    |   -    |    -    | Components displayed inside RowContent |
-| `className`       |    `string`    |    -     |   -    |    -    | Accepts class                          |
-| `containerWidth`  |    `string`    |    -     |   -    | `100px` | For task of width of child's container |
-| `disableSideInfo` |     `bool`     |    -     |   -    | `false` | If you do not need SideElements        |
-| `id`              |    `string`    |    -     |   -    |    -    | Accepts id                             |
-| `sideColor`       |    `string`    |    -     |   -    |    -    | Need for change side information color |
-| `style`           | `obj`, `array` |    -     |   -    |    -    | Accepts css style                      |
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `React.ReactElement[]` | – | Elements to arrange across the main and side containers. Side elements can pass `containerWidth` / `containerMinWidth` props. |
+| `className` | `string` | – | Custom class for the root wrapper. |
+| `disableSideInfo` | `boolean` | `false` | Hides the auto-generated tablet-side summary. |
+| `id` | `string` | – | DOM id for the wrapper. |
+| `onClick` | `() => void` | – | Click handler applied to the root container. |
+| `sideColor` | `string` | – | Overrides the color of the tablet side-info summary. |
+| `style` | `React.CSSProperties` | – | Inline styles for the root wrapper. |
+| `sectionWidth` | `number` | – | Adds a fixed width modifier for the main section. |
+| `convertSideInfo` | `boolean` | `true` | Controls whether `getSideInfo` should convert side elements into the tablet summary. |

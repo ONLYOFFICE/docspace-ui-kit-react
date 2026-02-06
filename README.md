@@ -56,6 +56,9 @@ import {
   Scrollbar,
   SearchInput,
   SelectedItem,
+  Row,
+  RowContainer,
+  RowContent,
   StatusMessage,
   TabItem,
   Tabs,
@@ -104,6 +107,7 @@ import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
 import { ModalDialog, ModalDialogType } from "@docspace/ui-kit/components/modal-dialog";
 import { Portal } from "@docspace/ui-kit/components/portal";
 import { PublicRoomBar } from "@docspace/ui-kit/components/public-room-bar";
+import { Row, RowContainer, RowContent } from "@docspace/ui-kit/components/rows";
 import { RadioButton } from "@docspace/ui-kit/components/radio-button";
 import { RadioButtonGroup } from "@docspace/ui-kit/components/radio-button-group";
 import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
@@ -182,6 +186,9 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [RectangleSkeleton](./components/rectangle/README.md) | Rectangular skeleton loader for text, buttons, and content placeholders |
 | [RoomIcon](./components/room-icon/README.md) | Room icon component with support for images, colors, badges, editing, and various states |
 | [RoomLogo](./components/room-logo/README.md) | Room logo component displaying room type icons with archive, template, and checkbox support |
+| [Row](./components/rows/row/README.md) | Versatile list row with checkbox, context menu, badges, and modern/default layouts for file or member listings |
+| [RowContainer](./components/rows/row-container/README.md) | Wrapper for rendering multiple rows with optional `react-window` virtualization and infinite loading |
+| [RowContent](./components/rows/row-content/README.md) | Layout helper that arranges row title, icons, and side sections while generating tablet-friendly summaries |
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
 | [SearchInput](./components/search-input/README.md) | Search input component with auto-refresh, clear button, and debounce support |
 | [SelectedItem](./components/selected-item/README.md) | Component for displaying selected items with remove functionality |
