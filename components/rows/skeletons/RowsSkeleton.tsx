@@ -24,9 +24,29 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { Row } from "./row";
-export { RowContent } from "./row-content";
-export { RowContainer } from "./row-container";
-export { IndexIconButtons } from "./row/sub-components/index-icon-buttons";
-export { RowSkeleton } from "./skeletons/RowSkeleton";
-export { RowsSkeleton } from "./skeletons/RowsSkeleton";
+import React from "react";
+
+import { RectangleSkeletonProps } from "../../rectangle";
+
+import { RowSkeleton } from "./RowSkeleton";
+
+const RowsSkeleton = ({
+  count = 25,
+  ...props
+}: {
+  count?: number;
+  style?: React.CSSProperties;
+} & RectangleSkeletonProps) => {
+  const items = [];
+
+  for (let i = 0; i < count; i += 1) {
+    items.push(<RowSkeleton key={`row_loader_${i}`} {...props} />);
+  }
+  return (
+    <div key="row-skeleton-container" data-testid="rows-skeleton">
+      {items}
+    </div>
+  );
+};
+
+export { RowsSkeleton };

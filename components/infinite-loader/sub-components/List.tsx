@@ -29,7 +29,7 @@ import { InfiniteLoader, WindowScroller, List } from "react-virtualized";
 import classNames from "classnames";
 
 import { TableSkeleton } from "../../table/sub-components/skeletons";
-// import { RowsSkeleton } from "../../../skeletons/rows";
+import { RowsSkeleton } from "../../rows/skeletons/RowsSkeleton";
 
 import { ListComponentProps } from "../InfiniteLoader.types";
 import styles from "../InfiniteLoader.module.scss";
@@ -70,15 +70,15 @@ const ListComponent = ({
             count={1}
           />
         );
-      // case "row":
-      //   return (
-      //     <RowsSkeleton
-      //       key={key}
-      //       style={style}
-      //       className="row-loader"
-      //       count={1}
-      //     />
-      //   );
+      case "row":
+        return (
+          <RowsSkeleton
+            key={key}
+            style={style}
+            className="row-loader"
+            count={1}
+          />
+        );
       default:
         return null;
     }
