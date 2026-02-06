@@ -25,10 +25,11 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { StoryObj, Meta } from "@storybook/react";
-import moment from "moment";
+import type { DateTime } from "luxon";
 
 import { DateTimePicker, DateTimePickerProps } from ".";
 import type { DateTimePickerTranslations } from ".";
+import { now } from "../../utils/date";
 
 const locales = [
   "az",
@@ -130,12 +131,12 @@ export const Default: Story = {
     locale: "en",
     maxDate: new Date(`${new Date().getFullYear() + 10}/01/01`),
     minDate: new Date("1970/01/01"),
-    openDate: moment(),
+    openDate: now(),
     selectDateText: "Select date",
     className: "date-time-picker",
     id: "default-date-time-picker",
     hasError: false,
-    onChange: (date: null | moment.Moment) =>
+    onChange: (date: null | DateTime) =>
       console.log("Date changed:", date),
     translations: { AM: "AM", PM: "PM" },
   },

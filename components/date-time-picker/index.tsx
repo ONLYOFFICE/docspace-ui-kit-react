@@ -25,12 +25,19 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState, useRef, useEffect } from "react";
-import moment from "moment";
 import classNames from "classnames";
+import type { DateTime } from "luxon";
 
 import ClockIcon from "../../assets/clock.react.svg";
 
 import { ButtonKeys } from "../../enums";
+
+import {
+  parseToDateTime,
+  formatDate,
+  addToDate,
+  subtractFromDate,
+} from "../../utils/date";
 
 import { TimePicker } from "../time-picker";
 import { DatePicker } from "../date-picker";
@@ -75,22 +82,21 @@ const DateTimePicker = (props: DateTimePickerComponentProps) => {
 
   const [isTimeFocused, setIsTimeFocused] = useState(false);
 
-  const [date, setDate] = useState(initialDate ? moment(initialDate) : null);
+  const [date, setDate] = useState<DateTime | null>(
+    initialDate ? parseToDateTime(initialDate) : null,
+  );
   const [isTwelveHourFormat, setIsTwelveHourFormat] = useState(true);
+  const initialDateTime = initialDate ? parseToDateTime(initialDate) : null;
   const [selectedFormat, setSelectedFormat] = useState<TOption>(
-    initialDate && moment(initialDate ?? undefined).hour() >= 12
-      ? options[1]
-      : options[0],
+    initialDateTime && initialDateTime.hour >= 12 ? options[1] : options[0],
   );
 
   const showTimePicker = () => setIsTimeFocused(true);
   const hideTimePicker = () => setIsTimeFocused(false);
 
-  const handleChange = (d: moment.Moment | null) => {
-    if (isTwelveHourFormat) {
-      setSelectedFormat(
-        moment(d ?? undefined).hour() >= 12 ? options[1] : options[0],
-      );
+  const handleChange = (d: DateTime | null) => {
+    if (isTwelveHourFormat && d) {
+      setSelectedFormat(d.hour >= 12 ? options[1] : options[0]);
     }
 
     onChange?.(d);
@@ -127,9 +133,9 @@ const DateTimePicker = (props: DateTimePickerComponentProps) => {
     if (!date) return;
 
     if (opt.key === "AM") {
-      handleChange(date?.subtract(12, "hours"));
+      handleChange(subtractFromDate(date, 12, "hours"));
     } else {
-      handleChange(date?.add(12, "hours"));
+      handleChange(addToDate(date, 12, "hours"));
     }
   };
 
@@ -143,18 +149,15 @@ const DateTimePicker = (props: DateTimePickerComponentProps) => {
   }, []);
 
   useEffect(() => {
-    const date = initialDate ? moment(initialDate) : moment();
-    date.locale(locale);
+    // Check if locale uses 12-hour time format
+    // Most locales use 24-hour format except US, AU, PH, etc.
+    const twelveHourLocales = ["en-US", "en-AU", "en-PH", "en"];
+    const is12Hour =
+      twelveHourLocales.some((l) => locale.startsWith(l)) ||
+      locale === "en-GB";
 
-    const localeData = date.localeData();
-    const timeFormat = localeData.longDateFormat("LT");
-
-    if (timeFormat.includes("h")) {
-      setIsTwelveHourFormat(true);
-    } else {
-      setIsTwelveHourFormat(false);
-    }
-  }, [initialDate]);
+    setIsTwelveHourFormat(is12Hour);
+  }, [initialDate, locale]);
 
   return (
     <div
@@ -212,7 +215,7 @@ const DateTimePicker = (props: DateTimePickerComponentProps) => {
               onClick={showTimePicker}
               data-testid="date-time-picker-time-display"
               role="button"
-              aria-label={`Current time: ${date.format("HH:mm")}`}
+              aria-label={`Current time: ${formatDate(date, "HH:mm")}`}
               tabIndex={0}
             >
               <ClockIcon
@@ -221,8 +224,8 @@ const DateTimePicker = (props: DateTimePickerComponentProps) => {
                 data-testid="date-time-picker-clock-icon"
               />
               {isTwelveHourFormat
-                ? date.format("hh:mm A")
-                : date.format("HH:mm")}
+                ? formatDate(date, "hh:mm a")
+                : formatDate(date, "HH:mm")}
             </span>
           )
         ) : null}
