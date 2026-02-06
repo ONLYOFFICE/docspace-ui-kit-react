@@ -27,7 +27,7 @@
 import React, { useRef, useState } from "react";
 import classNames from "classnames";
 
-import SettingsDeskReactSvgUrl from "PUBLIC_DIR/images/settings.desc.react.svg?url";
+import SettingsDeskReactSvgUrl from "../../../../assets/settings.desc.react.svg";
 
 import { IconButton } from "../../../icon-button";
 import { DropDown } from "../../../drop-down";
@@ -67,7 +67,7 @@ const TableSettings = ({ columns, disableSettings }: TableSettingsProps) => {
         })}
         size={12}
         isFill
-        iconName={SettingsDeskReactSvgUrl}
+        iconNode={<SettingsDeskReactSvgUrl />}
         onClick={onClick}
         isDisabled={disableSettings}
         dataTestId="table-settings-button"

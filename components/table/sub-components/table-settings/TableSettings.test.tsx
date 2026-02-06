@@ -66,25 +66,25 @@ describe("<TableSettings />", () => {
     render(<TableSettings columns={mockColumns} />);
 
     const button = screen.getByTestId("table-settings-button");
-    const dropDown = screen.getByTestId("drop-down");
+    const dropDown = screen.getByTestId("dropdown");
 
-    expect(dropDown).toHaveAttribute("data-open", "false");
+    expect(dropDown).not.toHaveClass("open");
 
     await userEvent.click(button);
 
-    expect(dropDown).toHaveAttribute("data-open", "true");
+    expect(dropDown).toHaveClass("open");
   });
 
   it("doesn't open DropDown by click on settings icon if settings are disabled", async () => {
     render(<TableSettings columns={mockColumns} disableSettings />);
 
     const button = screen.getByTestId("table-settings-button");
-    const dropDown = screen.getByTestId("drop-down");
+    const dropDown = screen.getByTestId("dropdown");
 
-    expect(dropDown).toHaveAttribute("data-open", "false");
+    expect(dropDown).not.toHaveClass("open");
 
     await userEvent.click(button);
 
-    expect(dropDown).toHaveAttribute("data-open", "false");
+    expect(dropDown).not.toHaveClass("open");
   });
 });
