@@ -27,12 +27,12 @@
 import React from "react";
 import classNames from "classnames";
 
-import SortDescReactSvgUrl from "PUBLIC_DIR/images/sort.desc.react.svg?url";
+import SortDescReactSvgUrl from "../../../../assets/sort.desc.react.svg";
 
 import { Checkbox } from "../../../checkbox";
 import { Text } from "../../../text";
 import { IconButton } from "../../../icon-button";
-import { globalColors } from "../../../../themes";
+import { globalColors } from "../../../../providers/theme";
 
 import { TableHeaderCellProps } from "../../Table.types";
 import styles from "./TableHeaderCell.module.scss";
@@ -119,7 +119,7 @@ const TableHeaderCell = ({
 					{sortingVisible ? (
 						<IconButton
 							onClick={column.onIconClick ? onIconClick : onClick}
-							iconName={SortDescReactSvgUrl}
+							iconNode={<SortDescReactSvgUrl />}
 							className={styles.sortIcon}
 							size={12}
 							color={globalColors.gray}
