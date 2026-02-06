@@ -26,9 +26,9 @@
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import PlanetIcon from "PUBLIC_DIR/images/icons/12/planet.react.svg?url";
-import PlusSvgUrl from "PUBLIC_DIR/images/icons/16/button.plus.react.svg?url";
-import EditPenSvgUrl from "PUBLIC_DIR/images/pencil.react.svg?url";
+import PlanetIcon from "../../assets/icons/12/planet.react.svg?url";
+import PlusSvgUrl from "../../assets/icons/16/button.plus.react.svg?url";
+import EditPenSvgUrl from "../../assets/pencil.react.svg?url";
 import styles from "./RoomIcon.stories.module.scss";
 
 import { RoomIcon } from ".";

@@ -82,7 +82,7 @@ const InteractiveTemplate: StoryFn<ImageEditorProps> = (args) => {
     <div style={{ width: "100%", maxWidth: "800px" }}>
       <ImageEditor
         {...args}
-        // t={t}
+        t={() => "choose another image"}
         image={image}
         onChangeImage={onChangeImage}
         onChangeFile={onChangeFile}
