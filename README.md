@@ -44,6 +44,7 @@ import {
   Label,
   Link,
   Loader,
+  LoaderWrapper,
   MCPIcon,
   ModalDialog,
   Portal,
@@ -103,6 +104,7 @@ import { InputBlock } from "@docspace/ui-kit/components/input-block";
 import { Label } from "@docspace/ui-kit/components/label";
 import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
 import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
+import { LoaderWrapper } from "@docspace/ui-kit/components/loader-wrapper";
 import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
 import { ModalDialog, ModalDialogType } from "@docspace/ui-kit/components/modal-dialog";
 import { Portal } from "@docspace/ui-kit/components/portal";
@@ -177,6 +179,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [Label](./components/label/README.md) | Form label with required indicator and tooltip support |
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
+| [LoaderWrapper](./components/loader-wrapper/README.md) | Wrapper that dims children and blocks interactions during loading |
 | [MCPIcon](./components/mcp-icon/README.md) | Icon component for MCP (Model Context Protocol) with image or text fallback |
 | [ModalDialog](./components/modal-dialog/README.md) | Versatile modal dialog component supporting both modal and aside (side panel) display types with keyboard shortcuts |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
