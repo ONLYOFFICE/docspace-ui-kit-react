@@ -24,12 +24,48 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import Base, { type TTheme } from "./base";
-import Dark from "./dark";
+import React from "react";
+import type { i18n as i18nType } from "i18next";
 
-export { Base, Dark };
-export type { TTheme };
-export type { TColorScheme } from "../../../context/ThemeContext";
+import type {
+  EmployeeFullDto,
+  SettingsDto,
+} from "@onlyoffice/docspace-api-sdk";
 
-export { globalColors } from "./globalColors";
-export * from "./constants";
+import { getI18NInstance, type TTranslations } from "./i18n";
+
+export type UseI18NProps = {
+  settings?: SettingsDto;
+  user?: EmployeeFullDto;
+  locale?: string;
+  translations?: TTranslations;
+};
+
+const useI18N = ({ settings, user, locale, translations }: UseI18NProps) => {
+  const lng = locale || user?.cultureName || settings?.culture || "en";
+  const portalLng = settings?.culture || "en";
+
+  const [i18n, setI18N] = React.useState<i18nType | null>(() =>
+    translations ? getI18NInstance(lng ?? portalLng, translations) : null,
+  );
+
+  const isInit = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!settings?.timezone) return;
+    window.timezone = settings.timezone;
+  }, [settings?.timezone]);
+
+  React.useEffect(() => {
+    if (!translations) return;
+    isInit.current = true;
+
+    const instance = getI18NInstance(lng ?? portalLng, translations);
+
+    if (instance) setI18N(instance);
+  }, [lng, portalLng, translations]);
+
+  return { i18n };
+};
+
+export default useI18N;

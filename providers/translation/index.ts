@@ -24,12 +24,6 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import Base, { type TTheme } from "./base";
-import Dark from "./dark";
-
-export { Base, Dark };
-export type { TTheme };
-export type { TColorScheme } from "../../../context/ThemeContext";
-
-export { globalColors } from "./globalColors";
-export * from "./constants";
+export * from "./i18n";
+export * from "./TranslationProvider";
+export * from "./useI18N";
