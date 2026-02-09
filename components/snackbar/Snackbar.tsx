@@ -31,6 +31,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import Countdown, { zeroPad } from "react-countdown";
 import classNames from "classnames";
+import xss from "xss";
 
 import { Heading, HeadingSize } from "../heading";
 import { Text } from "../text";
@@ -80,7 +81,7 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
   componentDidMount() {
     const { onLoad } = this.props;
     onLoad?.();
-   const skipBlur = this.props.skipBlur ?? false;
+    const skipBlur = this.props.skipBlur ?? false;
     if (!skipBlur) window.addEventListener("blur", this.onClickIFrame);
   }
 
@@ -135,7 +136,8 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
       htmlContent,
       style,
       countDownTime,
-      isCampaigns,additionalHeaderText,
+      isCampaigns,
+      additionalHeaderText,
       sectionWidth,
       opacity,
       backgroundImg,
@@ -189,9 +191,9 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
             className={styles.iframe}
             style={{ "--section-width": sectionWidth } as React.CSSProperties}
             data-testid="snackbar-html-content"
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: TODO fix
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: htmlContent is sanitized with xss library
             dangerouslySetInnerHTML={{
-              __html: htmlContent,
+              __html: xss(htmlContent),
             }}
           />
         ) : (
@@ -208,17 +210,17 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
                   />
                 </div>
               ) : null}
-<div className={styles.headerContainer}>
-              <Heading
-                size={HeadingSize.xsmall}
-                isInline
-                className={styles.textHeader}
-                style={headerStyles}
-                data-testid="snackbar-header"
-              >
-                {headerText}
-              </Heading>
-              {additionalHeaderText ? (
+              <div className={styles.headerContainer}>
+                <Heading
+                  size={HeadingSize.xsmall}
+                  isInline
+                  className={styles.textHeader}
+                  style={headerStyles}
+                  data-testid="snackbar-header"
+                >
+                  {headerText}
+                </Heading>
+                {additionalHeaderText ? (
                   <Text
                     as="span"
                     isInline
