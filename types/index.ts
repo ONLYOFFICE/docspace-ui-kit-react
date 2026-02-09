@@ -225,3 +225,24 @@ export type LinkRouterProps = {
 };
 
 export type ValueOf<T> = T[keyof T];
+
+export type TViewAs =
+  | "tile"
+  | "table"
+  | "row"
+  | "settings"
+  | "profile"
+  | "tileDynamicHeight";
+
+export type TSortOrder = "descending" | "ascending";
+
+export type TSortBy =
+  | "DateAndTime"
+  | "DateAndTimeCreation"
+  | "Tags"
+  | "Type"
+  | "AZ"
+  | "Author"
+  | "roomType"
+  | "usedspace"
+  | "Size";
