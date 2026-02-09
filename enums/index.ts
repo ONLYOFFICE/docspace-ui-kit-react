@@ -222,6 +222,24 @@ export const enum ErrorKeys {
 }
 
 /**
+ * Enum for sort by field name
+ * @readonly
+ */
+export const enum SortByFieldName {
+  Name = "AZ",
+  ModifiedDate = "DateAndTime",
+  CreationDate = "DateAndTimeCreation",
+  Author = "Author",
+  Size = "Size",
+  Type = "Type",
+  Location = "Location",
+  Tags = "Tags",
+  RoomType = "roomType",
+  LastOpened = "LastOpened",
+  UsedSpace = "usedspace",
+}
+
+/**
  * Enum for file status.
  * @readonly
  */
@@ -265,4 +283,10 @@ export enum VectorizationStatus {
   InProgress,
   Completed,
   Failed,
+}
+
+export const enum VDRIndexingAction {
+  HigherIndex = "HigherIndex",
+  LowerIndex = "LowerIndex",
+  MoveIndex = "MoveIndex",
 }

@@ -1,0 +1,68 @@
+@use "../../../styles/variables/colors" as *;
+@use "../../../styles/mixins";
+
+.common {
+  margin: 0 6px;
+  font-family: "Open Sans", -apple-system, "Segoe UI", sans-serif, Arial;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.rowContent {
+  width: 100%;
+  display: block;
+}
+
+.mainContainerWrapper {
+  @extend .common;
+  display: flex;
+  align-self: center;
+  margin-inline-start: 0;
+
+  min-width: 140px;
+  margin-top: 8px;
+  width: 95%;
+  margin-inline-end: 8px;
+}
+
+.mainContainer {
+  height: 20px;
+  max-width: 100%;
+  margin-inline-end: 8px;
+
+  @include mixins.truncate;
+
+  @include mixins.tablet {
+    @include mixins.truncate;
+    max-width: 100%;
+  }
+}
+
+.mainIcons {
+  height: 16px;
+  align-self: center;
+  white-space: nowrap;
+}
+
+.sideContainerWrapper {
+  @extend .common;
+  @include mixins.truncate;
+
+  align-self: center;
+  align-items: center;
+  display: none;
+
+  @include mixins.tablet {
+    @include mixins.truncate;
+  }
+
+  > a {
+    vertical-align: middle;
+  }
+}
+
+.tabletSideInfo {
+  display: block;
+  @include mixins.truncate;
+}

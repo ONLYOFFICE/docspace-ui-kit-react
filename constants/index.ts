@@ -56,6 +56,10 @@ export const OPERATIONS_NAME = Object.freeze({
 	backup: "backup",
 });
 
+export const EMPTY_ARRAY = Object.freeze([]) as [];
+export const EMPTY_OBJECT = Object.freeze({});
+export const FUNCTION_EMPTY = (): void => {};
+
 export const ROOM_ACTION_KEYS = {
 	CREATE_EDIT_ROOM_UPLOAD: "create_edit_room_upload",
 	CREATE_EDIT_ROOM_DELETE: "create_edit_room_delete",

@@ -5,6 +5,7 @@ import { ThemeProvider } from "../components/theme-provider";
 import type { TColorScheme } from "../context/ThemeContext";
 
 import { globalColors } from "../providers/theme/themes/globalColors";
+import globalTypes from "./globals";
 
 import "./styles.css";
 
@@ -50,6 +51,7 @@ const darkThemeConfig = {
 };
 
 const preview: Preview = {
+  globalTypes,
   parameters: {
     backgrounds: { disable: true },
     controls: {
@@ -66,14 +68,18 @@ const preview: Preview = {
   },
 
   decorators: [
-    (Story) => {
+    (Story, context) => {
       const isDark = useDarkMode();
+      const interfaceDirection = context.globals.direction;
 
       const theme = isDark ? darkThemeConfig : baseTheme;
       const currentColorScheme = isDark ? darkColorScheme : lightColorScheme;
 
       return (
-        <ThemeProvider theme={theme} currentColorScheme={currentColorScheme}>
+        <ThemeProvider
+          theme={{ ...theme, interfaceDirection }}
+          currentColorScheme={currentColorScheme}
+        >
           <div
             style={{
               backgroundColor: isDark ? globalColors.black : globalColors.white,
