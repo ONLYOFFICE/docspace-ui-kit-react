@@ -30,6 +30,19 @@ import { ErrorKeys, ParseErrorTypes } from "../../enums";
 
 import { EmailSettings } from "./emailSettings";
 
+// Check if string contains only ASCII characters (0-127)
+const isAsciiOnly = (str: string): boolean => {
+  for (let i = 0; i < str.length; i++) {
+    if (str.charCodeAt(i) > 127) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const STRICT_LOCAL_PART_REGEX =
+  /^[_]?([a-zA-Z0-9]+)([_\-\.\+][a-zA-Z0-9]+)*[_]?$/;
+
 /**
  * Parse address from string
  * @param {String} str
@@ -94,8 +107,8 @@ export class Email {
   isValid = () => {
     return this.parseErrors?.length === 0;
   };
-  // biome-ignore lint/suspicious/noExplicitAny: TODO fix
-  equals(this: any, addr: { [key: string]: string } | string | Email) {
+
+  equals(addr: { [key: string]: string } | string | Email) {
     if (typeof addr === "object" && addr instanceof Email) {
       return (
         "email" in this && this?.email === addr.email && this.name === addr.name
@@ -251,14 +264,11 @@ const checkErrors = (
     });
   }
 
-  // biome-ignore-start lint/suspicious/noControlCharactersInRegex: TODO fix
   if (
     options.allowStrictLocalPart &&
     "local" in parsedAddress &&
-    (!/^[\x00-\x7F]+$/.test(parsedAddress.local) ||
-      !/^[_]?([a-zA-Z0-9]+)([_\-\.\+][a-zA-Z0-9]+)*[_]?$/.test(
-        parsedAddress.local,
-      ))
+    (!isAsciiOnly(parsedAddress.local) ||
+      !STRICT_LOCAL_PART_REGEX.test(parsedAddress.local))
   ) {
     errors.push({
       message: "Incorrect localpart",
@@ -267,7 +277,6 @@ const checkErrors = (
       errorKey: ErrorKeys.IncorrectLocalPart,
     });
   }
-  // biome-ignore-end lint/suspicious/noControlCharactersInRegex: TODO fix
 
   if (
     !options.allowSpaces &&

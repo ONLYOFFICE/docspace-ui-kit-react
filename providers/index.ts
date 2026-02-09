@@ -28,4 +28,5 @@ export * from "./api";
 export * from "./error-boundary";
 export * from "./theme";
 export * from "./translation";
+export * from "./Providers";
 export { default as Providers } from "./Providers";

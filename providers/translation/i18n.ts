@@ -32,11 +32,11 @@ export type TTranslations = Map<string, Map<string, Record<string, string>>>;
 let isInitialized = false;
 
 function loadResources(translations: TTranslations) {
-  for (const [lang, nsList] of translations) {
-    for (const [ns, resources] of nsList) {
+  translations.forEach((nsList, lang) => {
+    nsList.forEach((resources, ns) => {
       i18n.addResourceBundle(lang, ns, resources, true, true);
-    }
-  }
+    });
+  });
 }
 
 export const getI18NInstance = (lng: string, translations: TTranslations) => {
@@ -78,11 +78,11 @@ export const getI18NInstance = (lng: string, translations: TTranslations) => {
     win.i18n.t = i18n.t.bind(i18n);
 
     const loaded: Record<string, { data: Record<string, string> }> = {};
-    for (const [lang, nsList] of translations) {
-      for (const [ns, resources] of nsList) {
+    translations.forEach((nsList, lang) => {
+      nsList.forEach((resources, ns) => {
         loaded[`${lang}/${ns}.json`] = { data: resources };
-      }
-    }
+      });
+    });
     win.i18n.loaded = loaded;
   }
 
