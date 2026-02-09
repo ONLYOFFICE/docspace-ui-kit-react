@@ -24,8 +24,58 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export type TInterfaceDirection = "rtl" | "ltr";
+"use client";
 
-export const CommonTheme = {
-  interfaceDirection: "ltr" as TInterfaceDirection,
+import React from "react";
+
+import {
+	Configuration,
+	ProfilesApi,
+	CommonSettingsApi,
+} from "@onlyoffice/docspace-api-sdk";
+
+export type TApiProvider = {
+	children: React.ReactNode;
+	url: string;
+	apiKey: string;
 };
+
+export type TApiContext = {
+	profilesApi: ProfilesApi;
+	commonSettingsApi: CommonSettingsApi;
+};
+
+const ApiContext = React.createContext<TApiContext | null>(null);
+
+export const useApi = () => {
+	const context = React.useContext(ApiContext);
+
+	if (!context) {
+		throw new Error("useApi must be used within an ApiProvider");
+	}
+
+	return context;
+};
+
+const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
+	const value = React.useMemo(() => {
+		const configuration = new Configuration({
+			basePath: url,
+			apiKey,
+			accessToken: apiKey,
+		});
+
+		return {
+			profilesApi: new ProfilesApi(configuration),
+			commonSettingsApi: new CommonSettingsApi(configuration),
+		};
+	}, [url, apiKey]);
+
+	return (
+		<ApiContext.Provider value={value}>
+			{children}
+		</ApiContext.Provider>
+	);
+};
+
+export default ApiProvider;

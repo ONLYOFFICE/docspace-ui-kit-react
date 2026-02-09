@@ -24,12 +24,48 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import Base, { type TTheme } from "./base";
-import Dark from "./dark";
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
 
-export { Base, Dark };
-export type { TTheme };
-export type { TColorScheme } from "../../../context/ThemeContext";
+export type TTranslations = Map<string, Map<string, Record<string, string>>>;
 
-export { globalColors } from "./globalColors";
-export * from "./constants";
+let isInitialized = false;
+
+function loadResources(translations: TTranslations) {
+  for (const [lang, nsList] of translations) {
+    for (const [ns, resources] of nsList) {
+      i18n.addResourceBundle(lang, ns, resources, true, true);
+    }
+  }
+}
+
+export const getI18NInstance = (lng: string, translations: TTranslations) => {
+  if (!isInitialized) {
+    i18n.use(initReactI18next).init({
+      lng,
+      fallbackLng: "en",
+      load: "currentOnly",
+      debug: false,
+      interpolation: {
+        escapeValue: false,
+        format(value, format) {
+          if (format === "lowercase") return value.toLowerCase();
+          return value;
+        },
+      },
+      ns: ["Common"],
+      defaultNS: "Common",
+      react: {
+        useSuspense: false,
+      },
+      initImmediate: false,
+    });
+    isInitialized = true;
+  } else if (i18n.language !== lng) {
+    i18n.changeLanguage(lng);
+  }
+
+  loadResources(translations);
+
+  return i18n;
+};

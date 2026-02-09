@@ -37,6 +37,7 @@ import type {
   VectorizationStatus,
   RoomsType,
 } from "../enums";
+import type { TooltipRefProps } from "react-tooltip";
 
 export type TDirectionX = "left" | "right";
 export type TDirectionY = "bottom" | "top" | "both";
@@ -244,6 +245,7 @@ export type TViewAs =
 declare global {
   interface Window {
     timezone: string;
+    __systemTooltipRef?: React.RefObject<TooltipRefProps | null>;
     AscDesktopEditor?: {
       execCommand: (key: string, value: string) => void;
       cloudCryptoCommand: (

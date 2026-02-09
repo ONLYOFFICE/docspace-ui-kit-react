@@ -36,7 +36,7 @@
     "assets/**/*",
     "utils/**/*",
     "styles/**/*",
-    "providers/theme/rtl-utils"
+    "providers/**/*"
   ],
   "exclude": [
     "node_modules",

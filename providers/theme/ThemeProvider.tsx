@@ -28,59 +28,37 @@
 
 import type React from "react";
 
-import type {
-	UserInfo,
-	SettingsDto,
-	CustomColorThemesSettingsDto,
-} from "@onlyoffice/docspace-api-sdk";
-
 import { ThemeProvider as ComponentThemeProvider } from "../../components/theme-provider";
 
-import type { ThemeKeys } from "../../enums";
+import useTheme, { type UseThemeProps } from "./useTheme";
 
-import useTheme from "./useTheme";
-// import useI18N from "@/hooks/useI18N";
-
-type TThemeProvider = {
-	children: React.ReactNode;
-
-	settings: SettingsDto | undefined;
-	user: UserInfo | undefined;
-	colorTheme: CustomColorThemesSettingsDto | undefined;
-
-	initialTheme: ThemeKeys | undefined;
-	systemTheme: ThemeKeys | undefined;
-
-	locale?: string;
-};
+export type TThemeProvider = {
+  children: React.ReactNode;
+  locale?: string;
+} & Pick<UseThemeProps, "initialTheme" | "systemTheme" | "colorTheme">;
 
 const ThemeProvider = ({
-	children,
-	user,
-	settings,
-	initialTheme,
-	systemTheme,
-	colorTheme,
-	locale,
+  children,
+  initialTheme,
+  systemTheme,
+  colorTheme,
+  locale,
 }: TThemeProvider) => {
-	// const { i18n } = useI18N({ settings, user, locale });
+  const { theme, currentColorTheme } = useTheme({
+    initialTheme,
+    systemTheme,
+    colorTheme,
+    lang: locale,
+  });
 
-	const { theme, currentColorTheme } = useTheme({
-		initialTheme,
-		// i18n,
-		systemTheme,
-		colorTheme,
-		lang: locale,
-	});
-
-	return (
-		<ComponentThemeProvider
-			theme={theme}
-			currentColorScheme={currentColorTheme}
-		>
-			{children}
-		</ComponentThemeProvider>
-	);
+  return (
+    <ComponentThemeProvider
+      theme={theme}
+      currentColorScheme={currentColorTheme}
+    >
+      {children}
+    </ComponentThemeProvider>
+  );
 };
 
 export default ThemeProvider;
