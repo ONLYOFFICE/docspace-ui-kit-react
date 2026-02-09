@@ -30,17 +30,17 @@
 
 .tableHeaderCell {
   :global(.light) & {
-    --table-header-text-color: #{colors.$gray-text};
-    --table-header-text-hover-color: #{colors.$black};
-    --table-container-border-right: 2px solid #{colors.$gray-light-mid};
-    --table-container-border-hover-color: #{colors.$gray-strong};
+    --table-header-text-color: #{colors.$gray};
+    --table-header-text-hover-color: #{colors.$light-gray-dark};
+    --table-container-border-right: 2px solid #{colors.$gray-strong};
+    --table-container-border-hover-color: #{colors.$light-gray-dark};
   }
 
   :global(.dark) & {
-    --table-header-text-color: #{colors.$gray-dark-text};
+    --table-header-text-color: #{colors.$gray-dark};
     --table-header-text-hover-color: #{colors.$white};
     --table-container-border-right: 2px solid #{colors.$gray-dark-strong};
-    --table-container-border-hover-color: #{colors.$gray-dark};
+    --table-container-border-hover-color: #{colors.$gray-dark-strong};
   }
 
   cursor: default;

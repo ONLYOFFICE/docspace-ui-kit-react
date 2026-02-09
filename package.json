@@ -65,6 +65,7 @@
     "react-window-infinite-loader": "1.0.9",
     "styled-components": "5.3.11",
     "ts-pattern": "5.5.0",
+    "xss": "^1.0.15",
     "zoom-level": "2.5.0"
   },
   "devDependencies": {

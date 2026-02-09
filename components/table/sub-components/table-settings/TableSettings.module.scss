@@ -40,7 +40,7 @@
 
 .tableSettingsIcon {
   :global(.light) & {
-    --table-settings-icon-disable-color: #{colors.$gray-light-mid};
+    --table-settings-icon-disable-color: #{colors.$gray-strong};
   }
 
   :global(.dark) & {
