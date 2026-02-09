@@ -30,10 +30,9 @@
 @use "../../styles/variables/colors";
 
 .wrapper {
-  :global(.light) & {
-    --text-color: #{colors.$black};
-    --combobox-children-button-default-disabled-color: #{colors.$gray-strong};
-  }
+  --text-color: #{colors.$black};
+  --combobox-children-button-default-disabled-color: #{colors.$gray-strong};
+  
 
   :global(.dark) & {
     --text-color: #{colors.$white};
@@ -85,10 +84,9 @@
 }
 
 .item {
-  :global(.light) & {
-    --access-right-select-description-color: #{colors.$gray};
-    --drop-down-item-icon-color: #{colors.$black};
-  }
+  --access-right-select-description-color: #{colors.$gray};
+  --drop-down-item-icon-color: #{colors.$black};
+
 
   :global(.dark) & {
     --access-right-select-description-color: #{colors.$gray-dark};

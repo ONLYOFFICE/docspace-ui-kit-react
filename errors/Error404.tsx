@@ -24,8 +24,15 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./themes";
-export * from "./rtl-utils";
-export * from "./useTheme";
-export * from "./ThemeProvider";
-export { default as ThemeProvider } from "./ThemeProvider";
+"use client";
+
+import { getCommonTranslation, getTranslationReady } from "../utils/i18n";
+import ErrorContainer from "../components/error-container/ErrorContainer";
+
+const Error404 = () => {
+  const ready = getTranslationReady();
+
+  return ready && <ErrorContainer headerText={getCommonTranslation("Error404Text")} />;
+};
+
+export default Error404;

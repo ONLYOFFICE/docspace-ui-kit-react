@@ -40,7 +40,7 @@ import "./ThemeProvider.scss";
 
 export type { ThemeProviderProps };
 
-export const ThemeProvider = ({
+export const ThemeProviderComponent = ({
 	theme,
 	currentColorScheme,
 	children,

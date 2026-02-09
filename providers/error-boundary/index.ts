@@ -24,9 +24,5 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./api";
-export * from "./error-boundary";
-export * from "./theme";
-export * from "./translation";
-export * from "./Providers";
-export { default as Providers } from "./Providers";
+export * from "./ErrorBoundary";
+export { default as ErrorBoundary } from "./ErrorBoundary";

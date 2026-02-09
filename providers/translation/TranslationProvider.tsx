@@ -40,8 +40,9 @@ const TranslationProvider = ({
   settings,
   user,
   locale,
+  translations,
 }: TTranslationProvider) => {
-  const { i18n } = useI18N({ settings, user, locale });
+  const { i18n } = useI18N({ settings, user, locale, translations });
 
   if (!i18n) return <>{children}</>;
 

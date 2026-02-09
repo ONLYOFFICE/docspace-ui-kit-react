@@ -1,15 +1,15 @@
 {
   "name": "@docspace/ui-kit",
-  "version": "0.0.9",
+  "version": "0.0.1",
   "description": "DocSpace UI Component Library",
   "private": "true",
   "scripts": {
-    "build": "rollup -c",
+    "build": "node scripts/copy-locales.js && rollup -c",
     "build:watch": "rollup -c -w",
     "clean": "rm -rf dist",
-    "storybook": "storybook dev -p 6006",
-    "storybook-build": "storybook build",
-    "storybook-serve": "serve storybook-static -p 6006",
+    "storybook": "node scripts/copy-locales.js && storybook dev -p 6006",
+    "storybook-build": "node scripts/copy-locales.js && storybook build",
+    "storybook-serve": "node scripts/copy-locales.js && serve storybook-static -p 6006",
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
@@ -130,7 +130,8 @@
     "directory": "libs/ui-kit"
   },
   "files": [
-    "dist"
+    "dist",
+    "locales"
   ],
   "publishConfig": {
     "main": "./dist/cjs/index.js",

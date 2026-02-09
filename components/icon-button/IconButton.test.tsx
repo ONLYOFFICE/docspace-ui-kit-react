@@ -29,7 +29,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import SearchReactSvgUrl from "../../assets/button.alert.react.svg?url";
-import { ThemeProvider } from "../theme-provider";
+import { ThemeProviderComponent } from "../theme-provider";
 import { IconButton } from ".";
 import type { IconButtonProps } from "./IconButton.types";
 
@@ -155,9 +155,9 @@ describe("<IconButton />", () => {
 
     const newIconName = "new-icon.svg";
     rerender(
-      <ThemeProvider theme={mockBaseTheme}>
+      <ThemeProviderComponent theme={mockBaseTheme}>
         <IconButton {...baseProps} iconName={newIconName} />
-      </ThemeProvider>,
+      </ThemeProviderComponent>,
     );
 
     const iconButton = screen.getByTestId("icon-button");

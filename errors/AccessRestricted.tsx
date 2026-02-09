@@ -24,8 +24,28 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./themes";
-export * from "./rtl-utils";
-export * from "./useTheme";
-export * from "./ThemeProvider";
-export { default as ThemeProvider } from "./ThemeProvider";
+import { useEffect } from "react";
+import { getCommonTranslation, getTranslationReady } from "../utils/i18n";
+import ErrorContainer from "../components/error-container/ErrorContainer";
+import styles from "./Errors.module.scss";
+
+export const AccessRestricted = () => {
+  const ready = getTranslationReady();
+
+  useEffect(() => {
+    window.history.replaceState(null, "");
+  }, []);
+
+  return (
+    ready && (
+      <div className={styles.accessRestrictedWrapper}>
+        <ErrorContainer
+          headerText={getCommonTranslation("AccessDenied")}
+          bodyText={getCommonTranslation("PortalRestriction", {
+            productName: getCommonTranslation("ProductName") ?? "",
+          })}
+        />
+      </div>
+    )
+  );
+};

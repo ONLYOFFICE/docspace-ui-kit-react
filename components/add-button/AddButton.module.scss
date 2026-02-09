@@ -4,9 +4,7 @@
   display: flex;
   align-items: center;
 
-  :global(.light) & {
-    --selector-add-button-text-disabled: #{colors.$gray-strong};
-  }
+  --selector-add-button-text-disabled: #{colors.$gray-strong};
 
   :global(.dark) & {
     --selector-add-button-text-disabled: #{colors.$gray-dark-text};
@@ -42,23 +40,21 @@
   padding: var(--selector-add-button-padding);
   cursor: pointer;
 
-  :global(.light) & {
-    --selector-add-button-background: #{colors.$gray-light-mid};
-    --selector-add-button-hover-background: #{colors.$light-gray-selected};
-    --selector-add-button-active-background: #{colors.$gray-strong};
-    --selector-add-button-disabled-background: #{colors.$light-gray-hover};
-    --selector-add-button-icon-color: #{colors.$light-gray-dark};
-    --selector-add-button-icon-color-hover: #{colors.$light-gray-dark};
-    --selector-add-button-icon-color-active: #{colors.$light-gray-dark};
-    --selector-add-button-icon-color-disabled: #{colors.$gray};
-    --selector-add-button-border: none;
-    --selector-add-button-box-sizing: border-box;
-    --selector-add-button-border-radius: 3px;
-    --selector-add-button-height: 32px;
-    --selector-add-button-width: 32px;
-    --selector-add-button-padding: 10px;
-  }
-
+  --selector-add-button-background: #{colors.$gray-light-mid};
+  --selector-add-button-hover-background: #{colors.$light-gray-selected};
+  --selector-add-button-active-background: #{colors.$gray-strong};
+  --selector-add-button-disabled-background: #{colors.$light-gray-hover};
+  --selector-add-button-icon-color: #{colors.$light-gray-dark};
+  --selector-add-button-icon-color-hover: #{colors.$light-gray-dark};
+  --selector-add-button-icon-color-active: #{colors.$light-gray-dark};
+  --selector-add-button-icon-color-disabled: #{colors.$gray};
+  --selector-add-button-border: none;
+  --selector-add-button-box-sizing: border-box;
+  --selector-add-button-border-radius: 3px;
+  --selector-add-button-height: 32px;
+  --selector-add-button-width: 32px;
+  --selector-add-button-padding: 10px;
+  
   :global(.dark) & {
     --selector-add-button-background: #{colors.$gray-dark-mid};
     --selector-add-button-hover-background: #{colors.$gray-dark-strong};
