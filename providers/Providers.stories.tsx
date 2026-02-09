@@ -55,19 +55,13 @@ export default meta;
 type Story = StoryObj<typeof Providers>;
 
 const DemoContent = () => {
-  let translatedText = "Translations not loaded";
-  try {
-    const { t } = useTranslation("Common");
-    translatedText = t("SaveButton");
-  } catch {
-    // i18n not available
-  }
+  const { t } = useTranslation("Common");
 
   return (
     <div style={{ padding: "16px" }}>
       <h3>All Providers Active</h3>
       <p>API, Translation, and Theme providers are all composed.</p>
-      <p>Translation test: {translatedText}</p>
+      <p>Translation test: {t("SaveButton")}</p>
     </div>
   );
 };
@@ -95,7 +89,8 @@ export const WithoutTranslations: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Providers without translations — only API and Theme are active.",
+        story:
+          "Providers without translations — only API and Theme are active.",
       },
     },
   },

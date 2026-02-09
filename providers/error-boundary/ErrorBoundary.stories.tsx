@@ -4,12 +4,12 @@ import type { Meta, StoryObj } from "@storybook/react";
 import ErrorBoundary from "./ErrorBoundary";
 
 const meta: Meta<typeof ErrorBoundary> = {
-	title: "Providers/ErrorBoundary",
-	component: ErrorBoundary,
-	parameters: {
-		docs: {
-			description: {
-				component: `ErrorBoundary catches JavaScript errors in its child component tree and renders a fallback UI.
+  title: "Providers/ErrorBoundary",
+  component: ErrorBoundary,
+  parameters: {
+    docs: {
+      description: {
+        component: `ErrorBoundary catches JavaScript errors in its child component tree and renders a fallback UI.
 
 ### Features
 
@@ -36,9 +36,9 @@ import { ErrorBoundary } from "@docspace/ui-kit/providers/error-boundary";
   <App />
 </ErrorBoundary>
 \`\`\``,
-			},
-		},
-	},
+      },
+    },
+  },
 };
 
 export default meta;
@@ -46,69 +46,69 @@ export default meta;
 type Story = StoryObj<typeof ErrorBoundary>;
 
 export const Default: Story = {
-	args: {
-		children: (
-			<div style={{ padding: "16px" }}>
-				<p>Children are rendered normally when no error occurs.</p>
-			</div>
-		),
-	},
+  args: {
+    children: (
+      <div style={{ padding: "16px" }}>
+        <p>Children are rendered normally when no error occurs.</p>
+      </div>
+    ),
+  },
 };
 
 const ThrowingComponent = () => {
-	throw new Error("Something broke!");
+  throw new Error("Something broke!");
 };
 
 export const WithError: Story = {
-	args: {
-		children: <ThrowingComponent />,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"When a child component throws, the default ErrorContainer fallback is rendered.",
-			},
-		},
-	},
+  args: {
+    children: <ThrowingComponent />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "When a child component throws, the default ErrorContainer fallback is rendered.",
+      },
+    },
+  },
 };
 
 export const WithCustomFallback: Story = {
-	args: {
-		fallback: (
-			<div style={{ padding: "16px", color: "red" }}>
-				<h3>Custom Error UI</h3>
-				<p>Something went wrong. Please try again.</p>
-			</div>
-		),
-		children: <ThrowingComponent />,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"A custom ReactNode can be provided as fallback for a fully customized error UI.",
-			},
-		},
-	},
+  args: {
+    fallback: (
+      <div style={{ padding: "16px", color: "red" }}>
+        <h3>Custom Error UI</h3>
+        <p>Something went wrong. Please try again.</p>
+      </div>
+    ),
+    children: <ThrowingComponent />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A custom ReactNode can be provided as fallback for a fully customized error UI.",
+      },
+    },
+  },
 };
 
 export const WithRenderFunctionFallback: Story = {
-	args: {
-		fallback: (error: Error) => (
-			<div style={{ padding: "16px", color: "red" }}>
-				<h3>Error Details</h3>
-				<p>{error.message}</p>
-			</div>
-		),
-		children: <ThrowingComponent />,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"A render function receives the caught error, enabling dynamic fallback UI based on the error.",
-			},
-		},
-	},
+  args: {
+    fallback: (error: Error) => (
+      <div style={{ padding: "16px", color: "red" }}>
+        <h3>Error Details</h3>
+        <p>{error.message}</p>
+      </div>
+    ),
+    children: <ThrowingComponent />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A render function receives the caught error, enabling dynamic fallback UI based on the error.",
+      },
+    },
+  },
 };
