@@ -31,31 +31,45 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ImageCropper from "./index";
 import type { ImageCropperProps, TImage } from "../ImageEditor.types";
 
+type AvatarEditorRef = {
+  getImageScaledToCanvas: () => { toDataURL: () => string };
+};
+
+type AvatarEditorMockProps = {
+  color?: [number, number, number, number];
+  onPositionChange?: (position: { x: number; y: number }) => void;
+  onImageReady?: () => void;
+};
+
 const mockToDataURL = vi.fn(() => "mock-preview");
 const mockGetImageScaledToCanvas = vi.fn(() => ({
   toDataURL: mockToDataURL,
 }));
-const mockEditorInstance = {
+const mockEditorInstance: AvatarEditorRef = {
   getImageScaledToCanvas: mockGetImageScaledToCanvas,
 };
-let avatarEditorProps: any;
+let avatarEditorProps: AvatarEditorMockProps | undefined;
 const mockUseTheme = vi.fn(() => ({ isBase: true }));
 
 vi.mock("react-avatar-editor", () => {
-  const React = require("react");
-  const AvatarEditor = React.forwardRef((props: any, ref: any) => {
-    avatarEditorProps = props;
-    if (typeof ref === "function") {
-      ref(mockEditorInstance);
-    } else if (ref) {
-      ref.current = mockEditorInstance;
-    }
+  const React = require("react") as typeof import("react");
+  const AvatarEditor = React.forwardRef<AvatarEditorRef, AvatarEditorMockProps>(
+    (props, ref) => {
+      avatarEditorProps = props;
+      if (typeof ref === "function") {
+        ref(mockEditorInstance);
+      } else if (ref) {
+        ref.current = mockEditorInstance;
+      }
 
-    return <div data-testid="avatar-editor-mock" />;
-  });
+      return <div data-testid="avatar-editor-mock" />;
+    },
+  );
 
   it("caps zoom in at maximum value", () => {
-    const props = createProps({ image: { uploadedFile: createFile(), zoom: 4.8, x: 0, y: 0 } });
+    const props = createProps({
+      image: { uploadedFile: createFile(), zoom: 4.8, x: 0, y: 0 },
+    });
     render(<ImageCropper {...props} />);
 
     fireEvent.click(screen.getByTestId("zoom_in_icon_button"));
@@ -66,7 +80,9 @@ vi.mock("react-avatar-editor", () => {
   });
 
   it("floors zoom out at minimum value", () => {
-    const props = createProps({ image: { uploadedFile: createFile(), zoom: 1.2, x: 0, y: 0 } });
+    const props = createProps({
+      image: { uploadedFile: createFile(), zoom: 1.2, x: 0, y: 0 },
+    });
     render(<ImageCropper {...props} />);
 
     fireEvent.click(screen.getByTestId("zoom_out_icon_button"));
@@ -106,7 +122,8 @@ vi.mock("../../../assets/icons/16/refresh.react.svg", () => ({
 
 const mockT = vi.fn((key: string) => key);
 
-const createFile = () => new File(["avatar"], "avatar.png", { type: "image/png" });
+const createFile = () =>
+  new File(["avatar"], "avatar.png", { type: "image/png" });
 
 const createProps = (
   overrides: Partial<ImageCropperProps> & { uploadedFile?: File | string } = {},
@@ -183,7 +200,7 @@ describe("ImageCropper", () => {
 
     expect(avatarEditorProps).toBeDefined();
 
-    avatarEditorProps.onPositionChange?.({ x: 0.2, y: -0.3 });
+    avatarEditorProps?.onPositionChange?.({ x: 0.2, y: -0.3 });
 
     expect(props.onChangeImage).toHaveBeenCalledWith(
       expect.objectContaining({ x: 0.2, y: -0.3 }),
@@ -194,7 +211,7 @@ describe("ImageCropper", () => {
     const props = createProps({ isDisabled: true });
     render(<ImageCropper {...props} />);
 
-    avatarEditorProps.onPositionChange?.({ x: 0.5, y: 0.5 });
+    avatarEditorProps?.onPositionChange?.({ x: 0.5, y: 0.5 });
 
     expect(props.onChangeImage).not.toHaveBeenCalled();
   });
@@ -203,7 +220,7 @@ describe("ImageCropper", () => {
     const props = createProps({ disableImageRescaling: true });
     render(<ImageCropper {...props} />);
 
-    avatarEditorProps.onPositionChange?.({ x: -0.1, y: 0.1 });
+    avatarEditorProps?.onPositionChange?.({ x: -0.1, y: 0.1 });
 
     expect(props.onChangeImage).not.toHaveBeenCalled();
   });
@@ -246,7 +263,7 @@ describe("ImageCropper", () => {
     render(<ImageCropper {...props} />);
 
     expect(avatarEditorProps).toBeDefined();
-    avatarEditorProps.onImageReady?.();
+    avatarEditorProps?.onImageReady?.();
 
     await waitFor(() =>
       expect(props.setPreviewImage).toHaveBeenCalledWith("mock-preview"),
@@ -261,7 +278,7 @@ describe("ImageCropper", () => {
     const props = createProps();
     render(<ImageCropper {...props} />);
 
-    expect(() => avatarEditorProps.onImageReady?.()).not.toThrow();
+    expect(() => avatarEditorProps?.onImageReady?.()).not.toThrow();
     expect(props.setPreviewImage).not.toHaveBeenCalled();
   });
 
@@ -311,7 +328,7 @@ describe("ImageCropper", () => {
     const props = createProps();
     render(<ImageCropper {...props} />);
 
-    expect(avatarEditorProps.color).toEqual([6, 22, 38, 0.2]);
+    expect(avatarEditorProps?.color).toEqual([6, 22, 38, 0.2]);
   });
 
   it("passes dark theme color when theme is not base", () => {
@@ -319,6 +336,6 @@ describe("ImageCropper", () => {
     const props = createProps();
     render(<ImageCropper {...props} />);
 
-    expect(avatarEditorProps.color).toEqual([20, 20, 20, 0.8]);
+    expect(avatarEditorProps?.color).toEqual([20, 20, 20, 0.8]);
   });
 });
