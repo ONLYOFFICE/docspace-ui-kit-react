@@ -45,7 +45,7 @@ describe('useEventListener', () => {
     const element = document.createElement('div');
     const elementAddSpy = vi.spyOn(element, 'addEventListener');
 
-    const { result } = renderHook(() => {
+    renderHook(() => {
       const ref = useRef<HTMLDivElement>(element);
       useEventListener('click', handler, ref);
       return ref;
