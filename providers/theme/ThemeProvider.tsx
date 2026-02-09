@@ -28,7 +28,7 @@
 
 import type React from "react";
 
-import { ThemeProvider as ComponentThemeProvider } from "../../components/theme-provider";
+import { ThemeProviderComponent } from "../../components/theme-provider";
 
 import useTheme, { type UseThemeProps } from "./useTheme";
 
@@ -52,12 +52,12 @@ const ThemeProvider = ({
   });
 
   return (
-    <ComponentThemeProvider
+    <ThemeProviderComponent
       theme={theme}
       currentColorScheme={currentColorTheme}
     >
       {children}
-    </ComponentThemeProvider>
+    </ThemeProviderComponent>
   );
 };
 

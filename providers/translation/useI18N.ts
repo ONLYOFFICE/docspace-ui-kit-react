@@ -62,7 +62,9 @@ const useI18N = ({ settings, user, locale, translations }: UseI18NProps) => {
 
     const instance = getI18NInstance(lng ?? portalLng, translations);
 
-    if (instance) setI18N(instance);
+    if (instance) {
+      setI18N(instance);
+    }
   }, [lng, portalLng, translations]);
 
   return { i18n };

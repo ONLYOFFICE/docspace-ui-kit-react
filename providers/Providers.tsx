@@ -33,10 +33,13 @@ import type {
   EmployeeFullDto,
 } from "@onlyoffice/docspace-api-sdk";
 
+import type { ErrorInfo, ReactNode } from "react";
+
 import type { TTranslationProvider } from "./translation";
 import type { TThemeProvider } from "./theme";
 import type { TApiProvider } from "./api";
 
+import ErrorBoundary from "./error-boundary/ErrorBoundary";
 import TranslationProvider from "./translation/TranslationProvider";
 import ThemeProvider from "./theme/ThemeProvider";
 import ApiProvider from "./api/ApiProvider";
@@ -45,6 +48,8 @@ import { useApi } from "./api";
 export type TProvidersProps = {
   children: React.ReactNode;
   locale?: string;
+  errorFallback?: ReactNode | ((error: Error) => ReactNode);
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 } & TTranslationProvider &
   TThemeProvider &
   Pick<TApiProvider, "url" | "apiKey">;
@@ -112,11 +117,20 @@ const InnerProviders = ({
   );
 };
 
-const Providers = ({ children, url, apiKey, ...rest }: TProvidersProps) => {
+const Providers = ({
+  children,
+  url,
+  apiKey,
+  errorFallback,
+  onError,
+  ...rest
+}: TProvidersProps) => {
   return (
-    <ApiProvider url={url} apiKey={apiKey}>
-      <InnerProviders {...rest}>{children}</InnerProviders>
-    </ApiProvider>
+    <ErrorBoundary fallback={errorFallback} onError={onError}>
+      <ApiProvider url={url} apiKey={apiKey}>
+        <InnerProviders {...rest}>{children}</InnerProviders>
+      </ApiProvider>
+    </ErrorBoundary>
   );
 };
 

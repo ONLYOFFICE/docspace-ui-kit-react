@@ -25,6 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 export * from "./api";
+export * from "./error-boundary";
 export * from "./theme";
 export * from "./translation";
 export { default as Providers } from "./Providers";

@@ -24,8 +24,24 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./themes";
-export * from "./rtl-utils";
-export * from "./useTheme";
-export * from "./ThemeProvider";
-export { default as ThemeProvider } from "./ThemeProvider";
+import { getCommonTranslation, getTranslationReady } from "../utils/i18n";
+import ErrorContainer from "../components/error-container/ErrorContainer";
+import styles from "./Errors.module.scss";
+
+const ErrorUnavailable = () => {
+  const ready = getTranslationReady();
+
+  return (
+    ready && (
+      <div className={styles.errorUnavailableWrapper}>
+        <ErrorContainer
+          headerText={getCommonTranslation("ErrorDeactivatedText", {
+            productName: getCommonTranslation("ProductName") ?? "",
+          })}
+        />
+      </div>
+    )
+  );
+};
+
+export default ErrorUnavailable;
