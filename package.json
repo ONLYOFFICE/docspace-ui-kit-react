@@ -1,15 +1,15 @@
 {
   "name": "@docspace/ui-kit",
-  "version": "0.0.4",
+  "version": "0.0.1",
   "description": "DocSpace UI Component Library",
   "private": "true",
   "scripts": {
-    "build": "rollup -c",
+    "build": "node scripts/copy-locales.js && rollup -c",
     "build:watch": "rollup -c -w",
     "clean": "rm -rf dist",
-    "storybook": "storybook dev -p 6006",
-    "storybook-build": "storybook build",
-    "storybook-serve": "serve storybook-static -p 6006",
+    "storybook": "node scripts/copy-locales.js && storybook dev -p 6006",
+    "storybook-build": "node scripts/copy-locales.js && storybook build",
+    "storybook-serve": "node scripts/copy-locales.js && serve storybook-static -p 6006",
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "test:watch": "vitest",
@@ -40,8 +40,10 @@
     "fast-deep-equal": "3.1.3",
     "framer-motion": "^12.30.0",
     "hex-rgb": "^5.0.0",
+    "i18n": "^0.15.3",
     "i18next": "23.7.19",
     "lodash": "4.17.23",
+    "luxon": "3.7.2",
     "react-autosize-textarea": "7.1.0",
     "react-avatar-editor": "^14.0.0",
     "react-colorful": "^5.6.1",
@@ -51,6 +53,7 @@
     "react-draggable": "4.4.6",
     "react-dropzone": "11.7.1",
     "react-hotkeys-hook": "^5.2.3",
+    "react-i18n": "^1.0.1",
     "react-i18next": "14.0.1",
     "react-svg": "16.1.34",
     "react-text-mask": "5.5.0",
@@ -62,14 +65,14 @@
     "react-window-infinite-loader": "1.0.9",
     "styled-components": "5.3.11",
     "ts-pattern": "5.5.0",
-    "zoom-level": "2.5.0",
-    "luxon": "3.7.2"
+    "xss": "^1.0.15",
+    "zoom-level": "2.5.0"
   },
   "devDependencies": {
-    "@types/luxon": "3.7.1",
     "@babel/core": "7.25.8",
     "@biomejs/biome": "2.3.11",
     "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.0",
@@ -87,6 +90,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/lodash": "4.17.10",
+    "@types/luxon": "3.7.1",
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",
     "@types/react-transition-group": "4.4.11",
@@ -104,6 +108,7 @@
     "rollup": "^4.28.0",
     "rollup-plugin-dts": "^6.1.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-polyfill-node": "^0.13.0",
     "rollup-plugin-postcss": "^4.0.2",
     "sass": "^1.79.5",
     "serve": "^14.2.5",
@@ -126,7 +131,8 @@
     "directory": "libs/ui-kit"
   },
   "files": [
-    "dist"
+    "dist",
+    "locales"
   ],
   "publishConfig": {
     "main": "./dist/cjs/index.js",

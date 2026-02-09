@@ -31,11 +31,11 @@ import type { TColorScheme } from "../../context/ThemeContext";
 import { Button, ButtonSize } from "../button";
 import { Text } from "../text";
 
-import { ThemeProvider } from ".";
+import { ThemeProviderComponent } from ".";
 
-const meta: Meta<typeof ThemeProvider> = {
+const meta: Meta<typeof ThemeProviderComponent> = {
 	title: "Components/Providers/ThemeProvider",
-	component: ThemeProvider,
+	component: ThemeProviderComponent,
 	parameters: {
 		docs: {
 			description: {
@@ -74,9 +74,9 @@ const colorScheme = {
   },
 };
 
-<ThemeProvider theme={theme} currentColorScheme={colorScheme}>
+<ThemeProviderComponent theme={theme} currentColorScheme={colorScheme}>
   <App />
-</ThemeProvider>
+</ThemeProviderComponent>
 \`\`\``,
 			},
 		},
@@ -95,7 +95,7 @@ const colorScheme = {
 
 export default meta;
 
-type Story = StoryObj<typeof ThemeProvider>;
+type Story = StoryObj<typeof ThemeProviderComponent>;
 
 // Mock theme objects
 const lightTheme = {
@@ -422,7 +422,7 @@ export const WithoutColorScheme: Story = {
 export const AllColorSchemes: Story = {
 	render: () => (
 		<div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-			<ThemeProvider theme={lightTheme} currentColorScheme={blueColorScheme}>
+			<ThemeProviderComponent theme={lightTheme} currentColorScheme={blueColorScheme}>
 				<div
 					style={{
 						padding: "16px",
@@ -438,9 +438,9 @@ export const AllColorSchemes: Story = {
 						<Button size={ButtonSize.normal} label="Secondary" />
 					</div>
 				</div>
-			</ThemeProvider>
+			</ThemeProviderComponent>
 
-			<ThemeProvider theme={lightTheme} currentColorScheme={greenColorScheme}>
+			<ThemeProviderComponent theme={lightTheme} currentColorScheme={greenColorScheme}>
 				<div
 					style={{
 						padding: "16px",
@@ -456,9 +456,9 @@ export const AllColorSchemes: Story = {
 						<Button size={ButtonSize.normal} label="Secondary" />
 					</div>
 				</div>
-			</ThemeProvider>
+			</ThemeProviderComponent>
 
-			<ThemeProvider theme={lightTheme} currentColorScheme={orangeColorScheme}>
+			<ThemeProviderComponent theme={lightTheme} currentColorScheme={orangeColorScheme}>
 				<div
 					style={{
 						padding: "16px",
@@ -474,9 +474,9 @@ export const AllColorSchemes: Story = {
 						<Button size={ButtonSize.normal} label="Secondary" />
 					</div>
 				</div>
-			</ThemeProvider>
+			</ThemeProviderComponent>
 
-			<ThemeProvider theme={lightTheme} currentColorScheme={purpleColorScheme}>
+			<ThemeProviderComponent theme={lightTheme} currentColorScheme={purpleColorScheme}>
 				<div
 					style={{
 						padding: "16px",
@@ -492,7 +492,7 @@ export const AllColorSchemes: Story = {
 						<Button size={ButtonSize.normal} label="Secondary" />
 					</div>
 				</div>
-			</ThemeProvider>
+			</ThemeProviderComponent>
 		</div>
 	),
 	parameters: {

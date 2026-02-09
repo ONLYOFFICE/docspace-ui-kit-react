@@ -43,7 +43,7 @@ export const LoaderWrapper = ({
         flexDirection: "column",
         flexGrow: 1,
       }}
-      data-testid={testId}
+      data-testid={testId || "loader-wrapper"}
     >
       {children}
     </div>

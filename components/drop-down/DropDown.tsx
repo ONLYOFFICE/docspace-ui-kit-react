@@ -191,7 +191,6 @@ const DropDown = ({
     topSpace,
   ]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: cause it work correct
   const checkPosition = React.useCallback(() => {
     if (!dropDownRef.current || fixedDirection) {
       setState((s) => ({
@@ -235,21 +234,21 @@ const DropDown = ({
       dimensions.toTopCorner > rects.height;
     const bottom = rects.top < 0;
 
-    const x = left ? "left" : rightVar ? "right" : state.directionX;
+    setState((s) => {
+      const x = left ? "left" : rightVar ? "right" : s.directionX;
+      const y = bottom ? "bottom" : topVar ? "top" : s.directionY;
+      const mY = topVar ? `${dimensions.parentHeight}px` : s.manualY;
 
-    const y = bottom ? "bottom" : topVar ? "top" : state.directionY;
-
-    const mY = topVar ? `${dimensions.parentHeight}px` : state.manualY;
-
-    setState((s) => ({
-      ...s,
-      directionX: x,
-      directionY: y,
-      manualY: mY,
-      width: dropDownRef.current ? dropDownRef.current.offsetWidth : 240,
-      isDropdownReady: true,
-    }));
-  }, [fixedDirection, isRTL, forwardedRef, directionX, directionY, manualY]);
+      return {
+        ...s,
+        directionX: x,
+        directionY: y,
+        manualY: mY,
+        width: dropDownRef.current ? dropDownRef.current.offsetWidth : 240,
+        isDropdownReady: true,
+      };
+    });
+  }, [fixedDirection, isRTL, forwardedRef]);
 
   const setDropDownRef = React.useCallback(
     (node: HTMLDivElement | null) => {

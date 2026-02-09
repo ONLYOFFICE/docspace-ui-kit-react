@@ -38,50 +38,66 @@ export const getCookie = (name: string): string | undefined => {
   return matches ? decodeURIComponent(matches[1]) : undefined;
 };
 
+type WindowI18n = {
+  t?: (key: string, options?: Record<string, string | number>) => string;
+  loaded?: Record<string, { data: Record<string, string> }>;
+};
+
+const getWindowI18n = (): WindowI18n | undefined => {
+  if (typeof window === "undefined") return undefined;
+  return (window as unknown as { i18n?: WindowI18n }).i18n;
+};
+
 /**
- * Gets a translation from window.i18n for the Common namespace
- * Reads language from the asc_language cookie
+ * Gets a translation from window.i18n.
+ * Uses i18next t function if available (set by TranslationProvider),
+ * otherwise falls back to manual lookup from window.i18n.loaded.
+ * Throws if the key is not found.
  */
 export const getCommonTranslation = (
   key: string,
   interpolation?: Record<string, string | number>,
-): string | undefined => {
-  if (typeof window === "undefined") return undefined;
+): string => {
+  const i18n = getWindowI18n();
 
-  const i18n = (
-    window as unknown as {
-      i18n?: {
-        loaded: Record<string, { data: Record<string, string> }>;
-      };
-    }
-  ).i18n;
-
-  if (!i18n?.loaded) return undefined;
-
-  const cookieLang = getCookie("asc_language");
-  const lang =
-    cookieLang === "en-US" || cookieLang === "en-GB" ? "en" : cookieLang;
-
-  const commonKeys = Object.getOwnPropertyNames(i18n.loaded).filter(
-    (k) => k.indexOf(`${lang}/Common.json`) > -1,
-  );
-
-  if (commonKeys.length === 0) return undefined;
-
-  const i18nKey = commonKeys.length === 1 ? commonKeys[0] : commonKeys[1];
-
-  let translation = i18n.loaded[i18nKey]?.data?.[key];
-
-  if (translation && interpolation) {
-    Object.keys(interpolation).forEach((param) => {
-      translation = translation.replace(
-        new RegExp(`{{\\s*${param}\\s*}}`, "g"),
-        String(interpolation[param]),
-      );
-    });
+  if (i18n?.t) {
+    const result = i18n.t(key, interpolation);
+    if (result && result !== key) return result;
   }
 
-  return translation;
+  if (i18n?.loaded) {
+    const cookieLang = getCookie("asc_language");
+    const lang =
+      cookieLang === "en-US" || cookieLang === "en-GB"
+        ? "en"
+        : (cookieLang ?? "en");
+
+    const commonKeys = Object.getOwnPropertyNames(i18n.loaded).filter(
+      (k) => k.indexOf(`${lang}/Common.json`) > -1,
+    );
+
+    if (commonKeys.length > 0) {
+      const i18nKey = commonKeys.length === 1 ? commonKeys[0] : commonKeys[1];
+
+      let translation = i18n.loaded[i18nKey]?.data?.[key];
+
+      if (translation) {
+        if (interpolation) {
+          Object.keys(interpolation).forEach((param) => {
+            translation = translation.replace(
+              new RegExp(`{{\\s*${param}\\s*}}`, "g"),
+              String(interpolation[param]),
+            );
+          });
+        }
+        return translation;
+      }
+    }
+  }
+
+  throw new Error(
+    `[i18n] Missing translation for key "${key}". Ensure the TranslationProvider is mounted or window.i18n.loaded contains the required Common namespace.`,
+  );
 };
 
 /**

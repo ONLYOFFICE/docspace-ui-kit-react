@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { ThemeProvider } from ".";
+import { ThemeProviderComponent } from ".";
 
 const mockColorScheme = {
 	id: 1,
@@ -48,9 +48,9 @@ describe("ThemeProvider", () => {
 
 	it("renders children correctly", () => {
 		render(
-			<ThemeProvider theme={Base}>
+			<ThemeProviderComponent theme={Base}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		expect(screen.getByTestId("test-child")).toBeInTheDocument();
@@ -58,9 +58,9 @@ describe("ThemeProvider", () => {
 
 	it("sets light theme correctly", () => {
 		render(
-			<ThemeProvider theme={Base}>
+			<ThemeProviderComponent theme={Base}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		expect(document.documentElement).toHaveAttribute("data-theme", "light");
@@ -68,9 +68,9 @@ describe("ThemeProvider", () => {
 
 	it("sets dark theme correctly", () => {
 		render(
-			<ThemeProvider theme={Dark}>
+			<ThemeProviderComponent theme={Dark}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		expect(document.documentElement).toHaveAttribute("data-theme", "dark");
@@ -82,9 +82,9 @@ describe("ThemeProvider", () => {
 			interfaceDirection: "rtl" as TInterfaceDirection,
 		};
 		render(
-			<ThemeProvider theme={rtlTheme}>
+			<ThemeProviderComponent theme={rtlTheme}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		expect(
@@ -94,9 +94,9 @@ describe("ThemeProvider", () => {
 
 	it("sets color scheme correctly", () => {
 		render(
-			<ThemeProvider theme={Base} currentColorScheme={mockColorScheme}>
+			<ThemeProviderComponent theme={Base} currentColorScheme={mockColorScheme}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		const rootStyles = document.documentElement.style;
@@ -116,17 +116,17 @@ describe("ThemeProvider", () => {
 
 	it("updates theme when props change", () => {
 		const { rerender } = render(
-			<ThemeProvider theme={Base}>
+			<ThemeProviderComponent theme={Base}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		expect(document.documentElement).toHaveAttribute("data-theme", "light");
 
 		rerender(
-			<ThemeProvider theme={Dark}>
+			<ThemeProviderComponent theme={Dark}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		expect(document.documentElement).toHaveAttribute("data-theme", "dark");
@@ -134,9 +134,9 @@ describe("ThemeProvider", () => {
 
 	it("updates color scheme when props change", () => {
 		const { rerender } = render(
-			<ThemeProvider theme={Base} currentColorScheme={mockColorScheme}>
+			<ThemeProviderComponent theme={Base} currentColorScheme={mockColorScheme}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		const newColorScheme = {
@@ -153,9 +153,9 @@ describe("ThemeProvider", () => {
 		};
 
 		rerender(
-			<ThemeProvider theme={Base} currentColorScheme={newColorScheme}>
+			<ThemeProviderComponent theme={Base} currentColorScheme={newColorScheme}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		const rootStyles = document.documentElement.style;
@@ -175,17 +175,17 @@ describe("ThemeProvider", () => {
 
 	it("handles theme change with color scheme", () => {
 		const { rerender } = render(
-			<ThemeProvider theme={Base} currentColorScheme={mockColorScheme}>
+			<ThemeProviderComponent theme={Base} currentColorScheme={mockColorScheme}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		expect(document.documentElement).toHaveAttribute("data-theme", "light");
 
 		rerender(
-			<ThemeProvider theme={Dark} currentColorScheme={mockColorScheme}>
+			<ThemeProviderComponent theme={Dark} currentColorScheme={mockColorScheme}>
 				<TestChild />
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		expect(document.documentElement).toHaveAttribute("data-theme", "dark");
@@ -197,7 +197,7 @@ describe("ThemeProvider", () => {
 
 	it("applies SCSS styles correctly", () => {
 		render(
-			<ThemeProvider theme={Base}>
+			<ThemeProviderComponent theme={Base}>
 				<div className="accent-main" data-testid="accent-main">
 					Accent Main
 				</div>
@@ -207,7 +207,7 @@ describe("ThemeProvider", () => {
 				<div className="accent-button" data-testid="accent-button">
 					Accent Button
 				</div>
-			</ThemeProvider>,
+			</ThemeProviderComponent>,
 		);
 
 		const accentMain = screen.getByTestId("accent-main");

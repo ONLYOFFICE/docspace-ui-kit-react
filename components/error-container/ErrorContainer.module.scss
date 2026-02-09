@@ -28,11 +28,10 @@
 @use "../../styles/mixins";
 
 .container {
-  :global(.light) & {
-    --error-container-background: #{colors.$white};
-    --error-container-body-text: #{colors.$gray};
-    --error-container-link-color: #{colors.$link};
-  }
+
+  --error-container-background: #{colors.$white};
+  --error-container-body-text: #{colors.$gray};
+  --error-container-link-color: #{colors.$link};
 
   :global(.dark) & {
     --error-container-background: #{colors.$black};

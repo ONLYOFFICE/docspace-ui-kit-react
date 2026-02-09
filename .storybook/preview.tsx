@@ -1,7 +1,7 @@
 import type { Preview } from "@storybook/react";
 import { useDarkMode } from "storybook-dark-mode";
 
-import { ThemeProvider } from "../components/theme-provider";
+import { ThemeProviderComponent } from "../components/theme-provider";
 import type { TColorScheme } from "../context/ThemeContext";
 
 import { globalColors } from "../providers/theme/themes/globalColors";
@@ -76,7 +76,7 @@ const preview: Preview = {
       const currentColorScheme = isDark ? darkColorScheme : lightColorScheme;
 
       return (
-        <ThemeProvider
+        <ThemeProviderComponent
           theme={{ ...theme, interfaceDirection }}
           currentColorScheme={currentColorScheme}
         >
@@ -90,7 +90,7 @@ const preview: Preview = {
           >
             <Story />
           </div>
-        </ThemeProvider>
+        </ThemeProviderComponent>
       );
     },
   ],
