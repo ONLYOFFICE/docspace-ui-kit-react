@@ -24,28 +24,34 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export const LoaderWrapper = ({
-  children,
-  isLoading,
-  testId,
-}: {
-  children: React.ReactNode;
-  isLoading: boolean;
-  testId?: string;
-}) => {
-  return (
-    <div
-      style={{
-        opacity: isLoading ? 0.5 : 1,
-        pointerEvents: isLoading ? "none" : "auto",
-        transition: "opacity 0.3s ease-in-out",
-        display: "flex",
-        flexDirection: "column",
-        flexGrow: 1,
-      }}
-      data-testid={testId || "loader-wrapper"}
-    >
-      {children}
-    </div>
-  );
-};
+import React from "react";
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
+
+import { LoaderWrapper } from ".";
+
+describe("LoaderWrapper", () => {
+  it("renders children and keeps interactions enabled when idle", () => {
+    render(
+      <LoaderWrapper isLoading={false}>
+        <span>Idle content</span>
+      </LoaderWrapper>,
+    );
+
+    const wrapper = screen.getByTestId("loader-wrapper");
+    expect(wrapper).toBeInTheDocument();
+    expect(wrapper).toHaveTextContent("Idle content");
+    expect(wrapper).toHaveStyle({ opacity: "1", pointerEvents: "auto" });
+  });
+
+  it("dims children and disables pointer events when loading", () => {
+    render(
+      <LoaderWrapper isLoading>
+        <button type="button">Action</button>
+      </LoaderWrapper>,
+    );
+
+    const wrapper = screen.getByTestId("loader-wrapper");
+    expect(wrapper).toHaveStyle({ opacity: "0.5", pointerEvents: "none" });
+  });
+});
