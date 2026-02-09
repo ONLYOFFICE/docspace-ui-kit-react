@@ -131,8 +131,3 @@ export type ComponentProps = OmitTooltipProps<
   }
 >;
 
-declare global {
-  interface Window {
-    __systemTooltipRef?: React.RefObject<TooltipRefProps | null>;
-  }
-}
