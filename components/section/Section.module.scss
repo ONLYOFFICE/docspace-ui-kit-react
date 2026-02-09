@@ -28,6 +28,24 @@
 @use "../../styles/mixins";
 
 .header {
+  :global(.light) {
+    --section-header-height: 69px;
+    --section-header-height-tablet: 61px;
+    --section-header-height-mobile: 53px;
+    --section-header-bg: #{colors.$white};
+    --section-desktop-padding: -20px;
+    --section-tablet-padding: -24px;
+  }
+
+  :global(.dark) {
+    --section-header-height: 69px;
+    --section-header-height-tablet: 61px;
+    --section-header-height-mobile: 53px;
+    --section-header-bg: #{colors.$black};
+    --section-desktop-padding: -20px;
+    --section-tablet-padding: -24px;
+  }
+
   position: relative;
   display: flex;
 
@@ -94,6 +112,18 @@
 }
 
 .infoPanelWrapper {
+  :global(.light) {
+    --info-panel-blur-color: #{colors.$blur-light};
+    --info-panel-bg: #{colors.$white};
+    --info-panel-border: #{colors.$gray-light-mid};
+  }
+
+  :global(.dark) {
+    --info-panel-blur-color: #{colors.$blur-dark};
+    --info-panel-bg: #{colors.$black};
+    --info-panel-border: #{colors.$gray-dark-strong};
+  }
+
   height: auto;
   width: auto;
   background: var(--info-panel-blur-color);
@@ -643,6 +673,16 @@
   }
 
   .infoIcon {
+    :global(.light) {
+      --status-icon-color-positive: #{colors.$light-status-positive};
+      --status-icon-color-negative: #{colors.$light-error-status};  
+    }
+
+    :global(.dark) {
+      --status-icon-color-positive: #{colors.$dark-status-positive};
+      --status-icon-color-negative: #{colors.$dark-error-status};
+    }
+
     position: absolute;
     width: 12px;
     height: 12px;
