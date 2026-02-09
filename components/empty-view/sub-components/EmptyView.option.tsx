@@ -30,7 +30,7 @@ import classNames from "classnames";
 import { Link, LinkType } from "../../link";
 import { Button, ButtonSize } from "../../button";
 
-import { EmptyViewItem } from "./EmptyView.item";
+import { EmptyViewItem } from "./EmptyViewItem";
 import { isEmptyButtonOption, isEmptyLinkOptions } from "../EmptyView.utils";
 import styles from "../EmptyView.module.scss";
 
