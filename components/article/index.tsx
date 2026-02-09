@@ -47,15 +47,22 @@ import styles from "./Article.module.scss";
 import { HEADER_NAME, MAIN_BUTTON_NAME, BODY_NAME } from "./Article.constants";
 import { ArticleProps } from "./Article.types";
 
-// biome-ignore-start lint/correctness/noUnusedVariables: TODO fix
-const ArticleHeader = ({ children }: { children: React.ReactNode }) => null;
+const ArticleHeader = ({
+  children: _children,
+}: {
+  children: React.ReactNode;
+}) => null;
 ArticleHeader.displayName = HEADER_NAME;
 
-const ArticleMainButton = ({ children }: { children?: React.ReactNode }) =>
-  null;
+const ArticleMainButton = ({
+  children: _children,
+}: {
+  children?: React.ReactNode;
+}) => null;
 ArticleMainButton.displayName = MAIN_BUTTON_NAME;
 
-const ArticleBody = ({ children }: { children: React.ReactNode }) => null;
+const ArticleBody = ({ children: _children }: { children: React.ReactNode }) =>
+  null;
 ArticleBody.displayName = BODY_NAME;
 
 const Article = ({
@@ -123,13 +130,12 @@ const Article = ({
     React.useState<null | React.JSX.Element>(null);
   const [articleBodyContent, setArticleBodyContent] =
     React.useState<null | React.JSX.Element>(null);
-  const [correctTabletHeight, setCorrectTabletHeight] = React.useState<
+  const [_correctTabletHeight, setCorrectTabletHeight] = React.useState<
     null | number
   >(null);
   const updateSizeRef = React.useRef<null | ReturnType<typeof setTimeout>>(
     null,
   );
-  // biome-ignore-end lint/correctness/noUnusedVariables: TODO fix
 
   const onMobileBack = React.useCallback(() => {
     // close article

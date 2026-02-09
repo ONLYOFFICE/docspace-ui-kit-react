@@ -25,13 +25,11 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 export const hasOwnProperty = (obj: unknown, propertyName: string): boolean => {
-    if (!obj) return false;
-  
-    try {
-      // biome-ignore lint/suspicious/noPrototypeBuiltins: TODO fix
-      return Object.prototype.hasOwnProperty.call(obj, propertyName);
-    } catch {
-      return false;
-    }
-  };
-  
+  if (!obj) return false;
+
+  try {
+    return Object.hasOwn(obj as object, propertyName);
+  } catch {
+    return false;
+  }
+};
