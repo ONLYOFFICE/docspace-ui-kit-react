@@ -26,6 +26,7 @@
 
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
+import { TFunction } from "i18next";
 import { render, fireEvent, screen, within } from "@testing-library/react";
 import { ContextMenuModel } from "../../context-menu/ContextMenu.types";
 import { RoomTile } from ".";
@@ -152,7 +153,7 @@ describe("RoomTile", () => {
 
   const renderRoomTile = (props: Partial<RoomTileProps> = {}) => {
     const defaultProps: RoomTileProps = {
-      t: (key: string) => key,
+      t: ((key: string) => key) as TFunction,
       item: mockItem,
       children: <RoomContent />,
       columnCount: 3,
