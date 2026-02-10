@@ -415,3 +415,16 @@ export type TFolder = {
   isLinkExpired?: boolean;
   external?: boolean;
 };
+
+export type TSortOrder = "descending" | "ascending";
+
+export type TSortBy =
+  | "DateAndTime"
+  | "DateAndTimeCreation"
+  | "Tags"
+  | "Type"
+  | "AZ"
+  | "Author"
+  | "roomType"
+  | "usedspace"
+  | "Size";
