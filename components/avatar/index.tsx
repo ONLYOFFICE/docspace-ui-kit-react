@@ -1,6 +1,3 @@
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: false */
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: false */
-
 "use client";
 
 // (c) Copyright Ascensio System SIA 2009-2026
@@ -223,6 +220,7 @@ const AvatarPure = ({
         onClick={onClick || onClickAvatar}
         ref={iconRef}
         data-testid={dataTestId ?? "avatar"}
+        role="button"
       >
         <div
           className={classNames(styles.avatarWrapper, className)}

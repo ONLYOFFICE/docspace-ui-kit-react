@@ -854,7 +854,6 @@ export class Scrollbar extends React.Component<ScrollbarProps, ScrollbarState> {
     return this.scrollValues;
   };
 
-  // biome-ignore-start lint/correctness/noUnusedVariables: TODO fix
   public render(): React.ReactNode {
     const {
       createContext,
@@ -921,7 +920,6 @@ export class Scrollbar extends React.Component<ScrollbarProps, ScrollbarState> {
 
       ...propsHolderProps
     } = this.props as ScrollbarProps;
-    // biome-ignore-end lint/correctness/noUnusedVariables: TODO fix
 
     const scrollbarWidth = !util.isUndef(propsScrollbarWidth)
       ? propsScrollbarWidth

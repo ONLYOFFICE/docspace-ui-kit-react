@@ -215,11 +215,9 @@ class ScrollbarThumb extends React.Component<ScrollbarThumbProps, unknown> {
     this.elementRefHack.current = ref;
   };
 
-  // biome-ignore-start lint/correctness/noUnusedVariables: TODO fix
   public render(): React.ReactElement<unknown> | null {
     const { elementRef, axis, onDrag, onDragEnd, onDragStart, ...props } = this
       .props as ScrollbarThumbProps;
-    // biome-ignore-end lint/correctness/noUnusedVariables: TODO fix
 
     props.className = cnb(
       "ScrollbarsCustom-Thumb",

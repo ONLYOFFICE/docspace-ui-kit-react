@@ -24,12 +24,21 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-// biome-ignore-start lint/suspicious/noExplicitAny: TODO fix
-function toFileWithPath(file: any, path: any) {
-  if (typeof file?.path === "string") return file;
+import React from "react";
+
+type DropEvent =
+  | DragEvent
+  | ClipboardEvent
+  | Event
+  | React.DragEvent<HTMLElement>
+  | React.ClipboardEvent<HTMLElement>
+  | React.ChangeEvent<HTMLInputElement>;
+
+function toFileWithPath(file: File, path?: string): File {
+  if (typeof (file as File & { path?: string })?.path === "string") return file;
 
   // on electron, path is already set to the absolute path
-  const { webkitRelativePath } = file;
+  const { webkitRelativePath } = file as File & { webkitRelativePath?: string };
   Object.defineProperty(file, "path", {
     value:
       typeof path === "string"
@@ -57,83 +66,102 @@ const FILES_TO_IGNORE = [
  * everything will be flattened and placed in the same list but the paths will be kept as a {path} property.
  * @param evt
  */
-export default async function getFilesFromEvent(evt: any) {
-  return (isDragEvt(evt) && evt.dataTransfer) || evt.clipboardData
-    ? getDataTransferFiles(evt.dataTransfer ?? evt.clipboardData, evt.type)
+export default async function getFilesFromEvent(
+  evt: DropEvent,
+): Promise<File[]> {
+  const dragEvt = evt as DragEvent | React.DragEvent<HTMLElement>;
+  const clipEvt = evt as ClipboardEvent | React.ClipboardEvent<HTMLElement>;
+  const dataTransfer = dragEvt.dataTransfer ?? clipEvt.clipboardData;
+  return (isDragEvt(evt) && dragEvt.dataTransfer) || clipEvt.clipboardData
+    ? getDataTransferFiles(dataTransfer!, evt.type)
     : getInputFiles(evt);
 }
 
-function isDragEvt(value: any) {
-  return !!value.dataTransfer;
+function isDragEvt(
+  value: DropEvent,
+): value is DragEvent | React.DragEvent<HTMLElement> {
+  return !!(value as DragEvent | React.DragEvent<HTMLElement>).dataTransfer;
 }
 
-function getInputFiles(evt: any) {
+function getInputFiles(evt: DropEvent): File[] {
   const files = isInput(evt.target)
     ? evt.target.files
-      ? fromList(evt.target.files)
+      ? fromList<File>(evt.target.files)
       : []
     : [];
-  // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
   return files.map((file) => toFileWithPath(file));
 }
 
-function isInput(value: any) {
-  return value !== null;
+function isInput(value: EventTarget | null): value is HTMLInputElement {
+  return value !== null && (value as HTMLInputElement).files !== undefined;
 }
 
-async function getDataTransferFiles(dt: any, type: any) {
+async function getDataTransferFiles(
+  dt: DataTransfer,
+  type: string,
+): Promise<File[]> {
   // IE11 does not support dataTransfer.items
   // See https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/items#Browser_compatibility
   if (dt.items) {
-    const items = fromList(dt.items).filter((item) => item.kind === "file");
+    const items = fromList<DataTransferItem>(dt.items).filter(
+      (item) => item.kind === "file",
+    );
     // According to https://html.spec.whatwg.org/multipage/dnd.html#dndevents,
     // only 'dragstart' and 'drop' has access to the data (source node)
     if (type !== "drop" && type !== "paste") {
-      return items;
+      return items as unknown as File[];
     }
     const files = await Promise.all(items.map(toFilePromises));
     return noIgnoredFiles(flatten(files));
   }
-  // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
-  return noIgnoredFiles(fromList(dt.files).map((file) => toFileWithPath(file)));
+  return noIgnoredFiles(
+    fromList<File>(dt.files).map((file) => toFileWithPath(file)),
+  );
 }
 
-function noIgnoredFiles(files: any) {
-  return files.filter((file: any) => FILES_TO_IGNORE.indexOf(file.name) === -1);
+function noIgnoredFiles(files: File[]): File[] {
+  return files.filter(
+    (file: File) => FILES_TO_IGNORE.indexOf(file.name) === -1,
+  );
 }
 
 // IE11 does not support Array.from()
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from#Browser_compatibility
 // https://developer.mozilla.org/en-US/docs/Web/API/FileList
 // https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItemList
-function fromList(items: any) {
-  const files = [];
-  // tslint:disable: prefer-for-of
+function fromList<T>(items: FileList | DataTransferItemList): T[] {
+  const files: T[] = [];
   for (let i = 0; i < items.length; i++) {
-    const file = items[i];
+    const file = items[i] as T;
     files.push(file);
   }
   return files;
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem
-function toFilePromises(item: any) {
-  if (typeof item.webkitGetAsEntry !== "function") {
+function toFilePromises(item: DataTransferItem): Promise<File | File[]> {
+  if (
+    typeof (
+      item as DataTransferItem & { webkitGetAsEntry?: () => FileSystemEntry }
+    ).webkitGetAsEntry !== "function"
+  ) {
     return fromDataTransferItem(item);
   }
-  const entry = item.webkitGetAsEntry();
+  const entry = (
+    item as DataTransferItem & { webkitGetAsEntry: () => FileSystemEntry }
+  ).webkitGetAsEntry();
   // Safari supports dropping an image node from a different window and can be retrieved using
   // the DataTransferItem.getAsFile() API
   // NOTE: FileSystemEntry.file() throws if trying to get the file
   if (entry && entry.isDirectory) {
-    return fromDirEntry(entry);
+    return fromDirEntry(entry as FileSystemDirectoryEntry);
   }
   return fromDataTransferItem(item);
 }
 
-function flatten(items: any) {
+function flatten(items: (File | File[])[]): File[] {
   return items.reduce(
-    (acc: any, files: any) => [
+    (acc: File[], files: File | File[]) => [
       ...acc,
       ...(Array.isArray(files) ? flatten(files) : [files]),
     ],
@@ -141,40 +169,42 @@ function flatten(items: any) {
   );
 }
 
-function fromDataTransferItem(item: any) {
+function fromDataTransferItem(item: DataTransferItem): Promise<File> {
   const file = item.getAsFile();
   if (!file) {
     return Promise.reject(`${item} is not a File`);
   }
-  // @ts-expect-error TS(2554): Expected 2 arguments, but got 1.
   const fwp = toFileWithPath(file);
   return Promise.resolve(fwp);
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemEntry
-async function fromEntry(entry: any) {
-  return entry.isDirectory ? fromDirEntry(entry) : fromFileEntry(entry);
+async function fromEntry(entry: FileSystemEntry): Promise<File | File[]> {
+  return entry.isDirectory
+    ? fromDirEntry(entry as FileSystemDirectoryEntry)
+    : fromFileEntry(entry as FileSystemFileEntry);
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemDirectoryEntry
-function fromDirEntry(entry: any) {
+function fromDirEntry(entry: FileSystemDirectoryEntry): Promise<File[]> {
   const reader = entry.createReader();
   return new Promise((resolve, reject) => {
-    const entries: any = [];
+    const entries: Promise<(File | File[])[]>[] = [];
     let empty = true;
     function readEntries() {
       // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemDirectoryEntry/createReader
       // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemDirectoryReader/readEntries
       reader.readEntries(
-        async (batch: any) => {
+        async (batch: FileSystemEntry[]) => {
           if (!batch.length) {
             // Done reading directory
             try {
               const files = await Promise.all(entries);
+              const flatFiles = flatten(files.flat());
               if (empty) {
-                files.push([createEmptyDirFile(entry)]);
+                flatFiles.push(createEmptyDirFile(entry));
               }
-              resolve(files);
+              resolve(flatFiles);
             } catch (err) {
               reject(err);
             }
@@ -186,7 +216,7 @@ function fromDirEntry(entry: any) {
             readEntries();
           }
         },
-        (err: any) => {
+        (err: Error) => {
           reject(err);
         },
       );
@@ -195,7 +225,7 @@ function fromDirEntry(entry: any) {
   });
 }
 
-function createEmptyDirFile(entry: any) {
+function createEmptyDirFile(entry: FileSystemDirectoryEntry): File {
   const file = new File([], entry.name);
   const fwp = toFileWithPath(file, entry.fullPath + "/");
 
@@ -206,17 +236,16 @@ function createEmptyDirFile(entry: any) {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/FileSystemFileEntry
-async function fromFileEntry(entry: any) {
+async function fromFileEntry(entry: FileSystemFileEntry): Promise<File> {
   return new Promise((resolve, reject) => {
     entry.file(
-      (file: any) => {
+      (file: File) => {
         const fwp = toFileWithPath(file, entry.fullPath);
         resolve(fwp);
       },
-      (err: any) => {
+      (err: Error) => {
         reject(err);
       },
     );
   });
 }
-// biome-ignore-end lint/suspicious/noExplicitAny: TODO fix

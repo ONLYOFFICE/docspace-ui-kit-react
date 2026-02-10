@@ -24,9 +24,6 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-/** biome-ignore-all lint/complexity/noThisInStatic: false */
-/** biome-ignore-all lint/complexity/noStaticOnlyClass: false */
-
 "use client";
 
 export default class DomHelpers {
