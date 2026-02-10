@@ -59,7 +59,7 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default {
-  title: "Layout components/Filter",
+  title: "Components/Layout components/Filter",
   component: Filter,
   argTypes: {
     onSearch: { action: "onSearch" },

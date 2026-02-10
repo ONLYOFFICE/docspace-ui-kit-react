@@ -3,10 +3,14 @@ import type { Preview } from "@storybook/react";
 import { useDarkMode } from "@vueless/storybook-dark-mode";
 
 import { ThemeProviderComponent } from "../components/theme-provider";
+import { TranslationProvider } from "../providers/translation";
+import type { TTranslations } from "../providers/translation";
+
 import type { TColorScheme } from "../context/ThemeContext";
 
 import { globalColors } from "../providers/theme/themes/globalColors";
 import globalTypes from "./globals";
+import enCommon from "../locales/en/Common.json";
 
 import "./styles.css";
 
@@ -79,22 +83,29 @@ const preview: Preview = {
       const theme = isDark ? darkThemeConfig : baseTheme;
       const currentColorScheme = isDark ? darkColorScheme : lightColorScheme;
 
+      const translations: TTranslations = new Map([
+        ["en", new Map([["Common", enCommon]])],
+      ]);
+
       return (
-        <ThemeProviderComponent
-          theme={{ ...theme, interfaceDirection }}
-          currentColorScheme={currentColorScheme}
-        >
-          <div
-            style={{
-              backgroundColor: isDark ? globalColors.black : globalColors.white,
-              color: isDark ? globalColors.white : globalColors.black,
-              minHeight: "100vh",
-              padding: "20px",
-            }}
+        <TranslationProvider locale="en" translations={translations}>
+          <ThemeProviderComponent
+            theme={{ ...theme, interfaceDirection }}
+            currentColorScheme={currentColorScheme}
           >
-            <Story />
-          </div>
-        </ThemeProviderComponent>
+            <div
+              style={{
+                backgroundColor: isDark
+                  ? globalColors.black
+                  : globalColors.white,
+                color: isDark ? globalColors.white : globalColors.black,
+                padding: "20px",
+              }}
+            >
+              <Story />
+            </div>
+          </ThemeProviderComponent>
+        </TranslationProvider>
       );
     },
   ],
