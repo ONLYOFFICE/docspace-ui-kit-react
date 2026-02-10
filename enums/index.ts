@@ -221,6 +221,76 @@ export const enum ErrorKeys {
   EmptyEmail = "EmptyEmail",
 }
 
+/**
+ * Enum for sort by field name
+ * @readonly
+ */
+export const enum SortByFieldName {
+  Name = "AZ",
+  ModifiedDate = "DateAndTime",
+  CreationDate = "DateAndTimeCreation",
+  Author = "Author",
+  Size = "Size",
+  Type = "Type",
+  Location = "Location",
+  Tags = "Tags",
+  RoomType = "roomType",
+  LastOpened = "LastOpened",
+  UsedSpace = "usedspace",
+}
+
+/**
+ * Enum for file status.
+ * @readonly
+ */
+export const enum FileStatus {
+  None = 0,
+  IsEditing = 1,
+  IsNew = 2,
+  IsConverting = 4,
+  IsOriginal = 8,
+  IsEditingAlone = 16,
+  IsFavorite = 32,
+  IsTemplate = 64,
+  IsFillFormDraft = 128,
+}
+
+export const enum ShareRights {
+  None = "None",
+  ReadWrite = "ReadWrite",
+  Read = "Read",
+  Restrict = "Restrict",
+  Varies = "Varies",
+  Review = "Review",
+  Comment = "Comment",
+  FillForms = "FillForms",
+  CustomFilter = "CustomFilter",
+  RoomManager = "RoomManager",
+  Editing = "Editing",
+  ContentCreator = "ContentCreator",
+}
+
+export enum FileFillingFormStatus {
+  None = 0,
+  Draft = 1,
+  YourTurn = 2,
+  InProgress = 3,
+  Completed = 4,
+  Stopped = 5,
+}
+
+export enum VectorizationStatus {
+  InProgress,
+  Completed,
+  Failed,
+}
+
+export const enum VDRIndexingAction {
+  HigherIndex = "HigherIndex",
+  LowerIndex = "LowerIndex",
+  MoveIndex = "MoveIndex",
+}
+
 export const enum FilterGroups {
   filterType = "filter-filterType",
   filterAuthor = "filter-author",

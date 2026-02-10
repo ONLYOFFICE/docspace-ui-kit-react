@@ -27,84 +27,84 @@
 import { describe, it, expect, vi } from "vitest";
 import { screen, render, fireEvent } from "@testing-library/react";
 import { ColorInput } from "./ColorInput";
-import { globalColors } from "../../themes";
+import { globalColors } from "../../providers/theme";
 import colorInputStyles from "./ColorInput.module.scss";
 
 describe("ColorInput component", () => {
-  it("renders without error", () => {
-    render(<ColorInput />);
-    expect(screen.getByTestId("color-input")).toBeInTheDocument();
-  });
+	it("renders without error", () => {
+		render(<ColorInput />);
+		expect(screen.getByTestId("color-input")).toBeInTheDocument();
+	});
 
-  it("uses default color when no color is provided", () => {
-    render(<ColorInput />);
-    const input = screen.getByRole("textbox") as HTMLInputElement;
-    expect(input.value).toBe(globalColors.lightBlueMain.toUpperCase());
-  });
+	it("uses default color when no color is provided", () => {
+		render(<ColorInput />);
+		const input = screen.getByRole("textbox") as HTMLInputElement;
+		expect(input.value).toBe(globalColors.lightBlueMain.toUpperCase());
+	});
 
-  it("uses provided default color", () => {
-    const testColor = "#FF0000";
-    render(<ColorInput defaultColor={testColor} />);
-    const input = screen.getByRole("textbox") as HTMLInputElement;
-    expect(input.value).toBe(testColor.toUpperCase());
-  });
+	it("uses provided default color", () => {
+		const testColor = "#FF0000";
+		render(<ColorInput defaultColor={testColor} />);
+		const input = screen.getByRole("textbox") as HTMLInputElement;
+		expect(input.value).toBe(testColor.toUpperCase());
+	});
 
-  it("calls handleChange when color is changed", () => {
-    const handleChange = vi.fn();
-    const newColor = "#00FF00";
-    render(<ColorInput handleChange={handleChange} />);
-    const input = screen.getByRole("textbox") as HTMLInputElement;
+	it("calls handleChange when color is changed", () => {
+		const handleChange = vi.fn();
+		const newColor = "#00FF00";
+		render(<ColorInput handleChange={handleChange} />);
+		const input = screen.getByRole("textbox") as HTMLInputElement;
 
-    fireEvent.change(input, { target: { value: newColor } });
-    expect(handleChange).toHaveBeenCalledWith(newColor);
-  });
+		fireEvent.change(input, { target: { value: newColor } });
+		expect(handleChange).toHaveBeenCalledWith(newColor);
+	});
 
-  it("disables input when isDisabled is true", () => {
-    render(<ColorInput isDisabled />);
-    const input = screen.getByRole("textbox") as HTMLInputElement;
-    expect(input).toBeDisabled();
-  });
+	it("disables input when isDisabled is true", () => {
+		render(<ColorInput isDisabled />);
+		const input = screen.getByRole("textbox") as HTMLInputElement;
+		expect(input).toBeDisabled();
+	});
 
-  it("applies error styles when hasError is true", () => {
-    render(<ColorInput hasError />);
-    const input = screen.getByRole("textbox");
-    expect(input).toHaveAttribute("data-error", "true");
-  });
+	it("applies error styles when hasError is true", () => {
+		render(<ColorInput hasError />);
+		const input = screen.getByRole("textbox");
+		expect(input).toHaveAttribute("data-error", "true");
+	});
 
-  it("applies warning styles when hasWarning is true", () => {
-    render(<ColorInput hasWarning />);
-    const input = screen.getByRole("textbox");
-    expect(input).toHaveAttribute("data-warning", "true");
-  });
+	it("applies warning styles when hasWarning is true", () => {
+		render(<ColorInput hasWarning />);
+		const input = screen.getByRole("textbox");
+		expect(input).toHaveAttribute("data-warning", "true");
+	});
 
-  it("applies scale styles when scale prop is true", () => {
-    render(<ColorInput scale />);
-    const input = screen.getByRole("textbox");
-    expect(input).toHaveAttribute("data-scale", "true");
-  });
+	it("applies scale styles when scale prop is true", () => {
+		render(<ColorInput scale />);
+		const input = screen.getByRole("textbox");
+		expect(input).toHaveAttribute("data-scale", "true");
+	});
 
-  it("applies custom className", () => {
-    const customClass = "custom-class";
-    render(<ColorInput className={customClass} />);
-    const wrapper = screen.getByTestId("color-input");
-    expect(wrapper).toHaveClass(customClass);
-  });
+	it("applies custom className", () => {
+		const customClass = "custom-class";
+		render(<ColorInput className={customClass} />);
+		const wrapper = screen.getByTestId("color-input");
+		expect(wrapper).toHaveClass(customClass);
+	});
 
-  it("applies custom id", () => {
-    const customId = "custom-id";
-    render(<ColorInput id={customId} />);
-    const wrapper = screen.getByTestId("color-input");
-    expect(wrapper).toHaveAttribute("id", customId);
-  });
+	it("applies custom id", () => {
+		const customId = "custom-id";
+		render(<ColorInput id={customId} />);
+		const wrapper = screen.getByTestId("color-input");
+		expect(wrapper).toHaveAttribute("id", customId);
+	});
 
-  it("toggles color picker on color block click", () => {
-    render(<ColorInput />);
-    const wrapper = screen.getByTestId("color-input");
-    const colorBlock = wrapper.querySelector(
-      `.${colorInputStyles.colorBlock}`,
-    ) as HTMLElement;
+	it("toggles color picker on color block click", () => {
+		render(<ColorInput />);
+		const wrapper = screen.getByTestId("color-input");
+		const colorBlock = wrapper.querySelector(
+			`.${colorInputStyles.colorBlock}`,
+		) as HTMLElement;
 
-    // Ensure colorBlock exists
-    expect(colorBlock).toBeInTheDocument();
-  });
+		// Ensure colorBlock exists
+		expect(colorBlock).toBeInTheDocument();
+	});
 });

@@ -1,10 +1,11 @@
 import type { Preview } from "@storybook/react";
 import { useDarkMode } from "storybook-dark-mode";
 
-import { ThemeProvider } from "../components/theme-provider";
+import { ThemeProviderComponent } from "../components/theme-provider";
 import type { TColorScheme } from "../context/ThemeContext";
 
-import { globalColors } from "../themes/globalColors";
+import { globalColors } from "../providers/theme/themes/globalColors";
+import globalTypes from "./globals";
 
 import "./styles.css";
 
@@ -50,6 +51,7 @@ const darkThemeConfig = {
 };
 
 const preview: Preview = {
+  globalTypes,
   parameters: {
     backgrounds: { disable: true },
     controls: {
@@ -66,14 +68,18 @@ const preview: Preview = {
   },
 
   decorators: [
-    (Story) => {
+    (Story, context) => {
       const isDark = useDarkMode();
+      const interfaceDirection = context.globals.direction;
 
       const theme = isDark ? darkThemeConfig : baseTheme;
       const currentColorScheme = isDark ? darkColorScheme : lightColorScheme;
 
       return (
-        <ThemeProvider theme={theme} currentColorScheme={currentColorScheme}>
+        <ThemeProviderComponent
+          theme={{ ...theme, interfaceDirection }}
+          currentColorScheme={currentColorScheme}
+        >
           <div
             style={{
               backgroundColor: isDark ? globalColors.black : globalColors.white,
@@ -84,7 +90,7 @@ const preview: Preview = {
           >
             <Story />
           </div>
-        </ThemeProvider>
+        </ThemeProviderComponent>
       );
     },
   ],

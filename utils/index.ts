@@ -45,3 +45,7 @@ export * from "./common";
 export * from "./email";
 
 export * from "./context";
+
+export * from "./edge-scrolling";
+
+export * from "./hasOwnProperty";

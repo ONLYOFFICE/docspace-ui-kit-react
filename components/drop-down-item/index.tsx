@@ -24,10 +24,6 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: false */
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: false */
-/** biome-ignore-all lint/a11y/useAriaPropsSupportedByRole: false */
-
 import React from "react";
 import { ReactSVG } from "react-svg";
 import classNames from "classnames";
@@ -35,7 +31,7 @@ import classNames from "classnames";
 import RightArrowReactSvgUrl from "../../assets/right.arrow.react.svg";
 import ArrowLeftReactUrl from "../../assets/arrow-left.react.svg";
 
-import { globalColors } from "../../themes";
+import { globalColors } from "../../providers/theme";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 import { useTheme } from "../../context/ThemeContext";
 import { isTouchDevice } from "../../utils/device";
@@ -127,7 +123,8 @@ const DropDownItem = ({
 	const { isRTL } = useInterfaceDirection();
 	const { isBase } = useTheme();
 
-	const resolvedBetaLabel = betaLabel || getCommonTranslation("BetaLabel") || "";
+	const resolvedBetaLabel =
+		betaLabel || getCommonTranslation("BetaLabel") || "";
 	const resolvedPaidLabel = paidLabel || getCommonTranslation("Paid") || "";
 
 	const withDisabledTooltip = disabled && tooltip;

@@ -25,9 +25,9 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 "use client";
 import * as React from "react";
+import type { Scrollbar } from "./Scrollbar";
 
-// biome-ignore lint/suspicious/noExplicitAny: TODO fix
-export type ScrollbarContextValue = { parentScrollbar: any | null };
+export type ScrollbarContextValue = { parentScrollbar: Scrollbar | null };
 
 const ScrollbarContext: React.Context<ScrollbarContextValue> =
   React.createContext({

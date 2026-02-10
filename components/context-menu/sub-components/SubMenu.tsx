@@ -36,7 +36,7 @@ import OutsdideIcon from "../../../assets/arrow.outside.react.svg";
 import CheckIconURL from "../../../assets/check.edit.react.svg";
 
 import { DomHelpers, isMobile, isTouchDevice } from "../../../utils";
-import { globalColors } from "../../../themes";
+import { globalColors } from "../../../providers/theme";
 import { useTheme, useInterfaceDirection } from "../../../context";
 
 import { ToggleButton } from "../../toggle-button";
@@ -61,14 +61,9 @@ const SUBMENU_LIST_MARGIN = 4; // Indentation of the second level menu from the 
 const SECTION_PADDING = 16; // Screen margin
 const MIN_SUBMENU_WIDTH = 240; // Minimum width for submenu on mobile devices
 
-// biome-ignore lint/complexity/noStaticOnlyClass: dont understand
-class ObjectUtils {
-  static getJSXElement(obj: unknown, ...params: unknown[]) {
-    // @ts-expect-error Don`t understand this line and class generally
-    // biome-ignore lint/complexity/noThisInStatic: dont understand
-    return this.isFunction(obj) ? obj(...params) : obj;
-  }
-}
+const getJSXElement = (obj: unknown, ...params: unknown[]) => {
+  return typeof obj === "function" ? obj(...params) : obj;
+};
 
 type SubMenuProps = {
   model: ContextMenuModel[];
@@ -524,11 +519,7 @@ const SubMenu = (props: SubMenuProps) => {
         active,
       };
 
-      content = ObjectUtils.getJSXElement(
-        item.template,
-        item,
-        defaultContentOptions,
-      );
+      content = getJSXElement(item.template, item, defaultContentOptions);
     }
     const toggleTooltipId = `context-menu-item-toggle-tooltip-${item.key}`;
     const itemTooltipId = `context-menu-item-tooltip-${item.key}`;

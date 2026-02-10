@@ -25,9 +25,10 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { Meta, StoryObj } from "@storybook/react";
-import moment from "moment";
+import type { DateTime } from "luxon";
 
 import { TimePicker, TimePickerProps } from ".";
+import { createDateTime, formatDate } from "../../utils/date";
 
 const meta = {
   title: "Components/UI/TimePicker",
@@ -84,9 +85,10 @@ const Template = (args: TimePickerProps) => {
 export const Default: Story = {
   render: Template,
   args: {
-    initialTime: moment("2025-01-27T10:30:00"),
+    initialTime: createDateTime(2025, 1, 27, 10, 30, 0),
     hasError: false,
-    onChange: (time) => console.log("Time changed:", time?.format("HH:mm")),
+    onChange: (time: DateTime) =>
+      console.log("Time changed:", formatDate(time, "HH:mm")),
     tabIndex: 0,
     focusOnRender: false,
     className: "",

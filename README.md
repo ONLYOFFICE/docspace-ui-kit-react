@@ -37,12 +37,14 @@ import {
   DropDownItem,
   EmptyScreenContainer,
   EmptyView,
+  FileInput,
   Heading,
   IconButton,
   InputBlock,
   Label,
   Link,
   Loader,
+  LoaderWrapper,
   MCPIcon,
   ModalDialog,
   Portal,
@@ -55,6 +57,10 @@ import {
   Scrollbar,
   SearchInput,
   SelectedItem,
+  Row,
+  RowContainer,
+  RowContent,
+  StatusMessage,
   TabItem,
   Tabs,
   Tag,
@@ -68,6 +74,13 @@ import {
   toastr,
   ToggleButton,
   Tooltip,
+  BaseTile,
+  FileTile,
+  FolderTile,
+  RoomTile,
+  TemplateTile,
+  TileContainer,
+  TileContent,
 } from "@docspace/ui-kit";
 ```
 
@@ -91,16 +104,19 @@ import { DropDown } from "@docspace/ui-kit/components/drop-down";
 import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
 import { EmptyScreenContainer } from "@docspace/ui-kit/components/empty-screen-container";
 import { EmptyView } from "@docspace/ui-kit/components/empty-view";
+import { FileInput } from "@docspace/ui-kit/components/file-input";
 import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
 import { IconButton } from "@docspace/ui-kit/components/icon-button";
 import { InputBlock } from "@docspace/ui-kit/components/input-block";
 import { Label } from "@docspace/ui-kit/components/label";
 import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
 import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
+import { LoaderWrapper } from "@docspace/ui-kit/components/loader-wrapper";
 import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
 import { ModalDialog, ModalDialogType } from "@docspace/ui-kit/components/modal-dialog";
 import { Portal } from "@docspace/ui-kit/components/portal";
 import { PublicRoomBar } from "@docspace/ui-kit/components/public-room-bar";
+import { Row, RowContainer, RowContent } from "@docspace/ui-kit/components/rows";
 import { RadioButton } from "@docspace/ui-kit/components/radio-button";
 import { RadioButtonGroup } from "@docspace/ui-kit/components/radio-button-group";
 import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
@@ -109,6 +125,7 @@ import { RoomLogo } from "@docspace/ui-kit/components/room-logo";
 import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
 import { SearchInput } from "@docspace/ui-kit/components/search-input";
 import { SelectedItem } from "@docspace/ui-kit/components/selected-item";
+import { StatusMessage } from "@docspace/ui-kit/components/status-message";
 import { TabItem } from "@docspace/ui-kit/components/tab-item";
 import { Tabs, TabsTypes } from "@docspace/ui-kit/components/tabs";
 import { Tag } from "@docspace/ui-kit/components/tag";
@@ -121,6 +138,7 @@ import { TimePicker } from "@docspace/ui-kit/components/time-picker";
 import { Toast, toastr } from "@docspace/ui-kit/components/toast";
 import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
 import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
+import { BaseTile, FileTile, FolderTile, RoomTile, TemplateTile, TileContainer, TileContent } from "@docspace/ui-kit/components/tiles";
 ```
 
 ### Import contexts and hooks
@@ -162,12 +180,14 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [DropDownItem](./components/drop-down-item/README.md) | Dropdown item for menus and lists with separator, header, submenu, and toggle support |
 | [EmptyScreenContainer](./components/empty-screen-container/README.md) | Component for displaying empty states with image, text, and action buttons |
 | [EmptyView](./components/empty-view/README.md) | Empty state component with icon, title, description, and interactive options |
+| [FileInput](./components/file-input/README.md) | File entry field |
 | [Heading](./components/heading/README.md) | Heading text structured in levels with customizable sizes and types |
 | [IconButton](./components/icon-button/README.md) | Button component displaying an icon with hover, click, and disabled states |
 | [InputBlock](./components/input-block/README.md) | Input component combining text input with optional icon and children elements |
 | [Label](./components/label/README.md) | Form label with required indicator and tooltip support |
 | [Link](./components/link/README.md) | Hyperlink component with page and action types |
 | [Loader](./components/loader/README.md) | Loading indicator with multiple animation types |
+| [LoaderWrapper](./components/loader-wrapper/README.md) | Wrapper that dims children and blocks interactions during loading |
 | [MCPIcon](./components/mcp-icon/README.md) | Icon component for MCP (Model Context Protocol) with image or text fallback |
 | [ModalDialog](./components/modal-dialog/README.md) | Versatile modal dialog component supporting both modal and aside (side panel) display types with keyboard shortcuts |
 | [Portal](./components/portal/README.md) | Renders children into a different DOM node |
@@ -177,9 +197,13 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [RectangleSkeleton](./components/rectangle/README.md) | Rectangular skeleton loader for text, buttons, and content placeholders |
 | [RoomIcon](./components/room-icon/README.md) | Room icon component with support for images, colors, badges, editing, and various states |
 | [RoomLogo](./components/room-logo/README.md) | Room logo component displaying room type icons with archive, template, and checkbox support |
+| [Row](./components/rows/row/README.md) | Versatile list row with checkbox, context menu, badges, and modern/default layouts for file or member listings |
+| [RowContainer](./components/rows/row-container/README.md) | Wrapper for rendering multiple rows with optional `react-window` virtualization and infinite loading |
+| [RowContent](./components/rows/row-content/README.md) | Layout helper that arranges row title, icons, and side sections while generating tablet-friendly summaries |
 | [Scrollbar](./components/scrollbar/README.md) | Custom scrollbar component with auto-hide, RTL support, and flexible styling options |
 | [SearchInput](./components/search-input/README.md) | Search input component with auto-refresh, clear button, and debounce support |
 | [SelectedItem](./components/selected-item/README.md) | Component for displaying selected items with remove functionality |
+| [StatusMessage](./components/status-message/README.md) | Animated status message component for displaying error and warning messages |
 | [TabItem](./components/tab-item/README.md) | Tab navigation component with active states, multi-select, and disabled state support |
 | [Tabs](./components/tabs/README.md) | Tab container component with primary/secondary themes, sticky positioning, and content management |
 | [Tag](./components/tag/README.md) | Tag component for displaying virtual room tags |
@@ -192,6 +216,13 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [Toast](./components/toast/README.md) | Notification component with success, error, warning, and info variants (see [i18n Setup](#i18n-setup)) |
 | [ToggleButton](./components/toggle-button/README.md) | Customizable toggle button with loading and disabled states |
 | [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
+| [BaseTile](./components/tiles/base-tile/README.md) | Base tile component providing foundational structure for all tile components |
+| [FileTile](./components/tiles/file-tile/README.md) | File tile component for displaying file information with thumbnail preview |
+| [FolderTile](./components/tiles/folder-tile/README.md) | Folder tile component with support for compact and big folder views |
+| [RoomTile](./components/tiles/room-tile/README.md) | Room tile component for displaying room information with tags and metadata |
+| [TemplateTile](./components/tiles/template-tile/README.md) | Template tile component with owner and storage metadata |
+| [TileContainer](./components/tiles/tile-container/README.md) | Container for organizing tiles in a grid layout with automatic categorization |
+| [TileContent](./components/tiles/tile-content/README.md) | Content wrapper component for tile children with consistent styling |
 
 ## Contexts
 
@@ -245,6 +276,8 @@ window.i18n = {
         SelectorVDREmptyScreenDescription: "Create a virtual data room...",
         CreateFormFillingRoom: "Create form filling room",
         CreateVirtualDataRoom: "Create virtual data room",
+        // FileInput
+        NotSupportedFormat: "Sorry, this file format isn't supported",
       },
     },
     "ru/Common.json": {

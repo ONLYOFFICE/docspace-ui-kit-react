@@ -25,14 +25,22 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useRef, useState, useEffect } from "react";
-import moment from "moment";
 import classNames from "classnames";
+import type { DateTime } from "luxon";
 
 import {
   InputSize,
   InputType,
   TextInput,
 } from "../text-input";
+
+import {
+  parseToDateTime,
+  formatDate,
+  startOf,
+  now,
+  parseWithFormat,
+} from "../../utils/date";
 
 import type { TimePickerProps } from "./TimePicker.types";
 import styles from "./TimePicker.module.scss";
@@ -56,16 +64,16 @@ const TimePicker = ({
   const hoursInputRef = useRef<HTMLInputElement>(null);
   const minutesInputRef = useRef<HTMLInputElement>(null);
 
-  const [date, setDate] = useState(
-    initialTime ? moment(initialTime) : moment().startOf("day"),
+  const [date, setDate] = useState<DateTime>(
+    initialTime ? parseToDateTime(initialTime)! : startOf(now(), "day")!,
   );
 
   const [isInputFocused, setIsInputFocused] = useState(false);
 
   const hoursFormat = isTwelveHourFormat ? "hh" : "HH";
-  const [hours, setHours] = useState(moment(date, "HH:mm").format(hoursFormat));
+  const [hours, setHours] = useState(formatDate(date, hoursFormat));
 
-  const [minutes, setMinutes] = useState(moment(date, "HH:mm").format("mm"));
+  const [minutes, setMinutes] = useState(formatDate(date, "mm"));
 
   const mountRef = useRef(false);
 
@@ -86,23 +94,19 @@ const TimePicker = ({
 
   const changeHours = (time: string) => {
     setHours(time);
-    setDate(
-      moment(
-        `${date.format("YYYY-MM-DD")} ${time}:${minutes}`,
-        "YYYY-MM-DD HH:mm",
-      ),
-    );
+    const dateStr = `${formatDate(date, "yyyy-MM-dd")} ${time}:${minutes}`;
+    const newDate = parseWithFormat(dateStr, "yyyy-MM-dd HH:mm");
+    if (newDate) setDate(newDate);
 
     const dateFormat = isTwelveHourFormat
-      ? "YYYY-MM-DD HH:mm A"
-      : "YYYY-MM-DD HH:mm";
+      ? "yyyy-MM-dd hh:mm a"
+      : "yyyy-MM-dd HH:mm";
 
-    onChange(
-      moment(
-        `${date.format("YYYY-MM-DD")} ${time}:${minutes} ${meridiem}`,
-        dateFormat,
-      ),
+    const parsedDate = parseWithFormat(
+      `${formatDate(date, "yyyy-MM-dd")} ${time}:${minutes} ${meridiem ?? ""}`.trim(),
+      dateFormat,
     );
+    if (parsedDate) onChange(parsedDate);
   };
 
   const onHoursBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -123,23 +127,19 @@ const TimePicker = ({
 
   const changeMinutes = (time: string) => {
     setMinutes(time);
-    setDate(
-      moment(
-        `${date.format("YYYY-MM-DD")} ${hours}:${time}`,
-        "YYYY-MM-DD HH:mm",
-      ),
-    );
+    const dateStr = `${formatDate(date, "yyyy-MM-dd")} ${hours}:${time}`;
+    const newDate = parseWithFormat(dateStr, "yyyy-MM-dd HH:mm");
+    if (newDate) setDate(newDate);
 
     const dateFormat = isTwelveHourFormat
-      ? "YYYY-MM-DD HH:mm A"
-      : "YYYY-MM-DD HH:mm";
+      ? "yyyy-MM-dd hh:mm a"
+      : "yyyy-MM-dd HH:mm";
 
-    onChange(
-      moment(
-        `${date.format("YYYY-MM-DD")} ${hours}:${time} ${meridiem}`,
-        dateFormat,
-      ),
+    const parsedDate = parseWithFormat(
+      `${formatDate(date, "yyyy-MM-dd")} ${hours}:${time} ${meridiem ?? ""}`.trim(),
+      dateFormat,
     );
+    if (parsedDate) onChange(parsedDate);
   };
 
   const handleChangeHours = (e: React.ChangeEvent<HTMLInputElement>) => {

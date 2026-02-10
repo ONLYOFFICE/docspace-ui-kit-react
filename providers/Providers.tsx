@@ -1,0 +1,137 @@
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+"use client";
+
+import React from "react";
+
+import type {
+  SettingsDto,
+  EmployeeFullDto,
+} from "@onlyoffice/docspace-api-sdk";
+
+import type { ErrorInfo, ReactNode } from "react";
+
+import type { TTranslationProvider } from "./translation";
+import type { TThemeProvider } from "./theme";
+import type { TApiProvider } from "./api";
+
+import ErrorBoundary from "./error-boundary/ErrorBoundary";
+import TranslationProvider from "./translation/TranslationProvider";
+import ThemeProvider from "./theme/ThemeProvider";
+import ApiProvider from "./api/ApiProvider";
+import { useApi } from "./api";
+
+export type TProvidersProps = {
+  children: React.ReactNode;
+  locale?: string;
+  errorFallback?: ReactNode | ((error: Error) => ReactNode);
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+} & TTranslationProvider &
+  TThemeProvider &
+  Pick<TApiProvider, "url" | "apiKey">;
+
+const InnerProviders = ({
+  children,
+
+  settings: settingsProp,
+  user: userProp,
+  locale,
+
+  initialTheme,
+  systemTheme,
+  colorTheme,
+
+  translations,
+}: Omit<TProvidersProps, "url" | "apiKey">) => {
+  const { profilesApi, commonSettingsApi } = useApi();
+
+  const [fetchedSettings, setFetchedSettings] = React.useState<
+    SettingsDto | undefined
+  >(undefined);
+  const [fetchedUser, setFetchedUser] = React.useState<
+    EmployeeFullDto | undefined
+  >(undefined);
+
+  React.useEffect(() => {
+    const fetchProvidersData = async () => {
+      const [settingsResponse, userResponse] = await Promise.all([
+        settingsProp ? undefined : commonSettingsApi.getPortalSettings(),
+        userProp ? undefined : profilesApi.getSelfProfile(),
+      ]);
+
+      if (settingsResponse) {
+        setFetchedSettings(settingsResponse.data.response);
+      }
+
+      if (userResponse) {
+        setFetchedUser(userResponse.data.response);
+      }
+    };
+
+    fetchProvidersData();
+  }, [profilesApi, commonSettingsApi, settingsProp, userProp]);
+
+  const settings = settingsProp ?? fetchedSettings;
+  const user = userProp ?? fetchedUser;
+
+  return (
+    <TranslationProvider
+      settings={settings}
+      user={user}
+      locale={locale}
+      translations={translations}
+    >
+      <ThemeProvider
+        initialTheme={initialTheme}
+        systemTheme={systemTheme}
+        colorTheme={colorTheme}
+        locale={locale}
+      >
+        {children}
+      </ThemeProvider>
+    </TranslationProvider>
+  );
+};
+
+const Providers = ({
+  children,
+  url,
+  apiKey,
+  errorFallback,
+  onError,
+  ...rest
+}: TProvidersProps) => {
+  return (
+    <ErrorBoundary fallback={errorFallback} onError={onError}>
+      <ApiProvider url={url} apiKey={apiKey}>
+        <InnerProviders {...rest}>{children}</InnerProviders>
+      </ApiProvider>
+    </ErrorBoundary>
+  );
+};
+
+export default Providers;

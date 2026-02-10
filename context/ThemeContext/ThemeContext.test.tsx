@@ -30,7 +30,6 @@ import { render, screen } from "@testing-library/react";
 import {
   ThemeContextProvider as ThemeProvider,
   useTheme,
-  type TTheme,
   type TColorScheme,
 } from "./index";
 
@@ -69,16 +68,16 @@ const TestComponent = ({ testId = "test-component" }: { testId?: string }) => {
           <span data-testid="color-scheme-id">{currentColorScheme.id}</span>
           <span data-testid="color-scheme-name">{currentColorScheme.name}</span>
           <span data-testid="main-accent">
-            {currentColorScheme.main.accent}
+            {currentColorScheme.main?.accent}
           </span>
           <span data-testid="main-buttons">
-            {currentColorScheme.main.buttons}
+            {currentColorScheme.main?.buttons}
           </span>
           <span data-testid="text-accent">
-            {currentColorScheme.text.accent}
+            {currentColorScheme.text?.accent}
           </span>
           <span data-testid="text-buttons">
-            {currentColorScheme.text.buttons}
+            {currentColorScheme.text?.buttons}
           </span>
         </>
       )}
@@ -116,15 +115,15 @@ const ColorSchemeAwareComponent = () => {
     <div
       data-testid="color-scheme-aware"
       style={{
-        backgroundColor: currentColorScheme.main.accent,
-        color: currentColorScheme.text.accent,
+        backgroundColor: currentColorScheme.main?.accent ?? "",
+        color: currentColorScheme.text?.accent ?? "",
       }}
     >
       <button
         type="button"
         style={{
-          backgroundColor: currentColorScheme.main.buttons,
-          color: currentColorScheme.text.buttons,
+          backgroundColor: currentColorScheme.main?.buttons ?? "",
+          color: currentColorScheme.text?.buttons ?? "",
         }}
       >
         Styled Button
@@ -577,7 +576,7 @@ describe("Nested Providers", () => {
 
 describe("Type Safety", () => {
   it("accepts Base theme type", () => {
-    const theme: TTheme = "Base";
+    const theme = "Base";
     render(
       <ThemeProvider theme={theme}>
         <TestComponent />
@@ -588,7 +587,7 @@ describe("Type Safety", () => {
   });
 
   it("accepts Dark theme type", () => {
-    const theme: TTheme = "Dark";
+    const theme = "Dark";
     render(
       <ThemeProvider theme={theme}>
         <TestComponent />
