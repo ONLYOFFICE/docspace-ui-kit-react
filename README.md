@@ -74,6 +74,13 @@ import {
   toastr,
   ToggleButton,
   Tooltip,
+  BaseTile,
+  FileTile,
+  FolderTile,
+  RoomTile,
+  TemplateTile,
+  TileContainer,
+  TileContent,
 } from "@docspace/ui-kit";
 ```
 
@@ -131,6 +138,7 @@ import { TimePicker } from "@docspace/ui-kit/components/time-picker";
 import { Toast, toastr } from "@docspace/ui-kit/components/toast";
 import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
 import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
+import { BaseTile, FileTile, FolderTile, RoomTile, TemplateTile, TileContainer, TileContent } from "@docspace/ui-kit/components/tiles";
 ```
 
 ### Import contexts and hooks
@@ -208,6 +216,13 @@ import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 | [Toast](./components/toast/README.md) | Notification component with success, error, warning, and info variants (see [i18n Setup](#i18n-setup)) |
 | [ToggleButton](./components/toggle-button/README.md) | Customizable toggle button with loading and disabled states |
 | [Tooltip](./components/tooltip/README.md) | Customizable tooltip with multiple trigger options |
+| [BaseTile](./components/tiles/base-tile/README.md) | Base tile component providing foundational structure for all tile components |
+| [FileTile](./components/tiles/file-tile/README.md) | File tile component for displaying file information with thumbnail preview |
+| [FolderTile](./components/tiles/folder-tile/README.md) | Folder tile component with support for compact and big folder views |
+| [RoomTile](./components/tiles/room-tile/README.md) | Room tile component for displaying room information with tags and metadata |
+| [TemplateTile](./components/tiles/template-tile/README.md) | Template tile component with owner and storage metadata |
+| [TileContainer](./components/tiles/tile-container/README.md) | Container for organizing tiles in a grid layout with automatic categorization |
+| [TileContent](./components/tiles/tile-content/README.md) | Content wrapper component for tile children with consistent styling |
 
 ## Contexts
 
