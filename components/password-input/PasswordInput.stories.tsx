@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState, useEffect } from "react";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import { InputSize, InputType, TextInput } from "../text-input";
 import { PasswordInput } from ".";
 import { PasswordInputProps, TPasswordValidation } from "./PasswordInput.types";

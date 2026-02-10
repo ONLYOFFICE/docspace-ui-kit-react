@@ -26,7 +26,7 @@
 
 import React, { useState, useEffect } from "react";
 
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Paging } from "./Paging";
 import { PagingProps } from "./Paging.types";

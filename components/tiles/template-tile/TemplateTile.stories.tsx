@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import PublicRoomTemplateIconReactSvg from "../../../assets/icons/32/template/public.react.svg";
 import CreateRoomReactSvg from "../../../assets/create.room.react.svg";
 import { ContextMenuModel } from "../../context-menu";

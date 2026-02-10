@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 
 import CatalogFolderReactSvg from "../../../assets/icons/16/catalog.folder.react.svg";
 import CheckReactSvgUrl from "../../../assets/check.react.svg?url";

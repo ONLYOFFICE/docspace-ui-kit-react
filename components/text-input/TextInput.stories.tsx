@@ -27,7 +27,7 @@
 import type React from "react";
 import { useState } from "react";
 
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TextInput } from ".";
 import { InputSize, InputType } from "./TextInput.enums";
 import type { TextInputProps } from "./TextInput.types";

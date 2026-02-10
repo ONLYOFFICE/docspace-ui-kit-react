@@ -1,5 +1,6 @@
+import React from "react";
 import type { Preview } from "@storybook/react";
-import { useDarkMode } from "storybook-dark-mode";
+import { useDarkMode } from "@vueless/storybook-dark-mode";
 
 import { ThemeProviderComponent } from "../components/theme-provider";
 import type { TColorScheme } from "../context/ThemeContext";
@@ -53,7 +54,7 @@ const darkThemeConfig = {
 const preview: Preview = {
   globalTypes,
   parameters: {
-    backgrounds: { disable: true },
+    backgrounds: { disabled: true },
     controls: {
       expanded: true,
       matchers: {
@@ -64,6 +65,9 @@ const preview: Preview = {
     darkMode: {
       light: lightTheme,
       dark: darkTheme,
+    },
+    docs: {
+      toc: true,
     },
   },
 

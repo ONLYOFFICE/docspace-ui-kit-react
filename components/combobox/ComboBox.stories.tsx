@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import MoveReactSvgUrl from "../../assets/icons/16/move.react.svg";
 import CopyReactSvgUrl from "../../assets/icons/16/copy.react.svg";
 import DownloadReactSvgUrl from "../../assets/icons/16/download.react.svg";

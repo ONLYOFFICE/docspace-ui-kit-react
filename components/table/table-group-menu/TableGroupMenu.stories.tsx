@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import ChangeToEmployeeReactSvgUrl from "../../../assets/change.to.employee.react.svg?url";
 import InfoReactSvgUrl from "../../../assets/info.outline.react.svg?url";

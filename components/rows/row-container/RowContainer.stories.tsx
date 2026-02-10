@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 
 import SendClockReactSvg from "../../../assets/send.clock.react.svg";
 import CatalogSpamReactSvg from "../../../assets/icons/16/catalog.spam.react.svg";

@@ -27,7 +27,7 @@
 // @ts-nocheck
 
 import React from "react";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import ArchiveSvgUrl from "../../assets/room.archive.react.svg?url";
 import FolderSvgUrl from "../../assets/icons/32/folder.react.svg?url";

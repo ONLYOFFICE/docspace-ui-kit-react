@@ -1,5 +1,5 @@
 import React from "react";
-import { Meta, StoryFn } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import Navigation from "./Navigation";
 import { TNavigationProps } from "./Navigation.types";
 import { DeviceType } from "../../enums";

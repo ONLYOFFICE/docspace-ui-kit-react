@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactNode } from "react";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { IndexRange } from "react-virtualized";
 
 import { InfiniteLoaderComponent } from "./InfiniteLoader";

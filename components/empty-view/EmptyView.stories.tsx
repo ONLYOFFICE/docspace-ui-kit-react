@@ -25,7 +25,7 @@
 
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import EmptySvg from "../../assets/empty.svg";
 import CrossSvg from "../../assets/icons/12/cross.react.svg";

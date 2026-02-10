@@ -10,9 +10,8 @@ const config: StorybookConfig = {
 
   addons: [
     "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-interactions",
-    "storybook-dark-mode",
+    "@vueless/storybook-dark-mode",
+    "@storybook/addon-docs",
   ],
 
   framework: {
@@ -20,7 +19,9 @@ const config: StorybookConfig = {
     options: {},
   },
 
-  docs: {},
+  docs: {
+    autodocs: true,
+  },
 
   typescript: {
     reactDocgen: "react-docgen-typescript",

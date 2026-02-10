@@ -14,7 +14,7 @@
 // You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
 
 import { useState, ChangeEvent } from "react";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import { Slider } from ".";
 import { SliderProps } from "./Slider.types";
 

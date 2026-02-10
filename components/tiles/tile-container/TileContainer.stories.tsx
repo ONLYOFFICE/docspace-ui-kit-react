@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { Meta, StoryFn } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 
 import File32ReactSvg from "../../../assets/icons/32/file.react.svg";
 import ImageReactSvg from "../../../assets/empty.rooms.root.light.svg";

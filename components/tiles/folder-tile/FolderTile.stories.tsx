@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import Folder32ReactSvg from "../../../assets/icons/32/folder.react.svg";
 import ImageReactSvg from "../../../assets/icons/96/folder.svg";
 import { Link } from "../../link";

@@ -1,5 +1,5 @@
 import React from "react";
-import { Meta, StoryFn } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react-vite";
 import { ArticleButtonLoader } from ".";
 import { ButtonLoaderProps } from "./ArticleButtonLoader.types";
 

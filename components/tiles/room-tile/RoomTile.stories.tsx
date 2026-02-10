@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import { TFunction } from "i18next";
 import PublicRoomIconReactSvg from "../../../assets/icons/32/room/public.react.svg";
 import UnpinReactSvg from "../../../assets/unpin.react.svg";
