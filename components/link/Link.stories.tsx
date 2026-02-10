@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Link, LinkTarget, LinkType } from "./index";
 
 const meta = {
-  title: "Components/Interactive Elements/Link",
+  title: "Components/Interactive elements/Link",
   component: Link,
   parameters: {
     docs: {

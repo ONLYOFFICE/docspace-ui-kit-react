@@ -28,15 +28,14 @@ import React, { useState } from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import classNames from "classnames";
 
-
- import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
- import DownloadReactSvgUrl from "../../assets/icons/16/download.react.svg?url";
+import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
+import DownloadReactSvgUrl from "../../assets/icons/16/download.react.svg?url";
 
 import { MainButtonMobile } from ".";
 import styles from "./MainButtonMobile.stories.module.scss";
 
 const meta = {
-  title: "Interactive Elements/MainButtonMobile",
+  title: "Components/Interactive elements/MainButtonMobile",
   component: MainButtonMobile,
   tags: ["autodocs"],
   parameters: {

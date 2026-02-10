@@ -5,7 +5,7 @@ Content wrapper component for tile children with consistent styling and layout.
 ## Usage
 
 ```tsx
-import { TileContent } from "@docspace/shared/components/tiles/tile-content";
+import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
 
 <TileContent>
   <Link>File name or content</Link>

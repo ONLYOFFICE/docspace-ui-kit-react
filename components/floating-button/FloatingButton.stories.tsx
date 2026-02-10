@@ -30,7 +30,7 @@ import { FloatingButton } from ".";
 import { FloatingButtonIcons } from "./FloatingButton.enums";
 
 const meta = {
-  title: "Components/Interactive Elements/FloatingButton",
+  title: "Components/Interactive elements/FloatingButton",
   component: FloatingButton,
   parameters: {
     design: {

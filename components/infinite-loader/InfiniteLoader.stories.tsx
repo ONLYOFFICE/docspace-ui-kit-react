@@ -92,7 +92,7 @@ const InfiniteLoaderDemo = () => {
 
 // Storybook metadata
 const meta = {
-  title: "Components/InfiniteLoader",
+  title: "Components/Status components/InfiniteLoader",
   component: InfiniteLoaderComponent,
   parameters: {
     docs: {
