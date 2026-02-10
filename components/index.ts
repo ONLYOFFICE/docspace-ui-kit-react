@@ -141,3 +141,5 @@ export * from "./progress-bar";
 export * from "./file-input";
 
 export * from "./rows";
+
+export * from "./filter";

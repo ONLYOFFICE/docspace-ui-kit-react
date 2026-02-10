@@ -29,7 +29,7 @@ import { StoryObj, Meta } from "@storybook/react-vite";
 import Dropzone from ".";
 
 const meta = {
-  title: "Components/Dropzone",
+  title: "Components/Interactive elements/Dropzone",
   component: Dropzone,
   argTypes: {
     isLoading: {

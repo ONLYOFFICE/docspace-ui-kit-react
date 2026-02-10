@@ -32,7 +32,7 @@ import ErrorContainer from "./ErrorContainer";
 type ErrorContainerType = FC<ErrorContainerProps>;
 
 const meta: Meta<ErrorContainerType> = {
-  title: "Layout components/ErrorContainer",
+  title: "Components/Layout components/ErrorContainer",
   component: ErrorContainer,
   argTypes: {
     onClickButton: { action: "clicked" },

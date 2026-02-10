@@ -5,7 +5,7 @@ File tile component for displaying file information in a tile format with thumbn
 ## Usage
 
 ```tsx
-import { FileTile } from "@docspace/shared/components/tiles/file-tile";
+import { FileTile } from "@docspace/ui-kit/components/tiles/file-tile";
 
 <FileTile
   item={{

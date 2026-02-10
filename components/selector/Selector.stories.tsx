@@ -49,7 +49,7 @@ import { globalColors } from "../../providers/theme";
 import { EmployeeStatus, EmployeeType } from "../../enums";
 
 const meta = {
-  title: "Components/Selector",
+  title: "Components/Layout components/Selector",
   component: Selector,
   parameters: {},
 } satisfies Meta<typeof Selector>;

@@ -70,10 +70,18 @@ import {
 
 import {
   toTimezone,
+  toAppTimezone,
   isValidTimezone,
+  getBrowserTimezone,
+  getAppTimezone,
+  getTimezoneOffset,
   toUnixTimestamp,
   fromUnixTimestamp,
   toISOString,
+  formatWithTimezone,
+  setDefaultTimezone,
+  setDefaultLocale,
+  toJSDate,
 } from "./timezone";
 
 describe("Date Utilities", () => {
@@ -267,7 +275,9 @@ describe("Date Utilities", () => {
     });
 
     it("humanizes with suffix", () => {
-      expect(humanizeDuration(2, "days", { addSuffix: true })).toBe("in 2 days");
+      expect(humanizeDuration(2, "days", { addSuffix: true })).toBe(
+        "in 2 days",
+      );
       expect(humanizeDuration(-2, "days", { addSuffix: true })).toBe(
         "2 days ago",
       );
@@ -325,15 +335,80 @@ describe("Date Utilities", () => {
   });
 
   describe("timezone", () => {
+    beforeEach(() => {
+      vi.restoreAllMocks();
+      const win = window as Window & { timezone?: string };
+      Reflect.deleteProperty(win, "timezone");
+      Settings.defaultZone = undefined as unknown as string;
+      Settings.defaultLocale = undefined as unknown as string;
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      const win = window as Window & { timezone?: string };
+      Reflect.deleteProperty(win, "timezone");
+      Settings.defaultZone = undefined as unknown as string;
+      Settings.defaultLocale = undefined as unknown as string;
+    });
+
     it("converts to timezone correctly", () => {
       const date = DateTime.fromISO("2024-01-15T10:00:00.000Z");
       const result = toTimezone(date, "America/New_York");
       expect(result?.zoneName).toBe("America/New_York");
     });
 
+    it("returns null when converting null to timezone", () => {
+      expect(toTimezone(null, "UTC")).toBeNull();
+    });
+
+    it("gets browser and app timezone", () => {
+      const dateTimeFormatSpy = vi
+        .spyOn(Intl, "DateTimeFormat")
+        .mockImplementation(() => ({
+          resolvedOptions: () => ({ timeZone: "UTC" }),
+        } as unknown as Intl.DateTimeFormat));
+
+      expect(getBrowserTimezone()).toBe("UTC");
+      const win = window as Window & { timezone?: string };
+      win.timezone = "Europe/Riga";
+      expect(getAppTimezone()).toBe("Europe/Riga");
+
+      dateTimeFormatSpy.mockRestore();
+    });
+
+    it("falls back to browser timezone when app timezone is unset", () => {
+      const dateTimeFormatSpy = vi
+        .spyOn(Intl, "DateTimeFormat")
+        .mockImplementation(() => ({
+          resolvedOptions: () => ({ timeZone: "Asia/Tokyo" }),
+        } as unknown as Intl.DateTimeFormat));
+
+      const win = window as Window & { timezone?: string };
+      Reflect.deleteProperty(win, "timezone");
+      expect(getAppTimezone()).toBe("Asia/Tokyo");
+
+      dateTimeFormatSpy.mockRestore();
+    });
+
+    it("converts to app timezone", () => {
+      const win = window as Window & { timezone?: string };
+      win.timezone = "UTC";
+      const result = toAppTimezone("2024-01-15T10:00:00Z");
+
+      expect(result?.zoneName).toBe("UTC");
+    });
+
     it("validates timezone correctly", () => {
       expect(isValidTimezone("America/New_York")).toBe(true);
       expect(isValidTimezone("Invalid/Timezone")).toBe(false);
+    });
+
+    it("returns timezone offset", () => {
+      vi.spyOn(DateTime, "now").mockReturnValue(
+        DateTime.fromISO("2024-01-01T00:00:00Z", { zone: "UTC" }) as unknown as DateTime,
+      );
+
+      expect(getTimezoneOffset("UTC")).toBe(0);
     });
 
     it("converts to/from Unix timestamp", () => {
@@ -345,10 +420,46 @@ describe("Date Utilities", () => {
       expect(backToDate.year).toBe(2024);
     });
 
+    it("returns zero timestamp for null input", () => {
+      expect(toUnixTimestamp(null)).toBe(0);
+    });
+
     it("converts to ISO string", () => {
       const date = new Date(2024, 0, 15, 10, 30, 0);
       const result = toISOString(date);
       expect(result).toContain("2024-01-15");
+    });
+
+    it("returns empty string for ISO conversion when date is null", () => {
+      expect(toISOString(null)).toBe("");
+    });
+
+    it("formats with timezone and locale", () => {
+      const formatted = formatWithTimezone("2024-01-01T00:00:00Z", "ZZ", {
+        timezone: "Europe/Riga",
+        locale: "fr",
+      });
+
+      expect(formatted).toBe("+02:00");
+    });
+
+    it("returns empty string when formatting null date", () => {
+      expect(formatWithTimezone(null, "yyyy")).toBe("");
+    });
+
+    it("sets default timezone and locale", () => {
+      setDefaultTimezone("UTC");
+      setDefaultLocale("fr");
+
+      expect(Settings.defaultZone?.name).toBe("UTC");
+      expect(Settings.defaultLocale).toBe("fr");
+    });
+
+    it("handles toJSDate for invalid and valid DateTime", () => {
+      expect(toJSDate(null)).toBeNull();
+
+      const valid = DateTime.fromISO("2024-01-01T00:00:00Z");
+      expect(toJSDate(valid)).toBeInstanceOf(Date);
     });
   });
 });

@@ -10,7 +10,7 @@ import { ArticleProps } from "./Article.types";
 import { ContextMenuModel } from "../context-menu";
 
 export default {
-  title: "Layout Components/Article",
+  title: "Components/Layout Components/Article",
   component: Article,
   parameters: {
     docs: {

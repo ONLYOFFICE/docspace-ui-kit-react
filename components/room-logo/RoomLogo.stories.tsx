@@ -30,7 +30,7 @@ import { RoomsType } from "../../enums";
 import { RoomLogoPure } from "./RoomLogo";
 
 const meta = {
-  title: "Base UI components/RoomLogo",
+  title: "Components/UI/RoomLogo",
   component: RoomLogoPure,
   parameters: {
     docs: {

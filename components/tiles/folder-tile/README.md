@@ -5,7 +5,7 @@ Folder tile component for displaying folder information in a tile format with su
 ## Usage
 
 ```tsx
-import { FolderTile } from "@docspace/shared/components/tiles/folder-tile";
+import { FolderTile } from "@docspace/ui-kit/components/tiles/folder-tile";
 
 <FolderTile
   item={{

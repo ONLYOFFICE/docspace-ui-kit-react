@@ -31,49 +31,49 @@ import { ColorPicker } from "./ColorPicker";
 import { globalColors } from "../../providers/theme";
 
 const meta = {
-	title: "Components/ColorPicker",
-	component: ColorPicker,
-	parameters: {
-		docs: {
-			description: {
-				component:
-					"A color picker component that allows users to select colors using a visual picker or hex input. Supports both standalone picker mode and a modal-like interface with apply/cancel actions.",
-			},
-		},
-	},
-	argTypes: {
-		appliedColor: {
-			control: "color",
-			description: "The currently selected color in hex format",
-			defaultValue: globalColors.lightBlueMain,
-		},
-		isPickerOnly: {
-			control: "boolean",
-			description:
-				"If true, shows only the color picker without hex input and buttons",
-		},
-		applyButtonLabel: {
-			control: "text",
-			description: "Label for the apply button",
-		},
-		cancelButtonLabel: {
-			control: "text",
-			description: "Label for the cancel button",
-		},
-		hexCodeLabel: {
-			control: "text",
-			description: "Label for the hex code input field",
-		},
-		onApply: {
-			description: "Callback when the apply button is clicked",
-		},
-		onClose: {
-			description: "Callback when the cancel button or close icon is clicked",
-		},
-		handleChange: {
-			description: "Callback that fires on every color change",
-		},
-	},
+  title: "Components/Interactive elements/ColorPicker",
+  component: ColorPicker,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "A color picker component that allows users to select colors using a visual picker or hex input. Supports both standalone picker mode and a modal-like interface with apply/cancel actions.",
+      },
+    },
+  },
+  argTypes: {
+    appliedColor: {
+      control: "color",
+      description: "The currently selected color in hex format",
+      defaultValue: globalColors.lightBlueMain,
+    },
+    isPickerOnly: {
+      control: "boolean",
+      description:
+        "If true, shows only the color picker without hex input and buttons",
+    },
+    applyButtonLabel: {
+      control: "text",
+      description: "Label for the apply button",
+    },
+    cancelButtonLabel: {
+      control: "text",
+      description: "Label for the cancel button",
+    },
+    hexCodeLabel: {
+      control: "text",
+      description: "Label for the hex code input field",
+    },
+    onApply: {
+      description: "Callback when the apply button is clicked",
+    },
+    onClose: {
+      description: "Callback when the cancel button or close icon is clicked",
+    },
+    handleChange: {
+      description: "Callback that fires on every color change",
+    },
+  },
 } satisfies Meta<typeof ColorPicker>;
 
 type Story = StoryObj<typeof ColorPicker>;
@@ -81,68 +81,68 @@ type Story = StoryObj<typeof ColorPicker>;
 export default meta;
 
 export const Default: Story = {
-	args: {
-		isPickerOnly: false,
-		appliedColor: globalColors.lightBlueMain,
-		applyButtonLabel: "Apply",
-		cancelButtonLabel: "Cancel",
-		hexCodeLabel: "Hex code",
-		onClose: () => console.log("Close clicked"),
-		onApply: (color) => console.log("Apply clicked with color:", color),
-		handleChange: (color) => console.log("Color changed to:", color),
-	},
+  args: {
+    isPickerOnly: false,
+    appliedColor: globalColors.lightBlueMain,
+    applyButtonLabel: "Apply",
+    cancelButtonLabel: "Cancel",
+    hexCodeLabel: "Hex code",
+    onClose: () => console.log("Close clicked"),
+    onApply: (color) => console.log("Apply clicked with color:", color),
+    handleChange: (color) => console.log("Color changed to:", color),
+  },
 };
 
 export const PickerOnly: Story = {
-	args: {
-		...Default.args,
-		isPickerOnly: true,
-	},
+  args: {
+    ...Default.args,
+    isPickerOnly: true,
+  },
 };
 
 export const CustomLabels: Story = {
-	args: {
-		...Default.args,
-		applyButtonLabel: "Save Color",
-		cancelButtonLabel: "Discard",
-		hexCodeLabel: "Color Code",
-	},
+  args: {
+    ...Default.args,
+    applyButtonLabel: "Save Color",
+    cancelButtonLabel: "Discard",
+    hexCodeLabel: "Color Code",
+  },
 };
 
 export const PresetColor: Story = {
-	args: {
-		...Default.args,
-		appliedColor: "#FF0000",
-	},
+  args: {
+    ...Default.args,
+    appliedColor: "#FF0000",
+  },
 };
 
 export const WithChangeHandler: Story = {
-	args: {
-		...Default.args,
-		handleChange: (color) => {
-			console.log("Selected color:", color);
-			// You can perform additional actions here
-		},
-	},
+  args: {
+    ...Default.args,
+    handleChange: (color) => {
+      console.log("Selected color:", color);
+      // You can perform additional actions here
+    },
+  },
 };
 
 // Example of how to use the ColorPicker in a controlled way
 export const Controlled: Story = {
-	render: function ControlledStory() {
-		const [color, setColor] = React.useState(globalColors.lightBlueMain);
+  render: function ControlledStory() {
+    const [color, setColor] = React.useState(globalColors.lightBlueMain);
 
-		return (
-			<div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-				<ColorPicker
-					isPickerOnly={false}
-					appliedColor={color}
-					handleChange={setColor}
-					onApply={(newColor) => {
-						setColor(newColor);
-						console.log("Applied color:", newColor);
-					}}
-				/>
-			</div>
-		);
-	},
+    return (
+      <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+        <ColorPicker
+          isPickerOnly={false}
+          appliedColor={color}
+          handleChange={setColor}
+          onApply={(newColor) => {
+            setColor(newColor);
+            console.log("Applied color:", newColor);
+          }}
+        />
+      </div>
+    );
+  },
 };

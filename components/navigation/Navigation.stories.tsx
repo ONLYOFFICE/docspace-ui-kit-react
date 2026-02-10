@@ -6,7 +6,7 @@ import { DeviceType } from "../../enums";
 import "./Navigation.stories.scss";
 
 export default {
-  title: "Layout Components/Navigation",
+  title: "Components/Layout Components/Navigation",
   component: Navigation,
   parameters: {
     docs: {

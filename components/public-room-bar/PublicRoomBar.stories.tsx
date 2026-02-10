@@ -32,7 +32,7 @@ import PublicRoomBar from "./index";
 import type { PublicRoomBarProps } from "./PublicRoomBar.types";
 
 export default {
-  title: "Base UI Components/PublicRoomBar",
+  title: "Components/UI/PublicRoomBar",
   component: PublicRoomBar,
   argTypes: {
     headerText: {

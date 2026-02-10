@@ -290,3 +290,57 @@ export const enum VDRIndexingAction {
   LowerIndex = "LowerIndex",
   MoveIndex = "MoveIndex",
 }
+
+export const enum FilterGroups {
+  filterType = "filter-filterType",
+  filterAuthor = "filter-author",
+  filterSharedBy = "filter-sharedBy",
+  filterFolders = "filter-folders",
+  filterRoom = "filter-room",
+  filterContent = "filter-withContent",
+  filterQuota = "filter-quota",
+  roomFilterProviderType = "filter-provider-type",
+  roomFilterType = "filter-type",
+  roomFilterSubject = "filter-subject",
+  roomFilterOwner = "filter-owner",
+  roomFilterTags = "filter-tags",
+  roomFilterFolders = "filter-withSubfolders",
+  roomFilterContent = "filter-content",
+  filterGroup = "filter-group",
+  groupsFilterMember = "filter-group-member",
+  groupsFilterManager = "filter-group-manager",
+  filterLoginType = "filter-login-type",
+  filterStatus = "filter-status",
+  filterAccount = "filter-account",
+  filterOther = "filter-other",
+  filterInviter = "filter-inviter",
+  filterLocation = "filter-location",
+}
+
+export const enum FilterKeys {
+  withSubfolders = "withSubfolders",
+  excludeSubfolders = "excludeSubfolders",
+  withContent = "withContent",
+  me = "me",
+  other = "other",
+  user = "user",
+  withoutGroup = "withoutGroup",
+  selectedGroup = "selectedGroup",
+  byManager = "byManager",
+  customQuota = "2",
+  defaultQuota = "1",
+}
+
+export const enum FilterSelectorTypes {
+  people = "people-selector",
+  rooms = "rooms-selector",
+  groups = "groups-selector",
+}
+
+export const enum Events {
+  CREATE = "create",
+  RENAME = "rename",
+  ROOM_CREATE = "create_room",
+  ROOM_EDIT = "edit_room",
+  CHANGE_COLUMN = "change_column",
+}

@@ -32,7 +32,7 @@ import { Paging } from "./Paging";
 import { PagingProps } from "./Paging.types";
 
 const meta = {
-  title: "Components/Paging",
+  title: "Components/Interactive elements/Paging",
   component: Paging,
   parameters: {
     docs: {

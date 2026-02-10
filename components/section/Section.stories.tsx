@@ -5,7 +5,7 @@ import Section from "./index";
 import { DeviceType } from "../../enums";
 
 const meta: Meta<typeof Section> = {
-  title: "Layout Components/Section",
+  title: "Components/Layout Components/Section",
   component: Section,
   parameters: {
     docs: {
