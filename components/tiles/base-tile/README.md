@@ -5,7 +5,7 @@ Base tile component that provides the foundational structure and functionality f
 ## Usage
 
 ```tsx
-import { BaseTile } from "@docspace/shared/components/tiles/base-tile";
+import { BaseTile } from "@docspace/ui-kit/components/tiles/base-tile";
 
 <BaseTile
   item={item}

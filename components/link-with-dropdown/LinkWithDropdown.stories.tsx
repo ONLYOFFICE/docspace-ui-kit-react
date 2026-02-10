@@ -28,7 +28,7 @@ import { Meta, StoryObj } from "@storybook/react";
 import { LinkWithDropdown } from "./LinkWithDropdown";
 
 const meta = {
-  title: "Components/LinkWithDropdown",
+  title: "Components/Interactive elements/LinkWithDropdown",
   component: LinkWithDropdown,
   parameters: {
     docs: {

@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { CircleSkeleton } from ".";
 
 const meta: Meta<typeof CircleSkeleton> = {
-  title: "Components/Skeletons/Circle",
+  title: "Skeletons/Circle",
   component: CircleSkeleton,
   tags: ["autodocs"],
   argTypes: {

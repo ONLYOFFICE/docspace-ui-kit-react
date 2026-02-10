@@ -26,7 +26,7 @@
 
 import { Text } from "../text";
 
-import EmptyViewOption from "./sub-components/EmptyView.option";
+import EmptyViewOption from "./sub-components/EmptyViewOption";
 
 import styles from "./EmptyView.module.scss";
 import type { EmptyViewProps } from "./EmptyView.types";

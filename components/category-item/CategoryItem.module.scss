@@ -82,10 +82,8 @@
 .arrowIcon {
   @include mixins.common-icons-style;
 
-  svg {
-    path {
-      fill: var(--settings-arrow-fill);
-    }
+  path {
+    fill: var(--settings-arrow-fill);
   }
 
   :global(.rtl) & {

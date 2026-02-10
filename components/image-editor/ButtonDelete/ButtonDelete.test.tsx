@@ -25,62 +25,48 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 
-import ArrowIcon from "../../../assets/right.arrow.react.svg";
+import ButtonDelete from "./index";
 
-import { Text } from "../../text";
-import { ContextMenu, type ContextMenuRefType } from "../../context-menu";
+vi.mock("../../../assets/icons/16/trash.react.svg", () => ({
+  __esModule: true,
+  default: () => <svg data-testid="trash-icon" />,
+}));
 
-import styles from "../EmptyView.module.scss";
-import type { EmptyViewItemProps } from "../EmptyView.types";
+const mockT = vi.fn((key: string) => key);
 
-export const EmptyViewItem = ({
-  description,
-  icon,
-  title,
-  onClick,
-  disabled,
-  model,
-  id,
-}: EmptyViewItemProps) => {
-  const contextRef = React.useRef<ContextMenuRefType>(null);
+describe("ButtonDelete", () => {
+  it("renders tooltip title with translation", () => {
+    render(<ButtonDelete t={mockT} onClick={vi.fn()} />);
 
-  if (disabled) return;
+    const button = screen.getByTestId("cropper_delete_button");
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveAttribute("title", "Common:Delete");
+    expect(mockT).toHaveBeenCalledWith("Common:Delete");
+  });
 
-  const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (!model) return onClick?.(event);
+  it("renders delete text and icon", () => {
+    render(<ButtonDelete t={mockT} onClick={vi.fn()} />);
 
-    contextRef.current?.show(event);
-  };
+    expect(screen.getByText("Common:Delete")).toBeInTheDocument();
+    expect(screen.getByTestId("trash-icon")).toBeInTheDocument();
+  });
 
-  const elementProps = { className: styles.itemIcon };
+  it("applies custom className", () => {
+    render(<ButtonDelete t={mockT} onClick={vi.fn()} className="custom" />);
 
-  return (
-    <div
-      id={id}
-      role="button"
-      tabIndex={0}
-      aria-label={title}
-      onClick={handleClick}
-      className={styles.itemWrapper}
-    >
-      <ContextMenu ref={contextRef} model={model ?? []} />
-      {React.cloneElement(icon, elementProps)}
-      <div className={styles.itemBody}>
-        <Text
-          as="h4"
-          fontWeight="600"
-          lineHeight="20px"
-          className={styles.itemHeader}
-          noSelect
-        >
-          {title}
-        </Text>
-        <Text as="p" fontSize="12px" className={styles.itemSubheading} noSelect>
-          {description}
-        </Text>
-      </div>
-      <ArrowIcon className={styles.arrowIcon} />
-    </div>
-  );
-};
+    const button = screen.getByTestId("cropper_delete_button");
+    expect(button).toHaveClass("custom");
+  });
+
+  it("calls onClick handler", () => {
+    const handleClick = vi.fn();
+
+    render(<ButtonDelete t={mockT} onClick={handleClick} />);
+
+    fireEvent.click(screen.getByTestId("cropper_delete_button"));
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+});

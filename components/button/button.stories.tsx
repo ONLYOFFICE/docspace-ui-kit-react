@@ -35,7 +35,7 @@ import { Button, ButtonSize } from ".";
 import type { ButtonProps } from "./Button.types";
 
 const meta = {
-  title: "Components/Interactive Elements/Button",
+  title: "Components/Interactive elements/Button",
   component: Button,
   parameters: {
     docs: {

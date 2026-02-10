@@ -1,6 +1,7 @@
 import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { screen, fireEvent, act, render } from "@testing-library/react";
+import * as deviceDetect from "react-device-detect";
 
 import { DeviceType } from "../../enums";
 import Article from "./index";
@@ -44,6 +45,16 @@ vi.mock("react-device-detect", () => ({
   isMobileOnly: false,
   isIOS: false,
 }));
+
+type DeviceFlags = {
+  isMobile: boolean;
+  isMobileOnly: boolean;
+  isIOS: boolean;
+};
+
+const setDeviceFlags = (flags: Partial<DeviceFlags>) => {
+  Object.assign(deviceDetect as Record<string, unknown>, flags);
+};
 
 const defaultProps = {
   showText: true,
@@ -92,6 +103,7 @@ describe("Article", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    setDeviceFlags({ isMobile: false, isMobileOnly: false, isIOS: false });
   });
 
   it("renders without crashing", () => {
@@ -126,6 +138,13 @@ describe("Article", () => {
 
     renderComponent({ children });
     expect(screen.getByText("Body Content")).toBeInTheDocument();
+  });
+
+  it("ignores children with unknown display names", () => {
+    const children = [<div key="custom">Custom Slot</div>];
+
+    renderComponent({ children });
+    expect(screen.queryByText("Custom Slot")).not.toBeInTheDocument();
   });
 
   it("shows profile when not hidden", () => {
@@ -207,6 +226,103 @@ describe("Article", () => {
     expect(setIsMobileArticle).toHaveBeenCalledWith(true);
   });
 
+  it("reschedules tablet height calculation when main bar height is zero", () => {
+    vi.useFakeTimers();
+    const timeoutSpy = vi.spyOn(window, "setTimeout");
+    const getElementByIdSpy = vi
+      .spyOn(document, "getElementById")
+      .mockReturnValue({ offsetHeight: 0 } as HTMLElement);
+
+    renderComponent({ mainBarVisible: true });
+
+    expect(timeoutSpy).toHaveBeenCalledWith(expect.any(Function), 0);
+
+    getElementByIdSpy.mockRestore();
+    timeoutSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("subtracts main bar height from tablet height when available", () => {
+    const originalUseState = React.useState;
+    const setCorrectTabletHeight = vi.fn();
+    let callIndex = 0;
+    const useStateMock = vi
+      .spyOn(React, "useState")
+      .mockImplementation(((initial?: unknown) => {
+        const result = originalUseState(initial as never);
+        if (callIndex === 3) {
+          callIndex += 1;
+          return [
+            result[0],
+            setCorrectTabletHeight as React.Dispatch<React.SetStateAction<unknown>>,
+          ];
+        }
+        callIndex += 1;
+        return result;
+      }) as unknown as typeof React.useState);
+
+    const getElementByIdSpy = vi
+      .spyOn(document, "getElementById")
+      .mockReturnValue({ offsetHeight: 120 } as HTMLElement);
+
+    const originalInnerHeight = window.innerHeight;
+    Object.defineProperty(window, "innerHeight", {
+      configurable: true,
+      value: 900,
+    });
+
+    renderComponent({ mainBarVisible: true });
+
+    expect(setCorrectTabletHeight).toHaveBeenCalledWith(780);
+
+    Object.defineProperty(window, "innerHeight", {
+      configurable: true,
+      value: originalInnerHeight,
+    });
+    getElementByIdSpy.mockRestore();
+    useStateMock.mockRestore();
+  });
+
+  it("attaches visualViewport resize listener on supported mobile iOS browsers", () => {
+    const addEventListener = vi.fn();
+    const removeEventListener = vi.fn();
+    const originalViewport = window.visualViewport;
+    Object.defineProperty(window, "visualViewport", {
+      configurable: true,
+      value: { addEventListener, removeEventListener },
+    });
+
+    setDeviceFlags({ isMobile: true, isMobileOnly: false, isIOS: true });
+
+    const { unmount } = renderComponent();
+
+    expect(addEventListener).toHaveBeenCalledWith("resize", expect.any(Function));
+
+    unmount();
+    expect(removeEventListener).toHaveBeenCalledWith("resize", expect.any(Function));
+
+    Object.defineProperty(window, "visualViewport", {
+      configurable: true,
+      value: originalViewport,
+    });
+  });
+
+  it("sets showText to false on tablet when local storage flag is false", () => {
+    const setIsMobileArticle = vi.fn();
+    const setShowText = vi.fn();
+
+    localStorage.setItem("showArticle", "false");
+
+    renderComponent({
+      currentDeviceType: DeviceType.tablet,
+      setIsMobileArticle,
+      setShowText,
+    });
+
+    expect(setIsMobileArticle).toHaveBeenCalledWith(true);
+    expect(setShowText).toHaveBeenCalledWith(false);
+  });
+
   it("shows backdrop on mobile when article is open", () => {
     renderComponent({
       currentDeviceType: DeviceType.mobile,
@@ -226,5 +342,13 @@ describe("Article", () => {
 
     fireEvent.click(screen.getByTestId("backdrop"));
     expect(toggleArticleOpen).toHaveBeenCalled();
+  });
+
+  it("renders Article.MainButton without additional markup", () => {
+    const { container } = render(
+      <Article.MainButton>Action</Article.MainButton>,
+    );
+
+    expect(container).toBeEmptyDOMElement();
   });
 });

@@ -5,7 +5,7 @@ Container component for organizing and displaying tiles in a grid layout with au
 ## Usage
 
 ```tsx
-import { TileContainer } from "@docspace/shared/components/tiles/tile-container";
+import { TileContainer } from "@docspace/ui-kit/components/tiles/tile-container";
 
 <TileContainer
   headingFolders="Folders"
