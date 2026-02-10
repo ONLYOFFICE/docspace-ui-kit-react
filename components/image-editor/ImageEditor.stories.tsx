@@ -31,7 +31,7 @@ import { ImageEditor } from "./index";
 import { ImageEditorProps, TImage } from "./ImageEditor.types";
 
 export default {
-  title: "Components/ImageEditor",
+  title: "Components/Interactive elements/ImageEditor",
   component: ImageEditor,
   argTypes: {
     isDisabled: {

@@ -35,7 +35,7 @@ import { DialogInvitePanelSkeleton } from "./Dialog.invite";
 import { DialogReassignmentSkeleton } from "./Dialog.reassignment";
 
 const meta = {
-  title: "Components/Skeletons/Dialog",
+  title: "Skeletons/Dialog",
   parameters: {
     docs: {
       description: {
@@ -52,7 +52,9 @@ type Story = StoryObj<typeof meta>;
 
 export const DefaultDialog: Story = {
   name: "Default Dialog",
-  render: () => <DialogModalSkeleton isLarge={false} withFooterBorder={false} />,
+  render: () => (
+    <DialogModalSkeleton isLarge={false} withFooterBorder={false} />
+  ),
   parameters: {
     docs: {
       description: {

@@ -5,7 +5,7 @@ Room tile component for displaying room information in a tile format with tags a
 ## Usage
 
 ```tsx
-import { RoomTile } from "@docspace/shared/components/tiles/room-tile";
+import { RoomTile } from "@docspace/ui-kit/components/tiles/room-tile";
 
 <RoomTile
   t={(key) => key}
