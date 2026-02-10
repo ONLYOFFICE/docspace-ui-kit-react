@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StoryFn, Meta } from "@storybook/react";
+import { StoryFn, Meta } from "@storybook/react-vite";
 
 import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
