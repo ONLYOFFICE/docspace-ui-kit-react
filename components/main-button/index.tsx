@@ -27,7 +27,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { ReactSVG } from "react-svg";
 import classNames from "classnames";
-import TriangleNavigationDownReactSvg from "../../assets/triangle.navigation.down.react.svg";
+import TriangleNavigationDownReactSvgUrl from "../../assets/triangle.navigation.down.react.svg?url";
 import { GuidanceRefKey } from "../../enums";
 import { Text } from "../text";
 import { ContextMenu } from "../context-menu";
@@ -116,10 +116,7 @@ const MainButton = (props: MainButtonProps) => {
         <Text className={styles.text}>{text}</Text>
         {isDropdown ? (
           <>
-            <ReactSVG
-              className={styles.img}
-              src={TriangleNavigationDownReactSvg as unknown as string}
-            />
+            <ReactSVG className={styles.img} src={TriangleNavigationDownReactSvgUrl} />
             <ContextMenu
               className={styles.menu}
               model={model}
