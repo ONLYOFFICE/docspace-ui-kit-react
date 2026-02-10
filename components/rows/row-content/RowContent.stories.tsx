@@ -40,7 +40,7 @@ import { globalColors } from "../../../providers/theme";
 import styles from "./RowContent.stories.module.scss";
 
 export default {
-  title: "Components/RowContent",
+  title: "Components/Rows/RowContent",
   component: RowContent,
 };
 

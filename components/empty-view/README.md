@@ -13,13 +13,13 @@ A component for displaying empty states with customizable icons, titles, descrip
 ## Installation
 
 ```tsx
-import { EmptyView } from "@docspace/ui-kit";
+import { EmptyView } from "@docspace/ui-kit/components/empty-view";
 ```
 
 For applications using react-router, use the shared wrapper which provides the Link component:
 
 ```tsx
-import { EmptyView } from "@docspace/shared/components/empty-view";
+import { EmptyView } from "@docspace/ui-kit/components/empty-view";
 ```
 
 ## Usage
@@ -148,7 +148,7 @@ Used for clickable list items with optional context menu.
 ### Filter Empty State
 
 ```tsx
-import { EmptyView } from "@docspace/shared/components/empty-view";
+import { EmptyView } from "@docspace/ui-kit/components/empty-view";
 import EmptyFilterIcon from "PUBLIC_DIR/images/emptyFilter/empty.filter.svg";
 import ClearFilterIcon from "PUBLIC_DIR/images/clear.empty.filter.svg";
 

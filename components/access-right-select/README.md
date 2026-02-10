@@ -3,7 +3,7 @@
 ### Usage
 
 ```js
-import { AccessRightSelect } from "@docspace/shared/components";
+import { AccessRightSelect } from "@docspace/ui-kit/components/access-right-select";
 ```
 
 ```jsx
