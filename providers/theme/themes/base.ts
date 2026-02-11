@@ -2846,6 +2846,10 @@ export const getBaseTheme = () => {
 
           warningColor: lightErrorStatus,
           color: lightStatusWarning,
+
+          payerInfo: {
+            disableColor: gray,
+          },
         },
 
         migration: {
