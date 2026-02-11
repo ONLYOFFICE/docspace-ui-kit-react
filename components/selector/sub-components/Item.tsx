@@ -29,7 +29,7 @@ import classNames from "classnames";
 
 import Planet12ReactSvg from "../../../assets/icons/12/planet.react.svg";
 import LifetimeRoomIcon from "../../../assets/lifetime-room.react.svg";
-import EveryoneIconUrl from "../../../assets/icons/16/departments.react.svg?url";
+import EveryoneIconUrl from "../../../assets/icons/16/departments.react.svg";
 
 import { getUserTypeTranslation } from "../../../utils/common";
 import { Avatar, AvatarRole, AvatarSize } from "../../avatar";
@@ -231,7 +231,8 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
 			</Text>
 		);
 
-		const itemAvatar = avatar ?? (isGroup && isSystem ? EveryoneIconUrl : "");
+		const itemAvatar =
+			avatar ?? (isGroup && isSystem ? <EveryoneIconUrl /> : "");
 
 		const isItemDisabled =
 			isDisabled ||

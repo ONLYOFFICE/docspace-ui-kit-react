@@ -52,245 +52,251 @@ import { AvatarRole, AvatarSize, AvatarActionKeys } from "./Avatar.enums";
 import { getRoleIcon, Initials, EmptyIcon } from "./Avatar.utils";
 
 export {
-  type AvatarProps,
-  type TAvatarModel,
-  AvatarRole,
-  AvatarSize,
-  AvatarActionKeys,
+	type AvatarProps,
+	type TAvatarModel,
+	AvatarRole,
+	AvatarSize,
+	AvatarActionKeys,
 };
 
 const AvatarPure = ({
-  size,
-  source,
-  userName,
-  role,
-  editing,
-  isDefaultSource = false,
-  hideRoleIcon,
-  tooltipContent,
-  withTooltip,
-  className,
-  onClick,
-  isGroup = false,
-  roleIcon: roleIconProp,
-  onChangeFile,
-  model,
-  hasAvatar,
-  noClick = false,
-  isNotIcon = false,
-  imgClassName = "",
-  dataTestId,
+	size,
+	source,
+	userName,
+	role,
+	editing,
+	isDefaultSource = false,
+	hideRoleIcon,
+	tooltipContent,
+	withTooltip,
+	className,
+	onClick,
+	isGroup = false,
+	roleIcon: roleIconProp,
+	onChangeFile,
+	model,
+	hasAvatar,
+	noClick = false,
+	isNotIcon = false,
+	imgClassName = "",
+	dataTestId,
 }: AvatarProps) => {
-  const { isRTL } = useInterfaceDirection();
-  const { isBase } = useTheme();
+	const { isRTL } = useInterfaceDirection();
+	const { isBase } = useTheme();
 
-  console.log(isBase);
+	const iconRef = React.useRef<HTMLDivElement>(null);
+	const inputFilesElement = React.useRef<HTMLInputElement>(null);
 
-  const iconRef = React.useRef<HTMLDivElement>(null);
-  const inputFilesElement = React.useRef<HTMLInputElement>(null);
+	const [openEditLogo, setOpenLogoEdit] = React.useState<boolean>(false);
 
-  const [openEditLogo, setOpenLogoEdit] = React.useState<boolean>(false);
+	const onToggleOpenEditLogo = () => setOpenLogoEdit(!openEditLogo);
 
-  const onToggleOpenEditLogo = () => setOpenLogoEdit(!openEditLogo);
+	useClickOutside(iconRef, () => {
+		setOpenLogoEdit(false);
+	});
 
-  useClickOutside(iconRef, () => {
-    setOpenLogoEdit(false);
-  });
+	const onInputClick = (e: React.MouseEvent<HTMLInputElement>) => {
+		const target = e.target as HTMLInputElement;
+		target.value = "";
+	};
 
-  const onInputClick = (e: React.MouseEvent<HTMLInputElement>) => {
-    const target = e.target as HTMLInputElement;
-    target.value = "";
-  };
+	let isDefault = false;
+	let isIcon = false;
 
-  let isDefault = false;
-  let isIcon = false;
+	if (typeof source === "string") {
+		if (source?.includes("default_user_photo")) isDefault = true;
+		else if (source?.includes(".svg")) isIcon = true;
+	}
 
-  console.log(isBase, source);
+	const avatarContent = source ? (
+		typeof source !== "string" ? (
+			source
+		) : isIcon && !isNotIcon ? (
+			<div className={styles.iconWrapper}>
+				<IconButton iconName={source} className="icon" isDisabled />
+			</div>
+		) : isDefault ? (
+			isBase ? (
+				<AvatarBaseReactSvgUrl
+					className={styles.image}
+					data-is-default="true"
+				/>
+			) : (
+				<AvatarDarkReactSvgUrl
+					className={styles.image}
+					data-is-default="true"
+				/>
+			)
+		) : (
+			<img
+				src={source}
+				className={`${styles.image}${imgClassName ? ` ${imgClassName}` : ""}`}
+				alt="avatar"
+			/>
+		)
+	) : userName ? (
+		<Initials userName={userName} size={size} isGroup={isGroup} />
+	) : isDefaultSource ? (
+		isBase ? (
+			<AvatarBaseReactSvgUrl className={styles.image} data-is-default="true" />
+		) : (
+			<AvatarDarkReactSvgUrl className={styles.image} data-is-default="true" />
+		)
+	) : (
+		<EmptyIcon size={IconSizeType.scale} />
+	);
 
-  if (source?.includes("default_user_photo")) isDefault = true;
-  else if (source?.includes(".svg")) isIcon = true;
+	const roleIcon = roleIconProp ?? getRoleIcon(role);
 
-  const avatarContent = source ? (
-    isIcon && !isNotIcon ? (
-      <div className={styles.iconWrapper}>
-        <IconButton iconName={source} className="icon" isDisabled />
-      </div>
-    ) : isDefault ? (
-      isBase ? (
-        <AvatarBaseReactSvgUrl className={styles.image} data-is-default="true" />
-      ) : (
-        <AvatarDarkReactSvgUrl className={styles.image} data-is-default="true" />
-      )
-    ) : (
-      <img
-        src={source}
-        className={`${styles.image}${imgClassName ? ` ${imgClassName}` : ""}`}
-        alt="avatar"
-      />
-    )
-  ) : userName ? (
-    <Initials userName={userName} size={size} isGroup={isGroup} />
-  ) : isDefaultSource ? (
-    isBase ? (
-      <AvatarBaseReactSvgUrl className={styles.image} data-is-default="true" />
-    ) : (
-      <AvatarDarkReactSvgUrl className={styles.image} data-is-default="true" />
-    )
-  ) : (
-    <EmptyIcon size={IconSizeType.scale} />
-  );
+	const uniqueTooltipId = withTooltip ? `roleTooltip_${Math.random()}` : "";
+	const tooltipPlace = isRTL ? "left" : "right";
 
-  const roleIcon = roleIconProp ?? getRoleIcon(role);
+	const getTooltipContent = ({ content }: TGetTooltipContent) => (
+		<Text fontSize="12px">{content}</Text>
+	);
 
-  const uniqueTooltipId = withTooltip ? `roleTooltip_${Math.random()}` : "";
-  const tooltipPlace = isRTL ? "left" : "right";
+	const onMouseDown = (e: React.MouseEvent) => {
+		if (e.button !== 1) return;
 
-  const getTooltipContent = ({ content }: TGetTooltipContent) => (
-    <Text fontSize="12px">{content}</Text>
-  );
+		if (onClick) onClick(e);
+	};
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 1) return;
+	const onUploadClick = (e?: React.MouseEvent) => {
+		e?.stopPropagation();
+		e?.preventDefault();
 
-    if (onClick) onClick(e);
-  };
+		if (!onChangeFile) return;
+		if (!model) return;
+		const menu = model[0];
+		menu.onClick(inputFilesElement);
+	};
 
-  const onUploadClick = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    e?.preventDefault();
+	const onClickAvatar = (e: React.MouseEvent) => {
+		if (!onChangeFile) return;
 
-    if (!onChangeFile) return;
-    if (!model) return;
-    const menu = model[0];
-    menu.onClick(inputFilesElement);
-  };
+		e.stopPropagation();
+		e.preventDefault();
+		if (noClick) return;
 
-  const onClickAvatar = (e: React.MouseEvent) => {
-    if (!onChangeFile) return;
+		if (hasAvatar) {
+			return onToggleOpenEditLogo();
+		}
 
-    e.stopPropagation();
-    e.preventDefault();
-    if (noClick) return;
+		onUploadClick();
+	};
 
-    if (hasAvatar) {
-      return onToggleOpenEditLogo();
-    }
+	const dropdownElement = (
+		<DropDown
+			open={openEditLogo}
+			clickOutsideAction={() => setOpenLogoEdit(false)}
+			withBackdrop={false}
+			isDefaultMode={false}
+		>
+			{model?.map((option) => {
+				const optionOnClickAction = () => {
+					setOpenLogoEdit(false);
 
-    onUploadClick();
-  };
+					if (option.key === AvatarActionKeys.PROFILE_AVATAR_UPLOAD) {
+						return option.onClick(inputFilesElement);
+					}
 
-  const dropdownElement = (
-    <DropDown
-      open={openEditLogo}
-      clickOutsideAction={() => setOpenLogoEdit(false)}
-      withBackdrop={false}
-      isDefaultMode={false}
-    >
-      {model?.map((option) => {
-        const optionOnClickAction = () => {
-          setOpenLogoEdit(false);
+					option.onClick();
+				};
 
-          if (option.key === AvatarActionKeys.PROFILE_AVATAR_UPLOAD) {
-            return option.onClick(inputFilesElement);
-          }
+				return (
+					<DropDownItem
+						key={option.key}
+						label={option.label}
+						icon={option.icon}
+						onClick={optionOnClickAction}
+						testId={option.key}
+					/>
+				);
+			})}
+		</DropDown>
+	);
 
-          option.onClick();
-        };
-
-        return (
-          <DropDownItem
-            key={option.key}
-            label={option.label}
-            icon={option.icon}
-            onClick={optionOnClickAction}
-            testId={option.key}
-          />
-        );
-      })}
-    </DropDown>
-  );
-
-  return (
-    <>
-      <div
-        className={classNames(styles.avatar, className)}
-        data-size={size}
-        data-no-click={noClick ? "true" : "false"}
-        onMouseDown={onMouseDown}
-        onClick={onClick || onClickAvatar}
-        ref={iconRef}
-        data-testid={dataTestId ?? "avatar"}
-        role="button"
-      >
-        <div
-          className={classNames(styles.avatarWrapper, className)}
-          data-has-source={!!source}
-          data-has-username={!!userName}
-          data-is-group={isGroup}
-        >
-          {avatarContent}
-        </div>
-        {editing && size === "max" ? (
-          <div className={classNames(styles.editContainer)}>
-            {hasAvatar ? (
-              <>
-                <IconButton
-                  className="edit_icon"
-                  iconNode={<PencilReactSvgUrl />}
-                  onClick={onToggleOpenEditLogo}
-                  size={16}
-                  dataTestId="edit_avatar_icon_button"
-                />
-                {dropdownElement}{" "}
-              </>
-            ) : (
-              <IconButton
-                className="edit_icon"
-                iconNode={<PlusSvgUrl />}
-                onClick={onUploadClick}
-                size={16}
-                dataTestId="edit_avatar_icon_button"
-              />
-            )}
-          </div>
-        ) : (
-          roleIcon &&
-          !hideRoleIcon && (
-            <div
-              className={classNames(styles.roleWrapper, "avatar_role-wrapper")}
-              data-size={size}
-              data-tooltip-id={uniqueTooltipId}
-              data-tooltip-content={tooltipContent}
-            >
-              {roleIcon}
-            </div>
-          )
-        )}
-        {withTooltip ? (
-          <Tooltip
-            float
-            id={uniqueTooltipId}
-            getContent={getTooltipContent}
-            place={tooltipPlace}
-            opacity={1}
-          />
-        ) : null}
-      </div>
-      {onChangeFile ? (
-        <input
-          id="customAvatarInput"
-          className="custom-file-input"
-          type="file"
-          onChange={onChangeFile}
-          accept="image/png, image/jpeg"
-          onClick={onInputClick}
-          ref={inputFilesElement}
-          style={{ display: "none" }}
-          data-testid="file-input"
-        />
-      ) : null}
-    </>
-  );
+	return (
+		<>
+			<div
+				className={classNames(styles.avatar, className)}
+				data-size={size}
+				data-no-click={noClick ? "true" : "false"}
+				onMouseDown={onMouseDown}
+				onClick={onClick || onClickAvatar}
+				ref={iconRef}
+				data-testid={dataTestId ?? "avatar"}
+				role="button"
+			>
+				<div
+					className={classNames(styles.avatarWrapper, className)}
+					data-has-source={!!source}
+					data-has-username={!!userName}
+					data-is-group={isGroup}
+				>
+					{avatarContent}
+				</div>
+				{editing && size === "max" ? (
+					<div className={classNames(styles.editContainer)}>
+						{hasAvatar ? (
+							<>
+								<IconButton
+									className="edit_icon"
+									iconNode={<PencilReactSvgUrl />}
+									onClick={onToggleOpenEditLogo}
+									size={16}
+									dataTestId="edit_avatar_icon_button"
+								/>
+								{dropdownElement}{" "}
+							</>
+						) : (
+							<IconButton
+								className="edit_icon"
+								iconNode={<PlusSvgUrl />}
+								onClick={onUploadClick}
+								size={16}
+								dataTestId="edit_avatar_icon_button"
+							/>
+						)}
+					</div>
+				) : (
+					roleIcon &&
+					!hideRoleIcon && (
+						<div
+							className={classNames(styles.roleWrapper, "avatar_role-wrapper")}
+							data-size={size}
+							data-tooltip-id={uniqueTooltipId}
+							data-tooltip-content={tooltipContent}
+						>
+							{roleIcon}
+						</div>
+					)
+				)}
+				{withTooltip ? (
+					<Tooltip
+						float
+						id={uniqueTooltipId}
+						getContent={getTooltipContent}
+						place={tooltipPlace}
+						opacity={1}
+					/>
+				) : null}
+			</div>
+			{onChangeFile ? (
+				<input
+					id="customAvatarInput"
+					className="custom-file-input"
+					type="file"
+					onChange={onChangeFile}
+					accept="image/png, image/jpeg"
+					onClick={onInputClick}
+					ref={inputFilesElement}
+					style={{ display: "none" }}
+					data-testid="file-input"
+				/>
+			) : null}
+		</>
+	);
 };
 
 const Avatar = memo(AvatarPure);
