@@ -157,61 +157,67 @@ const ListComponent = ({
   });
 
   return (
-    <InfiniteLoader
-      isRowLoaded={isItemLoaded}
-      rowCount={itemCount}
-      loadMoreRows={loadMoreItems}
-      ref={loaderRef}
+    <div
+      style={{ display: "contents" }}
       data-testid="infinite-loader-container-list"
     >
-      {({ onRowsRendered, registerChild }) => (
-        <WindowScroller scrollElement={scroll}>
-          {({ height, isScrolling, onChildScroll, scrollTop }) => {
-            let newHeight = height;
-            if (height === undefined && scroll instanceof Element) {
-              newHeight = scroll.getBoundingClientRect().height;
-            }
+      <InfiniteLoader
+        isRowLoaded={isItemLoaded}
+        rowCount={itemCount}
+        loadMoreRows={loadMoreItems}
+        ref={loaderRef}
+      >
+        {({ onRowsRendered, registerChild }) => (
+          <WindowScroller scrollElement={scroll}>
+            {({ height, isScrolling, onChildScroll, scrollTop }) => {
+              let newHeight = height;
+              if (height === undefined && scroll instanceof Element) {
+                newHeight = scroll.getBoundingClientRect().height;
+              }
 
-            const viewId =
-              viewAs === "table" ? "table-container" : "rowContainer";
+              const viewId =
+                viewAs === "table" ? "table-container" : "rowContainer";
 
-            const width =
-              document.getElementById(viewId)?.getBoundingClientRect().width ??
-              0;
+              const width =
+                document.getElementById(viewId)?.getBoundingClientRect()
+                  .width ?? 0;
 
-            return (
-              <List
-                autoHeight
-                height={newHeight}
-                onRowsRendered={onRowsRendered}
-                ref={(ref: List | null) => {
-                  listRef.current = ref;
-                  registerChild(ref);
-                }}
-                rowCount={hasMoreFiles ? children.length + 2 : children.length}
-                rowHeight={itemSize}
-                rowRenderer={viewAs === "table" ? renderTable : renderRow}
-                isScrolling={isScrolling}
-                onChildScroll={onChildScroll}
-                scrollTop={scrollTop}
-                overscanRowCount={3}
-                onScroll={onScroll}
-                viewAs={viewAs}
-                width={width}
-                // React virtualized sets "LTR" by default.
-                style={
-                  {
-                    direction: "inherit",
-                    "--infinite-loader-table-width": `${width}px`,
-                  } as React.CSSProperties
-                }
-                className={listClassName}
-              />
-            );
-          }}
-        </WindowScroller>
-      )}
-    </InfiniteLoader>
+              return (
+                <List
+                  autoHeight
+                  height={newHeight}
+                  onRowsRendered={onRowsRendered}
+                  ref={(ref: List | null) => {
+                    listRef.current = ref;
+                    registerChild(ref);
+                  }}
+                  rowCount={
+                    hasMoreFiles ? children.length + 2 : children.length
+                  }
+                  rowHeight={itemSize}
+                  rowRenderer={viewAs === "table" ? renderTable : renderRow}
+                  isScrolling={isScrolling}
+                  onChildScroll={onChildScroll}
+                  scrollTop={scrollTop}
+                  overscanRowCount={3}
+                  onScroll={onScroll}
+                  viewAs={viewAs}
+                  width={width}
+                  // React virtualized sets "LTR" by default.
+                  style={
+                    {
+                      direction: "inherit",
+                      "--infinite-loader-table-width": `${width}px`,
+                    } as React.CSSProperties
+                  }
+                  className={listClassName}
+                />
+              );
+            }}
+          </WindowScroller>
+        )}
+      </InfiniteLoader>
+    </div>
   );
 };
 
