@@ -28,8 +28,8 @@ import { useState, useEffect } from "react";
 
 import { MAX_INFINITE_LOADER_SHIFT, isMobile } from "../../utils/device";
 
-import ListComponent from "./sub-components/List";
-import GridComponent from "./sub-components/Grid";
+import ListComponent from "./sub-components/list/List";
+import GridComponent from "./sub-components/grid/Grid";
 
 import { InfiniteLoaderProps } from "./InfiniteLoader.types";
 

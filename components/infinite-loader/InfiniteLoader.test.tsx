@@ -183,9 +183,13 @@ describe("InfiniteLoader Component", () => {
     // When showSkeleton is true, ListComponent renders RowsSkeleton (data-testid="rows-skeleton")
     await waitFor(
       () => {
-        expect(screen.queryAllByTestId("rows-skeleton").length).toBeGreaterThan(
+        expect(screen.getAllByTestId("rows-skeleton").length).toBeGreaterThan(
           0,
         );
+        expect(screen.getAllByTestId("row-skeleton").length).toBeGreaterThan(0);
+        expect(
+          screen.getAllByTestId("rectangle-skeleton").length,
+        ).toBeGreaterThan(0);
       },
       { timeout: 2000 },
     );
