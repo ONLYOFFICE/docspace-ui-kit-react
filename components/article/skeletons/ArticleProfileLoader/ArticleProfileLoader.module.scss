@@ -1,6 +1,18 @@
 @use "../../../../styles/variables/colors";
 @use "../../../../styles/mixins";
 
+:global {
+  .light {
+    --catalog-profile-background: #{colors.$light-gray-hover};
+    --catalog-profile-border-top: 1px solid #{colors.$gray-light-mid};
+  }
+
+  .dark {
+    --catalog-profile-background: #{colors.$light-dark-gray-hover};
+    --catalog-profile-border-top: 1px solid #{colors.$gray-dark-strong};
+  }
+}
+
 .container {
   z-index: 209;
   position: absolute;
@@ -29,7 +41,7 @@
   justify-content: center;
 
   border-top: var(--catalog-profile-border-top);
-  border-inline-end: var(---catalog-profile-border-top);
+  border-inline-end: var(--catalog-profile-border-top);
   background-color: var(--catalog-profile-background);
 
   @include mixins.tablet-and-below {

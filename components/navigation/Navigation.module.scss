@@ -49,8 +49,8 @@
   }
 }
 
-.controlButtonContainer {
-  :global(.light) & {
+:global {
+  .light {
     --section-header-trash-erasure-label-background: #{colors.$gray-light};
     --section-header-trash-erasure-label-text: #{colors.$gray-text};
     --navigation-root-folder-title-color: #{colors.$gray};
@@ -70,9 +70,10 @@
     --navigation-header-icon-fill: #{colors.$light-gray-dark};
     --navigation-lifetime-enabled-fill: #{colors.$main-red};
     --navigation-lifetime-enabled-stroke: #{colors.$main-red};
+    --chat-button-open-background-color: #{colors.$light-gray-hover};
   }
 
-  :global(.dark) & {
+  .dark {
     --section-header-trash-erasure-label-background: #{colors.$dark-gray-light};
     --section-header-trash-erasure-label-text: #{colors.$dark-gray-dark};
     --navigation-root-folder-title-color: #{colors.$dark-gray-dark};
@@ -92,8 +93,11 @@
     --navigation-header-icon-fill: #{colors.$dark-gray-dark};
     --navigation-lifetime-enabled-fill: none;
     --navigation-lifetime-enabled-stroke: #{colors.$main-red};
+    --chat-button-open-background-color: #{colors.$dark-gray-light};
   }
+}
 
+.controlButtonContainer {
   display: flex;
   align-items: center;
   gap: 16px;

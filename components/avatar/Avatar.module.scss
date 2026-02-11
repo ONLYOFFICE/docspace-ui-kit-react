@@ -3,7 +3,6 @@
 
 .emptyIcon {
   @include mixins.common-icons-style;
-  border-radius: var(--avatar-image-border-radius);
 }
 
 .editContainer {
@@ -152,10 +151,6 @@
   border-radius: 50%;
 
   @include mixins.no-user-select;
-
-  &[data-is-default="true"] {
-    content: var(--avatar-default-image);
-  }
 }
 
 .roleWrapper {
