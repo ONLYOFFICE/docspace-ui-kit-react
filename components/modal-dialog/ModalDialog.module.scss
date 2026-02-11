@@ -33,7 +33,7 @@
     --modal-dialog-backdrop-bg-color: #{$blur-dark};
     --modal-dialog-header-border-color: #{$gray-dark-strong};
     --modal-dialog-link-underline-color: #{$dark-gray-dark};
-
+    --modal-dialog-border-color: #{$gray-light-mid};
     --modal-dialog-content-transform-x: 100%;
   }
 }
@@ -44,7 +44,7 @@
   --modal-dialog-backdrop-bg-color: #{$blur-light};
   --modal-dialog-header-border-color: #{$gray-light-mid};
   --modal-dialog-link-underline-color: #{$light-gray-dark};
-
+  --modal-dialog-border-color: #{$gray-dark-strong};
   --modal-dialog-content-transform-x: 100%;
 
   #create-text-input::-webkit-search-decoration,
