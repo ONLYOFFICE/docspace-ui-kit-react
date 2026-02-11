@@ -82,7 +82,7 @@ export type TComboboxProps = {
   /** Class name for dropdown container */
   dropDownClassName?: string;
   /** Icon for the combo button */
-  comboIcon?: string;
+  comboIcon?: string | React.ReactNode;
   /** Disable icon click */
   disableIconClick?: boolean;
   /** Disable item click */
@@ -236,7 +236,7 @@ export type TComboButtonProps = {
   /** Click handler */
   onClick?: () => void;
   /** Icon for the combo button */
-  comboIcon?: string;
+  comboIcon?: string | React.ReactNode;
   /** Indicates if the icon should be filled */
   fillIcon?: boolean;
   /** Indicates if modern view should be used */
