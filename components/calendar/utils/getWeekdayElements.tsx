@@ -34,8 +34,8 @@ export const getWeekdayElements = () => {
   const weekdays = getWeekdays("narrow").map(
     (weekday) => weekday.charAt(0).toUpperCase() + weekday.substring(1),
   );
-  return weekdays.map((day) => (
-    <span className={classNames(styles.weekDay, "weekday")} key={day}>
+  return weekdays.map((day, index) => (
+    <span className={classNames(styles.weekDay, "weekday")} key={`${day}-${index}`}>
       {day}
     </span>
   ));
