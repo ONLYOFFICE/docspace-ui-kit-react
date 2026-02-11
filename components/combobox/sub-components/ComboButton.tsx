@@ -231,14 +231,26 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
       >
         {displayArrow ? (
           comboIcon ? (
-            <ReactSVG
-              src={comboIcon}
-              className={classNames(
-                styles.comboButtonsExpanderIcon,
-                "combo-buttons_expander-icon",
-              )}
-              data-test-id="combo-button-custom-icon"
-            />
+            typeof comboIcon === "string" ? (
+              <ReactSVG
+                src={comboIcon}
+                className={classNames(
+                  styles.comboButtonsExpanderIcon,
+                  "combo-buttons_expander-icon",
+                )}
+                data-test-id="combo-button-custom-icon"
+              />
+            ) : (
+              <div
+                className={classNames(
+                  styles.comboButtonsExpanderIcon,
+                  "combo-buttons_expander-icon",
+                )}
+                data-test-id="combo-button-custom-icon"
+              >
+                {comboIcon}
+              </div>
+            )
           ) : (
             <TriangleDownIcon
               data-size={IconSizeType.scale}

@@ -25,9 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useRef, useEffect, useState } from "react";
-import { ReactSVG } from "react-svg";
 import classNames from "classnames";
-import TriangleNavigationDownReactSvgUrl from "../../assets/triangle.navigation.down.react.svg?url";
+import TriangleNavigationDownReactSvgUrl from "../../assets/triangle.navigation.down.react.svg";
 import { GuidanceRefKey } from "../../enums";
 import { Text } from "../text";
 import { ContextMenu } from "../context-menu";
@@ -116,7 +115,9 @@ const MainButton = (props: MainButtonProps) => {
         <Text className={styles.text}>{text}</Text>
         {isDropdown ? (
           <>
-            <ReactSVG className={styles.img} src={TriangleNavigationDownReactSvgUrl} />
+            <div className={styles.img}>
+              <TriangleNavigationDownReactSvgUrl />
+            </div>
             <ContextMenu
               className={styles.menu}
               model={model}

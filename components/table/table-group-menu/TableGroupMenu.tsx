@@ -29,9 +29,9 @@ import equal from "fast-deep-equal";
 import classNames from "classnames";
 import { getCommonTranslation } from "../../../utils";
 
-import TriangleNavigationDownReactSvgUrl from "../../../assets/triangle.navigation.down.react.svg?url";
-import PanelReactSvgUrl from "../../../assets/panel.react.svg?url";
-import CrossIconSvgUrl from "../../../assets/icons/16/cross.react.svg?url";
+import TriangleNavigationDownReactSvg from "../../../assets/triangle.navigation.down.react.svg";
+import PanelReactSvg from "../../../assets/panel.react.svg";
+import CrossIconSvg from "../../../assets/icons/16/cross.react.svg";
 
 import { EMPTY_ARRAY, EMPTY_OBJECT, FUNCTION_EMPTY } from "../../../constants";
 
@@ -128,7 +128,7 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
       {withComboBox ? (
         <ComboBox
           id="menu-combobox"
-          comboIcon={TriangleNavigationDownReactSvgUrl}
+          comboIcon={<TriangleNavigationDownReactSvg />}
           noBorder
           advancedOptions={checkboxOptions}
           className={classNames(styles.combobox, "not-selectable")}
@@ -156,7 +156,7 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
             className={styles.tableHeaderIconButton}
             size={16}
             onClick={onCloseClick}
-            iconName={CrossIconSvgUrl}
+            iconNode={<CrossIconSvg />}
             isFill
             dataTestId="close-button"
           />
@@ -185,7 +185,7 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
                 styles.tableHeaderIconButton,
                 "info-panel-toggle",
               )}
-              iconName={PanelReactSvgUrl}
+              iconNode={<PanelReactSvg />}
               size={16}
               isFill
               onClick={toggleInfoPanel}
