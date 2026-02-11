@@ -24,8 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-@use "../../../styles/variables";
 @use "../../../styles/mixins";
+@use "../../../styles/variables/colors";
 
 :global(.light) {
   :local {
@@ -55,6 +55,42 @@
         }
       }
     }
+  }
+}
+
+:global {
+  .light {
+    --article-item-header-color: #{colors.$gray};
+    --article-item-header-bg-color: #{colors.$gray-strong};
+    --article-item-badge-without-text-bg-color: #{colors.$light-status-warning};
+    --article-item-initial-text-color: #{colors.$white};
+    --article-item-text-color: #{colors.$gray-text};
+    --article-item-text-active-color: #{colors.$light-blue-main};
+    --article-item-img-svg-fill: #{colors.$light-gray-dark};
+    --article-item-img-svg-active-fill: #{colors.$light-blue-main};
+    --article-item-sibling-active-bg-color: #{colors.$light-gray-selected};
+    --article-item-sibling-hover-bg-color: #{colors.$gray-light-mid};
+    --article-item-dnd-bg-color: #{colors.$dnd-color};
+    --article-item-dnd-hover-bg-color: #{colors.$dnd-hover-color};
+    --article-item-trash-icon-fill: #{colors.$gray};
+    --story-wrapper-bg-color: #{colors.$gray-light};
+  }
+
+  .dark {
+    --article-item-header-color: #{colors.$gray-dark};
+    --article-item-header-bg-color: #{colors.$gray-dark-strong};
+    --article-item-badge-without-text-bg-color: #{colors.$main-orange};
+    --article-item-initial-text-color: #{colors.$black};
+    --article-item-text-color: #{colors.$dark-gray-dark};
+    --article-item-text-active-color: #{colors.$white};
+    --article-item-img-svg-fill: #{colors.$dark-gray-dark};
+    --article-item-img-svg-active-fill: #{colors.$white};
+    --article-item-sibling-active-bg-color: #{colors.$black};
+    --article-item-sibling-hover-bg-color: #{colors.$black};
+    --article-item-dnd-bg-color: #{colors.$dnd-dark-color};
+    --article-item-dnd-hover-bg-color: #{colors.$dnd-dark-hover};
+    --article-item-trash-icon-fill: #{colors.$gray-dark};
+    --story-wrapper-bg-color: #{colors.$dark-gray-light};
   }
 }
 
@@ -363,7 +399,7 @@
 
   cursor: pointer;
 
-  -webkit-tap-highlight-color: variables.$tap-highlight;
+  -webkit-tap-highlight-color: #{colors.$tap-highlight};
 
   &.showText {
     justify-content: space-between;

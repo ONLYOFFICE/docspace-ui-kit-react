@@ -44,6 +44,48 @@
   }
 }
 
+:global {
+  .light {
+    --files-article-body-download-app-list-text-color: #{colors.$gray};
+    --files-article-body-download-app-list-mac-hover-color: #{colors.$dark-black};
+    --files-article-body-dev-tools-color: #{colors.$gray-text};
+    --files-article-body-dev-tools-background-color: var(--accent-main, #{colors.$light-blue-main});
+    --files-article-body-dev-tools-background-opacity: 0.17;
+    --article-catalog-background: #{colors.$gray-light};
+    --article-catalog-show-text: #{colors.$light-gray-dark};
+    --article-catalog-header-border-bottom: 1px solid #{colors.$gray-light-mid};
+    --article-client-home-logo-color: #{colors.$black};
+    --article-catalog-profile-background: #{colors.$light-gray-hover};
+    --article-catalog-profile-border-top: 1px solid #{colors.$gray-light-mid};
+    --article-catalog-vertical-line: 1px solid #{colors.$gray-light-mid};
+    --article-catalog-background: #{colors.$gray-light};
+    --article-desktop-width: 252px;
+    --article-tablet-width: 243px;
+    --article-tablet-width-collapsed: 60px;
+    --back-button-text-color: #{colors.$gray-text};
+  }
+ 
+  .dark {
+    --files-article-body-download-app-list-text-color: #{colors.$gray-dark};
+    --files-article-body-download-app-list-mac-hover-color: #{colors.$white};
+    --files-article-body-dev-tools-color: #{colors.$black};
+    --files-article-body-dev-tools-background-color: #{colors.$dark-gray-dark};
+    --files-article-body-dev-tools-background-opacity: 1;
+    --article-catalog-background: #{colors.$dark-gray-light};
+    --article-catalog-show-text: #{colors.$dark-gray-dark};
+    --article-catalog-header-border-bottom: 1px solid #{colors.$gray-dark-strong};
+    --article-client-home-logo-color: #{colors.$white};
+    --article-catalog-profile-background: #{colors.$light-dark-gray-hover};
+    --article-catalog-profile-border-top: 1px solid #{colors.$gray-dark-strong};
+    --article-catalog-vertical-line: 1px solid #{colors.$gray-dark-strong};
+    --article-catalog-background: #{colors.$dark-gray-light};
+    --article-desktop-width: 252px;
+    --article-tablet-width: 243px;
+    --article-tablet-width-collapsed: 60px;
+    --back-button-text-color: #{colors.$white};
+  }
+}
+
 .apps {
   display: flex;
   flex-direction: column;
@@ -430,6 +472,7 @@
 .article {
   position: relative;
   overflow: hidden;
+  height: 100%;
   background: var(--article-catalog-background);
   min-width: var(--article-desktop-width);
   max-width: var(--article-desktop-width);
