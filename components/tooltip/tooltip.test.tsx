@@ -517,7 +517,7 @@ describe("useTooltipControl hook", () => {
   it("returns handlers and anchorId", () => {
     const { result, unmount } = renderHook(() => useTooltipControl());
 
-    expect(result.current.anchorId).toMatch(/^tooltip-\d+$/);
+    expect(result.current.anchorId).toMatch(/^tooltip-/);
     expect(typeof result.current.handleMouseEnter).toBe("function");
     expect(typeof result.current.handleMouseLeave).toBe("function");
     expect(typeof result.current.handleMouseMove).toBe("function");

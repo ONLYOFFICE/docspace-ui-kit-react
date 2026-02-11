@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { checkIsSSR } from "../../../utils/device";
 
@@ -76,9 +76,8 @@ export const useTooltipControl = (
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const virtualAnchorRef = useRef<HTMLDivElement | null>(null);
-  const anchorId = useRef<string>(
-    `tooltip-${Math.floor(Math.random() * 1000000)}`,
-  );
+  const reactId = useId();
+  const anchorId = useRef<string>(`tooltip-${reactId}`);
 
   useEffect(() => {
     return () => {

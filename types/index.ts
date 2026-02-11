@@ -246,6 +246,17 @@ declare global {
   interface Window {
     timezone: string;
     __systemTooltipRef?: React.RefObject<TooltipRefProps | null>;
+    i18n?: {
+      t?: (
+        key: string,
+        options?: Record<string, string | number>,
+      ) => string;
+      inLoad: { url: string; callbacks: Function[] }[];
+      loaded: Record<
+        string,
+        { data: Record<string, string>; namespaces: string }
+      >;
+    };
     AscDesktopEditor?: {
       execCommand: (key: string, value: string) => void;
       cloudCryptoCommand: (
