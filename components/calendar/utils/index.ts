@@ -24,11 +24,11 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { getCalendarDays } from "./getCalendarDays";
-export { getDayElements } from "./getDayElements";
-export { getWeekdayElements } from "./getWeekdayElements";
-export { getCalendarMonths } from "./getCalendarMonths";
-export { getMonthElements } from "./getMonthElements";
-export { getCalendarYears } from "./getCalendarYears";
-export { getYearElements } from "./getYearElements";
-export { getValidDates } from "./getValidDates";
+export { getCalendarDays } from "./get-calendar-days";
+export { getDayElements } from "./get-day-elements";
+export { getWeekdayElements } from "./get-weekday-elements";
+export { getCalendarMonths } from "./get-calendar-months";
+export { getMonthElements } from "./get-month-elements";
+export { getCalendarYears } from "./get-calendar-years";
+export { getYearElements } from "./get-year-elements";
+export { getValidDates } from "./get-valid-dates";

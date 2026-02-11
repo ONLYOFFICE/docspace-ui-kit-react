@@ -1,11 +1,39 @@
+/*
+ * (c) Copyright Ascensio System SIA 2009-2026
+ *
+ * This program is a free software product.
+ * You can redistribute it and/or modify it under the terms
+ * of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+ * Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+ * to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+ * any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+ * the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions of the Program must
+ * display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product logo when
+ * distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+ * trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+ * content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+ * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ */
+
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { DateTime } from "luxon";
-import { getMonthElements } from "./getMonthElements";
-import * as dateUtils from "../../../utils/date";
+import { getMonthElements } from "./index";
+import * as dateUtils from "../../../../utils/date";
 
-vi.mock("../../../utils/date", async (importOriginal) => {
+vi.mock("../../../../utils/date", async (importOriginal) => {
   const actual = await importOriginal<typeof dateUtils>();
   return {
     ...actual,
@@ -16,7 +44,7 @@ vi.mock("../../../utils/date", async (importOriginal) => {
 describe("getMonthElements", () => {
     // Mock now to be 2023-05-15 (May 2023 is current)
     const mockNow = DateTime.fromObject({ year: 2023, month: 5, day: 15 });
-    
+
     beforeEach(() => {
         vi.mocked(dateUtils.now).mockReturnValue(mockNow);
     });
@@ -26,7 +54,7 @@ describe("getMonthElements", () => {
     const mockMaxDate = DateTime.fromObject({ year: 2025, month: 12, day: 31 });
     const setObservedDate = vi.fn();
     const setSelectedScene = vi.fn();
-    
+
     const months = [
         { key: "2023-1", value: "Jan" },
         { key: "2023-2", value: "Feb" },
@@ -49,10 +77,10 @@ describe("getMonthElements", () => {
     it("should render month elements", () => {
         const elements = getMonthElements(months, setObservedDate, setSelectedScene, mockSelectedDate, mockMinDate, mockMaxDate);
         render(<>{elements}</>);
-        
+
         expect(screen.getAllByText("Jan")).toHaveLength(2); // One effectively for 2023, one for 2024
         expect(screen.getByText("Dec")).toBeDefined();
-        
+
         // 16 months total
         const buttons = screen.getAllByRole("button");
         expect(buttons).toHaveLength(16);
@@ -61,18 +89,18 @@ describe("getMonthElements", () => {
     it("should handle month clicks for various types", () => {
         const elements = getMonthElements(months, setObservedDate, setSelectedScene, mockSelectedDate, mockMinDate, mockMaxDate);
         render(<>{elements}</>);
-        
+
         const janButtons = screen.getAllByText("Jan");
         const jan2023 = janButtons[0];
         fireEvent.click(jan2023);
         expect(setObservedDate).toHaveBeenCalled();
         setObservedDate.mockClear();
-        
+
         const jan2024 = janButtons[1];
         fireEvent.click(jan2024);
         expect(setObservedDate).toHaveBeenCalled();
         setObservedDate.mockClear();
-        
+
         const mayButton = screen.getByText("May").closest('button');
         if (mayButton) {
             fireEvent.click(mayButton);
@@ -88,11 +116,11 @@ describe("getMonthElements", () => {
        const restrictiveMin = DateTime.fromObject({ year: 2023, month: 6, day: 1 });
        const elements = getMonthElements(months, setObservedDate, setSelectedScene, mockSelectedDate, restrictiveMin, mockMaxDate);
        render(<>{elements}</>);
-       
+
        // Jan 2023 (index 0) should be disabled
        const janButton = screen.getAllByText("Jan")[0].closest('button');
        expect(janButton).toBeDisabled();
-       
+
        // Jul 2023 (index 6) should be enabled
        const julButton = screen.getByText("Jul").closest('button');
        expect(julButton).not.toBeDisabled();
