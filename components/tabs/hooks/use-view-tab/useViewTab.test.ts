@@ -30,6 +30,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useViewTab } from "./useViewTab";
 import { RefObject } from "react";
+import { ScrollbarType } from "../../../scrollbar";
 
 describe("useViewTab", () => {
   let mockObserve: ReturnType<typeof vi.fn>;
@@ -42,29 +43,36 @@ describe("useViewTab", () => {
     mockDisconnect = vi.fn();
 
     // Mock IntersectionObserver
-    global.IntersectionObserver = vi.fn().mockImplementation(function (callback: IntersectionObserverCallback) {
-      intersectionObserverCallback = callback;
-      return {
-        observe: mockObserve,
-        unobserve: mockUnobserve,
-        disconnect: mockDisconnect,
-        root: null,
-        rootMargin: "",
-        thresholds: [],
-        takeRecords: () => [],
-      };
-    }) as any;
+    vi.stubGlobal(
+      "IntersectionObserver",
+      vi.fn(function (
+        this: IntersectionObserver,
+        callback: IntersectionObserverCallback,
+      ) {
+        intersectionObserverCallback = callback;
+        return {
+          observe: mockObserve,
+          unobserve: mockUnobserve,
+          disconnect: mockDisconnect,
+          root: null,
+          rootMargin: "",
+          thresholds: [],
+          takeRecords: () => [],
+        };
+      }),
+    );
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  const createMockContainerRef = () => ({
-    current: {
-      scrollerElement: document.createElement("div"),
-    },
-  } as any);
+  const createMockContainerRef = () =>
+    ({
+      current: {
+        scrollerElement: document.createElement("div"),
+      },
+    }) as unknown as RefObject<ScrollbarType>;
 
   const createMockTabRef = () => {
     const el = document.createElement("div");
@@ -77,7 +85,9 @@ describe("useViewTab", () => {
     const mockContainerRef = createMockContainerRef();
     const mockTabRef = createMockTabRef();
 
-    const { result } = renderHook(() => useViewTab(mockContainerRef, mockTabRef, 0));
+    const { result } = renderHook(() =>
+      useViewTab(mockContainerRef, mockTabRef, 0),
+    );
 
     expect(result.current).toBe(true);
   });
@@ -131,7 +141,7 @@ describe("useViewTab", () => {
           {
             isIntersecting: false,
             target: childElement,
-          } as unknown as IntersectionObserverEntry,
+          } as Partial<IntersectionObserverEntry> as IntersectionObserverEntry,
         ],
         {} as IntersectionObserver,
       );
@@ -146,7 +156,7 @@ describe("useViewTab", () => {
           {
             isIntersecting: true,
             target: childElement,
-          } as unknown as IntersectionObserverEntry,
+          } as Partial<IntersectionObserverEntry> as IntersectionObserverEntry,
         ],
         {} as IntersectionObserver,
       );
@@ -156,7 +166,9 @@ describe("useViewTab", () => {
   });
 
   it("should not create observer if container is null", () => {
-    const mockContainerRef = { current: null } as any;
+    const mockContainerRef = {
+      current: null,
+    } as unknown as RefObject<ScrollbarType>;
     const mockTabRef = createMockTabRef();
 
     renderHook(() => useViewTab(mockContainerRef, mockTabRef, 0));
@@ -166,7 +178,9 @@ describe("useViewTab", () => {
 
   it("should not create observer if tabRef is null", () => {
     const mockContainerRef = createMockContainerRef();
-    const mockTabRef = { current: null } as any;
+    const mockTabRef = {
+      current: null,
+    } as unknown as RefObject<HTMLDivElement>;
 
     renderHook(() => useViewTab(mockContainerRef, mockTabRef, 0));
 
@@ -175,7 +189,9 @@ describe("useViewTab", () => {
 
   it("should not create observer if child element does not exist", () => {
     const mockContainerRef = createMockContainerRef();
-    const mockTabRef = { current: document.createElement("div") } as any;
+    const mockTabRef = {
+      current: document.createElement("div"),
+    } as unknown as RefObject<HTMLDivElement>;
 
     renderHook(() => useViewTab(mockContainerRef, mockTabRef, 0));
 
@@ -187,7 +203,9 @@ describe("useViewTab", () => {
     const mockTabRef = createMockTabRef();
     const childElement = mockTabRef.current!.children[0];
 
-    const { unmount } = renderHook(() => useViewTab(mockContainerRef, mockTabRef, 0));
+    const { unmount } = renderHook(() =>
+      useViewTab(mockContainerRef, mockTabRef, 0),
+    );
 
     unmount();
 

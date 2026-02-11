@@ -120,14 +120,14 @@ describe("HeaderButtons Component", () => {
   });
 
   it("should apply mobile margin when isMobile is true", () => {
-    const { container } = render(<HeaderButtons {...defaultProps} isMobile={true} />);
+    render(<HeaderButtons {...defaultProps} isMobile={true} />);
 
     const prevButton = screen.getByLabelText("Previous");
     expect(prevButton.style.marginInlineEnd).toBe("12px");
   });
 
   it("should apply desktop margin when isMobile is false", () => {
-    const { container } = render(<HeaderButtons {...defaultProps} isMobile={false} />);
+    render(<HeaderButtons {...defaultProps} isMobile={false} />);
 
     const prevButton = screen.getByLabelText("Previous");
     expect(prevButton.style.marginInlineEnd).toBe("8px");

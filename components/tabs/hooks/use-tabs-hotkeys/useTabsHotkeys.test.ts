@@ -68,7 +68,8 @@ describe("useTabsHotkeys", () => {
     vi.clearAllMocks();
     mockUseHotkeys.mockClear();
     // Mock DOM element
-    document.body.innerHTML = '<div class="secondary-tabs-scroll-test-tabs" tabindex="0"></div>';
+    document.body.innerHTML =
+      '<div class="secondary-tabs-scroll-test-tabs" tabindex="0"></div>';
   });
 
   afterEach(() => {
@@ -80,7 +81,10 @@ describe("useTabsHotkeys", () => {
 
     renderHook(() => useTabsHotkeys(defaultProps));
 
-    expect(addEventListenerSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      "keydown",
+      expect.any(Function),
+    );
 
     addEventListenerSpy.mockRestore();
   });
@@ -91,7 +95,10 @@ describe("useTabsHotkeys", () => {
     const { unmount } = renderHook(() => useTabsHotkeys(defaultProps));
     unmount();
 
-    expect(removeEventListenerSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      "keydown",
+      expect.any(Function),
+    );
 
     removeEventListenerSpy.mockRestore();
   });
@@ -165,7 +172,7 @@ describe("useTabsHotkeys", () => {
 
     // Get the callback registered for "*" hotkey
     const arrowCallback = mockUseHotkeys.mock.calls.find(
-      (call) => call[0] === "*"
+      (call) => call[0] === "*",
     )?.[1];
 
     expect(arrowCallback).toBeDefined();
@@ -192,7 +199,7 @@ describe("useTabsHotkeys", () => {
     renderHook(() => useTabsHotkeys(propsWithLastTab));
 
     const arrowCallback = mockUseHotkeys.mock.calls.find(
-      (call) => call[0] === "*"
+      (call) => call[0] === "*",
     )?.[1];
 
     const arrowRightEvent = new KeyboardEvent("keydown", {
@@ -211,7 +218,7 @@ describe("useTabsHotkeys", () => {
     renderHook(() => useTabsHotkeys(defaultProps));
 
     const arrowCallback = mockUseHotkeys.mock.calls.find(
-      (call) => call[0] === "*"
+      (call) => call[0] === "*",
     )?.[1];
 
     const arrowLeftEvent = new KeyboardEvent("keydown", {
@@ -231,7 +238,7 @@ describe("useTabsHotkeys", () => {
 
     // Get the callback registered for "Enter, Space" hotkey
     const enterCallback = mockUseHotkeys.mock.calls.find(
-      (call) => call[0] === "Enter, Space"
+      (call) => call[0] === "Enter, Space",
     )?.[1];
 
     expect(enterCallback).toBeDefined();
@@ -264,7 +271,7 @@ describe("useTabsHotkeys", () => {
     renderHook(() => useTabsHotkeys(propsWithMiddleTab));
 
     const homeCallback = mockUseHotkeys.mock.calls.find(
-      (call) => call[0] === "Home"
+      (call) => call[0] === "Home",
     )?.[1];
 
     expect(homeCallback).toBeDefined();
@@ -281,7 +288,7 @@ describe("useTabsHotkeys", () => {
     renderHook(() => useTabsHotkeys(defaultProps));
 
     const endCallback = mockUseHotkeys.mock.calls.find(
-      (call) => call[0] === "End"
+      (call) => call[0] === "End",
     )?.[1];
 
     expect(endCallback).toBeDefined();
@@ -298,7 +305,7 @@ describe("useTabsHotkeys", () => {
     renderHook(() => useTabsHotkeys(defaultProps));
 
     const arrowCallback = mockUseHotkeys.mock.calls.find(
-      (call) => call[0] === "*"
+      (call) => call[0] === "*",
     )?.[1];
 
     const shiftArrowEvent = new KeyboardEvent("keydown", {
@@ -326,19 +333,19 @@ describe("useTabsHotkeys", () => {
     // Test checkbox input (should pass filter)
     const checkboxEvent = {
       target: { type: "checkbox", tagName: "INPUT" },
-    } as any;
+    } as unknown as KeyboardEvent;
     expect(filterFunction(checkboxEvent)).toBe(true);
 
     // Test text input (should not pass filter)
     const textInputEvent = {
       target: { type: "text", tagName: "INPUT" },
-    } as any;
+    } as unknown as KeyboardEvent;
     expect(filterFunction(textInputEvent)).toBe(false);
 
     // Test non-input element (should pass filter)
     const divEvent = {
       target: { tagName: "DIV" },
-    } as any;
+    } as unknown as KeyboardEvent;
     expect(filterFunction(divEvent)).toBe(true);
   });
 });

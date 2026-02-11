@@ -32,9 +32,20 @@ import * as dateUtils from "../../utils/date";
 
 // Mock sub-components
 vi.mock("./sub-components", () => ({
-  Days: ({ handleDateChange }: any) => (
+  Days: ({
+    handleDateChange,
+  }: {
+    handleDateChange: (date: DateTime) => void;
+  }) => (
     <div data-testid="days-component">
-      <button onClick={() => handleDateChange(DateTime.fromObject({ year: 2023, month: 6, day: 15 }))}>
+      <button
+        type="button"
+        onClick={() =>
+          handleDateChange(
+            DateTime.fromObject({ year: 2023, month: 6, day: 15 }),
+          )
+        }
+      >
         Select Date
       </button>
     </div>
@@ -45,7 +56,9 @@ vi.mock("./sub-components", () => ({
 
 // Mock Scrollbar
 vi.mock("../scrollbar", () => ({
-  Scrollbar: ({ children }: any) => <div data-testid="scrollbar">{children}</div>,
+  Scrollbar: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="scrollbar">{children}</div>
+  ),
 }));
 
 // Mock SCSS
@@ -81,7 +94,13 @@ describe("Calendar tests:", () => {
 
   const defaultProps = {
     locale: "en",
-    selectedDate: DateTime.fromObject({ year: 2023, month: 5, day: 15, hour: 10, minute: 30 }),
+    selectedDate: DateTime.fromObject({
+      year: 2023,
+      month: 5,
+      day: 15,
+      hour: 10,
+      minute: 30,
+    }),
     setSelectedDate: mockSetSelectedDate,
     minDate: DateTime.fromObject({ year: 2020, month: 1, day: 1 }),
     maxDate: DateTime.fromObject({ year: 2030, month: 12, day: 31 }),
@@ -106,26 +125,40 @@ describe("Calendar tests:", () => {
       }
       return null;
     });
-    vi.mocked(dateUtils.formatDate).mockImplementation((date: any, format: any) => {
-      if (format === "yyyy-MM-dd") {
-        return `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`;
-      }
-      if (format === "HH:mm") {
-        return `${String(date.hour).padStart(2, "0")}:${String(date.minute).padStart(2, "0")}`;
-      }
-      return "";
-    });
-    vi.mocked(dateUtils.endOf).mockImplementation((date: any, unit: any) => {
+    vi.mocked(dateUtils.formatDate).mockImplementation(
+      (date, format: string) => {
+        const d = date as DateTime;
+        if (format === "yyyy-MM-dd") {
+          return `${d.year}-${String(d.month).padStart(2, "0")}-${String(
+            d.day,
+          ).padStart(2, "0")}`;
+        }
+        if (format === "HH:mm") {
+          return `${String(d.hour).padStart(2, "0")}:${String(
+            d.minute,
+          ).padStart(2, "0")}`;
+        }
+        return "";
+      },
+    );
+    vi.mocked(dateUtils.endOf).mockImplementation((date, unit) => {
+      const d = date as DateTime;
       if (unit === "day") {
-        return date.set({ hour: 23, minute: 59, second: 59, millisecond: 999 });
+        return d.set({
+          hour: 23,
+          minute: 59,
+          second: 59,
+          millisecond: 999,
+        });
       }
-      return date;
+      return d;
     });
-    vi.mocked(dateUtils.startOf).mockImplementation((date: any, unit: any) => {
+    vi.mocked(dateUtils.startOf).mockImplementation((date, unit) => {
+      const d = date as DateTime;
       if (unit === "day") {
-        return date.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+        return d.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
       }
-      return date;
+      return d;
     });
     vi.mocked(dateUtils.dateDiffAbs).mockReturnValue(5);
 
@@ -147,20 +180,24 @@ describe("Calendar tests:", () => {
   });
 
   it("should handle date change with useMaxTime", () => {
-    render(<Calendar {...defaultProps} useMaxTime={true} onChange={mockOnChange} />);
+    render(
+      <Calendar {...defaultProps} useMaxTime={true} onChange={mockOnChange} />,
+    );
 
     const selectButton = screen.getByText("Select Date");
     fireEvent.click(selectButton);
 
     expect(mockSetSelectedDate).toHaveBeenCalled();
     expect(mockOnChange).toHaveBeenCalled();
-    
+
     // Verify endOf was called for useMaxTime
     expect(dateUtils.endOf).toHaveBeenCalledWith(expect.any(Object), "day");
   });
 
   it("should handle date change without useMaxTime", () => {
-    render(<Calendar {...defaultProps} useMaxTime={false} onChange={mockOnChange} />);
+    render(
+      <Calendar {...defaultProps} useMaxTime={false} onChange={mockOnChange} />,
+    );
 
     const selectButton = screen.getByText("Select Date");
     fireEvent.click(selectButton);
@@ -202,9 +239,9 @@ describe("Calendar tests:", () => {
   it("should use closest boundary when initialDate is not provided and today is out of range", async () => {
     const mockToday = DateTime.fromObject({ year: 2035, month: 5, day: 15 });
     vi.mocked(dateUtils.now).mockReturnValue(mockToday);
-    
+
     // Mock dateDiffAbs to return larger value for max (meaning max is closer)
-    vi.mocked(dateUtils.dateDiffAbs).mockImplementation((date1: any, date2: any, unit: any) => {
+    vi.mocked(dateUtils.dateDiffAbs).mockImplementation((_date1, date2) => {
       if ((date2 as DateTime).year === 2030) return 5; // distance to max
       if ((date2 as DateTime).year === 2020) return 15; // distance to min
       return 0;
@@ -222,14 +259,16 @@ describe("Calendar tests:", () => {
   });
 
   it("should warn and use closest boundary when initialDate is out of range (above max)", async () => {
-    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    
+    const consoleWarnSpy = vi
+      .spyOn(console, "warn")
+      .mockImplementation(() => {});
+
     vi.mocked(dateUtils.parseToDateTime).mockReturnValue(
       DateTime.fromObject({ year: 2035, month: 1, day: 1 }),
     );
 
     // Mock dateDiffAbs to return larger value for max (meaning max is closer)
-    vi.mocked(dateUtils.dateDiffAbs).mockImplementation((date1: any, date2: any, unit: any) => {
+    vi.mocked(dateUtils.dateDiffAbs).mockImplementation((_date1, date2) => {
       if ((date2 as DateTime).year === 2030) return 5; // distance to max
       if ((date2 as DateTime).year === 2020) return 15; // distance to min
       return 0;
@@ -241,7 +280,12 @@ describe("Calendar tests:", () => {
       DateTime.fromObject({ year: 2030, month: 12, day: 31 }),
     ]);
 
-    render(<Calendar {...defaultProps} initialDate={DateTime.fromObject({ year: 2035, month: 1, day: 1 })} />);
+    render(
+      <Calendar
+        {...defaultProps}
+        initialDate={DateTime.fromObject({ year: 2035, month: 1, day: 1 })}
+      />,
+    );
 
     expect(consoleWarnSpy).toHaveBeenCalledWith(
       "Initial date is out of min/max dates boundaries. Initial date will be set as closest boundary value",
@@ -252,14 +296,16 @@ describe("Calendar tests:", () => {
   });
 
   it("should warn and use closest boundary when initialDate is out of range (below min)", async () => {
-    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    
+    const consoleWarnSpy = vi
+      .spyOn(console, "warn")
+      .mockImplementation(() => {});
+
     vi.mocked(dateUtils.parseToDateTime).mockReturnValue(
       DateTime.fromObject({ year: 2015, month: 1, day: 1 }),
     );
 
     // Mock dateDiffAbs to return larger value for min (meaning min is closer)
-    vi.mocked(dateUtils.dateDiffAbs).mockImplementation((date1: any, date2: any, unit: any) => {
+    vi.mocked(dateUtils.dateDiffAbs).mockImplementation((_date1, date2) => {
       if ((date2 as DateTime).year === 2020) return 5; // distance to min
       if ((date2 as DateTime).year === 2030) return 15; // distance to max
       return 0;
@@ -271,7 +317,12 @@ describe("Calendar tests:", () => {
       DateTime.fromObject({ year: 2030, month: 12, day: 31 }),
     ]);
 
-    render(<Calendar {...defaultProps} initialDate={DateTime.fromObject({ year: 2015, month: 1, day: 1 })} />);
+    render(
+      <Calendar
+        {...defaultProps}
+        initialDate={DateTime.fromObject({ year: 2015, month: 1, day: 1 })}
+      />,
+    );
 
     expect(consoleWarnSpy).toHaveBeenCalledWith(
       "Initial date is out of min/max dates boundaries. Initial date will be set as closest boundary value",
