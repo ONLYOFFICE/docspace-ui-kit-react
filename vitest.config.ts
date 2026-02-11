@@ -8,6 +8,10 @@ export default defineConfig({
         find: /^(.*)\.react\.svg$/,
         replacement: path.resolve(__dirname, "./test/__mocks__/svgMock.tsx"),
       },
+      {
+        find: /^(.*)\.svg$/,
+        replacement: path.resolve(__dirname, "./test/__mocks__/svgMock.tsx"),
+      },
     ],
   },
   test: {

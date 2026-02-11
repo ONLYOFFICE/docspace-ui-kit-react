@@ -37,10 +37,6 @@ const MockIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg data-testid="item-icon" {...props} />
 );
 
-vi.mock("../../../../assets/right.arrow.react.svg", () => ({
-  default: () => <svg data-testid="arrow-icon" />,
-}));
-
 const contextMenuShowMock = vi.fn();
 
 vi.mock("../../../context-menu", () => {
@@ -87,7 +83,7 @@ describe("EmptyViewItem", () => {
     );
 
     expect(screen.getByTestId("item-icon")).toHaveClass(styles.itemIcon);
-    expect(screen.getByTestId("arrow-icon")).toBeInTheDocument();
+    expect(screen.getByTestId("svg-mock")).toBeInTheDocument();
   });
 
   it("does not render when disabled", () => {
