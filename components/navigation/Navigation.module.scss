@@ -49,51 +49,75 @@
   }
 }
 
-:global {
-  .light {
-    --section-header-trash-erasure-label-background: #{colors.$gray-light};
-    --section-header-trash-erasure-label-text: #{colors.$gray-text};
-    --navigation-root-folder-title-color: #{colors.$gray};
-    --navigation-expander-color: #{colors.$black};
-    --background-and-substrate-color: #{colors.$gray-light};
-    --navigation-background: #{colors.$white};
-    --navigation-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-color};
-    --navigation-icon-stroke: #{colors.$light-gray-selected};
-    --navigation-guid-animation-small-border: 1px solid
-      var(--accent-main, #{colors.$light-second-main});
-    --navigation-guid-animation-border: 2px solid
-      var(--accent-main, #{colors.$light-second-main});
-    --navigation-guid-animation-icon-color: var(
-      --accent-main,
-      #{colors.$light-second-main}
-    );
-    --navigation-header-icon-fill: #{colors.$light-gray-dark};
-    --navigation-lifetime-enabled-fill: #{colors.$main-red};
-    --navigation-lifetime-enabled-stroke: #{colors.$main-red};
-    --chat-button-open-background-color: #{colors.$light-gray-hover};
+:global(.light) {
+  :local {
+    .controlButtonContainer, 
+    .heading, 
+    .titleBlockBadge, 
+    .expanderIcon, 
+    .arrowIcon, 
+    .warningText, 
+    .infoPanelToggleWrapper, 
+    .box, 
+    .container, 
+    .chatButton {
+      --section-header-trash-erasure-label-background: #{colors.$gray-light};
+      --section-header-trash-erasure-label-text: #{colors.$gray-text};
+      --navigation-root-folder-title-color: #{colors.$gray};
+      --navigation-expander-color: #{colors.$black};
+      --background-and-substrate-color: #{colors.$gray-light};
+      --navigation-background: #{colors.$white};
+      --navigation-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-color};
+      --navigation-icon-stroke: #{colors.$light-gray-selected};
+      --navigation-guid-animation-small-border: 1px solid
+        var(--accent-main, #{colors.$light-second-main});
+      --navigation-guid-animation-border: 2px solid
+        var(--accent-main, #{colors.$light-second-main});
+      --navigation-guid-animation-icon-color: var(
+        --accent-main,
+        #{colors.$light-second-main}
+      );
+      --navigation-header-icon-fill: #{colors.$light-gray-dark};
+      --navigation-lifetime-enabled-fill: #{colors.$main-red};
+      --navigation-lifetime-enabled-stroke: #{colors.$main-red};
+      --chat-button-open-background-color: #{colors.$light-gray-hover};
+    }
   }
+}
 
-  .dark {
-    --section-header-trash-erasure-label-background: #{colors.$dark-gray-light};
-    --section-header-trash-erasure-label-text: #{colors.$dark-gray-dark};
-    --navigation-root-folder-title-color: #{colors.$dark-gray-dark};
-    --navigation-expander-color: #{colors.$white};
-    --background-and-substrate-color: #{colors.$dark-gray-light};
-    --navigation-background: #{colors.$black};
-    --navigation-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-dark-color};
-    --navigation-icon-stroke: #{colors.$gray-dark-strong};
-    --navigation-guid-animation-small-border: 1px solid
-      var(--accent-main, #{colors.$light-second-main});
-    --navigation-guid-animation-border: 2px solid
-      var(--accent-main, #{colors.$light-second-main});
-    --navigation-guid-animation-icon-color: var(
-      --accent-main,
+:global(.dark) {
+  :local {
+    .controlButtonContainer, 
+    .heading, 
+    .titleBlockBadge, 
+    .expanderIcon, 
+    .arrowIcon, 
+    .warningText, 
+    .infoPanelToggleWrapper, 
+    .box, 
+    .container, 
+    .chatButton {
+      --section-header-trash-erasure-label-background: #{colors.$dark-gray-light};
+      --section-header-trash-erasure-label-text: #{colors.$dark-gray-dark};
+      --navigation-root-folder-title-color: #{colors.$dark-gray-dark};
+      --navigation-expander-color: #{colors.$white};
+      --background-and-substrate-color: #{colors.$dark-gray-light};
+      --navigation-background: #{colors.$black};
+      --navigation-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-dark-color};
+      --navigation-icon-stroke: #{colors.$gray-dark-strong};
+      --navigation-guid-animation-small-border: 1px solid
+        var(--accent-main, #{colors.$light-second-main});
+      --navigation-guid-animation-border: 2px solid
+        var(--accent-main, #{colors.$light-second-main});
+      --navigation-guid-animation-icon-color: var(
+        --accent-main,
       #{colors.$light-second-main}
     );
-    --navigation-header-icon-fill: #{colors.$dark-gray-dark};
-    --navigation-lifetime-enabled-fill: none;
-    --navigation-lifetime-enabled-stroke: #{colors.$main-red};
-    --chat-button-open-background-color: #{colors.$dark-gray-light};
+      --navigation-header-icon-fill: #{colors.$dark-gray-dark};
+      --navigation-lifetime-enabled-fill: none;
+      --navigation-lifetime-enabled-stroke: #{colors.$main-red};
+      --chat-button-open-background-color: #{colors.$dark-gray-light};
+    }
   }
 }
 

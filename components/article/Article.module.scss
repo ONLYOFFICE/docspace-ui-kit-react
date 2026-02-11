@@ -44,8 +44,8 @@
   }
 }
 
-:global {
-  .light {
+:global(.light) {
+   :local(.apps, .wrapper, .hideArticleMenuButton, .articleHeader, .heading, .profileWrapper, .articleProfile, .article, .backButton){
     --files-article-body-download-app-list-text-color: #{colors.$gray};
     --files-article-body-download-app-list-mac-hover-color: #{colors.$dark-black};
     --files-article-body-dev-tools-color: #{colors.$gray-text};
@@ -64,8 +64,10 @@
     --article-tablet-width-collapsed: 60px;
     --back-button-text-color: #{colors.$gray-text};
   }
+}
  
-  .dark {
+:global(.dark) {
+   :local(.apps, .wrapper, .hideArticleMenuButton, .articleHeader, .heading, .profileWrapper, .articleProfile, .article, .backButton){
     --files-article-body-download-app-list-text-color: #{colors.$gray-dark};
     --files-article-body-download-app-list-mac-hover-color: #{colors.$white};
     --files-article-body-dev-tools-color: #{colors.$black};

@@ -55,11 +55,15 @@
         }
       }
     }
-  }
-}
 
-:global {
-  .light {
+  .articleItemHeaderContainer, 
+  .articleItemBadgeWrapper, 
+  .articleItemInitialText,
+  .articleItemText, 
+  .articleItemImg, 
+  .articleItemSibling, 
+  .articleItemContainer, 
+  .storyCatalogWrapper {
     --article-item-header-color: #{colors.$gray};
     --article-item-header-bg-color: #{colors.$gray-strong};
     --article-item-badge-without-text-bg-color: #{colors.$light-status-warning};
@@ -74,23 +78,34 @@
     --article-item-dnd-hover-bg-color: #{colors.$dnd-hover-color};
     --article-item-trash-icon-fill: #{colors.$gray};
     --story-wrapper-bg-color: #{colors.$gray-light};
-  }
+  }}
+}
 
-  .dark {
-    --article-item-header-color: #{colors.$gray-dark};
-    --article-item-header-bg-color: #{colors.$gray-dark-strong};
-    --article-item-badge-without-text-bg-color: #{colors.$main-orange};
-    --article-item-initial-text-color: #{colors.$black};
-    --article-item-text-color: #{colors.$dark-gray-dark};
-    --article-item-text-active-color: #{colors.$white};
-    --article-item-img-svg-fill: #{colors.$dark-gray-dark};
-    --article-item-img-svg-active-fill: #{colors.$white};
-    --article-item-sibling-active-bg-color: #{colors.$black};
-    --article-item-sibling-hover-bg-color: #{colors.$black};
-    --article-item-dnd-bg-color: #{colors.$dnd-dark-color};
-    --article-item-dnd-hover-bg-color: #{colors.$dnd-dark-hover};
-    --article-item-trash-icon-fill: #{colors.$gray-dark};
-    --story-wrapper-bg-color: #{colors.$dark-gray-light};
+:global(.dark) {
+  :local {
+    .articleItemHeaderContainer, 
+    .articleItemBadgeWrapper, 
+    .articleItemInitialText,
+    .articleItemText, 
+    .articleItemImg, 
+    .articleItemSibling, 
+    .articleItemContainer, 
+    .storyCatalogWrapper {
+      --article-item-header-color: #{colors.$gray-dark};
+      --article-item-header-bg-color: #{colors.$gray-dark-strong};
+      --article-item-badge-without-text-bg-color: #{colors.$main-orange};
+      --article-item-initial-text-color: #{colors.$black};
+      --article-item-text-color: #{colors.$dark-gray-dark};
+      --article-item-text-active-color: #{colors.$white};
+      --article-item-img-svg-fill: #{colors.$dark-gray-dark};
+      --article-item-img-svg-active-fill: #{colors.$white};
+      --article-item-sibling-active-bg-color: #{colors.$black};
+      --article-item-sibling-hover-bg-color: #{colors.$black};
+      --article-item-dnd-bg-color: #{colors.$dnd-dark-color};
+      --article-item-dnd-hover-bg-color: #{colors.$dnd-dark-hover};
+      --article-item-trash-icon-fill: #{colors.$gray-dark};
+      --story-wrapper-bg-color: #{colors.$dark-gray-light};
+    }
   }
 }
 
