@@ -34,7 +34,7 @@ import { useEventListener } from "../../hooks/useEventListener";
 import { Scrollbar, ScrollbarType } from "../scrollbar";
 import { LoaderWrapper } from "../loader-wrapper";
 
-import { useViewTab } from "./hooks/useViewTab";
+import { useViewTab } from "./hooks/use-view-tab/useViewTab";
 import { type TTabItem, type TabsProps } from "./Tabs.types";
 import { OFFSET_RIGHT, OFFSET_LEFT } from "./Tabs.constants";
 import styles from "./Tabs.module.scss";

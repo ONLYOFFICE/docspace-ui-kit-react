@@ -41,8 +41,8 @@ import {
   ARROW_WIDTH,
 } from "./Tabs.constants";
 import styles from "./Tabs.module.scss";
-import useTabsHotkeys from "./hooks/useTabsHotkeys";
-import { useViewTab } from "./hooks/useViewTab";
+import useTabsHotkeys from "./hooks/use-tabs-hotkeys/useTabsHotkeys";
+import { useViewTab } from "./hooks/use-view-tab/useViewTab";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 
 const SecondaryTabs = (props: TabsProps) => {
