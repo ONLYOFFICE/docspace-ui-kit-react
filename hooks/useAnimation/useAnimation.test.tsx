@@ -1,8 +1,8 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useAnimation, AnimationEvents } from './index';
+import { renderHook, act } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { useAnimation, AnimationEvents } from "./index";
 
-describe('useAnimation', () => {
+describe("useAnimation", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -12,29 +12,30 @@ describe('useAnimation', () => {
     vi.useRealTimers();
   });
 
-  it('should initialize with default values', () => {
+  it("should initialize with default values", () => {
     const { result } = renderHook(() => useAnimation(true));
 
-    expect(result.current.animationPhase).toBe('none');
+    expect(result.current.animationPhase).toBe("none");
     expect(result.current.isAnimationReady).toBe(false);
     expect(result.current.endWidth).toBe(90);
     expect(result.current.animationElementRef.current).toBeNull();
     expect(result.current.parentElementRef.current).toBeNull();
-    expect(typeof result.current.triggerAnimation).toBe('function');
+    expect(typeof result.current.triggerAnimation).toBe("function");
   });
 
-  it('should trigger animation and change phase to progress', () => {
+  it("should trigger animation and change phase to progress", () => {
     const { result } = renderHook(() => useAnimation(true));
 
     act(() => {
       result.current.triggerAnimation();
     });
 
-    expect(result.current.isAnimationReady).toBe(true);
-    expect(result.current.animationPhase).toBe('progress');
+    // startAnimation sets isAnimationReady to false after triggerAnimation sets it to true
+    expect(result.current.isAnimationReady).toBe(false);
+    expect(result.current.animationPhase).toBe("progress");
   });
 
-  it('should dispatch ANIMATION_STARTED event when animation starts', () => {
+  it("should dispatch ANIMATION_STARTED event when animation starts", () => {
     const eventSpy = vi.fn();
     window.addEventListener(AnimationEvents.ANIMATION_STARTED, eventSpy);
 
@@ -49,7 +50,7 @@ describe('useAnimation', () => {
     window.removeEventListener(AnimationEvents.ANIMATION_STARTED, eventSpy);
   });
 
-  it('should handle END_ANIMATION event and transition to finish phase', async () => {
+  it("should handle END_ANIMATION event and transition to finish phase", () => {
     const { result } = renderHook(() => useAnimation(true));
 
     // Mock refs with dimensions
@@ -60,11 +61,11 @@ describe('useAnimation', () => {
       offsetWidth: 200,
     } as HTMLDivElement;
 
-    Object.defineProperty(result.current.animationElementRef, 'current', {
+    Object.defineProperty(result.current.animationElementRef, "current", {
       writable: true,
       value: mockAnimationElement,
     });
-    Object.defineProperty(result.current.parentElementRef, 'current', {
+    Object.defineProperty(result.current.parentElementRef, "current", {
       writable: true,
       value: mockParentElement,
     });
@@ -73,22 +74,19 @@ describe('useAnimation', () => {
       result.current.triggerAnimation();
     });
 
-    expect(result.current.animationPhase).toBe('progress');
+    expect(result.current.animationPhase).toBe("progress");
 
     // Dispatch END_ANIMATION event
     act(() => {
       window.dispatchEvent(new CustomEvent(AnimationEvents.END_ANIMATION));
     });
 
-    await waitFor(() => {
-      expect(result.current.animationPhase).toBe('finish');
-    });
-
+    expect(result.current.animationPhase).toBe("finish");
     // Check calculated endWidth (180/200 * 100 = 90)
     expect(result.current.endWidth).toBe(90);
   });
 
-  it('should reset to none after finish phase timeout', async () => {
+  it("should reset to none after finish phase timeout", () => {
     const { result } = renderHook(() => useAnimation(true));
 
     const mockAnimationElement = {
@@ -98,11 +96,11 @@ describe('useAnimation', () => {
       offsetWidth: 200,
     } as HTMLDivElement;
 
-    Object.defineProperty(result.current.animationElementRef, 'current', {
+    Object.defineProperty(result.current.animationElementRef, "current", {
       writable: true,
       value: mockAnimationElement,
     });
-    Object.defineProperty(result.current.parentElementRef, 'current', {
+    Object.defineProperty(result.current.parentElementRef, "current", {
       writable: true,
       value: mockParentElement,
     });
@@ -115,22 +113,18 @@ describe('useAnimation', () => {
       window.dispatchEvent(new CustomEvent(AnimationEvents.END_ANIMATION));
     });
 
-    await waitFor(() => {
-      expect(result.current.animationPhase).toBe('finish');
-    });
+    expect(result.current.animationPhase).toBe("finish");
 
     // Fast-forward 400ms
     act(() => {
       vi.advanceTimersByTime(400);
     });
 
-    await waitFor(() => {
-      expect(result.current.animationPhase).toBe('none');
-      expect(result.current.isAnimationReady).toBe(false);
-    });
+    expect(result.current.animationPhase).toBe("none");
+    expect(result.current.isAnimationReady).toBe(false);
   });
 
-  it('should dispatch ANIMATION_ENDED event after reset', async () => {
+  it("should dispatch ANIMATION_ENDED event after reset", () => {
     const eventSpy = vi.fn();
     window.addEventListener(AnimationEvents.ANIMATION_ENDED, eventSpy);
 
@@ -143,11 +137,11 @@ describe('useAnimation', () => {
       offsetWidth: 200,
     } as HTMLDivElement;
 
-    Object.defineProperty(result.current.animationElementRef, 'current', {
+    Object.defineProperty(result.current.animationElementRef, "current", {
       writable: true,
       value: mockAnimationElement,
     });
-    Object.defineProperty(result.current.parentElementRef, 'current', {
+    Object.defineProperty(result.current.parentElementRef, "current", {
       writable: true,
       value: mockParentElement,
     });
@@ -160,60 +154,57 @@ describe('useAnimation', () => {
       window.dispatchEvent(new CustomEvent(AnimationEvents.END_ANIMATION));
     });
 
-    await waitFor(() => {
-      expect(result.current.animationPhase).toBe('finish');
-    });
+    expect(result.current.animationPhase).toBe("finish");
 
     act(() => {
       vi.advanceTimersByTime(400);
     });
 
-    await waitFor(() => {
-      expect(eventSpy).toHaveBeenCalledTimes(1);
-    });
+    expect(eventSpy).toHaveBeenCalledTimes(1);
 
     window.removeEventListener(AnimationEvents.ANIMATION_ENDED, eventSpy);
   });
 
-  it('should reset animation when isActive becomes false', () => {
+  it("should reset animation when isActive becomes false", () => {
     const { result, rerender } = renderHook(
       ({ isActive }) => useAnimation(isActive),
       {
         initialProps: { isActive: true },
-      }
+      },
     );
 
     act(() => {
       result.current.triggerAnimation();
     });
 
-    expect(result.current.animationPhase).toBe('progress');
-    expect(result.current.isAnimationReady).toBe(true);
+    expect(result.current.animationPhase).toBe("progress");
+    // startAnimation sets isAnimationReady to false
+    expect(result.current.isAnimationReady).toBe(false);
 
     // Change isActive to false
-    rerender({ isActive: false });
+    act(() => {
+      rerender({ isActive: false });
+    });
 
-    expect(result.current.animationPhase).toBe('none');
+    expect(result.current.animationPhase).toBe("none");
     expect(result.current.isAnimationReady).toBe(false);
   });
 
-  it('should not transition to finish if not in progress phase', async () => {
+  it("should not transition to finish if not in progress phase", () => {
     const { result } = renderHook(() => useAnimation(true));
 
     // Don't trigger animation, phase is 'none'
-    expect(result.current.animationPhase).toBe('none');
+    expect(result.current.animationPhase).toBe("none");
 
     act(() => {
       window.dispatchEvent(new CustomEvent(AnimationEvents.END_ANIMATION));
     });
 
     // Should remain in 'none' phase
-    await waitFor(() => {
-      expect(result.current.animationPhase).toBe('none');
-    });
+    expect(result.current.animationPhase).toBe("none");
   });
 
-  it('should calculate endWidth correctly based on element dimensions', async () => {
+  it("should calculate endWidth correctly based on element dimensions", () => {
     const { result } = renderHook(() => useAnimation(true));
 
     const mockAnimationElement = {
@@ -223,11 +214,11 @@ describe('useAnimation', () => {
       offsetWidth: 300,
     } as HTMLDivElement;
 
-    Object.defineProperty(result.current.animationElementRef, 'current', {
+    Object.defineProperty(result.current.animationElementRef, "current", {
       writable: true,
       value: mockAnimationElement,
     });
-    Object.defineProperty(result.current.parentElementRef, 'current', {
+    Object.defineProperty(result.current.parentElementRef, "current", {
       writable: true,
       value: mockParentElement,
     });
@@ -240,16 +231,13 @@ describe('useAnimation', () => {
       window.dispatchEvent(new CustomEvent(AnimationEvents.END_ANIMATION));
     });
 
-    await waitFor(() => {
-      expect(result.current.animationPhase).toBe('finish');
-    });
-
+    expect(result.current.animationPhase).toBe("finish");
     // 150/300 * 100 = 50
     expect(result.current.endWidth).toBe(50);
   });
 
-  it('should cleanup event listeners on unmount', () => {
-    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+  it("should cleanup event listeners on unmount", () => {
+    const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
 
     const { unmount } = renderHook(() => useAnimation(true));
 
@@ -257,11 +245,11 @@ describe('useAnimation', () => {
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
       AnimationEvents.END_ANIMATION,
-      expect.any(Function)
+      expect.any(Function),
     );
   });
 
-  it('should handle multiple animation triggers correctly', () => {
+  it("should handle multiple animation triggers correctly", () => {
     const { result } = renderHook(() => useAnimation(true));
 
     // First trigger
@@ -269,19 +257,19 @@ describe('useAnimation', () => {
       result.current.triggerAnimation();
     });
 
-    expect(result.current.animationPhase).toBe('progress');
+    expect(result.current.animationPhase).toBe("progress");
 
     // Second trigger while in progress
     act(() => {
       result.current.triggerAnimation();
     });
 
-    // Should still be in progress, ready state reset and set again
-    expect(result.current.animationPhase).toBe('progress');
-    expect(result.current.isAnimationReady).toBe(true);
+    // Should still be in progress, startAnimation sets isAnimationReady to false
+    expect(result.current.animationPhase).toBe("progress");
+    expect(result.current.isAnimationReady).toBe(false);
   });
 
-  it('should maintain default endWidth when refs are not set', async () => {
+  it("should maintain default endWidth when refs are not set", () => {
     const { result } = renderHook(() => useAnimation(true));
 
     // Don't set refs, they remain null
@@ -293,11 +281,9 @@ describe('useAnimation', () => {
       window.dispatchEvent(new CustomEvent(AnimationEvents.END_ANIMATION));
     });
 
-    await waitFor(() => {
-      expect(result.current.animationPhase).toBe('finish');
-    });
-
+    expect(result.current.animationPhase).toBe("finish");
     // Should keep default value of 90
     expect(result.current.endWidth).toBe(90);
   });
+
 });

@@ -25,6 +25,7 @@ export default defineConfig({
       "utils/**/*.test.{ts,tsx}",
       "context/**/*.test.{ts,tsx}",
       "providers/**/*.test.{ts,tsx}",
+      "hooks/**/*.test.{ts,tsx}",
     ],
     css: {
       modules: {
