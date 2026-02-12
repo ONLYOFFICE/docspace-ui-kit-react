@@ -57,6 +57,9 @@ import {
   isValidDate,
   isPast,
   isFuture,
+  isSameDay,
+  minDate,
+  maxDate,
 } from "./dateComparison";
 
 import { humanizeDuration, fromNow, createDuration } from "./duration";
@@ -296,6 +299,52 @@ describe("Date Utilities", () => {
       expect(isFuture(pastDate)).toBe(false);
       expect(isPast(futureDate)).toBe(false);
       expect(isFuture(futureDate)).toBe(true);
+      expect(isPast(null)).toBe(false);
+      expect(isFuture(null)).toBe(false);
+    });
+
+    it("isSameDay works correctly", () => {
+      const date1 = new Date(2024, 0, 15, 10, 30);
+      const date2 = new Date(2024, 0, 15, 20, 45);
+      const date3 = new Date(2024, 0, 16);
+      expect(isSameDay(date1, date2)).toBe(true);
+      expect(isSameDay(date1, date3)).toBe(false);
+      expect(isSameDay(null, date1)).toBe(false);
+    });
+
+    it("minDate and maxDate work correctly", () => {
+      const date1 = new Date(2024, 0, 10);
+      const date2 = new Date(2024, 0, 20);
+      expect(minDate(date1, date2)?.day).toBe(10);
+      expect(maxDate(date1, date2)?.day).toBe(20);
+
+      expect(minDate(null, date1)?.day).toBe(10);
+      expect(maxDate(date1, null)?.day).toBe(10);
+      expect(minDate(null, null)).toBeNull();
+    });
+
+    it("isBetween with inclusive/exclusive boundaries", () => {
+      const date = new Date(2024, 0, 15);
+      const start = new Date(2024, 0, 10);
+      const end = new Date(2024, 0, 15);
+      expect(isBetween(date, start, end, true)).toBe(true);
+      expect(isBetween(date, start, end, false)).toBe(false);
+    });
+
+    it("isSame without units", () => {
+      const date1 = new Date(2024, 0, 15, 10, 30);
+      const date2 = new Date(2024, 0, 15, 10, 30);
+      const date3 = new Date(2024, 0, 15, 10, 31);
+      expect(isSame(date1, date2)).toBe(true);
+      expect(isSame(date1, date3)).toBe(false);
+    });
+
+    it("handles null in comparison functions", () => {
+      expect(dateDiff(null, new Date(), "days")).toBe(0);
+      expect(isBefore(null, new Date())).toBe(false);
+      expect(isAfter(null, new Date())).toBe(false);
+      expect(isSame(null, new Date())).toBe(false);
+      expect(isBetween(null, new Date(), new Date())).toBe(false);
     });
   });
 
