@@ -26,7 +26,7 @@
 
 import { Meta, StoryObj } from "@storybook/react-vite";
 
-import LogoUrl from "../../assets/mail.react.svg?url";
+import LogoUrl from "../../assets/dark_leftmenu.svg?url";
 
 import { MCPIconSize } from "./MCPIcon.enum";
 import { MCPIcon } from "./MCPIcon";
