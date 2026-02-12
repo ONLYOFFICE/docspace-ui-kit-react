@@ -53,7 +53,7 @@ function collectUsedKeys() {
 const USED_KEYS = collectUsedKeys();
 
 // Keys that are not detected by regex but still required
-for (const key of ["Dont", "Warning", "Alert", "Info"]) {
+for (const key of ["Done", "SaveButton", "Warning", "Alert", "Info"]) {
   USED_KEYS.add(key);
 }
 
