@@ -31,12 +31,13 @@
 
 .selectorButton {
   display: inline-block;
+  overflow: hidden;
   background: var(--selector-add-button-background);
   border: var(--selector-add-button-border);
   box-sizing: var(--selector-add-button-box-sizing);
   border-radius: var(--selector-add-button-border-radius);
-  height: var(--selector-add-button-height);
-  width: var(--selector-add-button-width);
+  height: var(--selector-add-button-size, --selector-add-button-height);
+  width: var(--selector-add-button-size, --selector-add-button-width);
   padding: var(--selector-add-button-padding);
   cursor: pointer;
 

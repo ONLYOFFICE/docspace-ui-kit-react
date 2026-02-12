@@ -13,6 +13,7 @@ import globalTypes from "./globals";
 import enCommon from "../locales/en/Common.json";
 
 import "./styles.css";
+import "../css/fonts.css";
 
 import lightTheme from "./lightTheme";
 import darkTheme from "./darkTheme";
@@ -87,6 +88,8 @@ const preview: Preview = {
         ["en", new Map([["Common", enCommon]])],
       ]);
 
+      const isDocs = context.viewMode === "docs";
+
       return (
         <TranslationProvider locale="en" translations={translations}>
           <ThemeProviderComponent
@@ -99,7 +102,7 @@ const preview: Preview = {
                   ? globalColors.black
                   : globalColors.white,
                 color: isDark ? globalColors.white : globalColors.black,
-                padding: "20px",
+                padding: isDocs ? "0" : "20px",
               }}
             >
               <Story />

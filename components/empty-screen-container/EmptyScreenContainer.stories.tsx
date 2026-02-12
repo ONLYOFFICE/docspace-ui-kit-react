@@ -27,7 +27,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
-import EmptySvgUrl from "../../assets/empty.svg?url";
+import EmptyImageReactSvg from "../../assets/empty.rooms.root.light.svg?url";
 
 import { IconSizeType } from "../../utils";
 import { Link, LinkType } from "../link";
@@ -117,7 +117,7 @@ const HomeButton = () => (
 
 export const Default: Story = {
   args: {
-    imageSrc: EmptySvgUrl,
+    imageSrc: EmptyImageReactSvg,
     imageAlt: "Empty Screen Filter image",
     headerText: "No results matching your search could be found",
     subheadingText: "No files to be displayed in this section",
@@ -129,7 +129,7 @@ export const Default: Story = {
 
 export const MinimalContent: Story = {
   args: {
-    imageSrc: EmptySvgUrl,
+    imageSrc: EmptyImageReactSvg,
     imageAlt: "Empty search results",
     headerText: "No results found",
     buttons: <HomeButton />,
@@ -138,7 +138,7 @@ export const MinimalContent: Story = {
 
 export const CustomStyles: Story = {
   args: {
-    imageSrc: EmptySvgUrl,
+    imageSrc: EmptyImageReactSvg,
     imageAlt: "Empty Screen Filter image",
     headerText: "Custom styled empty state",
     descriptionText: "This example shows custom styles for image and buttons",
@@ -150,7 +150,7 @@ export const CustomStyles: Story = {
 
 export const WithoutFilter: Story = {
   args: {
-    imageSrc: EmptySvgUrl,
+    imageSrc: EmptyImageReactSvg,
     imageAlt: "Welcome image",
     headerText: "Welcome to your workspace",
     descriptionText:

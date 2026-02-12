@@ -416,13 +416,13 @@
   }
 }
 
-.withTabs {
-  top: 114px;
+// .withTabs {
+//   top: 114px;
 
-  @include mixins.mobile {
-    top: calc(106px + var(--nav-offset, 0));
-  }
-}
+//   @include mixins.mobile {
+//     top: calc(106px + var(--nav-offset, 0));
+//   }
+// }
 
 .sectionContainer {
   position: relative;

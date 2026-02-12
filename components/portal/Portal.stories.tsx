@@ -29,6 +29,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Portal } from "./Portal";
 
+import styles from "./Portal.module.scss";
+
 const meta: Meta<typeof Portal> = {
   title: "Components/UI/Portal",
   component: Portal,
@@ -60,42 +62,36 @@ export default meta;
 
 type Story = StoryObj<typeof Portal>;
 
-const popupStyles: React.CSSProperties = {
-  position: "fixed",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  padding: 20,
-  backgroundColor: "#fff",
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-  borderRadius: 6,
-  zIndex: 1000,
-};
-
 export const Default: Story = {
-  render: (args) => (
-    <div>
-      <p>Content outside portal</p>
-      <Portal {...args} />
-    </div>
-  ),
+  render: (args) => {
+    const [container, setContainer] = useState<HTMLElement | null>(null);
+
+    return (
+      <div ref={setContainer} className={styles.customContainer}>
+        <p>Content outside portal</p>
+        {container && <Portal {...args} appendTo={container} />}
+      </div>
+    );
+  },
   args: {
-    element: (
-      <div style={popupStyles}>This content is rendered in a portal</div>
-    ),
+    element: <div className={styles.popup}>This content is rendered in a portal</div>,
     visible: true,
   },
 };
 
 export const Hidden: Story = {
-  render: (args) => (
-    <div>
-      <p>Portal is hidden (visible=false)</p>
-      <Portal {...args} />
-    </div>
-  ),
+  render: (args) => {
+    const [container, setContainer] = useState<HTMLElement | null>(null);
+
+    return (
+      <div ref={setContainer} className={styles.customContainer}>
+        <p>Portal is hidden (visible=false)</p>
+        {container && <Portal {...args} appendTo={container} />}
+      </div>
+    );
+  },
   args: {
-    element: <div style={popupStyles}>You should not see this</div>,
+    element: <div className={styles.popup}>You should not see this</div>,
     visible: false,
   },
 };
@@ -107,29 +103,12 @@ export const CustomContainer: Story = {
     return (
       <div>
         <p>Main content</p>
-        <div
-          ref={setContainer}
-          style={{
-            position: "relative",
-            width: 300,
-            height: 150,
-            border: "2px dashed #ccc",
-            margin: 20,
-            padding: 10,
-          }}
-        >
+        <div ref={setContainer} className={styles.customContainer}>
           <p>Custom container (portal target)</p>
           {container && (
             <Portal
               element={
-                <div
-                  style={{
-                    padding: 10,
-                    backgroundColor: "#e3f2fd",
-                    borderRadius: 4,
-                    marginTop: 10,
-                  }}
-                >
+                <div className={`${styles.popup} ${styles.blue}`}>
                   Content rendered inside custom container
                 </div>
               }
@@ -143,58 +122,52 @@ export const CustomContainer: Story = {
 };
 
 export const MultiplePortals: Story = {
-  render: () => (
-    <div>
-      <p>Multiple portals example</p>
-      <Portal
-        element={
-          <div
-            style={{
-              ...popupStyles,
-              top: "30%",
-              backgroundColor: "#e3f2fd",
-            }}
-          >
-            First Portal
-          </div>
-        }
-      />
-      <Portal
-        element={
-          <div
-            style={{
-              ...popupStyles,
-              top: "50%",
-              backgroundColor: "#f3e5f5",
-            }}
-          >
-            Second Portal
-          </div>
-        }
-      />
-      <Portal
-        element={
-          <div
-            style={{
-              ...popupStyles,
-              top: "70%",
-              backgroundColor: "#e8f5e9",
-            }}
-          >
-            Third Portal
-          </div>
-        }
-      />
-    </div>
-  ),
+  render: () => {
+    const [container, setContainer] = useState<HTMLElement | null>(null);
+
+    return (
+      <div ref={setContainer} className={styles.customContainer}>
+        <p>Multiple portals example</p>
+        {container && (
+          <>
+            <Portal
+              element={
+                <div className={`${styles.popup} ${styles.blue}`}>
+                  First Portal
+                </div>
+              }
+              appendTo={container}
+            />
+            <Portal
+              element={
+                <div className={`${styles.popup} ${styles.purple}`}>
+                  Second Portal
+                </div>
+              }
+              appendTo={container}
+            />
+            <Portal
+              element={
+                <div className={`${styles.popup} ${styles.green}`}>
+                  Third Portal
+                </div>
+              }
+              appendTo={container}
+            />
+          </>
+        )}
+      </div>
+    );
+  },
 };
 
 export const ToggleVisibility: Story = {
   render: () => {
+    const [container, setContainer] = useState<HTMLElement | null>(null);
     const [visible, setVisible] = useState(false);
 
     return (
-      <div>
+      <div ref={setContainer} className={styles.customContainer}>
         <button
           type="button"
           onClick={() => setVisible(!visible)}
@@ -202,21 +175,24 @@ export const ToggleVisibility: Story = {
         >
           {visible ? "Hide Portal" : "Show Portal"}
         </button>
-        <Portal
-          element={
-            <div style={popupStyles}>
-              <p>Portal content</p>
-              <button
-                type="button"
-                onClick={() => setVisible(false)}
-                style={{ padding: "4px 8px", cursor: "pointer" }}
-              >
-                Close
-              </button>
-            </div>
-          }
-          visible={visible}
-        />
+        {container && (
+          <Portal
+            element={
+              <div className={styles.popup}>
+                <p>Portal content</p>
+                <button
+                  type="button"
+                  onClick={() => setVisible(false)}
+                  style={{ padding: "4px 8px", cursor: "pointer" }}
+                >
+                  Close
+                </button>
+              </div>
+            }
+            visible={visible}
+            appendTo={container}
+          />
+        )}
       </div>
     );
   },

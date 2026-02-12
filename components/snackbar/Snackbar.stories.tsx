@@ -123,7 +123,8 @@ export const WithCountdown: Story = {
 export const WithHtmlContent: Story = {
   args: {
     ...baseArgs,
-    htmlContent: "<img src='assets/lightsmall.svg' />",
+    htmlContent:
+      "<p style='margin: 0; font-size: 13px;'>Your storage is <b>almost full</b>. Please free up space or <a href='#' style='color: #4781d1;'>upgrade your plan</a> to continue working without interruptions.</p>",
     text: undefined as unknown as string,
   },
   render: (args) => <SnackBarWrapper {...args} />,

@@ -27,7 +27,8 @@
 import { useState } from "react";
 import { Meta, StoryObj } from "@storybook/react-vite";
 
-import File32ReactSvg from "../../../assets/icons/32/file.react.svg";
+import WordSvgUrl from "../../../assets/icons/32/word.svg";
+
 import ImageReactSvg from "../../../assets/empty.rooms.root.light.svg";
 import LockedReact12Svg from "../../../assets/icons/12/lock.react.svg";
 import { Link } from "../../link";
@@ -40,7 +41,7 @@ import { FileTileProps } from "./FileTile.types";
 import { TileContent } from "../tile-content";
 import { IconButton } from "../../icon-button";
 
-const element = <File32ReactSvg />;
+const wordElement = <WordSvgUrl />;
 
 const contextOptions = [
   {
@@ -143,7 +144,7 @@ export const Default: Story = {
       fileType: FileType.Document,
       contextOptions: ["copy-to", "move-to"],
     },
-    element,
+    element: wordElement,
     contextOptions,
     contentElement,
     badges,

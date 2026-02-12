@@ -61,7 +61,7 @@ const Template: StoryFn<DragAndDropProps> = (args) => {
   };
 
   const dropZoneStyle: React.CSSProperties = {
-    width: "300px",
+    width: "100%",
     height: "200px",
     border: `2px dashed ${isDragging ? "#2DA7DB" : "#D0D5DA"}`,
     borderRadius: "6px",

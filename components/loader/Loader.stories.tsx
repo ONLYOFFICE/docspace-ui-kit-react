@@ -31,53 +31,53 @@ import { LoaderTypes } from "./Loader.enums";
 import { globalColors } from "../../providers/theme";
 
 const meta = {
-	title: "Components/Status components/Loader",
-	component: Loader,
-	parameters: {
-		docs: {
-			description: {
-				component:
-					"Loader component is used for displaying loading states and progress indicators in the application. It supports multiple types of loaders and can be customized with different colors and sizes.",
-			},
-		},
-		design: {
-			type: "figma",
-			url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=419-1989&mode=design&t=TBNCKMQKQMxr44IZ-0",
-		},
-	},
-	argTypes: {
-		type: {
-			description: "Type of the loader animation",
-			control: "select",
-			options: Object.values(LoaderTypes),
-			table: {
-				type: { summary: "LoaderTypes" },
-				defaultValue: { summary: LoaderTypes.base },
-			},
-		},
-		color: {
-			description: "Color of the loader",
-			control: "color",
-			table: {
-				type: { summary: "string" },
-			},
-		},
-		size: {
-			description: "Size of the loader (in px, rem, or other CSS units)",
-			control: "text",
-			table: {
-				type: { summary: "string" },
-				defaultValue: { summary: "18px" },
-			},
-		},
-		label: {
-			description: "Accessibility label for screen readers",
-			control: "text",
-			table: {
-				type: { summary: "string" },
-			},
-		},
-	},
+  title: "Components/Status components/Loader",
+  component: Loader,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Loader component is used for displaying loading states and progress indicators in the application. It supports multiple types of loaders and can be customized with different colors and sizes.",
+      },
+    },
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=419-1989&mode=design&t=TBNCKMQKQMxr44IZ-0",
+    },
+  },
+  argTypes: {
+    type: {
+      description: "Type of the loader animation",
+      control: "select",
+      options: Object.values(LoaderTypes),
+      table: {
+        type: { summary: "LoaderTypes" },
+        defaultValue: { summary: LoaderTypes.base },
+      },
+    },
+    color: {
+      description: "Color of the loader",
+      control: "color",
+      table: {
+        type: { summary: "string" },
+      },
+    },
+    size: {
+      description: "Size of the loader (in px, rem, or other CSS units)",
+      control: "text",
+      table: {
+        type: { summary: "string" },
+        defaultValue: { summary: "18px" },
+      },
+    },
+    label: {
+      description: "Accessibility label for screen readers",
+      control: "text",
+      table: {
+        type: { summary: "string" },
+      },
+    },
+  },
 } satisfies Meta<typeof Loader>;
 
 type Story = StoryObj<typeof Loader>;
@@ -85,147 +85,150 @@ type Story = StoryObj<typeof Loader>;
 export default meta;
 
 export const Default: Story = {
-	args: {
-		type: LoaderTypes.base,
-		size: "18px",
-		label: "Loading content, please wait...",
-	},
+  args: {
+    type: LoaderTypes.base,
+    size: "18px",
+    label: "Loading content, please wait...",
+  },
 };
 
 export const Oval: Story = {
-	args: {
-		type: LoaderTypes.oval,
-		size: "40px",
-		color: globalColors.loaderLight,
-		label: "Loading...",
-	},
+  args: {
+    type: LoaderTypes.oval,
+    size: "40px",
+    color: globalColors.loaderLight,
+    label: "Loading...",
+  },
 };
 
 export const DualRing: Story = {
-	args: {
-		type: LoaderTypes.dualRing,
-		size: "40px",
-		color: "#333333",
-		label: "Loading...",
-	},
+  args: {
+    type: LoaderTypes.dualRing,
+    size: "40px",
+    color: "#333333",
+    label: "Loading...",
+  },
 };
 
 export const Rombs: Story = {
-	args: {
-		type: LoaderTypes.rombs,
-		size: "65px",
-		label: "Loading...",
-	},
+  args: {
+    type: LoaderTypes.rombs,
+    size: "65px",
+    label: "Loading...",
+  },
+  parameters: {
+    layout: "centered",
+  },
 };
 
 export const Track: Story = {
-	args: {
-		type: LoaderTypes.track,
-		size: "30px",
-		label: "Loading...",
-	},
+  args: {
+    type: LoaderTypes.track,
+    size: "30px",
+    label: "Loading...",
+  },
 };
 
 export const AllTypes: Story = {
-	render: () => (
-		<div
-			style={{
-				display: "flex",
-				gap: "40px",
-				alignItems: "center",
-				padding: "20px",
-			}}
-		>
-			<div style={{ textAlign: "center" }}>
-				<Loader type={LoaderTypes.base} size="18px" label="Base loader" />
-				<div style={{ marginTop: "10px", fontSize: "12px" }}>Base</div>
-			</div>
+  render: () => (
+    <div
+      style={{
+        display: "flex",
+        gap: "40px",
+        alignItems: "center",
+        padding: "20px",
+      }}
+    >
+      <div style={{ textAlign: "center" }}>
+        <Loader type={LoaderTypes.base} size="18px" label="Base loader" />
+        <div style={{ marginTop: "10px", fontSize: "12px" }}>Base</div>
+      </div>
 
-			<div style={{ textAlign: "center" }}>
-				<Loader
-					type={LoaderTypes.oval}
-					size="40px"
-					color={globalColors.loaderLight}
-					label="Oval loader"
-				/>
-				<div style={{ marginTop: "10px", fontSize: "12px" }}>Oval</div>
-			</div>
+      <div style={{ textAlign: "center" }}>
+        <Loader
+          type={LoaderTypes.oval}
+          size="40px"
+          color={globalColors.loaderLight}
+          label="Oval loader"
+        />
+        <div style={{ marginTop: "10px", fontSize: "12px" }}>Oval</div>
+      </div>
 
-			<div style={{ textAlign: "center" }}>
-				<Loader
-					type={LoaderTypes.dualRing}
-					size="40px"
-					color="#333333"
-					label="Dual ring loader"
-				/>
-				<div style={{ marginTop: "10px", fontSize: "12px" }}>Dual Ring</div>
-			</div>
+      <div style={{ textAlign: "center" }}>
+        <Loader
+          type={LoaderTypes.dualRing}
+          size="40px"
+          color="#333333"
+          label="Dual ring loader"
+        />
+        <div style={{ marginTop: "10px", fontSize: "12px" }}>Dual Ring</div>
+      </div>
 
-			<div style={{ textAlign: "center" }}>
-				<Loader type={LoaderTypes.rombs} size="65px" label="Rombs loader" />
-				<div style={{ marginTop: "10px", fontSize: "12px" }}>Rombs</div>
-			</div>
+      <div style={{ textAlign: "center" }}>
+        <Loader type={LoaderTypes.rombs} size="65px" label="Rombs loader" />
+        <div style={{ marginTop: "10px", fontSize: "12px" }}>Rombs</div>
+      </div>
 
-			<div style={{ textAlign: "center" }}>
-				<Loader type={LoaderTypes.track} size="30px" label="Track loader" />
-				<div style={{ marginTop: "10px", fontSize: "12px" }}>Track</div>
-			</div>
-		</div>
-	),
+      <div style={{ textAlign: "center" }}>
+        <Loader type={LoaderTypes.track} size="30px" label="Track loader" />
+        <div style={{ marginTop: "10px", fontSize: "12px" }}>Track</div>
+      </div>
+    </div>
+  ),
 };
 
 export const CustomColors: Story = {
-	render: () => (
-		<div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-			<Loader
-				type={LoaderTypes.dualRing}
-				color="#FF5722"
-				size="40px"
-				label="Orange loader"
-			/>
-			<Loader
-				type={LoaderTypes.dualRing}
-				color="#2196F3"
-				size="40px"
-				label="Blue loader"
-			/>
-			<Loader
-				type={LoaderTypes.dualRing}
-				color="#4CAF50"
-				size="40px"
-				label="Green loader"
-			/>
-			<Loader
-				type={LoaderTypes.dualRing}
-				color="#9C27B0"
-				size="40px"
-				label="Purple loader"
-			/>
-		</div>
-	),
+  render: () => (
+    <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+      <Loader
+        type={LoaderTypes.dualRing}
+        color="#FF5722"
+        size="40px"
+        label="Orange loader"
+      />
+      <Loader
+        type={LoaderTypes.dualRing}
+        color="#2196F3"
+        size="40px"
+        label="Blue loader"
+      />
+      <Loader
+        type={LoaderTypes.dualRing}
+        color="#4CAF50"
+        size="40px"
+        label="Green loader"
+      />
+      <Loader
+        type={LoaderTypes.dualRing}
+        color="#9C27B0"
+        size="40px"
+        label="Purple loader"
+      />
+    </div>
+  ),
 };
 
 export const DifferentSizes: Story = {
-	render: () => (
-		<div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-			<Loader
-				type={LoaderTypes.oval}
-				color={globalColors.loaderLight}
-				size="24px"
-				label="Small loader"
-			/>
-			<Loader
-				type={LoaderTypes.oval}
-				color={globalColors.loaderLight}
-				size="40px"
-				label="Medium loader"
-			/>
-			<Loader
-				type={LoaderTypes.oval}
-				color={globalColors.loaderLight}
-				size="60px"
-				label="Large loader"
-			/>
-		</div>
-	),
+  render: () => (
+    <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+      <Loader
+        type={LoaderTypes.oval}
+        color={globalColors.loaderLight}
+        size="24px"
+        label="Small loader"
+      />
+      <Loader
+        type={LoaderTypes.oval}
+        color={globalColors.loaderLight}
+        size="40px"
+        label="Medium loader"
+      />
+      <Loader
+        type={LoaderTypes.oval}
+        color={globalColors.loaderLight}
+        size="60px"
+        label="Large loader"
+      />
+    </div>
+  ),
 };

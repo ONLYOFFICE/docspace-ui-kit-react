@@ -278,7 +278,27 @@ export const Tel: Story = {
   args: {
     ...Default.args,
     type: InputType.tel,
-    placeholder: "Enter phone number",
+    placeholder: "+1 (___) ___-____",
+    mask: [
+      "+",
+      /\d/,
+      " ",
+      "(",
+      /\d/,
+      /\d/,
+      /\d/,
+      ")",
+      " ",
+      /\d/,
+      /\d/,
+      /\d/,
+      "-",
+      /\d/,
+      /\d/,
+      /\d/,
+      /\d/,
+    ],
+    guide: true,
   },
 };
 

@@ -84,7 +84,9 @@
     }
 
     svg {
-      fill: var(--main-button-mobile-icon-fill);
+      path, rect {
+        fill: var(--main-button-mobile-icon-fill);
+      }
     }
   }
 }
