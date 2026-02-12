@@ -58,7 +58,7 @@ const setupI18n = () => {
 };
 
 const meta: Meta = {
-  title: "Error Pages",
+  title: "Errors/Error Pages",
   parameters: {
     docs: {
       description: {
