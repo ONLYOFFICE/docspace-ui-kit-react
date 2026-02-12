@@ -27,7 +27,9 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react-vite";
 
-import File32ReactSvg from "../../../assets/icons/32/file.react.svg";
+import WordSvgUrl from "../../../assets/icons/32/word.svg";
+import PdfSvgUrl from "../../../assets/icons/32/pdf.svg";
+import SlideSvgUrl from "../../../assets/icons/32/slide.svg";
 import ImageReactSvg from "../../../assets/empty.rooms.root.light.svg";
 
 import { TileContainerProps } from "./TileContainer.types";
@@ -37,7 +39,9 @@ import { FileType } from "../../../enums";
 import { Link } from "../../link";
 import { FileTile } from "../file-tile";
 
-const element = <File32ReactSvg />;
+const wordElement = <WordSvgUrl />;
+const pdfElement = <PdfSvgUrl />;
+const slideElement = <SlideSvgUrl />;
 
 const meta: Meta = {
   title: "Components/UI/Tiles/TileContainer",
@@ -88,7 +92,13 @@ const Template: StoryFn<TileContainerProps> = (args) => {
           item={file}
           contextOptions={mockContextOptions}
           temporaryIcon={<ImageReactSvg />}
-          element={element}
+          element={
+            file.fileType === FileType.Spreadsheet
+              ? slideElement
+              : file.fileType === FileType.Presentation
+                ? pdfElement
+                : wordElement
+          }
         >
           <TileContent>
             <Link>{file.title}</Link>

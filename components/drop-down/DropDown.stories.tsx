@@ -470,44 +470,6 @@ export const CustomWidth: Story = {
   },
 };
 
-const WithKeyboardNavigationTemplate = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const parentRef = React.useRef<HTMLButtonElement>(null);
-
-  return (
-    <div style={{ padding: "20px" }}>
-      <Button
-        ref={parentRef}
-        label="Keyboard Navigation"
-        onClick={() => setIsOpen(true)}
-      />
-      <DropDown
-        open={isOpen}
-        forwardedRef={parentRef}
-        enableKeyboardEvents
-        clickOutsideAction={() => setIsOpen(false)}
-      >
-        <DropDownItem label="First Item" onClick={() => setIsOpen(false)} />
-        <DropDownItem label="Second Item" onClick={() => setIsOpen(false)} />
-        <DropDownItem label="Third Item" onClick={() => setIsOpen(false)} />
-        <DropDownItem label="Fourth Item" onClick={() => setIsOpen(false)} />
-      </DropDown>
-    </div>
-  );
-};
-
-export const WithKeyboardNavigation: Story = {
-  render: () => <WithKeyboardNavigationTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Enable `enableKeyboardEvents` to allow navigation with arrow keys. Press Enter to select.",
-      },
-    },
-  },
-};
-
 const ContextMenuTemplate = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const parentRef = React.useRef<HTMLButtonElement>(null);

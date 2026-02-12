@@ -27,15 +27,16 @@
 import { useState } from "react";
 import { Meta, StoryObj } from "@storybook/react-vite";
 
-import File32ReactSvg from "../../../assets/icons/32/file.react.svg";
+import WordSvgUrl from "../../../assets/icons/32/word.svg";
+import PdfSvgUrl from "../../../assets/icons/32/pdf.svg";
+import SlideSvgUrl from "../../../assets/icons/32/slide.svg";
 import { Link } from "../../link";
-import { FileType } from "../../../enums";
 
 import { BaseTile } from ".";
 import { BaseTileProps } from "./BaseTile.types";
 import { TileContent } from "../tile-content";
 
-const element = <File32ReactSvg />;
+const wordElement = <WordSvgUrl />;
 
 const contextOptions = [
   {
@@ -100,7 +101,7 @@ export const Default: Story = {
       title: "Document.docx",
       fileExst: ".docx",
     },
-    element,
+    element: wordElement,
     contextOptions,
     topContent: (
       <TileContent>

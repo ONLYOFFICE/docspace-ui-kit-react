@@ -106,30 +106,19 @@ const Template = ({
   };
 
   return (
-    <div style={{ height: "110px", display: "grid", gridGap: "24px" }}>
-      <div style={{ backgroundColor: "transparent", width: "fit-content" }}>
-        <TextInput
-          name="demoEmailInput"
-          type={InputType.email}
-          size={InputSize.base}
-          isDisabled={args.isDisabled}
-          isReadOnly
-          value="demo@gmail.com"
-          style={{ width: "166px" }}
-        />
-      </div>
+    <div style={{ height: "110px", display: "grid", gridGap: "24px", width: "320px" }}>
+     
 
-      <div style={{ backgroundColor: "transparent", width: "fit-content" }}>
-        <PasswordInput
-          size={InputSize.base}
-          {...args}
-          inputValue={value}
-          onChange={onChangeHandler}
-          tooltipPasswordLength={`${tooltipPasswordLength} ${passwordSettings?.minLength}`}
-          passwordSettings={fakeSettings}
-          onValidateInput={onValidateInputHandler}
-        />
-      </div>
+      <PasswordInput
+        size={InputSize.base}
+        {...args}
+        inputValue={value}
+        onChange={onChangeHandler}
+        tooltipPasswordLength={`${tooltipPasswordLength} ${passwordSettings?.minLength}`}
+        passwordSettings={fakeSettings}
+        onValidateInput={onValidateInputHandler}
+        scale
+      />
     </div>
   );
 };

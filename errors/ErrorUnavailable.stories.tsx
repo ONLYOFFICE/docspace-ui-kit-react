@@ -26,81 +26,28 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { Error401 } from "./Error401";
-import { Error403 } from "./Error403";
-import Error404 from "./Error404";
-import { ErrorOfflineContainer } from "./ErrorOffline";
-import { ErrorInvalidLink } from "./ErrorInvalidLink";
 import ErrorUnavailable from "./ErrorUnavailable";
-import { AccessRestricted } from "./AccessRestricted";
+import { setupErrorI18n } from "./stories.utils";
 
-const setupI18n = () => {
-  (window as unknown as Record<string, unknown>).i18n = {
-    loaded: {
-      "en/Common.json": {
-        data: {
-          Error401Text: "You are not authorized (401)",
-          Error403Text: "Access forbidden (403)",
-          Error404Text: "Page not found (404)",
-          ErrorOfflineText: "You are offline",
-          InvalidLink: "Invalid link",
-          LinkDoesNotExist: "This link does not exist or has expired",
-          ErrorDeactivatedText:
-            "This {{productName}} portal has been deactivated",
-          ProductName: "DocSpace",
-          AccessDenied: "Access denied",
-          PortalRestriction:
-            "Access to {{productName}} is restricted for your account",
-        },
-      },
-    },
-  };
-};
-
-const meta: Meta = {
-  title: "Errors/Error Pages",
+const meta: Meta<typeof ErrorUnavailable> = {
+  title: "Errors/ErrorUnavailable",
+  component: ErrorUnavailable,
   parameters: {
     docs: {
       description: {
-        component:
-          "Pre-built error page components that wrap ErrorContainer with common error messages",
+        component: "Unavailable error page. Displayed when the portal has been deactivated.",
       },
     },
   },
   decorators: [
     (Story) => {
-      setupI18n();
+      setupErrorI18n();
       return <Story />;
     },
   ],
 };
 
 export default meta;
+type Story = StoryObj<typeof ErrorUnavailable>;
 
-export const Unauthorized: StoryObj = {
-  render: () => <Error401 />,
-};
-
-export const Forbidden: StoryObj = {
-  render: () => <Error403 />,
-};
-
-export const NotFound: StoryObj = {
-  render: () => <Error404 />,
-};
-
-export const Offline: StoryObj = {
-  render: () => <ErrorOfflineContainer />,
-};
-
-export const InvalidLink: StoryObj = {
-  render: () => <ErrorInvalidLink />,
-};
-
-export const Unavailable: StoryObj = {
-  render: () => <ErrorUnavailable />,
-};
-
-export const Restricted: StoryObj = {
-  render: () => <AccessRestricted />,
-};
+export const Default: Story = {};
