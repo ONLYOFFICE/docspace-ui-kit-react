@@ -144,6 +144,7 @@ export const CustomIconSize: Story = {
   args: {
     title: "Add item",
     iconSize: 16,
+    size: "36px"
   },
 };
 

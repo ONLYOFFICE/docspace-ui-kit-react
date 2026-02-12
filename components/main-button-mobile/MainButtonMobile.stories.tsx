@@ -131,18 +131,16 @@ const Template = ({ ...args }) => {
       <MainButtonMobile
         {...args}
         style={{
-          position: "absolute",
-          bottom: "26px",
-          insetInlineEnd: "44px",
+          position: "fixed",
+          bottom: "24px",
+          insetInlineEnd: "24px",
         }}
         actionOptions={actionOptions}
         dropdownStyle={
           {
-            position: "absolute",
-            top: "auto",
-            bottom: "80px",
-            insetInlineEnd: "60px",
+            "--main-button-mobile-dropdown-position": "absolute",
             "--main-button-mobile-dropdown-right": "60px",
+            "--main-button-mobile-dropdown-bottom": "60px",
           } as React.CSSProperties
         }
         buttonOptions={buttonOptions}

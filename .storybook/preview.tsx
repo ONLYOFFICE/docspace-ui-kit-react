@@ -13,6 +13,7 @@ import globalTypes from "./globals";
 import enCommon from "../locales/en/Common.json";
 
 import "./styles.css";
+import "../css/fonts.css";
 
 import lightTheme from "./lightTheme";
 import darkTheme from "./darkTheme";
