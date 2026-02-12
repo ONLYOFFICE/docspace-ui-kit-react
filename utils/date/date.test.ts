@@ -33,6 +33,9 @@ import {
   convertMomentFormatToLuxon,
   getWeekdays,
   getMonths,
+  getMonthsShort,
+  getWeekdayName,
+  getFirstDayOfWeek,
 } from "./formatDate";
 
 import {
@@ -127,6 +130,31 @@ describe("Date Utilities", () => {
       const result = formatDate(date, "MMMM", { locale: "en" });
       expect(result).toBe("January");
     });
+
+    it("converts from moment format optionally", () => {
+      const date = new Date(2024, 0, 15);
+      expect(
+        formatDate(date, "YYYY-MM-DD", { convertFromMomentFormat: true }),
+      ).toBe("2024-01-15");
+    });
+
+    it("parses SQL and HTTP strings", () => {
+      const sql = "2024-01-15 10:30:00";
+      expect(formatDate(sql, "yyyy-MM-dd")).toBe("2024-01-15");
+
+      const http = "Mon, 15 Jan 2024 10:30:00 GMT";
+      expect(formatDate(http, "dd MMM yyyy")).toBe("15 Jan 2024");
+
+      const rfc = "Mon, 15 Jan 2024 10:30:00 +0000";
+      expect(formatDate(rfc, "yyyy-MM-dd")).toBe("2024-01-15");
+    });
+
+    it("returns empty string for invalid types in formatDate", () => {
+      // @ts-ignore
+      expect(formatDate(12345, "yyyy")).toBe("");
+      // @ts-ignore
+      expect(formatDate(true, "yyyy")).toBe("");
+    });
   });
 
   describe("convertMomentFormatToLuxon", () => {
@@ -139,6 +167,15 @@ describe("Date Utilities", () => {
     it("converts locale-aware tokens", () => {
       expect(convertMomentFormatToLuxon("LL")).toBe("DDD");
       expect(convertMomentFormatToLuxon("LT")).toBe("t");
+      expect(convertMomentFormatToLuxon("LTS")).toBe("tt");
+      expect(convertMomentFormatToLuxon("L")).toBe("D");
+      expect(convertMomentFormatToLuxon("llll")).toBe("ffff");
+    });
+
+    it("converts weekday and month tokens", () => {
+      expect(convertMomentFormatToLuxon("dddd")).toBe("cccc");
+      expect(convertMomentFormatToLuxon("ddd")).toBe("ccc");
+      expect(convertMomentFormatToLuxon("MMMM")).toBe("MMMM");
     });
   });
 
@@ -147,6 +184,28 @@ describe("Date Utilities", () => {
       const date = new Date(2024, 0, 15);
       const result = formatDateLocalized(date, "DATE_SHORT", { locale: "en" });
       expect(result).toContain("2024");
+    });
+
+    it("returns empty string for null in localized format", () => {
+      expect(formatDateLocalized(null, "DATE_SHORT")).toBe("");
+    });
+
+    it("handles parsing and timezone in formatDateLocalized", () => {
+      // ISO string
+      expect(
+        formatDateLocalized("2024-01-15T12:00:00Z", "TIME_24_SIMPLE", {
+          timezone: "UTC",
+        }),
+      ).toBe("12:00");
+      // Fallback JS Date
+      expect(
+        formatDateLocalized("2024/01/15", "DATE_SHORT", { locale: "en-US" }),
+      ).toContain("1/15/2024");
+      // Invalid string
+      expect(formatDateLocalized("invalid", "DATE_SHORT")).toBe("");
+      // Invalid type
+      // @ts-ignore
+      expect(formatDateLocalized(12345, "DATE_SHORT")).toBe("");
     });
   });
 
@@ -161,6 +220,23 @@ describe("Date Utilities", () => {
       const months = getMonths("long", "en");
       expect(months).toHaveLength(12);
       expect(months).toContain("January");
+    });
+
+    it("returns short month names", () => {
+      const months = getMonthsShort("en");
+      expect(months).toHaveLength(12);
+      expect(months).toContain("Jan");
+    });
+
+    it("getWeekdayName returns correct name", () => {
+      expect(getWeekdayName(1, "long", "en")).toBe("Monday");
+      expect(getWeekdayName(7, "long", "en")).toBe("Sunday");
+    });
+
+    it("getFirstDayOfWeek returns correct day", () => {
+      expect(getFirstDayOfWeek("en-US")).toBe(0); // Sunday
+      expect(getFirstDayOfWeek("en-GB")).toBe(1); // Monday
+      expect(getFirstDayOfWeek("ru")).toBe(1); // Monday
     });
   });
 
