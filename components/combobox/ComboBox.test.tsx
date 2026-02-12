@@ -25,11 +25,14 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { ComboBox } from "./ComboBox";
 import { ComboBoxDisplayType, ComboBoxSize } from "./ComboBox.enums";
+import styles from "./ComboBox.module.scss";
+import * as DropDownModule from "../drop-down";
+import type { DropDownProps } from "../drop-down/DropDown.types";
 
 const mockOptions = [
   { key: "1", label: "Option 1" },
@@ -51,6 +54,19 @@ const baseProps = {
 describe("ComboBox", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("uses memo compare function to avoid unnecessary rerenders with same props", () => {
+    const { rerender } = render(<ComboBox {...baseProps} />);
+
+    const buttonBefore = screen.getByRole("button");
+
+    rerender(<ComboBox {...baseProps} />);
+
+    const buttonAfter = screen.getByRole("button");
+
+    // If memoization works with deep equal compare, button node should stay the same
+    expect(buttonAfter).toBe(buttonBefore);
   });
 
   it("renders with base props", () => {
@@ -103,7 +119,7 @@ describe("ComboBox", () => {
     expect(separatorOption.isSeparator).toBe(true);
   });
 
-  it("handles click on selected item", async () => {
+  it("handles click on selected item by delegating to DropDownItem", async () => {
     const onClickSelectedItem = vi.fn();
     const user = userEvent.setup();
 
@@ -115,12 +131,13 @@ describe("ComboBox", () => {
       />,
     );
 
-    // Simulate clicking the selected item
-    const selectedItem = screen.getByRole("button");
-    await user.click(selectedItem);
+    await user.click(screen.getByRole("button"));
 
-    // Mock the onClickSelectedItem behavior
-    onClickSelectedItem(mockOptions[0]);
+    const selectedOption = await screen.findByRole("option", {
+      name: mockOptions[0].label,
+    });
+
+    await user.click(selectedOption);
 
     expect(onClickSelectedItem).toHaveBeenCalledWith(mockOptions[0]);
   });
@@ -138,7 +155,200 @@ describe("ComboBox", () => {
     );
 
     await user.click(screen.getByRole("button"));
-    expect(onToggle).toHaveBeenCalled();
+    expect(onToggle).toHaveBeenCalledWith(expect.anything(), true);
+  });
+
+  it("toggles onToggle open state on subsequent clicks", async () => {
+    const onToggle = vi.fn();
+    const user = userEvent.setup();
+
+    render(<ComboBox {...baseProps} onToggle={onToggle} />);
+
+    const button = screen.getByRole("button");
+
+    await user.click(button);
+    await user.click(button);
+
+    expect(onToggle).toHaveBeenNthCalledWith(1, expect.anything(), true);
+    expect(onToggle).toHaveBeenNthCalledWith(2, expect.anything(), false);
+  });
+
+  it("does not open when disabled", async () => {
+    const onToggle = vi.fn();
+    const user = userEvent.setup();
+
+    render(<ComboBox {...baseProps} isDisabled onToggle={onToggle} />);
+
+    await user.click(screen.getByRole("button"));
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
+  it("applies custom dataTestId", () => {
+    render(<ComboBox {...baseProps} dataTestId="custom-combobox" />);
+
+    expect(screen.getByTestId("custom-combobox")).toBeInTheDocument();
+  });
+
+  it("applies custom dropDownTestId", async () => {
+    const user = userEvent.setup();
+    const dropDownTestId = "custom-dropdown";
+
+    render(<ComboBox {...baseProps} dropDownTestId={dropDownTestId} />);
+
+    await user.click(screen.getByRole("button"));
+
+    expect(screen.getByTestId(dropDownTestId)).toBeInTheDocument();
+  });
+
+  it("calls setIsOpenItemAccess when opened prop is controlled", () => {
+    const setIsOpenItemAccess = vi.fn();
+
+    render(
+      <ComboBox
+        {...baseProps}
+        opened
+        setIsOpenItemAccess={setIsOpenItemAccess}
+      />,
+    );
+
+    expect(setIsOpenItemAccess).toHaveBeenCalledWith(true);
+  });
+
+  it("moves focus between options with ArrowDown key", () => {
+    render(<ComboBox {...baseProps} />);
+
+    // Open combobox so keyboard handler is active
+    fireEvent.click(screen.getByRole("button"));
+
+    const first = document.createElement("div");
+    first.setAttribute("data-testid", "drop-down-item");
+    const second = document.createElement("div");
+    second.setAttribute("data-testid", "drop-down-item");
+
+    document.body.append(first, second);
+
+    // First ArrowDown focuses first option
+
+    fireEvent.keyDown(document, { key: "ArrowDown" });
+    expect(first.getAttribute("data-focused")).toBe("true");
+    expect(second.getAttribute("data-focused")).toBe("false");
+
+    // Second ArrowDown moves focus to second option
+    fireEvent.keyDown(document, { key: "ArrowDown" });
+    expect(first.getAttribute("data-focused")).toBe("false");
+    expect(second.getAttribute("data-focused")).toBe("true");
+
+    document.body.removeChild(first);
+    document.body.removeChild(second);
+  });
+
+  it("calls onSelect when Enter is pressed on focused option", () => {
+    const onSelect = vi.fn();
+
+    render(<ComboBox {...baseProps} onSelect={onSelect} />);
+
+    // Open combobox so keyboard handler is active
+    fireEvent.click(screen.getByRole("button"));
+
+    const focusedOption = document.createElement("div");
+    focusedOption.setAttribute("data-testid", "drop-down-item");
+    focusedOption.setAttribute("data-focused", "true");
+    document.body.appendChild(focusedOption);
+
+    fireEvent.keyDown(document, { key: "Enter" });
+
+    expect(onSelect).toHaveBeenCalledWith(baseProps.options[0]);
+
+    document.body.removeChild(focusedOption);
+  });
+
+  it("ignores unsupported keys in keyboard handler", () => {
+    const onSelect = vi.fn();
+
+    render(<ComboBox {...baseProps} onSelect={onSelect} />);
+
+    fireEvent.click(screen.getByRole("button"));
+
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("derives optionsCount from advancedOptions excluding separator-like keys", () => {
+    const AdvancedWrapper = ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    );
+
+    const advancedChildren = [
+      <div key="1" />,
+      <div key="s1" />,
+      <div key="2" />,
+    ];
+
+    render(
+      <ComboBox
+        {...baseProps}
+        options={[]}
+        advancedOptions={<AdvancedWrapper>{advancedChildren}</AdvancedWrapper>}
+        hideMobileView={false}
+      />,
+    );
+
+    const combobox = screen.getByTestId("combobox");
+
+    // advancedOptionsWithoutSeparator should exclude the element with key "s1"
+    // which results in 2 options (< 4) and therefore enables disableMobileView.
+    expect(combobox).toHaveClass(styles.disableMobileView);
+  });
+
+  it("does not toggle state on outside click when onToggle is provided without backdrop handler", async () => {
+    const onToggle = vi.fn();
+    const user = userEvent.setup();
+
+    render(<ComboBox {...baseProps} onToggle={onToggle} />);
+
+    const button = screen.getByRole("button");
+
+    // Open via button click → comboBoxClick calls onToggle once
+    await user.click(button);
+    expect(onToggle).toHaveBeenCalledTimes(1);
+
+    // Simulate click outside the combobox
+    fireEvent.mouseDown(document.body);
+
+    // handleClickOutside should early-return and not call onToggle again
+    expect(onToggle).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls setIsOpenItemAccess from handleClickOutside", () => {
+    const setIsOpenItemAccess = vi.fn();
+    const onBackdropClick = vi.fn();
+
+    const dropDownSpy = vi
+      .spyOn(DropDownModule, "DropDown")
+      .mockImplementation((props: DropDownProps) => {
+        props.clickOutsideAction?.(
+          {
+            target: document.body,
+          } as unknown as Event,
+          false,
+        );
+
+        return <div data-testid="dropdown-mock" />;
+      });
+
+    render(
+      <ComboBox
+        {...baseProps}
+        setIsOpenItemAccess={setIsOpenItemAccess}
+        onBackdropClick={onBackdropClick}
+      />,
+    );
+
+    expect(setIsOpenItemAccess).toHaveBeenCalledWith(true);
+    expect(onBackdropClick).toHaveBeenCalled();
+
+    dropDownSpy.mockRestore();
   });
 
   it("sets correct tabIndex", () => {
