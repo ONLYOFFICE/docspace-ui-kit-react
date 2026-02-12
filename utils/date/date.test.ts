@@ -43,6 +43,8 @@ import {
   fromNowPlus,
   fromNowMinus,
   daysInMonth,
+  setDateValues,
+  getDateValues,
 } from "./dateArithmetic";
 
 import {
@@ -202,6 +204,39 @@ describe("Date Utilities", () => {
     it("daysInMonth returns correct count", () => {
       expect(daysInMonth(new Date(2024, 1, 1))).toBe(29); // Feb 2024 is leap year
       expect(daysInMonth(new Date(2024, 0, 1))).toBe(31); // January
+      expect(daysInMonth(null)).toBe(0);
+    });
+
+    it("setDateValues updates correctly", () => {
+      const date = new Date(2024, 0, 15);
+      const result = setDateValues(date, { year: 2025, month: 2 });
+      expect(result?.year).toBe(2025);
+      expect(result?.month).toBe(2);
+      expect(result?.day).toBe(15);
+      expect(setDateValues(null, { year: 2025 })).toBeNull();
+    });
+
+    it("getDateValues returns correct components", () => {
+      const date = new Date(2024, 0, 15, 10, 30, 45, 500);
+      const result = getDateValues(date);
+      expect(result).toEqual({
+        year: 2024,
+        month: 1,
+        day: 15,
+        hour: 10,
+        minute: 30,
+        second: 45,
+        millisecond: 500,
+        weekday: 1, // 2024-01-15 is Monday
+      });
+      expect(getDateValues(null)).toBeNull();
+    });
+
+    it("handles null/undefined in arithmetic functions", () => {
+      expect(addToDate(null, 1, "days")).toBeNull();
+      expect(subtractFromDate(null, 1, "days")).toBeNull();
+      expect(startOf(null, "day")).toBeNull();
+      expect(endOf(null, "day")).toBeNull();
     });
   });
 
