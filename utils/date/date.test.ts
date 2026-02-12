@@ -62,7 +62,13 @@ import {
   maxDate,
 } from "./dateComparison";
 
-import { humanizeDuration, fromNow, createDuration } from "./duration";
+import {
+  humanizeDuration,
+  fromNow,
+  createDuration,
+  toRelative,
+  convertDuration,
+} from "./duration";
 
 import {
   parseToDateTime,
@@ -368,6 +374,76 @@ describe("Date Utilities", () => {
       expect(humanizeDuration(-2, "days", { addSuffix: true })).toBe(
         "2 days ago",
       );
+    });
+
+    it("humanizes with thresholds", () => {
+      // Threshold 45 days means if we have >= 45 days, force using 'days' unit
+      expect(humanizeDuration(50, "days", { thresholds: { days: 45 } })).toBe(
+        "50 days",
+      );
+    });
+
+    it("humanizes with locale", () => {
+      const result = humanizeDuration(1, "days", { locale: "fr" }).replace(
+        /\s/g,
+        " ",
+      );
+      expect(result).toBe("1 jour");
+    });
+
+    it("fromNow works correctly", () => {
+      const past = DateTime.now().minus({ days: 10, hours: 1 });
+      const future = DateTime.now().plus({ days: 10, hours: 1 });
+
+      expect(fromNow(past)).toContain("10 days ago");
+      expect(fromNow(future)).toContain("10 days");
+      expect(fromNow(null)).toBe("");
+    });
+
+    it("handles different input types in fromNow", () => {
+      const now = DateTime.now();
+      expect(
+        fromNow(now.minus({ days: 2 }).toJSDate()).replace(/\s/g, " "),
+      ).toContain("2 days ago");
+      expect(
+        fromNow(now.minus({ days: 2 }).toISO()).replace(/\s/g, " "),
+      ).toContain("2 days ago");
+      expect(fromNow("invalid")).toBe("");
+    });
+
+    it("toRelative calculates difference between dates", () => {
+      const start = DateTime.now();
+      const end = start.plus({ days: 10, hours: 1 });
+      expect(toRelative(start, end)).toContain("10 days");
+      expect(toRelative(end, start)).toContain("10 days ago");
+      expect(toRelative(null, end)).toBe("");
+    });
+
+    it("handles different input types in toRelative", () => {
+      const start = DateTime.now();
+      const end = start.plus({ days: 2 });
+      expect(toRelative(start, end.toJSDate()).replace(/\s/g, " ")).toContain(
+        "in 2 days",
+      );
+      expect(toRelative(start.toISO(), end).replace(/\s/g, " ")).toContain(
+        "in 2 days",
+      );
+      expect(toRelative("invalid", end)).toBe("");
+      expect(toRelative(start, "invalid")).toBe("");
+    });
+
+    it("identifies significant units correctly", () => {
+      const now = DateTime.now().minus({ milliseconds: 100 }); // subtract small amount to ensure 'now' is slightly in the future
+      expect(fromNow(now.minus({ years: 2 }))).toContain("2 years ago");
+      expect(fromNow(now.minus({ months: 2 }))).toContain("2 months ago");
+      expect(fromNow(now.minus({ hours: 2 }))).toContain("2 hours ago");
+      expect(fromNow(now.minus({ minutes: 2 }))).toContain("2 minutes ago");
+      expect(fromNow(now.minus({ seconds: 30 }))).toContain("30 seconds ago");
+    });
+
+    it("convertDuration works", () => {
+      expect(convertDuration(1, "days", "hours")).toBe(24);
+      expect(convertDuration(60, "minutes", "hours")).toBe(1);
     });
   });
 
