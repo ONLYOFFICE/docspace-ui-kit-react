@@ -66,6 +66,9 @@ import {
   createDateTime,
   today,
   now,
+  fromMillis,
+  fromSeconds,
+  utc,
 } from "./parse";
 
 import {
@@ -332,6 +335,77 @@ describe("Date Utilities", () => {
       expect(result.minute).toBe(0);
       expect(result.second).toBe(0);
     });
+
+    it("parses DateTime objects", () => {
+      const dt = DateTime.fromISO("2024-01-15T10:30:00Z");
+      const result = parseToDateTime(dt);
+      expect(result?.toISO()).toBe(dt.toISO());
+
+      const invalidDt = DateTime.fromISO("invalid");
+      expect(parseToDateTime(invalidDt)).toBeNull();
+    });
+
+    it("parses invalid Date objects", () => {
+      const invalidDate = new Date("invalid");
+      expect(parseToDateTime(invalidDate)).toBeNull();
+    });
+
+    it("parses SQL, HTTP and RFC2822 formats", () => {
+      // SQL
+      const sqlStr = "2024-01-15 10:30:00";
+      expect(parseToDateTime(sqlStr)?.year).toBe(2024);
+
+      // HTTP
+      const httpStr = "Mon, 15 Jan 2024 10:30:00 GMT";
+      expect(parseToDateTime(httpStr)?.day).toBe(15);
+
+      // RFC2822
+      const rfcStr = "Mon, 15 Jan 2024 10:30:00 +0000";
+      expect(parseToDateTime(rfcStr)?.day).toBe(15);
+    });
+
+    it("parses various custom formats", () => {
+      expect(parseToDateTime("2024-01-15 10:30:00")?.hour).toBe(10);
+      expect(parseToDateTime("2024-01-15 10:30")?.minute).toBe(30);
+      expect(parseToDateTime("15 Jan 2024")?.month).toBe(1);
+      expect(parseToDateTime("15 January 2024")?.month).toBe(1);
+      expect(parseToDateTime("01/15/2024")?.month).toBe(1);
+      expect(parseToDateTime("15/01/2024")?.month).toBe(1);
+      expect(parseToDateTime("2024/01/15")?.month).toBe(1);
+    });
+
+    it("falls back to JS Date parsing", () => {
+      const jsDateStr = "Jan 15, 2024";
+      const result = parseToDateTime(jsDateStr);
+      expect(result?.year).toBe(2024);
+      expect(result?.month).toBe(1);
+      expect(result?.day).toBe(15);
+    });
+
+    it("fromMillis and fromSeconds work", () => {
+      const millis = 1705314600000; // 2024-01-15T10:30:00Z
+      expect(fromMillis(millis).toMillis()).toBe(millis);
+
+      const seconds = 1705314600;
+      expect(fromSeconds(seconds).toSeconds()).toBe(seconds);
+    });
+
+    it("utc creation works", () => {
+      const result = utc({ year: 2024, month: 1, day: 15 });
+      expect(result.zoneName).toBe("UTC");
+      expect(result.year).toBe(2024);
+
+      const nowUtc = utc();
+      expect(nowUtc.zoneName).toBe("UTC");
+    });
+
+    it("parseWithFormat handles locale", () => {
+      const result = parseWithFormat("15 janv. 2024", "dd MMM yyyy", {
+        locale: "fr",
+      });
+      expect(result?.month).toBe(1);
+      expect(result?.day).toBe(15);
+    });
   });
 
   describe("timezone", () => {
@@ -364,9 +438,12 @@ describe("Date Utilities", () => {
     it("gets browser and app timezone", () => {
       const dateTimeFormatSpy = vi
         .spyOn(Intl, "DateTimeFormat")
-        .mockImplementation(() => ({
-          resolvedOptions: () => ({ timeZone: "UTC" }),
-        } as unknown as Intl.DateTimeFormat));
+        .mockImplementation(
+          () =>
+            ({
+              resolvedOptions: () => ({ timeZone: "UTC" }),
+            }) as unknown as Intl.DateTimeFormat,
+        );
 
       expect(getBrowserTimezone()).toBe("UTC");
       const win = window as Window & { timezone?: string };
@@ -379,9 +456,12 @@ describe("Date Utilities", () => {
     it("falls back to browser timezone when app timezone is unset", () => {
       const dateTimeFormatSpy = vi
         .spyOn(Intl, "DateTimeFormat")
-        .mockImplementation(() => ({
-          resolvedOptions: () => ({ timeZone: "Asia/Tokyo" }),
-        } as unknown as Intl.DateTimeFormat));
+        .mockImplementation(
+          () =>
+            ({
+              resolvedOptions: () => ({ timeZone: "Asia/Tokyo" }),
+            }) as unknown as Intl.DateTimeFormat,
+        );
 
       const win = window as Window & { timezone?: string };
       Reflect.deleteProperty(win, "timezone");
@@ -405,7 +485,9 @@ describe("Date Utilities", () => {
 
     it("returns timezone offset", () => {
       vi.spyOn(DateTime, "now").mockReturnValue(
-        DateTime.fromISO("2024-01-01T00:00:00Z", { zone: "UTC" }) as unknown as DateTime,
+        DateTime.fromISO("2024-01-01T00:00:00Z", {
+          zone: "UTC",
+        }) as unknown as DateTime,
       );
 
       expect(getTimezoneOffset("UTC")).toBe(0);
