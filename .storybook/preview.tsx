@@ -44,6 +44,8 @@ const darkColorScheme: TColorScheme = {
   },
 };
 
+document.cookie = "asc_language=en";
+
 const baseTheme = {
   isBase: true,
   interfaceDirection: "ltr" as const,
