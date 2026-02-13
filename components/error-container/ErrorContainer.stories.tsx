@@ -76,10 +76,42 @@ export const InEditorMode: StoryObj<ErrorContainerType> = {
 
 export const WithChildren: StoryObj<ErrorContainerType> = {
   args: {
+    headerText: "Connection Error",
+    bodyText: "Unable to connect to the server",
     children: (
-      <div style={{ padding: "16px", textAlign: "center" }}>
-        <p>Custom child content</p>
-        <small>Additional details can be placed here</small>
+      <div style={{ padding: "20px", textAlign: "center" }}>
+        <p
+          style={{
+            fontSize: "14px",
+            marginBottom: "12px",
+            color: "var(--text-color)",
+          }}
+        >
+          Please check the following:
+        </p>
+        <ul
+          style={{
+            listStyle: "none",
+            padding: 0,
+            fontSize: "14px",
+            color: "var(--text-color)",
+            lineHeight: "1.8",
+          }}
+        >
+          <li>• Your internet connection is active</li>
+          <li>• Server status at status.example.com</li>
+          <li>• Firewall or antivirus settings</li>
+        </ul>
+        <p
+          style={{
+            fontSize: "13px",
+            marginTop: "16px",
+            color: "var(--gray)",
+            fontStyle: "italic",
+          }}
+        >
+          Error Code: ERR_CONNECTION_REFUSED
+        </p>
       </div>
     ),
   },
