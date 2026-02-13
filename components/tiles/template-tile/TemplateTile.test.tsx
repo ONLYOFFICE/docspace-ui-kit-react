@@ -28,7 +28,7 @@ import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 import { TemplateTile } from ".";
-import { TemplateTileProps, SpaceQuotaProps } from "./TemplateTile.types";
+import { TemplateTileProps, SpaceQuotaProps, TemplateItem } from "./TemplateTile.types";
 
 // Mock translations
 vi.mock("react-i18next", () => ({
@@ -83,14 +83,29 @@ interface BaseTileProps {
   topContent?: React.ReactNode;
   bottomContent?: React.ReactNode;
   className?: string;
+  onSelect?: (checked: boolean, item: unknown) => void;
+  item?: unknown;
 }
 
 // Mock BaseTile component
 vi.mock("../base-tile", () => ({
-  BaseTile: ({ topContent, bottomContent, className }: BaseTileProps) => (
+  BaseTile: ({
+    topContent,
+    bottomContent,
+    className,
+    onSelect,
+    item,
+  }: BaseTileProps) => (
     <div data-testid="base-tile" className={className}>
       <div data-testid="top-content">{topContent}</div>
       <div data-testid="bottom-content">{bottomContent}</div>
+      <button
+        type="button"
+        data-testid="select-button"
+        onClick={() => onSelect?.(true, item)}
+      >
+        Select
+      </button>
     </div>
   ),
 }));
@@ -220,5 +235,26 @@ describe("TemplateTile", () => {
     // Here we could check for specific layout adjustments based on columnCount
     // This might involve checking specific class names or styles
     expect(screen.getByTestId("base-tile")).toBeTruthy();
+  });
+
+  it("calls onSelect when base item is a template item", () => {
+    const onSelect = vi.fn();
+    renderTemplateTile({ onSelect });
+
+    const selectButton = screen.getByTestId("select-button");
+    fireEvent.click(selectButton);
+
+    expect(onSelect).toHaveBeenCalledWith(true, mockItem);
+  });
+
+  it("does not call onSelect when base item is not a template item", () => {
+    const onSelect = vi.fn();
+    const invalidItem = { id: "2" } as unknown as TemplateItem;
+    renderTemplateTile({ onSelect, item: invalidItem });
+
+    const selectButton = screen.getByTestId("select-button");
+    fireEvent.click(selectButton);
+
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });
