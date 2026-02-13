@@ -102,4 +102,110 @@ describe("<TimePicker />", () => {
     const minutesInput = screen.getByLabelText("Minutes");
     expect(minutesInput).toHaveAttribute("data-test-id", "minutes-input");
   });
+
+  it("automatically formats and blurs when entering a single digit > 5 in minutes", () => {
+    render(<TimePicker {...baseProps} />);
+    const minutesInput = screen.getByLabelText("Minutes") as HTMLInputElement;
+
+    fireEvent.change(minutesInput, { target: { value: "6" } });
+
+    expect(minutesInput.value).toBe("06");
+    expect(mockOnBlur).toHaveBeenCalled();
+  });
+
+  it("prevents context menu on inputs", () => {
+    render(<TimePicker {...baseProps} />);
+    const hoursInput = screen.getByLabelText("Hours");
+    const minutesInput = screen.getByLabelText("Minutes");
+
+    const hoursEvent = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
+    const minutesEvent = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
+
+    fireEvent(hoursInput, hoursEvent);
+    fireEvent(minutesInput, minutesEvent);
+
+    expect(hoursEvent.defaultPrevented).toBe(true);
+    expect(minutesEvent.defaultPrevented).toBe(true);
+  });
+
+  it("formats hours/minutes with leading zero on blur if single digit entered", () => {
+    render(<TimePicker {...baseProps} initialTime="2025-01-09T14:30:00" />);
+    const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
+    const minutesInput = screen.getByLabelText("Minutes") as HTMLInputElement;
+
+    fireEvent.change(hoursInput, { target: { value: "5" } });
+    fireEvent.blur(hoursInput);
+    expect(hoursInput.value).toBe("05");
+
+    fireEvent.change(minutesInput, { target: { value: "3" } });
+    fireEvent.blur(minutesInput);
+    expect(minutesInput.value).toBe("03");
+  });
+
+  it("handles empty input in hours and minutes", () => {
+    render(<TimePicker {...baseProps} />);
+    const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
+    const minutesInput = screen.getByLabelText("Minutes") as HTMLInputElement;
+
+    fireEvent.change(hoursInput, { target: { value: "" } });
+    expect(hoursInput.value).toBe("00");
+
+    fireEvent.change(minutesInput, { target: { value: "" } });
+    expect(minutesInput.value).toBe("00");
+  });
+
+  it("blurs minutes input if length exceeds 2", () => {
+    const focusSpy = vi.spyOn(HTMLInputElement.prototype, "blur");
+    render(<TimePicker {...baseProps} />);
+    const minutesInput = screen.getByLabelText("Minutes") as HTMLInputElement;
+
+    fireEvent.change(minutesInput, { target: { value: "123" } });
+
+    expect(focusSpy).toHaveBeenCalled();
+    expect(mockOnBlur).toHaveBeenCalled();
+    focusSpy.mockRestore();
+  });
+
+  it("calls onBlur if minutes value exceeds 59", () => {
+    render(<TimePicker {...baseProps} />);
+    const minutesInput = screen.getByLabelText("Minutes") as HTMLInputElement;
+
+    fireEvent.change(minutesInput, { target: { value: "60" } });
+
+    expect(mockOnBlur).toHaveBeenCalled();
+  });
+
+  it("renders correctly with default props", () => {
+    const { container } = render(<TimePicker />);
+    expect(container).toBeTruthy();
+
+    const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
+    fireEvent.change(hoursInput, { target: { value: "10" } });
+    // Should not throw even if onChange is not provided
+  });
+
+  it("selects hours input when clicking on the container but not on minutes", () => {
+    render(<TimePicker {...baseProps} />);
+    const container = screen.getByTestId("time-picker");
+    const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
+    const selectSpy = vi.spyOn(hoursInput, "select");
+
+    // Click on container (target is the div itself)
+    fireEvent.click(container);
+
+    expect(selectSpy).toHaveBeenCalled();
+    selectSpy.mockRestore();
+  });
+
+  it("focuses minutes input if hours input length exceeds 2", () => {
+    render(<TimePicker {...baseProps} />);
+    const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
+    const minutesInput = screen.getByLabelText("Minutes") as HTMLInputElement;
+    const selectSpy = vi.spyOn(minutesInput, "select");
+
+    fireEvent.change(hoursInput, { target: { value: "123" } });
+
+    expect(selectSpy).toHaveBeenCalled();
+    selectSpy.mockRestore();
+  });
 });
