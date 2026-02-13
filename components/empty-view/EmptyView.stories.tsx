@@ -26,8 +26,9 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import React from "react";
 
-import EmptySvg from "../../assets/empty.svg";
+import EmptyRoomsLightSvg from "../../assets/empty.rooms.root.light.svg";
 import CrossSvg from "../../assets/icons/12/cross.react.svg";
 import { EmptyView } from ".";
 import type { EmptyViewProps } from "./EmptyView.types";
@@ -67,7 +68,7 @@ const Template = ({ ...args }: EmptyViewProps) => {
 export const Default: Story = {
   render: Template,
   args: {
-    icon: <EmptySvg />,
+    icon: <EmptyRoomsLightSvg />,
     title: "Empty Folder",
     description: "This folder is empty. Add files or folders to get started.",
     options: [
@@ -85,7 +86,7 @@ export const Default: Story = {
 export const NoOptions: Story = {
   render: Template,
   args: {
-    icon: <EmptySvg />,
+    icon: <EmptyRoomsLightSvg />,
     title: "No Files Found",
     description: "There are no files matching your search criteria.",
   },
