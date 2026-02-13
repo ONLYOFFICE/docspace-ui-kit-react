@@ -23,9 +23,18 @@
   }
 
   &.truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    min-width: 0;
+
+    .selectorButton {
+      flex-shrink: 0;
+    }
+
+    .selectorText {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
   }
 }
 
