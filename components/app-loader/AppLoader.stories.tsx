@@ -1,6 +1,6 @@
 import { Meta, StoryFn } from "@storybook/react-vite";
 
-import AppLoader from "./index";
+import { AppLoader } from "./index";
 
 export default {
   title: "Components/Status components/AppLoader",

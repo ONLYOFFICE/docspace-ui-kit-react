@@ -32,7 +32,7 @@ import {
   act,
   render,
 } from "@testing-library/react";
-import Dropzone from "./index";
+import { Dropzone } from "./index";
 import styles from "./Dropzone.module.scss";
 
 describe("Dropzone", () => {

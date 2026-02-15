@@ -5,7 +5,7 @@ Default section
 ### Usage
 
 ```js
-import Section from "@docspace/ui-kit/components/section";
+import { Section } from "@docspace/ui-kit/components/section";
 ```
 
 ```jsx

@@ -26,7 +26,7 @@
 
 import { StoryObj, Meta } from "@storybook/react-vite";
 
-import Dropzone from ".";
+import { Dropzone } from ".";
 
 const meta = {
   title: "Components/Interactive elements/Dropzone",

@@ -5,7 +5,7 @@ import {
   EmployeeActivationStatus,
   EmployeeStatus,
 } from "../../enums";
-import Article from ".";
+import { Article } from ".";
 import { ArticleProps } from "./Article.types";
 import { ContextMenuModel } from "../context-menu";
 import LightSmallLogoUrl from "../../assets/lightsmall.svg?url";

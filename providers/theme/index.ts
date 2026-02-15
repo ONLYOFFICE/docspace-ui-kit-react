@@ -25,6 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 export * from "./themes";
+export * from "./themes/constants";
 export * from "./rtl-utils";
 export * from "./useTheme";
 export * from "./ThemeProvider";

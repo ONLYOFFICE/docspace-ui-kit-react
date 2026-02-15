@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
 import { DeviceType } from "../../../../enums";
-import BackButton from "./index";
+import { BackButton } from "./index";
 
 vi.mock("../../../../assets/arrow-left.react.svg", () => ({
   __esModule: true,
@@ -54,11 +54,7 @@ describe("BackButton", () => {
 
   it("renders loader when in loading state", () => {
     render(
-      <BackButton
-        showText
-        currentDeviceType={DeviceType.desktop}
-        isLoading
-      />,
+      <BackButton showText currentDeviceType={DeviceType.desktop} isLoading />,
     );
 
     expect(screen.getByTestId("article-header-loader")).toBeInTheDocument();
@@ -71,7 +67,9 @@ describe("BackButton", () => {
   });
 
   it("hides text when showText is false", () => {
-    render(<BackButton showText={false} currentDeviceType={DeviceType.desktop} />);
+    render(
+      <BackButton showText={false} currentDeviceType={DeviceType.desktop} />,
+    );
 
     expect(screen.queryByText("Back")).not.toBeInTheDocument();
   });

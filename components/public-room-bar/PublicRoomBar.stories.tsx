@@ -28,7 +28,7 @@ import type { Meta, StoryFn } from "@storybook/react-vite";
 
 import PlanetIcon from "../../assets/icons/12/planet.react.svg?url";
 
-import PublicRoomBar from "./index";
+import { PublicRoomBar } from "./index";
 import type { PublicRoomBarProps } from "./PublicRoomBar.types";
 
 export default {

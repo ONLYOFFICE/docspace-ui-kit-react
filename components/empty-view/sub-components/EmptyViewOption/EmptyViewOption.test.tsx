@@ -35,7 +35,7 @@ import type {
   EmptyViewItemProps,
 } from "../../EmptyView.types";
 
-import EmptyViewOption from ".";
+import { EmptyViewOption } from ".";
 import type { LinkRouterProps, To } from "../../../../types";
 
 vi.mock("../../EmptyView.module.scss", () => ({
@@ -60,7 +60,10 @@ vi.mock("../../../link", () => ({
 
 const buttonRenderSpy = vi.fn();
 vi.mock("../../../button", () => ({
-  Button: ({ label, ...props }: { label: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+  Button: ({
+    label,
+    ...props
+  }: { label: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
     buttonRenderSpy(props);
     return (
       <button data-testid="ui-button" {...props}>

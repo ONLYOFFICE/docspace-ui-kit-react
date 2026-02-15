@@ -49,3 +49,7 @@ export * from "./context";
 export * from "./edge-scrolling";
 
 export * from "./hasOwnProperty";
+
+export *  from './date';
+
+export * from './get-system-theme';

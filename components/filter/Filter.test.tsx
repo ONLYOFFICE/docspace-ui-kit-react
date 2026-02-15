@@ -30,7 +30,7 @@ import { act, render, screen, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { DeviceType } from "../../enums";
-import Filter from ".";
+import { Filter } from ".";
 import { TGetSelectedSortData, TSortDataItem } from "./Filter.types";
 import { TViewAs } from "../../types";
 import {

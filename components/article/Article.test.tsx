@@ -4,7 +4,7 @@ import { screen, fireEvent, act, render } from "@testing-library/react";
 import * as deviceDetect from "react-device-detect";
 
 import { DeviceType } from "../../enums";
-import Article from "./index";
+import { Article } from "./index";
 
 // Mock child components
 vi.mock("./sub-components/Header", () => ({
@@ -246,20 +246,22 @@ describe("Article", () => {
     const originalUseState = React.useState;
     const setCorrectTabletHeight = vi.fn();
     let callIndex = 0;
-    const useStateMock = vi
-      .spyOn(React, "useState")
-      .mockImplementation(((initial?: unknown) => {
-        const result = originalUseState(initial as never);
-        if (callIndex === 3) {
-          callIndex += 1;
-          return [
-            result[0],
-            setCorrectTabletHeight as React.Dispatch<React.SetStateAction<unknown>>,
-          ];
-        }
+    const useStateMock = vi.spyOn(React, "useState").mockImplementation(((
+      initial?: unknown,
+    ) => {
+      const result = originalUseState(initial as never);
+      if (callIndex === 3) {
         callIndex += 1;
-        return result;
-      }) as unknown as typeof React.useState);
+        return [
+          result[0],
+          setCorrectTabletHeight as React.Dispatch<
+            React.SetStateAction<unknown>
+          >,
+        ];
+      }
+      callIndex += 1;
+      return result;
+    }) as unknown as typeof React.useState);
 
     const getElementByIdSpy = vi
       .spyOn(document, "getElementById")
@@ -296,10 +298,16 @@ describe("Article", () => {
 
     const { unmount } = renderComponent();
 
-    expect(addEventListener).toHaveBeenCalledWith("resize", expect.any(Function));
+    expect(addEventListener).toHaveBeenCalledWith(
+      "resize",
+      expect.any(Function),
+    );
 
     unmount();
-    expect(removeEventListener).toHaveBeenCalledWith("resize", expect.any(Function));
+    expect(removeEventListener).toHaveBeenCalledWith(
+      "resize",
+      expect.any(Function),
+    );
 
     Object.defineProperty(window, "visualViewport", {
       configurable: true,

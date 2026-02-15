@@ -7,7 +7,7 @@ import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
 import { DeviceType, FilterGroups, SortByFieldName } from "../../enums";
 
 import Navigation from "../navigation/Navigation";
-import Filter from "../filter";
+import { Filter } from "../filter";
 import {
   TableContainer,
   TableHeader,
@@ -16,7 +16,7 @@ import {
   TableCell,
 } from "../table";
 
-import Section from "./index";
+import { Section } from "./index";
 
 const COLUMN_STORAGE_NAME = "section-story-columns";
 const COLUMN_INFO_PANEL_STORAGE_NAME = "section-story-columns-info";

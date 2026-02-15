@@ -28,7 +28,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
-import ImageCropper from "./index";
+import { ImageCropper } from "./index";
 import type { ImageCropperProps, TImage } from "../ImageEditor.types";
 
 type AvatarEditorRef = {

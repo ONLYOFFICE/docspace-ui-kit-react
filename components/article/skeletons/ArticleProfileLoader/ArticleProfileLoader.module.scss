@@ -1,15 +1,23 @@
 @use "../../../../styles/variables/colors";
 @use "../../../../styles/mixins";
 
-:global {
-  .light {
-    --catalog-profile-background: #{colors.$light-gray-hover};
-    --catalog-profile-border-top: 1px solid #{colors.$gray-light-mid};
+:global(.light) {
+  :local {
+    .container,
+    .block {
+      --catalog-profile-background: #{colors.$light-gray-hover};
+      --catalog-profile-border-top: 1px solid #{colors.$gray-light-mid};
+    }
   }
+}
 
-  .dark {
-    --catalog-profile-background: #{colors.$light-dark-gray-hover};
-    --catalog-profile-border-top: 1px solid #{colors.$gray-dark-strong};
+:global(.dark) {
+  :local {
+    .container,
+    .block {
+      --catalog-profile-background: #{colors.$light-dark-gray-hover};
+      --catalog-profile-border-top: 1px solid #{colors.$gray-dark-strong};
+    }
   }
 }
 

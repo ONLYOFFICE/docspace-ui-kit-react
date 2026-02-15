@@ -29,5 +29,6 @@ import Navigation from "./Navigation";
 import { TTitles, TNavigationItem } from "./Navigation.types";
 
 export type { TTitles, TNavigationItem };
+export { default as WarningComponent } from "./sub-components/WarningComponent";
 
 export default Navigation;

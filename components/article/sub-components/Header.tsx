@@ -32,7 +32,7 @@ import { ArticleHeaderLoader } from "../skeletons";
 import { useTheme } from "../../../context/ThemeContext";
 
 import { AsideHeader } from "../../aside";
-import BackButton from "./BackButton";
+import { BackButton } from "./BackButton";
 
 import styles from "../Article.module.scss";
 

@@ -5,7 +5,7 @@ import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
 
 import { DeviceType, FilterGroups, FilterKeys } from "../../enums";
-import Filter from ".";
+import { Filter } from ".";
 import { FilterProps, TSortDataItem } from "./Filter.types";
 import { ViewSelector, ViewSelectorProps } from "./sub-components/ViewSelector";
 

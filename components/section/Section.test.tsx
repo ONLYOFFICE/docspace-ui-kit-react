@@ -2,7 +2,7 @@ import React from "react";
 import { describe, it, expect } from "vitest";
 import { screen, render } from "@testing-library/react";
 
-import Section from "./index";
+import { Section } from "./index";
 import SectionBody from "./sub-components/SectionBody";
 import SectionFilter from "./sub-components/SectionFilter";
 import SectionFooter from "./sub-components/SectionFooter";

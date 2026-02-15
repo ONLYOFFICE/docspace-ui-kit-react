@@ -27,12 +27,12 @@
 import type React from "react";
 import classNames from "classnames";
 import { Loader, LoaderTypes } from "../loader";
-import { Tooltip } from "../tooltip";
+import { Tooltip, withTooltip } from "../tooltip";
 import type { ButtonProps } from "./Button.types";
 import { ButtonSize } from "./Button.enums";
 import styles from "./Button.module.scss";
 
-export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
+const Button = (props: React.PropsWithChildren<ButtonProps>) => {
   const {
     ref,
     label,
@@ -127,3 +127,6 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
 };
 
 Button.displayName = "Button";
+
+const ButtonWithTooltip = withTooltip(Button);
+export { ButtonWithTooltip as Button };

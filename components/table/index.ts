@@ -32,3 +32,4 @@ export { TableGroupMenu } from "./table-group-menu";
 export { TableCell } from "./sub-components/table-cell";
 
 export type { TTableColumn, TGroupMenuItem } from "./Table.types";
+export * from "./Table.constants";

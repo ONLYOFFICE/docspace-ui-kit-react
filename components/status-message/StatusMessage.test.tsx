@@ -27,7 +27,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { screen, render, waitFor } from "@testing-library/react";
 
-import StatusMessage from ".";
+import { StatusMessage } from ".";
 import styles from "./StatusMessage.module.scss";
 
 vi.mock("../../assets/danger.toast.react.svg", () => ({

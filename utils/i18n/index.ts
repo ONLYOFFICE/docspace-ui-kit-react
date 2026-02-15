@@ -95,7 +95,6 @@ export const getCommonTranslation = (
     }
   }
 
-
   throw new Error(
     `[i18n] Missing translation for key "${key}". Ensure the TranslationProvider is mounted or window.i18n.loaded contains the required Common namespace.`,
   );

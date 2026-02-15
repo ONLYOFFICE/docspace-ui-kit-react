@@ -27,7 +27,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-import PublicRoomBar from "./index";
+import { PublicRoomBar } from "./index";
 
 describe("PublicRoomBar", () => {
   const defaultProps = {
