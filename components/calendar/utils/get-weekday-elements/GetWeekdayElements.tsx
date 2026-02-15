@@ -31,9 +31,12 @@ import classNames from "classnames";
 import { getWeekdays } from "../../../../utils/date";
 import styles from "../../Calendar.module.scss";
 
-export const getWeekdayElements = () => {
+export const getWeekdayElements = (
+  format: "narrow" | "short" | "long" = "narrow",
+  locale?: string,
+) => {
   // Get minimal weekday names starting from Monday (luxon uses Monday=1 by default)
-  const weekdays = getWeekdays("narrow").map(
+  const weekdays = getWeekdays(format, locale).map(
     (weekday) => weekday.charAt(0).toUpperCase() + weekday.substring(1),
   );
   return weekdays.map((day, index) => (

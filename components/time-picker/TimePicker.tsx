@@ -114,7 +114,7 @@ const TimePicker = ({
     setIsInputFocused(false);
   };
   const onMinutesBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (e.target.value.length === 1) changeHours(`0${e.target.value}`);
+    if (e.target.value.length === 1) changeMinutes(`0${e.target.value}`);
     setIsInputFocused(false);
   };
 

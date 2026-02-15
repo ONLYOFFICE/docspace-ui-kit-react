@@ -33,13 +33,23 @@ import { getWeekdayElements } from "./index";
 
 describe("getWeekdayElements", () => {
     it("should render weekday names", () => {
+        // Uses default en-US locale from test setup
         const elements = getWeekdayElements();
         render(<>{elements}</>);
         
         const m = screen.getAllByText("M");
-        expect(m.length).toBeGreaterThan(0);
+        expect(m.length).toBe(1);
         
         const t = screen.getAllByText("T");
-        expect(t.length).toBeGreaterThan(1); // Tue, Thu
+        expect(t.length).toBe(2); // Tuesday, Thursday
+
+        const w = screen.getAllByText("W");
+        expect(w.length).toBe(1);
+
+        const f = screen.getAllByText("F");
+        expect(f.length).toBe(1);
+
+        const s = screen.getAllByText("S");
+        expect(s.length).toBe(2); // Saturday, Sunday
     });
 });
