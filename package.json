@@ -96,6 +96,7 @@
     "@vitest/coverage-v8": "^4.0.17",
     "@vitest/ui": "^4.0.17",
     "@vueless/storybook-dark-mode": "^10.0.0",
+    "glob": "^11.0.0",
     "jsdom": "^27.4.0",
     "lefthook": "^2.0.14",
     "postcss": "^8.4.49",
@@ -129,14 +130,103 @@
     "dist",
     "locales"
   ],
-  "publishConfig": {
-    "main": "./dist/cjs/index.js",
-    "module": "./dist/esm/index.js",
-    "types": "./dist/types/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
     ".": {
-      "esm": "dist/esm/index.js",
-      "cjs": "dist/cjs/index.js",
-      "types": "dist/types/index.d.ts"
+      "source": "./index.ts",
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./components": {
+      "source": "./components/index.ts",
+      "types": "./dist/types/components/index.d.ts",
+      "import": "./dist/esm/components/index.js",
+      "require": "./dist/cjs/components/index.js"
+    },
+    "./components/*": {
+      "source": "./components/*/index.ts",
+      "types": "./dist/types/components/*/index.d.ts",
+      "import": "./dist/esm/components/*/index.js",
+      "require": "./dist/cjs/components/*/index.js"
+    },
+    "./hooks": {
+      "source": "./hooks/index.ts",
+      "types": "./dist/types/hooks/index.d.ts",
+      "import": "./dist/esm/hooks/index.js",
+      "require": "./dist/cjs/hooks/index.js"
+    },
+    "./hooks/*": {
+      "source": "./hooks/*/index.ts",
+      "types": "./dist/types/hooks/*/index.d.ts",
+      "import": "./dist/esm/hooks/*/index.js",
+      "require": "./dist/cjs/hooks/*/index.js"
+    },
+    "./providers": {
+      "source": "./providers/index.ts",
+      "types": "./dist/types/providers/index.d.ts",
+      "import": "./dist/esm/providers/index.js",
+      "require": "./dist/cjs/providers/index.js"
+    },
+    "./providers/*": {
+      "source": "./providers/*/index.ts",
+      "types": "./dist/types/providers/*/index.d.ts",
+      "import": "./dist/esm/providers/*/index.js",
+      "require": "./dist/cjs/providers/*/index.js"
+    },
+    "./utils": {
+      "source": "./utils/index.ts",
+      "types": "./dist/types/utils/index.d.ts",
+      "import": "./dist/esm/utils/index.js",
+      "require": "./dist/cjs/utils/index.js"
+    },
+    "./utils/*": {
+      "source": "./utils/*/index.ts",
+      "types": "./dist/types/utils/*/index.d.ts",
+      "import": "./dist/esm/utils/*/index.js",
+      "require": "./dist/cjs/utils/*/index.js"
+    },
+    "./context/*": {
+      "source": "./context/*/index.ts",
+      "types": "./dist/types/context/*/index.d.ts",
+      "import": "./dist/esm/context/*/index.js",
+      "require": "./dist/cjs/context/*/index.js"
+    },
+    "./context": {
+      "source": "./context/index.ts",
+      "types": "./dist/types/context/index.d.ts",
+      "import": "./dist/esm/context/index.js",
+      "require": "./dist/cjs/context/index.js"
+    },
+    "./enums": {
+      "source": "./enums/index.ts",
+      "types": "./dist/types/enums/index.d.ts",
+      "import": "./dist/esm/enums/index.js",
+      "require": "./dist/cjs/enums/index.js"
+    },
+    "./constants": {
+      "source": "./constants/index.ts",
+      "types": "./dist/types/constants/index.d.ts",
+      "import": "./dist/esm/constants/index.js",
+      "require": "./dist/cjs/constants/index.js"
+    },
+    "./types": {
+      "source": "./types/index.ts",
+      "types": "./dist/types/types/index.d.ts",
+      "import": "./dist/esm/types/index.js",
+      "require": "./dist/cjs/types/index.js"
+    },
+    "./errors": {
+      "source": "./errors/index.ts",
+      "types": "./dist/types/errors/index.d.ts",
+      "import": "./dist/esm/errors/index.js",
+      "require": "./dist/cjs/errors/index.js"
     }
-  }
+  },
+  "sideEffects": [
+    "**/*.scss",
+    "**/*.css"
+  ]
 }

@@ -7,10 +7,47 @@ import dts from "rollup-plugin-dts";
 import nodePolyfills from "rollup-plugin-polyfill-node";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
 import postcss from "rollup-plugin-postcss";
+import { glob } from "glob";
+
+// get all index.ts files from subfolders
+const ignorePatterns = ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "**/*.stories.{ts,tsx}"];
+
+const componentEntries = glob.sync("components/*/index.ts", { ignore: ignorePatterns });
+const hookEntries = glob.sync("hooks/*/index.ts", { ignore: ignorePatterns });
+const providerEntries = glob.sync("providers/*/index.ts", { ignore: ignorePatterns });
+const utilEntries = glob.sync("utils/*/index.ts", { ignore: ignorePatterns });
+const contextEntries = glob.sync("context/*/index.ts", { ignore: ignorePatterns });
+const enumEntries = glob.sync("enums/*/index.ts", { ignore: ignorePatterns });
+const constantEntries = glob.sync("constants/*/index.ts", { ignore: ignorePatterns });
+const typeEntries = glob.sync("types/*/index.ts", { ignore: ignorePatterns });
+const errorEntries = glob.sync("errors/*/index.ts", { ignore: ignorePatterns });
+
+// merge all entry points
+const allEntries = [
+	"index.ts",
+	"components/index.ts",
+	"hooks/index.ts",
+	"providers/index.ts",
+	"utils/index.ts",
+	"context/index.ts",
+	"enums/index.ts",
+	"constants/index.ts",
+	"types/index.ts",
+	"errors/index.ts",
+	...componentEntries,
+	...hookEntries,
+	...providerEntries,
+	...utilEntries,
+	...contextEntries,
+	...enumEntries,
+	...constantEntries,
+	...typeEntries,
+	...errorEntries,
+];
 
 export default [
 	{
-		input: "index.ts",
+		input: allEntries,
 		output: [
 			{
 				dir: "dist/esm",
@@ -39,7 +76,7 @@ export default [
 			json(),
 			commonjs(),
 			typescript({
-				tsconfig: "./tsconfig.json",
+				tsconfig: "./tsconfig.build.json",
 				declaration: false,
 				declarationDir: undefined,
 			}),
@@ -61,17 +98,21 @@ export default [
 		],
 		external: ["react", "react-dom", "react/jsx-runtime"],
 	},
-	// Type definitions
 	{
-		input: "index.ts",
+		input: allEntries,
 		output: {
-			dir: "dist/types",
+			dir: 'dist/types',
 			format: "esm",
+			preserveModules: true,
+			preserveModulesRoot: '.',
 		},
 		plugins: [
-			dts({
-				tsconfig: "./tsconfig.json",
-			}),
+			typescript({
+				tsconfig: './tsconfig.build.json',
+				declaration: true,
+				declarationDir: 'dist/types',
+				emitDeclarationOnly: true,
+			  }),
 		],
 		external: [/\.scss$/, /\.css$/, /\.svg$/],
 	},
