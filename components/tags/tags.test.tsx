@@ -26,7 +26,7 @@
 
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 import { Tags } from ".";
 import type { TagsProps } from "./Tags.types";
@@ -90,16 +90,16 @@ describe("<Tags />", () => {
   it("calls onMouseEnter when mouse enters", () => {
     const onMouseEnterMock = vi.fn();
     render(<Tags {...baseProps} onMouseEnter={onMouseEnterMock} />);
-    const tag = screen.getByText("tag1");
-    tag.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+    const tags = screen.getAllByTestId("tag_item");
+    fireEvent.mouseEnter(tags[0]);
     expect(onMouseEnterMock).toHaveBeenCalled();
   });
 
   it("calls onMouseLeave when mouse leaves", () => {
     const onMouseLeaveMock = vi.fn();
     render(<Tags {...baseProps} onMouseLeave={onMouseLeaveMock} />);
-    const tag = screen.getByText("tag1");
-    tag.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
+    const tags = screen.getAllByTestId("tag_item");
+    fireEvent.mouseLeave(tags[0]);
     expect(onMouseLeaveMock).toHaveBeenCalled();
   });
 
