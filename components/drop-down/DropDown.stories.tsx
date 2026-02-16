@@ -297,6 +297,7 @@ const ScrollableTemplate = () => {
         forwardedRef={parentRef}
         maxHeight={200}
         clickOutsideAction={() => setIsOpen(false)}
+        style={{ width: "100px" }}
       >
         {items.map((item) => (
           <DropDownItem

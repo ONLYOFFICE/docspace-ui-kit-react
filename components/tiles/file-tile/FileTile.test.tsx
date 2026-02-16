@@ -25,13 +25,15 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, fireEvent, screen } from "@testing-library/react";
 
 import { FileType } from "../../../enums";
+import { isMobile, isTablet } from "../../../utils";
 
 import { FileTile } from ".";
 import { FileItemType } from "./FileTile.types";
+import { ContextMenuRefType, HeaderType } from "../../context-menu/ContextMenu.types";
 
 // Mock translations
 vi.mock("react-i18next", () => ({
@@ -40,24 +42,108 @@ vi.mock("react-i18next", () => ({
 
 // Mock ReactSVG component
 vi.mock("react-svg", () => ({
-  ReactSVG: () => <div data-testid="mock-svg" />,
+  ReactSVG: (props: Record<string, unknown>) => <div {...props} />,
 }));
 
 // Mock styles - return default export for CSS Modules
 vi.mock("./FileTile.module.scss", () => ({
   default: {
     fileTile: "fileTile",
-    isBlockingOperation: "isBlockingOperation",
+    isBlocked: "isBlocked",
     showHotkeyBorder: "showHotkeyBorder",
-    highlight: "highlight",
-    loader: "loader",
-    icons: "icons",
+    isDragging: "isDragging",
+    isActive: "isActive",
+    checked: "checked",
+    isEdit: "isEdit",
+    isTouchDevice: "isTouchDevice",
+    isHighlight: "isHighlight",
+    isImageOrMedia: "isImageOrMedia",
+    icon: "icon",
     iconContainer: "iconContainer",
+    checkbox: "checkbox",
+    fileTileTop: "fileTileTop",
+    fileTileBottom: "fileTileBottom",
+    content: "content",
+    isHovered: "isHovered",
+    optionButton: "optionButton",
+    expandButton: "expandButton",
+    loader: "loader",
+    thumbnailImage: "thumbnailImage",
+    temporaryIcon: "temporaryIcon",
   },
 }));
 
+vi.mock("../../../utils", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../../utils")>();
+  return {
+    ...actual,
+    isMobile: vi.fn(() => false),
+    isTablet: vi.fn(() => false),
+    getCommonTranslation: vi.fn((key) => key),
+  };
+});
+
+// Mock ContextMenuButton component
+vi.mock("../../context-menu-button", () => ({
+  ContextMenuButton: ({
+    title,
+    onClick,
+    getData,
+  }: {
+    title: string;
+    onClick: (e: React.MouseEvent) => void;
+    getData?: () => void;
+  }) => (
+    <button
+      type="button"
+      data-testid="context-menu-button"
+      title={title}
+      onClick={(e) => {
+        getData?.();
+        onClick(e);
+      }}
+    >
+      Actions
+    </button>
+  ),
+  ContextMenuButtonDisplayType: {
+    toggle: "toggle",
+  },
+}));
+
+// Mock ContextMenu component
+vi.mock("../../context-menu", () => {
+  const ContextMenuComponent = React.forwardRef(({
+    model,
+    header,
+  }: {
+    model?: Array<{ key: string; label: string }>;
+    header?: HeaderType;
+  }, ref: React.ForwardedRef<ContextMenuRefType>) => {
+    React.useImperativeHandle(ref, () => ({
+      show: vi.fn(),
+      hide: vi.fn(),
+      toggle: vi.fn(),
+      menuRef: { current: null },
+    }));
+
+    return (
+      <div data-testid="context-menu">
+        {header && (
+          <div data-testid="context-menu-header">{header.title}</div>
+        )}
+        {model?.map((item) => (
+          <div key={item.key}>{item.label}</div>
+        ))}
+      </div>
+    );
+  });
+  ContextMenuComponent.displayName = "ContextMenu";
+  return { ContextMenu: ContextMenuComponent };
+});
+
 // Mock Checkbox component
-vi.mock("@docspace/shared/components/checkbox", () => ({
+vi.mock("../../checkbox", () => ({
   Checkbox: ({
     isChecked,
     onChange,
@@ -68,7 +154,9 @@ vi.mock("@docspace/shared/components/checkbox", () => ({
     <input
       type="checkbox"
       checked={isChecked}
-      onChange={() => onChange?.({ target: { checked: !isChecked } })}
+      onChange={(e) => {
+        onChange?.({ target: { checked: !isChecked } });
+      }}
       data-testid="checkbox"
     />
   ),
@@ -80,6 +168,7 @@ describe("FileTile", () => {
     title: "Test File",
     fileExst: ".docx",
     fileType: FileType.Document,
+    contextOptions: [],
   };
 
   const mockContextOptions = [
@@ -99,6 +188,10 @@ describe("FileTile", () => {
     </div>
   );
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("renders file title correctly", () => {
     render(
       <FileTile {...defaultProps}>
@@ -111,7 +204,7 @@ describe("FileTile", () => {
 
   it("shows checkbox when checked prop is provided", () => {
     render(
-      <FileTile {...defaultProps} checked>
+      <FileTile {...defaultProps} checked={true}>
         <FileContent />
       </FileTile>,
     );
@@ -124,7 +217,7 @@ describe("FileTile", () => {
   it("calls onSelect when checkbox is clicked", () => {
     const onSelect = vi.fn();
     render(
-      <FileTile {...defaultProps} onSelect={onSelect}>
+      <FileTile {...defaultProps} onSelect={onSelect} checked={false}>
         <FileContent />
       </FileTile>,
     );
@@ -152,6 +245,7 @@ describe("FileTile", () => {
         {...defaultProps}
         thumbnailClick={thumbnailClick}
         thumbnail="test.png"
+        thumbSize={96}
       >
         <FileContent />
       </FileTile>,
@@ -179,7 +273,240 @@ describe("FileTile", () => {
         <FileContent />
       </FileTile>,
     );
-    const element = container.querySelector("[class*='showHotkeyBorder']");
-    expect(element).toBeTruthy();
+    expect(container.querySelector(".showHotkeyBorder")).toBeTruthy();
+  });
+
+  it("calls tileContextClick when ContextMenuButton is clicked", () => {
+    const tileContextClick = vi.fn();
+    render(
+      <FileTile {...defaultProps} tileContextClick={tileContextClick}>
+        <FileContent />
+      </FileTile>,
+    );
+
+    const button = screen.getByTestId("context-menu-button");
+    fireEvent.click(button);
+
+    expect(tileContextClick).toHaveBeenCalled();
+  });
+
+  it("calls withCtrlSelect when Ctrl+Click", () => {
+    const withCtrlSelect = vi.fn();
+    render(
+      <FileTile {...defaultProps} withCtrlSelect={withCtrlSelect}>
+        <FileContent />
+      </FileTile>,
+    );
+
+    const tile = screen.getByTestId("tile");
+    fireEvent.click(tile, { ctrlKey: true });
+
+    expect(withCtrlSelect).toHaveBeenCalledWith(mockItem);
+  });
+
+  it("calls withShiftSelect when Shift+Click", () => {
+    const withShiftSelect = vi.fn();
+    render(
+      <FileTile {...defaultProps} withShiftSelect={withShiftSelect}>
+        <FileContent />
+      </FileTile>,
+    );
+
+    const tile = screen.getByTestId("tile");
+    fireEvent.click(tile, { shiftKey: true });
+
+    expect(withShiftSelect).toHaveBeenCalledWith(mockItem);
+  });
+
+  it("calls onSelect when clicking on tile surface (detail=1)", () => {
+    const onSelect = vi.fn();
+    render(
+      <FileTile {...defaultProps} onSelect={onSelect} checked={false}>
+        <FileContent />
+      </FileTile>,
+    );
+
+    const tile = screen.getByTestId("tile");
+    fireEvent.click(tile, { detail: 1 });
+
+    expect(onSelect).toHaveBeenCalledWith(true, mockItem);
+  });
+
+  it("calls forwardRef.current.click when context menu is opened and mock menu ref is null", () => {
+    const clickSpy = vi.spyOn(HTMLElement.prototype, "click");
+    const ref = React.createRef<HTMLDivElement>();
+
+    render(
+      <FileTile {...defaultProps} forwardRef={ref}>
+        <FileContent />
+      </FileTile>,
+    );
+
+    const tile = screen.getByTestId("tile");
+    fireEvent.contextMenu(tile);
+
+    expect(clickSpy).toHaveBeenCalled();
+    clickSpy.mockRestore();
+  });
+
+  it("calls onSelect when file icon is clicked in mobile mode", () => {
+    vi.mocked(isMobile).mockReturnValue(true);
+    const onSelect = vi.fn();
+    render(
+      <FileTile {...defaultProps} onSelect={onSelect}>
+        <FileContent />
+      </FileTile>,
+    );
+
+    const icon = screen.getByTestId("file-icon");
+    fireEvent.click(icon);
+
+    expect(onSelect).toHaveBeenCalledWith(true, mockItem);
+    vi.mocked(isMobile).mockReturnValue(false);
+  });
+
+  it("handles thumbnail load error", () => {
+    render(
+      <FileTile {...defaultProps} thumbnail="invalid.png" thumbSize={96} temporaryIcon={<div data-testid='temp-icon' />}>
+        <FileContent />
+      </FileTile>,
+    );
+
+    const img = screen.getByTestId("file-thumbnail");
+    fireEvent.error(img);
+
+    expect(screen.getByTestId("temp-icon")).toBeTruthy();
+  });
+
+  it("renders ReactSVG for thumbnail when thumbSize is undefined", () => {
+    render(
+      <FileTile {...defaultProps} thumbnail="test.svg" thumbSize={undefined}>
+        <FileContent />
+      </FileTile>,
+    );
+
+    expect(screen.getByTestId("file-thumbnail")).toBeTruthy();
+  });
+
+  it("renders plugin icon when item.isPlugin is true", () => {
+    const pluginItem = { ...mockItem, isPlugin: true, fileTileIcon: "plugin.png" };
+    render(
+      <FileTile {...defaultProps} item={pluginItem}>
+        <FileContent />
+      </FileTile>,
+    );
+
+    const svgMock = screen.getByTestId("file-thumbnail");
+    expect(svgMock.getAttribute("src")).toBe("plugin.png");
+  });
+
+  it("constructs context menu header correctly from first child item", () => {
+    const childItem = { title: "Custom Title", icon: "custom-icon" };
+    const FileChild = ({ item }: { item: typeof childItem }) => <div data-testid="child" />;
+
+    render(
+      <FileTile {...defaultProps}>
+        <FileChild item={childItem} />
+      </FileTile>,
+    );
+
+    const header = screen.getByTestId("context-menu-header");
+    expect(header.textContent).toBe("Custom Title");
+  });
+
+  it("applies hovered class on mouse enter and removes on mouse leave", () => {
+    const { container } = render(
+      <FileTile {...defaultProps}>
+        <FileContent />
+      </FileTile>,
+    );
+
+    const content = container.querySelector(".content");
+    expect(content?.classList.contains("isHovered")).toBe(false);
+
+    const interactiveArea = container.querySelector(".iconContainer");
+    if (interactiveArea) {
+      fireEvent.mouseEnter(interactiveArea);
+      expect(content?.classList.contains("isHovered")).toBe(true);
+
+      fireEvent.mouseLeave(interactiveArea);
+      expect(content?.classList.contains("isHovered")).toBe(false);
+    }
+  });
+
+  it("applies isTouchDevice class when on mobile", () => {
+    vi.mocked(isMobile).mockReturnValue(true);
+    const { container } = render(
+      <FileTile {...defaultProps}>
+        <FileContent />
+      </FileTile>
+    );
+    expect(container.firstChild).toHaveClass("isTouchDevice");
+    vi.mocked(isMobile).mockReturnValue(false);
+  });
+
+  it("does not call setSelection when clicking on an image", () => {
+    const setSelection = vi.fn();
+    render(
+      <FileTile {...defaultProps} setSelection={setSelection} thumbnail="test.png" thumbSize={96}>
+        <FileContent />
+      </FileTile>
+    );
+
+    const img = screen.getByTestId("file-thumbnail");
+    fireEvent.click(img, { detail: 1 });
+
+    expect(setSelection).not.toHaveBeenCalled();
+  });
+
+  it("calls setSelection([]) when clicking on tile surface", () => {
+    const setSelection = vi.fn();
+    render(
+      <FileTile {...defaultProps} setSelection={setSelection}>
+        <FileContent />
+      </FileTile>
+    );
+
+    const tile = screen.getByTestId("tile");
+    fireEvent.click(tile, { detail: 1 });
+
+    expect(setSelection).toHaveBeenCalledWith([]);
+  });
+
+  it("applies isHighlight class when isHighlight is true", () => {
+    const { container } = render(
+      <FileTile {...defaultProps} isHighlight={true}>
+        <FileContent />
+      </FileTile>
+    );
+    expect(container.querySelector(".isHighlight")).toBeTruthy();
+  });
+
+  it("applies isImageOrMedia class when ImageView is true", () => {
+    const mediaItem = {
+      ...mockItem,
+      viewAccessibility: { ImageView: true, MediaView: false }
+    };
+    const { container } = render(
+      <FileTile {...defaultProps} item={mediaItem}>
+        <FileContent />
+      </FileTile>
+    );
+    expect(container.querySelector(".isImageOrMedia")).toBeTruthy();
+  });
+
+  it("does not call onSelect if detail is not 1", () => {
+    const onSelect = vi.fn();
+    render(
+      <FileTile {...defaultProps} onSelect={onSelect}>
+        <FileContent />
+      </FileTile>
+    );
+
+    const tile = screen.getByTestId("tile");
+    fireEvent.click(tile, { detail: 2 });
+
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });
+

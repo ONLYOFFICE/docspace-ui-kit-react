@@ -54,7 +54,9 @@ const Template: StoryFn = () => {
     document.body.appendChild(progressBar);
 
     return () => {
-      document.body.removeChild(progressBar);
+      if (document.body.contains(progressBar)) {
+        document.body.removeChild(progressBar);
+      }
     };
   }, []);
 
@@ -69,13 +71,6 @@ const Template: StoryFn = () => {
         style={{ marginLeft: "10px" }}
       >
         End Loading
-      </button>
-      <button
-        type="button"
-        onClick={() => TopLoaderService.cancel()}
-        style={{ marginLeft: "10px" }}
-      >
-        Cancel Loading
       </button>
     </div>
   );
