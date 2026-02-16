@@ -43,7 +43,7 @@ import {
 import { checkingForUnfixedSize, getSubstring } from "../Table.utils";
 import { isDesktop } from "../../../utils";
 import { useInterfaceDirection } from "../../../context/InterfaceDirectionContext";
-import { useTableHeaderPosition } from "./useTableHeaderPosition";
+import { useTableHeaderPosition } from "./hooks/use-table-header-position";
 
 type TPrevHeaderData = Nullable<
   Pick<TableHeaderProps, "columnStorageName" | "sortBy" | "sorted" | "columns">
