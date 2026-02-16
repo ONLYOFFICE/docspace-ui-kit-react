@@ -58,6 +58,16 @@
   border-radius: var(--tag-border-radius);
   border: var(--tag-border);
 
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+    width: 12px;
+    height: 12px;
+  }
+
   &.thirdPartyTag {
     padding: 0;
   }

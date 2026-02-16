@@ -26,6 +26,7 @@
 
 import React, { FC } from "react";
 import { ReactSVG } from "react-svg";
+import { match, P } from "ts-pattern";
 import classNames from "classnames";
 
 import CrossIconReactSvgUrl from "../../assets/icons/12/cross.react.svg";
@@ -91,12 +92,25 @@ const TagPure: FC<TagProps> = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {icon ? (
-        <ReactSVG
-          className={classNames(styles.thirdPartyTag, iconClassName)}
-          src={icon}
-        />
-      ) : null}
+      {match(icon)
+        .with(P.string, (icon) => (
+          <ReactSVG
+            className={classNames(styles.thirdPartyTag, iconClassName)}
+            src={icon}
+          />
+        ))
+        .with(P.nonNullable, (Icon) => (
+          <IconButton
+            className={classNames(
+              styles.thirdPartyTag,
+              styles.icon,
+              iconClassName,
+            )}
+            iconNode={<Icon />}
+            size={12}
+          />
+        ))
+        .otherwise(() => null)}
       <Text title={label} fontSize="13px" noSelect truncate>
         {label}
       </Text>

@@ -54,7 +54,7 @@ export type TagProps = {
   /** Accepts the dropdown options */
   advancedOptions?: React.ReactNode[];
   /** Accepts the icon associated with the tag */
-  icon?: string;
+  icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
   /** Accepts the icon class name */
   iconClassName?: string;
   /** Indicates if the tag is a default tag */
@@ -103,7 +103,7 @@ export type TagType = {
   /** Indicates the type of room associated with the tag. */
   roomType?: number;
   /** Accepts the icon associated with the tag. */
-  icon?: string;
+  icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
   /** Indicates the type of provider associated with the tag. */
   providerType?: number;
   /** Accepts the function that is called when the tag is clicked */
