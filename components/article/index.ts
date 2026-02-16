@@ -27,5 +27,3 @@
 export { Article } from "./Article";
 export type { TToggleArticleOpen, ArticleAppsProps, ArticleDevToolsBarProps, ArticleHeaderProps, ArticleHideMenuButtonProps, ArticleProfileProps, ArticleProps, ArticleZendeskProps } from "./Article.types";
 export { ArticleItem } from "./item";
-
-console.log('123');
