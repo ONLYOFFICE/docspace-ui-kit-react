@@ -573,10 +573,13 @@ const FilterInput = React.memo(
       [overflowGroups, handleFilterByGroup],
     );
 
-    const overflowContextMenuHeader = React.useMemo(() => ({
-      title: getCommonTranslation("RoomGroups"),
-      icon: "",
-    }), [getCommonTranslation]);
+    const overflowContextMenuHeader = React.useMemo(
+      () => ({
+        title: getCommonTranslation("RoomGroups"),
+        icon: "",
+      }),
+      [getCommonTranslation],
+    );
 
     const onOverflowContextMenu = React.useCallback((e: React.MouseEvent) => {
       contextMenuRef.current?.show(e);
@@ -716,7 +719,7 @@ const FilterInput = React.memo(
                   {showCreateGroupButton && (
                     <SelectedItem
                       propKey="create-group"
-                      label="CreateGroup"
+                      label={getCommonTranslation("CreateGroup")}
                       icon={PlusIcon}
                       onClick={handleCreateGroupClick}
                       onClose={() => {}}
