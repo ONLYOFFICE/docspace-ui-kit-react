@@ -44,13 +44,15 @@ const ArticleDevToolsBar = ({
   currentDeviceType,
   toggleArticleOpen,
   path,
+  navigate,
 }: ArticleDevToolsBarProps) => {
   const onClick = (e: React.MouseEvent) => {
     const pathDevTools = path ?? "/developer-tools";
 
     if (openingNewTab(pathDevTools, e)) return;
 
-    window.location.href = pathDevTools;
+    if (navigate) navigate(pathDevTools);
+    else window.location.href = pathDevTools;
 
     if (articleOpen && currentDeviceType === DeviceType.mobile)
       toggleArticleOpen();
