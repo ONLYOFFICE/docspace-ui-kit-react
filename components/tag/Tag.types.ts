@@ -27,6 +27,8 @@
 import type { TDirectionY } from "../../types";
 
 export type TagProps = {
+  /** Accepts the ref */
+  ref?: React.RefObject<HTMLDivElement>;
   /** Accepts the tag id */
   tag: string;
   /** Accepts the tag label */
@@ -79,4 +81,37 @@ export type TagProps = {
   manualY?: string;
   /** Required for specifying the exact distance from the parent component */
   manualX?: string;
+};
+
+export type TagType = {
+  /** Accepts a unique key for the tag. */
+  key?: string;
+  /** Indicates if the tag is a default tag. */
+  isDefault?: boolean;
+  /** Indicates if the tag is associated with a third-party provider. */
+  isThirdParty?: boolean;
+  /** Accepts the tag label */
+  label: string;
+  /** Accepts the max width of the tag */
+  maxWidth?: string;
+  /** Accepts the dropdown options */
+  advancedOptions?: string[];
+  /** Accepts the tag styles as disabled and disables clicking */
+  isDisabled?: boolean;
+  /** Indicates the type of room associated with the tag. */
+  roomType?: number;
+  /** Accepts the icon associated with the tag. */
+  icon?: string;
+  /** Indicates the type of provider associated with the tag. */
+  providerType?: number;
+  /** Accepts the function that is called when the tag is clicked */
+  onClick?: () => void;
+  /** Indicates if the tag is an overflow trigger */
+  isOptionTag?: boolean;
+};
+
+export type TagClickEvent = {
+  label: string;
+  roomType?: number;
+  providerType?: number;
 };
