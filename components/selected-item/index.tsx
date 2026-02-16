@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-
+import { ReactSVG } from "react-svg";
 import CrossReactSvgUrl from "../../assets/icons/12/cross.react.svg";
 import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
@@ -51,6 +51,8 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
     hideCross,
     title,
     dataTestId,
+    icon,
+    isActive,
   } = props;
   if (!label) return null;
 
@@ -69,6 +71,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
     styles.selectedItem,
     isInline && styles.isInline,
     isDisabled && styles.disabled,
+    isActive && styles.isActive,
     className,
   ]
     .filter(Boolean)
@@ -92,6 +95,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
       data-testid={dataTestId ?? "selected-item"}
       title={title}
     >
+      {icon ? <ReactSVG className={styles.icon} src={icon} /> : null}
       <div className={labelClassNames}>{label}</div>
       {!hideCross ? (
         <IconButton

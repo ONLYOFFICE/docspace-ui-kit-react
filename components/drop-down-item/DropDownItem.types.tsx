@@ -38,6 +38,8 @@ export type DropDownItemProps = {
   isModern?: boolean;
   /** Whether text content should be truncated with ellipsis when it overflows */
   textOverflow?: boolean;
+  /** Whether to apply additional text truncation styling to the label */
+  truncateText?: boolean;
 
   // Icon Related Props
   /** URL or path to the icon to display at the start of the item */
@@ -117,4 +119,7 @@ export type DropDownItemProps = {
 
   betaLabel?: string;
   paidLabel?: string;
+
+  /** When true, stops mousedown propagation to prevent click-outside detection from closing dropdown before click fires */
+  stopMouseDownPropagation?: boolean;
 };

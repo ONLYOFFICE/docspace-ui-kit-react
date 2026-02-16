@@ -63,4 +63,9 @@ export interface SelectedItemProps {
   hideCross?: boolean;
   title?: string;
   dataTestId?: string;
+  /** Icon data as SVG string */
+  icon?: string;
+  clickable?: boolean;
+  /** Sets the item as active/selected state */
+  isActive?: boolean;
 }

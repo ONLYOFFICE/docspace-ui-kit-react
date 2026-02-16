@@ -57,7 +57,8 @@
       align-items: center;
       flex-wrap: wrap;
 
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      margin-top: 8px;
 
       .clear-all-link {
         margin-inline-start: 12px;
@@ -744,5 +745,236 @@
   &.lastItem {
     border-start-end-radius: 3px;
     border-end-end-radius: 3px;
+  }
+}
+
+.tileView {
+  :global {
+    .filter-input_selected-row {
+      margin-bottom: 5px;
+
+      @include mixins.tablet-and-below {
+        margin-bottom: 3px;
+      }
+    }
+  }
+
+  .rowGroupingRooms {
+    margin-bottom: 5px;
+  }
+}
+
+.rowGroupingRooms {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+
+  :global(.light) & {
+    --room-group-tag-inactive-color: #{$light-gray-dark};
+    --room-group-tag-background: #{$gray-light};
+    --room-group-tag-hover-background: #{$light-gray-hover};
+  }
+
+  :global(.dark) & {
+    --room-group-tag-inactive-color: #{$dark-gray-dark};
+    --room-group-tag-background: #{$dark-gray-light};
+    --room-group-tag-hover-background: #{$light-dark-gray-hover};
+  }
+
+  :global {
+    .group-tags {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+
+      [data-testid="selected-item"] {
+        padding: 7px 12px;
+        border-radius: 6px;
+        margin: 0;
+        height: 34px;
+
+        .selected-item_label {
+          font-weight: 600;
+          margin-inline-end: 0;
+        }
+
+        > [class*="icon"] {
+          margin-top: 2px;
+        }
+
+        &:not([class*="isActive"]) {
+          background: var(--room-group-tag-background);
+
+          .selected-item_label {
+            color: var(--room-group-tag-inactive-color);
+          }
+
+          svg path {
+            fill: var(--room-group-tag-inactive-color);
+          }
+
+          &:hover {
+            background: var(--room-group-tag-hover-background);
+          }
+        }
+      }
+    }
+  }
+}
+
+.groupTagsMeasure {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  height: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  gap: 4px;
+}
+
+.ellipsisButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  background: none;
+  border: none;
+  width: 32px;
+  height: 32px;
+
+  :global(.light) & {
+    --room-group-tag-inactive-color: #{$light-gray-dark};
+    --room-group-tag-background: #{$gray-light};
+    --room-group-tag-hover-background: #{$light-gray-hover};
+  }
+
+  :global(.dark) & {
+    --room-group-tag-inactive-color: #{$dark-gray-dark};
+    --room-group-tag-background: #{$dark-gray-light};
+    --room-group-tag-hover-background: #{$light-dark-gray-hover};
+  }
+
+  :global {
+    .combobox {
+      padding: 0;
+      width: 32px;
+      height: 32px;
+    }
+
+    .combo-button {
+      background: var(--room-group-tag-background);
+      border: none !important;
+      box-sizing: border-box;
+      border-radius: 3px;
+      height: 32px !important;
+      width: 32px;
+      min-width: 32px;
+      padding: 7px 12px;
+      gap: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: var(--room-group-tag-hover-background);
+      }
+    }
+
+    .combo-button_arrow {
+      display: none;
+    }
+
+    .optionalBlock {
+      margin-inline-end: 0;
+    }
+
+    .overflow-dropdown-scroll-body {
+      padding-inline-end: 0 !important;
+    }
+  }
+}
+
+.ellipsisComboBox {
+  width: 32px;
+  height: 32px;
+  max-width: 32px;
+}
+
+.ellipsisIcon {
+  :global(.light) & {
+    --room-group-tag-inactive-color: #{$light-gray-dark};
+    --room-group-tag-background: #{$gray-light};
+    --room-group-tag-hover-background: #{$light-gray-hover};
+  }
+
+  :global(.dark) & {
+    --room-group-tag-inactive-color: #{$dark-gray-dark};
+    --room-group-tag-background: #{$dark-gray-light};
+    --room-group-tag-hover-background: #{$light-dark-gray-hover};
+  }
+
+  color: var(--room-group-tag-inactive-color);
+
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0px;
+}
+
+.ellipsisButtonMeasure {
+  display: inline-block;
+  height: 32px;
+  min-width: 32px;
+  padding: 0 8px;
+}
+
+.groupManagementButton {
+  :global(.light) & {
+    --room-group-tag-inactive-color: #{$light-gray-dark};
+    --room-group-tag-background: #{$gray-light};
+    --room-group-tag-hover-background: #{$light-gray-hover};
+    --selector-add-button-active-background: #{$gray-strong};
+
+    --icon-button-color: #{$light-gray-dark};
+    --icon-button-hover-color: #{$light-gray-dark};
+  }
+
+  :global(.dark) & {
+    --room-group-tag-inactive-color: #{$dark-gray-dark};
+    --room-group-tag-background: #{$dark-gray-light};
+    --room-group-tag-hover-background: #{$light-dark-gray-hover};
+    --selector-add-button-active-background: #{$gray-dark-mid};
+
+    --icon-button-color: #{$light-gray-dark};
+    --icon-button-hover-color: #{$light-gray-dark};
+  }
+
+  display: inline-block;
+  background: var(--room-group-tag-background);
+  border: none;
+  box-sizing: border-box;
+  border-radius: 3px;
+  height: 30px;
+  width: 40px;
+  padding: 7px 12px;
+  cursor: pointer;
+
+  svg path {
+    fill: var(--room-group-tag-inactive-color) !important;
+  }
+
+  &:hover {
+    background: var(--room-group-tag-hover-background);
+  }
+
+  &:active {
+    background: var(--selector-add-button-active-background);
   }
 }

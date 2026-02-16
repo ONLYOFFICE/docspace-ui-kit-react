@@ -80,6 +80,7 @@ type SubMenuProps = {
 
   isLowerSubmenu?: boolean;
   maxHeightLowerSubmenu?: number;
+  maxHeight?: number;
 
   mouseMoveHandler?: (
     index: number,
@@ -112,6 +113,7 @@ const SubMenu = (props: SubMenuProps) => {
     withHeader,
     isLowerSubmenu,
     maxHeightLowerSubmenu,
+    maxHeight,
     mouseMoveHandler,
     currentIndex,
     activeLevel,
@@ -401,30 +403,50 @@ const SubMenu = (props: SubMenuProps) => {
     });
     const subMenuIconClassName = "p-submenu-icon";
 
-    const icon = item.withMCPIcon ? (
-      <MCPIcon
-        title={item.label as string}
-        size={MCPIconSize.Small}
-        imgSrc={item.icon}
-        className={iconClassName || ""}
-      />
-    ) : (
-      item.icon &&
-      ((!item.icon.includes("images/") && !item.icon.includes(".svg")) ||
-      item.icon.includes("webplugins") ? (
-        <img
-          src={item.icon}
-          alt="plugin icon"
-          className={iconClassName || ""}
-        />
-      ) : (
+    const renderIcon = () => {
+      if (item.withMCPIcon) {
+        return (
+          <MCPIcon
+            title={item.label as string}
+            size={MCPIconSize.Small}
+            imgSrc={item.icon}
+            className={iconClassName || ""}
+          />
+        );
+      }
+
+      if (!item.icon) return null;
+
+      // Handle data URI SVGs
+      if (item.icon.startsWith("data:image/svg+xml")) {
+        return <ReactSVG className={iconClassName || ""} src={item.icon} />;
+      }
+
+      // Handle regular images
+      if (
+        (!item.icon.includes("images/") && !item.icon.includes(".svg")) ||
+        item.icon.includes("webplugins")
+      ) {
+        return (
+          <img
+            src={item.icon}
+            alt="plugin icon"
+            className={iconClassName || ""}
+          />
+        );
+      }
+
+      // Handle SVG URLs
+      return (
         <ReactSVG
           wrapper="span"
           className={iconClassName || ""}
           src={item.icon}
         />
-      ))
-    );
+      );
+    };
+
+    const icon = renderIcon();
 
     const label = item.label && (
       <span
@@ -702,6 +724,10 @@ const SubMenu = (props: SubMenuProps) => {
 
     if (isLowerSubmenu && maxHeightLowerSubmenu) {
       listHeight = Math.min(listHeight, maxHeightLowerSubmenu);
+    }
+
+    if (root && maxHeight) {
+      listHeight = Math.min(listHeight, maxHeight);
     }
 
     return (
