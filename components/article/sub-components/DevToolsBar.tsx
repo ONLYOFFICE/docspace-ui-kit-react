@@ -51,7 +51,8 @@ const ArticleDevToolsBar = ({
 
     if (openingNewTab(pathDevTools, e)) return;
 
-    navigate(pathDevTools);
+    if (navigate) navigate(pathDevTools);
+    else window.location.href = pathDevTools;
 
     if (articleOpen && currentDeviceType === DeviceType.mobile)
       toggleArticleOpen();

@@ -55,7 +55,8 @@ const ArticleHeader = ({
 
   const onLogoClick = () => {
     onLogoClickAction?.();
-    navigate("/");
+    if (navigate) navigate("/");
+    else window.location.href = "/";
   };
 
   const burgerLogo = getLogoUrl(

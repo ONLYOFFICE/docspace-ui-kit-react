@@ -51,7 +51,7 @@ const BackButton = ({
   onLogoClickAction?: () => void;
   isLoading?: boolean;
   toggleArticleOpen?: () => void;
-  navigate: (path: string) => void;
+  navigate?: (path: string) => void;
 }) => {
   const onClickBack = () => {
     onLogoClickAction?.();
@@ -59,7 +59,8 @@ const BackButton = ({
     if (toggleArticleOpen && currentDeviceType === DeviceType.mobile)
       toggleArticleOpen();
 
-    navigate("/");
+    if (navigate) navigate("/");
+    else window.location.href = "/";
   };
 
   const icon =
