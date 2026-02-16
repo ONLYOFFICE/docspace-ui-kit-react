@@ -28,7 +28,7 @@ import type { TDirectionY } from "../../types";
 
 export type TagProps = {
   /** Accepts the ref */
-  ref?: React.RefObject<HTMLDivElement>;
+  ref?: React.RefObject<HTMLDivElement | null>;
   /** Accepts the tag id */
   tag: string;
   /** Accepts the tag label */
@@ -46,7 +46,7 @@ export type TagProps = {
   /** Accepts the tag styles as deleted and disables clicking */
   isDeleted?: boolean;
   /** Accepts the function that is called when the tag is clicked */
-  onClick?: (tag?: object) => void;
+  onClick?: (tag: TagClickEvent) => void;
   /** Accepts the function that ist called when the tag delete button is clicked */
   onDelete?: (tag?: string) => void;
   /** Accepts the max width of the tag */
