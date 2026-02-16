@@ -55,6 +55,8 @@ export type TagProps = {
   advancedOptions?: React.ReactNode[];
   /** Accepts the icon associated with the tag */
   icon?: string;
+  /** Accepts the icon class name */
+  iconClassName?: string;
   /** Indicates if the tag is a default tag */
   isDefault?: boolean;
   /** Indicates if the tag is the last in a series */

@@ -47,10 +47,13 @@
   width: fit-content;
   display: flex;
   align-items: center;
+  justify-content: center;
   box-sizing: border-box;
   padding: 1px 7px;
   margin-inline-end: 4px;
   background: var(--tag-background);
+
+  max-height: 22px;
 
   border-radius: var(--tag-border-radius);
   border: var(--tag-border);

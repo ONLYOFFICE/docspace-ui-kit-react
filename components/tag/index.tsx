@@ -57,6 +57,7 @@ const TagPure: FC<TagProps> = ({
   dataTestId,
   onMouseEnter,
   onMouseLeave,
+  iconClassName,
 }) => {
   const onClickAction = React.useCallback(() => {
     if (onClick && !isDisabled && !isDeleted) {
@@ -90,7 +91,12 @@ const TagPure: FC<TagProps> = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {icon ? <ReactSVG className={styles.thirdPartyTag} src={icon} /> : null}
+      {icon ? (
+        <ReactSVG
+          className={classNames(styles.thirdPartyTag, iconClassName)}
+          src={icon}
+        />
+      ) : null}
       <Text title={label} fontSize="13px" noSelect truncate>
         {label}
       </Text>
