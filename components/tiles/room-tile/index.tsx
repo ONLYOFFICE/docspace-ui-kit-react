@@ -28,7 +28,7 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import { Tags } from "../../tags";
 import classNames from "classnames";
-import { TagType } from "../../tags/Tags.types";
+import type { TagType } from "../../tag";
 import { RoomTileProps, RoomItem } from "./RoomTile.types";
 import { BaseTile } from "../base-tile";
 import { TileItem } from "../tile-container/TileContainer.types";
