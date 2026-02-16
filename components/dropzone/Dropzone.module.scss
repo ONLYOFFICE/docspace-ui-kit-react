@@ -30,10 +30,32 @@
 .dropzoneWrapper {
   :global(.light) & {
     --dropzone-border: 2px dashed #{colors.$gray-light-mid};
+
+    --dropzone-secondary-link: #{colors.$black};
+    --dropzone-exsts-color: #{colors.$gray};
+
+    --dropzone-exsts-color-background-focus: #{colors.$light-gray-selected};
+    --dropzone-exsts-color-background-hover: #{colors.$gray-light-mid};
+    --dropzone-exsts-color-background-pressed: #{colors.$gray-strong};
+
+    --dropzone-exsts-color-focus: #{colors.$black};
+    --dropzone-exsts-badge-focus: #{colors.$gray-text};
+    --dropzone-arrow-icon-color-focus: #{colors.$black};
   }
 
   :global(.dark) & {
     --dropzone-border: 2px dashed #{colors.$gray-dark-strong};
+
+    --dropzone-secondary-link: #{colors.$white};
+    --dropzone-exsts-color: #{colors.$gray};
+
+    --dropzone-exsts-color-background-focus: #{colors.$gray-dark-mid};
+    --dropzone-exsts-color-background-hover: #{colors.$gray-dark-strong};
+    --dropzone-exsts-color-background-pressed: #{colors.$dark-gray-light};
+
+    --dropzone-exsts-color-focus: #{colors.$white};
+    --dropzone-exsts-badge-focus: #{colors.$gray-dark};
+    --dropzone-arrow-icon-color-focus: #{colors.$white};
   }
 
   cursor: pointer;
