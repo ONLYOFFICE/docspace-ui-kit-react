@@ -839,7 +839,7 @@ const FilterInput = React.memo(
                 >
                   <IconButton
                     size={16}
-                    iconName={GroupManagementIcon}
+                    iconNode={<GroupManagementIcon />}
                     isFill
                     isClickable
                   />

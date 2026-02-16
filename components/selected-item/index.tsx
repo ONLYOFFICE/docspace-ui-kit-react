@@ -95,7 +95,13 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
       data-testid={dataTestId ?? "selected-item"}
       title={title}
     >
-      {icon ? <ReactSVG className={styles.icon} src={icon} /> : null}
+      {icon ? (
+        typeof icon === "string" ? (
+          <ReactSVG className={styles.icon} src={icon} />
+        ) : (
+          <span className={styles.icon}>{React.createElement(icon)}</span>
+        )
+      ) : null}
       <div className={labelClassNames}>{label}</div>
       {!hideCross ? (
         <IconButton
