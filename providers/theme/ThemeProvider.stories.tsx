@@ -1,5 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useTheme } from "styled-components";
 
 import { ThemeKeys } from "../../enums";
 
@@ -39,22 +40,40 @@ export default meta;
 
 type Story = StoryObj<typeof ThemeProvider>;
 
-const ThemedContent = () => (
-  <div style={{ padding: "16px" }}>
-    <h3>Themed Content</h3>
-    <p>This content is rendered inside the ThemeProvider.</p>
+const ThemedContent = () => {
+  const theme = useTheme();
+  const isDark = !theme.isBase;
+
+  return (
     <div
       style={{
-        marginTop: "12px",
-        padding: "12px",
-        border: "1px solid #ccc",
+        padding: "16px",
+        backgroundColor: isDark ? "#333" : "#fff",
+        color: isDark ? "#fff" : "#333",
         borderRadius: "8px",
+        transition: "all 0.3s ease",
       }}
     >
-      <p>Theme styling is applied via styled-components context.</p>
+      <h3>Themed Content</h3>
+      <p>This content is rendered inside the ThemeProvider.</p>
+      <p>
+        <strong>Current theme:</strong> {isDark ? "Dark" : "Light"}
+      </p>
+      <div
+        style={{
+          marginTop: "12px",
+          padding: "12px",
+          border: `1px solid ${isDark ? "#555" : "#ccc"}`,
+          borderRadius: "8px",
+          backgroundColor: isDark ? "#444" : "#f5f5f5",
+        }}
+      >
+        <p>Theme styling is applied via styled-components context.</p>
+        <p>Background color changes based on theme.isBase property.</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const LightTheme: Story = {
   args: {
