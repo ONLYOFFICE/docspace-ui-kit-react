@@ -50,7 +50,13 @@ import { ModalDialogType } from "./ModalDialog.enums";
 const Header = ({ children }: { children: React.ReactNode }) => null;
 Header.displayName = MODAL_DIALOG_HEADER_NAME;
 
-const Body = ({ children }: { children: React.ReactNode }) => null;
+const Body = ({
+  children,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  ref?: React.RefObject<HTMLDivElement | null>;
+}) => null;
 Body.displayName = MODAL_DIALOG_BODY_NAME;
 
 const Footer = ({ children }: { children: React.ReactNode }) => null;
@@ -60,6 +66,7 @@ const Container = ({ children }: { children: React.ReactNode }) => null;
 Container.displayName = MODAL_DIALOG_CONTAINER_NAME;
 
 const ModalDialog = ({
+  ref,
   id,
   style,
   children,
@@ -180,6 +187,7 @@ const ModalDialog = ({
     <Portal
       element={
         <Modal
+          ref={ref}
           withForm={withForm}
           isDoubleFooterLine={isDoubleFooterLine}
           id={id}
