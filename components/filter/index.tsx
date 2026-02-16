@@ -576,7 +576,7 @@ const FilterInput = React.memo(
     const overflowContextMenuHeader = React.useMemo(() => ({
       title: getCommonTranslation("RoomGroups"),
       icon: "",
-    }));
+    }), [getCommonTranslation]);
 
     const onOverflowContextMenu = React.useCallback((e: React.MouseEvent) => {
       contextMenuRef.current?.show(e);
