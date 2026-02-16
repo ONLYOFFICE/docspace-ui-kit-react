@@ -1,4 +1,4 @@
-// (c) Copyright Ascensio System SIA 2009-2026
+// (c) Copyright Ascensio System SIA 2009-2025
 //
 // This program is a free software product.
 // You can redistribute it and/or modify it under the terms
@@ -23,30 +23,22 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-@use "../../styles/variables/colors";
 
-.tags {
-  width: 100%;
-  display: flex;
+import PlusIcon from "PUBLIC_DIR/images/icons/12/plus.svg?url";
 
-  align-items: center;
+export const paddingSize = 4;
 
-  overflow: hidden;
-}
+export const thirdPartyTagWidth = 40;
 
-.dropdownText {
-  --tag-dropdown-text-margin: 8px;
+export const fixedTagWidth = "44px";
 
-  line-height: 30px;
-  display: block;
-  pointer-events: none;
+export const defaultTagMaxWidth = "195px";
 
-  &:not(.removeTagIcon) {
-    [dir="rtl"] & {
-      margin-right: var(--tag-dropdown-text-margin) !important;
-    }
-    [dir="ltr"] & {
-      margin-left: var(--tag-dropdown-text-margin) !important;
-    }
-  }
-}
+export const createTag = {
+  label: "",
+  key: "create-tag",
+  advancedOptions: [],
+  maxWidth: "32px",
+  icon: PlusIcon,
+  isOptionTag: true,
+};

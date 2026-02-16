@@ -34,7 +34,7 @@ import type { TagsProps } from "./Tags.types";
 const baseProps: TagsProps = {
   tags: ["tag1", "tag2"],
   columnCount: 2,
-  onSelectTag: () => {},
+  onSelectTag: vi.fn(),
 };
 
 describe("<Tags />", () => {
@@ -57,6 +57,12 @@ describe("<Tags />", () => {
     expect(screen.getByText("tag1")).toBeInTheDocument();
   });
 
+  it("renders multiple tags", () => {
+    render(<Tags {...baseProps} tags={["tag1", "tag2", "tag3"]} />);
+    expect(screen.getByText("tag1")).toBeInTheDocument();
+    expect(screen.getByText("tag2")).toBeInTheDocument();
+  });
+
   it("calls onSelectTag when a tag is clicked", () => {
     const onSelectTagMock = vi.fn();
     render(
@@ -64,5 +70,79 @@ describe("<Tags />", () => {
     );
     screen.getByText("tag1").click();
     expect(onSelectTagMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("applies custom className", () => {
+    render(<Tags {...baseProps} className="custom-class" />);
+    expect(screen.getByTestId("tags")).toHaveClass("custom-class");
+  });
+
+  it("applies custom id", () => {
+    render(<Tags {...baseProps} id="custom-id" />);
+    expect(screen.getByTestId("tags")).toHaveAttribute("id", "custom-id");
+  });
+
+  it("applies custom style", () => {
+    render(<Tags {...baseProps} style={{ width: "200px" }} />);
+    expect(screen.getByTestId("tags")).toHaveStyle({ width: "200px" });
+  });
+
+  it("calls onMouseEnter when mouse enters", () => {
+    const onMouseEnterMock = vi.fn();
+    render(<Tags {...baseProps} onMouseEnter={onMouseEnterMock} />);
+    const tag = screen.getByText("tag1");
+    tag.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+    expect(onMouseEnterMock).toHaveBeenCalled();
+  });
+
+  it("calls onMouseLeave when mouse leaves", () => {
+    const onMouseLeaveMock = vi.fn();
+    render(<Tags {...baseProps} onMouseLeave={onMouseLeaveMock} />);
+    const tag = screen.getByText("tag1");
+    tag.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
+    expect(onMouseLeaveMock).toHaveBeenCalled();
+  });
+
+  it("renders with TagType objects", () => {
+    const tagObjects = [
+      { label: "Design", roomType: 1 },
+      { label: "Development", roomType: 2 },
+    ];
+    render(<Tags {...baseProps} tags={tagObjects} />);
+    expect(screen.getByText("Design")).toBeInTheDocument();
+    expect(screen.getByText("Development")).toBeInTheDocument();
+  });
+
+  it("handles columnCount of -1 to show all tags", () => {
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", "tag2", "tag3", "tag4"]}
+        columnCount={-1}
+      />,
+    );
+    expect(screen.getByText("tag1")).toBeInTheDocument();
+    expect(screen.getByText("tag2")).toBeInTheDocument();
+    expect(screen.getByText("tag3")).toBeInTheDocument();
+    expect(screen.getByText("tag4")).toBeInTheDocument();
+  });
+
+  it("calls onOptionTagClick when option tag is clicked", () => {
+    const onOptionTagClickMock = vi.fn();
+    const optionRef = React.createRef<HTMLDivElement>();
+
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", "tag2", "tag3"]}
+        columnCount={2}
+        optionTagRef={optionRef}
+        onOptionTagClick={onOptionTagClickMock}
+      />,
+    );
+
+    const optionTag = screen.getByText("+1");
+    optionTag.click();
+    expect(onOptionTagClickMock).toHaveBeenCalledTimes(1);
   });
 });
