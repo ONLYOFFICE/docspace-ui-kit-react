@@ -32,14 +32,15 @@ import { render, screen } from "@testing-library/react";
 import { getWeekdayElements } from "./index";
 
 describe("getWeekdayElements", () => {
-    it("should render weekday names", () => {
-        const elements = getWeekdayElements();
-        render(<>{elements}</>);
-        
-        const m = screen.getAllByText("M");
-        expect(m.length).toBeGreaterThan(0);
-        
-        const t = screen.getAllByText("T");
-        expect(t.length).toBeGreaterThan(1); // Tue, Thu
+  it("should render weekday names", () => {
+    const elements = getWeekdayElements();
+    const { container } = render(<>{elements}</>);
+
+    const weekdays = container.querySelectorAll(".weekday");
+    expect(weekdays).toHaveLength(7);
+
+    weekdays.forEach((el) => {
+      expect(el.textContent?.trim().length).toBeGreaterThan(0);
     });
+  });
 });
