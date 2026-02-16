@@ -42,7 +42,7 @@ const meta = {
       description: "Disables the dropzone",
       defaultValue: false,
     },
-    linkMainText: {
+    linkMainTextForFiles: {
       control: "text",
       description: "Main text displayed in the dropzone",
     },
@@ -112,7 +112,7 @@ export const SingleFileUpload: Story = {
   args: {
     ...defaultArgs,
     maxFiles: 1,
-    linkMainText: "Upload single file",
+    linkMainTextForFiles: "Upload single file",
     linkSecondaryText: "or drag it here",
   },
 };
@@ -121,7 +121,7 @@ export const ImageUpload: Story = {
   args: {
     ...defaultArgs,
     accept: [".png", ".jpg", ".jpeg", ".gif"],
-    linkMainText: "Upload images",
+    linkMainTextForFiles: "Upload images",
     linkSecondaryText: "or drag them here",
     exstsText: "Supported file types: PNG, JPG, JPEG, GIF",
   },
