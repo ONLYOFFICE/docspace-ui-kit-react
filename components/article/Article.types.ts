@@ -40,6 +40,7 @@ export type ArticleHeaderProps = {
   withCustomArticleHeader: boolean;
   currentDeviceType: DeviceType;
   showBackButton: boolean;
+  navigate?: (path: string) => void;
 };
 
 export type ArticleAppsProps = {
@@ -63,6 +64,7 @@ export type ArticleDevToolsBarProps = {
   currentDeviceType: DeviceType;
   toggleArticleOpen: TToggleArticleOpen;
   path?: string;
+  navigate?: (path: string) => void;
 };
 
 export type ArticleZendeskProps = {

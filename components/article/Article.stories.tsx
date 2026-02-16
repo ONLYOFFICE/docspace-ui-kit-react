@@ -89,6 +89,7 @@ const defaultProps: ArticleProps = {
   zendeskKey: "your-zendesk-key",
   showProgress: false,
   showBackButton: false,
+  navigate: (path: string) => console.log("navigate:", path),
   downloaddesktopUrl: "https://example.com/desktop",
   officeforandroidUrl: "https://example.com/android",
   officeforiosUrl: "https://example.com/ios",
