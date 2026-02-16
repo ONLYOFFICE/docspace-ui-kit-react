@@ -123,6 +123,7 @@ const Article = ({
   officeforandroidUrl,
   officeforiosUrl,
   showBackButton,
+  navigate,
 }: ArticleProps) => {
   const [articleHeaderContent, setArticleHeaderContent] =
     React.useState<null | React.JSX.Element>(null);
@@ -261,6 +262,7 @@ const Article = ({
           isBurgerLoading={isBurgerLoading}
           onIconClick={toggleArticleOpen}
           showBackButton={showBackButton}
+          navigate={navigate}
         >
           {articleHeaderContent ? articleHeaderContent.props.children : null}
         </SubArticleHeader>
@@ -286,6 +288,7 @@ const Article = ({
               currentDeviceType={currentDeviceType}
               onLogoClickAction={onLogoClickAction}
               isLoading={isBurgerLoading}
+              navigate={navigate}
             />
           ) : null}
           {articleBodyContent ? articleBodyContent.props.children : null}
@@ -298,6 +301,7 @@ const Article = ({
                   toggleArticleOpen={toggleArticleOpen}
                   showText={showText}
                   path={pathDevTools}
+                  navigate={navigate}
                 />
               ) : null}
               {!hideAppsBlock ? (

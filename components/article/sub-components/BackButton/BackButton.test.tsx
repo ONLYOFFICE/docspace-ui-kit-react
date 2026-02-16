@@ -1,5 +1,5 @@
 import React from "react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
 import { DeviceType } from "../../../../enums";
@@ -20,88 +20,65 @@ vi.mock("../../../../utils", () => ({
   getCommonTranslation: vi.fn((key: string) => key),
 }));
 
-const mockLocation = () => {
-  const setHref = vi.fn();
-
-  Object.defineProperty(window, "location", {
-    configurable: true,
-    value: {
-      get href() {
-        return "http://example.com";
-      },
-      set href(value: string) {
-        setHref(value);
-      },
-    },
-  });
-
-  return { setHref };
-};
-
 describe("BackButton", () => {
-  const originalLocation = window.location;
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  afterEach(() => {
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      value: originalLocation,
-    });
-  });
-
   it("renders loader when in loading state", () => {
     render(
-      <BackButton showText currentDeviceType={DeviceType.desktop} isLoading />,
+      <BackButton
+        showText
+        currentDeviceType={DeviceType.desktop}
+        isLoading
+        navigate={vi.fn()}
+      />,
     );
 
     expect(screen.getByTestId("article-header-loader")).toBeInTheDocument();
   });
 
   it("shows text when showText is true", () => {
-    render(<BackButton showText currentDeviceType={DeviceType.desktop} />);
+    render(<BackButton showText currentDeviceType={DeviceType.desktop} navigate={vi.fn()} />);
 
     expect(screen.getByText("Back")).toBeInTheDocument();
   });
 
   it("hides text when showText is false", () => {
-    render(
-      <BackButton showText={false} currentDeviceType={DeviceType.desktop} />,
-    );
+    render(<BackButton showText={false} currentDeviceType={DeviceType.desktop} navigate={vi.fn()} />);
 
     expect(screen.queryByText("Back")).not.toBeInTheDocument();
   });
 
   it("uses tablet arrow icon for non-desktop devices", () => {
-    render(<BackButton showText currentDeviceType={DeviceType.tablet} />);
+    render(<BackButton showText currentDeviceType={DeviceType.tablet} navigate={vi.fn()} />);
 
     expect(screen.getByTestId("tablet-arrow")).toBeInTheDocument();
   });
 
   it("calls onLogoClickAction and navigates on click", () => {
     const onLogoClickAction = vi.fn();
-    const { setHref } = mockLocation();
+    const navigate = vi.fn();
 
     render(
       <BackButton
         showText
         currentDeviceType={DeviceType.desktop}
         onLogoClickAction={onLogoClickAction}
+        navigate={navigate}
       />,
     );
 
     fireEvent.click(screen.getByText("Back").closest("div") as Element);
 
     expect(onLogoClickAction).toHaveBeenCalledTimes(1);
-    expect(setHref).toHaveBeenCalledWith("/");
+    expect(navigate).toHaveBeenCalledWith("/");
   });
 
   it("toggles article and navigates on mobile click", () => {
     const toggleArticleOpen = vi.fn();
     const onLogoClickAction = vi.fn();
-    const { setHref } = mockLocation();
+    const navigate = vi.fn();
 
     render(
       <BackButton
@@ -109,6 +86,7 @@ describe("BackButton", () => {
         currentDeviceType={DeviceType.mobile}
         onLogoClickAction={onLogoClickAction}
         toggleArticleOpen={toggleArticleOpen}
+        navigate={navigate}
       />,
     );
 
@@ -116,6 +94,7 @@ describe("BackButton", () => {
 
     expect(onLogoClickAction).toHaveBeenCalledTimes(1);
     expect(toggleArticleOpen).toHaveBeenCalledTimes(1);
-    expect(setHref).toHaveBeenCalledWith("/");
+    expect(navigate).toHaveBeenCalledWith("/");
   });
+
 });

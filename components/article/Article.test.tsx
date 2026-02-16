@@ -89,6 +89,7 @@ const defaultProps = {
   children: [],
   logoText: "",
   showBackButton: false,
+  navigate: vi.fn(),
   downloaddesktopUrl: "",
   officeforandroidUrl: "",
   officeforiosUrl: "",
