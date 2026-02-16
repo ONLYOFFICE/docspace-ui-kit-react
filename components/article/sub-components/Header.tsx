@@ -48,13 +48,14 @@ const ArticleHeader = ({
   currentDeviceType,
   onIconClick,
   showBackButton,
+  navigate,
   ...rest
 }: ArticleHeaderProps) => {
   const { isBase } = useTheme();
 
   const onLogoClick = () => {
     onLogoClickAction?.();
-    window.location.href = "/";
+    navigate("/");
   };
 
   const burgerLogo = getLogoUrl(
@@ -85,6 +86,7 @@ const ArticleHeader = ({
               showText={showText}
               currentDeviceType={currentDeviceType}
               toggleArticleOpen={onIconClick}
+              navigate={navigate}
             />
           ) : null
         }
@@ -129,9 +131,9 @@ const ArticleHeader = ({
             onClick={onLogoClick}
           />
         ) : (
-          <a href="/" onClick={onLogoClick}>
+          <div onClick={onLogoClick}>
             <img className="logo-icon_svg" alt="burger-logo" src={logo} />
-          </a>
+          </div>
         )}
       </div>
     </>
