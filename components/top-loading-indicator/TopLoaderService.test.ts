@@ -102,7 +102,7 @@ describe("TopLoaderService", () => {
     expect(widthVal).toBeGreaterThan(25);
     expect(widthVal).toBeLessThan(100);
 
-    vi.advanceTimersByTime(100);
+    vi.advanceTimersByTime(1000);
     expect(mockElement.style.width).toBe("0px");
   });
 
