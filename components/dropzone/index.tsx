@@ -28,7 +28,7 @@ import React from "react";
 import { useDropzone, DropEvent } from "react-dropzone";
 import classNames from "classnames";
 
-import TriangleDownIcon from "PUBLIC_DIR/images/triangle.down.react.svg";
+import TriangleDownIcon from "../../assets/triangle.down.react.svg";
 
 import { Loader, LoaderTypes } from "../loader";
 import { Badge } from "../badge";
@@ -136,7 +136,9 @@ const Dropzone = ({
       ) : (
         <div
           {...getRootProps({
-            className: classNames(styles.dropzone),
+            className: classNames(styles.dropzone, {
+              [styles.hasMultipleInputs]: !!linkMainTextForFolders,
+            }),
             "aria-label": "File upload area",
             "data-testid": "dropzone-input-area",
           })}
