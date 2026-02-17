@@ -30,7 +30,7 @@ import { type DependencyList, type RefObject, useEffect } from "react";
 
 export const useClickOutside = <T extends HTMLElement>(
   ref: RefObject<T | null>,
-  handler: VoidFunction,
+  handler: (e: MouseEvent) => void,
   options?: AddEventListenerOptions | boolean,
   ...deps: DependencyList
 ) => {
@@ -38,7 +38,7 @@ export const useClickOutside = <T extends HTMLElement>(
     const handleClickOutside = (e: MouseEvent) => {
       // e.stopPropagation();
       const target = e.target as HTMLElement;
-      if (ref.current && !ref.current.contains(target)) handler();
+      if (ref.current && !ref.current.contains(target)) handler(e);
     };
     document.addEventListener("mousedown", handleClickOutside, options);
     return () => {
