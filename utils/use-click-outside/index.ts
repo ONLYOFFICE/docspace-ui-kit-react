@@ -31,7 +31,7 @@ import { type DependencyList, type RefObject, useEffect } from "react";
 export const useClickOutside = <T extends HTMLElement>(
   ref: RefObject<T | null>,
   handler: VoidFunction,
-  options?: AddEventListenerOptions,
+  options?: AddEventListenerOptions | boolean,
   ...deps: DependencyList
 ) => {
   useEffect(() => {
