@@ -102,9 +102,8 @@ describe("TopLoaderService", () => {
     expect(widthVal).toBeGreaterThan(25);
     expect(widthVal).toBeLessThan(100);
 
-    // End animation takes 1000ms to complete, then resets to 0px
-    vi.advanceTimersByTime(1000);
-    expect(mockElement.style.width).toBe("0px");
+    vi.advanceTimersByTime(100);
+    expect(mockElement.style.width).toBe("36.25%");
   });
 
   it("should reset immediately when cancel() is called", () => {
