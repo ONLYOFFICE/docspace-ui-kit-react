@@ -1,6 +1,11 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
+if (process.env.CI) {
+  console.log("CI detected – skipping copy-locales");
+  process.exit(0);
+}
+
 const SOURCE = path.resolve(__dirname, "../../../public/locales");
 const DEST = path.resolve(__dirname, "../locales");
 const UI_KIT_ROOT = path.resolve(__dirname, "..");
