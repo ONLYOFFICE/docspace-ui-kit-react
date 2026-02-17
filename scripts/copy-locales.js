@@ -2,7 +2,10 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 if (process.env.CI) {
-  console.log("CI detected – skipping copy-locales");
+  const dest = path.resolve(__dirname, "../locales/en");
+  fs.mkdirSync(dest, { recursive: true });
+  fs.writeFileSync(path.join(dest, "Common.json"), "{}\n");
+  console.log("CI detected – created stub locales/en/Common.json");
   process.exit(0);
 }
 

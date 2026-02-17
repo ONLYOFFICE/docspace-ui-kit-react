@@ -40,9 +40,6 @@
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/*.test.*",
-    "**/*.stories.*",
-    "test/**/*"
+    "dist"
   ]
 }
