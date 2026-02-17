@@ -26,24 +26,15 @@
 
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 import { Tags } from ".";
 import type { TagsProps } from "./Tags.types";
 
-vi.mock("../tag", () => ({
-  Tag: ({ label, advancedOptions }: { label: string; advancedOptions?: React.ReactNode[] }) => (
-    <div data-testid="tag-mock" data-label={label}>
-      {label || "..."}
-      {advancedOptions && <div data-testid="advanced-options-mock" />}
-    </div>
-  ),
-}));
-
 const baseProps: TagsProps = {
   tags: ["tag1", "tag2"],
   columnCount: 2,
-  onSelectTag: () => {},
+  onSelectTag: vi.fn(),
 };
 
 describe("<Tags />", () => {
@@ -66,9 +57,25 @@ describe("<Tags />", () => {
     expect(screen.getByText("tag1")).toBeInTheDocument();
   });
 
-  it("returns early if columnCount is 0", () => {
+  it("renders multiple tags", () => {
+    render(<Tags {...baseProps} tags={["tag1", "tag2", "tag3"]} />);
+    expect(screen.getByText("tag1")).toBeInTheDocument();
+    expect(screen.getByText("tag2")).toBeInTheDocument();
+  });
+
+  it("calls onSelectTag when a tag is clicked", () => {
+    const onSelectTagMock = vi.fn();
+    render(
+      <Tags {...baseProps} tags={["tag1"]} onSelectTag={onSelectTagMock} />,
+    );
+    screen.getByText("tag1").click();
+    expect(onSelectTagMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders option tag when columnCount is 0", () => {
     render(<Tags {...baseProps} columnCount={0} />);
-    expect(screen.getByTestId("tags")).toBeEmptyDOMElement();
+    expect(screen.getByText("...")).toBeInTheDocument();
+    expect(screen.getByTestId("tag_item")).toBeInTheDocument();
   });
 
   it("handles a single tag as an object with isDefault", () => {
@@ -88,12 +95,12 @@ describe("<Tags />", () => {
       configurable: true,
       value: 1000,
     });
-    
+
     const tags = [
       { label: "TP", isThirdParty: true },
       { label: "Default", isDefault: true },
       { label: "Plain", isDefault: false, isThirdParty: false },
-      "String Tag"
+      "String Tag",
     ];
     render(<Tags {...baseProps} tags={tags} columnCount={5} />);
     expect(screen.getByText("TP")).toBeInTheDocument();
@@ -109,7 +116,7 @@ describe("<Tags />", () => {
     });
     const tags = [
       { label: "TP", isThirdParty: true },
-      { label: "Default", isDefault: true }
+      { label: "Default", isDefault: true },
     ];
     render(<Tags {...baseProps} tags={tags} columnCount={1} />);
     expect(screen.getByText("TP")).toBeInTheDocument();
@@ -130,11 +137,11 @@ describe("<Tags />", () => {
     });
     const tags = ["tag1", "tag2", "tag3", "tag4"];
     render(<Tags {...baseProps} tags={tags} columnCount={2} />);
-    
+
     expect(screen.getByText("tag1")).toBeInTheDocument();
     expect(screen.getByText("tag2")).toBeInTheDocument();
     expect(screen.getByText("...")).toBeInTheDocument();
-    expect(screen.getByTestId("advanced-options-mock")).toBeInTheDocument();
+    expect(screen.getByTestId("dropdown")).toBeInTheDocument();
   });
 
   it("handles mixed tags in dropdown mode (TP, Default, String)", () => {
@@ -147,16 +154,16 @@ describe("<Tags />", () => {
       { label: "Default", isDefault: true },
       { label: "Plain Object" },
       "Str",
-      "Hidden"
+      "Hidden",
     ];
     render(<Tags {...baseProps} tags={tags} columnCount={4} />);
-    
+
     expect(screen.getByText("TP")).toBeInTheDocument();
     expect(screen.getByText("Default")).toBeInTheDocument();
     expect(screen.getByText("Plain Object")).toBeInTheDocument();
     expect(screen.getByText("Str")).toBeInTheDocument();
     expect(screen.getByText("...")).toBeInTheDocument();
-    expect(screen.getByTestId("advanced-options-mock")).toBeInTheDocument();
+    expect(screen.getByTestId("dropdown")).toBeInTheDocument();
   });
 
   it("handles string labels in dropdown mode", () => {
@@ -179,5 +186,79 @@ describe("<Tags />", () => {
     render(<Tags {...baseProps} tags={["S1", "S2"]} columnCount={2} />);
     expect(screen.getByText("S1")).toBeInTheDocument();
     expect(screen.getByText("S2")).toBeInTheDocument();
+  });
+
+  it("applies custom className", () => {
+    render(<Tags {...baseProps} className="custom-class" />);
+    expect(screen.getByTestId("tags")).toHaveClass("custom-class");
+  });
+
+  it("applies custom id", () => {
+    render(<Tags {...baseProps} id="custom-id" />);
+    expect(screen.getByTestId("tags")).toHaveAttribute("id", "custom-id");
+  });
+
+  it("applies custom style", () => {
+    render(<Tags {...baseProps} style={{ width: "200px" }} />);
+    expect(screen.getByTestId("tags")).toHaveStyle({ width: "200px" });
+  });
+
+  it("calls onMouseEnter when mouse enters", () => {
+    const onMouseEnterMock = vi.fn();
+    render(<Tags {...baseProps} onMouseEnter={onMouseEnterMock} />);
+    const tags = screen.getAllByTestId("tag_item");
+    fireEvent.mouseEnter(tags[0]);
+    expect(onMouseEnterMock).toHaveBeenCalled();
+  });
+
+  it("calls onMouseLeave when mouse leaves", () => {
+    const onMouseLeaveMock = vi.fn();
+    render(<Tags {...baseProps} onMouseLeave={onMouseLeaveMock} />);
+    const tags = screen.getAllByTestId("tag_item");
+    fireEvent.mouseLeave(tags[0]);
+    expect(onMouseLeaveMock).toHaveBeenCalled();
+  });
+
+  it("renders with TagType objects", () => {
+    const tagObjects = [
+      { label: "Design", roomType: 1 },
+      { label: "Development", roomType: 2 },
+    ];
+    render(<Tags {...baseProps} tags={tagObjects} />);
+    expect(screen.getByText("Design")).toBeInTheDocument();
+    expect(screen.getByText("Development")).toBeInTheDocument();
+  });
+
+  it("handles columnCount of -1 to show all tags", () => {
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", "tag2", "tag3", "tag4"]}
+        columnCount={-1}
+      />,
+    );
+    expect(screen.getByText("tag1")).toBeInTheDocument();
+    expect(screen.getByText("tag2")).toBeInTheDocument();
+    expect(screen.getByText("tag3")).toBeInTheDocument();
+    expect(screen.getByText("tag4")).toBeInTheDocument();
+  });
+
+  it("calls onOptionTagClick when option tag is clicked", () => {
+    const onOptionTagClickMock = vi.fn();
+    const optionRef = React.createRef<HTMLDivElement>();
+
+    render(
+      <Tags
+        {...baseProps}
+        tags={["tag1", "tag2", "tag3"]}
+        columnCount={2}
+        optionTagRef={optionRef}
+        onOptionTagClick={onOptionTagClickMock}
+      />,
+    );
+
+    const optionTag = screen.getByText("+1");
+    optionTag.click();
+    expect(onOptionTagClickMock).toHaveBeenCalledTimes(1);
   });
 });

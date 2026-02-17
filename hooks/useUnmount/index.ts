@@ -24,25 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-"use client";
+import { useEffect, useEffectEvent } from "react";
 
-import { type DependencyList, type RefObject, useEffect } from "react";
+export const useUnmount = (func: VoidFunction) => {
+  const onUnmount = useEffectEvent(func);
 
-export const useClickOutside = <T extends HTMLElement>(
-  ref: RefObject<T | null>,
-  handler: (e: MouseEvent) => void,
-  options?: AddEventListenerOptions | boolean,
-  ...deps: DependencyList
-) => {
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      // e.stopPropagation();
-      const target = e.target as HTMLElement;
-      if (ref.current && !ref.current.contains(target)) handler(e);
-    };
-    document.addEventListener("mousedown", handleClickOutside, options);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      onUnmount();
     };
-  }, [ref, handler, ...deps]);
+  }, []);
 };

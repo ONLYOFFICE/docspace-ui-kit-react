@@ -23,6 +23,7 @@ import { Tag } from "@docspace/ui-kit";
 
 | Props            |      Type      | Required | Values | Default | Description                                                     |
 | ---------------- | :------------: | :------: | :----: | :-----: | --------------------------------------------------------------- |
+| `ref`            | `React.RefObject<HTMLDivElement>` |    -     |   -    |    -    | Accepts the ref                                                 |
 | `id`             |    `string`    |    -     |   -    |    -    | Accepts id                                                      |
 | `className`      |    `string`    |    -     |   -    |    -    | Accepts class                                                   |
 | `style`          | `obj`, `array` |    -     |   -    |    -    | Accepts css style                                               |
