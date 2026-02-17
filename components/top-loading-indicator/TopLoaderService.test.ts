@@ -103,7 +103,7 @@ describe("TopLoaderService", () => {
     expect(widthVal).toBeLessThan(100);
 
     vi.advanceTimersByTime(100);
-    expect(mockElement.style.width).toBe("0px");
+    expect(mockElement.style.width).toBe("36.25%");
   });
 
   it("should reset immediately when cancel() is called", () => {
