@@ -1,5 +1,3 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
 // This program is a free software product.
 // You can redistribute it and/or modify it under the terms
 // of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
@@ -24,10 +22,70 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./formatDate";
-export * from "./dateArithmetic";
-export * from "./dateComparison";
-export * from "./duration";
-export * from "./timezone";
-export * from "./parse";
-export * from "./getCorrectDate";
+.think {
+    // margin-bottom: 16px;
+
+    &.withMarginTop {
+        margin-top: 16px;
+    }
+
+    .thinkBlock {
+        background-color: var(--chat-message-tool-block-color);
+        padding: 12px;
+    }
+
+    .thinkTitle {
+        width: fit-content;
+
+        display: flex;
+        align-items: center;
+
+        gap: 8px;
+
+        height: 32px;
+
+        cursor: pointer;
+
+        .toolFinishIcon {
+            width: 12px;
+            height: 12px;
+
+            div {
+                width: 12px;
+                height: 12px;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            svg {
+                height: 12px;
+
+                path {
+                    fill: var(--chat-input-send-button-background);
+                    
+                }
+            }
+        }
+    }
+
+    .thinkTitleOpened {
+        margin-bottom: 6px;
+    }
+
+    .icon {
+        transition: transform 0.2s ease;
+
+        width: 12px;
+        height: 12px;
+
+        path {
+            fill: var(--text-color) !important;
+        }
+    }
+
+    .iconOpened {
+        transform: rotate(90deg);
+    }
+}

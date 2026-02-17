@@ -59,6 +59,12 @@ importers:
       luxon:
         specifier: 3.7.2
         version: 3.7.2
+      mobx:
+        specifier: 6.13.5
+        version: 6.13.5
+      mobx-react:
+        specifier: 7.6.0
+        version: 7.6.0(mobx@6.13.5)(react@19.2.3)
       react-autosize-textarea:
         specifier: 7.1.0
         version: 7.1.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -110,6 +116,9 @@ importers:
       react-virtualized:
         specifier: ^9.22.6
         version: 9.22.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react-virtualized-auto-sizer:
+        specifier: 1.0.24
+        version: 1.0.24(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react-window:
         specifier: 1.8.10
         version: 1.8.10(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -2873,6 +2882,35 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
+  mobx-react-lite@3.4.3:
+    resolution: {integrity: sha512-NkJREyFTSUXR772Qaai51BnE1voWx56LOL80xG7qkZr6vo8vEaLF3sz1JNUVh+rxmUzxYaqOhfuxTfqUh0FXUg==}
+    peerDependencies:
+      mobx: ^6.1.0
+      react: ^16.8.0 || ^17 || ^18
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+
+  mobx-react@7.6.0:
+    resolution: {integrity: sha512-+HQUNuh7AoQ9ZnU6c4rvbiVVl+wEkb9WqYsVDzGLng+Dqj1XntHu79PvEWKtSMoMj67vFp/ZPXcElosuJO8ckA==}
+    peerDependencies:
+      mobx: ^6.1.0
+      react: ^16.8.0 || ^17 || ^18
+      react-dom: '*'
+      react-native: '*'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+
+  mobx@6.13.5:
+    resolution: {integrity: sha512-/HTWzW2s8J1Gqt+WmUj5Y0mddZk+LInejADc79NJadrWla3rHzmRHki/mnEUH1AvOmbNTZ1BRbKxr8DSgfdjMA==}
+
   moo@0.5.2:
     resolution: {integrity: sha512-iSAJLHYKnX41mKcJKjqvnAN9sf0LMDTXDEvFv+ffuRR9a1MIuXLjMNL6EsnDHSkKLTWNqQQ5uo61P4EbU4NU+Q==}
 
@@ -3386,6 +3424,12 @@ packages:
     peerDependencies:
       react: '>=16.6.0'
       react-dom: '>=16.6.0'
+
+  react-virtualized-auto-sizer@1.0.24:
+    resolution: {integrity: sha512-3kCn7N9NEb3FlvJrSHWGQ4iVl+ydQObq2fHMn12i5wbtm74zHOPhz/i64OL3c1S1vi9i2GXtZqNqUJTQ+BnNfg==}
+    peerDependencies:
+      react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0
+      react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0
 
   react-virtualized@9.22.6:
     resolution: {integrity: sha512-U5j7KuUQt3AaMatlMJ0UJddqSiX+Km0YJxSqbAzIiGw5EmNz0khMyqP2hzgu4+QUtm+QPIrxzUX4raJxmVJnHg==}
@@ -6701,6 +6745,19 @@ snapshots:
 
   minipass@7.1.2: {}
 
+  mobx-react-lite@3.4.3(mobx@6.13.5)(react@19.2.3):
+    dependencies:
+      mobx: 6.13.5
+      react: 19.2.3
+
+  mobx-react@7.6.0(mobx@6.13.5)(react@19.2.3):
+    dependencies:
+      mobx: 6.13.5
+      mobx-react-lite: 3.4.3(mobx@6.13.5)(react@19.2.3)
+      react: 19.2.3
+
+  mobx@6.13.5: {}
+
   moo@0.5.2: {}
 
   motion-dom@12.30.1:
@@ -7190,6 +7247,11 @@ snapshots:
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+
+  react-virtualized-auto-sizer@1.0.24(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+    dependencies:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 

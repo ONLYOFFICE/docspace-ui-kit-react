@@ -24,10 +24,18 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./formatDate";
-export * from "./dateArithmetic";
-export * from "./dateComparison";
-export * from "./duration";
-export * from "./timezone";
-export * from "./parse";
-export * from "./getCorrectDate";
+import React from "react";
+
+import StatusMessage from "@docspace/ui-kit/components/status-message";
+
+import { ContentType } from "../../../../../../api/ai/enums";
+
+import { MessageErrorProps } from "../../../../Chat.types";
+
+const Error = ({ content }: MessageErrorProps) => {
+  if (content.type !== ContentType.Text) return null;
+
+  return <StatusMessage message={content.text} />;
+};
+
+export default Error;

@@ -24,10 +24,31 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./formatDate";
-export * from "./dateArithmetic";
-export * from "./dateComparison";
-export * from "./duration";
-export * from "./timezone";
-export * from "./parse";
-export * from "./getCorrectDate";
+import { DateTime } from "luxon";
+
+import { parseToDateTime } from "./parse";
+import { getAppTimezone } from "./timezone";
+import { convertMomentFormatToLuxon, formatDate } from "./formatDate";
+
+export function getCorrectDate(
+	locale: string,
+	date: string | Date | DateTime,
+	dateFormat = "L",
+	timeFormat = "LT",
+	tz?: string,
+) {
+	if (!date || date === "0001-01-01T00:00:00.0000000Z") return "—";
+
+	const dt = parseToDateTime(date);
+	if (!dt) return "—";
+
+	const timezone = tz || getAppTimezone();
+
+	const luxonDateFormat = convertMomentFormatToLuxon(dateFormat);
+	const luxonTimeFormat = convertMomentFormatToLuxon(timeFormat);
+
+	const curDate = formatDate(dt, luxonDateFormat, { locale, timezone });
+	const curTime = formatDate(dt, luxonTimeFormat, { locale, timezone });
+
+	return `${curDate} ${curTime}`;
+}

@@ -24,10 +24,49 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./formatDate";
-export * from "./dateArithmetic";
-export * from "./dateComparison";
-export * from "./duration";
-export * from "./timezone";
-export * from "./parse";
-export * from "./getCorrectDate";
+import { useRef } from "react";
+import { observer } from "mobx-react";
+
+import { ChatHeaderProps } from "../../Chat.types";
+
+import styles from "./ChatHeader.module.scss";
+
+import SelectChat from "./sub-components/SelectChat";
+import CreateChat from "./sub-components/CreateChat";
+import SelectModel from "./sub-components/SelectModel";
+
+const ChatHeader = ({
+  selectedModel,
+  isLoading,
+  getIcon,
+  roomId,
+  aiReady,
+  getResultStorageId,
+  setIsAIAgentChatDelete,
+  setDeleteDialogVisible,
+  folderFormValidation,
+}: ChatHeaderProps) => {
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div
+      ref={headerRef}
+      className={`${styles.chatHeader} chat-header`}
+      data-testid="chat-header"
+    >
+      <SelectChat
+        isLoadingProp={isLoading}
+        getIcon={getIcon}
+        getResultStorageId={getResultStorageId}
+        roomId={roomId}
+        setIsAIAgentChatDelete={setIsAIAgentChatDelete}
+        setDeleteDialogVisible={setDeleteDialogVisible}
+        folderFormValidation={folderFormValidation}
+      />
+      <CreateChat isLoadingProp={isLoading} isDisabled={!aiReady} />
+      <SelectModel selectedModel={selectedModel} isLoading={isLoading} />
+    </div>
+  );
+};
+
+export default observer(ChatHeader);

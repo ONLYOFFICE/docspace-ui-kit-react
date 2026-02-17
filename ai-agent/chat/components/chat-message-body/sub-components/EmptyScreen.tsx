@@ -24,10 +24,34 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./formatDate";
-export * from "./dateArithmetic";
-export * from "./dateComparison";
-export * from "./duration";
-export * from "./timezone";
-export * from "./parse";
-export * from "./getCorrectDate";
+import React from "react";
+import { useTranslation } from "react-i18next";
+
+import { RectangleSkeleton } from "../../../../../skeletons";
+
+import { Text } from "@docspace/ui-kit/components/text";
+
+import { MessageEmptyProps } from "../../../Chat.types";
+
+import styles from "../ChatMessageBody.module.scss";
+
+const EmptyScreen = ({ isLoading }: MessageEmptyProps) => {
+  const { t } = useTranslation(["Common"]);
+
+  return (
+    <Text
+      className={styles.chatEmptyHelpMessage}
+      isBold
+      fontSize="18px"
+      lineHeight="24px"
+    >
+      {isLoading ? (
+        <RectangleSkeleton height="24px" width="140px" borderRadius="3px" />
+      ) : (
+        t("Common:AIChatOfferHelp")
+      )}
+    </Text>
+  );
+};
+
+export default EmptyScreen;

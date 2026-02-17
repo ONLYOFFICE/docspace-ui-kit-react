@@ -24,10 +24,44 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./formatDate";
-export * from "./dateArithmetic";
-export * from "./dateComparison";
-export * from "./duration";
-export * from "./timezone";
-export * from "./parse";
-export * from "./getCorrectDate";
+import React from "react";
+
+import { getChats } from "../../../api/ai";
+import type { TChat } from "../../../api/ai/types";
+
+const useInitChats = ({ roomId }: { roomId: string | number }) => {
+	const [isLoading, setIsLoading] = React.useState(false);
+	const [isRequestRunning, setIsRequestRunning] = React.useState(false);
+	const [chats, setChats] = React.useState<TChat[]>([]);
+	const [totalChats, setTotalChats] = React.useState<number>(0);
+
+	const fetchChats = async () => {
+		if (!roomId) return;
+		if (isRequestRunning) return;
+
+		setIsLoading(true);
+		setIsRequestRunning(true);
+
+		try {
+			const { items, total } = await getChats(roomId);
+
+			setChats(items);
+			setTotalChats(total);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setIsRequestRunning(false);
+			setIsLoading(false);
+		}
+	};
+
+	return {
+		isLoading,
+		isRequestRunning,
+		chats,
+		totalChats,
+		fetchChats,
+	};
+};
+
+export default useInitChats;

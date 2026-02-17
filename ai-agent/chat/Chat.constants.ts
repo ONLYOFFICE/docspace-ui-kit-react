@@ -24,10 +24,6 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./formatDate";
-export * from "./dateArithmetic";
-export * from "./dateComparison";
-export * from "./duration";
-export * from "./timezone";
-export * from "./parse";
-export * from "./getCorrectDate";
+export const CHAT_SUPPORTED_FORMATS = "doc,docx,txt,pdf,xls,xlsx";
+
+export const CHAT_MAX_FILE_COUNT = 5;

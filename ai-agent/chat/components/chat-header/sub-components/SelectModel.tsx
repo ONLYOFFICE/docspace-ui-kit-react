@@ -24,10 +24,40 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./formatDate";
-export * from "./dateArithmetic";
-export * from "./dateComparison";
-export * from "./duration";
-export * from "./timezone";
-export * from "./parse";
-export * from "./getCorrectDate";
+import { getAiModelName } from "../../../../../utils/ai/getAiModelName";
+
+import { RectangleSkeleton } from "../../../../../components/rectangle";
+
+import { Text } from "../../../../../components/text";
+
+import type { SelectModelProps } from "../../../Chat.types";
+
+import styles from "../ChatHeader.module.scss";
+
+const SelectModel = ({ selectedModel, isLoading }: SelectModelProps) => {
+  if (isLoading) {
+    return (
+      <RectangleSkeleton
+        width="96px"
+        height="32px"
+        borderRadius="3px"
+        style={{ minWidth: "32px" }}
+      />
+    );
+  }
+
+  const name = getAiModelName(selectedModel);
+
+  return (
+    <Text
+      fontSize="13px"
+      fontWeight={600}
+      lineHeight="20px"
+      className={styles.selectModel}
+    >
+      {name}
+    </Text>
+  );
+};
+
+export default SelectModel;
