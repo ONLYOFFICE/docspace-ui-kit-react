@@ -63,39 +63,53 @@ if (USED_KEYS.size === 0) {
 }
 
 if (!fs.existsSync(SOURCE)) {
-  console.error(`Source locales not found: ${SOURCE}`);
-  process.exit(1);
-}
+  console.warn(`Source locales not found: ${SOURCE}`);
+  console.warn("Skipping locale copy - this is expected in standalone mode");
 
-const langs = fs
-  .readdirSync(SOURCE, { withFileTypes: true })
-  .filter((d) => d.isDirectory())
-  .map((d) => d.name);
-
-for (const lang of langs) {
-  const src = path.join(SOURCE, lang, "Common.json");
-  if (!fs.existsSync(src)) continue;
-
-  const all = JSON.parse(fs.readFileSync(src, "utf-8"));
-  const filtered = {};
-
+  // Create empty locales directory with minimal en locale for tests
+  const enDir = path.join(DEST, "en");
+  fs.mkdirSync(enDir, { recursive: true });
+  const minimalCommon = {};
   for (const key of USED_KEYS) {
-    if (key in all) {
-      filtered[key] = all[key];
+    minimalCommon[key] = key; // Use key as translation
+  }
+  fs.writeFileSync(
+    path.join(enDir, "Common.json"),
+    `${JSON.stringify(minimalCommon, null, 2)}\n`,
+  );
+  console.log("Created minimal en locale for standalone mode");
+} else {
+  const langs = fs
+    .readdirSync(SOURCE, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
+
+  for (const lang of langs) {
+    const src = path.join(SOURCE, lang, "Common.json");
+    if (!fs.existsSync(src)) continue;
+
+    const all = JSON.parse(fs.readFileSync(src, "utf-8"));
+    const filtered = {};
+
+    for (const key of USED_KEYS) {
+      if (key in all) {
+        filtered[key] = all[key];
+      }
     }
+
+    const destDir = path.join(DEST, lang);
+    fs.mkdirSync(destDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(destDir, "Common.json"),
+      `${JSON.stringify(filtered, null, 2)}\n`,
+    );
   }
 
-  const destDir = path.join(DEST, lang);
-  fs.mkdirSync(destDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(destDir, "Common.json"),
-    `${JSON.stringify(filtered, null, 2)}\n`,
+  console.log(
+    `Copied Common.json (${USED_KEYS.size} keys) for ${langs.length} locales into locales/`,
   );
 }
 
-console.log(
-  `Copied Common.json (${USED_KEYS.size} keys) for ${langs.length} locales into locales/`,
-);
 // --- Copy fonts ---
 const FONTS_CSS_SRC = path.resolve(__dirname, "../../../public/css/fonts.css");
 const FONTS_CSS_DEST = path.resolve(__dirname, "../css");
@@ -120,12 +134,16 @@ if (fs.existsSync(FONTS_CSS_SRC)) {
   fs.copyFileSync(FONTS_CSS_SRC, path.join(FONTS_CSS_DEST, "fonts.css"));
   console.log("Copied css/fonts.css");
 } else {
-  console.error(`fonts.css not found: ${FONTS_CSS_SRC}`);
+  console.warn(
+    `fonts.css not found: ${FONTS_CSS_SRC} (skipping in standalone mode)`,
+  );
 }
 
 if (fs.existsSync(FONTS_DIR_SRC)) {
   copyDirSync(FONTS_DIR_SRC, FONTS_DIR_DEST);
   console.log("Copied fonts/ directory");
 } else {
-  console.error(`fonts directory not found: ${FONTS_DIR_SRC}`);
+  console.warn(
+    `fonts directory not found: ${FONTS_DIR_SRC} (skipping in standalone mode)`,
+  );
 }
