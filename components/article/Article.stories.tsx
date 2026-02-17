@@ -8,6 +8,7 @@ import {
 import Article from ".";
 import { ArticleProps } from "./Article.types";
 import { ContextMenuModel } from "../context-menu";
+import LightSmallLogoUrl from "../../assets/lightsmall.svg?url";
 
 export default {
   title: "Components/Layout Components/Article",
@@ -19,6 +20,29 @@ export default {
       },
     },
   },
+  decorators: [
+    (Story) => {
+      React.useEffect(() => {
+        const replaceLogos = () => {
+          const images = document.querySelectorAll('img[src*="logo.ashx"]');
+          images.forEach((img) => {
+            (img as HTMLImageElement).src = LightSmallLogoUrl;
+          });
+        };
+
+        replaceLogos();
+        const observer = new MutationObserver(replaceLogos);
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+        });
+
+        return () => observer.disconnect();
+      }, []);
+
+      return <Story />;
+    },
+  ],
   argTypes: {
     children: { control: false },
     setShowText: { action: "setShowText" },
@@ -65,6 +89,7 @@ const defaultProps: ArticleProps = {
   zendeskKey: "your-zendesk-key",
   showProgress: false,
   showBackButton: false,
+  navigate: (path: string) => console.log("navigate:", path),
   downloaddesktopUrl: "https://example.com/desktop",
   officeforandroidUrl: "https://example.com/android",
   officeforiosUrl: "https://example.com/ios",

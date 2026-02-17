@@ -32,9 +32,11 @@ let isEnding = false;
 let endingStartTime = 0;
 let startTime = 0;
 
-let elem =
-  typeof document !== "undefined" &&
-  document.getElementById("ipl-progress-indicator");
+const getElement = () => {
+  return typeof document !== "undefined"
+    ? document.getElementById("ipl-progress-indicator")
+    : null;
+};
 
 const setAttributes = (element: HTMLElement | null) => {
   if (!element) return;
@@ -47,6 +49,7 @@ const setAttributes = (element: HTMLElement | null) => {
 const cancelProgress = () => {
   if (timerId) clearTimeout(timerId);
   timerId = null;
+  const elem = getElement();
   if (elem) {
     elem.style.width = "0px";
     elem.setAttribute("aria-valuenow", "0");
@@ -67,9 +70,9 @@ const animatingWidth = () => {
   const now = Date.now();
 
   if (isEnding) {
-    // End progress in 0.1 second
+    // End progress in 1 second for smooth completion
     const elapsed = now - endingStartTime;
-    const progress = Math.min(elapsed / 100, 1); // 0 to 1 over 0.1 second (100ms)
+    const progress = Math.min(elapsed / 1000, 1); // 0 to 1 over 1 second (1000ms)
     width = percentage + (MAX - percentage) * progress;
   } else if (startTime > 0) {
     // Normal progression: 50% in first second, then 10% every second
@@ -85,6 +88,7 @@ const animatingWidth = () => {
     }
   }
 
+  const elem = getElement();
   if (elem) {
     elem.style.width = `${width}%`;
     elem.setAttribute("aria-valuenow", width.toString());
@@ -94,8 +98,8 @@ const animatingWidth = () => {
 const startInterval = () => {
   if (timerId) return;
 
-  if (!elem) {
-    elem = document.getElementById("ipl-progress-indicator");
+  const elem = getElement();
+  if (elem) {
     setAttributes(elem);
   }
 
@@ -110,6 +114,7 @@ class TopLoaderService {
     isEnding = false;
     endingStartTime = 0;
 
+    const elem = getElement();
     if (elem) elem.setAttribute("aria-valuenow", "0");
 
     startInterval();

@@ -28,7 +28,7 @@
 
 import React, { useRef } from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 
 import { SortByFieldName } from "../../../enums";
 
@@ -38,13 +38,32 @@ import type { TableHeaderProps } from "../Table.types";
 const COLUMN_STORAGE_NAME = "vitest-table-header-column-storage";
 const COLUMN_INFO_PANEL_STORAGE_NAME = "vitest-table-header-info-panel-storage";
 
+// Mock dependencies
+vi.mock("../../../utils", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../../utils")>();
+  return {
+    ...actual,
+    isDesktop: vi.fn(() => true),
+    isMobile: vi.fn(() => false),
+    isTablet: vi.fn(() => false),
+  };
+});
+
+vi.mock("./hooks/use-table-header-position", () => ({
+  useTableHeaderPosition: vi.fn(),
+}));
+
 const TableHeaderWithContainerRef = (
   args: Omit<TableHeaderProps, "containerRef">,
 ) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div id="table-container" ref={containerRef}>
+    <div 
+      id="table-container" 
+      ref={containerRef}
+      style={{ display: "grid", gridTemplateColumns: "210px 110px 110px 110px 24px", width: "1000px" }}
+    >
       <TableHeader {...args} containerRef={containerRef} />
     </div>
   );
@@ -106,6 +125,19 @@ describe("<TableHeader />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+
+    // Mock getBoundingClientRect for elements
+    window.HTMLElement.prototype.getBoundingClientRect = vi.fn(() => ({
+      width: 1000,
+      height: 40,
+      top: 0,
+      left: 0,
+      bottom: 40,
+      right: 1000,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    } as DOMRect));
   });
 
   it("renders without errors", () => {
@@ -165,5 +197,80 @@ describe("<TableHeader />", () => {
       "title",
       settingsTitle,
     );
+  });
+
+  it("resets columns when column count changes and no storage", () => {
+    const removeItemSpy = vi.spyOn(Storage.prototype, "removeItem");
+    const { rerender } = render(<TableHeaderWithContainerRef {...defaultProps} />);
+    
+    // Clear storage created by first render to simulate "no storage"
+    localStorage.removeItem(COLUMN_STORAGE_NAME);
+    removeItemSpy.mockClear();
+    
+    const moreColumns = [...mockColumns, {
+      key: "NewCol",
+      title: "New Col",
+      enable: true,
+      sortBy: "NewCol",
+      onChange: () => {},
+      onClick: () => {},
+    }];
+    
+    act(() => {
+      rerender(<TableHeaderWithContainerRef {...defaultProps} columns={moreColumns} />);
+    });
+    
+    // resetColumns MUST call removeItem
+    expect(removeItemSpy).toHaveBeenCalledWith(COLUMN_STORAGE_NAME);
+    expect(localStorage.getItem(COLUMN_STORAGE_NAME)).not.toBeNull();
+    removeItemSpy.mockRestore();
+  });
+
+  it("calls onResize when columns length does not change", () => {
+    const removeItemSpy = vi.spyOn(Storage.prototype, "removeItem");
+    const { rerender } = render(<TableHeaderWithContainerRef {...defaultProps} />);
+    
+    // Clear calls from initial render
+    removeItemSpy.mockClear();
+
+    act(() => {
+      rerender(<TableHeaderWithContainerRef {...defaultProps} sortBy={SortByFieldName.Type} />);
+    });
+    
+    // onResize MUST NOT call removeItem(COLUMN_STORAGE_NAME) if infoPanelVisible is false.
+    // onResize might call removeItem(COLUMN_INFO_PANEL_STORAGE_NAME) for cleanup.
+    // We check that it didn't do a full reset.
+    expect(removeItemSpy).not.toHaveBeenCalledWith(COLUMN_STORAGE_NAME);
+    removeItemSpy.mockRestore();
+  });
+
+  it("calls onChange when sorting by a disabled column", () => {
+    const onChangeMock = vi.fn();
+    const columnsWithDisabled = mockColumns.map((col) => {
+      if (col.sortBy === SortByFieldName.Type) {
+        return { ...col, enable: false, onChange: onChangeMock };
+      }
+      return col;
+    });
+
+    const { rerender } = render(
+      <TableHeaderWithContainerRef 
+        {...defaultProps} 
+        columns={mockColumns} 
+        sortBy={SortByFieldName.Name} 
+      />
+    );
+
+    act(() => {
+      rerender(
+        <TableHeaderWithContainerRef 
+          {...defaultProps} 
+          columns={columnsWithDisabled} 
+          sortBy={SortByFieldName.Type} 
+        />
+      );
+    });
+
+    expect(onChangeMock).toHaveBeenCalledWith("Type");
   });
 });

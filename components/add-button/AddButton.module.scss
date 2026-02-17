@@ -23,9 +23,18 @@
   }
 
   &.truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    min-width: 0;
+
+    .selectorButton {
+      flex-shrink: 0;
+    }
+
+    .selectorText {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
   }
 }
 
@@ -140,6 +149,8 @@
   }
 
   &.isAction {
+    --accent-main: var(--color-scheme-main-accent, #{colors.$light-blue-main});
+    
     background-color: var(--main-accent-button) !important;
 
     :global(.icon-button_svg) {

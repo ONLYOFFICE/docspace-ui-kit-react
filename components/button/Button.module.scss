@@ -383,7 +383,7 @@
     border-color: var(--button-border-base-disabled);
 
     &.primary {
-      background: var(--accent-button, --button-background-primary-disabled);
+      background: var(--accent-button, var(--button-background-primary-disabled));
       color: var(--button-color-primary-disabled);
       border: var(--button-border-primary-disabled);
     }
