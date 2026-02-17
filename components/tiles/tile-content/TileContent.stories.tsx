@@ -26,7 +26,7 @@
 
 import { Meta, StoryObj } from "@storybook/react-vite";
 
-import File32ReactSvg from "../../../assets/icons/32/file.react.svg";
+import WordSvgUrl from "../../../assets/icons/32/word.svg";
 
 import { TileContent } from ".";
 import { BaseTile } from "../base-tile";
@@ -34,7 +34,7 @@ import { Link } from "../../link";
 import { Text } from "../../text";
 import { Badge } from "../../badge";
 
-const element = <File32ReactSvg />;
+const element = <WordSvgUrl />;
 
 const mockContextOptions = [
   { key: "edit", label: "Edit" },

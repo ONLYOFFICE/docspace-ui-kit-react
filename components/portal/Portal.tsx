@@ -47,7 +47,7 @@ const Portal = ({ visible = true, element, appendTo = null }: PortalProps) => {
     }
   }, [mounted, visible]);
 
-  return element && mounted
+  return element && mounted && visible
     ? createPortal(element, appendTo || document.body)
     : null;
 };
