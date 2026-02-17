@@ -227,6 +227,7 @@ describe("useClickOutside", () => {
       expect(addEventListenerSpy).toHaveBeenCalledWith(
         "mousedown",
         expect.any(Function),
+        undefined,
       );
 
       addEventListenerSpy.mockRestore();
