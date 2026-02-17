@@ -31,21 +31,6 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { Tags } from ".";
 import type { TagsProps } from "./Tags.types";
 
-vi.mock("../tag", () => ({
-  Tag: ({
-    label,
-    advancedOptions,
-  }: {
-    label: string;
-    advancedOptions?: React.ReactNode[];
-  }) => (
-    <div data-testid="tag-mock" data-label={label}>
-      {label || "..."}
-      {advancedOptions && <div data-testid="advanced-options-mock" />}
-    </div>
-  ),
-}));
-
 const baseProps: TagsProps = {
   tags: ["tag1", "tag2"],
   columnCount: 2,
@@ -87,9 +72,10 @@ describe("<Tags />", () => {
     expect(onSelectTagMock).toHaveBeenCalledTimes(1);
   });
 
-  it("returns early if columnCount is 0", () => {
+  it("renders option tag when columnCount is 0", () => {
     render(<Tags {...baseProps} columnCount={0} />);
-    expect(screen.getByTestId("tags")).toBeEmptyDOMElement();
+    expect(screen.getByText("...")).toBeInTheDocument();
+    expect(screen.getByTestId("tag_item")).toBeInTheDocument();
   });
 
   it("handles a single tag as an object with isDefault", () => {
@@ -155,7 +141,7 @@ describe("<Tags />", () => {
     expect(screen.getByText("tag1")).toBeInTheDocument();
     expect(screen.getByText("tag2")).toBeInTheDocument();
     expect(screen.getByText("...")).toBeInTheDocument();
-    expect(screen.getByTestId("advanced-options-mock")).toBeInTheDocument();
+    expect(screen.getByTestId("dropdown")).toBeInTheDocument();
   });
 
   it("handles mixed tags in dropdown mode (TP, Default, String)", () => {
@@ -177,7 +163,7 @@ describe("<Tags />", () => {
     expect(screen.getByText("Plain Object")).toBeInTheDocument();
     expect(screen.getByText("Str")).toBeInTheDocument();
     expect(screen.getByText("...")).toBeInTheDocument();
-    expect(screen.getByTestId("advanced-options-mock")).toBeInTheDocument();
+    expect(screen.getByTestId("dropdown")).toBeInTheDocument();
   });
 
   it("handles string labels in dropdown mode", () => {
