@@ -231,6 +231,22 @@ export type SearchInputProps = {
   initSearchValue?: string;
 };
 
+export type TRoomGroupIcon = {
+  id: string;
+  data: {
+    small: string;
+    default: string;
+  };
+};
+
+export type TRoomGroup = {
+  id: string;
+  name: string;
+  icon: TRoomGroupIcon | string | null;
+  userId: string;
+  totalRooms: number;
+};
+
 export type FilterProps = SearchInputProps &
   Omit<SortButtonProps, "id" | "title" | "viewSettings"> &
   Omit<FilterButtonProps, "id" | "title" | "selectedFilterValue"> & {
@@ -255,4 +271,18 @@ export type FilterProps = SearchInputProps &
 
     currentDeviceType: DeviceType;
     initSelectedFilterData?: TItem[];
+    setEditRoomGroupsDialogVisible?: (
+      visible: boolean,
+      roomIds?: number[] | null,
+      openInCreateMode?: boolean,
+    ) => void;
+    getAllRoomGroups?: () => Promise<TRoomGroup[]>;
+    roomGroups?: TRoomGroup[];
+    onFilterByGroup?: (groupId: string | null) => void;
+    /** Current group ID from URL filter - used to highlight the correct group tag on page load */
+    currentGroupId?: string | null;
+    isRoomsFolder?: boolean;
+    organizeRoomsGrouping?: boolean;
+    /** When true, hides the room grouping row because filters/search are active */
+    isFilterOrSearchActive?: boolean;
   };

@@ -26,7 +26,7 @@
 
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { screen, render } from "@testing-library/react";
+import { screen, render, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { InputSize, InputType } from "../text-input";
@@ -330,7 +330,6 @@ describe("<PasswordInput />", () => {
 
     it("validates special characters requirement", async () => {
       const onValidateInput = vi.fn();
-      const user = userEvent.setup({ delay: null });
       render(
         <PasswordInput
           {...baseProps}
@@ -342,16 +341,17 @@ describe("<PasswordInput />", () => {
         />,
       );
 
-      const input = screen.getByTestId("password-input").querySelector("input");
-      await user.type(input!, "nospecial");
+      const input = screen
+        .getByTestId("password-input")
+        .querySelector("input")!;
+      fireEvent.change(input, { target: { value: "nospecial" } });
 
       expect(onValidateInput).toHaveBeenCalledWith(
         false,
         expect.objectContaining({ special: false }),
       );
 
-      await user.clear(input!);
-      await user.type(input!, "with!@#special");
+      fireEvent.change(input, { target: { value: "with!@#special" } });
       expect(onValidateInput).toHaveBeenCalledWith(
         true,
         expect.objectContaining({ special: true }),

@@ -65,4 +65,6 @@ export type AddButtonProps = {
   testId?: string;
   /** Shows loading state with spinner */
   isLoading?: boolean;
+  /** Tab index for keyboard navigation */
+  tabIndex?: number;
 };

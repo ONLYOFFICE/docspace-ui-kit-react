@@ -33,7 +33,12 @@ import { Link, LinkType } from "../../../link";
 import { Button, ButtonSize } from "../../../button";
 
 import { EmptyViewItem } from "../EmptyViewItem";
-import { isEmptyButtonOption, isEmptyLinkOptions } from "../../EmptyView.utils";
+import {
+  isEmptyActionOption,
+  isEmptyButtonOption,
+  isEmptyLinkOptions,
+  isEmptySeparatorOption,
+} from "../../EmptyView.utils";
 import styles from "../../EmptyView.module.scss";
 
 import type { EmptyViewOptionProps } from "../../EmptyView.types";
@@ -65,6 +70,37 @@ const EmptyViewOption = ({ option, LinkRouter }: EmptyViewOptionProps) => {
         {option.icon}
         <span>{option.description}</span>
       </LinkRouter>
+    );
+  }
+
+  if (isEmptySeparatorOption(option)) {
+    return (
+      <span className={styles.separator} id={option.key.toString()}>
+        {option.text}
+      </span>
+    );
+  }
+
+  if (isEmptyActionOption(option)) {
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      if (typeof option.onClick === "function") {
+        (option.onClick as (e?: React.MouseEvent<HTMLDivElement>) => void)(e);
+      }
+    };
+
+    return (
+      <div
+        id={option.key.toString()}
+        className={classNames(styles.action, {
+          [styles.secondary]: option.className === "secondary",
+        })}
+        onClick={handleClick}
+        role="button"
+        tabIndex={0}
+      >
+        {option.icon}
+        <span>{option.title}</span>
+      </div>
     );
   }
 

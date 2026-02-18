@@ -63,4 +63,9 @@ export interface SelectedItemProps {
   hideCross?: boolean;
   title?: string;
   dataTestId?: string;
+  /** Icon as SVG URL string or React SVG component */
+  icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
+  clickable?: boolean;
+  /** Sets the item as active/selected state */
+  isActive?: boolean;
 }
