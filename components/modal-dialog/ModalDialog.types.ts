@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { RefObject } from "react";
 import { AsideHeaderProps } from "../aside";
 
 import { ModalDialogType } from "./ModalDialog.enums";
@@ -35,6 +36,8 @@ export type ModalDialogTypeDetailed = {
 };
 
 export type ModalSubComponentsProps = AsideHeaderProps & {
+  /** Reference to the modal element */
+  ref?: RefObject<HTMLDivElement | null>;
   /** Unique identifier for the modal */
   id?: string;
   /** Custom styles for the modal */

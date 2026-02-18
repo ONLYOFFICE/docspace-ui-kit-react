@@ -28,7 +28,7 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import { Tags } from "../../tags";
 import classNames from "classnames";
-import { TagType } from "../../tags/Tags.types";
+import type { TagClickEvent, TagType } from "../../tag";
 import { RoomTileProps, RoomItem } from "./RoomTile.types";
 import { BaseTile } from "../base-tile";
 import { TileItem } from "../tile-container/TileContainer.types";
@@ -50,6 +50,7 @@ export const RoomTile = ({
   thumbnailClick,
   badges,
   onSelect,
+  customBottomContent,
   ...rest
 }: RoomTileProps) => {
   const childrenArray = React.Children.toArray(children);
@@ -133,28 +134,24 @@ export const RoomTile = ({
   const topContent = (
     <>
       {RoomsTileContent}
-      <div onMouseEnter={onHover} onMouseLeave={onLeave}>
-        {badges}
-      </div>
+      <div className="tile-badges">{badges}</div>
     </>
   );
 
   const handleTagSelect = useCallback(
-    (tag?: object | undefined) => {
+    (tag: TagClickEvent) => {
       if (item.isAIAgent && !hasTags) return;
 
-      if (!tag) {
-        selectTag(undefined);
-        return;
-      }
       if ("label" in tag && "roomType" in tag) {
-        selectTag(tag as Array<TagType | string>);
+        selectTag(tag);
       }
     },
     [item.isAIAgent, hasTags, selectTag],
   );
 
-  const bottomContent = (
+  const bottomContent = customBottomContent ? (
+    customBottomContent(isHovered, tags)
+  ) : (
     <Tags
       columnCount={columnCount}
       onSelectTag={handleTagSelect}
@@ -192,7 +189,6 @@ export const RoomTile = ({
       isEdit={isEdit}
       item={item}
       onSelect={onSelectTileItem}
-      isHovered={isHovered}
       onHover={onHover}
       onLeave={onLeave}
       topContent={topContent}

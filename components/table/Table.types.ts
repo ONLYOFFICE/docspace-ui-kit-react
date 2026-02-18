@@ -142,6 +142,9 @@ export interface TableRowProps {
   dragging?: boolean;
   dataTestId?: string;
   contextMenuTestId?: string;
+
+  onMouseEnter?: (e: React.MouseEvent) => void;
+  onMouseLeave?: (e: React.MouseEvent) => void;
 }
 
 export interface TableCellProps {

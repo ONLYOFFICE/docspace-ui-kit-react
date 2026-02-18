@@ -3,10 +3,11 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { useTranslation } from "react-i18next";
 
-import enCommon from "../../locales/en/Common.json";
 import type { TTranslations } from "./i18n";
 
 import TranslationProvider from "./TranslationProvider";
+
+const enCommon: Record<string, string> = { SaveButton: "Save" };
 
 const translations: TTranslations = new Map([
   ["en", new Map([["Common", enCommon]])],

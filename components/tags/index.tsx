@@ -24,15 +24,17 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { FC } from "react";
+import isNil from "lodash/isNil";
+import classNames from "classnames";
+import React, { FC, useCallback } from "react";
 
-import { Tag } from "../tag";
+import { useUnmount } from "../../hooks/useUnmount";
+import { Tag, type TagType } from "../tag";
 
 import styles from "./Tags.module.scss";
-import { isTagType } from "./Tags.utils";
-import type { TagType, TagsProps } from "./Tags.types";
-
-export type { TagType, TagsProps };
+import { TagsDropdown } from "./Tags.dropdown";
+import { calculateRenderedTags } from "./Tags.utils";
+import type { TagsProps } from "./Tags.types";
 
 const Tags: FC<TagsProps> = ({
   id,
@@ -40,173 +42,96 @@ const Tags: FC<TagsProps> = ({
   style,
   className,
   columnCount,
+  removeTagIcon = false,
   onSelectTag,
-  removeTagIcon,
   onMouseEnter,
   onMouseLeave,
-  isDefaultMode = true,
-  directionY,
-  fixedDirection,
-  manualY,
-  manualX,
+  showCreateTag,
+  onOptionTagClick,
+  optionTagRef,
 }) => {
   const [renderedTags, setRenderedTags] = React.useState<TagType[]>([]);
+  const callBackRef = React.useRef<VoidFunction | undefined | null>(null);
 
   const tagsRef = React.useRef<HTMLDivElement>(null);
 
-  const updateRenderedTags = React.useCallback(() => {
-    if (tags && tagsRef) {
-      if (!columnCount) return;
-
-      const newTags: TagType[] = [];
-      const containerWidth = tagsRef.current?.offsetWidth ?? 0;
-
-      if (tags.length === 1) {
-        const firstTag = tags[0];
-
-        if (isTagType(firstTag) && firstTag?.isDefault) {
-          const tag = { ...firstTag, maxWidth: `100%` };
-          newTags.push(tag);
-        } else if (isTagType(firstTag) && firstTag?.isThirdParty) {
-          const tag = { ...firstTag, maxWidth: `44px` };
-          newTags.push(tag);
-        } else {
-          const label = isTagType(firstTag) ? firstTag.label : firstTag;
-
-          const tag = { label, maxWidth: `100%` };
-          newTags.push(tag);
-        }
-
-        return setRenderedTags(newTags);
-      }
-
-      if (
-        columnCount >= tags.length ||
-        (tags.length === 2 &&
-          isTagType(tags[0]) &&
-          tags[0]?.isThirdParty &&
-          isTagType(tags[1]) &&
-          tags[1]?.isDefault)
-      ) {
-        const thirdPartyTagCount =
-          isTagType(tags[0]) && tags[0]?.isThirdParty ? 1 : 0;
-
-        const currentTagMaxWidth =
-          (containerWidth -
-            thirdPartyTagCount * 40 -
-            (tags.length - thirdPartyTagCount) * 4) /
-          (tags.length - thirdPartyTagCount);
-
-        const maxWidthPercent = Math.floor(
-          (currentTagMaxWidth / containerWidth) * 100,
-        );
-
-        for (let i = 0; i < tags.length; i += 1) {
-          const tag = tags[i];
-          const isTag = isTagType(tag);
-
-          if (isTag && tag?.isThirdParty) {
-            const tagNew = { ...tag, maxWidth: `44px` };
-            newTags.push(tagNew);
-          } else if (isTag && tag?.isDefault) {
-            const tagNew = { ...tag, maxWidth: `${maxWidthPercent}%` };
-            newTags.push(tagNew);
-          } else {
-            const tagNew = {
-              label: isTag ? tag.label : tag,
-              maxWidth: `${maxWidthPercent}%`,
-            };
-            newTags.push(tagNew);
-          }
-        }
-      } else {
-        const tagWithDropdown = {
-          label: "",
-          key: "selector",
-          advancedOptions: tags.slice(
-            columnCount,
-            tags.length,
-          ) as React.ReactNode[],
-        };
-
-        const currentTagMaxWidth =
-          (containerWidth - columnCount * 4 - 40) / columnCount;
-
-        const maxWidthPercent = Math.floor(
-          (currentTagMaxWidth / containerWidth) * 100,
-        );
-
-        if (columnCount !== 0) {
-          for (let i = 0; i < columnCount; i += 1) {
-            const tag = tags[i];
-            const isTag = isTagType(tag);
-
-            if (isTag && tag?.isThirdParty) {
-              const tagNew = { ...tag, maxWidth: `44px` };
-              newTags.push(tagNew);
-            } else if (isTag && tag?.isDefault) {
-              const tagNew = { ...tag, maxWidth: `${maxWidthPercent}%` };
-              newTags.push(tagNew);
-            } else {
-              const tagNew = {
-                label: isTag ? tag.label : tag,
-                maxWidth: `${maxWidthPercent}%`,
-              };
-              newTags.push(tagNew);
-            }
-          }
-        }
-
-        newTags.push(tagWithDropdown);
-
-        newTags[newTags.length - 1].maxWidth = `35px`;
-      }
-
-      setRenderedTags(newTags);
-    }
-  }, [tags, tagsRef, columnCount]);
-
   React.useLayoutEffect(() => {
-    updateRenderedTags();
-  }, [updateRenderedTags]);
+    if (isNil(columnCount) || !tags || !tagsRef.current) return;
+
+    const withDropDownTags = !onOptionTagClick;
+
+    const newTags = calculateRenderedTags(
+      tags,
+      columnCount,
+      tagsRef.current.offsetWidth,
+      showCreateTag,
+      withDropDownTags,
+    );
+
+    setRenderedTags(newTags);
+  }, [tags, columnCount, showCreateTag]);
+
+  useUnmount(() => callBackRef.current?.());
+
+  const handleOptionTagClick = useCallback(() => {
+    onOptionTagClick?.();
+  }, [onOptionTagClick]);
 
   return (
     <div
-      data-testid="tags"
-      aria-label="Tags container"
       id={id}
-      className={`${styles.tags} ${className}`}
       style={style}
       ref={tagsRef}
+      data-testid="tags"
+      aria-label="Tags container"
+      className={classNames(styles.tags, className)}
     >
-      {renderedTags?.length > 0
-        ? renderedTags.map((tag, idx) => {
-            return (
-              <Tag
-                key={tag.label}
-                {...tags}
-                tag={tag.label}
-                providerType={tag.providerType}
-                icon={tag.icon}
-                advancedOptions={tag.advancedOptions}
-                tagMaxWidth={tag.maxWidth}
-                isNewTag={false}
-                label={tag.label}
-                onClick={onSelectTag}
-                isLast={idx === renderedTags.length - 1}
-                removeTagIcon={removeTagIcon}
-                roomType={tag.roomType}
-                onMouseEnter={onMouseEnter}
-                onMouseLeave={onMouseLeave}
-                isDefaultMode={isDefaultMode}
-                directionY={directionY}
-                fixedDirection={fixedDirection}
-                manualY={manualY}
-                manualX={manualX}
-              />
-            );
-          })
-        : null}
+      {renderedTags.map((tag, idx) => {
+        if (tag.isOptionTag && tag.advancedOptions?.length) {
+          return (
+            <TagsDropdown
+              key={tag.key}
+              tag={tag.label}
+              icon={tag.icon}
+              tagMaxWidth={tag.maxWidth}
+              providerType={tag.providerType}
+              isLast={idx === renderedTags.length - 1}
+              label={tag.label}
+              roomType={tag.roomType}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
+              advancedOptions={tag.advancedOptions}
+              onClick={onSelectTag}
+              removeTagIcon={removeTagIcon}
+            />
+          );
+        }
+
+        const props = tag.isOptionTag
+          ? {
+              ref: optionTagRef,
+              onClick: handleOptionTagClick,
+            }
+          : {
+              onClick: onSelectTag,
+            };
+
+        return (
+          <Tag
+            key={tag.label}
+            tag={tag.label}
+            icon={tag.icon}
+            tagMaxWidth={tag.maxWidth}
+            providerType={tag.providerType}
+            isLast={idx === renderedTags.length - 1}
+            label={tag.label}
+            roomType={tag.roomType}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+            {...props}
+          />
+        );
+      })}
     </div>
   );
 };

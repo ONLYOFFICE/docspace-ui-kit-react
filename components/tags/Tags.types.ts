@@ -24,31 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { TDirectionY } from "../../types";
-
-export type TagType = {
-  /** Accepts a unique key for the tag. */
-  key?: string;
-  /** Indicates if the tag is a default tag. */
-  isDefault?: boolean;
-  /** Indicates if the tag is associated with a third-party provider. */
-  isThirdParty?: boolean;
-  /** Accepts the tag label */
-  label: string;
-  /** Accepts the max width of the tag */
-  maxWidth?: string;
-  /** Accepts the dropdown options */
-  advancedOptions?: React.ReactNode[];
-  /** Accepts the tag styles as disabled and disables clicking */
-  isDisabled?: boolean;
-  /** Indicates the type of room associated with the tag. */
-  roomType?: number;
-  /** Accepts the icon associated with the tag. */
-  icon?: string;
-  /** Indicates the type of provider associated with the tag. */
-  providerType?: number;
-  onClick?: () => void;
-};
+import type { RefObject } from "react";
+import type { TagClickEvent, TagProps, TagType } from "../tag/Tag.types";
 
 export type TagsProps = {
   /** Accepts id */
@@ -62,18 +39,25 @@ export type TagsProps = {
   /** Accepts css style */
   style?: React.CSSProperties;
   /** Accepts the function that is called when the tag is selected */
-  onSelectTag: (tag?: object) => void;
+  onSelectTag: (tag: TagClickEvent) => void;
+  /** Mouse enter event handler */
+  onMouseEnter?: VoidFunction;
+  /** Mouse leave event handler */
+  onMouseLeave?: VoidFunction;
+  /** Reference to the option tag element */
+  optionTagRef?: RefObject<HTMLDivElement | null>;
+  /** Callback function that is called when the option tag is clicked */
+  onOptionTagClick?: VoidFunction;
+  /** Controls visibility of the create tag button */
+  showCreateTag?: boolean;
+  /** Determines whether to show a remove icon for the tag */
   removeTagIcon?: boolean;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
-  /** Controls whether the dropdown uses portal mode or not */
-  isDefaultMode?: boolean;
-  /** Sets the opening direction relative to the parent */
-  directionY?: TDirectionY;
-  /** Disables check position. Used to set the direction explicitly */
-  fixedDirection?: boolean;
-  /** Required for specifying the exact distance from the parent component */
-  manualY?: string;
-  /** Required for specifying the exact distance from the parent component */
-  manualX?: string;
 };
+
+/** Props for the dropdown tags component */
+export interface DropDownTagsProps extends TagProps {
+  /** Determines whether to show a remove icon for the tag */
+  removeTagIcon: boolean;
+  /** Array of advanced dropdown options */
+  advancedOptions: string[];
+}

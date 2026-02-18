@@ -231,7 +231,7 @@
     }
 
     &:active:not(:disabled) {
-      background: var(--accent-button, --button-background-primary-active);
+      background: var(--accent-button, var(--button-background-primary-active));
       color: var(--button-color-primary-active);
       border-color: var(--button-border-primary-active);
 

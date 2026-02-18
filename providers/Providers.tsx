@@ -43,6 +43,7 @@ import ErrorBoundary from "./error-boundary/ErrorBoundary";
 import TranslationProvider from "./translation/TranslationProvider";
 import ThemeProvider from "./theme/ThemeProvider";
 import ApiProvider from "./api/ApiProvider";
+import { SocketProvider } from "./socket";
 import { useApi } from "./api";
 
 export type TProvidersProps = {
@@ -50,6 +51,7 @@ export type TProvidersProps = {
   locale?: string;
   errorFallback?: ReactNode | ((error: Error) => ReactNode);
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  socketUrl?: string;
 } & TTranslationProvider &
   TThemeProvider &
   Pick<TApiProvider, "url" | "apiKey">;
@@ -123,12 +125,15 @@ const Providers = ({
   apiKey,
   errorFallback,
   onError,
+  socketUrl,
   ...rest
 }: TProvidersProps) => {
   return (
     <ErrorBoundary fallback={errorFallback} onError={onError}>
       <ApiProvider url={url} apiKey={apiKey}>
-        <InnerProviders {...rest}>{children}</InnerProviders>
+        <SocketProvider url={socketUrl} token={apiKey}>
+          <InnerProviders {...rest}>{children}</InnerProviders>
+        </SocketProvider>
       </ApiProvider>
     </ErrorBoundary>
   );
