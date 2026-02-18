@@ -82,7 +82,7 @@ export default meta;
 const defaultArgs = {
   isLoading: false,
   isDisabled: false,
-  linkMainText: "Click to upload",
+  linkMainTextForFiles: "Click to upload",
   linkSecondaryText: "or drag and drop files here",
   exstsText: "Supported file types: PDF, DOC, DOCX",
   accept: [".pdf", ".doc", ".docx"],
