@@ -1,82 +1,78 @@
 # Tags Component
 
-The `Tags` component is used to display tags.
+The `Tags` component is used to display a collection of tags with automatic overflow handling.
 
-## Properties
+## Usage
 
-| Property      | Type                       | Required | Default | Description                                         |
-| ------------- | -------------------------- | -------- | ------- | --------------------------------------------------- |
-| `id`          | `string`                   | No       | -       | Accepts an id.                                      |
-| `tags`        | `Array<TagType \| string>` | Yes      | -       | Accepts the tags.                                   |
-| `className`   | `string`                   | No       | -       | Accepts a class.                                    |
-| `columnCount` | `number`                   | Yes      | -       | Accepts the tag column count.                       |
-| `style`       | `React.CSSProperties`      | No       | -       | Accepts CSS styles.                                 |
-| `onSelectTag` | `(tag?: string) => void`   | Yes      | -       | Accepts the function called when a tag is selected. |
-
-### Property `id`
-
-- Type: `string`
-- Required: No
-- Default: -
-- Description: Accepts an id.
-
-### Property `tags`
-
-- Type: `Array<TagType | string>`
-- Required: Yes
-- Default: -
-- Description: Accepts the tags.
-
-### Property `className`
-
-- Type: `string`
-- Required: No
-- Default: -
-- Description: Accepts a class.
-
-### Property `columnCount`
-
-- Type: `number`
-- Required: Yes
-- Default: -
-- Description: Accepts the tag column count.
-
-### Property `style`
-
-- Type: `React.CSSProperties`
-- Required: No
-- Default: -
-- Description: Accepts CSS styles.
-
-### Property `onSelectTag`
-
-- Type: `(tag?: string) => void`
-- Required: Yes
-- Default: -
-- Description: Accepts the function called when a tag is selected.
-
-## Usage Example
-
-```jsx
-import React from "react";
+```tsx
 import { Tags } from "@docspace/ui-kit";
 
-const MyComponent = () => {
-  const handleTagSelection = (selectedTag) => {
-    console.log("Selected tag:", selectedTag);
+function MyComponent() {
+  const handleTagSelect = (tag) => {
+    console.log("Selected tag:", tag);
   };
 
   return (
     <Tags
-      id="myTags"
-      tags={["tag1", "tag2", "tag3"]}
-      className="custom-tags"
-      columnCount={2}
-      style={{ color: "blue" }}
-      onSelectTag={handleTagSelection}
+      tags={["Design", "Development", "Marketing", "Sales"]}
+      columnCount={3}
+      onSelectTag={handleTagSelect}
     />
   );
-};
+}
+```
 
-export default MyComponent;
+## Properties
+
+| Property          | Type                              | Required | Default | Description                                              |
+| ----------------- | --------------------------------- | -------- | ------- | -------------------------------------------------------- |
+| `id`              | `string`                          | No       | -       | Accepts id                                               |
+| `tags`            | `Array<TagType \| string>`        | Yes      | -       | Array of tags to display                                 |
+| `className`       | `string`                          | No       | -       | Accepts class                                            |
+| `columnCount`     | `number`                          | Yes      | -       | Number of tags to display before showing overflow        |
+| `style`           | `React.CSSProperties`             | No       | -       | Accepts css style                                        |
+| `onSelectTag`     | `(tag: TagClickEvent) => void`    | Yes      | -       | Function called when a tag is selected                   |
+| `onMouseEnter`    | `() => void`                      | No       | -       | Mouse enter event handler                                |
+| `onMouseLeave`    | `() => void`                      | No       | -       | Mouse leave event handler                                |
+| `optionTagRef`    | `RefObject<HTMLDivElement>`       | No       | -       | Reference to the option tag element                      |
+| `onOptionTagClick`| `VoidFunction`                    | No       | -       | Callback when the option tag is clicked                  |
+| `showCreateTag`   | `boolean`                         | No       | -       | Controls visibility of the create tag button             |
+| `removeTagIcon`   | `boolean`                         | No       | `false` | Determines whether to show a remove icon for the tag     |
+
+## Examples
+
+### Basic Usage
+
+```tsx
+<Tags
+  tags={["React", "TypeScript", "Node.js"]}
+  columnCount={3}
+  onSelectTag={(tag) => console.log(tag)}
+/>
+```
+
+### With Overflow Dropdown
+
+```tsx
+<Tags
+  tags={["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"]}
+  columnCount={3}
+  onSelectTag={(tag) => console.log(tag)}
+  style={{ width: "300px" }}
+/>
+```
+
+### With Custom Option Tag Handler
+
+```tsx
+const optionRef = useRef<HTMLDivElement>(null);
+
+<Tags
+  tags={["Design", "Development"]}
+  columnCount={2}
+  onSelectTag={(tag) => console.log(tag)}
+  optionTagRef={optionRef}
+  onOptionTagClick={() => console.log("Option tag clicked")}
+  showCreateTag
+/>
 ```

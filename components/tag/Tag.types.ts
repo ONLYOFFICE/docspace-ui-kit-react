@@ -27,6 +27,8 @@
 import type { TDirectionY } from "../../types";
 
 export type TagProps = {
+  /** Accepts the ref */
+  ref?: React.RefObject<HTMLDivElement | null>;
   /** Accepts the tag id */
   tag: string;
   /** Accepts the tag label */
@@ -44,7 +46,7 @@ export type TagProps = {
   /** Accepts the tag styles as deleted and disables clicking */
   isDeleted?: boolean;
   /** Accepts the function that is called when the tag is clicked */
-  onClick?: (tag?: object) => void;
+  onClick?: (tag: TagClickEvent) => void;
   /** Accepts the function that ist called when the tag delete button is clicked */
   onDelete?: (tag?: string) => void;
   /** Accepts the max width of the tag */
@@ -52,7 +54,9 @@ export type TagProps = {
   /** Accepts the dropdown options */
   advancedOptions?: React.ReactNode[];
   /** Accepts the icon associated with the tag */
-  icon?: string;
+  icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
+  /** Accepts the icon class name */
+  iconClassName?: string;
   /** Indicates if the tag is a default tag */
   isDefault?: boolean;
   /** Indicates if the tag is the last in a series */
@@ -79,4 +83,37 @@ export type TagProps = {
   manualY?: string;
   /** Required for specifying the exact distance from the parent component */
   manualX?: string;
+};
+
+export type TagType = {
+  /** Accepts a unique key for the tag. */
+  key?: string;
+  /** Indicates if the tag is a default tag. */
+  isDefault?: boolean;
+  /** Indicates if the tag is associated with a third-party provider. */
+  isThirdParty?: boolean;
+  /** Accepts the tag label */
+  label: string;
+  /** Accepts the max width of the tag */
+  maxWidth?: string;
+  /** Accepts the dropdown options */
+  advancedOptions?: string[];
+  /** Accepts the tag styles as disabled and disables clicking */
+  isDisabled?: boolean;
+  /** Indicates the type of room associated with the tag. */
+  roomType?: number;
+  /** Accepts the icon associated with the tag. */
+  icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
+  /** Indicates the type of provider associated with the tag. */
+  providerType?: number;
+  /** Accepts the function that is called when the tag is clicked */
+  onClick?: () => void;
+  /** Indicates if the tag is an overflow trigger */
+  isOptionTag?: boolean;
+};
+
+export type TagClickEvent = {
+  label: string;
+  roomType?: number;
+  providerType?: number;
 };

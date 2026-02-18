@@ -60,7 +60,6 @@ export type BaseTileProps = {
   isEdit?: boolean;
   topContent?: React.ReactNode;
   bottomContent?: React.ReactNode;
-  isHovered?: boolean;
   onHover?: () => void;
   onLeave?: () => void;
   className?: string;

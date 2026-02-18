@@ -271,6 +271,9 @@ declare global {
     RendererProcessVariable?: {
       theme?: { id: string; system: string; type: string; addlocal: string };
     };
+    logs: {
+      socket: string[];
+    };
   }
 }
 export type TShareSettings = {

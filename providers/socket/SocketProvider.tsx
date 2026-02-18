@@ -26,25 +26,43 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import React from "react";
-import { describe, it, expect, beforeAll } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { Settings } from "luxon";
-import { getWeekdayElements } from "./index";
+"use client";
 
-describe("getWeekdayElements", () => {
-  beforeAll(() => {
-    Settings.defaultLocale = "en-US";
-  });
+import { createContext, useContext, useEffect } from "react";
+import SocketHelper from "../../utils/socket";
 
-  it("should render weekday names", () => {
-    const elements = getWeekdayElements();
-    render(<>{elements}</>);
+type TSocketContext = typeof SocketHelper;
 
-    const m = screen.getAllByText("M");
-    expect(m.length).toBeGreaterThan(0);
+const SocketContext = createContext<TSocketContext | null>(null);
 
-    const t = screen.getAllByText("T");
-    expect(t.length).toBeGreaterThan(1); // Tue, Thu
-  });
-});
+export const useSocket = () => {
+  const context = useContext(SocketContext);
+  if (!context) {
+    throw new Error("useSocket must be used within a SocketProvider");
+  }
+  return context;
+};
+
+type SocketProviderProps = {
+  children: React.ReactNode;
+  url?: string;
+  token?: string;
+};
+
+export const SocketProvider = ({
+  children,
+  url,
+  token,
+}: SocketProviderProps) => {
+  useEffect(() => {
+    if (!url) return;
+
+    SocketHelper?.connect(url, "", token);
+  }, [SocketHelper, url, token]);
+
+  return (
+    <SocketContext.Provider value={SocketHelper}>
+      {children}
+    </SocketContext.Provider>
+  );
+};

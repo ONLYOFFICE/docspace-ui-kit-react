@@ -25,6 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { Meta, StoryObj } from "@storybook/react-vite";
+import { useRef } from "react";
 
 import { Tags } from ".";
 
@@ -40,33 +41,107 @@ const meta: Meta<TagsType> = {
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=62-2597&mode=design&t=TBNCKMQKQMxr44IZ-0",
     },
   },
+  argTypes: {
+    onSelectTag: { action: "tag selected" },
+    onMouseEnter: { action: "mouse enter" },
+    onMouseLeave: { action: "mouse leave" },
+    onOptionTagClick: { action: "option tag clicked" },
+  },
 };
 
 export default meta;
 
 export const Default: Story = {
   args: {
-    tags: ["tag1", "tag2"],
+    tags: ["Design", "Development"],
     columnCount: 2,
     onSelectTag: () => {},
   },
 };
 
-export const TagsWithDropDown: Story = {
+export const WithMultipleTags: Story = {
+  args: {
+    tags: ["React", "TypeScript", "Node.js", "GraphQL", "Docker"],
+    columnCount: 5,
+    onSelectTag: () => {},
+  },
+};
+
+export const WithDropdown: Story = {
   render: (args) => (
-    <div style={{ height: "100px", paddingTop: "20px" }}>
+    <div style={{ height: "150px", paddingTop: "20px" }}>
       <Tags {...args} />
     </div>
   ),
   args: {
-    tags: ["tag1", "tag2", "tag3", "tag4"],
-    style: { width: "150px" },
+    tags: ["Tag1", "Tag2", "Tag3", "Tag4", "Tag5", "Tag6"],
+    style: { width: "250px" },
+    columnCount: 3,
+    onSelectTag: () => {},
+  },
+};
+
+export const WithTagObjects: Story = {
+  args: {
+    tags: [
+      { label: "Design", roomType: 1 },
+      { label: "Development", roomType: 2 },
+      { label: "Marketing", roomType: 3 },
+    ],
+    columnCount: 3,
+    onSelectTag: () => {},
+  },
+};
+
+export const WithRemoveIcon: Story = {
+  render: (args) => (
+    <div style={{ height: "150px", paddingTop: "20px" }}>
+      <Tags {...args} />
+    </div>
+  ),
+  args: {
+    tags: ["Tag1", "Tag2", "Tag3", "Tag4"],
+    columnCount: 2,
+    removeTagIcon: true,
+    onSelectTag: () => {},
+    style: { width: "200px" },
+  },
+};
+
+export const WithCustomOptionTag: Story = {
+  render: (args) => {
+    const optionRef = useRef<HTMLDivElement>(null);
+    return (
+      <div style={{ height: "100px", paddingTop: "20px" }}>
+        <Tags
+          {...args}
+          optionTagRef={optionRef}
+          onOptionTagClick={() => console.log("Option tag clicked")}
+        />
+      </div>
+    );
+  },
+  args: {
+    tags: ["Tag1", "Tag2", "Tag3"],
     columnCount: 2,
     onSelectTag: () => {},
-    isDefaultMode: false,
-    directionY: "bottom",
-    fixedDirection: true,
-    manualY: "56px",
-    manualX: "100px",
+    style: { width: "150px" },
+  },
+};
+
+export const ShowAllTags: Story = {
+  args: {
+    tags: ["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"],
+    columnCount: -1,
+    onSelectTag: () => {},
+  },
+};
+
+export const WithCreateTag: Story = {
+  args: {
+    tags: ["Design", "Development"],
+    columnCount: 3,
+    showCreateTag: true,
+    onSelectTag: () => {},
   },
 };
