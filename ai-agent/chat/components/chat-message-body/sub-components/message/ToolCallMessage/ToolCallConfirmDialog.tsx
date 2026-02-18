@@ -31,7 +31,6 @@ import { observer } from "mobx-react";
 
 import { ToolsPermission } from "../../../../../../../enums";
 import type { TToolCallContent } from "../../../../../../../types/ai";
-import { updateToolsPermission } from "../../../../../../../api/ai";
 
 import { Text } from "../../../../../../../components/text";
 import { Button, ButtonSize } from "../../../../../../../components/button";
@@ -46,6 +45,7 @@ import { ToolCall } from "./ToolCall";
 import { getCommonTranslation, isMobile } from "../../../../../../../utils";
 import { ToolCallPlacement, ToolCallStatus } from "./ToolCall.enum";
 import { useMessageStore } from "../../../../../store/messageStore";
+import { useApi } from "../../../../../../../providers";
 
 type ToolCallConfirmDialogProps = {
   content: TToolCallContent;
@@ -60,10 +60,11 @@ export const ToolCallConfirmDialog = observer(
       addToToolsConfirmQueue,
       removeFromToolsConfirmQueue,
     } = useMessageStore();
+    const { aiApi } = useApi();
 
     const onClickAction = (decision: ToolsPermission) => {
       if (content.callId) {
-        updateToolsPermission(
+        aiApi.updateToolsPermission(
           content.callId,
           alwaysAllow && decision === ToolsPermission.Allow
             ? ToolsPermission.AlwaysAllow
@@ -76,7 +77,7 @@ export const ToolCallConfirmDialog = observer(
 
     const onCloseAction = () => {
       if (content.callId) {
-        updateToolsPermission(content.callId, ToolsPermission.Deny);
+        aiApi.updateToolsPermission(content.callId, ToolsPermission.Deny);
       }
 
       onClose();

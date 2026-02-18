@@ -32,6 +32,7 @@ import {
   Configuration,
   ProfilesApi,
   CommonSettingsApi,
+  ThirdPartyApi,
 } from "@onlyoffice/docspace-api-sdk";
 import { AiApi } from "../../api/ai";
 
@@ -45,6 +46,7 @@ export type TApiContext = {
   profilesApi: ProfilesApi;
   commonSettingsApi: CommonSettingsApi;
   aiApi: AiApi;
+  thirdPartyApi: ThirdPartyApi;
 };
 
 const ApiContext = React.createContext<TApiContext | null>(null);
@@ -70,6 +72,7 @@ const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
     return {
       profilesApi: new ProfilesApi(configuration),
       commonSettingsApi: new CommonSettingsApi(configuration),
+      thirdPartyApi: new ThirdPartyApi(configuration),
       aiApi: new AiApi({
         basePath: url,
         apiKey,

@@ -26,8 +26,8 @@
 
 import React, { useCallback } from "react";
 
-import { getChatMessages } from "../../../api/ai";
 import type { TMessage } from "../../../types/ai";
+import { useApi } from "../../../providers";
 
 const cacheChatId = new Map<string, string>();
 
@@ -35,6 +35,7 @@ const useInitMessages = (roomId: string | number) => {
   const [messages, setMessages] = React.useState<TMessage[]>([]);
   const [chatId, setChatId] = React.useState("");
   const [total, setTotal] = React.useState(0);
+  const { aiApi } = useApi();
 
   const resetChat = useCallback(() => {
     setMessages([]);
@@ -78,7 +79,7 @@ const useInitMessages = (roomId: string | number) => {
 
       cacheChatId.set("chat", currChatId);
 
-      const { items, total } = await getChatMessages(currChatId, 0);
+      const { items, total } = await aiApi.getChatMessages(currChatId, 0);
 
       const reversedItems = items.reverse();
 

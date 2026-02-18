@@ -191,4 +191,38 @@ export class AiApi extends BaseCustomApi {
       toastr.error(e as string);
     }
   }
+
+  startNewChat(
+    roomId: number | string,
+    message: string,
+    files: string[],
+    abortController?: AbortController,
+  ) {
+    return this.request<ReadableStream<Uint8Array> | null>(
+      `/ai/rooms/${roomId}/chats`,
+      {
+        method: "POST",
+        data: { message, files },
+        signal: abortController?.signal,
+        isStream: true,
+      },
+    );
+  }
+
+  sendMessageToChat(
+    chatId: string,
+    message: string,
+    files: string[],
+    abortController?: AbortController,
+  ) {
+    return this.request<ReadableStream<Uint8Array> | null>(
+      `/ai/chats/${chatId}/messages`,
+      {
+        method: "POST",
+        data: { message, files },
+        signal: abortController?.signal,
+        isStream: true,
+      },
+    );
+  }
 }

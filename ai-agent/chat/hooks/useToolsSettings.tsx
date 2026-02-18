@@ -29,11 +29,6 @@ import React from "react";
 import socket, { SocketEvents, TOptSocket } from "../../../utils/socket";
 
 import {
-  getMCPToolsForRoom,
-  getServersListForRoom,
-  getWebSearchInRoom,
-} from "../../../api/ai";
-import {
   TAIConfig,
   TMCPTool,
   TServer,
@@ -41,6 +36,7 @@ import {
 } from "../../../types/ai";
 import { Nullable } from "../../../types";
 import { RoomsType } from "../../../enums";
+import { useApi } from "../../../providers";
 
 type Props = {
   roomId: string | number;
@@ -55,6 +51,7 @@ const useToolsSettings = ({ roomId, aiConfig, chatSettings }: Props) => {
   );
   const [webSearchEnabled, setWebSearchEnabled] = React.useState(false);
   const [isFetched, setIsFetched] = React.useState(false);
+  const { aiApi } = useApi();
 
   const fetchServerTools = React.useCallback(
     async (res: TServer[], roomId: string | number) => {
@@ -64,7 +61,7 @@ const useToolsSettings = ({ roomId, aiConfig, chatSettings }: Props) => {
 
       const actions = await Promise.all(
         enabledServers.map((server) =>
-          getMCPToolsForRoom(Number(roomId), server.id),
+          aiApi.getMCPToolsForRoom(Number(roomId), server.id),
         ),
       );
 
@@ -80,7 +77,7 @@ const useToolsSettings = ({ roomId, aiConfig, chatSettings }: Props) => {
 
   const fetchTools = React.useCallback(async () => {
     setIsFetched(false);
-    const res = await getServersListForRoom(Number(roomId));
+    const res = await aiApi.getServersListForRoom(Number(roomId));
 
     if (!res) return;
 
@@ -92,7 +89,7 @@ const useToolsSettings = ({ roomId, aiConfig, chatSettings }: Props) => {
     if (!roomId) return;
 
     const [webSearchInRoom] = await Promise.all([
-      getWebSearchInRoom(Number(roomId)),
+      aiApi.getWebSearchInRoom(Number(roomId)),
       fetchTools(),
     ]);
     setWebSearchEnabled(webSearchInRoom?.webSearchEnabled ?? false);

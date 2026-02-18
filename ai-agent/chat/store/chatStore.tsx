@@ -26,206 +26,214 @@
 
 import { makeAutoObservable } from "mobx";
 import React from "react";
-import { deleteChat, getChat, getChats, renameChat } from "../../../api/ai";
 import type { Nullable } from "../../../types";
 import type { TChat } from "../../../types/ai";
 import socket, { SocketEvents } from "../../../utils/socket";
 import { toastr } from "../../../components/toast";
 import type { TChatStoreProps } from "../Chat.types";
+import type { AiApi } from "../../../api/ai";
+import { useApi } from "../../../providers";
 
 export default class ChatStore {
-	currentChat: Nullable<TChat> = null;
+  private aiApi: AiApi;
 
-	chats: TChat[] = [];
+  currentChat: Nullable<TChat> = null;
 
-	totalChats: number = 0;
+  chats: TChat[] = [];
 
-	roomId: TChatStoreProps["roomId"] = "";
+  totalChats: number = 0;
 
-	isLoading: boolean = false;
+  roomId: TChatStoreProps["roomId"] = "";
 
-	isRequestRunning: boolean = false;
+  isLoading: boolean = false;
 
-	constructor() {
-		makeAutoObservable(this);
-	}
+  isRequestRunning: boolean = false;
 
-	setRoomId = (value: TChatStoreProps["roomId"]) => {
-		this.roomId = value;
-	};
+  constructor(aiApi: AiApi) {
+    this.aiApi = aiApi;
+    makeAutoObservable(this);
+  }
 
-	setTotalChats = (value: number) => {
-		this.totalChats = value;
-	};
+  setRoomId = (value: TChatStoreProps["roomId"]) => {
+    this.roomId = value;
+  };
 
-	setChats = (value: TChat[]) => {
-		this.chats = value;
-	};
+  setTotalChats = (value: number) => {
+    this.totalChats = value;
+  };
 
-	updateUrlChatId = (chatId: string) => {
-		const currentSearch = new URLSearchParams(window.location.search);
+  setChats = (value: TChat[]) => {
+    this.chats = value;
+  };
 
-		if (currentSearch.get("chat") !== chatId) {
-			if (chatId) {
-				currentSearch.set("chat", chatId);
-			} else {
-				currentSearch.delete("chat");
-			}
-			window.history.replaceState(
-				null,
-				"",
-				`${window.location.pathname}?${currentSearch.toString()}`,
-			);
-		}
-	};
+  updateUrlChatId = (chatId: string) => {
+    const currentSearch = new URLSearchParams(window.location.search);
 
-	setCurrentChat = (chat: TChat | null) => {
-		this.updateUrlChatId(chat?.id ?? "");
+    if (currentSearch.get("chat") !== chatId) {
+      if (chatId) {
+        currentSearch.set("chat", chatId);
+      } else {
+        currentSearch.delete("chat");
+      }
+      window.history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}?${currentSearch.toString()}`,
+      );
+    }
+  };
 
-		this.currentChat = chat;
-	};
+  setCurrentChat = (chat: TChat | null) => {
+    this.updateUrlChatId(chat?.id ?? "");
 
-	setIsRequestRunning = (value: boolean) => {
-		this.isRequestRunning = value;
-	};
+    this.currentChat = chat;
+  };
 
-	setIsLoading = (value: boolean) => {
-		this.isLoading = value;
-	};
+  setIsRequestRunning = (value: boolean) => {
+    this.isRequestRunning = value;
+  };
 
-	fetchChat = async (id: string) => {
-		try {
-			const chat = await getChat(id);
+  setIsLoading = (value: boolean) => {
+    this.isLoading = value;
+  };
 
-			this.setCurrentChat(chat);
+  fetchChat = async (id: string) => {
+    try {
+      const chat = await this.aiApi.getChat(id);
 
-			if (!this.chats.some((c) => c.id === chat.id)) {
-				this.chats = [chat, ...this.chats];
-				this.setTotalChats(this.totalChats + 1);
-			}
-		} catch (error) {
-			console.error(error);
-			toastr.error(error as string);
-		}
-	};
+      this.setCurrentChat(chat);
 
-	addChats = (chats: TChat[]) => {
-		this.chats.push(...chats);
-	};
+      if (!this.chats.some((c) => c.id === chat.id)) {
+        this.chats = [chat, ...this.chats];
+        this.setTotalChats(this.totalChats + 1);
+      }
+    } catch (error) {
+      console.error(error);
+      toastr.error(error as string);
+    }
+  };
 
-	fetchNextChats = async (startIndex: number) => {
-		if (this.isRequestRunning) return;
+  addChats = (chats: TChat[]) => {
+    this.chats.push(...chats);
+  };
 
-		this.setIsRequestRunning(true);
-		this.setIsLoading(true);
+  fetchNextChats = async (startIndex: number) => {
+    if (this.isRequestRunning) return;
 
-		try {
-			const { items, total } = await getChats(this.roomId, startIndex);
+    this.setIsRequestRunning(true);
+    this.setIsLoading(true);
 
-			this.addChats(items);
-			this.setTotalChats(total);
-		} catch (error) {
-			console.error(error);
-			toastr.error(error as string);
-		} finally {
-			this.setIsRequestRunning(false);
-			this.setIsLoading(false);
-		}
-	};
+    try {
+      const { items, total } = await this.aiApi.getChats(
+        this.roomId,
+        startIndex,
+      );
 
-	renameChat = async (id: string, title: string) => {
-		try {
-			await renameChat(id, title);
-		} catch (error) {
-			console.error(error);
-			toastr.error(error as string);
-		}
+      this.addChats(items);
+      this.setTotalChats(total);
+    } catch (error) {
+      console.error(error);
+      toastr.error(error as string);
+    } finally {
+      this.setIsRequestRunning(false);
+      this.setIsLoading(false);
+    }
+  };
 
-		this.chats = this.chats.map((c) => (c.id === id ? { ...c, title } : c));
-	};
+  renameChat = async (id: string, title: string) => {
+    try {
+      await this.aiApi.renameChat(id, title);
+    } catch (error) {
+      console.error(error);
+      toastr.error(error as string);
+    }
 
-	deleteChat = async (id: string) => {
-		try {
-			await deleteChat(id);
-		} catch (error) {
-			console.error(error);
-			toastr.error(error as string);
-			throw error;
-		}
+    this.chats = this.chats.map((c) => (c.id === id ? { ...c, title } : c));
+  };
 
-		if (this.currentChat?.id === id) {
-			this.setCurrentChat(null);
-		}
-		this.chats = this.chats.filter((chat) => chat.id !== id);
+  deleteChat = async (id: string) => {
+    try {
+      await this.aiApi.deleteChat(id);
+    } catch (error) {
+      console.error(error);
+      toastr.error(error as string);
+      throw error;
+    }
 
-		this.setTotalChats(this.totalChats - 1);
-	};
+    if (this.currentChat?.id === id) {
+      this.setCurrentChat(null);
+    }
+    this.chats = this.chats.filter((chat) => chat.id !== id);
 
-	updateChatTitle = (chatId: string, chatTitle: string) => {
-		const foundChatIndex = this.chats.findIndex((chat) => chat.id === chatId);
-		if (foundChatIndex > -1) {
-			this.chats[foundChatIndex].title = chatTitle;
-		}
-	};
+    this.setTotalChats(this.totalChats - 1);
+  };
 
-	get hasNextChats() {
-		return this.totalChats > this.chats.length;
-	}
+  updateChatTitle = (chatId: string, chatTitle: string) => {
+    const foundChatIndex = this.chats.findIndex((chat) => chat.id === chatId);
+    if (foundChatIndex > -1) {
+      this.chats[foundChatIndex].title = chatTitle;
+    }
+  };
+
+  get hasNextChats() {
+    return this.totalChats > this.chats.length;
+  }
 }
 
 export const ChatStoreContext = React.createContext<ChatStore>({} as ChatStore);
 
 export const ChatStoreContextProvider = ({
-	roomId,
+  roomId,
 
-	chats,
-	totalChats,
-	children,
+  chats,
+  totalChats,
+  children,
 }: TChatStoreProps) => {
-	const store = React.useMemo(() => new ChatStore(), []);
+  const { aiApi } = useApi();
+  const store = React.useMemo(() => new ChatStore(aiApi), [aiApi]);
 
-	React.useEffect(() => {
-		store.setRoomId(roomId);
-	}, [store, roomId]);
+  React.useEffect(() => {
+    store.setRoomId(roomId);
+  }, [store, roomId]);
 
-	React.useEffect(() => {
-		store.setChats(chats);
-	}, [store, chats]);
+  React.useEffect(() => {
+    store.setChats(chats);
+  }, [store, chats]);
 
-	React.useEffect(() => {
-		store.setTotalChats(totalChats);
-	}, [store, totalChats]);
+  React.useEffect(() => {
+    store.setTotalChats(totalChats);
+  }, [store, totalChats]);
 
-	React.useEffect(() => {
-		const callback = ({
-			chatId,
-			chatTitle,
-		}: {
-			chatId: string;
-			chatTitle: string;
-		}) => {
-			console.log(`[WS] ${SocketEvents.UpdateChat}, data: `, {
-				chatId,
-				chatTitle,
-			});
+  React.useEffect(() => {
+    const callback = ({
+      chatId,
+      chatTitle,
+    }: {
+      chatId: string;
+      chatTitle: string;
+    }) => {
+      console.log(`[WS] ${SocketEvents.UpdateChat}, data: `, {
+        chatId,
+        chatTitle,
+      });
 
-			store.updateChatTitle(chatId, chatTitle);
-		};
+      store.updateChatTitle(chatId, chatTitle);
+    };
 
-		socket?.on(SocketEvents.UpdateChat, callback);
+    socket?.on(SocketEvents.UpdateChat, callback);
 
-		return () => {
-			socket?.off(SocketEvents.UpdateChat, callback);
-		};
-	}, [store]);
+    return () => {
+      socket?.off(SocketEvents.UpdateChat, callback);
+    };
+  }, [store]);
 
-	return (
-		<ChatStoreContext.Provider value={store}>
-			{children}
-		</ChatStoreContext.Provider>
-	);
+  return (
+    <ChatStoreContext.Provider value={store}>
+      {children}
+    </ChatStoreContext.Provider>
+  );
 };
 
 export const useChatStore = () => {
-	return React.useContext(ChatStoreContext);
+  return React.useContext(ChatStoreContext);
 };

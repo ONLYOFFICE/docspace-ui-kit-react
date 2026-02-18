@@ -31,8 +31,6 @@ import CopyIconUrl from "PUBLIC_DIR/images/icons/16/copy.react.svg?url";
 // import RefreshIconUrl from "PUBLIC_DIR/images/icons/16/refresh.react.svg?url";
 import SaveToFileIconUrl from "PUBLIC_DIR/images/message.save.svg?url";
 
-import { exportChatMessage } from "../../../../../../api/ai";
-
 import socket, {
   SocketCommands,
   SocketEvents,
@@ -55,6 +53,7 @@ import { MessageButtonsProps } from "../../../../Chat.types";
 import { FOLDER_FORM_VALIDATION } from "../../../../../../constants";
 import { ContentType } from "../../../../../../enums";
 import { getCommonTranslation } from "../../../../../../utils";
+import { useApi } from "../../../../../../providers/api";
 
 const Buttons = ({
   text,
@@ -68,6 +67,7 @@ const Buttons = ({
 }: MessageButtonsProps) => {
   const { roomId, findPreviousUserMessage } = useMessageStore();
   const { currentChat } = useChatStore();
+  const { aiApi } = useApi();
 
   const [showFolderSelector, setShowFolderSelector] = React.useState(false);
 
@@ -95,7 +95,7 @@ const Buttons = ({
       individual: true,
     });
 
-    await exportChatMessage(messageId, selectedItemId, fileName);
+    await aiApi.exportChatMessage(messageId, selectedItemId, fileName);
 
     console.log(socket?.socketSubscribers);
 

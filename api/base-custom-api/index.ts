@@ -34,6 +34,7 @@ type TConfiguration = {
 interface CustomRequestInit extends RequestInit {
   data?: unknown;
   params?: Record<string, string | number | boolean | undefined>;
+  isStream?: boolean;
 }
 
 export class BaseCustomApi {
@@ -47,7 +48,7 @@ export class BaseCustomApi {
     endpoint: string,
     options: CustomRequestInit = {},
   ): Promise<T> {
-    const { data, params, ...fetchOptions } = options;
+    const { data, params, isStream, ...fetchOptions } = options;
 
     let url = `${this.config.basePath}${endpoint}`;
     if (params) {
@@ -64,7 +65,7 @@ export class BaseCustomApi {
     }
 
     const headers = new Headers(fetchOptions.headers);
-    headers.set("Accept", "application/json");
+    headers.set("Accept", isStream ? "text/event-stream" : "application/json");
     headers.set("Authorization", this.config.apiKey || "");
 
     if (data) {
@@ -82,6 +83,10 @@ export class BaseCustomApi {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `Request error: ${response.status}`);
+    }
+
+    if (isStream) {
+      return response.body as unknown as T;
     }
 
     return response.json();

@@ -34,7 +34,6 @@ import RemoveSvgUrl from "PUBLIC_DIR/images/icons/16/catalog.trash.react.svg?url
 import SaveToFileIconUrl from "PUBLIC_DIR/images/message.save.svg?url";
 
 import { RectangleSkeleton } from "../../../../../components/rectangle";
-import { exportChat } from "../../../../../api/ai";
 
 import socket, {
   SocketCommands,
@@ -61,6 +60,7 @@ import { CHAT_LIST_MAX_HEIGHT, CHAT_LIST_WIDTH } from "../constants";
 import { getSelectChatRowHeight } from "../utils";
 import { ChatList } from "./ChatList";
 import { getCommonTranslation } from "../../../../../utils";
+import { useApi } from "../../../../../providers";
 
 const SelectChat = ({
   isLoadingProp,
@@ -90,6 +90,7 @@ const SelectChat = ({
     updateUrlChatId,
   } = useChatStore();
   const { fetchMessages, startNewChat, isRequestRunning } = useMessageStore();
+  const { aiApi } = useApi();
 
   const closeExportSelector = () => setIsExportOpen(false);
 
@@ -177,7 +178,7 @@ const SelectChat = ({
         individual: true,
       });
 
-      await exportChat(hoveredItem, selectedItemId, fileName);
+      await aiApi.exportChat(hoveredItem, selectedItemId, fileName);
 
       socket?.on(SocketEvents.ExportChat, (data) => {
         const { resultFile } = data;

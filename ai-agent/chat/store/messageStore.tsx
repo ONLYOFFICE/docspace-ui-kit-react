@@ -26,11 +26,6 @@
 
 import { makeAutoObservable } from "mobx";
 import React from "react";
-import {
-  getChatMessages,
-  sendMessageToChat,
-  startNewChat,
-} from "../../../api/ai";
 import { ContentType, EventType, RoleType } from "../../../enums";
 import type {
   TContent,
@@ -44,8 +39,12 @@ import type { TFile } from "../../../types";
 import { toastr } from "../../../components/toast";
 
 import type { TMessageStoreProps } from "../Chat.types";
+import { AiApi } from "../../../api/ai";
+import { useApi } from "../../../providers";
 
 export default class MessageStore {
+  private aiApi: AiApi;
+
   messages: TMessage[] = [];
 
   startIndex: number = 0;
@@ -74,7 +73,8 @@ export default class MessageStore {
 
   toolsConfirmQueue: string[] = [];
 
-  constructor() {
+  constructor(aiApi: AiApi) {
+    this.aiApi = aiApi;
     makeAutoObservable(this);
   }
 
@@ -175,7 +175,7 @@ export default class MessageStore {
     this.setIsGetMessageRequestRunning(true);
 
     try {
-      const { items, total } = await getChatMessages(chatId, 0);
+      const { items, total } = await this.aiApi.getChatMessages(chatId, 0);
       const reversedItems = items.reverse();
 
       this.setMessages(reversedItems);
@@ -200,7 +200,7 @@ export default class MessageStore {
     this.setIsGetMessageRequestRunning(true);
 
     try {
-      const { items, total } = await getChatMessages(
+      const { items, total } = await this.aiApi.getChatMessages(
         this.currentChatId,
         this.startIndex,
       );
@@ -593,7 +593,7 @@ export default class MessageStore {
 
       this.abortController = new AbortController();
 
-      const stream = await startNewChat(
+      const stream = await this.aiApi.startNewChat(
         this.roomId,
         message,
         files.map((f) => (f.id ? f.id.toString() : "")),
@@ -616,7 +616,7 @@ export default class MessageStore {
 
       this.abortController = new AbortController();
 
-      const stream = await sendMessageToChat(
+      const stream = await this.aiApi.sendMessageToChat(
         this.currentChatId,
         message,
         files.map((f) => (f.id ? f.id.toString() : "")),
@@ -660,7 +660,8 @@ export const MessageStoreContextProvider = ({
   total,
   multimodal,
 }: TMessageStoreProps) => {
-  const store = React.useMemo(() => new MessageStore(), []);
+  const { aiApi } = useApi();
+  const store = React.useMemo(() => new MessageStore(aiApi), [aiApi]);
 
   React.useEffect(() => {
     store.setRoomId(roomId);

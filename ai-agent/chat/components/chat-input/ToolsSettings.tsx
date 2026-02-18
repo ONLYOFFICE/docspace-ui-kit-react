@@ -27,6 +27,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
+import { LoginProvider } from "@onlyoffice/docspace-api-sdk";
 
 import { Portal } from "../../../../components/portal";
 
@@ -34,14 +35,6 @@ import McpToolReactSvgUrl from "PUBLIC_DIR/images/mcp.tool.svg?url";
 import WebSearchIconUrl from "PUBLIC_DIR/images/web.search.svg?url";
 import ManageConnectionsReactSvgUrl from "PUBLIC_DIR/images/manage.connection.react.svg?url";
 
-import { openConnectWindow } from "../../../../api/files";
-import {
-  changeMCPToolsForRoom,
-  connectServer,
-  disconnectServer,
-  getMCPToolsForRoom,
-  updateWebSearchInRoom,
-} from "../../../../api/ai";
 import { ServerType } from "../../../../enums";
 import { getOAuthToken } from "../../../../utils/get-oauth-token";
 import { getCommonTranslation, isMobile } from "../../../../utils";
@@ -67,6 +60,7 @@ import type useToolsSettings from "../../hooks/useToolsSettings";
 import styles from "./ChatInput.module.scss";
 import { Link, LinkType } from "../../../..//components/link";
 import { ContextMenuModel } from "../../../../components/context-menu";
+import { useApi } from "../../../../providers";
 
 const ToolsSettings = ({
   servers,
@@ -95,6 +89,7 @@ const ToolsSettings = ({
     setWebCrawlingToolName,
   } = useMessageStore();
   const { isBase } = useTheme();
+  const { aiApi, thirdPartyApi } = useApi();
 
   const [showManageConnections, setShowManageConnections] =
     React.useState(false);
@@ -120,9 +115,9 @@ const ToolsSettings = ({
           })) ?? [];
 
         if (enabled) {
-          await changeMCPToolsForRoom(Number(roomId), mcpId, []);
+          await aiApi.changeMCPToolsForRoom(Number(roomId), mcpId, []);
         } else {
-          await changeMCPToolsForRoom(
+          await aiApi.changeMCPToolsForRoom(
             Number(roomId),
             mcpId,
             newTools.map((tool) => tool.name),
@@ -142,13 +137,13 @@ const ToolsSettings = ({
         setMCPTools(new Map([...MCPTools, [mcpId, newTools]]));
 
         if (enabled) {
-          await changeMCPToolsForRoom(
+          await aiApi.changeMCPToolsForRoom(
             Number(roomId),
             mcpId,
             disabledTools.filter((tool) => tool !== toolId),
           );
         } else {
-          await changeMCPToolsForRoom(Number(roomId), mcpId, [
+          await aiApi.changeMCPToolsForRoom(Number(roomId), mcpId, [
             ...disabledTools,
             toolId,
           ]);
@@ -159,7 +154,9 @@ const ToolsSettings = ({
   );
 
   const openOauthWindow = async (serverId: string, type: string) => {
-    const url = await openConnectWindow(type);
+    const url = await thirdPartyApi.getThirdPartyCode(
+      type as unknown as LoginProvider,
+    );
 
     const newWindow = window.open(
       "",
@@ -167,7 +164,7 @@ const ToolsSettings = ({
       "height=600, width=1020",
     );
 
-    if (newWindow) {
+    if (newWindow && typeof url === "string") {
       newWindow.location = url;
     }
 
@@ -175,11 +172,14 @@ const ToolsSettings = ({
       .then(async (token) => {
         if (token) {
           try {
-            await connectServer(Number(roomId), serverId, token);
+            await aiApi.connectServer(Number(roomId), serverId, token);
 
             newWindow?.close();
 
-            const newTools = await getMCPToolsForRoom(Number(roomId), serverId);
+            const newTools = await aiApi.getMCPToolsForRoom(
+              Number(roomId),
+              serverId,
+            );
 
             if (!newTools) return;
 
@@ -206,7 +206,7 @@ const ToolsSettings = ({
 
   const disconnectServerAction = async (serverId: string) => {
     try {
-      await disconnectServer(Number(roomId), serverId);
+      await aiApi.disconnectServer(Number(roomId), serverId);
 
       setMCPTools((prev) => {
         const newMap = new Map(prev);
@@ -238,7 +238,7 @@ const ToolsSettings = ({
   const onWebSearchToggle = React.useCallback(() => {
     if (!webSearchAvailable) return;
 
-    updateWebSearchInRoom(Number(roomId), !webSearchEnabled);
+    aiApi.updateWebSearchInRoom(Number(roomId), !webSearchEnabled);
     setWebSearchEnabled(!webSearchEnabled);
   }, [roomId, webSearchEnabled, webSearchAvailable, setWebSearchEnabled]);
 
