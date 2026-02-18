@@ -26,6 +26,7 @@ import React from "react";
 
 import { DeviceType, FolderType } from "../../../../enums";
 import { isDesktop, isTablet } from "../../../../utils";
+import { getCommonTranslation } from "../../../../utils";
 
 // import FilesSelector from "../../../../selectors/Files";
 import { TGetIcon } from "../../../../types";
@@ -85,7 +86,7 @@ const ExportSelector = ({
     //   onSubmit={onSubmit}
     //   withHeader
     //   headerProps={{
-    //     headerLabel: t("Common:SaveButton"),
+    //     headerLabel: getCommonTranslation("SaveButton"),
     //     isCloseable: true,
     //     onCloseClick: onCloseFolderSelector,
     //   }}
@@ -96,15 +97,15 @@ const ExportSelector = ({
     //   withCreate={false}
     //   withFooterCheckbox
     //   withFooterInput
-    //   cancelButtonLabel={t("Common:CancelButton")}
-    //   submitButtonLabel={t("Common:SaveButton")}
+    //   cancelButtonLabel={getCommonTranslation("CancelButton")}
+    //   submitButtonLabel={getCommonTranslation("SaveButton")}
     //   disabledItems={[]}
     //   isRoomsOnly={false}
     //   isThirdParty={false}
     //   currentFolderId={currentFolderId}
     //   rootFolderType={FolderType.Rooms}
-    //   footerCheckboxLabel={t("Common:OpenSavedDocument")}
-    //   footerInputHeader={t("Common:FileName")}
+    //   footerCheckboxLabel={getCommonTranslation("OpenSavedDocument")}
+    //   footerInputHeader={getCommonTranslation("FileName")}
     //   currentFooterInputValue={getFileName()}
     //   descriptionText=""
     //   getFilesArchiveError={() => ""}

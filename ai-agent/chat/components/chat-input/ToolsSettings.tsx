@@ -25,7 +25,6 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
@@ -45,7 +44,7 @@ import {
 } from "../../../../api/ai";
 import { ServerType } from "../../../../enums";
 import { getOAuthToken } from "../../../../utils/get-oauth-token";
-import { isMobile } from "../../../../utils";
+import { getCommonTranslation, isMobile } from "../../../../utils";
 import { getServerIcon } from "../../../../utils/ai/getServerIcon";
 import { useTheme } from "../../../../context/ThemeContext";
 
@@ -89,8 +88,6 @@ const ToolsSettings = ({
   aiReady: boolean;
   goToWebSearchSettings?: () => void;
 }) => {
-  const { t } = useTranslation(["Common"]);
-
   const { roomId } = useChatStore();
   const {
     setKnowledgeSearchToolName,
@@ -166,7 +163,7 @@ const ToolsSettings = ({
 
     const newWindow = window.open(
       "",
-      t("Common:Authorization"),
+      getCommonTranslation("Authorization"),
       "height=600, width=1020",
     );
 
@@ -295,9 +292,14 @@ const ToolsSettings = ({
             .filter(Boolean),
         ];
 
+        const portalServerName =
+          getCommonTranslation("OrganizationName") +
+          " " +
+          getCommonTranslation("ProductName");
+
         const name =
           server.serverType === ServerType.Portal
-            ? `${t("Common:OrganizationName")} ${t("Common:ProductName")}`
+            ? portalServerName
             : server.name;
 
         return {
@@ -331,9 +333,9 @@ const ToolsSettings = ({
         getTooltipContent: () => (
           <>
             <Text>
-              {t("ConnectWebSearch", {
-                webSearch: t("Common:WebSearchAI"),
-                productName: t("Common:ProductName"),
+              {getCommonTranslation("ConnectWebSearch", {
+                webSearch: "WebSearchAI",
+                productName: "ProductName",
               })}
             </Text>
             {isAdmin ? (
@@ -344,7 +346,7 @@ const ToolsSettings = ({
                 onClick={goToWebSearchSettings}
                 dataTestId="go-to-settings-link"
               >
-                {t("Common:GoToSettings")}
+                {getCommonTranslation("GoToSettings")}
               </Link>
             ) : null}
           </>
@@ -361,7 +363,7 @@ const ToolsSettings = ({
         ? [
             {
               key: "manage-connections",
-              label: t("ManageConnection"),
+              label: getCommonTranslation("ManageConnection"),
               onClick: () => {
                 setShowManageConnections(true);
               },
@@ -369,8 +371,8 @@ const ToolsSettings = ({
               disabled: !showManageConnectionItem,
               getTooltipContent: () => (
                 <Text>
-                  {t("ConnectMCPServers", {
-                    mcpServers: t("Common:MCPSettingTitle"),
+                  {getCommonTranslation("ConnectMCPServers", {
+                    mcpServers: "MCPSettingTitle",
                   })}
                 </Text>
               ),
@@ -383,7 +385,6 @@ const ToolsSettings = ({
     isBase,
     isAdmin,
     servers,
-    t,
     toggleTool,
     webSearchEnabled,
     webSearchAvailable,
@@ -397,7 +398,7 @@ const ToolsSettings = ({
     <>
       <TooltipContainer
         as="div"
-        title={t("AIToolsHint")}
+        title={getCommonTranslation("AIToolsHint")}
         className={classNames(
           styles.chatInputButton,
           styles.chatInputToolsButton,
@@ -412,7 +413,7 @@ const ToolsSettings = ({
       >
         <IconButton iconName={McpToolReactSvgUrl} size={16} isFill={false} />
         <Text lineHeight="16px" fontSize="13px" fontWeight={600} noSelect>
-          {t("Tools")}
+          {getCommonTranslation("Tools")}
         </Text>
         <ContextMenu
           ref={contextMenuRef}
@@ -433,7 +434,7 @@ const ToolsSettings = ({
           element={
             <>
               <Aside
-                header={t("ManageConnection")}
+                header={getCommonTranslation("ManageConnection")}
                 onClose={() => setShowManageConnections(false)}
                 visible={showManageConnections}
               >
@@ -466,7 +467,9 @@ const ToolsSettings = ({
                         </div>
                         <Button
                           label={
-                            server.connected ? t("Disconnect") : t("Connect")
+                            server.connected
+                              ? getCommonTranslation("Disconnect")
+                              : getCommonTranslation("Connect")
                           }
                           size={ButtonSize.small}
                           onClick={() => {

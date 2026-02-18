@@ -25,7 +25,6 @@
 import React from "react";
 import { ReactSVG } from "react-svg";
 import copy from "copy-to-clipboard";
-import { Trans, useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 
 import CopyIconUrl from "PUBLIC_DIR/images/icons/16/copy.react.svg?url";
@@ -55,6 +54,7 @@ import styles from "../../ChatMessageBody.module.scss";
 import { MessageButtonsProps } from "../../../../Chat.types";
 import { FOLDER_FORM_VALIDATION } from "../../../../../../constants";
 import { ContentType } from "../../../../../../enums";
+import { getCommonTranslation } from "../../../../../../utils";
 
 const Buttons = ({
   text,
@@ -66,7 +66,6 @@ const Buttons = ({
   getResultStorageId,
   folderFormValidation,
 }: MessageButtonsProps) => {
-  const { t } = useTranslation(["Common"]);
   const { roomId, findPreviousUserMessage } = useMessageStore();
   const { currentChat } = useChatStore();
 
@@ -76,7 +75,7 @@ const Buttons = ({
 
   const onCopyAction = () => {
     copy(text, { format: "text/plain" });
-    toastr.success(t("MessageCopiedSuccess"));
+    toastr.success(getCommonTranslation("MessageCopiedSuccess"));
   };
 
   const onExportMessage = async (
@@ -108,22 +107,25 @@ const Buttons = ({
           openFile(resultFile.id.toString());
         }
 
-        const toastMsg = (
-          <Trans
-            ns="Common"
-            i18nKey="MessageExported"
-            values={{ fileName }}
-            t={t}
-            components={{
-              1: (
-                <Link
-                  type={LinkType.action}
-                  onClick={() => openFile(resultFile.id.toString())}
-                />
-              ),
-            }}
-          />
-        );
+        // TODO: Add custom Trans component
+
+        // const toastMsg = (
+        //   <Trans
+        //     ns="Common"
+        //     i18nKey="MessageExported"
+        //     values={{ fileName }}
+        //     components={{
+        //       1: (
+        //         <Link
+        //           type={LinkType.action}
+        //           onClick={() => openFile(resultFile.id.toString())}
+        //         />
+        //       ),
+        //     }}
+        //   />
+        // );
+
+        const toastMsg = getCommonTranslation("MessageExported");
 
         toastr.success(toastMsg);
       } else {
@@ -172,7 +174,7 @@ const Buttons = ({
         <div
           className={styles.buttonsBlockItem}
           onClick={onCopyAction}
-          title={t("CopyMessage")}
+          title={getCommonTranslation("CopyMessage")}
         >
           <ReactSVG src={CopyIconUrl} />
         </div>
@@ -180,9 +182,9 @@ const Buttons = ({
         {/*{isLast ? (*/}
         {/*  <div*/}
         {/*    className={styles.buttonsBlockItem}*/}
-        {/*    title={t("RefreshMessage")}*/}
+        {/*    title={getCommonTranslation("RefreshMessage")}*/}
         {/*    onClick={() => {*/}
-        {/*      toastr.info(t("Common:WorkInProgress"));*/}
+        {/*      toastr.info(getCommonTranslation("WorkInProgress"));*/}
         {/*    }}*/}
         {/*  >*/}
         {/*    <ReactSVG src={RefreshIconUrl} />*/}
@@ -192,7 +194,7 @@ const Buttons = ({
         <div
           className={styles.buttonsBlockItem}
           onClick={() => setShowFolderSelector(true)}
-          title={t("SaveToFile")}
+          title={getCommonTranslation("SaveToFile")}
         >
           <ReactSVG src={SaveToFileIconUrl} />
         </div>

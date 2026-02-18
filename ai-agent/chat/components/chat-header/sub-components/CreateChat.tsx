@@ -25,7 +25,6 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 
 import PlusReactSvgUrl from "PUBLIC_DIR/images/icons/16/plus.svg";
@@ -38,6 +37,7 @@ import { useMessageStore } from "../../../store/messageStore";
 import { useChatStore } from "../../../store/chatStore";
 
 import styles from "../ChatHeader.module.scss";
+import { getCommonTranslation } from "../../../../../utils";
 
 const CreateChat = ({
   isLoadingProp,
@@ -48,8 +48,6 @@ const CreateChat = ({
 }) => {
   const { messages, isRequestRunning, startNewChat } = useMessageStore();
   const { setCurrentChat } = useChatStore();
-
-  const { t } = useTranslation(["Common"]);
 
   if (isLoadingProp)
     return (
@@ -81,7 +79,7 @@ const CreateChat = ({
     >
       <PlusReactSvgUrl />
       <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
-        {t("AINewChat")}
+        {getCommonTranslation("AINewChat")}
       </Text>
     </div>
   );

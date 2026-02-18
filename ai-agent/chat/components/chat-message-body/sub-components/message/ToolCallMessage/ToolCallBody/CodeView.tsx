@@ -27,7 +27,6 @@
  */
 
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 import type { TToolCallContent } from "../../../../../../../../types/ai";
 import styles from "../../../../ChatMessageBody.module.scss";
@@ -35,6 +34,7 @@ import MarkdownField from "../../Markdown";
 import { formatJsonWithMarkdown } from "../../../../../../utils";
 import { Text } from "../../../../../../../../components/text";
 import type { ToolCallPlacement } from "../ToolCall.enum";
+import { getCommonTranslation } from "../../../../../../../../utils";
 
 export const CodeView = ({
   content,
@@ -43,8 +43,6 @@ export const CodeView = ({
   content: TToolCallContent;
   placement: ToolCallPlacement;
 }) => {
-  const { t } = useTranslation(["Common"]);
-
   const getResult = () => {
     if (content.result && typeof content.result === "string") {
       return content.result;
@@ -80,24 +78,24 @@ export const CodeView = ({
     <>
       <div className={styles.toolCallCodeViewItem}>
         <Text fontSize="15px" lineHeight="16px" fontWeight={600}>
-          {t("Common:ToolCallArg")}
+          {getCommonTranslation("ToolCallArg")}
         </Text>
         <MarkdownField
           chatMessage={formatJsonWithMarkdown(content.arguments)}
-          successCopyMessage={t("Common:ToolCallArgCopied")}
+          successCopyMessage={getCommonTranslation("ToolCallArgCopied")}
         />
       </div>
       {showResult ? (
         <div className={styles.toolCallCodeViewItem}>
           <Text fontSize="15px" lineHeight="16px" fontWeight={600}>
-            {t("Common:ToolCallResult")}
+            {getCommonTranslation("ToolCallResult")}
           </Text>
           <MarkdownField
             chatMessage={formatJsonWithMarkdown(
               isJson ? JSON.parse(result) : result,
             )}
             propLanguage={isErrorResult && !isJson ? "text" : undefined}
-            successCopyMessage={t("Common:ToolCallResultCopied")}
+            successCopyMessage={getCommonTranslation("ToolCallResultCopied")}
           />
         </div>
       ) : null}

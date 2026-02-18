@@ -28,7 +28,6 @@ import React from "react";
 import classNames from "classnames";
 import Linkify from "linkify-react";
 import { ReactSVG } from "react-svg";
-import { useTranslation } from "react-i18next";
 import copy from "copy-to-clipboard";
 
 import CopyIconUrl from "PUBLIC_DIR/images/icons/16/copy.react.svg?url";
@@ -54,6 +53,7 @@ import Error from "./Error";
 import Files from "./Files";
 import Images from "./Images";
 import Buttons from "./Buttons";
+import { getCommonTranslation } from "../../../../../../utils";
 
 const renderLink = ({
   attributes,
@@ -83,8 +83,6 @@ const Message = ({
   getResultStorageId,
   folderFormValidation,
 }: MessageProps) => {
-  const { t } = useTranslation(["Common"]);
-
   const { currentChat } = useChatStore();
 
   const isUser = message.role === RoleType.UserMessage;
@@ -162,7 +160,7 @@ const Message = ({
 
               copy(fullText);
             }}
-            title={t("CopyMessage")}
+            title={getCommonTranslation("CopyMessage")}
           >
             <ReactSVG src={CopyIconUrl} />
           </div>

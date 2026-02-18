@@ -25,7 +25,6 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation, Trans } from "react-i18next";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
@@ -61,6 +60,7 @@ import RenameChat from "./RenameChat";
 import { CHAT_LIST_MAX_HEIGHT, CHAT_LIST_WIDTH } from "../constants";
 import { getSelectChatRowHeight } from "../utils";
 import { ChatList } from "./ChatList";
+import { getCommonTranslation } from "../../../../../utils";
 
 const SelectChat = ({
   isLoadingProp,
@@ -71,8 +71,6 @@ const SelectChat = ({
   setDeleteDialogVisible,
   folderFormValidation,
 }: SelectChatProps) => {
-  const { t } = useTranslation(["Common"]);
-
   const [isOpen, setIsOpen] = React.useState(false);
   const [hoveredItem, setHoveredItem] = React.useState("");
   const [isRenameOpen, setIsRenameOpen] = React.useState(false);
@@ -130,18 +128,11 @@ const SelectChat = ({
       }
       setHoveredItem("");
 
-      toastr.success(t("Common:ChatSuccessDeleted"));
+      toastr.success(getCommonTranslation("ChatSuccessDeleted"));
     } catch (error) {
       console.error(error);
     }
-  }, [
-    hoveredItem,
-    deleteChat,
-    currentChat?.id,
-    startNewChat,
-    updateUrlChatId,
-    t,
-  ]);
+  }, [hoveredItem, deleteChat, currentChat?.id, startNewChat, updateUrlChatId]);
 
   const onDelete = React.useCallback(() => {
     if (isRequestRunning) return;
@@ -166,7 +157,7 @@ const SelectChat = ({
     if (isRequestRunning) return;
     setIsExportOpen(true);
     setIsOpen(false);
-  }, [hoveredItem, chats, isRequestRunning, t]);
+  }, [hoveredItem, chats, isRequestRunning]);
 
   const onSubmit = React.useCallback(
     async (
@@ -198,23 +189,26 @@ const SelectChat = ({
             openFile(resultFile.id.toString());
           }
 
-          const toastMsg = (
-            <Trans
-              ns="Common"
-              i18nKey="ChatExported"
-              t={t}
-              values={{ fileName, title }}
-              components={{
-                1: <b />,
-                2: (
-                  <Link
-                    type={LinkType.action}
-                    onClick={() => openFile(resultFile.id.toString())}
-                  />
-                ),
-              }}
-            />
-          );
+          // TODO: Add custom Trans component
+
+          // const toastMsg = (
+          //   <Trans
+          //     ns="Common"
+          //     i18nKey="ChatExported"
+          //     values={{ fileName, title }}
+          //     components={{
+          //       1: <b />,
+          //       2: (
+          //         <Link
+          //           type={LinkType.action}
+          //           onClick={() => openFile(resultFile.id.toString())}
+          //         />
+          //       ),
+          //     }}
+          //   />
+          // );
+
+          const toastMsg = getCommonTranslation("MessageExported");
 
           toastr.success(toastMsg);
         } else {
@@ -230,32 +224,32 @@ const SelectChat = ({
 
       setIsExportOpen(false);
     },
-    [hoveredItem, chats, isRequestRunning, t],
+    [hoveredItem, chats, isRequestRunning],
   );
 
   const contextModel = React.useMemo(() => {
     return [
       {
         key: "rename",
-        label: t("Common:Rename"),
+        label: getCommonTranslation("Rename"),
         icon: RenameReactSvgUrl,
         onClick: onRenameToggle,
       },
       {
         key: "save_to_file",
-        label: t("Common:SaveToFile"),
+        label: getCommonTranslation("SaveToFile"),
         icon: SaveToFileIconUrl,
         onClick: onSaveToFileAction,
       },
       { key: "separator", isSeparator: true },
       {
         key: "remove",
-        label: t("Common:Delete"),
+        label: getCommonTranslation("Delete"),
         icon: RemoveSvgUrl,
         onClick: onDelete,
       },
     ];
-  }, [t, onDelete, onRenameToggle, onSaveToFileAction]);
+  }, [onDelete, onRenameToggle, onSaveToFileAction]);
 
   const rowHeight = getSelectChatRowHeight();
 
@@ -299,7 +293,7 @@ const SelectChat = ({
     <>
       <TooltipContainer
         as="div"
-        title={t("Common:ChatHistory")}
+        title={getCommonTranslation("ChatHistory")}
         className={classNames(styles.selectChat, { [styles.open]: isOpen })}
         onClick={toggleOpen}
         ref={parentRef}

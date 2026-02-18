@@ -23,7 +23,6 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { ReactSVG } from "react-svg";
 
 import cn from "classnames";
@@ -31,7 +30,7 @@ import cn from "classnames";
 import ToolFinish from "PUBLIC_DIR/images/tool.finish.svg?url";
 import TriangleDownIcon from "PUBLIC_DIR/images/arrow.right.react.svg";
 
-import { IconSizeType } from "../../../../../../../utils";
+import { getCommonTranslation, IconSizeType } from "../../../../../../../utils";
 
 import { Loader, LoaderTypes } from "../../../../../../../components/loader";
 import { Text } from "../../../../../../../components/text";
@@ -47,7 +46,6 @@ const Think = ({
   isFirst?: boolean;
   isFinished?: boolean;
 }) => {
-  const { t } = useTranslation(["Common"]);
   const [isOpen, setIsOpen] = useState(false);
 
   const onToggle = () => {
@@ -67,7 +65,7 @@ const Think = ({
         )}
 
         <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
-          {t("Thinking")}
+          {getCommonTranslation("Thinking")}
         </Text>
 
         <TriangleDownIcon

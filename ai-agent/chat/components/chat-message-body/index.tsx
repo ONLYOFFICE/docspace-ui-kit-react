@@ -27,7 +27,6 @@
 import { useEffect, useRef } from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
-import { useTranslation } from "react-i18next";
 
 import socket, { SocketCommands, SocketEvents } from "../../../../utils/socket";
 
@@ -43,6 +42,7 @@ import Message from "./sub-components/message";
 
 import { useChatScroll } from "./hooks/useChatScroll";
 import styles from "./ChatMessageBody.module.scss";
+import { getCommonTranslation } from "../../../../utils";
 
 const ChatMessageBody = ({
   userAvatar,
@@ -59,8 +59,6 @@ const ChatMessageBody = ({
     addMessageId,
   } = useMessageStore();
   const { currentChat } = useChatStore();
-
-  const { t } = useTranslation(["Common"]);
 
   const chatBodyRef = useRef<HTMLDivElement>(null);
 
@@ -125,7 +123,7 @@ const ChatMessageBody = ({
           {!isStreamRunning && isRequestRunning ? (
             <div className={styles.chatLoader}>
               <Loader type={LoaderTypes.track} />
-              {t("Common:Analyzing")}
+              {getCommonTranslation("Analyzing")}
             </div>
           ) : null}
         </div>

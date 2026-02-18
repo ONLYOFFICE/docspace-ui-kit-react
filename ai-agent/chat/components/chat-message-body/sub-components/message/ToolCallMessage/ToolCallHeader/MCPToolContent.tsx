@@ -27,7 +27,6 @@
  */
 
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 import type { TToolCallContent } from "../../../../../../../../types/ai";
 import { useTheme } from "../../../../../../../../context/ThemeContext";
@@ -39,9 +38,9 @@ import {
   MCPIcon,
   MCPIconSize,
 } from "../../../../../../../../components/mcp-icon";
+import { getCommonTranslation } from "../../../../../../../../utils";
 
 export const MCPToolContent = ({ content }: { content: TToolCallContent }) => {
-  const { t } = useTranslation(["Common"]);
   const { isBase } = useTheme();
 
   const serverIcon =
@@ -55,7 +54,7 @@ export const MCPToolContent = ({ content }: { content: TToolCallContent }) => {
   return (
     <>
       <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
-        {t("Common:ToolCallExecuted")}:
+        {getCommonTranslation("ToolCallExecuted")}:
       </Text>
       <MCPIcon
         title={content.mcpServerInfo?.serverName || ""}

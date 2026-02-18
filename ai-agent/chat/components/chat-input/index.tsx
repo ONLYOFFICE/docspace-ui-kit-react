@@ -27,7 +27,6 @@
 import React, { KeyboardEvent } from "react";
 import classNames from "classnames";
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
 
 import type { TFile } from "../../../..//types";
 import { RectangleSkeleton } from "../../../../components/rectangle";
@@ -45,6 +44,7 @@ import FilesList from "./FilesList";
 import Buttons from "./Buttons";
 
 import styles from "./ChatInput.module.scss";
+import { getCommonTranslation } from "../../../../utils";
 
 const ChatInput = ({
   getIcon,
@@ -58,8 +58,6 @@ const ChatInput = ({
   multimodal,
   goToWebSearchSettings,
 }: ChatInputProps) => {
-  const { t } = useTranslation(["Common"]);
-
   const { startChat, sendMessage, currentChatId, isRequestRunning, roomId } =
     useMessageStore();
   const { fetchChat, currentChat } = useChatStore();
@@ -283,7 +281,7 @@ const ChatInput = ({
                 [styles.chatInputTextAreaWrapperFiles]:
                   selectedFiles.length > 0,
               })}
-              placeholder={t("Common:AIChatInput")}
+              placeholder={getCommonTranslation("AIChatInput")}
               isChatMode
               fontSize={15}
               isDisabled={!aiReady}
@@ -326,7 +324,7 @@ const ChatInput = ({
           className={styles.chatInputText}
           noSelect
         >
-          {t("Common:AICanMakeMistakes")}
+          {getCommonTranslation("AICanMakeMistakes")}
         </Text>
       ) : null}
     </>

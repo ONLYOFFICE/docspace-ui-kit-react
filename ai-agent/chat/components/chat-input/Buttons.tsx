@@ -27,7 +27,6 @@
 import React from "react";
 import classNames from "classnames";
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
 
 import SendReactSvgUrl from "PUBLIC_DIR/images/icons/12/arrow.up.react.svg?url";
 import AttachmentReactSvgUrl from "PUBLIC_DIR/images/attachment.react.svg?url";
@@ -41,6 +40,7 @@ import { ButtonsProps } from "../../Chat.types";
 
 import styles from "./ChatInput.module.scss";
 import ToolsSettings from "./ToolsSettings";
+import { getCommonTranslation } from "../../../../utils";
 
 const Buttons = ({
   isFilesSelectorVisible,
@@ -54,8 +54,6 @@ const Buttons = ({
   goToWebSearchSettings,
 }: ButtonsProps) => {
   const { isRequestRunning, stopMessage } = useMessageStore();
-
-  const { t } = useTranslation(["Common"]);
 
   const isSendButtonDisabled = !isRequestRunning
     ? !value.trim() || !selectedModel
@@ -84,7 +82,7 @@ const Buttons = ({
       <div className={styles.chatInputButtonsTools}>
         <TooltipContainer
           as="div"
-          title={t("AddFiles")}
+          title={getCommonTranslation("AddFiles")}
           className={classNames(styles.chatInputButton, {
             [styles.activeChatInputButton]: isFilesSelectorVisible,
             [styles.disabled]: !aiReady,

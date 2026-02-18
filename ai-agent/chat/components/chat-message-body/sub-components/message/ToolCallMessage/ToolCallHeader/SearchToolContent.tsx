@@ -27,7 +27,6 @@
  */
 
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { ReactSVG } from "react-svg";
 
 import DocumentsIcon from "PUBLIC_DIR/images/icons/16/catalog.documents.react.svg?url";
@@ -42,10 +41,9 @@ import { useMessageStore } from "../../../../../../store/messageStore";
 import styles from "../../../../ChatMessageBody.module.scss";
 import { Text } from "../../../../../../../../components/text";
 import { Link, LinkTarget } from "../../../../../../../../components/link";
+import { getCommonTranslation } from "../../../../../../../../utils";
 
 const WebCrawlingToolContent = ({ content }: { content: TToolCallContent }) => {
-  const { t } = useTranslation(["Common"]);
-
   const toolInfo = ((content.result?.data as TToolCallResultSourceData)
     ?.title || content.arguments.url) as string;
 
@@ -55,7 +53,8 @@ const WebCrawlingToolContent = ({ content }: { content: TToolCallContent }) => {
     <>
       <ReactSVG className={styles.searchToolIcon} src={UniverseIcon} />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
-        {t("Common:WebCrawling")} | <span title={toolInfo}>{toolInfo}</span>
+        {getCommonTranslation("WebCrawling")} |{" "}
+        <span title={toolInfo}>{toolInfo}</span>
       </Text>
     </>
   ) : (
@@ -67,7 +66,8 @@ const WebCrawlingToolContent = ({ content }: { content: TToolCallContent }) => {
     >
       <ReactSVG className={styles.searchToolIcon} src={UniverseIcon} />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
-        {t("Common:WebCrawling")} | <span title={toolInfo}>{toolInfo}</span>
+        {getCommonTranslation("WebCrawling")} |{" "}
+        <span title={toolInfo}>{toolInfo}</span>
       </Text>
       <ReactSVG className={styles.externalLinkIcon} src={ExternalLinkIcon} />
     </Link>
@@ -75,15 +75,14 @@ const WebCrawlingToolContent = ({ content }: { content: TToolCallContent }) => {
 };
 
 const WebSearchToolContent = ({ content }: { content: TToolCallContent }) => {
-  const { t } = useTranslation(["Common"]);
-
   const toolInfo = content.arguments.query as string;
 
   return (
     <>
       <ReactSVG className={styles.searchToolIcon} src={UniverseIcon} />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
-        {t("Common:WebSearch")} | <span title={toolInfo}>{toolInfo}</span>
+        {getCommonTranslation("WebSearch")} |{" "}
+        <span title={toolInfo}>{toolInfo}</span>
       </Text>
     </>
   );
@@ -94,15 +93,14 @@ const KnowledgeSearchToolContent = ({
 }: {
   content: TToolCallContent;
 }) => {
-  const { t } = useTranslation(["Common"]);
-
   const toolInfo = content.arguments.query as string;
 
   return (
     <>
       <ReactSVG className={styles.searchToolIcon} src={DocumentsIcon} />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
-        {t("Common:KnowledgeSearch")} | <span title={toolInfo}>{toolInfo}</span>
+        {getCommonTranslation("KnowledgeSearch")} |{" "}
+        <span title={toolInfo}>{toolInfo}</span>
       </Text>
     </>
   );

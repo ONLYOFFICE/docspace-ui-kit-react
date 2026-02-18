@@ -25,7 +25,6 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 import ChatNoAccessRightsDarkIcon from "PUBLIC_DIR/images/emptyview/empty.chat.access.rights.dark.svg";
 import ChatNoAccessRightsLightIcon from "PUBLIC_DIR/images/emptyview/empty.chat.access.rights.light.svg";
@@ -33,6 +32,7 @@ import ChatNoAccessRightsLightIcon from "PUBLIC_DIR/images/emptyview/empty.chat.
 import { EmptyView } from "../../../../components/empty-view";
 import { useTheme } from "../../../../context/ThemeContext";
 import { match, P } from "ts-pattern";
+import { getCommonTranslation } from "../../../../utils";
 
 type Props = {
   aiReady: boolean;
@@ -47,7 +47,6 @@ export const ChatNoAccessScreen = ({
   standalone,
   goToAISettings,
 }: Props) => {
-  const { t } = useTranslation("Common");
   const { isBase } = useTheme();
 
   const icon = isBase ? (
@@ -58,43 +57,46 @@ export const ChatNoAccessScreen = ({
 
   const title =
     isPortalAdmin && standalone
-      ? t("Common:EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
-          aiProvider: t("Common:AIProvider"),
+      ? getCommonTranslation("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
+          aiProvider: "AIProvider",
         })
-      : t("Common:AIFeaturesAreCurrentlyDisabled");
+      : getCommonTranslation("AIFeaturesAreCurrentlyDisabled");
 
   const description = match([standalone, isPortalAdmin])
     // standalone admin
     .with([true, true], () =>
-      t("Common:EmptyAIAgentsAIDisabledStandaloneAdminDescription", {
-        productName: t("Common:ProductName"),
-        aiChats: t("Common:AIChats"),
-      }),
+      getCommonTranslation(
+        "EmptyAIAgentsAIDisabledStandaloneAdminDescription",
+        {
+          productName: "ProductName",
+          aiChats: "AIChats",
+        },
+      ),
     )
     // saas admin
     .with([false, true], () =>
-      t("Common:EmptyChatAIDisabledSaasAdminDescription", {
-        productName: t("Common:ProductName"),
+      getCommonTranslation("EmptyChatAIDisabledSaasAdminDescription", {
+        productName: "ProductName",
       }),
     )
     // standalone/saas user
     .with([P._, false], () =>
-      t("Common:EmptyChatAIDisabledUserDescription", {
-        productName: t("Common:ProductName"),
+      getCommonTranslation("EmptyChatAIDisabledUserDescription", {
+        productName: "ProductName",
       }),
     )
     .otherwise(() => "");
 
   const goToServices = {
     type: "button",
-    title: t("Common:GoToSettings"),
+    title: getCommonTranslation("GoToSettings"),
     key: "go-to-services",
     onClick: goToAISettings,
   } as const;
 
   const goToAIProviderSettings = {
     type: "button",
-    title: t("Common:GoToSettings"),
+    title: getCommonTranslation("GoToSettings"),
     key: "go-to-ai-provider-settings",
     onClick: goToAISettings,
   } as const;

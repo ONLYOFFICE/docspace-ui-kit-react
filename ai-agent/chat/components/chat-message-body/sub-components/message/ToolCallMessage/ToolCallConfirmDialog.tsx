@@ -27,7 +27,6 @@
  */
 
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 
 import { ToolsPermission } from "../../../../../../../enums";
@@ -44,7 +43,7 @@ import {
 
 import styles from "../../../ChatMessageBody.module.scss";
 import { ToolCall } from "./ToolCall";
-import { isMobile } from "../../../../../../../utils";
+import { getCommonTranslation, isMobile } from "../../../../../../../utils";
 import { ToolCallPlacement, ToolCallStatus } from "./ToolCall.enum";
 import { useMessageStore } from "../../../../../store/messageStore";
 
@@ -56,7 +55,6 @@ type ToolCallConfirmDialogProps = {
 export const ToolCallConfirmDialog = observer(
   ({ content, onClose }: ToolCallConfirmDialogProps) => {
     const [alwaysAllow, setAlwaysAllow] = React.useState(false);
-    const { t } = useTranslation(["Common"]);
     const {
       toolsConfirmQueue,
       addToToolsConfirmQueue,
@@ -100,19 +98,21 @@ export const ToolCallConfirmDialog = observer(
         autoMaxHeight
         closeOnBackdropClick={false}
       >
-        <ModalDialog.Header>{t("Common:Confirmation")}</ModalDialog.Header>
+        <ModalDialog.Header>
+          {getCommonTranslation("Confirmation")}
+        </ModalDialog.Header>
 
         <ModalDialog.Body>
           <div className={styles.toolCallManage}>
-            <Text>{t("Common:AIWouldLikeToUseThisTool")}</Text>
+            <Text>{getCommonTranslation("AIWouldLikeToUseThisTool")}</Text>
             <ToolCall
               content={content}
               status={ToolCallStatus.Confirmation}
               placement={ToolCallPlacement.ConfirmDialog}
             />
             <div>
-              <Text>{t("Common:ReviewAction")}</Text>
-              <Text>{t("Common:CannotGuaranteeSecurity")}</Text>
+              <Text>{getCommonTranslation("ReviewAction")}</Text>
+              <Text>{getCommonTranslation("CannotGuaranteeSecurity")}</Text>
             </div>
           </div>
         </ModalDialog.Body>
@@ -122,19 +122,19 @@ export const ToolCallConfirmDialog = observer(
             <Checkbox
               isChecked={alwaysAllow}
               onChange={(e) => setAlwaysAllow(e.target.checked)}
-              label={t("Common:AlwaysAllowToolCall")}
+              label={getCommonTranslation("AlwaysAllowToolCall")}
             />
             <div className={styles.buttonsBlockContainer}>
               <Button
                 primary
-                label={t("Common:Allow")}
+                label={getCommonTranslation("Allow")}
                 onClick={() => onClickAction(ToolsPermission.Allow)}
                 scale={isMobile()}
                 size={ButtonSize.normal}
               />
               <Button
                 className={styles.denyButton}
-                label={t("Common:Deny")}
+                label={getCommonTranslation("Deny")}
                 onClick={() => onClickAction(ToolsPermission.Deny)}
                 size={ButtonSize.normal}
                 scale={isMobile()}

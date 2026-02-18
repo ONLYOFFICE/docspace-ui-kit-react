@@ -24,17 +24,16 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import React from "react";
 
 import AttachmentReactSvgUrl from "PUBLIC_DIR/images/attachment.react.svg?url";
 
 import { DeviceType, FolderType } from "../../../../enums";
-import { isDesktop, isTablet } from "../../../../utils";
+import { getCommonTranslation, isDesktop, isTablet } from "../../../../utils";
 
 import type { TFile } from "../../../../types";
 
-import FilesSelector from "../../../../selectors/Files";
+// import FilesSelector from "../../../../selectors/Files";
 
 import type { TSelectorItem } from "../../../../components/selector";
 
@@ -51,8 +50,6 @@ const Attachment = ({
   getIcon,
   setSelectedFiles,
 }: AttachmentProps) => {
-  const { t } = useTranslation(["Common"]);
-
   const [tempSelectedFiles, setTempSelectedFiles] = React.useState<
     Partial<TFile>[]
   >([]);
@@ -93,80 +90,83 @@ const Attachment = ({
     : CHAT_SUPPORTED_FORMATS;
 
   return (
-    <FilesSelector
-      isPanelVisible={isVisible}
-      onCancel={toggleAttachment}
-      openRoot
-      getIcon={getIcon}
-      getIsDisabled={(
-        isFirstLoad,
-        isSelectedParentFolder,
-        selectedItemId,
-        selectedItemType,
-        isRoot,
-        selectedItemSecurity,
-        selectedFileInfo,
-      ) => {
-        if (!selectedItemSecurity?.Read) return true;
-
-        if (!selectedFileInfo) return true;
-
-        return false;
-      }}
-      onSubmit={() => {
-        setSelectedFiles(tempSelectedFiles);
-        setTempSelectedFiles([]);
-        toggleAttachment();
-      }}
-      onSelectItem={onSelectItem}
-      withHeader
-      headerProps={{
-        headerLabel: t("Common:SelectFile"),
-        isCloseable: true,
-        onCloseClick: toggleAttachment,
-      }}
-      withSearch
-      withBreadCrumbs
-      withoutBackButton
-      withCancelButton
-      withCreate={false}
-      withFooterCheckbox={false}
-      withFooterInput={false}
-      cancelButtonLabel={t("Common:CancelButton")}
-      submitButtonLabel={t("Common:AddButton")}
-      disabledItems={[]}
-      isRoomsOnly={false}
-      isThirdParty={false}
-      currentFolderId=""
-      rootFolderType={FolderType.Rooms}
-      footerCheckboxLabel=""
-      footerInputHeader=""
-      currentFooterInputValue=""
-      descriptionText=""
-      getFilesArchiveError={() => ""}
-      filterParam={supportedFormats}
-      isMultiSelect
-      withRecentTreeFolder
-      withFavoritesTreeFolder
-      withAIAgentsTreeFolder
-      disableBySecurity="AskAi"
-      currentDeviceType={
-        isDesktop()
-          ? DeviceType.desktop
-          : isTablet()
-            ? DeviceType.tablet
-            : DeviceType.mobile
-      }
-      withInfoBar={withInfo}
-      maxSelectedItems={CHAT_MAX_FILE_COUNT}
-      infoBarData={{
-        title: t("Common:SelectorFilesLimit", { count: CHAT_MAX_FILE_COUNT }),
-        icon: AttachmentReactSvgUrl,
-        onClose: () => setWithInfo(!withInfo),
-        description: t("Common:SelectorFilesLimitDescription"),
-      }}
-      renderInPortal
-    />
+    // <FilesSelector
+    //   isPanelVisible={isVisible}
+    //   onCancel={toggleAttachment}
+    //   openRoot
+    //   getIcon={getIcon}
+    //   getIsDisabled={(
+    //     isFirstLoad,
+    //     isSelectedParentFolder,
+    //     selectedItemId,
+    //     selectedItemType,
+    //     isRoot,
+    //     selectedItemSecurity,
+    //     selectedFileInfo,
+    //   ) => {
+    //     if (!selectedItemSecurity?.Read) return true;
+    //
+    //     if (!selectedFileInfo) return true;
+    //
+    //     return false;
+    //   }}
+    //   onSubmit={() => {
+    //     setSelectedFiles(tempSelectedFiles);
+    //     setTempSelectedFiles([]);
+    //     toggleAttachment();
+    //   }}
+    //   onSelectItem={onSelectItem}
+    //   withHeader
+    //   headerProps={{
+    //     headerLabel: getCommonTranslation("SelectFile"),
+    //     isCloseable: true,
+    //     onCloseClick: toggleAttachment,
+    //   }}
+    //   withSearch
+    //   withBreadCrumbs
+    //   withoutBackButton
+    //   withCancelButton
+    //   withCreate={false}
+    //   withFooterCheckbox={false}
+    //   withFooterInput={false}
+    //   cancelButtonLabel={getCommonTranslation("CancelButton")}
+    //   submitButtonLabel={getCommonTranslation("AddButton")}
+    //   disabledItems={[]}
+    //   isRoomsOnly={false}
+    //   isThirdParty={false}
+    //   currentFolderId=""
+    //   rootFolderType={FolderType.Rooms}
+    //   footerCheckboxLabel=""
+    //   footerInputHeader=""
+    //   currentFooterInputValue=""
+    //   descriptionText=""
+    //   getFilesArchiveError={() => ""}
+    //   filterParam={supportedFormats}
+    //   isMultiSelect
+    //   withRecentTreeFolder
+    //   withFavoritesTreeFolder
+    //   withAIAgentsTreeFolder
+    //   disableBySecurity="AskAi"
+    //   currentDeviceType={
+    //     isDesktop()
+    //       ? DeviceType.desktop
+    //       : isTablet()
+    //         ? DeviceType.tablet
+    //         : DeviceType.mobile
+    //   }
+    //   withInfoBar={withInfo}
+    //   maxSelectedItems={CHAT_MAX_FILE_COUNT}
+    //   infoBarData={{
+    //     title: getCommonTranslation("SelectorFilesLimit", {
+    //       count: CHAT_MAX_FILE_COUNT,
+    //     }),
+    //     icon: AttachmentReactSvgUrl,
+    //     onClose: () => setWithInfo(!withInfo),
+    //     description: getCommonTranslation("SelectorFilesLimitDescription"),
+    //   }}
+    //   renderInPortal
+    // />
+    <div>Attach selector will be implemented later</div>
   );
 };
 

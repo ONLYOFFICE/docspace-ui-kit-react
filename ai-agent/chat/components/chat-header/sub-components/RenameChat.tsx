@@ -25,7 +25,6 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 import {
   ModalDialog,
@@ -41,10 +40,9 @@ import { Button, ButtonSize } from "../../../../../components/button";
 import { useChatStore } from "../../../store/chatStore";
 
 import { RenameChatProps } from "../../../Chat.types";
+import { getCommonTranslation } from "../../../../../utils";
 
 const RenameChat = ({ chatId, prevTitle, onRenameToggle }: RenameChatProps) => {
-  const { t } = useTranslation(["Common"]);
-
   const [isLoading, setIsLoading] = React.useState(false);
 
   const { renameChat } = useChatStore();
@@ -94,7 +92,7 @@ const RenameChat = ({ chatId, prevTitle, onRenameToggle }: RenameChatProps) => {
       onClose={onRenameClose}
       displayType={ModalDialogType.modal}
     >
-      <ModalDialog.Header>{t("Common:Rename")}</ModalDialog.Header>
+      <ModalDialog.Header>{getCommonTranslation("Rename")}</ModalDialog.Header>
       <ModalDialog.Body>
         <TextInput
           value={newName}
@@ -110,7 +108,7 @@ const RenameChat = ({ chatId, prevTitle, onRenameToggle }: RenameChatProps) => {
       <ModalDialog.Footer>
         <Button
           size={ButtonSize.normal}
-          label={t("Common:SaveButton")}
+          label={getCommonTranslation("SaveButton")}
           onClick={onRenameAction}
           scale
           primary
@@ -120,7 +118,7 @@ const RenameChat = ({ chatId, prevTitle, onRenameToggle }: RenameChatProps) => {
         />
         <Button
           size={ButtonSize.normal}
-          label={t("Common:CancelButton")}
+          label={getCommonTranslation("CancelButton")}
           onClick={onRenameToggle}
           scale
           isDisabled={isLoading}

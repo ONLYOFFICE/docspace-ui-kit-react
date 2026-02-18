@@ -25,7 +25,6 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 import { RectangleSkeleton } from "../../../../../components/rectangle";
 import { Text } from "../../../../../components/text";
@@ -33,10 +32,9 @@ import { Text } from "../../../../../components/text";
 import { MessageEmptyProps } from "../../../Chat.types";
 
 import styles from "../ChatMessageBody.module.scss";
+import { getCommonTranslation } from "../../../../../utils";
 
 const EmptyScreen = ({ isLoading }: MessageEmptyProps) => {
-  const { t } = useTranslation(["Common"]);
-
   return (
     <Text
       className={styles.chatEmptyHelpMessage}
@@ -47,7 +45,7 @@ const EmptyScreen = ({ isLoading }: MessageEmptyProps) => {
       {isLoading ? (
         <RectangleSkeleton height="24px" width="140px" borderRadius="3px" />
       ) : (
-        t("Common:AIChatOfferHelp")
+        getCommonTranslation("AIChatOfferHelp")
       )}
     </Text>
   );

@@ -26,37 +26,34 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { useTranslation } from "react-i18next";
-
 import InfoIcon from "PUBLIC_DIR/images/info.outline.react.svg?url";
 
 import PublicRoomBar from "../../../../components/public-room-bar";
 
 import { ChatInfoBlockProps } from "../../Chat.types";
 import styles from "./ChatInfoBlock.module.scss";
+import { getCommonTranslation } from "../../../../utils";
 
 export const ChatInfoBlock = ({
   standalone,
   isPortalAdmin,
 }: ChatInfoBlockProps) => {
-  const { t } = useTranslation("Common");
-
   const bodyText = !isPortalAdmin
-    ? t("Common:AIDisabledInfoBlockUserDescription", {
-        productName: t("Common:ProductName"),
+    ? getCommonTranslation("AIDisabledInfoBlockUserDescription", {
+        productName: "ProductName",
       })
     : standalone
-      ? t("Common:AIDisabledInfoBlockAdminStandaloneDescription", {
-          productName: t("Common:ProductName"),
+      ? getCommonTranslation("AIDisabledInfoBlockAdminStandaloneDescription", {
+          productName: "ProductName",
         })
-      : t("Common:AIDisabledInfoBlockAdminSaasDescription", {
-          productName: t("Common:ProductName"),
+      : getCommonTranslation("AIDisabledInfoBlockAdminSaasDescription", {
+          productName: "ProductName",
         });
 
   return (
     <PublicRoomBar
       className={styles.chatInfoBlock}
-      headerText={t("Common:AIFeaturesAreCurrentlyDisabled")}
+      headerText={getCommonTranslation("AIFeaturesAreCurrentlyDisabled")}
       bodyText={bodyText}
       iconName={InfoIcon}
       dataTestId="chat-info-block"
