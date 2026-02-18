@@ -29,53 +29,55 @@
 import React from "react";
 
 import {
-	Configuration,
-	ProfilesApi,
-	CommonSettingsApi,
+  Configuration,
+  ProfilesApi,
+  CommonSettingsApi,
 } from "@onlyoffice/docspace-api-sdk";
+import { AiApi } from "../../api/ai";
 
 export type TApiProvider = {
-	children: React.ReactNode;
-	url: string;
-	apiKey: string;
+  children: React.ReactNode;
+  url: string;
+  apiKey: string;
 };
 
 export type TApiContext = {
-	profilesApi: ProfilesApi;
-	commonSettingsApi: CommonSettingsApi;
+  profilesApi: ProfilesApi;
+  commonSettingsApi: CommonSettingsApi;
+  aiApi: AiApi;
 };
 
 const ApiContext = React.createContext<TApiContext | null>(null);
 
 export const useApi = () => {
-	const context = React.useContext(ApiContext);
+  const context = React.useContext(ApiContext);
 
-	if (!context) {
-		throw new Error("useApi must be used within an ApiProvider");
-	}
+  if (!context) {
+    throw new Error("useApi must be used within an ApiProvider");
+  }
 
-	return context;
+  return context;
 };
 
 const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
-	const value = React.useMemo(() => {
-		const configuration = new Configuration({
-			basePath: url,
-			apiKey,
-			accessToken: apiKey,
-		});
+  const value = React.useMemo(() => {
+    const configuration = new Configuration({
+      basePath: url,
+      apiKey,
+      accessToken: apiKey,
+    });
 
-		return {
-			profilesApi: new ProfilesApi(configuration),
-			commonSettingsApi: new CommonSettingsApi(configuration),
-		};
-	}, [url, apiKey]);
+    return {
+      profilesApi: new ProfilesApi(configuration),
+      commonSettingsApi: new CommonSettingsApi(configuration),
+      aiApi: new AiApi({
+        basePath: url,
+        apiKey,
+      }),
+    };
+  }, [url, apiKey]);
 
-	return (
-		<ApiContext.Provider value={value}>
-			{children}
-		</ApiContext.Provider>
-	);
+  return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 };
 
 export default ApiProvider;
