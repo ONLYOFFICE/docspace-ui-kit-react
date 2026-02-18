@@ -26,7 +26,7 @@
 
 import React from "react";
 
-import socket, { SocketEvents, TOptSocket } from "../../../utils/socket";
+import { SocketEvents, TOptSocket } from "../../../utils/socket";
 
 import {
   TAIConfig,
@@ -37,6 +37,7 @@ import {
 import { Nullable } from "../../../types";
 import { RoomsType } from "../../../enums";
 import { useApi } from "../../../providers";
+import { useSocket } from "../../../providers/socket";
 
 type Props = {
   roomId: string | number;
@@ -52,6 +53,7 @@ const useToolsSettings = ({ roomId, aiConfig, chatSettings }: Props) => {
   const [webSearchEnabled, setWebSearchEnabled] = React.useState(false);
   const [isFetched, setIsFetched] = React.useState(false);
   const { aiApi } = useApi();
+  const socket = useSocket();
 
   const fetchServerTools = React.useCallback(
     async (res: TServer[], roomId: string | number) => {

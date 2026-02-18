@@ -35,10 +35,7 @@ import SaveToFileIconUrl from "PUBLIC_DIR/images/message.save.svg?url";
 
 import { RectangleSkeleton } from "../../../../../components/rectangle";
 
-import socket, {
-  SocketCommands,
-  SocketEvents,
-} from "../../../../../utils/socket";
+import { SocketCommands, SocketEvents } from "../../../../../utils/socket";
 
 import { DropDown } from "../../../../../components/drop-down";
 import { TBreadCrumb } from "../../../../../components/selector";
@@ -61,6 +58,7 @@ import { getSelectChatRowHeight } from "../utils";
 import { ChatList } from "./ChatList";
 import { getCommonTranslation } from "../../../../../utils";
 import { useApi } from "../../../../../providers";
+import { useSocket } from "../../../../../providers/socket";
 
 const SelectChat = ({
   isLoadingProp,
@@ -75,6 +73,7 @@ const SelectChat = ({
   const [hoveredItem, setHoveredItem] = React.useState("");
   const [isRenameOpen, setIsRenameOpen] = React.useState(false);
   const [isExportOpen, setIsExportOpen] = React.useState(false);
+  const socket = useSocket();
 
   const parentRef = React.useRef<HTMLDivElement>(null);
 
@@ -183,11 +182,11 @@ const SelectChat = ({
       socket?.on(SocketEvents.ExportChat, (data) => {
         const { resultFile } = data;
 
-        const title = chats.find((chat) => chat.id === hoveredItem)?.title;
+        // const title = chats.find((chat) => chat.id === hoveredItem)?.title;
 
         if (resultFile) {
           if (isChecked) {
-            openFile(resultFile.id.toString());
+            openFile(resultFile.id!.toString());
           }
 
           // TODO: Add custom Trans component

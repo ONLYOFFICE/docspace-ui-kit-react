@@ -28,7 +28,7 @@ import { useEffect, useRef } from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-import socket, { SocketCommands, SocketEvents } from "../../../../utils/socket";
+import { SocketCommands, SocketEvents } from "../../../../utils/socket";
 
 import { Loader, LoaderTypes } from "../../../../components/loader";
 
@@ -43,6 +43,7 @@ import Message from "./sub-components/message";
 import { useChatScroll } from "./hooks/useChatScroll";
 import styles from "./ChatMessageBody.module.scss";
 import { getCommonTranslation } from "../../../../utils";
+import { useSocket } from "../../../../providers/socket";
 
 const ChatMessageBody = ({
   userAvatar,
@@ -59,6 +60,7 @@ const ChatMessageBody = ({
     addMessageId,
   } = useMessageStore();
   const { currentChat } = useChatStore();
+  const socket = useSocket();
 
   const chatBodyRef = useRef<HTMLDivElement>(null);
 

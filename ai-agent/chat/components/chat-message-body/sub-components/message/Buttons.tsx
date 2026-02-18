@@ -31,10 +31,7 @@ import CopyIconUrl from "PUBLIC_DIR/images/icons/16/copy.react.svg?url";
 // import RefreshIconUrl from "PUBLIC_DIR/images/icons/16/refresh.react.svg?url";
 import SaveToFileIconUrl from "PUBLIC_DIR/images/message.save.svg?url";
 
-import socket, {
-  SocketCommands,
-  SocketEvents,
-} from "../../../../../../utils/socket";
+import { SocketCommands, SocketEvents } from "../../../../../../utils/socket";
 
 import { TBreadCrumb } from "../../../../../../components/selector";
 import { toastr } from "../../../../../../components/toast";
@@ -54,6 +51,7 @@ import { FOLDER_FORM_VALIDATION } from "../../../../../../constants";
 import { ContentType } from "../../../../../../enums";
 import { getCommonTranslation } from "../../../../../../utils";
 import { useApi } from "../../../../../../providers/api";
+import { useSocket } from "../../../../../../providers/socket";
 
 const Buttons = ({
   text,
@@ -68,6 +66,7 @@ const Buttons = ({
   const { roomId, findPreviousUserMessage } = useMessageStore();
   const { currentChat } = useChatStore();
   const { aiApi } = useApi();
+  const socket = useSocket();
 
   const [showFolderSelector, setShowFolderSelector] = React.useState(false);
 
@@ -104,7 +103,7 @@ const Buttons = ({
 
       if (resultFile) {
         if (isChecked) {
-          openFile(resultFile.id.toString());
+          openFile(resultFile.id!.toString());
         }
 
         // TODO: Add custom Trans component
