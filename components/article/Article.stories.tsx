@@ -16,7 +16,7 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: "Article component with various display options",
+        component: "A sidebar/article panel component that displays content, navigation menus, and user profile information. Supports responsive behavior, text visibility toggles, and action handlers for navigation and user interactions.",
       },
     },
   },
