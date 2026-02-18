@@ -27,9 +27,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { RectangleSkeleton } from "../../../../../skeletons";
-
-import { Text } from "@docspace/ui-kit/components/text";
+import { RectangleSkeleton } from "../../../../../components/rectangle";
+import { Text } from "../../../../../components/text";
 
 import { MessageEmptyProps } from "../../../Chat.types";
 

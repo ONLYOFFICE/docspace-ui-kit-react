@@ -31,7 +31,7 @@ import classNames from "classnames";
 
 import VerticalDotsReactSvgUrl from "PUBLIC_DIR/images/icons/16/vertical-dots.react.svg?url";
 
-import type { TChat } from "../../../../../types";
+import type { TChat } from "../../../../../types/ai";
 import {
   ContextMenu,
   ContextMenuRefType,

@@ -33,15 +33,15 @@ import copy from "copy-to-clipboard";
 
 import CopyIconUrl from "PUBLIC_DIR/images/icons/16/copy.react.svg?url";
 
-import { ContentType, RoleType } from "../../../../../../api/ai/enums";
+import { ContentType, RoleType } from "../../../../../../enums";
 
-import { Link, LinkTarget } from "@docspace/ui-kit/components/link";
+import { Link, LinkTarget } from "../../../../../../components/link";
 import {
   Avatar,
   AvatarRole,
   AvatarSize,
-} from "@docspace/ui-kit/components/avatar";
-import { Text } from "@docspace/ui-kit/components/text";
+} from "../../../../../../components/avatar";
+import { Text } from "../../../../../../components/text";
 
 import type { MessageProps } from "../../../../Chat.types";
 import { useChatStore } from "../../../../store/chatStore";

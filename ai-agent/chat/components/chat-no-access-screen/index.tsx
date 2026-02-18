@@ -31,8 +31,8 @@ import { useNavigate } from "react-router";
 import ChatNoAccessRightsDarkIcon from "PUBLIC_DIR/images/emptyview/empty.chat.access.rights.dark.svg";
 import ChatNoAccessRightsLightIcon from "PUBLIC_DIR/images/emptyview/empty.chat.access.rights.light.svg";
 
-import { EmptyView } from "../../../empty-view";
-import { useTheme } from "@docspace/ui-kit/context/ThemeContext";
+import { EmptyView } from "../../../../components/empty-view";
+import { useTheme } from "../../../../context/ThemeContext";
 import { match, P } from "ts-pattern";
 
 type Props = {

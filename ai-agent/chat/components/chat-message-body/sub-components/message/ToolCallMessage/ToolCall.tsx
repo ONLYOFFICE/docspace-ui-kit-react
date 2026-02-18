@@ -29,7 +29,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 
-import type { TToolCallContent } from "../../../../../../../api/ai/types";
+import type { TToolCallContent } from "../../../../../../../types/ai";
 
 import styles from "../../../ChatMessageBody.module.scss";
 

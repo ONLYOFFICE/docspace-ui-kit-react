@@ -33,8 +33,12 @@ import {
   getServersListForRoom,
   getWebSearchInRoom,
 } from "../../../api/ai";
-import { TAIConfig, TMCPTool, TServer } from "../../../api/ai/types";
-import { TAIRoomChatSettings } from "../../../api/rooms/types";
+import {
+  TAIConfig,
+  TMCPTool,
+  TServer,
+  TAIRoomChatSettings,
+} from "../../../types/ai";
 import { Nullable } from "../../../types";
 import { RoomsType } from "../../../enums";
 

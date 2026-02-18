@@ -28,7 +28,7 @@ import React, { useCallback } from "react";
 import { useLocation } from "react-router";
 
 import { getChatMessages } from "../../../api/ai";
-import type { TMessage } from "../../../api/ai/types";
+import type { TMessage } from "../../../types/ai";
 
 const cacheChatId = new Map<string, string>();
 

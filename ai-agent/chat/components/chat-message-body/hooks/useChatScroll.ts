@@ -28,7 +28,7 @@
 
 import React, { useEffect, useEffectEvent, useRef } from "react";
 
-import { useIsMobile } from "../../../../../hooks/useIsMobile";
+import { useIsMobile } from "../../../../../hooks/use-is-mobile";
 
 import ChatStore from "../../../store/chatStore";
 import MessageStore from "../../../store/messageStore";

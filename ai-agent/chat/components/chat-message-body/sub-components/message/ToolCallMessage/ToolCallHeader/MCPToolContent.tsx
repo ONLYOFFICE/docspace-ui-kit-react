@@ -29,13 +29,16 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import type { TToolCallContent } from "../../../../../../../../api/ai/types";
-import { useTheme } from "@docspace/ui-kit/context/ThemeContext";
-import { getServerIcon } from "../../../../../../../../utils";
-import { ServerType } from "../../../../../../../../api/ai/enums";
-import { Text } from "@docspace/ui-kit/components/text";
+import type { TToolCallContent } from "../../../../../../../../types/ai";
+import { useTheme } from "../../../../../../../../context/ThemeContext";
+import { getServerIcon } from "../../../../../../../../utils/ai/getServerIcon";
+import { ServerType } from "../../../../../../../../enums";
+import { Text } from "../../../../../../../../components/text";
 import styles from "../../../../ChatMessageBody.module.scss";
-import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
+import {
+  MCPIcon,
+  MCPIconSize,
+} from "../../../../../../../../components/mcp-icon";
 
 export const MCPToolContent = ({ content }: { content: TToolCallContent }) => {
   const { t } = useTranslation(["Common"]);

@@ -35,10 +35,10 @@ import ExternalLinkIcon from "PUBLIC_DIR/images/external.link.svg?url";
 import type {
   TToolCallContent,
   TToolCallResultSourceData,
-} from "../../../../../../../../api/ai/types";
-import { Link, LinkTarget } from "@docspace/ui-kit/components/link";
-import { Text } from "@docspace/ui-kit/components/text";
-import { Tooltip } from "@docspace/ui-kit/components/tooltip";
+} from "../../../../../../../../types/ai";
+import { Link, LinkTarget } from "../../../../../../../../components/link";
+import { Text } from "../../../../../../../../components/text";
+import { Tooltip } from "../../../../../../../../components/tooltip";
 
 import styles from "../../../../ChatMessageBody.module.scss";
 import {

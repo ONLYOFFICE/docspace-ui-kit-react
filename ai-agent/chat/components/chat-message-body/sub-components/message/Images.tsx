@@ -26,9 +26,9 @@
 
 import { useEffect, useState } from "react";
 
-import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
+import { Loader, LoaderTypes } from "../../../../../../components/loader";
 
-import { ContentType } from "../../../../../../api/ai/enums";
+import { ContentType } from "../../../../../../enums";
 
 import { MessageImagesProps } from "../../../../Chat.types";
 

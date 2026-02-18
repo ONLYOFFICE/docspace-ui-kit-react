@@ -29,12 +29,12 @@
 import React from "react";
 
 import styles from "../../../../ChatMessageBody.module.scss";
-import type { TToolCallContent } from "../../../../../../../../api/ai/types";
+import type { TToolCallContent } from "../../../../../../../../types/ai";
 import type { ToolCallPlacement } from "../ToolCall.enum";
 import { useMessageStore } from "../../../../../../store/messageStore";
 import { CodeView } from "./CodeView";
 import { SourceView } from "./SourceView";
-import { Text } from "@docspace/ui-kit/components/text";
+import { Text } from "../../../../../../../../components/text";
 
 type ToolCallBodyProps = {
   content: TToolCallContent;

@@ -27,7 +27,8 @@
 import { makeAutoObservable } from "mobx";
 import React from "react";
 import { deleteChat, getChat, getChats, renameChat } from "../../../api/ai";
-import type { Nullable, TChat } from "../../../types";
+import type { Nullable } from "../../../types";
+import type { TChat } from "../../../types/ai";
 import socket, { SocketEvents } from "../../../utils/socket";
 import { toastr } from "../../../components/toast";
 import type { TChatStoreProps } from "../Chat.types";

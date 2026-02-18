@@ -31,7 +31,7 @@ import InfiniteLoader from "react-window-infinite-loader";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 
-import type { TChat } from "../../../../../types";
+import type { TChat } from "../../../../../types/ai";
 import { useInterfaceDirection } from "../../../../../context/InterfaceDirectionContext";
 import { Scrollbar } from "../../../../../components/scrollbar";
 import { CHAT_LIST_WIDTH } from "../constants";

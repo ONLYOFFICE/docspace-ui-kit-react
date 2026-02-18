@@ -37,11 +37,11 @@ import ExternalLinkIcon from "PUBLIC_DIR/images/external.link.svg?url";
 import {
   TToolCallContent,
   TToolCallResultSourceData,
-} from "../../../../../../../../api/ai/types";
+} from "../../../../../../../../types/ai";
 import { useMessageStore } from "../../../../../../store/messageStore";
 import styles from "../../../../ChatMessageBody.module.scss";
-import { Text } from "@docspace/ui-kit/components/text";
-import { Link, LinkTarget } from "@docspace/ui-kit/components/link";
+import { Text } from "../../../../../../../../components/text";
+import { Link, LinkTarget } from "../../../../../../../../components/link";
 
 const WebCrawlingToolContent = ({ content }: { content: TToolCallContent }) => {
   const { t } = useTranslation(["Common"]);

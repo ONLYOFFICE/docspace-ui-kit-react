@@ -27,41 +27,41 @@
 import React from "react";
 
 import { getChats } from "../../../api/ai";
-import type { TChat } from "../../../api/ai/types";
+import type { TChat } from "../../../types/ai";
 
 const useInitChats = ({ roomId }: { roomId: string | number }) => {
-	const [isLoading, setIsLoading] = React.useState(false);
-	const [isRequestRunning, setIsRequestRunning] = React.useState(false);
-	const [chats, setChats] = React.useState<TChat[]>([]);
-	const [totalChats, setTotalChats] = React.useState<number>(0);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isRequestRunning, setIsRequestRunning] = React.useState(false);
+  const [chats, setChats] = React.useState<TChat[]>([]);
+  const [totalChats, setTotalChats] = React.useState<number>(0);
 
-	const fetchChats = async () => {
-		if (!roomId) return;
-		if (isRequestRunning) return;
+  const fetchChats = async () => {
+    if (!roomId) return;
+    if (isRequestRunning) return;
 
-		setIsLoading(true);
-		setIsRequestRunning(true);
+    setIsLoading(true);
+    setIsRequestRunning(true);
 
-		try {
-			const { items, total } = await getChats(roomId);
+    try {
+      const { items, total } = await getChats(roomId);
 
-			setChats(items);
-			setTotalChats(total);
-		} catch (error) {
-			console.error(error);
-		} finally {
-			setIsRequestRunning(false);
-			setIsLoading(false);
-		}
-	};
+      setChats(items);
+      setTotalChats(total);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsRequestRunning(false);
+      setIsLoading(false);
+    }
+  };
 
-	return {
-		isLoading,
-		isRequestRunning,
-		chats,
-		totalChats,
-		fetchChats,
-	};
+  return {
+    isLoading,
+    isRequestRunning,
+    chats,
+    totalChats,
+    fetchChats,
+  };
 };
 
 export default useInitChats;

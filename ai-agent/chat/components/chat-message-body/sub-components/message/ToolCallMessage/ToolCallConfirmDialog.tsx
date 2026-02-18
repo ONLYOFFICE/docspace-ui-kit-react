@@ -30,17 +30,20 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { ToolsPermission } from "../../../../../../../api/ai/enums";
-import type { TToolCallContent } from "../../../../../../../api/ai/types";
+import { ToolsPermission } from "../../../../../../../enums";
+import type { TToolCallContent } from "../../../../../../../types/ai";
 import { updateToolsPermission } from "../../../../../../../api/ai";
 
-import { Text } from "@docspace/ui-kit/components/text";
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
-import { Checkbox } from "@docspace/ui-kit/components/checkbox";
+import { Text } from "../../../../../../../components/text";
+import { Button, ButtonSize } from "../../../../../../../components/button";
+import { Checkbox } from "../../../../../../../components/checkbox";
+import {
+  ModalDialog,
+  ModalDialogType,
+} from "../../../../../../../components/modal-dialog";
 
 import styles from "../../../ChatMessageBody.module.scss";
 import { ToolCall } from "./ToolCall";
-import { ModalDialog, ModalDialogType } from "@docspace/ui-kit/components/modal-dialog";
 import { isMobile } from "../../../../../../../utils";
 import { ToolCallPlacement, ToolCallStatus } from "./ToolCall.enum";
 import { useMessageStore } from "../../../../../store/messageStore";

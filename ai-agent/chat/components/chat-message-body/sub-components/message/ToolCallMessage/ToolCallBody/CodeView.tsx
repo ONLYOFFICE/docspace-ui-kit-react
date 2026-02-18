@@ -29,11 +29,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import type { TToolCallContent } from "../../../../../../../../api/ai/types";
+import type { TToolCallContent } from "../../../../../../../../types/ai";
 import styles from "../../../../ChatMessageBody.module.scss";
 import MarkdownField from "../../Markdown";
 import { formatJsonWithMarkdown } from "../../../../../../utils";
-import { Text } from "@docspace/ui-kit/components/text";
+import { Text } from "../../../../../../../../components/text";
 import type { ToolCallPlacement } from "../ToolCall.enum";
 
 export const CodeView = ({
