@@ -26,10 +26,9 @@
 
 import React from "react";
 
-import { type RoomType } from "@onlyoffice/docspace-api-sdk";
+import type { RoomType } from "@onlyoffice/docspace-api-sdk";
 
-import { createFolder } from "../../../api/files";
-import { createRoom } from "../../../api/rooms";
+import { useApi } from "../../../providers/api/ApiProvider";
 import type { TSelectorItem } from "../../../components/selector";
 import { toastr } from "../../../components/toast";
 
@@ -40,6 +39,7 @@ const useInputItemHelper = ({
   selectedItemId,
   setItems,
 }: TUseInputItemHelper) => {
+  const { foldersApi, roomsApi } = useApi();
   const selectedItemIdRef = React.useRef(selectedItemId);
 
   React.useEffect(() => {
@@ -73,16 +73,18 @@ const useInputItemHelper = ({
       try {
         // if (isAgent) await createAIAgent({ title: value });
         if (currentSelectedItemId)
-          await createFolder(currentSelectedItemId, value.trimEnd());
+          await foldersApi.createFolder(Number(currentSelectedItemId), {
+            title: value.trimEnd(),
+          });
         else if (roomType) {
-          await createRoom({ roomType, title: value });
+          await roomsApi.createRoom({ roomType, title: value });
         }
       } catch (e) {
         console.log(e);
         toastr.error(e as string);
       }
     },
-    [withCreate],
+    [withCreate, foldersApi, roomsApi],
   );
 
   const addInputItem = React.useCallback(
