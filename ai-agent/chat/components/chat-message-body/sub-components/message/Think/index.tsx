@@ -27,8 +27,8 @@ import { ReactSVG } from "react-svg";
 
 import cn from "classnames";
 
-import ToolFinish from "PUBLIC_DIR/images/tool.finish.svg?url";
-import TriangleDownIcon from "PUBLIC_DIR/images/arrow.right.react.svg";
+import ToolFinish from "../../../../../../../assets/tool.finish.svg?url";
+import TriangleDownIcon from "../../../../../../../assets/arrow.right.react.svg";
 
 import { getCommonTranslation, IconSizeType } from "../../../../../../../utils";
 

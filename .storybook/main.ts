@@ -6,6 +6,7 @@ const config: StorybookConfig = {
     "../components/**/*.stories.@(js|jsx|ts|tsx)",
     "../errors/**/*.stories.@(js|jsx|ts|tsx)",
     "../providers/**/*.stories.@(js|jsx|ts|tsx)",
+    "../ai-agent/**/*.stories.@(js|jsx|ts|tsx)",
   ],
 
   addons: [

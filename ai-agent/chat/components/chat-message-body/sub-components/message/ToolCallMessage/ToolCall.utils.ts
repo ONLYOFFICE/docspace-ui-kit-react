@@ -26,11 +26,11 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import WordIcon from "PUBLIC_DIR/images/icons/16/word.svg?url";
-import CellIcon from "PUBLIC_DIR/images/icons/16/cell.svg?url";
-import CellCommonIcon from "PUBLIC_DIR/images/icons/16/cellCommon.svg?url";
-import TextIcon from "PUBLIC_DIR/images/icons/16/text.svg?url";
-import PdfIcon from "PUBLIC_DIR/images/icons/16/pdf.svg?url";
+import WordIcon from "../../../../../../../assets/icons/16/word.svg?url";
+import CellIcon from "../../../../../../../assets/icons/16/cell.svg?url";
+import CellCommonIcon from "../../../../../../../assets/icons/16/cellCommon.svg?url";
+import TextIcon from "../../../../../../../assets/icons/16/text.svg?url";
+import PdfIcon from "../../../../../../../assets/icons/16/pdf.svg?url";
 
 export const getRootDomain = (url: string) => {
   try {

@@ -29,8 +29,8 @@
 import React, { useId, useState } from "react";
 import { ReactSVG } from "react-svg";
 
-import UniverseIcon from "PUBLIC_DIR/images/universe.react.svg?url";
-import ExternalLinkIcon from "PUBLIC_DIR/images/external.link.svg?url";
+import UniverseIcon from "../../../../../../../../assets/universe.react.svg?url";
+import ExternalLinkIcon from "../../../../../../../../assets/external.link.svg?url";
 
 import type {
   TToolCallContent,

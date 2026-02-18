@@ -27,9 +27,9 @@ import { ReactSVG } from "react-svg";
 import copy from "copy-to-clipboard";
 import { observer } from "mobx-react";
 
-import CopyIconUrl from "PUBLIC_DIR/images/icons/16/copy.react.svg?url";
-// import RefreshIconUrl from "PUBLIC_DIR/images/icons/16/refresh.react.svg?url";
-import SaveToFileIconUrl from "PUBLIC_DIR/images/message.save.svg?url";
+import CopyIconUrl from "../../../.././../../assets/icons/16/copy.react.svg?url";
+// import RefreshIconUrl from "../../../.././../../assets/16/refresh.react.svg?url";
+import SaveToFileIconUrl from "../../../.././../../assets/message.save.svg?url";
 
 import { SocketCommands, SocketEvents } from "../../../../../../utils/socket";
 

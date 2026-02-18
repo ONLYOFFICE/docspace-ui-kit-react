@@ -30,7 +30,7 @@ import Linkify from "linkify-react";
 import { ReactSVG } from "react-svg";
 import copy from "copy-to-clipboard";
 
-import CopyIconUrl from "PUBLIC_DIR/images/icons/16/copy.react.svg?url";
+import CopyIconUrl from "../../../../../../assets/icons/16/copy.react.svg?url";
 
 import { ContentType, RoleType } from "../../../../../../enums";
 

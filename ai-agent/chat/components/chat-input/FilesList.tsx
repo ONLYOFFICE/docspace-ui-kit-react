@@ -28,7 +28,7 @@ import React from "react";
 import { ReactSVG } from "react-svg";
 import classNames from "classnames";
 
-import CloseCircleReactSvgUrl from "PUBLIC_DIR/images/remove.session.svg?url";
+import CloseCircleReactSvgUrl from "../../../../assets/remove.session.svg?url";
 
 import { Text } from "../../../../components/text";
 import { IconButton } from "../../../../components/icon-button";

@@ -26,7 +26,7 @@
 
 import React from "react";
 
-import AttachmentReactSvgUrl from "PUBLIC_DIR/images/attachment.react.svg?url";
+import AttachmentReactSvgUrl from "../../../../assets/attachment.react.svg?url";
 
 import { DeviceType, FolderType } from "../../../../enums";
 import { getCommonTranslation, isDesktop, isTablet } from "../../../../utils";

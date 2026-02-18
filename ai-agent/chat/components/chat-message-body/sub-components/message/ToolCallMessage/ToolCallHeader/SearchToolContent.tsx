@@ -29,9 +29,9 @@
 import React from "react";
 import { ReactSVG } from "react-svg";
 
-import DocumentsIcon from "PUBLIC_DIR/images/icons/16/catalog.documents.react.svg?url";
-import UniverseIcon from "PUBLIC_DIR/images/universe.react.svg?url";
-import ExternalLinkIcon from "PUBLIC_DIR/images/external.link.svg?url";
+import DocumentsIcon from "../../../../../../../../assets/icons/16/catalog.documents.react.svg?url";
+import UniverseIcon from "../../../../../../../../assets/universe.react.svg?url";
+import ExternalLinkIcon from "../../../../../../../../assets/external.link.svg?url";
 
 import {
   TToolCallContent,

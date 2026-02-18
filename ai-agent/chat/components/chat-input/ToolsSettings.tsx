@@ -31,9 +31,9 @@ import { LoginProvider } from "@onlyoffice/docspace-api-sdk";
 
 import { Portal } from "../../../../components/portal";
 
-import McpToolReactSvgUrl from "PUBLIC_DIR/images/mcp.tool.svg?url";
-import WebSearchIconUrl from "PUBLIC_DIR/images/web.search.svg?url";
-import ManageConnectionsReactSvgUrl from "PUBLIC_DIR/images/manage.connection.react.svg?url";
+import McpToolReactSvgUrl from "../../../../assets/mcp.tool.svg?url";
+import WebSearchIconUrl from "../../../../assets/web.search.svg?url";
+import ManageConnectionsReactSvgUrl from "../../../../assets/manage.connection.react.svg?url";
 
 import { ServerType } from "../../../../enums";
 import { getOAuthToken } from "../../../../utils/get-oauth-token";

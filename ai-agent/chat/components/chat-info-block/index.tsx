@@ -26,7 +26,7 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import InfoIcon from "PUBLIC_DIR/images/info.outline.react.svg?url";
+import InfoIcon from "../../../../assets/info.outline.react.svg?url";
 
 import PublicRoomBar from "../../../../components/public-room-bar";
 

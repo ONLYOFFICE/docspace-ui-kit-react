@@ -26,11 +26,11 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import BoxDarkSvgUrl from "PUBLIC_DIR/images/thirdparties/box.dark.svg?url";
-import BoxSvgUrl from "PUBLIC_DIR/images/thirdparties/box.svg?url";
+import BoxDarkSvgUrl from "../../assets/thirdparties/box.dark.svg?url";
+import BoxSvgUrl from "../../assets/thirdparties/box.svg?url";
 
-import GitHubDarkSvgUrl from "PUBLIC_DIR/images/thirdparties/github.dark.react.svg?url";
-import GitHubLightSvgUrl from "PUBLIC_DIR/images/thirdparties/github.light.react.svg?url";
+import GitHubDarkSvgUrl from "../../assets/thirdparties/github.dark.react.svg?url";
+import GitHubLightSvgUrl from "../../assets/thirdparties/github.light.react.svg?url";
 
 import { ServerType } from "../../enums";
 

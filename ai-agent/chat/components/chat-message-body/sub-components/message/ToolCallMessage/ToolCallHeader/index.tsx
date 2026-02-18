@@ -31,9 +31,9 @@ import classNames from "classnames";
 import { ReactSVG } from "react-svg";
 import { observer } from "mobx-react";
 
-import ToolFinish from "PUBLIC_DIR/images/tool.finish.svg?url";
-import AlertIcon from "PUBLIC_DIR/images/button.alert.transparent.react.svg?url";
-import ArrowRightIcon from "PUBLIC_DIR/images/arrow.right.react.svg?url";
+import ToolFinish from "../../../../../../../../assets/tool.finish.svg?url";
+import AlertIcon from "../../../../../../../../assets/button.alert.transparent.react.svg?url";
+import ArrowRightIcon from "../../../../../../../../assets/arrow.right.react.svg?url";
 
 import { Loader, LoaderTypes } from "../../../../../../../../components/loader";
 import type { TToolCallContent } from "../../../../../../../../types/ai";

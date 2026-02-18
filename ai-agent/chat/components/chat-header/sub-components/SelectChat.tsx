@@ -28,10 +28,10 @@ import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-import SelectSessionReactSvg from "PUBLIC_DIR/images/select.session.react.svg";
-import RenameReactSvgUrl from "PUBLIC_DIR/images/rename.react.svg?url";
-import RemoveSvgUrl from "PUBLIC_DIR/images/icons/16/catalog.trash.react.svg?url";
-import SaveToFileIconUrl from "PUBLIC_DIR/images/message.save.svg?url";
+import SelectSessionReactSvg from "../../../../../assets/select.session.react.svg";
+import RenameReactSvgUrl from "../../../../../assets/rename.react.svg?url";
+import RemoveSvgUrl from "../../../../../assets/icons/16/catalog.trash.react.svg?url";
+import SaveToFileIconUrl from "../../../../../assets/message.save.svg?url";
 
 import { RectangleSkeleton } from "../../../../../components/rectangle";
 
