@@ -78,4 +78,9 @@ export type IconButtonProps = {
 
   tooltipId?: string;
   tooltipContent?: string;
+
+  /** Tab index for keyboard navigation */
+  tabIndex?: number;
+  /** Sets a callback function triggered on key down */
+  onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
 };
