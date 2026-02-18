@@ -27,16 +27,16 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import SocketHelper, {
+import socket, {
   SocketCommands,
   SocketEvents,
-  TOptSocket,
+  type TOptSocket,
 } from "../../../utils/socket";
 
 import { useApi } from "../../../providers/api";
 import type {
-	FileDtoInteger,
-	FolderDtoInteger,
+  FileDtoInteger,
+  FolderDtoInteger,
 } from "@onlyoffice/docspace-api-sdk";
 
 import type { TSelectorItem } from "../../../components/selector";
@@ -48,8 +48,6 @@ import {
 
 import type { UseSocketHelperProps } from "../types";
 import { SettingsContext } from "../contexts/Settings";
-import socket from "../../../utils/socket";
-
 const useSocketHelper = ({
   disabledItems,
   disabledFolderType,
@@ -73,7 +71,7 @@ const useSocketHelper = ({
     if (!id) {
       const roomParts = [...Array.from(folderSubscribers.current)];
 
-      SocketHelper?.emit(SocketCommands.Unsubscribe, {
+      socket?.emit(SocketCommands.Unsubscribe, {
         roomParts,
         individual: true,
       });
@@ -86,10 +84,10 @@ const useSocketHelper = ({
     const path = `DIR-${id}`;
 
     if (
-      SocketHelper?.socketSubscribers.has(path) &&
+      socket?.socketSubscribers.has(path) &&
       folderSubscribers.current.has(path)
     ) {
-      SocketHelper?.emit(SocketCommands.Unsubscribe, {
+      socket?.emit(SocketCommands.Unsubscribe, {
         roomParts: path,
         individual: true,
       });
@@ -102,7 +100,7 @@ const useSocketHelper = ({
     (id: number | string) => {
       const roomParts = `DIR-${id}`;
 
-      if (SocketHelper?.socketSubscribers.has(roomParts)) {
+      if (socket?.socketSubscribers.has(roomParts)) {
         subscribedId.current = id;
 
         return;
@@ -113,7 +111,7 @@ const useSocketHelper = ({
       folderSubscribers.current.add(roomParts);
       subscribedId.current = id;
 
-      SocketHelper?.emit(SocketCommands.Subscribe, {
+      socket?.emit(SocketCommands.Subscribe, {
         roomParts,
         individual: true,
       });
@@ -387,7 +385,7 @@ const useSocketHelper = ({
 
     initRef.current = true;
 
-    SocketHelper?.on(SocketEvents.ModifyFolder, handleSocketEvent);
+    socket?.on(SocketEvents.ModifyFolder, handleSocketEvent);
 
     return () => {
       socket?.off(SocketEvents.ModifyFolder, handleSocketEvent);

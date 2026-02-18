@@ -136,7 +136,7 @@ const useLoadersHelper = ({ withInit }: { withInit?: boolean }) => {
 
   React.useEffect(() => {
     calculateBreadCrumbsLoader();
-  }, [isBreadCrumbsLoading, calculateBreadCrumbsLoader]);
+  }, [calculateBreadCrumbsLoader]);
 
   return {
     isBreadCrumbsLoading,
