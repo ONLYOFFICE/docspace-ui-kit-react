@@ -23,10 +23,33 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { SelectorAccessRightsMode } from "./Selector.enums";
 
-export { Selector } from "./Selector";
+import { createContext, type ReactNode } from "react";
 
-export * from "./Selector.types";
-export { SelectorAccessRightsMode };
-export { SearchLoader, RowLoader, BreadCrumbsLoader } from "./sub-components/loaders";
+import useLoadersHelper from "../hooks/useLoadersHelper";
+
+type TLoaderContext = ReturnType<typeof useLoadersHelper>;
+
+export const LoadersContext = createContext<TLoaderContext>({
+  isFirstLoad: true,
+  isBreadCrumbsLoading: true,
+  isNextPageLoading: false,
+  showBreadCrumbsLoader: true,
+  showLoader: true,
+
+  setIsBreadCrumbsLoading: () => {},
+  setIsFirstLoad: () => {},
+  setIsNextPageLoading: () => {},
+});
+
+export const LoadersContextProvider = ({
+  children,
+  withInit,
+}: {
+  children: ReactNode;
+  withInit?: boolean;
+}) => {
+  const value = useLoadersHelper({ withInit });
+
+  return <LoadersContext value={value}>{children}</LoadersContext>;
+};

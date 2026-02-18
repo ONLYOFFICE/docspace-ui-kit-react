@@ -23,10 +23,57 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { SelectorAccessRightsMode } from "./Selector.enums";
 
-export { Selector } from "./Selector";
+import React from "react";
 
-export * from "./Selector.types";
-export { SelectorAccessRightsMode };
-export { SearchLoader, RowLoader, BreadCrumbsLoader } from "./sub-components/loaders";
+import {
+  RectangleSkeleton,
+  RectangleSkeletonProps,
+} from "../../../rectangle";
+
+import styles from "./BreadCrumbsLoader.module.scss";
+
+interface BreadCrumbsLoaderProps extends RectangleSkeletonProps {
+  id?: string;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+const BreadCrumbsLoader = ({ style, ...rest }: BreadCrumbsLoaderProps) => {
+  return (
+    <div className={styles.container} data-testid="bread-crumbs-loader">
+      <RectangleSkeleton
+        width="80px"
+        height="22px"
+        style={{ ...style }}
+        {...rest}
+      />
+      <RectangleSkeleton
+        width="12px"
+        height="12px"
+        style={{ ...style }}
+        {...rest}
+      />
+      <RectangleSkeleton
+        width="80px"
+        height="22px"
+        style={{ ...style }}
+        {...rest}
+      />
+      <RectangleSkeleton
+        width="12px"
+        height="12px"
+        style={{ ...style }}
+        {...rest}
+      />
+      <RectangleSkeleton
+        width="80px"
+        height="22px"
+        style={{ ...style }}
+        {...rest}
+      />
+    </div>
+  );
+};
+
+export default BreadCrumbsLoader;

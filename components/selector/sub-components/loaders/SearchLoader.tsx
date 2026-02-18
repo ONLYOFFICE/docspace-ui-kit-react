@@ -23,10 +23,42 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { SelectorAccessRightsMode } from "./Selector.enums";
 
-export { Selector } from "./Selector";
+import React from "react";
+import classNames from "classnames";
 
-export * from "./Selector.types";
-export { SelectorAccessRightsMode };
-export { SearchLoader, RowLoader, BreadCrumbsLoader } from "./sub-components/loaders";
+import {
+  RectangleSkeleton,
+  RectangleSkeletonProps,
+} from "../../../rectangle";
+
+import styles from "./SearchLoader.module.scss";
+
+interface SearchLoaderProps extends RectangleSkeletonProps {
+  id?: string;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+const SearchLoader = ({
+  className,
+  style,
+
+  ...rest
+}: SearchLoaderProps) => {
+  return (
+    <RectangleSkeleton
+      height="32px"
+      className={classNames(styles.search, className)}
+      style={{
+        paddingBlock: "0",
+        paddingInline: "16px 0",
+        marginBottom: "8px",
+        ...style,
+      }}
+      {...rest}
+    />
+  );
+};
+
+export default SearchLoader;

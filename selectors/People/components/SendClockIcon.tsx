@@ -23,10 +23,20 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { SelectorAccessRightsMode } from "./Selector.enums";
 
-export { Selector } from "./Selector";
+import React from "react";
+import classNames from "classnames";
+import SendClockIcon from "PUBLIC_DIR/images/send.clock.react.svg";
+import styles from "../PeopleSelector.module.scss";
 
-export * from "./Selector.types";
-export { SelectorAccessRightsMode };
-export { SearchLoader, RowLoader, BreadCrumbsLoader } from "./sub-components/loaders";
+interface SendClockIconProps {
+  className?: string;
+}
+
+const StyledSendClockIcon: React.FC<SendClockIconProps> = ({ className }) => {
+  return (
+    <SendClockIcon className={classNames(styles.sendClockIcon, className)} />
+  );
+};
+
+export default StyledSendClockIcon;

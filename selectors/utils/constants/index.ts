@@ -23,10 +23,10 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { SelectorAccessRightsMode } from "./Selector.enums";
 
-export { Selector } from "./Selector";
+export const SHOW_LOADER_TIMER = 200;
+export const MIN_LOADER_TIMER = 500;
 
-export * from "./Selector.types";
-export { SelectorAccessRightsMode };
-export { SearchLoader, RowLoader, BreadCrumbsLoader } from "./sub-components/loaders";
+export const PAGE_COUNT = 100;
+
+export const DEFAULT_FILE_EXTS = "file";

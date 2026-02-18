@@ -23,10 +23,54 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { SelectorAccessRightsMode } from "./Selector.enums";
 
-export { Selector } from "./Selector";
+import type { FolderDtoInteger, RoomType } from "@onlyoffice/docspace-api-sdk";
 
-export * from "./Selector.types";
-export { SelectorAccessRightsMode };
-export { SearchLoader, RowLoader, BreadCrumbsLoader } from "./sub-components/loaders";
+import type { WithFlag } from "../../types";
+import type {
+  TSelectorCancelButton,
+  TSelectorHeader,
+  TSelectorItem,
+  TSelectorWithAside,
+} from "../../components/selector";
+
+import type { RoomSearchArea } from "../../enums";
+
+export type TInitValue = WithFlag<
+  "withInit",
+  {
+    withInit: true;
+    initItems: FolderDtoInteger[];
+    initTotal: number;
+    initHasNextPage: boolean;
+    initSearchValue?: string;
+  }
+>;
+
+export type RoomSelectorProps = TSelectorHeader &
+  TSelectorCancelButton &
+  TSelectorWithAside & {
+    id?: string;
+    className?: string;
+    style?: React.CSSProperties;
+
+    isMultiSelect: boolean;
+
+    onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
+    roomType?: RoomType | RoomType[];
+    searchArea?: RoomSearchArea | string;
+    excludeItems?: (number | string | undefined)[];
+    setIsDataReady?: (value: boolean) => void;
+    submitButtonLabel?: string;
+
+    disableThirdParty?: boolean;
+
+    withPadding?: boolean;
+    withSearch?: boolean;
+    withCreate?: boolean;
+    createDefineRoomLabel?: string;
+    createDefineRoomType?: RoomType;
+
+    emptyScreenHeader?: string;
+    emptyScreenDescription?: string;
+  } & TInitValue;

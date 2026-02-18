@@ -247,10 +247,7 @@ declare global {
     timezone: string;
     __systemTooltipRef?: React.RefObject<TooltipRefProps | null>;
     i18n?: {
-      t?: (
-        key: string,
-        options?: Record<string, string | number>,
-      ) => string;
+      t?: (key: string, options?: Record<string, string | number>) => string;
       inLoad: { url: string; callbacks: Function[] }[];
       loaded: Record<
         string,

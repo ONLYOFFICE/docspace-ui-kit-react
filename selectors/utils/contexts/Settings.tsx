@@ -23,10 +23,56 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { SelectorAccessRightsMode } from "./Selector.enums";
 
-export { Selector } from "./Selector";
+import { createContext, useMemo, type ReactNode } from "react";
 
-export * from "./Selector.types";
-export { SelectorAccessRightsMode };
-export { SearchLoader, RowLoader, BreadCrumbsLoader } from "./sub-components/loaders";
+import type { FilesSettingsDto } from "@onlyoffice/docspace-api-sdk";
+import type { TGetIcon } from "../types";
+import useFilesSettings from "../hooks/useFilesSettings";
+
+export const SettingsContext = createContext<{
+  getIcon: (fileExst: string) => string;
+  filesSettingsLoading: boolean;
+  extsWebEdited: string[];
+  displayFileExtension: boolean;
+}>({
+  getIcon: () => "",
+  extsWebEdited: [],
+  filesSettingsLoading: false,
+  displayFileExtension: false,
+});
+
+export const SettingsContextProvider = ({
+  settings,
+  getIcon: getIconProp,
+  children,
+}: {
+  settings?: FilesSettingsDto;
+  getIcon?: TGetIcon;
+  children: ReactNode;
+}) => {
+  const { getIcon, extsWebEdited, isLoading, displayFileExtension } =
+    useFilesSettings(getIconProp, settings);
+
+  let displayExts = displayFileExtension;
+
+  if (
+    typeof window !== "undefined" &&
+    window.DocSpace &&
+    "displayFileExtension" in window.DocSpace
+  ) {
+    displayExts = window.DocSpace.displayFileExtension as boolean;
+  }
+
+  const value = useMemo(
+    () => ({
+      getIcon,
+      extsWebEdited: extsWebEdited ?? [],
+      filesSettingsLoading: isLoading!,
+      displayFileExtension: displayExts ?? false,
+    }),
+    [getIcon, extsWebEdited, isLoading, displayExts],
+  );
+
+  return <SettingsContext value={value}>{children}</SettingsContext>;
+};

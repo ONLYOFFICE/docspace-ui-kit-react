@@ -32,6 +32,9 @@ import {
 	Configuration,
 	ProfilesApi,
 	CommonSettingsApi,
+	FoldersApi,
+	RoomsApi,
+	FilesApi,
 } from "@onlyoffice/docspace-api-sdk";
 
 export type TApiProvider = {
@@ -43,6 +46,9 @@ export type TApiProvider = {
 export type TApiContext = {
 	profilesApi: ProfilesApi;
 	commonSettingsApi: CommonSettingsApi;
+	foldersApi: FoldersApi;
+	roomsApi: RoomsApi;
+	filesApi: FilesApi;
 };
 
 const ApiContext = React.createContext<TApiContext | null>(null);
@@ -68,6 +74,9 @@ const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
 		return {
 			profilesApi: new ProfilesApi(configuration),
 			commonSettingsApi: new CommonSettingsApi(configuration),
+			foldersApi: new FoldersApi(configuration),
+			roomsApi: new RoomsApi(configuration),
+			filesApi: new FilesApi(configuration),
 		};
 	}, [url, apiKey]);
 

@@ -23,10 +23,24 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { SelectorAccessRightsMode } from "./Selector.enums";
 
-export { Selector } from "./Selector";
+import type {
+  TAccessRight,
+  TSelectorHeader,
+  TSelectorWithAside,
+  TSelectorItem,
+} from "../../components/selector";
 
-export * from "./Selector.types";
-export { SelectorAccessRightsMode };
-export { SearchLoader, RowLoader, BreadCrumbsLoader } from "./sub-components/loaders";
+export type GroupsSelectorProps = TSelectorHeader &
+  TSelectorWithAside & {
+    id?: string;
+    className?: string;
+    onSubmit: (
+      selectedItems: TSelectorItem[],
+      access?: TAccessRight | null,
+      fileName?: string,
+      isFooterCheckboxChecked?: boolean,
+    ) => void | Promise<void>;
+  };
+
+export type GroupsSelectorItem = Pick<TSelectorItem, "id" | "label">;

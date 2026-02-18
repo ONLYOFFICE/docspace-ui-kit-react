@@ -28,7 +28,8 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import InfiniteLoader from "react-window-infinite-loader";
 import { VariableSizeList as List } from "react-window";
 import classNames from "classnames";
-import { RoomsType } from "../../../enums";
+import { RoomType } from "@onlyoffice/docspace-api-sdk";
+
 import type { Nullable } from "../../../types";
 import styles from "../Selector.module.scss";
 import { Scrollbar } from "../../scrollbar";
@@ -143,8 +144,8 @@ const Body = ({
 		itemsCount === 0 &&
 		!isSearch &&
 		Boolean(items?.[0]?.isRoomsOnly) &&
-		(Boolean(items?.[0]?.createDefineRoomType === RoomsType.FormRoom) ||
-			Boolean(items?.[0]?.createDefineRoomType === RoomsType.VirtualDataRoom));
+		(Boolean(items?.[0]?.createDefineRoomType === RoomType.FillingFormsRoom) ||
+			Boolean(items?.[0]?.createDefineRoomType === RoomType.VirtualDataRoom));
 
 	const visibleInfoBar = !isShareFormEmpty && !isBreadCrumbsLoading;
 

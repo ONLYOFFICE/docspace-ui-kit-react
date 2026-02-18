@@ -23,10 +23,65 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { SelectorAccessRightsMode } from "./Selector.enums";
 
-export { Selector } from "./Selector";
+import { FolderType, type FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import type { TSelectorItem } from "../../components/selector";
 
-export * from "./Selector.types";
-export { SelectorAccessRightsMode };
-export { SearchLoader, RowLoader, BreadCrumbsLoader } from "./sub-components/loaders";
+export const convertToItems = (folders: FolderDtoInteger[]) => {
+	const items: TSelectorItem[] = folders.map((folder) => {
+		const {
+			id,
+			title,
+			roomType,
+			logo,
+			shared,
+			parentId,
+			filesCount,
+			foldersCount,
+			rootFolderType,
+			security,
+
+			denyDownload,
+			indexing,
+			lifetime,
+			watermark,
+			tags,
+			quotaLimit,
+		} = folder;
+
+		const icon = logo.medium;
+		const iconOriginal = logo.original;
+		const { color } = logo;
+		const cover = logo?.cover;
+		const isTemplate = rootFolderType === FolderType.RoomTemplates;
+
+		return {
+			id,
+			label: title,
+			icon,
+			iconOriginal,
+			color,
+			roomType,
+			shared,
+			isFolder: true,
+			parentId,
+			filesCount,
+			foldersCount,
+			rootFolderType,
+			security,
+			cover,
+			isTemplate,
+			logo,
+
+			title,
+			denyDownload,
+			indexing,
+			lifetime,
+			watermark,
+			tags,
+			quotaLimit,
+		};
+	});
+
+	return items;
+};

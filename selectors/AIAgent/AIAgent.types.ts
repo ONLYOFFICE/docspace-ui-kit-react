@@ -23,10 +23,34 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { SelectorAccessRightsMode } from "./Selector.enums";
 
-export { Selector } from "./Selector";
+import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import type { TSelectorItem } from "../../components/selector";
+import type { WithFlag } from "../../types";
 
-export * from "./Selector.types";
-export { SelectorAccessRightsMode };
-export { SearchLoader, RowLoader, BreadCrumbsLoader } from "./sub-components/loaders";
+export type TInitValue = WithFlag<
+  "withInit",
+  {
+    withInit: true;
+    initItems: FolderDtoInteger[];
+    initTotal: number;
+    initHasNextPage: boolean;
+    initSearchValue?: string;
+  }
+>;
+
+export type AIAgentSelectorProps = {
+  id?: string;
+  className?: string;
+  style?: React.CSSProperties;
+
+  onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
+  excludeItems?: (number | string | undefined)[];
+  setIsDataReady?: (value: boolean) => void;
+
+  withPadding?: boolean;
+
+  onClose: () => void;
+
+  disableBySecurity?: string;
+} & TInitValue;

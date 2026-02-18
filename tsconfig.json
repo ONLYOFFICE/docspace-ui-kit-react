@@ -36,7 +36,8 @@
     "assets/**/*",
     "utils/**/*",
     "styles/**/*",
-    "providers/**/*"
+    "providers/**/*",
+    "selectors/**/*"
   ],
   "exclude": [
     "node_modules",
