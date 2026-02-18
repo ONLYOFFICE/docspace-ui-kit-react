@@ -247,35 +247,38 @@ export type TViewAs =
 	| "tileDynamicHeight";
 
 declare global {
-	interface Window {
-		timezone: string;
-		__systemTooltipRef?: React.RefObject<TooltipRefProps | null>;
-		i18n?: {
-			t?: (key: string, options?: Record<string, string | number>) => string;
-			inLoad: { url: string; callbacks: Function[] }[];
-			loaded: Record<
-				string,
-				{ data: Record<string, string>; namespaces: string }
-			>;
-		};
-		AscDesktopEditor?: {
-			execCommand: (key: string, value: string) => void;
-			cloudCryptoCommand: (
-				key: string,
-				value: unknown,
-				callback: unknown,
-			) => void;
-			getViewportSettings?: () => {
-				widgetType: "window" | "tab";
-				captionHeight: number;
-			};
-			onViewportSettingsChanged?: VoidFunction;
-			attachEvent?: (listener: string, callback: VoidFunction) => void;
-		};
-		RendererProcessVariable?: {
-			theme?: { id: string; system: string; type: string; addlocal: string };
-		};
-	}
+  interface Window {
+    timezone: string;
+    __systemTooltipRef?: React.RefObject<TooltipRefProps | null>;
+    i18n?: {
+      t?: (key: string, options?: Record<string, string | number>) => string;
+      inLoad: { url: string; callbacks: Function[] }[];
+      loaded: Record<
+        string,
+        { data: Record<string, string>; namespaces: string }
+      >;
+    };
+    AscDesktopEditor?: {
+      execCommand: (key: string, value: string) => void;
+      cloudCryptoCommand: (
+        key: string,
+        value: unknown,
+        callback: unknown,
+      ) => void;
+      getViewportSettings?: () => {
+        widgetType: "window" | "tab";
+        captionHeight: number;
+      };
+      onViewportSettingsChanged?: VoidFunction;
+      attachEvent?: (listener: string, callback: VoidFunction) => void;
+    };
+    RendererProcessVariable?: {
+      theme?: { id: string; system: string; type: string; addlocal: string };
+    };
+    logs: {
+      socket: string[];
+    };
+  }
 }
 export type TShareSettings = {
 	ExternalLink?: number;

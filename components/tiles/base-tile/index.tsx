@@ -59,7 +59,6 @@ export const BaseTile = ({
   isEdit,
   topContent,
   bottomContent,
-  isHovered,
   onHover,
   onLeave,
   className,
@@ -161,9 +160,7 @@ export const BaseTile = ({
     [styles.checked]: checked,
   });
 
-  const contentClassNames = classNames(styles.content, "content", {
-    [styles.isHovered]: isHovered,
-  });
+  const contentClassNames = classNames(styles.content, "content");
 
   return (
     <div
@@ -171,16 +168,13 @@ export const BaseTile = ({
       onClick={onRoomClick}
       onContextMenu={onContextMenu}
       data-testid={dataTestId ?? "tile"}
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
     >
       <div className={styles.topContent}>
         {element && !isEdit ? (
           !inProgress ? (
-            <div
-              className={iconContainerClassNames}
-              ref={checkboxContainerRef}
-              onMouseEnter={onHover}
-              onMouseLeave={onLeave}
-            >
+            <div className={iconContainerClassNames} ref={checkboxContainerRef}>
               <div className={iconClassNames} onClick={onRoomIconClick}>
                 {element}
               </div>
@@ -203,11 +197,7 @@ export const BaseTile = ({
 
         <div className={contentClassNames}>{topContent}</div>
 
-        <div
-          className={styles.optionButton}
-          onMouseEnter={onHover}
-          onMouseLeave={onLeave}
-        >
+        <div className={styles.optionButton}>
           {renderContext ? (
             <ContextMenuButton
               isFill

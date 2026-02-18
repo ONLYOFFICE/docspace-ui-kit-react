@@ -40,6 +40,7 @@ import { ModalSubComponentsProps } from "../ModalDialog.types";
 const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";
 
 const Modal = ({
+  ref,
   id,
   style,
   className,
@@ -104,7 +105,10 @@ const Modal = ({
     ? (header?.props as { className?: string })
     : { className: "" };
   const bodyProps = React.isValidElement(body)
-    ? (body?.props as { className?: string })
+    ? (body?.props as {
+        className?: string;
+        ref?: React.RefObject<HTMLDivElement | null>;
+      })
     : { className: "" };
   const footerProps = React.isValidElement(footer)
     ? (footer?.props as { className?: string })
@@ -193,6 +197,7 @@ const Modal = ({
   return (
     <div
       id={id}
+      ref={ref}
       className={classNames(styles.modal, {
         [styles.modalActive]: visible,
       })}

@@ -24,63 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useEffect } from "react";
-import { Meta, StoryFn } from "@storybook/react-vite";
-import { TopLoaderService } from "./index";
+import { useEffect, useEffectEvent } from "react";
 
-export default {
-  title: "Components/Layout components/TopLoader",
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "A top loading indicator that shows progress at the top of the page",
-      },
-    },
-  },
-} as Meta;
+export const useUnmount = (func: VoidFunction) => {
+  const onUnmount = useEffectEvent(func);
 
-const Template: StoryFn = () => {
   useEffect(() => {
-    // Create the progress bar element
-    const progressBar = document.createElement("div");
-    progressBar.id = "ipl-progress-indicator";
-    progressBar.style.position = "fixed";
-    progressBar.style.top = "0";
-    progressBar.style.left = "0";
-    progressBar.style.height = "2px";
-    progressBar.style.backgroundColor = "#2DA7DB";
-    progressBar.style.transition = "width 0.2s ease-in-out";
-    document.body.appendChild(progressBar);
-
     return () => {
-      if (document.body.contains(progressBar)) {
-        document.body.removeChild(progressBar);
-      }
+      onUnmount();
     };
   }, []);
-
-  return (
-    <div style={{ padding: "20px" }}>
-      <button type="button" onClick={() => TopLoaderService.start()}>
-        Start Loading
-      </button>
-      <button
-        type="button"
-        onClick={() => TopLoaderService.end()}
-        style={{ marginLeft: "10px" }}
-      >
-        End Loading
-      </button>
-    </div>
-  );
-};
-
-export const Default = Template.bind({});
-Default.parameters = {
-  docs: {
-    description: {
-      story: "Default top loader with start, end, and cancel controls",
-    },
-  },
 };

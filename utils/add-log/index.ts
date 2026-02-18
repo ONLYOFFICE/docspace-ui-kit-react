@@ -26,25 +26,15 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import React from "react";
-import { describe, it, expect, beforeAll } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { Settings } from "luxon";
-import { getWeekdayElements } from "./index";
+export const addLog = (log: string, category: "socket") => {
+  if (!window.ClientConfig?.logs?.enableLogs) return;
 
-describe("getWeekdayElements", () => {
-  beforeAll(() => {
-    Settings.defaultLocale = "en-US";
-  });
+  if (window.ClientConfig.logs.logsToConsole) console.log(log);
+  else {
+    if (!window.logs) window.logs = { socket: [] };
 
-  it("should render weekday names", () => {
-    const elements = getWeekdayElements();
-    render(<>{elements}</>);
+    if (!window.logs[category]) window.logs[category] = [];
 
-    const m = screen.getAllByText("M");
-    expect(m.length).toBeGreaterThan(0);
-
-    const t = screen.getAllByText("T");
-    expect(t.length).toBeGreaterThan(1); // Tue, Thu
-  });
-});
+    window.logs[category].push(log);
+  }
+};
