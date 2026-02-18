@@ -43,126 +43,132 @@ import { CHAT_SUPPORTED_FORMATS } from "./Chat.constants";
 export { CHAT_SUPPORTED_FORMATS };
 
 const Chat = observer(
-	({
-		isLoadingChat,
-		selectedModel,
-		getIcon,
-		roomId,
-		userAvatar,
-		attachmentFile,
-		clearAttachmentFile,
-		toolsSettings,
-		isAdmin = false,
-		standalone = false,
-		aiReady = false,
-		getResultStorageId,
-		setIsAIAgentChatDelete,
-		setDeleteDialogVisible,
-		folderFormValidation,
-		multimodal,
-	}: ChatProps & { isLoadingChat: boolean }) => {
-		const { currentChat } = useChatStore();
+  ({
+    isLoadingChat,
+    selectedModel,
+    getIcon,
+    roomId,
+    userAvatar,
+    attachmentFile,
+    clearAttachmentFile,
+    toolsSettings,
+    isAdmin = false,
+    standalone = false,
+    aiReady = false,
+    getResultStorageId,
+    setIsAIAgentChatDelete,
+    setDeleteDialogVisible,
+    folderFormValidation,
+    multimodal,
+    goToAISettings,
+    goToWebSearchSettings,
+  }: ChatProps & { isLoadingChat: boolean }) => {
+    const { currentChat } = useChatStore();
 
-		const showEmptyScreen = !isLoadingChat && !aiReady && !currentChat;
+    const showEmptyScreen = !isLoadingChat && !aiReady && !currentChat;
 
-		React.useEffect(() => {
-			window.dispatchEvent(
-				new CustomEvent("select-chat", {
-					detail: {
-						chatId: currentChat?.id,
-					},
-				}),
-			);
-		}, [currentChat?.id]);
+    React.useEffect(() => {
+      window.dispatchEvent(
+        new CustomEvent("select-chat", {
+          detail: {
+            chatId: currentChat?.id,
+          },
+        }),
+      );
+    }, [currentChat?.id]);
 
-		return (
-			<>
-				<ChatHeader
-					selectedModel={selectedModel}
-					isLoading={isLoadingChat}
-					getIcon={getIcon}
-					getResultStorageId={getResultStorageId}
-					roomId={roomId}
-					aiReady={aiReady}
-					setIsAIAgentChatDelete={setIsAIAgentChatDelete}
-					setDeleteDialogVisible={setDeleteDialogVisible}
-					folderFormValidation={folderFormValidation}
-				/>
-				{showEmptyScreen ? (
-					<ChatNoAccessScreen
-						aiReady={aiReady}
-						standalone={standalone}
-						isPortalAdmin={isAdmin}
-					/>
-				) : (
-					<>
-						<ChatMessageBody
-							userAvatar={userAvatar}
-							isLoading={isLoadingChat}
-							getIcon={getIcon}
-							getResultStorageId={getResultStorageId}
-							folderFormValidation={folderFormValidation}
-						/>
-						<ChatFooter
-							attachmentFile={attachmentFile}
-							clearAttachmentFile={clearAttachmentFile}
-							isLoading={isLoadingChat}
-							getIcon={getIcon}
-							selectedModel={selectedModel}
-							toolsSettings={toolsSettings}
-							isPortalAdmin={isAdmin}
-							aiReady={aiReady}
-							standalone={standalone}
-							multimodal={multimodal}
-						/>
-					</>
-				)}
-			</>
-		);
-	},
+    return (
+      <>
+        <ChatHeader
+          selectedModel={selectedModel}
+          isLoading={isLoadingChat}
+          getIcon={getIcon}
+          getResultStorageId={getResultStorageId}
+          roomId={roomId}
+          aiReady={aiReady}
+          setIsAIAgentChatDelete={setIsAIAgentChatDelete}
+          setDeleteDialogVisible={setDeleteDialogVisible}
+          folderFormValidation={folderFormValidation}
+        />
+        {showEmptyScreen ? (
+          <ChatNoAccessScreen
+            aiReady={aiReady}
+            standalone={standalone}
+            isPortalAdmin={isAdmin}
+            goToAISettings={goToAISettings}
+          />
+        ) : (
+          <>
+            <ChatMessageBody
+              userAvatar={userAvatar}
+              isLoading={isLoadingChat}
+              getIcon={getIcon}
+              getResultStorageId={getResultStorageId}
+              folderFormValidation={folderFormValidation}
+            />
+            <ChatFooter
+              attachmentFile={attachmentFile}
+              clearAttachmentFile={clearAttachmentFile}
+              isLoading={isLoadingChat}
+              getIcon={getIcon}
+              selectedModel={selectedModel}
+              toolsSettings={toolsSettings}
+              isPortalAdmin={isAdmin}
+              aiReady={aiReady}
+              standalone={standalone}
+              multimodal={multimodal}
+              goToWebSearchSettings={goToWebSearchSettings}
+            />
+          </>
+        )}
+      </>
+    );
+  },
 );
 
 const ChatWrapper = (props: ChatProps) => {
-	const {
-		roomId,
-		isLoading,
+  const {
+    roomId,
+    isLoading,
 
-		initChats,
+    initChats,
 
-		messagesSettings,
+    messagesSettings,
 
-		isAdmin = false,
-		standalone = false,
-		aiReady = false,
-		multimodal,
-	} = props;
+    isAdmin = false,
+    standalone = false,
+    aiReady = false,
+    multimodal,
+    goToAISettings,
+  } = props;
 
-	const isLoadingChat = isLoading || !roomId;
-	const hasChats = initChats?.chats?.length > 0;
+  const isLoadingChat = isLoading || !roomId;
+  const hasChats = initChats?.chats?.length > 0;
 
-	if (!isLoadingChat && !aiReady && !hasChats) {
-		return (
-			<ChatNoAccessScreen
-				aiReady={aiReady}
-				standalone={standalone}
-				isPortalAdmin={isAdmin}
-			/>
-		);
-	}
+  if (!isLoadingChat && !aiReady && !hasChats) {
+    return (
+      <ChatNoAccessScreen
+        aiReady={aiReady}
+        standalone={standalone}
+        isPortalAdmin={isAdmin}
+        goToAISettings={goToAISettings}
+      />
+    );
+  }
 
-	return (
-		<ChatStoreContextProvider roomId={roomId} {...initChats}>
-			<MessageStoreContextProvider
-				roomId={roomId}
-				{...messagesSettings}
-				multimodal={multimodal}
-			>
-				<ChatContainer isLoadingChat={isLoadingChat}>
-					<Chat {...props} isLoadingChat={isLoadingChat} />
-				</ChatContainer>
-			</MessageStoreContextProvider>
-		</ChatStoreContextProvider>
-	);
+  return (
+    <ChatStoreContextProvider roomId={roomId} {...initChats}>
+      <MessageStoreContextProvider
+        roomId={roomId}
+        {...messagesSettings}
+        multimodal={multimodal}
+      >
+        <ChatContainer isLoadingChat={isLoadingChat}>
+          <Chat {...props} isLoadingChat={isLoadingChat} />
+        </ChatContainer>
+      </MessageStoreContextProvider>
+    </ChatStoreContextProvider>
+  );
 };
 
 export default ChatWrapper;

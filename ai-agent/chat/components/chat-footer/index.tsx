@@ -42,6 +42,7 @@ const ChatFooter = ({
   selectedModel,
   toolsSettings,
   multimodal,
+  goToWebSearchSettings,
 }: ChatFooterProps) => {
   return (
     <div className={styles.chatFooter} data-testid="chat-footer">
@@ -58,6 +59,7 @@ const ChatFooter = ({
         isPortalAdmin={isPortalAdmin}
         aiReady={aiReady}
         multimodal={multimodal}
+        goToWebSearchSettings={goToWebSearchSettings}
       />
     </div>
   );

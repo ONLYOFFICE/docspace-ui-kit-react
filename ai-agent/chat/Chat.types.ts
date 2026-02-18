@@ -170,6 +170,7 @@ export type ButtonsProps = {
   toolsSettings: ReturnType<typeof useToolsSettings>;
   isAdmin?: boolean;
   aiReady: boolean;
+  goToWebSearchSettings?: () => void;
 };
 
 export type AttachmentProps = {
@@ -192,6 +193,7 @@ export type ChatInputProps = {
   isPortalAdmin: boolean;
   aiReady: boolean;
   multimodal?: TMultimodal;
+  goToWebSearchSettings?: () => void;
 };
 
 export type ChatInfoBlockProps = {
@@ -233,4 +235,6 @@ export type ChatProps = {
   folderFormValidation: RegExp;
 
   multimodal?: TMultimodal;
+  goToAISettings?: () => void;
+  goToWebSearchSettings?: () => void;
 };

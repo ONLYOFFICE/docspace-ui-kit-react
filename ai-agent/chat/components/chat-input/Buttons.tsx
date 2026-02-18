@@ -51,6 +51,7 @@ const Buttons = ({
   toolsSettings,
   isAdmin,
   aiReady,
+  goToWebSearchSettings,
 }: ButtonsProps) => {
   const { isRequestRunning, stopMessage } = useMessageStore();
 
@@ -99,7 +100,12 @@ const Buttons = ({
             data-testid="chat-input-attachment-button"
           />
         </TooltipContainer>
-        <ToolsSettings {...toolsSettings} isAdmin={isAdmin} aiReady={aiReady} />
+        <ToolsSettings
+          {...toolsSettings}
+          isAdmin={isAdmin}
+          aiReady={aiReady}
+          goToWebSearchSettings={goToWebSearchSettings}
+        />
       </div>
       <IconButton
         iconName={SendReactSvgUrl}

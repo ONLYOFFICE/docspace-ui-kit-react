@@ -56,6 +56,7 @@ const ChatInput = ({
   isPortalAdmin,
   aiReady,
   multimodal,
+  goToWebSearchSettings,
 }: ChatInputProps) => {
   const { t } = useTranslation(["Common"]);
 
@@ -306,6 +307,7 @@ const ChatInput = ({
               toolsSettings={toolsSettings}
               isAdmin={isPortalAdmin}
               aiReady={aiReady}
+              goToWebSearchSettings={goToWebSearchSettings}
             />
           </>
         )}

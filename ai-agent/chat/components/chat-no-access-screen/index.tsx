@@ -24,9 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useCallback } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
 
 import ChatNoAccessRightsDarkIcon from "PUBLIC_DIR/images/emptyview/empty.chat.access.rights.dark.svg";
 import ChatNoAccessRightsLightIcon from "PUBLIC_DIR/images/emptyview/empty.chat.access.rights.light.svg";
@@ -39,16 +38,17 @@ type Props = {
   aiReady: boolean;
   standalone: boolean;
   isPortalAdmin: boolean;
+  goToAISettings?: () => void;
 };
 
 export const ChatNoAccessScreen = ({
   aiReady,
   isPortalAdmin,
   standalone,
+  goToAISettings,
 }: Props) => {
   const { t } = useTranslation("Common");
   const { isBase } = useTheme();
-  const navigate = useNavigate();
 
   const icon = isBase ? (
     <ChatNoAccessRightsLightIcon />
@@ -85,33 +85,26 @@ export const ChatNoAccessScreen = ({
     )
     .otherwise(() => "");
 
-  const onGoToServices = useCallback(() => {
-    return navigate("/portal-settings/services");
-  }, []);
-
-  const onGoToAIProviderSettings = useCallback(() => {
-    return navigate("/portal-settings/ai-settings/providers");
-  }, []);
-
   const goToServices = {
     type: "button",
     title: t("Common:GoToSettings"),
     key: "go-to-services",
-    onClick: onGoToServices,
+    onClick: goToAISettings,
   } as const;
 
   const goToAIProviderSettings = {
     type: "button",
     title: t("Common:GoToSettings"),
     key: "go-to-ai-provider-settings",
-    onClick: onGoToAIProviderSettings,
+    onClick: goToAISettings,
   } as const;
 
-  const options = !isPortalAdmin
-    ? []
-    : standalone
-      ? [goToAIProviderSettings]
-      : [goToServices];
+  const options =
+    !isPortalAdmin || !goToAISettings
+      ? []
+      : standalone
+        ? [goToAIProviderSettings]
+        : [goToServices];
 
   return (
     <EmptyView

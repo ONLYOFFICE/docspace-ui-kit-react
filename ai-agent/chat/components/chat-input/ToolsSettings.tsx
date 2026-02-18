@@ -28,7 +28,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 import classNames from "classnames";
-import { useNavigate } from "react-router";
 
 import { Portal } from "../../../../components/portal";
 
@@ -84,12 +83,13 @@ const ToolsSettings = ({
   setWebSearchEnabled,
   isAdmin,
   aiReady,
+  goToWebSearchSettings,
 }: ReturnType<typeof useToolsSettings> & {
   isAdmin?: boolean;
   aiReady: boolean;
+  goToWebSearchSettings?: () => void;
 }) => {
   const { t } = useTranslation(["Common"]);
-  const navigate = useNavigate();
 
   const { roomId } = useChatStore();
   const {
@@ -160,10 +160,6 @@ const ToolsSettings = ({
     },
     [MCPTools, roomId, setMCPTools],
   );
-
-  const onGoToWebSearchPage = React.useCallback(() => {
-    navigate("/portal-settings/ai-settings/search");
-  }, [navigate]);
 
   const openOauthWindow = async (serverId: string, type: string) => {
     const url = await openConnectWindow(type);
@@ -345,7 +341,7 @@ const ToolsSettings = ({
                 type={LinkType.action}
                 isHovered
                 fontWeight={600}
-                onClick={onGoToWebSearchPage}
+                onClick={goToWebSearchSettings}
                 dataTestId="go-to-settings-link"
               >
                 {t("Common:GoToSettings")}
@@ -391,7 +387,7 @@ const ToolsSettings = ({
     toggleTool,
     webSearchEnabled,
     webSearchAvailable,
-    onGoToWebSearchPage,
+    goToWebSearchSettings,
     onWebSearchToggle,
   ]);
 
