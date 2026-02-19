@@ -395,13 +395,22 @@ export default class MessageStore {
     this.replaceLastMessage(newMsg);
   };
 
-  handleStreamError = (jsonData: string) => {
+  handleStreamError = (jsonData: string, error?: unknown) => {
     this.setIsStreamRunning(true);
     let message = "";
     try {
       message = JSON.parse(jsonData).message;
     } catch {
       message = jsonData;
+    }
+
+    if (!message && error) {
+      message =
+        typeof error === "object" &&
+        "message" in error &&
+        typeof error.message === "string"
+          ? error.message
+          : "";
     }
 
     const newMsg: TMessage = {
@@ -456,7 +465,10 @@ export default class MessageStore {
           const jsonData = JSON.parse(decodedChunk);
 
           if (jsonData.error) {
-            this.handleStreamError(JSON.stringify(jsonData.error));
+            this.handleStreamError(
+              JSON.stringify(jsonData.error),
+              jsonData.error,
+            );
 
             reader.cancel();
 
@@ -602,7 +614,7 @@ export default class MessageStore {
 
       await this.startStream(stream);
     } catch (e) {
-      this.handleStreamError(JSON.stringify(e));
+      this.handleStreamError(JSON.stringify(e), e);
     }
   };
 
@@ -625,7 +637,7 @@ export default class MessageStore {
 
       await this.startStream(stream);
     } catch (e) {
-      this.handleStreamError(JSON.stringify(e));
+      this.handleStreamError(JSON.stringify(e), e);
     }
   };
 
