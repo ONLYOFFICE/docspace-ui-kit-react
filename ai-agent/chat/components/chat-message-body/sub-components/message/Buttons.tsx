@@ -52,6 +52,7 @@ import { ContentType } from "../../../../../../enums";
 import { getCommonTranslation } from "../../../../../../utils";
 import { useApi } from "../../../../../../providers/api";
 import { useSocket } from "../../../../../../providers/socket";
+import {CommonTrans} from "../../../../../../utils/i18n/CommonTrans";
 
 const Buttons = ({
   text,
@@ -106,25 +107,20 @@ const Buttons = ({
           openFile(resultFile.id!.toString());
         }
 
-        // TODO: Add custom Trans component
-
-        // const toastMsg = (
-        //   <Trans
-        //     ns="Common"
-        //     i18nKey="MessageExported"
-        //     values={{ fileName }}
-        //     components={{
-        //       1: (
-        //         <Link
-        //           type={LinkType.action}
-        //           onClick={() => openFile(resultFile.id.toString())}
-        //         />
-        //       ),
-        //     }}
-        //   />
-        // );
-
-        const toastMsg = getCommonTranslation("MessageExported");
+        const toastMsg = (
+          <CommonTrans
+            i18nKey="MessageExported"
+            values={{ fileName }}
+            components={{
+              1: (
+                <Link
+                  type={LinkType.action}
+                  onClick={() => openFile(resultFile.id!.toString())}
+                />
+              ),
+            }}
+          />
+        );
 
         toastr.success(toastMsg);
       } else {

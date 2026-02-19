@@ -59,6 +59,7 @@ import { ChatList } from "./ChatList";
 import { getCommonTranslation } from "../../../../../utils";
 import { useApi } from "../../../../../providers";
 import { useSocket } from "../../../../../providers/socket";
+import {CommonTrans} from "../../../../../utils/i18n/CommonTrans";
 
 const SelectChat = ({
   isLoadingProp,
@@ -182,33 +183,28 @@ const SelectChat = ({
       socket?.on(SocketEvents.ExportChat, (data) => {
         const { resultFile } = data;
 
-        // const title = chats.find((chat) => chat.id === hoveredItem)?.title;
+        const title = chats.find((chat) => chat.id === hoveredItem)?.title;
 
         if (resultFile) {
           if (isChecked) {
             openFile(resultFile.id!.toString());
           }
 
-          // TODO: Add custom Trans component
-
-          // const toastMsg = (
-          //   <Trans
-          //     ns="Common"
-          //     i18nKey="ChatExported"
-          //     values={{ fileName, title }}
-          //     components={{
-          //       1: <b />,
-          //       2: (
-          //         <Link
-          //           type={LinkType.action}
-          //           onClick={() => openFile(resultFile.id.toString())}
-          //         />
-          //       ),
-          //     }}
-          //   />
-          // );
-
-          const toastMsg = getCommonTranslation("MessageExported");
+          const toastMsg = (
+            <CommonTrans
+              i18nKey="ChatExported"
+              values={{ fileName, title }}
+              components={{
+                1: <b />,
+                2: (
+                  <Link
+                    type={LinkType.action}
+                    onClick={() => openFile(resultFile.id!.toString())}
+                  />
+                ),
+              }}
+            />
+          );
 
           toastr.success(toastMsg);
         } else {
