@@ -40,14 +40,14 @@ export const ChatInfoBlock = ({
 }: ChatInfoBlockProps) => {
   const bodyText = !isPortalAdmin
     ? getCommonTranslation("AIDisabledInfoBlockUserDescription", {
-        productName: "ProductName",
+        productName: getCommonTranslation("ProductName"),
       })
     : standalone
       ? getCommonTranslation("AIDisabledInfoBlockAdminStandaloneDescription", {
-          productName: "ProductName",
+          productName: getCommonTranslation("ProductName"),
         })
       : getCommonTranslation("AIDisabledInfoBlockAdminSaasDescription", {
-          productName: "ProductName",
+          productName: getCommonTranslation("ProductName"),
         });
 
   return (

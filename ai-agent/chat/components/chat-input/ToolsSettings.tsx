@@ -333,8 +333,8 @@ const ToolsSettings = ({
           <>
             <Text>
               {getCommonTranslation("ConnectWebSearch", {
-                webSearch: "WebSearchAI",
-                productName: "ProductName",
+                webSearch: getCommonTranslation("WebSearchAI"),
+                productName: getCommonTranslation("ProductName"),
               })}
             </Text>
             {isAdmin ? (
@@ -371,7 +371,7 @@ const ToolsSettings = ({
               getTooltipContent: () => (
                 <Text>
                   {getCommonTranslation("ConnectMCPServers", {
-                    mcpServers: "MCPSettingTitle",
+                    mcpServers: getCommonTranslation("MCPSettingTitle"),
                   })}
                 </Text>
               ),

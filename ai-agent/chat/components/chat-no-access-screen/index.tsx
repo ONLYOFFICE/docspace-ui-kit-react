@@ -58,7 +58,7 @@ export const ChatNoAccessScreen = ({
   const title =
     isPortalAdmin && standalone
       ? getCommonTranslation("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
-          aiProvider: "AIProvider",
+          aiProvider: getCommonTranslation("AIProvider"),
         })
       : getCommonTranslation("AIFeaturesAreCurrentlyDisabled");
 
@@ -68,21 +68,21 @@ export const ChatNoAccessScreen = ({
       getCommonTranslation(
         "EmptyAIAgentsAIDisabledStandaloneAdminDescription",
         {
-          productName: "ProductName",
-          aiChats: "AIChats",
+          productName: getCommonTranslation("ProductName"),
+          aiChats: getCommonTranslation("AIChats"),
         },
       ),
     )
     // saas admin
     .with([false, true], () =>
       getCommonTranslation("EmptyChatAIDisabledSaasAdminDescription", {
-        productName: "ProductName",
+        productName: getCommonTranslation("ProductName"),
       }),
     )
     // standalone/saas user
     .with([P._, false], () =>
       getCommonTranslation("EmptyChatAIDisabledUserDescription", {
-        productName: "ProductName",
+        productName: getCommonTranslation("ProductName"),
       }),
     )
     .otherwise(() => "");
