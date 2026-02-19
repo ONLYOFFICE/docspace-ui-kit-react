@@ -31,224 +31,238 @@ import EmptyScreenRoomSelectorDark from "../../assets/empty.room.selector.dark.r
 
 import { getCommonTranslation } from "../../utils/i18n";
 import {
-  Selector,
-  RowLoader,
-  type TSelectorItem,
+	Selector,
+	RowLoader,
+	type TSelectorItem,
 } from "../../components/selector";
 import { useTheme } from "../../context/ThemeContext";
 import { useApi } from "../../providers/api/ApiProvider";
 
 const getServerIcon = (type: ServerType, _isBase: boolean) => {
-  switch (type) {
-    case ServerType.Portal:
-      return "/logo.ashx?logotype=3";
-    default:
-      return null;
-  }
+	switch (type) {
+		case ServerType.Portal:
+			return "/logo.ashx?logotype=3";
+		default:
+			return null;
+	}
 };
 
 export enum ServerType {
-  Custom,
-  Portal,
-  GitHub,
-  Box,
+	Custom,
+	Portal,
+	GitHub,
+	Box,
 }
 
 export type TServer = {
-  id: string;
-  name: string;
-  serverType: ServerType;
-  description?: string;
-  icon?: {
-    icon48: string;
-    icon32: string;
-    icon24: string;
-    icon16: string;
-  };
-  enabled?: boolean;
-  connected?: boolean;
-  headers: Record<string, string>;
-  endpoint: string;
-  authorizationEndpoint?: string;
-  needReset?: boolean;
+	id: string;
+	name: string;
+	serverType: ServerType;
+	description?: string;
+	icon?: {
+		icon48: string;
+		icon32: string;
+		icon24: string;
+		icon16: string;
+	};
+	enabled?: boolean;
+	connected?: boolean;
+	headers: Record<string, string>;
+	endpoint: string;
+	authorizationEndpoint?: string;
+	needReset?: boolean;
 };
 
 type MCPServersSelectorProps = {
-  onSubmit: (servers: TSelectorItem[]) => void;
-  onClose: VoidFunction;
-  onBackClick: VoidFunction;
+	onSubmit: (servers: TSelectorItem[]) => void;
+	onClose: VoidFunction;
+	onBackClick: VoidFunction;
 
-  initedSelectedServers?: string[];
+	initedSelectedServers?: string[];
 };
 
 const MCPServersSelector = ({
-  initedSelectedServers,
-  onSubmit,
-  onClose,
-  onBackClick,
+	initedSelectedServers,
+	onSubmit,
+	onClose,
+	onBackClick,
 }: MCPServersSelectorProps) => {
-  const { apiClient } = useApi();
-  const { isBase } = useTheme();
+	const { apiClient } = useApi();
+	const { isBase } = useTheme();
 
-  const [servers, setServers] = React.useState<TSelectorItem[]>([]);
-  const [selectedServers, setSelectedServers] = React.useState<TSelectorItem[]>(
-    [],
-  );
-  const [initedSelectedServersItems, setInitedSelectedServersItems] =
-    React.useState<TSelectorItem[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+	const [servers, setServers] = React.useState<TSelectorItem[]>([]);
+	const [selectedServers, setSelectedServers] = React.useState<TSelectorItem[]>(
+		[],
+	);
+	const [initedSelectedServersItems, setInitedSelectedServersItems] =
+		React.useState<TSelectorItem[]>([]);
+	const [isLoading, setIsLoading] = React.useState(true);
 
-  const startCurrentIndexRef = React.useRef(0);
-  const [totalServers, setTotalServers] = React.useState(0);
+	const startCurrentIndexRef = React.useRef(0);
+	const [totalServers, setTotalServers] = React.useState(0);
 
-  const isRequestLoading = React.useRef(false);
+	const isRequestLoading = React.useRef(false);
 
-  const convertServerToOption = React.useCallback(
-    (server: TServer): TSelectorItem => {
-      const name =
-        server.serverType === ServerType.Portal
-          ? `${getCommonTranslation("OrganizationName")} ${getCommonTranslation("ProductName")}`
-          : server.name;
+	const convertServerToOption = React.useCallback(
+		(server: TServer): TSelectorItem => {
+			const name =
+				server.serverType === ServerType.Portal
+					? `${getCommonTranslation("OrganizationName")} ${getCommonTranslation("ProductName")}`
+					: server.name;
 
-      return {
-        key: server.id,
-        id: server.id,
-        label: name,
-        icon:
-          (server.icon?.icon32 || getServerIcon(server.serverType, isBase)) ??
-          "",
-        isMCP: true,
-        isSelected: initedSelectedServers?.includes(server.id),
-        isDisabled: server.needReset,
-      };
-    },
-    [isBase, initedSelectedServers],
-  );
+			return {
+				key: server.id,
+				id: server.id,
+				label: name,
+				icon:
+					(server.icon?.icon32 || getServerIcon(server.serverType, isBase)) ??
+					"",
+				isMCP: true,
+				isSelected: initedSelectedServers?.includes(server.id),
+				isDisabled: server.needReset,
+			};
+		},
+		[isBase, initedSelectedServers],
+	);
 
-  const fetchServers = React.useCallback(async () => {
-    if (isRequestLoading.current) return;
+	const fetchServers = React.useCallback(async () => {
+		if (isRequestLoading.current) return;
 
-    isRequestLoading.current = true;
-    setIsLoading(true);
+		isRequestLoading.current = true;
+		setIsLoading(true);
 
-    try {
-      const response = await apiClient.request<{ items: TServer[]; total: number }>(
-        `/ai/servers/available?startIndex=0&count=100`,
-      );
+		try {
+			const response = await apiClient.request<{
+				items: TServer[];
+				total: number;
+			}>(`/api/2.0/ai/servers/available?startIndex=0&count=100`);
 
-      const items = response.items.map(convertServerToOption);
+			const items = response.items.map(convertServerToOption);
 
-      const selectedItems = items.filter((i) => i.isSelected);
+			const selectedItems = items.filter((i) => i.isSelected);
 
-      setServers(items);
-      setInitedSelectedServersItems(selectedItems);
-      setSelectedServers(selectedItems);
+			setServers(items);
+			setInitedSelectedServersItems(selectedItems);
+			setSelectedServers(selectedItems);
 
-      setTotalServers(response.total);
-      startCurrentIndexRef.current = 100;
-    } catch (e) {
-      console.error(e);
-    }
+			setTotalServers(response.total);
+			startCurrentIndexRef.current = 100;
+		} catch (e) {
+			console.error(e);
+		}
 
-    isRequestLoading.current = false;
-    setIsLoading(false);
-  }, [apiClient, convertServerToOption]);
+		isRequestLoading.current = false;
+		setIsLoading(false);
+	}, [apiClient, convertServerToOption]);
 
-  const fetchMoreServer = React.useCallback(async () => {
-    if (isRequestLoading.current) return;
-    isRequestLoading.current = true;
+	const fetchMoreServer = React.useCallback(async () => {
+		if (isRequestLoading.current) return;
+		isRequestLoading.current = true;
 
-    try {
-      const response = await apiClient.request<{ items: TServer[]; total: number }>(
-        `/ai/servers/available?startIndex=${startCurrentIndexRef.current}&count=100`,
-      );
+		try {
+			const response = await apiClient.request<{
+				items: TServer[];
+				total: number;
+			}>(
+				`/api/2.0/ai/servers/available?startIndex=${startCurrentIndexRef.current}&count=100`,
+			);
 
-      const items = response.items.map(convertServerToOption);
+			const items = response.items.map(convertServerToOption);
 
-      setServers((prev) => [...prev, ...items]);
+			setServers((prev) => [...prev, ...items]);
 
-      const selectedItems = items.filter((i) => i.isSelected);
+			const selectedItems = items.filter((i) => i.isSelected);
 
-      setInitedSelectedServersItems((prev) => [...prev, ...selectedItems]);
-      setSelectedServers((prev) => [...prev, ...selectedItems]);
+			setInitedSelectedServersItems((prev) => [...prev, ...selectedItems]);
+			setSelectedServers((prev) => [...prev, ...selectedItems]);
 
-      startCurrentIndexRef.current += 100;
-      setTotalServers(response.total);
-    } catch (e) {
-      console.error(e);
-    }
+			startCurrentIndexRef.current += 100;
+			setTotalServers(response.total);
+		} catch (e) {
+			console.error(e);
+		}
 
-    isRequestLoading.current = false;
-    setIsLoading(false);
-  }, [apiClient, convertServerToOption]);
+		isRequestLoading.current = false;
+		setIsLoading(false);
+	}, [apiClient, convertServerToOption]);
 
-  const onSelect = (item: TSelectorItem) => {
-    const isIncluded = selectedServers.some((i) => i.id === item.id);
+	const onSelect = (item: TSelectorItem) => {
+		const isIncluded = selectedServers.some((i) => i.id === item.id);
 
-    if (isIncluded) {
-      setSelectedServers((prev) => prev.filter((id) => id.id !== item.id));
-    } else {
-      setSelectedServers((prev) => [...prev, item]);
-    }
-  };
+		if (isIncluded) {
+			setSelectedServers((prev) => prev.filter((id) => id.id !== item.id));
+		} else {
+			setSelectedServers((prev) => [...prev, item]);
+		}
+	};
 
-  const onSubmitAction = () => {
-    onSubmit(selectedServers);
-    onBackClick();
-  };
+	const onSubmitAction = () => {
+		onSubmit(selectedServers);
+		onBackClick();
+	};
 
-  React.useEffect(() => {
-    fetchServers();
-  }, [fetchServers]);
+	React.useEffect(() => {
+		fetchServers();
+	}, [fetchServers]);
 
-  return (
-    <Selector
-      items={servers}
-      emptyScreenImage={
-        isBase ? <EmptyScreenRoomSelectorLight /> : <EmptyScreenRoomSelectorDark />
-      }
-      emptyScreenHeader={getCommonTranslation("NoMCPServers", {
-        mcpServers: getCommonTranslation("MCPSettingTitle"),
-      })}
-      emptyScreenDescription={getCommonTranslation("NoMCPServersDescription", {
-        mcpServers: getCommonTranslation("MCPSettingTitle"),
-        productName: getCommonTranslation("ProductName"),
-        aiAgent: getCommonTranslation("AIAgent"),
-      })}
-      searchEmptyScreenImage={
-        isBase ? <EmptyScreenRoomSelectorLight /> : <EmptyScreenRoomSelectorDark />
-      }
-      searchEmptyScreenHeader={getCommonTranslation("NotFoundTitle")}
-      searchEmptyScreenDescription={getCommonTranslation("SearchEmptyRoomsDescription")}
-      submitButtonLabel={getCommonTranslation("AddButton")}
-      disableSubmitButton={false}
-      onSubmit={onSubmitAction}
-      rowLoader={<RowLoader />}
-      hasNextPage={servers.length < totalServers}
-      isNextPageLoading={false}
-      totalItems={totalServers}
-      loadNextPage={fetchMoreServer}
-      isLoading={isLoading}
-      isMultiSelect
-      useAside={false}
-      onClose={onClose}
-      onSelect={onSelect}
-      withHeader
-      headerProps={{
-        headerLabel: getCommonTranslation("AvailableMCPServers", {
-          mcpServers: getCommonTranslation("MCPSettingTitle"),
-        }),
-        withoutBackButton: false,
-        onBackClick: onBackClick,
-        onCloseClick: onClose,
-        withoutBorder: false,
-      }}
-      withCancelButton
-      cancelButtonLabel={getCommonTranslation("CancelButton")}
-      onCancel={onBackClick}
-      selectedItems={initedSelectedServersItems}
-    />
-  );
+	return (
+		<Selector
+			items={servers}
+			emptyScreenImage={
+				isBase ? (
+					<EmptyScreenRoomSelectorLight />
+				) : (
+					<EmptyScreenRoomSelectorDark />
+				)
+			}
+			emptyScreenHeader={getCommonTranslation("NoMCPServers", {
+				mcpServers: getCommonTranslation("MCPSettingTitle"),
+			})}
+			emptyScreenDescription={getCommonTranslation("NoMCPServersDescription", {
+				mcpServers: getCommonTranslation("MCPSettingTitle"),
+				productName: getCommonTranslation("ProductName"),
+				aiAgent: getCommonTranslation("AIAgent"),
+			})}
+			searchEmptyScreenImage={
+				isBase ? (
+					<EmptyScreenRoomSelectorLight />
+				) : (
+					<EmptyScreenRoomSelectorDark />
+				)
+			}
+			searchEmptyScreenHeader={getCommonTranslation("NotFoundTitle")}
+			searchEmptyScreenDescription={getCommonTranslation(
+				"SearchEmptyRoomsDescription",
+			)}
+			submitButtonLabel={getCommonTranslation("AddButton")}
+			disableSubmitButton={false}
+			onSubmit={onSubmitAction}
+			rowLoader={<RowLoader />}
+			hasNextPage={servers.length < totalServers}
+			isNextPageLoading={false}
+			totalItems={totalServers}
+			loadNextPage={fetchMoreServer}
+			isLoading={isLoading}
+			isMultiSelect
+			useAside={false}
+			onClose={onClose}
+			onSelect={onSelect}
+			withHeader
+			headerProps={{
+				headerLabel: getCommonTranslation("AvailableMCPServers", {
+					mcpServers: getCommonTranslation("MCPSettingTitle"),
+				}),
+				withoutBackButton: false,
+				onBackClick: onBackClick,
+				onCloseClick: onClose,
+				withoutBorder: false,
+			}}
+			withCancelButton
+			cancelButtonLabel={getCommonTranslation("CancelButton")}
+			onCancel={onBackClick}
+			selectedItems={initedSelectedServersItems}
+		/>
+	);
 };
 
 export default MCPServersSelector;
