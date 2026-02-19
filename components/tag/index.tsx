@@ -59,6 +59,7 @@ const TagPure: FC<TagProps> = ({
   onMouseEnter,
   onMouseLeave,
   iconClassName,
+  withLabel = true,
 }) => {
   const onClickAction = React.useCallback(() => {
     if (onClick && !isDisabled && !isDeleted) {
@@ -111,9 +112,11 @@ const TagPure: FC<TagProps> = ({
           />
         ))
         .otherwise(() => null)}
-      <Text title={label} fontSize="13px" noSelect truncate>
-        {label}
-      </Text>
+      {withLabel ? (
+        <Text title={label} fontSize="13px" noSelect truncate>
+          {label}
+        </Text>
+      ) : null}
       {isNewTag && !!onDelete ? (
         <IconButton
           className={styles.tagIcon}
