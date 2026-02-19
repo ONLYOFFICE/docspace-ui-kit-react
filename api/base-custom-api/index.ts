@@ -50,7 +50,7 @@ export class BaseCustomApi {
   ): Promise<T> {
     const { data, params, isStream, ...fetchOptions } = options;
 
-    let url = `${this.config.basePath}${endpoint}`;
+    let url = `${this.config.basePath}/api/2.0${endpoint}`;
     if (params) {
       const searchParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
@@ -82,13 +82,29 @@ export class BaseCustomApi {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Request error: ${response.status}`);
+      throw new Error(
+        errorData.error?.message ||
+          errorData.message ||
+          `Request error: ${response.status}`,
+      );
     }
 
     if (isStream) {
       return response.body as unknown as T;
     }
 
-    return response.json();
+    const result = await response.json();
+
+    if (result && typeof result === "object" && "response" in result) {
+      if (result.total !== undefined) {
+        return {
+          total: result.total ? +result.total : 0,
+          items: result.response,
+        } as unknown as T;
+      }
+      return result.response as T;
+    }
+
+    return result as T;
   }
 }

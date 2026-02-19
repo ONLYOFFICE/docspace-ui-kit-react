@@ -47,7 +47,7 @@ export class AiApi extends BaseCustomApi {
   }
 
   getChat(chatId: string) {
-    return this.request<TChat>(`/ai/chats/chats/${chatId}`);
+    return this.request<TChat>(`/ai/chats/${chatId}`);
   }
 
   deleteChat(chatId: string) {
