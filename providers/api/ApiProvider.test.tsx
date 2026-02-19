@@ -12,10 +12,24 @@ vi.mock("@onlyoffice/docspace-api-sdk", () => {
   class MockCommonSettingsApi {
     getPortalSettings = vi.fn();
   }
+  class MockFoldersApi {}
+  class MockRoomsApi {}
+  class MockFilesApi {}
+  class MockFilesSettingsApi {}
+  class MockGroupApi {}
+  class MockPeopleSearchApi {}
+  class MockSearchApi {}
   return {
     Configuration: MockConfiguration,
     ProfilesApi: MockProfilesApi,
     CommonSettingsApi: MockCommonSettingsApi,
+    FoldersApi: MockFoldersApi,
+    RoomsApi: MockRoomsApi,
+    FilesApi: MockFilesApi,
+    FilesSettingsApi: MockFilesSettingsApi,
+    GroupApi: MockGroupApi,
+    PeopleSearchApi: MockPeopleSearchApi,
+    SearchApi: MockSearchApi,
   };
 });
 
