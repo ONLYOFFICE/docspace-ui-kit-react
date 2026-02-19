@@ -31,7 +31,7 @@ import { ContentType } from "../../../../../../enums";
 
 import { Text } from "../../../../../../components/text";
 
-import { MessageFilesProps } from "../../../../Chat.types";
+import type { MessageFilesProps } from "../../../../Chat.types";
 
 import { openFile } from "../../../../utils";
 

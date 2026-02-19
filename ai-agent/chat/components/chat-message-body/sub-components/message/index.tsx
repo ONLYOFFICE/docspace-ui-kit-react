@@ -82,6 +82,8 @@ const Message = ({
   getIcon,
   getResultStorageId,
   folderFormValidation,
+  setAiPlaylistImages,
+  setMediaViewerVisible,
 }: MessageProps) => {
   const { currentChat } = useChatStore();
 
@@ -109,7 +111,13 @@ const Message = ({
           />
 
           <div className={classNames(styles.chatMessageContent)}>
-            {images.length > 0 ? <Images images={images} /> : null}
+            {images.length > 0 ? (
+              <Images
+                images={images}
+                setMediaViewerVisible={setMediaViewerVisible}
+                setAiPlaylistImages={setAiPlaylistImages}
+              />
+            ) : null}
 
             {files.length > 0 ? (
               <Files files={files} getIcon={getIcon} />

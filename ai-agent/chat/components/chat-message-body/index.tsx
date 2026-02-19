@@ -51,6 +51,8 @@ const ChatMessageBody = ({
   isLoading,
   getResultStorageId,
   folderFormValidation,
+  setAiPlaylistImages,
+  setMediaViewerVisible,
 }: MessageBodyProps) => {
   const {
     messages,
@@ -119,6 +121,8 @@ const ChatMessageBody = ({
                 getIcon={getIcon}
                 getResultStorageId={getResultStorageId}
                 folderFormValidation={folderFormValidation}
+                setAiPlaylistImages={setAiPlaylistImages}
+                setMediaViewerVisible={setMediaViewerVisible}
               />
             );
           })}
