@@ -25,22 +25,21 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { use } from "react";
-import { useTranslation } from "react-i18next";
 
-import type {
-  TBreadCrumb,
-  TSelectorItem,
-} from "../../../components/selector";
+import type { TBreadCrumb, TSelectorItem } from "../../../components/selector";
 import {
   FolderType,
   type FolderDtoInteger,
   type FileDtoInteger,
   type FileEntryDtoIntegerAllOfSecurity,
+  type FileType,
 } from "@onlyoffice/docspace-api-sdk";
-import type { TTranslation } from "../../../types";
-import type { FileType } from "../../../enums";
+import { getCommonTranslation } from "../../../utils/i18n";
 
-import type { FilesSelectorProps, TFilesSelectorInit } from "../FilesSelector.types";
+import type {
+  FilesSelectorProps,
+  TFilesSelectorInit,
+} from "../FilesSelector.types";
 import {
   convertFoldersToItems,
   convertRoomsToItems,
@@ -61,15 +60,15 @@ const transformInitItems = (
   items: (FolderDtoInteger | FileDtoInteger)[],
   disabledItems: (string | number)[],
   withCreate: boolean,
-  t: TTranslation,
   getIcon: (fileExst: string) => string,
   initSelectedItemType?: string,
   filterParam?: string | number,
   disableBySecurity?: string,
 ) => {
   const rooms = convertRoomsToItems(
-    items.filter((item) => "roomType" in item && item.roomType) as FolderDtoInteger[],
-    t,
+    items.filter(
+      (item) => "roomType" in item && item.roomType,
+    ) as FolderDtoInteger[],
   );
   const folders = convertFoldersToItems(
     items.filter(
@@ -79,7 +78,9 @@ const transformInitItems = (
     filterParam,
   );
   const files = convertFilesToItems(
-    items.filter((item) => "folderId" in item && item.folderId) as FileDtoInteger[],
+    items.filter(
+      (item) => "folderId" in item && item.folderId,
+    ) as FileDtoInteger[],
     getIcon,
     filterParam,
     undefined,
@@ -90,7 +91,10 @@ const transformInitItems = (
     ...((withCreate && [
       {
         isCreateNewItem: true,
-        label: initSelectedItemType === "files" ? t("NewFolder") : t("NewRoom"),
+        label:
+          initSelectedItemType === "files"
+            ? getCommonTranslation("NewFolder")
+            : getCommonTranslation("NewRoom"),
         id: "create-folder-item",
         key: "create-folder-item",
         hotkey: "f",
@@ -121,7 +125,6 @@ const useSelectorState = ({
 
   disableBySecurity,
 }: UseSelectorStateProps & TFilesSelectorInit) => {
-  const { t } = useTranslation(["Common"]);
   const { getIcon } = use(SettingsContext);
 
   const [breadCrumbs, setBreadCrumbs] = React.useState<TBreadCrumb[]>(
@@ -136,7 +139,6 @@ const useSelectorState = ({
           initItems,
           disabledItems,
           withCreate,
-          t,
           getIcon,
           initSelectedItemType,
           filterParam,
@@ -153,7 +155,9 @@ const useSelectorState = ({
   const [selectedItemSecurity, setSelectedItemSecurity] = React.useState<
     FileEntryDtoIntegerAllOfSecurity | undefined
   >(undefined);
-  const [selectedTreeNode, setSelectedTreeNode] = React.useState({} as FolderDtoInteger);
+  const [selectedTreeNode, setSelectedTreeNode] = React.useState(
+    {} as FolderDtoInteger & { path?: { folderType?: FolderType }[] },
+  );
   const [selectedFileInfo, setSelectedFileInfo] = React.useState<{
     id: number | string;
     title: string;

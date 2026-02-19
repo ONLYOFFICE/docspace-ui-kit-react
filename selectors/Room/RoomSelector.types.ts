@@ -34,7 +34,7 @@ import type {
   TSelectorWithAside,
 } from "../../components/selector";
 
-import type { RoomSearchArea } from "../../enums";
+import type { SearchArea } from "@onlyoffice/docspace-api-sdk";
 
 export type TInitValue = WithFlag<
   "withInit",
@@ -58,7 +58,7 @@ export type RoomSelectorProps = TSelectorHeader &
 
     onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
     roomType?: RoomType | RoomType[];
-    searchArea?: RoomSearchArea | string;
+    searchArea?: SearchArea | string;
     excludeItems?: (number | string | undefined)[];
     setIsDataReady?: (value: boolean) => void;
     submitButtonLabel?: string;

@@ -247,7 +247,7 @@ type TBaseInputProps = {
   style: React.CSSProperties;
   placeholder?: string;
   color?: string;
-  icon?: string;
+  icon?: string | React.ReactElement;
 };
 
 export type InputItemProps = TBaseInputProps & {
@@ -562,7 +562,7 @@ export type TSelectorItemFolder = MergeTypes<
     foldersCount: number;
     security: FileEntryDtoIntegerAllOfSecurity;
     icon?: string;
-    avatar?: string;
+    avatar?: string | React.ReactElement;
   }
 >;
 
@@ -622,7 +622,7 @@ export type TSelectorItemInput = MergeTypes<
   {
     isInputItem: boolean;
     defaultInputValue: string;
-    icon?: string;
+    icon?: string | React.ReactElement;
     color?: string;
     roomType?: RoomType;
     cover?: ICover;

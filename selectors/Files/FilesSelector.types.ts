@@ -33,6 +33,12 @@ import type {
   FilesSettingsDto,
   FileEntryDtoIntegerAllOfSecurity,
 } from "@onlyoffice/docspace-api-sdk";
+export type {
+  FilesSettingsDto,
+  FolderDtoInteger,
+  FolderType as SdkFolderType,
+  FileEntryDtoIntegerAllOfSecurity,
+};
 
 import type {
   TSelectorItem,
@@ -41,11 +47,8 @@ import type {
   TSelectorHeader,
 } from "../../components/selector";
 import type { WithFlag, Nullable } from "../../types";
-import type {
-  ApplyFilterOption,
-  DeviceType,
-  RoomSearchArea,
-} from "../../enums";
+import type { ApplyFilterOption, SearchArea } from "@onlyoffice/docspace-api-sdk";
+import type { DeviceType } from "../../enums";
 import type { TGetIcon } from "../utils/types";
 
 export type TCreateDefineRoom = {
@@ -112,7 +115,7 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
       FileEntryDtoIntegerAllOfSecurity | FileEntryDtoIntegerAllOfSecurity | FileEntryDtoIntegerAllOfSecurity | undefined
     >
   >;
-  searchArea?: RoomSearchArea;
+  searchArea?: SearchArea;
 };
 
 export type UseFilesHelpersProps = {

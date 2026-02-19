@@ -24,9 +24,11 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { EmployeeFullDto } from "@onlyoffice/docspace-api-sdk";
-
-import type PeopleFilter from "../../api/people/filter";
+import type {
+	EmployeeFullDto,
+	EmployeeStatus as EmployeeStatusType,
+	Area,
+} from "@onlyoffice/docspace-api-sdk";
 import type {
 	TSelectorAccessRights,
 	TSelectorCancelButton,
@@ -36,6 +38,12 @@ import type {
 	TSelectorSubmitButton,
 	TSelectorWithAside,
 } from "../../components/selector";
+
+export type PeopleFilter = {
+	employeeStatus?: EmployeeStatusType;
+	area?: Area;
+	includeShared?: boolean;
+};
 
 export type UserTooltipProps = {
 	avatarUrl: string;
@@ -70,6 +78,7 @@ export type PeopleSelectorProps = TSelectorHeader &
 		style?: React.CSSProperties;
 
 		filter?: PeopleFilter | (() => PeopleFilter);
+
 
 		isMultiSelect?: boolean;
 

@@ -32,7 +32,7 @@ import {
   type FileDtoInteger,
 } from "@onlyoffice/docspace-api-sdk";
 
-import FolderSvgUrl from "PUBLIC_DIR/images/icons/32/folder.svg?url";
+import FolderSvg from "PUBLIC_DIR/images/icons/32/folder.svg";
 
 import { getCommonTranslation } from "../../../utils/i18n";
 
@@ -317,7 +317,7 @@ const useFilesHelper = ({
               key: "create-folder-item",
               hotkey: "f",
               onCreateClick: () =>
-                addInputItem(getCommonTranslation("NewFolder"), FolderSvgUrl),
+                addInputItem(getCommonTranslation("NewFolder"), React.createElement(FolderSvg)),
               onBackClick: () => {
                 let isRooms = false;
                 setBreadCrumbs((val) => {

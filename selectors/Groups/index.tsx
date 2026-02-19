@@ -29,7 +29,7 @@ import { useCallback, useRef, useState } from "react";
 import EmptyScreenGroupLight from "../../assets/empty.groups.light.react.svg";
 import EmptyScreenGroupDark from "../../assets/empty.groups.dark.react.svg";
 
-import api from "../../api";
+import { useApi } from "../../providers/api/ApiProvider";
 import { getCommonTranslation } from "../../utils/i18n";
 import {
   RowLoader,
@@ -57,6 +57,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
     onSubmit,
   } = props;
 
+  const { groupApi } = useApi();
   const { isBase } = useTheme();
 
   const emptyScreenImg = isBase ? (
@@ -120,17 +121,23 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       const pageCount = 100;
       setIsNextPageLoading(true);
 
-      // Todo: fix types after TS API will be done
-      const { items, total } = await api.groups.getGroupsByName(
-        searchValue,
-        startIndex,
+      const res = await groupApi.getGroups(
+        undefined,
+        undefined,
         pageCount,
+        startIndex,
+        undefined,
+        undefined,
+        searchValue,
       );
+
+      const items = res.data.response ?? [];
+      const total = res.data.count ?? 0;
 
       const convertedItems: TSelectorItem[] = items.map((group) => ({
         id: group.id,
-        label: group.name,
-        name: group.name,
+        label: group.name ?? "",
+        name: group.name ?? "",
         isGroup: true,
       }));
 
@@ -151,7 +158,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
 
       setIsNextPageLoading(false);
     },
-    [searchValue],
+    [searchValue, groupApi],
   );
 
   const withAside: TSelectorWithAside = useAside

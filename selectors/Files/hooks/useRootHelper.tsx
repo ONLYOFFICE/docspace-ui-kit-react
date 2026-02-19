@@ -26,15 +26,41 @@
 
 import React, { use } from "react";
 
-import { useTranslation } from "react-i18next";
-import { FolderType, type FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import {
+  FolderType,
+  type FolderDtoInteger,
+} from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers/api";
-import { getCatalogIconUrlByType } from "../../../utils/catalogIconHelper";
+import { getCommonTranslation } from "../../../utils/i18n";
 import type { TSelectorItem } from "../../../components/selector";
 import { getDefaultBreadCrumb } from "../../utils";
 import { LoadersContext } from "../../utils/contexts/Loaders";
 
+import CatalogDocumentsSvg from "../../../assets/icons/16/catalog.documents.react.svg";
+import CatalogRoomsSvg from "../../../assets/icons/16/catalog.rooms.react.svg";
+import CatalogArchiveSvg from "../../../assets/icons/16/catalog.archive.react.svg";
+import CatalogSharedSvg from "../../../assets/icons/16/catalog.shared.outline.svg";
+import CatalogPortfolioSvg from "../../../assets/icons/16/catalog.portfolio.react.svg";
+import CatalogFavoritesSvg from "../../../assets/icons/16/catalog.favorites.react.svg";
+import CatalogRecentSvg from "../../../assets/icons/16/catalog-settings-restore.svg";
+import CatalogPrivateSvg from "../../../assets/icons/16/catalog.private.react.svg";
+import CatalogTrashSvg from "../../../assets/icons/16/catalog.trash.react.svg";
+import CatalogAiAgentsSvg from "../../../assets/icons/16/catalog.ai-agents.react.svg";
+
 import type { UseRootHelperProps } from "../FilesSelector.types";
+
+const catalogIcons: Partial<Record<FolderType, React.FC>> = {
+  [FolderType.USER]: CatalogDocumentsSvg,
+  [FolderType.VirtualRooms]: CatalogRoomsSvg,
+  [FolderType.Archive]: CatalogArchiveSvg,
+  [FolderType.SHARE]: CatalogSharedSvg,
+  [FolderType.COMMON]: CatalogPortfolioSvg,
+  [FolderType.Favorites]: CatalogFavoritesSvg,
+  [FolderType.Recent]: CatalogRecentSvg,
+  [FolderType.Privacy]: CatalogPrivateSvg,
+  [FolderType.TRASH]: CatalogTrashSvg,
+  [FolderType.AiAgents]: CatalogAiAgentsSvg,
+};
 
 const useRootHelper = ({
   setBreadCrumbs,
@@ -50,8 +76,6 @@ const useRootHelper = ({
   isUserOnly,
   setIsInit,
 }: UseRootHelperProps) => {
-  const { t } = useTranslation(["Common"]);
-
   const { setIsBreadCrumbsLoading, setIsNextPageLoading, setIsFirstLoad } =
     use(LoadersContext);
 
@@ -83,9 +107,12 @@ const useRootHelper = ({
     }
 
     currentTree?.forEach((folder) => {
-      let avatar = "";
-      if (folder.rootFolderType)
-        avatar = getCatalogIconUrlByType(folder.rootFolderType);
+      const IconComponent = folder.rootFolderType
+        ? catalogIcons[folder.rootFolderType]
+        : undefined;
+      const avatar = IconComponent ? (
+        <IconComponent key={folder.rootFolderType} />
+      ) : undefined;
 
       if (
         (!isUserOnly && folder.rootFolderType === FolderType.VirtualRooms) ||
@@ -99,19 +126,19 @@ const useRootHelper = ({
         let title = "";
         switch (folder.rootFolderType) {
           case FolderType.USER:
-            title = t("Common:MyDocuments");
+            title = getCommonTranslation("MyDocuments");
             break;
           case FolderType.VirtualRooms:
-            title = t("Common:Rooms");
+            title = getCommonTranslation("Rooms");
             break;
           case FolderType.Favorites:
-            title = t("Common:Favorites");
+            title = getCommonTranslation("Favorites");
             break;
           case FolderType.Recent:
-            title = t("Common:Recent");
+            title = getCommonTranslation("Recent");
             break;
           case FolderType.AiAgents:
-            title = t("Common:AIAgents");
+            title = getCommonTranslation("AIAgents");
             break;
           default:
             break;
@@ -152,7 +179,7 @@ const useRootHelper = ({
     treeFolders,
     withRecentTreeFolder,
     withFavoritesTreeFolder,
-    t,
+    withAIAgentsTreeFolder,
   ]);
 
   return { isRoot, setIsRoot, getRootData };

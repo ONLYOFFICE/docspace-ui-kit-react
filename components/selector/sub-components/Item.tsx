@@ -281,15 +281,19 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
             isTemplate={isTemplate}
           />
         ) : icon ? (
-          <RoomIcon
-            title={label}
-            className={styles.itemLogo}
-            imgClassName={styles.roomLogo}
-            logo={icon}
-            showDefault={false}
-            badgeIconNode={badgeIconNode ?? undefined}
-            isTemplate={isTemplate}
-          />
+          typeof icon === "string" ? (
+            <RoomIcon
+              title={label}
+              className={styles.itemLogo}
+              imgClassName={styles.roomLogo}
+              logo={icon}
+              showDefault={false}
+              badgeIconNode={badgeIconNode ?? undefined}
+              isTemplate={isTemplate}
+            />
+          ) : (
+            <div className={styles.itemLogo}>{icon}</div>
+          )
         ) : null}
         {renderCustomItem ? (
           renderCustomItem(label, typeLabel, email, isGroup, status, id)

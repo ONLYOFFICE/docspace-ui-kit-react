@@ -25,7 +25,6 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 import socket, {
   SocketCommands,
@@ -46,6 +45,7 @@ import {
   convertFoldersToItems,
 } from "..";
 
+import { getCommonTranslation } from "../../../utils/i18n";
 import type { UseSocketHelperProps } from "../types";
 import { SettingsContext } from "../contexts/Settings";
 const useSocketHelper = ({
@@ -58,7 +58,6 @@ const useSocketHelper = ({
   setTotal,
   disableBySecurity,
 }: UseSocketHelperProps) => {
-  const { t } = useTranslation(["Common"]);
   const { getIcon } = React.use(SettingsContext);
   const { filesApi, foldersApi, roomsApi } = useApi();
 
@@ -148,7 +147,7 @@ const useSocketHelper = ({
         if ("roomType" in data) {
           const roomRes = await roomsApi.getRoomInfo(data.id!);
           const room = roomRes.data.response!;
-          item = convertRoomsToItems([room], t)[0];
+          item = convertRoomsToItems([room])[0];
         } else {
           const folderRes = await foldersApi.getFolderInfo(data.id!);
           const folder = folderRes.data.response!;
@@ -218,7 +217,6 @@ const useSocketHelper = ({
       getIcon,
       setItems,
       setTotal,
-      t,
       withCreate,
       disableBySecurity,
     ],
@@ -257,7 +255,7 @@ const useSocketHelper = ({
         if ("roomType" in data) {
           const roomRes = await roomsApi.getRoomInfo(data.id!);
           const room = roomRes.data.response!;
-          item = convertRoomsToItems([room], t)[0];
+          item = convertRoomsToItems([room])[0];
         } else {
           const folderRes = await foldersApi.getFolderInfo(data.id!);
           const folder = folderRes.data.response!;
@@ -328,7 +326,6 @@ const useSocketHelper = ({
       getIcon,
       setBreadCrumbs,
       setItems,
-      t,
       disableBySecurity,
     ],
   );

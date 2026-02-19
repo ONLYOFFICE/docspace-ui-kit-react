@@ -25,18 +25,20 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { use } from "react";
-import { useTranslation } from "react-i18next";
 
-import { getAIAgents } from "../../../api/ai";
-import RoomsFilter from "../../../api/rooms/filter";
-import { RoomSearchArea } from "../../../enums";
+import { SearchArea } from "@onlyoffice/docspace-api-sdk";
+import type {
+  FolderDtoInteger,
+  FileEntryDtoIntegerAllOfSecurity,
+} from "@onlyoffice/docspace-api-sdk";
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
-import type { FileEntryDtoIntegerAllOfSecurity } from "@onlyoffice/docspace-api-sdk";
 
+import { useApi } from "../../../providers/api/ApiProvider";
 import { LoadersContext } from "../contexts/Loaders";
 
 import { PAGE_COUNT } from "../constants";
 import type { UseAgentsHelperProps } from "../types";
+import { getCommonTranslation } from "../../../utils/i18n";
 import { convertRoomsToItems } from "..";
 
 // import useInputItemHelper from "./useInputItemHelper";
@@ -65,7 +67,7 @@ const useAgentsHelper = ({
   setSelectedTreeNode,
   disableBySecurity,
 }: UseAgentsHelperProps) => {
-  const { t } = useTranslation(["Common"]);
+  const { apiClient } = useApi();
   const {
     setIsNextPageLoading,
     setIsBreadCrumbsLoading,
@@ -105,25 +107,33 @@ const useAgentsHelper = ({
 
       const page = startIndex / PAGE_COUNT;
 
-      const filter = RoomsFilter.getDefault();
+      const params = new URLSearchParams({
+        page: String(page),
+        count: String(PAGE_COUNT),
+        searchArea: String(SearchArea.AiAgents),
+      });
 
-      filter.page = page;
-      filter.pageCount = PAGE_COUNT;
-      filter.filterValue = filterValue;
-      filter.searchArea = RoomSearchArea.AIAgents;
+      if (filterValue) {
+        params.set("filterValue", filterValue);
+      }
 
-      const roomsFromApi = await getAIAgents(filter);
+      const roomsFromApi = await apiClient.request<{
+        folders: FolderDtoInteger[];
+        current: FolderDtoInteger;
+        pathParts: { folderType?: number }[];
+        total: number;
+        count: number;
+      }>(`/ai/agents?${params.toString()}`);
 
       const { folders, total, count, current } = roomsFromApi;
 
       if (initRef.current) {
         const { title, id } = current;
 
-        // if (isRoomsOnly) subscribe(id);
-        subscribe(id);
+        subscribe(id!);
 
         const breadCrumbs: TBreadCrumb[] = [
-          { label: title, id, isRoom: false, isAgent: true },
+          { label: title ?? "", id: id!, isRoom: false, isAgent: true },
         ];
 
         // if (!isRoomsOnly) breadCrumbs.unshift({ ...getDefaultBreadCrumb() });
@@ -135,7 +145,9 @@ const useAgentsHelper = ({
         setIsBreadCrumbsLoading(false);
       }
 
-      const itemList: TSelectorItem[] = convertRoomsToItems(folders, t)
+      const itemList: TSelectorItem[] = convertRoomsToItems(
+        folders,
+      )
         .filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true))
         .map((item) => {
           const security = item.security as
@@ -154,9 +166,12 @@ const useAgentsHelper = ({
 
       setHasNextPage(count === PAGE_COUNT);
 
-      setSelectedItemSecurity?.(current.security);
+      setSelectedItemSecurity?.(current.security ?? undefined);
 
-      setSelectedTreeNode?.({ ...current, path: roomsFromApi.pathParts });
+      setSelectedTreeNode?.({
+        ...current,
+        path: roomsFromApi.pathParts,
+      } as typeof current & { path: typeof roomsFromApi.pathParts });
 
       if (firstLoadRef.current || startIndex === 0) {
         // const { security } = current;
@@ -207,26 +222,20 @@ const useAgentsHelper = ({
       setIsFirstLoad(false);
     },
     [
+      apiClient,
       searchValue,
-      t,
       setHasNextPage,
       setSelectedItemSecurity,
       setIsRoot,
       setIsInit,
       setIsFirstLoad,
       setIsNextPageLoading,
-      // isRoomsOnly,
       subscribe,
       onSetBaseFolderPath,
       setBreadCrumbs,
       setIsBreadCrumbsLoading,
-      // withCreate,
       setItems,
       setTotal,
-      // createDefineLabel,
-      // setSelectedItemType,
-      // getRootData,
-      // addInputItem,
       excludeItems,
       setSelectedTreeNode,
       disableBySecurity,

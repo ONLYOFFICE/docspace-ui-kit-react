@@ -25,9 +25,12 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { use } from "react";
-import { useTranslation } from "react-i18next";
 
-import { StorageFilter, type RoomType as RoomTypeEnum, type FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import {
+  StorageFilter,
+  type RoomType as RoomTypeEnum,
+  type FolderDtoInteger,
+} from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers/api";
 import { RoomsTypeValues } from "../../../utils/common";
 import RoomType from "../../../components/room-type";
@@ -37,6 +40,7 @@ import { LoadersContext } from "../contexts/Loaders";
 
 import { PAGE_COUNT } from "../constants";
 import type { UseRoomsHelperProps } from "../types";
+import { getCommonTranslation } from "../../../utils/i18n";
 import { convertRoomsToItems, getDefaultBreadCrumb } from "..";
 
 import useInputItemHelper from "./useInputItemHelper";
@@ -67,7 +71,6 @@ const useRoomsHelper = ({
   setSelectedItemSecurity,
   setSelectedTreeNode,
 }: UseRoomsHelperProps) => {
-  const { t } = useTranslation(["Common"]);
   const {
     setIsNextPageLoading,
     setIsBreadCrumbsLoading,
@@ -95,7 +98,7 @@ const useRoomsHelper = ({
   const createDropDownItems = React.useMemo(() => {
     return RoomsTypeValues.map((value) => {
       const onClick = () => {
-        addInputItem("", "", value as RoomTypeEnum, t("EnterName"));
+        addInputItem("", "", value as RoomTypeEnum, getCommonTranslation("EnterName"));
       };
 
       return (
@@ -109,7 +112,7 @@ const useRoomsHelper = ({
         />
       );
     });
-  }, [addInputItem, t]);
+  }, [addInputItem]);
 
   const getRoomList = React.useCallback(
     async (sIndex: number) => {
@@ -166,7 +169,9 @@ const useRoomsHelper = ({
 
         if (isRoomsOnly) subscribe(id!);
 
-        const breadCrumbs: TBreadCrumb[] = [{ label: title!, id: id!, isRoom: true }];
+        const breadCrumbs: TBreadCrumb[] = [
+          { label: title!, id: id!, isRoom: true },
+        ];
 
         if (!isRoomsOnly) breadCrumbs.unshift({ ...getDefaultBreadCrumb() });
 
@@ -177,15 +182,18 @@ const useRoomsHelper = ({
         setIsBreadCrumbsLoading(false);
       }
 
-      const itemList: TSelectorItem[] = convertRoomsToItems(folders ?? [], t).filter(
-        (x) => (excludeItems ? !excludeItems.includes(x.id) : true),
-      );
+      const itemList: TSelectorItem[] = convertRoomsToItems(
+        folders ?? [],
+      ).filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true));
 
       setHasNextPage(count === PAGE_COUNT);
 
       setSelectedItemSecurity?.(current!.security!);
 
-      setSelectedTreeNode?.({ ...current!, path: roomsFromApi.pathParts } as FolderDtoInteger);
+      setSelectedTreeNode?.({
+        ...current!,
+        path: roomsFromApi.pathParts,
+      } as FolderDtoInteger);
 
       if (firstLoadRef.current || startIndex === 0) {
         const { security } = current!;
@@ -194,7 +202,7 @@ const useRoomsHelper = ({
           setTotal(total + 1);
           const createItem: TSelectorItem = {
             isCreateNewItem: true,
-            label: createDefineRoomLabel ?? t("NewRoom"),
+            label: createDefineRoomLabel ?? getCommonTranslation("NewRoom"),
             id: "create-room-item",
             key: "create-room-item",
             hotkey: "r",
@@ -245,7 +253,6 @@ const useRoomsHelper = ({
       roomsApi,
       searchValue,
       createDefineRoomType,
-      t,
       setHasNextPage,
       setSelectedItemSecurity,
       setIsRoot,

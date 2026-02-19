@@ -147,13 +147,17 @@ const InputItem = ({
 			) : roomType ? (
 				<RoomLogo className={styles.roomLogoContainer} type={roomType} />
 			) : icon ? (
-				<RoomIcon
-					title={value}
-					className={styles.itemLogo}
-					imgClassName={styles.roomlogo}
-					logo={icon}
-					showDefault={false}
-				/>
+				typeof icon === "string" ? (
+					<RoomIcon
+						title={value}
+						className={styles.itemLogo}
+						imgClassName={styles.roomlogo}
+						logo={icon}
+						showDefault={false}
+					/>
+				) : (
+					<div className={styles.itemLogo}>{icon}</div>
+				)
 			) : null}
 			<TextInput
 				value={value}

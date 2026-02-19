@@ -29,18 +29,49 @@ import React from "react";
 import EmptyScreenRoomSelectorLight from "../../assets/empty.room.selector.light.react.svg";
 import EmptyScreenRoomSelectorDark from "../../assets/empty.room.selector.dark.react.svg";
 
-import { getAvailableServersList } from "../../api/ai";
-import type { TServer } from "../../api/ai/types";
-import { ServerType } from "../../api/ai/enums";
-
 import { getCommonTranslation } from "../../utils/i18n";
 import {
   Selector,
   RowLoader,
   type TSelectorItem,
 } from "../../components/selector";
-import { getServerIcon } from "../../utils";
 import { useTheme } from "../../context/ThemeContext";
+import { useApi } from "../../providers/api/ApiProvider";
+
+const getServerIcon = (type: ServerType, _isBase: boolean) => {
+  switch (type) {
+    case ServerType.Portal:
+      return "/logo.ashx?logotype=3";
+    default:
+      return null;
+  }
+};
+
+export enum ServerType {
+  Custom,
+  Portal,
+  GitHub,
+  Box,
+}
+
+export type TServer = {
+  id: string;
+  name: string;
+  serverType: ServerType;
+  description?: string;
+  icon?: {
+    icon48: string;
+    icon32: string;
+    icon24: string;
+    icon16: string;
+  };
+  enabled?: boolean;
+  connected?: boolean;
+  headers: Record<string, string>;
+  endpoint: string;
+  authorizationEndpoint?: string;
+  needReset?: boolean;
+};
 
 type MCPServersSelectorProps = {
   onSubmit: (servers: TSelectorItem[]) => void;
@@ -56,6 +87,7 @@ const MCPServersSelector = ({
   onClose,
   onBackClick,
 }: MCPServersSelectorProps) => {
+  const { apiClient } = useApi();
   const { isBase } = useTheme();
 
   const [servers, setServers] = React.useState<TSelectorItem[]>([]);
@@ -98,9 +130,12 @@ const MCPServersSelector = ({
 
     isRequestLoading.current = true;
     setIsLoading(true);
-    const response = await getAvailableServersList(0, 100);
 
-    if (response) {
+    try {
+      const response = await apiClient.request<{ items: TServer[]; total: number }>(
+        `/ai/servers/available?startIndex=0&count=100`,
+      );
+
       const items = response.items.map(convertServerToOption);
 
       const selectedItems = items.filter((i) => i.isSelected);
@@ -111,21 +146,23 @@ const MCPServersSelector = ({
 
       setTotalServers(response.total);
       startCurrentIndexRef.current = 100;
+    } catch (e) {
+      console.error(e);
     }
 
     isRequestLoading.current = false;
     setIsLoading(false);
-  }, [convertServerToOption]);
+  }, [apiClient, convertServerToOption]);
 
   const fetchMoreServer = React.useCallback(async () => {
     if (isRequestLoading.current) return;
     isRequestLoading.current = true;
-    const response = await getAvailableServersList(
-      startCurrentIndexRef.current,
-      100,
-    );
 
-    if (response) {
+    try {
+      const response = await apiClient.request<{ items: TServer[]; total: number }>(
+        `/ai/servers/available?startIndex=${startCurrentIndexRef.current}&count=100`,
+      );
+
       const items = response.items.map(convertServerToOption);
 
       setServers((prev) => [...prev, ...items]);
@@ -137,11 +174,13 @@ const MCPServersSelector = ({
 
       startCurrentIndexRef.current += 100;
       setTotalServers(response.total);
+    } catch (e) {
+      console.error(e);
     }
 
     isRequestLoading.current = false;
     setIsLoading(false);
-  }, [convertServerToOption]);
+  }, [apiClient, convertServerToOption]);
 
   const onSelect = (item: TSelectorItem) => {
     const isIncluded = selectedServers.some((i) => i.id === item.id);

@@ -90,7 +90,7 @@ const useInputItemHelper = ({
   const addInputItem = React.useCallback(
     (
       defaultInputValue: string,
-      icon: string,
+      icon: string | React.ReactElement,
       roomType?: RoomType,
       placeholder?: string,
       isAgent?: boolean,

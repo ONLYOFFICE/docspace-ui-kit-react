@@ -28,6 +28,7 @@ import type {
 	RoomType,
 	FolderDtoInteger,
 	FileEntryDtoIntegerAllOfSecurity,
+	SearchArea,
 } from "@onlyoffice/docspace-api-sdk";
 
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
@@ -43,7 +44,7 @@ export type TGetIcon = (size: number, fileExst: string) => string;
 export type UseRoomsHelperProps = TUseInputItemHelper & {
 	isAgent?: boolean;
 	searchValue?: string;
-	searchArea?: string;
+	searchArea?: SearchArea | string;
 	disableThirdParty?: boolean;
 	isRoomsOnly: boolean;
 	roomType?: RoomType | RoomType[];

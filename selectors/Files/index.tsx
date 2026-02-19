@@ -27,14 +27,12 @@
 "use client";
 
 import React, { use } from "react";
-import { useTranslation } from "react-i18next";
 
 import { Portal } from "../../components/portal";
 
-import { createFile, deleteFile } from "../../api/files";
-
 import { FolderType, RoomType } from "@onlyoffice/docspace-api-sdk";
-import { DeviceType, RoomSearchArea } from "../../enums";
+import { useApi } from "../../providers/api/ApiProvider";
+import { DeviceType } from "../../enums";
 
 import type { TSelectorItem, TBreadCrumb } from "../../components/selector";
 import { Aside } from "../../components/aside";
@@ -50,6 +48,7 @@ import useRootHelper from "./hooks/useRootHelper";
 import useSelectorBody from "./hooks/useSelectorBody";
 import useSelectorState from "./hooks/useSelectorState";
 
+import { getCommonTranslation } from "../../utils/i18n";
 import type { FilesSelectorProps } from "./FilesSelector.types";
 import { SettingsContextProvider } from "../utils/contexts/Settings";
 import {
@@ -79,7 +78,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     rootThirdPartyId,
     roomsFolderId,
     currentFolderId,
-    parentId,
+    // parentId,
     rootFolderType,
     onSubmit,
     onCancel,
@@ -119,7 +118,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     disableBySecurity,
   } = props;
 
-  const { t } = useTranslation(["Common"]);
+  const { filesApi } = useApi();
   const { isFirstLoad, setIsFirstLoad, showLoader } = use(LoadersContext);
 
   const currentSelectedItemId = React.useRef<undefined | number | string>(
@@ -209,15 +208,15 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withAIAgentsTreeFolder,
   });
 
-  let rootFolderTypeItem;
+  let rootFolderTypeItem = undefined;
   const rootFolderTypeIndex = breadCrumbs.findIndex((tp) => tp.rootFolderType);
   if (rootFolderTypeIndex > -1) {
     rootFolderTypeItem = breadCrumbs[rootFolderTypeIndex].rootFolderType;
   }
 
-  let searchArea;
+  let searchArea = undefined;
   if ((rootFolderType ?? rootFolderTypeItem) === FolderType.RoomTemplates) {
-    searchArea = RoomSearchArea.Templates;
+    searchArea = "Templates";
   }
 
   const { getAgentList } = useAgentsHelper({
@@ -431,8 +430,16 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
         if (checkCreating && item.id) {
           try {
-            const fileInfo = await createFile(item.id, t("Common:NewDocument"));
-            await deleteFile(fileInfo.id, true, true);
+            const res = await filesApi.createFile(Number(item.id), {
+              title: getCommonTranslation("NewDocument"),
+            });
+            const fileId = res.data.response?.id;
+            if (fileId != null) {
+              await filesApi.deleteFile(fileId, {
+                deleteAfter: true,
+                immediately: true,
+              });
+            }
             setIsDisabledFolder(false);
           } catch (e) {
             console.log(e);
@@ -473,9 +480,9 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       checkCreating,
       breadCrumbs,
       setSelectedItemType,
-      t,
       setIsDisabledFolder,
       onSelectItem,
+      filesApi,
     ],
   );
 
@@ -526,9 +533,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   }, [
     currentFolderId,
     isRoomsOnly,
-    isThirdParty,
     isUserOnly,
-    parentId,
     roomsFolderId,
     rootFolderType,
     openRoot,
@@ -558,7 +563,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     if (searchValue) {
       setIsFirstLoad(true);
     }
-  }, [searchValue, selectedItemType, setIsFirstLoad, setItems]);
+  }, [searchValue, selectedItemType, setIsFirstLoad]);
 
   const onClearSearchAction = React.useCallback(
     (callback?: VoidFunction) => {
@@ -573,7 +578,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         clearSearchCallback.current = callback;
       }
     },
-    [searchValue, setIsFirstLoad, setItems, setSearchValue],
+    [searchValue, setIsFirstLoad, setSearchValue],
   );
 
   React.useEffect(() => {
@@ -612,6 +617,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       selectedTreeNode,
       selectedFileInfo,
       folderIsShared,
+      isInsideKnowledge,
+      isInsideResultStorage,
     ],
   );
 
@@ -638,6 +645,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     if (selectedItemType === "files" && (selectedItemId || isUserOnly))
       getFileList(0);
   }, [
+    getAgentList,
     getFileList,
     getRoomList,
     selectedItemType,

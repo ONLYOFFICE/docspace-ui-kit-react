@@ -26,8 +26,8 @@
 
 import React from "react";
 
-import api from "../../../api";
 import type { FilesSettingsDto } from "@onlyoffice/docspace-api-sdk";
+import { useApi } from "../../../providers/api/ApiProvider";
 import { presentInArray } from "../../../utils/presentInArray";
 import {
   iconSize32,
@@ -49,6 +49,7 @@ const useFilesSettings = (
   getIconProp?: TGetIcon,
   settings?: FilesSettingsDto,
 ) => {
+  const { filesSettingsApi } = useApi();
   const [filesSettings, setFilesSettings] = React.useState<
     FilesSettingsDto | undefined
   >(settings);
@@ -57,15 +58,15 @@ const useFilesSettings = (
   const getFileSettings = React.useCallback(async () => {
     try {
       setIsLoading(true);
-      const newSettings = await api.files.getSettingsFiles();
+      const res = await filesSettingsApi.getFilesSettings();
 
-      setFilesSettings(newSettings);
+      setFilesSettings(res.data.response);
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
       toastr.error(e as TData);
     }
-  }, []);
+  }, [filesSettingsApi]);
 
   React.useEffect(() => {
     if (!settings) getFileSettings();
