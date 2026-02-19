@@ -26,7 +26,7 @@
 
 import React from "react";
 
-import AttachmentReactSvgUrl from "../../../../assets/attachment.react.svg?url";
+import AttachmentReactSvg from "../../../../assets/attachment.react.svg";
 
 import { DeviceType, FolderType } from "../../../../enums";
 import { getCommonTranslation, isDesktop, isTablet } from "../../../../utils";
@@ -160,7 +160,7 @@ const Attachment = ({
     //     title: getCommonTranslation("SelectorFilesLimit", {
     //       count: CHAT_MAX_FILE_COUNT,
     //     }),
-    //     icon: AttachmentReactSvgUrl,
+    //     icon: <AttachmentReactSvg />,
     //     onClose: () => setWithInfo(!withInfo),
     //     description: getCommonTranslation("SelectorFilesLimitDescription"),
     //   }}

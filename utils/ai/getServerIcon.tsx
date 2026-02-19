@@ -26,37 +26,30 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import WordIcon from "../../../../../../../assets/icons/16/word.svg?url";
-import CellIcon from "../../../../../../../assets/icons/16/cell.svg?url";
-import CellCommonIcon from "../../../../../../../assets/icons/16/cellCommon.svg?url";
-import TextIcon from "../../../../../../../assets/icons/16/text.svg?url";
-import PdfIcon from "../../../../../../../assets/icons/16/pdf.svg?url";
+import BoxDarkSvg from "../../assets/thirdparties/box.dark.svg";
+import BoxSvg from "../../assets/thirdparties/box.svg";
 
-export const getRootDomain = (url: string) => {
-  try {
-    const hostname = new URL(url).hostname;
+import GitHubDarkSvg from "../../assets/thirdparties/github.dark.react.svg";
+import GitHubLightSvg from "../../assets/thirdparties/github.light.react.svg";
 
-    return hostname.split(".").slice(-2).join(".");
-  } catch {
-    return "";
+import { ServerType } from "../../enums";
+
+export const getServerIcon = (
+  type: ServerType,
+  isBase: boolean,
+  portalUrl: string = "",
+) => {
+  switch (type) {
+    case ServerType.Custom:
+      return null;
+    case ServerType.Portal:
+      return <img src={portalUrl + "/logo.ashx?logotype=3"} alt="mcp icon" />;
+    case ServerType.GitHub:
+      if (isBase) return <GitHubLightSvg />;
+      return <GitHubDarkSvg />;
+    case ServerType.Box:
+      return isBase ? <BoxSvg /> : <BoxDarkSvg />;
+    default:
+      return null;
   }
-};
-
-const knowledgeIcons: Record<string, string> = {
-  ".docx": WordIcon,
-  ".xlsx": CellIcon,
-  ".csv": CellCommonIcon,
-  ".txt": TextIcon,
-  ".pdf": PdfIcon,
-};
-
-const getExtension = (fileName: string) => {
-  const idx = fileName.lastIndexOf(".");
-  return idx !== -1 ? fileName.slice(idx) : "";
-};
-
-export const getKnowledgeDocumentIconURLByFileName = (fileName: string) => {
-  const extension = getExtension(fileName);
-
-  return knowledgeIcons[extension] || "";
 };

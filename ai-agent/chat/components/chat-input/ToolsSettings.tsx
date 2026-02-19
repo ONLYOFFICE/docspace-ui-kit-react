@@ -31,9 +31,9 @@ import { LoginProvider } from "@onlyoffice/docspace-api-sdk";
 
 import { Portal } from "../../../../components/portal";
 
-import McpToolReactSvgUrl from "../../../../assets/mcp.tool.svg?url";
-import WebSearchIconUrl from "../../../../assets/web.search.svg?url";
-import ManageConnectionsReactSvgUrl from "../../../../assets/manage.connection.react.svg?url";
+import McpToolReactSvg from "../../../../assets/mcp.tool.svg";
+import WebSearchIcon from "../../../../assets/web.search.svg";
+import ManageConnectionsReactSvg from "../../../../assets/manage.connection.react.svg";
 
 import { ServerType } from "../../../../enums";
 import { getOAuthToken } from "../../../../utils/get-oauth-token";
@@ -89,7 +89,7 @@ const ToolsSettings = ({
     setWebCrawlingToolName,
   } = useMessageStore();
   const { isBase } = useTheme();
-  const { aiApi, thirdPartyApi } = useApi();
+  const { aiApi, thirdPartyApi, apiUrl } = useApi();
 
   const [showManageConnections, setShowManageConnections] =
     React.useState(false);
@@ -305,9 +305,8 @@ const ToolsSettings = ({
         return {
           key: mcpId,
           label: name,
-          icon:
-            (server.icon?.icon16 || getServerIcon(server.serverType, isBase)) ??
-            "",
+          icon: server.icon?.icon16 ?? "",
+          iconNode: getServerIcon(server.serverType, isBase, apiUrl),
           withMCPIcon: true,
           items,
         };
@@ -324,7 +323,7 @@ const ToolsSettings = ({
       {
         key: "web-search",
         label: "Web Search",
-        icon: WebSearchIconUrl,
+        iconNode: <WebSearchIcon />,
         withToggle: true,
         checked: webSearchEnabled && webSearchAvailable,
         onClick: onWebSearchToggle,
@@ -367,7 +366,7 @@ const ToolsSettings = ({
               onClick: () => {
                 setShowManageConnections(true);
               },
-              icon: ManageConnectionsReactSvgUrl,
+              iconNode: <ManageConnectionsReactSvg />,
               disabled: !showManageConnectionItem,
               getTooltipContent: () => (
                 <Text>
@@ -411,7 +410,7 @@ const ToolsSettings = ({
         data-testid="chat-input-tools-button"
         aria-disabled={!aiReady}
       >
-        <IconButton iconName={McpToolReactSvgUrl} size={16} isFill={false} />
+        <IconButton iconNode={<McpToolReactSvg />} size={16} isFill={false} />
         <Text lineHeight="16px" fontSize="13px" fontWeight={600} noSelect>
           {getCommonTranslation("Tools")}
         </Text>
@@ -449,14 +448,12 @@ const ToolsSettings = ({
                     return (
                       <div key={server.id} className={styles.toolSettingsItem}>
                         <div className={styles.toolSettingsItemInfo}>
-                          <img
-                            src={
-                              (server.icon?.icon16 ||
-                                getServerIcon(server.serverType, isBase)) ??
-                              ""
-                            }
-                            alt={server.name}
-                          />
+                          {server.icon?.icon16 ? (
+                            <img src={server.icon.icon16} alt={server.name} />
+                          ) : (
+                            getServerIcon(server.serverType, isBase, apiUrl)
+                          )}
+
                           <Text
                             fontSize="14px"
                             lineHeight="16px"

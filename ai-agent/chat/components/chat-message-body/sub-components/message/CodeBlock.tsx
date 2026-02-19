@@ -31,7 +31,7 @@ import { a11yDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 // @ts-expect-error file not inside global exports
 import a11yLight from "react-syntax-highlighter/dist/cjs/styles/prism/a11y-one-light";
 
-import CopyIconUrl from "../../../../../../assets/icons/16/copy.react.svg?url";
+import CopyIcon from "../../../../../../assets/icons/16/copy.react.svg";
 
 import { useTheme } from "../../../../../../context/ThemeContext";
 
@@ -64,7 +64,7 @@ const CodeBlock = ({
       <div className={styles.codeHeader}>
         {language ? <Text>{language}</Text> : null}
         <IconButton
-          iconName={CopyIconUrl}
+          iconNode={<CopyIcon />}
           size={16}
           isClickable
           onClick={onCopy}

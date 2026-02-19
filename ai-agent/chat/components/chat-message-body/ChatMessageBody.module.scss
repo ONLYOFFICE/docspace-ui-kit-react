@@ -434,13 +434,11 @@
     }
 
     .toolFinishIcon {
-      svg {
         height: 12px;
 
         path {
           fill: var(--chat-input-send-button-background);
         }
-      }
     }
 
     .toolName {
@@ -460,15 +458,15 @@
       }
     }
 
-    .arrowRightIcon svg path,
-    .searchToolIcon svg path {
+    .arrowRightIcon path,
+    .searchToolIcon path {
       fill: var(--text-color);
     }
 
     &.hide {
       border-bottom: none;
 
-      .arrowRightIcon svg {
+      .arrowRightIcon {
         @include mixins.flip-in-rtl;
       }
     }

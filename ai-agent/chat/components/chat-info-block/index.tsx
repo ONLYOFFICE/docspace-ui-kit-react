@@ -26,7 +26,7 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import InfoIcon from "../../../../assets/info.outline.react.svg?url";
+import InfoIcon from "../../../../assets/info.outline.react.svg";
 
 import PublicRoomBar from "../../../../components/public-room-bar";
 
@@ -55,7 +55,7 @@ export const ChatInfoBlock = ({
       className={styles.chatInfoBlock}
       headerText={getCommonTranslation("AIFeaturesAreCurrentlyDisabled")}
       bodyText={bodyText}
-      iconName={InfoIcon}
+      iconNode={<InfoIcon />}
       dataTestId="chat-info-block"
     />
   );

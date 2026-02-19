@@ -43,13 +43,7 @@ import { getCommonTranslation } from "../../../../../../../../utils";
 export const MCPToolContent = ({ content }: { content: TToolCallContent }) => {
   const { isBase } = useTheme();
 
-  const serverIcon =
-    content.mcpServerInfo?.icon?.icon16 ||
-    getServerIcon(
-      content.mcpServerInfo?.serverType || ServerType.Custom,
-      isBase,
-    ) ||
-    "";
+  const ownIcon = content.mcpServerInfo?.icon?.icon16;
 
   return (
     <>
@@ -58,7 +52,15 @@ export const MCPToolContent = ({ content }: { content: TToolCallContent }) => {
       </Text>
       <MCPIcon
         title={content.mcpServerInfo?.serverName || ""}
-        imgSrc={serverIcon}
+        imgSrc={ownIcon}
+        imgNode={
+          ownIcon
+            ? null
+            : getServerIcon(
+                content.mcpServerInfo?.serverType || ServerType.Custom,
+                isBase,
+              )
+        }
         size={MCPIconSize.Small}
       />
 

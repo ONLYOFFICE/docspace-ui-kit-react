@@ -406,8 +406,11 @@ const SubMenu = (props: SubMenuProps) => {
         title={item.label as string}
         size={MCPIconSize.Small}
         imgSrc={item.icon}
+        imgNode={item.iconNode}
         className={iconClassName || ""}
       />
+    ) : item.iconNode ? (
+      <span className={iconClassName || ""}>{item.iconNode}</span>
     ) : (
       item.icon &&
       ((!item.icon.includes("images/") && !item.icon.includes(".svg")) ||

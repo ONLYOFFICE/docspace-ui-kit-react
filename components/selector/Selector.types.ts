@@ -66,6 +66,7 @@ export type TInfoBarData = {
 	title: string;
 	description: string;
 	icon?: string;
+  iconNode?: React.ReactNode;
 	onClose?: VoidFunction;
 };
 

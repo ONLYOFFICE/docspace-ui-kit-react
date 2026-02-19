@@ -23,11 +23,10 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import { ReactSVG } from "react-svg";
 
 import cn from "classnames";
 
-import ToolFinish from "../../../../../../../assets/tool.finish.svg?url";
+import ToolFinishIcon from "../../../../../../../assets/tool.finish.svg";
 import TriangleDownIcon from "../../../../../../../assets/arrow.right.react.svg";
 
 import { getCommonTranslation, IconSizeType } from "../../../../../../../utils";
@@ -59,7 +58,7 @@ const Think = ({
         className={cn(styles.thinkTitle, { [styles.thinkTitleOpened]: isOpen })}
       >
         {isFinished ? (
-          <ReactSVG src={ToolFinish} className={styles.toolFinishIcon} />
+          <ToolFinishIcon className={styles.toolFinishIcon} />
         ) : (
           <Loader type={LoaderTypes.track} size="12px" />
         )}

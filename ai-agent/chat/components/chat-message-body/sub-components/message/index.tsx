@@ -30,7 +30,7 @@ import Linkify from "linkify-react";
 import { ReactSVG } from "react-svg";
 import copy from "copy-to-clipboard";
 
-import CopyIconUrl from "../../../../../../assets/icons/16/copy.react.svg?url";
+import CopyIcon from "../../../../../../assets/icons/16/copy.react.svg";
 
 import { ContentType, RoleType } from "../../../../../../enums";
 
@@ -170,7 +170,7 @@ const Message = ({
             }}
             title={getCommonTranslation("CopyMessage")}
           >
-            <ReactSVG src={CopyIconUrl} />
+            <CopyIcon/>
           </div>
         </div>
       </div>

@@ -42,6 +42,7 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
     headerText,
     bodyText,
     iconName,
+    iconNode,
     onClose,
     barIsVisible,
     className,
@@ -71,6 +72,8 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
           <div className={styles.headerIcon}>
             {iconName ? (
               <ReactSVG src={iconName} />
+            ) : iconNode ? (
+              iconNode
             ) : (
               <div>
                 <PeopleIcon />

@@ -27,9 +27,9 @@ import { ReactSVG } from "react-svg";
 import copy from "copy-to-clipboard";
 import { observer } from "mobx-react";
 
-import CopyIconUrl from "../../../.././../../assets/icons/16/copy.react.svg?url";
-// import RefreshIconUrl from "../../../.././../../assets/16/refresh.react.svg?url";
-import SaveToFileIconUrl from "../../../.././../../assets/message.save.svg?url";
+import CopyIcon from "../../../.././../../assets/icons/16/copy.react.svg";
+// import RefreshIcon from "../../../.././../../assets/16/refresh.react.svg";
+import SaveToFileIcon from "../../../.././../../assets/message.save.svg";
 
 import { SocketCommands, SocketEvents } from "../../../../../../utils/socket";
 
@@ -52,7 +52,7 @@ import { ContentType } from "../../../../../../enums";
 import { getCommonTranslation } from "../../../../../../utils";
 import { useApi } from "../../../../../../providers/api";
 import { useSocket } from "../../../../../../providers/socket";
-import {CommonTrans} from "../../../../../../utils/i18n/CommonTrans";
+import { CommonTrans } from "../../../../../../utils/i18n/CommonTrans";
 
 const Buttons = ({
   text,
@@ -171,7 +171,7 @@ const Buttons = ({
           onClick={onCopyAction}
           title={getCommonTranslation("CopyMessage")}
         >
-          <ReactSVG src={CopyIconUrl} />
+          <CopyIcon />
         </div>
 
         {/*{isLast ? (*/}
@@ -182,7 +182,7 @@ const Buttons = ({
         {/*      toastr.info(getCommonTranslation("WorkInProgress"));*/}
         {/*    }}*/}
         {/*  >*/}
-        {/*    <ReactSVG src={RefreshIconUrl} />*/}
+        {/*    <RefreshIcon />*/}
         {/*  </div>*/}
         {/*) : null}*/}
 
@@ -191,7 +191,7 @@ const Buttons = ({
           onClick={() => setShowFolderSelector(true)}
           title={getCommonTranslation("SaveToFile")}
         >
-          <ReactSVG src={SaveToFileIconUrl} />
+          <SaveToFileIcon />
         </div>
       </div>
       {showFolderSelector ? (

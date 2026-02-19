@@ -29,9 +29,9 @@ import { observer } from "mobx-react";
 import classNames from "classnames";
 
 import SelectSessionReactSvg from "../../../../../assets/select.session.react.svg";
-import RenameReactSvgUrl from "../../../../../assets/rename.react.svg?url";
-import RemoveSvgUrl from "../../../../../assets/icons/16/catalog.trash.react.svg?url";
-import SaveToFileIconUrl from "../../../../../assets/message.save.svg?url";
+import RenameReactSvg from "../../../../../assets/rename.react.svg";
+import RemoveSvg from "../../../../../assets/icons/16/catalog.trash.react.svg";
+import SaveToFileIcon from "../../../../../assets/message.save.svg";
 
 import { RectangleSkeleton } from "../../../../../components/rectangle";
 
@@ -59,7 +59,7 @@ import { ChatList } from "./ChatList";
 import { getCommonTranslation } from "../../../../../utils";
 import { useApi } from "../../../../../providers";
 import { useSocket } from "../../../../../providers/socket";
-import {CommonTrans} from "../../../../../utils/i18n/CommonTrans";
+import { CommonTrans } from "../../../../../utils/i18n/CommonTrans";
 
 const SelectChat = ({
   isLoadingProp,
@@ -228,20 +228,20 @@ const SelectChat = ({
       {
         key: "rename",
         label: getCommonTranslation("Rename"),
-        icon: RenameReactSvgUrl,
+        iconNode: <RenameReactSvg />,
         onClick: onRenameToggle,
       },
       {
         key: "save_to_file",
         label: getCommonTranslation("SaveToFile"),
-        icon: SaveToFileIconUrl,
+        iconNode: <SaveToFileIcon />,
         onClick: onSaveToFileAction,
       },
       { key: "separator", isSeparator: true },
       {
         key: "remove",
         label: getCommonTranslation("Delete"),
-        icon: RemoveSvgUrl,
+        iconNode: <RemoveSvg />,
         onClick: onDelete,
       },
     ];

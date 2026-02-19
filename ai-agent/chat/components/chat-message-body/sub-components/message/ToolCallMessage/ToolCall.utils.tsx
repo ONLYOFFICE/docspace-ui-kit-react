@@ -26,26 +26,37 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import BoxDarkSvgUrl from "../../assets/thirdparties/box.dark.svg?url";
-import BoxSvgUrl from "../../assets/thirdparties/box.svg?url";
+import WordIcon from "../../../../../../../assets/icons/16/word.svg";
+import CellIcon from "../../../../../../../assets/icons/16/cell.svg";
+import CellCommonIcon from "../../../../../../../assets/icons/16/cellCommon.svg";
+import TextIcon from "../../../../../../../assets/icons/16/text.svg";
+import PdfIcon from "../../../../../../../assets/icons/16/pdf.svg";
 
-import GitHubDarkSvgUrl from "../../assets/thirdparties/github.dark.react.svg?url";
-import GitHubLightSvgUrl from "../../assets/thirdparties/github.light.react.svg?url";
+export const getRootDomain = (url: string) => {
+  try {
+    const hostname = new URL(url).hostname;
 
-import { ServerType } from "../../enums";
-
-export const getServerIcon = (type: ServerType, isBase: boolean) => {
-  switch (type) {
-    case ServerType.Custom:
-      return null;
-    case ServerType.Portal:
-      return "/logo.ashx?logotype=3";
-    case ServerType.GitHub:
-      if (isBase) return GitHubLightSvgUrl;
-      return GitHubDarkSvgUrl;
-    case ServerType.Box:
-      return isBase ? BoxSvgUrl : BoxDarkSvgUrl;
-    default:
-      return null;
+    return hostname.split(".").slice(-2).join(".");
+  } catch {
+    return "";
   }
+};
+
+const knowledgeIcons: Record<string, React.ReactNode> = {
+  ".docx": <WordIcon />,
+  ".xlsx": <CellIcon />,
+  ".csv": <CellCommonIcon />,
+  ".txt": <TextIcon />,
+  ".pdf": <PdfIcon />,
+};
+
+const getExtension = (fileName: string) => {
+  const idx = fileName.lastIndexOf(".");
+  return idx !== -1 ? fileName.slice(idx) : "";
+};
+
+export const getKnowledgeDocumentIconByFileName = (fileName: string) => {
+  const extension = getExtension(fileName);
+
+  return knowledgeIcons[extension] || "";
 };

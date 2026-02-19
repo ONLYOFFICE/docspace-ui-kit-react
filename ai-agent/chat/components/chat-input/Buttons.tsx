@@ -28,8 +28,8 @@ import React from "react";
 import classNames from "classnames";
 import { observer } from "mobx-react";
 
-import SendReactSvgUrl from "../../../../assets/icons/12/arrow.up.react.svg?url";
-import AttachmentReactSvgUrl from "../../../../assets/attachment.react.svg?url";
+import SendReactSvg from "../../../../assets/icons/12/arrow.up.react.svg";
+import AttachmentReactSvg from "../../../../assets/attachment.react.svg";
 
 import { IconButton } from "../../../../components/icon-button";
 import { TooltipContainer } from "../../../../components/tooltip";
@@ -63,7 +63,7 @@ const Buttons = ({
     ? {
         onClick: sendMessageAction,
         isDisabled: isSendButtonDisabled,
-        iconNode: null,
+        iconNode: <SendReactSvg />,
       }
     : {
         onClick: stopMessage,
@@ -90,7 +90,7 @@ const Buttons = ({
           onClick={onAttachmentToggleClick}
         >
           <IconButton
-            iconName={AttachmentReactSvgUrl}
+            iconNode={<AttachmentReactSvg />}
             size={16}
             isFill={false}
             isDisabled={!aiReady}
@@ -106,7 +106,6 @@ const Buttons = ({
         />
       </div>
       <IconButton
-        iconName={SendReactSvgUrl}
         size={16}
         isClickable
         className={classNames(styles.chatInputButtonsSend, {

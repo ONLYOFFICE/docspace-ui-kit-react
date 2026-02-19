@@ -41,6 +41,7 @@ export const InfoBar = ({ ref, visible, className }: InfoBarProps) => {
 			headerText={infoBarData.title}
 			bodyText={infoBarData.description}
 			iconName={infoBarData.icon}
+      iconNode={infoBarData.iconNode}
 			onClose={infoBarData.onClose}
 			className={className}
 		/>

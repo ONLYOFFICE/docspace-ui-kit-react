@@ -27,10 +27,9 @@
  */
 
 import React, { useId, useState } from "react";
-import { ReactSVG } from "react-svg";
 
-import UniverseIcon from "../../../../../../../../assets/universe.react.svg?url";
-import ExternalLinkIcon from "../../../../../../../../assets/external.link.svg?url";
+import UniverseIcon from "../../../../../../../../assets/universe.react.svg";
+import ExternalLinkIcon from "../../../../../../../../assets/external.link.svg";
 
 import type {
   TToolCallContent,
@@ -42,7 +41,7 @@ import { Tooltip } from "../../../../../../../../components/tooltip";
 
 import styles from "../../../../ChatMessageBody.module.scss";
 import {
-  getKnowledgeDocumentIconURLByFileName,
+  getKnowledgeDocumentIconByFileName,
   getRootDomain,
 } from "../ToolCall.utils";
 
@@ -54,10 +53,6 @@ const SourceItem = ({ source }: { source: TToolCallResultSourceData }) => {
 
   const linkHref =
     isKnowledgeSource && source.fileId ? source.relativeUrl : source.url;
-
-  const iconUrl = isKnowledgeSource
-    ? getKnowledgeDocumentIconURLByFileName(source.title)
-    : source.faviconUrl;
 
   const sourceContent = isKnowledgeSource
     ? source.text
@@ -72,10 +67,12 @@ const SourceItem = ({ source }: { source: TToolCallResultSourceData }) => {
       truncate
     >
       {faviconLoadError ? (
-        <ReactSVG className={styles.sourceFallbackIcon} src={UniverseIcon} />
+        <UniverseIcon className={styles.sourceFallbackIcon} />
+      ) : isKnowledgeSource ? (
+        getKnowledgeDocumentIconByFileName(source.title)
       ) : (
         <img
-          src={iconUrl}
+          src={source.faviconUrl}
           onError={() => setFaviconLoadError(true)}
           alt="source icon"
           width={16}
@@ -118,7 +115,7 @@ const SourceItem = ({ source }: { source: TToolCallResultSourceData }) => {
         />
       ) : null}
 
-      <ReactSVG className={styles.externalLinkIcon} src={ExternalLinkIcon} />
+      <ExternalLinkIcon className={styles.externalLinkIcon} />
     </Link>
   );
 };

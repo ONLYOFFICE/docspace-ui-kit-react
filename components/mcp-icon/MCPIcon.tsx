@@ -38,6 +38,7 @@ export type MCPIconProps = {
   title: string;
   size?: MCPIconSize;
   imgSrc?: string;
+  imgNode?: React.ReactNode;
   className?: string;
   dataTestId?: string;
 };
@@ -49,6 +50,7 @@ export const MCPIcon = (props: MCPIconProps) => {
     size = MCPIconSize.Large,
     title,
     imgSrc,
+    imgNode,
 
     className,
     dataTestId = "mcp-icon",
@@ -56,7 +58,7 @@ export const MCPIcon = (props: MCPIconProps) => {
 
   const [imgError, setImgError] = useState(false);
 
-  const showImg = imgSrc && !imgError;
+  const showImg = (imgSrc && !imgError) || imgNode;
 
   useEffect(() => {
     if (imgSrc && imgError) {
@@ -72,12 +74,16 @@ export const MCPIcon = (props: MCPIconProps) => {
       })}
     >
       {showImg ? (
-        <img
-          className={styles.image}
-          src={imgSrc}
-          alt="mcp icon"
-          onError={() => setImgError(true)}
-        />
+        imgNode ? (
+          <div className={styles.image}>{imgNode}</div>
+        ) : (
+          <img
+            className={styles.image}
+            src={imgSrc}
+            alt="mcp icon"
+            onError={() => setImgError(true)}
+          />
+        )
       ) : (
         <Text className={styles.title} noSelect>
           {getFirstChar(title)}

@@ -27,11 +27,10 @@
  */
 
 import React from "react";
-import { ReactSVG } from "react-svg";
 
-import DocumentsIcon from "../../../../../../../../assets/icons/16/catalog.documents.react.svg?url";
-import UniverseIcon from "../../../../../../../../assets/universe.react.svg?url";
-import ExternalLinkIcon from "../../../../../../../../assets/external.link.svg?url";
+import DocumentsIcon from "../../../../../../../../assets/icons/16/catalog.documents.react.svg";
+import UniverseIcon from "../../../../../../../../assets/universe.react.svg";
+import ExternalLinkIcon from "../../../../../../../../assets/external.link.svg";
 
 import {
   TToolCallContent,
@@ -51,7 +50,7 @@ const WebCrawlingToolContent = ({ content }: { content: TToolCallContent }) => {
 
   return hasError ? (
     <>
-      <ReactSVG className={styles.searchToolIcon} src={UniverseIcon} />
+      <UniverseIcon className={styles.searchToolIcon} />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("WebCrawling")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
@@ -64,12 +63,12 @@ const WebCrawlingToolContent = ({ content }: { content: TToolCallContent }) => {
       target={LinkTarget.blank}
       textDecoration="none"
     >
-      <ReactSVG className={styles.searchToolIcon} src={UniverseIcon} />
+      <UniverseIcon className={styles.searchToolIcon} />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("WebCrawling")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
       </Text>
-      <ReactSVG className={styles.externalLinkIcon} src={ExternalLinkIcon} />
+      <ExternalLinkIcon className={styles.externalLinkIcon} />
     </Link>
   );
 };
@@ -79,7 +78,7 @@ const WebSearchToolContent = ({ content }: { content: TToolCallContent }) => {
 
   return (
     <>
-      <ReactSVG className={styles.searchToolIcon} src={UniverseIcon} />
+      <UniverseIcon className={styles.searchToolIcon} />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("WebSearch")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
@@ -97,7 +96,7 @@ const KnowledgeSearchToolContent = ({
 
   return (
     <>
-      <ReactSVG className={styles.searchToolIcon} src={DocumentsIcon} />
+      <DocumentsIcon className={styles.searchToolIcon} />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("KnowledgeSearch")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>

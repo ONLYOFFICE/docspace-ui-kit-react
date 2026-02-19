@@ -47,6 +47,7 @@ export type TApiContext = {
   commonSettingsApi: CommonSettingsApi;
   aiApi: AiApi;
   thirdPartyApi: ThirdPartyApi;
+  apiUrl: string;
 };
 
 const ApiContext = React.createContext<TApiContext | null>(null);
@@ -77,6 +78,7 @@ const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
         basePath: url,
         apiKey,
       }),
+      apiUrl: url,
     };
   }, [url, apiKey]);
 

@@ -28,7 +28,7 @@ import React from "react";
 import { ReactSVG } from "react-svg";
 import classNames from "classnames";
 
-import CloseCircleReactSvgUrl from "../../../../assets/remove.session.svg?url";
+import CloseCircleReactSvg from "../../../../assets/remove.session.svg";
 
 import { Text } from "../../../../components/text";
 import { IconButton } from "../../../../components/icon-button";
@@ -152,7 +152,7 @@ const FilesList = ({
 
                   {onRemove ? (
                     <IconButton
-                      iconName={CloseCircleReactSvgUrl}
+                      iconNode={<CloseCircleReactSvg />}
                       size={16}
                       isClickable
                       onClick={() => onRemove(file)}

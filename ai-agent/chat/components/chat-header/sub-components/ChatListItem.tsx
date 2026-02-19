@@ -29,7 +29,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import VerticalDotsReactSvgUrl from "../../../../../assets/icons/16/vertical-dots.react.svg?url";
+import VerticalDotsReactSvg from "../../../../../assets/icons/16/vertical-dots.react.svg";
 
 import type { TChat } from "../../../../../types/ai";
 import {
@@ -99,7 +99,7 @@ export const ChatListItem = ({
         {hoveredChatId === chat.id || !desktop ? (
           <div className={styles.iconButtonWrapper} onClick={onShowContextMenu}>
             <IconButton
-              iconName={VerticalDotsReactSvgUrl}
+              iconNode={<VerticalDotsReactSvg/>}
               size={16}
               isClickable
               isFill

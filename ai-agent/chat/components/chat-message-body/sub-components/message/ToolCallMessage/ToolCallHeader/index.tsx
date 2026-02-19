@@ -31,9 +31,9 @@ import classNames from "classnames";
 import { ReactSVG } from "react-svg";
 import { observer } from "mobx-react";
 
-import ToolFinish from "../../../../../../../../assets/tool.finish.svg?url";
-import AlertIcon from "../../../../../../../../assets/button.alert.transparent.react.svg?url";
-import ArrowRightIcon from "../../../../../../../../assets/arrow.right.react.svg?url";
+import ToolFinishIcon from "../../../../../../../../assets/tool.finish.svg";
+import AlertIcon from "../../../../../../../../assets/button.alert.transparent.react.svg";
+import ArrowRightIcon from "../../../../../../../../assets/arrow.right.react.svg";
 
 import { Loader, LoaderTypes } from "../../../../../../../../components/loader";
 import type { TToolCallContent } from "../../../../../../../../types/ai";
@@ -74,9 +74,9 @@ export const ToolCallHeader = observer(
         <Loader type={LoaderTypes.track} size="12px" />
       ),
       [ToolCallStatus.Finished]: (
-        <ReactSVG src={ToolFinish} className={styles.toolFinishIcon} />
+        <ToolFinishIcon className={styles.toolFinishIcon} />
       ),
-      [ToolCallStatus.Failed]: <ReactSVG src={AlertIcon} />,
+      [ToolCallStatus.Failed]: <AlertIcon />,
     };
 
     const statusIcon =
@@ -108,7 +108,7 @@ export const ToolCallHeader = observer(
         )}
 
         {expandable ? (
-          <ReactSVG src={ArrowRightIcon} className={styles.arrowRightIcon} />
+          <ArrowRightIcon className={styles.arrowRightIcon} />
         ) : null}
       </div>
     );
