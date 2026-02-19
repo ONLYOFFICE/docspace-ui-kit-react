@@ -129,8 +129,6 @@
   background: var(--info-panel-blur-color);
   z-index: 300;
 
-  @include mixins.no-user-select;
-
   @include mixins.tablet-and-below {
     z-index: 309;
     position: fixed;
@@ -675,7 +673,7 @@
   .infoIcon {
     :global(.light) {
       --status-icon-color-positive: #{colors.$light-status-positive};
-      --status-icon-color-negative: #{colors.$light-error-status};  
+      --status-icon-color-negative: #{colors.$light-error-status};
     }
 
     :global(.dark) {

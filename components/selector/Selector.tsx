@@ -120,6 +120,7 @@ const Selector = ({
   items,
   renderCustomItem,
   isMultiSelect,
+  forceIsMultiSelect,
   selectedItems,
   maxSelectedItems,
 
@@ -223,7 +224,7 @@ const Selector = ({
     );
 
     if (isMultiSelect) {
-      if (item.disableMultiSelect) return;
+      if (item.disableMultiSelect && !forceIsMultiSelect) return;
 
       if (item.isSelected) {
         setNewSelectedItems((value) => {
@@ -735,6 +736,7 @@ const Selector = ({
           withErrorFooter={withErrorFooter}
           isLimitReached={isLimitReached}
           displayFileExtension={displayFileExtension}
+          forceIsMultiSelect={forceIsMultiSelect}
           // info
           {...infoProps}
         />

@@ -548,8 +548,13 @@ class SocketHelper {
       }
 
       if (authToken) {
+        const isBearer = authToken.toLowerCase().startsWith("bearer");
+        const formattedToken = isBearer
+          ? authToken
+          : `bearer ${authToken}`;
+
         config.extraHeaders = {
-          Authorization: authToken,
+          Authorization: formattedToken,
         };
 
         // passing authorization header is not supported by websocket

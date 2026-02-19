@@ -76,7 +76,7 @@ type Story = StoryObj<typeof meta>;
 // Basic HelpButton with default settings
 export const Default: Story = {
   args: {
-    tooltipContent: "This is a help tooltip",
+    tooltipContent: <div>This is a help tooltip</div>,
     place: "right",
     offset: 8,
   },
@@ -85,7 +85,7 @@ export const Default: Story = {
 // HelpButton with custom size and color
 export const CustomStyle: Story = {
   args: {
-    tooltipContent: "Customized help button",
+    tooltipContent: <div>Customized help button</div>,
     size: 24,
     color: "#2DA7DB",
     place: "top",
@@ -93,8 +93,8 @@ export const CustomStyle: Story = {
   },
 };
 
-// HelpButton with rich content
-export const RichContent: Story = {
+// HelpButton with formatted content containing multiple elements
+export const WithCustomContent: Story = {
   args: {
     tooltipContent: (
       <div style={{ padding: "8px" }}>
@@ -116,30 +116,28 @@ export const RichContent: Story = {
   },
 };
 
-// HelpButton with dynamic content
-export const DynamicContent: Story = {
-  args: {
-    getContent: () => "This content is generated dynamically",
-    place: "top",
-    offset: 8,
-  },
-};
 
-// HelpButton with custom positioning
-export const CustomPosition: Story = {
+// HelpButton with tooltip positioned at a specific location
+export const CustomTooltipPosition: Story = {
   decorators: [
     (Story) => (
       <div
-        style={{ padding: "50px", display: "flex", justifyContent: "center" }}
+        style={{
+          height: "400px",
+          padding: "40px 20px",
+          border: "1px dashed #ccc",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
         <Story />
       </div>
     ),
   ],
   args: {
-    tooltipContent: "Custom positioned tooltip",
-    place: "right",
-    offset: 16,
-    style: { position: "relative" },
+    tooltipContent: <div>Tooltip appears at specified position</div>,
+    place: "top",
+    offset: 50,
   },
 };

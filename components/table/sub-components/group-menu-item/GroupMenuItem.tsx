@@ -35,6 +35,10 @@ import { DropDownItem } from "../../../drop-down-item";
 import { TGroupMenuItem } from "../../Table.types";
 import styles from "./GroupMenuItem.module.scss";
 
+const DESKTOP_WIDTH = 1024;
+const ITEM_HEIGHT_DESKTOP = 32;
+const ITEM_HEIGHT_TABLET_MOBILE = 36;
+
 const GroupMenuItem = React.memo(
   ({
     item,
@@ -58,7 +62,15 @@ const GroupMenuItem = React.memo(
       withDropDown,
       options,
       id,
+      isMobileView,
+      fixedDropdownStyles,
     } = item;
+
+    // Detect if we're below desktop width (tablet or mobile) - only used when fixedDropdownStyles is true
+    const isTabletOrBelow =
+      fixedDropdownStyles &&
+      typeof window !== "undefined" &&
+      window.innerWidth < DESKTOP_WIDTH;
 
     const onClickOutside = () => {
       setOpen(false);
@@ -104,11 +116,36 @@ const GroupMenuItem = React.memo(
               buttonRef as unknown as React.RefObject<HTMLDivElement>
             }
             zIndex={250}
+            maxHeight={
+              fixedDropdownStyles
+                ? isTabletOrBelow
+                  ? Math.min(options?.length || 5, 5) *
+                    ITEM_HEIGHT_TABLET_MOBILE
+                  : Math.min(options?.length || 5, 5) * ITEM_HEIGHT_DESKTOP
+                : undefined
+            }
+            isMobileView={isMobileView}
+            isNoFixedHeightOptions={fixedDropdownStyles}
+            disableScrollbarPadding={fixedDropdownStyles}
+            useFlexibleHeight={fixedDropdownStyles}
+            style={
+              fixedDropdownStyles && !isMobileView
+                ? { width: "161px" }
+                : undefined
+            }
           >
             {options?.map((option) => {
               const { key, ...rest } = option;
 
-              return <DropDownItem key={key} {...rest} setOpen={setOpen} />;
+              return (
+                <DropDownItem
+                  key={key}
+                  {...rest}
+                  setOpen={setOpen}
+                  truncateText
+                  stopMouseDownPropagation={fixedDropdownStyles}
+                />
+              );
             })}
           </DropDown>
         ) : null}

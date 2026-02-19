@@ -46,236 +46,264 @@ import styles from "./DropDownItem.module.scss";
 export type { DropDownItemProps };
 
 const IconComponent = ({
-	icon,
-	fillIcon = true,
+  icon,
+  fillIcon = true,
 }: {
-	icon: string | React.ReactElement | React.ElementType;
-	fillIcon?: boolean;
+  icon: string | React.ReactElement | React.ElementType;
+  fillIcon?: boolean;
 }) => {
-	const isImageSrc = (src: string) =>
-		(!src.includes("images/") && !src.includes(".svg")) ||
-		src.includes("webplugins");
+  const isImageSrc = (src: string) =>
+    (!src.includes("images/") && !src.includes(".svg")) ||
+    src.includes("webplugins");
 
-	if (typeof icon === "string" && isImageSrc(icon)) {
-		return (
-			<img className="drop-down-icon_image" src={icon} alt="plugin-logo" />
-		);
-	}
+  const isDataUrlSvg = (src: string) => src.startsWith("data:image/svg+xml");
 
-	if (
-		typeof icon === "function" &&
-		React.isValidElement(React.createElement(icon))
-	) {
-		return <div>{React.createElement(icon)}</div>;
-	}
+  if (typeof icon === "string" && isDataUrlSvg(icon)) {
+    return (
+      <ReactSVG
+        className={
+          fillIcon
+            ? classNames(styles.dropDownItemIcon, "drop-down-item_icon")
+            : ""
+        }
+        src={icon}
+      />
+    );
+  }
 
-	return (
-		<ReactSVG
-			src={typeof icon === "string" ? icon : ""}
-			className={
-				fillIcon
-					? classNames(styles.dropDownItemIcon, "drop-down-item_icon")
-					: ""
-			}
-		/>
-	);
+  if (typeof icon === "string" && isImageSrc(icon)) {
+    return (
+      <img className="drop-down-icon_image" src={icon} alt="plugin-logo" />
+    );
+  }
+
+  if (
+    typeof icon === "function" &&
+    React.isValidElement(React.createElement(icon))
+  ) {
+    return <div>{React.createElement(icon)}</div>;
+  }
+
+  return (
+    <ReactSVG
+      src={typeof icon === "string" ? icon : ""}
+      className={
+        fillIcon
+          ? classNames(styles.dropDownItemIcon, "drop-down-item_icon")
+          : ""
+      }
+    />
+  );
 };
 
 const DropDownItem = ({
-	isSeparator = false,
-	isHeader = false,
-	withHeaderArrow,
-	headerArrowAction,
-	icon,
-	children,
-	disabled = false,
-	className,
-	fillIcon = true,
-	isSubMenu = false,
-	isActive = false,
-	withoutIcon = false,
-	noHover = false,
-	noActive = false,
-	isSelected,
-	isActiveDescendant,
-	isBeta,
-	additionalElement,
-	setOpen,
-	withToggle,
-	checked,
-	onClick,
-	onMouseDown,
-	onClickSelectedItem,
-	label = "",
-	tabIndex = -1,
-	textOverflow = false,
-	minWidth,
-	isModern,
-	style,
-	isPaidBadge,
-	badgeLabel,
-	testId,
-	tooltip,
-	betaLabel,
-	paidLabel,
-	...rest
+  isSeparator = false,
+  isHeader = false,
+  withHeaderArrow,
+  headerArrowAction,
+  icon,
+  children,
+  disabled = false,
+  className,
+  fillIcon = true,
+  isSubMenu = false,
+  isActive = false,
+  withoutIcon = false,
+  noHover = false,
+  noActive = false,
+  isSelected,
+  isActiveDescendant,
+  isBeta,
+  additionalElement,
+  setOpen,
+  withToggle,
+  checked,
+  onClick,
+  onMouseDown,
+  onClickSelectedItem,
+  label = "",
+  tabIndex = -1,
+  textOverflow = false,
+  minWidth,
+  isModern,
+  style,
+  isPaidBadge,
+  badgeLabel,
+  testId,
+  tooltip,
+  truncateText,
+  stopMouseDownPropagation,
+  betaLabel,
+  paidLabel,
+  ...rest
 }: DropDownItemProps) => {
-	const { isRTL } = useInterfaceDirection();
-	const { isBase } = useTheme();
+  const { isRTL } = useInterfaceDirection();
+  const { isBase } = useTheme();
 
-	const resolvedBetaLabel =
-		betaLabel || getCommonTranslation("BetaLabel") || "";
-	const resolvedPaidLabel = paidLabel || getCommonTranslation("Paid") || "";
+  const resolvedBetaLabel =
+    betaLabel || getCommonTranslation("BetaLabel") || "";
+  const resolvedPaidLabel = paidLabel || getCommonTranslation("Paid") || "";
 
-	const withDisabledTooltip = disabled && tooltip;
+  const withDisabledTooltip = disabled && tooltip;
 
-	const handleClick = (
-		e: React.MouseEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement>,
-	) => {
-		if (!disabled) onClick?.(e);
-		if (isSelected) onClickSelectedItem?.();
-		if (withDisabledTooltip && isTouchDevice) return e.stopPropagation();
+  const handleMouseDown = (e: React.MouseEvent<HTMLElement>) => {
+    // Stop propagation to prevent click-outside detection from closing dropdown
+    if (stopMouseDownPropagation) e.stopPropagation();
+    onMouseDown?.(e);
+  };
 
-		setOpen?.(false);
-	};
+  const handleClick = (
+    e: React.MouseEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    if (!disabled) onClick?.(e);
+    if (isSelected) onClickSelectedItem?.();
+    if (withDisabledTooltip && isTouchDevice) return e.stopPropagation();
 
-	const handleToggleClick = (
-		e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>,
-	) => {
-		e.stopPropagation();
-	};
+    setOpen?.(false);
+  };
 
-	const handleToggleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		e.stopPropagation();
-		handleClick(e);
-	};
+  const handleToggleClick = (
+    e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    e.stopPropagation();
+  };
 
-	return (
-		<div
-			{...rest}
-			className={classNames(
-				styles.dropDownItem,
-				{
-					[styles.headerItem]: isHeader,
-					[styles.separator]: isSeparator,
-					[styles.noHover]: noHover || isHeader,
-					[styles.noActive]: noActive || isHeader,
-					[styles.rtlIem]: !noHover && !isHeader && isRTL,
-					[styles.selected]: (disabled && isSelected) || isActive,
-					[styles.activeDescendant]: isActiveDescendant && !disabled,
-					[styles.textOverflow]: textOverflow,
-					[styles.modern]: isModern,
-					[styles.disabled]: disabled && !isSelected,
-				},
-				className,
-			)}
-			onClick={handleClick}
-			onMouseDown={onMouseDown}
-			tabIndex={tabIndex}
-			data-testid={testId ?? "drop-down-item"}
-			data-focused={isActiveDescendant}
-			data-tooltip-id={
-				withDisabledTooltip && isTouchDevice ? "info-tooltip" : undefined
-			}
-			data-tooltip-content={
-				withDisabledTooltip && isTouchDevice ? tooltip : undefined
-			}
-			data-tooltip-place="bottom-end"
-			role={isSeparator ? "separator" : "option"}
-			aria-selected={isSelected}
-			aria-disabled={disabled}
-			style={
-				{ "--drop-down-min-width": minWidth, ...style } as React.CSSProperties
-			}
-		>
-			{isHeader && withHeaderArrow ? (
-				<div className={styles.iconWrapper} onClick={headerArrowAction}>
-					<div className="drop-down-icon_image">
-						<ArrowLeftReactUrl />
-					</div>
-				</div>
-			) : null}
+  const handleToggleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    handleClick(e);
+  };
 
-			{icon && !withoutIcon ? (
-				<div className={styles.iconWrapper}>
-					<IconComponent icon={icon} fillIcon={fillIcon} />
-				</div>
-			) : null}
+  return (
+    <div
+      {...rest}
+      className={classNames(
+        styles.dropDownItem,
+        {
+          [styles.headerItem]: isHeader,
+          [styles.separator]: isSeparator,
+          [styles.noHover]: noHover || isHeader,
+          [styles.noActive]: noActive || isHeader,
+          [styles.rtlIem]: !noHover && !isHeader && isRTL,
+          [styles.selected]: (disabled && isSelected) || isActive,
+          [styles.activeDescendant]: isActiveDescendant && !disabled,
+          [styles.textOverflow]: textOverflow,
+          [styles.modern]: isModern,
+          [styles.disabled]: disabled && !isSelected,
+        },
+        className,
+      )}
+      onClick={handleClick}
+      onMouseDown={handleMouseDown}
+      tabIndex={tabIndex}
+      data-testid={testId ?? "drop-down-item"}
+      data-focused={isActiveDescendant}
+      data-tooltip-id={
+        withDisabledTooltip && isTouchDevice ? "info-tooltip" : undefined
+      }
+      data-tooltip-content={
+        withDisabledTooltip && isTouchDevice ? tooltip : undefined
+      }
+      data-tooltip-place="bottom-end"
+      role={isSeparator ? "separator" : "option"}
+      aria-selected={isSelected}
+      aria-disabled={disabled}
+      style={
+        { "--drop-down-min-width": minWidth, ...style } as React.CSSProperties
+      }
+    >
+      {isHeader && withHeaderArrow ? (
+        <div className={styles.iconWrapper} onClick={headerArrowAction}>
+          <div className="drop-down-icon_image">
+            <ArrowLeftReactUrl />
+          </div>
+        </div>
+      ) : null}
 
-			{isSeparator ? (
-				"\u00A0"
-			) : label ? (
-				<span dir="auto">{label}</span>
-			) : (
-				children
-			)}
+      {icon && !withoutIcon ? (
+        <div className={styles.iconWrapper}>
+          <IconComponent icon={icon} fillIcon={fillIcon} />
+        </div>
+      ) : null}
 
-			{isSubMenu ? (
-				<div
-					className={classNames(styles.iconWrapper, styles.submenuArrow, {
-						[styles.RTL]: isRTL,
-						[styles.active]: isActive,
-					})}
-				>
-					<div
-						data-disabled={disabled}
-						className={classNames(
-							styles.dropDownItemIcon,
-							{ [styles.disabled]: disabled },
-							"drop-down-item_icon",
-						)}
-					>
-						<RightArrowReactSvgUrl />
-					</div>
-				</div>
-			) : null}
+      {isSeparator ? (
+        "\u00A0"
+      ) : label ? (
+        <span
+          dir="auto"
+          className={truncateText ? styles.truncateText : undefined}
+        >
+          {label}
+        </span>
+      ) : (
+        children
+      )}
 
-			{withToggle ? (
-				<div className={styles.wrapperToggle} onClick={handleToggleClick}>
-					<ToggleButton
-						isChecked={checked || false}
-						onChange={handleToggleChange}
-						noAnimation
-					/>
-				</div>
-			) : null}
+      {isSubMenu ? (
+        <div
+          className={classNames(styles.iconWrapper, styles.submenuArrow, {
+            [styles.RTL]: isRTL,
+            [styles.active]: isActive,
+          })}
+        >
+          <div
+            data-disabled={disabled}
+            className={classNames(
+              styles.dropDownItemIcon,
+              { [styles.disabled]: disabled },
+              "drop-down-item_icon",
+            )}
+          >
+            <RightArrowReactSvgUrl />
+          </div>
+        </div>
+      ) : null}
 
-			{isBeta ? (
-				<div className={styles.wrapperBadge}>
-					<Badge
-						noHover
-						fontSize="9px"
-						isHovered={false}
-						borderRadius="50px"
-						backgroundColor={globalColors.mainPurple}
-						label={resolvedBetaLabel}
-					/>
-				</div>
-			) : null}
-			{isPaidBadge ? (
-				<div className={styles.wrapperBadge}>
-					<Badge
-						noHover
-						fontSize="9px"
-						isHovered={false}
-						borderRadius="50px"
-						style={{ marginInlineStart: "10px" }}
-						backgroundColor={
-							isBase
-								? globalColors.favoritesStatus
-								: globalColors.favoriteStatusDark
-						}
-						label={badgeLabel || resolvedPaidLabel}
-						isPaidBadge
-					/>
-				</div>
-			) : null}
+      {withToggle ? (
+        <div className={styles.wrapperToggle} onClick={handleToggleClick}>
+          <ToggleButton
+            isChecked={checked || false}
+            onChange={handleToggleChange}
+            noAnimation
+          />
+        </div>
+      ) : null}
 
-			{additionalElement ? (
-				<div className={styles.elementWrapper}>{additionalElement}</div>
-			) : null}
-		</div>
-	);
+      {isBeta ? (
+        <div className={styles.wrapperBadge}>
+          <Badge
+            noHover
+            fontSize="9px"
+            isHovered={false}
+            borderRadius="50px"
+            backgroundColor={globalColors.mainPurple}
+            label={resolvedBetaLabel}
+          />
+        </div>
+      ) : null}
+      {isPaidBadge ? (
+        <div className={styles.wrapperBadge}>
+          <Badge
+            noHover
+            fontSize="9px"
+            isHovered={false}
+            borderRadius="50px"
+            style={{ marginInlineStart: "10px" }}
+            backgroundColor={
+              isBase
+                ? globalColors.favoritesStatus
+                : globalColors.favoriteStatusDark
+            }
+            label={badgeLabel || resolvedPaidLabel}
+            isPaidBadge
+          />
+        </div>
+      ) : null}
+
+      {additionalElement ? (
+        <div className={styles.elementWrapper}>{additionalElement}</div>
+      ) : null}
+    </div>
+  );
 };
 
 export { DropDownItem };

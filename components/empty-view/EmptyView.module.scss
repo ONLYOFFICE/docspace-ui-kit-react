@@ -52,6 +52,8 @@
     --empty-view-items-press: #{colors.$light-gray-selected};
     --empty-view-items-header: #{colors.$black};
     --empty-view-items-subheading: #{colors.$gray-text};
+    --empty-view-separator-color: #{colors.$gray};
+    --empty-view-action-secondary-color: #{colors.$gray};
   }
 
   :global(.dark) & {
@@ -65,6 +67,8 @@
     --empty-view-items-press: #{colors.$gray-dark-strong};
     --empty-view-items-header: #{colors.$white};
     --empty-view-items-subheading: #{colors.$dark-gray-dark};
+    --empty-view-separator-color: #{colors.$gray};
+    --empty-view-action-secondary-color: #{colors.$gray-dark};
   }
 
   @include mixins.mobile {
@@ -164,6 +168,38 @@
   .button {
     align-self: center;
     max-width: fit-content;
+  }
+
+  .separator {
+    align-self: center;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--empty-view-separator-color);
+  }
+
+  .action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    align-self: center;
+    cursor: pointer;
+    color: var(--accent-main, #{colors.$light-blue-main});
+
+    svg {
+      path {
+        fill: currentColor;
+      }
+    }
+
+    span {
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 15px;
+    }
+
+    &.secondary {
+      color: var(--empty-view-action-secondary-color);
+    }
   }
 
   .itemWrapper {

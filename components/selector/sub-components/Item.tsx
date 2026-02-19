@@ -84,6 +84,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
     listHeight,
     isLimitReached,
     displayFileExtension,
+    forceIsMultiSelect,
   }: Data = data;
 
   const { isBase } = useTheme();
@@ -351,7 +352,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
           >
             {disabledText}
           </Text>
-        ) : disableMultiSelect ? null : isMultiSelect ? (
+        ) : disableMultiSelect && !forceIsMultiSelect ? null : isMultiSelect ? (
           <Checkbox
             className={classNames(styles.checkbox, "checkbox")}
             isChecked={isSelected}

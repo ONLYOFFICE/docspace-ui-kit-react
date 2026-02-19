@@ -162,7 +162,7 @@ const Template = (args: AsideProps) => {
         Main content area
       </div>
 
-      <Backdrop visible={isVisible} onClick={close} zIndex={399} />
+      <Backdrop visible={isVisible} onClick={close} zIndex={399}  isAside={true} />
       <Aside {...args} visible={isVisible} onClose={close}>
         {args.children}
       </Aside>

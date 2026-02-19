@@ -18,8 +18,8 @@ export default {
 const Template: StoryFn = () => <AppLoader />;
 
 // Example with custom background color
-export const CustomBackground = Template.bind({});
-CustomBackground.decorators = [
+export const Default = Template.bind({});
+Default.decorators = [
   (StoryComponent) => (
     <div style={{ width: "500px", height: "500px", position: "relative" }}>
       {StoryComponent()}

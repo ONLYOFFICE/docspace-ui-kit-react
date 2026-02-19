@@ -405,6 +405,7 @@ export type SelectorProps = TSelectorHeader &
     ) => void;
 
     isMultiSelect: boolean;
+    forceIsMultiSelect?: boolean;
     selectedItems?: TSelectorItem[];
     maxSelectedItems?: number;
 
@@ -438,6 +439,7 @@ export type BodyProps = TSelectorInfo &
     value?: string;
 
     isMultiSelect: boolean;
+    forceIsMultiSelect?: boolean;
 
     inputItemVisible: boolean;
     setInputItemVisible: (value: boolean) => void;
@@ -659,6 +661,7 @@ export type TSelectorItem = TSelectorItemType & {
   templateIsOwner?: boolean;
   disableMultiSelect?: boolean;
   isSeparator?: boolean;
+  forceIsMultiSelect?: boolean;
 };
 
 export type Data = {
@@ -675,6 +678,7 @@ export type Data = {
   listHeight: number;
   isLimitReached?: boolean;
   displayFileExtension?: boolean;
+  forceIsMultiSelect?: boolean;
 };
 
 export interface ItemProps {
