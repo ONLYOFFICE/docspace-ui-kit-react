@@ -90,7 +90,6 @@ const defaultProps: ChatProps = {
     messages: [],
     chatId: "1",
     total: 0,
-    initMessages: async () => {},
   },
   folderFormValidation: /^[a-zA-Z0-9 ]+$/,
   isAdmin: true,

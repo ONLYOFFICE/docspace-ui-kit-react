@@ -24,7 +24,109 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+@use "../../../../styles/variables/colors" as *;
+
+:global(.dark) {
+  .chatContainer {
+    --accent-main: var(--color-scheme-main-accent, #{$light-blue-main});
+    --background-color: #{$black};
+    --text-color: #{$white};
+    --icon-button-color: #{$gray-dark};
+
+    --chat-header-model-color: #{$gray-dark};
+    --chat-header-button-svg-color: #{$white};
+    --chat-header-button-hover-background: #{$light-dark-gray-hover};
+    --chat-header-button-active-background: #{$gray-dark-mid};
+    --chat-header-button-disabled-color: #{$gray-dark};
+
+    --chat-message-color: #{$dark-gray-dark};
+    --chat-message-user-background-color: #{$white};
+    --chat-message-error-background-color: #{$dark-error-status};
+    --chat-message-file-border-color: #{$gray-dark-strong};
+    --chat-message-code-block-background-color: #{$dark-gray-light};
+    --chat-message-code-block-border: none;
+    --chat-message-code-block-separator-color: #{$gray-dark-strong};
+    --chat-message-tool-block-color: #{$gray-dark-mid};
+    --chat-message-hr-color: #{$gray-dark};
+    --chat-message-table-row-border-color: #{$gray-dark-strong};
+    --chat-message-blockquote-bg-color: #{$white};
+    --chat-message-blockquote-color: #{$dark-gray-dark};
+    --chat-message-source-url-color: #{$dark-gray-dark};
+    --chat-message-source-bg-hover-color: #{$light-dark-gray-hover};
+    --chat-message-source-bg-pressed-color: #{$black};
+    --chat-message-external-link-icon-color: #{$gray-dark};
+
+    --chat-input-background-color: #{$gray-dark-mid};
+    --chat-input-border: 1px solid #{$black};
+    --chat-input-file-border-color: #{$black};
+    --chat-input-file-background-color: #{$black};
+    --chat-input-file-exst-color: #{$gray};
+    --chat-input-tools-button-color: #{$dark-gray-dark};
+    --chat-input-tools-button-disabled-color: #{$gray-dark-strong};
+    --chat-input-tools-button-hover-background: #{$light-dark-gray-hover};
+    --chat-input-tools-button-active-color: #{$white};
+    --chat-input-tools-button-active-background: #{$gray-dark-mid};
+    --chat-input-send-button-color: #{$black};
+    --chat-input-send-button-background: #{$active-color-dark};
+    --chat-input-placeholder-disabled-color: #{$gray-dark-strong};
+
+    --chat-file-item-exst-color: #{$gray-dark};
+
+  }
+}
+
+:global(.rtl) {
+  .chatContainer {
+    --input-text-align: right;
+  }
+}
+
 .chatContainer {
+  --accent-main: var(--color-scheme-main-accent, #{$light-blue-main});
+  --input-text-align: left;
+  --background-color: #{$white};
+  --text-color: #{$black};
+  --icon-button-color: #{$gray};
+
+  --chat-header-model-color: #{$gray};
+  --chat-header-button-svg-color: #{$black};
+  --chat-header-button-hover-background: #{$light-gray-hover};
+  --chat-header-button-active-background: #{$gray-light-mid};
+  --chat-header-button-disabled-color: #{$gray};
+
+  --chat-message-color: #{$gray-text};
+  --chat-message-user-background-color: var(--accent-main);
+  --chat-message-error-background-color: #{$light-error-status};
+  --chat-message-file-border-color: #{$gray-light-mid};
+  --chat-message-code-block-background-color: #{$white};
+  --chat-message-code-block-border: 1px solid #{$gray-light-mid};
+  --chat-message-code-block-separator-color: #{$gray-light-mid};
+  --chat-message-tool-block-color: #{$light-gray-hover};
+  --chat-message-hr-color: #{$gray};
+  --chat-message-table-row-border-color: #{$gray-light-mid};
+  --chat-message-blockquote-bg-color: var(--accent-main);
+  --chat-message-blockquote-color: #{$gray-text};
+  --chat-message-source-url-color: #{$light-gray-dark};
+  --chat-message-source-bg-hover-color: #{$light-gray-selected};
+  --chat-message-source-bg-pressed-color: #{$gray-strong};
+  --chat-message-external-link-icon-color: #{$gray};
+
+  --chat-input-background-color: #{$gray-light};
+  --chat-input-border: unset;
+  --chat-input-file-border-color: #{$gray-light-mid};
+  --chat-input-file-background-color: #{$white};
+  --chat-input-file-exst-color: #{$gray};
+  --chat-input-tools-button-color: #{$gray-text};
+  --chat-input-tools-button-disabled-color: #{$gray};
+  --chat-input-tools-button-hover-background: #{$light-gray-hover};
+  --chat-input-tools-button-active-color: #{$black};
+  --chat-input-tools-button-active-background: #{$gray-light-mid};
+  --chat-input-send-button-color: #{$white};
+  --chat-input-send-button-background: var(--accent-main);
+  --chat-input-placeholder-disabled-color: #{$gray-strong};
+
+  --chat-file-item-exst-color: #{$gray};
+
   width: 100%;
   height: 100%;
 
