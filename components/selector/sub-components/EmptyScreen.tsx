@@ -131,6 +131,17 @@ const EmptyScreen = ({
     >
       {typeof currentImage === "string" ? (
         <img className="empty-image" src={currentImage} alt="empty-screen" />
+      ) : React.isValidElement(currentImage) ? (
+        React.cloneElement(
+          currentImage as React.ReactElement<{ className?: string }>,
+          {
+            className: classNames(
+              "empty-image",
+              (currentImage as React.ReactElement<{ className?: string }>).props
+                .className,
+            ),
+          },
+        )
       ) : (
         currentImage
       )}
