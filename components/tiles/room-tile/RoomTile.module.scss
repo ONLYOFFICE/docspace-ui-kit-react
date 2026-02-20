@@ -79,6 +79,20 @@
     }
   }
 
+  &.isHighlight {
+    animation: Highlight 2s 1;
+
+    @keyframes Highlight {
+      0% {
+        background: rgba(variables.$light-second-main, 0.2);
+      }
+
+      100% {
+        background: none;
+      }
+    }
+  }
+
   &.checked,
   &.isActive,
   &:hover:not(.isEdit) {

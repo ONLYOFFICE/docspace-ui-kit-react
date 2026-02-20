@@ -89,6 +89,8 @@ export type RoomTileProps = {
   inProgress?: boolean;
   /** Flag to show hotkey border */
   showHotkeyBorder?: boolean;
+  /** Flag indicating if the tile should be highlighted */
+  isHighlight?: boolean;
   /** Flag for edit mode */
   isEdit?: boolean;
   /** Data test id for the tile */

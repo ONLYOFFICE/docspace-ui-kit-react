@@ -41,6 +41,7 @@ export const RoomTile = ({
   item,
   checked,
   isActive,
+  isHighlight,
   isEdit,
   children,
   columnCount,
@@ -176,9 +177,10 @@ export const RoomTile = ({
       classNames(styles.roomTile, {
         [styles.checked]: checked,
         [styles.isActive]: isActive,
+        [styles.isHighlight]: isHighlight,
         [styles.isEdit]: isEdit,
       }),
-    [checked, isActive, isEdit],
+    [checked, isActive, isHighlight, isEdit],
   );
 
   return (
