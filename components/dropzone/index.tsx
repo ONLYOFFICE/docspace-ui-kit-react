@@ -38,6 +38,11 @@ import { IconSizeType } from "../../utils";
 import { DropzoneProps } from "./Dropzone.types";
 import styles from "./Dropzone.module.scss";
 import { Link } from "../link";
+import {
+  getRootFolderCount,
+  addPathToFiles,
+  createCustomGetFilesFromEvent,
+} from "./utils";
 
 const Dropzone = ({
   isLoading,
@@ -60,32 +65,6 @@ const Dropzone = ({
   className,
   loaderClassName,
 }: DropzoneProps) => {
-  const getFileRelativePath = (file: File) => {
-    const rawPath =
-      file.webkitRelativePath || (file as File & { path?: string }).path || "";
-    return rawPath.replace(/^\/+/, "");
-  };
-
-  const filterFiles = (files: File[]) => {
-    return files.filter((file) => {
-      const hasPath = getFileRelativePath(file).includes("/");
-      if (isFolderUpload) {
-        return hasPath;
-      }
-      return !hasPath;
-    });
-  };
-
-  const getRootFolderCount = (files: File[]) => {
-    const roots = new Set(
-      files.map((file) => {
-        const p = getFileRelativePath(file);
-        return p.split("/")[0];
-      }),
-    );
-    return roots.size;
-  };
-
   const handleDrop = (acceptedFiles: File[]) => {
     if (!onDrop || acceptedFiles.length === 0) return;
 
@@ -106,113 +85,12 @@ const Dropzone = ({
     onDrop(acceptedFiles);
   };
 
-  const customGetFilesFromEvent = async (event: DropEvent): Promise<File[]> => {
-    const items = (event as DragEvent).dataTransfer?.items;
-    if (!items) {
-      if (getFilesFromEvent) {
-        const files = await Promise.resolve(getFilesFromEvent(event));
-        return filterFiles(files as File[]);
-      }
-      return [];
-    }
-
-    const hasDirectory = Array.from(items).some((item) => {
-      const entry = item.webkitGetAsEntry?.();
-      return entry?.isDirectory;
-    });
-
-    if (!isFolderUpload && hasDirectory) {
-      return [];
-    }
-
-    if (isFolderUpload && !hasDirectory) {
-      return [];
-    }
-
-    if (!isMultipleUpload) {
-      if (isFolderUpload) {
-        const directoryCount = Array.from(items).filter((item) => {
-          const entry = item.webkitGetAsEntry?.();
-          return entry?.isDirectory;
-        }).length;
-        if (directoryCount > 1) {
-          onSingleUploadError?.();
-          return [];
-        }
-      } else {
-        const fileCount = Array.from(items).filter((item) => {
-          const entry = item.webkitGetAsEntry?.();
-          return entry?.isFile;
-        }).length;
-        if (fileCount > 1) {
-          onSingleUploadError?.();
-          return [];
-        }
-      }
-    }
-
-    if (getFilesFromEvent) {
-      const files = await Promise.resolve(getFilesFromEvent(event));
-      return files as File[];
-    }
-
-    const files: File[] = [];
-    const entries: FileSystemEntry[] = [];
-
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const entry = item.webkitGetAsEntry?.();
-      if (entry) {
-        entries.push(entry);
-      }
-    }
-
-    const processEntry = async (
-      entry: FileSystemEntry,
-      path = "",
-    ): Promise<void> => {
-      if (entry.isFile) {
-        const fileEntry = entry as FileSystemFileEntry;
-        const file = await new Promise<File>((resolve) => {
-          fileEntry.file((f) => {
-            Object.defineProperty(f, "webkitRelativePath", {
-              value: path + f.name,
-              writable: false,
-            });
-            resolve(f);
-          });
-        });
-        files.push(file);
-      } else if (entry.isDirectory) {
-        const dirEntry = entry as FileSystemDirectoryEntry;
-        const reader = dirEntry.createReader();
-        const subEntries = await new Promise<FileSystemEntry[]>((resolve) => {
-          reader.readEntries((entries) => resolve(entries));
-        });
-        for (const subEntry of subEntries) {
-          await processEntry(subEntry, path + entry.name + "/");
-        }
-      }
-    };
-
-    for (const entry of entries) {
-      const isDirectory = entry.isDirectory;
-
-      if (!isFolderUpload) {
-        if (isDirectory) {
-          continue;
-        }
-        await processEntry(entry, "");
-      } else {
-        if (!isDirectory) {
-          continue;
-        }
-        await processEntry(entry, "");
-      }
-    }
-
-    return files;
-  };
+  const customGetFilesFromEvent = createCustomGetFilesFromEvent({
+    isFolderUpload,
+    isMultipleUpload,
+    onSingleUploadError,
+    getFilesFromEvent,
+  });
 
   const dropzoneOptions = {
     maxFiles,
@@ -248,15 +126,7 @@ const Dropzone = ({
     const fileList = e.target.files;
     if (!fileList || fileList.length === 0) return;
 
-    const files = Array.from(fileList).map((file) => {
-      if (file.webkitRelativePath && !(file as File & { path?: string }).path) {
-        Object.defineProperty(file, "path", {
-          value: file.webkitRelativePath,
-          writable: false,
-        });
-      }
-      return file;
-    });
+    const files = addPathToFiles(Array.from(fileList));
     handleDrop(files);
     e.target.value = "";
   };
