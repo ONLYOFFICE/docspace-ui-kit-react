@@ -42,6 +42,14 @@ import styles from "./RowContent.stories.module.scss";
 export default {
   title: "Components/Rows/RowContent",
   component: RowContent,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Component for arranging row content with main section and side elements.",
+      },
+    },
+  },
 };
 
 const Template = (args: RowContentProps) => {
