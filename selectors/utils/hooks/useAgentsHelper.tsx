@@ -116,15 +116,17 @@ const useAgentsHelper = ({
         params.set("filterValue", filterValue);
       }
 
-      const roomsFromApi = await apiClient.request<{
-        folders: FolderDtoInteger[];
-        current: FolderDtoInteger;
-        pathParts: { folderType?: number }[];
-        total: number;
-        count: number;
+      const { response } = await apiClient.request<{
+        response: {
+          folders: FolderDtoInteger[];
+          current: FolderDtoInteger;
+          pathParts: { folderType?: number }[];
+          total: number;
+          count: number;
+        };
       }>(`/api/2.0/ai/agents?${params.toString()}`);
 
-      const { folders, total, count, current } = roomsFromApi;
+      const { folders, total, count, current } = response;
 
       if (initRef.current) {
         const { title, id } = current;
@@ -167,8 +169,8 @@ const useAgentsHelper = ({
 
       setSelectedTreeNode?.({
         ...current,
-        path: roomsFromApi.pathParts,
-      } as typeof current & { path: typeof roomsFromApi.pathParts });
+        path: response.pathParts,
+      } as typeof current & { path: typeof response.pathParts });
 
       if (firstLoadRef.current || startIndex === 0) {
         // const { security } = current;

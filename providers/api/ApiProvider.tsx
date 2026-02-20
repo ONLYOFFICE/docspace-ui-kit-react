@@ -58,7 +58,7 @@ export const createApiClient = (basePath: string, apiKey: string) => {
 
   const request = async <T = unknown>(path: string): Promise<T> => {
     const { data } = await instance.get(path);
-    return data.response;
+    return data;
   };
 
   return { instance, request };

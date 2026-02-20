@@ -25,9 +25,9 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { FolderType } from "@onlyoffice/docspace-api-sdk";
-import { EmployeeType, RoomsType } from "../enums";
-import { AvatarRole } from "../components/avatar/Avatar.enums";
-import { getCommonTranslation } from "./i18n";
+import { EmployeeType, RoomsType } from "../../enums";
+import { AvatarRole } from "../../components/avatar/Avatar.enums";
+import { getCommonTranslation } from "../i18n";
 
 export type TTranslation = (
   key: string,
