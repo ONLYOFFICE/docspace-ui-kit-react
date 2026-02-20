@@ -55,7 +55,7 @@ export const ChatInfoBlock = ({
       className={styles.chatInfoBlock}
       headerText={getCommonTranslation("AIFeaturesAreCurrentlyDisabled")}
       bodyText={bodyText}
-      iconNode={<InfoIcon />}
+      iconName={<InfoIcon />}
       dataTestId="chat-info-block"
     />
   );

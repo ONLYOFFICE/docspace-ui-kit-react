@@ -28,13 +28,12 @@ import React from "react";
 import classNames from "classnames";
 import { observer } from "mobx-react";
 import Linkify from "linkify-react";
-import { ReactSVG } from "react-svg";
 import copy from "copy-to-clipboard";
 
 import CopyIcon from "../../../../../../assets/icons/16/copy.react.svg";
 
 import { ContentType, RoleType } from "../../../../../../enums";
-import type { TContent } from "../../../../../../api/ai/types";
+import type { TContent } from "../../../../../../types/ai";
 
 import { Link, LinkTarget } from "../../../../../../components/link";
 import {
@@ -178,7 +177,7 @@ const Message = ({
             }}
             title={getCommonTranslation("CopyMessage")}
           >
-            <CopyIcon/>
+            <CopyIcon />
           </div>
         </div>
       </div>
