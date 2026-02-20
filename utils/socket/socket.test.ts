@@ -282,7 +282,6 @@ describe("SocketHelper", () => {
       instance.connect("/socket", "");
       fire("connection-init");
       mockSocket.emit.mockClear();
-      // @ts-expect-error — intentionally omitting required data
       instance.emit(SocketCommands.Subscribe);
       expect(mockSocket.emit).not.toHaveBeenCalled();
     });
