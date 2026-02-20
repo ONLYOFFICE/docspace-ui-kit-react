@@ -19,6 +19,13 @@ vi.mock("@onlyoffice/docspace-api-sdk", () => {
       data: { response: { culture: "en" } },
     });
   }
+  class MockFoldersApi {}
+  class MockRoomsApi {}
+  class MockFilesApi {}
+  class MockFilesSettingsApi {}
+  class MockGroupApi {}
+  class MockPeopleSearchApi {}
+  class MockSearchApi {}
   return {
     Configuration: MockConfiguration,
     ProfilesApi: MockProfilesApi,
@@ -26,6 +33,13 @@ vi.mock("@onlyoffice/docspace-api-sdk", () => {
     CommonSettingsApiAxiosParamCreator: () => ({
       getPortalColorTheme: vi.fn().mockResolvedValue({ themes: [] }),
     }),
+    FoldersApi: MockFoldersApi,
+    RoomsApi: MockRoomsApi,
+    FilesApi: MockFilesApi,
+    FilesSettingsApi: MockFilesSettingsApi,
+    GroupApi: MockGroupApi,
+    PeopleSearchApi: MockPeopleSearchApi,
+    SearchApi: MockSearchApi,
   };
 });
 

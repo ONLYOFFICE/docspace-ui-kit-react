@@ -30,11 +30,11 @@ import {
   RoomsTypeValues,
   RoomsTypes,
   isManagement,
-} from "./common";
-import { EmployeeType, RoomsType } from "../enums";
-import * as i18n from "./i18n";
+} from ".";
+import { EmployeeType, RoomsType } from "../../enums";
+import * as i18n from "../i18n";
 
-vi.mock("./i18n", () => ({
+vi.mock("../i18n", () => ({
   getCommonTranslation: vi.fn((key: string) => {
     const mocks: Record<string, string> = {
       Owner: "Owner",

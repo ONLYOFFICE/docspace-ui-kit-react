@@ -271,6 +271,11 @@ declare global {
     RendererProcessVariable?: {
       theme?: { id: string; system: string; type: string; addlocal: string };
     };
+    DocSpace: {
+      navigate: (path: string, state?: { [key: string]: unknown }) => void;
+      location: Location & { state: unknown };
+      displayFileExtension?: boolean;
+    };
     logs: {
       socket: string[];
     };

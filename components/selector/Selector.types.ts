@@ -26,23 +26,22 @@
 
 import type React from "react";
 import type {
+  EmployeeStatus,
+  EmployeeType,
+  RoomType,
+  FileShare,
+  FileType,
+  FolderType,
+  FileEntryDtoIntegerAllOfSecurity,
+} from "@onlyoffice/docspace-api-sdk";
+
+import type {
   ICover,
   MergeTypes,
   Nullable,
   WithFlag,
-  TFileSecurity,
-  TFolderSecurity,
-  TRoomSecurity,
   TUserGroup,
 } from "../../types";
-import type {
-  EmployeeStatus,
-  EmployeeType,
-  RoomsType,
-  ShareAccessRights,
-  FileType,
-  FolderType,
-} from "../../enums";
 
 import type { AvatarRole } from "../avatar";
 import type { TTabItem } from "../tabs";
@@ -65,7 +64,7 @@ export type THeaderBackButton =
 export type TInfoBarData = {
   title: string;
   description: string;
-  icon?: string;
+  icon?: string | React.ReactElement;
   onClose?: VoidFunction;
 };
 
@@ -115,7 +114,7 @@ export type TBreadCrumb = {
   isRoom?: boolean;
   isAgent?: boolean;
   minWidth?: string;
-  roomType?: RoomsType;
+  roomType?: RoomType;
   shared?: boolean;
   onClick?: TOnBreadCrumbClick;
   rootFolderType?: FolderType;
@@ -190,7 +189,7 @@ export type TSelectorSearch = WithFlag<
 // empty screen form room
 export type EmptyScreenFormRoomProps = {
   onCreateClickAction: VoidFunction;
-  createDefineRoomType: RoomsType;
+  createDefineRoomType: RoomType;
 };
 
 // empty screen
@@ -204,11 +203,11 @@ export type EmptyScreenProps = {
 };
 
 export type TSelectorEmptyScreen = {
-  emptyScreenImage: string;
+  emptyScreenImage: string | React.ReactElement;
   emptyScreenHeader: string;
   emptyScreenDescription: string;
 
-  searchEmptyScreenImage: string;
+  searchEmptyScreenImage: string | React.ReactElement;
   searchEmptyScreenHeader: string;
   searchEmptyScreenDescription: string;
 };
@@ -248,14 +247,14 @@ type TBaseInputProps = {
   style: React.CSSProperties;
   placeholder?: string;
   color?: string;
-  icon?: string;
+  icon?: string | React.ReactElement;
 };
 
 export type InputItemProps = TBaseInputProps & {
   defaultInputValue: string;
   onAcceptInput: (value: string) => void;
   onCancelInput: VoidFunction;
-  roomType?: RoomsType;
+  roomType?: RoomType;
   cover?: ICover;
   setInputItemVisible: (value: boolean) => void;
   setSavedInputValue: (value: Nullable<string>) => void;
@@ -539,7 +538,7 @@ export type TSelectorItemUser = MergeTypes<
     userType: EmployeeType;
     groups?: TUserGroup[];
     status: EmployeeStatus;
-    access?: ShareAccessRights | string | number;
+    access?: FileShare | string | number;
   }
 >;
 
@@ -550,7 +549,7 @@ export type TSelectorItemFile = MergeTypes<
     fileType: FileType;
     parentId: string | number;
     rootFolderType: string | number;
-    security: TFileSecurity;
+    security: FileEntryDtoIntegerAllOfSecurity;
     icon: string;
   }
 >;
@@ -563,9 +562,9 @@ export type TSelectorItemFolder = MergeTypes<
     rootFolderType: string | number;
     filesCount: number;
     foldersCount: number;
-    security: TFolderSecurity;
+    security: FileEntryDtoIntegerAllOfSecurity;
     icon?: string;
-    avatar?: string;
+    avatar?: string | React.ReactElement;
   }
 >;
 
@@ -573,13 +572,13 @@ export type TSelectorItemRoom = MergeTypes<
   TSelectorItemEmpty,
   {
     isFolder: boolean;
-    roomType: RoomsType;
+    roomType: RoomType;
     shared: boolean;
     parentId: string | number;
     rootFolderType: string | number;
     filesCount: number;
     foldersCount: number;
-    security: TRoomSecurity;
+    security: FileEntryDtoIntegerAllOfSecurity;
     icon?: string;
     color?: string;
     iconOriginal?: string;
@@ -616,7 +615,7 @@ export type TSelectorItemNew = MergeTypes<
     onBackClick: VoidFunction;
 
     isRoomsOnly?: boolean;
-    createDefineRoomType?: RoomsType;
+    createDefineRoomType?: RoomType;
   }
 >;
 
@@ -625,9 +624,9 @@ export type TSelectorItemInput = MergeTypes<
   {
     isInputItem: boolean;
     defaultInputValue: string;
-    icon?: string;
+    icon?: string | React.ReactElement;
     color?: string;
-    roomType?: RoomsType;
+    roomType?: RoomType;
     cover?: ICover;
     placeholder?: string;
 
@@ -658,7 +657,7 @@ export type TSelectorItem = TSelectorItemType & {
   lifetimeTooltip?: string | null;
   viewUrl?: string;
   isTemplate?: boolean;
-  templateAccess?: ShareAccessRights;
+  templateAccess?: FileShare;
   templateIsOwner?: boolean;
   disableMultiSelect?: boolean;
   isSeparator?: boolean;

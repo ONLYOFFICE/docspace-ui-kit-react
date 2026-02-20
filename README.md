@@ -428,6 +428,12 @@ import { Error401, Error403, Error404 } from "@docspace/ui-kit/errors";
 | [trim-separator](./utils/trim-separator/README.md) | Cleans up context menu arrays by removing redundant separators and disabled items |
 | [use-click-outside](./utils/use-click-outside/README.md) | React hook for detecting clicks outside an element, useful for dropdowns and modals |
 | [uuid](./utils/uuid/README.md) | UUID v4 generation utility for unique identifiers |
+| [add-log](./utils/add-log) | Conditionally logs to the browser console or accumulates messages in `window.logs` based on `ClientConfig` settings |
+| [getTitleWithoutExtension](./utils/getTitleWithoutExtension) | Strips the file extension from a title string, returning the bare name |
+| [image-helpers](./utils/image-helpers) | Generates Maps of file extension → SVG icon URL for 24 / 32 / 64 / 96 px icon sizes across document and folder types |
+| [presentInArray](./utils/presentInArray) | Checks whether a string exists in an array with optional case-insensitive comparison |
+| [socket](./utils/socket) | `SocketHelper` singleton for managing WebSocket connections, event subscriptions, and message emission with typed event/command enums |
+| [typeGuards](./utils/typeGuards) | Type guard that checks whether a value is a Next.js `StaticImageData` object (`src`, `height`, `width`) |
 
 ## Enums
 
@@ -472,6 +478,17 @@ Key TypeScript types from `@docspace/ui-kit/types`:
 | `TFolderSecurity` | Detailed folder access rights |
 | `TRoomSecurity` | Detailed room access rights |
 | `TViewAs` | View mode: `"tile"`, `"table"`, `"row"`, `"settings"`, `"profile"` |
+
+## Selectors
+
+| Variant | Item type | Description |
+|---------|-----------|-------------|
+| **Users Selector** | `TSelectorItemUser` | Picks workspace members; rows show avatar, role badge, employee type label, and group membership |
+| **Groups Selector** | `TSelectorItemGroup` | Picks user groups; distinguishes regular groups from system-managed ones |
+| **Files Selector** | `TSelectorItemFile` | Picks files; rows show file-type icon and extension label |
+| **Folders Selector** | `TSelectorItemFolder` | Picks folders; rows show folder icon with nested file and subfolder counts |
+| **Rooms Selector** | `TSelectorItemRoom` | Picks rooms; rows show room icon, cover image, tags, and room-type badge |
+| **MCP Selector** | `TSelectorItemMCP` | Picks Model Context Protocol agents; rows show agent icon and name |
 
 ## i18n Setup
 
