@@ -40,8 +40,6 @@ const DropDown = (props: DropDownProps) => {
     open,
     withBackdrop = true,
 
-    withBlur = false,
-
     isAside,
     withBackground,
     eventTypes,
