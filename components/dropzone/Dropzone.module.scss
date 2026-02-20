@@ -97,14 +97,6 @@
   &.isLoading {
     visibility: hidden;
   }
-
-  &.hasMultipleInputs {
-    cursor: default;
-
-    .dropzoneLink.main {
-      cursor: pointer;
-    }
-  }
 }
 
 .dropzoneLink {

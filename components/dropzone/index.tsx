@@ -42,12 +42,12 @@ import { Link } from "../link";
 const Dropzone = ({
   isLoading,
   isDisabled = false,
+  isFolderUpload = false,
   onDrop,
   accept,
   maxFiles = 0,
   getFilesFromEvent,
-  linkMainTextForFiles,
-  linkMainTextForFolders,
+  linkMainText,
   linkSecondaryText,
   exstsText,
   fullExstsText,
@@ -58,47 +58,145 @@ const Dropzone = ({
   className,
   loaderClassName,
 }: DropzoneProps) => {
-  const folderInputRef = React.useRef<HTMLInputElement>(null);
+  const filterFiles = (files: File[]) => {
+    return files.filter((file) => {
+      const hasPath = file.webkitRelativePath && file.webkitRelativePath.includes("/");
+      if (isFolderUpload) {
+        return hasPath;
+      }
+      return !hasPath;
+    });
+  };
+
+  const handleDrop = (acceptedFiles: File[]) => {
+    if (!onDrop) return;
+
+    const filteredFiles = filterFiles(acceptedFiles);
+    if (filteredFiles.length > 0) {
+      onDrop(filteredFiles);
+    }
+  };
+
+  const customGetFilesFromEvent = async (event: DropEvent): Promise<File[]> => {
+    const items = (event as DragEvent).dataTransfer?.items;
+    if (!items) {
+      if (getFilesFromEvent) {
+        const files = await Promise.resolve(getFilesFromEvent(event));
+        return filterFiles(files as File[]);
+      }
+      return [];
+    }
+
+    const hasDirectory = Array.from(items).some((item) => {
+      const entry = item.webkitGetAsEntry?.();
+      return entry?.isDirectory;
+    });
+
+    if (!isFolderUpload && hasDirectory) {
+      return [];
+    }
+
+    if (isFolderUpload && !hasDirectory) {
+      return [];
+    }
+
+    if (getFilesFromEvent) {
+      const files = await Promise.resolve(getFilesFromEvent(event));
+      return files as File[];
+    }
+
+    const files: File[] = [];
+    const entries: FileSystemEntry[] = [];
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const entry = item.webkitGetAsEntry?.();
+      if (entry) {
+        entries.push(entry);
+      }
+    }
+
+    const processEntry = async (entry: FileSystemEntry, path = ""): Promise<void> => {
+      if (entry.isFile) {
+        const fileEntry = entry as FileSystemFileEntry;
+        const file = await new Promise<File>((resolve) => {
+          fileEntry.file((f) => {
+            Object.defineProperty(f, "webkitRelativePath", {
+              value: path + f.name,
+              writable: false,
+            });
+            resolve(f);
+          });
+        });
+        files.push(file);
+      } else if (entry.isDirectory) {
+        const dirEntry = entry as FileSystemDirectoryEntry;
+        const reader = dirEntry.createReader();
+        const subEntries = await new Promise<FileSystemEntry[]>((resolve) => {
+          reader.readEntries((entries) => resolve(entries));
+        });
+        for (const subEntry of subEntries) {
+          await processEntry(subEntry, path + entry.name + "/");
+        }
+      }
+    };
+
+    for (const entry of entries) {
+      const isDirectory = entry.isDirectory;
+      
+      if (!isFolderUpload) {
+        if (isDirectory) {
+          continue;
+        }
+        await processEntry(entry, "");
+      } else {
+        if (!isDirectory) {
+          continue;
+        }
+        await processEntry(entry, "");
+      }
+    }
+
+    return files;
+  };
 
   const dropzoneOptions = {
     maxFiles,
-    noClick: isDisabled || !!linkMainTextForFolders,
-    noKeyboard: isDisabled,
+    noClick: isDisabled || isFolderUpload,
+    noKeyboard: isDisabled || isFolderUpload,
     noDrag: isDisabled,
     ...(accept ? { accept } : {}),
-    onDrop,
-    ...(getFilesFromEvent
-      ? {
-          getFilesFromEvent: (event: DropEvent) =>
-            Promise.resolve(getFilesFromEvent(event)),
-        }
-      : {}),
+    onDrop: handleDrop,
+    getFilesFromEvent: customGetFilesFromEvent,
   } as Parameters<typeof useDropzone>[0];
 
   const { getRootProps, getInputProps, open } = useDropzone(dropzoneOptions);
 
-  const handleFileClick = (e: React.MouseEvent) => {
-    if (linkMainTextForFolders && !isDisabled) {
-      e.stopPropagation();
-      e.preventDefault();
-      open();
-    }
-  };
+  const folderInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleFolderClick = (e: React.MouseEvent) => {
-    if (linkMainTextForFolders && !isDisabled) {
+  const openFolderDialog = (e?: React.MouseEvent) => {
+    if (e) {
       e.stopPropagation();
-      e.preventDefault();
+    }
+    if (!isDisabled) {
       folderInputRef.current?.click();
     }
   };
 
-  const handleFolderChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !getFilesFromEvent) return;
-    const files = await getFilesFromEvent(e as unknown as DropEvent);
-    if (onDrop) {
-      onDrop(files as File[]);
+  const handleFileClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isDisabled) {
+      open();
     }
+  };
+
+  const handleFolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+    
+    const files = Array.from(fileList);
+    handleDrop(files);
+    e.target.value = "";
   };
 
   const [isFormatsOpen, setIsFormatsOpen] = React.useState(false);
@@ -136,21 +234,13 @@ const Dropzone = ({
       ) : (
         <div
           {...getRootProps({
-            className: classNames(styles.dropzone, {
-              [styles.hasMultipleInputs]: !!linkMainTextForFolders,
-            }),
-            "aria-label": "File upload area",
+            className: styles.dropzone,
+            "aria-label": isFolderUpload ? "Folder upload area" : "File upload area",
             "data-testid": "dropzone-input-area",
           })}
+          {...(isFolderUpload ? { onClick: openFolderDialog } : {})}
         >
-          <input
-            disabled={isDisabled}
-            {...getInputProps({
-              "aria-label": "File input",
-              "data-testid": "dropzone-input",
-            })}
-          />
-          {!!linkMainTextForFolders && (
+          {isFolderUpload ? (
             <input
               ref={folderInputRef}
               type="file"
@@ -162,7 +252,15 @@ const Dropzone = ({
                 directory: "",
               } as React.InputHTMLAttributes<HTMLInputElement>)}
               aria-label="Folder input"
-              data-testid="dropzone-folder-input"
+              data-testid="dropzone-input"
+            />
+          ) : (
+            <input
+              disabled={isDisabled}
+              {...getInputProps({
+                "aria-label": "File input",
+                "data-testid": "dropzone-input",
+              })}
             />
           )}
           {icon && (
@@ -185,31 +283,10 @@ const Dropzone = ({
               })}
               data-testid="dropzone-main-text"
               color="accent"
-              onClick={linkMainTextForFolders ? handleFileClick : undefined}
+              onClick={isFolderUpload ? openFolderDialog : handleFileClick}
             >
-              {linkMainTextForFiles}
+              {linkMainText}
             </Link>
-            {!!linkMainTextForFolders && (
-              <>
-                <span
-                  className={classNames(styles.dropzoneLink, {
-                    [styles.secondary]: true,
-                  })}
-                >
-                  {" or "}
-                </span>
-                <Link
-                  className={classNames(styles.dropzoneLink, {
-                    [styles.main]: true,
-                  })}
-                  data-testid="dropzone-folder-text"
-                  color="accent"
-                  onClick={handleFolderClick}
-                >
-                  {linkMainTextForFolders}
-                </Link>
-              </>
-            )}
             <span
               className={classNames(styles.dropzoneLink, {
                 [styles.secondary]: true,
