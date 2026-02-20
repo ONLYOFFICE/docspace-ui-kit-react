@@ -26,6 +26,7 @@
 
 import React from "react";
 import classNames from "classnames";
+import { RoomType } from "@onlyoffice/docspace-api-sdk";
 
 import Planet12ReactSvg from "../../../assets/icons/12/planet.react.svg";
 import LifetimeRoomIcon from "../../../assets/lifetime-room.react.svg";
@@ -38,8 +39,6 @@ import { Checkbox } from "../../checkbox";
 import { RoomIcon } from "../../room-icon";
 import { Tooltip } from "../../tooltip";
 import { MCPIcon, MCPIconSize } from "../../mcp-icon";
-
-import { type EmployeeType, RoomsType } from "../../../enums";
 
 import type { Data, ItemProps, TSelectorItem } from "../Selector.types";
 import NewItem from "./NewItem";
@@ -194,9 +193,9 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
     }
 
     const showPlanetIcon =
-      (item.roomType === RoomsType.PublicRoom ||
-        item.roomType === RoomsType.FormRoom ||
-        item.roomType === RoomsType.CustomRoom) &&
+      (item.roomType === RoomType.PublicRoom ||
+        item.roomType === RoomType.FillingFormsRoom ||
+        item.roomType === RoomType.CustomRoom) &&
       item.shared;
 
     const badgeIconNode = showPlanetIcon ? <Planet12ReactSvg /> : null;
@@ -204,7 +203,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
     const currentRole = role || AvatarRole.user;
 
     const typeLabel = getUserTypeTranslation(
-      userType as unknown as EmployeeType,
+      userType as Parameters<typeof getUserTypeTranslation>[0],
     );
 
     const onChangeAction = () => {
@@ -283,15 +282,19 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
             isTemplate={isTemplate}
           />
         ) : icon ? (
-          <RoomIcon
-            title={label}
-            className={styles.itemLogo}
-            imgClassName={styles.roomLogo}
-            logo={icon}
-            showDefault={false}
-            badgeIconNode={badgeIconNode ?? undefined}
-            isTemplate={isTemplate}
-          />
+          typeof icon === "string" ? (
+            <RoomIcon
+              title={label}
+              className={styles.itemLogo}
+              imgClassName={styles.roomLogo}
+              logo={icon}
+              showDefault={false}
+              badgeIconNode={badgeIconNode ?? undefined}
+              isTemplate={isTemplate}
+            />
+          ) : (
+            <div className={styles.itemLogo}>{icon}</div>
+          )
         ) : null}
         {renderCustomItem ? (
           renderCustomItem(label, typeLabel, email, isGroup, status, id)

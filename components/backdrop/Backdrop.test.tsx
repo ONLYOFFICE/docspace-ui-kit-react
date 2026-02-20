@@ -189,12 +189,6 @@ describe("<Backdrop />", () => {
       expect(backdrop).toHaveClass(styles.withBackground);
     });
 
-    it("respects withoutBlur on mobile devices", () => {
-      vi.mocked(utils.isMobile).mockReturnValue(true);
-      render(<Backdrop visible withoutBlur />);
-      const backdrop = screen.getByTestId("backdrop");
-      expect(backdrop).toHaveClass(styles.withoutBlur);
-    });
   });
 
   describe("Multiple Backdrop Handling", () => {
@@ -328,16 +322,6 @@ describe("<Backdrop />", () => {
     it("applies visible class when visible is true", () => {
       render(<Backdrop visible />);
       expect(screen.getByTestId("backdrop")).toHaveClass(styles.visible);
-    });
-
-    it("applies withoutBlur class when withoutBlur is true", () => {
-      render(<Backdrop visible withoutBlur />);
-      expect(screen.getByTestId("backdrop")).toHaveClass(styles.withoutBlur);
-    });
-
-    it("applies withBlur class when withoutBlur is false", () => {
-      render(<Backdrop visible withoutBlur={false} />);
-      expect(screen.getByTestId("backdrop")).toHaveClass(styles.withBlur);
     });
   });
 });

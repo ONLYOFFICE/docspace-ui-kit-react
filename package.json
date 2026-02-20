@@ -33,6 +33,7 @@
     "@socket.io/component-emitter": "3.1.2",
     "@types/node": "24.10.7",
     "@types/react-text-mask": "5.4.14",
+    "axios": "^1.13.5",
     "classnames": "^2.5.1",
     "cnbuilder": "3.1.0",
     "copy-to-clipboard": "3.3.3",
