@@ -28,9 +28,9 @@
 
 import { observer } from "mobx-react";
 
-import WordIcon from "../../../../../../../../images/icons/16/word.svg";
-import FormIcon from "../../../../../../../../images/icons/16/pdf.svg";
-import PresentationIcon from "../../../../../../../../images/icons/16/presentation.svg";
+import WordIcon from "../../../../../../../../assets/icons/16/word.svg";
+import FormIcon from "../../../../../../../../assets/icons/16/pdf.svg";
+import PresentationIcon from "../../../../../../../../assets/icons/16/presentation.svg";
 
 import type { TToolCallContent } from "../../../../../../../../types/ai";
 import { useTheme } from "../../../../../../../../context/ThemeContext";
@@ -46,22 +46,23 @@ import { getCommonTranslation } from "../../../../../../../../utils";
 
 import { useMessageStore } from "../../../../../../store/messageStore";
 
-export const MCPToolContent = observer(({ content }: { content: TToolCallContent }) => {
-  const {
+export const MCPToolContent = observer(
+  ({ content }: { content: TToolCallContent }) => {
+    const {
       generateDocxToolName,
       generateFormToolName,
       generatePresentationToolName,
     } = useMessageStore();
-  const { isBase } = useTheme();
-  
-  const isGenerateDocx = generateDocxToolName === content.name;
-  const isGenerateForm = generateFormToolName === content.name;
-  const isGeneratePresentation =
-    generatePresentationToolName === content.name;
+    const { isBase } = useTheme();
 
-  const ownIcon = content.mcpServerInfo?.icon?.icon16;
+    const isGenerateDocx = generateDocxToolName === content.name;
+    const isGenerateForm = generateFormToolName === content.name;
+    const isGeneratePresentation =
+      generatePresentationToolName === content.name;
 
-  const icon = isGenerateDocx ? (
+    const ownIcon = content.mcpServerInfo?.icon?.icon16;
+
+    const icon = isGenerateDocx ? (
       <WordIcon />
     ) : isGenerateForm ? (
       <FormIcon />
@@ -69,33 +70,36 @@ export const MCPToolContent = observer(({ content }: { content: TToolCallContent
       <PresentationIcon />
     ) : null;
 
-  return (
-    <>
-      <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
-        {getCommonTranslation("ToolCallExecuted")}:
-      </Text>
-      {icon ?? <MCPIcon
-        title={content.mcpServerInfo?.serverName || ""}
-        imgSrc={ownIcon}
-        imgNode={
-          ownIcon
-            ? null
-            : getServerIcon(
-                content.mcpServerInfo?.serverType || ServerType.Custom,
-                isBase,
-              )
-        }
-        size={MCPIconSize.Small}
-      />}
+    return (
+      <>
+        <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
+          {getCommonTranslation("ToolCallExecuted")}:
+        </Text>
+        {icon ?? (
+          <MCPIcon
+            title={content.mcpServerInfo?.serverName || ""}
+            imgSrc={ownIcon}
+            imgNode={
+              ownIcon
+                ? null
+                : getServerIcon(
+                    content.mcpServerInfo?.serverType || ServerType.Custom,
+                    isBase,
+                  )
+            }
+            size={MCPIconSize.Small}
+          />
+        )}
 
-      <Text
-        fontSize="13px"
-        lineHeight="15px"
-        fontWeight={600}
-        className={styles.toolName}
-      >
-        {content.name}
-      </Text>
-    </>
-  );
-});
+        <Text
+          fontSize="13px"
+          lineHeight="15px"
+          fontWeight={600}
+          className={styles.toolName}
+        >
+          {content.name}
+        </Text>
+      </>
+    );
+  },
+);
