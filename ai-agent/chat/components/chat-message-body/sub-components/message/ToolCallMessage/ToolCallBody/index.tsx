@@ -26,7 +26,7 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import React from "react";
+import { observer } from "mobx-react";
 
 import styles from "../../../../ChatMessageBody.module.scss";
 import type { TToolCallContent } from "../../../../../../../../types/ai";
@@ -41,7 +41,7 @@ type ToolCallBodyProps = {
   placement: ToolCallPlacement;
 };
 
-export const ToolCallBody = ({ content, placement }: ToolCallBodyProps) => {
+export const ToolCallBody = observer(({ content, placement }: ToolCallBodyProps) => {
   const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
 
   if (content.result?.error) {
@@ -67,4 +67,5 @@ export const ToolCallBody = ({ content, placement }: ToolCallBodyProps) => {
       )}
     </div>
   );
-};
+}
+);

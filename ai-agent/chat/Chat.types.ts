@@ -44,6 +44,11 @@ export type TChatPlaylistImage = {
   src: string;
 };
 
+export type TGenerateDocStoreProps = {
+  roomId: string | number;
+  children: React.ReactNode;
+};
+
 export type TChatStoreProps = {
   roomId: string | number;
   children: React.ReactNode;
@@ -126,6 +131,7 @@ export type MessageErrorProps = {
 export type MessageFilesProps = {
   files: TContent[];
   getIcon: TGetIcon;
+  reverse?: boolean;
 };
 
 export type MessageImagesProps = {

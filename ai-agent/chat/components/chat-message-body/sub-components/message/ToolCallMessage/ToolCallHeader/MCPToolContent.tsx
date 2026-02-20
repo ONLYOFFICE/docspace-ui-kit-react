@@ -26,7 +26,11 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import React from "react";
+import { observer } from "mobx-react";
+
+import WordIcon from "../../../../../../../../images/icons/16/word.svg";
+import FormIcon from "../../../../../../../../images/icons/16/pdf.svg";
+import PresentationIcon from "../../../../../../../../images/icons/16/presentation.svg";
 
 import type { TToolCallContent } from "../../../../../../../../types/ai";
 import { useTheme } from "../../../../../../../../context/ThemeContext";
@@ -40,17 +44,37 @@ import {
 } from "../../../../../../../../components/mcp-icon";
 import { getCommonTranslation } from "../../../../../../../../utils";
 
-export const MCPToolContent = ({ content }: { content: TToolCallContent }) => {
+import { useMessageStore } from "../../../../../../store/messageStore";
+
+export const MCPToolContent = observer(({ content }: { content: TToolCallContent }) => {
+  const {
+      generateDocxToolName,
+      generateFormToolName,
+      generatePresentationToolName,
+    } = useMessageStore();
   const { isBase } = useTheme();
+  
+  const isGenerateDocx = generateDocxToolName === content.name;
+  const isGenerateForm = generateFormToolName === content.name;
+  const isGeneratePresentation =
+    generatePresentationToolName === content.name;
 
   const ownIcon = content.mcpServerInfo?.icon?.icon16;
+
+  const icon = isGenerateDocx ? (
+      <WordIcon />
+    ) : isGenerateForm ? (
+      <FormIcon />
+    ) : isGeneratePresentation ? (
+      <PresentationIcon />
+    ) : null;
 
   return (
     <>
       <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
         {getCommonTranslation("ToolCallExecuted")}:
       </Text>
-      <MCPIcon
+      {icon ?? <MCPIcon
         title={content.mcpServerInfo?.serverName || ""}
         imgSrc={ownIcon}
         imgNode={
@@ -62,7 +86,7 @@ export const MCPToolContent = ({ content }: { content: TToolCallContent }) => {
               )
         }
         size={MCPIconSize.Small}
-      />
+      />}
 
       <Text
         fontSize="13px"
@@ -74,4 +98,4 @@ export const MCPToolContent = ({ content }: { content: TToolCallContent }) => {
       </Text>
     </>
   );
-};
+});

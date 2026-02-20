@@ -26,6 +26,7 @@
 
 import React from "react";
 import classNames from "classnames";
+import { observer } from "mobx-react";
 import Linkify from "linkify-react";
 import { ReactSVG } from "react-svg";
 import copy from "copy-to-clipboard";
@@ -33,6 +34,7 @@ import copy from "copy-to-clipboard";
 import CopyIcon from "../../../../../../assets/icons/16/copy.react.svg";
 
 import { ContentType, RoleType } from "../../../../../../enums";
+import type { TContent } from "../../../../../../api/ai/types";
 
 import { Link, LinkTarget } from "../../../../../../components/link";
 import {
@@ -44,6 +46,7 @@ import { Text } from "../../../../../../components/text";
 
 import type { MessageProps } from "../../../../Chat.types";
 import { useChatStore } from "../../../../store/chatStore";
+import { useMessageStore } from "../../../../store/messageStore";
 
 import styles from "../../ChatMessageBody.module.scss";
 
@@ -86,6 +89,11 @@ const Message = ({
   setMediaViewerVisible,
 }: MessageProps) => {
   const { currentChat } = useChatStore();
+  const {
+    generateDocxToolName,
+    generateFormToolName,
+    generatePresentationToolName,
+  } = useMessageStore();
 
   const isUser = message.role === RoleType.UserMessage;
   const isError = message.role === RoleType.Error;
@@ -195,6 +203,29 @@ const Message = ({
     })
     .join("");
 
+  const files = message.contents
+    .map((c) => {
+      if (!message.id) return false;
+
+      if (c.type !== ContentType.Tool) return false;
+
+      if (
+        c.name !== generateDocxToolName &&
+        c.name !== generateFormToolName &&
+        c.name !== generatePresentationToolName
+      )
+        return false;
+
+      if (!c.result) return false;
+
+      const { data } = c.result;
+
+      if (!data) return false;
+
+      return { type: ContentType.Files, ...data } as TContent;
+    })
+    .filter((t) => !!t);
+
   return (
     <div
       key={`${currentChat?.id}-${message.createdOn}-${idx * 2}`}
@@ -215,6 +246,7 @@ const Message = ({
 
         return null;
       })}
+      {files.length ? <Files files={files} getIcon={getIcon} reverse /> : null}
       {message.id ? (
         <Buttons
           text={fullText}
@@ -231,4 +263,4 @@ const Message = ({
   );
 };
 
-export default React.memo(Message);
+export default observer(Message);

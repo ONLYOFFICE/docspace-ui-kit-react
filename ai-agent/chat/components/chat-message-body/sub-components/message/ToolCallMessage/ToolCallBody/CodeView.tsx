@@ -26,7 +26,7 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import React from "react";
+import { observer } from "mobx-react";
 
 import type { TToolCallContent } from "../../../../../../../../types/ai";
 import styles from "../../../../ChatMessageBody.module.scss";
@@ -36,7 +36,7 @@ import { Text } from "../../../../../../../../components/text";
 import type { ToolCallPlacement } from "../ToolCall.enum";
 import { getCommonTranslation } from "../../../../../../../../utils";
 
-export const CodeView = ({
+export const CodeView = observer(({
   content,
   placement,
 }: {
@@ -44,17 +44,19 @@ export const CodeView = ({
   placement: ToolCallPlacement;
 }) => {
   const getResult = () => {
-    if (content.result && typeof content.result === "string") {
-      return content.result;
-    }
+      if (content.result && typeof content.result === "string") {
+        return content.result;
+      }
 
-    if (content.result && "content" in content.result) {
-      return (content.result?.content as Record<string, unknown>[])?.[0]
-        .text as string;
-    }
+      if (content?.result?.data) return JSON.stringify(content.result.data);
 
-    return "";
-  };
+      if (content.result && "content" in content.result) {
+        return (content.result?.content as Record<string, unknown>[])?.[0]
+          .text as string;
+      }
+
+      return "";
+    };
 
   const result = getResult();
 
@@ -101,4 +103,4 @@ export const CodeView = ({
       ) : null}
     </>
   );
-};
+});
