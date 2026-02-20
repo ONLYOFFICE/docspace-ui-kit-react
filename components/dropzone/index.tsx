@@ -43,6 +43,8 @@ const Dropzone = ({
   isLoading,
   isDisabled = false,
   isFolderUpload = false,
+  isMultipleUpload = true,
+  onSingleUploadError,
   onDrop,
   accept,
   maxFiles = 0,
@@ -58,9 +60,15 @@ const Dropzone = ({
   className,
   loaderClassName,
 }: DropzoneProps) => {
+  const getFileRelativePath = (file: File) => {
+    const rawPath =
+      file.webkitRelativePath || (file as File & { path?: string }).path || "";
+    return rawPath.replace(/^\/+/, "");
+  };
+
   const filterFiles = (files: File[]) => {
     return files.filter((file) => {
-      const hasPath = file.webkitRelativePath && file.webkitRelativePath.includes("/");
+      const hasPath = getFileRelativePath(file).includes("/");
       if (isFolderUpload) {
         return hasPath;
       }
@@ -68,13 +76,34 @@ const Dropzone = ({
     });
   };
 
-  const handleDrop = (acceptedFiles: File[]) => {
-    if (!onDrop) return;
+  const getRootFolderCount = (files: File[]) => {
+    const roots = new Set(
+      files.map((file) => {
+        const p = getFileRelativePath(file);
+        return p.split("/")[0];
+      }),
+    );
+    return roots.size;
+  };
 
-    const filteredFiles = filterFiles(acceptedFiles);
-    if (filteredFiles.length > 0) {
-      onDrop(filteredFiles);
+  const handleDrop = (acceptedFiles: File[]) => {
+    if (!onDrop || acceptedFiles.length === 0) return;
+
+    if (!isMultipleUpload) {
+      if (isFolderUpload) {
+        if (getRootFolderCount(acceptedFiles) > 1) {
+          onSingleUploadError?.();
+          return;
+        }
+      } else {
+        if (acceptedFiles.length > 1) {
+          onSingleUploadError?.();
+          return;
+        }
+      }
     }
+
+    onDrop(acceptedFiles);
   };
 
   const customGetFilesFromEvent = async (event: DropEvent): Promise<File[]> => {
@@ -100,6 +129,28 @@ const Dropzone = ({
       return [];
     }
 
+    if (!isMultipleUpload) {
+      if (isFolderUpload) {
+        const directoryCount = Array.from(items).filter((item) => {
+          const entry = item.webkitGetAsEntry?.();
+          return entry?.isDirectory;
+        }).length;
+        if (directoryCount > 1) {
+          onSingleUploadError?.();
+          return [];
+        }
+      } else {
+        const fileCount = Array.from(items).filter((item) => {
+          const entry = item.webkitGetAsEntry?.();
+          return entry?.isFile;
+        }).length;
+        if (fileCount > 1) {
+          onSingleUploadError?.();
+          return [];
+        }
+      }
+    }
+
     if (getFilesFromEvent) {
       const files = await Promise.resolve(getFilesFromEvent(event));
       return files as File[];
@@ -116,7 +167,10 @@ const Dropzone = ({
       }
     }
 
-    const processEntry = async (entry: FileSystemEntry, path = ""): Promise<void> => {
+    const processEntry = async (
+      entry: FileSystemEntry,
+      path = "",
+    ): Promise<void> => {
       if (entry.isFile) {
         const fileEntry = entry as FileSystemFileEntry;
         const file = await new Promise<File>((resolve) => {
@@ -143,7 +197,7 @@ const Dropzone = ({
 
     for (const entry of entries) {
       const isDirectory = entry.isDirectory;
-      
+
       if (!isFolderUpload) {
         if (isDirectory) {
           continue;
@@ -165,7 +219,7 @@ const Dropzone = ({
     noClick: isDisabled || isFolderUpload,
     noKeyboard: isDisabled || isFolderUpload,
     noDrag: isDisabled,
-    ...(accept ? { accept } : {}),
+    ...(!isFolderUpload && accept ? { accept } : {}),
     onDrop: handleDrop,
     getFilesFromEvent: customGetFilesFromEvent,
   } as Parameters<typeof useDropzone>[0];
@@ -193,8 +247,16 @@ const Dropzone = ({
   const handleFolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (!fileList || fileList.length === 0) return;
-    
-    const files = Array.from(fileList);
+
+    const files = Array.from(fileList).map((file) => {
+      if (file.webkitRelativePath && !(file as File & { path?: string }).path) {
+        Object.defineProperty(file, "path", {
+          value: file.webkitRelativePath,
+          writable: false,
+        });
+      }
+      return file;
+    });
     handleDrop(files);
     e.target.value = "";
   };
@@ -235,7 +297,9 @@ const Dropzone = ({
         <div
           {...getRootProps({
             className: styles.dropzone,
-            "aria-label": isFolderUpload ? "Folder upload area" : "File upload area",
+            "aria-label": isFolderUpload
+              ? "Folder upload area"
+              : "File upload area",
             "data-testid": "dropzone-input-area",
           })}
           {...(isFolderUpload ? { onClick: openFolderDialog } : {})}
@@ -296,56 +360,58 @@ const Dropzone = ({
               {linkSecondaryText}
             </span>
           </div>
-          <div
-            ref={formatsRef}
-            className={classNames(styles.dropzoneExsts, {
-              [styles.clickable]: !!fullExstsText,
-            })}
-            data-testid="dropzone-file-types"
-            aria-label="Supported file types"
-            onClick={handleFormatsClick}
-          >
+          {!isFolderUpload && (
             <div
-              className={classNames(styles.dropzoneExstsTextContainer, {
-                [styles.isOpen]: isFormatsOpen,
+              ref={formatsRef}
+              className={classNames(styles.dropzoneExsts, {
                 [styles.clickable]: !!fullExstsText,
               })}
+              data-testid="dropzone-file-types"
+              aria-label="Supported file types"
+              onClick={handleFormatsClick}
             >
-              <span className={styles.dropzoneExstsText}>{exstsText}</span>
-              {formatsPlusBadgeValue && formatsPlusBadgeValue > 0 ? (
-                <Badge
-                  className={styles.dropzoneExstsBadge}
-                  label={`+${formatsPlusBadgeValue}`}
-                  isMutedBadge
-                  borderRadius="50px"
-                />
-              ) : null}
-              {fullExstsText ? (
-                <TriangleDownIcon
-                  data-size={IconSizeType.scale}
-                  className={classNames(styles.dropzoneArrowIcon, {
-                    [styles.isOpen]: isFormatsOpen,
-                  })}
-                />
-              ) : null}
-              {fullExstsText ? (
-                <DropDown
-                  className={styles.dropzoneFormatsDropdown}
-                  open={isFormatsOpen}
-                  clickOutsideAction={handleFormatsClose}
-                  forwardedRef={formatsRef}
-                  manualY="4"
-                  directionY="bottom"
-                  withBackdrop={false}
-                  isDefaultMode={false}
-                >
-                  <div className={styles.dropzoneFormatsContent}>
-                    {fullExstsText}
-                  </div>
-                </DropDown>
-              ) : null}
+              <div
+                className={classNames(styles.dropzoneExstsTextContainer, {
+                  [styles.isOpen]: isFormatsOpen,
+                  [styles.clickable]: !!fullExstsText,
+                })}
+              >
+                <span className={styles.dropzoneExstsText}>{exstsText}</span>
+                {formatsPlusBadgeValue && formatsPlusBadgeValue > 0 ? (
+                  <Badge
+                    className={styles.dropzoneExstsBadge}
+                    label={`+${formatsPlusBadgeValue}`}
+                    isMutedBadge
+                    borderRadius="50px"
+                  />
+                ) : null}
+                {fullExstsText ? (
+                  <TriangleDownIcon
+                    data-size={IconSizeType.scale}
+                    className={classNames(styles.dropzoneArrowIcon, {
+                      [styles.isOpen]: isFormatsOpen,
+                    })}
+                  />
+                ) : null}
+                {fullExstsText ? (
+                  <DropDown
+                    className={styles.dropzoneFormatsDropdown}
+                    open={isFormatsOpen}
+                    clickOutsideAction={handleFormatsClose}
+                    forwardedRef={formatsRef}
+                    manualY="4"
+                    directionY="bottom"
+                    withBackdrop={false}
+                    isDefaultMode={false}
+                  >
+                    <div className={styles.dropzoneFormatsContent}>
+                      {fullExstsText}
+                    </div>
+                  </DropDown>
+                ) : null}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>

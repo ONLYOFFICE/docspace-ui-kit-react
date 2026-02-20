@@ -33,6 +33,10 @@ type BaseDropzoneProps = {
   isDisabled?: boolean;
   /** Enables folder upload mode instead of file upload */
   isFolderUpload?: boolean;
+  /** Allows multiple files/folders upload. When false, only one item is accepted (default: true) */
+  isMultipleUpload?: boolean;
+  /** Called when user tries to upload multiple items in single upload mode */
+  onSingleUploadError?: () => void;
   /** Main text displayed in the dropzone */
   linkMainText: string;
   /** Secondary text displayed in the dropzone */
