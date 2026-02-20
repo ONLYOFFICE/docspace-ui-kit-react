@@ -108,8 +108,15 @@ describe("Dropzone", () => {
             kind: "file",
             type: file.type,
             getAsFile: () => file,
+            webkitGetAsEntry: () => ({
+              isFile: true,
+              isDirectory: false,
+              name: file.name,
+              file: (callback: (f: File) => void) => callback(file),
+            }),
           },
         ],
+        length: 1,
       },
     });
 
@@ -117,7 +124,7 @@ describe("Dropzone", () => {
       fireEvent(dropzone, dropEvent);
     });
     await new Promise(process.nextTick);
-    expect(onDrop).toHaveBeenCalledWith([file], [], expect.any(Object));
+    expect(onDrop).toHaveBeenCalledWith([file]);
   });
 
   it("applies loading styles when isLoading is true", () => {
