@@ -63,12 +63,6 @@ export interface BackdropProps {
   isAside?: boolean;
 
   /**
-   * Disables the blur effect, typically used with context menus
-   * @default false
-   */
-  withoutBlur?: boolean;
-
-  /**
    * Forces the backdrop to render without a background
    * Takes precedence over withBackground
    * @default false

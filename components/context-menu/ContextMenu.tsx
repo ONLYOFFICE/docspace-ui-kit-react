@@ -766,7 +766,6 @@ const ContextMenu = (props: ContextMenuProps) => {
         <Backdrop
           visible={(visible && (changeView || ignoreChangeView)) || false}
           withBackground
-          withoutBlur={false}
           zIndex={baseZIndex}
           onClick={onClickBackdrop}
         />

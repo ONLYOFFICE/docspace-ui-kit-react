@@ -40,8 +40,6 @@ const DropDown = (props: DropDownProps) => {
     open,
     withBackdrop = true,
 
-    withBlur = false,
-
     isAside,
     withBackground,
     eventTypes,
@@ -75,7 +73,6 @@ const DropDown = (props: DropDownProps) => {
       visible={open || false}
       zIndex={usePortalBackdrop ? 400 : 199}
       onClick={toggleDropDown}
-      withoutBlur={!withBlur}
       isAside={isAside}
       withBackground={withBackground}
       withoutBackground={withoutBackground}

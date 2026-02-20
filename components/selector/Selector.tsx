@@ -771,7 +771,6 @@ const Selector = ({
         zIndex={310}
         isAside
         withoutBackground={withoutBackground}
-        withoutBlur={!withBlur}
       />
       <Aside
         className="header_aside-panel"

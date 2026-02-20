@@ -32,9 +32,74 @@ const meta = {
   title: "Components/UI/Tag",
   component: Tag,
   parameters: {
+    docs: {
+      description: {
+        component: `
+A flexible tag/label component for displaying categorized or status information.
+
+## Features
+- Multiple tag types and states
+- New and deleted tag indicators
+- Disabled state support
+- Click and delete handlers
+- Custom styling options
+- Max width configuration
+- Responsive design
+
+## Usage
+Used for displaying tags, labels, categories, filters, or status badges throughout the application.
+`,
+      },
+    },
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=62-2597&mode=design&t=TBNCKMQKQMxr44IZ-0",
+    },
+  },
+  argTypes: {
+    tag: {
+      control: "text",
+      description: "Identifier for the tag type or category",
+    },
+    label: {
+      control: "text",
+      description: "Display text for the tag",
+    },
+    isNewTag: {
+      control: "boolean",
+      description: "When true, marks the tag as newly created",
+    },
+    isDeleted: {
+      control: "boolean",
+      description: "When true, displays the tag with a deleted/strikethrough style",
+    },
+    isDisabled: {
+      control: "boolean",
+      description: "When true, disables the tag and prevents interactions",
+    },
+    tagMaxWidth: {
+      control: "text",
+      description: "Maximum width of the tag element (CSS width value)",
+    },
+    onClick: {
+      action: "clicked",
+      description: "Callback function when the tag is clicked",
+    },
+    onDelete: {
+      action: "deleted",
+      description: "Callback function when the delete button is clicked",
+    },
+    id: {
+      control: "text",
+      description: "HTML id attribute for the tag element",
+    },
+    className: {
+      control: "text",
+      description: "Custom CSS class names",
+    },
+    style: {
+      control: "object",
+      description: "Custom inline styles",
     },
   },
 } satisfies Meta<typeof Tag>;
@@ -56,6 +121,13 @@ export const Default: Story = {
     className: "",
     style: { color: "red" },
   },
+  parameters: {
+    docs: {
+      description: {
+        story: "Default tag with standard styling. Shows a clickable tag with a delete button and custom red text color.",
+      },
+    },
+  },
 };
 
 export const NewTag: Story = {
@@ -66,6 +138,13 @@ export const NewTag: Story = {
     isDisabled: false,
     onDelete: () => {},
     onClick: () => {},
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Tag marked as newly created. Shows a visual indicator to distinguish newly added tags from existing ones.",
+      },
+    },
   },
 };
 
@@ -79,6 +158,13 @@ export const DeletedTag: Story = {
     onDelete: () => {},
     onClick: () => {},
   },
+  parameters: {
+    docs: {
+      description: {
+        story: "Tag marked as deleted. Shows strikethrough styling to indicate the tag has been deleted or is no longer active.",
+      },
+    },
+  },
 };
 
 export const DisabledTag: Story = {
@@ -89,6 +175,13 @@ export const DisabledTag: Story = {
     isDisabled: true,
     onDelete: () => {},
     onClick: () => {},
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Disabled tag that cannot be interacted with. Shows disabled styling and prevents click or delete actions.",
+      },
+    },
   },
 };
 
@@ -103,6 +196,13 @@ export const TagWithCustomStyles: Story = {
     tagMaxWidth: "200px",
     style: { backgroundColor: "pink" },
   },
+  parameters: {
+    docs: {
+      description: {
+        story: "Tag with custom styling applied. Demonstrates how to customize the tag appearance with inline styles and max width.",
+      },
+    },
+  },
 };
 
 export const TagWithClickHandler: Story = {
@@ -114,5 +214,12 @@ export const TagWithClickHandler: Story = {
     onDelete: () => {},
     onClick: () => alert("Tag clicked!"),
     tagMaxWidth: "160px",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Tag with an onClick handler. Clicking the tag itself (not the delete button) triggers a custom action or event.",
+      },
+    },
   },
 };
