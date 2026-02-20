@@ -75,6 +75,22 @@ const meta = {
     },
   },
   tags: ["!autodocs"],
+  decorators: [
+    (Story) => {
+      return (
+        <div>
+          <div style={{ marginBottom: "20px", fontSize: "14px" }}>
+            <p>
+              <strong>Note:</strong> TableHeader component for displaying table
+              headers with support for column resizing, sorting, and column
+              visibility settings.
+            </p>
+          </div>
+          <Story />
+        </div>
+      );
+    },
+  ],
 } satisfies Meta<typeof TableHeader>;
 
 export default meta;
@@ -150,42 +166,11 @@ export const WithoutSettings: Story = {
   },
 };
 
-export const WithInfoPanel: Story = {
-  render: (args) => <TableHeaderWrapper {...args} />,
-  args: {
-    ...Default.args,
-    infoPanelVisible: true,
-  },
-};
 
 export const WithoutSorting: Story = {
   render: (args) => <TableHeaderWrapper {...args} />,
   args: {
     ...Default.args,
     sortingVisible: false,
-  },
-};
-
-export const WithCheckbox: Story = {
-  render: (args) => <TableHeaderWrapper {...args} />,
-  args: {
-    ...Default.args,
-    columns: [
-      {
-        key: "checkbox",
-        title: "checkbox",
-        enable: true,
-        default: true,
-        active: true,
-        minWidth: 180,
-        resizable: false,
-        checkbox: {
-          value: true,
-          isIndeterminate: false,
-          onChange: () => {},
-        },
-      },
-      ...(Default.args?.columns as TTableColumn[]),
-    ],
   },
 };

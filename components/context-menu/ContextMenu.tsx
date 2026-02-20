@@ -117,6 +117,7 @@ const ContextMenu = (props: ContextMenuProps) => {
     showDisabledItems,
     withHotkeys = true,
     withoutBackHeaderButton,
+    maxHeight,
   } = props;
 
   const onMenuClick = () => {
@@ -739,6 +740,7 @@ const ContextMenu = (props: ContextMenuProps) => {
                 changeView={changeView}
                 withHeader={withHeader}
                 maxHeightLowerSubmenu={maxHeightLowerSubmenu}
+                maxHeight={maxHeight}
                 mouseMoveHandler={onMouseMove}
                 currentIndex={currentIndex}
                 activeLevel={activeLevel}
@@ -764,7 +766,6 @@ const ContextMenu = (props: ContextMenuProps) => {
         <Backdrop
           visible={(visible && (changeView || ignoreChangeView)) || false}
           withBackground
-          withoutBlur={false}
           zIndex={baseZIndex}
           onClick={onClickBackdrop}
         />

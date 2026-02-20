@@ -24,11 +24,12 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import { RoomType } from "@onlyoffice/docspace-api-sdk";
+
 import FormRoomEmptyDarkImage from "../../../../assets/selector.form.room.empty.screen.dark.react.svg";
 import FormRoomEmptyLightImage from "../../../../assets/selector.form.room.empty.screen.light.react.svg";
 import Plus16ReactSvg from "../../../../assets/icons/16/plus.react.svg";
 
-import { RoomsType } from "../../../../enums";
 import { getCommonTranslation } from "../../../../utils";
 import { useTheme } from "../../../../context/ThemeContext";
 
@@ -50,12 +51,12 @@ const EmptyScreenFormRoom = ({
     : FormRoomEmptyDarkImage;
 
   const description =
-    createDefineRoomType === RoomsType.FormRoom
+    createDefineRoomType === RoomType.FillingFormsRoom
       ? getCommonTranslation("SelectorFormRoomEmptyScreenDescription") || "" // t("SelectorFormRoomEmptyScreenDescription")
       : getCommonTranslation("SelectorVDREmptyScreenDescription") || ""; // t("SelectorVDREmptyScreenDescription")
 
   const buttonLabel =
-    createDefineRoomType === RoomsType.FormRoom
+    createDefineRoomType === RoomType.FillingFormsRoom
       ? getCommonTranslation("CreateFormFillingRoom") || ""
       : getCommonTranslation("CreateVirtualDataRoom") || "";
 

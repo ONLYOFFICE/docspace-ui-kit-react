@@ -100,7 +100,7 @@ export const PickerOnly: Story = {
   },
 };
 
-export const CustomLabels: Story = {
+export const CustomButtonLabels: Story = {
   args: {
     ...Default.args,
     applyButtonLabel: "Save Color",
@@ -110,38 +110,57 @@ export const CustomLabels: Story = {
 };
 
 export const PresetColor: Story = {
-  args: {
-    ...Default.args,
-    appliedColor: "#FF0000",
+  render: function PresetColorStory() {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <p style={{ margin: "0", fontSize: "14px" }}>
+          <strong>Preset Color:</strong> The color picker initialized with a
+          predefined color value. Current color is set to <strong>#FF0000</strong> (red)
+        </p>
+        <ColorPicker
+          isPickerOnly={false}
+          appliedColor="#FF0000"
+          onClose={() => console.log("Close clicked")}
+          onApply={(color) => console.log("Apply clicked with color:", color)}
+          handleChange={(color) => console.log("Color changed to:", color)}
+        />
+      </div>
+    );
   },
 };
 
-export const WithChangeHandler: Story = {
-  args: {
-    ...Default.args,
-    handleChange: (color) => {
-      console.log("Selected color:", color);
-      // You can perform additional actions here
-    },
-  },
-};
-
-// Example of how to use the ColorPicker in a controlled way
 export const Controlled: Story = {
   render: function ControlledStory() {
     const [color, setColor] = React.useState(globalColors.lightBlueMain);
 
     return (
-      <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div>
+          <p style={{fontSize: "14px"}}>
+            <strong>Controlled Component with Change Handler:</strong> Uses React state
+            to manage the selected color. The <i>handleChange</i> callback tracks color changes in real-time, while <i>onApply</i> confirms 
+            the final selection. Both the internal state and external props are
+            synchronized.
+          </p>
+        </div>
         <ColorPicker
           isPickerOnly={false}
           appliedColor={color}
-          handleChange={setColor}
+          handleChange={(newColor) => {
+            setColor(newColor);
+            console.log("Color changed to:", newColor);
+          }}
           onApply={(newColor) => {
             setColor(newColor);
             console.log("Applied color:", newColor);
           }}
+          onClose={() => console.log("Color picker closed")}
         />
+        <div>
+          <p style={{ margin: "0", fontSize: "12px" }}>
+            Current color: <strong>{color}</strong>
+          </p>
+        </div>
       </div>
     );
   },

@@ -252,6 +252,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     dataTestId,
     noSelect = true,
     useImageIcon = false,
+    withoutArrow = false,
   } = props;
 
   React.useEffect(() => {
@@ -512,6 +513,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         plusBadgeValue={plusBadgeValue}
         displayArrow={displayArrow}
         noSelect={noSelect}
+        withoutArrow={withoutArrow}
         {...imageProps}
       />
 

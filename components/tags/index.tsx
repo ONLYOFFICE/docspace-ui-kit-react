@@ -103,6 +103,7 @@ const Tags: FC<TagsProps> = ({
               advancedOptions={tag.advancedOptions}
               onClick={onSelectTag}
               removeTagIcon={removeTagIcon}
+              withLabel={!tag.isThirdParty}
             />
           );
         }
@@ -121,6 +122,7 @@ const Tags: FC<TagsProps> = ({
             key={tag.label}
             tag={tag.label}
             icon={tag.icon}
+            withLabel={!tag.isThirdParty}
             tagMaxWidth={tag.maxWidth}
             providerType={tag.providerType}
             isLast={idx === renderedTags.length - 1}

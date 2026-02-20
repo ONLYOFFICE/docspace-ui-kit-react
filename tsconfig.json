@@ -1,37 +1,50 @@
 {
-	"compilerOptions": {
-		"target": "ES2022",
-		"lib": ["DOM", "DOM.Iterable", "ES2023"],
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"jsx": "react-jsx",
-		"strict": true,
-		"esModuleInterop": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
-		"isolatedModules": true,
-		"noEmit": true,
-		"allowSyntheticDefaultImports": true,
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["./src/*"]
-		}
-	},
-	"include": [
-		"index.ts",
-		"components/**/*",
-		"context/**/*",
-		"hooks/**/*",
-		"ui/**/*",
-		"themes/**/*",
-		"types/**/*",
-		"test/**/*",
-		"assets/**/*",
-		"utils/**/*",
-		"styles/**/*",
-		"providers/**/*",
-		"ai-agent/**/*"
-	],
-	"exclude": ["node_modules", "dist"]
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2023"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "PUBLIC_DIR/*": [
+        "../../public/*"
+      ]
+    }
+  },
+  "include": [
+    "index.ts",
+    "components/**/*",
+    "context/**/*",
+    "hooks/**/*",
+    "ui/**/*",
+    "themes/**/*",
+    "types/**/*",
+    "test/**/*",
+    "assets/**/*",
+    "utils/**/*",
+    "styles/**/*",
+    "providers/**/*",
+    "selectors/**/*",
+    "ai-agent/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

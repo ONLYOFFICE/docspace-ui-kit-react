@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import io, { Socket } from "socket.io-client";
-import { DefaultEventsMap } from "@socket.io/component-emitter";
+import type { DefaultEventsMap } from "@socket.io/component-emitter";
 
 import type {
   EmployeeFullDto,
@@ -42,7 +42,7 @@ import { addLog } from "../add-log";
  * @enum {string}
  * @readonly
  */
-export const enum SocketEvents {
+export enum SocketEvents {
   Restore = "restore",
   Backup = "backup",
   RestoreBackup = "restore-backup",
@@ -89,7 +89,7 @@ export const enum SocketEvents {
  * @enum {string}
  * @readonly
  */
-export const enum SocketCommands {
+export enum SocketCommands {
   Subscribe = "subscribe",
   Unsubscribe = "unsubscribe",
   RefreshFolder = "refresh-folder",
@@ -375,20 +375,7 @@ export type TCallback = {
   callback: TSocketListener<SocketEvents>;
 };
 
-declare global {
-  interface Window {
-    SOCKET_INSTANCE: SocketHelper | undefined;
-  }
-
-  // Extend the globalThis type to include SOCKET_INSTANCE
-  var SOCKET_INSTANCE: SocketHelper | undefined;
-
-  // @ts-ignore
-
-  interface globalThis {
-    SOCKET_INSTANCE: typeof SOCKET_INSTANCE;
-  }
-}
+// Global SOCKET_INSTANCE declaration is in packages/shared/utils/socket.ts
 
 const isEmitDataValid = (
   command: SocketCommands,

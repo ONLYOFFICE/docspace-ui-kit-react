@@ -36,6 +36,26 @@ const meta = {
   title: "Components/Form Controls/SearchInput",
   component: SearchInput,
   parameters: {
+    docs: {
+      description: {
+        component: `
+A specialized input component designed for search functionality with built-in features for clearing and auto-refresh.
+
+## Features
+- Search-optimized input field
+- Clear button support
+- Auto-refresh with configurable timeout
+- Multiple size options
+- Disabled state support
+- Scale to fit container
+- Focus and change event handlers
+- Responsive design
+
+## Usage
+Used throughout the application for search bars, filter inputs, and any search-specific input fields.
+`,
+      },
+    },
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=58-2238&mode=design&t=TBNCKMQKQMxr44IZ-0",
@@ -93,6 +113,13 @@ export const Default: Story = {
     value: "",
     autoRefresh: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story: "Default search input with auto-refresh enabled and no clear button initially. Start typing to see the clear button appear.",
+      },
+    },
+  },
 };
 
 const SizesComponent = () => {
@@ -138,6 +165,13 @@ const SizesComponent = () => {
 
 export const Sizes: Story = {
   render: () => <SizesComponent />,
+  parameters: {
+    docs: {
+      description: {
+        story: "Demonstrates all available search input sizes: base (small), middle (default), and large. Each size is appropriate for different UI contexts and screen densities.",
+      },
+    },
+  },
 };
 
 const StatesComponent = () => {
@@ -185,6 +219,13 @@ const StatesComponent = () => {
 
 export const States: Story = {
   render: () => <StatesComponent />,
+  parameters: {
+    docs: {
+      description: {
+        story: "Shows different states of the search input: normal (interactive), disabled (non-interactive), and scaled (full-width). Type in any field to show the clear button.",
+      },
+    },
+  },
 };
 
 const BehaviorsComponent = () => {
@@ -233,4 +274,11 @@ const BehaviorsComponent = () => {
 
 export const Behaviors: Story = {
   render: () => <BehaviorsComponent />,
+  parameters: {
+    docs: {
+      description: {
+        story: "Demonstrates different search input behaviors: with clear button, with auto-refresh (1s timeout), and with custom placeholder. Type to test the clear button and auto-refresh functionality.",
+      },
+    },
+  },
 };

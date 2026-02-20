@@ -27,11 +27,19 @@
 "use client";
 
 import React from "react";
+import axios, { type AxiosInstance } from "axios";
 
 import {
   Configuration,
   ProfilesApi,
   CommonSettingsApi,
+  FoldersApi,
+  RoomsApi,
+  FilesApi,
+  FilesSettingsApi,
+  GroupApi,
+  PeopleSearchApi,
+  SearchApi,
   ThirdPartyApi,
 } from "@onlyoffice/docspace-api-sdk";
 import { AiApi } from "../../api/ai";
@@ -42,9 +50,35 @@ export type TApiProvider = {
   apiKey: string;
 };
 
+export const createApiClient = (basePath: string, apiKey: string) => {
+  const instance: AxiosInstance = axios.create({
+    baseURL: basePath,
+    headers: {
+      Authorization: apiKey,
+    },
+  });
+
+  const request = async <T = unknown>(path: string): Promise<T> => {
+    const { data } = await instance.get(path);
+    return data;
+  };
+
+  return { instance, request };
+};
+
+export type TApiClient = ReturnType<typeof createApiClient>;
+
 export type TApiContext = {
   profilesApi: ProfilesApi;
   commonSettingsApi: CommonSettingsApi;
+  foldersApi: FoldersApi;
+  roomsApi: RoomsApi;
+  filesApi: FilesApi;
+  filesSettingsApi: FilesSettingsApi;
+  groupApi: GroupApi;
+  peopleSearchApi: PeopleSearchApi;
+  groupSearchApi: SearchApi;
+  apiClient: TApiClient;
   aiApi: AiApi;
   thirdPartyApi: ThirdPartyApi;
   apiUrl: string;
@@ -73,6 +107,14 @@ const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
     return {
       profilesApi: new ProfilesApi(configuration),
       commonSettingsApi: new CommonSettingsApi(configuration),
+      foldersApi: new FoldersApi(configuration),
+      roomsApi: new RoomsApi(configuration),
+      filesApi: new FilesApi(configuration),
+      filesSettingsApi: new FilesSettingsApi(configuration),
+      groupApi: new GroupApi(configuration),
+      peopleSearchApi: new PeopleSearchApi(configuration),
+      groupSearchApi: new SearchApi(configuration),
+      apiClient: createApiClient(url, apiKey),
       thirdPartyApi: new ThirdPartyApi(configuration),
       aiApi: new AiApi({
         basePath: url,

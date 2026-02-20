@@ -73,3 +73,9 @@ export const LIVE_CHAT_LOCAL_STORAGE_KEY = "live_chat_state";
 export const LANGUAGE = "asc_language";
 
 export const FOLDER_FORM_VALIDATION = /[*+:"<>?|\\\/]/gim;
+
+export const TEMPLATE_GALLERY_FORMATS = [".docx", ".xlsx", ".pptx", ".pdf"];
+
+export const HTML_EXST = [".htm", ".mht", ".html", ".mhtml"];
+
+export const EBOOK_EXST = [".fb2", ".pb2", ".ibk", ".prc", ".epub", ".djvu"];

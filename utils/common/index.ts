@@ -24,8 +24,10 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { EmployeeType, RoomsType } from "../enums";
-import { getCommonTranslation } from "./i18n";
+import { FolderType } from "@onlyoffice/docspace-api-sdk";
+import { EmployeeType, RoomsType } from "../../enums";
+import { AvatarRole } from "../../components/avatar/Avatar.enums";
+import { getCommonTranslation } from "../i18n";
 
 export type TTranslation = (
   key: string,
@@ -90,4 +92,68 @@ export const RoomsTypes = RoomsTypeValues.reduce<Record<number, number>>(
 
 export const isManagement = () => {
   return window.location.pathname.includes("management");
+};
+
+export const getUserAvatarRoleByType = (type: EmployeeType) => {
+  switch (type) {
+    case EmployeeType.Owner:
+      return AvatarRole.owner;
+    case EmployeeType.Admin:
+      return AvatarRole.admin;
+    case EmployeeType.RoomAdmin:
+      return AvatarRole.manager;
+    default:
+      return AvatarRole.user;
+  }
+};
+
+type TUserLike = {
+  isOwner?: boolean;
+  isAdmin?: boolean;
+  isRoomAdmin?: boolean;
+  isCollaborator?: boolean;
+  isVisitor?: boolean;
+  listAdminModules?: string[] | null;
+};
+
+export const getUserType = (user: TUserLike) => {
+  if (user.isOwner) return EmployeeType.Owner;
+  if (
+    user.isAdmin ||
+    (user.listAdminModules && user.listAdminModules.length > 0)
+  )
+    return EmployeeType.Admin;
+  if (user.isRoomAdmin) return EmployeeType.RoomAdmin;
+  if (user.isCollaborator) return EmployeeType.User;
+  if (user.isVisitor) return EmployeeType.Guest;
+  return EmployeeType.Guest;
+};
+
+export const getLifetimePeriodTranslation = (period: number) => {
+  switch (period) {
+    case 0:
+      return getCommonTranslation("Days").toLowerCase();
+    case 1:
+      return getCommonTranslation("Months").toLowerCase();
+    case 2:
+      return getCommonTranslation("Years").toLowerCase();
+    default:
+      return getCommonTranslation("Days").toLowerCase();
+  }
+};
+
+type FolderTypeValueOf = (typeof FolderType)[keyof typeof FolderType];
+
+export const getIconPathByFolderType = (
+  folderType?: FolderTypeValueOf,
+): string => {
+  const defaultPath = "folder.svg";
+
+  const folderIconPath: Partial<Record<FolderTypeValueOf, string>> = {
+    [FolderType.ReadyFormFolder]: "folderComplete.svg",
+    [FolderType.InProcessFormFolder]: "folderInProgress.svg",
+    [FolderType.DEFAULT]: defaultPath,
+  };
+
+  return folderIconPath[folderType ?? FolderType.DEFAULT] ?? defaultPath;
 };

@@ -73,6 +73,12 @@ const meta: Meta<typeof Toast> = {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?node-id=648%3A4421&mode=dev",
     },
+    docs: {
+      description: {
+        component:
+          "Toast component for displaying temporary notifications with different types (success, error, warning, info) and automatic or manual dismissal.",
+      },
+    },
   },
 };
 

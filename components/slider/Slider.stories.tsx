@@ -21,6 +21,27 @@ import { SliderProps } from "./Slider.types";
 const meta: Meta<typeof Slider> = {
   title: "Components/Form Controls/Slider",
   component: Slider,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+A flexible range slider component for selecting numeric values within a defined range.
+
+## Features
+- Min and max value configuration
+- Custom step increments
+- Disabled state support
+- Optional pouring effect (visual feedback)
+- Customizable thumb and track sizing
+- Keyboard navigation support
+- Responsive design
+
+## Usage
+Used for selecting numeric values like volume, zoom level, price ranges, or any numeric parameter adjustment.
+`,
+      },
+    },
+  },
   argTypes: {
     min: { control: "number" },
     max: { control: "number" },

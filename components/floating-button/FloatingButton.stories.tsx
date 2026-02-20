@@ -33,6 +33,11 @@ const meta = {
   title: "Components/Interactive elements/FloatingButton",
   component: FloatingButton,
   parameters: {
+    docs: {
+      description: {
+        component: "A floating action button (FAB) component that appears on top of other UI elements. Used for primary or important actions that should be easily accessible. Supports custom icons, color customization, and optional alert indicators.",
+      },
+    },
     design: {
       type: "figma",
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=1053-45015&mode=design&t=TBNCKMQKQMxr44IZ-0",
