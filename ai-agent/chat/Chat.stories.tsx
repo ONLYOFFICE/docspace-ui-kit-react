@@ -36,15 +36,13 @@ const meta: Meta<typeof Chat> = {
   title: "AI-Agent/Chat",
   component: Chat,
   parameters: {
-    layout: "fullscreen",
+    layout: "padded",
   },
   decorators: [
     (Story) => (
       <ApiProvider url="https://example.com" apiKey="test">
         <SocketProvider>
-          <div style={{ height: "100vh", width: "100%" }}>
-            <Story />
-          </div>
+          <Story />
         </SocketProvider>
       </ApiProvider>
     ),
