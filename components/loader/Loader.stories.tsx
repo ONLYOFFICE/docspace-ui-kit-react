@@ -111,14 +111,20 @@ export const DualRing: Story = {
 };
 
 export const Rombs: Story = {
-  args: {
-    type: LoaderTypes.rombs,
-    size: "65px",
-    label: "Loading...",
-  },
-  parameters: {
-    layout: "centered",
-  },
+  render: () => (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "150px",
+        minWidth: "150px",
+        padding: "20px",
+      }}
+    >
+      <Loader type={LoaderTypes.rombs} size="65px" label="Loading..." />
+    </div>
+  ),
 };
 
 export const Track: Story = {
@@ -136,15 +142,17 @@ export const AllTypes: Story = {
         display: "flex",
         gap: "40px",
         alignItems: "center",
-        padding: "20px",
+        padding: "40px",
+        minHeight: "200px",
+        flexWrap: "wrap",
       }}
     >
-      <div style={{ textAlign: "center" }}>
+      <div style={{ textAlign: "center", minWidth: "100px" }}>
         <Loader type={LoaderTypes.base} size="18px" label="Base loader" />
         <div style={{ marginTop: "10px", fontSize: "12px" }}>Base</div>
       </div>
 
-      <div style={{ textAlign: "center" }}>
+      <div style={{ textAlign: "center", minWidth: "100px" }}>
         <Loader
           type={LoaderTypes.oval}
           size="40px"
@@ -154,22 +162,22 @@ export const AllTypes: Story = {
         <div style={{ marginTop: "10px", fontSize: "12px" }}>Oval</div>
       </div>
 
-      <div style={{ textAlign: "center" }}>
+      <div style={{ textAlign: "center", minWidth: "100px" }}>
         <Loader
           type={LoaderTypes.dualRing}
           size="40px"
-          color="#333333"
+
           label="Dual ring loader"
         />
         <div style={{ marginTop: "10px", fontSize: "12px" }}>Dual Ring</div>
       </div>
 
-      <div style={{ textAlign: "center" }}>
+      <div style={{ textAlign: "center", minWidth: "100px" }}>
         <Loader type={LoaderTypes.rombs} size="65px" label="Rombs loader" />
         <div style={{ marginTop: "10px", fontSize: "12px" }}>Rombs</div>
       </div>
 
-      <div style={{ textAlign: "center" }}>
+      <div style={{ textAlign: "center", minWidth: "100px" }}>
         <Loader type={LoaderTypes.track} size="30px" label="Track loader" />
         <div style={{ marginTop: "10px", fontSize: "12px" }}>Track</div>
       </div>

@@ -70,7 +70,11 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
         <div className={styles.headerBody}>
           <div className={styles.headerIcon}>
             {iconName ? (
-              <ReactSVG src={iconName} />
+              typeof iconName === "string" ? (
+                <ReactSVG src={iconName} />
+              ) : (
+                iconName
+              )
             ) : (
               <div>
                 <PeopleIcon />

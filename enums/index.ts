@@ -82,6 +82,23 @@ export enum EmployeeType {
 }
 
 /**
+ * Enum for files selector filter.
+ * @readonly
+ */
+export const enum FilesSelectorFilterTypes {
+  DOCX = "DOCX",
+  PPTX = "PPTX",
+  PDF = "PDF",
+  PDFForm = "PDFForm",
+  IMG = "IMG",
+  GZ = "GZ",
+  DOCXF = "DOCXF",
+  XLSX = "XLSX",
+  ALL = "ALL",
+  BackupOnly = "BackupOnly",
+}
+
+/**
  * Enum for file type.
  * @readonly
  */

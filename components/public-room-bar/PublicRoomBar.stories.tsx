@@ -34,6 +34,23 @@ import type { PublicRoomBarProps } from "./PublicRoomBar.types";
 export default {
   title: "Components/UI/PublicRoomBar",
   component: PublicRoomBar,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+A notification bar component for displaying information about public rooms.
+
+## Features
+- Customizable header and body text
+- Optional custom icon support
+- Close button with callback
+- Visibility control
+- Support for custom React components
+- Responsive design
+`,
+      },
+    },
+  },
   argTypes: {
     headerText: {
       control: "text",
@@ -68,17 +85,38 @@ Default.args = {
   bodyText: "This room is accessible to anyone with the link",
   barIsVisible: false,
 };
+Default.parameters = {
+  docs: {
+    description: {
+      story: "Basic configuration showing header, body text, and visibility control.",
+    },
+  },
+};
 
 export const WithCustomIcon = Template.bind({});
 WithCustomIcon.args = {
   ...Default.args,
   iconName: PlanetIcon,
 };
+WithCustomIcon.parameters = {
+  docs: {
+    description: {
+      story: "Shows the bar with a custom planet icon. Useful for indicating public or global access.",
+    },
+  },
+};
 
 export const WithoutCloseButton = Template.bind({});
 WithoutCloseButton.args = {
   ...Default.args,
   onClose: undefined,
+};
+WithoutCloseButton.parameters = {
+  docs: {
+    description: {
+      story: "Bar without a close button. The bar cannot be dismissed by the user and serves as a persistent notification.",
+    },
+  },
 };
 
 export const WithCustomComponents = Template.bind({});
@@ -88,4 +126,11 @@ WithCustomComponents.args = {
   ),
   bodyText: <div style={{ fontStyle: "italic" }}>Custom Body Component</div>,
   barIsVisible: true,
+};
+WithCustomComponents.parameters = {
+  docs: {
+    description: {
+      story: "Demonstrates passing React components for header and body text instead of plain strings. This allows for more complex layouts and styling.",
+    },
+  },
 };

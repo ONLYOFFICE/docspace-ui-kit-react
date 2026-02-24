@@ -28,12 +28,11 @@
 
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { EmployeeStatus, EmployeeType } from "@onlyoffice/docspace-api-sdk";
 
 import ArchiveSvgUrl from "../../assets/room.archive.react.svg?url";
 import FolderSvgUrl from "../../assets/icons/32/folder.react.svg?url";
 import EmptyScreenFilter from "../../assets/empty.filter.rooms.light.react.svg?url";
-
-import { RoomsTypeValues } from "../../utils";
 
 // import RoomType from "../room-type";
 import { AvatarRole } from "../avatar";
@@ -41,12 +40,11 @@ import { AvatarRole } from "../avatar";
 // 	BreadCrumbsLoader,
 // 	RowLoader,
 // 	SearchLoader,
-// } from "../../skeletons/selector";
+// } from "./sub-components/loaders";
 
 import { Selector } from "./Selector";
 import type { SelectorProps, TSelectorItem } from "./Selector.types";
 import { globalColors } from "../../providers/theme";
-import { EmployeeStatus, EmployeeType } from "../../enums";
 
 const meta = {
   title: "Components/Layout components/Selector",

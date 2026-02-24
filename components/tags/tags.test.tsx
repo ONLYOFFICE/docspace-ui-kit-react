@@ -87,7 +87,8 @@ describe("<Tags />", () => {
   it("handles a single tag as an object with isThirdParty", () => {
     const tags = [{ label: "TP Tag", isThirdParty: true }];
     render(<Tags {...baseProps} tags={tags} columnCount={1} />);
-    expect(screen.getByText("TP Tag")).toBeInTheDocument();
+    const tag = screen.getByTestId("tag_item");
+    expect(tag).toHaveAttribute("aria-label", "TP Tag");
   });
 
   it("handles multiple tags when columnCount is enough", () => {
@@ -103,7 +104,7 @@ describe("<Tags />", () => {
       "String Tag",
     ];
     render(<Tags {...baseProps} tags={tags} columnCount={5} />);
-    expect(screen.getByText("TP")).toBeInTheDocument();
+    expect(screen.getByLabelText("TP")).toBeInTheDocument();
     expect(screen.getByText("Default")).toBeInTheDocument();
     expect(screen.getByText("Plain")).toBeInTheDocument();
     expect(screen.getByText("String Tag")).toBeInTheDocument();
@@ -119,7 +120,7 @@ describe("<Tags />", () => {
       { label: "Default", isDefault: true },
     ];
     render(<Tags {...baseProps} tags={tags} columnCount={1} />);
-    expect(screen.getByText("TP")).toBeInTheDocument();
+    expect(screen.getByLabelText("TP")).toBeInTheDocument();
     expect(screen.getByText("Default")).toBeInTheDocument();
     expect(screen.queryByText("...")).not.toBeInTheDocument();
   });
@@ -158,7 +159,7 @@ describe("<Tags />", () => {
     ];
     render(<Tags {...baseProps} tags={tags} columnCount={4} />);
 
-    expect(screen.getByText("TP")).toBeInTheDocument();
+    expect(screen.getByLabelText("TP")).toBeInTheDocument();
     expect(screen.getByText("Default")).toBeInTheDocument();
     expect(screen.getByText("Plain Object")).toBeInTheDocument();
     expect(screen.getByText("Str")).toBeInTheDocument();
