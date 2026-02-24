@@ -38,7 +38,6 @@ const useInputItemHelper = ({
   withCreate,
   selectedItemId,
   setItems,
-  onRoomCreated,
 }: TUseInputItemHelper) => {
   const { foldersApi, roomsApi } = useApi();
   const selectedItemIdRef = React.useRef(selectedItemId);
@@ -79,14 +78,13 @@ const useInputItemHelper = ({
           });
         else if (roomType) {
           await roomsApi.createRoom({ roomType, title: value });
-          onRoomCreated?.();
         }
       } catch (e) {
         console.log(e);
         toastr.error(e as string);
       }
     },
-    [withCreate, foldersApi, roomsApi, onRoomCreated],
+    [withCreate, foldersApi, roomsApi],
   );
 
   const addInputItem = React.useCallback(
