@@ -1208,7 +1208,7 @@ packages:
     resolution: {integrity: sha512-dkIPDCjXcfhSHgNE1/qV6TeczQZR59Yx0xXeafVKgK3QVWoxc38ljwpksUpnzCGvN151KUbCJTDZVmahtf1YZw==}
 
   '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-3.6.0.tgz':
-    resolution: {integrity: sha512-90l2Y7yj4+cAgjUBbfyvybH3CMWHa+TLZS2IcqcTICu9I51MzKbbHU83Dr9qpwmFk5JwMS5sG5WYxjNiBM6AXA==, tarball: file:onlyoffice-docspace-api-sdk-3.6.0.tgz}
+    resolution: {integrity: sha512-21LcYXnFmz1ufRMNPIhiPEtHdGrPphMpRZ9absNmFcjKd97xCJtBSpBys3cdJv/rlGp+hp2A3vzxVofY5xaDvQ==, tarball: file:onlyoffice-docspace-api-sdk-3.6.0.tgz}
     version: 3.6.0
 
   '@parcel/watcher-android-arm64@2.5.6':
