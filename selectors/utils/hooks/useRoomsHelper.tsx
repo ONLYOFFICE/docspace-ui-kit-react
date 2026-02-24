@@ -81,11 +81,12 @@ const useRoomsHelper = ({
 
   const { roomsApi } = useApi();
 
-  const { addInputItem } = useInputItemHelper({ withCreate, setItems });
-
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
   const firstLoadRef = React.useRef(isFirstLoad);
+  const getRoomListRef = React.useRef<
+    ((sIndex: number) => Promise<void>) | null
+  >(null);
 
   React.useEffect(() => {
     firstLoadRef.current = isFirstLoad;
@@ -95,10 +96,28 @@ const useRoomsHelper = ({
     initRef.current = isInit;
   }, [isInit]);
 
+  const onRoomCreated = React.useCallback(() => {
+    if (getRoomListRef.current) {
+      setIsFirstLoad(true);
+      getRoomListRef.current(0);
+    }
+  }, [setIsFirstLoad]);
+
+  const { addInputItem } = useInputItemHelper({
+    withCreate,
+    setItems,
+    onRoomCreated,
+  });
+
   const createDropDownItems = React.useMemo(() => {
     return RoomsTypeValues.map((value) => {
       const onClick = () => {
-        addInputItem("", "", value as RoomTypeEnum, getCommonTranslation("EnterName"));
+        addInputItem(
+          "",
+          "",
+          value as RoomTypeEnum,
+          getCommonTranslation("EnterName"),
+        );
       };
 
       return (
@@ -279,6 +298,10 @@ const useRoomsHelper = ({
       setSelectedTreeNode,
     ],
   );
+
+  React.useEffect(() => {
+    getRoomListRef.current = getRoomList;
+  }, [getRoomList]);
 
   return { getRoomList };
 };
