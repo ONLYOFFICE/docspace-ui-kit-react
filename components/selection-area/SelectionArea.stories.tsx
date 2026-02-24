@@ -60,45 +60,64 @@ const Template: StoryFn<SelectionAreaProps> = (args) => {
   }) => {
     setSelectedItems((prev) => {
       const newItems = [...prev];
+
       added.forEach((element) => {
-        const id = element.getAttribute("data-id");
-        if (id && !newItems.includes(id)) {
-          newItems.push(id);
+        const valueElement =
+          args.viewAs === "tile"
+            ? element
+            : element.getElementsByClassName(args.itemClass || "item-name")[0];
+
+        const value = valueElement?.getAttribute("value");
+        if (value && !newItems.includes(value)) {
+          newItems.push(value);
         }
       });
+
       removed.forEach((element) => {
-        const id = element.getAttribute("data-id");
-        if (id) {
-          const index = newItems.indexOf(id);
+        const valueElement =
+          args.viewAs === "tile"
+            ? element
+            : element.getElementsByClassName(args.itemClass || "item-name")[0];
+
+        const value = valueElement?.getAttribute("value");
+        if (value) {
+          const index = newItems.indexOf(value);
           if (index > -1) {
             newItems.splice(index, 1);
           }
         }
       });
+
       return newItems;
     });
   };
 
   return (
-    <div className={`${styles.itemsContainer} items-container`}>
-      {Array.from({ length: 12 }).map((_, index) => (
-        <div
-          key={`${index}test`}
-          data-id={`item-${index}`}
-          className={`${styles.item} selectable-item ${selectedItems.includes(`item-${index}`) ? "selected" : ""}`}
-        >
-          Item {index + 1}
-        </div>
-      ))}
+    <>
+      <div className={styles.itemsContainer}>
+        {Array.from({ length: 12 }).map((_, index) => (
+          <div
+            key={`item_${index}`}
+            className={`${styles.item} selectable-item ${selectedItems.includes(`item_${index}`) ? styles.selected : ""}`}
+            {...({ value: `item_${index}` } as Record<string, string>)}
+            data-id={`item_${index}`}
+          >
+            Item {index + 1}
+          </div>
+        ))}
+      </div>
+
       <SelectionArea
         {...args}
         onMove={handleMove}
-        containerClass="selection-container"
-        itemsContainerClass="items-container"
+        containerClass={styles.container}
+        itemsContainerClass={styles.itemsContainer}
         selectableClass="selectable-item"
-        scrollClass="scroll-container"
+        scrollClass={styles.container}
+        itemClass="item-name"
+        viewAs="tile"
       />
-    </div>
+    </>
   );
 };
 
@@ -110,7 +129,7 @@ Default.args = {
   countTilesInRow: 4,
   arrayTypes: [
     {
-      type: "default",
+      type: "item",
       itemHeight: 150,
       rowGap: 16,
     },
