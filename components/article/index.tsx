@@ -39,6 +39,7 @@ import SubArticleHeader from "./sub-components/Header";
 import ArticleProfile from "./sub-components/Profile";
 import ArticleLiveChat from "./sub-components/LiveChat";
 import ArticleApps from "./sub-components/Apps";
+import ArticleCustomSlot from "./sub-components/PluginSlots";
 import ArticleDevToolsBar from "./sub-components/DevToolsBar";
 import HideArticleMenuButton from "./sub-components/HideMenuButton";
 import BackButton from "./sub-components/BackButton";
@@ -124,6 +125,7 @@ const Article = ({
   officeforiosUrl,
   showBackButton,
   navigate,
+  customSlot,
 }: ArticleProps) => {
   const [articleHeaderContent, setArticleHeaderContent] =
     React.useState<null | React.JSX.Element>(null);
@@ -294,6 +296,11 @@ const Article = ({
           {articleBodyContent ? articleBodyContent.props.children : null}
           {!showArticleLoader ? (
             <>
+              {customSlot ? (
+                <ArticleCustomSlot showText={showText}>
+                  {customSlot}
+                </ArticleCustomSlot>
+              ) : null}
               {!hideDevTools ? (
                 <ArticleDevToolsBar
                   articleOpen={articleOpen}

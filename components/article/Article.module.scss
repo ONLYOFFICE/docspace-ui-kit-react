@@ -46,7 +46,8 @@
 
 :global(.light) {
    :local {
-    .apps, 
+    .apps,
+    .pluginSlots, 
     .wrapper, 
     .hideArticleMenuButton, 
     .articleHeader, 
@@ -78,7 +79,8 @@
  
 :global(.dark) {
    :local {
-    .apps, 
+    .apps,
+    .pluginSlots, 
     .wrapper, 
     .hideArticleMenuButton, 
     .articleHeader, 
@@ -175,6 +177,22 @@
 
   .iosIcon {
     --icon-button-hover-color: var(--files-article-body-download-app-list-mac-hover-color);
+  }
+}
+
+.customSlot {
+  margin-top: auto;
+  margin-bottom: 16px;
+
+  @include mixins.tablet {
+    margin-bottom: 16px;
+  }
+
+  @include mixins.mobile {
+    position: relative;
+    bottom: 0px;
+    margin-top: 16px;
+    margin-bottom: 0;
   }
 }
 

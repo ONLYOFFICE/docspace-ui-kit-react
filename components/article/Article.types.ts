@@ -119,4 +119,6 @@ export type ArticleProps = ArticleProfileProps &
     trialDaysLeft?: number;
 
     limitedAccessDevToolsForUsers: boolean;
+    
+    customSlot?: React.ReactNode;
   };
