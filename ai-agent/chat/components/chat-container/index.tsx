@@ -49,7 +49,11 @@ const ChatContainer = ({
       style={{ width, height, ...style }}
     >
       {useInternalScroll ? (
-        <Scrollbar id="chat-internal-scroll" scrollBodyClassName={styles.chatScrollBody}>
+        <Scrollbar
+          id="chat-internal-scroll"
+          scrollBodyClassName={styles.chatScrollBody}
+          paddingInlineEnd="0"
+        >
           {children}
         </Scrollbar>
       ) : (

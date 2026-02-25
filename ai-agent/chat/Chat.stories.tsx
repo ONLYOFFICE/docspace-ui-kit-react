@@ -127,7 +127,6 @@ export const WithCustomStyles: Story = {
       border: "2px solid #4A90E2",
       borderRadius: "12px",
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-      paddingInline: "20px"
     },
   },
 };

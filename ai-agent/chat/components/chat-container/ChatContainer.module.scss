@@ -90,6 +90,10 @@
   flex-grow: 1;
 }
 
+.chatScrollBody {
+  padding: 0 20px !important;
+}
+
 .chatContainer {
   --accent-main: var(--color-scheme-main-accent, #{$light-blue-main});
   --input-text-align: left;
