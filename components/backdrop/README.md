@@ -48,7 +48,6 @@ import { Backdrop } from "@docspace/ui-kit/components/backdrop";
 | `style`              | `React.CSSProperties`           | -       | Custom inline styles                                     |
 | `withBackground`     | `boolean`                       | `false` | Enables background visibility                            |
 | `isAside`            | `boolean`                       | `false` | Indicates backdrop is used with an Aside component       |
-| `withoutBlur`        | `boolean`                       | `false` | Disables the blur effect                                 |
 | `withoutBackground`  | `boolean`                       | `false` | Forces backdrop to render without background             |
 | `isModalDialog`      | `boolean`                       | `false` | Indicates backdrop is used with a modal dialog           |
 | `shouldShowBackdrop` | `boolean`                       | `false` | Forces the backdrop to show regardless of existing count |

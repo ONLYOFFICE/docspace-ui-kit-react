@@ -34,6 +34,26 @@ import { TabsTypes } from "./Tabs.enums";
 const meta = {
   title: "Components/Data display/Tabs",
   component: Tabs,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+A flexible tabbed interface component for organizing content into multiple sections.
+
+## Features
+- Multiple tab types and styles
+- Customizable tab items
+- Tab selection with callbacks
+- Keyboard navigation support
+- Responsive design
+- Theme-aware styling
+
+## Usage
+Used for organizing related content into separate views or sections, allowing users to switch between different content panels.
+`,
+      },
+    },
+  },
 } satisfies Meta<typeof Tabs>;
 type Story = StoryObj<typeof meta>;
 
@@ -75,6 +95,13 @@ export const Default: Story = {
     selectedItemId: data[0].id,
     onSelect: () => {},
   },
+  parameters: {
+    docs: {
+      description: {
+        story: "Default primary style tabs. Click on any tab to switch between content sections. The selected tab is highlighted and the selection is displayed below.",
+      },
+    },
+  },
 };
 
 export const Secondary: Story = {
@@ -84,5 +111,12 @@ export const Secondary: Story = {
     type: TabsTypes.Secondary,
     selectedItemId: data[0].id,
     onSelect: () => {},
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Secondary style tabs with alternative visual appearance. Uses a different color scheme and styling compared to the default primary tabs. Best used for nested or secondary content sections.",
+      },
+    },
   },
 };

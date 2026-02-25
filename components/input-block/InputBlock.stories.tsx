@@ -36,13 +36,27 @@ import { InputSize, InputType } from "../text-input";
 const meta = {
   title: "Components/Form Controls/InputBlock",
   component: InputBlock,
-  argTypes: {
-    iconColor: { control: "color" },
-    hoverColor: { control: "color" },
-    onChange: { action: "onChange" },
-    onBlur: { action: "onBlur" },
-    onFocus: { action: "onFocus" },
-    onIconClick: { action: "onIconClick" },
+  parameters: {
+    docs: {
+      description: {
+        component: `
+A sophisticated input field component with integrated icon support and state management.
+
+## Features
+- Multiple input types (text, password, email, etc.)
+- Error and warning states
+- Icon support with customizable colors
+- Multiple size options
+- Read-only and disabled states
+- Event handlers for changes, focus, and blur
+- Autocomplete configuration
+- Auto-focus capability
+
+## Usage
+Used throughout the application for text input, search fields, password inputs, and other form controls requiring icon integration.
+`,
+      },
+    },
   },
   tags: ["autodocs"],
 } satisfies Meta<typeof InputBlock>;
@@ -89,6 +103,13 @@ const defaultArgs: InputBlockProps = {
 export const Default: Story = {
   render: (args) => <Template {...args} />,
   args: defaultArgs,
+  parameters: {
+    docs: {
+      description: {
+        story: "Default input field with icon support. Shows the basic configuration with a search icon and text input.",
+      },
+    },
+  },
 };
 
 export const WithError: Story = {
@@ -98,6 +119,13 @@ export const WithError: Story = {
     id: "error-input",
     hasError: true,
     placeholder: "Input with error state",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Input field in error state. Shows red border and styling to indicate validation failure or error condition.",
+      },
+    },
   },
 };
 
@@ -109,6 +137,13 @@ export const WithWarning: Story = {
     hasWarning: true,
     placeholder: "Input with warning state",
   },
+  parameters: {
+    docs: {
+      description: {
+        story: "Input field in warning state. Shows amber/orange styling to indicate caution or non-critical issues.",
+      },
+    },
+  },
 };
 
 export const Disabled: Story = {
@@ -118,6 +153,13 @@ export const Disabled: Story = {
     id: "disabled-input",
     isDisabled: true,
     placeholder: "Disabled input",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Disabled input field that cannot be interacted with. Shows grayed-out styling and prevents all user input.",
+      },
+    },
   },
 };
 
@@ -130,6 +172,13 @@ export const ReadOnly: Story = {
     value: "Read-only content",
     placeholder: "Read-only input",
   },
+  parameters: {
+    docs: {
+      description: {
+        story: "Read-only input field that displays content but cannot be edited. User can select and copy the text but cannot modify it.",
+      },
+    },
+  },
 };
 
 export const Password: Story = {
@@ -139,6 +188,13 @@ export const Password: Story = {
     id: "password-input",
     type: InputType.password,
     placeholder: "Enter password",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Password input field that masks typed characters for security. Typical use case for login and password change forms.",
+      },
+    },
   },
 };
 
@@ -166,4 +222,11 @@ export const Sizes: Story = {
       />
     </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: "Demonstrates all available input field sizes: base (small), middle (default), and large. Each size is appropriate for different UI contexts and density requirements.",
+      },
+    },
+  },
 };

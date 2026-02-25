@@ -24,28 +24,30 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import { default as i18ninstance } from "i18next";
+
 /**
  * Gets a cookie value by name
  */
 export const getCookie = (name: string): string | undefined => {
-	if (typeof document === "undefined") return undefined;
+  if (typeof document === "undefined") return undefined;
 
-	const matches = document.cookie.match(
-		new RegExp(
-			`(?:^|; )${name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1")}=([^;]*)`,
-		),
-	);
-	return matches ? decodeURIComponent(matches[1]) : undefined;
+  const matches = document.cookie.match(
+    new RegExp(
+      `(?:^|; )${name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1")}=([^;]*)`,
+    ),
+  );
+  return matches ? decodeURIComponent(matches[1]) : undefined;
 };
 
 type WindowI18n = {
-	t?: (key: string, options?: Record<string, string | number>) => string;
-	loaded?: Record<string, { data: Record<string, string> }>;
+  t?: (key: string, options?: Record<string, string | number>) => string;
+  loaded?: Record<string, { data: Record<string, string> }>;
 };
 
 const getWindowI18n = (): WindowI18n | undefined => {
-	if (typeof window === "undefined") return undefined;
-	return (window as unknown as { i18n?: WindowI18n }).i18n;
+  if (typeof window === "undefined") return undefined;
+  return (window as unknown as { i18n?: WindowI18n }).i18n;
 };
 
 /**
@@ -55,66 +57,68 @@ const getWindowI18n = (): WindowI18n | undefined => {
  * Throws if the key is not found.
  */
 export const getCommonTranslation = (
-	key: string,
-	interpolation?: Record<string, string | number>,
+  key: string,
+  interpolation?: Record<string, string | number>,
 ): string => {
-	const i18n = getWindowI18n();
+  if (typeof window === "undefined") return i18ninstance?.t(key);
 
-	if (i18n?.t) {
-		const result = i18n.t(key, interpolation);
-		if (result && result !== key) return result;
-	}
+  const i18n = getWindowI18n();
 
-	if (i18n?.loaded) {
-		const cookieLang = getCookie("asc_language");
-		const lang =
-			cookieLang === "en-US" || cookieLang === "en-GB"
-				? "en"
-				: (cookieLang ?? "en");
+  if (i18n?.t) {
+    const result = i18n.t(key, interpolation);
+    if (result && result !== key) return result;
+  }
 
-		const commonKeys = Object.getOwnPropertyNames(i18n.loaded).filter(
-			(k) => k.indexOf(`${lang}/Common.json`) > -1,
-		);
+  if (i18n?.loaded) {
+    const cookieLang = getCookie("asc_language");
+    const lang =
+      cookieLang === "en-US" || cookieLang === "en-GB"
+        ? "en"
+        : (cookieLang ?? "en");
 
-		if (commonKeys.length > 0) {
-			const i18nKey = commonKeys.length === 1 ? commonKeys[0] : commonKeys[1];
+    const commonKeys = Object.getOwnPropertyNames(i18n.loaded).filter(
+      (k) => k.indexOf(`${lang}/Common.json`) > -1,
+    );
 
-			let translation = i18n.loaded[i18nKey]?.data?.[key];
+    if (commonKeys.length > 0) {
+      const i18nKey = commonKeys.length === 1 ? commonKeys[0] : commonKeys[1];
 
-			if (translation) {
-				if (interpolation) {
-					Object.keys(interpolation).forEach((param) => {
-						translation = translation.replace(
-							new RegExp(`{{\\s*${param}\\s*}}`, "g"),
-							String(interpolation[param]),
-						);
-					});
-				}
-				return translation;
-			}
-		}
-	}
+      let translation = i18n.loaded[i18nKey]?.data?.[key];
 
-	console.error(
-		`[i18n] Missing translation for key "${key}". Ensure the TranslationProvider is mounted or window.i18n.loaded contains the required Common namespace.`,
-	);
+      if (translation) {
+        if (interpolation) {
+          Object.keys(interpolation).forEach((param) => {
+            translation = translation.replace(
+              new RegExp(`{{\\s*${param}\\s*}}`, "g"),
+              String(interpolation[param]),
+            );
+          });
+        }
+        return translation;
+      }
+    }
+  }
 
-	return "";
+  console.error(
+    `[i18n] Missing translation for key "${key}". Ensure the TranslationProvider is mounted or window.i18n.loaded contains the required Common namespace.`,
+  );
+
+  return "";
 };
 
 /**
  * Checks if translations are loaded and ready to use
  */
 export const getTranslationReady = () => {
-	if (typeof window === "undefined") return undefined;
+  if (typeof window === "undefined") return undefined;
 
-	const i18n = (
-		window as unknown as {
-			i18n?: {
-				loaded: Record<string, { data: Record<string, string> }>;
-			};
-		}
-	).i18n;
+  const i18n = (
+    window as unknown as {
+      i18n?: {
+        loaded: Record<string, { data: Record<string, string> }>;
+      };
+    }
+  ).i18n;
 
-	return i18n?.loaded;
+  return i18n?.loaded;
 };

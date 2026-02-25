@@ -21,6 +21,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "PUBLIC_DIR/*": [
+        "../../public/*"
       ]
     }
   },
@@ -36,7 +39,8 @@
     "assets/**/*",
     "utils/**/*",
     "styles/**/*",
-    "providers/**/*"
+    "providers/**/*",
+    "selectors/**/*"
   ],
   "exclude": [
     "node_modules",

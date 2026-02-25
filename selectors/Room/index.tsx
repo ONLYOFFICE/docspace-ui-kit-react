@@ -1,0 +1,389 @@
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+import React, { useEffect } from "react";
+
+import EmptyScreenFilterRoomsLight from "../../assets/empty.filter.rooms.light.react.svg";
+import EmptyScreenFilterRoomsDark from "../../assets/empty.filter.rooms.dark.react.svg";
+import EmptyScreenRoomsLight from "../../assets/empty.rooms.root.user.light.react.svg";
+import EmptyScreenRoomsDark from "../../assets/empty.rooms.root.user.dark.react.svg";
+
+import { getCommonTranslation } from "../../utils/i18n";
+import {
+	Selector,
+	RowLoader,
+	SearchLoader,
+	type TSelectorItem,
+	type TSelectorCancelButton,
+	type TSelectorHeader,
+	type TSelectorSearch,
+	type TSelectorWithAside,
+} from "../../components/selector";
+
+import { useTheme } from "../../context/ThemeContext";
+
+import useSocketHelper from "../utils/hooks/useSocketHelper";
+import useRoomsHelper from "../utils/hooks/useRoomsHelper";
+import type { RoomSelectorProps } from "./RoomSelector.types";
+import { convertToItems } from "./RoomSelector.utils";
+import {
+	LoadersContext,
+	LoadersContextProvider,
+} from "../utils/contexts/Loaders";
+
+const RoomSelectorComponent = ({
+	id,
+	className,
+	style,
+
+	excludeItems,
+
+	withSearch,
+
+	isMultiSelect,
+
+	submitButtonLabel,
+	onSubmit,
+
+	withHeader,
+	headerProps,
+
+	withPadding,
+
+	setIsDataReady,
+
+	withCancelButton,
+	cancelButtonLabel,
+	onCancel,
+
+	roomType,
+	searchArea,
+
+	disableThirdParty,
+	emptyScreenHeader,
+	emptyScreenDescription,
+
+	createDefineRoomLabel,
+	createDefineRoomType,
+
+	useAside,
+	onClose,
+	withBlur,
+	withoutBackground,
+
+	withInit,
+	withCreate,
+	initItems,
+	initTotal,
+	initHasNextPage,
+	initSearchValue,
+	disableSubmitUntilChanged,
+	sortSelectedFirst,
+	selectedItems,
+	disableFirstFetch,
+	forceIsMultiSelect,
+}: RoomSelectorProps) => {
+	const { isBase } = useTheme();
+
+	const { isFirstLoad, isNextPageLoading, setIsFirstLoad } =
+		React.useContext(LoadersContext);
+
+	const [searchValue, setSearchValue] = React.useState(() =>
+		withInit ? initSearchValue : "",
+	);
+	const [hasNextPage, setHasNextPage] = React.useState(() =>
+		withInit ? initHasNextPage : false,
+	);
+	const [selectedItem, setSelectedItem] = React.useState<TSelectorItem | null>(
+		null,
+	);
+
+	const [total, setTotal] = React.useState(() => (withInit ? initTotal : -1));
+	const [items, setItems] = React.useState<TSelectorItem[]>(
+		withInit
+			? convertToItems(initItems).filter((x) =>
+					excludeItems ? !excludeItems.includes(x.id) : true,
+				)
+			: [],
+	);
+
+	// Sort items so that selectedItems appear first
+	const sortedItems = React.useMemo(() => {
+		if (!sortSelectedFirst || !selectedItems || selectedItems.length === 0) {
+			return items;
+		}
+
+		const selectedIds = new Set(selectedItems.map((item) => item.id));
+		const selected: TSelectorItem[] = [];
+		const others: TSelectorItem[] = [];
+
+		items.forEach((item) => {
+			if (selectedIds.has(item.id)) {
+				selected.push(item);
+			} else {
+				others.push(item);
+			}
+		});
+
+		return [...selected, ...others];
+	}, [items, selectedItems, sortSelectedFirst]);
+
+	// Track initial selected item IDs for multi-select mode
+	const initialSelectedIdsRef = React.useRef<Set<string | number>>(
+		new Set(
+			selectedItems
+				?.map((item) => item.id)
+				.filter((id): id is string | number => id !== undefined) || [],
+		),
+	);
+
+	// Track current selection state for multi-select mode
+	const [currentSelectedIds, setCurrentSelectedIds] = React.useState<
+		Set<string | number>
+	>(
+		() =>
+			new Set(
+				selectedItems
+					?.map((item) => item.id)
+					.filter((id): id is string | number => id !== undefined) || [],
+			),
+	);
+
+	// Check if selection has changed from initial state (only when disableSubmitUntilChanged is true)
+	const hasSelectionChanged = React.useMemo(() => {
+		if (!isMultiSelect || !disableSubmitUntilChanged) return true;
+
+		const initial = initialSelectedIdsRef.current;
+		if (initial.size !== currentSelectedIds.size) return true;
+
+		for (const id of currentSelectedIds) {
+			if (!initial.has(id)) return true;
+		}
+		for (const id of initial) {
+			if (!currentSelectedIds.has(id)) return true;
+		}
+		return false;
+	}, [currentSelectedIds, isMultiSelect, disableSubmitUntilChanged]);
+
+	const isInitRef = React.useRef<boolean>(!withInit);
+	const afterSearch = React.useRef(false);
+
+	const setIsInit = React.useCallback((value: boolean) => {
+		isInitRef.current = value;
+	}, []);
+
+	const onSelect = (
+		item: TSelectorItem,
+		isDoubleClick: boolean,
+		doubleClickCallback: () => void,
+	) => {
+		setSelectedItem((el) => {
+			if (el?.id === item.id) return null;
+
+			return item;
+		});
+
+		// Track selection changes for multi-select mode
+		if (isMultiSelect && item.id !== undefined) {
+			setCurrentSelectedIds((prev) => {
+				const newSet = new Set(prev);
+				if (newSet.has(item.id!)) {
+					newSet.delete(item.id!);
+				} else {
+					newSet.add(item.id!);
+				}
+				return newSet;
+			});
+		}
+
+		if (isDoubleClick && !isMultiSelect) {
+			doubleClickCallback();
+		}
+	};
+
+	useEffect(() => {
+		setIsDataReady?.(!isFirstLoad);
+	}, [setIsDataReady, isFirstLoad]);
+
+	const onSearchAction = React.useCallback(
+		(value: string, callback?: VoidFunction) => {
+			afterSearch.current = true;
+			setIsFirstLoad(true);
+			setSearchValue(() => {
+				return value;
+			});
+			callback?.();
+		},
+		[setIsFirstLoad],
+	);
+
+	const { subscribe } = useSocketHelper({
+		withCreate,
+		setTotal,
+		setItems,
+		disabledItems: [],
+	});
+
+	const onClearSearchAction = React.useCallback(
+		(callback?: VoidFunction) => {
+			setIsFirstLoad(true);
+			afterSearch.current = true;
+			setSearchValue(() => {
+				return "";
+			});
+			callback?.();
+		},
+		[setIsFirstLoad],
+	);
+
+	const { getRoomList: onLoadNextPage } = useRoomsHelper({
+		withCreate,
+		isInit: isInitRef.current,
+		setIsInit,
+		createDefineRoomLabel,
+		createDefineRoomType,
+		excludeItems,
+		roomType,
+		searchValue,
+		isRoomsOnly: true,
+		setHasNextPage,
+		setTotal,
+		setItems,
+		withInit,
+		disableThirdParty,
+		searchArea,
+		subscribe,
+	});
+
+	const headerSelectorProps: TSelectorHeader = withHeader
+		? {
+				withHeader,
+				headerProps: {
+					...headerProps,
+					headerLabel:
+						headerProps.headerLabel || getCommonTranslation("RoomList"),
+				},
+			}
+		: {};
+
+	const cancelButtonSelectorProps: TSelectorCancelButton = withCancelButton
+		? {
+				withCancelButton: true,
+				cancelButtonLabel:
+					cancelButtonLabel || getCommonTranslation("CancelButton"),
+				onCancel,
+			}
+		: {};
+
+	const searchSelectorProps: TSelectorSearch = withSearch
+		? {
+				withSearch: true,
+				searchPlaceholder: getCommonTranslation("Search"),
+				searchValue,
+				onSearch: onSearchAction,
+				onClearSearch: onClearSearchAction,
+				searchLoader: <SearchLoader />,
+				isSearchLoading: isFirstLoad && !searchValue && !afterSearch.current,
+			}
+		: {};
+
+	const withAside: TSelectorWithAside = useAside
+		? { useAside, onClose, withBlur, withoutBackground }
+		: {};
+
+	return (
+		<Selector
+			id={id}
+			className={className}
+			style={style}
+			{...headerSelectorProps}
+			{...cancelButtonSelectorProps}
+			{...searchSelectorProps}
+			{...withAside}
+			withPadding={withPadding}
+			onSelect={onSelect}
+			items={sortedItems}
+			submitButtonLabel={
+				submitButtonLabel || getCommonTranslation("SelectAction")
+			}
+			onSubmit={onSubmit}
+			isMultiSelect={isMultiSelect}
+			emptyScreenImage={
+				isBase ? <EmptyScreenRoomsLight /> : <EmptyScreenRoomsDark />
+			}
+			emptyScreenHeader={
+				emptyScreenHeader ?? getCommonTranslation("EmptyRoomsHeader")
+			}
+			emptyScreenDescription={
+				emptyScreenDescription ??
+				getCommonTranslation("EmptyRoomsDescriptionText", {
+					sectionName: getCommonTranslation("Rooms"),
+				})
+			}
+			searchEmptyScreenImage={
+				isBase ? (
+					<EmptyScreenFilterRoomsLight />
+				) : (
+					<EmptyScreenFilterRoomsDark />
+				)
+			}
+			searchEmptyScreenHeader={getCommonTranslation("NotFoundTitle")}
+			searchEmptyScreenDescription={getCommonTranslation(
+				"SearchEmptyRoomsDescription",
+			)}
+			totalItems={total}
+			hasNextPage={hasNextPage}
+			isNextPageLoading={isNextPageLoading}
+			loadNextPage={onLoadNextPage}
+			isLoading={isFirstLoad}
+			disableSubmitButton={isMultiSelect ? !hasSelectionChanged : !selectedItem}
+			alwaysShowFooter={sortedItems.length !== 0 || Boolean(searchValue)}
+			rowLoader={
+				<RowLoader
+					isMultiSelect={isMultiSelect}
+					isContainer={isFirstLoad}
+					isUser={false}
+				/>
+			}
+			isSSR={withInit}
+			forceIsMultiSelect={forceIsMultiSelect}
+			dataTestId="room_selector"
+			disableFirstFetch={disableFirstFetch}
+		/>
+	);
+};
+
+const RoomSelector = (props: RoomSelectorProps) => {
+	const { withInit } = props;
+
+	return (
+		<LoadersContextProvider withInit={withInit}>
+			<RoomSelectorComponent {...props} />
+		</LoadersContextProvider>
+	);
+};
+
+export default RoomSelector;
