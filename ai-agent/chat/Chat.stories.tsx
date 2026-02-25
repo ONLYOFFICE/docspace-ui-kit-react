@@ -40,8 +40,14 @@ const meta: Meta<typeof Chat> = {
   },
   decorators: [
     (Story) => (
-      <ApiProvider url="https://example.com" apiKey="test">
-        <SocketProvider>
+      <ApiProvider
+        url={import.meta.env.STORYBOOK_AI_API_URL}
+        apiKey={import.meta.env.STORYBOOK_AI_API_KEY}
+      >
+        <SocketProvider
+          // url={import.meta.env.STORYBOOK_AI_SOCKET_URL}
+          // token={import.meta.env.STORYBOOK_AI_API_KEY}
+        >
           <Story />
         </SocketProvider>
       </ApiProvider>
@@ -53,7 +59,7 @@ export default meta;
 type Story = StoryObj<typeof Chat>;
 
 const defaultProps: ChatProps = {
-  roomId: 1,
+  roomId: 9,
   userAvatar: "",
   selectedModel: "gpt-4o",
   getIcon: () => "",
@@ -89,7 +95,7 @@ const defaultProps: ChatProps = {
   },
   messagesSettings: {
     messages: [],
-    chatId: "1",
+    chatId: "",
     total: 0,
   },
   folderFormValidation: /^[a-zA-Z0-9 ]+$/,
