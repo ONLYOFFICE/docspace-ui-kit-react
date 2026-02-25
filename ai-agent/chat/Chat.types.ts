@@ -162,6 +162,7 @@ export type MessageBodyProps = {
   getIcon: TGetIcon;
   getResultStorageId: () => number | null;
   folderFormValidation: RegExp;
+  useInternalScroll?: boolean;
 } & Pick<MessageProps, "setAiPlaylistImages" | "setMediaViewerVisible">;
 
 export type FilesListProps = {
@@ -220,6 +221,7 @@ export type ChatFooterProps = ChatInputProps & ChatInfoBlockProps;
 export type ChatContainerProps = {
   children: React.ReactNode;
   isLoadingChat?: boolean;
+  useInternalScroll?: boolean;
 };
 
 export type ChatProps = {
@@ -254,4 +256,6 @@ export type ChatProps = {
 
   setAiPlaylistImages?: (value: TChatPlaylistImage[]) => void;
   setMediaViewerVisible?: (value: boolean) => void;
+
+  useInternalScroll?: boolean;
 };

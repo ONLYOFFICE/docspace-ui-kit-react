@@ -25,6 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 @use "../../../../styles/variables/colors" as *;
+@use "../../../../styles/mixins";
 
 :global(.dark) {
   .chatContainer {
@@ -87,6 +88,7 @@
   --background-color: #{$white};
   --text-color: #{$black};
   --icon-button-color: #{$gray};
+  --chat-header-top: calc(var(--section-header-height) + var(--section-submenu-height));
 
   --chat-header-model-color: #{$gray};
   --chat-header-button-svg-color: #{$black};
@@ -134,4 +136,17 @@
   flex-direction: column;
   align-items: center;
   flex-grow: 1;
+
+  @include mixins.tablet-and-below {
+    --chat-header-top: calc(var(--section-header-height-tablet) + var(--section-submenu-height));
+  }
+
+  @include mixins.mobile {
+    --chat-header-top: calc(var(--section-header-height-mobile) + var(--section-submenu-height));
+  }
+
+  &.useInternalScroll {
+    --chat-header-top: 0;
+    height: 100%;
+  }
 }

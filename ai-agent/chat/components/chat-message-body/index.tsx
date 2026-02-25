@@ -53,6 +53,7 @@ const ChatMessageBody = ({
   folderFormValidation,
   setAiPlaylistImages,
   setMediaViewerVisible,
+  useInternalScroll = false,
 }: MessageBodyProps) => {
   const {
     messages,
@@ -94,12 +95,14 @@ const ChatMessageBody = ({
     fetchNextMessages,
     currentChat,
     messages,
+    useInternalScroll,
   });
 
   return (
     <div
       className={classNames(styles.chatMessageBody, {
         [styles.empty]: isEmpty,
+        [styles.useInternalScroll]: useInternalScroll,
       })}
       data-testid="chat-message-body"
     >

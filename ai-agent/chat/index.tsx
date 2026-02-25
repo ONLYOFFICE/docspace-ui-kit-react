@@ -64,6 +64,7 @@ const Chat = observer(
     goToWebSearchSettings,
     setAiPlaylistImages,
     setMediaViewerVisible,
+    useInternalScroll = false,
   }: ChatProps & { isLoadingChat: boolean }) => {
     const { currentChat } = useChatStore();
 
@@ -109,6 +110,7 @@ const Chat = observer(
               folderFormValidation={folderFormValidation}
               setAiPlaylistImages={setAiPlaylistImages}
               setMediaViewerVisible={setMediaViewerVisible}
+              useInternalScroll={useInternalScroll}
             />
             <ChatFooter
               attachmentFile={attachmentFile}
@@ -167,7 +169,10 @@ const ChatWrapper = (props: ChatProps) => {
         {...messagesSettings}
         multimodal={multimodal}
       >
-        <ChatContainer isLoadingChat={isLoadingChat}>
+        <ChatContainer
+          isLoadingChat={isLoadingChat}
+          useInternalScroll={props.useInternalScroll}
+        >
           <Chat {...props} isLoadingChat={isLoadingChat} />
         </ChatContainer>
       </MessageStoreContextProvider>

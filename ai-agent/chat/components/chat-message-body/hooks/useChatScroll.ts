@@ -39,6 +39,7 @@ type Props = {
   fetchNextMessages: VoidFunction;
   currentChat: ChatStore["currentChat"];
   messages: MessageStore["messages"];
+  useInternalScroll?: boolean;
 };
 
 export const useChatScroll = ({
@@ -47,6 +48,7 @@ export const useChatScroll = ({
   fetchNextMessages,
   currentChat,
   messages,
+  useInternalScroll = false,
 }: Props) => {
   const isMobile = useIsMobile();
 
@@ -92,9 +94,15 @@ export const useChatScroll = ({
 
   // Scroll setter
   useEffect(() => {
-    const scroll = isMobile
-      ? document.querySelector("#customScrollBar .scroll-wrapper > .scroller")
-      : document.querySelector("#sectionScroll .scroll-wrapper > .scroller");
+    const scrollId = useInternalScroll
+      ? "chat-internal-scroll"
+      : isMobile
+        ? "customScrollBar"
+        : "sectionScroll";
+
+    const scroll = document.querySelector(
+      `#${scrollId} .scroll-wrapper > .scroller`,
+    );
 
     if (!scroll) return;
 
@@ -105,7 +113,7 @@ export const useChatScroll = ({
     return () => {
       scroll.removeEventListener("scroll", onScroll);
     };
-  }, [isMobile]);
+  }, [isMobile, useInternalScroll]);
 
   // enable auto scroll on chat change
   useEffect(() => {

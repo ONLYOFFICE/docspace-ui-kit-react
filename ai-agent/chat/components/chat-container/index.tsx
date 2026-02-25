@@ -27,18 +27,36 @@
 import React from "react";
 import classNames from "classnames";
 
+import { Scrollbar } from "../../../../components/scrollbar";
+
 import { ChatContainerProps } from "../../Chat.types";
 import styles from "./ChatContainer.module.scss";
 
-const ChatContainer = ({ children, isLoadingChat }: ChatContainerProps) => {
-  return (
+const ChatContainer = ({
+  children,
+  isLoadingChat,
+  useInternalScroll = false,
+}: ChatContainerProps) => {
+  const containerContent = (
     <div
-      className={classNames(styles.chatContainer, "chat-container")}
+      className={classNames(styles.chatContainer, "chat-container", {
+        [styles.useInternalScroll]: useInternalScroll,
+      })}
       data-testid={isLoadingChat ? "chat-container-loading" : "chat-container"}
     >
       {children}
     </div>
   );
+
+  if (useInternalScroll) {
+    return (
+      <Scrollbar id="chat-internal-scroll">
+        {containerContent}
+      </Scrollbar>
+    );
+  }
+
+  return containerContent;
 };
 
 export default ChatContainer;

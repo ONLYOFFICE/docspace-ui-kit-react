@@ -39,19 +39,29 @@ const meta: Meta<typeof Chat> = {
     layout: "padded",
   },
   decorators: [
-    (Story) => (
-      <ApiProvider
-        url={import.meta.env.STORYBOOK_AI_API_URL}
-        apiKey={import.meta.env.STORYBOOK_AI_API_KEY}
-      >
-        <SocketProvider
-          // url={import.meta.env.STORYBOOK_AI_SOCKET_URL}
-          // token={import.meta.env.STORYBOOK_AI_API_KEY}
+    (Story, context) => {
+      const useInternalScroll = context.args.useInternalScroll;
+
+      return (
+        <ApiProvider
+          url={import.meta.env.STORYBOOK_AI_API_URL}
+          apiKey={import.meta.env.STORYBOOK_AI_API_KEY}
         >
-          <Story />
-        </SocketProvider>
-      </ApiProvider>
-    ),
+          <SocketProvider
+            // url={import.meta.env.STORYBOOK_AI_SOCKET_URL}
+            // token={import.meta.env.STORYBOOK_AI_API_KEY}
+          >
+            {useInternalScroll ? (
+              <div style={{ height: "500px" }}>
+                <Story />
+              </div>
+            ) : (
+              <Story />
+            )}
+          </SocketProvider>
+        </ApiProvider>
+      );
+    },
   ],
 };
 
@@ -59,7 +69,7 @@ export default meta;
 type Story = StoryObj<typeof Chat>;
 
 const defaultProps: ChatProps = {
-  roomId: 9,
+  roomId: 229754,
   userAvatar: "",
   selectedModel: "gpt-4o",
   getIcon: () => "",
@@ -104,4 +114,11 @@ const defaultProps: ChatProps = {
 
 export const Default: Story = {
   args: defaultProps,
+};
+
+export const WithInternalScroll: Story = {
+  args: {
+    ...defaultProps,
+    useInternalScroll: true,
+  },
 };
