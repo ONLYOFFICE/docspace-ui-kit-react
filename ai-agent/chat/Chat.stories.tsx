@@ -36,7 +36,8 @@ const meta: Meta<typeof Chat> = {
   title: "AI-Agent/Chat",
   component: Chat,
   parameters: {
-    layout: "padded",
+    layout: "fullscreen",
+    noPadding: true,
   },
   decorators: [
     (Story, context) => {
