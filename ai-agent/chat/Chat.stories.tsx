@@ -36,13 +36,10 @@ const meta: Meta<typeof Chat> = {
   title: "AI-Agent/Chat",
   component: Chat,
   parameters: {
-    layout: "fullscreen",
-    noPadding: true,
+    layout: "padded",
   },
   decorators: [
-    (Story, context) => {
-      const useInternalScroll = context.args.useInternalScroll;
-
+    (Story) => {
       return (
         <ApiProvider
           url={import.meta.env.STORYBOOK_AI_API_URL}
@@ -52,13 +49,7 @@ const meta: Meta<typeof Chat> = {
             // url={import.meta.env.STORYBOOK_AI_SOCKET_URL}
             // token={import.meta.env.STORYBOOK_AI_API_KEY}
           >
-            {useInternalScroll ? (
-              <div style={{ height: "500px" }}>
-                <Story />
-              </div>
-            ) : (
-              <Story />
-            )}
+            <Story />
           </SocketProvider>
         </ApiProvider>
       );
@@ -121,5 +112,22 @@ export const WithInternalScroll: Story = {
   args: {
     ...defaultProps,
     useInternalScroll: true,
+    width: "600px",
+    height: "500px",
+  },
+};
+
+export const WithCustomStyles: Story = {
+  args: {
+    ...defaultProps,
+    useInternalScroll: true,
+    width: "600px",
+    height: "500px",
+    style: {
+      border: "2px solid #4A90E2",
+      borderRadius: "12px",
+      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+      paddingInline: "20px"
+    },
   },
 };

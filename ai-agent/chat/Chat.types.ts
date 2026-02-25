@@ -222,6 +222,9 @@ export type ChatContainerProps = {
   children: React.ReactNode;
   isLoadingChat?: boolean;
   useInternalScroll?: boolean;
+  width?: string;
+  height?: string;
+  style?: React.CSSProperties;
 };
 
 export type ChatProps = {
@@ -258,4 +261,7 @@ export type ChatProps = {
   setMediaViewerVisible?: (value: boolean) => void;
 
   useInternalScroll?: boolean;
+  width?: string;
+  height?: string;
+  style?: React.CSSProperties;
 };

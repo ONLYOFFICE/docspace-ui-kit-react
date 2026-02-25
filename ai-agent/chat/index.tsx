@@ -172,6 +172,9 @@ const ChatWrapper = (props: ChatProps) => {
         <ChatContainer
           isLoadingChat={isLoadingChat}
           useInternalScroll={props.useInternalScroll}
+          width={props.width}
+          height={props.height}
+          style={props.style}
         >
           <Chat {...props} isLoadingChat={isLoadingChat} />
         </ChatContainer>

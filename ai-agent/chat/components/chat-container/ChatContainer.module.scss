@@ -137,9 +137,6 @@
 
   --chat-file-item-exst-color: #{$gray};
 
-  width: 100%;
-  height: 100%;
-
   @include mixins.tablet-and-below {
     --chat-header-top: calc(var(--section-header-height-tablet) + var(--section-submenu-height));
   }

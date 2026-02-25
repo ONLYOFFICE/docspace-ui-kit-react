@@ -36,6 +36,9 @@ const ChatContainer = ({
   children,
   isLoadingChat,
   useInternalScroll = false,
+  width = "100%",
+  height = "100%",
+  style,
 }: ChatContainerProps) => {
   return (
     <div
@@ -43,6 +46,7 @@ const ChatContainer = ({
         [styles.useInternalScroll]: useInternalScroll,
       })}
       data-testid={isLoadingChat ? "chat-container-loading" : "chat-container"}
+      style={{ width, height, ...style }}
     >
       {useInternalScroll ? (
         <Scrollbar id="chat-internal-scroll" scrollBodyClassName={styles.chatScrollBody}>
