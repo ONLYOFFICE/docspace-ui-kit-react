@@ -253,6 +253,10 @@ declare global {
         string,
         { data: Record<string, string>; namespaces: string }
       >;
+      instance?: {
+        on: (event: string, callback: (...args: unknown[]) => void) => void;
+        off: (event: string, callback: (...args: unknown[]) => void) => void;
+      };
     };
     AscDesktopEditor?: {
       execCommand: (key: string, value: string) => void;

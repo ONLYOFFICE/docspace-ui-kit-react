@@ -35,8 +35,7 @@ import IOSReactSvgUrl from "../../../assets/iOS.react.svg";
 
 import { Text } from "../../text";
 import { IconButton } from "../../icon-button";
-
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import styles from "../Article.module.scss";
 import { ArticleAppsProps } from "../Article.types";
@@ -50,6 +49,8 @@ const ArticleApps = React.memo(
     officeforandroidUrl,
     officeforiosUrl,
   }: ArticleAppsProps) => {
+    const getCommonTranslation = useCommonTranslation();
+
     if (!showText) return null;
 
     return (
@@ -67,7 +68,6 @@ const ArticleApps = React.memo(
           lineHeight="12px"
           fontWeight={600}
         >
-          {/* t("Common:DownloadApps") */}
           {getCommonTranslation("DownloadApps")}
         </Text>
         <div className="download-app-list">
@@ -81,9 +81,6 @@ const ArticleApps = React.memo(
               title={getCommonTranslation("MobileWin", {
                 organizationName: logoText,
               })}
-              /* t("Common:MobileWin", {
-                organizationName: logoText,
-              }) */
             />
           ) : null}
 
@@ -97,9 +94,6 @@ const ArticleApps = React.memo(
               title={getCommonTranslation("MobileMac", {
                 organizationName: logoText,
               })}
-              /* t("Common:MobileMac", {
-                organizationName: logoText,
-              }) */
             />
           ) : null}
 
@@ -113,9 +107,6 @@ const ArticleApps = React.memo(
               title={getCommonTranslation("MobileLinux", {
                 organizationName: logoText,
               })}
-              /* t("Common:MobileLinux", {
-                organizationName: logoText,
-              }) */
             />
           ) : null}
 
@@ -129,9 +120,6 @@ const ArticleApps = React.memo(
               title={getCommonTranslation("MobileAndroid", {
                 organizationName: logoText,
               })}
-              /* t("Common:MobileAndroid", {
-                organizationName: logoText,
-              }) */
             />
           ) : null}
 
@@ -145,9 +133,6 @@ const ArticleApps = React.memo(
               title={getCommonTranslation("MobileIos", {
                 organizationName: logoText,
               })}
-              /* t("Common:MobileIos", {
-                organizationName: logoText,
-              }) */
             />
           ) : null}
         </div>
