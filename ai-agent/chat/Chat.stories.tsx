@@ -49,7 +49,9 @@ const meta: Meta<typeof Chat> = {
             // url={import.meta.env.STORYBOOK_AI_SOCKET_URL}
             // token={import.meta.env.STORYBOOK_AI_API_KEY}
           >
-            <Story />
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Story />
+            </div>
           </SocketProvider>
         </ApiProvider>
       );

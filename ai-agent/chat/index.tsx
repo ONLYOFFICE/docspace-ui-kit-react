@@ -153,12 +153,20 @@ const ChatWrapper = (props: ChatProps) => {
 
   if (!isLoadingChat && !aiReady && !hasChats) {
     return (
-      <ChatNoAccessScreen
-        aiReady={aiReady}
-        standalone={standalone}
-        isPortalAdmin={isAdmin}
-        goToAISettings={goToAISettings}
-      />
+      <ChatContainer
+        isLoadingChat={isLoadingChat}
+        useInternalScroll={props.useInternalScroll}
+        width={props.width}
+        height={props.height}
+        style={props.style}
+      >
+        <ChatNoAccessScreen
+          aiReady={aiReady}
+          standalone={standalone}
+          isPortalAdmin={isAdmin}
+          goToAISettings={goToAISettings}
+        />
+      </ChatContainer>
     );
   }
 
