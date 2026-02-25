@@ -37,26 +37,22 @@ const ChatContainer = ({
   isLoadingChat,
   useInternalScroll = false,
 }: ChatContainerProps) => {
-  const containerContent = (
+  return (
     <div
       className={classNames(styles.chatContainer, "chat-container", {
         [styles.useInternalScroll]: useInternalScroll,
       })}
       data-testid={isLoadingChat ? "chat-container-loading" : "chat-container"}
     >
-      {children}
+      {useInternalScroll ? (
+        <Scrollbar id="chat-internal-scroll" scrollBodyClassName={styles.chatScrollBody}>
+          {children}
+        </Scrollbar>
+      ) : (
+        children
+      )}
     </div>
   );
-
-  if (useInternalScroll) {
-    return (
-      <Scrollbar id="chat-internal-scroll">
-        {containerContent}
-      </Scrollbar>
-    );
-  }
-
-  return containerContent;
 };
 
 export default ChatContainer;

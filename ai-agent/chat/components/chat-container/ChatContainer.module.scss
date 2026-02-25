@@ -82,6 +82,14 @@
   }
 }
 
+.chatContainer,
+.chatScrollBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+}
+
 .chatContainer {
   --accent-main: var(--color-scheme-main-accent, #{$light-blue-main});
   --input-text-align: left;
@@ -131,11 +139,6 @@
 
   width: 100%;
   height: 100%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-grow: 1;
 
   @include mixins.tablet-and-below {
     --chat-header-top: calc(var(--section-header-height-tablet) + var(--section-submenu-height));
