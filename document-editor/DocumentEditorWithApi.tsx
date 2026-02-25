@@ -53,7 +53,7 @@ const DocumentEditorInner = ({
   shardkey,
   onLoadComponentError,
 }: DocumentEditorInnerProps) => {
-  const { filesApi } = useApi();
+  const { filesApi, filesSettingsApi } = useApi();
   const containerRef = useRef<HTMLDivElement>(null);
   const [config, setConfig] = useState<IConfig | null>(null);
   const [documentServerUrl, setDocumentServerUrl] = useState<string>("");
@@ -68,7 +68,10 @@ const DocumentEditorInner = ({
 
     (async () => {
       try {
-        const result = await filesApi.openEditFile(fileId);
+        const [docServiceLocation, result] = await Promise.all([
+          filesSettingsApi.getDocServiceUrl(),
+          filesApi.openEditFile(fileId),
+        ]);
 
         if (!result.data.response) {
           throw new Error("Invalid response format: missing 'response' field");
@@ -80,12 +83,16 @@ const DocumentEditorInner = ({
           throw new Error("Invalid response format: missing 'editorUrl' field");
         }
 
-        const editorUrl = new URL(initialConfig.editorUrl);
-        const pathParts = editorUrl.pathname.split("/");
-        const baseUrl = `${editorUrl.protocol}//${editorUrl.host}/${pathParts[1]}/`;
+        const baseUrl = docServiceLocation?.data?.response?.docServiceUrl;
+
+        if (!baseUrl) {
+          throw new Error(
+            "Invalid response format: missing 'docServiceUrl' field",
+          );
+        }
 
         if (cancelled) return;
-        setDocumentServerUrl(baseUrl);
+        setDocumentServerUrl(baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`);
         setConfig(initialConfig as unknown as IConfig);
       } catch (err) {
         const errorMessage =
@@ -102,7 +109,7 @@ const DocumentEditorInner = ({
         containerRef.current.innerHTML = "";
       }
     };
-  }, [fileId, filesApi]);
+  }, [fileId, filesApi, filesSettingsApi]);
 
   if (loading) {
     return (
