@@ -31,6 +31,7 @@ import classNames from "classnames";
 import TriangleDownIcon from "../../assets/triangle.down.react.svg";
 
 import { Loader, LoaderTypes } from "../loader";
+import { PreparationPortalProgress } from "../progress-bar/PreparationPortalProgress";
 import { Badge } from "../badge";
 import { DropDown } from "../drop-down";
 import { IconSizeType } from "../../utils";
@@ -46,6 +47,7 @@ import {
 
 const Dropzone = ({
   isLoading,
+  uploadPercent,
   isDisabled = false,
   isFolderUpload = false,
   isMultipleUpload = true,
@@ -158,11 +160,23 @@ const Dropzone = ({
       aria-disabled={isDisabled}
     >
       {isLoading ? (
-        <Loader
-          className={classNames(styles.dropzoneLoader, loaderClassName)}
-          size="30px"
-          type={LoaderTypes.track}
-        />
+        uploadPercent !== undefined ? (
+          <PreparationPortalProgress
+            className={classNames(
+              styles.dropzoneLoader,
+              styles.dropzoneProgress,
+              loaderClassName
+            )}
+            percent={uploadPercent}
+            text=""
+          />
+        ) : (
+          <Loader
+            className={classNames(styles.dropzoneLoader, loaderClassName)}
+            size="30px"
+            type={LoaderTypes.track}
+          />
+        )
       ) : (
         <div
           {...getRootProps({

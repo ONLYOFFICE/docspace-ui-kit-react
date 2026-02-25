@@ -29,6 +29,8 @@ import type { DropEvent } from "react-dropzone";
 type BaseDropzoneProps = {
   /** Shows loading state of the dropzone */
   isLoading: boolean;
+  /** Upload progress percentage (0-100) shown when isLoading is true */
+  uploadPercent?: number;
   /** Disables the dropzone */
   isDisabled?: boolean;
   /** Enables folder upload mode instead of file upload */
