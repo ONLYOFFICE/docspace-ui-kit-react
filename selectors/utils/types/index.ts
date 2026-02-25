@@ -39,7 +39,10 @@ export type TUseInputItemHelper = {
 	setItems?: React.Dispatch<React.SetStateAction<TSelectorItem[]>>;
 };
 
-export type TGetIcon = (size: number, fileExst: string) => string;
+export type TGetIcon = (
+	size: number,
+	fileExst: string,
+) => React.FC<React.SVGProps<SVGSVGElement>> | null;
 
 export type UseRoomsHelperProps = TUseInputItemHelper & {
 	isAgent?: boolean;
