@@ -66,7 +66,9 @@ export class BaseCustomApi {
 
     const headers = new Headers(fetchOptions.headers);
     headers.set("Accept", isStream ? "text/event-stream" : "application/json");
-    headers.set("Authorization", this.config.apiKey || "");
+    if (this.config.apiKey) {
+      headers.set("Authorization", `Bearer ${this.config.apiKey}`);
+    }
 
     if (data) {
       fetchOptions.body = JSON.stringify(data);
