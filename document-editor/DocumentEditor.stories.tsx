@@ -49,7 +49,7 @@ const meta = {
       description: "URL of the DocSpace portal (e.g., http://localhost)",
     },
     fileId: {
-      control: "text",
+      control: "number",
       description: "ID of the file to open in the editor",
     },
     width: {
@@ -85,7 +85,7 @@ export default meta;
 export const Default: Story = {
   args: {
     url: "http://example.com",
-    fileId: "1",
+    fileId: 1,
     width: "100%",
     height: "600px",
     apiKey: "YOUR_API_KEY_HERE",

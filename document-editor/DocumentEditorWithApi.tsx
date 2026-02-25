@@ -32,26 +32,12 @@ import { DocumentEditor } from "./DocumentEditor";
 export type DocumentEditorWithApiProps = {
   id: string;
   url: string;
-  fileId: string | number;
+  fileId: number;
   width?: string;
   height?: string;
   shardkey?: string;
   onLoadComponentError?: (errorCode: number, errorDescription: string) => void;
   apiKey: string;
-};
-
-type IInitialConfig = {
-  document: {
-    fileType: string;
-    key: string;
-    title: string;
-    url: string;
-    permissions?: Record<string, boolean>;
-  };
-  documentType: string;
-  editorConfig: Record<string, unknown>;
-  editorUrl: string;
-  token?: string;
 };
 
 type DocumentEditorInnerProps = Omit<
@@ -67,7 +53,7 @@ const DocumentEditorInner = ({
   shardkey,
   onLoadComponentError,
 }: DocumentEditorInnerProps) => {
-  const { apiClient } = useApi();
+  const { filesApi } = useApi();
   const containerRef = useRef<HTMLDivElement>(null);
   const [config, setConfig] = useState<IConfig | null>(null);
   const [documentServerUrl, setDocumentServerUrl] = useState<string>("");
@@ -82,15 +68,17 @@ const DocumentEditorInner = ({
 
     (async () => {
       try {
-        const data = await apiClient.request<{ response: IInitialConfig }>(
-          `/api/2.0/files/file/${fileId}/openedit`,
-        );
+        const result = await filesApi.openEditFile(fileId);
 
-        if (!data.response) {
+        if (!result.data.response) {
           throw new Error("Invalid response format: missing 'response' field");
         }
 
-        const initialConfig = data.response;
+        const initialConfig = result.data.response;
+
+        if (!initialConfig.editorUrl) {
+          throw new Error("Invalid response format: missing 'editorUrl' field");
+        }
 
         const editorUrl = new URL(initialConfig.editorUrl);
         const pathParts = editorUrl.pathname.split("/");
@@ -114,7 +102,7 @@ const DocumentEditorInner = ({
         containerRef.current.innerHTML = "";
       }
     };
-  }, [apiClient, fileId]);
+  }, [fileId, filesApi]);
 
   if (loading) {
     return (
