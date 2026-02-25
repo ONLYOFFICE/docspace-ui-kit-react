@@ -27,7 +27,7 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { DocumentEditorWithApi } from ".";
+import { DocumentEditorWithApi } from "./DocumentEditorWithApi";
 
 const meta = {
   title: "Document Editor",
