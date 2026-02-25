@@ -42,7 +42,7 @@ export type ProgressBarProps = {
 };
 
 export type PreparationPortalProgressProps = {
-  text: string;
+  text?: string;
   percent: number;
   className?: string;
 

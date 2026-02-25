@@ -168,7 +168,6 @@ const Dropzone = ({
               loaderClassName
             )}
             percent={uploadPercent}
-            text=""
           />
         ) : (
           <Loader
