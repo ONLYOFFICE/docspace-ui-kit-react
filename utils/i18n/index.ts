@@ -40,9 +40,13 @@ export const getCookie = (name: string): string | undefined => {
   return matches ? decodeURIComponent(matches[1]) : undefined;
 };
 
-type WindowI18n = {
+export type WindowI18n = {
   t?: (key: string, options?: Record<string, string | number>) => string;
   loaded?: Record<string, { data: Record<string, string> }>;
+  instance?: {
+    on: (event: string, callback: (...args: unknown[]) => void) => void;
+    off: (event: string, callback: (...args: unknown[]) => void) => void;
+  };
 };
 
 const getWindowI18n = (): WindowI18n | undefined => {
@@ -109,6 +113,8 @@ export const getCommonTranslation = (
 /**
  * Checks if translations are loaded and ready to use
  */
+export { useCommonTranslation } from "./useCommonTranslation";
+
 export const getTranslationReady = () => {
   if (typeof window === "undefined") return undefined;
 

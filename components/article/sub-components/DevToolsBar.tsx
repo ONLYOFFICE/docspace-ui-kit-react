@@ -33,7 +33,7 @@ import ArrowReactSvg from "../../../assets/arrow.right.react.svg";
 import { DeviceType } from "../../../enums";
 import { openingNewTab } from "../../../utils/openingNewTab";
 import { Text } from "../../text";
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import styles from "../Article.module.scss";
 import { ArticleDevToolsBarProps } from "../Article.types";
@@ -63,6 +63,8 @@ const ArticleDevToolsBar = ({
 
     onClick(e);
   };
+
+  const getCommonTranslation = useCommonTranslation();
 
   if (!showText) return null;
 

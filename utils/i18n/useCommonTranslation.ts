@@ -24,55 +24,43 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
+import { useState, useEffect, useCallback } from "react";
 
-import ArticleHideMenuReactSvg from "../../../assets/article-hide-menu.react.svg";
-import ArticleShowMenuReactSvg from "../../../assets/article-show-menu.react.svg";
+import { getCommonTranslation } from "./index";
+import type { WindowI18n } from "./index";
 
-import { Text } from "../../text";
-import { useCommonTranslation } from "../../../utils/i18n";
-
-import styles from "../Article.module.scss";
-import { ArticleHideMenuButtonProps } from "../Article.types";
-
-const HideArticleMenuButton = ({
-  showText,
-  hideProfileBlock,
-  toggleShowText,
-}: ArticleHideMenuButtonProps) => {
-  const getCommonTranslation = useCommonTranslation();
-
-  return (
-    <div
-      className={styles.hideArticleMenuButton}
-      onClick={toggleShowText}
-      data-show-text={showText ? "true" : "false"}
-      data-hide-profile-block={hideProfileBlock ? "true" : "false"}
-    >
-      {showText ? (
-        <div className="article-hide-menu-container">
-          <ArticleHideMenuReactSvg className="article-hide-menu-icon_svg" />
-          <Text
-            className="article-hide-menu-text"
-            fontWeight={600}
-            fontSize="15px"
-            lineHeight="16px"
-            noSelect
-            truncate
-          >
-            {getCommonTranslation("HideArticleMenu")}
-          </Text>
-        </div>
-      ) : (
-        <div
-          className="article-show-menu-container"
-          id="document_catalog-show-menu"
-        >
-          <ArticleShowMenuReactSvg className="article-show-menu-icon_svg" />
-        </div>
-      )}
-    </div>
-  );
+const getI18nInstance = (): WindowI18n["instance"] | undefined => {
+  if (typeof window === "undefined") return undefined;
+  return (window as unknown as { i18n?: WindowI18n }).i18n?.instance;
 };
 
-export default HideArticleMenuButton;
+/**
+ * A React hook that provides a reactive version of `getCommonTranslation`.
+ * Listens to the app's i18n instance `languageChanged` event and forces a re-render,
+ * ensuring that translated strings update when the language changes.
+ *
+ * Requires `window.i18n.instance` to be set by the host application.
+ */
+export const useCommonTranslation = () => {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const instance = getI18nInstance();
+    if (!instance) return;
+
+    const handler = () => setTick((n) => n + 1);
+    instance.on("languageChanged", handler);
+    return () => {
+      instance.off("languageChanged", handler);
+    };
+  }, []);
+
+  const t = useCallback(
+    (key: string, interpolation?: Record<string, string | number>) =>
+      getCommonTranslation(key, interpolation),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tick],
+  );
+
+  return t;
+};
