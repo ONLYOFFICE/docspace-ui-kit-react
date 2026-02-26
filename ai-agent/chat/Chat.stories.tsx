@@ -37,6 +37,7 @@ const meta: Meta<typeof Chat> = {
   component: Chat,
   parameters: {
     layout: "padded",
+    noPadding: true,
   },
   decorators: [
     (Story) => {
@@ -63,6 +64,11 @@ export default meta;
 type Story = StoryObj<typeof Chat>;
 
 const defaultProps: ChatProps = {
+  internalInit: true,
+  width: "100%",
+  height: "100vh",
+  isLoading: false,
+  useInternalScroll: true,
   roomId: 229754,
   userAvatar: "",
   selectedModel: "gpt-4o",
@@ -71,84 +77,12 @@ const defaultProps: ChatProps = {
   aiReady: true,
   attachmentFile: null,
   clearAttachmentFile: () => {},
-  toolsSettings: {
-    servers: [],
-    MCPTools: new Map(),
-    webSearchAvailable: true,
-    webSearchEnabled: false,
-    isFetched: true,
-    knowledgeSearchToolName: "knowledge_search",
-    webSearchToolName: "web_search",
-    webCrawlingToolName: "web_crawling",
-    generateDocxToolName: "generate_doc",
-    generatePresentationToolName: "generate_doc",
-    generateFormToolName: "generate_doc",
-    setServers: () => {},
-    setMCPTools: () => {},
-    setWebSearchEnabled: () => {},
-    setIsFetched: () => {},
-    fetchTools: async () => {},
-    initTools: async () => {},
-  },
-  initChats: {
-    isLoading: false,
-    isRequestRunning: false,
-    chats: [],
-    totalChats: 0,
-    fetchChats: async () => {},
-  },
-  messagesSettings: {
-    messages: [],
-    chatId: "",
-    total: 0,
-  },
   folderFormValidation: /^[a-zA-Z0-9 ]+$/,
-  isAdmin: true,
+  isAdmin: false,
   persistDraft: false,
+
 };
 
 export const Default: Story = {
   args: defaultProps,
-};
-
-export const WithInternalScroll: Story = {
-  args: {
-    ...defaultProps,
-    useInternalScroll: true,
-    width: "600px",
-    height: "500px",
-  },
-};
-
-export const WithCustomStyles: Story = {
-  args: {
-    ...defaultProps,
-    useInternalScroll: true,
-    width: "600px",
-    height: "500px",
-    style: {
-      border: "2px solid #4A90E2",
-      borderRadius: "12px",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-    },
-  },
-};
-
-export const WithInternalInit: Story = {
-  args: {
-    roomId: 229754,
-    userAvatar: "",
-    selectedModel: "gpt-4o",
-    getIcon: () => "",
-    getResultStorageId: () => null,
-    aiReady: true,
-    attachmentFile: null,
-    clearAttachmentFile: () => {},
-    folderFormValidation: /^[a-zA-Z0-9 ]+$/,
-    isAdmin: true,
-    internalInit: true,
-    useInternalScroll: true,
-    width: "600px",
-    height: "500px",
-  },
 };
