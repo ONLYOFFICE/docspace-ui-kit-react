@@ -29,19 +29,19 @@ import classNames from "classnames";
 
 import styles from "../Article.module.scss";
 
-type ArticleCustomSlotProps = {
-  showText: boolean;
+type CustomSlotProps = {
   children?: React.ReactNode;
+  withDevTools?: boolean;
 };
 
-const ArticleCustomSlot = React.memo(
-  ({ showText, children }: ArticleCustomSlotProps) => {
+const CustomSlot = React.memo(
+  ({ children, withDevTools = false }: CustomSlotProps) => {
     if (!children) return null;
 
     return (
       <div
-        data-show-text={showText ? "true" : "false"}
-        className={classNames(styles.customSlot)}
+        data-with-dev-tools={withDevTools ? "true" : "false"}
+        className={styles.customSlot}
       >
         {children}
       </div>
@@ -49,6 +49,6 @@ const ArticleCustomSlot = React.memo(
   },
 );
 
-ArticleCustomSlot.displayName = "ArticleCustomSlot";
+CustomSlot.displayName = "CustomSlot";
 
-export default ArticleCustomSlot;
+export default CustomSlot;

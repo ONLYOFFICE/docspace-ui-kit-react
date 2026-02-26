@@ -46,6 +46,7 @@ export type ArticleHeaderProps = {
 export type ArticleAppsProps = {
   showText: boolean;
   withDevTools: boolean;
+  withCustomSlot: boolean;
   logoText: string;
   downloaddesktopUrl: string;
   officeforandroidUrl: string;
@@ -56,11 +57,13 @@ export type ArticleHideMenuButtonProps = {
   showText: boolean;
   toggleShowText: VoidFunction;
   hideProfileBlock: boolean;
+  withCustomSlot: boolean;
 };
 
 export type ArticleDevToolsBarProps = {
   showText: boolean;
   articleOpen: boolean;
+  withCustomSlot: boolean;
   currentDeviceType: DeviceType;
   toggleArticleOpen: TToggleArticleOpen;
   path?: string;
@@ -89,10 +92,10 @@ export type ArticleProfileProps = {
 
 export type ArticleProps = ArticleProfileProps &
   ArticleZendeskProps &
-  ArticleDevToolsBarProps &
   ArticleHideMenuButtonProps &
+  Omit<ArticleDevToolsBarProps, "withCustomSlot"> &
   Omit<ArticleHeaderProps, "children" | "onClick" | "onIconClick"> &
-  Omit<ArticleAppsProps, "withDevTools"> & {
+  Omit<ArticleAppsProps, "withDevTools" | "withCustomSlot"> & {
     setShowText: (value: boolean) => void;
     setIsMobileArticle: (value: boolean) => void;
     children: React.JSX.Element[];
@@ -119,6 +122,5 @@ export type ArticleProps = ArticleProfileProps &
     trialDaysLeft?: number;
 
     limitedAccessDevToolsForUsers: boolean;
-    
     customSlot?: React.ReactNode;
   };
