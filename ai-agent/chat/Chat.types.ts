@@ -240,9 +240,9 @@ export type ChatProps = {
   attachmentFile: ChatInputProps["attachmentFile"];
   clearAttachmentFile: ChatInputProps["clearAttachmentFile"];
 
-  toolsSettings: ChatInputProps["toolsSettings"];
-  initChats: ReturnType<typeof useInitChats>;
-  messagesSettings: Omit<ReturnType<typeof useInitMessages>, "initMessages">;
+  toolsSettings?: ChatInputProps["toolsSettings"];
+  initChats?: ReturnType<typeof useInitChats>;
+  messagesSettings?: Omit<ReturnType<typeof useInitMessages>, "initMessages">;
   isAdmin?: boolean;
   standalone?: boolean;
 
@@ -266,4 +266,23 @@ export type ChatProps = {
   height?: string;
   style?: React.CSSProperties;
   persistDraft?: boolean;
+  internalInit?: boolean;
+};
+
+export type ChatCoreProps = ChatProps & {
+  isLoadingChat: boolean;
+  initChats: NonNullable<ChatProps["initChats"]>;
+  messagesSettings: NonNullable<ChatProps["messagesSettings"]>;
+  toolsSettings: NonNullable<ChatProps["toolsSettings"]>;
+};
+
+export type ChatInternalInitProps = Omit<
+  ChatProps,
+  "initChats" | "messagesSettings" | "toolsSettings"
+>;
+
+export type ChatExternalInitProps = ChatProps & {
+  initChats: NonNullable<ChatProps["initChats"]>;
+  messagesSettings: NonNullable<ChatProps["messagesSettings"]>;
+  toolsSettings: NonNullable<ChatProps["toolsSettings"]>;
 };

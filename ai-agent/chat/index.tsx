@@ -30,7 +30,12 @@ import { observer } from "mobx-react";
 import { MessageStoreContextProvider } from "./store/messageStore";
 import { ChatStoreContextProvider, useChatStore } from "./store/chatStore";
 
-import type { ChatProps } from "./Chat.types";
+import type {
+  ChatProps,
+  ChatCoreProps,
+  ChatInternalInitProps,
+  ChatExternalInitProps,
+} from "./Chat.types";
 
 import ChatContainer from "./components/chat-container";
 import ChatHeader from "./components/chat-header";
@@ -39,10 +44,13 @@ import { ChatNoAccessScreen } from "./components/chat-no-access-screen";
 import ChatFooter from "./components/chat-footer";
 
 import { CHAT_SUPPORTED_FORMATS } from "./Chat.constants";
+import useInitChats from "./hooks/useInitChats";
+import useInitMessages from "./hooks/useInitMessages";
+import useToolsSettings from "./hooks/useToolsSettings";
 
 export { CHAT_SUPPORTED_FORMATS };
 
-const Chat = observer(
+const ChatUI = observer(
   ({
     isLoadingChat,
     selectedModel,
@@ -66,7 +74,7 @@ const Chat = observer(
     setMediaViewerVisible,
     useInternalScroll = false,
     persistDraft = false,
-  }: ChatProps & { isLoadingChat: boolean }) => {
+  }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
 
     const showEmptyScreen = !isLoadingChat && !aiReady && !currentChat;
@@ -134,33 +142,33 @@ const Chat = observer(
   },
 );
 
-const ChatWrapper = (props: ChatProps) => {
+const ChatCore = (props: ChatCoreProps) => {
   const {
     roomId,
-    isLoading,
-
     initChats,
-
     messagesSettings,
-
-    isAdmin = false,
-    standalone = false,
-    aiReady = false,
     multimodal,
+    isLoadingChat,
+    useInternalScroll = false,
+    width,
+    height,
+    style,
+    aiReady = false,
+    standalone = false,
+    isAdmin = false,
     goToAISettings,
   } = props;
 
-  const isLoadingChat = isLoading || !roomId;
   const hasChats = initChats?.chats?.length > 0;
 
   if (!isLoadingChat && !aiReady && !hasChats) {
     return (
       <ChatContainer
         isLoadingChat={isLoadingChat}
-        useInternalScroll={props.useInternalScroll}
-        width={props.width}
-        height={props.height}
-        style={props.style}
+        useInternalScroll={useInternalScroll}
+        width={width}
+        height={height}
+        style={style}
       >
         <ChatNoAccessScreen
           aiReady={aiReady}
@@ -181,16 +189,103 @@ const ChatWrapper = (props: ChatProps) => {
       >
         <ChatContainer
           isLoadingChat={isLoadingChat}
-          useInternalScroll={props.useInternalScroll}
-          width={props.width}
-          height={props.height}
-          style={props.style}
+          useInternalScroll={useInternalScroll}
+          width={width}
+          height={height}
+          style={style}
         >
-          <Chat {...props} isLoadingChat={isLoadingChat} />
+          <ChatUI {...props} />
         </ChatContainer>
       </MessageStoreContextProvider>
     </ChatStoreContextProvider>
   );
 };
 
-export default ChatWrapper;
+const ChatInternalInit = (props: ChatInternalInitProps) => {
+  const {
+    roomId,
+    multimodal,
+    isLoading,
+  } = props;
+
+  const initChats = useInitChats({ roomId: roomId ?? "" });
+  const { initMessages, ...messagesSettings } = useInitMessages(roomId ?? "");
+  const toolsSettings = useToolsSettings({
+    roomId: roomId ?? "",
+    aiConfig: null,
+    chatSettings: undefined,
+  });
+
+  const [isInitialized, setIsInitialized] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!roomId) return;
+
+    const init = async () => {
+      await Promise.all([
+        initChats.fetchChats(),
+        initMessages(),
+        toolsSettings.initTools(),
+      ]);
+      setIsInitialized(true);
+    };
+
+    init();
+  }, [roomId]);
+
+  React.useEffect(() => {
+    const onSelectChat = async () => {
+      await initMessages();
+    };
+
+    window.addEventListener("select-chat", onSelectChat);
+    return () => window.removeEventListener("select-chat", onSelectChat);
+  }, []);
+
+  return (
+    <ChatCore
+      {...props}
+      initChats={initChats}
+      messagesSettings={messagesSettings}
+      toolsSettings={toolsSettings}
+      multimodal={multimodal}
+      isLoadingChat={isLoading || !isInitialized}
+    />
+  );
+};
+
+const ChatExternalInit = (props: ChatExternalInitProps) => {
+  const { isLoading, roomId } = props;
+  const isLoadingChat = isLoading || !roomId;
+
+  return <ChatCore {...props} isLoadingChat={isLoadingChat} />;
+};
+
+const Chat = (props: ChatProps) => {
+  const { internalInit, ...rest } = props;
+
+  if (internalInit) {
+    return <ChatInternalInit {...rest} />;
+  }
+
+  // For external init, initChats, messagesSettings, and toolsSettings are required
+  const { initChats, messagesSettings, toolsSettings } = props;
+
+  if (!initChats || !messagesSettings || !toolsSettings) {
+    console.error(
+      "Chat: initChats, messagesSettings, and toolsSettings are required when internalInit is false",
+    );
+    return null;
+  }
+
+  return (
+    <ChatExternalInit
+      {...rest}
+      initChats={initChats}
+      messagesSettings={messagesSettings}
+      toolsSettings={toolsSettings}
+    />
+  );
+};
+
+export default Chat;

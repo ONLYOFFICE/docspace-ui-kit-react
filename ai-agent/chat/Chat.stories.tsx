@@ -133,3 +133,22 @@ export const WithCustomStyles: Story = {
     },
   },
 };
+
+export const WithInternalInit: Story = {
+  args: {
+    roomId: 229754,
+    userAvatar: "",
+    selectedModel: "gpt-4o",
+    getIcon: () => "",
+    getResultStorageId: () => null,
+    aiReady: true,
+    attachmentFile: null,
+    clearAttachmentFile: () => {},
+    folderFormValidation: /^[a-zA-Z0-9 ]+$/,
+    isAdmin: true,
+    internalInit: true,
+    useInternalScroll: true,
+    width: "600px",
+    height: "500px",
+  },
+};
