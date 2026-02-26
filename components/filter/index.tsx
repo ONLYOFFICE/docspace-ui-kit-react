@@ -838,6 +838,7 @@ const FilterInput = React.memo(
                 <TooltipContainer
                   as="div"
                   className={styles.groupManagementButton}
+                  title={getCommonTranslation("ManageGroupRooms")}
                   onClick={onCreateGroup}
                 >
                   <IconButton

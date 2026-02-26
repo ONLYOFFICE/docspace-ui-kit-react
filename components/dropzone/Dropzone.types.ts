@@ -29,12 +29,18 @@ import type { DropEvent } from "react-dropzone";
 type BaseDropzoneProps = {
   /** Shows loading state of the dropzone */
   isLoading: boolean;
+  /** Upload progress percentage (0-100) shown when isLoading is true */
+  uploadPercent?: number;
   /** Disables the dropzone */
   isDisabled?: boolean;
-  /** Main text displayed in the dropzone for file */
-  linkMainTextForFiles: string;
-  /** Main text displayed in the dropzone for folder */
-  linkMainTextForFolders?: string;
+  /** Enables folder upload mode instead of file upload */
+  isFolderUpload?: boolean;
+  /** Allows multiple files/folders upload. When false, only one item is accepted (default: true) */
+  isMultipleUpload?: boolean;
+  /** Called when user tries to upload multiple items in single upload mode */
+  onSingleUploadError?: () => void;
+  /** Main text displayed in the dropzone */
+  linkMainText: string;
   /** Secondary text displayed in the dropzone */
   linkSecondaryText: string;
   /** Text displaying supported file types (short version) */
