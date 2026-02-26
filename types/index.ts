@@ -25,6 +25,18 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type {
+  EmployeeFullDto,
+  FileDtoInteger,
+  GroupDto,
+} from "@onlyoffice/docspace-api-sdk";
+
+export type {
+  EmployeeFullDto,
+  FileDtoInteger,
+  GroupDto,
+}
+
+import type {
   ShareAccessRights,
   EmployeeStatus,
   EmployeeActivationStatus,
