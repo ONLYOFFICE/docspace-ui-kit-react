@@ -74,6 +74,11 @@
     .icon svg path {
       fill: var(--filter-block-item-tag-active-color);
     }
+
+    .icon svg path[stroke] {
+      fill: none;
+      stroke: var(--filter-block-item-tag-active-color);
+    }
   }
 
   &.isActive:not(.disabled):hover {

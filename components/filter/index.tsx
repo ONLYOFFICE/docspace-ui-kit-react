@@ -782,6 +782,7 @@ const FilterInput = React.memo(
                           noBorder
                           withoutArrow
                           displayArrow={false}
+                          usePortalBackdrop
                         >
                           <span className={styles.ellipsisIcon}>...</span>
                         </ComboBox>
@@ -838,6 +839,7 @@ const FilterInput = React.memo(
                 <TooltipContainer
                   as="div"
                   className={styles.groupManagementButton}
+                  title={getCommonTranslation("ManageGroupRooms")}
                   onClick={onCreateGroup}
                 >
                   <IconButton
