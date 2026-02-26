@@ -41,11 +41,11 @@ import { useSocket } from "../../../providers/socket";
 
 type Props = {
   agentId: string | number;
-  aiConfig: Nullable<TAIConfig>;
+  aiConfig?: Nullable<TAIConfig>;
   chatSettings?: TAIRoomChatSettings;
 };
 
-const useToolsSettings = ({ agentId, aiConfig: aiConfigProp, chatSettings }: Props) => {
+const useToolsSettings = ({ agentId, aiConfig: aiConfigProp, chatSettings: chatSettingsProp }: Props) => {
   const [servers, setServers] = React.useState<TServer[]>([]);
   const [MCPTools, setMCPTools] = React.useState<Map<string, TMCPTool[]>>(
     new Map(),
@@ -54,10 +54,13 @@ const useToolsSettings = ({ agentId, aiConfig: aiConfigProp, chatSettings }: Pro
   const [isFetched, setIsFetched] = React.useState(false);
   const [fetchedAiConfig, setFetchedAiConfig] =
     React.useState<TAIConfig | null>(null);
-  const { aiApi } = useApi();
+  const [fetchedChatSettings, setFetchedChatSettings] =
+    React.useState<TAIRoomChatSettings | null>(null);
+  const { aiApi, foldersApi } = useApi();
   const socket = useSocket();
 
   const aiConfig = aiConfigProp ?? fetchedAiConfig;
+  const chatSettings = chatSettingsProp ?? fetchedChatSettings;
 
   const fetchServerTools = React.useCallback(
     async (res: TServer[], agentId: string | number) => {
@@ -109,8 +112,19 @@ const useToolsSettings = ({ agentId, aiConfig: aiConfigProp, chatSettings }: Pro
       );
     }
 
+    if (!chatSettingsProp) {
+      promises.push(
+        foldersApi.getFolderByFolderId(Number(agentId)).then((res) => {
+          const current = res.data.response?.current;
+          if (current?.chatSettings) {
+            setFetchedChatSettings(current.chatSettings as TAIRoomChatSettings);
+          }
+        }),
+      );
+    }
+
     await Promise.all(promises);
-  }, [fetchTools, agentId, aiConfigProp, aiApi]);
+  }, [fetchTools, agentId, aiConfigProp, chatSettingsProp, aiApi, foldersApi]);
 
   const onModifyFolder = React.useCallback(
     (data?: TOptSocket) => {
