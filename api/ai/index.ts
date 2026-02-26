@@ -27,7 +27,7 @@
  */
 
 import { BaseCustomApi } from "../base-custom-api";
-import { TChat, TMCPTool, TMessage, TServer } from "../../types/ai";
+import { TAIConfig, TChat, TMCPTool, TMessage, TServer } from "../../types/ai";
 import { toastr } from "../../components/toast";
 import { TFile } from "../../types";
 import { ToolsPermission } from "../../enums";
@@ -224,5 +224,14 @@ export class AiApi extends BaseCustomApi {
         isStream: true,
       },
     );
+  }
+
+  async getAIConfig() {
+    try {
+      return await this.request<TAIConfig>("/ai/config");
+    } catch (e) {
+      console.log(e);
+      toastr.error(e as string);
+    }
   }
 }
