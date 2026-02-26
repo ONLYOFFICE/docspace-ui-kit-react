@@ -44,7 +44,7 @@ export default class ChatStore {
 
   totalChats: number = 0;
 
-  roomId: TChatStoreProps["roomId"] = "";
+  agentId: TChatStoreProps["agentId"] = "";
 
   isLoading: boolean = false;
 
@@ -55,8 +55,8 @@ export default class ChatStore {
     makeAutoObservable(this);
   }
 
-  setRoomId = (value: TChatStoreProps["roomId"]) => {
-    this.roomId = value;
+  setAgentId = (value: TChatStoreProps["agentId"]) => {
+    this.agentId = value;
   };
 
   setTotalChats = (value: number) => {
@@ -126,7 +126,7 @@ export default class ChatStore {
 
     try {
       const { items, total } = await this.aiApi.getChats(
-        this.roomId,
+        this.agentId,
         startIndex,
       );
 
@@ -184,7 +184,7 @@ export default class ChatStore {
 export const ChatStoreContext = React.createContext<ChatStore>({} as ChatStore);
 
 export const ChatStoreContextProvider = ({
-  roomId,
+  agentId,
 
   chats,
   totalChats,
@@ -195,8 +195,8 @@ export const ChatStoreContextProvider = ({
   const socket = useSocket();
 
   React.useEffect(() => {
-    store.setRoomId(roomId);
-  }, [store, roomId]);
+    store.setAgentId(agentId);
+  }, [store, agentId]);
 
   React.useEffect(() => {
     store.setChats(chats);

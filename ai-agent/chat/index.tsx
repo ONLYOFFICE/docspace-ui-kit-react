@@ -55,7 +55,7 @@ const ChatUI = observer(
     isLoadingChat,
     selectedModel,
     getIcon,
-    roomId,
+    agentId,
     userAvatar,
     attachmentFile,
     clearAttachmentFile,
@@ -96,7 +96,7 @@ const ChatUI = observer(
           isLoading={isLoadingChat}
           getIcon={getIcon}
           getResultStorageId={getResultStorageId}
-          roomId={roomId}
+          agentId={agentId}
           aiReady={aiReady}
           setIsAIAgentChatDelete={setIsAIAgentChatDelete}
           setDeleteDialogVisible={setDeleteDialogVisible}
@@ -144,7 +144,7 @@ const ChatUI = observer(
 
 const ChatCore = (props: ChatCoreProps) => {
   const {
-    roomId,
+    agentId,
     initChats,
     messagesSettings,
     multimodal,
@@ -181,9 +181,9 @@ const ChatCore = (props: ChatCoreProps) => {
   }
 
   return (
-    <ChatStoreContextProvider roomId={roomId} {...initChats}>
+    <ChatStoreContextProvider agentId={agentId} {...initChats}>
       <MessageStoreContextProvider
-        roomId={roomId}
+        agentId={agentId}
         {...messagesSettings}
         multimodal={multimodal}
       >
@@ -203,15 +203,15 @@ const ChatCore = (props: ChatCoreProps) => {
 
 const ChatInternalInit = (props: ChatInternalInitProps) => {
   const {
-    roomId,
+    agentId,
     multimodal,
     isLoading,
   } = props;
 
-  const initChats = useInitChats({ roomId: roomId ?? "" });
-  const { initMessages, ...messagesSettings } = useInitMessages(roomId ?? "");
+  const initChats = useInitChats({ agentId: agentId ?? "" });
+  const { initMessages, ...messagesSettings } = useInitMessages(agentId ?? "");
   const toolsSettings = useToolsSettings({
-    roomId: roomId ?? "",
+    agentId: agentId ?? "",
     aiConfig: null,
     chatSettings: undefined,
   });
@@ -219,7 +219,7 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
   const [isInitialized, setIsInitialized] = React.useState(false);
 
   React.useEffect(() => {
-    if (!roomId) return;
+    if (!agentId) return;
 
     const init = async () => {
       await Promise.all([
@@ -231,7 +231,7 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
     };
 
     init();
-  }, [roomId]);
+  }, [agentId]);
 
   React.useEffect(() => {
     const onSelectChat = async () => {
@@ -255,8 +255,8 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
 };
 
 const ChatExternalInit = (props: ChatExternalInitProps) => {
-  const { isLoading, roomId } = props;
-  const isLoadingChat = isLoading || !roomId;
+  const { isLoading, agentId } = props;
+  const isLoadingChat = isLoading || !agentId;
 
   return <ChatCore {...props} isLoadingChat={isLoadingChat} />;
 };

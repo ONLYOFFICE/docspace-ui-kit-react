@@ -63,7 +63,7 @@ import { CommonTrans } from "../../../../../utils/i18n/CommonTrans";
 
 const SelectChat = ({
   isLoadingProp,
-  roomId,
+  agentId,
   getIcon,
   getResultStorageId,
   setIsAIAgentChatDelete,
@@ -337,7 +337,7 @@ const SelectChat = ({
           getIcon={getIcon}
           showFolderSelector={isExportOpen}
           onCloseFolderSelector={closeExportSelector}
-          currentFolderId={getResultStorageId() || roomId}
+          currentFolderId={getResultStorageId() || agentId}
           getFileName={getFileName}
           onSubmit={onSubmit}
           folderFormValidation={folderFormValidation}

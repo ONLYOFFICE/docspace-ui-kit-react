@@ -45,17 +45,17 @@ export type TChatPlaylistImage = {
 };
 
 export type TGenerateDocStoreProps = {
-  roomId: string | number;
+  agentId: string | number;
   children: React.ReactNode;
 };
 
 export type TChatStoreProps = {
-  roomId: string | number;
+  agentId: string | number;
   children: React.ReactNode;
 } & ReturnType<typeof useInitChats>;
 
 export type TMessageStoreProps = {
-  roomId: string | number;
+  agentId: string | number;
   children: React.ReactNode;
   multimodal?: TMultimodal;
 } & Omit<ReturnType<typeof useInitMessages>, "initMessages">;
@@ -67,7 +67,7 @@ export type SelectModelProps = {
 
 export type SelectChatProps = {
   isLoadingProp?: boolean;
-  roomId: string | number;
+  agentId: string | number;
   getIcon: TGetIcon;
   getResultStorageId: () => number | null;
   setIsAIAgentChatDelete?: (value: {
@@ -229,7 +229,7 @@ export type ChatContainerProps = {
 };
 
 export type ChatProps = {
-  roomId: TChatStoreProps["roomId"];
+  agentId: TChatStoreProps["agentId"];
   userAvatar: MessageBodyProps["userAvatar"];
   selectedModel: string;
   getIcon: ChatInputProps["getIcon"];

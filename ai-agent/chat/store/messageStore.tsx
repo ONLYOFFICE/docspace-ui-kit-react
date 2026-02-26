@@ -53,7 +53,7 @@ export default class MessageStore {
 
   currentChatId: string = "";
 
-  roomId: number | string = "";
+  agentId: number | string = "";
 
   multimodal?: TMultimodal;
 
@@ -109,8 +109,8 @@ export default class MessageStore {
     return this.messages.at(-1) ?? null;
   }
 
-  setRoomId = (roomId: number | string) => {
-    this.roomId = roomId;
+  setAgentId = (agentId: number | string) => {
+    this.agentId = agentId;
   };
 
   setMultimodal = (multimodal?: TMultimodal) => {
@@ -654,7 +654,7 @@ export default class MessageStore {
       this.abortController = new AbortController();
 
       const stream = await this.aiApi.startNewChat(
-        this.roomId,
+        this.agentId,
         message,
         files.map((f) => (f.id ? f.id.toString() : "")),
         this.abortController,
@@ -714,7 +714,7 @@ export const MessageStoreContext = React.createContext<MessageStore>(
 
 export const MessageStoreContextProvider = ({
   children,
-  roomId,
+  agentId,
   messages,
   chatId,
   total,
@@ -724,8 +724,8 @@ export const MessageStoreContextProvider = ({
   const store = React.useMemo(() => new MessageStore(aiApi), [aiApi]);
 
   React.useEffect(() => {
-    store.setRoomId(roomId);
-  }, [store, roomId]);
+    store.setAgentId(agentId);
+  }, [store, agentId]);
 
   React.useEffect(() => {
     store.setMultimodal(multimodal);

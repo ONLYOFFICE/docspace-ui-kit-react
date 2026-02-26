@@ -69,7 +69,7 @@ const defaultProps: ChatProps = {
   height: "100vh",
   isLoading: false,
   useInternalScroll: true,
-  roomId: 229754,
+  agentId: 229754,
   userAvatar: "",
   selectedModel: "gpt-4o",
   getIcon: () => "",

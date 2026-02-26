@@ -85,7 +85,7 @@ const ToolsSettings = ({
   aiReady: boolean;
   goToWebSearchSettings?: () => void;
 }) => {
-  const { roomId } = useChatStore();
+  const { agentId } = useChatStore();
   const {
     setKnowledgeSearchToolName,
     setWebSearchToolName,
@@ -121,10 +121,10 @@ const ToolsSettings = ({
           })) ?? [];
 
         if (enabled) {
-          await aiApi.changeMCPToolsForRoom(Number(roomId), mcpId, []);
+          await aiApi.changeMCPToolsForRoom(Number(agentId), mcpId, []);
         } else {
           await aiApi.changeMCPToolsForRoom(
-            Number(roomId),
+            Number(agentId),
             mcpId,
             newTools.map((tool) => tool.name),
           );
@@ -144,19 +144,19 @@ const ToolsSettings = ({
 
         if (enabled) {
           await aiApi.changeMCPToolsForRoom(
-            Number(roomId),
+            Number(agentId),
             mcpId,
             disabledTools.filter((tool) => tool !== toolId),
           );
         } else {
-          await aiApi.changeMCPToolsForRoom(Number(roomId), mcpId, [
+          await aiApi.changeMCPToolsForRoom(Number(agentId), mcpId, [
             ...disabledTools,
             toolId,
           ]);
         }
       }
     },
-    [MCPTools, roomId, setMCPTools],
+    [MCPTools, agentId, setMCPTools],
   );
 
   const openOauthWindow = async (serverId: string, type: string) => {
@@ -178,12 +178,12 @@ const ToolsSettings = ({
       .then(async (token) => {
         if (token) {
           try {
-            await aiApi.connectServer(Number(roomId), serverId, token);
+            await aiApi.connectServer(Number(agentId), serverId, token);
 
             newWindow?.close();
 
             const newTools = await aiApi.getMCPToolsForRoom(
-              Number(roomId),
+              Number(agentId),
               serverId,
             );
 
@@ -212,7 +212,7 @@ const ToolsSettings = ({
 
   const disconnectServerAction = async (serverId: string) => {
     try {
-      await aiApi.disconnectServer(Number(roomId), serverId);
+      await aiApi.disconnectServer(Number(agentId), serverId);
 
       setMCPTools((prev) => {
         const newMap = new Map(prev);
@@ -244,9 +244,9 @@ const ToolsSettings = ({
   const onWebSearchToggle = React.useCallback(() => {
     if (!webSearchAvailable) return;
 
-    aiApi.updateWebSearchInRoom(Number(roomId), !webSearchEnabled);
+    aiApi.updateWebSearchInRoom(Number(agentId), !webSearchEnabled);
     setWebSearchEnabled(!webSearchEnabled);
-  }, [roomId, webSearchEnabled, webSearchAvailable, setWebSearchEnabled]);
+  }, [agentId, webSearchEnabled, webSearchAvailable, setWebSearchEnabled]);
 
   React.useEffect(() => {
     setKnowledgeSearchToolName(knowledgeSearchToolName);

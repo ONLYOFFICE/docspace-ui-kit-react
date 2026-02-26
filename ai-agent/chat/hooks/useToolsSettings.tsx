@@ -40,12 +40,12 @@ import { useApi } from "../../../providers";
 import { useSocket } from "../../../providers/socket";
 
 type Props = {
-  roomId: string | number;
+  agentId: string | number;
   aiConfig: Nullable<TAIConfig>;
   chatSettings?: TAIRoomChatSettings;
 };
 
-const useToolsSettings = ({ roomId, aiConfig, chatSettings }: Props) => {
+const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
   const [servers, setServers] = React.useState<TServer[]>([]);
   const [MCPTools, setMCPTools] = React.useState<Map<string, TMCPTool[]>>(
     new Map(),
@@ -56,14 +56,14 @@ const useToolsSettings = ({ roomId, aiConfig, chatSettings }: Props) => {
   const socket = useSocket();
 
   const fetchServerTools = React.useCallback(
-    async (res: TServer[], roomId: string | number) => {
+    async (res: TServer[], agentId: string | number) => {
       const enabledServers = res.filter(
         (server) => server.connected && !server.needReset,
       );
 
       const actions = await Promise.all(
         enabledServers.map((server) =>
-          aiApi.getMCPToolsForRoom(Number(roomId), server.id),
+          aiApi.getMCPToolsForRoom(Number(agentId), server.id),
         ),
       );
 
@@ -79,23 +79,23 @@ const useToolsSettings = ({ roomId, aiConfig, chatSettings }: Props) => {
 
   const fetchTools = React.useCallback(async () => {
     setIsFetched(false);
-    const res = await aiApi.getServersListForRoom(Number(roomId));
+    const res = await aiApi.getServersListForRoom(Number(agentId));
 
     if (!res) return;
 
     setServers(res);
-    fetchServerTools(res, roomId);
-  }, [roomId, fetchServerTools]);
+    fetchServerTools(res, agentId);
+  }, [agentId, fetchServerTools]);
 
   const initTools = React.useCallback(async () => {
-    if (!roomId) return;
+    if (!agentId) return;
 
     const [webSearchInRoom] = await Promise.all([
-      aiApi.getWebSearchInRoom(Number(roomId)),
+      aiApi.getWebSearchInRoom(Number(agentId)),
       fetchTools(),
     ]);
     setWebSearchEnabled(webSearchInRoom?.webSearchEnabled ?? false);
-  }, [fetchTools, roomId]);
+  }, [fetchTools, agentId]);
 
   const onModifyFolder = React.useCallback(
     (data?: TOptSocket) => {
@@ -104,7 +104,7 @@ const useToolsSettings = ({ roomId, aiConfig, chatSettings }: Props) => {
       if (
         data.type === "folder" &&
         data.id &&
-        Number(data.id) === Number(roomId) &&
+        Number(data.id) === Number(agentId) &&
         data.cmd !== "delete" &&
         data.data
       ) {
@@ -118,7 +118,7 @@ const useToolsSettings = ({ roomId, aiConfig, chatSettings }: Props) => {
         }
       }
     },
-    [fetchTools, roomId],
+    [fetchTools, agentId],
   );
 
   React.useEffect(() => {

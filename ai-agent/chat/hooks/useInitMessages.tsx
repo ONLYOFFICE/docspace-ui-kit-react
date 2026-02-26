@@ -31,7 +31,7 @@ import { useApi } from "../../../providers";
 
 const cacheChatId = new Map<string, string>();
 
-const useInitMessages = (roomId: string | number) => {
+const useInitMessages = (agentId: string | number) => {
   const [messages, setMessages] = React.useState<TMessage[]>([]);
   const [chatId, setChatId] = React.useState("");
   const [total, setTotal] = React.useState(0);
@@ -45,8 +45,8 @@ const useInitMessages = (roomId: string | number) => {
   }, []);
 
   React.useEffect(() => {
-    if (!roomId) cacheChatId.delete("chat");
-  }, [roomId]);
+    if (!agentId) cacheChatId.delete("chat");
+  }, [agentId]);
 
   React.useEffect(() => {
     const onCacheChat = (e: Event) => {

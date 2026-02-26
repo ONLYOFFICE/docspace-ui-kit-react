@@ -29,7 +29,7 @@ import React from "react";
 import type { TChat } from "../../../types/ai";
 import { useApi } from "../../../providers";
 
-const useInitChats = ({ roomId }: { roomId: string | number }) => {
+const useInitChats = ({ agentId }: { agentId: string | number }) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [isRequestRunning, setIsRequestRunning] = React.useState(false);
   const [chats, setChats] = React.useState<TChat[]>([]);
@@ -37,14 +37,14 @@ const useInitChats = ({ roomId }: { roomId: string | number }) => {
   const { aiApi } = useApi();
 
   const fetchChats = async () => {
-    if (!roomId) return;
+    if (!agentId) return;
     if (isRequestRunning) return;
 
     setIsLoading(true);
     setIsRequestRunning(true);
 
     try {
-      const { items, total } = await aiApi.getChats(roomId);
+      const { items, total } = await aiApi.getChats(agentId);
 
       setChats(items);
       setTotalChats(total);

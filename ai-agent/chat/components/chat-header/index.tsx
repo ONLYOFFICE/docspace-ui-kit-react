@@ -39,7 +39,7 @@ const ChatHeader = ({
   selectedModel,
   isLoading,
   getIcon,
-  roomId,
+  agentId,
   aiReady,
   getResultStorageId,
   setIsAIAgentChatDelete,
@@ -58,7 +58,7 @@ const ChatHeader = ({
         isLoadingProp={isLoading}
         getIcon={getIcon}
         getResultStorageId={getResultStorageId}
-        roomId={roomId}
+        agentId={agentId}
         setIsAIAgentChatDelete={setIsAIAgentChatDelete}
         setDeleteDialogVisible={setDeleteDialogVisible}
         folderFormValidation={folderFormValidation}

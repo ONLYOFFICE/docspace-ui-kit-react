@@ -64,7 +64,7 @@ const Buttons = ({
   getResultStorageId,
   folderFormValidation,
 }: MessageButtonsProps) => {
-  const { roomId, findPreviousUserMessage } = useMessageStore();
+  const { agentId, findPreviousUserMessage } = useMessageStore();
   const { currentChat } = useChatStore();
   const { aiApi } = useApi();
   const socket = useSocket();
@@ -198,7 +198,7 @@ const Buttons = ({
         <ExportSelector
           onCloseFolderSelector={onCloseFolderSelector}
           onSubmit={onExportMessage}
-          currentFolderId={getResultStorageId() || roomId}
+          currentFolderId={getResultStorageId() || agentId}
           getFileName={getExportedFileName}
           getIcon={getIcon}
           showFolderSelector={showFolderSelector}
