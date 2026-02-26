@@ -28,14 +28,9 @@ import type { IConfig } from "@onlyoffice/document-editor-react";
 
 export type { IConfig };
 
-/** Props for the DocumentEditor component */
-export type DocumentEditorProps = {
+type BaseDocumentEditorProps = {
   /** Unique identifier for the editor instance */
   id: string;
-  /** URL of the ONLYOFFICE Document Server */
-  documentServerUrl: string;
-  /** Editor configuration object (see Config API) */
-  config: IConfig;
   /** Width of the editor container */
   width?: string;
   /** Height of the editor container */
@@ -45,3 +40,23 @@ export type DocumentEditorProps = {
   /** Callback invoked when the component fails to load */
   onLoadComponentError?: (errorCode: number, errorDescription: string) => void;
 };
+
+type DocumentEditorWithConfigProps = BaseDocumentEditorProps & {
+  /** URL of the ONLYOFFICE Document Server */
+  documentServerUrl: string;
+  /** Editor configuration object (see Config API) */
+  config: IConfig;
+  fileId?: never;
+};
+
+type DocumentEditorWithApiProps = BaseDocumentEditorProps & {
+  /** ID of the file to open in the editor */
+  fileId: number;
+  documentServerUrl?: never;
+  config?: never;
+};
+
+/** Props for the DocumentEditor component */
+export type DocumentEditorProps =
+  | DocumentEditorWithConfigProps
+  | DocumentEditorWithApiProps;

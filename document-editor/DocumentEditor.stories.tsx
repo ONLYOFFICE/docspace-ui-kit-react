@@ -24,14 +24,16 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { DocumentEditorWithApi } from "./DocumentEditorWithApi";
+import { DocumentEditor } from "./DocumentEditor";
+import type { DocumentEditorProps } from "./DocumentEditor.types";
 
-const meta = {
+type StoryArgs = DocumentEditorProps;
+
+const meta: Meta<StoryArgs> = {
   title: "Document Editor",
-  component: DocumentEditorWithApi,
+  component: DocumentEditor,
   parameters: {
     docs: {
       description: {
@@ -43,10 +45,6 @@ const meta = {
     id: {
       control: "text",
       description: "Unique identifier for the editor DOM element",
-    },
-    url: {
-      control: "text",
-      description: "URL of the DocSpace portal (e.g., http://localhost)",
     },
     fileId: {
       control: "number",
@@ -66,31 +64,34 @@ const meta = {
       control: "text",
       description: "Shard key for Document Server load balancing",
     },
-    apiKey: {
-      control: "text",
-      description:
-        "API key for authentication (will be sent as 'Authorization: Bearer <apiKey>')",
-    },
     onLoadComponentError: {
       action: "onLoadComponentError",
       description: "Callback invoked when the component fails to load",
     },
   },
-} satisfies Meta<typeof DocumentEditorWithApi>;
+};
 
-type Story = StoryObj<ComponentProps<typeof DocumentEditorWithApi>>;
+type Story = StoryObj<StoryArgs>;
 
 export default meta;
 
 export const Default: Story = {
+  render: (args: StoryArgs) => {
+    const { ...editorProps } = args;
+
+    return (
+      <DocumentEditor
+        key={editorProps.fileId}
+        {...(editorProps as DocumentEditorProps)}
+      />
+    );
+  },
   args: {
-    url: "http://example.com",
+    id: "editor",
     fileId: 1,
     width: "100%",
     height: "600px",
-    apiKey: "YOUR_API_KEY_HERE",
-
-    onLoadComponentError: (errorCode, errorDescription) => {
+    onLoadComponentError: (errorCode: number, errorDescription: string) => {
       console.error(`Editor load error [${errorCode}]: ${errorDescription}`);
     },
   },

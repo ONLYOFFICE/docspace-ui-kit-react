@@ -24,21 +24,115 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import { useEffect, useState } from "react";
 import { DocumentEditor as OODocumentEditor } from "@onlyoffice/document-editor-react";
+import type { IConfig } from "@onlyoffice/document-editor-react";
+import { useApi } from "../providers/api";
 import type { DocumentEditorProps } from "./DocumentEditor.types";
 
-export const DocumentEditor = ({
-  id,
-  documentServerUrl,
-  config,
-  width = "100%",
-  height = "100%",
-  shardkey,
-  onLoadComponentError,
-}: DocumentEditorProps) => {
+export const DocumentEditor = (props: DocumentEditorProps) => {
+  const {
+    id,
+    width = "100%",
+    height = "100%",
+    shardkey,
+    onLoadComponentError,
+  } = props;
+
+  const hasConfig = "config" in props && props.config;
+  const hasDocumentServerUrl =
+    "documentServerUrl" in props && props.documentServerUrl;
+  const hasFileId = "fileId" in props && props.fileId;
+
+  const api = useApi();
+
+  const [config, setConfig] = useState<IConfig | null>(
+    hasConfig ? props.config : null,
+  );
+  const [documentServerUrl, setDocumentServerUrl] = useState<string>(
+    hasDocumentServerUrl ? props.documentServerUrl : "",
+  );
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (documentServerUrl || config) return;
+
+    let cancelled = false;
+    setError(null);
+
+    (async () => {
+      try {
+        const [docServiceLocation, result] = await Promise.all([
+          api.filesSettingsApi.getDocServiceUrl(),
+          api.filesApi.openEditFile(props.fileId || 1),
+        ]);
+
+        if (!result.data.response) {
+          throw new Error("Invalid response format: missing 'response' field");
+        }
+
+        const initialConfig = result.data.response;
+
+        if (!initialConfig.editorUrl) {
+          throw new Error("Invalid response format: missing 'editorUrl' field");
+        }
+
+        const baseUrl = docServiceLocation?.data?.response?.docServiceUrl;
+
+        if (!baseUrl) {
+          throw new Error(
+            "Invalid response format: missing 'docServiceUrl' field",
+          );
+        }
+
+        if (cancelled) return;
+        setDocumentServerUrl(baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`);
+        setConfig(initialConfig as unknown as IConfig);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
+        if (!cancelled) setError(errorMessage);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [documentServerUrl, hasFileId, api.filesApi, api.filesSettingsApi]);
+
+  if (error) {
+    return (
+      <div
+        style={{
+          width,
+          height,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          fontSize: "16px",
+          color: "#d32f2f",
+          padding: "20px",
+        }}
+      >
+        <div style={{ fontWeight: "bold", marginBottom: "10px" }}>
+          Error loading editor
+        </div>
+        <div>{error}</div>
+      </div>
+    );
+  }
+
+  if (!config || !documentServerUrl) {
+    return null;
+  }
+
+  const editorId = hasFileId ? `${id}-${props.fileId}` : id;
+
   return (
     <OODocumentEditor
-      id={id}
+      key={editorId}
+      id={editorId}
       documentServerUrl={documentServerUrl}
       config={config}
       width={width}
