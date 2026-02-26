@@ -30,7 +30,7 @@ import { getCommonTranslation } from "../../../../utils";
 
 import { TGetIcon } from "../../../../types";
 import { TBreadCrumb } from "../../../../components/selector";
-import FilesSelector from "../../../../selectors/Files";
+// import FilesSelector from "../../../../selectors/Files";
 
 type ExportSelectorProps = {
   showFolderSelector: boolean;
@@ -59,67 +59,68 @@ const ExportSelector = ({
   folderFormValidation,
 }: ExportSelectorProps) => {
   return (
-    <FilesSelector
-      isPanelVisible={showFolderSelector}
-      onCancel={onCloseFolderSelector}
-      getIcon={getIcon}
-      getIsDisabled={(
-        isFirstLoad,
-        isSelectedParentFolder,
-        selectedItemId,
-        selectedItemType,
-        isRoot,
-        selectedItemSecurity,
-      ) => {
-        if (selectedItemType === "rooms" || selectedItemType === "agents")
-          return true;
-
-        if (
-          selectedItemSecurity &&
-          "Create" in selectedItemSecurity &&
-          selectedItemSecurity.Create
-        )
-          return false;
-
-        return true;
-      }}
-      onSubmit={onSubmit}
-      withHeader
-      headerProps={{
-        headerLabel: getCommonTranslation("SaveButton"),
-        isCloseable: true,
-        onCloseClick: onCloseFolderSelector,
-      }}
-      withSearch
-      withBreadCrumbs
-      withoutBackButton
-      withCancelButton
-      withCreate={false}
-      withFooterCheckbox
-      withFooterInput
-      cancelButtonLabel={getCommonTranslation("CancelButton")}
-      submitButtonLabel={getCommonTranslation("SaveButton")}
-      disabledItems={[]}
-      isRoomsOnly={false}
-      isThirdParty={false}
-      currentFolderId={currentFolderId}
-      rootFolderType={FolderType.Rooms}
-      footerCheckboxLabel={getCommonTranslation("OpenSavedDocument")}
-      footerInputHeader={getCommonTranslation("FileName")}
-      currentFooterInputValue={getFileName()}
-      descriptionText=""
-      getFilesArchiveError={() => ""}
-      withAIAgentsTreeFolder
-      currentDeviceType={
-        isDesktop()
-          ? DeviceType.desktop
-          : isTablet()
-            ? DeviceType.tablet
-            : DeviceType.mobile
-      }
-      folderFormValidation={folderFormValidation}
-      renderInPortal
-    />
+    // <FilesSelector
+    //   isPanelVisible={showFolderSelector}
+    //   onCancel={onCloseFolderSelector}
+    //   getIcon={getIcon}
+    //   getIsDisabled={(
+    //     isFirstLoad,
+    //     isSelectedParentFolder,
+    //     selectedItemId,
+    //     selectedItemType,
+    //     isRoot,
+    //     selectedItemSecurity,
+    //   ) => {
+    //     if (selectedItemType === "rooms" || selectedItemType === "agents")
+    //       return true;
+    //
+    //     if (
+    //       selectedItemSecurity &&
+    //       "Create" in selectedItemSecurity &&
+    //       selectedItemSecurity.Create
+    //     )
+    //       return false;
+    //
+    //     return true;
+    //   }}
+    //   onSubmit={onSubmit}
+    //   withHeader
+    //   headerProps={{
+    //     headerLabel: getCommonTranslation("SaveButton"),
+    //     isCloseable: true,
+    //     onCloseClick: onCloseFolderSelector,
+    //   }}
+    //   withSearch
+    //   withBreadCrumbs
+    //   withoutBackButton
+    //   withCancelButton
+    //   withCreate={false}
+    //   withFooterCheckbox
+    //   withFooterInput
+    //   cancelButtonLabel={getCommonTranslation("CancelButton")}
+    //   submitButtonLabel={getCommonTranslation("SaveButton")}
+    //   disabledItems={[]}
+    //   isRoomsOnly={false}
+    //   isThirdParty={false}
+    //   currentFolderId={currentFolderId}
+    //   rootFolderType={FolderType.Rooms}
+    //   footerCheckboxLabel={getCommonTranslation("OpenSavedDocument")}
+    //   footerInputHeader={getCommonTranslation("FileName")}
+    //   currentFooterInputValue={getFileName()}
+    //   descriptionText=""
+    //   getFilesArchiveError={() => ""}
+    //   withAIAgentsTreeFolder
+    //   currentDeviceType={
+    //     isDesktop()
+    //       ? DeviceType.desktop
+    //       : isTablet()
+    //         ? DeviceType.tablet
+    //         : DeviceType.mobile
+    //   }
+    //   folderFormValidation={folderFormValidation}
+    //   renderInPortal
+    // />
+    <div>selector</div>
   );
 };
 

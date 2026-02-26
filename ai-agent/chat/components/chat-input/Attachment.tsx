@@ -33,7 +33,7 @@ import { getCommonTranslation, isDesktop, isTablet } from "../../../../utils";
 
 import type { TFile } from "../../../../types";
 
-import FilesSelector from "../../../../selectors/Files";
+// import FilesSelector from "../../../../selectors/Files";
 
 import type { TSelectorItem } from "../../../../components/selector";
 
@@ -90,82 +90,83 @@ const Attachment = ({
     : CHAT_SUPPORTED_FORMATS;
 
   return (
-    <FilesSelector
-      isPanelVisible={isVisible}
-      onCancel={toggleAttachment}
-      openRoot
-      getIcon={getIcon}
-      getIsDisabled={(
-        isFirstLoad,
-        isSelectedParentFolder,
-        selectedItemId,
-        selectedItemType,
-        isRoot,
-        selectedItemSecurity,
-        selectedFileInfo,
-      ) => {
-        if (!selectedItemSecurity?.Read) return true;
-
-        if (!selectedFileInfo) return true;
-
-        return false;
-      }}
-      onSubmit={() => {
-        setSelectedFiles(tempSelectedFiles);
-        setTempSelectedFiles([]);
-        toggleAttachment();
-      }}
-      onSelectItem={onSelectItem}
-      withHeader
-      headerProps={{
-        headerLabel: getCommonTranslation("SelectFile"),
-        isCloseable: true,
-        onCloseClick: toggleAttachment,
-      }}
-      withSearch
-      withBreadCrumbs
-      withoutBackButton
-      withCancelButton
-      withCreate={false}
-      withFooterCheckbox={false}
-      withFooterInput={false}
-      cancelButtonLabel={getCommonTranslation("CancelButton")}
-      submitButtonLabel={getCommonTranslation("AddButton")}
-      disabledItems={[]}
-      isRoomsOnly={false}
-      isThirdParty={false}
-      currentFolderId=""
-      rootFolderType={FolderType.Rooms}
-      footerCheckboxLabel=""
-      footerInputHeader=""
-      currentFooterInputValue=""
-      descriptionText=""
-      getFilesArchiveError={() => ""}
-      filterParam={supportedFormats}
-      isMultiSelect
-      withRecentTreeFolder
-      withFavoritesTreeFolder
-      withAIAgentsTreeFolder
-      disableBySecurity="AskAi"
-      currentDeviceType={
-        isDesktop()
-          ? DeviceType.desktop
-          : isTablet()
-            ? DeviceType.tablet
-            : DeviceType.mobile
-      }
-      withInfoBar={withInfo}
-      maxSelectedItems={CHAT_MAX_FILE_COUNT}
-      infoBarData={{
-        title: getCommonTranslation("SelectorFilesLimit", {
-          count: CHAT_MAX_FILE_COUNT,
-        }),
-        icon: <AttachmentReactSvg />,
-        onClose: () => setWithInfo(!withInfo),
-        description: getCommonTranslation("SelectorFilesLimitDescription"),
-      }}
-      renderInPortal
-    />
+    // <FilesSelector
+    //   isPanelVisible={isVisible}
+    //   onCancel={toggleAttachment}
+    //   openRoot
+    //   getIcon={getIcon}
+    //   getIsDisabled={(
+    //     isFirstLoad,
+    //     isSelectedParentFolder,
+    //     selectedItemId,
+    //     selectedItemType,
+    //     isRoot,
+    //     selectedItemSecurity,
+    //     selectedFileInfo,
+    //   ) => {
+    //     if (!selectedItemSecurity?.Read) return true;
+    //
+    //     if (!selectedFileInfo) return true;
+    //
+    //     return false;
+    //   }}
+    //   onSubmit={() => {
+    //     setSelectedFiles(tempSelectedFiles);
+    //     setTempSelectedFiles([]);
+    //     toggleAttachment();
+    //   }}
+    //   onSelectItem={onSelectItem}
+    //   withHeader
+    //   headerProps={{
+    //     headerLabel: getCommonTranslation("SelectFile"),
+    //     isCloseable: true,
+    //     onCloseClick: toggleAttachment,
+    //   }}
+    //   withSearch
+    //   withBreadCrumbs
+    //   withoutBackButton
+    //   withCancelButton
+    //   withCreate={false}
+    //   withFooterCheckbox={false}
+    //   withFooterInput={false}
+    //   cancelButtonLabel={getCommonTranslation("CancelButton")}
+    //   submitButtonLabel={getCommonTranslation("AddButton")}
+    //   disabledItems={[]}
+    //   isRoomsOnly={false}
+    //   isThirdParty={false}
+    //   currentFolderId=""
+    //   rootFolderType={FolderType.Rooms}
+    //   footerCheckboxLabel=""
+    //   footerInputHeader=""
+    //   currentFooterInputValue=""
+    //   descriptionText=""
+    //   getFilesArchiveError={() => ""}
+    //   filterParam={supportedFormats}
+    //   isMultiSelect
+    //   withRecentTreeFolder
+    //   withFavoritesTreeFolder
+    //   withAIAgentsTreeFolder
+    //   disableBySecurity="AskAi"
+    //   currentDeviceType={
+    //     isDesktop()
+    //       ? DeviceType.desktop
+    //       : isTablet()
+    //         ? DeviceType.tablet
+    //         : DeviceType.mobile
+    //   }
+    //   withInfoBar={withInfo}
+    //   maxSelectedItems={CHAT_MAX_FILE_COUNT}
+    //   infoBarData={{
+    //     title: getCommonTranslation("SelectorFilesLimit", {
+    //       count: CHAT_MAX_FILE_COUNT,
+    //     }),
+    //     icon: <AttachmentReactSvg />,
+    //     onClose: () => setWithInfo(!withInfo),
+    //     description: getCommonTranslation("SelectorFilesLimitDescription"),
+    //   }}
+    //   renderInPortal
+    // />
+    <div>attachment</div>
   );
 };
 
