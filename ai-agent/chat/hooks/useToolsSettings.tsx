@@ -45,15 +45,19 @@ type Props = {
   chatSettings?: TAIRoomChatSettings;
 };
 
-const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
+const useToolsSettings = ({ agentId, aiConfig: aiConfigProp, chatSettings }: Props) => {
   const [servers, setServers] = React.useState<TServer[]>([]);
   const [MCPTools, setMCPTools] = React.useState<Map<string, TMCPTool[]>>(
     new Map(),
   );
   const [webSearchEnabled, setWebSearchEnabled] = React.useState(false);
   const [isFetched, setIsFetched] = React.useState(false);
+  const [fetchedAiConfig, setFetchedAiConfig] =
+    React.useState<TAIConfig | null>(null);
   const { aiApi } = useApi();
   const socket = useSocket();
+
+  const aiConfig = aiConfigProp ?? fetchedAiConfig;
 
   const fetchServerTools = React.useCallback(
     async (res: TServer[], agentId: string | number) => {
@@ -90,12 +94,23 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
   const initTools = React.useCallback(async () => {
     if (!agentId) return;
 
-    const [webSearchInRoom] = await Promise.all([
-      aiApi.getWebSearchInRoom(Number(agentId)),
+    const promises: Promise<unknown>[] = [
+      aiApi.getWebSearchInRoom(Number(agentId)).then((res) => {
+        setWebSearchEnabled(res?.webSearchEnabled ?? false);
+      }),
       fetchTools(),
-    ]);
-    setWebSearchEnabled(webSearchInRoom?.webSearchEnabled ?? false);
-  }, [fetchTools, agentId]);
+    ];
+
+    if (!aiConfigProp) {
+      promises.push(
+        aiApi.getAIConfig().then((res) => {
+          if (res) setFetchedAiConfig(res);
+        }),
+      );
+    }
+
+    await Promise.all(promises);
+  }, [fetchTools, agentId, aiConfigProp, aiApi]);
 
   const onModifyFolder = React.useCallback(
     (data?: TOptSocket) => {
@@ -128,6 +143,7 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
       socket?.off(SocketEvents.ModifyFolder, onModifyFolder);
     };
   }, [onModifyFolder]);
+
 
   return {
     servers,
