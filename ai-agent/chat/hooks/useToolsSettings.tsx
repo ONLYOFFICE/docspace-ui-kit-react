@@ -45,7 +45,11 @@ type Props = {
   chatSettings?: TAIRoomChatSettings;
 };
 
-const useToolsSettings = ({ agentId, aiConfig: aiConfigProp, chatSettings: chatSettingsProp }: Props) => {
+const useToolsSettings = ({
+  agentId,
+  aiConfig: aiConfigProp,
+  chatSettings: chatSettingsProp,
+}: Props) => {
   const [servers, setServers] = React.useState<TServer[]>([]);
   const [MCPTools, setMCPTools] = React.useState<Map<string, TMCPTool[]>>(
     new Map(),
@@ -114,10 +118,10 @@ const useToolsSettings = ({ agentId, aiConfig: aiConfigProp, chatSettings: chatS
 
     if (!chatSettingsProp) {
       promises.push(
-        foldersApi.getFolderByFolderId(Number(agentId)).then((res) => {
-          const current = res.data.response?.current;
-          if (current?.chatSettings) {
-            setFetchedChatSettings(current.chatSettings as TAIRoomChatSettings);
+        aiApi.getAgentFolder(Number(agentId)).then((res) => {
+          const chatSettings = res.current?.chatSettings;
+          if (chatSettings) {
+            setFetchedChatSettings(chatSettings as TAIRoomChatSettings);
           }
         }),
       );
@@ -157,7 +161,6 @@ const useToolsSettings = ({ agentId, aiConfig: aiConfigProp, chatSettings: chatS
       socket?.off(SocketEvents.ModifyFolder, onModifyFolder);
     };
   }, [onModifyFolder]);
-
 
   return {
     servers,

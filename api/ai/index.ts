@@ -26,6 +26,8 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
+import { FolderContentDtoInteger } from "@onlyoffice/docspace-api-sdk";
+
 import { BaseCustomApi } from "../base-custom-api";
 import { TAIConfig, TChat, TMCPTool, TMessage, TServer } from "../../types/ai";
 import { toastr } from "../../components/toast";
@@ -233,5 +235,9 @@ export class AiApi extends BaseCustomApi {
       console.log(e);
       toastr.error(e as string);
     }
+  }
+
+  async getAgentFolder(agentId: number) {
+    return this.request<FolderContentDtoInteger>(`/files/${agentId}`);
   }
 }
