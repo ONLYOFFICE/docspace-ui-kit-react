@@ -32,7 +32,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import Icon from "../../assets/button.alert.react.svg";
 
 import { Button, ButtonSize } from ".";
-import type { ButtonProps } from "./Button.types";
 
 const meta = {
   title: "Components/Interactive elements/Button",
@@ -184,12 +183,8 @@ const Wrapper = (props: { isScale: boolean; children: React.ReactNode }) => {
   );
 };
 
-const Template = (args: ButtonProps) => (
-  <Button {...args} onClick={() => alert("Button clicked")} />
-);
-
 export const Default: Story = {
-  render: (args) => <Template {...args} />,
+  render: (args) => <Button {...args} onClick={() => alert("Button clicked")} />,
   args: { size: ButtonSize.small, label: "Button" },
 };
 
@@ -448,6 +443,12 @@ export const PrimaryButtons: Story = {
         story:
           "Primary buttons are used for main actions. They have a solid background color.",
       },
+      source: {
+        code: `<Button primary size={ButtonSize.extraSmall} label="Primary ExtraSmall" />
+<Button primary size={ButtonSize.small} label="Primary Small" />
+<Button primary size={ButtonSize.normal} label="Primary Normal" />
+<Button primary size={ButtonSize.medium} label="Primary Medium" />`,
+      },
     },
   },
 };
@@ -459,6 +460,12 @@ export const SecondaryButtons: Story = {
       description: {
         story:
           "Secondary buttons are used for secondary actions. They have a transparent background with a border.",
+      },
+      source: {
+        code: `<Button size={ButtonSize.extraSmall} label="Secondary ExtraSmall" />
+<Button size={ButtonSize.small} label="Secondary Small" />
+<Button size={ButtonSize.normal} label="Secondary Normal" />
+<Button size={ButtonSize.medium} label="Secondary Medium" />`,
       },
     },
   },
@@ -472,6 +479,12 @@ export const WithIconButtons: Story = {
         story:
           "Buttons can include icons alongside text. Icons are displayed before the label.",
       },
+      source: {
+        code: `<Button primary size={ButtonSize.small} icon={<Icon />} label="With Icon Small" />
+<Button primary size={ButtonSize.normal} icon={<Icon />} label="With Icon Normal" />
+<Button size={ButtonSize.small} icon={<Icon />} label="With Icon Small" />
+<Button size={ButtonSize.normal} icon={<Icon />} label="With Icon Normal" />`,
+      },
     },
   },
 };
@@ -483,6 +496,12 @@ export const IsLoadingButtons: Story = {
       description: {
         story:
           "Loading state displays a spinner and disables interaction. Use for async operations.",
+      },
+      source: {
+        code: `<Button primary size={ButtonSize.small} isLoading label="Loading Small" />
+<Button primary size={ButtonSize.normal} isLoading label="Loading Normal" />
+<Button size={ButtonSize.small} isLoading label="Loading Small" />
+<Button size={ButtonSize.normal} isLoading label="Loading Normal" />`,
       },
     },
   },
@@ -496,6 +515,12 @@ export const ScaleButtons: Story = {
         story:
           "Scale prop makes buttons expand to 100% of their container width. Useful for mobile layouts.",
       },
+      source: {
+        code: `<Button primary size={ButtonSize.small} scale label="Scale Small" />
+<Button primary size={ButtonSize.normal} scale label="Scale Normal" />
+<Button size={ButtonSize.small} scale label="Scale Small" />
+<Button size={ButtonSize.normal} scale label="Scale Normal" />`,
+      },
     },
   },
 };
@@ -507,6 +532,12 @@ export const DisabledButtons: Story = {
       description: {
         story:
           "Disabled buttons cannot be interacted with and have reduced opacity.",
+      },
+      source: {
+        code: `<Button primary size={ButtonSize.small} isDisabled label="Disabled Small" />
+<Button primary size={ButtonSize.normal} isDisabled label="Disabled Normal" />
+<Button size={ButtonSize.small} isDisabled label="Disabled Small" />
+<Button size={ButtonSize.normal} isDisabled label="Disabled Normal" />`,
       },
     },
   },
@@ -520,6 +551,12 @@ export const ClickedButtons: Story = {
         story:
           "Shows the visual state when a button is clicked/pressed. For demonstration purposes.",
       },
+      source: {
+        code: `<Button primary size={ButtonSize.small} isClicked label="Clicked Small" />
+<Button primary size={ButtonSize.normal} isClicked label="Clicked Normal" />
+<Button size={ButtonSize.small} isClicked label="Clicked Small" />
+<Button size={ButtonSize.normal} isClicked label="Clicked Normal" />`,
+      },
     },
   },
 };
@@ -531,6 +568,12 @@ export const HoveredButtons: Story = {
       description: {
         story:
           "Shows the visual state when a button is hovered. For demonstration purposes.",
+      },
+      source: {
+        code: `<Button primary size={ButtonSize.small} isHovered label="Hovered Small" />
+<Button primary size={ButtonSize.normal} isHovered label="Hovered Normal" />
+<Button size={ButtonSize.small} isHovered label="Hovered Small" />
+<Button size={ButtonSize.normal} isHovered label="Hovered Normal" />`,
       },
     },
   },
@@ -544,6 +587,12 @@ export const FilledButtons: Story = {
         story:
           "Filled variant provides an alternative solid background style for buttons.",
       },
+      source: {
+        code: `<Button primary size={ButtonSize.small} filled label="Filled Small" />
+<Button primary size={ButtonSize.normal} filled label="Filled Normal" />
+<Button size={ButtonSize.small} filled label="Filled Small" />
+<Button size={ButtonSize.normal} filled label="Filled Normal" />`,
+      },
     },
   },
 };
@@ -556,6 +605,12 @@ export const FilledStrokeButtons: Story = {
         story:
           "FilledStroke variant combines filled background with a stroke/border for emphasis.",
       },
+      source: {
+        code: `<Button primary size={ButtonSize.small} filledStroke label="FilledStroke Small" />
+<Button primary size={ButtonSize.normal} filledStroke label="FilledStroke Normal" />
+<Button size={ButtonSize.small} filledStroke label="FilledStroke Small" />
+<Button size={ButtonSize.normal} filledStroke label="FilledStroke Normal" />`,
+      },
     },
   },
 };
@@ -567,6 +622,11 @@ export const WithTooltip: Story = {
       description: {
         story:
           "Buttons can display tooltips on hover. Hover over the buttons to see the tooltip text.",
+      },
+      source: {
+        code: `<Button primary size={ButtonSize.small} label="Hover me" tooltipText="This is a primary button with a tooltip" />
+<Button size={ButtonSize.normal} label="Hover me too" tooltipText="This is a secondary button with a tooltip" />
+<Button primary size={ButtonSize.medium} icon={<Icon />} label="With icon" tooltipText="Button with icon and tooltip" />`,
       },
     },
   },
