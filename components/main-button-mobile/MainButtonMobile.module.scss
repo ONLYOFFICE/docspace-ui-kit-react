@@ -84,7 +84,8 @@
     }
 
     svg {
-      path, rect {
+      path,
+      rect {
         fill: var(--main-button-mobile-icon-fill);
       }
     }
@@ -195,7 +196,6 @@
 }
 
 .buttonOptions {
-  padding: 16px 0;
   background-color: var(--main-button-mobile-button-options-background-color);
   color: var(--main-button-mobile-button-options-color);
 
@@ -230,7 +230,7 @@
   }
 }
 
-.containerAction {
+:where(.containerAction, .buttonOptions) {
   padding: 16px 0px;
 
   .sublevel {

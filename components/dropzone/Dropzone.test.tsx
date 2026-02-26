@@ -38,7 +38,7 @@ import styles from "./Dropzone.module.scss";
 describe("Dropzone", () => {
   const defaultProps = {
     isLoading: false,
-    linkMainTextForFiles: "Click to upload",
+    linkMainText: "Click to upload",
     linkSecondaryText: "or drag and drop files here",
     exstsText: "Supported file types: PDF, DOC, DOCX",
     accept: [".pdf", ".doc", ".docx"],
@@ -59,7 +59,7 @@ describe("Dropzone", () => {
     expect(dropzone).toHaveAttribute("aria-busy", "false");
 
     expect(screen.getByTestId("dropzone-main-text")).toHaveTextContent(
-      defaultProps.linkMainTextForFiles,
+      defaultProps.linkMainText,
     );
     expect(screen.getByTestId("dropzone-secondary-text")).toHaveTextContent(
       defaultProps.linkSecondaryText,
@@ -108,8 +108,15 @@ describe("Dropzone", () => {
             kind: "file",
             type: file.type,
             getAsFile: () => file,
+            webkitGetAsEntry: () => ({
+              isFile: true,
+              isDirectory: false,
+              name: file.name,
+              file: (callback: (f: File) => void) => callback(file),
+            }),
           },
         ],
+        length: 1,
       },
     });
 
@@ -117,7 +124,7 @@ describe("Dropzone", () => {
       fireEvent(dropzone, dropEvent);
     });
     await new Promise(process.nextTick);
-    expect(onDrop).toHaveBeenCalledWith([file], [], expect.any(Object));
+    expect(onDrop).toHaveBeenCalledWith([file]);
   });
 
   it("applies loading styles when isLoading is true", () => {
@@ -131,7 +138,7 @@ describe("Dropzone", () => {
   it("renders custom text content", () => {
     const customProps = {
       ...defaultProps,
-      linkMainTextForFiles: "Custom upload text",
+      linkMainText: "Custom upload text",
       linkSecondaryText: "Custom secondary text",
       exstsText: "Custom file types",
     };
@@ -139,7 +146,7 @@ describe("Dropzone", () => {
     render(<Dropzone {...customProps} />);
 
     expect(screen.getByTestId("dropzone-main-text")).toHaveTextContent(
-      customProps.linkMainTextForFiles,
+      customProps.linkMainText,
     );
     expect(screen.getByTestId("dropzone-secondary-text")).toHaveTextContent(
       customProps.linkSecondaryText,
