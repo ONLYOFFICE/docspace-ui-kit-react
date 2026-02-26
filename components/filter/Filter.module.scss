@@ -818,8 +818,14 @@
             fill: var(--room-group-tag-inactive-color);
           }
 
+          svg path[stroke] {
+            fill: none;
+            stroke: var(--room-group-tag-inactive-color);
+          }
+
           &:hover {
             background: var(--room-group-tag-hover-background);
+            cursor: pointer;
           }
         }
       }
