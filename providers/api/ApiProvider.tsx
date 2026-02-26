@@ -52,7 +52,7 @@ export const createApiClient = (basePath: string, apiKey: string) => {
   const instance: AxiosInstance = axios.create({
     baseURL: basePath,
     headers: {
-      Authorization: apiKey,
+      Authorization: `Bearer ${apiKey}`,
     },
   });
 
@@ -92,11 +92,15 @@ export const useApi = () => {
 };
 
 const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
+  React.useEffect(() => {
+    document.cookie = `asc_auth_key=${apiKey}`;
+  }, [apiKey]);
+
   const value = React.useMemo(() => {
     const configuration = new Configuration({
       basePath: url,
-      apiKey,
-      accessToken: apiKey,
+      apiKey: `Bearer ${apiKey}`,
+      accessToken: `${apiKey}`,
     });
 
     return {

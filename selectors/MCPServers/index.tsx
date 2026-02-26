@@ -28,6 +28,7 @@ import React from "react";
 
 import EmptyScreenRoomSelectorLight from "../../assets/empty.room.selector.light.react.svg";
 import EmptyScreenRoomSelectorDark from "../../assets/empty.room.selector.dark.react.svg";
+import faviconUrl from "../../assets/favicon.ico";
 
 import { getCommonTranslation } from "../../utils/i18n";
 import {
@@ -41,7 +42,7 @@ import { useApi } from "../../providers/api/ApiProvider";
 const getServerIcon = (type: ServerType, _isBase: boolean) => {
   switch (type) {
     case ServerType.Portal:
-      return "/logo.ashx?logotype=3";
+      return faviconUrl;
     default:
       return null;
   }
