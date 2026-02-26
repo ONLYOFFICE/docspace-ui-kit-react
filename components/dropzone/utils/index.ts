@@ -27,8 +27,7 @@
 export type FileWithPath = File & { path?: string };
 
 export const getFileRelativePath = (file: File): string => {
-  const rawPath =
-    file.webkitRelativePath || (file as FileWithPath).path || "";
+  const rawPath = file.webkitRelativePath || (file as FileWithPath).path || "";
   return rawPath.replace(/^\/+/, "");
 };
 
@@ -73,7 +72,9 @@ export const countFiles = (items: DataTransferItemList): number => {
   }).length;
 };
 
-export const getEntriesFromItems = (items: DataTransferItemList): FileSystemEntry[] => {
+export const getEntriesFromItems = (
+  items: DataTransferItemList,
+): FileSystemEntry[] => {
   const entries: FileSystemEntry[] = [];
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
@@ -140,7 +141,12 @@ export type CreateCustomGetFilesFromEventOptions = {
 export const createCustomGetFilesFromEvent = (
   options: CreateCustomGetFilesFromEventOptions,
 ) => {
-  const { isFolderUpload, isMultipleUpload, onSingleUploadError, getFilesFromEvent } = options;
+  const {
+    isFolderUpload,
+    isMultipleUpload,
+    onSingleUploadError,
+    getFilesFromEvent,
+  } = options;
 
   return async (event: Event): Promise<File[]> => {
     const items = (event as DragEvent).dataTransfer?.items;
@@ -149,6 +155,12 @@ export const createCustomGetFilesFromEvent = (
         const files = await Promise.resolve(getFilesFromEvent(event));
         return filterFiles(files as File[], isFolderUpload);
       }
+
+      const inputEl = event.target as HTMLInputElement;
+      if (inputEl?.files?.length) {
+        return Array.from(inputEl.files);
+      }
+
       return [];
     }
 
