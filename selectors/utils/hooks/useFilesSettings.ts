@@ -39,7 +39,10 @@ import { toastr, type TData } from "../../../components/toast";
 
 import type { TGetIcon } from "../types";
 
-const IconSizes: Record<number, Map<string, string>> = {
+const IconSizes: Record<
+  number,
+  Map<string, React.FC<React.SVGProps<SVGSVGElement>>>
+> = {
   32: iconSize32,
   64: iconSize64,
   96: iconSize96,
@@ -113,17 +116,18 @@ const useFilesSettings = (
   );
 
   const getIcon = React.useCallback(
-    (fileExst: string, size = 32) => {
-      if (getIconProp) return getIconProp(size, fileExst) ?? "";
-      if (!filesSettings) return "";
+    (
+      fileExst: string,
+      size = 32,
+    ): React.FC<React.SVGProps<SVGSVGElement>> | null => {
+      if (getIconProp) return getIconProp(size, fileExst) ?? null;
+      if (!filesSettings) return null;
 
       const path = determineIconPath(fileExst);
 
       const iconSize = IconSizes[size] ?? iconSize32;
 
-      return iconSize.has(path)
-        ? (iconSize.get(path) ?? "")
-        : (iconSize.get("file.svg") ?? "");
+      return iconSize.get(path) ?? iconSize.get("file.svg") ?? null;
     },
     [filesSettings, getIconProp, determineIconPath],
   );

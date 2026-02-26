@@ -292,6 +292,10 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
               badgeIconNode={badgeIconNode ?? undefined}
               isTemplate={isTemplate}
             />
+          ) : typeof icon === "function" ? (
+            <div className={styles.itemLogo}>
+              {React.createElement(icon)}
+            </div>
           ) : (
             <div className={styles.itemLogo}>{icon}</div>
           )

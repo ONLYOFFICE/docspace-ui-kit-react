@@ -23,6 +23,7 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+import type React from "react";
 import type {
   FileDtoInteger,
   FolderDtoInteger,
@@ -100,13 +101,13 @@ export const convertRoomsToItems: (
 
 export const convertFilesToItems: (
   files: FileDtoInteger[],
-  getIcon: (fileExst: string) => string,
+  getIcon: (fileExst: string) => React.FC<React.SVGProps<SVGSVGElement>> | null,
   filterParam?: string | number,
   includedItems?: (number | string)[],
   disableBySecurity?: string,
 ) => TSelectorItem[] = (
   files: FileDtoInteger[],
-  getIcon: (fileExst: string) => string,
+  getIcon: (fileExst: string) => React.FC<React.SVGProps<SVGSVGElement>> | null,
   filterParam?: string | number,
   includedItems?: (number | string)[],
   disableBySecurity?: string,
@@ -186,7 +187,7 @@ export const convertFoldersToItems: (
     } = folder;
 
     const folderIconPath = getIconPathByFolderType(type);
-    const icon = iconSize32.get(folderIconPath) as string;
+    const icon = iconSize32.get(folderIconPath);
 
     const isDisabled =
       isDisableFolder(folder, disabledItems, filterParam) ||
