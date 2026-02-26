@@ -209,6 +209,7 @@ export type ChatInputProps = {
   aiReady: boolean;
   multimodal?: TMultimodal;
   goToWebSearchSettings?: () => void;
+  persistDraft?: boolean;
 };
 
 export type ChatInfoBlockProps = {
@@ -264,4 +265,5 @@ export type ChatProps = {
   width?: string;
   height?: string;
   style?: React.CSSProperties;
+  persistDraft?: boolean;
 };

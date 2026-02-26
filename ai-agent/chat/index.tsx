@@ -65,6 +65,7 @@ const Chat = observer(
     setAiPlaylistImages,
     setMediaViewerVisible,
     useInternalScroll = false,
+    persistDraft = false,
   }: ChatProps & { isLoadingChat: boolean }) => {
     const { currentChat } = useChatStore();
 
@@ -124,6 +125,7 @@ const Chat = observer(
               standalone={standalone}
               multimodal={multimodal}
               goToWebSearchSettings={goToWebSearchSettings}
+              persistDraft={persistDraft}
             />
           </>
         )}

@@ -57,6 +57,7 @@ const ChatInput = ({
   aiReady,
   multimodal,
   goToWebSearchSettings,
+  persistDraft = false,
 }: ChatInputProps) => {
   const { startChat, sendMessage, currentChatId, isRequestRunning, roomId } =
     useMessageStore();
@@ -73,7 +74,7 @@ const ChatInput = ({
 
   const saveChangesToStorage = React.useCallback(
     (value: string | null, selectedFiles: Partial<TFile>[]) => {
-      if (!roomId) return;
+      if (!roomId || !persistDraft) return;
 
       const localStorageId = `chat-${roomId}`;
 
@@ -101,7 +102,7 @@ const ChatInput = ({
 
       localStorage.setItem(localStorageId, JSON.stringify(obj));
     },
-    [currentChatId, roomId],
+    [currentChatId, roomId, persistDraft],
   );
 
   const handleSelectFile = React.useCallback(
@@ -180,6 +181,8 @@ const ChatInput = ({
   };
 
   React.useEffect(() => {
+    if (!persistDraft) return;
+
     if (currentChatId && !currentChat) {
       fetchChat(currentChatId);
     }
@@ -242,8 +245,8 @@ const ChatInput = ({
     roomId,
     currentChatId,
     currentChat,
-
     fetchChat,
+    persistDraft,
   ]);
 
   React.useEffect(() => {

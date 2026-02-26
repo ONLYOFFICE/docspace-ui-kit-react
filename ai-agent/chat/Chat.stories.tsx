@@ -104,6 +104,7 @@ const defaultProps: ChatProps = {
   },
   folderFormValidation: /^[a-zA-Z0-9 ]+$/,
   isAdmin: true,
+  persistDraft: false,
 };
 
 export const Default: Story = {

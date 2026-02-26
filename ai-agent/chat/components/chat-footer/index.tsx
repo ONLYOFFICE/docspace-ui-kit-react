@@ -43,6 +43,7 @@ const ChatFooter = ({
   toolsSettings,
   multimodal,
   goToWebSearchSettings,
+  persistDraft,
 }: ChatFooterProps) => {
   return (
     <div className={styles.chatFooter} data-testid="chat-footer">
@@ -60,6 +61,7 @@ const ChatFooter = ({
         aiReady={aiReady}
         multimodal={multimodal}
         goToWebSearchSettings={goToWebSearchSettings}
+        persistDraft={persistDraft}
       />
     </div>
   );
