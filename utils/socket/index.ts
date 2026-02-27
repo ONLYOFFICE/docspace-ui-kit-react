@@ -535,7 +535,7 @@ class SocketHelper {
       }
 
       const config: TConfig = {
-        withCredentials: true,
+        withCredentials: !authToken,
         transports: ["websocket", "polling"],
         eio: 4,
         path: socketPath,
@@ -549,9 +549,7 @@ class SocketHelper {
 
       if (authToken) {
         const isBearer = authToken.toLowerCase().startsWith("bearer");
-        const formattedToken = isBearer
-          ? authToken
-          : `bearer ${authToken}`;
+        const formattedToken = isBearer ? authToken : `bearer ${authToken}`;
 
         config.extraHeaders = {
           Authorization: formattedToken,

@@ -26,7 +26,7 @@
 
 import React from "react";
 
-import { SocketEvents, TOptSocket } from "../../../utils/socket";
+import socket, { SocketEvents, TOptSocket } from "../../../utils/socket";
 
 import {
   TAIConfig,
@@ -37,7 +37,6 @@ import {
 import { Nullable } from "../../../types";
 import { RoomsType } from "../../../enums";
 import { useApi } from "../../../providers";
-import { useSocket } from "../../../providers/socket";
 
 type Props = {
   agentId: string | number;
@@ -61,7 +60,6 @@ const useToolsSettings = ({
   const [fetchedChatSettings, setFetchedChatSettings] =
     React.useState<TAIRoomChatSettings | null>(null);
   const { aiApi, foldersApi } = useApi();
-  const socket = useSocket();
 
   const aiConfig = aiConfigProp ?? fetchedAiConfig;
   const chatSettings = chatSettingsProp ?? fetchedChatSettings;

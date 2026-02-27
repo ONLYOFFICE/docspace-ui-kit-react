@@ -28,6 +28,7 @@
 
 import React from "react";
 import axios, { type AxiosInstance } from "axios";
+import socket from "../../utils/socket";
 
 import {
   Configuration,
@@ -48,6 +49,8 @@ export type TApiProvider = {
   children: React.ReactNode;
   url: string;
   apiKey: string;
+  socketPath?: string;
+  initSocket?: boolean;
 };
 
 export const createApiClient = (basePath: string, apiKey: string) => {
@@ -96,7 +99,12 @@ export const useApi = () => {
   return context;
 };
 
-const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
+const ApiProvider = ({
+  children,
+  url,
+  apiKey,
+  initSocket = true,
+}: TApiProvider) => {
   const value = React.useMemo(() => {
     const authHeader = `Bearer ${apiKey}`;
     const baseOptions = {
@@ -131,6 +139,26 @@ const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
       apiUrl: url,
     };
   }, [url, apiKey]);
+
+  React.useEffect(() => {
+    if (!initSocket) return;
+
+    const initFunc = async () => {
+      let socketPath;
+
+      try {
+        const settingsRes = await value.commonSettingsApi.getPortalSettings();
+        socketPath = settingsRes?.data?.response?.socketUrl;
+      } catch (e) {
+        console.error(e);
+      }
+
+      const socketUrl = new URL(socketPath ?? "/socket.io", url).toString();
+      socket?.connect(socketUrl, "", apiKey);
+    };
+
+    initFunc();
+  }, [initSocket, url, apiKey, socket]);
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 };

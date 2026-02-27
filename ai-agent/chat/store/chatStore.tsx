@@ -28,12 +28,11 @@ import { makeAutoObservable } from "mobx";
 import React from "react";
 import type { Nullable } from "../../../types";
 import type { TChat } from "../../../types/ai";
-import { SocketEvents } from "../../../utils/socket";
+import socket, { SocketEvents } from "../../../utils/socket";
 import { toastr } from "../../../components/toast";
 import type { TChatStoreProps } from "../Chat.types";
 import type { AiApi } from "../../../api/ai";
 import { useApi } from "../../../providers";
-import { useSocket } from "../../../providers/socket";
 
 export default class ChatStore {
   private aiApi: AiApi;
@@ -192,7 +191,6 @@ export const ChatStoreContextProvider = ({
 }: TChatStoreProps) => {
   const { aiApi } = useApi();
   const store = React.useMemo(() => new ChatStore(aiApi), [aiApi]);
-  const socket = useSocket();
 
   React.useEffect(() => {
     store.setAgentId(agentId);

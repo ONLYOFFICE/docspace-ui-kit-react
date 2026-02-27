@@ -29,7 +29,6 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import Chat from "./index";
 import type { ChatProps } from "./Chat.types";
-import { SocketProvider } from "../../providers/socket/SocketProvider";
 
 const meta: Meta<typeof Chat> = {
   title: "AI-Agent/Chat",
@@ -41,11 +40,9 @@ const meta: Meta<typeof Chat> = {
   decorators: [
     (Story) => {
       return (
-        <SocketProvider>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <Story />
-          </div>
-        </SocketProvider>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Story />
+        </div>
       );
     },
   ],

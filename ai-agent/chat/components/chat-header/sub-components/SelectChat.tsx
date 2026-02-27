@@ -35,7 +35,7 @@ import SaveToFileIcon from "../../../../../assets/message.save.svg";
 
 import { RectangleSkeleton } from "../../../../../components/rectangle";
 
-import { SocketCommands, SocketEvents } from "../../../../../utils/socket";
+import socket, { SocketCommands, SocketEvents } from "../../../../../utils/socket";
 
 import { DropDown } from "../../../../../components/drop-down";
 import { TBreadCrumb } from "../../../../../components/selector";
@@ -58,7 +58,6 @@ import { getSelectChatRowHeight } from "../utils";
 import { ChatList } from "./ChatList";
 import { getCommonTranslation } from "../../../../../utils";
 import { useApi } from "../../../../../providers";
-import { useSocket } from "../../../../../providers/socket";
 import { CommonTrans } from "../../../../../utils/i18n/CommonTrans";
 
 const SelectChat = ({
@@ -75,7 +74,6 @@ const SelectChat = ({
   const [hoveredItem, setHoveredItem] = React.useState("");
   const [isRenameOpen, setIsRenameOpen] = React.useState(false);
   const [isExportOpen, setIsExportOpen] = React.useState(false);
-  const socket = useSocket();
 
   const parentRef = React.useRef<HTMLDivElement>(null);
 

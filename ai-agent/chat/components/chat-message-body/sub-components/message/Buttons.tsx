@@ -31,7 +31,7 @@ import CopyIcon from "../../../.././../../assets/icons/16/copy.react.svg";
 // import RefreshIcon from "../../../.././../../assets/16/refresh.react.svg";
 import SaveToFileIcon from "../../../.././../../assets/message.save.svg";
 
-import { SocketCommands, SocketEvents } from "../../../../../../utils/socket";
+import socket, { SocketCommands, SocketEvents } from "../../../../../../utils/socket";
 
 import { TBreadCrumb } from "../../../../../../components/selector";
 import { toastr } from "../../../../../../components/toast";
@@ -51,7 +51,6 @@ import { FOLDER_FORM_VALIDATION } from "../../../../../../constants";
 import { ContentType } from "../../../../../../enums";
 import { getCommonTranslation } from "../../../../../../utils";
 import { useApi } from "../../../../../../providers/api";
-import { useSocket } from "../../../../../../providers/socket";
 import { CommonTrans } from "../../../../../../utils/i18n/CommonTrans";
 
 const Buttons = ({
@@ -68,7 +67,6 @@ const Buttons = ({
   const { agentId, findPreviousUserMessage } = useMessageStore();
   const { currentChat } = useChatStore();
   const { aiApi } = useApi();
-  const socket = useSocket();
 
   const [showFolderSelector, setShowFolderSelector] = React.useState(false);
 
