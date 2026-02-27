@@ -7,6 +7,7 @@ const config: StorybookConfig = {
     "../errors/**/*.stories.@(js|jsx|ts|tsx)",
     "../providers/**/*.stories.@(js|jsx|ts|tsx)",
     "../document-editor/**/*.stories.@(js|jsx|ts|tsx)",
+    "../**/*.mdx",
   ],
 
   addons: [
