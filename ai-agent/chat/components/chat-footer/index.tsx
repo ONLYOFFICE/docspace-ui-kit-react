@@ -45,6 +45,7 @@ const ChatFooter = ({
   goToWebSearchSettings,
   persistDraft,
   allowExternalNavigation,
+  allowAttachFiles,
 }: ChatFooterProps) => {
   return (
     <div className={styles.chatFooter} data-testid="chat-footer">
@@ -64,6 +65,7 @@ const ChatFooter = ({
         goToWebSearchSettings={goToWebSearchSettings}
         persistDraft={persistDraft}
         allowExternalNavigation={allowExternalNavigation}
+        allowAttachFiles={allowAttachFiles}
       />
     </div>
   );

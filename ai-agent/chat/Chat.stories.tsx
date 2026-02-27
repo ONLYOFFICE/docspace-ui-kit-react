@@ -72,6 +72,7 @@ const defaultProps: ChatProps = {
   isAdmin: false,
   persistDraft: false,
   allowExternalNavigation: false,
+  allowAttachFiles: false,
 };
 
 export const Default: Story = {

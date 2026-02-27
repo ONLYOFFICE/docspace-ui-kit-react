@@ -53,6 +53,7 @@ const Buttons = ({
   aiReady,
   goToWebSearchSettings,
   allowExternalNavigation,
+  allowAttachFiles = false,
 }: ButtonsProps) => {
   const { isRequestRunning, stopMessage } = useMessageStore();
 
@@ -81,24 +82,26 @@ const Buttons = ({
   return (
     <div className={styles.chatInputButtons} data-testid="chat-input-buttons">
       <div className={styles.chatInputButtonsTools}>
-        <TooltipContainer
-          as="div"
-          title={getCommonTranslation("AddFiles")}
-          className={classNames(styles.chatInputButton, {
-            [styles.activeChatInputButton]: isFilesSelectorVisible,
-            [styles.disabled]: !aiReady,
-          })}
-          onClick={onAttachmentToggleClick}
-        >
-          <IconButton
-            iconNode={<AttachmentReactSvg />}
-            size={16}
-            isFill={false}
-            isDisabled={!aiReady}
-            className={classNames({ [styles.disabled]: !aiReady })}
-            data-testid="chat-input-attachment-button"
-          />
-        </TooltipContainer>
+        {allowAttachFiles && (
+          <TooltipContainer
+            as="div"
+            title={getCommonTranslation("AddFiles")}
+            className={classNames(styles.chatInputButton, {
+              [styles.activeChatInputButton]: isFilesSelectorVisible,
+              [styles.disabled]: !aiReady,
+            })}
+            onClick={onAttachmentToggleClick}
+          >
+            <IconButton
+              iconNode={<AttachmentReactSvg />}
+              size={16}
+              isFill={false}
+              isDisabled={!aiReady}
+              className={classNames({ [styles.disabled]: !aiReady })}
+              data-testid="chat-input-attachment-button"
+            />
+          </TooltipContainer>
+        )}
         <ToolsSettings
           {...toolsSettings}
           isAdmin={isAdmin}

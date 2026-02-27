@@ -59,6 +59,7 @@ const ChatInput = ({
   goToWebSearchSettings,
   persistDraft = false,
   allowExternalNavigation,
+  allowAttachFiles,
 }: ChatInputProps) => {
   const { startChat, sendMessage, currentChatId, isRequestRunning, agentId } =
     useMessageStore();
@@ -311,6 +312,7 @@ const ChatInput = ({
               aiReady={aiReady}
               goToWebSearchSettings={goToWebSearchSettings}
               allowExternalNavigation={allowExternalNavigation}
+              allowAttachFiles={allowAttachFiles}
             />
           </>
         )}

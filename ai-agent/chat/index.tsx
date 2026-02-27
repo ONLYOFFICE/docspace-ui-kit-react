@@ -75,6 +75,7 @@ const ChatUI = observer(
     useInternalScroll = false,
     persistDraft = false,
     allowExternalNavigation,
+    allowAttachFiles,
   }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
 
@@ -139,6 +140,7 @@ const ChatUI = observer(
               goToWebSearchSettings={goToWebSearchSettings}
               persistDraft={persistDraft}
               allowExternalNavigation={allowExternalNavigation}
+              allowAttachFiles={allowAttachFiles}
             />
           </>
         )}
