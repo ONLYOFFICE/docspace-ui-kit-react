@@ -42,7 +42,7 @@
     "styles/**/*",
     "providers/**/*",
     "selectors/**/*",
-    "document-editor"
+    "document-editor",
     "selectors/**/*",
     "ai-agent/**/*"
   ],
