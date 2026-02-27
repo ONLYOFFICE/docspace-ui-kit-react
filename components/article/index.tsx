@@ -301,7 +301,11 @@ const Article = ({
           {!showArticleLoader ? (
             <>
               {customSlot ? (
-                <ArticleCustomSlot withDevTools={!hideDevTools}>
+                <ArticleCustomSlot 
+                  withDevTools={!hideDevTools}
+                  showBackButton={showBackButton}
+                  showText={showText}
+                >
                   {customSlot}
                 </ArticleCustomSlot>
               ) : null}
