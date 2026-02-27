@@ -29,32 +29,23 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import Chat from "./index";
 import type { ChatProps } from "./Chat.types";
-import ApiProvider from "../../providers/api/ApiProvider";
 import { SocketProvider } from "../../providers/socket/SocketProvider";
 
 const meta: Meta<typeof Chat> = {
   title: "AI-Agent/Chat",
   component: Chat,
   parameters: {
-    layout: "padded",
+    layout: "fullscreen",
     noPadding: true,
   },
   decorators: [
     (Story) => {
       return (
-        <ApiProvider
-          url={import.meta.env.STORYBOOK_AI_API_URL}
-          apiKey={import.meta.env.STORYBOOK_AI_API_KEY}
-        >
-          <SocketProvider
-            // url={import.meta.env.STORYBOOK_AI_SOCKET_URL}
-            // token={import.meta.env.STORYBOOK_AI_API_KEY}
-          >
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <Story />
-            </div>
-          </SocketProvider>
-        </ApiProvider>
+        <SocketProvider>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Story />
+          </div>
+        </SocketProvider>
       );
     },
   ],
@@ -80,7 +71,6 @@ const defaultProps: ChatProps = {
   folderFormValidation: /^[a-zA-Z0-9 ]+$/,
   isAdmin: false,
   persistDraft: false,
-
 };
 
 export const Default: Story = {
