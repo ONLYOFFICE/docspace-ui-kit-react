@@ -77,6 +77,7 @@ export type TApiContext = {
   peopleSearchApi: PeopleSearchApi;
   groupSearchApi: SearchApi;
   apiClient: TApiClient;
+  baseUrl: string;
 };
 
 const ApiContext = React.createContext<TApiContext | null>(null);
@@ -92,9 +93,7 @@ export const useApi = () => {
 };
 
 const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
-  React.useEffect(() => {
-    document.cookie = `asc_auth_key=${apiKey}`;
-  }, [apiKey]);
+
 
   const value = React.useMemo(() => {
     const configuration = new Configuration({
@@ -114,6 +113,7 @@ const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
       peopleSearchApi: new PeopleSearchApi(configuration),
       groupSearchApi: new SearchApi(configuration),
       apiClient: createApiClient(url, apiKey),
+      baseUrl: url,
     };
   }, [url, apiKey]);
 
