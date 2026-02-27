@@ -48,6 +48,7 @@ import useInitChats from "./hooks/useInitChats";
 import useInitMessages from "./hooks/useInitMessages";
 import useToolsSettings from "./hooks/useToolsSettings";
 import useAiConfig from "./hooks/useAiConfig";
+import useChatSettings from "./hooks/useChatSettings";
 
 export { CHAT_SUPPORTED_FORMATS };
 
@@ -223,12 +224,16 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
   } = props;
 
   const { aiConfig, fetchAiConfig } = useAiConfig();
+  const { chatSettings, fetchChatSettings } = useChatSettings({
+    agentId: agentId ?? "",
+  });
+
   const initChats = useInitChats({ agentId: agentId ?? "" });
   const { initMessages, ...messagesSettings } = useInitMessages(agentId ?? "");
   const toolsSettings = useToolsSettings({
     agentId: agentId ?? "",
     aiConfig,
-    chatSettings: undefined,
+    chatSettings,
   });
 
   const [isInitialized, setIsInitialized] = React.useState(false);
@@ -241,6 +246,7 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
         initChats.fetchChats(),
         initMessages(),
         fetchAiConfig(),
+        fetchChatSettings(),
         toolsSettings.initTools(),
       ]);
       setIsInitialized(true);
@@ -267,6 +273,7 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
       multimodal={multimodal}
       isLoadingChat={isLoading || !isInitialized}
       aiReady={!!aiConfig?.aiReady}
+      selectedModel={chatSettings?.modelId ?? ""}
     />
   );
 };
