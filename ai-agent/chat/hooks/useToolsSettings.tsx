@@ -46,7 +46,7 @@ type Props = {
 
 const useToolsSettings = ({
   agentId,
-  aiConfig: aiConfigProp,
+  aiConfig,
   chatSettings: chatSettingsProp,
 }: Props) => {
   const [servers, setServers] = React.useState<TServer[]>([]);
@@ -55,13 +55,10 @@ const useToolsSettings = ({
   );
   const [webSearchEnabled, setWebSearchEnabled] = React.useState(false);
   const [isFetched, setIsFetched] = React.useState(false);
-  const [fetchedAiConfig, setFetchedAiConfig] =
-    React.useState<TAIConfig | null>(null);
   const [fetchedChatSettings, setFetchedChatSettings] =
     React.useState<TAIRoomChatSettings | null>(null);
   const { aiApi, foldersApi } = useApi();
 
-  const aiConfig = aiConfigProp ?? fetchedAiConfig;
   const chatSettings = chatSettingsProp ?? fetchedChatSettings;
 
   const fetchServerTools = React.useCallback(
@@ -106,14 +103,6 @@ const useToolsSettings = ({
       fetchTools(),
     ];
 
-    if (!aiConfigProp) {
-      promises.push(
-        aiApi.getAIConfig().then((res) => {
-          if (res) setFetchedAiConfig(res);
-        }),
-      );
-    }
-
     if (!chatSettingsProp) {
       promises.push(
         aiApi.getAgentFolder(Number(agentId)).then((res) => {
@@ -126,7 +115,7 @@ const useToolsSettings = ({
     }
 
     await Promise.all(promises);
-  }, [fetchTools, agentId, aiConfigProp, chatSettingsProp, aiApi, foldersApi]);
+  }, [fetchTools, agentId, aiConfig, chatSettingsProp, aiApi, foldersApi]);
 
   const onModifyFolder = React.useCallback(
     (data?: TOptSocket) => {

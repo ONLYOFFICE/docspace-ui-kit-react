@@ -47,6 +47,7 @@ import { CHAT_SUPPORTED_FORMATS } from "./Chat.constants";
 import useInitChats from "./hooks/useInitChats";
 import useInitMessages from "./hooks/useInitMessages";
 import useToolsSettings from "./hooks/useToolsSettings";
+import useAiConfig from "./hooks/useAiConfig";
 
 export { CHAT_SUPPORTED_FORMATS };
 
@@ -221,11 +222,12 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
     isLoading,
   } = props;
 
+  const { aiConfig, fetchAiConfig } = useAiConfig();
   const initChats = useInitChats({ agentId: agentId ?? "" });
   const { initMessages, ...messagesSettings } = useInitMessages(agentId ?? "");
   const toolsSettings = useToolsSettings({
     agentId: agentId ?? "",
-    aiConfig: null,
+    aiConfig,
     chatSettings: undefined,
   });
 
@@ -238,6 +240,7 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
       await Promise.all([
         initChats.fetchChats(),
         initMessages(),
+        fetchAiConfig(),
         toolsSettings.initTools(),
       ]);
       setIsInitialized(true);
@@ -263,6 +266,7 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
       toolsSettings={toolsSettings}
       multimodal={multimodal}
       isLoadingChat={isLoading || !isInitialized}
+      aiReady={!!aiConfig?.aiReady}
     />
   );
 };
