@@ -35,8 +35,6 @@ export type SavedApiProvider = {
 
 export const STORAGE_KEY = "sb-saved-api-providers";
 
-export const LAST_API_CONFIG_KEY = "sb-last-api-config";
-
 export const getSavedProviders = (): SavedApiProvider[] => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);

@@ -26,16 +26,21 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { addons, types } from "storybook/manager-api";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  addons,
+  types,
+  useStorybookApi,
+  useStorybookState,
+} from "storybook/manager-api";
 import { useGlobals } from "storybook/manager-api";
 import { Modal, Button, Form, Select } from "storybook/internal/components";
-import { EditorIcon } from "@storybook/icons";
+import { EditorIcon, TrashIcon } from "@storybook/icons";
 
 import {
   getSavedProviders,
+  deleteProvider,
   STORAGE_KEY,
-  LAST_API_CONFIG_KEY,
   type SavedApiProvider,
 } from "../utils/apiProviders";
 
@@ -63,9 +68,16 @@ const AddCustomModal = ({
   const [url, setUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
 
+  const resetState = () => {
+    setName("");
+    setUrl("");
+    setApiKey("");
+  };
+
   const handleSave = () => {
     if (!name.trim() || !url.trim() || !apiKey.trim()) return;
     onSave(name.trim(), url, apiKey);
+    resetState();
   };
 
   return (
@@ -128,6 +140,8 @@ const AddCustomModal = ({
 
 const ApiConfigDropdown = () => {
   const [globals, updateGlobals] = useGlobals();
+  const api = useStorybookApi();
+  const { viewMode } = useStorybookState();
   const [providers, setProviders] =
     useState<SavedApiProvider[]>(getSavedProviders);
   const [modalOpen, setModalOpen] = useState(false);
@@ -146,12 +160,10 @@ const ApiConfigDropdown = () => {
 
   const handleSelect = useCallback(
     (value: Value) => {
-      console.log(value);
       if (value === "add-custom") {
         setModalOpen(true);
       } else {
         updateGlobals({ apiConfig: value });
-        localStorage.setItem(LAST_API_CONFIG_KEY, String(value));
       }
     },
     [updateGlobals],
@@ -167,7 +179,6 @@ const ApiConfigDropdown = () => {
         STORAGE_KEY,
         JSON.stringify([...existing, newProvider]),
       );
-      localStorage.setItem(LAST_API_CONFIG_KEY, id);
 
       setProviders(getSavedProviders());
       setModalOpen(false);
@@ -180,9 +191,36 @@ const ApiConfigDropdown = () => {
     setModalOpen(false);
   }, []);
 
+  const handleDelete = useCallback(
+    (e: React.MouseEvent, id: string) => {
+      e.stopPropagation();
+      deleteProvider(id);
+      setProviders(getSavedProviders());
+      api.addNotification({
+        id: `api-provider-deleted-${id}`,
+        content: { headline: "Success deleted" },
+        duration: 4000,
+      });
+    },
+    [api],
+  );
+
   const options = [
     { title: "Default", value: "default" },
-    ...providers.map((p) => ({ title: p.name, value: p.id })),
+    ...providers.map((p) => ({
+      title: p.name,
+      value: p.id,
+      aside: (
+        <Button
+          variant="ghost"
+          size="small"
+          onClick={(e) => handleDelete(e, p.id)}
+          title="Delete"
+        >
+          <TrashIcon />
+        </Button>
+      ),
+    })),
     { title: "Add custom...", value: "add-custom" },
   ];
 
@@ -200,6 +238,7 @@ const ApiConfigDropdown = () => {
         ariaLabel="API Config"
         defaultOptions={apiConfig}
         onSelect={handleSelect}
+        disabled={viewMode === "docs"}
       />
     </>
   );
