@@ -80,10 +80,12 @@ const ToolsSettings = ({
   isAdmin,
   aiReady,
   goToWebSearchSettings,
+  allowExternalNavigation,
 }: ReturnType<typeof useToolsSettings> & {
   isAdmin?: boolean;
   aiReady: boolean;
   goToWebSearchSettings?: () => void;
+  allowExternalNavigation?: boolean;
 }) => {
   const { agentId } = useChatStore();
   const {
@@ -355,7 +357,7 @@ const ToolsSettings = ({
                 productName: getCommonTranslation("ProductName"),
               })}
             </Text>
-            {isAdmin ? (
+            {isAdmin && allowExternalNavigation ? (
               <Link
                 type={LinkType.action}
                 isHovered

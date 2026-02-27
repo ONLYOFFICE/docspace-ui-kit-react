@@ -37,7 +37,7 @@ import { openFile } from "../../../../utils";
 
 import styles from "../../ChatMessageBody.module.scss";
 
-const Files = ({ files, getIcon, reverse }: MessageFilesProps) => {
+const Files = ({ files, getIcon, reverse, allowExternalNavigation }: MessageFilesProps) => {
   if (!files.length) return null;
 
   return (
@@ -51,7 +51,7 @@ const Files = ({ files, getIcon, reverse }: MessageFilesProps) => {
           <div
             className={styles.filesListItem}
             key={file.id}
-            onClick={() => openFile(file.id.toString())}
+            onClick={() => openFile(file.id.toString(), allowExternalNavigation)}
           >
             <ReactSVG
               src={getIcon(24, file.extension!)}

@@ -54,6 +54,7 @@ const ChatMessageBody = ({
   setAiPlaylistImages,
   setMediaViewerVisible,
   useInternalScroll = false,
+  allowExternalNavigation,
 }: MessageBodyProps) => {
   const {
     messages,
@@ -126,6 +127,7 @@ const ChatMessageBody = ({
                 folderFormValidation={folderFormValidation}
                 setAiPlaylistImages={setAiPlaylistImages}
                 setMediaViewerVisible={setMediaViewerVisible}
+                allowExternalNavigation={allowExternalNavigation}
               />
             );
           })}

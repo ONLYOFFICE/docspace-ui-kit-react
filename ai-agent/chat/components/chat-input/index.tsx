@@ -58,6 +58,7 @@ const ChatInput = ({
   multimodal,
   goToWebSearchSettings,
   persistDraft = false,
+  allowExternalNavigation,
 }: ChatInputProps) => {
   const { startChat, sendMessage, currentChatId, isRequestRunning, agentId } =
     useMessageStore();
@@ -309,6 +310,7 @@ const ChatInput = ({
               isAdmin={isPortalAdmin}
               aiReady={aiReady}
               goToWebSearchSettings={goToWebSearchSettings}
+              allowExternalNavigation={allowExternalNavigation}
             />
           </>
         )}

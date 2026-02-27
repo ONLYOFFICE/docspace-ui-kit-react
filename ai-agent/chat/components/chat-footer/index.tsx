@@ -44,11 +44,12 @@ const ChatFooter = ({
   multimodal,
   goToWebSearchSettings,
   persistDraft,
+  allowExternalNavigation,
 }: ChatFooterProps) => {
   return (
     <div className={styles.chatFooter} data-testid="chat-footer">
       {!isLoading && !aiReady ? (
-        <ChatInfoBlock standalone={standalone} isPortalAdmin={isPortalAdmin} />
+        <ChatInfoBlock standalone={standalone} isPortalAdmin={isPortalAdmin} allowExternalNavigation={allowExternalNavigation} />
       ) : null}
       <ChatInput
         attachmentFile={attachmentFile}
@@ -62,6 +63,7 @@ const ChatFooter = ({
         multimodal={multimodal}
         goToWebSearchSettings={goToWebSearchSettings}
         persistDraft={persistDraft}
+        allowExternalNavigation={allowExternalNavigation}
       />
     </div>
   );

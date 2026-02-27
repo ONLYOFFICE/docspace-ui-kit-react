@@ -36,7 +36,7 @@ import { ToolCallConfirmDialog } from "./ToolCallConfirmDialog";
 import { ToolCall } from "./ToolCall";
 import { ToolCallPlacement, ToolCallStatus } from "./ToolCall.enum";
 
-const ToolCallMessage = ({ content }: MessageToolCallProps) => {
+const ToolCallMessage = ({ content, allowExternalNavigation }: MessageToolCallProps) => {
   const [needConfirmation, setNeedConfirmation] = React.useState(
     () => !!content.managed,
   );
@@ -66,6 +66,7 @@ const ToolCallMessage = ({ content }: MessageToolCallProps) => {
         content={content}
         status={toolCallStatus}
         placement={ToolCallPlacement.Message}
+        allowExternalNavigation={allowExternalNavigation}
       />
 
       {needConfirmation ? (

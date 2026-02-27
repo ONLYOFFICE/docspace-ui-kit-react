@@ -86,6 +86,7 @@ const Message = ({
   folderFormValidation,
   setAiPlaylistImages,
   setMediaViewerVisible,
+  allowExternalNavigation,
 }: MessageProps) => {
   const { currentChat } = useChatStore();
   const {
@@ -127,7 +128,7 @@ const Message = ({
             ) : null}
 
             {files.length > 0 ? (
-              <Files files={files} getIcon={getIcon} />
+              <Files files={files} getIcon={getIcon} allowExternalNavigation={allowExternalNavigation} />
             ) : null}
 
             {message.contents.map((c) => {
@@ -241,11 +242,11 @@ const Message = ({
           );
 
         if (c.type === ContentType.Tool)
-          return <ToolCallMessage key={`${c.name}_${mId * 2}`} content={c} />;
+          return <ToolCallMessage key={`${c.name}_${mId * 2}`} content={c} allowExternalNavigation={allowExternalNavigation} />;
 
         return null;
       })}
-      {files.length ? <Files files={files} getIcon={getIcon} reverse /> : null}
+      {files.length ? <Files files={files} getIcon={getIcon} reverse allowExternalNavigation={allowExternalNavigation} /> : null}
       {message.id ? (
         <Buttons
           text={fullText}

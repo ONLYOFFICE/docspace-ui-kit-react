@@ -71,6 +71,7 @@ const defaultProps: ChatProps = {
   folderFormValidation: /^[a-zA-Z0-9 ]+$/,
   isAdmin: false,
   persistDraft: false,
+  allowExternalNavigation: false,
 };
 
 export const Default: Story = {

@@ -53,6 +53,7 @@ type ToolCallHeaderProps = {
   placement: ToolCallPlacement;
   expandable?: boolean;
   isSearchTool?: boolean;
+  allowExternalNavigation?: boolean;
 };
 
 export const ToolCallHeader = observer(
@@ -64,6 +65,7 @@ export const ToolCallHeader = observer(
     placement,
     expandable,
     isSearchTool,
+    allowExternalNavigation,
   }: ToolCallHeaderProps) => {
     const { webCrawlingToolName } = useMessageStore();
 
@@ -103,7 +105,7 @@ export const ToolCallHeader = observer(
         <div className={styles.toolStatusIcon}>{statusIcon}</div>
 
         {isSearchTool ? (
-          <SearchToolContent content={content} />
+          <SearchToolContent content={content} allowExternalNavigation={allowExternalNavigation} />
         ) : (
           <MCPToolContent content={content} />
         )}

@@ -52,6 +52,7 @@ const Buttons = ({
   isAdmin,
   aiReady,
   goToWebSearchSettings,
+  allowExternalNavigation,
 }: ButtonsProps) => {
   const { isRequestRunning, stopMessage } = useMessageStore();
 
@@ -103,6 +104,7 @@ const Buttons = ({
           isAdmin={isAdmin}
           aiReady={aiReady}
           goToWebSearchSettings={goToWebSearchSettings}
+          allowExternalNavigation={allowExternalNavigation}
         />
       </div>
       <IconButton

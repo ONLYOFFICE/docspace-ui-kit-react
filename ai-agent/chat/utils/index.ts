@@ -119,7 +119,9 @@ export const formatJsonWithMarkdown = (
 	return `\`\`\`json\n${formattedJson}\n\`\`\``;
 };
 
-export const openFile = (id: string) => {
+export const openFile = (id: string, allowExternalNavigation?: boolean) => {
+	if (!allowExternalNavigation) return;
+
 	const searchParams = new URLSearchParams();
 
 	searchParams.set("fileId", id);

@@ -105,6 +105,7 @@ export type MessageProps = {
   getIcon: TGetIcon;
   getResultStorageId: () => number | null;
   folderFormValidation: RegExp;
+  allowExternalNavigation?: boolean;
 } & Pick<MessageImagesProps, "setAiPlaylistImages" | "setMediaViewerVisible">;
 
 export type MessageButtonsProps = {
@@ -132,6 +133,7 @@ export type MessageFilesProps = {
   files: TContent[];
   getIcon: TGetIcon;
   reverse?: boolean;
+  allowExternalNavigation?: boolean;
 };
 
 export type MessageImagesProps = {
@@ -149,6 +151,7 @@ export type MessageMarkdownFieldProps = {
 
 export type MessageToolCallProps = {
   content: TToolCallContent;
+  allowExternalNavigation?: boolean;
 };
 
 export type MessageEmptyProps = {
@@ -163,6 +166,7 @@ export type MessageBodyProps = {
   getResultStorageId: () => number | null;
   folderFormValidation: RegExp;
   useInternalScroll?: boolean;
+  allowExternalNavigation?: boolean;
 } & Pick<MessageProps, "setAiPlaylistImages" | "setMediaViewerVisible">;
 
 export type FilesListProps = {
@@ -186,6 +190,7 @@ export type ButtonsProps = {
   isAdmin?: boolean;
   aiReady: boolean;
   goToWebSearchSettings?: () => void;
+  allowExternalNavigation?: boolean;
 };
 
 export type AttachmentProps = {
@@ -210,11 +215,13 @@ export type ChatInputProps = {
   multimodal?: TMultimodal;
   goToWebSearchSettings?: () => void;
   persistDraft?: boolean;
+  allowExternalNavigation?: boolean;
 };
 
 export type ChatInfoBlockProps = {
   standalone: boolean;
   isPortalAdmin: boolean;
+  allowExternalNavigation?: boolean;
 };
 
 export type ChatFooterProps = ChatInputProps & ChatInfoBlockProps;
@@ -267,6 +274,7 @@ export type ChatProps = {
   style?: React.CSSProperties;
   persistDraft?: boolean;
   internalInit?: boolean;
+  allowExternalNavigation?: boolean;
 };
 
 export type ChatCoreProps = ChatProps & {

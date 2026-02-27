@@ -45,7 +45,7 @@ import {
   getRootDomain,
 } from "../ToolCall.utils";
 
-const SourceItem = ({ source }: { source: TToolCallResultSourceData }) => {
+const SourceItem = ({ source, allowExternalNavigation }: { source: TToolCallResultSourceData; allowExternalNavigation?: boolean }) => {
   const tooltipId = useId();
   const [faviconLoadError, setFaviconLoadError] = useState(false);
 
@@ -58,14 +58,8 @@ const SourceItem = ({ source }: { source: TToolCallResultSourceData }) => {
     ? source.text
     : getRootDomain(source.url || "");
 
-  return (
-    <Link
-      className={styles.sourceItem}
-      href={linkHref}
-      target={LinkTarget.blank}
-      textDecoration="none"
-      truncate
-    >
+  const content = (
+    <>
       {faviconLoadError ? (
         <UniverseIcon className={styles.sourceFallbackIcon} />
       ) : isKnowledgeSource ? (
@@ -115,12 +109,34 @@ const SourceItem = ({ source }: { source: TToolCallResultSourceData }) => {
         />
       ) : null}
 
-      <ExternalLinkIcon className={styles.externalLinkIcon} />
+      {allowExternalNavigation ? (
+        <ExternalLinkIcon className={styles.externalLinkIcon} />
+      ) : null}
+    </>
+  );
+
+  if (!allowExternalNavigation) {
+    return (
+      <div className={styles.sourceItem}>
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      className={styles.sourceItem}
+      href={linkHref}
+      target={LinkTarget.blank}
+      textDecoration="none"
+      truncate
+    >
+      {content}
     </Link>
   );
 };
 
-export const SourceView = ({ content }: { content: TToolCallContent }) => {
+export const SourceView = ({ content, allowExternalNavigation }: { content: TToolCallContent; allowExternalNavigation?: boolean }) => {
   if (!content.result) return null;
 
   const sources: TToolCallResultSourceData[] = Array.isArray(
@@ -136,6 +152,7 @@ export const SourceView = ({ content }: { content: TToolCallContent }) => {
           <SourceItem
             key={`${source.fileId || source.title}_${index * 2}`}
             source={source}
+            allowExternalNavigation={allowExternalNavigation}
           />
         ))}
       </div>

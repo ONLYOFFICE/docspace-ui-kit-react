@@ -42,13 +42,13 @@ import { Text } from "../../../../../../../../components/text";
 import { Link, LinkTarget } from "../../../../../../../../components/link";
 import { getCommonTranslation } from "../../../../../../../../utils";
 
-const WebCrawlingToolContent = ({ content }: { content: TToolCallContent }) => {
+const WebCrawlingToolContent = ({ content, allowExternalNavigation }: { content: TToolCallContent; allowExternalNavigation?: boolean }) => {
   const toolInfo = ((content.result?.data as TToolCallResultSourceData)
     ?.title || content.arguments.url) as string;
 
   const hasError = !!content.result?.error;
 
-  return hasError ? (
+  return hasError || !allowExternalNavigation ? (
     <>
       <UniverseIcon className={styles.searchToolIcon} />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
@@ -107,8 +107,10 @@ const KnowledgeSearchToolContent = ({
 
 export const SearchToolContent = ({
   content,
+  allowExternalNavigation,
 }: {
   content: TToolCallContent;
+  allowExternalNavigation?: boolean;
 }) => {
   const { knowledgeSearchToolName, webSearchToolName, webCrawlingToolName } =
     useMessageStore();
@@ -124,7 +126,7 @@ export const SearchToolContent = ({
       ) : null}
 
       {content.name === webCrawlingToolName ? (
-        <WebCrawlingToolContent content={content} />
+        <WebCrawlingToolContent content={content} allowExternalNavigation={allowExternalNavigation} />
       ) : null}
     </>
   );

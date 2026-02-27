@@ -74,6 +74,7 @@ const ChatUI = observer(
     setMediaViewerVisible,
     useInternalScroll = false,
     persistDraft = false,
+    allowExternalNavigation,
   }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
 
@@ -108,6 +109,7 @@ const ChatUI = observer(
             standalone={standalone}
             isPortalAdmin={isAdmin}
             goToAISettings={goToAISettings}
+            allowExternalNavigation={allowExternalNavigation}
           />
         ) : (
           <>
@@ -120,6 +122,7 @@ const ChatUI = observer(
               setAiPlaylistImages={setAiPlaylistImages}
               setMediaViewerVisible={setMediaViewerVisible}
               useInternalScroll={useInternalScroll}
+              allowExternalNavigation={allowExternalNavigation}
             />
             <ChatFooter
               attachmentFile={attachmentFile}
@@ -134,6 +137,7 @@ const ChatUI = observer(
               multimodal={multimodal}
               goToWebSearchSettings={goToWebSearchSettings}
               persistDraft={persistDraft}
+              allowExternalNavigation={allowExternalNavigation}
             />
           </>
         )}
@@ -157,6 +161,7 @@ const ChatCore = (props: ChatCoreProps) => {
     standalone = false,
     isAdmin = false,
     goToAISettings,
+    allowExternalNavigation,
   } = props;
 
   const hasChats = initChats?.chats?.length > 0;
@@ -175,6 +180,7 @@ const ChatCore = (props: ChatCoreProps) => {
           standalone={standalone}
           isPortalAdmin={isAdmin}
           goToAISettings={goToAISettings}
+          allowExternalNavigation={allowExternalNavigation}
         />
       </ChatContainer>
     );
