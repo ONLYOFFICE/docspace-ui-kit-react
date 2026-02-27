@@ -782,6 +782,7 @@ const FilterInput = React.memo(
                           noBorder
                           withoutArrow
                           displayArrow={false}
+                          usePortalBackdrop
                         >
                           <span className={styles.ellipsisIcon}>...</span>
                         </ComboBox>
