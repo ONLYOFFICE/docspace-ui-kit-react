@@ -24,186 +24,199 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { Label } from "./Label";
+import { Label } from ".";
 
-const meta: Meta<typeof Label> = {
+const meta = {
   title: "UI/Data display/Label",
   component: Label,
   parameters: {
     docs: {
       description: {
-        component:
-          "Label component displays the field name in forms. It supports required field indication, error states, and various display options.",
+        component: `Label component displays field names in forms with support for required indicators and error states.
+
+### Features
+
+- **Required Indicator**: Show a red asterisk (*) for required fields
+- **Error State**: Highlight the label in red for validation errors
+- **Truncation**: Truncate overflowing text with ellipsis
+- **Inline Display**: Render inline alongside form controls
+- **Form Association**: Associates with form controls via \`htmlFor\`
+- **Children Support**: Render additional content (e.g., "(optional)") inside the label
+
+### Accessibility
+
+- \`aria-required\`: Indicates when the associated field is required
+- \`aria-invalid\`: Indicates when the associated field has an error
+
+### Usage
+
+\`\`\`tsx
+import { Label } from "@docspace/ui-kit/components/label";
+
+// Basic label
+<Label text="First name" htmlFor="firstName" />
+
+// Required field
+<Label text="Email" htmlFor="email" isRequired />
+
+// Error state
+<Label text="Password" htmlFor="password" error />
+
+// With children
+<Label text="Phone" htmlFor="phone">
+  <span>(optional)</span>
+</Label>
+\`\`\``,
       },
     },
   },
   argTypes: {
     text: {
-      description: "The text content of the label",
       control: "text",
+      description: "The text content of the label",
     },
     title: {
-      description: "Title attribute for the label",
       control: "text",
+      description: "Title attribute for hover tooltip",
     },
     htmlFor: {
-      description: "Associates the label with a form control",
       control: "text",
+      description: "Associates the label with a form control",
     },
     isRequired: {
-      description: "Shows a required field indicator (*)",
       control: "boolean",
+      description: "Shows a required field indicator (*)",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     error: {
-      description: "Displays the label in error state",
       control: "boolean",
+      description: "Displays the label in error state (red color)",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     truncate: {
-      description: "Truncates text that overflows",
       control: "boolean",
+      description: "Truncates text that overflows with ellipsis",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isInline: {
-      description: "Displays the label inline",
       control: "boolean",
+      description: "Displays the label inline",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     display: {
-      description: "CSS display property",
       control: "select",
       options: ["block", "inline", "inline-block", "flex"],
-    },
-    style: {
-      description: "Custom CSS styles",
-      control: "object",
-    },
-    className: {
-      description: "Additional CSS class names",
-      control: "text",
+      description: "CSS display property",
     },
   },
-};
+} satisfies Meta<typeof Label>;
 
-type Story = StoryObj<typeof Label>;
+type Story = StoryObj<ComponentProps<typeof Label>>;
 
 export default meta;
 
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
 export const Default: Story = {
+  render: (args) => <Label {...args} />,
   args: {
     text: "First name",
     title: "Enter your first name",
     htmlFor: "firstName",
-    isRequired: false,
-    error: false,
-    truncate: false,
-    isInline: false,
-    display: "block",
   },
 };
 
-export const Required: Story = {
-  args: {
-    ...Default.args,
-    text: "Email address",
-    title: "Enter your email address",
-    htmlFor: "email",
-    isRequired: true,
-  },
+const RequiredTemplate = () => {
+  return (
+    <Wrapper>
+      <Label text="Email address" htmlFor="email" isRequired />
+      <Label text="Password" htmlFor="password" isRequired />
+      <Label text="Username" htmlFor="username" isRequired />
+    </Wrapper>
+  );
 };
 
-export const WithError: Story = {
-  args: {
-    ...Default.args,
-    text: "Password",
-    title: "Enter your password",
-    htmlFor: "password",
-    error: true,
-  },
+const ErrorTemplate = () => {
+  return (
+    <Wrapper>
+      <Label text="Password" htmlFor="password" error />
+      <Label text="Email" htmlFor="email" isRequired error />
+    </Wrapper>
+  );
 };
 
-export const Truncated: Story = {
-  render: (args) => (
-    <div style={{ width: "150px", border: "1px solid #ccc", padding: "8px" }}>
-      <Label style={{ display: "block" }} {...args} />
+const TruncatedTemplate = () => {
+  return (
+    <div style={{ width: 150, border: "1px solid #ccc", padding: 8 }}>
+      <Label
+        text="This is a very long label that will be truncated"
+        title="Full text shown on hover"
+        truncate
+        style={{ display: "block" }}
+      />
     </div>
-  ),
-  args: {
-    ...Default.args,
-    text: "This is a very long label that will be truncated",
-    title: "Full text shown on hover",
-    truncate: true,
-  },
+  );
 };
 
-export const Inline: Story = {
-  render: (args) => (
-    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-      <Label {...args} />
-      <input type="text" id={args.htmlFor} style={{ padding: "4px" }} />
+const InlineTemplate = () => {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <Label text="Username" htmlFor="username" isInline />
+      <input type="text" id="username" style={{ padding: 4 }} />
     </div>
-  ),
-  args: {
-    ...Default.args,
-    text: "Username",
-    title: "Enter username",
-    htmlFor: "username",
-    isInline: true,
-  },
+  );
 };
 
-export const WithChildren: Story = {
-  render: (args) => (
-    <Label {...args}>
-      <span style={{ marginLeft: "8px", color: "#666" }}>(optional)</span>
+const WithChildrenTemplate = () => {
+  return (
+    <Label text="Phone number" htmlFor="phone">
+      <span style={{ marginLeft: 8, color: "#666" }}>(optional)</span>
     </Label>
-  ),
-  args: {
-    ...Default.args,
-    text: "Phone number",
-    title: "Enter phone number",
-    htmlFor: "phone",
-  },
+  );
 };
 
-export const CustomStyling: Story = {
-  args: {
-    ...Default.args,
-    text: "Custom Label",
-    className: "custom-label",
-    style: {
-      fontWeight: 700,
-      color: "#2c3e50",
-      textTransform: "uppercase",
-    },
-  },
-};
-
-export const RequiredWithError: Story = {
-  args: {
-    ...Default.args,
-    text: "Email address",
-    htmlFor: "email",
-    isRequired: true,
-    error: true,
-  },
-};
-
-export const FormExample: Story = {
-  render: () => (
-    <form style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+const FormExampleTemplate = () => {
+  return (
+    <form
+      style={{ display: "flex", flexDirection: "column", gap: 16 }}
+      onSubmit={(e) => e.preventDefault()}
+    >
       <div>
-        <Label text="Username" htmlFor="username" isRequired />
+        <Label text="Username" htmlFor="form-username" isRequired />
         <input
           type="text"
-          id="username"
+          id="form-username"
           style={{ display: "block", marginTop: 4, padding: 8 }}
         />
       </div>
       <div>
-        <Label text="Email" htmlFor="email" isRequired error />
+        <Label text="Email" htmlFor="form-email" isRequired error />
         <input
           type="email"
-          id="email"
+          id="form-email"
           style={{
             display: "block",
             marginTop: 4,
@@ -213,14 +226,121 @@ export const FormExample: Story = {
         />
       </div>
       <div>
-        <Label text="Bio" htmlFor="bio">
+        <Label text="Bio" htmlFor="form-bio">
           <span style={{ color: "#666", fontWeight: 400 }}>(optional)</span>
         </Label>
         <textarea
-          id="bio"
+          id="form-bio"
           style={{ display: "block", marginTop: 4, padding: 8 }}
         />
       </div>
     </form>
-  ),
+  );
+};
+
+export const RequiredLabels: Story = {
+  render: () => <RequiredTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Labels with a required field indicator (*) to mark mandatory form fields.",
+      },
+      source: {
+        code: `<Label text="Email address" htmlFor="email" isRequired />
+<Label text="Password" htmlFor="password" isRequired />
+<Label text="Username" htmlFor="username" isRequired />`,
+      },
+    },
+  },
+};
+
+export const ErrorState: Story = {
+  render: () => <ErrorTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Labels in error state display red text to indicate validation failures.",
+      },
+      source: {
+        code: `<Label text="Password" htmlFor="password" error />
+<Label text="Email" htmlFor="email" isRequired error />`,
+      },
+    },
+  },
+};
+
+export const TruncatedLabel: Story = {
+  render: () => <TruncatedTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Label that truncates with an ellipsis when it exceeds the container width.",
+      },
+      source: {
+        code: `<div style={{ width: 150 }}>
+  <Label text="This is a very long label that will be truncated" truncate />
+</div>`,
+      },
+    },
+  },
+};
+
+export const InlineLabel: Story = {
+  render: () => <InlineTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Inline label displayed next to a form control in a horizontal layout.",
+      },
+      source: {
+        code: `<Label text="Username" htmlFor="username" isInline />
+<input type="text" id="username" />`,
+      },
+    },
+  },
+};
+
+export const WithChildren: Story = {
+  render: () => <WithChildrenTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Label with additional child content rendered alongside the text.",
+      },
+      source: {
+        code: `<Label text="Phone number" htmlFor="phone">
+  <span style={{ marginLeft: 8, color: "#666" }}>(optional)</span>
+</Label>`,
+      },
+    },
+  },
+};
+
+export const FormExample: Story = {
+  render: () => <FormExampleTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Complete form example showing labels with required, error, and optional states.",
+      },
+      source: {
+        code: `<Label text="Username" htmlFor="username" isRequired />
+<input type="text" id="username" />
+
+<Label text="Email" htmlFor="email" isRequired error />
+<input type="email" id="email" />
+
+<Label text="Bio" htmlFor="bio">
+  <span>(optional)</span>
+</Label>
+<textarea id="bio" />`,
+      },
+    },
+  },
 };

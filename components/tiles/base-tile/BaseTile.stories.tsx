@@ -24,8 +24,13 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import type { BaseTileProps } from "./BaseTile.types";
+
 import { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
 
 import WordSvgUrl from "../../../assets/icons/32/word.svg";
 import PdfSvgUrl from "../../../assets/icons/32/pdf.svg";
@@ -33,7 +38,6 @@ import SlideSvgUrl from "../../../assets/icons/32/slide.svg";
 import { Link } from "../../link";
 
 import { BaseTile } from ".";
-import { BaseTileProps } from "./BaseTile.types";
 import { TileContent } from "../tile-content";
 
 const wordElement = <WordSvgUrl />;
@@ -61,21 +65,75 @@ const meta = {
 	parameters: {
 		docs: {
 			description: {
-				component:
-					"Base tile component that serves as a foundation for file and room tiles",
+				component: `Base tile component that serves as a foundation for file, folder, and room tiles.
+
+### Features
+
+- **Selectable**: Supports checked/selected state with checkbox
+- **Active State**: Visual highlight for the currently active tile
+- **Progress State**: Built-in loading/progress indicator
+- **Hotkey Border**: Visual indicator for keyboard navigation
+- **Edit Mode**: Inline editing support
+- **Context Menu**: Right-click context menu integration
+- **Top & Bottom Content**: Flexible content slots for customization
+
+### Usage
+
+\`\`\`tsx
+import { BaseTile } from "@docspace/ui-kit/components/tiles/base-tile";
+import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+
+<BaseTile
+  item={{ id: "1", title: "Document.docx" }}
+  element={<WordIcon />}
+  contextOptions={options}
+  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  onSelect={handleSelect}
+/>
+\`\`\``,
 			},
 		},
 	},
 	argTypes: {
-		checked: { control: "boolean" },
-		isActive: { control: "boolean" },
-		inProgress: { control: "boolean" },
-		showHotkeyBorder: { control: "boolean" },
-		isEdit: { control: "boolean" },
+		checked: {
+			control: "boolean",
+			description: "Whether the tile is selected/checked",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		isActive: {
+			control: "boolean",
+			description: "Whether the tile is in active state",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		inProgress: {
+			control: "boolean",
+			description: "Whether the tile shows a loading/progress indicator",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		showHotkeyBorder: {
+			control: "boolean",
+			description: "Whether to display the hotkey navigation border",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		isEdit: {
+			control: "boolean",
+			description: "Whether the tile is in inline edit mode",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
 	},
 } satisfies Meta<typeof BaseTile>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof BaseTile>>;
 
 export default meta;
 
@@ -116,6 +174,16 @@ export const Default: Story = {
 			description: {
 				story: "Basic base tile with default configuration",
 			},
+			source: {
+				code: `<BaseTile
+  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  onSelect={handleSelect}
+  getContextModel={() => contextOptions}
+/>`,
+			},
 		},
 	},
 };
@@ -130,6 +198,16 @@ export const Checked: Story = {
 		docs: {
 			description: {
 				story: "Base tile in checked/selected state",
+			},
+			source: {
+				code: `<BaseTile
+  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  checked={true}
+  onSelect={handleSelect}
+/>`,
 			},
 		},
 	},
@@ -146,6 +224,15 @@ export const Active: Story = {
 			description: {
 				story: "Base tile in active state",
 			},
+			source: {
+				code: `<BaseTile
+  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  isActive={true}
+/>`,
+			},
 		},
 	},
 };
@@ -161,6 +248,15 @@ export const InProgress: Story = {
 			description: {
 				story: "Base tile showing progress/loading state",
 			},
+			source: {
+				code: `<BaseTile
+  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  inProgress={true}
+/>`,
+			},
 		},
 	},
 };
@@ -175,6 +271,15 @@ export const WithHotkeyBorder: Story = {
 		docs: {
 			description: {
 				story: "Base tile with hotkey border visible",
+			},
+			source: {
+				code: `<BaseTile
+  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  showHotkeyBorder={true}
+/>`,
 			},
 		},
 	},
@@ -199,6 +304,15 @@ export const WithBottomContent: Story = {
 		docs: {
 			description: {
 				story: "Base tile with both top and bottom content",
+			},
+			source: {
+				code: `<BaseTile
+  item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  topContent={<TileContent><Link>Document.docx</Link></TileContent>}
+  bottomContent={<div>Additional information</div>}
+/>`,
 			},
 		},
 	},

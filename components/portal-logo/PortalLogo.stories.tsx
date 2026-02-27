@@ -25,58 +25,100 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type { ComponentProps } from "react";
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { AccessRestricted } from "./AccessRestricted";
-import { setupErrorI18n } from "./stories.utils";
+import PortalLogo from "./PortalLogo";
 
 const meta = {
-  title: "UI/Feedback/AccessRestricted",
-  component: AccessRestricted,
+  title: "UI/Data display/PortalLogo",
+  component: PortalLogo,
   parameters: {
     docs: {
       description: {
-        component: `Access restricted error page. Displayed when the user's account is restricted from accessing the portal.
+        component: `Renders the portal logo with responsive behavior based on screen width and theme.
 
 ### Features
 
-- **Full-Page Display**: Renders a complete error page with animated SVG decorations
-- **Internationalized**: Uses translation keys for localized error messaging
-- **Consistent Styling**: Built on the ErrorContainer base component
-- **Access Restriction Notice**: Clearly communicates account restriction to the user
+- **Theme Aware**: Automatically selects light or dark logo variant
+- **Responsive**: Switches to a compact logo on mobile when resizable
+- **Error Handling**: Falls back to a default SVG logo if the image fails to load
 
 ### Usage
 
 \`\`\`tsx
-import { AccessRestricted } from "@docspace/ui-kit/errors";
+import PortalLogo from "@docspace/ui-kit/components/portal-logo";
 
-<AccessRestricted />
+// Basic portal logo
+<PortalLogo />
+
+// Resizable logo (adapts to mobile)
+<PortalLogo isResizable />
+
+// With custom class
+<PortalLogo className="custom-logo" isResizable />
 \`\`\``,
       },
     },
   },
-  decorators: [
-    (Story) => {
-      setupErrorI18n();
-      return <Story />;
+  argTypes: {
+    className: {
+      control: "text",
+      description: "Optional CSS class name applied to the logo",
     },
-  ],
-} satisfies Meta<typeof AccessRestricted>;
+    isResizable: {
+      control: "boolean",
+      description:
+        "Whether the logo resizes based on screen width (compact on mobile)",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+  },
+} satisfies Meta<typeof PortalLogo>;
 
-type Story = StoryObj<ComponentProps<typeof AccessRestricted>>;
+type Story = StoryObj<ComponentProps<typeof PortalLogo>>;
 
 export default meta;
 
 export const Default: Story = {
+  render: (args) => <PortalLogo {...args} />,
+  args: {
+    isResizable: false,
+  },
+};
+
+export const Resizable: Story = {
+  render: (args) => <PortalLogo {...args} />,
+  args: {
+    isResizable: true,
+  },
   parameters: {
     docs: {
       description: {
         story:
-          "Default access restricted error page with standard messaging.",
+          "Resizable logo that adapts to screen width. On mobile viewports, it switches to a compact logo displayed in a fixed header bar.",
       },
       source: {
-        code: `<AccessRestricted />`,
+        code: `<PortalLogo isResizable />`,
+      },
+    },
+  },
+};
+
+export const WithClassName: Story = {
+  render: (args) => <PortalLogo {...args} />,
+  args: {
+    className: "custom-logo-class",
+    isResizable: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Portal logo with a custom CSS class applied for additional styling.",
+      },
+      source: {
+        code: `<PortalLogo className="custom-logo-class" />`,
       },
     },
   },

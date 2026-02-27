@@ -24,7 +24,9 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { TableHeaderCell } from "./TableHeaderCell";
 import { SortByFieldName } from "../../../../enums";
 
@@ -34,8 +36,36 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "TableHeaderCell component for displaying column headers in tables",
+        component: `TableHeaderCell renders a single column header with sorting and resizing capabilities.
+
+### Features
+
+- **Sorting Indicator**: Displays an arrow icon when the column is the active sort field
+- **Resizable**: Drag handle for adjusting column width
+- **Checkbox Column**: Optional checkbox for row selection in the header
+- **Short Column Mode**: Compact layout for narrow columns like index numbers
+
+### Usage
+
+\`\`\`tsx
+import { TableHeaderCell } from "@docspace/ui-kit/components/table/sub-components/table-header-cell";
+
+<TableHeaderCell
+  column={{
+    key: "name",
+    title: "Name",
+    enable: true,
+    sortBy: SortByFieldName.Name,
+    resizable: true,
+  }}
+  index={0}
+  sortBy={SortByFieldName.Name}
+  sorted
+  sortingVisible
+  resizable
+  onMouseDown={handleResize}
+/>
+\`\`\``,
       },
     },
   },
@@ -46,6 +76,32 @@ const meta = {
     sortBy: {
       control: "select",
       options: [SortByFieldName.Name, SortByFieldName.Author],
+      description: "Current sort field for the table",
+    },
+    sorted: {
+      control: "boolean",
+      description: "Whether the table is currently sorted",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    sortingVisible: {
+      control: "boolean",
+      description: "Whether sorting indicators are visible on hover",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    resizable: {
+      control: "boolean",
+      description: "Whether the column can be resized by dragging",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    index: {
+      control: "number",
+      description: "Column index position in the header",
     },
   },
 
@@ -60,10 +116,12 @@ const meta = {
   ],
 } satisfies Meta<typeof TableHeaderCell>;
 
+type Story = StoryObj<ComponentProps<typeof TableHeaderCell>>;
+
 export default meta;
-type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
+  render: (args) => <TableHeaderCell {...args} />,
   args: {
     column: {
       key: "name",
@@ -81,18 +139,97 @@ export const Default: Story = {
     sorted: true,
     sortingVisible: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default header cell for a non-resizable column. Sorting is visible but the column is not the current sort field.",
+      },
+      source: {
+        code: `<TableHeaderCell
+  column={{
+    key: "name",
+    title: "Name",
+    enable: true,
+    sortBy: SortByFieldName.Name,
+    minWidth: 200,
+    resizable: false,
+    onClick: handleClick,
+  }}
+  index={0}
+  sortBy={SortByFieldName.Author}
+  sorted
+  sortingVisible
+/>`,
+      },
+    },
+  },
 };
 
 export const Resizable: Story = {
+  render: (args) => <TableHeaderCell {...args} />,
   args: {
     ...Default.args,
     column: { ...Default.args?.column, resizable: true },
     resizable: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Resizable header cell with a drag handle for adjusting column width.",
+      },
+      source: {
+        code: `<TableHeaderCell
+  column={{
+    key: "name",
+    title: "Name",
+    enable: true,
+    sortBy: SortByFieldName.Name,
+    minWidth: 200,
+    resizable: true,
+    onClick: handleClick,
+  }}
+  index={0}
+  sortBy={SortByFieldName.Author}
+  sorted
+  sortingVisible
+  resizable
+  onMouseDown={handleResize}
+/>`,
+      },
+    },
+  },
 };
 
 export const SortedByThisColumn: Story = {
+  render: (args) => <TableHeaderCell {...args} />,
   args: { ...Default.args, sortBy: SortByFieldName.Name },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Header cell where the current sort field matches this column, showing an active sort indicator.",
+      },
+      source: {
+        code: `<TableHeaderCell
+  column={{
+    key: "name",
+    title: "Name",
+    enable: true,
+    sortBy: SortByFieldName.Name,
+    minWidth: 200,
+    resizable: false,
+    onClick: handleClick,
+  }}
+  index={0}
+  sortBy={SortByFieldName.Name}
+  sorted
+  sortingVisible
+/>`,
+      },
+    },
+  },
 };
 
 export const WithoutSorting: Story = {
@@ -105,6 +242,23 @@ export const WithoutSorting: Story = {
   args: {
     ...Default.args,
     sortingVisible: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Header cell with sorting indicators hidden. No sort icon appears on hover.",
+      },
+      source: {
+        code: `<TableHeaderCell
+  column={column}
+  index={0}
+  sortBy={SortByFieldName.Author}
+  sorted
+  sortingVisible={false}
+/>`,
+      },
+    },
   },
 };
 
@@ -130,9 +284,34 @@ export const WithUncheckedCheckbox: Story = {
       },
     },
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Header cell with an unchecked checkbox. The checkbox is visually hidden when not checked.",
+      },
+      source: {
+        code: `<TableHeaderCell
+  column={{
+    key: "checkbox",
+    title: "Select",
+    enable: true,
+    minWidth: 100,
+    resizable: false,
+    checkbox: { value: false, isIndeterminate: false, onChange: handleChange },
+  }}
+  index={0}
+  sortBy={SortByFieldName.Author}
+  sorted
+  sortingVisible
+/>`,
+      },
+    },
+  },
 };
 
 export const WithCheckedCheckbox: Story = {
+  render: (args) => <TableHeaderCell {...args} />,
   args: {
     ...Default.args,
     column: {
@@ -148,9 +327,34 @@ export const WithCheckedCheckbox: Story = {
       },
     },
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Header cell with a checked checkbox, indicating all rows are selected.",
+      },
+      source: {
+        code: `<TableHeaderCell
+  column={{
+    key: "checkbox",
+    title: "Select",
+    enable: true,
+    minWidth: 100,
+    resizable: false,
+    checkbox: { value: true, isIndeterminate: false, onChange: handleChange },
+  }}
+  index={0}
+  sortBy={SortByFieldName.Author}
+  sorted
+  sortingVisible
+/>`,
+      },
+    },
+  },
 };
 
 export const WithIndeterminateCheckbox: Story = {
+  render: (args) => <TableHeaderCell {...args} />,
   args: {
     ...Default.args,
     column: {
@@ -163,6 +367,30 @@ export const WithIndeterminateCheckbox: Story = {
         value: true,
         isIndeterminate: true,
         onChange: () => {},
+      },
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Header cell with an indeterminate checkbox, indicating partial row selection.",
+      },
+      source: {
+        code: `<TableHeaderCell
+  column={{
+    key: "checkbox",
+    title: "Select",
+    enable: true,
+    minWidth: 100,
+    resizable: false,
+    checkbox: { value: true, isIndeterminate: true, onChange: handleChange },
+  }}
+  index={0}
+  sortBy={SortByFieldName.Author}
+  sorted
+  sortingVisible
+/>`,
       },
     },
   },
@@ -186,6 +414,32 @@ export const ShortColumn: Story = {
       title: "#",
       resizable: false,
       isShort: true,
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Short column header with a compact layout. The gap between the title and resize handle is reduced to 12px.",
+      },
+      source: {
+        code: `<TableHeaderCell
+  column={{
+    key: "name",
+    title: "#",
+    enable: true,
+    sortBy: SortByFieldName.Name,
+    minWidth: 200,
+    resizable: false,
+    isShort: true,
+  }}
+  index={0}
+  sortBy={SortByFieldName.Author}
+  sorted
+  sortingVisible={false}
+  resizable
+/>`,
+      },
     },
   },
 };

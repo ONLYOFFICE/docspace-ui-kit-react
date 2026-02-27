@@ -24,8 +24,11 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Meta, StoryObj } from "@storybook/react-vite";
-import { LinkWithDropdown } from "./LinkWithDropdown";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import { LinkWithDropdown } from ".";
 
 const meta = {
   title: "UI/Interactive elements/LinkWithDropdown",
@@ -33,107 +36,83 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `
-A dropdown component that appears as a link and expands to show a menu of options.
+        component: `A link component that expands to show a dropdown menu of options.
 
-## Features
-- Customizable text styles (font size, weight, color)
-- Optional expander icon
-- Support for disabled state
-- Theme support (light/dark)
-- Keyboard navigation
-- ARIA attributes for accessibility
-`,
+### Features
+
+- **Dashed Underline**: Configurable underline style (always or on hover)
+- **Custom Text Styles**: Configurable font size, weight, and color
+- **Expander Icon**: Optional arrow icon indicator
+- **Disabled State**: Non-interactive state with dimmed appearance
+- **Semitransparent Mode**: Reduced opacity style variant
+- **Custom Width**: Manual dropdown width control
+- **Direction Control**: Vertical dropdown direction (top/bottom)
+
+### Accessibility
+
+- \`aria-expanded\`: Indicates dropdown open state
+- \`aria-haspopup\`: Indicates popup menu presence
+- Keyboard navigation support
+
+### Usage
+
+\`\`\`tsx
+import { LinkWithDropdown } from "@docspace/ui-kit/components/link-with-dropdown";
+
+<LinkWithDropdown
+  data={[
+    { key: "1", label: "Option 1", onClick: handleClick },
+    { key: "2", label: "Option 2", onClick: handleClick },
+  ]}
+>
+  Click me
+</LinkWithDropdown>
+\`\`\``,
       },
     },
   },
   argTypes: {
     children: {
       control: "text",
-      description:
-        "Content to be displayed as the link text. Can be a string or React nodes",
-      table: {
-        type: { summary: "ReactNode" },
-        defaultValue: { summary: "undefined" },
-      },
+      description: "Content displayed as the link text",
     },
     data: {
       control: "object",
-      description:
-        "Array of dropdown items. Each item should have: `key` (required), `label` (string), `onClick` (function), and optionally `isSeparator` (boolean)",
+      description: "Array of dropdown items with key, label, onClick, and optional isSeparator",
+    },
+    fontSize: {
+      control: "text",
+      description: "Font size of the link text",
       table: {
-        type: {
-          summary:
-            "Array<{ key: string; label?: string; onClick?: () => void; isSeparator?: boolean; }>",
-        },
-        defaultValue: { summary: "[]" },
+        defaultValue: { summary: "13px" },
       },
     },
     fontWeight: {
       control: "text",
-      description:
-        "CSS font-weight value. Can be a number (400, 500, etc.) or string (normal, bold, etc.). Used in conjunction with or instead of isBold",
-      table: {
-        type: { summary: "number | string" },
-        defaultValue: { summary: "undefined" },
-      },
+      description: "CSS font-weight value (number or string)",
     },
     isBold: {
       control: "boolean",
-      description:
-        "Quick way to make text bold (equivalent to fontWeight: 'bold'). Takes precedence over fontWeight if both are specified",
+      description: "Quick way to make text bold",
       table: {
-        type: { summary: "boolean" },
-        defaultValue: { summary: "false" },
-      },
-    },
-    isTextOverflow: {
-      control: "boolean",
-      description:
-        "When true, long text will be truncated with ellipsis (...). Useful for fixed-width containers",
-      table: {
-        type: { summary: "boolean" },
         defaultValue: { summary: "false" },
       },
     },
     color: {
       control: "color",
       description: "Text color of the link",
-      table: {
-        type: { summary: "string" },
-        defaultValue: { summary: "theme.color" },
-      },
-    },
-    dropdownType: {
-      control: "select",
-      options: ["alwaysDashed", "appearDashedAfterHover"],
-      description: "Determines when the dashed underline appears",
-      table: {
-        type: { summary: "string" },
-        defaultValue: { summary: "alwaysDashed" },
-      },
-    },
-    fontSize: {
-      control: "text",
-      description: "Font size of the link text",
-      table: {
-        type: { summary: "string" },
-        defaultValue: { summary: "13px" },
-      },
     },
     isDisabled: {
       control: "boolean",
       description: "Disables the dropdown functionality",
       table: {
-        type: { summary: "boolean" },
         defaultValue: { summary: "false" },
       },
     },
     withExpander: {
       control: "boolean",
-      description: "Shows/hides the expander icon",
+      description: "Shows/hides the expander arrow icon",
       table: {
-        type: { summary: "boolean" },
         defaultValue: { summary: "false" },
       },
     },
@@ -141,38 +120,44 @@ A dropdown component that appears as a link and expands to show a menu of option
       control: "boolean",
       description: "Makes the link semi-transparent",
       table: {
-        type: { summary: "boolean" },
         defaultValue: { summary: "false" },
+      },
+    },
+    isTextOverflow: {
+      control: "boolean",
+      description: "Truncates long text with ellipsis",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    dropdownType: {
+      control: "select",
+      options: ["alwaysDashed", "appearDashedAfterHover"],
+      description: "Determines when the dashed underline appears",
+      table: {
+        defaultValue: { summary: "alwaysDashed" },
       },
     },
     manualWidth: {
       control: "text",
-      description:
-        "Sets a custom width for the dropdown menu. If not provided, the width is automatically calculated based on the content width plus padding",
+      description: "Sets a custom width for the dropdown menu",
+    },
+    directionY: {
+      control: "select",
+      options: ["top", "bottom"],
+      description: "Sets the vertical direction of the dropdown",
       table: {
-        type: { summary: "string" },
-        defaultValue: { summary: "undefined" },
+        defaultValue: { summary: "bottom" },
       },
     },
     fixedDirection: {
       control: "boolean",
       description: "Fixes the direction of the dropdown menu",
       table: {
-        type: { summary: "boolean" },
         defaultValue: { summary: "false" },
       },
     },
-    directionY: {
-      control: "select",
-      options: ["top", "bottom"],
-      description: "Sets the direction of the dropdown menu",
-      table: {
-        type: { summary: "string" },
-        defaultValue: { summary: "bottom" },
-      },
-    },
   },
-  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <div style={{ padding: "20px", marginBottom: "200px" }}>
@@ -182,7 +167,7 @@ A dropdown component that appears as a link and expands to show a menu of option
   ],
 } satisfies Meta<typeof LinkWithDropdown>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof LinkWithDropdown>>;
 
 export default meta;
 
@@ -209,6 +194,7 @@ const dropdownItems = [
 ];
 
 export const Default: Story = {
+  render: (args) => <LinkWithDropdown {...args} />,
   args: {
     children: "Default Link",
     data: dropdownItems,
@@ -223,75 +209,149 @@ export const Default: Story = {
   },
 };
 
+const WithExpanderTemplate = () => {
+  return (
+    <LinkWithDropdown
+      data={dropdownItems}
+      fontSize="13px"
+      withExpander
+      directionY="bottom"
+      fixedDirection
+      isDefaultMode={false}
+    >
+      Link with Expander
+    </LinkWithDropdown>
+  );
+};
+
 export const WithExpander: Story = {
-  args: {
-    children: "Link with Expander",
-    data: dropdownItems,
-    fontSize: "13px",
-    fontWeight: 400,
-    isBold: false,
-    isTextOverflow: false,
-    isSemitransparent: false,
-    withExpander: true,
-    directionY: "bottom",
-    fixedDirection: true,
-    isDefaultMode: false,
+  render: () => <WithExpanderTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Link with an expander arrow icon that indicates the presence of a dropdown menu.",
+      },
+      source: {
+        code: `<LinkWithDropdown data={items} withExpander>Link with Expander</LinkWithDropdown>`,
+      },
+    },
   },
+};
+
+const CustomStylingTemplate = () => {
+  return (
+    <LinkWithDropdown
+      data={dropdownItems}
+      fontSize="16px"
+      fontWeight={600}
+      isBold
+      color="#4781d1"
+      directionY="bottom"
+      fixedDirection
+      isDefaultMode={false}
+    >
+      Custom Styled Link
+    </LinkWithDropdown>
+  );
 };
 
 export const CustomStyling: Story = {
-  args: {
-    children: "Custom Styled Link",
-    data: dropdownItems,
-    fontSize: "16px",
-    fontWeight: 600,
-    isBold: true,
-    color: "#4781d1",
-    directionY: "bottom",
-    fixedDirection: true,
-    isDefaultMode: false,
+  render: () => <CustomStylingTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Link with custom font size, weight, and color for styled appearance.",
+      },
+      source: {
+        code: `<LinkWithDropdown data={items} fontSize="16px" fontWeight={600} isBold color="#4781d1">
+  Custom Styled Link
+</LinkWithDropdown>`,
+      },
+    },
   },
+};
+
+const DisabledTemplate = () => {
+  return (
+    <LinkWithDropdown data={dropdownItems} fontSize="13px" isDisabled>
+      Disabled Link
+    </LinkWithDropdown>
+  );
 };
 
 export const Disabled: Story = {
-  args: {
-    children: "Disabled Link",
-    data: dropdownItems,
-    fontSize: "13px",
-    fontWeight: 400,
-    isBold: false,
-    isTextOverflow: false,
-    isSemitransparent: false,
-    isDisabled: true,
+  render: () => <DisabledTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Disabled link that cannot open the dropdown. Appears dimmed to indicate non-interactive state.",
+      },
+      source: {
+        code: `<LinkWithDropdown data={items} isDisabled>Disabled Link</LinkWithDropdown>`,
+      },
+    },
   },
+};
+
+const SemiTransparentTemplate = () => {
+  return (
+    <LinkWithDropdown
+      data={dropdownItems}
+      fontSize="13px"
+      isSemitransparent
+      directionY="bottom"
+      fixedDirection
+      isDefaultMode={false}
+    >
+      Semi-transparent Link
+    </LinkWithDropdown>
+  );
 };
 
 export const SemiTransparent: Story = {
-  args: {
-    children: "Semi-transparent Link",
-    data: dropdownItems,
-    fontSize: "13px",
-    fontWeight: 400,
-    isBold: false,
-    isTextOverflow: false,
-    isSemitransparent: true,
-    directionY: "bottom",
-    fixedDirection: true,
-    isDefaultMode: false,
+  render: () => <SemiTransparentTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Link with reduced opacity for a subtle, secondary appearance.",
+      },
+      source: {
+        code: `<LinkWithDropdown data={items} isSemitransparent>Semi-transparent Link</LinkWithDropdown>`,
+      },
+    },
   },
 };
 
+const WithCustomWidthTemplate = () => {
+  return (
+    <LinkWithDropdown
+      data={dropdownItems}
+      fontSize="13px"
+      manualWidth="300px"
+      directionY="bottom"
+      fixedDirection
+      isDefaultMode={false}
+    >
+      Custom Width Link
+    </LinkWithDropdown>
+  );
+};
+
 export const WithCustomWidth: Story = {
-  args: {
-    children: "Custom Width Link",
-    data: dropdownItems,
-    fontSize: "13px",
-    fontWeight: 400,
-    isBold: false,
-    isTextOverflow: false,
-    manualWidth: "300px",
-    directionY: "bottom",
-    fixedDirection: true,
-    isDefaultMode: false,
+  render: () => <WithCustomWidthTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Link with a manually set dropdown width for controlling the menu size.",
+      },
+      source: {
+        code: `<LinkWithDropdown data={items} manualWidth="300px">Custom Width Link</LinkWithDropdown>`,
+      },
+    },
   },
 };

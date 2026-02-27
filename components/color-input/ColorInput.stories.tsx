@@ -24,13 +24,15 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type React from "react";
+import type { ComponentProps } from "react";
 
-import { ColorInput } from "./ColorInput";
-import { ColorInputProps } from "./ColorInput.types";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { InputSize } from "../text-input";
 import { globalColors } from "../../providers/theme";
+
+import { ColorInput } from ".";
 
 const meta = {
   title: "UI/Interactive elements/ColorInput",
@@ -38,57 +40,102 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "A color input component that allows users to enter and select colors using a hex value or color picker.",
+        component: `Color input component that allows users to enter and select colors using a hex value or integrated color picker.
+
+### Features
+
+- **Hex Input**: Enter color values directly as hex codes
+- **Color Picker**: Built-in color picker for visual selection
+- **Three Sizes**: base, middle, and large
+- **Validation States**: Error and warning visual indicators
+- **Full Width**: Scale to 100% width when needed
+
+### Usage
+
+\`\`\`tsx
+import { ColorInput } from "@docspace/ui-kit/components/color-input";
+
+<ColorInput
+  defaultColor="#4781D1"
+  handleChange={(color) => console.log(color)}
+/>
+\`\`\``,
       },
     },
   },
   argTypes: {
     defaultColor: {
       control: "color",
-      description: "Initial color value",
+      description: "Initial color value in hex format",
     },
     size: {
       control: "select",
       options: Object.values(InputSize),
       description: "Size of the input field",
+      table: {
+        defaultValue: { summary: "base" },
+      },
     },
     scale: {
       control: "boolean",
-      description: "Whether the input field has scale",
+      description: "Scale input to 100% width",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disables the input field",
+      description: "Disable the input field",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     hasError: {
       control: "boolean",
-      description: "Shows error state",
+      description: "Show error state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     hasWarning: {
       control: "boolean",
-      description: "Shows warning state",
+      description: "Show warning state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     handleChange: {
-      description: "Callback when color changes",
+      description: "Callback when the color value changes",
     },
   },
 } satisfies Meta<typeof ColorInput>;
 
-type Story = StoryObj<typeof ColorInput>;
+type Story = StoryObj<ComponentProps<typeof ColorInput>>;
 
 export default meta;
 
-const Template = ({ ...args }: ColorInputProps) => {
+const Wrapper = (props: { children: React.ReactNode }) => {
   return (
-    <div style={{ height: "410px" }}>
-      <ColorInput {...args} />
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+        gridGap: "16px",
+        alignItems: "start",
+        minHeight: "420px",
+      }}
+    >
+      {props.children}
     </div>
   );
 };
 
 export const Default: Story = {
-  render: (args) => <Template {...args} />,
+  render: (args) => (
+    <div style={{ height: "410px" }}>
+      <ColorInput {...args} />
+    </div>
+  ),
   args: {
     defaultColor: globalColors.lightBlueMain,
     handleChange: (color) => console.log("Color changed:", color),
@@ -100,56 +147,107 @@ export const Default: Story = {
   },
 };
 
-export const WithScale: Story = {
-  args: {
-    ...Default.args,
-    scale: true,
-  },
-  render: (args) => <Template {...args} />,
-};
-
-export const Disabled: Story = {
-  args: {
-    ...Default.args,
-    isDisabled: true,
-  },
-  render: (args) => <Template {...args} />,
-};
-
-export const WithError: Story = {
-  args: {
-    ...Default.args,
-    hasError: true,
-  },
-  render: (args) => <Template {...args} />,
-};
-
-export const WithWarning: Story = {
-  args: {
-    ...Default.args,
-    hasWarning: true,
-  },
-  render: (args) => <Template {...args} />,
-};
-
-export const DifferentSizes: Story = {
-  render: () => (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "1rem",
-        height: "600px",
-      }}
-    >
-      {Object.values(InputSize).map((size) => (
+const SizesTemplate = () => {
+  return (
+    <Wrapper>
+      {(Object.values(InputSize) as Array<InputSize>).map((size) => (
         <ColorInput
           key={size}
           defaultColor={globalColors.lightBlueMain}
           size={size}
-          handleChange={(color) => console.log(`${size} color changed:`, color)}
+          handleChange={(color) =>
+            console.log(`${size} color changed:`, color)
+          }
         />
       ))}
+    </Wrapper>
+  );
+};
+
+export const Sizes: Story = {
+  render: () => <SizesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "ColorInput supports three sizes: base, middle, and large for different UI contexts.",
+      },
+      source: {
+        code: `<ColorInput size={InputSize.base} defaultColor="#4781D1" />
+<ColorInput size={InputSize.middle} defaultColor="#4781D1" />
+<ColorInput size={InputSize.large} defaultColor="#4781D1" />`,
+      },
+    },
+  },
+};
+
+const StatesTemplate = () => {
+  return (
+    <Wrapper>
+      <ColorInput
+        defaultColor={globalColors.lightBlueMain}
+        handleChange={() => {}}
+      />
+      <ColorInput
+        defaultColor={globalColors.lightBlueMain}
+        hasError
+        handleChange={() => {}}
+      />
+      <ColorInput
+        defaultColor={globalColors.lightBlueMain}
+        hasWarning
+        handleChange={() => {}}
+      />
+      <ColorInput
+        defaultColor={globalColors.lightBlueMain}
+        isDisabled
+        handleChange={() => {}}
+      />
+    </Wrapper>
+  );
+};
+
+export const States: Story = {
+  render: () => <StatesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "ColorInput supports normal, error, warning, and disabled states.",
+      },
+      source: {
+        code: `<ColorInput defaultColor="#4781D1" />
+<ColorInput defaultColor="#4781D1" hasError />
+<ColorInput defaultColor="#4781D1" hasWarning />
+<ColorInput defaultColor="#4781D1" isDisabled />`,
+      },
+    },
+  },
+};
+
+const ScaledTemplate = () => {
+  return (
+    <div style={{ height: "410px" }}>
+      <ColorInput
+        defaultColor={globalColors.lightBlueMain}
+        scale
+        handleChange={(color) => console.log("Color changed:", color)}
+      />
     </div>
-  ),
+  );
+};
+
+export const ScaledInput: Story = {
+  render: () => <ScaledTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scale prop makes the color input expand to 100% of its container width.",
+      },
+      source: {
+        code: `<ColorInput defaultColor="#4781D1" scale />`,
+      },
+    },
+  },
 };

@@ -24,58 +24,84 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
+
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { DateTime } from "luxon";
 
-import { Calendar } from "./Calendar";
-import { CalendarProps } from "./Calendar.types";
 import { now } from "../../utils/date";
 
+import { Calendar } from ".";
+
+const locales = [
+  "az",
+  "ar-SA",
+  "zh-cn",
+  "cs",
+  "nl",
+  "en-gb",
+  "en",
+  "fi",
+  "fr",
+  "de",
+  "de-ch",
+  "el",
+  "it",
+  "ja",
+  "ko",
+  "lv",
+  "pl",
+  "pt",
+  "pt-br",
+  "ru",
+  "sk",
+  "sl",
+  "es",
+  "tr",
+  "uk",
+  "vi",
+];
+
 const meta = {
-  title: "UI/Form controls/Calendar",
+  title: "UI/Interactive elements/Calendar",
   component: Calendar,
-  argTypes: {
-    maxDate: { control: "date" },
-    minDate: { control: "date" },
-    initialDate: { control: "date" },
-    locale: {
-      type: "string",
-      options: [
-        "az",
-        "ar-SA",
-        "zh-cn",
-        "cs",
-        "nl",
-        "en-gb",
-        "en",
-        "fi",
-        "fr",
-        "de",
-        "de-ch",
-        "el",
-        "it",
-        "ja",
-        "ko",
-        "lv",
-        "pl",
-        "pt",
-        "pt-br",
-        "ru",
-        "sk",
-        "sl",
-        "es",
-        "tr",
-        "uk",
-        "vi",
-      ],
-    },
-    onChange: { action: "onChange" },
-  },
   parameters: {
     docs: {
       description: {
-        component: "Used to display custom calendar",
+        component: `Calendar component for selecting dates. Displays a monthly view with navigation between months and years.
+
+### Features
+
+- **Date Selection**: Click to select a specific date
+- **Month/Year Navigation**: Browse through months and years
+- **Locale Support**: Supports 25+ locales for date formatting and weekday names
+- **Date Range Constraints**: Configurable min/max date boundaries
+- **Initial Date**: Set the initially visible month/year
+- **Custom Styling**: Accepts className and inline styles
+
+### Usage
+
+\`\`\`tsx
+import { Calendar } from "@docspace/ui-kit/components/calendar";
+
+// Basic usage
+<Calendar
+  locale="en"
+  selectedDate={selectedDate}
+  setSelectedDate={setSelectedDate}
+/>
+
+// With date constraints
+<Calendar
+  locale="en"
+  selectedDate={selectedDate}
+  setSelectedDate={setSelectedDate}
+  minDate={new Date("2024/01/01")}
+  maxDate={new Date("2030/01/01")}
+/>
+\`\`\``,
       },
     },
     design: {
@@ -83,31 +109,180 @@ const meta = {
       url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=651-4406&mode=design&t=RrB9MOQGCnUPghij-0",
     },
   },
+  argTypes: {
+    locale: {
+      control: "select",
+      options: locales,
+      description: "Specifies the calendar locale",
+      table: {
+        defaultValue: { summary: "en" },
+      },
+    },
+    minDate: {
+      control: "date",
+      description: "Specifies the minimum selectable date",
+    },
+    maxDate: {
+      control: "date",
+      description: "Specifies the maximum selectable date",
+    },
+    initialDate: {
+      control: "date",
+      description: "First shown date when the calendar opens",
+    },
+    isMobile: {
+      control: "boolean",
+      description: "Enables mobile-optimized layout",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    className: {
+      control: "text",
+      description: "Additional CSS class for the calendar container",
+    },
+    onChange: {
+      action: "onChange",
+      description: "Callback function called when the selected date changes",
+    },
+  },
 } satisfies Meta<typeof Calendar>;
-type Story = StoryObj<typeof Calendar>;
+
+type Story = StoryObj<ComponentProps<typeof Calendar>>;
 
 export default meta;
 
-const Template = ({ locale, minDate, maxDate, ...args }: CalendarProps) => {
+const InteractiveCalendar = ({
+  locale,
+  minDate,
+  maxDate,
+  initialDate,
+  isMobile,
+  className,
+  id,
+}: {
+  locale: string;
+  minDate?: DateTime | Date;
+  maxDate?: DateTime | Date;
+  initialDate?: DateTime | Date;
+  isMobile?: boolean;
+  className?: string;
+  id?: string;
+}) => {
   const [selectedDate, setSelectedDate] = useState<DateTime>(now());
   return (
     <Calendar
-      {...args}
+      locale={locale}
       selectedDate={selectedDate}
       setSelectedDate={setSelectedDate}
       minDate={minDate}
       maxDate={maxDate}
-      locale={locale}
+      initialDate={initialDate}
+      isMobile={isMobile}
+      className={className}
+      id={id}
     />
   );
 };
 
 export const Default: Story = {
-  render: (args) => <Template {...args} />,
+  render: (args) => <InteractiveCalendar {...args} />,
   args: {
     locale: "en",
     maxDate: new Date(`${new Date().getFullYear() + 10}/01/01`),
     minDate: new Date("1970/01/01"),
     initialDate: new Date(),
+  },
+};
+
+const WithDateConstraintsTemplate = () => {
+  const [selectedDate, setSelectedDate] = useState<DateTime>(now());
+  const currentYear = new Date().getFullYear();
+  return (
+    <Calendar
+      locale="en"
+      selectedDate={selectedDate}
+      setSelectedDate={setSelectedDate}
+      minDate={new Date(`${currentYear}/01/01`)}
+      maxDate={new Date(`${currentYear}/12/31`)}
+    />
+  );
+};
+
+export const WithDateConstraints: Story = {
+  render: () => <WithDateConstraintsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Calendar with min and max date constraints. Only dates within the current year are selectable.",
+      },
+      source: {
+        code: `<Calendar
+  locale="en"
+  selectedDate={selectedDate}
+  setSelectedDate={setSelectedDate}
+  minDate={new Date("2026/01/01")}
+  maxDate={new Date("2026/12/31")}
+/>`,
+      },
+    },
+  },
+};
+
+const LocaleCalendarItem = ({ locale }: { locale: string }) => {
+  const [selectedDate, setSelectedDate] = useState<DateTime>(now());
+  return (
+    <div>
+      <div
+        style={{
+          marginBottom: "8px",
+          fontWeight: "bold",
+          textAlign: "center",
+        }}
+      >
+        {locale}
+      </div>
+      <Calendar
+        locale={locale}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
+    </div>
+  );
+};
+
+const LocaleExamplesTemplate = () => {
+  const sampleLocales = ["en", "ru", "de", "ja"];
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(2, 1fr)",
+        gridGap: "24px",
+      }}
+    >
+      {sampleLocales.map((locale) => (
+        <LocaleCalendarItem key={locale} locale={locale} />
+      ))}
+    </div>
+  );
+};
+
+export const LocaleExamples: Story = {
+  render: () => <LocaleExamplesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Calendar rendered in different locales. Shows how month names, weekday headers, and date formatting adapt to each locale.",
+      },
+      source: {
+        code: `<Calendar locale="en" selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+<Calendar locale="ru" selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+<Calendar locale="de" selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+<Calendar locale="ja" selectedDate={selectedDate} setSelectedDate={setSelectedDate} />`,
+      },
+    },
   },
 };

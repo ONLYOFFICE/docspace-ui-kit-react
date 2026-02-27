@@ -24,12 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { StoryObj, Meta } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { DateTime } from "luxon";
 
-import { DateTimePicker, DateTimePickerProps } from ".";
-import type { DateTimePickerTranslations } from ".";
 import { now } from "../../utils/date";
+
+import { DateTimePicker } from ".";
 
 const locales = [
   "az",
@@ -61,9 +63,65 @@ const locales = [
 ];
 
 const meta = {
-  title: "UI/Form controls/DateTimePicker",
+  title: "UI/Interactive elements/DateTimePicker",
   component: DateTimePicker,
+  parameters: {
+    docs: {
+      description: {
+        component: `Combined date and time input component that allows users to select both date and time values.
+
+### Features
+
+- **Calendar Date Selection**: Integrated calendar for picking dates
+- **Time Input**: Built-in time picker with validation
+- **Locale Support**: Supports 25+ locales for date/time formatting
+- **Date Range Constraints**: Configurable min/max date boundaries
+- **Error State**: Visual error indicator for validation
+- **AM/PM Support**: Configurable 12-hour time format translations
+
+### Usage
+
+\`\`\`tsx
+import { DateTimePicker } from "@docspace/ui-kit/components/date-time-picker";
+
+// Basic usage
+<DateTimePicker
+  locale="en"
+  openDate={new Date()}
+  selectDateText="Select date"
+  onChange={(date) => console.log(date)}
+/>
+
+// With date constraints
+<DateTimePicker
+  locale="en"
+  openDate={new Date()}
+  minDate={new Date("2024/01/01")}
+  maxDate={new Date("2030/01/01")}
+  selectDateText="Select date"
+  onChange={(date) => console.log(date)}
+/>
+\`\`\``,
+      },
+    },
+  },
   argTypes: {
+    locale: {
+      control: "select",
+      options: locales,
+      description:
+        "Locale for date and time formatting (affects calendar and time display)",
+      table: {
+        defaultValue: { summary: "en" },
+      },
+    },
+    hasError: {
+      control: "boolean",
+      description: "Indicates if the picker is in an error state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
     minDate: {
       control: "date",
       description: "Minimum selectable date and time",
@@ -80,53 +138,43 @@ const meta = {
       control: "date",
       description: "Date to display when the calendar initially opens",
     },
-    onChange: {
-      action: "onChange",
-      description:
-        "Callback function called when the selected date/time changes. Receives a Moment object or null",
-    },
-    locale: {
-      control: "select",
-      options: locales,
-      description:
-        "Locale for date and time formatting (affects calendar and time display)",
-    },
-    hasError: {
-      control: "boolean",
-      description: "Indicates if the picker is in an error state",
+    selectDateText: {
+      control: "text",
+      description: "Placeholder text shown before a date is selected",
     },
     className: {
       control: "text",
       description: "Additional CSS class for the date-time picker container",
     },
-  },
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "Combined date and time input component that allows users to select both date and time values. Provides calendar for date selection and time input with validation.",
+    hideCross: {
+      control: "boolean",
+      description: "Hides the clear (cross) button",
+      table: {
+        defaultValue: { summary: "false" },
       },
+    },
+    onChange: {
+      action: "onChange",
+      description:
+        "Callback function called when the selected date/time changes",
     },
   },
 } satisfies Meta<typeof DateTimePicker>;
-type Story = StoryObj<typeof DateTimePicker>;
+
+type Story = StoryObj<ComponentProps<typeof DateTimePicker>>;
 
 export default meta;
 
-type StoryProps = DateTimePickerProps & {
-  translations: DateTimePickerTranslations;
-};
-
-const Template = (args: StoryProps) => {
-  return (
-    <div style={{ height: "500px" }}>
-      <DateTimePicker {...args} />
-    </div>
-  );
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return <div style={{ height: "500px" }}>{props.children}</div>;
 };
 
 export const Default: Story = {
-  render: Template,
+  render: (args) => (
+    <Wrapper>
+      <DateTimePicker {...args} />
+    </Wrapper>
+  ),
   args: {
     locale: "en",
     maxDate: new Date(`${new Date().getFullYear() + 10}/01/01`),
@@ -139,5 +187,129 @@ export const Default: Story = {
     onChange: (date: null | DateTime) =>
       console.log("Date changed:", date),
     translations: { AM: "AM", PM: "PM" },
+  },
+};
+
+const WithErrorTemplate = () => {
+  return (
+    <Wrapper>
+      <DateTimePicker
+        locale="en"
+        maxDate={new Date(`${new Date().getFullYear() + 10}/01/01`)}
+        minDate={new Date("1970/01/01")}
+        openDate={now()}
+        selectDateText="Select date"
+        className="date-time-picker"
+        id="error-date-time-picker"
+        hasError
+        onChange={(date) => console.log("Date changed:", date)}
+        translations={{ AM: "AM", PM: "PM" }}
+      />
+    </Wrapper>
+  );
+};
+
+export const WithError: Story = {
+  render: () => <WithErrorTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "DateTimePicker in an error state. The input field displays a visual error indicator.",
+      },
+      source: {
+        code: `<DateTimePicker
+  locale="en"
+  openDate={now()}
+  selectDateText="Select date"
+  hasError
+  onChange={(date) => console.log(date)}
+/>`,
+      },
+    },
+  },
+};
+
+const WithInitialDateTemplate = () => {
+  return (
+    <Wrapper>
+      <DateTimePicker
+        locale="en"
+        maxDate={new Date(`${new Date().getFullYear() + 10}/01/01`)}
+        minDate={new Date("1970/01/01")}
+        openDate={now()}
+        initialDate={now()}
+        selectDateText="Select date"
+        className="date-time-picker"
+        id="initial-date-time-picker"
+        hasError={false}
+        onChange={(date) => console.log("Date changed:", date)}
+        translations={{ AM: "AM", PM: "PM" }}
+      />
+    </Wrapper>
+  );
+};
+
+export const WithInitialDate: Story = {
+  render: () => <WithInitialDateTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "DateTimePicker with an initial date pre-selected. The picker opens with the date already filled in.",
+      },
+      source: {
+        code: `<DateTimePicker
+  locale="en"
+  openDate={now()}
+  initialDate={now()}
+  selectDateText="Select date"
+  onChange={(date) => console.log(date)}
+/>`,
+      },
+    },
+  },
+};
+
+const HiddenCrossTemplate = () => {
+  return (
+    <Wrapper>
+      <DateTimePicker
+        locale="en"
+        maxDate={new Date(`${new Date().getFullYear() + 10}/01/01`)}
+        minDate={new Date("1970/01/01")}
+        openDate={now()}
+        initialDate={now()}
+        selectDateText="Select date"
+        className="date-time-picker"
+        id="hidden-cross-date-time-picker"
+        hasError={false}
+        hideCross
+        onChange={(date) => console.log("Date changed:", date)}
+        translations={{ AM: "AM", PM: "PM" }}
+      />
+    </Wrapper>
+  );
+};
+
+export const HiddenCross: Story = {
+  render: () => <HiddenCrossTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "DateTimePicker with the clear (cross) button hidden. Users cannot clear the selected date.",
+      },
+      source: {
+        code: `<DateTimePicker
+  locale="en"
+  openDate={now()}
+  initialDate={now()}
+  selectDateText="Select date"
+  hideCross
+  onChange={(date) => console.log(date)}
+/>`,
+      },
+    },
   },
 };

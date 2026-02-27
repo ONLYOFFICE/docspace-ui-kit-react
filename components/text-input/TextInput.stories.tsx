@@ -25,21 +25,49 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
+import type { ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { TextInput } from ".";
 import { InputSize, InputType } from "./TextInput.enums";
-import type { TextInputProps } from "./TextInput.types";
 
 const meta = {
-  title: "UI/Form controls/TextInput",
+  title: "UI/Interactive elements/TextInput",
   component: TextInput,
   parameters: {
     docs: {
       description: {
-        component:
-          "Input field for single-line strings with various styling options and features including masking, scaling, and different states.",
+        component: `Single-line text input field with support for various types, sizes, states, and input masking.
+
+### Features
+
+- **Multiple Types**: text, password, email, tel, search, and number
+- **Three Sizes**: base, middle, and large
+- **Input Masking**: Format input with custom masks (e.g., date, phone)
+- **Validation States**: Error and warning visual indicators
+- **Full Width**: Scale to 100% width when needed
+- **Bold Text**: Option for bold font weight
+
+### Usage
+
+\`\`\`tsx
+import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
+
+// Basic text input
+<TextInput value={value} onChange={handleChange} placeholder="Enter text" />
+
+// With input mask
+<TextInput
+  mask={[/\\d/, /\\d/, "/", /\\d/, /\\d/, "/", /\\d/, /\\d/, /\\d/, /\\d/]}
+  placeholder="DD/MM/YYYY"
+  guide
+/>
+
+// Error state
+<TextInput hasError value="Invalid" />
+\`\`\``,
       },
     },
     design: {
@@ -49,282 +77,380 @@ const meta = {
   },
   argTypes: {
     size: {
-      description: "Size variant of the input",
       control: "select",
       options: Object.values(InputSize),
+      description: "Size variant of the input",
+      table: {
+        defaultValue: { summary: "base" },
+      },
     },
     type: {
-      description: "Type of the input field",
       control: "select",
       options: Object.values(InputType),
+      description: "HTML input type",
+      table: {
+        defaultValue: { summary: "text" },
+      },
     },
     value: {
-      description: "Value of the input",
       control: "text",
+      description: "Input value",
     },
     placeholder: {
-      description: "Placeholder text",
       control: "text",
+      description: "Placeholder text",
     },
     isDisabled: {
-      description: "Indicates that the field cannot be used",
       control: "boolean",
+      description: "Disable the input field",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isReadOnly: {
-      description: "Indicates that the field is read-only",
       control: "boolean",
+      description: "Make the input read-only",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     hasError: {
-      description: "Indicates the input has an error",
       control: "boolean",
+      description: "Show error state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     hasWarning: {
-      description: "Indicates the input has a warning",
       control: "boolean",
+      description: "Show warning state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     scale: {
-      description: "Makes the input take full width",
       control: "boolean",
+      description: "Scale input to 100% width",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     withBorder: {
-      description: "Shows border around the input",
       control: "boolean",
+      description: "Show border around the input",
+      table: {
+        defaultValue: { summary: "true" },
+      },
     },
     isBold: {
-      description: "Sets font weight to 600",
       control: "boolean",
+      description: "Set font weight to 600",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     maxLength: {
-      description: "Maximum length of input value",
       control: "number",
+      description: "Maximum character length",
     },
   },
 } satisfies Meta<typeof TextInput>;
 
-type Story = StoryObj<typeof TextInput>;
+type Story = StoryObj<ComponentProps<typeof TextInput>>;
 
 export default meta;
 
-const Template = ({
-  onChange,
-  value,
-  type,
-  placeholder,
-  size,
-  isDisabled,
-  isReadOnly,
-  hasError,
-  hasWarning,
-  scale,
-  withBorder,
-  maxLength,
-  autoComplete,
-  tabIndex,
-  mask,
-  guide,
-  keepCharPositions,
-}: TextInputProps) => {
-  const [val, setValue] = useState(value);
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+        gridGap: "16px",
+        alignItems: "center",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+const ControlledInput = (
+  props: Partial<ComponentProps<typeof TextInput>> & { initialValue?: string },
+) => {
+  const { initialValue, type = InputType.text, ...rest } = props;
+  const [val, setValue] = useState(initialValue || rest.value || "");
 
   return (
     <TextInput
-      type={type || InputType.text}
-      placeholder={placeholder || "Enter text here"}
+      {...rest}
+      type={type}
       value={val}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
-        onChange?.(e);
-      }}
-      size={size}
-      isDisabled={isDisabled}
-      isReadOnly={isReadOnly}
-      hasError={hasError}
-      hasWarning={hasWarning}
-      scale={scale}
-      withBorder={withBorder}
-      maxLength={maxLength}
-      autoComplete={autoComplete}
-      tabIndex={tabIndex}
-      mask={mask}
-      guide={guide}
-      keepCharPositions={keepCharPositions}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+        setValue(e.target.value)
+      }
     />
   );
 };
 
 export const Default: Story = {
-  render: (args) => <Template {...args} />,
+  render: (args) => <ControlledInput {...args} />,
   args: {
     placeholder: "Enter text here",
     maxLength: 255,
     size: InputSize.base,
     type: InputType.text,
-    isAutoFocussed: false,
     isDisabled: false,
     isReadOnly: false,
     hasError: false,
     hasWarning: false,
     scale: false,
-    autoComplete: "off",
-    tabIndex: 1,
     withBorder: true,
     value: "",
   },
 };
 
+const SizesTemplate = () => {
+  return (
+    <Wrapper>
+      {(Object.keys(InputSize) as Array<InputSize>).map((size) => (
+        <ControlledInput
+          key={size}
+          size={size}
+          initialValue={`${size[0].toUpperCase()}${size.slice(1)} size`}
+          placeholder={`${size} input`}
+        />
+      ))}
+    </Wrapper>
+  );
+};
+
+export const Sizes: Story = {
+  render: () => <SizesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "TextInput supports three sizes: base, middle, and large for different UI contexts.",
+      },
+      source: {
+        code: `<TextInput size={InputSize.base} value="Base size" />
+<TextInput size={InputSize.middle} value="Middle size" />
+<TextInput size={InputSize.large} value="Large size" />`,
+      },
+    },
+  },
+};
+
+const TypesTemplate = () => {
+  return (
+    <Wrapper>
+      <ControlledInput type={InputType.text} placeholder="Text" />
+      <ControlledInput type={InputType.password} placeholder="Password" />
+      <ControlledInput type={InputType.email} placeholder="Email" />
+      <ControlledInput type={InputType.tel} placeholder="Telephone" />
+      <ControlledInput type={InputType.search} placeholder="Search" />
+      <ControlledInput type={InputType.number} placeholder="Number" />
+    </Wrapper>
+  );
+};
+
+export const Types: Story = {
+  render: () => <TypesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "TextInput supports text, password, email, tel, search, and number types.",
+      },
+      source: {
+        code: `<TextInput type={InputType.text} placeholder="Text" />
+<TextInput type={InputType.password} placeholder="Password" />
+<TextInput type={InputType.email} placeholder="Email" />
+<TextInput type={InputType.tel} placeholder="Telephone" />
+<TextInput type={InputType.search} placeholder="Search" />
+<TextInput type={InputType.number} placeholder="Number" />`,
+      },
+    },
+  },
+};
+
+const StatesTemplate = () => {
+  return (
+    <Wrapper>
+      <ControlledInput initialValue="Normal" placeholder="Normal" />
+      <ControlledInput
+        initialValue="Error state"
+        hasError
+        placeholder="Error"
+      />
+      <ControlledInput
+        initialValue="Warning state"
+        hasWarning
+        placeholder="Warning"
+      />
+      <ControlledInput
+        initialValue="Disabled"
+        isDisabled
+        placeholder="Disabled"
+      />
+      <ControlledInput
+        initialValue="Read only"
+        isReadOnly
+        placeholder="Read only"
+      />
+      <ControlledInput
+        initialValue="No border"
+        withBorder={false}
+        placeholder="No border"
+      />
+    </Wrapper>
+  );
+};
+
+export const States: Story = {
+  render: () => <StatesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "TextInput supports multiple states: normal, error, warning, disabled, read-only, and borderless.",
+      },
+      source: {
+        code: `<TextInput value="Normal" />
+<TextInput value="Error state" hasError />
+<TextInput value="Warning state" hasWarning />
+<TextInput value="Disabled" isDisabled />
+<TextInput value="Read only" isReadOnly />
+<TextInput value="No border" withBorder={false} />`,
+      },
+    },
+  },
+};
+
+const WithMaskTemplate = () => {
+  return (
+    <Wrapper>
+      <ControlledInput
+        mask={[/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/]}
+        placeholder="DD/MM/YYYY"
+        guide
+        keepCharPositions
+      />
+      <ControlledInput
+        mask={[
+          "+",
+          /\d/,
+          " ",
+          "(",
+          /\d/,
+          /\d/,
+          /\d/,
+          ")",
+          " ",
+          /\d/,
+          /\d/,
+          /\d/,
+          "-",
+          /\d/,
+          /\d/,
+          /\d/,
+          /\d/,
+        ]}
+        placeholder="+1 (___) ___-____"
+        guide
+      />
+    </Wrapper>
+  );
+};
+
 export const WithMask: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    mask: [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/],
-    placeholder: "DD/MM/YYYY",
-    guide: true,
-    keepCharPositions: true,
+  render: () => <WithMaskTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Input masking formats user input into predefined patterns like dates and phone numbers.",
+      },
+      source: {
+        code: `// Date mask
+<TextInput
+  mask={[/\\d/, /\\d/, "/", /\\d/, /\\d/, "/", /\\d/, /\\d/, /\\d/, /\\d/]}
+  placeholder="DD/MM/YYYY"
+  guide
+  keepCharPositions
+/>
+
+// Phone mask
+<TextInput
+  mask={["+", /\\d/, " ", "(", /\\d/, /\\d/, /\\d/, ")", " ", /\\d/, /\\d/, /\\d/, "-", /\\d/, /\\d/, /\\d/, /\\d/]}
+  placeholder="+1 (___) ___-____"
+  guide
+/>`,
+      },
+    },
   },
 };
 
-export const WithError: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    hasError: true,
-    value: "Invalid input",
+const ScaledTemplate = () => {
+  return (
+    <div style={{ display: "grid", gridGap: "16px" }}>
+      <ControlledInput
+        scale
+        initialValue="Scaled base"
+        size={InputSize.base}
+      />
+      <ControlledInput
+        scale
+        initialValue="Scaled middle"
+        size={InputSize.middle}
+      />
+      <ControlledInput
+        scale
+        initialValue="Scaled large"
+        size={InputSize.large}
+      />
+    </div>
+  );
+};
+
+export const ScaledInputs: Story = {
+  render: () => <ScaledTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scale prop makes inputs expand to 100% of their container width.",
+      },
+      source: {
+        code: `<TextInput scale size={InputSize.base} value="Scaled base" />
+<TextInput scale size={InputSize.middle} value="Scaled middle" />
+<TextInput scale size={InputSize.large} value="Scaled large" />`,
+      },
+    },
   },
 };
 
-export const WithWarning: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    hasWarning: true,
-    value: "Warning state",
-  },
+const BoldTemplate = () => {
+  return (
+    <Wrapper>
+      <ControlledInput initialValue="Normal weight" />
+      <ControlledInput initialValue="Bold weight" isBold />
+    </Wrapper>
+  );
 };
 
-export const Disabled: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    isDisabled: true,
-    value: "Disabled input",
-  },
-};
-
-export const ReadOnly: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    isReadOnly: true,
-    value: "Read only input",
-  },
-};
-
-export const Password: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    type: InputType.password,
-    placeholder: "Enter password",
-  },
-};
-
-export const Scaled: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    scale: true,
-    value: "Scaled input",
-  },
-};
-
-export const Large: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    size: InputSize.large,
-    placeholder: "Large input",
-  },
-};
-
-export const Middle: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    size: InputSize.middle,
-    placeholder: "Middle input",
-  },
-};
-
-export const Bold: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    isBold: true,
-    value: "Bold text input",
-  },
-};
-
-export const Email: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    type: InputType.email,
-    placeholder: "Enter email address",
-  },
-};
-
-export const Tel: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    type: InputType.tel,
-    placeholder: "+1 (___) ___-____",
-    mask: [
-      "+",
-      /\d/,
-      " ",
-      "(",
-      /\d/,
-      /\d/,
-      /\d/,
-      ")",
-      " ",
-      /\d/,
-      /\d/,
-      /\d/,
-      "-",
-      /\d/,
-      /\d/,
-      /\d/,
-      /\d/,
-    ],
-    guide: true,
-  },
-};
-
-export const Search: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    type: InputType.search,
-    placeholder: "Search...",
-  },
-};
-
-export const NumberInput: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    type: InputType.number,
-    placeholder: "Enter number",
-  },
-};
-
-export const WithoutBorder: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    withBorder: false,
-    value: "Input without border",
+export const BoldText: Story = {
+  render: () => <BoldTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: "The isBold prop sets font-weight to 600 for emphasized text.",
+      },
+      source: {
+        code: `<TextInput value="Normal weight" />
+<TextInput value="Bold weight" isBold />`,
+      },
+    },
   },
 };

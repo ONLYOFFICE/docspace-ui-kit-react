@@ -24,7 +24,9 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Tag } from ".";
 
@@ -34,21 +36,37 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `
-A flexible tag/label component for displaying categorized or status information.
+        component: `A tag component for displaying categorized labels, filters, or status indicators.
 
-## Features
-- Multiple tag types and states
-- New and deleted tag indicators
-- Disabled state support
-- Click and delete handlers
-- Custom styling options
-- Max width configuration
-- Responsive design
+### Features
 
-## Usage
-Used for displaying tags, labels, categories, filters, or status badges throughout the application.
-`,
+- **New Tag State**: Visual indicator for newly created tags with a delete button
+- **Disabled State**: Prevents interaction and applies disabled styling
+- **Deleted State**: Strikethrough styling for removed tags
+- **Click Handler**: Callback when the tag body is clicked
+- **Delete Handler**: Callback when the delete button is clicked (new tags only)
+- **Max Width**: Configurable maximum width with text truncation
+- **Icon Support**: Display SVG icons or third-party provider icons
+
+### Accessibility
+
+- \`aria-label\`: Set from the tag label text
+- \`aria-disabled\`: Indicates when the tag is disabled
+
+### Usage
+
+\`\`\`tsx
+import { Tag } from "@docspace/ui-kit/components/tag";
+
+// Basic tag
+<Tag tag="category" label="Design" />
+
+// New tag with delete
+<Tag tag="new" label="New Tag" isNewTag onDelete={(tag) => console.log(tag)} />
+
+// Clickable tag
+<Tag tag="filter" label="React" onClick={({ label }) => console.log(label)} />
+\`\`\``,
       },
     },
     design: {
@@ -67,158 +85,202 @@ Used for displaying tags, labels, categories, filters, or status badges througho
     },
     isNewTag: {
       control: "boolean",
-      description: "When true, marks the tag as newly created",
-    },
-    isDeleted: {
-      control: "boolean",
-      description: "When true, displays the tag with a deleted/strikethrough style",
+      description: "Marks the tag as newly created and shows delete button",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isDisabled: {
       control: "boolean",
-      description: "When true, disables the tag and prevents interactions",
+      description: "Disables the tag and prevents interactions",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDeleted: {
+      control: "boolean",
+      description: "Displays the tag with deleted/strikethrough styling",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     tagMaxWidth: {
       control: "text",
-      description: "Maximum width of the tag element (CSS width value)",
+      description: "Maximum width of the tag (CSS value)",
     },
     onClick: {
       action: "clicked",
-      description: "Callback function when the tag is clicked",
+      description: "Callback when the tag is clicked",
     },
     onDelete: {
       action: "deleted",
-      description: "Callback function when the delete button is clicked",
-    },
-    id: {
-      control: "text",
-      description: "HTML id attribute for the tag element",
-    },
-    className: {
-      control: "text",
-      description: "Custom CSS class names",
-    },
-    style: {
-      control: "object",
-      description: "Custom inline styles",
+      description: "Callback when the delete button is clicked",
     },
   },
 } satisfies Meta<typeof Tag>;
-type Story = StoryObj<typeof Tag>;
+
+type Story = StoryObj<ComponentProps<typeof Tag>>;
 
 export default meta;
 
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "8px",
+        alignItems: "center",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
 export const Default: Story = {
+  render: (args) => <Tag {...args} />,
   args: {
     tag: "script",
     label: "Script",
-    isNewTag: false,
-    isDisabled: false,
-    onDelete: () => {},
-    onClick: () => {},
-
-    tagMaxWidth: "160px",
-    id: "",
-    className: "",
-    style: { color: "red" },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Default tag with standard styling. Shows a clickable tag with a delete button and custom red text color.",
-      },
-    },
-  },
-};
-
-export const NewTag: Story = {
-  args: {
-    tag: "script",
-    label: "Script",
-    isNewTag: true,
-    isDisabled: false,
-    onDelete: () => {},
-    onClick: () => {},
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Tag marked as newly created. Shows a visual indicator to distinguish newly added tags from existing ones.",
-      },
-    },
-  },
-};
-
-export const DeletedTag: Story = {
-  args: {
-    tag: "script",
-    label: "Script",
-    isNewTag: false,
-    isDisabled: false,
-    isDeleted: true,
-    onDelete: () => {},
-    onClick: () => {},
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Tag marked as deleted. Shows strikethrough styling to indicate the tag has been deleted or is no longer active.",
-      },
-    },
-  },
-};
-
-export const DisabledTag: Story = {
-  args: {
-    tag: "script",
-    label: "No tag",
-    isNewTag: false,
-    isDisabled: true,
-    onDelete: () => {},
-    onClick: () => {},
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Disabled tag that cannot be interacted with. Shows disabled styling and prevents click or delete actions.",
-      },
-    },
-  },
-};
-
-export const TagWithCustomStyles: Story = {
-  args: {
-    tag: "custom",
-    label: "Custom Styled Tag",
-    isNewTag: false,
-    isDisabled: false,
-    onDelete: () => {},
-    onClick: () => {},
-    tagMaxWidth: "200px",
-    style: { backgroundColor: "pink" },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Tag with custom styling applied. Demonstrates how to customize the tag appearance with inline styles and max width.",
-      },
-    },
-  },
-};
-
-export const TagWithClickHandler: Story = {
-  args: {
-    tag: "clickable",
-    label: "Clickable Tag",
-    isNewTag: false,
-    isDisabled: false,
-    onDelete: () => {},
-    onClick: () => alert("Tag clicked!"),
     tagMaxWidth: "160px",
   },
+};
+
+const StatesTemplate = () => {
+  return (
+    <Wrapper>
+      <Tag tag="default" label="Default" />
+      <Tag tag="new" label="New Tag" isNewTag onDelete={() => {}} />
+      <Tag tag="disabled" label="Disabled" isDisabled />
+      <Tag tag="deleted" label="Deleted" isDeleted />
+    </Wrapper>
+  );
+};
+
+const NewTagTemplate = () => {
+  return (
+    <Wrapper>
+      <Tag
+        tag="react"
+        label="React"
+        isNewTag
+        onDelete={() => alert("Delete: React")}
+      />
+      <Tag
+        tag="typescript"
+        label="TypeScript"
+        isNewTag
+        onDelete={() => alert("Delete: TypeScript")}
+      />
+      <Tag
+        tag="nodejs"
+        label="Node.js"
+        isNewTag
+        onDelete={() => alert("Delete: Node.js")}
+      />
+    </Wrapper>
+  );
+};
+
+const ClickableTemplate = () => {
+  return (
+    <Wrapper>
+      <Tag
+        tag="design"
+        label="Design"
+        onClick={() => alert("Clicked: Design")}
+      />
+      <Tag
+        tag="development"
+        label="Development"
+        onClick={() => alert("Clicked: Development")}
+      />
+      <Tag
+        tag="marketing"
+        label="Marketing"
+        onClick={() => alert("Clicked: Marketing")}
+      />
+    </Wrapper>
+  );
+};
+
+const MaxWidthTemplate = () => {
+  return (
+    <Wrapper>
+      <Tag tag="short" label="Short" tagMaxWidth="80px" />
+      <Tag
+        tag="long"
+        label="This is a very long tag label that will be truncated"
+        tagMaxWidth="160px"
+      />
+      <Tag tag="wide" label="Wide tag with more space" tagMaxWidth="250px" />
+    </Wrapper>
+  );
+};
+
+export const States: Story = {
+  render: () => <StatesTemplate />,
   parameters: {
     docs: {
       description: {
-        story: "Tag with an onClick handler. Clicking the tag itself (not the delete button) triggers a custom action or event.",
+        story:
+          "All tag states: default, new (with delete button), disabled, and deleted.",
+      },
+      source: {
+        code: `<Tag tag="default" label="Default" />
+<Tag tag="new" label="New Tag" isNewTag onDelete={() => {}} />
+<Tag tag="disabled" label="Disabled" isDisabled />
+<Tag tag="deleted" label="Deleted" isDeleted />`,
+      },
+    },
+  },
+};
+
+export const NewTags: Story = {
+  render: () => <NewTagTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Tags marked as newly created with a delete button. Click the X to trigger the onDelete callback.",
+      },
+      source: {
+        code: `<Tag tag="react" label="React" isNewTag onDelete={(tag) => console.log(tag)} />
+<Tag tag="typescript" label="TypeScript" isNewTag onDelete={(tag) => console.log(tag)} />`,
+      },
+    },
+  },
+};
+
+export const ClickableTags: Story = {
+  render: () => <ClickableTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Tags with click handlers. Clicking the tag triggers the onClick callback with tag event data.",
+      },
+      source: {
+        code: `<Tag tag="design" label="Design" onClick={({ label }) => console.log(label)} />
+<Tag tag="development" label="Development" onClick={({ label }) => console.log(label)} />`,
+      },
+    },
+  },
+};
+
+export const MaxWidthVariants: Story = {
+  render: () => <MaxWidthTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Tags with different max-width values. Long text is truncated with ellipsis when it exceeds the max width.",
+      },
+      source: {
+        code: `<Tag tag="short" label="Short" tagMaxWidth="80px" />
+<Tag tag="long" label="This is a very long tag label..." tagMaxWidth="160px" />
+<Tag tag="wide" label="Wide tag with more space" tagMaxWidth="250px" />`,
       },
     },
   },

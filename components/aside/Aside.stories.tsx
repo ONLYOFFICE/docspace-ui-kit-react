@@ -25,6 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { useEffect, useState } from "react";
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Aside } from ".";
@@ -38,14 +39,31 @@ import { Text } from "../text";
 import { Label } from "../label";
 import { Backdrop } from "../backdrop";
 
-const meta: Meta<typeof Aside> = {
-  title: "UI/Layout components/Aside",
+const meta = {
+  title: "UI/Overlays/Aside",
   component: Aside,
   parameters: {
     docs: {
       description: {
-        component:
-          "Sliding panel component for displaying side content like settings, details, or forms.",
+        component: `Aside is a sliding panel that appears from the right side of the screen for displaying contextual content.
+
+### Features
+
+- **Slide-in Animation**: Smooth transition from the right edge
+- **Optional Header**: Built-in header with title, close button, and back navigation
+- **Scrollable Body**: Content area with automatic scrollbar support
+- **Scale Mode**: Full-width scaling option for responsive layouts
+- **Body Scroll Control**: Option to disable page scrolling when the panel is open
+
+### Usage
+
+\`\`\`tsx
+import { Aside } from "@docspace/ui-kit/components/aside";
+
+<Aside visible={isVisible} header="Panel Title" onClose={handleClose}>
+  <div>Panel content here</div>
+</Aside>
+\`\`\``,
       },
     },
     layout: "fullscreen",
@@ -54,48 +72,59 @@ const meta: Meta<typeof Aside> = {
     visible: {
       control: "boolean",
       description: "Controls panel visibility",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     scale: {
       control: "boolean",
       description: "Full-width scaling mode",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     zIndex: {
-      control: { type: "number", min: 0 },
+      control: "number",
       description: "CSS z-index value",
     },
     withoutHeader: {
       control: "boolean",
-      description: "Hide the header section",
+      description: "Hides the header section",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     withoutBodyScroll: {
       control: "boolean",
-      description: "Disable body scroll when open",
+      description: "Disables body scroll when panel is open",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     header: {
       control: "text",
-      description: "Header content",
+      description: "Header title content",
     },
     isBackButton: {
       control: "boolean",
-      description: "Show back button in header",
+      description: "Shows back button in header",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isCloseable: {
       control: "boolean",
-      description: "Show close button in header",
-    },
-    onClose: {
-      action: "closed",
-      description: "Callback when panel closes",
-    },
-    onBackClick: {
-      action: "back clicked",
-      description: "Back button click handler",
+      description: "Shows close button in header",
+      table: {
+        defaultValue: { summary: "true" },
+      },
     },
   },
-};
+} satisfies Meta<typeof Aside>;
+
+type Story = StoryObj<ComponentProps<typeof Aside>>;
 
 export default meta;
-type Story = StoryObj<AsideProps>;
 
 const pageStyles: React.CSSProperties = {
   height: "100vh",
@@ -162,7 +191,7 @@ const Template = (args: AsideProps) => {
         Main content area
       </div>
 
-      <Backdrop visible={isVisible} onClick={close} zIndex={399}  isAside={true} />
+      <Backdrop visible={isVisible} onClick={close} zIndex={399} isAside />
       <Aside {...args} visible={isVisible} onClose={close}>
         {args.children}
       </Aside>
@@ -386,6 +415,21 @@ export const Default: Story = {
       </div>
     ),
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default aside panel with a header and simple text content. Click the button to open.",
+      },
+      source: {
+        code: `<Aside visible={isVisible} header="Panel Title" onClose={handleClose}>
+  <div style={{ padding: "20px" }}>
+    <Text>Content here</Text>
+  </div>
+</Aside>`,
+      },
+    },
+  },
 };
 
 export const Settings: Story = {
@@ -394,6 +438,19 @@ export const Settings: Story = {
     visible: false,
     header: "Settings",
     children: <SettingsContent />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Aside panel displaying a settings form with toggle switches and save button.",
+      },
+      source: {
+        code: `<Aside visible={isVisible} header="Settings" onClose={handleClose}>
+  <SettingsContent />
+</Aside>`,
+      },
+    },
   },
 };
 
@@ -404,6 +461,19 @@ export const UserProfile: Story = {
     header: "Profile",
     children: <UserProfileContent />,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Aside panel showing a user profile with avatar, badge, and editable form fields.",
+      },
+      source: {
+        code: `<Aside visible={isVisible} header="Profile" onClose={handleClose}>
+  <UserProfileContent />
+</Aside>`,
+      },
+    },
+  },
 };
 
 export const FileDetails: Story = {
@@ -412,6 +482,19 @@ export const FileDetails: Story = {
     visible: false,
     header: "File Info",
     children: <FileDetailsContent />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Aside panel displaying file metadata, details, and sharing information.",
+      },
+      source: {
+        code: `<Aside visible={isVisible} header="File Info" onClose={handleClose}>
+  <FileDetailsContent />
+</Aside>`,
+      },
+    },
   },
 };
 
@@ -423,6 +506,19 @@ export const WithBackButton: Story = {
     isBackButton: true,
     children: <FileDetailsContent />,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Aside panel with a back button in the header for multi-level navigation.",
+      },
+      source: {
+        code: `<Aside visible={isVisible} header="Details" isBackButton onBackClick={handleBack} onClose={handleClose}>
+  <FileDetailsContent />
+</Aside>`,
+      },
+    },
+  },
 };
 
 export const WithoutHeader: Story = {
@@ -431,6 +527,19 @@ export const WithoutHeader: Story = {
     visible: false,
     withoutHeader: true,
     children: <UserProfileContent />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Aside panel without a header section. Useful when custom header content is needed.",
+      },
+      source: {
+        code: `<Aside visible={isVisible} withoutHeader onClose={handleClose}>
+  <UserProfileContent />
+</Aside>`,
+      },
+    },
   },
 };
 
@@ -441,5 +550,18 @@ export const Scaled: Story = {
     scale: true,
     header: "Full Width Panel",
     children: <SettingsContent />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Aside panel scaled to full width of the viewport. Useful for mobile layouts.",
+      },
+      source: {
+        code: `<Aside visible={isVisible} scale header="Full Width Panel" onClose={handleClose}>
+  <SettingsContent />
+</Aside>`,
+      },
+    },
   },
 };

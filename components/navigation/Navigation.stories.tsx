@@ -1,34 +1,161 @@
-import React from "react";
-import { Meta, StoryFn } from "@storybook/react-vite";
-import Navigation from "./Navigation";
-import { TNavigationProps } from "./Navigation.types";
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { DeviceType } from "../../enums";
+import Navigation from "./Navigation";
+
 import "./Navigation.stories.scss";
 
-export default {
-  title: "UI/Layout components/Navigation",
+const meta = {
+  title: "UI/Navigation/Navigation",
   component: Navigation,
   parameters: {
     docs: {
       description: {
-        component: "Navigation component for DocSpace application",
+        component: `Navigation provides breadcrumb-style folder navigation with context menus and action buttons.
+
+### Features
+
+- **Breadcrumb Trail**: Displays folder hierarchy with clickable navigation items
+- **Context Menus**: Folder options and create actions via dropdown menus
+- **Info Panel Toggle**: Built-in button to show/hide the info panel
+- **Trash Folder Support**: Special handling for trash folder with clear action
+- **Responsive**: Adapts to desktop, tablet, and mobile device types
+- **Room Support**: Special display for room-based navigation
+
+### Usage
+
+\`\`\`tsx
+import Navigation from "@docspace/ui-kit/components/navigation/Navigation";
+
+<Navigation
+  title="My Documents"
+  navigationItems={[{ id: "1", title: "Documents", isRootRoom: false }]}
+  onClickFolder={(id) => console.log(id)}
+  onBackToParentFolder={() => console.log("back")}
+  getContextOptionsFolder={() => []}
+  getContextOptionsPlus={() => []}
+/>
+\`\`\``,
       },
     },
   },
-} as Meta;
+  argTypes: {
+    title: {
+      control: "text",
+      description: "Current folder title",
+    },
+    showText: {
+      control: "boolean",
+      description: "Controls title text visibility",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    isRootFolder: {
+      control: "boolean",
+      description: "Whether the current folder is the root",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    canCreate: {
+      control: "boolean",
+      description: "Shows the plus/create button",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isTrashFolder: {
+      control: "boolean",
+      description: "Enables trash folder mode with clear action",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isRoom: {
+      control: "boolean",
+      description: "Enables room-based navigation display",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDesktop: {
+      control: "boolean",
+      description: "Desktop mode (shows info panel toggle)",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    isInfoPanelVisible: {
+      control: "boolean",
+      description: "Whether the info panel is currently visible",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withMenu: {
+      control: "boolean",
+      description: "Shows the context menu button",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    showNavigationButton: {
+      control: "boolean",
+      description: "Shows the navigation action button",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    showRootFolderTitle: {
+      control: "boolean",
+      description: "Displays the root folder title",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+  },
+} satisfies Meta<typeof Navigation>;
 
-const Wrapper = ({ children }: { children: React.ReactNode }) => (
-  <div style={{ height: "240px" }}>{children}</div>
+type Story = StoryObj<ComponentProps<typeof Navigation>>;
+
+export default meta;
+
+const Wrapper = (props: { children: React.ReactNode }) => (
+  <div style={{ height: "240px" }}>{props.children}</div>
 );
 
-const Template: StoryFn<TNavigationProps> = (args) => (
-  <Wrapper>
-    <Navigation {...args} />
-  </Wrapper>
-);
+const noop = () => {};
 
-export const Default = Template.bind({});
-Default.args = {
+const defaultArgs = {
   showText: true,
   isRootFolder: false,
   title: "My Documents",
@@ -38,8 +165,8 @@ Default.args = {
     { id: "2", title: "Shared with me", isRootRoom: false },
     { id: "3", title: "Project files", isRootRoom: true },
   ],
-  onClickFolder: (id: string | number) => console.log("Folder clicked:", id),
-  onBackToParentFolder: () => console.log("Back to parent folder"),
+  onClickFolder: noop,
+  onBackToParentFolder: noop,
   getContextOptionsFolder: () => [
     { key: "rename", label: "Rename" },
     { key: "delete", label: "Delete" },
@@ -50,10 +177,10 @@ Default.args = {
   ],
   isTrashFolder: false,
   isEmptyFilesList: false,
-  clearTrash: () => console.log("Clear trash"),
-  showFolderInfo: () => console.log("Show folder info"),
+  clearTrash: noop,
+  showFolderInfo: noop,
   isCurrentFolderInfo: false,
-  toggleInfoPanel: () => console.log("Toggle info panel"),
+  toggleInfoPanel: noop,
   isInfoPanelVisible: false,
   titles: {
     infoPanel: "Info Panel",
@@ -62,27 +189,158 @@ Default.args = {
     warningText: "Warning",
   },
   withMenu: true,
-  onPlusClick: () => console.log("Plus clicked"),
+  onPlusClick: noop,
   isEmptyPage: false,
   isDesktop: true,
   isRoom: false,
   isFrame: false,
-  hideInfoPanel: () => console.log("Hide info panel"),
+  hideInfoPanel: noop,
   withLogo: false,
-  burgerLogo: "https://example.com/logo.svg",
+  burgerLogo: "",
   showRootFolderTitle: true,
   isPublicRoom: false,
-  titleIcon: "folder",
+  titleIcon: "",
   currentDeviceType: DeviceType.desktop,
   rootRoomTitle: "",
   showTitle: true,
   showTitleInDropBox: false,
-  navigationButtonLabel: "Navigation",
-  onNavigationButtonClick: () => console.log("Navigation button clicked"),
-  tariffBar: <div>Tariff information</div>,
-  showNavigationButton: true,
-  titleIconTooltip: "Folder tooltip",
-  badgeLabel: "Beta",
-  onContextOptionsClick: () => console.log("Context options clicked"),
-  onLogoClick: () => console.log("Logo clicked"),
+  navigationButtonLabel: "",
+  onNavigationButtonClick: noop,
+  showNavigationButton: false,
+  onContextOptionsClick: noop,
+  onLogoClick: noop,
+};
+
+export const Default: Story = {
+  render: (args) => (
+    <Wrapper>
+      <Navigation {...args} />
+    </Wrapper>
+  ),
+  args: defaultArgs,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default navigation bar showing folder title with breadcrumb items, context menu, and create button.",
+      },
+      source: {
+        code: `<Navigation
+  title="My Documents"
+  showText
+  canCreate
+  isDesktop
+  navigationItems={[
+    { id: "1", title: "Documents", isRootRoom: false },
+    { id: "2", title: "Shared with me", isRootRoom: false },
+  ]}
+  onClickFolder={handleClick}
+  onBackToParentFolder={handleBack}
+  getContextOptionsFolder={() => [...]}
+  getContextOptionsPlus={() => [...]}
+/>`,
+      },
+    },
+  },
+};
+
+export const RootFolder: Story = {
+  render: (args) => (
+    <Wrapper>
+      <Navigation {...args} />
+    </Wrapper>
+  ),
+  args: {
+    ...defaultArgs,
+    isRootFolder: true,
+    title: "Documents",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Navigation at the root folder level. The back button is hidden since there is no parent folder.",
+      },
+      source: {
+        code: `<Navigation title="Documents" isRootFolder showText canCreate />`,
+      },
+    },
+  },
+};
+
+export const TrashFolder: Story = {
+  render: (args) => (
+    <Wrapper>
+      <Navigation {...args} />
+    </Wrapper>
+  ),
+  args: {
+    ...defaultArgs,
+    isTrashFolder: true,
+    title: "Trash",
+    canCreate: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Navigation in trash folder mode. Shows a warning and clear trash action instead of create options.",
+      },
+      source: {
+        code: `<Navigation title="Trash" isTrashFolder canCreate={false} clearTrash={handleClear} />`,
+      },
+    },
+  },
+};
+
+export const WithInfoPanel: Story = {
+  render: (args) => (
+    <Wrapper>
+      <Navigation {...args} />
+    </Wrapper>
+  ),
+  args: {
+    ...defaultArgs,
+    isInfoPanelVisible: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Navigation with the info panel toggle active, indicating the info panel is currently visible.",
+      },
+      source: {
+        code: `<Navigation title="My Documents" isInfoPanelVisible isDesktop toggleInfoPanel={handleToggle} />`,
+      },
+    },
+  },
+};
+
+export const WithNavigationButton: Story = {
+  render: (args) => (
+    <Wrapper>
+      <Navigation {...args} />
+    </Wrapper>
+  ),
+  args: {
+    ...defaultArgs,
+    showNavigationButton: true,
+    navigationButtonLabel: "Go to Room",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Navigation with an additional action button displayed alongside the standard controls.",
+      },
+      source: {
+        code: `<Navigation
+  title="My Documents"
+  showNavigationButton
+  navigationButtonLabel="Go to Room"
+  onNavigationButtonClick={handleClick}
+/>`,
+      },
+    },
+  },
 };

@@ -24,166 +24,390 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { Link, LinkTarget, LinkType } from "./index";
+import { Link, LinkType, LinkTarget } from ".";
 
 const meta = {
-  title: "UI/Interactive elements/Link",
+  title: "UI/Navigation/Link",
   component: Link,
   parameters: {
     docs: {
       description: {
-        component: `It is a link with 2 types:
+        component: `Link component with two types: page links for navigation and action links for triggering behavior.
 
-1. page - simple link which refer to other pages and parts of current page;
-2. action - link, which usually hasn't hyperlink and do anything on click - open dropdown, filter data, etc`,
+### Features
+
+- **Two Types**: \`page\` for navigation links with href, \`action\` for click-triggered behavior
+- **Bold Text**: Emphasize links with bold font weight
+- **Hover States**: Built-in hover effects with manual override via \`isHovered\`
+- **Semitransparent**: Reduced opacity for "pending" status indicators
+- **Text Overflow**: Truncate long link text with ellipsis
+- **User Selection**: Control whether link text can be selected
+- **Tooltip Support**: Built-in tooltip via the \`withTooltip\` HOC
+
+### Accessibility
+
+- \`aria-label\`: Automatically set from children text, overridable via \`ariaLabel\` prop
+
+### Usage
+
+\`\`\`tsx
+import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
+
+// Page link
+<Link type={LinkType.page} href="https://example.com" target={LinkTarget.blank}>
+  Visit Example
+</Link>
+
+// Action link
+<Link type={LinkType.action} onClick={handleClick}>
+  Click to filter
+</Link>
+
+// Bold link
+<Link type={LinkType.page} href="/profile" isBold>
+  View Profile
+</Link>
+\`\`\``,
       },
     },
   },
   argTypes: {
-    color: { control: "color" },
-    onClick: { action: "clickActionLink" },
+    type: {
+      control: "select",
+      options: ["page", "action"],
+      description: "Link type: page for navigation, action for click handlers",
+      table: {
+        defaultValue: { summary: "page" },
+      },
+    },
+    href: {
+      control: "text",
+      description: "URL for page-type links",
+    },
+    fontSize: {
+      control: "text",
+      description: "Font size",
+    },
+    fontWeight: {
+      control: "text",
+      description: "Font weight",
+    },
+    color: {
+      control: "color",
+      description: "Link text color",
+    },
+    isBold: {
+      control: "boolean",
+      description: "Bold font weight",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isHovered: {
+      control: "boolean",
+      description: "Force hover state (for demo purposes)",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isSemitransparent: {
+      control: "boolean",
+      description: "Apply 50% opacity for pending status",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isTextOverflow: {
+      control: "boolean",
+      description: "Truncate overflowing text with ellipsis",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    noHover: {
+      control: "boolean",
+      description: "Disable hover effects",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    enableUserSelect: {
+      control: "boolean",
+      description: "Allow text selection",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
   },
 } satisfies Meta<typeof Link>;
 
-type Story = StoryObj<typeof Link>;
+type Story = StoryObj<ComponentProps<typeof Link>>;
 
 export default meta;
 
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
 export const Default: Story = {
-  render: ({ label, onClick, href, ...args }) => {
-    const actionProps = href && href.length > 0 ? { href } : { onClick };
-    return (
-      <Link {...args} {...actionProps}>
-        {label}
-      </Link>
-    );
-  },
+  render: (args) => <Link {...args}>Simple link</Link>,
   args: {
-    href: "http://github.com",
-    label: "Simple label",
+    href: "https://github.com",
     type: LinkType.page,
     fontSize: "13px",
-    fontWeight: "400",
-    isBold: false,
     target: LinkTarget.blank,
-    isHovered: false,
-    noHover: false,
-    isSemitransparent: false,
-    isTextOverflow: false,
   },
 };
 
-export const AllTemplate: Story = {
-  render: () => {
-    const rowStyle = { marginTop: 8, fontSize: 12 };
+const PageLinksTemplate = () => {
+  return (
+    <Wrapper>
+      <Link type={LinkType.page} href="https://github.com" isBold>
+        Bold page link
+      </Link>
+      <Link type={LinkType.page} href="https://github.com">
+        Regular page link
+      </Link>
+      <Link type={LinkType.page} href="https://github.com" isHovered>
+        Hovered page link
+      </Link>
+      <Link type={LinkType.page} href="https://github.com" isSemitransparent>
+        Semitransparent page link
+      </Link>
+    </Wrapper>
+  );
+};
 
-    const headerStyle = {
-      padding: "8px 0 0 40px",
-      fontSize: 16,
-    };
-    return (
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-        <div style={headerStyle}>
-          <div>Page links:</div>
-          <div>
-            <div style={rowStyle}>
-              <Link type={LinkType.page} href="https://github.com" isBold>
-                Bold black page link
-              </Link>
-            </div>
-            <div style={rowStyle}>
-              <Link type={LinkType.page} href="https://github.com">
-                Black page link
-              </Link>
-            </div>
-            <div style={rowStyle}>
-              <Link type={LinkType.page} href="https://github.com" isHovered>
-                Black hovered page link
-              </Link>
-            </div>
-            <div style={rowStyle}>
-              <Link
-                type={LinkType.page}
-                href="https://github.com"
-                isSemitransparent
-              >
-                Semitransparent black page link
-              </Link>
-            </div>
-          </div>
-        </div>
-        <div style={headerStyle}>
-          <div>Action links:</div>
-          <div style={rowStyle}>
-            <Link type={LinkType.action} isBold>
-              Bold black action link
-            </Link>
-          </div>
-          <div style={rowStyle}>
-            <Link type={LinkType.action}>Black action link</Link>
-          </div>
-          <div style={rowStyle}>
-            <Link type={LinkType.action} isHovered>
-              Black hovered action link
-            </Link>
-          </div>
-          <div style={rowStyle}>
-            <Link type={LinkType.action} isSemitransparent>
-              Semitransparent black action link
-            </Link>
-          </div>
-        </div>
+const ActionLinksTemplate = () => {
+  return (
+    <Wrapper>
+      <Link type={LinkType.action} onClick={() => {}} isBold>
+        Bold action link
+      </Link>
+      <Link type={LinkType.action} onClick={() => {}}>
+        Regular action link
+      </Link>
+      <Link type={LinkType.action} onClick={() => {}} isHovered>
+        Hovered action link
+      </Link>
+      <Link type={LinkType.action} onClick={() => {}} isSemitransparent>
+        Semitransparent action link
+      </Link>
+    </Wrapper>
+  );
+};
+
+const AllVariantsTemplate = () => {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div>
+        <strong>Page links:</strong>
+        <Wrapper>
+          <Link type={LinkType.page} href="https://github.com" isBold>
+            Bold page link
+          </Link>
+          <Link type={LinkType.page} href="https://github.com">
+            Regular page link
+          </Link>
+          <Link type={LinkType.page} href="https://github.com" isHovered>
+            Hovered page link
+          </Link>
+          <Link
+            type={LinkType.page}
+            href="https://github.com"
+            isSemitransparent
+          >
+            Semitransparent page link
+          </Link>
+        </Wrapper>
       </div>
-    );
-  },
+      <div>
+        <strong>Action links:</strong>
+        <Wrapper>
+          <Link type={LinkType.action} onClick={() => {}} isBold>
+            Bold action link
+          </Link>
+          <Link type={LinkType.action} onClick={() => {}}>
+            Regular action link
+          </Link>
+          <Link type={LinkType.action} onClick={() => {}} isHovered>
+            Hovered action link
+          </Link>
+          <Link type={LinkType.action} onClick={() => {}} isSemitransparent>
+            Semitransparent action link
+          </Link>
+        </Wrapper>
+      </div>
+    </div>
+  );
 };
 
-export const Hovered: Story = {
-  render: () => (
+const HoveredTemplate = () => {
+  return (
     <Link type={LinkType.page} href="https://github.com" isHovered>
       Hovered link
     </Link>
-  ),
+  );
 };
 
-export const Semitransparent: Story = {
-  render: () => (
+const SemitransparentTemplate = () => {
+  return (
     <Link type={LinkType.page} href="https://github.com" isSemitransparent>
       Semitransparent link
     </Link>
-  ),
+  );
 };
 
-export const TextOverflow: Story = {
-  render: () => (
-    <Link type={LinkType.page} href="https://github.com" isTextOverflow>
-      This is a very long link that should demonstrate text overflow
-    </Link>
-  ),
+const TextOverflowTemplate = () => {
+  return (
+    <div style={{ width: 200 }}>
+      <Link type={LinkType.page} href="https://github.com" isTextOverflow>
+        This is a very long link that should demonstrate text overflow behavior
+      </Link>
+    </div>
+  );
 };
 
-export const NoHover: Story = {
-  render: () => (
+const NoHoverTemplate = () => {
+  return (
     <Link type={LinkType.page} href="https://github.com" noHover>
       No hover effect link
     </Link>
-  ),
+  );
 };
 
-export const EnableUserSelect: Story = {
-  render: () => (
-    <Link type={LinkType.page} href="https://github.com" enableUserSelect>
-      User-select enabled link
-    </Link>
-  ),
+export const PageLinks: Story = {
+  render: () => <PageLinksTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Page links navigate to other pages. They support bold, hovered, and semitransparent states.",
+      },
+      source: {
+        code: `<Link type={LinkType.page} href="https://github.com" isBold>Bold page link</Link>
+<Link type={LinkType.page} href="https://github.com">Regular page link</Link>
+<Link type={LinkType.page} href="https://github.com" isHovered>Hovered page link</Link>
+<Link type={LinkType.page} href="https://github.com" isSemitransparent>Semitransparent page link</Link>`,
+      },
+    },
+  },
 };
 
-export const ActionLink: Story = {
-  render: () => (
-    <Link type={LinkType.action} onClick={() => {}}>
-      Action link
-    </Link>
-  ),
+export const ActionLinks: Story = {
+  render: () => <ActionLinksTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Action links trigger behavior on click instead of navigating. Used for filtering, opening dropdowns, etc.",
+      },
+      source: {
+        code: `<Link type={LinkType.action} onClick={handleClick} isBold>Bold action link</Link>
+<Link type={LinkType.action} onClick={handleClick}>Regular action link</Link>
+<Link type={LinkType.action} onClick={handleClick} isHovered>Hovered action link</Link>
+<Link type={LinkType.action} onClick={handleClick} isSemitransparent>Semitransparent action link</Link>`,
+      },
+    },
+  },
+};
+
+export const AllVariants: Story = {
+  render: () => <AllVariantsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Side-by-side comparison of all page and action link variants.",
+      },
+      source: {
+        code: `// Page links
+<Link type={LinkType.page} href="https://github.com" isBold>Bold</Link>
+<Link type={LinkType.page} href="https://github.com">Regular</Link>
+<Link type={LinkType.page} href="https://github.com" isHovered>Hovered</Link>
+<Link type={LinkType.page} href="https://github.com" isSemitransparent>Semitransparent</Link>
+
+// Action links
+<Link type={LinkType.action} onClick={handleClick} isBold>Bold</Link>
+<Link type={LinkType.action} onClick={handleClick}>Regular</Link>`,
+      },
+    },
+  },
+};
+
+export const HoveredState: Story = {
+  render: () => <HoveredTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Link with forced hover state for demonstration purposes.",
+      },
+      source: {
+        code: `<Link type={LinkType.page} href="https://github.com" isHovered>Hovered link</Link>`,
+      },
+    },
+  },
+};
+
+export const SemitransparentState: Story = {
+  render: () => <SemitransparentTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Semitransparent link with reduced opacity, typically used for users with pending status.",
+      },
+      source: {
+        code: `<Link type={LinkType.page} href="https://github.com" isSemitransparent>Semitransparent link</Link>`,
+      },
+    },
+  },
+};
+
+export const WithTextOverflow: Story = {
+  render: () => <TextOverflowTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Link with text overflow truncation when it exceeds the container width.",
+      },
+      source: {
+        code: `<div style={{ width: 200 }}>
+  <Link type={LinkType.page} href="https://github.com" isTextOverflow>
+    Very long link text...
+  </Link>
+</div>`,
+      },
+    },
+  },
+};
+
+export const NoHoverEffect: Story = {
+  render: () => <NoHoverTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Link with hover effects disabled via the noHover prop.",
+      },
+      source: {
+        code: `<Link type={LinkType.page} href="https://github.com" noHover>No hover effect link</Link>`,
+      },
+    },
+  },
 };

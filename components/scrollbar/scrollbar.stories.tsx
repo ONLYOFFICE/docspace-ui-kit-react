@@ -24,18 +24,42 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { Scrollbar } from ".";
 
 const meta = {
-  title: "UI/Layout components/Scrollbar",
+  title: "UI/Layout/Scrollbar",
   component: Scrollbar,
   parameters: {
     docs: {
       description: {
-        component:
-          "Scrollbar is used for displaying custom scrollbar with auto-hide functionality, custom styling, and both vertical and horizontal scrolling support.",
+        component: `Scrollbar provides a custom scrollbar with auto-hide, fixed sizing, and both vertical and horizontal scrolling support.
+
+### Features
+
+- **Auto-Hide**: Scrollbar fades when not actively scrolling
+- **Fixed Size Thumb**: Keep the scrollbar thumb at a fixed size regardless of content length
+- **Vertical & Horizontal**: Supports both scroll directions independently
+- **Custom Padding**: Configurable padding after the last item and inline-end padding
+- **RTL Support**: Works correctly in right-to-left layouts
+
+### Usage
+
+\`\`\`tsx
+import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
+
+<Scrollbar style={{ width: 300, height: 200 }}>
+  <p>Scrollable content here...</p>
+</Scrollbar>
+
+// With auto-hide
+<Scrollbar autoHide style={{ width: 300, height: 200 }}>
+  <p>Content...</p>
+</Scrollbar>
+\`\`\``,
       },
     },
   },
@@ -43,29 +67,43 @@ const meta = {
     autoHide: {
       control: "boolean",
       description: "Automatically hide scrollbar when not in use",
-      table: { defaultValue: { summary: "false" } },
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     fixedSize: {
       control: "boolean",
-      description: "Keep scrollbar thumb size fixed",
-      table: { defaultValue: { summary: "false" } },
+      description: "Keep scrollbar thumb size fixed regardless of content",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     paddingAfterLastItem: {
       control: "text",
-      description: "Add padding after the last item",
+      description: "Padding added after the last scrollable item",
     },
     paddingInlineEnd: {
       control: "text",
-      description: "Add padding-inline-end",
+      description: "Padding added to the inline end of the scroll body",
     },
-    style: {
-      control: "object",
-      description: "Custom styles for the scrollbar container",
+    noScrollY: {
+      control: "boolean",
+      description: "Disables vertical scrolling",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    noScrollX: {
+      control: "boolean",
+      description: "Disables horizontal scrolling",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
 } satisfies Meta<typeof Scrollbar>;
 
-type Story = StoryObj<typeof Scrollbar>;
+type Story = StoryObj<ComponentProps<typeof Scrollbar>>;
 
 export default meta;
 
@@ -96,47 +134,82 @@ const LongContent = () => (
 );
 
 export const Default: Story = {
+  render: (args) => (
+    <Scrollbar {...args}>
+      <LongContent />
+    </Scrollbar>
+  ),
   args: {
     style: { width: 300, height: 200 },
     autoHide: false,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default scrollbar with vertical scrolling enabled and always-visible track.",
+      },
+      source: {
+        code: `<Scrollbar style={{ width: 300, height: 200 }}>
+  <p>Scrollable content...</p>
+</Scrollbar>`,
+      },
+    },
+  },
+};
+
+export const WithAutoHide: Story = {
   render: (args) => (
     <Scrollbar {...args}>
       <LongContent />
     </Scrollbar>
   ),
-};
-
-export const WithAutoHide: Story = {
   args: {
     style: { width: 300, height: 200 },
     autoHide: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scrollbar that automatically hides when not actively scrolling. Hover or scroll to reveal.",
+      },
+      source: {
+        code: `<Scrollbar autoHide style={{ width: 300, height: 200 }}>
+  <p>Content...</p>
+</Scrollbar>`,
+      },
+    },
+  },
+};
+
+export const WithFixedSize: Story = {
   render: (args) => (
     <Scrollbar {...args}>
       <LongContent />
     </Scrollbar>
   ),
-};
-
-export const WithFixedSize: Story = {
   args: {
     style: { width: 300, height: 200 },
     autoHide: false,
     fixedSize: true,
   },
-  render: (args) => (
-    <Scrollbar {...args}>
-      <LongContent />
-    </Scrollbar>
-  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scrollbar with a fixed-size thumb that doesn't change size based on content length.",
+      },
+      source: {
+        code: `<Scrollbar fixedSize style={{ width: 300, height: 200 }}>
+  <p>Content...</p>
+</Scrollbar>`,
+      },
+    },
+  },
 };
 
 export const WithHorizontalScroll: Story = {
-  args: {
-    style: { width: 300, height: 100 },
-    autoHide: false,
-  },
   render: (args) => (
     <Scrollbar {...args}>
       <div
@@ -151,13 +224,26 @@ export const WithHorizontalScroll: Story = {
       </div>
     </Scrollbar>
   ),
+  args: {
+    style: { width: 300, height: 100 },
+    autoHide: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scrollbar with horizontal scrolling for wide content that overflows the container.",
+      },
+      source: {
+        code: `<Scrollbar style={{ width: 300, height: 100 }}>
+  <div style={{ whiteSpace: "nowrap" }}>Wide content...</div>
+</Scrollbar>`,
+      },
+    },
+  },
 };
 
 export const WithBothScrollbars: Story = {
-  args: {
-    style: { width: 300, height: 200 },
-    autoHide: false,
-  },
   render: (args) => (
     <Scrollbar {...args}>
       <div style={{ width: "500px" }}>
@@ -165,30 +251,73 @@ export const WithBothScrollbars: Story = {
       </div>
     </Scrollbar>
   ),
+  args: {
+    style: { width: 300, height: 200 },
+    autoHide: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scrollbar with both vertical and horizontal scrolling when content exceeds both dimensions.",
+      },
+      source: {
+        code: `<Scrollbar style={{ width: 300, height: 200 }}>
+  <div style={{ width: "500px" }}>Tall and wide content...</div>
+</Scrollbar>`,
+      },
+    },
+  },
 };
 
 export const WithPaddingAfterLastItem: Story = {
+  render: (args) => (
+    <Scrollbar {...args}>
+      <LongContent />
+    </Scrollbar>
+  ),
   args: {
     style: { width: 300, height: 200 },
     autoHide: false,
     paddingAfterLastItem: "50px",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scrollbar with additional padding after the last item, providing extra space at the bottom of scrollable content.",
+      },
+      source: {
+        code: `<Scrollbar paddingAfterLastItem="50px" style={{ width: 300, height: 200 }}>
+  <p>Content with padding at bottom...</p>
+</Scrollbar>`,
+      },
+    },
+  },
+};
+
+export const WithPaddingInlineEnd: Story = {
   render: (args) => (
     <Scrollbar {...args}>
       <LongContent />
     </Scrollbar>
   ),
-};
-
-export const WithPaddingInlineEnd: Story = {
   args: {
     style: { width: 300, height: 200 },
     autoHide: false,
     paddingInlineEnd: "100px",
   },
-  render: (args) => (
-    <Scrollbar {...args}>
-      <LongContent />
-    </Scrollbar>
-  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scrollbar with inline-end padding, adding space on the right (or left in RTL) side of the scroll body.",
+      },
+      source: {
+        code: `<Scrollbar paddingInlineEnd="100px" style={{ width: 300, height: 200 }}>
+  <p>Content with inline-end padding...</p>
+</Scrollbar>`,
+      },
+    },
+  },
 };

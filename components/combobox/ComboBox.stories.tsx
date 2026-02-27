@@ -25,359 +25,449 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
+
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import MoveReactSvgUrl from "../../assets/icons/16/move.react.svg";
+
 import CopyReactSvgUrl from "../../assets/icons/16/copy.react.svg";
 import DownloadReactSvgUrl from "../../assets/icons/16/download.react.svg";
+import MoveReactSvgUrl from "../../assets/icons/16/move.react.svg";
+import { globalColors } from "../../providers/theme";
 
 import { ComboBox } from "./ComboBox";
-import type { TComboboxProps } from "./ComboBox.types";
-import { globalColors } from "../../providers/theme";
 import { ComboBoxDisplayType, ComboBoxSize } from "./ComboBox.enums";
 
 const meta = {
-	title: "UI/Form controls/ComboBox",
-	component: ComboBox,
-	parameters: {
-		docs: {
-			description: {
-				component: `ComboBox is a versatile UI component that combines a text input with a dropdown list. It supports multiple display types, search functionality, and customizable styling options.
-          
+  title: "UI/Interactive elements/ComboBox",
+  component: ComboBox,
+  parameters: {
+    docs: {
+      description: {
+        component: `ComboBox combines a text input with a dropdown list for selecting from predefined options.
+
 ### Features
 
-- Multiple display types (default, toggle)
-- Search functionality with customizable placeholder
-- Support for icons and advanced options
-- Accessible keyboard navigation
-- Customizable styling and theming
-- Responsive design
+- **Display Types**: Default and toggle display modes
+- **Multiple Sizes**: Configurable sizing via ComboBoxSize enum
+- **Search**: Built-in search functionality with customizable placeholder
+- **Icon Support**: Options can include icons for visual context
+- **Custom Styling**: Options support custom colors, backgrounds, and borders
+- **Keyboard Navigation**: Arrow keys, Enter/Space, Escape, and Tab support
+- **Scaled Mode**: Can scale to fill parent container width
+- **Disabled State**: Full disabled state for non-interactive display
 
 ### Accessibility
 
 The ComboBox component includes the following ARIA attributes:
 
-- \`aria-expanded\`: Indicates whether the dropdown list is currently expanded
-- \`aria-haspopup\`: Indicates that the component has a popup menu
+- \`aria-expanded\`: Indicates whether the dropdown list is expanded
+- \`aria-haspopup\`: Indicates the component has a popup menu
 - \`aria-label\`: Provides a text description of the combobox
 - \`role="combobox"\`: Identifies the component as a combobox
 
-### Keyboard Navigation
+### Usage
 
-- Enter/Space: Open/close dropdown
-- Arrow Up/Down: Navigate through options
-- Escape: Close dropdown
-- Tab: Focus next/previous element`,
-			},
-		},
-		design: {
-			type: "figma",
-			url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=0%3A1&mode=design&t=TBNCKMQKQMxr44IZ-0",
-		},
-	},
-	argTypes: {
-		displayType: {
-			options: Object.values(ComboBoxDisplayType),
-			control: { type: "select" },
-			description: "Display style of the combobox",
-		},
-		size: {
-			options: Object.values(ComboBoxSize),
-			control: { type: "select" },
-			description: "Size of the combobox",
-		},
-		scaled: {
-			control: "boolean",
-			description: "Enable scaling based on parent",
-		},
-		isDisabled: {
-			control: "boolean",
-			description: "Disable the combobox",
-		},
-		withSearch: {
-			control: "boolean",
-			description: "Enable search functionality",
-		},
-		dropDownMaxHeight: {
-			control: { type: "number" },
-		},
-		directionY: {
-			control: { type: "select" },
-			options: ["top", "bottom", "both"],
-		},
-		directionX: {
-			control: { type: "select" },
-			options: ["left", "right"],
-		},
-		fixedDirection: { control: { type: "boolean" } },
-		isDefaultMode: { control: { type: "boolean" } },
-		disableIconClick: { control: { type: "boolean" } },
-		disableItemClick: { control: { type: "boolean" } },
-		disableItemClickFirstLevel: { control: { type: "boolean" } },
-		displaySelectedOption: { control: { type: "boolean" } },
-		displayArrow: { control: { type: "boolean" } },
-		showDisabledItems: { control: { type: "boolean" } },
-		fillIcon: { control: { type: "boolean" } },
-		plusBadgeValue: { control: { type: "number" } },
-		forceCloseClickOutside: { control: { type: "boolean" } },
-		hideMobileView: { control: { type: "boolean" } },
-		isAside: { control: { type: "boolean" } },
-		isLoading: { control: { type: "boolean" } },
-		isMobileView: { control: { type: "boolean" } },
-		isNoFixedHeightOptions: { control: { type: "boolean" } },
-		manualWidth: { control: { type: "text" } },
-		manualX: { control: { type: "text" } },
-		manualY: { control: { type: "text" } },
-		modernView: { control: { type: "boolean" } },
-		noBorder: { control: { type: "boolean" } },
-		offsetX: { control: { type: "number" } },
-		opened: { control: { type: "boolean" } },
-		searchPlaceholder: { control: { type: "text" } },
-		scaledOptions: { control: { type: "boolean" } },
-		textOverflow: { control: { type: "boolean" } },
-		title: { control: { type: "text" } },
-		topSpace: { control: { type: "number" } },
-		type: {
-			control: {
-				type: "select",
-				options: ["badge", "onlyIcon", "descriptive", null],
-			},
-		},
-		usePortalBackdrop: { control: { type: "boolean" } },
-		withBackdrop: { control: { type: "boolean" } },
-		withBackground: { control: { type: "boolean" } },
-		withBlur: { control: { type: "boolean" } },
-		withLabel: { control: { type: "boolean" } },
-		withoutBackground: { control: { type: "boolean" } },
-		withoutPadding: { control: { type: "boolean" } },
-		shouldShowBackdrop: { control: { type: "boolean" } },
+\`\`\`tsx
+import { ComboBox, ComboBoxSize } from "@docspace/ui-kit/components/combobox";
 
-		options: { table: { disable: true } },
-		selectedOption: { table: { disable: true } },
-		advancedOptions: { table: { disable: true } },
-		advancedOptionsCount: { table: { disable: true } },
-		children: { table: { disable: true } },
-		className: { table: { disable: true } },
-		comboIcon: { table: { disable: true } },
-		id: { table: { disable: true } },
-		dropDownId: { table: { disable: true } },
-		optionStyle: { table: { disable: true } },
-		setIsOpenItemAccess: { table: { disable: true } },
-		role: { table: { disable: true } },
-		style: { table: { disable: true } },
-		tabIndex: { table: { disable: true } },
-		onBackdropClick: { table: { disable: true } },
-		onClickSelectedItem: { table: { disable: true } },
-		onSelect: { table: { disable: true } },
-		onToggle: { table: { disable: true } },
-	},
+<ComboBox
+  options={[
+    { key: 1, label: "Option 1" },
+    { key: 2, label: "Option 2" },
+  ]}
+  selectedOption={{ key: 0, label: "Select..." }}
+  onSelect={(option) => console.log(option)}
+/>
+\`\`\``,
+      },
+    },
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/ZiW5KSwb4t7Tj6Nz5TducC/UI-Kit-DocSpace-1.0.0?type=design&node-id=0%3A1&mode=design&t=TBNCKMQKQMxr44IZ-0",
+    },
+  },
+  argTypes: {
+    displayType: {
+      control: "select",
+      options: Object.values(ComboBoxDisplayType),
+      description: "Display style of the combobox",
+      table: {
+        defaultValue: { summary: "default" },
+      },
+    },
+    size: {
+      control: "select",
+      options: Object.values(ComboBoxSize),
+      description: "Size of the combobox",
+    },
+    scaled: {
+      control: "boolean",
+      description: "Enable scaling based on parent width",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDisabled: {
+      control: "boolean",
+      description: "Disable the combobox",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withSearch: {
+      control: "boolean",
+      description: "Enable search functionality",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    noBorder: {
+      control: "boolean",
+      description: "Remove the border",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    dropDownMaxHeight: {
+      control: "number",
+      description: "Maximum height of the dropdown list",
+    },
+    directionY: {
+      control: "select",
+      options: ["top", "bottom", "both"],
+      description: "Vertical direction for the dropdown",
+      table: {
+        defaultValue: { summary: "bottom" },
+      },
+    },
+    directionX: {
+      control: "select",
+      options: ["left", "right"],
+      description: "Horizontal direction for the dropdown",
+    },
+    fixedDirection: {
+      control: "boolean",
+      description: "Disable automatic direction adjustment",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDefaultMode: {
+      control: "boolean",
+      description: "Use portal mode for the dropdown",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    showDisabledItems: {
+      control: "boolean",
+      description: "Show disabled items in dropdown",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    displaySelectedOption: {
+      control: "boolean",
+      description: "Show the selected option in the dropdown list",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    displayArrow: {
+      control: "boolean",
+      description: "Show the dropdown arrow icon",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    modernView: {
+      control: "boolean",
+      description: "Use modern compact view",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isLoading: {
+      control: "boolean",
+      description: "Show loading state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    searchPlaceholder: {
+      control: "text",
+      description: "Placeholder text for the search input",
+    },
+    manualWidth: {
+      control: "text",
+      description: "Custom width for the dropdown",
+    },
+    textOverflow: {
+      control: "boolean",
+      description: "Truncate long option labels with ellipsis",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    fillIcon: {
+      control: "boolean",
+      description: "Fill option icons with text color",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+  },
 } satisfies Meta<typeof ComboBox>;
 
-const Wrapper = ({ children }: { children: React.ReactNode }) => {
-	return <div style={{ height: "240px", padding: "20px" }}>{children}</div>;
-};
-
-const defaultOptions = [
-	{
-		key: 1,
-		label: "Open",
-		backgroundColor: globalColors.lightBlueMain,
-		color: globalColors.white,
-	},
-	{
-		key: 2,
-		label: "Done",
-		backgroundColor: globalColors.black,
-		color: globalColors.white,
-	},
-	{
-		key: 3,
-		label: "In Progress",
-		backgroundColor: globalColors.white,
-		color: globalColors.grayText,
-		border: globalColors.lightBlueMain,
-	},
-	{
-		key: 4,
-		label: "Pending Review",
-		backgroundColor: globalColors.white,
-		color: globalColors.grayText,
-		border: globalColors.lightBlueMain,
-	},
-];
-
-const Template = (args: TComboboxProps) => (
-	<Wrapper>
-		<ComboBox {...args} />
-	</Wrapper>
-);
+type Story = StoryObj<ComponentProps<typeof ComboBox>>;
 
 export default meta;
 
-export const Default: StoryObj<typeof ComboBox> = {
-	render: (args) => <Template {...args} />,
-	args: {
-		options: defaultOptions,
-		selectedOption: {
-			key: 0,
-			label: "Select Status",
-		},
-		dropDownMaxHeight: 200,
-		scaled: false,
-		directionY: "bottom",
-		fixedDirection: true,
-		isDefaultMode: false,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "Default ComboBox with basic configuration.",
-			},
-		},
-	},
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return <div style={{ height: "240px", padding: "20px" }}>{props.children}</div>;
 };
 
-export const DifferentSizes: StoryObj<typeof ComboBox> = {
-	render: () => (
-		<div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-			{Object.values(ComboBoxSize).map((size) => (
-				<ComboBox
-					key={size}
-					options={defaultOptions}
-					selectedOption={{ key: 0, label: `Size: ${size}` }}
-					size={size}
-					directionY="bottom"
-					scaled={false}
-					fixedDirection
-					isDefaultMode={false}
-				/>
-			))}
-		</div>
-	),
-	parameters: {
-		docs: {
-			description: {
-				story: "ComboBox in different size variations.",
-			},
-		},
-	},
+const defaultOptions = [
+  {
+    key: 1,
+    label: "Open",
+    backgroundColor: globalColors.lightBlueMain,
+    color: globalColors.white,
+  },
+  {
+    key: 2,
+    label: "Done",
+    backgroundColor: globalColors.black,
+    color: globalColors.white,
+  },
+  {
+    key: 3,
+    label: "In Progress",
+    backgroundColor: globalColors.white,
+    color: globalColors.grayText,
+    border: globalColors.lightBlueMain,
+  },
+  {
+    key: 4,
+    label: "Pending Review",
+    backgroundColor: globalColors.white,
+    color: globalColors.grayText,
+    border: globalColors.lightBlueMain,
+  },
+];
+
+export const Default: Story = {
+  render: (args) => (
+    <Wrapper>
+      <ComboBox {...args} />
+    </Wrapper>
+  ),
+  args: {
+    options: defaultOptions,
+    selectedOption: { key: 0, label: "Select Status" },
+    dropDownMaxHeight: 200,
+    scaled: false,
+    directionY: "bottom",
+    fixedDirection: true,
+    isDefaultMode: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Default ComboBox with basic configuration and status options.",
+      },
+      source: {
+        code: `<ComboBox
+  options={statusOptions}
+  selectedOption={{ key: 0, label: "Select Status" }}
+  dropDownMaxHeight={200}
+/>`,
+      },
+    },
+  },
 };
 
-export const WithIcons: StoryObj<typeof ComboBox> = {
-	render: (args) => <Template {...args} />,
-	args: {
-		options: [
-			{
-				key: 1,
-				label: "Move",
-				icon: MoveReactSvgUrl,
-			},
-			{
-				key: 2,
-				label: "Copy",
-				icon: CopyReactSvgUrl,
-			},
-			{
-				key: 3,
-				label: "Download",
-				icon: DownloadReactSvgUrl,
-			},
-		],
-		selectedOption: {
-			key: 0,
-			label: "Select Type",
-		},
-		directionY: "bottom",
-		fixedDirection: true,
-		isDefaultMode: false,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"ComboBox with icons in options for better visual representation.",
-			},
-		},
-	},
+const DifferentSizesTemplate = () => {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      {Object.values(ComboBoxSize).map((size) => (
+        <ComboBox
+          key={size}
+          options={defaultOptions}
+          selectedOption={{ key: 0, label: `Size: ${size}` }}
+          size={size}
+          directionY="bottom"
+          scaled={false}
+          fixedDirection
+          isDefaultMode={false}
+        />
+      ))}
+    </div>
+  );
 };
 
-export const Disabled: StoryObj<typeof ComboBox> = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		isDisabled: true,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "Disabled state of the ComboBox.",
-			},
-		},
-	},
+export const DifferentSizes: Story = {
+  render: () => <DifferentSizesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: "ComboBox in all available size variations.",
+      },
+      source: {
+        code: `<ComboBox size={ComboBoxSize.base} options={options} selectedOption={selected} />
+<ComboBox size={ComboBoxSize.middle} options={options} selectedOption={selected} />
+<ComboBox size={ComboBoxSize.big} options={options} selectedOption={selected} />
+<ComboBox size={ComboBoxSize.huge} options={options} selectedOption={selected} />`,
+      },
+    },
+  },
 };
 
-export const WithSelectedOption: StoryObj<typeof ComboBox> = {
-	render: (args) => <Template {...args} />,
-	args: {
-		...Default.args,
-		selectedOption: defaultOptions[0],
-		directionY: "bottom",
-		fixedDirection: true,
-		isDefaultMode: false,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "ComboBox with a pre-selected option.",
-			},
-		},
-	},
+const WithIconsTemplate = () => {
+  return (
+    <Wrapper>
+      <ComboBox
+        options={[
+          { key: 1, label: "Move", icon: MoveReactSvgUrl },
+          { key: 2, label: "Copy", icon: CopyReactSvgUrl },
+          { key: 3, label: "Download", icon: DownloadReactSvgUrl },
+        ]}
+        selectedOption={{ key: 0, label: "Select Type" }}
+        directionY="bottom"
+        fixedDirection
+        isDefaultMode={false}
+      />
+    </Wrapper>
+  );
 };
 
-export const CustomStyling: StoryObj<typeof ComboBox> = {
-	render: (args) => <Template {...args} />,
-	args: {
-		options: [
-			{
-				key: 1,
-				label: "Critical",
-				backgroundColor: "#FF4444",
-				color: "#FFFFFF",
-			},
-			{
-				key: 2,
-				label: "High",
-				backgroundColor: "#FF8C00",
-				color: "#FFFFFF",
-			},
-			{
-				key: 3,
-				label: "Medium",
-				backgroundColor: "#FFD700",
-				color: "#000000",
-			},
-			{
-				key: 4,
-				label: "Low",
-				backgroundColor: "#90EE90",
-				color: "#000000",
-			},
-		],
-		selectedOption: {
-			key: 0,
-			label: "Select Priority",
-		},
-		noBorder: true,
-		directionY: "bottom",
-		fixedDirection: true,
-		isDefaultMode: false,
-		scaled: false,
-	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"ComboBox with custom styling for options, demonstrating color customization.",
-			},
-		},
-	},
+export const WithIcons: Story = {
+  render: () => <WithIconsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "ComboBox with icons in options for better visual representation of each action.",
+      },
+      source: {
+        code: `<ComboBox
+  options={[
+    { key: 1, label: "Move", icon: MoveIcon },
+    { key: 2, label: "Copy", icon: CopyIcon },
+    { key: 3, label: "Download", icon: DownloadIcon },
+  ]}
+  selectedOption={{ key: 0, label: "Select Type" }}
+/>`,
+      },
+    },
+  },
+};
+
+const DisabledTemplate = () => {
+  return (
+    <Wrapper>
+      <ComboBox
+        options={defaultOptions}
+        selectedOption={{ key: 0, label: "Select Status" }}
+        dropDownMaxHeight={200}
+        scaled={false}
+        directionY="bottom"
+        fixedDirection
+        isDefaultMode={false}
+        isDisabled
+      />
+    </Wrapper>
+  );
+};
+
+export const Disabled: Story = {
+  render: () => <DisabledTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Disabled state of the ComboBox. The dropdown cannot be opened and the component appears dimmed.",
+      },
+      source: {
+        code: `<ComboBox options={options} selectedOption={selected} isDisabled />`,
+      },
+    },
+  },
+};
+
+const WithSelectedOptionTemplate = () => {
+  return (
+    <Wrapper>
+      <ComboBox
+        options={defaultOptions}
+        selectedOption={defaultOptions[0]}
+        dropDownMaxHeight={200}
+        scaled={false}
+        directionY="bottom"
+        fixedDirection
+        isDefaultMode={false}
+      />
+    </Wrapper>
+  );
+};
+
+export const WithSelectedOption: Story = {
+  render: () => <WithSelectedOptionTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "ComboBox with a pre-selected option. The selected option is highlighted in the dropdown.",
+      },
+      source: {
+        code: `<ComboBox options={options} selectedOption={options[0]} />`,
+      },
+    },
+  },
+};
+
+const CustomStylingTemplate = () => {
+  return (
+    <Wrapper>
+      <ComboBox
+        options={[
+          { key: 1, label: "Critical", backgroundColor: "#FF4444", color: "#FFFFFF" },
+          { key: 2, label: "High", backgroundColor: "#FF8C00", color: "#FFFFFF" },
+          { key: 3, label: "Medium", backgroundColor: "#FFD700", color: "#000000" },
+          { key: 4, label: "Low", backgroundColor: "#90EE90", color: "#000000" },
+        ]}
+        selectedOption={{ key: 0, label: "Select Priority" }}
+        noBorder
+        directionY="bottom"
+        fixedDirection
+        isDefaultMode={false}
+        scaled={false}
+      />
+    </Wrapper>
+  );
+};
+
+export const CustomStyling: Story = {
+  render: () => <CustomStylingTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "ComboBox with custom-styled options demonstrating color-coded priority levels.",
+      },
+      source: {
+        code: `<ComboBox
+  options={[
+    { key: 1, label: "Critical", backgroundColor: "#FF4444", color: "#FFFFFF" },
+    { key: 2, label: "High", backgroundColor: "#FF8C00", color: "#FFFFFF" },
+    { key: 3, label: "Medium", backgroundColor: "#FFD700", color: "#000000" },
+    { key: 4, label: "Low", backgroundColor: "#90EE90", color: "#000000" },
+  ]}
+  selectedOption={{ key: 0, label: "Select Priority" }}
+  noBorder
+/>`,
+      },
+    },
+  },
 };

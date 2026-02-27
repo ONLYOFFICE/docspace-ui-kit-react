@@ -24,43 +24,72 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
 import { useState } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { Button, ButtonSize } from "../button";
 import { Portal } from "./Portal";
-
 import styles from "./Portal.module.scss";
 
-const meta: Meta<typeof Portal> = {
-  title: "UI/Overlays/Portal",
+const meta = {
+  title: "UI/Layout/Portal",
   component: Portal,
   parameters: {
     docs: {
       description: {
-        component:
-          "Portal component renders children into a DOM node outside the parent component's DOM hierarchy.",
+        component: `Portal renders children into a DOM node outside the parent component's DOM hierarchy using React portals.
+
+### Features
+
+- **DOM Escape Hatch**: Renders content outside the parent DOM tree
+- **Custom Target**: Append to any DOM element via \`appendTo\` prop
+- **Visibility Control**: Toggle portal content visibility without unmounting
+- **Default to Body**: Renders to \`document.body\` when no target is specified
+
+### Usage
+
+\`\`\`tsx
+import { Portal } from "@docspace/ui-kit/components/portal";
+
+// Render into document.body
+<Portal element={<div>Portal content</div>} />
+
+// Render into a specific container
+<Portal element={<div>Portal content</div>} appendTo={containerRef} />
+
+// Control visibility
+<Portal element={<div>Toggleable content</div>} visible={isVisible} />
+\`\`\``,
       },
     },
   },
   argTypes: {
     element: {
-      description: "The React node to be rendered inside the portal",
+      description: "React node to render inside the portal",
       control: false,
     },
     visible: {
-      description: "Whether the portal content should be visible",
       control: "boolean",
+      description: "Controls portal content visibility",
+      table: {
+        defaultValue: { summary: "true" },
+      },
     },
     appendTo: {
-      description: "The DOM element to append the portal to",
+      description: "Target DOM element to append the portal to",
       control: false,
+      table: {
+        defaultValue: { summary: "document.body" },
+      },
     },
   },
-};
+} satisfies Meta<typeof Portal>;
+
+type Story = StoryObj<ComponentProps<typeof Portal>>;
 
 export default meta;
-
-type Story = StoryObj<typeof Portal>;
 
 export const Default: Story = {
   render: (args) => {
@@ -76,6 +105,17 @@ export const Default: Story = {
   args: {
     element: <div className={styles.popup}>This content is rendered in a portal</div>,
     visible: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default portal rendering content into a custom container element.",
+      },
+      source: {
+        code: `<Portal element={<div>Portal content</div>} visible appendTo={containerElement} />`,
+      },
+    },
   },
 };
 
@@ -94,106 +134,162 @@ export const Hidden: Story = {
     element: <div className={styles.popup}>You should not see this</div>,
     visible: false,
   },
-};
-
-export const CustomContainer: Story = {
-  render: () => {
-    const [container, setContainer] = useState<HTMLElement | null>(null);
-
-    return (
-      <div>
-        <p>Main content</p>
-        <div ref={setContainer} className={styles.customContainer}>
-          <p>Custom container (portal target)</p>
-          {container && (
-            <Portal
-              element={
-                <div className={`${styles.popup} ${styles.blue}`}>
-                  Content rendered inside custom container
-                </div>
-              }
-              appendTo={container}
-            />
-          )}
-        </div>
-      </div>
-    );
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Portal with visible set to false. The content is not rendered.",
+      },
+      source: {
+        code: `<Portal element={<div>Hidden content</div>} visible={false} appendTo={containerElement} />`,
+      },
+    },
   },
 };
 
-export const MultiplePortals: Story = {
-  render: () => {
-    const [container, setContainer] = useState<HTMLElement | null>(null);
+const CustomContainerTemplate = () => {
+  const [container, setContainer] = useState<HTMLElement | null>(null);
 
-    return (
+  return (
+    <div>
+      <p>Main content</p>
       <div ref={setContainer} className={styles.customContainer}>
-        <p>Multiple portals example</p>
-        {container && (
-          <>
-            <Portal
-              element={
-                <div className={`${styles.popup} ${styles.blue}`}>
-                  First Portal
-                </div>
-              }
-              appendTo={container}
-            />
-            <Portal
-              element={
-                <div className={`${styles.popup} ${styles.purple}`}>
-                  Second Portal
-                </div>
-              }
-              appendTo={container}
-            />
-            <Portal
-              element={
-                <div className={`${styles.popup} ${styles.green}`}>
-                  Third Portal
-                </div>
-              }
-              appendTo={container}
-            />
-          </>
-        )}
-      </div>
-    );
-  },
-};
-
-export const ToggleVisibility: Story = {
-  render: () => {
-    const [container, setContainer] = useState<HTMLElement | null>(null);
-    const [visible, setVisible] = useState(false);
-
-    return (
-      <div ref={setContainer} className={styles.customContainer}>
-        <button
-          type="button"
-          onClick={() => setVisible(!visible)}
-          style={{ padding: "8px 16px", cursor: "pointer" }}
-        >
-          {visible ? "Hide Portal" : "Show Portal"}
-        </button>
+        <p>Custom container (portal target)</p>
         {container && (
           <Portal
             element={
-              <div className={styles.popup}>
-                <p>Portal content</p>
-                <button
-                  type="button"
-                  onClick={() => setVisible(false)}
-                  style={{ padding: "4px 8px", cursor: "pointer" }}
-                >
-                  Close
-                </button>
+              <div className={`${styles.popup} ${styles.blue}`}>
+                Content rendered inside custom container
               </div>
             }
-            visible={visible}
             appendTo={container}
           />
         )}
       </div>
-    );
+    </div>
+  );
+};
+
+export const CustomContainer: Story = {
+  render: () => <CustomContainerTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Portal rendering into a specific custom container element instead of document.body.",
+      },
+      source: {
+        code: `<Portal
+  element={<div>Custom container content</div>}
+  appendTo={customContainerElement}
+/>`,
+      },
+    },
+  },
+};
+
+const MultiplePortalsTemplate = () => {
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+
+  return (
+    <div ref={setContainer} className={styles.customContainer}>
+      <p>Multiple portals example</p>
+      {container && (
+        <>
+          <Portal
+            element={
+              <div className={`${styles.popup} ${styles.blue}`}>
+                First Portal
+              </div>
+            }
+            appendTo={container}
+          />
+          <Portal
+            element={
+              <div className={`${styles.popup} ${styles.purple}`}>
+                Second Portal
+              </div>
+            }
+            appendTo={container}
+          />
+          <Portal
+            element={
+              <div className={`${styles.popup} ${styles.green}`}>
+                Third Portal
+              </div>
+            }
+            appendTo={container}
+          />
+        </>
+      )}
+    </div>
+  );
+};
+
+export const MultiplePortals: Story = {
+  render: () => <MultiplePortalsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Multiple portals rendered into the same container, demonstrating portal stacking.",
+      },
+      source: {
+        code: `<Portal element={<div>First Portal</div>} appendTo={container} />
+<Portal element={<div>Second Portal</div>} appendTo={container} />
+<Portal element={<div>Third Portal</div>} appendTo={container} />`,
+      },
+    },
+  },
+};
+
+const ToggleVisibilityTemplate = () => {
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div ref={setContainer} className={styles.customContainer}>
+      <Button
+        label={visible ? "Hide Portal" : "Show Portal"}
+        primary
+        size={ButtonSize.small}
+        onClick={() => setVisible(!visible)}
+      />
+      {container && (
+        <Portal
+          element={
+            <div className={styles.popup}>
+              <p>Portal content</p>
+              <Button
+                label="Close"
+                size={ButtonSize.extraSmall}
+                onClick={() => setVisible(false)}
+              />
+            </div>
+          }
+          visible={visible}
+          appendTo={container}
+        />
+      )}
+    </div>
+  );
+};
+
+export const ToggleVisibility: Story = {
+  render: () => <ToggleVisibilityTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Portal with togglable visibility. The visible prop controls whether the content is rendered.",
+      },
+      source: {
+        code: `<Portal
+  element={<div>Toggleable content</div>}
+  visible={isVisible}
+  appendTo={container}
+/>`,
+      },
+    },
   },
 };

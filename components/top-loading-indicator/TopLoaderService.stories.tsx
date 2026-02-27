@@ -25,24 +25,55 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { useEffect } from "react";
-import { Meta, StoryFn } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { TopLoaderService } from "./index";
 
-export default {
+const meta = {
   title: "UI/Layout components/TopLoader",
   parameters: {
     docs: {
       description: {
-        component:
-          "A top loading indicator that shows progress at the top of the page",
+        component: `A lightweight top-of-page progress bar service for indicating page loading state. Uses direct DOM manipulation for performance.
+
+### Features
+
+- **Smooth Animation**: Linear progress to 50% in the first second, then 10% increments capped at 90%
+- **Completion Animation**: Smoothly animates from current position to 100% when \`end()\` is called
+- **Cancel Support**: Immediately resets the bar to 0% via \`cancel()\`
+- **No React Dependency**: Pure DOM manipulation service, works anywhere
+
+### Accessibility
+
+- \`role="progressbar"\` with \`aria-valuemin\`, \`aria-valuemax\`, \`aria-valuenow\`
+
+### Usage
+
+\`\`\`tsx
+import { TopLoaderService } from "@docspace/ui-kit/components/top-loading-indicator";
+
+// Prerequisite: add <div id="ipl-progress-indicator" /> to your HTML
+
+// Start loading
+TopLoaderService.start();
+
+// Complete loading
+TopLoaderService.end();
+
+// Cancel loading
+TopLoaderService.cancel();
+\`\`\``,
       },
     },
   },
-} as Meta;
+} satisfies Meta;
 
-const Template: StoryFn = () => {
+type Story = StoryObj;
+
+export default meta;
+
+const DefaultTemplate = () => {
   useEffect(() => {
-    // Create the progress bar element
     const progressBar = document.createElement("div");
     progressBar.id = "ipl-progress-indicator";
     progressBar.style.position = "fixed";
@@ -54,6 +85,7 @@ const Template: StoryFn = () => {
     document.body.appendChild(progressBar);
 
     return () => {
+      TopLoaderService.cancel();
       if (document.body.contains(progressBar)) {
         document.body.removeChild(progressBar);
       }
@@ -61,26 +93,40 @@ const Template: StoryFn = () => {
   }, []);
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ display: "flex", gap: "10px", padding: "20px" }}>
       <button type="button" onClick={() => TopLoaderService.start()}>
         Start Loading
       </button>
-      <button
-        type="button"
-        onClick={() => TopLoaderService.end()}
-        style={{ marginLeft: "10px" }}
-      >
+      <button type="button" onClick={() => TopLoaderService.end()}>
         End Loading
+      </button>
+      <button type="button" onClick={() => TopLoaderService.cancel()}>
+        Cancel
       </button>
     </div>
   );
 };
 
-export const Default = Template.bind({});
-Default.parameters = {
-  docs: {
-    description: {
-      story: "Default top loader with start, end, and cancel controls",
+export const Default: Story = {
+  render: () => <DefaultTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Interactive demo with Start, End, and Cancel buttons. A thin blue progress bar appears at the top of the viewport.",
+      },
+      source: {
+        code: `// Add to HTML: <div id="ipl-progress-indicator" />
+
+// Start loading
+TopLoaderService.start();
+
+// Complete loading
+TopLoaderService.end();
+
+// Cancel loading
+TopLoaderService.cancel();`,
+      },
     },
   },
 };

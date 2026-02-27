@@ -24,46 +24,175 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import { useState } from "react";
+
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import { Button, ButtonSize } from "../button";
 
 import StatusMessage from ".";
 
-const meta: Meta<typeof StatusMessage> = {
-  title: "UI/Data display/StatusMessage",
+const meta = {
+  title: "UI/Feedback/StatusMessage",
   component: StatusMessage,
   parameters: {
     docs: {
       description: {
-        component:
-          "Component that displays status messages with animation support. Messages can be error or warning type.",
+        component: `Component for displaying animated status messages with error or warning styling.
+
+### Features
+
+- **Animated Entry/Exit**: Smooth slide-in and fade-out animations
+- **Warning Variant**: Alternative styling for warning messages
+- **Auto-Hide**: Automatically hides when the message is cleared
+- **Message Swap**: Smoothly transitions between different messages
+- **Danger Icon**: Displays a warning icon alongside the message text
+
+### Usage
+
+\`\`\`tsx
+import StatusMessage from "@docspace/ui-kit/components/status-message";
+
+// Error message
+<StatusMessage message="Invalid email address" />
+
+// Warning message
+<StatusMessage message="Password is too weak" isWarning />
+
+// Controlled visibility (clear message to hide)
+<StatusMessage message={error || ""} />
+\`\`\``,
       },
     },
   },
   argTypes: {
     message: {
       control: "text",
-      description: "Message content to display",
+      description: "Message text to display. Set to empty string to hide.",
     },
     isWarning: {
       control: "boolean",
-      description: "Whether to display as warning style",
+      description: "Display with warning styling instead of error",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
-};
+} satisfies Meta<typeof StatusMessage>;
+
+type Story = StoryObj<ComponentProps<typeof StatusMessage>>;
 
 export default meta;
 
-type Story = StoryObj<typeof StatusMessage>;
-
 export const Default: Story = {
+  render: (args) => <StatusMessage {...args} />,
   args: {
     message: "This is a status message",
   },
 };
 
+const WarningTemplate = () => {
+  return <StatusMessage message="This is a warning message" isWarning />;
+};
+
+const ToggleTemplate = () => {
+  const [message, setMessage] = useState("Click the button to dismiss");
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <StatusMessage message={message} />
+      <div style={{ display: "flex", gap: 8 }}>
+        <Button
+          label="Show Message"
+          size={ButtonSize.small}
+          onClick={() => setMessage("Status message is visible")}
+        />
+        <Button
+          label="Hide Message"
+          size={ButtonSize.small}
+          onClick={() => setMessage("")}
+        />
+      </div>
+    </div>
+  );
+};
+
+const MessageSwapTemplate = () => {
+  const [message, setMessage] = useState("First message");
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <StatusMessage message={message} />
+      <div style={{ display: "flex", gap: 8 }}>
+        <Button
+          label="Message A"
+          size={ButtonSize.small}
+          onClick={() => setMessage("First message")}
+        />
+        <Button
+          label="Message B"
+          size={ButtonSize.small}
+          onClick={() => setMessage("Second message")}
+        />
+        <Button
+          label="Clear"
+          size={ButtonSize.small}
+          onClick={() => setMessage("")}
+        />
+      </div>
+    </div>
+  );
+};
+
 export const WarningMessage: Story = {
-  args: {
-    message: "This is a warning message",
-    isWarning: true,
+  render: () => <WarningTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: "Status message with warning styling for non-critical alerts.",
+      },
+      source: {
+        code: `<StatusMessage message="This is a warning message" isWarning />`,
+      },
+    },
+  },
+};
+
+export const ToggleVisibility: Story = {
+  render: () => <ToggleTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Demonstrates showing and hiding the status message by setting the message to an empty string.",
+      },
+      source: {
+        code: `const [message, setMessage] = useState("Click the button to dismiss");
+
+<StatusMessage message={message} />
+<Button label="Show" onClick={() => setMessage("Visible")} />
+<Button label="Hide" onClick={() => setMessage("")} />`,
+      },
+    },
+  },
+};
+
+export const MessageSwap: Story = {
+  render: () => <MessageSwapTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Demonstrates smooth transitions when swapping between different messages.",
+      },
+      source: {
+        code: `const [message, setMessage] = useState("First message");
+
+<StatusMessage message={message} />
+<Button label="Message A" onClick={() => setMessage("First message")} />
+<Button label="Message B" onClick={() => setMessage("Second message")} />
+<Button label="Clear" onClick={() => setMessage("")} />`,
+      },
+    },
   },
 };

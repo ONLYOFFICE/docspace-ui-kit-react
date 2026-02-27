@@ -24,8 +24,13 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import type { FileTileProps } from "./FileTile.types";
+
 import { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
 
 import WordSvgUrl from "../../../assets/icons/32/word.svg";
 
@@ -37,7 +42,6 @@ import { IconSizeType } from "../../../utils";
 import { FileType } from "../../../enums";
 
 import { FileTile } from ".";
-import { FileTileProps } from "./FileTile.types";
 import { TileContent } from "../tile-content";
 import { IconButton } from "../../icon-button";
 
@@ -100,19 +104,62 @@ const meta = {
 	parameters: {
 		docs: {
 			description: {
-				component:
-					"File tile component for displaying file information in a tile format",
+				component: `File tile component for displaying file information in a tile format.
+
+### Features
+
+- **File Preview**: Displays file icon and optional thumbnail preview
+- **Selectable**: Supports checked/selected state with checkbox
+- **Drag Support**: Built-in drag and drop functionality
+- **Progress State**: Loading indicator for file operations
+- **Badges**: Display status badges (e.g., "New", version info)
+- **Content Elements**: Lock icons and other file status indicators
+- **Context Menu**: Right-click context menu for file actions
+
+### Usage
+
+\`\`\`tsx
+import { FileTile } from "@docspace/ui-kit/components/tiles/file-tile";
+import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+
+<FileTile
+  item={{ id: "1", title: "Document.docx", fileExst: ".docx", fileType: FileType.Document }}
+  element={<WordIcon />}
+  contextOptions={options}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>Document.docx</Link></TileContent>
+</FileTile>
+\`\`\``,
 			},
 		},
 	},
 	argTypes: {
-		checked: { control: "boolean" },
-		isDragging: { control: "boolean" },
-		inProgress: { control: "boolean" },
+		checked: {
+			control: "boolean",
+			description: "Whether the tile is selected/checked",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		isDragging: {
+			control: "boolean",
+			description: "Whether the tile is currently being dragged",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		inProgress: {
+			control: "boolean",
+			description: "Whether the tile shows a loading/progress indicator",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
 	},
 } satisfies Meta<typeof FileTile>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof FileTile>>;
 
 export default meta;
 
@@ -161,6 +208,19 @@ export const Default: Story = {
 			description: {
 				story: "Basic file tile with selection functionality",
 			},
+			source: {
+				code: `<FileTile
+  item={{ id: "file-1", title: "Document.docx", fileExst: ".docx", fileType: FileType.Document }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  contentElement={contentElement}
+  badges={badges}
+  temporaryIcon={<ImageReactSvg />}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>File Content</Link></TileContent>
+</FileTile>`,
+			},
 		},
 	},
 };
@@ -176,6 +236,17 @@ export const Checked: Story = {
 			description: {
 				story: "File tile in checked state",
 			},
+			source: {
+				code: `<FileTile
+  item={{ id: "file-1", title: "Document.docx", fileExst: ".docx", fileType: FileType.Document }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  checked={true}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>File Content</Link></TileContent>
+</FileTile>`,
+			},
 		},
 	},
 };
@@ -190,6 +261,16 @@ export const InProgress: Story = {
 		docs: {
 			description: {
 				story: "File tile showing progress state",
+			},
+			source: {
+				code: `<FileTile
+  item={{ id: "file-1", title: "Document.docx", fileExst: ".docx", fileType: FileType.Document }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  inProgress={true}
+>
+  <TileContent><Link>File Content</Link></TileContent>
+</FileTile>`,
 			},
 		},
 	},

@@ -1,78 +1,247 @@
-/*
- * (c) Copyright Ascensio System SIA 2009-2026
- *
- * This program is a free software product.
- * You can redistribute it and/or modify it under the terms
- * of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
- * Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
- * to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
- * any third-party rights.
- *
- * This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
- * the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
- *
- * The  interactive user interfaces in modified source and object code versions of the Program must
- * display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
- *
- * Pursuant to Section 7(b) of the License you must retain the original Product logo when
- * distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
- * trademark law for use of our trademarks.
- *
- * All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
- * content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
- * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
- */
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { LoadingButton } from ".";
 
 const meta = {
-  title: "UI/Status components/LoadingButton",
+  title: "UI/Feedback/LoadingButton",
   component: LoadingButton,
   parameters: {
     docs: {
       description: {
-        component: "Loading button.",
+        component: `Loading button that displays a circular progress indicator. Used to show file conversion or processing progress.
+
+### Features
+
+- **Progress Indicator**: Circular loading animation with percentage
+- **Conversion Mode**: Special state for file conversion operations
+- **Default Mode**: Alternative display mode
+- **Color Customization**: Configurable loader and background colors
+- **Clickable**: Supports click handler for cancel/action operations
+
+### Usage
+
+\`\`\`tsx
+import { LoadingButton } from "@docspace/ui-kit/components/loading-button";
+
+// Basic loading button
+<LoadingButton percent={45} />
+
+// In conversion mode
+<LoadingButton percent={60} inConversion />
+
+// With custom colors
+<LoadingButton percent={30} loaderColor="#2DA7DB" backgroundColor="#f5f5f5" />
+\`\`\``,
       },
     },
   },
+  argTypes: {
+    percent: {
+      control: { type: "number", min: 0, max: 100 },
+      description: "Progress value in percent (0-100)",
+      table: {
+        defaultValue: { summary: "0" },
+      },
+    },
+    inConversion: {
+      control: "boolean",
+      description: "Indicates whether conversion is in progress",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDefaultMode: {
+      control: "boolean",
+      description: "Indicates whether the component is in default mode",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    loaderColor: {
+      control: "color",
+      description: "Color of the loading indicator",
+    },
+    backgroundColor: {
+      control: "color",
+      description: "Background color of the component",
+    },
+    onClick: {
+      action: "onClick",
+      description: "Function called when the button is clicked",
+    },
+  },
+} satisfies Meta<typeof LoadingButton>;
+
+type Story = StoryObj<ComponentProps<typeof LoadingButton>>;
+
+export default meta;
+
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(60px, 1fr))",
+        gridGap: "16px",
+        alignItems: "center",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+export const Default: Story = {
+  render: (args) => <LoadingButton {...args} />,
   args: {
     percent: 0,
     inConversion: false,
     isDefaultMode: false,
   },
-  argTypes: {
-    percent: {
-      control: { type: "number" },
-      description: "Progress value in percent",
-    },
-    inConversion: {
-      control: { type: "boolean" },
-      defaultValue: false,
-      description: "Indicates whether conversion is in progress",
-    },
-    loaderColor: {
-      control: { type: "color" },
-      description: "Color of the loading indicator",
-    },
-    backgroundColor: {
-      control: { type: "color" },
-      description: "Background color of the component",
-    },
-    isDefaultMode: {
-      control: { type: "boolean" },
-      defaultValue: false,
-      description: "Indicates whether the component is in default mode",
+};
+
+const ProgressStagesTemplate = () => {
+  const stages = [0, 25, 50, 75, 100];
+  return (
+    <Wrapper>
+      {stages.map((percent) => (
+        <div
+          key={percent}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <LoadingButton percent={percent} />
+          <span style={{ fontSize: "11px", color: "#666" }}>{percent}%</span>
+        </div>
+      ))}
+    </Wrapper>
+  );
+};
+
+export const ProgressStages: Story = {
+  render: () => <ProgressStagesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Loading buttons at various progress stages from 0% to 100%. Shows how the circular indicator fills as progress increases.",
+      },
+      source: {
+        code: `<LoadingButton percent={0} />
+<LoadingButton percent={25} />
+<LoadingButton percent={50} />
+<LoadingButton percent={75} />
+<LoadingButton percent={100} />`,
+      },
     },
   },
-} satisfies Meta<typeof LoadingButton>;
+};
 
-type Story = StoryObj<typeof LoadingButton>;
+const InConversionTemplate = () => {
+  return (
+    <Wrapper>
+      <LoadingButton percent={0} inConversion />
+      <LoadingButton percent={50} inConversion />
+      <LoadingButton percent={100} inConversion />
+    </Wrapper>
+  );
+};
 
-export default meta;
+export const InConversion: Story = {
+  render: () => <InConversionTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Loading buttons in conversion mode. Used when a file is being converted to a different format.",
+      },
+      source: {
+        code: `<LoadingButton percent={0} inConversion />
+<LoadingButton percent={50} inConversion />
+<LoadingButton percent={100} inConversion />`,
+      },
+    },
+  },
+};
 
-export const Default: Story = {};
+const DefaultModeTemplate = () => {
+  return (
+    <Wrapper>
+      <LoadingButton percent={45} isDefaultMode />
+    </Wrapper>
+  );
+};
+
+export const DefaultMode: Story = {
+  render: () => <DefaultModeTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Loading button in default mode. Provides an alternative visual display for the loading indicator.",
+      },
+      source: {
+        code: `<LoadingButton percent={45} isDefaultMode />`,
+      },
+    },
+  },
+};
+
+const CustomColorsTemplate = () => {
+  return (
+    <Wrapper>
+      <LoadingButton percent={60} loaderColor="#2DA7DB" />
+      <LoadingButton percent={60} loaderColor="#4CAF50" />
+      <LoadingButton percent={60} loaderColor="#FF5722" />
+    </Wrapper>
+  );
+};
+
+export const CustomColors: Story = {
+  render: () => <CustomColorsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Loading buttons with custom loader colors. Useful for matching the loading indicator to your application theme.",
+      },
+      source: {
+        code: `<LoadingButton percent={60} loaderColor="#2DA7DB" />
+<LoadingButton percent={60} loaderColor="#4CAF50" />
+<LoadingButton percent={60} loaderColor="#FF5722" />`,
+      },
+    },
+  },
+};

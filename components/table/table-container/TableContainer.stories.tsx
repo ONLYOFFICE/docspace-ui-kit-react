@@ -24,8 +24,11 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useRef } from "react";
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { TableContainerProps } from "../Table.types";
+
+import { useRef } from "react";
 import { uuid as uuidv4 } from "../../../utils/";
 
 import { TableContainer } from "./TableContainer";
@@ -34,7 +37,6 @@ import { TableRow } from "../table-row";
 import { TableCell } from "../sub-components/table-cell";
 import { TableHeader } from "../table-header";
 import { SortByFieldName } from "../../../enums";
-import type { TableContainerProps } from "../Table.types";
 import { TableBody } from "../table-body";
 
 const COLUMN_STORAGE_NAME = "storybook-table-container-column-storage";
@@ -127,12 +129,41 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "TableContainer is a container component for table elements (header, rows, cells). It applies specific styling when used with react-window for virtualized tables, including grid layout and scrolling behavior.",
+        component: `TableContainer is a wrapper for table elements including header, body, rows, and cells.
+
+### Features
+
+- **Grid Layout**: Applies CSS grid styling for consistent column alignment
+- **React-Window Support**: Configures specific styles for virtualized table content
+- **Scrolling Behavior**: Manages scroll context for child components
+- **Composable**: Works with TableHeader, TableBody, TableRow, and TableCell
+
+### Usage
+
+\`\`\`tsx
+import { TableContainer } from "@docspace/ui-kit/components/table/table-container";
+
+const ref = useRef<HTMLDivElement>(null);
+
+<TableContainer forwardedRef={ref} useReactWindow={false}>
+  <TableHeader {...headerProps} />
+  <TableBody {...bodyProps}>
+    {rows}
+  </TableBody>
+</TableContainer>
+\`\`\``,
       },
     },
   },
   argTypes: {
+    useReactWindow: {
+      control: "boolean",
+      description:
+        "Enable react-window mode for virtualized scrolling styles",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
     forwardedRef: { control: false },
     children: { control: false },
   },
@@ -162,11 +193,50 @@ const meta = {
   ],
 } satisfies Meta<typeof TableContainer>;
 
+type Story = StoryObj<ComponentProps<typeof TableContainer>>;
+
 export default meta;
-type Story = StoryObj<typeof TableContainer>;
 
 export const Default: Story = {
+  render: (args) => <TableContainerWrapper {...args} />,
   args: {
     useReactWindow: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default TableContainer with a header and body. Renders all rows without virtual scrolling.",
+      },
+      source: {
+        code: `const ref = useRef<HTMLDivElement>(null);
+
+<TableContainer forwardedRef={ref} useReactWindow={false}>
+  <TableHeader
+    containerRef={ref}
+    columns={columns}
+    columnStorageName="my-columns"
+    columnInfoPanelStorageName="my-info-panel"
+    sectionWidth={800}
+    useReactWindow={false}
+    showSettings
+    sortingVisible
+    sorted
+  />
+  <TableBody
+    columnStorageName="my-columns"
+    columnInfoPanelStorageName="my-info-panel"
+    fetchMoreFiles={fetchMore}
+    filesLength={10}
+    hasMoreFiles={false}
+    itemCount={10}
+    itemHeight={50}
+    useReactWindow={false}
+  >
+    {rows}
+  </TableBody>
+</TableContainer>`,
+      },
+    },
   },
 };

@@ -24,30 +24,93 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState, useEffect } from "react";
+import type { ComponentProps } from "react";
+import { useEffect, useState } from "react";
 
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Paging } from "./Paging";
-import { PagingProps } from "./Paging.types";
+import type { PagingProps } from "./Paging.types";
 
 const meta = {
-  title: "UI/Interactive elements/Paging",
+  title: "UI/Navigation/Paging",
   component: Paging,
   parameters: {
     docs: {
       description: {
-        component: "Paging is used to navigate med content pages",
+        component: `Paging provides page navigation controls with previous/next buttons and page/count selectors.
+
+### Features
+
+- **Previous/Next Buttons**: Navigate between pages with customizable labels
+- **Page Selector**: Dropdown to jump to a specific page
+- **Count Selector**: Dropdown to change items per page
+- **Disabled States**: Independently disable previous or next buttons
+- **Open Direction**: Control dropdown direction (top, bottom, or both)
+
+### Usage
+
+\`\`\`tsx
+import { Paging } from "@docspace/ui-kit/components/paging";
+
+<Paging
+  previousLabel="Previous"
+  nextLabel="Next"
+  previousAction={handlePrev}
+  nextAction={handleNext}
+  pageItems={pageItems}
+  countItems={countItems}
+  selectedPageItem={currentPage}
+  selectedCountItem={currentCount}
+  onSelectPage={handlePageSelect}
+  onSelectCount={handleCountSelect}
+/>
+\`\`\``,
       },
     },
   },
   argTypes: {
-    onSelectPage: { action: "onSelectPage" },
-    onSelectCount: { action: "onSelectCount" },
-    previousAction: { action: "onPrevious" },
+    previousLabel: {
+      control: "text",
+      description: "Label for the previous button",
+    },
+    nextLabel: {
+      control: "text",
+      description: "Label for the next button",
+    },
+    disablePrevious: {
+      control: "boolean",
+      description: "Disables the previous button",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    disableNext: {
+      control: "boolean",
+      description: "Disables the next button",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    openDirection: {
+      control: "select",
+      options: ["bottom", "top", "both"],
+      description: "Direction the dropdown menus open",
+      table: {
+        defaultValue: { summary: "bottom" },
+      },
+    },
+    showCountItem: {
+      control: "boolean",
+      description: "Shows the items-per-page selector",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
   },
 } satisfies Meta<typeof Paging>;
-type Story = StoryObj<typeof Paging>;
+
+type Story = StoryObj<ComponentProps<typeof Paging>>;
 
 export default meta;
 
@@ -63,28 +126,11 @@ const createPageItems = (count: number) => {
 };
 
 const countItems = [
-  {
-    key: 25,
-    label: "25 per page",
-  },
-  {
-    key: 50,
-    label: "50 per page",
-  },
-  {
-    key: 100,
-    label: "100 per page",
-  },
+  { key: 25, label: "25 per page" },
+  { key: 50, label: "50 per page" },
+  { key: 100, label: "100 per page" },
 ];
 
-const selectedCountPageHandler = (count: number) => {
-  return countItems.filter((item) => {
-    if (item.key === count) {
-      return true;
-    }
-    return false;
-  });
-};
 const pageItems = createPageItems(200);
 
 const Template = ({
@@ -98,7 +144,7 @@ const Template = ({
 
   useEffect(() => {
     setSelectedPageItems(pageItems[0]);
-  }, [pageItems]);
+  }, []);
 
   const onSelectPageNextHandler = () => {
     const currentPage = pageItems.filter(
@@ -132,7 +178,7 @@ const Template = ({
         onSelectPage={(a) => onSelectPage?.(a)}
         onSelectCount={(a) => onSelectCount?.(a)}
         selectedPageItem={selectedPageItem}
-        selectedCountItem={selectedCountPageHandler(25)[0]}
+        selectedCountItem={countItems[0]}
       />
     </div>
   );
@@ -143,15 +189,126 @@ export const Default: Story = {
   args: {
     previousLabel: "Previous",
     nextLabel: "Next",
-
     disablePrevious: false,
     disableNext: false,
     openDirection: "bottom",
-
-    selectedCountItem: {
-      key: 100,
-      label: "100 per page",
+    selectedCountItem: { key: 25, label: "25 per page" },
+    selectedPageItem: { key: 1, label: "1 of 200" },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default paging with previous/next buttons and page/count selectors. Navigate through 200 pages.",
+      },
+      source: {
+        code: `<Paging
+  previousLabel="Previous"
+  nextLabel="Next"
+  pageItems={pageItems}
+  countItems={countItems}
+  selectedPageItem={currentPage}
+  selectedCountItem={currentCount}
+  previousAction={handlePrev}
+  nextAction={handleNext}
+/>`,
+      },
     },
-    selectedPageItem: { key: 1, label: "1 of 10" },
+  },
+};
+
+const DisabledPreviousTemplate = () => {
+  return (
+    <Paging
+      previousLabel="Previous"
+      nextLabel="Next"
+      disablePrevious
+      pageItems={pageItems}
+      countItems={countItems}
+      selectedPageItem={pageItems[0]}
+      selectedCountItem={countItems[0]}
+      previousAction={async () => {}}
+      nextAction={async () => {}}
+      style={{ justifyContent: "center", alignItems: "center" }}
+    />
+  );
+};
+
+export const DisabledPrevious: Story = {
+  render: () => <DisabledPreviousTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Paging with the previous button disabled. Typically used when on the first page.",
+      },
+      source: {
+        code: `<Paging previousLabel="Previous" nextLabel="Next" disablePrevious />`,
+      },
+    },
+  },
+};
+
+const DisabledNextTemplate = () => {
+  return (
+    <Paging
+      previousLabel="Previous"
+      nextLabel="Next"
+      disableNext
+      pageItems={pageItems}
+      countItems={countItems}
+      selectedPageItem={pageItems[pageItems.length - 1]}
+      selectedCountItem={countItems[0]}
+      previousAction={async () => {}}
+      nextAction={async () => {}}
+      style={{ justifyContent: "center", alignItems: "center" }}
+    />
+  );
+};
+
+export const DisabledNext: Story = {
+  render: () => <DisabledNextTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Paging with the next button disabled. Typically used when on the last page.",
+      },
+      source: {
+        code: `<Paging previousLabel="Previous" nextLabel="Next" disableNext />`,
+      },
+    },
+  },
+};
+
+const WithoutCountTemplate = () => {
+  return (
+    <Paging
+      previousLabel="Previous"
+      nextLabel="Next"
+      showCountItem={false}
+      pageItems={pageItems}
+      countItems={countItems}
+      selectedPageItem={pageItems[0]}
+      selectedCountItem={countItems[0]}
+      previousAction={async () => {}}
+      nextAction={async () => {}}
+      style={{ justifyContent: "center", alignItems: "center" }}
+    />
+  );
+};
+
+export const WithoutCountSelector: Story = {
+  render: () => <WithoutCountTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Paging without the items-per-page selector. Only shows previous/next buttons and page selector.",
+      },
+      source: {
+        code: `<Paging previousLabel="Previous" nextLabel="Next" showCountItem={false} />`,
+      },
+    },
   },
 };

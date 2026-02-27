@@ -24,208 +24,332 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type React from "react";
+import type { ComponentProps } from "react";
+import { useState } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import SearchReactSvgUrl from "../../assets/search.react.svg?url";
 
-import { InputBlock } from ".";
-import { InputBlockProps } from "./InputBlock.types";
 import { InputSize, InputType } from "../text-input";
 
+import { InputBlock } from ".";
+import type { InputBlockProps } from "./InputBlock.types";
+
 const meta = {
-  title: "UI/Form controls/InputBlock",
+  title: "UI/Interactive elements/InputBlock",
   component: InputBlock,
   parameters: {
     docs: {
       description: {
-        component: `
-A sophisticated input field component with integrated icon support and state management.
+        component: `Input field with integrated icon support, combining a text input with an action icon button.
 
-## Features
-- Multiple input types (text, password, email, etc.)
-- Error and warning states
-- Icon support with customizable colors
-- Multiple size options
-- Read-only and disabled states
-- Event handlers for changes, focus, and blur
-- Autocomplete configuration
-- Auto-focus capability
+### Features
 
-## Usage
-Used throughout the application for text input, search fields, password inputs, and other form controls requiring icon integration.
-`,
+- **Icon Integration**: Attach icons with customizable colors and click handlers
+- **Multiple Types**: text, password, email, tel, search, and number
+- **Three Sizes**: base, middle, and large
+- **Validation States**: Error and warning visual indicators
+- **Read-Only & Disabled**: Prevent editing or interaction
+- **Full Width**: Scale to 100% width when needed
+
+### Usage
+
+\`\`\`tsx
+import { InputBlock } from "@docspace/ui-kit/components/input-block";
+import { InputSize, InputType } from "@docspace/ui-kit/components/text-input";
+
+<InputBlock
+  type={InputType.text}
+  size={InputSize.base}
+  iconName={SearchIconUrl}
+  placeholder="Search..."
+  value={value}
+  onChange={handleChange}
+  onIconClick={handleSearch}
+/>
+\`\`\``,
       },
     },
   },
-  tags: ["autodocs"],
+  argTypes: {
+    size: {
+      control: "select",
+      options: Object.values(InputSize),
+      description: "Size of the input field",
+      table: {
+        defaultValue: { summary: "base" },
+      },
+    },
+    type: {
+      control: "select",
+      options: Object.values(InputType),
+      description: "HTML input type",
+      table: {
+        defaultValue: { summary: "text" },
+      },
+    },
+    placeholder: {
+      control: "text",
+      description: "Placeholder text",
+    },
+    isDisabled: {
+      control: "boolean",
+      description: "Disable the input field",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isReadOnly: {
+      control: "boolean",
+      description: "Make the input read-only",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    hasError: {
+      control: "boolean",
+      description: "Show error state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    hasWarning: {
+      control: "boolean",
+      description: "Show warning state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    scale: {
+      control: "boolean",
+      description: "Scale input to 100% width",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    iconName: {
+      control: "text",
+      description: "Path to the icon SVG",
+    },
+    iconColor: {
+      control: "color",
+      description: "Icon color",
+    },
+    hoverColor: {
+      control: "color",
+      description: "Icon hover color",
+    },
+    isIconFill: {
+      control: "boolean",
+      description: "Fill the icon",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+  },
 } satisfies Meta<typeof InputBlock>;
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof InputBlock>>;
 
-const Template = (args: InputBlockProps) => {
-  const [value, setValue] = useState(args.value || "");
+export default meta;
+
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+        gridGap: "16px",
+        alignItems: "center",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+const ControlledInputBlock = (props: InputBlockProps) => {
+  const [value, setValue] = useState(props.value || "");
 
   return (
     <InputBlock
-      {...args}
+      {...props}
       value={value}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
-        args.onChange?.(e);
-      }}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+        setValue(e.target.value)
+      }
     />
   );
 };
 
-const defaultArgs: InputBlockProps = {
-  id: "default-input",
-  name: "default",
-  placeholder: "This is placeholder",
+const defaultProps: InputBlockProps = {
+  placeholder: "Enter text here",
   maxLength: 255,
   size: InputSize.base,
-  isAutoFocussed: false,
+  type: InputType.text,
+  isDisabled: false,
   isReadOnly: false,
   hasError: false,
   hasWarning: false,
   scale: false,
-  autoComplete: "off",
-  tabIndex: 1,
-  iconSize: 0,
-  type: InputType.text,
-  isDisabled: false,
   iconName: SearchReactSvgUrl,
   isIconFill: false,
   value: "",
 };
 
 export const Default: Story = {
-  render: (args) => <Template {...args} />,
-  args: defaultArgs,
-  parameters: {
-    docs: {
-      description: {
-        story: "Default input field with icon support. Shows the basic configuration with a search icon and text input.",
-      },
-    },
-  },
+  render: (args) => <ControlledInputBlock {...args} />,
+  args: defaultProps,
 };
 
-export const WithError: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...defaultArgs,
-    id: "error-input",
-    hasError: true,
-    placeholder: "Input with error state",
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Input field in error state. Shows red border and styling to indicate validation failure or error condition.",
-      },
-    },
-  },
-};
-
-export const WithWarning: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...defaultArgs,
-    id: "warning-input",
-    hasWarning: true,
-    placeholder: "Input with warning state",
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Input field in warning state. Shows amber/orange styling to indicate caution or non-critical issues.",
-      },
-    },
-  },
-};
-
-export const Disabled: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...defaultArgs,
-    id: "disabled-input",
-    isDisabled: true,
-    placeholder: "Disabled input",
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Disabled input field that cannot be interacted with. Shows grayed-out styling and prevents all user input.",
-      },
-    },
-  },
-};
-
-export const ReadOnly: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...defaultArgs,
-    id: "readonly-input",
-    isReadOnly: true,
-    value: "Read-only content",
-    placeholder: "Read-only input",
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Read-only input field that displays content but cannot be edited. User can select and copy the text but cannot modify it.",
-      },
-    },
-  },
-};
-
-export const Password: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...defaultArgs,
-    id: "password-input",
-    type: InputType.password,
-    placeholder: "Enter password",
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Password input field that masks typed characters for security. Typical use case for login and password change forms.",
-      },
-    },
-  },
-};
-
-export const Sizes: Story = {
-  args: defaultArgs,
-  render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <Template
-        {...defaultArgs}
-        id="base-size"
+const SizesTemplate = () => {
+  return (
+    <Wrapper>
+      <ControlledInputBlock
+        {...defaultProps}
         size={InputSize.base}
         placeholder="Base size"
       />
-      <Template
-        {...defaultArgs}
-        id="middle-size"
+      <ControlledInputBlock
+        {...defaultProps}
         size={InputSize.middle}
         placeholder="Middle size"
       />
-      <Template
-        {...defaultArgs}
-        id="large-size"
+      <ControlledInputBlock
+        {...defaultProps}
         size={InputSize.large}
         placeholder="Large size"
       />
-    </div>
-  ),
+    </Wrapper>
+  );
+};
+
+export const Sizes: Story = {
+  render: () => <SizesTemplate />,
   parameters: {
     docs: {
       description: {
-        story: "Demonstrates all available input field sizes: base (small), middle (default), and large. Each size is appropriate for different UI contexts and density requirements.",
+        story:
+          "InputBlock supports three sizes: base, middle, and large for different UI contexts.",
+      },
+      source: {
+        code: `<InputBlock size={InputSize.base} placeholder="Base size" iconName={SearchIcon} />
+<InputBlock size={InputSize.middle} placeholder="Middle size" iconName={SearchIcon} />
+<InputBlock size={InputSize.large} placeholder="Large size" iconName={SearchIcon} />`,
+      },
+    },
+  },
+};
+
+const StatesTemplate = () => {
+  return (
+    <Wrapper>
+      <ControlledInputBlock
+        {...defaultProps}
+        placeholder="Normal"
+      />
+      <ControlledInputBlock
+        {...defaultProps}
+        hasError
+        placeholder="Error state"
+      />
+      <ControlledInputBlock
+        {...defaultProps}
+        hasWarning
+        placeholder="Warning state"
+      />
+      <ControlledInputBlock
+        {...defaultProps}
+        isDisabled
+        placeholder="Disabled"
+      />
+      <ControlledInputBlock
+        {...defaultProps}
+        isReadOnly
+        value="Read-only content"
+      />
+    </Wrapper>
+  );
+};
+
+export const States: Story = {
+  render: () => <StatesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "InputBlock supports normal, error, warning, disabled, and read-only states.",
+      },
+      source: {
+        code: `<InputBlock placeholder="Normal" iconName={SearchIcon} />
+<InputBlock placeholder="Error state" hasError iconName={SearchIcon} />
+<InputBlock placeholder="Warning state" hasWarning iconName={SearchIcon} />
+<InputBlock placeholder="Disabled" isDisabled iconName={SearchIcon} />
+<InputBlock value="Read-only content" isReadOnly iconName={SearchIcon} />`,
+      },
+    },
+  },
+};
+
+const PasswordTemplate = () => {
+  return (
+    <div style={{ width: "300px" }}>
+      <ControlledInputBlock
+        {...defaultProps}
+        type={InputType.password}
+        placeholder="Enter password"
+      />
+    </div>
+  );
+};
+
+export const PasswordType: Story = {
+  render: () => <PasswordTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "InputBlock with password type masks typed characters for security.",
+      },
+      source: {
+        code: `<InputBlock
+  type={InputType.password}
+  placeholder="Enter password"
+  iconName={SearchIcon}
+/>`,
+      },
+    },
+  },
+};
+
+const WithIconClickTemplate = () => {
+  return (
+    <div style={{ width: "300px" }}>
+      <ControlledInputBlock
+        {...defaultProps}
+        placeholder="Click the icon"
+        onIconClick={() => alert("Icon clicked!")}
+      />
+    </div>
+  );
+};
+
+export const WithIconClick: Story = {
+  render: () => <WithIconClickTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The icon can be made clickable with the onIconClick callback. Click the search icon to see the action.",
+      },
+      source: {
+        code: `<InputBlock
+  placeholder="Click the icon"
+  iconName={SearchIcon}
+  onIconClick={() => alert("Icon clicked!")}
+/>`,
       },
     },
   },

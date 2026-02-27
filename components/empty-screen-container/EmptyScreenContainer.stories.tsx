@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
@@ -41,59 +42,89 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "A component for displaying empty states in the application. Use it to show informative messages " +
-          "with images, headers, descriptions, and action buttons when no content is available. " +
-          "Supports filter-related empty states with optional styling variants.",
+        component: `A component for displaying empty states in the application with images, headers, descriptions, and action buttons.
+
+### Features
+
+- **Image Display**: Configurable empty state illustration with custom sizing
+- **Text Content**: Header, subheading, and description text sections
+- **Action Buttons**: Optional button area for filter reset or navigation actions
+- **Filter Variant**: Styling variant for filter-related empty states via \`withoutFilter\`
+
+### Usage
+
+\`\`\`tsx
+import { EmptyScreenContainer } from "@docspace/ui-kit/components/empty-screen-container";
+
+// With filter reset button
+<EmptyScreenContainer
+  imageSrc={emptyImage}
+  imageAlt="No results"
+  headerText="No results matching your search"
+  descriptionText="Try adjusting your filters"
+  buttons={<ResetFilterButton />}
+/>
+
+// Welcome screen without filter styling
+<EmptyScreenContainer
+  imageSrc={welcomeImage}
+  imageAlt="Welcome"
+  headerText="Welcome to your workspace"
+  withoutFilter
+/>
+\`\`\``,
       },
     },
   },
   argTypes: {
     imageSrc: {
-      description: "URL source for the empty state image",
       control: "text",
+      description: "URL source for the empty state image",
     },
     imageAlt: {
-      description: "Alternative text for the image for accessibility",
       control: "text",
+      description: "Alternative text for the image for accessibility",
     },
     headerText: {
-      description: "Main header text displayed below the image",
       control: "text",
+      description: "Main header text displayed below the image",
     },
     subheadingText: {
-      description: "Optional subheading text displayed below the header",
       control: "text",
+      description: "Optional subheading text displayed below the header",
     },
     descriptionText: {
+      control: "text",
       description:
         "Optional description text or React node displayed below the subheading",
-      control: "text",
     },
     buttons: {
       description: "Optional action buttons or interactive elements",
       control: false,
     },
     withoutFilter: {
-      description: "Whether to display without filter styling",
       control: "boolean",
+      description: "Whether to display without filter styling",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     imageStyle: {
-      description: "Custom CSS styles for the image (desktop only)",
       control: "object",
+      description: "Custom CSS styles for the image (desktop only)",
     },
     buttonStyle: {
-      description: "Custom CSS styles for the buttons container",
       control: "object",
+      description: "Custom CSS styles for the buttons container",
     },
     className: {
-      description: "Additional CSS class name",
       control: "text",
+      description: "Additional CSS class name",
     },
   },
 } satisfies Meta<typeof EmptyScreenContainer>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof EmptyScreenContainer>>;
 
 export default meta;
 
@@ -116,6 +147,7 @@ const HomeButton = () => (
 );
 
 export const Default: Story = {
+  render: (args) => <EmptyScreenContainer {...args} />,
   args: {
     imageSrc: EmptyImageReactSvg,
     imageAlt: "Empty Screen Filter image",
@@ -125,18 +157,54 @@ export const Default: Story = {
       "No people matching your filter can be displayed in this section. Please select other filter options or clear filter to view all the people in this section.",
     buttons: <ResetFilterButton />,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Full-featured empty state with header, subheading, description, and a reset filter button.",
+      },
+      source: {
+        code: `<EmptyScreenContainer
+  imageSrc={emptyImage}
+  imageAlt="Empty Screen Filter image"
+  headerText="No results matching your search could be found"
+  subheadingText="No files to be displayed in this section"
+  descriptionText="No people matching your filter can be displayed..."
+  buttons={<ResetFilterButton />}
+/>`,
+      },
+    },
+  },
 };
 
 export const MinimalContent: Story = {
+  render: (args) => <EmptyScreenContainer {...args} />,
   args: {
     imageSrc: EmptyImageReactSvg,
     imageAlt: "Empty search results",
     headerText: "No results found",
     buttons: <HomeButton />,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Minimal empty state with only header text and a navigation button.",
+      },
+      source: {
+        code: `<EmptyScreenContainer
+  imageSrc={emptyImage}
+  imageAlt="Empty search results"
+  headerText="No results found"
+  buttons={<Link type={LinkType.action}>Go to home</Link>}
+/>`,
+      },
+    },
+  },
 };
 
 export const CustomStyles: Story = {
+  render: (args) => <EmptyScreenContainer {...args} />,
   args: {
     imageSrc: EmptyImageReactSvg,
     imageAlt: "Empty Screen Filter image",
@@ -146,9 +214,29 @@ export const CustomStyles: Story = {
     imageStyle: { width: "150px", height: "150px" },
     buttonStyle: { marginTop: "32px" },
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Empty state with custom image dimensions and button container spacing.",
+      },
+      source: {
+        code: `<EmptyScreenContainer
+  imageSrc={emptyImage}
+  imageAlt="Empty Screen Filter image"
+  headerText="Custom styled empty state"
+  descriptionText="This example shows custom styles for image and buttons"
+  buttons={<HomeButton />}
+  imageStyle={{ width: "150px", height: "150px" }}
+  buttonStyle={{ marginTop: "32px" }}
+/>`,
+      },
+    },
+  },
 };
 
 export const WithoutFilter: Story = {
+  render: (args) => <EmptyScreenContainer {...args} />,
   args: {
     imageSrc: EmptyImageReactSvg,
     imageAlt: "Welcome image",
@@ -157,5 +245,23 @@ export const WithoutFilter: Story = {
       "Get started by creating your first document or uploading files to this folder.",
     buttons: <HomeButton />,
     withoutFilter: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Welcome screen variant without filter-related styling, suitable for onboarding views.",
+      },
+      source: {
+        code: `<EmptyScreenContainer
+  imageSrc={welcomeImage}
+  imageAlt="Welcome image"
+  headerText="Welcome to your workspace"
+  descriptionText="Get started by creating your first document..."
+  buttons={<HomeButton />}
+  withoutFilter
+/>`,
+      },
+    },
   },
 };

@@ -24,37 +24,90 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { DateTime } from "luxon";
 
-import { TimePicker, TimePickerProps } from ".";
 import { createDateTime, formatDate } from "../../utils/date";
 
+import { TimePicker } from ".";
+
 const meta = {
-  title: "UI/Form controls/TimePicker",
+  title: "UI/Interactive elements/TimePicker",
   component: TimePicker,
+  parameters: {
+    docs: {
+      description: {
+        component: `Time input component that allows users to select or input time values.
+
+### Features
+
+- **Keyboard Input**: Users can type time values directly
+- **HH:mm Format**: Supports standard 24-hour time format
+- **12-Hour Format**: Optional AM/PM mode with meridiem indicator
+- **Error State**: Visual error indicator for validation
+- **Auto Focus**: Option to focus the input on render
+- **Tab Navigation**: Configurable tab index for keyboard navigation
+
+### Usage
+
+\`\`\`tsx
+import { TimePicker } from "@docspace/ui-kit/components/time-picker";
+
+// Basic usage
+<TimePicker
+  initialTime={new Date()}
+  onChange={(time) => console.log(time)}
+/>
+
+// With error state
+<TimePicker initialTime={new Date()} hasError onChange={(time) => console.log(time)} />
+
+// 12-hour format
+<TimePicker initialTime={new Date()} isTwelveHourFormat meridiem="AM" />
+\`\`\``,
+      },
+    },
+  },
   argTypes: {
     initialTime: {
       control: "date",
-      description: "Initial time value in the picker (Moment object)",
+      description: "Initial time value in the picker",
     },
     hasError: {
       control: "boolean",
       description: "Indicates if the picker is in an error state",
-    },
-    onChange: {
-      action: "onChange",
-      description:
-        "Callback function called when the time changes. Receives a Moment object or null",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     tabIndex: {
       control: "number",
-      description: "Tab index for the time picker input",
+      description: "Tab index for keyboard navigation",
+      table: {
+        defaultValue: { summary: "0" },
+      },
     },
     focusOnRender: {
       control: "boolean",
       description:
         "Whether to automatically focus the input when the component renders",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isTwelveHourFormat: {
+      control: "boolean",
+      description:
+        "Whether to use 12-hour time format (with AM/PM) instead of 24-hour format",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    meridiem: {
+      control: "text",
+      description: "The meridiem indicator (AM/PM) for 12-hour format",
     },
     className: {
       control: "text",
@@ -64,26 +117,34 @@ const meta = {
       control: "text",
       description: "Additional CSS class for the time picker input element",
     },
-  },
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "Time input component that allows users to select or input time in HH:mm format. Supports keyboard input and validation.",
-      },
+    onChange: {
+      action: "onChange",
+      description: "Callback function called when the time changes",
     },
   },
 } satisfies Meta<typeof TimePicker>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof TimePicker>>;
+
 export default meta;
 
-const Template = (args: TimePickerProps) => {
-  return <TimePicker {...args} />;
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+        gridGap: "16px",
+        alignItems: "center",
+      }}
+    >
+      {props.children}
+    </div>
+  );
 };
 
 export const Default: Story = {
-  render: Template,
+  render: (args) => <TimePicker {...args} />,
   args: {
     initialTime: createDateTime(2025, 1, 27, 10, 30, 0),
     hasError: false,
@@ -91,14 +152,102 @@ export const Default: Story = {
       console.log("Time changed:", formatDate(time, "HH:mm")),
     tabIndex: 0,
     focusOnRender: false,
-    className: "",
   },
 };
 
+const WithErrorTemplate = () => {
+  return (
+    <Wrapper>
+      <TimePicker
+        initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
+        hasError
+        onChange={(time) =>
+          console.log("Time changed:", formatDate(time, "HH:mm"))
+        }
+      />
+    </Wrapper>
+  );
+};
+
 export const WithError: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    hasError: true,
+  render: () => <WithErrorTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "TimePicker in an error state. The input field displays a visual error indicator for validation feedback.",
+      },
+      source: {
+        code: `<TimePicker initialTime={createDateTime(2025, 1, 27, 10, 30, 0)} hasError onChange={(time) => console.log(time)} />`,
+      },
+    },
+  },
+};
+
+const TwelveHourFormatTemplate = () => {
+  return (
+    <Wrapper>
+      <TimePicker
+        initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
+        isTwelveHourFormat
+        meridiem="AM"
+        onChange={(time) =>
+          console.log("Time changed:", formatDate(time, "hh:mm a"))
+        }
+      />
+      <TimePicker
+        initialTime={createDateTime(2025, 1, 27, 14, 30, 0)}
+        isTwelveHourFormat
+        meridiem="PM"
+        onChange={(time) =>
+          console.log("Time changed:", formatDate(time, "hh:mm a"))
+        }
+      />
+    </Wrapper>
+  );
+};
+
+export const TwelveHourFormat: Story = {
+  render: () => <TwelveHourFormatTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "TimePicker in 12-hour format with AM/PM meridiem indicator. Shows both AM and PM examples.",
+      },
+      source: {
+        code: `<TimePicker initialTime={time} isTwelveHourFormat meridiem="AM" onChange={(time) => console.log(time)} />
+<TimePicker initialTime={time} isTwelveHourFormat meridiem="PM" onChange={(time) => console.log(time)} />`,
+      },
+    },
+  },
+};
+
+const FocusOnRenderTemplate = () => {
+  return (
+    <Wrapper>
+      <TimePicker
+        initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
+        focusOnRender
+        onChange={(time) =>
+          console.log("Time changed:", formatDate(time, "HH:mm"))
+        }
+      />
+    </Wrapper>
+  );
+};
+
+export const FocusOnRender: Story = {
+  render: () => <FocusOnRenderTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "TimePicker that automatically focuses the input when the component renders. Useful for forms where the time input should receive immediate focus.",
+      },
+      source: {
+        code: `<TimePicker initialTime={time} focusOnRender onChange={(time) => console.log(time)} />`,
+      },
+    },
   },
 };

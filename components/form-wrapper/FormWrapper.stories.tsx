@@ -1,27 +1,86 @@
-import React from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+import type { ComponentProps } from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { FormWrapper } from "./index";
 
 import styles from "./FormWrapper.stories.module.scss";
 
-const meta: Meta<typeof FormWrapper> = {
+const meta = {
   title: "UI/Form controls/FormWrapper",
   component: FormWrapper,
-  tags: ["autodocs"],
   parameters: {
     docs: {
       description: {
-        component:
-          "FormWrapper is a container component that provides consistent styling for forms across the application.",
+        component: `A styled container component that wraps form content with consistent padding, background, and border-radius. Typically used on login and registration pages.
+
+### Features
+
+- **Consistent Styling**: Provides unified padding, background, and border-radius for forms
+- **Flexible Content**: Accepts any React children as form content
+- **Customizable**: Supports custom className, id, and inline styles
+
+### Usage
+
+\`\`\`tsx
+import { FormWrapper } from "@docspace/ui-kit/components/form-wrapper";
+
+<FormWrapper>
+  <Input placeholder="Email" />
+  <Input placeholder="Password" type="password" />
+  <Button primary label="Sign In" />
+</FormWrapper>
+\`\`\``,
       },
     },
   },
-};
+  argTypes: {
+    className: {
+      control: "text",
+      description: "Additional CSS class names",
+    },
+    id: {
+      control: "text",
+      description: "HTML id attribute",
+    },
+    style: {
+      control: "object",
+      description: "Custom inline styles",
+    },
+  },
+} satisfies Meta<typeof FormWrapper>;
+
+type Story = StoryObj<ComponentProps<typeof FormWrapper>>;
 
 export default meta;
-type Story = StoryObj<typeof FormWrapper>;
 
 export const Default: Story = {
+  render: (args) => <FormWrapper {...args} />,
   args: {
     children: (
       <div className={styles.demoContent}>
@@ -30,9 +89,24 @@ export const Default: Story = {
       </div>
     ),
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Basic form wrapper with simple content to demonstrate the container styling.",
+      },
+      source: {
+        code: `<FormWrapper>
+  <h3>Welcome</h3>
+  <p>This is a basic form wrapper example</p>
+</FormWrapper>`,
+      },
+    },
+  },
 };
 
 export const WithLoginForm: Story = {
+  render: (args) => <FormWrapper {...args} />,
   args: {
     children: (
       <form className={styles.demoForm}>
@@ -48,9 +122,27 @@ export const WithLoginForm: Story = {
       </form>
     ),
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Form wrapper containing a typical login form with email and password fields.",
+      },
+      source: {
+        code: `<FormWrapper>
+  <form>
+    <Input type="email" placeholder="Email" />
+    <Input type="password" placeholder="Password" />
+    <Button primary label="Sign In" />
+  </form>
+</FormWrapper>`,
+      },
+    },
+  },
 };
 
 export const WithRegistrationForm: Story = {
+  render: (args) => <FormWrapper {...args} />,
   args: {
     children: (
       <form className={styles.demoForm}>
@@ -75,5 +167,24 @@ export const WithRegistrationForm: Story = {
         </button>
       </form>
     ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Form wrapper containing a registration form with name, email, and password fields.",
+      },
+      source: {
+        code: `<FormWrapper>
+  <form>
+    <Input type="text" placeholder="Full Name" />
+    <Input type="email" placeholder="Email" />
+    <Input type="password" placeholder="Password" />
+    <Input type="password" placeholder="Confirm Password" />
+    <Button primary label="Create Account" />
+  </form>
+</FormWrapper>`,
+      },
+    },
   },
 };

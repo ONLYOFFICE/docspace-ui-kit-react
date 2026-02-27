@@ -24,18 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Error401 } from "./Error401";
 import { setupErrorI18n } from "./stories.utils";
 
-const meta: Meta<typeof Error401> = {
-  title: "Errors/Error401",
+const meta = {
+  title: "UI/Feedback/Error401",
   component: Error401,
   parameters: {
     docs: {
       description: {
-        component: "Unauthorized error page (401). Displayed when the user is not authenticated.",
+        component: `Unauthorized error page (401). Displayed when the user is not authenticated.
+
+### Features
+
+- **Full-Page Display**: Renders a complete error page with animated SVG decorations
+- **Internationalized**: Uses translation keys for localized error messaging
+- **Consistent Styling**: Built on the ErrorContainer base component
+- **Auto-Redirect Support**: Can redirect unauthenticated users to login
+
+### Usage
+
+\`\`\`tsx
+import { Error401 } from "@docspace/ui-kit/errors";
+
+<Error401 />
+\`\`\``,
       },
     },
   },
@@ -45,9 +62,21 @@ const meta: Meta<typeof Error401> = {
       return <Story />;
     },
   ],
-};
+} satisfies Meta<typeof Error401>;
+
+type Story = StoryObj<ComponentProps<typeof Error401>>;
 
 export default meta;
-type Story = StoryObj<typeof Error401>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "Default 401 unauthorized error page with standard messaging.",
+      },
+      source: {
+        code: `<Error401 />`,
+      },
+    },
+  },
+};

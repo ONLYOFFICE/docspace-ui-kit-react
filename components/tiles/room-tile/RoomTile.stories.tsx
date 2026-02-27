@@ -24,8 +24,13 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import type { RoomTileProps } from "./RoomTile.types";
+
+import { useState } from "react";
 import { TFunction } from "i18next";
 import PublicRoomIconReactSvg from "../../../assets/icons/32/room/public.react.svg";
 import UnpinReactSvg from "../../../assets/unpin.react.svg";
@@ -37,7 +42,6 @@ import { IconButton } from "../../icon-button";
 import { IconSizeType } from "../../../utils";
 
 import { RoomTile } from ".";
-import { RoomTileProps } from "./RoomTile.types";
 import { TileContent } from "../tile-content";
 
 const element = <PublicRoomIconReactSvg />;
@@ -76,20 +80,72 @@ const meta = {
 	parameters: {
 		docs: {
 			description: {
-				component:
-					"Room tile component for displaying room information in a tile format",
+				component: `Room tile component for displaying room information in a tile format.
+
+### Features
+
+- **Room Icon**: Displays room type icon with visual identity
+- **Selectable**: Supports checked/selected state with checkbox
+- **Active State**: Visual highlight for the currently active room
+- **Blocking Operation**: Indicates when a room operation is in progress
+- **Indeterminate State**: Partial selection indicator
+- **Tags**: Display room type tags below the room title
+- **Pin Badge**: Shows pinned state with unpin action
+- **Context Menu**: Right-click context menu for room actions
+
+### Usage
+
+\`\`\`tsx
+import { RoomTile } from "@docspace/ui-kit/components/tiles/room-tile";
+import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+
+<RoomTile
+  item={{ id: "1", title: "Sample Room", roomType: "collaboration", tags: [] }}
+  element={<PublicRoomIcon />}
+  contextOptions={options}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>Room Content</Link></TileContent>
+</RoomTile>
+\`\`\``,
 			},
 		},
 	},
 	argTypes: {
-		checked: { control: "boolean" },
-		isActive: { control: "boolean" },
-		isBlockingOperation: { control: "boolean" },
-		indeterminate: { control: "boolean" },
+		checked: {
+			control: "boolean",
+			description: "Whether the tile is selected/checked",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		isActive: {
+			control: "boolean",
+			description: "Whether the tile is in active state",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		isBlockingOperation: {
+			control: "boolean",
+			description:
+				"Whether a blocking operation is in progress on the room",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		indeterminate: {
+			control: "boolean",
+			description:
+				"Whether the checkbox shows an indeterminate state for partial selection",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
 	},
 } satisfies Meta<typeof RoomTile>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof RoomTile>>;
 
 export default meta;
 
@@ -142,6 +198,18 @@ export const Default: Story = {
 			description: {
 				story: "Basic room tile with selection functionality",
 			},
+			source: {
+				code: `<RoomTile
+  item={{ id: "room-1", title: "Sample Room", roomType: "collaboration", tags: [...] }}
+  element={<PublicRoomIconReactSvg />}
+  contextOptions={contextOptions}
+  badges={badges}
+  getContextModel={() => contextOptions}
+  columnCount={1}
+>
+  <TileContent><Link>Room Content</Link></TileContent>
+</RoomTile>`,
+			},
 		},
 	},
 };
@@ -157,6 +225,17 @@ export const Checked: Story = {
 			description: {
 				story: "Room tile in checked state",
 			},
+			source: {
+				code: `<RoomTile
+  item={{ id: "room-1", title: "Sample Room", roomType: "collaboration", tags: [...] }}
+  element={<PublicRoomIconReactSvg />}
+  contextOptions={contextOptions}
+  checked={true}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>Room Content</Link></TileContent>
+</RoomTile>`,
+			},
 		},
 	},
 };
@@ -170,7 +249,17 @@ export const InProgress: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story: "File tile showing progress state",
+				story: "Room tile showing progress state",
+			},
+			source: {
+				code: `<RoomTile
+  item={{ id: "room-1", title: "Sample Room", roomType: "collaboration", tags: [...] }}
+  element={<PublicRoomIconReactSvg />}
+  contextOptions={contextOptions}
+  inProgress={true}
+>
+  <TileContent><Link>Room Content</Link></TileContent>
+</RoomTile>`,
 			},
 		},
 	},
@@ -186,6 +275,16 @@ export const BlockingOperation: Story = {
 		docs: {
 			description: {
 				story: "Room tile showing blocking operation state",
+			},
+			source: {
+				code: `<RoomTile
+  item={{ id: "room-1", title: "Sample Room", roomType: "collaboration", tags: [...] }}
+  element={<PublicRoomIconReactSvg />}
+  contextOptions={contextOptions}
+  isBlockingOperation={true}
+>
+  <TileContent><Link>Room Content</Link></TileContent>
+</RoomTile>`,
 			},
 		},
 	},

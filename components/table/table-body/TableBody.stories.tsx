@@ -24,8 +24,10 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useEffect, useRef, useState } from "react";
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import { useEffect, useRef, useState } from "react";
 import { uuid as uuidv4 } from "../../../utils/";
 
 import { TableBody } from "./TableBody";
@@ -45,12 +47,76 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "TableBody component for displaying data in a table format with infinite scrolling capabilities",
+        component: `TableBody renders table rows with support for infinite scrolling and virtual scrolling.
+
+### Features
+
+- **Virtual Scrolling**: Uses react-window for efficient rendering of large datasets
+- **Infinite Scrolling**: Automatically fetches more data when scrolling near the bottom
+- **Configurable Item Height**: Supports custom row heights for different layouts
+- **Info Panel Awareness**: Adjusts column layout when the info panel is visible
+
+### Usage
+
+\`\`\`tsx
+import { TableBody } from "@docspace/ui-kit/components/table/table-body";
+
+<TableBody
+  columnStorageName="my-table-columns"
+  columnInfoPanelStorageName="my-table-info-panel"
+  fetchMoreFiles={fetchMore}
+  filesLength={items.length}
+  hasMoreFiles={hasMore}
+  itemCount={items.length}
+  itemHeight={50}
+  useReactWindow
+>
+  {rows}
+</TableBody>
+\`\`\``,
       },
     },
   },
   argTypes: {
+    useReactWindow: {
+      control: "boolean",
+      description: "Enable virtual scrolling with react-window",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    itemHeight: {
+      control: "number",
+      description: "Height of each row in pixels",
+      table: {
+        defaultValue: { summary: "50" },
+      },
+    },
+    itemCount: {
+      control: "number",
+      description: "Total number of items to render",
+    },
+    filesLength: {
+      control: "number",
+      description:
+        "Number of currently loaded files (used for infinite scroll calculation)",
+    },
+    hasMoreFiles: {
+      control: "boolean",
+      description:
+        "Whether more files are available to fetch",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    infoPanelVisible: {
+      control: "boolean",
+      description:
+        "Whether the info panel is visible (affects column layout)",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
     fetchMoreFiles: {
       control: false,
       action: "fetchMoreFiles",
@@ -118,8 +184,9 @@ const meta = {
   ],
 } satisfies Meta<typeof TableBody>;
 
+type Story = StoryObj<ComponentProps<typeof TableBody>>;
+
 export default meta;
-type Story = StoryObj<typeof TableBody>;
 
 const createMockRows = (count: number) => {
   return Array(count)
@@ -137,6 +204,7 @@ const createMockRows = (count: number) => {
 };
 
 export const Default: Story = {
+  render: (args) => <TableBody {...args} />,
   args: {
     columnStorageName: COLUMN_STORAGE_NAME,
     columnInfoPanelStorageName: COLUMN_INFO_PANEL_STORAGE_NAME,
@@ -149,28 +217,89 @@ export const Default: Story = {
     infoPanelVisible: false,
     children: createMockRows(20),
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default TableBody with react-window virtual scrolling enabled and 20 rows.",
+      },
+      source: {
+        code: `<TableBody
+  columnStorageName="my-columns"
+  columnInfoPanelStorageName="my-info-panel"
+  fetchMoreFiles={fetchMore}
+  filesLength={20}
+  hasMoreFiles={false}
+  itemCount={20}
+  itemHeight={50}
+  useReactWindow
+>
+  {rows}
+</TableBody>`,
+      },
+    },
+  },
 };
 
 export const WithoutReactWindow: Story = {
+  render: (args) => <TableBody {...args} />,
   args: {
     ...Default.args,
     useReactWindow: false,
   },
-};
-
-export const CustomItemHeight: Story = {
-  args: {
-    ...Default.args,
-    itemHeight: 80,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "TableBody without virtual scrolling. All rows are rendered in the DOM at once. Suitable for small datasets.",
+      },
+      source: {
+        code: `<TableBody
+  columnStorageName="my-columns"
+  columnInfoPanelStorageName="my-info-panel"
+  fetchMoreFiles={fetchMore}
+  filesLength={20}
+  hasMoreFiles={false}
+  itemCount={20}
+  itemHeight={50}
+  useReactWindow={false}
+>
+  {rows}
+</TableBody>`,
+      },
+    },
   },
 };
 
 export const WithMoreFiles: Story = {
+  render: (args) => <TableBody {...args} />,
   args: {
     ...Default.args,
     children: createMockRows(5),
     filesLength: 5,
     itemCount: 5,
     hasMoreFiles: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "TableBody with hasMoreFiles enabled, indicating more data can be fetched via infinite scroll.",
+      },
+      source: {
+        code: `<TableBody
+  columnStorageName="my-columns"
+  columnInfoPanelStorageName="my-info-panel"
+  fetchMoreFiles={fetchMore}
+  filesLength={5}
+  hasMoreFiles
+  itemCount={5}
+  itemHeight={50}
+  useReactWindow
+>
+  {rows}
+</TableBody>`,
+      },
+    },
   },
 };

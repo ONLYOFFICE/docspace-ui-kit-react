@@ -24,6 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import SettingsReactSvgUrl from "../../assets/settings.react.svg?url";
@@ -36,249 +38,402 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "A versatile dropdown item component used for menus, lists, and selection interfaces. Supports various display modes including separator, header, submenu, and interactive states.",
+        component: `A versatile dropdown item component used inside DropDown menus.
+
+### Features
+
+- **Multiple Modes**: Regular item, header, separator, and submenu
+- **Icon Support**: Display icons alongside text labels
+- **Toggle Switch**: Built-in toggle switch for boolean options
+- **Badges**: Beta and paid/pro badge indicators
+- **Selected State**: Visual indicator for the active selection
+- **Disabled State**: Non-interactive state with optional tooltip
+- **Text Overflow**: Automatic ellipsis for long labels
+- **Keyboard Navigation**: Active descendant highlighting
+
+### Usage
+
+\`\`\`tsx
+import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
+
+// Regular item with icon
+<DropDownItem label="Settings" icon={SettingsIcon} onClick={handleClick} />
+
+// Header
+<DropDownItem isHeader label="Section Title" />
+
+// Separator
+<DropDownItem isSeparator />
+
+// With toggle
+<DropDownItem label="Enable Feature" withToggle checked={isEnabled} />
+\`\`\``,
       },
     },
   },
   argTypes: {
-    onClick: { action: "clicked" },
-    onMouseDown: { action: "mouseDown" },
-    onClickSelectedItem: { action: "clickedSelectedItem" },
-    headerArrowAction: { action: "headerArrowClicked" },
-    icon: {
-      control: "text",
-      description: "URL or path to the icon",
-    },
     label: {
       control: "text",
       description: "Primary text content",
     },
+    icon: {
+      control: "text",
+      description: "URL or path to the icon",
+    },
     disabled: {
       control: "boolean",
       description: "Disables the item",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isSeparator: {
       control: "boolean",
       description: "Renders as a separator line",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isHeader: {
       control: "boolean",
       description: "Renders as a header item",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isSelected: {
       control: "boolean",
       description: "Shows selected state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isSubMenu: {
       control: "boolean",
       description: "Shows submenu arrow",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isModern: {
       control: "boolean",
       description: "Uses modern compact styling",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     noHover: {
       control: "boolean",
       description: "Disables hover effect",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     noActive: {
       control: "boolean",
       description: "Disables active state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     withToggle: {
       control: "boolean",
       description: "Shows toggle switch",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     checked: {
       control: "boolean",
-      description: "Toggle checked state",
+      description: "Toggle checked state (used with withToggle)",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isBeta: {
       control: "boolean",
       description: "Shows beta badge",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isPaidBadge: {
       control: "boolean",
       description: "Shows paid badge",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     textOverflow: {
       control: "boolean",
       description: "Truncates text with ellipsis",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     fillIcon: {
       control: "boolean",
       description: "Fills icon with text color",
-    },
-    withoutIcon: {
-      control: "boolean",
-      description: "Hides icon even when provided",
+      table: {
+        defaultValue: { summary: "true" },
+      },
     },
     isActiveDescendant: {
       control: "boolean",
       description: "Keyboard navigation active state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     minWidth: {
       control: "text",
       description: "Minimum width of the item",
     },
+    onClick: {
+      action: "clicked",
+      description: "Callback when the item is clicked",
+    },
   },
 } satisfies Meta<typeof DropDownItem>;
 
+type Story = StoryObj<ComponentProps<typeof DropDownItem>>;
+
 export default meta;
-type Story = StoryObj<typeof meta>;
+
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "4px",
+        width: "250px",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
 
 export const Default: Story = {
+  render: (args) => <DropDownItem {...args} />,
   args: {
     label: "Default Item",
   },
 };
 
-export const WithIcon: Story = {
-  args: {
-    label: "Settings",
-    icon: SettingsReactSvgUrl,
+const ItemTypesTemplate = () => {
+  return (
+    <Wrapper>
+      <DropDownItem isHeader label="Header Item" />
+      <DropDownItem label="Regular Item" />
+      <DropDownItem label="With Icon" icon={SettingsReactSvgUrl} />
+      <DropDownItem isSeparator />
+      <DropDownItem label="Selected Item" isSelected />
+      <DropDownItem label="Disabled Item" disabled />
+    </Wrapper>
+  );
+};
+
+export const ItemTypes: Story = {
+  render: () => <ItemTypesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "All available item types: header, regular, with icon, separator, selected, and disabled.",
+      },
+      source: {
+        code: `<DropDownItem isHeader label="Header Item" />
+<DropDownItem label="Regular Item" />
+<DropDownItem label="With Icon" icon={SettingsIcon} />
+<DropDownItem isSeparator />
+<DropDownItem label="Selected Item" isSelected />
+<DropDownItem label="Disabled Item" disabled />`,
+      },
+    },
   },
 };
 
-export const Disabled: Story = {
-  args: {
-    label: "Disabled Item",
-    icon: SettingsReactSvgUrl,
-    disabled: true,
-  },
-};
-
-export const Selected: Story = {
-  args: {
-    label: "Selected Item",
-    isSelected: true,
-  },
-};
-
-export const Separator: Story = {
-  args: {
-    isSeparator: true,
-  },
-};
-
-export const Header: Story = {
-  args: {
-    label: "Header Item",
-    isHeader: true,
-  },
-};
-
-export const HeaderWithArrow: Story = {
-  args: {
-    label: "Header with Back",
-    isHeader: true,
-    withHeaderArrow: true,
-  },
-};
-
-export const Submenu: Story = {
-  args: {
-    label: "Open Submenu",
-    icon: SettingsReactSvgUrl,
-    isSubMenu: true,
-  },
-};
-
-export const SubmenuActive: Story = {
-  args: {
-    label: "Active Submenu",
-    icon: SettingsReactSvgUrl,
-    isSubMenu: true,
-    isActive: true,
-  },
+const WithToggleTemplate = () => {
+  return (
+    <Wrapper>
+      <DropDownItem label="Toggle Off" withToggle checked={false} />
+      <DropDownItem label="Toggle On" withToggle checked />
+    </Wrapper>
+  );
 };
 
 export const WithToggle: Story = {
-  args: {
-    label: "Toggle Feature",
-    withToggle: true,
-    checked: false,
+  render: () => <WithToggleTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Items with built-in toggle switches for boolean options. Shows both unchecked and checked states.",
+      },
+      source: {
+        code: `<DropDownItem label="Toggle Off" withToggle checked={false} />
+<DropDownItem label="Toggle On" withToggle checked />`,
+      },
+    },
   },
 };
 
-export const WithToggleChecked: Story = {
-  args: {
-    label: "Feature Enabled",
-    withToggle: true,
-    checked: true,
+const WithBadgesTemplate = () => {
+  return (
+    <Wrapper>
+      <DropDownItem
+        label="New Feature"
+        icon={SettingsReactSvgUrl}
+        isBeta
+        betaLabel="Beta"
+      />
+      <DropDownItem
+        label="Premium Feature"
+        icon={SettingsReactSvgUrl}
+        isPaidBadge
+        paidLabel="Pro"
+      />
+    </Wrapper>
+  );
+};
+
+export const WithBadges: Story = {
+  render: () => <WithBadgesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Items with beta and paid/pro badges to indicate feature availability.",
+      },
+      source: {
+        code: `<DropDownItem label="New Feature" icon={SettingsIcon} isBeta betaLabel="Beta" />
+<DropDownItem label="Premium Feature" icon={SettingsIcon} isPaidBadge paidLabel="Pro" />`,
+      },
+    },
   },
 };
 
-export const WithBetaBadge: Story = {
-  args: {
-    label: "New Feature",
-    icon: SettingsReactSvgUrl,
-    isBeta: true,
-    betaLabel: "Beta",
+const SubmenuTemplate = () => {
+  return (
+    <Wrapper>
+      <DropDownItem
+        label="Open Submenu"
+        icon={SettingsReactSvgUrl}
+        isSubMenu
+      />
+      <DropDownItem
+        label="Active Submenu"
+        icon={SettingsReactSvgUrl}
+        isSubMenu
+        isActive
+      />
+    </Wrapper>
+  );
+};
+
+export const Submenu: Story = {
+  render: () => <SubmenuTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Items with submenu arrows. Shows both default and active submenu states.",
+      },
+      source: {
+        code: `<DropDownItem label="Open Submenu" icon={SettingsIcon} isSubMenu />
+<DropDownItem label="Active Submenu" icon={SettingsIcon} isSubMenu isActive />`,
+      },
+    },
   },
 };
 
-export const WithPaidBadge: Story = {
-  args: {
-    label: "Premium Feature",
-    icon: SettingsReactSvgUrl,
-    isPaidBadge: true,
-    paidLabel: "Pro",
-  },
-};
-
-export const Modern: Story = {
-  args: {
-    label: "Modern Style",
-    icon: SettingsReactSvgUrl,
-    isModern: true,
-  },
-};
-
-export const WithTextOverflow: Story = {
-  args: {
-    label:
-      "This is a very long item label that should trigger text overflow ellipsis when the container is too small",
-    textOverflow: true,
-    minWidth: "200px",
-  },
-};
-
-export const ActiveDescendant: Story = {
-  args: {
-    label: "Keyboard Focused",
-    isActiveDescendant: true,
-  },
-};
-
-export const NoHover: Story = {
-  args: {
-    label: "No Hover Effect",
-    noHover: true,
-  },
+const WithAdditionalElementTemplate = () => {
+  return (
+    <Wrapper>
+      <DropDownItem
+        label="Save"
+        icon={SettingsReactSvgUrl}
+        additionalElement={<span style={{ color: "#999" }}>Ctrl+S</span>}
+      />
+      <DropDownItem
+        label="Copy"
+        icon={SettingsReactSvgUrl}
+        additionalElement={<span style={{ color: "#999" }}>Ctrl+C</span>}
+      />
+    </Wrapper>
+  );
 };
 
 export const WithAdditionalElement: Story = {
-  args: {
-    label: "With Extra Content",
-    icon: SettingsReactSvgUrl,
-    additionalElement: <span style={{ color: "#999" }}>Ctrl+S</span>,
+  render: () => <WithAdditionalElementTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Items with additional elements such as keyboard shortcuts displayed alongside the label.",
+      },
+      source: {
+        code: `<DropDownItem label="Save" icon={SettingsIcon} additionalElement={<span>Ctrl+S</span>} />
+<DropDownItem label="Copy" icon={SettingsIcon} additionalElement={<span>Ctrl+C</span>} />`,
+      },
+    },
   },
 };
 
-export const IconNotFilled: Story = {
-  args: {
-    label: "Original Icon Colors",
-    icon: SettingsReactSvgUrl,
-    fillIcon: false,
+const HeaderWithArrowTemplate = () => {
+  return (
+    <Wrapper>
+      <DropDownItem
+        label="Header with Back"
+        isHeader
+        withHeaderArrow
+      />
+      <DropDownItem label="Option 1" />
+      <DropDownItem label="Option 2" />
+    </Wrapper>
+  );
+};
+
+export const HeaderWithArrow: Story = {
+  render: () => <HeaderWithArrowTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Header item with a back arrow for navigating submenu levels.",
+      },
+      source: {
+        code: `<DropDownItem label="Header with Back" isHeader withHeaderArrow />`,
+      },
+    },
   },
 };
 
-export const DisabledWithTooltip: Story = {
-  args: {
-    label: "Disabled with Tooltip",
-    disabled: true,
-    tooltip: "This feature is not available",
+const TextOverflowTemplate = () => {
+  return (
+    <Wrapper>
+      <DropDownItem
+        label="This is a very long item label that should trigger text overflow ellipsis when the container is too small"
+        textOverflow
+        minWidth="200px"
+      />
+    </Wrapper>
+  );
+};
+
+export const WithTextOverflow: Story = {
+  render: () => <TextOverflowTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Long labels are automatically truncated with ellipsis when `textOverflow` is enabled.",
+      },
+      source: {
+        code: `<DropDownItem label="Very long text..." textOverflow minWidth="200px" />`,
+      },
+    },
   },
 };

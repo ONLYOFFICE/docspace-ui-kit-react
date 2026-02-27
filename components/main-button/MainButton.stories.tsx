@@ -24,24 +24,13 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
-import { Meta, StoryFn } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
 import { MainButton } from ".";
-import { MainButtonProps } from "./MainButton.types";
-
-export default {
-  title: "UI/Interactive elements/MainButton",
-  component: MainButton,
-  parameters: {
-    docs: {
-      description: {
-        component: "Main button component with optional dropdown menu",
-      },
-    },
-  },
-} as Meta;
 
 const itemsModel = [
   {
@@ -90,45 +79,218 @@ const itemsModel = [
   },
 ];
 
-const Template: StoryFn<MainButtonProps> = (args) => <MainButton {...args} />;
+const meta = {
+  title: "UI/Interactive elements/MainButton",
+  component: MainButton,
+  parameters: {
+    docs: {
+      description: {
+        component: `Main action button with an optional dropdown menu. Typically used as the primary call-to-action in a sidebar or toolbar.
 
-export const Default = Template.bind({});
-Default.args = {
-  text: "Main Button",
-  model: itemsModel,
-  style: {
-    maxWidth: "210px",
+### Features
+
+- **Dropdown Menu**: Built-in dropdown with configurable menu items
+- **Nested Items**: Support for sub-menus within dropdown items
+- **Separators**: Visual dividers between menu item groups
+- **Icon Support**: Each menu item can have its own icon
+- **Disabled State**: Full disabled state for button and dropdown
+- **Action Callback**: Direct click handler when used without dropdown
+
+### Usage
+
+\`\`\`tsx
+import { MainButton } from "@docspace/ui-kit/components/main-button";
+
+// With dropdown menu
+<MainButton
+  text="Create new"
+  model={[
+    { key: 0, label: "New document", icon: FolderIcon },
+    { key: 1, label: "New folder", icon: FolderIcon },
+    { key: 2, isSeparator: true },
+    { key: 3, label: "Upload", icon: FolderIcon },
+  ]}
+/>
+
+// As a simple action button
+<MainButton text="Click Me" isDropdown={false} onAction={handleClick} />
+\`\`\``,
+      },
+    },
+  },
+  argTypes: {
+    text: {
+      control: "text",
+      description: "Button text label",
+    },
+    isDisabled: {
+      control: "boolean",
+      description: "Sets the button to present a disabled state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDropdown: {
+      control: "boolean",
+      description: "Activates a drop-down list for MainButton",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    opened: {
+      control: "boolean",
+      description: "Controls whether the dropdown is open",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    onAction: {
+      action: "onAction",
+      description:
+        "Callback function triggered when the button is clicked (non-dropdown mode)",
+    },
+  },
+} satisfies Meta<typeof MainButton>;
+
+type Story = StoryObj<ComponentProps<typeof MainButton>>;
+
+export default meta;
+
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div style={{ maxWidth: "210px" }}>{props.children}</div>
+  );
+};
+
+export const Default: Story = {
+  render: (args) => (
+    <Wrapper>
+      <MainButton {...args} />
+    </Wrapper>
+  ),
+  args: {
+    text: "Main Button",
+    model: itemsModel,
   },
 };
 
-export const Disabled = Template.bind({});
-Disabled.args = {
-  text: "Disabled Button",
-  isDisabled: true,
-  isDropdown: false,
-  style: {
-    maxWidth: "210px",
+const DisabledTemplate = () => {
+  return (
+    <Wrapper>
+      <MainButton
+        text="Disabled Button"
+        isDisabled
+        isDropdown={false}
+        model={[]}
+      />
+    </Wrapper>
+  );
+};
+
+export const Disabled: Story = {
+  render: () => <DisabledTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "MainButton in a disabled state. The button cannot be interacted with and appears with reduced opacity.",
+      },
+      source: {
+        code: `<MainButton text="Disabled Button" isDisabled isDropdown={false} model={[]} />`,
+      },
+    },
   },
 };
 
-export const DisabledWithDropdown = Template.bind({});
-DisabledWithDropdown.args = {
-  text: "Disabled Button with Dropdown",
-  isDropdown: true,
-  isDisabled: true,
-  model: itemsModel,
-  style: {
-    maxWidth: "310px",
+const DisabledWithDropdownTemplate = () => {
+  return (
+    <div style={{ maxWidth: "310px" }}>
+      <MainButton
+        text="Disabled with Dropdown"
+        isDropdown
+        isDisabled
+        model={itemsModel}
+      />
+    </div>
+  );
+};
+
+export const DisabledWithDropdown: Story = {
+  render: () => <DisabledWithDropdownTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "MainButton with a dropdown menu in a disabled state. Both the button and dropdown are non-interactive.",
+      },
+      source: {
+        code: `<MainButton text="Disabled with Dropdown" isDropdown isDisabled model={itemsModel} />`,
+      },
+    },
   },
 };
 
-export const WithAction = Template.bind({});
-WithAction.args = {
-  text: "Click Me",
-  isDropdown: false,
-  style: {
-    maxWidth: "210px",
-  },
+const WithActionTemplate = () => {
+  return (
+    <Wrapper>
+      <MainButton
+        text="Click Me"
+        isDropdown={false}
+        model={[]}
+        onAction={() => alert("Button clicked")}
+      />
+    </Wrapper>
+  );
+};
 
-  onAction: () => alert("Button clicked"),
+export const WithAction: Story = {
+  render: () => <WithActionTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "MainButton as a simple action button without dropdown. Clicking triggers the onAction callback.",
+      },
+      source: {
+        code: `<MainButton text="Click Me" isDropdown={false} onAction={() => alert("Button clicked")} />`,
+      },
+    },
+  },
+};
+
+const WithDropdownTemplate = () => {
+  return (
+    <Wrapper>
+      <MainButton text="Create new" model={itemsModel} />
+    </Wrapper>
+  );
+};
+
+export const WithDropdown: Story = {
+  render: () => <WithDropdownTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "MainButton with a full dropdown menu including icons, nested sub-menus, and separators. Click the button to see the dropdown.",
+      },
+      source: {
+        code: `<MainButton
+  text="Create new"
+  model={[
+    { key: 0, label: "New document", icon: FolderIcon },
+    { key: 1, label: "New spreadsheet", icon: FolderIcon },
+    { key: 2, label: "New presentation", icon: FolderIcon },
+    { key: 3, label: "Master form", icon: FolderIcon, items: [
+      { key: 4, label: "From blank" },
+      { key: 5, label: "From an existing text file" },
+    ]},
+    { key: 6, label: "New folder", icon: FolderIcon },
+    { key: 7, isSeparator: true },
+    { key: 8, label: "Upload", icon: FolderIcon },
+  ]}
+/>`,
+      },
+    },
+  },
 };

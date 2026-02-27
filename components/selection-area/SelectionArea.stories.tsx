@@ -24,19 +24,87 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
-import { Meta, StoryFn } from "@storybook/react-vite";
-import { SelectionArea } from "./SelectionArea";
+import type { ComponentProps } from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { SelectionAreaProps } from "./SelectionArea.types";
+
+import { useState } from "react";
+
+import { SelectionArea } from "./SelectionArea";
 import styles from "./SelectionArea.stories.module.scss";
 
-export default {
-  title: "UI/Layout components/SelectionArea",
+const meta = {
+  title: "UI/Layout/SelectionArea",
   component: SelectionArea,
   tags: ["!autodocs"],
   parameters: {
     docs: {
-      disable: true,
+      description: {
+        component: `SelectionArea enables drag-to-select functionality for lists of items in tile or row views.
+
+### Features
+
+- **Drag-to-select**: Click and drag to select multiple items at once
+- **Tile/Row views**: Supports both tile grid and row list layouts
+- **Scroll support**: Selection rectangle follows scroll position
+- **Multi-type item support**: Handle different item types with varying heights
+
+### Usage
+
+\`\`\`tsx
+import { SelectionArea } from "@docspace/ui-kit/components/selection-area";
+
+<SelectionArea
+  viewAs="tile"
+  containerClass="my-container"
+  itemsContainerClass="my-items"
+  selectableClass="selectable-item"
+  scrollClass="my-scroll"
+  itemClass="item-name"
+  onMove={handleMove}
+  countTilesInRow={4}
+  arrayTypes={[{ type: "item", itemHeight: 150, rowGap: 16 }]}
+/>
+\`\`\``,
+      },
+    },
+  },
+  argTypes: {
+    viewAs: {
+      control: "select",
+      options: ["tile", "row"],
+      description:
+        "Layout mode for items - tile grid or row list",
+    },
+    folderHeaderHeight: {
+      control: "number",
+      description: "Height of the folder header area in pixels",
+      table: {
+        defaultValue: { summary: "0" },
+      },
+    },
+    defaultHeaderHeight: {
+      control: "number",
+      description: "Default header height in pixels",
+      table: {
+        defaultValue: { summary: "0" },
+      },
+    },
+    countTilesInRow: {
+      control: "number",
+      description:
+        "Number of tiles displayed per row in tile view",
+      table: {
+        defaultValue: { summary: "4" },
+      },
+    },
+    isRooms: {
+      control: "boolean",
+      description:
+        "Whether the selection area is used for rooms",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
   decorators: [
@@ -46,10 +114,16 @@ export default {
       </div>
     ),
   ],
-} as Meta;
+} satisfies Meta<typeof SelectionArea>;
 
-const Template: StoryFn<SelectionAreaProps> = (args) => {
-  const [selectedItems, setSelectedItems] = React.useState<string[]>([]);
+type Story = StoryObj<ComponentProps<typeof SelectionArea>>;
+
+export default meta;
+
+const SelectionTemplate = (args: SelectionAreaProps) => {
+  const [selectedItems, setSelectedItems] = useState<string[]>(
+    [],
+  );
 
   const handleMove = ({
     added,
@@ -65,7 +139,9 @@ const Template: StoryFn<SelectionAreaProps> = (args) => {
         const valueElement =
           args.viewAs === "tile"
             ? element
-            : element.getElementsByClassName(args.itemClass || "item-name")[0];
+            : element.getElementsByClassName(
+                args.itemClass || "item-name",
+              )[0];
 
         const value = valueElement?.getAttribute("value");
         if (value && !newItems.includes(value)) {
@@ -77,7 +153,9 @@ const Template: StoryFn<SelectionAreaProps> = (args) => {
         const valueElement =
           args.viewAs === "tile"
             ? element
-            : element.getElementsByClassName(args.itemClass || "item-name")[0];
+            : element.getElementsByClassName(
+                args.itemClass || "item-name",
+              )[0];
 
         const value = valueElement?.getAttribute("value");
         if (value) {
@@ -97,9 +175,12 @@ const Template: StoryFn<SelectionAreaProps> = (args) => {
       <div className={styles.itemsContainer}>
         {Array.from({ length: 12 }).map((_, index) => (
           <div
-            key={`item_${index}`}
+            key={`item_${String(index)}`}
             className={`${styles.item} selectable-item ${selectedItems.includes(`item_${index}`) ? styles.selected : ""}`}
-            {...({ value: `item_${index}` } as Record<string, string>)}
+            {...({ value: `item_${index}` } as Record<
+              string,
+              string
+            >)}
             data-id={`item_${index}`}
           >
             Item {index + 1}
@@ -121,18 +202,41 @@ const Template: StoryFn<SelectionAreaProps> = (args) => {
   );
 };
 
-export const Default = Template.bind({});
-Default.args = {
-  viewAs: "tile",
-  folderHeaderHeight: 0,
-  defaultHeaderHeight: 0,
-  countTilesInRow: 4,
-  arrayTypes: [
-    {
-      type: "item",
-      itemHeight: 150,
-      rowGap: 16,
+export const Default: Story = {
+  render: (args) => <SelectionTemplate {...args} />,
+  args: {
+    viewAs: "tile",
+    folderHeaderHeight: 0,
+    defaultHeaderHeight: 0,
+    countTilesInRow: 4,
+    arrayTypes: [
+      {
+        type: "item",
+        itemHeight: 150,
+        rowGap: 16,
+      },
+    ],
+    isRooms: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default SelectionArea in tile view mode. Click and drag across the items to select them.",
+      },
+      source: {
+        code: `<SelectionArea
+  viewAs="tile"
+  containerClass="my-container"
+  itemsContainerClass="my-items"
+  selectableClass="selectable-item"
+  scrollClass="my-scroll"
+  itemClass="item-name"
+  onMove={handleMove}
+  countTilesInRow={4}
+  arrayTypes={[{ type: "item", itemHeight: 150, rowGap: 16 }]}
+/>`,
+      },
     },
-  ],
-  isRooms: false,
+  },
 };

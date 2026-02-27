@@ -24,18 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import ErrorUnavailable from "./ErrorUnavailable";
 import { setupErrorI18n } from "./stories.utils";
 
-const meta: Meta<typeof ErrorUnavailable> = {
-  title: "Errors/ErrorUnavailable",
+const meta = {
+  title: "UI/Feedback/ErrorUnavailable",
   component: ErrorUnavailable,
   parameters: {
     docs: {
       description: {
-        component: "Unavailable error page. Displayed when the portal has been deactivated.",
+        component: `Unavailable error page. Displayed when the portal has been deactivated.
+
+### Features
+
+- **Full-Page Display**: Renders a complete error page with animated SVG decorations
+- **Internationalized**: Uses translation keys for localized error messaging
+- **Consistent Styling**: Built on the ErrorContainer base component
+- **Deactivation Notice**: Clearly communicates that the portal is unavailable
+
+### Usage
+
+\`\`\`tsx
+import ErrorUnavailable from "@docspace/ui-kit/errors/ErrorUnavailable";
+
+<ErrorUnavailable />
+\`\`\``,
       },
     },
   },
@@ -45,9 +62,22 @@ const meta: Meta<typeof ErrorUnavailable> = {
       return <Story />;
     },
   ],
-};
+} satisfies Meta<typeof ErrorUnavailable>;
+
+type Story = StoryObj<ComponentProps<typeof ErrorUnavailable>>;
 
 export default meta;
-type Story = StoryObj<typeof ErrorUnavailable>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default unavailable error page with standard messaging.",
+      },
+      source: {
+        code: `<ErrorUnavailable />`,
+      },
+    },
+  },
+};

@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import AtReactSvgUrl from "../../assets/@.react.svg?url";
@@ -42,7 +43,7 @@ const meta = {
 
 - **Multiple Display Modes**: Images, initials, icons, or default placeholder
 - **Six Sizes**: min (32px), small (36px), base (40px), medium (48px), big (80px), max (124px)
-- **Role Indicators**: Owner, admin, guest, user badges
+- **Role Indicators**: Owner, admin, guest, user, manager, collaborator badges
 - **Group Avatars**: Specialized styling for group representations
 - **Editing Support**: Built-in edit mode with dropdown menu
 - **Tooltips**: Optional role tooltips on hover
@@ -152,11 +153,43 @@ import { Avatar, AvatarSize, AvatarRole } from "@docspace/ui-kit/components/avat
   },
 } satisfies Meta<typeof AvatarPure>;
 
-type Story = StoryObj<typeof AvatarPure>;
+type Story = StoryObj<ComponentProps<typeof AvatarPure>>;
 
 export default meta;
 
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "16px",
+        flexWrap: "wrap",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+const LabeledItem = (props: { label: string; children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "8px",
+      }}
+    >
+      {props.children}
+      <span style={{ fontSize: "12px", color: "#666" }}>{props.label}</span>
+    </div>
+  );
+};
+
 export const Default: Story = {
+  render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
     role: AvatarRole.user,
@@ -170,6 +203,7 @@ export const Default: Story = {
 };
 
 export const WithImage: Story = {
+  render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
     role: AvatarRole.admin,
@@ -187,11 +221,22 @@ export const WithImage: Story = {
         story:
           "Avatar displaying an image with admin role badge and tooltip on hover.",
       },
+      source: {
+        code: `<Avatar
+  size={AvatarSize.max}
+  role={AvatarRole.admin}
+  source="https://example.com/photo.jpg"
+  userName="John Smith"
+  tooltipContent="John Smith - Administrator"
+  withTooltip
+/>`,
+      },
     },
   },
 };
 
 export const WithInitials: Story = {
+  render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
     role: AvatarRole.guest,
@@ -208,11 +253,21 @@ export const WithInitials: Story = {
         story:
           "Avatar showing initials generated from the user name. Uses first letter of first two words (JD).",
       },
+      source: {
+        code: `<Avatar
+  size={AvatarSize.max}
+  role={AvatarRole.guest}
+  userName="John Doe"
+  withTooltip
+  tooltipContent="John Doe - Guest"
+/>`,
+      },
     },
   },
 };
 
 export const WithIcon: Story = {
+  render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
     role: AvatarRole.user,
@@ -220,13 +275,18 @@ export const WithIcon: Story = {
     userName: "",
     editing: false,
     hideRoleIcon: false,
-    tooltipContent: "",
-    withTooltip: false,
   },
   parameters: {
     docs: {
       description: {
         story: "Avatar displaying an SVG icon instead of an image or initials.",
+      },
+      source: {
+        code: `<Avatar
+  size={AvatarSize.max}
+  role={AvatarRole.user}
+  source={iconUrl}
+/>`,
       },
     },
   },
@@ -236,34 +296,18 @@ const AllSizesTemplate = () => {
   const sizes = Object.values(AvatarSize);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "16px",
-        flexWrap: "wrap",
-      }}
-    >
+    <Wrapper>
       {sizes.map((size) => (
-        <div
-          key={size}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "8px",
-          }}
-        >
+        <LabeledItem key={size} label={size}>
           <AvatarPure
             size={size}
             role={AvatarRole.admin}
             userName="John Doe"
             hideRoleIcon={size === AvatarSize.min}
           />
-          <span style={{ fontSize: "12px", color: "#666" }}>{size}</span>
-        </div>
+        </LabeledItem>
       ))}
-    </div>
+    </Wrapper>
   );
 };
 
@@ -274,6 +318,14 @@ export const AllSizes: Story = {
       description: {
         story:
           "All available avatar sizes: min (32px), small (36px), base (40px), medium (48px), big (80px), max (124px).",
+      },
+      source: {
+        code: `<Avatar size={AvatarSize.min} role={AvatarRole.admin} userName="John Doe" />
+<Avatar size={AvatarSize.small} role={AvatarRole.admin} userName="John Doe" />
+<Avatar size={AvatarSize.base} role={AvatarRole.admin} userName="John Doe" />
+<Avatar size={AvatarSize.medium} role={AvatarRole.admin} userName="John Doe" />
+<Avatar size={AvatarSize.big} role={AvatarRole.admin} userName="John Doe" />
+<Avatar size={AvatarSize.max} role={AvatarRole.admin} userName="John Doe" />`,
       },
     },
   },
@@ -291,29 +343,13 @@ const AllRolesTemplate = () => {
   ];
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "24px",
-        flexWrap: "wrap",
-      }}
-    >
+    <Wrapper>
       {roles.map(({ role, label }) => (
-        <div
-          key={label}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "8px",
-          }}
-        >
+        <LabeledItem key={label} label={label}>
           <AvatarPure size={AvatarSize.big} role={role} userName={label} />
-          <span style={{ fontSize: "12px", color: "#666" }}>{label}</span>
-        </div>
+        </LabeledItem>
       ))}
-    </div>
+    </Wrapper>
   );
 };
 
@@ -325,11 +361,21 @@ export const AllRoles: Story = {
         story:
           "All available role badges: owner (crown), admin, user, guest, manager, collaborator, and none.",
       },
+      source: {
+        code: `<Avatar size={AvatarSize.big} role={AvatarRole.owner} userName="Owner" />
+<Avatar size={AvatarSize.big} role={AvatarRole.admin} userName="Admin" />
+<Avatar size={AvatarSize.big} role={AvatarRole.user} userName="User" />
+<Avatar size={AvatarSize.big} role={AvatarRole.guest} userName="Guest" />
+<Avatar size={AvatarSize.big} role={AvatarRole.manager} userName="Manager" />
+<Avatar size={AvatarSize.big} role={AvatarRole.collaborator} userName="Collaborator" />
+<Avatar size={AvatarSize.big} role={AvatarRole.none} userName="None" />`,
+      },
     },
   },
 };
 
 export const GroupAvatar: Story = {
+  render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
     role: AvatarRole.none,
@@ -346,11 +392,21 @@ export const GroupAvatar: Story = {
         story:
           "Group avatar with uppercase initials and specialized background color. Role icons are typically hidden for groups.",
       },
+      source: {
+        code: `<Avatar
+  size={AvatarSize.max}
+  role={AvatarRole.none}
+  userName="Project Team"
+  isGroup
+  hideRoleIcon
+/>`,
+      },
     },
   },
 };
 
 export const EditingMode: Story = {
+  render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
     role: AvatarRole.owner,
@@ -366,11 +422,22 @@ export const EditingMode: Story = {
         story:
           "Avatar in editing mode showing the plus button for upload. Only available at max size.",
       },
+      source: {
+        code: `<Avatar
+  size={AvatarSize.max}
+  role={AvatarRole.owner}
+  userName="Jane Smith"
+  editing
+  hideRoleIcon
+  hasAvatar={false}
+/>`,
+      },
     },
   },
 };
 
 export const EditingWithAvatar: Story = {
+  render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
     role: AvatarRole.owner,
@@ -387,11 +454,23 @@ export const EditingWithAvatar: Story = {
         story:
           "Avatar in editing mode with existing image showing pencil edit button.",
       },
+      source: {
+        code: `<Avatar
+  size={AvatarSize.max}
+  role={AvatarRole.owner}
+  source="https://example.com/photo.jpg"
+  userName="Jane Smith"
+  editing
+  hideRoleIcon
+  hasAvatar
+/>`,
+      },
     },
   },
 };
 
 export const WithCustomRoleIcon: Story = {
+  render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
     role: AvatarRole.admin,
@@ -423,11 +502,20 @@ export const WithCustomRoleIcon: Story = {
         story:
           "Avatar with a custom role icon element instead of the default role badges.",
       },
+      source: {
+        code: `<Avatar
+  size={AvatarSize.max}
+  role={AvatarRole.admin}
+  userName="Custom Role"
+  roleIcon={<CustomRoleIcon />}
+/>`,
+      },
     },
   },
 };
 
 export const DefaultSource: Story = {
+  render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
     role: AvatarRole.user,
@@ -441,6 +529,13 @@ export const DefaultSource: Story = {
       description: {
         story:
           "Avatar showing the default placeholder image when no source or userName is provided.",
+      },
+      source: {
+        code: `<Avatar
+  size={AvatarSize.max}
+  role={AvatarRole.user}
+  isDefaultSource
+/>`,
       },
     },
   },

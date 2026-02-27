@@ -24,12 +24,15 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
 import { useState } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { Tabs } from ".";
 import { data } from "./data";
-import { TabsProps, TTabItem } from "./Tabs.types";
 import { TabsTypes } from "./Tabs.enums";
+import type { TabsProps, TTabItem } from "./Tabs.types";
 
 const meta = {
   title: "UI/Data display/Tabs",
@@ -37,36 +40,93 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `
-A flexible tabbed interface component for organizing content into multiple sections.
+        component: `Tabs organize content into multiple sections, allowing users to switch between views.
 
-## Features
-- Multiple tab types and styles
-- Customizable tab items
-- Tab selection with callbacks
-- Keyboard navigation support
-- Responsive design
-- Theme-aware styling
+### Features
 
-## Usage
-Used for organizing related content into separate views or sections, allowing users to switch between different content panels.
-`,
+- **Two Types**: Primary and Secondary visual styles
+- **Keyboard Navigation**: Navigate between tabs using keyboard
+- **Sticky Positioning**: Optional sticky top positioning
+- **Scaled Mode**: Tabs can scale to fill container width
+- **Animation**: Optional animated tab transitions
+- **Badges**: Primary tabs can display badges
+- **Icons**: Secondary tabs support icon display
+- **Disabled State**: Individual tabs can be disabled (secondary type only)
+
+### Accessibility
+
+The Tabs component supports keyboard navigation for switching between tabs using arrow keys.
+
+### Usage
+
+\`\`\`tsx
+import { Tabs } from "@docspace/ui-kit/components/tabs";
+import { TabsTypes } from "@docspace/ui-kit/components/tabs/Tabs.enums";
+
+// Primary tabs
+<Tabs
+  items={tabItems}
+  selectedItemId={selectedId}
+  onSelect={(item) => setSelectedId(item.id)}
+/>
+
+// Secondary tabs
+<Tabs
+  items={tabItems}
+  selectedItemId={selectedId}
+  type={TabsTypes.Secondary}
+  onSelect={(item) => setSelectedId(item.id)}
+/>
+
+// Scaled tabs
+<Tabs items={tabItems} selectedItemId={selectedId} scaled />
+\`\`\``,
       },
     },
   },
+  argTypes: {
+    type: {
+      control: "select",
+      options: Object.values(TabsTypes),
+      description: "Theme for displaying tabs",
+      table: {
+        defaultValue: { summary: "primary" },
+      },
+    },
+    scaled: {
+      control: "boolean",
+      description: "Scales tabs to container width",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isLoading: {
+      control: "boolean",
+      description: "Show loading state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withAnimation: {
+      control: "boolean",
+      description: "Enables animation for tab transitions",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    stickyTop: {
+      control: "text",
+      description: "Tab indentation for sticky positioning",
+    },
+  },
 } satisfies Meta<typeof Tabs>;
-type Story = StoryObj<typeof meta>;
+
+type Story = StoryObj<ComponentProps<typeof Tabs>>;
 
 export default meta;
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => (
-  <div
-    style={{
-      height: "170px",
-    }}
-  >
-    {children}
-  </div>
+  <div style={{ height: "170px" }}>{children}</div>
 );
 
 const Template = (args: TabsProps) => {
@@ -98,7 +158,15 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Default primary style tabs. Click on any tab to switch between content sections. The selected tab is highlighted and the selection is displayed below.",
+        story:
+          "Default primary style tabs. Click on any tab to switch between content sections.",
+      },
+      source: {
+        code: `<Tabs
+  items={tabItems}
+  selectedItemId={selectedId}
+  onSelect={(item) => setSelectedId(item.id)}
+/>`,
       },
     },
   },
@@ -115,7 +183,74 @@ export const Secondary: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Secondary style tabs with alternative visual appearance. Uses a different color scheme and styling compared to the default primary tabs. Best used for nested or secondary content sections.",
+        story:
+          "Secondary style tabs with alternative visual appearance. Uses a different color scheme and styling. Best used for nested or secondary content sections.",
+      },
+      source: {
+        code: `<Tabs
+  items={tabItems}
+  selectedItemId={selectedId}
+  type={TabsTypes.Secondary}
+  onSelect={(item) => setSelectedId(item.id)}
+/>`,
+      },
+    },
+  },
+};
+
+const ScaledTemplate = () => {
+  const [selectedId, setSelectedId] = useState(data[0].id);
+
+  return (
+    <Wrapper>
+      <Tabs
+        items={data}
+        selectedItemId={selectedId}
+        scaled
+        onSelect={(item) => setSelectedId(item.id)}
+      />
+    </Wrapper>
+  );
+};
+
+export const Scaled: Story = {
+  render: () => <ScaledTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Scaled tabs expand to fill the full width of their container. Useful for mobile or narrow layouts.",
+      },
+      source: {
+        code: `<Tabs items={tabItems} selectedItemId={selectedId} scaled onSelect={handleSelect} />`,
+      },
+    },
+  },
+};
+
+const LoadingTemplate = () => {
+  return (
+    <Wrapper>
+      <Tabs
+        items={data}
+        selectedItemId={data[0].id}
+        isLoading
+        onSelect={() => {}}
+      />
+    </Wrapper>
+  );
+};
+
+export const Loading: Story = {
+  render: () => <LoadingTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Loading state displays placeholder content while tab data is being fetched.",
+      },
+      source: {
+        code: `<Tabs items={tabItems} selectedItemId={selectedId} isLoading />`,
       },
     },
   },
