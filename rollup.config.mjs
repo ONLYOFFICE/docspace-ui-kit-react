@@ -7,6 +7,7 @@ import peerDepsExternal from "rollup-plugin-peer-deps-external";
 import postcss from "rollup-plugin-postcss";
 import terser from "@rollup/plugin-terser";
 import nodePolyfills from "rollup-plugin-polyfill-node";
+import url from "@rollup/plugin-url";
 import { glob } from "glob";
 
 // get all index.ts files from subfolders
@@ -33,6 +34,9 @@ const constantEntries = glob.sync("constants/*/index.ts", {
 });
 const typeEntries = glob.sync("types/*/index.ts", { ignore: ignorePatterns });
 const errorEntries = glob.sync("errors/*/index.ts", { ignore: ignorePatterns });
+const selectorsEntries = glob.sync("selectors/*/index.ts", {
+  ignore: ignorePatterns,
+});
 
 // merge all entry points
 const allEntries = [
@@ -46,6 +50,7 @@ const allEntries = [
   "constants/index.ts",
   "types/index.ts",
   "errors/index.ts",
+  "document-editor/index.ts",
   ...componentEntries,
   ...hookEntries,
   ...providerEntries,
@@ -55,6 +60,7 @@ const allEntries = [
   ...constantEntries,
   ...typeEntries,
   ...errorEntries,
+  ...selectorsEntries,
 ];
 
 export default [
@@ -84,6 +90,7 @@ export default [
         preferBuiltins: false,
       }),
       nodePolyfills(),
+      url(),
       svgr(),
       json(),
       commonjs(),
@@ -119,6 +126,7 @@ export default [
       preserveModulesRoot: ".",
     },
     plugins: [
+      url(),
       typescript({
         tsconfig: "./tsconfig.build.json",
         declaration: true,
