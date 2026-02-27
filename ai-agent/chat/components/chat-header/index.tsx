@@ -46,6 +46,7 @@ const ChatHeader = ({
   setDeleteDialogVisible,
   folderFormValidation,
   allowExternalNavigation,
+  allowSelectChat,
 }: ChatHeaderProps) => {
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -55,16 +56,18 @@ const ChatHeader = ({
       className={`${styles.chatHeader} chat-header`}
       data-testid="chat-header"
     >
-      <SelectChat
-        isLoadingProp={isLoading}
-        getIcon={getIcon}
-        getResultStorageId={getResultStorageId}
-        agentId={agentId}
-        setIsAIAgentChatDelete={setIsAIAgentChatDelete}
-        setDeleteDialogVisible={setDeleteDialogVisible}
-        folderFormValidation={folderFormValidation}
-        allowExternalNavigation={allowExternalNavigation}
-      />
+      {allowSelectChat && (
+        <SelectChat
+          isLoadingProp={isLoading}
+          getIcon={getIcon}
+          getResultStorageId={getResultStorageId}
+          agentId={agentId}
+          setIsAIAgentChatDelete={setIsAIAgentChatDelete}
+          setDeleteDialogVisible={setDeleteDialogVisible}
+          folderFormValidation={folderFormValidation}
+          allowExternalNavigation={allowExternalNavigation}
+        />
+      )}
       <CreateChat isLoadingProp={isLoading} isDisabled={!aiReady} />
       <SelectModel selectedModel={selectedModel} isLoading={isLoading} />
     </div>

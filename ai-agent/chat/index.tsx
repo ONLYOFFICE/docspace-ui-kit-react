@@ -77,6 +77,7 @@ const ChatUI = observer(
     allowExternalNavigation,
     allowAttachFiles,
     allowManageTools,
+    allowSelectChat,
   }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
 
@@ -105,6 +106,7 @@ const ChatUI = observer(
           setDeleteDialogVisible={setDeleteDialogVisible}
           folderFormValidation={folderFormValidation}
           allowExternalNavigation={allowExternalNavigation}
+          allowSelectChat={allowSelectChat}
         />
         {showEmptyScreen ? (
           <ChatNoAccessScreen

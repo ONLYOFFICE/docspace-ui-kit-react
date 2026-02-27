@@ -96,6 +96,7 @@ export type ChatHeaderProps = SelectModelProps &
     }) => void;
     setDeleteDialogVisible?: (value: boolean) => void;
     folderFormValidation: RegExp;
+    allowSelectChat?: boolean;
   };
 
 export type MessageProps = {
@@ -283,6 +284,7 @@ export type ChatProps = {
   allowExternalNavigation?: boolean;
   allowAttachFiles?: boolean;
   allowManageTools?: boolean;
+  allowSelectChat?: boolean;
 };
 
 export type ChatCoreProps = ChatProps & {

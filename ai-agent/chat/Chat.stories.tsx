@@ -74,6 +74,7 @@ const defaultProps: ChatProps = {
   allowExternalNavigation: false,
   allowAttachFiles: false,
   allowManageTools: false,
+  allowSelectChat: false,
 };
 
 export const Default: Story = {
