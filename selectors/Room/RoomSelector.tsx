@@ -387,3 +387,6 @@ const RoomSelector = (props: RoomSelectorProps) => {
 };
 
 export default RoomSelector;
+
+export type * from "./RoomSelector.types";
+export * from "./RoomSelector.utils";

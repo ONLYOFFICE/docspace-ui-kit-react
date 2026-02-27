@@ -193,7 +193,9 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       emptyScreenDescription={getCommonTranslation("GroupsNotFoundDescription")}
       searchEmptyScreenImage={emptyScreenImg}
       searchEmptyScreenHeader={getCommonTranslation("NotFoundGroups")}
-      searchEmptyScreenDescription={getCommonTranslation("GroupsNotFoundDescription")}
+      searchEmptyScreenDescription={getCommonTranslation(
+        "GroupsNotFoundDescription",
+      )}
       totalItems={totalRef.current}
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}

@@ -218,3 +218,6 @@ export const getDefaultBreadCrumb = () => {
     isRoom: false,
   };
 };
+
+export { default as useFilesSettings } from "./hooks/useFilesSettings";
+export type * from "./types";

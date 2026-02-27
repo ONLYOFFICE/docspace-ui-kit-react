@@ -35,7 +35,7 @@ type TSocketContext = typeof SocketHelper;
 
 const SocketContext = createContext<TSocketContext | null>(null);
 
-export const useSocket = () => {
+export const useSocket = (): TSocketContext => {
   const context = useContext(SocketContext);
   if (!context) {
     throw new Error("useSocket must be used within a SocketProvider");

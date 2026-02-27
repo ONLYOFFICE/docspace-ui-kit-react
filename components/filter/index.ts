@@ -30,6 +30,8 @@ export type {
   TGroupItem,
   SelectorRenderProps,
   TOnFilter,
+  TRoomGroup,
+  TRoomGroupIcon,
 } from "./Filter.types";
 export * from "./Filter.utils";
 export { default as FilterIcon } from "./sub-components/FilterIcon";
