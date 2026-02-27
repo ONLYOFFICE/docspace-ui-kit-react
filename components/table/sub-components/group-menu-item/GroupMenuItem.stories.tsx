@@ -30,7 +30,7 @@ import { GroupMenuItem } from "./GroupMenuItem";
 import { TGroupMenuItem } from "../../Table.types";
 
 const meta = {
-  title: "Components/Table/GroupMenuItem",
+  title: "UI/Table/GroupMenuItem",
   component: GroupMenuItem,
   parameters: {
     docs: {

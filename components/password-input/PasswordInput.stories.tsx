@@ -31,7 +31,7 @@ import { PasswordInput } from ".";
 import { PasswordInputProps, TPasswordValidation } from "./PasswordInput.types";
 
 const meta = {
-  title: "Components/Form controls/PasswordInput",
+  title: "UI/Form controls/PasswordInput",
   component: PasswordInput,
   parameters: {
     docs: {

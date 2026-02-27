@@ -33,7 +33,7 @@ type TagsType = typeof Tags;
 type Story = StoryObj<TagsType>;
 
 const meta: Meta<TagsType> = {
-  title: "Components/Data display/Tags",
+  title: "UI/Data display/Tags",
   component: Tags,
   parameters: {
     design: {

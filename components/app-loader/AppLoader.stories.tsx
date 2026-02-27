@@ -3,7 +3,7 @@ import { Meta, StoryFn } from "@storybook/react-vite";
 import AppLoader from "./index";
 
 export default {
-  title: "Components/Status components/AppLoader",
+  title: "UI/Status components/AppLoader",
   component: AppLoader,
   parameters: {
     docs: {

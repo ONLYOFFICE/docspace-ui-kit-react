@@ -31,7 +31,7 @@ import SettingsReactSvgUrl from "../../assets/settings.react.svg?url";
 import { DropDownItem } from ".";
 
 const meta = {
-  title: "components/UI/DropDownItem",
+  title: "UI/Overlays/DropDownItem",
   component: DropDownItem,
   parameters: {
     docs: {

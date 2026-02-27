@@ -31,7 +31,7 @@ import { TimePicker, TimePickerProps } from ".";
 import { createDateTime, formatDate } from "../../utils/date";
 
 const meta = {
-  title: "Components/UI/TimePicker",
+  title: "UI/Form controls/TimePicker",
   component: TimePicker,
   argTypes: {
     initialTime: {

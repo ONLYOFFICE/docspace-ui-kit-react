@@ -35,7 +35,7 @@ import { MainButtonMobile } from ".";
 import styles from "./MainButtonMobile.stories.module.scss";
 
 const meta = {
-  title: "Components/Interactive elements/MainButtonMobile",
+  title: "UI/Interactive elements/MainButtonMobile",
   component: MainButtonMobile,
   tags: ["autodocs"],
   parameters: {

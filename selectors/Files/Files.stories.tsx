@@ -34,7 +34,6 @@ import {
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
-import ApiProvider from "../../providers/api/ApiProvider";
 
 import { DeviceType } from "../../enums";
 import FilesSelector from ".";
@@ -46,10 +45,6 @@ import type {
 import type { TBreadCrumb } from "../../components/selector";
 
 type StoryArgs = {
-  // Connection (stories only)
-  url: string;
-  apiKey: string;
-
   // Panel
   isPanelVisible: boolean;
   embedded: boolean;
@@ -162,16 +157,6 @@ import { DeviceType } from "@docspace/ui-kit/enums";
     },
   },
   argTypes: {
-    // Connection
-    url: {
-      control: "text",
-      description: "Base URL of the DocSpace instance (used by ApiProvider)",
-    },
-    apiKey: {
-      control: "text",
-      description: "API key for authenticating requests (used by ApiProvider)",
-    },
-
     // Panel
     isPanelVisible: {
       control: "boolean",
@@ -403,7 +388,7 @@ const getIsDisabled = (
 const getFilesArchiveError = (name: string) =>
   `"${name}" is in the archive and cannot be used as a destination.`;
 
-const Template = ({ url, apiKey, ...props }: StoryArgs) => (
+const Template = (props: StoryArgs) => (
   <div
     style={{
       width: "100%",
@@ -413,28 +398,26 @@ const Template = ({ url, apiKey, ...props }: StoryArgs) => (
     }}
   >
     <Toast />
-    <ApiProvider url={url} apiKey={apiKey}>
-      <FilesSelector
-        {...(props as unknown as FilesSelectorProps)}
-        getIsDisabled={getIsDisabled}
-        getFilesArchiveError={getFilesArchiveError}
-        onSubmit={(
-          selectedItemId,
-          folderTitle,
-          _isPublic,
-          _breadCrumbs,
-          fileName,
-          isChecked,
-        ) => {
-          toastr.success(
-            `Saved to "${folderTitle}"${fileName ? ` as "${fileName}"` : ""}${isChecked ? " (checked)" : ""}`,
-          );
-        }}
-        onCancel={() => {
-          toastr.info("Cancelled");
-        }}
-      />
-    </ApiProvider>
+    <FilesSelector
+      {...(props as unknown as FilesSelectorProps)}
+      getIsDisabled={getIsDisabled}
+      getFilesArchiveError={getFilesArchiveError}
+      onSubmit={(
+        selectedItemId,
+        folderTitle,
+        _isPublic,
+        _breadCrumbs,
+        fileName,
+        isChecked,
+      ) => {
+        toastr.success(
+          `Saved to "${folderTitle}"${fileName ? ` as "${fileName}"` : ""}${isChecked ? " (checked)" : ""}`,
+        );
+      }}
+      onCancel={() => {
+        toastr.info("Cancelled");
+      }}
+    />
   </div>
 );
 
@@ -443,8 +426,7 @@ const Template = ({ url, apiKey, ...props }: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     isPanelVisible: true,
     embedded: true,
     currentDeviceType: DeviceType.desktop,
@@ -511,8 +493,7 @@ export const Default: Story = {
 export const RoomsOnly: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     isPanelVisible: true,
     embedded: true,
     currentDeviceType: DeviceType.desktop,
@@ -579,8 +560,7 @@ export const RoomsOnly: Story = {
 export const WithFooterInput: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     isPanelVisible: true,
     embedded: true,
     currentDeviceType: DeviceType.desktop,
@@ -647,8 +627,7 @@ export const WithFooterInput: Story = {
 export const WithFooterCheckbox: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     isPanelVisible: true,
     embedded: true,
     currentDeviceType: DeviceType.desktop,
@@ -715,8 +694,7 @@ export const WithFooterCheckbox: Story = {
 export const WithFileTypeFilter: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     isPanelVisible: true,
     embedded: true,
     currentDeviceType: DeviceType.desktop,
@@ -787,8 +765,7 @@ export const WithFileTypeFilter: Story = {
 export const WithRoomCreation: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     isPanelVisible: true,
     embedded: true,
     currentDeviceType: DeviceType.desktop,
@@ -857,28 +834,24 @@ export const WithRoomCreation: Story = {
 };
 
 export const AsidePanel: Story = {
-  render: ({ url, apiKey, ...props }: StoryArgs) => (
+  render: (props: StoryArgs) => (
     <div style={{ width: "100%", height: "600px", position: "relative" }}>
       <Toast />
-      <ApiProvider url={url} apiKey={apiKey}>
-        <FilesSelector
-          // biome-ignore lint/suspicious/noExplicitAny: StoryArgs has extra fields (url/apiKey) not in FilesSelectorProps
-          {...(props as any)}
-          getIsDisabled={getIsDisabled}
-          getFilesArchiveError={getFilesArchiveError}
-          onSubmit={(selectedItemId, folderTitle) => {
-            toastr.success(`Saved to "${folderTitle}"`);
-          }}
-          onCancel={() => {
-            toastr.info("Cancelled");
-          }}
-        />
-      </ApiProvider>
+      <FilesSelector
+        {...(props as unknown as FilesSelectorProps)}
+        getIsDisabled={getIsDisabled}
+        getFilesArchiveError={getFilesArchiveError}
+        onSubmit={(selectedItemId, folderTitle) => {
+          toastr.success(`Saved to "${folderTitle}"`);
+        }}
+        onCancel={() => {
+          toastr.info("Cancelled");
+        }}
+      />
     </div>
   ),
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     isPanelVisible: true,
     embedded: false,
     currentDeviceType: DeviceType.desktop,
@@ -945,8 +918,7 @@ export const AsidePanel: Story = {
 export const WithHeader: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     isPanelVisible: true,
     embedded: true,
     currentDeviceType: DeviceType.desktop,

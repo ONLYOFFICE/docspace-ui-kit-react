@@ -32,7 +32,7 @@ import { Portal } from "./Portal";
 import styles from "./Portal.module.scss";
 
 const meta: Meta<typeof Portal> = {
-  title: "Components/UI/Portal",
+  title: "UI/Overlays/Portal",
   component: Portal,
   parameters: {
     docs: {

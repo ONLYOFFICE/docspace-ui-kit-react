@@ -32,7 +32,7 @@ import { FileInputProps } from "./FileInput.types";
 import { FileInputPure } from "./FileInput";
 
 const meta = {
-  title: "Components/Form controls/FileInput",
+  title: "UI/Form controls/FileInput",
   component: FileInputPure,
   argTypes: {
     onInput: { action: "onInput" },

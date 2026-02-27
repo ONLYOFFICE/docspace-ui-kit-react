@@ -35,7 +35,7 @@ import {
 import { Checkbox } from "../../../checkbox";
 
 const meta: Meta<typeof TableCell> = {
-  title: "Components/Table/TableCell",
+  title: "UI/Table/TableCell",
   component: TableCell,
   parameters: {
     docs: {

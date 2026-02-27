@@ -31,7 +31,7 @@ import { LoaderTypes } from "./Loader.enums";
 import { globalColors } from "../../providers/theme";
 
 const meta = {
-  title: "Components/Status components/Loader",
+  title: "UI/Status components/Loader",
   component: Loader,
   parameters: {
     docs: {

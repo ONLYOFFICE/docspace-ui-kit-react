@@ -39,7 +39,7 @@ import { Label } from "../label";
 import { Backdrop } from "../backdrop";
 
 const meta: Meta<typeof Aside> = {
-  title: "components/Layout components/Aside",
+  title: "UI/Layout components/Aside",
   component: Aside,
   parameters: {
     docs: {

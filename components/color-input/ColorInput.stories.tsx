@@ -33,7 +33,7 @@ import { InputSize } from "../text-input";
 import { globalColors } from "../../providers/theme";
 
 const meta = {
-  title: "Components/Interactive elements/ColorInput",
+  title: "UI/Interactive elements/ColorInput",
   component: ColorInput,
   parameters: {
     docs: {

@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Label } from "./Label";
 
 const meta: Meta<typeof Label> = {
-  title: "Components/UI/Label",
+  title: "UI/Data display/Label",
   component: Label,
   parameters: {
     docs: {

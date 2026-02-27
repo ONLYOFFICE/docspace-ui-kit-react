@@ -47,7 +47,7 @@ import type { SelectorProps, TSelectorItem } from "./Selector.types";
 import { globalColors } from "../../providers/theme";
 
 const meta = {
-  title: "Components/Layout components/Selector",
+  title: "UI/Layout components/Selector",
   component: Selector,
   parameters: {},
 } satisfies Meta<typeof Selector>;

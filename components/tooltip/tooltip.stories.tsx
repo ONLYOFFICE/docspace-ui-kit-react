@@ -34,7 +34,7 @@ import { Text } from "../text";
 import { Tooltip } from ".";
 
 const meta = {
-	title: "components/UI/Tooltip",
+	title: "UI/Overlays/Tooltip",
 	component: Tooltip,
 	parameters: {
 		docs: {

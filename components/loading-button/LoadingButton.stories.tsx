@@ -31,7 +31,7 @@ import { Meta, StoryObj } from "@storybook/react-vite";
 import { LoadingButton } from ".";
 
 const meta = {
-  title: "Components/Status components/LoadingButton",
+  title: "UI/Status components/LoadingButton",
   component: LoadingButton,
   parameters: {
     docs: {

@@ -36,7 +36,7 @@ import { globalColors } from "../../providers/theme";
 import { ComboBoxDisplayType, ComboBoxSize } from "./ComboBox.enums";
 
 const meta = {
-	title: "Components/Form controls/ComboBox",
+	title: "UI/Form controls/ComboBox",
 	component: ComboBox,
 	parameters: {
 		docs: {

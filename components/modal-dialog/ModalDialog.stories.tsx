@@ -34,7 +34,7 @@ import { ModalDialogType } from "./ModalDialog.enums";
 import { ModalDialogProps } from "./ModalDialog.types";
 
 const meta = {
-  title: "Components/Layout components/ModalDialog",
+  title: "UI/Layout components/ModalDialog",
   component: ModalDialog,
   parameters: {
     docs: {

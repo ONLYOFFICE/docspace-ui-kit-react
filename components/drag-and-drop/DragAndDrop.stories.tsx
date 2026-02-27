@@ -5,7 +5,7 @@ import DragAndDrop from "./DragAndDrop";
 import { DragAndDropProps } from "./DragAndDrop.types";
 
 export default {
-  title: "Components/Interactive elements/DragAndDrop",
+  title: "UI/Interactive elements/DragAndDrop",
   component: DragAndDrop,
   parameters: {
     docs: {

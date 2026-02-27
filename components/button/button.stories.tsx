@@ -34,7 +34,7 @@ import Icon from "../../assets/button.alert.react.svg";
 import { Button, ButtonSize } from ".";
 
 const meta = {
-  title: "Components/Interactive elements/Button",
+  title: "UI/Interactive elements/Button",
   component: Button,
   parameters: {
     docs: {

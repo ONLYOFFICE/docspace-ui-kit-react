@@ -31,7 +31,7 @@ import { ImageEditorProps, TImage } from "./ImageEditor.types";
 import "../../assets/selector.form.room.empty.screen.light.react.svg";
 
 export default {
-  title: "Components/Interactive elements/ImageEditor",
+  title: "UI/Interactive elements/ImageEditor",
   component: ImageEditor,
   parameters: {
     docs: {

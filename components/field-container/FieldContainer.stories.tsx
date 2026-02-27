@@ -34,7 +34,7 @@ import { FieldContainerProps } from "./FieldContainer.types";
 import { globalColors } from "../../providers/theme";
 
 const meta = {
-	title: "Components/UI/FieldContainer",
+	title: "UI/Form controls/FieldContainer",
 	component: FieldContainer,
 	argTypes: {
 		errorColor: {

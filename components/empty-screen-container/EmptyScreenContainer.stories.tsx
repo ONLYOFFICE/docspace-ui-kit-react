@@ -36,7 +36,7 @@ import { EmptyScreenContainer } from ".";
 import styles from "./EmptyScreenContainer.stories.module.scss";
 
 const meta = {
-  title: "components/layout components/EmptyScreenContainer",
+  title: "UI/Layout components/EmptyScreenContainer",
   component: EmptyScreenContainer,
   parameters: {
     docs: {

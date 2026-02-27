@@ -31,7 +31,7 @@ import { globalColors } from "../../providers/theme";
 import { Badge } from ".";
 
 const meta = {
-	title: "components/Data Display/Badge",
+	title: "UI/Data display/Badge",
 	component: Badge,
 	parameters: {
 		docs: {

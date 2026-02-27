@@ -40,7 +40,7 @@ import { RowProps } from "./Row.types";
 import styles from "./row.stories.module.scss";
 
 const meta = {
-  title: "Components/Rows/Row",
+  title: "UI/Rows/Row",
   component: Row,
   parameters: {
     docs: { description: { component: "Displays content as row" } },

@@ -5,7 +5,7 @@ import { CategoryItem } from "./index";
 import { ICategoryItemProps } from "./CategoryItem.types";
 
 export default {
-  title: "Components/Layout components/CategoryItem",
+  title: "UI/Layout components/CategoryItem",
   component: CategoryItem,
   parameters: {
     docs: {

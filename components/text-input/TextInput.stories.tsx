@@ -33,7 +33,7 @@ import { InputSize, InputType } from "./TextInput.enums";
 import type { TextInputProps } from "./TextInput.types";
 
 const meta = {
-  title: "Components/Form Controls/TextInput",
+  title: "UI/Form controls/TextInput",
   component: TextInput,
   parameters: {
     docs: {

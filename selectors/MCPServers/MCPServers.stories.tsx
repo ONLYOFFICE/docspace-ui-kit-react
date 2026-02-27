@@ -24,14 +24,12 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
-import ApiProvider from "../../providers/api/ApiProvider";
 
-import MCPServersSelector, { ServerType } from ".";
+import MCPServersSelector from ".";
 import type { TSelectorItem } from "../../components/selector";
 
 type MCPServersSelectorProps = {
@@ -41,10 +39,7 @@ type MCPServersSelectorProps = {
   initedSelectedServers?: string[];
 };
 
-type StoryArgs = MCPServersSelectorProps & {
-  url: string;
-  apiKey: string;
-};
+type StoryArgs = MCPServersSelectorProps;
 
 const meta: Meta<StoryArgs> = {
   title: "Selectors/MCPServersSelector",
@@ -68,16 +63,13 @@ const meta: Meta<StoryArgs> = {
 
 \`\`\`tsx
 import MCPServersSelector from "@docspace/ui-kit/selectors/MCPServers";
-import ApiProvider from "@docspace/ui-kit/providers/api/ApiProvider";
 
-<ApiProvider url="https://my.docspace.io/" apiKey="sk-...">
-  <MCPServersSelector
-    initedSelectedServers={["server-id-1"]}
-    onSubmit={(servers) => saveConnectedServers(servers.map((s) => s.id))}
-    onClose={() => setOpen(false)}
-    onBackClick={() => navigateBack()}
-  />
-</ApiProvider>
+<MCPServersSelector
+  initedSelectedServers={["server-id-1"]}
+  onSubmit={(servers) => saveConnectedServers(servers.map((s) => s.id))}
+  onClose={() => setOpen(false)}
+  onBackClick={() => navigateBack()}
+/>
 \`\`\`
 
 ### Server Types
@@ -94,16 +86,6 @@ enum ServerType {
     },
   },
   argTypes: {
-    // Connection
-    url: {
-      control: "text",
-      description: "Base URL of the DocSpace instance (used by ApiProvider)",
-    },
-    apiKey: {
-      control: "text",
-      description: "API key for authenticating requests (used by ApiProvider)",
-    },
-
     // Behaviour
     initedSelectedServers: {
       control: "object",
@@ -133,7 +115,7 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
-const Template = ({ url, apiKey, ...props }: StoryArgs) => (
+const Template = (props: StoryArgs) => (
   <div
     style={{
       width: "100%",
@@ -143,17 +125,14 @@ const Template = ({ url, apiKey, ...props }: StoryArgs) => (
     }}
   >
     <Toast />
-    <ApiProvider url={url} apiKey={apiKey}>
-      <MCPServersSelector {...props} />
-    </ApiProvider>
+    <MCPServersSelector {...props} />
   </div>
 );
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     initedSelectedServers: [],
     onSubmit: (servers) => {
       const names = servers.map((s) => s.label).join(", ");
@@ -170,8 +149,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default story using a live DocSpace API. Available MCP servers are fetched and displayed for multi-selection. " +
-          "Requires a valid `url` and `apiKey`.",
+          "Default story using a live DocSpace API. Available MCP servers are fetched and displayed for multi-selection.",
       },
       source: {
         code: `<MCPServersSelector
@@ -188,8 +166,7 @@ export const Default: Story = {
 export const WithPreselection: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     initedSelectedServers: ["portal"],
     onSubmit: (servers) => {
       const names = servers.map((s) => s.label).join(", ");

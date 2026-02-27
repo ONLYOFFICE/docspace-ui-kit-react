@@ -24,20 +24,15 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
-import ApiProvider from "../../providers/api/ApiProvider";
 
 import GroupsSelector from ".";
 import type { GroupsSelectorProps } from "./GroupsSelector.types";
 
-type StoryArgs = GroupsSelectorProps & {
-  url: string;
-  apiKey: string;
-};
+type StoryArgs = GroupsSelectorProps;
 
 const meta: Meta<StoryArgs> = {
   title: "Selectors/GroupsSelector",
@@ -60,48 +55,33 @@ const meta: Meta<StoryArgs> = {
 
 \`\`\`tsx
 import GroupsSelector from "@docspace/ui-kit/selectors/Groups";
-import ApiProvider from "@docspace/ui-kit/providers/api/ApiProvider";
 
 // Inline mode
-<ApiProvider url="https://my.docspace.io/" apiKey="sk-...">
-  <GroupsSelector
-    withHeader
-    headerProps={{
-      headerLabel: "Select Group",
-      onCloseClick: () => setOpen(false),
-    }}
-    onSubmit={(items) => console.log(items[0])}
-  />
-</ApiProvider>
+<GroupsSelector
+  withHeader
+  headerProps={{
+    headerLabel: "Select Group",
+    onCloseClick: () => setOpen(false),
+  }}
+  onSubmit={(items) => console.log(items[0])}
+/>
 
 // Aside panel mode
-<ApiProvider url="https://my.docspace.io/" apiKey="sk-...">
-  <GroupsSelector
-    useAside
-    onClose={() => setOpen(false)}
-    withHeader
-    headerProps={{
-      headerLabel: "Select Group",
-      onCloseClick: () => setOpen(false),
-    }}
-    onSubmit={(items) => console.log(items[0])}
-  />
-</ApiProvider>
+<GroupsSelector
+  useAside
+  onClose={() => setOpen(false)}
+  withHeader
+  headerProps={{
+    headerLabel: "Select Group",
+    onCloseClick: () => setOpen(false),
+  }}
+  onSubmit={(items) => console.log(items[0])}
+/>
 \`\`\``,
       },
     },
   },
   argTypes: {
-    // Connection
-    url: {
-      control: "text",
-      description: "Base URL of the DocSpace instance (used by ApiProvider)",
-    },
-    apiKey: {
-      control: "text",
-      description: "API key for authenticating requests (used by ApiProvider)",
-    },
-
     // Layout
     id: {
       control: "text",
@@ -161,7 +141,7 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
-const Template = ({ url, apiKey, ...props }: StoryArgs) => (
+const Template = (props: StoryArgs) => (
   <div
     style={{
       width: "100%",
@@ -171,17 +151,14 @@ const Template = ({ url, apiKey, ...props }: StoryArgs) => (
     }}
   >
     <Toast />
-    <ApiProvider url={url} apiKey={apiKey}>
-      <GroupsSelector {...props} />
-    </ApiProvider>
+    <GroupsSelector {...props} />
   </div>
 );
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     withHeader: true,
     headerProps: {
       headerLabel: "Select Group",
@@ -199,8 +176,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default story using a live DocSpace API. Groups are fetched and filtered via the search field. " +
-          "Requires a valid `url` and `apiKey`.",
+          "Default story using a live DocSpace API. Groups are fetched and filtered via the search field.",
       },
       source: {
         code: `<GroupsSelector
@@ -220,8 +196,7 @@ export const Default: Story = {
 export const AsideMode: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     useAside: true,
     withoutBackground: false,
     withBlur: false,

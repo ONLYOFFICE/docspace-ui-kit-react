@@ -32,7 +32,7 @@ import { TableCell } from "../sub-components/table-cell";
 import { TableRow } from "./TableRow";
 
 const meta: Meta<typeof TableRow> = {
-  title: "Components/Table/TableRow",
+  title: "UI/Table/TableRow",
   component: TableRow,
   parameters: {
     docs: {

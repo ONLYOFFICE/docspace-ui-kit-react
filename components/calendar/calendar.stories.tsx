@@ -33,7 +33,7 @@ import { CalendarProps } from "./Calendar.types";
 import { now } from "../../utils/date";
 
 const meta = {
-  title: "Components/UI/Calendar",
+  title: "UI/Form controls/Calendar",
   component: Calendar,
   argTypes: {
     maxDate: { control: "date" },

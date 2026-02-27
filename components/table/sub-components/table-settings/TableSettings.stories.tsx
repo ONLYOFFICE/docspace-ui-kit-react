@@ -31,7 +31,7 @@ import { SortByFieldName } from "../../../../enums";
 import { TableSettings } from "./TableSettings";
 
 const meta = {
-  title: "Components/Table/TableSettings",
+  title: "UI/Table/TableSettings",
   component: TableSettings,
   parameters: {
     docs: {

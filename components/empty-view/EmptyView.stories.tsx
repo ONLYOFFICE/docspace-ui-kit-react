@@ -47,7 +47,7 @@ const MockLinkRouter = ({ children, to, ...props }: LinkRouterProps) => (
 );
 
 const meta = {
-  title: "components/Layout components/EmptyView",
+  title: "UI/Layout components/EmptyView",
   component: EmptyView,
   parameters: {
     docs: {

@@ -35,7 +35,7 @@ import { RoomIcon } from ".";
 import type { RoomIconProps } from "./RoomIcon.types";
 
 const meta: Meta<typeof RoomIcon> = {
-  title: "components/Data Display/RoomIcon",
+  title: "UI/Data display/RoomIcon",
   component: RoomIcon,
   parameters: {
     docs: {

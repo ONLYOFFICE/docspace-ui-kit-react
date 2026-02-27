@@ -39,40 +39,40 @@ import { TileContent } from "../tile-content";
 const wordElement = <WordSvgUrl />;
 
 const contextOptions = [
-  {
-    id: "option_edit",
-    key: "edit",
-    label: "Edit",
-    onClick: () => {},
-    disabled: false,
-  },
-  {
-    id: "option_delete",
-    key: "delete",
-    label: "Delete",
-    onClick: () => {},
-    disabled: false,
-  },
+	{
+		id: "option_edit",
+		key: "edit",
+		label: "Edit",
+		onClick: () => {},
+		disabled: false,
+	},
+	{
+		id: "option_delete",
+		key: "delete",
+		label: "Delete",
+		onClick: () => {},
+		disabled: false,
+	},
 ];
 
 const meta = {
-  title: "Components/UI/Tiles/BaseTile",
-  component: BaseTile,
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "Base tile component that serves as a foundation for file and room tiles",
-      },
-    },
-  },
-  argTypes: {
-    checked: { control: "boolean" },
-    isActive: { control: "boolean" },
-    inProgress: { control: "boolean" },
-    showHotkeyBorder: { control: "boolean" },
-    isEdit: { control: "boolean" },
-  },
+	title: "UI/Tiles/BaseTile",
+	component: BaseTile,
+	parameters: {
+		docs: {
+			description: {
+				component:
+					"Base tile component that serves as a foundation for file and room tiles",
+			},
+		},
+	},
+	argTypes: {
+		checked: { control: "boolean" },
+		isActive: { control: "boolean" },
+		inProgress: { control: "boolean" },
+		showHotkeyBorder: { control: "boolean" },
+		isEdit: { control: "boolean" },
+	},
 } satisfies Meta<typeof BaseTile>;
 
 type Story = StoryObj<typeof meta>;
@@ -80,126 +80,126 @@ type Story = StoryObj<typeof meta>;
 export default meta;
 
 const Template = ({ checked: initialChecked, ...args }: BaseTileProps) => {
-  const [checked, setChecked] = useState(initialChecked);
+	const [checked, setChecked] = useState(initialChecked);
 
-  const onSelect = (isSelected: boolean) => {
-    setChecked(isSelected);
-  };
+	const onSelect = (isSelected: boolean) => {
+		setChecked(isSelected);
+	};
 
-  return (
-    <div style={{ maxWidth: "300px", margin: "30px" }}>
-      <BaseTile {...args} checked={checked} onSelect={onSelect} />
-    </div>
-  );
+	return (
+		<div style={{ maxWidth: "300px", margin: "30px" }}>
+			<BaseTile {...args} checked={checked} onSelect={onSelect} />
+		</div>
+	);
 };
 
 export const Default: Story = {
-  render: Template,
-  args: {
-    item: {
-      id: "tile-1",
-      title: "Document.docx",
-      fileExst: ".docx",
-    },
-    element: wordElement,
-    contextOptions,
-    topContent: (
-      <TileContent>
-        <Link>Document.docx</Link>
-      </TileContent>
-    ),
-    onSelect: () => {},
-    getContextModel: () => contextOptions,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Basic base tile with default configuration",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		item: {
+			id: "tile-1",
+			title: "Document.docx",
+			fileExst: ".docx",
+		},
+		element: wordElement,
+		contextOptions,
+		topContent: (
+			<TileContent>
+				<Link>Document.docx</Link>
+			</TileContent>
+		),
+		onSelect: () => {},
+		getContextModel: () => contextOptions,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Basic base tile with default configuration",
+			},
+		},
+	},
 };
 
 export const Checked: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    checked: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Base tile in checked/selected state",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		...Default.args,
+		checked: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Base tile in checked/selected state",
+			},
+		},
+	},
 };
 
 export const Active: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    isActive: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Base tile in active state",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		...Default.args,
+		isActive: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Base tile in active state",
+			},
+		},
+	},
 };
 
 export const InProgress: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    inProgress: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Base tile showing progress/loading state",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		...Default.args,
+		inProgress: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Base tile showing progress/loading state",
+			},
+		},
+	},
 };
 
 export const WithHotkeyBorder: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    showHotkeyBorder: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Base tile with hotkey border visible",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		...Default.args,
+		showHotkeyBorder: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Base tile with hotkey border visible",
+			},
+		},
+	},
 };
 
 export const WithBottomContent: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    topContent: (
-      <TileContent>
-        <Link>Document.docx</Link>
-      </TileContent>
-    ),
-    bottomContent: (
-      <div style={{ padding: "8px", fontSize: "12px", color: "#666" }}>
-        Additional information
-      </div>
-    ),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Base tile with both top and bottom content",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		...Default.args,
+		topContent: (
+			<TileContent>
+				<Link>Document.docx</Link>
+			</TileContent>
+		),
+		bottomContent: (
+			<div style={{ padding: "8px", fontSize: "12px", color: "#666" }}>
+				Additional information
+			</div>
+		),
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Base tile with both top and bottom content",
+			},
+		},
+	},
 };

@@ -34,7 +34,7 @@ import { DropDown } from ".";
 import type { DropDownProps } from "./DropDown.types";
 
 const meta = {
-  title: "Components/UI/DropDown",
+  title: "UI/Overlays/DropDown",
   component: DropDown,
   parameters: {
     docs: {

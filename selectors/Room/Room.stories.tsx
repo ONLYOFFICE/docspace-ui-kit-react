@@ -29,17 +29,12 @@ import { RoomType, SearchArea } from "@onlyoffice/docspace-api-sdk";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
-import ApiProvider from "../../providers/api/ApiProvider";
 
 import RoomSelector from ".";
 import type { RoomSelectorProps } from "./RoomSelector.types";
 import type { TSelectorItem } from "../../components/selector";
 
 type StoryArgs = {
-  // Connection (stories only)
-  url: string;
-  apiKey: string;
-
   // Layout
   id?: string;
   className?: string;
@@ -143,16 +138,6 @@ import RoomSelector from "@docspace/ui-kit/selectors/Room";
     },
   },
   argTypes: {
-    // Connection
-    url: {
-      control: "text",
-      description: "Base URL of the DocSpace instance (used by ApiProvider)",
-    },
-    apiKey: {
-      control: "text",
-      description: "API key for authenticating requests (used by ApiProvider)",
-    },
-
     // Layout
     id: {
       control: "text",
@@ -319,7 +304,7 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
-const Template = ({ url, apiKey, ...props }: StoryArgs) => (
+const Template = (props: StoryArgs) => (
   <div
     style={{
       width: "100%",
@@ -329,17 +314,13 @@ const Template = ({ url, apiKey, ...props }: StoryArgs) => (
     }}
   >
     <Toast />
-    <ApiProvider url={url} apiKey={apiKey}>
-      <RoomSelector {...(props as unknown as RoomSelectorProps)} />
-    </ApiProvider>
+    <RoomSelector {...(props as unknown as RoomSelectorProps)} />
   </div>
 );
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
     withHeader: true,
     headerProps: {
       headerLabel: "Select Room",
@@ -359,8 +340,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default single-select mode with search. Fetches all rooms from the DocSpace API. " +
-          "Requires a valid `url` and `apiKey`.",
+          "Default single-select mode with search. Fetches all rooms from the DocSpace API.",
       },
       source: {
         code: `<RoomSelector
@@ -379,8 +359,6 @@ export const Default: Story = {
 export const MultiSelect: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
     withHeader: true,
     headerProps: {
       headerLabel: "Add to Rooms",
@@ -428,8 +406,6 @@ export const MultiSelect: Story = {
 export const FilteredByRoomType: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
     withHeader: true,
     headerProps: {
       headerLabel: "Select Custom Room",
@@ -471,8 +447,6 @@ export const FilteredByRoomType: Story = {
 export const AsideMode: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
     useAside: true,
     withoutBackground: false,
     withBlur: false,

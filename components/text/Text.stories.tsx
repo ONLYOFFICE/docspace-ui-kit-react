@@ -31,7 +31,7 @@ import { globalColors } from "../../providers/theme";
 import { Text } from ".";
 
 const meta: Meta<typeof Text> = {
-	title: "Components/UI/Text",
+	title: "UI/Data display/Text",
 	component: Text,
 	parameters: {
 		docs: {

@@ -31,7 +31,7 @@ import { SnackBar } from "./Snackbar";
 import type { SnackbarProps, TextAlignValue } from "./Snackbar.types";
 
 const meta = {
-  title: "Components/UI/SnackBar",
+  title: "UI/Overlays/SnackBar",
   component: SnackBar,
   tags: ["autodocs"],
   parameters: {

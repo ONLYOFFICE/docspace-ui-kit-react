@@ -24,12 +24,10 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
-import ApiProvider from "../../providers/api/ApiProvider";
 
 import { RoomType } from "@onlyoffice/docspace-api-sdk";
 import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
@@ -37,10 +35,7 @@ import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
 import AIAgentSelector from ".";
 import type { AIAgentSelectorProps } from "./AIAgent.types";
 
-type StoryArgs = AIAgentSelectorProps & {
-  url: string;
-  apiKey: string;
-};
+type StoryArgs = AIAgentSelectorProps;
 
 const meta: Meta<StoryArgs> = {
   title: "Selectors/AIAgentSelector",
@@ -63,16 +58,13 @@ const meta: Meta<StoryArgs> = {
 
 \`\`\`tsx
 import AIAgentSelector from "@docspace/ui-kit/selectors/AIAgent";
-import ApiProvider from "@docspace/ui-kit/providers/api/ApiProvider";
 
 // Live API mode
-<ApiProvider url="https://my.docspace.io/" apiKey="sk-...">
-  <AIAgentSelector
-    withPadding
-    onSubmit={(items) => console.log(items)}
-    onClose={() => setOpen(false)}
-  />
-</ApiProvider>
+<AIAgentSelector
+  withPadding
+  onSubmit={(items) => console.log(items)}
+  onClose={() => setOpen(false)}
+/>
 
 // Pre-loaded (SSR / offline) mode
 <AIAgentSelector
@@ -89,16 +81,6 @@ import ApiProvider from "@docspace/ui-kit/providers/api/ApiProvider";
     },
   },
   argTypes: {
-    // Connection
-    url: {
-      control: "text",
-      description: "Base URL of the DocSpace instance (used by ApiProvider)",
-    },
-    apiKey: {
-      control: "text",
-      description: "API key for authenticating requests (used by ApiProvider)",
-    },
-
     // Layout
     id: {
       control: "text",
@@ -174,20 +156,17 @@ export default meta;
 
 type Story = StoryObj<StoryArgs>;
 
-const Template = ({ url, apiKey, ...props }: StoryArgs) => (
+const Template = (props: StoryArgs) => (
   <div style={{ width: "100%", height: "500px", overflow: "hidden", transform: "translateZ(0)" }}>
     <Toast />
-    <ApiProvider url={url} apiKey={apiKey}>
-      <AIAgentSelector {...props} />
-    </ApiProvider>
+    <AIAgentSelector {...props} />
   </div>
 );
 
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "https://eu-test-oauth.onlyoffice.io",
-    apiKey: "sk-4cbb9ce8166171b0da120058c59c4343f83ebdc4ca1d291821e3035fb0c6f1a0",
+
     withPadding: true,
     disableBySecurity: undefined,
     excludeItems: [],
@@ -204,7 +183,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default story using a live DocSpace API. Requires a valid `url` and `apiKey` to load agent rooms.",
+          "Default story using a live DocSpace API to load agent rooms.",
       },
       source: {
         code: `<AIAgentSelector
@@ -257,8 +236,7 @@ const initItems: FolderDtoInteger[] = [
 export const WithInit: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    url: "",
-    apiKey: "",
+
     withPadding: true,
     withInit: true,
     initItems,

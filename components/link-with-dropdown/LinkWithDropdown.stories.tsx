@@ -28,7 +28,7 @@ import { Meta, StoryObj } from "@storybook/react-vite";
 import { LinkWithDropdown } from "./LinkWithDropdown";
 
 const meta = {
-  title: "Components/Interactive elements/LinkWithDropdown",
+  title: "UI/Interactive elements/LinkWithDropdown",
   component: LinkWithDropdown,
   parameters: {
     docs: {

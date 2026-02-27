@@ -39,7 +39,7 @@ const COLUMN_INFO_PANEL_STORAGE_NAME =
   "storybook-table-body-info-panel-storage";
 
 const meta = {
-  title: "Components/Table/TableBody",
+  title: "UI/Table/TableBody",
   component: TableBody,
   tags: ["!autodocs"],
   parameters: {

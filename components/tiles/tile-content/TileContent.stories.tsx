@@ -37,33 +37,33 @@ import { Badge } from "../../badge";
 const element = <WordSvgUrl />;
 
 const mockContextOptions = [
-  { key: "edit", label: "Edit" },
-  { key: "delete", label: "Delete" },
+	{ key: "edit", label: "Edit" },
+	{ key: "delete", label: "Delete" },
 ];
 
 const meta = {
-  title: "Components/UI/Tiles/TileContent",
-  component: TileContent,
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "Content wrapper component for tile items, handles layout and spacing",
-      },
-    },
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ maxWidth: "300px", margin: "20px" }}>
-        <BaseTile
-          item={{ id: "1", title: "Document.docx" }}
-          contextOptions={mockContextOptions}
-          element={element}
-          topContent={<Story />}
-        />
-      </div>
-    ),
-  ],
+	title: "UI/Tiles/TileContent",
+	component: TileContent,
+	parameters: {
+		docs: {
+			description: {
+				component:
+					"Content wrapper component for tile items, handles layout and spacing",
+			},
+		},
+	},
+	decorators: [
+		(Story) => (
+			<div style={{ maxWidth: "300px", margin: "20px" }}>
+				<BaseTile
+					item={{ id: "1", title: "Document.docx" }}
+					contextOptions={mockContextOptions}
+					element={element}
+					topContent={<Story />}
+				/>
+			</div>
+		),
+	],
 } satisfies Meta<typeof TileContent>;
 
 type Story = StoryObj<typeof meta>;
@@ -71,49 +71,49 @@ type Story = StoryObj<typeof meta>;
 export default meta;
 
 export const Default: Story = {
-  args: {
-    children: <Link>Document.docx</Link>,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Basic tile content with a link inside BaseTile",
-      },
-    },
-  },
+	args: {
+		children: <Link>Document.docx</Link>,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Basic tile content with a link inside BaseTile",
+			},
+		},
+	},
 };
 
 export const WithText: Story = {
-  args: {
-    children: (
-      <Text fontSize="14px" fontWeight={600}>
-        My Document
-      </Text>
-    ),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Tile content with text component inside BaseTile",
-      },
-    },
-  },
+	args: {
+		children: (
+			<Text fontSize="14px" fontWeight={600}>
+				My Document
+			</Text>
+		),
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Tile content with text component inside BaseTile",
+			},
+		},
+	},
 };
 
 export const WithMultipleElements: Story = {
-  args: {
-    children: (
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <Link>Document.docx</Link>
-        <Badge label="New" backgroundColor="#4781D1" color="#fff" />
-      </div>
-    ),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Tile content with multiple child elements",
-      },
-    },
-  },
+	args: {
+		children: (
+			<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+				<Link>Document.docx</Link>
+				<Badge label="New" backgroundColor="#4781D1" color="#fff" />
+			</div>
+		),
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Tile content with multiple child elements",
+			},
+		},
+	},
 };

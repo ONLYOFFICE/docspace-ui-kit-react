@@ -44,73 +44,73 @@ const pdfElement = <PdfSvgUrl />;
 const slideElement = <SlideSvgUrl />;
 
 const meta: Meta = {
-  title: "Components/UI/Tiles/TileContainer",
-  component: TileContainer,
-  parameters: {
-    docs: {
-      description: {
-        component: "Container component for displaying tiles in a grid layout",
-      },
-    },
-  },
+	title: "UI/Tiles/TileContainer",
+	component: TileContainer,
+	parameters: {
+		docs: {
+			description: {
+				component: "Container component for displaying tiles in a grid layout",
+			},
+		},
+	},
 };
 
 export default meta;
 
 const mockFiles = [
-  {
-    id: "1",
-    title: "Document.docx",
-    fileExst: ".docx",
-    fileType: FileType.Document,
-  },
-  {
-    id: "2",
-    title: "Presentation.pptx",
-    fileExst: ".pptx",
-    fileType: FileType.Presentation,
-  },
-  {
-    id: "3",
-    title: "Spreadsheet.xlsx",
-    fileExst: ".xlsx",
-    fileType: FileType.Spreadsheet,
-  },
+	{
+		id: "1",
+		title: "Document.docx",
+		fileExst: ".docx",
+		fileType: FileType.Document,
+	},
+	{
+		id: "2",
+		title: "Presentation.pptx",
+		fileExst: ".pptx",
+		fileType: FileType.Presentation,
+	},
+	{
+		id: "3",
+		title: "Spreadsheet.xlsx",
+		fileExst: ".xlsx",
+		fileType: FileType.Spreadsheet,
+	},
 ];
 
 const mockContextOptions = [
-  { key: "edit", label: "Edit" },
-  { key: "delete", label: "Delete" },
+	{ key: "edit", label: "Edit" },
+	{ key: "delete", label: "Delete" },
 ];
 
 const Template: StoryFn<TileContainerProps> = (args) => {
-  return (
-    <TileContainer {...args}>
-      {mockFiles.map((file) => (
-        <FileTile
-          key={file.id}
-          item={file}
-          contextOptions={mockContextOptions}
-          temporaryIcon={<ImageReactSvg />}
-          element={
-            file.fileType === FileType.Spreadsheet
-              ? slideElement
-              : file.fileType === FileType.Presentation
-                ? pdfElement
-                : wordElement
-          }
-        >
-          <TileContent>
-            <Link>{file.title}</Link>
-          </TileContent>
-        </FileTile>
-      ))}
-    </TileContainer>
-  );
+	return (
+		<TileContainer {...args}>
+			{mockFiles.map((file) => (
+				<FileTile
+					key={file.id}
+					item={file}
+					contextOptions={mockContextOptions}
+					temporaryIcon={<ImageReactSvg />}
+					element={
+						file.fileType === FileType.Spreadsheet
+							? slideElement
+							: file.fileType === FileType.Presentation
+								? pdfElement
+								: wordElement
+					}
+				>
+					<TileContent>
+						<Link>{file.title}</Link>
+					</TileContent>
+				</FileTile>
+			))}
+		</TileContainer>
+	);
 };
 
 export const Default = Template.bind({});
 Default.args = {
-  useReactWindow: false,
-  headingFiles: "Files",
+	useReactWindow: false,
+	headingFiles: "Files",
 };

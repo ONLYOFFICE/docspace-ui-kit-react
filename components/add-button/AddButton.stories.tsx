@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { AddButton, type AddButtonProps } from ".";
 
 const meta: Meta<typeof AddButton> = {
-  title: "components/Interactive elements/AddButton",
+  title: "UI/Interactive elements/AddButton",
   component: AddButton,
   parameters: {
     docs: {

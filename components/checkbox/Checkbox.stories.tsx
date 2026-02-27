@@ -30,7 +30,7 @@ import type { CheckboxProps } from "./Checkbox.types";
 import { Checkbox } from ".";
 
 const meta = {
-  title: "Components/Form Controls/Checkbox",
+  title: "UI/Form controls/Checkbox",
   component: Checkbox,
   parameters: {
     docs: {

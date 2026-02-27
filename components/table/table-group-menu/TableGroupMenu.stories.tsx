@@ -35,7 +35,7 @@ import { TGroupMenuItem } from "../Table.types";
 import { DropDownItem } from "../../drop-down-item";
 
 const meta = {
-  title: "Components/Table/TableGroupMenu",
+  title: "UI/Table/TableGroupMenu",
   component: TableGroupMenu,
   parameters: {
     docs: {

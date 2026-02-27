@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CircleSkeleton } from ".";
 
 const meta: Meta<typeof CircleSkeleton> = {
-  title: "Skeletons/Circle",
+  title: "UI/Skeletons/Circle",
   component: CircleSkeleton,
   tags: ["autodocs"],
   argTypes: {

@@ -32,7 +32,7 @@ import { TabsProps, TTabItem } from "./Tabs.types";
 import { TabsTypes } from "./Tabs.enums";
 
 const meta = {
-  title: "Components/Data display/Tabs",
+  title: "UI/Data display/Tabs",
   component: Tabs,
   parameters: {
     docs: {

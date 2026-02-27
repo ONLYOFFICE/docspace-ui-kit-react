@@ -31,7 +31,7 @@ import { ColorPicker } from "./ColorPicker";
 import { globalColors } from "../../providers/theme";
 
 const meta = {
-  title: "Components/Interactive elements/ColorPicker",
+  title: "UI/Interactive elements/ColorPicker",
   component: ColorPicker,
   parameters: {
     docs: {

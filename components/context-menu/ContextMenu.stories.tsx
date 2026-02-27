@@ -40,7 +40,7 @@ import type {
 import { ContextMenu } from ".";
 
 const meta = {
-	title: "components/UI/ContextMenu",
+	title: "UI/Overlays/ContextMenu",
 	component: ContextMenu,
 	parameters: {
 		docs: {

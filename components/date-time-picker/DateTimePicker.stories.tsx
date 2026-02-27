@@ -61,7 +61,7 @@ const locales = [
 ];
 
 const meta = {
-  title: "Components/UI/DateTimePicker",
+  title: "UI/Form controls/DateTimePicker",
   component: DateTimePicker,
   argTypes: {
     minDate: {

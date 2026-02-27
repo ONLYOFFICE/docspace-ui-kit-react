@@ -29,7 +29,7 @@ import { Meta, StoryObj } from "@storybook/react-vite";
 import { Tag } from ".";
 
 const meta = {
-  title: "Components/UI/Tag",
+  title: "UI/Data display/Tag",
   component: Tag,
   parameters: {
     docs: {

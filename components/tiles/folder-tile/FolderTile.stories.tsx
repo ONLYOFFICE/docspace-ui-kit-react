@@ -38,54 +38,54 @@ import { TileContent } from "../tile-content";
 const element = <Folder32ReactSvg />;
 
 const contextOptions = [
-  {
-    id: "option_copy-to",
-    key: "copy-to",
-    label: "Copy",
-    onClick: () => {},
-    disabled: false,
-  },
-  {
-    id: "option_move-to",
-    key: "move-to",
-    label: "Move to",
-    onClick: () => {},
-    disabled: false,
-  },
+	{
+		id: "option_copy-to",
+		key: "copy-to",
+		label: "Copy",
+		onClick: () => {},
+		disabled: false,
+	},
+	{
+		id: "option_move-to",
+		key: "move-to",
+		label: "Move to",
+		onClick: () => {},
+		disabled: false,
+	},
 ];
 
 const badges = (
-  <div className="badges">
-    <Badge
-      noHover
-      className="badge badge-version tablet-badge icons-group"
-      backgroundColor="#A3A9AE"
-      label="1"
-      title="my badge"
-      style={{
-        width: "max-content",
-      }}
-      onClick={() => {}}
-    />
-  </div>
+	<div className="badges">
+		<Badge
+			noHover
+			className="badge badge-version tablet-badge icons-group"
+			backgroundColor="#A3A9AE"
+			label="1"
+			title="my badge"
+			style={{
+				width: "max-content",
+			}}
+			onClick={() => {}}
+		/>
+	</div>
 );
 
 const meta = {
-  title: "Components/UI/Tiles/FolderTile",
-  component: FolderTile,
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "Folder tile component for displaying folder information in a tile format",
-      },
-    },
-  },
-  argTypes: {
-    checked: { control: "boolean" },
-    inProgress: { control: "boolean" },
-    indeterminate: { control: "boolean" },
-  },
+	title: "UI/Tiles/FolderTile",
+	component: FolderTile,
+	parameters: {
+		docs: {
+			description: {
+				component:
+					"Folder tile component for displaying folder information in a tile format",
+			},
+		},
+	},
+	argTypes: {
+		checked: { control: "boolean" },
+		inProgress: { control: "boolean" },
+		indeterminate: { control: "boolean" },
+	},
 } satisfies Meta<typeof FolderTile>;
 
 type Story = StoryObj<typeof meta>;
@@ -93,105 +93,105 @@ type Story = StoryObj<typeof meta>;
 export default meta;
 
 const Template = ({ checked: initialChecked, ...args }: FolderTileProps) => {
-  const [checked, setChecked] = useState(initialChecked);
+	const [checked, setChecked] = useState(initialChecked);
 
-  const onSelect = (isSelected: boolean) => {
-    setChecked(isSelected);
-  };
+	const onSelect = (isSelected: boolean) => {
+		setChecked(isSelected);
+	};
 
-  return (
-    <div style={{ maxWidth: "300px", margin: "30px" }}>
-      <FolderTile {...args} checked={checked} onSelect={onSelect}>
-        <TileContent>
-          <Link>Folder Content</Link>
-        </TileContent>
-      </FolderTile>
-    </div>
-  );
+	return (
+		<div style={{ maxWidth: "300px", margin: "30px" }}>
+			<FolderTile {...args} checked={checked} onSelect={onSelect}>
+				<TileContent>
+					<Link>Folder Content</Link>
+				</TileContent>
+			</FolderTile>
+		</div>
+	);
 };
 
 export const Default: Story = {
-  render: Template,
-  args: {
-    item: {
-      id: "folder-1",
-      title: "My Folder",
-      isFolder: true,
-      contextOptions: ["copy-to", "move-to"],
-    },
-    element,
-    contextOptions,
-    badges,
-    onSelect: () => {},
-    setSelection: () => {},
-    withCtrlSelect: () => {},
-    withShiftSelect: () => {},
-    getContextModel: () => contextOptions,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Basic folder tile with selection functionality",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		item: {
+			id: "folder-1",
+			title: "My Folder",
+			isFolder: true,
+			contextOptions: ["copy-to", "move-to"],
+		},
+		element,
+		contextOptions,
+		badges,
+		onSelect: () => {},
+		setSelection: () => {},
+		withCtrlSelect: () => {},
+		withShiftSelect: () => {},
+		getContextModel: () => contextOptions,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Basic folder tile with selection functionality",
+			},
+		},
+	},
 };
 
 export const Big: Story = {
-  render: Template,
-  args: {
-    item: {
-      id: "folder-1",
-      title: "My Folder",
-      isFolder: true,
-      contextOptions: ["copy-to", "move-to"],
-    },
-    element,
-    contextOptions,
-    badges,
-    isBigFolder: true,
-    temporaryIcon: <ImageReactSvg />,
-    onSelect: () => {},
-    setSelection: () => {},
-    withCtrlSelect: () => {},
-    withShiftSelect: () => {},
-    getContextModel: () => contextOptions,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Big folder tile with selection functionality",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		item: {
+			id: "folder-1",
+			title: "My Folder",
+			isFolder: true,
+			contextOptions: ["copy-to", "move-to"],
+		},
+		element,
+		contextOptions,
+		badges,
+		isBigFolder: true,
+		temporaryIcon: <ImageReactSvg />,
+		onSelect: () => {},
+		setSelection: () => {},
+		withCtrlSelect: () => {},
+		withShiftSelect: () => {},
+		getContextModel: () => contextOptions,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Big folder tile with selection functionality",
+			},
+		},
+	},
 };
 
 export const Checked: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    checked: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Folder tile in checked state",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		...Default.args,
+		checked: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Folder tile in checked state",
+			},
+		},
+	},
 };
 
 export const InProgress: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    inProgress: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Folder tile in progress state",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		...Default.args,
+		inProgress: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Folder tile in progress state",
+			},
+		},
+	},
 };

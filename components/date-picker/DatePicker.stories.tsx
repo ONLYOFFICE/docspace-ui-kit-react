@@ -40,7 +40,7 @@ import {
 } from "../../utils/date";
 
 export default {
-  title: "Components/UI/DatePicker",
+  title: "UI/Form controls/DatePicker",
   component: DatePicker,
   parameters: {
     docs: {

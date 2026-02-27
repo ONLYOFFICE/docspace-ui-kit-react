@@ -34,7 +34,7 @@ import { InputBlockProps } from "./InputBlock.types";
 import { InputSize, InputType } from "../text-input";
 
 const meta = {
-  title: "Components/Form Controls/InputBlock",
+  title: "UI/Form controls/InputBlock",
   component: InputBlock,
   parameters: {
     docs: {

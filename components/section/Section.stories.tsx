@@ -263,7 +263,7 @@ const TableContent = () => {
 };
 
 const meta: Meta<typeof Section> = {
-  title: "Components/Layout Components/Section",
+  title: "UI/Layout components/Section",
   component: Section,
   parameters: {
     docs: {

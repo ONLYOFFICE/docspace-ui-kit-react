@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ProgressBar, PreparationPortalProgress } from ".";
 
 const meta: Meta<typeof ProgressBar> = {
-  title: "Components/Status components/ProgressBar",
+  title: "UI/Status components/ProgressBar",
   component: ProgressBar,
   parameters: {
     docs: {

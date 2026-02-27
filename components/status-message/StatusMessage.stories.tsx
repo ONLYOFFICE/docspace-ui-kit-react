@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import StatusMessage from ".";
 
 const meta: Meta<typeof StatusMessage> = {
-  title: "Components/UI/StatusMessage",
+  title: "UI/Data display/StatusMessage",
   component: StatusMessage,
   parameters: {
     docs: {

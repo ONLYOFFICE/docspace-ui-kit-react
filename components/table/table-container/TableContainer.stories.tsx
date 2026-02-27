@@ -121,7 +121,7 @@ const TableContainerWrapper = (props: TableContainerProps) => {
 };
 
 const meta = {
-  title: "Components/Table/TableContainer",
+  title: "UI/Table/TableContainer",
   component: TableContainerWrapper,
   tags: ["!autodocs"],
   parameters: {

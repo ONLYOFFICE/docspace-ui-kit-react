@@ -41,7 +41,7 @@ function getMenuData() {
 }
 
 const meta = {
-  title: "components/Interactive elements/ContextMenuButton",
+  title: "UI/Interactive elements/ContextMenuButton",
   component: ContextMenuButton,
   parameters: {
     docs: {

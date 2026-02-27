@@ -31,7 +31,7 @@ import type { SelectionAreaProps } from "./SelectionArea.types";
 import styles from "./SelectionArea.stories.module.scss";
 
 export default {
-  title: "Components/Layout components/SelectionArea",
+  title: "UI/Layout components/SelectionArea",
   component: SelectionArea,
   tags: ["!autodocs"],
   parameters: {

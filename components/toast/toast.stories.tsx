@@ -35,7 +35,7 @@ import type { ToastProps } from "./Toast.types";
 import { ToastType } from "./Toast.enums";
 
 const meta: Meta<typeof Toast> = {
-  title: "components/Feedback components/Toast",
+  title: "UI/Overlays/Toast",
   component: Toast,
   tags: ["autodocs"],
   argTypes: {

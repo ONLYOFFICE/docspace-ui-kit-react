@@ -32,7 +32,7 @@ import { MainButton } from ".";
 import { MainButtonProps } from "./MainButton.types";
 
 export default {
-  title: "Components/Interactive elements/MainButton",
+  title: "UI/Interactive elements/MainButton",
   component: MainButton,
   parameters: {
     docs: {

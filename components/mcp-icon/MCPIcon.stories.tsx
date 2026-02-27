@@ -32,7 +32,7 @@ import { MCPIconSize } from "./MCPIcon.enum";
 import { MCPIcon } from "./MCPIcon";
 
 const meta = {
-  title: "Components/UI/MCPIcon",
+  title: "UI/Data display/MCPIcon",
   component: MCPIcon,
   parameters: {
     docs: {

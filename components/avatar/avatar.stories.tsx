@@ -31,7 +31,7 @@ import AtReactSvgUrl from "../../assets/@.react.svg?url";
 import { AvatarPure, AvatarRole, AvatarSize } from ".";
 
 const meta = {
-  title: "Components/UI/Avatar",
+  title: "UI/Data display/Avatar",
   component: AvatarPure,
   parameters: {
     docs: {

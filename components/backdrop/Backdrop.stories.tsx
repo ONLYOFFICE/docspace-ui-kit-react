@@ -33,7 +33,7 @@ import type { BackdropProps } from "./Backdrop.types";
 import { Backdrop } from ".";
 
 const meta = {
-  title: "components/UI/Backdrop",
+  title: "UI/Overlays/Backdrop",
   component: Backdrop,
   parameters: {
     docs: {

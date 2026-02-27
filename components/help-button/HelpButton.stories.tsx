@@ -30,7 +30,7 @@ import { HelpButton } from ".";
 import { Text } from "../text";
 
 const meta = {
-  title: "Components/Interactive elements/HelpButton",
+  title: "UI/Interactive elements/HelpButton",
   component: HelpButton,
   parameters: {
     docs: {

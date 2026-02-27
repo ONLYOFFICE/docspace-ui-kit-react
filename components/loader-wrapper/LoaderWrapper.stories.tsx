@@ -31,7 +31,7 @@ import { Button, Heading, HeadingSize, Text } from "../";
 import { LoaderWrapper } from ".";
 
 const meta = {
-  title: "Components/Status components/LoaderWrapper",
+  title: "UI/Status components/LoaderWrapper",
   component: LoaderWrapper,
   tags: ["autodocs"],
   parameters: {

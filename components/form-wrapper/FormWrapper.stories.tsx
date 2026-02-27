@@ -5,7 +5,7 @@ import { FormWrapper } from "./index";
 import styles from "./FormWrapper.stories.module.scss";
 
 const meta: Meta<typeof FormWrapper> = {
-  title: "Components/UI/FormWrapper",
+  title: "UI/Form controls/FormWrapper",
   component: FormWrapper,
   tags: ["autodocs"],
   parameters: {

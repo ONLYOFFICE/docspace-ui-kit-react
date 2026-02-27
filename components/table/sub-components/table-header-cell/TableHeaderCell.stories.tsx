@@ -29,7 +29,7 @@ import { TableHeaderCell } from "./TableHeaderCell";
 import { SortByFieldName } from "../../../../enums";
 
 const meta = {
-  title: "Components/Table/TableHeaderCell",
+  title: "UI/Table/TableHeaderCell",
   component: TableHeaderCell,
   parameters: {
     docs: {

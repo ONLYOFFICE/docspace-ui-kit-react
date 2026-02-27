@@ -30,7 +30,7 @@ import { Meta, StoryObj } from "@storybook/react-vite";
 import { TabItem } from ".";
 
 const meta = {
-  title: "Components/UI/TabItem",
+  title: "UI/Data display/TabItem",
   component: TabItem,
   parameters: {
     docs: {

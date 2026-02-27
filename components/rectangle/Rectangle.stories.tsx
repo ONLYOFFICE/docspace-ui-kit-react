@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { RectangleSkeleton } from ".";
 
 const meta: Meta<typeof RectangleSkeleton> = {
-  title: "Skeletons/Rectangle",
+  title: "UI/Skeletons/Rectangle",
   component: RectangleSkeleton,
   tags: ["autodocs"],
   argTypes: {

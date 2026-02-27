@@ -29,7 +29,7 @@ import { Meta, StoryFn } from "@storybook/react-vite";
 import { TopLoaderService } from "./index";
 
 export default {
-  title: "Components/Layout components/TopLoader",
+  title: "UI/Layout components/TopLoader",
   parameters: {
     docs: {
       description: {

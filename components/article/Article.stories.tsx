@@ -11,7 +11,7 @@ import { ContextMenuModel } from "../context-menu";
 import LightSmallLogoUrl from "../../assets/lightsmall.svg?url";
 
 export default {
-  title: "Components/Layout Components/Article",
+  title: "UI/Layout components/Article",
   component: Article,
   parameters: {
     docs: {

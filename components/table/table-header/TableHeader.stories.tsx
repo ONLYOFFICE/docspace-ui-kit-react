@@ -49,7 +49,7 @@ const TableHeaderWrapper = (args: Omit<TableHeaderProps, "containerRef">) => {
 };
 
 const meta = {
-  title: "Components/Table/TableHeader",
+  title: "UI/Table/TableHeader",
   component: TableHeader,
   parameters: {
     docs: {

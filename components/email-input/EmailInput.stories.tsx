@@ -33,7 +33,7 @@ import { EmailInput } from ".";
 import type { EmailInputProps, TValidate } from "./EmailInput.types";
 
 const meta = {
-  title: "Components/Form Controls/EmailInput",
+  title: "UI/Form controls/EmailInput",
   component: EmailInput,
   parameters: {
     docs: {

@@ -30,7 +30,7 @@ import { SelectedItem } from ".";
 import styles from "./SelectedItem.stories.module.scss";
 
 const meta = {
-  title: "Components/UI/SelectedItem",
+  title: "UI/Layout components/SelectedItem",
   component: SelectedItem,
   parameters: {
     docs: {
