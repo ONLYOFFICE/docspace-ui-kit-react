@@ -54,6 +54,7 @@ const Buttons = ({
   goToWebSearchSettings,
   allowExternalNavigation,
   allowAttachFiles = false,
+  allowManageTools,
 }: ButtonsProps) => {
   const { isRequestRunning, stopMessage } = useMessageStore();
 
@@ -102,13 +103,15 @@ const Buttons = ({
             />
           </TooltipContainer>
         )}
-        <ToolsSettings
-          {...toolsSettings}
-          isAdmin={isAdmin}
-          aiReady={aiReady}
-          goToWebSearchSettings={goToWebSearchSettings}
-          allowExternalNavigation={allowExternalNavigation}
-        />
+        {allowManageTools && (
+          <ToolsSettings
+            {...toolsSettings}
+            isAdmin={isAdmin}
+            aiReady={aiReady}
+            goToWebSearchSettings={goToWebSearchSettings}
+            allowExternalNavigation={allowExternalNavigation}
+          />
+        )}
       </div>
       <IconButton
         size={16}

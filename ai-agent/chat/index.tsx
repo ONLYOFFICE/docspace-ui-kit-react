@@ -76,6 +76,7 @@ const ChatUI = observer(
     persistDraft = false,
     allowExternalNavigation,
     allowAttachFiles,
+    allowManageTools,
   }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
 
@@ -141,6 +142,7 @@ const ChatUI = observer(
               persistDraft={persistDraft}
               allowExternalNavigation={allowExternalNavigation}
               allowAttachFiles={allowAttachFiles}
+              allowManageTools={allowManageTools}
             />
           </>
         )}

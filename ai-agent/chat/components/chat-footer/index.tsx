@@ -46,6 +46,7 @@ const ChatFooter = ({
   persistDraft,
   allowExternalNavigation,
   allowAttachFiles,
+  allowManageTools,
 }: ChatFooterProps) => {
   return (
     <div className={styles.chatFooter} data-testid="chat-footer">
@@ -66,6 +67,7 @@ const ChatFooter = ({
         persistDraft={persistDraft}
         allowExternalNavigation={allowExternalNavigation}
         allowAttachFiles={allowAttachFiles}
+        allowManageTools={allowManageTools}
       />
     </div>
   );

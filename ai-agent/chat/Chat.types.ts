@@ -194,6 +194,7 @@ export type ButtonsProps = {
   goToWebSearchSettings?: () => void;
   allowExternalNavigation?: boolean;
   allowAttachFiles?: boolean;
+  allowManageTools?: boolean;
 };
 
 export type AttachmentProps = {
@@ -220,6 +221,7 @@ export type ChatInputProps = {
   persistDraft?: boolean;
   allowExternalNavigation?: boolean;
   allowAttachFiles?: boolean;
+  allowManageTools?: boolean;
 };
 
 export type ChatInfoBlockProps = {
@@ -280,6 +282,7 @@ export type ChatProps = {
   internalInit?: boolean;
   allowExternalNavigation?: boolean;
   allowAttachFiles?: boolean;
+  allowManageTools?: boolean;
 };
 
 export type ChatCoreProps = ChatProps & {
