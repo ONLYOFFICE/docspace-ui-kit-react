@@ -24,23 +24,49 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import { useMemo, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { DocumentEditor } from "./DocumentEditor";
 import type { DocumentEditorProps } from "./DocumentEditor.types";
+
+import ErrorContainer from "../components/error-container/ErrorContainer";
 
 type StoryArgs = DocumentEditorProps;
 
 const meta: Meta<StoryArgs> = {
   title: "Document Editor",
   component: DocumentEditor,
-  parameters: {
-    docs: {
-      description: {
-        component: `DocumentEditor wraps the \`@onlyoffice/document-editor-react\` component, embedding an ONLYOFFICE Document Server editor into the UI.`,
-      },
+  decorators: [
+    (Story, context) => {
+      const [error, setError] = useState<string | null>(null);
+
+      const onLoadComponentError = useMemo(
+        () => (_: number, errorDescription: string) => {
+          setError(errorDescription);
+        },
+        [],
+      );
+
+      if (error) {
+        return (
+          <ErrorContainer
+            headerText={error}
+            bodyText="Make sure fileId, config, and docServiceUrl are valid and reachable"
+          />
+        );
+      }
+
+      return (
+        <Story
+          args={{
+            ...context.args,
+            onLoadComponentError,
+          }}
+        />
+      );
     },
-  },
+  ],
   argTypes: {
     id: {
       control: "text",
@@ -91,8 +117,51 @@ export const Default: Story = {
     fileId: 1,
     width: "100%",
     height: "600px",
-    onLoadComponentError: (errorCode: number, errorDescription: string) => {
-      console.error(`Editor load error [${errorCode}]: ${errorDescription}`);
-    },
+  },
+};
+
+export const ViewMode: Story = {
+  render: (args: StoryArgs) => {
+    const { ...editorProps } = args;
+
+    return (
+      <DocumentEditor
+        key={editorProps.fileId}
+        {...(editorProps as DocumentEditorProps)}
+      />
+    );
+  },
+  args: {
+    id: "viewer",
+    fileId: 4,
+    width: "100%",
+    height: "600px",
+    isView: true,
+  },
+};
+
+export const WithCustomEvent: Story = {
+  render: (args: StoryArgs) => {
+    const { ...editorProps } = args;
+
+    const onDocumentReady = () => {
+      const documentEditor = window.DocEditor.instances[editorProps.id];
+      documentEditor.showMessage("Welcome to ONLYOFFICE Editor!");
+    };
+
+    return (
+      <DocumentEditor
+        key={editorProps.fileId}
+        events_onDocumentReady={onDocumentReady}
+        {...(editorProps as DocumentEditorProps)}
+      />
+    );
+  },
+  args: {
+    id: "custom-event",
+    fileId: 3,
+    width: "100%",
+    height: "600px",
+    isView: true,
   },
 };

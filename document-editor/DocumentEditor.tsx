@@ -37,34 +37,37 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
     height = "100%",
     shardkey,
     onLoadComponentError,
+    fileVersion,
+    isView,
+    config: configProp,
+    documentServerUrl: documentServerUrlProp,
+    ...restProps
   } = props;
 
-  const hasConfig = "config" in props && props.config;
+  const hasConfig = "config" in props && configProp;
   const hasDocumentServerUrl =
-    "documentServerUrl" in props && props.documentServerUrl;
+    "documentServerUrl" in props && documentServerUrlProp;
   const hasFileId = "fileId" in props && props.fileId;
 
   const api = useApi();
 
   const [config, setConfig] = useState<IConfig | null>(
-    hasConfig ? props.config : null,
+    hasConfig ? configProp : null,
   );
   const [documentServerUrl, setDocumentServerUrl] = useState<string>(
-    hasDocumentServerUrl ? props.documentServerUrl : "",
+    hasDocumentServerUrl ? documentServerUrlProp : "",
   );
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (documentServerUrl || config) return;
 
     let cancelled = false;
-    setError(null);
 
     (async () => {
       try {
         const [docServiceLocation, result] = await Promise.all([
           api.filesSettingsApi.getDocServiceUrl(),
-          api.filesApi.openEditFile(props.fileId || 1),
+          api.filesApi.openEditFile(props.fileId || 1, fileVersion, isView),
         ]);
 
         if (!result.data.response) {
@@ -88,40 +91,24 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
         if (cancelled) return;
         setDocumentServerUrl(baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`);
         setConfig(initialConfig as unknown as IConfig);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Unknown error";
-        if (!cancelled) setError(errorMessage);
+      } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : "Unknown error";
+        if (!cancelled) {
+          onLoadComponentError?.(0, errorMessage);
+        }
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [documentServerUrl, hasFileId, api.filesApi, api.filesSettingsApi]);
-
-  if (error) {
-    return (
-      <div
-        style={{
-          width,
-          height,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          fontSize: "16px",
-          color: "#d32f2f",
-          padding: "20px",
-        }}
-      >
-        <div style={{ fontWeight: "bold", marginBottom: "10px" }}>
-          Error loading editor
-        </div>
-        <div>{error}</div>
-      </div>
-    );
-  }
+  }, [
+    documentServerUrl,
+    hasFileId,
+    api.filesApi,
+    api.filesSettingsApi,
+    onLoadComponentError,
+  ]);
 
   if (!config || !documentServerUrl) {
     return null;
@@ -132,13 +119,14 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
   return (
     <OODocumentEditor
       key={editorId}
-      id={editorId}
+      id={id}
       documentServerUrl={documentServerUrl}
       config={config}
       width={width}
       height={height}
       shardkey={shardkey}
       onLoadComponentError={onLoadComponentError}
+      {...restProps}
     />
   );
 };

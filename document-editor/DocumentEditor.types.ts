@@ -24,39 +24,17 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { IConfig } from "@onlyoffice/document-editor-react";
+import type {
+  IConfig,
+  DocumentEditorProps as OODocumentEditorProps,
+} from "@onlyoffice/document-editor-react";
 
 export type { IConfig };
 
-type BaseDocumentEditorProps = {
-  /** Unique identifier for the editor instance */
-  id: string;
-  /** Width of the editor container */
-  width?: string;
-  /** Height of the editor container */
-  height?: string;
-  /** Shard key for load balancing */
-  shardkey?: string;
-  /** Callback invoked when the component fails to load */
-  onLoadComponentError?: (errorCode: number, errorDescription: string) => void;
-};
-
-type DocumentEditorWithConfigProps = BaseDocumentEditorProps & {
-  /** URL of the ONLYOFFICE Document Server */
-  documentServerUrl: string;
-  /** Editor configuration object (see Config API) */
-  config: IConfig;
-  fileId?: never;
-};
-
-type DocumentEditorWithApiProps = BaseDocumentEditorProps & {
-  /** ID of the file to open in the editor */
+export type DocumentEditorProps = OODocumentEditorProps & {
   fileId: number;
-  documentServerUrl?: never;
-  config?: never;
+  /** Version of the file to open in the editor */
+  fileVersion?: number;
+  /** Whether the file is in view mode */
+  isView?: boolean;
 };
-
-/** Props for the DocumentEditor component */
-export type DocumentEditorProps =
-  | DocumentEditorWithConfigProps
-  | DocumentEditorWithApiProps;
