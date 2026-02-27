@@ -114,11 +114,8 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
     return null;
   }
 
-  const editorId = hasFileId ? `${id}-${props.fileId}` : id;
-
   return (
     <OODocumentEditor
-      key={editorId}
       id={id}
       documentServerUrl={documentServerUrl}
       config={config}
