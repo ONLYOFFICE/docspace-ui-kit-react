@@ -80,6 +80,7 @@
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.0",
+    "@rollup/plugin-url": "^8.0.2",
     "@storybook/addon-docs": "10.2.8",
     "@storybook/addon-links": "^10.2.8",
     "@storybook/icons": "^2.0.1",
@@ -143,6 +144,18 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
+    },
+    "./selectors/*": {
+      "source": "./selectors/*/index.ts",
+      "types": "./dist/types/selectors/*/index.d.ts",
+      "import": "./dist/esm/selectors/*/index.js",
+      "require": "./dist/cjs/selectors/*/index.js"
+    },
+    "./document-editor": {
+      "source": "./document-editor/index.ts",
+      "types": "./dist/types/document-editor/index.d.ts",
+      "import": "./dist/esm/document-editor/index.js",
+      "require": "./dist/cjs/document-editor/index.js"
     },
     "./components": {
       "source": "./components/index.ts",
