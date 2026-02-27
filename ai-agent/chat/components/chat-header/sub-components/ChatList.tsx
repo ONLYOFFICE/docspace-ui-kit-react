@@ -76,7 +76,7 @@ const Row = ({ data, index, style }: RowProps) => {
   );
 };
 
-type ChatListProps = {
+export type ChatListProps = {
   chats: TChat[];
   onSelectChat: (id: TChat["id"]) => void;
   contextModel: ContextMenuModel[];
