@@ -24,199 +24,38 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState, useRef } from "react";
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import Chat from "./index";
 import type { ChatProps } from "./Chat.types";
 import ApiProvider from "../../providers/api/ApiProvider";
 import { SocketProvider } from "../../providers/socket/SocketProvider";
-import { FieldContainer } from "../../components/field-container";
-import { TextInput, InputSize, InputType } from "../../components/text-input";
-import { PasswordInput } from "../../components/password-input";
-import { Button, ButtonSize } from "../../components/button";
-import { Text } from "../../components/text";
-import { Heading, HeadingLevel, HeadingSize } from "../../components/heading";
-
-import styles from "./ChatStories.module.scss";
-
-const ChatStoryWrapper = (props: ChatProps) => {
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const [apiUrl, setApiUrl] = useState(
-    localStorage.getItem("storybook_api_url") || "",
-  );
-  const [apiKey, setApiKey] = useState(
-    localStorage.getItem("storybook_api_key") || "",
-  );
-  const [agentId, setAgentId] = useState(
-    localStorage.getItem("storybook_agent_id") || "",
-  );
-  const [isConfigured, setIsConfigured] = useState(false);
-
-  React.useEffect(() => {
-    const savedApiUrl = localStorage.getItem("storybook_api_url");
-    const savedApiKey = localStorage.getItem("storybook_api_key");
-    const savedAgentId = localStorage.getItem("storybook_agent_id");
-
-    if (savedApiUrl && savedApiKey && savedAgentId) {
-      setIsConfigured(true);
-    }
-  }, []);
-
-  const requiredFieldsFilled =
-    apiUrl.trim().length > 0 &&
-    apiKey.trim().length > 0 &&
-    agentId.trim().length > 0;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (requiredFieldsFilled) {
-      localStorage.setItem("storybook_api_url", apiUrl);
-      localStorage.setItem("storybook_api_key", apiKey);
-      localStorage.setItem("storybook_agent_id", agentId);
-      setIsConfigured(true);
-    }
-  };
-
-  const handleSubmitClick = () => {
-    if (requiredFieldsFilled) submitButtonRef.current?.click();
-  };
-
-  const handleReset = () => {
-    setIsConfigured(false);
-    localStorage.removeItem("storybook_api_url");
-    localStorage.removeItem("storybook_api_key");
-    localStorage.removeItem("storybook_agent_id");
-  };
-
-  if (!isConfigured) {
-    return (
-      <div className={styles.configWrapper}>
-        <div className={styles.configContainer}>
-          <Heading
-            level={HeadingLevel.h2}
-            size={HeadingSize.medium}
-            className={styles.configTitle}
-          >
-            Configure AI Chat
-          </Heading>
-          <Text className={styles.configDescription}>
-            Please enter the required configuration to initialize the chat
-            component.
-          </Text>
-          <form onSubmit={handleSubmit}>
-            <FieldContainer
-              labelText="API URL"
-              labelVisible
-              isVertical
-              isRequired
-            >
-              <TextInput
-                size={InputSize.base}
-                type={InputType.text}
-                value={apiUrl}
-                onChange={(e) => setApiUrl(e.target.value)}
-                scale
-                placeholder="https://api.example.com"
-              />
-            </FieldContainer>
-
-            <FieldContainer
-              labelText="API Key"
-              labelVisible
-              isVertical
-              isRequired
-            >
-              <PasswordInput
-                size={InputSize.base}
-                inputValue={apiKey}
-                onChange={(_, value) => setApiKey(value ?? "")}
-                isFullWidth
-                isDisableTooltip
-                placeholder="Enter your API key"
-                isSimulateType
-                autoComplete="off"
-              />
-            </FieldContainer>
-
-            <FieldContainer
-              labelText="Agent ID"
-              labelVisible
-              isVertical
-              isRequired
-            >
-              <TextInput
-                size={InputSize.base}
-                type={InputType.text}
-                value={agentId}
-                onChange={(e) => setAgentId(e.target.value)}
-                scale
-                placeholder="229754"
-              />
-              <Text
-                style={{ marginTop: "4px", fontSize: "12px", color: "#999" }}
-              >
-                Numeric identifier of the AI agent
-              </Text>
-            </FieldContainer>
-
-            <button
-              type="submit"
-              ref={submitButtonRef}
-              hidden
-              aria-label="submit"
-            />
-          </form>
-
-          <div className={styles.configActions}>
-            <Button
-              primary
-              size={ButtonSize.normal}
-              label="Initialize Chat"
-              scale
-              onClick={handleSubmitClick}
-              isDisabled={!requiredFieldsFilled}
-            />
-          </div>
-
-          <Text className={styles.configHint}>
-            * All fields are required. Values will be saved in localStorage.
-          </Text>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ position: "relative" }}>
-      <div className={styles.resetButton}>
-        <Button
-          size={ButtonSize.small}
-          label="Reset Configuration"
-          onClick={handleReset}
-        />
-      </div>
-      <ApiProvider url={apiUrl} apiKey={apiKey}>
-        <SocketProvider>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <Chat {...props} agentId={Number(agentId)} />
-          </div>
-        </SocketProvider>
-      </ApiProvider>
-    </div>
-  );
-};
 
 const meta: Meta<typeof Chat> = {
   title: "AI-Agent/Chat",
   component: Chat,
   parameters: {
-    layout: "fullscreen",
+    layout: "padded",
     noPadding: true,
   },
   decorators: [
-    (Story, context) => {
-      return <ChatStoryWrapper {...context.args} />;
+    (Story) => {
+      return (
+        <ApiProvider
+          url={import.meta.env.STORYBOOK_AI_API_URL}
+          apiKey={import.meta.env.STORYBOOK_AI_API_KEY}
+        >
+          <SocketProvider
+            // url={import.meta.env.STORYBOOK_AI_SOCKET_URL}
+            // token={import.meta.env.STORYBOOK_AI_API_KEY}
+          >
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Story />
+            </div>
+          </SocketProvider>
+        </ApiProvider>
+      );
     },
   ],
 };
@@ -241,6 +80,7 @@ const defaultProps: ChatProps = {
   folderFormValidation: /^[a-zA-Z0-9 ]+$/,
   isAdmin: false,
   persistDraft: false,
+
 };
 
 export const Default: Story = {
