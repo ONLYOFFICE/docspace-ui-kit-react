@@ -45,6 +45,7 @@ import {
 import { getCommonTranslation } from "../../../../../../../../utils";
 
 import { useMessageStore } from "../../../../../../store/messageStore";
+import { useApi } from "../../../../../../../../providers";
 
 export const MCPToolContent = observer(
   ({ content }: { content: TToolCallContent }) => {
@@ -54,6 +55,7 @@ export const MCPToolContent = observer(
       generatePresentationToolName,
     } = useMessageStore();
     const { isBase } = useTheme();
+    const { apiUrl } = useApi();
 
     const isGenerateDocx = generateDocxToolName === content.name;
     const isGenerateForm = generateFormToolName === content.name;
@@ -85,6 +87,7 @@ export const MCPToolContent = observer(
                 : getServerIcon(
                     content.mcpServerInfo?.serverType || ServerType.Custom,
                     isBase,
+                    apiUrl,
                   )
             }
             size={MCPIconSize.Small}
