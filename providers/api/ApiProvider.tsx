@@ -93,10 +93,18 @@ export const useApi = () => {
 
 const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
   const value = React.useMemo(() => {
+    const authHeader = `Bearer ${apiKey}`;
+    const baseOptions = {
+      headers: {
+        Authorization: authHeader,
+      },
+    } as const;
+
     const configuration = new Configuration({
       basePath: url,
-      apiKey,
+      apiKey: authHeader,
       accessToken: apiKey,
+      baseOptions,
     });
 
     return {
