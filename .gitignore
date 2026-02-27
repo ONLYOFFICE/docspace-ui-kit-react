@@ -8,3 +8,4 @@ locales
 css
 fonts
 debug-storybook.log
+.env
