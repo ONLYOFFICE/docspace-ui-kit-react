@@ -31,6 +31,7 @@ import { toastr } from "../../components/toast/sub-components/Toastr";
 import ApiProvider from "../../providers/api/ApiProvider";
 
 import PeopleSelector from ".";
+import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import type { TAccessRight, TSelectorItem } from "../../components/selector";
 
 type StoryArgs = {
@@ -331,8 +332,7 @@ const Template = ({ url, apiKey, ...props }: StoryArgs) => (
   >
     <Toast />
     <ApiProvider url={url} apiKey={apiKey}>
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-      <PeopleSelector {...(props as any)} />
+      <PeopleSelector {...(props as unknown as PeopleSelectorProps)} />
     </ApiProvider>
   </div>
 );

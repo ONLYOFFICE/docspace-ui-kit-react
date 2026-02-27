@@ -39,6 +39,7 @@ import ApiProvider from "../../providers/api/ApiProvider";
 import { DeviceType } from "../../enums";
 import FilesSelector from ".";
 import type {
+  FilesSelectorProps,
   TSelectedFileInfo,
   FileEntryDtoIntegerAllOfSecurity,
 } from "./FilesSelector.types";
@@ -414,7 +415,7 @@ const Template = ({ url, apiKey, ...props }: StoryArgs) => (
     <Toast />
     <ApiProvider url={url} apiKey={apiKey}>
       <FilesSelector
-        {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+        {...(props as unknown as FilesSelectorProps)}
         getIsDisabled={getIsDisabled}
         getFilesArchiveError={getFilesArchiveError}
         onSubmit={(
@@ -861,7 +862,8 @@ export const AsidePanel: Story = {
       <Toast />
       <ApiProvider url={url} apiKey={apiKey}>
         <FilesSelector
-          {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+          // biome-ignore lint/suspicious/noExplicitAny: StoryArgs has extra fields (url/apiKey) not in FilesSelectorProps
+          {...(props as any)}
           getIsDisabled={getIsDisabled}
           getFilesArchiveError={getFilesArchiveError}
           onSubmit={(selectedItemId, folderTitle) => {

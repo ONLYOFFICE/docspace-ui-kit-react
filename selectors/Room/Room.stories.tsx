@@ -32,6 +32,7 @@ import { toastr } from "../../components/toast/sub-components/Toastr";
 import ApiProvider from "../../providers/api/ApiProvider";
 
 import RoomSelector from ".";
+import type { RoomSelectorProps } from "./RoomSelector.types";
 import type { TSelectorItem } from "../../components/selector";
 
 type StoryArgs = {
@@ -329,8 +330,7 @@ const Template = ({ url, apiKey, ...props }: StoryArgs) => (
   >
     <Toast />
     <ApiProvider url={url} apiKey={apiKey}>
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-      <RoomSelector {...(props as any)} />
+      <RoomSelector {...(props as unknown as RoomSelectorProps)} />
     </ApiProvider>
   </div>
 );
