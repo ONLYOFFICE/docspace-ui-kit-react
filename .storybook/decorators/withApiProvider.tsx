@@ -26,25 +26,32 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-/// <reference types="vite/client" />
+import React from "react";
+import type { Decorator } from "@storybook/react";
 
-export const DEFAULT_API_URL = import.meta.env.VITE_PROVIDER_API_URL || "";
-export const DEFAULT_API_KEY = import.meta.env.VITE_PROVIDER_API_KEY || "";
+import ApiProvider from "../../providers/api/ApiProvider";
+import { DEFAULT_API_URL, DEFAULT_API_KEY } from "../globals";
+import { getProviderById } from "../utils/apiProviders";
 
-const globalTypes = {
-  direction: {
-    name: "Direction",
-    description: "UI direction (LTR/RTL)",
-    defaultValue: "ltr",
-    toolbar: {
-      icon: "transfer" as const,
-      items: [
-        { value: "ltr", title: "LTR" },
-        { value: "rtl", title: "RTL" },
-      ],
-      dynamicTitle: true,
-    },
-  },
+const withApiProvider: Decorator = (Story, context) => {
+  const apiConfig = context.globals.apiConfig || "default";
+
+  let apiUrl = DEFAULT_API_URL;
+  let apiKey = DEFAULT_API_KEY;
+
+  if (apiConfig !== "default" && apiConfig !== "add-custom") {
+    const provider = getProviderById(apiConfig);
+    if (provider) {
+      apiUrl = provider.url;
+      apiKey = provider.apiKey;
+    }
+  }
+
+  return (
+    <ApiProvider url={apiUrl} apiKey={apiKey}>
+      <Story />
+    </ApiProvider>
+  );
 };
 
-export default globalTypes;
+export default withApiProvider;

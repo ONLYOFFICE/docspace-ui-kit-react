@@ -6,6 +6,7 @@ const config: StorybookConfig = {
     "../components/**/*.stories.@(js|jsx|ts|tsx)",
     "../errors/**/*.stories.@(js|jsx|ts|tsx)",
     "../providers/**/*.stories.@(js|jsx|ts|tsx)",
+    "../document-editor/**/*.stories.@(js|jsx|ts|tsx)",
     "../ai-agent/**/*.stories.@(js|jsx|ts|tsx)",
   ],
 
@@ -18,10 +19,6 @@ const config: StorybookConfig = {
   framework: {
     name: "@storybook/react-vite",
     options: {},
-  },
-
-  docs: {
-    autodocs: true,
   },
 
   typescript: {

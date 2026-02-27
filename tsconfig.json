@@ -42,6 +42,8 @@
     "styles/**/*",
     "providers/**/*",
     "selectors/**/*",
+    "document-editor"
+    "selectors/**/*",
     "ai-agent/**/*"
   ],
   "exclude": [

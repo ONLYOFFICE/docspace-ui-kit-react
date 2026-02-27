@@ -10,6 +10,7 @@ import type { TColorScheme } from "../context/ThemeContext";
 
 import { globalColors } from "../providers/theme/themes/globalColors";
 import globalTypes from "./globals";
+import withApiProvider from "./decorators/withApiProvider";
 import enCommon from "../locales/en/Common.json";
 
 import "./styles.css";
@@ -78,7 +79,12 @@ const preview: Preview = {
     },
   },
 
+  initialGlobals: {
+    apiConfig: "default",
+  },
+
   decorators: [
+    withApiProvider,
     (Story, context) => {
       const isDark = useDarkMode();
       const interfaceDirection = context.globals.direction;
