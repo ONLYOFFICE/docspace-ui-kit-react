@@ -10,6 +10,8 @@ const config: StorybookConfig = {
     "../**/*.mdx",
   ],
 
+  staticDirs: [{ from: "../../../public", to: "/static" }],
+
   addons: [
     "@storybook/addon-links",
     "@vueless/storybook-dark-mode",
