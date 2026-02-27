@@ -25,54 +25,39 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-
-import ArticleHideMenuReactSvg from "../../../assets/article-hide-menu.react.svg";
-import ArticleShowMenuReactSvg from "../../../assets/article-show-menu.react.svg";
-
-import { Text } from "../../text";
-import { getCommonTranslation } from "../../../utils";
+import classNames from "classnames";
 
 import styles from "../Article.module.scss";
-import { ArticleHideMenuButtonProps } from "../Article.types";
 
-const HideArticleMenuButton = ({
-  showText,
-  hideProfileBlock,
-  toggleShowText,
-  withCustomSlot,
-}: ArticleHideMenuButtonProps) => {
-  return (
-    <div
-      className={styles.hideArticleMenuButton}
-      onClick={toggleShowText}
-      data-show-text={showText ? "true" : "false"}
-      data-with-custom-slot={withCustomSlot ? "true" : "false"}
-      data-hide-profile-block={hideProfileBlock ? "true" : "false"}
-    >
-      {showText ? (
-        <div className="article-hide-menu-container">
-          <ArticleHideMenuReactSvg className="article-hide-menu-icon_svg" />
-          <Text
-            className="article-hide-menu-text"
-            fontWeight={600}
-            fontSize="15px"
-            lineHeight="16px"
-            noSelect
-            truncate
-          >
-            {getCommonTranslation("HideArticleMenu")}
-          </Text>
-        </div>
-      ) : (
-        <div
-          className="article-show-menu-container"
-          id="document_catalog-show-menu"
-        >
-          <ArticleShowMenuReactSvg className="article-show-menu-icon_svg" />
-        </div>
-      )}
-    </div>
-  );
+type CustomSlotProps = {
+  children?: React.ReactNode;
+  withDevTools?: boolean;
+  showBackButton?: boolean;
+  showText?: boolean;
 };
 
-export default HideArticleMenuButton;
+const CustomSlot = React.memo(
+  ({
+    children,
+    withDevTools = false,
+    showBackButton = false,
+    showText = false,
+  }: CustomSlotProps) => {
+    if (!children) return null;
+
+    return (
+      <div
+        data-with-dev-tools={withDevTools ? "true" : "false"}
+        data-with-back-button={showBackButton ? "true" : "false"}
+        data-with-show-text={showText ? "true" : "false"}
+        className={styles.customSlot}
+      >
+        {children}
+      </div>
+    );
+  },
+);
+
+CustomSlot.displayName = "CustomSlot";
+
+export default CustomSlot;
