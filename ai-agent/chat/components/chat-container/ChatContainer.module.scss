@@ -163,4 +163,8 @@
     --chat-header-top: 0;
     height: 100%;
   }
+
+  &:has(> :global(.chat-no-access-screen):only-child) {
+    padding-top: 19px;
+  }
 }

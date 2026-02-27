@@ -116,6 +116,7 @@ export const ChatNoAccessScreen = ({
       description={description}
       icon={icon}
       options={options}
+      className="chat-no-access-screen"
     />
   );
 };

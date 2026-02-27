@@ -50,7 +50,9 @@ export class BaseCustomApi {
   ): Promise<T> {
     const { data, params, isStream, ...fetchOptions } = options;
 
-    let url = `${this.config.basePath}/api/2.0${endpoint}`;
+    const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    let url = `${this.config.basePath}/api/2.0${cleanEndpoint}`;
+
     if (params) {
       const searchParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
@@ -96,7 +98,15 @@ export class BaseCustomApi {
       return response.body as unknown as T;
     }
 
-    const result = await response.json();
+    if (
+      response.status === 204 ||
+      response.headers.get("content-length") === "0"
+    ) {
+      return {} as T;
+    }
+
+    const text = await response.text();
+    const result = text ? JSON.parse(text) : {};
 
     if (result && typeof result === "object" && "response" in result) {
       if (result.total !== undefined) {
