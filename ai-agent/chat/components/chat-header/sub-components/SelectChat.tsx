@@ -69,6 +69,7 @@ const SelectChat = ({
   setIsAIAgentChatDelete,
   setDeleteDialogVisible,
   folderFormValidation,
+  allowExternalNavigation,
 }: SelectChatProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [hoveredItem, setHoveredItem] = React.useState("");
@@ -196,11 +197,13 @@ const SelectChat = ({
               values={{ fileName, title }}
               components={{
                 1: <b />,
-                2: (
+                2: allowExternalNavigation ? (
                   <Link
                     type={LinkType.action}
-                    onClick={() => openFile(resultFile.id!.toString())}
+                    onClick={() => openFile(resultFile.id!.toString(), allowExternalNavigation)}
                   />
+                ) : (
+                  <span />
                 ),
               }}
             />

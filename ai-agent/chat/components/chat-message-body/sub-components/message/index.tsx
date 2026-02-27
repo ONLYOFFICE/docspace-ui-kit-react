@@ -257,6 +257,7 @@ const Message = ({
           getIcon={getIcon}
           getResultStorageId={getResultStorageId}
           folderFormValidation={folderFormValidation}
+          allowExternalNavigation={allowExternalNavigation}
         />
       ) : null}
     </div>

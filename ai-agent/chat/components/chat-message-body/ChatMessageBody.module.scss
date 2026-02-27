@@ -178,6 +178,10 @@
 
         cursor: pointer;
 
+        &.disabledNavigation {
+          cursor: default;
+        }
+
         .filesListItemIcon {
           width: 32px;
           height: 32px;
@@ -365,6 +369,10 @@
     border-radius: 6px;
 
     cursor: pointer;
+
+    &.disabledNavigation {
+      cursor: default;
+    }
 
     .filesListItemIcon {
       width: 32px;
@@ -638,6 +646,18 @@
 
       .externalLinkIcon {
         display: none;
+      }
+
+      &.disabledNavigation {
+        cursor: default;
+
+        &:hover {
+          background-color: transparent;
+        }
+
+        &:active {
+          background-color: transparent;
+        }
       }
     }
 

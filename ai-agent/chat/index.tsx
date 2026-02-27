@@ -102,6 +102,7 @@ const ChatUI = observer(
           setIsAIAgentChatDelete={setIsAIAgentChatDelete}
           setDeleteDialogVisible={setDeleteDialogVisible}
           folderFormValidation={folderFormValidation}
+          allowExternalNavigation={allowExternalNavigation}
         />
         {showEmptyScreen ? (
           <ChatNoAccessScreen

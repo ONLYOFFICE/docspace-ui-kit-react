@@ -49,7 +49,9 @@ const Files = ({ files, getIcon, reverse, allowExternalNavigation }: MessageFile
 
         return (
           <div
-            className={styles.filesListItem}
+            className={classNames(styles.filesListItem, {
+              [styles.disabledNavigation]: !allowExternalNavigation,
+            })}
             key={file.id}
             onClick={() => openFile(file.id.toString(), allowExternalNavigation)}
           >

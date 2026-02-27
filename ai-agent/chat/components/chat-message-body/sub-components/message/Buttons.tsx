@@ -63,6 +63,7 @@ const Buttons = ({
   messageIndex,
   getResultStorageId,
   folderFormValidation,
+  allowExternalNavigation,
 }: MessageButtonsProps) => {
   const { agentId, findPreviousUserMessage } = useMessageStore();
   const { currentChat } = useChatStore();
@@ -104,7 +105,7 @@ const Buttons = ({
 
       if (resultFile) {
         if (isChecked) {
-          openFile(resultFile.id!.toString());
+          openFile(resultFile.id!.toString(), allowExternalNavigation);
         }
 
         const toastMsg = (
@@ -112,11 +113,13 @@ const Buttons = ({
             i18nKey="MessageExported"
             values={{ fileName }}
             components={{
-              1: (
+              1: allowExternalNavigation ? (
                 <Link
                   type={LinkType.action}
-                  onClick={() => openFile(resultFile.id!.toString())}
+                  onClick={() => openFile(resultFile.id!.toString(), allowExternalNavigation)}
                 />
+              ) : (
+                <span />
               ),
             }}
           />

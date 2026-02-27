@@ -27,6 +27,7 @@
  */
 
 import React, { useId, useState } from "react";
+import classNames from "classnames";
 
 import UniverseIcon from "../../../../../../../../assets/universe.react.svg";
 import ExternalLinkIcon from "../../../../../../../../assets/external.link.svg";
@@ -117,7 +118,7 @@ const SourceItem = ({ source, allowExternalNavigation }: { source: TToolCallResu
 
   if (!allowExternalNavigation) {
     return (
-      <div className={styles.sourceItem}>
+      <div className={classNames(styles.sourceItem, styles.disabledNavigation)}>
         {content}
       </div>
     );

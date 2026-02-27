@@ -77,6 +77,7 @@ export type SelectChatProps = {
   }) => void;
   setDeleteDialogVisible?: (value: boolean) => void;
   folderFormValidation: RegExp;
+  allowExternalNavigation?: boolean;
 };
 
 export type RenameChatProps = {
@@ -117,6 +118,7 @@ export type MessageButtonsProps = {
   messageIndex: number;
   getResultStorageId: () => number | null;
   folderFormValidation: RegExp;
+  allowExternalNavigation?: boolean;
 };
 
 export type MessageCodeBlockProps = {

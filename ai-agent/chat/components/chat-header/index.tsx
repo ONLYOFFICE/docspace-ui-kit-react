@@ -45,6 +45,7 @@ const ChatHeader = ({
   setIsAIAgentChatDelete,
   setDeleteDialogVisible,
   folderFormValidation,
+  allowExternalNavigation,
 }: ChatHeaderProps) => {
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -62,6 +63,7 @@ const ChatHeader = ({
         setIsAIAgentChatDelete={setIsAIAgentChatDelete}
         setDeleteDialogVisible={setDeleteDialogVisible}
         folderFormValidation={folderFormValidation}
+        allowExternalNavigation={allowExternalNavigation}
       />
       <CreateChat isLoadingProp={isLoading} isDisabled={!aiReady} />
       <SelectModel selectedModel={selectedModel} isLoading={isLoading} />
