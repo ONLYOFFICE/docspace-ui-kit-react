@@ -39,12 +39,14 @@ const HideArticleMenuButton = ({
   showText,
   hideProfileBlock,
   toggleShowText,
+  withCustomSlot,
 }: ArticleHideMenuButtonProps) => {
   return (
     <div
       className={styles.hideArticleMenuButton}
       onClick={toggleShowText}
       data-show-text={showText ? "true" : "false"}
+      data-with-custom-slot={withCustomSlot ? "true" : "false"}
       data-hide-profile-block={hideProfileBlock ? "true" : "false"}
     >
       {showText ? (

@@ -118,16 +118,6 @@ The Backdrop component is designed to be highly flexible and can be used in vari
         defaultValue: { summary: "false" },
       },
     },
-    withoutBlur: {
-      description:
-        "Disables the blur effect, typically used with context menus",
-      control: "boolean",
-      defaultValue: false,
-      table: {
-        type: { summary: "boolean" },
-        defaultValue: { summary: "false" },
-      },
-    },
     withoutBackground: {
       description:
         "Forces the backdrop to render without a background. Takes precedence over withBackground",
@@ -352,7 +342,49 @@ export const ModalDialog: Story = {
 };
 
 export const WithCustomZIndex: Story = {
-  render: (args) => <Template {...args} />,
+  render: (args) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const isDarkTheme = document.body.classList.contains("dark");
+
+    return (
+      <div style={{ height: "300px", position: "relative" }}>
+        <Button
+          label="Show Backdrop with z-index: 500"
+          primary
+          size={ButtonSize.medium}
+          onClick={() => setIsVisible(!isVisible)}
+        />
+        <Backdrop
+          {...args}
+          visible={isVisible}
+          onClick={() => setIsVisible(false)}
+        />
+        {isVisible ? (
+          <div
+            onClick={() => setIsVisible(false)}
+            style={{
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              backgroundColor: isDarkTheme
+                ? "rgba(32, 32, 32, 0.9)"
+                : "rgba(255, 255, 255, 0.9)",
+              color: isDarkTheme ? "#fff" : "#333",
+              padding: "2rem",
+              borderRadius: "8px",
+              zIndex: 501,
+              textAlign: "center",
+            }}
+          >
+            <h3>Custom z-index: 500</h3>
+            <p>Modal is on top (z-index: 501)</p>
+            <p>Click to close</p>
+          </div>
+        ) : null}
+      </div>
+    );
+  },
   args: {
     withBackground: true,
     zIndex: 500,
@@ -361,40 +393,9 @@ export const WithCustomZIndex: Story = {
     docs: {
       description: {
         story:
-          "Backdrop with a custom z-index value. Useful when you need to control the stacking order precisely.",
+          "Backdrop with a custom z-index value (500 instead of default 203). The modal dialog is rendered with z-index 501 to stay on top of the backdrop.",
       },
     },
   },
 };
 
-export const ForceShowBackdrop: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    withBackground: true,
-    shouldShowBackdrop: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Using shouldShowBackdrop to force the backdrop to display regardless of existing backdrop count.",
-      },
-    },
-  },
-};
-
-export const WithoutBlur: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    withBackground: true,
-    withoutBlur: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Backdrop without blur effect. Commonly used with context menus where blur is not desired.",
-      },
-    },
-  },
-};

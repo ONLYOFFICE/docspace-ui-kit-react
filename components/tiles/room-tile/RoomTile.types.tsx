@@ -26,7 +26,7 @@
 
 import { TFunction } from "i18next";
 import { ContextMenuModel } from "../../context-menu/ContextMenu.types";
-import { TagType } from "../../tags/Tags.types";
+import type { TagClickEvent, TagType } from "../../tag";
 import { TileItem } from "../tile-container/TileContainer.types";
 
 export interface RoomItem extends TileItem {
@@ -78,7 +78,7 @@ export type RoomTileProps = {
   /** Column count for tags layout */
   columnCount: number;
   /** Callback for tag selection */
-  selectTag: (tag: Array<TagType | string> | undefined) => void;
+  selectTag: (tag: TagClickEvent) => void;
   /** Callback for option selection */
   selectOption: (option: SelectOption) => void;
   /** Function to get room type name */
@@ -93,4 +93,9 @@ export type RoomTileProps = {
   isEdit?: boolean;
   /** Data test id for the tile */
   dataTestId?: string;
+
+  customBottomContent?: (
+    isHovered: boolean,
+    tags: Array<TagType | string>,
+  ) => React.ReactNode;
 };

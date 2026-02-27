@@ -46,7 +46,7 @@
   --tile-checked-background: #{$light-gray-hover};
   --tile-show-hotkey-border: #{$light-second-main};
   --tile-icon-button-color: #{$gray};
-  
+
   cursor: pointer;
   max-height: 104px;
 
@@ -160,6 +160,19 @@
     &.checked {
       opacity: 1;
       display: flex;
+    }
+  }
+
+  @media (hover: hover) {
+    &:hover:has(
+        .optionButton:hover,
+        .iconContainer:hover,
+        .bottomContent [data-testid="tag_item"]:hover,
+        :global(.tile-badges:hover)
+      ) {
+      a {
+        text-decoration: none;
+      }
     }
   }
 }

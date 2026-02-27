@@ -142,6 +142,9 @@ export interface TableRowProps {
   dragging?: boolean;
   dataTestId?: string;
   contextMenuTestId?: string;
+
+  onMouseEnter?: (e: React.MouseEvent) => void;
+  onMouseLeave?: (e: React.MouseEvent) => void;
 }
 
 export interface TableCellProps {
@@ -165,6 +168,9 @@ export type TGroupMenuItem = {
   withDropDown?: boolean;
   options?: ContextMenuModel[];
   id: string;
+  isMobileView?: boolean;
+  /** When true, applies fixed width (161px) and responsive height for the dropdown */
+  fixedDropdownStyles?: boolean;
 };
 
 interface TableGroupMenuBased {
@@ -186,7 +192,7 @@ interface TableGroupMenuBased {
 
 export type TGroupMenuProps = Pick<
   TableGroupMenuBased,
-  "headerMenu" | "isBlocked"
+  "headerMenu" | "isBlocked" | "isMobileView"
 >;
 
 export type TableGroupMenuProps =

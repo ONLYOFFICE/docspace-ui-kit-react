@@ -84,6 +84,13 @@ const meta = {
 
       return (
         <div>
+          <div style={{ marginBottom: "20px", fontSize: "14px" }}>
+            <p>
+              <strong>Note:</strong> TableBody component for displaying table
+              rows with support for infinite scrolling and virtual scrolling
+              using react-window.
+            </p>
+          </div>
           <Scrollbar
             id="sectionScroll"
             style={{ height: "400px" }}

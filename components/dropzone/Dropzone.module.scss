@@ -30,10 +30,32 @@
 .dropzoneWrapper {
   :global(.light) & {
     --dropzone-border: 2px dashed #{colors.$gray-light-mid};
+
+    --dropzone-secondary-link: #{colors.$black};
+    --dropzone-exsts-color: #{colors.$gray};
+
+    --dropzone-exsts-color-background-focus: #{colors.$light-gray-selected};
+    --dropzone-exsts-color-background-hover: #{colors.$gray-light-mid};
+    --dropzone-exsts-color-background-pressed: #{colors.$gray-strong};
+
+    --dropzone-exsts-color-focus: #{colors.$black};
+    --dropzone-exsts-badge-focus: #{colors.$gray-text};
+    --dropzone-arrow-icon-color-focus: #{colors.$black};
   }
 
   :global(.dark) & {
     --dropzone-border: 2px dashed #{colors.$gray-dark-strong};
+
+    --dropzone-secondary-link: #{colors.$white};
+    --dropzone-exsts-color: #{colors.$gray};
+
+    --dropzone-exsts-color-background-focus: #{colors.$gray-dark-mid};
+    --dropzone-exsts-color-background-hover: #{colors.$gray-dark-strong};
+    --dropzone-exsts-color-background-pressed: #{colors.$dark-gray-light};
+
+    --dropzone-exsts-color-focus: #{colors.$white};
+    --dropzone-exsts-badge-focus: #{colors.$gray-dark};
+    --dropzone-arrow-icon-color-focus: #{colors.$white};
   }
 
   cursor: pointer;
@@ -42,8 +64,12 @@
   height: 150px;
   border: var(--dropzone-border);
   border-radius: 6px;
+  display: flex;
+  box-sizing: border-box;
 
-  position: relative;
+  &.hasChildren {
+    height: auto;
+  }
 }
 
 .dropzoneLoader {
@@ -55,7 +81,12 @@
   transform: translate(-50%, -50%);
 }
 
+.dropzoneProgress {
+  width: 60%;
+}
+
 .dropzone {
+  flex: 1;
   height: 100%;
   width: 100%;
   visibility: visible;
@@ -106,9 +137,131 @@
   }
 }
 
-.dropzoneExst {
+.dropzoneIcon {
+  width: 50px;
+  height: 50px;
+}
+
+.dropzoneExsts {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+
+  color: var(--dropzone-exsts-color);
+}
+
+.dropzoneExstsTextContainer {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  border-radius: 3px;
+
+  padding-inline: 8px;
+  padding-block: 4px;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--dropzone-exsts-color-background-hover);
+    }
+
+    &:active {
+      background-color: var(--dropzone-exsts-color-background-pressed);
+    }
+  }
+
+  &.isOpen {
+    cursor: pointer;
+    background-color: var(--dropzone-exsts-color-background-focus);
+
+    .dropzoneExstsText {
+      color: var(--dropzone-exsts-color-focus);
+    }
+
+    .dropzoneExstsBadge {
+      [data-testid="badge-inner"] {
+        background-color: var(--dropzone-exsts-badge-focus);
+      }
+    }
+  }
+}
+
+.dropzoneExstsText {
   font-weight: 600;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.dropzoneExstsBadge {
+  [data-testid="badge-text"] {
+    font-weight: 700 !important;
+    font-size: 9px !important;
+  }
+}
+
+.dropzoneArrowIcon {
+  width: 6px;
+  height: 6px;
+  margin-inline-start: 2px;
+  transition: transform 0.2s ease;
+
+  path {
+    fill: var(--dropzone-exsts-color);
+  }
+
+  &.isOpen {
+    transform: rotate(180deg);
+    path {
+      fill: var(--dropzone-arrow-icon-color-focus);
+    }
+  }
+}
+
+.dropzoneFormatsDropdown {
+  :global(.light) & {
+    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-color};
+  }
+
+  :global(.dark) & {
+    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-color};
+  }
+
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: none !important;
+  z-index: 200;
+  width: 100%;
+  background: var(--background-content);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: var(--dropzone-context-menu-box-shadow);
+}
+
+.dropzoneFormatsContent {
+  padding-inline: 12px;
+  font-weight: 400;
   font-size: 12px;
   line-height: 16px;
-  color: #{colors.$gray};
+  color: var(--text-secondary);
+  word-wrap: break-word;
+}
+
+.dropzoneChildren {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.dropzone.hasChildren {
+  justify-content: flex-end;
+  padding: 16px;
+  box-sizing: border-box;
 }

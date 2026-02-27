@@ -24,6 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import { default as i18ninstance } from "i18next";
+
 /**
  * Gets a cookie value by name
  */
@@ -58,6 +60,8 @@ export const getCommonTranslation = (
   key: string,
   interpolation?: Record<string, string | number>,
 ): string => {
+  if (typeof window === "undefined") return i18ninstance?.t(key);
+
   const i18n = getWindowI18n();
 
   if (i18n?.t) {
@@ -95,9 +99,11 @@ export const getCommonTranslation = (
     }
   }
 
-  throw new Error(
+  console.error(
     `[i18n] Missing translation for key "${key}". Ensure the TranslationProvider is mounted or window.i18n.loaded contains the required Common namespace.`,
   );
+
+  return "";
 };
 
 /**

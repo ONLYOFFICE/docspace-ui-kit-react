@@ -106,7 +106,6 @@ const NewItemDropDown = ({
 							visible
 							onClick={() => onCloseDropDown()}
 							withBackground
-							withoutBlur={false}
 							isAside
 							zIndex={450}
 						/>

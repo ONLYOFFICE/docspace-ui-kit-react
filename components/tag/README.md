@@ -23,6 +23,7 @@ import { Tag } from "@docspace/ui-kit";
 
 | Props            |      Type      | Required | Values | Default | Description                                                     |
 | ---------------- | :------------: | :------: | :----: | :-----: | --------------------------------------------------------------- |
+| `ref`            | `React.RefObject<HTMLDivElement>` |    -     |   -    |    -    | Accepts the ref                                                 |
 | `id`             |    `string`    |    -     |   -    |    -    | Accepts id                                                      |
 | `className`      |    `string`    |    -     |   -    |    -    | Accepts class                                                   |
 | `style`          | `obj`, `array` |    -     |   -    |    -    | Accepts css style                                               |
@@ -34,3 +35,4 @@ import { Tag } from "@docspace/ui-kit";
 | `onDelete`       |   `function`   |    -     |   -    |    -    | Accepts the function that called when tag delete button clicked |
 | `tagMaxWidth`    |    `string`    |    -     |   -    |    -    | Accepts the max width of tag                                    |
 | `advancedOption` |    `object`    |    -     |   -    |    -    | Accepts the dropdowns options                                   |
+| `withLabel`      |   `boolean`    |    -     |   -    | `true`  | Whether to display the label text                               |

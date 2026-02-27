@@ -25,14 +25,22 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 import React, { useState, useCallback } from "react";
 import { StoryFn, Meta } from "@storybook/react-vite";
-// import { useTranslation } from "react-i18next";
 
 import { ImageEditor } from "./index";
 import { ImageEditorProps, TImage } from "./ImageEditor.types";
+import "../../assets/selector.form.room.empty.screen.light.react.svg";
 
 export default {
   title: "Components/Interactive elements/ImageEditor",
   component: ImageEditor,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "An image editor component that allows users to upload, crop, and zoom images. Supports customizable border radius, max file size, and image rescaling options.",
+      },
+    },
+  },
   argTypes: {
     isDisabled: {
       control: "boolean",
@@ -57,13 +65,12 @@ export default {
   },
 } as Meta;
 
-const InteractiveTemplate: StoryFn<ImageEditorProps> = (args) => {
-  // const { t } = useTranslation("Common");
-
+export const InteractiveTemplate: StoryFn<ImageEditorProps> = (args) => {
   const [image, setImage] = useState<TImage>({
-    uploadedFile: "/images/logo/leftmenu.svg",
-    zoom: 1,
-    x: 0,
+    uploadedFile:
+      "../../assets/selector.form.room.empty.screen.light.react.svg",
+    zoom: 0.5,
+    x: 0.5,
     y: 0,
   });
 

@@ -31,6 +31,13 @@ import { ProgressBar, PreparationPortalProgress } from ".";
 const meta: Meta<typeof ProgressBar> = {
   title: "Components/Status components/ProgressBar",
   component: ProgressBar,
+  parameters: {
+    docs: {
+      description: {
+        component: "A progress bar component that displays the progress of an operation. Supports percentage display, labels, status text, and error messages to provide users with feedback on long-running tasks.",
+      },
+    },
+  },
   argTypes: {
     percent: {
       control: { type: "number", min: 0, max: 100 },

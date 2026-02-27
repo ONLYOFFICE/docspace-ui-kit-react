@@ -37,9 +37,14 @@ const EmptyView = ({
   options,
   title,
   LinkRouter,
+  className,
+  bodyClassName,
 }: EmptyViewProps) => {
   return (
-    <div className={styles.wrapper} data-testid="empty-view">
+    <div
+      className={`${styles.wrapper}${className ? ` ${className}` : ""}`}
+      data-testid="empty-view"
+    >
       <div className={styles.header}>
         {icon}
         <Text
@@ -55,7 +60,10 @@ const EmptyView = ({
         </Text>
       </div>
       {options ? (
-        <div className={styles.body} data-testid="empty-view-body">
+        <div
+          className={`${styles.body}${bodyClassName ? ` ${bodyClassName}` : ""}`}
+          data-testid="empty-view-body"
+        >
           {options.map((option) => (
             <EmptyViewOption
               key={option.key}
@@ -76,4 +84,5 @@ export type {
   EmptyViewLinkType,
   EmptyViewOptionsType,
   EmptyViewProps,
+  EmptyViewSeparatorType,
 } from "./EmptyView.types";

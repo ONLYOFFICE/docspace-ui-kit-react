@@ -38,7 +38,6 @@ const Backdrop: React.FC<BackdropProps> = ({
   visible = false,
   className,
   withBackground = false,
-  withoutBlur = false,
   isAside = false,
   withoutBackground = false,
   isModalDialog = false,
@@ -71,9 +70,7 @@ const Backdrop: React.FC<BackdropProps> = ({
     // Determine if background is needed
     const shouldShowBackground =
       !withoutBackground &&
-      (withBackground ||
-        (isTabletOrMobile && !withoutBlur) ||
-        (isAside && !withoutBackground));
+      (withBackground || isTabletOrMobile || (isAside && !withoutBackground));
 
     setNeedBackdrop(shouldShowBackdrop);
     setNeedBackground(shouldShowBackground);
@@ -81,7 +78,6 @@ const Backdrop: React.FC<BackdropProps> = ({
     visible,
     isAside,
     withBackground,
-    withoutBlur,
     withoutBackground,
     shouldShowBackdropProp,
   ]);
@@ -95,8 +91,6 @@ const Backdrop: React.FC<BackdropProps> = ({
       [styles.visible]: visible,
       [styles.withBackground]: needBackground,
       [styles.withoutBackground]: !needBackground || withoutBackground,
-      [styles.withoutBlur]: withoutBlur,
-      [styles.withBlur]: !withoutBlur,
       [styles.isAside]: isAside,
       [styles.isModalDialog]: isModalDialog,
       [styles.mobileView]: isMobile() || isTablet(),

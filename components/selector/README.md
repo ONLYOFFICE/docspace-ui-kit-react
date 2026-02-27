@@ -151,10 +151,10 @@ The following translation keys are used by the Selector component:
 | `withCancelButton`             |     `bool`     |    -     |   -    |  false  | Add cancel button at footer                                   |
 | `cancelButtonLabel`            |    `string`    |    -     |   -    |    -    | Displaying text at cancel button                              |
 | `onCancel`                     |     `func`     |    -     |   -    |    -    | What the cancel button will trigger when clicked              |
-| `emptyScreenImage`             |    `string`    |    -     |   -    |    -    | Image for default empty screen                                |
+| `emptyScreenImage`             | `string\|node` |    -     |   -    |    -    | Image (URL string or SVG element) for default empty screen    |
 | `emptyScreenHeader`            |    `string`    |    -     |   -    |    -    | Header for default empty screen                               |
 | `emptyScreenDescription`       |    `string`    |    -     |   -    |    -    | Description for default empty screen                          |
-| `searchEmptyScreenImage`       |    `string`    |    -     |   -    |    -    | Image for search empty screen                                 |
+| `searchEmptyScreenImage`       | `string\|node` |    -     |   -    |    -    | Image (URL string or SVG element) for search empty screen     |
 | `searchEmptyScreenHeader`      |    `string`    |    -     |   -    |    -    | Header for search empty screen                                |
 | `searchEmptyScreenDescription` |    `string`    |    -     |   -    |    -    | Description for search empty screen                           |
 | `totalItems`                   |    `number`    |    -     |   -    |    -    | Count items for infinity scroll                               |

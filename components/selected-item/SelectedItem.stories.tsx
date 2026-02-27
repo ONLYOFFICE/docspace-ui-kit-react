@@ -32,8 +32,45 @@ import styles from "./SelectedItem.stories.module.scss";
 const meta = {
   title: "Components/UI/SelectedItem",
   component: SelectedItem,
+  parameters: {
+    docs: {
+      description: {
+        component: `
+A component that displays a selected item with an optional close button.
+
+## Features
+- Inline and block display modes
+- Disableable state
+- Removable with close button
+- Customizable label
+
+## Usage
+Typically used to display selected items in filters, tags, or multi-select inputs.
+`,
+      },
+    },
+  },
   argTypes: {
-    onClose: { action: "onClose" },
+    label: {
+      control: "text",
+      description: "Text content to display for the selected item",
+    },
+    isInline: {
+      control: "boolean",
+      description: "When true, displays the item inline; when false, as a block element",
+    },
+    isDisabled: {
+      control: "boolean",
+      description: "When true, disables the item and prevents interaction",
+    },
+    propKey: {
+      control: "text",
+      description: "Unique identifier for the selected item",
+    },
+    onClose: {
+      action: "onClose",
+      description: "Callback function triggered when close button is clicked",
+    },
   },
 } satisfies Meta<typeof SelectedItem>;
 type Story = StoryObj<typeof meta>;
@@ -47,6 +84,13 @@ export const Default: Story = {
     isDisabled: false,
     onClose: () => {},
     propKey: "",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Default inline selected item with close button. Click the close button to trigger the onClose callback.",
+      },
+    },
   },
 };
 
@@ -90,5 +134,12 @@ export const All: Story = {
     isDisabled: false,
     onClose: () => {},
     propKey: "",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Demonstrates different variations: inline enabled, inline disabled, and block display modes. Shows how the component adapts to different layout requirements.",
+      },
+    },
   },
 };

@@ -79,6 +79,7 @@ const defaultProps = {
   showArticleLoader: false,
   isAdmin: false,
   withCustomArticleHeader: false,
+  withCustomSlot: false,
   isBurgerLoading: false,
   languageBaseName: "en",
   zendeskEmail: "test@test.com",

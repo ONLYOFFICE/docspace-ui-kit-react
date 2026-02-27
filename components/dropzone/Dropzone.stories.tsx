@@ -42,6 +42,16 @@ const meta = {
       description: "Disables the dropzone",
       defaultValue: false,
     },
+    isFolderUpload: {
+      control: "boolean",
+      description: "Enables folder upload mode instead of file upload",
+      defaultValue: false,
+    },
+    isMultipleUpload: {
+      control: "boolean",
+      description: "Allows multiple files/folders upload. When false, only one item is accepted",
+      defaultValue: true,
+    },
     linkMainText: {
       control: "text",
       description: "Main text displayed in the dropzone",
@@ -56,7 +66,7 @@ const meta = {
     },
     accept: {
       control: "object",
-      description: "Accepted file types (string or array of strings)",
+      description: "Accepted file types (string or array of strings). Not applied in folder upload mode.",
     },
     maxFiles: {
       control: "number",
@@ -64,6 +74,7 @@ const meta = {
       defaultValue: 0,
     },
     onDrop: { action: "dropped" },
+    onSingleUploadError: { action: "singleUploadError" },
   },
   parameters: {
     docs: {
@@ -82,12 +93,15 @@ export default meta;
 const defaultArgs = {
   isLoading: false,
   isDisabled: false,
+  isFolderUpload: false,
+  isMultipleUpload: true,
   linkMainText: "Click to upload",
   linkSecondaryText: "or drag and drop files here",
   exstsText: "Supported file types: PDF, DOC, DOCX",
   accept: [".pdf", ".doc", ".docx"],
   maxFiles: 0,
   onDrop: () => {},
+  onSingleUploadError: () => {},
 };
 
 export const Default: Story = {
@@ -124,5 +138,36 @@ export const ImageUpload: Story = {
     linkMainText: "Upload images",
     linkSecondaryText: "or drag them here",
     exstsText: "Supported file types: PNG, JPG, JPEG, GIF",
+  },
+};
+
+export const FolderUpload: Story = {
+  args: {
+    ...defaultArgs,
+    isFolderUpload: true,
+    linkMainText: "Click to upload folder",
+    linkSecondaryText: "or drag and drop folders here",
+    exstsText: "Upload entire folders with their structure",
+  },
+};
+
+export const SingleFolderUpload: Story = {
+  args: {
+    ...defaultArgs,
+    isFolderUpload: true,
+    isMultipleUpload: false,
+    linkMainText: "Upload single folder",
+    linkSecondaryText: "or drag folder here",
+    exstsText: "Only one folder can be uploaded at a time",
+  },
+};
+
+export const SingleFileOnly: Story = {
+  args: {
+    ...defaultArgs,
+    isMultipleUpload: false,
+    linkMainText: "Upload single file",
+    linkSecondaryText: "or drag file here",
+    exstsText: "Only one file can be uploaded at a time",
   },
 };

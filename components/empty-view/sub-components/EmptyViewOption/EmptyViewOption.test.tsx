@@ -62,9 +62,37 @@ const buttonRenderSpy = vi.fn();
 vi.mock("../../../button", () => ({
   Button: ({
     label,
+    primary,
+    size,
+    isHovered,
+    disableHover,
+    isLoading,
+    isClicked,
+    minWidth,
+    scale,
     ...props
-  }: { label: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
-    buttonRenderSpy(props);
+  }: {
+    label: string;
+    primary?: boolean;
+    size?: string;
+    isHovered?: boolean;
+    disableHover?: boolean;
+    isLoading?: boolean;
+    isClicked?: boolean;
+    minWidth?: string;
+    scale?: boolean;
+  } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+    buttonRenderSpy({
+      primary,
+      size,
+      isHovered,
+      disableHover,
+      isLoading,
+      isClicked,
+      minWidth,
+      scale,
+      ...props,
+    });
     return (
       <button data-testid="ui-button" {...props}>
         {label}
