@@ -52,28 +52,44 @@ const Think = ({
   };
 
   return (
-    <div className={cn(styles.think, { [styles.withMarginTop]: !isFirst })}>
+    <div
+      className={cn(styles.think, { [styles.withMarginTop]: !isFirst })}
+      data-testid="think"
+    >
       <div
         onClick={onToggle}
         className={cn(styles.thinkTitle, { [styles.thinkTitleOpened]: isOpen })}
+        data-testid="think-title"
       >
         {isFinished ? (
-          <ToolFinishIcon className={styles.toolFinishIcon} />
+          <ToolFinishIcon
+            className={styles.toolFinishIcon}
+            data-testid="think-finished-icon"
+          />
         ) : (
-          <Loader type={LoaderTypes.track} size="12px" />
+          <Loader
+            type={LoaderTypes.track}
+            size="12px"
+            data-testid="think-loader"
+          />
         )}
-
+ 
         <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
           {getCommonTranslation("Thinking")}
         </Text>
-
+ 
         <TriangleDownIcon
           data-size={IconSizeType.scale}
           className={cn(styles.icon, { [styles.iconOpened]: isOpen })}
+          data-testid="think-arrow-icon"
         />
       </div>
-
-      {isOpen ? <div className={styles.thinkBlock}>{children}</div> : null}
+ 
+      {isOpen ? (
+        <div className={styles.thinkBlock} data-testid="think-content">
+          {children}
+        </div>
+      ) : null}
     </div>
   );
 };
