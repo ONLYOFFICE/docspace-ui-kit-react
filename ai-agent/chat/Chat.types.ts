@@ -58,6 +58,12 @@ export type TMessageStoreProps = {
   agentId: string | number;
   children: React.ReactNode;
   multimodal?: TMultimodal;
+  knowledgeSearchToolName?: string;
+  webSearchToolName?: string;
+  webCrawlingToolName?: string;
+  generateDocxToolName?: string;
+  generateFormToolName?: string;
+  generatePresentationToolName?: string;
 } & Omit<ReturnType<typeof useInitMessages>, "initMessages">;
 
 export type SelectModelProps = {

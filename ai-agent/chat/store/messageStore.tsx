@@ -719,6 +719,12 @@ export const MessageStoreContextProvider = ({
   chatId,
   total,
   multimodal,
+  knowledgeSearchToolName,
+  webSearchToolName,
+  webCrawlingToolName,
+  generateDocxToolName,
+  generateFormToolName,
+  generatePresentationToolName,
 }: TMessageStoreProps) => {
   const { aiApi } = useApi();
   const store = React.useMemo(() => new MessageStore(aiApi), [aiApi]);
@@ -736,6 +742,32 @@ export const MessageStoreContextProvider = ({
 
     if (chatId) store.setInitMessages(messages, total, chatId);
   }, [chatId, store, messages, total]);
+
+  React.useEffect(() => {
+    if (knowledgeSearchToolName)
+      store.setKnowledgeSearchToolName(knowledgeSearchToolName);
+  }, [store, knowledgeSearchToolName]);
+
+  React.useEffect(() => {
+    if (webSearchToolName) store.setWebSearchToolName(webSearchToolName);
+  }, [store, webSearchToolName]);
+
+  React.useEffect(() => {
+    if (webCrawlingToolName) store.setWebCrawlingToolName(webCrawlingToolName);
+  }, [store, webCrawlingToolName]);
+
+  React.useEffect(() => {
+    if (generateDocxToolName) store.setGenerateDocxToolName(generateDocxToolName);
+  }, [store, generateDocxToolName]);
+
+  React.useEffect(() => {
+    if (generateFormToolName) store.setGenerateFormToolName(generateFormToolName);
+  }, [store, generateFormToolName]);
+
+  React.useEffect(() => {
+    if (generatePresentationToolName)
+      store.setGeneratePresentationToolName(generatePresentationToolName);
+  }, [store, generatePresentationToolName]);
 
   return (
     <MessageStoreContext.Provider value={store}>

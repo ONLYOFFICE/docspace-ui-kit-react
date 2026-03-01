@@ -171,6 +171,7 @@ const ChatCore = (props: ChatCoreProps) => {
     isAdmin = false,
     goToAISettings,
     allowExternalNavigation,
+    toolsSettings,
   } = props;
 
   const hasChats = initChats?.chats?.length > 0;
@@ -201,6 +202,12 @@ const ChatCore = (props: ChatCoreProps) => {
         agentId={agentId}
         {...messagesSettings}
         multimodal={multimodal}
+        knowledgeSearchToolName={toolsSettings.knowledgeSearchToolName}
+        webSearchToolName={toolsSettings.webSearchToolName}
+        webCrawlingToolName={toolsSettings.webCrawlingToolName}
+        generateDocxToolName={toolsSettings.generateDocxToolName}
+        generateFormToolName={toolsSettings.generateFormToolName}
+        generatePresentationToolName={toolsSettings.generatePresentationToolName}
       >
         <ChatContainer
           isLoadingChat={isLoadingChat}

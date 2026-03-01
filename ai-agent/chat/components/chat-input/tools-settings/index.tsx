@@ -55,8 +55,6 @@ import { Backdrop } from "../../../../../components/backdrop";
 import { TooltipContainer } from "../../../../../components/tooltip";
 
 import { useChatStore } from "../../../store/chatStore";
-import { useMessageStore } from "../../../store/messageStore";
-
 import type useToolsSettings from "../../../hooks/useToolsSettings";
 
 import styles from "../ChatInput.module.scss";
@@ -70,12 +68,6 @@ const ToolsSettings = ({
   webSearchAvailable,
   webSearchEnabled,
   isFetched,
-  knowledgeSearchToolName,
-  webSearchToolName,
-  webCrawlingToolName,
-  generateDocxToolName,
-  generateFormToolName,
-  generatePresentationToolName,
   setServers,
   setMCPTools,
   setWebSearchEnabled,
@@ -90,14 +82,6 @@ const ToolsSettings = ({
   allowExternalNavigation?: boolean;
 }) => {
   const { agentId } = useChatStore();
-  const {
-    setKnowledgeSearchToolName,
-    setWebSearchToolName,
-    setWebCrawlingToolName,
-    setGenerateDocxToolName,
-    setGenerateFormToolName,
-    setGeneratePresentationToolName,
-  } = useMessageStore();
   const { isBase } = useTheme();
   const { aiApi, thirdPartyApi, apiUrl } = useApi();
 
@@ -251,30 +235,6 @@ const ToolsSettings = ({
     aiApi.updateWebSearchInRoom(Number(agentId), !webSearchEnabled);
     setWebSearchEnabled(!webSearchEnabled);
   }, [agentId, webSearchEnabled, webSearchAvailable, setWebSearchEnabled]);
-
-  React.useEffect(() => {
-    setKnowledgeSearchToolName(knowledgeSearchToolName);
-  }, [knowledgeSearchToolName, setKnowledgeSearchToolName]);
-
-  React.useEffect(() => {
-    setWebSearchToolName(webSearchToolName);
-  }, [webSearchToolName, setWebSearchToolName]);
-
-  React.useEffect(() => {
-    setWebCrawlingToolName(webCrawlingToolName);
-  }, [webCrawlingToolName, setWebCrawlingToolName]);
-
-  React.useEffect(() => {
-    setGenerateDocxToolName(generateDocxToolName);
-  }, [generateDocxToolName, setGenerateDocxToolName]);
-
-  React.useEffect(() => {
-    setGenerateFormToolName(generateFormToolName);
-  }, [generateFormToolName, setGenerateFormToolName]);
-
-  React.useEffect(() => {
-    setGeneratePresentationToolName(generatePresentationToolName);
-  }, [generatePresentationToolName, setGeneratePresentationToolName]);
 
   const model = React.useMemo(() => {
     const serverItems = Array.from(MCPTools.entries())
