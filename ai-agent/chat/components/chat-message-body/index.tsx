@@ -130,7 +130,7 @@ const ChatMessageBody = ({
             );
           })}
           {!isStreamRunning && isRequestRunning ? (
-            <div className={styles.chatLoader}>
+            <div className={styles.chatLoader} data-testid="chat-loader-container">
               <Loader type={LoaderTypes.track} />
               {getCommonTranslation("Analyzing")}
             </div>
