@@ -60,7 +60,7 @@ const CodeBlock = ({
   };
 
   return (
-    <div className={styles.codeContainer}>
+    <div className={styles.codeContainer} data-testid="code-block">
       <div className={styles.codeHeader}>
         {language ? <Text>{language}</Text> : null}
         <IconButton
@@ -68,6 +68,7 @@ const CodeBlock = ({
           size={16}
           isClickable
           onClick={onCopy}
+          aria-label="copy button"
         />
       </div>
       <Scrollbar

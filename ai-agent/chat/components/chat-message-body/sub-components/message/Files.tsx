@@ -54,6 +54,7 @@ const Files = ({ files, getIcon, reverse, allowExternalNavigation }: MessageFile
             })}
             key={file.id}
             onClick={() => openFile(file.id.toString(), allowExternalNavigation)}
+            data-testid="file-item"
           >
             <ReactSVG
               src={getIcon(24, file.extension!)}

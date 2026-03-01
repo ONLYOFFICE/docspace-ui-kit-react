@@ -117,6 +117,7 @@ const Images = ({
                 alt={`Image ${image.id}`}
                 onClick={() => onImageClick(image.id.toString())}
                 style={isClickable ? { cursor: "pointer" } : undefined}
+                data-testid="message-image"
               />
             ) : (
               <Loader
