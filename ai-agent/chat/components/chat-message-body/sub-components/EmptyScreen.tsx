@@ -41,6 +41,7 @@ const EmptyScreen = ({ isLoading }: MessageEmptyProps) => {
       isBold
       fontSize="18px"
       lineHeight="24px"
+      dataTestId="chat-empty-screen"
     >
       {isLoading ? (
         <RectangleSkeleton height="24px" width="140px" borderRadius="3px" />
