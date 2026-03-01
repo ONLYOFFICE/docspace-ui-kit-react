@@ -171,6 +171,7 @@ const Buttons = ({
           className={styles.buttonsBlockItem}
           onClick={onCopyAction}
           title={getCommonTranslation("CopyMessage")}
+          data-testid="copy-message-button"
         >
           <CopyIcon />
         </div>
@@ -191,6 +192,7 @@ const Buttons = ({
           className={styles.buttonsBlockItem}
           onClick={() => setShowFolderSelector(true)}
           title={getCommonTranslation("SaveToFile")}
+          data-testid="save-to-file-button"
         >
           <SaveToFileIcon />
         </div>
