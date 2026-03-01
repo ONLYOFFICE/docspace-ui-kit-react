@@ -50,7 +50,7 @@ const WebCrawlingToolContent = ({ content, allowExternalNavigation }: { content:
 
   return hasError || !allowExternalNavigation ? (
     <>
-      <UniverseIcon className={styles.searchToolIcon} />
+      <UniverseIcon className={styles.searchToolIcon} data-testid="universe-icon" />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("WebCrawling")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
@@ -63,12 +63,12 @@ const WebCrawlingToolContent = ({ content, allowExternalNavigation }: { content:
       target={LinkTarget.blank}
       textDecoration="none"
     >
-      <UniverseIcon className={styles.searchToolIcon} />
+      <UniverseIcon className={styles.searchToolIcon} data-testid="universe-icon" />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("WebCrawling")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
       </Text>
-      <ExternalLinkIcon className={styles.externalLinkIcon} />
+      <ExternalLinkIcon className={styles.externalLinkIcon} data-testid="external-link-icon" />
     </Link>
   );
 };
@@ -78,7 +78,7 @@ const WebSearchToolContent = ({ content }: { content: TToolCallContent }) => {
 
   return (
     <>
-      <UniverseIcon className={styles.searchToolIcon} />
+      <UniverseIcon className={styles.searchToolIcon} data-testid="universe-icon" />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("WebSearch")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
@@ -96,7 +96,7 @@ const KnowledgeSearchToolContent = ({
 
   return (
     <>
-      <DocumentsIcon className={styles.searchToolIcon} />
+      <DocumentsIcon className={styles.searchToolIcon} data-testid="documents-icon" />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("KnowledgeSearch")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>

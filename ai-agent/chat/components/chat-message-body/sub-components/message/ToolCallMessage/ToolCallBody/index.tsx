@@ -47,7 +47,7 @@ export const ToolCallBody = observer(({ content, placement, allowExternalNavigat
 
   if (content.result?.error) {
     return (
-      <div className={styles.toolCallBody}>
+      <div className={styles.toolCallBody} data-testid="tool-call-body">
         <Text fontSize="14px" fontWeight={600} lineHeight="20px">
           {content.result?.error as string}
         </Text>
@@ -60,7 +60,7 @@ export const ToolCallBody = observer(({ content, placement, allowExternalNavigat
   );
 
   return (
-    <div className={styles.toolCallBody}>
+    <div className={styles.toolCallBody} data-testid="tool-call-body">
       {isSourceView ? (
         <SourceView content={content} allowExternalNavigation={allowExternalNavigation} />
       ) : (

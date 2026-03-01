@@ -61,7 +61,7 @@ const ToolCallMessage = ({ content, allowExternalNavigation }: MessageToolCallPr
   }, [content.managed, needConfirmation]);
 
   return (
-    <div className={styles.toolCallMessage}>
+    <div className={styles.toolCallMessage} data-testid="tool-call-message">
       <ToolCall
         content={content}
         status={toolCallStatus}

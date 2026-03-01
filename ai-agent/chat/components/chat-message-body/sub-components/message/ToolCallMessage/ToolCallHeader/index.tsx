@@ -77,9 +77,12 @@ export const ToolCallHeader = observer(
         <Loader type={LoaderTypes.track} size="12px" />
       ),
       [ToolCallStatus.Finished]: (
-        <ToolFinishIcon className={styles.toolFinishIcon} />
+        <ToolFinishIcon
+          className={styles.toolFinishIcon}
+          data-testid="tool-finish-icon"
+        />
       ),
-      [ToolCallStatus.Failed]: <AlertIcon />,
+      [ToolCallStatus.Failed]: <AlertIcon data-testid="alert-icon" />,
     };
 
     const statusIcon =
@@ -115,5 +118,5 @@ export const ToolCallHeader = observer(
         ) : null}
       </div>
     );
-  },
+  }
 );

@@ -65,11 +65,11 @@ export const MCPToolContent = observer(
     const ownIcon = content.mcpServerInfo?.icon?.icon16;
 
     const icon = isGenerateDocx ? (
-      <WordIcon />
+      <WordIcon data-testid="word-icon" />
     ) : isGenerateForm ? (
-      <FormIcon />
+      <FormIcon data-testid="form-icon" />
     ) : isGeneratePresentation ? (
-      <PresentationIcon />
+      <PresentationIcon data-testid="presentation-icon" />
     ) : null;
 
     return (

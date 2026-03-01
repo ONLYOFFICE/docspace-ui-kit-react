@@ -98,6 +98,7 @@ export const ToolCallConfirmDialog = observer(
         isLarge
         autoMaxHeight
         closeOnBackdropClick={false}
+        data-testid="tool-call-confirm-dialog"
       >
         <ModalDialog.Header>
           {getCommonTranslation("Confirmation")}
@@ -124,6 +125,7 @@ export const ToolCallConfirmDialog = observer(
               isChecked={alwaysAllow}
               onChange={(e) => setAlwaysAllow(e.target.checked)}
               label={getCommonTranslation("AlwaysAllowToolCall")}
+              data-testid="always-allow-checkbox"
             />
             <div className={styles.buttonsBlockContainer}>
               <Button
@@ -132,6 +134,7 @@ export const ToolCallConfirmDialog = observer(
                 onClick={() => onClickAction(ToolsPermission.Allow)}
                 scale={isMobile()}
                 size={ButtonSize.normal}
+                data-testid="allow-button"
               />
               <Button
                 className={styles.denyButton}
@@ -139,6 +142,7 @@ export const ToolCallConfirmDialog = observer(
                 onClick={() => onClickAction(ToolsPermission.Deny)}
                 size={ButtonSize.normal}
                 scale={isMobile()}
+                data-testid="deny-button"
               />
             </div>
           </div>

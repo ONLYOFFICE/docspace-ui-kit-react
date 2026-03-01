@@ -78,7 +78,7 @@ export const CodeView = observer(({
 
   return (
     <>
-      <div className={styles.toolCallCodeViewItem}>
+      <div className={styles.toolCallCodeViewItem} data-testid="tool-call-code-view-item-arg">
         <Text fontSize="15px" lineHeight="16px" fontWeight={600}>
           {getCommonTranslation("ToolCallArg")}
         </Text>
@@ -88,7 +88,7 @@ export const CodeView = observer(({
         />
       </div>
       {showResult ? (
-        <div className={styles.toolCallCodeViewItem}>
+        <div className={styles.toolCallCodeViewItem} data-testid="tool-call-code-view-item-result">
           <Text fontSize="15px" lineHeight="16px" fontWeight={600}>
             {getCommonTranslation("ToolCallResult")}
           </Text>

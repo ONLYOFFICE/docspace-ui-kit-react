@@ -118,7 +118,7 @@ const SourceItem = ({ source, allowExternalNavigation }: { source: TToolCallResu
 
   if (!allowExternalNavigation) {
     return (
-      <div className={classNames(styles.sourceItem, styles.disabledNavigation)}>
+      <div className={classNames(styles.sourceItem, styles.disabledNavigation)} data-testid="source-item">
         {content}
       </div>
     );
@@ -131,6 +131,7 @@ const SourceItem = ({ source, allowExternalNavigation }: { source: TToolCallResu
       target={LinkTarget.blank}
       textDecoration="none"
       truncate
+      data-testid="source-item"
     >
       {content}
     </Link>
@@ -147,7 +148,7 @@ export const SourceView = ({ content, allowExternalNavigation }: { content: TToo
     : [content.result?.data];
 
   return (
-    <div className={styles.sourceView}>
+    <div className={styles.sourceView} data-testid="source-view">
       <div className={styles.sourceViewList}>
         {sources.map((source, index) => (
           <SourceItem
