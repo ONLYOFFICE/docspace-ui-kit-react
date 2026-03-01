@@ -26,47 +26,66 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
+import React from "react";
 import { observer } from "mobx-react";
 
-import styles from "../../../../ChatMessageBody.module.scss";
 import type { TToolCallContent } from "../../../../../../../../types/ai";
-import type { ToolCallPlacement } from "../tool-call/ToolCall.enum";
-import { useMessageStore } from "../../../../../../store/messageStore";
-import { CodeView } from "./code-view";
-import { SourceView } from "./source-view";
-import { Text } from "../../../../../../../../components/text";
 
-type ToolCallBodyProps = {
+import styles from "../../../../ChatMessageBody.module.scss";
+
+import { ToolCallHeader } from "../ToolCallHeader";
+import { ToolCallBody } from "../ToolCallBody";
+import { ToolCallPlacement, ToolCallStatus } from "./ToolCall.enum";
+import classNames from "classnames";
+import { useMessageStore } from "../../../../../../store/messageStore";
+
+type ToolCallProps = {
   content: TToolCallContent;
   placement: ToolCallPlacement;
+  status: ToolCallStatus;
   allowExternalNavigation?: boolean;
 };
 
-export const ToolCallBody = observer(({ content, placement, allowExternalNavigation }: ToolCallBodyProps) => {
-  const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
+export const ToolCall = observer(
+  ({ content, status, placement, allowExternalNavigation }: ToolCallProps) => {
+    const [collapsed, setCollapsed] = React.useState(true);
+    const { knowledgeSearchToolName, webSearchToolName, webCrawlingToolName } =
+      useMessageStore();
 
-  if (content.result?.error) {
+    const isSearchTool = [
+      knowledgeSearchToolName,
+      webSearchToolName,
+      webCrawlingToolName,
+    ].includes(content.name);
+
+    const isWebCrawlingTool = content.name === webCrawlingToolName;
+
+    const expandable =
+      (status === ToolCallStatus.Finished && !isWebCrawlingTool) ||
+      status === ToolCallStatus.Failed ||
+      placement === ToolCallPlacement.ConfirmDialog;
+
     return (
-      <div className={styles.toolCallBody} data-testid="tool-call-body">
-        <Text fontSize="14px" fontWeight={600} lineHeight="20px">
-          {content.result?.error as string}
-        </Text>
+      <div
+        className={classNames(styles.toolCall, {
+          [styles.inDialog]: placement === ToolCallPlacement.ConfirmDialog,
+        })}
+      >
+        <ToolCallHeader
+          content={content}
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          status={status}
+          placement={placement}
+          expandable={expandable}
+          isSearchTool={isSearchTool}
+          allowExternalNavigation={allowExternalNavigation}
+        />
+
+        {!expandable || collapsed ? null : (
+          <ToolCallBody content={content} placement={placement} allowExternalNavigation={allowExternalNavigation} />
+        )}
       </div>
     );
-  }
-
-  const isSourceView = [knowledgeSearchToolName, webSearchToolName].includes(
-    content.name,
-  );
-
-  return (
-    <div className={styles.toolCallBody} data-testid="tool-call-body">
-      {isSourceView ? (
-        <SourceView content={content} allowExternalNavigation={allowExternalNavigation} />
-      ) : (
-        <CodeView content={content} placement={placement} />
-      )}
-    </div>
-  );
-}
+  },
 );

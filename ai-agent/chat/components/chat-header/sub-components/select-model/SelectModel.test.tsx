@@ -26,47 +26,41 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { observer } from "mobx-react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import React from "react";
 
-import styles from "../../../../ChatMessageBody.module.scss";
-import type { TToolCallContent } from "../../../../../../../../types/ai";
-import type { ToolCallPlacement } from "../tool-call/ToolCall.enum";
-import { useMessageStore } from "../../../../../../store/messageStore";
-import { CodeView } from "./code-view";
-import { SourceView } from "./source-view";
-import { Text } from "../../../../../../../../components/text";
+import SelectModel from "./index";
+import * as aiModelUtils from "../../../../../../utils/ai/getAiModelName";
 
-type ToolCallBodyProps = {
-  content: TToolCallContent;
-  placement: ToolCallPlacement;
-  allowExternalNavigation?: boolean;
-};
+// Mock Skeleton
+vi.mock("../../../../../../components/rectangle", () => ({
+  RectangleSkeleton: () => <div data-testid="skeleton" />,
+}));
 
-export const ToolCallBody = observer(({ content, placement, allowExternalNavigation }: ToolCallBodyProps) => {
-  const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
-
-  if (content.result?.error) {
-    return (
-      <div className={styles.toolCallBody} data-testid="tool-call-body">
-        <Text fontSize="14px" fontWeight={600} lineHeight="20px">
-          {content.result?.error as string}
-        </Text>
-      </div>
-    );
-  }
-
-  const isSourceView = [knowledgeSearchToolName, webSearchToolName].includes(
-    content.name,
-  );
-
-  return (
-    <div className={styles.toolCallBody} data-testid="tool-call-body">
-      {isSourceView ? (
-        <SourceView content={content} allowExternalNavigation={allowExternalNavigation} />
-      ) : (
-        <CodeView content={content} placement={placement} />
-      )}
+// Mock Text
+vi.mock("../../../../../../components/text", () => ({
+  Text: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div className={className} data-testid="model-name">
+      {children}
     </div>
-  );
-}
-);
+  ),
+}));
+
+describe("<SelectModel />", () => {
+  it("renders skeleton when loading", () => {
+    render(<SelectModel selectedModel="gpt-4" isLoading={true} />);
+    expect(screen.getByTestId("skeleton")).toBeInTheDocument();
+  });
+
+  it("renders model name correctly", () => {
+    const spy = vi.spyOn(aiModelUtils, "getAiModelName").mockReturnValue("GPT-4 Turbo");
+    
+    render(<SelectModel selectedModel="gpt-4" isLoading={false} />);
+    
+    expect(screen.getByTestId("model-name")).toHaveTextContent("GPT-4 Turbo");
+    expect(spy).toHaveBeenCalledWith("gpt-4");
+    
+    spy.mockRestore();
+  });
+});

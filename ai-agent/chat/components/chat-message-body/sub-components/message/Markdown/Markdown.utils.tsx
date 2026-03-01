@@ -35,7 +35,7 @@ import { Link, LinkTarget } from "../../../../../../../components/link";
 import { Scrollbar } from "../../../../../../../components/scrollbar";
 
 import styles from "../../../ChatMessageBody.module.scss";
-import CodeBlock from "../CodeBlock";
+import CodeBlock from "../code-block";
 
 export const Code = ({
   className,

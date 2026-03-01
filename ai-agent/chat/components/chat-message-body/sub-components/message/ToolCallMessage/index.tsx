@@ -32,9 +32,9 @@ import { MessageToolCallProps } from "../../../../../Chat.types";
 
 import styles from "../../../ChatMessageBody.module.scss";
 
-import { ToolCallConfirmDialog } from "./ToolCallConfirmDialog";
-import { ToolCall } from "./ToolCall";
-import { ToolCallPlacement, ToolCallStatus } from "./ToolCall.enum";
+import { ToolCallConfirmDialog } from "./tool-call-confirm-dialog";
+import { ToolCall } from "./tool-call";
+import { ToolCallPlacement, ToolCallStatus } from "./tool-call/ToolCall.enum";
 
 const ToolCallMessage = ({ content, allowExternalNavigation }: MessageToolCallProps) => {
   const [needConfirmation, setNeedConfirmation] = React.useState(

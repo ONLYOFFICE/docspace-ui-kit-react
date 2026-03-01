@@ -30,7 +30,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ToolCallBody } from "./index";
-import { ToolCallPlacement } from "../ToolCall.enum";
+import { ToolCallPlacement } from "../tool-call/ToolCall.enum";
 import { useMessageStore } from "../../../../../../store/messageStore";
 import type { TToolCallContent } from "../../../../../../../../types/ai";
 import { ContentType } from "../../../../../../../../enums";
@@ -41,10 +41,10 @@ vi.mock("../../../../../../store/messageStore", () => ({
 }));
 
 // Mock child components
-vi.mock("./CodeView", () => ({
+vi.mock("./code-view", () => ({
   CodeView: () => <div data-testid="code-view" />,
 }));
-vi.mock("./SourceView", () => ({
+vi.mock("./source-view", () => ({
   SourceView: () => <div data-testid="source-view" />,
 }));
 vi.mock("../../../../../../../../components/text", () => ({

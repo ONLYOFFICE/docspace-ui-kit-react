@@ -27,46 +27,64 @@
  */
 
 import { observer } from "mobx-react";
+import classNames from "classnames";
 
-import styles from "../../../../ChatMessageBody.module.scss";
-import type { TToolCallContent } from "../../../../../../../../types/ai";
-import type { ToolCallPlacement } from "../tool-call/ToolCall.enum";
-import { useMessageStore } from "../../../../../../store/messageStore";
-import { CodeView } from "./code-view";
-import { SourceView } from "./source-view";
-import { Text } from "../../../../../../../../components/text";
+import PlusReactSvgUrl from "../../../../../../assets/icons/16/plus.react.svg";
 
-type ToolCallBodyProps = {
-  content: TToolCallContent;
-  placement: ToolCallPlacement;
-  allowExternalNavigation?: boolean;
-};
+import { RectangleSkeleton } from "../../../../../../components/rectangle";
 
-export const ToolCallBody = observer(({ content, placement, allowExternalNavigation }: ToolCallBodyProps) => {
-  const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
+import { Text } from "../../../../../../components/text";
 
-  if (content.result?.error) {
+import { useMessageStore } from "../../../../store/messageStore";
+import { useChatStore } from "../../../../store/chatStore";
+
+import styles from "../../ChatHeader.module.scss";
+import { getCommonTranslation } from "../../../../../../utils";
+
+const CreateChat = ({
+  isLoadingProp,
+  isDisabled,
+}: {
+  isLoadingProp?: boolean;
+  isDisabled?: boolean;
+}) => {
+  const { messages, isRequestRunning, startNewChat } = useMessageStore();
+  const { setCurrentChat } = useChatStore();
+
+  if (isLoadingProp)
     return (
-      <div className={styles.toolCallBody} data-testid="tool-call-body">
-        <Text fontSize="14px" fontWeight={600} lineHeight="20px">
-          {content.result?.error as string}
-        </Text>
-      </div>
+      <RectangleSkeleton
+        width="96px"
+        height="32px"
+        borderRadius="3px"
+        style={{ minWidth: "32px" }}
+      />
     );
-  }
 
-  const isSourceView = [knowledgeSearchToolName, webSearchToolName].includes(
-    content.name,
-  );
+  if (messages.length === 0) return null;
+
+  const onClickAction = () => {
+    if (isDisabled || isRequestRunning) return;
+
+    setCurrentChat(null);
+    startNewChat();
+  };
 
   return (
-    <div className={styles.toolCallBody} data-testid="tool-call-body">
-      {isSourceView ? (
-        <SourceView content={content} allowExternalNavigation={allowExternalNavigation} />
-      ) : (
-        <CodeView content={content} placement={placement} />
-      )}
+    <div
+      className={classNames(styles.createChat, {
+        [styles.disabled]: isDisabled,
+      })}
+      onClick={onClickAction}
+      data-testid="create-chat"
+      aria-disabled={isDisabled}
+    >
+      <PlusReactSvgUrl />
+      <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
+        {getCommonTranslation("AINewChat")}
+      </Text>
     </div>
   );
-}
-);
+};
+
+export default observer(CreateChat);

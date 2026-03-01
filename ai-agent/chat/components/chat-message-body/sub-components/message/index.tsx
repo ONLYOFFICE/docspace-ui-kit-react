@@ -51,10 +51,10 @@ import styles from "../../ChatMessageBody.module.scss";
 
 import Markdown from "./Markdown";
 import ToolCallMessage from "./ToolCallMessage";
-import Error from "./Error";
-import Files from "./Files";
-import Images from "./Images";
-import Buttons from "./Buttons";
+import Error from "./error";
+import Files from "./files";
+import Images from "./images";
+import Buttons from "./buttons";
 import { getCommonTranslation } from "../../../../../../utils";
 
 const renderLink = ({

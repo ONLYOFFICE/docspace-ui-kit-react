@@ -26,47 +26,40 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { observer } from "mobx-react";
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import Error from "./index";
+import { ContentType } from "../../../../../../../enums";
+import type { TMessage, TContent } from "../../../../../../../types/ai";
 
-import styles from "../../../../ChatMessageBody.module.scss";
-import type { TToolCallContent } from "../../../../../../../../types/ai";
-import type { ToolCallPlacement } from "../tool-call/ToolCall.enum";
-import { useMessageStore } from "../../../../../../store/messageStore";
-import { CodeView } from "./code-view";
-import { SourceView } from "./source-view";
-import { Text } from "../../../../../../../../components/text";
+vi.mock("../../../../../../../components/status-message", () => ({
+  default: ({ message }: { message: string }) => <div data-testid="status-message">{message}</div>,
+}));
 
-type ToolCallBodyProps = {
-  content: TToolCallContent;
-  placement: ToolCallPlacement;
-  allowExternalNavigation?: boolean;
-};
+describe("Error component", () => {
+  it("renders status message when content type is text", () => {
+    const mockContent = {
+      type: ContentType.Text,
+      text: "Error occurred",
+    } as TMessage["contents"][0];
 
-export const ToolCallBody = observer(({ content, placement, allowExternalNavigation }: ToolCallBodyProps) => {
-  const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
+    render(<Error content={mockContent} />);
 
-  if (content.result?.error) {
-    return (
-      <div className={styles.toolCallBody} data-testid="tool-call-body">
-        <Text fontSize="14px" fontWeight={600} lineHeight="20px">
-          {content.result?.error as string}
-        </Text>
-      </div>
-    );
-  }
+    const statusMessage = screen.getByTestId("status-message");
+    expect(statusMessage).toBeInTheDocument();
+    expect(statusMessage).toHaveTextContent("Error occurred");
+  });
 
-  const isSourceView = [knowledgeSearchToolName, webSearchToolName].includes(
-    content.name,
-  );
+  it("returns null when content type is not text", () => {
+    const mockContent = {
+      type: ContentType.Files,
+      id: 1,
+      title: "test.txt",
+      extension: ".txt",
+    } as TContent;
 
-  return (
-    <div className={styles.toolCallBody} data-testid="tool-call-body">
-      {isSourceView ? (
-        <SourceView content={content} allowExternalNavigation={allowExternalNavigation} />
-      ) : (
-        <CodeView content={content} placement={placement} />
-      )}
-    </div>
-  );
-}
-);
+    const { container } = render(<Error content={mockContent} />);
+    expect(container.firstChild).toBeNull();
+  });
+});

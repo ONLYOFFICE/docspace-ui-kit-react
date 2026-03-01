@@ -32,17 +32,17 @@ import ChatHeader from "./index";
 import { ChatHeaderProps } from "../../Chat.types";
 
 // Mock sub-components
-vi.mock("./sub-components/SelectChat", () => ({
+vi.mock("./sub-components/select-chat", () => ({
   default: vi.fn(() => <div data-testid="mock-select-chat" />),
 }));
 
-vi.mock("./sub-components/CreateChat", () => ({
+vi.mock("./sub-components/create-chat", () => ({
   default: vi.fn(({ isDisabled }) => (
     <div data-testid="mock-create-chat" data-disabled={isDisabled} />
   )),
 }));
 
-vi.mock("./sub-components/SelectModel", () => ({
+vi.mock("./sub-components/select-model", () => ({
   default: vi.fn(() => <div data-testid="mock-select-model" />),
 }));
 

@@ -65,7 +65,7 @@ vi.mock("../../../../components/text", () => ({
   Text: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock("./FilesList", () => ({
+vi.mock("./files-list", () => ({
   default: ({ files }: { files: Partial<TFile>[] }) => (
     <div data-testid="files-list" data-file-count={files.length}>
       {files.map((f) => (
@@ -75,7 +75,7 @@ vi.mock("./FilesList", () => ({
   ),
 }));
 
-vi.mock("./Buttons", () => ({
+vi.mock("./buttons", () => ({
   default: ({ sendMessageAction }: { sendMessageAction: () => void }) => (
     <div data-testid="buttons">
       <button onClick={sendMessageAction} data-testid="send-button">send</button>
@@ -83,7 +83,7 @@ vi.mock("./Buttons", () => ({
   ),
 }));
 
-vi.mock("./Attachment", () => ({
+vi.mock("./attachment", () => ({
   default: () => <div data-testid="attachment-selector" />,
 }));
 

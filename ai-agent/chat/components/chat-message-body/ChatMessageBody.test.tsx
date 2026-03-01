@@ -32,7 +32,7 @@ vi.mock("../../../../utils/socket", () => ({
   SocketEvents: { ChatMessageId: "ChatMessageId" },
 }));
 
-vi.mock("./sub-components/EmptyScreen", () => ({
+vi.mock("./sub-components/empty-screen", () => ({
   default: ({ isLoading }: { isLoading?: boolean }) => (
     <div data-testid="empty-screen">{isLoading ? "loading" : "empty"}</div>
   ),

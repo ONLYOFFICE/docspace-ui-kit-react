@@ -26,47 +26,18 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { observer } from "mobx-react";
+import React from "react";
 
-import styles from "../../../../ChatMessageBody.module.scss";
-import type { TToolCallContent } from "../../../../../../../../types/ai";
-import type { ToolCallPlacement } from "../tool-call/ToolCall.enum";
-import { useMessageStore } from "../../../../../../store/messageStore";
-import { CodeView } from "./code-view";
-import { SourceView } from "./source-view";
-import { Text } from "../../../../../../../../components/text";
+import StatusMessage from "../../../../../../../components/status-message";
 
-type ToolCallBodyProps = {
-  content: TToolCallContent;
-  placement: ToolCallPlacement;
-  allowExternalNavigation?: boolean;
+import { ContentType } from "../../../../../../../enums";
+
+import { MessageErrorProps } from "../../../../../Chat.types";
+
+const Error = ({ content }: MessageErrorProps) => {
+  if (content.type !== ContentType.Text) return null;
+
+  return <StatusMessage message={content.text} />;
 };
 
-export const ToolCallBody = observer(({ content, placement, allowExternalNavigation }: ToolCallBodyProps) => {
-  const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
-
-  if (content.result?.error) {
-    return (
-      <div className={styles.toolCallBody} data-testid="tool-call-body">
-        <Text fontSize="14px" fontWeight={600} lineHeight="20px">
-          {content.result?.error as string}
-        </Text>
-      </div>
-    );
-  }
-
-  const isSourceView = [knowledgeSearchToolName, webSearchToolName].includes(
-    content.name,
-  );
-
-  return (
-    <div className={styles.toolCallBody} data-testid="tool-call-body">
-      {isSourceView ? (
-        <SourceView content={content} allowExternalNavigation={allowExternalNavigation} />
-      ) : (
-        <CodeView content={content} placement={placement} />
-      )}
-    </div>
-  );
-}
-);
+export default Error;

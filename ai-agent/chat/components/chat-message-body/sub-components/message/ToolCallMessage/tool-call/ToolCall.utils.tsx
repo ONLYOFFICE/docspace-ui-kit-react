@@ -26,47 +26,37 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { observer } from "mobx-react";
+import WordIcon from "../../../../../../../../assets/icons/16/word.svg";
+import CellIcon from "../../../../../../../../assets/icons/16/cell.svg";
+import CellCommonIcon from "../../../../../../../../assets/icons/16/cellCommon.svg";
+import TextIcon from "../../../../../../../../assets/icons/16/text.svg";
+import PdfIcon from "../../../../../../../../assets/icons/16/pdf.svg";
 
-import styles from "../../../../ChatMessageBody.module.scss";
-import type { TToolCallContent } from "../../../../../../../../types/ai";
-import type { ToolCallPlacement } from "../tool-call/ToolCall.enum";
-import { useMessageStore } from "../../../../../../store/messageStore";
-import { CodeView } from "./code-view";
-import { SourceView } from "./source-view";
-import { Text } from "../../../../../../../../components/text";
+export const getRootDomain = (url: string) => {
+  try {
+    const hostname = new URL(url).hostname;
 
-type ToolCallBodyProps = {
-  content: TToolCallContent;
-  placement: ToolCallPlacement;
-  allowExternalNavigation?: boolean;
+    return hostname.split(".").slice(-2).join(".");
+  } catch {
+    return "";
+  }
 };
 
-export const ToolCallBody = observer(({ content, placement, allowExternalNavigation }: ToolCallBodyProps) => {
-  const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
+const knowledgeIcons: Record<string, React.ReactNode> = {
+  ".docx": <WordIcon />,
+  ".xlsx": <CellIcon />,
+  ".csv": <CellCommonIcon />,
+  ".txt": <TextIcon />,
+  ".pdf": <PdfIcon />,
+};
 
-  if (content.result?.error) {
-    return (
-      <div className={styles.toolCallBody} data-testid="tool-call-body">
-        <Text fontSize="14px" fontWeight={600} lineHeight="20px">
-          {content.result?.error as string}
-        </Text>
-      </div>
-    );
-  }
+const getExtension = (fileName: string) => {
+  const idx = fileName.lastIndexOf(".");
+  return idx !== -1 ? fileName.slice(idx) : "";
+};
 
-  const isSourceView = [knowledgeSearchToolName, webSearchToolName].includes(
-    content.name,
-  );
+export const getKnowledgeDocumentIconByFileName = (fileName: string) => {
+  const extension = getExtension(fileName);
 
-  return (
-    <div className={styles.toolCallBody} data-testid="tool-call-body">
-      {isSourceView ? (
-        <SourceView content={content} allowExternalNavigation={allowExternalNavigation} />
-      ) : (
-        <CodeView content={content} placement={placement} />
-      )}
-    </div>
-  );
-}
-);
+  return knowledgeIcons[extension] || "";
+};

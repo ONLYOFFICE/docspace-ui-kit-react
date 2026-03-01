@@ -26,47 +26,40 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { observer } from "mobx-react";
+import { getAiModelName } from "../../../../../../utils/ai/getAiModelName";
 
-import styles from "../../../../ChatMessageBody.module.scss";
-import type { TToolCallContent } from "../../../../../../../../types/ai";
-import type { ToolCallPlacement } from "../tool-call/ToolCall.enum";
-import { useMessageStore } from "../../../../../../store/messageStore";
-import { CodeView } from "./code-view";
-import { SourceView } from "./source-view";
-import { Text } from "../../../../../../../../components/text";
+import { RectangleSkeleton } from "../../../../../../components/rectangle";
 
-type ToolCallBodyProps = {
-  content: TToolCallContent;
-  placement: ToolCallPlacement;
-  allowExternalNavigation?: boolean;
-};
+import { Text } from "../../../../../../components/text";
 
-export const ToolCallBody = observer(({ content, placement, allowExternalNavigation }: ToolCallBodyProps) => {
-  const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
+import type { SelectModelProps } from "../../../../Chat.types";
 
-  if (content.result?.error) {
+import styles from "../../ChatHeader.module.scss";
+
+const SelectModel = ({ selectedModel, isLoading }: SelectModelProps) => {
+  if (isLoading) {
     return (
-      <div className={styles.toolCallBody} data-testid="tool-call-body">
-        <Text fontSize="14px" fontWeight={600} lineHeight="20px">
-          {content.result?.error as string}
-        </Text>
-      </div>
+      <RectangleSkeleton
+        width="96px"
+        height="32px"
+        borderRadius="3px"
+        style={{ minWidth: "32px" }}
+      />
     );
   }
 
-  const isSourceView = [knowledgeSearchToolName, webSearchToolName].includes(
-    content.name,
-  );
+  const name = getAiModelName(selectedModel);
 
   return (
-    <div className={styles.toolCallBody} data-testid="tool-call-body">
-      {isSourceView ? (
-        <SourceView content={content} allowExternalNavigation={allowExternalNavigation} />
-      ) : (
-        <CodeView content={content} placement={placement} />
-      )}
-    </div>
+    <Text
+      fontSize="13px"
+      fontWeight={600}
+      lineHeight="20px"
+      className={styles.selectModel}
+    >
+      {name}
+    </Text>
   );
-}
-);
+};
+
+export default SelectModel;

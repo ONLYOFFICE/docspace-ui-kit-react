@@ -37,7 +37,7 @@ import { useChatStore } from "../../store/chatStore";
 
 import type { MessageBodyProps } from "../../Chat.types";
 
-import EmptyScreen from "./sub-components/EmptyScreen";
+import EmptyScreen from "./sub-components/empty-screen";
 import Message from "./sub-components/message";
 
 import { useChatScroll } from "./hooks/useChatScroll";

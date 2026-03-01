@@ -29,8 +29,8 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { ToolCallHeader } from "./index";
-import { ToolCallPlacement, ToolCallStatus } from "../tool-call/ToolCall.enum";
+import { ToolCall } from "./index";
+import { ToolCallPlacement, ToolCallStatus } from "./ToolCall.enum";
 import { useMessageStore } from "../../../../../../store/messageStore";
 import type { TToolCallContent } from "../../../../../../../../types/ai";
 import { ContentType } from "../../../../../../../../enums";
@@ -41,18 +41,21 @@ vi.mock("../../../../../../store/messageStore", () => ({
 }));
 
 // Mock child components
-vi.mock("./search-tool-content", () => ({
-  SearchToolContent: () => <div data-testid="search-tool-content" />,
-}));
-vi.mock("./mcp-tool-content", () => ({
-  MCPToolContent: () => <div data-testid="mcp-tool-content" />,
-}));
-vi.mock("../../../../../../../../components/loader", () => ({
-  Loader: ({ "data-testid": testId }: { "data-testid"?: string }) => <div data-testid={testId || "loader"} />,
-  LoaderTypes: { track: "track" },
+vi.mock("../ToolCallHeader", () => ({
+  ToolCallHeader: ({ setCollapsed, expandable }: { setCollapsed: (val: boolean) => void, expandable: boolean }) => (
+    <div data-testid="tool-call-header">
+      {expandable ? (
+        <button onClick={() => setCollapsed(false)} data-testid="expand-button">Expand</button>
+      ) : null}
+    </div>
+  ),
 }));
 
-describe("<ToolCallHeader />", () => {
+vi.mock("../ToolCallBody", () => ({
+  ToolCallBody: () => <div data-testid="tool-call-body" />,
+}));
+
+describe("<ToolCall />", () => {
   const mockContent: TToolCallContent = {
     type: ContentType.Tool,
     callId: "call-1",
@@ -60,81 +63,51 @@ describe("<ToolCallHeader />", () => {
     arguments: {},
   };
 
-  const mockSetCollapsed = vi.fn();
-
   beforeEach(() => {
-    vi.clearAllMocks();
     vi.mocked(useMessageStore).mockReturnValue({
+      knowledgeSearchToolName: "knowledge",
+      webSearchToolName: "search",
       webCrawlingToolName: "crawl",
     } as unknown as ReturnType<typeof useMessageStore>);
   });
 
-  it("renders loader in Loading status", () => {
+  it("renders ToolCallHeader and not ToolCallBody when collapsed by default", () => {
     render(
-      <ToolCallHeader
+      <ToolCall
         content={mockContent}
-        collapsed={true}
-        setCollapsed={mockSetCollapsed}
-        status={ToolCallStatus.Loading}
-        placement={ToolCallPlacement.Message}
-      />
-    );
-    expect(screen.getByTestId("loader")).toBeInTheDocument();
-  });
-
-  it("renders finish icon in Finished status", () => {
-    render(
-      <ToolCallHeader
-        content={mockContent}
-        collapsed={true}
-        setCollapsed={mockSetCollapsed}
         status={ToolCallStatus.Finished}
         placement={ToolCallPlacement.Message}
       />
     );
-    expect(screen.getByTestId("tool-finish-icon")).toBeInTheDocument();
+    expect(screen.getByTestId("tool-call-header")).toBeInTheDocument();
+    expect(screen.queryByTestId("tool-call-body")).not.toBeInTheDocument();
   });
 
-  it("renders alert icon in Failed status", () => {
+  it("renders ToolCallBody when expanded", () => {
     render(
-      <ToolCallHeader
+      <ToolCall
         content={mockContent}
-        collapsed={true}
-        setCollapsed={mockSetCollapsed}
-        status={ToolCallStatus.Failed}
-        placement={ToolCallPlacement.Message}
-      />
-    );
-    expect(screen.getByTestId("alert-icon")).toBeInTheDocument();
-  });
-
-  it("renders SearchToolContent when isSearchTool=true", () => {
-    render(
-      <ToolCallHeader
-        content={mockContent}
-        collapsed={true}
-        setCollapsed={mockSetCollapsed}
         status={ToolCallStatus.Finished}
         placement={ToolCallPlacement.Message}
-        isSearchTool={true}
       />
     );
-    expect(screen.getByTestId("search-tool-content")).toBeInTheDocument();
+    const expandButton = screen.getByTestId("expand-button");
+    fireEvent.click(expandButton);
+    expect(screen.getByTestId("tool-call-body")).toBeInTheDocument();
   });
 
-  it("calls setCollapsed on click when expandable", () => {
+  it("sets expandable to false for web crawling tool", () => {
+    const crawlingContent: TToolCallContent = {
+      ...mockContent,
+      name: "crawl",
+    };
     render(
-      <ToolCallHeader
-        content={mockContent}
-        collapsed={true}
-        setCollapsed={mockSetCollapsed}
+      <ToolCall
+        content={crawlingContent}
         status={ToolCallStatus.Finished}
         placement={ToolCallPlacement.Message}
-        expandable={true}
       />
     );
-    const header = screen.getByTestId("tool-call-header");
-    fireEvent.click(header);
-    expect(mockSetCollapsed).toHaveBeenCalledWith(false);
+    expect(screen.queryByTestId("expand-button")).not.toBeInTheDocument();
   });
 });

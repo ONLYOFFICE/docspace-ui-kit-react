@@ -39,9 +39,9 @@ import { useChatStore } from "../../store/chatStore";
 
 import type { ChatInputProps } from "../../Chat.types";
 
-import Attachment from "./Attachment";
-import FilesList from "./FilesList";
-import Buttons from "./Buttons";
+import Attachment from "./attachment";
+import FilesList from "./files-list";
+import Buttons from "./buttons";
 
 import styles from "./ChatInput.module.scss";
 import { getCommonTranslation } from "../../../../utils";

@@ -31,9 +31,9 @@ import { ChatHeaderProps } from "../../Chat.types";
 
 import styles from "./ChatHeader.module.scss";
 
-import SelectChat from "./sub-components/SelectChat";
-import CreateChat from "./sub-components/CreateChat";
-import SelectModel from "./sub-components/SelectModel";
+import SelectChat from "./sub-components/select-chat";
+import CreateChat from "./sub-components/create-chat";
+import SelectModel from "./sub-components/select-model";
 
 const ChatHeader = ({
   selectedModel,

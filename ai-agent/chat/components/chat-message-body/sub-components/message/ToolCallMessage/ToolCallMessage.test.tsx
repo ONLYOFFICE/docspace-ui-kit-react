@@ -30,18 +30,18 @@ import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import ToolCallMessage from "./index";
-import { ToolCallStatus } from "./ToolCall.enum";
+import { ToolCallStatus } from "./tool-call/ToolCall.enum";
 import type { TToolCallContent } from "../../../../../../../types/ai";
 import { ContentType } from "../../../../../../../enums";
 
 // Mock child components
-vi.mock("./ToolCall", () => ({
+vi.mock("./tool-call", () => ({
   ToolCall: ({ status }: { status: ToolCallStatus }) => (
     <div data-testid="tool-call" data-status={status} />
   ),
 }));
 
-vi.mock("./ToolCallConfirmDialog", () => ({
+vi.mock("./tool-call-confirm-dialog", () => ({
   ToolCallConfirmDialog: ({ onClose }: { onClose: () => void }) => (
     <div data-testid="tool-call-confirm-dialog">
       <button onClick={onClose} data-testid="close-confirm-dialog">Close</button>
