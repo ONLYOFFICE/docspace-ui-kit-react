@@ -26,34 +26,18 @@
 
 // @ts-nocheck
 
-import React from "react";
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { EmployeeStatus, EmployeeType } from "@onlyoffice/docspace-api-sdk";
+import type { SelectorProps, TSelectorItem } from "./Selector.types";
 
+import React from "react";
+import { EmployeeStatus, EmployeeType } from "@onlyoffice/docspace-api-sdk";
 import ArchiveSvgUrl from "../../assets/room.archive.react.svg?url";
 import FolderSvgUrl from "../../assets/icons/32/folder.react.svg?url";
 import EmptyScreenFilter from "../../assets/empty.filter.rooms.light.react.svg?url";
-
-// import RoomType from "../room-type";
-import { AvatarRole } from "../avatar";
-// import {
-// 	BreadCrumbsLoader,
-// 	RowLoader,
-// 	SearchLoader,
-// } from "./sub-components/loaders";
-
-import { Selector } from "./Selector";
-import type { SelectorProps, TSelectorItem } from "./Selector.types";
 import { globalColors } from "../../providers/theme";
-
-const meta = {
-  title: "Components/Layout components/Selector",
-  component: Selector,
-  parameters: {},
-} satisfies Meta<typeof Selector>;
-type Story = StoryObj<typeof meta>;
-
-export default meta;
+import { AvatarRole } from "../avatar";
+import { Selector } from "./Selector";
 
 function makeName() {
   let result = "";
@@ -69,23 +53,11 @@ function makeName() {
 const getItems = (count: number) => {
   const items: TSelectorItem[] = [];
 
-  // const items = <RoomType />;
-
   items.push({
     key: "create_new",
     id: "create_new_item",
     label: "New folder",
     isCreateNewItem: true,
-    // dropDownItems: RoomsTypeValues.map((value) => (
-    // 	<RoomType
-    // 		key={value}
-    // 		roomType={value}
-    // 		selectedId={value}
-    // 		type="dropdownItem"
-    // 		isOpen={false}
-    // 		onClick={() => {}}
-    // 	/>
-    // )),
     onCreateClick: () => {},
     onBackClick: () => {},
   });
@@ -229,23 +201,146 @@ const Template = (args: SelectorProps) => {
         boxSizing: "border-box",
       }}
     >
-      {/* @ts-expect-error args is good */}
       <Selector
         {...args}
         items={rendItems}
         loadNextPage={loadNextPage}
-        // searchLoader={<SearchLoader />}
         searchLoader={<div />}
-        // rowLoader={<RowLoader isUser={false} isMultiSelect={isMultiSelect} />}
         rowLoader={<div />}
       />
     </div>
   );
 };
 
-// @ts-expect-error args is good
+const meta = {
+  title: "UI/Overlays/Selector",
+  component: Selector,
+  parameters: {
+    docs: {
+      description: {
+        component: `Selector is a versatile panel component for browsing, searching, and selecting items from large lists.
+
+### Features
+
+- **Search**: Built-in search with placeholder text and empty state
+- **Multi-select**: Toggle between single and multi-select modes with "Select All" support
+- **Breadcrumbs**: Navigate folder hierarchies with breadcrumb trail
+- **Access rights**: Assign access levels when selecting users/groups
+- **Empty screens**: Customizable empty states for no results and search
+- **Virtual scroll**: Efficiently renders large lists with infinite loading
+- **Footer input**: Optional input field in the footer for file naming
+
+### Usage
+
+\`\`\`tsx
+import { Selector } from "@docspace/ui-kit/components/selector";
+
+<Selector
+  headerLabel="Select users"
+  searchPlaceholder="Search users"
+  items={items}
+  onSelect={handleSelect}
+  submitButtonLabel="Add"
+  onSubmit={handleSubmit}
+  totalItems={totalItems}
+  hasNextPage
+  loadNextPage={loadNextPage}
+/>
+\`\`\``,
+      },
+    },
+  },
+  argTypes: {
+    headerLabel: {
+      control: "text",
+      description: "Label displayed in the selector header",
+    },
+    searchPlaceholder: {
+      control: "text",
+      description: "Placeholder text for the search input",
+    },
+    isMultiSelect: {
+      control: "boolean",
+      description: "Enable multi-select mode",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withSelectAll: {
+      control: "boolean",
+      description:
+        'Show a "Select All" option at the top of the list',
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withAccessRights: {
+      control: "boolean",
+      description:
+        "Show access rights dropdown for selected items",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withCancelButton: {
+      control: "boolean",
+      description: "Show a cancel button in the footer",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withBreadCrumbs: {
+      control: "boolean",
+      description: "Show breadcrumb navigation for folder hierarchy",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withSearch: {
+      control: "boolean",
+      description: "Show the search input field",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isLoading: {
+      control: "boolean",
+      description: "Show loading state for the entire selector",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    hasNextPage: {
+      control: "boolean",
+      description:
+        "Indicates more items are available for infinite scrolling",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    alwaysShowFooter: {
+      control: "boolean",
+      description:
+        "Always display the footer, even when no items are selected",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    disableSubmitButton: {
+      control: "boolean",
+      description: "Disable the submit button in the footer",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+  },
+} satisfies Meta<typeof Selector>;
+
+type Story = StoryObj<ComponentProps<typeof Selector>>;
+
+export default meta;
+
 export const Default: Story = {
-  // @ts-expect-error args is good
   render: (args) => <Template {...args} />,
   args: {
     headerLabel: "Room list",
@@ -284,7 +379,6 @@ export const Default: Story = {
     withBreadCrumbs: false,
     breadCrumbs: [],
     onSelectBreadCrumb: () => {},
-    // breadCrumbsLoader: <BreadCrumbsLoader />,
     breadCrumbsLoader: <div />,
     withoutBackButton: false,
     withSearch: false,
@@ -293,8 +387,29 @@ export const Default: Story = {
     disableSubmitButton: false,
     descriptionText: "",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default Selector with a flat list of items, single selection mode, and basic configuration.",
+      },
+      source: {
+        code: `<Selector
+  headerLabel="Room list"
+  searchPlaceholder="Search"
+  items={items}
+  onSelect={handleSelect}
+  submitButtonLabel="Add"
+  onSubmit={handleSubmit}
+  totalItems={totalItems}
+  hasNextPage
+  loadNextPage={loadNextPage}
+/>`,
+      },
+    },
+  },
 };
-// @ts-expect-error args is good
+
 export const BreadCrumbs: Story = {
   render: (args) => <Template {...args} />,
   args: {
@@ -340,7 +455,6 @@ export const BreadCrumbs: Story = {
       { id: 5, label: "4222222222222222222222222222222222222" },
     ],
     onSelectBreadCrumb: () => {},
-    // breadCrumbsLoader: <BreadCrumbsLoader />,
     breadCrumbsLoader: <div />,
     withoutBackButton: false,
     withSearch: false,
@@ -353,8 +467,32 @@ export const BreadCrumbs: Story = {
     disableSubmitButton: false,
     descriptionText: "",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Selector with breadcrumb navigation enabled, allowing users to traverse folder hierarchies.",
+      },
+      source: {
+        code: `<Selector
+  headerLabel="Room list"
+  items={items}
+  withBreadCrumbs
+  breadCrumbs={[
+    { id: 1, label: "DocSpace" },
+    { id: 2, label: "Folder A" },
+    { id: 3, label: "Subfolder B" },
+  ]}
+  onSelectBreadCrumb={handleBreadCrumb}
+  onSelect={handleSelect}
+  submitButtonLabel="Add"
+  onSubmit={handleSubmit}
+/>`,
+      },
+    },
+  },
 };
-// @ts-expect-error args is good
+
 export const NewName: Story = {
   render: (args) => <Template {...args} />,
   args: {
@@ -398,7 +536,6 @@ export const NewName: Story = {
       { id: 3, label: "21222222222" },
     ],
     onSelectBreadCrumb: () => {},
-    // breadCrumbsLoader: <BreadCrumbsLoader />,
     breadCrumbsLoader: <div />,
     withoutBackButton: false,
     withSearch: false,
@@ -410,5 +547,28 @@ export const NewName: Story = {
     alwaysShowFooter: false,
     disableSubmitButton: false,
     descriptionText: "",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Selector with a footer input field for renaming files during the save/copy operation.",
+      },
+      source: {
+        code: `<Selector
+  headerLabel="Room list"
+  items={items}
+  withBreadCrumbs
+  breadCrumbs={breadCrumbs}
+  withFooterInput
+  footerInputHeader="File name"
+  footerCheckboxLabel="Open saved document in new tab"
+  currentFooterInputValue="OldFileName.docx"
+  onSelect={handleSelect}
+  submitButtonLabel="Add"
+  onSubmit={handleSubmit}
+/>`,
+      },
+    },
   },
 };

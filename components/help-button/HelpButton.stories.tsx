@@ -24,19 +24,52 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { HelpButton } from ".";
+
 import { Text } from "../text";
 
+import { HelpButton } from ".";
+
 const meta = {
-  title: "Components/Interactive elements/HelpButton",
+  title: "UI/Interactive elements/HelpButton",
   component: HelpButton,
   parameters: {
     docs: {
       description: {
-        component:
-          "HelpButton is a component that displays a help icon with a tooltip. It's commonly used to provide additional information or guidance to users.",
+        component: `HelpButton displays a help icon with a tooltip. Commonly used to provide additional information or guidance to users.
+
+### Features
+
+- **Tooltip Content**: Accepts any React node as tooltip content
+- **Positioning**: Configurable tooltip placement (top, right, bottom, left)
+- **Size and Color**: Customizable icon size and color
+- **Click Mode**: Option to show tooltip on click instead of hover
+- **Offset Control**: Fine-grained positioning with offset props
+
+### Usage
+
+\`\`\`tsx
+import { HelpButton } from "@docspace/ui-kit/components/help-button";
+
+// Basic help button
+<HelpButton tooltipContent={<div>Help text here</div>} />
+
+// With custom position and offset
+<HelpButton
+  tooltipContent={<div>Help text</div>}
+  place="top"
+  offset={12}
+/>
+
+// With custom size and color
+<HelpButton
+  tooltipContent={<div>Help text</div>}
+  size={24}
+  color="#2DA7DB"
+/>
+\`\`\``,
       },
     },
   },
@@ -46,35 +79,70 @@ const meta = {
       control: "text",
     },
     place: {
-      description: "Position of the tooltip relative to the button",
       control: "select",
       options: ["top", "right", "bottom", "left"],
+      description: "Position of the tooltip relative to the button",
+      table: {
+        defaultValue: { summary: "right" },
+      },
     },
     size: {
-      description: "Size of the help icon",
       control: { type: "number", min: 8, max: 48 },
+      description: "Size of the help icon",
+      table: {
+        defaultValue: { summary: "12" },
+      },
     },
     color: {
-      description: "Color of the help icon",
       control: "color",
+      description: "Color of the help icon",
     },
-    isClickable: {
-      description: "Whether the button is clickable",
-      control: "boolean",
+    offset: {
+      control: "number",
+      description: "Offset distance for the tooltip from the target element",
     },
     openOnClick: {
-      description: "Whether to open tooltip on click instead of hover",
       control: "boolean",
+      description: "Whether to open tooltip on click instead of hover",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isClickable: {
+      control: "boolean",
+      description: "Whether the button is clickable",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
-  tags: ["autodocs"],
 } satisfies Meta<typeof HelpButton>;
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof HelpButton>>;
 
-// Basic HelpButton with default settings
+export default meta;
+
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: "32px",
+        alignItems: "center",
+        padding: "40px 20px",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
 export const Default: Story = {
+  render: (args) => (
+    <div style={{ padding: "40px 20px" }}>
+      <HelpButton {...args} />
+    </div>
+  ),
   args: {
     tooltipContent: <div>This is a help tooltip</div>,
     place: "right",
@@ -82,62 +150,143 @@ export const Default: Story = {
   },
 };
 
-// HelpButton with custom size and color
+const CustomStyleTemplate = () => {
+  return (
+    <Wrapper>
+      <HelpButton
+        tooltipContent={<div>Default size</div>}
+        place="top"
+        offset={8}
+      />
+      <HelpButton
+        tooltipContent={<div>Large blue help button</div>}
+        size={24}
+        color="#2DA7DB"
+        place="top"
+        offset={12}
+      />
+      <HelpButton
+        tooltipContent={<div>Large green help button</div>}
+        size={20}
+        color="#4CAF50"
+        place="top"
+        offset={12}
+      />
+    </Wrapper>
+  );
+};
+
 export const CustomStyle: Story = {
-  args: {
-    tooltipContent: <div>Customized help button</div>,
-    size: 24,
-    color: "#2DA7DB",
-    place: "top",
-    offset: 12,
+  render: () => <CustomStyleTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Help buttons with custom sizes and colors. Hover over each to see the tooltip.",
+      },
+      source: {
+        code: `<HelpButton tooltipContent={<div>Default size</div>} place="top" />
+<HelpButton tooltipContent={<div>Large blue</div>} size={24} color="#2DA7DB" place="top" />
+<HelpButton tooltipContent={<div>Large green</div>} size={20} color="#4CAF50" place="top" />`,
+      },
+    },
   },
 };
 
-// HelpButton with formatted content containing multiple elements
+const WithCustomContentTemplate = () => {
+  return (
+    <div style={{ padding: "40px 20px" }}>
+      <HelpButton
+        tooltipContent={
+          <div style={{ padding: "8px" }}>
+            <Text fontSize="14px" fontWeight="bold">
+              Help Information
+            </Text>
+            <ul style={{ margin: "8px 0" }}>
+              <li>First instruction</li>
+              <li>Second instruction</li>
+              <li>Third instruction</li>
+            </ul>
+            <Text fontSize="12px" color="gray">
+              Click for more details
+            </Text>
+          </div>
+        }
+        place="right"
+        offset={8}
+      />
+    </div>
+  );
+};
+
 export const WithCustomContent: Story = {
-  args: {
-    tooltipContent: (
-      <div style={{ padding: "8px" }}>
-        <Text fontSize="14px" fontWeight="bold">
-          Help Information
-        </Text>
-        <ul style={{ margin: "8px 0" }}>
-          <li>First instruction</li>
-          <li>Second instruction</li>
-          <li>Third instruction</li>
-        </ul>
-        <Text fontSize="12px" color="gray">
-          Click for more details
-        </Text>
-      </div>
-    ),
-    place: "right",
-    offset: 8,
+  render: () => <WithCustomContentTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "HelpButton with rich tooltip content containing formatted text, lists, and styled elements.",
+      },
+      source: {
+        code: `<HelpButton
+  tooltipContent={
+    <div>
+      <Text fontWeight="bold">Help Information</Text>
+      <ul>
+        <li>First instruction</li>
+        <li>Second instruction</li>
+      </ul>
+    </div>
+  }
+  place="right"
+/>`,
+      },
+    },
   },
 };
 
+const TooltipPositionsTemplate = () => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: "48px",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "80px 40px",
+      }}
+    >
+      {(["top", "right", "bottom", "left"] as const).map((place) => (
+        <div
+          key={place}
+          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}
+        >
+          <HelpButton
+            tooltipContent={<div>Tooltip appears at {place}</div>}
+            place={place}
+            offset={8}
+          />
+          <span style={{ fontSize: "12px", color: "#666" }}>{place}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-// HelpButton with tooltip positioned at a specific location
-export const CustomTooltipPosition: Story = {
-  decorators: [
-    (Story) => (
-      <div
-        style={{
-          height: "400px",
-          padding: "40px 20px",
-          border: "1px dashed #ccc",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Story />
-      </div>
-    ),
-  ],
-  args: {
-    tooltipContent: <div>Tooltip appears at specified position</div>,
-    place: "top",
-    offset: 50,
+export const TooltipPositions: Story = {
+  render: () => <TooltipPositionsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "HelpButton with tooltips in all four positions: top, right, bottom, and left. Hover over each to see the placement.",
+      },
+      source: {
+        code: `<HelpButton tooltipContent={<div>Top</div>} place="top" />
+<HelpButton tooltipContent={<div>Right</div>} place="right" />
+<HelpButton tooltipContent={<div>Bottom</div>} place="bottom" />
+<HelpButton tooltipContent={<div>Left</div>} place="left" />`,
+      },
+    },
   },
 };

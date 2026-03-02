@@ -1,0 +1,232 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Getting started/Themes" />
+
+# Themes
+
+The UI Kit ships with Base (light) and Dark themes built on **styled-components**.
+`ThemeProvider` resolves the active theme, sets CSS custom properties, and exposes theme tokens to all child components.
+
+## Setting up ThemeProvider
+
+```tsx
+import { ThemeProvider } from "@docspace/ui-kit/providers/theme";
+import { ThemeKeys } from "@docspace/ui-kit/enums";
+
+<ThemeProvider initialTheme={ThemeKeys.BaseStr} locale="en">
+  <App />
+</ThemeProvider>
+```
+
+Or use the composite `Providers` component:
+
+```tsx
+import { Providers } from "@docspace/ui-kit/providers";
+
+<Providers
+  url="https://your-docspace.com/api"
+  apiKey="your-api-key"
+  initialTheme={ThemeKeys.DarkStr}
+  locale="en"
+>
+  <App />
+</Providers>
+```
+
+### Provider props
+
+- **`initialTheme`** (`ThemeKeys`) — starting theme: `BaseStr`, `DarkStr`, or `SystemStr`
+- **`systemTheme`** (`ThemeKeys`) — override detected OS preference
+- **`colorTheme`** (`CustomColorThemesSettingsDto`) — custom color palette; fetched from API if omitted
+- **`locale`** (`string`) — language code for RTL detection and font selection
+
+### ThemeKeys enum
+
+```ts
+import { ThemeKeys } from "@docspace/ui-kit/enums";
+
+ThemeKeys.BaseStr    // "Base" — light theme
+ThemeKeys.DarkStr    // "Dark" — dark theme
+ThemeKeys.SystemStr  // "System" — follow OS preference
+```
+
+## Theme resolution order
+
+The hook resolves the active theme in this order:
+
+1. `initialTheme` if explicitly set to `BaseStr` or `DarkStr`
+2. If `initialTheme` is `SystemStr`, detect via `window.matchMedia("(prefers-color-scheme: dark)")`
+3. `systemTheme` fallback
+4. Default to Base (light)
+
+When `SystemStr` is used, a `matchMedia` listener automatically switches the theme when the OS preference changes.
+
+## Using theme in styled-components
+
+Every styled component receives the full theme object via props:
+
+```tsx
+import styled from "styled-components";
+
+const StyledCard = styled.div`
+  background-color: ${(props) => props.theme.backgroundColor};
+  color: ${(props) => props.theme.text.color};
+  font-family: ${(props) => props.theme.fontFamily};
+`;
+```
+
+### Theme object structure
+
+The theme object contains 100+ nested categories for component-specific tokens:
+
+```ts
+{
+  isBase: true,                    // true for Base, false for Dark
+  interfaceDirection: "ltr",       // "ltr" or "rtl"
+  fontFamily: "Open Sans, ...",
+  color: "#333333",
+  backgroundColor: "#FFFFFF",
+
+  text: { color, disableColor, fontWeight, ... },
+  heading: { fontSize: { xlarge, large, medium, small }, ... },
+  button: { padding, color, backgroundColor, ... },
+  input: { color, borderColor, ... },
+  checkbox: { ... },
+  tabs: { ... },
+  tooltip: { ... },
+  contextMenu: { ... },
+  modal: { ... },
+  table: { ... },
+  // ... and many more
+}
+```
+
+## useTheme context hook
+
+Read the current theme state from any component:
+
+```tsx
+import { useTheme } from "@docspace/ui-kit/context/ThemeContext";
+
+function MyComponent() {
+  const { theme, isBase, currentColorScheme } = useTheme();
+
+  return <div>{isBase ? "Light mode" : "Dark mode"}</div>;
+}
+```
+
+- **`theme`** (`"Base" | "Dark"`) — current theme name
+- **`isBase`** (`boolean`) — `true` if light theme is active
+- **`currentColorScheme`** (`CustomColorThemesSettingsItem`) — active color scheme (accent colors)
+
+## Custom color themes
+
+Custom color themes override the accent colors used across the UI.
+
+### Type
+
+```ts
+type CustomColorThemesSettingsDto = {
+  selected: string;  // ID of the active color theme
+  themes?: CustomColorThemesSettingsItem[];
+};
+
+type CustomColorThemesSettingsItem = {
+  id: string;
+  name?: string;
+  main?: { accent?: string; buttons?: string };
+  text?: { accent?: string; buttons?: string };
+};
+```
+
+### Passing a custom color theme
+
+```tsx
+const colorTheme = {
+  selected: "1",
+  themes: [
+    {
+      id: "1",
+      name: "Brand",
+      main: { accent: "#4781D1", buttons: "#5299E0" },
+      text: { accent: "#FFFFFF", buttons: "#FFFFFF" },
+    },
+  ],
+};
+
+<ThemeProvider initialTheme={ThemeKeys.BaseStr} colorTheme={colorTheme}>
+  <App />
+</ThemeProvider>
+```
+
+These colors are set as CSS custom properties on the document:
+
+```
+--color-scheme-main-accent
+--color-scheme-text-accent
+--color-scheme-main-buttons
+--color-scheme-text-buttons
+```
+
+If `colorTheme` is not provided, it is fetched automatically from the DocSpace API.
+
+## DOM attributes
+
+`ThemeProvider` sets the following attributes on the document:
+
+- `<html data-theme="light|dark">`
+- `<html data-dir="ltr|rtl">`
+- `<body class="light|dark ltr|rtl">`
+
+CSS custom properties set on `<html>`:
+
+```
+--interface-direction: "ltr" | "rtl"
+--font-family: "Open Sans, sans-serif, Arial"
+```
+
+## RTL support
+
+RTL is detected automatically from the `locale` prop. Arabic, Hebrew, Urdu, Persian, and other RTL languages flip the interface direction.
+
+```ts
+import {
+  isLanguageRtl,
+  getDirectionByLanguage,
+  getCorrectTextAlign,
+  getCorrectBorderRadius,
+} from "@docspace/ui-kit/providers/theme";
+
+isLanguageRtl("ar");           // true
+getDirectionByLanguage("en");  // "ltr"
+getDirectionByLanguage("he");  // "rtl"
+```
+
+Helper functions for styled-components:
+
+```ts
+// Flip text-align for RTL
+getCorrectTextAlign("left", "rtl");  // "right"
+
+// Flip border-radius for RTL
+getCorrectBorderRadius("4px 0 0 4px", "rtl");  // "0 4px 4px 0"
+
+// Flip four-value styles (margin, padding)
+getCorrectFourValuesStyle("0 8px 0 0", "rtl");  // "0 0 0 8px"
+```
+
+## Global color tokens
+
+Available in `@docspace/ui-kit/providers/theme`:
+
+```ts
+import { globalColors } from "@docspace/ui-kit/providers/theme";
+
+globalColors.white           // "#ffffff"
+globalColors.black           // "#333333"
+globalColors.lightBlueMain   // "#4781D1"
+globalColors.mainGreen       // "#2DB482"
+globalColors.mainRed         // "#F2675A"
+globalColors.mainOrange      // "#F97A0B"
+globalColors.grayLight       // "#F8F9F9"
+```

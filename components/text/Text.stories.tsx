@@ -24,250 +24,445 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
 
-import { globalColors } from "../../providers/theme";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Text } from ".";
 
-const meta: Meta<typeof Text> = {
-	title: "Components/UI/Text",
-	component: Text,
-	parameters: {
-		docs: {
-			description: {
-				component:
-					"Component that displays plain text with various styling options.",
-			},
-		},
-	},
-	argTypes: {
-		as: {
-			control: "select",
-			options: ["p", "span", "div", "h1", "h2", "h3", "h4", "h5", "h6"],
-			description: "HTML element to render",
-		},
-		textAlign: {
-			control: "select",
-			options: ["left", "center", "right", "justify"],
-			description: "Text alignment",
-		},
-		dir: {
-			control: "select",
-			options: ["ltr", "rtl", "auto"],
-			description: "Text direction",
-		},
-		color: { control: "color" },
-		backgroundColor: { control: "color" },
-		fontSize: { control: "text" },
-		fontWeight: { control: "text" },
-		lineHeight: { control: "text" },
-		isBold: { control: "boolean" },
-		isItalic: { control: "boolean" },
-		isInline: { control: "boolean" },
-		truncate: { control: "boolean" },
-		noSelect: { control: "boolean" },
-	},
-	args: {
-		as: "p",
-		fontSize: "13px",
-		fontWeight: "400",
-	},
-};
+const meta = {
+  title: "UI/Data display/Text",
+  component: Text,
+  parameters: {
+    docs: {
+      description: {
+        component: `Component that displays plain text with various styling options.
+
+### Features
+
+- **Multiple HTML Tags**: Render as p, span, div, or heading elements via the \`as\` prop
+- **Typography Control**: Customize fontSize, fontWeight, lineHeight, and color
+- **Text Styles**: Support for bold, italic, inline, and truncated text
+- **Text Direction**: LTR, RTL, and auto direction support
+- **Alignment**: Left, center, right, and justify alignment
+- **Selection Control**: Disable text selection with \`noSelect\`
+- **Tooltip Support**: Built-in tooltip via the \`withTooltip\` HOC
+
+### Usage
+
+\`\`\`tsx
+import { Text } from "@docspace/ui-kit/components/text";
+
+// Basic text
+<Text>Hello world</Text>
+
+// Bold heading text
+<Text as="h2" fontSize="24px" isBold>Section Title</Text>
+
+// Truncated text
+<Text truncate>Very long text that will be truncated...</Text>
+
+// RTL text
+<Text dir="rtl">مرحبا بالعالم</Text>
+\`\`\``,
+      },
+    },
+  },
+  argTypes: {
+    as: {
+      control: "select",
+      options: ["p", "span", "div", "h1", "h2", "h3", "h4", "h5", "h6"],
+      description: "HTML element to render",
+      table: {
+        defaultValue: { summary: "p" },
+      },
+    },
+    fontSize: {
+      control: "text",
+      description: "Sets the font size",
+    },
+    fontWeight: {
+      control: "text",
+      description: "Sets the font weight",
+    },
+    color: {
+      control: "color",
+      description: "Text color",
+    },
+    backgroundColor: {
+      control: "color",
+      description: "Background color",
+    },
+    textAlign: {
+      control: "select",
+      options: ["left", "center", "right", "justify"],
+      description: "Text alignment",
+      table: {
+        defaultValue: { summary: "left" },
+      },
+    },
+    lineHeight: {
+      control: "text",
+      description: "Line height",
+    },
+    dir: {
+      control: "select",
+      options: ["ltr", "rtl", "auto"],
+      description: "Text direction",
+      table: {
+        defaultValue: { summary: "ltr" },
+      },
+    },
+    isBold: {
+      control: "boolean",
+      description: "Sets font weight to bold (700)",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isItalic: {
+      control: "boolean",
+      description: "Sets font style to italic",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isInline: {
+      control: "boolean",
+      description: "Sets display to inline-block",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    truncate: {
+      control: "boolean",
+      description: "Truncates overflowing text with ellipsis",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    noSelect: {
+      control: "boolean",
+      description: "Disables text selection",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    title: {
+      control: "text",
+      description: "Title attribute for native hover tooltip",
+    },
+  },
+} satisfies Meta<typeof Text>;
+
+type Story = StoryObj<ComponentProps<typeof Text>>;
 
 export default meta;
 
-type Story = StoryObj<typeof Text>;
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
 
 export const Default: Story = {
-	args: {
-		children: "Sample text content",
-	},
+  render: (args) => <Text {...args} />,
+  args: {
+    children: "Sample text content",
+    as: "p",
+    fontSize: "13px",
+  },
 };
 
-export const Heading: Story = {
-	args: {
-		children: "Heading Text",
-		as: "h1",
-		fontSize: "24px",
-		fontWeight: "700",
-	},
+const FontSizesTemplate = () => {
+  return (
+    <Wrapper>
+      <Text fontSize="10px">10px - Extra small text</Text>
+      <Text fontSize="12px">12px - Small text</Text>
+      <Text fontSize="13px">13px - Default text</Text>
+      <Text fontSize="14px">14px - Medium text</Text>
+      <Text fontSize="16px">16px - Large text</Text>
+      <Text fontSize="18px">18px - Extra large text</Text>
+      <Text fontSize="24px">24px - Display text</Text>
+    </Wrapper>
+  );
 };
 
-export const Inline: Story = {
-	render: (args) => (
-		<>
-			<Text {...args}>First inline text</Text>{" "}
-			<Text {...args}>Second inline text</Text>
-		</>
-	),
-	args: {
-		isInline: true,
-	},
+const FontWeightsTemplate = () => {
+  return (
+    <Wrapper>
+      <Text fontWeight="300">Light (300)</Text>
+      <Text fontWeight="400">Regular (400)</Text>
+      <Text fontWeight="500">Medium (500)</Text>
+      <Text fontWeight="600">Semibold (600)</Text>
+      <Text fontWeight="700">Bold (700)</Text>
+    </Wrapper>
+  );
 };
 
-export const Styled: Story = {
-	args: {
-		children: "Styled text with custom properties",
-		fontSize: "16px",
-		fontWeight: "600",
-		color: globalColors.white,
-		backgroundColor: globalColors.black,
-		textAlign: "center",
-		isBold: true,
-		isItalic: true,
-		lineHeight: "1.5",
-	},
+const TextStylesTemplate = () => {
+  return (
+    <Wrapper>
+      <Text>Regular text</Text>
+      <Text isBold>Bold text</Text>
+      <Text isItalic>Italic text</Text>
+      <Text isBold isItalic>
+        Bold and italic text
+      </Text>
+    </Wrapper>
+  );
 };
 
-export const Interactive: Story = {
-	args: {
-		children: "Click me!",
-		isInline: true,
-		color: globalColors.lightBlueMain,
-		onClick: () => alert("Text clicked!"),
-		style: { cursor: "pointer" },
-	},
+const TextAlignmentTemplate = () => {
+  return (
+    <Wrapper>
+      <Text textAlign="left">Left aligned text</Text>
+      <Text textAlign="center">Center aligned text</Text>
+      <Text textAlign="right">Right aligned text</Text>
+      <Text textAlign="justify">
+        Justified text that spans multiple lines to demonstrate the justify
+        alignment behavior in longer paragraphs of content.
+      </Text>
+    </Wrapper>
+  );
 };
 
-export const NoSelect: Story = {
-	args: {
-		children: "This text cannot be selected",
-		noSelect: true,
-		color: globalColors.gray,
-	},
+const InlineTemplate = () => {
+  return (
+    <div>
+      <Text isInline>First inline text</Text>{" "}
+      <Text isInline>Second inline text</Text>{" "}
+      <Text isInline isBold>
+        Third bold inline text
+      </Text>
+    </div>
+  );
 };
 
-export const Truncated: Story = {
-	render: (args) => (
-		<div style={{ width: 200 }}>
-			<Text {...args} />
-		</div>
-	),
-	args: {
-		children:
-			"This is a very long text that will be truncated when it exceeds the container width",
-		truncate: true,
-	},
+const TruncatedTemplate = () => {
+  return (
+    <div style={{ width: 200 }}>
+      <Text truncate>
+        This is a very long text that will be truncated when it exceeds the
+        container width
+      </Text>
+    </div>
+  );
 };
 
-export const Bold: Story = {
-	args: {
-		children: "Bold text example",
-		isBold: true,
-	},
+const HeadingElementsTemplate = () => {
+  return (
+    <Wrapper>
+      <Text as="h1" fontSize="32px" fontWeight="700">
+        Heading 1
+      </Text>
+      <Text as="h2" fontSize="28px" fontWeight="700">
+        Heading 2
+      </Text>
+      <Text as="h3" fontSize="24px" fontWeight="600">
+        Heading 3
+      </Text>
+      <Text as="h4" fontSize="20px" fontWeight="600">
+        Heading 4
+      </Text>
+      <Text as="h5" fontSize="16px" fontWeight="600">
+        Heading 5
+      </Text>
+      <Text as="h6" fontSize="14px" fontWeight="600">
+        Heading 6
+      </Text>
+    </Wrapper>
+  );
 };
 
-export const Italic: Story = {
-	args: {
-		children: "Italic text example",
-		isItalic: true,
-	},
+const DirectionTemplate = () => {
+  return (
+    <Wrapper>
+      <Text dir="ltr">English text (LTR)</Text>
+      <Text dir="rtl" textAlign="right">
+        مرحبا بالعالم - Hello World (RTL)
+      </Text>
+      <Text dir="auto">English text with auto direction</Text>
+      <Text dir="auto">نص عربي مع اتجاه تلقائي</Text>
+    </Wrapper>
+  );
 };
 
-export const BoldItalic: Story = {
-	args: {
-		children: "Bold and italic text",
-		isBold: true,
-		isItalic: true,
-	},
-};
-
-export const AllHeadings: Story = {
-	render: () => (
-		<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-			<Text as="h1" fontSize="32px" fontWeight="700">
-				Heading 1
-			</Text>
-			<Text as="h2" fontSize="28px" fontWeight="700">
-				Heading 2
-			</Text>
-			<Text as="h3" fontSize="24px" fontWeight="600">
-				Heading 3
-			</Text>
-			<Text as="h4" fontSize="20px" fontWeight="600">
-				Heading 4
-			</Text>
-			<Text as="h5" fontSize="16px" fontWeight="600">
-				Heading 5
-			</Text>
-			<Text as="h6" fontSize="14px" fontWeight="600">
-				Heading 6
-			</Text>
-		</div>
-	),
-};
-
-export const TextAlignment: Story = {
-	render: (args) => (
-		<div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-			<Text {...args} textAlign="left">
-				Left aligned text
-			</Text>
-			<Text {...args} textAlign="center">
-				Center aligned text
-			</Text>
-			<Text {...args} textAlign="right">
-				Right aligned text
-			</Text>
-			<Text {...args} textAlign="justify">
-				Justified text that spans multiple lines to demonstrate the justify
-				alignment behavior in longer paragraphs of content.
-			</Text>
-		</div>
-	),
-};
-
-export const RTLDirection: Story = {
-	args: {
-		children: "مرحبا بالعالم - Hello World",
-		dir: "rtl",
-		textAlign: "right",
-	},
-};
-
-export const AutoDirection: Story = {
-	render: (args) => (
-		<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-			<Text {...args} dir="auto">
-				English text with auto direction
-			</Text>
-			<Text {...args} dir="auto">
-				نص عربي مع اتجاه تلقائي
-			</Text>
-		</div>
-	),
+const NoSelectTemplate = () => {
+  return (
+    <Wrapper>
+      <Text>This text can be selected</Text>
+      <Text noSelect>This text cannot be selected</Text>
+    </Wrapper>
+  );
 };
 
 export const FontSizes: Story = {
-	render: () => (
-		<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-			<Text fontSize="10px">10px - Extra small text</Text>
-			<Text fontSize="12px">12px - Small text</Text>
-			<Text fontSize="13px">13px - Default text</Text>
-			<Text fontSize="14px">14px - Medium text</Text>
-			<Text fontSize="16px">16px - Large text</Text>
-			<Text fontSize="18px">18px - Extra large text</Text>
-			<Text fontSize="24px">24px - Display text</Text>
-		</div>
-	),
+  render: () => <FontSizesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: "Text rendered at various font sizes from 10px to 24px.",
+      },
+      source: {
+        code: `<Text fontSize="10px">10px - Extra small text</Text>
+<Text fontSize="12px">12px - Small text</Text>
+<Text fontSize="13px">13px - Default text</Text>
+<Text fontSize="14px">14px - Medium text</Text>
+<Text fontSize="16px">16px - Large text</Text>
+<Text fontSize="18px">18px - Extra large text</Text>
+<Text fontSize="24px">24px - Display text</Text>`,
+      },
+    },
+  },
 };
 
 export const FontWeights: Story = {
-	render: () => (
-		<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-			<Text fontWeight="300">Light (300)</Text>
-			<Text fontWeight="400">Regular (400)</Text>
-			<Text fontWeight="500">Medium (500)</Text>
-			<Text fontWeight="600">Semibold (600)</Text>
-			<Text fontWeight="700">Bold (700)</Text>
-		</div>
-	),
+  render: () => <FontWeightsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Text rendered at various font weights from light (300) to bold (700).",
+      },
+      source: {
+        code: `<Text fontWeight="300">Light (300)</Text>
+<Text fontWeight="400">Regular (400)</Text>
+<Text fontWeight="500">Medium (500)</Text>
+<Text fontWeight="600">Semibold (600)</Text>
+<Text fontWeight="700">Bold (700)</Text>`,
+      },
+    },
+  },
 };
 
-export const WithTitle: Story = {
-	args: {
-		children: "Hover over this text to see the tooltip",
-		title: "This is a tooltip that appears on hover",
-	},
+export const TextStyles: Story = {
+  render: () => <TextStylesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Text with bold, italic, and combined bold+italic styling via boolean props.",
+      },
+      source: {
+        code: `<Text>Regular text</Text>
+<Text isBold>Bold text</Text>
+<Text isItalic>Italic text</Text>
+<Text isBold isItalic>Bold and italic text</Text>`,
+      },
+    },
+  },
+};
+
+export const TextAlignment: Story = {
+  render: () => <TextAlignmentTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Text with different alignment options: left, center, right, and justify.",
+      },
+      source: {
+        code: `<Text textAlign="left">Left aligned text</Text>
+<Text textAlign="center">Center aligned text</Text>
+<Text textAlign="right">Right aligned text</Text>
+<Text textAlign="justify">Justified text...</Text>`,
+      },
+    },
+  },
+};
+
+export const InlineText: Story = {
+  render: () => <InlineTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Inline text elements rendered side by side using the isInline prop.",
+      },
+      source: {
+        code: `<Text isInline>First inline text</Text>
+<Text isInline>Second inline text</Text>
+<Text isInline isBold>Third bold inline text</Text>`,
+      },
+    },
+  },
+};
+
+export const TruncatedText: Story = {
+  render: () => <TruncatedTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Text that truncates with an ellipsis when it exceeds the container width.",
+      },
+      source: {
+        code: `<div style={{ width: 200 }}>
+  <Text truncate>This is a very long text that will be truncated...</Text>
+</div>`,
+      },
+    },
+  },
+};
+
+export const HeadingElements: Story = {
+  render: () => <HeadingElementsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Text rendered as heading elements (h1-h6) using the as prop with appropriate sizes.",
+      },
+      source: {
+        code: `<Text as="h1" fontSize="32px" fontWeight="700">Heading 1</Text>
+<Text as="h2" fontSize="28px" fontWeight="700">Heading 2</Text>
+<Text as="h3" fontSize="24px" fontWeight="600">Heading 3</Text>
+<Text as="h4" fontSize="20px" fontWeight="600">Heading 4</Text>
+<Text as="h5" fontSize="16px" fontWeight="600">Heading 5</Text>
+<Text as="h6" fontSize="14px" fontWeight="600">Heading 6</Text>`,
+      },
+    },
+  },
+};
+
+export const Direction: Story = {
+  render: () => <DirectionTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Text direction support for LTR, RTL, and auto-detected direction.",
+      },
+      source: {
+        code: `<Text dir="ltr">English text (LTR)</Text>
+<Text dir="rtl" textAlign="right">مرحبا بالعالم (RTL)</Text>
+<Text dir="auto">Auto-detected direction</Text>`,
+      },
+    },
+  },
+};
+
+export const NoSelectText: Story = {
+  render: () => <NoSelectTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Text with selection disabled via the noSelect prop. Try selecting the second line.",
+      },
+      source: {
+        code: `<Text>This text can be selected</Text>
+<Text noSelect>This text cannot be selected</Text>`,
+      },
+    },
+  },
 };

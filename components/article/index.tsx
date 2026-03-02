@@ -39,6 +39,7 @@ import SubArticleHeader from "./sub-components/Header";
 import ArticleProfile from "./sub-components/Profile";
 import ArticleLiveChat from "./sub-components/LiveChat";
 import ArticleApps from "./sub-components/Apps";
+import ArticleCustomSlot from "./sub-components/CustomSlot";
 import ArticleDevToolsBar from "./sub-components/DevToolsBar";
 import HideArticleMenuButton from "./sub-components/HideMenuButton";
 import BackButton from "./sub-components/BackButton";
@@ -124,6 +125,7 @@ const Article = ({
   officeforiosUrl,
   showBackButton,
   navigate,
+  customSlot,
 }: ArticleProps) => {
   const [articleHeaderContent, setArticleHeaderContent] =
     React.useState<null | React.JSX.Element>(null);
@@ -291,11 +293,25 @@ const Article = ({
               navigate={navigate}
             />
           ) : null}
-          {articleBodyContent ? articleBodyContent.props.children : null}
+          {articleBodyContent
+            ? React.cloneElement(articleBodyContent.props.children, {
+                hasCustomSlot: !!customSlot,
+              })
+            : null}
           {!showArticleLoader ? (
             <>
+              {customSlot ? (
+                <ArticleCustomSlot 
+                  withDevTools={!hideDevTools}
+                  showBackButton={showBackButton}
+                  showText={showText}
+                >
+                  {customSlot}
+                </ArticleCustomSlot>
+              ) : null}
               {!hideDevTools ? (
                 <ArticleDevToolsBar
+                  withCustomSlot={!!customSlot}
                   articleOpen={articleOpen}
                   currentDeviceType={currentDeviceType}
                   toggleArticleOpen={toggleArticleOpen}
@@ -307,6 +323,7 @@ const Article = ({
               {!hideAppsBlock ? (
                 <ArticleApps
                   withDevTools={!hideDevTools}
+                  withCustomSlot={!!customSlot}
                   showText={showText}
                   logoText={logoText}
                   downloaddesktopUrl={downloaddesktopUrl}
@@ -337,6 +354,7 @@ const Article = ({
             showText={showText}
             toggleShowText={toggleShowText}
             hideProfileBlock={hideProfileBlock}
+            withCustomSlot={!!customSlot}
           />
         ) : null}
 

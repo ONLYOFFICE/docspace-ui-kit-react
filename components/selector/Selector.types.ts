@@ -542,6 +542,8 @@ export type TSelectorItemUser = MergeTypes<
   }
 >;
 
+export type TSvgComponent = React.FC<React.SVGProps<SVGSVGElement>>;
+
 export type TSelectorItemFile = MergeTypes<
   TSelectorItemEmpty,
   {
@@ -550,7 +552,7 @@ export type TSelectorItemFile = MergeTypes<
     parentId: string | number;
     rootFolderType: string | number;
     security: FileEntryDtoIntegerAllOfSecurity;
-    icon: string;
+    icon: TSvgComponent | string;
   }
 >;
 
@@ -563,7 +565,7 @@ export type TSelectorItemFolder = MergeTypes<
     filesCount: number;
     foldersCount: number;
     security: FileEntryDtoIntegerAllOfSecurity;
-    icon?: string;
+    icon?: TSvgComponent | string;
     avatar?: string | React.ReactElement;
   }
 >;

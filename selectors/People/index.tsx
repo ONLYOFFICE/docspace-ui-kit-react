@@ -72,6 +72,7 @@ const GUESTS_TAB_ID = "2";
 
 const toListItem = (
   item: EmployeeFullDto | GroupDto,
+  baseUrl: string,
   disableDisabledUsers?: boolean,
   disableInvitedUsers?: string[],
   isRoom?: boolean,
@@ -105,7 +106,11 @@ const toListItem = (
       ? DefaultUserPhoto.src
       : DefaultUserPhoto;
 
-    const userAvatar = hasAvatar && avatar ? avatar : defaultUserPhotoURL;
+    const avatarPath = hasAvatar && avatar ? avatar : defaultUserPhotoURL;
+    const userAvatar =
+      typeof avatarPath === "string" && avatarPath.startsWith("/")
+        ? `${baseUrl}${avatarPath}`
+        : avatarPath;
 
     const isInvited = checkIfUserInvited
       ? checkIfUserInvited(item)
@@ -242,7 +247,7 @@ const PeopleSelector = ({
   disabledInvitedText,
   isAgent,
 }: PeopleSelectorProps) => {
-  const { peopleSearchApi, groupSearchApi } = useApi();
+  const { peopleSearchApi, groupSearchApi, baseUrl } = useApi();
   const { isBase } = useTheme();
 
   const [activeTabId, setActiveTabId] = useState<string>(
@@ -441,6 +446,7 @@ const PeopleSelector = ({
           .map((item) =>
             toListItem(
               item,
+              baseUrl,
               disableDisabledUsers,
               disableInvitedUsers,
               !!roomId,
