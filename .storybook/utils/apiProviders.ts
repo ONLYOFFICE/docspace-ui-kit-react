@@ -26,25 +26,48 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-/// <reference types="vite/client" />
-
-export const DEFAULT_API_URL = import.meta.env.VITE_PROVIDER_API_URL || "";
-export const DEFAULT_API_KEY = import.meta.env.VITE_PROVIDER_API_KEY || "";
-
-const globalTypes = {
-  direction: {
-    name: "Direction",
-    description: "UI direction (LTR/RTL)",
-    defaultValue: "ltr",
-    toolbar: {
-      icon: "transfer" as const,
-      items: [
-        { value: "ltr", title: "LTR" },
-        { value: "rtl", title: "RTL" },
-      ],
-      dynamicTitle: true,
-    },
-  },
+export type SavedApiProvider = {
+  id: string;
+  name: string;
+  url: string;
+  apiKey: string;
 };
 
-export default globalTypes;
+export const STORAGE_KEY = "sb-saved-api-providers";
+
+export const LAST_API_CONFIG_KEY = "sb-last-api-config";
+
+export const getSavedProviders = (): SavedApiProvider[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+export const saveProvider = (provider: SavedApiProvider): void => {
+  const providers = getSavedProviders();
+  const existingIndex = providers.findIndex((p) => p.id === provider.id);
+
+  if (existingIndex >= 0) {
+    providers[existingIndex] = provider;
+  } else {
+    providers.push(provider);
+  }
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(providers));
+};
+
+export const deleteProvider = (id: string): void => {
+  const providers = getSavedProviders().filter((p) => p.id !== id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(providers));
+};
+
+export const getProviderById = (id: string): SavedApiProvider | undefined => {
+  return getSavedProviders().find((p) => p.id === id);
+};
+
+export const generateProviderId = (): string => {
+  return `provider-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};

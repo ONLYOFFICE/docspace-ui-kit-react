@@ -40,7 +40,8 @@
     "utils/**/*",
     "styles/**/*",
     "providers/**/*",
-    "selectors/**/*"
+    "selectors/**/*",
+    "document-editor"
   ],
   "exclude": [
     "node_modules",

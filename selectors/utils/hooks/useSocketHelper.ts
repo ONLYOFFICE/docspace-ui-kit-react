@@ -126,7 +126,9 @@ const useSocketHelper = ({
       if (
         "folderId" in data && data.folderId
           ? data.folderId !== subscribedId.current
-          : "parentId" in data && data.parentId !== subscribedId.current
+          : "parentId" in data &&
+            !("roomType" in data) &&
+            data.parentId !== subscribedId.current
       ) {
         return;
       }
