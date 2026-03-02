@@ -18,10 +18,10 @@ function collectUsedKeys() {
   const keys = new Set();
 
   const patterns = [
-    // getCommonTranslation("Key") or getCommonTranslation('Key')
-    /getCommonTranslation\(["']([^"']+)["']/g,
-    // t("Common:Key") or translate("Common:Key")
-    /(?:translate|\.t)\(["']Common:([^"']+)["']/g,
+    // getCommonTranslation("Key") or getCommonTranslation('Key'), possibly multiline
+    /getCommonTranslation\(\s*["']([^"']+)["']/g,
+    // t("Common:Key") or translate("Common:Key"), possibly multiline
+    /(?:translate|\.t)\(\s*["']Common:([^"']+)["']/g,
   ];
 
   function scan(dir) {
