@@ -97,6 +97,7 @@ export type ChatHeaderProps = SelectModelProps &
   Omit<SelectChatProps, "isLoadingProp"> & {
     aiReady: boolean;
     allowSelectChat?: boolean;
+    onNewChat?: () => void;
   };
 
 export type MessageProps = {
@@ -285,6 +286,7 @@ export type ChatProps = {
   onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
   onStopStream?: () => void;
   onStreamData?: (chunk: string) => void;
+  onNewChat?: () => void;
 }
 
 export type ChatCoreProps = ChatProps & {

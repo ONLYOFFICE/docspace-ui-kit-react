@@ -44,9 +44,11 @@ import { getCommonTranslation } from "../../../../../../utils";
 const CreateChat = ({
   isLoadingProp,
   isDisabled,
+  onNewChat,
 }: {
   isLoadingProp?: boolean;
   isDisabled?: boolean;
+  onNewChat?: () => void;
 }) => {
   const { messages, isRequestRunning, startNewChat } = useMessageStore();
   const { setCurrentChat } = useChatStore();
@@ -68,6 +70,7 @@ const CreateChat = ({
 
     setCurrentChat(null);
     startNewChat();
+    onNewChat?.();
   };
 
   return (

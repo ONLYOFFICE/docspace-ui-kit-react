@@ -45,6 +45,7 @@ const ChatHeader = ({
   folderFormValidation,
   allowExternalNavigation,
   allowSelectChat,
+  onNewChat,
 }: ChatHeaderProps) => {
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +65,7 @@ const ChatHeader = ({
           allowExternalNavigation={allowExternalNavigation}
         />
       )}
-      <CreateChat isLoadingProp={isLoading} isDisabled={!aiReady} />
+      <CreateChat isLoadingProp={isLoading} isDisabled={!aiReady} onNewChat={onNewChat} />
       <SelectModel selectedModel={selectedModel} isLoading={isLoading} />
     </div>
   );

@@ -81,6 +81,7 @@ const ChatUI = observer(
     allowSelectChat,
     onSendMessage,
     onStopStream,
+    onNewChat,
   }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
 
@@ -108,6 +109,7 @@ const ChatUI = observer(
           folderFormValidation={folderFormValidation}
           allowExternalNavigation={allowExternalNavigation}
           allowSelectChat={allowSelectChat}
+          onNewChat={onNewChat}
         />
         {showEmptyScreen ? (
           <ChatNoAccessScreen

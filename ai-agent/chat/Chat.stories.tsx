@@ -75,6 +75,7 @@ const defaultProps: ChatProps = {
   onSendMessage: fn(),
   onStopStream: fn(),
   onStreamData: fn(),
+  onNewChat: fn(),
 };
 
 export const Default: Story = {
