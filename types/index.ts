@@ -51,7 +51,10 @@ import type {
 } from "../enums";
 import type { TooltipRefProps } from "react-tooltip";
 
-export type TGetIcon = (size: number, fileExst: string) => string;
+export type TGetIcon = (
+  size: number,
+  fileExst: string,
+) => React.FC<React.SVGProps<SVGSVGElement>> | null | string;
 
 export type TDirectionX = "left" | "right";
 export type TDirectionY = "bottom" | "top" | "both";

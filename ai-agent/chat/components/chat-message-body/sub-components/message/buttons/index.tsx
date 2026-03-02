@@ -27,7 +27,6 @@
  */
 
 import React from "react";
-import { ReactSVG } from "react-svg";
 import copy from "copy-to-clipboard";
 import { observer } from "mobx-react";
 

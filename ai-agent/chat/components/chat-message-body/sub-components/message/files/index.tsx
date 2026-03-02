@@ -58,10 +58,25 @@ const Files = ({ files, getIcon, reverse, allowExternalNavigation }: MessageFile
             onClick={() => openFile(file.id.toString(), allowExternalNavigation)}
             data-testid="file-item"
           >
-            <ReactSVG
-              src={getIcon(24, file.extension!)}
-              className={styles.filesListItemIcon}
-            />
+            {(() => {
+              const icon = getIcon(24, file.extension!);
+              if (typeof icon === "string")
+                return (
+                  <ReactSVG
+                    src={icon}
+                    className={styles.filesListItemIcon}
+                  />
+                );
+              if (icon) {
+                const Icon = icon;
+                return (
+                  <div className={styles.filesListItemIcon}>
+                    <Icon />
+                  </div>
+                );
+              }
+              return null;
+            })()}
 
             <div className={styles.filesListItemInfo}>
               <div className={styles.filesListItemInfoText}>

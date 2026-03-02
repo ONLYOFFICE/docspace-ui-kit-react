@@ -28,7 +28,6 @@
 
 import type React from "react";
 import classNames from "classnames";
-import { ReactSVG } from "react-svg";
 import { observer } from "mobx-react";
 
 import ToolFinishIcon from "../../../../../../../../assets/tool.finish.svg";

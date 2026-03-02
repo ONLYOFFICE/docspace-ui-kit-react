@@ -245,7 +245,7 @@ export type ChatProps = {
   agentId: TChatStoreProps["agentId"];
   userAvatar: MessageBodyProps["userAvatar"];
   selectedModel: string;
-  getIcon: ChatInputProps["getIcon"];
+  getIcon?: ChatInputProps["getIcon"];
   getResultStorageId: () => number | null;
   isLoading?: boolean;
   aiReady: boolean;
@@ -281,6 +281,7 @@ export type ChatProps = {
 }
 
 export type ChatCoreProps = ChatProps & {
+  getIcon: TGetIcon;
   isLoadingChat: boolean;
   initChats: NonNullable<ChatProps["initChats"]>;
   messagesSettings: NonNullable<ChatProps["messagesSettings"]>;

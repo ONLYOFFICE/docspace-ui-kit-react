@@ -49,6 +49,7 @@ import useInitMessages from "./hooks/useInitMessages";
 import useToolsSettings from "./hooks/useToolsSettings";
 import useAiConfig from "./hooks/useAiConfig";
 import useChatSettings from "./hooks/useChatSettings";
+import useGetIcon from "./hooks/useGetIcon";
 
 export { CHAT_SUPPORTED_FORMATS };
 
@@ -224,6 +225,7 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
     agentId,
     multimodal,
     isLoading,
+    getIcon: getIconProp,
   } = props;
 
   const { aiConfig, fetchAiConfig } = useAiConfig();
@@ -238,6 +240,7 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
     aiConfig,
     chatSettings,
   });
+  const { getIcon, isLoading: isLoadingGetIcon } = useGetIcon(getIconProp);
 
   const [isInitialized, setIsInitialized] = React.useState(false);
 
@@ -270,11 +273,12 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
   return (
     <ChatCore
       {...props}
+      getIcon={getIcon}
       initChats={initChats}
       messagesSettings={messagesSettings}
       toolsSettings={toolsSettings}
       multimodal={multimodal}
-      isLoadingChat={isLoading || !isInitialized}
+      isLoadingChat={isLoading || !isInitialized || isLoadingGetIcon}
       aiReady={!!aiConfig?.aiReady}
       selectedModel={chatSettings?.modelId ?? ""}
     />
@@ -282,10 +286,11 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
 };
 
 const ChatExternalInit = (props: ChatExternalInitProps) => {
-  const { isLoading, agentId } = props;
-  const isLoadingChat = isLoading || !agentId;
+  const { isLoading, agentId, getIcon: getIconProp } = props;
+  const { getIcon, isLoading: isLoadingGetIcon } = useGetIcon(getIconProp);
+  const isLoadingChat = isLoading || !agentId || isLoadingGetIcon;
 
-  return <ChatCore {...props} isLoadingChat={isLoadingChat} />;
+  return <ChatCore {...props} getIcon={getIcon} isLoadingChat={isLoadingChat} />;
 };
 
 const Chat = (props: ChatProps) => {

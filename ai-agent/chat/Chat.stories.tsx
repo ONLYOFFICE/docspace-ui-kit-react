@@ -60,7 +60,6 @@ const defaultProps: ChatProps = {
   agentId: 229754,
   userAvatar: "",
   selectedModel: "gpt-4o",
-  getIcon: () => "",
   getResultStorageId: () => null,
   aiReady: true,
   attachmentFile: null,
