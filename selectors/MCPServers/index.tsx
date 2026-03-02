@@ -205,6 +205,10 @@ const MCPServersSelector = ({
     onBackClick();
   };
 
+  const withAsideProps: TSelectorWithAside = useAside
+    ? { useAside, onClose, withBlur, withoutBackground }
+    : {};
+
   React.useEffect(() => {
     fetchServers();
   }, [fetchServers]);
@@ -248,10 +252,7 @@ const MCPServersSelector = ({
       loadNextPage={fetchMoreServer}
       isLoading={isLoading}
       isMultiSelect
-      useAside={useAside ?? false}
-      withoutBackground={withoutBackground}
-      withBlur={withBlur}
-      onClose={onClose}
+      {...withAsideProps}
       onSelect={onSelect}
       withHeader
       headerProps={{
