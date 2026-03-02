@@ -24,8 +24,13 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import type { FileTileProps } from "./FileTile.types";
+
 import { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
 
 import WordSvgUrl from "../../../assets/icons/32/word.svg";
 
@@ -37,160 +42,236 @@ import { IconSizeType } from "../../../utils";
 import { FileType } from "../../../enums";
 
 import { FileTile } from ".";
-import { FileTileProps } from "./FileTile.types";
 import { TileContent } from "../tile-content";
 import { IconButton } from "../../icon-button";
 
 const wordElement = <WordSvgUrl />;
 
 const contextOptions = [
-  {
-    id: "option_copy-to",
-    key: "copy-to",
-    label: "Copy",
-    onClick: () => {},
-    disabled: false,
-  },
-  {
-    id: "option_move-to",
-    key: "move-to",
-    label: "Move to",
-    onClick: () => {},
-    disabled: false,
-  },
+	{
+		id: "option_copy-to",
+		key: "copy-to",
+		label: "Copy",
+		onClick: () => {},
+		disabled: false,
+	},
+	{
+		id: "option_move-to",
+		key: "move-to",
+		label: "Move to",
+		onClick: () => {},
+		disabled: false,
+	},
 ];
 
 const badges = (
-  <div className="badges">
-    <Badge
-      noHover
-      isVersionBadge
-      className="badge badge-version badge-version-current tablet-badge icons-group"
-      backgroundColor="#A3A9AE"
-      label="New"
-      title="my badge"
-      style={{
-        width: "max-content",
-      }}
-      onClick={() => {}}
-    />
-  </div>
+	<div className="badges">
+		<Badge
+			noHover
+			isVersionBadge
+			className="badge badge-version badge-version-current tablet-badge icons-group"
+			backgroundColor="#A3A9AE"
+			label="New"
+			title="my badge"
+			style={{
+				width: "max-content",
+			}}
+			onClick={() => {}}
+		/>
+	</div>
 );
 
 const contentElement = (
-  <div className="badges">
-    <IconButton
-      iconNode={<LockedReact12Svg />}
-      className="badge lock-file icons-group file-locked"
-      size={IconSizeType.medium}
-      data-id="file-lock"
-      data-locked={false}
-      onClick={() => {}}
-      color="#A3A9AE"
-      isDisabled={false}
-      hoverColor="accent"
-      title="Lock file"
-    />
-  </div>
+	<div className="badges">
+		<IconButton
+			iconNode={<LockedReact12Svg />}
+			className="badge lock-file icons-group file-locked"
+			size={IconSizeType.medium}
+			data-id="file-lock"
+			data-locked={false}
+			onClick={() => {}}
+			color="#A3A9AE"
+			isDisabled={false}
+			hoverColor="accent"
+			title="Lock file"
+		/>
+	</div>
 );
 
 const meta = {
-  title: "Components/UI/Tiles/FileTile",
-  component: FileTile,
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "File tile component for displaying file information in a tile format",
-      },
-    },
-  },
-  argTypes: {
-    checked: { control: "boolean" },
-    isDragging: { control: "boolean" },
-    inProgress: { control: "boolean" },
-  },
+	title: "UI/Tiles/FileTile",
+	component: FileTile,
+	parameters: {
+		docs: {
+			description: {
+				component: `File tile component for displaying file information in a tile format.
+
+### Features
+
+- **File Preview**: Displays file icon and optional thumbnail preview
+- **Selectable**: Supports checked/selected state with checkbox
+- **Drag Support**: Built-in drag and drop functionality
+- **Progress State**: Loading indicator for file operations
+- **Badges**: Display status badges (e.g., "New", version info)
+- **Content Elements**: Lock icons and other file status indicators
+- **Context Menu**: Right-click context menu for file actions
+
+### Usage
+
+\`\`\`tsx
+import { FileTile } from "@docspace/ui-kit/components/tiles/file-tile";
+import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+
+<FileTile
+  item={{ id: "1", title: "Document.docx", fileExst: ".docx", fileType: FileType.Document }}
+  element={<WordIcon />}
+  contextOptions={options}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>Document.docx</Link></TileContent>
+</FileTile>
+\`\`\``,
+			},
+		},
+	},
+	argTypes: {
+		checked: {
+			control: "boolean",
+			description: "Whether the tile is selected/checked",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		isDragging: {
+			control: "boolean",
+			description: "Whether the tile is currently being dragged",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		inProgress: {
+			control: "boolean",
+			description: "Whether the tile shows a loading/progress indicator",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+	},
 } satisfies Meta<typeof FileTile>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof FileTile>>;
 
 export default meta;
 
 const Template = ({ checked: initialChecked, ...args }: FileTileProps) => {
-  const [checked, setChecked] = useState(initialChecked);
+	const [checked, setChecked] = useState(initialChecked);
 
-  const onSelect = (isSelected: boolean) => {
-    setChecked(isSelected);
-  };
+	const onSelect = (isSelected: boolean) => {
+		setChecked(isSelected);
+	};
 
-  return (
-    <div style={{ maxWidth: "300px", margin: "30px" }}>
-      <FileTile {...args} checked={checked} onSelect={onSelect}>
-        <TileContent>
-          <Link>File Content</Link>
-        </TileContent>
-      </FileTile>
-    </div>
-  );
+	return (
+		<div style={{ maxWidth: "300px", margin: "30px" }}>
+			<FileTile {...args} checked={checked} onSelect={onSelect}>
+				<TileContent>
+					<Link>File Content</Link>
+				</TileContent>
+			</FileTile>
+		</div>
+	);
 };
 
 export const Default: Story = {
-  render: Template,
-  args: {
-    item: {
-      id: "file-1",
-      title: "Document.docx",
-      fileExst: ".docx",
-      fileType: FileType.Document,
-      contextOptions: ["copy-to", "move-to"],
-    },
-    element: wordElement,
-    contextOptions,
-    contentElement,
-    badges,
-    temporaryIcon: <ImageReactSvg />,
-    onSelect: () => {},
-    thumbnailClick: () => {},
-    setSelection: () => {},
-    withCtrlSelect: () => {},
-    withShiftSelect: () => {},
-    getContextModel: () => contextOptions,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Basic file tile with selection functionality",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		item: {
+			id: "file-1",
+			title: "Document.docx",
+			fileExst: ".docx",
+			fileType: FileType.Document,
+			contextOptions: ["copy-to", "move-to"],
+		},
+		element: wordElement,
+		contextOptions,
+		contentElement,
+		badges,
+		temporaryIcon: <ImageReactSvg />,
+		onSelect: () => {},
+		thumbnailClick: () => {},
+		setSelection: () => {},
+		withCtrlSelect: () => {},
+		withShiftSelect: () => {},
+		getContextModel: () => contextOptions,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Basic file tile with selection functionality",
+			},
+			source: {
+				code: `<FileTile
+  item={{ id: "file-1", title: "Document.docx", fileExst: ".docx", fileType: FileType.Document }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  contentElement={contentElement}
+  badges={badges}
+  temporaryIcon={<ImageReactSvg />}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>File Content</Link></TileContent>
+</FileTile>`,
+			},
+		},
+	},
 };
 
 export const Checked: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    checked: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "File tile in checked state",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		...Default.args,
+		checked: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "File tile in checked state",
+			},
+			source: {
+				code: `<FileTile
+  item={{ id: "file-1", title: "Document.docx", fileExst: ".docx", fileType: FileType.Document }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  checked={true}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>File Content</Link></TileContent>
+</FileTile>`,
+			},
+		},
+	},
 };
 
 export const InProgress: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    inProgress: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "File tile showing progress state",
-      },
-    },
-  },
+	render: Template,
+	args: {
+		...Default.args,
+		inProgress: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "File tile showing progress state",
+			},
+			source: {
+				code: `<FileTile
+  item={{ id: "file-1", title: "Document.docx", fileExst: ".docx", fileType: FileType.Document }}
+  element={<WordSvgUrl />}
+  contextOptions={contextOptions}
+  inProgress={true}
+>
+  <TileContent><Link>File Content</Link></TileContent>
+</FileTile>`,
+			},
+		},
+	},
 };

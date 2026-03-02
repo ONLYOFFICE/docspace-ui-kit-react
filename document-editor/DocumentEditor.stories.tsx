@@ -73,7 +73,7 @@ const StoryWrapper = ({
 };
 
 const meta: Meta<StoryArgs> = {
-  title: "Document Editor",
+  title: "Components/Document Editor",
   component: DocumentEditor,
   decorators: [
     (Story, context) => {

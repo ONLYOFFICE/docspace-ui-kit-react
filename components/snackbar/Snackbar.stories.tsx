@@ -24,6 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
 
@@ -31,14 +33,58 @@ import { SnackBar } from "./Snackbar";
 import type { SnackbarProps, TextAlignValue } from "./Snackbar.types";
 
 const meta = {
-  title: "Components/UI/SnackBar",
+  title: "UI/Feedback/SnackBar",
   component: SnackBar,
-  tags: ["autodocs"],
   parameters: {
     docs: {
       description: {
-        component:
-          "SnackBar is a component for displaying temporary notifications, alerts, or messages to users. It can be customized with various styles and behaviors.",
+        component: `SnackBar component for displaying persistent notification banners with optional actions and countdowns.
+
+### Features
+
+- **Header & Body**: Display a header text with a message body
+- **Action Button**: Optional action button with text label
+- **Countdown Timer**: Auto-dismiss with visible countdown
+- **Icon Display**: Show an info/warning icon alongside content
+- **HTML Content**: Render sanitized HTML content (via xss library)
+- **Maintenance Mode**: Special styling for maintenance notices
+- **Opacity Control**: Adjustable opacity for background styling
+- **Close Button**: Dismiss the snackbar via close button
+
+### Usage
+
+\`\`\`tsx
+import { SnackBar } from "@docspace/ui-kit/components/snackbar";
+
+// Basic snackbar
+<SnackBar
+  headerText="Notice"
+  text="Important notification"
+  showIcon
+  countDownTime={0}
+  sectionWidth={500}
+  onClose={handleClose}
+/>
+
+// With action button
+<SnackBar
+  headerText="Update"
+  text="New version available"
+  btnText="Update Now"
+  onAction={handleUpdate}
+  countDownTime={0}
+  sectionWidth={500}
+/>
+
+// With countdown auto-dismiss
+<SnackBar
+  headerText="Info"
+  text="Dismissing in 5 seconds"
+  countDownTime={5000}
+  sectionWidth={500}
+  onAction={handleDismiss}
+/>
+\`\`\``,
       },
     },
   },
@@ -57,15 +103,45 @@ const meta = {
     },
     showIcon: {
       control: "boolean",
-      description: "Whether to show the icon",
+      description: "Show the info/warning icon",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     countDownTime: {
       control: "number",
-      description: "Time in milliseconds before auto-dismissal",
+      description:
+        "Time in milliseconds before auto-dismissal (0 = no countdown)",
     },
     opacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
-      description: "Opacity of the snackbar",
+      description: "Opacity of the snackbar background",
+      table: {
+        defaultValue: { summary: "1" },
+      },
+    },
+    isMaintenance: {
+      control: "boolean",
+      description: "Apply maintenance banner styling",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    fontSize: {
+      control: "text",
+      description: "Font size for the message text",
+    },
+    fontWeight: {
+      control: "number",
+      description: "Font weight for the message text",
+    },
+    textAlign: {
+      control: "select",
+      options: ["left", "center", "right", "justify"],
+      description: "Text alignment for the message",
+      table: {
+        defaultValue: { summary: "left" },
+      },
     },
     onAction: { action: "onAction" },
     onClose: { action: "onClose" },
@@ -73,10 +149,11 @@ const meta = {
   },
 } satisfies Meta<typeof SnackBar>;
 
-export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof SnackBar>>;
 
-const baseArgs = {
+export default meta;
+
+const baseArgs: SnackbarProps = {
   backgroundImg: "",
   opacity: 1,
   headerText: "Attention",
@@ -92,6 +169,7 @@ const baseArgs = {
   onLoad: fn(),
   onAction: fn(),
 };
+
 const SnackBarWrapper = (args: SnackbarProps) => (
   <div data-testid="snackbar-wrapper" style={{ width: "calc(100% - 32px)" }}>
     <SnackBar {...args} />
@@ -99,43 +177,133 @@ const SnackBarWrapper = (args: SnackbarProps) => (
 );
 
 export const Default: Story = {
-  args: baseArgs,
   render: (args) => <SnackBarWrapper {...args} />,
+  args: baseArgs,
+};
+
+const WithActionTemplate = () => {
+  return (
+    <SnackBarWrapper
+      {...baseArgs}
+      btnText="Take Action"
+      onAction={() => alert("Action taken!")}
+    />
+  );
+};
+
+const WithCountdownTemplate = () => {
+  return (
+    <SnackBarWrapper
+      {...baseArgs}
+      countDownTime={5000}
+      text="This message will disappear in 5 seconds"
+    />
+  );
+};
+
+const WithHtmlContentTemplate = () => {
+  return (
+    <SnackBarWrapper
+      {...baseArgs}
+      htmlContent="<p style='margin: 0; font-size: 13px;'>Your storage is <b>almost full</b>. Please free up space or <a href='#' style='color: #4781d1;'>upgrade your plan</a> to continue working without interruptions.</p>"
+      text=""
+    />
+  );
+};
+
+const MaintenanceTemplate = () => {
+  return (
+    <SnackBarWrapper
+      {...baseArgs}
+      isMaintenance
+      headerText="Maintenance Notice"
+      text="System maintenance is scheduled for tonight at 10 PM"
+    />
+  );
 };
 
 export const WithAction: Story = {
-  args: {
-    ...baseArgs,
-    btnText: "Take Action",
+  render: () => <WithActionTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Snackbar with an action button. Clicking the button triggers the onAction callback.",
+      },
+      source: {
+        code: `<SnackBar
+  headerText="Attention"
+  text="Important notification"
+  btnText="Take Action"
+  showIcon
+  countDownTime={0}
+  sectionWidth={500}
+  onAction={handleAction}
+/>`,
+      },
+    },
   },
-  render: (args) => <SnackBarWrapper {...args} />,
 };
 
 export const WithCountdown: Story = {
-  args: {
-    ...baseArgs,
-    countDownTime: 5000,
-    text: "This message will disappear in 5 seconds",
+  render: () => <WithCountdownTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Snackbar with a countdown timer that auto-dismisses after the specified duration.",
+      },
+      source: {
+        code: `<SnackBar
+  headerText="Attention"
+  text="This message will disappear in 5 seconds"
+  showIcon
+  countDownTime={5000}
+  sectionWidth={500}
+  onAction={handleDismiss}
+/>`,
+      },
+    },
   },
-  render: (args) => <SnackBarWrapper {...args} />,
 };
 
 export const WithHtmlContent: Story = {
-  args: {
-    ...baseArgs,
-    htmlContent:
-      "<p style='margin: 0; font-size: 13px;'>Your storage is <b>almost full</b>. Please free up space or <a href='#' style='color: #4781d1;'>upgrade your plan</a> to continue working without interruptions.</p>",
-    text: undefined as unknown as string,
+  render: () => <WithHtmlContentTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Snackbar displaying sanitized HTML content instead of plain text.",
+      },
+      source: {
+        code: `<SnackBar
+  htmlContent="<p>Your storage is <b>almost full</b>. <a href='#'>Upgrade</a></p>"
+  countDownTime={0}
+  sectionWidth={500}
+/>`,
+      },
+    },
   },
-  render: (args) => <SnackBarWrapper {...args} />,
 };
 
 export const Maintenance: Story = {
-  args: {
-    ...baseArgs,
-    isMaintenance: true,
-    headerText: "Maintenance Notice",
-    text: "System maintenance is scheduled for tonight at 10 PM",
+  render: () => <MaintenanceTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Snackbar with maintenance banner styling for system-wide notices.",
+      },
+      source: {
+        code: `<SnackBar
+  isMaintenance
+  headerText="Maintenance Notice"
+  text="System maintenance is scheduled for tonight at 10 PM"
+  showIcon
+  countDownTime={0}
+  sectionWidth={500}
+/>`,
+      },
+    },
   },
-  render: (args) => <SnackBarWrapper {...args} />,
 };

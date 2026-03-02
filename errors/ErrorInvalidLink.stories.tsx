@@ -24,18 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { ErrorInvalidLink } from "./ErrorInvalidLink";
 import { setupErrorI18n } from "./stories.utils";
 
-const meta: Meta<typeof ErrorInvalidLink> = {
-  title: "Errors/ErrorInvalidLink",
+const meta = {
+  title: "Components/Errors/ErrorInvalidLink",
   component: ErrorInvalidLink,
   parameters: {
     docs: {
       description: {
-        component: "Invalid link error page. Displayed when a shared or invitation link is expired or does not exist.",
+        component: `Invalid link error page. Displayed when a shared or invitation link is expired or does not exist.
+
+### Features
+
+- **Full-Page Display**: Renders a complete error page with animated SVG decorations
+- **Internationalized**: Uses translation keys for localized error messaging
+- **Consistent Styling**: Built on the ErrorContainer base component
+- **Link Validation Feedback**: Clearly communicates that the link is invalid or expired
+
+### Usage
+
+\`\`\`tsx
+import { ErrorInvalidLink } from "@docspace/ui-kit/errors";
+
+<ErrorInvalidLink />
+\`\`\``,
       },
     },
   },
@@ -45,9 +62,22 @@ const meta: Meta<typeof ErrorInvalidLink> = {
       return <Story />;
     },
   ],
-};
+} satisfies Meta<typeof ErrorInvalidLink>;
+
+type Story = StoryObj<ComponentProps<typeof ErrorInvalidLink>>;
 
 export default meta;
-type Story = StoryObj<typeof ErrorInvalidLink>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default invalid link error page with standard messaging.",
+      },
+      source: {
+        code: `<ErrorInvalidLink />`,
+      },
+    },
+  },
+};

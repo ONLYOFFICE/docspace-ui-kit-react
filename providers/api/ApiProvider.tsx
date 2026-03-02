@@ -30,98 +30,100 @@ import React from "react";
 import axios, { type AxiosInstance } from "axios";
 
 import {
-  Configuration,
-  ProfilesApi,
-  CommonSettingsApi,
-  FoldersApi,
-  RoomsApi,
-  FilesApi,
-  FilesSettingsApi,
-  GroupApi,
-  PeopleSearchApi,
-  SearchApi,
+	Configuration,
+	ProfilesApi,
+	CommonSettingsApi,
+	FoldersApi,
+	RoomsApi,
+	FilesApi,
+	FilesSettingsApi,
+	GroupApi,
+	PeopleSearchApi,
+	SearchApi,
 } from "@onlyoffice/docspace-api-sdk";
 
 export type TApiProvider = {
-  children: React.ReactNode;
-  url: string;
-  apiKey: string;
+	children: React.ReactNode;
+	url: string;
+	apiKey: string;
 };
 
 export const createApiClient = (basePath: string, apiKey: string) => {
-  const instance: AxiosInstance = axios.create({
-    baseURL: basePath,
-    headers: {
-      Authorization: apiKey,
-    },
-  });
+	const instance: AxiosInstance = axios.create({
+		baseURL: basePath,
+		headers: {
+			Authorization: `Bearer ${apiKey}`,
+		},
+	});
 
-  const request = async <T = unknown>(path: string): Promise<T> => {
-    const { data } = await instance.get(path);
-    return data;
-  };
+	const request = async <T = unknown>(path: string): Promise<T> => {
+		const { data } = await instance.get(path);
+		return data;
+	};
 
-  return { instance, request };
+	return { instance, request };
 };
 
 export type TApiClient = ReturnType<typeof createApiClient>;
 
 export type TApiContext = {
-  profilesApi: ProfilesApi;
-  commonSettingsApi: CommonSettingsApi;
-  foldersApi: FoldersApi;
-  roomsApi: RoomsApi;
-  filesApi: FilesApi;
-  filesSettingsApi: FilesSettingsApi;
-  groupApi: GroupApi;
-  peopleSearchApi: PeopleSearchApi;
-  groupSearchApi: SearchApi;
-  apiClient: TApiClient;
+	profilesApi: ProfilesApi;
+	commonSettingsApi: CommonSettingsApi;
+	foldersApi: FoldersApi;
+	roomsApi: RoomsApi;
+	filesApi: FilesApi;
+	filesSettingsApi: FilesSettingsApi;
+	groupApi: GroupApi;
+	peopleSearchApi: PeopleSearchApi;
+	groupSearchApi: SearchApi;
+	apiClient: TApiClient;
+	baseUrl: string;
 };
 
 const ApiContext = React.createContext<TApiContext | null>(null);
 
 export const useApi = () => {
-  const context = React.useContext(ApiContext);
+	const context = React.useContext(ApiContext);
 
-  if (!context) {
-    throw new Error("useApi must be used within an ApiProvider");
-  }
+	if (!context) {
+		throw new Error("useApi must be used within an ApiProvider");
+	}
 
-  return context;
+	return context;
 };
 
 const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
-  const value = React.useMemo(() => {
-    const authHeader = `Bearer ${apiKey}`;
-    const baseOptions = {
-      headers: {
-        Authorization: authHeader,
-      },
-    } as const;
+	const value = React.useMemo(() => {
+		const authHeader = `Bearer ${apiKey}`;
+		const baseOptions = {
+			headers: {
+				Authorization: authHeader,
+			},
+		} as const;
 
-    const configuration = new Configuration({
-      basePath: url,
-      apiKey: authHeader,
-      accessToken: apiKey,
-      baseOptions,
-    });
+		const configuration = new Configuration({
+			basePath: url,
+			apiKey: authHeader,
+			accessToken: apiKey,
+			baseOptions,
+		});
 
-    return {
-      profilesApi: new ProfilesApi(configuration),
-      commonSettingsApi: new CommonSettingsApi(configuration),
-      foldersApi: new FoldersApi(configuration),
-      roomsApi: new RoomsApi(configuration),
-      filesApi: new FilesApi(configuration),
-      filesSettingsApi: new FilesSettingsApi(configuration),
-      groupApi: new GroupApi(configuration),
-      peopleSearchApi: new PeopleSearchApi(configuration),
-      groupSearchApi: new SearchApi(configuration),
-      apiClient: createApiClient(url, apiKey),
-    };
-  }, [url, apiKey]);
+		return {
+			profilesApi: new ProfilesApi(configuration),
+			commonSettingsApi: new CommonSettingsApi(configuration),
+			foldersApi: new FoldersApi(configuration),
+			roomsApi: new RoomsApi(configuration),
+			filesApi: new FilesApi(configuration),
+			filesSettingsApi: new FilesSettingsApi(configuration),
+			groupApi: new GroupApi(configuration),
+			peopleSearchApi: new PeopleSearchApi(configuration),
+			groupSearchApi: new SearchApi(configuration),
+			apiClient: createApiClient(url, apiKey),
+			baseUrl: url,
+		};
+	}, [url, apiKey]);
 
-  return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
+	return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 };
 
 export default ApiProvider;

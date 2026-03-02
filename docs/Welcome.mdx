@@ -1,0 +1,70 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Getting started/Welcome" />
+
+# DocSpace UI Kit
+
+A shared component library for ONLYOFFICE DocSpace that provides:
+
+- reusable React components, hooks, and utilities;
+- MobX stores for state management;
+- API client and type definitions.
+
+Used across all DocSpace applications: Client, Login, DocEditor, Management, and SDK.
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px", marginTop: "24px", marginBottom: "48px" }}>
+	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-structure--docs" target="_top">
+		<div style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Structure</div>
+		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>How the codebase is organized</p>
+	</a>
+	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-translation--docs" target="_top">
+		<div style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Translation</div>
+		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>How to use i18n and translations</p>
+	</a>
+	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-themes--docs" target="_top">
+		<div style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>Themes</div>
+		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Light/dark themes, color tokens, and RTL support</p>
+	</a>
+	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="/?path=/docs/getting-started-api--docs" target="_top">
+		<div style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>API</div>
+		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>How to use ApiProvider and REST API services</p>
+	</a>
+	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="https://api.onlyoffice.com/docspace/" target="_blank" rel="noreferrer">
+		<div style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>DocSpace API</div>
+		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Official DocSpace API documentation</p>
+	</a>
+	<a style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "24px", textDecoration: "none", color: "inherit" }} href="https://github.com/ONLYOFFICE/DocSpace-ui-kit-react" target="_blank" rel="noreferrer">
+		<div style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>GitHub</div>
+		<p style={{ fontSize: "14px", color: "#657076", margin: 0 }}>Source code repository</p>
+	</a>
+</div>
+
+## Installation
+
+```bash
+npm install @docspace/ui-kit
+```
+
+### Requirements
+
+- Node.js >= 24
+- React >= 19
+
+### Quick start
+
+```tsx
+import { Providers } from "@docspace/ui-kit/providers";
+
+<Providers url="https://your-docspace.com/api" apiKey="your-api-key" locale="en">
+  <App />
+</Providers>
+```
+
+### Run Storybook locally
+
+```bash
+git clone https://github.com/ONLYOFFICE/DocSpace-ui-kit-react.git
+cd DocSpace-ui-kit-react
+pnpm install
+pnpm storybook
+```

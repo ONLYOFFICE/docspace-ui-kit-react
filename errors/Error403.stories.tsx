@@ -24,18 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Error403 } from "./Error403";
 import { setupErrorI18n } from "./stories.utils";
 
-const meta: Meta<typeof Error403> = {
-  title: "Errors/Error403",
+const meta = {
+  title: "Components/Errors/Error403",
   component: Error403,
   parameters: {
     docs: {
       description: {
-        component: "Forbidden error page (403). Displayed when the user lacks permission to access a resource.",
+        component: `Forbidden error page (403). Displayed when the user lacks permission to access a resource.
+
+### Features
+
+- **Full-Page Display**: Renders a complete error page with animated SVG decorations
+- **Internationalized**: Uses translation keys for localized error messaging
+- **Consistent Styling**: Built on the ErrorContainer base component
+- **Permission Feedback**: Clearly communicates access denial to the user
+
+### Usage
+
+\`\`\`tsx
+import { Error403 } from "@docspace/ui-kit/errors";
+
+<Error403 />
+\`\`\``,
       },
     },
   },
@@ -45,9 +62,21 @@ const meta: Meta<typeof Error403> = {
       return <Story />;
     },
   ],
-};
+} satisfies Meta<typeof Error403>;
+
+type Story = StoryObj<ComponentProps<typeof Error403>>;
 
 export default meta;
-type Story = StoryObj<typeof Error403>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "Default 403 forbidden error page with standard messaging.",
+      },
+      source: {
+        code: `<Error403 />`,
+      },
+    },
+  },
+};

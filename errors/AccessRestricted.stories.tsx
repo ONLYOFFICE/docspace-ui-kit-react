@@ -24,18 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { AccessRestricted } from "./AccessRestricted";
 import { setupErrorI18n } from "./stories.utils";
 
-const meta: Meta<typeof AccessRestricted> = {
-  title: "Errors/AccessRestricted",
+const meta = {
+  title: "Components/Errors/AccessRestricted",
   component: AccessRestricted,
   parameters: {
     docs: {
       description: {
-        component: "Access restricted error page. Displayed when the user's account is restricted from accessing the portal.",
+        component: `Access restricted error page. Displayed when the user's account is restricted from accessing the portal.
+
+### Features
+
+- **Full-Page Display**: Renders a complete error page with animated SVG decorations
+- **Internationalized**: Uses translation keys for localized error messaging
+- **Consistent Styling**: Built on the ErrorContainer base component
+- **Access Restriction Notice**: Clearly communicates account restriction to the user
+
+### Usage
+
+\`\`\`tsx
+import { AccessRestricted } from "@docspace/ui-kit/errors";
+
+<AccessRestricted />
+\`\`\``,
       },
     },
   },
@@ -45,9 +62,22 @@ const meta: Meta<typeof AccessRestricted> = {
       return <Story />;
     },
   ],
-};
+} satisfies Meta<typeof AccessRestricted>;
+
+type Story = StoryObj<ComponentProps<typeof AccessRestricted>>;
 
 export default meta;
-type Story = StoryObj<typeof AccessRestricted>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default access restricted error page with standard messaging.",
+      },
+      source: {
+        code: `<AccessRestricted />`,
+      },
+    },
+  },
+};

@@ -111,7 +111,7 @@ const fillFakeData = (n: number) => {
 const fakeData = fillFakeData(20);
 
 const meta = {
-  title: "Components/Rows/RowContainer",
+  title: "UI/Rows/RowContainer",
   component: RowContainer,
   // subcomponents: { Row, RowContent },
   parameters: {

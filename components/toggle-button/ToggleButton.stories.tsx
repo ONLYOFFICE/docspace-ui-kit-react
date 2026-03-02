@@ -24,36 +24,69 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useEffect, useState } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+import { useEffect, useState } from "react";
 
-import type { ToggleButtonProps } from "./ToggleButton.types";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { ToggleButton } from ".";
 
+import type { ToggleButtonProps } from "./ToggleButton.types";
+
 const meta = {
-  title: "components/Form Controls/ToggleButton",
+  title: "UI/Form controls/ToggleButton",
   component: ToggleButton,
   parameters: {
     docs: {
       description: {
-        component:
-          "A customizable toggle button component that supports various states and styling options.",
+        component: `ToggleButton is a switch control for toggling between on and off states.
+
+### Features
+
+- **Animated Toggle**: Smooth Framer Motion animation between states
+- **Loading State**: Animated loading indicator during async operations
+- **Disabled State**: Prevents user interaction
+- **Optional Label**: Text label with configurable font size and weight
+- **No Animation Mode**: Disable animations when needed
+
+### Usage
+
+\`\`\`tsx
+import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
+
+// Basic toggle
+<ToggleButton label="Enable notifications" isChecked={isEnabled} onChange={handleChange} />
+
+// Loading state
+<ToggleButton label="Saving..." isLoading />
+
+// Without label
+<ToggleButton isChecked={isOn} onChange={handleChange} />
+\`\`\``,
       },
     },
   },
   argTypes: {
-    onChange: { action: "onChange" },
     isChecked: {
       control: "boolean",
       description: "Controls the checked state of the toggle",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isDisabled: {
       control: "boolean",
       description: "Disables the toggle button",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isLoading: {
       control: "boolean",
       description: "Shows loading animation",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     label: {
       control: "text",
@@ -62,14 +95,31 @@ const meta = {
     noAnimation: {
       control: "boolean",
       description: "Disables animation effects",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
-  tags: ["autodocs"],
 } satisfies Meta<typeof ToggleButton>;
 
-type Story = StoryObj<typeof ToggleButton>;
+type Story = StoryObj<ComponentProps<typeof ToggleButton>>;
 
 export default meta;
+
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+        gridGap: "16px",
+        alignItems: "center",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
 
 const Template = ({ isChecked, ...args }: ToggleButtonProps) => {
   const [checked, setChecked] = useState(isChecked);
@@ -86,58 +136,110 @@ const Template = ({ isChecked, ...args }: ToggleButtonProps) => {
 };
 
 export const Default: Story = {
-  render: Template,
+  render: (args) => <Template {...args} />,
   args: {
     label: "Toggle me",
     isChecked: false,
   },
 };
 
-export const Checked: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    isChecked: true,
+const StatesTemplate = () => {
+  return (
+    <Wrapper>
+      <ToggleButton label="Unchecked" />
+      <ToggleButton label="Checked" isChecked />
+      <ToggleButton label="Without label" />
+    </Wrapper>
+  );
+};
+
+export const CheckedStates: Story = {
+  render: () => <StatesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: "Comparison of unchecked and checked toggle states.",
+      },
+      source: {
+        code: `<ToggleButton label="Unchecked" />
+<ToggleButton label="Checked" isChecked />
+<ToggleButton />`,
+      },
+    },
   },
 };
 
-export const WithoutLabel: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    label: undefined,
+const DisabledTemplate = () => {
+  return (
+    <Wrapper>
+      <ToggleButton label="Disabled off" isDisabled />
+      <ToggleButton label="Disabled on" isDisabled isChecked />
+    </Wrapper>
+  );
+};
+
+export const DisabledStates: Story = {
+  render: () => <DisabledTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Disabled toggles cannot be interacted with and have reduced opacity.",
+      },
+      source: {
+        code: `<ToggleButton label="Disabled off" isDisabled />
+<ToggleButton label="Disabled on" isDisabled isChecked />`,
+      },
+    },
   },
 };
 
-export const Disabled: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    isDisabled: true,
+const LoadingTemplate = () => {
+  return (
+    <Wrapper>
+      <ToggleButton label="Loading unchecked" isLoading />
+      <ToggleButton label="Loading checked" isLoading isChecked />
+    </Wrapper>
+  );
+};
+
+export const LoadingState: Story = {
+  render: () => <LoadingTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Loading state shows an animated indicator. Use during async operations like saving settings.",
+      },
+      source: {
+        code: `<ToggleButton label="Loading unchecked" isLoading />
+<ToggleButton label="Loading checked" isLoading isChecked />`,
+      },
+    },
   },
 };
 
-export const DisabledChecked: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    isDisabled: true,
-    isChecked: true,
-  },
-};
-
-export const Loading: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    isLoading: true,
-  },
+const NoAnimationTemplate = () => {
+  return (
+    <Wrapper>
+      <ToggleButton label="No animation off" noAnimation />
+      <ToggleButton label="No animation on" noAnimation isChecked />
+    </Wrapper>
+  );
 };
 
 export const WithoutAnimation: Story = {
-  render: Template,
-  args: {
-    ...Default.args,
-    noAnimation: true,
+  render: () => <NoAnimationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Animations can be disabled with the noAnimation prop. The toggle switches instantly between states.",
+      },
+      source: {
+        code: `<ToggleButton label="No animation" noAnimation />
+<ToggleButton label="No animation on" noAnimation isChecked />`,
+      },
+    },
   },
 };

@@ -24,7 +24,9 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import WordSvgUrl from "../../../assets/icons/32/word.svg";
 
@@ -37,83 +39,120 @@ import { Badge } from "../../badge";
 const element = <WordSvgUrl />;
 
 const mockContextOptions = [
-  { key: "edit", label: "Edit" },
-  { key: "delete", label: "Delete" },
+	{ key: "edit", label: "Edit" },
+	{ key: "delete", label: "Delete" },
 ];
 
 const meta = {
-  title: "Components/UI/Tiles/TileContent",
-  component: TileContent,
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "Content wrapper component for tile items, handles layout and spacing",
-      },
-    },
-  },
-  decorators: [
-    (Story) => (
-      <div style={{ maxWidth: "300px", margin: "20px" }}>
-        <BaseTile
-          item={{ id: "1", title: "Document.docx" }}
-          contextOptions={mockContextOptions}
-          element={element}
-          topContent={<Story />}
-        />
-      </div>
-    ),
-  ],
+	title: "UI/Tiles/TileContent",
+	component: TileContent,
+	parameters: {
+		docs: {
+			description: {
+				component: `Content wrapper component for tile items, handles layout and spacing.
+
+### Features
+
+- **Flexible Layout**: Wraps any content within a tile structure
+- **Text Overflow**: Handles long text with ellipsis truncation
+- **Composable**: Works with Link, Text, Badge, and other components
+- **Consistent Spacing**: Provides uniform padding and alignment within tiles
+
+### Usage
+
+\`\`\`tsx
+import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+import { BaseTile } from "@docspace/ui-kit/components/tiles/base-tile";
+
+<BaseTile item={item} element={icon} topContent={
+  <TileContent>
+    <Link>Document.docx</Link>
+  </TileContent>
+} />
+\`\`\``,
+			},
+		},
+	},
+	decorators: [
+		(Story) => (
+			<div style={{ maxWidth: "300px", margin: "20px" }}>
+				<BaseTile
+					item={{ id: "1", title: "Document.docx" }}
+					contextOptions={mockContextOptions}
+					element={element}
+					topContent={<Story />}
+				/>
+			</div>
+		),
+	],
 } satisfies Meta<typeof TileContent>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof TileContent>>;
 
 export default meta;
 
 export const Default: Story = {
-  args: {
-    children: <Link>Document.docx</Link>,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Basic tile content with a link inside BaseTile",
-      },
-    },
-  },
+	args: {
+		children: <Link>Document.docx</Link>,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Basic tile content with a link inside BaseTile",
+			},
+			source: {
+				code: `<TileContent>
+  <Link>Document.docx</Link>
+</TileContent>`,
+			},
+		},
+	},
 };
 
 export const WithText: Story = {
-  args: {
-    children: (
-      <Text fontSize="14px" fontWeight={600}>
-        My Document
-      </Text>
-    ),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Tile content with text component inside BaseTile",
-      },
-    },
-  },
+	args: {
+		children: (
+			<Text fontSize="14px" fontWeight={600}>
+				My Document
+			</Text>
+		),
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Tile content with text component inside BaseTile",
+			},
+			source: {
+				code: `<TileContent>
+  <Text fontSize="14px" fontWeight={600}>My Document</Text>
+</TileContent>`,
+			},
+		},
+	},
 };
 
 export const WithMultipleElements: Story = {
-  args: {
-    children: (
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <Link>Document.docx</Link>
-        <Badge label="New" backgroundColor="#4781D1" color="#fff" />
-      </div>
-    ),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Tile content with multiple child elements",
-      },
-    },
-  },
+	args: {
+		children: (
+			<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+				<Link>Document.docx</Link>
+				<Badge label="New" backgroundColor="#4781D1" color="#fff" />
+			</div>
+		),
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: "Tile content with multiple child elements",
+			},
+			source: {
+				code: `<TileContent>
+  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+    <Link>Document.docx</Link>
+    <Badge label="New" backgroundColor="#4781D1" color="#fff" />
+  </div>
+</TileContent>`,
+			},
+		},
+	},
 };

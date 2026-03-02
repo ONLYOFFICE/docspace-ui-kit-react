@@ -20,108 +20,124 @@ import lightTheme from "./lightTheme";
 import darkTheme from "./darkTheme";
 
 const lightColorScheme: TColorScheme = {
-  id: 1,
-  name: "Light",
-  main: {
-    accent: globalColors.lightBlueMain,
-    buttons: globalColors.lightBlueMain,
-  },
-  text: {
-    accent: globalColors.white,
-    buttons: globalColors.white,
-  },
+	id: 1,
+	name: "Light",
+	main: {
+		accent: globalColors.lightBlueMain,
+		buttons: globalColors.lightBlueMain,
+	},
+	text: {
+		accent: globalColors.white,
+		buttons: globalColors.white,
+	},
 };
 
 const darkColorScheme: TColorScheme = {
-  id: 2,
-  name: "Dark",
-  main: {
-    accent: globalColors.lightSecondMain,
-    buttons: globalColors.lightSecondMain,
-  },
-  text: {
-    accent: globalColors.white,
-    buttons: globalColors.white,
-  },
+	id: 2,
+	name: "Dark",
+	main: {
+		accent: globalColors.lightSecondMain,
+		buttons: globalColors.lightSecondMain,
+	},
+	text: {
+		accent: globalColors.white,
+		buttons: globalColors.white,
+	},
 };
 
 document.cookie = "asc_language=en";
 
 const baseTheme = {
-  isBase: true,
-  interfaceDirection: "ltr" as const,
-  fontFamily: "Open Sans, sans-serif, Arial",
+	isBase: true,
+	interfaceDirection: "ltr" as const,
+	fontFamily: "Open Sans, sans-serif, Arial",
 };
 
 const darkThemeConfig = {
-  isBase: false,
-  interfaceDirection: "ltr" as const,
-  fontFamily: "Open Sans, sans-serif, Arial",
+	isBase: false,
+	interfaceDirection: "ltr" as const,
+	fontFamily: "Open Sans, sans-serif, Arial",
 };
 
 const preview: Preview = {
-  globalTypes,
-  parameters: {
-    backgrounds: { disabled: true },
-    controls: {
-      expanded: true,
-      matchers: {
-        color: /(background|color)$/i,
-        date: /Date$/i,
-      },
-    },
-    darkMode: {
-      light: lightTheme,
-      dark: darkTheme,
-    },
-    docs: {
-      toc: true,
-    },
-  },
+	globalTypes,
+	parameters: {
+		backgrounds: { disabled: true },
+		controls: {
+			expanded: true,
+			matchers: {
+				color: /(background|color)$/i,
+				date: /Date$/i,
+			},
+		},
+		darkMode: {
+			light: lightTheme,
+			dark: darkTheme,
+		},
+		docs: {
+			toc: true,
+		},
+		options: {
+			storySort: {
+				order: [
+					"Getting started",
+					["Welcome", "Structure", "Translation", "Themes", "API"],
+					"Samples",
+					"Components",
+					[
+						"Document Editor",
+						"Selectors",
+						"Providers",
+						"Errors",
+					],
+				],
+			},
+		},
+	},
 
-  initialGlobals: {
-    apiConfig: "default",
-  },
+	initialGlobals: {
+		apiConfig: "default",
+	},
 
-  decorators: [
-    withApiProvider,
-    (Story, context) => {
-      const isDark = useDarkMode();
-      const interfaceDirection = context.globals.direction;
+	decorators: [
+		withApiProvider,
+		(Story, context) => {
+			const isDark = useDarkMode();
+			const interfaceDirection = context.globals.direction;
 
-      const theme = isDark ? darkThemeConfig : baseTheme;
-      const currentColorScheme = isDark ? darkColorScheme : lightColorScheme;
+			const theme = isDark ? darkThemeConfig : baseTheme;
+			const currentColorScheme = isDark ? darkColorScheme : lightColorScheme;
 
-      const translations: TTranslations = new Map([
-        ["en", new Map([["Common", enCommon]])],
-      ]);
+			const translations: TTranslations = new Map([
+				["en", new Map([["Common", enCommon]])],
+			]);
 
-      const isDocs = context.viewMode === "docs";
+			const isDocs = context.viewMode === "docs";
 
-      return (
-        <TranslationProvider locale="en" translations={translations}>
-          <ThemeProviderComponent
-            theme={{ ...theme, interfaceDirection }}
-            currentColorScheme={currentColorScheme}
-          >
-            <div
-              style={{
-                backgroundColor: isDark
-                  ? globalColors.black
-                  : globalColors.white,
-                color: isDark ? globalColors.white : globalColors.black,
-                padding: isDocs ? "0" : "20px",
-              }}
-            >
-              <Story />
-            </div>
-          </ThemeProviderComponent>
-        </TranslationProvider>
-      );
-    },
-  ],
+			return (
+				<TranslationProvider locale="en" translations={translations}>
+					<ThemeProviderComponent
+						theme={{ ...theme, interfaceDirection }}
+						currentColorScheme={currentColorScheme}
+					>
+						<div
+							style={{
+								backgroundColor: isDark
+									? globalColors.black
+									: globalColors.white,
+								color: isDark ? globalColors.white : globalColors.black,
+								padding: isDocs ? "0" : "20px",
+							}}
+						>
+							<Story />
+						</div>
+					</ThemeProviderComponent>
+				</TranslationProvider>
+			);
+		},
+	],
 
-  tags: ["autodocs"],
+	tags: ["autodocs"],
 };
 
 export default preview;

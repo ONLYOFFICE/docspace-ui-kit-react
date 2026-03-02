@@ -24,21 +24,36 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Button, Heading, HeadingSize, Text } from "../";
 import { LoaderWrapper } from ".";
 
 const meta = {
-  title: "Components/Status components/LoaderWrapper",
+  title: "UI/Status components/LoaderWrapper",
   component: LoaderWrapper,
-  tags: ["autodocs"],
   parameters: {
     docs: {
       description: {
-        component:
-          "LoaderWrapper blurs children and disables pointer events when isLoading is true.",
+        component: `A wrapper component that dims its children and disables pointer events during loading states.
+
+### Features
+
+- **Soft Overlay**: Reduces opacity to 0.5 instead of hiding content
+- **Interaction Lock**: Automatically disables pointer events to prevent accidental clicks
+- **Smooth Transition**: 0.3s ease-in-out opacity animation
+- **Plug-and-Play**: Works with any child tree and keeps layout intact
+
+### Usage
+
+\`\`\`tsx
+import { LoaderWrapper } from "@docspace/ui-kit/components/loader-wrapper";
+
+<LoaderWrapper isLoading={isLoading}>
+  <SectionContent />
+</LoaderWrapper>
+\`\`\``,
       },
     },
     layout: "centered",
@@ -46,23 +61,25 @@ const meta = {
   argTypes: {
     children: {
       control: false,
-      description: "Content to render inside the wrapper.",
+      description: "Content to render inside the wrapper",
     },
     isLoading: {
       control: "boolean",
-      description: "Toggles the loading overlay style and interaction lock.",
+      description: "Toggles the loading overlay style and interaction lock",
     },
     testId: {
       control: "text",
-      description:
-        "Optional testing identifier applied to the wrapper element.",
+      description: "Optional data-testid override for automated testing",
+      table: {
+        defaultValue: { summary: "loader-wrapper" },
+      },
     },
   },
 } satisfies Meta<typeof LoaderWrapper>;
 
-export default meta;
+type Story = StoryObj<ComponentProps<typeof LoaderWrapper>>;
 
-type Story = StoryObj<typeof LoaderWrapper>;
+export default meta;
 
 const cardContent = (
   <div
@@ -88,15 +105,43 @@ const cardContent = (
 );
 
 export const IdleContent: Story = {
+  render: (args) => <LoaderWrapper {...args} />,
   args: {
     isLoading: false,
     children: cardContent,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Content in idle state with full opacity and pointer events enabled.",
+      },
+      source: {
+        code: `<LoaderWrapper isLoading={false}>
+  <CardContent />
+</LoaderWrapper>`,
+      },
+    },
+  },
 };
 
 export const LoadingContent: Story = {
+  render: (args) => <LoaderWrapper {...args} />,
   args: {
     isLoading: true,
     children: cardContent,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Content in loading state with reduced opacity (0.5) and pointer events disabled.",
+      },
+      source: {
+        code: `<LoaderWrapper isLoading>
+  <CardContent />
+</LoaderWrapper>`,
+      },
+    },
   },
 };
