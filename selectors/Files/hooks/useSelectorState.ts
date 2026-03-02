@@ -60,7 +60,10 @@ const transformInitItems = (
   items: (FolderDtoInteger | FileDtoInteger)[],
   disabledItems: (string | number)[],
   withCreate: boolean,
-  getIcon: (fileExst: string, size?: number) => React.FC<React.SVGProps<SVGSVGElement>> | null,
+  getIcon: (
+    fileExst: string,
+    size?: number,
+  ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null,
   initSelectedItemType?: string,
   filterParam?: string | number,
   disableBySecurity?: string,

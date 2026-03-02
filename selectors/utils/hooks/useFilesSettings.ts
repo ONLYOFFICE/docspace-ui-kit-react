@@ -119,7 +119,7 @@ const useFilesSettings = (
     (
       fileExst: string,
       size = 32,
-    ): React.FC<React.SVGProps<SVGSVGElement>> | null => {
+    ): React.FC<React.SVGProps<SVGSVGElement>> | string | null => {
       if (getIconProp) return getIconProp(size, fileExst) ?? null;
       if (!filesSettings) return null;
 

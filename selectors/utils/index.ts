@@ -101,13 +101,17 @@ export const convertRoomsToItems: (
 
 export const convertFilesToItems: (
   files: FileDtoInteger[],
-  getIcon: (fileExst: string) => React.FC<React.SVGProps<SVGSVGElement>> | null,
+  getIcon: (
+    fileExst: string,
+  ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null,
   filterParam?: string | number,
   includedItems?: (number | string)[],
   disableBySecurity?: string,
 ) => TSelectorItem[] = (
   files: FileDtoInteger[],
-  getIcon: (fileExst: string) => React.FC<React.SVGProps<SVGSVGElement>> | null,
+  getIcon: (
+    fileExst: string,
+  ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null,
   filterParam?: string | number,
   includedItems?: (number | string)[],
   disableBySecurity?: string,

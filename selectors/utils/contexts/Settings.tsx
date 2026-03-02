@@ -31,7 +31,10 @@ import type { TGetIcon } from "../types";
 import useFilesSettings from "../hooks/useFilesSettings";
 
 export const SettingsContext = createContext<{
-  getIcon: (fileExst: string, size?: number) => React.FC<React.SVGProps<SVGSVGElement>> | null;
+  getIcon: (
+    fileExst: string,
+    size?: number,
+  ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null;
   filesSettingsLoading: boolean;
   extsWebEdited: string[];
   displayFileExtension: boolean;
