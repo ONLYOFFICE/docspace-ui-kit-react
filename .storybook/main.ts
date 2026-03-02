@@ -49,10 +49,6 @@ const config: StorybookConfig = {
 		);
 
 		config.resolve = config.resolve || {};
-		// Vite matches aliases against the raw import specifier, so use a regex
-		// to catch any import of utils/image-helpers regardless of relative depth.
-		// The real file uses Webpack require() with ?url queries which are not
-		// available in Vite — redirect to a stub that returns empty Maps.
 		const existingAlias = config.resolve.alias ?? [];
 		const aliasArray = Array.isArray(existingAlias)
 			? existingAlias
@@ -62,10 +58,6 @@ const config: StorybookConfig = {
 				}));
 		config.resolve.alias = [
 			...aliasArray,
-			{
-				find: /.*\/utils\/image-helpers(\/index\.ts)?$/,
-				replacement: path.resolve(__dirname, "./mocks/image-helpers.ts"),
-			},
 			// PUBLIC_DIR is a Webpack alias pointing to the repo root /public directory.
 			// Vite/Storybook does not know about it, so resolve it here.
 			{

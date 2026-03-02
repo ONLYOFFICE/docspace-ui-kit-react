@@ -238,6 +238,8 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
       isDisabled ||
       (isMultiSelect && isLimitReached && !isSelected && !isFolder);
 
+    console.log("====", typeof icon);
+
     return (
       <div
         key={`${label}-${avatar}-${role}`}
@@ -292,12 +294,8 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
               badgeIconNode={badgeIconNode ?? undefined}
               isTemplate={isTemplate}
             />
-          ) : typeof icon === "function" ? (
-            <div className={styles.itemLogo}>
-              {React.createElement(icon)}
-            </div>
           ) : (
-            <div className={styles.itemLogo}>{icon}</div>
+            <div className={styles.itemLogo}>{React.createElement(icon)}</div>
           )
         ) : null}
         {renderCustomItem ? (
