@@ -47,6 +47,7 @@ const ChatFooter = ({
   allowExternalNavigation,
   allowAttachFiles,
   allowManageTools,
+  onSendMessage,
 }: ChatFooterProps) => {
   return (
     <div className={styles.chatFooter} data-testid="chat-footer">
@@ -68,6 +69,7 @@ const ChatFooter = ({
         allowExternalNavigation={allowExternalNavigation}
         allowAttachFiles={allowAttachFiles}
         allowManageTools={allowManageTools}
+        onSendMessage={onSendMessage}
       />
     </div>
   );

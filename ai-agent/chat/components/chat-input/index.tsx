@@ -61,6 +61,7 @@ const ChatInput = ({
   allowExternalNavigation,
   allowAttachFiles,
   allowManageTools,
+  onSendMessage,
 }: ChatInputProps) => {
   const { startChat, sendMessage, currentChatId, isRequestRunning, agentId } =
     useMessageStore();
@@ -142,6 +143,8 @@ const ChatInput = ({
         sendMessage(value, selectedFiles);
       }
 
+      onSendMessage?.(value, selectedFiles);
+
       setValue("");
       setSelectedFiles([]);
       saveChangesToStorage("", []);
@@ -155,6 +158,7 @@ const ChatInput = ({
     saveChangesToStorage,
     value,
     selectedFiles,
+    onSendMessage,
   ]);
 
   const onKeyEnter = React.useCallback(

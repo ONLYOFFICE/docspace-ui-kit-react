@@ -71,6 +71,9 @@ const defaultProps: ChatProps = {
   allowAttachFiles: false,
   allowManageTools: false,
   allowSelectChat: false,
+  onSendMessage: (message, files) => {
+    console.log(message, files)
+  },
 };
 
 export const Default: Story = {
