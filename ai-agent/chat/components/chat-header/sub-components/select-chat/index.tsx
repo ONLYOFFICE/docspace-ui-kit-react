@@ -55,6 +55,7 @@ import ExportSelector from "../../../export-selector";
 import styles from "../../ChatHeader.module.scss";
 
 import RenameChat from "../rename-chat";
+import DeleteChat from "../delete-chat";
 import { CHAT_LIST_MAX_HEIGHT, CHAT_LIST_WIDTH } from "../../constants";
 import { getSelectChatRowHeight } from "../../utils";
 import { ChatList } from "../chat-list";
@@ -67,14 +68,13 @@ const SelectChat = ({
   agentId,
   getIcon,
   getResultStorageId,
-  setIsAIAgentChatDelete,
-  setDeleteDialogVisible,
   folderFormValidation,
   allowExternalNavigation,
 }: SelectChatProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [hoveredItem, setHoveredItem] = React.useState("");
   const [isRenameOpen, setIsRenameOpen] = React.useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
   const [isExportOpen, setIsExportOpen] = React.useState(false);
 
   const parentRef = React.useRef<HTMLDivElement>(null);
@@ -114,46 +114,23 @@ const SelectChat = ({
     setIsRenameOpen((value) => !value);
   }, [isRequestRunning]);
 
+  const onDeleteToggle = React.useCallback(() => {
+    if (isRequestRunning) return;
+    setIsOpen(false);
+    setIsDeleteOpen((value) => !value);
+  }, [isRequestRunning]);
+
   const getFileName = () => {
     const title = chats.find((chat) => chat.id === hoveredItem)?.title;
 
     return title ?? "";
   };
 
-  const onDeleteAction = React.useCallback(async () => {
-    try {
-      await deleteChat(hoveredItem);
-
-      if (hoveredItem === currentChat?.id) {
-        startNewChat();
-        updateUrlChatId("");
-      }
-      setHoveredItem("");
-
-      toastr.success(getCommonTranslation("ChatSuccessDeleted"));
-    } catch (error) {
-      console.error(error);
-    }
-  }, [hoveredItem, deleteChat, currentChat?.id, startNewChat, updateUrlChatId]);
-
   const onDelete = React.useCallback(() => {
     if (isRequestRunning) return;
-
-    setIsAIAgentChatDelete?.({
-      visible: true,
-      itemName: getFileName(),
-      onDeleteAction: onDeleteAction,
-    });
-    setDeleteDialogVisible?.(true);
     setIsOpen(false);
-  }, [
-    isRequestRunning,
-    hoveredItem,
-    chats,
-    onDeleteAction,
-    setIsAIAgentChatDelete,
-    setDeleteDialogVisible,
-  ]);
+    setIsDeleteOpen(true);
+  }, [isRequestRunning]);
 
   const onSaveToFileAction = React.useCallback(async () => {
     if (isRequestRunning) return;
@@ -333,6 +310,13 @@ const SelectChat = ({
           chatId={hoveredItem}
           prevTitle={chats.find((chat) => chat.id === hoveredItem)?.title || ""}
           onRenameToggle={onRenameToggle}
+        />
+      ) : null}
+      {isDeleteOpen ? (
+        <DeleteChat
+          chatId={hoveredItem}
+          chatTitle={getFileName()}
+          onDeleteToggle={onDeleteToggle}
         />
       ) : null}
       {isExportOpen ? (

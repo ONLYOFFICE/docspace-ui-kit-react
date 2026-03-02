@@ -42,8 +42,6 @@ const ChatHeader = ({
   agentId,
   aiReady,
   getResultStorageId,
-  setIsAIAgentChatDelete,
-  setDeleteDialogVisible,
   folderFormValidation,
   allowExternalNavigation,
   allowSelectChat,
@@ -62,8 +60,6 @@ const ChatHeader = ({
           getIcon={getIcon}
           getResultStorageId={getResultStorageId}
           agentId={agentId}
-          setIsAIAgentChatDelete={setIsAIAgentChatDelete}
-          setDeleteDialogVisible={setDeleteDialogVisible}
           folderFormValidation={folderFormValidation}
           allowExternalNavigation={allowExternalNavigation}
         />

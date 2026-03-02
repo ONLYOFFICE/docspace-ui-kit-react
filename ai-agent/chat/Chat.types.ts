@@ -76,12 +76,6 @@ export type SelectChatProps = {
   agentId: string | number;
   getIcon: TGetIcon;
   getResultStorageId: () => number | null;
-  setIsAIAgentChatDelete?: (value: {
-    visible: boolean;
-    itemName: string;
-    onDeleteAction: () => void;
-  }) => void;
-  setDeleteDialogVisible?: (value: boolean) => void;
   folderFormValidation: RegExp;
   allowExternalNavigation?: boolean;
 };
@@ -92,16 +86,15 @@ export type RenameChatProps = {
   onRenameToggle: VoidFunction;
 };
 
+export type DeleteChatProps = {
+  chatId: string;
+  chatTitle: string;
+  onDeleteToggle: VoidFunction;
+};
+
 export type ChatHeaderProps = SelectModelProps &
   Omit<SelectChatProps, "isLoadingProp"> & {
     aiReady: boolean;
-    setIsAIAgentChatDelete?: (value: {
-      visible: boolean;
-      itemName: string;
-      onDeleteAction: () => void;
-    }) => void;
-    setDeleteDialogVisible?: (value: boolean) => void;
-    folderFormValidation: RegExp;
     allowSelectChat?: boolean;
   };
 
@@ -266,12 +259,6 @@ export type ChatProps = {
   isAdmin?: boolean;
   standalone?: boolean;
 
-  setIsAIAgentChatDelete?: (value: {
-    visible: boolean;
-    itemName: string;
-    onDeleteAction: () => void;
-  }) => void;
-  setDeleteDialogVisible?: (value: boolean) => void;
   folderFormValidation: RegExp;
 
   multimodal?: TMultimodal;
@@ -291,7 +278,7 @@ export type ChatProps = {
   allowAttachFiles?: boolean;
   allowManageTools?: boolean;
   allowSelectChat?: boolean;
-};
+}
 
 export type ChatCoreProps = ChatProps & {
   isLoadingChat: boolean;

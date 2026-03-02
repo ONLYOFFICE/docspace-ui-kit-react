@@ -66,8 +66,6 @@ const ChatUI = observer(
     standalone = false,
     aiReady = false,
     getResultStorageId,
-    setIsAIAgentChatDelete,
-    setDeleteDialogVisible,
     folderFormValidation,
     multimodal,
     goToAISettings,
@@ -104,8 +102,6 @@ const ChatUI = observer(
           getResultStorageId={getResultStorageId}
           agentId={agentId}
           aiReady={aiReady}
-          setIsAIAgentChatDelete={setIsAIAgentChatDelete}
-          setDeleteDialogVisible={setDeleteDialogVisible}
           folderFormValidation={folderFormValidation}
           allowExternalNavigation={allowExternalNavigation}
           allowSelectChat={allowSelectChat}

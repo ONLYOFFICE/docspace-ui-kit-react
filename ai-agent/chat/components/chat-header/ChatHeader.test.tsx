@@ -54,8 +54,6 @@ describe("<ChatHeader />", () => {
     agentId: "123",
     aiReady: true,
     getResultStorageId: vi.fn(),
-    setIsAIAgentChatDelete: vi.fn(),
-    setDeleteDialogVisible: vi.fn(),
     folderFormValidation: /dummy/,
     allowSelectChat: true,
   };
