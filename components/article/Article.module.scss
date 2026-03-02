@@ -46,7 +46,7 @@
 
 :global(.light) {
    :local {
-    .apps, 
+    .apps,
     .wrapper, 
     .hideArticleMenuButton, 
     .articleHeader, 
@@ -78,7 +78,7 @@
  
 :global(.dark) {
    :local {
-    .apps, 
+    .apps,
     .wrapper, 
     .hideArticleMenuButton, 
     .articleHeader, 
@@ -115,7 +115,7 @@
   position: relative;
   margin-bottom: 11px;
 
-  &[data-with-dev-tools="false"] {
+  &[data-with-dev-tools="false"]:not([data-with-custom-slot="true"]) {
     margin-top: auto;
   }
 
@@ -130,10 +130,18 @@
 
     &[data-with-dev-tools="false"] {
       margin-bottom: 61px;
+
+      &[data-with-custom-slot="true"] {
+        margin-bottom: 40px;
+      }
     }
 
     &[data-with-dev-tools="true"] {
       margin-bottom: 20px;
+
+      &[data-with-custom-slot="true"] {
+        margin-bottom: 0;
+      }
     }
   }
 
@@ -178,6 +186,27 @@
   }
 }
 
+.customSlot {
+  margin-top: auto;
+  overflow: hidden;
+
+  &[data-with-dev-tools="false"] {
+    margin-bottom: 16px;
+  }
+
+  @include mixins.tablet {
+    margin-inline-start: 8px;
+ 
+    &[data-with-dev-tools="false"] {
+      margin-bottom: 10px;
+
+      &[data-with-back-button="true"][data-with-show-text="false"] {
+        margin-bottom: 44px;
+      }
+    }
+  }
+}
+
 .wrapper {
   cursor: pointer;
   position: relative;
@@ -188,6 +217,17 @@
   gap: 8px;
   align-items: center;
   border-radius: 6px;
+
+  &[data-with-custom-slot="true"] {
+    margin-top: 16px;
+  }
+
+  @include mixins.tablet {
+    &[data-with-custom-slot="true"] {
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+  }
 
   @include mixins.mobile {
     bottom: 0px;
@@ -244,6 +284,10 @@
 
   &[data-hide-profile-block="false"] {
     bottom: 89px;
+
+    &[data-with-custom-slot="true"] {
+      bottom: 80px;
+    }
   }
 
   &[data-show-text="true"] {
