@@ -27,7 +27,6 @@
  */
 
 import React from "react";
-import { Trans } from "react-i18next";
 
 import {
   ModalDialog,
@@ -42,6 +41,7 @@ import { useMessageStore } from "../../../../store/messageStore";
 import { DeleteChatProps } from "../../../../Chat.types";
 import { getCommonTranslation } from "../../../../../../utils";
 import { toastr } from "../../../../../../components/toast";
+import {CommonTrans} from "../../../../../../utils/i18n/CommonTrans";
 
 const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -100,22 +100,22 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
       displayType={ModalDialogType.modal}
     >
       <ModalDialog.Header>
-        {getCommonTranslation("DeleteDialog:DeleteAIAgentChatTitle")}
+        {getCommonTranslation("DeleteAIAgentChatTitle")}
       </ModalDialog.Header>
       <ModalDialog.Body>
-        <Trans
+        <CommonTrans
           i18nKey="DeleteAIChatDescription"
-          ns="DeleteDialog"
           values={{ chatName: chatTitle }}
           components={{
             1: <Text key="chat-title" fontWeight={400} as="span" />,
           }}
-        />
+        />{" "}
+        {getCommonTranslation("WantToContinue")}
       </ModalDialog.Body>
       <ModalDialog.Footer>
         <Button
           size={ButtonSize.normal}
-          label={getCommonTranslation("EmptyTrashDialog:DeleteForeverButton")}
+          label={getCommonTranslation("DeleteForeverButton")}
           onClick={onDeleteAction}
           scale
           primary
