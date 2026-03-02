@@ -1,3 +1,8 @@
+if (process.env.CI) {
+  console.log("Skipping copy-images in CI");
+  process.exit(0);
+}
+
 const fs = require("node:fs");
 const path = require("node:path");
 
