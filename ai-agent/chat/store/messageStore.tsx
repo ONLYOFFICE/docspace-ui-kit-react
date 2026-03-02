@@ -693,6 +693,8 @@ export default class MessageStore {
     if (this.isRequestRunning) {
       try {
         this.abortController.abort("Stop message");
+        this.setIsRequestRunning(false);
+        this.setIsStreamRunning(false);
       } catch (e) {
         console.log(e);
       }
