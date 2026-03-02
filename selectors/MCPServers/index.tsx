@@ -260,7 +260,7 @@ const MCPServersSelector = ({
         }),
         withoutBackButton: false,
         onBackClick: onBackClick,
-        onCloseClick: onClose,
+        onCloseClick: onClose ?? onBackClick,
         withoutBorder: false,
       }}
       withCancelButton
