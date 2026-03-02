@@ -79,6 +79,8 @@ export default class MessageStore {
 
   toolsConfirmQueue: string[] = [];
 
+  onStreamData?: (chunk: string) => void;
+
   constructor(aiApi: AiApi) {
     this.aiApi = aiApi;
     makeAutoObservable(this);
@@ -536,6 +538,8 @@ export default class MessageStore {
 
             chunkIdx = idx;
 
+            this.onStreamData?.(chunk);
+
             const [event, data] = chunk.split("\n");
 
             const dataKey = "data:";
@@ -727,6 +731,7 @@ export const MessageStoreContextProvider = ({
   generateDocxToolName,
   generateFormToolName,
   generatePresentationToolName,
+  onStreamData,
 }: TMessageStoreProps) => {
   const { aiApi } = useApi();
   const store = React.useMemo(() => new MessageStore(aiApi), [aiApi]);
@@ -770,6 +775,10 @@ export const MessageStoreContextProvider = ({
     if (generatePresentationToolName)
       store.setGeneratePresentationToolName(generatePresentationToolName);
   }, [store, generatePresentationToolName]);
+
+  React.useEffect(() => {
+    store.onStreamData = onStreamData;
+  }, [store, onStreamData]);
 
   return (
     <MessageStoreContext.Provider value={store}>

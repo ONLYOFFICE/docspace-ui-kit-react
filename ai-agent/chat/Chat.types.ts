@@ -64,6 +64,7 @@ export type TMessageStoreProps = {
   generateDocxToolName?: string;
   generateFormToolName?: string;
   generatePresentationToolName?: string;
+  onStreamData?: (chunk: string) => void;
 } & Omit<ReturnType<typeof useInitMessages>, "initMessages">;
 
 export type SelectModelProps = {
@@ -283,6 +284,7 @@ export type ChatProps = {
   allowSelectChat?: boolean;
   onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
   onStopMessageStream?: () => void;
+  onStreamData?: (chunk: string) => void;
 }
 
 export type ChatCoreProps = ChatProps & {

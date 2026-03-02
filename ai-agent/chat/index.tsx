@@ -209,6 +209,7 @@ const ChatCore = (props: ChatCoreProps) => {
         generateDocxToolName={toolsSettings.generateDocxToolName}
         generateFormToolName={toolsSettings.generateFormToolName}
         generatePresentationToolName={toolsSettings.generatePresentationToolName}
+        onStreamData={props.onStreamData}
       >
         <ChatContainer
           isLoadingChat={isLoadingChat}

@@ -74,6 +74,7 @@ const defaultProps: ChatProps = {
   allowSelectChat: false,
   onSendMessage: fn(),
   onStopMessageStream: fn(),
+  onStreamData: fn(),
 };
 
 export const Default: Story = {
