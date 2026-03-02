@@ -42,6 +42,7 @@ import { DeleteChatProps } from "../../../../Chat.types";
 import { getCommonTranslation } from "../../../../../../utils";
 import { toastr } from "../../../../../../components/toast";
 import {CommonTrans} from "../../../../../../utils/i18n/CommonTrans";
+import styles from "./DeleteChat.module.scss";
 
 const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -102,7 +103,7 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
       <ModalDialog.Header>
         {getCommonTranslation("DeleteAIAgentChatTitle")}
       </ModalDialog.Header>
-      <ModalDialog.Body>
+      <ModalDialog.Body className={styles.modalWrapper}>
         <CommonTrans
           i18nKey="DeleteAIChatDescription"
           values={{ chatName: chatTitle }}

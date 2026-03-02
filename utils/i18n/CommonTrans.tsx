@@ -26,7 +26,7 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { ReactNode, ReactElement, cloneElement, Fragment } from "react";
+import { ReactNode, ReactElement, cloneElement, Fragment, createElement } from "react";
 import { getCommonTranslation } from ".";
 
 export type CommonTransComponent =
@@ -37,7 +37,7 @@ function renderCommonTrans(
   values: Record<string, ReactNode>,
   components: Record<number, CommonTransComponent>,
 ): ReactNode[] {
-  const REGEX = /<(\d+)>(.*?)<\/\1>|{{(.*?)}}/gs;
+  const REGEX = /<(\d+)>(.*?)<\/\1>|<([a-zA-Z]+)>(.*?)<\/\3>|{{(.*?)}}/gs;
   const result: ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -47,7 +47,7 @@ function renderCommonTrans(
       result.push(template.slice(lastIndex, match.index));
     }
 
-    // <1>...</1>
+    // <1>...</1> (numbered tags)
     if (match[1]) {
       const index = Number(match[1]);
       const content = match[2];
@@ -64,10 +64,24 @@ function renderCommonTrans(
         );
       }
     }
+    // <strong>...</strong> (HTML tags) - render as React elements
+    else if (match[3]) {
+      const tagName = match[3];
+      const content = match[4];
+      const children = renderCommonTrans(content, values, components);
+      
+      result.push(
+        createElement(
+          tagName,
+          { key: result.length },
+          ...children,
+        ),
+      );
+    }
 
     // {{value}}
-    if (match[3]) {
-      result.push(values[match[3]] ?? `{{${match[3]}}}`);
+    if (match[5]) {
+      result.push(values[match[5]] ?? `{{${match[5]}}}`);
     }
 
     lastIndex = REGEX.lastIndex;
