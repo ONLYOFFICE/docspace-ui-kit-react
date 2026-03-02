@@ -99,7 +99,7 @@ type StoryArgs = {
 };
 
 const meta: Meta<StoryArgs> = {
-  title: "Selectors/PeopleSelector",
+  title: "Components/Selectors/PeopleSelector",
   parameters: {
     docs: {
       description: {

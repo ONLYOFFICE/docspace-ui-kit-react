@@ -32,7 +32,7 @@ import { Error401 } from "./Error401";
 import { setupErrorI18n } from "./stories.utils";
 
 const meta = {
-  title: "UI/Feedback/Error401",
+  title: "Components/Errors/Error401",
   component: Error401,
   parameters: {
     docs: {

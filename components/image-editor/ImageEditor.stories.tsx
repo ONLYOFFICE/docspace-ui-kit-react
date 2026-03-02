@@ -141,6 +141,7 @@ const ImageEditorDemo = ({
     x: 0.5,
     y: 0,
   });
+  const [preview, setPreview] = useState<React.ReactNode>(null);
 
   const onChangeImage = useCallback((newImage: TImage) => {
     setImage(newImage);
@@ -156,6 +157,10 @@ const ImageEditorDemo = ({
     [],
   );
 
+  const handleSetPreview = useCallback((value: string) => {
+    setPreview(value ? <img src={value} alt="Preview" /> : null);
+  }, []);
+
   return (
     <div style={{ width: "100%", maxWidth: "800px" }}>
       <ImageEditor
@@ -163,8 +168,10 @@ const ImageEditorDemo = ({
         image={image}
         onChangeImage={onChangeImage}
         onChangeFile={onChangeFile}
-        editorBorderRadius={editorBorderRadius}
-        isDisabled={isDisabled}
+        Preview={preview}
+        setPreview={handleSetPreview}
+        editorBorderRadius={editorBorderRadius ?? 0}
+        isDisabled={isDisabled ?? false}
         disableImageRescaling={disableImageRescaling}
         maxImageSize={maxImageSize}
       />

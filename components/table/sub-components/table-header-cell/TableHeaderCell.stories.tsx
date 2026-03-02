@@ -170,7 +170,7 @@ export const Resizable: Story = {
   render: (args) => <TableHeaderCell {...args} />,
   args: {
     ...Default.args,
-    column: { ...Default.args?.column, resizable: true },
+    column: { ...Default.args?.column, key: "name", title: "Name", resizable: true },
     resizable: true,
   },
   parameters: {
@@ -411,6 +411,7 @@ export const ShortColumn: Story = {
     sortingVisible: false,
     column: {
       ...Default.args?.column,
+      key: "short",
       title: "#",
       resizable: false,
       isShort: true,

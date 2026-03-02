@@ -35,7 +35,7 @@ import type { GroupsSelectorProps } from "./GroupsSelector.types";
 type StoryArgs = GroupsSelectorProps;
 
 const meta: Meta<StoryArgs> = {
-  title: "Selectors/GroupsSelector",
+  title: "Components/Selectors/GroupsSelector",
   component: GroupsSelector,
   parameters: {
     docs: {

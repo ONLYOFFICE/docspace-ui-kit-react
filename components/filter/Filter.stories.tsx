@@ -603,6 +603,7 @@ export const DisabledFilter: Story = {
 
 const InteractiveViewSelectorTemplate = ({
   viewAs: argsViewAs,
+  onChangeView: _,
   ...rest
 }: ViewSelectorProps) => {
   const [viewAs, setViewAs] = useState(argsViewAs);
@@ -627,6 +628,7 @@ const ViewSelectorDefaultTemplate = () => {
       viewAs="row"
       isDisabled={false}
       isFilter={false}
+      onChangeView={() => {}}
     />
   );
 };
@@ -660,6 +662,7 @@ const ViewSelectorDisabledTemplate = () => {
       viewAs="row"
       isDisabled
       isFilter={false}
+      onChangeView={() => {}}
     />
   );
 };
@@ -686,6 +689,7 @@ const ViewSelectorFilterModeTemplate = () => {
       viewAs="row"
       isDisabled={false}
       isFilter
+      onChangeView={() => {}}
     />
   );
 };

@@ -7,7 +7,7 @@ import { ThemeKeys } from "../../enums";
 import ThemeProvider from "./ThemeProvider";
 
 const meta: Meta<typeof ThemeProvider> = {
-  title: "Providers/ThemeProvider",
+  title: "Components/Providers/ThemeProvider",
   component: ThemeProvider,
   parameters: {
     docs: {

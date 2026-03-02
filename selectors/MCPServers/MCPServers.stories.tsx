@@ -42,7 +42,7 @@ type MCPServersSelectorProps = {
 type StoryArgs = MCPServersSelectorProps;
 
 const meta: Meta<StoryArgs> = {
-  title: "Selectors/MCPServersSelector",
+  title: "Components/Selectors/MCPServersSelector",
   component: MCPServersSelector,
   parameters: {
     docs: {

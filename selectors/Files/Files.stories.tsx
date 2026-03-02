@@ -98,7 +98,7 @@ type StoryArgs = {
 };
 
 const meta: Meta<StoryArgs> = {
-  title: "Selectors/FilesSelector",
+  title: "Components/Selectors/FilesSelector",
   parameters: {
     docs: {
       description: {

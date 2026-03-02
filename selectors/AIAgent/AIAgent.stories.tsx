@@ -38,7 +38,7 @@ import type { AIAgentSelectorProps } from "./AIAgent.types";
 type StoryArgs = AIAgentSelectorProps;
 
 const meta: Meta<StoryArgs> = {
-  title: "Selectors/AIAgentSelector",
+  title: "Components/Selectors/AIAgentSelector",
   component: AIAgentSelector,
   parameters: {
     docs: {

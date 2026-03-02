@@ -32,7 +32,7 @@ import { ErrorOfflineContainer } from "./ErrorOffline";
 import { setupErrorI18n } from "./stories.utils";
 
 const meta = {
-  title: "UI/Feedback/ErrorOffline",
+  title: "Components/Errors/ErrorOffline",
   component: ErrorOfflineContainer,
   parameters: {
     docs: {

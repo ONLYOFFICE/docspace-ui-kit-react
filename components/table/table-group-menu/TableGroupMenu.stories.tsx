@@ -146,7 +146,8 @@ import { TableGroupMenu } from "@docspace/ui-kit/components/table/table-group-me
   ],
 } satisfies Meta<typeof TableGroupMenu>;
 
-type Story = StoryObj<ComponentProps<typeof TableGroupMenu>>;
+type TableGroupMenuProps = ComponentProps<typeof TableGroupMenu>;
+type Story = StoryObj<TableGroupMenuProps>;
 
 export default meta;
 
@@ -203,7 +204,7 @@ const checkboxOptions = (
 );
 
 export const Default: Story = {
-  render: (args) => <TableGroupMenu {...args} />,
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     isChecked: false,
     isIndeterminate: false,
@@ -239,7 +240,7 @@ export const Default: Story = {
 };
 
 export const Checked: Story = {
-  render: (args) => <TableGroupMenu {...args} />,
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
     isChecked: true,
@@ -265,7 +266,7 @@ export const Checked: Story = {
 };
 
 export const Indeterminate: Story = {
-  render: (args) => <TableGroupMenu {...args} />,
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
     isIndeterminate: true,
@@ -291,7 +292,7 @@ export const Indeterminate: Story = {
 };
 
 export const WithHeaderLabel: Story = {
-  render: (args) => <TableGroupMenu {...args} />,
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
     headerLabel: "Custom header label",
@@ -317,7 +318,7 @@ export const WithHeaderLabel: Story = {
 };
 
 export const Closeable: Story = {
-  render: (args) => <TableGroupMenu {...args} />,
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
     isCloseable: true,
@@ -345,7 +346,7 @@ export const Closeable: Story = {
 };
 
 export const Blocked: Story = {
-  render: (args) => <TableGroupMenu {...args} />,
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
     isBlocked: true,

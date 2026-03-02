@@ -32,7 +32,7 @@ import { AccessRestricted } from "./AccessRestricted";
 import { setupErrorI18n } from "./stories.utils";
 
 const meta = {
-  title: "UI/Feedback/AccessRestricted",
+  title: "Components/Errors/AccessRestricted",
   component: AccessRestricted,
   parameters: {
     docs: {

@@ -129,7 +129,8 @@ import { RoomIcon } from "@docspace/ui-kit/components/room-icon";
   },
 } satisfies Meta<typeof RoomIcon>;
 
-type Story = StoryObj<ComponentProps<typeof RoomIcon>>;
+type RoomIconProps = ComponentProps<typeof RoomIcon>;
+type Story = StoryObj<RoomIconProps>;
 
 export default meta;
 
@@ -164,7 +165,7 @@ const mockModel = [
 ];
 
 export const Default: Story = {
-  render: (args) => (
+  render: (args: RoomIconProps) => (
     <RoomIcon
       {...args}
       className={`${styles.roomTitle} ${styles.roomBackground}`}
@@ -237,7 +238,7 @@ export const Colors: Story = {
 };
 
 export const WithEditing: Story = {
-  render: (args) => (
+  render: (args: RoomIconProps) => (
     <div style={{ height: "200px" }}>
       <RoomIcon
         {...args}
@@ -275,7 +276,7 @@ export const WithEditing: Story = {
 };
 
 export const EmptyState: Story = {
-  render: (args) => (
+  render: (args: RoomIconProps) => (
     <div style={{ height: "200px" }}>
       <RoomIcon {...args} />
     </div>
@@ -300,7 +301,7 @@ export const EmptyState: Story = {
 };
 
 export const Archive: Story = {
-  render: (args) => (
+  render: (args: RoomIconProps) => (
     <RoomIcon {...args} className={styles.roomTitle} />
   ),
   args: {
@@ -324,7 +325,7 @@ export const Archive: Story = {
 };
 
 export const WithBadge: Story = {
-  render: (args) => (
+  render: (args: RoomIconProps) => (
     <div style={{ position: "relative", width: "120px", height: "120px" }}>
       <RoomIcon {...args} className={styles.roomTitle} />
     </div>
@@ -359,7 +360,7 @@ export const WithBadge: Story = {
 };
 
 export const WithTooltip: Story = {
-  render: (args) => (
+  render: (args: RoomIconProps) => (
     <div style={{ position: "relative", width: "120px", height: "120px" }}>
       <RoomIcon {...args} className={styles.roomTitle} />
     </div>
@@ -397,7 +398,7 @@ export const WithTooltip: Story = {
 };
 
 export const Template: Story = {
-  render: (args) => (
+  render: (args: RoomIconProps) => (
     <RoomIcon {...args} className={styles.roomTitle} />
   ),
   args: {
@@ -421,7 +422,7 @@ export const Template: Story = {
 };
 
 export const WithHover: Story = {
-  render: (args) => (
+  render: (args: RoomIconProps) => (
     <div style={{ height: "200px" }}>
       <RoomIcon
         {...args}
@@ -459,7 +460,7 @@ export const WithHover: Story = {
 };
 
 export const LongTitle: Story = {
-  render: (args) => (
+  render: (args: RoomIconProps) => (
     <RoomIcon
       {...args}
       className={`${styles.roomTitle} ${styles.roomBackground}`}

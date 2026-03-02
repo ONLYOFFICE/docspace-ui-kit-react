@@ -32,7 +32,7 @@ import { ErrorInvalidLink } from "./ErrorInvalidLink";
 import { setupErrorI18n } from "./stories.utils";
 
 const meta = {
-  title: "UI/Feedback/ErrorInvalidLink",
+  title: "Components/Errors/ErrorInvalidLink",
   component: ErrorInvalidLink,
   parameters: {
     docs: {

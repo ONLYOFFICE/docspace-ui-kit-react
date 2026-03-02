@@ -32,7 +32,7 @@ import ErrorUnavailable from "./ErrorUnavailable";
 import { setupErrorI18n } from "./stories.utils";
 
 const meta = {
-  title: "UI/Feedback/ErrorUnavailable",
+  title: "Components/Errors/ErrorUnavailable",
   component: ErrorUnavailable,
   parameters: {
     docs: {

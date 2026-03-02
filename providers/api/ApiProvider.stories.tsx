@@ -31,7 +31,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import ApiProvider from "./ApiProvider";
 
 const meta = {
-	title: "Providers/ApiProvider",
+	title: "Components/Providers/ApiProvider",
 	component: ApiProvider,
 	parameters: {
 		docs: {
