@@ -97,7 +97,7 @@ describe("<MCPToolContent />", () => {
     } as unknown as ReturnType<typeof useTheme>);
 
     vi.mocked(useApi).mockReturnValue({
-      apiUrl: "https://api.url",
+      baseUrl: "https://api.url",
     } as unknown as ReturnType<typeof useApi>);
   });
 

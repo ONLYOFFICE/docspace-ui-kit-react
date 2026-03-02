@@ -55,7 +55,7 @@ export const MCPToolContent = observer(
       generatePresentationToolName,
     } = useMessageStore();
     const { isBase } = useTheme();
-    const { apiUrl } = useApi();
+    const { baseUrl } = useApi();
 
     const isGenerateDocx = generateDocxToolName === content.name;
     const isGenerateForm = generateFormToolName === content.name;
@@ -87,7 +87,7 @@ export const MCPToolContent = observer(
                 : getServerIcon(
                     content.mcpServerInfo?.serverType || ServerType.Custom,
                     isBase,
-                    apiUrl,
+                    baseUrl,
                   )
             }
             size={MCPIconSize.Small}

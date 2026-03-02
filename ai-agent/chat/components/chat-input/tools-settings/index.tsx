@@ -83,7 +83,7 @@ const ToolsSettings = ({
 }) => {
   const { agentId } = useChatStore();
   const { isBase } = useTheme();
-  const { aiApi, thirdPartyApi, apiUrl } = useApi();
+  const { aiApi, thirdPartyApi, baseUrl } = useApi();
 
   const [showManageConnections, setShowManageConnections] =
     React.useState(false);
@@ -288,7 +288,7 @@ const ToolsSettings = ({
           key: mcpId,
           label: name,
           icon: server.icon?.icon16 ?? "",
-          iconNode: getServerIcon(server.serverType, isBase, apiUrl),
+          iconNode: getServerIcon(server.serverType, isBase, baseUrl),
           withMCPIcon: true,
           items,
         };
@@ -433,7 +433,7 @@ const ToolsSettings = ({
                           {server.icon?.icon16 ? (
                             <img src={server.icon.icon16} alt={server.name} />
                           ) : (
-                            getServerIcon(server.serverType, isBase, apiUrl)
+                            getServerIcon(server.serverType, isBase, baseUrl)
                           )}
 
                           <Text
