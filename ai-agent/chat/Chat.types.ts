@@ -79,6 +79,7 @@ export type SelectChatProps = {
   getResultStorageId: () => number | null;
   folderFormValidation: RegExp;
   allowExternalNavigation?: boolean;
+  onSelectChat?: (chatId: string) => void
 };
 
 export type RenameChatProps = {
@@ -98,6 +99,7 @@ export type ChatHeaderProps = SelectModelProps &
     aiReady: boolean;
     allowSelectChat?: boolean;
     onNewChat?: () => void;
+    onSelectChat?: (chatId: string) => void;
   };
 
 export type MessageProps = {
@@ -287,6 +289,7 @@ export type ChatProps = {
   onStopStream?: () => void;
   onStreamData?: (chunk: string) => void;
   onNewChat?: () => void;
+  onSelectChat?: (chatId: string) => void;
 }
 
 export type ChatCoreProps = ChatProps & {

@@ -70,6 +70,7 @@ const SelectChat = ({
   getResultStorageId,
   folderFormValidation,
   allowExternalNavigation,
+  onSelectChat,
 }: SelectChatProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [hoveredItem, setHoveredItem] = React.useState("");
@@ -106,6 +107,7 @@ const SelectChat = ({
     fetchChat(id);
     fetchMessages(id);
     toggleOpen();
+    onSelectChat?.(id);
   };
 
   const onRenameToggle = React.useCallback(() => {

@@ -46,6 +46,7 @@ const ChatHeader = ({
   allowExternalNavigation,
   allowSelectChat,
   onNewChat,
+  onSelectChat,
 }: ChatHeaderProps) => {
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -63,6 +64,7 @@ const ChatHeader = ({
           agentId={agentId}
           folderFormValidation={folderFormValidation}
           allowExternalNavigation={allowExternalNavigation}
+          onSelectChat={onSelectChat}
         />
       )}
       <CreateChat isLoadingProp={isLoading} isDisabled={!aiReady} onNewChat={onNewChat} />
