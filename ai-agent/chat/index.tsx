@@ -83,6 +83,7 @@ const ChatUI = observer(
     onStopStream,
     onNewChat,
     onSelectChat,
+    modelAliases,
   }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
 
@@ -112,6 +113,7 @@ const ChatUI = observer(
           allowSelectChat={allowSelectChat}
           onNewChat={onNewChat}
           onSelectChat={onSelectChat}
+          modelAliases={modelAliases}
         />
         {showEmptyScreen ? (
           <ChatNoAccessScreen

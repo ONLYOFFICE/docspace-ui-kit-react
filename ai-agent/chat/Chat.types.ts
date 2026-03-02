@@ -26,6 +26,7 @@
 import type React from "react";
 
 import type {
+  TAIConfig,
   TContent,
   TMessage,
   TToolCallContent,
@@ -70,6 +71,7 @@ export type TMessageStoreProps = {
 export type SelectModelProps = {
   selectedModel: string;
   isLoading?: boolean;
+  modelAliases?: TAIConfig["modelAliases"];
 };
 
 export type SelectChatProps = {
@@ -290,6 +292,8 @@ export type ChatProps = {
   onStreamData?: (chunk: string) => void;
   onNewChat?: () => void;
   onSelectChat?: (chatId: string) => void;
+
+  modelAliases?: TAIConfig["modelAliases"];
 }
 
 export type ChatCoreProps = ChatProps & {

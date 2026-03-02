@@ -99,8 +99,6 @@ const Buttons = ({
 
     await aiApi.exportChatMessage(messageId, selectedItemId, fileName);
 
-    console.log(socket?.socketSubscribers);
-
     socket?.on(SocketEvents.ExportChat, (data) => {
       const { resultFile } = data;
 

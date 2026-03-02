@@ -66,20 +66,12 @@ const FilesList = ({
     const downloadImages = async () => {
       const newImg = new Map<string, string>();
 
-      const actions = [];
       for (const file of imgFiles) {
         if (!file.viewUrl || !file.id) continue;
 
-        actions.push(downloadImageAsBase64(file.viewUrl));
-      }
-
-      const results = await Promise.all(actions);
-
-      results.forEach((result, index) => {
-        const file = imgFiles[index];
-        if (!file.id) return;
+        const result = await downloadImageAsBase64(file.viewUrl);
         newImg.set(file.id.toString(), result);
-      });
+      }
 
       setImgsBase64(newImg);
     };

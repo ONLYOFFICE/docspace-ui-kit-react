@@ -47,6 +47,7 @@ const ChatHeader = ({
   allowSelectChat,
   onNewChat,
   onSelectChat,
+  modelAliases,
 }: ChatHeaderProps) => {
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -68,7 +69,7 @@ const ChatHeader = ({
         />
       )}
       <CreateChat isLoadingProp={isLoading} isDisabled={!aiReady} onNewChat={onNewChat} />
-      <SelectModel selectedModel={selectedModel} isLoading={isLoading} />
+      <SelectModel selectedModel={selectedModel} isLoading={isLoading} modelAliases={modelAliases}/>
     </div>
   );
 };

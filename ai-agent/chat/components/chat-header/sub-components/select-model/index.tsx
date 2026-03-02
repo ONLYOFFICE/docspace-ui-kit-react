@@ -26,8 +26,6 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { getAiModelName } from "../../../../../../utils/ai/getAiModelName";
-
 import { RectangleSkeleton } from "../../../../../../components/rectangle";
 
 import { Text } from "../../../../../../components/text";
@@ -36,7 +34,7 @@ import type { SelectModelProps } from "../../../../Chat.types";
 
 import styles from "../../ChatHeader.module.scss";
 
-const SelectModel = ({ selectedModel, isLoading }: SelectModelProps) => {
+const SelectModel = ({ selectedModel, isLoading, modelAliases }: SelectModelProps) => {
   if (isLoading) {
     return (
       <RectangleSkeleton
@@ -48,7 +46,7 @@ const SelectModel = ({ selectedModel, isLoading }: SelectModelProps) => {
     );
   }
 
-  const name = getAiModelName(selectedModel);
+  const name = modelAliases?.[selectedModel] ?? "";
 
   return (
     <Text

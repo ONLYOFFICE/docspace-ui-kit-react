@@ -115,6 +115,8 @@ export type TAIConfig = {
   generateDocxToolName?: string;
   generateFormToolName?: string;
   generatePresentationToolName?: string;
+
+  modelAliases: Record<string, string>;
 };
 
 export type TMCPTool = {
