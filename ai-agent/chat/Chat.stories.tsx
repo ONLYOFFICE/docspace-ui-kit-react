@@ -26,6 +26,7 @@
 
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "storybook/test";
 
 import Chat from "./index";
 import type { ChatProps } from "./Chat.types";
@@ -71,9 +72,8 @@ const defaultProps: ChatProps = {
   allowAttachFiles: false,
   allowManageTools: false,
   allowSelectChat: false,
-  onSendMessage: (message, files) => {
-    console.log(message, files)
-  },
+  onSendMessage: fn(),
+  onStopMessageStream: fn(),
 };
 
 export const Default: Story = {

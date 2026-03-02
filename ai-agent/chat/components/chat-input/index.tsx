@@ -62,6 +62,7 @@ const ChatInput = ({
   allowAttachFiles,
   allowManageTools,
   onSendMessage,
+  onStopMessageStream,
 }: ChatInputProps) => {
   const { startChat, sendMessage, currentChatId, isRequestRunning, agentId } =
     useMessageStore();
@@ -319,6 +320,7 @@ const ChatInput = ({
               allowExternalNavigation={allowExternalNavigation}
               allowAttachFiles={allowAttachFiles}
               allowManageTools={allowManageTools}
+              onStopMessageStream={onStopMessageStream}
             />
           </>
         )}

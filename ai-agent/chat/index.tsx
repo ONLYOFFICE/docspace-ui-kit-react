@@ -80,6 +80,7 @@ const ChatUI = observer(
     allowManageTools,
     allowSelectChat,
     onSendMessage,
+    onStopMessageStream,
   }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
 
@@ -146,6 +147,7 @@ const ChatUI = observer(
               allowAttachFiles={allowAttachFiles}
               allowManageTools={allowManageTools}
               onSendMessage={onSendMessage}
+              onStopMessageStream={onStopMessageStream}
             />
           </>
         )}

@@ -195,6 +195,7 @@ export type ButtonsProps = {
   allowExternalNavigation?: boolean;
   allowAttachFiles?: boolean;
   allowManageTools?: boolean;
+  onStopMessageStream?: () => void;
 };
 
 export type AttachmentProps = {
@@ -223,6 +224,7 @@ export type ChatInputProps = {
   allowAttachFiles?: boolean;
   allowManageTools?: boolean;
   onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
+  onStopMessageStream?: () => void;
 };
 
 export type ChatInfoBlockProps = {
@@ -280,6 +282,7 @@ export type ChatProps = {
   allowManageTools?: boolean;
   allowSelectChat?: boolean;
   onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
+  onStopMessageStream?: () => void;
 }
 
 export type ChatCoreProps = ChatProps & {

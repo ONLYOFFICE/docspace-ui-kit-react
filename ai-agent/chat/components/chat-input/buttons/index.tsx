@@ -57,12 +57,18 @@ const Buttons = ({
   allowExternalNavigation,
   allowAttachFiles = false,
   allowManageTools,
+  onStopMessageStream,
 }: ButtonsProps) => {
   const { isRequestRunning, stopMessage } = useMessageStore();
 
   const isSendButtonDisabled = !isRequestRunning
     ? !value.trim() || !selectedModel
     : false;
+
+  const handleStopMessage = () => {
+    stopMessage();
+    onStopMessageStream?.();
+  };
 
   const sendIconProps = !isRequestRunning
     ? {
@@ -71,7 +77,7 @@ const Buttons = ({
         iconNode: <SendReactSvg />,
       }
     : {
-        onClick: stopMessage,
+        onClick: handleStopMessage,
         isDisabled: false,
         iconNode: <div className={styles.square} />,
       };
