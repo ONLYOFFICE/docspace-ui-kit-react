@@ -1,6 +1,15 @@
 .wrapper {
-  height: 200px;
+  height: 400px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   position: relative;
+
+  :global(.layout-progress-bar_wrapper) {
+    position: static;
+    width: auto;
+    height: auto;
+  }
 }
   
 .isAutoDocs {

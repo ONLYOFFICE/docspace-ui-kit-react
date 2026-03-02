@@ -38,36 +38,36 @@ import { MainButtonMobile } from ".";
 import styles from "./MainButtonMobile.stories.module.scss";
 
 const actionOptions = [
-  {
-    key: "1",
-    label: "New document",
-    icon: CatalogFolderReactSvgUrl,
-  },
-  {
-    key: "2",
-    label: "New presentation",
-    icon: CatalogFolderReactSvgUrl,
-  },
-  {
-    key: "3",
-    label: "New spreadsheet",
-    icon: CatalogFolderReactSvgUrl,
-  },
-  {
-    key: "4",
-    label: "New folder",
-    icon: CatalogFolderReactSvgUrl,
-  },
+	{
+		key: "1",
+		label: "New document",
+		icon: CatalogFolderReactSvgUrl,
+	},
+	{
+		key: "2",
+		label: "New presentation",
+		icon: CatalogFolderReactSvgUrl,
+	},
+	{
+		key: "3",
+		label: "New spreadsheet",
+		icon: CatalogFolderReactSvgUrl,
+	},
+	{
+		key: "4",
+		label: "New folder",
+		icon: CatalogFolderReactSvgUrl,
+	},
 ];
 
 const meta = {
-  title: "UI/Interactive elements/MainButtonMobile",
-  component: MainButtonMobile,
-  parameters: {
-    layout: "centered",
-    docs: {
-      description: {
-        component: `A mobile-friendly floating action button with dropdown menu and progress indicators.
+	title: "UI/Interactive elements/MainButtonMobile",
+	component: MainButtonMobile,
+	parameters: {
+		layout: "centered",
+		docs: {
+			description: {
+				component: `A mobile-friendly floating action button with dropdown menu and progress indicators.
 
 ### Features
 
@@ -102,72 +102,72 @@ import { MainButtonMobile } from "@docspace/ui-kit/components/main-button-mobile
   ]}
 />
 \`\`\``,
-      },
-    },
-  },
-  argTypes: {
-    title: {
-      control: "text",
-      description: "The button name displayed in the dropdown",
-    },
-    percent: {
-      control: { type: "range", min: 0, max: 100, step: 1 },
-      description: "Upload progress percentage",
-      table: {
-        defaultValue: { summary: "0" },
-      },
-    },
-    opened: {
-      control: "boolean",
-      description: "Controls whether the dropdown menu is open",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    alert: {
-      control: "boolean",
-      description: "Shows an alert indicator on the button",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    withMenu: {
-      control: "boolean",
-      description: "Whether to show the dropdown menu",
-      table: {
-        defaultValue: { summary: "true" },
-      },
-    },
-    withButton: {
-      control: "boolean",
-      description: "Displays a secondary button inside the dropdown",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    withoutButton: {
-      control: "boolean",
-      description: "If true, hides the main floating button",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    isOpenButton: {
-      control: "boolean",
-      description: "Opens the secondary button menu",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    onClick: {
-      action: "onClick",
-      description: "Click handler for the main button",
-    },
-    onClose: {
-      action: "onClose",
-      description: "Callback when the dropdown is closed",
-    },
-  },
+			},
+		},
+	},
+	argTypes: {
+		title: {
+			control: "text",
+			description: "The button name displayed in the dropdown",
+		},
+		percent: {
+			control: { type: "range", min: 0, max: 100, step: 1 },
+			description: "Upload progress percentage",
+			table: {
+				defaultValue: { summary: "0" },
+			},
+		},
+		opened: {
+			control: "boolean",
+			description: "Controls whether the dropdown menu is open",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		alert: {
+			control: "boolean",
+			description: "Shows an alert indicator on the button",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		withMenu: {
+			control: "boolean",
+			description: "Whether to show the dropdown menu",
+			table: {
+				defaultValue: { summary: "true" },
+			},
+		},
+		withButton: {
+			control: "boolean",
+			description: "Displays a secondary button inside the dropdown",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		withoutButton: {
+			control: "boolean",
+			description: "If true, hides the main floating button",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		isOpenButton: {
+			control: "boolean",
+			description: "Opens the secondary button menu",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		onClick: {
+			action: "onClick",
+			description: "Click handler for the main button",
+		},
+		onClose: {
+			action: "onClose",
+			description: "Callback when the dropdown is closed",
+		},
+	},
 } satisfies Meta<typeof MainButtonMobile>;
 
 type Story = StoryObj<ComponentProps<typeof MainButtonMobile>>;
@@ -175,149 +175,134 @@ type Story = StoryObj<ComponentProps<typeof MainButtonMobile>>;
 export default meta;
 
 const InteractiveTemplate = ({ ...args }) => {
-  const [isOpenButton, setIsOpenButton] = useState(false);
+	const [isOpenButton, setIsOpenButton] = useState(false);
 
-  const buttonOptions = [
-    {
-      key: "1",
-      label: "Import files",
-      icon: DownloadReactSvgUrl,
-      onClick: () => setIsOpenButton(false),
-    },
-    {
-      key: "2",
-      label: "Import folder",
-      icon: DownloadReactSvgUrl,
-      onClick: () => setIsOpenButton(false),
-    },
-    {
-      key: "4",
-      label: "Upload from cloud",
-      icon: DownloadReactSvgUrl,
-      onClick: () => setIsOpenButton(false),
-    },
-  ];
+	const buttonOptions = [
+		{
+			key: "1",
+			label: "Import files",
+			icon: DownloadReactSvgUrl,
+			onClick: () => setIsOpenButton(false),
+		},
+		{
+			key: "2",
+			label: "Import folder",
+			icon: DownloadReactSvgUrl,
+			onClick: () => setIsOpenButton(false),
+		},
+		{
+			key: "4",
+			label: "Upload from cloud",
+			icon: DownloadReactSvgUrl,
+			onClick: () => setIsOpenButton(false),
+		},
+	];
 
-  const isAutoDocs =
-    typeof window !== "undefined" && window?.location?.href.includes("docs");
+	const isAutoDocs =
+		typeof window !== "undefined" && window?.location?.href.includes("docs");
 
-  return (
-    <div
-      className={classNames(styles.wrapper, {
-        [styles.isAutoDocs]: isAutoDocs,
-      })}
-    >
-      <MainButtonMobile
-        {...args}
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          insetInlineEnd: "24px",
-        }}
-        actionOptions={actionOptions}
-        dropdownStyle={
-          {
-            "--main-button-mobile-dropdown-position": "absolute",
-            "--main-button-mobile-dropdown-right": "60px",
-            "--main-button-mobile-dropdown-bottom": "60px",
-          } as React.CSSProperties
-        }
-        buttonOptions={buttonOptions}
-        withButton
-        isOpenButton={isOpenButton}
-        opened={false}
-      />
-    </div>
-  );
+	return (
+		<div
+			className={classNames(styles.wrapper, {
+				[styles.isAutoDocs]: isAutoDocs,
+			})}
+		>
+			<MainButtonMobile
+				{...args}
+				actionOptions={actionOptions}
+				dropdownStyle={
+					{
+						"--main-button-mobile-dropdown-position": "absolute",
+						"--main-button-mobile-dropdown-right": "60px",
+						"--main-button-mobile-dropdown-bottom": "60px",
+					} as React.CSSProperties
+				}
+				buttonOptions={buttonOptions}
+				withButton
+				isOpenButton={isOpenButton}
+				opened={false}
+			/>
+		</div>
+	);
 };
 
 export const Default: Story = {
-  render: (args) => <InteractiveTemplate {...args} />,
-  args: {
-    title: "Upload",
-    opened: false,
-    alert: false,
-    withMenu: true,
-    actionOptions,
-  },
+	render: (args) => <InteractiveTemplate {...args} />,
+	args: {
+		title: "Upload",
+		opened: false,
+		alert: false,
+		withMenu: true,
+		actionOptions,
+	},
 };
 
 const WithAlertTemplate = () => {
-  return (
-    <div className={styles.wrapper}>
-      <MainButtonMobile
-        title="Upload"
-        alert
-        actionOptions={actionOptions}
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          insetInlineEnd: "24px",
-        }}
-        dropdownStyle={
-          {
-            "--main-button-mobile-dropdown-position": "absolute",
-            "--main-button-mobile-dropdown-right": "60px",
-            "--main-button-mobile-dropdown-bottom": "60px",
-          } as React.CSSProperties
-        }
-        opened={false}
-      />
-    </div>
-  );
+	return (
+		<div className={styles.wrapper}>
+			<MainButtonMobile
+				title="Upload"
+				alert
+				actionOptions={actionOptions}
+				dropdownStyle={
+					{
+						"--main-button-mobile-dropdown-position": "absolute",
+						"--main-button-mobile-dropdown-right": "60px",
+						"--main-button-mobile-dropdown-bottom": "60px",
+					} as React.CSSProperties
+				}
+				opened={false}
+			/>
+		</div>
+	);
 };
 
 export const WithAlert: Story = {
-  render: () => <WithAlertTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "MainButtonMobile with an alert indicator. Draws attention to notifications or important updates.",
-      },
-      source: {
-        code: `<MainButtonMobile title="Upload" alert actionOptions={actionOptions} />`,
-      },
-    },
-  },
+	render: () => <WithAlertTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"MainButtonMobile with an alert indicator. Draws attention to notifications or important updates.",
+			},
+			source: {
+				code: `<MainButtonMobile title="Upload" alert actionOptions={actionOptions} />`,
+			},
+		},
+	},
 };
 
 const WithProgressTemplate = () => {
-  return (
-    <div className={styles.wrapper}>
-      <MainButtonMobile
-        title="Upload"
-        percent={65}
-        actionOptions={actionOptions}
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          insetInlineEnd: "24px",
-        }}
-        dropdownStyle={
-          {
-            "--main-button-mobile-dropdown-position": "absolute",
-            "--main-button-mobile-dropdown-right": "60px",
-            "--main-button-mobile-dropdown-bottom": "60px",
-          } as React.CSSProperties
-        }
-        opened={false}
-      />
-    </div>
-  );
+	return (
+		<div className={styles.wrapper}>
+			<MainButtonMobile
+				title="Upload"
+				percent={65}
+				actionOptions={actionOptions}
+				dropdownStyle={
+					{
+						"--main-button-mobile-dropdown-position": "absolute",
+						"--main-button-mobile-dropdown-right": "60px",
+						"--main-button-mobile-dropdown-bottom": "60px",
+					} as React.CSSProperties
+				}
+				opened={false}
+			/>
+		</div>
+	);
 };
 
 export const WithProgress: Story = {
-  render: () => <WithProgressTemplate />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "MainButtonMobile showing upload progress at 65%. The progress indicator displays around the button.",
-      },
-      source: {
-        code: `<MainButtonMobile title="Upload" percent={65} actionOptions={actionOptions} />`,
-      },
-    },
-  },
+	render: () => <WithProgressTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"MainButtonMobile showing upload progress at 65%. The progress indicator displays around the button.",
+			},
+			source: {
+				code: `<MainButtonMobile title="Upload" percent={65} actionOptions={actionOptions} />`,
+			},
+		},
+	},
 };

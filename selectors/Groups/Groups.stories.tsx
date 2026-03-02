@@ -144,8 +144,9 @@ type Story = StoryObj<StoryArgs>;
 const Template = (props: StoryArgs) => (
   <div
     style={{
-      width: "100%",
-      height: "500px",
+      width: "700px",
+      height: "600px",
+      border: "4px dashed #d0d5dd",
       overflow: "hidden",
       transform: "translateZ(0)",
     }}

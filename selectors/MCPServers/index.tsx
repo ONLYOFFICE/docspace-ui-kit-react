@@ -35,6 +35,7 @@ import {
   Selector,
   RowLoader,
   type TSelectorItem,
+  type TSelectorWithAside,
 } from "../../components/selector";
 import { useTheme } from "../../context/ThemeContext";
 import { useApi } from "../../providers/api/ApiProvider";
@@ -74,9 +75,8 @@ export type TServer = {
   needReset?: boolean;
 };
 
-type MCPServersSelectorProps = {
+type MCPServersSelectorProps = TSelectorWithAside & {
   onSubmit: (servers: TSelectorItem[]) => void;
-  onClose: VoidFunction;
   onBackClick: VoidFunction;
 
   initedSelectedServers?: string[];
@@ -87,6 +87,9 @@ const MCPServersSelector = ({
   onSubmit,
   onClose,
   onBackClick,
+  useAside,
+  withoutBackground,
+  withBlur,
 }: MCPServersSelectorProps) => {
   const { apiClient } = useApi();
   const { isBase } = useTheme();
@@ -245,7 +248,9 @@ const MCPServersSelector = ({
       loadNextPage={fetchMoreServer}
       isLoading={isLoading}
       isMultiSelect
-      useAside={false}
+      useAside={useAside ?? false}
+      withoutBackground={withoutBackground}
+      withBlur={withBlur}
       onClose={onClose}
       onSelect={onSelect}
       withHeader

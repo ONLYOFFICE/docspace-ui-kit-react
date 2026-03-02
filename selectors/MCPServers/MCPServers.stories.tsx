@@ -37,6 +37,9 @@ type MCPServersSelectorProps = {
   onClose: VoidFunction;
   onBackClick: VoidFunction;
   initedSelectedServers?: string[];
+  useAside?: boolean;
+  withoutBackground?: boolean;
+  withBlur?: boolean;
 };
 
 type StoryArgs = MCPServersSelectorProps;
@@ -108,6 +111,23 @@ enum ServerType {
       description:
         "Called when the back button or cancel button is clicked — navigate to previous view",
     },
+
+    // Aside
+    useAside: {
+      control: "boolean",
+      description: "Render the selector inside an Aside panel with a backdrop",
+      table: { defaultValue: { summary: "false" } },
+    },
+    withoutBackground: {
+      control: "boolean",
+      description: "Remove the background overlay in Aside mode",
+      table: { defaultValue: { summary: "false" } },
+    },
+    withBlur: {
+      control: "boolean",
+      description: "Apply blur effect to the Aside backdrop",
+      table: { defaultValue: { summary: "false" } },
+    },
   },
 };
 
@@ -118,8 +138,9 @@ type Story = StoryObj<StoryArgs>;
 const Template = (props: StoryArgs) => (
   <div
     style={{
-      width: "100%",
-      height: "500px",
+      width: "700px",
+      height: "600px",
+      border: "4px dashed #d0d5dd",
       overflow: "hidden",
       transform: "translateZ(0)",
     }}
@@ -189,6 +210,46 @@ export const WithPreselection: Story = {
       source: {
         code: `<MCPServersSelector
   initedSelectedServers={["portal"]}
+  onSubmit={(servers) => saveConnectedServers(servers.map((s) => s.id))}
+  onClose={() => setOpen(false)}
+  onBackClick={() => navigateBack()}
+/>`,
+      },
+    },
+  },
+};
+
+export const AsideMode: Story = {
+  render: (args: StoryArgs) => <Template {...args} />,
+  args: {
+    useAside: true,
+    withoutBackground: false,
+    withBlur: false,
+    initedSelectedServers: [],
+    onSubmit: (servers) => {
+      const names = servers.map((s) => s.label).join(", ");
+      toastr.success(`Selected: ${names || "none"}`);
+    },
+    onClose: () => {
+      toastr.info("Selector closed");
+    },
+    onBackClick: () => {
+      toastr.info("Back clicked");
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Renders the selector inside an Aside panel with a backdrop overlay. " +
+          "Use `withBlur` to apply a blur effect and `withoutBackground` to remove the overlay.",
+      },
+      source: {
+        code: `<MCPServersSelector
+  useAside
+  withoutBackground={false}
+  withBlur={false}
+  initedSelectedServers={[]}
   onSubmit={(servers) => saveConnectedServers(servers.map((s) => s.id))}
   onClose={() => setOpen(false)}
   onBackClick={() => navigateBack()}
