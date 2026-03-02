@@ -73,7 +73,7 @@ const defaultProps: ChatProps = {
   allowManageTools: false,
   allowSelectChat: false,
   onSendMessage: fn(),
-  onStopMessageStream: fn(),
+  onStopStream: fn(),
   onStreamData: fn(),
 };
 

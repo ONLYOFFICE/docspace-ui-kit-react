@@ -48,7 +48,7 @@ const ChatFooter = ({
   allowAttachFiles,
   allowManageTools,
   onSendMessage,
-  onStopMessageStream,
+  onStopStream,
 }: ChatFooterProps) => {
   return (
     <div className={styles.chatFooter} data-testid="chat-footer">
@@ -71,7 +71,7 @@ const ChatFooter = ({
         allowAttachFiles={allowAttachFiles}
         allowManageTools={allowManageTools}
         onSendMessage={onSendMessage}
-        onStopMessageStream={onStopMessageStream}
+        onStopStream={onStopStream}
       />
     </div>
   );

@@ -57,7 +57,7 @@ const Buttons = ({
   allowExternalNavigation,
   allowAttachFiles = false,
   allowManageTools,
-  onStopMessageStream,
+  onStopStream,
 }: ButtonsProps) => {
   const { isRequestRunning, stopMessage } = useMessageStore();
 
@@ -67,7 +67,7 @@ const Buttons = ({
 
   const handleStopMessage = () => {
     stopMessage();
-    onStopMessageStream?.();
+    onStopStream?.();
   };
 
   const sendIconProps = !isRequestRunning
