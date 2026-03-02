@@ -22,6 +22,8 @@ function collectUsedKeys() {
     /getCommonTranslation\(["']([^"']+)["']/g,
     // t("Common:Key") or translate("Common:Key")
     /(?:translate|\.t)\(["']Common:([^"']+)["']/g,
+    // CommonTrans i18nKey="Key" or i18nKey='Key'
+    /i18nKey=["']([^"']+)["']/g,
   ];
 
   function scan(dir) {
