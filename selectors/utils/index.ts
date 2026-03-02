@@ -134,8 +134,6 @@ export const convertFilesToItems: (
       false,
     );
 
-    console.log(icon);
-
     const isDisabled = includedItems?.length
       ? !includedItems.includes(id!)
       : false;
@@ -194,8 +192,6 @@ export const convertFoldersToItems: (
 
     const folderIconPath = getIconPathByFolderType(type);
     const icon = iconSize32.get(folderIconPath);
-
-    console.log(icon, iconSize32, folderIconPath);
 
     const isDisabled =
       isDisableFolder(folder, disabledItems, filterParam) ||

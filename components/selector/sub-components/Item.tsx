@@ -238,8 +238,6 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
       isDisabled ||
       (isMultiSelect && isLimitReached && !isSelected && !isFolder);
 
-    console.log("====", typeof icon);
-
     return (
       <div
         key={`${label}-${avatar}-${role}`}
