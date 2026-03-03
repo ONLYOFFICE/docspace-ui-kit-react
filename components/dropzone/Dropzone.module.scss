@@ -81,6 +81,10 @@
   transform: translate(-50%, -50%);
 }
 
+.dropzoneProgress {
+  width: 60%;
+}
+
 .dropzone {
   flex: 1;
   height: 100%;
@@ -96,14 +100,6 @@
 
   &.isLoading {
     visibility: hidden;
-  }
-
-  &.hasMultipleInputs {
-    cursor: default;
-
-    .dropzoneLink.main {
-      cursor: pointer;
-    }
   }
 }
 

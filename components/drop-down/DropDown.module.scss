@@ -83,7 +83,7 @@
   }
 
   :global(.scroll-drop-down-item) {
-    .scroll-body {
+    :global(.scroll-body) {
       padding-inline-end: 0 !important;
     }
   }

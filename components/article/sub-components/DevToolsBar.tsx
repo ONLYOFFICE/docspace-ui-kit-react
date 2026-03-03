@@ -39,6 +39,7 @@ import styles from "../Article.module.scss";
 import { ArticleDevToolsBarProps } from "../Article.types";
 
 const ArticleDevToolsBar = ({
+  withCustomSlot,
   showText,
   articleOpen,
   currentDeviceType,
@@ -75,6 +76,7 @@ const ArticleDevToolsBar = ({
       onMouseDown={onMouseDown}
       data-testid="dev-tools-bar"
       data-show-text={showText ? "true" : "false"}
+      data-with-custom-slot={withCustomSlot ? "true" : "false"}
       data-hide-profile-block={articleOpen ? "true" : "false"}
     >
       <DeveloperReactSvg className="icon" />

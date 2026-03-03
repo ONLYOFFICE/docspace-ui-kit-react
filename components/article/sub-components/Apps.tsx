@@ -44,6 +44,7 @@ const ArticleApps = React.memo(
   ({
     showText,
     withDevTools,
+    withCustomSlot,
     logoText,
     downloaddesktopUrl,
     officeforandroidUrl,
@@ -57,6 +58,7 @@ const ArticleApps = React.memo(
       <div
         data-show-text={showText ? "true" : "false"}
         data-with-dev-tools={withDevTools ? "true" : "false"}
+        data-with-custom-slot={withCustomSlot ? "true" : "false"}
         className={classNames(styles.apps, {
           [styles.withDevTools]: withDevTools,
         })}
