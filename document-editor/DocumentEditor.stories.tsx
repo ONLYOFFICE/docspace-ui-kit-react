@@ -26,11 +26,21 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Meta, StoryContext, StoryObj } from "@storybook/react-vite";
+import { FilterType } from "@onlyoffice/docspace-api-sdk";
 
 import { DocumentEditor } from "./DocumentEditor";
 import type { DocumentEditorProps } from "./DocumentEditor.types";
 
 import ErrorContainer from "../components/error-container/ErrorContainer";
+import { Button, ButtonSize } from "../components/button";
+import { InputSize } from "../components/text-input";
+import { FileInput } from "../components/file-input";
+import { ComboBox, ComboBoxSize } from "../components/combobox";
+import type { TOption } from "../components/combobox/ComboBox.types";
+
+import FilesSelector from "../selectors/Files";
+
+import { dataSets, getIsDisabled } from "./DocumentEditor.story.helper";
 
 type StoryArgs = DocumentEditorProps;
 
@@ -149,12 +159,7 @@ export const Default: Story = {
   render: (args: StoryArgs) => {
     const { ...editorProps } = args;
 
-    return (
-      <DocumentEditor
-        key={editorProps.fileId}
-        {...(editorProps as DocumentEditorProps)}
-      />
-    );
+    return <DocumentEditor {...editorProps} />;
   },
   args: {
     id: "editor",
@@ -168,12 +173,7 @@ export const ViewMode: Story = {
   render: (args: StoryArgs) => {
     const { ...editorProps } = args;
 
-    return (
-      <DocumentEditor
-        key={editorProps.fileId}
-        {...(editorProps as DocumentEditorProps)}
-      />
-    );
+    return <DocumentEditor {...editorProps} />;
   },
   args: {
     id: "viewer",
@@ -195,9 +195,8 @@ export const WithCustomEvent: Story = {
 
     return (
       <DocumentEditor
-        key={editorProps.fileId}
         events_onDocumentReady={onDocumentReady}
-        {...(editorProps as DocumentEditorProps)}
+        {...editorProps}
       />
     );
   },
@@ -207,5 +206,157 @@ export const WithCustomEvent: Story = {
     width: "100%",
     height: "600px",
     isView: true,
+  },
+};
+
+export const FillSpreadsheetWithData: Story = {
+  render: (args: StoryArgs) => {
+    const { ...editorProps }: {} & Omit<DocumentEditorProps, "fileId"> = args;
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [fileId, setFileId] = useState<number | null>(null);
+    const [isReady, setIsReady] = useState(false);
+    const [selectedDataSet, setSelectedDataSet] = useState<TOption>({
+      key: dataSets[0].key,
+      label: dataSets[0].label,
+    });
+
+    const onSubmit = (selectedItemId: string | number | undefined) => {
+      setFileId(Number(selectedItemId));
+    };
+
+    if (!fileId)
+      return (
+        <>
+          <FileInput
+            fromStorage
+            placeholder="Choose file"
+            size={InputSize.base}
+            onClick={() => setIsOpen(true)}
+          />
+          {/* @ts-expect-error need pass all props */}
+          <FilesSelector
+            key="select-file-dialog"
+            isPanelVisible={isOpen}
+            onCancel={() => setIsOpen(false)}
+            onSubmit={onSubmit}
+            submitButtonLabel="Select"
+            isMultiSelect={false}
+            withRecentTreeFolder
+            withFavoritesTreeFolder
+            withAIAgentsTreeFolder
+            openRoot
+            withBreadCrumbs
+            withSearch
+            getIsDisabled={getIsDisabled}
+            filterParam={FilterType.SpreadsheetsOnly}
+          />
+        </>
+      );
+
+    const onDocumentReady = () => {
+      setIsReady(true);
+    };
+
+    const fillSpreadsheetData = () => {
+      // @ts-ignore - DocEditor is provided by ONLYOFFICE at runtime
+      const documentEditor = window.DocEditor?.instances?.[editorProps.id];
+      const currentDataSet = dataSets.find(
+        (ds) => ds.key === selectedDataSet.key,
+      );
+
+      if (!documentEditor || !currentDataSet) return;
+
+      try {
+        const connector = documentEditor.createConnector();
+
+        const headersLiteral = JSON.stringify(currentDataSet.headers);
+        const dataLiteral = JSON.stringify(currentDataSet.data);
+
+        // Construct a command function with inlined data to avoid scope issues in callCommand
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval
+        const commandFunction = new Function(
+          `
+            const headers = ${headersLiteral};
+            const data = ${dataLiteral};
+            const oWorksheet = Api.GetActiveSheet();
+
+            for (let i = 0; i < headers.length; i++) {
+              const headerCell = oWorksheet.GetRangeByNumber(0, i);
+              headerCell.SetValue(headers[i]);
+              headerCell.SetBold(true);
+              headerCell.SetFillColor(Api.CreateColorFromRGB(200, 200, 200));
+
+              const columnData = Array.isArray(data[i]) ? data[i] : [];
+              for (let j = 0; j < columnData.length; j++) {
+                oWorksheet.GetRangeByNumber(j + 1, i).SetValue(columnData[j]);
+              }
+            }
+
+            oWorksheet.SetColumnWidth(0, 15);
+            oWorksheet.SetColumnWidth(1, 20);
+            oWorksheet.SetColumnWidth(2, 15);
+            oWorksheet.SetColumnWidth(3, 15);
+            oWorksheet.SetColumnWidth(4, 15);
+          `,
+        );
+
+        connector.callCommand(commandFunction as () => void);
+      } catch (error) {
+        documentEditor.showMessage("Automation command failed: " + error);
+      }
+    };
+
+    const dataSetOptions: TOption[] = dataSets.map((ds) => ({
+      key: ds.key,
+      label: ds.label,
+    }));
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "8px",
+          height: "100%",
+        }}
+      >
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <ComboBox
+            options={dataSetOptions}
+            selectedOption={selectedDataSet}
+            onSelect={(option) => setSelectedDataSet(option)}
+            scaled={false}
+            scaledOptions
+            size={ComboBoxSize.huge}
+            directionY="bottom"
+            isDisabled={!isReady}
+            withoutBackground
+          />
+          <Button
+            onClick={fillSpreadsheetData}
+            label="Fill Spreadsheet"
+            isDisabled={!isReady}
+            size={ButtonSize.small}
+            primary
+          />
+          <Button
+            label="Reset file"
+            size={ButtonSize.small}
+            onClick={() => setFileId(null)}
+          />
+        </div>
+        <DocumentEditor
+          fileId={fileId}
+          events_onDocumentReady={onDocumentReady}
+          {...editorProps}
+        />
+      </div>
+    );
+  },
+  args: {
+    id: "fill-spreadsheet",
+    width: "100%",
+    height: "600px",
   },
 };
