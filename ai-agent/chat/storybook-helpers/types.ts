@@ -24,8 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export const CHAT_SUPPORTED_FORMATS = "doc,docx,txt,pdf,xls,xlsx";
+export type AgentIdValidationResult = {
+  isValid: boolean;
+  error?: string;
+  agentId?: string | number;
+};
 
-export const CHAT_MAX_FILE_COUNT = 5;
-
-export const AGENT_ID_STORAGE_KEY = "docspace-storybook-chat-agentId";
+export type AgentIdSetupProps = {
+  onAgentIdConfigured: (agentId: string | number) => void;
+  initialAgentId?: string | number;
+  initialError?: string;
+};

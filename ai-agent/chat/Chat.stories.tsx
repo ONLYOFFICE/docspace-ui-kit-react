@@ -26,6 +26,7 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { withAgentIdSetup } from "./storybook-helpers/decorators/withAgentIdSetup";
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
 
@@ -78,7 +79,9 @@ type StoryArgs = {
 
 const meta: Meta<StoryArgs> = {
   title: "Components/AI Agent/Chat",
+  decorators: [withAgentIdSetup],
   parameters: {
+    requireAgentId: true,
     docs: {
       description: {
         component: `Chat is a full-featured AI chat interface component for DocSpace.
@@ -287,7 +290,6 @@ export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
     internalInit: true,
-    agentId: 229754,
     userAvatar: "",
     selectedModel: "gpt-4o",
     getResultStorageId: () => null,
@@ -320,12 +322,12 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default chat configuration with basic features. AI responses are streamed in real-time.",
+          "Default chat configuration with basic features. AI responses are streamed in real-time. Agent ID is configured via the setup screen.",
       },
       source: {
         code: `<Chat
   internalInit
-  agentId={229754}
+  agentId={validatedAgentId}
   userAvatar=""
   selectedModel="gpt-4o"
   getResultStorageId={() => null}

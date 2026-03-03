@@ -24,8 +24,58 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export const CHAT_SUPPORTED_FORMATS = "doc,docx,txt,pdf,xls,xlsx";
+import React from "react";
 
-export const CHAT_MAX_FILE_COUNT = 5;
+import { AGENT_ID_STORAGE_KEY } from "../../Chat.constants";
 
-export const AGENT_ID_STORAGE_KEY = "docspace-storybook-chat-agentId";
+const usePersistedAgentId = () => {
+  const [agentId, setAgentId] = React.useState<string | number | null>(null);
+
+  const getPersistedAgentId = React.useCallback((): string | number | null => {
+    try {
+      const stored = localStorage.getItem(AGENT_ID_STORAGE_KEY);
+      if (stored) {
+        const parsed = Number(stored);
+        return Number.isNaN(parsed) ? stored : parsed;
+      }
+      return null;
+    } catch (error) {
+      console.error("Failed to get persisted agentId:", error);
+      return null;
+    }
+  }, []);
+
+  const saveAgentId = React.useCallback((id: string | number) => {
+    try {
+      localStorage.setItem(AGENT_ID_STORAGE_KEY, String(id));
+      setAgentId(id);
+    } catch (error) {
+      console.error("Failed to save agentId:", error);
+    }
+  }, []);
+
+  const clearAgentId = React.useCallback(() => {
+    try {
+      localStorage.removeItem(AGENT_ID_STORAGE_KEY);
+      setAgentId(null);
+    } catch (error) {
+      console.error("Failed to clear agentId:", error);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const persisted = getPersistedAgentId();
+    if (persisted) {
+      setAgentId(persisted);
+    }
+  }, [getPersistedAgentId]);
+
+  return {
+    agentId,
+    saveAgentId,
+    clearAgentId,
+    getPersistedAgentId,
+  };
+};
+
+export default usePersistedAgentId;
