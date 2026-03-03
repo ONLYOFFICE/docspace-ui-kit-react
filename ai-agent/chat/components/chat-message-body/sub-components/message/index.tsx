@@ -56,6 +56,7 @@ import Files from "./files";
 import Images from "./images";
 import Buttons from "./buttons";
 import { getCommonTranslation } from "../../../../../../utils";
+import {useApi} from "../../../../../../providers";
 
 const renderLink = ({
   attributes,
@@ -94,6 +95,7 @@ const Message = ({
     generateFormToolName,
     generatePresentationToolName,
   } = useMessageStore();
+  const { baseUrl } = useApi();
 
   const isUser = message.role === RoleType.UserMessage;
   const isError = message.role === RoleType.Error;
@@ -112,7 +114,9 @@ const Message = ({
         >
           <Avatar
             size={AvatarSize.min}
-            source={currentChat?.createdBy.avatarOriginal ?? userAvatar}
+            source={currentChat?.createdBy.avatarOriginal
+              ? `${baseUrl}${currentChat?.createdBy.avatarOriginal}`
+              : userAvatar}
             role={AvatarRole.user}
             noClick
             isNotIcon
