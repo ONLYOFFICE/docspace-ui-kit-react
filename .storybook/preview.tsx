@@ -85,6 +85,7 @@ const preview: Preview = {
 					"Samples",
 					"Components",
 					[
+            "Chat",
 						"Document Editor",
 						"Selectors",
 						"Providers",
