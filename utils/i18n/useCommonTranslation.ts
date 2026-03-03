@@ -24,15 +24,29 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useState, useEffect, useCallback } from "react";
+import { useSyncExternalStore, useCallback } from "react";
 
-import { getCommonTranslation } from "./index";
+import { getCookie, getCommonTranslation } from "./index";
 import type { WindowI18n } from "./index";
 
 const getI18nInstance = (): WindowI18n["instance"] | undefined => {
   if (typeof window === "undefined") return undefined;
   return (window as unknown as { i18n?: WindowI18n }).i18n?.instance;
 };
+
+const subscribe = (onStoreChange: () => void): (() => void) => {
+  const instance = getI18nInstance();
+  if (!instance) return () => {};
+
+  instance.on("languageChanged", onStoreChange);
+  return () => {
+    instance.off("languageChanged", onStoreChange);
+  };
+};
+
+const getSnapshot = (): string => getCookie("asc_language") ?? "en";
+
+const getServerSnapshot = (): string => "en";
 
 /**
  * A React hook that provides a reactive version of `getCommonTranslation`.
@@ -42,24 +56,12 @@ const getI18nInstance = (): WindowI18n["instance"] | undefined => {
  * Requires `window.i18n.instance` to be set by the host application.
  */
 export const useCommonTranslation = () => {
-  const [tick, setTick] = useState(0);
-
-  useEffect(() => {
-    const instance = getI18nInstance();
-    if (!instance) return;
-
-    const handler = () => setTick((n) => n + 1);
-    instance.on("languageChanged", handler);
-    return () => {
-      instance.off("languageChanged", handler);
-    };
-  }, []);
+  const lang = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const t = useCallback(
     (key: string, interpolation?: Record<string, string | number>) =>
       getCommonTranslation(key, interpolation),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tick],
+    [lang],
   );
 
   return t;
