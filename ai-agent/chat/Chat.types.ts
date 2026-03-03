@@ -78,7 +78,7 @@ export type SelectChatProps = {
   isLoadingProp?: boolean;
   agentId: string | number;
   getIcon: TGetIcon;
-  getResultStorageId: () => number | null;
+  getResultStorageId?: () => number | null;
   folderFormValidation: RegExp;
   allowExternalNavigation?: boolean;
   onSelectChat?: (chatId: string) => void
@@ -110,7 +110,7 @@ export type MessageProps = {
   userAvatar: string;
   isLast: boolean;
   getIcon: TGetIcon;
-  getResultStorageId: () => number | null;
+  getResultStorageId?: () => number | null;
   folderFormValidation: RegExp;
   allowExternalNavigation?: boolean;
 } & Pick<MessageImagesProps, "setAiPlaylistImages" | "setMediaViewerVisible">;
@@ -122,7 +122,7 @@ export type MessageButtonsProps = {
   isLast: boolean;
   getIcon: TGetIcon;
   messageIndex: number;
-  getResultStorageId: () => number | null;
+  getResultStorageId?: () => number | null;
   folderFormValidation: RegExp;
   allowExternalNavigation?: boolean;
 };
@@ -171,7 +171,7 @@ export type MessageBodyProps = {
   isLoading?: boolean;
 
   getIcon: TGetIcon;
-  getResultStorageId: () => number | null;
+  getResultStorageId?: () => number | null;
   folderFormValidation: RegExp;
   useInternalScroll?: boolean;
   allowExternalNavigation?: boolean;
@@ -255,7 +255,7 @@ export type ChatProps = {
   userAvatar: MessageBodyProps["userAvatar"];
   selectedModel: string;
   getIcon?: ChatInputProps["getIcon"];
-  getResultStorageId: () => number | null;
+  getResultStorageId?: () => number | null;
   isLoading?: boolean;
   aiReady: boolean;
 

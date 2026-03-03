@@ -35,41 +35,15 @@ import type { ChatProps } from "./Chat.types";
 import type { TFile } from "../../types";
 
 type StoryArgs = {
-  // Core
-  agentId: string | number;
-  userAvatar: string;
-  selectedModel: string;
-  isLoading?: boolean;
-  aiReady: boolean;
-
-  // Layout
+  userAvatar?: string;
+  folderFormValidation?: RegExp;
   width?: string;
   height?: string;
-  useInternalScroll?: boolean;
-
-  // Attachments
-  attachmentFile: ChatProps["attachmentFile"];
-  clearAttachmentFile: () => void;
-
-  // Validation
-  folderFormValidation: RegExp;
-
-  // Permissions
-  isAdmin?: boolean;
-  standalone?: boolean;
-
-  // Features
   persistDraft?: boolean;
   allowExternalNavigation?: boolean;
   allowAttachFiles?: boolean;
   allowManageTools?: boolean;
   allowSelectChat?: boolean;
-
-  // Internal initialization
-  internalInit?: boolean;
-
-  // Callbacks
-  getResultStorageId: () => number | null;
   onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
   onStopStream?: () => void;
   onStreamData?: (chunk: string) => void;
@@ -110,6 +84,8 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
 // Full-featured chat with all options
 <Chat
   agentId={123}
+  width="100%"
+  height="100vh
   persistDraft={true}
   allowExternalNavigation={true}
   allowAttachFiles={true}
@@ -126,33 +102,15 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
     },
   },
   argTypes: {
-    // Core
-    agentId: {
-      control: "text",
-      description: "Unique identifier for the AI agent",
-    },
     userAvatar: {
       control: "text",
       description: "URL or path to the user's avatar image",
     },
-    selectedModel: {
-      control: "text",
+    folderFormValidation: {
+      control: "object",
       description:
-        "Currently selected AI model (e.g., 'gpt-4o', 'gpt-3.5-turbo')",
-      table: { defaultValue: { summary: "gpt-4o" } },
+        "Regular expression for validating folder names in generated documents",
     },
-    isLoading: {
-      control: "boolean",
-      description: "Loading state for the chat component",
-      table: { defaultValue: { summary: "false" } },
-    },
-    aiReady: {
-      control: "boolean",
-      description: "Whether the AI service is ready and available",
-      table: { defaultValue: { summary: "true" } },
-    },
-
-    // Layout
     width: {
       control: "text",
       description: "Width of the chat container",
@@ -161,34 +119,8 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
     height: {
       control: "text",
       description: "Height of the chat container",
-      table: { defaultValue: { summary: "100vh" } },
+      table: { defaultValue: { summary: "100%" } },
     },
-    useInternalScroll: {
-      control: "boolean",
-      description: "Use internal scrolling for the message list",
-      table: { defaultValue: { summary: "true" } },
-    },
-
-    // Validation
-    folderFormValidation: {
-      control: "object",
-      description:
-        "Regular expression for validating folder names in generated documents",
-    },
-
-    // Permissions
-    isAdmin: {
-      control: "boolean",
-      description: "Whether the current user is an administrator",
-      table: { defaultValue: { summary: "false" } },
-    },
-    standalone: {
-      control: "boolean",
-      description: "Whether the chat is running in standalone mode",
-      table: { defaultValue: { summary: "false" } },
-    },
-
-    // Features
     persistDraft: {
       control: "boolean",
       description: "Persist draft messages across sessions",
@@ -213,19 +145,6 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
       control: "boolean",
       description: "Enable chat selection and switching",
       table: { defaultValue: { summary: "false" } },
-    },
-
-    // Internal initialization
-    internalInit: {
-      control: "boolean",
-      description: "Use internal initialization for chats, messages, and tools",
-      table: { defaultValue: { summary: "false" } },
-    },
-
-    // Callbacks
-    getResultStorageId: {
-      action: "getResultStorageId",
-      description: "Function to get the storage ID for results",
     },
     onSendMessage: {
       action: "onSendMessage",
@@ -259,7 +178,7 @@ const Template = (props: StoryArgs) => (
   <div
     style={{
       width: "100%",
-      height: "100vh",
+      height: "auto",
       overflow: "hidden",
       display: "flex",
       justifyContent: "center",
@@ -273,23 +192,15 @@ const Template = (props: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-    internalInit: true,
     userAvatar: "",
-    selectedModel: "gpt-4o",
-    getResultStorageId: () => null,
-    aiReady: true,
-    attachmentFile: null,
-    clearAttachmentFile: () => {},
     folderFormValidation: /^[a-zA-Z0-9 ]+$/,
-    isAdmin: false,
     persistDraft: false,
     allowExternalNavigation: false,
     allowAttachFiles: false,
     allowManageTools: false,
     allowSelectChat: false,
     width: "100%",
-    height: "100vh",
-    useInternalScroll: true,
+    height: "700px",
     onSendMessage: (message, files) => {
       toastr.success(
         `Message sent: ${message.substring(0, 50)}${message.length > 50 ? "..." : ""}`,
@@ -310,16 +221,10 @@ export const Default: Story = {
       },
       source: {
         code: `<Chat
-  internalInit
   agentId={validatedAgentId}
   userAvatar=""
-  selectedModel="gpt-4o"
-  getResultStorageId={() => null}
-  aiReady={true}
-  attachmentFile={null}
-  clearAttachmentFile={() => {}}
   folderFormValidation={/^[a-zA-Z0-9 ]+$/}
-  onSendMessage={(message, files) => console.log(message)}
+  onSendMessage={(message, files) => console.log(message, files)}
 />`,
       },
     },
@@ -335,8 +240,7 @@ export const AllFeaturesEnabled: Story = {
     allowManageTools: true,
     allowSelectChat: true,
     width: "100%",
-    height: "100vh",
-    useInternalScroll: true,
+    height: "700px",
     onSendMessage: (message, files) => {
       toastr.success(
         `Message sent: ${message.substring(0, 50)}${message.length > 50 ? "..." : ""}${files.length > 0 ? ` with ${files.length} file(s)` : ""}`,

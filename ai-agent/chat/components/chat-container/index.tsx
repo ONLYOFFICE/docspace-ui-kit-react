@@ -35,7 +35,7 @@ import styles from "./ChatContainer.module.scss";
 const ChatContainer = ({
   children,
   isLoadingChat,
-  useInternalScroll = false,
+  useInternalScroll,
   width = "100%",
   height = "100%",
   style,

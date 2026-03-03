@@ -48,7 +48,7 @@ export const useChatScroll = ({
   fetchNextMessages,
   currentChat,
   messages,
-  useInternalScroll = false,
+  useInternalScroll,
 }: Props) => {
   const isMobile = useIsMobile();
 

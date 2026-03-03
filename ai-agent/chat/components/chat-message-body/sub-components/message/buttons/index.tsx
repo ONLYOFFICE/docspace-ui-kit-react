@@ -202,7 +202,7 @@ const Buttons = ({
         <ExportSelector
           onCloseFolderSelector={onCloseFolderSelector}
           onSubmit={onExportMessage}
-          currentFolderId={getResultStorageId() || agentId}
+          currentFolderId={getResultStorageId?.() || agentId}
           getFileName={getExportedFileName}
           getIcon={getIcon}
           showFolderSelector={showFolderSelector}
