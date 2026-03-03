@@ -81,6 +81,8 @@ const meta: Meta<StoryArgs> = {
   title: "Components/AI Agent/Chat",
   decorators: [withAgentIdSetup],
   parameters: {
+    layout: "fullscreen",
+    noPadding: true,
     requireAgentId: true,
     docs: {
       description: {
@@ -103,29 +105,11 @@ const meta: Meta<StoryArgs> = {
 import Chat from "@docspace/ui-kit/ai-agent/chat";
 
 // Basic chat
-<Chat
-  agentId={123}
-  userAvatar="/avatar.jpg"
-  selectedModel="gpt-4o"
-  getResultStorageId={() => null}
-  aiReady={true}
-  attachmentFile={null}
-  clearAttachmentFile={() => {}}
-  folderFormValidation={/^[a-zA-Z0-9 ]+$/}
-  onSendMessage={(message, files) => console.log(message)}
-/>
+<Chat agentId={123} />
 
 // Full-featured chat with all options
 <Chat
   agentId={123}
-  userAvatar="/avatar.jpg"
-  getResultStorageId={() => storageId}
-  aiReady={true}
-  attachmentFile={file}
-  clearAttachmentFile={clearFile}
-  folderFormValidation={/^[a-zA-Z0-9 ]+$/}
-  isAdmin={true}
-  standalone={true}
   persistDraft={true}
   allowExternalNavigation={true}
   allowAttachFiles={true}
@@ -336,6 +320,60 @@ export const Default: Story = {
   clearAttachmentFile={() => {}}
   folderFormValidation={/^[a-zA-Z0-9 ]+$/}
   onSendMessage={(message, files) => console.log(message)}
+/>`,
+      },
+    },
+  },
+};
+
+export const AllFeaturesEnabled: Story = {
+  render: (args: StoryArgs) => <Template {...args} />,
+  args: {
+    persistDraft: true,
+    allowExternalNavigation: true,
+    allowAttachFiles: true,
+    allowManageTools: true,
+    allowSelectChat: true,
+    width: "100%",
+    height: "100vh",
+    useInternalScroll: true,
+    onSendMessage: (message, files) => {
+      toastr.success(
+        `Message sent: ${message.substring(0, 50)}${message.length > 50 ? "..." : ""}${files.length > 0 ? ` with ${files.length} file(s)` : ""}`,
+      );
+    },
+    onStopStream: () => {
+      toastr.info("Stream stopped");
+    },
+    onStreamData: (chunk) => {
+      console.log("Stream chunk:", chunk);
+    },
+    onNewChat: () => {
+      toastr.success("New chat created");
+    },
+    onSelectChat: (chatId) => {
+      toastr.info(`Chat selected: ${chatId}`);
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Full-featured chat with all capabilities enabled: file attachments, chat management, tool settings, draft persistence, external navigation, and admin features. This configuration showcases the complete functionality of the Chat component.",
+      },
+      source: {
+        code: `<Chat
+  agentId={validatedAgentId}
+  persistDraft={true}
+  allowExternalNavigation={true}
+  allowAttachFiles={true}
+  allowManageTools={true}
+  allowSelectChat={true}
+  onSendMessage={(message, files) => console.log(message, files)}
+  onStopStream={() => console.log("Stream stopped")}
+  onStreamData={(chunk) => console.log(chunk)}
+  onNewChat={() => console.log("New chat")}
+  onSelectChat={(chatId) => console.log(chatId)}
 />`,
       },
     },

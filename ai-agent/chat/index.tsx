@@ -305,7 +305,7 @@ const ChatExternalInit = (props: ChatExternalInitProps) => {
 };
 
 const Chat = (props: ChatProps) => {
-  const { internalInit, ...rest } = props;
+  const { internalInit = true, ...rest } = props;
 
   if (internalInit) {
     return <ChatInternalInit {...rest} />;
