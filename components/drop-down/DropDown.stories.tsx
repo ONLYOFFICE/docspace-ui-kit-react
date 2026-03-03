@@ -185,6 +185,25 @@ export const Default: Story = {
     directionX: "right",
     directionY: "bottom",
   },
+  parameters: {
+    docs: {
+      source: {
+        code: `const [isOpen, setIsOpen] = useState(false);
+const buttonRef = useRef<HTMLButtonElement>(null);
+
+<Button ref={buttonRef} label="Open Dropdown" onClick={() => setIsOpen(true)} />
+<DropDown
+  open={isOpen}
+  forwardedRef={buttonRef}
+  clickOutsideAction={() => setIsOpen(false)}
+>
+  <DropDownItem label="Option 1" onClick={() => setIsOpen(false)} />
+  <DropDownItem label="Option 2" onClick={() => setIsOpen(false)} />
+  <DropDownItem label="Option 3" onClick={() => setIsOpen(false)} />
+</DropDown>`,
+      },
+    },
+  },
 };
 
 const WithHeadersTemplate = () => {

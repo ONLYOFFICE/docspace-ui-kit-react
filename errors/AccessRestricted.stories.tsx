@@ -33,6 +33,7 @@ import { setupErrorI18n } from "./stories.utils";
 
 const meta = {
   title: "Components/Errors/AccessRestricted",
+  tags: ["!autodocs"],
   component: AccessRestricted,
   parameters: {
     docs: {

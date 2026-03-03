@@ -82,6 +82,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.0",
     "@storybook/addon-docs": "10.2.8",
+    "blocks": "link:@storybook/addon-docs/blocks",
     "@storybook/addon-links": "^10.2.8",
     "@storybook/icons": "^2.0.1",
     "@storybook/react": "^10.2.8",

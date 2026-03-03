@@ -8,6 +8,7 @@ import ThemeProvider from "./ThemeProvider";
 
 const meta: Meta<typeof ThemeProvider> = {
   title: "Components/Providers/ThemeProvider",
+  tags: ["!autodocs"],
   component: ThemeProvider,
   parameters: {
     docs: {

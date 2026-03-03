@@ -33,6 +33,7 @@ import { setupErrorI18n } from "./stories.utils";
 
 const meta = {
   title: "Components/Errors/Error404",
+  tags: ["!autodocs"],
   component: Error404,
   parameters: {
     docs: {

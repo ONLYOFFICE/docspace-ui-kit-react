@@ -43,6 +43,7 @@ import {
   STORAGE_KEY,
   type SavedApiProvider,
 } from "../utils/apiProviders";
+import { setCookie } from "../../utils/cookie";
 
 import "./index.css";
 
@@ -211,9 +212,11 @@ const ApiConfigDropdown = () => {
         setModalOpen(true);
       } else {
         updateGlobals({ apiConfig: value });
+        const provider = providers.find((p) => p.id === value);
+        setCookie("asc_auth_key", provider?.apiKey ?? "");
       }
     },
-    [updateGlobals],
+    [updateGlobals, providers],
   );
 
   const handleModalSave = useCallback(
@@ -230,6 +233,8 @@ const ApiConfigDropdown = () => {
       setProviders(getSavedProviders());
       setModalOpen(false);
       updateGlobals({ apiConfig: id });
+
+      setCookie("asc_auth_key", key);
     },
     [updateGlobals],
   );

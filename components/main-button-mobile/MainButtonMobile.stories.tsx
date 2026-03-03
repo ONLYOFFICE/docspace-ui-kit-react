@@ -24,18 +24,42 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import classNames from "classnames";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 import DownloadReactSvgUrl from "../../assets/icons/16/download.react.svg?url";
 
 import { MainButtonMobile } from ".";
 import styles from "./MainButtonMobile.stories.module.scss";
+
+import {
+  isDesktop as checkIsDesktop,
+  size,
+} from "../../utils/device";
+
+const useIsDesktop = () => {
+  const [isDesktopView, setIsDesktopView] = useState(checkIsDesktop);
+
+  useEffect(() => {
+    const handleResize = () =>
+      setIsDesktopView(window.innerWidth >= size.desktop);
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return isDesktopView;
+};
+
+const DesktopWarning = () => (
+  <div className={styles.desktopWarning}>
+    Need change to tablet or mobile viewport
+  </div>
+);
 
 const actionOptions = [
   {
@@ -64,7 +88,7 @@ const meta = {
   title: "UI/Interactive elements/MainButtonMobile",
   component: MainButtonMobile,
   parameters: {
-    layout: "centered",
+    layout: "fullscreen",
     docs: {
       description: {
         component: `A mobile-friendly floating action button with dropdown menu and progress indicators.
@@ -175,6 +199,7 @@ type Story = StoryObj<ComponentProps<typeof MainButtonMobile>>;
 export default meta;
 
 const InteractiveTemplate = ({ ...args }) => {
+  const isDesktop = useIsDesktop();
   const [isOpenButton, setIsOpenButton] = useState(false);
 
   const buttonOptions = [
@@ -198,36 +223,21 @@ const InteractiveTemplate = ({ ...args }) => {
     },
   ];
 
-  const isAutoDocs =
-    typeof window !== "undefined" && window?.location?.href.includes("docs");
+  if (isDesktop) return <DesktopWarning />;
 
   return (
-    <div
-      className={classNames(styles.wrapper, {
-        [styles.isAutoDocs]: isAutoDocs,
-      })}
-    >
-      <MainButtonMobile
-        {...args}
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          insetInlineEnd: "24px",
-        }}
-        actionOptions={actionOptions}
-        dropdownStyle={
-          {
-            "--main-button-mobile-dropdown-position": "absolute",
-            "--main-button-mobile-dropdown-right": "60px",
-            "--main-button-mobile-dropdown-bottom": "60px",
-          } as React.CSSProperties
-        }
-        buttonOptions={buttonOptions}
-        withButton
-        isOpenButton={isOpenButton}
-        opened={false}
-      />
-    </div>
+    <MainButtonMobile
+      {...args}
+      style={{
+        position: "fixed",
+        bottom: "24px",
+        insetInlineEnd: "24px",
+      }}
+      actionOptions={actionOptions}
+      buttonOptions={buttonOptions}
+      isOpenButton={isOpenButton}
+      onClose={() => setIsOpenButton(false)}
+    />
   );
 };
 
@@ -243,27 +253,21 @@ export const Default: Story = {
 };
 
 const WithAlertTemplate = () => {
+  const isDesktop = useIsDesktop();
+
+  if (isDesktop) return <DesktopWarning />;
+
   return (
-    <div className={styles.wrapper}>
-      <MainButtonMobile
-        title="Upload"
-        alert
-        actionOptions={actionOptions}
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          insetInlineEnd: "24px",
-        }}
-        dropdownStyle={
-          {
-            "--main-button-mobile-dropdown-position": "absolute",
-            "--main-button-mobile-dropdown-right": "60px",
-            "--main-button-mobile-dropdown-bottom": "60px",
-          } as React.CSSProperties
-        }
-        opened={false}
-      />
-    </div>
+    <MainButtonMobile
+      title="Upload"
+      alert
+      style={{
+        position: "fixed",
+        bottom: "24px",
+        insetInlineEnd: "24px",
+      }}
+      actionOptions={actionOptions}
+    />
   );
 };
 
@@ -283,27 +287,21 @@ export const WithAlert: Story = {
 };
 
 const WithProgressTemplate = () => {
+  const isDesktop = useIsDesktop();
+
+  if (isDesktop) return <DesktopWarning />;
+
   return (
-    <div className={styles.wrapper}>
-      <MainButtonMobile
-        title="Upload"
-        percent={65}
-        actionOptions={actionOptions}
-        style={{
-          position: "fixed",
-          bottom: "24px",
-          insetInlineEnd: "24px",
-        }}
-        dropdownStyle={
-          {
-            "--main-button-mobile-dropdown-position": "absolute",
-            "--main-button-mobile-dropdown-right": "60px",
-            "--main-button-mobile-dropdown-bottom": "60px",
-          } as React.CSSProperties
-        }
-        opened={false}
-      />
-    </div>
+    <MainButtonMobile
+      title="Upload"
+      percent={65}
+      style={{
+        position: "fixed",
+        bottom: "24px",
+        insetInlineEnd: "24px",
+      }}
+      actionOptions={actionOptions}
+    />
   );
 };
 

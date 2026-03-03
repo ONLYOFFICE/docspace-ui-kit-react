@@ -33,14 +33,14 @@ import EmptyScreenRoomsDark from "../../assets/empty.rooms.root.user.dark.react.
 
 import { getCommonTranslation } from "../../utils/i18n";
 import {
-	Selector,
-	RowLoader,
-	SearchLoader,
-	type TSelectorItem,
-	type TSelectorCancelButton,
-	type TSelectorHeader,
-	type TSelectorSearch,
-	type TSelectorWithAside,
+  Selector,
+  RowLoader,
+  SearchLoader,
+  type TSelectorItem,
+  type TSelectorCancelButton,
+  type TSelectorHeader,
+  type TSelectorSearch,
+  type TSelectorWithAside,
 } from "../../components/selector";
 
 import { useTheme } from "../../context/ThemeContext";
@@ -50,340 +50,341 @@ import useRoomsHelper from "../utils/hooks/useRoomsHelper";
 import type { RoomSelectorProps } from "./RoomSelector.types";
 import { convertToItems } from "./RoomSelector.utils";
 import {
-	LoadersContext,
-	LoadersContextProvider,
+  LoadersContext,
+  LoadersContextProvider,
 } from "../utils/contexts/Loaders";
 
 const RoomSelectorComponent = ({
-	id,
-	className,
-	style,
+  id,
+  className,
+  style,
 
-	excludeItems,
+  excludeItems,
 
-	withSearch,
+  withSearch,
 
-	isMultiSelect,
+  isMultiSelect,
 
-	submitButtonLabel,
-	onSubmit,
+  submitButtonLabel,
+  onSubmit,
 
-	withHeader,
-	headerProps,
+  withHeader,
+  headerProps,
 
-	withPadding,
+  withPadding,
 
-	setIsDataReady,
+  setIsDataReady,
 
-	withCancelButton,
-	cancelButtonLabel,
-	onCancel,
+  withCancelButton,
+  cancelButtonLabel,
+  onCancel,
 
-	roomType,
-	searchArea,
+  roomType,
+  searchArea,
 
-	disableThirdParty,
-	emptyScreenHeader,
-	emptyScreenDescription,
+  disableThirdParty,
+  emptyScreenHeader,
+  emptyScreenDescription,
 
-	createDefineRoomLabel,
-	createDefineRoomType,
+  createDefineRoomLabel,
+  createDefineRoomType,
 
-	useAside,
-	onClose,
-	withBlur,
-	withoutBackground,
+  useAside,
+  onClose,
+  withBlur,
+  withoutBackground,
 
-	withInit,
-	withCreate,
-	initItems,
-	initTotal,
-	initHasNextPage,
-	initSearchValue,
-	disableSubmitUntilChanged,
-	sortSelectedFirst,
-	selectedItems,
-	disableFirstFetch,
-	forceIsMultiSelect,
+  withInit,
+  withCreate,
+  initItems,
+  initTotal,
+  initHasNextPage,
+  initSearchValue,
+  disableSubmitUntilChanged,
+  sortSelectedFirst,
+  selectedItems,
+  disableFirstFetch,
+  forceIsMultiSelect,
 }: RoomSelectorProps) => {
-	const { isBase } = useTheme();
+  const { isBase } = useTheme();
 
-	const { isFirstLoad, isNextPageLoading, setIsFirstLoad } =
-		React.useContext(LoadersContext);
+  const { isFirstLoad, isNextPageLoading, setIsFirstLoad } =
+    React.useContext(LoadersContext);
 
-	const [searchValue, setSearchValue] = React.useState(() =>
-		withInit ? initSearchValue : "",
-	);
-	const [hasNextPage, setHasNextPage] = React.useState(() =>
-		withInit ? initHasNextPage : false,
-	);
-	const [selectedItem, setSelectedItem] = React.useState<TSelectorItem | null>(
-		null,
-	);
+  const [searchValue, setSearchValue] = React.useState(() =>
+    withInit ? initSearchValue : "",
+  );
+  const [hasNextPage, setHasNextPage] = React.useState(() =>
+    withInit ? initHasNextPage : false,
+  );
+  const [selectedItem, setSelectedItem] = React.useState<TSelectorItem | null>(
+    null,
+  );
 
-	const [total, setTotal] = React.useState(() => (withInit ? initTotal : -1));
-	const [items, setItems] = React.useState<TSelectorItem[]>(
-		withInit
-			? convertToItems(initItems).filter((x) =>
-					excludeItems ? !excludeItems.includes(x.id) : true,
-				)
-			: [],
-	);
+  const [total, setTotal] = React.useState(() => (withInit ? initTotal : -1));
+  const [items, setItems] = React.useState<TSelectorItem[]>(
+    withInit
+      ? convertToItems(initItems).filter((x) =>
+          excludeItems ? !excludeItems.includes(x.id) : true,
+        )
+      : [],
+  );
 
-	// Sort items so that selectedItems appear first
-	const sortedItems = React.useMemo(() => {
-		if (!sortSelectedFirst || !selectedItems || selectedItems.length === 0) {
-			return items;
-		}
+  // Sort items so that selectedItems appear first
+  const sortedItems = React.useMemo(() => {
+    if (!sortSelectedFirst || !selectedItems || selectedItems.length === 0) {
+      return items;
+    }
 
-		const selectedIds = new Set(selectedItems.map((item) => item.id));
-		const selected: TSelectorItem[] = [];
-		const others: TSelectorItem[] = [];
+    const selectedIds = new Set(selectedItems.map((item) => item.id));
+    const selected: TSelectorItem[] = [];
+    const others: TSelectorItem[] = [];
 
-		items.forEach((item) => {
-			if (selectedIds.has(item.id)) {
-				selected.push(item);
-			} else {
-				others.push(item);
-			}
-		});
+    items.forEach((item) => {
+      if (selectedIds.has(item.id)) {
+        selected.push(item);
+      } else {
+        others.push(item);
+      }
+    });
 
-		return [...selected, ...others];
-	}, [items, selectedItems, sortSelectedFirst]);
+    return [...selected, ...others];
+  }, [items, selectedItems, sortSelectedFirst]);
 
-	// Track initial selected item IDs for multi-select mode
-	const initialSelectedIdsRef = React.useRef<Set<string | number>>(
-		new Set(
-			selectedItems
-				?.map((item) => item.id)
-				.filter((id): id is string | number => id !== undefined) || [],
-		),
-	);
+  // Track initial selected item IDs for multi-select mode
+  const initialSelectedIdsRef = React.useRef<Set<string | number>>(
+    new Set(
+      selectedItems
+        ?.map((item) => item.id)
+        .filter((id): id is string | number => id !== undefined) || [],
+    ),
+  );
 
-	// Track current selection state for multi-select mode
-	const [currentSelectedIds, setCurrentSelectedIds] = React.useState<
-		Set<string | number>
-	>(
-		() =>
-			new Set(
-				selectedItems
-					?.map((item) => item.id)
-					.filter((id): id is string | number => id !== undefined) || [],
-			),
-	);
+  // Track current selection state for multi-select mode
+  const [currentSelectedIds, setCurrentSelectedIds] = React.useState<
+    Set<string | number>
+  >(
+    () =>
+      new Set(
+        selectedItems
+          ?.map((item) => item.id)
+          .filter((id): id is string | number => id !== undefined) || [],
+      ),
+  );
 
-	// Check if selection has changed from initial state (only when disableSubmitUntilChanged is true)
-	const hasSelectionChanged = React.useMemo(() => {
-		if (!isMultiSelect || !disableSubmitUntilChanged) return true;
+  // Check if selection has changed from initial state (only when disableSubmitUntilChanged is true)
+  const hasSelectionChanged = React.useMemo(() => {
+    if (!isMultiSelect || !disableSubmitUntilChanged) return true;
 
-		const initial = initialSelectedIdsRef.current;
-		if (initial.size !== currentSelectedIds.size) return true;
+    const initial = initialSelectedIdsRef.current;
+    if (initial.size !== currentSelectedIds.size) return true;
 
-		for (const id of currentSelectedIds) {
-			if (!initial.has(id)) return true;
-		}
-		for (const id of initial) {
-			if (!currentSelectedIds.has(id)) return true;
-		}
-		return false;
-	}, [currentSelectedIds, isMultiSelect, disableSubmitUntilChanged]);
+    for (const id of currentSelectedIds) {
+      if (!initial.has(id)) return true;
+    }
+    for (const id of initial) {
+      if (!currentSelectedIds.has(id)) return true;
+    }
+    return false;
+  }, [currentSelectedIds, isMultiSelect, disableSubmitUntilChanged]);
 
-	const isInitRef = React.useRef<boolean>(!withInit);
-	const afterSearch = React.useRef(false);
+  const isInitRef = React.useRef<boolean>(!withInit);
+  const afterSearch = React.useRef(false);
 
-	const setIsInit = React.useCallback((value: boolean) => {
-		isInitRef.current = value;
-	}, []);
+  const setIsInit = React.useCallback((value: boolean) => {
+    isInitRef.current = value;
+  }, []);
 
-	const onSelect = (
-		item: TSelectorItem,
-		isDoubleClick: boolean,
-		doubleClickCallback: () => void,
-	) => {
-		setSelectedItem((el) => {
-			if (el?.id === item.id) return null;
+  const onSelect = (
+    item: TSelectorItem,
+    isDoubleClick: boolean,
+    doubleClickCallback: () => void,
+  ) => {
+    setSelectedItem((el) => {
+      if (el?.id === item.id) return null;
 
-			return item;
-		});
+      return item;
+    });
 
-		// Track selection changes for multi-select mode
-		if (isMultiSelect && item.id !== undefined) {
-			setCurrentSelectedIds((prev) => {
-				const newSet = new Set(prev);
-				if (newSet.has(item.id!)) {
-					newSet.delete(item.id!);
-				} else {
-					newSet.add(item.id!);
-				}
-				return newSet;
-			});
-		}
+    // Track selection changes for multi-select mode
+    if (isMultiSelect && item.id !== undefined) {
+      setCurrentSelectedIds((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(item.id!)) {
+          newSet.delete(item.id!);
+        } else {
+          newSet.add(item.id!);
+        }
+        return newSet;
+      });
+    }
 
-		if (isDoubleClick && !isMultiSelect) {
-			doubleClickCallback();
-		}
-	};
+    if (isDoubleClick && !isMultiSelect) {
+      doubleClickCallback();
+    }
+  };
 
-	useEffect(() => {
-		setIsDataReady?.(!isFirstLoad);
-	}, [setIsDataReady, isFirstLoad]);
+  useEffect(() => {
+    setIsDataReady?.(!isFirstLoad);
+  }, [setIsDataReady, isFirstLoad]);
 
-	const onSearchAction = React.useCallback(
-		(value: string, callback?: VoidFunction) => {
-			afterSearch.current = true;
-			setIsFirstLoad(true);
-			setSearchValue(() => {
-				return value;
-			});
-			callback?.();
-		},
-		[setIsFirstLoad],
-	);
+  const onSearchAction = React.useCallback(
+    (value: string, callback?: VoidFunction) => {
+      afterSearch.current = true;
+      setIsFirstLoad(true);
+      setSearchValue(() => {
+        return value;
+      });
+      callback?.();
+    },
+    [setIsFirstLoad],
+  );
 
-	const { subscribe } = useSocketHelper({
-		withCreate,
-		setTotal,
-		setItems,
-		disabledItems: [],
-	});
+  const { subscribe } = useSocketHelper({
+    withCreate,
+    setTotal,
+    setItems,
+    disabledItems: [],
+  });
 
-	const onClearSearchAction = React.useCallback(
-		(callback?: VoidFunction) => {
-			setIsFirstLoad(true);
-			afterSearch.current = true;
-			setSearchValue(() => {
-				return "";
-			});
-			callback?.();
-		},
-		[setIsFirstLoad],
-	);
+  const onClearSearchAction = React.useCallback(
+    (callback?: VoidFunction) => {
+      setIsFirstLoad(true);
+      afterSearch.current = true;
+      setSearchValue(() => {
+        return "";
+      });
+      callback?.();
+    },
+    [setIsFirstLoad],
+  );
 
-	const { getRoomList: onLoadNextPage } = useRoomsHelper({
-		withCreate,
-		isInit: isInitRef.current,
-		setIsInit,
-		createDefineRoomLabel,
-		createDefineRoomType,
-		excludeItems,
-		roomType,
-		searchValue,
-		isRoomsOnly: true,
-		setHasNextPage,
-		setTotal,
-		setItems,
-		withInit,
-		disableThirdParty,
-		searchArea,
-		subscribe,
-	});
+  const { getRoomList: onLoadNextPage } = useRoomsHelper({
+    withCreate,
+    isInit: isInitRef.current,
+    setIsInit,
+    createDefineRoomLabel,
+    createDefineRoomType,
+    excludeItems,
+    roomType,
+    searchValue,
+    isRoomsOnly: true,
+    setHasNextPage,
+    setTotal,
+    setItems,
+    withInit,
+    disableThirdParty,
+    searchArea,
+    subscribe,
+  });
 
-	const headerSelectorProps: TSelectorHeader = withHeader
-		? {
-				withHeader,
-				headerProps: {
-					...headerProps,
-					headerLabel:
-						headerProps.headerLabel || getCommonTranslation("RoomList"),
-				},
-			}
-		: {};
+  const headerSelectorProps: TSelectorHeader = withHeader
+    ? {
+        withHeader,
+        headerProps: {
+          ...headerProps,
+          headerLabel:
+            headerProps.headerLabel || getCommonTranslation("RoomList"),
+        },
+      }
+    : {};
 
-	const cancelButtonSelectorProps: TSelectorCancelButton = withCancelButton
-		? {
-				withCancelButton: true,
-				cancelButtonLabel:
-					cancelButtonLabel || getCommonTranslation("CancelButton"),
-				onCancel,
-			}
-		: {};
+  const cancelButtonSelectorProps: TSelectorCancelButton = withCancelButton
+    ? {
+        withCancelButton: true,
+        cancelButtonLabel:
+          cancelButtonLabel || getCommonTranslation("CancelButton"),
+        onCancel,
+      }
+    : {};
 
-	const searchSelectorProps: TSelectorSearch = withSearch
-		? {
-				withSearch: true,
-				searchPlaceholder: getCommonTranslation("Search"),
-				searchValue,
-				onSearch: onSearchAction,
-				onClearSearch: onClearSearchAction,
-				searchLoader: <SearchLoader />,
-				isSearchLoading: isFirstLoad && !searchValue && !afterSearch.current,
-			}
-		: {};
+  const searchSelectorProps: TSelectorSearch = withSearch
+    ? {
+        withSearch: true,
+        searchPlaceholder: getCommonTranslation("Search"),
+        searchValue,
+        onSearch: onSearchAction,
+        onClearSearch: onClearSearchAction,
+        searchLoader: <SearchLoader />,
+        isSearchLoading: isFirstLoad && !searchValue && !afterSearch.current,
+      }
+    : {};
 
-	const withAside: TSelectorWithAside = useAside
-		? { useAside, onClose, withBlur, withoutBackground }
-		: {};
+  const withAside: TSelectorWithAside = useAside
+    ? { useAside, onClose, withBlur, withoutBackground }
+    : {};
 
-	return (
-		<Selector
-			id={id}
-			className={className}
-			style={style}
-			{...headerSelectorProps}
-			{...cancelButtonSelectorProps}
-			{...searchSelectorProps}
-			{...withAside}
-			withPadding={withPadding}
-			onSelect={onSelect}
-			items={sortedItems}
-			submitButtonLabel={
-				submitButtonLabel || getCommonTranslation("SelectAction")
-			}
-			onSubmit={onSubmit}
-			isMultiSelect={isMultiSelect}
-			emptyScreenImage={
-				isBase ? <EmptyScreenRoomsLight /> : <EmptyScreenRoomsDark />
-			}
-			emptyScreenHeader={
-				emptyScreenHeader ?? getCommonTranslation("EmptyRoomsHeader")
-			}
-			emptyScreenDescription={
-				emptyScreenDescription ??
-				getCommonTranslation("EmptyRoomsDescriptionText", {
-					sectionName: getCommonTranslation("Rooms"),
-				})
-			}
-			searchEmptyScreenImage={
-				isBase ? (
-					<EmptyScreenFilterRoomsLight />
-				) : (
-					<EmptyScreenFilterRoomsDark />
-				)
-			}
-			searchEmptyScreenHeader={getCommonTranslation("NotFoundTitle")}
-			searchEmptyScreenDescription={getCommonTranslation(
-				"SearchEmptyRoomsDescription",
-			)}
-			totalItems={total}
-			hasNextPage={hasNextPage}
-			isNextPageLoading={isNextPageLoading}
-			loadNextPage={onLoadNextPage}
-			isLoading={isFirstLoad}
-			disableSubmitButton={isMultiSelect ? !hasSelectionChanged : !selectedItem}
-			alwaysShowFooter={sortedItems.length !== 0 || Boolean(searchValue)}
-			rowLoader={
-				<RowLoader
-					isMultiSelect={isMultiSelect}
-					isContainer={isFirstLoad}
-					isUser={false}
-				/>
-			}
-			isSSR={withInit}
-			forceIsMultiSelect={forceIsMultiSelect}
-			dataTestId="room_selector"
-			disableFirstFetch={disableFirstFetch}
-		/>
-	);
+  return (
+    <Selector
+      id={id}
+      className={className}
+      style={style}
+      {...headerSelectorProps}
+      {...cancelButtonSelectorProps}
+      {...searchSelectorProps}
+      {...withAside}
+      withPadding={withPadding}
+      onSelect={onSelect}
+      items={sortedItems}
+      selectedItems={selectedItems}
+      submitButtonLabel={
+        submitButtonLabel || getCommonTranslation("SelectAction")
+      }
+      onSubmit={onSubmit}
+      isMultiSelect={isMultiSelect}
+      emptyScreenImage={
+        isBase ? <EmptyScreenRoomsLight /> : <EmptyScreenRoomsDark />
+      }
+      emptyScreenHeader={
+        emptyScreenHeader ?? getCommonTranslation("EmptyRoomsHeader")
+      }
+      emptyScreenDescription={
+        emptyScreenDescription ??
+        getCommonTranslation("EmptyRoomsDescriptionText", {
+          sectionName: getCommonTranslation("Rooms"),
+        })
+      }
+      searchEmptyScreenImage={
+        isBase ? (
+          <EmptyScreenFilterRoomsLight />
+        ) : (
+          <EmptyScreenFilterRoomsDark />
+        )
+      }
+      searchEmptyScreenHeader={getCommonTranslation("NotFoundTitle")}
+      searchEmptyScreenDescription={getCommonTranslation(
+        "SearchEmptyRoomsDescription",
+      )}
+      totalItems={total}
+      hasNextPage={hasNextPage}
+      isNextPageLoading={isNextPageLoading}
+      loadNextPage={onLoadNextPage}
+      isLoading={isFirstLoad}
+      disableSubmitButton={isMultiSelect ? !hasSelectionChanged : !selectedItem}
+      alwaysShowFooter={sortedItems.length !== 0 || Boolean(searchValue)}
+      rowLoader={
+        <RowLoader
+          isMultiSelect={isMultiSelect}
+          isContainer={isFirstLoad}
+          isUser={false}
+        />
+      }
+      isSSR={withInit}
+      forceIsMultiSelect={forceIsMultiSelect}
+      dataTestId="room_selector"
+      disableFirstFetch={disableFirstFetch}
+    />
+  );
 };
 
 const RoomSelector = (props: RoomSelectorProps) => {
-	const { withInit } = props;
+  const { withInit } = props;
 
-	return (
-		<LoadersContextProvider withInit={withInit}>
-			<RoomSelectorComponent {...props} />
-		</LoadersContextProvider>
-	);
+  return (
+    <LoadersContextProvider withInit={withInit}>
+      <RoomSelectorComponent {...props} />
+    </LoadersContextProvider>
+  );
 };
 
 export default RoomSelector;

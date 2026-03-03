@@ -26,6 +26,7 @@
 
 "use client";
 
+import "./Selector.theme.scss";
 import React from "react";
 
 import classNames from "classnames";

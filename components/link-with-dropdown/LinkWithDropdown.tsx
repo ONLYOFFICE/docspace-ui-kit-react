@@ -64,6 +64,9 @@ const LinkWithDropdown = ({
   withoutBackground,
   fixedDirection = false,
   isDefaultMode = true,
+  topSpace,
+  bottomSpace,
+  withDynamicScrollbar,
   ...rest
 }: LinkWithDropDownProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -230,14 +233,15 @@ const LinkWithDropdown = ({
         clickOutsideAction={onClose}
         isAside={isAside}
         withoutBackground={withoutBackground}
+        topSpace={topSpace}
+        bottomSpace={bottomSpace}
+        withDynamicScrollbar={withDynamicScrollbar}
         {...rest}
       >
         {showScroll ? (
           <Scrollbar
             className="scroll-drop-down-item"
-            style={{
-              height: scrollHeight,
-            }}
+            style={{ height: scrollHeight }}
           >
             {dropDownItem}
           </Scrollbar>

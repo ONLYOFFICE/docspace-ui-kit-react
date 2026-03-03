@@ -33,6 +33,7 @@ import { setupErrorI18n } from "./stories.utils";
 
 const meta = {
   title: "Components/Errors/ErrorOffline",
+  tags: ["!autodocs"],
   component: ErrorOfflineContainer,
   parameters: {
     docs: {

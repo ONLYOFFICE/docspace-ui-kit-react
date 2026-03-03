@@ -35,6 +35,7 @@ import {
   Selector,
   RowLoader,
   type TSelectorItem,
+  type TSelectorWithAside,
 } from "../../components/selector";
 import { useTheme } from "../../context/ThemeContext";
 import { useApi } from "../../providers/api/ApiProvider";
@@ -74,9 +75,8 @@ export type TServer = {
   needReset?: boolean;
 };
 
-type MCPServersSelectorProps = {
+type MCPServersSelectorProps = TSelectorWithAside & {
   onSubmit: (servers: TSelectorItem[]) => void;
-  onClose: VoidFunction;
   onBackClick: VoidFunction;
 
   initedSelectedServers?: string[];
@@ -87,6 +87,9 @@ const MCPServersSelector = ({
   onSubmit,
   onClose,
   onBackClick,
+  useAside,
+  withoutBackground,
+  withBlur,
 }: MCPServersSelectorProps) => {
   const { apiClient } = useApi();
   const { isBase } = useTheme();
@@ -202,6 +205,10 @@ const MCPServersSelector = ({
     onBackClick();
   };
 
+  const withAsideProps: TSelectorWithAside = useAside
+    ? { useAside, onClose, withBlur, withoutBackground }
+    : {};
+
   React.useEffect(() => {
     fetchServers();
   }, [fetchServers]);
@@ -245,8 +252,7 @@ const MCPServersSelector = ({
       loadNextPage={fetchMoreServer}
       isLoading={isLoading}
       isMultiSelect
-      useAside={false}
-      onClose={onClose}
+      {...withAsideProps}
       onSelect={onSelect}
       withHeader
       headerProps={{
@@ -255,7 +261,7 @@ const MCPServersSelector = ({
         }),
         withoutBackButton: false,
         onBackClick: onBackClick,
-        onCloseClick: onClose,
+        onCloseClick: onClose ?? onBackClick,
         withoutBorder: false,
       }}
       withCancelButton
