@@ -25,6 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import React from "react";
 
 import { withAgentIdSetup } from "./storybook-helpers/decorators/withAgentIdSetup";
 import { Toast } from "../../components/toast";
@@ -33,6 +34,8 @@ import { toastr } from "../../components/toast/sub-components/Toastr";
 import Chat from "./index";
 import type { ChatProps } from "./Chat.types";
 import type { TFile } from "../../types";
+
+import styles from "./Chat.stories.module.scss";
 
 type StoryArgs = {
   userAvatar?: string;
@@ -85,7 +88,7 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
 <Chat
   agentId={123}
   width="100%"
-  height="100vh
+  height="100vh"
   persistDraft={true}
   allowExternalNavigation={true}
   allowAttachFiles={true}
@@ -189,6 +192,119 @@ const Template = (props: StoryArgs) => (
   </div>
 );
 
+const CallbackLogger = (props: StoryArgs) => {
+  const [logs, setLogs] = React.useState<Array<{
+    id: number;
+    type: string;
+    timestamp: string;
+    data: any;
+  }>>([]);
+  const [filter, setFilter] = React.useState<string>("all");
+
+  const addLog = (type: string, data: any) => {
+    setLogs(prev => [{
+      id: Date.now(),
+      type,
+      timestamp: new Date().toLocaleTimeString(),
+      data
+    }, ...prev].slice(0, 50));
+  };
+
+  const filteredLogs = filter === "all" 
+    ? logs 
+    : logs.filter(log => log.type === filter);
+
+  const callbackTypes = [
+    "all",
+    "onSendMessage",
+    "onStopStream",
+    "onStreamData",
+    "onNewChat",
+    "onSelectChat"
+  ];
+
+  return (
+    <div style={{ display: "flex", height: "700px", gap: "16px" }}>
+      <Toast />
+      <div style={{ flex: "1 1 60%", minWidth: 0 }}>
+        <Chat
+          {...(props as unknown as ChatProps)}
+          onSendMessage={(message, files) => {
+            addLog("onSendMessage", { message: message.substring(0, 100), filesCount: files.length });
+            props.onSendMessage?.(message, files);
+          }}
+          onStopStream={() => {
+            addLog("onStopStream", {});
+            props.onStopStream?.();
+          }}
+          onStreamData={(chunk) => {
+            addLog("onStreamData", { chunkLength: chunk.length, preview: chunk.substring(0, 50) });
+            props.onStreamData?.(chunk);
+          }}
+          onNewChat={() => {
+            addLog("onNewChat", {});
+            props.onNewChat?.();
+          }}
+          onSelectChat={(chatId) => {
+            addLog("onSelectChat", { chatId });
+            props.onSelectChat?.(chatId);
+          }}
+        />
+      </div>
+
+      <div className={styles.callbackPanel}>
+        <div className={styles.panelHeader}>
+          <h3 className={styles.panelTitle}>
+            Callback Events
+          </h3>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className={styles.filterSelect}
+          >
+            {callbackTypes.map(type => (
+              <option key={type} value={type}>
+                {type === "all" ? "All Events" : type}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div key={filter} className={styles.logsContainer}>
+          {filteredLogs.length === 0 ? (
+            <div className={styles.emptyState}>
+              {filter === "all" 
+                ? "No events yet. Interact with the chat to see callbacks."
+                : `No ${filter} events yet.`}
+            </div>
+          ) : (
+            filteredLogs.map(log => (
+              <div key={log.id} className={styles.logItem}>
+                <div className={styles.logHeader}>
+                  <strong className={styles.logType}>{log.type}</strong>
+                  <span className={styles.logTimestamp}>{log.timestamp}</span>
+                </div>
+                {Object.keys(log.data).length > 0 && (
+                  <pre className={styles.logData}>
+                    {JSON.stringify(log.data, null, 2)}
+                  </pre>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className={styles.panelFooter}>
+          <span>{filteredLogs.length} event{filteredLogs.length !== 1 ? 's' : ''}</span>
+          <button onClick={() => setLogs([])} className={styles.clearButton}>
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
@@ -202,15 +318,13 @@ export const Default: Story = {
     width: "100%",
     height: "700px",
     onSendMessage: (message, files) => {
-      toastr.success(
-        `Message sent: ${message.substring(0, 50)}${message.length > 50 ? "..." : ""}`,
-      );
+      console.log("Message sent:", message, files);
     },
     onStopStream: () => {
-      toastr.info("Stream stopped");
+      console.log("Stream stopped");
     },
     onNewChat: () => {
-      toastr.success("New chat created");
+      console.log("New chat created");
     },
   },
   parameters: {
@@ -242,28 +356,26 @@ export const AllFeaturesEnabled: Story = {
     width: "100%",
     height: "700px",
     onSendMessage: (message, files) => {
-      toastr.success(
-        `Message sent: ${message.substring(0, 50)}${message.length > 50 ? "..." : ""}${files.length > 0 ? ` with ${files.length} file(s)` : ""}`,
-      );
+      console.log("Message sent:", message, files);
     },
     onStopStream: () => {
-      toastr.info("Stream stopped");
+      console.log("Stream stopped");
     },
     onStreamData: (chunk) => {
       console.log("Stream chunk:", chunk);
     },
     onNewChat: () => {
-      toastr.success("New chat created");
+      console.log("New chat created");
     },
     onSelectChat: (chatId) => {
-      toastr.info(`Chat selected: ${chatId}`);
+      console.log("Chat selected:", chatId);
     },
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Full-featured chat with all capabilities enabled: file attachments, chat management, tool settings, draft persistence, external navigation, and admin features. This configuration showcases the complete functionality of the Chat component.",
+          "Full-featured chat with all capabilities enabled: file attachments, chat management, tool settings, draft persistence. This configuration showcases the complete functionality of the Chat component.",
       },
       source: {
         code: `<Chat
@@ -278,6 +390,54 @@ export const AllFeaturesEnabled: Story = {
   onStreamData={(chunk) => console.log(chunk)}
   onNewChat={() => console.log("New chat")}
   onSelectChat={(chatId) => console.log(chatId)}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithCallbacks: Story = {
+  render: (args: StoryArgs) => <CallbackLogger {...args} />,
+  args: {
+    userAvatar: "",
+    folderFormValidation: /^[a-zA-Z0-9 ]+$/,
+    persistDraft: true,
+    allowExternalNavigation: true,
+    allowAttachFiles: true,
+    allowManageTools: true,
+    allowSelectChat: true,
+    width: "100%",
+    height: "700px",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Interactive demonstration of all callback functions. The chat is displayed on the left, while the right panel shows real-time logs of callback events with their parameters. Use the dropdown to filter specific event types.",
+      },
+      source: {
+        code: `<Chat
+  agentId={validatedAgentId}
+  persistDraft={true}
+  allowExternalNavigation={true}
+  allowAttachFiles={true}
+  allowManageTools={true}
+  allowSelectChat={true}
+  onSendMessage={(message, files) => {
+    console.log("Message:", message, "Files:", files);
+  }}
+  onStopStream={() => {
+    console.log("Stream stopped");
+  }}
+  onStreamData={(chunk) => {
+    console.log("Stream data:", chunk);
+  }}
+  onNewChat={() => {
+    console.log("New chat created");
+  }}
+  onSelectChat={(chatId) => {
+    console.log("Chat selected:", chatId);
+  }}
 />`,
       },
     },
