@@ -4,6 +4,9 @@ import type { Decorator } from "@storybook/react-vite";
 import AgentIdSetup from "../components/AgentIdSetup";
 import usePersistedAgentId from "../hooks/usePersistedAgentId";
 import useAgentIdValidation from "../hooks/useAgentIdValidation";
+import ManageConnectionIcon from "../../../../assets/manage.connection.react.svg";
+
+import styles from "./withAgentIdSetup.module.scss";
 
 const AgentIdSetupWrapper: React.FC<{
   children: (agentId: string | number) => React.ReactNode;
@@ -90,33 +93,9 @@ const AgentIdSetupWrapper: React.FC<{
   return (
     <>
       {children(validatedAgentId)}
-      <button
-        onClick={handleReset}
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          padding: "10px 16px",
-          background: "#fff",
-          border: "1px solid #ddd",
-          borderRadius: "6px",
-          cursor: "pointer",
-          fontSize: "13px",
-          fontWeight: 500,
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-          zIndex: 9999,
-          transition: "all 0.2s",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = "#f5f5f5";
-          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "#fff";
-          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.1)";
-        }}
-      >
-        🔄 Change Agent ID
+      <button onClick={handleReset} className={styles.configButton}>
+        <ManageConnectionIcon className={styles.icon} />
+        <span className={styles.label}>Configure AI agent</span>
       </button>
     </>
   );
