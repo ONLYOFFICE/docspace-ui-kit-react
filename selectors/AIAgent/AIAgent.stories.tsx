@@ -40,6 +40,7 @@ type StoryArgs = AIAgentSelectorProps;
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/AIAgentSelector",
   component: AIAgentSelector,
+  tags: ["!autodocs"],
   parameters: {
     docs: {
       description: {
@@ -234,6 +235,7 @@ const initItems: FolderDtoInteger[] = [
 ];
 
 export const WithInit: Story = {
+  tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
 

@@ -1,8 +1,6 @@
 .wrapper {
-  height: 400px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  height: 500px;
+  width: 100%;
   position: relative;
 
   :global(.layout-progress-bar_wrapper) {
@@ -11,7 +9,16 @@
     height: auto;
   }
 }
-  
+
+.desktopWarning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 16px;
+  color: var(--gray-dark, #657077);
+}
+
 .isAutoDocs {
   width: calc(100% + 40px);
   height: 500px;
@@ -20,4 +27,3 @@
   right: inherit;
   margin-inline: -20px 0;
 }
-  

@@ -42,7 +42,6 @@ import type {
 	TSelectedFileInfo,
 	FileEntryDtoIntegerAllOfSecurity,
 } from "./FilesSelector.types";
-import type { TBreadCrumb } from "../../components/selector";
 
 type StoryArgs = {
 	// Panel
@@ -99,63 +98,7 @@ type StoryArgs = {
 
 const meta: Meta<StoryArgs> = {
 	title: "Components/Selectors/FilesSelector",
-	parameters: {
-		docs: {
-			description: {
-				component: `FilesSelector is a full file-system browser selector for navigating DocSpace rooms, folders, and files.
-
-### Features
-
-- **Browse rooms & folders**: Navigate the full file hierarchy with breadcrumb trail
-- **Search**: Enable with \`withSearch\` — scoped to the current folder/room
-- **Room type filter**: Restrict the root list to specific room types via \`roomType\`
-- **File type filter**: Filter by extension or type via \`filterParam\`
-- **Footer input**: Optionally show a file-name input field in the footer
-- **Footer checkbox**: Optional checkbox (e.g., "keep original") in the footer
-- **Creation**: Show a create-room button via \`withCreate\` + \`createDefineRoomLabel\`
-- **Aside / embedded**: Rendered inside an \`<Aside>\` panel by default; pass \`embedded\` to render inline
-- **Portal on mobile**: Automatically renders in a Portal on mobile/tablet devices
-- **SSR support**: Pre-populate with server-fetched data via \`withInit\` + \`initItems\`
-
-### Usage
-
-\`\`\`tsx
-import FilesSelector from "@docspace/ui-kit/selectors/Files";
-import { FolderType } from "@onlyoffice/docspace-api-sdk";
-import { DeviceType } from "@docspace/ui-kit/enums";
-
-<FilesSelector
-  isPanelVisible={open}
-  embedded={false}
-  currentFolderId={0}
-  rootFolderType={FolderType.VirtualRooms}
-  currentDeviceType={DeviceType.desktop}
-  isRoomsOnly={false}
-  isThirdParty={false}
-  withSearch
-  withBreadCrumbs
-  withoutBackButton={false}
-  withCancelButton
-  withCreate={false}
-  withFooterInput={false}
-  withFooterCheckbox={false}
-  submitButtonLabel="Select"
-  cancelButtonLabel="Cancel"
-  footerInputHeader=""
-  currentFooterInputValue=""
-  footerCheckboxLabel=""
-  descriptionText=""
-  disabledItems={[]}
-  filesSettings={filesSettings}
-  onSubmit={(id, title) => console.log(id, title)}
-  onCancel={() => setOpen(false)}
-  getIsDisabled={(isFirstLoad, isParent, id) => !id || isFirstLoad}
-  getFilesArchiveError={(name) => \`\${name} is archived\`}
-/>
-\`\`\``,
-			},
-		},
-	},
+	tags: ["!autodocs"],
 	argTypes: {
 		// Panel
 		isPanelVisible: {
@@ -455,45 +398,6 @@ export const Default: Story = {
 		descriptionText: "",
 		disabledItems: [],
 	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"Default embedded mode starting at the rooms root. Navigate into any room or folder and " +
-					"click **Select** to confirm. The submit button is enabled only when a folder is selected.",
-			},
-			source: {
-				code: `<FilesSelector
-  isPanelVisible={true}
-  embedded
-  currentDeviceType={DeviceType.desktop}
-  currentFolderId={0}
-  rootFolderType={FolderType.VirtualRooms}
-  isRoomsOnly={false}
-  isThirdParty={false}
-  withSearch
-  withBreadCrumbs
-  withoutBackButton={false}
-  withCancelButton
-  cancelButtonLabel="Cancel"
-  withCreate={false}
-  withFooterInput={false}
-  withFooterCheckbox={false}
-  submitButtonLabel="Select"
-  footerInputHeader=""
-  currentFooterInputValue=""
-  footerCheckboxLabel=""
-  descriptionText=""
-  disabledItems={[]}
-  filesSettings={filesSettings}
-  onSubmit={(id, title) => moveFile(id, title)}
-  onCancel={() => setOpen(false)}
-  getIsDisabled={getIsDisabled}
-  getFilesArchiveError={getArchiveError}
-/>`,
-			},
-		},
-	},
 };
 
 export const RoomsOnly: Story = {
@@ -521,45 +425,6 @@ export const RoomsOnly: Story = {
 		descriptionText: "",
 		disabledItems: [],
 	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"Rooms-only mode — navigation is restricted to the rooms root level. " +
-					"Users cannot descend into individual room folders.",
-			},
-			source: {
-				code: `<FilesSelector
-  isRoomsOnly
-  embedded
-  currentFolderId={0}
-  rootFolderType={FolderType.VirtualRooms}
-  currentDeviceType={DeviceType.desktop}
-  isPanelVisible={true}
-  isThirdParty={false}
-  withSearch
-  withBreadCrumbs
-  withoutBackButton={false}
-  withCancelButton
-  cancelButtonLabel="Cancel"
-  withCreate={false}
-  withFooterInput={false}
-  withFooterCheckbox={false}
-  submitButtonLabel="Move here"
-  footerInputHeader=""
-  currentFooterInputValue=""
-  footerCheckboxLabel=""
-  descriptionText=""
-  disabledItems={[]}
-  filesSettings={filesSettings}
-  onSubmit={(id, title) => move(id, title)}
-  onCancel={() => setOpen(false)}
-  getIsDisabled={getIsDisabled}
-  getFilesArchiveError={getArchiveError}
-/>`,
-			},
-		},
-	},
 };
 
 export const WithFooterInput: Story = {
@@ -586,45 +451,6 @@ export const WithFooterInput: Story = {
 		footerCheckboxLabel: "",
 		descriptionText: "",
 		disabledItems: [],
-	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"Shows an editable file-name input in the footer. Useful for Save As dialogs " +
-					"where the user picks a destination folder and can rename the file.",
-			},
-			source: {
-				code: `<FilesSelector
-  embedded
-  currentFolderId={0}
-  rootFolderType={FolderType.VirtualRooms}
-  currentDeviceType={DeviceType.desktop}
-  isPanelVisible={true}
-  isRoomsOnly={false}
-  isThirdParty={false}
-  withSearch
-  withBreadCrumbs
-  withoutBackButton={false}
-  withCancelButton
-  cancelButtonLabel="Cancel"
-  withCreate={false}
-  withFooterInput
-  footerInputHeader="File name"
-  currentFooterInputValue={fileName}
-  withFooterCheckbox={false}
-  submitButtonLabel="Save"
-  footerCheckboxLabel=""
-  descriptionText=""
-  disabledItems={[]}
-  filesSettings={filesSettings}
-  onSubmit={(id, title, _public, _bc, fileName) => saveAs(id, fileName)}
-  onCancel={() => setOpen(false)}
-  getIsDisabled={getIsDisabled}
-  getFilesArchiveError={getArchiveError}
-/>`,
-			},
-		},
 	},
 };
 
@@ -655,47 +481,6 @@ export const WithFileTypeFilter: Story = {
 		filterParam: "PDF",
 		applyFilterOption: ApplyFilterOption.Files,
 	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"File type filter set to PDF. Only PDF files are shown inside folders. " +
-					"Change `filterParam` in the Controls panel to try other types (DOCX, IMG, XLSX, etc.).",
-			},
-			source: {
-				code: `<FilesSelector
-  embedded
-  currentFolderId={0}
-  rootFolderType={FolderType.VirtualRooms}
-  currentDeviceType={DeviceType.desktop}
-  isPanelVisible={true}
-  isRoomsOnly={false}
-  isThirdParty={false}
-  withSearch
-  withBreadCrumbs
-  withoutBackButton={false}
-  withCancelButton
-  cancelButtonLabel="Cancel"
-  withCreate={false}
-  withFooterInput={false}
-  withFooterCheckbox={false}
-  submitButtonLabel="Select file"
-  footerInputHeader=""
-  currentFooterInputValue=""
-  footerCheckboxLabel=""
-  descriptionText="Select a PDF file"
-  disabledItems={[]}
-  filterParam="PDF"
-  applyFilterOption={ApplyFilterOption.Files}
-  filesSettings={filesSettings}
-  onSubmit={(id, title, _pub, _bc, _fn, _chk, _node, fileInfo) => open(fileInfo)}
-  onCancel={() => setOpen(false)}
-  getIsDisabled={getIsDisabled}
-  getFilesArchiveError={getArchiveError}
-/>`,
-			},
-		},
-	},
 };
 
 export const WithRoomCreation: Story = {
@@ -724,47 +509,6 @@ export const WithRoomCreation: Story = {
 		footerCheckboxLabel: "",
 		descriptionText: "",
 		disabledItems: [],
-	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"Shows a create-room button at the top of the rooms list. Clicking it opens the " +
-					"room creation flow with the specified room type pre-selected.",
-			},
-			source: {
-				code: `<FilesSelector
-  embedded
-  currentFolderId={0}
-  rootFolderType={FolderType.VirtualRooms}
-  currentDeviceType={DeviceType.desktop}
-  isPanelVisible={true}
-  isRoomsOnly={false}
-  isThirdParty={false}
-  withSearch
-  withBreadCrumbs
-  withoutBackButton={false}
-  withCancelButton
-  cancelButtonLabel="Cancel"
-  withCreate
-  createDefineRoomLabel="Create new room"
-  createDefineRoomType={RoomType.CustomRoom}
-  withFooterInput={false}
-  withFooterCheckbox={false}
-  submitButtonLabel="Select"
-  footerInputHeader=""
-  currentFooterInputValue=""
-  footerCheckboxLabel=""
-  descriptionText=""
-  disabledItems={[]}
-  filesSettings={filesSettings}
-  onSubmit={(id, title) => save(id, title)}
-  onCancel={() => setOpen(false)}
-  getIsDisabled={getIsDisabled}
-  getFilesArchiveError={getArchiveError}
-/>`,
-			},
-		},
 	},
 };
 
@@ -808,45 +552,6 @@ export const AsidePanel: Story = {
 		descriptionText: "",
 		disabledItems: [],
 	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"Non-embedded mode: the selector renders inside an `<Aside>` panel with a backdrop. " +
-					"Toggle `isPanelVisible` in the Controls panel to show/hide it.",
-			},
-			source: {
-				code: `<FilesSelector
-  isPanelVisible={open}
-  embedded={false}
-  currentFolderId={0}
-  rootFolderType={FolderType.VirtualRooms}
-  currentDeviceType={DeviceType.desktop}
-  isRoomsOnly={false}
-  isThirdParty={false}
-  withSearch
-  withBreadCrumbs
-  withoutBackButton={false}
-  withCancelButton
-  cancelButtonLabel="Cancel"
-  withCreate={false}
-  withFooterInput={false}
-  withFooterCheckbox={false}
-  submitButtonLabel="Select"
-  footerInputHeader=""
-  currentFooterInputValue=""
-  footerCheckboxLabel=""
-  descriptionText=""
-  disabledItems={[]}
-  filesSettings={filesSettings}
-  onSubmit={(id, title) => save(id, title)}
-  onCancel={() => setOpen(false)}
-  getIsDisabled={getIsDisabled}
-  getFilesArchiveError={getArchiveError}
-/>`,
-			},
-		},
-	},
 };
 
 export const WithHeader: Story = {
@@ -878,45 +583,5 @@ export const WithHeader: Story = {
 		footerCheckboxLabel: "",
 		descriptionText: "",
 		disabledItems: [],
-	},
-	parameters: {
-		docs: {
-			description: {
-				story:
-					"Shows the optional header bar with a custom label and close button.",
-			},
-			source: {
-				code: `<FilesSelector
-  embedded
-  withHeader
-  headerProps={{ headerLabel: "Select destination", onCloseClick: () => setOpen(false) }}
-  currentFolderId={0}
-  rootFolderType={FolderType.VirtualRooms}
-  currentDeviceType={DeviceType.desktop}
-  isPanelVisible={true}
-  isRoomsOnly={false}
-  isThirdParty={false}
-  withSearch
-  withBreadCrumbs
-  withoutBackButton={false}
-  withCancelButton
-  cancelButtonLabel="Cancel"
-  withCreate={false}
-  withFooterInput={false}
-  withFooterCheckbox={false}
-  submitButtonLabel="Move here"
-  footerInputHeader=""
-  currentFooterInputValue=""
-  footerCheckboxLabel=""
-  descriptionText=""
-  disabledItems={[]}
-  filesSettings={filesSettings}
-  onSubmit={(id, title) => move(id, title)}
-  onCancel={() => setOpen(false)}
-  getIsDisabled={getIsDisabled}
-  getFilesArchiveError={getArchiveError}
-/>`,
-			},
-		},
 	},
 };

@@ -47,6 +47,7 @@ type StoryArgs = MCPServersSelectorProps;
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/MCPServersSelector",
   component: MCPServersSelector,
+  tags: ["!autodocs"],
   parameters: {
     docs: {
       description: {
@@ -185,6 +186,7 @@ export const Default: Story = {
 };
 
 export const WithPreselection: Story = {
+  tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
 
@@ -220,6 +222,7 @@ export const WithPreselection: Story = {
 };
 
 export const AsideMode: Story = {
+  tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
     useAside: true,

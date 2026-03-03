@@ -37,6 +37,7 @@ type StoryArgs = GroupsSelectorProps;
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/GroupsSelector",
   component: GroupsSelector,
+  tags: ["!autodocs"],
   parameters: {
     docs: {
       description: {
@@ -195,6 +196,7 @@ export const Default: Story = {
 };
 
 export const AsideMode: Story = {
+  tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
 

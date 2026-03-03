@@ -100,6 +100,7 @@ type StoryArgs = {
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/PeopleSelector",
+  tags: ["!autodocs"],
   parameters: {
     docs: {
       description: {
@@ -359,6 +360,7 @@ export const Default: Story = {
 };
 
 export const MultiSelectWithTabs: Story = {
+  tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
 
@@ -408,6 +410,7 @@ export const MultiSelectWithTabs: Story = {
 };
 
 export const AsideMode: Story = {
+  tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
 
