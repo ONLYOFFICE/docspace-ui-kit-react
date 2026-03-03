@@ -212,7 +212,7 @@ export const Default: Story = {
 
 const SizesTemplate = () => {
   return (
-    <Wrapper>
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px", alignItems: "flex-start" }}>
       {(Object.keys(InputSize) as Array<InputSize>).map((size) => (
         <ControlledInput
           key={size}
@@ -221,7 +221,7 @@ const SizesTemplate = () => {
           placeholder={`${size} input`}
         />
       ))}
-    </Wrapper>
+    </div>
   );
 };
 
