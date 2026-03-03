@@ -67,16 +67,57 @@ const AddCustomModal = ({
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const resetState = () => {
     setName("");
     setUrl("");
     setApiKey("");
+    setError("");
+    setIsLoading(false);
   };
 
-  const handleSave = () => {
+  const trimUrl = (rawUrl: string): string => {
+    return rawUrl.trim().replace(/\/+$/, "");
+  };
+
+  const testConnection = async (
+    baseUrl: string,
+    key: string,
+  ): Promise<boolean> => {
+    try {
+      const response = await fetch(`${baseUrl}/api/2.0/people/@self`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      return response.ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleSave = async () => {
     if (!name.trim() || !url.trim() || !apiKey.trim()) return;
-    onSave(name.trim(), url, apiKey);
+
+    setError("");
+    setIsLoading(true);
+
+    const trimmedUrl = trimUrl(url);
+
+    const isConnected = await testConnection(trimmedUrl, apiKey);
+
+    if (!isConnected) {
+      setError("Failed to connect to API. Please check the URL and API Key.");
+      setIsLoading(false);
+      return;
+    }
+
+    onSave(name.trim(), trimmedUrl, apiKey);
     resetState();
   };
 
@@ -115,6 +156,12 @@ const AddCustomModal = ({
           </div>
         </Form>
 
+        {error && (
+          <div style={{ color: "#d32f2f", marginTop: "8px", fontSize: "14px" }}>
+            {error}
+          </div>
+        )}
+
         <div className="footer">
           <Button
             type="button"
@@ -127,10 +174,10 @@ const AddCustomModal = ({
           <Button
             type="button"
             onClick={handleSave}
-            disabled={!name || !url || !apiKey}
+            disabled={!name || !url || !apiKey || isLoading}
             size="medium"
           >
-            Save
+            {isLoading ? "Testing..." : "Save"}
           </Button>
         </div>
       </div>
