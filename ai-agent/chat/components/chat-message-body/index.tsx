@@ -41,17 +41,17 @@ import EmptyScreen from "./sub-components/empty-screen";
 import Message from "./sub-components/message";
 
 import { useChatScroll } from "./hooks/useChatScroll";
+import { useChatScrollContext } from "../../providers/ChatScrollProvider";
 import styles from "./ChatMessageBody.module.scss";
 import { getCommonTranslation } from "../../../../utils";
 
-const ChatMessageBody = ({
+const ChatMessageBody = observer(({
   userAvatar,
   getIcon,
   isLoading,
   getResultStorageId,
   setAiPlaylistImages,
   setMediaViewerVisible,
-  useInternalScroll,
   allowExternalNavigation,
 }: MessageBodyProps) => {
   const {
@@ -62,6 +62,7 @@ const ChatMessageBody = ({
     addMessageId,
   } = useMessageStore();
   const { currentChat } = useChatStore();
+  const { useExternalScroll } = useChatScrollContext();
 
   const chatBodyRef = useRef<HTMLDivElement>(null);
 
@@ -93,14 +94,13 @@ const ChatMessageBody = ({
     fetchNextMessages,
     currentChat,
     messages,
-    useInternalScroll,
   });
 
   return (
     <div
       className={classNames(styles.chatMessageBody, {
         [styles.empty]: isEmpty,
-        [styles.useInternalScroll]: useInternalScroll,
+        [styles.useInternalScroll]: !useExternalScroll,
       })}
       data-testid="chat-message-body"
     >
@@ -140,6 +140,6 @@ const ChatMessageBody = ({
       )}
     </div>
   );
-};
+});
 
-export default observer(ChatMessageBody);
+export default ChatMessageBody;

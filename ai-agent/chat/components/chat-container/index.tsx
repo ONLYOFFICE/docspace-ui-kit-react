@@ -27,38 +27,57 @@
 import React from "react";
 import classNames from "classnames";
 
-import { Scrollbar } from "../../../../components/scrollbar";
+import { Scrollbar, type ScrollbarType } from "../../../../components/scrollbar";
 
 import { ChatContainerProps } from "../../Chat.types";
+import { ChatScrollProvider } from "../../providers/ChatScrollProvider";
 import styles from "./ChatContainer.module.scss";
 
 const ChatContainer = ({
   children,
   isLoadingChat,
-  useInternalScroll,
+  useExternalScroll = false,
+  externalScrollRef,
   width = "100%",
   height = "100%",
   style,
 }: ChatContainerProps) => {
+  const internalScrollRef = React.useRef<HTMLElement | null>(null);
+
+  const handleScrollbarRef = (instance: ScrollbarType | null) => {
+    if (instance) {
+      internalScrollRef.current = instance.scrollerElement;
+    }
+  };
+
   return (
     <div
       className={classNames(styles.chatContainer, "chat-container", {
-        [styles.useInternalScroll]: useInternalScroll,
+        [styles.useInternalScroll]: !useExternalScroll,
       })}
       data-testid={isLoadingChat ? "chat-container-loading" : "chat-container"}
       style={{ width, height, ...style }}
     >
-      {useInternalScroll ? (
-        <Scrollbar
-          id="chat-internal-scroll"
-          scrollBodyClassName={styles.chatScrollBody}
-          paddingInlineEnd="0"
-        >
-          {children}
-        </Scrollbar>
-      ) : (
-        children
-      )}
+      <ChatScrollProvider
+        useExternalScroll={useExternalScroll}
+        scrollbarRef={
+          (useExternalScroll ? externalScrollRef : internalScrollRef) || {
+            current: null,
+          }
+        }
+      >
+        {!useExternalScroll ? (
+          <Scrollbar
+            scrollBodyClassName={styles.chatScrollBody}
+            paddingInlineEnd="0"
+            ref={handleScrollbarRef}
+          >
+            {children}
+          </Scrollbar>
+        ) : (
+          children
+        )}
+      </ChatScrollProvider>
     </div>
   );
 };

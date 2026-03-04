@@ -72,7 +72,6 @@ const ChatUI = observer(
     goToWebSearchSettings,
     setAiPlaylistImages,
     setMediaViewerVisible,
-    useInternalScroll,
     persistDraft = false,
     allowExternalNavigation,
     allowAttachFiles,
@@ -130,7 +129,6 @@ const ChatUI = observer(
               getResultStorageId={getResultStorageId}
               setAiPlaylistImages={setAiPlaylistImages}
               setMediaViewerVisible={setMediaViewerVisible}
-              useInternalScroll={useInternalScroll}
               allowExternalNavigation={allowExternalNavigation}
             />
             <ChatFooter
@@ -166,7 +164,8 @@ const ChatCore = (props: ChatCoreProps) => {
     messagesSettings,
     multimodal,
     isLoadingChat,
-    useInternalScroll = true,
+    useExternalScroll = false,
+    externalScrollRef,
     width,
     height,
     style,
@@ -184,7 +183,8 @@ const ChatCore = (props: ChatCoreProps) => {
     return (
       <ChatContainer
         isLoadingChat={isLoadingChat}
-        useInternalScroll={useInternalScroll}
+        useExternalScroll={useExternalScroll}
+        externalScrollRef={externalScrollRef}
         width={width}
         height={height}
         style={style}
@@ -218,7 +218,8 @@ const ChatCore = (props: ChatCoreProps) => {
       >
         <ChatContainer
           isLoadingChat={isLoadingChat}
-          useInternalScroll={useInternalScroll}
+          useExternalScroll={useExternalScroll}
+          externalScrollRef={externalScrollRef}
           width={width}
           height={height}
           style={style}

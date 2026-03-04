@@ -50,6 +50,8 @@ type StoryArgs = {
   onStreamData?: (chunk: string) => void;
   onNewChat?: () => void;
   onSelectChat?: (chatId: string) => void;
+  useExternalScroll?: boolean;
+  externalScrollRef?: React.RefObject<HTMLElement | null>;
 };
 
 const meta: Meta<StoryArgs> = {
@@ -162,6 +164,15 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
     onSelectChat: {
       action: "onSelectChat",
       description: "Called when a different chat is selected",
+    },
+    useExternalScroll: {
+      control: "boolean",
+      description: "Whether to use an external scroll container",
+      table: { defaultValue: { summary: "false" } },
+    },
+    externalScrollRef: {
+      control: false,
+      description: "Ref to the external scroll container",
     },
   },
 };
@@ -441,6 +452,43 @@ export const WithCallbacks: Story = {
     console.log("Chat selected:", chatId);
   }}
 />`,
+      },
+    },
+  },
+};
+export const ExternalScroll: Story = {
+  render: (args: StoryArgs) => {
+    const scrollRef = React.useRef<HTMLDivElement>(null);
+
+    return (
+      <div
+        ref={scrollRef}
+        style={{
+          width: "100%",
+          height: "600px",
+          overflow: "auto",
+          border: "1px solid #444",
+          position: "relative",
+        }}
+      >
+        <Chat
+          {...(args as unknown as ChatProps)}
+          useExternalScroll={true}
+          externalScrollRef={scrollRef}
+          height="auto"
+        />
+      </div>
+    );
+  },
+  args: {
+    width: "100%",
+    allowSelectChat: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Demonstrates integration with an external scroll container. This is useful when the Chat is part of a larger scrollable page or a custom layout where a single scrollbar is desired for multiple sections. Note that `height` should be set to `auto` or not specified to allow the chat to grow within the container.",
       },
     },
   },

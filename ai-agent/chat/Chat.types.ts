@@ -168,7 +168,6 @@ export type MessageBodyProps = {
 
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
-  useInternalScroll?: boolean;
   allowExternalNavigation?: boolean;
 } & Pick<MessageProps, "setAiPlaylistImages" | "setMediaViewerVisible" | "userAvatar">;
 
@@ -239,7 +238,8 @@ export type ChatFooterProps = ChatInputProps & ChatInfoBlockProps;
 export type ChatContainerProps = {
   children: React.ReactNode;
   isLoadingChat?: boolean;
-  useInternalScroll?: boolean;
+  useExternalScroll?: boolean;
+  externalScrollRef?: React.RefObject<HTMLElement | null>;
   width?: string;
   height?: string;
   style?: React.CSSProperties;
@@ -270,7 +270,8 @@ export type ChatProps = {
   setAiPlaylistImages?: (value: TChatPlaylistImage[]) => void;
   setMediaViewerVisible?: (value: boolean) => void;
 
-  useInternalScroll?: boolean;
+  useExternalScroll?: boolean;
+  externalScrollRef?: React.RefObject<HTMLElement | null>;
   width?: string;
   height?: string;
   style?: React.CSSProperties;

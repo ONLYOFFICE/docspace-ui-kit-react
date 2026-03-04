@@ -28,10 +28,9 @@
 
 import React, { useEffect, useEffectEvent, useRef } from "react";
 
-import { useIsMobile } from "../../../../../hooks/use-is-mobile";
-
 import ChatStore from "../../../store/chatStore";
 import MessageStore from "../../../store/messageStore";
+import { useChatScrollContext } from "../../../providers/ChatScrollProvider";
 
 type Props = {
   chatBodyRef: React.RefObject<HTMLDivElement | null>;
@@ -39,7 +38,6 @@ type Props = {
   fetchNextMessages: VoidFunction;
   currentChat: ChatStore["currentChat"];
   messages: MessageStore["messages"];
-  useInternalScroll?: boolean;
 };
 
 export const useChatScroll = ({
@@ -48,11 +46,9 @@ export const useChatScroll = ({
   fetchNextMessages,
   currentChat,
   messages,
-  useInternalScroll,
 }: Props) => {
-  const isMobile = useIsMobile();
+  const { scrollbarRef } = useChatScrollContext();
 
-  const scrollbarRef = useRef<HTMLDivElement>(null);
   const prevScrollTopRef = useRef(0);
   const disableAutoScrollRef = useRef(false);
   const prevBodyHeight = useRef(0);
@@ -94,26 +90,16 @@ export const useChatScroll = ({
 
   // Scroll setter
   useEffect(() => {
-    const scrollId = useInternalScroll
-      ? "chat-internal-scroll"
-      : isMobile
-        ? "customScrollBar"
-        : "sectionScroll";
-
-    const scroll = document.querySelector(
-      `#${scrollId} .scroll-wrapper > .scroller`,
-    );
+    const scroll = scrollbarRef?.current;
 
     if (!scroll) return;
-
-    scrollbarRef.current = scroll as HTMLDivElement;
 
     scroll.addEventListener("scroll", onScroll);
 
     return () => {
       scroll.removeEventListener("scroll", onScroll);
     };
-  }, [isMobile, useInternalScroll]);
+  }, [scrollbarRef?.current]);
 
   // enable auto scroll on chat change
   useEffect(() => {
@@ -124,7 +110,7 @@ export const useChatScroll = ({
   useEffect(() => {
     if (isEmpty || disableAutoScrollRef.current) return;
 
-    const scrollEl = scrollbarRef.current;
+    const scrollEl = scrollbarRef?.current;
 
     requestAnimationFrame(() => {
       if (disableAutoScrollRef.current) return;
@@ -143,7 +129,7 @@ export const useChatScroll = ({
     }
 
     if (prevScrollTopRef.current === 0 && diff > 0) {
-      scrollbarRef.current?.scrollTo(0, diff);
+      scrollbarRef?.current?.scrollTo(0, diff);
     }
   }, [messages.length]);
 };
