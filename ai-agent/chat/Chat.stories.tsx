@@ -57,9 +57,9 @@ type StoryArgs = {
 const meta: Meta<StoryArgs> = {
   title: "Components/AI Agent/Chat",
   decorators: [withAgentIdSetup],
+  tags: ["!autodocs"],
   parameters: {
     layout: "fullscreen",
-    noPadding: true,
     requireAgentId: true,
     docs: {
       description: {
@@ -189,6 +189,7 @@ const Template = (props: StoryArgs) => (
       overflow: "hidden",
       display: "flex",
       justifyContent: "center",
+      border: "4px dashed rgb(208, 213, 221)",
     }}
   >
     <Toast />
@@ -236,7 +237,7 @@ const CallbackLogger = (props: StoryArgs) => {
   return (
     <div style={{ display: "flex", height: "700px", gap: "16px" }}>
       <Toast />
-      <div style={{ flex: "1 1 60%", minWidth: 0 }}>
+      <div style={{ flex: "1 1 60%", minWidth: 0, border: "4px dashed rgb(208, 213, 221)" }}>
         <Chat
           {...(props as unknown as ChatProps)}
           onSendMessage={(message, files) => {
@@ -420,7 +421,7 @@ export const WithCallbacks: Story = {
     allowManageTools: true,
     allowSelectChat: true,
     width: "100%",
-    height: "700px",
+    height: "100%",
   },
   parameters: {
     docs: {
@@ -468,6 +469,7 @@ export const ExternalScroll: Story = {
           height: "600px",
           overflowY: "scroll",
           position: "relative",
+          border: "4px dashed rgb(208, 213, 221)",
         }}
       >
         <Chat

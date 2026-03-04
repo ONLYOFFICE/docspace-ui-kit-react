@@ -18,7 +18,8 @@ const config: StorybookConfig = {
 		"../selectors/**/*.mdx",
 		"../selectors/**/*.stories.@(js|jsx|ts|tsx)",
 		"../document-editor/**/*.stories.@(js|jsx|ts|tsx)",
-    "../ai-agent/**/*.stories.@(js|jsx|ts|tsx)",
+		"../ai-agent/**/*.mdx",
+		"../ai-agent/**/*.stories.@(js|jsx|ts|tsx)",
 	],
 
 	addons: [
