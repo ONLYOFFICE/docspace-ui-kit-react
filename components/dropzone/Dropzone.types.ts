@@ -25,6 +25,9 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type { DropEvent } from "react-dropzone";
+import type { FC, SVGProps } from "react";
+
+export type SvgIconComponent = FC<SVGProps<SVGSVGElement>>;
 
 type BaseDropzoneProps = {
   /** Shows loading state of the dropzone */
@@ -51,8 +54,8 @@ type BaseDropzoneProps = {
   formatsPlusBadgeValue?: number;
   /** Maximum number of files allowed (0 for unlimited) */
   maxFiles?: number;
-  /** Optional icon URL to display */
-  icon?: string;
+  /** Optional icon URL (string) or SVG component to display */
+  icon?: string | SvgIconComponent;
   /** Optional className for the icon */
   iconClassName?: string;
   /** Optional className for the dropzone container */
