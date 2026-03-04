@@ -157,11 +157,7 @@ const AddCustomModal = ({
           </div>
         </Form>
 
-        {error && (
-          <div style={{ color: "#d32f2f", marginTop: "8px", fontSize: "14px" }}>
-            {error}
-          </div>
-        )}
+        {error ? <div className="error">{error}</div> : null}
 
         <div className="footer">
           <Button
