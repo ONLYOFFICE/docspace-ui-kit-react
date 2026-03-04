@@ -65,6 +65,7 @@ import { useTheme } from "../../context/ThemeContext";
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
 import styles from "./PeopleSelector.module.scss";
+import { Encoder } from "../../utils/encoder";
 
 const PEOPLE_TAB_ID = "0";
 const GROUP_TAB_ID = "1";
@@ -641,7 +642,7 @@ const PeopleSelector = ({
             aria-label={label}
             dir="auto"
           >
-            {label}
+            {Encoder.htmlDecode(label ?? "")}
           </Text>
           {!isGroup && String(id) === currentUserId ? (
             <Text className={styles.isMeLabel} fontWeight={600} fontSize="14px">

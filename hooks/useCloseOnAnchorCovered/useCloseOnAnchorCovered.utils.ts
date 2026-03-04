@@ -24,30 +24,29 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+/**
+ * Checks if an element is partially covered by other elements or outside the viewport
+ * @param element - The HTML element to check
+ * @returns true if the element is covered or outside viewport, false otherwise
+ */
+export function isElementCovered(element: HTMLElement): boolean {
+  const rect = element.getBoundingClientRect();
 
-export * from "./uuid";
+  // Check if element is outside viewport
+  if (
+    rect.bottom < 0 ||
+    rect.top > window.innerHeight ||
+    rect.right < 0 ||
+    rect.left > window.innerWidth
+  ) {
+    return true;
+  }
 
-export * from "./common-icons-style";
+  // Check if element is covered by another element
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + 5;
 
-export * from "./use-click-outside";
+  const topElement = document.elementFromPoint(x, y);
 
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./edge-scrolling";
-
-export * from "./hasOwnProperty";
-
-export * from "./encoder";
+  return !topElement?.contains(element);
+}
