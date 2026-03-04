@@ -34,9 +34,3 @@
   justify-content: flex-end;
   gap: 8px;
 }
-
-.error {
-  margin-top: 8px;
-  font-size: 14px;
-  color: #f24724;
-}

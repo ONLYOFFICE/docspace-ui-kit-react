@@ -34,7 +34,13 @@ import {
   useStorybookState,
 } from "storybook/manager-api";
 import { useGlobals } from "storybook/manager-api";
-import { Modal, Button, Form, Select } from "storybook/internal/components";
+import {
+  Modal,
+  Button,
+  Form,
+  Select,
+  Bar,
+} from "storybook/internal/components";
 import { EditorIcon, TrashIcon } from "@storybook/icons";
 
 import {
@@ -157,7 +163,7 @@ const AddCustomModal = ({
           </div>
         </Form>
 
-        {error ? <div className="error">{error}</div> : null}
+        {error ? <Bar>{error}</Bar> : null}
 
         <div className="footer">
           <Button
