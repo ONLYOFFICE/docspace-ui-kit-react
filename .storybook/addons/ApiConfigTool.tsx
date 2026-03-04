@@ -152,12 +152,9 @@ const ApiConfigDropdown = () => {
       } else {
         updateGlobals({ apiConfig: value });
         localStorage.setItem(LAST_API_CONFIG_KEY, String(value));
-
-        const provider = providers.find((p) => p.id === value);
-        setCookie("asc_auth_key", provider?.apiKey ?? "");
       }
     },
-    [updateGlobals, providers],
+    [updateGlobals],
   );
 
   const handleModalSave = useCallback(
@@ -175,8 +172,6 @@ const ApiConfigDropdown = () => {
       setProviders(getSavedProviders());
       setModalOpen(false);
       updateGlobals({ apiConfig: id });
-
-      setCookie("asc_auth_key", key);
     },
     [updateGlobals],
   );
