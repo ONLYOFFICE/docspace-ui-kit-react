@@ -178,18 +178,13 @@ export const ViewMode: Story = {
 
 export const WithCustomEvent: Story = {
   render: (args: StoryArgs) => {
-    const { ...editorProps } = args;
-
     const onDocumentReady = () => {
-      const documentEditor = window.DocEditor.instances[editorProps.id];
+      const documentEditor = window.DocEditor.instances[args.id];
       documentEditor.showMessage("Welcome to ONLYOFFICE Editor!");
     };
 
     return (
-      <DocumentEditor
-        events_onDocumentReady={onDocumentReady}
-        {...editorProps}
-      />
+      <DocumentEditor events_onDocumentReady={onDocumentReady} {...args} />
     );
   },
   args: {
@@ -203,8 +198,6 @@ export const WithCustomEvent: Story = {
 
 export const FillSpreadsheetWithData: Story = {
   render: (args: StoryArgs) => {
-    const { ...editorProps }: {} & Omit<DocumentEditorProps, "fileId"> = args;
-
     const [isOpen, setIsOpen] = useState(false);
     const [fileId, setFileId] = useState<number | null>(null);
     const [isReady, setIsReady] = useState(false);
@@ -343,7 +336,7 @@ export const FillSpreadsheetWithData: Story = {
         <DocumentEditor
           fileId={fileId}
           events_onDocumentReady={onDocumentReady}
-          {...editorProps}
+          {...args}
         />
       </div>
     );
