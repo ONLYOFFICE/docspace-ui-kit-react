@@ -133,7 +133,6 @@ describe("<Buttons />", () => {
     getIcon: vi.fn() as unknown as TGetIcon,
     messageIndex: 0,
     getResultStorageId: () => 1,
-    folderFormValidation: /.*/,
     allowExternalNavigation: true,
   };
 

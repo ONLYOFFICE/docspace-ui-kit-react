@@ -49,7 +49,6 @@ const ChatMessageBody = ({
   getIcon,
   isLoading,
   getResultStorageId,
-  folderFormValidation,
   setAiPlaylistImages,
   setMediaViewerVisible,
   useInternalScroll,
@@ -122,7 +121,6 @@ const ChatMessageBody = ({
                 isLast={index === 0}
                 getIcon={getIcon}
                 getResultStorageId={getResultStorageId}
-                folderFormValidation={folderFormValidation}
                 setAiPlaylistImages={setAiPlaylistImages}
                 setMediaViewerVisible={setMediaViewerVisible}
                 allowExternalNavigation={allowExternalNavigation}

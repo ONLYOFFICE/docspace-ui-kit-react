@@ -38,7 +38,6 @@ import styles from "./Chat.stories.module.scss";
 
 type StoryArgs = {
   userAvatar?: string;
-  folderFormValidation?: RegExp;
   width?: string;
   height?: string;
   persistDraft?: boolean;
@@ -107,11 +106,6 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
     userAvatar: {
       control: "text",
       description: "URL or path to the user's avatar image",
-    },
-    folderFormValidation: {
-      control: "object",
-      description:
-        "Regular expression for validating folder names in generated documents",
     },
     width: {
       control: "text",
@@ -308,7 +302,6 @@ export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
     userAvatar: "",
-    folderFormValidation: /^[a-zA-Z0-9 ]+$/,
     persistDraft: false,
     allowExternalNavigation: false,
     allowAttachFiles: false,
@@ -336,7 +329,6 @@ export const Default: Story = {
         code: `<Chat
   agentId={validatedAgentId}
   userAvatar=""
-  folderFormValidation={/^[a-zA-Z0-9 ]+$/}
   onSendMessage={(message, files) => console.log(message, files)}
 />`,
       },
@@ -399,7 +391,6 @@ export const WithCallbacks: Story = {
   render: (args: StoryArgs) => <CallbackLogger {...args} />,
   args: {
     userAvatar: "",
-    folderFormValidation: /^[a-zA-Z0-9 ]+$/,
     persistDraft: true,
     allowExternalNavigation: true,
     allowAttachFiles: true,

@@ -64,7 +64,6 @@ const Buttons = ({
   getIcon,
   messageIndex,
   getResultStorageId,
-  folderFormValidation,
   allowExternalNavigation,
 }: MessageButtonsProps) => {
   const { agentId, findPreviousUserMessage } = useMessageStore();
@@ -206,7 +205,6 @@ const Buttons = ({
           getFileName={getExportedFileName}
           getIcon={getIcon}
           showFolderSelector={showFolderSelector}
-          folderFormValidation={folderFormValidation}
           allowExternalNavigation={allowExternalNavigation}
         />
       ) : null}

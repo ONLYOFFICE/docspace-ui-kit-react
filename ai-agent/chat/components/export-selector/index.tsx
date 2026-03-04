@@ -28,6 +28,7 @@ import { DeviceType, FolderType } from "../../../../enums";
 import { isDesktop, isTablet } from "../../../../utils";
 import { getCommonTranslation } from "../../../../utils";
 
+import { FOLDER_FORM_VALIDATION } from "../../../../constants";
 import { TGetIcon } from "../../../../types";
 import { TBreadCrumb } from "../../../../components/selector";
 import FilesSelector from "../../../../selectors/Files";
@@ -46,7 +47,6 @@ type ExportSelectorProps = {
   ) => Promise<void>;
   currentFolderId: string | number;
   getFileName: () => string;
-  folderFormValidation: RegExp;
   allowExternalNavigation?: boolean;
 };
 
@@ -57,7 +57,6 @@ const ExportSelector = ({
   onSubmit,
   currentFolderId,
   getFileName,
-  folderFormValidation,
   allowExternalNavigation,
 }: ExportSelectorProps) => {
   return (
@@ -119,7 +118,7 @@ const ExportSelector = ({
             ? DeviceType.tablet
             : DeviceType.mobile
       }
-      folderFormValidation={folderFormValidation}
+      folderFormValidation={FOLDER_FORM_VALIDATION}
       renderInPortal
     />
   );

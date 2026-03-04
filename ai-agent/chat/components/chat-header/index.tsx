@@ -42,7 +42,6 @@ const ChatHeader = ({
   agentId,
   aiReady,
   getResultStorageId,
-  folderFormValidation,
   allowExternalNavigation,
   allowSelectChat,
   onNewChat,
@@ -63,7 +62,6 @@ const ChatHeader = ({
           getIcon={getIcon}
           getResultStorageId={getResultStorageId}
           agentId={agentId}
-          folderFormValidation={folderFormValidation}
           allowExternalNavigation={allowExternalNavigation}
           onSelectChat={onSelectChat}
         />

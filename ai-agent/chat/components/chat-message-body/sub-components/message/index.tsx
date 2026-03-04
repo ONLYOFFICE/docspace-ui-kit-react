@@ -84,7 +84,6 @@ const Message = ({
   isLast,
   getIcon,
   getResultStorageId,
-  folderFormValidation,
   setAiPlaylistImages,
   setMediaViewerVisible,
   allowExternalNavigation,
@@ -260,7 +259,6 @@ const Message = ({
           messageIndex={idx}
           getIcon={getIcon}
           getResultStorageId={getResultStorageId}
-          folderFormValidation={folderFormValidation}
           allowExternalNavigation={allowExternalNavigation}
         />
       ) : null}

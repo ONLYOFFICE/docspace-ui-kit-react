@@ -86,7 +86,6 @@ vi.mock("linkify-react", () => ({
 describe("Message component", () => {
   const getIcon = vi.fn();
   const getResultStorageId = vi.fn();
-  const folderFormValidation = /.*/;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -111,7 +110,6 @@ describe("Message component", () => {
         isLast={true}
         getIcon={getIcon}
         getResultStorageId={getResultStorageId}
-        folderFormValidation={folderFormValidation}
       />
     );
 
@@ -138,7 +136,6 @@ describe("Message component", () => {
           isLast={true}
           getIcon={getIcon}
           getResultStorageId={getResultStorageId}
-          folderFormValidation={folderFormValidation}
         />
       );
 
@@ -161,7 +158,6 @@ describe("Message component", () => {
         isLast={true}
         getIcon={getIcon}
         getResultStorageId={getResultStorageId}
-        folderFormValidation={folderFormValidation}
       />
     );
 
@@ -185,7 +181,6 @@ describe("Message component", () => {
         isLast={true}
         getIcon={getIcon}
         getResultStorageId={getResultStorageId}
-        folderFormValidation={folderFormValidation}
       />
     );
 
@@ -217,7 +212,6 @@ describe("Message component", () => {
           isLast={true}
           getIcon={getIcon}
           getResultStorageId={getResultStorageId}
-          folderFormValidation={folderFormValidation}
         />
       );
 

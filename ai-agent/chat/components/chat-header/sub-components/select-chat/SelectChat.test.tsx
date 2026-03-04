@@ -160,7 +160,6 @@ describe("<SelectChat />", () => {
     agentId: "123",
     getIcon: vi.fn(),
     getResultStorageId: () => 1,
-    folderFormValidation: /dummy/,
     isLoadingProp: false,
   };
 

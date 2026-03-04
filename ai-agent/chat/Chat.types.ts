@@ -79,7 +79,6 @@ export type SelectChatProps = {
   agentId: string | number;
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
-  folderFormValidation: RegExp;
   allowExternalNavigation?: boolean;
   onSelectChat?: (chatId: string) => void
 };
@@ -111,7 +110,6 @@ export type MessageProps = {
   isLast: boolean;
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
-  folderFormValidation: RegExp;
   allowExternalNavigation?: boolean;
 } & Pick<MessageImagesProps, "setAiPlaylistImages" | "setMediaViewerVisible">;
 
@@ -123,7 +121,6 @@ export type MessageButtonsProps = {
   getIcon: TGetIcon;
   messageIndex: number;
   getResultStorageId?: () => number | null;
-  folderFormValidation: RegExp;
   allowExternalNavigation?: boolean;
 };
 
@@ -172,7 +169,6 @@ export type MessageBodyProps = {
 
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
-  folderFormValidation: RegExp;
   useInternalScroll?: boolean;
   allowExternalNavigation?: boolean;
 } & Pick<MessageProps, "setAiPlaylistImages" | "setMediaViewerVisible">;
@@ -267,8 +263,6 @@ export type ChatProps = {
   messagesSettings?: Omit<ReturnType<typeof useInitMessages>, "initMessages">;
   isAdmin?: boolean;
   standalone?: boolean;
-
-  folderFormValidation: RegExp;
 
   multimodal?: TMultimodal;
   goToAISettings?: () => void;

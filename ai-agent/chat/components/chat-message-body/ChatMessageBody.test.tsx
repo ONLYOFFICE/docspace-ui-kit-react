@@ -63,7 +63,6 @@ describe("ChatMessageBody component", () => {
     getIcon: vi.fn(),
     isLoading: false,
     getResultStorageId: vi.fn(),
-    folderFormValidation: /.*/,
     setAiPlaylistImages: vi.fn(),
     setMediaViewerVisible: vi.fn(),
     allowExternalNavigation: true,

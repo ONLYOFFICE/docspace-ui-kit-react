@@ -67,7 +67,6 @@ const ChatUI = observer(
     standalone = false,
     aiReady = false,
     getResultStorageId,
-    folderFormValidation,
     multimodal,
     goToAISettings,
     goToWebSearchSettings,
@@ -108,7 +107,6 @@ const ChatUI = observer(
           getResultStorageId={getResultStorageId}
           agentId={agentId}
           aiReady={aiReady}
-          folderFormValidation={folderFormValidation}
           allowExternalNavigation={allowExternalNavigation}
           allowSelectChat={allowSelectChat}
           onNewChat={onNewChat}
@@ -130,7 +128,6 @@ const ChatUI = observer(
               isLoading={isLoadingChat}
               getIcon={getIcon}
               getResultStorageId={getResultStorageId}
-              folderFormValidation={folderFormValidation}
               setAiPlaylistImages={setAiPlaylistImages}
               setMediaViewerVisible={setMediaViewerVisible}
               useInternalScroll={useInternalScroll}

@@ -54,7 +54,6 @@ describe("<ChatHeader />", () => {
     agentId: "123",
     aiReady: true,
     getResultStorageId: vi.fn(),
-    folderFormValidation: /dummy/,
     allowSelectChat: true,
   };
 

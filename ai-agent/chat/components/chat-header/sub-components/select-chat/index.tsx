@@ -68,7 +68,6 @@ const SelectChat = ({
   agentId,
   getIcon,
   getResultStorageId,
-  folderFormValidation,
   allowExternalNavigation,
   onSelectChat,
 }: SelectChatProps) => {
@@ -329,7 +328,6 @@ const SelectChat = ({
           currentFolderId={getResultStorageId?.() || agentId}
           getFileName={getFileName}
           onSubmit={onSubmit}
-          folderFormValidation={folderFormValidation}
           allowExternalNavigation={allowExternalNavigation}
         />
       ) : null}
