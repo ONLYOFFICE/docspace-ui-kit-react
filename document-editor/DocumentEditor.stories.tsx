@@ -156,11 +156,7 @@ type Story = StoryObj<StoryArgs>;
 export default meta;
 
 export const Default: Story = {
-  render: (args: StoryArgs) => {
-    const { ...editorProps } = args;
-
-    return <DocumentEditor {...editorProps} />;
-  },
+  render: (args: StoryArgs) => <DocumentEditor {...args} />,
   args: {
     id: "editor",
     fileId: 1,
@@ -170,11 +166,7 @@ export const Default: Story = {
 };
 
 export const ViewMode: Story = {
-  render: (args: StoryArgs) => {
-    const { ...editorProps } = args;
-
-    return <DocumentEditor {...editorProps} />;
-  },
+  render: (args: StoryArgs) => <DocumentEditor {...args} />,
   args: {
     id: "viewer",
     fileId: 4,
@@ -271,38 +263,39 @@ export const FillSpreadsheetWithData: Story = {
       try {
         const connector = documentEditor.createConnector();
 
-        const headersLiteral = JSON.stringify(currentDataSet.headers);
-        const dataLiteral = JSON.stringify(currentDataSet.data);
+        // @ts-ignore - Asc.scope is provided by ONLYOFFICE connector API
+        window.Asc.scope.headers = currentDataSet.headers;
+        // @ts-ignore - Asc.scope is provided by ONLYOFFICE connector API
+        window.Asc.scope.data = currentDataSet.data;
 
-        // Construct a command function with inlined data to avoid scope issues in callCommand
-        // eslint-disable-next-line @typescript-eslint/no-implied-eval
-        const commandFunction = new Function(
-          `
-            const headers = ${headersLiteral};
-            const data = ${dataLiteral};
-            const oWorksheet = Api.GetActiveSheet();
+        connector.callCommand(() => {
+          // @ts-ignore - Asc.scope is provided by ONLYOFFICE connector API
+          const headers = Asc.scope.headers;
+          // @ts-ignore - Asc.scope is provided by ONLYOFFICE connector API
+          const data = Asc.scope.data;
 
-            for (let i = 0; i < headers.length; i++) {
-              const headerCell = oWorksheet.GetRangeByNumber(0, i);
-              headerCell.SetValue(headers[i]);
-              headerCell.SetBold(true);
-              headerCell.SetFillColor(Api.CreateColorFromRGB(200, 200, 200));
+          // @ts-ignore - Api is provided by ONLYOFFICE connector API
+          const oWorksheet = Api.GetActiveSheet();
 
-              const columnData = Array.isArray(data[i]) ? data[i] : [];
-              for (let j = 0; j < columnData.length; j++) {
-                oWorksheet.GetRangeByNumber(j + 1, i).SetValue(columnData[j]);
-              }
+          for (let i = 0; i < headers.length; i++) {
+            const headerCell = oWorksheet.GetRangeByNumber(0, i);
+            headerCell.SetValue(headers[i]);
+            headerCell.SetBold(true);
+            // @ts-ignore - Api is provided by ONLYOFFICE connector API
+            headerCell.SetFillColor(Api.CreateColorFromRGB(200, 200, 200));
+
+            const columnData = Array.isArray(data[i]) ? data[i] : [];
+            for (let j = 0; j < columnData.length; j++) {
+              oWorksheet.GetRangeByNumber(j + 1, i).SetValue(columnData[j]);
             }
+          }
 
-            oWorksheet.SetColumnWidth(0, 15);
-            oWorksheet.SetColumnWidth(1, 20);
-            oWorksheet.SetColumnWidth(2, 15);
-            oWorksheet.SetColumnWidth(3, 15);
-            oWorksheet.SetColumnWidth(4, 15);
-          `,
-        );
-
-        connector.callCommand(commandFunction as () => void);
+          oWorksheet.SetColumnWidth(0, 15);
+          oWorksheet.SetColumnWidth(1, 20);
+          oWorksheet.SetColumnWidth(2, 15);
+          oWorksheet.SetColumnWidth(3, 15);
+          oWorksheet.SetColumnWidth(4, 15);
+        });
       } catch (error) {
         documentEditor.showMessage("Automation command failed: " + error);
       }

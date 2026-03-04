@@ -104,7 +104,10 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
     };
   }, [
     documentServerUrl,
+    config,
     hasFileId,
+    fileVersion,
+    isView,
     api.filesApi,
     api.filesSettingsApi,
     onLoadComponentError,
