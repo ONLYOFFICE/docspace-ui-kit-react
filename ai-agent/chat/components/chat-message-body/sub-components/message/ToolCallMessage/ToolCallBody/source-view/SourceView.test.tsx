@@ -59,6 +59,10 @@ vi.mock("../../tool-call/ToolCall.utils", () => ({
   getRootDomain: vi.fn((url) => url),
 }));
 
+vi.mock("../../../../../../../../../providers/api", () => ({
+  useApi: () => ({ baseUrl: "mock-url" }),
+}));
+
 describe("<SourceView />", () => {
   const mockContent: TToolCallContent = {
     type: ContentType.Tool,

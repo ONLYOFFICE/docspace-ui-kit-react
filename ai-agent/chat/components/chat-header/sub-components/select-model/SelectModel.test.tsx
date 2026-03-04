@@ -54,13 +54,10 @@ describe("<SelectModel />", () => {
   });
 
   it("renders model name correctly", () => {
-    const spy = vi.spyOn(aiModelUtils, "getAiModelName").mockReturnValue("GPT-4 Turbo");
+    const modelAliases = { "gpt-4": "GPT-4 Turbo" };
     
-    render(<SelectModel selectedModel="gpt-4" isLoading={false} />);
+    render(<SelectModel selectedModel="gpt-4" isLoading={false} modelAliases={modelAliases} />);
     
     expect(screen.getByTestId("model-name")).toHaveTextContent("GPT-4 Turbo");
-    expect(spy).toHaveBeenCalledWith("gpt-4");
-    
-    spy.mockRestore();
   });
 });

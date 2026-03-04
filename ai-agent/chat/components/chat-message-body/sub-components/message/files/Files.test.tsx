@@ -38,6 +38,10 @@ vi.mock("../../../../../utils", () => ({
   openFile: vi.fn(),
 }));
 
+vi.mock("../../../../../../../providers/api", () => ({
+  useApi: () => ({ baseUrl: "mock-url" }),
+}));
+
 vi.mock("../../../../../../../components/text", () => ({
   Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }));
@@ -85,7 +89,7 @@ describe("Files component", () => {
     const fileItems = screen.getAllByTestId("file-item");
     fireEvent.click(fileItems[0]);
 
-    expect(openFile).toHaveBeenCalledWith("1", true);
+    expect(openFile).toHaveBeenCalledWith("1", true, "mock-url");
   });
 
   it("returns null when files list is empty", () => {

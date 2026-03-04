@@ -15,6 +15,10 @@ vi.mock("copy-to-clipboard", () => ({
   default: vi.fn(),
 }));
 
+vi.mock("../../../../../../providers", () => ({
+  useApi: () => ({ baseUrl: "mock-url" }),
+}));
+
 vi.mock("../../../../store/chatStore", () => ({
   useChatStore: () => ({
     currentChat: { id: "chat-1", createdBy: { avatarOriginal: "url" }, title: "Chat Title" },
