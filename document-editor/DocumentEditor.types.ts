@@ -32,7 +32,8 @@ import type {
 export type { IConfig };
 
 export type DocumentEditorProps = OODocumentEditorProps & {
-  fileId: number;
+  /** ID of the file to open in the editor */
+  fileId?: number;
   /** Version of the file to open in the editor */
   fileVersion?: number;
   /** Whether the file is in view mode */
