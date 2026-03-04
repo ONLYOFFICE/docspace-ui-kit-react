@@ -33,6 +33,7 @@ import { setupErrorI18n } from "./stories.utils";
 
 const meta = {
   title: "Components/Errors/Error403",
+  tags: ["!autodocs"],
   component: Error403,
   parameters: {
     docs: {

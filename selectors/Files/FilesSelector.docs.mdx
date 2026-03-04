@@ -1,0 +1,91 @@
+{/*
+(c) Copyright Ascensio System SIA 2009-2026
+
+This program is a free software product.
+You can redistribute it and/or modify it under the terms
+of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+any third-party rights.
+
+This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+
+You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+
+The  interactive user interfaces in modified source and object code versions of the Program must
+display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+
+Pursuant to Section 7(b) of the License you must retain the original Product logo when
+distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+trademark law for use of our trademarks.
+
+All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+*/}
+
+import { Meta, Controls, Story } from '@storybook/addon-docs/blocks';
+
+import * as FilesSelectorStories from './Files.stories';
+
+<Meta of={FilesSelectorStories} />
+
+# FilesSelector
+
+FilesSelector is a full file-system browser selector for navigating DocSpace rooms, folders, and files.
+
+## Features
+
+- **Browse rooms & folders** — Navigate the full file hierarchy with breadcrumb trail
+- **Search** — Enable with `withSearch`, scoped to the current folder/room
+- **Room type filter** — Restrict the root list to specific room types via `roomType`
+- **File type filter** — Filter by extension or type via `filterParam`
+- **Footer input** — Optionally show a file-name input field in the footer
+- **Footer checkbox** — Optional checkbox (e.g., "keep original") in the footer
+- **Creation** — Show a create-room button via `withCreate` + `createDefineRoomLabel`
+- **Aside / embedded** — Rendered inside an `<Aside>` panel by default; pass `embedded` to render inline
+- **Portal on mobile** — Automatically renders in a Portal on mobile/tablet devices
+- **SSR support** — Pre-populate with server-fetched data via `withInit` + `initItems`
+
+### Default
+
+Browse rooms and folders, then click **Select** to confirm. The submit button is enabled only when a folder is selected.
+
+<Story of={FilesSelectorStories.Default} />
+
+```tsx
+<FilesSelector
+  isPanelVisible={open}
+  embedded={false}
+  currentFolderId={0}
+  rootFolderType={FolderType.VirtualRooms}
+  currentDeviceType={DeviceType.desktop}
+  isRoomsOnly={false}
+  isThirdParty={false}
+  withSearch
+  withBreadCrumbs
+  withoutBackButton={false}
+  withCancelButton
+  withCreate={false}
+  withFooterInput={false}
+  withFooterCheckbox={false}
+  submitButtonLabel="Select"
+  cancelButtonLabel="Cancel"
+  footerInputHeader=""
+  currentFooterInputValue=""
+  footerCheckboxLabel=""
+  descriptionText=""
+  disabledItems={[]}
+  filesSettings={filesSettings}
+  onSubmit={(id, title) => console.log(id, title)}
+  onCancel={() => setOpen(false)}
+  getIsDisabled={getIsDisabled}
+  getFilesArchiveError={getArchiveError}
+/>
+```
+
+## Properties
+
+<Controls />

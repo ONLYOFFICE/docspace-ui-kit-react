@@ -37,6 +37,8 @@ import type { TDirectionX } from "../../types";
 
 import { Portal } from "../portal";
 
+import { Scrollbar } from "../scrollbar";
+
 import { VirtualList } from "./sub-components/VirtualList";
 import { Row } from "./sub-components/Row";
 
@@ -73,6 +75,8 @@ const DropDown = ({
   className,
   style,
   topSpace,
+  bottomSpace,
+  withDynamicScrollbar,
   backDrop,
   dataTestId,
 }: DropDownProps) => {
@@ -86,6 +90,7 @@ const DropDown = ({
     manualY,
     width: 0,
     isDropdownReady: false, // need to avoid scrollbar appearing during dropdown position calculation
+    dynamicMaxHeight: undefined as number | undefined,
   });
 
   const checkPositionPortal = React.useCallback(() => {
@@ -116,13 +121,39 @@ const DropDown = ({
 
     const dropDownRects = dropDown?.getBoundingClientRect();
 
-    if (
-      directionY === "top" ||
-      (directionY === "both" &&
-        parentRects.bottom + dropDownHeight > viewport.height)
-    ) {
-      bottom -= parent.current.clientHeight + dropDownHeight;
-      if (topSpace && bottom < 0) bottom = topSpace;
+    let dynamicMaxHeight: number | undefined;
+
+    if (withDynamicScrollbar) {
+      // --- withDynamicScrollbar: own direction, height constraint and positioning ---
+      const availableBelow =
+        viewport.height - parentRects.bottom - (bottomSpace ?? 0);
+      const availableAbove = parentRects.top - (topSpace ?? 0);
+
+      const goingUp =
+        directionY === "top" ||
+        (directionY === "both" &&
+          dropDownHeight > availableBelow &&
+          availableAbove > availableBelow);
+
+      const available = (goingUp ? availableAbove : availableBelow) - 8;
+
+      if (available > 0 && dropDownHeight > available)
+        dynamicMaxHeight = available;
+
+      if (goingUp) {
+        bottom -=
+          parent.current.clientHeight + (dynamicMaxHeight ?? dropDownHeight);
+        if (topSpace && bottom < 0) bottom = topSpace;
+      }
+    } else {
+      if (
+        directionY === "top" ||
+        (directionY === "both" &&
+          parentRects.bottom + dropDownHeight > viewport.height)
+      ) {
+        bottom -= parent.current.clientHeight + dropDownHeight;
+        if (topSpace && bottom < 0) bottom = topSpace;
+      }
     }
 
     if (dropDown && dropDownRects) {
@@ -173,6 +204,7 @@ const DropDown = ({
       const setAlignment = alignMap[hasNoSpace ? "hasNoSpace" : directionX];
       setAlignment();
     }
+    // --- Apply position and update state ---
     if (dropDownRef.current)
       dropDownRef.current.style.top = `${bottom + window.scrollY}px`;
 
@@ -182,6 +214,7 @@ const DropDown = ({
       directionY,
       width: dropDownRef.current ? dropDownRef.current.offsetWidth : 240,
       isDropdownReady: true,
+      dynamicMaxHeight,
     }));
   }, [
     directionX,
@@ -191,6 +224,8 @@ const DropDown = ({
     offsetX,
     isRTL,
     topSpace,
+    bottomSpace,
+    withDynamicScrollbar,
   ]);
 
   const checkPosition = React.useCallback(() => {
@@ -294,10 +329,17 @@ const DropDown = ({
         rowHeights &&
         rowHeights.reduce((a: number, b: number) => a + b, 0)) ||
       0;
+    // --- withDynamicScrollbar: override maxHeight with computed viewport-aware value ---
+    const useDynamicScrollbar =
+      withDynamicScrollbar && !!state.dynamicMaxHeight;
+    const effectiveMaxHeight = useDynamicScrollbar
+      ? state.dynamicMaxHeight
+      : maxHeight;
+
     const calculatedHeight =
-      fullHeight > 0 && maxHeight && fullHeight < maxHeight
+      fullHeight > 0 && effectiveMaxHeight && fullHeight < effectiveMaxHeight
         ? fullHeight
-        : maxHeight;
+        : effectiveMaxHeight;
 
     const dropDownMaxHeightProp = maxHeight
       ? { height: `${calculatedHeight}px` }
@@ -311,10 +353,13 @@ const DropDown = ({
       ["--manual-width" as string]: manualWidth,
       ["--manual-x" as string]: manualX,
       ["--manual-y" as string]: state.manualY,
+      // withDynamicScrollbar: lock width to prevent Scrollbar internals from collapsing it
+      ...(useDynamicScrollbar && state.width ? { width: state.width } : {}),
     };
 
     const dropDownClasses = classNames(styles.dropDown, className, {
       "dropdown-container": true,
+      "not-selectable": true,
       [styles.directionTop]: state.directionY === "top",
       [styles.directionBottom]: state.directionY === "bottom",
       [styles.directionRight]:
@@ -340,22 +385,32 @@ const DropDown = ({
           data-testid={dataTestId ?? "dropdown"}
           role="listbox"
         >
-          <VirtualList
-            Row={Row}
-            width={state.width}
-            itemCount={itemCount}
-            maxHeight={maxHeight}
-            cleanChildren={cleanChildren}
-            calculatedHeight={calculatedHeight || 0}
-            isNoFixedHeightOptions={isNoFixedHeightOptions ?? false}
-            disableScrollbarPadding={disableScrollbarPadding}
-            useFlexibleHeight={useFlexibleHeight}
-            getItemSize={getItemSize}
-            isOpen={open ?? false}
-            enableKeyboardEvents={enableKeyboardEvents ?? false}
-          >
-            {children}
-          </VirtualList>
+          {/* withDynamicScrollbar: use project Scrollbar instead of VirtualList */}
+          {useDynamicScrollbar ? (
+            <Scrollbar
+              className="scroll-drop-down-item"
+              style={{ height: state.dynamicMaxHeight! - 16 }}
+            >
+              {cleanChildren}
+            </Scrollbar>
+          ) : (
+            <VirtualList
+              Row={Row}
+              width={state.width}
+              itemCount={itemCount}
+              maxHeight={maxHeight}
+              cleanChildren={cleanChildren}
+              calculatedHeight={calculatedHeight || 0}
+              isNoFixedHeightOptions={isNoFixedHeightOptions ?? false}
+              disableScrollbarPadding={disableScrollbarPadding}
+              useFlexibleHeight={useFlexibleHeight}
+              getItemSize={getItemSize}
+              isOpen={open ?? false}
+              enableKeyboardEvents={enableKeyboardEvents ?? false}
+            >
+              {children}
+            </VirtualList>
+          )}
         </div>
       </>
     );
@@ -385,7 +440,12 @@ const DropDown = ({
     }
 
     return () => {
-      setState((s) => ({ ...s, isDropdownReady: false }));
+      // withDynamicScrollbar: reset dynamicMaxHeight so stale value doesn't affect next open
+      setState((s) => ({
+        ...s,
+        isDropdownReady: false,
+        dynamicMaxHeight: undefined,
+      }));
       window.removeEventListener("resize", resizeListener);
 
       if (isIOS && isMobile)

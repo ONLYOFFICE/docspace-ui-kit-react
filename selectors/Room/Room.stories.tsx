@@ -90,6 +90,7 @@ type StoryArgs = {
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Selectors/RoomSelector",
+  tags: ["!autodocs"],
   parameters: {
     docs: {
       description: {
@@ -307,8 +308,9 @@ type Story = StoryObj<StoryArgs>;
 const Template = (props: StoryArgs) => (
   <div
     style={{
-      width: "100%",
-      height: "500px",
+      width: "700px",
+      height: "600px",
+      border: "4px dashed #d0d5dd",
       overflow: "hidden",
       transform: "translateZ(0)",
     }}
@@ -357,6 +359,7 @@ export const Default: Story = {
 };
 
 export const MultiSelect: Story = {
+  tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
     withHeader: true,
@@ -404,6 +407,7 @@ export const MultiSelect: Story = {
 };
 
 export const FilteredByRoomType: Story = {
+  tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
     withHeader: true,
@@ -445,6 +449,7 @@ export const FilteredByRoomType: Story = {
 };
 
 export const AsideMode: Story = {
+  tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
     useAside: true,

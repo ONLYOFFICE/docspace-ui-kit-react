@@ -32,6 +32,7 @@ import ErrorBoundary from "./ErrorBoundary";
 
 const meta = {
 	title: "Components/Providers/ErrorProvider",
+	tags: ["!autodocs"],
 	component: ErrorBoundary,
 	parameters: {
 		docs: {

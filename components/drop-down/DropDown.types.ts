@@ -87,6 +87,8 @@ export interface DropDownProps {
   withoutBackground?: boolean;
   zIndex?: number;
   topSpace?: number;
+  bottomSpace?: number;
+  withDynamicScrollbar?: boolean;
   usePortalBackdrop?: boolean;
   backDrop?: JSX.Element | null;
   shouldShowBackdrop?: boolean;

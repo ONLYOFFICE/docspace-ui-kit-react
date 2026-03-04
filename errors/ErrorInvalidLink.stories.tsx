@@ -33,6 +33,7 @@ import { setupErrorI18n } from "./stories.utils";
 
 const meta = {
   title: "Components/Errors/ErrorInvalidLink",
+  tags: ["!autodocs"],
   component: ErrorInvalidLink,
   parameters: {
     docs: {

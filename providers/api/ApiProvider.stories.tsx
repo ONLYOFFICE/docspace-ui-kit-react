@@ -32,6 +32,7 @@ import ApiProvider from "./ApiProvider";
 
 const meta = {
 	title: "Components/Providers/ApiProvider",
+	tags: ["!autodocs"],
 	component: ApiProvider,
 	parameters: {
 		docs: {
