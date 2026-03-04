@@ -24,23 +24,23 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-.uploaderContainer {
-  display: flex;
-  flex-direction: column;
-}
+export const parseSizeLimit = (sizeString?: string): number | null => {
+  if (!sizeString) return null;
 
-.dropzoneWrapper {
-  width: 100%;
-  height: 100%;
-  flex: 1;
+  const match = sizeString.toLowerCase().match(/^(\d+)(kb|mb|gb)$/);
+  if (!match) return null;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  const value = Number.parseInt(match[1], 10);
+  const unit = match[2];
 
-.dropzoneLoader {
-  position: static;
-  transform: none;
-  margin: auto;
-}
+  switch (unit) {
+    case "kb":
+      return value * 1024;
+    case "mb":
+      return value * 1024 * 1024;
+    case "gb":
+      return value * 1024 * 1024 * 1024;
+    default:
+      return null;
+  }
+};

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { createFolder } from "@docspace/shared/api/files";
+import type { FoldersApi } from "@onlyoffice/docspace-api-sdk";
 
 import type { TFileWithParentFolderId } from "../Uploader.types";
 import {
@@ -38,6 +38,7 @@ import {
 export const buildParentFolderMap = async (
   files: TFileWithParentFolderId[],
   rootFolderId: number,
+  foldersApi: FoldersApi,
 ) => {
   const dirSet = new Set<string>();
 
@@ -70,7 +71,11 @@ export const buildParentFolderMap = async (
       throw new Error("Failed to resolve parent folder");
     }
 
-    const created = await createFolder(parentId, name);
+    const res = await foldersApi.createFolder(parentId, { title: name });
+    const created = res.data?.response;
+    if (!created?.id) {
+      throw new Error("Failed to create folder");
+    }
     dirToId.set(dir, created.id);
   }
 
@@ -80,6 +85,7 @@ export const buildParentFolderMap = async (
 export const attachParentFolderId = async (
   files: File[],
   rootFolderId: number,
+  foldersApi: FoldersApi,
 ): Promise<TFileWithParentFolderId[]> => {
   const normalizedFiles = files
     .filter((f) => {
@@ -89,7 +95,7 @@ export const attachParentFolderId = async (
     })
     .map((f) => f as TFileWithParentFolderId);
 
-  const dirToId = await buildParentFolderMap(normalizedFiles, rootFolderId);
+  const dirToId = await buildParentFolderMap(normalizedFiles, rootFolderId, foldersApi);
 
   normalizedFiles.forEach((f) => {
     if (isEmptyDirectoryFile(f)) return;
