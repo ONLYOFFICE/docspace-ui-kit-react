@@ -36,6 +36,7 @@ export type TTitles = {
   actions?: string;
   contextMenu?: string;
   warningText?: string;
+  warningIcon?: string;
 };
 
 export type TContextButtonProps = {
