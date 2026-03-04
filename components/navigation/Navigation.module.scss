@@ -319,7 +319,7 @@
   border-radius: 6px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   background: var(--section-header-trash-erasure-label-background);
 
   @include mixins.tablet-and-below {
