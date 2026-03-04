@@ -191,12 +191,12 @@ const CallbackLogger = (props: StoryArgs) => {
       id: number;
       type: string;
       timestamp: string;
-      data: any;
+      data: Record<string, unknown>;
     }>
   >([]);
   const [filter, setFilter] = React.useState<string>("all");
 
-  const addLog = (type: string, data: any) => {
+  const addLog = (type: string, data: Record<string, unknown>) => {
     setLogs((prev) =>
       [
         {

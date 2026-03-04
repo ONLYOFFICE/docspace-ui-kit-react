@@ -87,13 +87,11 @@ const SelectChat = ({
     isLoading,
     currentChat,
     fetchChat,
-    deleteChat,
     totalChats,
     fetchNextChats,
     hasNextChats,
-    updateUrlChatId,
   } = useChatStore();
-  const { fetchMessages, startNewChat, isRequestRunning } = useMessageStore();
+  const { fetchMessages, isRequestRunning } = useMessageStore();
   const { aiApi, baseUrl } = useApi();
 
   const closeExportSelector = () => setIsExportOpen(false);
