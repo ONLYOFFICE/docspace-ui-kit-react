@@ -330,6 +330,7 @@ const SelectChat = ({
           getFileName={getFileName}
           onSubmit={onSubmit}
           folderFormValidation={folderFormValidation}
+          allowExternalNavigation={allowExternalNavigation}
         />
       ) : null}
     </>

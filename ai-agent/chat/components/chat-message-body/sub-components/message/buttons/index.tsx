@@ -207,6 +207,7 @@ const Buttons = ({
           getIcon={getIcon}
           showFolderSelector={showFolderSelector}
           folderFormValidation={folderFormValidation}
+          allowExternalNavigation={allowExternalNavigation}
         />
       ) : null}
     </>
