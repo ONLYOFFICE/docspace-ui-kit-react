@@ -229,6 +229,7 @@ export const FillSpreadsheetWithData: Story = {
       return (
         <>
           <FileInput
+            scale
             fromStorage
             placeholder="Choose file"
             size={InputSize.base}
