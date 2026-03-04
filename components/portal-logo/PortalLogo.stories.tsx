@@ -1,0 +1,125 @@
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+import type { ComponentProps } from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import PortalLogo from "./PortalLogo";
+
+const meta = {
+  title: "UI/Data display/PortalLogo",
+  component: PortalLogo,
+  parameters: {
+    docs: {
+      description: {
+        component: `Renders the portal logo with responsive behavior based on screen width and theme.
+
+### Features
+
+- **Theme Aware**: Automatically selects light or dark logo variant
+- **Responsive**: Switches to a compact logo on mobile when resizable
+- **Error Handling**: Falls back to a default SVG logo if the image fails to load
+
+### Usage
+
+\`\`\`tsx
+import PortalLogo from "@docspace/ui-kit/components/portal-logo";
+
+// Basic portal logo
+<PortalLogo />
+
+// Resizable logo (adapts to mobile)
+<PortalLogo isResizable />
+
+// With custom class
+<PortalLogo className="custom-logo" isResizable />
+\`\`\``,
+      },
+    },
+  },
+  argTypes: {
+    className: {
+      control: "text",
+      description: "Optional CSS class name applied to the logo",
+    },
+    isResizable: {
+      control: "boolean",
+      description:
+        "Whether the logo resizes based on screen width (compact on mobile)",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+  },
+} satisfies Meta<typeof PortalLogo>;
+
+type Story = StoryObj<ComponentProps<typeof PortalLogo>>;
+
+export default meta;
+
+export const Default: Story = {
+  render: (args) => <PortalLogo {...args} />,
+  args: {
+    isResizable: false,
+  },
+};
+
+export const Resizable: Story = {
+  render: (args) => <PortalLogo {...args} />,
+  args: {
+    isResizable: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Resizable logo that adapts to screen width. On mobile viewports, it switches to a compact logo displayed in a fixed header bar.",
+      },
+      source: {
+        code: `<PortalLogo isResizable />`,
+      },
+    },
+  },
+};
+
+export const WithClassName: Story = {
+  render: (args) => <PortalLogo {...args} />,
+  args: {
+    className: "custom-logo-class",
+    isResizable: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Portal logo with a custom CSS class applied for additional styling.",
+      },
+      source: {
+        code: `<PortalLogo className="custom-logo-class" />`,
+      },
+    },
+  },
+};

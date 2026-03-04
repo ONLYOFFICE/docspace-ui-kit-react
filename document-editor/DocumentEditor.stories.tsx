@@ -32,7 +32,7 @@ import type { DocumentEditorProps } from "./DocumentEditor.types";
 type StoryArgs = DocumentEditorProps;
 
 const meta: Meta<StoryArgs> = {
-  title: "Document Editor",
+  title: "Components/Document Editor",
   component: DocumentEditor,
   parameters: {
     docs: {

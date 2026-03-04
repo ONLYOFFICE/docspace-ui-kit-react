@@ -1,17 +1,74 @@
-import React from "react";
-import { Meta, StoryFn } from "@storybook/react-vite";
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import DragAndDrop from "./DragAndDrop";
-import { DragAndDropProps } from "./DragAndDrop.types";
+import type React from "react";
+import type { ComponentProps } from "react";
+import { useState } from "react";
 
-export default {
-  title: "Components/Interactive elements/DragAndDrop",
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import { DragAndDrop } from ".";
+
+const meta = {
+  title: "UI/Interactive elements/DragAndDrop",
   component: DragAndDrop,
   parameters: {
     docs: {
       description: {
-        component:
-          "DragAndDrop component for handling file drag and drop operations",
+        component: `DragAndDrop component for handling file drag and drop operations.
+
+### Features
+
+- **Drop Zone**: Designate areas as file drop targets
+- **Drag State Tracking**: Visual feedback when items are being dragged over
+- **Drag Disable**: Optionally disable drag functionality
+- **Custom Styling**: Support for custom styles and class names
+- **Event Callbacks**: Handlers for drop, dragOver, dragLeave, and mouseDown events
+- **Ref Forwarding**: Forward refs for direct DOM access
+
+### Usage
+
+\`\`\`tsx
+import { DragAndDrop } from "@docspace/ui-kit/components/drag-and-drop";
+
+// Basic drop zone
+<DragAndDrop
+  isDropZone
+  onDrop={(files) => handleFiles(files)}
+  onDragOver={(isDragActive, e) => setDragging(isDragActive)}
+  onDragLeave={(e) => setDragging(false)}
+>
+  <div>Drop files here</div>
+</DragAndDrop>
+
+// Disabled drag zone
+<DragAndDrop isDragDisabled>
+  <div>Drag disabled</div>
+</DragAndDrop>
+\`\`\``,
       },
     },
   },
@@ -19,10 +76,24 @@ export default {
     isDropZone: {
       control: "boolean",
       description: "Sets the component as a dropzone",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     dragging: {
       control: "boolean",
       description: "Shows that the item is being dragged now",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isDragDisabled: {
+      control: "boolean",
+      description:
+        "Indicates that dragging files to this element is not allowed",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     onDrop: {
       action: "dropped",
@@ -36,11 +107,29 @@ export default {
       action: "dragLeave",
       description: "Callback when dragging leaves the zone",
     },
+    onMouseDown: {
+      action: "mouseDown",
+      description: "Callback when the mouse button is pressed",
+    },
+    children: {
+      description: "Children elements rendered inside the drop zone",
+    },
+    className: {
+      control: "text",
+      description: "Additional CSS class name",
+    },
+    style: {
+      description: "Inline styles applied to the component",
+    },
   },
-} as Meta;
+} satisfies Meta<typeof DragAndDrop>;
 
-const Template: StoryFn<DragAndDropProps> = (args) => {
-  const [isDragging, setIsDragging] = React.useState(false);
+type Story = StoryObj<ComponentProps<typeof DragAndDrop>>;
+
+export default meta;
+
+const InteractiveDropZone = (args: ComponentProps<typeof DragAndDrop>) => {
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleDragOver = (
     isDragActive: boolean,
@@ -96,18 +185,72 @@ const Template: StoryFn<DragAndDropProps> = (args) => {
   );
 };
 
-export const Default = Template.bind({});
-Default.args = {
-  isDropZone: true,
+export const Default: Story = {
+  render: (args) => <InteractiveDropZone {...args} />,
+  args: {
+    isDropZone: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default drop zone that accepts file drops. Drag files over the area to see visual feedback.",
+      },
+      source: {
+        code: `<DragAndDrop
+  isDropZone
+  onDrop={(files) => console.log("Dropped:", files)}
+  onDragOver={(isDragActive, e) => setDragging(isDragActive)}
+  onDragLeave={(e) => setDragging(false)}
+>
+  <div>Drag and drop files here or click to select</div>
+</DragAndDrop>`,
+      },
+    },
+  },
 };
 
-export const WithDraggingState = Template.bind({});
-WithDraggingState.args = {
-  isDropZone: true,
-  dragging: true,
+export const WithDraggingState: Story = {
+  render: (args) => <InteractiveDropZone {...args} />,
+  args: {
+    isDropZone: true,
+    dragging: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Drop zone with the dragging state forced to true, showing the visual appearance during an active drag operation.",
+      },
+      source: {
+        code: `<DragAndDrop
+  isDropZone
+  dragging
+  onDrop={(files) => console.log("Dropped:", files)}
+>
+  <div>Drop files here</div>
+</DragAndDrop>`,
+      },
+    },
+  },
 };
 
-export const Disabled = Template.bind({});
-Disabled.args = {
-  isDropZone: false,
+export const Disabled: Story = {
+  render: (args) => <InteractiveDropZone {...args} />,
+  args: {
+    isDropZone: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Drop zone with isDropZone set to false, disabling the drop target functionality.",
+      },
+      source: {
+        code: `<DragAndDrop isDropZone={false}>
+  <div>Drop zone disabled</div>
+</DragAndDrop>`,
+      },
+    },
+  },
 };
