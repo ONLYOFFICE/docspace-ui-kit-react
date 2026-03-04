@@ -75,6 +75,8 @@ const AgentIdSetup = ({
 
   const displayError = localError || validationError;
 
+  const inputPlaceholder = "Enter Agent ID (e.g., 229754)";
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -94,7 +96,7 @@ const AgentIdSetup = ({
               name="agentId"
               value={inputValue}
               onChange={handleInputChange}
-              placeholder="Enter Agent ID (e.g., 229754)"
+              placeholder={inputPlaceholder}
               hasError={!!displayError}
               isDisabled={isValidating}
               autoFocus

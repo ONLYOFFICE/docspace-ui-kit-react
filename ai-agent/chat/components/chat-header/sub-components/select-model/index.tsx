@@ -35,7 +35,7 @@ import type { SelectModelProps } from "../../../../Chat.types";
 import styles from "../../ChatHeader.module.scss";
 
 const SelectModel = ({
-  selectedModel,
+  selectedModel = "",
   isLoading,
   modelAliases,
 }: SelectModelProps) => {
@@ -50,7 +50,7 @@ const SelectModel = ({
     );
   }
 
-  const name = modelAliases?.[selectedModel] ?? "";
+  const name = modelAliases?.[selectedModel] ?? selectedModel;
 
   return (
     <Text

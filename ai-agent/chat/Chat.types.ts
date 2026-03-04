@@ -69,7 +69,7 @@ export type TMessageStoreProps = {
 } & Omit<ReturnType<typeof useInitMessages>, "initMessages">;
 
 export type SelectModelProps = {
-  selectedModel: string;
+  selectedModel?: string;
   isLoading?: boolean;
   modelAliases?: TAIConfig["modelAliases"];
 };
@@ -106,7 +106,7 @@ export type ChatHeaderProps = SelectModelProps &
 export type MessageProps = {
   message: TMessage;
   idx: number;
-  userAvatar: string;
+  userAvatar?: string;
   isLast: boolean;
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
@@ -164,14 +164,13 @@ export type MessageEmptyProps = {
 };
 
 export type MessageBodyProps = {
-  userAvatar: string;
   isLoading?: boolean;
 
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
   useInternalScroll?: boolean;
   allowExternalNavigation?: boolean;
-} & Pick<MessageProps, "setAiPlaylistImages" | "setMediaViewerVisible">;
+} & Pick<MessageProps, "setAiPlaylistImages" | "setMediaViewerVisible" | "userAvatar">;
 
 export type FilesListProps = {
   files: Partial<TFile>[];
@@ -212,8 +211,8 @@ export type ChatInputProps = {
   getIcon: AttachmentProps["getIcon"];
   isLoading?: boolean;
 
-  attachmentFile: Partial<TFile> | null;
-  clearAttachmentFile: VoidFunction;
+  attachmentFile?: Partial<TFile> | null;
+  clearAttachmentFile?: VoidFunction;
   selectedModel: string;
 
   toolsSettings: ReturnType<typeof useToolsSettings>;
@@ -248,12 +247,12 @@ export type ChatContainerProps = {
 
 export type ChatProps = {
   agentId: TChatStoreProps["agentId"];
-  userAvatar: MessageBodyProps["userAvatar"];
+  userAvatar?: MessageBodyProps["userAvatar"];
   selectedModel: string;
   getIcon?: ChatInputProps["getIcon"];
   getResultStorageId?: () => number | null;
   isLoading?: boolean;
-  aiReady: boolean;
+  aiReady?: boolean;
 
   attachmentFile: ChatInputProps["attachmentFile"];
   clearAttachmentFile: ChatInputProps["clearAttachmentFile"];

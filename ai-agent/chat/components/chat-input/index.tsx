@@ -263,7 +263,7 @@ const ChatInput = ({
           },
         ];
         handleSelectFile(file);
-        clearAttachmentFile();
+        clearAttachmentFile?.();
       }, 0);
     }
   }, [attachmentFile, handleSelectFile, clearAttachmentFile]);
