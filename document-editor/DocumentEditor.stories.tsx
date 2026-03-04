@@ -246,7 +246,7 @@ export const FillSpreadsheetWithData: Story = {
 
     const fillSpreadsheetData = () => {
       // @ts-ignore - DocEditor is provided by ONLYOFFICE at runtime
-      const documentEditor = window.DocEditor?.instances?.[editorProps.id];
+      const documentEditor = window.DocEditor?.instances?.[args.id];
       const currentDataSet = dataSets.find(
         (ds) => ds.key === selectedDataSet.key,
       );
