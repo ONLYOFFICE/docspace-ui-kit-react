@@ -24,18 +24,36 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import Error404 from "./Error404";
 import { setupErrorI18n } from "./stories.utils";
 
-const meta: Meta<typeof Error404> = {
-  title: "Errors/Error404",
+const meta = {
+  title: "Components/Errors/Error404",
+  tags: ["!autodocs"],
   component: Error404,
   parameters: {
     docs: {
       description: {
-        component: "Not Found error page (404). Displayed when the requested page does not exist.",
+        component: `Not Found error page (404). Displayed when the requested page does not exist.
+
+### Features
+
+- **Full-Page Display**: Renders a complete error page with animated SVG decorations
+- **Internationalized**: Uses translation keys for localized error messaging
+- **Consistent Styling**: Built on the ErrorContainer base component
+- **Navigation Guidance**: Helps users find their way back to valid pages
+
+### Usage
+
+\`\`\`tsx
+import Error404 from "@docspace/ui-kit/errors/Error404";
+
+<Error404 />
+\`\`\``,
       },
     },
   },
@@ -45,9 +63,21 @@ const meta: Meta<typeof Error404> = {
       return <Story />;
     },
   ],
-};
+} satisfies Meta<typeof Error404>;
+
+type Story = StoryObj<ComponentProps<typeof Error404>>;
 
 export default meta;
-type Story = StoryObj<typeof Error404>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: "Default 404 not found error page with standard messaging.",
+      },
+      source: {
+        code: `<Error404 />`,
+      },
+    },
+  },
+};

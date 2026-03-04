@@ -24,19 +24,47 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type React from "react";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { RadioButtonGroup } from ".";
 
 const meta = {
-  title: "Components/Form Controls/RadioButtonGroup",
+  title: "UI/Form controls/RadioButtonGroup",
   component: RadioButtonGroup,
   parameters: {
     docs: {
       description: {
-        component:
-          "RadioButtonGroup allows you to create a group of radio buttons with various configurations including horizontal/vertical layouts, disabled states, and text labels.",
+        component: `RadioButtonGroup renders a group of radio buttons with shared state management.
+
+### Features
+
+- **Two Orientations**: Horizontal and vertical layouts
+- **Disabled State**: Disable all or individual radio buttons
+- **Text Labels**: Insert text items between radio buttons
+- **Custom Styling**: Configurable font size, weight, spacing, and width
+- **Controlled Selection**: Managed selected state with callback
+
+### Usage
+
+\`\`\`tsx
+import { RadioButtonGroup } from "@docspace/ui-kit/components/radio-button-group";
+
+const options = [
+  { value: "option1", label: "Option 1" },
+  { value: "option2", label: "Option 2" },
+  { value: "option3", label: "Option 3" },
+];
+
+<RadioButtonGroup
+  options={options}
+  selected="option1"
+  onClick={(e) => console.log(e.target.value)}
+  orientation="horizontal"
+/>
+\`\`\``,
       },
     },
     design: {
@@ -46,38 +74,60 @@ const meta = {
   },
   argTypes: {
     orientation: {
-      description: "Layout orientation of the radio buttons",
-      control: "radio",
+      control: "select",
       options: ["horizontal", "vertical"],
-      defaultValue: "horizontal",
+      description: "Layout orientation of the radio buttons",
+      table: {
+        defaultValue: { summary: "horizontal" },
+      },
     },
     isDisabled: {
-      description: "Disable all radio buttons in the group",
       control: "boolean",
-      defaultValue: false,
+      description: "Disable all radio buttons in the group",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     width: {
-      description: "Width of the radio button group container",
       control: "text",
+      description: "Width of the radio button group container",
     },
     fontSize: {
-      description: "Font size for radio button labels",
       control: "text",
+      description: "Font size for radio button labels",
     },
     fontWeight: {
-      description: "Font weight for radio button labels",
       control: "text",
+      description: "Font weight for radio button labels",
     },
     spacing: {
-      description: "Spacing between radio buttons",
       control: "text",
+      description: "Spacing between radio buttons",
+      table: {
+        defaultValue: { summary: "15px" },
+      },
     },
   },
 } satisfies Meta<typeof RadioButtonGroup>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof RadioButtonGroup>>;
 
 export default meta;
+
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+        gridGap: "24px",
+        alignItems: "start",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
 
 const baseOptions = [
   { value: "option1", label: "Option 1" },
@@ -94,48 +144,170 @@ export const Default: Story = {
       console.log("Selected:", e.target.value),
     spacing: "15px",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default horizontal radio button group. Click any option to select it.",
+      },
+      source: {
+        code: `<RadioButtonGroup
+  options={options}
+  selected="option1"
+  orientation="horizontal"
+  onClick={handleClick}
+/>`,
+      },
+    },
+  },
+};
+
+const VerticalTemplate = () => {
+  return (
+    <RadioButtonGroup
+      options={baseOptions}
+      selected="option1"
+      orientation="vertical"
+      onClick={() => {}}
+    />
+  );
 };
 
 export const VerticalLayout: Story = {
-  args: {
-    ...Default.args,
-    orientation: "vertical",
+  render: () => <VerticalTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Vertical layout stacks radio buttons on top of each other. Useful for longer option lists or forms.",
+      },
+      source: {
+        code: `<RadioButtonGroup
+  options={options}
+  selected="option1"
+  orientation="vertical"
+  onClick={handleClick}
+/>`,
+      },
+    },
   },
 };
 
-export const WithDisabledOption: Story = {
-  args: {
-    ...Default.args,
-    options: [
-      ...baseOptions,
-      { value: "option4", label: "Disabled Option", disabled: true },
-    ],
+const DisabledTemplate = () => {
+  return (
+    <Wrapper>
+      <RadioButtonGroup
+        options={baseOptions}
+        selected="option1"
+        isDisabled
+        onClick={() => {}}
+      />
+      <RadioButtonGroup
+        options={[
+          ...baseOptions,
+          { value: "option4", label: "Disabled Option", disabled: true },
+        ]}
+        selected="option1"
+        onClick={() => {}}
+      />
+    </Wrapper>
+  );
+};
+
+export const DisabledStates: Story = {
+  render: () => <DisabledTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Left: entire group disabled. Right: individual option disabled while others remain interactive.",
+      },
+      source: {
+        code: `// All disabled
+<RadioButtonGroup options={options} selected="option1" isDisabled onClick={handleClick} />
+
+// Individual option disabled
+<RadioButtonGroup
+  options={[...options, { value: "opt4", label: "Disabled", disabled: true }]}
+  selected="option1"
+  onClick={handleClick}
+/>`,
+      },
+    },
   },
 };
 
-export const AllDisabled: Story = {
-  args: {
-    ...Default.args,
-    isDisabled: true,
-  },
+const WithTextLabelTemplate = () => {
+  return (
+    <RadioButtonGroup
+      options={[
+        { type: "text", label: "Please select an option:", value: "" },
+        ...baseOptions,
+      ]}
+      selected="option1"
+      orientation="vertical"
+      onClick={() => {}}
+    />
+  );
 };
 
 export const WithTextLabel: Story = {
-  args: {
-    ...Default.args,
-    options: [
-      { type: "text", label: "Please select an option:", value: "" },
-      ...baseOptions,
-    ],
+  render: () => <WithTextLabelTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Options with `type: "text"` render as plain text labels instead of radio buttons. Useful for adding headings or instructions within the group.',
+      },
+      source: {
+        code: `<RadioButtonGroup
+  options={[
+    { type: "text", label: "Please select an option:", value: "" },
+    { value: "option1", label: "Option 1" },
+    { value: "option2", label: "Option 2" },
+  ]}
+  selected="option1"
+  orientation="vertical"
+  onClick={handleClick}
+/>`,
+      },
+    },
   },
 };
 
+const CustomStylingTemplate = () => {
+  return (
+    <RadioButtonGroup
+      options={baseOptions}
+      selected="option1"
+      fontSize="16px"
+      fontWeight="600"
+      spacing="20px"
+      width="300px"
+      onClick={() => {}}
+    />
+  );
+};
+
 export const CustomStyling: Story = {
-  args: {
-    ...Default.args,
-    fontSize: "16px",
-    fontWeight: "600",
-    spacing: "20px",
-    width: "300px",
+  render: () => <CustomStylingTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Custom font size, weight, spacing, and container width for radio button labels.",
+      },
+      source: {
+        code: `<RadioButtonGroup
+  options={options}
+  selected="option1"
+  fontSize="16px"
+  fontWeight="600"
+  spacing="20px"
+  width="300px"
+  onClick={handleClick}
+/>`,
+      },
+    },
   },
 };

@@ -1,0 +1,35 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Getting started/Structure" />
+
+# Structure
+
+## Library layout
+
+```
+libs/ui-kit/
+├── components/       # 130+ reusable React components
+├── hooks/            # Custom React hooks
+├── providers/        # Context providers (theme, translation, API)
+├── selectors/        # Selector components (room, files, people)
+├── document-editor/  # Document editor component
+├── errors/           # Error page components
+├── constants/        # Shared constants
+├── context/          # React context definitions
+├── enums/            # TypeScript enums
+├── types/            # TypeScript type definitions
+├── utils/            # Utility functions
+├── locales/          # i18n translation files
+└── assets/           # Static assets (images, icons)
+```
+
+## Tech stack
+
+- **React 19** — UI framework
+- **TypeScript 5.9** — type safety
+- **MobX 6** — state management
+- **Styled Components 5** — component styling
+- **i18next** — internationalization
+- **Biome** — linting and formatting
+- **Vitest** — unit testing
+- **Storybook** — component documentation

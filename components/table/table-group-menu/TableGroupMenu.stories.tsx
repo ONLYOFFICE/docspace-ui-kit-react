@@ -24,38 +24,110 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { TGroupMenuItem } from "../Table.types";
 
 import ChangeToEmployeeReactSvgUrl from "../../../assets/change.to.employee.react.svg?url";
 import InfoReactSvgUrl from "../../../assets/info.outline.react.svg?url";
 import InviteAgainReactSvgUrl from "../../../assets/invite.again.react.svg?url";
 
 import { TableGroupMenu } from "./TableGroupMenu";
-import { TGroupMenuItem } from "../Table.types";
 import { DropDownItem } from "../../drop-down-item";
 
 const meta = {
-  title: "Components/Table/TableGroupMenu",
+  title: "UI/Table/TableGroupMenu",
   component: TableGroupMenu,
   parameters: {
     docs: {
       description: {
-        component:
-          "TableGroupMenu component for displaying group menu in tables with checkbox, combobox, and action buttons",
+        component: `TableGroupMenu displays a bulk action toolbar when table rows are selected.
+
+### Features
+
+- **Checkbox with ComboBox**: Select all or filter selection via dropdown options
+- **Action Buttons**: Configurable menu items with icons and optional dropdowns
+- **Indeterminate State**: Visual indicator for partial selection
+- **Header Label**: Optional label displayed next to the checkbox
+- **Info Panel Toggle**: Built-in button to toggle the info panel
+- **Closeable**: Optional close button to dismiss the group menu
+- **Blocked State**: Disables all actions while an operation is in progress
+
+### Usage
+
+\`\`\`tsx
+import { TableGroupMenu } from "@docspace/ui-kit/components/table/table-group-menu";
+
+<TableGroupMenu
+  isChecked={allSelected}
+  isIndeterminate={someSelected}
+  headerMenu={menuItems}
+  checkboxOptions={checkboxDropdown}
+  onChange={handleCheckboxChange}
+  onClick={handleCheckboxClick}
+  withComboBox
+/>
+\`\`\``,
       },
     },
   },
   argTypes: {
-    isChecked: { control: "boolean" },
-    isIndeterminate: { control: "boolean" },
-    isBlocked: { control: "boolean" },
-    isMobileView: { control: "boolean" },
-    isInfoPanelVisible: { control: "boolean" },
-    withoutInfoPanelToggler: { control: "boolean" },
-    withComboBox: { control: "boolean" },
-    isCloseable: { control: "boolean" },
-    checkboxMargin: { control: "text" },
-    headerLabel: { control: "text" },
+    isChecked: {
+      control: "boolean",
+      description: "Whether the select-all checkbox is checked",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isIndeterminate: {
+      control: "boolean",
+      description:
+        "Whether the checkbox is in an indeterminate state (partial selection)",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isBlocked: {
+      control: "boolean",
+      description:
+        "Block all interactions while an operation is in progress",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isMobileView: {
+      control: "boolean",
+      description: "Enable mobile-optimized layout",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isInfoPanelVisible: {
+      control: "boolean",
+      description: "Whether the info panel is currently visible",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    withComboBox: {
+      control: "boolean",
+      description:
+        "Show a dropdown combo box next to the checkbox for selection filtering",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isCloseable: {
+      control: "boolean",
+      description: "Show a close button to dismiss the group menu",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    headerLabel: {
+      control: "text",
+      description: "Optional label displayed next to the checkbox",
+    },
     onChange: { control: false },
     onClick: { control: false },
     toggleInfoPanel: { control: false },
@@ -74,8 +146,10 @@ const meta = {
   ],
 } satisfies Meta<typeof TableGroupMenu>;
 
+type TableGroupMenuProps = ComponentProps<typeof TableGroupMenu>;
+type Story = StoryObj<TableGroupMenuProps>;
+
 export default meta;
-type Story = StoryObj<typeof TableGroupMenu>;
 
 const createMenuItems = (): TGroupMenuItem[] => [
   {
@@ -130,6 +204,7 @@ const checkboxOptions = (
 );
 
 export const Default: Story = {
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     isChecked: false,
     isIndeterminate: false,
@@ -143,68 +218,155 @@ export const Default: Story = {
     isBlocked: false,
     withComboBox: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default group menu with checkbox, combo box, and action buttons. Appears when rows are selected.",
+      },
+      source: {
+        code: `<TableGroupMenu
+  isChecked={false}
+  isIndeterminate={false}
+  headerMenu={menuItems}
+  checkboxOptions={checkboxDropdown}
+  onChange={handleChange}
+  onClick={handleClick}
+  withComboBox
+/>`,
+      },
+    },
+  },
 };
 
 export const Checked: Story = {
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
     isChecked: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Group menu with the select-all checkbox in a checked state, indicating all items are selected.",
+      },
+      source: {
+        code: `<TableGroupMenu
+  isChecked
+  headerMenu={menuItems}
+  checkboxOptions={checkboxDropdown}
+  onChange={handleChange}
+  onClick={handleClick}
+  withComboBox
+/>`,
+      },
+    },
+  },
 };
 
 export const Indeterminate: Story = {
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
     isIndeterminate: true,
   },
-};
-
-export const WithoutComboBox: Story = {
-  args: {
-    ...Default.args,
-    withComboBox: false,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Group menu with the checkbox in an indeterminate state, indicating partial selection.",
+      },
+      source: {
+        code: `<TableGroupMenu
+  isIndeterminate
+  headerMenu={menuItems}
+  checkboxOptions={checkboxDropdown}
+  onChange={handleChange}
+  onClick={handleClick}
+  withComboBox
+/>`,
+      },
+    },
   },
 };
 
 export const WithHeaderLabel: Story = {
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
     headerLabel: "Custom header label",
   },
-};
-
-export const WithInfoPanelVisible: Story = {
-  args: {
-    ...Default.args,
-    isInfoPanelVisible: true,
-  },
-};
-
-export const WithoutInfoPanelToggler: Story = {
-  args: {
-    ...Default.args,
-    withoutInfoPanelToggler: true,
-  },
-};
-
-export const Blocked: Story = {
-  args: {
-    ...Default.args,
-    isBlocked: true,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Group menu with a custom header label displayed next to the checkbox.",
+      },
+      source: {
+        code: `<TableGroupMenu
+  headerLabel="Custom header label"
+  headerMenu={menuItems}
+  checkboxOptions={checkboxDropdown}
+  onChange={handleChange}
+  onClick={handleClick}
+  withComboBox
+/>`,
+      },
+    },
   },
 };
 
 export const Closeable: Story = {
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
     isCloseable: true,
     onCloseClick: () => {},
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Group menu with a close button that allows users to dismiss the toolbar.",
+      },
+      source: {
+        code: `<TableGroupMenu
+  isCloseable
+  onCloseClick={handleClose}
+  headerMenu={menuItems}
+  checkboxOptions={checkboxDropdown}
+  onChange={handleChange}
+  onClick={handleClick}
+  withComboBox
+/>`,
+      },
+    },
+  },
 };
 
-export const WithCustomCheckboxMargin: Story = {
+export const Blocked: Story = {
+  render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
-    checkboxMargin: "100px",
+    isBlocked: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Group menu in a blocked state. All actions are disabled while an operation is in progress.",
+      },
+      source: {
+        code: `<TableGroupMenu
+  isBlocked
+  headerMenu={menuItems}
+  checkboxOptions={checkboxDropdown}
+  onChange={handleChange}
+  onClick={handleClick}
+  withComboBox
+/>`,
+      },
+    },
   },
 };

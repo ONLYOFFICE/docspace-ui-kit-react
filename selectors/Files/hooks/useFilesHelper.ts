@@ -32,7 +32,7 @@ import {
   type FileDtoInteger,
 } from "@onlyoffice/docspace-api-sdk";
 
-import FolderSvg from "PUBLIC_DIR/images/icons/32/folder.svg";
+import FolderSvg from "../../../assets/icons/32/folder.svg";
 
 import { getCommonTranslation } from "../../../utils/i18n";
 
