@@ -41,7 +41,6 @@ import EmptyScreen from "./sub-components/empty-screen";
 import Message from "./sub-components/message";
 
 import { useChatScroll } from "./hooks/useChatScroll";
-import { useChatScrollContext } from "../../providers/ChatScrollProvider";
 import styles from "./ChatMessageBody.module.scss";
 import { getCommonTranslation } from "../../../../utils";
 
@@ -62,7 +61,6 @@ const ChatMessageBody = observer(({
     addMessageId,
   } = useMessageStore();
   const { currentChat } = useChatStore();
-  const { useExternalScroll } = useChatScrollContext();
 
   const chatBodyRef = useRef<HTMLDivElement>(null);
 
@@ -98,9 +96,8 @@ const ChatMessageBody = observer(({
 
   return (
     <div
-      className={classNames(styles.chatMessageBody, {
+      className={classNames(styles.chatMessageBody, "chat-message-body", {
         [styles.empty]: isEmpty,
-        [styles.useInternalScroll]: !useExternalScroll,
       })}
       data-testid="chat-message-body"
     >

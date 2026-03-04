@@ -41,6 +41,7 @@ const ChatContainer = ({
   width = "100%",
   height = "100%",
   style,
+  className,
 }: ChatContainerProps) => {
   const internalScrollRef = React.useRef<HTMLElement | null>(null);
 
@@ -52,7 +53,7 @@ const ChatContainer = ({
 
   return (
     <div
-      className={classNames(styles.chatContainer, "chat-container", {
+      className={classNames(styles.chatContainer, "chat-container", className, {
         [styles.useInternalScroll]: !useExternalScroll,
       })}
       data-testid={isLoadingChat ? "chat-container-loading" : "chat-container"}

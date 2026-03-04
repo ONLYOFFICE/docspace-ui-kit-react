@@ -243,6 +243,7 @@ export type ChatContainerProps = {
   width?: string;
   height?: string;
   style?: React.CSSProperties;
+  className?: string;
 };
 
 export type ChatProps = {
@@ -275,6 +276,7 @@ export type ChatProps = {
   width?: string;
   height?: string;
   style?: React.CSSProperties;
+  className?: string;
   persistDraft?: boolean;
   internalInit?: boolean;
   allowExternalNavigation?: boolean;

@@ -169,6 +169,7 @@ const ChatCore = (props: ChatCoreProps) => {
     width,
     height,
     style,
+    className,
     aiReady = false,
     standalone = false,
     isAdmin = false,
@@ -188,6 +189,7 @@ const ChatCore = (props: ChatCoreProps) => {
         width={width}
         height={height}
         style={style}
+        className={className}
       >
         <ChatNoAccessScreen
           aiReady={aiReady}
@@ -223,6 +225,7 @@ const ChatCore = (props: ChatCoreProps) => {
           width={width}
           height={height}
           style={style}
+          className={className}
         >
           <ChatUI {...props} />
         </ChatContainer>

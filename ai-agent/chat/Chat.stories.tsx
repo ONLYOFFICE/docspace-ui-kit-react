@@ -466,8 +466,7 @@ export const ExternalScroll: Story = {
         style={{
           width: "100%",
           height: "600px",
-          overflow: "auto",
-          border: "1px solid #444",
+          overflowY: "scroll",
           position: "relative",
         }}
       >

@@ -30,8 +30,6 @@
   height: 100%;
   max-height: 100%;
 
-  margin: 0 -20px;
-
   overflow: hidden;
 
   display: flex;
@@ -42,22 +40,10 @@
 
   box-sizing: border-box;
 
-  &.useInternalScroll {
-    margin: 0;
-  }
-
   &.empty {
     height: auto;
     flex-grow: 0;
     max-height: fit-content;
-  }
-
-  @include mixins.tablet-and-below {
-    margin: 0 -16px;
-
-    &.useInternalScroll {
-      margin: 0;
-    }
   }
 }
 

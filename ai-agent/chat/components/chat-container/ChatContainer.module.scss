@@ -110,7 +110,6 @@
   --background-color: #{$white};
   --text-color: #{$black};
   --icon-button-color: #{$gray};
-  --chat-header-top: calc(var(--section-header-height) + var(--section-submenu-height));
 
   --chat-header-model-color: #{$gray};
   --chat-header-button-svg-color: #{$black};
@@ -151,16 +150,7 @@
 
   --chat-file-item-exst-color: #{$gray};
 
-  @include mixins.tablet-and-below {
-    --chat-header-top: calc(var(--section-header-height-tablet) + var(--section-submenu-height));
-  }
-
-  @include mixins.mobile {
-    --chat-header-top: calc(var(--section-header-height-mobile) + var(--section-submenu-height));
-  }
-
   &.useInternalScroll {
-    --chat-header-top: 0;
     height: 100%;
   }
 
