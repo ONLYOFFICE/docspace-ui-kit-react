@@ -53,15 +53,12 @@ describe("<ChatContainer />", () => {
     expect(screen.queryByTestId("chat-container")).not.toBeInTheDocument();
   });
 
-  it("applies useInternalScroll class and renders Scrollbar when useInternalScroll is true", () => {
+  it("renders Scrollbar when useExternalScroll is false", () => {
     render(
-      <ChatContainer useInternalScroll>
+      <ChatContainer useExternalScroll={false}>
         <div data-testid="child">Child Content</div>
       </ChatContainer>,
     );
-
-    const mainDiv = screen.getByTestId("chat-container");
-    expect(mainDiv.className).toContain("useInternalScroll");
 
     // Check if Scrollbar content (or scroller/scroll-body from Scrollbar.tsx) is present
     expect(screen.getByTestId("scroll-body")).toBeInTheDocument();
@@ -82,9 +79,9 @@ describe("<ChatContainer />", () => {
     expect(mainDiv.style.backgroundColor).toBe("red");
   });
 
-  it("renders children directly when useInternalScroll is false", () => {
+  it("renders children directly when useExternalScroll true", () => {
     render(
-      <ChatContainer useInternalScroll={false}>
+      <ChatContainer useExternalScroll>
         <div data-testid="child">Child Content</div>
       </ChatContainer>,
     );
