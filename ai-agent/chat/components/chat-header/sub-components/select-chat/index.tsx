@@ -37,7 +37,10 @@ import SaveToFileIcon from "../../../../../../assets/message.save.svg";
 
 import { RectangleSkeleton } from "../../../../../../components/rectangle";
 
-import socket, { SocketCommands, SocketEvents } from "../../../../../../utils/socket";
+import socket, {
+  SocketCommands,
+  SocketEvents,
+} from "../../../../../../utils/socket";
 
 import { DropDown } from "../../../../../../components/drop-down";
 import { TBreadCrumb } from "../../../../../../components/selector";
@@ -166,7 +169,11 @@ const SelectChat = ({
 
         if (resultFile) {
           if (isChecked) {
-            openFile(resultFile.id!.toString(), allowExternalNavigation, baseUrl);
+            openFile(
+              resultFile.id!.toString(),
+              allowExternalNavigation,
+              baseUrl,
+            );
           }
 
           const toastMsg = (
@@ -178,7 +185,13 @@ const SelectChat = ({
                 2: allowExternalNavigation ? (
                   <Link
                     type={LinkType.action}
-                    onClick={() => openFile(resultFile.id!.toString(), allowExternalNavigation, baseUrl)}
+                    onClick={() =>
+                      openFile(
+                        resultFile.id!.toString(),
+                        allowExternalNavigation,
+                        baseUrl,
+                      )
+                    }
                   />
                 ) : (
                   <span />

@@ -41,21 +41,40 @@ vi.mock("../../../utils", () => ({
 
 // Mock components
 vi.mock("react-svg", () => ({
-  ReactSVG: ({ src }: { src: string }) => <div data-testid="file-icon" data-src={src} />,
+  ReactSVG: ({ src }: { src: string }) => (
+    <div data-testid="file-icon" data-src={src} />
+  ),
 }));
 
 vi.mock("../../../../../components/text", () => ({
-  Text: ({ children, truncate }: { children: React.ReactNode; truncate?: boolean }) => <div data-testid="text" data-truncate={truncate}>{children}</div>,
+  Text: ({
+    children,
+    truncate,
+  }: {
+    children: React.ReactNode;
+    truncate?: boolean;
+  }) => (
+    <div data-testid="text" data-truncate={truncate}>
+      {children}
+    </div>
+  ),
 }));
 
 vi.mock("../../../../../components/icon-button", () => ({
   IconButton: (props: Record<string, unknown>) => (
-    <button onClick={props.onClick as () => void} data-testid={props["dataTestId"] as string}>remove</button>
+    <button
+      onClick={props.onClick as () => void}
+      data-testid={props["dataTestId"] as string}
+    >
+      remove
+    </button>
   ),
 }));
 
 vi.mock("../../../../../components/scrollbar", () => ({
-  Scrollbar: ({ children }: { children: React.ReactNode }) => <div data-testid="scrollbar">{children}</div>,
+  Scrollbar: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="scrollbar">{children}</div>
+  ),
 }));
 
 vi.mock("../../../../../components/loader", () => ({
@@ -64,7 +83,9 @@ vi.mock("../../../../../components/loader", () => ({
 }));
 
 // Mock Assets
-vi.mock("../../../../../assets/remove.session.svg", () => ({ default: () => <svg /> }));
+vi.mock("../../../../../assets/remove.session.svg", () => ({
+  default: () => <svg />,
+}));
 
 describe("<FilesList />", () => {
   const mockGetIcon = vi.fn((size, exst) => `icon-${exst}-${size}`);
@@ -90,7 +111,10 @@ describe("<FilesList />", () => {
 
   it("renders file icon and title for non-image files", () => {
     render(<FilesList {...defaultProps} />);
-    expect(screen.getByTestId("file-icon")).toHaveAttribute("data-src", "icon-.docx-24");
+    expect(screen.getByTestId("file-icon")).toHaveAttribute(
+      "data-src",
+      "icon-.docx-24",
+    );
     expect(screen.getByText("file")).toBeInTheDocument();
     expect(screen.getByText(".docx")).toBeInTheDocument();
   });
@@ -103,18 +127,23 @@ describe("<FilesList />", () => {
   });
 
   it("renders image and handles multimodal download", async () => {
-    const imgFile = { id: 2, title: "image.png", fileExst: ".png", viewUrl: "img-url" };
+    const imgFile = {
+      id: 2,
+      title: "image.png",
+      fileExst: ".png",
+      viewUrl: "img-url",
+    };
     vi.mocked(downloadImageAsBase64).mockResolvedValue("base64-content");
-    
+
     render(<FilesList {...defaultProps} files={[imgFile]} />);
-    
+
     // Initially loader since download is async
     expect(screen.getByTestId("loader")).toBeInTheDocument();
-    
+
     await waitFor(() => {
       expect(screen.getByRole("img")).toHaveAttribute("src", "base64-content");
     });
-    
+
     expect(downloadImageAsBase64).toHaveBeenCalledWith("img-url");
   });
 });

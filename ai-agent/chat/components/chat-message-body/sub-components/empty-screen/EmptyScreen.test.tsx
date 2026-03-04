@@ -36,9 +36,13 @@ vi.mock("../../../../../../components/rectangle", () => ({
 }));
 
 vi.mock("../../../../../../components/text", () => ({
-  Text: ({ children, dataTestId }: { children?: React.ReactNode; dataTestId?: string }) => (
-    <div data-testid={dataTestId ?? "text"}>{children}</div>
-  ),
+  Text: ({
+    children,
+    dataTestId,
+  }: {
+    children?: React.ReactNode;
+    dataTestId?: string;
+  }) => <div data-testid={dataTestId ?? "text"}>{children}</div>,
 }));
 
 vi.mock("../../../../../../utils", () => ({

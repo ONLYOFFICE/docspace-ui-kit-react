@@ -38,9 +38,7 @@ const useAgentIdValidation = () => {
   const { aiApi } = useApi();
 
   const validateAgentId = React.useCallback(
-    async (
-      agentId: string | number,
-    ): Promise<AgentIdValidationResult> => {
+    async (agentId: string | number): Promise<AgentIdValidationResult> => {
       if (!agentId) {
         const error = "Agent ID is required";
         setValidationError(error);
@@ -69,13 +67,15 @@ const useAgentIdValidation = () => {
         setIsValidating(false);
         return { isValid: true, agentId: numericId };
       } catch (error: unknown) {
-        let errorMessage = "Please check your API provider settings and Agent ID";
+        let errorMessage =
+          "Please check your API provider settings and Agent ID";
 
         if (error && typeof error === "object") {
           if ("message" in error && typeof error.message === "string") {
             const message = error.message.toLowerCase();
             if (message.includes("not found") || message.includes("404")) {
-              errorMessage = "Agent not found. Please check the Agent ID and try again.";
+              errorMessage =
+                "Agent not found. Please check the Agent ID and try again.";
             }
           }
         }

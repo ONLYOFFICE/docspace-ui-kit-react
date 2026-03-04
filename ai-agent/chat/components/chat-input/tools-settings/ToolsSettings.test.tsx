@@ -51,28 +51,32 @@ vi.mock("../../../../../providers", () => ({ useApi: vi.fn() }));
 
 // Mock components
 vi.mock("../../../../../components/context-menu", () => ({
-  ContextMenu: React.forwardRef<unknown, { model: Record<string, unknown>[] }>((props, ref) => {
-    React.useImperativeHandle(ref, () => ({
-      show: vi.fn(),
-    }));
-    return (
-      <div data-testid="context-menu">
-        {props.model.map((item) => (
-          <div 
-            key={item.key as string} 
-            onClick={(e) => {
-              e.stopPropagation();
-              (item.onClick as () => void)();
-            }} 
-            data-testid={`menu-item-${item.key}`}
-          >
-            {item.label as string}
-            {typeof item.getTooltipContent === "function" ? (item.getTooltipContent as () => React.ReactNode)() : null}
-          </div>
-        ))}
-      </div>
-    );
-  }),
+  ContextMenu: React.forwardRef<unknown, { model: Record<string, unknown>[] }>(
+    (props, ref) => {
+      React.useImperativeHandle(ref, () => ({
+        show: vi.fn(),
+      }));
+      return (
+        <div data-testid="context-menu">
+          {props.model.map((item) => (
+            <div
+              key={item.key as string}
+              onClick={(e) => {
+                e.stopPropagation();
+                (item.onClick as () => void)();
+              }}
+              data-testid={`menu-item-${item.key}`}
+            >
+              {item.label as string}
+              {typeof item.getTooltipContent === "function"
+                ? (item.getTooltipContent as () => React.ReactNode)()
+                : null}
+            </div>
+          ))}
+        </div>
+      );
+    },
+  ),
 }));
 
 vi.mock("../../../../../components/icon-button", () => ({
@@ -80,17 +84,27 @@ vi.mock("../../../../../components/icon-button", () => ({
 }));
 
 vi.mock("../../../../../components/link", () => ({
-  Link: ({ children, onClick, dataTestId }: { children: React.ReactNode; onClick: () => void; dataTestId?: string }) => (
-    <button onClick={onClick} data-testid={dataTestId}>{children}</button>
+  Link: ({
+    children,
+    onClick,
+    dataTestId,
+  }: {
+    children: React.ReactNode;
+    onClick: () => void;
+    dataTestId?: string;
+  }) => (
+    <button onClick={onClick} data-testid={dataTestId}>
+      {children}
+    </button>
   ),
   LinkType: { action: "action" },
 }));
 
 vi.mock("../../../../../components/tooltip", () => ({
   TooltipContainer: (props: Record<string, unknown>) => (
-    <div 
-      onClick={props.onClick as () => void} 
-      title={props.title as string} 
+    <div
+      onClick={props.onClick as () => void}
+      title={props.title as string}
       data-testid={props["data-testid"] as string}
     >
       {props.children as React.ReactNode}
@@ -104,11 +118,21 @@ vi.mock("../../../../../components/text", () => ({
 }));
 
 vi.mock("../../../../../components/portal", () => ({
-  Portal: ({ element }: { element: React.ReactNode }) => <div data-testid="portal">{element}</div>,
+  Portal: ({ element }: { element: React.ReactNode }) => (
+    <div data-testid="portal">{element}</div>
+  ),
 }));
 
 vi.mock("../../../../../components/aside", () => ({
-  Aside: ({ children, header, onClose }: { children: React.ReactNode; header: string; onClose: () => void }) => (
+  Aside: ({
+    children,
+    header,
+    onClose,
+  }: {
+    children: React.ReactNode;
+    header: string;
+    onClose: () => void;
+  }) => (
     <div data-testid="aside">
       <h2>{header}</h2>
       <button onClick={onClose}>close</button>
@@ -118,7 +142,9 @@ vi.mock("../../../../../components/aside", () => ({
 }));
 
 vi.mock("../../../../../components/button", () => ({
-  Button: ({ label, onClick }: { label: string; onClick: () => void }) => <button onClick={onClick}>{label}</button>,
+  Button: ({ label, onClick }: { label: string; onClick: () => void }) => (
+    <button onClick={onClick}>{label}</button>
+  ),
   ButtonSize: { small: "small" },
 }));
 
@@ -127,9 +153,15 @@ vi.mock("../../../../../components/backdrop", () => ({
 }));
 
 // Mock Assets
-vi.mock("../../../../../assets/mcp.tool.svg", () => ({ default: () => <svg /> }));
-vi.mock("../../../../../assets/web.search.svg", () => ({ default: () => <svg /> }));
-vi.mock("../../../../../assets/manage.connection.react.svg", () => ({ default: () => <svg /> }));
+vi.mock("../../../../../assets/mcp.tool.svg", () => ({
+  default: () => <svg />,
+}));
+vi.mock("../../../../../assets/web.search.svg", () => ({
+  default: () => <svg />,
+}));
+vi.mock("../../../../../assets/manage.connection.react.svg", () => ({
+  default: () => <svg />,
+}));
 
 // Mock utils
 vi.mock("../../../../../utils", () => ({
@@ -155,7 +187,9 @@ describe("<ToolsSettings />", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useChatStore).mockReturnValue({ agentId: "123" } as unknown as ReturnType<typeof useChatStore>);
+    vi.mocked(useChatStore).mockReturnValue({
+      agentId: "123",
+    } as unknown as ReturnType<typeof useChatStore>);
     vi.mocked(useMessageStore).mockReturnValue({
       setKnowledgeSearchToolName: vi.fn(),
       setWebSearchToolName: vi.fn(),
@@ -164,18 +198,31 @@ describe("<ToolsSettings />", () => {
       setGenerateFormToolName: vi.fn(),
       setGeneratePresentationToolName: vi.fn(),
     } as unknown as ReturnType<typeof useMessageStore>);
-    vi.mocked(useTheme).mockReturnValue({ isBase: true } as unknown as ReturnType<typeof useTheme>);
-    vi.mocked(useApi).mockReturnValue({ aiApi: mockAiApi } as unknown as ReturnType<typeof useApi>);
+    vi.mocked(useTheme).mockReturnValue({
+      isBase: true,
+    } as unknown as ReturnType<typeof useTheme>);
+    vi.mocked(useApi).mockReturnValue({
+      aiApi: mockAiApi,
+    } as unknown as ReturnType<typeof useApi>);
   });
 
-  const defaultProps: ReturnType<typeof useToolsSettings> & { 
+  const defaultProps: ReturnType<typeof useToolsSettings> & {
     aiReady: boolean;
     isAdmin: boolean;
     goToWebSearchSettings: () => void;
     allowExternalNavigation: boolean;
   } = {
-    servers: [{ id: "s1", name: "Server 1", serverType: ServerType.Portal, connected: true }] as unknown as TServer[],
-    MCPTools: new Map([["s1", [{ name: "tool1", enabled: true }]]]) as unknown as Map<string, TMCPTool[]>,
+    servers: [
+      {
+        id: "s1",
+        name: "Server 1",
+        serverType: ServerType.Portal,
+        connected: true,
+      },
+    ] as unknown as TServer[],
+    MCPTools: new Map([
+      ["s1", [{ name: "tool1", enabled: true }]],
+    ]) as unknown as Map<string, TMCPTool[]>,
     webSearchAvailable: true,
     webSearchEnabled: true,
     isFetched: true,
@@ -211,12 +258,18 @@ describe("<ToolsSettings />", () => {
   });
 
   it("renders web search tooltip and admin link", () => {
-    render(<ToolsSettings {...defaultProps} isAdmin={true} allowExternalNavigation={true} />);
+    render(
+      <ToolsSettings
+        {...defaultProps}
+        isAdmin={true}
+        allowExternalNavigation={true}
+      />,
+    );
     fireEvent.click(screen.getByTestId("chat-input-tools-button"));
-    
+
     expect(screen.getByText("ConnectWebSearch")).toBeInTheDocument();
     expect(screen.getByTestId("go-to-settings-link")).toBeInTheDocument();
-    
+
     const settingsLink = screen.getByTestId("go-to-settings-link");
     fireEvent.click(settingsLink);
     expect(defaultProps.goToWebSearchSettings).toHaveBeenCalled();
@@ -224,32 +277,42 @@ describe("<ToolsSettings />", () => {
 
   it("handles server disconnection in aside", () => {
     const connectedExternal: TServer[] = [
-      { id: "s2", name: "Connected Server", serverType: ServerType.GitHub, connected: true } as TServer
+      {
+        id: "s2",
+        name: "Connected Server",
+        serverType: ServerType.GitHub,
+        connected: true,
+      } as TServer,
     ];
     render(<ToolsSettings {...defaultProps} servers={connectedExternal} />);
-    
+
     // Open aside
     fireEvent.click(screen.getByTestId("chat-input-tools-button"));
     fireEvent.click(screen.getByTestId("menu-item-manage-connections"));
-    
+
     const disconnectBtn = screen.getByText("Disconnect");
     fireEvent.click(disconnectBtn);
-    
+
     expect(mockAiApi.disconnectServer).toHaveBeenCalledWith(123, "s2");
   });
 
   it("handles aside close button", () => {
     const serversWithExternal: TServer[] = [
-      { id: "s1", name: "External Server", serverType: ServerType.GitHub, connected: false } as TServer
+      {
+        id: "s1",
+        name: "External Server",
+        serverType: ServerType.GitHub,
+        connected: false,
+      } as TServer,
     ];
     render(<ToolsSettings {...defaultProps} servers={serversWithExternal} />);
-    
+
     fireEvent.click(screen.getByTestId("chat-input-tools-button"));
     fireEvent.click(screen.getByTestId("menu-item-manage-connections"));
-    
+
     const closeBtn = screen.getByText("close");
     fireEvent.click(closeBtn);
-    
+
     expect(screen.queryByTestId("aside")).not.toBeInTheDocument();
   });
 });

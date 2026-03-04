@@ -41,28 +41,69 @@ vi.mock("../../../../store/chatStore", () => ({
 // Mock components
 vi.mock("../../../../../../components/modal-dialog", () => ({
   ModalDialog: Object.assign(
-    ({ children, visible }: { children: React.ReactNode; visible: boolean; onClose: () => void }) => 
-      visible ? <div data-testid="modal">{children}</div> : null,
+    ({
+      children,
+      visible,
+    }: {
+      children: React.ReactNode;
+      visible: boolean;
+      onClose: () => void;
+    }) => (visible ? <div data-testid="modal">{children}</div> : null),
     {
-      Header: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-header">{children}</div>,
-      Body: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-body">{children}</div>,
-      Footer: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-footer">{children}</div>,
-    }
+      Header: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="modal-header">{children}</div>
+      ),
+      Body: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="modal-body">{children}</div>
+      ),
+      Footer: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="modal-footer">{children}</div>
+      ),
+    },
   ),
   ModalDialogType: { modal: "modal" },
 }));
 
 vi.mock("../../../../../../components/text-input", () => ({
-  TextInput: ({ value, onChange, placeholder }: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; placeholder?: string }) => (
-    <input data-testid="rename-input" value={value} onChange={onChange} placeholder={placeholder} />
+  TextInput: ({
+    value,
+    onChange,
+    placeholder,
+  }: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder?: string;
+  }) => (
+    <input
+      data-testid="rename-input"
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+    />
   ),
   InputSize: { base: "base" },
   InputType: { text: "text" },
 }));
 
 vi.mock("../../../../../../components/button", () => ({
-  Button: ({ label, onClick, isDisabled, isLoading, testId }: { label: string; onClick: () => void; isDisabled?: boolean; isLoading?: boolean; testId?: string }) => (
-    <button data-testid={testId} onClick={onClick} disabled={isDisabled || isLoading}>
+  Button: ({
+    label,
+    onClick,
+    isDisabled,
+    isLoading,
+    testId,
+  }: {
+    label: string;
+    onClick: () => void;
+    isDisabled?: boolean;
+    isLoading?: boolean;
+    testId?: string;
+  }) => (
+    <button
+      data-testid={testId}
+      onClick={onClick}
+      disabled={isDisabled || isLoading}
+    >
       {label}
     </button>
   ),

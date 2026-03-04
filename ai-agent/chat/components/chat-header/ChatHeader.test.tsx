@@ -66,7 +66,9 @@ describe("<ChatHeader />", () => {
   });
 
   it("passes aiReady correctly to CreateChat", () => {
-    const { rerender } = render(<ChatHeader {...defaultProps} aiReady={true} />);
+    const { rerender } = render(
+      <ChatHeader {...defaultProps} aiReady={true} />,
+    );
     let createChat = screen.getByTestId("mock-create-chat");
     expect(createChat.getAttribute("data-disabled")).toBe("false");
 

@@ -71,8 +71,23 @@ vi.mock("../chat-list", () => ({
       <button onClick={() => onSelectChat("chat-1")}>Select Chat</button>
       <div data-testid="context-actions">
         {contextModel.map((item: unknown) => {
-          const m = item as { key: string; onClick: () => void; label: string; isSeparator?: boolean };
-          return !m.isSeparator && <button key={m.key} onClick={m.onClick} data-testid={`action-${m.key}`}>{m.label}</button>;
+          const m = item as {
+            key: string;
+            onClick: () => void;
+            label: string;
+            isSeparator?: boolean;
+          };
+          return (
+            !m.isSeparator && (
+              <button
+                key={m.key}
+                onClick={m.onClick}
+                data-testid={`action-${m.key}`}
+              >
+                {m.label}
+              </button>
+            )
+          );
         })}
       </div>
     </div>
@@ -84,15 +99,38 @@ vi.mock("../rename-chat", () => ({
 }));
 
 vi.mock("../../../export-selector", () => ({
-  default: ({ onSubmit }: { onSubmit: (folderId: string, title: string, isFolder: boolean, folderPermissions: unknown[], filename: string, isExport: boolean) => void }) => (
+  default: ({
+    onSubmit,
+  }: {
+    onSubmit: (
+      folderId: string,
+      title: string,
+      isFolder: boolean,
+      folderPermissions: unknown[],
+      filename: string,
+      isExport: boolean,
+    ) => void;
+  }) => (
     <div data-testid="export-selector">
-      <button onClick={() => onSubmit("folder-1", "title", false, [], "file.docx", true)}>Submit Export</button>
+      <button
+        onClick={() =>
+          onSubmit("folder-1", "title", false, [], "file.docx", true)
+        }
+      >
+        Submit Export
+      </button>
     </div>
   ),
 }));
 
 vi.mock("../../../../../../components/drop-down", () => ({
-  DropDown: ({ children, open }: { children: React.ReactNode; open: boolean }) => open ? <div data-testid="dropdown">{children}</div> : null,
+  DropDown: ({
+    children,
+    open,
+  }: {
+    children: React.ReactNode;
+    open: boolean;
+  }) => (open ? <div data-testid="dropdown">{children}</div> : null),
 }));
 
 vi.mock("../../../../../../components/rectangle", () => ({
@@ -100,10 +138,22 @@ vi.mock("../../../../../../components/rectangle", () => ({
 }));
 
 vi.mock("../../../../../../components/tooltip", () => ({
-  TooltipContainer: React.forwardRef<HTMLDivElement, { children: React.ReactNode; onClick: () => void; className?: string }>(({ children, onClick, className }, ref) => (
-    <div ref={ref} onClick={onClick} className={className} data-testid="selector-icon">{children}</div>
+  TooltipContainer: React.forwardRef<
+    HTMLDivElement,
+    { children: React.ReactNode; onClick: () => void; className?: string }
+  >(({ children, onClick, className }, ref) => (
+    <div
+      ref={ref}
+      onClick={onClick}
+      className={className}
+      data-testid="selector-icon"
+    >
+      {children}
+    </div>
   )),
-  withTooltip: <T extends object>(Component: React.ComponentType<T>) => (props: T) => <Component {...props} />,
+  withTooltip:
+    <T extends object>(Component: React.ComponentType<T>) =>
+    (props: T) => <Component {...props} />,
 }));
 
 vi.mock("../../../../../../components/toast", () => ({
@@ -111,10 +161,18 @@ vi.mock("../../../../../../components/toast", () => ({
 }));
 
 // Mock Assets
-vi.mock("../../../../../../assets/select.session.react.svg", () => ({ default: () => <svg /> }));
-vi.mock("../../../../../../assets/rename.react.svg", () => ({ default: () => <svg /> }));
-vi.mock("../../../../../../assets/icons/16/catalog.trash.react.svg", () => ({ default: () => <svg /> }));
-vi.mock("../../../../../../assets/message.save.svg", () => ({ default: () => <svg /> }));
+vi.mock("../../../../../../assets/select.session.react.svg", () => ({
+  default: () => <svg />,
+}));
+vi.mock("../../../../../../assets/rename.react.svg", () => ({
+  default: () => <svg />,
+}));
+vi.mock("../../../../../../assets/icons/16/catalog.trash.react.svg", () => ({
+  default: () => <svg />,
+}));
+vi.mock("../../../../../../assets/message.save.svg", () => ({
+  default: () => <svg />,
+}));
 
 // Mock utils
 vi.mock("../../../../utils", () => ({
@@ -175,15 +233,15 @@ describe("<SelectChat />", () => {
       startNewChat: mockStartNewChat,
     } as unknown as ReturnType<typeof useMessageStore>);
     render(<SelectChat {...defaultProps} />);
-    
+
     const icon = screen.getByTestId("selector-icon");
     fireEvent.click(icon);
-    
+
     expect(screen.queryByTestId("dropdown")).not.toBeInTheDocument();
   });
 
   it("renders null if no chats", () => {
-    vi.mocked(useChatStore).mockReturnValue({ 
+    vi.mocked(useChatStore).mockReturnValue({
       chats: [],
       currentChat: null,
       isLoading: false,
@@ -198,7 +256,7 @@ describe("<SelectChat />", () => {
 
     // Closed by default (in our mock)
     expect(screen.queryByTestId("dropdown")).not.toBeInTheDocument();
-    
+
     fireEvent.click(icon);
     expect(screen.getByTestId("dropdown")).toBeInTheDocument();
   });
@@ -206,10 +264,10 @@ describe("<SelectChat />", () => {
   it("handles chat selection", () => {
     render(<SelectChat {...defaultProps} />);
     fireEvent.click(screen.getByTestId("selector-icon"));
-    
+
     const selectButton = screen.getByText("Select Chat");
     fireEvent.click(selectButton);
-    
+
     expect(mockFetchChat).toHaveBeenCalledWith("chat-1");
     expect(mockFetchMessages).toHaveBeenCalledWith("chat-1");
     expect(screen.queryByTestId("dropdown")).not.toBeInTheDocument();
@@ -218,10 +276,10 @@ describe("<SelectChat />", () => {
   it("opens rename modal from context menu", () => {
     render(<SelectChat {...defaultProps} />);
     fireEvent.click(screen.getByTestId("selector-icon"));
-    
+
     const renameButton = screen.getByTestId("action-rename");
     fireEvent.click(renameButton);
-    
+
     expect(screen.getByTestId("rename-chat")).toBeInTheDocument();
   });
 
@@ -229,31 +287,40 @@ describe("<SelectChat />", () => {
     mockExportChat.mockResolvedValue(undefined);
     render(<SelectChat {...defaultProps} />);
     fireEvent.click(screen.getByTestId("selector-icon"));
-    
+
     const exportButton = screen.getByTestId("action-save_to_file");
     fireEvent.click(exportButton);
-    
+
     expect(screen.getByTestId("export-selector")).toBeInTheDocument();
-    
+
     const submitButton = screen.getByText("Submit Export");
     fireEvent.click(submitButton);
-    
+
     await waitFor(() => expect(mockExportChat).toHaveBeenCalled());
-    expect(vi.mocked(socket!.emit)).toHaveBeenCalledWith("subscribe", expect.anything());
-    
+    expect(vi.mocked(socket!.emit)).toHaveBeenCalledWith(
+      "subscribe",
+      expect.anything(),
+    );
+
     // Wait for socket.on to be called
     await waitFor(() => {
       const calls = vi.mocked(socket!.on).mock.calls;
-      const exportCall = calls.find((call) => call[0] === SocketEvents.ExportChat);
+      const exportCall = calls.find(
+        (call) => call[0] === SocketEvents.ExportChat,
+      );
       expect(exportCall).toBeDefined();
     });
 
     const calls = vi.mocked(socket!.on).mock.calls;
-    const exportCall = calls.find((call) => call[0] === SocketEvents.ExportChat);
-    const socketCallback = exportCall![1] as (data: { resultFile: { id: number } }) => void;
-    
+    const exportCall = calls.find(
+      (call) => call[0] === SocketEvents.ExportChat,
+    );
+    const socketCallback = exportCall![1] as (data: {
+      resultFile: { id: number };
+    }) => void;
+
     socketCallback({ resultFile: { id: 100 } });
-    
+
     expect(vi.mocked(toastr.success)).toHaveBeenCalled();
   });
 });

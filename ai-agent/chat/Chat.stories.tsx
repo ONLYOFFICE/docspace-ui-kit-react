@@ -186,26 +186,32 @@ const Template = (props: StoryArgs) => (
 );
 
 const CallbackLogger = (props: StoryArgs) => {
-  const [logs, setLogs] = React.useState<Array<{
-    id: number;
-    type: string;
-    timestamp: string;
-    data: any;
-  }>>([]);
+  const [logs, setLogs] = React.useState<
+    Array<{
+      id: number;
+      type: string;
+      timestamp: string;
+      data: any;
+    }>
+  >([]);
   const [filter, setFilter] = React.useState<string>("all");
 
   const addLog = (type: string, data: any) => {
-    setLogs(prev => [{
-      id: Date.now(),
-      type,
-      timestamp: new Date().toLocaleTimeString(),
-      data
-    }, ...prev].slice(0, 50));
+    setLogs((prev) =>
+      [
+        {
+          id: Date.now(),
+          type,
+          timestamp: new Date().toLocaleTimeString(),
+          data,
+        },
+        ...prev,
+      ].slice(0, 50),
+    );
   };
 
-  const filteredLogs = filter === "all" 
-    ? logs 
-    : logs.filter(log => log.type === filter);
+  const filteredLogs =
+    filter === "all" ? logs : logs.filter((log) => log.type === filter);
 
   const callbackTypes = [
     "all",
@@ -213,7 +219,7 @@ const CallbackLogger = (props: StoryArgs) => {
     "onStopStream",
     "onStreamData",
     "onNewChat",
-    "onSelectChat"
+    "onSelectChat",
   ];
 
   return (
@@ -223,7 +229,10 @@ const CallbackLogger = (props: StoryArgs) => {
         <Chat
           {...(props as unknown as ChatProps)}
           onSendMessage={(message, files) => {
-            addLog("onSendMessage", { message: message.substring(0, 100), filesCount: files.length });
+            addLog("onSendMessage", {
+              message: message.substring(0, 100),
+              filesCount: files.length,
+            });
             props.onSendMessage?.(message, files);
           }}
           onStopStream={() => {
@@ -231,7 +240,10 @@ const CallbackLogger = (props: StoryArgs) => {
             props.onStopStream?.();
           }}
           onStreamData={(chunk) => {
-            addLog("onStreamData", { chunkLength: chunk.length, preview: chunk.substring(0, 50) });
+            addLog("onStreamData", {
+              chunkLength: chunk.length,
+              preview: chunk.substring(0, 50),
+            });
             props.onStreamData?.(chunk);
           }}
           onNewChat={() => {
@@ -247,15 +259,13 @@ const CallbackLogger = (props: StoryArgs) => {
 
       <div className={styles.callbackPanel}>
         <div className={styles.panelHeader}>
-          <h3 className={styles.panelTitle}>
-            Callback Events
-          </h3>
+          <h3 className={styles.panelTitle}>Callback Events</h3>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className={styles.filterSelect}
           >
-            {callbackTypes.map(type => (
+            {callbackTypes.map((type) => (
               <option key={type} value={type}>
                 {type === "all" ? "All Events" : type}
               </option>
@@ -266,12 +276,12 @@ const CallbackLogger = (props: StoryArgs) => {
         <div key={filter} className={styles.logsContainer}>
           {filteredLogs.length === 0 ? (
             <div className={styles.emptyState}>
-              {filter === "all" 
+              {filter === "all"
                 ? "No events yet. Interact with the chat to see callbacks."
                 : `No ${filter} events yet.`}
             </div>
           ) : (
-            filteredLogs.map(log => (
+            filteredLogs.map((log) => (
               <div key={log.id} className={styles.logItem}>
                 <div className={styles.logHeader}>
                   <strong className={styles.logType}>{log.type}</strong>
@@ -288,7 +298,9 @@ const CallbackLogger = (props: StoryArgs) => {
         </div>
 
         <div className={styles.panelFooter}>
-          <span>{filteredLogs.length} event{filteredLogs.length !== 1 ? 's' : ''}</span>
+          <span>
+            {filteredLogs.length} event{filteredLogs.length !== 1 ? "s" : ""}
+          </span>
           <button onClick={() => setLogs([])} className={styles.clearButton}>
             Clear
           </button>

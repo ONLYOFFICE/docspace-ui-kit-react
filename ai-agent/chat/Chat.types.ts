@@ -80,7 +80,7 @@ export type SelectChatProps = {
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
   allowExternalNavigation?: boolean;
-  onSelectChat?: (chatId: string) => void
+  onSelectChat?: (chatId: string) => void;
 };
 
 export type RenameChatProps = {
@@ -288,7 +288,7 @@ export type ChatProps = {
   onSelectChat?: (chatId: string) => void;
 
   modelAliases?: TAIConfig["modelAliases"];
-}
+};
 
 export type ChatCoreProps = ChatProps & {
   getIcon: TGetIcon;

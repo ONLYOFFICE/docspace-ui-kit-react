@@ -40,7 +40,13 @@ vi.mock("../../../../../../components/rectangle", () => ({
 
 // Mock Text
 vi.mock("../../../../../../components/text", () => ({
-  Text: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+  Text: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
     <div className={className} data-testid="model-name">
       {children}
     </div>
@@ -55,9 +61,15 @@ describe("<SelectModel />", () => {
 
   it("renders model name correctly", () => {
     const modelAliases = { "gpt-4": "GPT-4 Turbo" };
-    
-    render(<SelectModel selectedModel="gpt-4" isLoading={false} modelAliases={modelAliases} />);
-    
+
+    render(
+      <SelectModel
+        selectedModel="gpt-4"
+        isLoading={false}
+        modelAliases={modelAliases}
+      />,
+    );
+
     expect(screen.getByTestId("model-name")).toHaveTextContent("GPT-4 Turbo");
   });
 });

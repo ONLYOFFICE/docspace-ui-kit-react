@@ -40,11 +40,17 @@ vi.mock("../../../../components/empty-view", () => ({
       <div data-testid="empty-view-icon">{icon}</div>
       {options && options.length > 0 && (
         <div data-testid="empty-view-options">
-          {options.map((opt: { key: string; title: string; onClick?: () => void }) => (
-            <button key={opt.key} onClick={opt.onClick} data-testid={`option-${opt.key}`}>
-              {opt.title}
-            </button>
-          ))}
+          {options.map(
+            (opt: { key: string; title: string; onClick?: () => void }) => (
+              <button
+                key={opt.key}
+                onClick={opt.onClick}
+                data-testid={`option-${opt.key}`}
+              >
+                {opt.title}
+              </button>
+            ),
+          )}
         </div>
       )}
     </div>
@@ -81,8 +87,12 @@ describe("<ChatNoAccessScreen />", () => {
   it("renders with user description when not an admin", () => {
     render(<ChatNoAccessScreen {...defaultProps} />);
 
-    expect(screen.getByTestId("empty-view-title")).toHaveTextContent("AIFeaturesAreCurrentlyDisabled");
-    expect(screen.getByTestId("empty-view-description")).toHaveTextContent("EmptyChatAIDisabledUserDescription");
+    expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
+      "AIFeaturesAreCurrentlyDisabled",
+    );
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "EmptyChatAIDisabledUserDescription",
+    );
     expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
 
     expect(EmptyView).toHaveBeenCalledWith(
@@ -91,35 +101,59 @@ describe("<ChatNoAccessScreen />", () => {
         description: "EmptyChatAIDisabledUserDescription",
         options: [],
       }),
-      undefined
+      undefined,
     );
   });
 
   it("renders with standalone admin title and description", () => {
-    render(<ChatNoAccessScreen {...defaultProps} isPortalAdmin={true} standalone={true} />);
+    render(
+      <ChatNoAccessScreen
+        {...defaultProps}
+        isPortalAdmin={true}
+        standalone={true}
+      />,
+    );
 
-    expect(screen.getByTestId("empty-view-title")).toHaveTextContent("EmptyAIAgentsAIDisabledStandaloneAdminTitle");
-    expect(screen.getByTestId("empty-view-description")).toHaveTextContent("EmptyAIAgentsAIDisabledStandaloneAdminDescription");
-    
+    expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
+      "EmptyAIAgentsAIDisabledStandaloneAdminTitle",
+    );
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "EmptyAIAgentsAIDisabledStandaloneAdminDescription",
+    );
+
     // Check for "Go to Settings" button
-    expect(screen.getByTestId("option-go-to-ai-provider-settings")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("option-go-to-ai-provider-settings"),
+    ).toBeInTheDocument();
 
     expect(EmptyView).toHaveBeenCalledWith(
       expect.objectContaining({
         title: "EmptyAIAgentsAIDisabledStandaloneAdminTitle",
         description: "EmptyAIAgentsAIDisabledStandaloneAdminDescription",
-        options: [expect.objectContaining({ key: "go-to-ai-provider-settings" })],
+        options: [
+          expect.objectContaining({ key: "go-to-ai-provider-settings" }),
+        ],
       }),
-      undefined
+      undefined,
     );
   });
 
   it("renders with saas admin description", () => {
-    render(<ChatNoAccessScreen {...defaultProps} isPortalAdmin={true} standalone={false} />);
+    render(
+      <ChatNoAccessScreen
+        {...defaultProps}
+        isPortalAdmin={true}
+        standalone={false}
+      />,
+    );
 
-    expect(screen.getByTestId("empty-view-title")).toHaveTextContent("AIFeaturesAreCurrentlyDisabled");
-    expect(screen.getByTestId("empty-view-description")).toHaveTextContent("EmptyChatAIDisabledSaasAdminDescription");
-    
+    expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
+      "AIFeaturesAreCurrentlyDisabled",
+    );
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "EmptyChatAIDisabledSaasAdminDescription",
+    );
+
     // Check for "Go to Settings" button
     expect(screen.getByTestId("option-go-to-services")).toBeInTheDocument();
 
@@ -129,25 +163,37 @@ describe("<ChatNoAccessScreen />", () => {
         description: "EmptyChatAIDisabledSaasAdminDescription",
         options: [expect.objectContaining({ key: "go-to-services" })],
       }),
-      undefined
+      undefined,
     );
   });
 
   it("hides settings button if allowExternalNavigation is false", () => {
-    render(<ChatNoAccessScreen {...defaultProps} isPortalAdmin={true} allowExternalNavigation={false} />);
+    render(
+      <ChatNoAccessScreen
+        {...defaultProps}
+        isPortalAdmin={true}
+        allowExternalNavigation={false}
+      />,
+    );
 
     expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
-    
+
     expect(EmptyView).toHaveBeenCalledWith(
       expect.objectContaining({
         options: [],
       }),
-      undefined
+      undefined,
     );
   });
 
   it("hides settings button if goToAISettings is not provided", () => {
-    render(<ChatNoAccessScreen {...defaultProps} isPortalAdmin={true} goToAISettings={undefined} />);
+    render(
+      <ChatNoAccessScreen
+        {...defaultProps}
+        isPortalAdmin={true}
+        goToAISettings={undefined}
+      />,
+    );
 
     expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
   });

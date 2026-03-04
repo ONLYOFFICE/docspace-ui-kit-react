@@ -31,7 +31,11 @@ import React from "react";
 import AttachmentReactSvg from "../../../../../assets/attachment.react.svg";
 
 import { DeviceType, FolderType } from "../../../../../enums";
-import { getCommonTranslation, isDesktop, isTablet } from "../../../../../utils";
+import {
+  getCommonTranslation,
+  isDesktop,
+  isTablet,
+} from "../../../../../utils";
 
 import type { TFile } from "../../../../../types";
 

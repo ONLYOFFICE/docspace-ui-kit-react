@@ -249,13 +249,7 @@ const ChatInput = ({
       setValue("");
       setSelectedFiles([]);
     }
-  }, [
-    agentId,
-    currentChatId,
-    currentChat,
-    fetchChat,
-    persistDraft,
-  ]);
+  }, [agentId, currentChatId, currentChat, fetchChat, persistDraft]);
 
   React.useEffect(() => {
     if (attachmentFile) {

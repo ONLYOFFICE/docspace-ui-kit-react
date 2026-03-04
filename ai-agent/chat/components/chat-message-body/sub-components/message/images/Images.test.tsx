@@ -35,7 +35,9 @@ import type { TContent } from "../../../../../../../types/ai";
 import { downloadImageAsBase64 } from "../../../../../utils";
 
 vi.mock("../../../../../utils", () => ({
-  downloadImageAsBase64: vi.fn().mockResolvedValue("data:image/png;base64,mock"),
+  downloadImageAsBase64: vi
+    .fn()
+    .mockResolvedValue("data:image/png;base64,mock"),
 }));
 
 vi.mock("../../../../../../../components/loader", () => ({
@@ -72,7 +74,7 @@ describe("Images component", () => {
         images={images}
         setAiPlaylistImages={setAiPlaylistImages}
         setMediaViewerVisible={setMediaViewerVisible}
-      />
+      />,
     );
 
     // Initial state: loaders
@@ -82,7 +84,10 @@ describe("Images component", () => {
     await waitFor(() => {
       const renderedImages = screen.getAllByTestId("message-image");
       expect(renderedImages).toHaveLength(2);
-      expect(renderedImages[0]).toHaveAttribute("src", "data:image/png;base64,mock");
+      expect(renderedImages[0]).toHaveAttribute(
+        "src",
+        "data:image/png;base64,mock",
+      );
     });
   });
 
@@ -92,21 +97,23 @@ describe("Images component", () => {
         images={images}
         setAiPlaylistImages={setAiPlaylistImages}
         setMediaViewerVisible={setMediaViewerVisible}
-      />
+      />,
     );
 
     await waitFor(() => {
-        expect(screen.getAllByTestId("message-image")).toHaveLength(2);
+      expect(screen.getAllByTestId("message-image")).toHaveLength(2);
     });
 
     fireEvent.click(screen.getAllByTestId("message-image")[0]);
 
     expect(setMediaViewerVisible).toHaveBeenCalledWith(true);
-    expect(setAiPlaylistImages).toHaveBeenCalledWith([{
+    expect(setAiPlaylistImages).toHaveBeenCalledWith([
+      {
         title: "Test.jpg",
         fileId: 1,
-        src: "https://example.com/image1.jpg"
-    }]);
+        src: "https://example.com/image1.jpg",
+      },
+    ]);
   });
 
   it("returns null when images list is empty", () => {
@@ -115,7 +122,7 @@ describe("Images component", () => {
         images={[]}
         setAiPlaylistImages={setAiPlaylistImages}
         setMediaViewerVisible={setMediaViewerVisible}
-      />
+      />,
     );
     expect(container.firstChild).toBeNull();
   });
@@ -124,7 +131,7 @@ describe("Images component", () => {
     render(<Images images={images} />);
 
     await waitFor(() => {
-        expect(screen.getAllByTestId("message-image")).toHaveLength(2);
+      expect(screen.getAllByTestId("message-image")).toHaveLength(2);
     });
 
     fireEvent.click(screen.getAllByTestId("message-image")[0]);

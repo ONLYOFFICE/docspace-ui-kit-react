@@ -62,7 +62,7 @@ describe("<ChatContainer />", () => {
 
     const mainDiv = screen.getByTestId("chat-container");
     expect(mainDiv.className).toContain("useInternalScroll");
-    
+
     // Check if Scrollbar content (or scroller/scroll-body from Scrollbar.tsx) is present
     expect(screen.getByTestId("scroll-body")).toBeInTheDocument();
     expect(screen.getByTestId("child")).toBeInTheDocument();

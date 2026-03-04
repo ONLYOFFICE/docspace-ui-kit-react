@@ -42,31 +42,35 @@ type ToolCallBodyProps = {
   allowExternalNavigation?: boolean;
 };
 
-export const ToolCallBody = observer(({ content, placement, allowExternalNavigation }: ToolCallBodyProps) => {
-  const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
+export const ToolCallBody = observer(
+  ({ content, placement, allowExternalNavigation }: ToolCallBodyProps) => {
+    const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
 
-  if (content.result?.error) {
+    if (content.result?.error) {
+      return (
+        <div className={styles.toolCallBody} data-testid="tool-call-body">
+          <Text fontSize="14px" fontWeight={600} lineHeight="20px">
+            {content.result?.error as string}
+          </Text>
+        </div>
+      );
+    }
+
+    const isSourceView = [knowledgeSearchToolName, webSearchToolName].includes(
+      content.name,
+    );
+
     return (
       <div className={styles.toolCallBody} data-testid="tool-call-body">
-        <Text fontSize="14px" fontWeight={600} lineHeight="20px">
-          {content.result?.error as string}
-        </Text>
+        {isSourceView ? (
+          <SourceView
+            content={content}
+            allowExternalNavigation={allowExternalNavigation}
+          />
+        ) : (
+          <CodeView content={content} placement={placement} />
+        )}
       </div>
     );
-  }
-
-  const isSourceView = [knowledgeSearchToolName, webSearchToolName].includes(
-    content.name,
-  );
-
-  return (
-    <div className={styles.toolCallBody} data-testid="tool-call-body">
-      {isSourceView ? (
-        <SourceView content={content} allowExternalNavigation={allowExternalNavigation} />
-      ) : (
-        <CodeView content={content} placement={placement} />
-      )}
-    </div>
-  );
-}
+  },
 );

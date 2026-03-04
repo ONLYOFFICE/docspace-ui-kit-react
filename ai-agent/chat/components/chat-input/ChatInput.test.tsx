@@ -44,12 +44,18 @@ vi.mock("../../../../components/rectangle", () => ({
 }));
 
 vi.mock("../../../../components/textarea", () => ({
-  Textarea: ({ onChange, value, onKeyDown, dataTestId, isDisabled }: { 
-    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void; 
-    value: string; 
-    onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void; 
-    dataTestId: string; 
-    isDisabled: boolean; 
+  Textarea: ({
+    onChange,
+    value,
+    onKeyDown,
+    dataTestId,
+    isDisabled,
+  }: {
+    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    value: string;
+    onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+    dataTestId: string;
+    isDisabled: boolean;
   }) => (
     <textarea
       data-testid={dataTestId}
@@ -78,7 +84,9 @@ vi.mock("./files-list", () => ({
 vi.mock("./buttons", () => ({
   default: ({ sendMessageAction }: { sendMessageAction: () => void }) => (
     <div data-testid="buttons">
-      <button onClick={sendMessageAction} data-testid="send-button">send</button>
+      <button onClick={sendMessageAction} data-testid="send-button">
+        send
+      </button>
     </div>
   ),
 }));
@@ -110,7 +118,7 @@ describe("<ChatInput />", () => {
       fetchChat: mockFetchChat,
       currentChat: null,
     } as unknown as ReturnType<typeof useChatStore>);
-    
+
     // Clear localStorage
     localStorage.clear();
   });
@@ -155,10 +163,10 @@ describe("<ChatInput />", () => {
     render(<ChatInput {...defaultProps} />);
     const textarea = screen.getByTestId("chat-input-textarea");
     fireEvent.change(textarea, { target: { value: "Hello" } });
-    
+
     const sendButton = screen.getByTestId("send-button");
     fireEvent.click(sendButton);
-    
+
     expect(mockStartChat).toHaveBeenCalledWith("Hello", []);
     expect(textarea).toHaveValue("");
   });
@@ -172,10 +180,10 @@ describe("<ChatInput />", () => {
     render(<ChatInput {...defaultProps} />);
     const textarea = screen.getByTestId("chat-input-textarea");
     fireEvent.change(textarea, { target: { value: "Hello" } });
-    
+
     const sendButton = screen.getByTestId("send-button");
     fireEvent.click(sendButton);
-    
+
     expect(mockSendMessage).toHaveBeenCalledWith("Hello", []);
   });
 
@@ -183,7 +191,7 @@ describe("<ChatInput />", () => {
     render(<ChatInput {...defaultProps} />);
     const textarea = screen.getByTestId("chat-input-textarea");
     fireEvent.change(textarea, { target: { value: "Hello" } });
-    
+
     fireEvent.keyDown(textarea, { key: "Enter", shiftKey: false });
     expect(mockStartChat).toHaveBeenCalledWith("Hello", []);
   });
@@ -192,7 +200,7 @@ describe("<ChatInput />", () => {
     render(<ChatInput {...defaultProps} />);
     const textarea = screen.getByTestId("chat-input-textarea");
     fireEvent.change(textarea, { target: { value: "Hello" } });
-    
+
     fireEvent.keyDown(textarea, { key: "Enter", shiftKey: true });
     expect(mockStartChat).not.toHaveBeenCalled();
   });
@@ -201,17 +209,17 @@ describe("<ChatInput />", () => {
     render(<ChatInput {...defaultProps} persistDraft={true} />);
     const textarea = screen.getByTestId("chat-input-textarea");
     fireEvent.change(textarea, { target: { value: "Draft 1" } });
-    
+
     const saved = JSON.parse(localStorage.getItem("chat-agent-1") || "{}");
     expect(saved["empty"].value).toBe("Draft 1");
   });
 
   it("loads draft from localStorage on mount", async () => {
     const draftData = {
-      "chat-1": { value: "Saved Draft", selectedFiles: [], time: Date.now() }
+      "chat-1": { value: "Saved Draft", selectedFiles: [], time: Date.now() },
     };
     localStorage.setItem("chat-agent-1", JSON.stringify(draftData));
-    
+
     vi.mocked(useMessageStore).mockReturnValue({
       startChat: vi.fn(),
       sendMessage: vi.fn(),
@@ -222,7 +230,7 @@ describe("<ChatInput />", () => {
 
     render(<ChatInput {...defaultProps} persistDraft={true} />);
     const textarea = screen.getByTestId("chat-input-textarea");
-    
+
     await waitFor(() => {
       expect(textarea).toHaveValue("Saved Draft");
     });
@@ -241,7 +249,7 @@ describe("<ChatInput />", () => {
         {...defaultProps}
         attachmentFile={attachmentFile as Partial<TFile>}
         clearAttachmentFile={mockClearAttachmentFile}
-      />
+      />,
     );
 
     await waitFor(() => {

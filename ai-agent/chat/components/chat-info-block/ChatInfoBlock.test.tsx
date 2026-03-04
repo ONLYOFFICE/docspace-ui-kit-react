@@ -57,42 +57,50 @@ describe("<ChatInfoBlock />", () => {
 
   it("renders with user description when not a portal admin", () => {
     render(<ChatInfoBlock isPortalAdmin={false} standalone={false} />);
-    
+
     expect(screen.getByTestId("chat-info-block")).toBeInTheDocument();
-    expect(screen.getByTestId("bar-header")).toHaveTextContent("AIFeaturesAreCurrentlyDisabled");
-    expect(screen.getByTestId("bar-body")).toHaveTextContent("AIDisabledInfoBlockUserDescription");
-    
+    expect(screen.getByTestId("bar-header")).toHaveTextContent(
+      "AIFeaturesAreCurrentlyDisabled",
+    );
+    expect(screen.getByTestId("bar-body")).toHaveTextContent(
+      "AIDisabledInfoBlockUserDescription",
+    );
+
     expect(PublicRoomBar).toHaveBeenCalledWith(
       expect.objectContaining({
         bodyText: "AIDisabledInfoBlockUserDescription",
       }),
-      undefined
+      undefined,
     );
   });
 
   it("renders with admin standalone description when portal admin and standalone", () => {
     render(<ChatInfoBlock isPortalAdmin={true} standalone={true} />);
-    
-    expect(screen.getByTestId("bar-body")).toHaveTextContent("AIDisabledInfoBlockAdminStandaloneDescription");
-    
+
+    expect(screen.getByTestId("bar-body")).toHaveTextContent(
+      "AIDisabledInfoBlockAdminStandaloneDescription",
+    );
+
     expect(PublicRoomBar).toHaveBeenCalledWith(
       expect.objectContaining({
         bodyText: "AIDisabledInfoBlockAdminStandaloneDescription",
       }),
-      undefined
+      undefined,
     );
   });
 
   it("renders with admin saas description when portal admin and not standalone", () => {
     render(<ChatInfoBlock isPortalAdmin={true} standalone={false} />);
-    
-    expect(screen.getByTestId("bar-body")).toHaveTextContent("AIDisabledInfoBlockAdminSaasDescription");
-    
+
+    expect(screen.getByTestId("bar-body")).toHaveTextContent(
+      "AIDisabledInfoBlockAdminSaasDescription",
+    );
+
     expect(PublicRoomBar).toHaveBeenCalledWith(
       expect.objectContaining({
         bodyText: "AIDisabledInfoBlockAdminSaasDescription",
       }),
-      undefined
+      undefined,
     );
   });
 });

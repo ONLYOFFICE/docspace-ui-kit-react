@@ -40,15 +40,22 @@ import { useApi } from "../../../../../../../providers/api";
 
 import styles from "../../../ChatMessageBody.module.scss";
 
-const Files = ({ files, getIcon, reverse, allowExternalNavigation }: MessageFilesProps) => {
+const Files = ({
+  files,
+  getIcon,
+  reverse,
+  allowExternalNavigation,
+}: MessageFilesProps) => {
   const { baseUrl } = useApi();
-  
+
   if (!files.length) return null;
 
   return (
-    <div className={classNames(styles.filesListWrapper, {
+    <div
+      className={classNames(styles.filesListWrapper, {
         [styles.reverse]: reverse,
-      })}>
+      })}
+    >
       {files.map((file) => {
         if (file.type !== ContentType.Files) return null;
 
@@ -58,17 +65,16 @@ const Files = ({ files, getIcon, reverse, allowExternalNavigation }: MessageFile
               [styles.disabledNavigation]: !allowExternalNavigation,
             })}
             key={file.id}
-            onClick={() => openFile(file.id.toString(), allowExternalNavigation, baseUrl)}
+            onClick={() =>
+              openFile(file.id.toString(), allowExternalNavigation, baseUrl)
+            }
             data-testid="file-item"
           >
             {(() => {
               const icon = getIcon(24, file.extension!);
               if (typeof icon === "string")
                 return (
-                  <ReactSVG
-                    src={icon}
-                    className={styles.filesListItemIcon}
-                  />
+                  <ReactSVG src={icon} className={styles.filesListItemIcon} />
                 );
               if (icon) {
                 const Icon = icon;

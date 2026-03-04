@@ -34,13 +34,19 @@ import copy from "copy-to-clipboard";
 import { toastr } from "../../../../../../../components/toast";
 import { getCommonTranslation } from "../../../../../../../utils";
 import type { TBreadCrumb } from "../../../../../../../components/selector";
-import socket, { SocketCommands, SocketEvents, ExportChatEventData } from "../../../../../../../utils/socket";
+import socket, {
+  SocketCommands,
+  SocketEvents,
+  ExportChatEventData,
+} from "../../../../../../../utils/socket";
 import type { TGetIcon } from "../../../../../../../types";
 
 // Mocks
 vi.mock("copy-to-clipboard");
 vi.mock("mobx-react", () => ({
-  observer: <T extends React.ComponentType<P>, P extends object>(component: T): T => component,
+  observer: <T extends React.ComponentType<P>, P extends object>(
+    component: T,
+  ): T => component,
 }));
 
 vi.mock("../../../../../../../components/toast", () => ({
@@ -107,7 +113,20 @@ interface ExportSelectorProps {
 vi.mock("../../../../export-selector", () => ({
   default: ({ onSubmit }: ExportSelectorProps) => (
     <div data-testid="export-selector">
-      <button onClick={() => onSubmit("selected-id", "folderTitle", false, [], "fileName.docx", false)}>Submit</button>
+      <button
+        onClick={() =>
+          onSubmit(
+            "selected-id",
+            "folderTitle",
+            false,
+            [],
+            "fileName.docx",
+            false,
+          )
+        }
+      >
+        Submit
+      </button>
     </div>
   ),
 }));
@@ -164,25 +183,37 @@ describe("<Buttons />", () => {
   it("calls exportChatMessage when export selector is submitted", async () => {
     render(<Buttons {...defaultProps} />);
     fireEvent.click(screen.getByTestId("save-to-file-button"));
-    
+
     const submitBtn = screen.getByText("Submit");
     fireEvent.click(submitBtn);
 
-    expect(mockedSocket?.emit).toHaveBeenCalledWith(SocketCommands.Subscribe, expect.any(Object));
-    expect(mockExportChatMessage).toHaveBeenCalledWith(123, "selected-id", "fileName.docx");
+    expect(mockedSocket?.emit).toHaveBeenCalledWith(
+      SocketCommands.Subscribe,
+      expect.any(Object),
+    );
+    expect(mockExportChatMessage).toHaveBeenCalledWith(
+      123,
+      "selected-id",
+      "fileName.docx",
+    );
   });
 
   it("handles socket export event", async () => {
     let socketCallback: (data: ExportChatEventData) => void = () => {};
-    
-    const onMock = mockedSocket?.on as unknown as (event: string, cb: (data: ExportChatEventData) => void) => void;
-    
+
+    const onMock = mockedSocket?.on as unknown as (
+      event: string,
+      cb: (data: ExportChatEventData) => void,
+    ) => void;
+
     if (onMock) {
-      vi.mocked(onMock).mockImplementation((event: string, callback: (data: ExportChatEventData) => void) => {
-        if (event === SocketEvents.ExportChat) {
-          socketCallback = callback;
-        }
-      });
+      vi.mocked(onMock).mockImplementation(
+        (event: string, callback: (data: ExportChatEventData) => void) => {
+          if (event === SocketEvents.ExportChat) {
+            socketCallback = callback;
+          }
+        },
+      );
     }
 
     render(<Buttons {...defaultProps} />);
@@ -190,27 +221,40 @@ describe("<Buttons />", () => {
     fireEvent.click(screen.getByText("Submit"));
 
     await waitFor(() => {
-      expect(mockedSocket?.on).toHaveBeenCalledWith(SocketEvents.ExportChat, expect.any(Function));
+      expect(mockedSocket?.on).toHaveBeenCalledWith(
+        SocketEvents.ExportChat,
+        expect.any(Function),
+      );
     });
 
-    socketCallback({ resultFile: { id: 456 } } as unknown as ExportChatEventData);
+    socketCallback({
+      resultFile: { id: 456 },
+    } as unknown as ExportChatEventData);
 
     expect(toastr.success).toHaveBeenCalled();
     expect(mockedSocket?.off).toHaveBeenCalledWith(SocketEvents.ExportChat);
-    expect(mockedSocket?.emit).toHaveBeenCalledWith(SocketCommands.Unsubscribe, expect.any(Object));
+    expect(mockedSocket?.emit).toHaveBeenCalledWith(
+      SocketCommands.Unsubscribe,
+      expect.any(Object),
+    );
   });
 
   it("handles socket export error", async () => {
     let socketCallback: (data: ExportChatEventData) => void = () => {};
-    
-    const onMock = mockedSocket?.on as unknown as (event: string, cb: (data: ExportChatEventData) => void) => void;
-    
+
+    const onMock = mockedSocket?.on as unknown as (
+      event: string,
+      cb: (data: ExportChatEventData) => void,
+    ) => void;
+
     if (onMock) {
-      vi.mocked(onMock).mockImplementation((event: string, callback: (data: ExportChatEventData) => void) => {
-        if (event === SocketEvents.ExportChat) {
-          socketCallback = callback;
-        }
-      });
+      vi.mocked(onMock).mockImplementation(
+        (event: string, callback: (data: ExportChatEventData) => void) => {
+          if (event === SocketEvents.ExportChat) {
+            socketCallback = callback;
+          }
+        },
+      );
     }
 
     render(<Buttons {...defaultProps} />);
@@ -218,10 +262,16 @@ describe("<Buttons />", () => {
     fireEvent.click(screen.getByText("Submit"));
 
     await waitFor(() => {
-      expect(mockedSocket?.on).toHaveBeenCalledWith(SocketEvents.ExportChat, expect.any(Function));
+      expect(mockedSocket?.on).toHaveBeenCalledWith(
+        SocketEvents.ExportChat,
+        expect.any(Function),
+      );
     });
 
-    socketCallback({ resultFile: null, error: "Export failed" } as unknown as ExportChatEventData);
+    socketCallback({
+      resultFile: null,
+      error: "Export failed",
+    } as unknown as ExportChatEventData);
 
     expect(toastr.error).toHaveBeenCalledWith("Export failed");
   });

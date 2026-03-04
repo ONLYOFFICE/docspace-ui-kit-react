@@ -38,13 +38,13 @@ const fileRegex = /@\d+/g;
  * @returns The cleaned message without folder references
  */
 export const removeFolderFromMessage = (message: string): string => {
-	const folderRegex = /@folder-\d+/g;
+  const folderRegex = /@folder-\d+/g;
 
-	const newMsg = message.replace(folderRegex, "").trim();
+  const newMsg = message.replace(folderRegex, "").trim();
 
-	if (message.match(fileRegex)) return newMsg;
+  if (message.match(fileRegex)) return newMsg;
 
-	return newMsg.replaceAll("@", "");
+  return newMsg.replaceAll("@", "");
 };
 
 /**
@@ -53,55 +53,55 @@ export const removeFolderFromMessage = (message: string): string => {
  * @returns An object containing the cleaned message and an array of file IDs
  */
 export const extractFilesFromMessage = (
-	message: string,
+  message: string,
 ): {
-	cleanedMessage: string;
-	fileIds: string[];
+  cleanedMessage: string;
+  fileIds: string[];
 } => {
-	const fileIds: string[] = [];
+  const fileIds: string[] = [];
 
-	Array.from(message.matchAll(fileRegex)).forEach((match) => {
-		fileIds.push(match[0].replace("@", ""));
-	});
+  Array.from(message.matchAll(fileRegex)).forEach((match) => {
+    fileIds.push(match[0].replace("@", ""));
+  });
 
-	const cleanedMessage = message.replaceAll(fileRegex, "").trim();
+  const cleanedMessage = message.replaceAll(fileRegex, "").trim();
 
-	return {
-		cleanedMessage,
-		fileIds,
-	};
+  return {
+    cleanedMessage,
+    fileIds,
+  };
 };
 
 export const getChatDate = (date: Date): string => {
-	const today = new Date();
-	const yesterday = new Date(today);
-	yesterday.setDate(yesterday.getDate() - 1);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
 
-	// Reset hours to compare just the dates
-	const dateToCheck = new Date(date);
-	today.setHours(0, 0, 0, 0);
-	yesterday.setHours(0, 0, 0, 0);
-	dateToCheck.setHours(0, 0, 0, 0);
+  // Reset hours to compare just the dates
+  const dateToCheck = new Date(date);
+  today.setHours(0, 0, 0, 0);
+  yesterday.setHours(0, 0, 0, 0);
+  dateToCheck.setHours(0, 0, 0, 0);
 
-	if (dateToCheck.getTime() === today.getTime()) {
-		return "today";
-	}
-	if (dateToCheck.getTime() === yesterday.getTime()) {
-		return "yesterday";
-	}
-	const locale = getCookie(LANGUAGE);
-	return getCorrectDate(locale || "en", dateToCheck).split(" ")[0];
+  if (dateToCheck.getTime() === today.getTime()) {
+    return "today";
+  }
+  if (dateToCheck.getTime() === yesterday.getTime()) {
+    return "yesterday";
+  }
+  const locale = getCookie(LANGUAGE);
+  return getCorrectDate(locale || "en", dateToCheck).split(" ")[0];
 };
 
 export const getSessionId = (folderId: string | number, userId: string) => {
-	return `folder-${folderId}-${userId}-${new Date().getTime()}`;
+  return `folder-${folderId}-${userId}-${new Date().getTime()}`;
 };
 
 export const getChateTranslationDate = (value: string) => {
-	const key =
-		value === "today" ? "Today" : value === "yesterday" ? "Yesterday" : "";
+  const key =
+    value === "today" ? "Today" : value === "yesterday" ? "Yesterday" : "";
 
-	return getCommonTranslation(key);
+  return getCommonTranslation(key);
 };
 
 /**
@@ -110,28 +110,32 @@ export const getChateTranslationDate = (value: string) => {
  * @returns A string formatted as a markdown code block with JSON syntax highlighting
  */
 export const formatJsonWithMarkdown = (
-	obj: Record<string, unknown>,
+  obj: Record<string, unknown>,
 ): string => {
-	// Format the JSON with 2 space indentation
-	const formattedJson = JSON.stringify(obj, null, 2);
+  // Format the JSON with 2 space indentation
+  const formattedJson = JSON.stringify(obj, null, 2);
 
-	// Return the formatted JSON wrapped in markdown code block syntax
-	return `\`\`\`json\n${formattedJson}\n\`\`\``;
+  // Return the formatted JSON wrapped in markdown code block syntax
+  return `\`\`\`json\n${formattedJson}\n\`\`\``;
 };
 
-export const openFile = (id: string, allowExternalNavigation?: boolean, baseUrl?: string) => {
-	if (!allowExternalNavigation) return;
+export const openFile = (
+  id: string,
+  allowExternalNavigation?: boolean,
+  baseUrl?: string,
+) => {
+  if (!allowExternalNavigation) return;
 
-	const searchParams = new URLSearchParams();
+  const searchParams = new URLSearchParams();
 
-	searchParams.set("fileId", id);
+  searchParams.set("fileId", id);
 
-	const url = combineUrl(
-		baseUrl || window.location.origin,
-		`/doceditor?${searchParams.toString()}`,
-	);
+  const url = combineUrl(
+    baseUrl || window.location.origin,
+    `/doceditor?${searchParams.toString()}`,
+  );
 
-	window.open(url, "_blank");
+  window.open(url, "_blank");
 };
 
 /**
@@ -141,35 +145,35 @@ export const openFile = (id: string, allowExternalNavigation?: boolean, baseUrl?
  * @throws Error if the image fails to load or the fetch fails
  */
 export const downloadImageAsBase64 = async (url: string): Promise<string> => {
-	try {
-		const response = await fetch(url);
+  try {
+    const response = await fetch(url);
 
-		if (!response.ok) {
-			throw new Error(`Failed to fetch image: ${response.statusText}`);
-		}
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
 
-		const blob = await response.blob();
+    const blob = await response.blob();
 
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
 
-			reader.onloadend = () => {
-				if (typeof reader.result === "string") {
-					resolve(reader.result);
-				} else {
-					reject(new Error("Failed to convert image to base64"));
-				}
-			};
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          resolve(reader.result);
+        } else {
+          reject(new Error("Failed to convert image to base64"));
+        }
+      };
 
-			reader.onerror = () => {
-				reject(new Error("Failed to read image blob"));
-			};
+      reader.onerror = () => {
+        reject(new Error("Failed to read image blob"));
+      };
 
-			reader.readAsDataURL(blob);
-		});
-	} catch (error) {
-		throw new Error(
-			`Failed to download image: ${error instanceof Error ? error.message : "Unknown error"}`,
-		);
-	}
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    throw new Error(
+      `Failed to download image: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
 };

@@ -49,10 +49,16 @@ vi.mock("../../../../../../../../../providers", () => ({
 
 // Mock components
 vi.mock("../../../../../../../../../components/text", () => ({
-  Text: ({ children, className }: { children: React.ReactNode, className?: string }) => <div className={className}>{children}</div>,
+  Text: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => <div className={className}>{children}</div>,
 }));
 vi.mock("../../../../../../../../../components/mcp-icon", () => ({
-  MCPIcon: ({ title, imgSrc }: { title: string, imgSrc?: string }) => (
+  MCPIcon: ({ title, imgSrc }: { title: string; imgSrc?: string }) => (
     <div data-testid="mcp-icon" title={title} data-imgsrc={imgSrc} />
   ),
   MCPIconSize: { Small: "small" },

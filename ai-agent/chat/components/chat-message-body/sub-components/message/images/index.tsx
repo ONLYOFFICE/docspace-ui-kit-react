@@ -73,7 +73,7 @@ const Images = ({
     downloadImages();
   }, [images]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (!images.length) return;
 
     const playlist: TChatPlaylistImage[] = [];

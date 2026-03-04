@@ -66,8 +66,16 @@ const ChatHeader = ({
           onSelectChat={onSelectChat}
         />
       )}
-      <CreateChat isLoadingProp={isLoading} isDisabled={!aiReady} onNewChat={onNewChat} />
-      <SelectModel selectedModel={selectedModel} isLoading={isLoading} modelAliases={modelAliases}/>
+      <CreateChat
+        isLoadingProp={isLoading}
+        isDisabled={!aiReady}
+        onNewChat={onNewChat}
+      />
+      <SelectModel
+        selectedModel={selectedModel}
+        isLoading={isLoading}
+        modelAliases={modelAliases}
+      />
     </div>
   );
 };

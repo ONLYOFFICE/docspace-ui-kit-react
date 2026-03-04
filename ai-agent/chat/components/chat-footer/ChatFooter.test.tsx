@@ -88,13 +88,19 @@ describe("<ChatFooter />", () => {
   });
 
   it("renders ChatInfoBlock only when not loading and AI is not ready", () => {
-    const { rerender } = render(<ChatFooter {...defaultProps} aiReady={false} isLoading={false} />);
+    const { rerender } = render(
+      <ChatFooter {...defaultProps} aiReady={false} isLoading={false} />,
+    );
     expect(screen.getByTestId("mock-chat-info-block")).toBeInTheDocument();
 
     rerender(<ChatFooter {...defaultProps} aiReady={true} isLoading={false} />);
-    expect(screen.queryByTestId("mock-chat-info-block")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("mock-chat-info-block"),
+    ).not.toBeInTheDocument();
 
     rerender(<ChatFooter {...defaultProps} aiReady={false} isLoading={true} />);
-    expect(screen.queryByTestId("mock-chat-info-block")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("mock-chat-info-block"),
+    ).not.toBeInTheDocument();
   });
 });

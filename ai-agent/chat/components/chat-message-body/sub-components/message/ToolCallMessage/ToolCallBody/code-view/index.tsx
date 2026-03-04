@@ -36,14 +36,15 @@ import { Text } from "../../../../../../../../../components/text";
 import type { ToolCallPlacement } from "../../tool-call/ToolCall.enum";
 import { getCommonTranslation } from "../../../../../../../../../utils";
 
-export const CodeView = observer(({
-  content,
-  placement,
-}: {
-  content: TToolCallContent;
-  placement: ToolCallPlacement;
-}) => {
-  const getResult = () => {
+export const CodeView = observer(
+  ({
+    content,
+    placement,
+  }: {
+    content: TToolCallContent;
+    placement: ToolCallPlacement;
+  }) => {
+    const getResult = () => {
       if (content.result && typeof content.result === "string") {
         return content.result;
       }
@@ -58,49 +59,56 @@ export const CodeView = observer(({
       return "";
     };
 
-  const result = getResult();
+    const result = getResult();
 
-  let isJson = false;
+    let isJson = false;
 
-  try {
-    JSON.parse(result);
-    isJson = true;
-  } catch {
-    isJson = false;
-  }
+    try {
+      JSON.parse(result);
+      isJson = true;
+    } catch {
+      isJson = false;
+    }
 
-  const showResult = placement === "message" && content.result;
-  const isErrorResult =
-    content.result &&
-    typeof content.result !== "string" &&
-    "isError" in content.result &&
-    content.result?.isError;
+    const showResult = placement === "message" && content.result;
+    const isErrorResult =
+      content.result &&
+      typeof content.result !== "string" &&
+      "isError" in content.result &&
+      content.result?.isError;
 
-  return (
-    <>
-      <div className={styles.toolCallCodeViewItem} data-testid="tool-call-code-view-item-arg">
-        <Text fontSize="15px" lineHeight="16px" fontWeight={600}>
-          {getCommonTranslation("ToolCallArg")}
-        </Text>
-        <MarkdownField
-          chatMessage={formatJsonWithMarkdown(content.arguments)}
-          successCopyMessage={getCommonTranslation("ToolCallArgCopied")}
-        />
-      </div>
-      {showResult ? (
-        <div className={styles.toolCallCodeViewItem} data-testid="tool-call-code-view-item-result">
+    return (
+      <>
+        <div
+          className={styles.toolCallCodeViewItem}
+          data-testid="tool-call-code-view-item-arg"
+        >
           <Text fontSize="15px" lineHeight="16px" fontWeight={600}>
-            {getCommonTranslation("ToolCallResult")}
+            {getCommonTranslation("ToolCallArg")}
           </Text>
           <MarkdownField
-            chatMessage={formatJsonWithMarkdown(
-              isJson ? JSON.parse(result) : result,
-            )}
-            propLanguage={isErrorResult && !isJson ? "text" : undefined}
-            successCopyMessage={getCommonTranslation("ToolCallResultCopied")}
+            chatMessage={formatJsonWithMarkdown(content.arguments)}
+            successCopyMessage={getCommonTranslation("ToolCallArgCopied")}
           />
         </div>
-      ) : null}
-    </>
-  );
-});
+        {showResult ? (
+          <div
+            className={styles.toolCallCodeViewItem}
+            data-testid="tool-call-code-view-item-result"
+          >
+            <Text fontSize="15px" lineHeight="16px" fontWeight={600}>
+              {getCommonTranslation("ToolCallResult")}
+            </Text>
+            <MarkdownField
+              chatMessage={formatJsonWithMarkdown(
+                isJson ? JSON.parse(result) : result,
+              )}
+              propLanguage={isErrorResult && !isJson ? "text" : undefined}
+              successCopyMessage={getCommonTranslation("ToolCallResultCopied")}
+            />
+          </div>
+        ) : null}
+      </>
+    );
+  },
+);

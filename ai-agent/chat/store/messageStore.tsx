@@ -764,11 +764,13 @@ export const MessageStoreContextProvider = ({
   }, [store, webCrawlingToolName]);
 
   React.useEffect(() => {
-    if (generateDocxToolName) store.setGenerateDocxToolName(generateDocxToolName);
+    if (generateDocxToolName)
+      store.setGenerateDocxToolName(generateDocxToolName);
   }, [store, generateDocxToolName]);
 
   React.useEffect(() => {
-    if (generateFormToolName) store.setGenerateFormToolName(generateFormToolName);
+    if (generateFormToolName)
+      store.setGenerateFormToolName(generateFormToolName);
   }, [store, generateFormToolName]);
 
   React.useEffect(() => {

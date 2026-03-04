@@ -107,7 +107,10 @@ export const ToolCallHeader = observer(
         <div className={styles.toolStatusIcon}>{statusIcon}</div>
 
         {isSearchTool ? (
-          <SearchToolContent content={content} allowExternalNavigation={allowExternalNavigation} />
+          <SearchToolContent
+            content={content}
+            allowExternalNavigation={allowExternalNavigation}
+          />
         ) : (
           <MCPToolContent content={content} />
         )}
@@ -117,5 +120,5 @@ export const ToolCallHeader = observer(
         ) : null}
       </div>
     );
-  }
+  },
 );

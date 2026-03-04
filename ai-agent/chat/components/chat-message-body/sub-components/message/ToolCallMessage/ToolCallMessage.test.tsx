@@ -44,7 +44,9 @@ vi.mock("./tool-call", () => ({
 vi.mock("./tool-call-confirm-dialog", () => ({
   ToolCallConfirmDialog: ({ onClose }: { onClose: () => void }) => (
     <div data-testid="tool-call-confirm-dialog">
-      <button onClick={onClose} data-testid="close-confirm-dialog">Close</button>
+      <button onClick={onClose} data-testid="close-confirm-dialog">
+        Close
+      </button>
     </div>
   ),
 }));
@@ -59,7 +61,9 @@ describe("<ToolCallMessage />", () => {
   };
 
   it("renders ToolCall with Loading status when no result", () => {
-    render(<ToolCallMessage content={mockContent} allowExternalNavigation={true} />);
+    render(
+      <ToolCallMessage content={mockContent} allowExternalNavigation={true} />,
+    );
     const toolCall = screen.getByTestId("tool-call");
     expect(toolCall).toBeInTheDocument();
     expect(toolCall).toHaveAttribute("data-status", ToolCallStatus.Loading);
@@ -70,7 +74,12 @@ describe("<ToolCallMessage />", () => {
       ...mockContent,
       result: { data: "ok" },
     };
-    render(<ToolCallMessage content={contentWithResult} allowExternalNavigation={true} />);
+    render(
+      <ToolCallMessage
+        content={contentWithResult}
+        allowExternalNavigation={true}
+      />,
+    );
     const toolCall = screen.getByTestId("tool-call");
     expect(toolCall).toHaveAttribute("data-status", ToolCallStatus.Finished);
   });
@@ -80,7 +89,12 @@ describe("<ToolCallMessage />", () => {
       ...mockContent,
       result: { error: "error message" },
     };
-    render(<ToolCallMessage content={contentWithError} allowExternalNavigation={true} />);
+    render(
+      <ToolCallMessage
+        content={contentWithError}
+        allowExternalNavigation={true}
+      />,
+    );
     const toolCall = screen.getByTestId("tool-call");
     expect(toolCall).toHaveAttribute("data-status", ToolCallStatus.Failed);
   });
@@ -90,9 +104,17 @@ describe("<ToolCallMessage />", () => {
       ...mockContent,
       managed: true,
     };
-    render(<ToolCallMessage content={contentManaged} allowExternalNavigation={true} />);
+    render(
+      <ToolCallMessage
+        content={contentManaged}
+        allowExternalNavigation={true}
+      />,
+    );
     expect(screen.getByTestId("tool-call-confirm-dialog")).toBeInTheDocument();
     const toolCall = screen.getByTestId("tool-call");
-    expect(toolCall).toHaveAttribute("data-status", ToolCallStatus.Confirmation);
+    expect(toolCall).toHaveAttribute(
+      "data-status",
+      ToolCallStatus.Confirmation,
+    );
   });
 });

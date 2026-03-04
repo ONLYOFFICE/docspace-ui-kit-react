@@ -35,13 +35,29 @@ import { ContentType } from "../../../../../../../../../enums";
 
 // Mock child components
 vi.mock("../../../../../../../../../components/link", () => ({
-  Link: ({ children, href, "data-testid": testId }: { children: React.ReactNode, href?: string, "data-testid"?: string }) => (
-    <a href={href} data-testid={testId}>{children}</a>
+  Link: ({
+    children,
+    href,
+    "data-testid": testId,
+  }: {
+    children: React.ReactNode;
+    href?: string;
+    "data-testid"?: string;
+  }) => (
+    <a href={href} data-testid={testId}>
+      {children}
+    </a>
   ),
   LinkTarget: { blank: "_blank" },
 }));
 vi.mock("../../../../../../../../../components/text", () => ({
-  Text: ({ children, title }: { children: React.ReactNode, title?: string }) => <div title={title}>{children}</div>,
+  Text: ({
+    children,
+    title,
+  }: {
+    children: React.ReactNode;
+    title?: string;
+  }) => <div title={title}>{children}</div>,
 }));
 vi.mock("../../../../../../../../../components/tooltip", () => ({
   Tooltip: () => <div data-testid="tooltip" />,
@@ -55,7 +71,9 @@ vi.mock("../../../../../../../../../assets/external.link.svg", () => ({
 
 // Mock utils
 vi.mock("../../tool-call/ToolCall.utils", () => ({
-  getKnowledgeDocumentIconByFileName: vi.fn(() => <div data-testid="doc-icon" />),
+  getKnowledgeDocumentIconByFileName: vi.fn(() => (
+    <div data-testid="doc-icon" />
+  )),
   getRootDomain: vi.fn((url) => url),
 }));
 
@@ -97,7 +115,10 @@ describe("<SourceView />", () => {
     render(<SourceView content={mockContent} allowExternalNavigation={true} />);
     const webSource = screen.getByText("Source 1").closest("a");
     expect(webSource).toHaveAttribute("href", "https://example.com/1");
-    expect(screen.getByAltText("source icon")).toHaveAttribute("src", "https://example.com/fav1.ico");
+    expect(screen.getByAltText("source icon")).toHaveAttribute(
+      "src",
+      "https://example.com/fav1.ico",
+    );
   });
 
   it("renders knowledge source with document icon", () => {
@@ -107,7 +128,9 @@ describe("<SourceView />", () => {
   });
 
   it("respects allowExternalNavigation=false", () => {
-    render(<SourceView content={mockContent} allowExternalNavigation={false} />);
+    render(
+      <SourceView content={mockContent} allowExternalNavigation={false} />,
+    );
     const webSource = screen.getByText("Source 1").closest("div");
     expect(webSource).not.toHaveAttribute("href");
     expect(screen.queryByTestId("external-link-icon")).not.toBeInTheDocument();

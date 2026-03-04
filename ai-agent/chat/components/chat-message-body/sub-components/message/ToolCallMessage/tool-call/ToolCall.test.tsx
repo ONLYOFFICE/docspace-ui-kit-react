@@ -42,10 +42,18 @@ vi.mock("../../../../../../store/messageStore", () => ({
 
 // Mock child components
 vi.mock("../ToolCallHeader", () => ({
-  ToolCallHeader: ({ setCollapsed, expandable }: { setCollapsed: (val: boolean) => void, expandable: boolean }) => (
+  ToolCallHeader: ({
+    setCollapsed,
+    expandable,
+  }: {
+    setCollapsed: (val: boolean) => void;
+    expandable: boolean;
+  }) => (
     <div data-testid="tool-call-header">
       {expandable ? (
-        <button onClick={() => setCollapsed(false)} data-testid="expand-button">Expand</button>
+        <button onClick={() => setCollapsed(false)} data-testid="expand-button">
+          Expand
+        </button>
       ) : null}
     </div>
   ),
@@ -77,7 +85,7 @@ describe("<ToolCall />", () => {
         content={mockContent}
         status={ToolCallStatus.Finished}
         placement={ToolCallPlacement.Message}
-      />
+      />,
     );
     expect(screen.getByTestId("tool-call-header")).toBeInTheDocument();
     expect(screen.queryByTestId("tool-call-body")).not.toBeInTheDocument();
@@ -89,7 +97,7 @@ describe("<ToolCall />", () => {
         content={mockContent}
         status={ToolCallStatus.Finished}
         placement={ToolCallPlacement.Message}
-      />
+      />,
     );
     const expandButton = screen.getByTestId("expand-button");
     fireEvent.click(expandButton);
@@ -106,7 +114,7 @@ describe("<ToolCall />", () => {
         content={crawlingContent}
         status={ToolCallStatus.Finished}
         placement={ToolCallPlacement.Message}
-      />
+      />,
     );
     expect(screen.queryByTestId("expand-button")).not.toBeInTheDocument();
   });

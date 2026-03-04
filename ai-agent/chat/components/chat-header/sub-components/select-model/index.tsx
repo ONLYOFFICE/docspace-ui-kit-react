@@ -34,7 +34,11 @@ import type { SelectModelProps } from "../../../../Chat.types";
 
 import styles from "../../ChatHeader.module.scss";
 
-const SelectModel = ({ selectedModel, isLoading, modelAliases }: SelectModelProps) => {
+const SelectModel = ({
+  selectedModel,
+  isLoading,
+  modelAliases,
+}: SelectModelProps) => {
   if (isLoading) {
     return (
       <RectangleSkeleton

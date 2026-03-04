@@ -83,7 +83,11 @@ export const ToolCall = observer(
         />
 
         {!expandable || collapsed ? null : (
-          <ToolCallBody content={content} placement={placement} allowExternalNavigation={allowExternalNavigation} />
+          <ToolCallBody
+            content={content}
+            placement={placement}
+            allowExternalNavigation={allowExternalNavigation}
+          />
         )}
       </div>
     );

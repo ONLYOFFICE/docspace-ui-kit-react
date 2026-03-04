@@ -38,7 +38,15 @@ import type { TChat } from "../../../../../../types/ai";
 
 // Mock components
 vi.mock("../../../../../../components/drop-down-item", () => ({
-  DropDownItem: ({ children, onClick, isActive }: { children: React.ReactNode; onClick: () => void; isActive?: boolean }) => (
+  DropDownItem: ({
+    children,
+    onClick,
+    isActive,
+  }: {
+    children: React.ReactNode;
+    onClick: () => void;
+    isActive?: boolean;
+  }) => (
     <div data-testid="drop-down-item" data-active={isActive} onClick={onClick}>
       {children}
     </div>
@@ -46,12 +54,30 @@ vi.mock("../../../../../../components/drop-down-item", () => ({
 }));
 
 vi.mock("../../../../../../components/text", () => ({
-  Text: ({ children, className }: { children: React.ReactNode; className?: string }) => <div className={className} data-testid="chat-title">{children}</div>,
+  Text: ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) => (
+    <div className={className} data-testid="chat-title">
+      {children}
+    </div>
+  ),
 }));
 
 vi.mock("../../../../../../components/icon-button", () => ({
-  IconButton: ({ onClick, dataTestId }: { onClick: (e: React.MouseEvent) => void; dataTestId?: string }) => (
-    <button data-testid={dataTestId} onClick={onClick}>icon</button>
+  IconButton: ({
+    onClick,
+    dataTestId,
+  }: {
+    onClick: (e: React.MouseEvent) => void;
+    dataTestId?: string;
+  }) => (
+    <button data-testid={dataTestId} onClick={onClick}>
+      icon
+    </button>
   ),
 }));
 
@@ -94,20 +120,20 @@ describe("<ChatListItem />", () => {
   it("calls onClick when clicking on the item", () => {
     vi.spyOn(utils, "isDesktop").mockReturnValue(true);
     render(<ChatListItem {...defaultProps} />);
-    
+
     const item = screen.getByTestId("drop-down-item");
     fireEvent.click(item);
-    
+
     expect(mockOnClick).toHaveBeenCalledWith("chat-123");
   });
 
   it("does not call onClick when clicking on the icon wrapper", () => {
     vi.spyOn(utils, "isDesktop").mockReturnValue(true);
     render(<ChatListItem {...defaultProps} hoveredChatId="chat-123" />);
-    
+
     const menuButton = screen.getByTestId("chat-list-item-context-menu-button");
     fireEvent.click(menuButton);
-    
+
     expect(mockOnClick).not.toHaveBeenCalled();
   });
 
@@ -120,16 +146,24 @@ describe("<ChatListItem />", () => {
 
   it("shows menu button if hovered on desktop", () => {
     vi.spyOn(utils, "isDesktop").mockReturnValue(true);
-    const { rerender } = render(<ChatListItem {...defaultProps} hoveredChatId="" />);
-    expect(screen.queryByTestId("chat-list-item-context-menu-button")).not.toBeInTheDocument();
+    const { rerender } = render(
+      <ChatListItem {...defaultProps} hoveredChatId="" />,
+    );
+    expect(
+      screen.queryByTestId("chat-list-item-context-menu-button"),
+    ).not.toBeInTheDocument();
 
     rerender(<ChatListItem {...defaultProps} hoveredChatId="chat-123" />);
-    expect(screen.getByTestId("chat-list-item-context-menu-button")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("chat-list-item-context-menu-button"),
+    ).toBeInTheDocument();
   });
 
   it("always shows menu button on mobile/tablet", () => {
     vi.spyOn(utils, "isDesktop").mockReturnValue(false);
     render(<ChatListItem {...defaultProps} hoveredChatId="" />);
-    expect(screen.getByTestId("chat-list-item-context-menu-button")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("chat-list-item-context-menu-button"),
+    ).toBeInTheDocument();
   });
 });

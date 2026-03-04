@@ -11,7 +11,9 @@ import { RoleType } from "../../../../enums";
 
 // Mocks
 vi.mock("mobx-react", () => ({
-  observer: <T extends React.ComponentType<P>, P extends object>(component: T): T => component,
+  observer: <T extends React.ComponentType<P>, P extends object>(
+    component: T,
+  ): T => component,
 }));
 
 vi.mock("../../store/messageStore", () => ({
@@ -69,8 +71,18 @@ describe("ChatMessageBody component", () => {
   };
 
   const mockMessages: TMessage[] = [
-    { id: 1, contents: [], createdOn: "2024-01-01", role: RoleType.AssistantMessage },
-    { id: 2, contents: [], createdOn: "2024-01-02", role: RoleType.UserMessage },
+    {
+      id: 1,
+      contents: [],
+      createdOn: "2024-01-01",
+      role: RoleType.AssistantMessage,
+    },
+    {
+      id: 2,
+      contents: [],
+      createdOn: "2024-01-02",
+      role: RoleType.UserMessage,
+    },
   ];
 
   const mockedUseMessageStore = vi.mocked(useMessageStore);
@@ -142,9 +154,12 @@ describe("ChatMessageBody component", () => {
 
     unmount();
 
-    expect(mockedSocket!.emit).toHaveBeenCalledWith(SocketCommands.Unsubscribe, {
-      roomParts: "CHAT-chat-1",
-    });
+    expect(mockedSocket!.emit).toHaveBeenCalledWith(
+      SocketCommands.Unsubscribe,
+      {
+        roomParts: "CHAT-chat-1",
+      },
+    );
   });
 
   it("sets up socket listener for ChatMessageId", () => {
@@ -159,10 +174,15 @@ describe("ChatMessageBody component", () => {
 
     render(<ChatMessageBody {...defaultProps} />);
 
-    expect(mockedSocket!.on).toHaveBeenCalledWith(SocketEvents.ChatMessageId, expect.any(Function));
+    expect(mockedSocket!.on).toHaveBeenCalledWith(
+      SocketEvents.ChatMessageId,
+      expect.any(Function),
+    );
 
     // Simulate event
-    const callback = mockedSocket!.on.mock.calls.find((call) => call[0] === SocketEvents.ChatMessageId)?.[1];
+    const callback = mockedSocket!.on.mock.calls.find(
+      (call) => call[0] === SocketEvents.ChatMessageId,
+    )?.[1];
     if (callback) {
       (callback as (data: { messageId: number }) => void)({ messageId: 456 });
       expect(addMessageId).toHaveBeenCalledWith(456);
@@ -195,6 +215,8 @@ describe("ChatMessageBody component", () => {
 
     render(<ChatMessageBody {...defaultProps} />);
 
-    expect(screen.queryByTestId("chat-loader-container")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("chat-loader-container"),
+    ).not.toBeInTheDocument();
   });
 });

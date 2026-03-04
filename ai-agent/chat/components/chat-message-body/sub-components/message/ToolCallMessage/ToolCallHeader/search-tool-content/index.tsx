@@ -42,7 +42,13 @@ import { Text } from "../../../../../../../../../components/text";
 import { Link, LinkTarget } from "../../../../../../../../../components/link";
 import { getCommonTranslation } from "../../../../../../../../../utils";
 
-const WebCrawlingToolContent = ({ content, allowExternalNavigation }: { content: TToolCallContent; allowExternalNavigation?: boolean }) => {
+const WebCrawlingToolContent = ({
+  content,
+  allowExternalNavigation,
+}: {
+  content: TToolCallContent;
+  allowExternalNavigation?: boolean;
+}) => {
   const toolInfo = ((content.result?.data as TToolCallResultSourceData)
     ?.title || content.arguments.url) as string;
 
@@ -50,7 +56,10 @@ const WebCrawlingToolContent = ({ content, allowExternalNavigation }: { content:
 
   return hasError || !allowExternalNavigation ? (
     <>
-      <UniverseIcon className={styles.searchToolIcon} data-testid="universe-icon" />
+      <UniverseIcon
+        className={styles.searchToolIcon}
+        data-testid="universe-icon"
+      />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("WebCrawling")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
@@ -63,12 +72,18 @@ const WebCrawlingToolContent = ({ content, allowExternalNavigation }: { content:
       target={LinkTarget.blank}
       textDecoration="none"
     >
-      <UniverseIcon className={styles.searchToolIcon} data-testid="universe-icon" />
+      <UniverseIcon
+        className={styles.searchToolIcon}
+        data-testid="universe-icon"
+      />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("WebCrawling")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
       </Text>
-      <ExternalLinkIcon className={styles.externalLinkIcon} data-testid="external-link-icon" />
+      <ExternalLinkIcon
+        className={styles.externalLinkIcon}
+        data-testid="external-link-icon"
+      />
     </Link>
   );
 };
@@ -78,7 +93,10 @@ const WebSearchToolContent = ({ content }: { content: TToolCallContent }) => {
 
   return (
     <>
-      <UniverseIcon className={styles.searchToolIcon} data-testid="universe-icon" />
+      <UniverseIcon
+        className={styles.searchToolIcon}
+        data-testid="universe-icon"
+      />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("WebSearch")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
@@ -96,7 +114,10 @@ const KnowledgeSearchToolContent = ({
 
   return (
     <>
-      <DocumentsIcon className={styles.searchToolIcon} data-testid="documents-icon" />
+      <DocumentsIcon
+        className={styles.searchToolIcon}
+        data-testid="documents-icon"
+      />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
         {getCommonTranslation("KnowledgeSearch")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
@@ -126,7 +147,10 @@ export const SearchToolContent = ({
       ) : null}
 
       {content.name === webCrawlingToolName ? (
-        <WebCrawlingToolContent content={content} allowExternalNavigation={allowExternalNavigation} />
+        <WebCrawlingToolContent
+          content={content}
+          allowExternalNavigation={allowExternalNavigation}
+        />
       ) : null}
     </>
   );

@@ -43,11 +43,15 @@ vi.mock("../../../../../../../providers/api", () => ({
 }));
 
 vi.mock("../../../../../../../components/text", () => ({
-  Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
+  Text: ({ children }: { children: React.ReactNode }) => (
+    <span>{children}</span>
+  ),
 }));
 
 vi.mock("react-svg", () => ({
-  ReactSVG: ({ src }: { src: string }) => <div data-testid="file-icon" data-src={src} />,
+  ReactSVG: ({ src }: { src: string }) => (
+    <div data-testid="file-icon" data-src={src} />
+  ),
 }));
 
 describe("Files component", () => {
@@ -109,7 +113,7 @@ describe("Files component", () => {
       { type: ContentType.Text, text: "should not render" } as TContent,
     ];
     render(<Files {...defaultProps} files={mixedFiles} />);
-    
+
     expect(screen.getAllByTestId("file-item")).toHaveLength(2);
   });
 });

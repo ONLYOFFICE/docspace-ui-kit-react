@@ -211,7 +211,9 @@ const ChatCore = (props: ChatCoreProps) => {
         webCrawlingToolName={toolsSettings.webCrawlingToolName}
         generateDocxToolName={toolsSettings.generateDocxToolName}
         generateFormToolName={toolsSettings.generateFormToolName}
-        generatePresentationToolName={toolsSettings.generatePresentationToolName}
+        generatePresentationToolName={
+          toolsSettings.generatePresentationToolName
+        }
         onStreamData={props.onStreamData}
       >
         <ChatContainer
@@ -229,12 +231,7 @@ const ChatCore = (props: ChatCoreProps) => {
 };
 
 const ChatInternalInit = (props: ChatInternalInitProps) => {
-  const {
-    agentId,
-    multimodal,
-    isLoading,
-    getIcon: getIconProp,
-  } = props;
+  const { agentId, multimodal, isLoading, getIcon: getIconProp } = props;
 
   const { aiConfig, fetchAiConfig } = useAiConfig();
   const { chatSettings, fetchChatSettings } = useChatSettings({
@@ -298,7 +295,9 @@ const ChatExternalInit = (props: ChatExternalInitProps) => {
   const { getIcon, isLoading: isLoadingGetIcon } = useGetIcon(getIconProp);
   const isLoadingChat = isLoading || !agentId || isLoadingGetIcon;
 
-  return <ChatCore {...props} getIcon={getIcon} isLoadingChat={isLoadingChat} />;
+  return (
+    <ChatCore {...props} getIcon={getIcon} isLoadingChat={isLoadingChat} />
+  );
 };
 
 const Chat = (props: ChatProps) => {

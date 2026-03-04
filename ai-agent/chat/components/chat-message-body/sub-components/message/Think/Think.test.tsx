@@ -33,7 +33,9 @@ import Think from "./index";
 
 // Mock child components
 vi.mock("../../../../../../../components/loader", () => ({
-  Loader: ({ "data-testid": testId }: { "data-testid"?: string }) => <div data-testid={testId || "loader"} />,
+  Loader: ({ "data-testid": testId }: { "data-testid"?: string }) => (
+    <div data-testid={testId || "loader"} />
+  ),
   LoaderTypes: { track: "track" },
 }));
 vi.mock("../../../../../../../components/text", () => ({
@@ -51,7 +53,7 @@ describe("<Think />", () => {
     render(
       <Think isFinished={false}>
         <div data-testid="child-content">Think content</div>
-      </Think>
+      </Think>,
     );
 
     expect(screen.getByTestId("think-loader")).toBeInTheDocument();
@@ -63,7 +65,7 @@ describe("<Think />", () => {
     render(
       <Think isFinished={true}>
         <div data-testid="child-content">Think content</div>
-      </Think>
+      </Think>,
     );
 
     expect(screen.getByTestId("think-finished-icon")).toBeInTheDocument();
@@ -74,11 +76,11 @@ describe("<Think />", () => {
     render(
       <Think>
         <div data-testid="child-content">Think content</div>
-      </Think>
+      </Think>,
     );
 
     const title = screen.getByTestId("think-title");
-    
+
     // Initial state: hidden
     expect(screen.queryByTestId("child-content")).not.toBeInTheDocument();
 
@@ -94,7 +96,7 @@ describe("<Think />", () => {
   it("applies correct styles based on isFirst prop", () => {
     const { rerender } = render(<Think isFirst={true}>Content</Think>);
     const think = screen.getByTestId("think");
-    
+
     // When isFirst is true, it shouldn't have withMarginTop
     expect(think.className).not.toContain("withMarginTop");
 

@@ -53,7 +53,11 @@ const ChatFooter = ({
   return (
     <div className={styles.chatFooter} data-testid="chat-footer">
       {!isLoading && !aiReady ? (
-        <ChatInfoBlock standalone={standalone} isPortalAdmin={isPortalAdmin} allowExternalNavigation={allowExternalNavigation} />
+        <ChatInfoBlock
+          standalone={standalone}
+          isPortalAdmin={isPortalAdmin}
+          allowExternalNavigation={allowExternalNavigation}
+        />
       ) : null}
       <ChatInput
         attachmentFile={attachmentFile}

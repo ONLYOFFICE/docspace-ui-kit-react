@@ -99,7 +99,7 @@ export const ChatListItem = ({
         {hoveredChatId === chat.id || !desktop ? (
           <div className={styles.iconButtonWrapper} onClick={onShowContextMenu}>
             <IconButton
-              iconNode={<VerticalDotsReactSvg/>}
+              iconNode={<VerticalDotsReactSvg />}
               size={16}
               isClickable
               isFill

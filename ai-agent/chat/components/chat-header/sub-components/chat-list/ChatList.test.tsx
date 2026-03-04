@@ -35,13 +35,22 @@ import { ChatList, type ChatListProps } from "./index";
 
 // Mock virtualization components to just render children
 vi.mock("react-virtualized-auto-sizer", () => ({
-  default: ({ children }: { children: (size: { height: number; width: number }) => React.ReactNode }) => 
-    children({ height: 500, width: 300 }),
+  default: ({
+    children,
+  }: {
+    children: (size: { height: number; width: number }) => React.ReactNode;
+  }) => children({ height: 500, width: 300 }),
 }));
 
 vi.mock("react-window-infinite-loader", () => ({
-  default: ({ children, isItemLoaded }: { 
-    children: (props: { onItemsRendered: Mock; ref: React.Ref<unknown> | null }) => React.ReactNode;
+  default: ({
+    children,
+    isItemLoaded,
+  }: {
+    children: (props: {
+      onItemsRendered: Mock;
+      ref: React.Ref<unknown> | null;
+    }) => React.ReactNode;
     itemCount: number;
     isItemLoaded: (index: number) => boolean;
     loadMoreItems: () => void;
@@ -53,8 +62,16 @@ vi.mock("react-window-infinite-loader", () => ({
 }));
 
 vi.mock("react-window", () => ({
-  FixedSizeList: ({ children, itemCount, itemData }: {
-    children: (props: { index: number; style: React.CSSProperties; data: unknown }) => React.ReactNode;
+  FixedSizeList: ({
+    children,
+    itemCount,
+    itemData,
+  }: {
+    children: (props: {
+      index: number;
+      style: React.CSSProperties;
+      data: unknown;
+    }) => React.ReactNode;
     itemCount: number;
     itemData: unknown;
   }) => (
@@ -72,7 +89,9 @@ vi.mock("../chat-list-item", () => ({
 
 // Mock Scrollbar
 vi.mock("../../../../../../components/scrollbar", () => ({
-  Scrollbar: ({ children }: { children: React.ReactNode }) => <div data-testid="scrollbar">{children}</div>,
+  Scrollbar: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="scrollbar">{children}</div>
+  ),
 }));
 
 describe("<ChatList />", () => {
@@ -89,7 +108,9 @@ describe("<ChatList />", () => {
   };
 
   it("calculates correct itemCount and renders list", () => {
-    const { rerender } = render(<ChatList {...defaultProps} hasNextPage={false} />);
+    const { rerender } = render(
+      <ChatList {...defaultProps} hasNextPage={false} />,
+    );
     let list = screen.getByTestId("virtual-list");
     expect(list.getAttribute("data-itemcount")).toBe("1"); // chats.length
 

@@ -73,18 +73,18 @@ const Think = ({
             data-testid="think-loader"
           />
         )}
- 
+
         <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
           {getCommonTranslation("Thinking")}
         </Text>
- 
+
         <TriangleDownIcon
           data-size={IconSizeType.scale}
           className={cn(styles.icon, { [styles.iconOpened]: isOpen })}
           data-testid="think-arrow-icon"
         />
       </div>
- 
+
       {isOpen ? (
         <div className={styles.thinkBlock} data-testid="think-content">
           {children}

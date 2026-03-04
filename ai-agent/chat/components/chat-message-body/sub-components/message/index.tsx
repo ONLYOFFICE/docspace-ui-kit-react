@@ -56,7 +56,7 @@ import Files from "./files";
 import Images from "./images";
 import Buttons from "./buttons";
 import { getCommonTranslation } from "../../../../../../utils";
-import {useApi} from "../../../../../../providers";
+import { useApi } from "../../../../../../providers";
 
 const renderLink = ({
   attributes,
@@ -113,9 +113,11 @@ const Message = ({
         >
           <Avatar
             size={AvatarSize.min}
-            source={currentChat?.createdBy.avatarOriginal
-              ? `${baseUrl}${currentChat?.createdBy.avatarOriginal}`
-              : userAvatar}
+            source={
+              currentChat?.createdBy.avatarOriginal
+                ? `${baseUrl}${currentChat?.createdBy.avatarOriginal}`
+                : userAvatar
+            }
             role={AvatarRole.user}
             noClick
             isNotIcon
@@ -131,7 +133,11 @@ const Message = ({
             ) : null}
 
             {files.length > 0 ? (
-              <Files files={files} getIcon={getIcon} allowExternalNavigation={allowExternalNavigation} />
+              <Files
+                files={files}
+                getIcon={getIcon}
+                allowExternalNavigation={allowExternalNavigation}
+              />
             ) : null}
 
             {message.contents.map((c) => {
@@ -245,11 +251,24 @@ const Message = ({
           );
 
         if (c.type === ContentType.Tool)
-          return <ToolCallMessage key={`${c.name}_${mId * 2}`} content={c} allowExternalNavigation={allowExternalNavigation} />;
+          return (
+            <ToolCallMessage
+              key={`${c.name}_${mId * 2}`}
+              content={c}
+              allowExternalNavigation={allowExternalNavigation}
+            />
+          );
 
         return null;
       })}
-      {files.length ? <Files files={files} getIcon={getIcon} reverse allowExternalNavigation={allowExternalNavigation} /> : null}
+      {files.length ? (
+        <Files
+          files={files}
+          getIcon={getIcon}
+          reverse
+          allowExternalNavigation={allowExternalNavigation}
+        />
+      ) : null}
       {message.id ? (
         <Buttons
           text={fullText}

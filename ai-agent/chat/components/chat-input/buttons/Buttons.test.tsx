@@ -43,9 +43,9 @@ vi.mock("../../../store/messageStore", () => ({
 // Mock components
 vi.mock("../../../../../components/icon-button", () => ({
   IconButton: (props: Record<string, unknown>) => (
-    <button 
-      onClick={props.onClick as () => void} 
-      disabled={props.isDisabled as boolean} 
+    <button
+      onClick={props.onClick as () => void}
+      disabled={props.isDisabled as boolean}
       data-testid={props["data-testid"] as string}
     >
       icon
@@ -54,8 +54,18 @@ vi.mock("../../../../../components/icon-button", () => ({
 }));
 
 vi.mock("../../../../../components/tooltip", () => ({
-  TooltipContainer: ({ children, onClick, title }: { children: React.ReactNode; onClick: () => void; title: string }) => (
-    <div onClick={onClick} title={title} data-testid="tooltip">{children}</div>
+  TooltipContainer: ({
+    children,
+    onClick,
+    title,
+  }: {
+    children: React.ReactNode;
+    onClick: () => void;
+    title: string;
+  }) => (
+    <div onClick={onClick} title={title} data-testid="tooltip">
+      {children}
+    </div>
   ),
 }));
 
@@ -64,8 +74,12 @@ vi.mock("../tools-settings", () => ({
 }));
 
 // Mock Assets
-vi.mock("../../../../../assets/icons/12/arrow.up.react.svg", () => ({ default: () => <svg /> }));
-vi.mock("../../../../../assets/attachment.react.svg", () => ({ default: () => <svg /> }));
+vi.mock("../../../../../assets/icons/12/arrow.up.react.svg", () => ({
+  default: () => <svg />,
+}));
+vi.mock("../../../../../assets/attachment.react.svg", () => ({
+  default: () => <svg />,
+}));
 
 // Mock utils
 vi.mock("../../../../../utils", () => ({
@@ -125,7 +139,9 @@ describe("<Buttons />", () => {
   });
 
   it("disables send button if no selected model", () => {
-    render(<Buttons {...defaultProps} selectedModel={null as unknown as string} />);
+    render(
+      <Buttons {...defaultProps} selectedModel={null as unknown as string} />,
+    );
     const sendButton = screen.getByTestId("chat-input-send-button");
     expect(sendButton).toBeDisabled();
   });
@@ -156,6 +172,8 @@ describe("<Buttons />", () => {
 
   it("hides attachment button if allowAttachFiles is false", () => {
     render(<Buttons {...defaultProps} allowAttachFiles={false} />);
-    expect(screen.queryByTestId("chat-input-attachment-button")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("chat-input-attachment-button"),
+    ).not.toBeInTheDocument();
   });
 });

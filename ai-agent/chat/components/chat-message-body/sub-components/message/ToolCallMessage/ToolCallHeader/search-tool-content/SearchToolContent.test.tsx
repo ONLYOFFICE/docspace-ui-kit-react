@@ -41,11 +41,27 @@ vi.mock("../../../../../../../store/messageStore", () => ({
 
 // Mock components
 vi.mock("../../../../../../../../../components/text", () => ({
-  Text: ({ children, title }: { children: React.ReactNode, title?: string }) => <div title={title}>{children}</div>,
+  Text: ({
+    children,
+    title,
+  }: {
+    children: React.ReactNode;
+    title?: string;
+  }) => <div title={title}>{children}</div>,
 }));
 vi.mock("../../../../../../../../../components/link", () => ({
-  Link: ({ children, href, "data-testid": testId }: { children: React.ReactNode, href?: string, "data-testid"?: string }) => (
-    <a href={href} data-testid={testId}>{children}</a>
+  Link: ({
+    children,
+    href,
+    "data-testid": testId,
+  }: {
+    children: React.ReactNode;
+    href?: string;
+    "data-testid"?: string;
+  }) => (
+    <a href={href} data-testid={testId}>
+      {children}
+    </a>
   ),
   LinkTarget: { blank: "_blank" },
 }));
@@ -99,11 +115,19 @@ describe("<SearchToolContent />", () => {
       name: "crawl",
       result: { data: { title: "Page Title" } },
     };
-    render(<SearchToolContent content={crawlingContent} allowExternalNavigation={true} />);
+    render(
+      <SearchToolContent
+        content={crawlingContent}
+        allowExternalNavigation={true}
+      />,
+    );
     expect(screen.getByTestId("universe-icon")).toBeInTheDocument();
     expect(screen.getByText(/WebCrawling/)).toBeInTheDocument();
     expect(screen.getByText(/Page Title/)).toBeInTheDocument();
-    expect(screen.getByRole("link")).toHaveAttribute("href", "https://example.com");
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "href",
+      "https://example.com",
+    );
     expect(screen.getByTestId("external-link-icon")).toBeInTheDocument();
   });
 
@@ -113,7 +137,12 @@ describe("<SearchToolContent />", () => {
       name: "crawl",
       result: { data: { title: "Page Title" } },
     };
-    render(<SearchToolContent content={crawlingContent} allowExternalNavigation={false} />);
+    render(
+      <SearchToolContent
+        content={crawlingContent}
+        allowExternalNavigation={false}
+      />,
+    );
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
     expect(screen.queryByTestId("external-link-icon")).not.toBeInTheDocument();
   });

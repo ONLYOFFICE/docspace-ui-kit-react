@@ -75,7 +75,7 @@ describe("<ToolCallBody />", () => {
       <ToolCallBody
         content={errorContent}
         placement={ToolCallPlacement.Message}
-      />
+      />,
     );
     expect(screen.getByText("something went wrong")).toBeInTheDocument();
   });
@@ -90,7 +90,7 @@ describe("<ToolCallBody />", () => {
       <ToolCallBody
         content={knowledgeContent}
         placement={ToolCallPlacement.Message}
-      />
+      />,
     );
     expect(screen.getByTestId("source-view")).toBeInTheDocument();
   });
@@ -105,7 +105,7 @@ describe("<ToolCallBody />", () => {
       <ToolCallBody
         content={regularContent}
         placement={ToolCallPlacement.Message}
-      />
+      />,
     );
     expect(screen.getByTestId("code-view")).toBeInTheDocument();
   });

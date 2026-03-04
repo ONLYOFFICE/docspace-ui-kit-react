@@ -41,7 +41,7 @@ import { useMessageStore } from "../../../../store/messageStore";
 import { DeleteChatProps } from "../../../../Chat.types";
 import { getCommonTranslation } from "../../../../../../utils";
 import { toastr } from "../../../../../../components/toast";
-import {CommonTrans} from "../../../../../../utils/i18n/CommonTrans";
+import { CommonTrans } from "../../../../../../utils/i18n/CommonTrans";
 import styles from "./DeleteChat.module.scss";
 
 const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
@@ -57,9 +57,9 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
 
   const onDeleteAction = React.useCallback(async () => {
     if (isLoading) return;
-    
+
     setIsLoading(true);
-    
+
     try {
       await deleteChat(chatId);
 
@@ -75,7 +75,15 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [chatId, currentChat?.id, deleteChat, startNewChat, updateUrlChatId, onDeleteToggle, isLoading]);
+  }, [
+    chatId,
+    currentChat?.id,
+    deleteChat,
+    startNewChat,
+    updateUrlChatId,
+    onDeleteToggle,
+    isLoading,
+  ]);
 
   React.useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {

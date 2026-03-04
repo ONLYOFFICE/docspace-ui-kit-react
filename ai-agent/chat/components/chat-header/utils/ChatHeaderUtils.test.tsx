@@ -28,7 +28,10 @@ import { describe, it, expect, vi } from "vitest";
 import * as utils from "../../../../../utils";
 
 import { getSelectChatRowHeight } from "./index";
-import { CHAT_LIST_ROW_HEIGHT_DESKTOP, CHAT_LIST_ROW_HEIGHT_TABLET_AND_MOBILE } from "../constants";
+import {
+  CHAT_LIST_ROW_HEIGHT_DESKTOP,
+  CHAT_LIST_ROW_HEIGHT_TABLET_AND_MOBILE,
+} from "../constants";
 
 describe("chat-header utils", () => {
   it("returns desktop row height when isDesktop is true", () => {
@@ -39,7 +42,9 @@ describe("chat-header utils", () => {
 
   it("returns mobile row height when isDesktop is false", () => {
     const spy = vi.spyOn(utils, "isDesktop").mockReturnValue(false);
-    expect(getSelectChatRowHeight()).toBe(CHAT_LIST_ROW_HEIGHT_TABLET_AND_MOBILE);
+    expect(getSelectChatRowHeight()).toBe(
+      CHAT_LIST_ROW_HEIGHT_TABLET_AND_MOBILE,
+    );
     spy.mockRestore();
   });
 });

@@ -48,7 +48,13 @@ import {
   getRootDomain,
 } from "../../tool-call/ToolCall.utils";
 
-const SourceItem = ({ source, allowExternalNavigation }: { source: TToolCallResultSourceData; allowExternalNavigation?: boolean }) => {
+const SourceItem = ({
+  source,
+  allowExternalNavigation,
+}: {
+  source: TToolCallResultSourceData;
+  allowExternalNavigation?: boolean;
+}) => {
   const tooltipId = useId();
   const [faviconLoadError, setFaviconLoadError] = useState(false);
   const { baseUrl } = useApi();
@@ -56,8 +62,8 @@ const SourceItem = ({ source, allowExternalNavigation }: { source: TToolCallResu
   const isKnowledgeSource = !!source.fileId;
 
   const linkHref =
-    isKnowledgeSource && source.fileId 
-      ? combineUrl(baseUrl, source.relativeUrl || "") 
+    isKnowledgeSource && source.fileId
+      ? combineUrl(baseUrl, source.relativeUrl || "")
       : source.url;
 
   const sourceContent = isKnowledgeSource
@@ -123,7 +129,10 @@ const SourceItem = ({ source, allowExternalNavigation }: { source: TToolCallResu
 
   if (!allowExternalNavigation) {
     return (
-      <div className={classNames(styles.sourceItem, styles.disabledNavigation)} data-testid="source-item">
+      <div
+        className={classNames(styles.sourceItem, styles.disabledNavigation)}
+        data-testid="source-item"
+      >
         {content}
       </div>
     );
@@ -143,7 +152,13 @@ const SourceItem = ({ source, allowExternalNavigation }: { source: TToolCallResu
   );
 };
 
-export const SourceView = ({ content, allowExternalNavigation }: { content: TToolCallContent; allowExternalNavigation?: boolean }) => {
+export const SourceView = ({
+  content,
+  allowExternalNavigation,
+}: {
+  content: TToolCallContent;
+  allowExternalNavigation?: boolean;
+}) => {
   if (!content.result) return null;
 
   const sources: TToolCallResultSourceData[] = Array.isArray(

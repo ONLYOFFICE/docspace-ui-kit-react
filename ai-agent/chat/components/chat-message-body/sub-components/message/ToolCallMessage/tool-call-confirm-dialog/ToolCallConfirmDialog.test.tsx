@@ -45,25 +45,53 @@ vi.mock("../../../../../../../../providers", () => ({
 
 // Mock components
 vi.mock("../../../../../../../../components/modal-dialog", () => ({
-  ModalDialog: Object.assign(({ children, visible }: { children: React.ReactNode, visible: boolean }) => (
-    visible ? <div data-testid="modal-dialog">{children}</div> : null
-  ), {
-    Header: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    Body: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    Footer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  }),
+  ModalDialog: Object.assign(
+    ({ children, visible }: { children: React.ReactNode; visible: boolean }) =>
+      visible ? <div data-testid="modal-dialog">{children}</div> : null,
+    {
+      Header: ({ children }: { children: React.ReactNode }) => (
+        <div>{children}</div>
+      ),
+      Body: ({ children }: { children: React.ReactNode }) => (
+        <div>{children}</div>
+      ),
+      Footer: ({ children }: { children: React.ReactNode }) => (
+        <div>{children}</div>
+      ),
+    },
+  ),
   ModalDialogType: { modal: "modal" },
 }));
 
 vi.mock("../../../../../../../../components/button", () => ({
-  Button: ({ onClick, label, "data-testid": testId }: { onClick: () => void, label: string, "data-testid"?: string }) => (
-    <button onClick={onClick} data-testid={testId}>{label}</button>
+  Button: ({
+    onClick,
+    label,
+    "data-testid": testId,
+  }: {
+    onClick: () => void;
+    label: string;
+    "data-testid"?: string;
+  }) => (
+    <button onClick={onClick} data-testid={testId}>
+      {label}
+    </button>
   ),
   ButtonSize: { normal: "normal" },
 }));
 
 vi.mock("../../../../../../../../components/checkbox", () => ({
-  Checkbox: ({ isChecked, onChange, label, "data-testid": testId }: { isChecked: boolean, onChange: (e: { target: { checked: boolean } }) => void, label: string, "data-testid"?: string }) => (
+  Checkbox: ({
+    isChecked,
+    onChange,
+    label,
+    "data-testid": testId,
+  }: {
+    isChecked: boolean;
+    onChange: (e: { target: { checked: boolean } }) => void;
+    label: string;
+    "data-testid"?: string;
+  }) => (
     <label>
       <input
         type="checkbox"
@@ -117,32 +145,51 @@ describe("<ToolCallConfirmDialog />", () => {
   });
 
   it("renders when current call is first in queue", () => {
-    render(<ToolCallConfirmDialog content={mockContent} onClose={mockOnClose} />);
+    render(
+      <ToolCallConfirmDialog content={mockContent} onClose={mockOnClose} />,
+    );
     expect(screen.getByTestId("modal-dialog")).toBeInTheDocument();
   });
 
   it("calls updateToolsPermission with Allow when allow button is clicked", () => {
-    render(<ToolCallConfirmDialog content={mockContent} onClose={mockOnClose} />);
+    render(
+      <ToolCallConfirmDialog content={mockContent} onClose={mockOnClose} />,
+    );
     fireEvent.click(screen.getByTestId("allow-button"));
-    expect(mockUpdateToolsPermission).toHaveBeenCalledWith("call-1", ToolsPermission.Allow);
+    expect(mockUpdateToolsPermission).toHaveBeenCalledWith(
+      "call-1",
+      ToolsPermission.Allow,
+    );
     expect(mockOnClose).toHaveBeenCalled();
   });
 
   it("calls updateToolsPermission with AlwaysAllow when checkbox is checked and allow is clicked", () => {
-    render(<ToolCallConfirmDialog content={mockContent} onClose={mockOnClose} />);
+    render(
+      <ToolCallConfirmDialog content={mockContent} onClose={mockOnClose} />,
+    );
     fireEvent.click(screen.getByTestId("always-allow-checkbox"));
     fireEvent.click(screen.getByTestId("allow-button"));
-    expect(mockUpdateToolsPermission).toHaveBeenCalledWith("call-1", ToolsPermission.AlwaysAllow);
+    expect(mockUpdateToolsPermission).toHaveBeenCalledWith(
+      "call-1",
+      ToolsPermission.AlwaysAllow,
+    );
   });
 
   it("calls updateToolsPermission with Deny when deny button is clicked", () => {
-    render(<ToolCallConfirmDialog content={mockContent} onClose={mockOnClose} />);
+    render(
+      <ToolCallConfirmDialog content={mockContent} onClose={mockOnClose} />,
+    );
     fireEvent.click(screen.getByTestId("deny-button"));
-    expect(mockUpdateToolsPermission).toHaveBeenCalledWith("call-1", ToolsPermission.Deny);
+    expect(mockUpdateToolsPermission).toHaveBeenCalledWith(
+      "call-1",
+      ToolsPermission.Deny,
+    );
   });
 
   it("adds/removes call from queue on mount/unmount", () => {
-    const { unmount } = render(<ToolCallConfirmDialog content={mockContent} onClose={mockOnClose} />);
+    const { unmount } = render(
+      <ToolCallConfirmDialog content={mockContent} onClose={mockOnClose} />,
+    );
     expect(mockAddToToolsConfirmQueue).toHaveBeenCalledWith("call-1");
     unmount();
     expect(mockRemoveFromToolsConfirmQueue).toHaveBeenCalledWith("call-1");

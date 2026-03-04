@@ -57,14 +57,19 @@ vi.mock("react-syntax-highlighter", () => ({
 }));
 
 vi.mock("../../../../../../../components/text", () => ({
-  Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
+  Text: ({ children }: { children: React.ReactNode }) => (
+    <span>{children}</span>
+  ),
 }));
 
 vi.mock("../../../../../../../components/icon-button", () => ({
   IconButton: ({
     onClick,
     "aria-label": ariaLabel,
-  }: { onClick: () => void; "aria-label": string }) => (
+  }: {
+    onClick: () => void;
+    "aria-label": string;
+  }) => (
     <button
       data-testid="copy-button"
       onClick={onClick}
@@ -75,7 +80,9 @@ vi.mock("../../../../../../../components/icon-button", () => ({
 }));
 
 vi.mock("../../../../../../../components/scrollbar", () => ({
-  Scrollbar: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Scrollbar: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 vi.mock("../../../../../../../utils", () => ({
@@ -104,8 +111,13 @@ describe("CodeBlock component", () => {
     render(<CodeBlock {...defaultProps} />);
 
     expect(screen.getByText("typescript")).toBeInTheDocument();
-    expect(screen.getByTestId("syntax-highlighter")).toHaveTextContent("const a = 1;");
-    expect(screen.getByTestId("syntax-highlighter")).toHaveAttribute("data-language", "typescript");
+    expect(screen.getByTestId("syntax-highlighter")).toHaveTextContent(
+      "const a = 1;",
+    );
+    expect(screen.getByTestId("syntax-highlighter")).toHaveAttribute(
+      "data-language",
+      "typescript",
+    );
     expect(screen.getByTestId("code-block")).toBeInTheDocument();
   });
 

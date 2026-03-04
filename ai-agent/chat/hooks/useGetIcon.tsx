@@ -117,10 +117,7 @@ const useGetIcon = (getIconProp?: TGetIcon) => {
   );
 
   const builtInGetIcon = React.useCallback(
-    (
-      size = 32,
-      fileExst: string,
-    ) => {
+    (size = 32, fileExst: string) => {
       if (!filesSettings) return null;
 
       const path = determineIconPath(fileExst);

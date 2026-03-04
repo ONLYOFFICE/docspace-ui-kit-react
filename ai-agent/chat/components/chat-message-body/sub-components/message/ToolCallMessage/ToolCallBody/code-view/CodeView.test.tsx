@@ -36,7 +36,9 @@ import { ContentType } from "../../../../../../../../../enums";
 
 // Mock child components
 vi.mock("../../../Markdown", () => ({
-  default: ({ chatMessage }: { chatMessage: string }) => <div data-testid="markdown">{chatMessage}</div>,
+  default: ({ chatMessage }: { chatMessage: string }) => (
+    <div data-testid="markdown">{chatMessage}</div>
+  ),
 }));
 vi.mock("../../../../../../../../../components/text", () => ({
   Text: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -57,8 +59,12 @@ describe("<CodeView />", () => {
   };
 
   it("renders arguments by default", () => {
-    render(<CodeView content={mockContent} placement={ToolCallPlacement.Message} />);
-    expect(screen.getByTestId("tool-call-code-view-item-arg")).toBeInTheDocument();
+    render(
+      <CodeView content={mockContent} placement={ToolCallPlacement.Message} />,
+    );
+    expect(
+      screen.getByTestId("tool-call-code-view-item-arg"),
+    ).toBeInTheDocument();
     expect(screen.getByText('{"arg1":"val1"}')).toBeInTheDocument();
   });
 
@@ -67,8 +73,15 @@ describe("<CodeView />", () => {
       ...mockContent,
       result: { data: { res1: "val2" } },
     };
-    render(<CodeView content={contentWithResult} placement={ToolCallPlacement.Message} />);
-    expect(screen.getByTestId("tool-call-code-view-item-result")).toBeInTheDocument();
+    render(
+      <CodeView
+        content={contentWithResult}
+        placement={ToolCallPlacement.Message}
+      />,
+    );
+    expect(
+      screen.getByTestId("tool-call-code-view-item-result"),
+    ).toBeInTheDocument();
     expect(screen.getByText('{"res1":"val2"}')).toBeInTheDocument();
   });
 
@@ -77,7 +90,14 @@ describe("<CodeView />", () => {
       ...mockContent,
       result: { data: { res1: "val2" } },
     };
-    render(<CodeView content={contentWithResult} placement={ToolCallPlacement.ConfirmDialog} />);
-    expect(screen.queryByTestId("tool-call-code-view-item-result")).not.toBeInTheDocument();
+    render(
+      <CodeView
+        content={contentWithResult}
+        placement={ToolCallPlacement.ConfirmDialog}
+      />,
+    );
+    expect(
+      screen.queryByTestId("tool-call-code-view-item-result"),
+    ).not.toBeInTheDocument();
   });
 });

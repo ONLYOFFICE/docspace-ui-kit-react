@@ -105,7 +105,10 @@ const FilesList = ({
                   const icon = getIcon(24, file.fileExst ?? "");
                   if (typeof icon === "string")
                     return (
-                      <ReactSVG src={icon} className={styles.filesListItemIcon} />
+                      <ReactSVG
+                        src={icon}
+                        className={styles.filesListItemIcon}
+                      />
                     );
                   if (icon) {
                     const Icon = icon;

@@ -48,7 +48,9 @@ vi.mock("./mcp-tool-content", () => ({
   MCPToolContent: () => <div data-testid="mcp-tool-content" />,
 }));
 vi.mock("../../../../../../../../components/loader", () => ({
-  Loader: ({ "data-testid": testId }: { "data-testid"?: string }) => <div data-testid={testId || "loader"} />,
+  Loader: ({ "data-testid": testId }: { "data-testid"?: string }) => (
+    <div data-testid={testId || "loader"} />
+  ),
   LoaderTypes: { track: "track" },
 }));
 
@@ -77,7 +79,7 @@ describe("<ToolCallHeader />", () => {
         setCollapsed={mockSetCollapsed}
         status={ToolCallStatus.Loading}
         placement={ToolCallPlacement.Message}
-      />
+      />,
     );
     expect(screen.getByTestId("loader")).toBeInTheDocument();
   });
@@ -90,7 +92,7 @@ describe("<ToolCallHeader />", () => {
         setCollapsed={mockSetCollapsed}
         status={ToolCallStatus.Finished}
         placement={ToolCallPlacement.Message}
-      />
+      />,
     );
     expect(screen.getByTestId("tool-finish-icon")).toBeInTheDocument();
   });
@@ -103,7 +105,7 @@ describe("<ToolCallHeader />", () => {
         setCollapsed={mockSetCollapsed}
         status={ToolCallStatus.Failed}
         placement={ToolCallPlacement.Message}
-      />
+      />,
     );
     expect(screen.getByTestId("alert-icon")).toBeInTheDocument();
   });
@@ -117,7 +119,7 @@ describe("<ToolCallHeader />", () => {
         status={ToolCallStatus.Finished}
         placement={ToolCallPlacement.Message}
         isSearchTool={true}
-      />
+      />,
     );
     expect(screen.getByTestId("search-tool-content")).toBeInTheDocument();
   });
@@ -131,7 +133,7 @@ describe("<ToolCallHeader />", () => {
         status={ToolCallStatus.Finished}
         placement={ToolCallPlacement.Message}
         expandable={true}
-      />
+      />,
     );
     const header = screen.getByTestId("tool-call-header");
     fireEvent.click(header);

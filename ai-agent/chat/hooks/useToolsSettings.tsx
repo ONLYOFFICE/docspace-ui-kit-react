@@ -44,11 +44,7 @@ type Props = {
   chatSettings?: Nullable<TAIRoomChatSettings>;
 };
 
-const useToolsSettings = ({
-  agentId,
-  aiConfig,
-  chatSettings,
-}: Props) => {
+const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
   const [servers, setServers] = React.useState<TServer[]>([]);
   const [MCPTools, setMCPTools] = React.useState<Map<string, TMCPTool[]>>(
     new Map(),

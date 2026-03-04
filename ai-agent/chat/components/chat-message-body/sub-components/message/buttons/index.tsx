@@ -34,11 +34,18 @@ import CopyIcon from "../../../../../../../assets/icons/16/copy.react.svg";
 // import RefreshIcon from "../../../.././../../assets/16/refresh.react.svg";
 import SaveToFileIcon from "../../../../../../../assets/message.save.svg";
 
-import socket, { SocketCommands, SocketEvents } from "../../../../../../../utils/socket";
+import socket, {
+  SocketCommands,
+  SocketEvents,
+} from "../../../../../../../utils/socket";
 
 import { TBreadCrumb } from "../../../../../../../components/selector";
 import { toastr } from "../../../../../../../components/toast";
-import { Link, LinkTarget, LinkType } from "../../../../../../../components/link";
+import {
+  Link,
+  LinkTarget,
+  LinkType,
+} from "../../../../../../../components/link";
 
 import { useMessageStore } from "../../../../../store/messageStore";
 import { useChatStore } from "../../../../../store/chatStore";
@@ -114,7 +121,13 @@ const Buttons = ({
               1: allowExternalNavigation ? (
                 <Link
                   type={LinkType.action}
-                  onClick={() => openFile(resultFile.id!.toString(), allowExternalNavigation, baseUrl)}
+                  onClick={() =>
+                    openFile(
+                      resultFile.id!.toString(),
+                      allowExternalNavigation,
+                      baseUrl,
+                    )
+                  }
                 />
               ) : (
                 <span />
