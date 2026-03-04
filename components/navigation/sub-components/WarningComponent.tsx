@@ -40,7 +40,7 @@ const WarningComponent = ({
   return (
     <TooltipContainer
       as="div"
-      className={`${styles.warningText}`}
+      className={`${styles.warningText} ${icon ? styles.warningTextWithIcon : ""}`}
       title={tooltip}
     >
       {icon && <img src={icon} alt="" className={styles.warningIcon} />}
