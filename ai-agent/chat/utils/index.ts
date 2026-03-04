@@ -119,7 +119,7 @@ export const formatJsonWithMarkdown = (
 	return `\`\`\`json\n${formattedJson}\n\`\`\``;
 };
 
-export const openFile = (id: string, allowExternalNavigation?: boolean) => {
+export const openFile = (id: string, allowExternalNavigation?: boolean, baseUrl?: string) => {
 	if (!allowExternalNavigation) return;
 
 	const searchParams = new URLSearchParams();
@@ -127,7 +127,7 @@ export const openFile = (id: string, allowExternalNavigation?: boolean) => {
 	searchParams.set("fileId", id);
 
 	const url = combineUrl(
-		window.location.origin,
+		baseUrl || window.location.origin,
 		`/doceditor?${searchParams.toString()}`,
 	);
 

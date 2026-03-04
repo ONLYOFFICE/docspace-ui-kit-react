@@ -92,7 +92,7 @@ const SelectChat = ({
     updateUrlChatId,
   } = useChatStore();
   const { fetchMessages, startNewChat, isRequestRunning } = useMessageStore();
-  const { aiApi } = useApi();
+  const { aiApi, baseUrl } = useApi();
 
   const closeExportSelector = () => setIsExportOpen(false);
 
@@ -167,7 +167,7 @@ const SelectChat = ({
 
         if (resultFile) {
           if (isChecked) {
-            openFile(resultFile.id!.toString());
+            openFile(resultFile.id!.toString(), allowExternalNavigation, baseUrl);
           }
 
           const toastMsg = (
@@ -179,7 +179,7 @@ const SelectChat = ({
                 2: allowExternalNavigation ? (
                   <Link
                     type={LinkType.action}
-                    onClick={() => openFile(resultFile.id!.toString(), allowExternalNavigation)}
+                    onClick={() => openFile(resultFile.id!.toString(), allowExternalNavigation, baseUrl)}
                   />
                 ) : (
                   <span />

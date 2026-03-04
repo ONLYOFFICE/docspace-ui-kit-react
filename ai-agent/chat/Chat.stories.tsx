@@ -29,7 +29,6 @@ import React from "react";
 
 import { withAgentIdSetup } from "./storybook-helpers/decorators/withAgentIdSetup";
 import { Toast } from "../../components/toast";
-import { toastr } from "../../components/toast/sub-components/Toastr";
 
 import Chat from "./index";
 import type { ChatProps } from "./Chat.types";

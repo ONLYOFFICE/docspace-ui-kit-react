@@ -69,7 +69,7 @@ const Buttons = ({
 }: MessageButtonsProps) => {
   const { agentId, findPreviousUserMessage } = useMessageStore();
   const { currentChat } = useChatStore();
-  const { aiApi } = useApi();
+  const { aiApi, baseUrl } = useApi();
 
   const [showFolderSelector, setShowFolderSelector] = React.useState(false);
 
@@ -104,7 +104,7 @@ const Buttons = ({
 
       if (resultFile) {
         if (isChecked) {
-          openFile(resultFile.id!.toString(), allowExternalNavigation);
+          openFile(resultFile.id!.toString(), allowExternalNavigation, baseUrl);
         }
 
         const toastMsg = (
@@ -115,7 +115,7 @@ const Buttons = ({
               1: allowExternalNavigation ? (
                 <Link
                   type={LinkType.action}
-                  onClick={() => openFile(resultFile.id!.toString(), allowExternalNavigation)}
+                  onClick={() => openFile(resultFile.id!.toString(), allowExternalNavigation, baseUrl)}
                 />
               ) : (
                 <span />

@@ -39,6 +39,8 @@ import type {
 import { Link, LinkTarget } from "../../../../../../../../../components/link";
 import { Text } from "../../../../../../../../../components/text";
 import { Tooltip } from "../../../../../../../../../components/tooltip";
+import { useApi } from "../../../../../../../../../providers/api";
+import { combineUrl } from "../../../../../../../../../utils/combineUrl";
 
 import styles from "../../../../../ChatMessageBody.module.scss";
 import {
@@ -49,11 +51,14 @@ import {
 const SourceItem = ({ source, allowExternalNavigation }: { source: TToolCallResultSourceData; allowExternalNavigation?: boolean }) => {
   const tooltipId = useId();
   const [faviconLoadError, setFaviconLoadError] = useState(false);
+  const { baseUrl } = useApi();
 
   const isKnowledgeSource = !!source.fileId;
 
   const linkHref =
-    isKnowledgeSource && source.fileId ? source.relativeUrl : source.url;
+    isKnowledgeSource && source.fileId 
+      ? combineUrl(baseUrl, source.relativeUrl || "") 
+      : source.url;
 
   const sourceContent = isKnowledgeSource
     ? source.text

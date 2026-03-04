@@ -36,10 +36,13 @@ import { Text } from "../../../../../../../components/text";
 import type { MessageFilesProps } from "../../../../../Chat.types";
 
 import { openFile } from "../../../../../utils";
+import { useApi } from "../../../../../../../providers/api";
 
 import styles from "../../../ChatMessageBody.module.scss";
 
 const Files = ({ files, getIcon, reverse, allowExternalNavigation }: MessageFilesProps) => {
+  const { baseUrl } = useApi();
+  
   if (!files.length) return null;
 
   return (
@@ -55,7 +58,7 @@ const Files = ({ files, getIcon, reverse, allowExternalNavigation }: MessageFile
               [styles.disabledNavigation]: !allowExternalNavigation,
             })}
             key={file.id}
-            onClick={() => openFile(file.id.toString(), allowExternalNavigation)}
+            onClick={() => openFile(file.id.toString(), allowExternalNavigation, baseUrl)}
             data-testid="file-item"
           >
             {(() => {
