@@ -167,24 +167,6 @@ describe("<ChatNoAccessScreen />", () => {
     );
   });
 
-  it("hides settings button if allowExternalNavigation is false", () => {
-    render(
-      <ChatNoAccessScreen
-        {...defaultProps}
-        isPortalAdmin={true}
-        allowExternalNavigation={false}
-      />,
-    );
-
-    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
-
-    expect(EmptyView).toHaveBeenCalledWith(
-      expect.objectContaining({
-        options: [],
-      }),
-      undefined,
-    );
-  });
 
   it("hides settings button if goToAISettings is not provided", () => {
     render(

@@ -32,10 +32,10 @@ import { describe, it, expect, vi } from "vitest";
 import Files from "./index";
 import { ContentType } from "../../../../../../../enums";
 import type { TContent } from "../../../../../../../types/ai";
-import { openFile } from "../../../../../utils";
+import { openFileInEditor } from "../../../../../utils";
 
 vi.mock("../../../../../utils", () => ({
-  openFile: vi.fn(),
+  openFileInEditor: vi.fn(),
 }));
 
 vi.mock("../../../../../../../providers/api", () => ({
@@ -72,7 +72,7 @@ describe("Files component", () => {
       },
     ] as TContent[],
     getIcon: mockGetIcon,
-    allowExternalNavigation: true,
+    openFile: vi.fn(),
   };
 
   it("renders list of files with correct information", () => {
@@ -87,13 +87,23 @@ describe("Files component", () => {
     expect(screen.getByText(".png")).toBeInTheDocument();
   });
 
-  it("calls openFile when a file item is clicked", () => {
+  it("calls openFile prop when a file item is clicked", () => {
     render(<Files {...defaultProps} />);
 
     const fileItems = screen.getAllByTestId("file-item");
     fireEvent.click(fileItems[0]);
 
-    expect(openFile).toHaveBeenCalledWith("1", true, "mock-url");
+    expect(defaultProps.openFile).toHaveBeenCalledWith("1");
+  });
+
+  it("calls openFileInEditor from utils when openFile prop is not provided", () => {
+    const propsWithoutOpenFile = { ...defaultProps, openFile: undefined };
+    render(<Files {...propsWithoutOpenFile} />);
+
+    const fileItems = screen.getAllByTestId("file-item");
+    fireEvent.click(fileItems[0]);
+
+    expect(openFileInEditor).toHaveBeenCalledWith("1", "mock-url");
   });
 
   it("returns null when files list is empty", () => {

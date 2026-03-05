@@ -106,13 +106,13 @@ describe("<SourceView />", () => {
   };
 
   it("renders multiple source items", () => {
-    render(<SourceView content={mockContent} allowExternalNavigation={true} />);
+    render(<SourceView content={mockContent} />);
     const items = screen.getAllByTestId("source-item");
     expect(items).toHaveLength(2);
   });
 
   it("renders web source with link and icon", () => {
-    render(<SourceView content={mockContent} allowExternalNavigation={true} />);
+    render(<SourceView content={mockContent} />);
     const webSource = screen.getByText("Source 1").closest("a");
     expect(webSource).toHaveAttribute("href", "https://example.com/1");
     expect(screen.getByAltText("source icon")).toHaveAttribute(
@@ -122,17 +122,10 @@ describe("<SourceView />", () => {
   });
 
   it("renders knowledge source with document icon", () => {
-    render(<SourceView content={mockContent} allowExternalNavigation={true} />);
+    render(<SourceView content={mockContent} />);
     expect(screen.getByText("Document 1")).toBeInTheDocument();
     expect(screen.getByTestId("doc-icon")).toBeInTheDocument();
   });
 
-  it("respects allowExternalNavigation=false", () => {
-    render(
-      <SourceView content={mockContent} allowExternalNavigation={false} />,
-    );
-    const webSource = screen.getByText("Source 1").closest("div");
-    expect(webSource).not.toHaveAttribute("href");
-    expect(screen.queryByTestId("external-link-icon")).not.toBeInTheDocument();
-  });
+
 });

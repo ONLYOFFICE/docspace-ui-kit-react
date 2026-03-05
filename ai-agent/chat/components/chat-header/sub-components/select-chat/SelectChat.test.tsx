@@ -176,7 +176,7 @@ vi.mock("../../../../../../assets/message.save.svg", () => ({
 
 // Mock utils
 vi.mock("../../../../utils", () => ({
-  openFile: vi.fn(),
+  openFileInEditor: vi.fn(),
   getCommonTranslation: vi.fn((key: string) => key),
 }));
 

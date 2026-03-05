@@ -118,7 +118,6 @@ describe("<SearchToolContent />", () => {
     render(
       <SearchToolContent
         content={crawlingContent}
-        allowExternalNavigation={true}
       />,
     );
     expect(screen.getByTestId("universe-icon")).toBeInTheDocument();
@@ -131,19 +130,5 @@ describe("<SearchToolContent />", () => {
     expect(screen.getByTestId("external-link-icon")).toBeInTheDocument();
   });
 
-  it("renders WebCrawlingToolContent as text when navigation not allowed", () => {
-    const crawlingContent: TToolCallContent = {
-      ...mockContent,
-      name: "crawl",
-      result: { data: { title: "Page Title" } },
-    };
-    render(
-      <SearchToolContent
-        content={crawlingContent}
-        allowExternalNavigation={false}
-      />,
-    );
-    expect(screen.queryByRole("link")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("external-link-icon")).not.toBeInTheDocument();
-  });
+
 });
