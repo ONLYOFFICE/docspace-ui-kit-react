@@ -305,12 +305,11 @@ function ResponsiveChat() {
 1. **Agent ID**: Always provide a valid agent ID that the user has access to
 2. **Initialization Mode**: Use internal initialization (default) unless you need custom data fetching control
 3. **Auto-computed Props**: When using internal initialization, `selectedModel` and `aiReady` are computed automatically
-4. **External Initialization**: When `internalInit=false`, you must provide `selectedModel` and `aiReady`
-5. **File Attachments**: Set `allowAttachFiles={true}` only if multimodal is supported
-6. **Draft Persistence**: Enable `persistDraft` for better user experience in long sessions
-7. **Callbacks**: Implement `onSendMessage` and `onStreamData` for custom message handling
-8. **Custom Navigation**: Provide `openFile` and `openLink` callbacks to customize how files and links are opened
-9. **Error Handling**: Monitor the loading states and handle errors appropriately
+4. **External Initialization**: When `internalInit=false`, provide all required initialization data including `selectedModel`, `aiReady`, `initChats`, `messagesSettings`, and `toolsSettings`
+5. **Draft Persistence**: Enable `persistDraft` for better user experience in long sessions
+6. **Callbacks**: Implement `onSendMessage` and `onStreamData` for custom message handling
+7. **Custom Navigation**: Provide `openFile` and `openLink` callbacks to customize how files and links are opened
+8. **Error Handling**: Monitor the loading states and handle errors appropriately
 
 ## Common Use Cases
 
