@@ -41,7 +41,7 @@ import {
   DEFAULT_MAX_UPLOAD_FILES_COUNT,
 } from "../../constants";
 import { getCommonTranslation } from "../../utils";
-import { attachParentFolderId } from "./utils/folder";
+import { prepareFolderUpload } from "./utils/folder";
 import { isEmptyDirectoryFile } from "./utils/path";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import { useApi } from "../../providers/api";
@@ -84,13 +84,10 @@ const Uploader = ({
 
   const uploadFiles = useCallback(
     async (rawFiles: File[]) => {
-      const prepared = await attachParentFolderId(
-        rawFiles,
-        folderTargetId,
-        foldersApi,
-      );
+      const { files: preparedFiles, parentFolderMap } =
+        await prepareFolderUpload(rawFiles, folderTargetId, foldersApi);
 
-      const onlyFiles = prepared.filter((f) => !isEmptyDirectoryFile(f));
+      const onlyFiles = preparedFiles.filter((f) => !isEmptyDirectoryFile(f));
 
       const uploadedFiles: unknown[] = [];
 
@@ -100,7 +97,7 @@ const Uploader = ({
       setUploadPercent(0);
 
       await runWithConcurrency(onlyFiles, maxUploadFilesCount, async (file) => {
-        const targetFolderId = file.parentFolderId ?? folderTargetId;
+        const targetFolderId = parentFolderMap.get(file) ?? folderTargetId;
 
         const createOn = file.lastModified
           ? new Date(file.lastModified).toISOString()

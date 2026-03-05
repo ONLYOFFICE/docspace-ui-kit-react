@@ -26,7 +26,6 @@
 
 import type { FoldersApi } from "@onlyoffice/docspace-api-sdk";
 
-import type { TFileWithParentFolderId } from "../Uploader.types";
 import {
   getFilePath,
   getDirPathFromFilePath,
@@ -36,7 +35,7 @@ import {
 } from "./path";
 
 export const buildParentFolderMap = async (
-  files: TFileWithParentFolderId[],
+  files: File[],
   rootFolderId: number,
   foldersApi: FoldersApi,
 ) => {
@@ -82,11 +81,11 @@ export const buildParentFolderMap = async (
   return dirToId;
 };
 
-export const attachParentFolderId = async (
+export const prepareFolderUpload = async (
   files: File[],
   rootFolderId: number,
   foldersApi: FoldersApi,
-): Promise<TFileWithParentFolderId[]> => {
+): Promise<{ files: File[]; parentFolderMap: Map<File, number> }> => {
   const normalizedFiles = files.filter((f) => {
     const p = getFilePath(f);
     if (!p) return true;
@@ -94,7 +93,7 @@ export const attachParentFolderId = async (
   });
 
   const dirToId = await buildParentFolderMap(
-    normalizedFiles as TFileWithParentFolderId[],
+    normalizedFiles,
     rootFolderId,
     foldersApi,
   );
@@ -112,12 +111,5 @@ export const attachParentFolderId = async (
     }
   });
 
-  return normalizedFiles.map((f) => {
-    const parentFolderId = parentFolderMap.get(f);
-    return Object.assign(
-      Object.create(Object.getPrototypeOf(f)),
-      f,
-      parentFolderId ? { parentFolderId } : {},
-    ) as TFileWithParentFolderId;
-  });
+  return { files: normalizedFiles, parentFolderMap };
 };
