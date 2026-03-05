@@ -106,6 +106,11 @@ const meta: Meta<StoryArgs> = {
       control: "text",
       description: "Maximum total upload size (e.g. '100MB')",
     },
+    getFolderUrl: {
+      control: false,
+      description:
+        "Callback to generate folder URL for success toast link. If not provided, no link is shown.",
+    },
   },
   parameters: {
     docs: {

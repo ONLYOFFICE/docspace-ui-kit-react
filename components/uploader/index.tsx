@@ -67,6 +67,7 @@ const Uploader = ({
   isMultipleUpload,
   maxPerUploadSize,
   maxTotalUploadSize,
+  getFolderUrl,
 }: UploaderProps) => {
   const { operationsApi, foldersApi } = useApi();
 
@@ -258,22 +259,26 @@ const Uploader = ({
 
       try {
         const uploadedFiles = await uploadFiles(acceptedFiles);
-        const folderUrl = `${window.location.origin}/rooms/personal/filter?folder=${folderTargetId}`;
+        const folderUrl = getFolderUrl?.(folderTargetId);
 
         toastr.success(
           <>
             {getCommonTranslation("ItemsSuccessfullyUploaded", {
               count: acceptedFiles.length,
             })}
-            <br />
-            <a
-              href={folderUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "inherit", textDecoration: "underline" }}
-            >
-              {getCommonTranslation("Open")}
-            </a>
+            {folderUrl && (
+              <>
+                <br />
+                <a
+                  href={folderUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "inherit", textDecoration: "underline" }}
+                >
+                  {getCommonTranslation("Open")}
+                </a>
+              </>
+            )}
           </>,
           getCommonTranslation("Done"),
         );
@@ -298,6 +303,7 @@ const Uploader = ({
       maxTotalUploadSize,
       isFolderUpload,
       isMultipleUpload,
+      getFolderUrl,
     ],
   );
 

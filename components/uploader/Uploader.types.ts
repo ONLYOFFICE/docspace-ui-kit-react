@@ -72,6 +72,8 @@ export type UploaderProps = {
   maxPerUploadSize?: string;
   /** Maximum total upload size (e.g. "100MB") */
   maxTotalUploadSize?: string;
+  /** Callback to generate folder URL for success toast link. If not provided, no link is shown. */
+  getFolderUrl?: (folderId: number) => string;
 };
 
 export type TFileWithParentFolderId = File & { parentFolderId?: number };
