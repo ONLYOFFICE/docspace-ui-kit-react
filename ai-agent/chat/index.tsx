@@ -251,9 +251,13 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
   const { getIcon, isLoading: isLoadingGetIcon } = useGetIcon(getIconProp);
 
   const [isInitialized, setIsInitialized] = React.useState(false);
+  const prevAgentIdRef = React.useRef<string | number | null>(null);
 
   React.useEffect(() => {
     if (!agentId) return;
+    if (prevAgentIdRef.current === agentId) return;
+
+    prevAgentIdRef.current = agentId;
 
     const init = async () => {
       await Promise.all([
@@ -267,7 +271,14 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
     };
 
     init();
-  }, [agentId]);
+  }, [
+    agentId,
+    initChats.fetchChats,
+    initMessages,
+    fetchAiConfig,
+    fetchChatSettings,
+    toolsSettings.initTools,
+  ]);
 
   React.useEffect(() => {
     const onSelectChat = async () => {
@@ -276,7 +287,7 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
 
     window.addEventListener("select-chat", onSelectChat);
     return () => window.removeEventListener("select-chat", onSelectChat);
-  }, []);
+  }, [initMessages]);
 
   return (
     <ChatCore

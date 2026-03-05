@@ -70,7 +70,6 @@ export const ChatListItem = ({
 
   return (
     <DropDownItem
-      key={chat.id}
       onClick={(e) => {
         e.stopPropagation();
 
