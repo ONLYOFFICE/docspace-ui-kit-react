@@ -39,6 +39,7 @@ import { ComboBox, ComboBoxSize } from "../components/combobox";
 import type { TOption } from "../components/combobox/ComboBox.types";
 
 import FilesSelector from "../selectors/Files";
+import type { TSelectedFileInfo } from "../selectors/Files/FilesSelector.types";
 
 import { dataSets, getIsDisabled } from "./DocumentEditor.story.helper";
 
@@ -105,6 +106,8 @@ const meta: Meta<StoryArgs> = {
           <ErrorContainer
             headerText={error}
             bodyText="Make sure fileId, config, and docServiceUrl are valid and reachable"
+            buttonText="Try again"
+            onClickButton={() => window.location.reload()}
           />
         );
       }
@@ -206,15 +209,25 @@ export const FillSpreadsheetWithData: Story = {
       label: dataSets[0].label,
     });
 
-    const onSubmit = (selectedItemId: string | number | undefined) => {
-      setFileId(Number(selectedItemId));
+    const onSubmit = (
+      _selectedItemId: string | number | undefined,
+      _folderTitle: string,
+      _isPublic: boolean,
+      _breadCrumbs: unknown,
+      _fileName: string,
+      _isChecked: boolean,
+      _selectedTreeNode: unknown,
+      selectedFileInfo: TSelectedFileInfo,
+    ) => {
+      if (selectedFileInfo?.id !== undefined) {
+        setFileId(Number(selectedFileInfo.id));
+      }
     };
 
     if (!fileId)
       return (
         <>
           <FileInput
-            scale
             fromStorage
             placeholder="Choose file"
             size={InputSize.base}
