@@ -58,8 +58,6 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
   const headerAs = typeof headerText !== "string" ? "div" : undefined;
   const bodyAs = typeof bodyText !== "string" ? "div" : undefined;
 
-  console.log("iconName", iconName);
-
   const icon =
     typeof iconName === "string" ? <ReactSVG src={iconName} /> : iconName;
 
