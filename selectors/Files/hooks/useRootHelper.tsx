@@ -154,6 +154,7 @@ const useRootHelper = ({
           isFolder: true,
           avatar,
           disableMultiSelect: true,
+          isSystem: true,
         });
       }
     });
