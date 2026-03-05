@@ -137,13 +137,12 @@ const DropDownItem = ({
   paidLabel,
   ...rest
 }: DropDownItemProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const { isRTL } = useInterfaceDirection();
   const { isBase } = useTheme();
 
-  const resolvedBetaLabel =
-    betaLabel || getCommonTranslation("BetaLabel") || "";
-  const resolvedPaidLabel = paidLabel || getCommonTranslation("Paid") || "";
+  const resolvedBetaLabel = betaLabel || t("BetaLabel") || "";
+  const resolvedPaidLabel = paidLabel || t("Paid") || "";
 
   const withDisabledTooltip = disabled && tooltip;
 

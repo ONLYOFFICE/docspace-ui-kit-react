@@ -41,7 +41,7 @@ const HideArticleMenuButton = ({
   toggleShowText,
   withCustomSlot,
 }: ArticleHideMenuButtonProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
 
   return (
     <div
@@ -62,7 +62,7 @@ const HideArticleMenuButton = ({
             noSelect
             truncate
           >
-            {getCommonTranslation("HideArticleMenu")}
+            {t("HideArticleMenu")}
           </Text>
         </div>
       ) : (

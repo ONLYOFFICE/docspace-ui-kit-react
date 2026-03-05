@@ -53,7 +53,7 @@ const BackButton = ({
   toggleArticleOpen?: () => void;
   navigate?: (path: string) => void;
 }) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
 
   const onClickBack = () => {
     onLogoClickAction?.();
@@ -88,7 +88,7 @@ const BackButton = ({
       onClick={onClickBack}
     >
       <IconButton className={styles.arrowIcon} iconNode={icon} isClickable />
-      {showText ? <Text truncate>{getCommonTranslation("Back")}</Text> : null}
+      {showText ? <Text truncate>{t("Back")}</Text> : null}
     </div>
   );
 };

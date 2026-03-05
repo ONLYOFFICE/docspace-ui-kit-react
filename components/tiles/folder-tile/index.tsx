@@ -70,7 +70,7 @@ export const FolderTile = ({
   isBigFolder,
   temporaryIcon,
 }: FolderTileProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const childrenArray = React.Children.toArray(children);
   const [FolderTileContent] = childrenArray;
 
@@ -318,7 +318,7 @@ export const FolderTile = ({
                 e.stopPropagation();
                 onContextMenu(e);
               }}
-              title={getCommonTranslation("TitleShowActions")}
+              title={t("TitleShowActions")}
             />
           ) : (
             <div className="expandButton" />

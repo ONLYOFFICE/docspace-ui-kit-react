@@ -57,7 +57,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
     onSubmit,
   } = props;
 
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const { groupApi } = useApi();
   const { isBase } = useTheme();
 
@@ -175,11 +175,11 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       headerProps={{
         ...headerProps,
         onCloseClick: headerProps?.onCloseClick ?? onClose ?? (() => {}),
-        headerLabel: headerProps?.headerLabel || getCommonTranslation("Groups"),
+        headerLabel: headerProps?.headerLabel || t("Groups"),
       }}
       alwaysShowFooter={itemsList.length !== 0 || Boolean(searchValue)}
       withSearch
-      searchPlaceholder={getCommonTranslation("Search")}
+      searchPlaceholder={t("Search")}
       onSearch={onSearch}
       searchValue={searchValue}
       onClearSearch={onClearSearch}
@@ -187,16 +187,14 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       disableSubmitButton={!selectedItem}
       isMultiSelect={false}
       items={itemsList}
-      submitButtonLabel={getCommonTranslation("SelectAction")}
+      submitButtonLabel={t("SelectAction")}
       onSubmit={onSubmitAction}
       emptyScreenImage={emptyScreenImg}
-      emptyScreenHeader={getCommonTranslation("NotFoundGroups")}
-      emptyScreenDescription={getCommonTranslation("GroupsNotFoundDescription")}
+      emptyScreenHeader={t("NotFoundGroups")}
+      emptyScreenDescription={t("GroupsNotFoundDescription")}
       searchEmptyScreenImage={emptyScreenImg}
-      searchEmptyScreenHeader={getCommonTranslation("NotFoundGroups")}
-      searchEmptyScreenDescription={getCommonTranslation(
-        "GroupsNotFoundDescription",
-      )}
+      searchEmptyScreenHeader={t("NotFoundGroups")}
+      searchEmptyScreenDescription={t("GroupsNotFoundDescription")}
       totalItems={totalRef.current}
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}

@@ -30,7 +30,7 @@ import ErrorContainer from "../components/error-container/ErrorContainer";
 import styles from "./Errors.module.scss";
 
 export const AccessRestricted = () => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const ready = getTranslationReady();
 
   useEffect(() => {
@@ -41,9 +41,9 @@ export const AccessRestricted = () => {
     ready && (
       <div className={styles.accessRestrictedWrapper}>
         <ErrorContainer
-          headerText={getCommonTranslation("AccessDenied")}
-          bodyText={getCommonTranslation("PortalRestriction", {
-            productName: getCommonTranslation("ProductName") ?? "",
+          headerText={t("AccessDenied")}
+          bodyText={t("PortalRestriction", {
+            productName: t("ProductName") ?? "",
           })}
         />
       </div>

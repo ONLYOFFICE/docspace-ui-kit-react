@@ -64,7 +64,7 @@ const transformInitItems = (
     fileExst: string,
     size?: number,
   ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null,
-  getCommonTranslation: (key: string) => string,
+  t: (key: string) => string,
   initSelectedItemType?: string,
   filterParam?: string | number,
   disableBySecurity?: string,
@@ -95,10 +95,7 @@ const transformInitItems = (
     ...((withCreate && [
       {
         isCreateNewItem: true,
-        label:
-          initSelectedItemType === "files"
-            ? getCommonTranslation("NewFolder")
-            : getCommonTranslation("NewRoom"),
+        label: initSelectedItemType === "files" ? t("NewFolder") : t("NewRoom"),
         id: "create-folder-item",
         key: "create-folder-item",
         hotkey: "f",
@@ -129,7 +126,7 @@ const useSelectorState = ({
 
   disableBySecurity,
 }: UseSelectorStateProps & TFilesSelectorInit) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const { getIcon } = use(SettingsContext);
 
   const [breadCrumbs, setBreadCrumbs] = React.useState<TBreadCrumb[]>(
@@ -145,7 +142,7 @@ const useSelectorState = ({
           disabledItems,
           withCreate,
           getIcon,
-          getCommonTranslation,
+          t,
           initSelectedItemType,
           filterParam,
           disableBySecurity,

@@ -28,13 +28,13 @@ import { useCommonTranslation, getTranslationReady } from "../utils/i18n";
 import ErrorContainer from "../components/error-container/ErrorContainer";
 
 export const ErrorInvalidLink = () => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const ready = getTranslationReady();
 
   return ready ? (
     <ErrorContainer
-      headerText={getCommonTranslation("InvalidLink")}
-      bodyText={getCommonTranslation("LinkDoesNotExist")}
+      headerText={t("InvalidLink")}
+      bodyText={t("LinkDoesNotExist")}
     />
   ) : null;
 };

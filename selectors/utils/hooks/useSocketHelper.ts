@@ -58,7 +58,7 @@ const useSocketHelper = ({
   setTotal,
   disableBySecurity,
 }: UseSocketHelperProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const { getIcon } = React.use(SettingsContext);
   const { filesApi, foldersApi, roomsApi } = useApi();
 

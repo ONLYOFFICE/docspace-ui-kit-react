@@ -62,7 +62,7 @@ const FilterBlock = ({
   disableThirdParty,
   renderSelector,
 }: FilterBlockProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const [showSelector, setShowSelector] = React.useState<{
     show: boolean;
     type: string | null;
@@ -570,7 +570,7 @@ const FilterBlock = ({
           id="filter_apply-button"
           size={ButtonSize.normal}
           primary
-          label={getCommonTranslation("ApplyButton") ?? ""}
+          label={t("ApplyButton") ?? ""}
           scale
           onClick={onFilterAction}
           isDisabled={!showFooter}
@@ -579,7 +579,7 @@ const FilterBlock = ({
         <Button
           id="filter_cancel-button"
           size={ButtonSize.normal}
-          label={getCommonTranslation("CancelButton") ?? ""}
+          label={t("CancelButton") ?? ""}
           scale
           onClick={hideFilterBlock}
           isDisabled={isLoading}

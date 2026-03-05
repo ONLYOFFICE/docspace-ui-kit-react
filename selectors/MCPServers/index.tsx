@@ -91,7 +91,7 @@ const MCPServersSelector = ({
   withoutBackground,
   withBlur,
 }: MCPServersSelectorProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const { apiClient } = useApi();
   const { isBase } = useTheme();
 
@@ -112,7 +112,7 @@ const MCPServersSelector = ({
     (server: TServer): TSelectorItem => {
       const name =
         server.serverType === ServerType.Portal
-          ? `${getCommonTranslation("OrganizationName")} ${getCommonTranslation("ProductName")}`
+          ? `${t("OrganizationName")} ${t("ProductName")}`
           : server.name;
 
       return {
@@ -224,13 +224,13 @@ const MCPServersSelector = ({
           <EmptyScreenRoomSelectorDark />
         )
       }
-      emptyScreenHeader={getCommonTranslation("NoMCPServers", {
-        mcpServers: getCommonTranslation("MCPSettingTitle"),
+      emptyScreenHeader={t("NoMCPServers", {
+        mcpServers: t("MCPSettingTitle"),
       })}
-      emptyScreenDescription={getCommonTranslation("NoMCPServersDescription", {
-        mcpServers: getCommonTranslation("MCPSettingTitle"),
-        productName: getCommonTranslation("ProductName"),
-        aiAgent: getCommonTranslation("AIAgent"),
+      emptyScreenDescription={t("NoMCPServersDescription", {
+        mcpServers: t("MCPSettingTitle"),
+        productName: t("ProductName"),
+        aiAgent: t("AIAgent"),
       })}
       searchEmptyScreenImage={
         isBase ? (
@@ -239,11 +239,9 @@ const MCPServersSelector = ({
           <EmptyScreenRoomSelectorDark />
         )
       }
-      searchEmptyScreenHeader={getCommonTranslation("NotFoundTitle")}
-      searchEmptyScreenDescription={getCommonTranslation(
-        "SearchEmptyRoomsDescription",
-      )}
-      submitButtonLabel={getCommonTranslation("AddButton")}
+      searchEmptyScreenHeader={t("NotFoundTitle")}
+      searchEmptyScreenDescription={t("SearchEmptyRoomsDescription")}
+      submitButtonLabel={t("AddButton")}
       disableSubmitButton={false}
       onSubmit={onSubmitAction}
       rowLoader={<RowLoader />}
@@ -257,8 +255,8 @@ const MCPServersSelector = ({
       onSelect={onSelect}
       withHeader
       headerProps={{
-        headerLabel: getCommonTranslation("AvailableMCPServers", {
-          mcpServers: getCommonTranslation("MCPSettingTitle"),
+        headerLabel: t("AvailableMCPServers", {
+          mcpServers: t("MCPSettingTitle"),
         }),
         withoutBackButton: false,
         onBackClick: onBackClick,
@@ -266,7 +264,7 @@ const MCPServersSelector = ({
         withoutBorder: false,
       }}
       withCancelButton
-      cancelButtonLabel={getCommonTranslation("CancelButton")}
+      cancelButtonLabel={t("CancelButton")}
       onCancel={onBackClick}
       selectedItems={initedSelectedServersItems}
     />

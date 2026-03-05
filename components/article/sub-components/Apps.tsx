@@ -50,7 +50,7 @@ const ArticleApps = React.memo(
     officeforandroidUrl,
     officeforiosUrl,
   }: ArticleAppsProps) => {
-    const getCommonTranslation = useCommonTranslation();
+    const t = useCommonTranslation();
 
     if (!showText) return null;
 
@@ -70,7 +70,7 @@ const ArticleApps = React.memo(
           lineHeight="12px"
           fontWeight={600}
         >
-          {getCommonTranslation("DownloadApps")}
+          {t("DownloadApps")}
         </Text>
         <div className="download-app-list">
           {downloaddesktopUrl ? (
@@ -80,7 +80,7 @@ const ArticleApps = React.memo(
               iconNode={<WindowsReactSvgUrl />}
               size={32}
               isFill
-              title={getCommonTranslation("MobileWin", {
+              title={t("MobileWin", {
                 organizationName: logoText,
               })}
             />
@@ -93,7 +93,7 @@ const ArticleApps = React.memo(
               iconNode={<MacOSReactSvgUrl />}
               size={32}
               isFill
-              title={getCommonTranslation("MobileMac", {
+              title={t("MobileMac", {
                 organizationName: logoText,
               })}
             />
@@ -106,7 +106,7 @@ const ArticleApps = React.memo(
               iconNode={<LinuxReactSvgUrl />}
               size={32}
               isFill
-              title={getCommonTranslation("MobileLinux", {
+              title={t("MobileLinux", {
                 organizationName: logoText,
               })}
             />
@@ -119,7 +119,7 @@ const ArticleApps = React.memo(
               iconNode={<AndroidReactSvgUrl />}
               size={32}
               isFill
-              title={getCommonTranslation("MobileAndroid", {
+              title={t("MobileAndroid", {
                 organizationName: logoText,
               })}
             />
@@ -132,7 +132,7 @@ const ArticleApps = React.memo(
               iconNode={<IOSReactSvgUrl />}
               size={32}
               isFill
-              title={getCommonTranslation("MobileIos", {
+              title={t("MobileIos", {
                 organizationName: logoText,
               })}
             />

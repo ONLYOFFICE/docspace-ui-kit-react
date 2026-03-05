@@ -47,7 +47,7 @@ export const TemplateTile = ({
   onSelect,
   ...rest
 }: TemplateTileProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const childrenArray = React.Children.toArray(children);
   const [TileContent] = childrenArray;
 
@@ -70,7 +70,7 @@ export const TemplateTile = ({
     <div className={styles.wrapper}>
       <div className={styles.field}>
         <Text truncate fontSize="13px" fontWeight={400} className={styles.text}>
-          {getCommonTranslation("Owner")}
+          {t("Owner")}
         </Text>
         {showStorageInfo ? (
           <Text
@@ -79,7 +79,7 @@ export const TemplateTile = ({
             fontWeight={400}
             className={styles.text}
           >
-            {getCommonTranslation("Storage")}
+            {t("Storage")}
           </Text>
         ) : null}
       </div>

@@ -77,7 +77,7 @@ const FileTile = ({
   dataTestId,
   ...rest
 }: FileTileProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const childrenArray = React.Children.toArray(children);
   const [FilesTileContent] = childrenArray;
 
@@ -371,7 +371,7 @@ const FileTile = ({
                 e.stopPropagation();
                 onContextMenu(e);
               }}
-              title={getCommonTranslation("TitleShowActions")}
+              title={t("TitleShowActions")}
             />
           ) : (
             <div className="expandButton" />

@@ -67,7 +67,7 @@ const ViewSelector = ({
   style,
   ...rest
 }: ViewSelectorProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const onChangeViewHandler = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isDisabled) return;
 
@@ -108,8 +108,8 @@ const ViewSelector = ({
           data-view={value}
           title={
             value === "row"
-              ? (getCommonTranslation("SwitchViewToCompact") ?? "")
-              : (getCommonTranslation("SwitchToThumbnails") ?? "")
+              ? (t("SwitchViewToCompact") ?? "")
+              : (t("SwitchToThumbnails") ?? "")
           }
           data-testid="view-selector-icon"
         >
@@ -138,8 +138,8 @@ const ViewSelector = ({
           data-view={value}
           title={
             value === "row"
-              ? (getCommonTranslation("SwitchViewToCompact") ?? "")
-              : (getCommonTranslation("SwitchToThumbnails") ?? "")
+              ? (t("SwitchViewToCompact") ?? "")
+              : (t("SwitchToThumbnails") ?? "")
           }
           data-testid="view-selector-icon"
         >

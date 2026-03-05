@@ -66,7 +66,7 @@ const EmptyScreen = ({
   inputItemVisible,
   hideBackButton,
 }: EmptyScreenProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const {
     emptyScreenImage,
     emptyScreenHeader,
@@ -194,9 +194,7 @@ const EmptyScreen = ({
             />
 
             <Link {...linkStyles}>
-              {withSearch
-                ? getCommonTranslation("ClearFilter") || ""
-                : getCommonTranslation("Back") || ""}
+              {withSearch ? t("ClearFilter") || "" : t("Back") || ""}
             </Link>
           </div>
         ) : null}

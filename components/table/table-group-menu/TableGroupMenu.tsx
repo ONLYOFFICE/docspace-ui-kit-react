@@ -65,7 +65,7 @@ const GroupMenu: FC<TGroupMenuProps> = memo(
 );
 
 const TableGroupMenu = memo((props: TableGroupMenuProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
 
   const {
     isChecked,
@@ -126,7 +126,7 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
           onChange={onCheckboxChange}
           isChecked={isChecked}
           isIndeterminate={isIndeterminate}
-          title={getCommonTranslation("MainHeaderSelectAll")}
+          title={t("MainHeaderSelectAll")}
         />
       )}
 
@@ -141,7 +141,7 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
           selectedOption={EMPTY_OBJECT as TOption}
           manualY="42px"
           manualX="-32px"
-          title={getCommonTranslation("TitleSelectFile")}
+          title={t("TitleSelectFile")}
           isMobileView={isMobileView}
           onSelect={FUNCTION_EMPTY}
           dataTestId="table_group_menu_combobox"

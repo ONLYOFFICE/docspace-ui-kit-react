@@ -68,7 +68,7 @@ export const BaseTile = ({
   dataTestId,
   badgeUrl,
 }: BaseTileProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const childrenArray = React.Children.toArray(topContent);
 
   const cmRef = useRef<ContextMenuRefType>(null);
@@ -210,7 +210,7 @@ export const BaseTile = ({
                 e.stopPropagation();
                 onContextMenu(e);
               }}
-              title={getCommonTranslation("TitleShowFolderActions")}
+              title={t("TitleShowFolderActions")}
             />
           ) : (
             <div className="expandButton" />

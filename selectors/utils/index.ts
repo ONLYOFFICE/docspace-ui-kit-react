@@ -216,9 +216,9 @@ export const convertFoldersToItems: (
   return items;
 };
 
-export const getDefaultBreadCrumb = () => {
+export const getDefaultBreadCrumb = (t: (key: string) => string) => {
   return {
-    label: getCommonTranslation("ProductName"),
+    label: t("ProductName"),
     id: 0,
     isRoom: false,
   };

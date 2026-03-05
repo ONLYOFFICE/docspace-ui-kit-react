@@ -55,7 +55,7 @@ const ArticleLiveChat = ({
   isShowLiveChat,
   isInfoPanelVisible,
 }: ArticleZendeskProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const ready = getTranslationReady();
   const { currentColorScheme } = useTheme();
   const { isRTL } = useInterfaceDirection();
@@ -91,14 +91,14 @@ const ArticleLiveChat = ({
       zendeskAPI.addChanges("webWidget", "updateSettings", {
         launcher: {
           label: {
-            "*": getCommonTranslation("Support"), // t("Common:Support"),
+            "*": t("Support"), // t("Common:Support"),
           },
           chatLabel: {
-            "*": getCommonTranslation("Support"),
+            "*": t("Support"),
           },
         },
       });
-  }, [languageBaseName, ready, getCommonTranslation]);
+  }, [languageBaseName, ready, t]);
 
   useEffect(() => {
     zendeskAPI.addChanges("webWidget", "updateSettings", {

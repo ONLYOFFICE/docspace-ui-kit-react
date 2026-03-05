@@ -75,7 +75,7 @@ const AIAgentSelectorComponent = ({
   initSearchValue,
   disableBySecurity,
 }: AIAgentSelectorProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const { isBase } = useTheme();
 
   const { isFirstLoad, isNextPageLoading, setIsFirstLoad } =
@@ -181,8 +181,8 @@ const AIAgentSelectorComponent = ({
     withCreate: true,
     isInit: isInitRef.current,
     setIsInit,
-    createDefineLabel: getCommonTranslation("CreateAIAgent", {
-      aiAgent: getCommonTranslation("AIAgent"),
+    createDefineLabel: t("CreateAIAgent", {
+      aiAgent: t("AIAgent"),
     }),
     excludeItems,
     searchValue,
@@ -208,7 +208,7 @@ const AIAgentSelectorComponent = ({
   const headerSelectorProps: TSelectorHeader = {
     withHeader: true,
     headerProps: {
-      headerLabel: getCommonTranslation("AIAgents"),
+      headerLabel: t("AIAgents"),
       onCloseClick: onClose,
       isCloseable: true,
     },
@@ -216,13 +216,13 @@ const AIAgentSelectorComponent = ({
 
   const cancelButtonSelectorProps: TSelectorCancelButton = {
     withCancelButton: true,
-    cancelButtonLabel: getCommonTranslation("CancelButton"),
+    cancelButtonLabel: t("CancelButton"),
     onCancel: onClose,
   };
 
   const searchSelectorProps: TSelectorSearch = {
     withSearch: true,
-    searchPlaceholder: getCommonTranslation("Search"),
+    searchPlaceholder: t("Search"),
     searchValue,
     onSearch: onSearchAction,
     onClearSearch: onClearSearchAction,
@@ -241,7 +241,7 @@ const AIAgentSelectorComponent = ({
       withPadding={withPadding}
       onSelect={onSelect}
       items={items}
-      submitButtonLabel={getCommonTranslation("SelectAction")}
+      submitButtonLabel={t("SelectAction")}
       onSubmit={onSubmit}
       isMultiSelect={false}
       emptyScreenImage={
@@ -251,10 +251,10 @@ const AIAgentSelectorComponent = ({
           <EmptyScreenAIAgentsSelectorDark />
         )
       }
-      emptyScreenHeader={getCommonTranslation("NoAIAgents", {
-        aiAgents: getCommonTranslation("AIAgents"),
+      emptyScreenHeader={t("NoAIAgents", {
+        aiAgents: t("AIAgents"),
       })}
-      emptyScreenDescription={getCommonTranslation("NoAIAgentsDescription")}
+      emptyScreenDescription={t("NoAIAgentsDescription")}
       searchEmptyScreenImage={
         isBase ? (
           <EmptyScreenAIAgentsSelectorLight />
@@ -262,12 +262,10 @@ const AIAgentSelectorComponent = ({
           <EmptyScreenAIAgentsSelectorDark />
         )
       }
-      searchEmptyScreenHeader={getCommonTranslation("NoAIAgentsSearch", {
-        aiAgents: getCommonTranslation("AIAgents"),
+      searchEmptyScreenHeader={t("NoAIAgentsSearch", {
+        aiAgents: t("AIAgents"),
       })}
-      searchEmptyScreenDescription={getCommonTranslation(
-        "NoAIAgentsSearchDescription",
-      )}
+      searchEmptyScreenDescription={t("NoAIAgentsSearchDescription")}
       totalItems={total}
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
@@ -288,12 +286,12 @@ const AIAgentSelectorComponent = ({
       onClose={onClose}
       withInfoBar={withInfo}
       infoBarData={{
-        title: getCommonTranslation("ChooseAIAgent", {
-          aiAgent: getCommonTranslation("AIAgent"),
+        title: t("ChooseAIAgent", {
+          aiAgent: t("AIAgent"),
         }),
         icon: <InfoIconSvgUrl />,
         onClose: () => setWithInfo(!withInfo),
-        description: getCommonTranslation("ChooseAIAgentDescription"),
+        description: t("ChooseAIAgentDescription"),
       }}
       hideBackButton
     />

@@ -29,15 +29,15 @@ import ErrorContainer from "../components/error-container/ErrorContainer";
 import styles from "./Errors.module.scss";
 
 const ErrorUnavailable = () => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const ready = getTranslationReady();
 
   return (
     ready && (
       <div className={styles.errorUnavailableWrapper}>
         <ErrorContainer
-          headerText={getCommonTranslation("ErrorDeactivatedText", {
-            productName: getCommonTranslation("ProductName") ?? "",
+          headerText={t("ErrorDeactivatedText", {
+            productName: t("ProductName") ?? "",
           })}
         />
       </div>

@@ -121,9 +121,9 @@ const toListItem = (
       disableDisabledUsers && status === EmployeeStatus.Terminated;
 
     const disabledText = isInvited
-      ? (disabledInvitedText ?? getCommonTranslation("Invited"))
+      ? (disabledInvitedText ?? t("Invited"))
       : isDisabled
-        ? getCommonTranslation("Disabled")
+        ? t("Disabled")
         : "";
 
     const avatarRole = getUserAvatarRoleByType(role);
@@ -161,9 +161,7 @@ const toListItem = (
 
   const isInvited =
     (id && disableInvitedUsers?.includes(id)) || (isRoom && shared);
-  const disabledText = isInvited
-    ? (disabledInvitedText ?? getCommonTranslation("Invited"))
-    : "";
+  const disabledText = isInvited ? (disabledInvitedText ?? t("Invited")) : "";
 
   return {
     id,
@@ -248,7 +246,7 @@ const PeopleSelector = ({
   disabledInvitedText,
   isAgent,
 }: PeopleSelectorProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const { peopleSearchApi, groupSearchApi, baseUrl } = useApi();
   const { isBase } = useTheme();
 
@@ -570,8 +568,7 @@ const PeopleSelector = ({
         withHeader,
         headerProps: {
           ...headerProps,
-          headerLabel:
-            headerProps.headerLabel || getCommonTranslation("Contacts"),
+          headerLabel: headerProps.headerLabel || t("Contacts"),
         },
       }
     : ({} as TSelectorHeader);
@@ -579,15 +576,14 @@ const PeopleSelector = ({
   const cancelButtonSelectorProps: TSelectorCancelButton = withCancelButton
     ? {
         withCancelButton,
-        cancelButtonLabel:
-          cancelButtonLabel || getCommonTranslation("CancelButton"),
+        cancelButtonLabel: cancelButtonLabel || t("CancelButton"),
         onCancel,
       }
     : ({} as TSelectorCancelButton);
 
   const searchSelectorProps: TSelectorSearch = {
     withSearch: true,
-    searchPlaceholder: getCommonTranslation("Search"),
+    searchPlaceholder: t("Search"),
     searchValue,
     onSearch,
     onClearSearch,
@@ -647,7 +643,7 @@ const PeopleSelector = ({
           </Text>
           {!isGroup && String(id) === currentUserId ? (
             <Text className={styles.isMeLabel} fontWeight={600} fontSize="14px">
-              ({getCommonTranslation("MeLabel")})
+              ({t("MeLabel")})
             </Text>
           ) : null}
           {status === EmployeeStatus.Pending ? <StyledSendClockIcon /> : null}
@@ -688,14 +684,14 @@ const PeopleSelector = ({
           tabsData: [
             {
               id: PEOPLE_TAB_ID,
-              name: getCommonTranslation("Members"),
+              name: t("Members"),
               onClick: () => changeActiveTab(PEOPLE_TAB_ID),
               content: null,
             },
             ...[
               withGroups && {
                 id: GROUP_TAB_ID,
-                name: getCommonTranslation("Groups"),
+                name: t("Groups"),
                 onClick: () => changeActiveTab(GROUP_TAB_ID),
                 content: null,
               },
@@ -703,7 +699,7 @@ const PeopleSelector = ({
             ...[
               withGuests && {
                 id: GUESTS_TAB_ID,
-                name: getCommonTranslation("Guests"),
+                name: t("Guests"),
                 onClick: () => changeActiveTab(GUESTS_TAB_ID),
                 content: null,
               },
@@ -751,9 +747,7 @@ const PeopleSelector = ({
       data-selector-type={dataSelectorType || "people"}
       dataTestId={dataTestId || "people-selector"}
       items={itemsList}
-      submitButtonLabel={
-        submitButtonLabel || getCommonTranslation("SelectAction")
-      }
+      submitButtonLabel={submitButtonLabel || t("SelectAction")}
       onSubmit={onSubmit}
       disableSubmitButton={disableSubmitButton || !selectedItems.length}
       selectedItem={isMultiSelect ? null : selectedItems[0]}
@@ -762,37 +756,37 @@ const PeopleSelector = ({
       emptyScreenHeader={
         emptyScreenHeader ??
         (activeTabId === GUESTS_TAB_ID
-          ? getCommonTranslation("NotFoundGuests")
+          ? t("NotFoundGuests")
           : activeTabId === PEOPLE_TAB_ID
-            ? getCommonTranslation("EmptyHeader")
-            : getCommonTranslation("NotFoundGroups"))
+            ? t("EmptyHeader")
+            : t("NotFoundGroups"))
       }
       emptyScreenDescription={
         emptyScreenDescription ??
         (activeTabId === GUESTS_TAB_ID
           ? isAgent
-            ? getCommonTranslation("NotFoundGuestsDescriptionAgent")
-            : getCommonTranslation("NotFoundGuestsDescription")
+            ? t("NotFoundGuestsDescriptionAgent")
+            : t("NotFoundGuestsDescription")
           : activeTabId === PEOPLE_TAB_ID
-            ? getCommonTranslation("EmptyDescription", {
-                productName: getCommonTranslation("ProductName"),
+            ? t("EmptyDescription", {
+                productName: t("ProductName"),
               })
-            : getCommonTranslation("GroupsNotFoundDescription"))
+            : t("GroupsNotFoundDescription"))
       }
       searchEmptyScreenImage={emptyScreenImage}
       searchEmptyScreenHeader={
         activeTabId === GUESTS_TAB_ID
-          ? getCommonTranslation("NotFoundGuestsFilter")
+          ? t("NotFoundGuestsFilter")
           : activeTabId === PEOPLE_TAB_ID
-            ? getCommonTranslation("NotFoundMembers")
-            : getCommonTranslation("NotFoundGroups")
+            ? t("NotFoundMembers")
+            : t("NotFoundGroups")
       }
       searchEmptyScreenDescription={
         activeTabId === GUESTS_TAB_ID
-          ? getCommonTranslation("NotFoundFilterGuestsDescription")
+          ? t("NotFoundFilterGuestsDescription")
           : activeTabId === PEOPLE_TAB_ID
-            ? getCommonTranslation("NotFoundUsersDescription")
-            : getCommonTranslation("GroupsNotFoundDescription")
+            ? t("NotFoundUsersDescription")
+            : t("GroupsNotFoundDescription")
       }
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}

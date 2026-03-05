@@ -71,7 +71,7 @@ const useRoomsHelper = ({
   setSelectedItemSecurity,
   setSelectedTreeNode,
 }: UseRoomsHelperProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const {
     setIsNextPageLoading,
     setIsBreadCrumbsLoading,
@@ -99,12 +99,7 @@ const useRoomsHelper = ({
   const createDropDownItems = React.useMemo(() => {
     return RoomsTypeValues.map((value) => {
       const onClick = () => {
-        addInputItem(
-          "",
-          "",
-          value as RoomTypeEnum,
-          getCommonTranslation("EnterName"),
-        );
+        addInputItem("", "", value as RoomTypeEnum, t("EnterName"));
       };
 
       return (
@@ -179,7 +174,7 @@ const useRoomsHelper = ({
           { label: title!, id: id!, isRoom: true },
         ];
 
-        if (!isRoomsOnly) breadCrumbs.unshift({ ...getDefaultBreadCrumb() });
+        if (!isRoomsOnly) breadCrumbs.unshift({ ...getDefaultBreadCrumb(t) });
 
         onSetBaseFolderPath?.(breadCrumbs);
 
@@ -208,7 +203,7 @@ const useRoomsHelper = ({
           setTotal(total + 1);
           const createItem: TSelectorItem = {
             isCreateNewItem: true,
-            label: createDefineRoomLabel ?? getCommonTranslation("NewRoom"),
+            label: createDefineRoomLabel ?? t("NewRoom"),
             id: "create-room-item",
             key: "create-room-item",
             hotkey: "r",

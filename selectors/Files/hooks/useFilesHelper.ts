@@ -96,7 +96,7 @@ const useFilesHelper = ({
 
   disableBySecurity,
 }: UseFilesHelpersProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const {
     isFirstLoad,
     setIsFirstLoad,
@@ -298,7 +298,7 @@ const useFilesHelper = ({
           // });
 
           if (!isThirdParty && !isRoomsOnly && !isUserOnly)
-            breadCrumbs.unshift({ ...getDefaultBreadCrumb() });
+            breadCrumbs.unshift({ ...getDefaultBreadCrumb(t) });
 
           onSetBaseFolderPath?.(isErrorPath ? [] : breadCrumbs);
 
@@ -313,15 +313,12 @@ const useFilesHelper = ({
             setTotal(total + 1);
             itemList.unshift({
               isCreateNewItem: true,
-              label: getCommonTranslation("NewFolder"),
+              label: t("NewFolder"),
               id: "create-folder-item",
               key: "create-folder-item",
               hotkey: "f",
               onCreateClick: () =>
-                addInputItem(
-                  getCommonTranslation("NewFolder"),
-                  React.createElement(FolderSvg),
-                ),
+                addInputItem(t("NewFolder"), React.createElement(FolderSvg)),
               onBackClick: () => {
                 let isRooms = false;
                 setBreadCrumbs((val) => {

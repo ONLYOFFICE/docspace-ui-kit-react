@@ -44,7 +44,7 @@ const EmptyScreenFormRoom = ({
   onCreateClickAction,
   createDefineRoomType,
 }: EmptyScreenFormRoomProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const { isBase } = useTheme();
 
   const FormRoomEmptyScreenImage = isBase
@@ -53,20 +53,20 @@ const EmptyScreenFormRoom = ({
 
   const description =
     createDefineRoomType === RoomType.FillingFormsRoom
-      ? getCommonTranslation("SelectorFormRoomEmptyScreenDescription") || "" // t("SelectorFormRoomEmptyScreenDescription")
-      : getCommonTranslation("SelectorVDREmptyScreenDescription") || ""; // t("SelectorVDREmptyScreenDescription")
+      ? t("SelectorFormRoomEmptyScreenDescription") || "" // t("SelectorFormRoomEmptyScreenDescription")
+      : t("SelectorVDREmptyScreenDescription") || ""; // t("SelectorVDREmptyScreenDescription")
 
   const buttonLabel =
     createDefineRoomType === RoomType.FillingFormsRoom
-      ? getCommonTranslation("CreateFormFillingRoom") || ""
-      : getCommonTranslation("CreateVirtualDataRoom") || "";
+      ? t("CreateFormFillingRoom") || ""
+      : t("CreateVirtualDataRoom") || "";
 
   return (
     <section className={styles.newEmptyScreen}>
       <FormRoomEmptyScreenImage className="empty-image" />
       <Heading level={3} className="empty-header">
         {/* t("NoRoomsFound") */}
-        {getCommonTranslation("NoRoomsFound") || ""}
+        {t("NoRoomsFound") || ""}
       </Heading>
       <Text className="empty-description">{description}</Text>
       <div className="empty_button-wrapper" onClick={onCreateClickAction}>

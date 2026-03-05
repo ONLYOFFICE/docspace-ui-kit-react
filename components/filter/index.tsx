@@ -135,7 +135,7 @@ const FilterInput = React.memo(
     organizeRoomsGrouping,
     isFilterOrSearchActive,
   }: FilterProps) => {
-    const getCommonTranslation = useCommonTranslation();
+    const t = useCommonTranslation();
 
     const { searchComponent } = useSearch({
       onSearch,
@@ -577,10 +577,10 @@ const FilterInput = React.memo(
 
     const overflowContextMenuHeader = React.useMemo(
       () => ({
-        title: getCommonTranslation("RoomGroups"),
+        title: t("RoomGroups"),
         icon: "",
       }),
-      [getCommonTranslation],
+      [t],
     );
 
     const onOverflowContextMenu = React.useCallback((e: React.MouseEvent) => {
@@ -696,7 +696,7 @@ const FilterInput = React.memo(
                 onClick={clearAll}
                 dataTestId="filter_clear_all_link"
               >
-                {getCommonTranslation("ClearAll")}
+                {t("ClearAll")}
               </Link>
             ) : null}
           </div>
@@ -711,7 +711,7 @@ const FilterInput = React.memo(
                 <div className="group-tags">
                   <SelectedItem
                     propKey="all-rooms"
-                    label={getCommonTranslation("AllRooms")}
+                    label={t("AllRooms")}
                     onClick={() => handleFilterByGroup(null)}
                     onClose={() => {}}
                     hideCross
@@ -721,7 +721,7 @@ const FilterInput = React.memo(
                   {showCreateGroupButton && (
                     <SelectedItem
                       propKey="create-group"
-                      label={getCommonTranslation("CreateGroup")}
+                      label={t("CreateGroup")}
                       icon={PlusIcon}
                       onClick={handleCreateGroupClick}
                       onClose={() => {}}
@@ -809,7 +809,7 @@ const FilterInput = React.memo(
               <div className={styles.groupTagsMeasure} aria-hidden>
                 <SelectedItem
                   propKey="m-all"
-                  label={getCommonTranslation("AllRooms")}
+                  label={t("AllRooms")}
                   onClick={() => {}}
                   onClose={() => {}}
                   hideCross
@@ -841,7 +841,7 @@ const FilterInput = React.memo(
                 <TooltipContainer
                   as="div"
                   className={styles.groupManagementButton}
-                  title={getCommonTranslation("ManageGroupRooms")}
+                  title={t("ManageGroupRooms")}
                   onClick={onCreateGroup}
                 >
                   <IconButton

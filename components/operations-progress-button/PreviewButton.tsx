@@ -53,7 +53,7 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
   allOperationsLength,
   setShowSeveralOperationsIcon,
 }) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [animationState, setAnimationState] = useState<
     "raising" | "dropping" | "hidingUnder"
@@ -297,7 +297,7 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
           (dropTargetFolderName || lastKnownTitle) ? (
             <Text fontWeight={600} fontSize="14px">
               {/* t("Common:DropToLocation", { folderName: dropTargetFolderName || lastKnownTitle }) */}
-              {getCommonTranslation("DropToLocation", {
+              {t("DropToLocation", {
                 folderName: dropTargetFolderName! || lastKnownTitle!,
               })}
             </Text>

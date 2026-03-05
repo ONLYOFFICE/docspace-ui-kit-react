@@ -51,7 +51,7 @@ const ColorPicker = ({
   handleChange,
   hexCodeLabel = "Hex code",
 }: ColorPickerProps) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const [color, setColor] = useState(() => appliedColor);
 
   const onColorChange = (newColor: string) => {
@@ -77,7 +77,7 @@ const ColorPicker = ({
               truncate
               data-testid="color-picker-title"
             >
-              {getCommonTranslation("Custom")}
+              {t("Custom")}
             </Text>
           </div>
           <div className={styles.hexClose}>

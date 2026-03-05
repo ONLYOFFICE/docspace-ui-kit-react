@@ -86,7 +86,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   isDragging,
   clearDropPreviewLocation,
 }) => {
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
   const [isOpenDropdown, setIsOpenDropdown] = useState<boolean>(false);
   const [isHideTooltip, setIsHideTooltip] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -292,7 +292,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       return (
         <Text fontWeight={600}>
           {/* t("Common:Processes", { count: allOperationsLength }) */}
-          {getCommonTranslation("Processes", { count: allOperationsLength })}
+          {t("Processes", { count: allOperationsLength })}
         </Text>
       );
     }
@@ -316,7 +316,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
             {operationName}
             <br />
             {/* t("Common:ErrorUploadingFiles", { count: getErrorCount() }) */}
-            {getCommonTranslation("ErrorUploadingFiles", {
+            {t("ErrorUploadingFiles", {
               count: getErrorCount()!,
             })}
           </Text>
@@ -326,7 +326,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       return (
         <Text fontWeight={600}>
           {/* t("Common:ErrorOperation", { operationName }) */}
-          {getCommonTranslation("ErrorOperation", {
+          {t("ErrorOperation", {
             operationName,
           })}
         </Text>
@@ -341,7 +341,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       return (
         <Text fontWeight={600}>
           {/* t("Common:SuccessOperation", { operationName }) */}
-          {getCommonTranslation("SuccessOperation", {
+          {t("SuccessOperation", {
             operationName,
           })}
         </Text>
@@ -368,7 +368,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   };
 
   const onCancelOperation = () => {
-    cancelUpload?.(getCommonTranslation);
+    cancelUpload?.(t);
   };
 
   const disableOpenPanel =

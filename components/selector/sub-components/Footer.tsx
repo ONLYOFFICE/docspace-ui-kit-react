@@ -68,7 +68,7 @@ const Footer = React.memo(
     requestRunning,
     withErrorFooter,
   }: FooterProps) => {
-    const getCommonTranslation = useCommonTranslation();
+    const t = useCommonTranslation();
     const ref = useRef<HTMLDivElement>(null);
 
     const label =
@@ -123,7 +123,7 @@ const Footer = React.memo(
                   fontSize="12px"
                   lineHeight="16px"
                 >
-                  {getCommonTranslation("ContainsSpecCharacter") || ""}
+                  {t("ContainsSpecCharacter") || ""}
                 </Text>
               ) : null}
             </div>

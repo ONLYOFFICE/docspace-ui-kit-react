@@ -65,7 +65,7 @@ const ArticleDevToolsBar = ({
     onClick(e);
   };
 
-  const getCommonTranslation = useCommonTranslation();
+  const t = useCommonTranslation();
 
   if (!showText) return null;
 
@@ -81,7 +81,7 @@ const ArticleDevToolsBar = ({
     >
       <DeveloperReactSvg className="icon" />
       <Text fontWeight={600} fontSize="12px" className="label">
-        {getCommonTranslation("DeveloperTools")}
+        {t("DeveloperTools")}
       </Text>
       <ArrowReactSvg className="arrow" />
     </div>
