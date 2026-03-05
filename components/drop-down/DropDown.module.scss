@@ -69,6 +69,14 @@
     display: table;
   }
 
+  &.useFlexibleHeight.open {
+    display: block;
+  }
+
+  &.useFlexibleHeight.open:not(.mobileView) {
+    width: fit-content;
+  }
+
   &.withColumns {
     display: block;
 
