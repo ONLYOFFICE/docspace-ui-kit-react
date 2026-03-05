@@ -389,12 +389,12 @@ export default class MessageStore {
     const fileId = Number(data?.id);
     if (!Number.isInteger(fileId) || fileId <= 0) return;
 
-    const webSearhParams = new URLSearchParams();
+    const webSearchParams = new URLSearchParams();
 
-    webSearhParams.append("fileId", String(fileId));
-    webSearhParams.append("withTool", "true");
+    webSearchParams.append("fileId", String(fileId));
+    webSearchParams.append("withTool", "true");
 
-    const url = `${window.location.origin}/doceditor?${webSearhParams.toString()}`;
+    const url = `${window.location.origin}/doceditor?${webSearchParams.toString()}`;
 
     window.open(url, "_blank");
   };

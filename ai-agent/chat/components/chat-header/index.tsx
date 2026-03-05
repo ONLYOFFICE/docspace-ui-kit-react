@@ -24,7 +24,6 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useRef } from "react";
 import { observer } from "mobx-react";
 
 import { ChatHeaderProps } from "../../Chat.types";
@@ -48,11 +47,8 @@ const ChatHeader = ({
   onSelectChat,
   modelAliases,
 }: ChatHeaderProps) => {
-  const headerRef = useRef<HTMLDivElement>(null);
-
   return (
     <div
-      ref={headerRef}
       className={`${styles.chatHeader} chat-header`}
       data-testid="chat-header"
     >
