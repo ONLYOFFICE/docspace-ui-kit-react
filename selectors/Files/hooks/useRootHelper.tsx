@@ -124,6 +124,7 @@ const useRootHelper = ({
           folder.rootFolderType === FolderType.AiAgents)
       ) {
         let title = "";
+
         switch (folder.rootFolderType) {
           case FolderType.USER:
             title = getCommonTranslation("MyDocuments");
@@ -143,6 +144,7 @@ const useRootHelper = ({
           default:
             break;
         }
+
         newItems.push({
           label: title,
           id: folder.id!,
