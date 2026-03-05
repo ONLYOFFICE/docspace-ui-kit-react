@@ -39,7 +39,7 @@ import {
   Button,
   Form,
   Select,
-  Bar,
+  Badge,
 } from "storybook/internal/components";
 import { EditorIcon, TrashIcon } from "@storybook/icons";
 
@@ -49,7 +49,6 @@ import {
   STORAGE_KEY,
   type SavedApiProvider,
 } from "../utils/apiProviders";
-import { setCookie } from "../../utils/cookie";
 
 import "./index.css";
 
@@ -163,7 +162,14 @@ const AddCustomModal = ({
           </div>
         </Form>
 
-        {error ? <Bar>{error}</Bar> : null}
+        {error ? (
+          <Badge status="critical">{error}</Badge>
+        ) : (
+          <Badge status="warning">
+            ⚠️ API keys are stored unencrypted in localStorage for development
+            convenience only.
+          </Badge>
+        )}
 
         <div className="footer">
           <Button

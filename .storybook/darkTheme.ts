@@ -5,7 +5,6 @@ import { globalColors } from "../providers/theme/themes/globalColors";
 export default create({
   base: "dark",
   appBg: globalColors.black,
-  barTextColor: globalColors.darkErrorStatus,
 
   brandTitle: "DocSpace UI Kit",
   brandUrl: "https://www.onlyoffice.com/docspace.aspx",
