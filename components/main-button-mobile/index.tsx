@@ -341,7 +341,6 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
 				ref={mainButtonRef}
 				className={className}
 				style={{
-					position: "relative",
 					zIndex: `${isOpen ? "211" : "201"}`,
 					...style,
 				}}
