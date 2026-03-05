@@ -52,7 +52,7 @@ export const createApiClient = (basePath: string, apiKey: string) => {
   const instance: AxiosInstance = axios.create({
     baseURL: basePath,
     headers: {
-      Authorization: apiKey,
+      Authorization: `Bearer ${apiKey}`,
     },
   });
 
@@ -77,6 +77,7 @@ export type TApiContext = {
   peopleSearchApi: PeopleSearchApi;
   groupSearchApi: SearchApi;
   apiClient: TApiClient;
+  baseUrl: string;
 };
 
 const ApiContext = React.createContext<TApiContext | null>(null);
@@ -100,11 +101,13 @@ const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
       },
     } as const;
 
+    const params = apiKey
+      ? { apiKey: authHeader, accessToken: apiKey, baseOptions }
+      : {};
+
     const configuration = new Configuration({
       basePath: url,
-      apiKey: authHeader,
-      accessToken: apiKey,
-      baseOptions,
+      ...params,
     });
 
     return {
@@ -118,6 +121,7 @@ const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
       peopleSearchApi: new PeopleSearchApi(configuration),
       groupSearchApi: new SearchApi(configuration),
       apiClient: createApiClient(url, apiKey),
+      baseUrl: url,
     };
   }, [url, apiKey]);
 

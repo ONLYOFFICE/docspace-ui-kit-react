@@ -18,6 +18,7 @@ import "../css/fonts.css";
 
 import lightTheme from "./lightTheme";
 import darkTheme from "./darkTheme";
+import { DocsContainer } from "./DocsContainer";
 
 const lightColorScheme: TColorScheme = {
   id: 1,
@@ -75,7 +76,19 @@ const preview: Preview = {
       dark: darkTheme,
     },
     docs: {
+      container: DocsContainer,
       toc: true,
+    },
+    options: {
+      storySort: {
+        order: [
+          "Getting started",
+          ["Welcome", "Structure", "Translation", "Themes", "API"],
+          "Samples",
+          "Components",
+          ["Document Editor", "Selectors", "Providers", "Errors"],
+        ],
+      },
     },
   },
 

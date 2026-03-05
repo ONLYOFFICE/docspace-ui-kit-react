@@ -24,107 +24,315 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type React from "react";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { InputSize } from "../text-input";
-import { FileInputProps } from "./FileInput.types";
-import { FileInputPure } from "./FileInput";
+
+import { FileInput } from ".";
 
 const meta = {
-  title: "Components/Form controls/FileInput",
-  component: FileInputPure,
-  argTypes: {
-    onInput: { action: "onInput" },
-    size: {
-      control: "select",
-      options: Object.values(InputSize),
-      description: "Size of the input field",
-    },
-    hasError: {
-      control: "boolean",
-      description: "Shows error state",
-    },
-    hasWarning: {
-      control: "boolean",
-      description: "Shows warning state",
-    },
-    isDisabled: {
-      control: "boolean",
-      description: "Disables the input",
-    },
-    isLoading: {
-      control: "boolean",
-      description: "Shows loading state",
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "File input component for handling file uploads with various states and sizes",
-      },
-    },
-  },
-} satisfies Meta<typeof FileInputPure>;
+	title: "UI/Form controls/FileInput",
+	component: FileInput,
+	parameters: {
+		docs: {
+			description: {
+				component: `File input component for handling file uploads with a button trigger, various states, and multiple size options.
+
+### Features
+
+- **File Selection**: Native file picker with customizable accept filters
+- **Multiple Files**: Support for single or multiple file selection
+- **Three Sizes**: base, middle, and large
+- **Loading State**: Show spinner during upload operations
+- **Validation States**: Error and warning visual indicators
+- **Custom Button Label**: Configurable upload button text
+- **Icon Variants**: Document or folder icon styles
+
+### Accessibility
+
+- \`aria-label\`: Describes the file input button action
+- \`aria-description\`: Provides additional context for the input
+
+### Usage
+
+\`\`\`tsx
+import { FileInput } from "@docspace/ui-kit/components/file-input";
+
+<FileInput
+  placeholder="Choose file"
+  size={InputSize.base}
+  onInput={(file) => console.log(file)}
+  accept={[".pdf", ".docx"]}
+/>
+
+// Multiple files
+<FileInput
+  placeholder="Choose files"
+  isMultiple
+  onInput={(files) => console.log(files)}
+/>
+\`\`\``,
+			},
+		},
+	},
+	argTypes: {
+		size: {
+			control: "select",
+			options: Object.values(InputSize),
+			description: "Size of the input field",
+			table: {
+				defaultValue: { summary: "base" },
+			},
+		},
+		placeholder: {
+			control: "text",
+			description: "Placeholder text",
+		},
+		buttonLabel: {
+			control: "text",
+			description: "Label for the upload button",
+		},
+		isDisabled: {
+			control: "boolean",
+			description: "Disable the input field",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		isLoading: {
+			control: "boolean",
+			description: "Show loading spinner",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		hasError: {
+			control: "boolean",
+			description: "Show error state",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		hasWarning: {
+			control: "boolean",
+			description: "Show warning state",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		scale: {
+			control: "boolean",
+			description: "Scale input to 100% width",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		isMultiple: {
+			control: "boolean",
+			description: "Allow multiple file selection",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		isDocumentIcon: {
+			control: "boolean",
+			description: "Use document icon instead of folder icon",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+	},
+} satisfies Meta<typeof FileInput>;
+
+type Story = StoryObj<ComponentProps<typeof FileInput>>;
 
 export default meta;
-type Story = StoryObj<typeof FileInputPure>;
 
-const Template = (args: FileInputProps) => <FileInputPure {...args} />;
+const Wrapper = (props: { children: React.ReactNode }) => {
+	return (
+		<div
+			style={{
+				display: "grid",
+				gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+				gridGap: "16px",
+				alignItems: "center",
+			}}
+		>
+			{props.children}
+		</div>
+	);
+};
 
 export const Default: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    placeholder: "Choose file",
-    size: InputSize.base,
-    scale: false,
-    isDisabled: false,
-    "aria-label": "Choose file",
-  },
+	render: (args) => <FileInput {...args} />,
+	args: {
+		placeholder: "Choose file",
+		size: InputSize.base,
+		scale: false,
+		isDisabled: false,
+		isLoading: false,
+		hasError: false,
+		hasWarning: false,
+		"aria-label": "Choose file",
+	},
 };
 
-export const Middle: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    size: InputSize.middle,
-    placeholder: "Middle input",
-  },
+const SizesTemplate = () => {
+	return (
+		<Wrapper>
+			<FileInput
+				size={InputSize.base}
+				placeholder="Base size"
+				aria-label="Base size file input"
+			/>
+			<FileInput
+				size={InputSize.middle}
+				placeholder="Middle size"
+				aria-label="Middle size file input"
+			/>
+			<FileInput
+				size={InputSize.large}
+				placeholder="Large size"
+				aria-label="Large size file input"
+			/>
+		</Wrapper>
+	);
 };
 
-export const WithError: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    hasError: true,
-    placeholder: "Error state",
-  },
+export const Sizes: Story = {
+	render: () => <SizesTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"FileInput supports three sizes: base, middle, and large for different UI contexts.",
+			},
+			source: {
+				code: `<FileInput size={InputSize.base} placeholder="Base size" />
+<FileInput size={InputSize.middle} placeholder="Middle size" />
+<FileInput size={InputSize.large} placeholder="Large size" />`,
+			},
+		},
+	},
 };
 
-export const WithWarning: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    hasWarning: true,
-    placeholder: "Warning state",
-  },
+const StatesTemplate = () => {
+	return (
+		<Wrapper>
+			<FileInput
+				size={InputSize.base}
+				placeholder="Normal"
+				aria-label="Normal file input"
+			/>
+			<FileInput
+				size={InputSize.base}
+				placeholder="Error state"
+				hasError
+				aria-label="Error file input"
+			/>
+			<FileInput
+				size={InputSize.base}
+				placeholder="Warning state"
+				hasWarning
+				aria-label="Warning file input"
+			/>
+			<FileInput
+				size={InputSize.base}
+				placeholder="Disabled"
+				isDisabled
+				aria-label="Disabled file input"
+			/>
+			<FileInput
+				size={InputSize.base}
+				placeholder="Loading"
+				isLoading
+				aria-label="Loading file input"
+			/>
+		</Wrapper>
+	);
 };
 
-export const Disabled: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    isDisabled: true,
-    placeholder: "Disabled input",
-  },
+export const States: Story = {
+	render: () => <StatesTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"FileInput supports normal, error, warning, disabled, and loading states.",
+			},
+			source: {
+				code: `<FileInput placeholder="Normal" />
+<FileInput placeholder="Error state" hasError />
+<FileInput placeholder="Warning state" hasWarning />
+<FileInput placeholder="Disabled" isDisabled />
+<FileInput placeholder="Loading" isLoading />`,
+			},
+		},
+	},
 };
 
-export const Loading: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    isLoading: true,
-    placeholder: "Loading state",
-  },
+const WithAcceptFilterTemplate = () => {
+	return (
+		<Wrapper>
+			<FileInput
+				size={InputSize.base}
+				placeholder="Images only"
+				accept={[".png", ".jpg", ".jpeg", ".gif"]}
+				aria-label="Image file input"
+			/>
+			<FileInput
+				size={InputSize.base}
+				placeholder="Documents only"
+				accept={[".pdf", ".docx", ".xlsx"]}
+				aria-label="Document file input"
+			/>
+		</Wrapper>
+	);
+};
+
+export const WithAcceptFilter: Story = {
+	render: () => <WithAcceptFilterTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"The accept prop filters which file types are visible in the file picker dialog.",
+			},
+			source: {
+				code: `<FileInput placeholder="Images only" accept={[".png", ".jpg", ".jpeg", ".gif"]} />
+<FileInput placeholder="Documents only" accept={[".pdf", ".docx", ".xlsx"]} />`,
+			},
+		},
+	},
+};
+
+const ScaledTemplate = () => {
+	return (
+		<div style={{ display: "grid", gridGap: "16px" }}>
+			<FileInput
+				size={InputSize.base}
+				placeholder="Scaled file input"
+				scale
+				aria-label="Scaled file input"
+			/>
+		</div>
+	);
+};
+
+export const ScaledInput: Story = {
+	render: () => <ScaledTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Scale prop makes the file input expand to 100% of its container width.",
+			},
+			source: {
+				code: `<FileInput placeholder="Scaled file input" scale />`,
+			},
+		},
+	},
 };

@@ -179,7 +179,12 @@ const ControlButtons = ({
   const renderWarning = () => {
     if (!isDesktop || !titles?.warningText) return null;
 
-    return <WarningComponent title={titles?.warningText} />;
+    return (
+      <WarningComponent
+        title={titles?.warningText}
+        icon={titles?.warningIcon}
+      />
+    );
   };
 
   return (
