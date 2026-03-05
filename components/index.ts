@@ -143,3 +143,5 @@ export * from "./file-input";
 export * from "./rows";
 
 export * from "./filter";
+
+export * from "./uploader";

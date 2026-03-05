@@ -87,15 +87,19 @@ export const attachParentFolderId = async (
   rootFolderId: number,
   foldersApi: FoldersApi,
 ): Promise<TFileWithParentFolderId[]> => {
-  const normalizedFiles = files
-    .filter((f) => {
-      const p = getFilePath(f);
-      if (!p) return true;
-      return !isHiddenFilePath(p);
-    })
-    .map((f) => f as TFileWithParentFolderId);
+  const normalizedFiles = files.filter((f) => {
+    const p = getFilePath(f);
+    if (!p) return true;
+    return !isHiddenFilePath(p);
+  });
 
-  const dirToId = await buildParentFolderMap(normalizedFiles, rootFolderId, foldersApi);
+  const dirToId = await buildParentFolderMap(
+    normalizedFiles as TFileWithParentFolderId[],
+    rootFolderId,
+    foldersApi,
+  );
+
+  const parentFolderMap = new Map<File, number>();
 
   normalizedFiles.forEach((f) => {
     if (isEmptyDirectoryFile(f)) return;
@@ -104,12 +108,16 @@ export const attachParentFolderId = async (
     const dirPath = getDirPathFromFilePath(p);
     const parentFolderId = dirPath ? dirToId.get(dirPath) : rootFolderId;
     if (parentFolderId) {
-      Object.defineProperty(f, "parentFolderId", {
-        value: parentFolderId,
-        configurable: true,
-      });
+      parentFolderMap.set(f, parentFolderId);
     }
   });
 
-  return normalizedFiles;
+  return normalizedFiles.map((f) => {
+    const parentFolderId = parentFolderMap.get(f);
+    return Object.assign(
+      Object.create(Object.getPrototypeOf(f)),
+      f,
+      parentFolderId ? { parentFolderId } : {},
+    ) as TFileWithParentFolderId;
+  });
 };
