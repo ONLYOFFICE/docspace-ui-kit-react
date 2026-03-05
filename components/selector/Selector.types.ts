@@ -567,7 +567,6 @@ export type TSelectorItemFolder = MergeTypes<
     security: FileEntryDtoIntegerAllOfSecurity;
     icon?: TSvgComponent | string;
     avatar?: string | React.ReactElement;
-    isSystem?: boolean;
   }
 >;
 
