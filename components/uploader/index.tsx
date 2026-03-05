@@ -81,87 +81,114 @@ const Uploader = ({
   const [isLoading, setIsLoading] = useState(false);
   const [uploadPercent, setUploadPercent] = useState(0);
 
-  const uploadFiles = useCallback(async (rawFiles: File[]) => {
-    const prepared = await attachParentFolderId(rawFiles, folderTargetId, foldersApi);
-
-    const onlyFiles = prepared.filter((f) => !isEmptyDirectoryFile(f));
-
-    const uploadedFiles: unknown[] = [];
-
-    const totalBytes = onlyFiles.reduce((sum, f) => sum + f.size, 0);
-    let uploadedBytes = 0;
-
-    setUploadPercent(0);
-
-    await runWithConcurrency(onlyFiles, maxUploadFilesCount, async (file) => {
-      const targetFolderId = file.parentFolderId ?? folderTargetId;
-
-      const createOn = file.lastModified
-        ? new Date(file.lastModified).toISOString()
-        : new Date().toISOString();
-
-      const sessionRes = await operationsApi.createUploadSessionInFolder(
-        targetFolderId,
-        {
-          fileName: file.name,
-          fileSize: file.size,
-          relativePath: "",
-          encrypted: false,
-          createOn: createOn as unknown as ApiDateTime,
-          createNewIfExist: true,
-        },
+  const uploadFiles = useCallback(
+    async (rawFiles: File[]) => {
+      const prepared = await attachParentFolderId(
+        rawFiles,
+        folderTargetId,
+        foldersApi,
       );
 
-      const sessionId = sessionRes.data?.response?.id;
+      const onlyFiles = prepared.filter((f) => !isEmptyDirectoryFile(f));
 
-      if (!sessionId) {
-        throw new Error("Failed to start upload session");
-      }
+      const uploadedFiles: unknown[] = [];
 
-      const chunks = createChunks(file, chunkUploadSize);
-      let uploadedChunks = 0;
+      const totalBytes = onlyFiles.reduce((sum, f) => sum + f.size, 0);
+      let uploadedBytes = 0;
 
-      onUploadProgress?.({
-        sessionId,
-        fileName: file.name,
-        uploadedChunks: 0,
-        totalChunks: chunks.length,
-        percent: 0,
-      });
+      setUploadPercent(0);
 
-      await runWithConcurrency(chunks, maxUploadThreadCount, async (chunk) => {
-        const chunkFile = new File([chunk.data.get("file") as Blob], file.name);
+      await runWithConcurrency(onlyFiles, maxUploadFilesCount, async (file) => {
+        const targetFolderId = file.parentFolderId ?? folderTargetId;
 
-        await operationsApi.uploadAsyncSession(
+        const createOn = file.lastModified
+          ? new Date(file.lastModified).toISOString()
+          : new Date().toISOString();
+
+        const sessionRes = await operationsApi.createUploadSessionInFolder(
           targetFolderId,
-          sessionId,
-          chunk.index,
-          chunkFile,
+          {
+            fileName: file.name,
+            fileSize: file.size,
+            relativePath: "",
+            encrypted: false,
+            createOn: createOn as unknown as ApiDateTime,
+            createNewIfExist: true,
+          },
         );
 
-        uploadedChunks += 1;
-        uploadedBytes += chunk.size;
-        const filePercent = Math.round((uploadedChunks / chunks.length) * 100);
-        const overallPercent = Math.round((uploadedBytes / totalBytes) * 100);
-        setUploadPercent(overallPercent);
+        const sessionId = sessionRes.data?.response?.id;
+
+        if (!sessionId) {
+          throw new Error("Failed to start upload session");
+        }
+
+        const chunks = createChunks(file, chunkUploadSize);
+        let uploadedChunks = 0;
 
         onUploadProgress?.({
           sessionId,
           fileName: file.name,
-          uploadedChunks,
+          uploadedChunks: 0,
           totalChunks: chunks.length,
-          percent: filePercent,
+          percent: 0,
         });
+
+        await runWithConcurrency(
+          chunks,
+          maxUploadThreadCount,
+          async (chunk) => {
+            const chunkFile = new File(
+              [chunk.data.get("file") as Blob],
+              file.name,
+            );
+
+            await operationsApi.uploadAsyncSession(
+              targetFolderId,
+              sessionId,
+              chunk.index,
+              chunkFile,
+            );
+
+            uploadedChunks += 1;
+            uploadedBytes += chunk.size;
+            const filePercent = Math.round(
+              (uploadedChunks / chunks.length) * 100,
+            );
+            const overallPercent = Math.round(
+              (uploadedBytes / totalBytes) * 100,
+            );
+            setUploadPercent(overallPercent);
+
+            onUploadProgress?.({
+              sessionId,
+              fileName: file.name,
+              uploadedChunks,
+              totalChunks: chunks.length,
+              percent: filePercent,
+            });
+          },
+        );
+
+        const result = await operationsApi.finalizeSession(
+          targetFolderId,
+          sessionId,
+        );
+        uploadedFiles.push(result.data);
       });
 
-      const result = await operationsApi.finalizeSession(targetFolderId, sessionId);
-      uploadedFiles.push(result.data);
-    });
-
-    return uploadedFiles;
-  }, [
-    folderTargetId,
-     chunkUploadSize, maxUploadFilesCount, maxUploadThreadCount, operationsApi, foldersApi, onUploadProgress]);
+      return uploadedFiles;
+    },
+    [
+      folderTargetId,
+      chunkUploadSize,
+      maxUploadFilesCount,
+      maxUploadThreadCount,
+      operationsApi,
+      foldersApi,
+      onUploadProgress,
+    ],
+  );
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -180,11 +207,15 @@ const Uploader = ({
 
           if (isFolderMode) {
             toastr.error(
-              getCommonTranslation("FolderSizeExceedsLimit", { maxSize: maxSizeFormatted ?? "" }),
+              getCommonTranslation("FolderSizeExceedsLimit", {
+                maxSize: maxSizeFormatted ?? "",
+              }),
             );
           } else {
             toastr.error(
-              getCommonTranslation("FileSizeExceedsLimit", { maxSize: maxSizeFormatted ?? "" }),
+              getCommonTranslation("FileSizeExceedsLimit", {
+                maxSize: maxSizeFormatted ?? "",
+              }),
             );
           }
           return;
@@ -201,8 +232,7 @@ const Uploader = ({
           );
 
           if (totalSize > maxTotalBytes) {
-            const maxTotalFormatted =
-              maxTotalUploadSize.toUpperCase();
+            const maxTotalFormatted = maxTotalUploadSize.toUpperCase();
             const isFolderMode = isFolderUpload ?? false;
 
             if (isFolderMode) {
@@ -224,6 +254,7 @@ const Uploader = ({
       }
 
       setIsLoading(true);
+      setUploadPercent(0);
 
       try {
         const uploadedFiles = await uploadFiles(acceptedFiles);
@@ -249,7 +280,8 @@ const Uploader = ({
 
         onUploadSuccess?.(uploadedFiles);
       } catch (err) {
-        const message = getErrorMessage(err) || getCommonTranslation("UnexpectedError");
+        const message =
+          getErrorMessage(err) || getCommonTranslation("UnexpectedError");
         toastr.error(message);
 
         onUploadError?.({ error: message });
@@ -257,7 +289,16 @@ const Uploader = ({
         setIsLoading(false);
       }
     },
-    [uploadFiles, folderTargetId, onUploadSuccess, onUploadError, maxPerUploadSize, maxTotalUploadSize, isFolderUpload, isMultipleUpload],
+    [
+      uploadFiles,
+      folderTargetId,
+      onUploadSuccess,
+      onUploadError,
+      maxPerUploadSize,
+      maxTotalUploadSize,
+      isFolderUpload,
+      isMultipleUpload,
+    ],
   );
 
   const getSecondaryText = () => {
