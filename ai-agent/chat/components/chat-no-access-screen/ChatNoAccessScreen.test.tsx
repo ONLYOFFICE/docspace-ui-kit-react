@@ -81,7 +81,6 @@ describe("<ChatNoAccessScreen />", () => {
     standalone: false,
     isPortalAdmin: false,
     goToAISettings: vi.fn(),
-    allowExternalNavigation: true,
   };
 
   it("renders with user description when not an admin", () => {
@@ -166,7 +165,6 @@ describe("<ChatNoAccessScreen />", () => {
       undefined,
     );
   });
-
 
   it("hides settings button if goToAISettings is not provided", () => {
     render(

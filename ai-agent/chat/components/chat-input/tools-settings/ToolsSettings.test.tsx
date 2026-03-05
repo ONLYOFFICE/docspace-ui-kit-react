@@ -210,7 +210,6 @@ describe("<ToolsSettings />", () => {
     aiReady: boolean;
     isAdmin: boolean;
     goToWebSearchSettings: () => void;
-    allowExternalNavigation: boolean;
   } = {
     servers: [
       {
@@ -241,7 +240,6 @@ describe("<ToolsSettings />", () => {
     aiReady: true,
     isAdmin: false,
     goToWebSearchSettings: vi.fn(),
-    allowExternalNavigation: false,
   };
 
   it("renders tools button correctly", () => {
@@ -258,13 +256,7 @@ describe("<ToolsSettings />", () => {
   });
 
   it("renders web search tooltip and admin link", () => {
-    render(
-      <ToolsSettings
-        {...defaultProps}
-        isAdmin={true}
-        allowExternalNavigation={true}
-      />,
-    );
+    render(<ToolsSettings {...defaultProps} isAdmin={true} />);
     fireEvent.click(screen.getByTestId("chat-input-tools-button"));
 
     expect(screen.getByText("ConnectWebSearch")).toBeInTheDocument();

@@ -152,7 +152,6 @@ describe("<Buttons />", () => {
     getIcon: vi.fn() as unknown as TGetIcon,
     messageIndex: 0,
     getResultStorageId: () => 1,
-    allowExternalNavigation: true,
   };
 
   const mockedSocket = vi.mocked(socket);

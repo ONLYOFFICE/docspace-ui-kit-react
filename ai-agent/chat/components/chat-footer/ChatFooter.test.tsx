@@ -73,7 +73,6 @@ describe("<ChatFooter />", () => {
     multimodal: { image: { formats: [] } },
     goToWebSearchSettings: vi.fn(),
     persistDraft: false,
-    allowExternalNavigation: true,
     allowAttachFiles: true,
     allowManageTools: true,
   };

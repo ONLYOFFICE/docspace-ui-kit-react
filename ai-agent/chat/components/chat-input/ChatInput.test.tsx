@@ -135,7 +135,6 @@ describe("<ChatInput />", () => {
     multimodal: {} as unknown as ChatInputProps["multimodal"],
     goToWebSearchSettings: vi.fn(),
     persistDraft: false,
-    allowExternalNavigation: true,
     allowAttachFiles: true,
     allowManageTools: true,
   };

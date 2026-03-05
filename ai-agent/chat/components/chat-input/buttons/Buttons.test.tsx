@@ -109,7 +109,6 @@ describe("<Buttons />", () => {
     isAdmin: false,
     aiReady: true,
     goToWebSearchSettings: vi.fn(),
-    allowExternalNavigation: true,
     allowAttachFiles: true,
     allowManageTools: true,
   };

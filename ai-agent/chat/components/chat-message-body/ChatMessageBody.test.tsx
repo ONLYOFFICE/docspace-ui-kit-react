@@ -67,7 +67,6 @@ describe("ChatMessageBody component", () => {
     getResultStorageId: vi.fn(),
     setAiPlaylistImages: vi.fn(),
     setMediaViewerVisible: vi.fn(),
-    allowExternalNavigation: true,
   };
 
   const mockMessages: TMessage[] = [
