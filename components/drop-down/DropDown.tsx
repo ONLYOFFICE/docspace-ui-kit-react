@@ -372,6 +372,7 @@ const DropDown = ({
       [styles.maxHeight]: maxHeight,
       [styles.withManualWidth]: manualWidth,
       [styles.notReady]: !state.isDropdownReady,
+      [styles.useFlexibleHeight]: useFlexibleHeight,
     });
 
     return (
