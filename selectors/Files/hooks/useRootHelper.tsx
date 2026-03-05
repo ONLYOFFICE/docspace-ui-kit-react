@@ -31,7 +31,7 @@ import {
   type FolderDtoInteger,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers/api";
-import { getCommonTranslation } from "../../../utils/i18n";
+import { useCommonTranslation } from "../../../utils/i18n";
 import type { TSelectorItem } from "../../../components/selector";
 import { getDefaultBreadCrumb } from "../../utils";
 import { LoadersContext } from "../../utils/contexts/Loaders";
@@ -76,6 +76,7 @@ const useRootHelper = ({
   isUserOnly,
   setIsInit,
 }: UseRootHelperProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const { setIsBreadCrumbsLoading, setIsNextPageLoading, setIsFirstLoad } =
     use(LoadersContext);
 

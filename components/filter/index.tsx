@@ -51,7 +51,7 @@ import FilterButton from "./sub-components/FilterButton";
 import SortButton from "./sub-components/SortButton";
 import { isDesktop, isMobile } from "../../utils";
 import useSearch from "./hooks/useSearch";
-import { getCommonTranslation } from "../../utils";
+import { useCommonTranslation } from "../../utils/i18n";
 import styles from "./Filter.module.scss";
 import { FilterProps, TItem, TRoomGroup } from "./Filter.types";
 import {
@@ -135,6 +135,8 @@ const FilterInput = React.memo(
     organizeRoomsGrouping,
     isFilterOrSearchActive,
   }: FilterProps) => {
+    const getCommonTranslation = useCommonTranslation();
+
     const { searchComponent } = useSearch({
       onSearch,
       onClearFilter,

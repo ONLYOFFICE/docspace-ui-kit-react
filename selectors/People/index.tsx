@@ -54,7 +54,7 @@ import {
   type EmployeeType as SdkEmployeeType,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../providers/api/ApiProvider";
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 import { getUserAvatarRoleByType, getUserType } from "../../utils/common";
 import { Text } from "../../components/text";
 import { globalColors } from "../../providers/theme";
@@ -248,6 +248,7 @@ const PeopleSelector = ({
   disabledInvitedText,
   isAgent,
 }: PeopleSelectorProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const { peopleSearchApi, groupSearchApi, baseUrl } = useApi();
   const { isBase } = useTheme();
 

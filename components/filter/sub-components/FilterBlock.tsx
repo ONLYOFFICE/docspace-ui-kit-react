@@ -35,7 +35,7 @@ import { FilterGroups } from "../../../enums";
 import { Button, ButtonSize } from "../../button";
 import { ModalDialog, ModalDialogType } from "../../modal-dialog";
 import { IconButton } from "../../icon-button";
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils/i18n";
 import styles from "../Filter.module.scss";
 import { FilterBlockProps, TGroupItem, TItem } from "../Filter.types";
 import {
@@ -62,6 +62,7 @@ const FilterBlock = ({
   disableThirdParty,
   renderSelector,
 }: FilterBlockProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const [showSelector, setShowSelector] = React.useState<{
     show: boolean;
     type: string | null;

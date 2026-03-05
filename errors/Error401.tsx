@@ -24,9 +24,10 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { getCommonTranslation } from "../utils/i18n";
+import { useCommonTranslation } from "../utils/i18n";
 import ErrorContainer from "../components/error-container/ErrorContainer";
 
 export const Error401 = () => {
+  const getCommonTranslation = useCommonTranslation();
   return <ErrorContainer headerText={getCommonTranslation("Error401Text")} />;
 };

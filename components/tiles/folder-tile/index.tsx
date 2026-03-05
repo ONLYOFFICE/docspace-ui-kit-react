@@ -26,7 +26,7 @@
 
 import React, { useRef, useState } from "react";
 import classNames from "classnames";
-import { getCommonTranslation, isMobile } from "../../../utils";
+import { useCommonTranslation, isMobile } from "../../../utils";
 import { ReactSVG } from "react-svg";
 import { Checkbox } from "../../checkbox";
 import {
@@ -70,6 +70,7 @@ export const FolderTile = ({
   isBigFolder,
   temporaryIcon,
 }: FolderTileProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const childrenArray = React.Children.toArray(children);
   const [FolderTileContent] = childrenArray;
 

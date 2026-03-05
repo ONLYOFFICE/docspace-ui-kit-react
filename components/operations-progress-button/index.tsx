@@ -34,16 +34,13 @@ import React, {
 import classNames from "classnames";
 
 import { isMobile } from "react-device-detect";
-import {
-  FloatingButton,
-  FloatingButtonIcons,
-} from "../floating-button";
+import { FloatingButton, FloatingButtonIcons } from "../floating-button";
 import { DropDown } from "../drop-down";
 import { OPERATIONS_NAME } from "../../constants/index";
 import { HelpButton } from "../help-button";
 import { Backdrop } from "../backdrop";
 import { Text } from "../text";
-import { getCommonTranslation } from "../../utils";
+import { useCommonTranslation } from "../../utils";
 
 import PreviewButton from "./PreviewButton";
 import ProgressList from "./ProgressList";
@@ -89,6 +86,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   isDragging,
   clearDropPreviewLocation,
 }) => {
+  const getCommonTranslation = useCommonTranslation();
   const [isOpenDropdown, setIsOpenDropdown] = useState<boolean>(false);
   const [isHideTooltip, setIsHideTooltip] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -318,7 +316,9 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
             {operationName}
             <br />
             {/* t("Common:ErrorUploadingFiles", { count: getErrorCount() }) */}
-            {getCommonTranslation("ErrorUploadingFiles", { count: getErrorCount()! })}
+            {getCommonTranslation("ErrorUploadingFiles", {
+              count: getErrorCount()!,
+            })}
           </Text>
         );
       }

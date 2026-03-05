@@ -34,7 +34,7 @@ import {
   type FileEntryDtoIntegerAllOfSecurity,
   type FileType,
 } from "@onlyoffice/docspace-api-sdk";
-import { getCommonTranslation } from "../../../utils/i18n";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import type {
   FilesSelectorProps,
@@ -64,6 +64,7 @@ const transformInitItems = (
     fileExst: string,
     size?: number,
   ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null,
+  getCommonTranslation: (key: string) => string,
   initSelectedItemType?: string,
   filterParam?: string | number,
   disableBySecurity?: string,
@@ -128,6 +129,7 @@ const useSelectorState = ({
 
   disableBySecurity,
 }: UseSelectorStateProps & TFilesSelectorInit) => {
+  const getCommonTranslation = useCommonTranslation();
   const { getIcon } = use(SettingsContext);
 
   const [breadCrumbs, setBreadCrumbs] = React.useState<TBreadCrumb[]>(
@@ -143,6 +145,7 @@ const useSelectorState = ({
           disabledItems,
           withCreate,
           getIcon,
+          getCommonTranslation,
           initSelectedItemType,
           filterParam,
           disableBySecurity,

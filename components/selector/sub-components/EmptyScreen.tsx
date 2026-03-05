@@ -33,7 +33,7 @@ import PlusReactSvg from "../../../assets/icons/12/plus.react.svg";
 import UpReactSvg from "../../../assets/up.react.svg";
 import ClearEmptyFilterReactSvg from "../../../assets/clear.empty.filter.react.svg";
 
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import { Heading } from "../../heading";
 import { Text } from "../../text";
@@ -66,6 +66,7 @@ const EmptyScreen = ({
   inputItemVisible,
   hideBackButton,
 }: EmptyScreenProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const {
     emptyScreenImage,
     emptyScreenHeader,

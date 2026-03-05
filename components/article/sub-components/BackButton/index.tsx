@@ -32,7 +32,7 @@ import ArrowTabletIcon from "../../../../assets/arrow-left.long.react.svg";
 import { IconButton } from "../../../icon-button";
 import { Text } from "../../../text";
 import { DeviceType } from "../../../../enums";
-import { getCommonTranslation } from "../../../../utils";
+import { useCommonTranslation } from "../../../../utils";
 
 import { ArticleHeaderLoader } from "../../skeletons";
 
@@ -53,6 +53,8 @@ const BackButton = ({
   toggleArticleOpen?: () => void;
   navigate?: (path: string) => void;
 }) => {
+  const getCommonTranslation = useCommonTranslation();
+
   const onClickBack = () => {
     onLogoClickAction?.();
 

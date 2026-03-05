@@ -45,7 +45,7 @@ import {
   convertFoldersToItems,
 } from "..";
 
-import { getCommonTranslation } from "../../../utils/i18n";
+import { useCommonTranslation } from "../../../utils/i18n";
 import type { UseSocketHelperProps } from "../types";
 import { SettingsContext } from "../contexts/Settings";
 const useSocketHelper = ({
@@ -58,6 +58,7 @@ const useSocketHelper = ({
   setTotal,
   disableBySecurity,
 }: UseSocketHelperProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const { getIcon } = React.use(SettingsContext);
   const { filesApi, foldersApi, roomsApi } = useApi();
 

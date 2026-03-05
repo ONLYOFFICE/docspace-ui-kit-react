@@ -35,7 +35,7 @@ import { globalColors } from "../../providers/theme";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 import { useTheme } from "../../context/ThemeContext";
 import { isTouchDevice } from "../../utils/device";
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { ToggleButton } from "../toggle-button";
 import { Badge } from "../badge";
@@ -137,6 +137,7 @@ const DropDownItem = ({
   paidLabel,
   ...rest
 }: DropDownItemProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const { isRTL } = useInterfaceDirection();
   const { isBase } = useTheme();
 

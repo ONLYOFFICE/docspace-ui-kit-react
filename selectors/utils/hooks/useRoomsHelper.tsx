@@ -40,7 +40,7 @@ import { LoadersContext } from "../contexts/Loaders";
 
 import { PAGE_COUNT } from "../constants";
 import type { UseRoomsHelperProps } from "../types";
-import { getCommonTranslation } from "../../../utils/i18n";
+import { useCommonTranslation } from "../../../utils/i18n";
 import { convertRoomsToItems, getDefaultBreadCrumb } from "..";
 
 import useInputItemHelper from "./useInputItemHelper";
@@ -71,6 +71,7 @@ const useRoomsHelper = ({
   setSelectedItemSecurity,
   setSelectedTreeNode,
 }: UseRoomsHelperProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const {
     setIsNextPageLoading,
     setIsBreadCrumbsLoading,
@@ -98,7 +99,12 @@ const useRoomsHelper = ({
   const createDropDownItems = React.useMemo(() => {
     return RoomsTypeValues.map((value) => {
       const onClick = () => {
-        addInputItem("", "", value as RoomTypeEnum, getCommonTranslation("EnterName"));
+        addInputItem(
+          "",
+          "",
+          value as RoomTypeEnum,
+          getCommonTranslation("EnterName"),
+        );
       };
 
       return (

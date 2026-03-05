@@ -34,7 +34,7 @@ import {
 
 import FolderSvg from "../../../assets/icons/32/folder.svg";
 
-import { getCommonTranslation } from "../../../utils/i18n";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import { useApi } from "../../../providers/api";
 
@@ -96,6 +96,7 @@ const useFilesHelper = ({
 
   disableBySecurity,
 }: UseFilesHelpersProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const {
     isFirstLoad,
     setIsFirstLoad,
@@ -317,7 +318,10 @@ const useFilesHelper = ({
               key: "create-folder-item",
               hotkey: "f",
               onCreateClick: () =>
-                addInputItem(getCommonTranslation("NewFolder"), React.createElement(FolderSvg)),
+                addInputItem(
+                  getCommonTranslation("NewFolder"),
+                  React.createElement(FolderSvg),
+                ),
               onBackClick: () => {
                 let isRooms = false;
                 setBreadCrumbs((val) => {

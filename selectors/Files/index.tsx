@@ -48,7 +48,7 @@ import useRootHelper from "./hooks/useRootHelper";
 import useSelectorBody from "./hooks/useSelectorBody";
 import useSelectorState from "./hooks/useSelectorState";
 
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 import type { FilesSelectorProps } from "./FilesSelector.types";
 import { SettingsContextProvider } from "../utils/contexts/Settings";
 import {
@@ -118,6 +118,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     disableBySecurity,
   } = props;
 
+  const getCommonTranslation = useCommonTranslation();
   const { filesApi } = useApi();
   const { isFirstLoad, setIsFirstLoad, showLoader } = use(LoadersContext);
 

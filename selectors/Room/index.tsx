@@ -31,7 +31,7 @@ import EmptyScreenFilterRoomsDark from "../../assets/empty.filter.rooms.dark.rea
 import EmptyScreenRoomsLight from "../../assets/empty.rooms.root.user.light.react.svg";
 import EmptyScreenRoomsDark from "../../assets/empty.rooms.root.user.dark.react.svg";
 
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 import {
   Selector,
   RowLoader,
@@ -106,6 +106,7 @@ const RoomSelectorComponent = ({
   disableFirstFetch,
   forceIsMultiSelect,
 }: RoomSelectorProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const { isBase } = useTheme();
 
   const { isFirstLoad, isNextPageLoading, setIsFirstLoad } =

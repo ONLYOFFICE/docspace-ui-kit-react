@@ -30,7 +30,7 @@ import EmptyScreenGroupLight from "../../assets/empty.groups.light.react.svg";
 import EmptyScreenGroupDark from "../../assets/empty.groups.dark.react.svg";
 
 import { useApi } from "../../providers/api/ApiProvider";
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 import {
   RowLoader,
   SearchLoader,
@@ -57,6 +57,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
     onSubmit,
   } = props;
 
+  const getCommonTranslation = useCommonTranslation();
   const { groupApi } = useApi();
   const { isBase } = useTheme();
 
@@ -193,7 +194,9 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       emptyScreenDescription={getCommonTranslation("GroupsNotFoundDescription")}
       searchEmptyScreenImage={emptyScreenImg}
       searchEmptyScreenHeader={getCommonTranslation("NotFoundGroups")}
-      searchEmptyScreenDescription={getCommonTranslation("GroupsNotFoundDescription")}
+      searchEmptyScreenDescription={getCommonTranslation(
+        "GroupsNotFoundDescription",
+      )}
       totalItems={totalRef.current}
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}

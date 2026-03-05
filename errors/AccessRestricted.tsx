@@ -25,11 +25,12 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { useEffect } from "react";
-import { getCommonTranslation, getTranslationReady } from "../utils/i18n";
+import { useCommonTranslation, getTranslationReady } from "../utils/i18n";
 import ErrorContainer from "../components/error-container/ErrorContainer";
 import styles from "./Errors.module.scss";
 
 export const AccessRestricted = () => {
+  const getCommonTranslation = useCommonTranslation();
   const ready = getTranslationReady();
 
   useEffect(() => {

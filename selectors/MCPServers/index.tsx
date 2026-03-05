@@ -30,7 +30,7 @@ import EmptyScreenRoomSelectorLight from "../../assets/empty.room.selector.light
 import EmptyScreenRoomSelectorDark from "../../assets/empty.room.selector.dark.react.svg";
 import faviconUrl from "../../assets/favicon.ico";
 
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 import {
   Selector,
   RowLoader,
@@ -91,6 +91,7 @@ const MCPServersSelector = ({
   withoutBackground,
   withBlur,
 }: MCPServersSelectorProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const { apiClient } = useApi();
   const { isBase } = useTheme();
 

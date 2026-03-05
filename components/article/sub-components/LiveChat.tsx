@@ -33,7 +33,7 @@ import { Zendesk } from "../zendesk";
 import { zendeskAPI } from "../zendesk/Zendesk.utils";
 import { ArticleZendeskProps } from "../Article.types";
 
-import { getCommonTranslation, getTranslationReady } from "../../../utils";
+import { useCommonTranslation, getTranslationReady } from "../../../utils";
 
 const baseConfig = {
   webWidget: {
@@ -55,6 +55,7 @@ const ArticleLiveChat = ({
   isShowLiveChat,
   isInfoPanelVisible,
 }: ArticleZendeskProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const ready = getTranslationReady();
   const { currentColorScheme } = useTheme();
   const { isRTL } = useInterfaceDirection();
@@ -97,7 +98,7 @@ const ArticleLiveChat = ({
           },
         },
       });
-  }, [languageBaseName, ready]);
+  }, [languageBaseName, ready, getCommonTranslation]);
 
   useEffect(() => {
     zendeskAPI.addChanges("webWidget", "updateSettings", {

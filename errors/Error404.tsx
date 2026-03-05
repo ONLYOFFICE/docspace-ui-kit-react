@@ -26,13 +26,18 @@
 
 "use client";
 
-import { getCommonTranslation, getTranslationReady } from "../utils/i18n";
+import { useCommonTranslation, getTranslationReady } from "../utils/i18n";
 import ErrorContainer from "../components/error-container/ErrorContainer";
 
 const Error404 = () => {
+  const getCommonTranslation = useCommonTranslation();
   const ready = getTranslationReady();
 
-  return ready && <ErrorContainer headerText={getCommonTranslation("Error404Text")} />;
+  return (
+    ready && (
+      <ErrorContainer headerText={getCommonTranslation("Error404Text")} />
+    )
+  );
 };
 
 export default Error404;

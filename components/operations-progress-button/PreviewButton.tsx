@@ -29,11 +29,8 @@ import classNames from "classnames";
 
 import { Text } from "../text";
 import { HelpButton } from "../help-button";
-import {
-  FloatingButton,
-  FloatingButtonIcons,
-} from "../floating-button";
-import { getCommonTranslation } from "../../utils";
+import { FloatingButton, FloatingButtonIcons } from "../floating-button";
+import { useCommonTranslation } from "../../utils";
 
 import styles from "./OperationsProgressButton.module.scss";
 
@@ -56,6 +53,7 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
   allOperationsLength,
   setShowSeveralOperationsIcon,
 }) => {
+  const getCommonTranslation = useCommonTranslation();
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [animationState, setAnimationState] = useState<
     "raising" | "dropping" | "hidingUnder"

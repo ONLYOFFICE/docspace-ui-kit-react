@@ -34,7 +34,7 @@ import { BaseTile } from "../base-tile";
 import { TileItem } from "../tile-container/TileContainer.types";
 
 import styles from "./RoomTile.module.scss";
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils";
 
 export const RoomTile = ({
   t,
@@ -53,6 +53,7 @@ export const RoomTile = ({
   customBottomContent,
   ...rest
 }: RoomTileProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const childrenArray = React.Children.toArray(children);
   const [RoomsTileContent] = childrenArray;
 

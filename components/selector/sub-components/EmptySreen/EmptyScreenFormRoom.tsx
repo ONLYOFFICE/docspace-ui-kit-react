@@ -30,7 +30,7 @@ import FormRoomEmptyDarkImage from "../../../../assets/selector.form.room.empty.
 import FormRoomEmptyLightImage from "../../../../assets/selector.form.room.empty.screen.light.react.svg";
 import Plus16ReactSvg from "../../../../assets/icons/16/plus.react.svg";
 
-import { getCommonTranslation } from "../../../../utils";
+import { useCommonTranslation } from "../../../../utils/i18n";
 import { useTheme } from "../../../../context/ThemeContext";
 
 import { Text } from "../../../text";
@@ -44,6 +44,7 @@ const EmptyScreenFormRoom = ({
   onCreateClickAction,
   createDefineRoomType,
 }: EmptyScreenFormRoomProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const { isBase } = useTheme();
 
   const FormRoomEmptyScreenImage = isBase

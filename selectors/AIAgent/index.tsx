@@ -31,7 +31,7 @@ import EmptyScreenAIAgentsSelectorLight from "../../assets/ai.agents.selector.li
 import EmptyScreenAIAgentsSelectorDark from "../../assets/ai.agents.selector.dark.react.svg";
 
 import { useTheme } from "../../context/ThemeContext";
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import {
   Selector,
@@ -75,6 +75,7 @@ const AIAgentSelectorComponent = ({
   initSearchValue,
   disableBySecurity,
 }: AIAgentSelectorProps) => {
+  const getCommonTranslation = useCommonTranslation();
   const { isBase } = useTheme();
 
   const { isFirstLoad, isNextPageLoading, setIsFirstLoad } =

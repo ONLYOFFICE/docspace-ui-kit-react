@@ -27,7 +27,7 @@
 import { FC, memo, useCallback } from "react";
 import equal from "fast-deep-equal";
 import classNames from "classnames";
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils";
 
 import TriangleNavigationDownReactSvg from "../../../assets/triangle.navigation.down.react.svg";
 import PanelReactSvg from "../../../assets/panel.react.svg";
@@ -65,6 +65,8 @@ const GroupMenu: FC<TGroupMenuProps> = memo(
 );
 
 const TableGroupMenu = memo((props: TableGroupMenuProps) => {
+  const getCommonTranslation = useCommonTranslation();
+
   const {
     isChecked,
     isIndeterminate,
