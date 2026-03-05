@@ -507,8 +507,8 @@ export default class MessageStore {
     let message = "";
     try {
       const parsed = JSON.parse(jsonData);
-      message = parsed && typeof parsed === "object" && typeof parsed.message === "string" 
-        ? parsed.message 
+      message = parsed && typeof parsed === "object" && typeof parsed.message === "string"
+        ? parsed.message
         : String(jsonData);
     } catch {
       message = jsonData;
@@ -732,7 +732,7 @@ export default class MessageStore {
 
       await this.startStream(stream);
     } catch (e) {
-      this.handleStreamError(JSON.stringify(e), e);
+      this.handleStreamError("", e);
     }
   };
 
@@ -755,7 +755,7 @@ export default class MessageStore {
 
       await this.startStream(stream);
     } catch (e) {
-      this.handleStreamError(JSON.stringify(e), e);
+      this.handleStreamError("", e);
     }
   };
 
