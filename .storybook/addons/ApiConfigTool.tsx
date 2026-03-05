@@ -26,7 +26,7 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { addons, types } from "storybook/manager-api";
 import { useGlobals } from "storybook/manager-api";
 import { Modal, Button, Form, Select } from "storybook/internal/components";
@@ -38,6 +38,7 @@ import {
   LAST_API_CONFIG_KEY,
   type SavedApiProvider,
 } from "../utils/apiProviders";
+import { setCookie } from "../../utils/cookie";
 
 import "./index.css";
 
@@ -146,7 +147,6 @@ const ApiConfigDropdown = () => {
 
   const handleSelect = useCallback(
     (value: Value) => {
-      console.log(value);
       if (value === "add-custom") {
         setModalOpen(true);
       } else {

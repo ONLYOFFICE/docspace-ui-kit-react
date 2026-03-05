@@ -22,11 +22,11 @@
 //
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { Meta, StoryObj } from "@storybook/react-vite";
 import React from "react";
+import type { ComponentProps } from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import EmptyRoomsLightSvg from "../../assets/empty.rooms.root.light.svg";
 import CrossSvg from "../../assets/icons/12/cross.react.svg";
@@ -47,19 +47,79 @@ const MockLinkRouter = ({ children, to, ...props }: LinkRouterProps) => (
 );
 
 const meta = {
-  title: "components/Layout components/EmptyView",
+  title: "UI/Layout components/EmptyView",
   component: EmptyView,
   parameters: {
     docs: {
       description: {
-        component:
-          "Empty state component with customizable icon, title, description and action options",
+        component: `Empty state component with customizable icon, title, description, and action options for guiding users when no content is available.
+
+### Features
+
+- **Icon Display**: Customizable SVG icon for the empty state illustration
+- **Action Options**: Supports multiple option types (items, links, buttons, separators, actions)
+- **Router Integration**: Accepts a LinkRouter component for navigation options
+- **Context Menu**: Items can include context menu configurations
+
+### Usage
+
+\`\`\`tsx
+import { EmptyView } from "@docspace/ui-kit/components/empty-view";
+
+// With link options
+<EmptyView
+  icon={<EmptyIcon />}
+  title="Empty Folder"
+  description="This folder is empty. Add files to get started."
+  options={[
+    { key: "upload", icon: <UploadIcon />, to: "/upload", description: "Upload files" },
+  ]}
+  LinkRouter={RouterLink}
+/>
+
+// Without options
+<EmptyView
+  icon={<SearchIcon />}
+  title="No Results"
+  description="No files matching your search criteria."
+  options={null}
+/>
+\`\`\``,
       },
     },
   },
+  argTypes: {
+    title: {
+      control: "text",
+      description: "Main title text displayed below the icon",
+    },
+    description: {
+      control: "text",
+      description: "Subheading description text",
+    },
+    icon: {
+      description: "Icon element displayed at the top",
+      control: false,
+    },
+    options: {
+      description:
+        "Array of action options (items, links, buttons, separators, or actions)",
+      control: false,
+    },
+    className: {
+      control: "text",
+      description: "Optional CSS class name for the wrapper",
+    },
+    bodyClassName: {
+      control: "text",
+      description: "Optional CSS class name for the options body section",
+    },
+  },
 } satisfies Meta<typeof EmptyView>;
+
+type Story = StoryObj<ComponentProps<typeof EmptyView>>;
+
 export default meta;
-type Story = StoryObj<typeof EmptyView>;
 
 const Template = ({ ...args }: EmptyViewProps) => {
   return <EmptyView {...args} LinkRouter={MockLinkRouter} />;
@@ -81,6 +141,25 @@ export const Default: Story = {
       },
     ],
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default empty view with an icon, title, description, and a link option for navigation.",
+      },
+      source: {
+        code: `<EmptyView
+  icon={<EmptyRoomsIcon />}
+  title="Empty Folder"
+  description="This folder is empty. Add files or folders to get started."
+  options={[
+    { key: "upload", icon: <UploadIcon />, to: "/upload", description: "Clear Filter" },
+  ]}
+  LinkRouter={RouterLink}
+/>`,
+      },
+    },
+  },
 };
 
 export const NoOptions: Story = {
@@ -89,5 +168,71 @@ export const NoOptions: Story = {
     icon: <EmptyRoomsLightSvg />,
     title: "No Files Found",
     description: "There are no files matching your search criteria.",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Empty view without any action options, displaying only the header with icon, title, and description.",
+      },
+      source: {
+        code: `<EmptyView
+  icon={<SearchIcon />}
+  title="No Files Found"
+  description="There are no files matching your search criteria."
+  options={null}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithMultipleOptions: Story = {
+  render: Template,
+  args: {
+    icon: <EmptyRoomsLightSvg />,
+    title: "Get Started",
+    description: "Choose an action to begin working with your workspace.",
+    options: [
+      {
+        key: "create",
+        icon: <CrossSvg />,
+        to: "/create",
+        description: "Create a new document",
+      },
+      {
+        key: "upload",
+        icon: <CrossSvg />,
+        to: "/upload",
+        description: "Upload files from your computer",
+      },
+      {
+        key: "import",
+        icon: <CrossSvg />,
+        to: "/import",
+        description: "Import from external storage",
+      },
+    ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Empty view with multiple link options for different actions the user can take.",
+      },
+      source: {
+        code: `<EmptyView
+  icon={<EmptyIcon />}
+  title="Get Started"
+  description="Choose an action to begin working with your workspace."
+  options={[
+    { key: "create", icon: <CreateIcon />, to: "/create", description: "Create a new document" },
+    { key: "upload", icon: <UploadIcon />, to: "/upload", description: "Upload files" },
+    { key: "import", icon: <ImportIcon />, to: "/import", description: "Import from external storage" },
+  ]}
+  LinkRouter={RouterLink}
+/>`,
+      },
+    },
   },
 };

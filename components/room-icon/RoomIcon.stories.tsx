@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import PlanetIcon from "../../assets/icons/12/planet.react.svg?url";
@@ -32,16 +33,37 @@ import EditPenSvgUrl from "../../assets/pencil.react.svg?url";
 import styles from "./RoomIcon.stories.module.scss";
 
 import { RoomIcon } from ".";
-import type { RoomIconProps } from "./RoomIcon.types";
 
-const meta: Meta<typeof RoomIcon> = {
-  title: "components/Data Display/RoomIcon",
+const meta = {
+  title: "UI/Data display/RoomIcon",
   component: RoomIcon,
   parameters: {
     docs: {
       description: {
-        component:
-          "Versatile room icon component for displaying room avatars with support for images, colors, badges, editing capabilities, and various states.",
+        component: `Versatile room icon component for displaying room avatars with support for images, colors, badges, editing capabilities, and various states.
+
+### Features
+
+- **Color Backgrounds**: Display colored initials from room titles
+- **Three Sizes**: 32px, 48px, and 96px
+- **Badge Support**: Optional badge icons with tooltips
+- **Editing Mode**: Built-in edit dropdown with upload/edit actions
+- **States**: Archive, template, empty, and hover states
+
+### Usage
+
+\`\`\`tsx
+import { RoomIcon } from "@docspace/ui-kit/components/room-icon";
+
+// Basic room icon
+<RoomIcon title="My Room" color="4781D1" size="48px" showDefault />
+
+// With badge
+<RoomIcon title="Public" color="3B72A7" size="96px" badgeUrl={iconUrl} showDefault />
+
+// With editing
+<RoomIcon title="Editable" size="96px" color="4781D1" withEditing model={menuModel} showDefault />
+\`\`\``,
       },
     },
   },
@@ -58,36 +80,74 @@ const meta: Meta<typeof RoomIcon> = {
       control: "select",
       options: ["32px", "48px", "96px"],
       description: "Icon size",
+      table: {
+        defaultValue: { summary: "32px" },
+      },
     },
     radius: {
       control: "text",
       description: "Border radius",
+      table: {
+        defaultValue: { summary: "6px" },
+      },
     },
     showDefault: {
       control: "boolean",
       description: "Show default state with initials",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isArchive: {
       control: "boolean",
       description: "Archive state styling",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isTemplate: {
       control: "boolean",
       description: "Template room styling",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     withEditing: {
       control: "boolean",
       description: "Enable edit mode with dropdown",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isEmptyIcon: {
       control: "boolean",
       description: "Show empty icon placeholder",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
-};
+} satisfies Meta<typeof RoomIcon>;
+
+type RoomIconProps = ComponentProps<typeof RoomIcon>;
+type Story = StoryObj<RoomIconProps>;
 
 export default meta;
-type Story = StoryObj<RoomIconProps>;
+
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "16px",
+        flexWrap: "wrap",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
 
 const mockModel = [
   {
@@ -105,6 +165,12 @@ const mockModel = [
 ];
 
 export const Default: Story = {
+  render: (args: RoomIconProps) => (
+    <RoomIcon
+      {...args}
+      className={`${styles.roomTitle} ${styles.roomBackground}`}
+    />
+  ),
   args: {
     title: "Test Room",
     size: "96px",
@@ -112,39 +178,74 @@ export const Default: Story = {
     radius: "6px",
     showDefault: true,
   },
+};
+
+const SizesTemplate = () => {
+  return (
+    <Wrapper>
+      <RoomIcon title="S" color="4781D1" size="32px" showDefault />
+      <RoomIcon title="M" color="4781D1" size="48px" showDefault />
+      <RoomIcon title="L" color="4781D1" size="96px" showDefault />
+    </Wrapper>
+  );
+};
+
+export const Sizes: Story = {
+  render: () => <SizesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "All available icon sizes: 32px (small), 48px (medium), and 96px (large).",
+      },
+      source: {
+        code: `<RoomIcon title="S" color="4781D1" size="32px" showDefault />
+<RoomIcon title="M" color="4781D1" size="48px" showDefault />
+<RoomIcon title="L" color="4781D1" size="96px" showDefault />`,
+      },
+    },
+  },
+};
+
+const ColorsTemplate = () => {
+  return (
+    <Wrapper>
+      <RoomIcon title="Blue" color="4781D1" size="48px" showDefault />
+      <RoomIcon title="Green" color="2DB482" size="48px" showDefault />
+      <RoomIcon title="Orange" color="F97A0B" size="48px" showDefault />
+      <RoomIcon title="Purple" color="533ED1" size="48px" showDefault />
+      <RoomIcon title="Red" color="F2675A" size="48px" showDefault />
+    </Wrapper>
+  );
+};
+
+export const Colors: Story = {
+  render: () => <ColorsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: "Room icons with different background colors.",
+      },
+      source: {
+        code: `<RoomIcon title="Blue" color="4781D1" size="48px" showDefault />
+<RoomIcon title="Green" color="2DB482" size="48px" showDefault />
+<RoomIcon title="Orange" color="F97A0B" size="48px" showDefault />
+<RoomIcon title="Purple" color="533ED1" size="48px" showDefault />
+<RoomIcon title="Red" color="F2675A" size="48px" showDefault />`,
+      },
+    },
+  },
+};
+
+export const WithEditing: Story = {
   render: (args: RoomIconProps) => (
-    <div>
+    <div style={{ height: "200px" }}>
       <RoomIcon
         {...args}
         className={`${styles.roomTitle} ${styles.roomBackground}`}
       />
     </div>
   ),
-};
-
-export const Sizes: Story = {
-  render: () => (
-    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-      <RoomIcon title="S" color="4781D1" size="32px" showDefault />
-      <RoomIcon title="M" color="4781D1" size="48px" showDefault />
-      <RoomIcon title="L" color="4781D1" size="96px" showDefault />
-    </div>
-  ),
-};
-
-export const Colors: Story = {
-  render: () => (
-    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-      <RoomIcon title="Blue" color="4781D1" size="48px" showDefault />
-      <RoomIcon title="Green" color="2DB482" size="48px" showDefault />
-      <RoomIcon title="Orange" color="F97A0B" size="48px" showDefault />
-      <RoomIcon title="Purple" color="533ED1" size="48px" showDefault />
-      <RoomIcon title="Red" color="F2675A" size="48px" showDefault />
-    </div>
-  ),
-};
-
-export const WithEditing: Story = {
   args: {
     title: "Editable",
     size: "96px",
@@ -154,31 +255,55 @@ export const WithEditing: Story = {
     withEditing: true,
     model: mockModel,
   },
-  render: (args: RoomIconProps) => (
-    <div style={{ height: "200px" }}>
-      <RoomIcon
-        {...args}
-        className={`${styles.roomTitle} ${styles.roomBackground}`}
-      />
-    </div>
-  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Room icon with editing enabled. Hover to see the edit overlay with dropdown menu.",
+      },
+      source: {
+        code: `<RoomIcon
+  title="Editable"
+  size="96px"
+  color="4781D1"
+  withEditing
+  model={menuModel}
+  showDefault
+/>`,
+      },
+    },
+  },
 };
 
 export const EmptyState: Story = {
+  render: (args: RoomIconProps) => (
+    <div style={{ height: "200px" }}>
+      <RoomIcon {...args} />
+    </div>
+  ),
   args: {
     title: "",
     size: "96px",
     isEmptyIcon: true,
     model: mockModel,
   },
-  render: (args: RoomIconProps) => (
-    <div style={{ height: "200px" }}>
-      <RoomIcon {...args} />
-    </div>
-  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Empty icon placeholder state, typically used when no room image has been set yet.",
+      },
+      source: {
+        code: `<RoomIcon title="" size="96px" isEmptyIcon model={menuModel} />`,
+      },
+    },
+  },
 };
 
 export const Archive: Story = {
+  render: (args: RoomIconProps) => (
+    <RoomIcon {...args} className={styles.roomTitle} />
+  ),
   args: {
     title: "Archived",
     size: "96px",
@@ -187,14 +312,24 @@ export const Archive: Story = {
     showDefault: true,
     isArchive: true,
   },
-  render: (args: RoomIconProps) => (
-    <div>
-      <RoomIcon {...args} className={styles.roomTitle} />
-    </div>
-  ),
+  parameters: {
+    docs: {
+      description: {
+        story: "Archived room with muted styling to indicate inactive state.",
+      },
+      source: {
+        code: `<RoomIcon title="Archived" size="96px" color="A3A9AE" isArchive showDefault />`,
+      },
+    },
+  },
 };
 
 export const WithBadge: Story = {
+  render: (args: RoomIconProps) => (
+    <div style={{ position: "relative", width: "120px", height: "120px" }}>
+      <RoomIcon {...args} className={styles.roomTitle} />
+    </div>
+  ),
   args: {
     title: "Public",
     color: "3B72A7",
@@ -204,14 +339,32 @@ export const WithBadge: Story = {
     onBadgeClick: () => console.log("Badge clicked"),
     showDefault: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Room icon with a badge indicator, useful for showing public/shared status.",
+      },
+      source: {
+        code: `<RoomIcon
+  title="Public"
+  color="3B72A7"
+  size="96px"
+  badgeUrl={planetIconUrl}
+  onBadgeClick={handleBadgeClick}
+  showDefault
+/>`,
+      },
+    },
+  },
+};
+
+export const WithTooltip: Story = {
   render: (args: RoomIconProps) => (
     <div style={{ position: "relative", width: "120px", height: "120px" }}>
       <RoomIcon {...args} className={styles.roomTitle} />
     </div>
   ),
-};
-
-export const WithTooltip: Story = {
   args: {
     title: "Tooltip",
     color: "2DB482",
@@ -223,14 +376,31 @@ export const WithTooltip: Story = {
     tooltipId: "room-tooltip",
     showDefault: true,
   },
-  render: (args: RoomIconProps) => (
-    <div style={{ position: "relative", width: "120px", height: "120px" }}>
-      <RoomIcon {...args} className={styles.roomTitle} />
-    </div>
-  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Room icon with a badge that shows a tooltip on hover for additional context.",
+      },
+      source: {
+        code: `<RoomIcon
+  title="Tooltip"
+  color="2DB482"
+  size="96px"
+  badgeUrl={planetIconUrl}
+  tooltipContent="This room is publicly accessible"
+  tooltipId="room-tooltip"
+  showDefault
+/>`,
+      },
+    },
+  },
 };
 
 export const Template: Story = {
+  render: (args: RoomIconProps) => (
+    <RoomIcon {...args} className={styles.roomTitle} />
+  ),
   args: {
     title: "Template",
     color: "533ED1",
@@ -239,14 +409,27 @@ export const Template: Story = {
     isTemplate: true,
     showDefault: true,
   },
-  render: (args: RoomIconProps) => (
-    <div>
-      <RoomIcon {...args} className={styles.roomTitle} />
-    </div>
-  ),
+  parameters: {
+    docs: {
+      description: {
+        story: "Template room icon with specialized styling.",
+      },
+      source: {
+        code: `<RoomIcon title="Template" color="533ED1" size="96px" isTemplate showDefault />`,
+      },
+    },
+  },
 };
 
 export const WithHover: Story = {
+  render: (args: RoomIconProps) => (
+    <div style={{ height: "200px" }}>
+      <RoomIcon
+        {...args}
+        className={`${styles.roomTitle} ${styles.roomBackground}`}
+      />
+    </div>
+  ),
   args: {
     title: "Hover",
     size: "96px",
@@ -256,17 +439,33 @@ export const WithHover: Story = {
     hoverSrc: "https://picsum.photos/200",
     model: mockModel,
   },
-  render: (args: RoomIconProps) => (
-    <div style={{ height: "200px" }}>
-      <RoomIcon
-        {...args}
-        className={`${styles.roomTitle} ${styles.roomBackground}`}
-      />
-    </div>
-  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Room icon with a hover effect that reveals a preview image on mouse over.",
+      },
+      source: {
+        code: `<RoomIcon
+  title="Hover"
+  size="96px"
+  color="4781D1"
+  hoverSrc="https://example.com/preview.jpg"
+  model={menuModel}
+  showDefault
+/>`,
+      },
+    },
+  },
 };
 
 export const LongTitle: Story = {
+  render: (args: RoomIconProps) => (
+    <RoomIcon
+      {...args}
+      className={`${styles.roomTitle} ${styles.roomBackground}`}
+    />
+  ),
   args: {
     title: "Very Long Room Name That Should Be Truncated",
     size: "48px",
@@ -274,12 +473,20 @@ export const LongTitle: Story = {
     radius: "6px",
     showDefault: true,
   },
-  render: (args: RoomIconProps) => (
-    <div>
-      <RoomIcon
-        {...args}
-        className={`${styles.roomTitle} ${styles.roomBackground}`}
-      />
-    </div>
-  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Room icon with a long title to demonstrate initial truncation behavior.",
+      },
+      source: {
+        code: `<RoomIcon
+  title="Very Long Room Name That Should Be Truncated"
+  size="48px"
+  color="F97A0B"
+  showDefault
+/>`,
+      },
+    },
+  },
 };
