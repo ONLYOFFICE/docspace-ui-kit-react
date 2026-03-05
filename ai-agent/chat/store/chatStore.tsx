@@ -212,11 +212,6 @@ export const ChatStoreContextProvider = ({
       chatId: string;
       chatTitle: string;
     }) => {
-      console.log(`[WS] ${SocketEvents.UpdateChat}, data: `, {
-        chatId,
-        chatTitle,
-      });
-
       store.updateChatTitle(chatId, chatTitle);
     };
 

@@ -384,8 +384,6 @@ export default class MessageStore {
       return;
     }
 
-
-
     const fileId = Number(data?.id);
     if (!Number.isInteger(fileId) || fileId <= 0) return;
 
@@ -507,9 +505,12 @@ export default class MessageStore {
     let message = "";
     try {
       const parsed = JSON.parse(jsonData);
-      message = parsed && typeof parsed === "object" && typeof parsed.message === "string"
-        ? parsed.message
-        : String(jsonData);
+      message =
+        parsed &&
+        typeof parsed === "object" &&
+        typeof parsed.message === "string"
+          ? parsed.message
+          : String(jsonData);
     } catch {
       message = jsonData;
     }
@@ -560,8 +561,7 @@ export default class MessageStore {
 
           try {
             reader.cancel();
-          } catch (e) {
-            console.log(e);
+          } catch {
             // Ignore cancel errors
           }
           return;
@@ -625,7 +625,11 @@ export default class MessageStore {
             if (event.includes(EventType.NewToken)) {
               try {
                 const parsed = JSON.parse(jsonData);
-                if (!parsed || typeof parsed !== "object" || typeof parsed.text !== "string") {
+                if (
+                  !parsed ||
+                  typeof parsed !== "object" ||
+                  typeof parsed.text !== "string"
+                ) {
                   return;
                 }
                 const { text } = parsed;
@@ -680,7 +684,11 @@ export default class MessageStore {
                 try {
                   const parsed = JSON.parse(jsonData);
 
-                  if (parsed && typeof parsed === "object" && typeof parsed.messageId === "number") {
+                  if (
+                    parsed &&
+                    typeof parsed === "object" &&
+                    typeof parsed.messageId === "number"
+                  ) {
                     this.addMessageId(parsed.messageId);
                   }
                 } catch {
@@ -688,15 +696,15 @@ export default class MessageStore {
                 }
 
                 reader.cancel();
-              } catch (e) {
-                console.log(e);
+              } catch {
+                // ignore
               }
             }
           });
 
           await streamHandler();
         } catch (e) {
-          console.log(e);
+          console.error(e);
         } finally {
           this.setIsRequestRunning(false);
           this.setIsStreamRunning(false);
@@ -705,7 +713,7 @@ export default class MessageStore {
 
       await streamHandler();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       toastr.error(e as string);
     } finally {
       this.setIsRequestRunning(false);
@@ -765,8 +773,8 @@ export default class MessageStore {
         this.abortController.abort("Stop message");
         this.setIsRequestRunning(false);
         this.setIsStreamRunning(false);
-      } catch (e) {
-        console.log(e);
+      } catch {
+        // ignore abort error
       }
     }
   };
