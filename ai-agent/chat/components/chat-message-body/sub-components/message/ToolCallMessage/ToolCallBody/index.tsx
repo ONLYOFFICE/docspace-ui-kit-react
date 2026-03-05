@@ -39,11 +39,12 @@ import { Text } from "../../../../../../../../components/text";
 type ToolCallBodyProps = {
   content: TToolCallContent;
   placement: ToolCallPlacement;
-  allowExternalNavigation?: boolean;
+  openLink?: (url: string) => void;
+  openFile?: (fileId: string) => void;
 };
 
 export const ToolCallBody = observer(
-  ({ content, placement, allowExternalNavigation }: ToolCallBodyProps) => {
+  ({ content, placement, openLink, openFile }: ToolCallBodyProps) => {
     const { knowledgeSearchToolName, webSearchToolName } = useMessageStore();
 
     if (content.result?.error) {
@@ -65,7 +66,8 @@ export const ToolCallBody = observer(
         {isSourceView ? (
           <SourceView
             content={content}
-            allowExternalNavigation={allowExternalNavigation}
+            openLink={openLink}
+            openFile={openFile}
           />
         ) : (
           <CodeView content={content} placement={placement} />

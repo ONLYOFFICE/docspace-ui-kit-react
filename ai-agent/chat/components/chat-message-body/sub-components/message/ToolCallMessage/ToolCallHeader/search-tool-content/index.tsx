@@ -44,17 +44,24 @@ import { getCommonTranslation } from "../../../../../../../../../utils";
 
 const WebCrawlingToolContent = ({
   content,
-  allowExternalNavigation,
+  openLink,
 }: {
   content: TToolCallContent;
-  allowExternalNavigation?: boolean;
+  openLink?: (url: string) => void;
 }) => {
   const toolInfo = ((content.result?.data as TToolCallResultSourceData)
     ?.title || content.arguments.url) as string;
 
   const hasError = !!content.result?.error;
 
-  return hasError || !allowExternalNavigation ? (
+  const handleClick = (e: React.MouseEvent) => {
+    if (openLink && content.arguments?.url) {
+      e.preventDefault();
+      openLink(content.arguments.url as string);
+    }
+  };
+
+  return hasError ? (
     <>
       <UniverseIcon
         className={styles.searchToolIcon}
@@ -71,6 +78,7 @@ const WebCrawlingToolContent = ({
       href={content.arguments?.url as string}
       target={LinkTarget.blank}
       textDecoration="none"
+      onClick={handleClick}
     >
       <UniverseIcon
         className={styles.searchToolIcon}
@@ -128,10 +136,10 @@ const KnowledgeSearchToolContent = ({
 
 export const SearchToolContent = ({
   content,
-  allowExternalNavigation,
+  openLink,
 }: {
   content: TToolCallContent;
-  allowExternalNavigation?: boolean;
+  openLink?: (url: string) => void;
 }) => {
   const { knowledgeSearchToolName, webSearchToolName, webCrawlingToolName } =
     useMessageStore();
@@ -149,7 +157,7 @@ export const SearchToolContent = ({
       {content.name === webCrawlingToolName ? (
         <WebCrawlingToolContent
           content={content}
-          allowExternalNavigation={allowExternalNavigation}
+          openLink={openLink}
         />
       ) : null}
     </>

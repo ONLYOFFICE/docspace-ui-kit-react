@@ -43,11 +43,12 @@ type ToolCallProps = {
   content: TToolCallContent;
   placement: ToolCallPlacement;
   status: ToolCallStatus;
-  allowExternalNavigation?: boolean;
+  openLink?: (url: string) => void;
+  openFile?: (fileId: string) => void;
 };
 
 export const ToolCall = observer(
-  ({ content, status, placement, allowExternalNavigation }: ToolCallProps) => {
+  ({ content, status, placement, openLink, openFile }: ToolCallProps) => {
     const [collapsed, setCollapsed] = React.useState(true);
     const { knowledgeSearchToolName, webSearchToolName, webCrawlingToolName } =
       useMessageStore();
@@ -79,14 +80,15 @@ export const ToolCall = observer(
           placement={placement}
           expandable={expandable}
           isSearchTool={isSearchTool}
-          allowExternalNavigation={allowExternalNavigation}
+          openLink={openLink}
         />
 
         {!expandable || collapsed ? null : (
           <ToolCallBody
             content={content}
             placement={placement}
-            allowExternalNavigation={allowExternalNavigation}
+            openLink={openLink}
+            openFile={openFile}
           />
         )}
       </div>

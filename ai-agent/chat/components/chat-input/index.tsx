@@ -58,7 +58,7 @@ const ChatInput = ({
   multimodal,
   goToWebSearchSettings,
   persistDraft = false,
-  allowExternalNavigation,
+  openFile,
   allowAttachFiles,
   allowManageTools,
   onSendMessage,
@@ -312,7 +312,7 @@ const ChatInput = ({
               isAdmin={isPortalAdmin}
               aiReady={aiReady}
               goToWebSearchSettings={goToWebSearchSettings}
-              allowExternalNavigation={allowExternalNavigation}
+              openFile={openFile}
               allowAttachFiles={allowAttachFiles}
               allowManageTools={allowManageTools}
               onStopStream={onStopStream}

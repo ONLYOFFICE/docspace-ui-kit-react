@@ -54,7 +54,6 @@ const Buttons = ({
   isAdmin,
   aiReady,
   goToWebSearchSettings,
-  allowExternalNavigation,
   allowAttachFiles = false,
   allowManageTools,
   onStopStream,
@@ -117,7 +116,6 @@ const Buttons = ({
             isAdmin={isAdmin}
             aiReady={aiReady}
             goToWebSearchSettings={goToWebSearchSettings}
-            allowExternalNavigation={allowExternalNavigation}
           />
         )}
       </div>

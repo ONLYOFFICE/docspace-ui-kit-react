@@ -49,7 +49,7 @@ import { Link, LinkType } from "../../../../../../components/link";
 
 import { useChatStore } from "../../../../store/chatStore";
 import { useMessageStore } from "../../../../store/messageStore";
-import { openFile } from "../../../../utils";
+import { openFileInEditor } from "../../../../utils";
 import { SelectChatProps } from "../../../../Chat.types";
 import { TooltipContainer } from "../../../../../../components/tooltip";
 
@@ -71,7 +71,7 @@ const SelectChat = ({
   agentId,
   getIcon,
   getResultStorageId,
-  allowExternalNavigation,
+  openFile,
   onSelectChat,
 }: SelectChatProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -93,6 +93,14 @@ const SelectChat = ({
   } = useChatStore();
   const { fetchMessages, isRequestRunning } = useMessageStore();
   const { aiApi, baseUrl } = useApi();
+
+  const handleFileOpen = (fileId: string) => {
+    if (openFile) {
+      openFile(fileId);
+    } else {
+      openFileInEditor(fileId, baseUrl);
+    }
+  };
 
   const closeExportSelector = () => setIsExportOpen(false);
 
@@ -167,11 +175,7 @@ const SelectChat = ({
 
         if (resultFile) {
           if (isChecked) {
-            openFile(
-              resultFile.id!.toString(),
-              allowExternalNavigation,
-              baseUrl,
-            );
+            handleFileOpen(resultFile.id!.toString());
           }
 
           const toastMsg = (
@@ -180,19 +184,11 @@ const SelectChat = ({
               values={{ fileName, title }}
               components={{
                 1: <b />,
-                2: allowExternalNavigation ? (
+                2: (
                   <Link
                     type={LinkType.action}
-                    onClick={() =>
-                      openFile(
-                        resultFile.id!.toString(),
-                        allowExternalNavigation,
-                        baseUrl,
-                      )
-                    }
+                    onClick={() => handleFileOpen(resultFile.id!.toString())}
                   />
-                ) : (
-                  <span />
                 ),
               }}
             />
@@ -339,7 +335,6 @@ const SelectChat = ({
           currentFolderId={getResultStorageId?.() || agentId}
           getFileName={getFileName}
           onSubmit={onSubmit}
-          allowExternalNavigation={allowExternalNavigation}
         />
       ) : null}
     </>

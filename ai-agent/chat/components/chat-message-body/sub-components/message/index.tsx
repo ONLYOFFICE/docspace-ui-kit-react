@@ -58,24 +58,37 @@ import Buttons from "./buttons";
 import { getCommonTranslation } from "../../../../../../utils";
 import { useApi } from "../../../../../../providers";
 
-const renderLink = ({
-  attributes,
-  content,
-}: {
-  attributes: { href?: string };
-  content: string;
-}) => (
-  <Link
-    href={attributes.href}
-    className={styles.link}
-    target={LinkTarget.blank}
-    fontSize="15px"
-    lineHeight="22px"
-    color="accent"
-  >
-    {content}
-  </Link>
-);
+const renderLink = (
+  {
+    attributes,
+    content,
+  }: {
+    attributes: { href?: string };
+    content: string;
+  },
+  openLink?: (url: string) => void,
+) => {
+  const handleClick = (e: React.MouseEvent) => {
+    if (openLink && attributes.href) {
+      e.preventDefault();
+      openLink(attributes.href);
+    }
+  };
+
+  return (
+    <Link
+      href={attributes.href}
+      className={styles.link}
+      target={LinkTarget.blank}
+      fontSize="15px"
+      lineHeight="22px"
+      color="accent"
+      onClick={handleClick}
+    >
+      {content}
+    </Link>
+  );
+};
 
 const Message = ({
   message,
@@ -86,7 +99,8 @@ const Message = ({
   getResultStorageId,
   setAiPlaylistImages,
   setMediaViewerVisible,
-  allowExternalNavigation,
+  openFile,
+  openLink,
 }: MessageProps) => {
   const { currentChat } = useChatStore();
   const {
@@ -136,7 +150,7 @@ const Message = ({
               <Files
                 files={files}
                 getIcon={getIcon}
-                allowExternalNavigation={allowExternalNavigation}
+                openFile={openFile}
               />
             ) : null}
 
@@ -247,6 +261,8 @@ const Message = ({
               key={`${idx}_${c.type}_${mId}`}
               chatMessage={c.text}
               isFirst={mId === 0}
+              openLink={openLink}
+              openFile={openFile}
             />
           );
 
@@ -255,7 +271,8 @@ const Message = ({
             <ToolCallMessage
               key={`${c.name}_${mId * 2}`}
               content={c}
-              allowExternalNavigation={allowExternalNavigation}
+              openLink={openLink}
+              openFile={openFile}
             />
           );
 
@@ -266,7 +283,7 @@ const Message = ({
           files={files}
           getIcon={getIcon}
           reverse
-          allowExternalNavigation={allowExternalNavigation}
+          openFile={openFile}
         />
       ) : null}
       {message.id ? (
@@ -278,7 +295,7 @@ const Message = ({
           messageIndex={idx}
           getIcon={getIcon}
           getResultStorageId={getResultStorageId}
-          allowExternalNavigation={allowExternalNavigation}
+          openFile={openFile}
         />
       ) : null}
     </div>

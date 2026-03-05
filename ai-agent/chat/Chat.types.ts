@@ -79,7 +79,7 @@ export type SelectChatProps = {
   agentId: string | number;
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
-  allowExternalNavigation?: boolean;
+  openFile?: (fileId: string) => void;
   onSelectChat?: (chatId: string) => void;
 };
 
@@ -110,7 +110,8 @@ export type MessageProps = {
   isLast: boolean;
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
-  allowExternalNavigation?: boolean;
+  openFile?: (fileId: string) => void;
+  openLink?: (url: string) => void;
 } & Pick<MessageImagesProps, "setAiPlaylistImages" | "setMediaViewerVisible">;
 
 export type MessageButtonsProps = {
@@ -121,7 +122,7 @@ export type MessageButtonsProps = {
   getIcon: TGetIcon;
   messageIndex: number;
   getResultStorageId?: () => number | null;
-  allowExternalNavigation?: boolean;
+  openFile?: (fileId: string) => void;
 };
 
 export type MessageCodeBlockProps = {
@@ -138,7 +139,7 @@ export type MessageFilesProps = {
   files: TContent[];
   getIcon: TGetIcon;
   reverse?: boolean;
-  allowExternalNavigation?: boolean;
+  openFile?: (fileId: string) => void;
 };
 
 export type MessageImagesProps = {
@@ -152,11 +153,14 @@ export type MessageMarkdownFieldProps = {
   propLanguage?: string;
   isFirst?: boolean;
   successCopyMessage?: string;
+  openLink?: (url: string) => void;
+  openFile?: (fileId: string) => void;
 };
 
 export type MessageToolCallProps = {
   content: TToolCallContent;
-  allowExternalNavigation?: boolean;
+  openLink?: (url: string) => void;
+  openFile?: (fileId: string) => void;
 };
 
 export type MessageEmptyProps = {
@@ -168,7 +172,8 @@ export type MessageBodyProps = {
 
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
-  allowExternalNavigation?: boolean;
+  openFile?: (fileId: string) => void;
+  openLink?: (url: string) => void;
 } & Pick<MessageProps, "setAiPlaylistImages" | "setMediaViewerVisible" | "userAvatar">;
 
 export type FilesListProps = {
@@ -192,7 +197,7 @@ export type ButtonsProps = {
   isAdmin?: boolean;
   aiReady: boolean;
   goToWebSearchSettings?: () => void;
-  allowExternalNavigation?: boolean;
+  openFile?: (fileId: string) => void;
   allowAttachFiles?: boolean;
   allowManageTools?: boolean;
   onStopStream?: () => void;
@@ -220,7 +225,7 @@ export type ChatInputProps = {
   multimodal?: TMultimodal;
   goToWebSearchSettings?: () => void;
   persistDraft?: boolean;
-  allowExternalNavigation?: boolean;
+  openFile?: (fileId: string) => void;
   allowAttachFiles?: boolean;
   allowManageTools?: boolean;
   onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
@@ -230,7 +235,6 @@ export type ChatInputProps = {
 export type ChatInfoBlockProps = {
   standalone: boolean;
   isPortalAdmin: boolean;
-  allowExternalNavigation?: boolean;
 };
 
 export type ChatFooterProps = ChatInputProps & ChatInfoBlockProps;
@@ -279,7 +283,8 @@ export type ChatProps = {
   className?: string;
   persistDraft?: boolean;
   internalInit?: boolean;
-  allowExternalNavigation?: boolean;
+  openFile?: (fileId: string) => void;
+  openLink?: (url: string) => void;
   allowAttachFiles?: boolean;
   allowManageTools?: boolean;
   allowSelectChat?: boolean;

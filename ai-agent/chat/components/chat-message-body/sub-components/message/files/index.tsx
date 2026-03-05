@@ -35,7 +35,7 @@ import { Text } from "../../../../../../../components/text";
 
 import type { MessageFilesProps } from "../../../../../Chat.types";
 
-import { openFile } from "../../../../../utils";
+import { openFileInEditor } from "../../../../../utils";
 import { useApi } from "../../../../../../../providers/api";
 
 import styles from "../../../ChatMessageBody.module.scss";
@@ -44,9 +44,17 @@ const Files = ({
   files,
   getIcon,
   reverse,
-  allowExternalNavigation,
+  openFile,
 }: MessageFilesProps) => {
   const { baseUrl } = useApi();
+
+  const handleFileClick = (fileId: string) => {
+    if (openFile) {
+      openFile(fileId);
+    } else {
+      openFileInEditor(fileId, baseUrl);
+    }
+  };
 
   if (!files.length) return null;
 
@@ -61,13 +69,9 @@ const Files = ({
 
         return (
           <div
-            className={classNames(styles.filesListItem, {
-              [styles.disabledNavigation]: !allowExternalNavigation,
-            })}
+            className={classNames(styles.filesListItem)}
             key={file.id}
-            onClick={() =>
-              openFile(file.id.toString(), allowExternalNavigation, baseUrl)
-            }
+            onClick={() => handleFileClick(file.id.toString())}
             data-testid="file-item"
           >
             {(() => {

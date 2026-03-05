@@ -50,7 +50,7 @@ import {
 import { useMessageStore } from "../../../../../store/messageStore";
 import { useChatStore } from "../../../../../store/chatStore";
 
-import { openFile } from "../../../../../utils";
+import { openFileInEditor } from "../../../../../utils";
 
 import ExportSelector from "../../../../export-selector";
 
@@ -71,11 +71,19 @@ const Buttons = ({
   getIcon,
   messageIndex,
   getResultStorageId,
-  allowExternalNavigation,
+  openFile,
 }: MessageButtonsProps) => {
   const { agentId, findPreviousUserMessage } = useMessageStore();
   const { currentChat } = useChatStore();
   const { aiApi, baseUrl } = useApi();
+
+  const handleFileOpen = (fileId: string) => {
+    if (openFile) {
+      openFile(fileId);
+    } else {
+      openFileInEditor(fileId, baseUrl);
+    }
+  };
 
   const [showFolderSelector, setShowFolderSelector] = React.useState(false);
 
@@ -110,7 +118,7 @@ const Buttons = ({
 
       if (resultFile) {
         if (isChecked) {
-          openFile(resultFile.id!.toString(), allowExternalNavigation, baseUrl);
+          handleFileOpen(resultFile.id!.toString());
         }
 
         const toastMsg = (
@@ -118,19 +126,11 @@ const Buttons = ({
             i18nKey="MessageExported"
             values={{ fileName }}
             components={{
-              1: allowExternalNavigation ? (
+              1: (
                 <Link
                   type={LinkType.action}
-                  onClick={() =>
-                    openFile(
-                      resultFile.id!.toString(),
-                      allowExternalNavigation,
-                      baseUrl,
-                    )
-                  }
+                  onClick={() => handleFileOpen(resultFile.id!.toString())}
                 />
-              ) : (
-                <span />
               ),
             }}
           />
@@ -218,7 +218,6 @@ const Buttons = ({
           getFileName={getExportedFileName}
           getIcon={getIcon}
           showFolderSelector={showFolderSelector}
-          allowExternalNavigation={allowExternalNavigation}
         />
       ) : null}
     </>

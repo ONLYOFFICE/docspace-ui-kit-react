@@ -67,10 +67,11 @@ const MyComponent = () => {
   width="100%"
   height="100vh"
   persistDraft={true}
-  allowExternalNavigation={true}
   allowAttachFiles={true}
   allowManageTools={true}
   allowSelectChat={true}
+  openFile={(fileId) => console.log("Open file:", fileId)}
+  openLink={(url) => console.log("Open link:", url)}
   onSendMessage={(message, files) => console.log(message, files)}
   onStopStream={() => console.log("Stream stopped")}
   onStreamData={(chunk) => console.log(chunk)}
@@ -147,7 +148,8 @@ const MyComponent = ({
 | `style` | `React.CSSProperties` | - | - | Inline styles for the container |
 | `persistDraft` | `boolean` | - | `false` | Persist draft messages across sessions |
 | `internalInit` | `boolean` | - | `true` | Use internal initialization (auto-fetch data) |
-| `allowExternalNavigation` | `boolean` | - | `false` | Allow navigation to external links and resources |
+| `openFile` | `(fileId: string) => void` | - | - | Custom handler for opening files |
+| `openLink` | `(url: string) => void` | - | - | Custom handler for opening external links |
 | `allowAttachFiles` | `boolean` | - | `false` | Enable file attachment functionality |
 | `allowManageTools` | `boolean` | - | `false` | Allow users to manage AI tools and settings |
 | `allowSelectChat` | `boolean` | - | `false` | Enable chat selection and switching |
@@ -250,7 +252,7 @@ import { CHAT_SUPPORTED_FORMATS } from "@docspace/ui-kit/ai-agent/chat";
 />
 ```
 
-### Full-Featured Chat with Callbacks
+### Full-Featured Chat with Listeners
 
 ```tsx
 const handleSendMessage = (message: string, files: Partial<TFile>[]) => {
@@ -269,10 +271,11 @@ const handleNewChat = () => {
 <Chat
   agentId={123}
   persistDraft={true}
-  allowExternalNavigation={true}
   allowAttachFiles={true}
   allowManageTools={true}
   allowSelectChat={true}
+  openFile={(fileId) => window.open(`/doceditor?fileId=${fileId}`, "_blank")}
+  openLink={(url) => window.open(url, "_blank")}
   onSendMessage={handleSendMessage}
   onStreamData={handleStreamData}
   onNewChat={handleNewChat}
@@ -306,7 +309,7 @@ function ResponsiveChat() {
 5. **File Attachments**: Set `allowAttachFiles={true}` only if multimodal is supported
 6. **Draft Persistence**: Enable `persistDraft` for better user experience in long sessions
 7. **Callbacks**: Implement `onSendMessage` and `onStreamData` for custom message handling
-8. **External Navigation**: Enable `allowExternalNavigation` carefully based on security requirements
+8. **Custom Navigation**: Provide `openFile` and `openLink` callbacks to customize how files and links are opened
 9. **Error Handling**: Monitor the loading states and handle errors appropriately
 
 ## Common Use Cases
@@ -330,7 +333,6 @@ function ResponsiveChat() {
   agentId={123}
   width="100vw"
   height="100vh"
-  allowExternalNavigation={true}
   allowAttachFiles={true}
   allowManageTools={true}
   allowSelectChat={true}

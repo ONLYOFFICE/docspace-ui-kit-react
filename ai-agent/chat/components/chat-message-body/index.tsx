@@ -51,7 +51,8 @@ const ChatMessageBody = observer(({
   getResultStorageId,
   setAiPlaylistImages,
   setMediaViewerVisible,
-  allowExternalNavigation,
+  openFile,
+  openLink,
 }: MessageBodyProps) => {
   const {
     messages,
@@ -120,7 +121,8 @@ const ChatMessageBody = observer(({
                 getResultStorageId={getResultStorageId}
                 setAiPlaylistImages={setAiPlaylistImages}
                 setMediaViewerVisible={setMediaViewerVisible}
-                allowExternalNavigation={allowExternalNavigation}
+                openFile={openFile}
+                openLink={openLink}
               />
             );
           })}

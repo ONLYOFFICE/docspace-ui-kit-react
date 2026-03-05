@@ -73,7 +73,8 @@ const ChatUI = observer(
     setAiPlaylistImages,
     setMediaViewerVisible,
     persistDraft = false,
-    allowExternalNavigation,
+    openFile,
+    openLink,
     allowAttachFiles,
     allowManageTools,
     allowSelectChat,
@@ -106,7 +107,7 @@ const ChatUI = observer(
           getResultStorageId={getResultStorageId}
           agentId={agentId}
           aiReady={aiReady}
-          allowExternalNavigation={allowExternalNavigation}
+          openFile={openFile}
           allowSelectChat={allowSelectChat}
           onNewChat={onNewChat}
           onSelectChat={onSelectChat}
@@ -118,7 +119,6 @@ const ChatUI = observer(
             standalone={standalone}
             isPortalAdmin={isAdmin}
             goToAISettings={goToAISettings}
-            allowExternalNavigation={allowExternalNavigation}
           />
         ) : (
           <>
@@ -129,7 +129,8 @@ const ChatUI = observer(
               getResultStorageId={getResultStorageId}
               setAiPlaylistImages={setAiPlaylistImages}
               setMediaViewerVisible={setMediaViewerVisible}
-              allowExternalNavigation={allowExternalNavigation}
+              openFile={openFile}
+              openLink={openLink}
             />
             <ChatFooter
               attachmentFile={attachmentFile}
@@ -144,7 +145,7 @@ const ChatUI = observer(
               multimodal={multimodal}
               goToWebSearchSettings={goToWebSearchSettings}
               persistDraft={persistDraft}
-              allowExternalNavigation={allowExternalNavigation}
+              openFile={openFile}
               allowAttachFiles={allowAttachFiles}
               allowManageTools={allowManageTools}
               onSendMessage={onSendMessage}
@@ -174,7 +175,6 @@ const ChatCore = (props: ChatCoreProps) => {
     standalone = false,
     isAdmin = false,
     goToAISettings,
-    allowExternalNavigation,
     toolsSettings,
   } = props;
 
@@ -196,7 +196,6 @@ const ChatCore = (props: ChatCoreProps) => {
           standalone={standalone}
           isPortalAdmin={isAdmin}
           goToAISettings={goToAISettings}
-          allowExternalNavigation={allowExternalNavigation}
         />
       </ChatContainer>
     );

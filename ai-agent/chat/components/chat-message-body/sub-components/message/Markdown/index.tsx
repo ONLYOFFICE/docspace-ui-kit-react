@@ -70,6 +70,8 @@ const MarkdownField = React.memo(
     propLanguage,
     isFirst,
     successCopyMessage,
+    openLink,
+    openFile,
   }: MessageMarkdownFieldProps) => {
     // Process the chat message to handle <think> tags
     // const processedChatMessage = preprocessChatMessage(chatMessage);
@@ -94,6 +96,13 @@ const MarkdownField = React.memo(
       [propLanguage, successCopyMessage],
     );
 
+    const AnchorWithProps = useCallback(
+      (props: PropsWithChildren<{ href?: string }>) => (
+        <Anchor {...props} openLink={openLink} openFile={openFile} />
+      ),
+      [openLink, openFile],
+    );
+
     const components = {
       h1: H1,
       h2: H2,
@@ -101,7 +110,7 @@ const MarkdownField = React.memo(
       h4: H4,
       h5: H5,
       h6: H6,
-      a: Anchor,
+      a: AnchorWithProps,
       blockquote: Blockquote,
       hr: Hr,
       table: Table,

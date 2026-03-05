@@ -41,10 +41,11 @@ type StoryArgs = {
   width?: string;
   height?: string;
   persistDraft?: boolean;
-  allowExternalNavigation?: boolean;
   allowAttachFiles?: boolean;
   allowManageTools?: boolean;
   allowSelectChat?: boolean;
+  openFile?: (fileId: string) => void;
+  openLink?: (url: string) => void;
   onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
   onStopStream?: () => void;
   onStreamData?: (chunk: string) => void;
@@ -90,10 +91,11 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
   width="100%"
   height="100vh"
   persistDraft={true}
-  allowExternalNavigation={true}
   allowAttachFiles={true}
   allowManageTools={true}
   allowSelectChat={true}
+  openFile={(fileId) => console.log(fileId)}
+  openLink={(url) => console.log(url)}
   onSendMessage={handleSend}
   onStopStream={handleStop}
   onStreamData={handleStream}
@@ -124,11 +126,6 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
       description: "Persist draft messages across sessions",
       table: { defaultValue: { summary: "false" } },
     },
-    allowExternalNavigation: {
-      control: "boolean",
-      description: "Allow navigation to external links and resources",
-      table: { defaultValue: { summary: "false" } },
-    },
     allowAttachFiles: {
       control: "boolean",
       description: "Enable file attachment functionality",
@@ -143,6 +140,16 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
       control: "boolean",
       description: "Enable chat selection and switching",
       table: { defaultValue: { summary: "false" } },
+    },
+    openFile: {
+      action: "openFile",
+      description:
+        "Custom handler for opening files (e.g., generated documents)",
+    },
+    openLink: {
+      action: "openLink",
+      description:
+        "Custom handler for opening external links in messages and tool results",
     },
     onSendMessage: {
       action: "onSendMessage",
@@ -237,7 +244,13 @@ const CallbackLogger = (props: StoryArgs) => {
   return (
     <div style={{ display: "flex", height: "700px", gap: "16px" }}>
       <Toast />
-      <div style={{ flex: "1 1 60%", minWidth: 0, border: "4px dashed rgb(208, 213, 221)" }}>
+      <div
+        style={{
+          flex: "1 1 60%",
+          minWidth: 0,
+          border: "4px dashed rgb(208, 213, 221)",
+        }}
+      >
         <Chat
           {...(props as unknown as ChatProps)}
           onSendMessage={(message, files) => {
@@ -271,7 +284,7 @@ const CallbackLogger = (props: StoryArgs) => {
 
       <div className={styles.callbackPanel}>
         <div className={styles.panelHeader}>
-          <h3 className={styles.panelTitle}>Callback Events</h3>
+          <h3 className={styles.panelTitle}>Listener Events</h3>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -289,7 +302,7 @@ const CallbackLogger = (props: StoryArgs) => {
           {filteredLogs.length === 0 ? (
             <div className={styles.emptyState}>
               {filter === "all"
-                ? "No events yet. Interact with the chat to see callbacks."
+                ? "No events yet. Interact with the chat to see listeners."
                 : `No ${filter} events yet.`}
             </div>
           ) : (
@@ -327,7 +340,6 @@ export const Default: Story = {
   args: {
     userAvatar: "",
     persistDraft: false,
-    allowExternalNavigation: false,
     allowAttachFiles: false,
     allowManageTools: false,
     allowSelectChat: false,
@@ -364,7 +376,6 @@ export const AllFeaturesEnabled: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
     persistDraft: true,
-    allowExternalNavigation: true,
     allowAttachFiles: true,
     allowManageTools: true,
     allowSelectChat: true,
@@ -396,7 +407,6 @@ export const AllFeaturesEnabled: Story = {
         code: `<Chat
   agentId={validatedAgentId}
   persistDraft={true}
-  allowExternalNavigation={true}
   allowAttachFiles={true}
   allowManageTools={true}
   allowSelectChat={true}
@@ -411,12 +421,11 @@ export const AllFeaturesEnabled: Story = {
   },
 };
 
-export const WithCallbacks: Story = {
+export const WithListeners: Story = {
   render: (args: StoryArgs) => <CallbackLogger {...args} />,
   args: {
     userAvatar: "",
     persistDraft: true,
-    allowExternalNavigation: true,
     allowAttachFiles: true,
     allowManageTools: true,
     allowSelectChat: true,
@@ -433,7 +442,6 @@ export const WithCallbacks: Story = {
         code: `<Chat
   agentId={validatedAgentId}
   persistDraft={true}
-  allowExternalNavigation={true}
   allowAttachFiles={true}
   allowManageTools={true}
   allowSelectChat={true}

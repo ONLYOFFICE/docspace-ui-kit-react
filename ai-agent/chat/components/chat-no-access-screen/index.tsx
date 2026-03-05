@@ -39,7 +39,6 @@ type Props = {
   standalone: boolean;
   isPortalAdmin: boolean;
   goToAISettings?: () => void;
-  allowExternalNavigation?: boolean;
 };
 
 export const ChatNoAccessScreen = ({
@@ -47,7 +46,6 @@ export const ChatNoAccessScreen = ({
   isPortalAdmin,
   standalone,
   goToAISettings,
-  allowExternalNavigation,
 }: Props) => {
   const { isBase } = useTheme();
 
@@ -104,7 +102,7 @@ export const ChatNoAccessScreen = ({
   } as const;
 
   const options =
-    !isPortalAdmin || !goToAISettings || !allowExternalNavigation
+    !isPortalAdmin || !goToAISettings
       ? []
       : standalone
         ? [goToAIProviderSettings]

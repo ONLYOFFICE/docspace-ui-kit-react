@@ -50,10 +50,12 @@ import {
 
 const SourceItem = ({
   source,
-  allowExternalNavigation,
+  openLink,
+  openFile,
 }: {
   source: TToolCallResultSourceData;
-  allowExternalNavigation?: boolean;
+  openLink?: (url: string) => void;
+  openFile?: (fileId: string) => void;
 }) => {
   const tooltipId = useId();
   const [faviconLoadError, setFaviconLoadError] = useState(false);
@@ -121,22 +123,22 @@ const SourceItem = ({
         />
       ) : null}
 
-      {allowExternalNavigation ? (
-        <ExternalLinkIcon className={styles.externalLinkIcon} />
-      ) : null}
+      <ExternalLinkIcon className={styles.externalLinkIcon} />
     </>
   );
 
-  if (!allowExternalNavigation) {
-    return (
-      <div
-        className={classNames(styles.sourceItem, styles.disabledNavigation)}
-        data-testid="source-item"
-      >
-        {content}
-      </div>
-    );
-  }
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // For knowledge base sources, use openFile with fileId
+    if (isKnowledgeSource && source.fileId && openFile) {
+      openFile(source.fileId.toString());
+    }
+    // For web search sources, use openLink with URL
+    else if (!isKnowledgeSource && linkHref && openLink) {
+      openLink(linkHref);
+    }
+  };
 
   return (
     <Link
@@ -145,6 +147,7 @@ const SourceItem = ({
       target={LinkTarget.blank}
       textDecoration="none"
       truncate
+      onClick={handleClick}
       data-testid="source-item"
     >
       {content}
@@ -154,10 +157,12 @@ const SourceItem = ({
 
 export const SourceView = ({
   content,
-  allowExternalNavigation,
+  openLink,
+  openFile,
 }: {
   content: TToolCallContent;
-  allowExternalNavigation?: boolean;
+  openLink?: (url: string) => void;
+  openFile?: (fileId: string) => void;
 }) => {
   if (!content.result) return null;
 
@@ -174,7 +179,8 @@ export const SourceView = ({
           <SourceItem
             key={`${source.fileId || source.title}_${index * 2}`}
             source={source}
-            allowExternalNavigation={allowExternalNavigation}
+            openLink={openLink}
+            openFile={openFile}
           />
         ))}
       </div>

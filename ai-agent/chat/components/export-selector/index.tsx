@@ -47,7 +47,6 @@ type ExportSelectorProps = {
   ) => Promise<void>;
   currentFolderId: string | number;
   getFileName: () => string;
-  allowExternalNavigation?: boolean;
 };
 
 const ExportSelector = ({
@@ -57,7 +56,6 @@ const ExportSelector = ({
   onSubmit,
   currentFolderId,
   getFileName,
-  allowExternalNavigation,
 }: ExportSelectorProps) => {
   return (
     <FilesSelector
@@ -96,7 +94,7 @@ const ExportSelector = ({
       withoutBackButton
       withCancelButton
       withCreate={false}
-      withFooterCheckbox={!!allowExternalNavigation}
+      withFooterCheckbox
       withFooterInput
       cancelButtonLabel={getCommonTranslation("CancelButton")}
       submitButtonLabel={getCommonTranslation("SaveButton")}

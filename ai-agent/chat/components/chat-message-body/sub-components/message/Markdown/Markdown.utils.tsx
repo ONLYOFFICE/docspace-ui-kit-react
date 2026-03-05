@@ -167,18 +167,45 @@ export const H6 = ({ children }: PropsWithChildren) => (
 export const Anchor = ({
   children,
   href,
-}: PropsWithChildren<{ href?: string }>) => (
-  <Link
-    className={styles.link}
-    target={LinkTarget.blank}
-    href={href}
-    fontSize="15px"
-    lineHeight="22px"
-    color="accent"
-  >
-    {children}
-  </Link>
-);
+  openLink,
+  openFile,
+}: PropsWithChildren<{
+  href?: string;
+  openLink?: (url: string) => void;
+  openFile?: (fileId: string) => void;
+}>) => {
+  const handleClick = (e: React.MouseEvent) => {
+    if (!href) return;
+
+    // Check if it's a doceditor link
+    if (href.startsWith("/doceditor") && openFile) {
+      e.preventDefault();
+      // Extract fileId from URL params
+      const url = new URL(href, window.location.origin);
+      const fileId = url.searchParams.get("fileId");
+      if (fileId) {
+        openFile(fileId);
+      }
+    } else if (openLink) {
+      e.preventDefault();
+      openLink(href);
+    }
+  };
+
+  return (
+    <Link
+      className={styles.link}
+      target={LinkTarget.blank}
+      href={href}
+      fontSize="15px"
+      lineHeight="22px"
+      color="accent"
+      onClick={handleClick}
+    >
+      {children}
+    </Link>
+  );
+};
 
 export const Blockquote = ({ children }: PropsWithChildren) => (
   <blockquote className={styles.blockquote}>{children}</blockquote>

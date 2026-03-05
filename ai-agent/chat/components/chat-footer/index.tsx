@@ -44,7 +44,7 @@ const ChatFooter = ({
   multimodal,
   goToWebSearchSettings,
   persistDraft,
-  allowExternalNavigation,
+  openFile,
   allowAttachFiles,
   allowManageTools,
   onSendMessage,
@@ -56,7 +56,6 @@ const ChatFooter = ({
         <ChatInfoBlock
           standalone={standalone}
           isPortalAdmin={isPortalAdmin}
-          allowExternalNavigation={allowExternalNavigation}
         />
       ) : null}
       <ChatInput
@@ -71,7 +70,7 @@ const ChatFooter = ({
         multimodal={multimodal}
         goToWebSearchSettings={goToWebSearchSettings}
         persistDraft={persistDraft}
-        allowExternalNavigation={allowExternalNavigation}
+        openFile={openFile}
         allowAttachFiles={allowAttachFiles}
         allowManageTools={allowManageTools}
         onSendMessage={onSendMessage}

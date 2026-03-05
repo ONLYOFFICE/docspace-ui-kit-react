@@ -42,7 +42,7 @@ const ChatHeader = ({
   agentId,
   aiReady,
   getResultStorageId,
-  allowExternalNavigation,
+  openFile,
   allowSelectChat,
   onNewChat,
   onSelectChat,
@@ -62,7 +62,7 @@ const ChatHeader = ({
           getIcon={getIcon}
           getResultStorageId={getResultStorageId}
           agentId={agentId}
-          allowExternalNavigation={allowExternalNavigation}
+          openFile={openFile}
           onSelectChat={onSelectChat}
         />
       )}

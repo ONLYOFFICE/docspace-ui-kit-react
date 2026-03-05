@@ -38,7 +38,8 @@ import { ToolCallPlacement, ToolCallStatus } from "./tool-call/ToolCall.enum";
 
 const ToolCallMessage = ({
   content,
-  allowExternalNavigation,
+  openLink,
+  openFile,
 }: MessageToolCallProps) => {
   const [needConfirmation, setNeedConfirmation] = React.useState(
     () => !!content.managed,
@@ -69,7 +70,8 @@ const ToolCallMessage = ({
         content={content}
         status={toolCallStatus}
         placement={ToolCallPlacement.Message}
-        allowExternalNavigation={allowExternalNavigation}
+        openLink={openLink}
+        openFile={openFile}
       />
 
       {needConfirmation ? (
