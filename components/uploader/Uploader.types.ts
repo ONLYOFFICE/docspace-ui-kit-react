@@ -74,8 +74,6 @@ export type UploaderProps = {
   getFolderUrl?: (folderId: number) => string;
 };
 
-export type TFileWithParentFolderId = File & { parentFolderId?: number };
-
 export type TFileWithOptionalPath = File & { path?: string };
 export type TFileWithOptionalEmptyDir = File & { isEmptyDirectory?: boolean };
 export type TFileWithOptionalLastModifiedDate = File & {
