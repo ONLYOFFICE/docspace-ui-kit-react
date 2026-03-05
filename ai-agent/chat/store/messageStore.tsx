@@ -339,14 +339,27 @@ export default class MessageStore {
   };
 
   handleMetadata = (jsonData: string) => {
-    const { chatId, error } = JSON.parse(jsonData);
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonData);
+    } catch {
+      console.error("Failed to parse metadata", jsonData);
+      return;
+    }
+
+    if (!parsed || typeof parsed !== "object") {
+      console.error("Unexpected metadata shape", parsed);
+      return;
+    }
+
+    const { chatId, error } = parsed;
 
     if (chatId) {
       this.setCurrentChatId(chatId);
     }
 
     if (error) {
-      toastr.error(error as string);
+      toastr.error(typeof error === "string" ? error : JSON.stringify(error));
     }
   };
 
@@ -364,13 +377,21 @@ export default class MessageStore {
     )
       return;
 
-    const { data } = result as {
-      data: { extension: string; id: number; title: string };
-    };
+    const data = (result as { data?: { id?: number; title?: string } })?.data;
+
+    if (typeof data?.id !== "number" || typeof data?.title !== "string") {
+      console.error("Unexpected generateDoc result shape", data);
+      return;
+    }
+
+
+
+    const fileId = Number(data?.id);
+    if (!Number.isInteger(fileId) || fileId <= 0) return;
 
     const webSearhParams = new URLSearchParams();
 
-    webSearhParams.append("fileId", `${data.id}`);
+    webSearhParams.append("fileId", String(fileId));
     webSearhParams.append("withTool", "true");
 
     const url = `${window.location.origin}/doceditor?${webSearhParams.toString()}`;
@@ -379,7 +400,25 @@ export default class MessageStore {
   };
 
   handleToolCall = (jsonData: string) => {
-    const { name, arguments: args, callId, ...rest } = JSON.parse(jsonData);
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonData);
+    } catch {
+      console.error("Failed to parse tool call", jsonData);
+      return;
+    }
+
+    if (!parsed || typeof parsed !== "object") {
+      console.error("Unexpected tool call shape", parsed);
+      return;
+    }
+
+    const { name, arguments: args, callId, ...rest } = parsed;
+
+    if (typeof name !== "string" || typeof callId !== "string") {
+      console.error("Unexpected tool call properties", parsed);
+      return;
+    }
     const lastMessage = this.getLastMessage();
 
     const shouldCreateNewMessage =
@@ -414,7 +453,25 @@ export default class MessageStore {
   };
 
   handleToolResult = (jsonData: string) => {
-    const { result, callId } = JSON.parse(jsonData);
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonData);
+    } catch {
+      console.error("Failed to parse tool result", jsonData);
+      return;
+    }
+
+    if (!parsed || typeof parsed !== "object") {
+      console.error("Unexpected tool result shape", parsed);
+      return;
+    }
+
+    const { result, callId } = parsed;
+
+    if (typeof callId !== "string") {
+      console.error("Unexpected tool result properties", parsed);
+      return;
+    }
     const lastMessage = this.getLastMessage();
     if (!lastMessage) return;
 
@@ -449,7 +506,10 @@ export default class MessageStore {
     this.setIsStreamRunning(true);
     let message = "";
     try {
-      message = JSON.parse(jsonData).message;
+      const parsed = JSON.parse(jsonData);
+      message = parsed && typeof parsed === "object" && typeof parsed.message === "string" 
+        ? parsed.message 
+        : String(jsonData);
     } catch {
       message = jsonData;
     }
@@ -514,7 +574,7 @@ export default class MessageStore {
         try {
           const jsonData = JSON.parse(decodedChunk);
 
-          if (jsonData.error) {
+          if (jsonData && typeof jsonData === "object" && jsonData.error) {
             this.handleStreamError(
               JSON.stringify(jsonData.error),
               jsonData.error,
@@ -564,7 +624,11 @@ export default class MessageStore {
 
             if (event.includes(EventType.NewToken)) {
               try {
-                const { text } = JSON.parse(jsonData);
+                const parsed = JSON.parse(jsonData);
+                if (!parsed || typeof parsed !== "object" || typeof parsed.text !== "string") {
+                  return;
+                }
+                const { text } = parsed;
 
                 msg += text;
 
@@ -614,9 +678,11 @@ export default class MessageStore {
             if (event.includes(EventType.MessageStop)) {
               try {
                 try {
-                  const { messageId } = JSON.parse(jsonData);
+                  const parsed = JSON.parse(jsonData);
 
-                  if (messageId) this.addMessageId(messageId);
+                  if (parsed && typeof parsed === "object" && typeof parsed.messageId === "number") {
+                    this.addMessageId(parsed.messageId);
+                  }
                 } catch {
                   // ignore
                 }
