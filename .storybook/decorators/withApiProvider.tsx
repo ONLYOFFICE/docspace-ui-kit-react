@@ -39,7 +39,11 @@ const withApiProvider: Decorator = (Story, context) => {
   let apiUrl = DEFAULT_API_URL;
   let apiKey = DEFAULT_API_KEY;
 
-  if (apiConfig !== "default" && apiConfig !== "add-custom") {
+  if (
+    apiConfig !== "default" &&
+    apiConfig !== "add-custom" &&
+    context.viewMode !== "docs"
+  ) {
     const provider = getProviderById(apiConfig);
     if (provider) {
       apiUrl = provider.url;
@@ -48,8 +52,12 @@ const withApiProvider: Decorator = (Story, context) => {
   }
 
   return (
-    <ApiProvider url={apiUrl} apiKey={apiKey} initSocket={false}>
-      <Story />
+    <ApiProvider
+      key={apiConfig}
+      url={apiUrl}
+      apiKey={apiKey}
+      initSocket={false}>
+      <Story key={apiConfig} />
     </ApiProvider>
   );
 };
