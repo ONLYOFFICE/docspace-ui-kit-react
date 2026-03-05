@@ -178,13 +178,15 @@ export const Anchor = ({
     if (!href) return;
 
     // Check if it's a doceditor link
-    if (href.startsWith("/doceditor") && openFile) {
-      e.preventDefault();
-      // Extract fileId from URL params
-      const url = new URL(href, window.location.origin);
-      const fileId = url.searchParams.get("fileId");
-      if (fileId) {
-        openFile(fileId);
+    if (href.startsWith("/doceditor")) {
+      if (openFile) {
+        e.preventDefault();
+        // Extract fileId from URL params
+        const url = new URL(href, window.location.origin);
+        const fileId = url.searchParams.get("fileId");
+        if (fileId) {
+          openFile(fileId);
+        }
       }
     } else if (openLink) {
       e.preventDefault();

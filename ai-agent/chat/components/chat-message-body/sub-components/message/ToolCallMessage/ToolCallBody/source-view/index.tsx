@@ -128,14 +128,14 @@ const SourceItem = ({
   );
 
   const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    
     // For knowledge base sources, use openFile with fileId
     if (isKnowledgeSource && source.fileId && openFile) {
+      e.preventDefault();
       openFile(source.fileId.toString());
     }
     // For web search sources, use openLink with URL
     else if (!isKnowledgeSource && linkHref && openLink) {
+      e.preventDefault();
       openLink(linkHref);
     }
   };
