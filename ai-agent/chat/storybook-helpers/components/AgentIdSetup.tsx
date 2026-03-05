@@ -101,6 +101,7 @@ const AgentIdSetup = ({
               isDisabled={isValidating}
               autoFocus
               type={InputType.text}
+              scale
             />
             {displayError && (
               <div className={styles.error}>
