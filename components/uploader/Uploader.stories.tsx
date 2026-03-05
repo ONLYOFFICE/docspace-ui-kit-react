@@ -26,14 +26,23 @@
 
 import type { StoryObj, Meta } from "@storybook/react-vite";
 
-import { Uploader } from ".";
+import { Uploader } from "./index";
 import type { UploaderProps } from "./Uploader.types";
+import { Toast } from "../toast";
 
 type StoryArgs = UploaderProps;
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Interactive elements/Uploader",
   component: Uploader,
+  decorators: [
+    (Story) => (
+      <>
+        <Story />
+        <Toast />
+      </>
+    ),
+  ],
   argTypes: {
     width: {
       control: "text",
