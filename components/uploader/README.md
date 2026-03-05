@@ -42,7 +42,7 @@ import { Uploader } from "@docspace/ui-kit/components/uploader";
 | `onUploadProgress`   | `(data: UploadProgressData) => void`      | —       | Called on each upload progress update per file                 |
 | `onUploadSuccess`    | `(data: unknown[]) => void`               | —       | Called when all files are uploaded successfully                |
 | `onUploadError`      | `(data: { error: string }) => void`       | —       | Called when upload fails                                       |
-| `getFolderUrl`       | `(folderId: string) => string`            | —       | Callback to generate folder URL for success toast link         |
+| `getFolderUrl`       | `(folderId: number) => string`            | —       | Callback to generate folder URL for success toast link.        |
 
 ## Examples
 

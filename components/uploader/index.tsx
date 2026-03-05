@@ -273,7 +273,7 @@ const Uploader = ({
                   href={folderUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: "inherit", textDecoration: "underline" }}
+                  className={styles.toastLink}
                 >
                   {getCommonTranslation("Open")}
                 </a>

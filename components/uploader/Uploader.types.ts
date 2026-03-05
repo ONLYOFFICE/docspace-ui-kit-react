@@ -56,8 +56,6 @@ export type UploaderProps = {
   onUploadError?: (data: { error: string }) => void;
   /** Target folder ID for uploads */
   targetId?: string;
-  /** Accepted file extensions string */
-  acceptExtensions?: string;
   /** Main text displayed in the dropzone */
   linkMainText?: string;
   /** Secondary text displayed in the dropzone */
