@@ -72,6 +72,7 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
       onDeleteToggle();
     } catch (error) {
       console.error(error);
+      toastr.error(error);
     } finally {
       setIsLoading(false);
     }
