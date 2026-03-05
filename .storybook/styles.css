@@ -8,6 +8,14 @@ body {
   margin: 0;
 }
 
-.sb-show-main.sb-main-padded {
+/* .sb-show-main.sb-main-padded {
   padding: 0;
 }
+
+#storybook-docs .css-1cvjpgl {
+  padding: 0;
+} */
+
+/* #storybook-docs .css-1cvjpgl .innerZoomElementWrapper > * {
+  border: none !important;
+} */

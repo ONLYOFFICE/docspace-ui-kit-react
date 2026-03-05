@@ -77,6 +77,17 @@ const preview: Preview = {
     docs: {
       toc: true,
     },
+    options: {
+      storySort: {
+        order: [
+          "Getting started",
+          ["Welcome", "Structure", "Translation", "Themes", "API"],
+          "Samples",
+          "Components",
+          ["Document Editor", "Selectors", "Providers", "Errors"],
+        ],
+      },
+    },
   },
 
   initialGlobals: {

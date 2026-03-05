@@ -1,0 +1,224 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Getting started/API" />
+
+# API
+
+The UI Kit uses `ApiProvider` to give components access to the DocSpace REST API.
+It wraps the `@onlyoffice/docspace-api-sdk` and authenticates requests with a Bearer token.
+
+## Setting up ApiProvider
+
+```tsx
+import { ApiProvider } from "@docspace/ui-kit/providers/api";
+
+<ApiProvider url="https://your-docspace.com/api" apiKey="your-api-key">
+  <App />
+</ApiProvider>
+```
+
+Or use the composite `Providers` component that includes API, translation, and theme providers:
+
+```tsx
+import { Providers } from "@docspace/ui-kit/providers";
+
+<Providers url="https://your-docspace.com/api" apiKey="your-api-key" locale="en">
+  <App />
+</Providers>
+```
+
+### Provider props
+
+- **`url`** (`string`) — base URL of the DocSpace API
+- **`apiKey`** (`string`) — API key used as Bearer token for authentication
+
+## Using the API in components
+
+Use the `useApi` hook to access API services:
+
+```tsx
+import { useApi } from "@docspace/ui-kit/providers/api";
+
+function MyComponent() {
+  const { profilesApi, commonSettingsApi } = useApi();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const profile = await profilesApi.getSelfProfile();
+      const settings = await commonSettingsApi.getPortalSettings();
+
+      // Access data via .data.response
+      console.log(profile.data.response);
+      console.log(settings.data.response);
+    };
+
+    fetchData();
+  }, [profilesApi, commonSettingsApi]);
+
+  return <div>...</div>;
+}
+```
+
+> Calling `useApi()` outside of `ApiProvider` throws: `"useApi must be used within an ApiProvider"`
+
+## Available API services
+
+The `useApi` hook returns the following services:
+
+- **`profilesApi`** — user profile operations (`getSelfProfile`)
+- **`commonSettingsApi`** — portal settings (`getPortalSettings`)
+- **`foldersApi`** — folder management (`createFolder`)
+- **`roomsApi`** — room management (`createRoom`, `getRoomsFolder`)
+- **`filesApi`** — file operations (`openEditFile`)
+- **`filesSettingsApi`** — file settings (`getDocServiceUrl`)
+- **`groupApi`** — group management
+- **`peopleSearchApi`** — people search
+- **`groupSearchApi`** — group search
+- **`apiClient`** — raw axios instance for custom requests
+- **`baseUrl`** — base API URL string
+
+## Response format
+
+All API calls return responses in this format:
+
+```ts
+{
+  data: {
+    response: T  // Actual data payload
+  }
+}
+```
+
+Access the data via `.data.response`:
+
+```ts
+const result = await profilesApi.getSelfProfile();
+const user = result.data.response; // EmployeeFullDto
+```
+
+## Usage examples
+
+### Creating a folder
+
+```tsx
+const { foldersApi } = useApi();
+
+await foldersApi.createFolder(parentFolderId, {
+  title: "My Folder",
+});
+```
+
+### Creating a room
+
+```tsx
+import { RoomType } from "@onlyoffice/docspace-api-sdk";
+
+const { roomsApi } = useApi();
+
+await roomsApi.createRoom({
+  roomType: RoomType.CustomRoom,
+  title: "My Room",
+});
+```
+
+### Listing rooms with pagination
+
+```tsx
+const { roomsApi } = useApi();
+
+const res = await roomsApi.getRoomsFolder(
+  typeFilter,          // room type filter
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  undefined,
+  StorageFilter.Internal,
+  pageCount,           // items per page
+  startIndex,          // pagination offset
+  undefined,
+  undefined,
+  searchValue,         // search string
+);
+
+const { folders, total, count } = res.data.response;
+```
+
+### Opening a file in the editor
+
+```tsx
+const { filesApi, filesSettingsApi } = useApi();
+
+const [docService, editConfig] = await Promise.all([
+  filesSettingsApi.getDocServiceUrl(),
+  filesApi.openEditFile(fileId),
+]);
+
+const editorUrl = docService.data.response?.docServiceUrl;
+const config = editConfig.data.response;
+```
+
+## Raw API client
+
+For endpoints not covered by the SDK services, use the `apiClient` directly:
+
+```tsx
+const { apiClient } = useApi();
+
+// Using the typed request helper
+const data = await apiClient.request<MyType>("/custom/endpoint");
+
+// Using the raw axios instance
+const response = await apiClient.instance.post("/custom/endpoint", body);
+```
+
+## Provider hierarchy
+
+When using the composite `Providers` component, providers are nested in this order:
+
+```
+ErrorBoundary
+  └── ApiProvider
+      └── SocketProvider
+          └── TranslationProvider
+              └── ThemeProvider
+                  └── {children}
+```
+
+## Testing
+
+Mock the SDK classes in your tests:
+
+```tsx
+vi.mock("@onlyoffice/docspace-api-sdk", () => ({
+  Configuration: class {},
+  ProfilesApi: class {
+    getSelfProfile = vi.fn().mockResolvedValue({
+      data: { response: { cultureName: "en" } },
+    });
+  },
+  CommonSettingsApi: class {
+    getPortalSettings = vi.fn().mockResolvedValue({
+      data: { response: { culture: "en" } },
+    });
+  },
+  // ... other API mocks
+}));
+```
+
+Or wrap your component in `ApiProvider` for integration tests:
+
+```tsx
+const { result } = renderHook(() => useApi(), {
+  wrapper: ({ children }) => (
+    <ApiProvider url="https://example.com" apiKey="test-key">
+      {children}
+    </ApiProvider>
+  ),
+});
+
+expect(result.current.profilesApi).toBeDefined();
+```

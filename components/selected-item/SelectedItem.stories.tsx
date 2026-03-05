@@ -24,121 +24,183 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { SelectedItem } from ".";
 import styles from "./SelectedItem.stories.module.scss";
 
 const meta = {
-  title: "Components/UI/SelectedItem",
+  title: "UI/Data display/SelectedItem",
   component: SelectedItem,
   parameters: {
     docs: {
       description: {
-        component: `
-A component that displays a selected item with an optional close button.
+        component: `SelectedItem displays a selected value with an optional close button for removal.
 
-## Features
-- Inline and block display modes
-- Disableable state
-- Removable with close button
-- Customizable label
+### Features
 
-## Usage
-Typically used to display selected items in filters, tags, or multi-select inputs.
-`,
+- **Inline & Block Modes**: Display as inline (fit-content width) or block element
+- **Close Button**: Built-in close button with callback for item removal
+- **Disabled State**: Prevents interaction when disabled
+- **Group Support**: Optional group key for categorized selections
+- **Custom Icons**: Support for SVG icons alongside the label
+
+### Usage
+
+\`\`\`tsx
+import { SelectedItem } from "@docspace/ui-kit/components/selected-item";
+
+// Inline selected item
+<SelectedItem label="Finance" propKey="finance" isInline onClose={handleRemove} />
+
+// Block selected item
+<SelectedItem label="Full width item" propKey="item-1" isInline={false} onClose={handleRemove} />
+
+// Disabled
+<SelectedItem label="Locked" propKey="locked" isDisabled onClose={handleRemove} />
+\`\`\``,
       },
     },
   },
   argTypes: {
     label: {
       control: "text",
-      description: "Text content to display for the selected item",
+      description: "Text content for the selected item",
     },
     isInline: {
       control: "boolean",
-      description: "When true, displays the item inline; when false, as a block element",
+      description: "Display as inline (fit-content) or block element",
+      table: {
+        defaultValue: { summary: "true" },
+      },
     },
     isDisabled: {
       control: "boolean",
-      description: "When true, disables the item and prevents interaction",
+      description: "Disables the item and prevents interaction",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     propKey: {
       control: "text",
       description: "Unique identifier for the selected item",
     },
-    onClose: {
-      action: "onClose",
-      description: "Callback function triggered when close button is clicked",
+    group: {
+      control: "text",
+      description: "Optional group key for categorized selections",
+    },
+    hideCross: {
+      control: "boolean",
+      description: "Hides the close/remove button",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
 } satisfies Meta<typeof SelectedItem>;
-type Story = StoryObj<typeof meta>;
+
+type Story = StoryObj<ComponentProps<typeof SelectedItem>>;
 
 export default meta;
 
+const noop = () => {};
+
 export const Default: Story = {
+  render: (args) => <SelectedItem {...args} />,
   args: {
     label: "Selected item",
     isInline: true,
     isDisabled: false,
-    onClose: () => {},
-    propKey: "",
+    onClose: noop,
+    propKey: "item-1",
   },
   parameters: {
     docs: {
       description: {
-        story: "Default inline selected item with close button. Click the close button to trigger the onClose callback.",
+        story:
+          "Default inline selected item with a close button. Click the close button to trigger the onClose callback.",
+      },
+      source: {
+        code: `<SelectedItem label="Selected item" propKey="item-1" isInline onClose={handleRemove} />`,
       },
     },
   },
 };
 
-const AllTemplate = () => {
-  const onCloseHandler = () => {};
+export const DisabledState: Story = {
+  render: (args) => <SelectedItem {...args} />,
+  args: {
+    label: "Disabled item",
+    isInline: true,
+    isDisabled: true,
+    onClose: noop,
+    propKey: "item-disabled",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Disabled selected item that cannot be interacted with or removed.",
+      },
+      source: {
+        code: `<SelectedItem label="Disabled item" propKey="item-1" isInline isDisabled onClose={handleRemove} />`,
+      },
+    },
+  },
+};
+
+export const BlockDisplay: Story = {
+  render: (args) => <SelectedItem {...args} />,
+  args: {
+    label: "Block display item",
+    isInline: false,
+    isDisabled: false,
+    onClose: noop,
+    propKey: "item-block",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Selected item in block display mode, taking the full width of its container.",
+      },
+      source: {
+        code: `<SelectedItem label="Block item" propKey="item-1" isInline={false} onClose={handleRemove} />`,
+      },
+    },
+  },
+};
+
+const AllVariantsTemplate = () => {
   return (
     <>
       <div className={styles.containerInline}>
-        <SelectedItem
-          label="Selected item"
-          propKey=""
-          isInline
-          onClose={onCloseHandler}
-        />
-        <SelectedItem
-          label="Selected item"
-          propKey=""
-          isInline
-          isDisabled
-          onClose={onCloseHandler}
-        />
+        <SelectedItem label="Inline enabled" propKey="1" isInline onClose={noop} />
+        <SelectedItem label="Inline disabled" propKey="2" isInline isDisabled onClose={noop} />
+        <SelectedItem label="Another item" propKey="3" isInline onClose={noop} />
       </div>
 
       <div className={styles.container}>
-        <SelectedItem
-          label="Selected item"
-          propKey=""
-          isInline={false}
-          onClose={onCloseHandler}
-        />
+        <SelectedItem label="Block display item" propKey="4" isInline={false} onClose={noop} />
       </div>
     </>
   );
 };
 
-export const All: Story = {
-  render: () => <AllTemplate />,
-  args: {
-    label: "Selected item",
-    isInline: true,
-    isDisabled: false,
-    onClose: () => {},
-    propKey: "",
-  },
+export const AllVariants: Story = {
+  render: () => <AllVariantsTemplate />,
   parameters: {
     docs: {
       description: {
-        story: "Demonstrates different variations: inline enabled, inline disabled, and block display modes. Shows how the component adapts to different layout requirements.",
+        story:
+          "All selected item variants: multiple inline items (enabled and disabled) and a block display item.",
+      },
+      source: {
+        code: `<SelectedItem label="Inline enabled" propKey="1" isInline onClose={handleRemove} />
+<SelectedItem label="Inline disabled" propKey="2" isInline isDisabled onClose={handleRemove} />
+<SelectedItem label="Block item" propKey="3" isInline={false} onClose={handleRemove} />`,
       },
     },
   },

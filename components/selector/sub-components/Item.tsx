@@ -292,8 +292,10 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
               badgeIconNode={badgeIconNode ?? undefined}
               isTemplate={isTemplate}
             />
-          ) : (
+          ) : React.isValidElement(icon) ? (
             <div className={styles.itemLogo}>{icon}</div>
+          ) : (
+            <div className={styles.itemLogo}>{React.createElement(icon)}</div>
           )
         ) : null}
         {renderCustomItem ? (

@@ -24,63 +24,103 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
+import { useState } from "react";
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { ColorPicker } from "./ColorPicker";
 import { globalColors } from "../../providers/theme";
 
+import { ColorPicker } from ".";
+
 const meta = {
-  title: "Components/Interactive elements/ColorPicker",
+  title: "UI/Interactive elements/ColorPicker",
   component: ColorPicker,
   parameters: {
     docs: {
       description: {
-        component:
-          "A color picker component that allows users to select colors using a visual picker or hex input. Supports both standalone picker mode and a modal-like interface with apply/cancel actions.",
+        component: `Visual color picker component for selecting colors using a gradient area, hue slider, or hex code input. Supports both standalone picker mode and a full interface with apply/cancel actions.
+
+### Features
+
+- **Visual Picker**: Gradient-based color selection area
+- **Hue Slider**: Slider control for hue selection
+- **Hex Input**: Direct hex code entry with label
+- **Action Buttons**: Apply and cancel buttons with customizable labels
+- **Picker-Only Mode**: Minimal mode showing just the color picker area
+- **Controlled Component**: Supports external state management
+
+### Usage
+
+\`\`\`tsx
+import { ColorPicker } from "@docspace/ui-kit/components/color-picker";
+
+// Full picker with buttons
+<ColorPicker
+  appliedColor="#4781D1"
+  onApply={(color) => console.log("Applied:", color)}
+  onClose={() => console.log("Cancelled")}
+  isPickerOnly={false}
+/>
+
+// Picker only (no buttons or hex input)
+<ColorPicker appliedColor="#FF0000" isPickerOnly />
+\`\`\``,
       },
     },
   },
   argTypes: {
     appliedColor: {
       control: "color",
-      description: "The currently selected color in hex format",
-      defaultValue: globalColors.lightBlueMain,
+      description: "Currently selected color in hex format",
     },
     isPickerOnly: {
       control: "boolean",
       description:
-        "If true, shows only the color picker without hex input and buttons",
+        "Show only the color picker without hex input and buttons",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     applyButtonLabel: {
       control: "text",
       description: "Label for the apply button",
+      table: {
+        defaultValue: { summary: "Apply" },
+      },
     },
     cancelButtonLabel: {
       control: "text",
       description: "Label for the cancel button",
+      table: {
+        defaultValue: { summary: "Cancel" },
+      },
     },
     hexCodeLabel: {
       control: "text",
       description: "Label for the hex code input field",
+      table: {
+        defaultValue: { summary: "Hex code" },
+      },
     },
     onApply: {
       description: "Callback when the apply button is clicked",
     },
     onClose: {
-      description: "Callback when the cancel button or close icon is clicked",
+      description: "Callback when the cancel button is clicked",
     },
     handleChange: {
-      description: "Callback that fires on every color change",
+      description: "Callback on every color change",
     },
   },
 } satisfies Meta<typeof ColorPicker>;
 
-type Story = StoryObj<typeof ColorPicker>;
+type Story = StoryObj<ComponentProps<typeof ColorPicker>>;
 
 export default meta;
 
 export const Default: Story = {
+  render: (args) => <ColorPicker {...args} />,
   args: {
     isPickerOnly: false,
     appliedColor: globalColors.lightBlueMain,
@@ -93,75 +133,138 @@ export const Default: Story = {
   },
 };
 
+const PickerOnlyTemplate = () => {
+  return (
+    <ColorPicker
+      isPickerOnly
+      appliedColor={globalColors.lightBlueMain}
+      handleChange={(color) => console.log("Color changed:", color)}
+    />
+  );
+};
+
 export const PickerOnly: Story = {
-  args: {
-    ...Default.args,
-    isPickerOnly: true,
+  render: () => <PickerOnlyTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Picker-only mode shows just the color gradient area and hue slider, without hex input or action buttons.",
+      },
+      source: {
+        code: `<ColorPicker isPickerOnly appliedColor="#4781D1" />`,
+      },
+    },
   },
 };
 
-export const CustomButtonLabels: Story = {
-  args: {
-    ...Default.args,
-    applyButtonLabel: "Save Color",
-    cancelButtonLabel: "Discard",
-    hexCodeLabel: "Color Code",
+const CustomLabelsTemplate = () => {
+  return (
+    <ColorPicker
+      isPickerOnly={false}
+      appliedColor={globalColors.lightBlueMain}
+      applyButtonLabel="Save Color"
+      cancelButtonLabel="Discard"
+      hexCodeLabel="Color Code"
+      onApply={(color) => console.log("Saved:", color)}
+      onClose={() => console.log("Discarded")}
+    />
+  );
+};
+
+export const CustomLabels: Story = {
+  render: () => <CustomLabelsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Button and input labels can be customized for different locales or UI contexts.",
+      },
+      source: {
+        code: `<ColorPicker
+  isPickerOnly={false}
+  appliedColor="#4781D1"
+  applyButtonLabel="Save Color"
+  cancelButtonLabel="Discard"
+  hexCodeLabel="Color Code"
+/>`,
+      },
+    },
   },
 };
 
-export const PresetColor: Story = {
-  render: function PresetColorStory() {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-        <p style={{ margin: "0", fontSize: "14px" }}>
-          <strong>Preset Color:</strong> The color picker initialized with a
-          predefined color value. Current color is set to <strong>#FF0000</strong> (red)
-        </p>
-        <ColorPicker
-          isPickerOnly={false}
-          appliedColor="#FF0000"
-          onClose={() => console.log("Close clicked")}
-          onApply={(color) => console.log("Apply clicked with color:", color)}
-          handleChange={(color) => console.log("Color changed to:", color)}
-        />
-      </div>
-    );
-  },
+const ControlledTemplate = () => {
+  const [color, setColor] = useState(globalColors.lightBlueMain);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <ColorPicker
+        isPickerOnly={false}
+        appliedColor={color}
+        handleChange={(newColor) => setColor(newColor)}
+        onApply={(newColor) => {
+          setColor(newColor);
+          console.log("Applied color:", newColor);
+        }}
+        onClose={() => console.log("Closed")}
+      />
+      <p style={{ margin: 0, fontSize: "12px" }}>
+        Current color: <strong>{color}</strong>
+      </p>
+    </div>
+  );
 };
 
 export const Controlled: Story = {
-  render: function ControlledStory() {
-    const [color, setColor] = React.useState(globalColors.lightBlueMain);
+  render: () => <ControlledTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Controlled component using React state to track the selected color in real time.",
+      },
+      source: {
+        code: `const [color, setColor] = useState("#4781D1");
 
-    return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-        <div>
-          <p style={{fontSize: "14px"}}>
-            <strong>Controlled Component with Change Handler:</strong> Uses React state
-            to manage the selected color. The <i>handleChange</i> callback tracks color changes in real-time, while <i>onApply</i> confirms 
-            the final selection. Both the internal state and external props are
-            synchronized.
-          </p>
-        </div>
-        <ColorPicker
-          isPickerOnly={false}
-          appliedColor={color}
-          handleChange={(newColor) => {
-            setColor(newColor);
-            console.log("Color changed to:", newColor);
-          }}
-          onApply={(newColor) => {
-            setColor(newColor);
-            console.log("Applied color:", newColor);
-          }}
-          onClose={() => console.log("Color picker closed")}
-        />
-        <div>
-          <p style={{ margin: "0", fontSize: "12px" }}>
-            Current color: <strong>{color}</strong>
-          </p>
-        </div>
-      </div>
-    );
+<ColorPicker
+  isPickerOnly={false}
+  appliedColor={color}
+  handleChange={(newColor) => setColor(newColor)}
+  onApply={(newColor) => setColor(newColor)}
+  onClose={() => console.log("Closed")}
+/>`,
+      },
+    },
+  },
+};
+
+const PresetColorTemplate = () => {
+  return (
+    <ColorPicker
+      isPickerOnly={false}
+      appliedColor="#FF0000"
+      onApply={(color) => console.log("Applied:", color)}
+      onClose={() => console.log("Closed")}
+    />
+  );
+};
+
+export const PresetColor: Story = {
+  render: () => <PresetColorTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Color picker initialized with a preset color value (#FF0000 red).",
+      },
+      source: {
+        code: `<ColorPicker
+  isPickerOnly={false}
+  appliedColor="#FF0000"
+  onApply={(color) => console.log("Applied:", color)}
+  onClose={() => console.log("Closed")}
+/>`,
+      },
+    },
   },
 };

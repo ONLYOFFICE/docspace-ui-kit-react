@@ -25,16 +25,18 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
+
+import type { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { DropDownItem } from "../drop-down-item";
 import { Button } from "../button";
+import { DropDownItem } from "../drop-down-item";
 
 import { DropDown } from ".";
-import type { DropDownProps } from "./DropDown.types";
 
 const meta = {
-  title: "Components/UI/DropDown",
+  title: "UI/Overlays/DropDown",
   component: DropDown,
   parameters: {
     docs: {
@@ -149,11 +151,11 @@ const buttonRef = useRef<HTMLButtonElement>(null);
   },
 } satisfies Meta<typeof DropDown>;
 
-type Story = StoryObj<typeof DropDown>;
+type Story = StoryObj<ComponentProps<typeof DropDown>>;
 
 export default meta;
 
-const BasicTemplate = (args: DropDownProps) => {
+const BasicTemplate = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const parentRef = React.useRef<HTMLButtonElement>(null);
 
@@ -165,7 +167,6 @@ const BasicTemplate = (args: DropDownProps) => {
         onClick={() => setIsOpen(true)}
       />
       <DropDown
-        {...args}
         open={isOpen}
         forwardedRef={parentRef}
         clickOutsideAction={() => setIsOpen(false)}
@@ -179,10 +180,29 @@ const BasicTemplate = (args: DropDownProps) => {
 };
 
 export const Default: Story = {
-  render: (args) => <BasicTemplate {...args} />,
+  render: () => <BasicTemplate />,
   args: {
     directionX: "right",
     directionY: "bottom",
+  },
+  parameters: {
+    docs: {
+      source: {
+        code: `const [isOpen, setIsOpen] = useState(false);
+const buttonRef = useRef<HTMLButtonElement>(null);
+
+<Button ref={buttonRef} label="Open Dropdown" onClick={() => setIsOpen(true)} />
+<DropDown
+  open={isOpen}
+  forwardedRef={buttonRef}
+  clickOutsideAction={() => setIsOpen(false)}
+>
+  <DropDownItem label="Option 1" onClick={() => setIsOpen(false)} />
+  <DropDownItem label="Option 2" onClick={() => setIsOpen(false)} />
+  <DropDownItem label="Option 3" onClick={() => setIsOpen(false)} />
+</DropDown>`,
+      },
+    },
   },
 };
 
@@ -223,6 +243,17 @@ export const WithHeadersAndSeparators: Story = {
       description: {
         story:
           "Dropdowns can include headers and separators to organize items into logical groups.",
+      },
+      source: {
+        code: `<DropDown open={isOpen} forwardedRef={buttonRef} clickOutsideAction={() => setIsOpen(false)}>
+  <DropDownItem isHeader label="File" />
+  <DropDownItem label="Open" onClick={handleClick} />
+  <DropDownItem label="Download" onClick={handleClick} />
+  <DropDownItem isSeparator />
+  <DropDownItem isHeader label="Edit" />
+  <DropDownItem label="Rename" onClick={handleClick} />
+  <DropDownItem label="Move" onClick={handleClick} />
+</DropDown>`,
       },
     },
   },
@@ -272,6 +303,13 @@ export const WithDisabledItems: Story = {
         story:
           "Use `showDisabledItems` to display disabled items. By default, disabled items are hidden.",
       },
+      source: {
+        code: `<DropDown open={isOpen} showDisabledItems>
+  <DropDownItem label="Edit" onClick={handleClick} />
+  <DropDownItem label="Move (no permission)" disabled />
+  <DropDownItem label="Delete (no permission)" disabled />
+</DropDown>`,
+      },
     },
   },
 };
@@ -318,6 +356,13 @@ export const ScrollableList: Story = {
       description: {
         story:
           "Use `maxHeight` to limit the dropdown height and enable scrolling for long lists.",
+      },
+      source: {
+        code: `<DropDown open={isOpen} maxHeight={200}>
+  {items.map((item) => (
+    <DropDownItem key={item.id} label={item.label} onClick={handleClick} />
+  ))}
+</DropDown>`,
       },
     },
   },
@@ -425,6 +470,12 @@ export const DirectionVariants: Story = {
         story:
           "Control dropdown position with `directionX` (left/right) and `directionY` (top/bottom) props.",
       },
+      source: {
+        code: `<DropDown directionX="right" directionY="bottom">...</DropDown>
+<DropDown directionX="left" directionY="bottom">...</DropDown>
+<DropDown directionX="right" directionY="top">...</DropDown>
+<DropDown directionX="left" directionY="top">...</DropDown>`,
+      },
     },
   },
 };
@@ -467,6 +518,13 @@ export const CustomWidth: Story = {
       description: {
         story: "Use `manualWidth` to set a custom width for the dropdown.",
       },
+      source: {
+        code: `<DropDown open={isOpen} manualWidth="300px">
+  <DropDownItem label="This is a longer option text" />
+  <DropDownItem label="Another long option" />
+  <DropDownItem label="Short" />
+</DropDown>`,
+      },
     },
   },
 };
@@ -507,6 +565,15 @@ export const ContextMenu: Story = {
       description: {
         story:
           "Example of a context menu style dropdown with common editing actions.",
+      },
+      source: {
+        code: `<DropDown open={isOpen}>
+  <DropDownItem label="Cut" onClick={handleClick} />
+  <DropDownItem label="Copy" onClick={handleClick} />
+  <DropDownItem label="Paste" onClick={handleClick} />
+  <DropDownItem isSeparator />
+  <DropDownItem label="Select All" onClick={handleClick} />
+</DropDown>`,
       },
     },
   },
