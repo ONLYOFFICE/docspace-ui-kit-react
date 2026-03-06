@@ -248,13 +248,13 @@ const CallbackLogger = (props: StoryArgs) => {
   ];
 
   return (
-    <div style={{ display: "flex", height: "700px", gap: "16px" }}>
+    <div className={styles.withListenersStory}>
       <Toast />
       <div
         style={{
-          flex: "1 1 60%",
-          minWidth: 0,
           border: "4px dashed rgb(208, 213, 221)",
+          flexBasis: "60%",
+          minWidth: "400px"
         }}
       >
         <Chat
