@@ -71,6 +71,8 @@ const AgentIdSetup = ({
     }
   };
 
+  const buttonText = "Browse AI Agents";
+
   return (
     <>
       <div className={styles.container}>
@@ -91,7 +93,7 @@ const AgentIdSetup = ({
             type="button"
             primary
             size={ButtonSize.medium}
-            label="Browse AI Agents"
+            label={buttonText}
             onClick={() => setIsSelectorOpen(true)}
             isLoading={isApiValidating}
             isDisabled={!!apiError || isApiValidating}
