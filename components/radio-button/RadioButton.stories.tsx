@@ -24,27 +24,50 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState, useEffect } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+import { useEffect, useState } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { RadioButton } from ".";
-import { RadioButtonProps } from "./RadioButton.types";
+
+import type { RadioButtonProps } from "./RadioButton.types";
 
 const meta = {
-  title: "Components/Form Controls/RadioButton",
+  title: "UI/Form controls/RadioButton",
   component: RadioButton,
   parameters: {
     docs: {
       description: {
-        component: `RadioButton is a form control that allows users to select a single option from a set of options.
-          
+        component: `RadioButton is a form control that allows users to select a single option from a set.
+
 ### Features
-- Support for checked and unchecked states
-- Disabled state support
-- Customizable label text and styling
-- Horizontal and vertical orientation options
-- Keyboard accessibility
-- Custom styling support`,
+
+- **Checked/Unchecked States**: Visual indication of selection
+- **Disabled State**: Prevents user interaction
+- **Custom Label**: Text or ReactNode label with configurable font size and weight
+- **Keyboard Accessibility**: Supports focus and keyboard interaction
+- **Orientation**: Horizontal and vertical layout options
+- **Custom Spacing**: Configurable margin between radio buttons
+
+### Accessibility
+
+The RadioButton component uses a native \`<input type="radio">\` element for screen reader support and keyboard navigation.
+
+### Usage
+
+\`\`\`tsx
+import { RadioButton } from "@docspace/ui-kit/components/radio-button";
+
+// Basic radio button
+<RadioButton name="group" value="option1" label="Option 1" />
+
+// Checked radio button
+<RadioButton name="group" value="option2" label="Option 2" isChecked />
+
+// Disabled radio button
+<RadioButton name="group" value="option3" label="Option 3" isDisabled />
+\`\`\``,
       },
     },
     design: {
@@ -54,39 +77,70 @@ const meta = {
   },
   argTypes: {
     isChecked: {
-      description: "Controls the checked state of the radio button",
       control: "boolean",
+      description: "Controls the checked state of the radio button",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isDisabled: {
-      description: "Disables the radio button when set to true",
       control: "boolean",
+      description: "Disables the radio button when set to true",
     },
     label: {
-      description: "Text label displayed next to the radio button",
       control: "text",
+      description: "Text label displayed next to the radio button",
     },
     name: {
-      description: "Name attribute for the radio button input",
       control: "text",
+      description: "Name attribute for the radio button input",
     },
     value: {
-      description: "Value attribute for the radio button input",
       control: "text",
+      description: "Value attribute for the radio button input",
     },
     fontSize: {
-      description: "Font size of the label text",
       control: "text",
+      description: "Font size of the label text",
+      table: {
+        defaultValue: { summary: "13px" },
+      },
     },
     fontWeight: {
-      description: "Font weight of the label text",
       control: "number",
+      description: "Font weight of the label text",
+      table: {
+        defaultValue: { summary: "400" },
+      },
+    },
+    spacing: {
+      control: "text",
+      description: "Margin between radio buttons",
+      table: {
+        defaultValue: { summary: "15px" },
+      },
     },
   },
 } satisfies Meta<typeof RadioButton>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof RadioButton>>;
 
 export default meta;
+
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+        gridGap: "16px",
+        alignItems: "center",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
 
 const Template = ({ isChecked, ...args }: RadioButtonProps) => {
   const [checked, setIsChecked] = useState(isChecked);
@@ -118,41 +172,109 @@ export const Default: Story = {
   },
 };
 
-export const Checked: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    label: "Checked radio button",
-    isChecked: true,
+const StatesTemplate = () => {
+  return (
+    <Wrapper>
+      <RadioButton
+        name="states"
+        value="unchecked"
+        label="Unchecked"
+        isChecked={false}
+      />
+      <RadioButton
+        name="states-checked"
+        value="checked"
+        label="Checked"
+        isChecked
+      />
+    </Wrapper>
+  );
+};
+
+export const CheckedStates: Story = {
+  render: () => <StatesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: "Comparison of checked and unchecked radio button states.",
+      },
+      source: {
+        code: `<RadioButton name="group" value="unchecked" label="Unchecked" />
+<RadioButton name="group" value="checked" label="Checked" isChecked />`,
+      },
+    },
   },
 };
 
-export const Disabled: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    label: "Disabled radio button",
-    isDisabled: true,
+const DisabledTemplate = () => {
+  return (
+    <Wrapper>
+      <RadioButton
+        name="disabled"
+        value="disabled"
+        label="Disabled unchecked"
+        isDisabled
+      />
+      <RadioButton
+        name="disabled-checked"
+        value="disabled-checked"
+        label="Disabled checked"
+        isDisabled
+        isChecked
+      />
+    </Wrapper>
+  );
+};
+
+export const DisabledStates: Story = {
+  render: () => <DisabledTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Disabled radio buttons cannot be interacted with and have reduced opacity.",
+      },
+      source: {
+        code: `<RadioButton name="group" value="1" label="Disabled unchecked" isDisabled />
+<RadioButton name="group" value="2" label="Disabled checked" isDisabled isChecked />`,
+      },
+    },
   },
 };
 
-export const DisabledChecked: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    label: "Disabled checked radio button",
-    isDisabled: true,
-    isChecked: true,
-  },
+const CustomStylingTemplate = () => {
+  return (
+    <Wrapper>
+      <RadioButton
+        name="custom"
+        value="custom"
+        label="Custom styled"
+        fontSize="16px"
+        fontWeight={600}
+      />
+      <RadioButton
+        name="custom-small"
+        value="small"
+        label="Small text"
+        fontSize="11px"
+        fontWeight={300}
+      />
+    </Wrapper>
+  );
 };
 
 export const CustomStyling: Story = {
-  render: (args) => <Template {...args} />,
-  args: {
-    ...Default.args,
-    label: "Custom styled radio button",
-    fontSize: "16px",
-    fontWeight: 600,
-    style: { marginTop: "10px" },
+  render: () => <CustomStylingTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Radio buttons support custom font size and weight for label styling.",
+      },
+      source: {
+        code: `<RadioButton name="group" value="1" label="Custom styled" fontSize="16px" fontWeight={600} />
+<RadioButton name="group" value="2" label="Small text" fontSize="11px" fontWeight={300} />`,
+      },
+    },
   },
 };

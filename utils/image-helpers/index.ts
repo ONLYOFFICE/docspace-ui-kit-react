@@ -24,6 +24,10 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type React from "react";
+
+import { iconsMap as iconsStaticMap } from "./icons-map";
+
 enum IconNames {
   Word = "word.svg",
   WordCommon = "wordCommon.svg",
@@ -154,19 +158,18 @@ const createIconEntries = (icons: Record<string, string[]>) => {
 
 const { all, nonRoom } = createIconEntries(iconsMap);
 
-const getUrlByName = (size: number, name: string): string =>
-  require(`PUBLIC_DIR/images/icons/${size}/${name}?url`);
-
 const generateMapForSize = (
   size: number,
   entries: [string, string][],
-): Map<string, string> =>
+): Map<string, React.FC<React.SVGProps<SVGSVGElement>>> =>
   new Map(
-    entries.map(([format, iconName]) => {
+    entries.flatMap(([format, iconName]) => {
       const svg = `${format.replace(/^\./, "")}.svg`;
-      const url = getUrlByName(size, iconName);
+      const component = iconsStaticMap[size]?.[iconName];
 
-      return [svg, url];
+      if (!component) return [];
+
+      return [[svg, component]];
     }),
   );
 

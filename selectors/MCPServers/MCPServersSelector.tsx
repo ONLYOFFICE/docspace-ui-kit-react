@@ -28,12 +28,14 @@ import React from "react";
 
 import EmptyScreenRoomSelectorLight from "../../assets/empty.room.selector.light.react.svg";
 import EmptyScreenRoomSelectorDark from "../../assets/empty.room.selector.dark.react.svg";
+import faviconUrl from "../../assets/favicon.ico";
 
 import { getCommonTranslation } from "../../utils/i18n";
 import {
   Selector,
   RowLoader,
   type TSelectorItem,
+  type TSelectorWithAside,
 } from "../../components/selector";
 import { useTheme } from "../../context/ThemeContext";
 import { useApi } from "../../providers/api/ApiProvider";
@@ -41,7 +43,7 @@ import { useApi } from "../../providers/api/ApiProvider";
 const getServerIcon = (type: ServerType, _isBase: boolean) => {
   switch (type) {
     case ServerType.Portal:
-      return "/logo.ashx?logotype=3";
+      return faviconUrl;
     default:
       return null;
   }
@@ -73,9 +75,8 @@ export type TServer = {
   needReset?: boolean;
 };
 
-type MCPServersSelectorProps = {
+type MCPServersSelectorProps = TSelectorWithAside & {
   onSubmit: (servers: TSelectorItem[]) => void;
-  onClose: VoidFunction;
   onBackClick: VoidFunction;
 
   initedSelectedServers?: string[];
@@ -86,6 +87,9 @@ const MCPServersSelector = ({
   onSubmit,
   onClose,
   onBackClick,
+  useAside,
+  withoutBackground,
+  withBlur,
 }: MCPServersSelectorProps) => {
   const { apiClient } = useApi();
   const { isBase } = useTheme();
@@ -201,6 +205,10 @@ const MCPServersSelector = ({
     onBackClick();
   };
 
+  const withAsideProps: TSelectorWithAside = useAside
+    ? { useAside, onClose, withBlur, withoutBackground }
+    : {};
+
   React.useEffect(() => {
     fetchServers();
   }, [fetchServers]);
@@ -244,8 +252,7 @@ const MCPServersSelector = ({
       loadNextPage={fetchMoreServer}
       isLoading={isLoading}
       isMultiSelect
-      useAside={false}
-      onClose={onClose}
+      {...withAsideProps}
       onSelect={onSelect}
       withHeader
       headerProps={{
@@ -254,7 +261,7 @@ const MCPServersSelector = ({
         }),
         withoutBackButton: false,
         onBackClick: onBackClick,
-        onCloseClick: onClose,
+        onCloseClick: onClose ?? onBackClick,
         withoutBorder: false,
       }}
       withCancelButton

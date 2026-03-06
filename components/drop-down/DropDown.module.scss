@@ -69,6 +69,14 @@
     display: table;
   }
 
+  &.useFlexibleHeight.open {
+    display: block;
+  }
+
+  &.useFlexibleHeight.open:not(.mobileView) {
+    width: fit-content;
+  }
+
   &.withColumns {
     display: block;
 
@@ -83,7 +91,7 @@
   }
 
   :global(.scroll-drop-down-item) {
-    .scroll-body {
+    :global(.scroll-body) {
       padding-inline-end: 0 !important;
     }
   }

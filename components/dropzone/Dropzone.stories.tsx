@@ -24,33 +24,96 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { StoryObj, Meta } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Dropzone } from ".";
 
 const meta = {
-  title: "Components/Interactive elements/Dropzone",
+  title: "UI/Interactive elements/Dropzone",
   component: Dropzone,
+  parameters: {
+    docs: {
+      description: {
+        component: `A component for handling file uploads through drag and drop or file selection.
+
+### Features
+
+- **File Upload**: Click to select or drag and drop files
+- **Folder Upload**: Upload entire folders with directory structure preserved
+- **Multiple / Single Upload**: Toggle between single and multiple file or folder uploads
+- **Loading State**: Display a loader or progress bar during upload
+- **Accepted Formats**: Restrict uploads to specific file types
+- **Max Files**: Set a maximum number of files allowed per upload
+- **Expandable Formats List**: Show supported formats with an expandable dropdown
+
+### Usage
+
+\`\`\`tsx
+import { Dropzone } from "@docspace/ui-kit/components/dropzone";
+
+// Basic file upload
+<Dropzone
+  linkMainText="Click to upload"
+  linkSecondaryText="or drag and drop files here"
+  exstsText="Supported file types: PDF, DOC, DOCX"
+  accept={[".pdf", ".doc", ".docx"]}
+  onDrop={(files) => handleUpload(files)}
+/>
+
+// Folder upload
+<Dropzone
+  isFolderUpload
+  linkMainText="Click to upload folder"
+  linkSecondaryText="or drag and drop folders here"
+  onDrop={(files) => handleFolderUpload(files)}
+/>
+
+// Single file with loading state
+<Dropzone
+  isLoading
+  uploadPercent={45}
+  linkMainText="Uploading..."
+/>
+\`\`\``,
+      },
+    },
+  },
   argTypes: {
     isLoading: {
       control: "boolean",
       description: "Shows loading state of the dropzone",
-      defaultValue: false,
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    uploadPercent: {
+      control: "number",
+      description:
+        "Upload progress percentage. When provided during loading, shows a progress bar instead of a spinner",
     },
     isDisabled: {
       control: "boolean",
       description: "Disables the dropzone",
-      defaultValue: false,
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isFolderUpload: {
       control: "boolean",
       description: "Enables folder upload mode instead of file upload",
-      defaultValue: false,
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     isMultipleUpload: {
       control: "boolean",
-      description: "Allows multiple files/folders upload. When false, only one item is accepted",
-      defaultValue: true,
+      description:
+        "Allows multiple files/folders upload. When false, only one item is accepted",
+      table: {
+        defaultValue: { summary: "true" },
+      },
     },
     linkMainText: {
       control: "text",
@@ -64,33 +127,65 @@ const meta = {
       control: "text",
       description: "Text displaying supported file types",
     },
+    fullExstsText: {
+      control: "text",
+      description:
+        "Full list of supported formats shown in an expandable dropdown",
+    },
+    formatsPlusBadgeValue: {
+      control: "number",
+      description:
+        "Number shown in a badge next to the formats text, indicating additional formats",
+    },
     accept: {
       control: "object",
-      description: "Accepted file types (string or array of strings). Not applied in folder upload mode.",
+      description:
+        "Accepted file types (string or array of strings). Not applied in folder upload mode.",
     },
     maxFiles: {
       control: "number",
       description: "Maximum number of files allowed (0 for unlimited)",
-      defaultValue: 0,
-    },
-    onDrop: { action: "dropped" },
-    onSingleUploadError: { action: "singleUploadError" },
-  },
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "A component for handling file uploads through drag and drop or file selection.",
+      table: {
+        defaultValue: { summary: "0" },
       },
+    },
+    icon: {
+      control: "text",
+      description: "Custom icon URL displayed above the upload text",
+    },
+    iconClassName: {
+      control: "text",
+      description: "CSS class name applied to the icon element",
+    },
+    className: {
+      control: "text",
+      description: "CSS class name applied to the wrapper element",
+    },
+    loaderClassName: {
+      control: "text",
+      description: "CSS class name applied to the loader element",
+    },
+    dataTestId: {
+      control: "text",
+      description: "Custom data-testid attribute for testing",
+    },
+    onDrop: {
+      action: "dropped",
+      description: "Callback fired when files are dropped or selected",
+    },
+    onSingleUploadError: {
+      action: "singleUploadError",
+      description:
+        "Callback fired when multiple items are provided in single upload mode",
     },
   },
 } satisfies Meta<typeof Dropzone>;
 
-type Story = StoryObj<typeof Dropzone>;
+type Story = StoryObj<ComponentProps<typeof Dropzone>>;
 
 export default meta;
 
-const defaultArgs = {
+const defaultArgs: ComponentProps<typeof Dropzone> = {
   isLoading: false,
   isDisabled: false,
   isFolderUpload: false,
@@ -106,6 +201,23 @@ const defaultArgs = {
 
 export const Default: Story = {
   args: defaultArgs,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default dropzone allowing multiple file uploads via click or drag and drop.",
+      },
+      source: {
+        code: `<Dropzone
+  linkMainText="Click to upload"
+  linkSecondaryText="or drag and drop files here"
+  exstsText="Supported file types: PDF, DOC, DOCX"
+  accept={[".pdf", ".doc", ".docx"]}
+  onDrop={(files) => console.log(files)}
+/>`,
+      },
+    },
+  },
 };
 
 export const Loading: Story = {
@@ -113,12 +225,42 @@ export const Loading: Story = {
     ...defaultArgs,
     isLoading: true,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Dropzone in a loading state, displaying a spinner to indicate an upload in progress.",
+      },
+      source: {
+        code: `<Dropzone
+  isLoading
+  linkMainText="Click to upload"
+  linkSecondaryText="or drag and drop files here"
+/>`,
+      },
+    },
+  },
 };
 
 export const Disabled: Story = {
   args: {
     ...defaultArgs,
     isDisabled: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Disabled dropzone that prevents all user interaction including click and drag.",
+      },
+      source: {
+        code: `<Dropzone
+  isDisabled
+  linkMainText="Click to upload"
+  linkSecondaryText="or drag and drop files here"
+/>`,
+      },
+    },
   },
 };
 
@@ -128,6 +270,22 @@ export const SingleFileUpload: Story = {
     maxFiles: 1,
     linkMainText: "Upload single file",
     linkSecondaryText: "or drag it here",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Dropzone configured to accept only a single file at a time via the maxFiles prop.",
+      },
+      source: {
+        code: `<Dropzone
+  maxFiles={1}
+  linkMainText="Upload single file"
+  linkSecondaryText="or drag it here"
+  onDrop={(files) => console.log(files)}
+/>`,
+      },
+    },
   },
 };
 
@@ -139,6 +297,23 @@ export const ImageUpload: Story = {
     linkSecondaryText: "or drag them here",
     exstsText: "Supported file types: PNG, JPG, JPEG, GIF",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Dropzone restricted to image file types only using the accept prop.",
+      },
+      source: {
+        code: `<Dropzone
+  accept={[".png", ".jpg", ".jpeg", ".gif"]}
+  linkMainText="Upload images"
+  linkSecondaryText="or drag them here"
+  exstsText="Supported file types: PNG, JPG, JPEG, GIF"
+  onDrop={(files) => console.log(files)}
+/>`,
+      },
+    },
+  },
 };
 
 export const FolderUpload: Story = {
@@ -148,6 +323,23 @@ export const FolderUpload: Story = {
     linkMainText: "Click to upload folder",
     linkSecondaryText: "or drag and drop folders here",
     exstsText: "Upload entire folders with their structure",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Dropzone in folder upload mode, allowing users to upload entire directories while preserving folder structure.",
+      },
+      source: {
+        code: `<Dropzone
+  isFolderUpload
+  linkMainText="Click to upload folder"
+  linkSecondaryText="or drag and drop folders here"
+  exstsText="Upload entire folders with their structure"
+  onDrop={(files) => console.log(files)}
+/>`,
+      },
+    },
   },
 };
 
@@ -160,6 +352,25 @@ export const SingleFolderUpload: Story = {
     linkSecondaryText: "or drag folder here",
     exstsText: "Only one folder can be uploaded at a time",
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Folder upload mode restricted to a single folder. Triggers onSingleUploadError if multiple folders are provided.",
+      },
+      source: {
+        code: `<Dropzone
+  isFolderUpload
+  isMultipleUpload={false}
+  linkMainText="Upload single folder"
+  linkSecondaryText="or drag folder here"
+  exstsText="Only one folder can be uploaded at a time"
+  onDrop={(files) => console.log(files)}
+  onSingleUploadError={() => alert("Only one folder allowed")}
+/>`,
+      },
+    },
+  },
 };
 
 export const SingleFileOnly: Story = {
@@ -169,5 +380,23 @@ export const SingleFileOnly: Story = {
     linkMainText: "Upload single file",
     linkSecondaryText: "or drag file here",
     exstsText: "Only one file can be uploaded at a time",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "File upload mode restricted to a single file. Triggers onSingleUploadError if multiple files are provided.",
+      },
+      source: {
+        code: `<Dropzone
+  isMultipleUpload={false}
+  linkMainText="Upload single file"
+  linkSecondaryText="or drag file here"
+  exstsText="Only one file can be uploaded at a time"
+  onDrop={(files) => console.log(files)}
+  onSingleUploadError={() => alert("Only one file allowed")}
+/>`,
+      },
+    },
   },
 };

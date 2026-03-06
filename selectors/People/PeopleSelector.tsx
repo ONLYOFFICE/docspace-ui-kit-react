@@ -65,6 +65,7 @@ import { useTheme } from "../../context/ThemeContext";
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
 import styles from "./PeopleSelector.module.scss";
+import { Encoder } from "../../utils/encoder";
 
 const PEOPLE_TAB_ID = "0";
 const GROUP_TAB_ID = "1";
@@ -72,6 +73,7 @@ const GUESTS_TAB_ID = "2";
 
 const toListItem = (
   item: EmployeeFullDto | GroupDto,
+  baseUrl: string,
   disableDisabledUsers?: boolean,
   disableInvitedUsers?: string[],
   isRoom?: boolean,
@@ -105,7 +107,11 @@ const toListItem = (
       ? DefaultUserPhoto.src
       : DefaultUserPhoto;
 
-    const userAvatar = hasAvatar && avatar ? avatar : defaultUserPhotoURL;
+    const avatarPath = hasAvatar && avatar ? avatar : defaultUserPhotoURL;
+    const userAvatar =
+      typeof avatarPath === "string" && avatarPath.startsWith("/")
+        ? `${baseUrl}${avatarPath}`
+        : avatarPath;
 
     const isInvited = checkIfUserInvited
       ? checkIfUserInvited(item)
@@ -242,7 +248,7 @@ const PeopleSelector = ({
   disabledInvitedText,
   isAgent,
 }: PeopleSelectorProps) => {
-  const { peopleSearchApi, groupSearchApi } = useApi();
+  const { peopleSearchApi, groupSearchApi, baseUrl } = useApi();
   const { isBase } = useTheme();
 
   const [activeTabId, setActiveTabId] = useState<string>(
@@ -441,6 +447,7 @@ const PeopleSelector = ({
           .map((item) =>
             toListItem(
               item,
+              baseUrl,
               disableDisabledUsers,
               disableInvitedUsers,
               !!roomId,
@@ -635,7 +642,7 @@ const PeopleSelector = ({
             aria-label={label}
             dir="auto"
           >
-            {label}
+            {Encoder.htmlDecode(label ?? "")}
           </Text>
           {!isGroup && String(id) === currentUserId ? (
             <Text className={styles.isMeLabel} fontWeight={600} fontSize="14px">

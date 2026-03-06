@@ -24,53 +24,110 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import LogoUrl from "../../assets/dark_leftmenu.svg?url";
 
-import { MCPIconSize } from "./MCPIcon.enum";
-import { MCPIcon } from "./MCPIcon";
+import { MCPIcon, MCPIconSize } from ".";
 
 const meta = {
-  title: "Components/UI/MCPIcon",
+  title: "UI/Data display/MCPIcon",
   component: MCPIcon,
   parameters: {
     docs: {
       description: {
-        component:
-          "An icon component for MCP (Model Context Protocol) with configurable size options.",
+        component: `An icon component for MCP (Model Context Protocol) with configurable size options and image fallback.
+
+### Features
+
+- **Four Sizes**: Small, Medium, Big, and Large
+- **Image Support**: Display a custom image or fall back to the first character of the title
+- **Error Handling**: Gracefully falls back to title initial if image fails to load
+
+### Usage
+
+\`\`\`tsx
+import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
+
+// With title initial
+<MCPIcon title="DocSpace MCP" size={MCPIconSize.Large} />
+
+// With image
+<MCPIcon title="My Server" size={MCPIconSize.Medium} imgSrc="/path/to/icon.svg" />
+\`\`\``,
       },
     },
+    layout: "centered",
   },
   argTypes: {
     title: {
-      description: "Title text for the icon",
       control: "text",
+      description: "Title text (first character used as fallback icon)",
     },
     size: {
-      description: "Size of the icon",
       control: "select",
       options: Object.values(MCPIconSize),
+      description: "Size of the icon",
+      table: {
+        defaultValue: { summary: "large" },
+      },
     },
     imgSrc: {
-      description: "Image source URL for the icon",
       control: "text",
+      description: "Image source URL for the icon",
     },
     className: {
-      description: "Additional CSS class name",
       control: "text",
+      description: "Additional CSS class name",
     },
     dataTestId: {
-      description: "Test ID for testing purposes",
       control: "text",
+      description: "Test ID for testing purposes",
+      table: {
+        defaultValue: { summary: "mcp-icon" },
+      },
     },
   },
 } satisfies Meta<typeof MCPIcon>;
 
+type Story = StoryObj<ComponentProps<typeof MCPIcon>>;
+
 export default meta;
-type Story = StoryObj<typeof MCPIcon>;
+
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "16px",
+        flexWrap: "wrap",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+const LabeledItem = (props: { label: string; children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "8px",
+      }}
+    >
+      {props.children}
+      <span style={{ fontSize: "12px", color: "#666" }}>{props.label}</span>
+    </div>
+  );
+};
 
 export const Default: Story = {
+  render: (args) => <MCPIcon {...args} />,
   args: {
     title: "DocSpace MCP",
     size: MCPIconSize.Large,
@@ -78,9 +135,87 @@ export const Default: Story = {
 };
 
 export const WithImage: Story = {
+  render: (args) => <MCPIcon {...args} />,
   args: {
     title: "Any",
     size: MCPIconSize.Large,
     imgSrc: LogoUrl,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "MCP icon displaying a custom image. Falls back to title initial if the image fails to load.",
+      },
+      source: {
+        code: `<MCPIcon title="My Server" size={MCPIconSize.Large} imgSrc="/path/to/icon.svg" />`,
+      },
+    },
+  },
+};
+
+const AllSizesTemplate = () => {
+  return (
+    <Wrapper>
+      {(Object.keys(MCPIconSize) as Array<keyof typeof MCPIconSize>).map(
+        (key) => (
+          <LabeledItem key={key} label={key}>
+            <MCPIcon title="DocSpace" size={MCPIconSize[key]} />
+          </LabeledItem>
+        ),
+      )}
+    </Wrapper>
+  );
+};
+
+export const AllSizes: Story = {
+  render: () => <AllSizesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: "All available MCP icon sizes: Small, Medium, Big, and Large.",
+      },
+      source: {
+        code: `<MCPIcon title="DocSpace" size={MCPIconSize.Small} />
+<MCPIcon title="DocSpace" size={MCPIconSize.Medium} />
+<MCPIcon title="DocSpace" size={MCPIconSize.Big} />
+<MCPIcon title="DocSpace" size={MCPIconSize.Large} />`,
+      },
+    },
+  },
+};
+
+const AllSizesWithImageTemplate = () => {
+  return (
+    <Wrapper>
+      {(Object.keys(MCPIconSize) as Array<keyof typeof MCPIconSize>).map(
+        (key) => (
+          <LabeledItem key={key} label={key}>
+            <MCPIcon
+              title="DocSpace"
+              size={MCPIconSize[key]}
+              imgSrc={LogoUrl}
+            />
+          </LabeledItem>
+        ),
+      )}
+    </Wrapper>
+  );
+};
+
+export const AllSizesWithImage: Story = {
+  render: () => <AllSizesWithImageTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: "All sizes with a custom image instead of the title initial.",
+      },
+      source: {
+        code: `<MCPIcon title="DocSpace" size={MCPIconSize.Small} imgSrc={logoUrl} />
+<MCPIcon title="DocSpace" size={MCPIconSize.Medium} imgSrc={logoUrl} />
+<MCPIcon title="DocSpace" size={MCPIconSize.Big} imgSrc={logoUrl} />
+<MCPIcon title="DocSpace" size={MCPIconSize.Large} imgSrc={logoUrl} />`,
+      },
+    },
   },
 };

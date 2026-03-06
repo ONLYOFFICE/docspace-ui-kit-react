@@ -46,6 +46,7 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
   const prevMessageRef = React.useRef<string | React.ReactNode | undefined>(
     message,
   );
+  const prevIsWarningRef = React.useRef<boolean | undefined>(isWarning);
   const shouldShowAfterAnimationRef = React.useRef(false);
 
   React.useEffect(() => {
@@ -59,17 +60,19 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
       if (!shouldShowAfterAnimationRef.current) {
         setIsVisible(true);
         prevMessageRef.current = message;
+        prevIsWarningRef.current = isWarning;
       }
 
       return;
     }
 
     prevMessageRef.current = message;
+    prevIsWarningRef.current = isWarning;
     if (!message) return;
 
     setIsShowComponent(true);
     setIsVisible(true);
-  }, [message]);
+  }, [message, isWarning]);
 
   React.useEffect(() => {
     const element = messageRef.current;
@@ -79,6 +82,7 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
       const resetStates = () => {
         shouldShowAfterAnimationRef.current = false;
         prevMessageRef.current = message;
+        prevIsWarningRef.current = isWarning;
       };
 
       if (!message) {
@@ -113,7 +117,7 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
   return (
     <div
       ref={messageRef}
-      className={`${styles.body} ${!isVisible ? styles.hide : ""} ${isWarning ? styles.warning : ""}`}
+      className={`${styles.body} ${!isVisible ? styles.hide : ""} ${prevIsWarningRef.current ? styles.warning : ""}`}
     >
       <DangerToastReactSvg
         className={styles.dangerToastIcon}

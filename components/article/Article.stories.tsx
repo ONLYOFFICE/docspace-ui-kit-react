@@ -1,23 +1,79 @@
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+
 import React from "react";
-import { Meta, StoryFn } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import LightSmallLogoUrl from "../../assets/lightsmall.svg?url";
 import {
   DeviceType,
   EmployeeActivationStatus,
   EmployeeStatus,
 } from "../../enums";
-import { Article } from ".";
-import { ArticleProps } from "./Article.types";
-import { ContextMenuModel } from "../context-menu";
-import LightSmallLogoUrl from "../../assets/lightsmall.svg?url";
+import type { ContextMenuModel } from "../context-menu";
 
-export default {
-  title: "Components/Layout Components/Article",
+import { Article } from ".";
+import type { ArticleProps } from "./Article.types";
+
+const meta = {
+  title: "UI/Layout/Article",
   component: Article,
   parameters: {
     docs: {
       description: {
-        component:
-          "A sidebar/article panel component that displays content, navigation menus, and user profile information. Supports responsive behavior, text visibility toggles, and action handlers for navigation and user interactions.",
+        component: `Article is a sidebar panel displaying navigation menus, user profile, and action buttons.
+
+### Features
+
+- **Compound Components**: Header, MainButton, and Body sub-components
+- **User Profile**: Displays user avatar, name, and context menu actions
+- **Responsive**: Adapts to desktop, tablet, and mobile device types
+- **Collapsible**: Toggle text visibility to show icons only
+- **Live Chat**: Optional Zendesk live chat integration
+- **Apps Block**: Links to desktop and mobile applications
+
+### Usage
+
+\`\`\`tsx
+import Article from "@docspace/ui-kit/components/article";
+
+<Article showText articleOpen currentDeviceType={DeviceType.desktop}>
+  <Article.Header>
+    <h2>My App</h2>
+  </Article.Header>
+  <Article.MainButton>
+    <button>Create</button>
+  </Article.MainButton>
+  <Article.Body>
+    <nav>Navigation items</nav>
+  </Article.Body>
+</Article>
+\`\`\``,
       },
     },
   },
@@ -33,10 +89,7 @@ export default {
 
         replaceLogos();
         const observer = new MutationObserver(replaceLogos);
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true,
-        });
+        observer.observe(document.body, { childList: true, subtree: true });
 
         return () => observer.disconnect();
       }, []);
@@ -45,31 +98,66 @@ export default {
     },
   ],
   argTypes: {
-    children: { control: false },
-    setShowText: { action: "setShowText" },
-    toggleShowText: { action: "toggleShowText" },
-    toggleArticleOpen: { action: "toggleArticleOpen" },
-    setIsMobileArticle: { action: "setIsMobileArticle" },
-    setArticleOpen: { action: "setArticleOpen" },
-    onLogoClickAction: { action: "onLogoClickAction" },
-    onProfileClick: { action: "onProfileClick" },
+    showText: {
+      control: "boolean",
+      description: "Shows text labels alongside icons",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    articleOpen: {
+      control: "boolean",
+      description: "Controls whether the article panel is open",
+      table: {
+        defaultValue: { summary: "true" },
+      },
+    },
+    hideProfileBlock: {
+      control: "boolean",
+      description: "Hides the user profile section",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    hideAppsBlock: {
+      control: "boolean",
+      description: "Hides the apps download section",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isAdmin: {
+      control: "boolean",
+      description: "Whether the current user is an admin",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    currentDeviceType: {
+      control: "select",
+      options: Object.values(DeviceType),
+      description: "Current device type for responsive layout",
+      table: {
+        defaultValue: { summary: "desktop" },
+      },
+    },
   },
-} as Meta;
+} satisfies Meta<typeof Article>;
 
-const Template: StoryFn<ArticleProps> = (args) => (
-  <div style={{ height: "600px", position: "relative" }}>
-    <Article {...args} />
-  </div>
-);
+type Story = StoryObj<ComponentProps<typeof Article>>;
+
+export default meta;
+
+const noop = () => {};
 
 const defaultProps: ArticleProps = {
   showText: true,
-  setShowText: () => {},
+  setShowText: noop,
   articleOpen: true,
-  toggleShowText: () => {},
-  toggleArticleOpen: () => {},
-  setIsMobileArticle: () => {},
-  setArticleOpen: () => {},
+  toggleShowText: noop,
+  toggleArticleOpen: noop,
+  setIsMobileArticle: noop,
+  setArticleOpen: noop,
   withSendAgain: false,
   mainBarVisible: true,
   hideProfileBlock: false,
@@ -80,8 +168,8 @@ const defaultProps: ArticleProps = {
   isLiveChatAvailable: false,
   isAdmin: false,
   currentDeviceType: DeviceType.desktop,
-  onLogoClickAction: () => {},
-  onProfileClick: () => {},
+  onLogoClickAction: noop,
+  onProfileClick: noop,
   withCustomArticleHeader: false,
   isBurgerLoading: false,
   languageBaseName: "en",
@@ -91,7 +179,7 @@ const defaultProps: ArticleProps = {
   zendeskKey: "your-zendesk-key",
   showProgress: false,
   showBackButton: false,
-  navigate: (path: string) => console.log("navigate:", path),
+  navigate: noop,
   downloaddesktopUrl: "https://example.com/desktop",
   officeforandroidUrl: "https://example.com/android",
   officeforiosUrl: "https://example.com/ios",
@@ -109,64 +197,80 @@ const defaultProps: ArticleProps = {
   ],
 };
 
-export const Default = Template.bind({});
-Default.args = {
-  ...defaultProps,
-  user: {
-    id: "user-1",
-    displayName: "John Smith",
-    title: "Manager",
-    avatarSmall: "https://via.placeholder.com/32",
-    access: 0,
-    firstName: "",
-    lastName: "",
-    userName: "",
-    email: "",
-    status: EmployeeStatus.Active,
-    activationStatus: EmployeeActivationStatus.NotActivated,
-    department: "",
-    workFrom: "",
-    avatarMax: "",
-    avatarMedium: "",
-    avatarOriginal: "",
-    avatar: "",
-    isAdmin: false,
-    isRoomAdmin: false,
-    isLDAP: false,
-    listAdminModules: [],
-    isOwner: false,
-    isVisitor: false,
-    isCollaborator: false,
-    mobilePhoneActivationStatus: 0,
-    isSSO: false,
-    profileUrl: "",
-    hasAvatar: false,
-    isAnonim: false,
+const mockUser = {
+  id: "user-1",
+  displayName: "John Smith",
+  title: "Manager",
+  avatarSmall: "https://via.placeholder.com/32",
+  access: 0,
+  firstName: "",
+  lastName: "",
+  userName: "",
+  email: "",
+  status: EmployeeStatus.Active,
+  activationStatus: EmployeeActivationStatus.NotActivated,
+  department: "",
+  workFrom: "",
+  avatarMax: "",
+  avatarMedium: "",
+  avatarOriginal: "",
+  avatar: "",
+  isAdmin: false,
+  isRoomAdmin: false,
+  isLDAP: false,
+  listAdminModules: [],
+  isOwner: false,
+  isVisitor: false,
+  isCollaborator: false,
+  mobilePhoneActivationStatus: 0,
+  isSSO: false,
+  profileUrl: "",
+  hasAvatar: false,
+  isAnonim: false,
+};
+
+const Template = (args: ArticleProps) => (
+  <div style={{ height: "600px", position: "relative" }}>
+    <Article {...args} />
+  </div>
+);
+
+export const Default: Story = {
+  render: (args) => <Template {...args} />,
+  args: {
+    ...defaultProps,
+    user: mockUser,
+    getActions: () =>
+      [
+        { key: "profile", label: "Profile", onClick: noop },
+        { key: "help", label: "Help", onClick: noop },
+        { key: "logout", label: "Logout", onClick: noop },
+      ] as ContextMenuModel[],
+    children: [
+      <Article.Header key="header">
+        <h2>Article with Context Menu</h2>
+      </Article.Header>,
+      <Article.Body key="body">
+        <div>Content with available user context menu</div>
+      </Article.Body>,
+    ],
   },
-  getActions: () =>
-    [
-      {
-        key: "profile",
-        label: "Profile",
-        onClick: () => console.log("Profile clicked"),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default Article sidebar with user profile, header, and body content. The profile section includes a context menu with actions.",
       },
-      {
-        key: "help",
-        label: "Help",
-        onClick: () => console.log("Help clicked"),
+      source: {
+        code: `<Article showText articleOpen currentDeviceType={DeviceType.desktop} user={user} getActions={getActions}>
+  <Article.Header>
+    <h2>Article Header</h2>
+  </Article.Header>
+  <Article.Body>
+    <div>Content</div>
+  </Article.Body>
+</Article>`,
       },
-      {
-        key: "logout",
-        label: "Logout",
-        onClick: () => console.log("Logout clicked"),
-      },
-    ] as ContextMenuModel[],
-  children: [
-    <Article.Header key="header">
-      <h2>Article with Context Menu</h2>
-    </Article.Header>,
-    <Article.Body key="body">
-      <div>Content with available user context menu</div>
-    </Article.Body>,
-  ],
+    },
+  },
 };

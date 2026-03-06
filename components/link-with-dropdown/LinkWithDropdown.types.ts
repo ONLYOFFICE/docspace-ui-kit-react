@@ -85,4 +85,10 @@ export type LinkWithDropDownProps = SimpleLinkWithDropdownProps & {
   fixedDirection?: boolean;
   /** Use default mode for dropdown positioning */
   isDefaultMode?: boolean;
+  /** Minimum space from top of viewport */
+  topSpace?: number;
+  /** Minimum space from bottom of viewport */
+  bottomSpace?: number;
+  /** Enables dynamic height calculation and project Scrollbar for the dropdown list */
+  withDynamicScrollbar?: boolean;
 };

@@ -24,19 +24,22 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { createContext, useMemo, type ReactNode } from "react";
-
 import type { FilesSettingsDto } from "@onlyoffice/docspace-api-sdk";
+import React, { createContext, useMemo, type ReactNode } from "react";
+
 import type { TGetIcon } from "../types";
 import useFilesSettings from "../hooks/useFilesSettings";
 
 export const SettingsContext = createContext<{
-  getIcon: (fileExst: string) => string;
+  getIcon: (
+    fileExst: string,
+    size?: number,
+  ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null;
   filesSettingsLoading: boolean;
   extsWebEdited: string[];
   displayFileExtension: boolean;
 }>({
-  getIcon: () => "",
+  getIcon: () => null,
   extsWebEdited: [],
   filesSettingsLoading: false,
   displayFileExtension: false,
