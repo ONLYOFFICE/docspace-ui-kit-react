@@ -26,65 +26,106 @@
 
 import { useState, useCallback } from "react";
 import type { StoryObj, Meta } from "@storybook/react-vite";
+import { FolderType } from "@onlyoffice/docspace-api-sdk";
 
 import { Uploader } from "./index";
 import type { UploaderProps } from "./Uploader.types";
 import { Toast } from "../components/toast";
+
 import { useApi } from "../providers/api";
+import FilesSelector from "../selectors/Files";
+import type { TBreadCrumb } from "../components/selector/Selector.types";
+import { DeviceType } from "../enums";
+import { InputSize } from "../components/text-input";
+import { FileInput } from "../components/file-input";
+import {
+  getFolderUrl as getFolderUrlHelper,
+  getIsDisabled as getIsDisabledHelper,
+} from "./Uploader.story.helper";
 
-type StoryArgs = UploaderProps;
+type StoryArgs = UploaderProps & {
+  storyId?: string;
+};
 
-const TARGET_ID_KEY = "uploader-target-id";
-
-const UploaderWithFolderUrl = (args: UploaderProps) => {
+const UploaderWithFolderUrl = (args: StoryArgs) => {
   const { baseUrl } = useApi();
+  const { storyId = "default", ...uploaderProps } = args;
+
+  const TARGET_ID_KEY = `uploader-target-id-${storyId}`;
 
   const [targetId, setTargetId] = useState(
     () => sessionStorage.getItem(TARGET_ID_KEY) || "",
   );
-
-  const handleTargetIdChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setTargetId(value);
-      sessionStorage.setItem(TARGET_ID_KEY, value);
-    },
-    [],
+  const [folderPath, setFolderPath] = useState(
+    () => sessionStorage.getItem(`${TARGET_ID_KEY}-path`) || "",
   );
+  const [isSelectorVisible, setIsSelectorVisible] = useState(false);
+
+  const handleSelectFolder = (
+    selectedItemId: string | number | undefined,
+    folderTitle: string,
+    _isPublic: boolean,
+    breadCrumbs: TBreadCrumb[],
+  ) => {
+    if (!selectedItemId) return;
+    
+    const idStr = String(selectedItemId);
+    const path = breadCrumbs.map((crumb) => crumb.label).join(" / ");
+    setTargetId(idStr);
+    setFolderPath(path);
+    sessionStorage.setItem(TARGET_ID_KEY, idStr);
+    sessionStorage.setItem(`${TARGET_ID_KEY}-path`, path);
+    setIsSelectorVisible(false);
+  };
 
   const getFolderUrl = useCallback(
-    (folderId: number) => {
-      return `${baseUrl}/rooms/personal/filter?folder=${folderId}`;
-    },
+    (folderId: number) => getFolderUrlHelper(baseUrl, folderId),
     [baseUrl],
   );
 
+  const getIsDisabled = useCallback(getIsDisabledHelper, []);
+
   return (
     <>
-      <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-        <label htmlFor="uploader-target-id" style={{ fontWeight: 600 }}>
-          targetId:
-        </label>
-        <input
-          id="uploader-target-id"
-          type="text"
-          value={targetId}
-          onChange={handleTargetIdChange}
-          placeholder="Enter folder ID"
-          style={{
-            padding: "4px 8px",
-            border: "1px solid #ccc",
-            borderRadius: 4,
-            width: 200,
-          }}
-        />
+      <div style={{ marginBottom: 16, display: "flex", gap: 8, alignItems: "center" }}>
+        <label style={{ fontWeight: 600, display: "block", marginBottom: 4 }}>Target Folder:</label>
+        <div style={{ width: '300px' }}>
+          <FileInput
+            fromStorage
+            placeholder={folderPath || "Choose folder"}
+            size={InputSize.base}
+            scale
+            onClick={() => setIsSelectorVisible(true)}
+          />
+        </div>
         {!targetId && (
-          <span style={{ color: "red" }}>
-            Required — please enter a target folder ID
+          <span style={{ color: "red", fontSize: 12, marginTop: 4, display: "block" }}>
+            Required — please select a target folder
           </span>
         )}
       </div>
-      <Uploader {...args} targetId={targetId} getFolderUrl={getFolderUrl} />
+
+      {/* @ts-expect-error need pass all props */}
+      <FilesSelector
+        isPanelVisible={isSelectorVisible}
+        embedded={false}
+        currentDeviceType={DeviceType.desktop}
+        currentFolderId={0}
+        rootFolderType={FolderType.VirtualRooms}
+        isRoomsOnly={false}
+        isThirdParty={false}
+        withSearch
+        withBreadCrumbs
+        withoutBackButton={false}
+        withCancelButton
+        cancelButtonLabel="Cancel"
+        submitButtonLabel="Select"
+        getIsDisabled={getIsDisabled}
+        onSubmit={handleSelectFolder}
+        onCancel={() => setIsSelectorVisible(false)}
+      />
+
+      <Uploader {...uploaderProps} targetId={targetId} getFolderUrl={getFolderUrl} />
     </>
   );
 };
@@ -138,7 +179,11 @@ const meta: Meta<StoryArgs> = {
     },
     targetId: {
       control: false,
-      description: "Target folder ID for uploads (managed via shared input above the component)",
+      description: "Target folder ID for uploads (managed via folder selector above the component)",
+    },
+    storyId: {
+      control: false,
+      description: "Unique identifier for the story to isolate targetId in sessionStorage",
     },
     linkMainText: {
       control: "text",
@@ -198,12 +243,16 @@ const defaultArgs: Omit<StoryArgs, "getFolderUrl"> = {
 };
 
 export const Default: Story = {
-  args: defaultArgs,
+  args: {
+    ...defaultArgs,
+    storyId: "default",
+  },
 };
 
 export const SingleFileUpload: Story = {
   args: {
     ...defaultArgs,
+    storyId: "single-file",
     linkMainText: "Upload file",
     secondaryText: "or drag and drop a file here",
     isMultipleUpload: false,
@@ -213,6 +262,7 @@ export const SingleFileUpload: Story = {
 export const FolderUpload: Story = {
   args: {
     ...defaultArgs,
+    storyId: "folder",
     shortText: "Any files",
     fullText: undefined,
     badgeValue: undefined,
@@ -226,6 +276,7 @@ export const FolderUpload: Story = {
 export const SingleFolderUpload: Story = {
   args: {
     ...defaultArgs,
+    storyId: "single-folder",
     shortText: "Any files",
     fullText: undefined,
     badgeValue: undefined,
@@ -239,6 +290,7 @@ export const SingleFolderUpload: Story = {
 export const ImageUpload: Story = {
   args: {
     ...defaultArgs,
+    storyId: "image",
     accept: ".png,.jpg,.jpeg,.gif,.webp,.svg",
     shortText: "PNG, JPG, JPEG, GIF",
     fullText: "PNG, JPG, JPEG, GIF, WEBP, SVG",
@@ -251,6 +303,7 @@ export const ImageUpload: Story = {
 export const WithSizeLimit: Story = {
   args: {
     ...defaultArgs,
+    storyId: "size-limit",
     linkMainText: "Upload files (max 10MB each)",
     maxPerUploadSize: "10MB",
   },
@@ -259,6 +312,7 @@ export const WithSizeLimit: Story = {
 export const WithTotalSizeLimit: Story = {
   args: {
     ...defaultArgs,
+    storyId: "total-size-limit",
     linkMainText: "Upload files (max 100MB total)",
     maxPerUploadSize: "10MB",
     maxTotalUploadSize: "100MB",
@@ -268,6 +322,7 @@ export const WithTotalSizeLimit: Story = {
 export const AnyFiles: Story = {
   args: {
     ...defaultArgs,
+    storyId: "any-files",
     accept: "*",
     shortText: "Any files",
     fullText: undefined,
@@ -280,6 +335,7 @@ export const AnyFiles: Story = {
 export const CustomSettings: Story = {
   args: {
     ...defaultArgs,
+    storyId: "custom-settings",
 
     filesSettings: {
       chunkUploadSize: 10 * 1024 * 1024,
