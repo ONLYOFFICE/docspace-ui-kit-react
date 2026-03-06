@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import { useState, useCallback } from "react";
 import type { StoryObj, Meta } from "@storybook/react-vite";
 
 import { Uploader } from "./index";
@@ -33,14 +34,59 @@ import { useApi } from "../providers/api";
 
 type StoryArgs = UploaderProps;
 
+const TARGET_ID_KEY = "uploader-target-id";
+
 const UploaderWithFolderUrl = (args: UploaderProps) => {
   const { baseUrl } = useApi();
 
-  const getFolderUrl = (folderId: number) => {
-    return `${baseUrl}/rooms/personal/filter?folder=${folderId}`;
-  };
+  const [targetId, setTargetId] = useState(
+    () => sessionStorage.getItem(TARGET_ID_KEY) || "",
+  );
 
-  return <Uploader {...args} getFolderUrl={getFolderUrl} />;
+  const handleTargetIdChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setTargetId(value);
+      sessionStorage.setItem(TARGET_ID_KEY, value);
+    },
+    [],
+  );
+
+  const getFolderUrl = useCallback(
+    (folderId: number) => {
+      return `${baseUrl}/rooms/personal/filter?folder=${folderId}`;
+    },
+    [baseUrl],
+  );
+
+  return (
+    <>
+      <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+        <label htmlFor="uploader-target-id" style={{ fontWeight: 600 }}>
+          targetId:
+        </label>
+        <input
+          id="uploader-target-id"
+          type="text"
+          value={targetId}
+          onChange={handleTargetIdChange}
+          placeholder="Enter folder ID"
+          style={{
+            padding: "4px 8px",
+            border: "1px solid #ccc",
+            borderRadius: 4,
+            width: 200,
+          }}
+        />
+        {!targetId && (
+          <span style={{ color: "red" }}>
+            Required — please enter a target folder ID
+          </span>
+        )}
+      </div>
+      <Uploader {...args} targetId={targetId} getFolderUrl={getFolderUrl} />
+    </>
+  );
 };
 
 const meta: Meta<StoryArgs> = {
@@ -91,8 +137,8 @@ const meta: Meta<StoryArgs> = {
         "File settings from the server (chunkUploadSize, maxUploadThreadCount, etc.)",
     },
     targetId: {
-      control: "text",
-      description: "Target folder ID for uploads",
+      control: false,
+      description: "Target folder ID for uploads (managed via shared input above the component)",
     },
     linkMainText: {
       control: "text",
@@ -145,7 +191,6 @@ const defaultArgs: Omit<StoryArgs, "getFolderUrl"> = {
   shortText: "PDF, DOC, DOCX, XLS, XLSX",
   fullText: "PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX",
   badgeValue: 2,
-  targetId: "61822",
   linkMainText: "Upload files",
   secondaryText: "or drag and drop files here",
   isFolderUpload: false,
@@ -235,11 +280,13 @@ export const AnyFiles: Story = {
 export const CustomSettings: Story = {
   args: {
     ...defaultArgs,
+
     filesSettings: {
       chunkUploadSize: 10 * 1024 * 1024,
       maxUploadThreadCount: 5,
       maxUploadFilesCount: 3,
     },
+
     linkMainText: "Upload with custom settings",
     secondaryText: "10MB chunks, 5 threads, 3 files at once",
   },
