@@ -213,7 +213,7 @@ const Template = (props: StoryArgs) => (
 const CallbackLogger = (props: StoryArgs) => {
   const [logs, setLogs] = React.useState<
     Array<{
-      id: number;
+      id: string;
       type: string;
       timestamp: string;
       data: Record<string, unknown>;
@@ -225,7 +225,7 @@ const CallbackLogger = (props: StoryArgs) => {
     setLogs((prev) =>
       [
         {
-          id: Date.now(),
+          id: crypto.randomUUID(),
           type,
           timestamp: new Date().toLocaleTimeString(),
           data,
