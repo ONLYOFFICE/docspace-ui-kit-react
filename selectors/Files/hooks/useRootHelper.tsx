@@ -125,6 +125,7 @@ const useRootHelper = ({
           folder.rootFolderType === FolderType.AiAgents)
       ) {
         let title = "";
+
         switch (folder.rootFolderType) {
           case FolderType.USER:
             title = t("MyDocuments");
@@ -144,6 +145,7 @@ const useRootHelper = ({
           default:
             break;
         }
+
         newItems.push({
           label: title,
           id: folder.id!,
