@@ -220,19 +220,69 @@ const CallbackLogger = (props: StoryArgs) => {
     }>
   >([]);
   const [filter, setFilter] = React.useState<string>("all");
+  const [showScrollButton, setShowScrollButton] = React.useState(false);
+  const logsContainerRef = React.useRef<HTMLDivElement>(null);
+  const prevScrollHeightRef = React.useRef<number>(0);
+
+  const handleScroll = () => {
+    const container = logsContainerRef.current;
+    if (container) {
+      const isNearBottom =
+        container.scrollHeight - container.clientHeight - container.scrollTop < 100;
+      setShowScrollButton(!isNearBottom && container.scrollHeight > container.clientHeight);
+    }
+  };
+
+  const scrollToBottom = () => {
+    const container = logsContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+      setShowScrollButton(false);
+    }
+  };
+
+  const prevFilterRef = React.useRef(filter);
+
+  React.useEffect(() => {
+    const container = logsContainerRef.current;
+    if (container) {
+      const filterChanged = prevFilterRef.current !== filter;
+      const isContentScrollable = container.scrollHeight > container.clientHeight;
+
+      if (filterChanged) {
+        // When switching tabs, show the latest logs and hide the button
+        container.scrollTop = container.scrollHeight;
+        setShowScrollButton(false);
+      } else {
+        // Logic for tracking new logs
+        const isNearBottom =
+          prevScrollHeightRef.current - container.clientHeight - container.scrollTop < 150;
+
+        if (isNearBottom) {
+          container.scrollTop = container.scrollHeight;
+          setShowScrollButton(false);
+        } else {
+          setShowScrollButton(isContentScrollable);
+        }
+      }
+
+      prevScrollHeightRef.current = container.scrollHeight;
+      prevFilterRef.current = filter;
+    } else {
+      setShowScrollButton(false);
+    }
+  }, [logs, filter]);
 
   const addLog = (type: string, data: Record<string, unknown>) => {
-    setLogs((prev) =>
-      [
-        {
-          id: crypto.randomUUID(),
-          type,
-          timestamp: new Date().toLocaleTimeString(),
-          data,
-        },
-        ...prev,
-      ].slice(0, 50),
-    );
+    setLogs((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        type,
+        timestamp: new Date().toLocaleTimeString(),
+        data,
+      },
+    ]);
   };
 
   const filteredLogs =
@@ -304,7 +354,12 @@ const CallbackLogger = (props: StoryArgs) => {
           </select>
         </div>
 
-        <div key={filter} className={styles.logsContainer}>
+        <div
+          key={filter}
+          ref={logsContainerRef}
+          className={styles.logsContainer}
+          onScroll={handleScroll}
+        >
           {filteredLogs.length === 0 ? (
             <div className={styles.emptyState}>
               {filter === "all"
@@ -327,6 +382,25 @@ const CallbackLogger = (props: StoryArgs) => {
             ))
           )}
         </div>
+
+        <button
+          className={`${styles.scrollToBottomButton} ${showScrollButton ? styles.visible : ""}`}
+          onClick={scrollToBottom}
+          title="Scroll to bottom"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 5v14M19 12l-7 7-7-7" />
+          </svg>
+        </button>
 
         <div className={styles.panelFooter}>
           <span>

@@ -1,4 +1,5 @@
 .callbackPanel {
+  position: relative;
   display: flex;
   flex-direction: column;
   border: 1px solid #ddd;
@@ -12,6 +13,48 @@
   :global(.dark) & {
     background: #1e1e1e;
     border-color: #444;
+  }
+}
+
+.scrollToBottomButton {
+  position: absolute;
+  bottom: 64px;
+  inset-inline-end: 24px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #0066cc;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  z-index: 10;
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  &:hover {
+    background: #0056b3;
+    transform: scale(1.1);
+  }
+
+  :global(.dark) & {
+    background: #4a9eff;
+    color: #1e1e1e;
+
+    &:hover {
+      background: #76b5ff;
+    }
   }
 }
 
