@@ -74,6 +74,7 @@ const GUESTS_TAB_ID = "2";
 const toListItem = (
   item: EmployeeFullDto | GroupDto,
   baseUrl: string,
+  t: (key: string) => string,
   disableDisabledUsers?: boolean,
   disableInvitedUsers?: string[],
   isRoom?: boolean,
@@ -447,6 +448,7 @@ const PeopleSelector = ({
             toListItem(
               item,
               baseUrl,
+              t,
               disableDisabledUsers,
               disableInvitedUsers,
               !!roomId,

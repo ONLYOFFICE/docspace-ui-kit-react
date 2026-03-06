@@ -35,6 +35,7 @@ import { TileItem } from "../tile-container/TileContainer.types";
 
 import styles from "./RoomTile.module.scss";
 import { useCommonTranslation } from "../../../utils";
+import type { TFunction } from "i18next";
 
 export const RoomTile = ({
   item,
@@ -118,7 +119,7 @@ export const RoomTile = ({
     } else {
       tempTags.push({
         isDefault: true,
-        label: getRoomTypeName(item.roomType, t),
+        label: getRoomTypeName(item.roomType, t as TFunction),
         roomType: Number(item.roomType),
         onClick: () =>
           selectOption({
