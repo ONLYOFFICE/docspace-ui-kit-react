@@ -186,8 +186,10 @@ const useFilesHelper = ({
         }
 
         const currentSearch = searchValue || "";
+
+        // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
         const folderRes = await foldersApi.getFolderByFolderId(
-          Number(folderId),
+          folderId as number,
           undefined,
           undefined,
           filterParams.filterType,
