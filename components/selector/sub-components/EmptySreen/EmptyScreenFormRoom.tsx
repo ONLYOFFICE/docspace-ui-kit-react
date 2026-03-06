@@ -53,8 +53,8 @@ const EmptyScreenFormRoom = ({
 
   const description =
     createDefineRoomType === RoomType.FillingFormsRoom
-      ? t("SelectorFormRoomEmptyScreenDescription") || "" // t("SelectorFormRoomEmptyScreenDescription")
-      : t("SelectorVDREmptyScreenDescription") || ""; // t("SelectorVDREmptyScreenDescription")
+      ? t("SelectorFormRoomEmptyScreenDescription") || ""
+      : t("SelectorVDREmptyScreenDescription") || "";
 
   const buttonLabel =
     createDefineRoomType === RoomType.FillingFormsRoom
