@@ -27,18 +27,28 @@
  */
 
 import React, { useState, useEffect, useCallback } from "react";
-import { addons, types } from "storybook/manager-api";
+import {
+  addons,
+  types,
+  useStorybookApi,
+  useStorybookState,
+} from "storybook/manager-api";
 import { useGlobals } from "storybook/manager-api";
-import { Modal, Button, Form, Select } from "storybook/internal/components";
-import { EditorIcon } from "@storybook/icons";
+import {
+  Modal,
+  Button,
+  Form,
+  Select,
+  Badge,
+} from "storybook/internal/components";
+import { EditorIcon, TrashIcon } from "@storybook/icons";
 
 import {
   getSavedProviders,
+  deleteProvider,
   STORAGE_KEY,
-  LAST_API_CONFIG_KEY,
   type SavedApiProvider,
 } from "../utils/apiProviders";
-import { setCookie } from "../../utils/cookie";
 
 import "./index.css";
 
@@ -63,10 +73,58 @@ const AddCustomModal = ({
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSave = () => {
+  const resetState = () => {
+    setName("");
+    setUrl("");
+    setApiKey("");
+    setError("");
+    setIsLoading(false);
+  };
+
+  const trimUrl = (rawUrl: string): string => {
+    return rawUrl.trim().replace(/\/+$/, "");
+  };
+
+  const testConnection = async (
+    baseUrl: string,
+    key: string,
+  ): Promise<boolean> => {
+    try {
+      const response = await fetch(`${baseUrl}/api/2.0/people/@self`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      return response.ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleSave = async () => {
     if (!name.trim() || !url.trim() || !apiKey.trim()) return;
-    onSave(name.trim(), url, apiKey);
+
+    setError("");
+    setIsLoading(true);
+
+    const trimmedUrl = trimUrl(url);
+
+    const isConnected = await testConnection(trimmedUrl, apiKey);
+
+    if (!isConnected) {
+      setError("Failed to connect to API. Please check the URL and API Key.");
+      setIsLoading(false);
+      return;
+    }
+
+    onSave(name.trim(), trimmedUrl, apiKey);
+    resetState();
   };
 
   return (
@@ -104,6 +162,15 @@ const AddCustomModal = ({
           </div>
         </Form>
 
+        {error ? (
+          <Badge status="critical">{error}</Badge>
+        ) : (
+          <Badge status="warning">
+            ⚠️ API keys are stored unencrypted in localStorage for development
+            convenience only.
+          </Badge>
+        )}
+
         <div className="footer">
           <Button
             type="button"
@@ -116,10 +183,10 @@ const AddCustomModal = ({
           <Button
             type="button"
             onClick={handleSave}
-            disabled={!name || !url || !apiKey}
+            disabled={!name || !url || !apiKey || isLoading}
             size="medium"
           >
-            Save
+            {isLoading ? "Testing..." : "Save"}
           </Button>
         </div>
       </div>
@@ -129,6 +196,8 @@ const AddCustomModal = ({
 
 const ApiConfigDropdown = () => {
   const [globals, updateGlobals] = useGlobals();
+  const api = useStorybookApi();
+  const { viewMode } = useStorybookState();
   const [providers, setProviders] =
     useState<SavedApiProvider[]>(getSavedProviders);
   const [modalOpen, setModalOpen] = useState(false);
@@ -151,7 +220,6 @@ const ApiConfigDropdown = () => {
         setModalOpen(true);
       } else {
         updateGlobals({ apiConfig: value });
-        localStorage.setItem(LAST_API_CONFIG_KEY, String(value));
       }
     },
     [updateGlobals],
@@ -167,7 +235,6 @@ const ApiConfigDropdown = () => {
         STORAGE_KEY,
         JSON.stringify([...existing, newProvider]),
       );
-      localStorage.setItem(LAST_API_CONFIG_KEY, id);
 
       setProviders(getSavedProviders());
       setModalOpen(false);
@@ -180,9 +247,36 @@ const ApiConfigDropdown = () => {
     setModalOpen(false);
   }, []);
 
+  const handleDelete = useCallback(
+    (e: React.MouseEvent, id: string) => {
+      e.stopPropagation();
+      deleteProvider(id);
+      setProviders(getSavedProviders());
+      api.addNotification({
+        id: `api-provider-deleted-${id}`,
+        content: { headline: "Success deleted" },
+        duration: 4000,
+      });
+    },
+    [api],
+  );
+
   const options = [
     { title: "Default", value: "default" },
-    ...providers.map((p) => ({ title: p.name, value: p.id })),
+    ...providers.map((p) => ({
+      title: p.name,
+      value: p.id,
+      aside: (
+        <Button
+          variant="ghost"
+          size="small"
+          onClick={(e) => handleDelete(e, p.id)}
+          title="Delete"
+        >
+          <TrashIcon />
+        </Button>
+      ),
+    })),
     { title: "Add custom...", value: "add-custom" },
   ];
 
@@ -200,6 +294,7 @@ const ApiConfigDropdown = () => {
         ariaLabel="API Config"
         defaultOptions={apiConfig}
         onSelect={handleSelect}
+        disabled={viewMode === "docs"}
       />
     </>
   );

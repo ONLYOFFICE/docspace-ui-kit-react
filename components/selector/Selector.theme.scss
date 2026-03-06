@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 @use "../../styles/variables/colors" as *;
 
-:global(.light) {
+.light {
   --selector-border: 1px solid #{$gray-light-mid};
 
   --selector-body-description-text: #{$gray};
@@ -46,9 +46,11 @@
   --selector-empty-screen-button-color: #{$light-gray-dark};
   --selector-empty-screen-hover-button-color: #{$black};
   --selector-empty-screen-description-color: #{$gray-text};
+
+  --info-panel-role-color: #{$light-gray-dark};
 }
 
-:global(.dark) {
+.dark {
   --selector-border: 1px solid #{$gray-dark-strong};
 
   --selector-body-description-text: #{$gray-dark};
@@ -69,4 +71,6 @@
   --selector-empty-screen-button-color: #{$dark-gray-dark};
   --selector-empty-screen-hover-button-color: #{$white};
   --selector-empty-screen-description-color: #{$dark-gray-dark};
+
+  --info-panel-role-color: #{$gray};
 }

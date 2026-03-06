@@ -128,6 +128,7 @@ const GroupMenuItem = React.memo(
             isNoFixedHeightOptions={fixedDropdownStyles}
             disableScrollbarPadding={fixedDropdownStyles}
             useFlexibleHeight={fixedDropdownStyles}
+            withoutBackground={!isMobileView}
             style={
               fixedDropdownStyles && !isMobileView
                 ? { width: "161px" }

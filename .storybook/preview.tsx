@@ -18,6 +18,7 @@ import "../css/fonts.css";
 
 import lightTheme from "./lightTheme";
 import darkTheme from "./darkTheme";
+import { DocsContainer } from "./DocsContainer";
 
 const lightColorScheme: TColorScheme = {
   id: 1,
@@ -75,6 +76,7 @@ const preview: Preview = {
       dark: darkTheme,
     },
     docs: {
+      container: DocsContainer,
       toc: true,
     },
     options: {
