@@ -57,7 +57,14 @@ type StoryArgs = {
 
 const meta: Meta<StoryArgs> = {
   title: "Components/AI Agent/Chat",
-  decorators: [withAgentIdSetup],
+  decorators: [
+    (Story) => (
+      <div className={styles.storyWrapper}>
+        <Story />
+      </div>
+    ),
+    withAgentIdSetup,
+  ],
   tags: ["!autodocs"],
   parameters: {
     layout: "fullscreen",
