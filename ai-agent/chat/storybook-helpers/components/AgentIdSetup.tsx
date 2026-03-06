@@ -26,108 +26,86 @@
 
 import React from "react";
 
-import { InputType, TextInput } from "../../../../components/text-input";
 import { Button, ButtonSize } from "../../../../components/button";
-import { Loader } from "../../../../components/loader";
+import AIAgentSelector from "../../../../selectors/AIAgent";
+import { useApi } from "../../../../providers";
+import type { TSelectorItem } from "../../../../components/selector";
 
-import useAgentIdValidation from "../hooks/useAgentIdValidation";
 import type { AgentIdSetupProps } from "../types";
 
 import styles from "./AgentIdSetup.module.scss";
 
 const AgentIdSetup = ({
   onAgentIdConfigured,
-  initialAgentId,
   initialError,
 }: AgentIdSetupProps) => {
-  const [inputValue, setInputValue] = React.useState(
-    initialAgentId ? String(initialAgentId) : "",
-  );
-  const { isValidating, validationError, validateAgentId } =
-    useAgentIdValidation();
-
-  const [localError, setLocalError] = React.useState<string | undefined>(
+  const [isSelectorOpen, setIsSelectorOpen] = React.useState(false);
+  const [isApiValidating, setIsApiValidating] = React.useState(true);
+  const [apiError, setApiError] = React.useState<string | undefined>(
     initialError,
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLocalError(undefined);
+  const { profilesApi } = useApi();
 
-    if (!inputValue.trim()) {
-      setLocalError("Please enter an Agent ID");
-      return;
-    }
+  React.useEffect(() => {
+    const checkConnection = async () => {
+      try {
+        await profilesApi.getSelfProfile();
+        setApiError(undefined);
+      } catch {
+        setApiError(
+          "Failed to connect to the portal. Please check your API settings in the provider.",
+        );
+      } finally {
+        setIsApiValidating(false);
+      }
+    };
 
-    const result = await validateAgentId(inputValue.trim());
+    checkConnection();
+  }, [profilesApi]);
 
-    if (result.isValid && result.agentId) {
-      onAgentIdConfigured(result.agentId);
-    } else {
-      setLocalError(result.error);
+  const handleAgentSelected = (items: TSelectorItem[]) => {
+    setIsSelectorOpen(false);
+    if (items.length > 0 && items[0].id) {
+      onAgentIdConfigured(items[0].id);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    setLocalError(undefined);
-  };
-
-  const displayError = localError || validationError;
-
-  const inputPlaceholder = "Enter Agent ID (e.g., 229754)";
+  if (isSelectorOpen) {
+    return (
+      <div className={styles.selectorOverlay}>
+        <AIAgentSelector
+          onSubmit={handleAgentSelected}
+          onClose={() => setIsSelectorOpen(false)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
         <h2 className={styles.title}>Configure AI Agent</h2>
         <p className={styles.description}>
-          Enter the Agent ID to connect to the AI chat service. Make sure the
-          API provider is configured correctly.
+          Select an AI agent from your portal to enable the chat component.
         </p>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.inputWrapper}>
-            <label htmlFor="agentId" className={styles.label}>
-              Agent ID
-            </label>
-            <TextInput
-              id="agentId"
-              name="agentId"
-              value={inputValue}
-              onChange={handleInputChange}
-              placeholder={inputPlaceholder}
-              hasError={!!displayError}
-              isDisabled={isValidating}
-              autoFocus
-              type={InputType.text}
-              scale
-            />
-            {displayError && (
-              <div className={styles.error}>
-                <span>⚠</span>
-                <span>{displayError}</span>
-              </div>
-            )}
-          </div>
-
-          <div className={styles.buttonGroup}>
-            <Button
-              type="submit"
-              primary
-              size={ButtonSize.medium}
-              label={isValidating ? "Validating..." : "Validate & Save"}
-              isDisabled={isValidating || !inputValue.trim()}
-              className={styles.button}
-            />
-          </div>
-        </form>
-
-        {isValidating && (
-          <div style={{ marginTop: "16px", textAlign: "center" }}>
-            <Loader size="16px" />
+        {apiError && (
+          <div className={styles.error}>
+            <span>⚠</span>
+            <span>{apiError}</span>
           </div>
         )}
+
+        <Button
+          type="button"
+          primary
+          size={ButtonSize.medium}
+          label="Browse AI Agents"
+          onClick={() => setIsSelectorOpen(true)}
+          isLoading={isApiValidating}
+          isDisabled={!!apiError || isApiValidating}
+        />
       </div>
     </div>
   );

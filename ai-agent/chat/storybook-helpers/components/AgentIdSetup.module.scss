@@ -5,22 +5,25 @@
   justify-content: center;
   height: 100%;
   padding: 32px;
-  background: var(--background-color, #f8f9fa);
+  background: var(--background-page, #f8f9fa);
 }
 
 .card {
   background: var(--background-content, #ffffff);
   border-radius: 12px;
   padding: 40px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   max-width: 500px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .title {
   font-size: 24px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   color: var(--text-color, #333333);
   text-align: center;
 }
@@ -33,39 +36,28 @@
   line-height: 1.5;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.inputWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-color, #333333);
-}
-
 .error {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--error-color, #f21c0e);
-  margin-top: 4px;
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(242, 28, 14, 0.05);
+  border-radius: 8px;
+  width: 100%;
+  justify-content: center;
 }
 
-.buttonGroup {
+.selectorOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background: var(--background-content, #ffffff);
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.button {
-  flex: 1;
+  flex-direction: column;
 }

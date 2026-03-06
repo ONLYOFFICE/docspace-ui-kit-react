@@ -1,4 +1,4 @@
-.configButton {
+.resetButton {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -49,7 +49,7 @@
 .label {
   display: none;
 
-  .configButton:hover & {
+  .resetButton:hover & {
     display: inline;
   }
 }
