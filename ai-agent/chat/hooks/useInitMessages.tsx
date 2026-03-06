@@ -45,8 +45,8 @@ const useInitMessages = (agentId: string | number) => {
   }, []);
 
   React.useEffect(() => {
-    if (!agentId) cacheChatId.delete("chat");
-  }, [agentId]);
+    resetChat();
+  }, [agentId, resetChat]);
 
   React.useEffect(() => {
     const onCacheChat = (e: Event) => {

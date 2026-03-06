@@ -27,6 +27,18 @@ const AgentIdSetupWrapper: React.FC<{
     }
   }, [agentId]);
 
+  React.useEffect(() => {
+    const currentSearch = new URLSearchParams(window.location.search);
+    if (currentSearch.has("chat")) {
+      currentSearch.delete("chat");
+      window.history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}?${currentSearch.toString()}`,
+      );
+    }
+  }, [agentId]);
+
   const handleAgentIdConfigured = React.useCallback(
     (newAgentId: string | number) => {
       saveAgentId(newAgentId);

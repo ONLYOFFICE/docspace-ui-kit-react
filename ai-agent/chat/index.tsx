@@ -281,6 +281,10 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
   ]);
 
   React.useEffect(() => {
+    setIsInitialized(false);
+  }, [agentId]);
+
+  React.useEffect(() => {
     const onSelectChat = async () => {
       await initMessages();
     };
