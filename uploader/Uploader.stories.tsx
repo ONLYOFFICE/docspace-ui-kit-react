@@ -29,12 +29,24 @@ import type { StoryObj, Meta } from "@storybook/react-vite";
 import { Uploader } from "./index";
 import type { UploaderProps } from "./Uploader.types";
 import { Toast } from "../components/toast";
+import { useApi } from "../providers/api";
 
 type StoryArgs = UploaderProps;
+
+const UploaderWithFolderUrl = (args: UploaderProps) => {
+  const { baseUrl } = useApi();
+
+  const getFolderUrl = (folderId: number) => {
+    return `${baseUrl}/rooms/personal/filter?folder=${folderId}`;
+  };
+
+  return <Uploader {...args} getFolderUrl={getFolderUrl} />;
+};
 
 const meta: Meta<StoryArgs> = {
   title: "Components/Uploader",
   component: Uploader,
+  render: (args) => <UploaderWithFolderUrl {...args} />,
   decorators: [
     (Story) => (
       <>
@@ -126,7 +138,7 @@ type Story = StoryObj<StoryArgs>;
 
 export default meta;
 
-const defaultArgs: StoryArgs = {
+const defaultArgs: Omit<StoryArgs, "getFolderUrl"> = {
   width: "100%",
   height: "600px",
   accept: ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx",
