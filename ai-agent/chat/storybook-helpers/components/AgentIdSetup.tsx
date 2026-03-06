@@ -54,7 +54,7 @@ const AgentIdSetup = ({
         setApiError(undefined);
       } catch {
         setApiError(
-          "Failed to connect to the portal. Please check your API settings in the provider.",
+          "Failed to connect to the portal. Please check your API settings in the API Config.",
         );
       } finally {
         setIsApiValidating(false);
@@ -71,43 +71,40 @@ const AgentIdSetup = ({
     }
   };
 
-  if (isSelectorOpen) {
-    return (
-      <div className={styles.selectorOverlay}>
+  return (
+    <>
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <h2 className={styles.title}>Configure AI Agent</h2>
+          <p className={styles.description}>
+            Select an AI agent from your portal to enable the chat component.
+          </p>
+
+          {apiError && (
+            <div className={styles.error}>
+              <span>⚠</span>
+              <span>{apiError}</span>
+            </div>
+          )}
+
+          <Button
+            type="button"
+            primary
+            size={ButtonSize.medium}
+            label="Browse AI Agents"
+            onClick={() => setIsSelectorOpen(true)}
+            isLoading={isApiValidating}
+            isDisabled={!!apiError || isApiValidating}
+          />
+        </div>
+      </div>
+      {isSelectorOpen && (
         <AIAgentSelector
           onSubmit={handleAgentSelected}
           onClose={() => setIsSelectorOpen(false)}
         />
-      </div>
-    );
-  }
-
-  return (
-    <div className={styles.container}>
-      <div className={styles.card}>
-        <h2 className={styles.title}>Configure AI Agent</h2>
-        <p className={styles.description}>
-          Select an AI agent from your portal to enable the chat component.
-        </p>
-
-        {apiError && (
-          <div className={styles.error}>
-            <span>⚠</span>
-            <span>{apiError}</span>
-          </div>
-        )}
-
-        <Button
-          type="button"
-          primary
-          size={ButtonSize.medium}
-          label="Browse AI Agents"
-          onClick={() => setIsSelectorOpen(true)}
-          isLoading={isApiValidating}
-          isDisabled={!!apiError || isApiValidating}
-        />
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
