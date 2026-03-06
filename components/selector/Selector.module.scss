@@ -514,11 +514,9 @@
     cursor: pointer;
   }
 
-  &.isSystem {
-    .userAvatar {
-      svg path {
-        fill: var(--info-panel-role-color);
-      }
+  .userAvatar {
+    svg path {
+      fill: var(--info-panel-role-color) !important;
     }
   }
 
