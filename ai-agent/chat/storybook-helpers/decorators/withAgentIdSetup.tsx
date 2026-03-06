@@ -61,13 +61,13 @@ const AgentIdSetupWrapper: React.FC<{
   }
 
   return (
-    <>
+    <div className={styles.container}>
       {children(validatedAgentId)}
       <button onClick={handleReset} className={styles.resetButton}>
         <TrashIcon className={styles.icon} />
         <span className={styles.label}>Reset AI agent</span>
       </button>
-    </>
+    </div>
   );
 };
 

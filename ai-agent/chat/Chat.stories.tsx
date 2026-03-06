@@ -202,7 +202,6 @@ const Template = (props: StoryArgs) => (
       height: "auto",
       overflow: "hidden",
       display: "flex",
-      justifyContent: "center",
       border: "4px dashed rgb(208, 213, 221)",
     }}
   >
