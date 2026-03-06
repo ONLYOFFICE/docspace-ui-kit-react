@@ -18,6 +18,7 @@ const config: StorybookConfig = {
 		"../selectors/**/*.mdx",
 		"../selectors/**/*.stories.@(js|jsx|ts|tsx)",
 		"../document-editor/**/*.stories.@(js|jsx|ts|tsx)",
+		"../uploader/**/*.stories.@(js|jsx|ts|tsx)",
 	],
 
 	addons: [

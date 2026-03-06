@@ -5,7 +5,7 @@ A complete file upload component with chunked upload support, progress tracking,
 ## Usage
 
 ```tsx
-import { Uploader } from "@docspace/ui-kit/components/uploader";
+import { Uploader } from "@docspace/ui-kit/uploader";
 
 <Uploader
   targetId="12345"

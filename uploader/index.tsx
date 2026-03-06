@@ -26,25 +26,25 @@
 
 import { useCallback, useState } from "react";
 
-import UploadSvg from "../../assets/upload.svg";
+import UploadSvg from "../assets/upload.svg";
 
 import type { ApiDateTime } from "@onlyoffice/docspace-api-sdk";
 import type { UploaderProps } from "./Uploader.types";
 import { createChunks, runWithConcurrency } from "./utils/upload";
 import { parseSizeLimit } from "./utils/sizeLimit";
 
-import { toastr } from "../toast";
-import Dropzone from "../dropzone";
+import { toastr } from "../components/toast";
+import Dropzone from "../components/dropzone";
 import {
   DEFAULT_CHUNK_UPLOAD_SIZE,
   DEFAULT_MAX_UPLOAD_THREAD_COUNT,
   DEFAULT_MAX_UPLOAD_FILES_COUNT,
-} from "../../constants";
-import { getCommonTranslation } from "../../utils";
+} from "../constants";
+import { getCommonTranslation } from "../utils";
 import { prepareFolderUpload } from "./utils/folder";
 import { isEmptyDirectoryFile } from "./utils/path";
-import { getErrorMessage } from "../../utils/getErrorMessage";
-import { useApi } from "../../providers/api";
+import { getErrorMessage } from "../utils/getErrorMessage";
+import { useApi } from "../providers/api";
 
 import styles from "./Uploader.module.scss";
 
