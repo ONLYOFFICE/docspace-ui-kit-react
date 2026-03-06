@@ -38,27 +38,11 @@ import styles from "./Chat.stories.module.scss";
 
 import { CallbackLogger } from "./storybook-helpers/components/CallbackLogger";
 
-export type StoryArgs = {
-  userAvatar?: string;
-  width?: string;
-  height?: string;
-  persistDraft?: boolean;
-  allowAttachFiles?: boolean;
-  allowManageTools?: boolean;
-  allowSelectChat?: boolean;
-  openFile?: (fileId: string) => void;
-  openLink?: (url: string) => void;
-  onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
-  onStopStream?: () => void;
-  onStreamData?: (chunk: string) => void;
-  onNewChat?: () => void;
-  onSelectChat?: (chatId: string) => void;
-  useExternalScroll?: boolean;
-  externalScrollRef?: React.RefObject<HTMLElement | null>;
-};
+export type StoryArgs = Partial<ChatProps>;
 
-const meta: Meta<StoryArgs> = {
+const meta: Meta<typeof Chat> = {
   title: "Components/AI Agent/Chat",
+  component: Chat,
   decorators: [
     (Story) => (
       <div className={styles.storyWrapper}>
@@ -195,9 +179,9 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
 
 export default meta;
 
-type Story = StoryObj<StoryArgs>;
+type Story = StoryObj<typeof Chat>;
 
-const Template = (props: StoryArgs) => (
+const Template = (props: Partial<ChatProps>) => (
   <div
     style={{
       width: "100%",
@@ -208,14 +192,14 @@ const Template = (props: StoryArgs) => (
     }}
   >
     <Toast />
-    <Chat {...(props as unknown as ChatProps)} />
+    <Chat {...(props as ChatProps)} />
   </div>
 );
 
 
 
 export const Default: Story = {
-  render: (args: StoryArgs) => <Template {...args} />,
+  render: (args) => <Template {...args} />,
   args: {
     userAvatar: "",
     persistDraft: false,
@@ -252,7 +236,7 @@ export const Default: Story = {
 };
 
 export const AllFeaturesEnabled: Story = {
-  render: (args: StoryArgs) => <Template {...args} />,
+  render: (args) => <Template {...args} />,
   args: {
     persistDraft: true,
     allowAttachFiles: true,
@@ -301,7 +285,7 @@ export const AllFeaturesEnabled: Story = {
 };
 
 export const WithListeners: Story = {
-  render: (args: StoryArgs) => <CallbackLogger {...args} />,
+  render: (args) => <CallbackLogger {...args} />,
   args: {
     userAvatar: "",
     persistDraft: true,
