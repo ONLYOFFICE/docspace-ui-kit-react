@@ -291,7 +291,6 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
     if (isSeveralOperations) {
       return (
         <Text fontWeight={600}>
-          {/* t("Common:Processes", { count: allOperationsLength }) */}
           {t("Processes", { count: allOperationsLength })}
         </Text>
       );
@@ -315,7 +314,6 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
           <Text fontWeight={600}>
             {operationName}
             <br />
-            {/* t("Common:ErrorUploadingFiles", { count: getErrorCount() }) */}
             {t("ErrorUploadingFiles", {
               count: getErrorCount()!,
             })}
@@ -325,7 +323,6 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
 
       return (
         <Text fontWeight={600}>
-          {/* t("Common:ErrorOperation", { operationName }) */}
           {t("ErrorOperation", {
             operationName,
           })}
@@ -340,7 +337,6 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
 
       return (
         <Text fontWeight={600}>
-          {/* t("Common:SuccessOperation", { operationName }) */}
           {t("SuccessOperation", {
             operationName,
           })}

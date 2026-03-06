@@ -65,7 +65,6 @@ const EmptyScreenFormRoom = ({
     <section className={styles.newEmptyScreen}>
       <FormRoomEmptyScreenImage className="empty-image" />
       <Heading level={3} className="empty-header">
-        {/* t("NoRoomsFound") */}
         {t("NoRoomsFound") || ""}
       </Heading>
       <Text className="empty-description">{description}</Text>

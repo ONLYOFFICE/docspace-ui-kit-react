@@ -51,8 +51,6 @@ export interface SelectOption {
 }
 
 export type RoomTileProps = {
-  /** Translation function */
-  t?: TFunction;
   /** Indicates if the room is selected */
   checked?: boolean;
   /** Indicates if the room is in active state */
