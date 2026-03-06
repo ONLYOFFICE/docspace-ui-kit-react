@@ -139,8 +139,8 @@ type Story = StoryObj<StoryArgs>;
 export default meta;
 
 const defaultArgs: Omit<StoryArgs, "getFolderUrl"> = {
-  width: "100%",
-  height: "600px",
+  width: "800px",
+  height: "300px",
   accept: ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx",
   shortText: "PDF, DOC, DOCX, XLS, XLSX",
   fullText: "PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX",
