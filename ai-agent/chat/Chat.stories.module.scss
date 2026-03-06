@@ -2,14 +2,4 @@
   max-width: 1024px;
   width: 100%;
   flex-shrink: 0;
-
-  &:has(:global(.with-listeners-story)) {
-    max-width: 1440px;
-
-    @media (min-height: 1024px) {
-      flex-direction: column;
-      max-width: 1024px;
-
-    }
-  }
 }
