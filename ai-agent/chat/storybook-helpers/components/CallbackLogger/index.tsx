@@ -106,8 +106,8 @@ export const CallbackLogger = (props: StoryArgs) => {
           {...(props as unknown as ChatProps)}
           onSendMessage={(message, files) => {
             addLog("onSendMessage", {
-              message: message.substring(0, 100),
-              filesCount: files.length,
+              message: message,
+              files: files,
             });
             props.onSendMessage?.(message, files);
           }}
@@ -117,8 +117,7 @@ export const CallbackLogger = (props: StoryArgs) => {
           }}
           onStreamData={(chunk) => {
             addLog("onStreamData", {
-              chunkLength: chunk.length,
-              preview: chunk.substring(0, 50),
+              chunk,
             });
             props.onStreamData?.(chunk);
           }}
