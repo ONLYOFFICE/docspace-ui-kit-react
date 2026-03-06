@@ -38,7 +38,7 @@ import { FileInput } from "../components/file-input";
 import { ComboBox, ComboBoxSize } from "../components/combobox";
 import type { TOption } from "../components/combobox/ComboBox.types";
 
-import FilesSelector from "../selectors/Files";
+import { FilesSelector } from "../selectors/Files";
 import type { TSelectedFileInfo } from "../selectors/Files/FilesSelector.types";
 
 import { dataSets, getIsDisabled } from "./DocumentEditor.story.helper";

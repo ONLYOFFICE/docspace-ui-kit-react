@@ -32,7 +32,7 @@ import { toastr } from "../../components/toast/sub-components/Toastr";
 import { RoomType } from "@onlyoffice/docspace-api-sdk";
 import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
 
-import AIAgentSelector from ".";
+import { AIAgentsSelector as AIAgentSelector } from ".";
 import type { AIAgentSelectorProps } from "./AIAgent.types";
 
 type StoryArgs = AIAgentSelectorProps;
@@ -158,7 +158,15 @@ export default meta;
 type Story = StoryObj<StoryArgs>;
 
 const Template = (props: StoryArgs) => (
-  <div style={{ width: "700px", height: "600px", border: "4px dashed #d0d5dd", overflow: "hidden", transform: "translateZ(0)" }}>
+  <div
+    style={{
+      width: "700px",
+      height: "600px",
+      border: "4px dashed #d0d5dd",
+      overflow: "hidden",
+      transform: "translateZ(0)",
+    }}
+  >
     <Toast />
     <AIAgentSelector {...props} />
   </div>
@@ -167,7 +175,6 @@ const Template = (props: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withPadding: true,
     disableBySecurity: undefined,
     excludeItems: [],
@@ -183,8 +190,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Default story using a live DocSpace API to load agent rooms.",
+        story: "Default story using a live DocSpace API to load agent rooms.",
       },
       source: {
         code: `<AIAgentSelector
@@ -238,7 +244,6 @@ export const WithInit: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withPadding: true,
     withInit: true,
     initItems,

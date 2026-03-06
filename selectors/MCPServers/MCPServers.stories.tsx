@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
 
-import MCPServersSelector from ".";
+import { MCPServersSelector } from ".";
 import type { TSelectorItem } from "../../components/selector";
 
 type MCPServersSelectorProps = {
@@ -154,7 +154,6 @@ const Template = (props: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     initedSelectedServers: [],
     onSubmit: (servers) => {
       const names = servers.map((s) => s.label).join(", ");
@@ -189,7 +188,6 @@ export const WithPreselection: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     initedSelectedServers: ["portal"],
     onSubmit: (servers) => {
       const names = servers.map((s) => s.label).join(", ");

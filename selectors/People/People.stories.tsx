@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
 
-import PeopleSelector from ".";
+import { PeopleSelector } from ".";
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import type { TAccessRight, TSelectorItem } from "../../components/selector";
 

@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
 
-import GroupsSelector from ".";
+import { GroupsSelector } from ".";
 import type { GroupsSelectorProps } from "./GroupsSelector.types";
 
 type StoryArgs = GroupsSelectorProps;
@@ -160,7 +160,6 @@ const Template = (props: StoryArgs) => (
 export const Default: Story = {
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     withHeader: true,
     headerProps: {
       headerLabel: "Select Group",
@@ -199,7 +198,6 @@ export const AsideMode: Story = {
   tags: ["!autodocs"],
   render: (args: StoryArgs) => <Template {...args} />,
   args: {
-
     useAside: true,
     withoutBackground: false,
     withBlur: false,

@@ -28,7 +28,7 @@ import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import OperationsProgressButton from ".";
+import { OperationsProgressButton } from ".";
 import type { Operation } from "./OperationsProgressButton.types";
 
 const meta = {

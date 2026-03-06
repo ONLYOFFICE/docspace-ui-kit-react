@@ -30,7 +30,7 @@ import { RoomType, SearchArea } from "@onlyoffice/docspace-api-sdk";
 import { Toast } from "../../components/toast";
 import { toastr } from "../../components/toast/sub-components/Toastr";
 
-import RoomSelector from ".";
+import { RoomSelector } from ".";
 import type { RoomSelectorProps } from "./RoomSelector.types";
 import type { TSelectorItem } from "../../components/selector";
 
@@ -170,7 +170,12 @@ import RoomSelector from "@docspace/ui-kit/selectors/Room";
     },
     searchArea: {
       control: "select",
-      options: [undefined, SearchArea.Active, SearchArea.Archive, SearchArea.Templates],
+      options: [
+        undefined,
+        SearchArea.Active,
+        SearchArea.Archive,
+        SearchArea.Templates,
+      ],
       description: "Search scope — Active rooms, Archive, or Templates",
     },
     excludeItems: {
@@ -257,7 +262,8 @@ import RoomSelector from "@docspace/ui-kit/selectors/Room";
     // Sort & submit
     forceIsMultiSelect: {
       control: "boolean",
-      description: "Force multi-select UI behavior regardless of the isMultiSelect prop",
+      description:
+        "Force multi-select UI behavior regardless of the isMultiSelect prop",
       table: { defaultValue: { summary: "false" } },
     },
     sortSelectedFirst: {
@@ -267,7 +273,8 @@ import RoomSelector from "@docspace/ui-kit/selectors/Room";
     },
     disableSubmitUntilChanged: {
       control: "boolean",
-      description: "Keep submit disabled until the selection differs from the initial state",
+      description:
+        "Keep submit disabled until the selection differs from the initial state",
       table: { defaultValue: { summary: "false" } },
     },
     submitButtonLabel: {
@@ -288,7 +295,8 @@ import RoomSelector from "@docspace/ui-kit/selectors/Room";
     // Callbacks
     onSubmit: {
       action: "onSubmit",
-      description: "Called with the array of selected TSelectorItem(s) on confirm",
+      description:
+        "Called with the array of selected TSelectorItem(s) on confirm",
     },
     onClose: {
       action: "onClose",
