@@ -68,7 +68,7 @@ const UploaderWithFolderUrl = (args: StoryArgs) => {
     breadCrumbs: TBreadCrumb[],
   ) => {
     if (!selectedItemId) return;
-    
+
     const idStr = String(selectedItemId);
     const path = breadCrumbs.map((crumb) => crumb.label).join(" / ");
     setTargetId(idStr);
@@ -87,9 +87,18 @@ const UploaderWithFolderUrl = (args: StoryArgs) => {
 
   return (
     <>
-      <div style={{ marginBottom: 16, display: "flex", gap: 8, alignItems: "center" }}>
-        <label style={{ fontWeight: 600, display: "block", marginBottom: 4 }}>Target Folder:</label>
-        <div style={{ width: '300px' }}>
+      <div
+        style={{
+          marginBottom: 16,
+          display: "flex",
+          gap: 8,
+          alignItems: "center",
+        }}
+      >
+        <label style={{ fontWeight: 600, display: "block", marginBottom: 4 }}>
+          Target Folder:
+        </label>
+        <div style={{ width: "300px" }}>
           <FileInput
             fromStorage
             placeholder={folderPath || "Choose folder"}
@@ -99,7 +108,14 @@ const UploaderWithFolderUrl = (args: StoryArgs) => {
           />
         </div>
         {!targetId && (
-          <span style={{ color: "red", fontSize: 12, marginTop: 4, display: "block" }}>
+          <span
+            style={{
+              color: "red",
+              fontSize: 12,
+              marginTop: 4,
+              display: "block",
+            }}
+          >
             Required — please select a target folder
           </span>
         )}
@@ -120,12 +136,17 @@ const UploaderWithFolderUrl = (args: StoryArgs) => {
         withCancelButton
         cancelButtonLabel="Cancel"
         submitButtonLabel="Select"
+        disabledItems={[]}
         getIsDisabled={getIsDisabled}
         onSubmit={handleSelectFolder}
         onCancel={() => setIsSelectorVisible(false)}
       />
 
-      <Uploader {...uploaderProps} targetId={targetId} getFolderUrl={getFolderUrl} />
+      <Uploader
+        {...uploaderProps}
+        targetId={targetId}
+        getFolderUrl={getFolderUrl}
+      />
     </>
   );
 };
@@ -179,11 +200,13 @@ const meta: Meta<StoryArgs> = {
     },
     targetId: {
       control: false,
-      description: "Target folder ID for uploads (managed via folder selector above the component)",
+      description:
+        "Target folder ID for uploads (managed via folder selector above the component)",
     },
     storyId: {
       control: false,
-      description: "Unique identifier for the story to isolate targetId in sessionStorage",
+      description:
+        "Unique identifier for the story to isolate targetId in sessionStorage",
     },
     linkMainText: {
       control: "text",
