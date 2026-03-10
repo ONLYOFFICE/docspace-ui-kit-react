@@ -484,6 +484,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       setIsDisabledFolder,
       onSelectItem,
       filesApi,
+      t,
     ],
   );
 
