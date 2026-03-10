@@ -58,7 +58,7 @@ const getWindowI18n = (): WindowI18n | undefined => {
  * Gets a translation from window.i18n.
  * Uses i18next t function if available (set by TranslationProvider),
  * otherwise falls back to manual lookup from window.i18n.loaded.
- * Throws if the key is not found.
+ * Logs a console error and returns an empty string if the key is not found.
  */
 export const getCommonTranslation = (
   key: string,
@@ -110,11 +110,11 @@ export const getCommonTranslation = (
   return "";
 };
 
+export { useCommonTranslation } from "./useCommonTranslation";
+
 /**
  * Checks if translations are loaded and ready to use
  */
-export { useCommonTranslation } from "./useCommonTranslation";
-
 export const getTranslationReady = () => {
   if (typeof window === "undefined") return undefined;
 
