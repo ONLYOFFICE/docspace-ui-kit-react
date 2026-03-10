@@ -179,6 +179,7 @@ const useRootHelper = ({
     setIsNextPageLoading,
     setItems,
     setTotal,
+    t,
     treeFolders,
     withRecentTreeFolder,
     withFavoritesTreeFolder,

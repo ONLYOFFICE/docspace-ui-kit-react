@@ -32,11 +32,11 @@ import type {
 } from "@onlyoffice/docspace-api-sdk";
 import { RoomType } from "@onlyoffice/docspace-api-sdk";
 
+import { getCommonTranslation } from "../../utils/i18n";
 import {
   getIconPathByFolderType,
   getLifetimePeriodTranslation,
 } from "../../utils/common";
-import { getCommonTranslation } from "../../utils/i18n";
 import { iconSize32 } from "../../utils/image-helpers";
 import { getTitleWithoutExtension } from "../../utils/getTitleWithoutExtension";
 
@@ -44,9 +44,11 @@ import type { TSelectorItem } from "../../components/selector";
 
 import { DEFAULT_FILE_EXTS } from "./constants";
 
-export const convertRoomsToItems: (
+export const convertRoomsToItems = (
   rooms: FolderDtoInteger[],
-) => TSelectorItem[] = (rooms: FolderDtoInteger[]) => {
+  t?: (key: string, interpolation?: Record<string, string | number>) => string,
+): TSelectorItem[] => {
+  const translate = t ?? getCommonTranslation;
   const items = rooms.map((room) => {
     const {
       id,
@@ -69,9 +71,9 @@ export const convertRoomsToItems: (
     const iconProp = icon ? { icon } : { color: logo?.color as string };
 
     const lifetimeTooltip = lifetime
-      ? getCommonTranslation("RoomFilesLifetime", {
+      ? translate("RoomFilesLifetime", {
           days: String(lifetime.value),
-          period: getLifetimePeriodTranslation(lifetime.period!),
+          period: getLifetimePeriodTranslation(lifetime.period!, t),
         })
       : null;
 

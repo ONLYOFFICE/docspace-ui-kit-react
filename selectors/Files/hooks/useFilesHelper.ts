@@ -427,6 +427,7 @@ const useFilesHelper = ({
       includedItems,
       disabledFolderType,
       disableBySecurity,
+      t,
     ],
   );
 

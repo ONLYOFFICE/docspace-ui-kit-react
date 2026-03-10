@@ -73,6 +73,7 @@ const transformInitItems = (
     items.filter(
       (item) => "roomType" in item && item.roomType,
     ) as FolderDtoInteger[],
+    t,
   );
   const folders = convertFoldersToItems(
     items.filter(

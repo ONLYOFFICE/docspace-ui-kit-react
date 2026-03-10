@@ -230,7 +230,7 @@ const useSelectorBody = ({
     if (isEmptyAgentsRootScreen) return t("EmptyRoomsHeaderAgent");
 
     return t("EmptyRoomsHeader");
-  }, [isKnowledgeFolder, isEmptyFilesRootScreen, isEmptyAgentsRootScreen]);
+  }, [isKnowledgeFolder, isEmptyFilesRootScreen, isEmptyAgentsRootScreen, t]);
 
   const emptyScreenDescription = isEmptyFilesRootScreen
     ? ""

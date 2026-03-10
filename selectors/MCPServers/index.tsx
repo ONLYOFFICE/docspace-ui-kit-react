@@ -127,7 +127,7 @@ const MCPServersSelector = ({
         isDisabled: server.needReset,
       };
     },
-    [isBase, initedSelectedServers],
+    [isBase, initedSelectedServers, t],
   );
 
   const fetchServers = React.useCallback(async () => {

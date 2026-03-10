@@ -518,6 +518,7 @@ const PeopleSelector = ({
       peopleSearchApi,
       groupSearchApi,
       disabledInvitedText,
+      t,
     ],
   );
 

@@ -113,7 +113,7 @@ const useRoomsHelper = ({
         />
       );
     });
-  }, [addInputItem]);
+  }, [addInputItem, t]);
 
   const getRoomList = React.useCallback(
     async (sIndex: number) => {
@@ -185,6 +185,7 @@ const useRoomsHelper = ({
 
       const itemList: TSelectorItem[] = convertRoomsToItems(
         folders ?? [],
+        t,
       ).filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true));
 
       setHasNextPage(count === PAGE_COUNT);
@@ -278,6 +279,7 @@ const useRoomsHelper = ({
       disableThirdParty,
       excludeItems,
       setSelectedTreeNode,
+      t,
     ],
   );
 
