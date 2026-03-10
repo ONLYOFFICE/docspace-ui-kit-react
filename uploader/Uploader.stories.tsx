@@ -51,14 +51,8 @@ const UploaderWithFolderUrl = (args: StoryArgs) => {
   const { baseUrl } = useApi();
   const { storyId = "default", ...uploaderProps } = args;
 
-  const TARGET_ID_KEY = `uploader-target-id-${storyId}`;
-
-  const [targetId, setTargetId] = useState(
-    () => sessionStorage.getItem(TARGET_ID_KEY) || "",
-  );
-  const [folderPath, setFolderPath] = useState(
-    () => sessionStorage.getItem(`${TARGET_ID_KEY}-path`) || "",
-  );
+  const [targetId, setTargetId] = useState("");
+  const [folderPath, setFolderPath] = useState("");
   const [isSelectorVisible, setIsSelectorVisible] = useState(false);
 
   const handleSelectFolder = (
@@ -73,8 +67,6 @@ const UploaderWithFolderUrl = (args: StoryArgs) => {
     const path = breadCrumbs.map((crumb) => crumb.label).join(" / ");
     setTargetId(idStr);
     setFolderPath(path);
-    sessionStorage.setItem(TARGET_ID_KEY, idStr);
-    sessionStorage.setItem(`${TARGET_ID_KEY}-path`, path);
     setIsSelectorVisible(false);
   };
 

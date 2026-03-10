@@ -339,7 +339,9 @@ const Uploader = ({
         accept={accept}
         linkMainText={linkMainText ?? getCommonTranslation("Upload")}
         linkSecondaryText={getSecondaryText()}
-        exstsText={extensionsText ?? shortText ?? getCommonTranslation("AnyFiles")}
+        exstsText={
+          extensionsText ?? shortText ?? getCommonTranslation("AnyFiles")
+        }
         fullExstsText={fullText}
         formatsPlusBadgeValue={badgeValue}
         dataTestId="sdk-uploader"
