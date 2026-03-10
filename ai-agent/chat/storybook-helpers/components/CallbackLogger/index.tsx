@@ -1,5 +1,8 @@
 import React from "react";
 import { Toast } from "../../../../../components/toast";
+import { ComboBox, type TOption } from "../../../../../components/combobox";
+import { Button, ButtonSize } from "../../../../../components/button";
+import { IconButton } from "../../../../../components/icon-button";
 import Chat from "../../../index";
 import type { ChatProps } from "../../../Chat.types";
 import type { StoryArgs } from "../../../Chat.stories";
@@ -83,14 +86,26 @@ export const CallbackLogger = (props: StoryArgs) => {
   const filteredLogs =
     filter === "all" ? logs : logs.filter((log) => log.type === filter);
 
-  const callbackTypes = [
-    "all",
-    "onSendMessage",
-    "onStopStream",
-    "onStreamData",
-    "onNewChat",
-    "onSelectChat",
-  ];
+  const callbackOptions: TOption[] = React.useMemo(
+    () =>
+      [
+        "all",
+        "onSendMessage",
+        "onStopStream",
+        "onStreamData",
+        "onNewChat",
+        "onSelectChat",
+      ].map((type) => ({
+        label: type === "all" ? "All Events" : type,
+        key: type,
+      })),
+    [],
+  );
+
+  const selectedOption = React.useMemo(
+    () => callbackOptions.find((o) => o.key === filter) || callbackOptions[0],
+    [filter, callbackOptions],
+  );
 
   return (
     <div className={`${styles.withListenersStory} with-listeners-story`}>
@@ -135,17 +150,14 @@ export const CallbackLogger = (props: StoryArgs) => {
       <div className={styles.callbackPanel}>
         <div className={styles.panelHeader}>
           <h3 className={styles.panelTitle}>Listener Events</h3>
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className={styles.filterSelect}
-          >
-            {callbackTypes.map((type) => (
-              <option key={type} value={type}>
-                {type === "all" ? "All Events" : type}
-              </option>
-            ))}
-          </select>
+          <ComboBox
+            options={callbackOptions}
+            selectedOption={selectedOption}
+            onSelect={(option) => setFilter(option.key as string)}
+            scaled
+            scaledOptions
+            displaySelectedOption
+          />
         </div>
 
         <div
@@ -177,32 +189,39 @@ export const CallbackLogger = (props: StoryArgs) => {
           )}
         </div>
 
-        <button
+        <IconButton
           className={`${styles.scrollToBottomButton} ${showScrollButton ? styles.visible : ""}`}
           onClick={scrollToBottom}
           title="Scroll to bottom"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 5v14M19 12l-7 7-7-7" />
-          </svg>
-        </button>
+          size={20}
+          isStroke
+          color="white"
+          iconNode={
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
+          }
+        />
 
         <div className={styles.panelFooter}>
           <span>
             {filteredLogs.length} event{filteredLogs.length !== 1 ? "s" : ""}
           </span>
-          <button onClick={() => setLogs([])} className={styles.clearButton}>
-            Clear
-          </button>
+          <Button
+            size={ButtonSize.extraSmall}
+            onClick={() => setLogs([])}
+            className={styles.clearButton}
+            label="Clear"
+          />
         </div>
       </div>
     </div>

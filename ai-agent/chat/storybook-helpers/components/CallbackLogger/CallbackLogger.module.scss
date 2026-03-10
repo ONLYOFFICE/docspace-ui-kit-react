@@ -1,20 +1,20 @@
 .withListenersStory {
-  display: flex;
-  gap: 16px;
-  width: 100%;
-  height: calc(100vh - 40px);
-  max-height: 700px;
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    height: calc(100vh - 40px);
+    max-height: 700px;
 
-  @media (min-height: 1024px) {
-    flex-direction: column;
+    @media (min-height: 1024px) {
+        flex-direction: column;
 
-    max-height: 1440px;
-    max-width: 1024px;
+        max-height: 1440px;
+        max-width: 1024px;
 
-    .callbackPanel {
-      flex-grow: 1;
+        .callbackPanel {
+            flex-grow: 1;
+        }
     }
-  }
 }
 
 .callbackPanel {
@@ -43,18 +43,15 @@
     height: 36px;
     border-radius: 50%;
     background: #0066cc;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
     z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &.visible {
         opacity: 1;
@@ -69,11 +66,17 @@
 
     :global(.dark) & {
         background: #4a9eff;
-        color: #1e1e1e;
 
         &:hover {
             background: #76b5ff;
         }
+    }
+
+    // IconButton specific centering
+    :global(.icon-button_svg) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
@@ -99,36 +102,7 @@
     }
 }
 
-.filterSelect {
-    width: 100%;
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    font-size: 13px;
-    background: #fff;
-    color: #333;
-    cursor: pointer;
 
-    &:focus {
-        outline: none;
-        border-color: #0066cc;
-    }
-
-    :global(.dark) & {
-        background: #333;
-        border-color: #555;
-        color: #e0e0e0;
-
-        &:focus {
-            border-color: #4a9eff;
-        }
-
-        option {
-            background: #333;
-            color: #e0e0e0;
-        }
-    }
-}
 
 .logsContainer {
     flex: 1;
@@ -214,23 +188,7 @@
 }
 
 .clearButton {
-    padding: 4px 12px;
-    font-size: 11px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #fff;
-    color: #333;
-    cursor: pointer;
-
-    &:hover {
-        background: #f5f5f5;
-    }
-
     :global(.dark) & {
-        background: #333;
-        border-color: #555;
-        color: #e0e0e0;
-
         &:hover {
             background: #444;
         }
