@@ -27,12 +27,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  addons,
-  types,
-  useStorybookApi,
-  useStorybookState,
-} from "storybook/manager-api";
+import { addons, types, useStorybookApi } from "storybook/manager-api";
 import { useGlobals } from "storybook/manager-api";
 import {
   Modal,
@@ -197,7 +192,6 @@ const AddCustomModal = ({
 const ApiConfigDropdown = () => {
   const [globals, updateGlobals] = useGlobals();
   const api = useStorybookApi();
-  const { viewMode } = useStorybookState();
   const [providers, setProviders] =
     useState<SavedApiProvider[]>(getSavedProviders);
   const [modalOpen, setModalOpen] = useState(false);
@@ -294,7 +288,6 @@ const ApiConfigDropdown = () => {
         ariaLabel="API Config"
         defaultOptions={apiConfig}
         onSelect={handleSelect}
-        disabled={viewMode === "docs"}
       />
     </>
   );
