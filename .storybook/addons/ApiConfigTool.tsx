@@ -161,8 +161,8 @@ const AddCustomModal = ({
           <Badge status="critical">{error}</Badge>
         ) : (
           <Badge status="warning">
-            ⚠️ API keys are stored unencrypted in localStorage for development
-            convenience only.
+            {"\u26A0\uFE0F"} API keys are stored unencrypted in localStorage for
+            development convenience only.
           </Badge>
         )}
 

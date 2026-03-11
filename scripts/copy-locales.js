@@ -5,7 +5,7 @@ if (process.env.CI) {
   const dest = path.resolve(__dirname, "../locales/en");
   fs.mkdirSync(dest, { recursive: true });
   fs.writeFileSync(path.join(dest, "Common.json"), "{}\n");
-  console.log("CI detected – created stub locales/en/Common.json");
+  console.log("CI detected - created stub locales/en/Common.json");
   process.exit(0);
 }
 
