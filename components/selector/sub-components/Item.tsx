@@ -248,6 +248,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
           [styles.selectedSingle]: isSelected && !isMultiSelect,
           [styles.hoverable]: !isItemDisabled,
           [styles.isSystem]: isSystem,
+          [styles.isAvatar]: !item.rootFolderType,
         })}
         data-testid={`selector-item-${index}`}
       >
