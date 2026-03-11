@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { DropEvent } from "react-dropzone";
+import type { DropEvent, FileRejection } from "react-dropzone";
 
 type BaseDropzoneProps = {
   /** Shows loading state of the dropzone */
@@ -72,6 +72,8 @@ export type DropzoneProps = BaseDropzoneProps & {
   ) => Promise<(File | DataTransferItem)[]> | (File | DataTransferItem)[];
   /** Callback when files are dropped */
   onDrop?: FileDropHandler;
+  /** Callback when files are rejected (e.g., wrong file type) */
+  onDropRejected?: (fileRejections: FileRejection[]) => void;
   /** Data test id */
   dataTestId?: string;
 };
