@@ -514,9 +514,11 @@
     cursor: pointer;
   }
 
-  .userAvatar {
-    svg path {
-      fill: var(--info-panel-role-color) !important;
+  &:not(.isAvatar) {
+    .userAvatar {
+      svg path {
+        fill: var(--info-panel-role-color) !important;
+      }
     }
   }
 

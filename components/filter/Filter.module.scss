@@ -963,6 +963,7 @@
   }
 
   display: inline-block;
+  flex-shrink: 0;
   background: var(--room-group-tag-background);
   border: none;
   box-sizing: border-box;

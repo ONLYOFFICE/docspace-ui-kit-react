@@ -126,6 +126,7 @@
   align-items: center;
   gap: 16px;
   height: 32px;
+  min-width: 0;
 
   &[data-show-title="true"] {
     margin-inline-start: 16px;
@@ -320,6 +321,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  overflow: hidden;
   background: var(--section-header-trash-erasure-label-background);
 
   @include mixins.tablet-and-below {
