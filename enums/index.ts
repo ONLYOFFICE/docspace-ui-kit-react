@@ -24,6 +24,18 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import {
+  SortedByType as SdkSortedByType,
+  DateToAutoCleanUp as SdkDateToAutoCleanUp,
+  FilesSettingsDtoDefaultSharingAccessRightsEnum as SdkFilesSettingsDtoDefaultSharingAccessRightsEnum,
+} from "@onlyoffice/docspace-api-sdk";
+
+export {
+  SdkSortedByType,
+  SdkDateToAutoCleanUp,
+  SdkFilesSettingsDtoDefaultSharingAccessRightsEnum,
+};
+
 export enum ShareAccessRights {
   None = 0,
   FullAccess = 1,
