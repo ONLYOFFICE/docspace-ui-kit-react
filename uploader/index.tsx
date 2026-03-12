@@ -391,3 +391,5 @@ const Uploader = ({
 };
 
 export { Uploader };
+
+export { createChunks, runWithConcurrency } from "./utils/upload";
