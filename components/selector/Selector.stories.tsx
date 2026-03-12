@@ -33,7 +33,7 @@ import type { SelectorProps, TSelectorItem } from "./Selector.types";
 import React from "react";
 import { EmployeeStatus, EmployeeType } from "@onlyoffice/docspace-api-sdk";
 import FolderSvgUrl from "../../assets/icons/32/folder.svg?url";
-import EmptyScreenFilter from "../../assets/empty.filter.rooms.light.svg?url";
+import EmptyScreenFilter from "../../assets/emptyFilter/empty.filter.rooms.light.svg?url";
 import { globalColors } from "../../providers/theme";
 import { AvatarRole } from "../avatar";
 import { Selector } from "./Selector";

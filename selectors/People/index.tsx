@@ -25,8 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import DefaultUserPhoto from "../../assets/default_user_photo_size_82-82.png";
-import EmptyScreenPersonsLight from "../../assets/empty.filter.people.light.svg";
-import EmptyScreenPersonsDark from "../../assets/empty.filter.people.dark.svg";
+import EmptyScreenPersonsLight from "../../assets/emptyFilter/empty.filter.people.light.svg";
+import EmptyScreenPersonsDark from "../../assets/emptyFilter/empty.filter.people.dark.svg";
 
 import axios from "axios";
 import { useState, useCallback, useRef, useEffect } from "react";

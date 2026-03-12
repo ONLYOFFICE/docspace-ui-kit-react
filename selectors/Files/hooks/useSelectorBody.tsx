@@ -25,10 +25,10 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 import { use, useMemo } from "react";
 
-import EmptyScreenFilterFilesLight from "../../../assets/empty.filter.files.light.svg";
-import EmptyScreenFilterFilesDark from "../../../assets/empty.filter.files.dark.svg";
-import EmptyScreenRoomsLight from "../../../assets/empty.rooms.root.user.light.svg";
-import EmptyScreenRoomsDark from "../../../assets/empty.rooms.root.user.dark.svg";
+import EmptyScreenFilterFilesLight from "../../../assets/emptyFilter/empty.filter.files.light.svg";
+import EmptyScreenFilterFilesDark from "../../../assets/emptyFilter/empty.filter.files.dark.svg";
+import EmptyScreenRoomsLight from "../../../assets/emptyview/empty.rooms.root.user.light.svg";
+import EmptyScreenRoomsDark from "../../../assets/emptyview/empty.rooms.root.user.dark.svg";
 
 import { getCommonTranslation } from "../../../utils/i18n";
 import {

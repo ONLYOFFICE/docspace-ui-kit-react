@@ -26,8 +26,8 @@
 
 import { useCallback, useRef, useState } from "react";
 
-import EmptyScreenGroupLight from "../../assets/empty.groups.light.svg";
-import EmptyScreenGroupDark from "../../assets/empty.groups.dark.svg";
+import EmptyScreenGroupLight from "../../assets/emptyview/empty.groups.light.svg";
+import EmptyScreenGroupDark from "../../assets/emptyview/empty.groups.dark.svg";
 
 import { useApi } from "../../providers/api/ApiProvider";
 import { getCommonTranslation } from "../../utils/i18n";
