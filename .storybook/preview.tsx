@@ -86,7 +86,7 @@ const preview: Preview = {
           ["Welcome", "Structure", "Translation", "Themes", "API"],
           "Samples",
           "Components",
-          ["Document Editor", "Selectors", "Providers", "Errors"],
+          ["Document Editor", "Uploader", "Selectors", "Providers", "Errors"],
         ],
       },
     },

@@ -51,3 +51,5 @@ export * from "./edge-scrolling";
 export * from "./hasOwnProperty";
 
 export * from "./encoder";
+
+export * from "./getErrorMessage";

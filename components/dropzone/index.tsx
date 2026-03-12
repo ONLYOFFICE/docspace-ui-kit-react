@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useDropzone, DropEvent } from "react-dropzone";
+import { useDropzone } from "react-dropzone";
 import classNames from "classnames";
 
 import TriangleDownIcon from "../../assets/triangle.down.react.svg";
@@ -53,6 +53,7 @@ const Dropzone = ({
   isMultipleUpload = true,
   onSingleUploadError,
   onDrop,
+  onDropRejected,
   accept,
   maxFiles = 0,
   getFilesFromEvent,
@@ -101,6 +102,7 @@ const Dropzone = ({
     noDrag: isDisabled,
     ...(!isFolderUpload && accept ? { accept } : {}),
     onDrop: handleDrop,
+    onDropRejected,
     getFilesFromEvent: customGetFilesFromEvent,
   } as Parameters<typeof useDropzone>[0];
 
@@ -211,12 +213,19 @@ const Dropzone = ({
             />
           )}
           {icon && (
-            <img
-              src={icon}
-              alt="Upload"
-              className={classNames(styles.dropzoneIcon, iconClassName)}
-              data-testid="dropzone-icon"
-            />
+            typeof icon === "string" ? (
+              <img
+                src={icon}
+                alt="Upload"
+                className={classNames(styles.dropzoneIcon, iconClassName)}
+                data-testid="dropzone-icon"
+              />
+            ) : (
+              React.createElement(icon, {
+                className: classNames(styles.dropzoneIcon, iconClassName),
+                "data-testid": "dropzone-icon",
+              } as React.SVGProps<SVGSVGElement>)
+            )
           )}
           <div
             className={styles.dropzoneLink}
