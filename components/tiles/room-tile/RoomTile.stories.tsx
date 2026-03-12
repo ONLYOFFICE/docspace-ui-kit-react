@@ -32,7 +32,7 @@ import type { RoomTileProps } from "./RoomTile.types";
 
 import { useState } from "react";
 import { TFunction } from "i18next";
-import PublicRoomIconReactSvg from "../../../assets/icons/32/room/public.react.svg";
+import PublicRoomIconReactSvg from "../../../assets/icons/32/room/public.svg";
 import UnpinReactSvg from "../../../assets/unpin.react.svg";
 
 import { RoomsType } from "../../../enums";
