@@ -1186,7 +1186,7 @@ packages:
       react: '>=16'
 
   '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-3.6.0.tgz':
-    resolution: {integrity: sha512-3tDOwn6u7RyF8BpHhwgO5uQQra1vh8tZqAOXHqWB29lI7+g5hWAPfpe8OfTX7Vq4V/twphaZEVG5OBPvH5dM1Q==, tarball: file:onlyoffice-docspace-api-sdk-3.6.0.tgz}
+    resolution: {integrity: sha512-Cgg11ZXTNKrsp8VwYB4HmkixD+xPJZk0fDaYksNIAyFGWDG1oxMk6NW9axclCcqDCUUVNRzg/MUyk4OL5MbsiA==, tarball: file:onlyoffice-docspace-api-sdk-3.6.0.tgz}
     version: 3.6.0
 
   '@onlyoffice/document-editor-react@2.1.1':
