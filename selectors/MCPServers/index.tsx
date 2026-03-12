@@ -26,8 +26,8 @@
 
 import React from "react";
 
-import EmptyScreenRoomSelectorLight from "../../assets/empty.room.selector.light.react.svg";
-import EmptyScreenRoomSelectorDark from "../../assets/empty.room.selector.dark.react.svg";
+import EmptyScreenRoomSelectorLight from "../../assets/empty.room.selector.light.svg";
+import EmptyScreenRoomSelectorDark from "../../assets/empty.room.selector.dark.svg";
 import faviconUrl from "../../assets/favicon.ico";
 
 import { getCommonTranslation } from "../../utils/i18n";

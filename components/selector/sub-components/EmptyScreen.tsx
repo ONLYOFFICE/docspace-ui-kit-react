@@ -29,9 +29,9 @@ import React, { use } from "react";
 import classNames from "classnames";
 import { RoomType } from "@onlyoffice/docspace-api-sdk";
 
-import PlusReactSvg from "../../../assets/icons/12/plus.react.svg";
-import UpReactSvg from "../../../assets/up.react.svg";
-import ClearEmptyFilterReactSvg from "../../../assets/clear.empty.filter.react.svg";
+import PlusReactSvg from "../../../assets/icons/12/plus.svg";
+import UpReactSvg from "../../../assets/up.svg";
+import ClearEmptyFilterReactSvg from "../../../assets/clear.empty.filter.svg";
 
 import { getCommonTranslation } from "../../../utils";
 

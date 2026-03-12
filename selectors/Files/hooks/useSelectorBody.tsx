@@ -25,10 +25,10 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 import { use, useMemo } from "react";
 
-import EmptyScreenFilterFilesLight from "../../../assets/empty.filter.files.light.react.svg";
-import EmptyScreenFilterFilesDark from "../../../assets/empty.filter.files.dark.react.svg";
-import EmptyScreenRoomsLight from "../../../assets/empty.rooms.root.user.light.react.svg";
-import EmptyScreenRoomsDark from "../../../assets/empty.rooms.root.user.dark.react.svg";
+import EmptyScreenFilterFilesLight from "../../../assets/empty.filter.files.light.svg";
+import EmptyScreenFilterFilesDark from "../../../assets/empty.filter.files.dark.svg";
+import EmptyScreenRoomsLight from "../../../assets/empty.rooms.root.user.light.svg";
+import EmptyScreenRoomsDark from "../../../assets/empty.rooms.root.user.dark.svg";
 
 import { getCommonTranslation } from "../../../utils/i18n";
 import {
@@ -45,7 +45,10 @@ import {
   type TSelectorSearch,
   type TSelectorSubmitButton,
 } from "../../../components/selector";
-import { FolderType, type FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import {
+  FolderType,
+  type FolderDtoInteger,
+} from "@onlyoffice/docspace-api-sdk";
 import { useTheme } from "../../../context/ThemeContext";
 
 import type { FilesSelectorProps } from "../FilesSelector.types";
@@ -151,7 +154,8 @@ const useSelectorBody = ({
         withHeader,
         headerProps: {
           ...headerProps,
-          headerLabel: headerProps?.headerLabel || getCommonTranslation("SelectAction"),
+          headerLabel:
+            headerProps?.headerLabel || getCommonTranslation("SelectAction"),
           onCloseClick: onCancel,
         },
       }
@@ -179,7 +183,8 @@ const useSelectorBody = ({
   const cancelButtonProps: TSelectorCancelButton = withCancelButton
     ? {
         withCancelButton,
-        cancelButtonLabel: cancelButtonLabel || getCommonTranslation("CancelButton"),
+        cancelButtonLabel:
+          cancelButtonLabel || getCommonTranslation("CancelButton"),
         cancelButtonId,
         onCancel,
       }
@@ -221,9 +226,11 @@ const useSelectorBody = ({
       return getCommonTranslation("SelectorEmptyScreenHeaderKnowledge");
     }
 
-    if (isEmptyFilesRootScreen) return getCommonTranslation("SelectorEmptyScreenHeader");
+    if (isEmptyFilesRootScreen)
+      return getCommonTranslation("SelectorEmptyScreenHeader");
 
-    if (isEmptyAgentsRootScreen) return getCommonTranslation("EmptyRoomsHeaderAgent");
+    if (isEmptyAgentsRootScreen)
+      return getCommonTranslation("EmptyRoomsHeaderAgent");
 
     return getCommonTranslation("EmptyRoomsHeader");
   }, [isKnowledgeFolder, isEmptyFilesRootScreen, isEmptyAgentsRootScreen]);
@@ -257,10 +264,16 @@ const useSelectorBody = ({
       emptyScreenHeader={emptyScreenHeader}
       emptyScreenDescription={emptyScreenDescription}
       searchEmptyScreenImage={
-        isBase ? <EmptyScreenFilterFilesLight /> : <EmptyScreenFilterFilesDark />
+        isBase ? (
+          <EmptyScreenFilterFilesLight />
+        ) : (
+          <EmptyScreenFilterFilesDark />
+        )
       }
       searchEmptyScreenHeader={getCommonTranslation("NotFoundTitle")}
-      searchEmptyScreenDescription={getCommonTranslation("EmptyFilterDescriptionText")}
+      searchEmptyScreenDescription={getCommonTranslation(
+        "EmptyFilterDescriptionText",
+      )}
       isLoading={showLoader}
       rowLoader={
         <RowLoader

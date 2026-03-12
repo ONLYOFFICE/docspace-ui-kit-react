@@ -26,8 +26,8 @@
 
 import { useCallback, useRef, useState } from "react";
 
-import EmptyScreenGroupLight from "../../assets/empty.groups.light.react.svg";
-import EmptyScreenGroupDark from "../../assets/empty.groups.dark.react.svg";
+import EmptyScreenGroupLight from "../../assets/empty.groups.light.svg";
+import EmptyScreenGroupDark from "../../assets/empty.groups.dark.svg";
 
 import { useApi } from "../../providers/api/ApiProvider";
 import { getCommonTranslation } from "../../utils/i18n";
@@ -193,7 +193,9 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       emptyScreenDescription={getCommonTranslation("GroupsNotFoundDescription")}
       searchEmptyScreenImage={emptyScreenImg}
       searchEmptyScreenHeader={getCommonTranslation("NotFoundGroups")}
-      searchEmptyScreenDescription={getCommonTranslation("GroupsNotFoundDescription")}
+      searchEmptyScreenDescription={getCommonTranslation(
+        "GroupsNotFoundDescription",
+      )}
       totalItems={totalRef.current}
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
