@@ -30,7 +30,7 @@ import EmptyScreenFilterFilesDark from "../../../assets/empty.filter.files.dark.
 import EmptyScreenRoomsLight from "../../../assets/empty.rooms.root.user.light.react.svg";
 import EmptyScreenRoomsDark from "../../../assets/empty.rooms.root.user.dark.react.svg";
 
-import { getCommonTranslation } from "../../../utils/i18n";
+import { useCommonTranslation } from "../../../utils/i18n";
 import {
   Selector,
   BreadCrumbsLoader,
@@ -45,7 +45,10 @@ import {
   type TSelectorSearch,
   type TSelectorSubmitButton,
 } from "../../../components/selector";
-import { FolderType, type FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
+import {
+  FolderType,
+  type FolderDtoInteger,
+} from "@onlyoffice/docspace-api-sdk";
 import { useTheme } from "../../../context/ThemeContext";
 
 import type { FilesSelectorProps } from "../FilesSelector.types";
@@ -140,6 +143,7 @@ const useSelectorBody = ({
   PickedBreadCrumbsProps &
   PickedSelectorBodyProps &
   SelectedTreeNodeProps) => {
+  const t = useCommonTranslation();
   const { isBase } = useTheme();
 
   const { showBreadCrumbsLoader, isNextPageLoading, showLoader } =
@@ -151,7 +155,7 @@ const useSelectorBody = ({
         withHeader,
         headerProps: {
           ...headerProps,
-          headerLabel: headerProps?.headerLabel || getCommonTranslation("SelectAction"),
+          headerLabel: headerProps?.headerLabel || t("SelectAction"),
           onCloseClick: onCancel,
         },
       }
@@ -161,7 +165,7 @@ const useSelectorBody = ({
     ? {
         withSearch,
         searchLoader: <SearchLoader />,
-        searchPlaceholder: getCommonTranslation("Search"),
+        searchPlaceholder: t("Search"),
         searchValue,
         isSearchLoading: showBreadCrumbsLoader,
         onSearch: onSearch!,
@@ -179,7 +183,7 @@ const useSelectorBody = ({
   const cancelButtonProps: TSelectorCancelButton = withCancelButton
     ? {
         withCancelButton,
-        cancelButtonLabel: cancelButtonLabel || getCommonTranslation("CancelButton"),
+        cancelButtonLabel: cancelButtonLabel || t("CancelButton"),
         cancelButtonId,
         onCancel,
       }
@@ -218,24 +222,24 @@ const useSelectorBody = ({
 
   const emptyScreenHeader = useMemo(() => {
     if (isKnowledgeFolder) {
-      return getCommonTranslation("SelectorEmptyScreenHeaderKnowledge");
+      return t("SelectorEmptyScreenHeaderKnowledge");
     }
 
-    if (isEmptyFilesRootScreen) return getCommonTranslation("SelectorEmptyScreenHeader");
+    if (isEmptyFilesRootScreen) return t("SelectorEmptyScreenHeader");
 
-    if (isEmptyAgentsRootScreen) return getCommonTranslation("EmptyRoomsHeaderAgent");
+    if (isEmptyAgentsRootScreen) return t("EmptyRoomsHeaderAgent");
 
-    return getCommonTranslation("EmptyRoomsHeader");
-  }, [isKnowledgeFolder, isEmptyFilesRootScreen, isEmptyAgentsRootScreen]);
+    return t("EmptyRoomsHeader");
+  }, [isKnowledgeFolder, isEmptyFilesRootScreen, isEmptyAgentsRootScreen, t]);
 
   const emptyScreenDescription = isEmptyFilesRootScreen
     ? ""
     : isEmptyAgentsRootScreen
-      ? getCommonTranslation("EmptyRoomsDescriptionTextAgent", {
-          sectionName: getCommonTranslation("AIAgents"),
+      ? t("EmptyRoomsDescriptionTextAgent", {
+          sectionName: t("AIAgents"),
         })
-      : getCommonTranslation("EmptyRoomsDescriptionText", {
-          sectionName: getCommonTranslation("Rooms"),
+      : t("EmptyRoomsDescriptionText", {
+          sectionName: t("Rooms"),
         });
 
   const SelectorBody = (
@@ -257,10 +261,14 @@ const useSelectorBody = ({
       emptyScreenHeader={emptyScreenHeader}
       emptyScreenDescription={emptyScreenDescription}
       searchEmptyScreenImage={
-        isBase ? <EmptyScreenFilterFilesLight /> : <EmptyScreenFilterFilesDark />
+        isBase ? (
+          <EmptyScreenFilterFilesLight />
+        ) : (
+          <EmptyScreenFilterFilesDark />
+        )
       }
-      searchEmptyScreenHeader={getCommonTranslation("NotFoundTitle")}
-      searchEmptyScreenDescription={getCommonTranslation("EmptyFilterDescriptionText")}
+      searchEmptyScreenHeader={t("NotFoundTitle")}
+      searchEmptyScreenDescription={t("EmptyFilterDescriptionText")}
       isLoading={showLoader}
       rowLoader={
         <RowLoader

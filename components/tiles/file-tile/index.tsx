@@ -38,7 +38,7 @@ import { HeaderType } from "../../context-menu/ContextMenu.types";
 import { Link, LinkType } from "../../link";
 import { Loader, LoaderTypes } from "../../loader";
 
-import { getCommonTranslation, isMobile, isTablet } from "../../../utils";
+import { useCommonTranslation, isMobile, isTablet } from "../../../utils";
 import { hasOwnProperty } from "../../../utils/hasOwnProperty";
 
 import { FileChildProps, FileTileProps } from "./FileTile.types";
@@ -77,6 +77,7 @@ const FileTile = ({
   dataTestId,
   ...rest
 }: FileTileProps) => {
+  const t = useCommonTranslation();
   const childrenArray = React.Children.toArray(children);
   const [FilesTileContent] = childrenArray;
 
@@ -370,7 +371,7 @@ const FileTile = ({
                 e.stopPropagation();
                 onContextMenu(e);
               }}
-              title={getCommonTranslation("TitleShowActions")}
+              title={t("TitleShowActions")}
             />
           ) : (
             <div className="expandButton" />

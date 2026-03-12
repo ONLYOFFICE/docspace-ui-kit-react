@@ -45,7 +45,6 @@ import {
   convertFoldersToItems,
 } from "..";
 
-import { getCommonTranslation } from "../../../utils/i18n";
 import type { UseSocketHelperProps } from "../types";
 import { SettingsContext } from "../contexts/Settings";
 const useSocketHelper = ({

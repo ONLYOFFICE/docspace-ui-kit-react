@@ -31,7 +31,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { RoomTileProps } from "./RoomTile.types";
 
 import { useState } from "react";
-import { TFunction } from "i18next";
 import PublicRoomIconReactSvg from "../../../assets/icons/32/room/public.react.svg";
 import UnpinReactSvg from "../../../assets/unpin.react.svg";
 
@@ -170,7 +169,6 @@ const Template = ({ checked: initialChecked, ...args }: RoomTileProps) => {
 export const Default: Story = {
 	render: Template,
 	args: {
-		t: ((key: string) => key) as TFunction,
 		item: {
 			id: "room-1",
 			title: "Sample Room",

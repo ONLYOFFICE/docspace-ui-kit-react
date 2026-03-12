@@ -40,9 +40,13 @@ export const getCookie = (name: string): string | undefined => {
   return matches ? decodeURIComponent(matches[1]) : undefined;
 };
 
-type WindowI18n = {
+export type WindowI18n = {
   t?: (key: string, options?: Record<string, string | number>) => string;
   loaded?: Record<string, { data: Record<string, string> }>;
+  instance?: {
+    on: (event: string, callback: (...args: unknown[]) => void) => void;
+    off: (event: string, callback: (...args: unknown[]) => void) => void;
+  };
 };
 
 const getWindowI18n = (): WindowI18n | undefined => {
@@ -54,7 +58,7 @@ const getWindowI18n = (): WindowI18n | undefined => {
  * Gets a translation from window.i18n.
  * Uses i18next t function if available (set by TranslationProvider),
  * otherwise falls back to manual lookup from window.i18n.loaded.
- * Throws if the key is not found.
+ * Logs a console error and returns an empty string if the key is not found.
  */
 export const getCommonTranslation = (
   key: string,
@@ -105,6 +109,8 @@ export const getCommonTranslation = (
 
   return "";
 };
+
+export { useCommonTranslation } from "./useCommonTranslation";
 
 /**
  * Checks if translations are loaded and ready to use

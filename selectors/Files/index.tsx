@@ -48,7 +48,7 @@ import useRootHelper from "./hooks/useRootHelper";
 import useSelectorBody from "./hooks/useSelectorBody";
 import useSelectorState from "./hooks/useSelectorState";
 
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 import type { FilesSelectorProps } from "./FilesSelector.types";
 import { SettingsContextProvider } from "../utils/contexts/Settings";
 import {
@@ -118,6 +118,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     disableBySecurity,
   } = props;
 
+  const t = useCommonTranslation();
   const { filesApi } = useApi();
   const { isFirstLoad, setIsFirstLoad, showLoader } = use(LoadersContext);
 
@@ -133,7 +134,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     ? {
         withInit,
         initItems,
-        initBreadCrumbs: [getDefaultBreadCrumb(), ...initBreadCrumbs],
+        initBreadCrumbs: [getDefaultBreadCrumb(t), ...initBreadCrumbs],
         initSelectedItemType,
         initSelectedItemId,
         initSearchValue,
@@ -431,7 +432,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         if (checkCreating && item.id) {
           try {
             const res = await filesApi.createFile(Number(item.id), {
-              title: getCommonTranslation("NewDocument"),
+              title: t("NewDocument"),
             });
             const fileId = res.data.response?.id;
             if (fileId != null) {
@@ -483,6 +484,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       setIsDisabledFolder,
       onSelectItem,
       filesApi,
+      t,
     ],
   );
 

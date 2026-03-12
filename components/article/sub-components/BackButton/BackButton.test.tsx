@@ -18,6 +18,7 @@ vi.mock("../../../../assets/arrow-left.long.react.svg", () => ({
 vi.mock("../../../../utils", () => ({
   __esModule: true,
   getCommonTranslation: vi.fn((key: string) => key),
+  useCommonTranslation: () => (key: string) => key,
 }));
 
 describe("BackButton", () => {

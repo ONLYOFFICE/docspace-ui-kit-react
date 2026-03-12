@@ -31,7 +31,7 @@ import EmptyScreenFilterRoomsDark from "../../assets/empty.filter.rooms.dark.rea
 import EmptyScreenRoomsLight from "../../assets/empty.rooms.root.user.light.react.svg";
 import EmptyScreenRoomsDark from "../../assets/empty.rooms.root.user.dark.react.svg";
 
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 import {
   Selector,
   RowLoader,
@@ -106,6 +106,7 @@ const RoomSelectorComponent = ({
   disableFirstFetch,
   forceIsMultiSelect,
 }: RoomSelectorProps) => {
+  const t = useCommonTranslation();
   const { isBase } = useTheme();
 
   const { isFirstLoad, isNextPageLoading, setIsFirstLoad } =
@@ -283,8 +284,7 @@ const RoomSelectorComponent = ({
         withHeader,
         headerProps: {
           ...headerProps,
-          headerLabel:
-            headerProps.headerLabel || getCommonTranslation("RoomList"),
+          headerLabel: headerProps.headerLabel || t("RoomList"),
         },
       }
     : {};
@@ -292,8 +292,7 @@ const RoomSelectorComponent = ({
   const cancelButtonSelectorProps: TSelectorCancelButton = withCancelButton
     ? {
         withCancelButton: true,
-        cancelButtonLabel:
-          cancelButtonLabel || getCommonTranslation("CancelButton"),
+        cancelButtonLabel: cancelButtonLabel || t("CancelButton"),
         onCancel,
       }
     : {};
@@ -301,7 +300,7 @@ const RoomSelectorComponent = ({
   const searchSelectorProps: TSelectorSearch = withSearch
     ? {
         withSearch: true,
-        searchPlaceholder: getCommonTranslation("Search"),
+        searchPlaceholder: t("Search"),
         searchValue,
         onSearch: onSearchAction,
         onClearSearch: onClearSearchAction,
@@ -327,21 +326,17 @@ const RoomSelectorComponent = ({
       onSelect={onSelect}
       items={sortedItems}
       selectedItems={selectedItems}
-      submitButtonLabel={
-        submitButtonLabel || getCommonTranslation("SelectAction")
-      }
+      submitButtonLabel={submitButtonLabel || t("SelectAction")}
       onSubmit={onSubmit}
       isMultiSelect={isMultiSelect}
       emptyScreenImage={
         isBase ? <EmptyScreenRoomsLight /> : <EmptyScreenRoomsDark />
       }
-      emptyScreenHeader={
-        emptyScreenHeader ?? getCommonTranslation("EmptyRoomsHeader")
-      }
+      emptyScreenHeader={emptyScreenHeader ?? t("EmptyRoomsHeader")}
       emptyScreenDescription={
         emptyScreenDescription ??
-        getCommonTranslation("EmptyRoomsDescriptionText", {
-          sectionName: getCommonTranslation("Rooms"),
+        t("EmptyRoomsDescriptionText", {
+          sectionName: t("Rooms"),
         })
       }
       searchEmptyScreenImage={
@@ -351,10 +346,8 @@ const RoomSelectorComponent = ({
           <EmptyScreenFilterRoomsDark />
         )
       }
-      searchEmptyScreenHeader={getCommonTranslation("NotFoundTitle")}
-      searchEmptyScreenDescription={getCommonTranslation(
-        "SearchEmptyRoomsDescription",
-      )}
+      searchEmptyScreenHeader={t("NotFoundTitle")}
+      searchEmptyScreenDescription={t("SearchEmptyRoomsDescription")}
       totalItems={total}
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
