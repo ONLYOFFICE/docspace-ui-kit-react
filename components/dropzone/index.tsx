@@ -53,6 +53,7 @@ const Dropzone = ({
   isMultipleUpload = true,
   onSingleUploadError,
   onDrop,
+  onDropRejected,
   accept,
   maxFiles = 0,
   getFilesFromEvent,
@@ -101,6 +102,7 @@ const Dropzone = ({
     noDrag: isDisabled,
     ...(!isFolderUpload && accept ? { accept } : {}),
     onDrop: handleDrop,
+    onDropRejected,
     getFilesFromEvent: customGetFilesFromEvent,
   } as Parameters<typeof useDropzone>[0];
 
