@@ -239,7 +239,8 @@ const Article = ({
     user?.isVisitor ||
     (!user?.isAdmin && limitedAccessDevToolsForUsers) ||
     window.location.pathname.includes("portal-settings") ||
-    window.location.pathname.includes("management") ||
+    (window.location.pathname.includes("management") &&
+      !window.location.pathname.includes("profile")) ||
     window.location.pathname.includes("accounts");
 
   const pathDevTools = user?.isAdmin
@@ -301,7 +302,7 @@ const Article = ({
           {!showArticleLoader ? (
             <>
               {customSlot ? (
-                <ArticleCustomSlot 
+                <ArticleCustomSlot
                   withDevTools={!hideDevTools}
                   showBackButton={showBackButton}
                   showText={showText}

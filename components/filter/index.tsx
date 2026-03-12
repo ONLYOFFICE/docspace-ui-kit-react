@@ -362,7 +362,7 @@ const FilterInput = React.memo(
 
       const MANAGEMENT_BTN_W = 40;
       const ROW_GAP = 16;
-      const TAG_GAP = 4;
+      const TAG_GAP = 8;
 
       const allRoomsW = getElementFullWidth(allRoomsMeasureRef.current);
       const ellipsisW = getElementFullWidth(ellipsisMeasureRef.current);
@@ -456,12 +456,8 @@ const FilterInput = React.memo(
           visible.unshift(groupToMove.id); // Use the actual group ID to maintain type consistency
 
           // Recalculate overflow to make room for the group at position 0
-          while (visible.length > 1 && getVisibleWidth() > availableW) {
+          while (visible.length > 0 && getVisibleWidth() > availableW) {
             const removedId = visible.pop()!;
-            if (String(removedId) === String(groupToKeepVisible)) {
-              visible.push(removedId);
-              break;
-            }
             const removedGroup = roomGroupsWithIcons.find(
               (g) => g.id === removedId,
             );
