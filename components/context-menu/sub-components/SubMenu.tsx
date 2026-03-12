@@ -174,8 +174,7 @@ const SubMenu = (props: SubMenuProps) => {
     onClick?.({ originalEvent: e, action, item });
 
     if ((items || item.onLoad) && isMobileDevice) {
-      setActiveItems([item]);
-      // setActiveItemKey(item.key);
+      setActiveHotkeysModel(item, model, menuLevel);
 
       e.stopPropagation();
       return;

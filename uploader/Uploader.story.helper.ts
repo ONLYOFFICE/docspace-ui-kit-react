@@ -24,20 +24,21 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+export const getFolderUrl = (baseUrl: string, folderId: number): string => {
+  return `${baseUrl}/rooms/personal/filter?folder=${folderId}`;
+};
 
-export * from "./utils";
-
-export * from "./context";
-
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
+export const getIsDisabled = (
+  isFirstLoad: boolean,
+  isSelectedParentFolder: boolean,
+  selectedItemId: string | number | undefined,
+  selectedItemType: "rooms" | "files" | "agents" | undefined,
+  isRoot: boolean,
+): boolean => {
+  if (isFirstLoad) return true;
+  if (isSelectedParentFolder) return true;
+  if (isRoot) return true;
+  if (!selectedItemId) return true;
+  if (selectedItemType === "rooms") return true;
+  return false;
+};

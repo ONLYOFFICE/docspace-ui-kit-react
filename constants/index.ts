@@ -77,3 +77,9 @@ export const TEMPLATE_GALLERY_FORMATS = [".docx", ".xlsx", ".pptx", ".pdf"];
 export const HTML_EXST = [".htm", ".mht", ".html", ".mhtml"];
 
 export const EBOOK_EXST = [".fb2", ".pb2", ".ibk", ".prc", ".epub", ".djvu"];
+
+export const DEFAULT_CHUNK_UPLOAD_SIZE = 5 * 1024 * 1024;
+export const DEFAULT_MAX_UPLOAD_THREAD_COUNT = 3;
+export const DEFAULT_MAX_UPLOAD_FILES_COUNT = 2;
+
+export const MAX_VISIBLE_EXTENSIONS = 5;

@@ -24,20 +24,25 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+type TApiErrorShape = {
+  message?: string;
+  response?: {
+    data?: {
+      error?: {
+        message?: string | number;
+      };
+    };
+  };
+};
 
-export * from "./utils";
-
-export * from "./context";
-
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
+export const getErrorMessage = (err: unknown) => {
+  if (typeof err === "string") return err;
+  if (err && typeof err === "object") {
+    const e = err as TApiErrorShape;
+    const responseMessage = e.response?.data?.error?.message;
+    if (typeof responseMessage === "string") return responseMessage;
+    if (typeof responseMessage === "number") return String(responseMessage);
+    if (typeof e.message === "string") return e.message;
+  }
+  return "";
+};
