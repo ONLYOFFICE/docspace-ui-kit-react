@@ -40,6 +40,7 @@ import {
   GroupApi,
   PeopleSearchApi,
   SearchApi,
+  OperationsApi,
 } from "@onlyoffice/docspace-api-sdk";
 
 export type TApiProvider = {
@@ -76,6 +77,7 @@ export type TApiContext = {
   groupApi: GroupApi;
   peopleSearchApi: PeopleSearchApi;
   groupSearchApi: SearchApi;
+  operationsApi: OperationsApi;
   apiClient: TApiClient;
   baseUrl: string;
 };
@@ -120,6 +122,7 @@ const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
       groupApi: new GroupApi(configuration),
       peopleSearchApi: new PeopleSearchApi(configuration),
       groupSearchApi: new SearchApi(configuration),
+      operationsApi: new OperationsApi(configuration),
       apiClient: createApiClient(url, apiKey),
       baseUrl: url,
     };

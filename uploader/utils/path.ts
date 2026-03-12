@@ -24,20 +24,39 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import type {
+  TFileWithOptionalPath,
+  TFileWithOptionalEmptyDir,
+} from "../Uploader.types";
 
-export * from "./utils";
+export const normalizePath = (path: string) => path.replace(/^\/+/, "").trim();
 
-export * from "./context";
+export const isHiddenFilePath = (path: string) => /(^|\/)\.[^\/\.]/g.test(path);
 
-export * from "./enums";
+export const getDirPathFromFilePath = (filePath: string) => {
+  const normalized = normalizePath(filePath);
 
-export * from "./constants";
+  if (!normalized) return "";
 
-export * from "./types";
+  if (normalized.endsWith("/")) {
+    return normalized.replace(/\/+$/, "");
+  }
 
-export * from "./providers";
+  const parts = normalized.split("/");
+  if (parts.length <= 1) return "";
 
-export * from "./errors";
+  return parts.slice(0, -1).join("/");
+};
 
-export * from "./uploader";
+export const getPathSegments = (dirPath: string) =>
+  normalizePath(dirPath).split("/").filter(Boolean);
+
+export const getFilePath = (file: File) => {
+  const f = file as TFileWithOptionalPath;
+  return typeof f.path === "string" && f.path.length > 0 ? f.path : file.name;
+};
+
+export const isEmptyDirectoryFile = (file: File) => {
+  const f = file as TFileWithOptionalEmptyDir;
+  return f.isEmptyDirectory === true;
+};

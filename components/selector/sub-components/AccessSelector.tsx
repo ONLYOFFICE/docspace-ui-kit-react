@@ -86,7 +86,7 @@ const AccessSelector = (props: AccessSelectorProps) => {
 			manualWidth={isMobileView ? "100%" : `${width}px`}
 			isAside={isMobileView}
 			manualY={isMobileView ? "0px" : undefined}
-			withoutBackground={isMobileView}
+			withoutBackground={!isMobileView}
 			withBackground={!isMobileView}
 			withBlur={isMobileView}
 		/>

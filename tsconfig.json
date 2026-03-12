@@ -41,7 +41,8 @@
     "styles/**/*",
     "providers/**/*",
     "selectors/**/*",
-    "document-editor"
+    "document-editor",
+    "uploader"
   ],
   "exclude": [
     "node_modules",
