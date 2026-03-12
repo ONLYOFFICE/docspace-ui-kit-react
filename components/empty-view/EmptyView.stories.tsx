@@ -28,7 +28,7 @@ import React from "react";
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import EmptyRoomsLightSvg from "../../assets/empty.rooms.root.light.svg";
+import EmptyRoomsLightSvg from "../../assets/emptyview/empty.rooms.root.light.svg";
 import CrossSvg from "../../assets/icons/12/cross.react.svg";
 import { EmptyView } from ".";
 import type { EmptyViewProps } from "./EmptyView.types";
