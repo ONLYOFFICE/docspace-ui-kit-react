@@ -38,6 +38,13 @@ export type UploadProgressData = {
   percent: number;
 };
 
+export type RejectedFile = {
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  errors: Array<{ code: string; message: string }>;
+};
+
 export type UploaderProps = {
   /** Width of the uploader container */
   width?: string;
@@ -53,7 +60,10 @@ export type UploaderProps = {
   /** Called when all files are uploaded successfully */
   onUploadSuccess?: (data: unknown[]) => void;
   /** Called when upload fails */
-  onUploadError?: (data: { error: string }) => void;
+  onUploadError?: (data: {
+    error: string;
+    rejectedFiles?: RejectedFile[];
+  }) => void;
   /** Target folder ID for uploads */
   targetId?: string;
   /** Main text displayed in the dropzone */

@@ -304,6 +304,42 @@ const Uploader = ({
     ],
   );
 
+  const onDropRejected = useCallback(
+    (
+      fileRejections: {
+        file: File;
+        errors: { code: string; message: string }[];
+      }[],
+    ) => {
+      if (fileRejections.length === 0) return;
+
+      const isMultiple = isMultipleUpload ?? true;
+
+      if (isMultiple) {
+        toastr.error(
+          getCommonTranslation("FilesRejectedDueToFormat", {
+            count: fileRejections.length,
+          }),
+        );
+      } else {
+        toastr.error(getCommonTranslation("FileFormatNotAllowed"));
+      }
+
+      const rejectedFiles = fileRejections.map((rejection) => ({
+        fileName: rejection.file.name,
+        fileSize: rejection.file.size,
+        fileType: rejection.file.type,
+        errors: rejection.errors,
+      }));
+
+      onUploadError?.({
+        error: "Files rejected due to unsupported format",
+        rejectedFiles,
+      });
+    },
+    [isMultipleUpload],
+  );
+
   const getSecondaryText = () => {
     if (secondaryText) {
       return secondaryText;
@@ -336,6 +372,7 @@ const Uploader = ({
           toastr.warning(getCommonTranslation("SingleUploadWarning"));
         }}
         onDrop={onDrop}
+        onDropRejected={onDropRejected}
         accept={accept}
         linkMainText={linkMainText ?? getCommonTranslation("Upload")}
         linkSecondaryText={getSecondaryText()}
