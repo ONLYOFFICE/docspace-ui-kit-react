@@ -56,6 +56,7 @@ import { TooltipContainer } from "../../../../../components/tooltip";
 
 import { useChatStore } from "../../../store/chatStore";
 import type useToolsSettings from "../../../hooks/useToolsSettings";
+import { useMessageStore } from "../../../store/messageStore";
 
 import styles from "../ChatInput.module.scss";
 import { Link, LinkType } from "../../../../../components/link";
@@ -74,11 +75,13 @@ const ToolsSettings = ({
   isAdmin,
   aiReady,
   goToWebSearchSettings,
+  thinkingSupported,
 }: ReturnType<typeof useToolsSettings> & {
   isAdmin?: boolean;
   aiReady: boolean;
   goToWebSearchSettings?: () => void;
 }) => {
+  const { thinkingEnabled, setThinkingEnabled } = useMessageStore();
   const { agentId } = useChatStore();
   const { isBase } = useTheme();
   const { aiApi, thirdPartyApi, baseUrl } = useApi();
@@ -331,6 +334,17 @@ const ToolsSettings = ({
           </>
         ),
       },
+      ...(thinkingSupported
+        ? [
+            {
+              key: "extended-thinking",
+              label: getCommonTranslation("ExtendedThinking"),
+              withToggle: true,
+              checked: thinkingEnabled,
+              onClick: () => setThinkingEnabled(!thinkingEnabled),
+            },
+          ]
+        : []),
       ...(showManageConnectionItem || serverItems.length > 0
         ? [{ key: "separator-1", isSeparator: true }]
         : []),
@@ -369,6 +383,9 @@ const ToolsSettings = ({
     webSearchAvailable,
     goToWebSearchSettings,
     onWebSearchToggle,
+    thinkingEnabled,
+    thinkingSupported,
+    setThinkingEnabled,
   ]);
 
   if (!isFetched) return;

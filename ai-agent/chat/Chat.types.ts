@@ -66,6 +66,7 @@ export type TMessageStoreProps = {
   generateFormToolName?: string;
   generatePresentationToolName?: string;
   onStreamData?: (chunk: string) => void;
+  thinkingSupported?: boolean;
 } & Omit<ReturnType<typeof useInitMessages>, "initMessages">;
 
 export type SelectModelProps = {

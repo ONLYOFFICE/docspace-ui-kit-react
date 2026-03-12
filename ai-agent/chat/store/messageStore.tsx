@@ -26,13 +26,22 @@
 
 import { makeAutoObservable } from "mobx";
 import React from "react";
-import { ContentType, EventType, RoleType } from "../../../enums";
+import {
+  ContentType,
+  EventType,
+  RoleType,
+  ChatReasoningEffort,
+} from "../../../enums";
 import type {
   TContent,
   TMessage,
   TToolCallContent,
   TMultimodal,
 } from "../../../types/ai";
+import {
+  getReasoningStateFromLocalStorage,
+  setReasoningStateToLocalStorage,
+} from "../utils/reasoning";
 
 import type { TFile } from "../../../types";
 
@@ -80,6 +89,8 @@ export default class MessageStore {
   toolsConfirmQueue: string[] = [];
 
   onStreamData?: (chunk: string) => void;
+
+  thinkingEnabled: boolean = false;
 
   constructor(aiApi: AiApi) {
     this.aiApi = aiApi;
@@ -169,6 +180,22 @@ export default class MessageStore {
 
   setIsStreamRunning = (isStreamRunning: boolean) => {
     this.isStreamRunning = isStreamRunning;
+  };
+
+  initThinkingEnabled = (thinkingSupported?: boolean) => {
+    if (!thinkingSupported) {
+      this.thinkingEnabled = false;
+      return;
+    }
+    this.thinkingEnabled = getReasoningStateFromLocalStorage(
+      this.agentId,
+      this.currentChatId,
+    );
+  };
+
+  setThinkingEnabled = (enabled: boolean) => {
+    this.thinkingEnabled = enabled;
+    setReasoningStateToLocalStorage(this.agentId, this.currentChatId, enabled);
   };
 
   startNewChat = async () => {
@@ -355,6 +382,9 @@ export default class MessageStore {
     const { chatId, error } = parsed;
 
     if (chatId) {
+      if (!this.currentChatId && this.thinkingEnabled) {
+        setReasoningStateToLocalStorage(this.agentId, chatId, true);
+      }
       this.setCurrentChatId(chatId);
     }
 
@@ -731,11 +761,16 @@ export default class MessageStore {
 
       this.abortController = new AbortController();
 
+      const reasoningEffort = this.thinkingEnabled
+        ? ChatReasoningEffort.Medium
+        : ChatReasoningEffort.None;
+
       const stream = await this.aiApi.startNewChat(
         this.agentId,
         message,
         files.map((f) => (f.id ? f.id.toString() : "")),
         this.abortController,
+        reasoningEffort,
       );
 
       await this.startStream(stream);
@@ -754,11 +789,16 @@ export default class MessageStore {
 
       this.abortController = new AbortController();
 
+      const reasoningEffort = this.thinkingEnabled
+        ? ChatReasoningEffort.Medium
+        : ChatReasoningEffort.None;
+
       const stream = await this.aiApi.sendMessageToChat(
         this.currentChatId,
         message,
         files.map((f) => (f.id ? f.id.toString() : "")),
         this.abortController,
+        reasoningEffort,
       );
 
       await this.startStream(stream);
@@ -806,6 +846,7 @@ export const MessageStoreContextProvider = ({
   generateFormToolName,
   generatePresentationToolName,
   onStreamData,
+  thinkingSupported,
 }: TMessageStoreProps) => {
   const { aiApi } = useApi();
   const store = React.useMemo(() => new MessageStore(aiApi), [aiApi]);
@@ -855,6 +896,10 @@ export const MessageStoreContextProvider = ({
   React.useEffect(() => {
     store.onStreamData = onStreamData;
   }, [store, onStreamData]);
+
+  React.useEffect(() => {
+    store.initThinkingEnabled(thinkingSupported);
+  }, [store, agentId, chatId, thinkingSupported]);
 
   return (
     <MessageStoreContext.Provider value={store}>

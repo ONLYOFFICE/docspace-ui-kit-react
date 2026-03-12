@@ -150,4 +150,5 @@ export type TAIRoomChatSettings = {
   internal: boolean;
   modelAlias?: string;
   multimodal?: TMultimodal;
+  thinking?: boolean;
 };

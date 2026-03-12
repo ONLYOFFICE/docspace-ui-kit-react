@@ -216,6 +216,7 @@ const ChatCore = (props: ChatCoreProps) => {
           toolsSettings.generatePresentationToolName
         }
         onStreamData={props.onStreamData}
+        thinkingSupported={toolsSettings.thinkingSupported}
       >
         <ChatContainer
           isLoadingChat={isLoadingChat}

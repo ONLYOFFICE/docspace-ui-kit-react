@@ -26,39 +26,51 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-export enum ServerType {
-  Custom,
-  Portal,
-  GitHub,
-  Box,
-}
+export const getReasoningStateFromLocalStorage = (
+  agentId: string | number,
+  chatId: string,
+): boolean => {
+  const key = `agent_${agentId}_reasoning`;
+  const storedValue = localStorage.getItem(key);
+  if (!storedValue) return false;
 
-export enum ContentType {
-  Text = 0,
-  Tool = 1,
-  Files = 2,
-  Images = 3,
-}
+  try {
+    const data = JSON.parse(storedValue);
+    const keyToSearch = chatId || "empty";
+    return !!data[keyToSearch];
+  } catch {
+    return false;
+  }
+};
 
-export enum RoleType {
-  UserMessage = 0,
-  AssistantMessage = 1,
-  Error = 10,
-}
+export const setReasoningStateToLocalStorage = (
+  agentId: string | number,
+  chatId: string,
+  enabled: boolean,
+): void => {
+  const key = `agent_${agentId}_reasoning`;
+  const storedValue = localStorage.getItem(key);
+  let data: Record<string, boolean> = {};
 
-export enum EventType {
-  MessageStart = "message_start",
-  MessageStop = "message_stop",
-  NewToken = "new_token",
-  ToolCall = "tool_call",
-  ToolResult = "tool_result",
-  Error = "error",
-}
+  if (storedValue) {
+    try {
+      data = JSON.parse(storedValue);
+    } catch {
+      data = {};
+    }
+  }
 
-export enum ChatReasoningEffort {
-  None = 0,
-  Low = 1,
-  Medium = 2,
-  High = 3,
-  XHigh = 4,
-}
+  const keyToUse = chatId || "empty";
+
+  if (enabled) {
+    data[keyToUse] = true;
+  } else {
+    delete data[keyToUse];
+  }
+
+  if (Object.keys(data).length === 0) {
+    localStorage.removeItem(key);
+  } else {
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+};

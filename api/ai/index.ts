@@ -30,9 +30,9 @@ import { FolderContentDtoInteger } from "@onlyoffice/docspace-api-sdk";
 
 import { BaseCustomApi } from "../base-custom-api";
 import { TAIConfig, TChat, TMCPTool, TMessage, TServer } from "../../types/ai";
+import { ChatReasoningEffort, ToolsPermission } from "../../enums";
 import { toastr } from "../../components/toast";
 import { TFile } from "../../types";
-import { ToolsPermission } from "../../enums";
 
 export class AiApi extends BaseCustomApi {
   getChats(
@@ -199,12 +199,13 @@ export class AiApi extends BaseCustomApi {
     message: string,
     files: string[],
     abortController?: AbortController,
+    reasoningEffort?: ChatReasoningEffort,
   ) {
     return this.request<ReadableStream<Uint8Array> | null>(
       `/ai/rooms/${roomId}/chats`,
       {
         method: "POST",
-        data: { message, files },
+        data: { message, files, reasoningEffort },
         signal: abortController?.signal,
         isStream: true,
       },
@@ -216,12 +217,13 @@ export class AiApi extends BaseCustomApi {
     message: string,
     files: string[],
     abortController?: AbortController,
+    reasoningEffort?: ChatReasoningEffort,
   ) {
     return this.request<ReadableStream<Uint8Array> | null>(
       `/ai/chats/${chatId}/messages`,
       {
         method: "POST",
-        data: { message, files },
+        data: { message, files, reasoningEffort },
         signal: abortController?.signal,
         isStream: true,
       },
