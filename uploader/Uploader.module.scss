@@ -24,20 +24,28 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+.uploaderContainer {
+  display: flex;
+  flex-direction: column;
+}
 
-export * from "./utils";
+.dropzoneWrapper {
+  width: 100%;
+  height: 100%;
+  flex: 1;
 
-export * from "./context";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-export * from "./enums";
+.dropzoneLoader {
+  position: static;
+  transform: none;
+  margin: auto;
+}
 
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
+.toastLink {
+  color: inherit;
+  text-decoration: underline;
+}

@@ -1,0 +1,176 @@
+import { Meta, Primary, Controls, Story } from '@storybook/addon-docs/blocks';
+ 
+import * as UploaderStories from './Uploader.stories';
+
+<Meta of={UploaderStories} />
+
+# Uploader
+
+Uploader is a file upload component that supports chunked uploads, folder uploads, and file size validation. It uses the DocSpace API SDK for upload operations and provides a drag-and-drop interface.
+
+### Default file upload
+
+This example shows the basic file uploader with multiple file support and file type restrictions.
+
+<Story of={UploaderStories.Default} />
+
+Basic usage with file type restrictions and multiple file upload enabled:
+
+```tsx
+<Uploader
+  width="800px"
+  height="300px"
+  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+  shortText="PDF, DOC, DOCX, XLS, XLSX"
+  fullText="PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX"
+  badgeValue={2}
+  linkMainText="Upload files"
+  secondaryText="or drag and drop files here"
+  isMultipleUpload={true}
+  targetId="123"
+/>
+```
+
+### Single file upload
+
+Demonstrates uploading a single file at a time.
+
+<Story of={UploaderStories.SingleFileUpload} />
+
+Restrict to single file upload by setting `isMultipleUpload` to false:
+
+```tsx
+<Uploader
+  linkMainText="Upload file"
+  secondaryText="or drag and drop a file here"
+  isMultipleUpload={false}
+  targetId="123"
+/>
+```
+
+### Folder upload
+
+Shows how to enable folder upload mode for uploading entire directories.
+
+<Story of={UploaderStories.FolderUpload} />
+
+Enable folder upload with `isFolderUpload` prop:
+
+```tsx
+<Uploader
+  shortText="Any files"
+  linkMainText="Upload folder"
+  secondaryText="or drag and drop a folder here"
+  isFolderUpload={true}
+  isMultipleUpload={true}
+  targetId="123"
+/>
+```
+
+### Single folder upload
+
+Demonstrates uploading a single folder at a time.
+
+<Story of={UploaderStories.SingleFolderUpload} />
+
+```tsx
+<Uploader
+  linkMainText="Upload folder"
+  secondaryText="or drag and drop a folder here"
+  isFolderUpload={true}
+  isMultipleUpload={false}
+  targetId="123"
+/>
+```
+
+### Image upload
+
+Specialized uploader for image files only.
+
+<Story of={UploaderStories.ImageUpload} />
+
+Restrict to image file types:
+
+```tsx
+<Uploader
+  accept=".png,.jpg,.jpeg,.gif,.webp,.svg"
+  shortText="PNG, JPG, JPEG, GIF"
+  fullText="PNG, JPG, JPEG, GIF, WEBP, SVG"
+  badgeValue={2}
+  linkMainText="Upload images"
+  secondaryText="or drag and drop images here"
+  targetId="123"
+/>
+```
+
+### With size limit
+
+Shows how to set maximum file size per upload.
+
+<Story of={UploaderStories.WithSizeLimit} />
+
+Set maximum file size with `maxPerUploadSize`:
+
+```tsx
+<Uploader
+  linkMainText="Upload files (max 10MB each)"
+  maxPerUploadSize="10MB"
+  targetId="123"
+/>
+```
+
+### With total size limit
+
+Demonstrates setting both per-file and total upload size limits.
+
+<Story of={UploaderStories.WithTotalSizeLimit} />
+
+Set both individual and total size limits:
+
+```tsx
+<Uploader
+  linkMainText="Upload files (max 100MB total)"
+  maxPerUploadSize="10MB"
+  maxTotalUploadSize="100MB"
+  targetId="123"
+/>
+```
+
+### Any file types
+
+Allows uploading any file type without restrictions.
+
+<Story of={UploaderStories.AnyFiles} />
+
+Accept all file types with wildcard:
+
+```tsx
+<Uploader
+  accept="*"
+  shortText="Any files"
+  linkMainText="Upload any files"
+  secondaryText="All file types are accepted"
+  targetId="123"
+/>
+```
+
+### Custom upload settings
+
+Shows how to customize chunk size, thread count, and concurrent file uploads.
+
+<Story of={UploaderStories.CustomSettings} />
+
+Configure upload behavior with `filesSettings`:
+
+```tsx
+<Uploader
+  filesSettings={{
+    chunkUploadSize: 10 * 1024 * 1024,
+    maxUploadThreadCount: 5,
+    maxUploadFilesCount: 3,
+  }}
+  linkMainText="Upload with custom settings"
+  secondaryText="10MB chunks, 5 threads, 3 files at once"
+  targetId="123"
+/>
+```

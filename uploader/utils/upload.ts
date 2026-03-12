@@ -1,3 +1,4 @@
+
 // (c) Copyright Ascensio System SIA 2009-2026
 //
 // This program is a free software product.
@@ -24,20 +25,42 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+export const runWithConcurrency = async <T>(
+  items: T[],
+  concurrency: number,
+  worker: (item: T) => Promise<void>,
+) => {
+  const limit = Math.max(1, concurrency);
+  let cursor = 0;
 
-export * from "./utils";
+  const runners = Array.from({ length: Math.min(limit, items.length) }).map(
+    async () => {
+      while (cursor < items.length) {
+        const current = cursor;
+        cursor += 1;
+        await worker(items[current]);
+      }
+    },
+  );
 
-export * from "./context";
+  await Promise.all(runners);
+};
 
-export * from "./enums";
+export const createChunks = (file: File, chunkSize: number) => {
+  const safeChunkSize = Math.max(1, chunkSize);
+  const chunks = file.size === 0 ? 1 : Math.ceil(file.size / safeChunkSize);
+  const items: Array<{ index: number; data: FormData; size: number }> = [];
 
-export * from "./constants";
+  for (let i = 0; i < chunks; i++) {
+    const offset = i * safeChunkSize;
+    const end = Math.min(file.size, offset + safeChunkSize);
+    const part = file.slice(offset, end);
 
-export * from "./types";
+    const fd = new FormData();
+    fd.append("file", part);
 
-export * from "./providers";
+    items.push({ index: i + 1, data: fd, size: end - offset });
+  }
 
-export * from "./errors";
-
-export * from "./uploader";
+  return items;
+};
