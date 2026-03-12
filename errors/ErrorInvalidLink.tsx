@@ -24,16 +24,17 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { getCommonTranslation, getTranslationReady } from "../utils/i18n";
+import { useCommonTranslation, getTranslationReady } from "../utils/i18n";
 import ErrorContainer from "../components/error-container/ErrorContainer";
 
 export const ErrorInvalidLink = () => {
+  const t = useCommonTranslation();
   const ready = getTranslationReady();
 
   return ready ? (
     <ErrorContainer
-      headerText={getCommonTranslation("InvalidLink")}
-      bodyText={getCommonTranslation("LinkDoesNotExist")}
+      headerText={t("InvalidLink")}
+      bodyText={t("LinkDoesNotExist")}
     />
   ) : null;
 };

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { ContextMenuModel } from "../../context-menu/ContextMenu.types";
 import type { TagClickEvent, TagType } from "../../tag";
 import { TileItem } from "../tile-container/TileContainer.types";
@@ -51,8 +51,6 @@ export interface SelectOption {
 }
 
 export type RoomTileProps = {
-  /** Translation function */
-  t: TFunction;
   /** Indicates if the room is selected */
   checked?: boolean;
   /** Indicates if the room is in active state */
@@ -82,7 +80,15 @@ export type RoomTileProps = {
   /** Callback for option selection */
   selectOption: (option: SelectOption) => void;
   /** Function to get room type name */
-  getRoomTypeName: (type: string, t: TFunction) => string;
+  getRoomTypeName: (
+    type: string,
+    t:
+      | TFunction
+      | ((
+          key: string,
+          interpolation?: Record<string, string | number>,
+        ) => string),
+  ) => string;
   /** Room badges */
   badges?: React.ReactNode;
   /** Indicates if room is in progress state */

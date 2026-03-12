@@ -31,7 +31,7 @@ import {
   type FolderDtoInteger,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers/api";
-import { getCommonTranslation } from "../../../utils/i18n";
+import { useCommonTranslation } from "../../../utils/i18n";
 import type { TSelectorItem } from "../../../components/selector";
 import { getDefaultBreadCrumb } from "../../utils";
 import { LoadersContext } from "../../utils/contexts/Loaders";
@@ -76,6 +76,7 @@ const useRootHelper = ({
   isUserOnly,
   setIsInit,
 }: UseRootHelperProps) => {
+  const t = useCommonTranslation();
   const { setIsBreadCrumbsLoading, setIsNextPageLoading, setIsFirstLoad } =
     use(LoadersContext);
 
@@ -88,7 +89,7 @@ const useRootHelper = ({
     if (requestRunning.current) return;
 
     requestRunning.current = true;
-    setBreadCrumbs([getDefaultBreadCrumb()]);
+    setBreadCrumbs([getDefaultBreadCrumb(t)]);
     setIsRoot(true);
     setIsNextPageLoading(true);
     setIsBreadCrumbsLoading(false);
@@ -127,19 +128,19 @@ const useRootHelper = ({
 
         switch (folder.rootFolderType) {
           case FolderType.USER:
-            title = getCommonTranslation("MyDocuments");
+            title = t("MyDocuments");
             break;
           case FolderType.VirtualRooms:
-            title = getCommonTranslation("Rooms");
+            title = t("Rooms");
             break;
           case FolderType.Favorites:
-            title = getCommonTranslation("Favorites");
+            title = t("Favorites");
             break;
           case FolderType.Recent:
-            title = getCommonTranslation("Recent");
+            title = t("Recent");
             break;
           case FolderType.AiAgents:
-            title = getCommonTranslation("AIAgents");
+            title = t("AIAgents");
             break;
           default:
             break;
@@ -178,6 +179,7 @@ const useRootHelper = ({
     setIsNextPageLoading,
     setItems,
     setTotal,
+    t,
     treeFolders,
     withRecentTreeFolder,
     withFavoritesTreeFolder,

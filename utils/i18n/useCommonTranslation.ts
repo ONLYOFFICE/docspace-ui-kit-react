@@ -24,25 +24,45 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useCommonTranslation, getTranslationReady } from "../utils/i18n";
-import ErrorContainer from "../components/error-container/ErrorContainer";
-import styles from "./Errors.module.scss";
+import { useSyncExternalStore, useCallback } from "react";
 
-const ErrorUnavailable = () => {
-  const t = useCommonTranslation();
-  const ready = getTranslationReady();
+import { getCookie, getCommonTranslation } from "./index";
+import type { WindowI18n } from "./index";
 
-  return (
-    ready && (
-      <div className={styles.errorUnavailableWrapper}>
-        <ErrorContainer
-          headerText={t("ErrorDeactivatedText", {
-            productName: t("ProductName") ?? "",
-          })}
-        />
-      </div>
-    )
-  );
+const getI18nInstance = (): WindowI18n["instance"] | undefined => {
+  if (typeof window === "undefined") return undefined;
+  return (window as unknown as { i18n?: WindowI18n }).i18n?.instance;
 };
 
-export default ErrorUnavailable;
+const subscribe = (onStoreChange: () => void): (() => void) => {
+  const instance = getI18nInstance();
+  if (!instance) return () => {};
+
+  instance.on("languageChanged", onStoreChange);
+  return () => {
+    instance.off("languageChanged", onStoreChange);
+  };
+};
+
+const getSnapshot = (): string => getCookie("asc_language") ?? "en";
+
+const getServerSnapshot = (): string => "en";
+
+/**
+ * A React hook that provides a reactive version of `getCommonTranslation`.
+ * Listens to the app's i18n instance `languageChanged` event and forces a re-render,
+ * ensuring that translated strings update when the language changes.
+ *
+ * Requires `window.i18n.instance` to be set by the host application.
+ */
+export const useCommonTranslation = () => {
+  const lang = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  const t = useCallback(
+    (key: string, interpolation?: Record<string, string | number>) =>
+      getCommonTranslation(key, interpolation),
+    [lang],
+  );
+
+  return t;
+};

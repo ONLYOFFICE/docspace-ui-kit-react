@@ -34,7 +34,7 @@ import {
   type FileEntryDtoIntegerAllOfSecurity,
   type FileType,
 } from "@onlyoffice/docspace-api-sdk";
-import { getCommonTranslation } from "../../../utils/i18n";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import type {
   FilesSelectorProps,
@@ -64,6 +64,7 @@ const transformInitItems = (
     fileExst: string,
     size?: number,
   ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null,
+  t: (key: string) => string,
   initSelectedItemType?: string,
   filterParam?: string | number,
   disableBySecurity?: string,
@@ -72,6 +73,7 @@ const transformInitItems = (
     items.filter(
       (item) => "roomType" in item && item.roomType,
     ) as FolderDtoInteger[],
+    t,
   );
   const folders = convertFoldersToItems(
     items.filter(
@@ -94,10 +96,7 @@ const transformInitItems = (
     ...((withCreate && [
       {
         isCreateNewItem: true,
-        label:
-          initSelectedItemType === "files"
-            ? getCommonTranslation("NewFolder")
-            : getCommonTranslation("NewRoom"),
+        label: initSelectedItemType === "files" ? t("NewFolder") : t("NewRoom"),
         id: "create-folder-item",
         key: "create-folder-item",
         hotkey: "f",
@@ -128,6 +127,7 @@ const useSelectorState = ({
 
   disableBySecurity,
 }: UseSelectorStateProps & TFilesSelectorInit) => {
+  const t = useCommonTranslation();
   const { getIcon } = use(SettingsContext);
 
   const [breadCrumbs, setBreadCrumbs] = React.useState<TBreadCrumb[]>(
@@ -143,6 +143,7 @@ const useSelectorState = ({
           disabledItems,
           withCreate,
           getIcon,
+          t,
           initSelectedItemType,
           filterParam,
           disableBySecurity,
