@@ -30,7 +30,7 @@ import ArticleHideMenuReactSvg from "../../../assets/article-hide-menu.react.svg
 import ArticleShowMenuReactSvg from "../../../assets/article-show-menu.react.svg";
 
 import { Text } from "../../text";
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import styles from "../Article.module.scss";
 import { ArticleHideMenuButtonProps } from "../Article.types";
@@ -41,6 +41,8 @@ const HideArticleMenuButton = ({
   toggleShowText,
   withCustomSlot,
 }: ArticleHideMenuButtonProps) => {
+  const t = useCommonTranslation();
+
   return (
     <div
       className={styles.hideArticleMenuButton}
@@ -60,7 +62,7 @@ const HideArticleMenuButton = ({
             noSelect
             truncate
           >
-            {getCommonTranslation("HideArticleMenu")}
+            {t("HideArticleMenu")}
           </Text>
         </div>
       ) : (

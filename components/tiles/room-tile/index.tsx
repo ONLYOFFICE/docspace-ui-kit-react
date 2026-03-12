@@ -34,10 +34,9 @@ import { BaseTile } from "../base-tile";
 import { TileItem } from "../tile-container/TileContainer.types";
 
 import styles from "./RoomTile.module.scss";
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils";
 
 export const RoomTile = ({
-  t,
   item,
   checked,
   isActive,
@@ -53,6 +52,7 @@ export const RoomTile = ({
   customBottomContent,
   ...rest
 }: RoomTileProps) => {
+  const t = useCommonTranslation();
   const childrenArray = React.Children.toArray(children);
   const [RoomsTileContent] = childrenArray;
 
@@ -113,7 +113,7 @@ export const RoomTile = ({
     } else if (item.isAIAgent) {
       tempTags.push({
         isDefault: true,
-        label: getCommonTranslation("NoTags") ?? "",
+        label: t("NoTags") ?? "",
       });
     } else {
       tempTags.push({

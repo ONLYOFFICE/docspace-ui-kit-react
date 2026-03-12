@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useRef } from "react";
-import { getCommonTranslation, isMobile } from "../../../utils";
+import { useCommonTranslation, isMobile } from "../../../utils";
 import classNames from "classnames";
 
 import { Checkbox } from "../../checkbox";
@@ -68,6 +68,7 @@ export const BaseTile = ({
   dataTestId,
   badgeUrl,
 }: BaseTileProps) => {
+  const t = useCommonTranslation();
   const childrenArray = React.Children.toArray(topContent);
 
   const cmRef = useRef<ContextMenuRefType>(null);
@@ -209,7 +210,7 @@ export const BaseTile = ({
                 e.stopPropagation();
                 onContextMenu(e);
               }}
-              title={getCommonTranslation("TitleShowFolderActions")}
+              title={t("TitleShowFolderActions")}
             />
           ) : (
             <div className="expandButton" />

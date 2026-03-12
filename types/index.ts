@@ -253,6 +253,7 @@ declare global {
         string,
         { data: Record<string, string>; namespaces: string }
       >;
+      instance?: import("i18next").i18n;
     };
     AscDesktopEditor?: {
       execCommand: (key: string, value: string) => void;
