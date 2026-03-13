@@ -84,7 +84,7 @@ const AgentIdSetup = ({
 
           {apiError && (
             <div className={styles.error}>
-              <span>⚠</span>
+              <span>{"\u26A0"}</span>
               <span>{apiError}</span>
             </div>
           )}
