@@ -235,7 +235,7 @@ const ChatCore = (props: ChatCoreProps) => {
 };
 
 const ChatInternalInit = (props: ChatInternalInitProps) => {
-  const { agentId, multimodal, isLoading, getIcon: getIconProp } = props;
+  const { agentId, isLoading, getIcon: getIconProp } = props;
 
   const { aiConfig, fetchAiConfig } = useAiConfig();
   const { chatSettings, fetchChatSettings } = useChatSettings({
@@ -301,9 +301,10 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
       initChats={initChats}
       messagesSettings={messagesSettings}
       toolsSettings={toolsSettings}
-      multimodal={multimodal}
+      multimodal={chatSettings?.multimodal}
       isLoadingChat={isLoading || !isInitialized || isLoadingGetIcon}
       aiReady={!!aiConfig?.aiReady}
+      modelAliases={aiConfig?.modelAliases}
       selectedModel={chatSettings?.modelId ?? ""}
     />
   );

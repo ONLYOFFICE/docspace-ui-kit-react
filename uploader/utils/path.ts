@@ -53,7 +53,10 @@ export const getPathSegments = (dirPath: string) =>
 
 export const getFilePath = (file: File) => {
   const f = file as TFileWithOptionalPath;
-  return typeof f.path === "string" && f.path.length > 0 ? f.path : file.name;
+  if (typeof f.path === "string" && f.path.length > 0) return f.path;
+  if (file.webkitRelativePath && file.webkitRelativePath.length > 0)
+    return file.webkitRelativePath;
+  return file.name;
 };
 
 export const isEmptyDirectoryFile = (file: File) => {
