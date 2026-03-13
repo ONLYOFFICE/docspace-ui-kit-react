@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, reaction } from "mobx";
 import React from "react";
 import {
   ContentType,
@@ -92,9 +92,16 @@ export default class MessageStore {
 
   thinkingEnabled: boolean = false;
 
+  thinkingSupported: boolean = false;
+
   constructor(aiApi: AiApi) {
     this.aiApi = aiApi;
     makeAutoObservable(this);
+
+    reaction(
+      () => [this.agentId, this.currentChatId, this.thinkingSupported],
+      () => this.syncThinkingEnabled(),
+    );
   }
 
   addToToolsConfirmQueue = (id: string) => {
@@ -182,8 +189,12 @@ export default class MessageStore {
     this.isStreamRunning = isStreamRunning;
   };
 
-  initThinkingEnabled = (thinkingSupported?: boolean) => {
-    if (!thinkingSupported) {
+  setThinkingSupported = (supported: boolean) => {
+    this.thinkingSupported = supported;
+  };
+
+  syncThinkingEnabled = () => {
+    if (!this.thinkingSupported) {
       this.thinkingEnabled = false;
       return;
     }
@@ -898,8 +909,8 @@ export const MessageStoreContextProvider = ({
   }, [store, onStreamData]);
 
   React.useEffect(() => {
-    store.initThinkingEnabled(thinkingSupported);
-  }, [store, agentId, chatId, thinkingSupported]);
+    store.setThinkingSupported(!!thinkingSupported);
+  }, [store, thinkingSupported]);
 
   return (
     <MessageStoreContext.Provider value={store}>
