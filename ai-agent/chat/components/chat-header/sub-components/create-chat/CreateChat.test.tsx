@@ -50,7 +50,7 @@ vi.mock("../../../../../../components/rectangle", () => ({
 }));
 
 // Mock SVG
-vi.mock("../../../../../../assets/icons/16/plus.react.svg", () => ({
+vi.mock("../../../../../../assets/icons/16/plus.svg", () => ({
   default: () => <svg data-testid="plus-icon" />,
 }));
 

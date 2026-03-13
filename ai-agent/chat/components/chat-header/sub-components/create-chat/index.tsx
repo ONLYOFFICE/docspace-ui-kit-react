@@ -29,7 +29,7 @@
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-import PlusReactSvgUrl from "../../../../../../assets/icons/16/plus.react.svg";
+import PlusReactSvgUrl from "../../../../../../assets/icons/16/plus.svg";
 
 import { RectangleSkeleton } from "../../../../../../components/rectangle";
 
