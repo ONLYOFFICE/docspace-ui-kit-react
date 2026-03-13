@@ -46,12 +46,30 @@ export type WindowI18n = {
   instance?: {
     on: (event: string, callback: (...args: unknown[]) => void) => void;
     off: (event: string, callback: (...args: unknown[]) => void) => void;
+    language?: string;
+    resolvedLanguage?: string;
   };
 };
 
 const getWindowI18n = (): WindowI18n | undefined => {
   if (typeof window === "undefined") return undefined;
   return (window as unknown as { i18n?: WindowI18n }).i18n;
+};
+
+const normalizeCommonLanguage = (language?: string): string => {
+  return language === "en-US" || language === "en-GB"
+    ? "en"
+    : (language ?? "en");
+};
+
+export const getCurrentCommonLanguage = (): string => {
+  const i18n = getWindowI18n();
+  const language =
+    i18n?.instance?.resolvedLanguage ??
+    i18n?.instance?.language ??
+    getCookie("asc_language");
+
+  return normalizeCommonLanguage(language);
 };
 
 /**
@@ -74,11 +92,7 @@ export const getCommonTranslation = (
   }
 
   if (i18n?.loaded) {
-    const cookieLang = getCookie("asc_language");
-    const lang =
-      cookieLang === "en-US" || cookieLang === "en-GB"
-        ? "en"
-        : (cookieLang ?? "en");
+    const lang = getCurrentCommonLanguage();
 
     const commonKeys = Object.getOwnPropertyNames(i18n.loaded).filter(
       (k) => k.indexOf(`${lang}/Common.json`) > -1,
