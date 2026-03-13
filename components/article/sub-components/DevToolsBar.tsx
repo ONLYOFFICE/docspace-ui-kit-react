@@ -27,7 +27,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import DeveloperReactSvg from "../../../assets/catalog.developer.react.svg";
+import DeveloperReactSvg from "../../../assets/icons/16/catalog.developer.react.svg";
 import ArrowReactSvg from "../../../assets/arrow.right.react.svg";
 
 import { DeviceType } from "../../../enums";

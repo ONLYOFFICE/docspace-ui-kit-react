@@ -33,7 +33,7 @@ import type { TileContainerProps } from "./TileContainer.types";
 import WordSvgUrl from "../../../assets/icons/32/word.svg";
 import PdfSvgUrl from "../../../assets/icons/32/pdf.svg";
 import SlideSvgUrl from "../../../assets/icons/32/slide.svg";
-import ImageReactSvg from "../../../assets/empty.rooms.root.light.svg";
+import ImageReactSvg from "../../../assets/emptyview/empty.rooms.root.light.svg";
 
 import { TileContainer } from ".";
 import { TileContent } from "../tile-content";
@@ -46,38 +46,38 @@ const pdfElement = <PdfSvgUrl />;
 const slideElement = <SlideSvgUrl />;
 
 const mockFiles = [
-	{
-		id: "1",
-		title: "Document.docx",
-		fileExst: ".docx",
-		fileType: FileType.Document,
-	},
-	{
-		id: "2",
-		title: "Presentation.pptx",
-		fileExst: ".pptx",
-		fileType: FileType.Presentation,
-	},
-	{
-		id: "3",
-		title: "Spreadsheet.xlsx",
-		fileExst: ".xlsx",
-		fileType: FileType.Spreadsheet,
-	},
+  {
+    id: "1",
+    title: "Document.docx",
+    fileExst: ".docx",
+    fileType: FileType.Document,
+  },
+  {
+    id: "2",
+    title: "Presentation.pptx",
+    fileExst: ".pptx",
+    fileType: FileType.Presentation,
+  },
+  {
+    id: "3",
+    title: "Spreadsheet.xlsx",
+    fileExst: ".xlsx",
+    fileType: FileType.Spreadsheet,
+  },
 ];
 
 const mockContextOptions = [
-	{ key: "edit", label: "Edit" },
-	{ key: "delete", label: "Delete" },
+  { key: "edit", label: "Edit" },
+  { key: "delete", label: "Delete" },
 ];
 
 const meta = {
-	title: "UI/Tiles/TileContainer",
-	component: TileContainer,
-	parameters: {
-		docs: {
-			description: {
-				component: `Container component for displaying tiles in a grid layout.
+  title: "UI/Tiles/TileContainer",
+  component: TileContainer,
+  parameters: {
+    docs: {
+      description: {
+        component: `Container component for displaying tiles in a grid layout.
 
 ### Features
 
@@ -98,22 +98,22 @@ import { FileTile } from "@docspace/ui-kit/components/tiles/file-tile";
   </FileTile>
 </TileContainer>
 \`\`\``,
-			},
-		},
-	},
-	argTypes: {
-		useReactWindow: {
-			control: "boolean",
-			description: "Whether to use virtualized scrolling via react-window",
-			table: {
-				defaultValue: { summary: "false" },
-			},
-		},
-		headingFiles: {
-			control: "text",
-			description: "Heading text displayed above the files section",
-		},
-	},
+      },
+    },
+  },
+  argTypes: {
+    useReactWindow: {
+      control: "boolean",
+      description: "Whether to use virtualized scrolling via react-window",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    headingFiles: {
+      control: "text",
+      description: "Heading text displayed above the files section",
+    },
+  },
 } satisfies Meta<typeof TileContainer>;
 
 type Story = StoryObj<ComponentProps<typeof TileContainer>>;
@@ -121,44 +121,44 @@ type Story = StoryObj<ComponentProps<typeof TileContainer>>;
 export default meta;
 
 const ContainerTemplate = (args: TileContainerProps) => {
-	return (
-		<TileContainer {...args}>
-			{mockFiles.map((file) => (
-				<FileTile
-					key={file.id}
-					item={file}
-					contextOptions={mockContextOptions}
-					temporaryIcon={<ImageReactSvg />}
-					element={
-						file.fileType === FileType.Spreadsheet
-							? slideElement
-							: file.fileType === FileType.Presentation
-								? pdfElement
-								: wordElement
-					}
-				>
-					<TileContent>
-						<Link>{file.title}</Link>
-					</TileContent>
-				</FileTile>
-			))}
-		</TileContainer>
-	);
+  return (
+    <TileContainer {...args}>
+      {mockFiles.map((file) => (
+        <FileTile
+          key={file.id}
+          item={file}
+          contextOptions={mockContextOptions}
+          temporaryIcon={<ImageReactSvg />}
+          element={
+            file.fileType === FileType.Spreadsheet
+              ? slideElement
+              : file.fileType === FileType.Presentation
+                ? pdfElement
+                : wordElement
+          }
+        >
+          <TileContent>
+            <Link>{file.title}</Link>
+          </TileContent>
+        </FileTile>
+      ))}
+    </TileContainer>
+  );
 };
 
 export const Default: Story = {
-	render: (args) => <ContainerTemplate {...args} />,
-	args: {
-		useReactWindow: false,
-		headingFiles: "Files",
-	},
-	parameters: {
-		docs: {
-			description: {
-				story: "Default tile container displaying files in a grid layout",
-			},
-			source: {
-				code: `<TileContainer useReactWindow={false} headingFiles="Files">
+  render: (args) => <ContainerTemplate {...args} />,
+  args: {
+    useReactWindow: false,
+    headingFiles: "Files",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Default tile container displaying files in a grid layout",
+      },
+      source: {
+        code: `<TileContainer useReactWindow={false} headingFiles="Files">
   <FileTile item={file1} element={<WordSvgUrl />} contextOptions={options}>
     <TileContent><Link>Document.docx</Link></TileContent>
   </FileTile>
@@ -169,7 +169,7 @@ export const Default: Story = {
     <TileContent><Link>Spreadsheet.xlsx</Link></TileContent>
   </FileTile>
 </TileContainer>`,
-			},
-		},
-	},
+      },
+    },
+  },
 };

@@ -26,10 +26,10 @@
 
 import React, { useEffect } from "react";
 
-import EmptyScreenFilterRoomsLight from "../../assets/empty.filter.rooms.light.react.svg";
-import EmptyScreenFilterRoomsDark from "../../assets/empty.filter.rooms.dark.react.svg";
-import EmptyScreenRoomsLight from "../../assets/empty.rooms.root.user.light.react.svg";
-import EmptyScreenRoomsDark from "../../assets/empty.rooms.root.user.dark.react.svg";
+import EmptyScreenFilterRoomsLight from "../../assets/emptyFilter/empty.filter.rooms.light.svg";
+import EmptyScreenFilterRoomsDark from "../../assets/emptyFilter/empty.filter.rooms.dark.svg";
+import EmptyScreenRoomsLight from "../../assets/emptyview/empty.rooms.root.user.light.svg";
+import EmptyScreenRoomsDark from "../../assets/emptyview/empty.rooms.root.user.dark.svg";
 
 import { useCommonTranslation } from "../../utils/i18n";
 import {
