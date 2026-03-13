@@ -191,11 +191,11 @@ const ToolsSettings = ({
               return newServers;
             });
           } catch (e) {
-            console.log(e);
+            console.error(e);
           }
         }
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.error(e));
   };
 
   const disconnectServerAction = async (serverId: string) => {
@@ -214,7 +214,7 @@ const ToolsSettings = ({
         return newServers;
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 

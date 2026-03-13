@@ -43,6 +43,7 @@ import { useChatStore } from "../../../../store/chatStore";
 
 import { RenameChatProps } from "../../../../Chat.types";
 import { useCommonTranslation } from "../../../../../../utils/i18n";
+import { toastr } from "../../../../../../components/toast";
 
 const RenameChat = ({ chatId, prevTitle, onRenameToggle }: RenameChatProps) => {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -67,9 +68,15 @@ const RenameChat = ({ chatId, prevTitle, onRenameToggle }: RenameChatProps) => {
   const onRenameAction = React.useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
-    await renameChat(chatId, newName);
-    onRenameToggle();
-    setIsLoading(false);
+    try {
+      await renameChat(chatId, newName);
+      onRenameToggle();
+    } catch (error) {
+      console.error(error);
+      toastr.error(error as string);
+    } finally {
+      setIsLoading(false);
+    }
   }, [chatId, newName, onRenameToggle, renameChat, isLoading]);
 
   React.useEffect(() => {

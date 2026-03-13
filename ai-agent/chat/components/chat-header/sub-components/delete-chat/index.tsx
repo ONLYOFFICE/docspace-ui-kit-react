@@ -72,7 +72,6 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
       toastr.success(t("ChatSuccessDeleted"));
       onDeleteToggle();
     } catch (error) {
-      console.error(error);
       toastr.error(error as string);
     } finally {
       setIsLoading(false);
