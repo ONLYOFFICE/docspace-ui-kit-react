@@ -39,7 +39,8 @@ import ManageConnectionsReactSvg from "../../../../../assets/manage.connection.r
 
 import { ServerType } from "../../../../../enums";
 import { getOAuthToken } from "../../../../../utils/get-oauth-token";
-import { getCommonTranslation, isMobile } from "../../../../../utils";
+import { isMobile } from "../../../../../utils";
+import { useCommonTranslation } from "../../../../../utils/i18n";
 import { getServerIcon } from "../../../../../utils/ai/getServerIcon";
 import { useTheme } from "../../../../../context/ThemeContext";
 
@@ -81,6 +82,7 @@ const ToolsSettings = ({
   aiReady: boolean;
   goToWebSearchSettings?: () => void;
 }) => {
+  const t = useCommonTranslation();
   const { thinkingEnabled, setThinkingEnabled } = useMessageStore();
   const { agentId } = useChatStore();
   const { isBase } = useTheme();
@@ -155,7 +157,7 @@ const ToolsSettings = ({
 
     const newWindow = window.open(
       "",
-      getCommonTranslation("Authorization"),
+      t("Authorization"),
       "height=600, width=1020",
     );
 
@@ -192,11 +194,11 @@ const ToolsSettings = ({
               return newServers;
             });
           } catch (e) {
-            console.log(e);
+            console.error(e);
           }
         }
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.error(e));
   };
 
   const disconnectServerAction = async (serverId: string) => {
@@ -215,7 +217,7 @@ const ToolsSettings = ({
         return newServers;
       });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -276,9 +278,9 @@ const ToolsSettings = ({
         ];
 
         const portalServerName =
-          getCommonTranslation("OrganizationName") +
+          t("OrganizationName") +
           " " +
-          getCommonTranslation("ProductName");
+          t("ProductName");
 
         const name =
           server.serverType === ServerType.Portal
@@ -315,9 +317,9 @@ const ToolsSettings = ({
         getTooltipContent: () => (
           <>
             <Text>
-              {getCommonTranslation("ConnectWebSearch", {
-                webSearch: getCommonTranslation("WebSearchAI"),
-                productName: getCommonTranslation("ProductName"),
+              {t("ConnectWebSearch", {
+                webSearch: t("WebSearchAI"),
+                productName: t("ProductName"),
               })}
             </Text>
             {isAdmin && goToWebSearchSettings ? (
@@ -328,7 +330,7 @@ const ToolsSettings = ({
                 onClick={goToWebSearchSettings}
                 dataTestId="go-to-settings-link"
               >
-                {getCommonTranslation("GoToSettings")}
+                {t("GoToSettings")}
               </Link>
             ) : null}
           </>
@@ -338,7 +340,7 @@ const ToolsSettings = ({
         ? [
             {
               key: "extended-thinking",
-              label: getCommonTranslation("ExtendedThinking"),
+              label: t("ExtendedThinking"),
               withToggle: true,
               checked: thinkingEnabled,
               onClick: () => setThinkingEnabled(!thinkingEnabled),
@@ -356,7 +358,7 @@ const ToolsSettings = ({
         ? [
             {
               key: "manage-connections",
-              label: getCommonTranslation("ManageConnection"),
+              label: t("ManageConnection"),
               onClick: () => {
                 setShowManageConnections(true);
               },
@@ -364,8 +366,8 @@ const ToolsSettings = ({
               disabled: !showManageConnectionItem,
               getTooltipContent: () => (
                 <Text>
-                  {getCommonTranslation("ConnectMCPServers", {
-                    mcpServers: getCommonTranslation("MCPSettingTitle"),
+                  {t("ConnectMCPServers", {
+                    mcpServers: t("MCPSettingTitle"),
                   })}
                 </Text>
               ),
@@ -394,7 +396,7 @@ const ToolsSettings = ({
     <>
       <TooltipContainer
         as="div"
-        title={getCommonTranslation("AIToolsHint")}
+        title={t("AIToolsHint")}
         className={classNames(
           styles.chatInputButton,
           styles.chatInputToolsButton,
@@ -409,7 +411,7 @@ const ToolsSettings = ({
       >
         <IconButton iconNode={<McpToolReactSvg />} size={16} isFill={false} />
         <Text lineHeight="16px" fontSize="13px" fontWeight={600} noSelect>
-          {getCommonTranslation("Tools")}
+          {t("Tools")}
         </Text>
         <ContextMenu
           ref={contextMenuRef}
@@ -430,7 +432,7 @@ const ToolsSettings = ({
           element={
             <>
               <Aside
-                header={getCommonTranslation("ManageConnection")}
+                header={t("ManageConnection")}
                 onClose={() => setShowManageConnections(false)}
                 visible={showManageConnections}
               >
@@ -462,8 +464,8 @@ const ToolsSettings = ({
                         <Button
                           label={
                             server.connected
-                              ? getCommonTranslation("Disconnect")
-                              : getCommonTranslation("Connect")
+                              ? t("Disconnect")
+                              : t("Connect")
                           }
                           size={ButtonSize.small}
                           onClick={() => {

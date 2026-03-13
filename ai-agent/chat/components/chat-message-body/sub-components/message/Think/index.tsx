@@ -29,7 +29,8 @@ import cn from "classnames";
 import ToolFinishIcon from "../../../../../../../assets/tool.finish.svg";
 import TriangleDownIcon from "../../../../../../../assets/arrow.right.react.svg";
 
-import { getCommonTranslation, IconSizeType } from "../../../../../../../utils";
+import { IconSizeType } from "../../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../../utils/i18n";
 
 import { Loader, LoaderTypes } from "../../../../../../../components/loader";
 import { Text } from "../../../../../../../components/text";
@@ -45,6 +46,7 @@ const Think = ({
   isFirst?: boolean;
   isFinished?: boolean;
 }) => {
+  const t = useCommonTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const onToggle = () => {
@@ -75,7 +77,7 @@ const Think = ({
         )}
 
         <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
-          {getCommonTranslation("Thinking")}
+          {t("Thinking")}
         </Text>
 
         <TriangleDownIcon

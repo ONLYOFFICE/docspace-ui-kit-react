@@ -32,10 +32,10 @@ import AttachmentReactSvg from "../../../../../assets/attachment.react.svg";
 
 import { DeviceType, FolderType } from "../../../../../enums";
 import {
-  getCommonTranslation,
   isDesktop,
   isTablet,
 } from "../../../../../utils";
+import { useCommonTranslation } from "../../../../../utils/i18n";
 
 import type { TFile } from "../../../../../types";
 
@@ -56,6 +56,7 @@ const Attachment = ({
   getIcon,
   setSelectedFiles,
 }: AttachmentProps) => {
+  const t = useCommonTranslation();
   const [tempSelectedFiles, setTempSelectedFiles] = React.useState<
     Partial<TFile>[]
   >([]);
@@ -124,7 +125,7 @@ const Attachment = ({
       onSelectItem={onSelectItem}
       withHeader
       headerProps={{
-        headerLabel: getCommonTranslation("SelectFile"),
+        headerLabel: t("SelectFile"),
         isCloseable: true,
         onCloseClick: toggleAttachment,
       }}
@@ -135,8 +136,8 @@ const Attachment = ({
       withCreate={false}
       withFooterCheckbox={false}
       withFooterInput={false}
-      cancelButtonLabel={getCommonTranslation("CancelButton")}
-      submitButtonLabel={getCommonTranslation("AddButton")}
+      cancelButtonLabel={t("CancelButton")}
+      submitButtonLabel={t("AddButton")}
       disabledItems={[]}
       isRoomsOnly={false}
       isThirdParty={false}
@@ -163,12 +164,12 @@ const Attachment = ({
       withInfoBar={withInfo}
       maxSelectedItems={CHAT_MAX_FILE_COUNT}
       infoBarData={{
-        title: getCommonTranslation("SelectorFilesLimit", {
+        title: t("SelectorFilesLimit", {
           count: CHAT_MAX_FILE_COUNT,
         }),
         icon: <AttachmentReactSvg />,
         onClose: () => setWithInfo(!withInfo),
-        description: getCommonTranslation("SelectorFilesLimitDescription"),
+        description: t("SelectorFilesLimitDescription"),
       }}
       renderInPortal
     />

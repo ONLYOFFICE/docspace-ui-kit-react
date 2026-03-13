@@ -55,7 +55,7 @@ import Error from "./error";
 import Files from "./files";
 import Images from "./images";
 import Buttons from "./buttons";
-import { getCommonTranslation } from "../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../utils/i18n";
 import { useApi } from "../../../../../../providers";
 
 const renderLink = (
@@ -102,6 +102,7 @@ const Message = ({
   openFile,
   openLink,
 }: MessageProps) => {
+  const t = useCommonTranslation();
   const { currentChat } = useChatStore();
   const {
     generateDocxToolName,
@@ -199,7 +200,7 @@ const Message = ({
 
               copy(fullText);
             }}
-            title={getCommonTranslation("CopyMessage")}
+            title={t("CopyMessage")}
           >
             <CopyIcon />
           </div>

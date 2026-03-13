@@ -44,7 +44,7 @@ import FilesList from "./files-list";
 import Buttons from "./buttons";
 
 import styles from "./ChatInput.module.scss";
-import { getCommonTranslation } from "../../../../utils";
+import { useCommonTranslation } from "../../../../utils/i18n";
 
 const ChatInput = ({
   getIcon,
@@ -64,6 +64,7 @@ const ChatInput = ({
   onSendMessage,
   onStopStream,
 }: ChatInputProps) => {
+  const t = useCommonTranslation();
   const { startChat, sendMessage, currentChatId, isRequestRunning, agentId } =
     useMessageStore();
   const { fetchChat, currentChat } = useChatStore();
@@ -150,7 +151,7 @@ const ChatInput = ({
       setSelectedFiles([]);
       saveChangesToStorage("", []);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }, [
     currentChatId,
@@ -287,7 +288,7 @@ const ChatInput = ({
                 [styles.chatInputTextAreaWrapperFiles]:
                   selectedFiles.length > 0,
               })}
-              placeholder={getCommonTranslation("AIChatInput")}
+              placeholder={t("AIChatInput")}
               isChatMode
               fontSize={15}
               isDisabled={!aiReady}
@@ -334,7 +335,7 @@ const ChatInput = ({
           className={styles.chatInputText}
           noSelect
         >
-          {getCommonTranslation("AICanMakeMistakes")}
+          {t("AICanMakeMistakes")}
         </Text>
       ) : null}
     </>

@@ -43,9 +43,8 @@ vi.mock("../../../../../../../components/text", () => ({
 }));
 
 // Mock utils
-vi.mock("../../../../../../../utils", () => ({
-  getCommonTranslation: vi.fn((key) => key),
-  IconSizeType: { scale: "scale" },
+vi.mock("../../../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key) => key),
 }));
 
 describe("<Think />", () => {

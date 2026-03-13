@@ -32,28 +32,29 @@ import PublicRoomBar from "../../../../components/public-room-bar";
 
 import { ChatInfoBlockProps } from "../../Chat.types";
 import styles from "./ChatInfoBlock.module.scss";
-import { getCommonTranslation } from "../../../../utils";
+import { useCommonTranslation } from "../../../../utils/i18n";
 
 export const ChatInfoBlock = ({
   standalone,
   isPortalAdmin,
 }: ChatInfoBlockProps) => {
+  const t = useCommonTranslation();
   const bodyText = !isPortalAdmin
-    ? getCommonTranslation("AIDisabledInfoBlockUserDescription", {
-        productName: getCommonTranslation("ProductName"),
+    ? t("AIDisabledInfoBlockUserDescription", {
+        productName: t("ProductName"),
       })
     : standalone
-      ? getCommonTranslation("AIDisabledInfoBlockAdminStandaloneDescription", {
-          productName: getCommonTranslation("ProductName"),
+      ? t("AIDisabledInfoBlockAdminStandaloneDescription", {
+          productName: t("ProductName"),
         })
-      : getCommonTranslation("AIDisabledInfoBlockAdminSaasDescription", {
-          productName: getCommonTranslation("ProductName"),
+      : t("AIDisabledInfoBlockAdminSaasDescription", {
+          productName: t("ProductName"),
         });
 
   return (
     <PublicRoomBar
       className={styles.chatInfoBlock}
-      headerText={getCommonTranslation("AIFeaturesAreCurrentlyDisabled")}
+      headerText={t("AIFeaturesAreCurrentlyDisabled")}
       bodyText={bodyText}
       iconName={<InfoIcon />}
       dataTestId="chat-info-block"

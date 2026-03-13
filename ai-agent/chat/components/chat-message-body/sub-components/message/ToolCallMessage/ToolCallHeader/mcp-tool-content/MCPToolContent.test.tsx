@@ -65,8 +65,8 @@ vi.mock("../../../../../../../../../components/mcp-icon", () => ({
 }));
 
 // Mock utils
-vi.mock("../../../../../../../../../utils", () => ({
-  getCommonTranslation: vi.fn((key) => key),
+vi.mock("../../../../../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key) => key),
 }));
 vi.mock("../../../../../../../../../utils/ai/getServerIcon", () => ({
   getServerIcon: vi.fn(() => <div data-testid="server-icon" />),

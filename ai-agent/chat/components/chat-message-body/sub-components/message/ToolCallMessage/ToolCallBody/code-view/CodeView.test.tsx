@@ -47,7 +47,10 @@ vi.mock("../../../../../../../../../components/text", () => ({
 // Mock utils
 vi.mock("../../../../../../../utils", () => ({
   formatJsonWithMarkdown: vi.fn((json) => JSON.stringify(json)),
-  getCommonTranslation: vi.fn((key) => key),
+}));
+
+vi.mock("../../../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key) => key),
 }));
 
 describe("<CodeView />", () => {

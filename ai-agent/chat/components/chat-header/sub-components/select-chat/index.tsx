@@ -62,7 +62,7 @@ import DeleteChat from "../delete-chat";
 import { CHAT_LIST_MAX_HEIGHT, CHAT_LIST_WIDTH } from "../../constants";
 import { getSelectChatRowHeight } from "../../utils";
 import { ChatList } from "../chat-list";
-import { getCommonTranslation } from "../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../utils/i18n";
 import { useApi } from "../../../../../../providers";
 import { CommonTrans } from "../../../../../../utils/i18n/CommonTrans";
 
@@ -79,6 +79,8 @@ const SelectChat = ({
   const [isRenameOpen, setIsRenameOpen] = React.useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
   const [isExportOpen, setIsExportOpen] = React.useState(false);
+
+  const t = useCommonTranslation();
 
   const parentRef = React.useRef<HTMLDivElement>(null);
 
@@ -215,25 +217,25 @@ const SelectChat = ({
     return [
       {
         key: "rename",
-        label: getCommonTranslation("Rename"),
+        label: t("Rename"),
         iconNode: <RenameReactSvg />,
         onClick: onRenameToggle,
       },
       {
         key: "save_to_file",
-        label: getCommonTranslation("SaveToFile"),
+        label: t("SaveToFile"),
         iconNode: <SaveToFileIcon />,
         onClick: onSaveToFileAction,
       },
       { key: "separator", isSeparator: true },
       {
         key: "remove",
-        label: getCommonTranslation("Delete"),
+        label: t("Delete"),
         iconNode: <RemoveSvg />,
         onClick: onDelete,
       },
     ];
-  }, [onDelete, onRenameToggle, onSaveToFileAction]);
+  }, [onDelete, onRenameToggle, onSaveToFileAction, t]);
 
   const rowHeight = getSelectChatRowHeight();
 
@@ -277,7 +279,7 @@ const SelectChat = ({
     <>
       <TooltipContainer
         as="div"
-        title={getCommonTranslation("ChatHistory")}
+        title={t("ChatHistory")}
         className={classNames(styles.selectChat, { [styles.open]: isOpen })}
         onClick={toggleOpen}
         ref={parentRef}

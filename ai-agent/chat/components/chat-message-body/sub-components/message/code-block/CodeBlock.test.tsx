@@ -85,8 +85,8 @@ vi.mock("../../../../../../../components/scrollbar", () => ({
   ),
 }));
 
-vi.mock("../../../../../../../utils", () => ({
-  getCommonTranslation: vi.fn((key: string) => key),
+vi.mock("../../../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key: string) => key),
 }));
 
 describe("CodeBlock component", () => {

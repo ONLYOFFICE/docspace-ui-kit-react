@@ -28,9 +28,9 @@ import { RoomType } from "@onlyoffice/docspace-api-sdk";
 
 import FormRoomEmptyDarkImage from "../../../../assets/selector.form.room.empty.screen.dark.react.svg";
 import FormRoomEmptyLightImage from "../../../../assets/selector.form.room.empty.screen.light.react.svg";
-import Plus16ReactSvg from "../../../../assets/icons/16/plus.react.svg";
+import Plus16ReactSvg from "../../../../assets/icons/16/plus.svg";
 
-import { getCommonTranslation } from "../../../../utils";
+import { useCommonTranslation } from "../../../../utils/i18n";
 import { useTheme } from "../../../../context/ThemeContext";
 
 import { Text } from "../../../text";
@@ -44,6 +44,7 @@ const EmptyScreenFormRoom = ({
   onCreateClickAction,
   createDefineRoomType,
 }: EmptyScreenFormRoomProps) => {
+  const t = useCommonTranslation();
   const { isBase } = useTheme();
 
   const FormRoomEmptyScreenImage = isBase
@@ -52,20 +53,19 @@ const EmptyScreenFormRoom = ({
 
   const description =
     createDefineRoomType === RoomType.FillingFormsRoom
-      ? getCommonTranslation("SelectorFormRoomEmptyScreenDescription") || "" // t("SelectorFormRoomEmptyScreenDescription")
-      : getCommonTranslation("SelectorVDREmptyScreenDescription") || ""; // t("SelectorVDREmptyScreenDescription")
+      ? t("SelectorFormRoomEmptyScreenDescription") || ""
+      : t("SelectorVDREmptyScreenDescription") || "";
 
   const buttonLabel =
     createDefineRoomType === RoomType.FillingFormsRoom
-      ? getCommonTranslation("CreateFormFillingRoom") || ""
-      : getCommonTranslation("CreateVirtualDataRoom") || "";
+      ? t("CreateFormFillingRoom") || ""
+      : t("CreateVirtualDataRoom") || "";
 
   return (
     <section className={styles.newEmptyScreen}>
       <FormRoomEmptyScreenImage className="empty-image" />
       <Heading level={3} className="empty-header">
-        {/* t("NoRoomsFound") */}
-        {getCommonTranslation("NoRoomsFound") || ""}
+        {t("NoRoomsFound") || ""}
       </Heading>
       <Text className="empty-description">{description}</Text>
       <div className="empty_button-wrapper" onClick={onCreateClickAction}>

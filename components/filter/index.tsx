@@ -51,7 +51,7 @@ import FilterButton from "./sub-components/FilterButton";
 import SortButton from "./sub-components/SortButton";
 import { isDesktop, isMobile } from "../../utils";
 import useSearch from "./hooks/useSearch";
-import { getCommonTranslation } from "../../utils";
+import { useCommonTranslation } from "../../utils/i18n";
 import styles from "./Filter.module.scss";
 import { FilterProps, TItem, TRoomGroup } from "./Filter.types";
 import {
@@ -135,6 +135,8 @@ const FilterInput = React.memo(
     organizeRoomsGrouping,
     isFilterOrSearchActive,
   }: FilterProps) => {
+    const t = useCommonTranslation();
+
     const { searchComponent } = useSearch({
       onSearch,
       onClearFilter,
@@ -362,7 +364,7 @@ const FilterInput = React.memo(
 
       const MANAGEMENT_BTN_W = 40;
       const ROW_GAP = 16;
-      const TAG_GAP = 4;
+      const TAG_GAP = 8;
 
       const allRoomsW = getElementFullWidth(allRoomsMeasureRef.current);
       const ellipsisW = getElementFullWidth(ellipsisMeasureRef.current);
@@ -456,12 +458,8 @@ const FilterInput = React.memo(
           visible.unshift(groupToMove.id); // Use the actual group ID to maintain type consistency
 
           // Recalculate overflow to make room for the group at position 0
-          while (visible.length > 1 && getVisibleWidth() > availableW) {
+          while (visible.length > 0 && getVisibleWidth() > availableW) {
             const removedId = visible.pop()!;
-            if (String(removedId) === String(groupToKeepVisible)) {
-              visible.push(removedId);
-              break;
-            }
             const removedGroup = roomGroupsWithIcons.find(
               (g) => g.id === removedId,
             );
@@ -575,10 +573,10 @@ const FilterInput = React.memo(
 
     const overflowContextMenuHeader = React.useMemo(
       () => ({
-        title: getCommonTranslation("RoomGroups"),
+        title: t("RoomGroups"),
         icon: "",
       }),
-      [getCommonTranslation],
+      [t],
     );
 
     const onOverflowContextMenu = React.useCallback((e: React.MouseEvent) => {
@@ -694,7 +692,7 @@ const FilterInput = React.memo(
                 onClick={clearAll}
                 dataTestId="filter_clear_all_link"
               >
-                {getCommonTranslation("ClearAll")}
+                {t("ClearAll")}
               </Link>
             ) : null}
           </div>
@@ -709,7 +707,7 @@ const FilterInput = React.memo(
                 <div className="group-tags">
                   <SelectedItem
                     propKey="all-rooms"
-                    label={getCommonTranslation("AllRooms")}
+                    label={t("AllRooms")}
                     onClick={() => handleFilterByGroup(null)}
                     onClose={() => {}}
                     hideCross
@@ -719,7 +717,7 @@ const FilterInput = React.memo(
                   {showCreateGroupButton && (
                     <SelectedItem
                       propKey="create-group"
-                      label={getCommonTranslation("CreateGroup")}
+                      label={t("CreateGroup")}
                       icon={PlusIcon}
                       onClick={handleCreateGroupClick}
                       onClose={() => {}}
@@ -807,7 +805,7 @@ const FilterInput = React.memo(
               <div className={styles.groupTagsMeasure} aria-hidden>
                 <SelectedItem
                   propKey="m-all"
-                  label={getCommonTranslation("AllRooms")}
+                  label={t("AllRooms")}
                   onClick={() => {}}
                   onClose={() => {}}
                   hideCross
@@ -839,7 +837,7 @@ const FilterInput = React.memo(
                 <TooltipContainer
                   as="div"
                   className={styles.groupManagementButton}
-                  title={getCommonTranslation("ManageGroupRooms")}
+                  title={t("ManageGroupRooms")}
                   onClick={onCreateGroup}
                 >
                   <IconButton

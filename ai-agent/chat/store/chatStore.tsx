@@ -141,24 +141,13 @@ export default class ChatStore {
   };
 
   renameChat = async (id: string, title: string) => {
-    try {
-      await this.aiApi.renameChat(id, title);
-    } catch (error) {
-      console.error(error);
-      toastr.error(error as string);
-    }
+    await this.aiApi.renameChat(id, title);
 
     this.chats = this.chats.map((c) => (c.id === id ? { ...c, title } : c));
   };
 
   deleteChat = async (id: string) => {
-    try {
-      await this.aiApi.deleteChat(id);
-    } catch (error) {
-      console.error(error);
-      toastr.error(error as string);
-      throw error;
-    }
+    await this.aiApi.deleteChat(id);
 
     if (this.currentChat?.id === id) {
       this.setCurrentChat(null);

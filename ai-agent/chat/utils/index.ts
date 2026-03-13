@@ -28,7 +28,6 @@ import { LANGUAGE } from "../../../constants";
 import { getCookie } from "../../../utils/cookie";
 import { getCorrectDate } from "../../../utils/date";
 import { combineUrl } from "../../../utils/combineUrl";
-import { getCommonTranslation } from "../../../utils";
 
 const fileRegex = /@\d+/g;
 
@@ -97,11 +96,8 @@ export const getSessionId = (folderId: string | number, userId: string) => {
   return `folder-${folderId}-${userId}-${new Date().getTime()}`;
 };
 
-export const getChateTranslationDate = (value: string) => {
-  const key =
-    value === "today" ? "Today" : value === "yesterday" ? "Yesterday" : "";
-
-  return getCommonTranslation(key);
+export const getChatTranslationDateKey = (value: string) => {
+  return value === "today" ? "Today" : value === "yesterday" ? "Yesterday" : "";
 };
 
 /**

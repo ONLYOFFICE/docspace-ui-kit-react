@@ -32,7 +32,7 @@ import ChatNoAccessRightsLightIcon from "../../../../assets/emptyview/empty.chat
 import { EmptyView } from "../../../../components/empty-view";
 import { useTheme } from "../../../../context/ThemeContext";
 import { match, P } from "ts-pattern";
-import { getCommonTranslation } from "../../../../utils";
+import { useCommonTranslation } from "../../../../utils/i18n";
 
 type Props = {
   aiReady: boolean;
@@ -48,6 +48,7 @@ export const ChatNoAccessScreen = ({
   goToAISettings,
 }: Props) => {
   const { isBase } = useTheme();
+  const t = useCommonTranslation();
 
   const icon = isBase ? (
     <ChatNoAccessRightsLightIcon />
@@ -57,46 +58,46 @@ export const ChatNoAccessScreen = ({
 
   const title =
     isPortalAdmin && standalone
-      ? getCommonTranslation("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
-          aiProvider: getCommonTranslation("AIProvider"),
+      ? t("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
+          aiProvider: t("AIProvider"),
         })
-      : getCommonTranslation("AIFeaturesAreCurrentlyDisabled");
+      : t("AIFeaturesAreCurrentlyDisabled");
 
   const description = match([standalone, isPortalAdmin])
     // standalone admin
     .with([true, true], () =>
-      getCommonTranslation(
+      t(
         "EmptyAIAgentsAIDisabledStandaloneAdminDescription",
         {
-          productName: getCommonTranslation("ProductName"),
-          aiChats: getCommonTranslation("AIChats"),
+          productName: t("ProductName"),
+          aiChats: t("AIChats"),
         },
       ),
     )
     // saas admin
     .with([false, true], () =>
-      getCommonTranslation("EmptyChatAIDisabledSaasAdminDescription", {
-        productName: getCommonTranslation("ProductName"),
+      t("EmptyChatAIDisabledSaasAdminDescription", {
+        productName: t("ProductName"),
       }),
     )
     // standalone/saas user
     .with([P._, false], () =>
-      getCommonTranslation("EmptyChatAIDisabledUserDescription", {
-        productName: getCommonTranslation("ProductName"),
+      t("EmptyChatAIDisabledUserDescription", {
+        productName: t("ProductName"),
       }),
     )
     .otherwise(() => "");
 
   const goToServices = {
     type: "button",
-    title: getCommonTranslation("GoToSettings"),
+    title: t("GoToSettings"),
     key: "go-to-services",
     onClick: goToAISettings,
   } as const;
 
   const goToAIProviderSettings = {
     type: "button",
-    title: getCommonTranslation("GoToSettings"),
+    title: t("GoToSettings"),
     key: "go-to-ai-provider-settings",
     onClick: goToAISettings,
   } as const;

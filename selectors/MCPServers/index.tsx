@@ -26,11 +26,11 @@
 
 import React from "react";
 
-import EmptyScreenRoomSelectorLight from "../../assets/empty.room.selector.light.react.svg";
-import EmptyScreenRoomSelectorDark from "../../assets/empty.room.selector.dark.react.svg";
+import EmptyScreenRoomSelectorLight from "../../assets/emptyview/empty.room.selector.light.svg";
+import EmptyScreenRoomSelectorDark from "../../assets/emptyview/empty.room.selector.dark.svg";
 import faviconUrl from "../../assets/favicon.ico";
 
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 import {
   Selector,
   RowLoader,
@@ -91,6 +91,7 @@ const MCPServersSelector = ({
   withoutBackground,
   withBlur,
 }: MCPServersSelectorProps) => {
+  const t = useCommonTranslation();
   const { apiClient } = useApi();
   const { isBase } = useTheme();
 
@@ -111,7 +112,7 @@ const MCPServersSelector = ({
     (server: TServer): TSelectorItem => {
       const name =
         server.serverType === ServerType.Portal
-          ? `${getCommonTranslation("OrganizationName")} ${getCommonTranslation("ProductName")}`
+          ? `${t("OrganizationName")} ${t("ProductName")}`
           : server.name;
 
       return {
@@ -126,7 +127,7 @@ const MCPServersSelector = ({
         isDisabled: server.needReset,
       };
     },
-    [isBase, initedSelectedServers],
+    [isBase, initedSelectedServers, t],
   );
 
   const fetchServers = React.useCallback(async () => {
@@ -223,13 +224,13 @@ const MCPServersSelector = ({
           <EmptyScreenRoomSelectorDark />
         )
       }
-      emptyScreenHeader={getCommonTranslation("NoMCPServers", {
-        mcpServers: getCommonTranslation("MCPSettingTitle"),
+      emptyScreenHeader={t("NoMCPServers", {
+        mcpServers: t("MCPSettingTitle"),
       })}
-      emptyScreenDescription={getCommonTranslation("NoMCPServersDescription", {
-        mcpServers: getCommonTranslation("MCPSettingTitle"),
-        productName: getCommonTranslation("ProductName"),
-        aiAgent: getCommonTranslation("AIAgent"),
+      emptyScreenDescription={t("NoMCPServersDescription", {
+        mcpServers: t("MCPSettingTitle"),
+        productName: t("ProductName"),
+        aiAgent: t("AIAgent"),
       })}
       searchEmptyScreenImage={
         isBase ? (
@@ -238,11 +239,9 @@ const MCPServersSelector = ({
           <EmptyScreenRoomSelectorDark />
         )
       }
-      searchEmptyScreenHeader={getCommonTranslation("NotFoundTitle")}
-      searchEmptyScreenDescription={getCommonTranslation(
-        "SearchEmptyRoomsDescription",
-      )}
-      submitButtonLabel={getCommonTranslation("AddButton")}
+      searchEmptyScreenHeader={t("NotFoundTitle")}
+      searchEmptyScreenDescription={t("SearchEmptyRoomsDescription")}
+      submitButtonLabel={t("AddButton")}
       disableSubmitButton={false}
       onSubmit={onSubmitAction}
       rowLoader={<RowLoader />}
@@ -256,8 +255,8 @@ const MCPServersSelector = ({
       onSelect={onSelect}
       withHeader
       headerProps={{
-        headerLabel: getCommonTranslation("AvailableMCPServers", {
-          mcpServers: getCommonTranslation("MCPSettingTitle"),
+        headerLabel: t("AvailableMCPServers", {
+          mcpServers: t("MCPSettingTitle"),
         }),
         withoutBackButton: false,
         onBackClick: onBackClick,
@@ -265,7 +264,7 @@ const MCPServersSelector = ({
         withoutBorder: false,
       }}
       withCancelButton
-      cancelButtonLabel={getCommonTranslation("CancelButton")}
+      cancelButtonLabel={t("CancelButton")}
       onCancel={onBackClick}
       selectedItems={initedSelectedServersItems}
     />

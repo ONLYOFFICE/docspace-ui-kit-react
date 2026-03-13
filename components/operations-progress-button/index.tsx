@@ -34,16 +34,13 @@ import React, {
 import classNames from "classnames";
 
 import { isMobile } from "react-device-detect";
-import {
-  FloatingButton,
-  FloatingButtonIcons,
-} from "../floating-button";
+import { FloatingButton, FloatingButtonIcons } from "../floating-button";
 import { DropDown } from "../drop-down";
 import { OPERATIONS_NAME } from "../../constants/index";
 import { HelpButton } from "../help-button";
 import { Backdrop } from "../backdrop";
 import { Text } from "../text";
-import { getCommonTranslation } from "../../utils";
+import { useCommonTranslation } from "../../utils";
 
 import PreviewButton from "./PreviewButton";
 import ProgressList from "./ProgressList";
@@ -89,6 +86,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   isDragging,
   clearDropPreviewLocation,
 }) => {
+  const t = useCommonTranslation();
   const [isOpenDropdown, setIsOpenDropdown] = useState<boolean>(false);
   const [isHideTooltip, setIsHideTooltip] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -293,8 +291,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
     if (isSeveralOperations) {
       return (
         <Text fontWeight={600}>
-          {/* t("Common:Processes", { count: allOperationsLength }) */}
-          {getCommonTranslation("Processes", { count: allOperationsLength })}
+          {t("Processes", { count: allOperationsLength })}
         </Text>
       );
     }
@@ -317,16 +314,16 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
           <Text fontWeight={600}>
             {operationName}
             <br />
-            {/* t("Common:ErrorUploadingFiles", { count: getErrorCount() }) */}
-            {getCommonTranslation("ErrorUploadingFiles", { count: getErrorCount()! })}
+            {t("ErrorUploadingFiles", {
+              count: getErrorCount()!,
+            })}
           </Text>
         );
       }
 
       return (
         <Text fontWeight={600}>
-          {/* t("Common:ErrorOperation", { operationName }) */}
-          {getCommonTranslation("ErrorOperation", {
+          {t("ErrorOperation", {
             operationName,
           })}
         </Text>
@@ -340,8 +337,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
 
       return (
         <Text fontWeight={600}>
-          {/* t("Common:SuccessOperation", { operationName }) */}
-          {getCommonTranslation("SuccessOperation", {
+          {t("SuccessOperation", {
             operationName,
           })}
         </Text>
@@ -368,7 +364,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   };
 
   const onCancelOperation = () => {
-    cancelUpload?.(getCommonTranslation);
+    cancelUpload?.(t);
   };
 
   const disableOpenPanel =

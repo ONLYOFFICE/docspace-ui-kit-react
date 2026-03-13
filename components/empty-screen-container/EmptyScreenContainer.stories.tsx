@@ -28,7 +28,7 @@ import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
-import EmptyImageReactSvg from "../../assets/empty.rooms.root.light.svg?url";
+import EmptyImageReactSvg from "../../assets/emptyview/empty.rooms.root.light.svg?url";
 
 import { IconSizeType } from "../../utils";
 import { Link, LinkType } from "../link";

@@ -26,7 +26,7 @@ import React from "react";
 
 import { DeviceType, FolderType } from "../../../../enums";
 import { isDesktop, isTablet } from "../../../../utils";
-import { getCommonTranslation } from "../../../../utils";
+import { useCommonTranslation } from "../../../../utils/i18n";
 
 import { FOLDER_FORM_VALIDATION } from "../../../../constants";
 import { TGetIcon } from "../../../../types";
@@ -57,6 +57,7 @@ const ExportSelector = ({
   currentFolderId,
   getFileName,
 }: ExportSelectorProps) => {
+  const t = useCommonTranslation();
   return (
     <FilesSelector
       isPanelVisible={showFolderSelector}
@@ -85,7 +86,7 @@ const ExportSelector = ({
       onSubmit={onSubmit}
       withHeader
       headerProps={{
-        headerLabel: getCommonTranslation("SaveButton"),
+        headerLabel: t("SaveButton"),
         isCloseable: true,
         onCloseClick: onCloseFolderSelector,
       }}
@@ -96,15 +97,15 @@ const ExportSelector = ({
       withCreate={false}
       withFooterCheckbox
       withFooterInput
-      cancelButtonLabel={getCommonTranslation("CancelButton")}
-      submitButtonLabel={getCommonTranslation("SaveButton")}
+      cancelButtonLabel={t("CancelButton")}
+      submitButtonLabel={t("SaveButton")}
       disabledItems={[]}
       isRoomsOnly={false}
       isThirdParty={false}
       currentFolderId={currentFolderId}
       rootFolderType={FolderType.Rooms}
-      footerCheckboxLabel={getCommonTranslation("OpenSavedDocument")}
-      footerInputHeader={getCommonTranslation("FileName")}
+      footerCheckboxLabel={t("OpenSavedDocument")}
+      footerInputHeader={t("FileName")}
       currentFooterInputValue={getFileName()}
       descriptionText=""
       getFilesArchiveError={() => ""}

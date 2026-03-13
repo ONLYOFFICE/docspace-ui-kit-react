@@ -42,7 +42,7 @@ import Message from "./sub-components/message";
 
 import { useChatScroll } from "./hooks/useChatScroll";
 import styles from "./ChatMessageBody.module.scss";
-import { getCommonTranslation } from "../../../../utils";
+import { useCommonTranslation } from "../../../../utils/i18n";
 
 const ChatMessageBody = observer(({
   userAvatar,
@@ -62,6 +62,7 @@ const ChatMessageBody = observer(({
     addMessageId,
   } = useMessageStore();
   const { currentChat } = useChatStore();
+  const t = useCommonTranslation();
 
   const chatBodyRef = useRef<HTMLDivElement>(null);
 
@@ -132,7 +133,7 @@ const ChatMessageBody = observer(({
               data-testid="chat-loader-container"
             >
               <Loader type={LoaderTypes.track} />
-              {getCommonTranslation("Analyzing")}
+              {t("Analyzing")}
             </div>
           ) : null}
         </div>

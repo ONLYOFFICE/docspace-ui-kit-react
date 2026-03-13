@@ -82,8 +82,8 @@ vi.mock("../../../../../assets/attachment.react.svg", () => ({
 }));
 
 // Mock utils
-vi.mock("../../../../../utils", () => ({
-  getCommonTranslation: vi.fn((key) => key),
+vi.mock("../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key) => key),
 }));
 
 describe("<Buttons />", () => {

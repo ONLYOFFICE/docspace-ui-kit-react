@@ -40,7 +40,7 @@ import { useMessageStore } from "../../../../../../../store/messageStore";
 import styles from "../../../../../ChatMessageBody.module.scss";
 import { Text } from "../../../../../../../../../components/text";
 import { Link, LinkTarget } from "../../../../../../../../../components/link";
-import { getCommonTranslation } from "../../../../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../../../../utils/i18n";
 
 const WebCrawlingToolContent = ({
   content,
@@ -49,6 +49,7 @@ const WebCrawlingToolContent = ({
   content: TToolCallContent;
   openLink?: (url: string) => void;
 }) => {
+  const t = useCommonTranslation();
   const toolInfo = ((content.result?.data as TToolCallResultSourceData)
     ?.title || content.arguments.url) as string;
 
@@ -68,7 +69,7 @@ const WebCrawlingToolContent = ({
         data-testid="universe-icon"
       />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
-        {getCommonTranslation("WebCrawling")} |{" "}
+        {t("WebCrawling")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
       </Text>
     </>
@@ -85,7 +86,7 @@ const WebCrawlingToolContent = ({
         data-testid="universe-icon"
       />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
-        {getCommonTranslation("WebCrawling")} |{" "}
+        {t("WebCrawling")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
       </Text>
       <ExternalLinkIcon
@@ -97,6 +98,7 @@ const WebCrawlingToolContent = ({
 };
 
 const WebSearchToolContent = ({ content }: { content: TToolCallContent }) => {
+  const t = useCommonTranslation();
   const toolInfo = content.arguments.query as string;
 
   return (
@@ -106,7 +108,7 @@ const WebSearchToolContent = ({ content }: { content: TToolCallContent }) => {
         data-testid="universe-icon"
       />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
-        {getCommonTranslation("WebSearch")} |{" "}
+        {t("WebSearch")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
       </Text>
     </>
@@ -118,6 +120,7 @@ const KnowledgeSearchToolContent = ({
 }: {
   content: TToolCallContent;
 }) => {
+  const t = useCommonTranslation();
   const toolInfo = content.arguments.query as string;
 
   return (
@@ -127,7 +130,7 @@ const KnowledgeSearchToolContent = ({
         data-testid="documents-icon"
       />
       <Text fontSize="13px" lineHeight="20px" fontWeight={600} truncate>
-        {getCommonTranslation("KnowledgeSearch")} |{" "}
+        {t("KnowledgeSearch")} |{" "}
         <span title={toolInfo}>{toolInfo}</span>
       </Text>
     </>

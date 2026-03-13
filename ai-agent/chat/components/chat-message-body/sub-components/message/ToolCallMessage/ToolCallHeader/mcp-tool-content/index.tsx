@@ -42,7 +42,7 @@ import {
   MCPIcon,
   MCPIconSize,
 } from "../../../../../../../../../components/mcp-icon";
-import { getCommonTranslation } from "../../../../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../../../../utils/i18n";
 
 import { useMessageStore } from "../../../../../../../store/messageStore";
 import { useApi } from "../../../../../../../../../providers";
@@ -56,6 +56,7 @@ export const MCPToolContent = observer(
     } = useMessageStore();
     const { isBase } = useTheme();
     const { baseUrl } = useApi();
+    const t = useCommonTranslation();
 
     const isGenerateDocx = generateDocxToolName === content.name;
     const isGenerateForm = generateFormToolName === content.name;
@@ -75,7 +76,7 @@ export const MCPToolContent = observer(
     return (
       <>
         <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
-          {getCommonTranslation("ToolCallExecuted")}:
+          {t("ToolCallExecuted")}:
         </Text>
         {icon ?? (
           <MCPIcon

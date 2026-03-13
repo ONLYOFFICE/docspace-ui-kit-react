@@ -42,7 +42,7 @@ import { ButtonsProps } from "../../../Chat.types";
 
 import styles from "../ChatInput.module.scss";
 import ToolsSettings from "../tools-settings";
-import { getCommonTranslation } from "../../../../../utils";
+import { useCommonTranslation } from "../../../../../utils/i18n";
 
 const Buttons = ({
   isFilesSelectorVisible,
@@ -59,6 +59,7 @@ const Buttons = ({
   onStopStream,
 }: ButtonsProps) => {
   const { isRequestRunning, stopMessage } = useMessageStore();
+  const t = useCommonTranslation();
 
   const isSendButtonDisabled = !isRequestRunning
     ? !value.trim() || !selectedModel
@@ -93,7 +94,7 @@ const Buttons = ({
         {allowAttachFiles && (
           <TooltipContainer
             as="div"
-            title={getCommonTranslation("AddFiles")}
+            title={t("AddFiles")}
             className={classNames(styles.chatInputButton, {
               [styles.activeChatInputButton]: isFilesSelectorVisible,
               [styles.disabled]: !aiReady,

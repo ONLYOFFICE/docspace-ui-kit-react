@@ -43,7 +43,78 @@ import type { TSelectedFileInfo } from "../selectors/Files/FilesSelector.types";
 
 import { dataSets, getIsDisabled } from "./DocumentEditor.story.helper";
 
-type StoryArgs = DocumentEditorProps;
+type FileSelectorWrapperProps = {
+  children: (fileId: number) => React.ReactNode;
+  filterParam?: string | number;
+};
+
+const FileSelectorWrapper = ({
+  children,
+  filterParam = FilterType.FilesOnly,
+}: FileSelectorWrapperProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [fileId, setFileId] = useState<number | null>(null);
+
+  const onSubmit = (
+    _selectedItemId: string | number | undefined,
+    _folderTitle: string,
+    _isPublic: boolean,
+    _breadCrumbs: unknown,
+    _fileName: string,
+    _isChecked: boolean,
+    _selectedTreeNode: unknown,
+    selectedFileInfo: TSelectedFileInfo,
+  ) => {
+    if (selectedFileInfo?.id !== undefined) {
+      setFileId(Number(selectedFileInfo.id));
+    }
+  };
+
+  if (!fileId)
+    return (
+      <>
+        <FileInput
+          fromStorage
+          placeholder="Choose file"
+          size={InputSize.base}
+          onClick={() => setIsOpen(true)}
+        />
+        {/* @ts-expect-error need pass all props */}
+        <FilesSelector
+          key="select-file-dialog"
+          isPanelVisible={isOpen}
+          onCancel={() => setIsOpen(false)}
+          onSubmit={onSubmit}
+          submitButtonLabel="Select"
+          isMultiSelect={false}
+          withRecentTreeFolder
+          withFavoritesTreeFolder
+          withAIAgentsTreeFolder
+          openRoot
+          withBreadCrumbs
+          withSearch
+          getIsDisabled={getIsDisabled}
+          filterParam={filterParam}
+        />
+      </>
+    );
+
+  return (
+    <>
+      {children(fileId)}
+      <Button
+        label="Change file"
+        size={ButtonSize.small}
+        onClick={() => setFileId(null)}
+        style={{ marginTop: "8px" }}
+      />
+    </>
+  );
+};
+
+type StoryArgs = DocumentEditorProps & {
+  filterParam?: string | number;
+};
 
 type StoryWrapperProps = {
   Story: React.ComponentType<{ args: StoryArgs }>;
@@ -70,12 +141,14 @@ const StoryWrapper = ({
     };
   }, [storyKey]);
 
+  const { filterParam, ...editorArgs } = context.args;
+
   return (
     <div key={storyKey} ref={containerRef}>
       <Story
         key={storyKey}
         args={{
-          ...context.args,
+          ...editorArgs,
           onLoadComponentError,
         }}
       />
@@ -115,12 +188,16 @@ const meta: Meta<StoryArgs> = {
       const storyKey = `${context.args.fileId}-${context.args.id}`;
 
       return (
-        <StoryWrapper
-          Story={Story}
-          context={context}
-          onLoadComponentError={onLoadComponentError}
-          storyKey={storyKey}
-        />
+        <FileSelectorWrapper filterParam={context.args.filterParam}>
+          {(fileId) => (
+            <StoryWrapper
+              Story={Story}
+              context={{ ...context, args: { ...context.args, fileId } }}
+              onLoadComponentError={onLoadComponentError}
+              storyKey={storyKey}
+            />
+          )}
+        </FileSelectorWrapper>
       );
     },
   ],
@@ -162,7 +239,6 @@ export const Default: Story = {
   render: (args: StoryArgs) => <DocumentEditor {...args} />,
   args: {
     id: "editor",
-    fileId: 1,
     width: "100%",
     height: "600px",
   },
@@ -172,7 +248,6 @@ export const ViewMode: Story = {
   render: (args: StoryArgs) => <DocumentEditor {...args} />,
   args: {
     id: "viewer",
-    fileId: 4,
     width: "100%",
     height: "600px",
     isView: true,
@@ -192,7 +267,6 @@ export const WithCustomEvent: Story = {
   },
   args: {
     id: "custom-event",
-    fileId: 3,
     width: "100%",
     height: "600px",
     isView: true,
@@ -201,57 +275,11 @@ export const WithCustomEvent: Story = {
 
 export const FillSpreadsheetWithData: Story = {
   render: (args: StoryArgs) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [fileId, setFileId] = useState<number | null>(null);
     const [isReady, setIsReady] = useState(false);
     const [selectedDataSet, setSelectedDataSet] = useState<TOption>({
       key: dataSets[0].key,
       label: dataSets[0].label,
     });
-
-    const onSubmit = (
-      _selectedItemId: string | number | undefined,
-      _folderTitle: string,
-      _isPublic: boolean,
-      _breadCrumbs: unknown,
-      _fileName: string,
-      _isChecked: boolean,
-      _selectedTreeNode: unknown,
-      selectedFileInfo: TSelectedFileInfo,
-    ) => {
-      if (selectedFileInfo?.id !== undefined) {
-        setFileId(Number(selectedFileInfo.id));
-      }
-    };
-
-    if (!fileId)
-      return (
-        <>
-          <FileInput
-            fromStorage
-            placeholder="Choose file"
-            size={InputSize.base}
-            onClick={() => setIsOpen(true)}
-          />
-          {/* @ts-expect-error need pass all props */}
-          <FilesSelector
-            key="select-file-dialog"
-            isPanelVisible={isOpen}
-            onCancel={() => setIsOpen(false)}
-            onSubmit={onSubmit}
-            submitButtonLabel="Select"
-            isMultiSelect={false}
-            withRecentTreeFolder
-            withFavoritesTreeFolder
-            withAIAgentsTreeFolder
-            openRoot
-            withBreadCrumbs
-            withSearch
-            getIsDisabled={getIsDisabled}
-            filterParam={FilterType.SpreadsheetsOnly}
-          />
-        </>
-      );
 
     const onDocumentReady = () => {
       setIsReady(true);
@@ -340,17 +368,8 @@ export const FillSpreadsheetWithData: Story = {
             size={ButtonSize.small}
             primary
           />
-          <Button
-            label="Reset file"
-            size={ButtonSize.small}
-            onClick={() => setFileId(null)}
-          />
         </div>
-        <DocumentEditor
-          fileId={fileId}
-          events_onDocumentReady={onDocumentReady}
-          {...args}
-        />
+        <DocumentEditor events_onDocumentReady={onDocumentReady} {...args} />
       </div>
     );
   },
@@ -358,5 +377,6 @@ export const FillSpreadsheetWithData: Story = {
     id: "fill-spreadsheet",
     width: "100%",
     height: "600px",
+    filterParam: FilterType.SpreadsheetsOnly,
   },
 };

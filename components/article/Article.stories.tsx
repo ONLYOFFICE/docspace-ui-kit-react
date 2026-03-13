@@ -29,8 +29,12 @@ import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import LightSmallLogoUrl from "../../assets/lightsmall.svg?url";
-import { DeviceType, EmployeeActivationStatus, EmployeeStatus } from "../../enums";
+import LightSmallLogoUrl from "../../assets/logo/lightsmall.svg?url";
+import {
+  DeviceType,
+  EmployeeActivationStatus,
+  EmployeeStatus,
+} from "../../enums";
 import type { ContextMenuModel } from "../context-menu";
 
 import Article from ".";
