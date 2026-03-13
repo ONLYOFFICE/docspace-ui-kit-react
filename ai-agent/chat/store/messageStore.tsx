@@ -99,8 +99,8 @@ export default class MessageStore {
     makeAutoObservable(this);
 
     reaction(
-      () => [this.agentId, this.currentChatId, this.thinkingSupported],
-      () => this.syncThinkingEnabled(),
+      () => [this.agentId, this.thinkingSupported],
+      () => this.loadThinkingEnabled(),
     );
   }
 
@@ -189,24 +189,24 @@ export default class MessageStore {
     this.isStreamRunning = isStreamRunning;
   };
 
+  get reasoningEffort() {
+    return this.thinkingEnabled && this.thinkingSupported
+      ? ChatReasoningEffort.Medium
+      : ChatReasoningEffort.None;
+  }
+
   setThinkingSupported = (supported: boolean) => {
     this.thinkingSupported = supported;
   };
 
-  syncThinkingEnabled = () => {
-    if (!this.thinkingSupported) {
-      this.thinkingEnabled = false;
-      return;
-    }
-    this.thinkingEnabled = getReasoningStateFromLocalStorage(
-      this.agentId,
-      this.currentChatId,
-    );
+  loadThinkingEnabled = () => {
+    const fromStorage = getReasoningStateFromLocalStorage(this.agentId);
+    this.thinkingEnabled = this.thinkingSupported && fromStorage;
   };
 
   setThinkingEnabled = (enabled: boolean) => {
     this.thinkingEnabled = enabled;
-    setReasoningStateToLocalStorage(this.agentId, this.currentChatId, enabled);
+    setReasoningStateToLocalStorage(this.agentId, enabled);
   };
 
   startNewChat = async () => {
@@ -393,9 +393,6 @@ export default class MessageStore {
     const { chatId, error } = parsed;
 
     if (chatId) {
-      if (!this.currentChatId && this.thinkingEnabled) {
-        setReasoningStateToLocalStorage(this.agentId, chatId, true);
-      }
       this.setCurrentChatId(chatId);
     }
 
@@ -772,16 +769,12 @@ export default class MessageStore {
 
       this.abortController = new AbortController();
 
-      const reasoningEffort = this.thinkingEnabled
-        ? ChatReasoningEffort.Medium
-        : ChatReasoningEffort.None;
-
       const stream = await this.aiApi.startNewChat(
         this.agentId,
         message,
         files.map((f) => (f.id ? f.id.toString() : "")),
         this.abortController,
-        reasoningEffort,
+        this.reasoningEffort,
       );
 
       await this.startStream(stream);
@@ -800,16 +793,12 @@ export default class MessageStore {
 
       this.abortController = new AbortController();
 
-      const reasoningEffort = this.thinkingEnabled
-        ? ChatReasoningEffort.Medium
-        : ChatReasoningEffort.None;
-
       const stream = await this.aiApi.sendMessageToChat(
         this.currentChatId,
         message,
         files.map((f) => (f.id ? f.id.toString() : "")),
         this.abortController,
-        reasoningEffort,
+        this.reasoningEffort,
       );
 
       await this.startStream(stream);

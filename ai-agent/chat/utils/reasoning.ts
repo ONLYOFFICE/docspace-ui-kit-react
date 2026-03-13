@@ -26,51 +26,23 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
+const getReasoningKey = (agentId: string | number) => `agent_${agentId}_reasoning`;
+
 export const getReasoningStateFromLocalStorage = (
   agentId: string | number,
-  chatId: string,
 ): boolean => {
-  const key = `agent_${agentId}_reasoning`;
-  const storedValue = localStorage.getItem(key);
-  if (!storedValue) return false;
-
-  try {
-    const data = JSON.parse(storedValue);
-    const keyToSearch = chatId || "empty";
-    return !!data[keyToSearch];
-  } catch {
-    return false;
-  }
+  const storedValue = localStorage.getItem(getReasoningKey(agentId));
+  return storedValue === "true";
 };
 
 export const setReasoningStateToLocalStorage = (
   agentId: string | number,
-  chatId: string,
   enabled: boolean,
 ): void => {
-  const key = `agent_${agentId}_reasoning`;
-  const storedValue = localStorage.getItem(key);
-  let data: Record<string, boolean> = {};
-
-  if (storedValue) {
-    try {
-      data = JSON.parse(storedValue);
-    } catch {
-      data = {};
-    }
-  }
-
-  const keyToUse = chatId || "empty";
-
+  const key = getReasoningKey(agentId);
   if (enabled) {
-    data[keyToUse] = true;
+    localStorage.setItem(key, "true");
   } else {
-    delete data[keyToUse];
-  }
-
-  if (Object.keys(data).length === 0) {
     localStorage.removeItem(key);
-  } else {
-    localStorage.setItem(key, JSON.stringify(data));
   }
 };
