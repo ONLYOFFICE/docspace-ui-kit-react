@@ -303,6 +303,7 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
       multimodal={chatSettings?.multimodal}
       isLoadingChat={isLoading || !isInitialized || isLoadingGetIcon}
       aiReady={!!aiConfig?.aiReady}
+      modelAliases={aiConfig?.modelAliases}
       selectedModel={chatSettings?.modelId ?? ""}
     />
   );
