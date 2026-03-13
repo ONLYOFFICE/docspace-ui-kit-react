@@ -193,15 +193,18 @@ const Uploader = ({
       if (!acceptedFiles.length) return;
 
       const maxPerUploadBytes = parseSizeLimit(maxPerUploadSize);
+      const isFolderMode = isFolderUpload ?? false;
+      const isMultiple = isMultipleUpload ?? false;
+
+      let filesToUpload = [...acceptedFiles];
 
       if (maxPerUploadBytes) {
-        const oversizedFiles = acceptedFiles.filter(
+        const oversizedFiles = filesToUpload.filter(
           (file) => file.size > maxPerUploadBytes,
         );
 
         if (oversizedFiles.length > 0) {
           const maxSizeFormatted = maxPerUploadSize?.toUpperCase();
-          const isFolderMode = isFolderUpload ?? false;
 
           if (isFolderMode) {
             toastr.error(
@@ -216,22 +219,34 @@ const Uploader = ({
               }),
             );
           }
-          return;
+
+          if (!isMultiple) return;
+
+          filesToUpload = filesToUpload.filter(
+            (file) => file.size <= maxPerUploadBytes,
+          );
         }
       }
 
-      if (isMultipleUpload && maxTotalUploadSize) {
+      if (isMultiple && maxTotalUploadSize) {
         const maxTotalBytes = parseSizeLimit(maxTotalUploadSize);
 
         if (maxTotalBytes) {
-          const totalSize = acceptedFiles.reduce(
-            (sum, file) => sum + file.size,
-            0,
-          );
+          const fitsInLimit: File[] = [];
+          let accumulated = 0;
+          let limitExceeded = false;
 
-          if (totalSize > maxTotalBytes) {
+          for (const file of filesToUpload) {
+            if (accumulated + file.size <= maxTotalBytes) {
+              fitsInLimit.push(file);
+              accumulated += file.size;
+            } else {
+              limitExceeded = true;
+            }
+          }
+
+          if (limitExceeded) {
             const maxTotalFormatted = maxTotalUploadSize.toUpperCase();
-            const isFolderMode = isFolderUpload ?? false;
 
             if (isFolderMode) {
               toastr.error(
@@ -246,22 +261,25 @@ const Uploader = ({
                 }),
               );
             }
-            return;
           }
+
+          filesToUpload = fitsInLimit;
         }
       }
+
+      if (!filesToUpload.length) return;
 
       setIsLoading(true);
       setUploadPercent(0);
 
       try {
-        const uploadedFiles = await uploadFiles(acceptedFiles);
+        const uploadedFiles = await uploadFiles(filesToUpload);
         const folderUrl = getFolderUrl?.(folderTargetId);
 
         toastr.success(
           <>
             {getCommonTranslation("ItemsSuccessfullyUploaded", {
-              count: acceptedFiles.length,
+              count: filesToUpload.length,
             })}
             {folderUrl && (
               <>
