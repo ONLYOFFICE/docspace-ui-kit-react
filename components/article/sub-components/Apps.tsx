@@ -35,8 +35,7 @@ import IOSReactSvgUrl from "../../../assets/iOS.react.svg";
 
 import { Text } from "../../text";
 import { IconButton } from "../../icon-button";
-
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import styles from "../Article.module.scss";
 import { ArticleAppsProps } from "../Article.types";
@@ -51,6 +50,8 @@ const ArticleApps = React.memo(
     officeforandroidUrl,
     officeforiosUrl,
   }: ArticleAppsProps) => {
+    const t = useCommonTranslation();
+
     if (!showText) return null;
 
     return (
@@ -69,8 +70,7 @@ const ArticleApps = React.memo(
           lineHeight="12px"
           fontWeight={600}
         >
-          {/* t("Common:DownloadApps") */}
-          {getCommonTranslation("DownloadApps")}
+          {t("DownloadApps")}
         </Text>
         <div className="download-app-list">
           {downloaddesktopUrl ? (
@@ -80,12 +80,9 @@ const ArticleApps = React.memo(
               iconNode={<WindowsReactSvgUrl />}
               size={32}
               isFill
-              title={getCommonTranslation("MobileWin", {
+              title={t("MobileWin", {
                 organizationName: logoText,
               })}
-              /* t("Common:MobileWin", {
-                organizationName: logoText,
-              }) */
             />
           ) : null}
 
@@ -96,12 +93,9 @@ const ArticleApps = React.memo(
               iconNode={<MacOSReactSvgUrl />}
               size={32}
               isFill
-              title={getCommonTranslation("MobileMac", {
+              title={t("MobileMac", {
                 organizationName: logoText,
               })}
-              /* t("Common:MobileMac", {
-                organizationName: logoText,
-              }) */
             />
           ) : null}
 
@@ -112,12 +106,9 @@ const ArticleApps = React.memo(
               iconNode={<LinuxReactSvgUrl />}
               size={32}
               isFill
-              title={getCommonTranslation("MobileLinux", {
+              title={t("MobileLinux", {
                 organizationName: logoText,
               })}
-              /* t("Common:MobileLinux", {
-                organizationName: logoText,
-              }) */
             />
           ) : null}
 
@@ -128,12 +119,9 @@ const ArticleApps = React.memo(
               iconNode={<AndroidReactSvgUrl />}
               size={32}
               isFill
-              title={getCommonTranslation("MobileAndroid", {
+              title={t("MobileAndroid", {
                 organizationName: logoText,
               })}
-              /* t("Common:MobileAndroid", {
-                organizationName: logoText,
-              }) */
             />
           ) : null}
 
@@ -144,12 +132,9 @@ const ArticleApps = React.memo(
               iconNode={<IOSReactSvgUrl />}
               size={32}
               isFill
-              title={getCommonTranslation("MobileIos", {
+              title={t("MobileIos", {
                 organizationName: logoText,
               })}
-              /* t("Common:MobileIos", {
-                organizationName: logoText,
-              }) */
             />
           ) : null}
         </div>

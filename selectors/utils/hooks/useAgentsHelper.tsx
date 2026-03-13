@@ -39,6 +39,7 @@ import { LoadersContext } from "../contexts/Loaders";
 import { PAGE_COUNT } from "../constants";
 import type { UseAgentsHelperProps } from "../types";
 import { convertRoomsToItems } from "..";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 // import useInputItemHelper from "./useInputItemHelper";
 
@@ -66,6 +67,7 @@ const useAgentsHelper = ({
   setSelectedTreeNode,
   disableBySecurity,
 }: UseAgentsHelperProps) => {
+  const t = useCommonTranslation();
   const { apiClient } = useApi();
   const {
     setIsNextPageLoading,
@@ -146,7 +148,7 @@ const useAgentsHelper = ({
         setIsBreadCrumbsLoading(false);
       }
 
-      const itemList: TSelectorItem[] = convertRoomsToItems(folders)
+      const itemList: TSelectorItem[] = convertRoomsToItems(folders, t)
         .filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true))
         .map((item) => {
           const security = item.security as
@@ -238,6 +240,7 @@ const useAgentsHelper = ({
       excludeItems,
       setSelectedTreeNode,
       disableBySecurity,
+      t,
     ],
   );
 

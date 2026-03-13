@@ -27,7 +27,7 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import LogoUrl from "../../assets/dark_leftmenu.svg?url";
+import LogoUrl from "../../assets/logo/dark_leftmenu.svg?url";
 
 import { MCPIcon, MCPIconSize } from ".";
 

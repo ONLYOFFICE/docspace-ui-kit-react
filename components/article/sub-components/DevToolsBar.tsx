@@ -27,13 +27,13 @@
 import React from "react";
 import classNames from "classnames";
 
-import DeveloperReactSvg from "../../../assets/catalog.developer.react.svg";
+import DeveloperReactSvg from "../../../assets/icons/16/catalog.developer.react.svg";
 import ArrowReactSvg from "../../../assets/arrow.right.react.svg";
 
 import { DeviceType } from "../../../enums";
 import { openingNewTab } from "../../../utils/openingNewTab";
 import { Text } from "../../text";
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import styles from "../Article.module.scss";
 import { ArticleDevToolsBarProps } from "../Article.types";
@@ -65,6 +65,8 @@ const ArticleDevToolsBar = ({
     onClick(e);
   };
 
+  const t = useCommonTranslation();
+
   if (!showText) return null;
 
   return (
@@ -79,7 +81,7 @@ const ArticleDevToolsBar = ({
     >
       <DeveloperReactSvg className="icon" />
       <Text fontWeight={600} fontSize="12px" className="label">
-        {getCommonTranslation("DeveloperTools")}
+        {t("DeveloperTools")}
       </Text>
       <ArrowReactSvg className="arrow" />
     </div>

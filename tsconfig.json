@@ -43,7 +43,7 @@
     "providers/**/*",
     "selectors/**/*",
     "document-editor",
-    "selectors/**/*",
+    "uploader",
     "ai-agent/**/*"
   ],
   "exclude": [

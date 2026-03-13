@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import PlusIcon from "../../assets/icons/12/plus.react.svg";
+import PlusIcon from "../../assets/icons/12/plus.svg";
 
 export const paddingSize = 4;
 

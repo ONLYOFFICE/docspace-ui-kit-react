@@ -32,7 +32,7 @@ import ArrowTabletIcon from "../../../../assets/arrow-left.long.react.svg";
 import { IconButton } from "../../../icon-button";
 import { Text } from "../../../text";
 import { DeviceType } from "../../../../enums";
-import { getCommonTranslation } from "../../../../utils";
+import { useCommonTranslation } from "../../../../utils";
 
 import { ArticleHeaderLoader } from "../../skeletons";
 
@@ -53,6 +53,8 @@ const BackButton = ({
   toggleArticleOpen?: () => void;
   navigate?: (path: string) => void;
 }) => {
+  const t = useCommonTranslation();
+
   const onClickBack = () => {
     onLogoClickAction?.();
 
@@ -86,7 +88,7 @@ const BackButton = ({
       onClick={onClickBack}
     >
       <IconButton className={styles.arrowIcon} iconNode={icon} isClickable />
-      {showText ? <Text truncate>{getCommonTranslation("Back")}</Text> : null}
+      {showText ? <Text truncate>{t("Back")}</Text> : null}
     </div>
   );
 };

@@ -89,9 +89,10 @@ const preview: Preview = {
           [
             "AI Agent",
             "Document Editor",
+            "Uploader",
             "Selectors",
             "Providers",
-            "Errors",
+            "Errors"
           ],
         ],
       },
