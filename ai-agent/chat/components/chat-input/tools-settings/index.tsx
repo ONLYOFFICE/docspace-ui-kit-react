@@ -35,6 +35,7 @@ import { Portal } from "../../../../../components/portal";
 
 import McpToolReactSvg from "../../../../../assets/mcp.tool.svg";
 import WebSearchIcon from "../../../../../assets/web.search.svg";
+import LightbulbIcon from "../../../../../assets/lightbulb.svg";
 import ManageConnectionsReactSvg from "../../../../../assets/manage.connection.react.svg";
 
 import { ServerType } from "../../../../../enums";
@@ -277,10 +278,7 @@ const ToolsSettings = ({
             .filter(Boolean),
         ];
 
-        const portalServerName =
-          t("OrganizationName") +
-          " " +
-          t("ProductName");
+        const portalServerName = t("OrganizationName") + " " + t("ProductName");
 
         const name =
           server.serverType === ServerType.Portal
@@ -344,6 +342,7 @@ const ToolsSettings = ({
               withToggle: true,
               checked: thinkingEnabled,
               onClick: () => setThinkingEnabled(!thinkingEnabled),
+              iconNode: <LightbulbIcon />,
             },
           ]
         : []),
@@ -463,9 +462,7 @@ const ToolsSettings = ({
                         </div>
                         <Button
                           label={
-                            server.connected
-                              ? t("Disconnect")
-                              : t("Connect")
+                            server.connected ? t("Disconnect") : t("Connect")
                           }
                           size={ButtonSize.small}
                           onClick={() => {
