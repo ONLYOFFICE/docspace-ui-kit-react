@@ -59,7 +59,7 @@ import styles from "../../../ChatMessageBody.module.scss";
 import { MessageButtonsProps } from "../../../../../Chat.types";
 import { FOLDER_FORM_VALIDATION } from "../../../../../../../constants";
 import { ContentType } from "../../../../../../../enums";
-import { getCommonTranslation } from "../../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../../utils/i18n";
 import { useApi } from "../../../../../../../providers/api";
 import { CommonTrans } from "../../../../../../../utils/i18n/CommonTrans";
 
@@ -73,6 +73,7 @@ const Buttons = ({
   getResultStorageId,
   openFile,
 }: MessageButtonsProps) => {
+  const t = useCommonTranslation();
   const { agentId, findPreviousUserMessage } = useMessageStore();
   const { currentChat } = useChatStore();
   const { aiApi, baseUrl } = useApi();
@@ -91,7 +92,7 @@ const Buttons = ({
 
   const onCopyAction = () => {
     copy(text, { format: "text/plain" });
-    toastr.success(getCommonTranslation("MessageCopiedSuccess"));
+    toastr.success(t("MessageCopiedSuccess"));
   };
 
   const onExportMessage = async (
@@ -183,7 +184,7 @@ const Buttons = ({
         <div
           className={styles.buttonsBlockItem}
           onClick={onCopyAction}
-          title={getCommonTranslation("CopyMessage")}
+          title={t("CopyMessage")}
           data-testid="copy-message-button"
         >
           <CopyIcon />
@@ -192,9 +193,9 @@ const Buttons = ({
         {/*{isLast ? (*/}
         {/*  <div*/}
         {/*    className={styles.buttonsBlockItem}*/}
-        {/*    title={getCommonTranslation("RefreshMessage")}*/}
+        {/*    title={t("RefreshMessage")}*/}
         {/*    onClick={() => {*/}
-        {/*      toastr.info(getCommonTranslation("WorkInProgress"));*/}
+        {/*      toastr.info(t("WorkInProgress"));*/}
         {/*    }}*/}
         {/*  >*/}
         {/*    <RefreshIcon />*/}
@@ -204,7 +205,7 @@ const Buttons = ({
         <div
           className={styles.buttonsBlockItem}
           onClick={() => setShowFolderSelector(true)}
-          title={getCommonTranslation("SaveToFile")}
+          title={t("SaveToFile")}
           data-testid="save-to-file-button"
         >
           <SaveToFileIcon />

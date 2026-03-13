@@ -95,8 +95,8 @@ vi.mock("../../../../../../components/text", () => ({
   ),
 }));
 
-vi.mock("../../../../../../utils", () => ({
-  getCommonTranslation: (key: string) => key,
+vi.mock("../../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key: string) => key),
 }));
 
 vi.mock("linkify-react", () => ({

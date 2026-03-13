@@ -165,8 +165,11 @@ vi.mock("../../../../../assets/manage.connection.react.svg", () => ({
 
 // Mock utils
 vi.mock("../../../../../utils", () => ({
-  getCommonTranslation: vi.fn((key) => key),
   isMobile: vi.fn(() => false),
+}));
+
+vi.mock("../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key) => key),
 }));
 
 vi.mock("../../../../../utils/ai/getServerIcon", () => ({

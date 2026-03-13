@@ -55,8 +55,8 @@ vi.mock("../../../../components/loader", () => ({
   LoaderTypes: { track: "track" },
 }));
 
-vi.mock("../../../../utils", () => ({
-  getCommonTranslation: (key: string) => key,
+vi.mock("../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key: string) => key),
 }));
 
 describe("ChatMessageBody component", () => {

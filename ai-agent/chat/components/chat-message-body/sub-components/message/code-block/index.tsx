@@ -45,19 +45,20 @@ import { toastr } from "../../../../../../../components/toast";
 import styles from "../../../ChatMessageBody.module.scss";
 
 import { MessageCodeBlockProps } from "../../../../../Chat.types";
-import { getCommonTranslation } from "../../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../../utils/i18n";
 
 const CodeBlock = ({
   language,
   content,
   successCopyMessage,
 }: MessageCodeBlockProps) => {
+  const t = useCommonTranslation();
   const { isBase } = useTheme();
 
   const onCopy = () => {
     copy(content);
     toastr.success(
-      successCopyMessage ?? getCommonTranslation("CopiedToClipboard"),
+      successCopyMessage ?? t("CopiedToClipboard"),
     );
   };
 

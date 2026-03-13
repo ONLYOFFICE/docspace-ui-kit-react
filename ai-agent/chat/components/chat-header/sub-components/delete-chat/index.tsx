@@ -39,7 +39,7 @@ import { useChatStore } from "../../../../store/chatStore";
 import { useMessageStore } from "../../../../store/messageStore";
 
 import { DeleteChatProps } from "../../../../Chat.types";
-import { getCommonTranslation } from "../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../utils/i18n";
 import { toastr } from "../../../../../../components/toast";
 import { CommonTrans } from "../../../../../../utils/i18n/CommonTrans";
 import styles from "./DeleteChat.module.scss";
@@ -49,6 +49,7 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
 
   const { deleteChat, currentChat, updateUrlChatId } = useChatStore();
   const { startNewChat } = useMessageStore();
+  const t = useCommonTranslation();
 
   const onDeleteClose = React.useCallback(() => {
     if (isLoading) return;
@@ -68,7 +69,7 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
         updateUrlChatId("");
       }
 
-      toastr.success(getCommonTranslation("ChatSuccessDeleted"));
+      toastr.success(t("ChatSuccessDeleted"));
       onDeleteToggle();
     } catch (error) {
       console.error(error);
@@ -110,7 +111,7 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
       displayType={ModalDialogType.modal}
     >
       <ModalDialog.Header>
-        {getCommonTranslation("DeleteAIAgentChatTitle")}
+        {t("DeleteAIAgentChatTitle")}
       </ModalDialog.Header>
       <ModalDialog.Body className={styles.modalWrapper}>
         <CommonTrans
@@ -120,12 +121,12 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
             1: <Text key="chat-title" fontWeight={400} as="span" />,
           }}
         />{" "}
-        {getCommonTranslation("WantToContinue")}
+        {t("WantToContinue")}
       </ModalDialog.Body>
       <ModalDialog.Footer>
         <Button
           size={ButtonSize.normal}
-          label={getCommonTranslation("DeleteForeverButton")}
+          label={t("DeleteForeverButton")}
           onClick={onDeleteAction}
           scale
           primary
@@ -134,7 +135,7 @@ const DeleteChat = ({ chatId, chatTitle, onDeleteToggle }: DeleteChatProps) => {
         />
         <Button
           size={ButtonSize.normal}
-          label={getCommonTranslation("CancelButton")}
+          label={t("CancelButton")}
           onClick={onDeleteClose}
           scale
           isDisabled={isLoading}

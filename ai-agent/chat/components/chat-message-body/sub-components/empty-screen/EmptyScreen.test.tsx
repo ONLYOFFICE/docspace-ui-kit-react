@@ -45,8 +45,8 @@ vi.mock("../../../../../../components/text", () => ({
   }) => <div data-testid={dataTestId ?? "text"}>{children}</div>,
 }));
 
-vi.mock("../../../../../../utils", () => ({
-  getCommonTranslation: vi.fn((key: string) => `translated-${key}`),
+vi.mock("../../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key: string) => `translated-${key}`),
 }));
 
 describe("EmptyScreen component", () => {

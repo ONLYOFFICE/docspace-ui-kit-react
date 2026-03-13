@@ -34,7 +34,7 @@ import MarkdownField from "../../../Markdown";
 import { formatJsonWithMarkdown } from "../../../../../../../utils";
 import { Text } from "../../../../../../../../../components/text";
 import type { ToolCallPlacement } from "../../tool-call/ToolCall.enum";
-import { getCommonTranslation } from "../../../../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../../../../utils/i18n";
 
 export const CodeView = observer(
   ({
@@ -44,6 +44,7 @@ export const CodeView = observer(
     content: TToolCallContent;
     placement: ToolCallPlacement;
   }) => {
+    const t = useCommonTranslation();
     const getResult = () => {
       if (content.result && typeof content.result === "string") {
         return content.result;
@@ -84,11 +85,11 @@ export const CodeView = observer(
           data-testid="tool-call-code-view-item-arg"
         >
           <Text fontSize="15px" lineHeight="16px" fontWeight={600}>
-            {getCommonTranslation("ToolCallArg")}
+            {t("ToolCallArg")}
           </Text>
           <MarkdownField
             chatMessage={formatJsonWithMarkdown(content.arguments)}
-            successCopyMessage={getCommonTranslation("ToolCallArgCopied")}
+            successCopyMessage={t("ToolCallArgCopied")}
           />
         </div>
         {showResult ? (
@@ -97,14 +98,14 @@ export const CodeView = observer(
             data-testid="tool-call-code-view-item-result"
           >
             <Text fontSize="15px" lineHeight="16px" fontWeight={600}>
-              {getCommonTranslation("ToolCallResult")}
+              {t("ToolCallResult")}
             </Text>
             <MarkdownField
               chatMessage={formatJsonWithMarkdown(
                 isJson ? JSON.parse(result) : result,
               )}
               propLanguage={isErrorResult && !isJson ? "text" : undefined}
-              successCopyMessage={getCommonTranslation("ToolCallResultCopied")}
+              successCopyMessage={t("ToolCallResultCopied")}
             />
           </div>
         ) : null}

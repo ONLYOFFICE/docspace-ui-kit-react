@@ -42,13 +42,9 @@ vi.mock("../../../../components/public-room-bar", () => ({
 }));
 
 // Mock translations
-vi.mock("../../../../utils", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../../../utils")>();
-  return {
-    ...actual,
-    getCommonTranslation: vi.fn((key) => key),
-  };
-});
+vi.mock("../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key) => key),
+}));
 
 describe("<ChatInfoBlock />", () => {
   beforeEach(() => {

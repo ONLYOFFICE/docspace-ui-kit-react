@@ -55,8 +55,8 @@ vi.mock("../../../../../../assets/icons/16/plus.svg", () => ({
 }));
 
 // Mock translations
-vi.mock("../../../../../../utils", () => ({
-  getCommonTranslation: vi.fn((key) => key),
+vi.mock("../../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key) => key),
 }));
 
 import { ModalDialogProps } from "../../../../../../components/modal-dialog/ModalDialog.types";

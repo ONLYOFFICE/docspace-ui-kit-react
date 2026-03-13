@@ -34,9 +34,10 @@ import { Text } from "../../../../../../components/text";
 import { MessageEmptyProps } from "../../../../Chat.types";
 
 import styles from "../../ChatMessageBody.module.scss";
-import { getCommonTranslation } from "../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../utils/i18n";
 
 const EmptyScreen = ({ isLoading }: MessageEmptyProps) => {
+  const t = useCommonTranslation();
   return (
     <Text
       className={styles.chatEmptyHelpMessage}
@@ -48,7 +49,7 @@ const EmptyScreen = ({ isLoading }: MessageEmptyProps) => {
       {isLoading ? (
         <RectangleSkeleton height="24px" width="140px" borderRadius="3px" />
       ) : (
-        getCommonTranslation("AIChatOfferHelp")
+        t("AIChatOfferHelp")
       )}
     </Text>
   );

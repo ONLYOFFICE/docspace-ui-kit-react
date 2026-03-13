@@ -67,8 +67,8 @@ vi.mock("../../../../../../../../../components/link", () => ({
 }));
 
 // Mock utils
-vi.mock("../../../../../../../../../utils", () => ({
-  getCommonTranslation: vi.fn((key) => key),
+vi.mock("../../../../../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key) => key),
 }));
 
 describe("<SearchToolContent />", () => {
@@ -115,11 +115,7 @@ describe("<SearchToolContent />", () => {
       name: "crawl",
       result: { data: { title: "Page Title" } },
     };
-    render(
-      <SearchToolContent
-        content={crawlingContent}
-      />,
-    );
+    render(<SearchToolContent content={crawlingContent} />);
     expect(screen.getByTestId("universe-icon")).toBeInTheDocument();
     expect(screen.getByText(/WebCrawling/)).toBeInTheDocument();
     expect(screen.getByText(/Page Title/)).toBeInTheDocument();
@@ -129,6 +125,4 @@ describe("<SearchToolContent />", () => {
     );
     expect(screen.getByTestId("external-link-icon")).toBeInTheDocument();
   });
-
-
 });

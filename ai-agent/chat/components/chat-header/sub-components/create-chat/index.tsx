@@ -39,7 +39,7 @@ import { useMessageStore } from "../../../../store/messageStore";
 import { useChatStore } from "../../../../store/chatStore";
 
 import styles from "../../ChatHeader.module.scss";
-import { getCommonTranslation } from "../../../../../../utils";
+import { useCommonTranslation } from "../../../../../../utils/i18n";
 
 const CreateChat = ({
   isLoadingProp,
@@ -52,6 +52,7 @@ const CreateChat = ({
 }) => {
   const { messages, isRequestRunning, startNewChat } = useMessageStore();
   const { setCurrentChat } = useChatStore();
+  const t = useCommonTranslation();
 
   if (isLoadingProp)
     return (
@@ -84,7 +85,7 @@ const CreateChat = ({
     >
       <PlusReactSvgUrl />
       <Text fontSize="13px" lineHeight="15px" fontWeight={600}>
-        {getCommonTranslation("AINewChat")}
+        {t("AINewChat")}
       </Text>
     </div>
   );

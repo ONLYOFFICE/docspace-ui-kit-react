@@ -177,7 +177,10 @@ vi.mock("../../../../../../assets/message.save.svg", () => ({
 // Mock utils
 vi.mock("../../../../utils", () => ({
   openFileInEditor: vi.fn(),
-  getCommonTranslation: vi.fn((key: string) => key),
+}));
+
+vi.mock("../../../../../../utils/i18n", () => ({
+  useCommonTranslation: () => vi.fn((key: string) => key),
 }));
 
 describe("<SelectChat />", () => {
