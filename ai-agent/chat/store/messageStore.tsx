@@ -589,6 +589,7 @@ export default class MessageStore {
 
       let buffer = "";
       let chunkIdx = -1;
+      let isReasoningRunning = false;
 
       const streamHandler = async () => {
         const { done, value } = await reader.read();
@@ -596,6 +597,12 @@ export default class MessageStore {
         if (done) {
           this.setIsRequestRunning(false);
           this.setIsStreamRunning(false);
+
+          if (isReasoningRunning) {
+            msg += "\n</think>\n";
+            this.continueAIMessage(msg);
+            isReasoningRunning = false;
+          }
 
           try {
             reader.cancel();
@@ -617,6 +624,12 @@ export default class MessageStore {
               JSON.stringify(jsonData.error),
               jsonData.error,
             );
+
+            if (isReasoningRunning) {
+              msg += "\n</think>\n";
+              this.continueAIMessage(msg);
+              isReasoningRunning = false;
+            }
 
             reader.cancel();
 
@@ -652,10 +665,50 @@ export default class MessageStore {
               return;
             }
 
+            if (isReasoningRunning && !event.includes(EventType.Reasoning)) {
+              msg += "\n</think>\n";
+              this.continueAIMessage(msg);
+              isReasoningRunning = false;
+            }
+
             if (event.includes(EventType.MessageStart)) {
               this.setIsStreamRunning(true);
 
               this.handleMetadata(jsonData);
+
+              return;
+            }
+
+            if (event.includes(EventType.Reasoning)) {
+              try {
+                const parsed = JSON.parse(jsonData);
+                if (
+                  !parsed ||
+                  typeof parsed !== "object" ||
+                  typeof parsed.text !== "string"
+                ) {
+                  return;
+                }
+                const { text } = parsed;
+
+                if (!isReasoningRunning) {
+                  isReasoningRunning = true;
+                  msg += "<think>\n";
+                }
+
+                msg += text;
+
+                if (msg) {
+                  if (prevMsg) {
+                    this.continueAIMessage(msg);
+                  } else {
+                    this.addNewAIMessage(msg);
+                  }
+                  prevMsg = msg;
+                }
+              } catch {
+                // ignore
+              }
 
               return;
             }

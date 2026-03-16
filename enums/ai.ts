@@ -50,6 +50,7 @@ export enum EventType {
   MessageStart = "message_start",
   MessageStop = "message_stop",
   NewToken = "new_token",
+  Reasoning = "reasoning",
   ToolCall = "tool_call",
   ToolResult = "tool_result",
   Error = "error",
