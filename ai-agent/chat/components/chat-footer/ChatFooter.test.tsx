@@ -69,6 +69,7 @@ describe("<ChatFooter />", () => {
       setIsFetched: vi.fn(),
       fetchTools: vi.fn(),
       initTools: vi.fn(),
+      thinkingSupported: false,
     },
     multimodal: { image: { formats: [] } },
     goToWebSearchSettings: vi.fn(),
