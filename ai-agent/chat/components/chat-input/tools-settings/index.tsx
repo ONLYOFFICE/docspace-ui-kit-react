@@ -312,6 +312,7 @@ const ToolsSettings = ({
         checked: webSearchEnabled && webSearchAvailable,
         onClick: onWebSearchToggle,
         disabled: !webSearchAvailable,
+        disabledStylesType: "toggle",
         tooltipTarget: "toggle",
         getTooltipContent: () => (
           <>
@@ -357,6 +358,7 @@ const ToolsSettings = ({
         onClick: () => setThinkingEnabled(!thinkingEnabled),
         iconNode: <LightbulbIcon />,
         disabled: !thinkingSupported,
+        disabledStylesType: "toggle",
         tooltipTarget: "toggle",
         getTooltipContent: () =>
           !thinkingSupported ? (
