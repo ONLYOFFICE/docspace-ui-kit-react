@@ -64,6 +64,7 @@ import styles from "../ChatInput.module.scss";
 import { Link, LinkType } from "../../../../../components/link";
 import { ContextMenuModel } from "../../../../../components/context-menu";
 import { useApi } from "../../../../../providers";
+import { HelpButton } from "../../../../../components";
 
 const ToolsSettings = ({
   servers,
@@ -336,7 +337,21 @@ const ToolsSettings = ({
       },
       {
         key: "extended-thinking",
-        label: t("ExtendedThinking"),
+        label: (
+          <div className={styles.extendedThinkingLabel}>
+            {t("ExtendedThinking")}{" "}
+            <HelpButton
+              tooltipContent={
+                <Text>
+                  {t("ExtendedThinkingIncreasedCosts")}
+                </Text>
+              }
+              openOnClick={false}
+              tooltipStyle={{ zIndex: 1001 }}
+              className={styles.extendedThinkingHelpButton}
+            />
+          </div>
+        ),
         withToggle: true,
         checked: thinkingEnabled && thinkingSupported,
         onClick: () => setThinkingEnabled(!thinkingEnabled),
