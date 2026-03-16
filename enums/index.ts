@@ -36,6 +36,8 @@ export {
   SdkFilesSettingsDtoDefaultSharingAccessRightsEnum,
 };
 
+export * from "./ai";
+
 export enum ShareAccessRights {
   None = 0,
   FullAccess = 1,
@@ -373,4 +375,10 @@ export const enum Events {
   ROOM_CREATE = "create_room",
   ROOM_EDIT = "edit_room",
   CHANGE_COLUMN = "change_column",
+}
+
+export enum ToolsPermission {
+  Allow,
+  AlwaysAllow,
+  Deny,
 }

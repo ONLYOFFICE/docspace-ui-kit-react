@@ -86,7 +86,14 @@ const preview: Preview = {
           ["Welcome", "Structure", "Translation", "Themes", "API"],
           "Samples",
           "Components",
-          ["Document Editor", "Uploader", "Selectors", "Providers", "Errors"],
+          [
+            "AI Agent",
+            "Document Editor",
+            "Uploader",
+            "Selectors",
+            "Providers",
+            "Errors"
+          ],
         ],
       },
     },
@@ -110,6 +117,7 @@ const preview: Preview = {
       ]);
 
       const isDocs = context.viewMode === "docs";
+      const noPadding = context.parameters?.noPadding;
 
       return (
         <TranslationProvider locale="en" translations={translations}>
@@ -123,7 +131,7 @@ const preview: Preview = {
                   ? globalColors.black
                   : globalColors.white,
                 color: isDark ? globalColors.white : globalColors.black,
-                padding: isDocs ? "0" : "20px",
+                padding: isDocs || noPadding ? "0" : "20px",
               }}
             >
               <Story />

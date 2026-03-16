@@ -109,7 +109,9 @@
   line-height: inherit;
 }
 
-.image {
+.image,
+.image img,
+.image svg {
   width: inherit;
   height: inherit;
 }

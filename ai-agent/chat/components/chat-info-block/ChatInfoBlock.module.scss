@@ -1,4 +1,4 @@
-/*
+/*!
  * (c) Copyright Ascensio System SIA 2009-2026
  *
  * This program is a free software product.
@@ -26,43 +26,19 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-"use client";
+@use "../../../../styles/variables";
 
-import { createContext, useContext, useEffect } from "react";
-import SocketHelper from "../../utils/socket";
+.chatInfoBlock {
+  box-sizing: border-box;
 
-type TSocketContext = typeof SocketHelper;
+  width: 100%;
+  max-width: 700px;
 
-const SocketContext = createContext<TSocketContext | null>(null);
+  padding: 12px 16px;
 
-export const useSocket = () => {
-  const context = useContext(SocketContext);
-  if (!context) {
-    throw new Error("useSocket must be used within a SocketProvider");
+  svg {
+    path {
+      fill: variables.$light-status-warning !important;
+    }
   }
-  return context;
-};
-
-type SocketProviderProps = {
-  children: React.ReactNode;
-  url?: string;
-  token?: string;
-};
-
-export const SocketProvider = ({
-  children,
-  url,
-  token,
-}: SocketProviderProps) => {
-  useEffect(() => {
-    if (!url) return;
-
-    SocketHelper?.connect(url, "", token);
-  }, [SocketHelper, url, token]);
-
-  return (
-    <SocketContext.Provider value={SocketHelper}>
-      {children}
-    </SocketContext.Provider>
-  );
-};
+}

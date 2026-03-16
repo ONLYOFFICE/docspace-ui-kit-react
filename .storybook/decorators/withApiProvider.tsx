@@ -48,7 +48,11 @@ const withApiProvider: Decorator = (Story, context) => {
   }
 
   return (
-    <ApiProvider key={apiConfig} url={apiUrl} apiKey={apiKey}>
+    <ApiProvider
+      key={apiConfig}
+      url={apiUrl}
+      apiKey={apiKey}
+      initSocket={false}>
       <Story key={apiConfig} />
     </ApiProvider>
   );

@@ -409,9 +409,14 @@ const SubMenu = (props: SubMenuProps) => {
             title={item.label as string}
             size={MCPIconSize.Small}
             imgSrc={item.icon}
+            imgNode={item.iconNode}
             className={iconClassName || ""}
           />
         );
+      }
+
+      if (item.iconNode) {
+        return <span className={iconClassName || ""}>{item.iconNode}</span>
       }
 
       if (!item.icon) return null;

@@ -26,4 +26,38 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-export * from "./SocketProvider";
+import InfoIcon from "../../../../assets/info.outline.react.svg";
+
+import PublicRoomBar from "../../../../components/public-room-bar";
+
+import { ChatInfoBlockProps } from "../../Chat.types";
+import styles from "./ChatInfoBlock.module.scss";
+import { useCommonTranslation } from "../../../../utils/i18n";
+
+export const ChatInfoBlock = ({
+  standalone,
+  isPortalAdmin,
+}: ChatInfoBlockProps) => {
+  const t = useCommonTranslation();
+  const bodyText = !isPortalAdmin
+    ? t("AIDisabledInfoBlockUserDescription", {
+        productName: t("ProductName"),
+      })
+    : standalone
+      ? t("AIDisabledInfoBlockAdminStandaloneDescription", {
+          productName: t("ProductName"),
+        })
+      : t("AIDisabledInfoBlockAdminSaasDescription", {
+          productName: t("ProductName"),
+        });
+
+  return (
+    <PublicRoomBar
+      className={styles.chatInfoBlock}
+      headerText={t("AIFeaturesAreCurrentlyDisabled")}
+      bodyText={bodyText}
+      iconName={<InfoIcon />}
+      dataTestId="chat-info-block"
+    />
+  );
+};

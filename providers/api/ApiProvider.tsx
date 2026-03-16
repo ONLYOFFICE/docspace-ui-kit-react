@@ -28,6 +28,7 @@
 
 import React from "react";
 import axios, { type AxiosInstance } from "axios";
+import socket from "../../utils/socket";
 
 import {
   Configuration,
@@ -41,12 +42,16 @@ import {
   PeopleSearchApi,
   SearchApi,
   OperationsApi,
+  ThirdPartyApi,
 } from "@onlyoffice/docspace-api-sdk";
+import { AiApi } from "../../api/ai";
 
 export type TApiProvider = {
   children: React.ReactNode;
   url: string;
   apiKey: string;
+  socketPath?: string;
+  initSocket?: boolean;
 };
 
 export const createApiClient = (basePath: string, apiKey: string) => {
@@ -80,6 +85,8 @@ export type TApiContext = {
   operationsApi: OperationsApi;
   apiClient: TApiClient;
   baseUrl: string;
+  aiApi: AiApi;
+  thirdPartyApi: ThirdPartyApi;
 };
 
 const ApiContext = React.createContext<TApiContext | null>(null);
@@ -94,7 +101,7 @@ export const useApi = () => {
   return context;
 };
 
-const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
+const ApiProvider = ({ children, url, apiKey, initSocket = true }: TApiProvider) => {
   const value = React.useMemo(() => {
     const authHeader = `Bearer ${apiKey}`;
     const baseOptions = {
@@ -125,8 +132,33 @@ const ApiProvider = ({ children, url, apiKey }: TApiProvider) => {
       operationsApi: new OperationsApi(configuration),
       apiClient: createApiClient(url, apiKey),
       baseUrl: url,
+      thirdPartyApi: new ThirdPartyApi(configuration),
+      aiApi: new AiApi({
+        basePath: url,
+        apiKey,
+      }),
     };
   }, [url, apiKey]);
+
+  React.useEffect(() => {
+    if (!initSocket) return;
+
+    const initFunc = async () => {
+      let socketPath;
+
+      try {
+        const settingsRes = await value.commonSettingsApi.getPortalSettings();
+        socketPath = settingsRes?.data?.response?.socketUrl;
+      } catch (e) {
+        console.error(e);
+      }
+
+      const socketUrl = new URL(socketPath ?? "/socket.io", url).toString();
+      socket?.connect(socketUrl, "", apiKey);
+    };
+
+    initFunc();
+  }, [initSocket, url, apiKey, socket]);
 
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 };

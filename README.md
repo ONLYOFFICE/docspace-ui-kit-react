@@ -250,6 +250,7 @@ import type { TFile, TFolder, TUser, TFileSecurity, TFolderSecurity, TRoomSecuri
 | [Button](./components/button/README.md) | Versatile button component with primary/secondary variants, multiple sizes, loading states, and tooltip support |
 | [Calendar](./components/calendar/README.md) | Custom calendar component for date selection |
 | CategoryItem | Navigation link item with optional badge and arrow indicator for menu hierarchies |
+| [Chat](./ai-agent/chat/README.md) | AI chat interface with streaming responses, message history, file attachments, and AI tools integration |
 | [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |
 | [CircleSkeleton](./components/circle/README.md) | Circular skeleton loader for avatar and icon placeholders |
 | [ColorInput](./components/color-input/README.md) | Text input for entering and validating color values |

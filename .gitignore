@@ -9,3 +9,4 @@ css
 fonts
 debug-storybook.log
 .env
+.env.local
