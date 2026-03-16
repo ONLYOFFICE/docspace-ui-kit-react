@@ -334,18 +334,20 @@ const ToolsSettings = ({
           </>
         ),
       },
-      ...(thinkingSupported
-        ? [
-            {
-              key: "extended-thinking",
-              label: t("ExtendedThinking"),
-              withToggle: true,
-              checked: thinkingEnabled,
-              onClick: () => setThinkingEnabled(!thinkingEnabled),
-              iconNode: <LightbulbIcon />,
-            },
-          ]
-        : []),
+      {
+        key: "extended-thinking",
+        label: t("ExtendedThinking"),
+        withToggle: true,
+        checked: thinkingEnabled && thinkingSupported,
+        onClick: () => setThinkingEnabled(!thinkingEnabled),
+        iconNode: <LightbulbIcon />,
+        disabled: !thinkingSupported,
+        tooltipTarget: "toggle",
+        getTooltipContent: () =>
+          !thinkingSupported ? (
+            <Text>{t("ExtendedThinkingNotSupported")}</Text>
+          ) : null,
+      },
       ...(showManageConnectionItem || serverItems.length > 0
         ? [{ key: "separator-1", isSeparator: true }]
         : []),
