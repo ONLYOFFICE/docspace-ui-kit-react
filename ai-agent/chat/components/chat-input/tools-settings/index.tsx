@@ -340,16 +340,16 @@ const ToolsSettings = ({
         label: (
           <div className={styles.extendedThinkingLabel}>
             {t("ExtendedThinking")}{" "}
-            <HelpButton
-              tooltipContent={
-                <Text>
-                  {t("ExtendedThinkingIncreasedCosts")}
-                </Text>
-              }
-              openOnClick={false}
-              tooltipStyle={{ zIndex: 1001 }}
-              className={styles.extendedThinkingHelpButton}
-            />
+            {thinkingSupported && (
+              <HelpButton
+                tooltipContent={
+                  <Text>{t("ExtendedThinkingIncreasedCosts")}</Text>
+                }
+                openOnClick={false}
+                tooltipStyle={{ zIndex: 1001 }}
+                className={styles.extendedThinkingHelpButton}
+              />
+            )}
           </div>
         ),
         withToggle: true,
