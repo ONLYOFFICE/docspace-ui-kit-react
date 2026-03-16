@@ -63,11 +63,11 @@ vi.mock("../../../../../components/context-menu", () => ({
               key={item.key as string}
               onClick={(e) => {
                 e.stopPropagation();
-                (item.onClick as () => void)();
+                (item.onClick as () => void)?.();
               }}
               data-testid={`menu-item-${item.key}`}
             >
-              {item.label as string}
+              {item.label as React.ReactNode}
               {typeof item.getTooltipContent === "function"
                 ? (item.getTooltipContent as () => React.ReactNode)()
                 : null}
@@ -152,6 +152,10 @@ vi.mock("../../../../../components/backdrop", () => ({
   Backdrop: () => <div data-testid="backdrop" />,
 }));
 
+vi.mock("../../../../../components", () => ({
+  HelpButton: () => <button>help</button>,
+}));
+
 // Mock Assets
 vi.mock("../../../../../assets/mcp.tool.svg", () => ({
   default: () => <svg />,
@@ -160,6 +164,9 @@ vi.mock("../../../../../assets/web.search.svg", () => ({
   default: () => <svg />,
 }));
 vi.mock("../../../../../assets/manage.connection.react.svg", () => ({
+  default: () => <svg />,
+}));
+vi.mock("../../../../../assets/lightbulb.svg", () => ({
   default: () => <svg />,
 }));
 
@@ -194,6 +201,8 @@ describe("<ToolsSettings />", () => {
       agentId: "123",
     } as unknown as ReturnType<typeof useChatStore>);
     vi.mocked(useMessageStore).mockReturnValue({
+      thinkingEnabled: false,
+      setThinkingEnabled: vi.fn(),
       setKnowledgeSearchToolName: vi.fn(),
       setWebSearchToolName: vi.fn(),
       setWebCrawlingToolName: vi.fn(),
@@ -206,6 +215,10 @@ describe("<ToolsSettings />", () => {
     } as unknown as ReturnType<typeof useTheme>);
     vi.mocked(useApi).mockReturnValue({
       aiApi: mockAiApi,
+      thirdPartyApi: {
+        getThirdPartyCode: vi.fn(),
+      },
+      baseUrl: "https://test.com",
     } as unknown as ReturnType<typeof useApi>);
   });
 
@@ -234,6 +247,7 @@ describe("<ToolsSettings />", () => {
     generateDocxToolName: "",
     generateFormToolName: "",
     generatePresentationToolName: "",
+    thinkingSupported: true,
     setServers: mockSetServers,
     setMCPTools: mockSetMCPTools,
     setWebSearchEnabled: mockSetWebSearchEnabled,
@@ -309,5 +323,32 @@ describe("<ToolsSettings />", () => {
     fireEvent.click(closeBtn);
 
     expect(screen.queryByTestId("aside")).not.toBeInTheDocument();
+  });
+
+  it("handles thinking toggle", () => {
+    const mockSetThinkingEnabled = vi.fn();
+    vi.mocked(useMessageStore).mockReturnValue({
+      thinkingEnabled: false,
+      setThinkingEnabled: mockSetThinkingEnabled,
+    } as unknown as ReturnType<typeof useMessageStore>);
+
+    render(<ToolsSettings {...defaultProps} thinkingSupported={true} />);
+
+    fireEvent.click(screen.getByTestId("chat-input-tools-button"));
+
+    const thinkingItem = screen.getByText("ExtendedThinking");
+    fireEvent.click(thinkingItem);
+
+    expect(mockSetThinkingEnabled).toHaveBeenCalledWith(true);
+  });
+
+  it("shows disabled thinking when not supported", () => {
+    render(<ToolsSettings {...defaultProps} thinkingSupported={false} />);
+
+    fireEvent.mouseEnter(screen.getByTestId("chat-input-tools-button"));
+
+    expect(
+      screen.getByText("ExtendedThinkingNotSupported"),
+    ).toBeInTheDocument();
   });
 });
