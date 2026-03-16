@@ -39,6 +39,11 @@ import type useToolsSettings from "./hooks/useToolsSettings";
 import type useInitChats from "./hooks/useInitChats";
 import type useInitMessages from "./hooks/useInitMessages";
 
+export type TChatSample = {
+  title: string;
+  prompt: string;
+};
+
 export type TChatPlaylistImage = {
   fileId: number;
   title: string;
@@ -230,6 +235,8 @@ export type ChatInputProps = {
   allowManageTools?: boolean;
   onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
   onStopStream?: () => void;
+  withSamples?: boolean;
+  samples?: TChatSample[];
 };
 
 export type ChatInfoBlockProps = {
@@ -295,6 +302,9 @@ export type ChatProps = {
   onSelectChat?: (chatId: string) => void;
 
   modelAliases?: TAIConfig["modelAliases"];
+
+  withSamples?: boolean;
+  samples?: TChatSample[];
 };
 
 export type ChatCoreProps = ChatProps & {
