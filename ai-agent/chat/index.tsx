@@ -31,10 +31,10 @@ import { MessageStoreContextProvider } from "./store/messageStore";
 import { ChatStoreContextProvider, useChatStore } from "./store/chatStore";
 
 import type {
-  ChatProps,
-  ChatCoreProps,
-  ChatInternalInitProps,
-  ChatExternalInitProps,
+	ChatProps,
+	ChatCoreProps,
+	ChatInternalInitProps,
+	ChatExternalInitProps,
 } from "./Chat.types";
 
 import ChatContainer from "./components/chat-container";
@@ -54,152 +54,156 @@ import useGetIcon from "./hooks/useGetIcon";
 export { CHAT_SUPPORTED_FORMATS };
 
 const ChatUI = observer(
-  ({
-    isLoadingChat,
-    selectedModel,
-    getIcon,
-    agentId,
-    userAvatar,
-    attachmentFile,
-    clearAttachmentFile,
-    toolsSettings,
-    isAdmin = false,
-    standalone = false,
-    aiReady = false,
-    getResultStorageId,
-    multimodal,
-    goToAISettings,
-    goToWebSearchSettings,
-    setAiPlaylistImages,
-    setMediaViewerVisible,
-    persistDraft = false,
-    openFile,
-    openLink,
-    allowAttachFiles,
-    allowManageTools,
-    allowSelectChat,
-    onSendMessage,
-    onStopStream,
-    onNewChat,
-    onSelectChat,
-    modelAliases,
-  }: ChatCoreProps) => {
-    const { currentChat } = useChatStore();
+	({
+		isLoadingChat,
+		selectedModel,
+		getIcon,
+		agentId,
+		userAvatar,
+		attachmentFile,
+		clearAttachmentFile,
+		toolsSettings,
+		isAdmin = false,
+		standalone = false,
+		aiReady = false,
+		getResultStorageId,
+		multimodal,
+		goToAISettings,
+		goToWebSearchSettings,
+		setAiPlaylistImages,
+		setMediaViewerVisible,
+		persistDraft = false,
+		openFile,
+		openLink,
+		allowAttachFiles,
+		allowManageTools,
+		allowSelectChat,
+		onSendMessage,
+		onStopStream,
+		onNewChat,
+		onSelectChat,
+		modelAliases,
+		withSamples,
+		samples,
+	}: ChatCoreProps) => {
+		const { currentChat } = useChatStore();
 
-    const showEmptyScreen = !isLoadingChat && !aiReady && !currentChat;
+		const showEmptyScreen = !isLoadingChat && !aiReady && !currentChat;
 
-    React.useEffect(() => {
-      window.dispatchEvent(
-        new CustomEvent("select-chat", {
-          detail: {
-            chatId: currentChat?.id,
-          },
-        }),
-      );
-    }, [currentChat?.id]);
+		React.useEffect(() => {
+			window.dispatchEvent(
+				new CustomEvent("select-chat", {
+					detail: {
+						chatId: currentChat?.id,
+					},
+				}),
+			);
+		}, [currentChat?.id]);
 
-    return (
-      <>
-        <ChatHeader
-          selectedModel={selectedModel}
-          isLoading={isLoadingChat}
-          getIcon={getIcon}
-          getResultStorageId={getResultStorageId}
-          agentId={agentId}
-          aiReady={aiReady}
-          openFile={openFile}
-          allowSelectChat={allowSelectChat}
-          onNewChat={onNewChat}
-          onSelectChat={onSelectChat}
-          modelAliases={modelAliases}
-        />
-        {showEmptyScreen ? (
-          <ChatNoAccessScreen
-            aiReady={aiReady}
-            standalone={standalone}
-            isPortalAdmin={isAdmin}
-            goToAISettings={goToAISettings}
-          />
-        ) : (
-          <>
-            <ChatMessageBody
-              userAvatar={userAvatar}
-              isLoading={isLoadingChat}
-              getIcon={getIcon}
-              getResultStorageId={getResultStorageId}
-              setAiPlaylistImages={setAiPlaylistImages}
-              setMediaViewerVisible={setMediaViewerVisible}
-              openFile={openFile}
-              openLink={openLink}
-            />
-            <ChatFooter
-              attachmentFile={attachmentFile}
-              clearAttachmentFile={clearAttachmentFile}
-              isLoading={isLoadingChat}
-              getIcon={getIcon}
-              selectedModel={selectedModel}
-              toolsSettings={toolsSettings}
-              isPortalAdmin={isAdmin}
-              aiReady={aiReady}
-              standalone={standalone}
-              multimodal={multimodal}
-              goToWebSearchSettings={goToWebSearchSettings}
-              persistDraft={persistDraft}
-              openFile={openFile}
-              allowAttachFiles={allowAttachFiles}
-              allowManageTools={allowManageTools}
-              onSendMessage={onSendMessage}
-              onStopStream={onStopStream}
-            />
-          </>
-        )}
-      </>
-    );
-  },
+		return (
+			<>
+				<ChatHeader
+					selectedModel={selectedModel}
+					isLoading={isLoadingChat}
+					getIcon={getIcon}
+					getResultStorageId={getResultStorageId}
+					agentId={agentId}
+					aiReady={aiReady}
+					openFile={openFile}
+					allowSelectChat={allowSelectChat}
+					onNewChat={onNewChat}
+					onSelectChat={onSelectChat}
+					modelAliases={modelAliases}
+				/>
+				{showEmptyScreen ? (
+					<ChatNoAccessScreen
+						aiReady={aiReady}
+						standalone={standalone}
+						isPortalAdmin={isAdmin}
+						goToAISettings={goToAISettings}
+					/>
+				) : (
+					<>
+						<ChatMessageBody
+							userAvatar={userAvatar}
+							isLoading={isLoadingChat}
+							getIcon={getIcon}
+							getResultStorageId={getResultStorageId}
+							setAiPlaylistImages={setAiPlaylistImages}
+							setMediaViewerVisible={setMediaViewerVisible}
+							openFile={openFile}
+							openLink={openLink}
+						/>
+						<ChatFooter
+							attachmentFile={attachmentFile}
+							clearAttachmentFile={clearAttachmentFile}
+							isLoading={isLoadingChat}
+							getIcon={getIcon}
+							selectedModel={selectedModel}
+							toolsSettings={toolsSettings}
+							isPortalAdmin={isAdmin}
+							aiReady={aiReady}
+							standalone={standalone}
+							multimodal={multimodal}
+							goToWebSearchSettings={goToWebSearchSettings}
+							persistDraft={persistDraft}
+							openFile={openFile}
+							allowAttachFiles={allowAttachFiles}
+							allowManageTools={allowManageTools}
+							onSendMessage={onSendMessage}
+							onStopStream={onStopStream}
+							withSamples={withSamples}
+							samples={samples}
+						/>
+					</>
+				)}
+			</>
+		);
+	},
 );
 
 const ChatCore = (props: ChatCoreProps) => {
-  const {
-    agentId,
-    initChats,
-    messagesSettings,
-    multimodal,
-    isLoadingChat,
-    useExternalScroll = false,
-    externalScrollRef,
-    width,
-    height,
-    style,
-    className,
-    aiReady = false,
-    standalone = false,
-    isAdmin = false,
-    goToAISettings,
-    toolsSettings,
-  } = props;
+	const {
+		agentId,
+		initChats,
+		messagesSettings,
+		multimodal,
+		isLoadingChat,
+		useExternalScroll = false,
+		externalScrollRef,
+		width,
+		height,
+		style,
+		className,
+		aiReady = false,
+		standalone = false,
+		isAdmin = false,
+		goToAISettings,
+		toolsSettings,
+	} = props;
 
-  const hasChats = initChats?.chats?.length > 0;
+	const hasChats = initChats?.chats?.length > 0;
 
-  if (!isLoadingChat && !aiReady && !hasChats) {
-    return (
-      <ChatContainer
-        isLoadingChat={isLoadingChat}
-        useExternalScroll={useExternalScroll}
-        externalScrollRef={externalScrollRef}
-        width={width}
-        height={height}
-        style={style}
-        className={className}
-      >
-        <ChatNoAccessScreen
-          aiReady={aiReady}
-          standalone={standalone}
-          isPortalAdmin={isAdmin}
-          goToAISettings={goToAISettings}
-        />
-      </ChatContainer>
-    );
-  }
+	if (!isLoadingChat && !aiReady && !hasChats) {
+		return (
+			<ChatContainer
+				isLoadingChat={isLoadingChat}
+				useExternalScroll={useExternalScroll}
+				externalScrollRef={externalScrollRef}
+				width={width}
+				height={height}
+				style={style}
+				className={className}
+			>
+				<ChatNoAccessScreen
+					aiReady={aiReady}
+					standalone={standalone}
+					isPortalAdmin={isAdmin}
+					goToAISettings={goToAISettings}
+				/>
+			</ChatContainer>
+		);
+	}
 
   return (
     <ChatStoreContextProvider agentId={agentId} {...initChats}>
@@ -235,116 +239,116 @@ const ChatCore = (props: ChatCoreProps) => {
 };
 
 const ChatInternalInit = (props: ChatInternalInitProps) => {
-  const { agentId, isLoading, getIcon: getIconProp } = props;
+	const { agentId, isLoading, getIcon: getIconProp } = props;
 
-  const { aiConfig, fetchAiConfig } = useAiConfig();
-  const { chatSettings, fetchChatSettings } = useChatSettings({
-    agentId: agentId ?? "",
-  });
+	const { aiConfig, fetchAiConfig } = useAiConfig();
+	const { chatSettings, fetchChatSettings } = useChatSettings({
+		agentId: agentId ?? "",
+	});
 
-  const initChats = useInitChats({ agentId: agentId ?? "" });
-  const { initMessages, ...messagesSettings } = useInitMessages(agentId ?? "");
-  const toolsSettings = useToolsSettings({
-    agentId: agentId ?? "",
-    aiConfig,
-    chatSettings,
-  });
-  const { getIcon, isLoading: isLoadingGetIcon } = useGetIcon(getIconProp);
+	const initChats = useInitChats({ agentId: agentId ?? "" });
+	const { initMessages, ...messagesSettings } = useInitMessages(agentId ?? "");
+	const toolsSettings = useToolsSettings({
+		agentId: agentId ?? "",
+		aiConfig,
+		chatSettings,
+	});
+	const { getIcon, isLoading: isLoadingGetIcon } = useGetIcon(getIconProp);
 
-  const [isInitialized, setIsInitialized] = React.useState(false);
-  const prevAgentIdRef = React.useRef<string | number | null>(null);
+	const [isInitialized, setIsInitialized] = React.useState(false);
+	const prevAgentIdRef = React.useRef<string | number | null>(null);
 
-  React.useEffect(() => {
-    if (!agentId) return;
-    if (prevAgentIdRef.current === agentId) return;
+	React.useEffect(() => {
+		if (!agentId) return;
+		if (prevAgentIdRef.current === agentId) return;
 
-    prevAgentIdRef.current = agentId;
+		prevAgentIdRef.current = agentId;
 
-    const init = async () => {
-      await Promise.all([
-        initChats.fetchChats(),
-        initMessages(),
-        fetchAiConfig(),
-        fetchChatSettings(),
-        toolsSettings.initTools(),
-      ]);
-      setIsInitialized(true);
-    };
+		const init = async () => {
+			await Promise.all([
+				initChats.fetchChats(),
+				initMessages(),
+				fetchAiConfig(),
+				fetchChatSettings(),
+				toolsSettings.initTools(),
+			]);
+			setIsInitialized(true);
+		};
 
-    init();
-  }, [
-    agentId,
-    initChats.fetchChats,
-    initMessages,
-    fetchAiConfig,
-    fetchChatSettings,
-    toolsSettings.initTools,
-  ]);
+		init();
+	}, [
+		agentId,
+		initChats.fetchChats,
+		initMessages,
+		fetchAiConfig,
+		fetchChatSettings,
+		toolsSettings.initTools,
+	]);
 
-  React.useEffect(() => {
-    setIsInitialized(false);
-  }, [agentId]);
+	React.useEffect(() => {
+		setIsInitialized(false);
+	}, [agentId]);
 
-  React.useEffect(() => {
-    const onSelectChat = async () => {
-      await initMessages();
-    };
+	React.useEffect(() => {
+		const onSelectChat = async () => {
+			await initMessages();
+		};
 
-    window.addEventListener("select-chat", onSelectChat);
-    return () => window.removeEventListener("select-chat", onSelectChat);
-  }, [initMessages]);
+		window.addEventListener("select-chat", onSelectChat);
+		return () => window.removeEventListener("select-chat", onSelectChat);
+	}, [initMessages]);
 
-  return (
-    <ChatCore
-      {...props}
-      getIcon={getIcon}
-      initChats={initChats}
-      messagesSettings={messagesSettings}
-      toolsSettings={toolsSettings}
-      multimodal={chatSettings?.multimodal}
-      isLoadingChat={isLoading || !isInitialized || isLoadingGetIcon}
-      aiReady={!!aiConfig?.aiReady}
-      modelAliases={aiConfig?.modelAliases}
-      selectedModel={chatSettings?.modelId ?? ""}
-    />
-  );
+	return (
+		<ChatCore
+			{...props}
+			getIcon={getIcon}
+			initChats={initChats}
+			messagesSettings={messagesSettings}
+			toolsSettings={toolsSettings}
+			multimodal={chatSettings?.multimodal}
+			isLoadingChat={isLoading || !isInitialized || isLoadingGetIcon}
+			aiReady={!!aiConfig?.aiReady}
+			modelAliases={aiConfig?.modelAliases}
+			selectedModel={chatSettings?.modelId ?? ""}
+		/>
+	);
 };
 
 const ChatExternalInit = (props: ChatExternalInitProps) => {
-  const { isLoading, agentId, getIcon: getIconProp } = props;
-  const { getIcon, isLoading: isLoadingGetIcon } = useGetIcon(getIconProp);
-  const isLoadingChat = isLoading || !agentId || isLoadingGetIcon;
+	const { isLoading, agentId, getIcon: getIconProp } = props;
+	const { getIcon, isLoading: isLoadingGetIcon } = useGetIcon(getIconProp);
+	const isLoadingChat = isLoading || !agentId || isLoadingGetIcon;
 
-  return (
-    <ChatCore {...props} getIcon={getIcon} isLoadingChat={isLoadingChat} />
-  );
+	return (
+		<ChatCore {...props} getIcon={getIcon} isLoadingChat={isLoadingChat} />
+	);
 };
 
 const Chat = (props: ChatProps) => {
-  const { internalInit = true, ...rest } = props;
+	const { internalInit = true, ...rest } = props;
 
-  if (internalInit) {
-    return <ChatInternalInit {...rest} />;
-  }
+	if (internalInit) {
+		return <ChatInternalInit {...rest} />;
+	}
 
-  // For external init, initChats, messagesSettings, and toolsSettings are required
-  const { initChats, messagesSettings, toolsSettings } = props;
+	// For external init, initChats, messagesSettings, and toolsSettings are required
+	const { initChats, messagesSettings, toolsSettings } = props;
 
-  if (!initChats || !messagesSettings || !toolsSettings) {
-    console.error(
-      "Chat: initChats, messagesSettings, and toolsSettings are required when internalInit is false",
-    );
-    return null;
-  }
+	if (!initChats || !messagesSettings || !toolsSettings) {
+		console.error(
+			"Chat: initChats, messagesSettings, and toolsSettings are required when internalInit is false",
+		);
+		return null;
+	}
 
-  return (
-    <ChatExternalInit
-      {...rest}
-      initChats={initChats}
-      messagesSettings={messagesSettings}
-      toolsSettings={toolsSettings}
-    />
-  );
+	return (
+		<ChatExternalInit
+			{...rest}
+			initChats={initChats}
+			messagesSettings={messagesSettings}
+			toolsSettings={toolsSettings}
+		/>
+	);
 };
 
 export default Chat;

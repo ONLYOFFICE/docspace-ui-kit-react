@@ -1,4 +1,4 @@
-/*
+/*!
  * (c) Copyright Ascensio System SIA 2009-2026
  *
  * This program is a free software product.
@@ -26,62 +26,40 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { ChatFooterProps } from "../../Chat.types";
-import { ChatInfoBlock } from "../chat-info-block";
-import ChatInput from "../chat-input";
-import styles from "./ChatFooter.module.scss";
+.samples {
+  width: 100%;
+  max-width: 700px;
 
-const ChatFooter = ({
-  isLoading,
-  aiReady,
-  isPortalAdmin,
-  standalone,
-  attachmentFile,
-  clearAttachmentFile,
-  getIcon,
-  selectedModel,
-  toolsSettings,
-  multimodal,
-  goToWebSearchSettings,
-  persistDraft,
-  openFile,
-  allowAttachFiles,
-  allowManageTools,
-  onSendMessage,
-  onStopStream,
-  withSamples,
-  samples,
-}: ChatFooterProps) => {
-  return (
-    <div className={styles.chatFooter} data-testid="chat-footer">
-      {!isLoading && !aiReady ? (
-        <ChatInfoBlock
-          standalone={standalone}
-          isPortalAdmin={isPortalAdmin}
-        />
-      ) : null}
-      <ChatInput
-        attachmentFile={attachmentFile}
-        clearAttachmentFile={clearAttachmentFile}
-        isLoading={isLoading}
-        getIcon={getIcon}
-        selectedModel={selectedModel}
-        toolsSettings={toolsSettings}
-        isPortalAdmin={isPortalAdmin}
-        aiReady={aiReady}
-        multimodal={multimodal}
-        goToWebSearchSettings={goToWebSearchSettings}
-        persistDraft={persistDraft}
-        openFile={openFile}
-        allowAttachFiles={allowAttachFiles}
-        allowManageTools={allowManageTools}
-        onSendMessage={onSendMessage}
-        onStopStream={onStopStream}
-        withSamples={withSamples}
-        samples={samples}
-      />
-    </div>
-  );
-};
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 
-export default ChatFooter;
+  margin-bottom: 12px;
+
+  box-sizing: border-box;
+}
+
+.sampleItem {
+  padding: 10px 12px;
+
+  border: 1px solid var(--accent-main);
+  border-radius: 6px;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  text-align: center;
+
+  overflow: hidden;
+
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--chat-input-tools-button-hover-background);
+  }
+}
+
+.sampleText {
+  color: var(--text-color);
+}

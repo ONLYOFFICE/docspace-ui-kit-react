@@ -17,8 +17,8 @@
     "test:coverage": "pnpm run copy-assets && vitest --coverage",
     "lint": "pnpm run copy-assets && biome lint .",
     "lint:fix": "pnpm run copy-assets && biome lint --write .",
-    "format": "pnpm run copy-assets && biome check .",
-    "format:fix": "pnpm run copy-assets && biome check --write .",
+    "format": "pnpm run copy-assets && prettier --check .",
+    "format:fix": "pnpm run copy-assets && prettier --write .",
     "tsc": "pnpm run copy-assets && tsc",
     "prepublishOnly": "pnpm run build",
     "prepare": "node -e \"if (!process.env.CI) { try { require('child_process').execSync('git --version', {stdio: 'ignore'}); require('child_process').execSync('lefthook install', {stdio: 'inherit'}); } catch (e) { console.error('Lefthook installation skipped:', e.message); } }\""
@@ -83,6 +83,7 @@
   "devDependencies": {
     "@babel/core": "7.25.8",
     "@biomejs/biome": "2.3.14",
+    "prettier": "^3.8.1",
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.3.0",

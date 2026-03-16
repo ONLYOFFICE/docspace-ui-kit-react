@@ -35,6 +35,12 @@ import type {
 
 import { addLog } from "../add-log";
 
+export const enum SocketCommandsRoomParts {
+  ExternalDbSettings = "external-db-settings",
+  StorageEncryption = "storage-encryption",
+  Restore = "restore",
+}
+
 /**
  * Enum representing various socket events used in the application.
  * These events are used for communication between the client and server.
@@ -81,6 +87,7 @@ export enum SocketEvents {
   ChaneFolderAccessRights = "s:change-access-rights-folder",
   ExportChat = "s:export-chat",
   QuotaExceeded = "s:quota_exceeded",
+  ExternalDbSettings = "s:external-db-settings",
 }
 
 /**
@@ -345,6 +352,9 @@ export type TListenEventCallbackMap = {
       scope: "room" | "user" | "tenant";
     };
   }) => void;
+  [SocketEvents.ExternalDbSettings]: (
+    settings: Partial<Record<string, unknown>>,
+  ) => void;
 };
 
 /**

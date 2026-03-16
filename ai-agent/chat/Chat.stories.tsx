@@ -165,6 +165,16 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
       action: "onSelectChat",
       description: "Called when a different chat is selected",
     },
+    withSamples: {
+      control: "boolean",
+      description: "Show sample prompt suggestions above the input",
+      table: { defaultValue: { summary: "false" } },
+    },
+    samples: {
+      control: "object",
+      description:
+        "Array of sample prompt strings (up to 4) displayed above the input when withSamples is enabled",
+    },
     useExternalScroll: {
       control: "boolean",
       description: "Whether to use an external scroll container",
@@ -328,6 +338,61 @@ export const WithListeners: Story = {
     },
   },
 };
+export const WithSamples: Story = {
+  render: (args) => <Template {...args} />,
+  args: {
+    width: "100%",
+    height: "700px",
+    withSamples: true,
+    samples: [
+      {
+        title: "Write an email",
+        prompt:
+          "Write a professional email to a client updating them on the current project status and next steps",
+      },
+      {
+        title: "Brainstorm ideas",
+        prompt:
+          "Help me brainstorm 10 creative ideas for improving team productivity and collaboration",
+      },
+      {
+        title: "Explain a concept",
+        prompt:
+          "Explain the concept of microservices architecture in simple terms with pros and cons",
+      },
+      {
+        title: "Create a to-do list",
+        prompt:
+          "Create a structured to-do list for planning and launching a new product feature from scratch",
+      },
+    ],
+    onSendMessage: (message, files) => {
+      console.log("Message sent:", message, files);
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Chat with sample prompts displayed above the input. Clicking a sample fills the input with the prompt text. Each sample has a `title` (displayed as button label) and a `prompt` (inserted into input on click).",
+      },
+      source: {
+        code: `<Chat
+  agentId={validatedAgentId}
+  withSamples={true}
+  samples={[
+    { title: "Write an email", prompt: "Write a professional email to a client..." },
+    { title: "Brainstorm ideas", prompt: "Help me brainstorm 10 creative ideas..." },
+    { title: "Explain a concept", prompt: "Explain the concept of microservices..." },
+    { title: "Create a to-do list", prompt: "Create a structured to-do list..." },
+  ]}
+  onSendMessage={(message, files) => console.log(message, files)}
+/>`,
+      },
+    },
+  },
+};
+
 export const ExternalScroll: Story = {
   render: (args: StoryArgs) => {
     const scrollRef = React.useRef<HTMLDivElement>(null);

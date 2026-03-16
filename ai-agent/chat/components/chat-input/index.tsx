@@ -42,6 +42,7 @@ import type { ChatInputProps } from "../../Chat.types";
 import Attachment from "./attachment";
 import FilesList from "./files-list";
 import Buttons from "./buttons";
+import ChatSamples from "./samples";
 
 import styles from "./ChatInput.module.scss";
 import { useCommonTranslation } from "../../../../utils/i18n";
@@ -63,10 +64,18 @@ const ChatInput = ({
   allowManageTools,
   onSendMessage,
   onStopStream,
+  withSamples,
+  samples,
 }: ChatInputProps) => {
   const t = useCommonTranslation();
-  const { startChat, sendMessage, currentChatId, isRequestRunning, agentId } =
-    useMessageStore();
+  const {
+    startChat,
+    sendMessage,
+    currentChatId,
+    isRequestRunning,
+    agentId,
+    messages,
+  } = useMessageStore();
   const { fetchChat, currentChat } = useChatStore();
 
   const [value, setValue] = React.useState("");
@@ -269,8 +278,15 @@ const ChatInput = ({
     }
   }, [attachmentFile, handleSelectFile, clearAttachmentFile]);
 
+  const handleSampleSelect = (sample: string) => {
+    setValue(sample);
+  };
+
   return (
     <>
+      {withSamples && samples && samples.length > 0 && messages.length === 0 ? (
+        <ChatSamples samples={samples} onSelect={handleSampleSelect} />
+      ) : null}
       <div className={classNames(styles.chatInput, "chat-input")}>
         {isLoading ? (
           <RectangleSkeleton width="100%" height="116px" borderRadius="3px" />
