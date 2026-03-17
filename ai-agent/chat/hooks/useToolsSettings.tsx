@@ -51,7 +51,7 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
   );
   const [webSearchEnabled, setWebSearchEnabled] = React.useState(false);
   const [isFetched, setIsFetched] = React.useState(false);
-  const { aiApi, foldersApi } = useApi();
+  const { aiApi } = useApi();
 
   const fetchServerTools = React.useCallback(
     async (res: TServer[], agentId: string | number) => {
@@ -96,7 +96,7 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
     ];
 
     await Promise.all(promises);
-  }, [fetchTools, agentId, aiApi, foldersApi]);
+  }, [fetchTools, agentId, aiApi]);
 
   const onModifyFolder = React.useCallback(
     (data?: TOptSocket) => {
