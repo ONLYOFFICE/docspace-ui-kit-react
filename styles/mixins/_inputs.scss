@@ -29,7 +29,6 @@
 @use "text";
 @use "../variables/colors" as *;
 
-
 // Light theme variables mixin
 @mixin input-theme-variables-light {
   // Input colors
@@ -154,7 +153,6 @@
   --text-input-font-weight-large: 400;
 }
 
-
 @mixin common-input-color-styles {
   @include input-theme-variables-light;
 
@@ -260,7 +258,7 @@
     @include text.no-user-select;
   }
 
-  &:not(:disabled):not(&[data-disabled="true"]) {
+  &:not(:disabled):not(&[data-disabled="true"]):not(&[data-error="true"]) {
     &:hover {
       border-color: var(--input-border-hover);
     }
