@@ -158,8 +158,12 @@ const ChatInput = ({
       onSendMessage?.(value, selectedFiles);
 
       setValue("");
-      setSelectedFiles([]);
-      saveChangesToStorage("", []);
+      if (!hideAttachments) {
+        setSelectedFiles([]);
+        saveChangesToStorage("", []);
+      } else {
+        saveChangesToStorage("", selectedFiles);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -171,6 +175,7 @@ const ChatInput = ({
     value,
     selectedFiles,
     onSendMessage,
+    hideAttachments,
   ]);
 
   const onKeyEnter = React.useCallback(
@@ -274,10 +279,12 @@ const ChatInput = ({
           },
         ];
         handleSelectFile(file);
-        clearAttachmentFile?.();
+        if (!hideAttachments) {
+          clearAttachmentFile?.();
+        }
       }, 0);
     }
-  }, [attachmentFile, handleSelectFile, clearAttachmentFile]);
+  }, [attachmentFile, handleSelectFile, clearAttachmentFile, hideAttachments]);
 
   const handleSampleSelect = (sample: string) => {
     setValue(sample);
