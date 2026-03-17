@@ -31,6 +31,7 @@ const getReasoningKey = (agentId: string | number) => `agent_${agentId}_reasonin
 export const getReasoningStateFromLocalStorage = (
   agentId: string | number,
 ): boolean => {
+  if (typeof window === "undefined") return false;
   const storedValue = localStorage.getItem(getReasoningKey(agentId));
   return storedValue === "true";
 };
@@ -39,6 +40,7 @@ export const setReasoningStateToLocalStorage = (
   agentId: string | number,
   enabled: boolean,
 ): void => {
+  if (typeof window === "undefined") return;
   const key = getReasoningKey(agentId);
   if (enabled) {
     localStorage.setItem(key, "true");
