@@ -30,6 +30,8 @@
 .dropzoneWrapper {
   :global(.light) & {
     --dropzone-border: 2px dashed #{colors.$gray-light-mid};
+    --dropzone-drag-active-bg: #{colors.$light-blue-dropzone-active};
+    --dropzone-hover-bg: #{colors.$light-blue-dropzone-hover};
 
     --dropzone-secondary-link: #{colors.$black};
     --dropzone-exsts-color: #{colors.$gray};
@@ -45,6 +47,8 @@
 
   :global(.dark) & {
     --dropzone-border: 2px dashed #{colors.$gray-dark-strong};
+    --dropzone-drag-active-bg: #{colors.$light-blue-dropzone-active};
+    --dropzone-hover-bg: #{colors.$light-blue-dropzone-hover};
 
     --dropzone-secondary-link: #{colors.$white};
     --dropzone-exsts-color: #{colors.$gray};
@@ -70,6 +74,14 @@
 
   &.hasChildren {
     height: auto;
+  }
+
+  &.isDraggingOnPage {
+    background-color: var(--dropzone-drag-active-bg);
+  }
+
+  &.isDragOver {
+    background-color: var(--dropzone-hover-bg);
   }
 }
 
