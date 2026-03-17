@@ -63,8 +63,8 @@
 }
 
 .chatEmptyHelpMessage {
-  margin-top: 32px;
-  margin-bottom: 24px;
+  margin-top: 32px !important;
+  margin-bottom: 24px !important;
   text-align: center;
 }
 
@@ -88,12 +88,11 @@
     pointer-events: none;
   }
 
-
   &:hover {
     .userMessageBtns {
       opacity: 1;
       pointer-events: auto;
-    } 
+    }
   }
 }
 
@@ -512,11 +511,11 @@
     }
 
     .toolFinishIcon {
-        height: 12px;
+      height: 12px;
 
-        path {
-          fill: var(--chat-input-send-button-background);
-        }
+      path {
+        fill: var(--chat-input-send-button-background);
+      }
     }
 
     .toolName {
@@ -701,32 +700,32 @@
   margin-top: 8px;
 }
 
- .buttonsBlockItem {
-    width: 32px;
-    height: 32px;
+.buttonsBlockItem {
+  width: 32px;
+  height: 32px;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    div {
-      width: 16px;
-      height: 16px;
-    }
+  div {
+    width: 16px;
+    height: 16px;
+  }
 
-    &:hover {
-      background-color: var(--chat-header-button-hover-background);
-      border-radius: 3px;
-    }
+  &:hover {
+    background-color: var(--chat-header-button-hover-background);
+    border-radius: 3px;
+  }
 
-    svg {
-      path {
-        fill: var(--icon-button-color);
-      }
+  svg {
+    path {
+      fill: var(--icon-button-color);
     }
   }
+}
 
 .chatLoader {
   display: flex;
