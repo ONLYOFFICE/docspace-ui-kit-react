@@ -95,6 +95,7 @@ const Message = ({
   idx,
   userAvatar,
   isLast,
+  hideAttachments,
   getIcon,
   getResultStorageId,
   setAiPlaylistImages,
@@ -139,7 +140,7 @@ const Message = ({
           />
 
           <div className={classNames(styles.chatMessageContent)}>
-            {images.length > 0 ? (
+            {images.length > 0 && !hideAttachments ? (
               <Images
                 images={images}
                 setMediaViewerVisible={setMediaViewerVisible}
@@ -147,7 +148,7 @@ const Message = ({
               />
             ) : null}
 
-            {files.length > 0 ? (
+            {files.length > 0 && !hideAttachments ? (
               <Files
                 files={files}
                 getIcon={getIcon}
