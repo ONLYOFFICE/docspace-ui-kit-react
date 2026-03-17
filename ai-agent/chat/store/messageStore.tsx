@@ -546,7 +546,7 @@ export default class MessageStore {
   };
 
   handleStreamError = (jsonData: string, error?: unknown) => {
-    this.setIsStreamRunning(true);
+    this.setIsStreamRunning(false);
     this.setIsAnalyzing(false);
     let message = "";
     try {
