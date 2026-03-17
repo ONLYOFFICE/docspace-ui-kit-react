@@ -438,7 +438,6 @@ const ToolsSettings = ({
           maxHeightLowerSubmenu={360}
           showDisabledItems
           withBackdrop={isMobile()}
-          //ignoreChangeView
           headerOnlyMobile
           withoutBackHeaderButton
           dataTestId="chat-input-tools-context-menu"
