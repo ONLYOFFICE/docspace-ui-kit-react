@@ -114,6 +114,7 @@ export type MessageProps = {
   idx: number;
   userAvatar?: string;
   isLast: boolean;
+  hideAttachments?: boolean;
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
   openFile?: (fileId: string) => void;
@@ -171,10 +172,13 @@ export type MessageToolCallProps = {
 
 export type MessageEmptyProps = {
   isLoading?: boolean;
+  emptyScreenText?: string;
 };
 
 export type MessageBodyProps = {
   isLoading?: boolean;
+  hideAttachments?: boolean;
+  emptyScreenText?: string;
 
   getIcon: TGetIcon;
   getResultStorageId?: () => number | null;
@@ -223,6 +227,7 @@ export type ChatInputProps = {
 
   attachmentFile?: Partial<TFile> | null;
   clearAttachmentFile?: VoidFunction;
+  hideAttachments?: boolean;
   selectedModel: string;
 
   toolsSettings: ReturnType<typeof useToolsSettings>;
@@ -269,6 +274,7 @@ export type ChatProps = {
 
   attachmentFile: ChatInputProps["attachmentFile"];
   clearAttachmentFile: ChatInputProps["clearAttachmentFile"];
+  hideAttachments?: ChatInputProps["hideAttachments"];
 
   toolsSettings?: ChatInputProps["toolsSettings"];
   initChats?: ReturnType<typeof useInitChats>;
@@ -280,6 +286,7 @@ export type ChatProps = {
   goToAISettings?: () => void;
   goToWebSearchSettings?: () => void;
 
+  emptyScreenText?: string;
   setAiPlaylistImages?: (value: TChatPlaylistImage[]) => void;
   setMediaViewerVisible?: (value: boolean) => void;
 

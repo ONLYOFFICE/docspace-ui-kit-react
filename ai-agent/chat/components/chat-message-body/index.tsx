@@ -48,6 +48,8 @@ const ChatMessageBody = observer(({
   userAvatar,
   getIcon,
   isLoading,
+  hideAttachments,
+  emptyScreenText,
   getResultStorageId,
   setAiPlaylistImages,
   setMediaViewerVisible,
@@ -104,7 +106,7 @@ const ChatMessageBody = observer(({
       data-testid="chat-message-body"
     >
       {isEmpty ? (
-        <EmptyScreen isLoading={isLoading} />
+        <EmptyScreen isLoading={isLoading} emptyScreenText={emptyScreenText} />
       ) : (
         <div
           className={classNames(styles.chatMessageContainer)}
@@ -118,6 +120,7 @@ const ChatMessageBody = observer(({
                 idx={index}
                 userAvatar={userAvatar}
                 isLast={index === 0}
+                hideAttachments={hideAttachments}
                 getIcon={getIcon}
                 getResultStorageId={getResultStorageId}
                 setAiPlaylistImages={setAiPlaylistImages}

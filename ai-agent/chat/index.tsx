@@ -62,6 +62,7 @@ const ChatUI = observer(
     userAvatar,
     attachmentFile,
     clearAttachmentFile,
+    hideAttachments,
     toolsSettings,
     isAdmin = false,
     standalone = false,
@@ -70,6 +71,7 @@ const ChatUI = observer(
     multimodal,
     goToAISettings,
     goToWebSearchSettings,
+    emptyScreenText,
     setAiPlaylistImages,
     setMediaViewerVisible,
     persistDraft = false,
@@ -127,6 +129,8 @@ const ChatUI = observer(
             <ChatMessageBody
               userAvatar={userAvatar}
               isLoading={isLoadingChat}
+              hideAttachments={hideAttachments}
+              emptyScreenText={emptyScreenText}
               getIcon={getIcon}
               getResultStorageId={getResultStorageId}
               setAiPlaylistImages={setAiPlaylistImages}
@@ -137,6 +141,7 @@ const ChatUI = observer(
             <ChatFooter
               attachmentFile={attachmentFile}
               clearAttachmentFile={clearAttachmentFile}
+              hideAttachments={hideAttachments}
               isLoading={isLoadingChat}
               getIcon={getIcon}
               selectedModel={selectedModel}
@@ -352,3 +357,4 @@ const Chat = (props: ChatProps) => {
 };
 
 export default Chat;
+

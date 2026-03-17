@@ -52,6 +52,7 @@ const ChatInput = ({
   isLoading,
   attachmentFile,
   clearAttachmentFile,
+  hideAttachments,
   selectedModel,
   toolsSettings,
   isPortalAdmin,
@@ -302,7 +303,7 @@ const ChatInput = ({
               wrapperClassName={classNames({
                 [styles.chatInputTextAreaWrapper]: true,
                 [styles.chatInputTextAreaWrapperFiles]:
-                  selectedFiles.length > 0,
+                  selectedFiles.length > 0 && !hideAttachments,
               })}
               placeholder={t("AIChatInput")}
               isChatMode
@@ -312,12 +313,14 @@ const ChatInput = ({
               dataTestId="chat-input-textarea"
             />
 
-            <FilesList
-              files={selectedFiles}
-              getIcon={getIcon}
-              onRemove={handleRemoveFile}
-              multimodal={multimodal}
-            />
+            {!hideAttachments ? (
+              <FilesList
+                files={selectedFiles}
+                getIcon={getIcon}
+                onRemove={handleRemoveFile}
+                multimodal={multimodal}
+              />
+            ) : null}
 
             <Buttons
               isFilesSelectorVisible={isFilesSelectorVisible}
@@ -359,3 +362,4 @@ const ChatInput = ({
 };
 
 export default observer(ChatInput);
+
