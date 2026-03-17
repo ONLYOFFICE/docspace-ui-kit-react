@@ -175,6 +175,17 @@ import Chat from "@docspace/ui-kit/ai-agent/chat";
       description:
         "Array of sample prompt strings (up to 4) displayed above the input when withSamples is enabled",
     },
+    hideAttachments: {
+      control: "boolean",
+      description:
+        "Hide file and image attachments in chat messages and the input area",
+      table: { defaultValue: { summary: "false" } },
+    },
+    emptyScreenText: {
+      control: "text",
+      description:
+        "Custom text for the empty chat screen. Falls back to the default translation if not provided.",
+    },
     useExternalScroll: {
       control: "boolean",
       description: "Whether to use an external scroll container",
