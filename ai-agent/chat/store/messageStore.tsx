@@ -72,6 +72,8 @@ export default class MessageStore {
 
   isStreamRunning: boolean = false;
 
+  isAnalyzing: boolean = false;
+
   isGetMessageRequestRunning: boolean = false;
 
   knowledgeSearchToolName: string = "";
@@ -189,6 +191,10 @@ export default class MessageStore {
     this.isStreamRunning = isStreamRunning;
   };
 
+  setIsAnalyzing = (isAnalyzing: boolean) => {
+    this.isAnalyzing = isAnalyzing;
+  };
+
   get reasoningEffort() {
     return this.thinkingEnabled && this.thinkingSupported
       ? ChatReasoningEffort.Medium
@@ -284,6 +290,7 @@ export default class MessageStore {
 
     this.setIsStreamRunning(false);
     this.setIsRequestRunning(false);
+    this.setIsAnalyzing(false);
   };
 
   addUserMessage = (message: string, files: Partial<TFile>[]) => {
@@ -540,6 +547,7 @@ export default class MessageStore {
 
   handleStreamError = (jsonData: string, error?: unknown) => {
     this.setIsStreamRunning(true);
+    this.setIsAnalyzing(false);
     let message = "";
     try {
       const parsed = JSON.parse(jsonData);
@@ -597,6 +605,7 @@ export default class MessageStore {
         if (done) {
           this.setIsRequestRunning(false);
           this.setIsStreamRunning(false);
+          this.setIsAnalyzing(false);
 
           if (isReasoningRunning) {
             msg += "\n</think>\n";
@@ -669,6 +678,10 @@ export default class MessageStore {
               msg += "\n</think>\n";
               this.continueAIMessage(msg);
               isReasoningRunning = false;
+            }
+
+            if (!event.includes(EventType.MessageStart)) {
+              this.setIsAnalyzing(false);
             }
 
             if (event.includes(EventType.MessageStart)) {
@@ -809,6 +822,7 @@ export default class MessageStore {
     } finally {
       this.setIsRequestRunning(false);
       this.setIsStreamRunning(false);
+      this.setIsAnalyzing(false);
     }
   };
 
@@ -817,6 +831,7 @@ export default class MessageStore {
       this.addUserMessage(message, files);
 
       this.setIsRequestRunning(true);
+      this.setIsAnalyzing(true);
 
       this.abortController.abort("Start new chat");
 
@@ -841,6 +856,7 @@ export default class MessageStore {
       this.addUserMessage(message, files);
 
       this.setIsRequestRunning(true);
+      this.setIsAnalyzing(true);
 
       this.abortController.abort("Start new message");
 
@@ -866,6 +882,7 @@ export default class MessageStore {
         this.abortController.abort("Stop message");
         this.setIsRequestRunning(false);
         this.setIsStreamRunning(false);
+        this.setIsAnalyzing(false);
       } catch {
         // ignore abort error
       }
