@@ -46,18 +46,19 @@ export const DaysHeader = ({
   minDate,
   maxDate,
   isMobile,
+  locale,
 }: DaysHeaderProps) => {
   const onTitleClick = () =>
     setSelectedScene((prevSelectedScene) => prevSelectedScene + 1);
 
   const onLeftClick = () =>
-    setObservedDate((prevObservedDate) =>
-      subtractFromDate(prevObservedDate, 1, "months")!,
+    setObservedDate(
+      (prevObservedDate) => subtractFromDate(prevObservedDate, 1, "months")!,
     );
 
   const onRightClick = () =>
-    setObservedDate((prevObservedDate) =>
-      addToDate(prevObservedDate, 1, "months")!,
+    setObservedDate(
+      (prevObservedDate) => addToDate(prevObservedDate, 1, "months")!,
     );
 
   const isLeftDisabled =
@@ -65,7 +66,7 @@ export const DaysHeader = ({
   const isRightDisabled =
     startOf(addToDate(observedDate, 1, "months")!, "month")! > maxDate;
 
-  const monthName = formatDate(observedDate, "MMMM");
+  const monthName = formatDate(observedDate, "MMMM", { locale });
 
   return (
     <div className={styles.headerContainer}>
@@ -74,7 +75,7 @@ export const DaysHeader = ({
         className={classNames(styles.title, "days-header")}
       >
         {monthName.charAt(0).toUpperCase() + monthName.substring(1)}{" "}
-        {formatDate(observedDate, "yyyy")}
+        {formatDate(observedDate, "yyyy", { locale })}
         <span className={styles.headerActionIcon} />
       </h2>
       <HeaderButtons
