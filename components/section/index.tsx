@@ -110,6 +110,7 @@ const Section = (props: SectionProps) => {
     secondaryOperationsCompleted,
     secondaryActiveOperations = [],
     clearSecondaryProgressData,
+    cancelSecondaryOperationById,
     primaryOperationsArray = [],
     clearPrimaryProgressData,
     primaryOperationsCompleted,
@@ -261,11 +262,19 @@ const Section = (props: SectionProps) => {
     pluginOperations,
   ]);
 
+  const totalOperationsCount =
+    (secondaryActiveOperations?.length || 0) +
+    (primaryOperationsArray?.length || 0) +
+    (pluginOperations?.length || 0);
+
   const showCancelButton =
     (primaryOperationsArray.length > 0 &&
       !primaryOperationsCompleted &&
       primaryOperationsArray.some((op) => op.operation === "upload")) ||
-    pluginShowCancelButton;
+    pluginShowCancelButton ||
+    (totalOperationsCount === 1 &&
+      secondaryActiveOperations.length === 1 &&
+      !secondaryOperationsCompleted);
 
   const isInfoVisible = canDisplay && isInfoPanelVisible;
 
@@ -351,6 +360,7 @@ const Section = (props: SectionProps) => {
         {isShowOperationButton ? (
           <OperationsProgressButton
             clearOperationsData={clearSecondaryProgressData}
+            cancelSecondaryOperationById={cancelSecondaryOperationById}
             operations={[
               ...(secondaryActiveOperations || []),
               ...(pluginOperations || []),
