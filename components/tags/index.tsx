@@ -130,6 +130,7 @@ const Tags: FC<TagsProps> = ({
             roomType={tag.roomType}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            dataTestId={`tag_item_${tag.label}`}
             {...props}
           />
         );
