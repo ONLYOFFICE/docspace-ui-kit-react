@@ -133,6 +133,7 @@ const DropDownItem = ({
   badgeLabel,
   withExternalLink,
   externalLinkPath,
+  onExternalLinkClick,
   testId,
   tooltip,
   truncateText,
@@ -303,15 +304,13 @@ const DropDownItem = ({
         </div>
       ) : null}
 
-      {withExternalLink ? (
+      {withExternalLink && externalLinkPath ? (
         <Link
           type={LinkType.action}
-          className={classNames(styles.iconWrapper, styles.externalLink)}
+          className={styles.externalLink}
           onClick={(e) => {
             e.stopPropagation();
-            if (externalLinkPath) {
-              window.DocSpace?.navigate(externalLinkPath);
-            }
+            onExternalLinkClick?.();
           }}
         >
           <ExternalLinkReactSvgUrl />

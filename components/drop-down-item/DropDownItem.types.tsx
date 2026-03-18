@@ -86,6 +86,8 @@ export type DropDownItemProps = {
   withExternalLink?: boolean;
   /** URL to navigate to when the external link icon is clicked */
   externalLinkPath?: string;
+  /** Callback triggered when the external link icon is clicked */
+  onExternalLinkClick?: () => void;
 
   // Toggle Props
   /** Whether to show a toggle switch at the end of the item */

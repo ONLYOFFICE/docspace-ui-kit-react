@@ -317,7 +317,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     const selectedKey = selectedOption?.key;
 
     return options.map((option) => {
-      const { key, disabled, label, icon, isBeta, withExternalLink, externalLinkPath } = option;
+      const { key, disabled, label, icon, isBeta, withExternalLink, externalLinkPath, onExternalLinkClick } = option;
 
       const isSameAsSelectedLabel = label === selectedLabel;
       const isSameAsSelectedKey = key === selectedKey;
@@ -364,6 +364,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
           tooltip={option.tooltip}
           withExternalLink={withExternalLink}
           externalLinkPath={externalLinkPath}
+          onExternalLinkClick={onExternalLinkClick}
         />
       );
     });

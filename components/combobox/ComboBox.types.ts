@@ -59,6 +59,7 @@ export type TBaseOption = {
   tooltip?: string;
   withExternalLink?: boolean;
   externalLinkPath?: string;
+  onExternalLinkClick?: () => void;
 };
 
 export type TRegularOption = TBaseOption & {
