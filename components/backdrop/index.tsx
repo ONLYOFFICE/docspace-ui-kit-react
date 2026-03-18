@@ -57,7 +57,7 @@ const Backdrop: React.FC<BackdropProps> = ({
       return;
     }
 
-    const isTabletOrMobile = isTablet() || isMobile();
+    const isMobileView = isMobile();
     const existingBackdrops = document.querySelectorAll(".backdrop-active");
     const backdropCount = existingBackdrops.length;
 
@@ -70,7 +70,7 @@ const Backdrop: React.FC<BackdropProps> = ({
     // Determine if background is needed
     const shouldShowBackground =
       !withoutBackground &&
-      (withBackground || isTabletOrMobile || (isAside && !withoutBackground));
+      (withBackground || isMobileView || (isAside && !withoutBackground));
 
     setNeedBackdrop(shouldShowBackdrop);
     setNeedBackground(shouldShowBackground);
