@@ -188,7 +188,7 @@ describe("<ToolsSettings />", () => {
   const mockSetMCPTools = vi.fn();
   const mockSetWebSearchEnabled = vi.fn();
   const mockAiApi = {
-    updateWebSearchInRoom: vi.fn(),
+    updateUserChatSettings: vi.fn(),
     changeMCPToolsForRoom: vi.fn(),
     disconnectServer: vi.fn(),
     connectServer: vi.fn(),
@@ -336,7 +336,7 @@ describe("<ToolsSettings />", () => {
         thinkingSupported={true}
         thinkingEnabled={false}
         setThinkingEnabled={mockSetThinkingEnabled}
-      />
+      />,
     );
 
     fireEvent.click(screen.getByTestId("chat-input-tools-button"));
