@@ -55,7 +55,16 @@ export interface OperationsProgressProps {
   ) => void;
   clearPanelOperationsData?: (operation?: string | null) => void;
   clearDropPreviewLocation?: () => void;
-  cancelUpload?: (t: (key: string, interpolation?: Record<string, string | number> | undefined) => string | undefined) => void;
+  cancelUpload?: (
+    t: (
+      key: string,
+      interpolation?: Record<string, string | number> | undefined,
+    ) => string | undefined,
+  ) => void;
+  cancelSecondaryOperationById?: (
+    operation: string,
+    operationId: string,
+  ) => void;
   onOpenPanel?: () => void;
   mainButtonVisible?: boolean;
   needErrorChecking?: boolean;
