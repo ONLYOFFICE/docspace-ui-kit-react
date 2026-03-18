@@ -29,7 +29,14 @@
 import { FolderContentDtoInteger } from "@onlyoffice/docspace-api-sdk";
 
 import { BaseCustomApi } from "../base-custom-api";
-import { TAIConfig, TChat, TMCPTool, TMessage, TServer } from "../../types/ai";
+import {
+  TAIConfig,
+  TChat,
+  TMCPTool,
+  TMessage,
+  TServer,
+  UserChatSettingsDto,
+} from "../../types/ai";
 import { ChatReasoningEffort, ToolsPermission } from "../../enums";
 import { toastr } from "../../components/toast";
 import { TFile } from "../../types";
@@ -124,11 +131,14 @@ export class AiApi extends BaseCustomApi {
     });
   }
 
-  async updateWebSearchInRoom(roomId: number, webSearchEnabled: boolean) {
+  async updateUserChatSettings(
+    roomId: number,
+    settings: Partial<UserChatSettingsDto>,
+  ) {
     try {
       return await this.request(`/ai/rooms/${roomId}/chats/config`, {
         method: "PUT",
-        data: { webSearchEnabled },
+        data: settings,
       });
     } catch (e) {
       console.log(e);
@@ -146,9 +156,9 @@ export class AiApi extends BaseCustomApi {
     }
   }
 
-  async getWebSearchInRoom(roomId: number) {
+  async getUserChatSettings(roomId: number) {
     try {
-      return await this.request<{ webSearchEnabled: boolean }>(
+      return await this.request<UserChatSettingsDto>(
         `/ai/rooms/${roomId}/chats/config`,
         {
           method: "GET",
@@ -199,13 +209,12 @@ export class AiApi extends BaseCustomApi {
     message: string,
     files: string[],
     abortController?: AbortController,
-    reasoningEffort?: ChatReasoningEffort,
   ) {
     return this.request<ReadableStream<Uint8Array> | null>(
       `/ai/rooms/${roomId}/chats`,
       {
         method: "POST",
-        data: { message, files, reasoningEffort },
+        data: { message, files },
         signal: abortController?.signal,
         isStream: true,
       },
@@ -217,13 +226,12 @@ export class AiApi extends BaseCustomApi {
     message: string,
     files: string[],
     abortController?: AbortController,
-    reasoningEffort?: ChatReasoningEffort,
   ) {
     return this.request<ReadableStream<Uint8Array> | null>(
       `/ai/chats/${chatId}/messages`,
       {
         method: "POST",
-        data: { message, files, reasoningEffort },
+        data: { message, files },
         signal: abortController?.signal,
         isStream: true,
       },

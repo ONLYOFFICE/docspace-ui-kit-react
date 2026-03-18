@@ -35,7 +35,7 @@ import {
   TAIRoomChatSettings,
 } from "../../../types/ai";
 import { Nullable } from "../../../types";
-import { RoomsType } from "../../../enums";
+import { RoomsType, ChatReasoningEffort } from "../../../enums";
 import { useApi } from "../../../providers";
 
 type Props = {
@@ -50,6 +50,7 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
     new Map(),
   );
   const [webSearchEnabled, setWebSearchEnabled] = React.useState(false);
+  const [thinkingEnabled, setThinkingEnabled] = React.useState(false);
   const [isFetched, setIsFetched] = React.useState(false);
   const { aiApi } = useApi();
 
@@ -89,8 +90,14 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
     if (!agentId) return;
 
     const promises: Promise<unknown>[] = [
-      aiApi.getWebSearchInRoom(Number(agentId)).then((res) => {
+      aiApi.getUserChatSettings(Number(agentId)).then((res) => {
         setWebSearchEnabled(res?.webSearchEnabled ?? false);
+
+        const isThinkingEnabled =
+          res?.reasoningEffort !== undefined &&
+          res?.reasoningEffort !== null &&
+          res?.reasoningEffort !== ChatReasoningEffort.None;
+        setThinkingEnabled(isThinkingEnabled);
       }),
       fetchTools(),
     ];
@@ -150,6 +157,8 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
     fetchTools,
     initTools,
     thinkingSupported: chatSettings?.thinking || false,
+    thinkingEnabled,
+    setThinkingEnabled,
   };
 };
 

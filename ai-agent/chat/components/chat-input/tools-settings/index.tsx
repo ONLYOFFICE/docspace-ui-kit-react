@@ -38,7 +38,7 @@ import WebSearchIcon from "../../../../../assets/web.search.svg";
 import LightbulbIcon from "../../../../../assets/lightbulb.svg";
 import ManageConnectionsReactSvg from "../../../../../assets/manage.connection.react.svg";
 
-import { ServerType } from "../../../../../enums";
+import { ServerType, ChatReasoningEffort } from "../../../../../enums";
 import { getOAuthToken } from "../../../../../utils/get-oauth-token";
 import { isMobile } from "../../../../../utils";
 import { useCommonTranslation } from "../../../../../utils/i18n";
@@ -58,7 +58,6 @@ import { TooltipContainer } from "../../../../../components/tooltip";
 
 import { useChatStore } from "../../../store/chatStore";
 import type useToolsSettings from "../../../hooks/useToolsSettings";
-import { useMessageStore } from "../../../store/messageStore";
 
 import styles from "../ChatInput.module.scss";
 import { Link, LinkType } from "../../../../../components/link";
@@ -79,13 +78,14 @@ const ToolsSettings = ({
   aiReady,
   goToWebSearchSettings,
   thinkingSupported,
+  thinkingEnabled,
+  setThinkingEnabled,
 }: ReturnType<typeof useToolsSettings> & {
   isAdmin?: boolean;
   aiReady: boolean;
   goToWebSearchSettings?: () => void;
 }) => {
   const t = useCommonTranslation();
-  const { thinkingEnabled, setThinkingEnabled } = useMessageStore();
   const { agentId } = useChatStore();
   const { isBase } = useTheme();
   const { aiApi, thirdPartyApi, baseUrl } = useApi();
@@ -237,9 +237,30 @@ const ToolsSettings = ({
   const onWebSearchToggle = React.useCallback(() => {
     if (!webSearchAvailable) return;
 
-    aiApi.updateWebSearchInRoom(Number(agentId), !webSearchEnabled);
+    aiApi.updateUserChatSettings(Number(agentId), {
+      webSearchEnabled: !webSearchEnabled,
+    });
     setWebSearchEnabled(!webSearchEnabled);
-  }, [agentId, webSearchEnabled, webSearchAvailable, setWebSearchEnabled]);
+  }, [
+    agentId,
+    webSearchEnabled,
+    webSearchAvailable,
+    setWebSearchEnabled,
+    aiApi,
+  ]);
+
+  const onThinkingToggle = React.useCallback(() => {
+    if (!thinkingSupported) return;
+
+    const newReasoningEffort = !thinkingEnabled
+      ? ChatReasoningEffort.Medium
+      : ChatReasoningEffort.None;
+
+    aiApi.updateUserChatSettings(Number(agentId), {
+      reasoningEffort: newReasoningEffort,
+    });
+    setThinkingEnabled(!thinkingEnabled);
+  }, [agentId, thinkingEnabled, thinkingSupported, setThinkingEnabled, aiApi]);
 
   const model = React.useMemo(() => {
     const serverItems = Array.from(MCPTools.entries())
@@ -355,7 +376,7 @@ const ToolsSettings = ({
         ),
         withToggle: true,
         checked: thinkingEnabled && thinkingSupported,
-        onClick: () => setThinkingEnabled(!thinkingEnabled),
+        onClick: onThinkingToggle,
         iconNode: <LightbulbIcon />,
         disabled: !thinkingSupported,
         disabledStylesType: "toggle",
@@ -405,7 +426,7 @@ const ToolsSettings = ({
     onWebSearchToggle,
     thinkingEnabled,
     thinkingSupported,
-    setThinkingEnabled,
+    onThinkingToggle,
   ]);
 
   if (!isFetched) return;

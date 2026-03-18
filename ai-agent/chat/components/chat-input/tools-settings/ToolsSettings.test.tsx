@@ -248,6 +248,8 @@ describe("<ToolsSettings />", () => {
     generateFormToolName: "",
     generatePresentationToolName: "",
     thinkingSupported: true,
+    thinkingEnabled: false,
+    setThinkingEnabled: vi.fn(),
     setServers: mockSetServers,
     setMCPTools: mockSetMCPTools,
     setWebSearchEnabled: mockSetWebSearchEnabled,
@@ -327,12 +329,15 @@ describe("<ToolsSettings />", () => {
 
   it("handles thinking toggle", () => {
     const mockSetThinkingEnabled = vi.fn();
-    vi.mocked(useMessageStore).mockReturnValue({
-      thinkingEnabled: false,
-      setThinkingEnabled: mockSetThinkingEnabled,
-    } as unknown as ReturnType<typeof useMessageStore>);
 
-    render(<ToolsSettings {...defaultProps} thinkingSupported={true} />);
+    render(
+      <ToolsSettings
+        {...defaultProps}
+        thinkingSupported={true}
+        thinkingEnabled={false}
+        setThinkingEnabled={mockSetThinkingEnabled}
+      />
+    );
 
     fireEvent.click(screen.getByTestId("chat-input-tools-button"));
 
