@@ -82,6 +82,10 @@ export type DropDownItemProps = {
   isPaidBadge?: boolean;
   /** Sets paid badge label */
   badgeLabel?: string;
+  /** Whether to show an external link icon at the end of the item */
+  withExternalLink?: boolean;
+  /** URL to navigate to when the external link icon is clicked */
+  externalLinkPath?: string;
 
   // Toggle Props
   /** Whether to show a toggle switch at the end of the item */

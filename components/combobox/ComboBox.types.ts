@@ -57,6 +57,8 @@ export type TBaseOption = {
   pageNumber?: number;
   count?: number;
   tooltip?: string;
+  withExternalLink?: boolean;
+  externalLinkPath?: string;
 };
 
 export type TRegularOption = TBaseOption & {

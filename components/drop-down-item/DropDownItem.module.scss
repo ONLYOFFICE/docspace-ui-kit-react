@@ -54,6 +54,19 @@
   --dropdown-item-separator-border: #{$gray-light-mid};
 }
 
+.externalLink {
+  margin-inline-start: auto;
+  margin-inline-end: 0;
+  align-self: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+
+  svg path {
+    fill: var(--drop-down-item-external-link-color, currentColor);
+  }
+}
+
 .elementWrapper {
   display: flex;
   align-items: center;
