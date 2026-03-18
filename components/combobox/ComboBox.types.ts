@@ -36,7 +36,7 @@ export type TCombobox = null | "badge" | "onlyIcon" | "descriptive";
 export type TBaseOption = {
   key: string | number;
   icon?: string | React.ElementType | React.ReactElement;
-  label?: string;
+  label?: React.ReactNode;
   color?: string;
   backgroundColor?: string;
   border?: string;
@@ -62,7 +62,7 @@ export type TBaseOption = {
 };
 
 export type TRegularOption = TBaseOption & {
-  label: string;
+  label: React.ReactNode;
   isSeparator?: boolean;
 };
 
