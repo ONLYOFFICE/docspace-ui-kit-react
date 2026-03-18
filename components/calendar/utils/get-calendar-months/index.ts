@@ -29,9 +29,9 @@
 import type { DateTime } from "luxon";
 import { getMonths, addToDate } from "../../../../utils/date";
 
-export const getCalendarMonths = (observedDate: DateTime) => {
+export const getCalendarMonths = (observedDate: DateTime, locale?: string) => {
   // Get short month names and capitalize first letter
-  const months = getMonths("short").map(
+  const months = getMonths("short", locale).map(
     (month) => month[0].toUpperCase() + month.substring(1),
   );
 

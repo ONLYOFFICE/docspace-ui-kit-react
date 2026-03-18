@@ -106,7 +106,40 @@ const Dropzone = ({
     getFilesFromEvent: customGetFilesFromEvent,
   } as Parameters<typeof useDropzone>[0];
 
-  const { getRootProps, getInputProps, open } = useDropzone(dropzoneOptions);
+  const { getRootProps, getInputProps, open, isDragActive } =
+    useDropzone(dropzoneOptions);
+
+  const [isDraggingOnPage, setIsDraggingOnPage] = React.useState(false);
+  const pageDragCounter = React.useRef(0);
+
+  React.useEffect(() => {
+    const handleDragEnter = () => {
+      pageDragCounter.current += 1;
+      setIsDraggingOnPage(true);
+    };
+
+    const handleDragLeave = () => {
+      pageDragCounter.current -= 1;
+      if (pageDragCounter.current === 0) {
+        setIsDraggingOnPage(false);
+      }
+    };
+
+    const handleDrop = () => {
+      pageDragCounter.current = 0;
+      setIsDraggingOnPage(false);
+    };
+
+    document.addEventListener("dragenter", handleDragEnter);
+    document.addEventListener("dragleave", handleDragLeave);
+    document.addEventListener("drop", handleDrop);
+
+    return () => {
+      document.removeEventListener("dragenter", handleDragEnter);
+      document.removeEventListener("dragleave", handleDragLeave);
+      document.removeEventListener("drop", handleDrop);
+    };
+  }, []);
 
   const folderInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -156,6 +189,8 @@ const Dropzone = ({
     <div
       className={classNames(styles.dropzoneWrapper, className, {
         [styles.isLoading]: isLoading,
+        [styles.isDraggingOnPage]: isDraggingOnPage && !isDragActive,
+        [styles.isDragOver]: isDragActive,
       })}
       data-testid={dataTestId ?? "dropzone"}
       aria-busy={isLoading}
@@ -167,7 +202,7 @@ const Dropzone = ({
             className={classNames(
               styles.dropzoneLoader,
               styles.dropzoneProgress,
-              loaderClassName
+              loaderClassName,
             )}
             percent={uploadPercent}
           />
@@ -212,8 +247,8 @@ const Dropzone = ({
               })}
             />
           )}
-          {icon && (
-            typeof icon === "string" ? (
+          {icon &&
+            (typeof icon === "string" ? (
               <img
                 src={icon}
                 alt="Upload"
@@ -225,8 +260,7 @@ const Dropzone = ({
                 className: classNames(styles.dropzoneIcon, iconClassName),
                 "data-testid": "dropzone-icon",
               } as React.SVGProps<SVGSVGElement>)
-            )
-          )}
+            ))}
           <div
             className={styles.dropzoneLink}
             data-testid="dropzone-text"
@@ -311,3 +345,4 @@ const Dropzone = ({
 };
 
 export default Dropzone;
+
