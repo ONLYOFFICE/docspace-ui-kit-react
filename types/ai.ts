@@ -117,6 +117,8 @@ export type TAIConfig = {
   generatePresentationToolName?: string;
 
   modelAliases: Record<string, string>;
+
+  systemAiEnabled?: boolean;
 };
 
 export type TMCPTool = {
@@ -151,3 +153,4 @@ export type TAIRoomChatSettings = {
   modelAlias?: string;
   multimodal?: TMultimodal;
 };
+
