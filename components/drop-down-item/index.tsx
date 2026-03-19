@@ -30,6 +30,7 @@ import classNames from "classnames";
 
 import RightArrowReactSvgUrl from "../../assets/right.arrow.react.svg";
 import ArrowLeftReactUrl from "../../assets/arrow-left.react.svg";
+import ExternalLinkReactSvgUrl from "../../assets/external.link.svg";
 
 import { globalColors } from "../../providers/theme";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
@@ -39,6 +40,7 @@ import { useCommonTranslation } from "../../utils/i18n";
 
 import { ToggleButton } from "../toggle-button";
 import { Badge } from "../badge";
+import { Link, LinkType } from "../link";
 
 import type { DropDownItemProps } from "./DropDownItem.types";
 import styles from "./DropDownItem.module.scss";
@@ -129,6 +131,9 @@ const DropDownItem = ({
   style,
   isPaidBadge,
   badgeLabel,
+  withExternalLink,
+  externalLinkPath,
+  onExternalLinkClick,
   testId,
   tooltip,
   truncateText,
@@ -297,6 +302,19 @@ const DropDownItem = ({
             isPaidBadge
           />
         </div>
+      ) : null}
+
+      {withExternalLink && externalLinkPath ? (
+        <Link
+          type={LinkType.action}
+          className={styles.externalLink}
+          onClick={(e) => {
+            e.stopPropagation();
+            onExternalLinkClick?.();
+          }}
+        >
+          <ExternalLinkReactSvgUrl />
+        </Link>
       ) : null}
 
       {additionalElement ? (
