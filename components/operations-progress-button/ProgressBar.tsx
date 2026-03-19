@@ -42,6 +42,7 @@ import { ProgressBarMobileProps } from "./OperationsProgressButton.types";
 const ProgressBar = ({
 	label,
 	alert,
+	stopped,
 	percent,
 	open,
 	onCancel,

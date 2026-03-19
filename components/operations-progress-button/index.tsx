@@ -75,6 +75,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   panelOperations = [],
   operationsAlert,
   operationsCompleted = false,
+  operationsStopped = false,
   clearOperationsData,
   clearPanelOperationsData,
   cancelUpload,
@@ -293,6 +294,20 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       return (
         <Text fontWeight={600}>
           {t("Processes", { count: allOperationsLength })}
+        </Text>
+      );
+    }
+
+    if (operationsStopped) {
+      const operationName = operationsLength
+        ? operations[0].label
+        : panelOperations[0].label;
+
+      return (
+        <Text fontWeight={600}>
+          {t("StoppedOperation", {
+            operationName,
+          })}
         </Text>
       );
     }

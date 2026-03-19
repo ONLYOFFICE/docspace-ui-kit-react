@@ -30,6 +30,7 @@ export interface Operation {
   label: string;
   alert: boolean;
   completed: boolean;
+  stopped?: boolean;
   percent?: number;
   withoutStatus?: boolean;
   showPanel?: (open: boolean) => void;
@@ -48,6 +49,7 @@ export interface OperationsProgressProps {
   operations?: Operation[];
   operationsAlert?: boolean;
   operationsCompleted?: boolean;
+  operationsStopped?: boolean;
   clearOperationsData?: (
     operationId?: string | null,
     operation?: string | null,
@@ -102,6 +104,8 @@ export interface ProgressBarMobileProps {
   iconUrl?: string;
   /** Indicates if the operation is completed */
   completed?: boolean;
+  /** Indicates if the operation was stopped by user */
+  stopped?: boolean;
   /** Callback function for clearing progress */
   onClearProgress?: (operationId: string | null, operation: string) => void;
   /** Unique identifier for the operation */

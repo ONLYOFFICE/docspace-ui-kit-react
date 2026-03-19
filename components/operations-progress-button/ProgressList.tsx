@@ -120,6 +120,7 @@ const ProgressList = ({
           <div key={getOperationKey(item)} className="progress-list">
             <ProgressBar
               completed={item.completed}
+              stopped={item.stopped}
               label={item.label}
               alert={item.alert}
               open
