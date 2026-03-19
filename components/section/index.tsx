@@ -115,6 +115,7 @@ const Section = (props: SectionProps) => {
     clearPrimaryProgressData,
     primaryOperationsCompleted,
     cancelUpload,
+    secondaryOperationsStopped,
     secondaryOperationsAlert,
     mainButtonVisible,
 
@@ -368,6 +369,7 @@ const Section = (props: SectionProps) => {
             operationsCompleted={isCompletedOperations}
             clearPanelOperationsData={clearPrimaryProgressData}
             clearDropPreviewLocation={clearDropPreviewLocation}
+            operationsStopped={secondaryOperationsStopped}
             operationsAlert={
               primaryOperationsAlert ||
               secondaryOperationsAlert ||

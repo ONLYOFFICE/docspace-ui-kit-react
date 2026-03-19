@@ -152,6 +152,7 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
       operation: string,
       operationId: string,
     ) => void;
+    secondaryOperationsStopped?: boolean;
     secondaryOperationsAlert?: boolean;
     mainButtonVisible?: boolean;
     primaryOperationsAlert?: boolean;
