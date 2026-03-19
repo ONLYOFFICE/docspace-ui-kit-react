@@ -106,6 +106,6 @@
   }
 
   :global(.backdrop-active) {
-    z-index: 210;
+    z-index: 210 !important;
   }
 }
