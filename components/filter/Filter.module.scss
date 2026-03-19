@@ -792,7 +792,7 @@
       flex: 1;
       min-width: 0;
 
-      [data-testid="selected-item"] {
+      .group-tag-item {
         padding: 7px 12px;
         border-radius: 6px;
         margin: 0;
