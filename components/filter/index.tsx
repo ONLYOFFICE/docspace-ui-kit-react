@@ -713,6 +713,7 @@ const FilterInput = React.memo(
                     hideCross
                     clickable
                     isActive={activeGroupId === null}
+                    className="group-tag-item"
                     dataTestId="all_rooms_tags_measure"
                   />
                   {showCreateGroupButton && (
@@ -724,6 +725,7 @@ const FilterInput = React.memo(
                       onClose={() => {}}
                       hideCross
                       clickable
+                      className="group-tag-item"
                       dataTestId="create_group_tag"
                     />
                   )}
@@ -743,6 +745,7 @@ const FilterInput = React.memo(
                         hideCross
                         clickable
                         isActive={String(activeGroupId) === String(group.id)}
+                        className="group-tag-item"
                         dataTestId={`room_group_tag_${groupId}`}
                       />
                     );
