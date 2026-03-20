@@ -47,3 +47,16 @@
   border-end-end-radius: $br;
   border-end-start-radius: $bl;
 }
+
+/// Applies padding using logical properties for RTL support.
+/// Works exactly like the CSS padding shorthand (1–4 values).
+@mixin logical-padding($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  $top: nth($values, 1);
+  $right: if(length($values) >= 2, nth($values, 2), $top);
+  $bottom: if(length($values) >= 3, nth($values, 3), $top);
+  $left: if(length($values) >= 4, nth($values, 4), $right);
+
+  padding-block: $top $bottom;
+  padding-inline: $left $right;
+}
