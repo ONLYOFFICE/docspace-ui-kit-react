@@ -35,7 +35,13 @@
 /// Applies border-radius using logical properties for RTL support.
 /// Arguments follow the same order as the CSS shorthand:
 /// top-left, top-right, bottom-right, bottom-left
-@mixin logical-border-radius($tl: 0, $tr: $tl, $br: $tl, $bl: $tr) {
+@mixin logical-border-radius($values...) {
+  $values: if(length($values) == 1, nth($values, 1), $values);
+  $tl: nth($values, 1);
+  $tr: if(length($values) >= 2, nth($values, 2), $tl);
+  $br: if(length($values) >= 3, nth($values, 3), $tl);
+  $bl: if(length($values) >= 4, nth($values, 4), $tr);
+
   border-start-start-radius: $tl;
   border-start-end-radius: $tr;
   border-end-end-radius: $br;

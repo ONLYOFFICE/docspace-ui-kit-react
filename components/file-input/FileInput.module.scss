@@ -194,7 +194,7 @@
   position: absolute;
   margin: 0;
 
-  @include mixins.logical-border-radius(0, 3px, 3px, 0);
+  @include mixins.logical-border-radius(0 3px 3px 0);
 
   &.base,
   &.middle {
