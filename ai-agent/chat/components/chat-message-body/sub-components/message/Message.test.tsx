@@ -51,13 +51,13 @@ vi.mock("./ToolCallMessage", () => ({
   ),
 }));
 
-vi.mock("./Error", () => ({
+vi.mock("./error", () => ({
   default: ({ content }: { content: { text: string } }) => (
     <div data-testid="error-comp">{content.text}</div>
   ),
 }));
 
-vi.mock("./Files", () => ({
+vi.mock("./files", () => ({
   default: ({ files }: { files: Array<{ id: number; title: string }> }) => (
     <div data-testid="files-comp">
       {files.map((f) => (
@@ -67,7 +67,7 @@ vi.mock("./Files", () => ({
   ),
 }));
 
-vi.mock("./Images", () => ({
+vi.mock("./images", () => ({
   default: ({ images }: { images: Array<{ id: number }> }) => (
     <div data-testid="images-comp">
       {images.map((i) => (
@@ -77,7 +77,7 @@ vi.mock("./Images", () => ({
   ),
 }));
 
-vi.mock("./Buttons", () => ({
+vi.mock("./buttons", () => ({
   default: ({ text }: { text: string }) => (
     <div data-testid="buttons-comp">{text}</div>
   ),
