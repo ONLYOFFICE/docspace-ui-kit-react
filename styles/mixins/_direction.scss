@@ -31,3 +31,13 @@
     transform: scaleX(-1);
   }
 }
+
+/// Applies border-radius using logical properties for RTL support.
+/// Arguments follow the same order as the CSS shorthand:
+/// top-left, top-right, bottom-right, bottom-left
+@mixin logical-border-radius($tl: 0, $tr: $tl, $br: $tl, $bl: $tr) {
+  border-start-start-radius: $tl;
+  border-start-end-radius: $tr;
+  border-end-end-radius: $br;
+  border-end-start-radius: $bl;
+}

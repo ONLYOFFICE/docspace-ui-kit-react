@@ -25,32 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 @use "../../styles/variables/colors" as *;
-
-:global(.rtl) {
-  :local {
-    .container {
-      .textInput {
-        padding-left: 40px;
-
-        &.base {
-          padding-left: 37px;
-        }
-
-        &.middle {
-          padding-left: 48px;
-        }
-
-        &.large {
-          padding-left: 64px;
-        }
-      }
-    }
-
-    .icon {
-      border-radius: 3px 0 0 3px;
-    }
-  }
-}
+@use "../../styles/mixins";
 
 :global(.dark) {
   .container {
@@ -159,18 +134,18 @@
       border-color: var(--file-input-error-border-color) !important;
     }
 
-    padding-right: 40px;
+    padding-inline-end: 40px;
 
     &.base {
-      padding-right: 37px;
+      padding-inline-end: 37px;
     }
 
     &.middle {
-      padding-right: 48px;
+      padding-inline-end: 48px;
     }
 
     &.large {
-      padding-right: 64px;
+      padding-inline-end: 64px;
     }
   }
 
@@ -219,7 +194,7 @@
   position: absolute;
   margin: 0;
 
-  border-radius: 0 3px 3px 0;
+  @include mixins.logical-border-radius(0, 3px, 3px, 0);
 
   &.base,
   &.middle {
