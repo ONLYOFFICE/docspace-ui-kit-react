@@ -35,9 +35,10 @@ import { Portal } from "../../../../../components/portal";
 
 import McpToolReactSvg from "../../../../../assets/mcp.tool.svg";
 import WebSearchIcon from "../../../../../assets/web.search.svg";
+import LightbulbIcon from "../../../../../assets/lightbulb.svg";
 import ManageConnectionsReactSvg from "../../../../../assets/manage.connection.react.svg";
 
-import { ServerType } from "../../../../../enums";
+import { ServerType, ChatReasoningEffort } from "../../../../../enums";
 import { getOAuthToken } from "../../../../../utils/get-oauth-token";
 import { isMobile } from "../../../../../utils";
 import { useCommonTranslation } from "../../../../../utils/i18n";
@@ -62,6 +63,7 @@ import styles from "../ChatInput.module.scss";
 import { Link, LinkType } from "../../../../../components/link";
 import { ContextMenuModel } from "../../../../../components/context-menu";
 import { useApi } from "../../../../../providers";
+import { HelpButton } from "../../../../../components";
 
 const ToolsSettings = ({
   servers,
@@ -75,6 +77,9 @@ const ToolsSettings = ({
   isAdmin,
   aiReady,
   goToWebSearchSettings,
+  thinkingSupported,
+  thinkingEnabled,
+  setThinkingEnabled,
 }: ReturnType<typeof useToolsSettings> & {
   isAdmin?: boolean;
   aiReady: boolean;
@@ -232,9 +237,30 @@ const ToolsSettings = ({
   const onWebSearchToggle = React.useCallback(() => {
     if (!webSearchAvailable) return;
 
-    aiApi.updateWebSearchInRoom(Number(agentId), !webSearchEnabled);
+    aiApi.updateUserChatSettings(Number(agentId), {
+      webSearchEnabled: !webSearchEnabled,
+    });
     setWebSearchEnabled(!webSearchEnabled);
-  }, [agentId, webSearchEnabled, webSearchAvailable, setWebSearchEnabled]);
+  }, [
+    agentId,
+    webSearchEnabled,
+    webSearchAvailable,
+    setWebSearchEnabled,
+    aiApi,
+  ]);
+
+  const onThinkingToggle = React.useCallback(() => {
+    if (!thinkingSupported) return;
+
+    const newReasoningEffort = !thinkingEnabled
+      ? ChatReasoningEffort.Medium
+      : ChatReasoningEffort.None;
+
+    aiApi.updateUserChatSettings(Number(agentId), {
+      reasoningEffort: newReasoningEffort,
+    });
+    setThinkingEnabled(!thinkingEnabled);
+  }, [agentId, thinkingEnabled, thinkingSupported, setThinkingEnabled, aiApi]);
 
   const model = React.useMemo(() => {
     const serverItems = Array.from(MCPTools.entries())
@@ -274,10 +300,7 @@ const ToolsSettings = ({
             .filter(Boolean),
         ];
 
-        const portalServerName =
-          t("OrganizationName") +
-          " " +
-          t("ProductName");
+        const portalServerName = t("OrganizationName") + " " + t("ProductName");
 
         const name =
           server.serverType === ServerType.Portal
@@ -310,6 +333,7 @@ const ToolsSettings = ({
         checked: webSearchEnabled && webSearchAvailable,
         onClick: onWebSearchToggle,
         disabled: !webSearchAvailable,
+        disabledStylesType: "toggle",
         tooltipTarget: "toggle",
         getTooltipContent: () => (
           <>
@@ -332,6 +356,35 @@ const ToolsSettings = ({
             ) : null}
           </>
         ),
+      },
+      {
+        key: "extended-thinking",
+        label: (
+          <div className={styles.extendedThinkingLabel}>
+            {t("ExtendedThinking")}{" "}
+            {thinkingSupported && (
+              <HelpButton
+                tooltipContent={
+                  <Text>{t("ExtendedThinkingIncreasedCosts")}</Text>
+                }
+                openOnClick={false}
+                tooltipStyle={{ zIndex: 1001 }}
+                className={styles.extendedThinkingHelpButton}
+              />
+            )}
+          </div>
+        ),
+        withToggle: true,
+        checked: thinkingEnabled && thinkingSupported,
+        onClick: onThinkingToggle,
+        iconNode: <LightbulbIcon />,
+        disabled: !thinkingSupported,
+        disabledStylesType: "toggle",
+        tooltipTarget: "toggle",
+        getTooltipContent: () =>
+          !thinkingSupported ? (
+            <Text>{t("ExtendedThinkingNotSupported")}</Text>
+          ) : null,
       },
       ...(showManageConnectionItem || serverItems.length > 0
         ? [{ key: "separator-1", isSeparator: true }]
@@ -371,6 +424,9 @@ const ToolsSettings = ({
     webSearchAvailable,
     goToWebSearchSettings,
     onWebSearchToggle,
+    thinkingEnabled,
+    thinkingSupported,
+    onThinkingToggle,
   ]);
 
   if (!isFetched) return;
@@ -403,7 +459,6 @@ const ToolsSettings = ({
           maxHeightLowerSubmenu={360}
           showDisabledItems
           withBackdrop={isMobile()}
-          //ignoreChangeView
           headerOnlyMobile
           withoutBackHeaderButton
           dataTestId="chat-input-tools-context-menu"
@@ -446,9 +501,7 @@ const ToolsSettings = ({
                         </div>
                         <Button
                           label={
-                            server.connected
-                              ? t("Disconnect")
-                              : t("Connect")
+                            server.connected ? t("Disconnect") : t("Connect")
                           }
                           size={ButtonSize.small}
                           onClick={() => {
