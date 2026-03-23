@@ -61,9 +61,50 @@ import type useToolsSettings from "../../../hooks/useToolsSettings";
 
 import styles from "../ChatInput.module.scss";
 import { Link, LinkType } from "../../../../../components/link";
-import { ContextMenuModel } from "../../../../../components/context-menu";
+import {
+  ContextMenuModel,
+  TContextMenuValueTypeOnClick,
+} from "../../../../../components/context-menu";
 import { useApi } from "../../../../../providers";
 import { HelpButton } from "../../../../../components";
+
+const ThinkingHelpButton = () => {
+  const t = useCommonTranslation();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (!wrapperRef.current?.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [isOpen]);
+
+  return (
+    <div
+      ref={wrapperRef}
+      className={classNames(styles.extendedThinkingHelpButton, "no-toggle")}
+      onClick={(e) => {
+        e.stopPropagation();
+        setIsOpen((prev) => !prev);
+      }}
+    >
+      <HelpButton
+        tooltipContent={<Text>{t("ExtendedThinkingIncreasedCosts")}</Text>}
+        tooltipStyle={{ zIndex: 1001 }}
+        openOnClick={false}
+        isOpen={isOpen}
+        afterHide={() => setIsOpen(false)}
+      />
+    </div>
+  );
+};
 
 const ToolsSettings = ({
   servers,
@@ -249,18 +290,28 @@ const ToolsSettings = ({
     aiApi,
   ]);
 
-  const onThinkingToggle = React.useCallback(() => {
-    if (!thinkingSupported) return;
+  const onThinkingToggle = React.useCallback(
+    (e: TContextMenuValueTypeOnClick) => {
+      const eventTarget =
+        e && "originalEvent" in e ? e.originalEvent?.target : e?.target;
 
-    const newReasoningEffort = !thinkingEnabled
-      ? ChatReasoningEffort.Medium
-      : ChatReasoningEffort.None;
+      if ((eventTarget as HTMLElement)?.closest?.(".no-toggle")) {
+        return;
+      }
 
-    aiApi.updateUserChatSettings(Number(agentId), {
-      reasoningEffort: newReasoningEffort,
-    });
-    setThinkingEnabled(!thinkingEnabled);
-  }, [agentId, thinkingEnabled, thinkingSupported, setThinkingEnabled, aiApi]);
+      if (!thinkingSupported) return;
+
+      const newReasoningEffort = !thinkingEnabled
+        ? ChatReasoningEffort.Medium
+        : ChatReasoningEffort.None;
+
+      aiApi.updateUserChatSettings(Number(agentId), {
+        reasoningEffort: newReasoningEffort,
+      });
+      setThinkingEnabled(!thinkingEnabled);
+    },
+    [agentId, thinkingEnabled, thinkingSupported, setThinkingEnabled, aiApi],
+  );
 
   const model = React.useMemo(() => {
     const serverItems = Array.from(MCPTools.entries())
@@ -362,16 +413,7 @@ const ToolsSettings = ({
         label: (
           <div className={styles.extendedThinkingLabel}>
             {t("ExtendedThinking")}{" "}
-            {thinkingSupported && (
-              <HelpButton
-                tooltipContent={
-                  <Text>{t("ExtendedThinkingIncreasedCosts")}</Text>
-                }
-                openOnClick={false}
-                tooltipStyle={{ zIndex: 1001 }}
-                className={styles.extendedThinkingHelpButton}
-              />
-            )}
+            {thinkingSupported && <ThinkingHelpButton />}
           </div>
         ),
         withToggle: true,
