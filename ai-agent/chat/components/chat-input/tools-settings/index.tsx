@@ -90,10 +90,7 @@ const ThinkingHelpButton = () => {
     <div
       ref={wrapperRef}
       className={classNames(styles.extendedThinkingHelpButton, "no-toggle")}
-      onClick={(e) => {
-        e.stopPropagation();
-        setIsOpen((prev) => !prev);
-      }}
+      onClick={() => setIsOpen((prev) => !prev)}
     >
       <HelpButton
         tooltipContent={<Text>{t("ExtendedThinkingIncreasedCosts")}</Text>}
