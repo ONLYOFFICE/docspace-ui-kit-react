@@ -236,6 +236,7 @@ const Navigation = ({
               <Backdrop
                 visible={isOpen}
                 withBackground={false}
+                withoutBackground
                 zIndex={400}
                 onClick={onCloseDropBox}
               />

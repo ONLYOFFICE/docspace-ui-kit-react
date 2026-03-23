@@ -117,6 +117,8 @@ export type TAIConfig = {
   generatePresentationToolName?: string;
 
   modelAliases: Record<string, string>;
+
+  systemAiEnabled?: boolean;
 };
 
 export type TMCPTool = {

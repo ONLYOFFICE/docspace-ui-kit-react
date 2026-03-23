@@ -155,8 +155,9 @@ const useFilesHelper = ({
         isErrorPath = false,
       ) => {
         if (initRef.current && getRootData && folderId !== "@my") {
+        // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
           const folderInfoRes = await foldersApi.getFolderInfo(
-            Number(folderId),
+           folderId as number,
           );
           const folder = folderInfoRes.data.response!;
 

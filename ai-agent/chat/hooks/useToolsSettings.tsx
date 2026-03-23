@@ -140,8 +140,7 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
   return {
     servers,
     MCPTools,
-    webSearchAvailable:
-      aiConfig?.webSearchEnabled || chatSettings?.internal || false,
+    webSearchAvailable: aiConfig?.webSearchEnabled || false,
     webSearchEnabled,
     isFetched,
     knowledgeSearchToolName: aiConfig?.knowledgeSearchToolName || "",
@@ -163,3 +162,4 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
 };
 
 export default useToolsSettings;
+

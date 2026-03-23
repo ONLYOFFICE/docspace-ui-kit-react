@@ -168,7 +168,11 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
       ) : null}
       {type === "badge" ? (
         <Badge
-          label={selectedOption.label}
+          label={
+            typeof selectedOption.label === "string"
+              ? selectedOption.label
+              : undefined
+          }
           noHover
           color={selectedOption.color}
           backgroundColor={selectedOption.backgroundColor}
@@ -181,7 +185,11 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
           data-test-id="combo-button-descriptive"
         >
           <Text
-            title={selectedOption?.label}
+            title={
+              typeof selectedOption?.label === "string"
+                ? selectedOption.label
+                : undefined
+            }
             as="div"
             truncate
             fontWeight={600}
@@ -207,7 +215,11 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
         </div>
       ) : type !== "onlyIcon" ? (
         <Text
-          title={selectedOption?.label}
+          title={
+            typeof selectedOption?.label === "string"
+              ? selectedOption.label
+              : undefined
+          }
           as="div"
           truncate
           fontWeight={600}
