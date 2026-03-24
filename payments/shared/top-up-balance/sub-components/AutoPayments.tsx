@@ -42,315 +42,316 @@ import styles from "../styles/AutoPayments.module.scss";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
 type AutoPaymentsProps = {
-	onAdditionalSave?: () => void;
-	noMargin?: boolean;
-	isEditAutoPayment?: boolean;
-	isDisabled?: boolean;
+  onAdditionalSave?: () => void;
+  noMargin?: boolean;
+  isEditAutoPayment?: boolean;
+  isDisabled?: boolean;
 };
 
 type CurrentPaymentSettingsProps = {
-	autoPayments: TAutoTopUpSettings;
-	formatWalletCurrency?: (item?: number, fractionDigits?: number) => string;
+  autoPayments: TAutoTopUpSettings;
+  formatWalletCurrency?: (item?: number, fractionDigits?: number) => string;
 };
 
 const CurrentPaymentSettings = ({
-	autoPayments,
-	formatWalletCurrency,
+  autoPayments,
+  formatWalletCurrency,
 }: CurrentPaymentSettingsProps) => {
-	const { t } = useTranslation("Payments");
+  const { t } = useTranslation("Payments");
 
-	const { minBalance, upToBalance } = autoPayments!;
+  const { minBalance, upToBalance } = autoPayments!;
 
-	return (
-		<div className={styles.infoBlock}>
-			<div className={styles.infoBlockTitle}>
-				<CheckRoundSvg />
-				<Text fontSize="12px" fontWeight={600}>
-					{t("AutoTopUp")}
-				</Text>
-			</div>
-			<Text fontSize="12px" fontWeight={400} className={styles.infoDescription}>
-				{t("WhenBalanceDropsTo", {
-					min: formatWalletCurrency!(minBalance, 0),
-					max: formatWalletCurrency!(upToBalance, 0),
-				})}
-			</Text>
-		</div>
-	);
+  return (
+    <div className={styles.infoBlock}>
+      <div className={styles.infoBlockTitle}>
+        <CheckRoundSvg />
+        <Text fontSize="12px" fontWeight={600}>
+          {t("AutoTopUp")}
+        </Text>
+      </div>
+      <Text fontSize="12px" fontWeight={400} className={styles.infoDescription}>
+        {t("WhenBalanceDropsTo", {
+          min: formatWalletCurrency!(minBalance, 0),
+          max: formatWalletCurrency!(upToBalance, 0),
+        })}
+      </Text>
+    </div>
+  );
 };
 
 const AutoPayments = ({
-	onAdditionalSave,
-	noMargin,
-	isEditAutoPayment,
-	isDisabled,
+  onAdditionalSave,
+  noMargin,
+  isEditAutoPayment,
+  isDisabled,
 }: AutoPaymentsProps) => {
-	const paymentStore = usePaymentStore();
+  const paymentStore = usePaymentStore();
 
-	const {
-		updateAutoPayments,
-		autoPayments,
-		isAutoPaymentExist,
-		setMinBalance,
-		setUpToBalance,
-		isAutomaticPaymentsEnabled,
-		setIsAutomaticPaymentsEnabled,
-		minBalance,
-		upToBalance,
-		setMinBalanceError,
-		minBalanceError,
-		setUpToBalanceError,
-		upToBalanceError,
-		formatWalletCurrency,
-	} = paymentStore;
+  const {
+    updateAutoPayments,
+    autoPayments,
+    isAutoPaymentExist,
+    setMinBalance,
+    setUpToBalance,
+    isAutomaticPaymentsEnabled,
+    setIsAutomaticPaymentsEnabled,
+    minBalance,
+    upToBalance,
+    setMinBalanceError,
+    minBalanceError,
+    setUpToBalanceError,
+    upToBalanceError,
+    formatWalletCurrency,
+  } = paymentStore;
 
-	const { walletCustomerEmail } = paymentStore;
-	const { t } = useTranslation(["Payments", "Common"]);
+  const { walletCustomerEmail } = paymentStore;
+  const { t } = useTranslation(["Payments", "Common"]);
 
-	const showCurrentSettings = isAutoPaymentExist && !isEditAutoPayment;
+  const showCurrentSettings = isAutoPaymentExist && !isEditAutoPayment;
 
-	const [isLoading, setIsLoading] = useState(false);
-	const [isCurrentSettings, setIsCurrentSettings] =
-		useState(showCurrentSettings);
-	const [animateSettings, setAnimateSettings] = useState(false);
-	const [minUpToBalance, setMinUpToBalance] = useState(6);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCurrentSettings, setIsCurrentSettings] =
+    useState(showCurrentSettings);
+  const [animateSettings, setAnimateSettings] = useState(false);
+  const [minUpToBalance, setMinUpToBalance] = useState(6);
 
-	const isFirstRender = useRef(true);
+  const isFirstRender = useRef(true);
 
-	useEffect(() => {
-		if (isFirstRender.current) {
-			isFirstRender.current = false;
-		}
-	}, []);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+    }
+  }, []);
 
-	const validateMaxUpToBalance = (value: string, minimumBalance: string) => {
-		const numValue = parseInt(value, 10);
-		const minInputValue = minimumBalance ? parseInt(minimumBalance, 10) : 5;
+  const validateMaxUpToBalance = (value: string, minimumBalance: string) => {
+    const numValue = parseInt(value, 10);
+    const minInputValue = minimumBalance ? parseInt(minimumBalance, 10) : 5;
 
-		const minValue = minInputValue + 1;
+    const minValue = minInputValue + 1;
 
-		if (Number.isNaN(numValue) || numValue < minValue || numValue > 5000) {
-			setUpToBalanceError!(true);
-			return;
-		}
+    if (Number.isNaN(numValue) || numValue < minValue || numValue > 5000) {
+      setUpToBalanceError!(true);
+      return;
+    }
 
-		setUpToBalanceError!(false);
-	};
+    setUpToBalanceError!(false);
+  };
 
-	const validateMinBalance = (value: string) => {
-		const numValue = parseInt(value, 10);
+  const validateMinBalance = (value: string) => {
+    const numValue = parseInt(value, 10);
 
-		if (Number.isNaN(numValue) || numValue < 5 || numValue > 1000) {
-			setMinBalanceError!(true);
-			return;
-		}
+    if (Number.isNaN(numValue) || numValue < 5 || numValue > 1000) {
+      setMinBalanceError!(true);
+      return;
+    }
 
-		setMinBalanceError!(false);
-		setMinUpToBalance(numValue + 1);
+    setMinBalanceError!(false);
+    setMinUpToBalance(numValue + 1);
 
-		if (upToBalance) {
-			validateMaxUpToBalance(upToBalance, value);
-		}
-	};
+    if (upToBalance) {
+      validateMaxUpToBalance(upToBalance, value);
+    }
+  };
 
-	const onMinBalanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { value, validity } = e.target;
+  const onMinBalanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, validity } = e.target;
 
-		if (!validity.valid) return;
+    if (!validity.valid) return;
 
-		setMinBalance!(value);
-		validateMinBalance(value);
-	};
+    setMinBalance!(value);
+    validateMinBalance(value);
+  };
 
-	const onMaxUpToBalanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { value, validity } = e.target;
+  const onMaxUpToBalanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, validity } = e.target;
 
-		if (!validity.valid) return;
+    if (!validity.valid) return;
 
-		setUpToBalance!(value);
-		validateMaxUpToBalance(value, minBalance!);
-	};
+    setUpToBalance!(value);
+    validateMaxUpToBalance(value, minBalance!);
+  };
 
-	const onSave = async (isEnable: boolean = true) => {
-		const timerId = setTimeout(() => {
-			setIsLoading(true);
-		}, 200);
+  const onSave = async (isEnable: boolean = true) => {
+    const timerId = setTimeout(() => {
+      setIsLoading(true);
+    }, 200);
 
-		try {
-			await updateAutoPayments!();
-			setIsCurrentSettings(isEnable);
-			setIsLoading(false);
-			setAnimateSettings(false);
-			setTimeout(() => {
-				setAnimateSettings(true);
-			}, 50);
-		} catch (error) {
-			toastr.error(error as string);
-		}
+    try {
+      await updateAutoPayments!();
+      setIsCurrentSettings(isEnable);
+      setIsLoading(false);
+      setAnimateSettings(false);
+      setTimeout(() => {
+        setAnimateSettings(true);
+      }, 50);
+    } catch (error) {
+      toastr.error(error as string);
+    }
 
-		clearTimeout(timerId);
-		setIsLoading(false);
-	};
+    clearTimeout(timerId);
+    setIsLoading(false);
+  };
 
-	const onToggleClick = () => {
-		const isEnable = !isAutomaticPaymentsEnabled;
+  const onToggleClick = () => {
+    const isEnable = !isAutomaticPaymentsEnabled;
 
-		setIsAutomaticPaymentsEnabled!(isEnable);
+    setIsAutomaticPaymentsEnabled!(isEnable);
 
-		if (!isEnable && isAutoPaymentExist) {
-			onSave(isEnable);
-		}
-	};
+    if (!isEnable && isAutoPaymentExist) {
+      onSave(isEnable);
+    }
+  };
 
-	const onSaveAutoPayment = () => {
-		onSave();
-	};
+  const onSaveAutoPayment = () => {
+    onSave();
+  };
 
-	const onClose = () => {
-		if (isAutoPaymentExist) {
-			setIsCurrentSettings(true);
-			setAnimateSettings(false);
-			setTimeout(() => {
-				setAnimateSettings(true);
-			}, 50);
-			return;
-		}
+  const onClose = () => {
+    if (isAutoPaymentExist) {
+      setIsCurrentSettings(true);
+      setAnimateSettings(false);
+      setTimeout(() => {
+        setAnimateSettings(true);
+      }, 50);
+      return;
+    }
 
-		onToggleClick();
-	};
+    onToggleClick();
+  };
 
-	const onEditClick = () => {
-		setAnimateSettings(false);
-		setIsCurrentSettings(false);
-	};
+  const onEditClick = () => {
+    setAnimateSettings(false);
+    setIsCurrentSettings(false);
+  };
 
-	const description = (min: number, max: number) => (
-		<Text fontSize="12px" className={styles.inputDescription} fontWeight={400}>
-			{t("EnterAnIntegerAmountBetween", {
-				min: formatWalletCurrency!(min, 0),
-				max: formatWalletCurrency!(max, 0),
-			})}
-		</Text>
-	);
+  const description = (min: number, max: number) => (
+    <Text fontSize="12px" className={styles.inputDescription} fontWeight={400}>
+      {t("EnterAnIntegerAmountBetween", {
+        min: formatWalletCurrency!(min, 0),
+        max: formatWalletCurrency!(max, 0),
+      })}
+    </Text>
+  );
 
-	const renderInputField = () => (
-		<div className={styles.inputFields}>
-			<div className={styles.inputField}>
-				<Text fontSize="12px" className={styles.inputLabel} fontWeight={600}>
-					{t("WhenBalanceGoesBellow")}
-				</Text>
-				<TextInput
-					scale
-					value={minBalance!}
-					onChange={onMinBalanceChange}
-					hasError={minBalanceError}
-					type={InputType.text}
-					pattern="\d+"
-					isDisabled={isDisabled}
-					testId="top_up_min_balance_input"
-				/>
-				{description(5, 1000)}
-			</div>
+  const renderInputField = () => (
+    <div className={styles.inputFields}>
+      <div className={styles.inputField}>
+        <Text fontSize="12px" className={styles.inputLabel} fontWeight={600}>
+          {t("WhenBalanceGoesBellow")}
+        </Text>
+        <TextInput
+          scale
+          value={minBalance!}
+          onChange={onMinBalanceChange}
+          hasError={minBalanceError}
+          type={InputType.text}
+          pattern="\d+"
+          isDisabled={isDisabled}
+          testId="top_up_min_balance_input"
+        />
+        {description(5, 1000)}
+      </div>
 
-			<div className={styles.inputField}>
-				<Text fontSize="12px" className={styles.inputLabel} fontWeight={600}>
-					{t("BringCreditBackUpTo")}
-				</Text>
-				<TextInput
-					scale
-					value={upToBalance!}
-					onChange={onMaxUpToBalanceChange}
-					hasError={upToBalanceError}
-					type={InputType.text}
-					pattern="\d+"
-					isDisabled={isDisabled}
-					testId="top_up_max_balance_input"
-				/>
-				{description(minUpToBalance, 5000)}
-			</div>
-			{!onAdditionalSave ? (
-				<div className={styles.inputButtons}>
-					<Button
-						key="OkButton"
-						label={t("Common:SaveButton")}
-						size={ButtonSize.small}
-						primary
-						onClick={onSaveAutoPayment}
-						isLoading={isLoading}
-						isDisabled={
-							isDisabled ||
-							minBalanceError ||
-							upToBalanceError ||
-							!minBalance ||
-							!upToBalance
-						}
-						testId="save_auto_payment_button"
-					/>
-					<Button
-						key="CancelButton"
-						label={t("Common:CancelButton")}
-						size={ButtonSize.small}
-						onClick={onClose}
-						isDisabled={isDisabled || isLoading}
-						testId="cancel_auto_payment_button"
-					/>
-				</div>
-			) : null}
-		</div>
-	);
+      <div className={styles.inputField}>
+        <Text fontSize="12px" className={styles.inputLabel} fontWeight={600}>
+          {t("BringCreditBackUpTo")}
+        </Text>
+        <TextInput
+          scale
+          value={upToBalance!}
+          onChange={onMaxUpToBalanceChange}
+          hasError={upToBalanceError}
+          type={InputType.text}
+          pattern="\d+"
+          isDisabled={isDisabled}
+          testId="top_up_max_balance_input"
+        />
+        {description(minUpToBalance, 5000)}
+      </div>
+      {!onAdditionalSave ? (
+        <div className={styles.inputButtons}>
+          <Button
+            key="OkButton"
+            label={t("Common:SaveButton")}
+            size={ButtonSize.small}
+            primary
+            onClick={onSaveAutoPayment}
+            isLoading={isLoading}
+            isDisabled={
+              isDisabled ||
+              minBalanceError ||
+              upToBalanceError ||
+              !minBalance ||
+              !upToBalance
+            }
+            testId="save_auto_payment_button"
+          />
+          <Button
+            key="CancelButton"
+            label={t("Common:CancelButton")}
+            size={ButtonSize.small}
+            onClick={onClose}
+            isDisabled={isDisabled || isLoading}
+            testId="cancel_auto_payment_button"
+          />
+        </div>
+      ) : null}
+    </div>
+  );
 
-	const renderCurrentSettings = () => (
-		<div
-			className={classNames(styles.settingsWrapper, {
-				[styles.animated]: animateSettings,
-				[styles.showBlock]: isDisabled || isFirstRender.current,
-			})}
-		>
-			<CurrentPaymentSettings
-				autoPayments={autoPayments!}
-				formatWalletCurrency={formatWalletCurrency}
-			/>
-			<Button
-				key="EditButton"
-				label={t("Common:EditButton")}
-				size={ButtonSize.small}
-				onClick={onEditClick}
-				isDisabled={isDisabled}
-				testId="edit_auto_payment_button"
-			/>
-		</div>
-	);
+  const renderCurrentSettings = () => (
+    <div
+      className={classNames(styles.settingsWrapper, {
+        [styles.animated]: animateSettings,
+        [styles.showBlock]: isDisabled || isFirstRender.current,
+      })}
+    >
+      <CurrentPaymentSettings
+        autoPayments={autoPayments!}
+        formatWalletCurrency={formatWalletCurrency}
+      />
+      <Button
+        key="EditButton"
+        label={t("Common:EditButton")}
+        size={ButtonSize.small}
+        onClick={onEditClick}
+        isDisabled={isDisabled}
+        testId="edit_auto_payment_button"
+      />
+    </div>
+  );
 
-	return (
-		<div
-			className={classNames(styles.automaticPaymentsBlock, {
-				[styles.noMargin]: noMargin,
-			})}
-		>
-			<div className={styles.autoPaymentHeader}>
-				<Text isBold fontSize="16px">
-					{t("AutomaticPayments")}
-				</Text>
-				<ToggleButton
-					isChecked={isAutomaticPaymentsEnabled}
-					onChange={onToggleClick}
-					className={styles.toggleButton}
-					isDisabled={isDisabled || !walletCustomerEmail}
-					dataTestId="auto_payments_toggle_button"
-				/>
-			</div>
+  return (
+    <div
+      className={classNames(styles.automaticPaymentsBlock, {
+        [styles.noMargin]: noMargin,
+      })}
+    >
+      <div className={styles.autoPaymentHeader}>
+        <Text isBold fontSize="16px">
+          {t("AutomaticPayments")}
+        </Text>
+        <ToggleButton
+          isChecked={isAutomaticPaymentsEnabled}
+          onChange={onToggleClick}
+          className={styles.toggleButton}
+          isDisabled={isDisabled || !walletCustomerEmail}
+          dataTestId="auto_payments_toggle_button"
+        />
+      </div>
 
-			<Text fontSize="12px" className={styles.autoPaymentDescription}>
-				{t("AutomaticallyTopUpCard")}
-			</Text>
+      <Text fontSize="12px" className={styles.autoPaymentDescription}>
+        {t("AutomaticallyTopUpCard")}
+      </Text>
 
-			{isAutomaticPaymentsEnabled
-				? isCurrentSettings
-					? renderCurrentSettings()
-					: renderInputField()
-				: null}
-		</div>
-	);
+      {isAutomaticPaymentsEnabled
+        ? isCurrentSettings
+          ? renderCurrentSettings()
+          : renderInputField()
+        : null}
+    </div>
+  );
 };
 
 export default observer(AutoPayments);
+
