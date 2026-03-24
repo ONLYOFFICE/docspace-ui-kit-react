@@ -77,6 +77,12 @@ export type TAiToolsPrices = {
   webSearch?: TAiToolsWebSearchPrice[];
 };
 
+export type TPaymentUser = {
+  id: string;
+  email: string;
+  isOwner: boolean;
+};
+
 /** Minimal config provided by the host application. Everything else is fetched internally. */
 export type TPaymentConfig = {
   theme: any;
@@ -85,6 +91,7 @@ export type TPaymentConfig = {
   logoText?: string;
   walletHelpUrl?: string;
   utcOffset?: string;
+  user?: TPaymentUser;
 };
 
 export type TPaymentNavigationEvent =

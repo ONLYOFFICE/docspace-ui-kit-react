@@ -35,22 +35,17 @@ import WalletContainer from "./WalletContainer";
 import StorageTariffDeactivated from "../dialogs/StorageTariffDeactivated";
 
 type WalletProps = {
-  language: string;
   onSetDocumentTitle?: (title: string) => void;
   showPortalSettingsLoader: boolean;
   isUpdatingTariff?: boolean;
 };
 
 const Wallet = observer((props: WalletProps) => {
-  const { language, showPortalSettingsLoader } = props;
+  const { showPortalSettingsLoader } = props;
 
   const paymentStore = usePaymentStore();
-  const {
-    isInitWalletPage,
-    isShowStorageTariffDeactivatedModal,
-    setIsInitWalletPage,
-    walletInit,
-  } = paymentStore;
+  const { isInitWalletPage, isShowStorageTariffDeactivatedModal, walletInit } =
+    paymentStore;
 
   const { t, ready } = useTranslation(["Payments", "Common"]);
 
@@ -58,13 +53,9 @@ const Wallet = observer((props: WalletProps) => {
 
   useEffect(() => {
     walletInit(t);
-
-    return () => {
-      setIsInitWalletPage(false);
-    };
   }, []);
 
-  return shouldShowLoader && showPortalSettingsLoader ? (
+  return shouldShowLoader || showPortalSettingsLoader ? (
     <WalletLoader />
   ) : (
     <>
@@ -79,3 +70,4 @@ const Wallet = observer((props: WalletProps) => {
 });
 
 export default Wallet;
+

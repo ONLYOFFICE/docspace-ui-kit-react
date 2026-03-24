@@ -93,6 +93,12 @@ const PaymentStoreInner = ({ children, config }: TPaymentStoreInnerProps) => {
   }, [store, config]);
 
   React.useEffect(() => {
+    if (!config.user) {
+      store.fetchCurrentUser();
+    }
+  }, [store, config.user]);
+
+  React.useEffect(() => {
     return () => {
       store.dispose();
     };

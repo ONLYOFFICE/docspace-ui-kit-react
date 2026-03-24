@@ -197,6 +197,11 @@ class PaymentStore {
     if (config.walletHelpUrl !== undefined)
       this.walletHelpUrl = config.walletHelpUrl;
     if (config.utcOffset !== undefined) this.utcOffset = config.utcOffset;
+    if (config.user) {
+      this._currentUserEmail = config.user.email ?? "";
+      this.userId = config.user.id ?? "";
+      this.isOwner = config.user.isOwner ?? false;
+    }
   };
 
   private addAbortController(controller: AbortController) {
@@ -822,7 +827,10 @@ class PaymentStore {
   };
 
   initWalletPayerAndBalance = async (isRefresh: boolean) => {
-    await Promise.all([this.fetchBalance(isRefresh)]);
+    await Promise.all([
+      this.tariffStatusStore?.fetchCustomerInfo(),
+      this.fetchBalance(isRefresh),
+    ]);
   };
 
   setServiceQuota = async (serviceName = BACKUP_SERVICE) => {
@@ -1031,8 +1039,7 @@ class PaymentStore {
 
     const requests: Promise<unknown>[] = [];
     try {
-      await this.fetchCurrentUser();
-      await this.initWalletPayerAndBalance(isRefresh);
+      await Promise.all([this.initWalletPayerAndBalance(isRefresh)]);
       this.previousBalance = this.balance;
 
       if (this.isAlreadyPaid) {
@@ -1053,6 +1060,9 @@ class PaymentStore {
         this.setIsShowTariffDeactivatedModal(true);
         requests.push(this.handleServicesQuotas());
       }
+
+      if (this.tariffStatusStore)
+        requests.push(this.tariffStatusStore.fetchPortalTariff());
 
       await Promise.all(requests);
 
