@@ -174,6 +174,11 @@ describe("useCloseOnAnchorCovered", () => {
   it("should use default isElementCovered when not provided", () => {
     const onClose = vi.fn();
 
+    // elementFromPoint returns body which contains anchorElement → not covered
+    const elementFromPointSpy = vi
+      .spyOn(document, "elementFromPoint")
+      .mockReturnValue(document.body);
+
     rafSpy.mockImplementationOnce((callback: FrameRequestCallback) => {
       callback(0);
       return ++rafIdCounter;
@@ -184,6 +189,9 @@ describe("useCloseOnAnchorCovered", () => {
       useCloseOnAnchorCovered({ anchorRef, onClose });
     });
 
+    expect(onClose).not.toHaveBeenCalled();
     expect(rafSpy).toHaveBeenCalledTimes(2);
+
+    elementFromPointSpy.mockRestore();
   });
 });
