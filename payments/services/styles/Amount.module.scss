@@ -24,22 +24,24 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+.amountContainer {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
 
-export * from "./utils";
+.amountTitle {
+  margin-bottom: 12px;
+}
 
-export * from "./context";
+.tabsWrapper {
+  margin-bottom: 12px;
+}
 
-export * from "./enums";
+.quantity,
+.storagePerMonth {
+  color: var(--payment-dialog-text);
+}
 
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+.storagePerMonth {
+  margin-top: 4px;
+}

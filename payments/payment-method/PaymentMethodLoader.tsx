@@ -24,22 +24,55 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
 
-export * from "./utils";
+import styles from "./PaymentMethodLoader.module.scss";
 
-export * from "./context";
+const PaymentMethodLoader: React.FC = () => {
+  return (
+    <div className={styles.container}>
+      <div className={styles.sectionHeader}>
+        <RectangleSkeleton width="80px" height="22px" borderRadius="3px" />
+        <RectangleSkeleton width="16px" height="16px" borderRadius="50%" />
+      </div>
 
-export * from "./enums";
+      <RectangleSkeleton
+        width="100%"
+        height="16px"
+        borderRadius="3px"
+        className={styles.description}
+      />
 
-export * from "./constants";
+      <RectangleSkeleton
+        width="100%"
+        height="72px"
+        borderRadius="6px"
+        className={styles.payerCard}
+      />
 
-export * from "./types";
+      <div className={styles.sectionHeader}>
+        <RectangleSkeleton width="150px" height="22px" borderRadius="3px" />
+      </div>
 
-export * from "./providers";
+      <RectangleSkeleton
+        width="100%"
+        height="16px"
+        borderRadius="3px"
+        className={styles.description}
+      />
 
-export * from "./errors";
+      <RectangleSkeleton
+        width="100%"
+        height="48px"
+        borderRadius="6px"
+        className={styles.cardRow}
+      />
 
-export * from "./uploader";
+      <RectangleSkeleton width="120px" height="32px" borderRadius="3px" />
+    </div>
+  );
+};
 
-export * from "./payments";
+export default PaymentMethodLoader;
+

@@ -24,22 +24,26 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+export const calculateDifference = (
+  quantity: number,
+  currentAllocated: number,
+): number => {
+  if (!quantity) return 0;
 
-export * from "./utils";
+  return Math.abs(currentAllocated - quantity);
+};
 
-export * from "./context";
+export const isUpgrade = (quantity: number, current: number) =>
+  quantity > current;
 
-export * from "./enums";
+export const isDowngrade = (quantity: number, current: number) =>
+  quantity < current;
 
-export * from "./constants";
+export const isExceedingLimit = (quantity: number, limit: number) =>
+  quantity > limit;
 
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export const isSamePlan = (
+  quantity: number,
+  hasSubscription: boolean,
+  current: number,
+) => hasSubscription && quantity === current;

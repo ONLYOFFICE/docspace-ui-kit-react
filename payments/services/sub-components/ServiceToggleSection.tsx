@@ -24,22 +24,59 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import { Text } from "@docspace/ui-kit/components/text";
+import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
 
-export * from "./utils";
+import styles from "../styles/ServiceComponents.module.scss";
 
-export * from "./context";
+interface ServiceToggleSectionProps {
+  isEnabled: boolean;
+  onToggle: () => void;
+  title: React.ReactNode;
+  priceText?: string;
+  description?: string;
+  testId?: string;
+  isDisabled?: boolean;
+}
 
-export * from "./enums";
+const ServiceToggleSection: React.FC<ServiceToggleSectionProps> = ({
+  isEnabled,
+  onToggle,
+  title,
+  priceText,
+  description,
+  testId,
+  isDisabled,
+}) => {
+  return (
+    <div className={styles.serviceToggleSection}>
+      <div className={styles.toggleButton}>
+        <ToggleButton
+          isChecked={isEnabled}
+          onChange={onToggle}
+          dataTestId={testId}
+          isDisabled={isDisabled}
+        />
+      </div>
+      <div className={styles.textContent}>
+        <div>
+          <Text fontSize="12px" fontWeight={600} as="span">
+            {title}
+          </Text>
+          {priceText ? (
+            <>
+              {" "}
+              <Text as="span" fontSize="12px">
+                {priceText}
+              </Text>
+            </>
+          ) : null}
+        </div>
+        {description ? <Text fontSize="12px">{description}</Text> : null}
+      </div>
+    </div>
+  );
+};
 
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export default ServiceToggleSection;

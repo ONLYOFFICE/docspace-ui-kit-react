@@ -24,22 +24,54 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import PaymentStore from "./PaymentStore";
+import { useApi } from "../../providers";
+import type { TPaymentConfig } from "../types";
 
-export * from "./utils";
+type TPaymentStoreProviderProps = {
+  children: React.ReactNode;
+  config: TPaymentConfig;
+};
 
-export * from "./context";
+const PaymentStoreContext = React.createContext<PaymentStore | null>(null);
 
-export * from "./enums";
+export const usePaymentStore = () => {
+  const store = React.useContext(PaymentStoreContext);
 
-export * from "./constants";
+  if (!store) {
+    throw new Error(
+      "usePaymentStore must be used within a PaymentStoreProvider",
+    );
+  }
 
-export * from "./types";
+  return store;
+};
 
-export * from "./providers";
+export const PaymentStoreProvider = ({
+  children,
+  config,
+}: TPaymentStoreProviderProps) => {
+  const { paymentApi, portalQuotaApi, profilesApi } = useApi();
 
-export * from "./errors";
+  const store = React.useMemo(
+    () => new PaymentStore(paymentApi, portalQuotaApi, profilesApi),
+    [paymentApi, portalQuotaApi, profilesApi],
+  );
 
-export * from "./uploader";
+  React.useEffect(() => {
+    store.configure(config);
+  }, [store, config]);
 
-export * from "./payments";
+  React.useEffect(() => {
+    return () => {
+      store.dispose();
+    };
+  }, [store]);
+
+  return (
+    <PaymentStoreContext.Provider value={store}>
+      {children}
+    </PaymentStoreContext.Provider>
+  );
+};

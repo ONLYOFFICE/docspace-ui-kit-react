@@ -24,22 +24,89 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+.walletContainer {
+  width: 100%;
 
-export * from "./utils";
+  .walletDescription {
+    max-width: 660px;
+    color: var(--payment-text-color);
+    margin-bottom: 4px;
+    line-height: 20px;
+  }
 
-export * from "./context";
+  .balanceWrapper {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    .balanceTitle {
+      height: 24px;
+    }
+  }
 
-export * from "./enums";
+  .topUpButton {
+    max-width: 152px;
+    width: 152px;
 
-export * from "./constants";
+    &.isMobileButton {
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+  .autoPaymentInformation {
+    margin-bottom: 24px;
+    color: var(--payment-text-color);
+    p:first-child {
+      margin-bottom: 2px;
+    }
+  }
 
-export * from "./types";
+  .autoPaymentEditing {
+    display: flex;
+  }
 
-export * from "./providers";
+  .headerContainer {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
 
-export * from "./errors";
 
-export * from "./uploader";
 
-export * from "./payments";
+  .integer,
+  .group,
+  .decimal,
+  .literal,
+  .currency {
+    font-weight: 700;
+    font-size: 44px;
+  }
+
+  .fraction {
+    font-weight: 700;
+    font-size: 28px;
+  }
+}
+
+
+
+
+
+
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.warningColor {
+  color: var(--warning-color);
+}
+
+.autoPaymentInformation {
+  margin-bottom: 24px;
+  color: var(--payment-text-color);
+}
+
+.autoPaymentEditing {
+  display: flex;
+}

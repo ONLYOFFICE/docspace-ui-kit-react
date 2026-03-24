@@ -24,22 +24,45 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React, { createContext, useContext, useState, useMemo } from "react";
 
-export * from "./utils";
+const AmountContext = createContext<{
+  amount: string;
+  setAmount: React.Dispatch<React.SetStateAction<string>>;
+  hasError: boolean;
+  setHasError: React.Dispatch<React.SetStateAction<boolean>>;
+  isBalanceInsufficient: boolean;
+  setIsBalanceInsufficient: React.Dispatch<React.SetStateAction<boolean>>;
+} | null>(null);
 
-export * from "./context";
+export const useAmountValue = () => {
+  const context = useContext(AmountContext);
+  if (!context) {
+    throw new Error("useAmountValue must be used within an AmountProvider");
+  }
+  return context;
+};
 
-export * from "./enums";
+export const AmountProvider: React.FC<{
+  children: React.ReactNode;
+  initialAmount?: string;
+}> = ({ children, initialAmount = "" }) => {
+  const [amount, setAmount] = useState<string>(initialAmount);
+  const [hasError, setHasError] = useState(false);
+  const [isBalanceInsufficient, setIsBalanceInsufficient] = useState(false);
+  const value = useMemo(
+    () => ({
+      amount,
+      setAmount,
+      hasError,
+      setHasError,
+      isBalanceInsufficient,
+      setIsBalanceInsufficient,
+    }),
+    [amount, hasError, isBalanceInsufficient],
+  );
 
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+  return (
+    <AmountContext.Provider value={value}>{children}</AmountContext.Provider>
+  );
+};

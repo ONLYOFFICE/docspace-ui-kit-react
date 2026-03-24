@@ -43,6 +43,8 @@ import {
   SearchApi,
   OperationsApi,
   ThirdPartyApi,
+  PaymentApi,
+  PortalQuotaApi,
 } from "@onlyoffice/docspace-api-sdk";
 import { AiApi } from "../../api/ai";
 
@@ -87,6 +89,8 @@ export type TApiContext = {
   baseUrl: string;
   aiApi: AiApi;
   thirdPartyApi: ThirdPartyApi;
+  paymentApi: PaymentApi;
+  portalQuotaApi: PortalQuotaApi;
 };
 
 const ApiContext = React.createContext<TApiContext | null>(null);
@@ -133,6 +137,8 @@ const ApiProvider = ({ children, url, apiKey, initSocket = true }: TApiProvider)
       apiClient: createApiClient(url, apiKey),
       baseUrl: url,
       thirdPartyApi: new ThirdPartyApi(configuration),
+      paymentApi: new PaymentApi(configuration),
+      portalQuotaApi: new PortalQuotaApi(configuration),
       aiApi: new AiApi({
         basePath: url,
         apiKey,

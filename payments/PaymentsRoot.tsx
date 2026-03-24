@@ -24,22 +24,30 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import { PaymentStoreProvider } from "./store/PaymentStoreProvider";
+import { ServicesStoreProvider } from "./store/ServicesStoreProvider";
+import type { TPaymentConfig } from "./types";
 
-export * from "./utils";
+type PaymentsRootProps = {
+  config: TPaymentConfig;
+  children: React.ReactNode;
+};
 
-export * from "./context";
+/**
+ * Root wrapper for all payment pages.
+ * Provides PaymentStore and ServicesStore contexts.
+ * Client just renders:
+ *   <PaymentsRoot config={...}>
+ *     <PaymentDashboard />
+ *   </PaymentsRoot>
+ */
+const PaymentsRoot = ({ config, children }: PaymentsRootProps) => {
+  return (
+    <PaymentStoreProvider config={config}>
+      <ServicesStoreProvider>{children}</ServicesStoreProvider>
+    </PaymentStoreProvider>
+  );
+};
 
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export default PaymentsRoot;

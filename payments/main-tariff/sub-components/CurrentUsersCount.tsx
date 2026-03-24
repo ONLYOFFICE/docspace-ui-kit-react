@@ -24,22 +24,58 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import { Text } from "@docspace/ui-kit/components/text";
+import React from "react";
+import styled, { css, useTheme } from "styled-components";
+import { observer } from "mobx-react";
+import SelectTotalSizeContainer from "./SelectTotalSizeContainer";
+import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
-export * from "./utils";
+const StyledCurrentUsersContainer = styled.div`
+  height: fit-content;
+  .current-admins-number {
+    ${(props) =>
+      props.isDisabled &&
+      css`
+        color: ${
+          props.theme.client.settings.payment.priceContainer.disableColor
+        };
+      `}
+  }
+`;
 
-export * from "./context";
+const CurrentUsersCountContainer = observer((props: any) => {
+  const {
+    isNeedPlusSign,
+    isDisabled,
+    addedManagersCountTitle,
+  } = props;
 
-export * from "./enums";
+  const paymentStore = usePaymentStore();
+  const { maxCountManagersByQuota } = paymentStore.externalState;
+  const theme = useTheme() as any;
 
-export * from "./constants";
+  return (
+    <StyledCurrentUsersContainer isDisabled={isDisabled} theme={theme}>
+      <Text
+        fontSize="16px"
+        fontWeight={600}
+        textAlign="center"
+        className="current-admins-number"
+      >
+        {addedManagersCountTitle}
+      </Text>
+      <Text
+        fontSize="44px"
+        fontWeight={700}
+        textAlign="center"
+        className="current-admins-number"
+      >
+        {maxCountManagersByQuota}
+      </Text>
+      <SelectTotalSizeContainer isNeedPlusSign={isNeedPlusSign} />
+    </StyledCurrentUsersContainer>
+  );
+});
 
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export default CurrentUsersCountContainer;

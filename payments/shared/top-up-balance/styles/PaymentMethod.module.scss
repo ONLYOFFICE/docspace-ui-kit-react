@@ -24,22 +24,52 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+.addPaymentMethod {
 
-export * from "./utils";
+  padding: 21px 0;
+  border-bottom: 1px solid var(--aside-header-border-color);
 
-export * from "./context";
+  .paymentMethodDescription {
+    margin-bottom: 12px;
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    .noPayment {
+      color: var(--payment-dialog-text);
+    }
+  }
 
-export * from "./enums";
+  .addPaymentMethodContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    cursor: pointer;
+  }
 
-export * from "./constants";
+  .plusIconWrapper {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--payment-rectangle-color);
+    border: 1px solid var(--payment-rectangle-color);
 
-export * from "./types";
+    svg {
+      width: 12px;
+      height: 24px;
+    }
+  }
 
-export * from "./providers";
+  .paymentMethodTitle {
+    display: flex;
+    justify-content: space-between;
+  }
 
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+  .disabledLink{
+    pointer-events: none;
+    opacity: 0.6;
+  }
+  
+}

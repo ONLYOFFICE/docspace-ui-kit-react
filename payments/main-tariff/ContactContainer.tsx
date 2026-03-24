@@ -24,22 +24,44 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import styled from "styled-components";
+import { observer } from "mobx-react";
+import { Text } from "@docspace/ui-kit/components/text";
+import { Link } from "@docspace/ui-kit/components/link";
 
-export * from "./utils";
+import { usePaymentStore } from "../store/PaymentStoreProvider";
 
-export * from "./context";
+const StyledContactContainer = styled.div`
+  display: flex;
+  width: 100%;
+  a {
+    margin-inline-start: 4px;
+  }
+`;
 
-export * from "./enums";
+const ContactContainer = observer(({ t }: any) => {
+	const paymentStore = usePaymentStore();
+	const { salesEmail } = paymentStore;
 
-export * from "./constants";
+	return (
+		<StyledContactContainer>
+			{salesEmail ? (
+				<Text as="span" fontWeight={600}>
+					{t("Common:ContactUs")}
+					<Link
+						className="sales-email-link"
+						tag="a"
+						fontWeight="600"
+						href={`mailto:${salesEmail}`}
+						color="accent"
+						dataTestId="sales_email_link"
+					>
+						{salesEmail}
+					</Link>
+				</Text>
+			) : null}
+		</StyledContactContainer>
+	);
+});
 
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export default ContactContainer;

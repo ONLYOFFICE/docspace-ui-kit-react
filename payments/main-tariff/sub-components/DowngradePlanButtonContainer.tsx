@@ -24,22 +24,39 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import { observer } from "mobx-react";
+import { Button } from "@docspace/ui-kit/components/button";
+import styled from "styled-components";
+import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
-export * from "./utils";
+const StyledBody = styled.div`
+  button {
+    width: 100%;
+  }
+`;
 
-export * from "./context";
+const DowngradePlanButtonContainer = observer(({
+  isDisabled,
+  onDowngradeTariff,
+  buttonLabel,
+}: any) => {
+  const paymentStore = usePaymentStore();
+  const { isLoading, isLessCountThanAcceptable } = paymentStore;
 
-export * from "./enums";
+  return (
+    <StyledBody>
+      <Button
+        label={buttonLabel}
+        size="medium"
+        primary
+        isDisabled={isLessCountThanAcceptable || isLoading || isDisabled}
+        onClick={onDowngradeTariff}
+        isLoading={isLoading}
+        testId="downgrade_plan_button"
+      />
+    </StyledBody>
+  );
+});
 
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export default DowngradePlanButtonContainer;

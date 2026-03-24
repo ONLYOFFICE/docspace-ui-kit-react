@@ -24,22 +24,37 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React, { createContext, useContext, useState, useMemo } from "react";
 
-export * from "./utils";
+type PaymentContextType = {
+  isWaitingCalculation: boolean;
+  setIsWaitingCalculation: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-export * from "./context";
+const initialPaymentContext: PaymentContextType = {
+  isWaitingCalculation: false,
+  setIsWaitingCalculation: () => {},
+};
 
-export * from "./enums";
+const PaymentContext = createContext<PaymentContextType>(initialPaymentContext);
 
-export * from "./constants";
+export const PaymentProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
+  const [isWaitingCalculation, setIsWaitingCalculation] = useState(false);
 
-export * from "./types";
+  const value = useMemo(
+    () => ({
+      isWaitingCalculation,
 
-export * from "./providers";
+      setIsWaitingCalculation,
+    }),
+    [isWaitingCalculation],
+  );
 
-export * from "./errors";
+  return (
+    <PaymentContext.Provider value={value}>{children}</PaymentContext.Provider>
+  );
+};
 
-export * from "./uploader";
-
-export * from "./payments";
+export const usePaymentContext = () => useContext(PaymentContext);

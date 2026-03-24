@@ -24,22 +24,61 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Button } from "@docspace/ui-kit/components/button";
+import styled from "styled-components";
+import { observer } from "mobx-react";
+import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import SalesDepartmentRequestDialog from "../../dialogs/SalesDepartmentRequestDialog";
 
-export * from "./utils";
+const StyledBody = styled.div`
+  button {
+    width: 100%;
+  }
+`;
 
-export * from "./context";
+type RequestButtonContainerProps = {
+  isDisabled?: boolean;
+};
 
-export * from "./enums";
+const RequestButtonContainer = observer(({
+  isDisabled,
+}: RequestButtonContainerProps) => {
+  const paymentStore = usePaymentStore();
+  const { isLoading } = paymentStore;
 
-export * from "./constants";
+  const [isVisibleDialog, setIsVisibleDialog] = useState(false);
+  const { t } = useTranslation(["Common"]);
 
-export * from "./types";
+  const toDoRequest = () => {
+    setIsVisibleDialog(true);
+  };
 
-export * from "./providers";
+  const onClose = () => {
+    isVisibleDialog && setIsVisibleDialog(false);
+  };
 
-export * from "./errors";
+  return (
+    <StyledBody>
+      {isVisibleDialog ? (
+        <SalesDepartmentRequestDialog
+          visible={isVisibleDialog}
+          onClose={onClose}
+        />
+      ) : null}
+      <Button
+        className="send-request-button"
+        label={t("Common:SendRequest")}
+        size="medium"
+        primary
+        isDisabled={isLoading || isDisabled}
+        onClick={toDoRequest}
+        isLoading={isLoading}
+        testId="sales_request_button"
+      />
+    </StyledBody>
+  );
+});
 
-export * from "./uploader";
-
-export * from "./payments";
+export default RequestButtonContainer;

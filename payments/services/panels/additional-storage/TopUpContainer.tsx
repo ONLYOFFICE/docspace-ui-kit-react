@@ -24,22 +24,53 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import { DISK_STORAGE } from "@docspace/shared/constants";
+import { observer } from "mobx-react";
 
-export * from "./utils";
+import TopUpModal from "../../../shared/top-up-balance/TopUpModal";
 
-export * from "./context";
+import { usePaymentStore } from "../../../store/PaymentStoreProvider";
+import { useServicesStore } from "../../../store/ServicesStoreProvider";
 
-export * from "./enums";
+type TopUpContainerTypes = {
+  isVisibleContainer: boolean;
+  onCloseTopUpModal: () => void;
+  amount?: number;
+  initialAmount?: number;
+};
 
-export * from "./constants";
+const TopUpContainer = (props: TopUpContainerTypes) => {
+  const {
+    isVisibleContainer,
+    onCloseTopUpModal,
+    amount,
+    initialAmount,
+  } = props;
 
-export * from "./types";
+  const paymentStore = usePaymentStore();
+  const servicesStore = useServicesStore();
 
-export * from "./providers";
+  const { storageServiceName } = paymentStore;
+  const { reccomendedAmount = 0 } = servicesStore;
 
-export * from "./errors";
+  const reccomended = initialAmount ?? reccomendedAmount;
 
-export * from "./uploader";
+  return isVisibleContainer ? (
+    <TopUpModal
+      visible={isVisibleContainer}
+      onClose={onCloseTopUpModal}
+      headerProps={{
+        isBackButton: true,
+        onBackClick: onCloseTopUpModal,
+        onCloseClick: onCloseTopUpModal,
+      }}
+      {...(reccomended > 0 && {
+        reccomendedAmount: reccomended.toString(),
+        amount: amount!.toString(),
+      })}
+      serviceName={storageServiceName ?? DISK_STORAGE}
+    />
+  ) : null;
+};
 
-export * from "./payments";
+export default observer(TopUpContainer);

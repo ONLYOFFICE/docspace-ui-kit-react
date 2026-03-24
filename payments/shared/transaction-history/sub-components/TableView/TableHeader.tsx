@@ -24,22 +24,71 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import { useTranslation } from "react-i18next";
 
-export * from "./utils";
+import { TableHeader } from "@docspace/ui-kit/components/table";
 
-export * from "./context";
+type TableHeaderProps = {
+  containerRef: React.RefObject<HTMLDivElement>;
+  columnStorageName: string;
+  columnInfoPanelStorageName: string;
+  sectionWidth: number;
+  itemHeight: number;
+};
 
-export * from "./enums";
+const TransactionHistoryTableHeader = (props: TableHeaderProps) => {
+  const { t } = useTranslation(["Payments", "Common"]);
 
-export * from "./constants";
+  const defaultColumns = [
+    {
+      key: "Date",
+      title: t("Common:Date"),
+      enable: true,
+      resizable: true,
+      default: true,
+      sortBy: "AZ",
+      active: true,
+      minWidth: 150,
+    },
+    {
+      key: "Type",
+      title: t("Common:Type"),
+      enable: true,
+      resizable: true,
+      minWidth: 120,
+    },
+    {
+      key: "Contact",
+      title: t("Payments:Contact"),
+      enable: true,
+      resizable: true,
+      minWidth: 120,
+    },
+    {
+      key: "Quantity",
+      title: t("Common:Quantity"),
+      enable: true,
+      resizable: true,
+      minWidth: 150,
+    },
+    {
+      key: "Amount",
+      title: t("Payments:Amount"),
+      enable: true,
+      resizable: true,
+      minWidth: 120,
+    },
+  ];
 
-export * from "./types";
+  return (
+    <TableHeader
+      columns={defaultColumns}
+      showSettings={false}
+      useReactWindow
+      {...props}
+    />
+  );
+};
 
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export default TransactionHistoryTableHeader;

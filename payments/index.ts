@@ -24,22 +24,24 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+export { default as PaymentDashboard } from "./main-tariff";
+export { default as PaymentWallet } from "./wallet";
+export { default as PaymentMethod } from "./payment-method";
+export { default as PaymentServicesList } from "./services";
+export { default as PaymentsRoot } from "./PaymentsRoot";
 
-export * from "./utils";
+export {
+  PaymentStoreProvider,
+  usePaymentStore,
+} from "./store/PaymentStoreProvider";
+export {
+  ServicesStoreProvider,
+  useServicesStore,
+} from "./store/ServicesStoreProvider";
 
-export * from "./context";
-
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export type {
+  TPaymentExternalState,
+  TPaymentNavigationEvent,
+  TAiToolsPrices,
+  TServiceFeatureWithPrice,
+} from "./types";

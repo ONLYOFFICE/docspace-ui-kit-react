@@ -24,22 +24,100 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
 
-export * from "./utils";
+.modalBody{
+  margin-top:20px;
+}
 
-export * from "./context";
+.buttonContainerWrapper {
+  display: flex;
+  gap: inherit;
+  flex-direction: column;
+  width: 100%;
+}
 
-export * from "./enums";
+.buttonContainer {
+  gap: inherit;
+  display: flex;
+  width: 100%;
+}
 
-export * from "./constants";
+.walletInfoContainer {
+  display: flex;
+  background: var(--payment-background-color);
+  min-height: 72px;
+  padding: 16px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  align-items: center;
+  position: relative;
+}
 
-export * from "./types";
+ .shortView {
+    max-width: 320px;
+  }
 
-export * from "./providers";
+  .withoutBackground {
+    background: transparent;
+    border: 1px solid var(--aside-header-border-color);
+  }
 
-export * from "./errors";
+.walletInfoIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--payment-icon-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline-end: 16px;
 
-export * from "./uploader";
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-export * from "./payments";
+    svg {
+      width: 16px;
+      height: 16px;
+        path {
+          fill: var(--payment-icon-color);
+        }
+    }
+  }
+
+  
+}
+
+.walletInfoBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.walletInfoTitle {
+  line-height: 16px;
+}
+
+.walletInfoBalance {
+  font-size: 14px;
+  line-height: 16px;
+  &.warningColor {
+    color: var(--warning-color);
+  }
+}
+
+.walletInfoTopUp {
+  margin-left: auto;
+  color: var(--payment-link-color);
+  cursor: pointer;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.balanceValue {
+  color: (var(--color-scheme-main-accent))
+}

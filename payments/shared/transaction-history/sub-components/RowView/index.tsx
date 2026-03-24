@@ -23,23 +23,39 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+import { observer } from "mobx-react";
 
-export * from "./components";
+import { RowContainer } from "@docspace/ui-kit/components/rows";
+import { TTransactionCollection } from "@docspace/shared/api/portal/types";
 
-export * from "./utils";
+import TransactionRowView from "./RowBody";
+import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 
-export * from "./context";
+const RowView = ({
+  sectionWidth,
+}: {
+  sectionWidth: number;
+}) => {
+  const paymentStore = usePaymentStore();
+  const history = paymentStore.transactionHistory ?? [];
+  return (
+    <RowContainer
+      useReactWindow
+      fetchMoreFiles={() => Promise.resolve()}
+      hasMoreFiles={false}
+      itemCount={history.length}
+      filesLength={history.length}
+      itemHeight={50}
+    >
+      {history.map((transaction, index) => (
+        <TransactionRowView
+          transaction={transaction}
+          key={`transaction-row-${transaction.date || index}`}
+          sectionWidth={sectionWidth}
+        />
+      ))}
+    </RowContainer>
+  );
+};
 
-export * from "./enums";
-
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export default observer(RowView);

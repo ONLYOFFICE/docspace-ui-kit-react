@@ -24,22 +24,74 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+.orderSummaryWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 20px;
 
-export * from "./utils";
+}
 
-export * from "./context";
 
-export * from "./enums";
 
-export * from "./constants";
+.summaryCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-export * from "./types";
+.summaryContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: var(--payment-background-color);
+  border-radius: 6px;
+}
 
-export * from "./providers";
+.summaryRow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
 
-export * from "./errors";
+.rowLabel {
+  flex: 1;
 
-export * from "./uploader";
+  line-height: 16px;
+}
 
-export * from "./payments";
+.rowValue {
+  line-height: 16px;
+}
+
+.rowSubtext {
+  color: var(--payment-dialog-text);
+  font-weight: 400;
+}
+
+.divider {
+  height: 1px;
+  background:  var(--aside-header-border-color);
+  width: 100%;
+}
+
+.planInfoHeader {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
+
+.balanceInfo {
+  color: var(--payment-dialog-text);
+    margin-right: 0;
+    margin-left: auto;
+
+     &.warningColor {
+    color: var(--warning-color);
+  }
+}
+
+

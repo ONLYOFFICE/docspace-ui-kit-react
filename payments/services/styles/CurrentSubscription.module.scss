@@ -24,22 +24,58 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+.currentSubscriptionWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin:20px 0;
+}
 
-export * from "./utils";
+.subscriptionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
-export * from "./context";
+.subscriptionContent {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: var(--payment-background-color);
+  border-radius: 6px;
+}
 
-export * from "./enums";
+.storageInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
 
-export * from "./constants";
+.storageIcon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-export * from "./types";
+.storageDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 
-export * from "./providers";
 
-export * from "./errors";
 
-export * from "./uploader";
+.priceInfo {
+  display: flex;
+  align-items: center;
+}
 
-export * from "./payments";
+
+
+.renewalInfo {
+  color: var(--payment-dialog-text);
+}

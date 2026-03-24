@@ -24,22 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import { Text } from "@docspace/ui-kit/components/text";
 
-export * from "./utils";
+import styles from "../styles/ServiceComponents.module.scss";
 
-export * from "./context";
+interface ServiceContentProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
 
-export * from "./enums";
+const ServiceContent: React.FC<ServiceContentProps> = ({
+  icon,
+  title,
+  description,
+}) => {
+  return (
+    <div className={styles.serviceContent}>
+      <div className={styles.iconContainer}>{icon}</div>
+      <div className={styles.serviceInfo}>
+        <Text fontSize="12px" fontWeight={600}>
+          {title}
+        </Text>
+        <Text fontSize="10px" className={styles.serviceDescription}>
+          {description}
+        </Text>
+      </div>
+    </div>
+  );
+};
 
-export * from "./constants";
-
-export * from "./types";
-
-export * from "./providers";
-
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export default ServiceContent;

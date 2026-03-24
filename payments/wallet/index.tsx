@@ -24,22 +24,59 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React, { useEffect } from "react";
+import { observer } from "mobx-react";
+import { useTranslation } from "react-i18next";
 
-export * from "./utils";
+import { usePaymentStore } from "../store/PaymentStoreProvider";
 
-export * from "./context";
+import WalletLoader from "./WalletLoader";
+import WalletContainer from "./WalletContainer";
+import StorageTariffDeactivated from "../dialogs/StorageTariffDeactivated";
 
-export * from "./enums";
+type WalletProps = {
+  language: string;
+  onSetDocumentTitle?: (title: string) => void;
+  showPortalSettingsLoader: boolean;
+  isUpdatingTariff?: boolean;
+};
 
-export * from "./constants";
+const Wallet = observer((props: WalletProps) => {
+  const { language, showPortalSettingsLoader } = props;
 
-export * from "./types";
+  const paymentStore = usePaymentStore();
+  const {
+    isInitWalletPage,
+    isShowStorageTariffDeactivatedModal,
+    setIsInitWalletPage,
+  } = paymentStore;
 
-export * from "./providers";
+  const { t, ready } = useTranslation(["Payments", "Common"]);
 
-export * from "./errors";
+  const shouldShowLoader = !isInitWalletPage || !ready;
 
-export * from "./uploader";
+  useEffect(() => {
+    // Locale is now handled by the date utility functions
+  }, [language]);
 
-export * from "./payments";
+  useEffect(() => {
+    return () => {
+      setIsInitWalletPage(false);
+    };
+  }, []);
+
+  return shouldShowLoader && showPortalSettingsLoader ? (
+    <WalletLoader />
+  ) : (
+    <>
+      <WalletContainer t={t} />
+      {isShowStorageTariffDeactivatedModal ? (
+        <StorageTariffDeactivated
+          visible={isShowStorageTariffDeactivatedModal}
+        />
+      ) : null}
+    </>
+  );
+});
+
+export default Wallet;

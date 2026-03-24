@@ -24,22 +24,50 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+.gridContainer {
+  display: grid;
+  grid-gap: 16px;
+  width: fit-content;
+}
 
-export * from "./utils";
+.gridContainerDesktop {
+  grid-template-columns: repeat(2, 1fr);
+}
 
-export * from "./context";
+.gridContainerMobile {
+  grid-template-columns: 1fr;
+}
 
-export * from "./enums";
+.loaderContainer {
+  max-width: 280px;
+  padding: 20px;
+}
 
-export * from "./constants";
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
 
-export * from "./types";
+.middleRow {
+  margin-bottom: 12px;
+  max-width: 130px;
+}
 
-export * from "./providers";
+.longRow {
+  max-width: 271px;
+}
+.bottomRow {
+  margin-top: 12px;
+}
 
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+.firstLoader {
+  max-width: 376px;
+}
+.firstMobileLoader {
+  max-width: 211px;
+}
+.loaderWrapper {
+  width: 100%;
+}

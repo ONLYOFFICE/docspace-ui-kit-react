@@ -24,22 +24,53 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import ServicesStore from "./ServicesStore";
+import { useApi } from "../../providers";
+import { usePaymentStore } from "./PaymentStoreProvider";
 
-export * from "./utils";
+type TServicesStoreProviderProps = {
+  children: React.ReactNode;
+};
 
-export * from "./context";
+const ServicesStoreContext = React.createContext<ServicesStore | null>(null);
 
-export * from "./enums";
+export const useServicesStore = () => {
+  const store = React.useContext(ServicesStoreContext);
 
-export * from "./constants";
+  if (!store) {
+    throw new Error(
+      "useServicesStore must be used within a ServicesStoreProvider",
+    );
+  }
 
-export * from "./types";
+  return store;
+};
 
-export * from "./providers";
+export const ServicesStoreProvider = ({
+  children,
+}: TServicesStoreProviderProps) => {
+  const { paymentApi } = useApi();
+  const paymentStore = usePaymentStore();
 
-export * from "./errors";
+  const store = React.useMemo(
+    () => new ServicesStore(paymentApi),
+    [paymentApi],
+  );
 
-export * from "./uploader";
+  React.useEffect(() => {
+    store.setPaymentStore(paymentStore);
+  }, [store, paymentStore]);
 
-export * from "./payments";
+  React.useEffect(() => {
+    return () => {
+      store.dispose();
+    };
+  }, [store]);
+
+  return (
+    <ServicesStoreContext.Provider value={store}>
+      {children}
+    </ServicesStoreContext.Provider>
+  );
+};

@@ -24,22 +24,51 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./components";
+import React from "react";
+import styled, { useTheme } from "styled-components";
+import { useTranslation } from "react-i18next";
+import { Text } from "@docspace/ui-kit/components/text";
+import { observer } from "mobx-react";
+import { getConvertedSize } from "@docspace/shared/utils/common";
+import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
-export * from "./utils";
+const StyledBody = styled.div`
+  .select-total-size_title {
+    margin-bottom: 8px;
+    margin-inline: auto;
 
-export * from "./context";
+    color: ${(props) =>
+      props.isDisabled
+        ? props.theme.client.settings.payment.priceContainer.disableColor
+        : props.theme.client.settings.payment.priceContainer.featureTextColor};
+  }
+`;
 
-export * from "./enums";
+const SelectTotalSizeContainer = observer(({
+  usedTotalStorageSizeTitle,
+  isNeedPlusSign,
+}: any) => {
+  const paymentStore = usePaymentStore();
+  const { allowedStorageSizeByQuota } = paymentStore;
+  const theme = useTheme() as any;
 
-export * from "./constants";
+  const { t } = useTranslation(["Payments", "Common"]);
 
-export * from "./types";
+  const convertedSize = getConvertedSize(t, allowedStorageSizeByQuota);
 
-export * from "./providers";
+  return (
+    <StyledBody theme={theme}>
+      <Text
+        textAlign="center"
+        fontWeight={600}
+        fontSize="11px"
+        className="select-total-size_title"
+        color={theme.client.settings.payment.storageSizeTitle}
+      >
+        {usedTotalStorageSizeTitle}: {convertedSize} {isNeedPlusSign ? "+" : ""}
+      </Text>
+    </StyledBody>
+  );
+});
 
-export * from "./errors";
-
-export * from "./uploader";
-
-export * from "./payments";
+export default SelectTotalSizeContainer;
