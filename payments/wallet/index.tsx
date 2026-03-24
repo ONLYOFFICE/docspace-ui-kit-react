@@ -49,6 +49,7 @@ const Wallet = observer((props: WalletProps) => {
     isInitWalletPage,
     isShowStorageTariffDeactivatedModal,
     setIsInitWalletPage,
+    walletInit,
   } = paymentStore;
 
   const { t, ready } = useTranslation(["Payments", "Common"]);
@@ -56,10 +57,8 @@ const Wallet = observer((props: WalletProps) => {
   const shouldShowLoader = !isInitWalletPage || !ready;
 
   useEffect(() => {
-    // Locale is now handled by the date utility functions
-  }, [language]);
+    walletInit(t);
 
-  useEffect(() => {
     return () => {
       setIsInitWalletPage(false);
     };
