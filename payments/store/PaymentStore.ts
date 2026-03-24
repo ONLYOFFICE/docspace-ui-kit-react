@@ -621,9 +621,9 @@ class PaymentStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getCustomerBalance(
-        abortController.signal,
-      );
+      const res = await this.paymentApi.getCustomerBalance(isRefresh, {
+        signal: abortController.signal,
+      });
 
       if (!res?.data?.response) return;
 
@@ -744,17 +744,21 @@ class PaymentStore {
   updateAutoPayments = async () => {
     try {
       const res = await this.paymentApi.setTenantWalletSettings({
-        enabled: this.isAutomaticPaymentsEnabled,
-        minBalance: +this.minBalance,
-        upToBalance: +this.upToBalance,
-        currency: this.walletCodeCurrency || "",
+        settings: {
+          enabled: this.isAutomaticPaymentsEnabled,
+          minBalance: +this.minBalance,
+          upToBalance: +this.upToBalance,
+          currency: this.walletCodeCurrency || "",
+        },
       });
 
-      if (!res?.data?.response) {
+      const data = res?.data as unknown as { response?: TAutoTopUpSettings };
+
+      if (!data?.response) {
         throw new Error();
       }
 
-      this.autoPayments = res.data.response as unknown as TAutoTopUpSettings;
+      this.autoPayments = data.response;
     } catch (error) {
       toastr.error(error as string);
     }
