@@ -27,30 +27,39 @@
  */
 
 export enum ServerType {
-	Custom,
-	Portal,
-	GitHub,
-	Box,
+  Custom,
+  Portal,
+  GitHub,
+  Box,
 }
 
 export enum ContentType {
-	Text = 0,
-	Tool = 1,
-	Files = 2,
-	Images = 3,
+  Text = 0,
+  Tool = 1,
+  Files = 2,
+  Images = 3,
 }
 
 export enum RoleType {
-	UserMessage = 0,
-	AssistantMessage = 1,
-	Error = 10,
+  UserMessage = 0,
+  AssistantMessage = 1,
+  Error = 10,
 }
 
 export enum EventType {
-	MessageStart = "message_start",
-	MessageStop = "message_stop",
-	NewToken = "new_token",
-	ToolCall = "tool_call",
-	ToolResult = "tool_result",
-	Error = "error",
+  MessageStart = "message_start",
+  MessageStop = "message_stop",
+  NewToken = "new_token",
+  Reasoning = "reasoning",
+  ToolCall = "tool_call",
+  ToolResult = "tool_result",
+  Error = "error",
+}
+
+export enum ChatReasoningEffort {
+  None = 0,
+  Low = 1,
+  Medium = 2,
+  High = 3,
+  XHigh = 4,
 }

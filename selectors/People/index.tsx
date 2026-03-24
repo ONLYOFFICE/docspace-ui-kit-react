@@ -379,7 +379,8 @@ const PeopleSelector = ({
           items = res.data.response ?? [];
           responseTotal = res.data.count ?? 0;
         } else if (isGroupsTab) {
-          const id = Number(roomId);
+          // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
+          const id = roomId as number;
           const fetcher =
             targetEntityType === "file"
               ? groupSearchApi.getGroupsWithFilesShared.bind(groupSearchApi)
@@ -401,7 +402,8 @@ const PeopleSelector = ({
           }));
           responseTotal = res.data.count ?? 0;
         } else {
-          const id = Number(roomId);
+          // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
+          const id = roomId as number;
           const fetcher =
             targetEntityType === "file"
               ? peopleSearchApi.getUsersWithFilesShared.bind(peopleSearchApi)
