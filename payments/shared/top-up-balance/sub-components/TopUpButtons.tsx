@@ -27,10 +27,10 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
-import { toastr } from "@docspace/ui-kit/components/toast";
+import { Button, ButtonSize } from "../../../../components/button";
+import { toastr } from "../../../../components/toast";
 
-import { Text } from "@docspace/ui-kit/components/text";
+import { Text } from "../../../../components/text";
 
 import { useAmountValue } from "../../../wallet/context";
 import styles from "../styles/TopUpModal.module.scss";

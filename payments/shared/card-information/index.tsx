@@ -28,7 +28,7 @@ import CardIconUrl from "../../../assets/icons/payments/16/card.react.svg";
 import CheckReactSvg from "../../../assets/icons/payments/check.edit.react.svg";
 import styles from "./CardInformation.module.scss";
 import classNames from "classnames";
-import { Text } from "@docspace/ui-kit/components/text";
+import { Text } from "../../../components/text";
 import AttentionReactSvg from "../../../assets/icons/payments/plugin.incompatible.react.svg";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";

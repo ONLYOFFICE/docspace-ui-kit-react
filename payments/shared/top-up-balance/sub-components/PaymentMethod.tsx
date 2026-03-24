@@ -31,11 +31,11 @@ import { toAbsoluteUrl } from "../../../utils/url";
 import classNames from "classnames";
 import { observer } from "mobx-react";
 
-import { Link } from "@docspace/ui-kit/components/link";
-import { Text } from "@docspace/ui-kit/components/text";
-import { toastr } from "@docspace/ui-kit/components/toast";
+import { Link } from "../../../../components/link";
+import { Text } from "../../../../components/text";
+import { toastr } from "../../../../components/toast";
 
-import { AddButton } from "@docspace/ui-kit/components/add-button";
+import { AddButton } from "../../../../components/add-button";
 
 import styles from "../styles/PaymentMethod.module.scss";
 import { CardInformation } from "../../card-information";

@@ -31,10 +31,10 @@ import { observer } from "mobx-react";
 import {
   ModalDialog,
   ModalDialogType,
-} from "@docspace/ui-kit/components/modal-dialog";
-import { Text } from "@docspace/ui-kit/components/text";
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
-import { toastr } from "@docspace/ui-kit/components/toast";
+} from "../../components/modal-dialog";
+import { Text } from "../../components/text";
+import { Button, ButtonSize } from "../../components/button";
+import { toastr } from "../../components/toast";
 
 import AutomaticPaymentsBlock from "../shared/top-up-balance/sub-components/AutoPayments";
 

@@ -27,13 +27,13 @@
 import React from "react";
 import { observer } from "mobx-react";
 
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
+import { Button, ButtonSize } from "../../../../components/button";
 
 import { useServicesActions } from "../../hooks/useServicesActions";
 import { usePaymentContext } from "../../context/PaymentContext";
 
 import styles from "../../styles/index.module.scss";
-import { Text } from "@docspace/ui-kit/components";
+import { Text } from "../../../../components";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 

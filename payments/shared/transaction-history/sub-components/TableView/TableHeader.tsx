@@ -27,7 +27,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { TableHeader } from "@docspace/ui-kit/components/table";
+import { TableHeader } from "../../../../../components/table";
 
 type TableHeaderProps = {
   containerRef: React.RefObject<HTMLDivElement>;

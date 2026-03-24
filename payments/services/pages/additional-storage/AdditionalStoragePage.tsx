@@ -28,12 +28,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { Text } from "@docspace/ui-kit/components/text";
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
+import { Text } from "../../../../components/text";
+import { Button, ButtonSize } from "../../../../components/button";
 import {
   ContextMenu,
   type ContextMenuRefType,
-} from "@docspace/ui-kit/components/context-menu";
+} from "../../../../components/context-menu";
 
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import BalanceAmount from "../../../shared/balance-amount";
@@ -52,7 +52,7 @@ import {
 } from "@docspace/shared/utils/common";
 import type { DateTime } from "luxon";
 import { updateWalletPayment } from "@docspace/shared/api/portal";
-import { toastr } from "@docspace/ui-kit/components/toast";
+import { toastr } from "../../../../components/toast";
 import StoragePlanUpgrade from "../../panels/additional-storage/StoragePlanUpgrade";
 import StoragePlanCancel from "../../panels/additional-storage/StoragePlanCancel";
 import StorageWarning from "../../panels/additional-storage/StorageWarning";

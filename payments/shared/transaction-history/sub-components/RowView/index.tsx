@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 import { observer } from "mobx-react";
 
-import { RowContainer } from "@docspace/ui-kit/components/rows";
+import { RowContainer } from "../../../../../components/rows";
 import { TTransactionCollection } from "@docspace/shared/api/portal/types";
 
 import TransactionRowView from "./RowBody";

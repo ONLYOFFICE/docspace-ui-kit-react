@@ -31,7 +31,7 @@ import { observer } from "mobx-react";
 import {
   ModalDialog,
   ModalDialogType,
-} from "@docspace/ui-kit/components/modal-dialog";
+} from "../../../../components/modal-dialog";
 
 import styles from "../../styles/BackupServiceDialog.module.scss";
 

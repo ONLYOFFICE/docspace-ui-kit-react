@@ -29,12 +29,12 @@ import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 import { Duration } from "luxon";
 
-import { Text } from "@docspace/ui-kit/components/text";
-import { useInterfaceDirection } from "@docspace/ui-kit/context/InterfaceDirectionContext";
-import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
-import { toastr } from "@docspace/ui-kit/components/toast";
-import { HelpButton } from "@docspace/ui-kit/components/help-button";
-import { now, formatDateLocalized } from "@docspace/ui-kit/utils/date";
+import { Text } from "../../../../components/text";
+import { useInterfaceDirection } from "../../../../context/InterfaceDirectionContext";
+import { Loader, LoaderTypes } from "../../../../components/loader";
+import { toastr } from "../../../../components/toast";
+import { HelpButton } from "../../../../components/help-button";
+import { now, formatDateLocalized } from "../../../../utils/date";
 
 import { calcalateWalletPayment } from "@docspace/shared/api/portal";
 

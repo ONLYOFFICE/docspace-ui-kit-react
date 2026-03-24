@@ -29,19 +29,19 @@ import { useTranslation, Trans } from "react-i18next";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 import type { DateTime } from "luxon";
-import { parseToDateTime, isSameDay, now } from "@docspace/ui-kit/utils/date";
-import { getCookie } from "@docspace/ui-kit/utils/cookie";
+import { parseToDateTime, isSameDay, now } from "../../../utils/date";
+import { getCookie } from "../../../utils/cookie";
 import { LANGUAGE } from "@docspace/shared/constants";
 
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
-import { Text } from "@docspace/ui-kit/components/text";
+import { Button, ButtonSize } from "../../../components/button";
+import { Text } from "../../../components/text";
 import {
   ComboBox,
   ComboBoxSize,
   TOption,
-} from "@docspace/ui-kit/components/combobox";
-import { DatePicker } from "@docspace/ui-kit/components/date-picker";
-import { toastr } from "@docspace/ui-kit/components/toast";
+} from "../../../components/combobox";
+import { DatePicker } from "../../../components/date-picker";
+import { toastr } from "../../../components/toast";
 import {
   checkTransactionHistoryReport,
   startTransactionHistoryReport,
@@ -53,21 +53,21 @@ import {
 import {
   ModalDialog,
   ModalDialogType,
-} from "@docspace/ui-kit/components/modal-dialog";
-import FilterIcon from "@docspace/ui-kit/components/filter/sub-components/FilterIcon";
-import { AddButton } from "@docspace/ui-kit/components/add-button";
-import { SelectedItemPure } from "@docspace/ui-kit/components/selected-item";
-import { TSelectorItem } from "@docspace/ui-kit/components/selector";
+} from "../../../components/modal-dialog";
+import FilterIcon from "../../../components/filter/sub-components/FilterIcon";
+import { AddButton } from "../../../components/add-button";
+import { SelectedItemPure } from "../../../components/selected-item";
+import { TSelectorItem } from "../../../components/selector";
 import { TUser } from "@docspace/shared/api/people/types";
-import PeopleSelector from "@docspace/ui-kit/selectors/People";
-import type { PeopleFilter } from "@docspace/ui-kit/selectors/People/PeopleSelector.types";
+import PeopleSelector from "../../../selectors/People";
+import type { PeopleFilter } from "../../../selectors/People/PeopleSelector.types";
 import Filter from "@docspace/shared/api/people/filter";
 
 import FilterPanel from "./sub-components/FilterPanel";
 import TransactionBody from "./sub-components/TransactionBody";
 import styles from "./styles/TransactionHistory.module.scss";
 import TableLoader from "./sub-components/TableLoader";
-import { Link } from "@docspace/ui-kit/components/link";
+import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
 type TransactionHistoryReportResponse = {

@@ -31,7 +31,7 @@ import {
   DISK_STORAGE,
   STORAGE_ENUM,
 } from "@docspace/shared/constants";
-import { toastr } from "@docspace/ui-kit/components/toast";
+import { toastr } from "../../components/toast";
 import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 

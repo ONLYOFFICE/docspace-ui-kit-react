@@ -27,9 +27,9 @@
 import { useTranslation, Trans } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { Button } from "@docspace/ui-kit/components/button";
-import { Text } from "@docspace/ui-kit/components/text";
-import { ModalDialog } from "@docspace/ui-kit/components/modal-dialog";
+import { Button } from "../../components/button";
+import { Text } from "../../components/text";
+import { ModalDialog } from "../../components/modal-dialog";
 import { getConvertedSize } from "@docspace/shared/utils/common";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";

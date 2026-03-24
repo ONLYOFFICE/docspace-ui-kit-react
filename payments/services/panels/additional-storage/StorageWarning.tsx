@@ -30,12 +30,12 @@ import { observer } from "mobx-react";
 
 import InfoIcon from "../../../../assets/icons/payments/info.outline.react.svg";
 
-import { Text } from "@docspace/ui-kit/components/text";
-import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
+import { Text } from "../../../../components/text";
+import { Loader, LoaderTypes } from "../../../../components/loader";
 
 import styles from "../../styles/StorageSummary.module.scss";
 import { useServicesActions } from "../../hooks/useServicesActions";
-import { Link } from "@docspace/ui-kit/components";
+import { Link } from "../../../../components";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 

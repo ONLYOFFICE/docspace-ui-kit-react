@@ -4,8 +4,8 @@ import classNames from "classnames";
 
 import RefreshReactSvgUrl from "../../../assets/icons/payments/16/refresh.react.svg?url";
 
-import { IconButton } from "@docspace/ui-kit/components/icon-button";
-import { Text } from "@docspace/ui-kit/components/text";
+import { IconButton } from "../../../components/icon-button";
+import { Text } from "../../../components/text";
 import { truncateNumberToFraction } from "@docspace/shared/utils/common";
 import { observer } from "mobx-react";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";

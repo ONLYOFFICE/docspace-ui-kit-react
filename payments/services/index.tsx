@@ -28,7 +28,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { Trans, useTranslation } from "react-i18next";
 
-import { toastr } from "@docspace/ui-kit/components/toast";
+import { toastr } from "../../components/toast";
 import {
   AI_ENUM,
   BACKUP_SERVICE,

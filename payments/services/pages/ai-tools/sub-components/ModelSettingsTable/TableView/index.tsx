@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import { observer } from "mobx-react";
 
-import { TableBody, TableContainer } from "@docspace/ui-kit/components/table";
-import { Text } from "@docspace/ui-kit/components/text";
+import { TableBody, TableContainer } from "../../../../../../../components/table";
+import { Text } from "../../../../../../../components/text";
 import { useTranslation, Trans } from "react-i18next";
 
 import type { TAiToolsPrices } from "../../../../../../types";
@@ -10,7 +10,7 @@ import type { TAiToolsPrices } from "../../../../../../types";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import styles from "./ModelSettingsTable.module.scss";
-import { Link, LinkTarget } from "@docspace/ui-kit/components";
+import { Link, LinkTarget } from "../../../../../../../components";
 
 import { useServicesStore } from "../../../../../../store/ServicesStoreProvider";
 import { usePaymentStore } from "../../../../../../store/PaymentStoreProvider";

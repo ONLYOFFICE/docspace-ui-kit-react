@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Text } from "@docspace/ui-kit/components/text";
+import { Text } from "../../../../components/text";
 import modalStyles from "../styles/TopUpAiModal.module.scss";
 import WalletInfo from "./WalletInfo";
 import AiAgents from "../../../../assets/icons/payments/16/ai-agents.svg?url";

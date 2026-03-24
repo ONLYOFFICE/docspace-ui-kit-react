@@ -28,7 +28,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 
-import { Text } from "@docspace/ui-kit/components/text";
+import { Text } from "../../../../components/text";
 import DiskStorageIcon from "../../../../assets/icons/payments/16/catalog-settings-storage-management.svg";
 
 import styles from "../../styles/CurrentSubscription.module.scss";

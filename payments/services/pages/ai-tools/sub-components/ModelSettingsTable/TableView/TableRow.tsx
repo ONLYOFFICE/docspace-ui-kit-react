@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 
-import { TableCell, TableRow } from "@docspace/ui-kit/components/table";
-import { Text } from "@docspace/ui-kit/components/text";
-import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
+import { TableCell, TableRow } from "../../../../../../../components/table";
+import { Text } from "../../../../../../../components/text";
+import { ToggleButton } from "../../../../../../../components/toggle-button";
 
 import styles from "./ModelSettingsTable.module.scss";
 

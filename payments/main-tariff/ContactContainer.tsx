@@ -26,8 +26,8 @@
 
 import styled from "styled-components";
 import { observer } from "mobx-react";
-import { Text } from "@docspace/ui-kit/components/text";
-import { Link } from "@docspace/ui-kit/components/link";
+import { Text } from "../../components/text";
+import { Link } from "../../components/link";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 

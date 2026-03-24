@@ -26,7 +26,7 @@
 
 import React, { useEffect, useRef } from "react";
 import styled, { css, useTheme } from "styled-components";
-import { Text } from "@docspace/ui-kit/components/text";
+import { Text } from "../../components/text";
 import { observer } from "mobx-react";
 import { Trans } from "react-i18next";
 import SelectUsersCountContainer from "./sub-components/SelectUsersCountContainer";

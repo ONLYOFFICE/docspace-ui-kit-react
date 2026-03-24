@@ -29,10 +29,10 @@ import { Trans, useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 import { useNavigate } from "react-router";
 
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
-import { Text } from "@docspace/ui-kit/components/text";
-import { Tabs, type TTabItem } from "@docspace/ui-kit/components/tabs";
-import { Link } from "@docspace/ui-kit/components/link";
+import { Button, ButtonSize } from "../../../../components/button";
+import { Text } from "../../../../components/text";
+import { Tabs, type TTabItem } from "../../../../components/tabs";
+import { Link } from "../../../../components/link";
 
 import { AI_ENUM, AI_TOOLS } from "@docspace/shared/constants";
 import { DeviceType } from "@docspace/shared/enums";
@@ -54,9 +54,9 @@ import styles from "./AiPage.module.scss";
 import {
   formatDateLocalized,
   getAppTimezone,
-} from "@docspace/ui-kit/utils/date";
+} from "../../../../utils/date";
 import { setServiceState } from "@docspace/shared/api/portal";
-import { toastr } from "@docspace/ui-kit/components";
+import { toastr } from "../../../../components";
 import AIServiceDialog from "../../panels/ai-service/AIServiceDialog";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 

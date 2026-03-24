@@ -1,8 +1,8 @@
 import React from "react";
 import { Trans, useTranslation } from "react-i18next";
 
-import { Text } from "@docspace/ui-kit/components/text";
-import { Link } from "@docspace/ui-kit/components/link";
+import { Text } from "../../../../components/text";
+import { Link } from "../../../../components/link";
 
 import AIAgentsIcon from "../../../../assets/icons/payments/32/ai-agents.svg";
 import ChatIcon from "../../../../assets/icons/payments/32/ai-chat.svg";
@@ -19,7 +19,7 @@ import RightArrowIcon from "../../../../assets/icons/payments/16/right.arrow.rea
 import styles from "../../styles/BackupServiceDialog.module.scss";
 import PriceBackground from "../../../../assets/icons/payments/16/price.react.svg";
 import AiSvg from "../../../../assets/icons/payments/16/AI.svg";
-import { ModalDialog, ModalDialogType } from "@docspace/ui-kit/components";
+import { ModalDialog, ModalDialogType } from "../../../../components";
 import { observer } from "mobx-react";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";

@@ -32,9 +32,9 @@ import { useNavigate } from "react-router";
 import {
   ModalDialog,
   ModalDialogType,
-} from "@docspace/ui-kit/components/modal-dialog";
-import { Text } from "@docspace/ui-kit/components/text";
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
+} from "../../../../components/modal-dialog";
+import { Text } from "../../../../components/text";
+import { Button, ButtonSize } from "../../../../components/button";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 

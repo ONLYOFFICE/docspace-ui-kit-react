@@ -2,10 +2,10 @@ import React from "react";
 import { observer } from "mobx-react";
 import { useTranslation, Trans } from "react-i18next";
 
-import { RowContainer } from "@docspace/ui-kit/components/rows";
-import { Text } from "@docspace/ui-kit/components/text";
-import { Link, LinkTarget } from "@docspace/ui-kit/components";
-import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
+import { RowContainer } from "../../../../../../../components/rows";
+import { Text } from "../../../../../../../components/text";
+import { Link, LinkTarget } from "../../../../../../../components";
+import { ToggleButton } from "../../../../../../../components/toggle-button";
 
 import type { TAiToolsPrices } from "../../../../../../types";
 

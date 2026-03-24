@@ -28,16 +28,16 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { FieldContainer } from "@docspace/ui-kit/components/field-container";
-import { Button } from "@docspace/ui-kit/components/button";
-import { TextInput } from "@docspace/ui-kit/components/text-input";
-import { Text } from "@docspace/ui-kit/components/text";
-import { Textarea } from "@docspace/ui-kit/components/textarea";
+import { FieldContainer } from "../../components/field-container";
+import { Button } from "../../components/button";
+import { TextInput } from "../../components/text-input";
+import { Text } from "../../components/text";
+import { Textarea } from "../../components/textarea";
 import {
   ModalDialog,
   ModalDialogType,
-} from "@docspace/ui-kit/components/modal-dialog";
-import { EmailInput } from "@docspace/ui-kit/components/email-input";
+} from "../../components/modal-dialog";
+import { EmailInput } from "../../components/email-input";
 import { ErrorKeys } from "@docspace/shared/enums";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";

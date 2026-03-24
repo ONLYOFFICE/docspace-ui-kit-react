@@ -28,15 +28,15 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { Text } from "@docspace/ui-kit/components/text";
-import { TextInput, InputType } from "@docspace/ui-kit/components/text-input";
-import { FieldContainer } from "@docspace/ui-kit/components/field-container";
+import { Text } from "../../../../components/text";
+import { TextInput, InputType } from "../../../../components/text-input";
+import { FieldContainer } from "../../../../components/field-container";
 
 import {
   ModalDialog,
   ModalDialogType,
-} from "@docspace/ui-kit/components/modal-dialog";
-import { toastr } from "@docspace/ui-kit/components/toast";
+} from "../../../../components/modal-dialog";
+import { toastr } from "../../../../components/toast";
 import { updateWalletPayment } from "@docspace/shared/api/portal";
 import { calculateTotalPrice } from "@docspace/shared/utils/common";
 import {

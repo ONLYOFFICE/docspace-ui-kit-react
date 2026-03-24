@@ -29,11 +29,11 @@ import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
-import { Text } from "@docspace/ui-kit/components/text";
-import { toastr } from "@docspace/ui-kit/components/toast";
-import { TextInput, InputType } from "@docspace/ui-kit/components/text-input";
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
+import { ToggleButton } from "../../../../components/toggle-button";
+import { Text } from "../../../../components/text";
+import { toastr } from "../../../../components/toast";
+import { TextInput, InputType } from "../../../../components/text-input";
+import { Button, ButtonSize } from "../../../../components/button";
 import { TAutoTopUpSettings } from "@docspace/shared/api/portal/types";
 
 import CheckRoundSvg from "../../../../assets/icons/payments/16/check.round.react.svg";

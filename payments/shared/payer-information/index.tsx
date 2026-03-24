@@ -27,16 +27,16 @@
 import styled from "styled-components";
 
 import { toAbsoluteUrl } from "../../utils/url";
-import { Text } from "@docspace/ui-kit/components/text";
+import { Text } from "../../../components/text";
 import { useTranslation, Trans } from "react-i18next";
 import { observer } from "mobx-react";
-import { HelpButton } from "@docspace/ui-kit/components/help-button";
-import { Avatar } from "@docspace/ui-kit/components/avatar";
-import { toastr } from "@docspace/ui-kit/components/toast";
+import { HelpButton } from "../../../components/help-button";
+import { Avatar } from "../../../components/avatar";
+import { toastr } from "../../../components/toast";
 import DefaultUserPhoto from "../../../assets/icons/payments/default_user_photo_size_82-82.png";
-import { Link } from "@docspace/ui-kit/components/link";
+import { Link } from "../../../components/link";
 import { useState } from "react";
-import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
+import { Loader, LoaderTypes } from "../../../components/loader";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
 const StyledContainer = styled.div`

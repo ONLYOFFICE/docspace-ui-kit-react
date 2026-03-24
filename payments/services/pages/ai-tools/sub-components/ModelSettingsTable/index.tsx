@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { Consumer } from "@docspace/ui-kit/utils";
+import { Consumer } from "../../../../../../utils";
 import { DeviceType } from "@docspace/shared/enums";
 
 import useViewEffect from "../../../../../hooks/useViewEffect";

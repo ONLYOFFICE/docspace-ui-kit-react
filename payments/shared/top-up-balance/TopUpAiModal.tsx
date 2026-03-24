@@ -31,8 +31,8 @@ import { observer } from "mobx-react";
 import {
   ModalDialog,
   ModalDialogType,
-} from "@docspace/ui-kit/components/modal-dialog";
-import { Text } from "@docspace/ui-kit/components/text";
+} from "../../../components/modal-dialog";
+import { Text } from "../../../components/text";
 
 import Amount from "./sub-components/Amount";
 import TopUpButtons from "./sub-components/TopUpButtons";
@@ -47,7 +47,7 @@ import { useNavigate } from "react-router";
 import FromWalletToAi from "./sub-components/FromWalletToAi";
 import { AI_TOOLS } from "@docspace/shared/constants";
 import { DateTime } from "luxon";
-import { Link } from "@docspace/ui-kit/components";
+import { Link } from "../../../components";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
 type TopUpAiModalProps = {

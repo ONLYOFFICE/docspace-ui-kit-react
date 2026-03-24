@@ -27,12 +27,12 @@
 import { useTranslation, Trans } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
-import { Text } from "@docspace/ui-kit/components/text";
+import { Button, ButtonSize } from "../../components/button";
+import { Text } from "../../components/text";
 import {
   ModalDialog,
   ModalDialogType,
-} from "@docspace/ui-kit/components/modal-dialog";
+} from "../../components/modal-dialog";
 import {
   calculateTotalPrice,
   getConvertedSize,

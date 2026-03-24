@@ -1,5 +1,5 @@
 import React from "react";
-import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
+import { RectangleSkeleton } from "../../../../components/rectangle";
 
 import styles from "./AiPageLoader.module.scss";
 

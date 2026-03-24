@@ -28,14 +28,14 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 import classNames from "classnames";
-import { now, formatDateLocalized } from "@docspace/ui-kit/utils/date";
+import { now, formatDateLocalized } from "../../../../utils/date";
 
-import { Text } from "@docspace/ui-kit/components/text";
+import { Text } from "../../../../components/text";
 import { calcalateWalletPayment } from "@docspace/shared/api/portal";
-import { toastr } from "@docspace/ui-kit/components/toast";
-import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
-import { useInterfaceDirection } from "@docspace/ui-kit/context/InterfaceDirectionContext";
-import { HelpButton } from "@docspace/ui-kit/components/help-button";
+import { toastr } from "../../../../components/toast";
+import { Loader, LoaderTypes } from "../../../../components/loader";
+import { useInterfaceDirection } from "../../../../context/InterfaceDirectionContext";
+import { HelpButton } from "../../../../components/help-button";
 
 import UpgradeWalletIcon from "../../../../assets/icons/payments/16/upgrade.react.svg";
 

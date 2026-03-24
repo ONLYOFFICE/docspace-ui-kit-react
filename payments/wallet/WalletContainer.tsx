@@ -33,10 +33,10 @@ import { toAbsoluteUrl } from "../utils/url";
 import classNames from "classnames";
 
 import { Text } from "../../components/text";
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
-import { toastr } from "@docspace/ui-kit/components/toast";
-import { Link } from "@docspace/ui-kit/components/link";
-import { TColorScheme } from "@docspace/ui-kit/providers/theme/themes";
+import { Button, ButtonSize } from "../../components/button";
+import { toastr } from "../../components/toast";
+import { Link } from "../../components/link";
+import { TColorScheme } from "../../providers/theme/themes";
 
 import { finishRefreshingWithMinCycle } from "../utils/refreshing";
 

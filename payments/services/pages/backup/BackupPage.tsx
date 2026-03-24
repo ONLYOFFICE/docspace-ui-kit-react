@@ -28,18 +28,18 @@ import React, { useState } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { Text } from "@docspace/ui-kit/components/text";
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
+import { Text } from "../../../../components/text";
+import { Button, ButtonSize } from "../../../../components/button";
 
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./BackupPage.module.scss";
 import { BACKUP_SERVICE } from "@docspace/shared/constants";
-import { DeviceType } from "@docspace/ui-kit/enums";
+import { DeviceType } from "../../../../enums";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import { setServiceState } from "@docspace/shared/api/portal";
-import { now, formatDateLocalized } from "@docspace/ui-kit/utils/date";
-import { toastr } from "@docspace/ui-kit/components";
+import { now, formatDateLocalized } from "../../../../utils/date";
+import { toastr } from "../../../../components";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
 import TopUpModal from "../../../shared/top-up-balance/TopUpModal";
 import BackupPageLoader from "./BackupPageLoader";

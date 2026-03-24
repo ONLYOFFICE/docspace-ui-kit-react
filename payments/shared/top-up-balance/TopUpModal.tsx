@@ -31,7 +31,7 @@ import { observer } from "mobx-react";
 import {
   ModalDialog,
   ModalDialogType,
-} from "@docspace/ui-kit/components/modal-dialog";
+} from "../../../components/modal-dialog";
 
 import WalletInfo from "./sub-components/WalletInfo";
 import PaymentMethod from "./sub-components/PaymentMethod";

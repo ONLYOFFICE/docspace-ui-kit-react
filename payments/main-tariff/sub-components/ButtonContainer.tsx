@@ -26,9 +26,9 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { Button } from "@docspace/ui-kit/components/button";
+import { Button } from "../../../components/button";
 import styled from "styled-components";
-import { toastr } from "@docspace/ui-kit/components/toast";
+import { toastr } from "../../../components/toast";
 import RequestButtonContainer from "./RequestButtonContainer";
 import UpdatePlanButtonContainer from "./UpdatePlanButtonContainer";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";

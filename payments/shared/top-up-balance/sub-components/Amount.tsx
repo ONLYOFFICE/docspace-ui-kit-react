@@ -28,14 +28,14 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { isMobile } from "react-device-detect";
 
-import { TabItem } from "@docspace/ui-kit/components/tab-item";
-import { InputType, TextInput } from "@docspace/ui-kit/components/text-input";
-import { Text } from "@docspace/ui-kit/components/text";
-import { Tooltip } from "@docspace/ui-kit/components/tooltip";
+import { TabItem } from "../../../../components/tab-item";
+import { InputType, TextInput } from "../../../../components/text-input";
+import { Text } from "../../../../components/text";
+import { Tooltip } from "../../../../components/tooltip";
 
 import styles from "../styles/Amount.module.scss";
 import { useAmountValue } from "../../../wallet/context";
-import { FieldContainer } from "@docspace/ui-kit/components";
+import { FieldContainer } from "../../../../components";
 
 type AmountProps = {
   isDisabled: boolean;

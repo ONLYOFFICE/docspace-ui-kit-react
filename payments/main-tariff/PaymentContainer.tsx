@@ -30,10 +30,10 @@ import styled, { css, useTheme } from "styled-components";
 import { Trans } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { Text } from "@docspace/ui-kit/components/text";
-import { size, desktop, mobile, Consumer } from "@docspace/ui-kit/utils";
+import { Text } from "../../components/text";
+import { size, desktop, mobile, Consumer } from "../../utils";
 
-import { HelpButton } from "@docspace/ui-kit/components/help-button";
+import { HelpButton } from "../../components/help-button";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 

@@ -26,7 +26,7 @@
 import React, { useRef } from "react";
 import { observer } from "mobx-react";
 
-import { TableBody, TableContainer } from "@docspace/ui-kit/components/table";
+import { TableBody, TableContainer } from "../../../../../components/table";
 
 import styles from "../../styles/TransactionHistory.module.scss";
 import TableHeader from "./TableHeader";

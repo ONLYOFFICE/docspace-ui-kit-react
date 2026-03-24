@@ -26,7 +26,7 @@
 
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@docspace/ui-kit/components/button";
+import { Button } from "../../../components/button";
 import styled from "styled-components";
 import { observer } from "mobx-react";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";

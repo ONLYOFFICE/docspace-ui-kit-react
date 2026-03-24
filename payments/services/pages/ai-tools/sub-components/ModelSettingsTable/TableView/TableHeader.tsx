@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { TableHeader } from "@docspace/ui-kit/components/table";
+import { TableHeader } from "../../../../../../../components/table";
 
 import { useServicesStore } from "../../../../../../store/ServicesStoreProvider";
 

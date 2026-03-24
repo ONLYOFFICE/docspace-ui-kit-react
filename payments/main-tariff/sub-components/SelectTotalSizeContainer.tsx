@@ -27,7 +27,7 @@
 import React from "react";
 import styled, { useTheme } from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Text } from "@docspace/ui-kit/components/text";
+import { Text } from "../../../components/text";
 import { observer } from "mobx-react";
 import { getConvertedSize } from "@docspace/shared/utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";

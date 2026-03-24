@@ -2,8 +2,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Trans } from "react-i18next";
 import { observer } from "mobx-react";
-import { Text } from "@docspace/ui-kit/components/text";
-import { HelpButton } from "@docspace/ui-kit/components/help-button";
+import { Text } from "../../../../components/text";
+import { HelpButton } from "../../../../components/help-button";
 import HelpReactSvgUrl from "../../../../assets/icons/payments/help.react.svg?url";
 import InputTokensIcon from "../../../../assets/icons/payments/16/input-tokens.svg";
 import OutputTokensIcon from "../../../../assets/icons/payments/16/output-tokens.svg";
@@ -17,7 +17,7 @@ import {
   LinkTarget,
   ModalDialog,
   ModalDialogType,
-} from "@docspace/ui-kit/components";
+} from "../../../../components";
 
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 

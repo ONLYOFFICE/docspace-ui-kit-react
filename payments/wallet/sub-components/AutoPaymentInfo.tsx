@@ -28,8 +28,8 @@ import React from "react";
 import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 
-import { Text } from "@docspace/ui-kit/components/text";
-import { Link } from "@docspace/ui-kit/components/link";
+import { Text } from "../../../components/text";
+import { Link } from "../../../components/link";
 
 import styles from "../styles/Wallet.module.scss";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";

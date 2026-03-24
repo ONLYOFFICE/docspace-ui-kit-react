@@ -29,12 +29,12 @@ import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 
-import { TableRow, TableCell } from "@docspace/ui-kit/components/table";
-import { Text } from "@docspace/ui-kit/components/text";
+import { TableRow, TableCell } from "../../../../../components/table";
+import { Text } from "../../../../../components/text";
 import { TTransactionCollection } from "@docspace/shared/api/portal/types";
-import { Encoder } from "@docspace/ui-kit/utils/encoder";
+import { Encoder } from "../../../../../utils/encoder";
 
-import { getCorrectDate } from "@docspace/ui-kit/utils/date/getCorrectDate";
+import { getCorrectDate } from "../../../../../utils/date/getCorrectDate";
 import styles from "../../styles/TransactionHistory.module.scss";
 import { accountingLedgersFormat, getServiceQuantity } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
