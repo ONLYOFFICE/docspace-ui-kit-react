@@ -46,7 +46,7 @@ const TableView = ({
 }: TransactionHistoryProps) => {
   const paymentStore = usePaymentStore();
   const history = paymentStore.transactionHistory ?? [];
-  const userId = paymentStore.externalState.userId;
+  const userId = paymentStore.userId;
   const columnStorageName = `${COLUMNS_SIZE}=${userId}`;
   const columnInfoPanelStorageName = `${INFO_PANEL_COLUMNS_SIZE}=${userId}`;
   const ref = useRef<HTMLDivElement>(null);

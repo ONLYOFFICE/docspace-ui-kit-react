@@ -74,7 +74,7 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
 
   const { formatWalletCurrency } = paymentStore;
   const { walletCustomerStatusNotActive, walletCustomerEmail, logoText } =
-    paymentStore.externalState;
+    paymentStore;
 
   const { t } = useTranslation(["Payments", "Services", "Common"]);
 

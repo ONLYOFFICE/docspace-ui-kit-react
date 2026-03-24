@@ -45,7 +45,7 @@ const ButtonContainer = observer(({
 }: any) => {
   const paymentStore = usePaymentStore();
   const { isNeedRequest, isLoading, paymentLink } = paymentStore;
-  const { isNotPaidPeriod, isGracePeriod } = paymentStore.externalState;
+  const { isNotPaidPeriod, isGracePeriod } = paymentStore;
 
   const goToStripePortal = () => {
     paymentLink

@@ -89,7 +89,7 @@ const TotalTariffContainer = observer(({
     maxAvailableManagersCount,
     formatPaymentCurrency,
   } = paymentStore;
-  const { isYearTariff } = paymentStore.externalState;
+  const { isYearTariff } = paymentStore;
   const theme = useTheme() as any;
 
   return (

@@ -97,7 +97,7 @@ const PriceCalculation = observer(({ t }: any) => {
     isNotPaidPeriod,
     isYearTariff,
     planCost,
-  } = paymentStore.externalState;
+  } = paymentStore;
 
   const priceManagerPerMonth = planCost.value;
 

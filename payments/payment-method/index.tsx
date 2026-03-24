@@ -64,7 +64,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
   } = paymentStore;
 
   const { walletCustomerStatusNotActive, walletCustomerEmail } =
-    paymentStore.externalState;
+    paymentStore;
 
   if (!isPaymentMethodInit || !ready) return <PaymentMethodLoader />;
 

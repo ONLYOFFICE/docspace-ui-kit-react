@@ -44,7 +44,7 @@ const CardInfoComponent = ({
   withoutMargin
 }: CardInfoComponentProps) => {
   const paymentStore = usePaymentStore();
-  const { walletCustomerStatusNotActive } = paymentStore.externalState;
+  const { walletCustomerStatusNotActive } = paymentStore;
   const { t } = useTranslation(["Payments", "Common"]);
 
   return (

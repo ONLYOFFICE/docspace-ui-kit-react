@@ -49,7 +49,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
 }) => {
   const paymentStore = usePaymentStore();
   const { tariffPlanTitle, paymentDate, gracePeriodEndDate, delayDaysCount } =
-    paymentStore.externalState;
+    paymentStore;
 
   const { t } = useTranslation(["Payments", "Common"]);
   const navigate = useNavigate();

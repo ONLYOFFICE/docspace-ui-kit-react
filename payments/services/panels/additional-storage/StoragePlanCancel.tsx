@@ -69,7 +69,7 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
   } = paymentStore;
 
   const { currentStoragePlanSize, usedTotalStorageSizeCount } =
-    paymentStore.externalState;
+    paymentStore;
 
   const totalPrice = calculateTotalPrice(
     currentStoragePlanSize,

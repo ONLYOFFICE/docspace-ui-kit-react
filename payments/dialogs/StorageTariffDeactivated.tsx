@@ -68,7 +68,7 @@ const StorageTariffDeactivated = observer(
       usedTotalStorageSizeCount,
       maxTotalSizeByQuota,
       isStorageTariffLimit,
-    } = paymentStore.externalState;
+    } = paymentStore;
 
     const { t, ready } = useTranslation(["Payments", "Services", "Common"]);
 

@@ -49,7 +49,7 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     showRefresh = true,
     amount = 0,
     currency = "USD",
-    language = paymentStore.externalState.language || "en",
+    language = paymentStore.language || "en",
     maximumFractionDigits = 3,
     className,
     withoutMargin = false,

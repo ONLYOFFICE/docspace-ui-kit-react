@@ -94,7 +94,7 @@ const UpdatePlanButtonContainer = observer(({
     maxCountManagersByQuota,
     isYearTariff,
     walletCustomerStatusNotActive,
-  } = paymentStore.externalState;
+  } = paymentStore;
   const [isVisiblePaymentConfirm, setIsVisiblePaymentConfirm] = useState(false);
   const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
     useState(false);

@@ -24,58 +24,48 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Text } from "@docspace/ui-kit/components/text";
 import React from "react";
-import styled, { css, useTheme } from "styled-components";
-import { observer } from "mobx-react";
-import SelectTotalSizeContainer from "./SelectTotalSizeContainer";
-import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import CurrentQuotasStore from "./CurrentQuotasStore";
+import { useApi } from "../../providers";
 
-const StyledCurrentUsersContainer = styled.div`
-  height: fit-content;
-  .current-admins-number {
-    ${(props) =>
-      props.isDisabled &&
-      css`
-        color: ${
-          props.theme.client.settings.payment.priceContainer.disableColor
-        };
-      `}
+type TCurrentQuotasStoreProviderProps = {
+  children: React.ReactNode;
+};
+
+const CurrentQuotasStoreContext =
+  React.createContext<CurrentQuotasStore | null>(null);
+
+export const useCurrentQuotasStore = () => {
+  const store = React.useContext(CurrentQuotasStoreContext);
+
+  if (!store) {
+    throw new Error(
+      "useCurrentQuotasStore must be used within a CurrentQuotasStoreProvider",
+    );
   }
-`;
 
-const CurrentUsersCountContainer = observer((props: any) => {
-  const {
-    isNeedPlusSign,
-    isDisabled,
-    addedManagersCountTitle,
-  } = props;
+  return store;
+};
 
-  const paymentStore = usePaymentStore();
-  const { maxCountManagersByQuota } = paymentStore;
-  const theme = useTheme() as any;
+export const CurrentQuotasStoreProvider = ({
+  children,
+}: TCurrentQuotasStoreProviderProps) => {
+  const { portalQuotaApi } = useApi();
+
+  const store = React.useMemo(
+    () => new CurrentQuotasStore(portalQuotaApi),
+    [portalQuotaApi],
+  );
+
+  React.useEffect(() => {
+    return () => {
+      store.dispose();
+    };
+  }, [store]);
 
   return (
-    <StyledCurrentUsersContainer isDisabled={isDisabled} theme={theme}>
-      <Text
-        fontSize="16px"
-        fontWeight={600}
-        textAlign="center"
-        className="current-admins-number"
-      >
-        {addedManagersCountTitle}
-      </Text>
-      <Text
-        fontSize="44px"
-        fontWeight={700}
-        textAlign="center"
-        className="current-admins-number"
-      >
-        {maxCountManagersByQuota}
-      </Text>
-      <SelectTotalSizeContainer isNeedPlusSign={isNeedPlusSign} />
-    </StyledCurrentUsersContainer>
+    <CurrentQuotasStoreContext.Provider value={store}>
+      {children}
+    </CurrentQuotasStoreContext.Provider>
   );
-});
-
-export default CurrentUsersCountContainer;
+};

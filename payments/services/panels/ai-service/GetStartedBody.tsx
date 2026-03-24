@@ -45,7 +45,7 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
   onBack,
 }) => {
   const paymentStore = usePaymentStore();
-  const { logoText } = paymentStore.externalState;
+  const { logoText } = paymentStore;
 
   const { t } = useTranslation(["Services", "Payments", "Common"]);
 

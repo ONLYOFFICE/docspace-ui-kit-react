@@ -41,7 +41,7 @@ const TableView = (props: ModelSettingsTableViewProps) => {
     aiModelAvailabilityUpdatingSet,
   } = servicesStore;
 
-  const userId = paymentStore.externalState.userId;
+  const userId = paymentStore.userId;
 
   const models = aiToolsPrices?.chat ?? [];
 

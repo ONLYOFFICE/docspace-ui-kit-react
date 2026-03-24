@@ -47,7 +47,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
   transaction,
 }) => {
   const paymentStore = usePaymentStore();
-  const { language } = paymentStore.externalState;
+  const { language } = paymentStore;
   const { credit, debit, currency } = transaction;
   const { t } = useTranslation("Payments");
   const isCredit = credit > 0;

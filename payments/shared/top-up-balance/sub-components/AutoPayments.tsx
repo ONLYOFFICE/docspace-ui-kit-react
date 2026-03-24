@@ -104,7 +104,7 @@ const AutoPayments = ({
 		formatWalletCurrency,
 	} = paymentStore;
 
-	const { walletCustomerEmail } = paymentStore.externalState;
+	const { walletCustomerEmail } = paymentStore;
 	const { t } = useTranslation(["Payments", "Common"]);
 
 	const showCurrentSettings = isAutoPaymentExist && !isEditAutoPayment;

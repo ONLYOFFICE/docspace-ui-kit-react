@@ -77,7 +77,7 @@ const Wallet = (props: WalletProps) => {
     walletCustomerStatusNotActive,
     walletCustomerEmail: payerEmail,
     walletHelpUrl,
-  } = paymentStore.externalState;
+  } = paymentStore;
 
   const { t } = useTranslation(["Payments", "Common"]);
 

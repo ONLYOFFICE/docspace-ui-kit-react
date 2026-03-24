@@ -87,54 +87,6 @@ export type TPaymentConfig = {
   utcOffset?: string;
 };
 
-/** Full internal data shape — populated via API fetches, not passed in from outside. */
-export type TPaymentExternalState = {
-  language: string;
-  userId: string;
-  isOwner: boolean;
-  walletHelpUrl: string;
-  logoText: string;
-  utcOffset: string;
-  walletCustomerEmail: string;
-  walletCustomerStatusNotActive: boolean;
-  walletCustomerInfo: unknown;
-  isFreeTariff: boolean;
-  isNonProfit: boolean;
-  isYearTariff: boolean;
-  isGracePeriod: boolean;
-  isNotPaidPeriod: boolean;
-  isPaidPeriod: boolean;
-  addedManagersCount: number;
-  maxCountManagersByQuota: number;
-  usedTotalStorageSizeCount: number;
-  currentPlanCost: { value: number; currencySymbol?: string };
-  planCost: { value: number; isoCurrencySymbol: string };
-  stepAddingQuotaManagers: number | null;
-  stepAddingQuotaTotalSize: number | null;
-  previousStoragePlanSize: number | null;
-  currentStoragePlanSize: number | null;
-  hasScheduledStorageChange: boolean;
-  nextStoragePlanSize: number | null;
-  hasStorageSubscription: boolean;
-  theme: any;
-  expandArticle: boolean;
-  currentTariffPlanTitle: string;
-  tariffPlanTitle: string;
-  customerId: string;
-  portalTariffStatus: any;
-  paymentDate: string;
-  gracePeriodEndDate: string;
-  delayDaysCount: number;
-  isPaymentDateValid: boolean;
-  portalPaymentQuotas: any;
-  portalPaymentQuotasFeatures: any;
-  quotaCharacteristics: any[];
-  // Computed fields accessed via cast in components
-  maxFreeBackups?: number;
-  daysUntilStorageExpiry?: number;
-  storageExpiryDate?: string;
-};
-
 export type TPaymentNavigationEvent =
   | { action: "open-main-tariff" }
   | { action: "open-wallet" }

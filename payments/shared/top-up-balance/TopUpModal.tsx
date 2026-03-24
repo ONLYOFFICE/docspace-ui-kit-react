@@ -84,7 +84,7 @@ const TopUpModal = (props: TopUpModalProps) => {
   } = paymentStore;
 
   const { walletCustomerStatusNotActive, walletCustomerEmail } =
-    paymentStore.externalState;
+    paymentStore;
 
   const { t } = useTranslation(["Payments", "Common"]);
 

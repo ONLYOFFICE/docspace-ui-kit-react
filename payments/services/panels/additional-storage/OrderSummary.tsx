@@ -73,9 +73,9 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   const { formatWalletCurrency, storagePriceIncrement, walletBalance } =
     paymentStore;
   const { language, currentStoragePlanSize, hasStorageSubscription } =
-    paymentStore.externalState;
-  const storageExpiryDate = (paymentStore.externalState as { storageExpiryDate?: string }).storageExpiryDate;
-  const daysUntilStorageExpiry = (paymentStore.externalState as { daysUntilStorageExpiry?: number }).daysUntilStorageExpiry ?? 0;
+    paymentStore;
+  const storageExpiryDate = paymentStore.storageExpiryDate;
+  const daysUntilStorageExpiry = paymentStore.daysUntilStorageExpiry ?? 0;
   const { setPartialUpgradeFee, partialUpgradeFee } = servicesStore;
 
   const { t } = useTranslation(["Services", "Payments", "Common"]);

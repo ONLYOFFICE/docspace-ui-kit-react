@@ -48,7 +48,7 @@ const FromWalletToAi = (props: IFromWalletToAi) => {
 
   const { walletBalance, formatWalletCurrency } = paymentStore;
   const { formatAiServiceCurrency } = servicesStore;
-  const { logoText, walletCustomerEmail } = paymentStore.externalState;
+  const { logoText, walletCustomerEmail } = paymentStore;
   const { t } = useTranslation(["Payments", "Services", "Common"]);
   const aiServiceBalanceValue = formatAiServiceCurrency!();
   const { amount, setIsBalanceInsufficient } = useAmountValue();

@@ -24,58 +24,54 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Text } from "@docspace/ui-kit/components/text";
 import React from "react";
-import styled, { css, useTheme } from "styled-components";
-import { observer } from "mobx-react";
-import SelectTotalSizeContainer from "./SelectTotalSizeContainer";
-import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import PaymentQuotasStore from "./PaymentQuotasStore";
+import { useApi } from "../../providers";
+import { useCurrentQuotasStore } from "./CurrentQuotasStoreProvider";
 
-const StyledCurrentUsersContainer = styled.div`
-  height: fit-content;
-  .current-admins-number {
-    ${(props) =>
-      props.isDisabled &&
-      css`
-        color: ${
-          props.theme.client.settings.payment.priceContainer.disableColor
-        };
-      `}
+type TPaymentQuotasStoreProviderProps = {
+  children: React.ReactNode;
+};
+
+const PaymentQuotasStoreContext =
+  React.createContext<PaymentQuotasStore | null>(null);
+
+export const usePaymentQuotasStore = () => {
+  const store = React.useContext(PaymentQuotasStoreContext);
+
+  if (!store) {
+    throw new Error(
+      "usePaymentQuotasStore must be used within a PaymentQuotasStoreProvider",
+    );
   }
-`;
 
-const CurrentUsersCountContainer = observer((props: any) => {
-  const {
-    isNeedPlusSign,
-    isDisabled,
-    addedManagersCountTitle,
-  } = props;
+  return store;
+};
 
-  const paymentStore = usePaymentStore();
-  const { maxCountManagersByQuota } = paymentStore;
-  const theme = useTheme() as any;
+export const PaymentQuotasStoreProvider = ({
+  children,
+}: TPaymentQuotasStoreProviderProps) => {
+  const { paymentApi } = useApi();
+  const currentQuotasStore = useCurrentQuotasStore();
+
+  const store = React.useMemo(
+    () => new PaymentQuotasStore(paymentApi),
+    [paymentApi],
+  );
+
+  React.useEffect(() => {
+    store.setCurrentQuotasStore(currentQuotasStore);
+  }, [store, currentQuotasStore]);
+
+  React.useEffect(() => {
+    return () => {
+      store.dispose();
+    };
+  }, [store]);
 
   return (
-    <StyledCurrentUsersContainer isDisabled={isDisabled} theme={theme}>
-      <Text
-        fontSize="16px"
-        fontWeight={600}
-        textAlign="center"
-        className="current-admins-number"
-      >
-        {addedManagersCountTitle}
-      </Text>
-      <Text
-        fontSize="44px"
-        fontWeight={700}
-        textAlign="center"
-        className="current-admins-number"
-      >
-        {maxCountManagersByQuota}
-      </Text>
-      <SelectTotalSizeContainer isNeedPlusSign={isNeedPlusSign} />
-    </StyledCurrentUsersContainer>
+    <PaymentQuotasStoreContext.Provider value={store}>
+      {children}
+    </PaymentQuotasStoreContext.Provider>
   );
-});
-
-export default CurrentUsersCountContainer;
+};

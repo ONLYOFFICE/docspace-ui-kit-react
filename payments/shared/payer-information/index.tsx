@@ -118,7 +118,7 @@ const PayerInformation = ({
     isNotPaidPeriod,
     walletCustomerEmail: email,
     walletCustomerInfo: payerInfo,
-  } = paymentStoreInstance.externalState;
+  } = paymentStoreInstance;
   const { t } = useTranslation(["Payments", "Common"]);
 
   const [isDisabled, setDisabled] = useState(false);

@@ -28,6 +28,18 @@ import React from "react";
 import PaymentStore from "./PaymentStore";
 import { useApi } from "../../providers";
 import type { TPaymentConfig } from "../types";
+import {
+  CurrentTariffStatusStoreProvider,
+  useCurrentTariffStatusStore,
+} from "./CurrentTariffStatusStoreProvider";
+import {
+  CurrentQuotasStoreProvider,
+  useCurrentQuotasStore,
+} from "./CurrentQuotasStoreProvider";
+import {
+  PaymentQuotasStoreProvider,
+  usePaymentQuotasStore,
+} from "./PaymentQuotasStoreProvider";
 
 type TPaymentStoreProviderProps = {
   children: React.ReactNode;
@@ -48,16 +60,33 @@ export const usePaymentStore = () => {
   return store;
 };
 
-export const PaymentStoreProvider = ({
-  children,
-  config,
-}: TPaymentStoreProviderProps) => {
-  const { paymentApi, portalQuotaApi, profilesApi } = useApi();
+type TPaymentStoreInnerProps = {
+  children: React.ReactNode;
+  config: TPaymentConfig;
+};
+
+const PaymentStoreInner = ({ children, config }: TPaymentStoreInnerProps) => {
+  const { paymentApi, profilesApi } = useApi();
+  const tariffStatusStore = useCurrentTariffStatusStore();
+  const quotasStore = useCurrentQuotasStore();
+  const paymentQuotasStore = usePaymentQuotasStore();
 
   const store = React.useMemo(
-    () => new PaymentStore(paymentApi, portalQuotaApi, profilesApi),
-    [paymentApi, portalQuotaApi, profilesApi],
+    () => new PaymentStore(paymentApi, profilesApi),
+    [paymentApi, profilesApi],
   );
+
+  React.useEffect(() => {
+    store.setTariffStatusStore(tariffStatusStore);
+  }, [store, tariffStatusStore]);
+
+  React.useEffect(() => {
+    store.setQuotasStore(quotasStore);
+  }, [store, quotasStore]);
+
+  React.useEffect(() => {
+    store.setPaymentQuotasStore(paymentQuotasStore);
+  }, [store, paymentQuotasStore]);
 
   React.useEffect(() => {
     store.configure(config);
@@ -73,5 +102,20 @@ export const PaymentStoreProvider = ({
     <PaymentStoreContext.Provider value={store}>
       {children}
     </PaymentStoreContext.Provider>
+  );
+};
+
+export const PaymentStoreProvider = ({
+  children,
+  config,
+}: TPaymentStoreProviderProps) => {
+  return (
+    <CurrentTariffStatusStoreProvider language={config.language}>
+      <CurrentQuotasStoreProvider>
+        <PaymentQuotasStoreProvider>
+          <PaymentStoreInner config={config}>{children}</PaymentStoreInner>
+        </PaymentQuotasStoreProvider>
+      </CurrentQuotasStoreProvider>
+    </CurrentTariffStatusStoreProvider>
   );
 };

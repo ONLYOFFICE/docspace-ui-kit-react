@@ -105,7 +105,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     hasStorageSubscription,
     previousStoragePlanSize,
     isFreeTariff,
-  } = paymentStore.externalState;
+  } = paymentStore;
 
   const isDisabled = cardLinkedOnFreeTariff || !isFreeTariff ? !isPayer : false;
   const { t } = useServicesActions();

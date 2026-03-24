@@ -78,7 +78,7 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
   const paymentStore = usePaymentStore();
 
   const { handleServicesQuotas } = paymentStore;
-  const { logoText } = paymentStore.externalState;
+  const { logoText } = paymentStore;
   const { t } = useTranslation(["Payments", "Services", "Common"]);
 
   const { amount, isBalanceInsufficient, hasError } = useAmountValue();

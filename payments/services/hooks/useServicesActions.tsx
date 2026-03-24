@@ -41,14 +41,11 @@ export const useServicesActions = () => {
   const paymentStore = usePaymentStore();
   const {
     walletBalance,
-    externalState,
-  } = paymentStore;
-  const {
     currentStoragePlanSize,
     hasScheduledStorageChange,
     nextStoragePlanSize,
     hasStorageSubscription,
-  } = externalState;
+  } = paymentStore;
 
   const maxStorageLimit = 9999;
 

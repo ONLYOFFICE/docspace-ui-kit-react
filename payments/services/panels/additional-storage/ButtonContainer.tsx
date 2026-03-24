@@ -68,8 +68,8 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
   } = props;
 
   const paymentStore = usePaymentStore();
-  const { hasStorageSubscription } = paymentStore.externalState;
-  const storageExpiryDate = (paymentStore.externalState as { storageExpiryDate?: string }).storageExpiryDate;
+  const { hasStorageSubscription } = paymentStore;
+  const storageExpiryDate = paymentStore.storageExpiryDate;
   const { formatWalletCurrency } = paymentStore;
 
   const { t } = useServicesActions();

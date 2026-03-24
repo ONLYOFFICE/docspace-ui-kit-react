@@ -94,7 +94,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     previousStoragePlanSize,
     isGracePeriod,
     hasStorageSubscription = false,
-  } = paymentStore.externalState;
+  } = paymentStore;
 
   const { isInitServicesData } = servicesStore;
 

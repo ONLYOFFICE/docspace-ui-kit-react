@@ -130,7 +130,7 @@ const PaymentContainer = observer((props: any) => {
     isPaymentDateValid,
     isYearTariff,
     planCost,
-  } = paymentStore.externalState;
+  } = paymentStore;
 
   const startValue = planCost.value;
 

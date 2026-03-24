@@ -40,7 +40,6 @@ export {
 } from "./store/ServicesStoreProvider";
 
 export type {
-  TPaymentExternalState,
   TPaymentNavigationEvent,
   TAiToolsPrices,
   TServiceFeatureWithPrice,

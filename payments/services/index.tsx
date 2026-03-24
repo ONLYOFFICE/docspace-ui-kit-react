@@ -91,7 +91,7 @@ const Services = observer(
       currentStoragePlanSize,
       isFreeTariff,
       logoText,
-    } = paymentStore.externalState;
+    } = paymentStore;
 
     const { t, ready } = useTranslation(["Payments", "Services", "Common"]);
     const [dialogVisibility, setDialogVisibility] = useState({

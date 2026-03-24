@@ -117,7 +117,7 @@ const StyledBody = styled.div`
 
 const BenefitsContainer = observer(({ t }: any) => {
   const paymentStore = usePaymentStore();
-  const { portalPaymentQuotasFeatures: features } = paymentStore.externalState;
+  const { portalPaymentQuotasFeatures: features } = paymentStore;
 
   const renderTooltip = () => {
     const onClickServiceUrl = () => {

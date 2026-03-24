@@ -94,7 +94,7 @@ class ServicesStore {
   };
 
   get language() {
-    return this.paymentStore?.externalState.language ?? "en";
+    return this.paymentStore?.language ?? "en";
   }
 
   get aiServiceBalance() {
@@ -413,7 +413,7 @@ class ServicesStore {
 
           if (
             this.paymentStore.isPayer &&
-            this.paymentStore.externalState.walletCustomerStatusNotActive
+            this.paymentStore.walletCustomerStatusNotActive
           ) {
             await fetchCardLinked();
           }
@@ -471,7 +471,7 @@ class ServicesStore {
 
           if (
             this.paymentStore.isPayer &&
-            this.paymentStore.externalState.walletCustomerStatusNotActive
+            this.paymentStore.walletCustomerStatusNotActive
           ) {
             await fetchCardLinked();
           }

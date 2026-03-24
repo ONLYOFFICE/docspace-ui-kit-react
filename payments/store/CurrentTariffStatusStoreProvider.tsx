@@ -24,58 +24,54 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { Text } from "@docspace/ui-kit/components/text";
 import React from "react";
-import styled, { css, useTheme } from "styled-components";
-import { observer } from "mobx-react";
-import SelectTotalSizeContainer from "./SelectTotalSizeContainer";
-import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import CurrentTariffStatusStore from "./CurrentTariffStatusStore";
+import { useApi } from "../../providers";
 
-const StyledCurrentUsersContainer = styled.div`
-  height: fit-content;
-  .current-admins-number {
-    ${(props) =>
-      props.isDisabled &&
-      css`
-        color: ${
-          props.theme.client.settings.payment.priceContainer.disableColor
-        };
-      `}
+type TCurrentTariffStatusStoreProviderProps = {
+  children: React.ReactNode;
+  language: string;
+};
+
+const CurrentTariffStatusStoreContext =
+  React.createContext<CurrentTariffStatusStore | null>(null);
+
+export const useCurrentTariffStatusStore = () => {
+  const store = React.useContext(CurrentTariffStatusStoreContext);
+
+  if (!store) {
+    throw new Error(
+      "useCurrentTariffStatusStore must be used within a CurrentTariffStatusStoreProvider",
+    );
   }
-`;
 
-const CurrentUsersCountContainer = observer((props: any) => {
-  const {
-    isNeedPlusSign,
-    isDisabled,
-    addedManagersCountTitle,
-  } = props;
+  return store;
+};
 
-  const paymentStore = usePaymentStore();
-  const { maxCountManagersByQuota } = paymentStore;
-  const theme = useTheme() as any;
+export const CurrentTariffStatusStoreProvider = ({
+  children,
+  language,
+}: TCurrentTariffStatusStoreProviderProps) => {
+  const { portalQuotaApi, paymentApi } = useApi();
+
+  const store = React.useMemo(
+    () => new CurrentTariffStatusStore(portalQuotaApi, paymentApi),
+    [portalQuotaApi, paymentApi],
+  );
+
+  React.useEffect(() => {
+    store.setLanguage(language);
+  }, [store, language]);
+
+  React.useEffect(() => {
+    return () => {
+      store.dispose();
+    };
+  }, [store]);
 
   return (
-    <StyledCurrentUsersContainer isDisabled={isDisabled} theme={theme}>
-      <Text
-        fontSize="16px"
-        fontWeight={600}
-        textAlign="center"
-        className="current-admins-number"
-      >
-        {addedManagersCountTitle}
-      </Text>
-      <Text
-        fontSize="44px"
-        fontWeight={700}
-        textAlign="center"
-        className="current-admins-number"
-      >
-        {maxCountManagersByQuota}
-      </Text>
-      <SelectTotalSizeContainer isNeedPlusSign={isNeedPlusSign} />
-    </StyledCurrentUsersContainer>
+    <CurrentTariffStatusStoreContext.Provider value={store}>
+      {children}
+    </CurrentTariffStatusStoreContext.Provider>
   );
-});
-
-export default CurrentUsersCountContainer;
+};

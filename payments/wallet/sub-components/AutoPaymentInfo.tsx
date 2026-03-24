@@ -51,7 +51,7 @@ const AutoPaymentInfo = (props: AutoPaymentInfoProps) => {
     formatWalletCurrency,
   } = paymentStore;
 
-  const { language } = paymentStore.externalState;
+  const { language } = paymentStore;
 
   const minBalance = autoPayments?.minBalance ?? 0;
   const upToBalance = autoPayments?.upToBalance ?? 0;

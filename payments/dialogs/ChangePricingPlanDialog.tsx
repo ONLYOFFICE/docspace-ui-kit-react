@@ -45,7 +45,7 @@ const ChangePricingPlanDialog = observer(
     const paymentStore = usePaymentStore();
     const { managersCount, allowedStorageSizeByQuota } = paymentStore;
     const { addedManagersCount, usedTotalStorageSizeCount } =
-      paymentStore.externalState;
+      paymentStore;
 
     const { t, ready } = useTranslation(["DowngradePlanDialog", "Common"]);
 

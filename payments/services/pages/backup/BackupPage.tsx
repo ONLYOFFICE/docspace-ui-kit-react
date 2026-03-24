@@ -59,8 +59,8 @@ const BackupPage: React.FC = () => {
     isBackupServiceOn,
   } = paymentStore;
 
-  const { isFreeTariff } = paymentStore.externalState;
-  const maxFreeBackups = (paymentStore.externalState as { maxFreeBackups?: number }).maxFreeBackups;
+  const { isFreeTariff } = paymentStore;
+  const maxFreeBackups = paymentStore.maxFreeBackups;
   const { usedBackupsCount, isInitServicesData } = servicesStore;
 
   const { t, ready } = useTranslation(["Payments", "Services", "Common"]);

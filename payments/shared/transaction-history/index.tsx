@@ -193,7 +193,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     fetchTransactionHistory,
   } = paymentStore;
 
-  const { isNotPaidPeriod } = paymentStore.externalState;
+  const { isNotPaidPeriod } = paymentStore;
 
   const { t } = useTranslation(["Payments", "Settings"]);
 

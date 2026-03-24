@@ -86,7 +86,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     hasStorageSubscription,
     currentStoragePlanSize = 0,
     hasScheduledStorageChange,
-  } = paymentStore.externalState;
+  } = paymentStore;
 
   const {
     fetchBalance,

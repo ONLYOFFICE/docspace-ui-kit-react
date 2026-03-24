@@ -69,7 +69,7 @@ const StyledCurrentTariffContainer = styled.div`
 const CurrentTariffContainer = observer(({ style }: any) => {
   const { t } = useTranslation(["Payments", "Common"]);
   const paymentStore = usePaymentStore();
-  const { quotaCharacteristics } = paymentStore.externalState;
+  const { quotaCharacteristics } = paymentStore;
 
   return (
     <StyledCurrentTariffContainer style={style}>

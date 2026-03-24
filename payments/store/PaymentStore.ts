@@ -25,11 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { makeAutoObservable } from "mobx";
-import type {
-  PaymentApi,
-  PortalQuotaApi,
-  ProfilesApi,
-} from "@onlyoffice/docspace-api-sdk";
+import type { PaymentApi, ProfilesApi } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
 import type {
@@ -38,11 +34,6 @@ import type {
   TTransactionCollection,
   TPaymentFeature,
   TPaymentQuota,
-  TNumericPaymentFeature,
-  TBooleanPaymentFeature,
-  TPortalTariff,
-  TQuotas,
-  TCustomerInfo,
   TLicenseQuota,
 } from "@docspace/shared/api/portal/types";
 import { formatCurrencyValue } from "@docspace/shared/utils/common";
@@ -50,37 +41,26 @@ import { combineUrl } from "@docspace/shared/utils/combineUrl";
 import {
   AI_ENUM,
   BACKUP_SERVICE,
-  FREE_BACKUP,
-  MANAGER,
-  ROOM,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
   WEB_SEARCH,
-  YEAR_KEY,
 } from "@docspace/shared/constants";
 import type { TTranslation } from "@docspace/shared/types";
 import {
-  dateDiff,
-  formatDateLocalized,
-  getAppTimezone,
-  isValidDate,
   now,
   subtractFromDate,
   formatDate as formatDateUtil,
 } from "../../utils/date";
 import type { DateTime } from "luxon";
-import type {
-  TPaymentConfig,
-  TPaymentExternalState,
-  TServiceFeatureWithPrice,
-} from "../types";
+import type { TPaymentConfig, TServiceFeatureWithPrice } from "../types";
+import type CurrentTariffStatusStore from "./CurrentTariffStatusStore";
+import type CurrentQuotasStore from "./CurrentQuotasStore";
+import type PaymentQuotasStore from "./PaymentQuotasStore";
 
 export const TOTAL_SIZE = "total_size";
 
 class PaymentStore {
   private paymentApi: PaymentApi;
-
-  private portalQuotaApi: PortalQuotaApi;
 
   private profilesApi: ProfilesApi;
 
@@ -88,54 +68,27 @@ class PaymentStore {
 
   private _currentUserEmail = "";
 
-  private _walletQuotas: TQuotas[] = [];
+  tariffStatusStore: CurrentTariffStatusStore | null = null;
 
-  private _previousWalletQuota: TQuotas[] = [];
+  quotasStore: CurrentQuotasStore | null = null;
 
-  private _currentPortalQuotaId: number | null = null;
+  paymentQuotasStore: PaymentQuotasStore | null = null;
 
-  externalState: TPaymentExternalState = {
-    language: "en",
-    userId: "",
-    isOwner: false,
-    walletHelpUrl: "",
-    logoText: "",
-    utcOffset: "",
-    walletCustomerEmail: "",
-    walletCustomerStatusNotActive: false,
-    walletCustomerInfo: null,
-    isFreeTariff: true,
-    isNonProfit: false,
-    isYearTariff: false,
-    isGracePeriod: false,
-    isNotPaidPeriod: false,
-    isPaidPeriod: false,
-    addedManagersCount: 0,
-    maxCountManagersByQuota: 0,
-    usedTotalStorageSizeCount: 0,
-    currentPlanCost: { value: 0 },
-    planCost: { value: 0, isoCurrencySymbol: "USD" },
-    stepAddingQuotaManagers: null,
-    stepAddingQuotaTotalSize: null,
-    previousStoragePlanSize: null,
-    currentStoragePlanSize: null,
-    hasScheduledStorageChange: false,
-    nextStoragePlanSize: null,
-    hasStorageSubscription: false,
-    theme: null,
-    expandArticle: false,
-    currentTariffPlanTitle: "",
-    tariffPlanTitle: "",
-    customerId: "",
-    portalTariffStatus: null,
-    paymentDate: "",
-    gracePeriodEndDate: "",
-    delayDaysCount: 0,
-    isPaymentDateValid: false,
-    portalPaymentQuotas: null,
-    portalPaymentQuotasFeatures: null,
-    quotaCharacteristics: [],
-  };
+  language = "en";
+
+  userId = "";
+
+  isOwner = false;
+
+  walletHelpUrl = "";
+
+  logoText = "";
+
+  utcOffset = "";
+
+  theme: any = null;
+
+  expandArticle = false;
 
   licenseQuota: TLicenseQuota | null = null;
 
@@ -217,28 +170,33 @@ class PaymentStore {
 
   reccomendedAmount = "";
 
-  constructor(
-    paymentApi: PaymentApi,
-    portalQuotaApi: PortalQuotaApi,
-    profilesApi: ProfilesApi,
-  ) {
+  constructor(paymentApi: PaymentApi, profilesApi: ProfilesApi) {
     this.paymentApi = paymentApi;
-    this.portalQuotaApi = portalQuotaApi;
     this.profilesApi = profilesApi;
 
     makeAutoObservable(this);
   }
 
+  setTariffStatusStore = (store: CurrentTariffStatusStore) => {
+    this.tariffStatusStore = store;
+  };
+
+  setQuotasStore = (store: CurrentQuotasStore) => {
+    this.quotasStore = store;
+  };
+
+  setPaymentQuotasStore = (store: PaymentQuotasStore) => {
+    this.paymentQuotasStore = store;
+  };
+
   configure = (config: TPaymentConfig) => {
-    this.externalState.theme = config.theme;
-    this.externalState.language = config.language;
-    this.externalState.expandArticle = config.expandArticle;
-    if (config.logoText !== undefined)
-      this.externalState.logoText = config.logoText;
+    this.theme = config.theme;
+    this.language = config.language;
+    this.expandArticle = config.expandArticle;
+    if (config.logoText !== undefined) this.logoText = config.logoText;
     if (config.walletHelpUrl !== undefined)
-      this.externalState.walletHelpUrl = config.walletHelpUrl;
-    if (config.utcOffset !== undefined)
-      this.externalState.utcOffset = config.utcOffset;
+      this.walletHelpUrl = config.walletHelpUrl;
+    if (config.utcOffset !== undefined) this.utcOffset = config.utcOffset;
   };
 
   private addAbortController(controller: AbortController) {
@@ -252,10 +210,165 @@ class PaymentStore {
     this.abortControllers = [];
   };
 
-  get isAlreadyPaid() {
+  // ─── Getters delegated to sub-stores ───────────────────────────────────────
+
+  get walletCustomerEmail() {
+    return this.tariffStatusStore?.walletCustomerEmail ?? "";
+  }
+
+  get walletCustomerStatusNotActive() {
+    return this.tariffStatusStore?.walletCustomerStatusNotActive ?? false;
+  }
+
+  get walletCustomerInfo() {
+    return this.tariffStatusStore?.walletCustomerInfo ?? null;
+  }
+
+  get isGracePeriod() {
+    return this.tariffStatusStore?.isGracePeriod ?? false;
+  }
+
+  get isNotPaidPeriod() {
+    return this.tariffStatusStore?.isNotPaidPeriod ?? false;
+  }
+
+  get isPaidPeriod() {
+    return this.tariffStatusStore?.isPaidPeriod ?? false;
+  }
+
+  get portalTariffStatus() {
+    return this.tariffStatusStore?.portalTariffStatus ?? null;
+  }
+
+  get customerId() {
+    return this.tariffStatusStore?.customerId ?? "";
+  }
+
+  get paymentDate() {
+    return this.tariffStatusStore?.paymentDate ?? "";
+  }
+
+  get isPaymentDateValid() {
+    return this.tariffStatusStore?.isPaymentDateValid ?? false;
+  }
+
+  get gracePeriodEndDate() {
+    return this.tariffStatusStore?.gracePeriodEndDate ?? "";
+  }
+
+  get delayDaysCount() {
+    return this.tariffStatusStore?.delayDaysCount ?? 0;
+  }
+
+  get hasStorageSubscription() {
+    return this.tariffStatusStore?.hasStorageSubscription ?? false;
+  }
+
+  get currentStoragePlanSize() {
+    return this.tariffStatusStore?.currentStoragePlanSize ?? 0;
+  }
+
+  get previousStoragePlanSize() {
+    return this.tariffStatusStore?.previousStoragePlanSize ?? 0;
+  }
+
+  get hasScheduledStorageChange() {
+    return this.tariffStatusStore?.hasScheduledStorageChange ?? false;
+  }
+
+  get nextStoragePlanSize() {
+    return this.tariffStatusStore?.nextStoragePlanSize ?? null;
+  }
+
+  get storageExpiryDate() {
+    return this.tariffStatusStore?.storageExpiryDate ?? "";
+  }
+
+  get daysUntilStorageExpiry() {
+    return this.tariffStatusStore?.daysUntilStorageExpiry ?? 0;
+  }
+
+  get isFreeTariff() {
+    return this.quotasStore?.isFreeTariff ?? true;
+  }
+
+  get isNonProfit() {
+    return this.quotasStore?.isNonProfit ?? false;
+  }
+
+  get isYearTariff() {
+    return this.quotasStore?.isYearTariff ?? false;
+  }
+
+  get currentTariffPlanTitle() {
+    return this.quotasStore?.currentTariffPlanTitle ?? "";
+  }
+
+  get currentPlanCost() {
+    return this.quotasStore?.currentPlanCost ?? { value: 0 };
+  }
+
+  get maxCountManagersByQuota() {
+    return this.quotasStore?.maxCountManagersByQuota ?? 0;
+  }
+
+  get addedManagersCount() {
+    return this.quotasStore?.addedManagersCount ?? 0;
+  }
+
+  get usedTotalStorageSizeCount() {
+    return this.quotasStore?.usedTotalStorageSizeCount ?? 0;
+  }
+
+  get maxFreeBackups() {
+    return this.quotasStore?.maxFreeBackups ?? 0;
+  }
+
+  get quotaCharacteristics() {
+    return this.quotasStore?.quotaCharacteristics ?? [];
+  }
+
+  get maxTotalSizeByQuota() {
+    return this.quotasStore?.maxTotalSizeByQuota ?? -1;
+  }
+
+  get isStorageTariffLimit() {
+    return this.quotasStore?.isStorageTariffLimit ?? false;
+  }
+
+  get tariffPlanTitle() {
+    return this.paymentQuotasStore?.tariffPlanTitle ?? "";
+  }
+
+  get planCost() {
     return (
-      this.externalState.walletCustomerEmail || !this.externalState.isFreeTariff
+      this.paymentQuotasStore?.planCost ?? {
+        value: 0,
+        isoCurrencySymbol: "USD",
+      }
     );
+  }
+
+  get stepAddingQuotaManagers() {
+    return this.paymentQuotasStore?.stepAddingQuotaManagers ?? null;
+  }
+
+  get stepAddingQuotaTotalSize() {
+    return this.paymentQuotasStore?.stepAddingQuotaTotalSize ?? null;
+  }
+
+  get portalPaymentQuotas() {
+    return this.paymentQuotasStore?.portalPaymentQuotas ?? null;
+  }
+
+  get portalPaymentQuotasFeatures() {
+    return this.paymentQuotasStore?.portalPaymentQuotasFeatures ?? null;
+  }
+
+  // ─── Existing getters ───────────────────────────────────────────────────────
+
+  get isAlreadyPaid() {
+    return this.walletCustomerEmail || !this.isFreeTariff;
   }
 
   get isNeedRequest() {
@@ -267,22 +380,18 @@ class PaymentStore {
   }
 
   get isPayer() {
-    const { walletCustomerEmail } = this.externalState;
+    if (!this._currentUserEmail || !this.walletCustomerEmail) return false;
 
-    if (!this._currentUserEmail || !walletCustomerEmail) return false;
-
-    return this._currentUserEmail === walletCustomerEmail;
+    return this._currentUserEmail === this.walletCustomerEmail;
   }
 
   get isStripePortalAvailable() {
-    return this.externalState.isOwner || this.isPayer;
+    return this.isOwner || this.isPayer;
   }
 
   get canUpdateTariff() {
-    const { walletCustomerEmail, isNonProfit } = this.externalState;
-
-    if (isNonProfit) {
-      if (!walletCustomerEmail) return true;
+    if (this.isNonProfit) {
+      if (!this.walletCustomerEmail) return true;
       return this.isPayer;
     }
 
@@ -292,27 +401,22 @@ class PaymentStore {
   }
 
   get canPayTariff() {
-    const { addedManagersCount } = this.externalState;
-    return this.managersCount >= addedManagersCount;
+    return this.managersCount >= this.addedManagersCount;
   }
 
   get canDowngradeTariff() {
-    const { addedManagersCount, usedTotalStorageSizeCount } =
-      this.externalState;
-
-    if (addedManagersCount > this.managersCount) return false;
-    if (usedTotalStorageSizeCount > this.allowedStorageSizeByQuota) return false;
+    if (this.addedManagersCount > this.managersCount) return false;
+    if (this.usedTotalStorageSizeCount > this.allowedStorageSizeByQuota)
+      return false;
 
     return true;
   }
 
   get isCardLinkedToPortal() {
-    const { isNonProfit, isFreeTariff } = this.externalState;
-
     return (
       this.cardLinkedOnNonProfit ||
       this.cardLinkedOnFreeTariff ||
-      (!isNonProfit && !isFreeTariff)
+      (!this.isNonProfit && !this.isFreeTariff)
     );
   }
 
@@ -348,15 +452,12 @@ class PaymentStore {
   }
 
   get cardLinkedOnFreeTariff() {
-    const { isFreeTariff, walletCustomerEmail } = this.externalState;
-    return isFreeTariff && !!walletCustomerEmail;
+    return this.isFreeTariff && !!this.walletCustomerEmail;
   }
 
   get cardLinkedOnNonProfit() {
-    const { walletCustomerEmail, isNonProfit } = this.externalState;
-
-    if (!isNonProfit) return false;
-    if (!walletCustomerEmail) return false;
+    if (!this.isNonProfit) return false;
+    if (!this.walletCustomerEmail) return false;
 
     return true;
   }
@@ -491,7 +592,7 @@ class PaymentStore {
     const amount = item ?? this.walletBalance;
 
     return formatCurrencyValue(
-      this.externalState.language,
+      this.language,
       amount,
       this.walletCodeCurrency,
       fractionDigits,
@@ -500,10 +601,10 @@ class PaymentStore {
 
   formatPaymentCurrency = (item: number = 0, fractionDigits: number = 0) => {
     const amount = item || this.walletBalance;
-    const { isoCurrencySymbol } = this.externalState.planCost;
+    const { isoCurrencySymbol } = this.planCost;
 
     return formatCurrencyValue(
-      this.externalState.language,
+      this.language,
       amount,
       isoCurrencySymbol || "USD",
       fractionDigits,
@@ -561,17 +662,19 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getCustomerOperations(
-        startDate ? this.formatDate(startDate, "start") : undefined,
-        endDate ? this.formatDate(endDate, "end") : undefined,
-        credit,
-        debit,
-        participantName,
         0,
         25,
         serviceName,
+        startDate ? this.formatDate(startDate, "start") : undefined,
+        endDate ? this.formatDate(endDate, "end") : undefined,
+        participantName,
+        credit,
+        debit,
         undefined,
         undefined,
-        abortController.signal,
+        undefined,
+        undefined,
+        { signal: abortController.signal },
       );
 
       if (!res?.data?.response) return;
@@ -656,9 +759,7 @@ class PaymentStore {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
-    const res = await this.paymentApi.getWalletServices(
-      abortController.signal,
-    );
+    const res = await this.paymentApi.getWalletServices(abortController.signal);
 
     if (!res?.data?.response) return;
 
@@ -692,9 +793,7 @@ class PaymentStore {
   };
 
   isShowStorageTariffDeactivated = () => {
-    const { previousStoragePlanSize } = this.externalState;
-
-    if (!previousStoragePlanSize) return false;
+    if (!this.previousStoragePlanSize) return false;
 
     return localStorage.getItem(STORAGE_TARIFF_DEACTIVATED) !== "true";
   };
@@ -810,24 +909,18 @@ class PaymentStore {
   };
 
   basicSettings = async () => {
-    const { isGracePeriod, isNotPaidPeriod, addedManagersCount } =
-      this.externalState;
-
     this.setIsUpdatingBasicSettings(true);
 
     const requests: Promise<unknown>[] = [];
 
-    if (isGracePeriod || isNotPaidPeriod) {
-      requests.push(this.getBasicPaymentLink(addedManagersCount));
+    if (this.isGracePeriod || this.isNotPaidPeriod) {
+      requests.push(this.getBasicPaymentLink(this.addedManagersCount));
     }
 
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
       requests.push(this.setPaymentAccount());
 
-      if (
-        this.isPayer &&
-        this.externalState.walletCustomerStatusNotActive
-      ) {
+      if (this.isPayer && this.walletCustomerStatusNotActive) {
         requests.push(this.fetchCardLinked());
       }
 
@@ -836,7 +929,7 @@ class PaymentStore {
         await this.handleServicesQuotas();
       }
     } else {
-      requests.push(this.getBasicPaymentLink(addedManagersCount));
+      requests.push(this.getBasicPaymentLink(this.addedManagersCount));
     }
 
     try {
@@ -855,36 +948,24 @@ class PaymentStore {
       return;
     }
 
-    await Promise.all([
-      this.fetchCurrentUser(),
-      this.fetchCustomerInfo(),
-      this.fetchPortalTariff(),
-      this.fetchPortalQuota(),
-    ]);
-    await this.fetchPaymentQuotas();
-
-    const { addedManagersCount, isGracePeriod, isNotPaidPeriod } =
-      this.externalState;
+    await this.fetchCurrentUser();
 
     const requests: Promise<unknown>[] = [];
 
     requests.push(this.getSettingsPayment());
 
-    if (isGracePeriod || isNotPaidPeriod) {
-      requests.push(this.getBasicPaymentLink(addedManagersCount));
+    if (this.isGracePeriod || this.isNotPaidPeriod) {
+      requests.push(this.getBasicPaymentLink(this.addedManagersCount));
     }
 
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
       requests.push(this.setPaymentAccount());
 
-      if (
-        this.isPayer &&
-        this.externalState.walletCustomerStatusNotActive
-      ) {
+      if (this.isPayer && this.walletCustomerStatusNotActive) {
         requests.push(this.fetchCardLinked());
       }
     } else {
-      requests.push(this.getBasicPaymentLink(addedManagersCount));
+      requests.push(this.getBasicPaymentLink(this.addedManagersCount));
     }
 
     if (this.isShowStorageTariffDeactivated() && this.isPayer) {
@@ -912,23 +993,14 @@ class PaymentStore {
 
       this.setPaymentMethodInit(false);
 
-      await Promise.all([
-        this.fetchCurrentUser(),
-        this.fetchCustomerInfo(),
-        this.fetchPortalTariff(),
-        this.fetchPortalQuota(),
-      ]);
-
+      await this.fetchCurrentUser();
       await this.initWalletPayerAndBalance(isRefresh);
 
       if (this.isAlreadyPaid) {
         if (this.isStripePortalAvailable) {
           requests.push(this.setPaymentAccount());
 
-          if (
-            this.isPayer &&
-            this.externalState.walletCustomerStatusNotActive
-          ) {
+          if (this.isPayer && this.walletCustomerStatusNotActive) {
             requests.push(this.fetchCardLinked());
           }
         }
@@ -958,15 +1030,8 @@ class PaymentStore {
     }
 
     const requests: Promise<unknown>[] = [];
-
     try {
-      await Promise.all([
-        this.fetchCurrentUser(),
-        this.fetchCustomerInfo(),
-        this.fetchPortalTariff(),
-        this.fetchPortalQuota(),
-      ]);
-
+      await this.fetchCurrentUser();
       await this.initWalletPayerAndBalance(isRefresh);
       this.previousBalance = this.balance;
 
@@ -974,10 +1039,7 @@ class PaymentStore {
         if (this.isStripePortalAvailable) {
           requests.push(this.setPaymentAccount());
 
-          if (
-            this.isPayer &&
-            this.externalState.walletCustomerStatusNotActive
-          ) {
+          if (this.isPayer && this.walletCustomerStatusNotActive) {
             requests.push(this.fetchCardLinked());
           }
         }
@@ -1033,9 +1095,7 @@ class PaymentStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getPortalPrices(
-        abortController.signal,
-      );
+      const res = await this.paymentApi.getPortalPrices(abortController.signal);
 
       if (!res?.data) return;
 
@@ -1074,7 +1134,7 @@ class PaymentStore {
   };
 
   getTotalCostByFormula = (value: number) => {
-    const costValuePerManager = this.externalState.planCost.value;
+    const costValuePerManager = this.planCost.value;
     if (costValuePerManager) return value * +costValuePerManager;
   };
 
@@ -1083,30 +1143,23 @@ class PaymentStore {
   };
 
   setBasicTariffContainer = () => {
-    const {
-      currentPlanCost,
-      maxCountManagersByQuota,
-      addedManagersCount,
-      isFreeTariff,
-    } = this.externalState;
+    const currentTotalPrice = this.currentPlanCost.value;
 
-    const currentTotalPrice = currentPlanCost.value;
-
-    if (!isFreeTariff) {
+    if (!this.isFreeTariff) {
       const countOnRequest =
-        maxCountManagersByQuota > this.maxAvailableManagersCount;
+        this.maxCountManagersByQuota > this.maxAvailableManagersCount;
 
       this.managersCount = countOnRequest
         ? this.maxAvailableManagersCount + 1
-        : maxCountManagersByQuota;
+        : this.maxCountManagersByQuota;
 
       this.totalPrice = +currentTotalPrice;
 
       return;
     }
 
-    this.managersCount = addedManagersCount;
-    const totalPrice = this.getTotalCostByFormula(addedManagersCount);
+    this.managersCount = this.addedManagersCount;
+    const totalPrice = this.getTotalCostByFormula(this.addedManagersCount);
 
     if (totalPrice) this.totalPrice = totalPrice;
   };
@@ -1123,18 +1176,15 @@ class PaymentStore {
   };
 
   setRangeStepByQuota = () => {
-    const { stepAddingQuotaManagers, stepAddingQuotaTotalSize } =
-      this.externalState;
+    const stepManagers = this.stepAddingQuotaManagers;
+    const stepSize = this.stepAddingQuotaTotalSize;
 
-    if (stepAddingQuotaManagers && typeof stepAddingQuotaManagers === "number")
-      this.stepByQuotaForManager = stepAddingQuotaManagers;
+    if (stepManagers && typeof stepManagers === "number")
+      this.stepByQuotaForManager = stepManagers;
     this.minAvailableManagersValue = this.stepByQuotaForManager;
 
-    if (
-      stepAddingQuotaTotalSize &&
-      typeof stepAddingQuotaTotalSize === "number"
-    )
-      this.stepByQuotaForTotalSize = stepAddingQuotaTotalSize;
+    if (stepSize && typeof stepSize === "number")
+      this.stepByQuotaForTotalSize = stepSize;
     this.minAvailableTotalSizeValue = this.stepByQuotaForManager;
   };
 
@@ -1156,277 +1206,8 @@ class PaymentStore {
       };
 
       this._currentUserEmail = user.email ?? "";
-      this.externalState.userId = user.id ?? "";
-      this.externalState.isOwner = user.isOwner ?? false;
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
-      console.error(error);
-    }
-  };
-
-  fetchCustomerInfo = async () => {
-    const abortController = new AbortController();
-    this.addAbortController(abortController);
-
-    try {
-      const res = await this.paymentApi.getCustomerInfo(undefined, {
-        signal: abortController.signal,
-      });
-
-      if (!res?.data?.response) return;
-
-      const info = res.data.response as unknown as TCustomerInfo;
-
-      this.externalState.walletCustomerEmail = info.email ?? "";
-      this.externalState.walletCustomerInfo = info.payer ?? null;
-
-      // PaymentMethodStatus: None=0, Set=1, Expired=2
-      const status = (info.paymentMethodStatus as unknown as number) ?? 0;
-      this.externalState.walletCustomerStatusNotActive =
-        !!info.email && (status === 0 || status === 2);
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
-      console.error(error);
-    }
-  };
-
-  fetchPortalTariff = async () => {
-    const abortController = new AbortController();
-    this.addAbortController(abortController);
-
-    try {
-      const res = await this.portalQuotaApi.getPortalTariff(undefined, {
-        signal: abortController.signal,
-      });
-
-      if (!res?.data?.response) return;
-
-      const tariff = res.data.response as unknown as TPortalTariff;
-      const state = tariff.state as unknown as number;
-
-      // TariffState: Paid=1, Delay=2, NotPaid=3
-      this.externalState.isGracePeriod = state === 2;
-      this.externalState.isNotPaidPeriod = state === 3;
-      this.externalState.isPaidPeriod = state === 1;
-      this.externalState.portalTariffStatus = tariff;
-      this.externalState.customerId = tariff.customerId ?? "";
-
-      if (tariff.dueDate) {
-        const isValid = isValidDate(tariff.dueDate);
-        this.externalState.isPaymentDateValid = isValid;
-        if (isValid) {
-          this.externalState.paymentDate = formatDateLocalized(
-            tariff.dueDate,
-            "DATE_FULL",
-            {
-              locale: this.externalState.language,
-              timezone: getAppTimezone(),
-            },
-          );
-        }
-      }
-
-      const endDateSrc = isValidDate(tariff.delayDueDate)
-        ? tariff.delayDueDate
-        : tariff.dueDate;
-      if (endDateSrc) {
-        this.externalState.gracePeriodEndDate = formatDateLocalized(
-          endDateSrc,
-          "DATE_FULL",
-          {
-            locale: this.externalState.language,
-            timezone: getAppTimezone(),
-          },
-        );
-      }
-
-      if (tariff.delayDueDate) {
-        this.externalState.delayDaysCount = Math.floor(
-          Math.abs(dateDiff(tariff.delayDueDate, now(), "days")),
-        );
-      }
-
-      const walletQuota = tariff.quotas?.find((q: TQuotas) => q.wallet === true);
-
-      if (walletQuota) {
-        // QuotaState: Overdue=1
-        if ((walletQuota.state as unknown as number) === 1) {
-          this._previousWalletQuota = [walletQuota];
-          this._walletQuotas = [];
-        } else {
-          this._walletQuotas = [walletQuota];
-          this._previousWalletQuota = [];
-        }
-      } else {
-        this._walletQuotas = [];
-        this._previousWalletQuota = [];
-      }
-
-      const activeQuota = this._walletQuotas[0];
-      const previousQuota = this._previousWalletQuota[0];
-
-      this.externalState.hasStorageSubscription = this._walletQuotas.length > 0;
-      this.externalState.currentStoragePlanSize = activeQuota?.quantity ?? 0;
-      this.externalState.previousStoragePlanSize = previousQuota?.quantity ?? 0;
-      this.externalState.hasScheduledStorageChange = activeQuota
-        ? (activeQuota.nextQuantity ?? -1) >= 0
-        : false;
-      this.externalState.nextStoragePlanSize =
-        activeQuota?.nextQuantity ?? null;
-
-      if (activeQuota?.dueDate) {
-        this.externalState.storageExpiryDate = formatDateLocalized(
-          activeQuota.dueDate,
-          "DATE_FULL",
-          {
-            locale: this.externalState.language,
-            timezone: getAppTimezone(),
-          },
-        );
-        this.externalState.daysUntilStorageExpiry = Math.floor(
-          dateDiff(activeQuota.dueDate, now(), "days"),
-        );
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
-      console.error(error);
-    }
-  };
-
-  fetchPortalQuota = async () => {
-    const abortController = new AbortController();
-    this.addAbortController(abortController);
-
-    try {
-      const res = await this.portalQuotaApi.getPortalQuota({
-        signal: abortController.signal,
-      });
-
-      if (!res?.data?.response) return;
-
-      const quota = res.data.response as unknown as TPaymentQuota;
-
-      this._currentPortalQuotaId = quota.id;
-      this.externalState.isFreeTariff = !!quota.free;
-      this.externalState.isNonProfit = !!quota.nonProfit;
-      this.externalState.currentTariffPlanTitle = quota.title ?? "";
-      this.externalState.currentPlanCost = quota.price
-        ? {
-            value: quota.price.value,
-            currencySymbol: quota.price.currencySymbol,
-          }
-        : { value: 0 };
-
-      const featuresMap = new Map<string, TPaymentFeature>(
-        quota.features.map((f: TPaymentFeature) => [f.id, f]),
-      );
-
-      const managerFeature = featuresMap.get(
-        MANAGER,
-      ) as TNumericPaymentFeature | undefined;
-      this.externalState.maxCountManagersByQuota = managerFeature?.value ?? 0;
-      this.externalState.addedManagersCount =
-        managerFeature?.used?.value ?? 0;
-
-      const totalSizeFeature = featuresMap.get(
-        TOTAL_SIZE,
-      ) as TNumericPaymentFeature | undefined;
-      this.externalState.usedTotalStorageSizeCount =
-        totalSizeFeature?.used?.value ?? 0;
-
-      const yearFeature = featuresMap.get(
-        YEAR_KEY,
-      ) as TBooleanPaymentFeature | undefined;
-      this.externalState.isYearTariff = !!yearFeature?.value;
-
-      const freeBackupFeature = featuresMap.get(
-        FREE_BACKUP,
-      ) as TNumericPaymentFeature | undefined;
-      this.externalState.maxFreeBackups = freeBackupFeature?.value ?? 0;
-
-      const roomFeature = featuresMap.get(ROOM);
-      const characteristics: TPaymentFeature[] = [];
-      if (roomFeature) characteristics.push(roomFeature);
-      if (managerFeature) characteristics.push(managerFeature);
-      if (totalSizeFeature) characteristics.push(totalSizeFeature);
-      this.externalState.quotaCharacteristics = characteristics;
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
-      console.error(error);
-    }
-  };
-
-  fetchPaymentQuotas = async () => {
-    const abortController = new AbortController();
-    this.addAbortController(abortController);
-
-    try {
-      const res = await this.paymentApi.getPaymentQuotas(false, {
-        signal: abortController.signal,
-      });
-
-      if (!res?.data?.response) return;
-
-      const quotas = res.data.response as unknown as TPaymentQuota[];
-
-      type QuotaWithMap = TPaymentQuota & {
-        featuresMap: Map<string, TPaymentFeature>;
-      };
-
-      const quotasById = new Map<number, QuotaWithMap>(
-        quotas.map((q) => [
-          q.id,
-          {
-            ...q,
-            featuresMap: new Map(
-              q.features.map((f: TPaymentFeature) => [f.id, f]),
-            ),
-          },
-        ]),
-      );
-
-      const quotasByYear = new Map<boolean, QuotaWithMap>(
-        Array.from(quotasById.values()).map((q) => {
-          const yearFeature = q.featuresMap.get(
-            YEAR_KEY,
-          ) as TBooleanPaymentFeature | undefined;
-          return [yearFeature?.value ?? false, q];
-        }),
-      );
-
-      const { isFreeTariff } = this.externalState;
-      let matchedQuota: QuotaWithMap | undefined;
-
-      if (isFreeTariff) {
-        matchedQuota = quotasByYear.get(false);
-      } else if (this._currentPortalQuotaId !== null) {
-        matchedQuota = quotasById.get(this._currentPortalQuotaId);
-      }
-      if (!matchedQuota) {
-        matchedQuota = quotasByYear.get(true);
-      }
-
-      if (!matchedQuota) return;
-
-      this.externalState.portalPaymentQuotas = matchedQuota;
-      this.externalState.portalPaymentQuotasFeatures = matchedQuota.featuresMap;
-      this.externalState.tariffPlanTitle = matchedQuota.title ?? "";
-
-      const planPrice = matchedQuota.price;
-      this.externalState.planCost = {
-        value: planPrice?.value ?? 0,
-        isoCurrencySymbol: planPrice?.isoCurrencySymbol ?? "USD",
-      };
-
-      const managerStep = matchedQuota.featuresMap.get(
-        MANAGER,
-      ) as TNumericPaymentFeature | undefined;
-      this.externalState.stepAddingQuotaManagers = managerStep?.value ?? null;
-
-      const sizeStep = matchedQuota.featuresMap.get(
-        TOTAL_SIZE,
-      ) as TNumericPaymentFeature | undefined;
-      this.externalState.stepAddingQuotaTotalSize = sizeStep?.value ?? null;
+      this.userId = user.id ?? "";
+      this.isOwner = user.isOwner ?? false;
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -1453,3 +1234,4 @@ class PaymentStore {
 }
 
 export default PaymentStore;
+

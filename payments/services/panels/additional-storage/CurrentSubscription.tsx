@@ -38,8 +38,8 @@ import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 const CurrentSubscription: React.FC = () => {
   const paymentStore = usePaymentStore();
   const { formatWalletCurrency, storagePriceIncrement } = paymentStore;
-  const { currentStoragePlanSize } = paymentStore.externalState;
-  const storageExpiryDate = (paymentStore.externalState as { storageExpiryDate?: string }).storageExpiryDate;
+  const { currentStoragePlanSize } = paymentStore;
+  const storageExpiryDate = paymentStore.storageExpiryDate;
 
   const { t } = useTranslation(["Payments", "Common"]);
 
