@@ -631,3 +631,123 @@ export const WithTooltip: Story = {
     },
   },
 };
+
+const CustomizationTemplate = () => {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      <div>
+        <h4 style={{ margin: "0 0 8px" }}>Default theme (no overrides)</h4>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Button size={ButtonSize.normal} label="Secondary" />
+          <Button size={ButtonSize.normal} label="Primary" primary />
+        </div>
+      </div>
+
+      <div
+        style={
+          {
+            "--button-root-bg": "#e91e63",
+            "--button-root-color": "#fff",
+            "--button-root-border": "1px solid #e91e63",
+            "--button-root-border-radius": "24px",
+            "--button-root-bg-hover": "#c2185b",
+            "--button-root-color-hover": "#fff",
+            "--button-root-border-hover": "1px solid #c2185b",
+          } as React.CSSProperties
+        }
+      >
+        <h4 style={{ margin: "0 0 8px" }}>Custom secondary (pink, rounded)</h4>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Button size={ButtonSize.normal} label="Custom" />
+          <Button size={ButtonSize.small} label="Small" />
+          <Button size={ButtonSize.normal} label="Disabled" isDisabled />
+        </div>
+      </div>
+
+      <div
+        style={
+          {
+            "--button-primary-bg": "#7c3aed",
+            "--button-primary-color": "#fff",
+            "--button-primary-border": "1px solid #7c3aed",
+            "--button-primary-bg-hover": "#6d28d9",
+            "--button-root-border-radius": "8px",
+          } as React.CSSProperties
+        }
+      >
+        <h4 style={{ margin: "0 0 8px" }}>Custom primary (purple)</h4>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Button size={ButtonSize.normal} label="Save" primary />
+          <Button size={ButtonSize.small} label="Submit" primary />
+          <Button size={ButtonSize.normal} label="Cancel" />
+        </div>
+      </div>
+
+      <div
+        style={
+          {
+            "--button-root-bg": "#065f46",
+            "--button-root-color": "#d1fae5",
+            "--button-root-border": "1px solid #065f46",
+            "--button-root-bg-hover": "#047857",
+            "--button-root-color-hover": "#fff",
+            "--button-root-border-hover": "1px solid #047857",
+            "--button-primary-bg": "#f59e0b",
+            "--button-primary-color": "#000",
+            "--button-primary-border": "1px solid #f59e0b",
+            "--button-primary-bg-hover": "#d97706",
+            "--button-root-border-radius": "0",
+          } as React.CSSProperties
+        }
+      >
+        <h4 style={{ margin: "0 0 8px" }}>Full rebrand (green + amber, no radius)</h4>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Button size={ButtonSize.normal} label="Secondary" />
+          <Button size={ButtonSize.normal} label="Primary" primary />
+          <Button size={ButtonSize.normal} label="Disabled" isDisabled />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `Buttons can be customized via CSS Custom Properties on a parent element.
+No JavaScript needed — just set variables on any wrapper.
+
+**Available variables:**
+
+| Variable | Description |
+|----------|-------------|
+| \`--button-root-bg\` | Secondary background |
+| \`--button-root-color\` | Secondary text color |
+| \`--button-root-border\` | Secondary border |
+| \`--button-root-border-radius\` | Border radius (all variants) |
+| \`--button-root-bg-hover\` | Secondary hover background |
+| \`--button-root-bg-disabled\` | Secondary disabled background |
+| \`--button-primary-bg\` | Primary background |
+| \`--button-primary-color\` | Primary text color |
+| \`--button-primary-border\` | Primary border |
+| \`--button-primary-bg-hover\` | Primary hover background |
+
+All variables support \`-hover\`, \`-active\`, \`-disabled\` suffixes.`,
+      },
+      source: {
+        code: `// Wrap buttons in a div with CSS variables
+<div style={{
+  "--button-root-bg": "#e91e63",
+  "--button-root-color": "#fff",
+  "--button-root-border": "1px solid #e91e63",
+  "--button-root-border-radius": "24px",
+}}>
+  <Button label="Custom" />
+  <Button label="Primary" primary />
+</div>`,
+      },
+    },
+  },
+};
