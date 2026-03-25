@@ -1000,12 +1000,10 @@ class PaymentStore {
 
   paymentMethodInit = async (t: TTranslation) => {
     const isRefresh = window.location.href.includes("complete=true");
+
     try {
       const requests: Promise<unknown>[] = [];
 
-      this.setPaymentMethodInit(false);
-
-      await this.fetchCurrentUser();
       await this.initWalletPayerAndBalance(isRefresh);
 
       if (this.isAlreadyPaid) {

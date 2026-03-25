@@ -205,7 +205,8 @@ class CurrentTariffStatusStore {
   get walletCustomerStatusNotActive() {
     if (!this.walletCustomerEmail) return false;
     // PaymentMethodStatus: None=0, Expired=2
-    const status = (this.payerInfo.paymentMethodStatus as unknown as number) ?? 0;
+    const status =
+      (this.payerInfo.paymentMethodStatus as unknown as number) ?? 0;
     return status === 0 || status === 2;
   }
 
@@ -253,12 +254,12 @@ class CurrentTariffStatusStore {
     }
   };
 
-  fetchCustomerInfo = async () => {
+  fetchCustomerInfo = async (isRefresh?: boolean) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getCustomerInfo(undefined, {
+      const res = await this.paymentApi.getCustomerInfo(isRefresh, {
         signal: abortController.signal,
       });
 
@@ -280,3 +281,4 @@ class CurrentTariffStatusStore {
 }
 
 export default CurrentTariffStatusStore;
+
