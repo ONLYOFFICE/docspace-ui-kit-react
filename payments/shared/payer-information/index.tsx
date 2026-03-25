@@ -30,7 +30,6 @@ import { toAbsoluteUrl } from "../../utils/url";
 import { Text } from "../../../components/text";
 import { useTranslation, Trans } from "react-i18next";
 import { observer } from "mobx-react";
-import { HelpButton } from "../../../components/help-button";
 import { Avatar } from "../../../components/avatar";
 import { toastr } from "../../../components/toast";
 import DefaultUserPhoto from "../../../assets/icons/payments/default_user_photo_size_82-82.png";
@@ -38,6 +37,9 @@ import { Link } from "../../../components/link";
 import { useState } from "react";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import { useCurrentTariffStatusStore } from "../../store/CurrentTariffStatusStoreProvider";
+
+import { useTheme } from "../../../context/ThemeContext";
 
 const StyledContainer = styled.div`
   display: flex;
@@ -105,15 +107,17 @@ const StyledContainer = styled.div`
     }
 `;
 
-const PayerInformation = ({
-  style,
-  theme,
-  user,
-  fetchPayerInfo = async () => {},
-}) => {
+const PayerInformation = () => {
   const paymentStoreInstance = usePaymentStore();
+  const tariffStore = useCurrentTariffStatusStore();
 
-  const { accountLink, isStripePortalAvailable } = paymentStoreInstance;
+  const theme = useTheme();
+
+  const { accountLink, isStripePortalAvailable, isOwner } =
+    paymentStoreInstance;
+
+  const { fetchCustomerInfo } = tariffStore;
+
   const {
     isNotPaidPeriod,
     walletCustomerEmail: email,
@@ -131,7 +135,7 @@ const PayerInformation = ({
   const onRefreshData = async () => {
     setDisabled(true);
     try {
-      await fetchPayerInfo(true);
+      await fetchCustomerInfo(true);
     } catch (error) {
       let errorMessage = "";
 
@@ -153,7 +157,7 @@ const PayerInformation = ({
   const unknownPayerDescription = () => {
     const userNotFound = `${t("UserNotFoundMatchingEmail")} `;
 
-    let invalidEmailDescription = user.isOwner
+    let invalidEmailDescription = isOwner
       ? t("UnknownPayerForOwner", {
           productName: t("Common:ProductName"),
         })
@@ -162,7 +166,7 @@ const PayerInformation = ({
         });
 
     if (isNotPaidPeriod) {
-      invalidEmailDescription = user.isOwner
+      invalidEmailDescription = isOwner
         ? t("InvalidEmailWithoutActiveSubscription", {
             productName: t("Common:ProductName"),
           })
@@ -272,7 +276,7 @@ const PayerInformation = ({
     : {};
 
   return (
-    <StyledContainer style={style} isDisabled={isDisabled}>
+    <StyledContainer isDisabled={isDisabled}>
       <div className="payer-info_avatar">
         <Avatar
           size="base"
@@ -292,3 +296,4 @@ const PayerInformation = ({
 };
 
 export default observer(PayerInformation);
+

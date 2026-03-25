@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 
@@ -54,6 +54,12 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const { t, ready } = useTranslation(["Payments", "Common"]);
   const paymentStore = usePaymentStore();
 
+  const { paymentMethodInit } = paymentStore;
+
+  useEffect(() => {
+    paymentMethodInit(t);
+  }, []);
+
   const {
     accountLink,
     isAlreadyPaid,
@@ -63,10 +69,10 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     isShowStorageTariffDeactivatedModal,
   } = paymentStore;
 
-  const { walletCustomerStatusNotActive, walletCustomerEmail } =
-    paymentStore;
+  const { walletCustomerStatusNotActive, walletCustomerEmail } = paymentStore;
 
-  if (!isPaymentMethodInit || !ready) return <PaymentMethodLoader />;
+  if (!isPaymentMethodInit || !ready || showPortalSettingsLoader)
+    return <PaymentMethodLoader />;
 
   const goToStripePortal = () => {
     accountLink
@@ -174,3 +180,4 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 };
 
 export default observer(PaymentMethod);
+
