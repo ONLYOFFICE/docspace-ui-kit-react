@@ -80,7 +80,6 @@ const Services = observer(
       isVisibleWalletSettings,
       setConfirmActionType,
       confirmActionType,
-      setIsInitServicesPage,
       setVisibleWalletSetting,
       wasFirstAiServiceTopUp,
       formatAiServiceCurrency,
@@ -158,12 +157,6 @@ const Services = observer(
         );
       }
     }, [initialOpenDialog, updateDialogVisibility, previousStoragePlanSize]);
-
-    useEffect(() => {
-      return () => {
-        setIsInitServicesPage(false);
-      };
-    }, [setIsInitServicesPage]);
 
     const confirmationDialogContent = {
       [BACKUP_SERVICE]: {
