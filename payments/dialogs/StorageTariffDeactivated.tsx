@@ -40,14 +40,13 @@ import {
 import { STORAGE_TARIFF_DEACTIVATED } from "@docspace/shared/constants";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
-import type { TPaymentNavigationEvent } from "../types";
+import { useNavigate } from "react-router";
 import styles from "./StorageTariff.module.scss";
 
 type StorageTariffDeactivatedProps = {
   visible: boolean;
   onClose?: () => void;
   onOpenPanel?: () => void;
-  onNavigate?: (event: TPaymentNavigationEvent) => void;
 };
 
 const StorageTariffDeactivated = observer(
@@ -55,8 +54,8 @@ const StorageTariffDeactivated = observer(
     visible,
     onClose,
     onOpenPanel,
-    onNavigate,
   }: StorageTariffDeactivatedProps) => {
+    const navigate = useNavigate();
     const store = usePaymentStore();
     const {
       storagePriceIncrement,
@@ -87,7 +86,7 @@ const StorageTariffDeactivated = observer(
       if (onOpenPanel) {
         onOpenPanel();
       } else {
-        onNavigate?.({ action: "open-services", state: { openDialog: true } });
+        navigate("/portal-settings/payments/services", { state: { openDialog: true } });
       }
 
       onCloseModal();
