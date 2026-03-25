@@ -109,7 +109,6 @@ test.describe("Button — screenshots (light theme)", () => {
     await firstButton.hover();
     await expect(page).toHaveScreenshot("button-secondary-hover-mouse.png");
   });
-
 });
 
 // ─── Behaviour tests ──────────────────────────────────────────────────────────
@@ -158,5 +157,5 @@ test.describe("Button — behaviour", () => {
       await expect(button).toBeVisible();
     }
   });
-
 });
+

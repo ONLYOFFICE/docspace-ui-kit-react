@@ -184,7 +184,9 @@ const Wrapper = (props: { isScale: boolean; children: React.ReactNode }) => {
 };
 
 export const Default: Story = {
-  render: (args) => <Button {...args} onClick={() => alert("Button clicked")} />,
+  render: (args) => (
+    <Button {...args} onClick={() => alert("Button clicked")} />
+  ),
   args: { size: ButtonSize.small, label: "Button" },
 };
 
@@ -700,7 +702,9 @@ const CustomizationTemplate = () => {
           } as React.CSSProperties
         }
       >
-        <h4 style={{ margin: "0 0 8px" }}>Full rebrand (green + amber, no radius)</h4>
+        <h4 style={{ margin: "0 0 8px" }}>
+          Full rebrand (green + amber, no radius)
+        </h4>
         <div style={{ display: "flex", gap: "8px" }}>
           <Button size={ButtonSize.normal} label="Secondary" />
           <Button size={ButtonSize.normal} label="Primary" primary />

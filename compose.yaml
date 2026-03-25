@@ -37,3 +37,4 @@ services:
       - ./playwright.config.ts:/app/libs/ui-kit/playwright.config.ts
       # Reports output
       - ../../playwright-report/ui-kit:/app/playwright-report/ui-kit
+
