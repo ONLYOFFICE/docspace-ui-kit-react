@@ -27,6 +27,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { Trans, useTranslation } from "react-i18next";
+import type { ChangeWalletServiceStateRequestDto } from "@onlyoffice/docspace-api-sdk";
 
 import { toastr } from "../../components/toast";
 import {
@@ -83,6 +84,7 @@ const Services = observer(
       setVisibleWalletSetting,
       wasFirstAiServiceTopUp,
       formatAiServiceCurrency,
+      servicesInit,
     } = servicesStore;
 
     const {
@@ -94,14 +96,22 @@ const Services = observer(
     } = paymentStore;
 
     const { t, ready } = useTranslation(["Payments", "Services", "Common"]);
-    const [dialogVisibility, setDialogVisibility] = useState({
+
+    useEffect(() => {
+      servicesInit(t);
+    }, []);
+
+    const initialDialogVisibility: Record<string, boolean> = {
       [TOTAL_SIZE]: false,
       [BACKUP_SERVICE]: false,
       [AI_ENUM]: false,
-    });
+    };
+    const [dialogVisibility, setDialogVisibility] = useState(
+      initialDialogVisibility,
+    );
 
     const updateDialogVisibility = useCallback(
-      (dialogType: keyof typeof dialogVisibility, isVisible: boolean) => {
+      (dialogType: string, isVisible: boolean) => {
         setDialogVisibility((prev) => {
           if (prev[dialogType] === isVisible) return prev;
           return { ...prev, [dialogType]: isVisible };
@@ -118,8 +128,7 @@ const Services = observer(
     const [previousValue, setPreviousValue] = useState("");
 
     const [isTopUpBalanceVisible, setIsTopUpBalanceVisible] = useState(false);
-    const [isAiServiceTopUpVisible, setIsAiServiceTopUpVisible] =
-      useState(false);
+
     const shouldShowLoader = !isInitServicesPage || !ready;
 
     const previousDialogRef = useRef<boolean>(false);
@@ -130,7 +139,6 @@ const Services = observer(
       if (confirmActionType === TOTAL_SIZE) {
         updateDialogVisibility(TOTAL_SIZE, isVisibleWalletSettings);
       } else if (confirmActionType === AI_ENUM) {
-        setIsAiServiceTopUpVisible(true);
         updateDialogVisibility(AI_ENUM, isVisibleWalletSettings);
       } else {
         setIsTopUpBalanceVisible(true);
@@ -214,9 +222,7 @@ const Services = observer(
       if (!actionType || !(actionType in confirmationDialogContent)) {
         return { title: "", body: "" };
       }
-      return confirmationDialogContent[
-        actionType as keyof typeof confirmationDialogContent
-      ];
+      return confirmationDialogContent[Number(actionType)];
     };
 
     const onClick = (id: string) => {
@@ -251,7 +257,7 @@ const Services = observer(
         return;
       }
 
-      updateDialogVisibility(id as keyof typeof dialogVisibility, true);
+      updateDialogVisibility(id, true);
     };
 
     const onClose = () => {
@@ -285,7 +291,7 @@ const Services = observer(
       }
 
       if (id !== TOTAL_SIZE) {
-        if (dialogVisibility[id as keyof typeof dialogVisibility]) {
+        if (dialogVisibility[id]) {
           previousDialogRef.current = true;
         }
       }
@@ -293,7 +299,10 @@ const Services = observer(
       if (!currentEnabled || id === BACKUP_SERVICE || id === AI_ENUM)
         setIsConfirmDialogVisible(true);
       else {
-        const raw = { service: id, enabled: false };
+        const raw: ChangeWalletServiceStateRequestDto = {
+          service: confirmActionType,
+          enabled: false,
+        };
 
         changeServiceState(id);
 
@@ -320,10 +329,7 @@ const Services = observer(
       previousDialogRef.current = false;
 
       if (isDialogVisible && confirmActionType) {
-        updateDialogVisibility(
-          confirmActionType as keyof typeof dialogVisibility,
-          true,
-        );
+        updateDialogVisibility(confirmActionType, true);
       }
 
       setIsConfirmDialogVisible(false);
@@ -332,7 +338,7 @@ const Services = observer(
     const onConfirm = async () => {
       if (!confirmActionType) return;
 
-      const raw = {
+      const raw: ChangeWalletServiceStateRequestDto = {
         service: confirmActionType,
         enabled: !isCurrentConfirmState,
       };
@@ -417,7 +423,6 @@ const Services = observer(
           <AIServiceDialog
             visible={dialogVisibility[AI_ENUM]}
             onClose={onCloseAiService}
-            isTopUpVisible={isAiServiceTopUpVisible}
           />
         ) : null}
         {isConfirmDialogVisible && confirmActionType ? (
@@ -441,3 +446,4 @@ const Services = observer(
 );
 
 export default Services;
+
