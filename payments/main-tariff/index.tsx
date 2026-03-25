@@ -46,18 +46,16 @@ type SaaSPageProps = {
 
 const SaaSPage = observer(
   ({
-    language,
-    user,
     isUpdatingTariff = false,
-    showPortalSettingsLoader = true,
+    showPortalSettingsLoader = false,
     onSetDocumentTitle,
   }: SaaSPageProps) => {
     const paymentStore = usePaymentStore();
     const {
       isInitPaymentPage,
-      isUpdatingBasicSettings,
       resetTariffContainerToBasic,
       isShowStorageTariffDeactivatedModal,
+      init,
     } = paymentStore;
 
     const { t, ready } = useTranslation(["Payments", "Common", "Settings"]);
@@ -65,9 +63,10 @@ const SaaSPage = observer(
       !isInitPaymentPage ||
       !ready ||
       isUpdatingTariff ||
-      isUpdatingBasicSettings;
+      showPortalSettingsLoader;
 
     useEffect(() => {
+      init(t);
       return () => resetTariffContainerToBasic();
     }, []);
 
@@ -80,7 +79,7 @@ const SaaSPage = observer(
       }
     }, [ready]);
 
-    return shouldShowLoader && showPortalSettingsLoader ? (
+    return shouldShowLoader ? (
       <PaymentsLoader />
     ) : (
       <div data-testid="saas-page">

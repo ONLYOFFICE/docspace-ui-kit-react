@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { makeAutoObservable } from "mobx";
-import type { PortalQuotaApi } from "@onlyoffice/docspace-api-sdk";
+import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import type {
   TPaymentFeature,
   TPaymentQuota,
@@ -42,7 +42,7 @@ import {
 export const TOTAL_SIZE = "total_size";
 
 class CurrentQuotasStore {
-  private portalQuotaApi: PortalQuotaApi;
+  private paymentApi: PaymentApi;
 
   private abortControllers: AbortController[] = [];
 
@@ -52,8 +52,8 @@ class CurrentQuotasStore {
 
   isLoaded = false;
 
-  constructor(portalQuotaApi: PortalQuotaApi) {
-    this.portalQuotaApi = portalQuotaApi;
+  constructor(paymentApi: PaymentApi) {
+    this.paymentApi = paymentApi;
 
     makeAutoObservable(this);
   }
@@ -86,9 +86,9 @@ class CurrentQuotasStore {
   }
 
   get isYearTariff() {
-    const result = this.currentPortalQuotaFeatures.get(
-      YEAR_KEY,
-    ) as TBooleanPaymentFeature | undefined;
+    const result = this.currentPortalQuotaFeatures.get(YEAR_KEY) as
+      | TBooleanPaymentFeature
+      | undefined;
     return !!result?.value;
   }
 
@@ -107,30 +107,30 @@ class CurrentQuotasStore {
   }
 
   get maxCountManagersByQuota() {
-    const result = this.currentPortalQuotaFeatures.get(
-      MANAGER,
-    ) as TNumericPaymentFeature | undefined;
+    const result = this.currentPortalQuotaFeatures.get(MANAGER) as
+      | TNumericPaymentFeature
+      | undefined;
     return result?.value ?? 0;
   }
 
   get addedManagersCount() {
-    const result = this.currentPortalQuotaFeatures.get(
-      MANAGER,
-    ) as TNumericPaymentFeature | undefined;
+    const result = this.currentPortalQuotaFeatures.get(MANAGER) as
+      | TNumericPaymentFeature
+      | undefined;
     return result?.used?.value ?? 0;
   }
 
   get usedTotalStorageSizeCount() {
-    const result = this.currentPortalQuotaFeatures.get(
-      TOTAL_SIZE,
-    ) as TNumericPaymentFeature | undefined;
+    const result = this.currentPortalQuotaFeatures.get(TOTAL_SIZE) as
+      | TNumericPaymentFeature
+      | undefined;
     return result?.used?.value ?? 0;
   }
 
   get maxTotalSizeByQuota() {
-    const result = this.currentPortalQuotaFeatures.get(
-      TOTAL_SIZE,
-    ) as TNumericPaymentFeature | undefined;
+    const result = this.currentPortalQuotaFeatures.get(TOTAL_SIZE) as
+      | TNumericPaymentFeature
+      | undefined;
     if (!result?.value) return -1;
     return result.value;
   }
@@ -139,15 +139,15 @@ class CurrentQuotasStore {
     if (this.maxTotalSizeByQuota === -1) return false;
 
     return (
-      (this.usedTotalStorageSizeCount / this.maxTotalSizeByQuota) * 100 >=
-        90 && this.usedTotalStorageSizeCount >= this.maxTotalSizeByQuota
+      (this.usedTotalStorageSizeCount / this.maxTotalSizeByQuota) * 100 >= 90 &&
+      this.usedTotalStorageSizeCount >= this.maxTotalSizeByQuota
     );
   }
 
   get maxFreeBackups() {
-    const result = this.currentPortalQuotaFeatures.get(
-      FREE_BACKUP,
-    ) as TNumericPaymentFeature | undefined;
+    const result = this.currentPortalQuotaFeatures.get(FREE_BACKUP) as
+      | TNumericPaymentFeature
+      | undefined;
     return result?.value ?? 0;
   }
 
@@ -172,12 +172,12 @@ class CurrentQuotasStore {
     this.setIsLoaded(true);
   };
 
-  fetchPortalQuota = async () => {
+  fetchPortalQuota = async (isRefresh?: boolean) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
     try {
-      const res = await this.portalQuotaApi.getPortalQuota({
+      const res = await this.paymentApi.getQuotaPaymentInformation(isRefresh, {
         signal: abortController.signal,
       });
 
@@ -193,3 +193,4 @@ class CurrentQuotasStore {
 }
 
 export default CurrentQuotasStore;
+

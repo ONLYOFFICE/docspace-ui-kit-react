@@ -115,12 +115,8 @@ const PaymentContainer = observer((props: any) => {
   const { formatPaymentCurrency, expandArticle } = store;
 
   const theme = useTheme() as any;
-  const {
-    isFreeTariff,
-    isNonProfit,
-    currentTariffPlanTitle,
-    isYearTariff,
-  } = store.quotas;
+  const { isFreeTariff, isNonProfit, currentTariffPlanTitle, isYearTariff } =
+    store.quotas;
   const {
     isPaidPeriod,
     isPaymentDateValid,
@@ -175,6 +171,7 @@ const PaymentContainer = observer((props: any) => {
       );
     }
 
+    console.log("isPaidPeriod", isPaidPeriod, "isFreeTariff", isFreeTariff);
     if (isPaidPeriod || isGracePeriod) {
       return (
         <Text fontSize="16px" isBold>
@@ -344,3 +341,4 @@ const PaymentContainer = observer((props: any) => {
 });
 
 export default PaymentContainer;
+

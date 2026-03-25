@@ -74,6 +74,14 @@ class PaymentQuotasStore {
     this.isLoaded = isLoaded;
   };
 
+  get usedTotalStorageSizeTitle() {
+    return this.portalPaymentQuotasFeatures.get(TOTAL_SIZE)?.priceTitle;
+  }
+
+  get addedManagersCountTitle() {
+    return this.portalPaymentQuotasFeatures.get(MANAGER)?.priceTitle;
+  }
+
   get tariffPlanTitle() {
     return this.portalPaymentQuotas?.title ?? "";
   }
@@ -87,16 +95,16 @@ class PaymentQuotasStore {
   }
 
   get stepAddingQuotaManagers() {
-    const result = this.portalPaymentQuotasFeatures.get(
-      MANAGER,
-    ) as TNumericPaymentFeature | undefined;
+    const result = this.portalPaymentQuotasFeatures.get(MANAGER) as
+      | TNumericPaymentFeature
+      | undefined;
     return result?.value ?? null;
   }
 
   get stepAddingQuotaTotalSize() {
-    const result = this.portalPaymentQuotasFeatures.get(
-      TOTAL_SIZE,
-    ) as TNumericPaymentFeature | undefined;
+    const result = this.portalPaymentQuotasFeatures.get(TOTAL_SIZE) as
+      | TNumericPaymentFeature
+      | undefined;
     return result?.value ?? null;
   }
 
@@ -131,9 +139,9 @@ class PaymentQuotasStore {
 
       const quotasByYear = new Map<boolean, QuotaWithMap>(
         Array.from(quotasById.values()).map((q) => {
-          const yearFeature = q.featuresMap.get(
-            YEAR_KEY,
-          ) as TBooleanPaymentFeature | undefined;
+          const yearFeature = q.featuresMap.get(YEAR_KEY) as
+            | TBooleanPaymentFeature
+            | undefined;
           return [yearFeature?.value ?? false, q];
         }),
       );
@@ -166,3 +174,4 @@ class PaymentQuotasStore {
 }
 
 export default PaymentQuotasStore;
+

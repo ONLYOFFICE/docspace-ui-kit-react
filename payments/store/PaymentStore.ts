@@ -29,6 +29,7 @@ import type {
   PaymentApi,
   ProfilesApi,
   PortalQuotaApi,
+  CommonSettingsApi,
 } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
@@ -67,6 +68,8 @@ class PaymentStore {
   private paymentApi: PaymentApi;
 
   private profilesApi: ProfilesApi;
+
+  private commonSettingsApi: CommonSettingsApi;
 
   private abortControllers: AbortController[] = [];
 
@@ -178,12 +181,14 @@ class PaymentStore {
     paymentApi: PaymentApi,
     profilesApi: ProfilesApi,
     portalQuotaApi: PortalQuotaApi,
+    commonSettingsApi: CommonSettingsApi,
   ) {
     this.paymentApi = paymentApi;
     this.profilesApi = profilesApi;
+    this.commonSettingsApi = commonSettingsApi;
 
     this.tariff = new CurrentTariffStatusStore(portalQuotaApi, paymentApi);
-    this.quotas = new CurrentQuotasStore(portalQuotaApi);
+    this.quotas = new CurrentQuotasStore(paymentApi);
     this.paymentQuotas = new PaymentQuotasStore(paymentApi);
     this.paymentQuotas.setCurrentQuotasStore(this.quotas);
 
@@ -232,7 +237,8 @@ class PaymentStore {
   }
 
   get isPayer() {
-    if (!this._currentUserEmail || !this.tariff.walletCustomerEmail) return false;
+    if (!this._currentUserEmail || !this.tariff.walletCustomerEmail)
+      return false;
 
     return this._currentUserEmail === this.tariff.walletCustomerEmail;
   }
@@ -791,6 +797,8 @@ class PaymentStore {
       requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
     }
 
+    requests.push(this.tariff.fetchPortalTariff());
+
     try {
       await Promise.all(requests);
       this.setBasicTariffContainer();
@@ -802,16 +810,21 @@ class PaymentStore {
   };
 
   init = async (t: TTranslation) => {
+    await this.tariff.fetchCustomerInfo();
+
     if (this.isInitPaymentPage) {
       await this.basicSettings();
       return;
     }
 
-    await this.fetchCurrentUser();
-
     const requests: Promise<unknown>[] = [];
 
-    requests.push(this.getSettingsPayment());
+    requests.push(
+      this.getSettingsPayment(),
+      this.paymentQuotas.fetchPaymentQuotas(),
+      this.quotas.fetchPortalQuota(),
+      this.tariff.fetchPortalTariff(),
+    );
 
     if (this.tariff.isGracePeriod || this.tariff.isNotPaidPeriod) {
       requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
@@ -869,6 +882,8 @@ class PaymentStore {
         this.setIsShowTariffDeactivatedModal(true);
         requests.push(this.handleServicesQuotas());
       }
+
+      requests.push(this.tariff.fetchPortalTariff());
 
       await Promise.all(requests);
 
@@ -953,17 +968,13 @@ class PaymentStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getPortalPrices(abortController.signal);
+      const res = await this.commonSettingsApi.getPaymentSettings({
+        signal: abortController.signal,
+      });
 
-      if (!res?.data) return;
+      if (!res?.data.response) return;
 
-      const newSettings = res.data as unknown as {
-        buyUrl: string;
-        salesEmail: string;
-        currentLicense: { date: string; trial: boolean } | null;
-        standalone: boolean;
-        max: number;
-      };
+      const newSettings = res.data.response;
 
       const {
         buyUrl,
@@ -1017,7 +1028,9 @@ class PaymentStore {
     }
 
     this.managersCount = this.quotas.addedManagersCount;
-    const totalPrice = this.getTotalCostByFormula(this.quotas.addedManagersCount);
+    const totalPrice = this.getTotalCostByFormula(
+      this.quotas.addedManagersCount,
+    );
 
     if (totalPrice) this.totalPrice = totalPrice;
   };

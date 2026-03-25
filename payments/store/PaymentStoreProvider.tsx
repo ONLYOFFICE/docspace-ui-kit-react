@@ -52,11 +52,18 @@ export const PaymentStoreProvider = ({
   children,
   config,
 }: TPaymentStoreProviderProps) => {
-  const { paymentApi, profilesApi, portalQuotaApi } = useApi();
+  const { paymentApi, profilesApi, portalQuotaApi, commonSettingsApi } =
+    useApi();
 
   const store = React.useMemo(
-    () => new PaymentStore(paymentApi, profilesApi, portalQuotaApi),
-    [paymentApi, profilesApi, portalQuotaApi],
+    () =>
+      new PaymentStore(
+        paymentApi,
+        profilesApi,
+        portalQuotaApi,
+        commonSettingsApi,
+      ),
+    [paymentApi, profilesApi, portalQuotaApi, commonSettingsApi],
   );
 
   React.useEffect(() => {
