@@ -19,6 +19,8 @@ vi.mock("@onlyoffice/docspace-api-sdk", () => {
   class MockGroupApi {}
   class MockPeopleSearchApi {}
   class MockSearchApi {}
+  class MockOperationsApi {}
+  class MockThirdPartyApi {}
   return {
     Configuration: MockConfiguration,
     ProfilesApi: MockProfilesApi,
@@ -30,6 +32,8 @@ vi.mock("@onlyoffice/docspace-api-sdk", () => {
     GroupApi: MockGroupApi,
     PeopleSearchApi: MockPeopleSearchApi,
     SearchApi: MockSearchApi,
+    OperationsApi: MockOperationsApi,
+    ThirdPartyApi: MockThirdPartyApi,
   };
 });
 

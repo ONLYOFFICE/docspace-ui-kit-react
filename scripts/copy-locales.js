@@ -5,7 +5,7 @@ if (process.env.CI) {
   const dest = path.resolve(__dirname, "../locales/en");
   fs.mkdirSync(dest, { recursive: true });
   fs.writeFileSync(path.join(dest, "Common.json"), "{}\n");
-  console.log("CI detected – created stub locales/en/Common.json");
+  console.log("CI detected - created stub locales/en/Common.json");
   process.exit(0);
 }
 
@@ -18,10 +18,13 @@ function collectUsedKeys() {
   const keys = new Set();
 
   const patterns = [
-    // getCommonTranslation("Key") or getCommonTranslation('Key')
-    /getCommonTranslation\(["']([^"']+)["']/g,
-    // t("Common:Key") or translate("Common:Key")
-    /(?:translate|\.t)\(["']Common:([^"']+)["']/g,
+    // getCommonTranslation("Key") or getCommonTranslation('Key'), possibly multiline
+    /getCommonTranslation\(\s*["']([^"']+)["']/g,
+    // match t("Key"), t("Common:Key"), translate("Key"), etc.
+    // \b handles standalone "t" and avoids "alert", "start", etc.
+    /\b(?:translate|t)\(\s*["'](?:Common:)?([^"']+)["']/g,
+    // CommonTrans i18nKey="Key" or i18nKey='Key'
+    /i18nKey=["'](?:Common:)?([^"']+)["']/g,
   ];
 
   function scan(dir) {

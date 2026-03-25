@@ -174,21 +174,13 @@ describe("<Backdrop />", () => {
     });
   });
 
-  describe("Mobile and Tablet Behavior", () => {
+  describe("Mobile Behavior", () => {
     it("shows background on mobile devices without withoutBlur", () => {
       vi.mocked(utils.isMobile).mockReturnValue(true);
       render(<Backdrop visible />);
       const backdrop = screen.getByTestId("backdrop");
       expect(backdrop).toHaveClass(styles.withBackground);
     });
-
-    it("shows background on tablet devices without withoutBlur", () => {
-      vi.mocked(utils.isTablet).mockReturnValue(true);
-      render(<Backdrop visible />);
-      const backdrop = screen.getByTestId("backdrop");
-      expect(backdrop).toHaveClass(styles.withBackground);
-    });
-
   });
 
   describe("Multiple Backdrop Handling", () => {

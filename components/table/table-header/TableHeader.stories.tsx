@@ -24,10 +24,12 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useRef } from "react";
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { TableHeaderProps } from "../Table.types";
+
+import { useRef } from "react";
 import { TableHeader } from ".";
-import { type TableHeaderProps, TTableColumn } from "../Table.types";
 import { SortByFieldName } from "../../../enums";
 
 const COLUMN_STORAGE_NAME = "storybook-table-header-column-storage";
@@ -49,13 +51,40 @@ const TableHeaderWrapper = (args: Omit<TableHeaderProps, "containerRef">) => {
 };
 
 const meta = {
-  title: "Components/Table/TableHeader",
+  title: "UI/Table/TableHeader",
   component: TableHeader,
   parameters: {
     docs: {
       description: {
-        component:
-          "TableHeader component for displaying table headers with resizable columns",
+        component: `TableHeader displays column headers with interactive features for data tables.
+
+### Features
+
+- **Resizable Columns**: Drag column borders to adjust widths
+- **Sorting**: Click column headers to sort by that field
+- **Column Settings**: Toggle column visibility via a settings dropdown
+- **Info Panel Support**: Adjusts layout when the info panel is visible
+- **Index Editing Mode**: Special mode for reordering items
+
+### Usage
+
+\`\`\`tsx
+import { TableHeader } from "@docspace/ui-kit/components/table/table-header";
+
+const ref = useRef<HTMLDivElement>(null);
+
+<TableHeader
+  containerRef={ref}
+  columns={columns}
+  columnStorageName="my-columns"
+  columnInfoPanelStorageName="my-info-panel"
+  sectionWidth={1000}
+  sortBy={SortByFieldName.Name}
+  sorted
+  showSettings
+  sortingVisible
+/>
+\`\`\``,
       },
     },
   },
@@ -72,6 +101,42 @@ const meta = {
         SortByFieldName.Tags,
         SortByFieldName.Author,
       ],
+      description: "Field name used for the current sort order",
+    },
+    sorted: {
+      control: "boolean",
+      description: "Whether the table is currently sorted",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    showSettings: {
+      control: "boolean",
+      description: "Show the column settings dropdown",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    sortingVisible: {
+      control: "boolean",
+      description: "Show sorting indicators on column headers",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    infoPanelVisible: {
+      control: "boolean",
+      description: "Whether the info panel is visible",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isIndexEditingMode: {
+      control: "boolean",
+      description: "Enable index editing mode for reordering",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
   tags: ["!autodocs"],
@@ -93,8 +158,9 @@ const meta = {
   ],
 } satisfies Meta<typeof TableHeader>;
 
+type Story = StoryObj<ComponentProps<typeof TableHeader>>;
+
 export default meta;
-type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => <TableHeaderWrapper {...args} />,
@@ -156,6 +222,27 @@ export const Default: Story = {
     isIndexEditingMode: false,
     withoutWideColumn: false,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default table header with four resizable columns, sorting enabled, and column settings visible.",
+      },
+      source: {
+        code: `<TableHeader
+  containerRef={ref}
+  columns={columns}
+  columnStorageName="my-columns"
+  columnInfoPanelStorageName="my-info-panel"
+  sectionWidth={1000}
+  sortBy={SortByFieldName.Name}
+  sorted
+  showSettings
+  sortingVisible
+/>`,
+      },
+    },
+  },
 };
 
 export const WithoutSettings: Story = {
@@ -164,13 +251,54 @@ export const WithoutSettings: Story = {
     ...Default.args,
     showSettings: false,
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Table header without the column settings dropdown. Users cannot toggle column visibility.",
+      },
+      source: {
+        code: `<TableHeader
+  containerRef={ref}
+  columns={columns}
+  columnStorageName="my-columns"
+  columnInfoPanelStorageName="my-info-panel"
+  sectionWidth={1000}
+  sortBy={SortByFieldName.Name}
+  sorted
+  showSettings={false}
+  sortingVisible
+/>`,
+      },
+    },
+  },
 };
-
 
 export const WithoutSorting: Story = {
   render: (args) => <TableHeaderWrapper {...args} />,
   args: {
     ...Default.args,
     sortingVisible: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Table header with sorting indicators hidden. Column headers do not display sort direction arrows.",
+      },
+      source: {
+        code: `<TableHeader
+  containerRef={ref}
+  columns={columns}
+  columnStorageName="my-columns"
+  columnInfoPanelStorageName="my-info-panel"
+  sectionWidth={1000}
+  sortBy={SortByFieldName.Name}
+  sorted
+  showSettings
+  sortingVisible={false}
+/>`,
+      },
+    },
   },
 };

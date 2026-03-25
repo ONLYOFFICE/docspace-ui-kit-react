@@ -76,6 +76,9 @@
     path {
       fill: #{colors.$light-gray-dark};
     }
+    &:empty {
+      display: none;
+    }
   }
 
   .body {

@@ -38,6 +38,7 @@ vi.mock("react-i18next", () => ({
 // Mock getCommonTranslation
 vi.mock("../../../utils/i18n", () => ({
   getCommonTranslation: (key: string) => key,
+  useCommonTranslation: () => (key: string) => key,
 }));
 
 // Mock styles - return default export for CSS Modules

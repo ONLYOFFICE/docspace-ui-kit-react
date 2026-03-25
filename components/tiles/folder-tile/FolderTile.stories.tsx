@@ -24,15 +24,20 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
-import Folder32ReactSvg from "../../../assets/icons/32/folder.react.svg";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import type { FolderTileProps } from "./FolderTile.types";
+
+import { useState } from "react";
+
+import Folder32ReactSvg from "../../../assets/icons/32/folder.svg";
 import ImageReactSvg from "../../../assets/icons/96/folder.svg";
 import { Link } from "../../link";
 import { Badge } from "../../badge";
 
 import { FolderTile } from ".";
-import { FolderTileProps } from "./FolderTile.types";
 import { TileContent } from "../tile-content";
 
 const element = <Folder32ReactSvg />;
@@ -71,24 +76,68 @@ const badges = (
 );
 
 const meta = {
-  title: "Components/UI/Tiles/FolderTile",
+  title: "UI/Tiles/FolderTile",
   component: FolderTile,
   parameters: {
     docs: {
       description: {
-        component:
-          "Folder tile component for displaying folder information in a tile format",
+        component: `Folder tile component for displaying folder information in a tile format.
+
+### Features
+
+- **Folder Icon**: Displays folder icon with optional large preview
+- **Selectable**: Supports checked/selected state with checkbox
+- **Indeterminate State**: Partial selection indicator for nested content
+- **Progress State**: Loading indicator for folder operations
+- **Badges**: Display status badges on the folder
+- **Big Folder Mode**: Enlarged folder view with thumbnail preview
+- **Context Menu**: Right-click context menu for folder actions
+
+### Usage
+
+\`\`\`tsx
+import { FolderTile } from "@docspace/ui-kit/components/tiles/folder-tile";
+import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+
+<FolderTile
+  item={{ id: "1", title: "My Folder", isFolder: true }}
+  element={<FolderIcon />}
+  contextOptions={options}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>My Folder</Link></TileContent>
+</FolderTile>
+\`\`\``,
       },
     },
   },
   argTypes: {
-    checked: { control: "boolean" },
-    inProgress: { control: "boolean" },
-    indeterminate: { control: "boolean" },
+    checked: {
+      control: "boolean",
+      description: "Whether the tile is selected/checked",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    inProgress: {
+      control: "boolean",
+      description: "Whether the tile shows a loading/progress indicator",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    indeterminate: {
+      control: "boolean",
+      description:
+        "Whether the checkbox shows an indeterminate state for partial selection",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
   },
 } satisfies Meta<typeof FolderTile>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof FolderTile>>;
 
 export default meta;
 
@@ -133,6 +182,17 @@ export const Default: Story = {
       description: {
         story: "Basic folder tile with selection functionality",
       },
+      source: {
+        code: `<FolderTile
+  item={{ id: "folder-1", title: "My Folder", isFolder: true }}
+  element={<Folder32ReactSvg />}
+  contextOptions={contextOptions}
+  badges={badges}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>Folder Content</Link></TileContent>
+</FolderTile>`,
+      },
     },
   },
 };
@@ -162,6 +222,19 @@ export const Big: Story = {
       description: {
         story: "Big folder tile with selection functionality",
       },
+      source: {
+        code: `<FolderTile
+  item={{ id: "folder-1", title: "My Folder", isFolder: true }}
+  element={<Folder32ReactSvg />}
+  contextOptions={contextOptions}
+  badges={badges}
+  isBigFolder={true}
+  temporaryIcon={<ImageReactSvg />}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>Folder Content</Link></TileContent>
+</FolderTile>`,
+      },
     },
   },
 };
@@ -177,6 +250,17 @@ export const Checked: Story = {
       description: {
         story: "Folder tile in checked state",
       },
+      source: {
+        code: `<FolderTile
+  item={{ id: "folder-1", title: "My Folder", isFolder: true }}
+  element={<Folder32ReactSvg />}
+  contextOptions={contextOptions}
+  checked={true}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>Folder Content</Link></TileContent>
+</FolderTile>`,
+      },
     },
   },
 };
@@ -191,6 +275,16 @@ export const InProgress: Story = {
     docs: {
       description: {
         story: "Folder tile in progress state",
+      },
+      source: {
+        code: `<FolderTile
+  item={{ id: "folder-1", title: "My Folder", isFolder: true }}
+  element={<Folder32ReactSvg />}
+  contextOptions={contextOptions}
+  inProgress={true}
+>
+  <TileContent><Link>Folder Content</Link></TileContent>
+</FolderTile>`,
       },
     },
   },

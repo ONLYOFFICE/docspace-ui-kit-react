@@ -248,6 +248,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
           [styles.selectedSingle]: isSelected && !isMultiSelect,
           [styles.hoverable]: !isItemDisabled,
           [styles.isSystem]: isSystem,
+          [styles.isAvatar]: !item.rootFolderType,
         })}
         data-testid={`selector-item-${index}`}
       >
@@ -292,8 +293,10 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
               badgeIconNode={badgeIconNode ?? undefined}
               isTemplate={isTemplate}
             />
-          ) : (
+          ) : React.isValidElement(icon) ? (
             <div className={styles.itemLogo}>{icon}</div>
+          ) : (
+            <div className={styles.itemLogo}>{React.createElement(icon)}</div>
           )
         ) : null}
         {renderCustomItem ? (

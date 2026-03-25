@@ -25,6 +25,18 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type {
+  EmployeeFullDto,
+  FileDtoInteger,
+  GroupDto,
+} from "@onlyoffice/docspace-api-sdk";
+
+export type {
+  EmployeeFullDto,
+  FileDtoInteger,
+  GroupDto,
+}
+
+import type {
   ShareAccessRights,
   EmployeeStatus,
   EmployeeActivationStatus,
@@ -38,6 +50,11 @@ import type {
   RoomsType,
 } from "../enums";
 import type { TooltipRefProps } from "react-tooltip";
+
+export type TGetIcon = (
+  size: number,
+  fileExst: string,
+) => React.FC<React.SVGProps<SVGSVGElement>> | null | string;
 
 export type TDirectionX = "left" | "right";
 export type TDirectionY = "bottom" | "top" | "both";
@@ -253,6 +270,7 @@ declare global {
         string,
         { data: Record<string, string>; namespaces: string }
       >;
+      instance?: import("i18next").i18n;
     };
     AscDesktopEditor?: {
       execCommand: (key: string, value: string) => void;

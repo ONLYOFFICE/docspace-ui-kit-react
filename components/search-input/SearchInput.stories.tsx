@@ -24,36 +24,54 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
+import type React from "react";
+import type { ComponentProps } from "react";
+import { useState } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { InputSize } from "../text-input";
 
 import { SearchInput } from ".";
-import { SearchInputProps } from "./SearchInput.types";
 
 const meta = {
-  title: "Components/Form Controls/SearchInput",
+  title: "UI/Interactive elements/SearchInput",
   component: SearchInput,
   parameters: {
     docs: {
       description: {
-        component: `
-A specialized input component designed for search functionality with built-in features for clearing and auto-refresh.
+        component: `Search-optimized input field with built-in clear button, auto-refresh capability, and multiple size options.
 
-## Features
-- Search-optimized input field
-- Clear button support
-- Auto-refresh with configurable timeout
-- Multiple size options
-- Disabled state support
-- Scale to fit container
-- Focus and change event handlers
-- Responsive design
+### Features
 
-## Usage
-Used throughout the application for search bars, filter inputs, and any search-specific input fields.
-`,
+- **Clear Button**: Show/hide clear button to reset the search value
+- **Auto-Refresh**: Automatically trigger search after a configurable timeout
+- **Three Sizes**: base, middle, and large
+- **Disabled State**: Prevent user interaction
+- **Full Width**: Scale to 100% width when needed
+
+### Usage
+
+\`\`\`tsx
+import { SearchInput } from "@docspace/ui-kit/components/search-input";
+import { InputSize } from "@docspace/ui-kit/components/text-input";
+
+<SearchInput
+  size={InputSize.base}
+  value={searchValue}
+  onChange={(value) => setSearchValue(value)}
+  placeholder="Search..."
+  showClearButton={!!searchValue}
+/>
+
+// With auto-refresh
+<SearchInput
+  value={value}
+  onChange={handleSearch}
+  autoRefresh
+  refreshTimeout={1000}
+/>
+\`\`\``,
       },
     },
     design: {
@@ -62,48 +80,114 @@ Used throughout the application for search bars, filter inputs, and any search-s
     },
   },
   argTypes: {
-    onChange: { action: "onChange" },
-    onClearSearch: { action: "onClearSearch" },
-    onFocus: { action: "onFocus" },
-    onClick: { action: "onClick" },
     size: {
       control: "select",
       options: Object.values(InputSize),
+      description: "Size variant of the input",
+      table: {
+        defaultValue: { summary: "base" },
+      },
     },
     isDisabled: {
       control: "boolean",
+      description: "Disable the input field",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     showClearButton: {
       control: "boolean",
+      description: "Show the clear button",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
     autoRefresh: {
       control: "boolean",
+      description: "Enable auto-refresh on value change",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    scale: {
+      control: "boolean",
+      description: "Scale input to 100% width",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    placeholder: {
+      control: "text",
+      description: "Placeholder text",
     },
   },
 } satisfies Meta<typeof SearchInput>;
-type Story = StoryObj<typeof SearchInput>;
+
+type Story = StoryObj<ComponentProps<typeof SearchInput>>;
 
 export default meta;
 
-const Template = ({ value, onChange, ...args }: SearchInputProps) => {
-  const [searchValue, setSearchValue] = useState(value);
-
+const Wrapper = (props: { children: React.ReactNode }) => {
   return (
-    <div style={{ width: "300px" }}>
-      <SearchInput
-        {...args}
-        value={searchValue}
-        onChange={(v: string) => {
-          onChange?.(v);
-          setSearchValue(v);
-        }}
-      />
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+        gridGap: "16px",
+        alignItems: "center",
+      }}
+    >
+      {props.children}
     </div>
   );
 };
 
+const ControlledSearch = (props: {
+  initialValue?: string;
+  size?: InputSize;
+  isDisabled?: boolean;
+  scale?: boolean;
+  placeholder?: string;
+  autoRefresh?: boolean;
+  refreshTimeout?: number;
+}) => {
+  const {
+    initialValue = "",
+    size = InputSize.base,
+    placeholder = "Search",
+    ...rest
+  } = props;
+  const [value, setValue] = useState(initialValue);
+
+  return (
+    <SearchInput
+      size={size}
+      value={value}
+      onChange={(v) => setValue(v)}
+      showClearButton={!!value}
+      onClearSearch={() => setValue("")}
+      placeholder={placeholder}
+      {...rest}
+    />
+  );
+};
+
 export const Default: Story = {
-  render: (args) => <Template {...args} />,
+  render: (args) => {
+    const [value, setValue] = useState(args.value || "");
+
+    return (
+      <div style={{ width: "300px" }}>
+        <SearchInput
+          {...args}
+          value={value}
+          onChange={(v) => setValue(v)}
+          showClearButton={!!value}
+          onClearSearch={() => setValue("")}
+        />
+      </div>
+    );
+  },
   args: {
     id: "default-search",
     isDisabled: false,
@@ -111,173 +195,97 @@ export const Default: Story = {
     scale: false,
     placeholder: "Search",
     value: "",
-    autoRefresh: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Default search input with auto-refresh enabled and no clear button initially. Start typing to see the clear button appear.",
-      },
-    },
+    autoRefresh: false,
   },
 };
 
-const SizesComponent = () => {
-  const [sizes, setSizes] = useState({
-    base: "Base size",
-    middle: "Middle size",
-    large: "Large size",
-  });
-
-  const handleChange = (key: string) => (value: string) => {
-    setSizes((prev) => ({ ...prev, [key]: value }));
-  };
-
+const SizesTemplate = () => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div style={{ width: "300px" }}>
-        <SearchInput
-          size={InputSize.base}
-          value={sizes.base}
-          onChange={handleChange("base")}
-          showClearButton={!!sizes.base}
-        />
-      </div>
-      <div style={{ width: "300px" }}>
-        <SearchInput
-          size={InputSize.middle}
-          value={sizes.middle}
-          onChange={handleChange("middle")}
-          showClearButton={!!sizes.middle}
-        />
-      </div>
-      <div style={{ width: "300px" }}>
-        <SearchInput
-          size={InputSize.large}
-          value={sizes.large}
-          onChange={handleChange("large")}
-          showClearButton={!!sizes.large}
-        />
-      </div>
-    </div>
+    <Wrapper>
+      <ControlledSearch size={InputSize.base} initialValue="Base size" />
+      <ControlledSearch size={InputSize.middle} initialValue="Middle size" />
+      <ControlledSearch size={InputSize.large} initialValue="Large size" />
+    </Wrapper>
   );
 };
 
 export const Sizes: Story = {
-  render: () => <SizesComponent />,
+  render: () => <SizesTemplate />,
   parameters: {
     docs: {
       description: {
-        story: "Demonstrates all available search input sizes: base (small), middle (default), and large. Each size is appropriate for different UI contexts and screen densities.",
+        story:
+          "SearchInput supports three sizes: base, middle, and large. Each size is suited for different UI contexts.",
+      },
+      source: {
+        code: `<SearchInput size={InputSize.base} value="Base size" />
+<SearchInput size={InputSize.middle} value="Middle size" />
+<SearchInput size={InputSize.large} value="Large size" />`,
       },
     },
   },
 };
 
-const StatesComponent = () => {
-  const [values, setValues] = useState({
-    normal: "Normal state",
-    disabled: "Disabled state",
-    scaled: "With scale",
-  });
-
-  const handleChange = (key: string) => (value: string) => {
-    setValues((prev) => ({ ...prev, [key]: value }));
-  };
-
+const StatesTemplate = () => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div style={{ width: "300px" }}>
-        <SearchInput
-          size={InputSize.base}
-          value={values.normal}
-          onChange={handleChange("normal")}
-          showClearButton={!!values.normal}
-        />
-      </div>
-      <div style={{ width: "300px" }}>
-        <SearchInput
-          size={InputSize.base}
-          value={values.disabled}
-          onChange={handleChange("disabled")}
-          isDisabled
-          showClearButton={!!values.disabled}
-        />
-      </div>
-      <div style={{ width: "300px" }}>
-        <SearchInput
-          size={InputSize.base}
-          value={values.scaled}
-          onChange={handleChange("scaled")}
-          scale
-          showClearButton={!!values.scaled}
-        />
-      </div>
-    </div>
+    <Wrapper>
+      <ControlledSearch initialValue="Normal" />
+      <ControlledSearch initialValue="Disabled" isDisabled />
+      <ControlledSearch initialValue="Scaled" scale />
+      <ControlledSearch placeholder="Empty with placeholder" />
+    </Wrapper>
   );
 };
 
 export const States: Story = {
-  render: () => <StatesComponent />,
+  render: () => <StatesTemplate />,
   parameters: {
     docs: {
       description: {
-        story: "Shows different states of the search input: normal (interactive), disabled (non-interactive), and scaled (full-width). Type in any field to show the clear button.",
+        story:
+          "SearchInput supports normal, disabled, and scaled states. The clear button appears when the input has a value.",
+      },
+      source: {
+        code: `<SearchInput value="Normal" />
+<SearchInput value="Disabled" isDisabled />
+<SearchInput value="Scaled" scale />
+<SearchInput placeholder="Empty with placeholder" value="" />`,
       },
     },
   },
 };
 
-const BehaviorsComponent = () => {
-  const [searchValues, setSearchValues] = useState({
-    withClear: "With clear button",
-    autoRefresh: "Auto refresh enabled",
-    withPlaceholder: "",
-  });
-
-  const handleChange = (key: string) => (value: string) => {
-    setSearchValues((prev) => ({ ...prev, [key]: value }));
-  };
-
+const AutoRefreshTemplate = () => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <div style={{ width: "300px" }}>
-        <SearchInput
-          size={InputSize.base}
-          value={searchValues.withClear}
-          onChange={handleChange("withClear")}
-          showClearButton={!!searchValues.withClear}
-        />
-      </div>
-      <div style={{ width: "300px" }}>
-        <SearchInput
-          size={InputSize.base}
-          value={searchValues.autoRefresh}
-          onChange={handleChange("autoRefresh")}
-          autoRefresh
-          refreshTimeout={1000}
-          showClearButton={!!searchValues.autoRefresh}
-        />
-      </div>
-      <div style={{ width: "300px" }}>
-        <SearchInput
-          size={InputSize.base}
-          placeholder="With placeholder"
-          value={searchValues.withPlaceholder}
-          onChange={handleChange("withPlaceholder")}
-          showClearButton={!!searchValues.withPlaceholder}
-        />
-      </div>
-    </div>
+    <Wrapper>
+      <ControlledSearch
+        placeholder="Type to auto-refresh (1s)"
+        autoRefresh
+        refreshTimeout={1000}
+      />
+      <ControlledSearch placeholder="No auto-refresh" />
+    </Wrapper>
   );
 };
 
-export const Behaviors: Story = {
-  render: () => <BehaviorsComponent />,
+export const AutoRefreshMode: Story = {
+  render: () => <AutoRefreshTemplate />,
   parameters: {
     docs: {
       description: {
-        story: "Demonstrates different search input behaviors: with clear button, with auto-refresh (1s timeout), and with custom placeholder. Type to test the clear button and auto-refresh functionality.",
+        story:
+          "Auto-refresh mode triggers the onChange callback after a configurable timeout, useful for search-as-you-type with debouncing.",
+      },
+      source: {
+        code: `// With auto-refresh (1s timeout)
+<SearchInput
+  autoRefresh
+  refreshTimeout={1000}
+  placeholder="Type to auto-refresh"
+/>
+
+// Without auto-refresh
+<SearchInput placeholder="No auto-refresh" />`,
       },
     },
   },

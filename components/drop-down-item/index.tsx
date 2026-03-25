@@ -30,18 +30,21 @@ import classNames from "classnames";
 
 import RightArrowReactSvgUrl from "../../assets/right.arrow.react.svg";
 import ArrowLeftReactUrl from "../../assets/arrow-left.react.svg";
+import ExternalLinkReactSvgUrl from "../../assets/external.link.svg";
 
 import { globalColors } from "../../providers/theme";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 import { useTheme } from "../../context/ThemeContext";
 import { isTouchDevice } from "../../utils/device";
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { ToggleButton } from "../toggle-button";
 import { Badge } from "../badge";
+import { Link, LinkType } from "../link";
 
 import type { DropDownItemProps } from "./DropDownItem.types";
 import styles from "./DropDownItem.module.scss";
+import { TooltipContainer } from "../tooltip";
 
 export type { DropDownItemProps };
 
@@ -129,6 +132,9 @@ const DropDownItem = ({
   style,
   isPaidBadge,
   badgeLabel,
+  withExternalLink,
+  externalLinkPath,
+  onExternalLinkClick,
   testId,
   tooltip,
   truncateText,
@@ -137,12 +143,12 @@ const DropDownItem = ({
   paidLabel,
   ...rest
 }: DropDownItemProps) => {
+  const t = useCommonTranslation();
   const { isRTL } = useInterfaceDirection();
   const { isBase } = useTheme();
 
-  const resolvedBetaLabel =
-    betaLabel || getCommonTranslation("BetaLabel") || "";
-  const resolvedPaidLabel = paidLabel || getCommonTranslation("Paid") || "";
+  const resolvedBetaLabel = betaLabel || t("BetaLabel") || "";
+  const resolvedPaidLabel = paidLabel || t("Paid") || "";
 
   const withDisabledTooltip = disabled && tooltip;
 
@@ -228,12 +234,14 @@ const DropDownItem = ({
       {isSeparator ? (
         "\u00A0"
       ) : label ? (
-        <span
+        <TooltipContainer
+          as="span"
           dir="auto"
+          title={typeof label === "string" ? label : undefined}
           className={truncateText ? styles.truncateText : undefined}
         >
           {label}
-        </span>
+        </TooltipContainer>
       ) : (
         children
       )}
@@ -297,6 +305,19 @@ const DropDownItem = ({
             isPaidBadge
           />
         </div>
+      ) : null}
+
+      {withExternalLink && externalLinkPath ? (
+        <Link
+          type={LinkType.action}
+          className={styles.externalLink}
+          onClick={(e) => {
+            e.stopPropagation();
+            onExternalLinkClick?.();
+          }}
+        >
+          <ExternalLinkReactSvgUrl />
+        </Link>
       ) : null}
 
       {additionalElement ? (

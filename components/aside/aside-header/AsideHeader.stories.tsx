@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { AsideHeader } from ".";
 
 const meta: Meta<typeof AsideHeader> = {
-  title: "components/UI/AsideHeader",
+  title: "UI/Layout components/AsideHeader",
   component: AsideHeader,
   parameters: {
     docs: {

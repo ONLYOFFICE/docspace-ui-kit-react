@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Loader } from ".";
@@ -31,13 +32,34 @@ import { LoaderTypes } from "./Loader.enums";
 import { globalColors } from "../../providers/theme";
 
 const meta = {
-  title: "Components/Status components/Loader",
+  title: "UI/Status components/Loader",
   component: Loader,
   parameters: {
     docs: {
       description: {
-        component:
-          "Loader component is used for displaying loading states and progress indicators in the application. It supports multiple types of loaders and can be customized with different colors and sizes.",
+        component: `Loader component for displaying loading states and progress indicators with multiple animation types.
+
+### Features
+
+- **Five Animation Types**: Base (text), Oval, DualRing, Rombs, and Track
+- **Customizable Color**: Apply any CSS color to the loader
+- **Flexible Sizing**: Set size using px, rem, or other CSS units
+- **Accessibility**: Supports label text for screen readers
+
+### Usage
+
+\`\`\`tsx
+import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
+
+// Oval loader
+<Loader type={LoaderTypes.oval} size="40px" color="#333" />
+
+// Rombs loader
+<Loader type={LoaderTypes.rombs} size="65px" />
+
+// Base text loader
+<Loader type={LoaderTypes.base} label="Loading content..." />
+\`\`\``,
       },
     },
     design: {
@@ -47,44 +69,73 @@ const meta = {
   },
   argTypes: {
     type: {
-      description: "Type of the loader animation",
       control: "select",
       options: Object.values(LoaderTypes),
+      description: "Type of the loader animation",
       table: {
-        type: { summary: "LoaderTypes" },
-        defaultValue: { summary: LoaderTypes.base },
+        defaultValue: { summary: "base" },
       },
     },
     color: {
-      description: "Color of the loader",
       control: "color",
-      table: {
-        type: { summary: "string" },
-      },
+      description: "Color of the loader",
     },
     size: {
-      description: "Size of the loader (in px, rem, or other CSS units)",
       control: "text",
+      description: "Size of the loader (in px, rem, or other CSS units)",
       table: {
-        type: { summary: "string" },
-        defaultValue: { summary: "18px" },
+        defaultValue: { summary: "40px" },
       },
     },
     label: {
-      description: "Accessibility label for screen readers",
       control: "text",
+      description: "Accessibility label for screen readers",
       table: {
-        type: { summary: "string" },
+        defaultValue: { summary: "Loading content, please wait." },
       },
     },
   },
 } satisfies Meta<typeof Loader>;
 
-type Story = StoryObj<typeof Loader>;
+type Story = StoryObj<ComponentProps<typeof Loader>>;
 
 export default meta;
 
+const Wrapper = (props: { children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: "40px",
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+const LabeledItem = (props: { label: string; children: React.ReactNode }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "10px",
+        minWidth: "100px",
+        textAlign: "center",
+      }}
+    >
+      {props.children}
+      <span style={{ fontSize: "12px", color: "#666" }}>{props.label}</span>
+    </div>
+  );
+};
+
 export const Default: Story = {
+  render: (args) => <Loader {...args} />,
   args: {
     type: LoaderTypes.base,
     size: "18px",
@@ -93,20 +144,42 @@ export const Default: Story = {
 };
 
 export const Oval: Story = {
+  render: (args) => <Loader {...args} />,
   args: {
     type: LoaderTypes.oval,
     size: "40px",
     color: globalColors.loaderLight,
     label: "Loading...",
   },
+  parameters: {
+    docs: {
+      description: {
+        story: "Oval spinner animation, commonly used for inline loading states.",
+      },
+      source: {
+        code: `<Loader type={LoaderTypes.oval} size="40px" color={globalColors.loaderLight} />`,
+      },
+    },
+  },
 };
 
 export const DualRing: Story = {
+  render: (args) => <Loader {...args} />,
   args: {
     type: LoaderTypes.dualRing,
     size: "40px",
     color: "#333333",
     label: "Loading...",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Dual ring animation with two concentric spinning rings.",
+      },
+      source: {
+        code: `<Loader type={LoaderTypes.dualRing} size="40px" color="#333333" />`,
+      },
+    },
   },
 };
 
@@ -125,69 +198,91 @@ export const Rombs: Story = {
       <Loader type={LoaderTypes.rombs} size="65px" label="Loading..." />
     </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Rombs (diamond) animation, used as the main application loader.",
+      },
+      source: {
+        code: `<Loader type={LoaderTypes.rombs} size="65px" />`,
+      },
+    },
+  },
 };
 
 export const Track: Story = {
+  render: (args) => <Loader {...args} />,
   args: {
     type: LoaderTypes.track,
     size: "30px",
     label: "Loading...",
   },
+  parameters: {
+    docs: {
+      description: {
+        story: "Track animation for compact loading indicators.",
+      },
+      source: {
+        code: `<Loader type={LoaderTypes.track} size="30px" />`,
+      },
+    },
+  },
 };
 
-export const AllTypes: Story = {
-  render: () => (
-    <div
-      style={{
-        display: "flex",
-        gap: "40px",
-        alignItems: "center",
-        padding: "40px",
-        minHeight: "200px",
-        flexWrap: "wrap",
-      }}
-    >
-      <div style={{ textAlign: "center", minWidth: "100px" }}>
+const AllTypesTemplate = () => {
+  return (
+    <Wrapper>
+      <LabeledItem label="Base">
         <Loader type={LoaderTypes.base} size="18px" label="Base loader" />
-        <div style={{ marginTop: "10px", fontSize: "12px" }}>Base</div>
-      </div>
-
-      <div style={{ textAlign: "center", minWidth: "100px" }}>
+      </LabeledItem>
+      <LabeledItem label="Oval">
         <Loader
           type={LoaderTypes.oval}
           size="40px"
           color={globalColors.loaderLight}
           label="Oval loader"
         />
-        <div style={{ marginTop: "10px", fontSize: "12px" }}>Oval</div>
-      </div>
-
-      <div style={{ textAlign: "center", minWidth: "100px" }}>
+      </LabeledItem>
+      <LabeledItem label="Dual Ring">
         <Loader
           type={LoaderTypes.dualRing}
           size="40px"
-
           label="Dual ring loader"
         />
-        <div style={{ marginTop: "10px", fontSize: "12px" }}>Dual Ring</div>
-      </div>
-
-      <div style={{ textAlign: "center", minWidth: "100px" }}>
+      </LabeledItem>
+      <LabeledItem label="Rombs">
         <Loader type={LoaderTypes.rombs} size="65px" label="Rombs loader" />
-        <div style={{ marginTop: "10px", fontSize: "12px" }}>Rombs</div>
-      </div>
-
-      <div style={{ textAlign: "center", minWidth: "100px" }}>
+      </LabeledItem>
+      <LabeledItem label="Track">
         <Loader type={LoaderTypes.track} size="30px" label="Track loader" />
-        <div style={{ marginTop: "10px", fontSize: "12px" }}>Track</div>
-      </div>
-    </div>
-  ),
+      </LabeledItem>
+    </Wrapper>
+  );
 };
 
-export const CustomColors: Story = {
-  render: () => (
-    <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+export const AllTypes: Story = {
+  render: () => <AllTypesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Side-by-side comparison of all five loader animation types: Base, Oval, DualRing, Rombs, and Track.",
+      },
+      source: {
+        code: `<Loader type={LoaderTypes.base} size="18px" />
+<Loader type={LoaderTypes.oval} size="40px" />
+<Loader type={LoaderTypes.dualRing} size="40px" />
+<Loader type={LoaderTypes.rombs} size="65px" />
+<Loader type={LoaderTypes.track} size="30px" />`,
+      },
+    },
+  },
+};
+
+const CustomColorsTemplate = () => {
+  return (
+    <Wrapper>
       <Loader
         type={LoaderTypes.dualRing}
         color="#FF5722"
@@ -212,31 +307,72 @@ export const CustomColors: Story = {
         size="40px"
         label="Purple loader"
       />
-    </div>
-  ),
+    </Wrapper>
+  );
+};
+
+export const CustomColors: Story = {
+  render: () => <CustomColorsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "DualRing loaders with different custom colors applied via the color prop.",
+      },
+      source: {
+        code: `<Loader type={LoaderTypes.dualRing} color="#FF5722" size="40px" />
+<Loader type={LoaderTypes.dualRing} color="#2196F3" size="40px" />
+<Loader type={LoaderTypes.dualRing} color="#4CAF50" size="40px" />
+<Loader type={LoaderTypes.dualRing} color="#9C27B0" size="40px" />`,
+      },
+    },
+  },
+};
+
+const DifferentSizesTemplate = () => {
+  return (
+    <Wrapper>
+      <LabeledItem label="24px">
+        <Loader
+          type={LoaderTypes.oval}
+          color={globalColors.loaderLight}
+          size="24px"
+          label="Small loader"
+        />
+      </LabeledItem>
+      <LabeledItem label="40px">
+        <Loader
+          type={LoaderTypes.oval}
+          color={globalColors.loaderLight}
+          size="40px"
+          label="Medium loader"
+        />
+      </LabeledItem>
+      <LabeledItem label="60px">
+        <Loader
+          type={LoaderTypes.oval}
+          color={globalColors.loaderLight}
+          size="60px"
+          label="Large loader"
+        />
+      </LabeledItem>
+    </Wrapper>
+  );
 };
 
 export const DifferentSizes: Story = {
-  render: () => (
-    <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-      <Loader
-        type={LoaderTypes.oval}
-        color={globalColors.loaderLight}
-        size="24px"
-        label="Small loader"
-      />
-      <Loader
-        type={LoaderTypes.oval}
-        color={globalColors.loaderLight}
-        size="40px"
-        label="Medium loader"
-      />
-      <Loader
-        type={LoaderTypes.oval}
-        color={globalColors.loaderLight}
-        size="60px"
-        label="Large loader"
-      />
-    </div>
-  ),
+  render: () => <DifferentSizesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Oval loaders at three different sizes to demonstrate scalability.",
+      },
+      source: {
+        code: `<Loader type={LoaderTypes.oval} size="24px" />
+<Loader type={LoaderTypes.oval} size="40px" />
+<Loader type={LoaderTypes.oval} size="60px" />`,
+      },
+    },
+  },
 };

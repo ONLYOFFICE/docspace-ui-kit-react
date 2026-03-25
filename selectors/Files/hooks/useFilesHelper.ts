@@ -32,9 +32,9 @@ import {
   type FileDtoInteger,
 } from "@onlyoffice/docspace-api-sdk";
 
-import FolderSvg from "PUBLIC_DIR/images/icons/32/folder.svg";
+import FolderSvg from "../../../assets/icons/32/folder.svg";
 
-import { getCommonTranslation } from "../../../utils/i18n";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import { useApi } from "../../../providers/api";
 
@@ -96,6 +96,7 @@ const useFilesHelper = ({
 
   disableBySecurity,
 }: UseFilesHelpersProps) => {
+  const t = useCommonTranslation();
   const {
     isFirstLoad,
     setIsFirstLoad,
@@ -154,8 +155,9 @@ const useFilesHelper = ({
         isErrorPath = false,
       ) => {
         if (initRef.current && getRootData && folderId !== "@my") {
+        // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
           const folderInfoRes = await foldersApi.getFolderInfo(
-            Number(folderId),
+           folderId as number,
           );
           const folder = folderInfoRes.data.response!;
 
@@ -185,8 +187,10 @@ const useFilesHelper = ({
         }
 
         const currentSearch = searchValue || "";
+
+        // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
         const folderRes = await foldersApi.getFolderByFolderId(
-          Number(folderId),
+          folderId as number,
           undefined,
           undefined,
           filterParams.filterType,
@@ -297,7 +301,7 @@ const useFilesHelper = ({
           // });
 
           if (!isThirdParty && !isRoomsOnly && !isUserOnly)
-            breadCrumbs.unshift({ ...getDefaultBreadCrumb() });
+            breadCrumbs.unshift({ ...getDefaultBreadCrumb(t) });
 
           onSetBaseFolderPath?.(isErrorPath ? [] : breadCrumbs);
 
@@ -312,12 +316,12 @@ const useFilesHelper = ({
             setTotal(total + 1);
             itemList.unshift({
               isCreateNewItem: true,
-              label: getCommonTranslation("NewFolder"),
+              label: t("NewFolder"),
               id: "create-folder-item",
               key: "create-folder-item",
               hotkey: "f",
               onCreateClick: () =>
-                addInputItem(getCommonTranslation("NewFolder"), React.createElement(FolderSvg)),
+                addInputItem(t("NewFolder"), React.createElement(FolderSvg)),
               onBackClick: () => {
                 let isRooms = false;
                 setBreadCrumbs((val) => {
@@ -424,6 +428,7 @@ const useFilesHelper = ({
       includedItems,
       disabledFolderType,
       disableBySecurity,
+      t,
     ],
   );
 

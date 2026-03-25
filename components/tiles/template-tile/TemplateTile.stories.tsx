@@ -24,9 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
+
+import type { TemplateTileProps, TemplateItem } from "./TemplateTile.types";
+
 import React, { useState } from "react";
-import { Meta, StoryObj } from "@storybook/react-vite";
-import PublicRoomTemplateIconReactSvg from "../../../assets/icons/32/template/public.react.svg";
+import PublicRoomTemplateIconReactSvg from "../../../assets/icons/32/template/public.svg";
 import CreateRoomReactSvg from "../../../assets/create.room.react.svg";
 import { ContextMenuModel } from "../../context-menu";
 import { Link } from "../../link";
@@ -35,7 +40,6 @@ import { ComboBox, ComboBoxSize } from "../../combobox";
 import { Text } from "../../text";
 
 import { TemplateTile } from ".";
-import { TemplateTileProps, TemplateItem } from "./TemplateTile.types";
 import { TileContent } from "../tile-content";
 import { IconButton } from "../../icon-button";
 
@@ -182,25 +186,77 @@ const defaultItem: StoryTemplateItem = {
 };
 
 const meta = {
-  title: "Components/UI/Tiles/TemplateTile",
+  title: "UI/Tiles/TemplateTile",
   component: TemplateTile,
   parameters: {
     docs: {
       description: {
-        component:
-          "Template tile component for displaying template information in a tile format",
+        component: `Template tile component for displaying template information in a tile format.
+
+### Features
+
+- **Template Icon**: Displays template type icon
+- **Selectable**: Supports checked/selected state with checkbox
+- **Active State**: Visual highlight for the currently active template
+- **Blocking Operation**: Indicates when a template operation is in progress
+- **Indeterminate State**: Partial selection indicator
+- **Space Quota**: Displays storage usage and quota information
+- **Badges**: Action badges like "Create Room" button
+- **Context Menu**: Right-click context menu for template actions
+
+### Usage
+
+\`\`\`tsx
+import { TemplateTile } from "@docspace/ui-kit/components/tiles/template-tile";
+import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+
+<TemplateTile
+  item={{ id: "1", title: "Sample Template", createdBy: { id: "u1", displayName: "John" } }}
+  element={<TemplateIcon />}
+  contextOptions={options}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>Template Content</Link></TileContent>
+</TemplateTile>
+\`\`\``,
       },
     },
   },
   argTypes: {
-    checked: { control: "boolean" },
-    isActive: { control: "boolean" },
-    isBlockingOperation: { control: "boolean" },
-    indeterminate: { control: "boolean" },
+    checked: {
+      control: "boolean",
+      description: "Whether the tile is selected/checked",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isActive: {
+      control: "boolean",
+      description: "Whether the tile is in active state",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    isBlockingOperation: {
+      control: "boolean",
+      description:
+        "Whether a blocking operation is in progress on the template",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
+    indeterminate: {
+      control: "boolean",
+      description:
+        "Whether the checkbox shows an indeterminate state for partial selection",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
   },
 } satisfies Meta<typeof TemplateTile>;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<ComponentProps<typeof TemplateTile>>;
 
 export default meta;
 
@@ -240,6 +296,19 @@ export const Default: Story = {
       description: {
         story: "Basic template tile with selection functionality",
       },
+      source: {
+        code: `<TemplateTile
+  item={{ id: "template-1", title: "Sample Template", createdBy: { id: "user-1", displayName: "John Doe" } }}
+  element={<PublicRoomTemplateIconReactSvg />}
+  contextOptions={contextOptions}
+  badges={badges}
+  showStorageInfo={true}
+  getContextModel={() => contextOptions}
+  columnCount={1}
+>
+  <TileContent><Link>Template Content</Link></TileContent>
+</TemplateTile>`,
+      },
     },
   },
 };
@@ -254,6 +323,17 @@ export const Checked: Story = {
     docs: {
       description: {
         story: "Template tile in checked state",
+      },
+      source: {
+        code: `<TemplateTile
+  item={item}
+  element={<PublicRoomTemplateIconReactSvg />}
+  contextOptions={contextOptions}
+  checked={true}
+  onSelect={handleSelect}
+>
+  <TileContent><Link>Template Content</Link></TileContent>
+</TemplateTile>`,
       },
     },
   },
@@ -275,6 +355,17 @@ export const WithSpaceQuota: Story = {
     docs: {
       description: {
         story: "Template tile with space quota information and controls",
+      },
+      source: {
+        code: `<TemplateTile
+  item={{ ...item, quotaLimit: 104857600 }}
+  element={<PublicRoomTemplateIconReactSvg />}
+  contextOptions={contextOptions}
+  showStorageInfo={true}
+  SpaceQuotaComponent={SpaceQuota}
+>
+  <TileContent><Link>Template Content</Link></TileContent>
+</TemplateTile>`,
       },
     },
   },
@@ -299,6 +390,17 @@ export const WithReadOnlyQuota: Story = {
       description: {
         story: "Template tile with read-only quota display",
       },
+      source: {
+        code: `<TemplateTile
+  item={{ ...item, quotaLimit: 104857600, security: { EditRoom: false } }}
+  element={<PublicRoomTemplateIconReactSvg />}
+  contextOptions={contextOptions}
+  showStorageInfo={true}
+  SpaceQuotaComponent={SpaceQuota}
+>
+  <TileContent><Link>Template Content</Link></TileContent>
+</TemplateTile>`,
+      },
     },
   },
 };
@@ -313,6 +415,16 @@ export const BlockingOperation: Story = {
     docs: {
       description: {
         story: "Template tile showing blocking operation state",
+      },
+      source: {
+        code: `<TemplateTile
+  item={item}
+  element={<PublicRoomTemplateIconReactSvg />}
+  contextOptions={contextOptions}
+  isBlockingOperation={true}
+>
+  <TileContent><Link>Template Content</Link></TileContent>
+</TemplateTile>`,
       },
     },
   },

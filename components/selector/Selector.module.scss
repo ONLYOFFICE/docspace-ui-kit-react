@@ -486,6 +486,7 @@
 
   .itemLogo {
     min-width: 32px;
+    height: 32px;
   }
 
   .selectorItemName {
@@ -513,10 +514,10 @@
     cursor: pointer;
   }
 
-  &.isSystem {
+  &:not(.isAvatar) {
     .userAvatar {
       svg path {
-        fill: var(--info-panel-role-color);
+        fill: var(--info-panel-role-color) !important;
       }
     }
   }

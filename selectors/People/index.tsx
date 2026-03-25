@@ -25,8 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import DefaultUserPhoto from "../../assets/default_user_photo_size_82-82.png";
-import EmptyScreenPersonsLight from "../../assets/empty.filter.people.light.react.svg";
-import EmptyScreenPersonsDark from "../../assets/empty.filter.people.dark.react.svg";
+import EmptyScreenPersonsLight from "../../assets/emptyFilter/empty.filter.people.light.svg";
+import EmptyScreenPersonsDark from "../../assets/emptyFilter/empty.filter.people.dark.svg";
 
 import axios from "axios";
 import { useState, useCallback, useRef, useEffect } from "react";
@@ -54,7 +54,7 @@ import {
   type EmployeeType as SdkEmployeeType,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../providers/api/ApiProvider";
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 import { getUserAvatarRoleByType, getUserType } from "../../utils/common";
 import { Text } from "../../components/text";
 import { globalColors } from "../../providers/theme";
@@ -65,6 +65,7 @@ import { useTheme } from "../../context/ThemeContext";
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
 import styles from "./PeopleSelector.module.scss";
+import { Encoder } from "../../utils/encoder";
 
 const PEOPLE_TAB_ID = "0";
 const GROUP_TAB_ID = "1";
@@ -72,6 +73,8 @@ const GUESTS_TAB_ID = "2";
 
 const toListItem = (
   item: EmployeeFullDto | GroupDto,
+  baseUrl: string,
+  t: (key: string) => string,
   disableDisabledUsers?: boolean,
   disableInvitedUsers?: string[],
   isRoom?: boolean,
@@ -105,7 +108,11 @@ const toListItem = (
       ? DefaultUserPhoto.src
       : DefaultUserPhoto;
 
-    const userAvatar = hasAvatar && avatar ? avatar : defaultUserPhotoURL;
+    const avatarPath = hasAvatar && avatar ? avatar : defaultUserPhotoURL;
+    const userAvatar =
+      typeof avatarPath === "string" && avatarPath.startsWith("/")
+        ? `${baseUrl}${avatarPath}`
+        : avatarPath;
 
     const isInvited = checkIfUserInvited
       ? checkIfUserInvited(item)
@@ -115,9 +122,9 @@ const toListItem = (
       disableDisabledUsers && status === EmployeeStatus.Terminated;
 
     const disabledText = isInvited
-      ? (disabledInvitedText ?? getCommonTranslation("Invited"))
+      ? (disabledInvitedText ?? t("Invited"))
       : isDisabled
-        ? getCommonTranslation("Disabled")
+        ? t("Disabled")
         : "";
 
     const avatarRole = getUserAvatarRoleByType(role);
@@ -155,9 +162,7 @@ const toListItem = (
 
   const isInvited =
     (id && disableInvitedUsers?.includes(id)) || (isRoom && shared);
-  const disabledText = isInvited
-    ? (disabledInvitedText ?? getCommonTranslation("Invited"))
-    : "";
+  const disabledText = isInvited ? (disabledInvitedText ?? t("Invited")) : "";
 
   return {
     id,
@@ -242,7 +247,8 @@ const PeopleSelector = ({
   disabledInvitedText,
   isAgent,
 }: PeopleSelectorProps) => {
-  const { peopleSearchApi, groupSearchApi } = useApi();
+  const t = useCommonTranslation();
+  const { peopleSearchApi, groupSearchApi, baseUrl } = useApi();
   const { isBase } = useTheme();
 
   const [activeTabId, setActiveTabId] = useState<string>(
@@ -373,7 +379,8 @@ const PeopleSelector = ({
           items = res.data.response ?? [];
           responseTotal = res.data.count ?? 0;
         } else if (isGroupsTab) {
-          const id = Number(roomId);
+          // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
+          const id = roomId as number;
           const fetcher =
             targetEntityType === "file"
               ? groupSearchApi.getGroupsWithFilesShared.bind(groupSearchApi)
@@ -395,7 +402,8 @@ const PeopleSelector = ({
           }));
           responseTotal = res.data.count ?? 0;
         } else {
-          const id = Number(roomId);
+          // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
+          const id = roomId as number;
           const fetcher =
             targetEntityType === "file"
               ? peopleSearchApi.getUsersWithFilesShared.bind(peopleSearchApi)
@@ -441,6 +449,8 @@ const PeopleSelector = ({
           .map((item) =>
             toListItem(
               item,
+              baseUrl,
+              t,
               disableDisabledUsers,
               disableInvitedUsers,
               !!roomId,
@@ -510,6 +520,7 @@ const PeopleSelector = ({
       peopleSearchApi,
       groupSearchApi,
       disabledInvitedText,
+      t,
     ],
   );
 
@@ -562,8 +573,7 @@ const PeopleSelector = ({
         withHeader,
         headerProps: {
           ...headerProps,
-          headerLabel:
-            headerProps.headerLabel || getCommonTranslation("Contacts"),
+          headerLabel: headerProps.headerLabel || t("Contacts"),
         },
       }
     : ({} as TSelectorHeader);
@@ -571,15 +581,14 @@ const PeopleSelector = ({
   const cancelButtonSelectorProps: TSelectorCancelButton = withCancelButton
     ? {
         withCancelButton,
-        cancelButtonLabel:
-          cancelButtonLabel || getCommonTranslation("CancelButton"),
+        cancelButtonLabel: cancelButtonLabel || t("CancelButton"),
         onCancel,
       }
     : ({} as TSelectorCancelButton);
 
   const searchSelectorProps: TSelectorSearch = {
     withSearch: true,
-    searchPlaceholder: getCommonTranslation("Search"),
+    searchPlaceholder: t("Search"),
     searchValue,
     onSearch,
     onClearSearch,
@@ -635,11 +644,11 @@ const PeopleSelector = ({
             aria-label={label}
             dir="auto"
           >
-            {label}
+            {Encoder.htmlDecode(label ?? "")}
           </Text>
           {!isGroup && String(id) === currentUserId ? (
             <Text className={styles.isMeLabel} fontWeight={600} fontSize="14px">
-              ({getCommonTranslation("MeLabel")})
+              ({t("MeLabel")})
             </Text>
           ) : null}
           {status === EmployeeStatus.Pending ? <StyledSendClockIcon /> : null}
@@ -680,14 +689,14 @@ const PeopleSelector = ({
           tabsData: [
             {
               id: PEOPLE_TAB_ID,
-              name: getCommonTranslation("Members"),
+              name: t("Members"),
               onClick: () => changeActiveTab(PEOPLE_TAB_ID),
               content: null,
             },
             ...[
               withGroups && {
                 id: GROUP_TAB_ID,
-                name: getCommonTranslation("Groups"),
+                name: t("Groups"),
                 onClick: () => changeActiveTab(GROUP_TAB_ID),
                 content: null,
               },
@@ -695,7 +704,7 @@ const PeopleSelector = ({
             ...[
               withGuests && {
                 id: GUESTS_TAB_ID,
-                name: getCommonTranslation("Guests"),
+                name: t("Guests"),
                 onClick: () => changeActiveTab(GUESTS_TAB_ID),
                 content: null,
               },
@@ -743,9 +752,7 @@ const PeopleSelector = ({
       data-selector-type={dataSelectorType || "people"}
       dataTestId={dataTestId || "people-selector"}
       items={itemsList}
-      submitButtonLabel={
-        submitButtonLabel || getCommonTranslation("SelectAction")
-      }
+      submitButtonLabel={submitButtonLabel || t("SelectAction")}
       onSubmit={onSubmit}
       disableSubmitButton={disableSubmitButton || !selectedItems.length}
       selectedItem={isMultiSelect ? null : selectedItems[0]}
@@ -754,37 +761,37 @@ const PeopleSelector = ({
       emptyScreenHeader={
         emptyScreenHeader ??
         (activeTabId === GUESTS_TAB_ID
-          ? getCommonTranslation("NotFoundGuests")
+          ? t("NotFoundGuests")
           : activeTabId === PEOPLE_TAB_ID
-            ? getCommonTranslation("EmptyHeader")
-            : getCommonTranslation("NotFoundGroups"))
+            ? t("EmptyHeader")
+            : t("NotFoundGroups"))
       }
       emptyScreenDescription={
         emptyScreenDescription ??
         (activeTabId === GUESTS_TAB_ID
           ? isAgent
-            ? getCommonTranslation("NotFoundGuestsDescriptionAgent")
-            : getCommonTranslation("NotFoundGuestsDescription")
+            ? t("NotFoundGuestsDescriptionAgent")
+            : t("NotFoundGuestsDescription")
           : activeTabId === PEOPLE_TAB_ID
-            ? getCommonTranslation("EmptyDescription", {
-                productName: getCommonTranslation("ProductName"),
+            ? t("EmptyDescription", {
+                productName: t("ProductName"),
               })
-            : getCommonTranslation("GroupsNotFoundDescription"))
+            : t("GroupsNotFoundDescription"))
       }
       searchEmptyScreenImage={emptyScreenImage}
       searchEmptyScreenHeader={
         activeTabId === GUESTS_TAB_ID
-          ? getCommonTranslation("NotFoundGuestsFilter")
+          ? t("NotFoundGuestsFilter")
           : activeTabId === PEOPLE_TAB_ID
-            ? getCommonTranslation("NotFoundMembers")
-            : getCommonTranslation("NotFoundGroups")
+            ? t("NotFoundMembers")
+            : t("NotFoundGroups")
       }
       searchEmptyScreenDescription={
         activeTabId === GUESTS_TAB_ID
-          ? getCommonTranslation("NotFoundFilterGuestsDescription")
+          ? t("NotFoundFilterGuestsDescription")
           : activeTabId === PEOPLE_TAB_ID
-            ? getCommonTranslation("NotFoundUsersDescription")
-            : getCommonTranslation("GroupsNotFoundDescription")
+            ? t("NotFoundUsersDescription")
+            : t("GroupsNotFoundDescription")
       }
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}

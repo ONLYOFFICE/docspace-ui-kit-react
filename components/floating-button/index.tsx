@@ -43,7 +43,7 @@ import DownloadIcon from "../../assets/icons/24/download.react.svg";
 import DuplicateIcon from "../../assets/icons/24/duplicate.react.svg";
 import MarkAsReadIcon from "../../assets/icons/24/mark-as-read.react.svg";
 import MoveIcon from "../../assets/icons/24/move.react.svg";
-import FileIcon from "../../assets/icons/24/file.react.svg";
+import FileIcon from "../../assets/icons/24/file.svg";
 import BackupIcon from "../../assets/icons/24/backup.react.svg";
 
 import classNames from "classnames";
@@ -100,8 +100,8 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
     ref,
   ) => {
     const iconComponent = useMemo(() => {
-        if (iconUrl) {
-        return <img width={20} src={iconUrl} alt="icon"/>;
+      if (iconUrl) {
+        return <img width={20} src={iconUrl} alt="icon" />;
       }
       return (
         ICON_COMPONENTS[icon] ?? ICON_COMPONENTS[FloatingButtonIcons.other]

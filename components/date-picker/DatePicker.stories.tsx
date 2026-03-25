@@ -24,141 +24,276 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState } from "react";
-import type { Meta, StoryFn } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+import { useState } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { DateTime } from "luxon";
 
-import { DatePicker } from "./index";
-import type { DatePickerProps } from "./DatePicker.types";
 import {
-  now,
-  addToDate,
-  startOf,
-  createDateTime,
-  parseToDateTime,
-  formatDate,
+	addToDate,
+	createDateTime,
+	now,
+	parseToDateTime,
+	startOf,
 } from "../../utils/date";
 
-export default {
-  title: "Components/UI/DatePicker",
-  component: DatePicker,
-  parameters: {
-    docs: {
-      description: {
-        component:
-          "A customizable date picker component that allows users to select dates with various configuration options.",
-      },
-    },
-  },
-  argTypes: {
-    initialDate: {
-      control: "date",
-      description: "Initial selected date value in the picker",
-    },
-    maxDate: {
-      control: "date",
-      description: "Maximum selectable date",
-    },
-    minDate: {
-      control: "date",
-      description: "Minimum selectable date",
-    },
-    openDate: {
-      control: "date",
-      description: "Date to display when the calendar initially opens",
-    },
-    locale: {
-      control: "text",
-      description:
-        "Locale for date formatting and calendar display (e.g., 'en', 'ru')",
-    },
-    selectDateText: {
-      control: "text",
-      description: "Placeholder text shown when no date is selected",
-    },
-    onChange: {
-      action: "onChange",
-      description:
-        "Callback function called when the selected date changes. Receives a Moment object or null",
-    },
-    showCalendarIcon: {
-      control: "boolean",
-      description: "Whether to show the calendar icon in the input field",
-    },
-    className: {
-      control: "text",
-      description: "Additional CSS class for the date picker container",
-    },
-  },
-} as Meta;
+import { DatePicker } from ".";
 
-const Wrapper = ({ children }: { children: React.ReactNode }) => {
-  return <div style={{ height: "280px", padding: "20px" }}>{children}</div>;
+const meta = {
+	title: "UI/Form controls/DatePicker",
+	component: DatePicker,
+	parameters: {
+		docs: {
+			description: {
+				component: `Date picker component that allows users to select dates from a calendar popup with configurable date ranges and locale support.
+
+### Features
+
+- **Calendar Popup**: Visual calendar for date selection
+- **Date Ranges**: Configurable minimum and maximum selectable dates
+- **Locale Support**: Calendar formatting based on locale
+- **Calendar Icon**: Optional calendar icon in the selected date chip
+- **Selected Date Chip**: Displays the chosen date as a removable chip
+- **Auto-Positioning**: Automatically adjusts calendar position based on available space
+
+### Usage
+
+\`\`\`tsx
+import { DatePicker } from "@docspace/ui-kit/components/date-picker";
+
+<DatePicker
+  locale="en"
+  openDate={now()}
+  onChange={(date) => console.log(date)}
+  selectDateText="Select date"
+/>
+
+// With date constraints
+<DatePicker
+  locale="en"
+  openDate={now()}
+  minDate={now()}
+  maxDate={addToDate(now(), 1, "years")}
+  onChange={handleDateChange}
+/>
+\`\`\``,
+			},
+		},
+	},
+	argTypes: {
+		locale: {
+			control: "text",
+			description: "Locale for date formatting (e.g., 'en', 'ru')",
+		},
+		selectDateText: {
+			control: "text",
+			description: "Placeholder text when no date is selected",
+		},
+		showCalendarIcon: {
+			control: "boolean",
+			description: "Show calendar icon in the selected date chip",
+			table: {
+				defaultValue: { summary: "true" },
+			},
+		},
+		hideCross: {
+			control: "boolean",
+			description: "Hide the close/remove button on the selected date chip",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+		autoPosition: {
+			control: "boolean",
+			description:
+				"Auto-position the calendar based on available viewport space",
+			table: {
+				defaultValue: { summary: "false" },
+			},
+		},
+	},
+} satisfies Meta<typeof DatePicker>;
+
+type Story = StoryObj<ComponentProps<typeof DatePicker>>;
+
+export default meta;
+
+const DatePickerWrapper = (props: { children: React.ReactNode }) => {
+	return (
+		<div style={{ height: "350px", padding: "20px" }}>{props.children}</div>
+	);
 };
 
-const Template: StoryFn<typeof DatePicker> = ({
-  initialDate,
-  ...rest
-}: DatePickerProps) => {
-  const [selectedDate, setSelectedDate] = useState<DateTime | null>(
-    initialDate ? parseToDateTime(initialDate) : null,
-  );
+const ControlledDatePicker = (
+	props: Omit<ComponentProps<typeof DatePicker>, "onChange"> & {
+		onChange?: (d: null | DateTime) => void;
+	},
+) => {
+	const { initialDate, onChange, ...rest } = props;
+	const [selectedDate, setSelectedDate] = useState<DateTime | null>(
+		initialDate ? parseToDateTime(initialDate) : null,
+	);
 
-  return (
-    <Wrapper>
-      <DatePicker
-        {...rest}
-        initialDate={initialDate}
-        onChange={(date) => {
-          rest.onChange?.(date);
-          setSelectedDate(date);
-        }}
-        outerDate={selectedDate}
-      />
-    </Wrapper>
-  );
+	return (
+		<DatePickerWrapper>
+			<DatePicker
+				{...rest}
+				initialDate={initialDate}
+				onChange={(date) => {
+					setSelectedDate(date);
+					onChange?.(date);
+				}}
+				outerDate={selectedDate}
+			/>
+		</DatePickerWrapper>
+	);
 };
 
-export const Default = Template.bind({});
-Default.args = {
-  maxDate: startOf(addToDate(now(), 10, "years")!, "year")!,
-  minDate: createDateTime(1970, 1, 1),
-  openDate: now(),
-  locale: "en",
-  selectDateText: "Select date",
-  onChange: (date) =>
-    console.log(
-      "Selected date:",
-      date ? formatDate(date, "dd MMM yyyy") : "No date",
-    ),
+export const Default: Story = {
+	render: (args) => <ControlledDatePicker {...args} />,
+	args: {
+		locale: "en",
+		openDate: now(),
+		maxDate: startOf(
+			addToDate(now(), 10, "years") as DateTime,
+			"year",
+		) as DateTime,
+		minDate: createDateTime(1970, 1, 1),
+		selectDateText: "Select date",
+		showCalendarIcon: true,
+	},
 };
 
-export const WithInitialDate = Template.bind({});
-WithInitialDate.args = {
-  ...Default.args,
-  initialDate: now(),
-  selectDateText: "Date with initial value",
+const WithInitialDateTemplate = () => {
+	return (
+		<ControlledDatePicker
+			locale="en"
+			openDate={now()}
+			initialDate={now()}
+			maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
+			minDate={createDateTime(1970, 1, 1)}
+			selectDateText="Date with initial value"
+		/>
+	);
 };
 
-export const WithCustomOpenDate = Template.bind({});
-WithCustomOpenDate.args = {
-  ...Default.args,
-  openDate: addToDate(now(), 1, "months")!,
-  selectDateText: "Date with custom open date",
+export const WithInitialDate: Story = {
+	render: () => <WithInitialDateTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"DatePicker initialized with the current date. The selected date appears as a chip that can be removed.",
+			},
+			source: {
+				code: `<DatePicker
+  locale="en"
+  openDate={now()}
+  initialDate={now()}
+  selectDateText="Date with initial value"
+/>`,
+			},
+		},
+	},
 };
 
-export const WithFutureOnlyDates = Template.bind({});
-WithFutureOnlyDates.args = {
-  ...Default.args,
-  minDate: startOf(now(), "day")!,
-  selectDateText: "Only future dates available",
+const FutureDatesOnlyTemplate = () => {
+	return (
+		<ControlledDatePicker
+			locale="en"
+			openDate={now()}
+			minDate={startOf(now(), "day") as DateTime}
+			maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
+			selectDateText="Only future dates"
+		/>
+	);
 };
 
-export const WithSpecificYear = Template.bind({});
-WithSpecificYear.args = {
-  ...Default.args,
-  minDate: createDateTime(2023, 1, 1),
-  maxDate: createDateTime(2023, 12, 31),
-  openDate: createDateTime(2023, 6, 15),
-  selectDateText: "Only dates from 2023",
+export const FutureDatesOnly: Story = {
+	render: () => <FutureDatesOnlyTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Restricts selection to future dates only by setting minDate to today. Past dates appear disabled in the calendar.",
+			},
+			source: {
+				code: `<DatePicker
+  locale="en"
+  openDate={now()}
+  minDate={startOf(now(), "day")}
+  selectDateText="Only future dates"
+/>`,
+			},
+		},
+	},
+};
+
+const SpecificYearTemplate = () => {
+	return (
+		<ControlledDatePicker
+			locale="en"
+			openDate={createDateTime(2023, 6, 15)}
+			minDate={createDateTime(2023, 1, 1)}
+			maxDate={createDateTime(2023, 12, 31)}
+			selectDateText="Only dates from 2023"
+		/>
+	);
+};
+
+export const SpecificYearRange: Story = {
+	render: () => <SpecificYearTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"Constrains the calendar to a specific year (2023). Only dates within January 1 - December 31, 2023 are selectable.",
+			},
+			source: {
+				code: `<DatePicker
+  locale="en"
+  openDate={createDateTime(2023, 6, 15)}
+  minDate={createDateTime(2023, 1, 1)}
+  maxDate={createDateTime(2023, 12, 31)}
+  selectDateText="Only dates from 2023"
+/>`,
+			},
+		},
+	},
+};
+
+const WithoutCalendarIconTemplate = () => {
+	return (
+		<ControlledDatePicker
+			locale="en"
+			openDate={now()}
+			initialDate={now()}
+			maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
+			minDate={createDateTime(1970, 1, 1)}
+			selectDateText="No calendar icon"
+			showCalendarIcon={false}
+		/>
+	);
+};
+
+export const WithoutCalendarIcon: Story = {
+	render: () => <WithoutCalendarIconTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"The calendar icon in the selected date chip can be hidden with showCalendarIcon={false}.",
+			},
+			source: {
+				code: `<DatePicker
+  locale="en"
+  openDate={now()}
+  initialDate={now()}
+  showCalendarIcon={false}
+  selectDateText="No calendar icon"
+/>`,
+			},
+		},
+	},
 };

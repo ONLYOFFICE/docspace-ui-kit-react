@@ -126,6 +126,7 @@
   align-items: center;
   gap: 16px;
   height: 32px;
+  min-width: 0;
 
   &[data-show-title="true"] {
     margin-inline-start: 16px;
@@ -304,6 +305,12 @@
   }
 }
 
+.warningIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 .warningText {
   @include mixins.no-user-select;
 
@@ -311,8 +318,11 @@
   height: 32px;
   padding: 8px 12px;
   border-radius: 6px;
-  display: grid;
-  justify-content: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
   background: var(--section-header-trash-erasure-label-background);
 
   @include mixins.tablet-and-below {
@@ -330,6 +340,10 @@
       @include mixins.truncate;
     }
   }
+}
+
+.warningTextWithIcon {
+  height: 40px;
 }
 
 .tariffWrapper {

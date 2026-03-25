@@ -35,7 +35,7 @@ import { FilterGroups } from "../../../enums";
 import { Button, ButtonSize } from "../../button";
 import { ModalDialog, ModalDialogType } from "../../modal-dialog";
 import { IconButton } from "../../icon-button";
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils/i18n";
 import styles from "../Filter.module.scss";
 import { FilterBlockProps, TGroupItem, TItem } from "../Filter.types";
 import {
@@ -62,6 +62,7 @@ const FilterBlock = ({
   disableThirdParty,
   renderSelector,
 }: FilterBlockProps) => {
+  const t = useCommonTranslation();
   const [showSelector, setShowSelector] = React.useState<{
     show: boolean;
     type: string | null;
@@ -549,7 +550,7 @@ const FilterBlock = ({
           id="filter_apply-button"
           size={ButtonSize.normal}
           primary
-          label={getCommonTranslation("ApplyButton") ?? ""}
+          label={t("ApplyButton") ?? ""}
           scale
           onClick={onFilterAction}
           isDisabled={!showFooter}
@@ -558,7 +559,7 @@ const FilterBlock = ({
         <Button
           id="filter_cancel-button"
           size={ButtonSize.normal}
-          label={getCommonTranslation("CancelButton") ?? ""}
+          label={t("CancelButton") ?? ""}
           scale
           onClick={hideFilterBlock}
           isDisabled={isLoading}

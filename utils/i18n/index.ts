@@ -40,9 +40,15 @@ export const getCookie = (name: string): string | undefined => {
   return matches ? decodeURIComponent(matches[1]) : undefined;
 };
 
-type WindowI18n = {
+export type WindowI18n = {
   t?: (key: string, options?: Record<string, string | number>) => string;
   loaded?: Record<string, { data: Record<string, string> }>;
+  instance?: {
+    on: (event: string, callback: (...args: unknown[]) => void) => void;
+    off: (event: string, callback: (...args: unknown[]) => void) => void;
+    language?: string;
+    resolvedLanguage?: string;
+  };
 };
 
 const getWindowI18n = (): WindowI18n | undefined => {
@@ -50,11 +56,27 @@ const getWindowI18n = (): WindowI18n | undefined => {
   return (window as unknown as { i18n?: WindowI18n }).i18n;
 };
 
+const normalizeCommonLanguage = (language?: string): string => {
+  return language === "en-US" || language === "en-GB"
+    ? "en"
+    : (language ?? "en");
+};
+
+export const getCurrentCommonLanguage = (): string => {
+  const i18n = getWindowI18n();
+  const language =
+    i18n?.instance?.resolvedLanguage ??
+    i18n?.instance?.language ??
+    getCookie("asc_language");
+
+  return normalizeCommonLanguage(language);
+};
+
 /**
  * Gets a translation from window.i18n.
  * Uses i18next t function if available (set by TranslationProvider),
  * otherwise falls back to manual lookup from window.i18n.loaded.
- * Throws if the key is not found.
+ * Logs a console error and returns an empty string if the key is not found.
  */
 export const getCommonTranslation = (
   key: string,
@@ -70,11 +92,7 @@ export const getCommonTranslation = (
   }
 
   if (i18n?.loaded) {
-    const cookieLang = getCookie("asc_language");
-    const lang =
-      cookieLang === "en-US" || cookieLang === "en-GB"
-        ? "en"
-        : (cookieLang ?? "en");
+    const lang = getCurrentCommonLanguage();
 
     const commonKeys = Object.getOwnPropertyNames(i18n.loaded).filter(
       (k) => k.indexOf(`${lang}/Common.json`) > -1,
@@ -106,6 +124,8 @@ export const getCommonTranslation = (
   return "";
 };
 
+export { useCommonTranslation } from "./useCommonTranslation";
+
 /**
  * Checks if translations are loaded and ready to use
  */
@@ -122,3 +142,5 @@ export const getTranslationReady = () => {
 
   return i18n?.loaded;
 };
+
+

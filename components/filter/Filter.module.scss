@@ -792,7 +792,7 @@
       flex: 1;
       min-width: 0;
 
-      [data-testid="selected-item"] {
+      .group-tag-item {
         padding: 7px 12px;
         border-radius: 6px;
         margin: 0;
@@ -963,6 +963,7 @@
   }
 
   display: inline-block;
+  flex-shrink: 0;
   background: var(--room-group-tag-background);
   border: none;
   box-sizing: border-box;

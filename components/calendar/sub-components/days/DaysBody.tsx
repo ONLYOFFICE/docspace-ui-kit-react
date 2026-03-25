@@ -39,6 +39,7 @@ export const DaysBody = ({
   minDate,
   maxDate,
   isScroll,
+  locale,
 }: DaysBodyProps) => {
   const daysElements = getDayElements(
     observedDate,
@@ -47,7 +48,7 @@ export const DaysBody = ({
     minDate,
     maxDate,
   );
-  const weekdayElements = getWeekdayElements();
+  const weekdayElements = getWeekdayElements(locale);
 
   return (
     <div

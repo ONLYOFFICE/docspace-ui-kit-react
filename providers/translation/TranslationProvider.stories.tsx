@@ -12,7 +12,8 @@ const translations: TTranslations = new Map([
 ]);
 
 const meta: Meta<typeof TranslationProvider> = {
-  title: "Providers/TranslationProvider",
+  title: "Components/Providers/TranslationProvider",
+  tags: ["!autodocs"],
   component: TranslationProvider,
   decorators: [
     (Story) => (

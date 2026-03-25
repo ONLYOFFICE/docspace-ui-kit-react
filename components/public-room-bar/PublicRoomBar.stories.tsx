@@ -24,113 +24,174 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { Meta, StoryFn } from "@storybook/react-vite";
+import type { ComponentProps } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import PlanetIcon from "../../assets/icons/12/planet.react.svg?url";
 
 import PublicRoomBar from "./index";
-import type { PublicRoomBarProps } from "./PublicRoomBar.types";
 
-export default {
-  title: "Components/UI/PublicRoomBar",
+const meta = {
+  title: "UI/Feedback/PublicRoomBar",
   component: PublicRoomBar,
   parameters: {
     docs: {
       description: {
-        component: `
-A notification bar component for displaying information about public rooms.
+        component: `PublicRoomBar displays a notification bar for public room status with header, body text, and optional close action.
 
-## Features
-- Customizable header and body text
-- Optional custom icon support
-- Close button with callback
-- Visibility control
-- Support for custom React components
-- Responsive design
-`,
+### Features
+
+- **Header & Body Text**: Supports both strings and React nodes for flexible content
+- **Custom Icon**: Optional icon display alongside the header
+- **Close Button**: Optional dismiss action with callback
+- **Visibility Control**: Toggle bar visibility programmatically
+
+### Usage
+
+\`\`\`tsx
+import PublicRoomBar from "@docspace/ui-kit/components/public-room-bar";
+
+<PublicRoomBar
+  headerText="Public Room"
+  bodyText="This room is accessible to anyone with the link"
+  onClose={handleClose}
+/>
+
+// With custom icon
+<PublicRoomBar
+  headerText="Public Room"
+  bodyText="Accessible via link"
+  iconName={PlanetIcon}
+/>
+\`\`\``,
       },
     },
   },
   argTypes: {
     headerText: {
       control: "text",
-      description: "Header text or component to be displayed",
+      description: "Header text or React node",
     },
     bodyText: {
       control: "text",
-      description: "Body text or component to be displayed",
+      description: "Body text or React node",
     },
     iconName: {
       control: "text",
-      description: "Custom icon path (optional)",
+      description: "Custom icon path or React element",
     },
     barIsVisible: {
       control: "boolean",
       description: "Controls the visibility of the bar",
-    },
-    onClose: {
-      action: "clicked",
-      description: "Callback function when close button is clicked",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
-} as Meta;
+} satisfies Meta<typeof PublicRoomBar>;
 
-const Template: StoryFn<PublicRoomBarProps> = (args) => (
-  <PublicRoomBar {...args} />
+type Story = StoryObj<ComponentProps<typeof PublicRoomBar>>;
+
+export default meta;
+
+export const Default: Story = {
+  render: (args) => <PublicRoomBar {...args} />,
+  args: {
+    headerText: "Public Room",
+    bodyText: "This room is accessible to anyone with the link",
+    barIsVisible: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Default public room bar with header and body text. Shows basic room access information.",
+      },
+      source: {
+        code: `<PublicRoomBar
+  headerText="Public Room"
+  bodyText="This room is accessible to anyone with the link"
+/>`,
+      },
+    },
+  },
+};
+
+export const WithCustomIcon: Story = {
+  render: (args) => <PublicRoomBar {...args} />,
+  args: {
+    headerText: "Public Room",
+    bodyText: "This room is accessible to anyone with the link",
+    barIsVisible: false,
+    iconName: PlanetIcon,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Public room bar with a custom planet icon indicating global/public access.",
+      },
+      source: {
+        code: `<PublicRoomBar
+  headerText="Public Room"
+  bodyText="Accessible via link"
+  iconName={PlanetIcon}
+/>`,
+      },
+    },
+  },
+};
+
+export const WithoutCloseButton: Story = {
+  render: (args) => <PublicRoomBar {...args} />,
+  args: {
+    headerText: "Public Room",
+    bodyText: "This room is accessible to anyone with the link",
+    barIsVisible: false,
+    onClose: undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Persistent bar without a close button. Cannot be dismissed by the user.",
+      },
+      source: {
+        code: `<PublicRoomBar
+  headerText="Public Room"
+  bodyText="Persistent notification"
+/>`,
+      },
+    },
+  },
+};
+
+const WithCustomComponentsTemplate = () => (
+  <PublicRoomBar
+    headerText={
+      <div style={{ color: "var(--accent-main)" }}>Custom Header Component</div>
+    }
+    bodyText={<div style={{ fontStyle: "italic" }}>Custom Body Component</div>}
+    barIsVisible
+  />
 );
 
-export const Default = Template.bind({});
-Default.args = {
-  headerText: "Public Room",
-  bodyText: "This room is accessible to anyone with the link",
-  barIsVisible: false,
-};
-Default.parameters = {
-  docs: {
-    description: {
-      story: "Basic configuration showing header, body text, and visibility control.",
-    },
-  },
-};
-
-export const WithCustomIcon = Template.bind({});
-WithCustomIcon.args = {
-  ...Default.args,
-  iconName: PlanetIcon,
-};
-WithCustomIcon.parameters = {
-  docs: {
-    description: {
-      story: "Shows the bar with a custom planet icon. Useful for indicating public or global access.",
-    },
-  },
-};
-
-export const WithoutCloseButton = Template.bind({});
-WithoutCloseButton.args = {
-  ...Default.args,
-  onClose: undefined,
-};
-WithoutCloseButton.parameters = {
-  docs: {
-    description: {
-      story: "Bar without a close button. The bar cannot be dismissed by the user and serves as a persistent notification.",
-    },
-  },
-};
-
-export const WithCustomComponents = Template.bind({});
-WithCustomComponents.args = {
-  headerText: (
-    <div style={{ color: "var(--accent-main)" }}>Custom Header Component</div>
-  ),
-  bodyText: <div style={{ fontStyle: "italic" }}>Custom Body Component</div>,
-  barIsVisible: true,
-};
-WithCustomComponents.parameters = {
-  docs: {
-    description: {
-      story: "Demonstrates passing React components for header and body text instead of plain strings. This allows for more complex layouts and styling.",
+export const WithCustomComponents: Story = {
+  render: () => <WithCustomComponentsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Bar with React components for header and body instead of plain strings, allowing custom styling and layout.",
+      },
+      source: {
+        code: `<PublicRoomBar
+  headerText={<div style={{ color: "var(--accent-main)" }}>Custom Header</div>}
+  bodyText={<div style={{ fontStyle: "italic" }}>Custom Body</div>}
+  barIsVisible
+/>`,
+      },
     },
   },
 };

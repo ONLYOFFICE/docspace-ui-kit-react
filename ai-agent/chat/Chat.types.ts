@@ -1,0 +1,334 @@
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+import type React from "react";
+
+import type {
+  TAIConfig,
+  TContent,
+  TMessage,
+  TToolCallContent,
+  TMultimodal,
+} from "../../types/ai";
+
+import type { TFile, TGetIcon } from "../../types";
+
+import type useToolsSettings from "./hooks/useToolsSettings";
+import type useInitChats from "./hooks/useInitChats";
+import type useInitMessages from "./hooks/useInitMessages";
+
+export type TChatSample = {
+  title: string;
+  prompt: string;
+};
+
+export type TChatPlaylistImage = {
+  fileId: number;
+  title: string;
+  src: string;
+};
+
+export type TGenerateDocStoreProps = {
+  agentId: string | number;
+  children: React.ReactNode;
+};
+
+export type TChatStoreProps = {
+  agentId: string | number;
+  children: React.ReactNode;
+} & ReturnType<typeof useInitChats>;
+
+export type TMessageStoreProps = {
+  agentId: string | number;
+  children: React.ReactNode;
+  multimodal?: TMultimodal;
+  knowledgeSearchToolName?: string;
+  webSearchToolName?: string;
+  webCrawlingToolName?: string;
+  generateDocxToolName?: string;
+  generateFormToolName?: string;
+  generatePresentationToolName?: string;
+  onStreamData?: (chunk: string) => void;
+} & Omit<ReturnType<typeof useInitMessages>, "initMessages">;
+
+export type SelectModelProps = {
+  selectedModel?: string;
+  isLoading?: boolean;
+  modelAliases?: TAIConfig["modelAliases"];
+};
+
+export type SelectChatProps = {
+  isLoadingProp?: boolean;
+  agentId: string | number;
+  getIcon: TGetIcon;
+  getResultStorageId?: () => number | null;
+  openFile?: (fileId: string) => void;
+  onSelectChat?: (chatId: string) => void;
+};
+
+export type RenameChatProps = {
+  chatId: string;
+  prevTitle: string;
+  onRenameToggle: VoidFunction;
+};
+
+export type DeleteChatProps = {
+  chatId: string;
+  chatTitle: string;
+  onDeleteToggle: VoidFunction;
+};
+
+export type ChatHeaderProps = SelectModelProps &
+  Omit<SelectChatProps, "isLoadingProp"> & {
+    aiReady: boolean;
+    allowSelectChat?: boolean;
+    onNewChat?: () => void;
+    onSelectChat?: (chatId: string) => void;
+  };
+
+export type MessageProps = {
+  message: TMessage;
+  idx: number;
+  userAvatar?: string;
+  isLast: boolean;
+  hideAttachments?: boolean;
+  getIcon: TGetIcon;
+  getResultStorageId?: () => number | null;
+  openFile?: (fileId: string) => void;
+  openLink?: (url: string) => void;
+} & Pick<MessageImagesProps, "setAiPlaylistImages" | "setMediaViewerVisible">;
+
+export type MessageButtonsProps = {
+  text: string;
+  chatName?: string;
+  messageId?: number;
+  isLast: boolean;
+  getIcon: TGetIcon;
+  messageIndex: number;
+  getResultStorageId?: () => number | null;
+  openFile?: (fileId: string) => void;
+};
+
+export type MessageCodeBlockProps = {
+  language?: string;
+  content: string;
+  successCopyMessage?: string;
+};
+
+export type MessageErrorProps = {
+  content: TContent;
+};
+
+export type MessageFilesProps = {
+  files: TContent[];
+  getIcon: TGetIcon;
+  reverse?: boolean;
+  openFile?: (fileId: string) => void;
+};
+
+export type MessageImagesProps = {
+  images: TContent[];
+  setAiPlaylistImages?: (value: TChatPlaylistImage[]) => void;
+  setMediaViewerVisible?: (value: boolean) => void;
+};
+
+export type MessageMarkdownFieldProps = {
+  chatMessage: string;
+  propLanguage?: string;
+  isFirst?: boolean;
+  successCopyMessage?: string;
+  openLink?: (url: string) => void;
+  openFile?: (fileId: string) => void;
+};
+
+export type MessageToolCallProps = {
+  content: TToolCallContent;
+  openLink?: (url: string) => void;
+  openFile?: (fileId: string) => void;
+};
+
+export type MessageEmptyProps = {
+  isLoading?: boolean;
+  emptyScreenText?: string;
+};
+
+export type MessageBodyProps = {
+  isLoading?: boolean;
+  hideAttachments?: boolean;
+  emptyScreenText?: string;
+
+  getIcon: TGetIcon;
+  getResultStorageId?: () => number | null;
+  openFile?: (fileId: string) => void;
+  openLink?: (url: string) => void;
+} & Pick<MessageProps, "setAiPlaylistImages" | "setMediaViewerVisible" | "userAvatar">;
+
+export type FilesListProps = {
+  files: Partial<TFile>[];
+  isFixed?: boolean;
+  multimodal?: TMultimodal;
+  getIcon: TGetIcon;
+  onRemove?: (file: Partial<TFile>) => void;
+};
+
+export type ButtonsProps = {
+  isFilesSelectorVisible: boolean;
+
+  toggleFilesSelector: VoidFunction;
+  sendMessageAction: () => Promise<void>;
+
+  value: string;
+  selectedModel: string;
+
+  toolsSettings: ReturnType<typeof useToolsSettings>;
+  isAdmin?: boolean;
+  aiReady: boolean;
+  goToWebSearchSettings?: () => void;
+  openFile?: (fileId: string) => void;
+  allowAttachFiles?: boolean;
+  allowManageTools?: boolean;
+  onStopStream?: () => void;
+};
+
+export type AttachmentProps = {
+  isVisible: boolean;
+  toggleAttachment: VoidFunction;
+  getIcon: TGetIcon;
+  setSelectedFiles: (files: Partial<TFile>[]) => void;
+  multimodal?: TMultimodal;
+};
+
+export type ChatInputProps = {
+  getIcon: AttachmentProps["getIcon"];
+  isLoading?: boolean;
+
+  attachmentFile?: Partial<TFile> | null;
+  clearAttachmentFile?: VoidFunction;
+  hideAttachments?: boolean;
+  selectedModel: string;
+
+  toolsSettings: ReturnType<typeof useToolsSettings>;
+  isPortalAdmin: boolean;
+  aiReady: boolean;
+  multimodal?: TMultimodal;
+  goToWebSearchSettings?: () => void;
+  persistDraft?: boolean;
+  openFile?: (fileId: string) => void;
+  allowAttachFiles?: boolean;
+  allowManageTools?: boolean;
+  onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
+  onStopStream?: () => void;
+  withSamples?: boolean;
+  samples?: TChatSample[];
+};
+
+export type ChatInfoBlockProps = {
+  standalone: boolean;
+  isPortalAdmin: boolean;
+};
+
+export type ChatFooterProps = ChatInputProps & ChatInfoBlockProps;
+
+export type ChatContainerProps = {
+  children: React.ReactNode;
+  isLoadingChat?: boolean;
+  useExternalScroll?: boolean;
+  externalScrollRef?: React.RefObject<HTMLElement | null>;
+  width?: string;
+  height?: string;
+  style?: React.CSSProperties;
+  className?: string;
+};
+
+export type ChatProps = {
+  agentId: TChatStoreProps["agentId"];
+  userAvatar?: MessageBodyProps["userAvatar"];
+  selectedModel: string;
+  getIcon?: ChatInputProps["getIcon"];
+  getResultStorageId?: () => number | null;
+  isLoading?: boolean;
+  aiReady?: boolean;
+
+  attachmentFile: ChatInputProps["attachmentFile"];
+  clearAttachmentFile: ChatInputProps["clearAttachmentFile"];
+  hideAttachments?: ChatInputProps["hideAttachments"];
+
+  toolsSettings?: ChatInputProps["toolsSettings"];
+  initChats?: ReturnType<typeof useInitChats>;
+  messagesSettings?: Omit<ReturnType<typeof useInitMessages>, "initMessages">;
+  isAdmin?: boolean;
+  standalone?: boolean;
+
+  multimodal?: TMultimodal;
+  goToAISettings?: () => void;
+  goToWebSearchSettings?: () => void;
+
+  emptyScreenText?: string;
+  setAiPlaylistImages?: (value: TChatPlaylistImage[]) => void;
+  setMediaViewerVisible?: (value: boolean) => void;
+
+  useExternalScroll?: boolean;
+  externalScrollRef?: React.RefObject<HTMLElement | null>;
+  width?: string;
+  height?: string;
+  style?: React.CSSProperties;
+  className?: string;
+  persistDraft?: boolean;
+  internalInit?: boolean;
+  openFile?: (fileId: string) => void;
+  openLink?: (url: string) => void;
+  allowAttachFiles?: boolean;
+  allowManageTools?: boolean;
+  allowSelectChat?: boolean;
+  onSendMessage?: (message: string, files: Partial<TFile>[]) => void;
+  onStopStream?: () => void;
+  onStreamData?: (chunk: string) => void;
+  onNewChat?: () => void;
+  onSelectChat?: (chatId: string) => void;
+
+  modelAliases?: TAIConfig["modelAliases"];
+
+  withSamples?: boolean;
+  samples?: TChatSample[];
+};
+
+export type ChatCoreProps = ChatProps & {
+  getIcon: TGetIcon;
+  isLoadingChat: boolean;
+  initChats: NonNullable<ChatProps["initChats"]>;
+  messagesSettings: NonNullable<ChatProps["messagesSettings"]>;
+  toolsSettings: NonNullable<ChatProps["toolsSettings"]>;
+};
+
+export type ChatInternalInitProps = Omit<
+  ChatProps,
+  "initChats" | "messagesSettings" | "toolsSettings"
+>;
+
+export type ChatExternalInitProps = ChatProps & {
+  initChats: NonNullable<ChatProps["initChats"]>;
+  messagesSettings: NonNullable<ChatProps["messagesSettings"]>;
+  toolsSettings: NonNullable<ChatProps["toolsSettings"]>;
+};
