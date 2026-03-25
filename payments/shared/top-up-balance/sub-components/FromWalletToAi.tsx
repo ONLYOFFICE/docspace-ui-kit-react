@@ -43,12 +43,12 @@ interface IFromWalletToAi {
 const FromWalletToAi = (props: IFromWalletToAi) => {
   const { onTopUpBalance, onAmountDifferenceChange } = props;
 
-  const paymentStore = usePaymentStore();
+  const store = usePaymentStore();
   const servicesStore = useServicesStore();
 
-  const { walletBalance, formatWalletCurrency } = paymentStore;
+  const { walletBalance, formatWalletCurrency, logoText } = store;
   const { formatAiServiceCurrency } = servicesStore;
-  const { logoText, walletCustomerEmail } = paymentStore;
+  const { walletCustomerEmail } = store.tariff;
   const { t } = useTranslation(["Payments", "Services", "Common"]);
   const aiServiceBalanceValue = formatAiServiceCurrency!();
   const { amount, setIsBalanceInsufficient } = useAmountValue();

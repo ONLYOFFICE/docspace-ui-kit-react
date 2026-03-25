@@ -48,8 +48,9 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
   onClose,
 }) => {
   const paymentStore = usePaymentStore();
-  const { tariffPlanTitle, paymentDate, gracePeriodEndDate, delayDaysCount } =
-    paymentStore;
+  const { paymentDate, gracePeriodEndDate, delayDaysCount } =
+    paymentStore.tariff;
+  const { tariffPlanTitle } = paymentStore.paymentQuotas;
 
   const { t } = useTranslation(["Payments", "Common"]);
   const navigate = useNavigate();

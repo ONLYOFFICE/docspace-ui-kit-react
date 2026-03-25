@@ -43,8 +43,8 @@ const CardInfoComponent = ({
   scale,
   withoutMargin
 }: CardInfoComponentProps) => {
-  const paymentStore = usePaymentStore();
-  const { walletCustomerStatusNotActive } = paymentStore;
+  const store = usePaymentStore();
+  const { walletCustomerStatusNotActive } = store.tariff;
   const { t } = useTranslation(["Payments", "Common"]);
 
   return (

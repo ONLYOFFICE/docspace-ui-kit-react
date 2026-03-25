@@ -56,7 +56,7 @@ type WalletProps = {
 const Wallet = (props: WalletProps) => {
   const { isMobile, currentColorScheme } = props;
 
-  const paymentStore = usePaymentStore();
+  const store = usePaymentStore();
 
   const {
     walletBalance,
@@ -70,14 +70,14 @@ const Wallet = (props: WalletProps) => {
     cardLinked,
     isPayer,
     reccomendedAmount,
-  } = paymentStore;
+    walletHelpUrl,
+  } = store;
 
   const {
     isNotPaidPeriod,
     walletCustomerStatusNotActive,
     walletCustomerEmail: payerEmail,
-    walletHelpUrl,
-  } = paymentStore;
+  } = store.tariff;
 
   const { t } = useTranslation(["Payments", "Common"]);
 

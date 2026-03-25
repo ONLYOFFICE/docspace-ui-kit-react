@@ -75,7 +75,7 @@ const UpdatePlanButtonContainer = observer(({
   tariffPlanTitle,
   setPortalQuotaValue,
 }: UpdatePlanButtonContainerProps) => {
-  const paymentStore = usePaymentStore();
+  const store = usePaymentStore();
   const {
     setIsLoading,
     paymentLink,
@@ -89,12 +89,9 @@ const UpdatePlanButtonContainer = observer(({
     formatPaymentCurrency,
     canDowngradeTariff,
     cardLinked,
-  } = paymentStore;
-  const {
-    maxCountManagersByQuota,
-    isYearTariff,
-    walletCustomerStatusNotActive,
-  } = paymentStore;
+  } = store;
+  const { maxCountManagersByQuota, isYearTariff } = store.quotas;
+  const { walletCustomerStatusNotActive } = store.tariff;
   const [isVisiblePaymentConfirm, setIsVisiblePaymentConfirm] = useState(false);
   const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
     useState(false);

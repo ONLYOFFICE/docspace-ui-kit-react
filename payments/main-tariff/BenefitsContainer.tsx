@@ -116,8 +116,8 @@ const StyledBody = styled.div`
 `;
 
 const BenefitsContainer = observer(({ t }: any) => {
-  const paymentStore = usePaymentStore();
-  const { portalPaymentQuotasFeatures: features } = paymentStore;
+  const store = usePaymentStore();
+  const { portalPaymentQuotasFeatures: features } = store.paymentQuotas;
 
   const renderTooltip = () => {
     const onClickServiceUrl = () => {

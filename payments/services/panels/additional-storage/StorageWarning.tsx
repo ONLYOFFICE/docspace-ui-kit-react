@@ -53,7 +53,7 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
   style,
 }) => {
   const paymentStore = usePaymentStore();
-  const { currentStoragePlanSize } = paymentStore;
+  const { currentStoragePlanSize } = paymentStore.tariff;
 
   const { t } = useServicesActions();
 

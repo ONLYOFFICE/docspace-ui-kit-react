@@ -413,7 +413,7 @@ class ServicesStore {
 
           if (
             this.paymentStore.isPayer &&
-            this.paymentStore.walletCustomerStatusNotActive
+            this.paymentStore.tariff.walletCustomerStatusNotActive
           ) {
             await fetchCardLinked();
           }
@@ -471,7 +471,7 @@ class ServicesStore {
 
           if (
             this.paymentStore.isPayer &&
-            this.paymentStore.walletCustomerStatusNotActive
+            this.paymentStore.tariff.walletCustomerStatusNotActive
           ) {
             await fetchCardLinked();
           }

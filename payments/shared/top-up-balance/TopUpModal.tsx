@@ -71,7 +71,7 @@ const TopUpModal = (props: TopUpModalProps) => {
     serviceName,
   } = props;
 
-  const paymentStore = usePaymentStore();
+  const store = usePaymentStore();
 
   const {
     fetchBalance,
@@ -81,10 +81,10 @@ const TopUpModal = (props: TopUpModalProps) => {
     walletCodeCurrency: currency,
     wasFirstTopUp,
     formatWalletCurrency,
-  } = paymentStore;
+  } = store;
 
   const { walletCustomerStatusNotActive, walletCustomerEmail } =
-    paymentStore;
+    store.tariff;
 
   const { t } = useTranslation(["Payments", "Common"]);
 

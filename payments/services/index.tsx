@@ -90,9 +90,9 @@ const Services = observer(
       isGracePeriod,
       previousStoragePlanSize,
       currentStoragePlanSize,
-      isFreeTariff,
-      logoText,
-    } = paymentStore;
+    } = paymentStore.tariff;
+    const { isFreeTariff } = paymentStore.quotas;
+    const { logoText } = paymentStore;
 
     const { t, ready } = useTranslation(["Payments", "Services", "Common"]);
 

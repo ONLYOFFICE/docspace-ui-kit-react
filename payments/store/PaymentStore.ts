@@ -25,7 +25,11 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { makeAutoObservable } from "mobx";
-import type { PaymentApi, ProfilesApi } from "@onlyoffice/docspace-api-sdk";
+import type {
+  PaymentApi,
+  ProfilesApi,
+  PortalQuotaApi,
+} from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
 import type {
@@ -53,9 +57,9 @@ import {
 } from "../../utils/date";
 import type { DateTime } from "luxon";
 import type { TPaymentConfig, TServiceFeatureWithPrice } from "../types";
-import type CurrentTariffStatusStore from "./CurrentTariffStatusStore";
-import type CurrentQuotasStore from "./CurrentQuotasStore";
-import type PaymentQuotasStore from "./PaymentQuotasStore";
+import CurrentTariffStatusStore from "./CurrentTariffStatusStore";
+import CurrentQuotasStore from "./CurrentQuotasStore";
+import PaymentQuotasStore from "./PaymentQuotasStore";
 
 export const TOTAL_SIZE = "total_size";
 
@@ -68,11 +72,11 @@ class PaymentStore {
 
   private _currentUserEmail = "";
 
-  tariffStatusStore: CurrentTariffStatusStore | null = null;
+  readonly tariff: CurrentTariffStatusStore;
 
-  quotasStore: CurrentQuotasStore | null = null;
+  readonly quotas: CurrentQuotasStore;
 
-  paymentQuotasStore: PaymentQuotasStore | null = null;
+  readonly paymentQuotas: PaymentQuotasStore;
 
   language = "en";
 
@@ -170,24 +174,21 @@ class PaymentStore {
 
   reccomendedAmount = "";
 
-  constructor(paymentApi: PaymentApi, profilesApi: ProfilesApi) {
+  constructor(
+    paymentApi: PaymentApi,
+    profilesApi: ProfilesApi,
+    portalQuotaApi: PortalQuotaApi,
+  ) {
     this.paymentApi = paymentApi;
     this.profilesApi = profilesApi;
 
+    this.tariff = new CurrentTariffStatusStore(portalQuotaApi, paymentApi);
+    this.quotas = new CurrentQuotasStore(portalQuotaApi);
+    this.paymentQuotas = new PaymentQuotasStore(paymentApi);
+    this.paymentQuotas.setCurrentQuotasStore(this.quotas);
+
     makeAutoObservable(this);
   }
-
-  setTariffStatusStore = (store: CurrentTariffStatusStore) => {
-    this.tariffStatusStore = store;
-  };
-
-  setQuotasStore = (store: CurrentQuotasStore) => {
-    this.quotasStore = store;
-  };
-
-  setPaymentQuotasStore = (store: PaymentQuotasStore) => {
-    this.paymentQuotasStore = store;
-  };
 
   configure = (config: TPaymentConfig) => {
     this.theme = config.theme;
@@ -209,171 +210,17 @@ class PaymentStore {
   }
 
   dispose = () => {
+    this.tariff.dispose();
+    this.quotas.dispose();
+    this.paymentQuotas.dispose();
     for (const controller of this.abortControllers) {
       controller.abort();
     }
     this.abortControllers = [];
   };
 
-  // ─── Getters delegated to sub-stores ───────────────────────────────────────
-
-  get walletCustomerEmail() {
-    return this.tariffStatusStore?.walletCustomerEmail ?? "";
-  }
-
-  get walletCustomerStatusNotActive() {
-    return this.tariffStatusStore?.walletCustomerStatusNotActive ?? false;
-  }
-
-  get walletCustomerInfo() {
-    return this.tariffStatusStore?.walletCustomerInfo ?? null;
-  }
-
-  get isGracePeriod() {
-    return this.tariffStatusStore?.isGracePeriod ?? false;
-  }
-
-  get isNotPaidPeriod() {
-    return this.tariffStatusStore?.isNotPaidPeriod ?? false;
-  }
-
-  get isPaidPeriod() {
-    return this.tariffStatusStore?.isPaidPeriod ?? false;
-  }
-
-  get portalTariffStatus() {
-    return this.tariffStatusStore?.portalTariffStatus ?? null;
-  }
-
-  get customerId() {
-    return this.tariffStatusStore?.customerId ?? "";
-  }
-
-  get paymentDate() {
-    return this.tariffStatusStore?.paymentDate ?? "";
-  }
-
-  get isPaymentDateValid() {
-    return this.tariffStatusStore?.isPaymentDateValid ?? false;
-  }
-
-  get gracePeriodEndDate() {
-    return this.tariffStatusStore?.gracePeriodEndDate ?? "";
-  }
-
-  get delayDaysCount() {
-    return this.tariffStatusStore?.delayDaysCount ?? 0;
-  }
-
-  get hasStorageSubscription() {
-    return this.tariffStatusStore?.hasStorageSubscription ?? false;
-  }
-
-  get currentStoragePlanSize() {
-    return this.tariffStatusStore?.currentStoragePlanSize ?? 0;
-  }
-
-  get previousStoragePlanSize() {
-    return this.tariffStatusStore?.previousStoragePlanSize ?? 0;
-  }
-
-  get hasScheduledStorageChange() {
-    return this.tariffStatusStore?.hasScheduledStorageChange ?? false;
-  }
-
-  get nextStoragePlanSize() {
-    return this.tariffStatusStore?.nextStoragePlanSize ?? null;
-  }
-
-  get storageExpiryDate() {
-    return this.tariffStatusStore?.storageExpiryDate ?? "";
-  }
-
-  get daysUntilStorageExpiry() {
-    return this.tariffStatusStore?.daysUntilStorageExpiry ?? 0;
-  }
-
-  get isFreeTariff() {
-    return this.quotasStore?.isFreeTariff ?? true;
-  }
-
-  get isNonProfit() {
-    return this.quotasStore?.isNonProfit ?? false;
-  }
-
-  get isYearTariff() {
-    return this.quotasStore?.isYearTariff ?? false;
-  }
-
-  get currentTariffPlanTitle() {
-    return this.quotasStore?.currentTariffPlanTitle ?? "";
-  }
-
-  get currentPlanCost() {
-    return this.quotasStore?.currentPlanCost ?? { value: 0 };
-  }
-
-  get maxCountManagersByQuota() {
-    return this.quotasStore?.maxCountManagersByQuota ?? 0;
-  }
-
-  get addedManagersCount() {
-    return this.quotasStore?.addedManagersCount ?? 0;
-  }
-
-  get usedTotalStorageSizeCount() {
-    return this.quotasStore?.usedTotalStorageSizeCount ?? 0;
-  }
-
-  get maxFreeBackups() {
-    return this.quotasStore?.maxFreeBackups ?? 0;
-  }
-
-  get quotaCharacteristics() {
-    return this.quotasStore?.quotaCharacteristics ?? [];
-  }
-
-  get maxTotalSizeByQuota() {
-    return this.quotasStore?.maxTotalSizeByQuota ?? -1;
-  }
-
-  get isStorageTariffLimit() {
-    return this.quotasStore?.isStorageTariffLimit ?? false;
-  }
-
-  get tariffPlanTitle() {
-    return this.paymentQuotasStore?.tariffPlanTitle ?? "";
-  }
-
-  get planCost() {
-    return (
-      this.paymentQuotasStore?.planCost ?? {
-        value: 0,
-        isoCurrencySymbol: "USD",
-      }
-    );
-  }
-
-  get stepAddingQuotaManagers() {
-    return this.paymentQuotasStore?.stepAddingQuotaManagers ?? null;
-  }
-
-  get stepAddingQuotaTotalSize() {
-    return this.paymentQuotasStore?.stepAddingQuotaTotalSize ?? null;
-  }
-
-  get portalPaymentQuotas() {
-    return this.paymentQuotasStore?.portalPaymentQuotas ?? null;
-  }
-
-  get portalPaymentQuotasFeatures() {
-    return this.paymentQuotasStore?.portalPaymentQuotasFeatures ?? null;
-  }
-
-  // ─── Existing getters ───────────────────────────────────────────────────────
-
   get isAlreadyPaid() {
-    return this.walletCustomerEmail || !this.isFreeTariff;
+    return this.tariff.walletCustomerEmail || !this.quotas.isFreeTariff;
   }
 
   get isNeedRequest() {
@@ -385,9 +232,9 @@ class PaymentStore {
   }
 
   get isPayer() {
-    if (!this._currentUserEmail || !this.walletCustomerEmail) return false;
+    if (!this._currentUserEmail || !this.tariff.walletCustomerEmail) return false;
 
-    return this._currentUserEmail === this.walletCustomerEmail;
+    return this._currentUserEmail === this.tariff.walletCustomerEmail;
   }
 
   get isStripePortalAvailable() {
@@ -395,8 +242,8 @@ class PaymentStore {
   }
 
   get canUpdateTariff() {
-    if (this.isNonProfit) {
-      if (!this.walletCustomerEmail) return true;
+    if (this.quotas.isNonProfit) {
+      if (!this.tariff.walletCustomerEmail) return true;
       return this.isPayer;
     }
 
@@ -406,12 +253,12 @@ class PaymentStore {
   }
 
   get canPayTariff() {
-    return this.managersCount >= this.addedManagersCount;
+    return this.managersCount >= this.quotas.addedManagersCount;
   }
 
   get canDowngradeTariff() {
-    if (this.addedManagersCount > this.managersCount) return false;
-    if (this.usedTotalStorageSizeCount > this.allowedStorageSizeByQuota)
+    if (this.quotas.addedManagersCount > this.managersCount) return false;
+    if (this.quotas.usedTotalStorageSizeCount > this.allowedStorageSizeByQuota)
       return false;
 
     return true;
@@ -421,7 +268,7 @@ class PaymentStore {
     return (
       this.cardLinkedOnNonProfit ||
       this.cardLinkedOnFreeTariff ||
-      (!this.isNonProfit && !this.isFreeTariff)
+      (!this.quotas.isNonProfit && !this.quotas.isFreeTariff)
     );
   }
 
@@ -457,12 +304,12 @@ class PaymentStore {
   }
 
   get cardLinkedOnFreeTariff() {
-    return this.isFreeTariff && !!this.walletCustomerEmail;
+    return this.quotas.isFreeTariff && !!this.tariff.walletCustomerEmail;
   }
 
   get cardLinkedOnNonProfit() {
-    if (!this.isNonProfit) return false;
-    if (!this.walletCustomerEmail) return false;
+    if (!this.quotas.isNonProfit) return false;
+    if (!this.tariff.walletCustomerEmail) return false;
 
     return true;
   }
@@ -606,7 +453,7 @@ class PaymentStore {
 
   formatPaymentCurrency = (item: number = 0, fractionDigits: number = 0) => {
     const amount = item || this.walletBalance;
-    const { isoCurrencySymbol } = this.planCost;
+    const { isoCurrencySymbol } = this.paymentQuotas.planCost;
 
     return formatCurrencyValue(
       this.language,
@@ -802,7 +649,7 @@ class PaymentStore {
   };
 
   isShowStorageTariffDeactivated = () => {
-    if (!this.previousStoragePlanSize) return false;
+    if (!this.tariff.previousStoragePlanSize) return false;
 
     return localStorage.getItem(STORAGE_TARIFF_DEACTIVATED) !== "true";
   };
@@ -832,7 +679,7 @@ class PaymentStore {
 
   initWalletPayerAndBalance = async (isRefresh: boolean) => {
     await Promise.all([
-      this.tariffStatusStore?.fetchCustomerInfo(),
+      this.tariff.fetchCustomerInfo(),
       this.fetchBalance(isRefresh),
     ]);
   };
@@ -925,14 +772,14 @@ class PaymentStore {
 
     const requests: Promise<unknown>[] = [];
 
-    if (this.isGracePeriod || this.isNotPaidPeriod) {
-      requests.push(this.getBasicPaymentLink(this.addedManagersCount));
+    if (this.tariff.isGracePeriod || this.tariff.isNotPaidPeriod) {
+      requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
     }
 
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
       requests.push(this.setPaymentAccount());
 
-      if (this.isPayer && this.walletCustomerStatusNotActive) {
+      if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
         requests.push(this.fetchCardLinked());
       }
 
@@ -941,7 +788,7 @@ class PaymentStore {
         await this.handleServicesQuotas();
       }
     } else {
-      requests.push(this.getBasicPaymentLink(this.addedManagersCount));
+      requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
     }
 
     try {
@@ -966,18 +813,18 @@ class PaymentStore {
 
     requests.push(this.getSettingsPayment());
 
-    if (this.isGracePeriod || this.isNotPaidPeriod) {
-      requests.push(this.getBasicPaymentLink(this.addedManagersCount));
+    if (this.tariff.isGracePeriod || this.tariff.isNotPaidPeriod) {
+      requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
     }
 
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
       requests.push(this.setPaymentAccount());
 
-      if (this.isPayer && this.walletCustomerStatusNotActive) {
+      if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
         requests.push(this.fetchCardLinked());
       }
     } else {
-      requests.push(this.getBasicPaymentLink(this.addedManagersCount));
+      requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
     }
 
     if (this.isShowStorageTariffDeactivated() && this.isPayer) {
@@ -1010,7 +857,7 @@ class PaymentStore {
         if (this.isStripePortalAvailable) {
           requests.push(this.setPaymentAccount());
 
-          if (this.isPayer && this.walletCustomerStatusNotActive) {
+          if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
             requests.push(this.fetchCardLinked());
           }
         }
@@ -1048,7 +895,7 @@ class PaymentStore {
         if (this.isStripePortalAvailable) {
           requests.push(this.setPaymentAccount());
 
-          if (this.isPayer && this.walletCustomerStatusNotActive) {
+          if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
             requests.push(this.fetchCardLinked());
           }
         }
@@ -1063,8 +910,7 @@ class PaymentStore {
         requests.push(this.handleServicesQuotas());
       }
 
-      if (this.tariffStatusStore)
-        requests.push(this.tariffStatusStore.fetchPortalTariff());
+      requests.push(this.tariff.fetchPortalTariff());
 
       await Promise.all(requests);
 
@@ -1146,7 +992,7 @@ class PaymentStore {
   };
 
   getTotalCostByFormula = (value: number) => {
-    const costValuePerManager = this.planCost.value;
+    const costValuePerManager = this.paymentQuotas.planCost.value;
     if (costValuePerManager) return value * +costValuePerManager;
   };
 
@@ -1155,23 +1001,23 @@ class PaymentStore {
   };
 
   setBasicTariffContainer = () => {
-    const currentTotalPrice = this.currentPlanCost.value;
+    const currentTotalPrice = this.quotas.currentPlanCost.value;
 
-    if (!this.isFreeTariff) {
+    if (!this.quotas.isFreeTariff) {
       const countOnRequest =
-        this.maxCountManagersByQuota > this.maxAvailableManagersCount;
+        this.quotas.maxCountManagersByQuota > this.maxAvailableManagersCount;
 
       this.managersCount = countOnRequest
         ? this.maxAvailableManagersCount + 1
-        : this.maxCountManagersByQuota;
+        : this.quotas.maxCountManagersByQuota;
 
       this.totalPrice = +currentTotalPrice;
 
       return;
     }
 
-    this.managersCount = this.addedManagersCount;
-    const totalPrice = this.getTotalCostByFormula(this.addedManagersCount);
+    this.managersCount = this.quotas.addedManagersCount;
+    const totalPrice = this.getTotalCostByFormula(this.quotas.addedManagersCount);
 
     if (totalPrice) this.totalPrice = totalPrice;
   };
@@ -1188,8 +1034,8 @@ class PaymentStore {
   };
 
   setRangeStepByQuota = () => {
-    const stepManagers = this.stepAddingQuotaManagers;
-    const stepSize = this.stepAddingQuotaTotalSize;
+    const stepManagers = this.paymentQuotas.stepAddingQuotaManagers;
+    const stepSize = this.paymentQuotas.stepAddingQuotaTotalSize;
 
     if (stepManagers && typeof stepManagers === "number")
       this.stepByQuotaForManager = stepManagers;

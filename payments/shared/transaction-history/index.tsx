@@ -183,7 +183,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     hideTypeFilter,
   } = props;
 
-  const paymentStore = usePaymentStore();
+  const store = usePaymentStore();
 
   const {
     getStartTransactionDate,
@@ -191,9 +191,9 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     isTransactionHistoryExist,
     formatDate,
     fetchTransactionHistory,
-  } = paymentStore;
+  } = store;
 
-  const { isNotPaidPeriod } = paymentStore;
+  const { isNotPaidPeriod } = store.tariff;
 
   const { t } = useTranslation(["Payments", "Settings"]);
 

@@ -68,8 +68,8 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
     formatWalletCurrency,
   } = paymentStore;
 
-  const { currentStoragePlanSize, usedTotalStorageSizeCount } =
-    paymentStore;
+  const { currentStoragePlanSize } = paymentStore.tariff;
+  const { usedTotalStorageSizeCount } = paymentStore.quotas;
 
   const totalPrice = calculateTotalPrice(
     currentStoragePlanSize,

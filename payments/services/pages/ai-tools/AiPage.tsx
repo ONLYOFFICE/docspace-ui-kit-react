@@ -86,7 +86,8 @@ const AiPage = (props: AiPageProps) => {
     formatWalletCurrency,
   } = paymentStore;
 
-  const { logoText, language, isFreeTariff } = paymentStore;
+  const { logoText, language } = paymentStore;
+  const { isFreeTariff } = paymentStore.quotas;
 
   const {
     aiServiceCodeCurrency,

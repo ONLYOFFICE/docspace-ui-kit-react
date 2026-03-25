@@ -111,26 +111,26 @@ const StyledBody = styled.div`
 const PaymentContainer = observer((props: any) => {
   const { t } = props;
 
-  const paymentStore = usePaymentStore();
-  const { formatPaymentCurrency } = paymentStore;
+  const store = usePaymentStore();
+  const { formatPaymentCurrency, expandArticle } = store;
 
   const theme = useTheme() as any;
   const {
     isFreeTariff,
+    isNonProfit,
+    currentTariffPlanTitle,
+    isYearTariff,
+  } = store.quotas;
+  const {
+    isPaidPeriod,
+    isPaymentDateValid,
     isGracePeriod,
     isNotPaidPeriod,
-    isPaidPeriod,
-    currentTariffPlanTitle,
-    tariffPlanTitle,
-    expandArticle,
     gracePeriodEndDate,
     delayDaysCount,
     paymentDate,
-    isNonProfit,
-    isPaymentDateValid,
-    isYearTariff,
-    planCost,
-  } = paymentStore;
+  } = store.tariff;
+  const { tariffPlanTitle, planCost } = store.paymentQuotas;
 
   const startValue = planCost.value;
 

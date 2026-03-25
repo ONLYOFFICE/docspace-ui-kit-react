@@ -82,14 +82,14 @@ const TotalTariffContainer = observer(({
   t,
   isDisabled,
 }: any) => {
-  const paymentStore = usePaymentStore();
+  const store = usePaymentStore();
   const {
     totalPrice,
     isNeedRequest,
     maxAvailableManagersCount,
     formatPaymentCurrency,
-  } = paymentStore;
-  const { isYearTariff } = paymentStore;
+  } = store;
+  const { isYearTariff } = store.quotas;
   const theme = useTheme() as any;
 
   return (

@@ -38,8 +38,7 @@ import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 const CurrentSubscription: React.FC = () => {
   const paymentStore = usePaymentStore();
   const { formatWalletCurrency, storagePriceIncrement } = paymentStore;
-  const { currentStoragePlanSize } = paymentStore;
-  const storageExpiryDate = paymentStore.storageExpiryDate;
+  const { currentStoragePlanSize, storageExpiryDate } = paymentStore.tariff;
 
   const { t } = useTranslation(["Payments", "Common"]);
 

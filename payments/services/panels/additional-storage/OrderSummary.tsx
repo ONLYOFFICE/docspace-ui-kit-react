@@ -70,12 +70,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
-  const { formatWalletCurrency, storagePriceIncrement, walletBalance } =
+  const { formatWalletCurrency, storagePriceIncrement, walletBalance, language } =
     paymentStore;
-  const { language, currentStoragePlanSize, hasStorageSubscription } =
-    paymentStore;
-  const storageExpiryDate = paymentStore.storageExpiryDate;
-  const daysUntilStorageExpiry = paymentStore.daysUntilStorageExpiry ?? 0;
+  const { currentStoragePlanSize, hasStorageSubscription, storageExpiryDate } =
+    paymentStore.tariff;
+  const daysUntilStorageExpiry = paymentStore.tariff.daysUntilStorageExpiry ?? 0;
   const { setPartialUpgradeFee, partialUpgradeFee } = servicesStore;
 
   const { t } = useTranslation(["Services", "Payments", "Common"]);

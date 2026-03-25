@@ -54,7 +54,7 @@ const WalletContainer = (props: WalletContainerProps) => {
   } = props;
 
   const paymentStore = usePaymentStore();
-  const { hasScheduledStorageChange } = paymentStore;
+  const { hasScheduledStorageChange } = paymentStore.tariff;
   const { formatWalletCurrency } = paymentStore;
 
   const { isWaitingCalculation } = usePaymentContext();

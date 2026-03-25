@@ -64,9 +64,8 @@ const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
-  const { currentStoragePlanSize } = paymentStore;
-  const daysUntilStorageExpiry = paymentStore.daysUntilStorageExpiry;
-  const storageExpiryDate = paymentStore.storageExpiryDate;
+  const { currentStoragePlanSize, daysUntilStorageExpiry, storageExpiryDate } =
+    paymentStore.tariff;
   const { setPartialUpgradeFee, partialUpgradeFee } = servicesStore;
   const { formatWalletCurrency } = paymentStore;
 

@@ -69,7 +69,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     isShowStorageTariffDeactivatedModal,
   } = paymentStore;
 
-  const { walletCustomerStatusNotActive, walletCustomerEmail } = paymentStore;
+  const { walletCustomerStatusNotActive, walletCustomerEmail } = paymentStore.tariff;
 
   if (!isPaymentMethodInit || !ready || showPortalSettingsLoader)
     return <PaymentMethodLoader />;

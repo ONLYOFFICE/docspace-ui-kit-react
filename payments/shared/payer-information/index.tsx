@@ -37,7 +37,6 @@ import { Link } from "../../../components/link";
 import { useState } from "react";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import { useCurrentTariffStatusStore } from "../../store/CurrentTariffStatusStoreProvider";
 
 import { useTheme } from "../../../context/ThemeContext";
 
@@ -108,21 +107,18 @@ const StyledContainer = styled.div`
 `;
 
 const PayerInformation = () => {
-  const paymentStoreInstance = usePaymentStore();
-  const tariffStore = useCurrentTariffStatusStore();
+  const store = usePaymentStore();
 
   const theme = useTheme();
 
-  const { accountLink, isStripePortalAvailable, isOwner } =
-    paymentStoreInstance;
-
-  const { fetchCustomerInfo } = tariffStore;
+  const { accountLink, isStripePortalAvailable, isOwner } = store;
 
   const {
     isNotPaidPeriod,
     walletCustomerEmail: email,
     walletCustomerInfo: payerInfo,
-  } = paymentStoreInstance;
+    fetchCustomerInfo,
+  } = store.tariff;
   const { t } = useTranslation(["Payments", "Common"]);
 
   const [isDisabled, setDisabled] = useState(false);

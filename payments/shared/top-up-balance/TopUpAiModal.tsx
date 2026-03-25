@@ -70,11 +70,11 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
     reccomendedAmount,
   } = props;
 
-  const paymentStore = usePaymentStore();
+  const store = usePaymentStore();
 
-  const { formatWalletCurrency } = paymentStore;
-  const { walletCustomerStatusNotActive, walletCustomerEmail, logoText } =
-    paymentStore;
+  const { formatWalletCurrency, logoText } = store;
+  const { walletCustomerStatusNotActive, walletCustomerEmail } =
+    store.tariff;
 
   const { t } = useTranslation(["Payments", "Services", "Common"]);
 

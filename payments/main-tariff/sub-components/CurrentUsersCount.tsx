@@ -51,8 +51,8 @@ const CurrentUsersCountContainer = observer((props: any) => {
     addedManagersCountTitle,
   } = props;
 
-  const paymentStore = usePaymentStore();
-  const { maxCountManagersByQuota } = paymentStore;
+  const store = usePaymentStore();
+  const { maxCountManagersByQuota } = store.quotas;
   const theme = useTheme() as any;
 
   return (

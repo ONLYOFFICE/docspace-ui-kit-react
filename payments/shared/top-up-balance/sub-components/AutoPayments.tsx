@@ -85,7 +85,7 @@ const AutoPayments = ({
   isEditAutoPayment,
   isDisabled,
 }: AutoPaymentsProps) => {
-  const paymentStore = usePaymentStore();
+  const store = usePaymentStore();
 
   const {
     updateAutoPayments,
@@ -102,9 +102,9 @@ const AutoPayments = ({
     setUpToBalanceError,
     upToBalanceError,
     formatWalletCurrency,
-  } = paymentStore;
+  } = store;
 
-  const { walletCustomerEmail } = paymentStore;
+  const { walletCustomerEmail } = store.tariff;
   const { t } = useTranslation(["Payments", "Common"]);
 
   const showCurrentSettings = isAutoPaymentExist && !isEditAutoPayment;

@@ -57,18 +57,18 @@ const StorageTariffDeactivated = observer(
     onOpenPanel,
     onNavigate,
   }: StorageTariffDeactivatedProps) => {
-    const paymentStore = usePaymentStore();
+    const store = usePaymentStore();
     const {
       storagePriceIncrement,
       formatWalletCurrency,
       setIsShowTariffDeactivatedModal,
-    } = paymentStore;
+    } = store;
+    const { previousStoragePlanSize } = store.tariff;
     const {
-      previousStoragePlanSize,
       usedTotalStorageSizeCount,
       maxTotalSizeByQuota,
       isStorageTariffLimit,
-    } = paymentStore;
+    } = store.quotas;
 
     const { t, ready } = useTranslation(["Payments", "Services", "Common"]);
 

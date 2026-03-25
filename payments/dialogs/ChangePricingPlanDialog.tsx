@@ -42,10 +42,10 @@ type ChangePricingPlanDialogProps = {
 
 const ChangePricingPlanDialog = observer(
   ({ visible, onClose }: ChangePricingPlanDialogProps) => {
-    const paymentStore = usePaymentStore();
-    const { managersCount, allowedStorageSizeByQuota } = paymentStore;
+    const store = usePaymentStore();
+    const { managersCount, allowedStorageSizeByQuota } = store;
     const { addedManagersCount, usedTotalStorageSizeCount } =
-      paymentStore;
+      store.quotas;
 
     const { t, ready } = useTranslation(["DowngradePlanDialog", "Common"]);
 

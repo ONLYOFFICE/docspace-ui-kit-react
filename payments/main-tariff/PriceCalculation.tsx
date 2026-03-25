@@ -79,7 +79,7 @@ let timeout: any = null;
 let controller: AbortController | undefined;
 
 const PriceCalculation = observer(({ t }: any) => {
-  const paymentStore = usePaymentStore();
+  const store = usePaymentStore();
 
   const {
     setIsLoading,
@@ -89,15 +89,12 @@ const PriceCalculation = observer(({ t }: any) => {
     isAlreadyPaid,
     getPaymentLink,
     formatPaymentCurrency,
-  } = paymentStore;
+  } = store;
 
   const theme = useTheme() as any;
-  const {
-    isGracePeriod,
-    isNotPaidPeriod,
-    isYearTariff,
-    planCost,
-  } = paymentStore;
+  const { isGracePeriod, isNotPaidPeriod } = store.tariff;
+  const { isYearTariff } = store.quotas;
+  const { planCost } = store.paymentQuotas;
 
   const priceManagerPerMonth = planCost.value;
 
