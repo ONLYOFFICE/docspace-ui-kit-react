@@ -27,6 +27,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { Trans, useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import type { ChangeWalletServiceStateRequestDto } from "@onlyoffice/docspace-api-sdk";
 
 import { toastr } from "../../components/toast";
@@ -49,10 +50,7 @@ import StoragePlanCancel from "./panels/additional-storage/StoragePlanCancel";
 import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
 import AIServiceDialog from "./panels/ai-service/AIServiceDialog";
-import type { TPaymentNavigationEvent } from "../types";
-
 type TServicesProps = {
-  onNavigate?: (event: TPaymentNavigationEvent) => void;
   showPortalSettingsLoader?: boolean;
   initialOpenDialog?: string;
   getAIConfig?: () => Promise<void>;
@@ -60,11 +58,11 @@ type TServicesProps = {
 
 const Services = observer(
   ({
-    onNavigate,
     showPortalSettingsLoader = true,
     initialOpenDialog,
     getAIConfig,
   }: TServicesProps) => {
+    const navigate = useNavigate();
     const paymentStore = usePaymentStore();
     const servicesStore = useServicesStore();
     const { paymentApi } = useApi();
@@ -86,11 +84,8 @@ const Services = observer(
       servicesInit,
     } = servicesStore;
 
-    const {
-      isGracePeriod,
-      previousStoragePlanSize,
-      currentStoragePlanSize,
-    } = paymentStore.tariff;
+    const { isGracePeriod, previousStoragePlanSize, currentStoragePlanSize } =
+      paymentStore.tariff;
     const { isFreeTariff } = paymentStore.quotas;
     const { logoText } = paymentStore;
 
@@ -225,7 +220,7 @@ const Services = observer(
         id === TOTAL_SIZE &&
         (currentStoragePlanSize || previousStoragePlanSize)
       ) {
-        onNavigate?.({ action: "open-disk-storage" });
+        navigate("/portal-settings/payments/services/disk-storage");
         return;
       }
 
@@ -235,12 +230,12 @@ const Services = observer(
       }
 
       if (id === AI_ENUM && wasFirstAiServiceTopUp) {
-        onNavigate?.({ action: "open-ai-services" });
+        navigate("/portal-settings/payments/services/ai-services");
         return;
       }
 
       if (id === BACKUP_SERVICE && isCardLinkedToPortal) {
-        onNavigate?.({ action: "open-backup" });
+        navigate("/portal-settings/payments/services/backup");
         return;
       }
 
