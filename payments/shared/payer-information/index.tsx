@@ -30,7 +30,7 @@ import { toAbsoluteUrl } from "../../utils/url";
 import { Text } from "../../../components/text";
 import { useTranslation, Trans } from "react-i18next";
 import { observer } from "mobx-react";
-import { Avatar } from "../../../components/avatar";
+import { Avatar, AvatarRole, AvatarSize } from "../../../components/avatar";
 import { toastr } from "../../../components/toast";
 import DefaultUserPhoto from "../../../assets/icons/payments/default_user_photo_size_82-82.png";
 import { Link } from "../../../components/link";
@@ -279,7 +279,8 @@ const PayerInformation = () => {
     <StyledContainer isDisabled={isDisabled}>
       <div className="payer-info_avatar">
         <Avatar
-          size="base"
+          role={AvatarRole.none}
+          size={AvatarSize.base}
           {...avatarUrl}
           isDefaultSource
           userName={payerInfo?.displayName}
