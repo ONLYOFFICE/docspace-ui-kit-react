@@ -59,7 +59,7 @@ const Wallet = observer((props: WalletProps) => {
     <WalletLoader />
   ) : (
     <>
-      <WalletContainer t={t} />
+      <WalletContainer />
       {isShowStorageTariffDeactivatedModal ? (
         <StorageTariffDeactivated
           visible={isShowStorageTariffDeactivatedModal}
