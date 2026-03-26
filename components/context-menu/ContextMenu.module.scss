@@ -172,7 +172,9 @@
       }
 
       &.p-disabled {
-        color: var(--sub-menu-item-disabled-color);
+        &:not(.p-disabled-styles-toggle) {
+          color: var(--sub-menu-item-disabled-color);
+        }
 
         &:hover {
           cursor: default;

@@ -40,8 +40,9 @@ export const MonthsBody = ({
   minDate,
   maxDate,
   isScroll,
+  locale,
 }: MonthsBodyProps) => {
-  const months = getCalendarMonths(observedDate);
+  const months = getCalendarMonths(observedDate, locale);
   const monthsElements = getMonthElements(
     months,
     setObservedDate,

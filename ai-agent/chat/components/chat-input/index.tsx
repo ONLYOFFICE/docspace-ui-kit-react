@@ -52,6 +52,7 @@ const ChatInput = ({
   isLoading,
   attachmentFile,
   clearAttachmentFile,
+  hideAttachments,
   selectedModel,
   toolsSettings,
   isPortalAdmin,
@@ -157,8 +158,12 @@ const ChatInput = ({
       onSendMessage?.(value, selectedFiles);
 
       setValue("");
-      setSelectedFiles([]);
-      saveChangesToStorage("", []);
+      if (!hideAttachments) {
+        setSelectedFiles([]);
+        saveChangesToStorage("", []);
+      } else {
+        saveChangesToStorage("", selectedFiles);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -170,6 +175,7 @@ const ChatInput = ({
     value,
     selectedFiles,
     onSendMessage,
+    hideAttachments,
   ]);
 
   const onKeyEnter = React.useCallback(
@@ -273,10 +279,12 @@ const ChatInput = ({
           },
         ];
         handleSelectFile(file);
-        clearAttachmentFile?.();
+        if (!hideAttachments) {
+          clearAttachmentFile?.();
+        }
       }, 0);
     }
-  }, [attachmentFile, handleSelectFile, clearAttachmentFile]);
+  }, [attachmentFile, handleSelectFile, clearAttachmentFile, hideAttachments]);
 
   const handleSampleSelect = (sample: string) => {
     setValue(sample);
@@ -302,7 +310,7 @@ const ChatInput = ({
               wrapperClassName={classNames({
                 [styles.chatInputTextAreaWrapper]: true,
                 [styles.chatInputTextAreaWrapperFiles]:
-                  selectedFiles.length > 0,
+                  selectedFiles.length > 0 && !hideAttachments,
               })}
               placeholder={t("AIChatInput")}
               isChatMode
@@ -312,12 +320,14 @@ const ChatInput = ({
               dataTestId="chat-input-textarea"
             />
 
-            <FilesList
-              files={selectedFiles}
-              getIcon={getIcon}
-              onRemove={handleRemoveFile}
-              multimodal={multimodal}
-            />
+            {!hideAttachments ? (
+              <FilesList
+                files={selectedFiles}
+                getIcon={getIcon}
+                onRemove={handleRemoveFile}
+                multimodal={multimodal}
+              />
+            ) : null}
 
             <Buttons
               isFilesSelectorVisible={isFilesSelectorVisible}
@@ -359,3 +369,4 @@ const ChatInput = ({
 };
 
 export default observer(ChatInput);
+

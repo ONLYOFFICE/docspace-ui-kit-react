@@ -41,6 +41,7 @@ export const Days = ({
   maxDate,
   isMobile,
   isScroll,
+  locale,
 }: DaysProps) => {
   return (
     <>
@@ -51,6 +52,7 @@ export const Days = ({
         minDate={minDate}
         maxDate={maxDate}
         isMobile={isMobile}
+        locale={locale}
       />
       <DaysBody
         observedDate={observedDate}
@@ -60,6 +62,7 @@ export const Days = ({
         maxDate={maxDate}
         isMobile={isMobile}
         isScroll={isScroll}
+        locale={locale}
       />
     </>
   );
