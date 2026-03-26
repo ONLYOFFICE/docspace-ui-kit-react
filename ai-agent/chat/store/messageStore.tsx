@@ -26,13 +26,18 @@
 
 import { makeAutoObservable } from "mobx";
 import React from "react";
-import { ContentType, EventType, RoleType } from "../../../enums";
+import {
+  ContentType,
+  EventType,
+  RoleType,
+} from "../../../enums";
 import type {
   TContent,
   TMessage,
   TToolCallContent,
   TMultimodal,
 } from "../../../types/ai";
+
 
 import type { TFile } from "../../../types";
 
@@ -62,6 +67,8 @@ export default class MessageStore {
   isRequestRunning: boolean = false;
 
   isStreamRunning: boolean = false;
+
+  isAnalyzing: boolean = false;
 
   isGetMessageRequestRunning: boolean = false;
 
@@ -171,6 +178,11 @@ export default class MessageStore {
     this.isStreamRunning = isStreamRunning;
   };
 
+  setIsAnalyzing = (isAnalyzing: boolean) => {
+    this.isAnalyzing = isAnalyzing;
+  };
+
+
   startNewChat = async () => {
     this.setCurrentChatId("");
     this.setMessages([]);
@@ -246,6 +258,7 @@ export default class MessageStore {
 
     this.setIsStreamRunning(false);
     this.setIsRequestRunning(false);
+    this.setIsAnalyzing(false);
   };
 
   addUserMessage = (message: string, files: Partial<TFile>[]) => {
@@ -501,7 +514,8 @@ export default class MessageStore {
   };
 
   handleStreamError = (jsonData: string, error?: unknown) => {
-    this.setIsStreamRunning(true);
+    this.setIsStreamRunning(false);
+    this.setIsAnalyzing(false);
     let message = "";
     try {
       const parsed = JSON.parse(jsonData);
@@ -551,6 +565,7 @@ export default class MessageStore {
 
       let buffer = "";
       let chunkIdx = -1;
+      let isReasoningRunning = false;
 
       const streamHandler = async () => {
         const { done, value } = await reader.read();
@@ -558,6 +573,13 @@ export default class MessageStore {
         if (done) {
           this.setIsRequestRunning(false);
           this.setIsStreamRunning(false);
+          this.setIsAnalyzing(false);
+
+          if (isReasoningRunning) {
+            msg += "\n</think>\n";
+            this.continueAIMessage(msg);
+            isReasoningRunning = false;
+          }
 
           try {
             reader.cancel();
@@ -579,6 +601,12 @@ export default class MessageStore {
               JSON.stringify(jsonData.error),
               jsonData.error,
             );
+
+            if (isReasoningRunning) {
+              msg += "\n</think>\n";
+              this.continueAIMessage(msg);
+              isReasoningRunning = false;
+            }
 
             reader.cancel();
 
@@ -614,10 +642,54 @@ export default class MessageStore {
               return;
             }
 
+            if (isReasoningRunning && !event.includes(EventType.Reasoning)) {
+              msg += "\n</think>\n";
+              this.continueAIMessage(msg);
+              isReasoningRunning = false;
+            }
+
+            if (!event.includes(EventType.MessageStart)) {
+              this.setIsAnalyzing(false);
+            }
+
             if (event.includes(EventType.MessageStart)) {
               this.setIsStreamRunning(true);
 
               this.handleMetadata(jsonData);
+
+              return;
+            }
+
+            if (event.includes(EventType.Reasoning)) {
+              try {
+                const parsed = JSON.parse(jsonData);
+                if (
+                  !parsed ||
+                  typeof parsed !== "object" ||
+                  typeof parsed.text !== "string"
+                ) {
+                  return;
+                }
+                const { text } = parsed;
+
+                if (!isReasoningRunning) {
+                  isReasoningRunning = true;
+                  msg += "<think>\n";
+                }
+
+                msg += text;
+
+                if (msg) {
+                  if (prevMsg) {
+                    this.continueAIMessage(msg);
+                  } else {
+                    this.addNewAIMessage(msg);
+                  }
+                  prevMsg = msg;
+                }
+              } catch {
+                // ignore
+              }
 
               return;
             }
@@ -718,6 +790,7 @@ export default class MessageStore {
     } finally {
       this.setIsRequestRunning(false);
       this.setIsStreamRunning(false);
+      this.setIsAnalyzing(false);
     }
   };
 
@@ -726,6 +799,7 @@ export default class MessageStore {
       this.addUserMessage(message, files);
 
       this.setIsRequestRunning(true);
+      this.setIsAnalyzing(true);
 
       this.abortController.abort("Start new chat");
 
@@ -749,6 +823,7 @@ export default class MessageStore {
       this.addUserMessage(message, files);
 
       this.setIsRequestRunning(true);
+      this.setIsAnalyzing(true);
 
       this.abortController.abort("Start new message");
 
@@ -773,6 +848,7 @@ export default class MessageStore {
         this.abortController.abort("Stop message");
         this.setIsRequestRunning(false);
         this.setIsStreamRunning(false);
+        this.setIsAnalyzing(false);
       } catch {
         // ignore abort error
       }
@@ -855,6 +931,7 @@ export const MessageStoreContextProvider = ({
   React.useEffect(() => {
     store.onStreamData = onStreamData;
   }, [store, onStreamData]);
+
 
   return (
     <MessageStoreContext.Provider value={store}>
