@@ -185,6 +185,17 @@ const getSubjectId = (filterValues: TGroupItem[] | TItem[]) => {
   return filterOwner || null;
 };
 
+const getSubjectOwnerId = (filterValues: TGroupItem[] | TItem[]) => {
+  const filterOwner = result(
+    find(filterValues, (value) => {
+      return value.group === FilterGroups.roomFilterOwner;
+    }),
+    "key",
+  );
+
+  return filterOwner || null;
+};
+
 const getFilterContent = (filterValues: TGroupItem[] | TItem[]) => {
   const filterContent = result(
     find(filterValues, (value) => {
@@ -315,6 +326,7 @@ export {
   getType,
   getProviderType,
   getSubjectId,
+  getSubjectOwnerId,
   getFilterContent,
   getTags,
   getQuotaFilter,
