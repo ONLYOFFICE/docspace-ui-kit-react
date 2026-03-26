@@ -24,27 +24,19 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import styled from "styled-components";
 import { observer } from "mobx-react";
 import { Text } from "../../components/text";
 import { Link } from "../../components/link";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
-
-const StyledContactContainer = styled.div`
-  display: flex;
-  width: 100%;
-  a {
-    margin-inline-start: 4px;
-  }
-`;
+import styles from "./MainTariff.module.scss";
 
 const ContactContainer = observer(({ t }: any) => {
 	const paymentStore = usePaymentStore();
 	const { salesEmail } = paymentStore;
 
 	return (
-		<StyledContactContainer>
+		<div className={styles.contactContainer}>
 			{salesEmail ? (
 				<Text as="span" fontWeight={600}>
 					{t("Common:ContactUs")}
@@ -60,7 +52,7 @@ const ContactContainer = observer(({ t }: any) => {
 					</Link>
 				</Text>
 			) : null}
-		</StyledContactContainer>
+		</div>
 	);
 });
 

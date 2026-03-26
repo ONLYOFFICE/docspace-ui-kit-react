@@ -26,12 +26,10 @@
 
 import HelpReactSvgUrl from "../../assets/icons/payments/help.react.svg?url";
 import React from "react";
-import styled, { css, useTheme } from "styled-components";
 import { Trans } from "react-i18next";
 import { observer } from "mobx-react";
 
 import { Text } from "../../components/text";
-import { size, desktop, mobile, Consumer } from "../../utils";
 
 import { HelpButton } from "../../components/help-button";
 
@@ -41,80 +39,14 @@ import CurrentTariffContainer from "./CurrentTariffContainer";
 import PriceCalculation from "./PriceCalculation";
 import BenefitsContainer from "./BenefitsContainer";
 import ContactContainer from "./ContactContainer";
-import PayerInformation from "../shared/payer-information";
-
-const StyledBody = styled.div`
-  max-width: 660px;
-
-  .payment-info_suggestion,
-  .payment-info_grace-period {
-    margin-bottom: 12px;
-  }
-
-  .payment-info {
-    margin-top: 18px;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(100px, 320px));
-    grid-gap: 20px;
-    margin-bottom: 20px;
-
-    @media ${mobile} {
-      grid-template-columns: 1fr;
-
-      grid-template-rows: 1fr max-content;
-
-      .price-calculation-container,
-      .benefits-container {
-        max-width: 600px;
-      }
-      .select-users-count-container {
-        max-width: 520px;
-      }
-    }
-
-    ${(props: any) =>
-      props.isChangeView &&
-      css`
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr max-content;
-
-        .price-calculation-container,
-        .benefits-container {
-          -webkit-transition: all 0.8s ease;
-          transition: all 0.4s ease;
-          max-width: 600px;
-        }
-        .select-users-count-container {
-          -webkit-transition: all 0.8s ease;
-          transition: all 0.4s ease;
-          max-width: 520px;
-        }
-
-        @media ${desktop} {
-          grid-template-columns: repeat(2, minmax(100px, 320px));
-        }
-      `}
-  }
-  .payment-info_wrapper {
-    display: flex;
-
-    margin-top: 11px;
-    div {
-      margin: auto 0;
-    }
-    .payment-info_managers-price {
-      margin-inline-end: 6px;
-    }
-  }
-`;
+import styles from "./MainTariff.module.scss";
 
 const PaymentContainer = observer((props: any) => {
   const { t } = props;
 
   const store = usePaymentStore();
-  const { formatPaymentCurrency, expandArticle } = store;
+  const { formatPaymentCurrency } = store;
 
-  const theme = useTheme() as any;
   const { isFreeTariff, isNonProfit, currentTariffPlanTitle, isYearTariff } =
     store.quotas;
   const {
@@ -188,7 +120,7 @@ const PaymentContainer = observer((props: any) => {
       <Text
         fontSize="16px"
         isBold
-        color={theme.client.settings.payment.warningColor}
+        color="var(--settings-payment-warning-color)"
         dataTestId="expired_subscription_text"
       >
         <Trans t={t} i18nKey="BusinessExpired" ns="Payments">
@@ -201,7 +133,7 @@ const PaymentContainer = observer((props: any) => {
   const planSuggestion = () => {
     if (isFreeTariff && !isNonProfit) {
       return (
-        <Text fontSize="16px" isBold className="payment-info_suggestion">
+        <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
           <Trans t={t} i18nKey="StartupSuggestion" ns="Payments">
             {{ planName: tariffPlanTitle }}
           </Trans>
@@ -211,7 +143,7 @@ const PaymentContainer = observer((props: any) => {
 
     if (isPaidPeriod && !isNonProfit) {
       return (
-        <Text fontSize="16px" isBold className="payment-info_suggestion">
+        <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
           <Trans t={t} i18nKey="BusinessSuggestion" ns="Payments">
             {{ planName: tariffPlanTitle }}
           </Trans>
@@ -221,7 +153,7 @@ const PaymentContainer = observer((props: any) => {
 
     if (isNotPaidPeriod) {
       return (
-        <Text fontSize="16px" isBold className="payment-info_suggestion">
+        <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
           <Trans t={t} i18nKey="RenewSubscription" ns="Payments">
             {{ planName: tariffPlanTitle }}
           </Trans>
@@ -234,8 +166,8 @@ const PaymentContainer = observer((props: any) => {
         <Text
           fontSize="16px"
           isBold
-          className="payment-info_grace-period"
-          color={theme.client.settings.payment.warningColor}
+          className={styles.paymentInfoGracePeriod}
+          color="var(--settings-payment-warning-color)"
         >
           <Trans t={t} i18nKey="DelayedPayment" ns="Payments">
             {{ date: paymentDate }} {{ planName: currentTariffPlanTitle }}
@@ -272,7 +204,7 @@ const PaymentContainer = observer((props: any) => {
         <Text
           fontSize="14px"
           lineHeight="16px"
-          className="payment-info_managers-price"
+          className={styles.paymentInfoManagersPrice}
         >
           <Trans t={t} i18nKey="BusinessFinalDateInfo" ns="Payments">
             {{ finalDate: paymentDate }}
@@ -282,61 +214,53 @@ const PaymentContainer = observer((props: any) => {
   };
 
   return (
-    <Consumer>
-      {(context: any) => (
-        <StyledBody
-          isChangeView={
-            context.sectionWidth <= size.mobile ? expandArticle : null
-          }
-        >
-          {isNotPaidPeriod
-            ? expiredTitleSubscriptionWarning()
-            : currentPlanTitle()}
+    <div className={styles.paymentBody}>
+      {isNotPaidPeriod
+        ? expiredTitleSubscriptionWarning()
+        : currentPlanTitle()}
 
-          <CurrentTariffContainer />
+      <CurrentTariffContainer />
 
-          {planSuggestion()}
-          {planDescription()}
+      {planSuggestion()}
+      {planDescription()}
 
-          {!isNonProfit && !isGracePeriod && !isNotPaidPeriod ? (
-            <div className="payment-info_wrapper">
-              <Text
-                fontWeight={600}
-                fontSize="14px"
-                className="payment-info_managers-price"
-              >
-                {isYearTariff ? (
-                  <Trans
-                    t={t}
-                    i18nKey="PerUserYear"
-                    ns="Common"
-                    values={{ price: formatPaymentCurrency(startValue) }}
-                    components={{ 1: <span key="price-span" /> }}
-                  />
-                ) : (
-                  <Trans
-                    t={t}
-                    i18nKey="PerUserMonth"
-                    ns="Common"
-                    values={{ price: formatPaymentCurrency(startValue) }}
-                    components={{ 1: <span key="price-span" /> }}
-                  />
-                )}
-              </Text>
+      {!isNonProfit && !isGracePeriod && !isNotPaidPeriod ? (
+        <div className={styles.paymentInfoWrapper}>
+          <Text
+            fontWeight={600}
+            fontSize="14px"
+            className={styles.paymentInfoManagersPrice}
+          >
+            {isYearTariff ? (
+              <Trans
+                t={t}
+                i18nKey="PerUserYear"
+                ns="Common"
+                values={{ price: formatPaymentCurrency(startValue) }}
+                components={{ 1: <span key="price-span" /> }}
+              />
+            ) : (
+              <Trans
+                t={t}
+                i18nKey="PerUserMonth"
+                ns="Common"
+                values={{ price: formatPaymentCurrency(startValue) }}
+                components={{ 1: <span key="price-span" /> }}
+              />
+            )}
+          </Text>
 
-              {renderTooltip()}
-            </div>
-          ) : null}
+          {renderTooltip()}
+        </div>
+      ) : null}
 
-          <div className="payment-info">
-            {!isNonProfit ? <PriceCalculation t={t} /> : null}
+      <div className={styles.paymentInfo}>
+        {!isNonProfit ? <PriceCalculation t={t} /> : null}
 
-            <BenefitsContainer t={t} />
-          </div>
-          <ContactContainer t={t} />
-        </StyledBody>
-      )}
-    </Consumer>
+        <BenefitsContainer t={t} />
+      </div>
+      <ContactContainer t={t} />
+    </div>
   );
 });
 

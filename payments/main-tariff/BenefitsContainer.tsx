@@ -26,7 +26,6 @@
 
 import React from "react";
 import { Trans } from "react-i18next";
-import styled, { css } from "styled-components";
 import { observer } from "mobx-react";
 
 import { Text } from "../../components/text";
@@ -38,82 +37,7 @@ import { FREE_BACKUP } from "@docspace/shared/constants";
 import HelpReactSvgUrl from "../../assets/icons/payments/help.react.svg?url";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
-
-const StyledBody = styled.div`
-  border-radius: 12px;
-  border: ${(props) => props.theme.client.settings.payment.border};
-  max-width: 320px;
-
-  padding: 24px;
-  box-sizing: border-box;
-  background: ${(props) =>
-    props.theme.client.settings.payment.backgroundBenefitsColor};
-
-  p {
-    margin-bottom: 24px;
-  }
-  .payment-benefits_text {
-    margin-bottom: 20px;
-  }
-  .payment-benefits {
-    margin-bottom: 14px;
-    align-items: center;
-    display: grid;
-    grid-template-columns: 24px 1fr;
-    grid-gap: 10px;
-    p {
-      margin-bottom: 0;
-    }
-
-    .payment-benefits_feature {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .icons-container {
-      width: 24px;
-      height: 24px;
-
-      ${(props) =>
-        !props.theme.isBase &&
-        css`
-          svg {
-            path[stroke],
-            g[stroke],
-            circle[stroke],
-            rect[stroke] {
-              stroke: ${({ theme }: any) =>
-                theme.client.settings.payment.benefitsContainer
-                  .iconsColor} !important;
-            }
-
-            path[fill]:not([fill="none"]),
-            g[fill]:not([fill="none"]),
-            circle[fill]:not([fill="none"]),
-            rect[fill]:not([fill="none"]) {
-              fill: ${({ theme }: any) =>
-                theme.client.settings.payment.benefitsContainer
-                  .iconsColor} !important;
-            }
-
-            path:not([stroke]):not([fill]),
-            g:not([stroke]):not([fill]) path:not([stroke]):not([fill]) {
-              fill: ${({ theme }: any) =>
-                theme.client.settings.payment.benefitsContainer
-                  .iconsColor} !important;
-            }
-
-            mask path {
-              fill: ${({ theme }: any) =>
-                theme.client.settings.payment.benefitsContainer
-                  .iconsColor} !important;
-            }
-          }
-        `}
-    }
-  }
-`;
+import styles from "./MainTariff.module.scss";
 
 const BenefitsContainer = observer(({ t }: any) => {
   const store = usePaymentStore();
@@ -153,28 +77,28 @@ const BenefitsContainer = observer(({ t }: any) => {
   };
 
   return (
-    <StyledBody className="benefits-container">
-      <Text fontSize="16px" fontWeight="600" className="payment-benefits_text">
+    <div className={styles.benefitsBody}>
+      <Text fontSize="16px" fontWeight="600" className={styles.benefitsText}>
         {t("Benefits")}
       </Text>
       {features &&
         Array.from(features.values()).map((item: any) => {
           if (!item.title || !item.image) return;
           return (
-            <div className="payment-benefits" key={item.title || item.image}>
+            <div className={styles.paymentBenefits} key={item.title || item.image}>
               <div
                 // biome-ignore lint/security/noDangerouslySetInnerHtml: TODO fix
                 dangerouslySetInnerHTML={{ __html: item.image }}
-                className="icons-container"
+                className={styles.iconsContainer}
               />
-              <div className="payment-benefits_feature">
+              <div className={styles.benefitsFeature}>
                 <Text as="span">{item.title}</Text>
                 {item.id === FREE_BACKUP ? renderTooltip() : null}
               </div>
             </div>
           );
         })}
-    </StyledBody>
+    </div>
   );
 });
 

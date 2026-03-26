@@ -24,47 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import styled from "styled-components";
 import { Text } from "../../components/text";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 import { PortalFeaturesLimitations } from "@docspace/shared/enums";
 import { getConvertedSize } from "@docspace/shared/utils/common";
-import { mobile } from "@docspace/shared/utils";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
-
-const StyledCurrentTariffContainer = styled.div`
-  display: flex;
-  min-height: 40px;
-  background: ${(props) => props.theme.client.settings.payment.backgroundColor};
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  margin-top: 14px;
-  padding: 12px 16px;
-  box-sizing: border-box;
-  padding-bottom: 0;
-  border-radius: 6px;
-
-  @media ${mobile} {
-    flex-direction: column;
-    margin-bottom: 27px;
-  }
-
-  div {
-    padding-bottom: 8px;
-    margin-inline-end: 24px;
-  }
-
-  p {
-    margin-bottom: 0;
-    color: ${(props) => props.theme.client.settings.payment.tariffText};
-    .current-tariff_count {
-      color: ${(props) => props.theme.client.settings.payment.tariffText};
-      margin-inline-start: 4px;
-    }
-  }
-`;
+import styles from "./MainTariff.module.scss";
 
 const CurrentTariffContainer = observer(({ style }: any) => {
   const { t } = useTranslation(["Payments", "Common"]);
@@ -72,7 +39,7 @@ const CurrentTariffContainer = observer(({ style }: any) => {
   const { quotaCharacteristics } = store.quotas;
 
   return (
-    <StyledCurrentTariffContainer style={style}>
+    <div className={styles.currentTariffContainer} style={style}>
       {quotaCharacteristics.map((item: any) => {
         const maxValue = item.value;
         const usedValue = item.used.value;
@@ -97,7 +64,7 @@ const CurrentTariffContainer = observer(({ style }: any) => {
             <Text isBold fontSize="14px">
               {item.used.title}
               <Text
-                className="current-tariff_count"
+                className={styles.currentTariffCount}
                 as="span"
                 isBold
                 fontSize="14px"
@@ -109,7 +76,7 @@ const CurrentTariffContainer = observer(({ style }: any) => {
           </div>
         );
       })}
-    </StyledCurrentTariffContainer>
+    </div>
   );
 });
 
