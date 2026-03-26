@@ -33,7 +33,7 @@ import {
   ModalDialogType,
 } from "../../../../components/modal-dialog";
 import { toastr } from "../../../../components/toast";
-import { updateWalletPayment } from "@docspace/shared/api/portal";
+import { useApi } from "../../../../providers";
 import { Button, ButtonSize } from "../../../../components/button";
 import {
   calculateTotalPrice,
@@ -51,14 +51,13 @@ import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 type StorageDialogProps = {
   visible: boolean;
   onClose: () => void;
-  fetchPortalTariff?: () => void;
 };
 
 const StoragePlanCancel: React.FC<StorageDialogProps> = ({
   visible,
   onClose,
-  fetchPortalTariff,
 }) => {
+  const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
 
   const {
@@ -68,7 +67,7 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
     formatWalletCurrency,
   } = paymentStore;
 
-  const { currentStoragePlanSize } = paymentStore.tariff;
+  const { currentStoragePlanSize, fetchPortalTariff } = paymentStore.tariff;
   const { usedTotalStorageSizeCount } = paymentStore.quotas;
 
   const totalPrice = calculateTotalPrice(
@@ -86,7 +85,11 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
     }, 200);
 
     try {
-      const res = await updateWalletPayment(0, 0);
+      const walletRes = await paymentApi.updateWalletPayment({
+        quantity: { storage: 0 },
+        productQuantityType: 0,
+      });
+      const res = walletRes?.data?.response;
 
       if (res === false) {
         toastr.error(t("Common:UnexpectedError"));
@@ -179,3 +182,4 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
 };
 
 export default observer(StoragePlanCancel);
+

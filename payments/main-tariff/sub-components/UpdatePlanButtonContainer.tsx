@@ -31,12 +31,8 @@ import styled from "styled-components";
 
 import { Button, ButtonSize } from "../../../components/button";
 import { toastr } from "../../../components/toast";
-import api from "@docspace/shared/api";
-import {
-  ModalDialog,
-  ModalDialogType,
-} from "../../../components/modal-dialog";
-import { updatePayment } from "@docspace/shared/api/portal";
+import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
+import { useApi } from "../../../providers";
 import { Text } from "../../../components/text";
 
 import DowngradePlanButtonContainer from "./DowngradePlanButtonContainer";
@@ -65,17 +61,24 @@ type UpdatePlanButtonContainerProps = {
   currentTariffPlanTitle?: string;
   t: (key: string, options?: Record<string, unknown>) => string;
   tariffPlanTitle?: string;
-  setPortalQuotaValue?: (res: unknown) => void;
 };
 
-const UpdatePlanButtonContainer = observer(({
+const UpdatePlanButtonContainer = ({
   isDisabled,
   currentTariffPlanTitle,
   t,
   tariffPlanTitle,
-  setPortalQuotaValue,
 }: UpdatePlanButtonContainerProps) => {
+  const { paymentApi } = useApi();
   const store = usePaymentStore();
+
+  const fetchQuotaInfo = async () => {
+    const r = await paymentApi.getQuotaPaymentInformation(true);
+    return r.data.response as unknown as {
+      features: { id: string; value: number }[];
+    };
+  };
+
   const {
     setIsLoading,
     paymentLink,
@@ -90,7 +93,8 @@ const UpdatePlanButtonContainer = observer(({
     canDowngradeTariff,
     cardLinked,
   } = store;
-  const { maxCountManagersByQuota, isYearTariff } = store.quotas;
+  const { maxCountManagersByQuota, isYearTariff, setPortalQuotaValue } =
+    store.quotas;
   const { walletCustomerStatusNotActive } = store.tariff;
   const [isVisiblePaymentConfirm, setIsVisiblePaymentConfirm] = useState(false);
   const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
@@ -128,7 +132,7 @@ const UpdatePlanButtonContainer = observer(({
         }
 
         isWaitRequest = true;
-        const res = await api.portal.getPortalQuota(true);
+        const res = await fetchQuotaInfo();
 
         const managersObject = res.features.find((obj) => obj.id === MANAGER);
 
@@ -164,7 +168,11 @@ const UpdatePlanButtonContainer = observer(({
 
       if (isVisiblePaymentConfirm) onClose();
 
-      const res = await updatePayment(managersCount, isYearTariff);
+      const data = isYearTariff
+        ? { adminyear: managersCount }
+        : { admin: managersCount };
+      const updateRes = await paymentApi.updatePayment({ quantity: data });
+      const res = updateRes?.data?.response;
 
       if (res === false) {
         const errorText =
@@ -195,7 +203,12 @@ const UpdatePlanButtonContainer = observer(({
       }
 
       previousManagersCount = maxCountManagersByQuota;
-      const quotaRes = await api.portal.getPortalQuota(true);
+      const quotaRes = await paymentApi.getQuotaPaymentInformation(true).then(
+        (r) =>
+          r.data.response as unknown as {
+            features: { id: string; value: number }[];
+          },
+      );
       const managersObject = quotaRes.features.find(
         (obj) => obj.id === MANAGER,
       );
@@ -404,6 +417,7 @@ const UpdatePlanButtonContainer = observer(({
       ) : null}
     </StyledBody>
   );
-});
+};
 
-export default UpdatePlanButtonContainer;
+export default observer(UpdatePlanButtonContainer);
+

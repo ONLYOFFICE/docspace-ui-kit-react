@@ -51,7 +51,7 @@ import {
   getConvertedSize,
 } from "@docspace/shared/utils/common";
 import type { DateTime } from "luxon";
-import { updateWalletPayment } from "@docspace/shared/api/portal";
+import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components/toast";
 import StoragePlanUpgrade from "../../panels/additional-storage/StoragePlanUpgrade";
 import StoragePlanCancel from "../../panels/additional-storage/StoragePlanCancel";
@@ -68,9 +68,8 @@ type AdditionalStoragePageProps = {
   fetchPortalTariff?: () => Promise<void>;
 };
 
-const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
-  fetchPortalTariff,
-}) => {
+const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
+  const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
@@ -94,6 +93,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     previousStoragePlanSize,
     isGracePeriod,
     hasStorageSubscription = false,
+    fetchPortalTariff,
   } = paymentStore.tariff;
 
   const { isInitServicesData, initServiceData } = servicesStore;
@@ -156,8 +156,13 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
   const handleCancelChange = async () => {
     setIsCancelLoading(true);
     try {
-      const res = await updateWalletPayment(null, 0);
+      const walletRes = await paymentApi.updateWalletPayment({
+        quantity: { storage: null },
+        productQuantityType: 0,
+      });
+      const res = walletRes?.data?.response;
       if (res === false) throw new Error(t("Common:UnexpectedError"));
+
       await Promise.all([
         fetchPortalTariff?.(),
         fetchBalance?.(),

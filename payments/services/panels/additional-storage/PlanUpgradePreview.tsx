@@ -31,7 +31,7 @@ import classNames from "classnames";
 import { now, formatDateLocalized } from "../../../../utils/date";
 
 import { Text } from "../../../../components/text";
-import { calcalateWalletPayment } from "@docspace/shared/api/portal";
+import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components/toast";
 import { Loader, LoaderTypes } from "../../../../components/loader";
 import { useInterfaceDirection } from "../../../../context/InterfaceDirectionContext";
@@ -61,6 +61,7 @@ const getDirectionalText = (isRTL: boolean) => {
 const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
   const { amount } = props;
 
+  const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
@@ -110,11 +111,11 @@ const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
 
         const quantity = calculateDifferenceBetweenPlan(amount);
         try {
-          const currentWriteOff = await calcalateWalletPayment(
-            quantity,
-            1,
-            controller.signal,
+          const calcRes = await paymentApi.calculateWalletPayment(
+            { quantity: { storage: quantity }, productQuantityType: 1 },
+            { signal: controller.signal },
           );
+          const currentWriteOff = calcRes?.data?.response as unknown as { amount: number } | null;
 
           if (!currentWriteOff) {
             toastr.error(t("Common:UnexpectedError"));

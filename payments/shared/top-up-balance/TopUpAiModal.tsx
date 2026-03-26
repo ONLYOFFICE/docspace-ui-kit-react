@@ -40,7 +40,6 @@ import { AmountProvider } from "../../wallet/context";
 import styles from "./styles/TopUpModal.module.scss";
 
 import modalStyles from "./styles/TopUpAiModal.module.scss";
-import { buyWalletService } from "@docspace/shared/api/portal";
 
 import { useNavigate } from "react-router";
 

@@ -36,7 +36,7 @@ import { toastr } from "../../../../components/toast";
 import { HelpButton } from "../../../../components/help-button";
 import { now, formatDateLocalized } from "../../../../utils/date";
 
-import { calcalateWalletPayment } from "@docspace/shared/api/portal";
+import { useApi } from "../../../../providers";
 
 import { useServicesActions } from "../../hooks/useServicesActions";
 import { usePaymentContext } from "../../context/PaymentContext";
@@ -67,6 +67,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   hasMinError,
   isExceedingStorageLimit,
 }) => {
+  const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
@@ -106,11 +107,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
       const quantity = calculateDifferenceBetweenPlan(amount);
       try {
-        const result = await calcalateWalletPayment(
-          quantity,
-          1,
-          controllerRef.current.signal,
+        const calcRes = await paymentApi.calculateWalletPayment(
+          { quantity: { storage: quantity }, productQuantityType: 1 },
+          { signal: controllerRef.current.signal },
         );
+        const result = calcRes?.data?.response as unknown as { amount: number } | null;
 
         if (!result) {
           toastr.error(t("Common:UnexpectedError"));

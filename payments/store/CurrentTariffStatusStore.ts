@@ -214,12 +214,12 @@ class CurrentTariffStatusStore {
     return this.payerInfo.payer ?? null;
   }
 
-  fetchPortalTariff = async () => {
+  fetchPortalTariff = async (isRefresh?: boolean) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
     try {
-      const res = await this.portalQuotaApi.getPortalTariff(undefined, {
+      const res = await this.portalQuotaApi.getPortalTariff(isRefresh, {
         signal: abortController.signal,
       });
 
@@ -248,6 +248,8 @@ class CurrentTariffStatusStore {
       }
 
       this.setIsLoaded(true);
+
+      return tariff;
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);

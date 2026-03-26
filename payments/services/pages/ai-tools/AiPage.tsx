@@ -55,7 +55,7 @@ import {
   formatDateLocalized,
   getAppTimezone,
 } from "../../../../utils/date";
-import { setServiceState } from "@docspace/shared/api/portal";
+import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components";
 import AIServiceDialog from "../../panels/ai-service/AIServiceDialog";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
@@ -74,6 +74,7 @@ const AiPage = (props: AiPageProps) => {
     getAIConfig,
   } = props;
 
+  const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
@@ -159,7 +160,7 @@ const AiPage = (props: AiPageProps) => {
     changeServiceState(AI_ENUM);
 
     try {
-      const result = await setServiceState(raw);
+      const result = await paymentApi.changeTenantWalletServiceState(raw);
 
       if (!result) {
         toastr.error(t("Common:UnexpectedError"));

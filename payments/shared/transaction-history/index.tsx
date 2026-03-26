@@ -42,10 +42,7 @@ import {
 } from "../../../components/combobox";
 import { DatePicker } from "../../../components/date-picker";
 import { toastr } from "../../../components/toast";
-import {
-  checkTransactionHistoryReport,
-  startTransactionHistoryReport,
-} from "@docspace/shared/api/portal";
+import { useApi } from "../../../providers";
 import {
   EmployeeStatus,
   EmployeeType,
@@ -183,6 +180,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     hideTypeFilter,
   } = props;
 
+  const { paymentApi } = useApi();
   const store = usePaymentStore();
 
   const {
@@ -475,20 +473,21 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     const isDebit = selectedType.key !== "credit";
 
     try {
-      await startTransactionHistoryReport(
-        formatDate!(startDate),
-        formatDate!(endDate),
-        isCredit,
-        isDebit,
-        selectedContact?.id,
+      await paymentApi.createCustomerOperationsReport({
+        startDate: formatDate!(startDate),
+        endDate: formatDate!(endDate),
+        credit: isCredit,
+        debit: isDebit,
+        participantName: selectedContact?.id,
         serviceName,
-      );
+      });
 
       const result = await new Promise<TransactionHistoryReportResponse>(
         (resolve, reject) => {
           const checkStatus = async () => {
             try {
-              const response = await checkTransactionHistoryReport();
+              const checkRes = await paymentApi.getCustomerOperationsReport();
+              const response = checkRes?.data?.response as unknown as TransactionHistoryReportResponse;
 
               if (!response) {
                 reject(new Error(t("Common:UnexpectedError")));

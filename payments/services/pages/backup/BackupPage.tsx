@@ -37,7 +37,7 @@ import styles from "./BackupPage.module.scss";
 import { BACKUP_SERVICE } from "@docspace/shared/constants";
 import { DeviceType } from "../../../../enums";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
-import { setServiceState } from "@docspace/shared/api/portal";
+import { useApi } from "../../../../providers";
 import { now, formatDateLocalized } from "../../../../utils/date";
 import { toastr } from "../../../../components";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
@@ -48,6 +48,7 @@ import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 
 const BackupPage: React.FC = () => {
+  const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
@@ -89,7 +90,7 @@ const BackupPage: React.FC = () => {
     changeServiceState(BACKUP_SERVICE);
 
     try {
-      await setServiceState(raw);
+      await paymentApi.changeTenantWalletServiceState(raw);
     } catch (error) {
       console.error(error);
       toastr.error(t("Common:UnexpectedError"));

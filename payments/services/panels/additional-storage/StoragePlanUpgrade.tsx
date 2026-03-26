@@ -37,7 +37,7 @@ import {
   ModalDialogType,
 } from "../../../../components/modal-dialog";
 import { toastr } from "../../../../components/toast";
-import { updateWalletPayment } from "@docspace/shared/api/portal";
+import { useApi } from "../../../../providers";
 import { calculateTotalPrice } from "@docspace/shared/utils/common";
 import {
   STORAGE_DEACTIVATION_VISITED,
@@ -65,9 +65,6 @@ type StorageDialogProps = {
   visible: boolean;
   onClose: () => void;
   previousValue?: string;
-  fetchPortalTariff?: (
-    force?: boolean,
-  ) => Promise<{ walletQuotas: { quantity: number; nextQuantity?: number }[] }>;
 };
 
 const MAX_ATTEMPTS = 30;
@@ -77,8 +74,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
   visible,
   onClose,
   previousValue = "",
-  fetchPortalTariff,
 }) => {
+  const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
@@ -86,6 +83,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     hasStorageSubscription,
     currentStoragePlanSize = 0,
     hasScheduledStorageChange,
+    fetchPortalTariff,
   } = paymentStore.tariff;
 
   const {
@@ -247,9 +245,9 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
           if (isWaitingRef.current) return;
           isWaitingRef.current = true;
 
-          const { walletQuotas } = await fetchPortalTariff!(true);
+          const { quotas } = await fetchPortalTariff!(true);
 
-          if (isUpdatedTariff(walletQuotas, isCancellation)) {
+          if (isUpdatedTariff(quotas, isCancellation)) {
             resetIntervalSuccess(isCancellation);
           }
         } catch (e) {
@@ -280,7 +278,11 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       const isNewSubscription = !hasStorageSubscription;
 
       try {
-        const res = await updateWalletPayment(value, productType);
+        const walletRes = await paymentApi.updateWalletPayment({
+          quantity: value !== null ? { storage: value } : null,
+          productQuantityType: productType,
+        });
+        const res = walletRes?.data?.response;
 
         if (res === false) {
           throw new Error(t("Common:UnexpectedError"));
@@ -297,11 +299,9 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         }
 
         if (isUpgradeStoragePlan) fetchBalance();
-        const { walletQuotas } = await fetchPortalTariff!(true);
+        const { quotas } = await fetchPortalTariff!(true);
 
-        if (!walletQuotas) return;
-
-        if (isUpdatedTariff(walletQuotas, isCancellation)) {
+        if (isUpdatedTariff(quotas, isCancellation)) {
           resetIntervalSuccess(isCancellation);
         } else {
           waitingForTariff(isCancellation);
@@ -433,10 +433,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
                     ns="Payments"
                     i18nKey="PerStorageWitnMinValue"
                     values={{
-                      currency: formatWalletCurrency(
-                        storagePriceIncrement,
-                        2,
-                      ),
+                      currency: formatWalletCurrency(storagePriceIncrement, 2),
                       amount: `1 ${t("Common:Gigabyte")}`,
                       minValue: MIN_VALUE,
                       storageUnit: t("Common:Gigabyte"),
@@ -493,3 +490,4 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 };
 
 export default observer(StoragePlanUpgrade);
+

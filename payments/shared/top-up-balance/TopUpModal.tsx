@@ -40,7 +40,7 @@ import TopUpButtons from "./sub-components/TopUpButtons";
 import AutomaticPaymentsBlock from "./sub-components/AutoPayments";
 import { AmountProvider } from "../../wallet/context";
 import styles from "./styles/TopUpModal.module.scss";
-import { saveDeposite } from "@docspace/shared/api/portal";
+import { useApi } from "../../../providers";
 import type { DateTime } from "luxon";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
@@ -71,6 +71,7 @@ const TopUpModal = (props: TopUpModalProps) => {
     serviceName,
   } = props;
 
+  const { paymentApi } = useApi();
   const store = usePaymentStore();
 
   const {
@@ -91,6 +92,11 @@ const TopUpModal = (props: TopUpModalProps) => {
   const balanceValue = formatWalletCurrency!();
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const topUpDeposit = async (amount: number, currency: string) => {
+    const res = await paymentApi.topUpDeposit({ amount, currency });
+    return res?.data?.response as unknown as string;
+  };
 
   const onFetchHistory = async () => {
     await fetchTransactionHistory?.(null, null, true, true, "", serviceName);
@@ -145,7 +151,7 @@ const TopUpModal = (props: TopUpModalProps) => {
             setIsLoading={setIsLoading}
             isLoading={isLoading}
             walletCustomerStatusNotActive={walletCustomerStatusNotActive}
-            onTopUpBalance={saveDeposite}
+            onTopUpBalance={topUpDeposit}
             afterTopUp={afterTopUp}
           />
         </ModalDialog.Footer>
