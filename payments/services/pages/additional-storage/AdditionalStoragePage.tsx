@@ -44,7 +44,7 @@ import RemoveSessionIcon from "../../../../assets/icons/payments/remove.session.
 
 import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./AdditionalStoragePage.module.scss";
-import { DISK_STORAGE } from "@docspace/shared/constants";
+import { DISK_STORAGE, STORAGE_ENUM } from "@docspace/shared/constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import {
   calculateTotalPrice,
@@ -96,7 +96,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     hasStorageSubscription = false,
   } = paymentStore.tariff;
 
-  const { isInitServicesData } = servicesStore;
+  const { isInitServicesData, initServiceData } = servicesStore;
 
   const { t, ready } = useTranslation(["Payments", "Common", "Services"]);
   const contextMenuRef = useRef<ContextMenuRefType>(null);
@@ -105,6 +105,10 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
   const [isCancelLoading, setIsCancelLoading] = useState(false);
   const [isGracePeriodModalVisible, setIsGracePeriodModalVisible] =
     useState(false);
+
+  useEffect(() => {
+    initServiceData(t, DISK_STORAGE, STORAGE_ENUM);
+  }, []);
   const shouldShowLoader = !isInitServicesData || !ready;
 
   useEffect(() => {
@@ -332,7 +336,10 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
       ) : null}
 
       <div className={styles.transactionSection}>
-        <TransactionHistory serviceName={storageServiceName ?? DISK_STORAGE} hideTypeFilter />
+        <TransactionHistory
+          serviceName={storageServiceName ?? DISK_STORAGE}
+          hideTypeFilter
+        />
       </div>
 
       {isShowStorageTariffDeactivatedModal ? (
@@ -345,7 +352,9 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         <StoragePlanUpgrade
           visible={isStorageDialogVisible}
           onClose={onCloseUpgradeStorage}
-          {...(previousStoragePlanSize && { previousValue: previousStoragePlanSize.toString() })}
+          {...(previousStoragePlanSize && {
+            previousValue: previousStoragePlanSize.toString(),
+          })}
         />
       ) : null}
       {isCancelDialogVisible ? (
@@ -365,3 +374,4 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
 };
 
 export default observer(AdditionalStoragePage);
+
