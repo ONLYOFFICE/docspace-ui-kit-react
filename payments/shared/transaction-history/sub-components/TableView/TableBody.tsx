@@ -31,7 +31,7 @@ import classNames from "classnames";
 
 import { TableRow, TableCell } from "../../../../../components/table";
 import { Text } from "../../../../../components/text";
-import { TTransactionCollection } from "@docspace/shared/api/portal/types";
+import type { OperationDto } from "@onlyoffice/docspace-api-sdk";
 import { Encoder } from "../../../../../utils/encoder";
 
 import { getCorrectDate } from "../../../../../utils/date/getCorrectDate";
@@ -40,7 +40,7 @@ import { accountingLedgersFormat, getServiceQuantity } from "../../../../wallet/
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 
 interface TransactionRowProps {
-  transaction: TTransactionCollection;
+  transaction: OperationDto;
 }
 
 const TransactionRow: React.FC<TransactionRowProps> = ({

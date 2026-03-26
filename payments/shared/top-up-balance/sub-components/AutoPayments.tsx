@@ -34,7 +34,7 @@ import { Text } from "../../../../components/text";
 import { toastr } from "../../../../components/toast";
 import { TextInput, InputType } from "../../../../components/text-input";
 import { Button, ButtonSize } from "../../../../components/button";
-import { TAutoTopUpSettings } from "@docspace/shared/api/portal/types";
+import type { TenantWalletSettings } from "@onlyoffice/docspace-api-sdk";
 
 import CheckRoundSvg from "../../../../assets/icons/payments/16/check.round.react.svg";
 
@@ -49,7 +49,7 @@ type AutoPaymentsProps = {
 };
 
 type CurrentPaymentSettingsProps = {
-  autoPayments: TAutoTopUpSettings;
+  autoPayments: TenantWalletSettings;
   formatWalletCurrency?: (item?: number, fractionDigits?: number) => string;
 };
 

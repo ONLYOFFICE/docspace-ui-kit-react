@@ -26,7 +26,7 @@
 import { observer } from "mobx-react";
 
 import { RowContainer } from "../../../../../components/rows";
-import { TTransactionCollection } from "@docspace/shared/api/portal/types";
+import type { OperationDto } from "@onlyoffice/docspace-api-sdk";
 
 import TransactionRowView from "./RowBody";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";

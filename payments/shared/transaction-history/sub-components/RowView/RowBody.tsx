@@ -32,7 +32,7 @@ import classNames from "classnames";
 import { TTheme } from "../../../../../providers/theme/themes";
 import { Text } from "../../../../../components/text";
 import { Row, RowContent } from "../../../../../components/rows";
-import { TTransactionCollection } from "@docspace/shared/api/portal/types";
+import type { OperationDto } from "@onlyoffice/docspace-api-sdk";
 import { Encoder } from "../../../../../utils/encoder";
 import { getCorrectDate } from "../../../../../utils/date/getCorrectDate";
 
@@ -41,7 +41,7 @@ import { accountingLedgersFormat, getServiceQuantity } from "../../../../wallet/
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 
 type TransactionRowViewProps = {
-  transaction: TTransactionCollection;
+  transaction: OperationDto;
   theme?: TTheme;
   sectionWidth: number;
 };
