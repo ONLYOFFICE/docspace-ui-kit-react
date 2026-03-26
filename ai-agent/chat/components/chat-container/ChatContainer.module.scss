@@ -29,49 +29,49 @@
 
 :global(.dark) {
   .chatContainer {
-    --accent-main: var(--color-scheme-main-accent, #{$light-blue-main});
-    --background-color: #{$black};
-    --text-color: #{$white};
-    --icon-button-color: #{$gray-dark};
+    --accent-main: var(--chat-accent-color, var(--color-scheme-main-accent, #{$light-blue-main}));
+    --background-color: var(--chat-background, #{$black});
+    --text-color: var(--chat-text-color, #{$white});
+    --icon-button-color: var(--chat-icon-color, #{$gray-dark});
 
-    --chat-header-model-color: #{$gray-dark};
-    --chat-header-button-svg-color: #{$white};
-    --chat-header-button-hover-background: #{$light-dark-gray-hover};
-    --chat-header-button-active-background: #{$gray-dark-mid};
-    --chat-header-button-disabled-color: #{$gray-dark};
+    --chat-header-model-color: var(--chat-header-model-text-color, #{$gray-dark});
+    --chat-header-button-svg-color: var(--chat-header-button-color, var(--chat-text-color, #{$white}));
+    --chat-header-button-hover-background: var(--chat-header-button-hover-background-color, #{$light-dark-gray-hover});
+    --chat-header-button-active-background: var(--chat-header-button-active-background-color, #{$gray-dark-mid});
+    --chat-header-button-disabled-color: var(--chat-header-button-disabled-text-color, #{$gray-dark});
 
-    --chat-message-color: #{$dark-gray-dark};
-    --chat-message-user-background-color: #{$white};
-    --chat-message-error-background-color: #{$dark-error-status};
-    --chat-message-file-border-color: #{$gray-dark-strong};
-    --chat-message-code-block-background-color: #{$dark-gray-light};
-    --chat-message-code-block-border: none;
-    --chat-message-code-block-separator-color: #{$gray-dark-strong};
-    --chat-message-tool-block-color: #{$gray-dark-mid};
-    --chat-message-hr-color: #{$gray-dark};
-    --chat-message-table-row-border-color: #{$gray-dark-strong};
-    --chat-message-blockquote-bg-color: #{$white};
-    --chat-message-blockquote-color: #{$dark-gray-dark};
-    --chat-message-source-url-color: #{$dark-gray-dark};
-    --chat-message-source-bg-hover-color: #{$light-dark-gray-hover};
-    --chat-message-source-bg-pressed-color: #{$black};
-    --chat-message-external-link-icon-color: #{$gray-dark};
+    --chat-message-color: var(--chat-message-text-color, #{$dark-gray-dark});
+    --chat-message-user-background-color: var(--chat-user-message-background, #{$white});
+    --chat-message-error-background-color: var(--chat-error-background, #{$dark-error-status});
+    --chat-message-file-border-color: var(--chat-file-border-color, #{$gray-dark-strong});
+    --chat-message-code-block-background-color: var(--chat-code-background, #{$dark-gray-light});
+    --chat-message-code-block-border: var(--chat-code-border, none);
+    --chat-message-code-block-separator-color: var(--chat-code-separator-color, #{$gray-dark-strong});
+    --chat-message-tool-block-color: var(--chat-tool-block-background, #{$gray-dark-mid});
+    --chat-message-hr-color: var(--chat-divider-color, #{$gray-dark});
+    --chat-message-table-row-border-color: var(--chat-table-border-color, #{$gray-dark-strong});
+    --chat-message-blockquote-bg-color: var(--chat-blockquote-background, #{$white});
+    --chat-message-blockquote-color: var(--chat-blockquote-text-color, #{$dark-gray-dark});
+    --chat-message-source-url-color: var(--chat-source-url-color, #{$dark-gray-dark});
+    --chat-message-source-bg-hover-color: var(--chat-source-hover-background, #{$light-dark-gray-hover});
+    --chat-message-source-bg-pressed-color: var(--chat-source-pressed-background, #{$black});
+    --chat-message-external-link-icon-color: var(--chat-link-icon-color, #{$gray-dark});
 
-    --chat-input-background-color: #{$gray-dark-mid};
-    --chat-input-border: 1px solid #{$black};
-    --chat-input-file-border-color: #{$black};
-    --chat-input-file-background-color: #{$black};
-    --chat-input-file-exst-color: #{$gray};
-    --chat-input-tools-button-color: #{$dark-gray-dark};
-    --chat-input-tools-button-disabled-color: #{$gray-dark-strong};
-    --chat-input-tools-button-hover-background: #{$light-dark-gray-hover};
-    --chat-input-tools-button-active-color: #{$white};
-    --chat-input-tools-button-active-background: #{$gray-dark-mid};
-    --chat-input-send-button-color: #{$black};
-    --chat-input-send-button-background: #{$active-color-dark};
-    --chat-input-placeholder-disabled-color: #{$gray-dark-strong};
+    --chat-input-background-color: var(--chat-input-background, #{$gray-dark-mid});
+    --chat-input-border: var(--chat-input-border-style, 1px solid #{$black});
+    --chat-input-file-border-color: var(--chat-file-border-color, #{$black});
+    --chat-input-file-background-color: var(--chat-file-background, #{$black});
+    --chat-input-file-exst-color: var(--chat-file-extension-color, #{$gray});
+    --chat-input-tools-button-color: var(--chat-toolbar-button-color, #{$dark-gray-dark});
+    --chat-input-tools-button-disabled-color: var(--chat-toolbar-button-disabled-color, #{$gray-dark-strong});
+    --chat-input-tools-button-hover-background: var(--chat-toolbar-button-hover-background, #{$light-dark-gray-hover});
+    --chat-input-tools-button-active-color: var(--chat-toolbar-button-active-color, #{$white});
+    --chat-input-tools-button-active-background: var(--chat-toolbar-button-active-background, #{$gray-dark-mid});
+    --chat-input-send-button-color: var(--chat-send-button-color, #{$black});
+    --chat-input-send-button-background: var(--chat-send-button-background, #{$active-color-dark});
+    --chat-input-placeholder-disabled-color: var(--chat-placeholder-disabled-color, #{$gray-dark-strong});
 
-    --chat-file-item-exst-color: #{$gray-dark};
+    --chat-file-item-exst-color: var(--chat-file-extension-color, #{$gray-dark});
 
   }
 }
@@ -101,54 +101,148 @@
 }
 
 .chatScrollBody {
-  padding: 0 20px !important;
+  padding: 0 var(--chat-content-padding) !important;
 }
 
 .chatContainer {
-  --accent-main: var(--color-scheme-main-accent, #{$light-blue-main});
+  // ─── Public API ───────────────────────────────────────────────────────
+  // Set any --chat-* variable on a parent element to override the default.
+  // If not set, the fallback (second argument) is used.
+
+  // ── Global colors ──
+  --accent-main: var(--chat-accent-color, var(--color-scheme-main-accent, #{$light-blue-main}));
   --input-text-align: left;
-  --background-color: #{$white};
-  --text-color: #{$black};
-  --icon-button-color: #{$gray};
+  --background-color: var(--chat-background, #{$white});
+  --text-color: var(--chat-text-color, #{$black});
+  --icon-button-color: var(--chat-icon-color, #{$gray});
 
-  --chat-header-model-color: #{$gray};
-  --chat-header-button-svg-color: #{$black};
-  --chat-header-button-hover-background: #{$light-gray-hover};
-  --chat-header-button-active-background: #{$gray-light-mid};
-  --chat-header-button-disabled-color: #{$gray};
+  // ── Header colors ──
+  --chat-header-model-color: var(--chat-header-model-text-color, #{$gray});
+  --chat-header-button-svg-color: var(--chat-header-button-color, var(--chat-text-color, #{$black}));
+  --chat-header-button-hover-background: var(--chat-header-button-hover-background-color, #{$light-gray-hover});
+  --chat-header-button-active-background: var(--chat-header-button-active-background-color, #{$gray-light-mid});
+  --chat-header-button-disabled-color: var(--chat-header-button-disabled-text-color, #{$gray});
 
-  --chat-message-color: #{$gray-text};
-  --chat-message-user-background-color: var(--accent-main);
-  --chat-message-error-background-color: #{$light-error-status};
-  --chat-message-file-border-color: #{$gray-light-mid};
-  --chat-message-code-block-background-color: #{$white};
-  --chat-message-code-block-border: 1px solid #{$gray-light-mid};
-  --chat-message-code-block-separator-color: #{$gray-light-mid};
-  --chat-message-tool-block-color: #{$light-gray-hover};
-  --chat-message-hr-color: #{$gray};
-  --chat-message-table-row-border-color: #{$gray-light-mid};
-  --chat-message-blockquote-bg-color: var(--accent-main);
-  --chat-message-blockquote-color: #{$gray-text};
-  --chat-message-source-url-color: #{$light-gray-dark};
-  --chat-message-source-bg-hover-color: #{$light-gray-selected};
-  --chat-message-source-bg-pressed-color: #{$gray-strong};
-  --chat-message-external-link-icon-color: #{$gray};
+  // ── Message colors ──
+  --chat-message-color: var(--chat-message-text-color, #{$gray-text});
+  --chat-message-user-background-color: var(--chat-user-message-background, var(--accent-main));
+  --chat-message-error-background-color: var(--chat-error-background, #{$light-error-status});
+  --chat-message-file-border-color: var(--chat-file-border-color, #{$gray-light-mid});
+  --chat-message-code-block-background-color: var(--chat-code-background, #{$white});
+  --chat-message-code-block-border: var(--chat-code-border, 1px solid #{$gray-light-mid});
+  --chat-message-code-block-separator-color: var(--chat-code-separator-color, #{$gray-light-mid});
+  --chat-message-tool-block-color: var(--chat-tool-block-background, #{$light-gray-hover});
+  --chat-message-hr-color: var(--chat-divider-color, #{$gray});
+  --chat-message-table-row-border-color: var(--chat-table-border-color, #{$gray-light-mid});
+  --chat-message-blockquote-bg-color: var(--chat-blockquote-background, var(--accent-main));
+  --chat-message-blockquote-color: var(--chat-blockquote-text-color, #{$gray-text});
+  --chat-message-source-url-color: var(--chat-source-url-color, #{$light-gray-dark});
+  --chat-message-source-bg-hover-color: var(--chat-source-hover-background, #{$light-gray-selected});
+  --chat-message-source-bg-pressed-color: var(--chat-source-pressed-background, #{$gray-strong});
+  --chat-message-external-link-icon-color: var(--chat-link-icon-color, #{$gray});
 
-  --chat-input-background-color: #{$gray-light};
-  --chat-input-border: unset;
-  --chat-input-file-border-color: #{$gray-light-mid};
-  --chat-input-file-background-color: #{$white};
-  --chat-input-file-exst-color: #{$gray};
-  --chat-input-tools-button-color: #{$gray-text};
-  --chat-input-tools-button-disabled-color: #{$gray};
-  --chat-input-tools-button-hover-background: #{$light-gray-hover};
-  --chat-input-tools-button-active-color: #{$black};
-  --chat-input-tools-button-active-background: #{$gray-light-mid};
-  --chat-input-send-button-color: #{$white};
-  --chat-input-send-button-background: var(--accent-main);
-  --chat-input-placeholder-disabled-color: #{$gray-strong};
+  // ── Input colors ──
+  --chat-input-background-color: var(--chat-input-background, #{$gray-light});
+  --chat-input-border: var(--chat-input-border-style, unset);
+  --chat-input-file-border-color: var(--chat-file-border-color, #{$gray-light-mid});
+  --chat-input-file-background-color: var(--chat-file-background, #{$white});
+  --chat-input-file-exst-color: var(--chat-file-extension-color, #{$gray});
+  --chat-input-tools-button-color: var(--chat-toolbar-button-color, #{$gray-text});
+  --chat-input-tools-button-disabled-color: var(--chat-toolbar-button-disabled-color, #{$gray});
+  --chat-input-tools-button-hover-background: var(--chat-toolbar-button-hover-background, #{$light-gray-hover});
+  --chat-input-tools-button-active-color: var(--chat-toolbar-button-active-color, #{$black});
+  --chat-input-tools-button-active-background: var(--chat-toolbar-button-active-background, #{$gray-light-mid});
+  --chat-input-send-button-color: var(--chat-send-button-color, #{$white});
+  --chat-input-send-button-background: var(--chat-send-button-background, var(--accent-main));
+  --chat-input-placeholder-disabled-color: var(--chat-placeholder-disabled-color, #{$gray-strong});
+  --chat-file-item-exst-color: var(--chat-file-extension-color, #{$gray});
 
-  --chat-file-item-exst-color: #{$gray};
+  // ── Design tokens (base scale) ──
+  --chat-border-radius: var(--chat-border-radius-base, 6px);
+  --chat-radius-sm: var(--chat-border-radius-small, 3px);
+  --chat-spacing-xs: var(--chat-spacing-extra-small, 4px);
+  --chat-spacing-sm: var(--chat-spacing-small, 6px);
+  --chat-spacing-base: var(--chat-spacing-base-value, 8px);
+  --chat-spacing-md: var(--chat-spacing-medium, 12px);
+  --chat-spacing-lg: var(--chat-spacing-large, 16px);
+  --chat-icon-xs: var(--chat-icon-extra-small, 12px);
+  --chat-icon-sm: var(--chat-icon-small, 16px);
+  --chat-icon-md: var(--chat-icon-medium, 32px);
+
+  // ── Shared layout ──
+  --chat-content-max-width: var(--chat-max-width, 700px);
+  --chat-content-padding: var(--chat-padding, 20px);
+
+  // ── Header ──
+  --chat-header-padding: var(--chat-header-padding-value, 16px 0);
+  --chat-header-min-height: var(--chat-header-height, 48px);
+  --chat-header-gap: var(--chat-header-spacing, 16px);
+  --chat-header-button-size: var(--chat-header-button-height, var(--chat-icon-md));
+  --chat-header-button-padding: var(--chat-header-button-inner-padding, var(--chat-spacing-base));
+  --chat-header-button-border-radius: var(--chat-header-button-radius, var(--chat-border-radius));
+  --chat-header-icon-button-size: var(--chat-header-icon-button-height, var(--chat-icon-md));
+  --chat-header-icon-button-border-radius: var(--chat-header-icon-button-radius, var(--chat-radius-sm));
+  --chat-header-dropdown-gap: var(--chat-header-dropdown-spacing, var(--chat-spacing-base));
+  --chat-header-dropdown-icon-size: var(--chat-header-dropdown-icon-width, var(--chat-icon-sm));
+
+  // ── Messages ──
+  --chat-message-gap: var(--chat-message-spacing, 32px);
+  --chat-message-font-size: var(--chat-font-size, 15px);
+  --chat-message-line-height: var(--chat-line-height, 22px);
+  --chat-message-bubble-radius: var(--chat-bubble-border-radius, 16px);
+  --chat-message-bubble-padding: var(--chat-bubble-padding, 0 12px);
+  --chat-message-content-gap: var(--chat-message-inner-spacing, var(--chat-spacing-base));
+  --chat-message-block-margin: var(--chat-content-block-margin, 8px 0);
+  --chat-message-image-size: var(--chat-image-thumbnail-size, 80px);
+  --chat-message-file-max-width: var(--chat-file-item-width, 300px);
+  --chat-message-file-gap: var(--chat-file-spacing, var(--chat-spacing-sm));
+  --chat-message-error-padding: var(--chat-error-inner-padding, var(--chat-spacing-base));
+  --chat-message-buttons-gap: var(--chat-message-buttons-spacing, var(--chat-spacing-base));
+  --chat-message-buttons-margin-top: var(--chat-message-buttons-offset, var(--chat-spacing-base));
+
+  // ── Code blocks ──
+  --chat-code-max-height: var(--chat-code-block-max-height, 420px);
+
+  // ── Tool calls ──
+  --chat-tool-call-gap: var(--chat-tool-call-spacing, var(--chat-spacing-lg));
+  --chat-tool-call-body-padding: var(--chat-tool-call-body-inner-padding, var(--chat-spacing-md));
+  --chat-tool-call-body-gap: var(--chat-tool-call-body-spacing, var(--chat-spacing-md));
+  --chat-tool-call-header-padding: var(--chat-tool-call-header-inner-padding, var(--chat-spacing-base) 0);
+
+  // ── Blockquote ──
+  --chat-blockquote-padding: var(--chat-blockquote-inner-padding, 6px 12px);
+
+  // ── Table ──
+  --chat-table-cell-padding: var(--chat-table-cell-inner-padding, 8px 12px);
+  --chat-table-cell-width: var(--chat-table-column-width, 175px);
+
+  // ── Source links ──
+  --chat-source-item-padding: var(--chat-source-item-inner-padding, var(--chat-spacing-xs) var(--chat-spacing-base));
+  --chat-source-item-gap: var(--chat-source-item-spacing, var(--chat-spacing-base));
+
+  // ── Input ──
+  --chat-input-min-height: var(--chat-input-height, 40px);
+  --chat-input-padding: var(--chat-input-inner-padding, 6px 8px 44px);
+  --chat-input-buttons-bottom: var(--chat-input-buttons-offset, var(--chat-spacing-sm));
+  --chat-input-buttons-padding: var(--chat-input-buttons-inner-padding, 0 var(--chat-spacing-base));
+  --chat-input-button-height: var(--chat-input-button-size, var(--chat-icon-md));
+  --chat-input-button-padding: var(--chat-input-button-inner-padding, 0 var(--chat-spacing-base));
+  --chat-input-button-gap: var(--chat-input-button-spacing, var(--chat-spacing-base));
+  --chat-input-toolbar-gap: var(--chat-input-toolbar-spacing, var(--chat-spacing-xs));
+  --chat-input-send-button-size: var(--chat-send-button-size, var(--chat-icon-md));
+
+  // ── File attachments (input) ──
+  --chat-file-list-height: calc(var(--chat-icon-md) + var(--chat-spacing-md));
+  --chat-file-list-gap: var(--chat-file-list-spacing, var(--chat-spacing-sm));
+  --chat-file-item-height: var(--chat-file-item-size, var(--chat-icon-md));
+
+  // ── Samples ──
+  --chat-samples-gap: var(--chat-samples-spacing, 8px);
+  --chat-samples-padding: var(--chat-samples-item-padding, 10px 12px);
+  --chat-samples-margin-bottom: var(--chat-samples-bottom-margin, 12px);
+
+  // ── Info block ──
+  --chat-info-block-padding: var(--chat-info-block-inner-padding, 12px 16px);
 
   &.useInternalScroll {
     height: 100%;

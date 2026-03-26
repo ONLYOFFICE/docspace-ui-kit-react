@@ -53,17 +53,17 @@
   display: flex;
   flex-direction: column;
 
-  gap: 32px;
+  gap: var(--chat-message-gap);
 
   width: 100%;
-  max-width: 700px;
+  max-width: var(--chat-content-max-width);
 
-  padding: 20px;
+  padding: var(--chat-content-padding);
   margin: 0 auto;
 }
 
 .chatEmptyHelpMessage {
-  margin-top: 32px !important;
+  margin-top: var(--chat-message-gap) !important;
   margin-bottom: 24px !important;
   text-align: center;
 }
@@ -72,7 +72,7 @@
   color: var(--text-color);
 
   font-size: 12px;
-  line-height: 16px;
+  line-height: var(--chat-icon-sm);
 }
 
 .userMessageContainer {
@@ -107,11 +107,11 @@
   align-items: flex-end;
   justify-content: flex-start;
 
-  gap: 8px;
+  gap: var(--chat-message-content-gap);
 
   box-sizing: border-box;
 
-  border-radius: 6px;
+  border-radius: var(--chat-border-radius);
 
   position: relative;
 
@@ -130,7 +130,7 @@
     .filesListWrapperContainer {
       display: flex;
 
-      height: 48px;
+      height: var(--chat-header-min-height);
       width: 100%;
     }
 
@@ -143,38 +143,38 @@
 
       justify-content: end;
 
-      gap: 6px;
+      gap: var(--chat-message-file-gap);
 
-      margin-bottom: 8px;
+      margin-bottom: var(--chat-message-content-gap);
 
       .filesListItem {
         width: fit-content;
         min-width: fit-content;
-        height: 32px;
-        max-width: 300px;
+        height: var(--chat-icon-md);
+        max-width: var(--chat-message-file-max-width);
 
-        padding-inline-end: 8px;
+        padding-inline-end: var(--chat-spacing-base);
 
         display: flex;
         align-items: center;
 
         border: 1px solid var(--chat-message-file-border-color);
 
-        border-radius: 6px;
+        border-radius: var(--chat-border-radius);
 
         cursor: pointer;
 
         .filesListItemIcon {
-          width: 32px;
-          height: 32px;
+          width: var(--chat-icon-md);
+          height: var(--chat-icon-md);
 
           display: flex;
           align-items: center;
           justify-content: center;
 
           div {
-            width: 32px;
-            height: 32px;
+            width: var(--chat-icon-md);
+            height: var(--chat-icon-md);
 
             display: flex;
             align-items: center;
@@ -187,24 +187,24 @@
         display: flex;
         align-items: center;
 
-        gap: 8px;
+        gap: var(--chat-message-content-gap);
 
-        max-width: 300px;
+        max-width: var(--chat-message-file-max-width);
 
         .filesListItemImage {
-          height: 32px;
-          width: 32px;
+          height: var(--chat-icon-md);
+          width: var(--chat-icon-md);
           margin: 0;
           padding: 0;
-          border-start-start-radius: 6px;
-          border-end-start-radius: 6px;
+          border-start-start-radius: var(--chat-border-radius);
+          border-end-start-radius: var(--chat-border-radius);
           object-fit: fill;
           display: flex;
           align-items: center;
           justify-content: center;
 
           &:has(div) {
-            padding: 6px;
+            padding: var(--chat-spacing-sm);
             box-sizing: border-box;
           }
         }
@@ -231,17 +231,17 @@
 
       justify-content: end;
 
-      gap: 8px;
+      gap: var(--chat-message-content-gap);
 
-      margin-bottom: 8px;
+      margin-bottom: var(--chat-message-content-gap);
 
       .imagesListItem {
-        width: 80px;
-        height: 80px;
+        width: var(--chat-image-preview-size);
+        height: var(--chat-image-preview-size);
 
         border: 1px solid var(--chat-message-file-border-color);
 
-        border-radius: 6px;
+        border-radius: var(--chat-border-radius);
 
         overflow: hidden;
 
@@ -257,7 +257,7 @@
 
         .loader {
           height: 20px;
-          margin: 6px;
+          margin: var(--chat-spacing-sm);
         }
 
         .imagesListItemLoader {
@@ -271,9 +271,9 @@
     }
 
     .chatMessageUser {
-      padding: 0 12px;
+      padding: var(--chat-message-bubble-padding);
 
-      border-radius: 16px;
+      border-radius: var(--chat-message-bubble-radius);
 
       width: fit-content;
 
@@ -312,13 +312,13 @@
 
   padding-inline-end: 40px;
 
-  padding-top: 4px;
+  padding-top: var(--chat-spacing-xs);
 }
 
 .filesListWrapperContainer {
   display: flex;
 
-  height: 48px;
+  height: var(--chat-header-min-height);
   width: 100%;
 }
 
@@ -335,38 +335,38 @@
     justify-content: start;
   }
 
-  gap: 6px;
+  gap: var(--chat-message-file-gap);
 
-  margin-bottom: 8px;
+  margin-bottom: var(--chat-message-content-gap);
 
   .filesListItem {
     width: fit-content;
     min-width: fit-content;
-    height: 32px;
-    max-width: 300px;
+    height: var(--chat-icon-md);
+    max-width: var(--chat-message-file-max-width);
 
-    padding-inline-end: 8px;
+    padding-inline-end: var(--chat-spacing-base);
 
     display: flex;
     align-items: center;
 
     border: 1px solid var(--chat-message-file-border-color);
 
-    border-radius: 6px;
+    border-radius: var(--chat-border-radius);
 
     cursor: pointer;
 
     .filesListItemIcon {
-      width: 32px;
-      height: 32px;
+      width: var(--chat-icon-md);
+      height: var(--chat-icon-md);
 
       display: flex;
       align-items: center;
       justify-content: center;
 
       div {
-        width: 32px;
-        height: 32px;
+        width: var(--chat-icon-md);
+        height: var(--chat-icon-md);
 
         display: flex;
         align-items: center;
@@ -379,9 +379,9 @@
     display: flex;
     align-items: center;
 
-    gap: 8px;
+    gap: var(--chat-message-content-gap);
 
-    max-width: 300px;
+    max-width: var(--chat-message-file-max-width);
 
     .filesListItemInfoText {
       max-width: 100%;
@@ -406,12 +406,12 @@
   background-color: var(--chat-message-code-block-background-color);
   border: var(--chat-message-code-block-border);
 
-  border-radius: 3px;
+  border-radius: var(--chat-radius-sm);
 
   box-sizing: border-box;
 
-  margin: 8px 0;
-  max-height: 420px;
+  margin: var(--chat-message-block-margin);
+  max-height: var(--chat-code-max-height);
 
   @include mixins.mobile {
     max-height: 320px;
@@ -420,7 +420,7 @@
   .codeHeader {
     width: 100%;
 
-    height: 32px;
+    height: var(--chat-icon-md);
 
     display: flex;
     flex-direction: row;
@@ -429,7 +429,7 @@
     flex-basis: 32px;
     flex-shrink: 0;
 
-    padding: 0 8px;
+    padding: 0 var(--chat-spacing-base);
 
     box-sizing: border-box;
 
@@ -452,12 +452,12 @@
 
   box-sizing: border-box;
 
-  border-radius: 6px;
+  border-radius: var(--chat-border-radius);
 
   display: flex;
   flex-direction: column;
 
-  gap: 16px;
+  gap: var(--chat-tool-call-gap);
 }
 
 .toolCallFooter {
@@ -466,19 +466,19 @@
   display: flex;
   flex-direction: column;
 
-  gap: 16px;
+  gap: var(--chat-tool-call-gap);
 
   .buttonsBlockContainer {
     width: 100%;
 
     display: flex;
-    gap: 8px;
+    gap: var(--chat-message-content-gap);
   }
 }
 
 .toolCallMessage {
   &:not(:last-child) {
-    margin: 8px 0;
+    margin: var(--chat-message-block-margin);
   }
 }
 
@@ -498,9 +498,9 @@
     flex-direction: row;
     align-items: center;
 
-    gap: 8px;
+    gap: var(--chat-message-content-gap);
 
-    padding: 8px 0;
+    padding: var(--chat-tool-call-header-padding);
 
     box-sizing: border-box;
 
@@ -511,7 +511,7 @@
     }
 
     .toolFinishIcon {
-      height: 12px;
+      height: var(--chat-icon-xs);
 
       path {
         fill: var(--chat-input-send-button-background);
@@ -523,8 +523,8 @@
     }
 
     .searchToolIcon {
-      width: 16px;
-      height: 16px;
+      width: var(--chat-icon-sm);
+      height: var(--chat-icon-sm);
     }
 
     .arrowRightIcon {
@@ -560,9 +560,9 @@
   }
 
   .toolCallBody {
-    margin-top: 6px;
+    margin-top: var(--chat-spacing-sm);
 
-    padding: 12px;
+    padding: var(--chat-content-padding, 12px);
 
     width: 100%;
 
@@ -572,15 +572,15 @@
 
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--chat-tool-call-body-gap);
 
-    border-radius: 6px;
+    border-radius: var(--chat-border-radius);
 
     .toolCallCodeViewItem {
       display: flex;
       flex-direction: column;
 
-      gap: 8px;
+      gap: var(--chat-message-content-gap);
 
       pre {
         margin: 0;
@@ -596,25 +596,25 @@
     }
 
     .sourceViewHeading {
-      margin-bottom: 12px;
+      margin-bottom: var(--chat-spacing-md);
     }
 
     .sourceViewList {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: var(--chat-source-item-gap);
     }
 
     .sourceItem {
       display: flex;
-      gap: 8px;
+      gap: var(--chat-message-content-gap);
       align-items: center;
 
       cursor: pointer;
 
-      border-radius: 6px;
+      border-radius: var(--chat-border-radius);
 
-      padding: 4px 8px;
+      padding: var(--chat-source-item-padding);
 
       &:hover {
         background-color: var(--chat-message-source-bg-hover-color);
@@ -635,7 +635,7 @@
 
     .sourceContent {
       flex: 1;
-      min-width: 80px;
+      min-width: var(--chat-image-preview-size);
       color: var(--chat-message-source-url-color);
     }
 
@@ -646,8 +646,8 @@
     }
 
     .sourceFallbackIcon {
-      width: 16px;
-      height: 16px;
+      width: var(--chat-icon-sm);
+      height: var(--chat-icon-sm);
       flex-shrink: 0;
 
       path {
@@ -657,8 +657,8 @@
   }
 
   .externalLinkIcon {
-    width: 16px;
-    height: 16px;
+    width: var(--chat-icon-sm);
+    height: var(--chat-icon-sm);
 
     @include mixins.flip-in-rtl;
 
@@ -681,28 +681,28 @@
     color: var(--text-color) !important;
   }
 
-  padding: 8px;
+  padding: var(--chat-message-error-padding);
 
-  border-radius: 6px;
+  border-radius: var(--chat-border-radius);
 
   box-sizing: border-box;
 }
 
 .buttonsBlock {
   width: 100%;
-  height: 32px;
+  height: var(--chat-icon-md);
 
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--chat-message-content-gap);
   flex-direction: row;
 
-  margin-top: 8px;
+  margin-top: var(--chat-message-buttons-margin-top);
 }
 
 .buttonsBlockItem {
-  width: 32px;
-  height: 32px;
+  width: var(--chat-icon-md);
+  height: var(--chat-icon-md);
 
   cursor: pointer;
 
@@ -711,13 +711,13 @@
   justify-content: center;
 
   div {
-    width: 16px;
-    height: 16px;
+    width: var(--chat-icon-sm);
+    height: var(--chat-icon-sm);
   }
 
   &:hover {
     background-color: var(--chat-header-button-hover-background);
-    border-radius: 3px;
+    border-radius: var(--chat-radius-sm);
   }
 
   svg {
@@ -729,15 +729,15 @@
 
 .chatLoader {
   display: flex;
-  gap: 8px;
+  gap: var(--chat-message-content-gap);
 }
 
 .heading {
-  padding: 8px 0;
+  padding: var(--chat-tool-call-header-padding);
 }
 
 .paragraph {
-  padding: 8px 0;
+  padding: var(--chat-tool-call-header-padding);
   white-space: pre-line;
   color: var(--text-color);
   font-weight: 400;
@@ -751,17 +751,17 @@
 .blockquote {
   position: relative;
 
-  margin: 8px 0;
-  padding: 6px 12px;
+  margin: var(--chat-message-block-margin);
+  padding: var(--chat-blockquote-padding);
 
   width: fit-content;
 
   border-inline-start: 3px solid var(--chat-message-blockquote-bg-color);
-  border-radius: 3px;
+  border-radius: var(--chat-radius-sm);
 
   color: var(--chat-message);
-  font-size: 15px;
-  line-height: 22px;
+  font-size: var(--chat-message-font-size);
+  line-height: var(--chat-message-line-height);
 
   overflow: hidden;
 
@@ -779,7 +779,7 @@
 }
 
 .hrWrapper {
-  padding: 8px 0;
+  padding: var(--chat-tool-call-header-padding);
 }
 
 .hr {
@@ -789,7 +789,7 @@
 }
 
 .listBlock {
-  font-size: 15px;
+  font-size: var(--chat-message-font-size);
 
   margin: 0;
   padding-inline-start: 22px;
@@ -805,7 +805,7 @@
 
 .listBlock,
 .listItem {
-  line-height: 22px;
+  line-height: var(--chat-message-line-height);
 
   .paragraph {
     padding: 0;
@@ -826,7 +826,7 @@
 
   // gap between first level items
   &:not(.listBlock .listBlock) > .listItem + .listItem {
-    margin-top: 8px;
+    margin-top: var(--chat-message-buttons-margin-top);
   }
 
   // gap between other items
@@ -837,7 +837,7 @@
 
 // first level
 .listBlock {
-  margin: 8px 0;
+  margin: var(--chat-message-block-margin);
 }
 
 // other levels
@@ -859,7 +859,7 @@
 }
 
 .tableScroll {
-  margin: 8px 0;
+  margin: var(--chat-message-block-margin);
 }
 
 .tableScrollBody {
@@ -879,15 +879,15 @@
 .td {
   box-sizing: border-box;
 
-  font-size: 15px;
-  line-height: 22px;
+  font-size: var(--chat-message-font-size);
+  line-height: var(--chat-message-line-height);
   vertical-align: middle;
   text-align: start;
 
-  min-width: 175px;
-  max-width: 175px;
+  min-width: var(--chat-table-cell-width);
+  max-width: var(--chat-table-cell-width);
 
-  padding: 8px 12px;
+  padding: var(--chat-table-cell-padding);
 
   overflow-wrap: break-word;
 }
