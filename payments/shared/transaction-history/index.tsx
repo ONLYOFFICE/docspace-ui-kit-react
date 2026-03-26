@@ -35,30 +35,18 @@ import { LANGUAGE } from "@docspace/shared/constants";
 
 import { Button, ButtonSize } from "../../../components/button";
 import { Text } from "../../../components/text";
-import {
-  ComboBox,
-  ComboBoxSize,
-  TOption,
-} from "../../../components/combobox";
+import { ComboBox, ComboBoxSize, TOption } from "../../../components/combobox";
 import { DatePicker } from "../../../components/date-picker";
 import { toastr } from "../../../components/toast";
 import { useApi } from "../../../providers";
-import {
-  EmployeeStatus,
-  EmployeeType,
-} from "@docspace/shared/enums";
-import {
-  ModalDialog,
-  ModalDialogType,
-} from "../../../components/modal-dialog";
+import { EmployeeStatus } from "@onlyoffice/docspace-api-sdk";
+import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import FilterIcon from "../../../components/filter/sub-components/FilterIcon";
 import { AddButton } from "../../../components/add-button";
 import { SelectedItemPure } from "../../../components/selected-item";
 import { TSelectorItem } from "../../../components/selector";
-import { TUser } from "@docspace/shared/api/people/types";
 import PeopleSelector from "../../../selectors/People";
 import type { PeopleFilter } from "../../../selectors/People/PeopleSelector.types";
-import Filter from "@docspace/shared/api/people/filter";
 
 import FilterPanel from "./sub-components/FilterPanel";
 import TransactionBody from "./sub-components/TransactionBody";
@@ -72,6 +60,8 @@ type TransactionHistoryReportResponse = {
   isCompleted: boolean;
   resultFileUrl?: string;
 };
+
+type TContact = Pick<TSelectorItem, "displayName" | "label"> & { id: string };
 
 type TransactionHistoryProps = {
   openOnNewPage?: boolean;
@@ -90,12 +80,10 @@ const getTransactionType = (key: string) => {
   };
 };
 
-const filter = (): PeopleFilter => {
-  const newFilter = Filter.getDefault();
-  newFilter.role = [EmployeeType.Admin];
-  newFilter.employeeStatus = EmployeeStatus.Active;
-  return newFilter as unknown as PeopleFilter;
-};
+const filter = (): PeopleFilter => ({
+  employeeStatus: EmployeeStatus.Active,
+  // newFilter.role = [EmployeeType.Admin];
+});
 
 let timerId = null;
 
@@ -109,7 +97,7 @@ const useInitialState = (
       selectedType: initialType,
       startDate: parseToDateTime(getStartTransactionDate()) ?? now(),
       endDate: parseToDateTime(getEndTransactionDate()) ?? now(),
-      selectedContact: null as TUser | null,
+      selectedContact: null as TContact | null,
       isChanged: false,
     };
   }, []);
@@ -118,7 +106,7 @@ const useInitialState = (
     selectedType: TOption;
     startDate: DateTime;
     endDate: DateTime;
-    selectedContact: TUser | null;
+    selectedContact: TContact | null;
   }) => {
     return (
       currentState.selectedType.key !== initialState.selectedType.key ||
@@ -225,7 +213,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
   );
   const [startDate, setStartDate] = useState<DateTime>(initialState.startDate);
   const [endDate, setEndDate] = useState<DateTime>(initialState.endDate);
-  const [selectedContact, setSelectedContact] = useState<TUser | null>(
+  const [selectedContact, setSelectedContact] = useState<TContact | null>(
     initialState.selectedContact,
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -393,18 +381,19 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
   };
 
   const onSubmitContactSelector = async (contacts: TSelectorItem[]) => {
+    const contact = contacts[0] as unknown as TContact;
     setIsSelectorVisible(false);
 
     if (isFilterDialogVisible) {
       setMobileFilterState((prev) => ({
         ...prev,
-        selectedContact: contacts[0] as unknown as TUser,
+        selectedContact: contact,
       }));
       setIsChanged(true);
       return;
     }
 
-    setSelectedContact(contacts[0] as unknown as TUser);
+    setSelectedContact(contact);
 
     if (fetchTransactionHistory) {
       await fetchTransactions(
@@ -413,7 +402,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         selectedType.key as string,
         startDate,
         endDate,
-        contacts[0].id as string,
+        contact.id,
         serviceName,
       );
     }
@@ -487,7 +476,8 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           const checkStatus = async () => {
             try {
               const checkRes = await paymentApi.getCustomerOperationsReport();
-              const response = checkRes?.data?.response as unknown as TransactionHistoryReportResponse;
+              const response = checkRes?.data
+                ?.response as unknown as TransactionHistoryReportResponse;
 
               if (!response) {
                 reject(new Error(t("Common:UnexpectedError")));
@@ -600,7 +590,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
   ) : (
     <SelectedItemPure
       key={`${currentContact}`}
-      propKey={currentContact?.id}
+      propKey={currentContact.id}
       label={currentContact.displayName}
       onClose={onCloseSelectedContact}
       className={styles.selectedContactItem}
@@ -774,3 +764,4 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 };
 
 export default observer(TransactionHistory);
+
