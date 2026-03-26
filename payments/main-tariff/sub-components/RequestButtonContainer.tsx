@@ -26,7 +26,7 @@
 
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "../../../components/button";
+import { Button, ButtonSize } from "../../../components/button";
 import { observer } from "mobx-react";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import SalesDepartmentRequestDialog from "../../dialogs/SalesDepartmentRequestDialog";
@@ -36,43 +36,44 @@ type RequestButtonContainerProps = {
   isDisabled?: boolean;
 };
 
-const RequestButtonContainer = observer(({
-  isDisabled,
-}: RequestButtonContainerProps) => {
-  const paymentStore = usePaymentStore();
-  const { isLoading } = paymentStore;
+const RequestButtonContainer = observer(
+  ({ isDisabled }: RequestButtonContainerProps) => {
+    const paymentStore = usePaymentStore();
+    const { isLoading } = paymentStore;
 
-  const [isVisibleDialog, setIsVisibleDialog] = useState(false);
-  const { t } = useTranslation(["Common"]);
+    const [isVisibleDialog, setIsVisibleDialog] = useState(false);
+    const { t } = useTranslation(["Common"]);
 
-  const toDoRequest = () => {
-    setIsVisibleDialog(true);
-  };
+    const toDoRequest = () => {
+      setIsVisibleDialog(true);
+    };
 
-  const onClose = () => {
-    isVisibleDialog && setIsVisibleDialog(false);
-  };
+    const onClose = () => {
+      isVisibleDialog && setIsVisibleDialog(false);
+    };
 
-  return (
-    <div className={styles.requestButton}>
-      {isVisibleDialog ? (
-        <SalesDepartmentRequestDialog
-          visible={isVisibleDialog}
-          onClose={onClose}
+    return (
+      <div className={styles.requestButton}>
+        {isVisibleDialog ? (
+          <SalesDepartmentRequestDialog
+            visible={isVisibleDialog}
+            onClose={onClose}
+          />
+        ) : null}
+        <Button
+          className="send-request-button"
+          label={t("Common:SendRequest")}
+          size={ButtonSize.medium}
+          primary
+          isDisabled={isLoading || isDisabled}
+          onClick={toDoRequest}
+          isLoading={isLoading}
+          testId="sales_request_button"
         />
-      ) : null}
-      <Button
-        className="send-request-button"
-        label={t("Common:SendRequest")}
-        size="medium"
-        primary
-        isDisabled={isLoading || isDisabled}
-        onClick={toDoRequest}
-        isLoading={isLoading}
-        testId="sales_request_button"
-      />
-    </div>
-  );
-});
+      </div>
+    );
+  },
+);
 
 export default RequestButtonContainer;
+

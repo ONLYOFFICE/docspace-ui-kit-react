@@ -34,6 +34,7 @@ import { toastr } from "../../../components/toast";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import { useApi } from "../../../providers";
 import { Text } from "../../../components/text";
+import { Link } from "../../../components/link";
 
 import DowngradePlanButtonContainer from "./DowngradePlanButtonContainer";
 import ChangePricingPlanDialog from "../../dialogs/ChangePricingPlanDialog";
@@ -168,7 +169,7 @@ const UpdatePlanButtonContainer = ({
 
       if (isVisiblePaymentConfirm) onClose();
 
-      const data = isYearTariff
+      const data: { [key: string]: number } = isYearTariff
         ? { adminyear: managersCount }
         : { admin: managersCount };
       const updateRes = await paymentApi.updatePayment({ quantity: data });
@@ -180,14 +181,15 @@ const UpdatePlanButtonContainer = ({
             <>
               {t("CardUnlinked")} <br />
               {t("LinkNewCard")} {"  "}
-              <a
+              <Link
                 onClick={goLinkCard}
                 fontWeight={600}
                 style={{ textDecoration: "underline" }}
                 data-testid="add_payment_method_link"
+                color="accent"
               >
                 {t("AddPaymentMethod")}
-              </a>
+              </Link>
             </>
           ) : (
             t("ErrorNotification")
@@ -281,7 +283,7 @@ const UpdatePlanButtonContainer = ({
       <Button
         className="upgrade-now-button"
         label={t("UpgradeNow")}
-        size="medium"
+        size={ButtonSize.medium}
         primary
         isDisabled={isLessCountThanAcceptable || isLoading || isDisabled}
         onClick={goToStripePortal}
@@ -306,7 +308,7 @@ const UpdatePlanButtonContainer = ({
         <Button
           className="upgrade-now-button"
           label={t("UpgradeNow")}
-          size="medium"
+          size={ButtonSize.medium}
           primary
           isDisabled={isLoading || isDisabled}
           onClick={onOpenPaymentDialog}
@@ -326,7 +328,7 @@ const UpdatePlanButtonContainer = ({
       <Button
         className="upgrade-now-button"
         label={t("UpgradeNow")}
-        size="medium"
+        size={ButtonSize.medium}
         primary
         isDisabled={
           isLessCountThanAcceptable || isTheSameCount || isLoading || isDisabled
@@ -364,7 +366,6 @@ const UpdatePlanButtonContainer = ({
                 <Trans
                   i18nKey="SwitchPlan"
                   ns="Payments"
-                  t={t}
                   values={{ planName: tariffPlanTitle }}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
@@ -375,7 +376,6 @@ const UpdatePlanButtonContainer = ({
                 <Trans
                   i18nKey="ChargeAmount"
                   ns="Payments"
-                  t={t}
                   values={{ price: formatPaymentCurrency(totalPrice) }}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
@@ -386,7 +386,6 @@ const UpdatePlanButtonContainer = ({
                 <Trans
                   i18nKey="ActionCannotBeUndone"
                   ns="Payments"
-                  t={t}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
                   }}
