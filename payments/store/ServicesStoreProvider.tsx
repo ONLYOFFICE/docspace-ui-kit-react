@@ -47,20 +47,16 @@ export const useServicesStore = () => {
   return store;
 };
 
-export const ServicesStoreProvider = ({
+const ServicesStoreProviderInner = ({
   children,
 }: TServicesStoreProviderProps) => {
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
 
   const store = React.useMemo(
-    () => new ServicesStore(paymentApi),
-    [paymentApi],
+    () => new ServicesStore(paymentApi, paymentStore),
+    [paymentApi, paymentStore],
   );
-
-  React.useEffect(() => {
-    store.setPaymentStore(paymentStore);
-  }, [store, paymentStore]);
 
   React.useEffect(() => {
     return () => {
@@ -73,4 +69,16 @@ export const ServicesStoreProvider = ({
       {children}
     </ServicesStoreContext.Provider>
   );
+};
+
+export const ServicesStoreProvider = ({
+  children,
+}: TServicesStoreProviderProps) => {
+  const existingStore = React.useContext(ServicesStoreContext);
+
+  if (existingStore) {
+    return <>{children}</>;
+  }
+
+  return <ServicesStoreProviderInner>{children}</ServicesStoreProviderInner>;
 };

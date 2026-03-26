@@ -43,7 +43,7 @@ class ServicesStore {
 
   private abortControllers: AbortController[] = [];
 
-  paymentStore: PaymentStore | null = null;
+  paymentStore: PaymentStore;
 
   isInitServicesPage = false;
 
@@ -69,8 +69,9 @@ class ServicesStore {
 
   aiModelAvailabilityUpdatingSet: Set<string> = new Set();
 
-  constructor(paymentApi: PaymentApi) {
+  constructor(paymentApi: PaymentApi, paymentStore: PaymentStore) {
     this.paymentApi = paymentApi;
+    this.paymentStore = paymentStore;
 
     makeAutoObservable(this, {
       aiModelAvailabilityMap: observable.ref,
@@ -78,9 +79,7 @@ class ServicesStore {
     });
   }
 
-  setPaymentStore = (paymentStore: PaymentStore) => {
-    this.paymentStore = paymentStore;
-  };
+
 
   private addAbortController(controller: AbortController) {
     this.abortControllers.push(controller);
@@ -94,7 +93,7 @@ class ServicesStore {
   };
 
   get language() {
-    return this.paymentStore?.language ?? "en";
+    return this.paymentStore.language ?? "en";
   }
 
   get aiServiceBalance() {
@@ -215,12 +214,7 @@ class ServicesStore {
   };
 
   formatAiModelsCurrency = (amount: number) => {
-    return formatCurrencyValue(
-      this.language,
-      amount,
-      this.aiModelsCurrency,
-      0,
-    );
+    return formatCurrencyValue(this.language, amount, this.aiModelsCurrency, 0);
   };
 
   formatAiServiceCurrency = (
@@ -238,9 +232,7 @@ class ServicesStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getPortalPrices(
-        abortController.signal,
-      );
+      const res = await this.paymentApi.getPortalPrices(abortController.signal);
       if (!res?.data?.response) return;
       this.aiToolsPrices = res.data.response as unknown as TAiToolsPrices;
     } catch (error: unknown) {
@@ -356,10 +348,6 @@ class ServicesStore {
   ) => {
     const isRefresh = window.location.href.includes("complete=true");
 
-    this.setIsInitServiceData(false);
-
-    if (!this.paymentStore) return;
-
     const {
       fetchTransactionHistory,
       initWalletPayerAndBalance,
@@ -382,6 +370,7 @@ class ServicesStore {
 
       const requests: Promise<unknown>[] = [
         ...serviceQuotaRequest,
+        this.paymentStore.tariff.fetchPortalTariff(),
         fetchTransactionHistory(
           null,
           null,
@@ -442,8 +431,6 @@ class ServicesStore {
     if (!isRefresh) {
       if (this.isVisibleWalletSettings) this.setVisibleWalletSetting(false);
     }
-
-    if (!this.paymentStore) return;
 
     const {
       fetchAutoPayments,
@@ -531,3 +518,4 @@ class ServicesStore {
 }
 
 export default ServicesStore;
+

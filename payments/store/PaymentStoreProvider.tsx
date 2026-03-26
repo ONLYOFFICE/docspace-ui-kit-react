@@ -48,7 +48,7 @@ export const usePaymentStore = () => {
   return store;
 };
 
-export const PaymentStoreProvider = ({
+const PaymentStoreProviderInner = ({
   children,
   config,
 }: TPaymentStoreProviderProps) => {
@@ -92,3 +92,21 @@ export const PaymentStoreProvider = ({
     </PaymentStoreContext.Provider>
   );
 };
+
+export const PaymentStoreProvider = ({
+  children,
+  config,
+}: TPaymentStoreProviderProps) => {
+  const existingStore = React.useContext(PaymentStoreContext);
+
+  if (existingStore) {
+    return <>{children}</>;
+  }
+
+  return (
+    <PaymentStoreProviderInner config={config}>
+      {children}
+    </PaymentStoreProviderInner>
+  );
+};
+
