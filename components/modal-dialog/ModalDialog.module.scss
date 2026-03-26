@@ -34,7 +34,12 @@
     --modal-dialog-header-border-color: #{$gray-dark-strong};
     --modal-dialog-link-underline-color: #{$dark-gray-dark};
     --modal-dialog-border-color: #{$gray-dark-strong};
-    --modal-dialog-content-transform-x: 100%;
+  }
+}
+
+:global(.rtl) {
+  .modal {
+    --modal-dialog-content-transform-x: -100%;
   }
 }
 
