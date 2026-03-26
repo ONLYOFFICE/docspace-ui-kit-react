@@ -91,6 +91,7 @@ const ThinkingHelpButton = () => {
       ref={wrapperRef}
       className={classNames(styles.extendedThinkingHelpButton, "no-toggle")}
       onClick={() => setIsOpen((prev) => !prev)}
+      data-testid="extended-thinking-help-button"
     >
       <HelpButton
         tooltipContent={<Text>{t("ExtendedThinkingIncreasedCosts")}</Text>}
