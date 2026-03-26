@@ -91,7 +91,8 @@ const Buttons = ({
   const onCloseFolderSelector = () => setShowFolderSelector(false);
 
   const onCopyAction = () => {
-    copy(text, { format: "text/plain" });
+    const textWithoutThink = text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+    copy(textWithoutThink, { format: "text/plain" });
     toastr.success(t("MessageCopiedSuccess"));
   };
 

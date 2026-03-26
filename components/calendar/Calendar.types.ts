@@ -65,6 +65,7 @@ export interface DaysProps {
   maxDate: DateTime;
   isMobile: boolean;
   isScroll?: boolean;
+  locale?: string;
 }
 
 export interface DaysHeaderProps {
@@ -74,6 +75,7 @@ export interface DaysHeaderProps {
   minDate: DateTime;
   maxDate: DateTime;
   isMobile: boolean;
+  locale?: string;
 }
 
 export interface DaysBodyProps {
@@ -84,6 +86,7 @@ export interface DaysBodyProps {
   maxDate: DateTime;
   isMobile: boolean;
   isScroll?: boolean;
+  locale?: string;
 }
 
 export interface HeaderButtonsProps {
@@ -103,6 +106,7 @@ export interface MonthsProps {
   maxDate: DateTime;
   isMobile: boolean;
   isScroll?: boolean;
+  locale?: string;
 }
 
 export interface MonthsBodyProps {
@@ -114,6 +118,7 @@ export interface MonthsBodyProps {
   maxDate: DateTime;
   isMobile: boolean;
   isScroll?: boolean;
+  locale?: string;
 }
 
 export interface MonthsHeaderProps {

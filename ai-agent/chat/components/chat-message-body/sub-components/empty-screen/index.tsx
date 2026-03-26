@@ -36,7 +36,7 @@ import { MessageEmptyProps } from "../../../../Chat.types";
 import styles from "../../ChatMessageBody.module.scss";
 import { useCommonTranslation } from "../../../../../../utils/i18n";
 
-const EmptyScreen = ({ isLoading }: MessageEmptyProps) => {
+const EmptyScreen = ({ isLoading, emptyScreenText }: MessageEmptyProps) => {
   const t = useCommonTranslation();
   return (
     <Text
@@ -49,7 +49,7 @@ const EmptyScreen = ({ isLoading }: MessageEmptyProps) => {
       {isLoading ? (
         <RectangleSkeleton height="24px" width="140px" borderRadius="3px" />
       ) : (
-        t("AIChatOfferHelp")
+        emptyScreenText ?? t("AIChatOfferHelp")
       )}
     </Text>
   );

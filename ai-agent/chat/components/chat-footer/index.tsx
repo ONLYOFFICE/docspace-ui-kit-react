@@ -38,6 +38,7 @@ const ChatFooter = ({
   standalone,
   attachmentFile,
   clearAttachmentFile,
+  hideAttachments,
   getIcon,
   selectedModel,
   toolsSettings,
@@ -55,14 +56,12 @@ const ChatFooter = ({
   return (
     <div className={styles.chatFooter} data-testid="chat-footer">
       {!isLoading && !aiReady ? (
-        <ChatInfoBlock
-          standalone={standalone}
-          isPortalAdmin={isPortalAdmin}
-        />
+        <ChatInfoBlock standalone={standalone} isPortalAdmin={isPortalAdmin} />
       ) : null}
       <ChatInput
         attachmentFile={attachmentFile}
         clearAttachmentFile={clearAttachmentFile}
+        hideAttachments={hideAttachments}
         isLoading={isLoading}
         getIcon={getIcon}
         selectedModel={selectedModel}
@@ -85,3 +84,4 @@ const ChatFooter = ({
 };
 
 export default ChatFooter;
+

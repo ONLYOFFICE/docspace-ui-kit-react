@@ -89,6 +89,7 @@ export type ContextMenuType = {
   getTooltipContent?: () => React.ReactNode;
   withMCPIcon?: boolean;
   iconNode?: React.ReactNode;
+  disabledStylesType?: "default" | "toggle";
 };
 
 export type SeparatorType = {

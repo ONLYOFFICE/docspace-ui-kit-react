@@ -54,11 +54,13 @@ const MenuItem = ({
 
 	const linkClassName = classNames("p-menuitem-link", "not-selectable", {
 		"p-disabled": item.disabled || item.disableColor,
+		"p-disabled-styles-toggle": item.disabled && item.disabledStylesType === "toggle",
 		[styles.menuItemWithToggle]: item.withToggle,
 	});
 
 	const iconClassName = classNames("p-menuitem-icon", {
 		"p-disabled": item.disabled || item.disableColor,
+		"p-disabled-styles-toggle": item.disabled && item.disabledStylesType === "toggle",
 	});
 
 	const renderIcon = () => {

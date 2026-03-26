@@ -27,7 +27,7 @@
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 
-import ArrowReactSvgUrl from "PUBLIC_DIR/images/arrow.react.svg?url";
+import ArrowReactSvg from "../../assets/arrow.react.svg";
 
 import { RoomsType } from "../../enums";
 
@@ -92,7 +92,7 @@ const RoomType = ({
 
       <IconButton
         className={arrowClassName}
-        iconName={ArrowReactSvgUrl}
+        iconNode={<ArrowReactSvg />}
         size={16}
         onClick={onClick}
       />

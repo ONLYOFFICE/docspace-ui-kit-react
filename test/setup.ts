@@ -4,6 +4,52 @@ import enCommon from "../locales/en/Common.json";
 import type { TTranslations } from "../providers/translation/i18n";
 import { getI18NInstance } from "../providers/translation/i18n";
 
+// Node.js 22+ exposes a built-in `localStorage` that lacks standard Web Storage
+// methods (clear, setItem, etc.), which shadows the jsdom implementation.
+// Provide a spec-compliant in-memory Storage mock so that tests calling
+// `vi.spyOn(Storage.prototype, ...)` work correctly.
+class MockStorage implements Storage {
+  private store: Record<string, string> = {};
+
+  getItem(key: string): string | null {
+    return key in this.store ? this.store[key] : null;
+  }
+
+  setItem(key: string, value: string): void {
+    this.store[key] = String(value);
+  }
+
+  removeItem(key: string): void {
+    delete this.store[key];
+  }
+
+  clear(): void {
+    this.store = {};
+  }
+
+  key(index: number): string | null {
+    return Object.keys(this.store)[index] ?? null;
+  }
+
+  get length(): number {
+    return Object.keys(this.store).length;
+  }
+}
+
+// Replace the global Storage constructor so spyOn(Storage.prototype, ...) works
+Object.defineProperty(globalThis, "Storage", {
+  value: MockStorage,
+  writable: true,
+});
+Object.defineProperty(globalThis, "localStorage", {
+  value: new MockStorage(),
+  writable: true,
+});
+Object.defineProperty(globalThis, "sessionStorage", {
+  value: new MockStorage(),
+  writable: true,
+});
+
 const translations: TTranslations = new Map([
   ["en", new Map([["Common", enCommon]])],
 ]);

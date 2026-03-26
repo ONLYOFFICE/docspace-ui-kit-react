@@ -128,6 +128,7 @@ const Calendar = ({
         maxDate={resultMaxDate}
         isMobile={isMobile || false}
         isScroll={isScroll}
+        locale={locale}
       />
     ) : selectedScene === 1 ? (
       <Months
@@ -139,6 +140,7 @@ const Calendar = ({
         maxDate={resultMaxDate}
         isMobile={isMobile || false}
         isScroll={isScroll}
+        locale={locale}
       />
     ) : (
       <Years
