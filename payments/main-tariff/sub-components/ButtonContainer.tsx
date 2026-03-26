@@ -26,7 +26,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { Button } from "../../../components/button";
+import { Button, ButtonSize } from "../../../components/button";
 import styled from "styled-components";
 import { toastr } from "../../../components/toast";
 import RequestButtonContainer from "./RequestButtonContainer";
@@ -39,10 +39,7 @@ const StyledBody = styled.div`
   }
 `;
 
-const ButtonContainer = observer(({
-  isDisabled,
-  t,
-}: any) => {
+const ButtonContainer = observer(({ isDisabled, t }: any) => {
   const store = usePaymentStore();
   const { isNeedRequest, isLoading, paymentLink } = store;
   const { isNotPaidPeriod, isGracePeriod } = store.tariff;
@@ -59,7 +56,7 @@ const ButtonContainer = observer(({
         <Button
           className="pay-button"
           label={t("Pay")}
-          size="medium"
+          size={ButtonSize.medium}
           primary
           isDisabled={isLoading || isDisabled}
           onClick={goToStripePortal}
@@ -76,3 +73,4 @@ const ButtonContainer = observer(({
 });
 
 export default ButtonContainer;
+

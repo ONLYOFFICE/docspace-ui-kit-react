@@ -26,23 +26,11 @@
 
 import { Text } from "../../../components/text";
 import React from "react";
-import styled, { css, useTheme } from "styled-components";
+import classNames from "classnames";
 import { observer } from "mobx-react";
 import SelectTotalSizeContainer from "./SelectTotalSizeContainer";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-
-const StyledCurrentUsersContainer = styled.div`
-  height: fit-content;
-  .current-admins-number {
-    ${(props) =>
-      props.isDisabled &&
-      css`
-        color: ${
-          props.theme.client.settings.payment.priceContainer.disableColor
-        };
-      `}
-  }
-`;
+import styles from "./SubComponents.module.scss";
 
 const CurrentUsersCountContainer = observer((props: any) => {
   const {
@@ -53,15 +41,16 @@ const CurrentUsersCountContainer = observer((props: any) => {
 
   const store = usePaymentStore();
   const { maxCountManagersByQuota } = store.quotas;
-  const theme = useTheme() as any;
 
   return (
-    <StyledCurrentUsersContainer isDisabled={isDisabled} theme={theme}>
+    <div className={styles.currentUsersContainer}>
       <Text
         fontSize="16px"
         fontWeight={600}
         textAlign="center"
-        className="current-admins-number"
+        className={classNames(styles.currentAdminsNumber, {
+          [styles.isDisabled]: isDisabled,
+        })}
       >
         {addedManagersCountTitle}
       </Text>
@@ -69,12 +58,14 @@ const CurrentUsersCountContainer = observer((props: any) => {
         fontSize="44px"
         fontWeight={700}
         textAlign="center"
-        className="current-admins-number"
+        className={classNames(styles.currentAdminsNumber, {
+          [styles.isDisabled]: isDisabled,
+        })}
       >
         {maxCountManagersByQuota}
       </Text>
       <SelectTotalSizeContainer isNeedPlusSign={isNeedPlusSign} />
-    </StyledCurrentUsersContainer>
+    </div>
   );
 });
 

@@ -27,14 +27,8 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { Button } from "../../../components/button";
-import styled from "styled-components";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-
-const StyledBody = styled.div`
-  button {
-    width: 100%;
-  }
-`;
+import styles from "./SubComponents.module.scss";
 
 const DowngradePlanButtonContainer = observer(({
   isDisabled,
@@ -45,7 +39,7 @@ const DowngradePlanButtonContainer = observer(({
   const { isLoading, isLessCountThanAcceptable } = paymentStore;
 
   return (
-    <StyledBody>
+    <div className={styles.downgradePlanButton}>
       <Button
         label={buttonLabel}
         size="medium"
@@ -55,7 +49,7 @@ const DowngradePlanButtonContainer = observer(({
         isLoading={isLoading}
         testId="downgrade_plan_button"
       />
-    </StyledBody>
+    </div>
   );
 });
 

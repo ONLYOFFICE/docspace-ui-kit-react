@@ -25,58 +25,12 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import styled, { css, useTheme } from "styled-components";
+import classNames from "classnames";
 import { Trans } from "react-i18next";
 import { Text } from "../../../components/text";
 import { observer } from "mobx-react";
-import { mobile } from "@docspace/shared/utils";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-
-const StyledBody = styled.div`
-  max-width: 272px;
-  margin: 0 auto;
-  word-break: break-word;
-  text-align: center;
-
-  @media ${mobile} {
-    max-width: 520px;
-  }
-
-  .payment_price_total-price {
-    display: flex;
-    justify-content: center;
-    min-height: 65px;
-    margin-top: 16px;
-    margin-bottom: 16px;
-
-    .lagerFontSize {
-      font-size: 48px;
-    }
-
-    ${(props) =>
-      props.isDisabled &&
-      css`
-        color: ${
-          props.theme.client.settings.payment.priceContainer.disableColor
-        };
-      `};
-
-    .payment_price_price-text,
-    .total-tariff_description {
-    }
-
-    .total-tariff_description {
-      margin: auto;
-    }
-    p {
-      margin-bottom: 0;
-    }
-  }
-
-  button {
-    width: 100%;
-  }
-`;
+import styles from "./SubComponents.module.scss";
 
 const TotalTariffContainer = observer(({
   t,
@@ -90,17 +44,20 @@ const TotalTariffContainer = observer(({
     formatPaymentCurrency,
   } = store;
   const { isYearTariff } = store.quotas;
-  const theme = useTheme() as any;
 
   return (
-    <StyledBody isDisabled={isDisabled} theme={theme}>
-      <div className="payment_price_total-price">
+    <div className={styles.totalTariffContainer}>
+      <div
+        className={classNames(styles.paymentPriceTotalPrice, {
+          [styles.isDisabled]: isDisabled,
+        })}
+      >
         {isNeedRequest ? (
           <Text
             fontSize="14"
             textAlign="center"
             fontWeight={600}
-            className="total-tariff_description"
+            className={styles.totalTariffDescription}
           >
             <Trans t={t} i18nKey="BusinessRequestDescription" ns="Payments">
               {{ peopleNumber: maxAvailableManagersCount }}
@@ -115,7 +72,7 @@ const TotalTariffContainer = observer(({
                 ns="Payments"
                 values={{ price: formatPaymentCurrency(totalPrice) }}
                 components={{
-                  2: <span key="large-font-year" className="lagerFontSize" />,
+                  2: <span key="large-font-year" className={styles.largerFontSize} />,
                   3: <Text fontWeight={600} as="span" key="bold-text-year" />,
                 }}
               />
@@ -126,7 +83,7 @@ const TotalTariffContainer = observer(({
                 ns="Payments"
                 values={{ price: formatPaymentCurrency(totalPrice) }}
                 components={{
-                  2: <span key="large-font-month" className="lagerFontSize" />,
+                  2: <span key="large-font-month" className={styles.largerFontSize} />,
                   3: <Text fontWeight={600} as="span" key="bold-text-month" />,
                 }}
               />
@@ -134,7 +91,7 @@ const TotalTariffContainer = observer(({
           </Text>
         )}
       </div>
-    </StyledBody>
+    </div>
   );
 });
 
