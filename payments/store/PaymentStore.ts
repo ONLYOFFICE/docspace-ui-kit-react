@@ -30,17 +30,14 @@ import type {
   ProfilesApi,
   PortalQuotaApi,
   CommonSettingsApi,
+  TenantQuotaFeatureDto,
+  QuotaDto,
+  TenantWalletSettings,
+  OperationDto,
 } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
-import type {
-  TBalance,
-  TAutoTopUpSettings,
-  TTransactionCollection,
-  TPaymentFeature,
-  TPaymentQuota,
-  TLicenseQuota,
-} from "@docspace/shared/api/portal/types";
+import type { TBalance } from "../types";
 import { formatCurrencyValue } from "@docspace/shared/utils/common";
 import { combineUrl } from "@docspace/shared/utils/combineUrl";
 import {
@@ -50,7 +47,7 @@ import {
   STORAGE_DEACTIVATION_VISITED,
   WEB_SEARCH,
 } from "@docspace/shared/constants";
-import type { TTranslation } from "@docspace/shared/types";
+import type { TTranslation } from "../../utils/common";
 import {
   now,
   subtractFromDate,
@@ -146,11 +143,11 @@ class PaymentStore {
 
   cardLinked = "";
 
-  transactionHistory: TTransactionCollection[] = [];
+  transactionHistory: OperationDto[] = [];
 
   isTransactionHistoryExist = false;
 
-  autoPayments: TAutoTopUpSettings | null = null;
+  autoPayments: TenantWalletSettings | null = null;
 
   minBalance: string = "";
 
@@ -166,10 +163,10 @@ class PaymentStore {
 
   servicesQuotasFeatures: Map<
     string,
-    TPaymentFeature | TServiceFeatureWithPrice
+    TenantQuotaFeatureDto | TServiceFeatureWithPrice
   > = new Map();
 
-  servicesQuotas: TPaymentQuota | null = null;
+  servicesQuotas: QuotaDto | null = null;
 
   isShowStorageTariffDeactivatedModal = false;
 
@@ -538,7 +535,7 @@ class PaymentStore {
       if (!res?.data?.response) return;
 
       const data = res.data.response as unknown as {
-        collection: TTransactionCollection[];
+        collection: OperationDto[];
       };
       this.transactionHistory = data.collection;
       this.isTransactionHistoryExist = data.collection.length > 0;
@@ -559,13 +556,13 @@ class PaymentStore {
 
       if (!res?.data?.response) return;
 
-      const data = res.data.response as unknown as TAutoTopUpSettings;
+      const data = res.data.response as unknown as TenantWalletSettings;
       this.autoPayments = data;
-      this.isAutomaticPaymentsEnabled = data.enabled;
+      this.isAutomaticPaymentsEnabled = data.enabled ?? false;
 
       if (data.enabled) {
-        this.setMinBalance(data.minBalance.toString());
-        this.setUpToBalance(data.upToBalance.toString());
+        this.setMinBalance((data.minBalance ?? 0).toString());
+        this.setUpToBalance((data.upToBalance ?? 0).toString());
       }
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
@@ -605,7 +602,7 @@ class PaymentStore {
         },
       });
 
-      const data = res?.data as unknown as { response?: TAutoTopUpSettings };
+      const data = res?.data as unknown as { response?: TenantWalletSettings };
 
       if (!data?.response) {
         throw new Error();
@@ -625,7 +622,7 @@ class PaymentStore {
 
     if (!res?.data?.response) return;
 
-    const services = res.data.response as unknown as TPaymentQuota[];
+    const services = res.data.response as unknown as QuotaDto[];
 
     const quotas = services.map((service) => {
       const feature = service.features[0];
@@ -701,7 +698,7 @@ class PaymentStore {
 
     if (!res?.data?.response) return;
 
-    const service = res.data.response as unknown as TPaymentQuota;
+    const service = res.data.response as unknown as QuotaDto;
     const feature = service.features[0];
 
     const featureWithPrice = {

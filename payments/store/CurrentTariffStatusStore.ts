@@ -25,12 +25,13 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { makeAutoObservable } from "mobx";
-import type { PaymentApi, PortalQuotaApi } from "@onlyoffice/docspace-api-sdk";
 import type {
-  TPortalTariff,
-  TQuotas,
-  TCustomerInfo,
-} from "@docspace/shared/api/portal/types";
+  PaymentApi,
+  PortalQuotaApi,
+  Tariff,
+  Quota,
+  CustomerInfoDto,
+} from "@onlyoffice/docspace-api-sdk";
 import {
   dateDiff,
   formatDateLocalized,
@@ -46,17 +47,17 @@ class CurrentTariffStatusStore {
 
   private abortControllers: AbortController[] = [];
 
-  portalTariffStatus: TPortalTariff | null = null;
+  portalTariffStatus: Tariff | null = null;
 
-  private _walletQuotas: TQuotas[] = [];
+  private _walletQuotas: Quota[] = [];
 
-  private _previousWalletQuota: TQuotas[] = [];
+  private _previousWalletQuota: Quota[] = [];
 
-  payerInfo: TCustomerInfo = {
+  payerInfo: CustomerInfoDto = {
     portalId: null,
     paymentMethodStatus: 0,
     email: null,
-    payer: null,
+    payer: undefined,
   };
 
   isLoaded = false;
@@ -225,12 +226,12 @@ class CurrentTariffStatusStore {
 
       if (!res?.data?.response) return;
 
-      const tariff = res.data.response as unknown as TPortalTariff;
+      const tariff = res.data.response as unknown as Tariff;
 
       this.portalTariffStatus = tariff;
 
       const walletQuota = tariff.quotas?.find(
-        (q: TQuotas) => q.wallet === true,
+        (q: Quota) => q.wallet === true,
       );
 
       if (walletQuota) {
@@ -267,13 +268,13 @@ class CurrentTariffStatusStore {
 
       if (!res?.data?.response) return;
 
-      const info = res.data.response as unknown as TCustomerInfo;
+      const info = res.data.response as unknown as CustomerInfoDto;
 
       this.payerInfo = {
         portalId: null,
         paymentMethodStatus: info.paymentMethodStatus ?? 0,
         email: info.email ?? null,
-        payer: info.payer ?? null,
+        payer: info.payer,
       };
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;

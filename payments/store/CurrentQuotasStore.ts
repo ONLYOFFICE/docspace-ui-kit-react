@@ -25,13 +25,12 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { makeAutoObservable } from "mobx";
-import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import type {
-  TPaymentFeature,
-  TPaymentQuota,
-  TNumericPaymentFeature,
-  TBooleanPaymentFeature,
-} from "@docspace/shared/api/portal/types";
+  PaymentApi,
+  TenantQuotaFeatureDto,
+  QuotaDto,
+} from "@onlyoffice/docspace-api-sdk";
+import type { TNumericPaymentFeature, TBooleanPaymentFeature } from "../types";
 import {
   FREE_BACKUP,
   MANAGER,
@@ -46,9 +45,9 @@ class CurrentQuotasStore {
 
   private abortControllers: AbortController[] = [];
 
-  currentPortalQuota: TPaymentQuota | null = null;
+  currentPortalQuota: QuotaDto | null = null;
 
-  currentPortalQuotaFeatures: Map<string, TPaymentFeature> = new Map();
+  currentPortalQuotaFeatures: Map<string, TenantQuotaFeatureDto> = new Map();
 
   isLoaded = false;
 
@@ -152,7 +151,7 @@ class CurrentQuotasStore {
   }
 
   get quotaCharacteristics() {
-    const characteristics: TPaymentFeature[] = [];
+    const characteristics: TenantQuotaFeatureDto[] = [];
     const roomFeature = this.currentPortalQuotaFeatures.get(ROOM);
     const managerFeature = this.currentPortalQuotaFeatures.get(MANAGER);
     const totalSizeFeature = this.currentPortalQuotaFeatures.get(TOTAL_SIZE);
@@ -164,10 +163,10 @@ class CurrentQuotasStore {
     return characteristics;
   }
 
-  setPortalQuotaValue = (res: TPaymentQuota) => {
+  setPortalQuotaValue = (res: QuotaDto) => {
     this.currentPortalQuota = res;
     this.currentPortalQuotaFeatures = new Map(
-      res.features.map((f: TPaymentFeature) => [f.id, f]),
+      (res.features ?? []).map((f) => [f.id ?? "", f]),
     );
     this.setIsLoaded(true);
   };
@@ -183,7 +182,7 @@ class CurrentQuotasStore {
 
       if (!res?.data?.response) return;
 
-      const quota = res.data.response as unknown as TPaymentQuota;
+      const quota = res.data.response as unknown as QuotaDto;
       this.setPortalQuotaValue(quota);
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;

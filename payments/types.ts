@@ -24,7 +24,19 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { TNumericPaymentFeature } from "@docspace/shared/api/portal/types";
+import type { TenantQuotaFeatureDto, Balance, QuotaDto } from "@onlyoffice/docspace-api-sdk";
+
+/** Feature with a numeric value (e.g. manager count, storage size). */
+export type TNumericPaymentFeature = TenantQuotaFeatureDto & { value: number };
+
+/** Feature with a boolean value (e.g. SSO enabled). */
+export type TBooleanPaymentFeature = TenantQuotaFeatureDto & { value: boolean };
+
+/** Balance from the wallet API — can be a Balance object, 0, or null. */
+export type TBalance = Balance | 0 | null;
+
+/** QuotaDto extended with serviceName (returned by wallet service endpoints). */
+export type TWalletServiceQuota = QuotaDto & { serviceName?: string };
 
 export type TServiceFeatureWithPrice = TNumericPaymentFeature & {
   price: {

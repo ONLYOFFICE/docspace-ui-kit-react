@@ -25,13 +25,12 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { makeAutoObservable } from "mobx";
-import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import type {
-  TPaymentFeature,
-  TPaymentQuota,
-  TNumericPaymentFeature,
-  TBooleanPaymentFeature,
-} from "@docspace/shared/api/portal/types";
+  PaymentApi,
+  TenantQuotaFeatureDto,
+  QuotaDto,
+} from "@onlyoffice/docspace-api-sdk";
+import type { TNumericPaymentFeature, TBooleanPaymentFeature } from "../types";
 import { MANAGER, YEAR_KEY } from "@docspace/shared/constants";
 import { TOTAL_SIZE } from "./CurrentQuotasStore";
 import type CurrentQuotasStore from "./CurrentQuotasStore";
@@ -43,9 +42,9 @@ class PaymentQuotasStore {
 
   currentQuotasStore: CurrentQuotasStore | null = null;
 
-  portalPaymentQuotas: TPaymentQuota | null = null;
+  portalPaymentQuotas: QuotaDto | null = null;
 
-  portalPaymentQuotasFeatures: Map<string, TPaymentFeature> = new Map();
+  portalPaymentQuotasFeatures: Map<string, TenantQuotaFeatureDto> = new Map();
 
   isLoaded = false;
 
@@ -119,10 +118,10 @@ class PaymentQuotasStore {
 
       if (!res?.data?.response) return;
 
-      const quotas = res.data.response as unknown as TPaymentQuota[];
+      const quotas = res.data.response as unknown as QuotaDto[];
 
-      type QuotaWithMap = TPaymentQuota & {
-        featuresMap: Map<string, TPaymentFeature>;
+      type QuotaWithMap = QuotaDto & {
+        featuresMap: Map<string, TenantQuotaFeatureDto>;
       };
 
       const quotasById = new Map<number, QuotaWithMap>(
@@ -131,7 +130,7 @@ class PaymentQuotasStore {
           {
             ...q,
             featuresMap: new Map(
-              q.features.map((f: TPaymentFeature) => [f.id, f]),
+              (q.features ?? []).map((f) => [f.id ?? "", f]),
             ),
           },
         ]),

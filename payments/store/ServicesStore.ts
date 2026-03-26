@@ -27,8 +27,8 @@
 import { makeAutoObservable, observable } from "mobx";
 import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
-import type { TBalance } from "@docspace/shared/api/portal/types";
-import type { TTranslation } from "@docspace/shared/types";
+import type { TBalance } from "../types";
+import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "@docspace/shared/utils/common";
 import {
   AI_TOOLS,
