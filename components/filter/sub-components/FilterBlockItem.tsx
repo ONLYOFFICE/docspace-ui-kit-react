@@ -364,6 +364,7 @@ const FilterBlockItem = ({
               (gi) =>
                 "selectedKey" in gi &&
                 gi.selectedKey &&
+                gi.selectedKey !== FilterKeys.me &&
                 gi.isSelected &&
                 "displaySelectorType" in gi &&
                 gi.displaySelectorType,
