@@ -1,5 +1,11 @@
 import "@testing-library/jest-dom/vitest";
 
+// @tanem/svg-injector uses SVGSVGElement which jsdom doesn't provide
+if (typeof SVGSVGElement === "undefined") {
+  (globalThis as Record<string, unknown>).SVGSVGElement =
+    class SVGSVGElement {} as unknown as typeof globalThis.SVGSVGElement;
+}
+
 import enCommon from "../locales/en/Common.json";
 import type { TTranslations } from "../providers/translation/i18n";
 import { getI18NInstance } from "../providers/translation/i18n";
