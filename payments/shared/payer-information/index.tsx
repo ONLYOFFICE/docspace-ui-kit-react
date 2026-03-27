@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import styled from "styled-components";
+import classNames from "classnames";
 
 import { toAbsoluteUrl } from "../../utils/url";
 import { Text } from "../../../components/text";
@@ -33,83 +33,15 @@ import { observer } from "mobx-react";
 import { Avatar, AvatarRole, AvatarSize } from "../../../components/avatar";
 import { toastr } from "../../../components/toast";
 import DefaultUserPhoto from "../../../assets/icons/payments/default_user_photo_size_82-82.png";
-import { Link } from "../../../components/link";
+import { Link, LinkTarget } from "../../../components/link";
 import { useState } from "react";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
-import { useTheme } from "../../../context/ThemeContext";
-
-const StyledContainer = styled.div`
-  display: flex;
-  background: ${(props) => props.theme.client.settings.payment.backgroundColor};
-  min-height: 72px;
-  padding: 16px;
-  box-sizing: border-box;
-  margin-top: 16px;
-  border-radius: 6px;
-  max-width: 660px;
-  .payer-info {
-    margin-inline-start: 3px;
-  }
-
-  .payer-info_avatar {
-    margin-inline-end: 16px;
-  }
-  .payer-info {
-    margin-inline-end: 3px;
-  }
-    
-  .payer-info_container{
-    display: flex;
-    gap:8px;
-    flex-wrap:wrap;
-    align-items: center;
-
-    .loader_container{
-      .refresh-data_loader{
-        height:16px;
-      }
-    }
-  }
-
-  .payer-info_wrapper {
-    height: max-content;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: max-content max-content;
-    grid-gap: 4px;
-
-    .payer-info_description {
-      display: flex;
-      align-items: center;
-
-      p {
-        margin-inline-end: 4px;
-      }
-      div {
-        display: inline-block;
-        margin: auto 0;
-      }
-    }
-    .payer-info_account-link {
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    .payer-info_refresh-data {
-      cursor: ${(props) => (props.isDisabled ? "default" : "pointer")};
-      color: ${(props) =>
-        props.isDisabled
-          ? props.theme.client.settings.payment.payerInfo.disableColor
-          : "inherit"};
-    }
-`;
+import styles from "./PayerInformation.module.scss";
 
 const PayerInformation = () => {
   const store = usePaymentStore();
-
-  const theme = useTheme();
 
   const { accountLink, isStripePortalAvailable, isOwner } = store;
 
@@ -136,10 +68,15 @@ const PayerInformation = () => {
       let errorMessage = "";
 
       if (typeof error === "object") {
+        const err = error as {
+          response?: { data?: { error?: { message?: string } } };
+          statusText?: string;
+          message?: string;
+        };
         errorMessage =
-          error?.response?.data?.error?.message ||
-          error?.statusText ||
-          error?.message ||
+          err?.response?.data?.error?.message ||
+          err?.statusText ||
+          err?.message ||
           "";
       } else if (typeof error === "string") {
         errorMessage = error;
@@ -183,7 +120,7 @@ const PayerInformation = () => {
       </Text>
       <div>
         {isStripePortalAvailable ? (
-          <div className="payer-info_container">
+          <div className={styles.infoContainer}>
             <Trans
               t={t}
               i18nKey="ChooseNewPayerOrRefrashData"
@@ -192,9 +129,8 @@ const PayerInformation = () => {
                   <Link
                     noSelect
                     fontWeight={600}
-                    tag="a"
-                    target="_blank"
-                    className="payer-info_account-link"
+                    target={LinkTarget.blank}
+                    className={styles.accountLink}
                     color="accent"
                     onClick={goToStripePortal}
                     dataTestId="stripe_customer_portal_link"
@@ -206,19 +142,21 @@ const PayerInformation = () => {
                     fontWeight={600}
                     onClick={isDisabled ? () => {} : onRefreshData}
                     textDecoration="underline dotted"
-                    className="payer-info_refresh-data"
+                    className={classNames(styles.refreshData, {
+                      [styles.disabled]: isDisabled,
+                    })}
                     dataTestId="stripe_customer_refresh_data"
                   />
                 ),
               }}
             />
             {isDisabled ? (
-              <div className="loader_container">
+              <div className={styles.loaderContainer}>
                 <Loader
                   color=""
                   size="16px"
                   type={LoaderTypes.track}
-                  className="refresh-data_loader"
+                  className={styles.refreshDataLoader}
                 />
               </div>
             ) : null}
@@ -232,7 +170,6 @@ const PayerInformation = () => {
     <Link
       fontWeight={600}
       href={`mailto:${email}`}
-      tag="a"
       color="accent"
       dataTestId="payer_email_link"
     >
@@ -250,16 +187,19 @@ const PayerInformation = () => {
         {payerInfo ? (
           payerInfo.displayName
         ) : (
-          <Trans t={t} i18nKey="UserNotFound" ns="Payments">
+          <Trans
+            t={t}
+            i18nKey="UserNotFound"
+            ns="Payments"
+            values={{ email: emailUnfoundedUser }}
+          >
             User
             <Text
               as="span"
-              color={theme.client.settings.payment.warningColor}
+              className={styles.refreshData}
               fontWeight={600}
               fontSize="14px"
-            >
-              {{ email: emailUnfoundedUser }}
-            </Text>
+            />
             is not found
           </Trans>
         )}
@@ -267,30 +207,29 @@ const PayerInformation = () => {
     );
   };
 
-  const avatarUrl = payerInfo
-    ? { source: payerInfo.hasAvatar ? payerInfo.avatar : DefaultUserPhoto }
-    : {};
+  const avatarSource = payerInfo
+    ? (payerInfo.hasAvatar ? payerInfo.avatar : DefaultUserPhoto) ?? undefined
+    : undefined;
 
   return (
-    <StyledContainer isDisabled={isDisabled}>
-      <div className="payer-info_avatar">
+    <div className={styles.container}>
+      <div className={styles.avatar}>
         <Avatar
           role={AvatarRole.none}
           size={AvatarSize.base}
-          {...avatarUrl}
+          source={avatarSource}
           isDefaultSource
-          userName={payerInfo?.displayName}
+          userName={payerInfo?.displayName ?? undefined}
         />
       </div>
 
-      <div className="payer-info_wrapper">
-        <div className="payer-info_description">{payerName()}</div>
+      <div className={styles.wrapper}>
+        <div className={styles.description}>{payerName()}</div>
 
         {!payerInfo ? unknownPayerInformation : payerInformation}
       </div>
-    </StyledContainer>
+    </div>
   );
 };
 
 export default observer(PayerInformation);
-
