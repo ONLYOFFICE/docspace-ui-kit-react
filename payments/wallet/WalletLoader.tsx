@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { RectangleSkeleton } from "@docspace/shared/skeletons";
+import { RectangleSkeleton } from "../../components/rectangle";
 import classNames from "classnames";
 
 import styles from "../shared/transaction-history/styles/TransactionHistory.module.scss";
