@@ -32,6 +32,7 @@ import styled from "styled-components";
 import { Button, ButtonSize } from "../../../components/button";
 import { toastr } from "../../../components/toast";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
+import type { QuotaDto } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers";
 import { Text } from "../../../components/text";
 import { Link } from "../../../components/link";
@@ -75,9 +76,7 @@ const UpdatePlanButtonContainer = ({
 
   const fetchQuotaInfo = async () => {
     const r = await paymentApi.getQuotaPaymentInformation(true);
-    return r.data.response as unknown as {
-      features: { id: string; value: number }[];
-    };
+    return r.data.response as unknown as QuotaDto;
   };
 
   const {
@@ -135,7 +134,7 @@ const UpdatePlanButtonContainer = ({
         isWaitRequest = true;
         const res = await fetchQuotaInfo();
 
-        const managersObject = res.features.find((obj) => obj.id === MANAGER);
+        const managersObject = res.features?.find((obj) => obj.id === MANAGER);
 
         if (managersObject?.value !== previousManagersCount) {
           setPortalQuotaValue(res);
@@ -145,7 +144,7 @@ const UpdatePlanButtonContainer = ({
       } catch (e) {
         setIsLoading(false);
 
-        intervalId && toastr.error(e);
+        intervalId && toastr.error(e as string);
         clearInterval(intervalId);
         intervalId = null;
       }
@@ -206,12 +205,9 @@ const UpdatePlanButtonContainer = ({
 
       previousManagersCount = maxCountManagersByQuota;
       const quotaRes = await paymentApi.getQuotaPaymentInformation(true).then(
-        (r) =>
-          r.data.response as unknown as {
-            features: { id: string; value: number }[];
-          },
+        (r) => r.data.response as unknown as QuotaDto,
       );
-      const managersObject = quotaRes.features.find(
+      const managersObject = quotaRes.features?.find(
         (obj) => obj.id === MANAGER,
       );
 

@@ -36,11 +36,11 @@ import InfoIcon from "../../../assets/icons/payments/info.outline.react.svg";
 interface ServiceCardProps {
   onClick: (e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>) => void;
   onToggle: (e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>) => void;
-  priceTitle: string;
-  id: string;
-  image: string;
-  serviceTitle: string;
-  priceDescription: string;
+  priceTitle?: string | null;
+  id?: string | null;
+  image?: string | null;
+  serviceTitle?: string | null;
+  priceDescription?: string | null;
   children?: React.ReactNode;
   toggleDisabled?: boolean;
   cardDisabled?: boolean;
@@ -61,8 +61,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   children,
   toggleDisabled,
   isEnabled,
-  id,
-  image,
+  id = "",
+  image = "",
   serviceTitle,
   priceDescription,
   tooltip,
@@ -179,3 +179,4 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 };
 
 export default ServiceCard;
+
