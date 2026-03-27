@@ -29,7 +29,7 @@ import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 
 import { getConvertedSize } from "../../utils/common";
-import QuantityPicker from "@docspace/shared/components/quantity-picker";
+import QuantityPicker from "../../../components/quantity-picker";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
 let formattedSizeTitle: string | null = null;
