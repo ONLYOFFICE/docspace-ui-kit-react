@@ -27,7 +27,7 @@
 import { useTranslation, Trans } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { Button } from "../../components/button";
+import { Button, ButtonSize } from "../../components/button";
 import { Text } from "../../components/text";
 import { ModalDialog } from "../../components/modal-dialog";
 import { getConvertedSize } from "../utils/common";
@@ -44,8 +44,7 @@ const ChangePricingPlanDialog = observer(
   ({ visible, onClose }: ChangePricingPlanDialogProps) => {
     const store = usePaymentStore();
     const { managersCount, allowedStorageSizeByQuota } = store;
-    const { addedManagersCount, usedTotalStorageSizeCount } =
-      store.quotas;
+    const { addedManagersCount, usedTotalStorageSizeCount } = store.quotas;
 
     const { t, ready } = useTranslation(["DowngradePlanDialog", "Common"]);
 
@@ -53,38 +52,41 @@ const ChangePricingPlanDialog = observer(
       onClose?.();
     };
 
-    const allowedStorageSpace = getConvertedSize(
-      t,
-      allowedStorageSizeByQuota,
-    );
-    const currentStorageSpace = getConvertedSize(
-      t,
-      usedTotalStorageSizeCount,
-    );
+    const allowedStorageSpace = getConvertedSize(t, allowedStorageSizeByQuota);
+    const currentStorageSpace = getConvertedSize(t, usedTotalStorageSizeCount);
 
     const planUsersLimitations = (
       <Text as="span" fontSize="13px">
-        <Trans t={t} i18nKey="PlanUsersLimit" ns="DowngradePlanDialog">
-          You wish to downgrade the team to
-          <strong>{{ usersCount: managersCount }}</strong>
-          admins, and current number of such users in your
-          {{ productName: t("Common:ProductName") }} is
-          <strong>{{ currentUsersCount: addedManagersCount }}</strong>
-        </Trans>
+        <Trans
+          t={t}
+          i18nKey="PlanUsersLimit"
+          ns="DowngradePlanDialog"
+          values={{
+            usersCount: managersCount,
+            productName: t("Common:ProductName"),
+            currentUsersCount: addedManagersCount,
+          }}
+          components={{
+            1: <Text as="span" fontWeight={700} />,
+          }}
+        />
       </Text>
     );
 
     const storagePlanLimitations = (
       <Text as="span" fontSize="13px">
-        <Trans t={t} i18nKey="PlanStorageLimit" ns="DowngradePlanDialog">
-          New tariff's limitation is
-          <strong>{{ storageValue: allowedStorageSpace }}</strong> of storage,
-          and your current used storage is
-          <strong>
-            {{ currentStorageValue: currentStorageSpace }}
-          </strong>
-          .
-        </Trans>
+        <Trans
+          t={t}
+          i18nKey="PlanStorageLimit"
+          ns="DowngradePlanDialog"
+          values={{
+            storageValue: allowedStorageSpace,
+            currentStorageValue: currentStorageSpace,
+          }}
+          components={{
+            1: <Text as="span" fontWeight={700} />,
+          }}
+        />
       </Text>
     );
 
@@ -115,7 +117,7 @@ const ChangePricingPlanDialog = observer(
           <Button
             className="ok-button"
             label={t("Common:OKButton")}
-            size="normal"
+            size={ButtonSize.normal}
             primary
             onClick={onCloseModal}
             tabIndex={3}
@@ -127,3 +129,4 @@ const ChangePricingPlanDialog = observer(
 );
 
 export default ChangePricingPlanDialog;
+

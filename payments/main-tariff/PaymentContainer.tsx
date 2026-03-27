@@ -183,14 +183,20 @@ const PaymentContainer = observer((props: any) => {
     if (isGracePeriod)
       return (
         <Text fontSize="14px" lineHeight="16px">
-          <Trans t={t} i18nKey="GracePeriodActivatedInfo" ns="Payments">
-            Grace period activated
-            <strong>
-              from {{ fromDate: paymentDate }} to
-              {{ byDate: gracePeriodEndDate }}
-            </strong>
-            (days remaining: {{ delayDaysCount }})
-          </Trans>{" "}
+          <Trans
+            i18nKey="GracePeriodActivatedInfo"
+            ns="Payments"
+            t={t}
+            values={{
+              fromDate: paymentDate,
+              byDate: gracePeriodEndDate,
+              delayDaysCount,
+            }}
+            components={{
+              1: <Text as="span" />,
+            }}
+          />
+
           <Text as="span" fontSize="14px" lineHeight="16px">
             {t("GracePeriodActivatedDescription", {
               productName: t("Common:ProductName"),
@@ -215,9 +221,7 @@ const PaymentContainer = observer((props: any) => {
 
   return (
     <div className={styles.paymentBody}>
-      {isNotPaidPeriod
-        ? expiredTitleSubscriptionWarning()
-        : currentPlanTitle()}
+      {isNotPaidPeriod ? expiredTitleSubscriptionWarning() : currentPlanTitle()}
 
       <CurrentTariffContainer />
 

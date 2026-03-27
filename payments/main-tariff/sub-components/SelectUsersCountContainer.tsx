@@ -56,7 +56,7 @@ const SelectUsersCountContainer = observer(
     const { t } = useTranslation(["Payments", "Common"]);
 
     const sizeValue = getConvertedSize(t, allowedStorageSizeByQuota);
-    formattedSizeTitle = `${usedTotalStorageSizeTitle}: ${sizeValue}${isNeedPlusSign ? "+" : ""}`;
+    formattedSizeTitle = `${usedTotalStorageSizeTitle ?? ""}: ${sizeValue}${isNeedPlusSign ? "+" : ""}`;
 
     const onChangeNumber = (value: any) => {
       setManagersCount(value);

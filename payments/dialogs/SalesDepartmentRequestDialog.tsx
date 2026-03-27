@@ -29,8 +29,8 @@ import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 
 import { FieldContainer } from "../../components/field-container";
-import { Button } from "../../components/button";
-import { TextInput } from "../../components/text-input";
+import { Button, ButtonSize } from "../../components/button";
+import { TextInput, InputType, InputSize } from "../../components/text-input";
 import { Text } from "../../components/text";
 import { Textarea } from "../../components/textarea";
 import {
@@ -188,8 +188,8 @@ const SalesDepartmentRequestDialog = observer(
               id="your-name"
               hasError={!isValidName}
               name="name"
-              type="text"
-              size="base"
+              type={InputType.text}
+              size={InputSize.base}
               scale
               tabIndex={1}
               placeholder={t("YourName")}
@@ -251,7 +251,7 @@ const SalesDepartmentRequestDialog = observer(
           <Button
             className="send-button"
             label={isLoading ? t("Common:Sending") : t("Common:SendButton")}
-            size="normal"
+            size={ButtonSize.normal}
             primary
             onClick={onSendRequest}
             isLoading={isLoading}
@@ -262,7 +262,7 @@ const SalesDepartmentRequestDialog = observer(
           <Button
             className="cancel-button"
             label={t("Common:CancelButton")}
-            size="normal"
+            size={ButtonSize.normal}
             onClick={onCloseModal}
             isLoading={isLoading}
             isDisabled={isLoading}

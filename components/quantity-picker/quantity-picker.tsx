@@ -48,7 +48,7 @@ type QuantityPickerProps = {
   minValue: number;
   maxValue: number;
   step: number;
-  title?: string;
+  title?: string | null;
   subtitle?: string;
   showPlusSign?: boolean;
   isDisabled?: boolean;
@@ -325,3 +325,4 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
 };
 
 export default QuantityPicker;
+

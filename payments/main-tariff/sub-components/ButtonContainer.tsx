@@ -64,7 +64,7 @@ const ButtonContainer = observer(({ isDisabled, t }: any) => {
           testId="pay_button"
         />
       ) : isNeedRequest ? (
-        <RequestButtonContainer isDisabled={isDisabled} t={t} />
+        <RequestButtonContainer isDisabled={isDisabled} />
       ) : (
         <UpdatePlanButtonContainer t={t} isDisabled={isDisabled} />
       )}
