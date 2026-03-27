@@ -34,7 +34,7 @@ import { Text } from "../../../../components/text";
 import { Tabs, type TTabItem } from "../../../../components/tabs";
 import { Link } from "../../../../components/link";
 
-import { AI_ENUM, AI_TOOLS } from "@docspace/shared/constants";
+import { AI_ENUM, AI_TOOLS } from "../../../constants";
 import { DeviceType } from "@docspace/shared/enums";
 
 import TransactionHistory from "../../../shared/transaction-history";

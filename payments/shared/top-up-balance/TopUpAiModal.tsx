@@ -44,7 +44,7 @@ import modalStyles from "./styles/TopUpAiModal.module.scss";
 import { useNavigate } from "react-router";
 
 import FromWalletToAi from "./sub-components/FromWalletToAi";
-import { AI_TOOLS } from "@docspace/shared/constants";
+import { AI_TOOLS } from "../../constants";
 import { DateTime } from "luxon";
 import { Link } from "../../../components";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";

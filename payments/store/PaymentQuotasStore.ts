@@ -31,7 +31,7 @@ import type {
   QuotaDto,
 } from "@onlyoffice/docspace-api-sdk";
 import type { TNumericPaymentFeature, TBooleanPaymentFeature } from "../types";
-import { MANAGER, YEAR_KEY } from "@docspace/shared/constants";
+import { MANAGER, YEAR_KEY } from "../constants";
 import { TOTAL_SIZE } from "./CurrentQuotasStore";
 import type CurrentQuotasStore from "./CurrentQuotasStore";
 

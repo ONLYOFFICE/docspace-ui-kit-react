@@ -46,7 +46,7 @@ import {
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
   WEB_SEARCH,
-} from "@docspace/shared/constants";
+} from "../constants";
 import type { TTranslation } from "../../utils/common";
 import {
   now,

@@ -31,7 +31,7 @@ import classNames from "classnames";
 import type { DateTime } from "luxon";
 import { parseToDateTime, isSameDay, now } from "../../../utils/date";
 import { getCookie } from "../../../utils/cookie";
-import { LANGUAGE } from "@docspace/shared/constants";
+import { LANGUAGE } from "../../../constants";
 
 import { Button, ButtonSize } from "../../../components/button";
 import { Text } from "../../../components/text";

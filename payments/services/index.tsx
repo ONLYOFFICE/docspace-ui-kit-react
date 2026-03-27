@@ -35,7 +35,7 @@ import {
   AI_ENUM,
   BACKUP_SERVICE,
   TOTAL_SIZE,
-} from "@docspace/shared/constants";
+} from "../constants";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";

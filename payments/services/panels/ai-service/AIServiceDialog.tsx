@@ -40,10 +40,10 @@ import PricingBillingBody from "./PricingBillingBody";
 
 import { DateTime } from "luxon";
 import { useNavigate } from "react-router";
-import { AI_TOOLS } from "@docspace/shared/constants";
+import { AI_TOOLS } from "../../../constants";
 import TopUpButtons from "../../../shared/top-up-balance/sub-components/TopUpButtons";
 
-import { buyWalletService } from "@docspace/shared/api/portal";
+import { useApi } from "../../../../providers";
 import TopUpAiModal from "../../../shared/top-up-balance/TopUpAiModal";
 import TopUpModal from "../../../shared/top-up-balance/TopUpModal";
 import { AmountProvider } from "../../../wallet/context";
@@ -62,14 +62,12 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
   visible,
   onClose,
 }) => {
+  const { apiClient } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
-  const {
-    fetchTransactionHistory,
-    fetchBalance,
-    walletCodeCurrency,
-  } = paymentStore;
+  const { fetchTransactionHistory, fetchBalance, walletCodeCurrency } =
+    paymentStore;
 
   const { logoText } = paymentStore;
   const { walletCustomerEmail, walletCustomerStatusNotActive } =
@@ -123,6 +121,14 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
 
   const onBackWalletClick = () => {
     setView("top-up");
+  };
+
+  const buyWalletService = async (quantity: number, serviceName: string) => {
+    const { data } = await apiClient.instance.post(
+      "api/2.0/portal/payment/buywalletservice",
+      { quantity, serviceName },
+    );
+    return data as string;
   };
 
   const container =
@@ -206,3 +212,4 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
 };
 
 export default observer(AIServiceDialog);
+

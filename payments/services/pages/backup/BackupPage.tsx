@@ -34,7 +34,7 @@ import { Button, ButtonSize } from "../../../../components/button";
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./BackupPage.module.scss";
-import { BACKUP_SERVICE } from "@docspace/shared/constants";
+import { BACKUP_SERVICE } from "../../../constants";
 import { DeviceType } from "../../../../enums";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import { useApi } from "../../../../providers";

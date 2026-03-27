@@ -36,23 +36,18 @@ import {
   BACKUP_SERVICE,
   DISK_STORAGE,
   TOTAL_SIZE,
-} from "@docspace/shared/constants";
+} from "../constants";
 import {
   calculateTotalPrice,
   getConvertedSize,
 } from "@docspace/shared/utils/common";
-import { Tooltip } from "../../components/tooltip";
-import { DeviceType } from "@docspace/shared/enums";
 
-import CheckIcon from "../../assets/icons/payments/16/check.round.react.svg";
-import InfoIcon from "../../assets/icons/payments/info.outline.react.svg";
 import PriceIcon from "../../assets/icons/payments/16/price.react.svg";
 
 import styles from "./styles/AdditionalStorage.module.scss";
 import { useServicesActions } from "./hooks/useServicesActions";
-import PayerInformation from "../shared/payer-information";
+
 import ServiceCard from "./sub-components/ServiceCard";
-import { DISK_SPACE } from "@docspace/shared/pages/backup/restore-backup/RestoreBackup.constants";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
@@ -253,92 +248,104 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
         })}
       >
         {Array.from(servicesQuotasFeatures?.values() || []).map(
-          (item: { title: string; image: string; priceTitle: string; id: string; value: boolean; serviceName: string; price: { value: number } }) => {
-          if (!item.title || !item.image) return null;
+          (item: {
+            title: string;
+            image: string;
+            priceTitle: string;
+            id: string;
+            value: boolean;
+            serviceName: string;
+            price: { value: number };
+          }) => {
+            if (!item.title || !item.image) return null;
 
-          if (item.serviceName === BACKUP_SERVICE) {
-            return (
-              <ServiceCard
-                key={item.id}
-                cardDisabled={isDisabled}
-                toggleDisabled={isDisabled}
-                priceTitle={item.priceTitle}
-                id={item.id}
-                image={item.image}
-                isEnabled={item.value}
-                serviceTitle={item.title}
-                onClick={handleClick}
-                onToggle={handleToggle}
-                priceDescription={priceDescription(
-                  item.serviceName,
-                  item.price.value,
-                )}
-                tooltip={isDisabled ? permissionTooltipText : undefined}
-                isWarningColor={
-                  item.value && walletCustomerEmail
-                    ? availableBackupsCount === 0
-                    : false
-                }
-              />
-            );
-          }
+            if (item.serviceName === BACKUP_SERVICE) {
+              return (
+                <ServiceCard
+                  key={item.id}
+                  cardDisabled={isDisabled}
+                  toggleDisabled={isDisabled}
+                  priceTitle={item.priceTitle}
+                  id={item.id}
+                  image={item.image}
+                  isEnabled={item.value}
+                  serviceTitle={item.title}
+                  onClick={handleClick}
+                  onToggle={handleToggle}
+                  priceDescription={priceDescription(
+                    item.serviceName,
+                    item.price.value,
+                  )}
+                  tooltip={isDisabled ? permissionTooltipText : undefined}
+                  isWarningColor={
+                    item.value && walletCustomerEmail
+                      ? availableBackupsCount === 0
+                      : false
+                  }
+                />
+              );
+            }
 
-          if (item.serviceName === AI_TOOLS) {
-            return (
-              <ServiceCard
-                key={item.id}
-                toggleDisabled={isDisabled}
-                cardDisabled={wasFirstAiServiceTopUp ? false : isDisabled}
-                onClick={handleClick}
-                onToggle={handleToggle}
-                serviceTitle={item.title}
-                priceDescription={priceDescription(item.id, 0, item.value)}
-                priceTitle={item.priceTitle}
-                id={item.id}
-                image={item.image}
-                isEnabled={item.value}
-                tooltip={isDisabled ? permissionTooltipText : undefined}
-                isInactiveColor={
-                  aiServiceBalance ? aiServiceBalance > 0 && !item.value : false
-                }
-                isErrorColor={isAiServiceLowBalance}
-                icon={<PriceIcon />}
-              />
-            );
-          }
+            if (item.serviceName === AI_TOOLS) {
+              return (
+                <ServiceCard
+                  key={item.id}
+                  toggleDisabled={isDisabled}
+                  cardDisabled={wasFirstAiServiceTopUp ? false : isDisabled}
+                  onClick={handleClick}
+                  onToggle={handleToggle}
+                  serviceTitle={item.title}
+                  priceDescription={priceDescription(item.id, 0, item.value)}
+                  priceTitle={item.priceTitle}
+                  id={item.id}
+                  image={item.image}
+                  isEnabled={item.value}
+                  tooltip={isDisabled ? permissionTooltipText : undefined}
+                  isInactiveColor={
+                    aiServiceBalance
+                      ? aiServiceBalance > 0 && !item.value
+                      : false
+                  }
+                  isErrorColor={isAiServiceLowBalance}
+                  icon={<PriceIcon />}
+                />
+              );
+            }
 
-          if (item.serviceName === DISK_STORAGE) {
-            const eventDisabled =
-              isGracePeriod || isDisabled || hasScheduledStorageChange;
+            if (item.serviceName === DISK_STORAGE) {
+              const eventDisabled =
+                isGracePeriod || isDisabled || hasScheduledStorageChange;
 
-            return (
-              <ServiceCard
-                key={item.id}
-                cardDisabled={isDisabled}
-                toggleDisabled={!!eventDisabled}
-                onClick={handleClick}
-                onToggle={handleToggle}
-                serviceTitle={item.title}
-                priceDescription={priceDescription(item.id)}
-                priceTitle={item.priceTitle}
-                id={item.id}
-                image={item.image}
-                isEnabled={hasStorageSubscription}
-                tooltip={isDisabled ? permissionTooltipText : undefined}
-                priceTooltip={
-                  hasScheduledStorageChange ? textTooltip : undefined
-                }
-                isWarningColor={hasScheduledStorageChange}
-                isErrorColor={
-                  !!previousStoragePlanSize && !isStorageDeactivationVisited
-                }
-              />
-            );
-          }
-        })}
+              return (
+                <ServiceCard
+                  key={item.id}
+                  cardDisabled={isDisabled}
+                  toggleDisabled={!!eventDisabled}
+                  onClick={handleClick}
+                  onToggle={handleToggle}
+                  serviceTitle={item.title}
+                  priceDescription={priceDescription(item.id)}
+                  priceTitle={item.priceTitle}
+                  id={item.id}
+                  image={item.image}
+                  isEnabled={hasStorageSubscription}
+                  tooltip={isDisabled ? permissionTooltipText : undefined}
+                  priceTooltip={
+                    hasScheduledStorageChange ? textTooltip : undefined
+                  }
+                  isWarningColor={hasScheduledStorageChange}
+                  isErrorColor={
+                    !!previousStoragePlanSize && !isStorageDeactivationVisited
+                  }
+                />
+              );
+            }
+          },
+        )}
       </div>
     </div>
   );
 };
 
 export default observer(ServicesItems);
+

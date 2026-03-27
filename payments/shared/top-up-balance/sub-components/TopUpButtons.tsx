@@ -34,7 +34,7 @@ import { Text } from "../../../../components/text";
 
 import { useAmountValue } from "../../../wallet/context";
 import styles from "../styles/TopUpModal.module.scss";
-import { AI_TOOLS } from "@docspace/shared/constants";
+import { AI_TOOLS } from "../../../constants";
 import { observer } from "mobx-react";
 import { DateTime } from "luxon";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";

@@ -24,53 +24,17 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { DISK_STORAGE } from "../../../constants";
-import { observer } from "mobx-react";
+export const MANAGER = "manager";
+export const TOTAL_SIZE = "total_size";
+export const ROOM = "room";
+export const YEAR_KEY = "year";
+export const BACKUP_SERVICE = "backup";
+export const AI_TOOLS = "ai-tools";
+export const AI_ENUM = "aitools";
+export const STORAGE_ENUM = "storage";
+export const DISK_STORAGE = "disk-storage";
+export const WEB_SEARCH = "websearch";
+export const FREE_BACKUP = "free_backup";
+export const STORAGE_TARIFF_DEACTIVATED = "storageTariffDeactivated";
+export const STORAGE_DEACTIVATION_VISITED = "storageDeactivationVisited";
 
-import TopUpModal from "../../../shared/top-up-balance/TopUpModal";
-
-import { usePaymentStore } from "../../../store/PaymentStoreProvider";
-import { useServicesStore } from "../../../store/ServicesStoreProvider";
-
-type TopUpContainerTypes = {
-  isVisibleContainer: boolean;
-  onCloseTopUpModal: () => void;
-  amount?: number;
-  initialAmount?: number;
-};
-
-const TopUpContainer = (props: TopUpContainerTypes) => {
-  const {
-    isVisibleContainer,
-    onCloseTopUpModal,
-    amount,
-    initialAmount,
-  } = props;
-
-  const paymentStore = usePaymentStore();
-  const servicesStore = useServicesStore();
-
-  const { storageServiceName } = paymentStore;
-  const { reccomendedAmount = 0 } = servicesStore;
-
-  const reccomended = initialAmount ?? reccomendedAmount;
-
-  return isVisibleContainer ? (
-    <TopUpModal
-      visible={isVisibleContainer}
-      onClose={onCloseTopUpModal}
-      headerProps={{
-        isBackButton: true,
-        onBackClick: onCloseTopUpModal,
-        onCloseClick: onCloseTopUpModal,
-      }}
-      {...(reccomended > 0 && {
-        reccomendedAmount: reccomended.toString(),
-        amount: amount!.toString(),
-      })}
-      serviceName={storageServiceName ?? DISK_STORAGE}
-    />
-  ) : null;
-};
-
-export default observer(TopUpContainer);

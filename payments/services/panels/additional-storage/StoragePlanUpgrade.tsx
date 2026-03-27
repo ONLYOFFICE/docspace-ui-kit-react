@@ -42,7 +42,7 @@ import { calculateTotalPrice } from "@docspace/shared/utils/common";
 import {
   STORAGE_DEACTIVATION_VISITED,
   STORAGE_TARIFF_DEACTIVATED,
-} from "@docspace/shared/constants";
+} from "../../../constants";
 import { useNavigate } from "react-router";
 
 import styles from "../../styles/index.module.scss";

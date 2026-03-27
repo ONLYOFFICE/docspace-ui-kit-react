@@ -44,7 +44,7 @@ import RemoveSessionIcon from "../../../../assets/icons/payments/remove.session.
 
 import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./AdditionalStoragePage.module.scss";
-import { DISK_STORAGE, STORAGE_ENUM } from "@docspace/shared/constants";
+import { DISK_STORAGE, STORAGE_ENUM } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import {
   calculateTotalPrice,

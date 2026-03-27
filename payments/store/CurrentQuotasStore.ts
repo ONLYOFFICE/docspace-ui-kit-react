@@ -36,9 +36,10 @@ import {
   MANAGER,
   ROOM,
   YEAR_KEY,
-} from "@docspace/shared/constants";
+  TOTAL_SIZE,
+} from "../constants";
 
-export const TOTAL_SIZE = "total_size";
+export { TOTAL_SIZE };
 
 class CurrentQuotasStore {
   private paymentApi: PaymentApi;

@@ -34,7 +34,7 @@ import {
   AI_TOOLS,
   BACKUP_SERVICE,
   STORAGE_ENUM,
-} from "@docspace/shared/constants";
+} from "../constants";
 import type { TAiToolsPrices } from "../types";
 import type PaymentStore from "./PaymentStore";
 

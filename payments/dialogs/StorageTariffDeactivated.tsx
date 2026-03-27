@@ -37,7 +37,7 @@ import {
   calculateTotalPrice,
   getConvertedSize,
 } from "@docspace/shared/utils/common";
-import { STORAGE_TARIFF_DEACTIVATED } from "@docspace/shared/constants";
+import { STORAGE_TARIFF_DEACTIVATED } from "../constants";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useNavigate } from "react-router";

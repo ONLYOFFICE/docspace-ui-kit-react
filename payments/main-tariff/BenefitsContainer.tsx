@@ -32,7 +32,7 @@ import { Text } from "../../components/text";
 import { HelpButton } from "../../components/help-button";
 import { Link } from "../../components/link";
 import { combineUrl } from "@docspace/shared/utils/combineUrl";
-import { FREE_BACKUP } from "@docspace/shared/constants";
+import { FREE_BACKUP } from "../constants";
 
 import HelpReactSvgUrl from "../../assets/icons/payments/help.react.svg?url";
 
