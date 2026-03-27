@@ -264,6 +264,8 @@ const FilterBlock = ({
               value[idx].key = key;
               if (label) {
                 value[idx].label = label;
+              } else if (!key) {
+                delete value[idx].label;
               }
             }
           }
