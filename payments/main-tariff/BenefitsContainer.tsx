@@ -31,7 +31,7 @@ import { observer } from "mobx-react";
 import { Text } from "../../components/text";
 import { HelpButton } from "../../components/help-button";
 import { Link } from "../../components/link";
-import { combineUrl } from "@docspace/shared/utils/combineUrl";
+import { combineUrl } from "../../utils/combineUrl";
 import { FREE_BACKUP } from "../constants";
 
 import HelpReactSvgUrl from "../../assets/icons/payments/help.react.svg?url";
