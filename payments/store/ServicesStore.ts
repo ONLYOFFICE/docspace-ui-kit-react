@@ -25,16 +25,15 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { makeAutoObservable, observable } from "mobx";
-import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
+import type {
+  PaymentApi,
+  TenantWalletService,
+} from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "../utils/common";
-import {
-  AI_TOOLS,
-  BACKUP_SERVICE,
-  STORAGE_ENUM,
-} from "../constants";
+import { AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
 import type { TAiToolsPrices } from "../types";
 import type PaymentStore from "./PaymentStore";
 
@@ -79,8 +78,6 @@ class ServicesStore {
     });
   }
 
-
-
   private addAbortController(controller: AbortController) {
     this.abortControllers.push(controller);
   }
@@ -96,9 +93,16 @@ class ServicesStore {
     return this.paymentStore.language ?? "en";
   }
 
-  get aiServiceBalance() {
-    if (this.aiToolsBalance && this.aiToolsBalance.subAccounts.length > 0)
-      return this.aiToolsBalance.subAccounts[0].amount;
+  private get aiBalanceData() {
+    if (this.aiToolsBalance && typeof this.aiToolsBalance !== "number")
+      return this.aiToolsBalance;
+    return null;
+  }
+
+  get aiServiceBalance(): number {
+    const balance = this.aiBalanceData;
+    if (balance?.subAccounts && balance.subAccounts.length > 0)
+      return balance.subAccounts[0].amount ?? 0;
 
     return 0.0;
   }
@@ -109,9 +113,10 @@ class ServicesStore {
     return this.aiServiceBalance < 1;
   }
 
-  get aiServiceCodeCurrency() {
-    if (this.aiToolsBalance && this.aiToolsBalance.subAccounts.length > 0)
-      return this.aiToolsBalance.subAccounts[0].currency;
+  get aiServiceCodeCurrency(): string {
+    const balance = this.aiBalanceData;
+    if (balance?.subAccounts && balance.subAccounts.length > 0)
+      return balance.subAccounts[0].currency ?? "USD";
 
     return "USD";
   }
@@ -182,7 +187,7 @@ class ServicesStore {
   get wasFirstAiServiceTopUp() {
     if (!this.aiToolsBalance) return false;
 
-    return this.aiToolsBalance.subAccounts.length !== 0;
+    return (this.aiBalanceData?.subAccounts?.length ?? 0) !== 0;
   }
 
   setPartialUpgradeFee = (partialUpgradeFee: number) => {
@@ -232,7 +237,9 @@ class ServicesStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getPortalPrices(abortController.signal);
+      const res = await this.paymentApi.getPortalPrices({
+        signal: abortController.signal,
+      });
       if (!res?.data?.response) return;
       this.aiToolsPrices = res.data.response as unknown as TAiToolsPrices;
     } catch (error: unknown) {
@@ -246,9 +253,9 @@ class ServicesStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getPaymentQuotas(
-        abortController.signal,
-      );
+      const res = await this.paymentApi.getPaymentQuotas(undefined, {
+        signal: abortController.signal,
+      });
       if (!res?.data?.response) return;
 
       const data = res.data.response as unknown as { models?: string[] };
@@ -322,8 +329,8 @@ class ServicesStore {
 
     try {
       const res = await this.paymentApi.getWalletService(
-        AI_TOOLS,
-        abortController.signal,
+        AI_TOOLS as unknown as TenantWalletService,
+        { signal: abortController.signal },
       );
 
       if (!res?.data?.response) return;

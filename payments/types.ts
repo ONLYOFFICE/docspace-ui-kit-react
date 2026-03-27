@@ -29,7 +29,6 @@ import type {
   Balance,
   QuotaDto,
 } from "@onlyoffice/docspace-api-sdk";
-import type { TTheme } from "../providers/theme/themes";
 
 /** Feature with a numeric value (e.g. manager count, storage size). */
 export type TNumericPaymentFeature = TenantQuotaFeatureDto & { value: number };
@@ -102,7 +101,6 @@ export type TPaymentUser = {
 
 /** Minimal config provided by the host application. Everything else is fetched internally. */
 export type TPaymentConfig = {
-  theme: TTheme | null;
   language: string;
   expandArticle: boolean;
   logoText?: string;

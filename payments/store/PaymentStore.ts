@@ -33,6 +33,7 @@ import type {
   TenantQuotaFeatureDto,
   QuotaDto,
   TenantWalletSettings,
+  TenantWalletService,
   OperationDto,
 } from "@onlyoffice/docspace-api-sdk";
 
@@ -59,7 +60,11 @@ import {
   formatDate as formatDateUtil,
 } from "../../utils/date";
 import type { DateTime } from "luxon";
-import type { TPaymentConfig, TServiceFeatureWithPrice } from "../types";
+import type {
+  TPaymentConfig,
+  TServiceFeatureWithPrice,
+  TWalletServiceQuota,
+} from "../types";
 import CurrentTariffStatusStore from "./CurrentTariffStatusStore";
 import CurrentQuotasStore from "./CurrentQuotasStore";
 import PaymentQuotasStore from "./PaymentQuotasStore";
@@ -95,11 +100,9 @@ class PaymentStore {
 
   utcOffset = "";
 
-  theme: any = null;
-
   expandArticle = false;
 
-  licenseQuota: TLicenseQuota | null = null;
+  licenseQuota: Record<string, unknown> | null = null;
 
   salesEmail = "";
 
@@ -148,7 +151,7 @@ class PaymentStore {
 
   cardLinked = "";
 
-  transactionHistory: OperationDto[] = [];
+  transactionHistory: WalletOperationDto[] = [];
 
   isTransactionHistoryExist = false;
 
@@ -198,7 +201,6 @@ class PaymentStore {
   }
 
   configure = (config: TPaymentConfig) => {
-    this.theme = config.theme;
     this.language = config.language;
     this.expandArticle = config.expandArticle;
     if (config.logoText !== undefined) this.logoText = config.logoText;
@@ -227,7 +229,7 @@ class PaymentStore {
   };
 
   get isAlreadyPaid() {
-    return this.tariff.walletCustomerEmail || !this.quotas.isFreeTariff;
+    return !!this.tariff.walletCustomerEmail || !this.quotas.isFreeTariff;
   }
 
   get isNeedRequest() {
@@ -284,16 +286,23 @@ class PaymentStore {
     return this.autoPayments?.enabled;
   }
 
-  get walletCodeCurrency() {
-    if (this.balance && this.balance.subAccounts.length > 0)
-      return this.balance.subAccounts[0].currency;
+  private get balanceData() {
+    if (this.balance && typeof this.balance !== "number") return this.balance;
+    return null;
+  }
+
+  get walletCodeCurrency(): string {
+    const balance = this.balanceData;
+    if (balance?.subAccounts && balance.subAccounts.length > 0)
+      return balance.subAccounts[0].currency ?? "USD";
 
     return "USD";
   }
 
-  get walletBalance() {
-    if (this.balance && this.balance.subAccounts.length > 0)
-      return this.balance.subAccounts[0].amount;
+  get walletBalance(): number {
+    const balance = this.balanceData;
+    if (balance?.subAccounts && balance.subAccounts.length > 0)
+      return balance.subAccounts[0].amount ?? 0;
 
     return 0.0;
   }
@@ -303,11 +312,11 @@ class PaymentStore {
   }
 
   get wasChangeBalance() {
+    const balance = this.balanceData;
     return (
       this.previousBalance === 0 &&
-      typeof this.balance !== "number" &&
-      !!this.balance &&
-      this.balance.subAccounts.length > 0
+      !!balance &&
+      (balance.subAccounts?.length ?? 0) > 0
     );
   }
 
@@ -540,7 +549,7 @@ class PaymentStore {
       if (!res?.data?.response) return;
 
       const data = res.data.response as unknown as {
-        collection: OperationDto[];
+        collection: WalletOperationDto[];
       };
       this.transactionHistory = data.collection;
       this.isTransactionHistoryExist = data.collection.length > 0;
@@ -555,13 +564,16 @@ class PaymentStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getTenantWalletSettings(
-        abortController.signal,
-      );
+      const res = await this.paymentApi.getTenantWalletSettings({
+        signal: abortController.signal,
+      });
 
-      if (!res?.data?.response) return;
+      if (!res) return;
 
-      const data = res.data.response as unknown as TenantWalletSettings;
+      const data = (res?.data as unknown as { response?: TenantWalletSettings })
+        ?.response;
+
+      if (!data) return;
       this.autoPayments = data;
       this.isAutomaticPaymentsEnabled = data.enabled ?? false;
 
@@ -582,10 +594,9 @@ class PaymentStore {
     const backUrl = url || `${window.location.href}?complete=true`;
 
     try {
-      const res = await this.paymentApi.getCheckoutSetupUrl(
-        backUrl,
-        abortController.signal,
-      );
+      const res = await this.paymentApi.getCheckoutSetupUrl(backUrl, {
+        signal: abortController.signal,
+      });
 
       if (!res?.data?.response) return;
 
@@ -623,14 +634,16 @@ class PaymentStore {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
-    const res = await this.paymentApi.getWalletServices(abortController.signal);
+    const res = await this.paymentApi.getWalletServices({
+      signal: abortController.signal,
+    });
 
     if (!res?.data?.response) return;
 
-    const services = res.data.response as unknown as QuotaDto[];
+    const services = res.data.response as unknown as TWalletServiceQuota[];
 
     const quotas = services.map((service) => {
-      const feature = service.features[0];
+      const feature = service.features?.[0];
       return {
         ...feature,
         price: service.price,
@@ -639,8 +652,8 @@ class PaymentStore {
     });
 
     this.servicesQuotasFeatures = new Map(
-      quotas.map((feature) => [feature.id, feature]),
-    );
+      quotas.map((feature) => [feature.id ?? "", feature]),
+    ) as Map<string, TenantQuotaFeatureDto | TServiceFeatureWithPrice>;
 
     return services;
   };
@@ -667,9 +680,9 @@ class PaymentStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getPaymentAccount(
-        abortController.signal,
-      );
+      const res = await this.paymentApi.getPaymentAccount(undefined, {
+        signal: abortController.signal,
+      });
 
       if (!res?.data?.response) return;
 
@@ -697,14 +710,14 @@ class PaymentStore {
     this.addAbortController(abortController);
 
     const res = await this.paymentApi.getWalletService(
-      serviceName,
-      abortController.signal,
+      serviceName as unknown as TenantWalletService,
+      { signal: abortController.signal },
     );
 
     if (!res?.data?.response) return;
 
-    const service = res.data.response as unknown as QuotaDto;
-    const feature = service.features[0];
+    const service = res.data.response as unknown as TWalletServiceQuota;
+    const feature = service.features?.[0];
 
     const featureWithPrice = {
       ...feature,
@@ -721,7 +734,7 @@ class PaymentStore {
 
     const key = existingEntry
       ? existingEntry[0]
-      : service.features[0].id.toString();
+      : (service.features?.[0]?.id?.toString() ?? "");
 
     this.servicesQuotasFeatures.set(key, featureWithPrice);
 
@@ -739,8 +752,8 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getPaymentUrl(
-        { adminCount: managersCount, backUrl },
-        abortController.signal,
+        { quantity: { admin: managersCount }, backUrl },
+        { signal: abortController.signal },
       );
 
       if (!res?.data?.response) return;
@@ -751,7 +764,7 @@ class PaymentStore {
     }
   };
 
-  getPaymentLink = async (token = undefined) => {
+  getPaymentLink = async (token?: AbortSignal) => {
     const backUrl = combineUrl(
       window.location.origin,
       "/portal-settings/payments/portal-payments?complete=true",
@@ -759,8 +772,8 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getPaymentUrl(
-        { adminCount: this.managersCount, backUrl },
-        { signal: token } as unknown as undefined,
+        { quantity: { admin: this.managersCount }, backUrl },
+        token ? { signal: token } : undefined,
       );
 
       if (!res?.data?.response) return;
@@ -986,14 +999,14 @@ class PaymentStore {
         max,
       } = newSettings;
 
-      this.buyUrl = buyUrl;
-      this.salesEmail = salesEmail;
+      this.buyUrl = buyUrl ?? "";
+      this.salesEmail = salesEmail ?? "";
       this.standaloneMode = standaloneMode;
       this.maxAvailableManagersCount = max;
 
       if (currentLicense) {
-        if (currentLicense.date)
-          this.currentLicense.expiresDate = new Date(currentLicense.date);
+        if (currentLicense.dueDate)
+          this.currentLicense.expiresDate = new Date(currentLicense.dueDate);
 
         if (currentLicense.trial)
           this.currentLicense.trialMode = currentLicense.trial;
@@ -1024,7 +1037,7 @@ class PaymentStore {
         ? this.maxAvailableManagersCount + 1
         : this.quotas.maxCountManagersByQuota;
 
-      this.totalPrice = +currentTotalPrice;
+      this.totalPrice = currentTotalPrice ? +currentTotalPrice : 0;
 
       return;
     }
