@@ -27,7 +27,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
 
-import { EmptyView } from "@docspace/shared/components/empty-view";
+import { EmptyView } from "../../../../components/empty-view";
 
 import { DeviceType } from "../../../../enums";
 import { Consumer } from "../../../../utils";

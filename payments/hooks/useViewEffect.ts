@@ -28,7 +28,7 @@ import { useEffect, use } from "react";
 import { isMobile as isMobileDevice } from "react-device-detect";
 
 import { DeviceType } from "../../enums";
-import { isTablet, isMobile } from "@docspace/shared/utils";
+import { isTablet, isMobile } from "../../utils/device";
 import { Context } from "../../utils/context";
 
 type UseViewEffectProps = {
