@@ -37,10 +37,7 @@ import {
   DISK_STORAGE,
   TOTAL_SIZE,
 } from "../constants";
-import {
-  calculateTotalPrice,
-  getConvertedSize,
-} from "@docspace/shared/utils/common";
+import { calculateTotalPrice, getConvertedSize } from "../utils/common";
 
 import PriceIcon from "../../assets/icons/payments/16/price.react.svg";
 

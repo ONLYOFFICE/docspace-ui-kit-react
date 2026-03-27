@@ -33,10 +33,7 @@ import {
   ModalDialog,
   ModalDialogType,
 } from "../../components/modal-dialog";
-import {
-  calculateTotalPrice,
-  getConvertedSize,
-} from "@docspace/shared/utils/common";
+import { calculateTotalPrice, getConvertedSize } from "../utils/common";
 import { STORAGE_TARIFF_DEACTIVATED } from "../constants";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";

@@ -38,7 +38,7 @@ import { Button, ButtonSize } from "../../../../components/button";
 import {
   calculateTotalPrice,
   getConvertedSize,
-} from "@docspace/shared/utils/common";
+} from "../../../utils/common";
 import { Text } from "../../../../components/text";
 
 import { useServicesActions } from "../../hooks/useServicesActions";

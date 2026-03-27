@@ -29,7 +29,7 @@ import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
-import { formatCurrencyValue } from "@docspace/shared/utils/common";
+import { formatCurrencyValue } from "../utils/common";
 import {
   AI_TOOLS,
   BACKUP_SERVICE,

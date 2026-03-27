@@ -38,7 +38,7 @@ import {
 } from "../../../../components/modal-dialog";
 import { toastr } from "../../../../components/toast";
 import { useApi } from "../../../../providers";
-import { calculateTotalPrice } from "@docspace/shared/utils/common";
+import { calculateTotalPrice } from "../../../utils/common";
 import {
   STORAGE_DEACTIVATION_VISITED,
   STORAGE_TARIFF_DEACTIVATED,

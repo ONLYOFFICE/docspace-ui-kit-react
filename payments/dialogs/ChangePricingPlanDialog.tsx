@@ -30,7 +30,7 @@ import { observer } from "mobx-react";
 import { Button } from "../../components/button";
 import { Text } from "../../components/text";
 import { ModalDialog } from "../../components/modal-dialog";
-import { getConvertedSize } from "@docspace/shared/utils/common";
+import { getConvertedSize } from "../utils/common";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./ChangePricingPlan.module.scss";

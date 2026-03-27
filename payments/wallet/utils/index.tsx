@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type { TTranslation } from "../../../utils/common";
-import { truncateNumberToFraction } from "@docspace/shared/utils/common";
+import { truncateNumberToFraction } from "../../utils/common";
 
 const truncateNumberToFractionNumeric = (
   value: number,

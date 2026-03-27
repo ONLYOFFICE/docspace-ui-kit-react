@@ -28,7 +28,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Text } from "../../../components/text";
 import { observer } from "mobx-react";
-import { getConvertedSize } from "@docspace/shared/utils/common";
+import { getConvertedSize } from "../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import styles from "./SubComponents.module.scss";
 

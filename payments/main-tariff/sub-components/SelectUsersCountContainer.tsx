@@ -28,7 +28,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 
-import { getConvertedSize } from "@docspace/shared/utils/common";
+import { getConvertedSize } from "../../utils/common";
 import QuantityPicker from "@docspace/shared/components/quantity-picker";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 

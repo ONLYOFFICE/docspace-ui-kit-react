@@ -38,7 +38,7 @@ import type {
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
 import type { TBalance } from "../types";
-import { formatCurrencyValue } from "@docspace/shared/utils/common";
+import { formatCurrencyValue } from "../utils/common";
 import { combineUrl } from "@docspace/shared/utils/combineUrl";
 import {
   AI_ENUM,

@@ -49,7 +49,7 @@ import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo
 import {
   calculateTotalPrice,
   getConvertedSize,
-} from "@docspace/shared/utils/common";
+} from "../../../utils/common";
 import type { DateTime } from "luxon";
 import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components/toast";
