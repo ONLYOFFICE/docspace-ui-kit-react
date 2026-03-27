@@ -53,10 +53,10 @@ const StyledModalBody = styled.div`
 `;
 
 const MANAGER = "manager";
-let timerId: any = null;
-let intervalId: any = null;
+let timerId: ReturnType<typeof setTimeout> | undefined;
+let intervalId: ReturnType<typeof setInterval> | undefined;
 let isWaitRequest = false;
-let previousManagersCount: any = null;
+let previousManagersCount: number | null = null;
 
 type UpdatePlanButtonContainerProps = {
   isDisabled?: boolean;
@@ -106,7 +106,7 @@ const UpdatePlanButtonContainer = ({
         t("BusinessUpdated", { planName: currentTariffPlanTitle }),
       );
     clearInterval(intervalId);
-    intervalId = null;
+    intervalId = undefined;
     setIsLoading(false);
   };
 
@@ -120,7 +120,7 @@ const UpdatePlanButtonContainer = ({
 
           intervalId && toastr.error(t("ErrorNotification"));
           clearInterval(intervalId);
-          intervalId = null;
+          intervalId = undefined;
 
           return;
         }
@@ -146,7 +146,7 @@ const UpdatePlanButtonContainer = ({
 
         intervalId && toastr.error(e as string);
         clearInterval(intervalId);
-        intervalId = null;
+        intervalId = undefined;
       }
 
       isWaitRequest = false;
@@ -198,15 +198,15 @@ const UpdatePlanButtonContainer = ({
 
         setIsLoading(false);
         clearTimeout(timerId);
-        timerId = null;
+        timerId = undefined;
 
         return;
       }
 
       previousManagersCount = maxCountManagersByQuota;
-      const quotaRes = await paymentApi.getQuotaPaymentInformation(true).then(
-        (r) => r.data.response as unknown as QuotaDto,
-      );
+      const quotaRes = await paymentApi
+        .getQuotaPaymentInformation(true)
+        .then((r) => r.data.response as unknown as QuotaDto);
       const managersObject = quotaRes.features?.find(
         (obj) => obj.id === MANAGER,
       );
@@ -222,7 +222,7 @@ const UpdatePlanButtonContainer = ({
       toastr.error(t("ErrorNotification"));
       setIsLoading(false);
       clearTimeout(timerId);
-      timerId = null;
+      timerId = undefined;
     }
   };
 
@@ -267,10 +267,10 @@ const UpdatePlanButtonContainer = ({
   useEffect(() => {
     return () => {
       timerId && clearTimeout(timerId);
-      timerId = null;
+      timerId = undefined;
 
       intervalId && clearInterval(intervalId);
-      intervalId = null;
+      intervalId = undefined;
     };
   }, []);
 

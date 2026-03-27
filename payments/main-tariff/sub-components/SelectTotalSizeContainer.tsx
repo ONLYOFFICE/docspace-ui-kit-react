@@ -35,7 +35,10 @@ import styles from "./SubComponents.module.scss";
 const SelectTotalSizeContainer = observer(({
   usedTotalStorageSizeTitle,
   isNeedPlusSign,
-}: any) => {
+}: {
+  usedTotalStorageSizeTitle?: string;
+  isNeedPlusSign: boolean;
+}) => {
   const paymentStore = usePaymentStore();
   const { allowedStorageSizeByQuota } = paymentStore;
 

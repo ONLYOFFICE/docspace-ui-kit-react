@@ -32,12 +32,15 @@ import SelectTotalSizeContainer from "./SelectTotalSizeContainer";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import styles from "./SubComponents.module.scss";
 
-const CurrentUsersCountContainer = observer((props: any) => {
-  const {
-    isNeedPlusSign,
-    isDisabled,
-    addedManagersCountTitle,
-  } = props;
+const CurrentUsersCountContainer = observer(({
+  isNeedPlusSign,
+  isDisabled,
+  addedManagersCountTitle,
+}: {
+  isNeedPlusSign: boolean;
+  isDisabled: boolean;
+  addedManagersCountTitle?: string | null;
+}) => {
 
   const store = usePaymentStore();
   const { maxCountManagersByQuota } = store.quotas;

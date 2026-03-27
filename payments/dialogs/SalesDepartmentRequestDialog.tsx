@@ -38,6 +38,7 @@ import {
   ModalDialogType,
 } from "../../components/modal-dialog";
 import { EmailInput } from "../../components/email-input";
+import type { TValidate } from "../../components/email-input";
 import { ErrorKeys } from "../../enums";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
@@ -113,13 +114,13 @@ const SalesDepartmentRequestDialog = observer(
       onClose?.();
     };
 
-    const onValidateEmailInput = (result: any) => {
+    const onValidateEmailInput = (result: TValidate) => {
       if (result.isValid) {
         setEmailError("");
         return;
       }
 
-      const translatedErrors = result.errors.map((errorKey: string) => {
+      const translatedErrors = result.errors?.map((errorKey: string) => {
         switch (errorKey) {
           case ErrorKeys.LocalDomain:
             return t("Common:LocalDomain");
@@ -148,7 +149,7 @@ const SalesDepartmentRequestDialog = observer(
         }
       });
 
-      setEmailError(translatedErrors[0]);
+      if (translatedErrors) setEmailError(translatedErrors[0]);
     };
 
     return (

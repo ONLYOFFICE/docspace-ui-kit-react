@@ -34,7 +34,7 @@ import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
 let formattedSizeTitle: string | null = null;
 const SelectUsersCountContainer = observer(
-  ({ isDisabled, isNeedPlusSign }: any) => {
+  ({ isDisabled, isNeedPlusSign }: { isDisabled: boolean; isNeedPlusSign: boolean }) => {
     const store = usePaymentStore();
 
     const {
@@ -58,7 +58,7 @@ const SelectUsersCountContainer = observer(
     const sizeValue = getConvertedSize(t, allowedStorageSizeByQuota);
     formattedSizeTitle = `${usedTotalStorageSizeTitle ?? ""}: ${sizeValue}${isNeedPlusSign ? "+" : ""}`;
 
-    const onChangeNumber = (value: any) => {
+    const onChangeNumber = (value: number) => {
       setManagersCount(value);
       setTotalPrice(value);
     };

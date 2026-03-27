@@ -34,13 +34,15 @@ import TotalTariffContainer from "./sub-components/TotalTariffContainer";
 import ButtonContainer from "./sub-components/ButtonContainer";
 import CurrentUsersCountContainer from "./sub-components/CurrentUsersCount";
 
+import type { TTranslation } from "../../utils/common";
+
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./MainTariff.module.scss";
 
-let timeout: any = null;
+let timeout: ReturnType<typeof setTimeout> | null = null;
 let controller: AbortController | undefined;
 
-const PriceCalculation = observer(({ t }: any) => {
+const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
   const store = usePaymentStore();
 
   const {
@@ -55,7 +57,7 @@ const PriceCalculation = observer(({ t }: any) => {
 
   const { isGracePeriod, isNotPaidPeriod } = store.tariff;
   const { isYearTariff } = store.quotas;
-  const { planCost } = store.paymentQuotas;
+  const { planCost, addedManagersCountTitle } = store.paymentQuotas;
 
   const priceManagerPerMonth = planCost.value;
 
@@ -104,7 +106,6 @@ const PriceCalculation = observer(({ t }: any) => {
       >
         {isYearTariff ? (
           <Trans
-            t={t}
             i18nKey="PerUserYear"
             ns="Common"
             values={{ price: formatPaymentCurrency(priceManagerPerMonth) }}
@@ -114,7 +115,6 @@ const PriceCalculation = observer(({ t }: any) => {
           />
         ) : (
           <Trans
-            t={t}
             i18nKey="PerUserMonth"
             ns="Common"
             values={{ price: formatPaymentCurrency(priceManagerPerMonth) }}
@@ -145,8 +145,8 @@ const PriceCalculation = observer(({ t }: any) => {
       {isGracePeriod || isNotPaidPeriod ? (
         <CurrentUsersCountContainer
           isNeedPlusSign={isNeedPlusSign}
-          t={t}
           isDisabled={isDisabled}
+          addedManagersCountTitle={addedManagersCountTitle}
         />
       ) : (
         <SelectUsersCountContainer

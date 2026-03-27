@@ -31,6 +31,7 @@ import styled from "styled-components";
 import { toastr } from "../../../components/toast";
 import RequestButtonContainer from "./RequestButtonContainer";
 import UpdatePlanButtonContainer from "./UpdatePlanButtonContainer";
+import type { TTranslation } from "../../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
 const StyledBody = styled.div`
@@ -39,7 +40,7 @@ const StyledBody = styled.div`
   }
 `;
 
-const ButtonContainer = observer(({ isDisabled, t }: any) => {
+const ButtonContainer = observer(({ isDisabled, t }: { isDisabled: boolean; t: TTranslation }) => {
   const store = usePaymentStore();
   const { isNeedRequest, isLoading, paymentLink } = store;
   const { isNotPaidPeriod, isGracePeriod } = store.tariff;

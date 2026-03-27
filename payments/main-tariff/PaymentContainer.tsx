@@ -33,6 +33,8 @@ import { Text } from "../../components/text";
 
 import { HelpButton } from "../../components/help-button";
 
+import type { TTranslation } from "../../utils/common";
+
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 
 import CurrentTariffContainer from "./CurrentTariffContainer";
@@ -41,8 +43,7 @@ import BenefitsContainer from "./BenefitsContainer";
 import ContactContainer from "./ContactContainer";
 import styles from "./MainTariff.module.scss";
 
-const PaymentContainer = observer((props: any) => {
-  const { t } = props;
+const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
 
   const store = usePaymentStore();
   const { formatPaymentCurrency } = store;
@@ -96,7 +97,7 @@ const PaymentContainer = observer((props: any) => {
     if (isFreeTariff) {
       return (
         <Text fontSize="16px" isBold>
-          <Trans t={t} i18nKey="StartupTitle" ns="Payments">
+          <Trans i18nKey="StartupTitle" ns="Payments">
             {{ planName: currentTariffPlanTitle }}
           </Trans>
         </Text>
@@ -107,7 +108,7 @@ const PaymentContainer = observer((props: any) => {
     if (isPaidPeriod || isGracePeriod) {
       return (
         <Text fontSize="16px" isBold>
-          <Trans t={t} i18nKey="BusinessTitle" ns="Payments">
+          <Trans i18nKey="BusinessTitle" ns="Payments">
             {{ planName: currentTariffPlanTitle }}
           </Trans>
         </Text>
@@ -123,7 +124,7 @@ const PaymentContainer = observer((props: any) => {
         color="var(--settings-payment-warning-color)"
         dataTestId="expired_subscription_text"
       >
-        <Trans t={t} i18nKey="BusinessExpired" ns="Payments">
+        <Trans i18nKey="BusinessExpired" ns="Payments">
           {{ date: gracePeriodEndDate }} {{ planName: tariffPlanTitle }}
         </Trans>
       </Text>
@@ -134,7 +135,7 @@ const PaymentContainer = observer((props: any) => {
     if (isFreeTariff && !isNonProfit) {
       return (
         <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
-          <Trans t={t} i18nKey="StartupSuggestion" ns="Payments">
+          <Trans i18nKey="StartupSuggestion" ns="Payments">
             {{ planName: tariffPlanTitle }}
           </Trans>
         </Text>
@@ -144,7 +145,7 @@ const PaymentContainer = observer((props: any) => {
     if (isPaidPeriod && !isNonProfit) {
       return (
         <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
-          <Trans t={t} i18nKey="BusinessSuggestion" ns="Payments">
+          <Trans i18nKey="BusinessSuggestion" ns="Payments">
             {{ planName: tariffPlanTitle }}
           </Trans>
         </Text>
@@ -154,7 +155,7 @@ const PaymentContainer = observer((props: any) => {
     if (isNotPaidPeriod) {
       return (
         <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
-          <Trans t={t} i18nKey="RenewSubscription" ns="Payments">
+          <Trans i18nKey="RenewSubscription" ns="Payments">
             {{ planName: tariffPlanTitle }}
           </Trans>
         </Text>
@@ -169,7 +170,7 @@ const PaymentContainer = observer((props: any) => {
           className={styles.paymentInfoGracePeriod}
           color="var(--settings-payment-warning-color)"
         >
-          <Trans t={t} i18nKey="DelayedPayment" ns="Payments">
+          <Trans i18nKey="DelayedPayment" ns="Payments">
             {{ date: paymentDate }} {{ planName: currentTariffPlanTitle }}
           </Trans>
         </Text>
@@ -186,7 +187,6 @@ const PaymentContainer = observer((props: any) => {
           <Trans
             i18nKey="GracePeriodActivatedInfo"
             ns="Payments"
-            t={t}
             values={{
               fromDate: paymentDate,
               byDate: gracePeriodEndDate,
@@ -212,7 +212,7 @@ const PaymentContainer = observer((props: any) => {
           lineHeight="16px"
           className={styles.paymentInfoManagersPrice}
         >
-          <Trans t={t} i18nKey="BusinessFinalDateInfo" ns="Payments">
+          <Trans i18nKey="BusinessFinalDateInfo" ns="Payments">
             {{ finalDate: paymentDate }}
           </Trans>
         </Text>
@@ -237,7 +237,6 @@ const PaymentContainer = observer((props: any) => {
           >
             {isYearTariff ? (
               <Trans
-                t={t}
                 i18nKey="PerUserYear"
                 ns="Common"
                 values={{ price: formatPaymentCurrency(startValue) }}
@@ -245,7 +244,6 @@ const PaymentContainer = observer((props: any) => {
               />
             ) : (
               <Trans
-                t={t}
                 i18nKey="PerUserMonth"
                 ns="Common"
                 values={{ price: formatPaymentCurrency(startValue) }}

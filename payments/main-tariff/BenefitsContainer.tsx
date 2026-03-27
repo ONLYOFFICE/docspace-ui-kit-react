@@ -32,6 +32,8 @@ import { Text } from "../../components/text";
 import { HelpButton } from "../../components/help-button";
 import { Link } from "../../components/link";
 import { combineUrl } from "../../utils/combineUrl";
+import type { TTranslation } from "../../utils/common";
+import type { TenantQuotaFeatureDto } from "@onlyoffice/docspace-api-sdk";
 import { FREE_BACKUP } from "../constants";
 
 import HelpReactSvgUrl from "../../assets/icons/payments/help.react.svg?url";
@@ -39,7 +41,7 @@ import HelpReactSvgUrl from "../../assets/icons/payments/help.react.svg?url";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./MainTariff.module.scss";
 
-const BenefitsContainer = observer(({ t }: any) => {
+const BenefitsContainer = observer(({ t }: { t: TTranslation }) => {
   const store = usePaymentStore();
   const { portalPaymentQuotasFeatures: features } = store.paymentQuotas;
 
@@ -57,7 +59,6 @@ const BenefitsContainer = observer(({ t }: any) => {
         iconName={HelpReactSvgUrl}
         tooltipContent={
           <Trans
-            t={t}
             i18nKey="NeedMoreGoToServices"
             ns="Payments"
             components={{
@@ -82,7 +83,7 @@ const BenefitsContainer = observer(({ t }: any) => {
         {t("Benefits")}
       </Text>
       {features &&
-        Array.from(features.values()).map((item: any) => {
+        Array.from(features.values()).map((item: TenantQuotaFeatureDto) => {
           if (!item.title || !item.image) return;
           return (
             <div className={styles.paymentBenefits} key={item.title || item.image}>

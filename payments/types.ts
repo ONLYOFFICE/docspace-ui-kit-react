@@ -24,7 +24,12 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { TenantQuotaFeatureDto, Balance, QuotaDto } from "@onlyoffice/docspace-api-sdk";
+import type {
+  TenantQuotaFeatureDto,
+  Balance,
+  QuotaDto,
+} from "@onlyoffice/docspace-api-sdk";
+import type { TTheme } from "../providers/theme/themes";
 
 /** Feature with a numeric value (e.g. manager count, storage size). */
 export type TNumericPaymentFeature = TenantQuotaFeatureDto & { value: number };
@@ -97,7 +102,7 @@ export type TPaymentUser = {
 
 /** Minimal config provided by the host application. Everything else is fetched internally. */
 export type TPaymentConfig = {
-  theme: any;
+  theme: TTheme | null;
   language: string;
   expandArticle: boolean;
   logoText?: string;
@@ -114,3 +119,4 @@ export type TPaymentNavigationEvent =
   | { action: "open-disk-storage" }
   | { action: "open-ai-services" }
   | { action: "open-backup" };
+

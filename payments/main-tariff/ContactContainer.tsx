@@ -25,13 +25,14 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { observer } from "mobx-react";
+import type { TTranslation } from "../../utils/common";
 import { Text } from "../../components/text";
 import { Link } from "../../components/link";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./MainTariff.module.scss";
 
-const ContactContainer = observer(({ t }: any) => {
+const ContactContainer = observer(({ t }: { t: TTranslation }) => {
 	const paymentStore = usePaymentStore();
 	const { salesEmail } = paymentStore;
 

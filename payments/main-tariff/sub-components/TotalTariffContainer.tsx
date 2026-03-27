@@ -29,13 +29,17 @@ import classNames from "classnames";
 import { Trans } from "react-i18next";
 import { Text } from "../../../components/text";
 import { observer } from "mobx-react";
+import type { TTranslation } from "../../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import styles from "./SubComponents.module.scss";
 
 const TotalTariffContainer = observer(({
   t,
   isDisabled,
-}: any) => {
+}: {
+  t: TTranslation;
+  isDisabled: boolean;
+}) => {
   const store = usePaymentStore();
   const {
     totalPrice,
@@ -59,7 +63,7 @@ const TotalTariffContainer = observer(({
             fontWeight={600}
             className={styles.totalTariffDescription}
           >
-            <Trans t={t} i18nKey="BusinessRequestDescription" ns="Payments">
+            <Trans i18nKey="BusinessRequestDescription" ns="Payments">
               {{ peopleNumber: maxAvailableManagersCount }}
             </Trans>
           </Text>
@@ -67,7 +71,6 @@ const TotalTariffContainer = observer(({
           <Text fontWeight={600} fontSize="16px">
             {isYearTariff ? (
               <Trans
-                t={t}
                 i18nKey="TotalPricePerYear"
                 ns="Payments"
                 values={{ price: formatPaymentCurrency(totalPrice) }}
@@ -78,7 +81,6 @@ const TotalTariffContainer = observer(({
               />
             ) : (
               <Trans
-                t={t}
                 i18nKey="TotalPricePerMonth"
                 ns="Payments"
                 values={{ price: formatPaymentCurrency(totalPrice) }}
