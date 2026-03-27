@@ -210,7 +210,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
   };
 
   const isUpdatedTariff = (
-    walletQuotas: { quantity: number; nextQuantity?: number }[],
+    walletQuotas: { quantity?: number; nextQuantity?: number | null }[],
     isCancellation: boolean,
   ) => {
     const walletQuantity =
@@ -245,7 +245,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
           if (isWaitingRef.current) return;
           isWaitingRef.current = true;
 
-          const { quotas } = await fetchPortalTariff!(true);
+          const tariff = await fetchPortalTariff!(true);
+          const quotas = tariff?.quotas ?? [];
 
           if (isUpdatedTariff(quotas, isCancellation)) {
             resetIntervalSuccess(isCancellation);
@@ -299,7 +300,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         }
 
         if (isUpgradeStoragePlan) fetchBalance();
-        const { quotas } = await fetchPortalTariff!(true);
+        const tariff = await fetchPortalTariff!(true);
+        const quotas = tariff?.quotas ?? [];
 
         if (isUpdatedTariff(quotas, isCancellation)) {
           resetIntervalSuccess(isCancellation);

@@ -34,6 +34,7 @@ import { Text } from "../../../../components/text";
 import { Tabs, type TTabItem } from "../../../../components/tabs";
 import { Link } from "../../../../components/link";
 
+import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { AI_ENUM, AI_TOOLS } from "../../../constants";
 import { DeviceType } from "../../../../enums";
 
@@ -51,10 +52,7 @@ import ModelSettingsTable from "./sub-components/ModelSettingsTable";
 import AiPageLoader from "./AiPageLoader";
 
 import styles from "./AiPage.module.scss";
-import {
-  formatDateLocalized,
-  getAppTimezone,
-} from "../../../../utils/date";
+import { formatDateLocalized, getAppTimezone } from "../../../../utils/date";
 import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components";
 import AIServiceDialog from "../../panels/ai-service/AIServiceDialog";
@@ -69,10 +67,7 @@ type AiPageProps = {
 };
 
 const AiPage = (props: AiPageProps) => {
-  const {
-    currentDeviceType,
-    getAIConfig,
-  } = props;
+  const { currentDeviceType, getAIConfig } = props;
 
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
@@ -153,7 +148,7 @@ const AiPage = (props: AiPageProps) => {
     setIsConfirmDialogVisible(false);
 
     const raw = {
-      service: AI_ENUM,
+      service: TenantWalletService.AITools,
       enabled: !isAiToolsServiceOn,
     };
 
@@ -410,3 +405,4 @@ const AiPage = (props: AiPageProps) => {
 };
 
 export default observer(AiPage);
+

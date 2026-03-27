@@ -100,14 +100,14 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
         throw new Error(t("Common:UnexpectedError"));
       }
 
-      const requests = [
+      const requests: Promise<unknown>[] = [
         fetchBalance!(),
         fetchTransactionHistory!(null, null, true, true, "", serviceName),
       ];
 
       if (serviceName) {
         requests.push(fetchServiceBalance!());
-        requests.push(handleServicesQuotas!(AI_TOOLS));
+        requests.push(handleServicesQuotas!());
       }
 
       await Promise.allSettled(requests);

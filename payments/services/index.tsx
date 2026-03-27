@@ -28,7 +28,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import type { ChangeWalletServiceStateRequestDto } from "@onlyoffice/docspace-api-sdk";
+import { type ChangeWalletServiceStateRequestDto, TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 
 import { toastr } from "../../components/toast";
 import {
@@ -36,6 +36,12 @@ import {
   BACKUP_SERVICE,
   TOTAL_SIZE,
 } from "../constants";
+
+const toWalletService = (id: string): TenantWalletService => {
+  if (id === BACKUP_SERVICE) return TenantWalletService.Backup;
+  if (id === AI_ENUM) return TenantWalletService.AITools;
+  return TenantWalletService.Storage;
+};
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
@@ -153,7 +159,7 @@ const Services = observer(
       }
     }, [initialOpenDialog, updateDialogVisibility, previousStoragePlanSize]);
 
-    const confirmationDialogContent = {
+    const confirmationDialogContent: Record<string, { title: string; body: string | React.ReactNode[] }> = {
       [BACKUP_SERVICE]: {
         title: t("Common:Confirmation"),
         body: !isCurrentConfirmState
@@ -210,7 +216,7 @@ const Services = observer(
       if (!actionType || !(actionType in confirmationDialogContent)) {
         return { title: "", body: "" };
       }
-      return confirmationDialogContent[Number(actionType)];
+      return confirmationDialogContent[actionType];
     };
 
     const onClick = (id: string) => {
@@ -288,7 +294,7 @@ const Services = observer(
         setIsConfirmDialogVisible(true);
       else {
         const raw: ChangeWalletServiceStateRequestDto = {
-          service: confirmActionType,
+          service: toWalletService(confirmActionType!),
           enabled: false,
         };
 
@@ -327,7 +333,7 @@ const Services = observer(
       if (!confirmActionType) return;
 
       const raw: ChangeWalletServiceStateRequestDto = {
-        service: confirmActionType,
+        service: toWalletService(confirmActionType),
         enabled: !isCurrentConfirmState,
       };
 

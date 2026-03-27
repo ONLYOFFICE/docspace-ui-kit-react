@@ -34,8 +34,8 @@ import { Button, ButtonSize } from "../../../../components/button";
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./BackupPage.module.scss";
+import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { BACKUP_SERVICE } from "../../../constants";
-import { DeviceType } from "../../../../enums";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import { useApi } from "../../../../providers";
 import { now, formatDateLocalized } from "../../../../utils/date";
@@ -81,7 +81,7 @@ const BackupPage: React.FC = () => {
 
   const onConfirm = async () => {
     const raw = {
-      service: BACKUP_SERVICE,
+      service: TenantWalletService.Backup,
       enabled: !isBackupServiceOn,
     };
 
@@ -266,3 +266,4 @@ const BackupPage: React.FC = () => {
 };
 
 export default observer(BackupPage);
+
