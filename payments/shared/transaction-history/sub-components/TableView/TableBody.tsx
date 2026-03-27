@@ -31,35 +31,42 @@ import classNames from "classnames";
 
 import { TableRow, TableCell } from "../../../../../components/table";
 import { Text } from "../../../../../components/text";
-import type { OperationDto } from "@onlyoffice/docspace-api-sdk";
+import type { WalletOperationDto } from "../../../../store/PaymentStore";
 import { Encoder } from "../../../../../utils/encoder";
 
 import { getCorrectDate } from "../../../../../utils/date/getCorrectDate";
 import styles from "../../styles/TransactionHistory.module.scss";
-import { accountingLedgersFormat, getServiceQuantity } from "../../../../wallet/utils";
+import {
+  accountingLedgersFormat,
+  getServiceQuantity,
+} from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 
 interface TransactionRowProps {
-  transaction: OperationDto;
+  transaction: WalletOperationDto;
 }
 
-const TransactionRow: React.FC<TransactionRowProps> = ({
-  transaction,
-}) => {
+const TransactionRow: React.FC<TransactionRowProps> = ({ transaction }) => {
   const paymentStore = usePaymentStore();
   const { language } = paymentStore;
   const { credit, debit, currency } = transaction;
   const { t } = useTranslation("Payments");
-  const isCredit = credit > 0;
+  const creditValue = credit ?? 0;
+  const debitValue = debit ?? 0;
+
+  const isCredit = creditValue > 0;
 
   const formattedAmount = accountingLedgersFormat(
     language,
-    credit || debit,
+    creditValue || debitValue,
     isCredit,
-    currency,
+    currency ?? "",
   );
 
-  const correctDate = getCorrectDate(language, transaction.date);
+  const correctDate = getCorrectDate(
+    language,
+    transaction.date,
+  );
 
   return (
     <TableRow>
@@ -88,7 +95,11 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
       </TableCell>
       <TableCell>
         <Text fontWeight={600} fontSize="11px">
-          {getServiceQuantity(t, transaction.quantity, transaction.serviceUnit)}
+          {getServiceQuantity(
+            t,
+            transaction.quantity ?? 0,
+            transaction.serviceUnit ?? undefined,
+          )}
         </Text>
       </TableCell>
       <TableCell>
@@ -107,3 +118,4 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
 };
 
 export default observer(TransactionRow);
+

@@ -32,16 +32,19 @@ import classNames from "classnames";
 import { TTheme } from "../../../../../providers/theme/themes";
 import { Text } from "../../../../../components/text";
 import { Row, RowContent } from "../../../../../components/rows";
-import type { OperationDto } from "@onlyoffice/docspace-api-sdk";
+import type { WalletOperationDto } from "../../../../store/PaymentStore";
 import { Encoder } from "../../../../../utils/encoder";
 import { getCorrectDate } from "../../../../../utils/date/getCorrectDate";
 
 import styles from "../../styles/TransactionHistory.module.scss";
-import { accountingLedgersFormat, getServiceQuantity } from "../../../../wallet/utils";
+import {
+  accountingLedgersFormat,
+  getServiceQuantity,
+} from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 
 type TransactionRowViewProps = {
-  transaction: OperationDto;
+  transaction: WalletOperationDto;
   theme?: TTheme;
   sectionWidth: number;
 };
@@ -53,18 +56,21 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
 }) => {
   const paymentStore = usePaymentStore();
   const { language } = paymentStore;
-  const { credit, debit, currency } = transaction;
+  const { credit, debit, currency, date } = transaction;
   const { t } = useTranslation("Payments");
-  const isCredit = credit > 0;
+  const creditValue = credit ?? 0;
+  const debitValue = debit ?? 0;
+
+  const isCredit = creditValue > 0;
 
   const formattedAmount = accountingLedgersFormat(
     language,
-    credit || debit,
+    creditValue || debitValue,
     isCredit,
-    currency,
+    currency ?? "",
   );
 
-  const correctDate = getCorrectDate(language, transaction.date);
+  const correctDate = getCorrectDate(language, date);
 
   const getRowChildren = () => {
     const children = [
@@ -105,7 +111,11 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
     if (transaction.serviceUnit) {
       children.push(
         <Text key="quantity" fontWeight={600} fontSize="11px">
-          {getServiceQuantity(t, transaction.quantity, transaction.serviceUnit)}
+          {getServiceQuantity(
+            t,
+            transaction.quantity ?? 0,
+            transaction.serviceUnit ?? undefined,
+          )}
         </Text>,
       );
     }
@@ -139,3 +149,4 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
 };
 
 export default observer(TransactionRowView);
+

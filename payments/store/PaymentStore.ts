@@ -35,6 +35,11 @@ import type {
   TenantWalletSettings,
   OperationDto,
 } from "@onlyoffice/docspace-api-sdk";
+
+/** SDK types date as ApiDateTime but API returns an ISO string. */
+export type WalletOperationDto = Omit<OperationDto, "date"> & {
+  date?: string;
+};
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
 import type { TBalance } from "../types";
