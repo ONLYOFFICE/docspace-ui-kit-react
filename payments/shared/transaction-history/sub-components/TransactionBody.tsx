@@ -29,7 +29,7 @@ import { observer } from "mobx-react";
 
 import { EmptyView } from "@docspace/shared/components/empty-view";
 
-import { DeviceType } from "@docspace/shared/enums";
+import { DeviceType } from "../../../../enums";
 import { Consumer } from "../../../../utils";
 
 import NoTransactionsIcon from "../../../../assets/icons/payments/no.transactions.react.svg";

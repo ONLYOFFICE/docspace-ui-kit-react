@@ -38,7 +38,7 @@ import {
   ModalDialogType,
 } from "../../components/modal-dialog";
 import { EmailInput } from "../../components/email-input";
-import { ErrorKeys } from "@docspace/shared/enums";
+import { ErrorKeys } from "../../enums";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 

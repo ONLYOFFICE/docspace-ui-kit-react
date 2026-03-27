@@ -27,7 +27,7 @@
 import { Text } from "../../components/text";
 import { useTranslation } from "react-i18next";
 import { observer } from "mobx-react";
-import { PortalFeaturesLimitations } from "@docspace/shared/enums";
+import { PortalFeaturesLimitations } from "../../enums";
 import { getConvertedSize } from "../utils/common";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";

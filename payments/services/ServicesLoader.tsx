@@ -29,7 +29,7 @@ import { RectangleSkeleton } from "../../components/rectangle";
 
 import classNames from "classnames";
 
-import { DeviceType } from "@docspace/shared/enums";
+import { DeviceType } from "../../enums";
 import styles from "./styles/ServicesLoader.module.scss";
 
 type ServicesLoaderProps = {
