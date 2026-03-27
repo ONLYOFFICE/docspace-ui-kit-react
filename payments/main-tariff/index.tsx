@@ -29,7 +29,7 @@ import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 
-import PaymentsLoader from "@docspace/shared/skeletons/payments";
+import PaymentsLoader from "../loader";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 
