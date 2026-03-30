@@ -80,6 +80,7 @@ const Body = ({
   renderCustomItem,
   isLoading,
   isContentLoading,
+  wasEmptyScreen,
 
   rowLoader,
 
@@ -135,10 +136,6 @@ const Body = ({
   const previousItemsRef = React.useRef(items);
   const previousTotalRef = React.useRef(totalItems);
 
-  // Track whether EmptyScreen was shown before content loading started
-  const wasEmptyScreenRef = React.useRef(false);
-  const prevIsContentLoadingRef = React.useRef(isContentLoading);
-
   // Track whether search was active before content loading started
   const wasSearchActiveRef = React.useRef(false);
   if (!isContentLoading) {
@@ -150,24 +147,15 @@ const Body = ({
     previousTotalRef.current = totalItems;
   }
 
-  // When isContentLoading transitions to true, record if EmptyScreen was visible
-  if (!prevIsContentLoadingRef.current && isContentLoading) {
-    wasEmptyScreenRef.current = items.length === 0;
-  }
-  if (!isContentLoading) {
-    wasEmptyScreenRef.current = false;
-  }
-  prevIsContentLoadingRef.current = isContentLoading;
-
   // Use previous items when content is loading and current items are empty
-  // but only if EmptyScreen was NOT previously shown
+  // but only if EmptyScreen was NOT previously shown (wasEmptyScreen is explicit from parent)
   const displayItems =
-    isContentLoading && items.length === 0 && !wasEmptyScreenRef.current
+    isContentLoading && items.length === 0 && !wasEmptyScreen
       ? previousItemsRef.current
       : items;
 
   const displayTotal =
-    isContentLoading && items.length === 0 && !wasEmptyScreenRef.current
+    isContentLoading && items.length === 0 && !wasEmptyScreen
       ? previousTotalRef.current
       : totalItems;
 
@@ -397,8 +385,7 @@ const Body = ({
           inputItemVisible={inputItemVisible}
           hideBackButton={hideBackButton}
         />
-      ) : isContentLoading &&
-        (wasEmptyScreenRef.current || itemsCount === 0) ? (
+      ) : isContentLoading && wasEmptyScreen ? (
         <div
           style={{
             opacity: 0.5,

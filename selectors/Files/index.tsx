@@ -27,7 +27,6 @@
 "use client";
 
 import React, { use } from "react";
-import { flushSync } from "react-dom";
 
 import { Portal } from "../../components/portal";
 
@@ -123,12 +122,20 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const { filesApi } = useApi();
   const { isFirstLoad, setIsFirstLoad, showBodyLoader } = use(LoadersContext);
 
-  const [isContentLoading, setIsContentLoading] = React.useState(false);
+  const [isContentLoading, setIsContentLoadingRaw] = React.useState(false);
+  const [wasEmptyScreen, setWasEmptyScreen] = React.useState(false);
+
+  const setIsContentLoading = React.useCallback((value: boolean) => {
+    setIsContentLoadingRaw(value);
+    if (!value) {
+      setWasEmptyScreen(false);
+    }
+  }, []);
 
   const resetContentLoading = React.useCallback(() => {
     if (isFirstLoad) return;
     setIsContentLoading(true);
-  }, [isFirstLoad]);
+  }, [isFirstLoad, setIsContentLoading]);
 
   const currentSelectedItemId = React.useRef<undefined | number | string>(
     undefined,
@@ -510,6 +517,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       onSelectItem,
       filesApi,
       t,
+      resetContentLoading,
     ],
   );
 
@@ -587,21 +595,11 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   React.useEffect(() => {
     if (!selectedItemType) return;
 
-    if (searchValue) {
-      if (isFirstLoad) {
-        setIsFirstLoad(true);
-      } else {
-        // Only dim content, don't show skeleton
-        resetContentLoading();
-      }
+    if (searchValue && !isFirstLoad) {
+      // Only dim content, don't show skeleton
+      resetContentLoading();
     }
-  }, [
-    searchValue,
-    selectedItemType,
-    isFirstLoad,
-    setIsFirstLoad,
-    resetContentLoading,
-  ]);
+  }, [searchValue, selectedItemType, isFirstLoad, resetContentLoading]);
 
   const onClearSearchAction = React.useCallback(
     (callback?: VoidFunction) => {
@@ -610,11 +608,15 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       if (isFirstLoad) {
         setIsFirstLoad(true);
       } else {
-        // Use flushSync to force synchronous state update
-        // This ensures Body.tsx sees the empty state before new data loads
-        flushSync(() => {
-          setIsContentLoading(true);
-        });
+        // Set wasEmptyScreen if we're clearing search that returned empty results
+        // Check if items are empty or contain only service items (like "Create new folder")
+        const hasOnlyServiceItems =
+          items.length === 0 ||
+          (items.length === 1 && items[0]?.isCreateNewItem);
+        if (hasOnlyServiceItems) {
+          setWasEmptyScreen(true);
+        }
+        setIsContentLoading(true);
       }
 
       setSearchValue("");
@@ -631,6 +633,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       setIsFirstLoad,
       setSearchValue,
       setIsContentLoading,
+      items.length,
     ],
   );
 
@@ -767,6 +770,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     hasNextPage,
     totalItems: total,
     isContentLoading,
+    wasEmptyScreen,
 
     isRoot,
 
