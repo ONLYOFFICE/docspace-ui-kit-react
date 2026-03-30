@@ -27,6 +27,7 @@
 "use client";
 
 import React, { use } from "react";
+import { flushSync } from "react-dom";
 
 import { Portal } from "../../components/portal";
 
@@ -121,6 +122,13 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const t = useCommonTranslation();
   const { filesApi } = useApi();
   const { isFirstLoad, setIsFirstLoad, showBodyLoader } = use(LoadersContext);
+
+  const [isContentLoading, setIsContentLoading] = React.useState(false);
+
+  const resetContentLoading = React.useCallback(() => {
+    if (isFirstLoad) return;
+    setIsContentLoading(true);
+  }, [isFirstLoad]);
 
   const currentSelectedItemId = React.useRef<undefined | number | string>(
     undefined,
@@ -238,6 +246,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     disableBySecurity,
 
     withInit,
+    setIsContentLoading,
   });
 
   const { getRoomList } = useRoomsHelper({
@@ -264,6 +273,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     searchArea,
 
     withInit,
+    setIsContentLoading,
   });
 
   const { getFileList } = useFilesHelper({
@@ -303,6 +313,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withInit,
     applyFilterOption,
     disableBySecurity,
+    setIsContentLoading,
   });
 
   const onClickBreadCrumb = React.useCallback(
@@ -310,6 +321,10 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       if (!isFirstLoad) {
         afterSearch.current = false;
         setSearchValue("");
+        // Don't dim when navigating to root
+        if (+item.id !== 0) {
+          resetContentLoading();
+        }
         setIsFirstLoad(true);
         if (+item.id === 0) {
           setSelectedItemSecurity(undefined);
@@ -376,6 +391,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       setSelectedItemId,
       setSelectedItemSecurity,
       setSelectedItemType,
+      resetContentLoading,
     ],
   );
 
@@ -394,10 +410,19 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         if (isFormRoom && formProps?.isRoomFormAccessible === false)
           return toastr.warning(formProps.message);
 
-        setIsFirstLoad(true);
-
         const isAgent =
           item.parentId === 0 && item.rootFolderType === FolderType.AiAgents;
+
+        // Don't dim when clicking on root sections (AI agents, Rooms, etc.)
+        const isRootSection =
+          item.parentId === 0 &&
+          (item.rootFolderType === FolderType.VirtualRooms ||
+            item.rootFolderType === FolderType.AiAgents);
+
+        if (!isRootSection) {
+          resetContentLoading();
+        }
+        setIsFirstLoad(true);
 
         setBreadCrumbs((value) => [
           ...value,
@@ -563,14 +588,34 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     if (!selectedItemType) return;
 
     if (searchValue) {
-      setIsFirstLoad(true);
+      if (isFirstLoad) {
+        setIsFirstLoad(true);
+      } else {
+        // Only dim content, don't show skeleton
+        resetContentLoading();
+      }
     }
-  }, [searchValue, selectedItemType, setIsFirstLoad]);
+  }, [
+    searchValue,
+    selectedItemType,
+    isFirstLoad,
+    setIsFirstLoad,
+    resetContentLoading,
+  ]);
 
   const onClearSearchAction = React.useCallback(
     (callback?: VoidFunction) => {
       if (!searchValue) return;
-      setIsFirstLoad(true);
+
+      if (isFirstLoad) {
+        setIsFirstLoad(true);
+      } else {
+        // Use flushSync to force synchronous state update
+        // This ensures Body.tsx sees the empty state before new data loads
+        flushSync(() => {
+          setIsContentLoading(true);
+        });
+      }
 
       setSearchValue("");
 
@@ -580,7 +625,13 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         clearSearchCallback.current = callback;
       }
     },
-    [searchValue, setIsFirstLoad, setSearchValue],
+    [
+      searchValue,
+      isFirstLoad,
+      setIsFirstLoad,
+      setSearchValue,
+      setIsContentLoading,
+    ],
   );
 
   React.useEffect(() => {
@@ -715,6 +766,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     hasNextPage,
     totalItems: total,
+    isContentLoading,
 
     isRoot,
 

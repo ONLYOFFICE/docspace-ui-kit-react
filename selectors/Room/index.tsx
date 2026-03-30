@@ -109,8 +109,13 @@ const RoomSelectorComponent = ({
   const t = useCommonTranslation();
   const { isBase } = useTheme();
 
-  const { isFirstLoad, isNextPageLoading, setIsFirstLoad } =
-    React.useContext(LoadersContext);
+  const {
+    isFirstLoad,
+    isNextPageLoading,
+    setIsFirstLoad,
+    setIsLoading,
+    showBodyLoader,
+  } = React.useContext(LoadersContext);
 
   const [searchValue, setSearchValue] = React.useState(() =>
     withInit ? initSearchValue : "",
@@ -232,13 +237,17 @@ const RoomSelectorComponent = ({
   const onSearchAction = React.useCallback(
     (value: string, callback?: VoidFunction) => {
       afterSearch.current = true;
-      setIsFirstLoad(true);
+      if (isFirstLoad) {
+        setIsFirstLoad(true);
+      } else {
+        setIsLoading("body", true);
+      }
       setSearchValue(() => {
         return value;
       });
       callback?.();
     },
-    [setIsFirstLoad],
+    [isFirstLoad, setIsFirstLoad, setIsLoading],
   );
 
   const { subscribe } = useSocketHelper({
@@ -250,14 +259,18 @@ const RoomSelectorComponent = ({
 
   const onClearSearchAction = React.useCallback(
     (callback?: VoidFunction) => {
-      setIsFirstLoad(true);
       afterSearch.current = true;
+      if (isFirstLoad) {
+        setIsFirstLoad(true);
+      } else {
+        setIsLoading("body", true);
+      }
       setSearchValue(() => {
         return "";
       });
       callback?.();
     },
-    [setIsFirstLoad],
+    [isFirstLoad, setIsFirstLoad, setIsLoading],
   );
 
   const { getRoomList: onLoadNextPage } = useRoomsHelper({
@@ -352,13 +365,14 @@ const RoomSelectorComponent = ({
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
       loadNextPage={onLoadNextPage}
-      isLoading={isFirstLoad}
+      isLoading={showBodyLoader}
+      isContentLoading={showBodyLoader && !isFirstLoad}
       disableSubmitButton={isMultiSelect ? !hasSelectionChanged : !selectedItem}
       alwaysShowFooter={sortedItems.length !== 0 || Boolean(searchValue)}
       rowLoader={
         <RowLoader
           isMultiSelect={isMultiSelect}
-          isContainer={isFirstLoad}
+          isContainer={showBodyLoader}
           isUser={false}
         />
       }

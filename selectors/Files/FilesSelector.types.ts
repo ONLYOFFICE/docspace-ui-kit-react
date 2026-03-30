@@ -173,6 +173,7 @@ export type UseFilesHelpersProps = {
   applyFilterOption?: ApplyFilterOption;
 
   disableBySecurity?: string;
+  setIsContentLoading?: (value: boolean) => void;
 };
 
 export type TUseInputItemHelper = {

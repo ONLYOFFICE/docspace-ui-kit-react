@@ -78,8 +78,13 @@ const AIAgentSelectorComponent = ({
   const t = useCommonTranslation();
   const { isBase } = useTheme();
 
-  const { isFirstLoad, isNextPageLoading, setIsFirstLoad } =
-    React.useContext(LoadersContext);
+  const {
+    isFirstLoad,
+    isNextPageLoading,
+    setIsFirstLoad,
+    setIsLoading,
+    showBodyLoader,
+  } = React.useContext(LoadersContext);
 
   const [searchValue, setSearchValue] = React.useState(() =>
     withInit ? initSearchValue : "",
@@ -148,13 +153,17 @@ const AIAgentSelectorComponent = ({
   const onSearchAction = React.useCallback(
     (value: string, callback?: VoidFunction) => {
       afterSearch.current = true;
-      setIsFirstLoad(true);
+      if (isFirstLoad) {
+        setIsFirstLoad(true);
+      } else {
+        setIsLoading("body", true);
+      }
       setSearchValue(() => {
         return value;
       });
       callback?.();
     },
-    [setIsFirstLoad],
+    [isFirstLoad, setIsFirstLoad, setIsLoading],
   );
 
   const { subscribe } = useSocketHelper({
@@ -167,14 +176,18 @@ const AIAgentSelectorComponent = ({
 
   const onClearSearchAction = React.useCallback(
     (callback?: VoidFunction) => {
-      setIsFirstLoad(true);
       afterSearch.current = true;
+      if (isFirstLoad) {
+        setIsFirstLoad(true);
+      } else {
+        setIsLoading("body", true);
+      }
       setSearchValue(() => {
         return "";
       });
       callback?.();
     },
-    [setIsFirstLoad],
+    [isFirstLoad, setIsFirstLoad, setIsLoading],
   );
 
   const { getAgentList: onLoadNextPage } = useAgentsHelper({
@@ -270,13 +283,14 @@ const AIAgentSelectorComponent = ({
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
       loadNextPage={onLoadNextPage}
-      isLoading={isFirstLoad}
+      isLoading={showBodyLoader}
+      isContentLoading={showBodyLoader && !isFirstLoad}
       disableSubmitButton={!selectedItem}
       alwaysShowFooter={items.length !== 0 || Boolean(searchValue)}
       rowLoader={
         <RowLoader
           isMultiSelect={false}
-          isContainer={isFirstLoad}
+          isContainer={showBodyLoader}
           isUser={false}
         />
       }

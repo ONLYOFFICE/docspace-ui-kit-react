@@ -72,6 +72,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [itemsList, setItemsList] = useState<TSelectorItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<TSelectorItem | null>(null);
+  const [isContentLoading, setIsContentLoading] = useState(false);
 
   const isFirstLoad = useRef(true);
   const afterSearch = useRef(false);
@@ -93,8 +94,12 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
     }
   };
   const onSearch = useCallback((value: string, callback?: () => void) => {
-    isFirstLoad.current = true;
     afterSearch.current = true;
+    if (isFirstLoad.current) {
+      isFirstLoad.current = true;
+    } else {
+      setIsContentLoading(true);
+    }
     setSearchValue(() => {
       return value;
     });
@@ -102,8 +107,12 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   }, []);
 
   const onClearSearch = useCallback((callback?: () => void) => {
-    isFirstLoad.current = true;
     afterSearch.current = true;
+    if (isFirstLoad.current) {
+      isFirstLoad.current = true;
+    } else {
+      setIsContentLoading(true);
+    }
     setSearchValue(() => {
       return "";
     });
@@ -158,6 +167,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       }
 
       setIsNextPageLoading(false);
+      setIsContentLoading(false);
     },
     [searchValue, groupApi],
   );
@@ -199,7 +209,8 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
       loadNextPage={onLoadNextPage}
-      isLoading={isFirstLoad.current}
+      isLoading={isFirstLoad.current || isContentLoading}
+      isContentLoading={isContentLoading}
       searchLoader={<SearchLoader />}
       onSelect={onSelect}
       rowLoader={

@@ -66,6 +66,7 @@ const useAgentsHelper = ({
   setSelectedItemSecurity,
   setSelectedTreeNode,
   disableBySecurity,
+  setIsContentLoading,
 }: UseAgentsHelperProps) => {
   const t = useCommonTranslation();
   const { apiClient } = useApi();
@@ -221,6 +222,7 @@ const useAgentsHelper = ({
       setIsRoot?.(false);
       setIsInit(false);
       setIsFirstLoad(false);
+      setIsContentLoading?.(false);
     },
     [
       apiClient,

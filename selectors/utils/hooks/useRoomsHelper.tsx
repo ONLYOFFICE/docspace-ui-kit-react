@@ -70,6 +70,7 @@ const useRoomsHelper = ({
   subscribe,
   setSelectedItemSecurity,
   setSelectedTreeNode,
+  setIsContentLoading,
 }: UseRoomsHelperProps) => {
   const t = useCommonTranslation();
   const {
@@ -250,6 +251,7 @@ const useRoomsHelper = ({
       setIsRoot?.(false);
       setIsInit(false);
       setIsFirstLoad(false);
+      setIsContentLoading?.(false);
     },
     [
       roomsApi,

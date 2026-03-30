@@ -95,14 +95,11 @@ const useFilesHelper = ({
   setIsInsideResultStorage,
 
   disableBySecurity,
+  setIsContentLoading,
 }: UseFilesHelpersProps) => {
   const t = useCommonTranslation();
-  const {
-    isFirstLoad,
-    setIsFirstLoad,
-    setIsNextPageLoading,
-    setIsLoading,
-  } = use(LoadersContext);
+  const { isFirstLoad, setIsFirstLoad, setIsNextPageLoading, setIsLoading } =
+    use(LoadersContext);
 
   const { getIcon, extsWebEdited, filesSettingsLoading } = use(SettingsContext);
 
@@ -155,9 +152,9 @@ const useFilesHelper = ({
         isErrorPath = false,
       ) => {
         if (initRef.current && getRootData && folderId !== "@my") {
-        // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
+          // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
           const folderInfoRes = await foldersApi.getFolderInfo(
-           folderId as number,
+            folderId as number,
           );
           const folder = folderInfoRes.data.response!;
 
@@ -353,6 +350,7 @@ const useFilesHelper = ({
         setIsInit(false);
         setIsNextPageLoading(false);
         setIsFirstLoad(false);
+        setIsContentLoading?.(false);
       };
 
       try {

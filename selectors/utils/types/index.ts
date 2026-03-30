@@ -73,6 +73,7 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
     React.SetStateAction<FileEntryDtoIntegerAllOfSecurity | undefined>
   >;
   setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDtoInteger>>;
+  setIsContentLoading?: (value: boolean) => void;
 };
 
 export type UseAgentsHelperProps = TUseInputItemHelper & {
@@ -100,6 +101,7 @@ export type UseAgentsHelperProps = TUseInputItemHelper & {
   >;
   setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDtoInteger>>;
   disableBySecurity?: string;
+  setIsContentLoading?: (value: boolean) => void;
 };
 
 export type UseSocketHelperProps = {

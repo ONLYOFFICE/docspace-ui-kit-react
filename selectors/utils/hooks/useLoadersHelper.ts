@@ -164,7 +164,8 @@ const useLoadersHelper = ({ withInit }: { withInit?: boolean }) => {
     [setIsLoading],
   );
 
-  const showSearchLoader = showBreadCrumbsLoader || showBodyLoader;
+  const showSearchLoader =
+    isFirstLoad && (showBreadCrumbsLoader || showBodyLoader);
 
   return {
     setIsLoading,

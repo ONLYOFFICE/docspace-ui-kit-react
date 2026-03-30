@@ -397,7 +397,8 @@ const Body = ({
           inputItemVisible={inputItemVisible}
           hideBackButton={hideBackButton}
         />
-      ) : isContentLoading && wasEmptyScreenRef.current ? (
+      ) : isContentLoading &&
+        (wasEmptyScreenRef.current || itemsCount === 0) ? (
         <div
           style={{
             opacity: 0.5,

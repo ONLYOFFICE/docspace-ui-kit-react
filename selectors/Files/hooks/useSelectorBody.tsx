@@ -137,17 +137,23 @@ const useSelectorBody = ({
 
   selectedItemType,
   selectedTreeNode,
+  isContentLoading: externalIsContentLoading,
 }: Omit<FilesSelectorProps, "withSearch" | "onSubmit"> &
   PickedSearchProps &
   PickedSubmitButtonProps &
   PickedBreadCrumbsProps &
   PickedSelectorBodyProps &
-  SelectedTreeNodeProps) => {
+  SelectedTreeNodeProps & { isContentLoading?: boolean }) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
 
-  const { showBreadCrumbsLoader, showSearchLoader, isNextPageLoading, showBodyLoader, isFirstLoad } =
-    use(LoadersContext);
+  const {
+    showBreadCrumbsLoader,
+    showSearchLoader,
+    isNextPageLoading,
+    showBodyLoader,
+    isFirstLoad,
+  } = use(LoadersContext);
   const { displayFileExtension } = use(SettingsContext);
 
   const headerSelectorProps: TSelectorHeader = withHeader
@@ -270,7 +276,9 @@ const useSelectorBody = ({
       searchEmptyScreenHeader={t("NotFoundTitle")}
       searchEmptyScreenDescription={t("EmptyFilterDescriptionText")}
       isLoading={showBodyLoader}
-      isContentLoading={showBodyLoader && !isFirstLoad}
+      isContentLoading={
+        externalIsContentLoading ?? (showBodyLoader && !isFirstLoad)
+      }
       rowLoader={
         <RowLoader
           isMultiSelect={false}
