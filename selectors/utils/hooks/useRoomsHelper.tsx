@@ -74,7 +74,7 @@ const useRoomsHelper = ({
   const t = useCommonTranslation();
   const {
     setIsNextPageLoading,
-    setIsBreadCrumbsLoading,
+    setIsLoading,
     setIsFirstLoad,
 
     isFirstLoad,
@@ -180,7 +180,7 @@ const useRoomsHelper = ({
 
         setBreadCrumbs?.(breadCrumbs);
 
-        setIsBreadCrumbsLoading(false);
+        setIsLoading("breadcrumbs", false);
       }
 
       const itemList: TSelectorItem[] = convertRoomsToItems(
@@ -266,7 +266,7 @@ const useRoomsHelper = ({
       subscribe,
       onSetBaseFolderPath,
       setBreadCrumbs,
-      setIsBreadCrumbsLoading,
+      setIsLoading,
       withCreate,
       setItems,
       setTotal,

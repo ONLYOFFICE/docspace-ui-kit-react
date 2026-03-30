@@ -71,7 +71,7 @@ const useAgentsHelper = ({
   const { apiClient } = useApi();
   const {
     setIsNextPageLoading,
-    setIsBreadCrumbsLoading,
+    setIsLoading,
     setIsFirstLoad,
 
     isFirstLoad,
@@ -145,7 +145,7 @@ const useAgentsHelper = ({
 
         setBreadCrumbs?.(breadCrumbs);
 
-        setIsBreadCrumbsLoading(false);
+        setIsLoading("breadcrumbs", false);
       }
 
       const itemList: TSelectorItem[] = convertRoomsToItems(folders, t)
@@ -234,7 +234,7 @@ const useAgentsHelper = ({
       subscribe,
       onSetBaseFolderPath,
       setBreadCrumbs,
-      setIsBreadCrumbsLoading,
+      setIsLoading,
       setItems,
       setTotal,
       excludeItems,

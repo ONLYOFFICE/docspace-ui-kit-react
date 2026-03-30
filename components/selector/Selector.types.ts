@@ -221,6 +221,7 @@ type TSelectorPagination = {
   isNextPageLoading: boolean;
   totalItems: number;
   isLoading: boolean;
+  isContentLoading?: boolean;
 };
 
 // NewItem

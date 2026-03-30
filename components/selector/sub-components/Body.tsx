@@ -79,6 +79,7 @@ const Body = ({
   totalItems,
   renderCustomItem,
   isLoading,
+  isContentLoading,
 
   rowLoader,
 
@@ -130,16 +131,60 @@ const Body = ({
     null,
   );
 
-  const isEmptyInput =
-    items.length === 2 && items[1].isInputItem && items[0].isCreateNewItem;
+  // Store previous items for dimming display during content loading
+  const previousItemsRef = React.useRef(items);
+  const previousTotalRef = React.useRef(totalItems);
 
-  const itemsCount = hasNextPage
-    ? items.length + 1
-    : items.length === 1 && items[0].isCreateNewItem
+  // Track whether EmptyScreen was shown before content loading started
+  const wasEmptyScreenRef = React.useRef(false);
+  const prevIsContentLoadingRef = React.useRef(isContentLoading);
+
+  // Track whether search was active before content loading started
+  const wasSearchActiveRef = React.useRef(false);
+  if (!isContentLoading) {
+    wasSearchActiveRef.current = isSearch;
+  }
+
+  if (items.length > 0 && !isContentLoading) {
+    previousItemsRef.current = items;
+    previousTotalRef.current = totalItems;
+  }
+
+  // When isContentLoading transitions to true, record if EmptyScreen was visible
+  if (!prevIsContentLoadingRef.current && isContentLoading) {
+    wasEmptyScreenRef.current = items.length === 0;
+  }
+  if (!isContentLoading) {
+    wasEmptyScreenRef.current = false;
+  }
+  prevIsContentLoadingRef.current = isContentLoading;
+
+  // Use previous items when content is loading and current items are empty
+  // but only if EmptyScreen was NOT previously shown
+  const displayItems =
+    isContentLoading && items.length === 0 && !wasEmptyScreenRef.current
+      ? previousItemsRef.current
+      : items;
+
+  const displayTotal =
+    isContentLoading && items.length === 0 && !wasEmptyScreenRef.current
+      ? previousTotalRef.current
+      : totalItems;
+
+  const isEmptyInput =
+    displayItems.length === 2 &&
+    displayItems[1].isInputItem &&
+    displayItems[0].isCreateNewItem;
+
+  const displayHasNextPage = isContentLoading ? false : hasNextPage;
+
+  const itemsCount = displayHasNextPage
+    ? displayItems.length + 1
+    : displayItems.length === 1 && displayItems[0].isCreateNewItem
       ? 0
       : isEmptyInput
         ? 1
-        : items.length;
+        : displayItems.length;
 
   const isShareFormEmpty =
     itemsCount === 0 &&
@@ -243,7 +288,9 @@ const Body = ({
 
   let listHeight = bodyHeight - infoBarHeight - injectedElementHeight;
 
-  const showSearch = withSearch && (isSearch || itemsCount > 0);
+  const effectiveIsSearch =
+    isSearch || (isContentLoading && wasSearchActiveRef.current);
+  const showSearch = withSearch && (effectiveIsSearch || itemsCount > 0);
   const showSelectAll = (isMultiSelect && withSelectAll && !isSearch) || false;
 
   if (withPadding) {
@@ -284,7 +331,7 @@ const Body = ({
   const cloneProps = { ref: injectedElementRef };
 
   const getItemSize = (index: number): number => {
-    if (items[index]?.isSeparator) {
+    if (displayItems[index]?.isSeparator) {
       return 16;
     }
 
@@ -329,9 +376,9 @@ const Body = ({
         />
       ) : null}
 
-      <Search isSearch={itemsCount > 0 || isSearch} />
+      <Search isSearch={itemsCount > 0 || !!effectiveIsSearch} />
 
-      {withInfo && !isLoading ? (
+      {withInfo && (!isLoading || isContentLoading) ? (
         <Info
           withInfo={withInfo}
           infoText={infoText}
@@ -339,17 +386,45 @@ const Body = ({
         />
       ) : null}
 
-      {isLoading ? (
-        <Scrollbar style={{ height: listHeight }}>{rowLoader}</Scrollbar>
-      ) : itemsCount === 0 ? (
+      {isLoading && !isContentLoading ? (
+        <Scrollbar style={{ height: listHeight > 0 ? listHeight : "100%" }}>
+          {rowLoader}
+        </Scrollbar>
+      ) : itemsCount === 0 && !isContentLoading ? (
         <EmptyScreen
           withSearch={isSearch}
-          items={items}
+          items={displayItems}
           inputItemVisible={inputItemVisible}
           hideBackButton={hideBackButton}
         />
+      ) : isContentLoading && wasEmptyScreenRef.current ? (
+        <div
+          style={{
+            opacity: 0.5,
+            pointerEvents: "none",
+            transition: "opacity 0.3s ease-in-out 0.2s",
+          }}
+        >
+          <EmptyScreen
+            withSearch={wasSearchActiveRef.current}
+            items={displayItems}
+            inputItemVisible={inputItemVisible}
+            hideBackButton={hideBackButton}
+          />
+        </div>
       ) : (
-        <>
+        <div
+          style={{
+            opacity: isContentLoading ? 0.5 : 1,
+            pointerEvents: isContentLoading ? "none" : "auto",
+            transition: isContentLoading
+              ? "opacity 0.3s ease-in-out 0.2s"
+              : "opacity 0.3s ease-in-out",
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 1,
+          }}
+        >
           {descriptionText ? (
             <Text className={styles.bodyDescriptionText}>
               {descriptionText}
@@ -373,7 +448,7 @@ const Body = ({
                 } as React.CSSProperties
               }
             >
-              {items.map((item, index) => (
+              {displayItems.map((item, index) => (
                 <div
                   key={item.id}
                   style={{
@@ -386,7 +461,7 @@ const Body = ({
                     index={index}
                     style={{ flexGrow: 1 }}
                     data={{
-                      items,
+                      items: displayItems,
                       onSelect,
                       isMultiSelect: isMultiSelect || false,
                       rowLoader,
@@ -404,25 +479,27 @@ const Body = ({
                 </div>
               ))}
             </Scrollbar>
-          ) : items.length === 2 && items[1]?.isInputItem ? (
+          ) : displayItems.length === 2 && displayItems[1]?.isInputItem ? (
             <InputItem
-              defaultInputValue={savedInputValue ?? items[1].defaultInputValue}
-              onAcceptInput={items[1].onAcceptInput}
-              onCancelInput={items[1].onCancelInput}
+              defaultInputValue={
+                savedInputValue ?? displayItems[1].defaultInputValue
+              }
+              onAcceptInput={displayItems[1].onAcceptInput}
+              onCancelInput={displayItems[1].onCancelInput}
               style={{}}
-              color={items[1].color}
-              roomType={items[1].roomType}
-              cover={items[1].cover}
-              icon={items[1].icon}
+              color={displayItems[1].color}
+              roomType={displayItems[1].roomType}
+              cover={displayItems[1].cover}
+              icon={displayItems[1].icon}
               setInputItemVisible={setInputItemVisible}
               setSavedInputValue={setSavedInputValue}
-              placeholder={items[1].placeholder}
+              placeholder={displayItems[1].placeholder}
             />
           ) : (
             <InfiniteLoader
               ref={listOptionsRef}
               isItemLoaded={isItemLoaded}
-              itemCount={totalItems}
+              itemCount={displayTotal}
               loadMoreItems={onLoadMoreItems}
             >
               {({ onItemsRendered, ref }) => (
@@ -432,7 +509,7 @@ const Body = ({
                   width="100%"
                   itemCount={itemsCount}
                   itemData={{
-                    items: isEmptyInput ? [items[1]] : items,
+                    items: isEmptyInput ? [displayItems[1]] : displayItems,
                     onSelect,
                     isMultiSelect: isMultiSelect || false,
                     rowLoader,
@@ -457,7 +534,7 @@ const Body = ({
               )}
             </InfiniteLoader>
           )}
-        </>
+        </div>
       )}
     </div>
   );

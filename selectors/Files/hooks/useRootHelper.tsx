@@ -77,7 +77,7 @@ const useRootHelper = ({
   setIsInit,
 }: UseRootHelperProps) => {
   const t = useCommonTranslation();
-  const { setIsBreadCrumbsLoading, setIsNextPageLoading, setIsFirstLoad } =
+  const { setIsLoading, setIsNextPageLoading, setIsFirstLoad } =
     use(LoadersContext);
 
   const { foldersApi } = useApi();
@@ -92,7 +92,7 @@ const useRootHelper = ({
     setBreadCrumbs([getDefaultBreadCrumb(t)]);
     setIsRoot(true);
     setIsNextPageLoading(true);
-    setIsBreadCrumbsLoading(false);
+    setIsLoading("breadcrumbs", false);
     const newItems: TSelectorItem[] = [];
 
     let currentTree: FolderDtoInteger[] | null = null;
@@ -174,7 +174,7 @@ const useRootHelper = ({
     setIsFirstLoad,
     setBreadCrumbs,
     setHasNextPage,
-    setIsBreadCrumbsLoading,
+    setIsLoading,
     setIsInit,
     setIsNextPageLoading,
     setItems,

@@ -120,7 +120,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
   const t = useCommonTranslation();
   const { filesApi } = useApi();
-  const { isFirstLoad, setIsFirstLoad, showLoader } = use(LoadersContext);
+  const { isFirstLoad, setIsFirstLoad, showBodyLoader } = use(LoadersContext);
 
   const currentSelectedItemId = React.useRef<undefined | number | string>(
     undefined,
@@ -584,8 +584,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   );
 
   React.useEffect(() => {
-    if (setIsDataReady) setIsDataReady(!showLoader);
-  }, [setIsDataReady, showLoader]);
+    if (setIsDataReady) setIsDataReady(!showBodyLoader);
+  }, [setIsDataReady, showBodyLoader]);
 
   const onSubmitAction = React.useCallback(
     async (
@@ -685,7 +685,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     onSubmit: onSubmitAction,
     disableSubmitButton: getIsDisabled(
-      isFirstLoad && showLoader,
+      isFirstLoad && showBodyLoader,
       isSelectedParentFolder,
       selectedItemId,
       selectedItemType,

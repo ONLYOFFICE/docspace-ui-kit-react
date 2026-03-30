@@ -32,12 +32,12 @@ type TLoaderContext = ReturnType<typeof useLoadersHelper>;
 
 export const LoadersContext = createContext<TLoaderContext>({
   isFirstLoad: true,
-  isBreadCrumbsLoading: true,
   isNextPageLoading: false,
   showBreadCrumbsLoader: true,
-  showLoader: true,
+  showSearchLoader: true,
+  showBodyLoader: true,
 
-  setIsBreadCrumbsLoading: () => {},
+  setIsLoading: () => {},
   setIsFirstLoad: () => {},
   setIsNextPageLoading: () => {},
 });

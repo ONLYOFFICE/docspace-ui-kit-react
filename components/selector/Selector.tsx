@@ -134,6 +134,7 @@ const Selector = ({
 	loadNextPage,
 	totalItems,
 	isLoading,
+	isContentLoading,
 	disableFirstFetch,
 
 	alwaysShowFooter,
@@ -725,6 +726,7 @@ const Selector = ({
 					renderCustomItem={renderCustomItem}
 					totalItems={totalItems || 0}
 					isLoading={isLoading}
+					isContentLoading={isContentLoading}
 					rowLoader={rowLoader}
 					withFooterInput={withFooterInput}
 					withFooterCheckbox={withFooterCheckbox}

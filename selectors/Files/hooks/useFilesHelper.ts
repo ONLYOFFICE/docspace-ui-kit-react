@@ -101,7 +101,7 @@ const useFilesHelper = ({
     isFirstLoad,
     setIsFirstLoad,
     setIsNextPageLoading,
-    setIsBreadCrumbsLoading,
+    setIsLoading,
   } = use(LoadersContext);
 
   const { getIcon, extsWebEdited, filesSettingsLoading } = use(SettingsContext);
@@ -306,7 +306,7 @@ const useFilesHelper = ({
           onSetBaseFolderPath?.(isErrorPath ? [] : breadCrumbs);
 
           setBreadCrumbs(breadCrumbs);
-          setIsBreadCrumbsLoading(false);
+          setIsLoading("breadcrumbs", false);
         }
 
         if (firstLoadRef.current || startIndex === 0) {
@@ -413,7 +413,7 @@ const useFilesHelper = ({
       getFilesArchiveError,
       isThirdParty,
       setBreadCrumbs,
-      setIsBreadCrumbsLoading,
+      setIsLoading,
       roomsFolderId,
       setIsSelectedParentFolder,
       setItems,

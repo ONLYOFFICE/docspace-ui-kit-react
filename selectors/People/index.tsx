@@ -261,6 +261,7 @@ const PeopleSelector = ({
   const [hasNextPage, setHasNextPage] = useState(true);
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [selectedItems, setSelectedItems] = useState<TSelectorItem[]>([]);
+  const [isContentLoading, setIsContentLoading] = useState(false);
   const isFirstLoadRef = useRef(true);
   const afterSearch = useRef(false);
   const totalRef = useRef(0);
@@ -463,7 +464,7 @@ const PeopleSelector = ({
           ? responseTotal - totalDifferent - 1
           : responseTotal - totalDifferent;
 
-        if (isFirstLoadRef.current) {
+        if (isFirstLoadRef.current || startIndex === 0) {
           const newItems = withOutCurrentAuthorizedUser
             ? removeCurrentUserFromList(data)
             : moveCurrentUserToTopOfList(data);
@@ -494,6 +495,7 @@ const PeopleSelector = ({
 
         setIsNextPageLoading(false);
         isFirstLoadRef.current = false;
+        setIsContentLoading(false);
       } catch (error) {
         if (axios.isCancel(error)) return;
 
@@ -529,7 +531,8 @@ const PeopleSelector = ({
     setHasNextPage(true);
     setTotal(-1);
     totalRef.current = 0;
-    isFirstLoadRef.current = true;
+    if (isFirstLoadRef.current) return;
+    setIsContentLoading(true);
   }, []);
 
   const onSearch = useCallback(
@@ -798,7 +801,8 @@ const PeopleSelector = ({
       loadNextPage={loadNextPage}
       isMultiSelect={isMultiSelect ?? false}
       totalItems={total}
-      isLoading={isFirstLoadRef.current}
+      isLoading={isFirstLoadRef.current || isContentLoading}
+      isContentLoading={isContentLoading}
       rowLoader={
         <RowLoader
           isUser

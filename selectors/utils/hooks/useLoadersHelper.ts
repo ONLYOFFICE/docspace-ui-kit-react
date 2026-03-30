@@ -28,119 +28,147 @@ import React from "react";
 
 import { MIN_LOADER_TIMER, SHOW_LOADER_TIMER } from "../constants";
 
+export type SelectorSectionType = "breadcrumbs" | "body";
+
+interface SectionLoaderState {
+  timer: NodeJS.Timeout | null;
+  startTime: Date | null;
+}
+
 const useLoadersHelper = ({ withInit }: { withInit?: boolean }) => {
-  const [isBreadCrumbsLoading, setIsBreadCrumbsLoading] =
-    React.useState<boolean>(!withInit);
   const [isNextPageLoading, setIsNextPageLoading] =
     React.useState<boolean>(false);
+  const [isFirstLoad, setIsFirstLoadState] = React.useState(!withInit);
 
   const [showBreadCrumbsLoader, setShowBreadCrumbsLoader] =
     React.useState<boolean>(!withInit);
-  const [showLoader, setShowLoader] = React.useState<boolean>(!withInit);
-
-  const [isFirstLoad, setIsFirstLoad] = React.useState(!withInit);
-
-  const startLoader = React.useRef<Date | null>(withInit ? null : new Date());
-  const loaderTimeout = React.useRef<NodeJS.Timeout | null>(null);
-
-  const breadCrumbsLoaderTimeout = React.useRef<NodeJS.Timeout | null>(null);
-  const breadCrumbsStartLoader = React.useRef<Date | null>(new Date());
+  const [showBodyLoader, setShowBodyLoader] =
+    React.useState<boolean>(!withInit);
 
   const isMount = React.useRef<boolean>(true);
+
+  const loaderStates = React.useRef<
+    Record<SelectorSectionType, SectionLoaderState>
+  >({
+    breadcrumbs: {
+      timer: null,
+      startTime: withInit ? null : new Date(),
+    },
+    body: {
+      timer: null,
+      startTime: withInit ? null : new Date(),
+    },
+  });
+
+  const isFirstLoadRef = React.useRef(!withInit);
+
+  React.useEffect(() => {
+    isFirstLoadRef.current = isFirstLoad;
+  }, [isFirstLoad]);
 
   React.useEffect(() => {
     isMount.current = true;
     return () => {
       isMount.current = false;
+
+      const { breadcrumbs, body } = loaderStates.current;
+      if (breadcrumbs.timer) clearTimeout(breadcrumbs.timer);
+      if (body.timer) clearTimeout(body.timer);
     };
   }, []);
 
-  const calculateLoader = React.useCallback(() => {
-    if (isFirstLoad) {
-      loaderTimeout.current = setTimeout(() => {
-        startLoader.current = new Date();
-        if (isMount.current) setShowLoader(true);
-      }, SHOW_LOADER_TIMER);
-    } else if (startLoader.current) {
-      const currentDate = new Date();
+  const setVisibility = React.useCallback(
+    (section: SelectorSectionType, visible: boolean) => {
+      if (!isMount.current) return;
 
-      const ms = Math.abs(
-        startLoader.current.getTime() - currentDate.getTime(),
-      );
-
-      if (loaderTimeout.current) {
-        window.clearTimeout(loaderTimeout.current);
-        loaderTimeout.current = null;
+      if (section === "breadcrumbs") {
+        setShowBreadCrumbsLoader(visible);
+      } else {
+        setShowBodyLoader(visible);
       }
+    },
+    [],
+  );
 
-      if (ms >= MIN_LOADER_TIMER) {
-        startLoader.current = null;
-        return setShowLoader(false);
-      }
+  const setIsLoading = React.useCallback(
+    (section: SelectorSectionType, isLoading: boolean) => {
+      // On first load, don't hide sections individually — wait for setIsFirstLoad
+      if (!isLoading && isFirstLoadRef.current) return;
 
-      setTimeout(() => {
-        if (isMount.current) {
-          startLoader.current = null;
-          setShowLoader(false);
-        }
-      }, MIN_LOADER_TIMER - ms);
-    } else if (loaderTimeout.current) {
-      clearTimeout(loaderTimeout.current);
-      loaderTimeout.current = null;
-    }
-  }, [isFirstLoad]);
+      const state = loaderStates.current[section];
 
-  const calculateBreadCrumbsLoader = React.useCallback(() => {
-    if (isBreadCrumbsLoading) {
-      if (breadCrumbsLoaderTimeout.current) {
-        return;
-      }
-      breadCrumbsLoaderTimeout.current = setTimeout(() => {
-        breadCrumbsStartLoader.current = new Date();
-
-        if (isMount.current) setShowBreadCrumbsLoader(true);
-      }, SHOW_LOADER_TIMER);
-    } else {
-      if (breadCrumbsLoaderTimeout.current && !breadCrumbsStartLoader.current) {
-        clearTimeout(breadCrumbsLoaderTimeout.current);
-        breadCrumbsLoaderTimeout.current = null;
-        breadCrumbsStartLoader.current = null;
-        return setShowBreadCrumbsLoader(false);
-      }
-
-      if (breadCrumbsStartLoader.current) {
-        const currentDate = new Date();
-
-        const ms = Math.abs(
-          breadCrumbsStartLoader.current.getTime() - currentDate.getTime(),
-        );
-
-        if (ms >= MIN_LOADER_TIMER) {
-          breadCrumbsStartLoader.current = null;
-          return setShowBreadCrumbsLoader(false);
+      if (isLoading) {
+        if (state.timer) {
+          clearTimeout(state.timer);
+          state.timer = null;
         }
 
-        setTimeout(() => {
-          if (isMount.current) {
-            breadCrumbsStartLoader.current = null;
-            setShowBreadCrumbsLoader(false);
+        if (isFirstLoadRef.current) {
+          state.startTime = new Date();
+          setVisibility(section, true);
+          return;
+        }
+
+        state.timer = setTimeout(() => {
+          state.startTime = new Date();
+          setVisibility(section, true);
+        }, SHOW_LOADER_TIMER);
+      } else {
+        if (state.timer && !state.startTime) {
+          clearTimeout(state.timer);
+          state.timer = null;
+          state.startTime = null;
+          setVisibility(section, false);
+          return;
+        }
+
+        if (state.startTime) {
+          const ms = Math.abs(state.startTime.getTime() - new Date().getTime());
+
+          if (state.timer) {
+            clearTimeout(state.timer);
+            state.timer = null;
           }
-        }, MIN_LOADER_TIMER - ms);
+
+          if (ms >= MIN_LOADER_TIMER) {
+            state.startTime = null;
+            setVisibility(section, false);
+            return;
+          }
+
+          setTimeout(() => {
+            if (isMount.current) {
+              state.startTime = null;
+              setVisibility(section, false);
+            }
+          }, MIN_LOADER_TIMER - ms);
+        } else if (state.timer) {
+          clearTimeout(state.timer);
+          state.timer = null;
+        }
       }
-    }
-  }, [isBreadCrumbsLoading]);
+    },
+    [setVisibility],
+  );
 
-  React.useEffect(() => {
-    calculateLoader();
-  }, [calculateLoader]);
+  const setIsFirstLoad = React.useCallback(
+    (value: boolean) => {
+      setIsFirstLoadState(value);
+      if (!value) {
+        // Update ref synchronously so setIsLoading won't ignore these calls
+        isFirstLoadRef.current = false;
+        setIsLoading("breadcrumbs", false);
+        setIsLoading("body", false);
+      }
+    },
+    [setIsLoading],
+  );
 
-  React.useEffect(() => {
-    calculateBreadCrumbsLoader();
-  }, [calculateBreadCrumbsLoader]);
+  const showSearchLoader = showBreadCrumbsLoader || showBodyLoader;
 
   return {
-    isBreadCrumbsLoading,
-    setIsBreadCrumbsLoading,
+    setIsLoading,
+
     isNextPageLoading,
     setIsNextPageLoading,
 
@@ -148,8 +176,10 @@ const useLoadersHelper = ({ withInit }: { withInit?: boolean }) => {
     setIsFirstLoad,
 
     showBreadCrumbsLoader,
-    showLoader,
+    showSearchLoader,
+    showBodyLoader,
   };
 };
 
 export default useLoadersHelper;
+
