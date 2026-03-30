@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { observer } from "mobx-react";
 
@@ -61,7 +61,8 @@ const BackupPage: React.FC = () => {
   } = paymentStore;
 
   const { isFreeTariff, maxFreeBackups } = paymentStore.quotas;
-  const { usedBackupsCount, isInitServicesData } = servicesStore;
+  const { usedBackupsCount, isInitServicesData, initServiceData } =
+    servicesStore;
 
   const { t, ready } = useTranslation(["Payments", "Services", "Common"]);
 
@@ -70,6 +71,10 @@ const BackupPage: React.FC = () => {
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
 
   const shouldShowLoader = !isInitServicesData || !ready;
+
+  useEffect(() => {
+    initServiceData(t, BACKUP_SERVICE);
+  }, []);
 
   const handleToggleChange = () => {
     setIsConfirmDialogVisible(true);

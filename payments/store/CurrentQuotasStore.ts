@@ -31,13 +31,7 @@ import type {
   QuotaDto,
 } from "@onlyoffice/docspace-api-sdk";
 import type { TNumericPaymentFeature, TBooleanPaymentFeature } from "../types";
-import {
-  FREE_BACKUP,
-  MANAGER,
-  ROOM,
-  YEAR_KEY,
-  TOTAL_SIZE,
-} from "../constants";
+import { FREE_BACKUP, MANAGER, ROOM, YEAR_KEY, TOTAL_SIZE } from "../constants";
 
 export { TOTAL_SIZE };
 
@@ -148,6 +142,7 @@ class CurrentQuotasStore {
     const result = this.currentPortalQuotaFeatures.get(FREE_BACKUP) as
       | TNumericPaymentFeature
       | undefined;
+
     return result?.value ?? 0;
   }
 

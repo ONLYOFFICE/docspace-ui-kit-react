@@ -96,6 +96,7 @@ const AiPage = (props: AiPageProps) => {
     isAiServiceLowBalance,
     isInitServicesData,
     wasFirstAiServiceTopUp,
+    initServiceData,
   } = servicesStore;
 
   const { t } = useTranslation("Services");
@@ -110,6 +111,10 @@ const AiPage = (props: AiPageProps) => {
   const isDisabled = cardLinkedOnFreeTariff || !isFreeTariff ? !isPayer : false;
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    initServiceData(t, AI_TOOLS, AI_ENUM);
+  }, []);
 
   useEffect(() => {
     if (isInitServicesData && !wasFirstAiServiceTopUp) {

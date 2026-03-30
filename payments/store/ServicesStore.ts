@@ -36,9 +36,12 @@ import { formatCurrencyValue } from "../utils/common";
 import { AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
 import type { TAiToolsPrices } from "../types";
 import type PaymentStore from "./PaymentStore";
+import type { TApiClient } from "../../providers/api/ApiProvider";
 
 class ServicesStore {
   private paymentApi: PaymentApi;
+
+  #apiClient: TApiClient;
 
   private abortControllers: AbortController[] = [];
 
@@ -68,9 +71,14 @@ class ServicesStore {
 
   aiModelAvailabilityUpdatingSet: Set<string> = new Set();
 
-  constructor(paymentApi: PaymentApi, paymentStore: PaymentStore) {
+  constructor(
+    paymentApi: PaymentApi,
+    paymentStore: PaymentStore,
+    apiClient: TApiClient,
+  ) {
     this.paymentApi = paymentApi;
     this.paymentStore = paymentStore;
+    this.#apiClient = apiClient;
 
     makeAutoObservable(this, {
       aiModelAvailabilityMap: observable.ref,
@@ -343,9 +351,22 @@ class ServicesStore {
   };
 
   fetchBackupsCount = async () => {
-    // This was using backup API which isn't in PaymentApi
-    // Will be handled by the host app or a separate API call
-    console.warn("fetchBackupsCount not yet available in ui-kit PaymentApi");
+    const abortController = new AbortController();
+    this.abortControllers.push(abortController);
+
+    try {
+      const { data } = await this.#apiClient.instance.get(
+        "api/2.0/backup/getbackupscount",
+        { signal: abortController.signal },
+      );
+
+      if (data?.response == null) return;
+
+      this.usedBackupsCount = data.response as number;
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
   };
 
   initServiceData = async (

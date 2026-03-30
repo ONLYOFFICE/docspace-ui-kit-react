@@ -837,7 +837,6 @@ class PaymentStore {
     requests.push(
       this.getSettingsPayment(),
       this.paymentQuotas.fetchPaymentQuotas(),
-      this.quotas.fetchPortalQuota(),
       this.tariff.fetchPortalTariff(),
     );
 

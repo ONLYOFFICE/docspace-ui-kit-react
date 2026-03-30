@@ -81,6 +81,12 @@ const PaymentStoreProviderInner = ({
   }, [store, config.user]);
 
   React.useEffect(() => {
+    if (!store.quotas.isLoaded) {
+      store.quotas.fetchPortalQuota();
+    }
+  }, [store]);
+
+  React.useEffect(() => {
     return () => {
       store.dispose();
     };
