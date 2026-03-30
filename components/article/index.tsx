@@ -237,13 +237,13 @@ const Article = ({
 
   const hideDevTools =
     user?.isVisitor ||
-    (!user?.isAdmin && limitedAccessDevToolsForUsers) ||
+    (!isAdmin && limitedAccessDevToolsForUsers) ||
     window.location.pathname.includes("portal-settings") ||
     (window.location.pathname.includes("management") &&
       !window.location.pathname.includes("profile")) ||
     window.location.pathname.includes("accounts");
 
-  const pathDevTools = user?.isAdmin
+  const pathDevTools = isAdmin
     ? "/portal-settings/developer-tools"
     : "/developer-tools";
 
