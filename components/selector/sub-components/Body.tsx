@@ -40,6 +40,10 @@ import { BreadCrumbsContext } from "../contexts/BreadCrumbs";
 import { TabsContext } from "../contexts/Tabs";
 import { SelectAllContext } from "../contexts/SelectAll";
 import { InfoBarContext } from "../contexts/InfoBar";
+import {
+  EmptyScreenContext,
+  EmptyScreenProvider,
+} from "../contexts/EmptyScreen";
 
 import type { BodyProps } from "../Selector.types";
 
@@ -114,6 +118,7 @@ const Body = ({
   const { withSearch } = React.use(SearchContext);
   const isSearch = React.use(SearchValueContext);
   const { withInfoBar } = React.use(InfoBarContext);
+  const emptyScreenCtx = React.use(EmptyScreenContext);
 
   const { withBreadCrumbs, isBreadCrumbsLoading } =
     React.useContext(BreadCrumbsContext);
@@ -136,15 +141,19 @@ const Body = ({
   const previousItemsRef = React.useRef(items);
   const previousTotalRef = React.useRef(totalItems);
 
+  // Save EmptyScreen context when empty screen is actually displayed
+  const savedEmptyScreenCtxRef = React.useRef(emptyScreenCtx);
+
   // Track whether search was active before content loading started
   const wasSearchActiveRef = React.useRef(false);
   if (!isContentLoading) {
     wasSearchActiveRef.current = isSearch;
   }
 
-  if (items.length > 0 && !isContentLoading) {
+  if (!isContentLoading) {
     previousItemsRef.current = items;
     previousTotalRef.current = totalItems;
+    savedEmptyScreenCtxRef.current = emptyScreenCtx;
   }
 
   // Use previous items when content is loading and current items are empty
@@ -393,12 +402,14 @@ const Body = ({
             transition: "opacity 0.3s ease-in-out 0.2s",
           }}
         >
-          <EmptyScreen
-            withSearch={wasSearchActiveRef.current}
-            items={displayItems}
-            inputItemVisible={inputItemVisible}
-            hideBackButton={hideBackButton}
-          />
+          <EmptyScreenProvider {...savedEmptyScreenCtxRef.current}>
+            <EmptyScreen
+              withSearch={wasSearchActiveRef.current}
+              items={displayItems}
+              inputItemVisible={inputItemVisible}
+              hideBackButton={hideBackButton}
+            />
+          </EmptyScreenProvider>
         </div>
       ) : (
         <div

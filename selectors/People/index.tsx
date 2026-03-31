@@ -261,7 +261,15 @@ const PeopleSelector = ({
   const [hasNextPage, setHasNextPage] = useState(true);
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [selectedItems, setSelectedItems] = useState<TSelectorItem[]>([]);
-  const [isContentLoading, setIsContentLoading] = useState(false);
+  const [isContentLoading, setIsContentLoadingRaw] = useState(false);
+  const [wasEmptyScreen, setWasEmptyScreen] = useState(false);
+
+  const setIsContentLoading = useCallback((value: boolean) => {
+    setIsContentLoadingRaw(value);
+    if (!value) {
+      setWasEmptyScreen(false);
+    }
+  }, []);
   const isFirstLoadRef = useRef(true);
   const afterSearch = useRef(false);
   const totalRef = useRef(0);
@@ -552,6 +560,9 @@ const PeopleSelector = ({
   const onClearSearch = useCallback(
     (callback?: VoidFunction) => {
       afterSearch.current = true;
+      if (itemsList.length === 0) {
+        setWasEmptyScreen(true);
+      }
       resetSelectorList();
       setSearchValue(() => {
         return "";
@@ -562,7 +573,7 @@ const PeopleSelector = ({
 
       callback?.();
     },
-    [resetSelectorList, loadNextPage],
+    [resetSelectorList, loadNextPage, itemsList.length],
   );
 
   const emptyScreenImage = isBase ? (
@@ -678,11 +689,14 @@ const PeopleSelector = ({
   const changeActiveTab = useCallback(
     (tab: number | string) => {
       if (setActiveTab) setActiveTab(`${tab}`);
+      if (itemsList.length === 0) {
+        setWasEmptyScreen(true);
+      }
       setActiveTabId(`${tab}`);
       onSearch("");
       resetSelectorList();
     },
-    [onSearch, resetSelectorList, setActiveTab],
+    [onSearch, resetSelectorList, setActiveTab, itemsList.length],
   );
 
   const withTabsProps: TSelectorTabs =
@@ -803,6 +817,7 @@ const PeopleSelector = ({
       totalItems={total}
       isLoading={isFirstLoadRef.current || isContentLoading}
       isContentLoading={isContentLoading}
+      wasEmptyScreen={wasEmptyScreen}
       rowLoader={
         <RowLoader
           isUser
