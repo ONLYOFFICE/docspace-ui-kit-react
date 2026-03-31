@@ -131,9 +131,11 @@
   display: block;
 }
 
-// Descending: arrow points down (rotate 180)
-.headerCell.sorted .sortIcon svg {
-  transform: rotate(180deg);
+// Default: arrow-down SVG. When NOT descending (ascending), flip it up.
+.headerCell:not(.sorted) .sortIcon {
+  transform: scale(1, -1);
+  padding-block: 14px;
+  padding-inline: 4px 0;
 }
 
 .settingsBlock {

@@ -170,10 +170,15 @@ function HeaderCell({ header, activeSortBy, activeSortOrder }: HeaderCellProps) 
                 )}
           </span>
         </div>
-        {/* Sort icon: always rendered, visibility controlled by CSS */}
+        {/* Sort icon: same SVG as legacy TableHeaderCell (arrow-down, flipped via CSS for asc) */}
         <span className={styles.sortIcon} data-testid="sort-icon">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-            <path d="M6 1L10 7H2L6 1Z" />
+          <svg width="12" height="12" viewBox="0 0 12 12">
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M6.14453 10.8536C6.33979 11.0488 6.65638 11.0488 6.85164 10.8536L10.3516 7.35355L9.64453 6.64645L6.99808 9.29289V2H5.99808V9.29289L3.35164 6.64645L2.64453 7.35355L6.14453 10.8536Z"
+              fill="currentColor"
+            />
           </svg>
         </span>
       </div>
