@@ -40,6 +40,11 @@ export interface TanStackTableHeaderProps {
   settingsTitle?: string;
   /** Render prop for the settings dropdown content */
   renderSettings?: (table: Table<unknown>) => React.ReactNode;
+  /** External sort key (e.g. "title", "membersCount") — used when sorting
+   *  is managed outside TanStack Table (e.g. via URL filter params). */
+  activeSortBy?: string;
+  /** External sort direction — "ascending" or "descending" */
+  activeSortOrder?: "ascending" | "descending";
   /** Additional class name */
   className?: string;
 }
@@ -48,6 +53,8 @@ export function TanStackTableHeader({
   showSettings = true,
   settingsTitle,
   renderSettings,
+  activeSortBy,
+  activeSortOrder,
   className,
 }: TanStackTableHeaderProps) {
   const { table } = useTanStackTable();
@@ -80,7 +87,12 @@ export function TanStackTableHeader({
     >
       {table.getHeaderGroups().map((headerGroup) =>
         headerGroup.headers.map((header) => (
-          <HeaderCell key={header.id} header={header} />
+          <HeaderCell
+            key={header.id}
+            header={header}
+            activeSortBy={activeSortBy}
+            activeSortOrder={activeSortOrder}
+          />
         )),
       )}
 
@@ -99,9 +111,11 @@ export function TanStackTableHeader({
 
 interface HeaderCellProps {
   header: Header<unknown, unknown>;
+  activeSortBy?: string;
+  activeSortOrder?: "ascending" | "descending";
 }
 
-function HeaderCell({ header }: HeaderCellProps) {
+function HeaderCell({ header, activeSortBy, activeSortOrder }: HeaderCellProps) {
   const meta = header.column.columnDef.meta as
     | Record<string, unknown>
     | undefined;
@@ -111,7 +125,13 @@ function HeaderCell({ header }: HeaderCellProps) {
     | ((sortBy: string, e: React.MouseEvent) => void)
     | undefined;
 
-  const isSorted = header.column.getIsSorted();
+  // Support both TanStack-managed sorting and external (URL-based) sorting
+  const tanstackSorted = header.column.getIsSorted();
+  const isExternalSorted = sortBy ? activeSortBy === sortBy : false;
+  const isSorted = tanstackSorted || isExternalSorted;
+  const sortDirection = tanstackSorted
+    ? tanstackSorted
+    : activeSortOrder === "descending" ? "desc" : "asc";
   const canResize = header.column.getCanResize();
 
   const handleSortClick = (e: React.MouseEvent) => {
@@ -121,7 +141,7 @@ function HeaderCell({ header }: HeaderCellProps) {
   };
 
   const cellClasses = classNames(styles.headerCell, "table-container_header-cell", {
-    [styles.isActive]: !!isSorted,
+    [styles.isActive]: isSorted,
     [styles.isDefault]: isDefault,
   });
 
@@ -151,7 +171,7 @@ function HeaderCell({ header }: HeaderCellProps) {
           </span>
           {isSorted ? (
             <span className={styles.sortIcon} data-testid="sort-icon">
-              {isSorted === "asc" ? " \u2191" : " \u2193"}
+              {sortDirection === "asc" ? " \u2191" : " \u2193"}
             </span>
           ) : null}
         </div>
