@@ -568,12 +568,9 @@ const PeopleSelector = ({
         return "";
       });
 
-      // Trigger initial load after clearing search
-      loadNextPage(0);
-
       callback?.();
     },
-    [resetSelectorList, loadNextPage, itemsList.length],
+    [resetSelectorList, itemsList.length],
   );
 
   const emptyScreenImage = isBase ? (
