@@ -41,19 +41,23 @@
 .tanstackTableHeader {
   :global(.light) & {
     --header-border-color: #{colors.$gray-light-mid};
+    --header-bg: #{colors.$white};
   }
 
   :global(.dark) & {
     --header-border-color: #{colors.$gray-dark-strong};
+    --header-bg: #{colors.$black};
   }
 
   display: grid;
-  position: fixed;
-  z-index: 1;
-  padding: 0 20px;
-  border-bottom: 1px solid var(--header-border-color);
-  height: 40px;
+  z-index: 200;
+  height: 39px;
   align-items: center;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border-color);
+  // No position:fixed — we stay in flow, no JS width needed
+  // Padding matches the parent section-wrapper-content padding structure
+  padding: 0;
 }
 
 .headerCell {
@@ -62,6 +66,19 @@
   position: relative;
   overflow: hidden;
   user-select: none;
+
+  // Vertical separator line before non-first columns
+  &:not(.isDefault) {
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 1px;
+      height: 10px;
+      background: var(--header-border-color);
+      margin-inline-end: 8px;
+      flex-shrink: 0;
+    }
+  }
 }
 
 .headerItem {
@@ -127,11 +144,10 @@
 .tanstackTableBody {
   display: block;
   height: 100%;
-  margin-top: 40px; // offset for fixed header
 }
 
-// ===== Row =====
-.tanstackTableRow {
+// ===== Row (virtual row container) =====
+.rowContainer {
   :global(.light) & {
     --row-border-color: #{colors.$gray-light-mid};
     --row-bg-active: #f3f4f4;
@@ -142,26 +158,59 @@
     --row-bg-active: #3d3d3d;
   }
 
-  display: contents;
+  align-items: center;
+  border-bottom: 1px solid var(--row-border-color);
 
-  :global(.table-container_cell) {
-    border-top: 1px solid var(--row-border-color);
-    margin-top: -1px;
+  // Checkbox hidden by default, shown on hover/check
+  :global(.table-container_row-checkbox) {
+    display: none;
   }
 
-  &.checked,
-  &.isActive {
-    :global(.table-container_cell) {
-      background: var(--row-bg-active) !important;
-    }
+  :global(.table-container_element) {
+    display: flex;
+  }
+
+  // Context menu button hidden by default
+  :global(.table-container_row-context-menu-wrapper) {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    opacity: 0;
   }
 
   @media (hover: hover) {
     &:hover {
-      :global(.table-container_cell) {
-        cursor: pointer;
-        background: var(--row-bg-active) !important;
+      background: var(--row-bg-active);
+      cursor: pointer;
+
+      :global(.table-container_row-checkbox) {
+        display: block;
       }
+
+      :global(.table-container_element) {
+        display: none;
+      }
+
+      :global(.table-container_row-context-menu-wrapper) {
+        opacity: 1;
+      }
+    }
+  }
+
+  // When row is selected
+  &:global(.table-row-selected) {
+    background: var(--row-bg-active);
+
+    :global(.table-container_row-checkbox) {
+      display: block;
+    }
+
+    :global(.table-container_element) {
+      display: none;
+    }
+
+    :global(.table-container_row-context-menu-wrapper) {
+      opacity: 1;
     }
   }
 }

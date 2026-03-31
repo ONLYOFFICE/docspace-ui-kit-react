@@ -70,7 +70,7 @@ export function TanStackTableBody({
   totalCount,
   className,
 }: TanStackTableBodyProps) {
-  const table = useTanStackTable();
+  const { table } = useTanStackTable();
   const rows = table.getRowModel().rows;
   const count = totalCount ?? rows.length;
 
@@ -143,7 +143,7 @@ export function TanStackTableBody({
               data-index={virtualRow.index}
               style={rowStyle}
               {...extraProps}
-              className={`table-list-item window-item ${
+              className={`${styles.rowContainer} table-list-item window-item ${
                 (extraProps.className as string) ?? ""
               }`}
             >

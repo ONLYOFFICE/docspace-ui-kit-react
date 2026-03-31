@@ -1,5 +1,14 @@
 import "@testing-library/jest-dom/vitest";
 
+// ResizeObserver is not available in jsdom
+if (typeof globalThis.ResizeObserver === "undefined") {
+  (globalThis as Record<string, unknown>).ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 // @tanem/svg-injector uses SVGSVGElement which jsdom doesn't provide
 if (typeof SVGSVGElement === "undefined") {
   (globalThis as Record<string, unknown>).SVGSVGElement =

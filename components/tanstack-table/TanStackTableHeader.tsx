@@ -50,7 +50,7 @@ export function TanStackTableHeader({
   renderSettings,
   className,
 }: TanStackTableHeaderProps) {
-  const table = useTanStackTable();
+  const { table } = useTanStackTable();
 
   const gridTemplateColumns = useMemo(() => {
     const visibleColumns = table.getVisibleLeafColumns();

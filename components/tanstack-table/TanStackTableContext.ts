@@ -28,13 +28,20 @@ import { createContext, useContext } from "react";
 
 import type { Table } from "@tanstack/react-table";
 
+interface TanStackTableContextValue {
+  // biome-ignore lint: Table<any> is the correct generic here
+  table: Table<any>;
+  /** Measured container width in pixels */
+  containerWidth: number;
+}
+
 /**
- * Context that provides the TanStack Table instance to child components.
- * The table instance is created in TanStackTableContainer and consumed
- * by TanStackTableHeader, TanStackTableBody, and TanStackTableRow.
+ * Context that provides the TanStack Table instance and container
+ * measurements to child components.
  */
-// biome-ignore lint: Table<any> is the correct generic here for the context
-const TanStackTableContext = createContext<Table<any> | null>(null);
+const TanStackTableContext = createContext<TanStackTableContextValue | null>(
+  null,
+);
 
 export const TanStackTableProvider = TanStackTableContext.Provider;
 
@@ -42,12 +49,15 @@ export const TanStackTableProvider = TanStackTableContext.Provider;
  * Hook to access the TanStack Table instance from context.
  * Must be used within a TanStackTableContainer.
  */
-export function useTanStackTable<TData>(): Table<TData> {
-  const table = useContext(TanStackTableContext);
-  if (!table) {
+export function useTanStackTable<TData>(): {
+  table: Table<TData>;
+  containerWidth: number;
+} {
+  const ctx = useContext(TanStackTableContext);
+  if (!ctx) {
     throw new Error(
       "useTanStackTable must be used within a TanStackTableContainer",
     );
   }
-  return table as Table<TData>;
+  return { table: ctx.table as Table<TData>, containerWidth: ctx.containerWidth };
 }

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useMemo, useState, useCallback, useEffect } from "react";
+import React, { useMemo, useState, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import classNames from "classnames";
 
 import {
@@ -126,8 +126,22 @@ export function TanStackTableContainer<TData>({
     [],
   );
 
-  // Track whether a column is currently being resized
-  const isResizingRef = React.useRef(false);
+  // Track column sizing info (resize-in-progress state) properly
+  const [columnSizingInfo, setColumnSizingInfo] = useState(
+    {} as import("@tanstack/react-table").ColumnSizingInfoState,
+  );
+  const wasResizingRef = useRef(false);
+
+  // Detect resize end: when isResizingColumn transitions from truthy to falsy
+  useEffect(() => {
+    const isResizing = !!columnSizingInfo.isResizingColumn;
+    if (wasResizingRef.current && !isResizing) {
+      // Resize just ended — persist
+      saveSizing(columnSizing);
+      onColumnSizingChange?.(columnSizing);
+    }
+    wasResizingRef.current = isResizing;
+  }, [columnSizingInfo.isResizingColumn, columnSizing, saveSizing, onColumnSizingChange]);
 
   const table = useReactTable({
     data,
@@ -138,29 +152,14 @@ export function TanStackTableContainer<TData>({
     },
     state: {
       columnSizing,
+      columnSizingInfo,
       columnVisibility,
       sorting,
     },
     columnResizeMode,
     columnResizeDirection,
     onColumnSizingChange: handleColumnSizingChange,
-    onColumnSizingInfoChange: (updater) => {
-      // Use functional form to detect resize end
-      const prevIsResizing = isResizingRef.current;
-      // We need to let TanStack handle the update internally;
-      // just detect transitions from resizing → not resizing
-      if (typeof updater === "function") {
-        // Peek at the result to detect resize end
-        const dummyPrev = { isResizingColumn: prevIsResizing ? "col" : false };
-        const next = updater(dummyPrev as never);
-        const nowResizing = !!next.isResizingColumn;
-        if (prevIsResizing && !nowResizing) {
-          saveSizing(columnSizing);
-          onColumnSizingChange?.(columnSizing);
-        }
-        isResizingRef.current = nowResizing;
-      }
-    },
+    onColumnSizingInfoChange: setColumnSizingInfo,
     onColumnVisibilityChange: handleColumnVisibilityChange,
     onSortingChange,
     getCoreRowModel: getCoreRowModel(),
@@ -168,14 +167,93 @@ export function TanStackTableContainer<TData>({
     enableColumnResizing: true,
   });
 
-  // Build gridTemplateColumns string from table column state
-  // This maintains compatibility with the existing CSS grid row layout
-  const gridTemplateColumns = useMemo(() => {
-    const visibleColumns = table.getVisibleLeafColumns();
-    const parts = visibleColumns.map((col) => `${col.getSize()}px`);
-    parts.push(`${TABLE_DEFAULTS.SETTINGS_COLUMN_SIZE}px`);
-    return parts.join(" ");
-  }, [table, columnSizing, columnVisibility]);
+  // Measure container width and distribute column sizes proportionally
+  // when there's no persisted sizing (first render or after reset)
+  const internalRef = useRef<HTMLDivElement>(null);
+  const containerRefResolved = (forwardedRef as React.RefObject<HTMLDivElement>) ?? internalRef;
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  // Measure container and compute initial column widths
+  /** Distribute column widths proportionally to fill the given width */
+  const distributeColumns = useCallback(
+    (width: number) => {
+      const visibleCols = table.getVisibleLeafColumns();
+      if (visibleCols.length === 0 || width === 0) return;
+
+      const available = width - TABLE_DEFAULTS.SETTINGS_COLUMN_SIZE;
+      const defaultCol = visibleCols.find(
+        (c) => (c.columnDef.meta as Record<string, unknown>)?.isDefault,
+      );
+      const otherCols = visibleCols.filter(
+        (c) => (c.columnDef.meta as Record<string, unknown>)?.isDefault !== true,
+      );
+
+      const nameWidth = Math.max(
+        Math.floor((available * TABLE_DEFAULTS.NAME_COLUMN_PERCENT) / 100),
+        TABLE_DEFAULTS.MIN_NAME_COLUMN_SIZE,
+      );
+      const remainingWidth = available - nameWidth;
+      const perOther =
+        otherCols.length > 0
+          ? Math.max(
+              Math.floor(remainingWidth / otherCols.length),
+              TABLE_DEFAULTS.MIN_COLUMN_SIZE,
+            )
+          : 0;
+
+      const newSizing: ColumnSizingState = {};
+      if (defaultCol) newSizing[defaultCol.id] = nameWidth;
+      for (const col of otherCols) newSizing[col.id] = perOther;
+
+      setColumnSizing(newSizing);
+      saveSizing(newSizing);
+    },
+    [table, saveSizing],
+  );
+
+  // Measure container and compute initial + responsive column widths
+  const lastWidthRef = useRef(0);
+
+  useLayoutEffect(() => {
+    const el = (containerRefResolved as React.RefObject<HTMLDivElement>).current;
+    if (!el) return;
+
+    const handleResize = () => {
+      const width = el.clientWidth;
+      if (width === 0 || width === lastWidthRef.current) return;
+      lastWidthRef.current = width;
+      setContainerWidth(width);
+
+      // On first mount: use persisted sizing if available
+      const hasPersistedSizing = Object.keys(initialSizing).length > 0;
+      if (hasPersistedSizing && containerWidth === 0) {
+        // First render with persisted data — proportionally scale to fit
+        const totalStored = Object.values(initialSizing).reduce(
+          (a, b) => a + b,
+          0,
+        );
+        if (totalStored > 0) {
+          const available = width - TABLE_DEFAULTS.SETTINGS_COLUMN_SIZE;
+          const scale = available / totalStored;
+          const scaled: ColumnSizingState = {};
+          for (const [key, val] of Object.entries(initialSizing)) {
+            scaled[key] = Math.floor(val * scale);
+          }
+          setColumnSizing(scaled);
+          return;
+        }
+      }
+
+      // Fresh calculation or resize
+      distributeColumns(width);
+    };
+
+    handleResize();
+
+    const ro = new ResizeObserver(handleResize);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const containerClasses = classNames(
     styles.tanstackTableContainer,
@@ -183,14 +261,19 @@ export function TanStackTableContainer<TData>({
     className,
   );
 
+  const contextValue = useMemo(
+    () => ({ table, containerWidth }),
+    [table, containerWidth],
+  );
+
   return (
-    <TanStackTableProvider value={table}>
+    <TanStackTableProvider value={contextValue}>
       <div
         id="table-container"
-        ref={forwardedRef}
+        ref={containerRefResolved as React.RefObject<HTMLDivElement>}
         className={containerClasses}
-        style={{ gridTemplateColumns }}
         data-testid="table-container"
+        data-container-width={containerWidth}
       >
         {children}
       </div>
