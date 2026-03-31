@@ -82,7 +82,6 @@ const AIAgentSelectorComponent = ({
     isFirstLoad,
     isNextPageLoading,
     setIsFirstLoad,
-    setIsLoading,
     showBodyLoader,
   } = React.useContext(LoadersContext);
 

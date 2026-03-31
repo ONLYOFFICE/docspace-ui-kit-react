@@ -441,16 +441,10 @@ const Body = ({
         />
       ) : (
         <div
-          style={{
-            opacity: isContentLoading ? 0.5 : 1,
-            pointerEvents: isContentLoading ? "none" : "auto",
-            transition: isContentLoading
-              ? "opacity 0.3s ease-in-out 0.2s"
-              : "opacity 0.3s ease-in-out",
-            display: "flex",
-            flexDirection: "column",
-            flexGrow: 1,
-          }}
+          className={classNames(
+            styles.bodyContentWrapper,
+            isContentLoading && styles.bodyContentDimmed,
+          )}
         >
           {descriptionText ? (
             <Text className={styles.bodyDescriptionText}>

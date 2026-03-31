@@ -113,7 +113,6 @@ const RoomSelectorComponent = ({
     isFirstLoad,
     isNextPageLoading,
     setIsFirstLoad,
-    setIsLoading,
     showBodyLoader,
   } = React.useContext(LoadersContext);
 

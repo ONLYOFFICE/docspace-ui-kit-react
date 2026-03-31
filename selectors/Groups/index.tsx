@@ -101,18 +101,21 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       doubleClickCallback();
     }
   };
-  const onSearch = useCallback((value: string, callback?: () => void) => {
-    afterSearch.current = true;
-    if (isFirstLoad.current) {
-      isFirstLoad.current = true;
-    } else {
-      setIsContentLoading(true);
-    }
-    setSearchValue(() => {
-      return value;
-    });
-    callback?.();
-  }, []);
+  const onSearch = useCallback(
+    (value: string, callback?: () => void) => {
+      afterSearch.current = true;
+      if (isFirstLoad.current) {
+        isFirstLoad.current = true;
+      } else {
+        setIsContentLoading(true);
+      }
+      setSearchValue(() => {
+        return value;
+      });
+      callback?.();
+    },
+    [setIsContentLoading],
+  );
 
   const onClearSearch = useCallback(
     (callback?: () => void) => {

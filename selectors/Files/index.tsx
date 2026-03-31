@@ -595,11 +595,11 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   React.useEffect(() => {
     if (!selectedItemType) return;
 
-    if (searchValue && !isFirstLoad) {
+    if (searchValue) {
       // Only dim content, don't show skeleton
       resetContentLoading();
     }
-  }, [searchValue, selectedItemType, isFirstLoad, resetContentLoading]);
+  }, [searchValue, selectedItemType, resetContentLoading]);
 
   const onClearSearchAction = React.useCallback(
     (callback?: VoidFunction) => {
