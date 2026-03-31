@@ -260,19 +260,14 @@ const Selector = ({
           return;
         }
 
-        setNewSelectedItems((value) => {
-          value.push({
-            ...item,
-          });
-
-          return [...value];
-        });
+        setNewSelectedItems((value) => [...value, { ...item }]);
 
         if (activeTabId) {
           setSelectedTabItems((value) => {
             const newValue = { ...value };
 
-            if (newValue[activeTabId]) newValue[activeTabId].push(item);
+            if (newValue[activeTabId])
+              newValue[activeTabId] = [...newValue[activeTabId], item];
             else newValue[activeTabId] = [{ ...item }];
 
             return newValue;

@@ -41,8 +41,6 @@ import type { UseAgentsHelperProps } from "../types";
 import { convertRoomsToItems } from "..";
 import { useCommonTranslation } from "../../../utils/i18n";
 
-// import useInputItemHelper from "./useInputItemHelper";
-
 const useAgentsHelper = ({
   setHasNextPage,
   setTotal,
@@ -50,18 +48,12 @@ const useAgentsHelper = ({
   setBreadCrumbs,
   setIsRoot,
   onSetBaseFolderPath,
-  // createDefineLabel,
 
   searchValue,
-  // isRoomsOnly,
 
   isInit,
   setIsInit,
-  // withCreate all time false for agent without billing
-  // withCreate = false,
   excludeItems,
-  // getRootData,
-  // setSelectedItemType,
   subscribe,
   setSelectedItemSecurity,
   setSelectedTreeNode,
@@ -77,8 +69,6 @@ const useAgentsHelper = ({
 
     isFirstLoad,
   } = use(LoadersContext);
-
-  // const { addInputItem } = useInputItemHelper({ withCreate, setItems });
 
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
@@ -99,130 +89,95 @@ const useAgentsHelper = ({
       requestRunning.current = true;
       setIsNextPageLoading(true);
 
-      const startIndex = sIndex;
+      try {
+        const startIndex = sIndex;
 
-      // if (withCreate) {
-      //   startIndex -= startIndex % 100;
-      // }
+        const filterValue = searchValue || "";
 
-      const filterValue = searchValue || "";
+        const page = startIndex / PAGE_COUNT;
 
-      const page = startIndex / PAGE_COUNT;
+        const params = new URLSearchParams({
+          page: String(page),
+          count: String(PAGE_COUNT),
+          searchArea: String(SearchArea.AiAgents),
+        });
 
-      const params = new URLSearchParams({
-        page: String(page),
-        count: String(PAGE_COUNT),
-        searchArea: String(SearchArea.AiAgents),
-      });
+        if (filterValue) {
+          params.set("filterValue", filterValue);
+        }
 
-      if (filterValue) {
-        params.set("filterValue", filterValue);
-      }
-
-      const { response } = await apiClient.request<{
-        response: {
-          folders: FolderDtoInteger[];
-          current: FolderDtoInteger;
-          pathParts: { folderType?: number }[];
-          total: number;
-          count: number;
-        };
-      }>(`/api/2.0/ai/agents?${params.toString()}`);
-
-      const { folders, total, count, current } = response;
-
-      if (initRef.current) {
-        const { title, id } = current;
-
-        subscribe(id!);
-
-        const breadCrumbs: TBreadCrumb[] = [
-          { label: title ?? "", id: id!, isRoom: false, isAgent: true },
-        ];
-
-        // if (!isRoomsOnly) breadCrumbs.unshift({ ...getDefaultBreadCrumb() });
-
-        onSetBaseFolderPath?.(breadCrumbs);
-
-        setBreadCrumbs?.(breadCrumbs);
-
-        setIsLoading("breadcrumbs", false);
-      }
-
-      const itemList: TSelectorItem[] = convertRoomsToItems(folders, t)
-        .filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true))
-        .map((item) => {
-          const security = item.security as
-            | FileEntryDtoIntegerAllOfSecurity
-            | undefined;
-          const isDisabledBySecurity = disableBySecurity
-            ? !security?.[
-                disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity
-              ]
-            : false;
-          return {
-            ...item,
-            isDisabled: item.isDisabled || isDisabledBySecurity,
+        const { response } = await apiClient.request<{
+          response: {
+            folders: FolderDtoInteger[];
+            current: FolderDtoInteger;
+            pathParts: { folderType?: number }[];
+            total: number;
+            count: number;
           };
-        });
+        }>(`/api/2.0/ai/agents?${params.toString()}`);
 
-      setHasNextPage(count === PAGE_COUNT);
+        const { folders, total, count, current } = response;
 
-      setSelectedItemSecurity?.(current.security ?? undefined);
+        if (initRef.current) {
+          const { title, id } = current;
 
-      setSelectedTreeNode?.({
-        ...current,
-        path: response.pathParts,
-      } as typeof current & { path: typeof response.pathParts });
+          subscribe(id!);
 
-      if (firstLoadRef.current || startIndex === 0) {
-        // const { security } = current;
+          const breadCrumbs: TBreadCrumb[] = [
+            { label: title ?? "", id: id!, isRoom: false, isAgent: true },
+          ];
 
-        // if (withCreate && security.Create) {
-        //   setTotal(total + 1);
-        //   const createItem: TSelectorItem = {
-        //     isCreateNewItem: true,
-        //     label: createDefineLabel ?? t("NewAgent"),
-        //     id: "create-room-item",
-        //     key: "create-room-item",
-        //     hotkey: "r",
-        //     // isRoomsOnly,
+          onSetBaseFolderPath?.(breadCrumbs);
 
-        //     onBackClick: () => {
-        //       setIsRoot?.(true);
-        //       setSelectedItemType?.(undefined);
-        //       setBreadCrumbs?.((val) => {
-        //         const newVal = [...val];
+          setBreadCrumbs?.(breadCrumbs);
 
-        //         newVal.pop();
+          setIsLoading("breadcrumbs", false);
+        }
 
-        //         return newVal;
-        //       });
-        //       getRootData?.();
-        //     },
-        //   };
+        const itemList: TSelectorItem[] = convertRoomsToItems(folders, t)
+          .filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true))
+          .map((item) => {
+            const security = item.security as
+              | FileEntryDtoIntegerAllOfSecurity
+              | undefined;
+            const isDisabledBySecurity = disableBySecurity
+              ? !security?.[
+                  disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity
+                ]
+              : false;
+            return {
+              ...item,
+              isDisabled: item.isDisabled || isDisabledBySecurity,
+            };
+          });
 
-        //   createItem.onCreateClick = () =>
-        //     addInputItem("", "", undefined, createDefineLabel, true);
+        setHasNextPage(count === PAGE_COUNT);
 
-        //   itemList.unshift(createItem);
-        // } else {
-        setTotal(total);
-        // }
-        setItems?.(itemList);
-      } else {
-        setItems?.((prevState) => {
-          if (prevState) return [...prevState, ...itemList];
-          return [...itemList];
-        });
+        setSelectedItemSecurity?.(current.security ?? undefined);
+
+        setSelectedTreeNode?.({
+          ...current,
+          path: response.pathParts,
+        } as typeof current & { path: typeof response.pathParts });
+
+        if (firstLoadRef.current || startIndex === 0) {
+          setTotal(total);
+          setItems?.(itemList);
+        } else {
+          setItems?.((prevState) => {
+            if (prevState) return [...prevState, ...itemList];
+            return [...itemList];
+          });
+        }
+
+        setIsRoot?.(false);
+        setIsInit(false);
+        setIsFirstLoad(false);
+        setIsContentLoading?.(false);
+      } finally {
+        requestRunning.current = false;
+        setIsNextPageLoading(false);
       }
-
-      requestRunning.current = false;
-      setIsNextPageLoading(false);
-      setIsRoot?.(false);
-      setIsInit(false);
-      setIsFirstLoad(false);
-      setIsContentLoading?.(false);
     },
     [
       apiClient,

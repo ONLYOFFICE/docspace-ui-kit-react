@@ -123,135 +123,143 @@ const useRoomsHelper = ({
       requestRunning.current = true;
       setIsNextPageLoading(true);
 
-      let startIndex = sIndex;
+      try {
+        let startIndex = sIndex;
 
-      if (withCreate) {
-        startIndex -= startIndex % 100;
-      }
-
-      const filterValue = searchValue || "";
-
-      let typeFilter: RoomTypeEnum[] | undefined;
-
-      if (roomType || createDefineRoomType) {
-        const types: RoomTypeEnum[] = roomType
-          ? Array.isArray(roomType)
-            ? [...roomType]
-            : [roomType]
-          : [];
-        if (createDefineRoomType && !types.includes(createDefineRoomType)) {
-          types.push(createDefineRoomType);
+        if (withCreate) {
+          startIndex -= startIndex % 100;
         }
-        typeFilter = types.length > 0 ? types : undefined;
-      }
 
-      const res = await roomsApi.getRoomsFolder(
-        typeFilter,
-        undefined,
-        searchArea as unknown as import("@onlyoffice/docspace-api-sdk").SearchArea,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        disableThirdParty ? StorageFilter.Internal : undefined,
-        PAGE_COUNT,
-        startIndex,
-        undefined,
-        undefined,
-        filterValue,
-      );
-      const roomsFromApi = res.data.response!;
+        const filterValue = searchValue || "";
 
-      const { folders, total, count, current } = roomsFromApi;
+        let typeFilter: RoomTypeEnum[] | undefined;
 
-      if (initRef.current) {
-        const { title, id } = current!;
-
-        if (isRoomsOnly) subscribe(id!);
-
-        const breadCrumbs: TBreadCrumb[] = [
-          { label: title!, id: id!, isRoom: true },
-        ];
-
-        if (!isRoomsOnly) breadCrumbs.unshift({ ...getDefaultBreadCrumb(t) });
-
-        onSetBaseFolderPath?.(breadCrumbs);
-
-        setBreadCrumbs?.(breadCrumbs);
-
-        setIsLoading("breadcrumbs", false);
-      }
-
-      const itemList: TSelectorItem[] = convertRoomsToItems(
-        folders ?? [],
-        t,
-      ).filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true));
-
-      setHasNextPage(count === PAGE_COUNT);
-
-      setSelectedItemSecurity?.(current!.security!);
-
-      setSelectedTreeNode?.({
-        ...current!,
-        path: roomsFromApi.pathParts,
-      } as FolderDtoInteger);
-
-      if (firstLoadRef.current || startIndex === 0) {
-        const { security } = current!;
-
-        if (withCreate && security?.Create) {
-          setTotal(total + 1);
-          const createItem: TSelectorItem = {
-            isCreateNewItem: true,
-            label: createDefineRoomLabel ?? t("NewRoom"),
-            id: "create-room-item",
-            key: "create-room-item",
-            hotkey: "r",
-            isRoomsOnly,
-            createDefineRoomType,
-            dropDownItems: createDefineRoomType
-              ? undefined
-              : createDropDownItems,
-
-            onBackClick: () => {
-              setIsRoot?.(true);
-              setSelectedItemType?.(undefined);
-              setBreadCrumbs?.((val) => {
-                const newVal = [...val];
-
-                newVal.pop();
-
-                return newVal;
-              });
-              getRootData?.();
-            },
-          };
-
-          if (createDefineRoomType) {
-            createItem.onCreateClick = () =>
-              addInputItem("", "", createDefineRoomType, createDefineRoomLabel);
+        if (roomType || createDefineRoomType) {
+          const types: RoomTypeEnum[] = roomType
+            ? Array.isArray(roomType)
+              ? [...roomType]
+              : [roomType]
+            : [];
+          if (createDefineRoomType && !types.includes(createDefineRoomType)) {
+            types.push(createDefineRoomType);
           }
-
-          itemList.unshift(createItem);
-        } else {
-          setTotal(total);
+          typeFilter = types.length > 0 ? types : undefined;
         }
-        setItems?.(itemList);
-      } else {
-        setItems?.((prevState) => {
-          if (prevState) return [...prevState, ...itemList];
-          return [...itemList];
-        });
-      }
 
-      requestRunning.current = false;
-      setIsNextPageLoading(false);
-      setIsRoot?.(false);
-      setIsInit(false);
-      setIsFirstLoad(false);
-      setIsContentLoading?.(false);
+        const res = await roomsApi.getRoomsFolder(
+          typeFilter,
+          undefined,
+          searchArea as unknown as import("@onlyoffice/docspace-api-sdk").SearchArea,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          disableThirdParty ? StorageFilter.Internal : undefined,
+          PAGE_COUNT,
+          startIndex,
+          undefined,
+          undefined,
+          filterValue,
+        );
+        const roomsFromApi = res.data.response!;
+
+        const { folders, total, count, current } = roomsFromApi;
+
+        if (initRef.current) {
+          const { title, id } = current!;
+
+          if (isRoomsOnly) subscribe(id!);
+
+          const breadCrumbs: TBreadCrumb[] = [
+            { label: title!, id: id!, isRoom: true },
+          ];
+
+          if (!isRoomsOnly) breadCrumbs.unshift({ ...getDefaultBreadCrumb(t) });
+
+          onSetBaseFolderPath?.(breadCrumbs);
+
+          setBreadCrumbs?.(breadCrumbs);
+
+          setIsLoading("breadcrumbs", false);
+        }
+
+        const itemList: TSelectorItem[] = convertRoomsToItems(
+          folders ?? [],
+          t,
+        ).filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true));
+
+        setHasNextPage(count === PAGE_COUNT);
+
+        setSelectedItemSecurity?.(current!.security!);
+
+        setSelectedTreeNode?.({
+          ...current!,
+          path: roomsFromApi.pathParts,
+        } as FolderDtoInteger);
+
+        if (firstLoadRef.current || startIndex === 0) {
+          const { security } = current!;
+
+          if (withCreate && security?.Create) {
+            setTotal(total + 1);
+            const createItem: TSelectorItem = {
+              isCreateNewItem: true,
+              label: createDefineRoomLabel ?? t("NewRoom"),
+              id: "create-room-item",
+              key: "create-room-item",
+              hotkey: "r",
+              isRoomsOnly,
+              createDefineRoomType,
+              dropDownItems: createDefineRoomType
+                ? undefined
+                : createDropDownItems,
+
+              onBackClick: () => {
+                setIsRoot?.(true);
+                setSelectedItemType?.(undefined);
+                setBreadCrumbs?.((val) => {
+                  const newVal = [...val];
+
+                  newVal.pop();
+
+                  return newVal;
+                });
+                getRootData?.();
+              },
+            };
+
+            if (createDefineRoomType) {
+              createItem.onCreateClick = () =>
+                addInputItem(
+                  "",
+                  "",
+                  createDefineRoomType,
+                  createDefineRoomLabel,
+                );
+            }
+
+            itemList.unshift(createItem);
+          } else {
+            setTotal(total);
+          }
+          setItems?.(itemList);
+        } else {
+          setItems?.((prevState) => {
+            if (prevState) return [...prevState, ...itemList];
+            return [...itemList];
+          });
+        }
+
+        setIsRoot?.(false);
+        setIsInit(false);
+        setIsFirstLoad(false);
+        setIsContentLoading?.(false);
+      } finally {
+        requestRunning.current = false;
+        setIsNextPageLoading(false);
+      }
     },
     [
       roomsApi,

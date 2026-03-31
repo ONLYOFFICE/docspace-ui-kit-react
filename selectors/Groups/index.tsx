@@ -104,9 +104,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   const onSearch = useCallback(
     (value: string, callback?: () => void) => {
       afterSearch.current = true;
-      if (isFirstLoad.current) {
-        isFirstLoad.current = true;
-      } else {
+      if (!isFirstLoad.current) {
         setIsContentLoading(true);
       }
       setSearchValue(() => {
@@ -120,9 +118,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   const onClearSearch = useCallback(
     (callback?: () => void) => {
       afterSearch.current = true;
-      if (isFirstLoad.current) {
-        isFirstLoad.current = true;
-      } else {
+      if (!isFirstLoad.current) {
         if (itemsList.length === 0) {
           setWasEmptyScreen(true);
         }

@@ -643,3 +643,12 @@
   pointer-events: none;
   transition-delay: 0.2s;
 }
+
+.dimmedEmptyScreen {
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+
+  &.dimmed {
+    opacity: 0.5;
+  }
+}

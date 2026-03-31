@@ -45,7 +45,11 @@ import {
   EmptyScreenProvider,
 } from "../contexts/EmptyScreen";
 
-import type { BodyProps, TSelectorEmptyScreen, TSelectorItem } from "../Selector.types";
+import type {
+  BodyProps,
+  TSelectorEmptyScreen,
+  TSelectorItem,
+} from "../Selector.types";
 
 import { InfoBar } from "./InfoBar";
 import { Search } from "./Search";
@@ -80,11 +84,7 @@ const DimmedEmptyScreen = ({
 
   return (
     <div
-      style={{
-        opacity: dimmed ? 0.5 : 1,
-        pointerEvents: "none",
-        transition: "opacity 0.3s ease-in-out",
-      }}
+      className={classNames(styles.dimmedEmptyScreen, dimmed && styles.dimmed)}
     >
       <EmptyScreenProvider {...emptyScreenCtx}>
         <EmptyScreen
