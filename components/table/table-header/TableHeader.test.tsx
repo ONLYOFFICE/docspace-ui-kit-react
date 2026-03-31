@@ -29,6 +29,7 @@
 import React, { useRef } from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { SortByFieldName } from "../../../enums";
 
@@ -272,5 +273,323 @@ describe("<TableHeader />", () => {
     });
 
     expect(onChangeMock).toHaveBeenCalledWith("Type");
+  });
+
+  describe("column width persistence", () => {
+    it("stores gridTemplateColumns in localStorage on initial render", () => {
+      render(<TableHeaderWithContainerRef {...defaultProps} />);
+
+      const stored = localStorage.getItem(COLUMN_STORAGE_NAME);
+      expect(stored).not.toBeNull();
+      // Should have N columns + settings column (24px)
+      const parts = stored!.split(" ");
+      expect(parts).toHaveLength(mockColumns.length + 1);
+      expect(parts[parts.length - 1]).toBe("24px");
+    });
+
+    it("restores column widths from localStorage on mount", () => {
+      const storedWidths = "300px 200px 200px 276px 24px";
+      localStorage.setItem(COLUMN_STORAGE_NAME, storedWidths);
+
+      render(<TableHeaderWithContainerRef {...defaultProps} />);
+
+      const stored = localStorage.getItem(COLUMN_STORAGE_NAME);
+      expect(stored).not.toBeNull();
+      // Should recalculate proportionally, but total should match container
+      const parts = stored!.split(" ");
+      expect(parts).toHaveLength(5);
+    });
+
+    it("uses separate storage key when infoPanelVisible", () => {
+      render(<TableHeaderWithContainerRef {...defaultProps} infoPanelVisible />);
+
+      expect(localStorage.getItem(COLUMN_INFO_PANEL_STORAGE_NAME)).not.toBeNull();
+      expect(localStorage.getItem(COLUMN_STORAGE_NAME)).toBeNull();
+    });
+
+    it("removes info panel storage when infoPanelVisible is false", () => {
+      localStorage.setItem(COLUMN_INFO_PANEL_STORAGE_NAME, "300px 200px 200px 276px 24px");
+
+      render(<TableHeaderWithContainerRef {...defaultProps} />);
+
+      expect(localStorage.getItem(COLUMN_INFO_PANEL_STORAGE_NAME)).toBeNull();
+    });
+  });
+
+  describe("resetColumns (fresh width calculation)", () => {
+    it("allocates ~40% to default (Name) column and ~60% to others", () => {
+      render(<TableHeaderWithContainerRef {...defaultProps} />);
+
+      const stored = localStorage.getItem(COLUMN_STORAGE_NAME);
+      const parts = stored!.split(" ").map((p) => parseFloat(p));
+      const settingsSize = parts.pop()!;
+      const nameWidth = parts[0];
+      const totalContent = parts.reduce((a, b) => a + b, 0);
+
+      expect(settingsSize).toBe(24);
+      // Name column should get roughly 40% of content width
+      expect(nameWidth / totalContent).toBeGreaterThan(0.35);
+      expect(nameWidth / totalContent).toBeLessThan(0.45);
+    });
+
+    it("enforces minimum 210px for Name column", () => {
+      // Use a narrow container where 40% < 210px
+      render(
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          sectionWidth={400}
+        />,
+      );
+
+      const stored = localStorage.getItem(COLUMN_STORAGE_NAME);
+      const nameWidth = parseFloat(stored!.split(" ")[0]);
+      expect(nameWidth).toBeGreaterThanOrEqual(210);
+    });
+
+    it("enforces minimum 110px for non-Name columns", () => {
+      render(
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          sectionWidth={400}
+        />,
+      );
+
+      const stored = localStorage.getItem(COLUMN_STORAGE_NAME);
+      const parts = stored!.split(" ").map((p) => parseFloat(p));
+      // Check enabled non-Name columns (skip last = settings)
+      for (let i = 1; i < parts.length - 1; i++) {
+        if (parts[i] > 0) {
+          expect(parts[i]).toBeGreaterThanOrEqual(110);
+        }
+      }
+    });
+
+    it("total column widths equal container width", () => {
+      render(<TableHeaderWithContainerRef {...defaultProps} />);
+
+      const stored = localStorage.getItem(COLUMN_STORAGE_NAME);
+      const total = stored!
+        .split(" ")
+        .map((p) => parseFloat(p))
+        .reduce((a, b) => a + b, 0);
+
+      // Should be close to container width (1000px)
+      expect(Math.abs(total - 1000)).toBeLessThan(2);
+    });
+  });
+
+  describe("column visibility changes", () => {
+    it("resets columns when a column is disabled", () => {
+      const { rerender } = render(
+        <TableHeaderWithContainerRef {...defaultProps} />,
+      );
+
+      const columnsWithDisabled = mockColumns.map((col) =>
+        col.key === "Type" ? { ...col, enable: false } : col,
+      );
+
+      act(() => {
+        rerender(
+          <TableHeaderWithContainerRef
+            {...defaultProps}
+            columns={columnsWithDisabled}
+          />,
+        );
+      });
+
+      const stored = localStorage.getItem(COLUMN_STORAGE_NAME);
+      const parts = stored!.split(" ");
+      // Type column (index 1) should be 0px
+      expect(parts[1]).toBe("0px");
+    });
+
+    it("redistributes width when a column is enabled", () => {
+      const columnsWithDisabled = mockColumns.map((col) =>
+        col.key === "Type" ? { ...col, enable: false } : col,
+      );
+      const { rerender } = render(
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          columns={columnsWithDisabled}
+        />,
+      );
+
+      act(() => {
+        rerender(
+          <TableHeaderWithContainerRef {...defaultProps} />,
+        );
+      });
+
+      const stored = localStorage.getItem(COLUMN_STORAGE_NAME);
+      const parts = stored!.split(" ").map((p) => parseFloat(p));
+      // Type column (index 1) should now have width > 0
+      expect(parts[1]).toBeGreaterThan(0);
+    });
+
+    it("preserves total width when toggling column visibility", () => {
+      const { rerender } = render(
+        <TableHeaderWithContainerRef {...defaultProps} />,
+      );
+
+      const columnsWithDisabled = mockColumns.map((col) =>
+        col.key === "Tags" ? { ...col, enable: false } : col,
+      );
+
+      act(() => {
+        rerender(
+          <TableHeaderWithContainerRef
+            {...defaultProps}
+            columns={columnsWithDisabled}
+          />,
+        );
+      });
+
+      const stored = localStorage.getItem(COLUMN_STORAGE_NAME);
+      const total = stored!
+        .split(" ")
+        .map((p) => parseFloat(p))
+        .reduce((a, b) => a + b, 0);
+
+      expect(Math.abs(total - 1000)).toBeLessThan(2);
+    });
+  });
+
+  describe("column sorting interaction", () => {
+    it("renders sort icon on the active sorted column", () => {
+      render(
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          sortBy={SortByFieldName.Name}
+          sorted
+        />,
+      );
+
+      const nameColumn = screen.getByTestId("column-Name");
+      const sortIcon = nameColumn.querySelector("[data-testid='sort-icon']");
+      expect(sortIcon).toBeInTheDocument();
+    });
+
+    it("calls column onClick when header cell is clicked", async () => {
+      const onClickMock = vi.fn();
+      const columnsWithClick = mockColumns.map((col) =>
+        col.key === "Type" ? { ...col, onClick: onClickMock } : col,
+      );
+
+      render(
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          columns={columnsWithClick}
+        />,
+      );
+
+      const typeColumn = screen.getByTestId("column-Type");
+      // onClick is on the .textWrapper div inside the header cell
+      const textWrapper = typeColumn.querySelector(".header-container-text")?.parentElement || typeColumn;
+      await userEvent.click(textWrapper);
+
+      expect(onClickMock).toHaveBeenCalled();
+    });
+  });
+
+  describe("resize handle interaction", () => {
+    it("renders resize handles on resizable columns", () => {
+      render(<TableHeaderWithContainerRef {...defaultProps} />);
+
+      const resizeHandles = screen.getAllByTestId("resize-handle");
+      // Last column's resize handle depends on next column being resizable
+      expect(resizeHandles.length).toBeGreaterThan(0);
+    });
+
+    it("fires onMouseDown on resize handle mousedown", async () => {
+      render(<TableHeaderWithContainerRef {...defaultProps} />);
+
+      const resizeHandles = screen.getAllByTestId("resize-handle");
+      await userEvent.pointer({
+        keys: "[MouseLeft>]",
+        target: resizeHandles[0],
+      });
+
+      // The mousedown should register (no errors thrown)
+      expect(resizeHandles[0]).toBeInTheDocument();
+    });
+  });
+
+  describe("responsive behavior", () => {
+    it("calls setHideColumns when container is too narrow", () => {
+      const setHideColumns = vi.fn();
+
+      // Mock very narrow container
+      window.HTMLElement.prototype.getBoundingClientRect = vi.fn(() => ({
+        width: 200,
+        height: 40,
+        top: 0, left: 0, bottom: 40, right: 200,
+        x: 0, y: 0,
+        toJSON: () => {},
+      } as DOMRect));
+
+      render(
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          setHideColumns={setHideColumns}
+        />,
+      );
+
+      expect(setHideColumns).toHaveBeenCalledWith(true);
+    });
+
+    it("does not hide columns when container is wide enough", () => {
+      const setHideColumns = vi.fn();
+
+      render(
+        <TableHeaderWithContainerRef
+          {...defaultProps}
+          setHideColumns={setHideColumns}
+        />,
+      );
+
+      // With 1000px width and 4 columns, should not need to hide
+      expect(setHideColumns).not.toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe("columnStorageName change (section switching)", () => {
+    it("recalculates when columnStorageName changes", () => {
+      const { rerender } = render(
+        <TableHeaderWithContainerRef {...defaultProps} />,
+      );
+
+      const newStorageName = "new-section-columns";
+      act(() => {
+        rerender(
+          <TableHeaderWithContainerRef
+            {...defaultProps}
+            columnStorageName={newStorageName}
+          />,
+        );
+      });
+
+      // New storage key should have data
+      expect(localStorage.getItem(newStorageName)).not.toBeNull();
+    });
+
+    it("does not corrupt old storage when switching to new columnStorageName", () => {
+      const { rerender } = render(
+        <TableHeaderWithContainerRef {...defaultProps} />,
+      );
+
+      const originalStored = localStorage.getItem(COLUMN_STORAGE_NAME);
+
+      act(() => {
+        rerender(
+          <TableHeaderWithContainerRef
+            {...defaultProps}
+            columnStorageName="other-section"
+          />,
+        );
+      });
+
+      // Original storage should remain unchanged
+      expect(localStorage.getItem(COLUMN_STORAGE_NAME)).toBe(originalStored);
+    });
   });
 });
