@@ -86,12 +86,13 @@ export function TanStackTableHeader({
       data-testid="table-header"
     >
       {table.getHeaderGroups().map((headerGroup) =>
-        headerGroup.headers.map((header) => (
+        headerGroup.headers.map((header, idx) => (
           <HeaderCell
             key={header.id}
             header={header}
             activeSortBy={activeSortBy}
             activeSortOrder={activeSortOrder}
+            isLastColumn={idx === headerGroup.headers.length - 1}
           />
         )),
       )}
@@ -113,9 +114,10 @@ interface HeaderCellProps {
   header: Header<unknown, unknown>;
   activeSortBy?: string;
   activeSortOrder?: "ascending" | "descending";
+  isLastColumn?: boolean;
 }
 
-function HeaderCell({ header, activeSortBy, activeSortOrder }: HeaderCellProps) {
+function HeaderCell({ header, activeSortBy, activeSortOrder, isLastColumn }: HeaderCellProps) {
   const meta = header.column.columnDef.meta as
     | Record<string, unknown>
     | undefined;
@@ -183,7 +185,7 @@ function HeaderCell({ header, activeSortBy, activeSortOrder }: HeaderCellProps) 
         </span>
       </div>
 
-      {canResize ? (
+      {canResize && !isLastColumn ? (
         <div
           className={styles.resizeHandle}
           onMouseDown={header.getResizeHandler()}

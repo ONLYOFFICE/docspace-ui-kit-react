@@ -154,11 +154,13 @@
   position: absolute;
   top: 14px;
   inset-inline-end: 0;
-  width: 8px; // wider touch target
+  width: 0;
   height: 10px;
   cursor: ew-resize;
   z-index: 1;
   border-inline-end: var(--header-resize-border);
+  // 8px padding for wider touch target without visual change
+  padding-inline: 4px;
 
   &:hover {
     border-color: var(--header-resize-hover-color);
