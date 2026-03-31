@@ -168,6 +168,7 @@ const useFilesHelper = ({
               toastr.error(error);
 
               requestRunning.current = false;
+              setIsContentLoading?.(false);
               return;
             }
 
@@ -179,6 +180,7 @@ const useFilesHelper = ({
               toastr.error(error);
             }
             requestRunning.current = false;
+            setIsContentLoading?.(false);
             return;
           }
         }
@@ -372,6 +374,7 @@ const useFilesHelper = ({
 
           toastr.error(e as TData);
           requestRunning.current = false;
+          setIsContentLoading?.(false);
           return;
         }
 
@@ -384,6 +387,7 @@ const useFilesHelper = ({
           onSetBaseFolderPath([]);
         }
         setIsFirstLoad(false);
+        setIsContentLoading?.(false);
         toastr.error(e as TData);
       }
     },
