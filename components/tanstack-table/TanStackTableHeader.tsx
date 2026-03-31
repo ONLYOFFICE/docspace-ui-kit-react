@@ -144,6 +144,7 @@ function HeaderCell({ header, activeSortBy, activeSortOrder }: HeaderCellProps) 
     [styles.isActive]: isSorted,
     [styles.isDefault]: isDefault,
     [styles.sortable]: !!sortBy,
+    [styles.sorted]: sortDirection === "desc",
   });
 
   return (
@@ -171,7 +172,9 @@ function HeaderCell({ header, activeSortBy, activeSortOrder }: HeaderCellProps) 
         </div>
         {/* Sort icon: always rendered, visibility controlled by CSS */}
         <span className={styles.sortIcon} data-testid="sort-icon">
-          {sortDirection === "desc" ? "\u2193" : "\u2191"}
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+            <path d="M6 1L10 7H2L6 1Z" />
+          </svg>
         </span>
       </div>
 
