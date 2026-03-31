@@ -24,44 +24,30 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-// Types
-export type {
-  ColumnPersistenceConfig,
-  PersistedColumnState,
-  ColumnPersistenceResult,
-  InfiniteScrollConfig,
-} from "./TanStackTable.types";
-export { TABLE_DEFAULTS } from "./TanStackTable.types";
+import { createContext, useContext } from "react";
 
-// Utils
-export {
-  adaptLegacyColumns,
-  extractVisibility,
-  findDefaultColumnKey,
-} from "./utils/columnDefAdapter";
-export {
-  parseGridTemplateColumns,
-  migrateGridTemplateToSizing,
-  sizingToGridTemplate,
-  isLegacyFormat,
-  readSizingFromStorage,
-  writeSizingToStorage,
-} from "./utils/storageMigration";
+import type { Table } from "@tanstack/react-table";
 
-// Hooks
-export { useColumnPersistence } from "./hooks/useColumnPersistence";
-export { useColumnVisibility } from "./hooks/useColumnVisibility";
-export { useInfiniteScroll } from "./hooks/useInfiniteScroll";
+/**
+ * Context that provides the TanStack Table instance to child components.
+ * The table instance is created in TanStackTableContainer and consumed
+ * by TanStackTableHeader, TanStackTableBody, and TanStackTableRow.
+ */
+// biome-ignore lint: Table<any> is the correct generic here for the context
+const TanStackTableContext = createContext<Table<any> | null>(null);
 
-// Context
-export { TanStackTableProvider, useTanStackTable } from "./TanStackTableContext";
+export const TanStackTableProvider = TanStackTableContext.Provider;
 
-// Components
-export { TanStackTableContainer } from "./TanStackTableContainer";
-export type { TanStackTableContainerProps } from "./TanStackTableContainer";
-export { TanStackTableHeader } from "./TanStackTableHeader";
-export type { TanStackTableHeaderProps } from "./TanStackTableHeader";
-export { TanStackTableBody } from "./TanStackTableBody";
-export type { TanStackTableBodyProps } from "./TanStackTableBody";
-export { TanStackTableRow } from "./TanStackTableRow";
-export type { TanStackTableRowProps } from "./TanStackTableRow";
+/**
+ * Hook to access the TanStack Table instance from context.
+ * Must be used within a TanStackTableContainer.
+ */
+export function useTanStackTable<TData>(): Table<TData> {
+  const table = useContext(TanStackTableContext);
+  if (!table) {
+    throw new Error(
+      "useTanStackTable must be used within a TanStackTableContainer",
+    );
+  }
+  return table as Table<TData>;
+}

@@ -1,0 +1,167 @@
+/*!
+ * (c) Copyright Ascensio System SIA 2009-2026
+ *
+ * This program is a free software product.
+ * You can redistribute it and/or modify it under the terms
+ * of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+ * Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+ * to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+ * any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+ * the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions of the Program must
+ * display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product logo when
+ * distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+ * trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+ * content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+ * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ */
+
+@use "../../styles/variables/colors";
+
+// ===== Container =====
+.tanstackTableContainer {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  user-select: none;
+}
+
+// ===== Header =====
+.tanstackTableHeader {
+  :global(.light) & {
+    --header-border-color: #{colors.$gray-light-mid};
+  }
+
+  :global(.dark) & {
+    --header-border-color: #{colors.$gray-dark-strong};
+  }
+
+  display: grid;
+  position: fixed;
+  z-index: 1;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--header-border-color);
+  height: 40px;
+  align-items: center;
+}
+
+.headerCell {
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.headerItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+}
+
+.textWrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  overflow: hidden;
+  gap: 4px;
+}
+
+.text {
+  font-weight: 600;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sortIcon {
+  flex-shrink: 0;
+  font-size: 10px;
+}
+
+.isActive {
+  .sortIcon {
+    opacity: 1;
+  }
+}
+
+.settingsBlock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+}
+
+// ===== Resize handle =====
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  inset-inline-end: 0;
+  width: 4px;
+  height: 100%;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+  z-index: 1;
+
+  &:hover,
+  &.isResizing {
+    background: colors.$light-blue-main;
+  }
+}
+
+// ===== Body =====
+.tanstackTableBody {
+  display: block;
+  height: 100%;
+  margin-top: 40px; // offset for fixed header
+}
+
+// ===== Row =====
+.tanstackTableRow {
+  :global(.light) & {
+    --row-border-color: #{colors.$gray-light-mid};
+    --row-bg-active: #f3f4f4;
+  }
+
+  :global(.dark) & {
+    --row-border-color: #{colors.$gray-dark-strong};
+    --row-bg-active: #3d3d3d;
+  }
+
+  display: contents;
+
+  :global(.table-container_cell) {
+    border-top: 1px solid var(--row-border-color);
+    margin-top: -1px;
+  }
+
+  &.checked,
+  &.isActive {
+    :global(.table-container_cell) {
+      background: var(--row-bg-active) !important;
+    }
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      :global(.table-container_cell) {
+        cursor: pointer;
+        background: var(--row-bg-active) !important;
+      }
+    }
+  }
+}
