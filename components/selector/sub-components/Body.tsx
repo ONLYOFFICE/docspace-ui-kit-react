@@ -45,7 +45,7 @@ import {
   EmptyScreenProvider,
 } from "../contexts/EmptyScreen";
 
-import type { BodyProps } from "../Selector.types";
+import type { BodyProps, TSelectorEmptyScreen, TSelectorItem } from "../Selector.types";
 
 import { InfoBar } from "./InfoBar";
 import { Search } from "./Search";
@@ -57,6 +57,46 @@ import { Info } from "./Info";
 import { VirtualScroll } from "./VirtualScroll";
 import { Tabs } from "../../tabs";
 import InputItem from "./InputItem";
+
+const DimmedEmptyScreen = ({
+  emptyScreenCtx,
+  wasSearchActive,
+  displayItems,
+  inputItemVisible,
+  hideBackButton,
+}: {
+  emptyScreenCtx: TSelectorEmptyScreen;
+  wasSearchActive: boolean;
+  displayItems: TSelectorItem[];
+  inputItemVisible: boolean;
+  hideBackButton?: boolean;
+}) => {
+  const [dimmed, setDimmed] = React.useState(false);
+
+  React.useEffect(() => {
+    const id = requestAnimationFrame(() => setDimmed(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  return (
+    <div
+      style={{
+        opacity: dimmed ? 0.5 : 1,
+        pointerEvents: "none",
+        transition: "opacity 0.3s ease-in-out",
+      }}
+    >
+      <EmptyScreenProvider {...emptyScreenCtx}>
+        <EmptyScreen
+          withSearch={wasSearchActive}
+          items={displayItems}
+          inputItemVisible={inputItemVisible}
+          hideBackButton={hideBackButton}
+        />
+      </EmptyScreenProvider>
+    </div>
+  );
+};
 
 const CONTAINER_PADDING = 16;
 const HEADER_HEIGHT = 54;
@@ -148,9 +188,6 @@ const Body = ({
   const wasSearchActiveRef = React.useRef(false);
   if (!isContentLoading) {
     wasSearchActiveRef.current = isSearch;
-  }
-
-  if (!isContentLoading) {
     previousItemsRef.current = items;
     previousTotalRef.current = totalItems;
     savedEmptyScreenCtxRef.current = emptyScreenCtx;
@@ -395,22 +432,13 @@ const Body = ({
           hideBackButton={hideBackButton}
         />
       ) : isContentLoading && wasEmptyScreen ? (
-        <div
-          style={{
-            opacity: 0.5,
-            pointerEvents: "none",
-            transition: "opacity 0.3s ease-in-out 0.2s",
-          }}
-        >
-          <EmptyScreenProvider {...savedEmptyScreenCtxRef.current}>
-            <EmptyScreen
-              withSearch={wasSearchActiveRef.current}
-              items={displayItems}
-              inputItemVisible={inputItemVisible}
-              hideBackButton={hideBackButton}
-            />
-          </EmptyScreenProvider>
-        </div>
+        <DimmedEmptyScreen
+          emptyScreenCtx={savedEmptyScreenCtxRef.current}
+          wasSearchActive={wasSearchActiveRef.current}
+          displayItems={displayItems}
+          inputItemVisible={inputItemVisible}
+          hideBackButton={hideBackButton}
+        />
       ) : (
         <div
           style={{

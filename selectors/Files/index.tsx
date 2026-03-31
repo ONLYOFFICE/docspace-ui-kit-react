@@ -633,7 +633,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       setIsFirstLoad,
       setSearchValue,
       setIsContentLoading,
-      items.length,
+      items,
     ],
   );
 

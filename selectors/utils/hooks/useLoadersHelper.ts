@@ -136,9 +136,10 @@ const useLoadersHelper = ({ withInit }: { withInit?: boolean }) => {
             return;
           }
 
-          setTimeout(() => {
+          state.timer = setTimeout(() => {
             if (isMount.current) {
               state.startTime = null;
+              state.timer = null;
               setVisibility(section, false);
             }
           }, MIN_LOADER_TIMER - ms);

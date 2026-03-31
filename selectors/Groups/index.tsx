@@ -72,7 +72,15 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [itemsList, setItemsList] = useState<TSelectorItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<TSelectorItem | null>(null);
-  const [isContentLoading, setIsContentLoading] = useState(false);
+  const [isContentLoading, setIsContentLoadingRaw] = useState(false);
+  const [wasEmptyScreen, setWasEmptyScreen] = useState(false);
+
+  const setIsContentLoading = useCallback((value: boolean) => {
+    setIsContentLoadingRaw(value);
+    if (!value) {
+      setWasEmptyScreen(false);
+    }
+  }, []);
 
   const isFirstLoad = useRef(true);
   const afterSearch = useRef(false);
@@ -106,18 +114,24 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
     callback?.();
   }, []);
 
-  const onClearSearch = useCallback((callback?: () => void) => {
-    afterSearch.current = true;
-    if (isFirstLoad.current) {
-      isFirstLoad.current = true;
-    } else {
-      setIsContentLoading(true);
-    }
-    setSearchValue(() => {
-      return "";
-    });
-    callback?.();
-  }, []);
+  const onClearSearch = useCallback(
+    (callback?: () => void) => {
+      afterSearch.current = true;
+      if (isFirstLoad.current) {
+        isFirstLoad.current = true;
+      } else {
+        if (itemsList.length === 0) {
+          setWasEmptyScreen(true);
+        }
+        setIsContentLoading(true);
+      }
+      setSearchValue(() => {
+        return "";
+      });
+      callback?.();
+    },
+    [setIsContentLoading, itemsList.length],
+  );
 
   const onSubmitAction = useCallback(
     (items: TSelectorItem[]) => {
@@ -211,6 +225,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       loadNextPage={onLoadNextPage}
       isLoading={isFirstLoad.current || isContentLoading}
       isContentLoading={isContentLoading}
+      wasEmptyScreen={wasEmptyScreen}
       searchLoader={<SearchLoader />}
       onSelect={onSelect}
       rowLoader={

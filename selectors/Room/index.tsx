@@ -117,6 +117,16 @@ const RoomSelectorComponent = ({
     showBodyLoader,
   } = React.useContext(LoadersContext);
 
+  const [isContentLoading, setIsContentLoadingRaw] = React.useState(false);
+  const [wasEmptyScreen, setWasEmptyScreen] = React.useState(false);
+
+  const setIsContentLoading = React.useCallback((value: boolean) => {
+    setIsContentLoadingRaw(value);
+    if (!value) {
+      setWasEmptyScreen(false);
+    }
+  }, []);
+
   const [searchValue, setSearchValue] = React.useState(() =>
     withInit ? initSearchValue : "",
   );
@@ -240,14 +250,14 @@ const RoomSelectorComponent = ({
       if (isFirstLoad) {
         setIsFirstLoad(true);
       } else {
-        setIsLoading("body", true);
+        setIsContentLoading(true);
       }
       setSearchValue(() => {
         return value;
       });
       callback?.();
     },
-    [isFirstLoad, setIsFirstLoad, setIsLoading],
+    [isFirstLoad, setIsFirstLoad, setIsContentLoading],
   );
 
   const { subscribe } = useSocketHelper({
@@ -263,14 +273,17 @@ const RoomSelectorComponent = ({
       if (isFirstLoad) {
         setIsFirstLoad(true);
       } else {
-        setIsLoading("body", true);
+        if (items.length === 0) {
+          setWasEmptyScreen(true);
+        }
+        setIsContentLoading(true);
       }
       setSearchValue(() => {
         return "";
       });
       callback?.();
     },
-    [isFirstLoad, setIsFirstLoad, setIsLoading],
+    [isFirstLoad, setIsFirstLoad, setIsContentLoading, items.length],
   );
 
   const { getRoomList: onLoadNextPage } = useRoomsHelper({
@@ -290,6 +303,7 @@ const RoomSelectorComponent = ({
     disableThirdParty,
     searchArea,
     subscribe,
+    setIsContentLoading,
   });
 
   const headerSelectorProps: TSelectorHeader = withHeader
@@ -365,8 +379,9 @@ const RoomSelectorComponent = ({
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
       loadNextPage={onLoadNextPage}
-      isLoading={showBodyLoader}
-      isContentLoading={showBodyLoader && !isFirstLoad}
+      isLoading={showBodyLoader || isContentLoading}
+      isContentLoading={isContentLoading}
+      wasEmptyScreen={wasEmptyScreen}
       disableSubmitButton={isMultiSelect ? !hasSelectionChanged : !selectedItem}
       alwaysShowFooter={sortedItems.length !== 0 || Boolean(searchValue)}
       rowLoader={
