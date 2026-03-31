@@ -331,6 +331,12 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         setSearchValue("");
         // Don't dim when navigating to root
         if (+item.id !== 0) {
+          const hasOnlyServiceItems =
+            items.length === 0 ||
+            (items.length === 1 && items[0]?.isCreateNewItem);
+          if (hasOnlyServiceItems) {
+            setWasEmptyScreen(true);
+          }
           resetContentLoading();
         }
         setIsFirstLoad(true);
@@ -391,6 +397,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       getRootData,
       isFirstLoad,
       isSelectedParentFolder,
+      items,
       setBreadCrumbs,
       setIsFirstLoad,
       setIsSelectedParentFolder,

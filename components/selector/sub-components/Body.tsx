@@ -186,12 +186,14 @@ const Body = ({
 
   // Track whether search was active before content loading started
   const wasSearchActiveRef = React.useRef(false);
-  if (!isContentLoading) {
-    wasSearchActiveRef.current = isSearch;
-    previousItemsRef.current = items;
-    previousTotalRef.current = totalItems;
-    savedEmptyScreenCtxRef.current = emptyScreenCtx;
-  }
+  React.useEffect(() => {
+    if (!isContentLoading) {
+      wasSearchActiveRef.current = isSearch;
+      previousItemsRef.current = items;
+      previousTotalRef.current = totalItems;
+      savedEmptyScreenCtxRef.current = emptyScreenCtx;
+    }
+  }, [isContentLoading, isSearch, items, totalItems, emptyScreenCtx]);
 
   // Use previous items when content is loading and current items are empty
   // but only if EmptyScreen was NOT previously shown (wasEmptyScreen is explicit from parent)
