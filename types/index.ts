@@ -30,11 +30,7 @@ import type {
   GroupDto,
 } from "@onlyoffice/docspace-api-sdk";
 
-export type {
-  EmployeeFullDto,
-  FileDtoInteger,
-  GroupDto,
-}
+export type { EmployeeFullDto, FileDtoInteger, GroupDto };
 
 import type {
   ShareAccessRights,
@@ -108,6 +104,7 @@ export type TFileSecurity = {
   Embed: boolean;
   Vectorization: boolean;
   AskAi?: boolean;
+  UpdateXlsx: boolean;
 };
 
 // Folder security type
@@ -133,6 +130,7 @@ export type TFolderSecurity = {
   Embed: boolean;
   ChangeOwner: boolean;
   IndexExport: boolean;
+  UpdateXlsx: boolean;
 };
 
 // Room security type
