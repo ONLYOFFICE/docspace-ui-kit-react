@@ -143,6 +143,7 @@ function HeaderCell({ header, activeSortBy, activeSortOrder }: HeaderCellProps) 
   const cellClasses = classNames(styles.headerCell, "table-container_header-cell", {
     [styles.isActive]: isSorted,
     [styles.isDefault]: isDefault,
+    [styles.sortable]: !!sortBy,
   });
 
   return (
@@ -158,8 +159,6 @@ function HeaderCell({ header, activeSortBy, activeSortOrder }: HeaderCellProps) 
         <div
           className={styles.textWrapper}
           onClick={handleSortClick}
-          role="button"
-          tabIndex={0}
         >
           <span className={classNames(styles.text, "header-container-text")}>
             {header.isPlaceholder
@@ -169,19 +168,16 @@ function HeaderCell({ header, activeSortBy, activeSortOrder }: HeaderCellProps) 
                   header.getContext(),
                 )}
           </span>
-          {isSorted ? (
-            <span className={styles.sortIcon} data-testid="sort-icon">
-              {sortDirection === "asc" ? " \u2191" : " \u2193"}
-            </span>
-          ) : null}
         </div>
+        {/* Sort icon: always rendered, visibility controlled by CSS */}
+        <span className={styles.sortIcon} data-testid="sort-icon">
+          {sortDirection === "desc" ? "\u2193" : "\u2191"}
+        </span>
       </div>
 
       {canResize ? (
         <div
-          className={classNames(styles.resizeHandle, {
-            [styles.isResizing]: header.column.getIsResizing(),
-          })}
+          className={styles.resizeHandle}
           onMouseDown={header.getResizeHandler()}
           onTouchStart={header.getResizeHandler()}
           data-testid="resize-handle"

@@ -61,82 +61,95 @@
 }
 
 .headerCell {
-  display: flex;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-  user-select: none;
+  :global(.light) & {
+    --header-text-color: #{colors.$gray};
+    --header-text-hover-color: #{colors.$light-gray-dark};
+    --header-resize-border: 2px solid #{colors.$gray-strong};
+    --header-resize-hover-color: #{colors.$light-gray-dark};
+  }
 
-  // Vertical separator line before non-first columns
-  &:not(.isDefault) {
-    &::before {
-      content: "";
-      display: inline-block;
-      width: 1px;
-      height: 10px;
-      background: var(--header-border-color);
-      margin-inline-end: 8px;
-      flex-shrink: 0;
-    }
+  :global(.dark) & {
+    --header-text-color: #{colors.$gray-dark};
+    --header-text-hover-color: #{colors.$white};
+    --header-resize-border: 2px solid #{colors.$gray-dark-strong};
+    --header-resize-hover-color: #{colors.$gray-dark-strong};
+  }
+
+  cursor: default;
+  overflow: hidden;
+  position: relative;
+
+  &.sortable {
+    cursor: pointer;
   }
 }
 
 .headerItem {
-  display: flex;
-  align-items: center;
-  width: 100%;
+  display: grid;
+  grid-template-columns: auto 22px;
+  margin-inline-end: 8px;
   overflow: hidden;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .textWrapper {
   display: flex;
-  align-items: center;
-  cursor: pointer;
   overflow: hidden;
-  gap: 4px;
 }
 
 .text {
   font-weight: 600;
-  font-size: 12px;
+  font-size: 13px;
+  height: 38px;
+  line-height: 38px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--header-text-color);
 }
 
+.sortable .text:hover {
+  color: var(--header-text-hover-color);
+}
+
+// Sort icon: hidden by default, shown on hover or when active
 .sortIcon {
-  flex-shrink: 0;
-  font-size: 10px;
+  display: none;
+  padding-block: 14px;
+  padding-inline: 4px 0;
+  font-size: 12px;
+  color: var(--header-text-color);
+
+  &:hover {
+    color: var(--header-text-hover-color);
+  }
 }
 
-.isActive {
-  .sortIcon {
-    opacity: 1;
-  }
+.headerCell.sortable:hover .sortIcon,
+.headerCell.isActive .sortIcon {
+  display: block;
 }
 
 .settingsBlock {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   width: 24px;
 }
 
-// ===== Resize handle =====
+// ===== Resize handle with separator line =====
 .resizeHandle {
-  position: absolute;
-  top: 0;
-  inset-inline-end: 0;
-  width: 4px;
-  height: 100%;
-  cursor: col-resize;
-  touch-action: none;
-  user-select: none;
+  display: block;
+  cursor: ew-resize;
+  height: 10px;
+  margin-block: 14px 0;
+  margin-inline: auto 0;
   z-index: 1;
+  border-inline-end: var(--header-resize-border);
 
-  &:hover,
-  &.isResizing {
-    background: colors.$light-blue-main;
+  &:hover {
+    border-color: var(--header-resize-hover-color);
   }
 }
 
@@ -158,35 +171,61 @@
     --row-bg-active: #3d3d3d;
   }
 
-  align-items: center;
-  border-bottom: 1px solid var(--row-border-color);
+  // Match old table: cells are grid children, each with border-top
+  :global(.table-container_cell) {
+    display: flex;
+    align-items: center;
+    height: auto;
+    max-height: 48px;
+    border-top: 1px solid var(--row-border-color);
+    margin-top: -1px;
+  }
+
+  // Checkbox wrapper — contains both avatar and checkbox
+  :global(.table-container_row-checkbox-wrapper) {
+    display: flex;
+    min-width: 48px;
+    padding-inline-end: 0;
+  }
 
   // Checkbox hidden by default, shown on hover/check
   :global(.table-container_row-checkbox) {
     display: none;
+    margin-inline-start: -4px;
+    padding-block: 16px;
+    padding-inline: 12px 0;
   }
 
   :global(.table-container_element) {
     display: flex;
   }
 
-  // Context menu button hidden by default
+  // Name link margin
+  :global(.table-cell_group-title) {
+    margin-inline-end: 12px;
+  }
+
+  // Context menu wrapper — always visible (matches old TableRow behavior)
   :global(.table-container_row-context-menu-wrapper) {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    visibility: hidden;
-
-    // Ensure the expand button inside inherits visibility
-    :global(.expandButton) {
-      visibility: inherit;
-    }
+    height: 49px !important;
+    max-height: none !important;
+    box-sizing: border-box;
+    border-top: 1px solid var(--row-border-color);
+    margin-top: -1px;
+    padding-inline-end: 0;
   }
 
   @media (hover: hover) {
     &:hover {
-      background: var(--row-bg-active);
       cursor: pointer;
+
+      :global(.table-container_cell),
+      :global(.table-container_row-context-menu-wrapper) {
+        background: var(--row-bg-active) !important;
+      }
 
       :global(.table-container_row-checkbox) {
         display: block;
@@ -195,16 +234,15 @@
       :global(.table-container_element) {
         display: none;
       }
-
-      :global(.table-container_row-context-menu-wrapper) {
-        visibility: visible;
-      }
     }
   }
 
   // When row is selected
   &:global(.table-row-selected) {
-    background: var(--row-bg-active);
+    :global(.table-container_cell),
+    :global(.table-container_row-context-menu-wrapper) {
+      background: var(--row-bg-active) !important;
+    }
 
     :global(.table-container_row-checkbox) {
       display: block;
@@ -212,10 +250,6 @@
 
     :global(.table-container_element) {
       display: none;
-    }
-
-    :global(.table-container_row-context-menu-wrapper) {
-      visibility: visible;
     }
   }
 }
