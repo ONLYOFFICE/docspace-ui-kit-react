@@ -46,8 +46,12 @@ export interface TanStackTableBodyProps {
   fetchMore?: () => void;
   /** Distance from bottom to trigger loading (default: 300px) */
   loadThreshold?: number;
-  /** Render function for each row */
-  renderRow: (rowIndex: number, style: React.CSSProperties) => React.ReactNode;
+  /** Render function for each row. Must return direct cell elements (no wrapper div)
+   *  — they become CSS grid children of the virtual row container. */
+  renderRow: (rowIndex: number) => React.ReactNode;
+  /** Optional: return extra props (className, onClick, data-testid, etc.)
+   *  to apply to each virtual row container div. */
+  getRowContainerProps?: (rowIndex: number) => Record<string, unknown>;
   /** Total item count (may be larger than data.length for pagination) */
   totalCount?: number;
   /** Additional class name */
@@ -62,6 +66,7 @@ export function TanStackTableBody({
   fetchMore,
   loadThreshold = 300,
   renderRow,
+  getRowContainerProps,
   totalCount,
   className,
 }: TanStackTableBodyProps) {
@@ -130,14 +135,19 @@ export function TanStackTableBody({
             gridTemplateColumns,
           };
 
+          const extraProps = getRowContainerProps?.(virtualRow.index) ?? {};
+
           return (
             <div
               key={virtualRow.key}
-              className="table-list-item window-item"
               data-index={virtualRow.index}
               style={rowStyle}
+              {...extraProps}
+              className={`table-list-item window-item ${
+                (extraProps.className as string) ?? ""
+              }`}
             >
-              {renderRow(virtualRow.index, rowStyle)}
+              {renderRow(virtualRow.index)}
             </div>
           );
         })}
