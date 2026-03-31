@@ -234,6 +234,17 @@
       :global(.table-container_element) {
         display: none;
       }
+
+      // Extend selection beyond table edges (matches old GroupsRow :hover)
+      :global(.table-container_group-title-cell) {
+        margin-inline-start: -24px;
+        padding-inline-start: 24px;
+      }
+
+      :global(.table-container_row-context-menu-wrapper) {
+        margin-inline-end: -20px;
+        padding-inline-end: 20px;
+      }
     }
   }
 
@@ -250,6 +261,17 @@
 
     :global(.table-container_element) {
       display: none;
+    }
+
+    // Extend selection beyond table edges
+    :global(.table-container_group-title-cell) {
+      margin-inline-start: -24px;
+      padding-inline-start: 24px;
+    }
+
+    :global(.table-container_row-context-menu-wrapper) {
+      margin-inline-end: -20px;
+      padding-inline-end: 20px;
     }
   }
 }
