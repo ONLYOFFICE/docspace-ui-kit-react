@@ -76,6 +76,7 @@
 
   cursor: default;
   overflow: hidden;
+  position: relative; // for absolute resize handle
 
   &.sortable {
     cursor: pointer;
@@ -84,8 +85,10 @@
 
 .headerItem {
   display: grid;
-  grid-template-columns: 1fr 22px;
+  grid-template-columns: auto 22px;
   margin-inline-end: 8px;
+  max-width: calc(100% - 8px); // account for resize handle area
+  overflow: hidden;
 }
 
 .textWrapper {
@@ -146,14 +149,14 @@
 }
 
 // ===== Resize handle with separator line =====
-// Positioned in block flow after headerItem; clipped by cell overflow:hidden
-// margin-top:14px places the 10px-tall border-right near vertical center
+// Absolutely positioned at right edge of cell, vertically centered
 .resizeHandle {
-  display: block;
-  cursor: ew-resize;
+  position: absolute;
+  top: 14px;
+  inset-inline-end: 0;
+  width: 8px; // wider touch target
   height: 10px;
-  margin-block: 14px 0;
-  margin-inline: auto 0;
+  cursor: ew-resize;
   z-index: 1;
   border-inline-end: var(--header-resize-border);
 
