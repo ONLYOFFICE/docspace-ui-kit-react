@@ -137,6 +137,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setIsContentLoading(true);
   }, [isFirstLoad, setIsContentLoading]);
 
+  const navigatingRef = React.useRef(false);
   const currentSelectedItemId = React.useRef<undefined | number | string>(
     undefined,
   );
@@ -411,6 +412,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       onSelectItem?.(item);
       if (item.isFolder) {
         if (isDoubleClick) return;
+        if (navigatingRef.current) return;
 
         const isFormRoom = item.roomType === RoomType.FillingFormsRoom;
 
@@ -425,6 +427,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           item.parentId === 0 &&
           (item.rootFolderType === FolderType.VirtualRooms ||
             item.rootFolderType === FolderType.AiAgents);
+
+        navigatingRef.current = true;
 
         if (!isRootSection) {
           resetContentLoading();
@@ -520,6 +524,12 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       resetContentLoading,
     ],
   );
+
+  React.useEffect(() => {
+    if (!isFirstLoad) {
+      navigatingRef.current = false;
+    }
+  }, [isFirstLoad]);
 
   React.useEffect(() => {
     if (!selectedItemId) return;
