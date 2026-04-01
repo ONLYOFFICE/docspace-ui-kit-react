@@ -107,6 +107,7 @@ export function TanStackTableBody({
   const gridTemplateColumns = useMemo(() => {
     const visibleColumns = table.getVisibleLeafColumns();
     const parts = visibleColumns.map((col) => `${col.getSize()}px`);
+    // Context menu / settings column
     parts.push(`${TABLE_DEFAULTS.SETTINGS_COLUMN_SIZE}px`);
     return parts.join(" ");
   }, [table, table.getState().columnSizing, table.getState().columnVisibility]);

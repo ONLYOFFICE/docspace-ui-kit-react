@@ -115,11 +115,55 @@ export function TanStackTableContainer<TData>({
     [onColumnVisibilityChange],
   );
 
+  // Use refs for values needed inside the resize handler to avoid
+  // circular dependency (handler defined before table/containerWidth)
+  const containerWidthRef = useRef(0);
+  // biome-ignore lint: Table<any> needed for ref compatibility across TData generics
+  const tableRef = useRef<ReturnType<typeof useReactTable<any>> | null>(null);
+  const sizingInfoRef = useRef<import("@tanstack/react-table").ColumnSizingInfoState>(
+    {} as import("@tanstack/react-table").ColumnSizingInfoState,
+  );
+
   const handleColumnSizingChange: OnChangeFn<ColumnSizingState> = useCallback(
     (updater) => {
       setColumnSizing((prev) => {
         const next =
           typeof updater === "function" ? updater(prev) : updater;
+
+        // Constrained resize: total data columns must not exceed
+        // containerWidth - SETTINGS_COLUMN_SIZE.
+        const cw = containerWidthRef.current;
+        const t = tableRef.current;
+        if (cw > 0 && t) {
+          const maxDataWidth = cw - TABLE_DEFAULTS.SETTINGS_COLUMN_SIZE;
+          const visibleCols = t.getVisibleLeafColumns();
+          const total = visibleCols.reduce(
+            (sum, col) => sum + (next[col.id] ?? col.getSize()),
+            0,
+          );
+
+          if (total > maxDataWidth) {
+            const overflow = total - maxDataWidth;
+            const resizingId = sizingInfoRef.current.isResizingColumn;
+            const resizingIdx = visibleCols.findIndex(
+              (c) => c.id === resizingId,
+            );
+            const targetIdx =
+              resizingIdx < visibleCols.length - 1
+                ? resizingIdx + 1
+                : resizingIdx - 1;
+
+            if (targetIdx >= 0 && targetIdx < visibleCols.length) {
+              const targetCol = visibleCols[targetIdx];
+              const targetSize =
+                next[targetCol.id] ?? targetCol.getSize();
+              const minSize =
+                targetCol.columnDef.minSize ?? TABLE_DEFAULTS.MIN_COLUMN_SIZE;
+              next[targetCol.id] = Math.max(targetSize - overflow, minSize);
+            }
+          }
+        }
+
         return next;
       });
     },
@@ -167,11 +211,16 @@ export function TanStackTableContainer<TData>({
     enableColumnResizing: true,
   });
 
+  // Keep refs in sync for the constrained resize handler
+  tableRef.current = table;
+  sizingInfoRef.current = columnSizingInfo;
+
   // Measure container width and distribute column sizes proportionally
   // when there's no persisted sizing (first render or after reset)
   const internalRef = useRef<HTMLDivElement>(null);
   const containerRefResolved = (forwardedRef as React.RefObject<HTMLDivElement>) ?? internalRef;
   const [containerWidth, setContainerWidth] = useState(0);
+  containerWidthRef.current = containerWidth;
 
   // Measure container and compute initial column widths
   /** Distribute column widths proportionally to fill the given width */
@@ -255,10 +304,13 @@ export function TanStackTableContainer<TData>({
     return () => ro.disconnect();
   }, []);
 
+  const isResizing = !!columnSizingInfo.isResizingColumn;
+
   const containerClasses = classNames(
     styles.tanstackTableContainer,
     "table-container",
     className,
+    { [styles.isResizing]: isResizing },
   );
 
   const contextValue = useMemo(

@@ -83,6 +83,7 @@ export interface InfiniteScrollConfig {
 export const TABLE_DEFAULTS = {
   MIN_COLUMN_SIZE: 110,
   MIN_NAME_COLUMN_SIZE: 210,
+  /** Settings/context-menu column width */
   SETTINGS_COLUMN_SIZE: 24,
   HEADER_HEIGHT: 40,
   NAME_COLUMN_PERCENT: 40,

@@ -62,6 +62,7 @@ export function TanStackTableHeader({
   const gridTemplateColumns = useMemo(() => {
     const visibleColumns = table.getVisibleLeafColumns();
     const parts = visibleColumns.map((col) => `${col.getSize()}px`);
+    // Settings column: 32px icon area, content right-aligned
     parts.push(`${TABLE_DEFAULTS.SETTINGS_COLUMN_SIZE}px`);
     return parts.join(" ");
   }, [

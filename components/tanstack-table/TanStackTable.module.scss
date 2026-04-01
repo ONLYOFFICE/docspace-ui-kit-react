@@ -34,7 +34,13 @@
   width: 100%;
   max-width: 100%;
   height: 100%;
-  user-select: none;
+
+  // Disable text selection during column resize to prevent accidental selection
+  &.isResizing,
+  &.isResizing * {
+    user-select: none !important;
+    cursor: col-resize !important;
+  }
 }
 
 // ===== Header =====
@@ -55,6 +61,7 @@
   // align-items: normal (default) — cells stretch to fill row height = 39px
   // combined with overflow:hidden on cells, resizeHandle is clipped
   background: var(--header-bg);
+  // Divider per Figma: 1px #ECEEF1 at bottom, inset 20px from edges
   border-bottom: 1px solid var(--header-border-color);
   padding: 0;
 }
@@ -65,6 +72,7 @@
     --header-text-hover-color: #{colors.$light-gray-dark};
     --header-resize-border: 2px solid #{colors.$gray-strong};
     --header-resize-hover-color: #{colors.$light-gray-dark};
+    --header-separator-color: #{colors.$gray-strong};
   }
 
   :global(.dark) & {
@@ -72,6 +80,7 @@
     --header-text-hover-color: #{colors.$white};
     --header-resize-border: 2px solid #{colors.$gray-dark-strong};
     --header-resize-hover-color: #{colors.$gray-dark-strong};
+    --header-separator-color: #{colors.$gray-dark-strong};
   }
 
   cursor: default;
@@ -81,14 +90,19 @@
   &.sortable {
     cursor: pointer;
   }
+
 }
 
 .headerItem {
   display: grid;
   grid-template-columns: auto 22px;
   margin-inline-end: 8px;
-  max-width: calc(100% - 8px); // account for resize handle area
-  overflow: hidden;
+  width: fit-content;
+}
+
+// Non-default columns: small left padding for gap from resize handle separator
+.headerCell:not(.isDefault) .headerItem {
+  padding-inline-start: 8px;
 }
 
 .textWrapper {
@@ -141,11 +155,11 @@
   padding-inline: 4px 0;
 }
 
+// Settings column: icon right-aligned
 .settingsBlock {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  width: 24px;
 }
 
 // ===== Resize handle with separator line =====
@@ -185,33 +199,63 @@
     --row-bg-active: #3d3d3d;
   }
 
-  // Match old table: cells are grid children, each with border-top
+
+  // Match old table: cells with border-top AND border-bottom, overflow hidden
   :global(.table-container_cell) {
     display: flex;
     align-items: center;
     height: auto;
     max-height: 48px;
     border-top: 1px solid var(--row-border-color);
+    border-bottom: 1px solid var(--row-border-color);
     margin-top: -1px;
+    overflow: hidden;
   }
 
   // Checkbox wrapper — contains both avatar and checkbox
+  // Fixed width so toggling doesn't shift text
+  // Hover on THIS element (not entire row) toggles avatar/checkbox
   :global(.table-container_row-checkbox-wrapper) {
     display: flex;
+    align-items: center;
     min-width: 48px;
+    width: 48px;
     padding-inline-end: 0;
-  }
 
-  // Checkbox hidden by default, shown on hover/check
-  :global(.table-container_row-checkbox) {
-    display: none;
-    margin-inline-start: -4px;
-    padding-block: 16px;
-    padding-inline: 12px 0;
-  }
+    // Avatar: left-aligned in wrapper (matches OLD)
+    :global(.table-container_element) {
+      display: flex;
+    }
 
-  :global(.table-container_element) {
-    display: flex;
+    // Checkbox: same position as avatar, hidden by default
+    // padding/margin match OLD TableCell.module.scss
+    :global(.table-container_row-checkbox) {
+      display: none;
+      margin-inline-start: -4px;
+      padding: 16px;
+    }
+
+    // When row is checked: show checkbox, hide avatar
+    &:global(.checked) {
+      :global(.table-container_element) {
+        display: none;
+      }
+      :global(.table-container_row-checkbox) {
+        display: flex;
+      }
+    }
+
+    // Hover on checkbox-wrapper area: show checkbox, hide avatar
+    @media (hover: hover) {
+      &:hover {
+        :global(.table-container_element) {
+          display: none;
+        }
+        :global(.table-container_row-checkbox) {
+          display: flex;
+        }
+      }
+    }
   }
 
   // Name link margin
@@ -228,8 +272,10 @@
     max-height: none !important;
     box-sizing: border-box;
     border-top: 1px solid var(--row-border-color);
+    border-bottom: 1px solid var(--row-border-color);
     margin-top: -1px;
     padding-inline-end: 0;
+    overflow: hidden;
   }
 
   @media (hover: hover) {
@@ -239,14 +285,6 @@
       :global(.table-container_cell),
       :global(.table-container_row-context-menu-wrapper) {
         background: var(--row-bg-active) !important;
-      }
-
-      :global(.table-container_row-checkbox) {
-        display: block;
-      }
-
-      :global(.table-container_element) {
-        display: none;
       }
 
       // Extend selection beyond table edges (matches old GroupsRow :hover)
@@ -262,19 +300,11 @@
     }
   }
 
-  // When row is selected
+  // When row is selected (checked)
   &:global(.table-row-selected) {
     :global(.table-container_cell),
     :global(.table-container_row-context-menu-wrapper) {
       background: var(--row-bg-active) !important;
-    }
-
-    :global(.table-container_row-checkbox) {
-      display: block;
-    }
-
-    :global(.table-container_element) {
-      display: none;
     }
 
     // Extend selection beyond table edges
@@ -289,3 +319,4 @@
     }
   }
 }
+

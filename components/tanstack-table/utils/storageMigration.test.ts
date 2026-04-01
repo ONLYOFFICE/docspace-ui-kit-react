@@ -73,13 +73,20 @@ describe("migrateGridTemplateToSizing", () => {
     });
   });
 
-  it("skips the settings column (24px at end)", () => {
-    const result = migrateGridTemplateToSizing(
+  it("skips the settings column at end (legacy 24px or new 24px)", () => {
+    // Legacy format with 24px settings
+    const result1 = migrateGridTemplateToSizing(
       "400px 300px 24px",
       ["Name", "Type"],
     );
+    expect(result1).toEqual({ Name: 400, Type: 300 });
 
-    expect(result).toEqual({ Name: 400, Type: 300 });
+    // New format with 24px settings
+    const result2 = migrateGridTemplateToSizing(
+      "400px 300px 24px",
+      ["Name", "Type"],
+    );
+    expect(result2).toEqual({ Name: 400, Type: 300 });
   });
 
   it("handles 0px columns (disabled)", () => {
