@@ -96,6 +96,7 @@ export type TFileSecurity = {
   Review: boolean;
   SubmitToFormGallery: boolean;
   StopFilling?: boolean;
+  StartFilling?: boolean;
   ResetFilling?: boolean;
   EditForm: boolean;
   Comment: boolean;
@@ -104,7 +105,7 @@ export type TFileSecurity = {
   Embed: boolean;
   Vectorization: boolean;
   AskAi?: boolean;
-  UpdateXlsx: boolean;
+  UpdateXlsx?: boolean;
 };
 
 // Folder security type
@@ -130,7 +131,7 @@ export type TFolderSecurity = {
   Embed: boolean;
   ChangeOwner: boolean;
   IndexExport: boolean;
-  UpdateXlsx: boolean;
+  UpdateXlsx?: boolean;
 };
 
 // Room security type
@@ -395,6 +396,7 @@ export type TFile = {
   dimensions?: TDimensions;
   editingBy?: Record<string, string>;
   activeEditors?: Record<string, string>;
+  isFillingPreparing?: boolean;
 };
 
 export type TPathParts = {
