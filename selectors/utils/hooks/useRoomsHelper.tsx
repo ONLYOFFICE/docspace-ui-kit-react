@@ -255,10 +255,10 @@ const useRoomsHelper = ({
         setIsRoot?.(false);
         setIsInit(false);
         setIsFirstLoad(false);
-        setIsContentLoading?.(false);
       } finally {
         requestRunning.current = false;
         setIsNextPageLoading(false);
+        setIsContentLoading?.(false);
       }
     },
     [
