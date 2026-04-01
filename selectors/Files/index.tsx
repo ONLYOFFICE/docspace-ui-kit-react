@@ -429,17 +429,9 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         const isAgent =
           item.parentId === 0 && item.rootFolderType === FolderType.AiAgents;
 
-        // Don't dim when clicking on root sections (AI agents, Rooms, etc.)
-        const isRootSection =
-          item.parentId === 0 &&
-          (item.rootFolderType === FolderType.VirtualRooms ||
-            item.rootFolderType === FolderType.AiAgents);
-
         navigatingRef.current = true;
 
-        if (!isRootSection) {
-          resetContentLoading();
-        }
+        resetContentLoading();
         setIsFirstLoad(true);
 
         setBreadCrumbs((value) => [
