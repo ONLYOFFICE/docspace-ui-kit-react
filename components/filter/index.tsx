@@ -458,7 +458,7 @@ const FilterInput = React.memo(
           visible.unshift(groupToMove.id); // Use the actual group ID to maintain type consistency
 
           // Recalculate overflow to make room for the group at position 0
-          while (visible.length > 0 && getVisibleWidth() > availableW) {
+          while (visible.length > 1 && getVisibleWidth() > availableW) {
             const removedId = visible.pop()!;
             const removedGroup = roomGroupsWithIcons.find(
               (g) => g.id === removedId,
@@ -745,7 +745,7 @@ const FilterInput = React.memo(
                         hideCross
                         clickable
                         isActive={String(activeGroupId) === String(group.id)}
-                        className="group-tag-item"
+                        className="group-tag-item group-tag-room"
                         dataTestId={`room_group_tag_${groupId}`}
                       />
                     );
@@ -829,6 +829,7 @@ const FilterInput = React.memo(
                     hideCross
                     clickable
                     forwardedRef={getGroupMeasureRef(g.id)}
+                    className="group-tag-item group-tag-room"
                   />
                 ))}
                 <div
