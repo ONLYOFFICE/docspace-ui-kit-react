@@ -28,14 +28,13 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { Trans, useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
-import { type ChangeWalletServiceStateRequestDto, TenantWalletService } from "@onlyoffice/docspace-api-sdk";
+import {
+  type ChangeWalletServiceStateRequestDto,
+  TenantWalletService,
+} from "@onlyoffice/docspace-api-sdk";
 
 import { toastr } from "../../components/toast";
-import {
-  AI_ENUM,
-  BACKUP_SERVICE,
-  TOTAL_SIZE,
-} from "../constants";
+import { AI_ENUM, BACKUP_SERVICE, TOTAL_SIZE } from "../constants";
 
 const toWalletService = (id: string): TenantWalletService => {
   if (id === BACKUP_SERVICE) return TenantWalletService.Backup;
@@ -159,7 +158,10 @@ const Services = observer(
       }
     }, [initialOpenDialog, updateDialogVisibility, previousStoragePlanSize]);
 
-    const confirmationDialogContent: Record<string, { title: string; body: string | React.ReactNode[] }> = {
+    const confirmationDialogContent: Record<
+      string,
+      { title: string; body: string | React.ReactNode[] }
+    > = {
       [BACKUP_SERVICE]: {
         title: t("Common:Confirmation"),
         body: !isCurrentConfirmState

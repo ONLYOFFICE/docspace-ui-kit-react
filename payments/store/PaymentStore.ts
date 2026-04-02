@@ -209,11 +209,8 @@ class PaymentStore {
 
   configure = (config: TPaymentConfig) => {
     this.language = config.language;
-    this.expandArticle = config.expandArticle;
+
     if (config.logoText !== undefined) this.logoText = config.logoText;
-    if (config.walletHelpUrl !== undefined)
-      this.walletHelpUrl = config.walletHelpUrl;
-    if (config.utcOffset !== undefined) this.utcOffset = config.utcOffset;
     if (config.routes) this.routes = config.routes;
     if (config.user) {
       this._currentUserEmail = config.user.email ?? "";
