@@ -55,7 +55,7 @@ export const getI18NInstance = (lng: string, translations: TTranslations) => {
           return value;
         },
       },
-      ns: ["Common", "Payments", "Services"],
+      ns: ["Common"],
       defaultNS: "Common",
       react: {
         useSuspense: false,
