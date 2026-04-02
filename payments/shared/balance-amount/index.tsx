@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 
 import classNames from "classnames";
 
-import RefreshReactSvgUrl from "../../../assets/icons/payments/16/refresh.react.svg?url";
+import RefreshReactSvgUrl from "../../../assets/icons/16/refresh.react.svg?url";
 
 import { IconButton } from "../../../components/icon-button";
 import { Text } from "../../../components/text";

@@ -38,9 +38,9 @@ import {
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import BalanceAmount from "../../../shared/balance-amount";
 
-import SettingsIcon from "../../../../assets/icons/payments/16/catalog-settings-common.svg";
-import PencilIcon from "../../../../assets/icons/payments/pencil.react.svg?url";
-import RemoveSessionIcon from "../../../../assets/icons/payments/remove.session.svg?url";
+import SettingsIcon from "../../../../assets/icons/16/catalog-settings-common.svg";
+import PencilIcon from "../../../../assets/pencil.react.svg?url";
+import RemoveSessionIcon from "../../../../assets/remove.session.svg?url";
 
 import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./AdditionalStoragePage.module.scss";

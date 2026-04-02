@@ -27,8 +27,8 @@
 import { Text } from "../../../../components/text";
 import modalStyles from "../styles/TopUpAiModal.module.scss";
 import WalletInfo from "./WalletInfo";
-import AiAgents from "../../../../assets/icons/payments/16/ai-agents.svg?url";
 import { useTranslation } from "react-i18next";
+import AiAgents from "../../../../assets/icons/16/ai-agents.svg?url";
 import { useAmountValue } from "../../../wallet/context";
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";

@@ -24,13 +24,13 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import CardIconUrl from "../../../assets/icons/payments/16/card.react.svg";
-import CheckReactSvg from "../../../assets/icons/payments/check.edit.react.svg";
+import CardIconUrl from "../../../assets/icons/16/card.react.svg";
+import CheckReactSvg from "../../../assets/check.edit.react.svg";
 import styles from "./CardInformation.module.scss";
 import classNames from "classnames";
 import { Text } from "../../../components/text";
-import AttentionReactSvg from "../../../assets/icons/payments/plugin.incompatible.react.svg";
 import { useTranslation } from "react-i18next";
+import AttentionReactSvg from "../../../assets/plugin.incompatible.react.svg";
 import { observer } from "mobx-react";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 

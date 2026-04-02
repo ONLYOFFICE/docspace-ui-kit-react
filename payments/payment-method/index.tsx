@@ -33,7 +33,7 @@ import { Button, ButtonSize } from "../../components/button";
 import { toastr } from "../../components/toast";
 import { HelpButton } from "../../components";
 
-import HelpReactSvgUrl from "../../assets/icons/payments/help.react.svg?url";
+import HelpReactSvgUrl from "../../assets/help.react.svg?url";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { toAbsoluteUrl } from "../utils/url";

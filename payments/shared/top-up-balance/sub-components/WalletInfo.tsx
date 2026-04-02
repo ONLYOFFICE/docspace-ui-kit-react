@@ -32,7 +32,7 @@ import { ReactSVG } from "react-svg";
 import { Text } from "../../../../components/text";
 import { Link } from "../../../../components/link";
 
-import WalletReactSvgUrl from "../../../../assets/icons/payments/16/wallet.react.svg?url";
+import WalletReactSvgUrl from "../../../../assets/icons/16/wallet.react.svg?url";
 
 import styles from "../styles/TopUpModal.module.scss";
 

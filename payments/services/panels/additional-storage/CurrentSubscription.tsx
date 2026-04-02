@@ -29,7 +29,7 @@ import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 
 import { Text } from "../../../../components/text";
-import DiskStorageIcon from "../../../../assets/icons/payments/16/catalog-settings-storage-management.svg";
+import DiskStorageIcon from "../../../../assets/icons/16/catalog-settings-storage-management.svg";
 
 import styles from "../../styles/CurrentSubscription.module.scss";
 

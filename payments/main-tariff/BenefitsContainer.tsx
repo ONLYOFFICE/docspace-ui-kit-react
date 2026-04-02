@@ -36,7 +36,7 @@ import type { TTranslation } from "../../utils/common";
 import type { TenantQuotaFeatureDto } from "@onlyoffice/docspace-api-sdk";
 import { FREE_BACKUP } from "../constants";
 
-import HelpReactSvgUrl from "../../assets/icons/payments/help.react.svg?url";
+import HelpReactSvgUrl from "../../assets/help.react.svg?url";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./MainTariff.module.scss";

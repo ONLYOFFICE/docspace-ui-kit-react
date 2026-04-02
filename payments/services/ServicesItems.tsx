@@ -40,7 +40,7 @@ import {
 import { calculateTotalPrice, getConvertedSize } from "../utils/common";
 import type { TServiceFeatureWithPrice } from "../types";
 
-import PriceIcon from "../../assets/icons/payments/16/price.react.svg";
+import PriceIcon from "../../assets/icons/16/price.react.svg";
 
 import styles from "./styles/AdditionalStorage.module.scss";
 import { useServicesActions } from "./hooks/useServicesActions";

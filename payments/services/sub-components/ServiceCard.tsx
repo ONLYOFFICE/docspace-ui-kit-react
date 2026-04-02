@@ -31,8 +31,8 @@ import { Text } from "../../../components/text";
 import { Tooltip } from "../../../components/tooltip";
 import styles from "../styles/AdditionalStorage.module.scss";
 
-import CheckIcon from "../../../assets/icons/payments/16/check.round.react.svg";
-import InfoIcon from "../../../assets/icons/payments/info.outline.react.svg";
+import CheckIcon from "../../../assets/icons/16/check.round.react.svg";
+import InfoIcon from "../../../assets/info.outline.react.svg";
 interface ServiceCardProps {
   onClick: (e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>) => void;
   onToggle: (e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>) => void;

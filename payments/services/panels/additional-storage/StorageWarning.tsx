@@ -28,7 +28,7 @@ import React from "react";
 
 import { observer } from "mobx-react";
 
-import InfoIcon from "../../../../assets/icons/payments/info.outline.react.svg";
+import InfoIcon from "../../../../assets/info.outline.react.svg";
 
 import { Text } from "../../../../components/text";
 import { Loader, LoaderTypes } from "../../../../components/loader";

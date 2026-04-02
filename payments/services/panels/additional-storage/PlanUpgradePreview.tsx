@@ -37,7 +37,7 @@ import { Loader, LoaderTypes } from "../../../../components/loader";
 import { useInterfaceDirection } from "../../../../context/InterfaceDirectionContext";
 import { HelpButton } from "../../../../components/help-button";
 
-import UpgradeWalletIcon from "../../../../assets/icons/payments/16/upgrade.react.svg";
+import UpgradeWalletIcon from "../../../../assets/icons/16/upgrade.react.svg";
 
 import styles from "../../styles/StorageSummary.module.scss";
 import { useServicesActions } from "../../hooks/useServicesActions";

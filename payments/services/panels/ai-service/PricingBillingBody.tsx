@@ -4,9 +4,9 @@ import { Trans } from "react-i18next";
 import { observer } from "mobx-react";
 import { Text } from "../../../../components/text";
 import { HelpButton } from "../../../../components/help-button";
-import HelpReactSvgUrl from "../../../../assets/icons/payments/help.react.svg?url";
-import InputTokensIcon from "../../../../assets/icons/payments/16/input-tokens.svg";
-import OutputTokensIcon from "../../../../assets/icons/payments/16/output-tokens.svg";
+import HelpReactSvgUrl from "../../../../assets/help.react.svg?url";
+import InputTokensIcon from "../../../../assets/icons/16/input-tokens.svg";
+import OutputTokensIcon from "../../../../assets/icons/16/output-tokens.svg";
 
 import styles from "../../styles/BackupServiceDialog.module.scss";
 import type { TAiToolsPrices } from "../../../types";

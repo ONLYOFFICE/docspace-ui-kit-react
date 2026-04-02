@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import HelpReactSvgUrl from "../../assets/icons/payments/help.react.svg?url";
+import HelpReactSvgUrl from "../../assets/help.react.svg?url";
 import React from "react";
 import { Trans } from "react-i18next";
 import { observer } from "mobx-react";

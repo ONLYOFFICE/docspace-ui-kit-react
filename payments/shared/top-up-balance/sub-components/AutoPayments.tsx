@@ -36,7 +36,7 @@ import { TextInput, InputType } from "../../../../components/text-input";
 import { Button, ButtonSize } from "../../../../components/button";
 import type { TenantWalletSettings } from "@onlyoffice/docspace-api-sdk";
 
-import CheckRoundSvg from "../../../../assets/icons/payments/16/check.round.react.svg";
+import CheckRoundSvg from "../../../../assets/icons/16/check.round.react.svg";
 
 import styles from "../styles/AutoPayments.module.scss";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";

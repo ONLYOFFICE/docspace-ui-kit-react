@@ -26,7 +26,7 @@
 
 import { useTranslation } from "react-i18next";
 
-import ClearReactSvgUrl from "../../../../assets/icons/payments/17/clear.react.svg?url";
+import ClearReactSvgUrl from "../../../../assets/icons/17/clear.react.svg?url";
 
 import { Button, ButtonSize } from "../../../../components/button";
 import {

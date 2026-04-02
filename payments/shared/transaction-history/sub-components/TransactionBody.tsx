@@ -32,8 +32,8 @@ import { EmptyView } from "../../../../components/empty-view";
 import { DeviceType } from "../../../../enums";
 import { Consumer } from "../../../../utils";
 
-import NoTransactionsIcon from "../../../../assets/icons/payments/no.transactions.react.svg";
-import NoTransactionsFilterIcon from "../../../../assets/icons/payments/no.transactions.filter.react.svg";
+import NoTransactionsIcon from "../../../../assets/no.transactions.react.svg";
+import NoTransactionsFilterIcon from "../../../../assets/no.transactions.filter.react.svg";
 
 import useViewEffect from "../../../hooks/useViewEffect";
 
