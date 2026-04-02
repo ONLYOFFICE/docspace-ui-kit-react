@@ -26,7 +26,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
 import { Duration } from "luxon";
 
 import { Text } from "../../../../components/text";
@@ -78,7 +78,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   const daysUntilStorageExpiry = paymentStore.tariff.daysUntilStorageExpiry ?? 0;
   const { setPartialUpgradeFee, partialUpgradeFee } = servicesStore;
 
-  const { t } = useTranslation(["Services", "Payments", "Common"]);
+  const t = useCommonTranslation(["Services", "Payments", "Common"]);
   const { isRTL } = useInterfaceDirection();
   const { setIsWaitingCalculation } = usePaymentContext();
   const { calculateDifferenceBetweenPlan, maxStorageLimit } =

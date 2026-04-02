@@ -26,7 +26,7 @@
 
 import React, { useState } from "react";
 import { observer } from "mobx-react";
-import { Trans } from "react-i18next";
+import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 
 import {
   ModalDialog,
@@ -128,10 +128,9 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
             <Text>{t("WantToCancelStoragePlan")}</Text>
             <br />
             <Text as="span">
-              <Trans
-                t={t}
-                ns="Payments"
+              <CommonTrans
                 i18nKey="YourCurrentPlan"
+                namespaces={["Payments"]}
                 values={{
                   amount: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
                   price: formatWalletCurrency(totalPrice, 2),
@@ -143,10 +142,9 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
               />
             </Text>
             <Text>
-              <Trans
-                t={t}
-                ns="Payments"
+              <CommonTrans
                 i18nKey="StorageUsed"
+                namespaces={["Payments"]}
                 values={{
                   amount: getConvertedSize(t, usedTotalStorageSizeCount),
                 }}

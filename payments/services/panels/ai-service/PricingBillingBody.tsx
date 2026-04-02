@@ -1,6 +1,6 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
-import { Trans } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
+import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 import { Text } from "../../../../components/text";
 import { HelpButton } from "../../../../components/help-button";
@@ -46,7 +46,7 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
     minimumOutputPrice,
   } = servicesStore;
 
-  const { t } = useTranslation(["Services", "Common"]);
+  const t = useCommonTranslation(["Services", "Common"]);
 
   const safeFormatAiModelsCurrency = (amount: number) =>
     formatAiModelsCurrency ? formatAiModelsCurrency(amount) : String(amount);
@@ -81,18 +81,16 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                 style={{ height: "15px", margin: "0" }}
                 tooltipContent={
                   <>
-                    <Trans
-                      t={t}
-                      ns="Services"
+                    <CommonTrans
+                      namespaces={["Services"]}
                       i18nKey="AIPricingTokensTooltipInput"
                       components={{
                         1: <strong />,
                       }}
                     />
                     <br />
-                    <Trans
-                      t={t}
-                      ns="Services"
+                    <CommonTrans
+                      namespaces={["Services"]}
                       i18nKey="AIPricingTokensTooltipOutput"
                       components={{
                         1: <strong />,
@@ -110,9 +108,8 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                   <Text fontSize="12px">{t("AIPricingInputTokens")}</Text>
                 </div>
                 <Text fontSize="12px" fontWeight="600">
-                  <Trans
-                    t={t}
-                    ns="Services"
+                  <CommonTrans
+                    namespaces={["Services"]}
                     i18nKey="AIPricingInputTokensPrice"
                     components={{
                       1: (
@@ -135,9 +132,8 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                   <Text fontSize="12px">{t("AIPricingOutputTokens")}</Text>
                 </div>
                 <Text fontSize="12px" fontWeight="600">
-                  <Trans
-                    t={t}
-                    ns="Services"
+                  <CommonTrans
+                    namespaces={["Services"]}
                     i18nKey="AIPricingOutputTokensPrice"
                     components={{
                       1: (
@@ -158,9 +154,8 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
             </div>
 
             <Text className={styles.payForItemTextMuted}>
-              <Trans
-                t={t}
-                ns="Services"
+              <CommonTrans
+                namespaces={["Services"]}
                 i18nKey="AIPricingFeeNoteUsage"
                 components={{
                   1: (
@@ -188,27 +183,24 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                 style={{ height: "15px", margin: "0" }}
                 tooltipContent={
                   <>
-                    <Trans
-                      t={t}
-                      ns="Services"
+                    <CommonTrans
+                      namespaces={["Services"]}
                       i18nKey="AIPricingAdditionalTooltipVectorization"
                       components={{
                         1: <strong />,
                       }}
                     />
                     <br />
-                    <Trans
-                      t={t}
-                      ns="Services"
+                    <CommonTrans
+                      namespaces={["Services"]}
                       i18nKey="AIPricingAdditionalTooltipWebSearch"
                       components={{
                         1: <strong />,
                       }}
                     />
                     <br />
-                    <Trans
-                      t={t}
-                      ns="Services"
+                    <CommonTrans
+                      namespaces={["Services"]}
                       i18nKey="AIPricingAdditionalTooltipWebCrawling"
                       components={{
                         1: <strong />,
@@ -243,9 +235,8 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                   </div>
                   <Text className={styles.pricingRowPrice}>
                     <Text fontWeight="600" as="span">
-                      <Trans
-                        t={t}
-                        ns="Services"
+                      <CommonTrans
+                        namespaces={["Services"]}
                         i18nKey="AIPricingPricePerTokens"
                         components={{
                           1: (
@@ -288,9 +279,8 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                       ) : null}
                     </div>
                     <Text fontSize="12px" fontWeight="600">
-                      <Trans
-                        t={t}
-                        ns="Services"
+                      <CommonTrans
+                        namespaces={["Services"]}
                         i18nKey="AIPricingPricePerRequest"
                         components={{
                           1: (
@@ -321,9 +311,8 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
             </Text>
 
             <Text className={styles.payForItemTextMuted}>
-              <Trans
-                t={t}
-                ns="Services"
+              <CommonTrans
+                namespaces={["Services"]}
                 i18nKey="AIPricingFeeNoteUsage"
                 components={{
                   1: (

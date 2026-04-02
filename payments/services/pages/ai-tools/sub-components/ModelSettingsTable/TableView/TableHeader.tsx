@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../../../../utils/i18n";
 import { observer } from "mobx-react";
 
 import { TableHeader } from "../../../../../../../components/table";
@@ -18,7 +18,7 @@ const ModelSettingsTableHeader = (props: TableHeaderProps) => {
   const servicesStore = useServicesStore();
   const { aiModelsCurrencySymbol } = servicesStore;
 
-  const { t } = useTranslation(["Services"]);
+  const t = useCommonTranslation(["Services"]);
 
   const defaultColumns = [
     {

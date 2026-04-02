@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 import { now, formatDateLocalized } from "../../../../utils/date";
@@ -73,7 +73,7 @@ const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
   const { isRTL } = useInterfaceDirection();
 
   const { setIsWaitingCalculation } = usePaymentContext();
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
   const [isLoading, setIsLoading] = useState(false);
 
   const { calculateDifferenceBetweenPlan } = useServicesActions();

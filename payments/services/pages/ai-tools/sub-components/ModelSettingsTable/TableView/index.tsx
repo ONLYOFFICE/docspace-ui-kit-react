@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 
 import { TableBody, TableContainer } from "../../../../../../../components/table";
 import { Text } from "../../../../../../../components/text";
-import { useTranslation, Trans } from "react-i18next";
+import { CommonTrans } from "../../../../../../../utils/i18n/CommonTrans";
 
 import type { TAiToolsPrices } from "../../../../../../types";
 
@@ -45,8 +45,6 @@ const TableView = (props: ModelSettingsTableViewProps) => {
 
   const models = aiToolsPrices?.chat ?? [];
 
-  const { t } = useTranslation("Services");
-
   const onToggle = async (modelId: string, enabled: boolean) => {
     await setAiModelAvailability(modelId, enabled);
   };
@@ -58,10 +56,9 @@ const TableView = (props: ModelSettingsTableViewProps) => {
   return (
     <div className={styles.tableWrapper}>
       <Text className={styles.introText}>
-        <Trans
-          t={t}
-          ns="Services"
+        <CommonTrans
           i18nKey="AIModelsIntro"
+          namespaces={["Services"]}
           components={{
             1: (
               <Link

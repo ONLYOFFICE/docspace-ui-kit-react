@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
 import { observer } from "mobx-react";
 
 import {
@@ -76,7 +76,7 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
   const { fetchAiServiceBalance, featureCountData, wasFirstAiServiceTopUp } =
     servicesStore;
 
-  const { t } = useTranslation(["Services", "Common", "Payments"]);
+  const t = useCommonTranslation(["Services", "Common", "Payments"]);
 
   const [view, setView] = useState<DialogView>("top-up");
   const [isLoading, setIsLoading] = useState<boolean>(false);

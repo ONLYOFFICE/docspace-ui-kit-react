@@ -25,7 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
+import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
@@ -100,7 +101,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     setPartialUpgradeFee,
   } = servicesStore;
 
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
   const [amount, setAmount] = useState<string>(
     isVisibleWalletSettings
       ? featureCountData.toString()
@@ -429,9 +430,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
               </FieldContainer>
               {!hasMinError ? (
                 <Text className={styles.perStorageInfo} fontSize="12px">
-                  <Trans
-                    t={t}
-                    ns="Payments"
+                  <CommonTrans
+                    namespaces={["Payments"]}
                     i18nKey="PerStorageWitnMinValue"
                     values={{
                       currency: formatWalletCurrency(storagePriceIncrement, 2),

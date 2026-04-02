@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import {
   ModalDialog,
@@ -49,7 +49,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   title,
   onConfirm,
 }) => {
-  const { t } = useTranslation("Common");
+  const t = useCommonTranslation(["Common"]);
 
   const bodyItems = Array.isArray(bodyText) ? bodyText : [bodyText];
 

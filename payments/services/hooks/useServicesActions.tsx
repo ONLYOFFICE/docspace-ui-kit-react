@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import {
@@ -36,7 +36,7 @@ import {
 } from "./resourceUtils";
 
 export const useServicesActions = () => {
-  const { t } = useTranslation(["Payments", "Common", "Services"]);
+  const t = useCommonTranslation(["Payments", "Common", "Services"]);
 
   const paymentStore = usePaymentStore();
   const { walletBalance } = paymentStore;

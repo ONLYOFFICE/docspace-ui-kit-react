@@ -25,7 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState, useEffect } from "react";
-import { useTranslation, Trans } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
+import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
@@ -64,13 +65,13 @@ const BackupPage: React.FC = () => {
   const { usedBackupsCount, isInitServicesData, initServiceData } =
     servicesStore;
 
-  const { t, ready } = useTranslation(["Payments", "Services", "Common"]);
+  const t = useCommonTranslation(["Payments", "Services", "Common"]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
 
-  const shouldShowLoader = !isInitServicesData || !ready;
+  const shouldShowLoader = !isInitServicesData;
 
   useEffect(() => {
     initServiceData(t, BACKUP_SERVICE);
@@ -142,9 +143,8 @@ const BackupPage: React.FC = () => {
         onToggle={handleToggleChange}
         title={
           <Text fontSize="12px" fontWeight={400}>
-            <Trans
-              t={t}
-              ns="Payments"
+            <CommonTrans
+              namespaces={["Payments"]}
               i18nKey="BackupTitle"
               values={{
                 currency: formatWalletCurrency(backupServicePrice, 2),
@@ -222,9 +222,8 @@ const BackupPage: React.FC = () => {
       </div>
       {!isFreeTariff ? (
         <Text className={styles.backupPaidInfo}>
-          <Trans
-            t={t}
-            ns="Services"
+          <CommonTrans
+            namespaces={["Services"]}
             i18nKey="FreeBackupsRenewsDate"
             values={{
               date: formatDateLocalized(

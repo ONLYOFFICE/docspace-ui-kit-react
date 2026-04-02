@@ -25,7 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState, useRef, useEffect } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
+import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
@@ -98,7 +99,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
 
   const { isInitServicesData, initServiceData } = servicesStore;
 
-  const { t, ready } = useTranslation(["Payments", "Common", "Services"]);
+  const t = useCommonTranslation(["Payments", "Common", "Services"]);
   const contextMenuRef = useRef<ContextMenuRefType>(null);
   const [isStorageDialogVisible, setIsStorageDialogVisible] = useState(false);
   const [isCancelDialogVisible, setIsCancelDialogVisible] = useState(false);
@@ -109,7 +110,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
   useEffect(() => {
     initServiceData(t, DISK_STORAGE, STORAGE_ENUM);
   }, []);
-  const shouldShowLoader = !isInitServicesData || !ready;
+  const shouldShowLoader = !isInitServicesData;
 
   useEffect(() => {
     if (previousStoragePlanSize) {
@@ -271,9 +272,8 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
               fractionFontSize="20px"
             />
             <Text fontWeight={700} fontSize="20px">
-              <Trans
-                t={t}
-                ns="Payments"
+              <CommonTrans
+                namespaces={["Payments"]}
                 i18nKey="SizePerMonth"
                 values={{
                   size: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
@@ -311,9 +311,8 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
       {currentStoragePlanSize ? (
         <Text className={styles.renewalText}>
           {isDowngrade ? (
-            <Trans
-              t={t}
-              ns="Payments"
+            <CommonTrans
+              namespaces={["Payments"]}
               i18nKey="SubscriptionAutoRenewedWithUpdate"
               values={{
                 finalDate: storageExpiryDate,
@@ -325,9 +324,8 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
               }}
             />
           ) : (
-            <Trans
-              t={t}
-              ns="Payments"
+            <CommonTrans
+              namespaces={["Payments"]}
               i18nKey={keyProp.tKey}
               values={{
                 finalDate: storageExpiryDate,

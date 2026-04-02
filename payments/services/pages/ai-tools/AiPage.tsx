@@ -25,7 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState, useEffect } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
+import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 import { useNavigate } from "react-router";
 
@@ -99,7 +100,7 @@ const AiPage = (props: AiPageProps) => {
     initServiceData,
   } = servicesStore;
 
-  const { t } = useTranslation("Services");
+  const t = useCommonTranslation(["Services"]);
 
   const [selectedTabId, setSelectedTabId] = useState("usage");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -130,7 +131,7 @@ const AiPage = (props: AiPageProps) => {
     const startTime = Date.now();
     try {
       await Promise.all([
-        fetchAiServiceBalance(true),
+        fetchAiServiceBalance(),
         fetchTransactionHistory(null, null, true, true, "", AI_TOOLS),
       ]);
     } finally {
@@ -185,10 +186,10 @@ const AiPage = (props: AiPageProps) => {
           t("Services:DisableAIToolsConfirm", {
             organizationName: logoText,
           }),
-          <Trans
-            key="DisableBalance"
-            i18nKey="Services:DisableAIToolsConfirmBalance"
-            t={t}
+          <CommonTrans
+            key="DisableAIToolsConfirmBalance"
+            namespaces={["Services"]}
+            i18nKey="DisableAIToolsConfirmBalance"
             values={{
               balance: formatAiServiceCurrency(
                 aiServiceBalance ?? 0,
@@ -325,9 +326,8 @@ const AiPage = (props: AiPageProps) => {
       <div className={styles.lastTopUpRow}>
         {aiServiceLastCreditAmount ? (
           <Text className={styles.lastTopUpLabel}>
-            <Trans
-              t={t}
-              ns="Services"
+            <CommonTrans
+              namespaces={["Services"]}
               i18nKey="LastTopUp"
               components={{
                 1: (

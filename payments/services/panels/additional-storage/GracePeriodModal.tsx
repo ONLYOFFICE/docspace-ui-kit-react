@@ -25,7 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation, Trans } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
+import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 import { useNavigate } from "react-router";
 
@@ -52,7 +53,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
     paymentStore.tariff;
   const { tariffPlanTitle } = paymentStore.paymentQuotas;
 
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
   const navigate = useNavigate();
   const onClick = () => {
     navigate(paymentStore.routes.portalPayments);
@@ -74,10 +75,9 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
         <br />
         <Text fontWeight={600}>{t("Reminder")}</Text>
         <Text as="span" dataTestId="grace_period_info">
-          <Trans
+          <CommonTrans
+            namespaces={["Payments"]}
             i18nKey="GracePeriodActivatedInfo"
-            ns="Payments"
-            t={t}
             values={{
               fromDate: paymentDate,
               byDate: gracePeriodEndDate,

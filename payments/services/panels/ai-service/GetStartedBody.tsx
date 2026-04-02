@@ -1,5 +1,6 @@
 import React from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
+import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 
 import { Text } from "../../../../components/text";
 import { Link } from "../../../../components/link";
@@ -47,7 +48,7 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
   const paymentStore = usePaymentStore();
   const { logoText } = paymentStore;
 
-  const { t } = useTranslation(["Services", "Payments", "Common"]);
+  const t = useCommonTranslation(["Services", "Payments", "Common"]);
 
   const serviceOptions: ServiceOption[] = [
     {
@@ -250,9 +251,8 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
                     <AiVectorizationIcon />
                   </div>
                   <Text fontSize="12px" fontWeight={600} as="span">
-                    <Trans
-                      t={t}
-                      ns="Services"
+                    <CommonTrans
+                      namespaces={["Services"]}
                       i18nKey="AIWhatYouPayForVectorization"
                       components={{
                         1: (

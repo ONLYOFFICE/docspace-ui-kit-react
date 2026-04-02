@@ -26,7 +26,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
 
 import { Text } from "../../../../components/text";
 import DiskStorageIcon from "../../../../assets/icons/16/catalog-settings-storage-management.svg";
@@ -40,7 +40,7 @@ const CurrentSubscription: React.FC = () => {
   const { formatWalletCurrency, storagePriceIncrement } = paymentStore;
   const { currentStoragePlanSize, storageExpiryDate } = paymentStore.tariff;
 
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   const totalPrice =
     (currentStoragePlanSize || 0) * (storagePriceIncrement || 0);

@@ -1,6 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { useTranslation, Trans } from "react-i18next";
+import { useCommonTranslation } from "../../../../../../../utils/i18n";
+import { CommonTrans } from "../../../../../../../utils/i18n/CommonTrans";
 
 import { RowContainer } from "../../../../../../../components/rows";
 import { Text } from "../../../../../../../components/text";
@@ -34,7 +35,7 @@ const RowView = (props: ModelSettingsRowViewProps) => {
   } = servicesStore;
 
   const models = aiToolsPrices?.chat ?? [];
-  const { t } = useTranslation("Services");
+  const t = useCommonTranslation(["Services"]);
 
   const onToggle = async (modelId: string, enabled: boolean) => {
     await setAiModelAvailability(modelId, enabled);
@@ -45,10 +46,9 @@ const RowView = (props: ModelSettingsRowViewProps) => {
   return (
     <div className={styles.rowContainer}>
       <Text className={styles.introText}>
-        <Trans
-          t={t}
-          ns="Services"
+        <CommonTrans
           i18nKey="AIModelsIntro"
+          namespaces={["Services"]}
           components={{
             1: (
               <Link
