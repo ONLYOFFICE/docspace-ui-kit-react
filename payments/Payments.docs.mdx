@@ -1,0 +1,268 @@
+{/*
+(c) Copyright Ascensio System SIA 2009-2026
+
+This program is a free software product.
+You can redistribute it and/or modify it under the terms
+of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+any third-party rights.
+
+This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For details, see
+the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+
+You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+
+The interactive user interfaces in modified source and object code versions of the Program must
+display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+
+Pursuant to Section 7(b) of the License you must retain the original Product logo when
+distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+trademark law for use of our trademarks.
+
+All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+*/}
+
+import { Meta, Story } from "@storybook/addon-docs/blocks";
+import * as PaymentsStories from "./Payments.stories";
+
+<Meta of={PaymentsStories} />
+
+# Payments
+
+Complete billing and subscription management system for DocSpace SaaS.
+Handles tariff plans, wallet operations, payment methods, and service subscriptions — all in one self-contained module.
+
+## Features
+
+- **Tariff management** — View current plan, adjust manager count, upgrade or downgrade with real-time pricing
+- **Wallet** — Portal wallet for paying all services; top-up via Stripe, auto-payment threshold, transaction history with export
+- **Transaction history** — Filterable by date range, type (credit/debit), and contact; exportable as report
+- **Payment method** — Payer information with avatar, linked card status, Stripe customer portal integration
+- **Services** — AI tools, backup, and disk storage with enable/disable toggles, confirmation dialogs, and pricing
+- **Theming** — Full light/dark mode support via CSS custom properties
+
+## Quick start
+
+Every payment page must be wrapped in `PaymentsRoot`, which provides the store context:
+
+```tsx
+import { PaymentsRoot, PaymentDashboard } from "@docspace/ui-kit/payments";
+
+<PaymentsRoot
+  config={{
+    language: "en",
+    routes: {
+      portalPayments: "/portal-settings/payments",
+      services: "/portal-settings/payments/services",
+      aiServices: "/portal-settings/payments/services/ai",
+      backup: "/portal-settings/payments/services/backup",
+      diskStorage: "/portal-settings/payments/services/disk-storage",
+    },
+  }}
+>
+  <PaymentDashboard />
+</PaymentsRoot>;
+```
+
+---
+
+## Main Tariff
+
+Main billing page. Shows the current tariff plan with a pricing slider for adjusting manager count, per-user cost, total price, and upgrade/downgrade actions. Fetches tariff status, portal quotas, and payment plans on mount.
+
+**Non-payer admins:** the pricing slider is disabled and upgrade/downgrade actions are hidden. The page is read-only — only the payer can modify the tariff.
+
+```tsx
+import { PaymentsRoot, PaymentDashboard } from "@docspace/ui-kit/payments";
+
+<PaymentsRoot config={config}>
+  <PaymentDashboard />
+</PaymentsRoot>;
+```
+
+---
+
+## Loading States
+
+Each page has its own skeleton loader shown while fetching data on mount. Use the tabs to preview all four loaders.
+
+<Story of={PaymentsStories.LoadingStates} />
+
+---
+
+## Wallet
+
+Portal wallet — the central balance used to pay for all DocSpace services (AI tools, backup, additional disk storage). When a service is active, its costs are automatically deducted from the wallet balance.
+
+**Non-payer admins:** the top-up button and auto-payment settings are hidden. The page shows balance and transaction history in read-only mode.
+
+<Story of={PaymentsStories.Wallet} />
+
+```tsx
+import { PaymentsRoot, PaymentWallet } from "@docspace/ui-kit/payments";
+
+<PaymentsRoot config={config}>
+  <PaymentWallet showPortalSettingsLoader={false} />
+</PaymentsRoot>;
+```
+
+### Key capabilities
+
+- **Balance display** — Locale-aware currency formatting with manual refresh
+- **Top-up** — One-click deposit via Stripe with amount presets and custom input
+- **Auto-payments** — Configure a threshold so the wallet tops up automatically when the balance falls below it
+- **Transaction history** — Full filtering: by date range, type (all/credit/debit), and participant; export as report. In service pages the history is scoped to the service with date and participant filters only
+- **Service payments** — Wallet funds are used to pay for AI tools usage, backup creation, and additional storage
+
+---
+
+## Payment Method
+
+Payment card and payer management page. Adapts to multiple states:
+
+- **Card linked** — Shows payer details (avatar, name, email), card status (active/warning), and a Stripe portal button (visible only to the portal owner or the payer)
+- **Admin is not payer** — The Stripe customer portal button is hidden; the admin can only view payer info
+- **Payer not found** — If the payer email doesn't match any portal user, a message suggests choosing a new payer (for owners) or contacting the owner (for admins)
+- **No card** — Shows an "Add payment method" button that redirects to card linking
+
+<Story of={PaymentsStories.Method} />
+
+```tsx
+import { PaymentsRoot, PaymentMethod } from "@docspace/ui-kit/payments";
+
+<PaymentsRoot config={config}>
+  <PaymentMethod />
+</PaymentsRoot>;
+```
+
+### Payer management
+
+The payer is the person responsible for billing. Only the portal owner and the current payer have access to the Stripe customer portal, where they can reassign the payer role or manage payment details. Other admins see payer info in read-only mode. When the payer email doesn't match any portal user, the component shows contextual guidance — owners are prompted to choose a new payer, while admins are advised to contact the owner.
+
+---
+
+## Services
+
+Service subscription management with three service cards:
+
+- **AI Tools** — Enable/disable AI models for all portal users, manage AI balance with dedicated top-up, view per-model pricing (input/output tokens)
+- **Backup** — Enable/disable paid backups, view available backup count based on wallet balance
+- **Disk Storage** — Purchase additional storage on top of the base tariff, manage or cancel the subscription
+
+<Story of={PaymentsStories.Services} />
+
+```tsx
+import { PaymentsRoot, PaymentServicesList } from "@docspace/ui-kit/payments";
+
+<PaymentsRoot config={config}>
+  <PaymentServicesList
+    showPortalSettingsLoader={false}
+    getAIConfig={async () => {
+      /* refresh AI config */
+    }}
+  />
+</PaymentsRoot>;
+```
+
+### Service toggle flow
+
+Each service toggle follows a confirmation flow:
+
+1. User clicks toggle or service card
+2. Confirmation dialog explains the consequences
+3. If wallet has insufficient funds or no card linked — top-up modal opens first
+4. Service state is updated via API; if the request fails, the toggle reverts to its previous state
+
+Once a service is paid for, the service card becomes clickable and navigates to a dedicated detail page with usage breakdown, transaction history, and service-specific settings (e.g. AI model configuration, storage subscription management, backup quotas).
+
+---
+
+## AI Tools
+
+Dedicated page for managing the AI tools service. Provides a separate AI credits balance (sub-account of the portal wallet), model configuration, and usage tracking.
+
+### Key features
+
+- **Service toggle** — Enable/disable AI tools for all portal users with a confirmation dialog
+- **AI balance** — Separate credit balance for AI usage with dedicated top-up; low balance indicator when credits are running out
+- **Pricing & billing** — Link to per-model pricing details (input/output tokens, service fee)
+- **Tabbed interface:**
+  - **Usage** — Transaction history scoped to AI tools with date and participant filters
+  - **Model Settings** — Table to configure available AI models (enable/disable individual models)
+- **Last top-up info** — Shows the amount and date of the last credit deposit
+
+---
+
+## Backup
+
+Dedicated page for managing the backup service. Displays free and paid backup quotas, with a toggle to enable/disable paid backups.
+
+### Key features
+
+- **Service toggle** — Enable/disable paid backups with context-specific confirmation (different messages for free vs. paid tariffs)
+- **Free backups** — Monthly free backup count with renewal date (not shown on free tariff)
+- **Paid backups** — Available backup count based on wallet balance and price per backup
+- **Transaction history** — Scoped to backup service with date and participant filters
+- **Top-up prompt** — If the wallet balance is insufficient, prompts to top up before enabling
+
+---
+
+## Disk Storage
+
+Dedicated page for managing additional disk storage purchased on top of the base tariff.
+
+### Key features
+
+- **Subscription card** — Shows current storage plan size and monthly price with edit/cancel options
+- **Edit subscription** — Adjust the amount of additional storage (upgrade or downgrade)
+- **Cancel subscription** — Cancel the additional storage; shows a warning about data implications
+- **Scheduled changes** — Visual indicator when an upgrade, downgrade, or cancellation is scheduled for the next billing cycle
+- **Renewal info** — Different messages for auto-renewal with/without pending changes
+- **Transaction history** — Scoped to storage service with date and participant filters
+
+---
+
+## Configuration reference
+
+### TPaymentConfig
+
+```typescript
+type TPaymentConfig = {
+  language: string; // Locale code ("en", "ru", "de", ...)
+  routes: TPaymentRoutes; // Navigation routes for all pages
+  logoText?: string; // Organization name (shown in AI dialogs)
+  user?: TPaymentUser; // Current user; omit to fetch from API
+};
+```
+
+### TPaymentRoutes
+
+```typescript
+type TPaymentRoutes = {
+  portalPayments: string; // Dashboard route
+  services: string; // Services list route
+  aiServices: string; // AI services detail route
+  backup: string; // Backup service route
+  diskStorage: string; // Storage service route
+};
+```
+
+### TPaymentNavigationEvent
+
+Used by page components to request navigation between payment pages:
+
+```typescript
+type TPaymentNavigationEvent =
+  | { action: "open-main-tariff" }
+  | { action: "open-wallet" }
+  | { action: "open-payment-method" }
+  | { action: "open-services" }
+  | { action: "open-disk-storage" }
+  | { action: "open-ai-services" }
+  | { action: "open-backup" };
+```
+

@@ -54,11 +54,14 @@ export type TApiProvider = {
   apiKey: string;
   socketPath?: string;
   initSocket?: boolean;
+  /** When true, rawApiClient sends Authorization with Bearer prefix (needed in Storybook). */
+  useBearerForRawClient?: boolean;
 };
 
 export const createApiClient = (
   basePath: string,
   apiKey: string,
+  addBearerPrefix = true,
 ) => {
   const instance: AxiosInstance = axios.create({
     baseURL: basePath,
@@ -67,7 +70,7 @@ export const createApiClient = (
     },
   });
 
-  const request = async <T = unknown>(path: string): Promise<T> => {
+  const request = async <T = unknown,>(path: string): Promise<T> => {
     const { data } = await instance.get(path);
     return data;
   };
@@ -109,7 +112,13 @@ export const useApi = () => {
   return context;
 };
 
-const ApiProvider = ({ children, url, apiKey, initSocket = true }: TApiProvider) => {
+const ApiProvider = ({
+  children,
+  url,
+  apiKey,
+  initSocket = true,
+  useBearerForRawClient = false,
+}: TApiProvider) => {
   const value = React.useMemo(() => {
     const authHeader = `Bearer ${apiKey}`;
     const baseOptions = {
@@ -175,3 +184,4 @@ const ApiProvider = ({ children, url, apiKey, initSocket = true }: TApiProvider)
 };
 
 export default ApiProvider;
+

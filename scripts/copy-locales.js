@@ -7,6 +7,7 @@ if (process.env.CI) {
   fs.writeFileSync(path.join(dest, "Common.json"), "{}\n");
   fs.writeFileSync(path.join(dest, "Payments.json"), "{}\n");
   fs.writeFileSync(path.join(dest, "Services.json"), "{}\n");
+  fs.writeFileSync(path.join(dest, "Settings.json"), "{}\n");
   console.log("CI detected - created stub locale files");
   process.exit(0);
 }
@@ -110,12 +111,16 @@ console.log(
   `Copied Common.json (${USED_KEYS.size} keys) for ${langs.length} locales into locales/`,
 );
 
-// --- Copy Payments.json and Services.json (full files, no key filtering) ---
-const EXTRA_NS = ["Payments", "Services"];
+// --- Copy Payments.json, Services.json, Settings.json (full files, no key filtering) ---
+const CLIENT_LOCALES = path.resolve(
+  __dirname,
+  "../../../packages/client/public/locales",
+);
+const EXTRA_NS = ["Payments", "Services", "Settings"];
 for (const ns of EXTRA_NS) {
   let copiedCount = 0;
   for (const lang of langs) {
-    const src = path.join(SOURCE, lang, `${ns}.json`);
+    const src = path.join(CLIENT_LOCALES, lang, `${ns}.json`);
     if (!fs.existsSync(src)) continue;
 
     const destDir = path.join(DEST, lang);
@@ -158,3 +163,4 @@ if (fs.existsSync(FONTS_DIR_SRC)) {
 } else {
   console.error(`fonts directory not found: ${FONTS_DIR_SRC}`);
 }
+

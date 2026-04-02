@@ -29,6 +29,8 @@ import { PaymentStoreProvider } from "./store/PaymentStoreProvider";
 import { ServicesStoreProvider } from "./store/ServicesStoreProvider";
 import type { TPaymentConfig } from "./types";
 
+import styles from "./PaymentsRoot.module.scss";
+
 type PaymentsRootProps = {
   config: TPaymentConfig;
   children: React.ReactNode;
@@ -37,6 +39,7 @@ type PaymentsRootProps = {
 /**
  * Root wrapper for all payment pages.
  * Provides PaymentStore and ServicesStore contexts.
+ * CSS custom properties for theming are defined in PaymentsRoot.module.scss.
  * Client just renders:
  *   <PaymentsRoot config={...}>
  *     <PaymentDashboard />
@@ -45,7 +48,9 @@ type PaymentsRootProps = {
 const PaymentsRoot = ({ config, children }: PaymentsRootProps) => {
   return (
     <PaymentStoreProvider config={config}>
-      <ServicesStoreProvider>{children}</ServicesStoreProvider>
+      <ServicesStoreProvider>
+        <div className={styles.paymentsRoot}>{children}</div>
+      </ServicesStoreProvider>
     </PaymentStoreProvider>
   );
 };
