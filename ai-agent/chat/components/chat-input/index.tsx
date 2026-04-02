@@ -312,7 +312,7 @@ const ChatInput = ({
                 [styles.chatInputTextAreaWrapperFiles]:
                   selectedFiles.length > 0 && !hideAttachments,
               })}
-              placeholder={t("AIChatInput")}
+              placeholder={t("AskAnyQuestion")}
               isChatMode
               fontSize={15}
               isDisabled={!aiReady}
