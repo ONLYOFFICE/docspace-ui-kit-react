@@ -65,12 +65,8 @@ const BackButton = ({
     else window.location.href = "/";
   };
 
-  const icon =
-    currentDeviceType === DeviceType.desktop ? (
-      <ArrowIcon />
-    ) : (
-      <ArrowTabletIcon />
-    );
+  const isDesktop = currentDeviceType === DeviceType.desktop;
+  const icon = isDesktop ? <ArrowIcon /> : <ArrowTabletIcon />;
 
   if (isLoading)
     return (
@@ -85,6 +81,7 @@ const BackButton = ({
     <div
       className={styles.backButton}
       data-show-article={showText ? "true" : "false"}
+      data-arrow-type={isDesktop ? "desktop" : "tablet"}
       onClick={onClickBack}
     >
       <IconButton className={styles.arrowIcon} iconNode={icon} isClickable />
