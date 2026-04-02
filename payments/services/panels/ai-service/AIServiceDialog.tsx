@@ -100,7 +100,7 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
   };
 
   const onFetchHistory = async () => {
-    await fetchTransactionHistory(null, null, true, true, AI_TOOLS);
+    await fetchTransactionHistory(null, null, true, true, "", AI_TOOLS);
   };
 
   const onRedirect = () => {
