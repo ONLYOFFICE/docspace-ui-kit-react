@@ -29,6 +29,7 @@
 
 :global(.light) {
   :local {
+
     .apps,
     .wrapper,
     .hideArticleMenuButton,
@@ -41,15 +42,12 @@
       --files-article-body-download-app-list-text-color: #{colors.$gray};
       --files-article-body-download-app-list-mac-hover-color: #{colors.$dark-black};
       --files-article-body-dev-tools-color: #{colors.$gray-text};
-      --files-article-body-dev-tools-background-color: var(
-        --accent-main,
-        #{colors.$light-blue-main}
-      );
+      --files-article-body-dev-tools-background-color: var(--accent-main,
+        #{colors.$light-blue-main});
       --files-article-body-dev-tools-background-opacity: 0.17;
       --article-catalog-background: #{colors.$gray-light};
       --article-catalog-show-text: #{colors.$light-gray-dark};
-      --article-catalog-header-border-bottom: 1px solid
-        #{colors.$gray-light-mid};
+      --article-catalog-header-border-bottom: 1px solid #{colors.$gray-light-mid};
       --article-client-home-logo-color: #{colors.$black};
       --article-catalog-profile-background: #{colors.$light-gray-hover};
       --article-catalog-profile-border-top: 1px solid #{colors.$gray-light-mid};
@@ -65,6 +63,7 @@
 
 :global(.dark) {
   :local {
+
     .apps,
     .wrapper,
     .hideArticleMenuButton,
@@ -81,12 +80,10 @@
       --files-article-body-dev-tools-background-opacity: 1;
       --article-catalog-background: #{colors.$dark-gray-light};
       --article-catalog-show-text: #{colors.$dark-gray-dark};
-      --article-catalog-header-border-bottom: 1px solid
-        #{colors.$gray-dark-strong};
+      --article-catalog-header-border-bottom: 1px solid #{colors.$gray-dark-strong};
       --article-client-home-logo-color: #{colors.$white};
       --article-catalog-profile-background: #{colors.$light-dark-gray-hover};
-      --article-catalog-profile-border-top: 1px solid
-        #{colors.$gray-dark-strong};
+      --article-catalog-profile-border-top: 1px solid #{colors.$gray-dark-strong};
       --article-catalog-vertical-line: 1px solid #{colors.$gray-dark-strong};
       --article-catalog-background: #{colors.$dark-gray-light};
       --article-desktop-width: 252px;
@@ -116,22 +113,6 @@
     &[data-show-text="true"] {
       margin-inline-start: 8px;
     }
-
-    &[data-with-dev-tools="false"] {
-      margin-bottom: 61px;
-
-      &[data-with-custom-slot="true"] {
-        margin-bottom: 40px;
-      }
-    }
-
-    &[data-with-dev-tools="true"] {
-      margin-bottom: 20px;
-
-      &[data-with-custom-slot="true"] {
-        margin-bottom: 0;
-      }
-    }
   }
 
   @include mixins.mobile {
@@ -159,9 +140,7 @@
   }
 
   .macOsIcon {
-    --icon-button-hover-color: var(
-      --files-article-body-download-app-list-mac-hover-color
-    );
+    --icon-button-hover-color: var(--files-article-body-download-app-list-mac-hover-color);
   }
 
   .linuxIcon {
@@ -173,9 +152,7 @@
   }
 
   .iosIcon {
-    --icon-button-hover-color: var(
-      --files-article-body-download-app-list-mac-hover-color
-    );
+    --icon-button-hover-color: var(--files-article-body-download-app-list-mac-hover-color);
   }
 }
 
@@ -311,6 +288,7 @@
       &[data-show-text="true"] {
         display: flex;
       }
+
       &[data-show-text="false"] {
         display: none;
       }
@@ -332,14 +310,17 @@
       :global(.article-hide-menu-container) {
         display: flex;
       }
+
       :global(.article-show-menu-container) {
         display: none;
       }
     }
+
     &[data-show-text="false"] {
       :global(.article-hide-menu-container) {
         display: none;
       }
+
       :global(.article-show-menu-container) {
         display: flex;
       }
@@ -597,6 +578,10 @@
     :global(.article-body__scrollbar) {
       height: calc(100% - 150px) !important;
 
+      @include mixins.tablet {
+        height: calc(100% - 190px) !important;
+      }
+
       @include mixins.mobile {
         height: 100% !important;
       }
@@ -665,6 +650,7 @@
     p {
       font-size: 13px;
     }
+
     margin-inline-start: 12px;
   }
 
@@ -676,6 +662,7 @@
       margin-top: 5px;
       margin-inline-end: 3px;
     }
+
     &[data-show-article="true"] {
       margin-inline-start: 10px;
       gap: 11px;
