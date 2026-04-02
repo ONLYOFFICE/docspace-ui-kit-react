@@ -26,7 +26,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import { getConvertedSize } from "../../utils/common";
 import QuantityPicker from "../../../components/quantity-picker";
@@ -53,7 +53,7 @@ const SelectUsersCountContainer = observer(
     const { addedManagersCountTitle, usedTotalStorageSizeTitle } =
       store.paymentQuotas;
 
-    const { t } = useTranslation(["Payments", "Common"]);
+    const t = useCommonTranslation(["Payments", "Common"]);
 
     const sizeValue = getConvertedSize(t, allowedStorageSizeByQuota);
     formattedSizeTitle = `${usedTotalStorageSizeTitle ?? ""}: ${sizeValue}${isNeedPlusSign ? "+" : ""}`;

@@ -26,7 +26,8 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
-import { Trans, useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../utils/i18n";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { useNavigate } from "react-router";
 import {
   type ChangeWalletServiceStateRequestDto,
@@ -94,7 +95,7 @@ const Services = observer(
     const { isFreeTariff } = paymentStore.quotas;
     const { logoText } = paymentStore;
 
-    const { t, ready } = useTranslation(["Payments", "Services", "Common"]);
+    const t = useCommonTranslation(["Payments", "Services", "Common"]);
 
     useEffect(() => {
       servicesInit(t);
@@ -128,7 +129,7 @@ const Services = observer(
 
     const [isTopUpBalanceVisible, setIsTopUpBalanceVisible] = useState(false);
 
-    const shouldShowLoader = !isInitServicesPage || !ready;
+    const shouldShowLoader = !isInitServicesPage;
 
     const previousDialogRef = useRef<boolean>(false);
 
@@ -183,10 +184,10 @@ const Services = observer(
               t("Services:DisableAIToolsConfirm", {
                 organizationName: logoText,
               }),
-              <Trans
-                key="DisableBalance"
-                i18nKey="Services:DisableAIToolsConfirmBalance"
-                t={t}
+              <CommonTrans
+                key="DisableAIToolsConfirmBalance"
+                namespaces={["Services"]}
+                i18nKey="DisableAIToolsConfirmBalance"
                 values={{ balance: formatAiServiceCurrency() }}
                 components={{
                   1: <span style={{ fontWeight: 600 }} />,
@@ -199,11 +200,10 @@ const Services = observer(
                 productName: t("Common:ProductName"),
                 organizationName: logoText,
               }),
-              <Trans
-                key="Payments"
-                ns="Payments"
+              <CommonTrans
+                key="CurrentBalance"
+                namespaces={["Payments"]}
                 i18nKey="CurrentBalance"
-                t={t}
                 values={{ balance: formatAiServiceCurrency() }}
                 components={{
                   1: <span style={{ fontWeight: 600 }} />,

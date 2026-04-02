@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../utils/i18n";
 import { Text } from "../../../components/text";
 import { observer } from "mobx-react";
 import { getConvertedSize } from "../../utils/common";
@@ -42,7 +42,7 @@ const SelectTotalSizeContainer = observer(({
   const paymentStore = usePaymentStore();
   const { allowedStorageSizeByQuota } = paymentStore;
 
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   const convertedSize = getConvertedSize(t, allowedStorageSizeByQuota);
 

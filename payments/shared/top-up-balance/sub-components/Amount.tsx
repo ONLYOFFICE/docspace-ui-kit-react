@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
 import { isMobile } from "react-device-detect";
 
 import { TabItem } from "../../../../components/tab-item";
@@ -63,7 +63,7 @@ const Amount = (props: AmountProps) => {
   const { amount, setAmount, hasError, setHasError } = useAmountValue();
   const [hasMinError, setHasMinError] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<string | undefined>();
-  const { t } = useTranslation("Payments");
+  const t = useCommonTranslation(["Payments"]);
 
   const getAmountTabs = () => {
     const amounts = [10, 20, 30, 50, 100];

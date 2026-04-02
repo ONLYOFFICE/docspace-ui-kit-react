@@ -28,7 +28,7 @@ import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 import { Text } from "../../components/text";
 import { observer } from "mobx-react";
-import { Trans } from "react-i18next";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import SelectUsersCountContainer from "./sub-components/SelectUsersCountContainer";
 import TotalTariffContainer from "./sub-components/TotalTariffContainer";
 import ButtonContainer from "./sub-components/ButtonContainer";
@@ -105,18 +105,18 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
         })}
       >
         {isYearTariff ? (
-          <Trans
+          <CommonTrans
             i18nKey="PerUserYear"
-            ns="Common"
+            namespaces={["Common"]}
             values={{ price: formatPaymentCurrency(priceManagerPerMonth) }}
             components={{
               1: <strong key="price-year" style={{ fontSize: "16px" }} />,
             }}
           />
         ) : (
-          <Trans
+          <CommonTrans
             i18nKey="PerUserMonth"
-            ns="Common"
+            namespaces={["Common"]}
             values={{ price: formatPaymentCurrency(priceManagerPerMonth) }}
             components={{
               1: <strong key="price-month" style={{ fontSize: "16px" }} />,

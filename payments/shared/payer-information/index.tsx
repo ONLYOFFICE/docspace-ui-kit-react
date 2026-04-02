@@ -28,11 +28,12 @@ import classNames from "classnames";
 
 import { toAbsoluteUrl } from "../../utils/url";
 import { Text } from "../../../components/text";
-import { useTranslation, Trans } from "react-i18next";
+import { useCommonTranslation } from "../../../utils/i18n";
+import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 import { Avatar, AvatarRole, AvatarSize } from "../../../components/avatar";
 import { toastr } from "../../../components/toast";
-import DefaultUserPhoto from "../../../assets/icons/payments/default_user_photo_size_82-82.png";
+import DefaultUserPhoto from "../../../assets/default_user_photo_size_82-82.png";
 import { Link, LinkTarget } from "../../../components/link";
 import { useState } from "react";
 import { Loader, LoaderTypes } from "../../../components/loader";
@@ -51,7 +52,7 @@ const PayerInformation = () => {
     walletCustomerInfo: payerInfo,
     fetchCustomerInfo,
   } = store.tariff;
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   const [isDisabled, setDisabled] = useState(false);
   const goToStripePortal = () => {
@@ -121,8 +122,8 @@ const PayerInformation = () => {
       <div>
         {isStripePortalAvailable ? (
           <div className={styles.infoContainer}>
-            <Trans
-              t={t}
+            <CommonTrans
+              namespaces={["Payments"]}
               i18nKey="ChooseNewPayerOrRefrashData"
               components={{
                 1: (
@@ -187,21 +188,21 @@ const PayerInformation = () => {
         {payerInfo ? (
           payerInfo.displayName
         ) : (
-          <Trans
-            t={t}
+          <CommonTrans
+            namespaces={["Payments"]}
             i18nKey="UserNotFound"
-            ns="Payments"
             values={{ email: emailUnfoundedUser }}
-          >
-            User
-            <Text
-              as="span"
-              className={styles.refreshData}
-              fontWeight={600}
-              fontSize="14px"
-            />
-            is not found
-          </Trans>
+            components={{
+              1: (
+                <Text
+                  as="span"
+                  className={styles.refreshData}
+                  fontWeight={600}
+                  fontSize="14px"
+                />
+              ),
+            }}
+          />
         )}
       </Text>
     );

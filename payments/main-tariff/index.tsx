@@ -27,7 +27,7 @@
 import React, { useEffect } from "react";
 
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import PaymentsLoader from "../loader";
 
@@ -58,10 +58,9 @@ const SaaSPage = observer(
       init,
     } = paymentStore;
 
-    const { t, ready } = useTranslation(["Payments", "Common", "Settings"]);
+    const t = useCommonTranslation(["Payments", "Common", "Settings"]);
     const shouldShowLoader =
       !isInitPaymentPage ||
-      !ready ||
       isUpdatingTariff ||
       showPortalSettingsLoader;
 
@@ -77,7 +76,7 @@ const SaaSPage = observer(
       } else {
         document.title = title;
       }
-    }, [ready]);
+    }, []);
 
     return shouldShowLoader ? (
       <PaymentsLoader />

@@ -25,7 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import { useTranslation, Trans } from "react-i18next";
+import { useCommonTranslation } from "../../utils/i18n";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
 import {
@@ -61,7 +62,7 @@ const WalletRefilledModal = (props: WalletRefilledModalProps) => {
     formatWalletCurrency,
   } = paymentStore;
 
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -103,10 +104,9 @@ const WalletRefilledModal = (props: WalletRefilledModalProps) => {
             <Text as="span">{t("ToppedUpWallet")}</Text>
             <br />
             <Text as="span">
-              <Trans
-                ns="Payments"
+              <CommonTrans
+                namespaces={["Payments"]}
                 i18nKey="CurrentBalance"
-                t={t}
                 values={{ balance: formattedBalance }}
                 components={{
                   1: <span style={{ fontWeight: 600 }} />,

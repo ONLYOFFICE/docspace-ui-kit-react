@@ -25,7 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation, Trans } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
+import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import classNames from "classnames";
 import { ReactSVG } from "react-svg";
 
@@ -56,7 +57,7 @@ const WalletInfo = (props: WalletInfoProps) => {
     shortView,
     withoutBackground,
   } = props;
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   const keyProp = isBalanceInsufficient
     ? { tKey: "BalanceInsufficient" }
@@ -86,10 +87,9 @@ const WalletInfo = (props: WalletInfoProps) => {
             [styles.warningColor]: isBalanceInsufficient,
           })}
         >
-          <Trans
-            t={t}
+          <CommonTrans
+            namespaces={["Payments"]}
             i18nKey={keyProp.tKey}
-            ns="Payments"
             values={{ balance }}
             components={{
               1: isBalanceInsufficient ? (

@@ -26,7 +26,8 @@
 
 import React, { useState } from "react";
 import { observer } from "mobx-react";
-import { useTranslation, Trans } from "react-i18next";
+import { useCommonTranslation } from "../../utils/i18n";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
 
 import { toAbsoluteUrl } from "../utils/url";
 
@@ -76,7 +77,7 @@ const Wallet = (props: WalletProps) => {
     walletCustomerEmail: payerEmail,
   } = store.tariff;
 
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   const [visible, setVisible] = useState(isVisibleWalletSettings);
   const [isEditAutoPayment, setIsEditAutoPayment] = useState(false);
@@ -172,8 +173,8 @@ const Wallet = (props: WalletProps) => {
             {isPayer ? (
               t("LinkNewCard")
             ) : (
-              <Trans
-                t={t}
+              <CommonTrans
+                namespaces={["Payments"]}
                 i18nKey="LinkNewCardEmail"
                 values={{
                   email: payerEmail,

@@ -24,7 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useTranslation, Trans } from "react-i18next";
+import { useCommonTranslation } from "../../utils/i18n";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
 import { Button, ButtonSize } from "../../components/button";
@@ -46,7 +47,7 @@ const ChangePricingPlanDialog = observer(
     const { managersCount, allowedStorageSizeByQuota } = store;
     const { addedManagersCount, usedTotalStorageSizeCount } = store.quotas;
 
-    const { t, ready } = useTranslation(["DowngradePlanDialog", "Common"]);
+    const t = useCommonTranslation(["DowngradePlanDialog", "Common"]);
 
     const onCloseModal = () => {
       onClose?.();
@@ -57,10 +58,9 @@ const ChangePricingPlanDialog = observer(
 
     const planUsersLimitations = (
       <Text as="span" fontSize="13px">
-        <Trans
-          t={t}
+        <CommonTrans
           i18nKey="PlanUsersLimit"
-          ns="DowngradePlanDialog"
+          namespaces={["DowngradePlanDialog"]}
           values={{
             usersCount: managersCount,
             productName: t("Common:ProductName"),
@@ -75,10 +75,9 @@ const ChangePricingPlanDialog = observer(
 
     const storagePlanLimitations = (
       <Text as="span" fontSize="13px">
-        <Trans
-          t={t}
+        <CommonTrans
           i18nKey="PlanStorageLimit"
-          ns="DowngradePlanDialog"
+          namespaces={["DowngradePlanDialog"]}
           values={{
             storageValue: allowedStorageSpace,
             currentStorageValue: currentStorageSpace,
@@ -96,7 +95,6 @@ const ChangePricingPlanDialog = observer(
         onClose={onCloseModal}
         autoMaxHeight
         isLarge
-        isLoading={!ready}
       >
         <ModalDialog.Header>{t("ChangePricingPlan")}</ModalDialog.Header>
         <ModalDialog.Body>

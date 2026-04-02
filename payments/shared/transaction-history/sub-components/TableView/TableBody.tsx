@@ -26,7 +26,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../../utils/i18n";
 import classNames from "classnames";
 
 import { TableRow, TableCell } from "../../../../../components/table";
@@ -50,7 +50,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({ transaction }) => {
   const paymentStore = usePaymentStore();
   const { language } = paymentStore;
   const { credit, debit, currency } = transaction;
-  const { t } = useTranslation("Payments");
+  const t = useCommonTranslation(["Payments"]);
   const creditValue = credit ?? 0;
   const debitValue = debit ?? 0;
 

@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
 
 import { Button, ButtonSize } from "../../../../components/button";
 import { toastr } from "../../../../components/toast";
@@ -79,7 +79,7 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
 
   const { handleServicesQuotas } = paymentStore;
   const { logoText } = paymentStore;
-  const { t } = useTranslation(["Payments", "Services", "Common"]);
+  const t = useCommonTranslation(["Payments", "Services", "Common"]);
 
   const { amount, isBalanceInsufficient, hasError } = useAmountValue();
 

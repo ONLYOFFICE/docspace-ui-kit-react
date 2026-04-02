@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { Trans } from "react-i18next";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
 import { Text } from "../../components/text";
@@ -58,9 +58,9 @@ const BenefitsContainer = observer(({ t }: { t: TTranslation }) => {
         offsetRight={0}
         iconName={HelpReactSvgUrl}
         tooltipContent={
-          <Trans
+          <CommonTrans
             i18nKey="NeedMoreGoToServices"
-            ns="Payments"
+            namespaces={["Payments"]}
             components={{
               1: (
                 <Link

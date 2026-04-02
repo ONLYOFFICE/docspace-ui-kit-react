@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
 import { observer } from "mobx-react";
 
 import { EmptyView } from "../../../../components/empty-view";
@@ -61,7 +61,7 @@ const TransactionBody = ({
     currentDeviceType: currentDeviceType!,
   });
 
-  const { t } = useTranslation(["Payments", "Settings"]);
+  const t = useCommonTranslation(["Payments", "Settings"]);
 
   const icon = hasAppliedDateFilter ? (
     <NoTransactionsFilterIcon />

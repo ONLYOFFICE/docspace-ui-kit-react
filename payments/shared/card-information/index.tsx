@@ -29,8 +29,8 @@ import CheckReactSvg from "../../../assets/check.edit.react.svg";
 import styles from "./CardInformation.module.scss";
 import classNames from "classnames";
 import { Text } from "../../../components/text";
-import { useTranslation } from "react-i18next";
 import AttentionReactSvg from "../../../assets/plugin.incompatible.react.svg";
+import { useCommonTranslation } from "../../../utils/i18n";
 import { observer } from "mobx-react";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
@@ -45,7 +45,7 @@ const CardInfoComponent = ({
 }: CardInfoComponentProps) => {
   const store = usePaymentStore();
   const { walletCustomerStatusNotActive } = store.tariff;
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   return (
     <div

@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { Text } from "../../components/text";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../utils/i18n";
 import { observer } from "mobx-react";
 import type { TenantQuotaFeatureDto } from "@onlyoffice/docspace-api-sdk";
 import { PortalFeaturesLimitations } from "../../enums";
@@ -35,7 +35,7 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./MainTariff.module.scss";
 
 const CurrentTariffContainer = observer(({ style }: { style?: React.CSSProperties }) => {
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
   const store = usePaymentStore();
   const { quotaCharacteristics } = store.quotas;
 

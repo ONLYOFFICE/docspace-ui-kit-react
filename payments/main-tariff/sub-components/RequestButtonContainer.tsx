@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../utils/i18n";
 import { Button, ButtonSize } from "../../../components/button";
 import { observer } from "mobx-react";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
@@ -42,7 +42,7 @@ const RequestButtonContainer = observer(
     const { isLoading } = paymentStore;
 
     const [isVisibleDialog, setIsVisibleDialog] = useState(false);
-    const { t } = useTranslation(["Common"]);
+    const t = useCommonTranslation(["Common"]);
 
     const toDoRequest = () => {
       setIsVisibleDialog(true);

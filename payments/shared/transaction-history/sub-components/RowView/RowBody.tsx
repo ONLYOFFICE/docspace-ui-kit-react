@@ -26,7 +26,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../../utils/i18n";
 import classNames from "classnames";
 
 import { Text } from "../../../../../components/text";
@@ -54,7 +54,7 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
   const paymentStore = usePaymentStore();
   const { language } = paymentStore;
   const { credit, debit, currency, date } = transaction;
-  const { t } = useTranslation("Payments");
+  const t = useCommonTranslation(["Payments"]);
   const creditValue = credit ?? 0;
   const debitValue = debit ?? 0;
 

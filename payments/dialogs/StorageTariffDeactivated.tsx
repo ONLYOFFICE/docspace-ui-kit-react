@@ -24,7 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useTranslation, Trans } from "react-i18next";
+import { useCommonTranslation } from "../../utils/i18n";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
 import { Button, ButtonSize } from "../../components/button";
@@ -66,7 +67,7 @@ const StorageTariffDeactivated = observer(
       isStorageTariffLimit,
     } = store.quotas;
 
-    const { t, ready } = useTranslation(["Payments", "Services", "Common"]);
+    const t = useCommonTranslation(["Payments", "Services", "Common"]);
 
     const totalPrice = calculateTotalPrice(
       previousStoragePlanSize,
@@ -94,7 +95,6 @@ const StorageTariffDeactivated = observer(
         visible={visible}
         onClose={onCloseModal}
         autoMaxHeight
-        isLoading={!ready}
         displayType={ModalDialogType.modal}
         isLarge
       >
@@ -107,10 +107,9 @@ const StorageTariffDeactivated = observer(
           <Text fontWeight={600}>{t("StorageTariffDeactivated")}</Text>
           <br />
           <Text as="span">
-            <Trans
-              t={t}
-              ns="Payments"
+            <CommonTrans
               i18nKey="PreviousPlan"
+              namespaces={["Payments"]}
               values={{
                 amount: `${previousStoragePlanSize} ${t("Common:Gigabyte")}`,
                 price: formatWalletCurrency(totalPrice, 2),
@@ -122,10 +121,9 @@ const StorageTariffDeactivated = observer(
             />
           </Text>
           <Text>
-            <Trans
-              t={t}
-              ns="Payments"
+            <CommonTrans
               i18nKey="StorageUsed"
+              namespaces={["Payments"]}
               values={{
                 amount: getConvertedSize(t, usedTotalStorageSizeCount!),
               }}
@@ -135,10 +133,9 @@ const StorageTariffDeactivated = observer(
             />
           </Text>
           <Text>
-            <Trans
-              t={t}
-              ns="Payments"
+            <CommonTrans
               i18nKey="AvailableLimit"
+              namespaces={["Payments"]}
               values={{
                 amount: getConvertedSize(t, maxTotalSizeByQuota!),
               }}

@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../utils/i18n";
 import { observer } from "mobx-react";
 
 import { Text } from "../../components/text";
@@ -51,7 +51,7 @@ interface PaymentMethodProps {
 const PaymentMethod: React.FC<PaymentMethodProps> = ({
   showPortalSettingsLoader,
 }) => {
-  const { t, ready } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
   const paymentStore = usePaymentStore();
 
   const { paymentMethodInit } = paymentStore;
@@ -69,9 +69,10 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     isShowStorageTariffDeactivatedModal,
   } = paymentStore;
 
-  const { walletCustomerStatusNotActive, walletCustomerEmail } = paymentStore.tariff;
+  const { walletCustomerStatusNotActive, walletCustomerEmail } =
+    paymentStore.tariff;
 
-  if (!isPaymentMethodInit || !ready || showPortalSettingsLoader)
+  if (!isPaymentMethodInit || showPortalSettingsLoader)
     return <PaymentMethodLoader />;
 
   const goToStripePortal = () => {

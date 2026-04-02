@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../utils/i18n";
 import { observer } from "mobx-react";
 
 import {
@@ -75,7 +75,7 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
   const { walletCustomerStatusNotActive, walletCustomerEmail } =
     store.tariff;
 
-  const { t } = useTranslation(["Payments", "Services", "Common"]);
+  const t = useCommonTranslation(["Payments", "Services", "Common"]);
 
   const isDisabled = (isLoading || walletCustomerStatusNotActive) ?? false;
 

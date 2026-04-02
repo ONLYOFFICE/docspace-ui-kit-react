@@ -25,7 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../utils/i18n";
+import type { TTranslation } from "../../utils/common";
 import { observer } from "mobx-react";
 
 import { FieldContainer } from "../../components/field-container";
@@ -53,7 +54,7 @@ const SalesDepartmentRequestDialog = observer(
     const paymentStore = usePaymentStore();
     const { sendPaymentRequest } = paymentStore;
 
-    const { t, ready } = useTranslation([
+    const t = useCommonTranslation([
       "SalesDepartmentRequestDialog",
       "Common",
       "SMTPSettings",
@@ -109,7 +110,7 @@ const SalesDepartmentRequestDialog = observer(
 
       setIsLoading(true);
 
-      await sendPaymentRequest(email, name, description, t);
+      await sendPaymentRequest(email, name, description, t as TTranslation);
 
       onClose?.();
     };
@@ -157,7 +158,6 @@ const SalesDepartmentRequestDialog = observer(
         visible={visible}
         onClose={onCloseModal}
         autoMaxHeight
-        isLoading={!ready}
         displayType={ModalDialogType.modal}
       >
         <ModalDialog.Header>

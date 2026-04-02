@@ -26,7 +26,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import { Text } from "../../../components/text";
 import { Link } from "../../../components/link";
@@ -56,7 +56,7 @@ const AutoPaymentInfo = (props: AutoPaymentInfoProps) => {
   const minBalance = autoPayments?.minBalance ?? 0;
   const upToBalance = autoPayments?.upToBalance ?? 0;
 
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   if (
     !isAutoPaymentExist ||

@@ -26,7 +26,7 @@
 
 import React, { useEffect } from "react";
 import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 
@@ -47,9 +47,9 @@ const Wallet = observer((props: WalletProps) => {
   const { isInitWalletPage, isShowStorageTariffDeactivatedModal, walletInit } =
     paymentStore;
 
-  const { t, ready } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
-  const shouldShowLoader = !isInitWalletPage || !ready;
+  const shouldShowLoader = !isInitWalletPage;
 
   useEffect(() => {
     walletInit(t);

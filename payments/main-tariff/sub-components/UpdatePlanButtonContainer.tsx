@@ -26,7 +26,7 @@
 
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
-import { Trans } from "react-i18next";
+import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import styled from "styled-components";
 
 import { Button, ButtonSize } from "../../../components/button";
@@ -359,9 +359,9 @@ const UpdatePlanButtonContainer = ({
           <ModalDialog.Body>
             <StyledModalBody>
               <Text>
-                <Trans
+                <CommonTrans
                   i18nKey="SwitchPlan"
-                  ns="Payments"
+                  namespaces={["Payments"]}
                   values={{ planName: tariffPlanTitle }}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
@@ -369,9 +369,9 @@ const UpdatePlanButtonContainer = ({
                 />
               </Text>
               <Text>
-                <Trans
+                <CommonTrans
                   i18nKey="ChargeAmount"
-                  ns="Payments"
+                  namespaces={["Payments"]}
                   values={{ price: formatPaymentCurrency(totalPrice) }}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
@@ -379,9 +379,9 @@ const UpdatePlanButtonContainer = ({
                 />
               </Text>
               <Text className="text-warning">
-                <Trans
+                <CommonTrans
                   i18nKey="ActionCannotBeUndone"
-                  ns="Payments"
+                  namespaces={["Payments"]}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
                   }}

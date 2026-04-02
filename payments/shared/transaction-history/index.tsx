@@ -25,7 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState, useMemo } from "react";
-import { useTranslation, Trans } from "react-i18next";
+import { useCommonTranslation } from "../../../utils/i18n";
+import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 import type { DateTime } from "luxon";
@@ -181,7 +182,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 
   const { isNotPaidPeriod } = store.tariff;
 
-  const { t } = useTranslation(["Payments", "Settings"]);
+  const t = useCommonTranslation(["Payments", "Settings"]);
 
   const typeOfHistoty: TOption[] = [
     {
@@ -523,10 +524,9 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 
   const datesComponent = (
     <div className={styles.transactionDates}>
-      <Trans
+      <CommonTrans
+        namespaces={["Payments"]}
         i18nKey="FromTo"
-        ns="Payments"
-        t={t}
         components={{
           1: (
             <DatePicker

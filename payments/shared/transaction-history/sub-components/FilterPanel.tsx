@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
 
 import ClearReactSvgUrl from "../../../../assets/icons/17/clear.react.svg?url";
 
@@ -75,7 +75,7 @@ const FilterPanel = ({
   shouldShowClearButton,
   hideTypeFilter,
 }: FilterPanelProps) => {
-  const { t } = useTranslation(["Payments", "Settings"]);
+  const t = useCommonTranslation(["Payments", "Settings"]);
   return (
     <ModalDialog
       visible={isFilterDialogVisible}

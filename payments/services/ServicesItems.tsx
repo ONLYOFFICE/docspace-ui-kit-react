@@ -27,7 +27,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
-import { Trans } from "react-i18next";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
 
 import { Text } from "../../components/text";
 import {
@@ -104,10 +104,9 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   const { t } = useServicesActions();
 
   const permissionTooltipText = (
-    <Trans
-      t={t}
+    <CommonTrans
+      namespaces={["Services"]}
       i18nKey="InsufficientPermissionsMessage"
-      ns="Services"
       values={{
         payerContact:
           (walletCustomerInfo as { displayName?: string })?.displayName ||

@@ -26,7 +26,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import { Trans } from "react-i18next";
+import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { Text } from "../../../components/text";
 import { observer } from "mobx-react";
 import type { TTranslation } from "../../../utils/common";
@@ -63,16 +63,14 @@ const TotalTariffContainer = observer(({
             fontWeight={600}
             className={styles.totalTariffDescription}
           >
-            <Trans i18nKey="BusinessRequestDescription" ns="Payments">
-              {{ peopleNumber: maxAvailableManagersCount }}
-            </Trans>
+            <CommonTrans i18nKey="BusinessRequestDescription" namespaces={["Payments"]} values={{ peopleNumber: maxAvailableManagersCount }} />
           </Text>
         ) : (
           <Text fontWeight={600} fontSize="16px">
             {isYearTariff ? (
-              <Trans
+              <CommonTrans
                 i18nKey="TotalPricePerYear"
-                ns="Payments"
+                namespaces={["Payments"]}
                 values={{ price: formatPaymentCurrency(totalPrice) }}
                 components={{
                   2: <span key="large-font-year" className={styles.largerFontSize} />,
@@ -80,9 +78,9 @@ const TotalTariffContainer = observer(({
                 }}
               />
             ) : (
-              <Trans
+              <CommonTrans
                 i18nKey="TotalPricePerMonth"
-                ns="Payments"
+                namespaces={["Payments"]}
                 values={{ price: formatPaymentCurrency(totalPrice) }}
                 components={{
                   2: <span key="large-font-month" className={styles.largerFontSize} />,

@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState, useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
@@ -57,7 +57,7 @@ const CurrentPaymentSettings = ({
   autoPayments,
   formatWalletCurrency,
 }: CurrentPaymentSettingsProps) => {
-  const { t } = useTranslation("Payments");
+  const t = useCommonTranslation(["Payments"]);
 
   const { minBalance, upToBalance } = autoPayments!;
 
@@ -105,7 +105,7 @@ const AutoPayments = ({
   } = store;
 
   const { walletCustomerEmail } = store.tariff;
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   const showCurrentSettings = isAutoPaymentExist && !isEditAutoPayment;
 

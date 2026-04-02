@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../utils/i18n";
 
 import { toAbsoluteUrl } from "../../../utils/url";
 import classNames from "classnames";
@@ -69,7 +69,7 @@ const PaymentMethod = (props: PaymentMethodProps) => {
   const { fetchCardLinked } = paymentStore;
   const { confirmActionType } = servicesStore;
 
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   const [isLoading, setIsLoading] = useState(!walletCustomerEmail);
 

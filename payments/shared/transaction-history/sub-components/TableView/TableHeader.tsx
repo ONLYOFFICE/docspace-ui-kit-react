@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useCommonTranslation } from "../../../../../utils/i18n";
 
 import { TableHeader } from "../../../../../components/table";
 
@@ -38,7 +38,7 @@ type TableHeaderProps = {
 };
 
 const TransactionHistoryTableHeader = (props: TableHeaderProps) => {
-  const { t } = useTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation(["Payments", "Common"]);
 
   const defaultColumns = [
     {
