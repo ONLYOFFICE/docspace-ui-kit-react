@@ -36,8 +36,6 @@ import { Text } from "../../components/text";
 import { Button, ButtonSize } from "../../components/button";
 import { toastr } from "../../components/toast";
 import { Link } from "../../components/link";
-import { TColorScheme } from "../../providers/theme/themes";
-
 import { finishRefreshingWithMinCycle } from "../utils/refreshing";
 
 import TransactionHistory from "../shared/transaction-history";
@@ -50,11 +48,10 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 
 type WalletProps = {
   isMobile?: boolean;
-  currentColorScheme?: TColorScheme;
 };
 
 const Wallet = (props: WalletProps) => {
-  const { isMobile, currentColorScheme } = props;
+  const { isMobile } = props;
 
   const store = usePaymentStore();
 
@@ -135,7 +132,7 @@ const Wallet = (props: WalletProps) => {
           textDecoration="underline"
           fontWeight={600}
           href={walletHelpUrl}
-          color={currentColorScheme?.main?.accent ?? undefined}
+          className={styles.learnMoreLink}
           dataTestId="wallet_learn_more_link"
         >
           {t("Common:LearnMore")}

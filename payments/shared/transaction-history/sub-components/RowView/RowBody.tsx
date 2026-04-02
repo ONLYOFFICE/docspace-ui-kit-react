@@ -29,7 +29,6 @@ import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 
-import { TTheme } from "../../../../../providers/theme/themes";
 import { Text } from "../../../../../components/text";
 import { Row, RowContent } from "../../../../../components/rows";
 import type { WalletOperationDto } from "../../../../store/PaymentStore";
@@ -45,13 +44,11 @@ import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 
 type TransactionRowViewProps = {
   transaction: WalletOperationDto;
-  theme?: TTheme;
   sectionWidth: number;
 };
 
 const TransactionRowView: React.FC<TransactionRowViewProps> = ({
   transaction,
-  theme,
   sectionWidth,
 }) => {
   const paymentStore = usePaymentStore();
@@ -138,10 +135,7 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
         </Text>
       }
     >
-      <RowContent
-        sideColor={theme?.filesSection?.rowView?.sideColor || ""}
-        sectionWidth={sectionWidth}
-      >
+      <RowContent sectionWidth={sectionWidth}>
         {getRowChildren()}
       </RowContent>
     </Row>
