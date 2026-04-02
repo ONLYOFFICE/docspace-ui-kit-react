@@ -99,10 +99,19 @@ export type TPaymentUser = {
   isOwner: boolean;
 };
 
+export type TPaymentRoutes = {
+  portalPayments: string;
+  services: string;
+  aiServices: string;
+  backup: string;
+  diskStorage: string;
+};
+
 /** Minimal config provided by the host application. Everything else is fetched internally. */
 export type TPaymentConfig = {
   language: string;
   expandArticle: boolean;
+  routes: TPaymentRoutes;
   logoText?: string;
   walletHelpUrl?: string;
   utcOffset?: string;

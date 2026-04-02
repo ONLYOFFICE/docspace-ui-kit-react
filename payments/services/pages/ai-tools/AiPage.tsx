@@ -118,7 +118,7 @@ const AiPage = (props: AiPageProps) => {
 
   useEffect(() => {
     if (isInitServicesData && !wasFirstAiServiceTopUp) {
-      navigate("/portal-settings/payments/services");
+      navigate(paymentStore.routes.services);
     }
   }, [isInitServicesData, wasFirstAiServiceTopUp]);
 

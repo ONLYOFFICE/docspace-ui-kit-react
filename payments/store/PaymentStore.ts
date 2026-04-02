@@ -62,6 +62,7 @@ import {
 import type { DateTime } from "luxon";
 import type {
   TPaymentConfig,
+  TPaymentRoutes,
   TServiceFeatureWithPrice,
   TWalletServiceQuota,
 } from "../types";
@@ -100,7 +101,13 @@ class PaymentStore {
 
   utcOffset = "";
 
-  expandArticle = false;
+  routes: TPaymentRoutes = {
+    portalPayments: "",
+    services: "",
+    aiServices: "",
+    backup: "",
+    diskStorage: "",
+  };
 
   licenseQuota: Record<string, unknown> | null = null;
 
@@ -207,6 +214,7 @@ class PaymentStore {
     if (config.walletHelpUrl !== undefined)
       this.walletHelpUrl = config.walletHelpUrl;
     if (config.utcOffset !== undefined) this.utcOffset = config.utcOffset;
+    if (config.routes) this.routes = config.routes;
     if (config.user) {
       this._currentUserEmail = config.user.email ?? "";
       this.userId = config.user.id ?? "";

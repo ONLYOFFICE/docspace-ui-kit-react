@@ -83,7 +83,7 @@ const StorageTariffDeactivated = observer(
       if (onOpenPanel) {
         onOpenPanel();
       } else {
-        navigate("/portal-settings/payments/services", { state: { openDialog: true } });
+        navigate(store.routes.services, { state: { openDialog: true } });
       }
 
       onCloseModal();

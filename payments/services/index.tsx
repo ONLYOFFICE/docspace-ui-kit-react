@@ -226,7 +226,7 @@ const Services = observer(
         id === TOTAL_SIZE &&
         (currentStoragePlanSize || previousStoragePlanSize)
       ) {
-        navigate("/portal-settings/payments/services/disk-storage");
+        navigate(paymentStore.routes.diskStorage);
         return;
       }
 
@@ -236,12 +236,12 @@ const Services = observer(
       }
 
       if (id === AI_ENUM && wasFirstAiServiceTopUp) {
-        navigate("/portal-settings/payments/services/ai-services");
+        navigate(paymentStore.routes.aiServices);
         return;
       }
 
       if (id === BACKUP_SERVICE && isCardLinkedToPortal) {
-        navigate("/portal-settings/payments/services/backup");
+        navigate(paymentStore.routes.backup);
         return;
       }
 

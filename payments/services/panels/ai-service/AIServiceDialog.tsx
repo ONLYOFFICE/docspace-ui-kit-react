@@ -105,7 +105,7 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
 
   const onRedirect = () => {
     if (!wasFirstAiServiceTopUp)
-      navigate("/portal-settings/payments/services/ai-services");
+      navigate(paymentStore.routes.aiServices);
 
     onClose();
   };

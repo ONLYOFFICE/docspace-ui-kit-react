@@ -55,9 +55,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
   const { t } = useTranslation(["Payments", "Common"]);
   const navigate = useNavigate();
   const onClick = () => {
-    const paymentPageUrl = "/portal-settings/payments/portal-payments";
-
-    navigate(paymentPageUrl);
+    navigate(paymentStore.routes.portalPayments);
   };
 
   return (
