@@ -24,34 +24,38 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+/**
+ * Composes an async pipeline from a list of step functions.
+ * Each step receives the result of the previous one.
+ * Equivalent to Compare() from functional composition patterns.
+ */
+export const pipe =
+  <T>(...fns: Array<(v: T) => T | Promise<T>>) =>
+  (seed: T): Promise<T> =>
+    fns.reduce((acc: Promise<T>, fn) => acc.then(fn), Promise.resolve(seed));
 
-export * from "./uuid";
+/**
+ * Returns a step function that waits `ms` milliseconds before passing the value through.
+ */
+export const delay =
+  (ms: number) =>
+  <T>(value: T): Promise<T> =>
+    new Promise((resolve) => setTimeout(() => resolve(value), ms));
 
-export * from "./common-icons-style";
+/**
+ * Returns a step function that either finishes the pipeline or recurses.
+ * Equivalent to ExitCondition() from functional composition patterns.
+ *
+ * @param predicate - returns true when the pipeline should stop
+ * @param onDone    - called with the final value when predicate is true
+ * @param recurse   - called to restart the pipeline when predicate is false
+ */
+export const stopWhen =
+  <T>(
+    predicate: (v: T) => boolean,
+    onDone: (v: T) => T | Promise<T>,
+    recurse: () => Promise<T>,
+  ) =>
+  (value: T): Promise<T> =>
+    predicate(value) ? Promise.resolve(value).then(onDone) : recurse();
 
-export * from "./use-click-outside";
-
-export { default as DomHelpers } from "./dom-helpers";
-
-export * from "./get-text-color";
-
-export * from "./trim-separator";
-
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./edge-scrolling";
-
-export * from "./hasOwnProperty";
-
-export * from "./encoder";
-
-export * from "./getErrorMessage";
-
-export * from "./pipe";
