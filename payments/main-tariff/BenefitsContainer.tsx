@@ -47,9 +47,7 @@ const BenefitsContainer = observer(({ t }: { t: TTranslation }) => {
 
   const renderTooltip = () => {
     const onClickServiceUrl = () => {
-      const servicePageUrl = combineUrl("/portal-settings", "/services");
-
-      window.DocSpace.navigate(servicePageUrl);
+      window.DocSpace.navigate(store.routes.services);
     };
 
     return (
