@@ -108,6 +108,12 @@
   width: calc(100% - 32px);
   padding: 0 16px;
 
+  &.withFooterInputAndCheckbox {
+    height: 181px;
+    max-height: 181px;
+    min-height: 181px;
+  }
+
   &.withFooterInput {
     height: 145px;
     max-height: 145px;
@@ -115,9 +121,10 @@
   }
 
   &.withFooterCheckbox {
-    height: 181px;
-    max-height: 181px;
-    min-height: 181px;
+    padding-top: 16px;
+    height: 88px;
+    max-height: 88px;
+    min-height: 88px;
   }
 
   &.defaultHeight {

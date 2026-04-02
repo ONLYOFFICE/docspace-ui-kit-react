@@ -89,8 +89,10 @@ const Footer = React.memo(
       <div
         ref={ref}
         className={classNames(styles.footer, "selector-footer", {
+          [styles.withFooterInputAndCheckbox]:
+            withFooterInput && withFooterCheckbox,
           [styles.withFooterCheckbox]: withFooterCheckbox && !withFooterInput,
-          [styles.withFooterInput]: !withFooterCheckbox && withFooterInput,
+          [styles.withFooterInput]: withFooterInput && !withFooterCheckbox,
           [styles.defaultHeight]: !withFooterCheckbox && !withFooterInput,
           [styles.withErrorFooter]: withErrorFooter,
         })}
