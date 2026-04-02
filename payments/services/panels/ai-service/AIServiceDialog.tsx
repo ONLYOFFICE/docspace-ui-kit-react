@@ -62,7 +62,7 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
   visible,
   onClose,
 }) => {
-  const { apiClient } = useApi();
+  const { rawApiClient } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
@@ -124,7 +124,7 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
   };
 
   const buyWalletService = async (quantity: number, serviceName: string) => {
-    const { data } = await apiClient.instance.post(
+    const { data } = await rawApiClient.instance.post(
       "api/2.0/portal/payment/buywalletservice",
       { quantity, serviceName },
     );

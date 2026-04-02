@@ -56,11 +56,14 @@ export type TApiProvider = {
   initSocket?: boolean;
 };
 
-export const createApiClient = (basePath: string, apiKey: string) => {
+export const createApiClient = (
+  basePath: string,
+  apiKey: string,
+) => {
   const instance: AxiosInstance = axios.create({
     baseURL: basePath,
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: addBearerPrefix ? `Bearer ${apiKey}` : apiKey,
     },
   });
 
@@ -86,6 +89,7 @@ export type TApiContext = {
   groupSearchApi: SearchApi;
   operationsApi: OperationsApi;
   apiClient: TApiClient;
+  rawApiClient: TApiClient;
   baseUrl: string;
   aiApi: AiApi;
   thirdPartyApi: ThirdPartyApi;
@@ -135,6 +139,7 @@ const ApiProvider = ({ children, url, apiKey, initSocket = true }: TApiProvider)
       groupSearchApi: new SearchApi(configuration),
       operationsApi: new OperationsApi(configuration),
       apiClient: createApiClient(url, apiKey),
+      rawApiClient: createApiClient(url, apiKey, false),
       baseUrl: url,
       thirdPartyApi: new ThirdPartyApi(configuration),
       paymentApi: new PaymentApi(configuration),

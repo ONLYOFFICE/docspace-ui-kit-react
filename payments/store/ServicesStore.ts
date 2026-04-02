@@ -25,10 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { makeAutoObservable, observable } from "mobx";
-import type {
-  PaymentApi,
-  TenantWalletService,
-} from "@onlyoffice/docspace-api-sdk";
+import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
@@ -41,7 +38,7 @@ import type { TApiClient } from "../../providers/api/ApiProvider";
 class ServicesStore {
   private paymentApi: PaymentApi;
 
-  #apiClient: TApiClient;
+  #rawApiClient: TApiClient;
 
   private abortControllers: AbortController[] = [];
 
@@ -74,11 +71,11 @@ class ServicesStore {
   constructor(
     paymentApi: PaymentApi,
     paymentStore: PaymentStore,
-    apiClient: TApiClient,
+    rawApiClient: TApiClient,
   ) {
     this.paymentApi = paymentApi;
     this.paymentStore = paymentStore;
-    this.#apiClient = apiClient;
+    this.#rawApiClient = rawApiClient;
 
     makeAutoObservable(this, {
       aiModelAvailabilityMap: observable.ref,
@@ -240,16 +237,19 @@ class ServicesStore {
     return formatCurrencyValue(this.language, amount, currency, fractionDigits);
   };
 
+  // TODO: Replace with SDK method once it is available in the API SDK
   fetchAiPrices = async () => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getPortalPrices({
-        signal: abortController.signal,
-      });
-      if (!res?.data?.response) return;
-      this.aiToolsPrices = res.data.response as unknown as TAiToolsPrices;
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/ai-prices",
+        { signal: abortController.signal },
+      );
+
+      if (!data?.response) return;
+      this.aiToolsPrices = data.response as unknown as TAiToolsPrices;
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -331,19 +331,23 @@ class ServicesStore {
     }
   };
 
-  fetchAiServiceBalance = async (isRefresh?: boolean) => {
+  // TODO: Replace with SDK method once it is available in the API SDK
+  fetchAiServiceBalance = async () => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getWalletService(
-        AI_TOOLS as unknown as TenantWalletService,
-        { signal: abortController.signal },
+      const { data } = await this.#rawApiClient.instance.get(
+        `api/2.0/portal/payment/customer/servicequota`,
+        {
+          params: { serviceName: AI_TOOLS },
+          signal: abortController.signal,
+        },
       );
 
-      if (!res?.data?.response) return;
+      if (!data?.response) return;
 
-      this.aiToolsBalance = res.data.response as unknown as TBalance;
+      this.aiToolsBalance = data.response as unknown as TBalance;
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -355,7 +359,7 @@ class ServicesStore {
     this.abortControllers.push(abortController);
 
     try {
-      const { data } = await this.#apiClient.instance.get(
+      const { data } = await this.#rawApiClient.instance.get(
         "api/2.0/backup/getbackupscount",
         { signal: abortController.signal },
       );
