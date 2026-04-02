@@ -833,6 +833,11 @@
   }
 }
 
+.rowGroupingRooms :global(.group-tag-room) {
+  max-width: 150px;
+  overflow: hidden;
+}
+
 .groupTagsMeasure {
   position: absolute;
   visibility: hidden;
