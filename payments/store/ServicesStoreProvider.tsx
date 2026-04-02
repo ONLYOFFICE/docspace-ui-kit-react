@@ -50,12 +50,12 @@ export const useServicesStore = () => {
 const ServicesStoreProviderInner = ({
   children,
 }: TServicesStoreProviderProps) => {
-  const { paymentApi, apiClient } = useApi();
+  const { paymentApi, rawApiClient } = useApi();
   const paymentStore = usePaymentStore();
 
   const store = React.useMemo(
-    () => new ServicesStore(paymentApi, paymentStore, apiClient),
-    [paymentApi, paymentStore, apiClient],
+    () => new ServicesStore(paymentApi, paymentStore, rawApiClient),
+    [paymentApi, paymentStore, rawApiClient],
   );
 
   React.useEffect(() => {

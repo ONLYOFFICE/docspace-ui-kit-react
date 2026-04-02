@@ -31,13 +31,10 @@ import type { OperationDto } from "@onlyoffice/docspace-api-sdk";
 import TransactionRowView from "./RowBody";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 
-const RowView = ({
-  sectionWidth,
-}: {
-  sectionWidth: number;
-}) => {
+const RowView = ({ sectionWidth }: { sectionWidth: number }) => {
   const paymentStore = usePaymentStore();
   const history = paymentStore.transactionHistory ?? [];
+
   return (
     <RowContainer
       useReactWindow
@@ -59,3 +56,4 @@ const RowView = ({
 };
 
 export default observer(RowView);
+
