@@ -27,6 +27,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("react-svg", () => ({
+  ReactSVG: (props: Record<string, unknown>) => (
+    <div data-testid="react-svg-mock" {...props} />
+  ),
+}));
+
 import { IconSizeType } from "../../utils";
 
 import { Avatar, AvatarActionKeys } from ".";

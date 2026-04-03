@@ -44,105 +44,105 @@ import { useChatScroll } from "./hooks/useChatScroll";
 import styles from "./ChatMessageBody.module.scss";
 import { useCommonTranslation } from "../../../../utils/i18n";
 
-const ChatMessageBody = observer(({
-  userAvatar,
-  getIcon,
-  isLoading,
-  hideAttachments,
-  emptyScreenText,
-  getResultStorageId,
-  setAiPlaylistImages,
-  setMediaViewerVisible,
-  openFile,
-  openLink,
-}: MessageBodyProps) => {
-  const {
-    messages,
-    isStreamRunning,
-    isRequestRunning,
-    fetchNextMessages,
-    addMessageId,
-  } = useMessageStore();
-  const { currentChat } = useChatStore();
-  const t = useCommonTranslation();
+const ChatMessageBody = observer(
+  ({
+    userAvatar,
+    getIcon,
+    isLoading,
+    hideAttachments,
+    emptyScreenText,
+    getResultStorageId,
+    setAiPlaylistImages,
+    setMediaViewerVisible,
+    openFile,
+    openLink,
+  }: MessageBodyProps) => {
+    const { messages, isAnalyzing, fetchNextMessages, addMessageId } =
+      useMessageStore();
+    const { currentChat } = useChatStore();
+    const t = useCommonTranslation();
 
-  const chatBodyRef = useRef<HTMLDivElement>(null);
+    const chatBodyRef = useRef<HTMLDivElement>(null);
 
-  const isEmpty = messages.length === 0 || isLoading;
+    const isEmpty = messages.length === 0 || isLoading;
 
-  useEffect(() => {
-    if (!currentChat?.id) return;
+    useEffect(() => {
+      if (!currentChat?.id) return;
 
-    socket?.emit(SocketCommands.Subscribe, {
-      roomParts: `CHAT-${currentChat?.id}`,
-    });
-
-    return () => {
-      socket?.emit(SocketCommands.Unsubscribe, {
+      socket?.emit(SocketCommands.Subscribe, {
         roomParts: `CHAT-${currentChat?.id}`,
       });
-    };
-  }, [currentChat?.id]);
 
-  useEffect(() => {
-    socket?.on(SocketEvents.ChatMessageId, (data) => {
-      addMessageId(data.messageId);
+      return () => {
+        socket?.emit(SocketCommands.Unsubscribe, {
+          roomParts: `CHAT-${currentChat?.id}`,
+        });
+      };
+    }, [currentChat?.id]);
+
+    useEffect(() => {
+      socket?.on(SocketEvents.ChatMessageId, (data) => {
+        addMessageId(data.messageId);
+      });
+    }, [addMessageId]);
+
+    useChatScroll({
+      chatBodyRef,
+      isEmpty,
+      fetchNextMessages,
+      currentChat,
+      messages,
     });
-  }, [addMessageId]);
 
-  useChatScroll({
-    chatBodyRef,
-    isEmpty,
-    fetchNextMessages,
-    currentChat,
-    messages,
-  });
-
-  return (
-    <div
-      className={classNames(styles.chatMessageBody, "chat-message-body", {
-        [styles.empty]: isEmpty,
-      })}
-      data-testid="chat-message-body"
-    >
-      {isEmpty ? (
-        <EmptyScreen isLoading={isLoading} emptyScreenText={emptyScreenText} />
-      ) : (
-        <div
-          className={classNames(styles.chatMessageContainer)}
-          ref={chatBodyRef}
-        >
-          {messages.map((message, index) => {
-            return (
-              <Message
-                key={`${currentChat?.id}-${message.createdOn}-${index * 2}`}
-                message={message}
-                idx={index}
-                userAvatar={userAvatar}
-                isLast={index === 0}
-                hideAttachments={hideAttachments}
-                getIcon={getIcon}
-                getResultStorageId={getResultStorageId}
-                setAiPlaylistImages={setAiPlaylistImages}
-                setMediaViewerVisible={setMediaViewerVisible}
-                openFile={openFile}
-                openLink={openLink}
-              />
-            );
-          })}
-          {!isStreamRunning && isRequestRunning ? (
-            <div
-              className={styles.chatLoader}
-              data-testid="chat-loader-container"
-            >
-              <Loader type={LoaderTypes.track} />
-              {t("Analyzing")}
-            </div>
-          ) : null}
-        </div>
-      )}
-    </div>
-  );
-});
+    return (
+      <div
+        className={classNames(styles.chatMessageBody, "chat-message-body", {
+          [styles.empty]: isEmpty,
+        })}
+        data-testid="chat-message-body"
+      >
+        {isEmpty ? (
+          <EmptyScreen
+            isLoading={isLoading}
+            emptyScreenText={emptyScreenText}
+          />
+        ) : (
+          <div
+            className={classNames(styles.chatMessageContainer)}
+            ref={chatBodyRef}
+          >
+            {messages.map((message, index) => {
+              return (
+                <Message
+                  key={`${currentChat?.id}-${message.createdOn}-${index * 2}`}
+                  message={message}
+                  idx={index}
+                  userAvatar={userAvatar}
+                  isLast={index === 0}
+                  hideAttachments={hideAttachments}
+                  getIcon={getIcon}
+                  getResultStorageId={getResultStorageId}
+                  setAiPlaylistImages={setAiPlaylistImages}
+                  setMediaViewerVisible={setMediaViewerVisible}
+                  openFile={openFile}
+                  openLink={openLink}
+                />
+              );
+            })}
+            {isAnalyzing ? (
+              <div
+                className={styles.chatLoader}
+                data-testid="chat-loader-container"
+              >
+                <Loader type={LoaderTypes.track} />
+                {t("Analyzing")}
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>
+    );
+  },
+);
 
 export default ChatMessageBody;

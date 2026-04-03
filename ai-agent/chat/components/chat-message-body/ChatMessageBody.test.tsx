@@ -188,13 +188,12 @@ describe("ChatMessageBody component", () => {
     }
   });
 
-  it("shows loader when request is running but not streaming", () => {
+  it("shows loader when isAnalyzing is true", () => {
     mockedUseMessageStore.mockReturnValue({
       messages: mockMessages,
-      isStreamRunning: false,
-      isRequestRunning: true,
       fetchNextMessages: vi.fn(),
       addMessageId: vi.fn(),
+      isAnalyzing: true,
     } as unknown as ReturnType<typeof useMessageStore>);
 
     render(<ChatMessageBody {...defaultProps} />);
@@ -203,13 +202,12 @@ describe("ChatMessageBody component", () => {
     expect(screen.getByText("Analyzing")).toBeInTheDocument();
   });
 
-  it("does not show loader when streaming", () => {
+  it("does not show loader when isAnalyzing is false", () => {
     mockedUseMessageStore.mockReturnValue({
       messages: mockMessages,
-      isStreamRunning: true,
-      isRequestRunning: true,
       fetchNextMessages: vi.fn(),
       addMessageId: vi.fn(),
+      isAnalyzing: false,
     } as unknown as ReturnType<typeof useMessageStore>);
 
     render(<ChatMessageBody {...defaultProps} />);

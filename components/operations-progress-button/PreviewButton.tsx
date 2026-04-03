@@ -60,6 +60,7 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
   >("raising");
   const [lastKnownTitle, setLastKnownTitle] = useState<string | null>(null);
 
+  const isHidingUnderRef = useRef(false);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const previewMainContainerRef = useRef<HTMLDivElement>(null);
   const previewHideTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -162,9 +163,13 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
     if (isDragging) return;
 
     const shouldHideUnder = hasUploadOperationByDrag();
-    const animationType = shouldHideUnder ? "hidingUnder" : "dropping";
 
-    setAnimationState(animationType);
+    if (shouldHideUnder) {
+      isHidingUnderRef.current = true;
+      setAnimationState("hidingUnder");
+    } else if (!isHidingUnderRef.current) {
+      setAnimationState("dropping");
+    }
 
     if (previewButtonWasVisible.current) {
       // Dragging stopped
@@ -237,6 +242,7 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
           animation.includes("hideUnderProgressBarTablet")) &&
         !isDragging
       ) {
+        isHidingUnderRef.current = false;
         onHideAnimationComplete();
       }
     },
@@ -323,3 +329,4 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
 };
 
 export default PreviewButton;
+

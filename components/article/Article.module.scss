@@ -27,38 +27,23 @@
 @use "../../styles/variables/colors";
 @use "../../styles/mixins";
 
-:global(.rtl) {
-  :local(.wrapper) {
-    :global(.arrow) {
-      svg {
-        transform: scaleX(-1);
-      }
-    }
-  }
-
-  :local(.hideArticleMenuButton) {
-    :global(.article-hide-menu-icon_svg),
-    :global(.article-show-menu-icon_svg) {
-      transform: scaleX(-1);
-    }
-  }
-}
-
 :global(.light) {
-   :local {
+  :local {
+
     .apps,
-    .wrapper, 
-    .hideArticleMenuButton, 
-    .articleHeader, 
-    .heading, 
-    .profileWrapper, 
-    .articleProfile, 
-    .article, 
+    .wrapper,
+    .hideArticleMenuButton,
+    .articleHeader,
+    .heading,
+    .profileWrapper,
+    .articleProfile,
+    .article,
     .backButton {
       --files-article-body-download-app-list-text-color: #{colors.$gray};
       --files-article-body-download-app-list-mac-hover-color: #{colors.$dark-black};
       --files-article-body-dev-tools-color: #{colors.$gray-text};
-      --files-article-body-dev-tools-background-color: var(--accent-main, #{colors.$light-blue-main});
+      --files-article-body-dev-tools-background-color: var(--accent-main,
+        #{colors.$light-blue-main});
       --files-article-body-dev-tools-background-opacity: 0.17;
       --article-catalog-background: #{colors.$gray-light};
       --article-catalog-show-text: #{colors.$light-gray-dark};
@@ -75,17 +60,18 @@
     }
   }
 }
- 
+
 :global(.dark) {
-   :local {
+  :local {
+
     .apps,
-    .wrapper, 
-    .hideArticleMenuButton, 
-    .articleHeader, 
-    .heading, 
-    .profileWrapper, 
-    .articleProfile, 
-    .article, 
+    .wrapper,
+    .hideArticleMenuButton,
+    .articleHeader,
+    .heading,
+    .profileWrapper,
+    .articleProfile,
+    .article,
     .backButton {
       --files-article-body-download-app-list-text-color: #{colors.$gray-dark};
       --files-article-body-download-app-list-mac-hover-color: #{colors.$white};
@@ -126,22 +112,6 @@
   @include mixins.tablet-and-below {
     &[data-show-text="true"] {
       margin-inline-start: 8px;
-    }
-
-    &[data-with-dev-tools="false"] {
-      margin-bottom: 61px;
-
-      &[data-with-custom-slot="true"] {
-        margin-bottom: 40px;
-      }
-    }
-
-    &[data-with-dev-tools="true"] {
-      margin-bottom: 20px;
-
-      &[data-with-custom-slot="true"] {
-        margin-bottom: 0;
-      }
     }
   }
 
@@ -196,7 +166,7 @@
 
   @include mixins.tablet {
     margin-inline-start: 8px;
- 
+
     &[data-with-dev-tools="false"] {
       margin-bottom: 10px;
 
@@ -241,6 +211,8 @@
   :global(.arrow) {
     height: 16px;
     margin-inline-start: auto;
+
+    @include mixins.flip-in-rtl;
   }
 
   :global(.label) {
@@ -316,6 +288,7 @@
       &[data-show-text="true"] {
         display: flex;
       }
+
       &[data-show-text="false"] {
         display: none;
       }
@@ -337,14 +310,17 @@
       :global(.article-hide-menu-container) {
         display: flex;
       }
+
       :global(.article-show-menu-container) {
         display: none;
       }
     }
+
     &[data-show-text="false"] {
       :global(.article-hide-menu-container) {
         display: none;
       }
+
       :global(.article-show-menu-container) {
         display: flex;
       }
@@ -354,6 +330,8 @@
   :global(.article-hide-menu-icon_svg),
   :global(.article-show-menu-icon_svg) {
     height: 20px;
+
+    @include mixins.flip-in-rtl;
   }
 
   :global(.article-hide-menu-icon_svg) {
@@ -600,6 +578,10 @@
     :global(.article-body__scrollbar) {
       height: calc(100% - 150px) !important;
 
+      @include mixins.tablet {
+        height: calc(100% - 190px) !important;
+      }
+
       @include mixins.mobile {
         height: 100% !important;
       }
@@ -668,6 +650,7 @@
     p {
       font-size: 13px;
     }
+
     margin-inline-start: 12px;
   }
 
@@ -679,6 +662,7 @@
       margin-top: 5px;
       margin-inline-end: 3px;
     }
+
     &[data-show-article="true"] {
       margin-inline-start: 10px;
       gap: 11px;
@@ -696,6 +680,8 @@
   .arrowIcon {
     width: 20px;
     height: 20px;
+
+    @include mixins.flip-in-rtl;
 
     @include mixins.desktop {
       width: 16px !important;

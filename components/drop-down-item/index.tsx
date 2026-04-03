@@ -44,6 +44,7 @@ import { Link, LinkType } from "../link";
 
 import type { DropDownItemProps } from "./DropDownItem.types";
 import styles from "./DropDownItem.module.scss";
+import { TooltipContainer } from "../tooltip";
 
 export type { DropDownItemProps };
 
@@ -233,12 +234,14 @@ const DropDownItem = ({
       {isSeparator ? (
         "\u00A0"
       ) : label ? (
-        <span
+        <TooltipContainer
+          as="span"
           dir="auto"
+          title={typeof label === "string" ? label : undefined}
           className={truncateText ? styles.truncateText : undefined}
         >
           {label}
-        </span>
+        </TooltipContainer>
       ) : (
         children
       )}

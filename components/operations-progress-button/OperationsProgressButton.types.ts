@@ -29,6 +29,7 @@ export interface Operation {
   operation: string;
   label: string;
   alert: boolean;
+  canceled?: boolean;
   completed: boolean;
   stopped?: boolean;
   percent?: number;
@@ -48,6 +49,7 @@ export interface OperationsProgressProps {
   panelOperations?: Operation[];
   operations?: Operation[];
   operationsAlert?: boolean;
+  operationsCanceled?: boolean;
   operationsCompleted?: boolean;
   operationsStopped?: boolean;
   clearOperationsData?: (
