@@ -88,7 +88,8 @@ export enum SocketEvents {
   ExportChat = "s:export-chat",
   QuotaExceeded = "s:quota_exceeded",
   ExternalDbSettings = "s:external-db-settings",
-  ChangeWebPlugin = "s:change-web-plugin"
+  ChangeWebPlugin = "s:change-web-plugin",
+  ChangeAiConfig = "s:change-ai-config",
 }
 
 /**
@@ -363,6 +364,7 @@ export type TListenEventCallbackMap = {
     settings: Partial<Record<string, unknown>>,
   ) => void;
   [SocketEvents.ChangeWebPlugin]: (data: TChangeWebPluginData) => void;
+  [SocketEvents.ChangeAiConfig]: () => void;
 };
 
 /**

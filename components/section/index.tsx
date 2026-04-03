@@ -118,6 +118,7 @@ const Section = (props: SectionProps) => {
     mainButtonVisible,
 
     primaryOperationsAlert,
+    primaryOperationsCanceled,
     needErrorChecking,
 
     withTabs,
@@ -363,6 +364,7 @@ const Section = (props: SectionProps) => {
               secondaryOperationsAlert ||
               pluginOperationsAlert
             }
+            operationsCanceled={primaryOperationsCanceled}
             needErrorChecking={needErrorChecking}
             panelOperations={primaryOperationsArray}
             cancelUpload={cancelUpload}
