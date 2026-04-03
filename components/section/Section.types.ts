@@ -148,6 +148,11 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     ) => void;
     clearPrimaryProgressData?: (operation?: string | null) => void;
     cancelUpload?: () => void;
+    cancelSecondaryOperationById?: (
+      operation: string,
+      operationId: string,
+    ) => void;
+    secondaryOperationsStopped?: boolean;
     secondaryOperationsAlert?: boolean;
     mainButtonVisible?: boolean;
     primaryOperationsAlert?: boolean;
