@@ -510,9 +510,17 @@ export const TableHeader = (props: TableHeaderProps) => {
     const shortSize =
       columns.find((col) => col.isShort && col.enable)?.minWidth || 0;
 
-    // TODO: Fixed columns size if something went wrong
+    // Reset storage if columns count doesn't match (e.g. stale data from another section)
     if (storageSize) {
       const splitStorage = storageSize.split(" ");
+
+      if (splitStorage.length !== columns.length + 1) {
+        localStorage.removeItem(columnStorageName);
+        resetColumns();
+        return;
+      }
+
+      // TODO: Fixed columns size if something went wrong
       if (
         !shortSize &&
         getSubstring(splitStorage[0]) <= DEFAULT_MIN_COLUMN_SIZE
@@ -1140,14 +1148,20 @@ export const TableHeader = (props: TableHeaderProps) => {
         headerRef.current.style.width = `${containerWidth}px`;
       }
 
-      if (infoPanelVisible) {
-        localStorage.setItem(columnInfoPanelStorageName || "", str);
-      } else {
-        localStorage.setItem(columnStorageName, str);
-      }
+      // columns.length + 1 accounts for the settings column
+      const strColumnsCount = str.split(" ").length;
+      const isColumnsCountValid = strColumnsCount === columns.length + 1;
 
-      if (!infoPanelVisible) {
-        localStorage.removeItem(columnInfoPanelStorageName || "");
+      if (isColumnsCountValid) {
+        if (infoPanelVisible) {
+          localStorage.setItem(columnInfoPanelStorageName || "", str);
+        } else {
+          localStorage.setItem(columnStorageName, str);
+        }
+
+        if (!infoPanelVisible) {
+          localStorage.removeItem(columnInfoPanelStorageName || "");
+        }
       }
     }
   }
