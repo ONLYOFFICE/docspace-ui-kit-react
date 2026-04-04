@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -358,6 +358,63 @@ const DynamicGroupTemplate = () => {
       />
     </div>
   );
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div style={{ height: "200px", position: "relative" }}>
+      <div style={{ position: "absolute", top: 80, left: 100 }}>
+        <Link
+          data-tooltip-id="css-customization-tooltip"
+          data-tooltip-content="Custom tooltip"
+        >
+          Hover to see custom tooltip
+        </Link>
+      </div>
+      <Tooltip
+        id="css-customization-tooltip"
+        isOpen
+        place="top"
+        style={
+          {
+            "--tooltip-radius": "16px",
+            "--tooltip-inner-padding": "12px 20px",
+            "--tooltip-bg": "#1e1b4b",
+            "--tooltip-color": "#e0e7ff",
+            "--tooltip-shadow": "0 4px 16px rgba(0,0,0,0.4)",
+          } as CSSProperties
+        }
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization. Pass via the \`style\` prop on \`<Tooltip>\`:
+
+\`\`\`css
+--tooltip-bg           /* background color (replaces theme color) */
+--tooltip-color        /* text color (replaces theme color) */
+--tooltip-max-width-value /* max-width override */
+--tooltip-radius       /* border radius (default: 6px) */
+--tooltip-shadow       /* box-shadow (default: 0 2px 4px rgba(0,0,0,0.15)) */
+--tooltip-inner-padding /* padding (default: 8px 12px) */
+--tooltip-text-size    /* font-size (default: 12px) */
+--tooltip-layer        /* z-index (default: 999) */
+\`\`\``,
+      },
+      source: {
+        code: `<Tooltip
+  id="custom"
+  style={{
+    "--tooltip-radius": "16px",
+    "--tooltip-bg": "#1e1b4b",
+    "--tooltip-color": "#e0e7ff",
+  }}
+/>`,
+      },
+    },
+  },
 };
 
 export const DynamicGroup: Story = {
