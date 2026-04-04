@@ -130,38 +130,56 @@ export function TanStackTableContainer<TData>({
         const next =
           typeof updater === "function" ? updater(prev) : updater;
 
-        // Constrained resize: total data columns must not exceed
-        // containerWidth - SETTINGS_COLUMN_SIZE.
-        const cw = containerWidthRef.current;
         const t = tableRef.current;
-        if (cw > 0 && t) {
-          const maxDataWidth = cw - TABLE_DEFAULTS.SETTINGS_COLUMN_SIZE;
-          const visibleCols = t.getVisibleLeafColumns();
-          const total = visibleCols.reduce(
-            (sum, col) => sum + (next[col.id] ?? col.getSize()),
-            0,
-          );
+        if (!t) return next;
 
-          if (total > maxDataWidth) {
-            const overflow = total - maxDataWidth;
-            const resizingId = sizingInfoRef.current.isResizingColumn;
-            const resizingIdx = visibleCols.findIndex(
-              (c) => c.id === resizingId,
-            );
-            const targetIdx =
-              resizingIdx < visibleCols.length - 1
-                ? resizingIdx + 1
-                : resizingIdx - 1;
+        const visibleCols = t.getVisibleLeafColumns();
 
-            if (targetIdx >= 0 && targetIdx < visibleCols.length) {
-              const targetCol = visibleCols[targetIdx];
-              const targetSize =
-                next[targetCol.id] ?? targetCol.getSize();
-              const minSize =
-                targetCol.columnDef.minSize ?? TABLE_DEFAULTS.MIN_COLUMN_SIZE;
-              next[targetCol.id] = Math.max(targetSize - overflow, minSize);
-            }
+        // Find which column is being resized by comparing prev and next
+        let resizingId: string | null = null;
+        for (const col of visibleCols) {
+          const colPrev = prev[col.id] ?? col.getSize();
+          const colNext = next[col.id] ?? colPrev;
+          if (colNext !== colPrev) {
+            resizingId = col.id;
+            break;
           }
+        }
+        if (!resizingId) return next;
+
+        const resizingIdx = visibleCols.findIndex((c) => c.id === resizingId);
+
+        // Zero-sum resize matching old table behavior:
+        // resizing column compensates with the adjacent column to the right.
+        // Last data column handle is blocked (no right column to take from).
+        if (resizingIdx >= visibleCols.length - 1) {
+          // Block last column resize — revert to previous size
+          next[resizingId] = prev[resizingId] ?? visibleCols[resizingIdx].getSize();
+          return next;
+        }
+
+        const resizingPrev = prev[resizingId] ?? visibleCols[resizingIdx].getSize();
+        const resizingNext = next[resizingId] ?? resizingPrev;
+        const delta = resizingNext - resizingPrev;
+
+        if (delta === 0) return next;
+
+        // Compensate adjacent right column with inverse delta
+        const rightCol = visibleCols[resizingIdx + 1];
+        const rightPrevSize = prev[rightCol.id] ?? rightCol.getSize();
+        const rightMinSize = rightCol.columnDef.minSize ?? TABLE_DEFAULTS.MIN_COLUMN_SIZE;
+        const resizingMinSize =
+          visibleCols[resizingIdx].columnDef.minSize ?? TABLE_DEFAULTS.MIN_COLUMN_SIZE;
+
+        const newRightSize = rightPrevSize - delta;
+
+        if (newRightSize >= rightMinSize) {
+          next[rightCol.id] = newRightSize;
+        } else {
+          // Right column hits min: cap how much the resizing column can change
+          const actualDelta = rightPrevSize - rightMinSize;
+          next[rightCol.id] = rightMinSize;
+          next[resizingId] = Math.max(resizingPrev + actualDelta, resizingMinSize);
         }
 
         return next;
