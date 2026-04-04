@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { ProgressBar, PreparationPortalProgress } from ".";
@@ -195,6 +195,56 @@ export const Complete: Story = {
       },
       source: {
         code: `<ProgressBar percent={100} label="Upload complete" status="All files processed successfully" />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: (args) => (
+    <div
+      style={
+        {
+          "--progress-bar-size": "8px",
+          "--progress-bar-radius": "8px",
+          "--progress-bar-fill": "#7c3aed",
+          "--progress-bar-track": "#e9d5ff",
+          "--progress-bar-bottom-margin": "12px",
+        } as CSSProperties
+      }
+    >
+      <ProgressBar {...args} />
+    </div>
+  ),
+  args: {
+    percent: 65,
+    label: "Customized progress bar",
+    status: "Violet theme, 8px height",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization. Set on a parent element:
+
+\`\`\`css
+--progress-bar-track      /* track background (replaces theme color) */
+--progress-bar-fill       /* fill background (replaces theme color) */
+--progress-bar-text       /* status text color */
+--progress-bar-error-text /* error text color */
+--progress-bar-size       /* bar height (default: 4px) */
+--progress-bar-radius     /* border radius (default: 3px) */
+--progress-bar-bottom-margin /* margin below bar (default: 8px) */
+\`\`\``,
+      },
+      source: {
+        code: `<div style={{
+  "--progress-bar-size": "8px",
+  "--progress-bar-radius": "8px",
+  "--progress-bar-fill": "#7c3aed",
+  "--progress-bar-track": "#e9d5ff",
+}}>
+  <ProgressBar percent={65} label="Customized" />
+</div>`,
       },
     },
   },
