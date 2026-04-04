@@ -34,6 +34,7 @@
   width: 100%;
   max-width: 100%;
   height: 100%;
+  margin-top: -25px;
 
   // Disable text selection during column resize to prevent accidental selection
   &.isResizing,
@@ -48,22 +49,38 @@
   :global(.light) & {
     --header-border-color: #{colors.$gray-light-mid};
     --header-bg: #{colors.$white};
+    --header-border-image-source: linear-gradient(
+      to right,
+      #{colors.$white} 0px,
+      #{colors.$gray-light-mid} 0px,
+      #{colors.$gray-light-mid} 100%,
+      #{colors.$white} 100%
+    );
   }
 
   :global(.dark) & {
     --header-border-color: #{colors.$gray-dark-strong};
     --header-bg: #{colors.$black};
+    --header-border-image-source: linear-gradient(
+      to right,
+      #{colors.$black} 0px,
+      #{colors.$gray-dark-strong} 0px,
+      #{colors.$gray-dark-strong} 100%,
+      #{colors.$black} 100%
+    );
   }
 
+  position: sticky;
+  top: 0;
   display: grid;
   z-index: 200;
   height: 39px;
-  // align-items: normal (default) — cells stretch to fill row height = 39px
-  // combined with overflow:hidden on cells, resizeHandle is clipped
   background: var(--header-bg);
-  // Divider per Figma: 1px #ECEEF1 at bottom, inset 20px from edges
-  border-bottom: 1px solid var(--header-border-color);
-  padding: 0;
+  border-bottom: 1px solid;
+  border-image-slice: 1;
+  border-image-source: var(--header-border-image-source);
+  margin: 0 -20px;
+  padding: 0 20px;
 }
 
 .headerCell {
@@ -228,11 +245,12 @@
     }
 
     // Checkbox: same position as avatar, hidden by default
-    // padding/margin match OLD TableCell.module.scss
+    // padding/margin match OLD GroupsRow styled component
     :global(.table-container_row-checkbox) {
       display: none;
       margin-inline-start: -4px;
-      padding: 16px;
+      padding-block: 16px;
+      padding-inline: 12px 0;
     }
 
     // When row is checked: show checkbox, hide avatar

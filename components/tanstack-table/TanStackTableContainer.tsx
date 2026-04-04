@@ -250,9 +250,12 @@ export function TanStackTableContainer<TData>({
             )
           : 0;
 
+      const remainder = otherCols.length > 0 ? remainingWidth - perOther * otherCols.length : 0;
       const newSizing: ColumnSizingState = {};
       if (defaultCol) newSizing[defaultCol.id] = nameWidth;
-      for (const col of otherCols) newSizing[col.id] = perOther;
+      otherCols.forEach((col, i) => {
+        newSizing[col.id] = perOther + (i === 0 ? remainder : 0);
+      });
 
       setColumnSizing(newSizing);
       saveSizing(newSizing);
