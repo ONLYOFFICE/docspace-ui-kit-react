@@ -513,6 +513,16 @@ export const TableHeader = (props: TableHeaderProps) => {
     // TODO: Fixed columns size if something went wrong
     if (storageSize) {
       const splitStorage = storageSize.split(" ");
+
+      // Reset storage if columns count doesn't match (e.g. stale data from another section)
+      if (splitStorage.length !== columns.length + 1) {
+        localStorage.removeItem(columnStorageName);
+        if (!isResized) {
+          resetColumns();
+          return;
+        }
+      }
+
       if (
         !shortSize &&
         getSubstring(splitStorage[0]) <= DEFAULT_MIN_COLUMN_SIZE

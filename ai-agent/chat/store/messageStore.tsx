@@ -86,6 +86,9 @@ export default class MessageStore {
 
   toolsConfirmQueue: string[] = [];
 
+  openFileConfirmQueue: Array<{ fileId: number; title: string }> =
+    [];
+
   onStreamData?: (chunk: string) => void;
 
   constructor(aiApi: AiApi) {
@@ -101,6 +104,20 @@ export default class MessageStore {
     this.toolsConfirmQueue = this.toolsConfirmQueue.filter(
       (item) => item !== id,
     );
+  };
+
+  addToOpenFileConfirmQueue = (entry: {
+    fileId: number;
+    title: string;
+  }) => {
+    this.openFileConfirmQueue.push(entry);
+  };
+
+  removeFromOpenFileConfirmQueue = (fileId: number) => {
+    this.openFileConfirmQueue =
+      this.openFileConfirmQueue.filter(
+        (item) => item.fileId !== fileId,
+      );
   };
 
   addMessage = (message: TMessage) => {
@@ -400,14 +417,10 @@ export default class MessageStore {
     const fileId = Number(data?.id);
     if (!Number.isInteger(fileId) || fileId <= 0) return;
 
-    const webSearchParams = new URLSearchParams();
-
-    webSearchParams.append("fileId", String(fileId));
-    webSearchParams.append("withTool", "true");
-
-    const url = `${window.location.origin}/doceditor?${webSearchParams.toString()}`;
-
-    window.open(url, "_blank");
+    this.addToOpenFileConfirmQueue({
+      fileId,
+      title: data.title,
+    });
   };
 
   handleToolCall = (jsonData: string) => {
@@ -555,6 +568,9 @@ export default class MessageStore {
       return;
     }
 
+    let analyzeTimer: ReturnType<typeof setTimeout> | null =
+      null;
+
     try {
       const textDecoder = new TextDecoder();
 
@@ -567,10 +583,36 @@ export default class MessageStore {
       let chunkIdx = -1;
       let isReasoningRunning = false;
 
+      const hasPendingToolCall = () => {
+        const lastMsg = this.getLastMessage();
+        if (!lastMsg) return false;
+        return lastMsg.contents.some(
+          (c) =>
+            (c as TToolCallContent).type ===
+              ContentType.Tool &&
+            !(c as TToolCallContent).result,
+        );
+      };
+
+      const resetAnalyzeTimer = () => {
+        if (analyzeTimer) clearTimeout(analyzeTimer);
+        analyzeTimer = setTimeout(() => {
+          if (
+            this.toolsConfirmQueue.length > 0 ||
+            this.openFileConfirmQueue.length > 0 ||
+            hasPendingToolCall()
+          ) {
+            return;
+          }
+          this.setIsAnalyzing(true);
+        }, 1000);
+      };
+
       const streamHandler = async () => {
         const { done, value } = await reader.read();
 
         if (done) {
+          if (analyzeTimer) clearTimeout(analyzeTimer);
           this.setIsRequestRunning(false);
           this.setIsStreamRunning(false);
           this.setIsAnalyzing(false);
@@ -774,6 +816,8 @@ export default class MessageStore {
             }
           });
 
+          resetAnalyzeTimer();
+
           await streamHandler();
         } catch (e) {
           console.error(e);
@@ -788,6 +832,7 @@ export default class MessageStore {
       console.error(e);
       toastr.error(e as string);
     } finally {
+      if (analyzeTimer) clearTimeout(analyzeTimer);
       this.setIsRequestRunning(false);
       this.setIsStreamRunning(false);
       this.setIsAnalyzing(false);

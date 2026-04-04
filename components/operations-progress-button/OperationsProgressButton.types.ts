@@ -29,7 +29,9 @@ export interface Operation {
   operation: string;
   label: string;
   alert: boolean;
+  canceled?: boolean;
   completed: boolean;
+  stopped?: boolean;
   percent?: number;
   withoutStatus?: boolean;
   showPanel?: (open: boolean) => void;
@@ -47,7 +49,9 @@ export interface OperationsProgressProps {
   panelOperations?: Operation[];
   operations?: Operation[];
   operationsAlert?: boolean;
+  operationsCanceled?: boolean;
   operationsCompleted?: boolean;
+  operationsStopped?: boolean;
   clearOperationsData?: (
     operationId?: string | null,
     operation?: string | null,
@@ -55,7 +59,16 @@ export interface OperationsProgressProps {
   ) => void;
   clearPanelOperationsData?: (operation?: string | null) => void;
   clearDropPreviewLocation?: () => void;
-  cancelUpload?: (t: (key: string, interpolation?: Record<string, string | number> | undefined) => string | undefined) => void;
+  cancelUpload?: (
+    t: (
+      key: string,
+      interpolation?: Record<string, string | number> | undefined,
+    ) => string | undefined,
+  ) => void;
+  cancelSecondaryOperationById?: (
+    operation: string,
+    operationId: string,
+  ) => void;
   onOpenPanel?: () => void;
   mainButtonVisible?: boolean;
   needErrorChecking?: boolean;
@@ -93,6 +106,8 @@ export interface ProgressBarMobileProps {
   iconUrl?: string;
   /** Indicates if the operation is completed */
   completed?: boolean;
+  /** Indicates if the operation was stopped by user */
+  stopped?: boolean;
   /** Callback function for clearing progress */
   onClearProgress?: (operationId: string | null, operation: string) => void;
   /** Unique identifier for the operation */
