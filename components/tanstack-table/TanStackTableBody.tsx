@@ -24,10 +24,10 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useRef, useMemo, useCallback, useEffect } from "react";
+import React, { useRef, useMemo, useEffect } from "react";
 import classNames from "classnames";
 
-import { useWindowVirtualizer } from "@tanstack/react-virtual";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { useTanStackTable } from "./TanStackTableContext";
 import { TABLE_DEFAULTS } from "./TanStackTable.types";
@@ -72,36 +72,30 @@ export function TanStackTableBody({
 }: TanStackTableBodyProps) {
   const { table } = useTanStackTable();
   const rows = table.getRowModel().rows;
-  const count = totalCount ?? rows.length;
+  const loadedCount = rows.length;
+  const count = totalCount ?? loadedCount;
 
-  const virtualizer = useWindowVirtualizer({
+  const virtualizer = useVirtualizer({
     count,
     estimateSize: () => itemHeight,
     overscan,
+    getScrollElement: () => document.querySelector<HTMLElement>(".section-scroll"),
   });
 
-  // Infinite scroll: trigger fetchMore near bottom
+  // Infinite scroll: trigger fetchMore when last visible item reaches end of loaded data
   const isLoadingRef = useRef(isLoading);
   isLoadingRef.current = isLoading;
 
+  const virtualItems = virtualizer.getVirtualItems();
+  const lastVirtualItem = virtualItems[virtualItems.length - 1];
+
   useEffect(() => {
     if (!hasMore || !fetchMore) return;
-
-    const items = virtualizer.getVirtualItems();
-    if (items.length === 0) return;
-
-    const lastItem = items[items.length - 1];
-    if (!lastItem) return;
-
-    if (lastItem.index >= count - 1 && !isLoadingRef.current) {
+    if (!lastVirtualItem) return;
+    if (lastVirtualItem.index >= loadedCount - 1 && !isLoadingRef.current) {
       fetchMore();
     }
-  }, [
-    hasMore,
-    fetchMore,
-    count,
-    virtualizer.getVirtualItems().length,
-  ]);
+  }, [hasMore, fetchMore, loadedCount, lastVirtualItem?.index]);
 
   // gridTemplateColumns from table state (not from localStorage)
   const gridTemplateColumns = useMemo(() => {
@@ -112,7 +106,6 @@ export function TanStackTableBody({
     return parts.join(" ");
   }, [table, table.getState().columnSizing, table.getState().columnVisibility]);
 
-  const virtualItems = virtualizer.getVirtualItems();
   const totalSize = virtualizer.getTotalSize();
 
   const bodyClasses = classNames(
