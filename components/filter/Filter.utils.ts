@@ -99,17 +99,6 @@ const getFilterLocation = (filterValues: TGroupItem[] | TItem[]) => {
   return filterType?.toString() ? +filterType : null;
 };
 
-const getSubjectFilter = (filterValues: TGroupItem[] | TItem[]) => {
-  const subjectFilter = result(
-    find(filterValues, (value) => {
-      return value.group === FilterGroups.roomFilterOwner;
-    }),
-    "key",
-  );
-
-  return subjectFilter?.toString() ? subjectFilter?.toString() : null;
-};
-
 const getAuthorType = (filterValues: TGroupItem[] | TItem[]) => {
   const authorType = result(
     find(filterValues, (value) => {
@@ -178,6 +167,17 @@ const getSubjectId = (filterValues: TGroupItem[] | TItem[]) => {
   const filterOwner = result(
     find(filterValues, (value) => {
       return value.group === FilterGroups.roomFilterSubject;
+    }),
+    "key",
+  );
+
+  return filterOwner || null;
+};
+
+const getSubjectOwnerId = (filterValues: TGroupItem[] | TItem[]) => {
+  const filterOwner = result(
+    find(filterValues, (value) => {
+      return value.group === FilterGroups.roomFilterOwner;
     }),
     "key",
   );
@@ -308,13 +308,13 @@ export {
   getFilterType,
   getSharedBy,
   getFilterLocation,
-  getSubjectFilter,
   getAuthorType,
   getRoomId,
   getSearchParams,
   getType,
   getProviderType,
   getSubjectId,
+  getSubjectOwnerId,
   getFilterContent,
   getTags,
   getQuotaFilter,

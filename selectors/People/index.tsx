@@ -52,6 +52,7 @@ import {
   type EmployeeFullDto,
   type GroupDto,
   type EmployeeType as SdkEmployeeType,
+  type SearchUsersByExtendedFilterEmployeeTypesEnum,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../providers/api/ApiProvider";
 import { useCommonTranslation } from "../../utils/i18n";
@@ -353,12 +354,15 @@ const PeopleSelector = ({
         let responseTotal = 0;
 
         if (!roomId) {
+          const employeeType =
+            currentFilter.role as SearchUsersByExtendedFilterEmployeeTypesEnum[];
+
           const res = await peopleSearchApi.searchUsersByExtendedFilter(
             currentFilter.employeeStatus,
             undefined,
             undefined,
             undefined,
-            undefined,
+            employeeType,
             undefined,
             undefined,
             undefined,
@@ -812,3 +816,4 @@ const PeopleSelector = ({
 };
 
 export default PeopleSelector;
+

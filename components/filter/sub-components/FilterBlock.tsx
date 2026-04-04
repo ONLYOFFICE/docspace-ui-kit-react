@@ -78,26 +78,6 @@ const FilterBlock = ({
   const [isLoading, setIsLoading] = React.useState(isRooms);
 
   const setFilterDataFn = (data: TItem[]) => {
-    const filterSubject = data.find(
-      (f) => f.group === FilterGroups.roomFilterSubject,
-    );
-
-    if (filterSubject && filterSubject.groupItem) {
-      const filterOwner = data.find(
-        (f) => f.group === FilterGroups.roomFilterOwner,
-      );
-
-      const isSelected =
-        filterSubject.groupItem.findIndex((i) => i.isSelected) > -1;
-
-      if (
-        filterOwner &&
-        filterOwner.groupItem &&
-        "isDisabled" in filterOwner.groupItem[0]
-      )
-        filterOwner.groupItem[0].isDisabled = !isSelected;
-    }
-
     syncGroupManagerCheckBox(data);
 
     setFilterData(data);
@@ -281,9 +261,11 @@ const FilterBlock = ({
             ) {
               value[idx].key.push(key);
             } else {
-              value[idx].key = isSelected && isFilterOwner ? "1" : key;
+              value[idx].key = key;
               if (label) {
                 value[idx].label = label;
+              } else if (!key) {
+                delete value[idx].label;
               }
             }
           }
