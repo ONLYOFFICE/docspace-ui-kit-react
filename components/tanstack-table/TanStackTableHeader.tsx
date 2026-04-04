@@ -61,7 +61,46 @@ export function TanStackTableHeader({
 
   const gridTemplateColumns = useMemo(() => {
     const visibleColumns = table.getVisibleLeafColumns();
-    const parts = visibleColumns.map((col) => `${col.getSize()}px`);
+    const { isResizingColumn, columnSizingStart = [], deltaOffset = 0 } =
+      table.getState().columnSizingInfo;
+
+    const resizingIdx = isResizingColumn
+      ? visibleColumns.findIndex((c) => c.id === isResizingColumn)
+      : -1;
+    const resizingStartSize = isResizingColumn
+      ? (columnSizingStart.find(([id]) => id === isResizingColumn)?.[1] ?? 0)
+      : 0;
+    const adjacentIdx =
+      resizingIdx >= 0 && resizingIdx < visibleColumns.length - 1
+        ? resizingIdx + 1
+        : -1;
+
+    const parts = visibleColumns.map((col, i) => {
+      const isLastDataCol = i === visibleColumns.length - 1;
+
+      if (i === resizingIdx && isResizingColumn && deltaOffset) {
+        const minSize = col.columnDef.minSize ?? TABLE_DEFAULTS.MIN_COLUMN_SIZE;
+        return `${Math.max(resizingStartSize + deltaOffset, minSize)}px`;
+      }
+      // Last visible column always fills remaining space; 1fr naturally
+      // compensates when an adjacent column is resized — no px override needed.
+      if (isLastDataCol) return "1fr";
+      if (i === adjacentIdx && isResizingColumn && deltaOffset) {
+        const currentSize = col.getSize();
+        const minSize = col.columnDef.minSize ?? TABLE_DEFAULTS.MIN_COLUMN_SIZE;
+        const resizingMinSize =
+          visibleColumns[resizingIdx].columnDef.minSize ??
+          TABLE_DEFAULTS.MIN_COLUMN_SIZE;
+        const actualResizingSize = Math.max(
+          resizingStartSize + deltaOffset,
+          resizingMinSize,
+        );
+        const actualDelta = actualResizingSize - resizingStartSize;
+        return `${Math.max(currentSize - actualDelta, minSize)}px`;
+      }
+      return `${col.getSize()}px`;
+    });
+
     // Settings column: 32px icon area, content right-aligned
     parts.push(`${TABLE_DEFAULTS.SETTINGS_COLUMN_SIZE}px`);
     return parts.join(" ");
@@ -86,17 +125,20 @@ export function TanStackTableHeader({
       style={{ gridTemplateColumns }}
       data-testid="table-header"
     >
-      {table.getHeaderGroups().map((headerGroup) =>
-        headerGroup.headers.map((header, idx) => (
+      {table.getHeaderGroups().map((headerGroup) => {
+        const visibleHeaders = headerGroup.headers.filter((h) =>
+          h.column.getIsVisible(),
+        );
+        return visibleHeaders.map((header, idx) => (
           <HeaderCell
             key={header.id}
             header={header}
             activeSortBy={activeSortBy}
             activeSortOrder={activeSortOrder}
-            isLastColumn={idx === headerGroup.headers.length - 1}
+            isLastColumn={idx === visibleHeaders.length - 1}
           />
-        )),
-      )}
+        ));
+      })}
 
       {showSettings ? (
         <div
@@ -188,7 +230,7 @@ function HeaderCell({ header, activeSortBy, activeSortOrder, isLastColumn }: Hea
 
       {canResize && !isLastColumn ? (
         <div
-          className={styles.resizeHandle}
+          className={`${styles.resizeHandle} not-selectable`}
           onMouseDown={header.getResizeHandler()}
           onTouchStart={header.getResizeHandler()}
           data-testid="resize-handle"

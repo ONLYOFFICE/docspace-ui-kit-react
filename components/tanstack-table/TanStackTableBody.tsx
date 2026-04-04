@@ -97,14 +97,58 @@ export function TanStackTableBody({
     }
   }, [hasMore, fetchMore, loadedCount, lastVirtualItem?.index]);
 
-  // gridTemplateColumns from table state (not from localStorage)
+  // gridTemplateColumns: shows live zero-sum preview during column resize
   const gridTemplateColumns = useMemo(() => {
     const visibleColumns = table.getVisibleLeafColumns();
-    const parts = visibleColumns.map((col) => `${col.getSize()}px`);
+    const { isResizingColumn, columnSizingStart = [], deltaOffset = 0 } =
+      table.getState().columnSizingInfo;
+
+    const resizingIdx = isResizingColumn
+      ? visibleColumns.findIndex((c) => c.id === isResizingColumn)
+      : -1;
+    const resizingStartSize = isResizingColumn
+      ? (columnSizingStart.find(([id]) => id === isResizingColumn)?.[1] ?? 0)
+      : 0;
+    const adjacentIdx =
+      resizingIdx >= 0 && resizingIdx < visibleColumns.length - 1
+        ? resizingIdx + 1
+        : -1;
+
+    const parts = visibleColumns.map((col, i) => {
+      const isLastDataCol = i === visibleColumns.length - 1;
+
+      if (i === resizingIdx && isResizingColumn && deltaOffset) {
+        const minSize = col.columnDef.minSize ?? TABLE_DEFAULTS.MIN_COLUMN_SIZE;
+        return `${Math.max(resizingStartSize + deltaOffset, minSize)}px`;
+      }
+      // Last visible column always fills remaining space; 1fr naturally
+      // compensates when an adjacent column is resized — no px override needed.
+      if (isLastDataCol) return "1fr";
+      if (i === adjacentIdx && isResizingColumn && deltaOffset) {
+        const currentSize = col.getSize();
+        const minSize = col.columnDef.minSize ?? TABLE_DEFAULTS.MIN_COLUMN_SIZE;
+        const resizingMinSize =
+          visibleColumns[resizingIdx].columnDef.minSize ??
+          TABLE_DEFAULTS.MIN_COLUMN_SIZE;
+        const actualResizingSize = Math.max(
+          resizingStartSize + deltaOffset,
+          resizingMinSize,
+        );
+        const actualDelta = actualResizingSize - resizingStartSize;
+        return `${Math.max(currentSize - actualDelta, minSize)}px`;
+      }
+      return `${col.getSize()}px`;
+    });
+
     // Context menu / settings column
     parts.push(`${TABLE_DEFAULTS.SETTINGS_COLUMN_SIZE}px`);
     return parts.join(" ");
-  }, [table, table.getState().columnSizing, table.getState().columnVisibility]);
+  }, [
+    table,
+    table.getState().columnSizing,
+    table.getState().columnVisibility,
+    table.getState().columnSizingInfo,
+  ]);
 
   const totalSize = virtualizer.getTotalSize();
 

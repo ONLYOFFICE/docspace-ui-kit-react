@@ -241,13 +241,16 @@ const SelectionArea = ({
     for (let i = 0; i < selectables.length; i += 1) {
       const node = selectables[i];
 
-      const splitItem =
+      const innerEl =
+        viewAs !== "tile"
+          ? node?.getElementsByClassName(itemClass)[0]
+          : null;
+      const rawValue =
         viewAs === "tile"
-          ? node?.getAttribute("value")?.split("_")
-          : node
-              ?.getElementsByClassName(itemClass)[0]
-              ?.getAttribute("value")
-              ?.split("_");
+          ? node?.getAttribute("value")
+          : (innerEl?.getAttribute("data-value") ??
+             innerEl?.getAttribute("value"));
+      const splitItem = rawValue?.split("_");
 
       const itemType = splitItem?.[0];
       const itemIndex = splitItem?.[splitItem.length - 1];

@@ -86,7 +86,7 @@ export function TanStackTableContainer<TData>({
   onSortingChange,
   onColumnVisibilityChange,
   onColumnSizingChange,
-  columnResizeMode = "onChange",
+  columnResizeMode = "onEnd",
   columnResizeDirection = "ltr",
   className,
   forwardedRef,
@@ -99,9 +99,19 @@ export function TanStackTableContainer<TData>({
 
   const [columnSizing, setColumnSizing] =
     useState<ColumnSizingState>(initialSizing);
+  // Derive visibility synchronously during render: if initialVisibility changed,
+  // update columnVisibility in the same render (no useEffect lag).
+  const prevInitialVisibilityRef = useRef(initialVisibility);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialVisibility ?? {},
   );
+  let effectiveVisibility = columnVisibility;
+  if (initialVisibility && initialVisibility !== prevInitialVisibilityRef.current) {
+    prevInitialVisibilityRef.current = initialVisibility;
+    effectiveVisibility = initialVisibility;
+    // Schedule state sync so React's state is consistent on next render
+    setColumnVisibility(initialVisibility);
+  }
 
   const handleColumnVisibilityChange: OnChangeFn<VisibilityState> = useCallback(
     (updater) => {
@@ -215,7 +225,7 @@ export function TanStackTableContainer<TData>({
     state: {
       columnSizing,
       columnSizingInfo,
-      columnVisibility,
+      columnVisibility: effectiveVisibility,
       sorting,
     },
     columnResizeMode,
