@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -281,6 +281,55 @@ export const MaxWidthVariants: Story = {
         code: `<Tag tag="short" label="Short" tagMaxWidth="80px" />
 <Tag tag="long" label="This is a very long tag label..." tagMaxWidth="160px" />
 <Tag tag="wide" label="Wide tag with more space" tagMaxWidth="250px" />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--tag-bg": "#EDE7F6",
+          "--tag-border-style": "1px solid #9C27B0",
+          "--tag-radius": "16px",
+          "--tag-inner-padding": "4px 14px",
+          "--tag-text-color": "#6A1B9A",
+          "--tag-size": "13px",
+        } as CSSProperties
+      }
+    >
+      <Tag tag="custom" label="Custom Tag" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+\`\`\`css
+--tag-bg            /* background color */
+--tag-border-style  /* border shorthand */
+--tag-radius        /* border-radius */
+--tag-inner-padding /* padding */
+--tag-text-color    /* text color */
+--tag-size          /* font-size */
+\`\`\``,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--tag-bg": "#EDE7F6",
+    "--tag-border-style": "1px solid #9C27B0",
+    "--tag-radius": "16px",
+    "--tag-inner-padding": "4px 14px",
+    "--tag-text-color": "#6A1B9A",
+    "--tag-size": "13px",
+  }}
+>
+  <Tag tag="custom" label="Custom Tag" />
+</div>`,
       },
     },
   },
