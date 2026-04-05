@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -322,6 +322,52 @@ export const CustomStyled: Story = {
         code: `<Heading level={HeadingLevel.h1} color="blue">Blue Heading</Heading>
 <Heading level={HeadingLevel.h1} style={{ fontStyle: "italic" }}>Italic Heading</Heading>
 <Heading level={HeadingLevel.h1} style={{ textDecoration: "underline" }}>Underlined Heading</Heading>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--heading-text-color": "#7B4FBF",
+          "--heading-weight": "800",
+          "--heading-size-content": "22px",
+        } as CSSProperties
+      }
+    >
+      <Heading level={HeadingLevel.h2} type="content">
+        Custom Heading
+      </Heading>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+\`\`\`css
+--heading-text-color     /* color override */
+--heading-weight         /* font-weight override */
+--heading-size-content   /* content type font-size (default 18px) */
+--heading-size-menu      /* menu type font-size (default 23px) */
+--heading-size-header    /* header type font-size (default 28px) */
+\`\`\``,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--heading-text-color": "#7B4FBF",
+    "--heading-weight": "800",
+    "--heading-size-content": "22px",
+  }}
+>
+  <Heading level={HeadingLevel.h2} type="content">
+    Custom Heading
+  </Heading>
+</div>`,
       },
     },
   },
