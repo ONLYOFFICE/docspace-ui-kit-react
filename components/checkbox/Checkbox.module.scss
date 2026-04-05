@@ -69,12 +69,15 @@
   --text-color: #{variables.$black};
   --text-disable-color: #{variables.$gray};
 
+  --checkbox-spacing: var(--checkbox-gap, 12px);
+  --checkbox-line-height: var(--checkbox-lh, 16px);
+
   display: flex;
   align-items: center;
   position: relative;
   margin: 0;
 
-  line-height: 16px;
+  line-height: var(--checkbox-line-height);
 
   user-select: none;
   -o-user-select: none;
@@ -83,7 +86,7 @@
   -webkit-tap-highlight-color: #{variables.$tap-highlight};
 
   .checkbox {
-    margin-inline-end: 12px;
+    margin-inline-end: var(--checkbox-spacing);
     overflow: visible;
     outline: none;
   }
