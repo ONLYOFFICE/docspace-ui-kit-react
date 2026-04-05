@@ -74,6 +74,8 @@
   --toggle-button-text-color: #{$black};
   --toggle-button-text-disable-color: #{$gray};
 
+  --toggle-button-gap: var(--toggle-button-spacing, 8px);
+
   display: inline-block;
 }
 
@@ -88,7 +90,7 @@
 
   display: grid;
   grid-template-columns: min-content auto;
-  grid-gap: 8px;
+  grid-gap: var(--toggle-button-gap);
 
   cursor: pointer;
 

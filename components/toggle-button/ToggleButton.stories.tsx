@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -239,6 +239,36 @@ export const WithoutAnimation: Story = {
       source: {
         code: `<ToggleButton label="No animation" noAnimation />
 <ToggleButton label="No animation on" noAnimation isChecked />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--toggle-button-spacing": "16px",
+        } as CSSProperties
+      }
+    >
+      <ToggleButton label="Increased gap" isChecked />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+\`\`\`css
+--toggle-button-spacing  /* gap between toggle and label (default 8px) */
+\`\`\``,
+      },
+      source: {
+        code: `<div style={{ "--toggle-button-spacing": "16px" }}>
+  <ToggleButton label="Increased gap" isChecked />
+</div>`,
       },
     },
   },
