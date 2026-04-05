@@ -140,11 +140,13 @@
   --filled-button-icon-color-hover: #{$light-gray-dark};
   --filled-button-text-color-hover: #{$gray-text};
 
+  --button-font-weight: var(--button-text-weight, 600);
+
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  font-weight: var(--button-font-weight);
   border-radius: var(--button-root-border-radius, 3px);
   cursor: pointer;
   margin: 0;
@@ -166,29 +168,29 @@
 
   // Size variants
   &.extraSmall {
-    height: 24px;
-    font-size: 12px;
+    height: var(--button-height-xs, 24px);
+    font-size: var(--button-font-size-xs, 12px);
     line-height: 15px;
     padding: 0 11.5px;
   }
 
   &.small {
-    height: 32px;
-    font-size: 13px;
+    height: var(--button-height-sm, 32px);
+    font-size: var(--button-font-size-sm, 13px);
     line-height: 20px;
     padding: 0 28px;
   }
 
   &.normal {
-    height: 40px;
-    font-size: 14px;
+    height: var(--button-height-md, 40px);
+    font-size: var(--button-font-size-md, 14px);
     line-height: 16px;
     padding: 0 28px;
   }
 
   &.medium {
-    height: 44px;
-    font-size: 16px;
+    height: var(--button-height-lg, 44px);
+    font-size: var(--button-font-size-lg, 16px);
     line-height: 22px;
     padding: 0 32px;
   }

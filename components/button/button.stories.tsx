@@ -737,8 +737,11 @@ No JavaScript needed — just set variables on any wrapper.
 | \`--button-primary-color\` | Primary text color |
 | \`--button-primary-border\` | Primary border |
 | \`--button-primary-bg-hover\` | Primary hover background |
+| \`--button-text-weight\` | Font weight (default: 600) |
+| \`--button-height-xs/sm/md/lg\` | Height per size variant |
+| \`--button-font-size-xs/sm/md/lg\` | Font size per size variant |
 
-All variables support \`-hover\`, \`-active\`, \`-disabled\` suffixes.`,
+All color variables support \`-hover\`, \`-active\`, \`-disabled\` suffixes.`,
       },
       source: {
         code: `// Wrap buttons in a div with CSS variables

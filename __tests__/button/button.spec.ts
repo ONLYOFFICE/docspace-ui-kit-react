@@ -109,6 +109,39 @@ test.describe("Button — screenshots (light theme)", () => {
     await firstButton.hover();
     await expect(page).toHaveScreenshot("button-secondary-hover-mouse.png");
   });
+
+  test("css customization", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await expect(page).toHaveScreenshot("button-css-customization.png");
+  });
+});
+
+test.describe("Button — screenshots (dark theme)", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("dark");
+      });
+    });
+  });
+
+  test("primary variants — all sizes dark", async ({ page }) => {
+    await gotoStory(page, "primary-buttons");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("button-primary-all-sizes-dark.png");
+  });
+
+  test("secondary variants — all sizes dark", async ({ page }) => {
+    await gotoStory(page, "secondary-buttons");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("button-secondary-all-sizes-dark.png");
+  });
+
+  test("css customization dark", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("button-css-customization-dark.png");
+  });
 });
 
 // ─── Behaviour tests ──────────────────────────────────────────────────────────
