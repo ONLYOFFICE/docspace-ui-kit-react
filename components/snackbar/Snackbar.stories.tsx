@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
@@ -281,6 +281,51 @@ export const WithHtmlContent: Story = {
   countDownTime={0}
   sectionWidth={500}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          width: "400px",
+          "--snackbar-bg": "#1e1b4b",
+          "--snackbar-text-color": "#e0e7ff",
+          "--snackbar-accent-color": "#818cf8",
+          "--snackbar-accent-width": "6px",
+          "--snackbar-text-size": "13px",
+          "--snackbar-content-padding": "16px 24px",
+          "--snackbar-icon-fill": "#818cf8",
+        } as CSSProperties
+      }
+    >
+      <SnackBar
+        text="Custom styled notification with CSS variables"
+        headerText="Custom Theme"
+        showIcon
+        countDownTime={0}
+        sectionWidth={400}
+        onAction={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--snackbar-bg\` | Background color | theme token |
+| \`--snackbar-text-color\` | Text color | theme token |
+| \`--snackbar-accent-color\` | Accent border color | theme token |
+| \`--snackbar-accent-width\` | Accent border width | \`4px\` |
+| \`--snackbar-text-size\` | Font size | \`12px\` |
+| \`--snackbar-content-padding\` | Content padding | \`12px 20px\` |
+| \`--snackbar-icon-fill\` | Icon fill color | theme token |`,
       },
     },
   },
