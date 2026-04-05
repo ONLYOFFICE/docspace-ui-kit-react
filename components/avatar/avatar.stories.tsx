@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import AtReactSvgUrl from "../../assets/@.react.svg?url";
@@ -509,6 +509,41 @@ export const WithCustomRoleIcon: Story = {
   userName="Custom Role"
   roleIcon={<CustomRoleIcon />}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          gap: "16px",
+          alignItems: "center",
+          "--avatar-radius": "8px",
+          "--avatar-initials-weight": "400",
+          "--avatar-initials-bg": "#7c3aed",
+        } as CSSProperties
+      }
+    >
+      <AvatarPure size={AvatarSize.big} userName="John Doe" role={AvatarRole.admin} />
+      <AvatarPure size={AvatarSize.big} userName="Jane Smith" role={AvatarRole.user} />
+      <AvatarPure size={AvatarSize.medium} userName="AB" role={AvatarRole.guest} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--avatar-radius\` | Border radius | \`50%\` |
+| \`--avatar-bg\` | Background color (no image/initials) | theme token |
+| \`--avatar-initials-bg\` | Background color when showing initials | theme token |
+| \`--avatar-initials-weight\` | Font weight of initials | \`600\` |`,
       },
     },
   },
