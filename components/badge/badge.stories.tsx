@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { globalColors } from "../../providers/theme";
@@ -352,6 +352,49 @@ export const InteractiveBadge: Story = {
       },
       source: {
         code: `<Badge label="Click me" onClick={() => alert("Badge clicked!")} />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--badge-bg": "#7B4FBF",
+          "--badge-radius": "12px",
+          "--badge-high-padding": "3px 14px",
+          "--badge-high-font-size": "14px",
+        } as CSSProperties
+      }
+    >
+      <Badge type="high" label="Premium" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+\`\`\`css
+--badge-bg              /* background color */
+--badge-radius          /* border-radius (default 6px) */
+--badge-high-padding    /* padding for high type (default 3px 10px) */
+--badge-high-font-size  /* font-size for high type (default 13px) */
+\`\`\``,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--badge-bg": "#7B4FBF",
+    "--badge-radius": "12px",
+    "--badge-high-padding": "3px 14px",
+    "--badge-high-font-size": "14px",
+  }}
+>
+  <Badge type="high" label="Premium" />
+</div>`,
       },
     },
   },
