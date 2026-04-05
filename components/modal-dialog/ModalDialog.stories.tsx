@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -590,6 +590,74 @@ export const AsideNonCloseable: Story = {
   <ModalDialog.Footer>
     <Button label="Close" primary onClick={closeModal} />
   </ModalDialog.Footer>
+</ModalDialog>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <ModalDialog
+      visible
+      onClose={() => {}}
+      displayType={ModalDialogType.modal}
+      style={
+        {
+          "--modal-dialog-radius": "16px",
+          "--modal-dialog-bg": "#1e1b4b",
+          "--modal-dialog-color": "#e0e7ff",
+          "--modal-dialog-default-width": "460px",
+          "--modal-dialog-horizontal-padding": "24px",
+          "--modal-dialog-buttons-gap": "12px",
+        } as CSSProperties
+      }
+    >
+      <ModalDialog.Header>Custom styled dialog</ModalDialog.Header>
+      <ModalDialog.Body>
+        <p>This dialog uses CSS custom properties for theming.</p>
+      </ModalDialog.Body>
+      <ModalDialog.Footer>
+        <Button label="Confirm" primary size={ButtonSize.normal} scale />
+        <Button label="Cancel" size={ButtonSize.normal} scale />
+      </ModalDialog.Footer>
+    </ModalDialog>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization. Pass via the \`style\` prop on \`<ModalDialog>\`:
+
+\`\`\`css
+--modal-dialog-bg                    /* background color */
+--modal-dialog-color                 /* text color */
+--modal-dialog-backdrop              /* backdrop background */
+--modal-dialog-divider               /* footer border / header border color */
+--modal-dialog-aside-border          /* aside panel inline-start border */
+--modal-dialog-radius                /* border-radius (default: 6px) */
+--modal-dialog-horizontal-padding    /* body/footer horizontal padding (default: 16px) */
+--modal-dialog-vertical-padding      /* body/footer vertical padding (default: 16px) */
+--modal-dialog-buttons-gap           /* footer button gap (default: 8px) */
+--modal-dialog-header-offset         /* header margin-bottom (default: 16px) */
+--modal-dialog-default-width         /* modal width (default: 400px) */
+--modal-dialog-default-max-height    /* modal max-height (default: 280px) */
+--modal-dialog-lg-width              /* large modal width (default: 520px) */
+--modal-dialog-lg-max-height         /* large modal max-height (default: 400px) */
+--modal-dialog-xl-max-width          /* huge modal max-width (default: 730px) */
+--modal-dialog-aside-default-width   /* aside width (default: 480px) */
+\`\`\``,
+      },
+      source: {
+        code: `<ModalDialog
+  visible
+  style={{
+    "--modal-dialog-radius": "16px",
+    "--modal-dialog-bg": "#1e1b4b",
+    "--modal-dialog-color": "#e0e7ff",
+    "--modal-dialog-horizontal-padding": "24px",
+  }}
+>
+  ...
 </ModalDialog>`,
       },
     },
