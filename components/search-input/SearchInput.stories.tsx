@@ -311,8 +311,8 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <SearchInput placeholder="Custom styled search" value="" onChange={() => {}} />
-      <SearchInput placeholder="With value" value="Search term" onChange={() => {}} />
+      <SearchInput size={InputSize.base} placeholder="Custom styled search" value="" onChange={() => {}} />
+      <SearchInput size={InputSize.base} placeholder="With value" value="Search term" onChange={() => {}} />
     </div>
   ),
   parameters: {
