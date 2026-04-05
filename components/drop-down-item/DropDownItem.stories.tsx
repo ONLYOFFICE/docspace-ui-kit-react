@@ -24,12 +24,13 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import SettingsReactSvgUrl from "../../assets/settings.react.svg?url";
 
+import { DropDown } from "../drop-down";
 import { DropDownItem } from ".";
 
 const meta = {
@@ -318,11 +319,7 @@ export const WithBadges: Story = {
 const SubmenuTemplate = () => {
   return (
     <Wrapper>
-      <DropDownItem
-        label="Open Submenu"
-        icon={SettingsReactSvgUrl}
-        isSubMenu
-      />
+      <DropDownItem label="Open Submenu" icon={SettingsReactSvgUrl} isSubMenu />
       <DropDownItem
         label="Active Submenu"
         icon={SettingsReactSvgUrl}
@@ -385,11 +382,7 @@ export const WithAdditionalElement: Story = {
 const HeaderWithArrowTemplate = () => {
   return (
     <Wrapper>
-      <DropDownItem
-        label="Header with Back"
-        isHeader
-        withHeaderArrow
-      />
+      <DropDownItem label="Header with Back" isHeader withHeaderArrow />
       <DropDownItem label="Option 1" />
       <DropDownItem label="Option 2" />
     </Wrapper>
@@ -401,8 +394,7 @@ export const HeaderWithArrow: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Header item with a back arrow for navigating submenu levels.",
+        story: "Header item with a back arrow for navigating submenu levels.",
       },
       source: {
         code: `<DropDownItem label="Header with Back" isHeader withHeaderArrow />`,
@@ -433,6 +425,52 @@ export const WithTextOverflow: Story = {
       },
       source: {
         code: `<DropDownItem label="Very long text..." textOverflow minWidth="200px" />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          position: "relative",
+          height: "200px",
+          width: "240px",
+          "--drop-down-item-color": "#4c1d95",
+          "--drop-down-item-hover-bg": "#ede9fe",
+          "--drop-down-item-divider": "#c4b5fd",
+          "--drop-down-item-height": "40px",
+          "--drop-down-item-font-size": "14px",
+          "--drop-down-item-padding": "0 20px",
+        } as CSSProperties
+      }
+    >
+      <DropDown open directionY="bottom" fixedDirection>
+        <DropDownItem label="Custom Item" icon={SettingsReactSvgUrl} />
+        <DropDownItem label="Another Item" icon={SettingsReactSvgUrl} />
+        <DropDownItem isSeparator />
+        <DropDownItem label="Disabled Item" disabled />
+      </DropDown>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--drop-down-item-color\` | Text and icon color | theme token |
+| \`--drop-down-item-hover-bg\` | Hover background color | theme token |
+| \`--drop-down-item-divider\` | Separator color | theme token |
+| \`--drop-down-item-height\` | Item line height | \`32px\` |
+| \`--drop-down-item-font-size\` | Item font size | \`13px\` |
+| \`--drop-down-item-font-weight\` | Item font weight | \`600\` |
+| \`--drop-down-item-padding\` | Item padding | \`0 12px\` |
+| \`--drop-down-item-header-height\` | Header item height | \`48px\` |
+| \`--drop-down-item-header-font-size\` | Header font size | \`15px\` |`,
       },
     },
   },
