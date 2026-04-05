@@ -316,8 +316,12 @@ export const CssCustomization: Story = {
         disablePrevious={false}
         disableNext={false}
         openDirection="bottom"
+        pageItems={createPageItems(10)}
+        countItems={countItems}
         selectedCountItem={{ key: 25, label: "25 per page" }}
         selectedPageItem={{ key: 1, label: "1 of 10" }}
+        previousAction={() => {}}
+        nextAction={() => {}}
       />
     </div>
   ),
