@@ -48,7 +48,7 @@
 .loader {
   width: var(--loader-size, 40px);
   height: var(--loader-size, 40px);
-  stroke: var(--loader-color);
+  stroke: var(--loader-stroke, var(--loader-color));
 }
 
 .loaderTrack {
