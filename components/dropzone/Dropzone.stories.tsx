@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -197,6 +197,99 @@ const defaultArgs: ComponentProps<typeof Dropzone> = {
   maxFiles: 0,
   onDrop: () => {},
   onSingleUploadError: () => {},
+};
+
+const CssCustomizationTemplate = () => {
+  return (
+    <div
+      style={
+        {
+          // === Dropzone — border, background, shape ===
+          "--dropzone-border-style": "2px dashed #0082c9",
+          "--dropzone-radius": "12px",
+          "--dropzone-min-height": "180px",
+          "--dropzone-drag-bg": "#e6f3fb",
+          "--dropzone-hover-bg-override": "#cce5f6",
+          "--dropzone-text-size": "14px",
+          // === Dropzone — exsts / formats area ===
+          "--dropzone-text-color": "#0082c9",
+          "--dropzone-text-hover-bg": "rgba(0, 130, 201, 0.1)",
+          "--dropzone-text-focus-bg": "rgba(0, 130, 201, 0.15)",
+          "--dropzone-text-focus-color": "#0082c9",
+          "--dropzone-exsts-radius": "6px",
+          "--dropzone-formats-radius": "10px",
+          "--dropzone-formats-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
+          // === Link (main/secondary upload link text) ===
+          "--link-color": "#0082c9",
+          // === Badge (format count badge) ===
+          "--badge-bg": "#0082c9",
+          "--badge-radius": "8px",
+        } as CSSProperties
+      }
+    >
+      <Dropzone
+        linkMainText="Click to upload"
+        linkSecondaryText="or drag and drop files here"
+        exstsText="PDF, DOC, DOCX"
+        formatsPlusBadgeValue={5}
+        accept={[".pdf", ".doc", ".docx"]}
+        onDrop={() => {}}
+        onSingleUploadError={() => {}}
+      />
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**Dropzone — border and background**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--dropzone-border-style\` | Border shorthand (width style color) | theme-based dashed |
+| \`--dropzone-radius\` | Border radius | \`6px\` |
+| \`--dropzone-min-height\` | Minimum height | \`150px\` |
+| \`--dropzone-drag-bg\` | Background when item is dragged onto the page | theme-based |
+| \`--dropzone-hover-bg-override\` | Background on drag-over (hover) | theme-based |
+| \`--dropzone-gap\` | Gap between child elements | \`4px\` |
+
+**Dropzone — exsts / formats area**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--dropzone-text-size\` | Font size for link and exsts text | \`13px\` |
+| \`--dropzone-text-color\` | Exsts text and arrow icon color | theme-based |
+| \`--dropzone-link-secondary-color\` | Secondary link text color | theme-based |
+| \`--dropzone-text-hover-bg\` | Exsts container hover background | theme-based |
+| \`--dropzone-text-pressed-bg\` | Exsts container pressed background | theme-based |
+| \`--dropzone-text-focus-bg\` | Exsts container open/focus background | theme-based |
+| \`--dropzone-text-focus-color\` | Exsts text color when open | theme-based |
+| \`--dropzone-badge-focus-color\` | Badge background when open | theme-based |
+| \`--dropzone-arrow-focus-color\` | Arrow icon color when open | theme-based |
+| \`--dropzone-exsts-radius\` | Exsts text container border radius | \`3px\` |
+| \`--dropzone-formats-radius\` | Formats dropdown border radius | \`6px\` |
+| \`--dropzone-formats-shadow\` | Formats dropdown box shadow | theme-based |
+
+**Link (main/secondary upload text)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--link-color\` | Link text color | theme-based |
+
+**Badge (format count badge)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--badge-bg\` | Badge background color | theme accent |
+| \`--badge-radius\` | Badge border radius | \`6px\` |`,
+      },
+    },
+  },
 };
 
 export const Default: Story = {
