@@ -38,25 +38,36 @@
     --progress-bar-background-hover: #{colors.$light-gray-dark};
   }
 
-  margin-bottom: 8px;
+  --ops-progress-dropdown-bg-value: var(
+    --ops-progress-dropdown-bg,
+    var(--progress-bar-background-dropdown-color)
+  );
+  --ops-progress-dropdown-hover-value: var(
+    --ops-progress-dropdown-hover,
+    var(--progress-bar-background-hover)
+  );
+  --ops-progress-dropdown-margin-value: var(--ops-progress-dropdown-margin, 8px);
+  --ops-progress-list-padding-value: var(--ops-progress-list-padding, 0px 8px);
 
-  background-color: var(--progress-bar-background-dropdown-color);
+  margin-bottom: var(--ops-progress-dropdown-margin-value);
+
+  background-color: var(--ops-progress-dropdown-bg-value);
 
   :global {
     .progress-list {
-      padding: 0px 8px;
+      padding: var(--ops-progress-list-padding-value);
     }
 
     .progress-list.withHover:hover {
-      background-color: var(--progress-bar-background-hover);
+      background-color: var(--ops-progress-dropdown-hover-value);
     }
   }
 
   &:active {
-    background-color: var(--progress-bar-background-dropdown-color);
+    background-color: var(--ops-progress-dropdown-bg-value);
   }
   @media (hover: hover) {
-    background-color: var(--progress-bar-background-dropdown-color);
+    background-color: var(--ops-progress-dropdown-bg-value);
   }
 }
 
@@ -282,6 +293,15 @@
       --status-icon-color-negative: #{colors.$dark-error-status};
     }
 
+    --ops-progress-success-icon-value: var(
+      --ops-progress-success-icon,
+      var(--status-icon-color-positive)
+    );
+    --ops-progress-error-icon-value: var(
+      --ops-progress-error-icon,
+      var(--status-icon-color-negative)
+    );
+
     position: absolute;
     width: 12px;
     height: 12px;
@@ -297,7 +317,7 @@
     &.alert {
       svg {
         path {
-          fill: var(--status-icon-color-negative) !important;
+          fill: var(--ops-progress-error-icon-value) !important;
         }
       }
     }
@@ -305,7 +325,7 @@
     &.complete {
       svg {
         path {
-          fill: var(--status-icon-color-positive) !important;
+          fill: var(--ops-progress-success-icon-value) !important;
         }
       }
     }
@@ -314,7 +334,7 @@
   .labelWrapper {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: var(--ops-progress-label-gap, 8px);
   }
 
   :global {
@@ -341,13 +361,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: var(--ops-progress-wrapper-margin, 4px);
   width: 100%;
 }
 
 .progressHeader {
   color: var(--text-primary);
-  margin-right: 8px;
+  margin-right: var(--ops-progress-header-margin, 8px);
 
   &.withClick {
     cursor: pointer;
@@ -365,6 +385,15 @@
     --progress-bar-hover-icon: #{colors.$gray};
   }
 
+  --ops-progress-icon-color-value: var(
+    --ops-progress-icon-color,
+    var(--progress-bar-icon-color)
+  );
+  --ops-progress-icon-hover-value: var(
+    --ops-progress-icon-hover,
+    var(--progress-bar-hover-icon)
+  );
+
   display: flex;
 
   align-items: center;
@@ -372,19 +401,19 @@
 
   svg {
     path {
-      fill: var(--progress-bar-icon-color) !important;
+      fill: var(--ops-progress-icon-color-value) !important;
     }
     &:hover {
       cursor: pointer;
       path {
-        fill: var(--progress-bar-hover-icon) !important;
+        fill: var(--ops-progress-icon-hover-value) !important;
       }
     }
   }
 }
 .progressMainContainer {
   display: flex;
-  gap: 8px;
+  gap: var(--ops-progress-items-gap, 8px);
   width: 100%;
   align-items: center;
   div:first-child {
@@ -422,7 +451,7 @@
   align-items: center;
   flex-wrap: wrap;
 
-  padding: 8px 16px;
+  padding: var(--ops-progress-bar-padding, 8px 16px);
   background: var(--background-primary);
   border-top: 1px solid var(--progress-bar-border);
   border-bottom: 1px solid var(--progress-bar-border);
