@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import ErrorContainer from "./ErrorContainer";
@@ -251,6 +251,39 @@ export const WithChildren: Story = {
     </ul>
   </div>
 </ErrorContainer>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization = {
+  render: () => (
+    <div
+      style={
+        {
+          "--error-container-bg": "#e6f3fb",
+          "--error-container-text": "#1d2d44",
+          "--error-container-link": "#0082c9",
+        } as CSSProperties
+      }
+    >
+      <ErrorContainer
+        headerText="Connection error"
+        bodyText="Unable to connect to the server."
+        buttonText="Try again"
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--error-container-bg\` | Container background | white / black |
+| \`--error-container-text\` | Body text color | theme gray |
+| \`--error-container-link\` | Link color | theme link |`,
       },
     },
   },
