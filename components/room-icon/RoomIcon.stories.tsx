@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import PlanetIcon from "../../assets/icons/12/planet.react.svg?url";
@@ -486,6 +486,48 @@ export const LongTitle: Story = {
   color="F97A0B"
   showDefault
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          gap: "24px",
+          alignItems: "center",
+        } as CSSProperties
+      }
+    >
+      <RoomIcon title="NC" size="96px" color="0082c9" radius="50%" showDefault />
+      <div
+        style={
+          {
+            "--room-icon-empty-radius": "50%",
+            "--room-icon-dashed-border": "2px dashed #0082c9",
+          } as CSSProperties
+        }
+      >
+        <RoomIcon title="" size="96px" isEmptyIcon model={mockModel} />
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--room-icon-bg\` | Icon fill/background overlay color | theme white/black |
+| \`--room-icon-button-icon-color\` | Button icon color | theme gray |
+| \`--room-icon-bg-opacity\` | Background overlay opacity | \`1\` / \`0.1\` |
+| \`--room-icon-edit-bg\` | Edit icon background | theme gray-light-mid |
+| \`--room-icon-empty-radius\` | Empty placeholder border radius | \`10px\` |
+| \`--room-icon-dashed-border\` | Empty placeholder border | theme dashed gray |`,
       },
     },
   },
