@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -223,6 +223,49 @@ export const AllVariants: Story = {
         code: `<CategoryItem title="General Settings" subtitle="Manage settings" />
 <CategoryItem title="Security" subtitle="Configure access" withPaidBadge badgeLabel="PRO" />
 <CategoryItem title="Backup" subtitle="Manage backup" isDisabled />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--category-item-description-color": "#0082c9",
+          "--category-item-arrow-color": "#0082c9",
+          "--category-item-subheader-size": "14px",
+          "--category-item-margin": "16px",
+        } as CSSProperties
+      }
+    >
+      <CategoryItem
+        title="Files"
+        subtitle="Manage files and storage settings"
+        url="/settings/files"
+        onClickLink={() => {}}
+      />
+      <CategoryItem
+        title="Security"
+        subtitle="Configure passwords and two-factor authentication"
+        url="/settings/security"
+        onClickLink={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--category-item-description-color\` | Description text color | theme gray |
+| \`--category-item-arrow-color\` | Arrow icon fill color | theme black/white |
+| \`--category-item-disabled-color\` | Disabled text color | theme gray |
+| \`--category-item-subheader-size\` | Subheader font size | \`13px\` |
+| \`--category-item-margin\` | Bottom margin between items | \`20px\` |`,
       },
     },
   },
