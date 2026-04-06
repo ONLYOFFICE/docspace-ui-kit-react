@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -160,6 +160,45 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   return (
     <div style={{ maxWidth: "210px" }}>{props.children}</div>
   );
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--main-button-bg": "#0082c9",
+          "--main-button-color": "#ffffff",
+          "--main-button-icon-color": "#ffffff",
+          "--main-button-radius": "50px",
+          "--main-button-text-size": "14px",
+          "--main-button-inner-padding": "6px 20px",
+        } as CSSProperties
+      }
+    >
+      <Wrapper>
+        <MainButton text="New" model={itemsModel} />
+      </Wrapper>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--main-button-bg\` | Button background color | accent |
+| \`--main-button-color\` | Button text color | white |
+| \`--main-button-icon-color\` | Icon fill color | white |
+| \`--main-button-radius\` | Border radius | \`3px\` |
+| \`--main-button-inner-padding\` | Button padding | \`5px 14px 5px 12px\` |
+| \`--main-button-text-size\` | Font size | \`16px\` |
+| \`--main-button-text-weight\` | Font weight | \`700\` |
+| \`--main-button-text-line-height\` | Line height | \`22px\` |`,
+      },
+    },
+  },
 };
 
 export const Default: Story = {
