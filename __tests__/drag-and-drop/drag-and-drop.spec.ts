@@ -24,50 +24,39 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-@use "../../styles/variables";
-@use "../../styles/mixins";
+import { type Page, expect, test } from "@playwright/test";
 
-.dragAndDrop {
-  :global(.light) & {
-    --drag-and-drop-bg: #{variables.$dnd-color};
-    --drag-and-drop-accept-bg: #{variables.$dnd-hover-color};
-  }
+// Title: "UI/Interactive elements/DragAndDrop"
+// → prefix: "ui-interactive-elements-draganddrop"
+const STORY_BASE = "ui-interactive-elements-draganddrop";
 
-  :global(.dark) & {
-    --drag-and-drop-bg: #{variables.$dnd-dark-color};
-    --drag-and-drop-accept-bg: #{variables.$dnd-dark-hover};
-  }
-
-  --dnd-bg-value: var(--dnd-dragging-bg, var(--drag-and-drop-bg));
-  --dnd-accept-bg-value: var(--dnd-accept-bg, var(--drag-and-drop-accept-bg));
-  --dnd-disabled-opacity-value: var(--dnd-disabled-opacity, 0.4);
-
-  height: 100%;
-  margin-inline-start: -2px;
-  position: relative;
-  outline: none;
-
-  @include mixins.tablet {
-    margin-inline-start: 0;
-  }
-
-  &.dragging {
-    background: var(--dnd-bg-value);
-
-    &.dragAccept {
-      background: var(--dnd-accept-bg-value);
-    }
-  }
-
-  &.dragDisabled {
-    opacity: var(--dnd-disabled-opacity-value);
-  }
-
-  &:not(.dragging):not(.dragDisabled) {
-    background: none !important;
-  }
+async function gotoStory(page: Page, storyId: string) {
+  const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
+  await page.goto(url);
+  await page.waitForSelector("#storybook-root", { state: "visible" });
+  await expect(page.locator("text=Story not found")).toHaveCount(0);
+  await page.waitForLoadState("networkidle");
 }
 
-.droppableHover {
-  background: var(--dnd-accept-bg-value);
-}
+test.describe("DragAndDrop — light", () => {
+  test("css customization", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await expect(page).toHaveScreenshot("drag-and-drop-css-customization.png");
+  });
+});
+
+test.describe("DragAndDrop — dark", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("dark");
+      });
+    });
+  });
+
+  test("css customization dark", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("drag-and-drop-css-customization-dark.png");
+  });
+});
