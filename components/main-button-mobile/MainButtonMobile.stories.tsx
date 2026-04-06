@@ -26,7 +26,7 @@
 
 import { useEffect, useState } from "react";
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -315,6 +315,56 @@ export const WithProgress: Story = {
       },
       source: {
         code: `<MainButtonMobile title="Upload" percent={65} actionOptions={actionOptions} />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--main-button-mobile-button-color": "#0082c9",
+          "--main-button-mobile-icon-fill": "#ffffff",
+          "--main-button-mobile-circle-background": "#0082c9",
+          "--main-button-mobile-z-index": "100",
+          "--main-button-mobile-badge-size": "14px",
+          "--main-button-mobile-badge-offset": "8px",
+          "--main-button-mobile-progress-height": "6px",
+          "--main-button-mobile-progress-radius": "6px",
+          "--main-button-mobile-dropdown-item-padding": "8px 20px",
+        } as CSSProperties
+      }
+    >
+      <MainButtonMobile
+        title="New"
+        actionOptions={actionOptions}
+        percent={65}
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          insetInlineEnd: "24px",
+        }}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--main-button-mobile-button-color\` | Button background color | accent |
+| \`--main-button-mobile-icon-fill\` | Icon fill color | white |
+| \`--main-button-mobile-circle-background\` | Progress circle fill | accent |
+| \`--main-button-mobile-z-index\` | Stack order | \`1010\` |
+| \`--main-button-mobile-badge-size\` | Alert badge size | \`12px\` |
+| \`--main-button-mobile-badge-offset\` | Alert badge position offset | \`10px\` |
+| \`--main-button-mobile-progress-height\` | Progress bar height | \`4px\` |
+| \`--main-button-mobile-progress-radius\` | Progress bar border-radius | \`2px\` |
+| \`--main-button-mobile-dropdown-item-padding\` | Dropdown item padding | \`6px 23px\` |`,
       },
     },
   },
