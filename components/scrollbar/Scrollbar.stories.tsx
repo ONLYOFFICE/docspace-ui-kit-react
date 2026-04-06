@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -317,6 +317,45 @@ export const WithPaddingInlineEnd: Story = {
         code: `<Scrollbar paddingInlineEnd="100px" style={{ width: 300, height: 200 }}>
   <p>Content with inline-end padding...</p>
 </Scrollbar>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--scrollbar-bg": "#7c3aed",
+          "--scrollbar-bg-hover": "#5b21b6",
+          "--scrollbar-bg-active": "#4c1d95",
+          "--scrollbar-thumb-size": "6px",
+          "--scrollbar-radius": "4px",
+        } as CSSProperties
+      }
+    >
+      <Scrollbar style={{ width: 300, height: 200 }} autoHide={false}>
+        <LongContent />
+      </Scrollbar>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--scrollbar-bg\` | Thumb default color | theme token |
+| \`--scrollbar-bg-hover\` | Thumb hover color | theme token |
+| \`--scrollbar-bg-active\` | Thumb active/pressed color | theme token |
+| \`--scrollbar-thumb-size\` | Thumb width (vertical) / height (horizontal) | \`4px\` |
+| \`--scrollbar-radius\` | Track border radius | \`8px\` |
+| \`--scrollbar-track-padding\` | Track inner padding | \`4px\` |
+| \`--scrollbar-padding-end\` | Scroll body inline-end padding | \`17px\` |
+| \`--scrollbar-padding-end-mobile\` | Scroll body inline-end padding (mobile) | \`8px\` |
+| \`--scrollbar-last-padding\` | Padding after last item | \`unset\` |`,
       },
     },
   },
