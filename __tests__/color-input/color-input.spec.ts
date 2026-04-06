@@ -24,71 +24,39 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-@use "../../styles/mixins";
-@use "../../styles/variables";
+import { type Page, expect, test } from "@playwright/test";
 
-:global(.dark) {
-  :local {
-    .dropDownItemHex {
-      --dropdown-background: #{variables.$black};
-    }
-  }
+// Title: "UI/Interactive elements/ColorInput"
+// → prefix: "ui-interactive-elements-colorinput"
+const STORY_BASE = "ui-interactive-elements-colorinput";
+
+async function gotoStory(page: Page, storyId: string) {
+  const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
+  await page.goto(url);
+  await page.waitForSelector("#storybook-root", { state: "visible" });
+  await expect(page.locator("text=Story not found")).toHaveCount(0);
+  await page.waitForLoadState("networkidle");
 }
 
-.wrapper {
-  position: relative;
+test.describe("ColorInput — light", () => {
+  test("css customization", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await expect(page).toHaveScreenshot("color-input-css-customization.png");
+  });
+});
 
-  // bridge vars for hardcoded values
-  --color-input-height-v: var(--color-input-height, 32px);
-  --color-input-padding-v: var(--color-input-padding, 6px 8px);
-  --color-input-swatch-size-v: var(--color-input-swatch-size, 20px);
-  --color-input-swatch-radius-v: var(--color-input-swatch-radius, 2px);
-}
+test.describe("ColorInput — dark", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("dark");
+      });
+    });
+  });
 
-.hexValue {
-  @include mixins.common-input-styles;
-  box-sizing: border-box;
-  height: var(--color-input-height-v);
-  padding: var(--color-input-padding-v);
-
-  :focus-visible {
-    outline: none;
-  }
-}
-
-.dropDownItemHex {
-  --dropdown-background: #{variables.$white};;
-
-  cursor: auto;
-  background: var(--dropdown-background);
-
-  &:hover {
-    background: var(--dropdown-background);
-  }
-}
-
-.inputWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: fit-content;
-
-  &.scale {
-    width: 100%;
-  }
-}
-
-.colorBlock {
-  position: absolute;
-  inset-inline-end: 8px;
-  cursor: pointer;
-  width: var(--color-input-swatch-size-v);
-  height: var(--color-input-swatch-size-v);
-  border-radius: var(--color-input-swatch-radius-v);
-  background-color: var(--block-color);
-
-  &.disabled {
-    cursor: auto;
-    pointer-events: none;
-  }
-}
+  test("css customization dark", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("color-input-css-customization-dark.png");
+  });
+});
