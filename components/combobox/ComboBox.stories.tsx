@@ -26,7 +26,7 @@
 
 import type React from "react";
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -467,6 +467,49 @@ export const CustomStyling: Story = {
   selectedOption={{ key: 0, label: "Select Priority" }}
   noBorder
 />`,
+      },
+    },
+  },
+};
+
+const baseOptions = [
+  { key: 1, label: "Option 1" },
+  { key: 2, label: "Option 2" },
+  { key: 3, label: "Option 3" },
+];
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--combobox-open-bg": "#ede9fe",
+          "--combobox-radius": "12px",
+          "--combobox-inner-padding": "8px 0",
+          "--combobox-base-width": "220px",
+        } as CSSProperties
+      }
+    >
+      <ComboBox
+        options={baseOptions}
+        selectedOption={{ key: 0, label: "Select option" }}
+        size={ComboBoxSize.base}
+        noBorder
+        onSelect={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--combobox-open-bg\` | Background when open (noBorder mode) | theme token |
+| \`--combobox-radius\` | Border radius in noBorder open state | \`3px\` |
+| \`--combobox-inner-padding\` | Inner padding | \`4px 0\` |
+| \`--combobox-base-width\` | Width for base size | \`173px\` |`,
       },
     },
   },
