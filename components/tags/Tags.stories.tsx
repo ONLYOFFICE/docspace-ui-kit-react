@@ -26,7 +26,7 @@
 
 import { useRef } from "react";
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -313,6 +313,36 @@ export const WithCustomOptionTag: Story = {
   onOptionTagClick={() => console.log("Option tag clicked")}
   style={{ width: "150px" }}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--tags-overflow-text-margin": "12px",
+        } as CSSProperties
+      }
+    >
+      <Tags
+        tags={["React", "TypeScript", "Node.js", "GraphQL"]}
+        columnCount={3}
+        onSelectTag={() => {}}
+        style={{ width: "200px" }}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--tags-overflow-text-margin\` | Margin before the overflow count text | \`8px\` |`,
       },
     },
   },
