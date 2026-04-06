@@ -55,12 +55,20 @@
     --link-dropdown-expander-width: 6.35px;
   }
 
+  --link-dropdown-text-color: var(--link-with-dropdown-color, var(--link-dropdown-color-default));
+  --link-dropdown-bg-value: var(--link-with-dropdown-bg, var(--link-dropdown-background-default));
+  --link-dropdown-hover-bg-value: var(--link-with-dropdown-hover-bg, var(--link-dropdown-hover-background));
+  --link-dropdown-hover-text-value: var(--link-with-dropdown-hover-color, var(--link-dropdown-hover-color));
+  --link-dropdown-disabled-color-value: var(--link-with-dropdown-disabled-color, var(--link-dropdown-disable-color));
+  --link-dropdown-padding-value: var(--link-with-dropdown-padding, 4px 8px);
+  --link-dropdown-radius-value: var(--link-with-dropdown-radius, 3px);
+
   display: inline-block;
-  padding: 4px 8px;
-  border-radius: 3px;
+  padding: var(--link-dropdown-padding-value);
+  border-radius: var(--link-dropdown-radius-value);
   position: relative;
-  color: var(--link-dropdown-color-default);
-  background: var(--link-dropdown-background-default);
+  color: var(--link-dropdown-text-color);
+  background: var(--link-dropdown-bg-value);
 
   .dropDownItem {
     display: block;
@@ -72,24 +80,24 @@
 
   .expander {
     path {
-      fill: var(--link-dropdown-color-default);
+      fill: var(--link-dropdown-text-color);
     }
   }
 
   &:hover {
-    color: var(--link-dropdown-hover-color);
-    background: var(--link-dropdown-hover-background);
+    color: var(--link-dropdown-hover-text-value);
+    background: var(--link-dropdown-hover-bg-value);
 
     .expander {
       path {
-        fill: var(--link-dropdown-color-default);
+        fill: var(--link-dropdown-text-color);
       }
     }
   }
 
   &.isOpen {
-    color: var(--link-dropdown-hover-color);
-    background: var(--link-dropdown-hover-background);
+    color: var(--link-dropdown-hover-text-value);
+    background: var(--link-dropdown-hover-bg-value);
   }
 
   .text {
@@ -111,7 +119,7 @@
 
     &.disabled {
       cursor: default;
-      color: var(--link-dropdown-disable-color);
+      color: var(--link-dropdown-disabled-color-value);
     }
 
     &.semitransparent {
@@ -132,13 +140,13 @@
       }
 
       &.disabled {
-        color: var(--link-dropdown-disable-color);
+        color: var(--link-dropdown-disabled-color-value);
       }
     }
 
     &:hover {
       &.disabled {
-        color: var(--link-dropdown-disable-color);
+        color: var(--link-dropdown-disabled-color-value);
       }
 
       &.appearDashedAfterHover {
