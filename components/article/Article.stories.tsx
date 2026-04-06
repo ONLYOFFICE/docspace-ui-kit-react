@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -234,6 +234,84 @@ const Template = (args: ArticleProps) => (
     <Article {...args} />
   </div>
 );
+
+const CssCustomizationTemplate = () => (
+  <div
+    style={
+      {
+        height: "600px",
+        position: "relative",
+        // === Article — sidebar background and borders ===
+        "--article-bg": "#e6f3fb",
+        "--article-border": "1px solid #0082c9",
+        "--article-header-border": "1px solid #0082c9",
+        "--article-logo-color": "#0082c9",
+        // === Article — profile section ===
+        "--article-profile-bg": "#cce5f6",
+        "--article-profile-border": "1px solid #0082c9",
+        // === Article — back button ===
+        "--article-back-color": "#0082c9",
+        // === Article — sidebar width ===
+        "--article-width": "260px",
+      } as CSSProperties
+    }
+  >
+    <Article
+      {...defaultProps}
+      user={mockUser}
+      getActions={() =>
+        [
+          { key: "profile", label: "Profile", onClick: () => {} },
+          { key: "logout", label: "Logout", onClick: () => {} },
+        ] as ContextMenuModel[]
+      }
+      children={[
+        <Article.Header key="header">
+          <h2>Sidebar</h2>
+        </Article.Header>,
+        <Article.Body key="body">
+          <div>Navigation items</div>
+        </Article.Body>,
+      ]}
+    />
+  </div>
+);
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**Article — sidebar**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--article-bg\` | Sidebar background color | theme-based |
+| \`--article-border\` | Sidebar right border | theme-based |
+| \`--article-header-border\` | Header bottom border (mobile) | theme-based |
+| \`--article-logo-color\` | Logo path fill color | theme-based |
+| \`--article-width\` | Sidebar width (desktop) | \`252px\` |
+| \`--article-sidebar-width\` | Sidebar width (tablet) | \`243px\` |
+| \`--article-sidebar-collapsed-width\` | Collapsed sidebar width (tablet) | \`60px\` |
+
+**Article — profile section**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--article-profile-bg\` | Profile block background | theme-based |
+| \`--article-profile-border\` | Profile block top border | theme-based |
+
+**Article — back button**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--article-back-color\` | Back button text/icon color | theme-based |`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   render: (args) => <Template {...args} />,
