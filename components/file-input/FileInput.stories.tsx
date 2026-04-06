@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -164,6 +164,103 @@ const Wrapper = (props: { children: React.ReactNode }) => {
 			{props.children}
 		</div>
 	);
+};
+
+const CssCustomizationTemplate = () => {
+	return (
+		<div style={{ display: "grid", gridGap: "16px", width: "320px" }}>
+			<div
+				style={
+					{
+						// === FileInput — border and radius ===
+						"--file-input-border": "#0082c9",
+						"--file-input-hover-border": "#006ba6",
+						"--file-input-focus-border": "#004f82",
+						"--file-input-radius": "8px",
+						// === FileInput — validation states ===
+						"--file-input-warning-border": "#e67e00",
+						"--file-input-error-border": "#c0392b",
+						"--file-input-disabled-border": "#b0cce3",
+						"--file-input-placeholder-color": "#7aa8c7",
+						// === TextInput (inner text field) ===
+						"--text-input-bg": "#f0f8ff",
+						"--text-input-color": "#004f82",
+						"--text-input-radius": "8px 0 0 8px",
+						// === IconButton (trigger icon) ===
+						"--icon-button-color": "#0082c9",
+						"--icon-button-hover-color": "#006ba6",
+					} as CSSProperties
+				}
+			>
+				<FileInput
+					placeholder="Choose file"
+					size="base"
+					scale
+					aria-label="Custom styled file input"
+				/>
+				<FileInput
+					placeholder="Warning state"
+					size="base"
+					scale
+					hasWarning
+					aria-label="Warning file input"
+				/>
+				<FileInput
+					placeholder="Error state"
+					size="base"
+					scale
+					hasError
+					aria-label="Error file input"
+				/>
+				<FileInput
+					placeholder="Disabled"
+					size="base"
+					scale
+					isDisabled
+					aria-label="Disabled file input"
+				/>
+			</div>
+		</div>
+	);
+};
+
+export const CssCustomization: Story = {
+	render: () => <CssCustomizationTemplate />,
+	parameters: {
+		docs: {
+			description: {
+				story: `CSS Custom Properties for external customization:
+
+**FileInput — border**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--file-input-border\` | Default border color | theme-based |
+| \`--file-input-hover-border\` | Hover border color | theme-based |
+| \`--file-input-focus-border\` | Focus/active border color | theme-based |
+| \`--file-input-disabled-border\` | Disabled border color | theme-based |
+| \`--file-input-warning-border\` | Warning state border color | theme-based |
+| \`--file-input-error-border\` | Error state border color | theme-based |
+| \`--file-input-placeholder-color\` | Disabled placeholder text color | theme-based |
+| \`--file-input-radius\` | Icon button border radius | \`3px\` |
+
+**TextInput (inner text field)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--text-input-bg\` | Input background color | theme-based |
+| \`--text-input-color\` | Input text color | theme-based |
+| \`--text-input-radius\` | Input border radius | theme-based |
+
+**IconButton (file picker trigger)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--icon-button-color\` | Icon fill/stroke color | theme-based |
+| \`--icon-button-hover-color\` | Icon hover color | theme-based |`,
+			},
+		},
+	},
 };
 
 export const Default: Story = {
