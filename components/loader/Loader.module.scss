@@ -52,18 +52,22 @@
 }
 
 .loaderTrack {
+  --loader-track-primary-value: var(--loader-track-primary, var(--button-loader-track-primary));
+  --loader-track-base-value: var(--loader-track-base, var(--button-loader-track-base));
+  --loader-disabled-opacity: var(--loader-opacity-disabled, 0.6);
+
   width: var(--loader-size, 20px);
   height: var(--loader-size, 20px);
 
   &.primary {
-    color: var(--button-loader-track-primary);
+    color: var(--loader-track-primary-value);
   }
 
   &.base {
-    color: var(--button-loader-track-base);
+    color: var(--loader-track-base-value);
   }
 
   &.disabled {
-    opacity: 0.6;
+    opacity: var(--loader-disabled-opacity);
   }
 }
