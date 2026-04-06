@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Button, Heading, HeadingSize, Text } from "../";
@@ -120,6 +120,34 @@ export const IdleContent: Story = {
         code: `<LoaderWrapper isLoading={false}>
   <CardContent />
 </LoaderWrapper>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--loader-wrapper-loading-opacity": "0.3",
+          "--loader-wrapper-transition": "opacity 0.6s ease-in-out",
+        } as CSSProperties
+      }
+    >
+      <LoaderWrapper isLoading>{cardContent}</LoaderWrapper>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--loader-wrapper-loading-opacity\` | Opacity when in loading state | \`0.5\` |
+| \`--loader-wrapper-idle-opacity\` | Opacity when idle | \`1\` |
+| \`--loader-wrapper-transition\` | CSS transition for opacity | \`opacity 0.3s ease-in-out\` |`,
       },
     },
   },
