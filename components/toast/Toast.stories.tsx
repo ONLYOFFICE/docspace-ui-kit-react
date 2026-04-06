@@ -24,7 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import { useEffect } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -334,6 +335,48 @@ export const AllTypes: Story = {
 toastr.error("Error message", "Error", 0, true);
 toastr.warning("Warning message", "Warning", 0, true);
 toastr.info("Info message", "Info", 0, true);`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => {
+  useEffect(() => {
+    toastr.success("Custom success notification", "Styled Toast", 0, true);
+    toastr.error("Custom error notification", "Styled Error", 0, true);
+  }, []);
+
+  return (
+    <div
+      style={
+        {
+          "--toast-radius": "12px",
+          "--toast-padding": "16px",
+          "--toast-text-size": "13px",
+          "--toast-width": "360px",
+          "--toast-inset-end": "32px",
+        } as CSSProperties
+      }
+    >
+      <Toast />
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--toast-radius\` | Toast border radius | \`6px\` |
+| \`--toast-padding\` | Toast inner padding | \`12px\` |
+| \`--toast-text-size\` | Toast font size | \`12px\` |
+| \`--toast-width\` | Container width | \`320px\` |
+| \`--toast-inset-end\` | Offset from inline-end edge | \`24px\` |`,
       },
     },
   },
