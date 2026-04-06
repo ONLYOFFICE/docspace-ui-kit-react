@@ -24,38 +24,39 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-@use "../../styles/variables/colors.scss" as *;
+import { type Page, expect, test } from "@playwright/test";
 
-:global(.dark) {
-  :local {
-    .loaderContainer {
-      --app-loader-background-color: #{$black};
-    }
-  }
+// Title: "UI/Status components/AppLoader"
+// → prefix: "ui-status-components-apploader"
+const STORY_BASE = "ui-status-components-apploader";
+
+async function gotoStory(page: Page, storyId: string) {
+  const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
+  await page.goto(url);
+  await page.waitForSelector("#storybook-root", { state: "visible" });
+  await expect(page.locator("text=Story not found")).toHaveCount(0);
+  await page.waitForLoadState("networkidle");
 }
 
-.loaderContainer {
-  --app-loader-background-color: #{$white};
+test.describe("AppLoader — light", () => {
+  test("css customization", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await expect(page).toHaveScreenshot("app-loader-css-customization.png");
+  });
+});
 
-  --app-loader-bg-value: var(--app-loader-bg, var(--app-loader-background-color));
-  --app-loader-z-index-value: var(--app-loader-z-index, 5000);
+test.describe("AppLoader — dark", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("dark");
+      });
+    });
+  });
 
-  width: 100vw;
-  height: 100vh;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background: var(--app-loader-bg-value);
-  z-index: var(--app-loader-z-index-value);
-  position: fixed;
-  top: 0;
-  inset-inline-start: 0;
-
-  .pageLoader {
-    position: fixed;
-    inset-inline-start: calc(50% - 20px);
-    top: 35%;
-  }
-}
+  test("css customization dark", async ({ page }) => {
+    await gotoStory(page, "css-customization");
+    await page.evaluate(() => document.body.classList.add("dark"));
+    await expect(page).toHaveScreenshot("app-loader-css-customization-dark.png");
+  });
+});
