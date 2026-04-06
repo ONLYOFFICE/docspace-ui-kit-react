@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import { RoomsType } from "../../enums";
 
@@ -190,6 +190,47 @@ export const DropdownItem: Story = {
   selectedId="room-3"
   onClick={handleClick}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization = {
+  render: () => (
+    <div
+      style={
+        {
+          width: "320px",
+          "--room-type-item-bg": "#e6f3fb",
+          "--room-type-item-border": "#0082c9",
+          "--room-type-item-hover-bg": "#cde7f5",
+          "--room-type-item-radius": "12px",
+          "--room-type-item-padding": "12px",
+        } as CSSProperties
+      }
+    >
+      <RoomType
+        roomType={RoomsType.FormRoom}
+        type="listItem"
+        isOpen={false}
+        selectedId="room-1"
+        onClick={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--room-type-item-bg\` | List/display item background | theme |
+| \`--room-type-item-border\` | Item border color | theme gray |
+| \`--room-type-item-hover-bg\` | Hover background | theme |
+| \`--room-type-item-radius\` | Border radius | \`6px\` |
+| \`--room-type-item-padding\` | Item padding | \`16px\` |
+| \`--room-type-description-color\` | Description text color | theme gray |`,
       },
     },
   },

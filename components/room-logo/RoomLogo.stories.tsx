@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { RoomsType } from "../../enums";
@@ -325,6 +325,52 @@ export const CheckboxChecked: Story = {
   isChecked
   onChange={handleChange}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization = {
+  render: () => (
+    <div
+      style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+    >
+      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <span style={{ fontSize: "12px", color: "#666", width: "80px" }}>Default</span>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <RoomLogoPure type={RoomsType.FormRoom} />
+          <RoomLogoPure type={RoomsType.EditingRoom} />
+          <RoomLogoPure type={RoomsType.CustomRoom} />
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <span style={{ fontSize: "12px", color: "#666", width: "80px" }}>Rounded</span>
+        <div
+          style={
+            {
+              display: "flex",
+              gap: "8px",
+              "--room-logo-size": "40px",
+              "--room-logo-radius": "50%",
+            } as CSSProperties
+          }
+        >
+          <RoomLogoPure type={RoomsType.FormRoom} />
+          <RoomLogoPure type={RoomsType.EditingRoom} />
+          <RoomLogoPure type={RoomsType.CustomRoom} />
+        </div>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--room-logo-size\` | Icon container size | \`32px\` |
+| \`--room-logo-radius\` | Icon border radius | \`6px\` |`,
       },
     },
   },

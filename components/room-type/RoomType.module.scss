@@ -86,15 +86,23 @@
 }
 
 .roomType {
+  --room-type-item-bg-value: var(--room-type-item-bg, var(--room-type-list-item-background));
+  --room-type-item-border-value: var(--room-type-item-border, var(--room-type-list-item-border));
+  --room-type-item-hover-bg-value: var(--room-type-item-hover-bg, var(--room-type-list-item-hover-background));
+  --room-type-description-color-value: var(--room-type-description-color, var(--room-type-list-item-description-text));
+  --room-type-item-border-radius: var(--room-type-item-radius, 6px);
+  --room-type-item-inner-padding: var(--room-type-item-padding, 16px);
+  --room-type-item-gap: var(--room-type-gap, 12px);
+
   cursor: pointer;
   outline: 0;
 
-  padding: 16px;
+  padding: var(--room-type-item-inner-padding);
   width: 100%;
   box-sizing: border-box;
 
   display: flex;
-  gap: 12px;
+  gap: var(--room-type-item-gap);
   align-items: center;
 
   :global {
@@ -136,12 +144,12 @@
 }
 
 .listItem {
-  background-color: var(--room-type-list-item-background);
-  border: 1px solid var(--room-type-list-item-border);
-  border-radius: 6px;
+  background-color: var(--room-type-item-bg-value);
+  border: 1px solid var(--room-type-item-border-value);
+  border-radius: var(--room-type-item-border-radius);
 
   &:hover:not(:active) {
-    background-color: var(--room-type-list-item-hover-background);
+    background-color: var(--room-type-item-hover-bg-value);
   }
 
   &:active {
@@ -150,18 +158,18 @@
 
   :global {
     .choose_room-description {
-      color: var(--room-type-list-item-description-text);
+      color: var(--room-type-description-color-value);
     }
   }
 }
 
 .dropDownButton {
-  background-color: var(--room-type-dropdown-button-background);
-  border-radius: 6px;
-  border: 1px solid var(--room-type-dropdown-button-border);
+  background-color: var(--room-type-item-bg-value);
+  border-radius: var(--room-type-item-border-radius);
+  border: 1px solid var(--room-type-item-border-value);
 
   &:not(.isOpen):hover:not(:active) {
-    background-color: var(--room-type-dropdown-button-hover-background);
+    background-color: var(--room-type-item-hover-bg-value);
   }
 
   &.isOpen,
@@ -171,7 +179,7 @@
 
   :global {
     .choose_room-description {
-      color: var(--room-type-dropdown-button-description-text);
+      color: var(--room-type-description-color-value);
     }
 
     .choose_room-forward_btn {
@@ -193,15 +201,15 @@
 }
 
 .dropDownItem {
-  background-color: var(--room-type-dropdown-item-background);
+  background-color: var(--room-type-item-bg-value);
 
   &:hover {
-    background-color: var(--room-type-dropdown-item-hover-background);
+    background-color: var(--room-type-item-hover-bg-value);
   }
 
   :global {
     .choose_room-description {
-      color: var(--room-type-dropdown-item-description-text);
+      color: var(--room-type-description-color-value);
     }
 
     .choose_room-forward_btn {
@@ -212,13 +220,13 @@
 
 .displayItem {
   cursor: default;
-  background-color: var(--room-type-display-item-background);
-  border: 1px solid var(--room-type-display-item-border);
-  border-radius: 6px;
+  background-color: var(--room-type-item-bg-value);
+  border: 1px solid var(--room-type-item-border-value);
+  border-radius: var(--room-type-item-border-radius);
 
   :global {
     .choose_room-description {
-      color: var(--room-type-display-item-description-text);
+      color: var(--room-type-description-color-value);
     }
 
     .choose_room-forward_btn {
