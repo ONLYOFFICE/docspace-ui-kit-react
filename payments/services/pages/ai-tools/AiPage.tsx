@@ -78,13 +78,11 @@ const AiPage = (props: AiPageProps) => {
     fetchTransactionHistory,
     changeServiceState,
     isAiToolsServiceOn,
-    cardLinkedOnFreeTariff,
-    isPayer,
+    isServiceActionDisabled,
     formatWalletCurrency,
   } = paymentStore;
 
   const { logoText, language } = paymentStore;
-  const { isFreeTariff } = paymentStore.quotas;
 
   const {
     aiServiceCodeCurrency,
@@ -109,7 +107,7 @@ const AiPage = (props: AiPageProps) => {
   const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
   const [isTopUpConfirmVisible, setIsTopUpConfirmVisible] = useState(false);
 
-  const isDisabled = cardLinkedOnFreeTariff || !isFreeTariff ? !isPayer : false;
+  const isDisabled = isServiceActionDisabled;
 
   const navigate = useNavigate();
 

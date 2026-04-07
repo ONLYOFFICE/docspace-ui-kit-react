@@ -69,7 +69,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   const servicesStore = useServicesStore();
 
   const {
-    cardLinkedOnFreeTariff,
+    isServiceActionDisabled,
     isPayer,
     isCardLinkedToPortal,
     servicesQuotasFeatures,
@@ -98,9 +98,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     hasStorageSubscription,
     previousStoragePlanSize,
   } = paymentStore.tariff;
-  const { isFreeTariff } = paymentStore.quotas;
 
-  const isDisabled = cardLinkedOnFreeTariff || !isFreeTariff ? !isPayer : false;
+  const isDisabled = isServiceActionDisabled;
   const { t } = useServicesActions();
 
   const permissionTooltipText = (
@@ -251,7 +250,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             return (
               <ServiceCard
                 key={item.id}
-                cardDisabled={isDisabled}
                 toggleDisabled={isDisabled}
                 priceTitle={item.priceTitle}
                 id={item.id}
@@ -278,8 +276,12 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             return (
               <ServiceCard
                 key={item.id}
+                cardDisabled={
+                  isCardLinkedToPortal
+                    ? !wasFirstAiServiceTopUp && !isPayer
+                    : false
+                }
                 toggleDisabled={isDisabled}
-                cardDisabled={wasFirstAiServiceTopUp ? false : isDisabled}
                 onClick={handleClick}
                 onToggle={handleToggle}
                 serviceTitle={item.title}
@@ -305,7 +307,9 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             return (
               <ServiceCard
                 key={item.id}
-                cardDisabled={isDisabled}
+                cardDisabled={
+                  isCardLinkedToPortal ? !hasStorageSubscription : false
+                }
                 toggleDisabled={!!eventDisabled}
                 onClick={handleClick}
                 onToggle={handleToggle}

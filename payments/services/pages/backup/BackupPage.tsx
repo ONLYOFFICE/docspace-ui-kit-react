@@ -59,6 +59,7 @@ const BackupPage: React.FC = () => {
     backupServicePrice,
     changeServiceState,
     isBackupServiceOn,
+    isServiceActionDisabled,
   } = paymentStore;
 
   const { isFreeTariff, maxFreeBackups } = paymentStore.quotas;
@@ -72,6 +73,7 @@ const BackupPage: React.FC = () => {
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
 
   const shouldShowLoader = !isInitServicesData;
+  const isDisabled = isServiceActionDisabled;
 
   useEffect(() => {
     initServiceData(t, BACKUP_SERVICE);
@@ -156,13 +158,13 @@ const BackupPage: React.FC = () => {
           </Text>
         }
         description={t("Payments:BackupDescription")}
-        isDisabled={isLoading}
+        isDisabled={isDisabled || isLoading}
       />
       <WalletInfo
         shortView
         withoutBackground
         balance={balance}
-        onTopUp={isLowBalance ? onTopUp : undefined}
+        onTopUp={isLowBalance && !isDisabled ? onTopUp : undefined}
       />
       {isLowBalance ? (
         <Text className={styles.lowBalance} fontSize="15px" fontWeight={600}>

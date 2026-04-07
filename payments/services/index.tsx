@@ -77,6 +77,7 @@ const Services = observer(
       isShowStorageTariffDeactivatedModal,
       changeServiceState,
       isCardLinkedToPortal,
+      isServiceActionDisabled,
     } = paymentStore;
 
     const {
@@ -237,9 +238,13 @@ const Services = observer(
         return;
       }
 
-      if (id === AI_ENUM && wasFirstAiServiceTopUp) {
-        navigate(paymentStore.routes.aiServices);
-        return;
+      if (id === AI_ENUM) {
+        if (isServiceActionDisabled && !wasFirstAiServiceTopUp) return;
+
+        if (wasFirstAiServiceTopUp) {
+          navigate(paymentStore.routes.aiServices);
+          return;
+        }
       }
 
       if (id === BACKUP_SERVICE && isCardLinkedToPortal) {
@@ -282,6 +287,8 @@ const Services = observer(
       }
 
       if (id === AI_ENUM && !wasFirstAiServiceTopUp) {
+        if (isServiceActionDisabled) return;
+
         updateDialogVisibility(AI_ENUM, true);
         return;
       }

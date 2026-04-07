@@ -252,6 +252,12 @@ class PaymentStore {
     return this._currentUserEmail === this.tariff.walletCustomerEmail;
   }
 
+  get isServiceActionDisabled() {
+    if (this.isCardLinkedToPortal) return !this.isPayer;
+
+    return false;
+  }
+
   get isStripePortalAvailable() {
     return this.isOwner || this.isPayer;
   }
