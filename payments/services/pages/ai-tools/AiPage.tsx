@@ -107,7 +107,7 @@ const AiPage = (props: AiPageProps) => {
   const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
   const [isTopUpConfirmVisible, setIsTopUpConfirmVisible] = useState(false);
 
-  const isDisabled = isServiceActionDisabled;
+  const isDisabled = isServiceActionDisabled!;
 
   const navigate = useNavigate();
 
