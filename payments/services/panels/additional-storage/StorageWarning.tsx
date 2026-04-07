@@ -40,7 +40,7 @@ import { Link } from "../../../../components";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
 type StorageWarningProps = {
-  isDisabled: boolean;
+  isDisabled?: boolean;
   title?: string;
   onCancelChange?: () => void;
   isCancelLoading?: boolean;
