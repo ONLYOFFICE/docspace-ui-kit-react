@@ -362,6 +362,9 @@ export const CssCustomization: Story = {
         openDate={now()}
         initialDate={now()}
         selectDateText="Select date"
+        className="date-time-picker"
+        id="css-customization-date-time-picker"
+        hasError={false}
         onChange={() => {}}
         translations={{ AM: "AM", PM: "PM" }}
       />

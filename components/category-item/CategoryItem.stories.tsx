@@ -245,12 +245,16 @@ export const CssCustomization: Story = {
         subtitle="Manage files and storage settings"
         url="/settings/files"
         onClickLink={() => {}}
+        withPaidBadge={false}
+        badgeLabel=""
       />
       <CategoryItem
         title="Security"
         subtitle="Configure passwords and two-factor authentication"
         url="/settings/security"
         onClickLink={() => {}}
+        withPaidBadge={false}
+        badgeLabel=""
       />
     </div>
   ),

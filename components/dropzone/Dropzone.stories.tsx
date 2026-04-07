@@ -235,6 +235,7 @@ const CssCustomizationTemplate = () => {
         accept={[".pdf", ".doc", ".docx"]}
         onDrop={() => {}}
         onSingleUploadError={() => {}}
+        isLoading={false}
       />
     </div>
   );

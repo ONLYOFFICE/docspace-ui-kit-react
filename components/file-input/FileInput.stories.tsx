@@ -194,27 +194,27 @@ const CssCustomizationTemplate = () => {
 			>
 				<FileInput
 					placeholder="Choose file"
-					size="base"
+					size={InputSize.base}
 					scale
 					aria-label="Custom styled file input"
 				/>
 				<FileInput
 					placeholder="Warning state"
-					size="base"
+					size={InputSize.base}
 					scale
 					hasWarning
 					aria-label="Warning file input"
 				/>
 				<FileInput
 					placeholder="Error state"
-					size="base"
+					size={InputSize.base}
 					scale
 					hasError
 					aria-label="Error file input"
 				/>
 				<FileInput
 					placeholder="Disabled"
-					size="base"
+					size={InputSize.base}
 					scale
 					isDisabled
 					aria-label="Disabled file input"

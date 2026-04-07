@@ -24,7 +24,9 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { CSSProperties, Meta, StoryObj } from "@storybook/react-vite";
+import type { CSSProperties } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import AppLoader from "./index";
 
