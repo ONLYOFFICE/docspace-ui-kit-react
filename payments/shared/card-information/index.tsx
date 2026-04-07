@@ -41,7 +41,7 @@ type CardInfoComponentProps = {
 
 const CardInfoComponent = ({
   scale,
-  withoutMargin
+  withoutMargin,
 }: CardInfoComponentProps) => {
   const store = usePaymentStore();
   const { walletCustomerStatusNotActive } = store.tariff;
@@ -52,7 +52,7 @@ const CardInfoComponent = ({
       className={classNames(styles.cardRow, {
         [styles.warningColor]: walletCustomerStatusNotActive,
         [styles.scale]: scale,
-        [styles.withoutMargin]:withoutMargin
+        [styles.withoutMargin]: withoutMargin,
       })}
     >
       <div className={styles.iconButton}>
@@ -61,7 +61,7 @@ const CardInfoComponent = ({
 
       <div className={styles.cardContent}>
         <Text fontSize="14px" fontWeight={600} lineHeight="16px">
-          {t("CardLinked")}
+          {walletCustomerStatusNotActive ? t("CardUnlinked") : t("CardLinked")}
         </Text>
       </div>
 
