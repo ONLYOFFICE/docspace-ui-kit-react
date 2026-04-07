@@ -55,6 +55,7 @@ import styles from "./styles/TransactionHistory.module.scss";
 import TableLoader from "./sub-components/TableLoader";
 import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import { AI_TOOLS } from "../../constants";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -470,6 +471,9 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         debit: isDebit,
         participantName: selectedContact?.id,
         serviceName,
+        ...(serviceName === AI_TOOLS
+          ? { writeOffServiceQuota: true }
+          : {}),
       });
 
       const result = await new Promise<TransactionHistoryReportResponse>(
