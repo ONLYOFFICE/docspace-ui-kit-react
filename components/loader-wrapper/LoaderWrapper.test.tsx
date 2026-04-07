@@ -41,7 +41,9 @@ describe("LoaderWrapper", () => {
     const wrapper = screen.getByTestId("loader-wrapper");
     expect(wrapper).toBeInTheDocument();
     expect(wrapper).toHaveTextContent("Idle content");
-    expect(wrapper).toHaveStyle({ opacity: "1", pointerEvents: "auto" });
+    // opacity uses a CSS variable for external customization
+    expect(wrapper.style.opacity).toMatch(/var\(--loader-wrapper-idle-opacity/);
+    expect(wrapper).toHaveStyle({ pointerEvents: "auto" });
   });
 
   it("dims children and disables pointer events when loading", () => {
@@ -52,6 +54,8 @@ describe("LoaderWrapper", () => {
     );
 
     const wrapper = screen.getByTestId("loader-wrapper");
-    expect(wrapper).toHaveStyle({ opacity: "0.5", pointerEvents: "none" });
+    // opacity uses a CSS variable for external customization
+    expect(wrapper.style.opacity).toMatch(/var\(--loader-wrapper-loading-opacity/);
+    expect(wrapper).toHaveStyle({ pointerEvents: "none" });
   });
 });
