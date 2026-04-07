@@ -59,6 +59,15 @@ const ArticleHeader = ({
     else window.location.href = "/";
   };
 
+  const onLogoAuxClick = (e: React.MouseEvent) => {
+    const isMouseWheelClick = e.button === 1;
+
+    if (!isMouseWheelClick) return;
+
+    e.preventDefault();
+    window.open("/", "_blank");
+  };
+
   const burgerLogo = getLogoUrl(
     WhiteLabelLogoType.LeftMenu,
     !isBase,
@@ -117,6 +126,7 @@ const ArticleHeader = ({
             className="burger-logo"
             alt="burger-logo"
             onClick={onLogoClick}
+            onAuxClick={onLogoAuxClick}
           />
         </div>
       ) : null}
@@ -130,9 +140,10 @@ const ArticleHeader = ({
             alt="burger-logo"
             src={logo}
             onClick={onLogoClick}
+            onAuxClick={onLogoAuxClick}
           />
         ) : (
-          <div onClick={onLogoClick}>
+          <div onClick={onLogoClick} onAuxClick={onLogoAuxClick}>
             <img className="logo-icon_svg" alt="burger-logo" src={logo} />
           </div>
         )}
