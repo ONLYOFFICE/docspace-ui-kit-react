@@ -125,7 +125,9 @@ const Wallet = (props: WalletProps) => {
   return (
     <div className={styles.walletContainer}>
       <Text className={styles.walletDescription}>
-        {t("WalletDescription", { productName: t("Common:ProductName") })}
+        {t("WalletSectionDescription", {
+          productName: t("Common:ProductName"),
+        })}
       </Text>
 
       {walletHelpUrl ? (
