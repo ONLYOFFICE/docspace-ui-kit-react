@@ -37,7 +37,6 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@types/react-text-mask": "5.4.14",
     "axios": "1.13.5",
-    "better-react-mathjax": "^3.0.0",
     "classnames": "2.5.1",
     "cnbuilder": "3.1.0",
     "copy-to-clipboard": "3.3.3",
