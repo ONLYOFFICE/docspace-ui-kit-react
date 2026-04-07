@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useState } from "react";
+import React, { useState } from "react";
 
 import type { ComponentProps } from "react";
 
@@ -282,6 +282,55 @@ export const LocaleExamples: Story = {
 <Calendar locale="ru" selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
 <Calendar locale="de" selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
 <Calendar locale="ja" selectedDate={selectedDate} setSelectedDate={setSelectedDate} />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => {
+    const [selectedDate, setSelectedDate] = useState<DateTime>(now());
+    return (
+      <div
+        style={
+          {
+            // Calendar container
+            "--calendar-bg": "#e6f3fb",
+            "--calendar-border": "#0082c9",
+            "--calendar-shadow": "0 4px 16px rgba(0,130,201,0.25)",
+            "--calendar-radius": "12px",
+            "--calendar-padding": "24px",
+            "--calendar-width": "340px",
+            // Title
+            "--calendar-title": "#0082c9",
+            "--calendar-title-size": "16px",
+            // Navigation arrows
+            "--calendar-outline": "#0082c9",
+            "--calendar-arrow": "#0082c9",
+            "--calendar-disabled-arrow": "#cce5f6",
+            // Weekday labels
+            "--calendar-weekday": "#0082c9",
+            // Date items
+            "--calendar-accent": "#0082c9",
+            "--calendar-hover-bg": "#cce5f6",
+            "--calendar-past": "#5ab4e5",
+            "--calendar-disabled": "#cce5f6",
+          } as React.CSSProperties
+        }
+      >
+        <Calendar
+          locale="en"
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          initialDate={new Date()}
+        />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "CSS custom property overrides applied to the calendar container.",
       },
     },
   },
