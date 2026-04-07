@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { useEffect, useState } from "react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Aside } from ".";
@@ -401,6 +401,80 @@ const FileDetailsContent = () => (
     </div>
   </div>
 );
+
+const CssCustomizationTemplate = () => (
+  <div
+    style={
+      {
+        height: "400px",
+        position: "relative",
+        // === Aside — panel background and size ===
+        "--aside-bg": "#e6f3fb",
+        "--aside-width": "360px",
+        "--aside-transition": "transform 0.2s ease",
+        // === AsideHeader — title and border ===
+        "--aside-header-color": "#004f82",
+        "--aside-header-border": "#0082c9",
+        "--aside-header-font-size": "18px",
+        "--aside-header-height": "60px",
+        // === IconButton (close/back buttons in header) ===
+        "--icon-button-color": "#0082c9",
+        "--icon-button-hover-color": "#006ba6",
+      } as CSSProperties
+    }
+  >
+    <Aside
+      visible
+      header="Settings"
+      onClose={() => {}}
+    >
+      <div style={{ padding: "20px" }}>
+        <p style={{ margin: "0 0 12px", fontWeight: 600, color: "#004f82" }}>Custom styled panel</p>
+        <p style={{ margin: 0, fontSize: "13px", color: "#5aa9d0" }}>
+          Background, width, header color and border customized via CSS vars.
+        </p>
+      </div>
+    </Aside>
+  </div>
+);
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**Aside — panel**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--aside-bg\` | Panel background color | theme-based (white/black) |
+| \`--aside-width\` | Panel width | \`480px\` |
+| \`--aside-transition\` | Slide animation | \`transform 0.3s ease-in-out\` |
+| \`--aside-mobile-footer-height\` | Mobile footer offset | \`64px\` |
+
+**AsideHeader — header bar**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--aside-header-color\` | Header title text color | theme-based |
+| \`--aside-header-border\` | Header bottom border color | theme-based |
+| \`--aside-header-font-size\` | Header title font size | \`21px\` |
+| \`--aside-header-height\` | Header height | \`53px\` |
+| \`--aside-header-margin\` | Header horizontal margins | \`0 16px\` |
+| \`--aside-header-gap\` | Gap between header elements | \`6px\` |
+
+**IconButton (close/back buttons)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--icon-button-color\` | Icon fill color | theme-based |
+| \`--icon-button-hover-color\` | Icon hover color | theme-based |`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   render: (args) => <Template {...args} />,
