@@ -26,14 +26,15 @@
 import React from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { observer } from "mobx-react";
+import { useTheme } from "../../../../context/ThemeContext";
 
 import { EmptyView } from "../../../../components/empty-view";
 
 import { DeviceType } from "../../../../enums";
 import { Consumer } from "../../../../utils";
 
-import NoTransactionsIcon from "../../../../assets/no.transactions.react.svg";
 import NoTransactionsFilterIcon from "../../../../assets/no.transactions.filter.react.svg";
+import NoTransactionsFilterDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
 
 import useViewEffect from "../../../hooks/useViewEffect";
 
@@ -55,6 +56,8 @@ const TransactionBody = ({
   hasAppliedDateFilter,
   isTransactionHistoryExist,
 }: TransactionHistoryProps) => {
+  const { isBase } = useTheme();
+
   useViewEffect({
     view: viewAs!,
     setView: setViewAs!,
@@ -63,10 +66,10 @@ const TransactionBody = ({
 
   const t = useCommonTranslation(["Payments", "Settings"]);
 
-  const icon = hasAppliedDateFilter ? (
+  const filterIcon = isBase ? (
     <NoTransactionsFilterIcon />
   ) : (
-    <NoTransactionsIcon />
+    <NoTransactionsFilterDarkIcon />
   );
 
   const title = hasAppliedDateFilter
@@ -78,7 +81,7 @@ const TransactionBody = ({
 
   const emptyView = (
     <EmptyView
-      icon={icon}
+      icon={filterIcon}
       title={title}
       description={description}
       options={null}
@@ -101,3 +104,4 @@ const TransactionBody = ({
 };
 
 export default observer(TransactionBody);
+
