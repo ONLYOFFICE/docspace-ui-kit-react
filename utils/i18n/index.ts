@@ -107,25 +107,30 @@ export const getCommonTranslation = (
     const searchNamespaces = hasPrefix ? [key.split(":")[0]] : namespaces;
     const bareKey = hasPrefix ? key.split(":").slice(1).join(":") : key;
 
-    for (const ns of searchNamespaces) {
-      const loadedKeys: string[] = Object.getOwnPropertyNames(
-        i18n.loaded,
-      ).filter((k) => k.indexOf(`${lang}/${ns}.json`) > -1);
+    const langsToTry = lang !== "en" ? [lang, "en"] : [lang];
 
-      if (loadedKeys.length > 0) {
-        const i18nKey = loadedKeys.length === 1 ? loadedKeys[0] : loadedKeys[1];
-        let translation = i18n.loaded[i18nKey]?.data?.[bareKey];
+    for (const tryLang of langsToTry) {
+      for (const ns of searchNamespaces) {
+        const loadedKeys: string[] = Object.getOwnPropertyNames(
+          i18n.loaded,
+        ).filter((k) => k.indexOf(`${tryLang}/${ns}.json`) > -1);
 
-        if (translation) {
-          if (interpolation) {
-            Object.keys(interpolation).forEach((param) => {
-              translation = translation.replace(
-                new RegExp(`{{\\s*${param}\\s*}}`, "g"),
-                String(interpolation[param]),
-              );
-            });
+        if (loadedKeys.length > 0) {
+          const i18nKey =
+            loadedKeys.length === 1 ? loadedKeys[0] : loadedKeys[1];
+          let translation = i18n.loaded[i18nKey]?.data?.[bareKey];
+
+          if (translation) {
+            if (interpolation) {
+              Object.keys(interpolation).forEach((param) => {
+                translation = translation.replace(
+                  new RegExp(`{{\\s*${param}\\s*}}`, "g"),
+                  String(interpolation[param]),
+                );
+              });
+            }
+            return translation;
           }
-          return translation;
         }
       }
     }
