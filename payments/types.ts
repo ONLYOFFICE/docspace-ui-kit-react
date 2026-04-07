@@ -112,6 +112,7 @@ export type TPaymentConfig = {
   language: string;
   routes: TPaymentRoutes;
   logoText?: string;
+  walletHelpUrl?: string;
   user?: TPaymentUser;
 };
 

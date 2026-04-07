@@ -211,6 +211,8 @@ class PaymentStore {
     this.language = config.language;
 
     if (config.logoText !== undefined) this.logoText = config.logoText;
+    if (config.walletHelpUrl !== undefined)
+      this.walletHelpUrl = config.walletHelpUrl;
     if (config.routes) this.routes = config.routes;
     if (config.user) {
       this._currentUserEmail = config.user.email ?? "";
