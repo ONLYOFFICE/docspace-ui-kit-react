@@ -26,8 +26,11 @@
 
 import React, { PropsWithChildren, useCallback } from "react";
 import Markdown from "react-markdown";
+import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import "katex/dist/katex.min.css";
 
 import type { MessageMarkdownFieldProps } from "../../../../../Chat.types";
 
@@ -64,6 +67,12 @@ import {
 //     .replace(/<\/think>/g, "`</think>`");
 // };
 
+// Normalize all common LaTeX delimiters to remark-math format
+const normalizeMathDelimiters = (text: string): string =>
+  text
+    .replace(/\\\[([\s\S]*?)\\\]/g, (_, inner) => `$$${inner}$$`)
+    .replace(/\\\(([\s\S]*?)\\\)/g, (_, inner) => `$${inner}$`);
+
 const MarkdownField = React.memo(
   ({
     chatMessage,
@@ -82,7 +91,7 @@ const MarkdownField = React.memo(
       : [chatMessage];
 
     const thinkBlock = withThinkBlock
-      ? splitedMsg[0].replace("<think>\n", "")
+      ? normalizeMathDelimiters(splitedMsg[0].replace("<think>\n", ""))
       : "";
 
     const CodeWithProps = useCallback(
@@ -124,7 +133,9 @@ const MarkdownField = React.memo(
       code: CodeWithProps,
     };
 
-    const processedChatMessage = withThinkBlock ? splitedMsg[1] : chatMessage;
+    const processedChatMessage = normalizeMathDelimiters(
+      withThinkBlock ? splitedMsg[1] : chatMessage,
+    );
 
     return (
       <div style={{ width: "100%" }} className={styles.markdownField}>
@@ -134,8 +145,8 @@ const MarkdownField = React.memo(
             isFirst={isFirst}
           >
             <Markdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw]}
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeRaw, rehypeKatex]}
               components={components}
             >
               {thinkBlock}
@@ -143,8 +154,8 @@ const MarkdownField = React.memo(
           </Think>
         ) : null}
         <Markdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeRaw]}
+          remarkPlugins={[remarkGfm, remarkMath]}
+          rehypePlugins={[rehypeRaw, rehypeKatex]}
           components={components}
         >
           {processedChatMessage}
