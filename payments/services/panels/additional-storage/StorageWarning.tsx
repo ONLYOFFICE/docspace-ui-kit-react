@@ -40,6 +40,7 @@ import { Link } from "../../../../components";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
 type StorageWarningProps = {
+  isDisabled: boolean;
   title?: string;
   onCancelChange?: () => void;
   isCancelLoading?: boolean;
@@ -51,6 +52,7 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
   onCancelChange,
   isCancelLoading,
   style,
+  isDisabled,
 }) => {
   const paymentStore = usePaymentStore();
   const { currentStoragePlanSize } = paymentStore.tariff;
@@ -79,7 +81,7 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
         })}
       </Text>
 
-      {isCancellationMode ? (
+      {!isDisabled && isCancellationMode ? (
         <div className={styles.cancelChangeRow}>
           <Link
             textDecoration="underline dashed"
