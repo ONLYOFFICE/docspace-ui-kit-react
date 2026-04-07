@@ -265,15 +265,14 @@ const CssCustomizationTemplate = () => (
           { key: "logout", label: "Logout", onClick: () => {} },
         ] as ContextMenuModel[]
       }
-      children={[
-        <Article.Header key="header">
-          <h2>Sidebar</h2>
-        </Article.Header>,
-        <Article.Body key="body">
-          <div>Navigation items</div>
-        </Article.Body>,
-      ]}
-    />
+    >
+      <Article.Header key="header">
+        <h2>Sidebar</h2>
+      </Article.Header>
+      <Article.Body key="body">
+        <div>Navigation items</div>
+      </Article.Body>
+    </Article>
   </div>
 );
 
