@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import React from "react";
 import type { ComponentProps } from "react";
 import { useState } from "react";
 
@@ -293,6 +294,63 @@ export const WithoutCalendarIcon: Story = {
   showCalendarIcon={false}
   selectDateText="No calendar icon"
 />`,
+			},
+		},
+	},
+};
+
+export const CssCustomization: Story = {
+	render: () => (
+		<div
+			style={
+				{
+					height: "350px",
+					padding: "20px",
+					// DatePicker container
+					"--date-picker-bg": "#e6f3fb",
+					"--date-picker-header-border": "1px solid #0082c9",
+					"--date-picker-padding": "0 16px 16px",
+					"--date-picker-body-padding": "12px 0",
+					// Calendar sub-component
+					"--calendar-bg": "#e6f3fb",
+					"--calendar-border": "#0082c9",
+					"--calendar-shadow": "0 4px 16px rgba(0,130,201,0.25)",
+					"--calendar-radius": "12px",
+					"--calendar-title": "#0082c9",
+					"--calendar-outline": "#0082c9",
+					"--calendar-arrow": "#0082c9",
+					"--calendar-weekday": "#0082c9",
+					"--calendar-accent": "#0082c9",
+					"--calendar-hover-bg": "#cce5f6",
+					// AddButton sub-component
+					"--add-button-background": "#e6f3fb",
+					"--add-button-icon": "#0082c9",
+					// SelectedItem sub-component
+					"--selected-item-background": "#cce5f6",
+					"--selected-item-background-hover": "#b3d9f0",
+					"--selected-item-active-background": "#0082c9",
+					"--selected-item-active-color": "#ffffff",
+					// IconButton (used in SelectedItem close button)
+					"--icon-button-color": "#0082c9",
+					"--icon-button-hover-color": "#006fa6",
+				} as React.CSSProperties
+			}
+		>
+			<ControlledDatePicker
+				locale="en"
+				openDate={now()}
+				initialDate={now()}
+				maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
+				minDate={createDateTime(1970, 1, 1)}
+				selectDateText="Select date"
+			/>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story:
+					"CSS custom property overrides applied to the date picker and its Calendar, AddButton, and SelectedItem sub-components.",
 			},
 		},
 	},
