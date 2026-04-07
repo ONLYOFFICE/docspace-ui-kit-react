@@ -33,6 +33,7 @@ import { EmptyView } from "../../../../components/empty-view";
 import { DeviceType } from "../../../../enums";
 import { Consumer } from "../../../../utils";
 
+import NoTransactionsIcon from "../../../../assets/no.transactions.react.svg";
 import NoTransactionsFilterIcon from "../../../../assets/no.transactions.filter.react.svg";
 import NoTransactionsFilterDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
 
@@ -81,7 +82,7 @@ const TransactionBody = ({
 
   const emptyView = (
     <EmptyView
-      icon={filterIcon}
+      icon={hasAppliedDateFilter ? filterIcon : <NoTransactionsIcon />}
       title={title}
       description={description}
       options={null}
