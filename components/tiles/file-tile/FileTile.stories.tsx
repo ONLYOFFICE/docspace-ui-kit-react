@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -271,6 +271,69 @@ export const InProgress: Story = {
 >
   <TileContent><Link>File Content</Link></TileContent>
 </FileTile>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--tile-bg": "#e6f3fb",
+          "--tile-border-style": "1px solid #0082c9",
+          "--tile-radius": "16px",
+          "--tile-hover-bg": "#cce5f6",
+          "--tile-icon-color": "#0082c9",
+          "--tile-hotkey-color": "#0082c9",
+          "--tile-badge-bg": "#e6f3fb",
+          "--tile-badge-radius": "6px",
+          "--tile-badge-box-shadow": "0 2px 8px rgba(0,130,201,0.2)",
+          "--tile-text-size": "13px",
+        } as CSSProperties
+      }
+    >
+      <div style={{ maxWidth: "300px", margin: "30px" }}>
+        <FileTile
+          item={{
+            id: "file-1",
+            title: "Document.docx",
+            fileExst: ".docx",
+            fileType: FileType.Document,
+            contextOptions: ["copy-to", "move-to"],
+          }}
+          element={wordElement}
+          contextOptions={contextOptions}
+          temporaryIcon={<ImageReactSvg />}
+          onSelect={() => {}}
+          getContextModel={() => contextOptions}
+        >
+          <TileContent>
+            <Link>Document.docx</Link>
+          </TileContent>
+        </FileTile>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--tile-bg\` | Tile background color | theme-based |
+| \`--tile-border-style\` | Tile border | theme-based |
+| \`--tile-radius\` | Tile border radius | \`12px\` |
+| \`--tile-hover-bg\` | Hover/checked background | theme-based |
+| \`--tile-icon-color\` | Icon button color | theme-based |
+| \`--tile-hotkey-color\` | Hotkey navigation border color | theme-based |
+| \`--tile-badge-bg\` | Badge background color | theme-based |
+| \`--tile-badge-radius\` | Badge border radius | \`3px\` |
+| \`--tile-badge-box-shadow\` | Badge box shadow | theme-based |
+| \`--tile-text-size\` | File name font size | \`14px\` |
+| \`--tile-text-line-height\` | File name line height | \`16px\` |`,
       },
     },
   },

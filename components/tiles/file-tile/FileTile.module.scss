@@ -69,11 +69,11 @@
   box-sizing: border-box;
   position: relative;
 
-  height: 222px;
+  height: var(--tile-height, 222px);
 
-  background: var(--tile-background-color);
-  border: var(--tile-border);
-  border-radius: var(--tile-border-radius);
+  background: var(--tile-bg, var(--tile-background-color));
+  border: var(--tile-border-style, var(--tile-border));
+  border-radius: var(--tile-radius, var(--tile-border-radius));
 
   @include mixins.mobile {
     margin-inline-start: 2px;
@@ -101,13 +101,13 @@
   &.checked,
   &.isActive {
     .fileTileBottom {
-      background: var(--tile-checked-background);
+      background: var(--tile-hover-bg, var(--tile-checked-background));
     }
   }
 
   &.checked {
     .fileTileTop {
-      background: var(--tile-checked-background);
+      background: var(--tile-hover-bg, var(--tile-checked-background));
     }
   }
 
@@ -116,11 +116,11 @@
   }
 
   &.showHotkeyBorder {
-    border-color: var(--tile-show-hotkey-border);
+    border-color: var(--tile-hotkey-color, var(--tile-show-hotkey-border));
 
     &:before,
     &:after {
-      border-color: var(--tile-show-hotkey-border);
+      border-color: var(--tile-hotkey-color, var(--tile-show-hotkey-border));
     }
   }
 
@@ -141,9 +141,9 @@
         align-items: center;
         justify-content: center;
         padding: 8px;
-        background: var(--tile-background-badge-color);
-        border-radius: 3px;
-        box-shadow: var(--tile-badge-shadow);
+        background: var(--tile-badge-bg, var(--tile-background-badge-color));
+        border-radius: var(--tile-badge-radius, 3px);
+        box-shadow: var(--tile-badge-box-shadow, var(--tile-badge-shadow));
       }
     }
   }
@@ -197,7 +197,7 @@
 
     &:hover:not(.isDragging, .inProgress),
     &.checked {
-      background: var(--tile-background-color);
+      background: var(--tile-bg, var(--tile-background-color));
       border-radius: 6px;
     }
 
@@ -260,8 +260,8 @@
       white-space: normal;
       word-break: break-word;
 
-      font-size: var(--tile-font-size);
-      line-height: var(--tile-line-height);
+      font-size: var(--tile-text-size, var(--tile-font-size));
+      line-height: var(--tile-text-line-height, var(--tile-line-height));
 
       text-underline-offset: 2px;
       text-decoration-thickness: 1px;
@@ -286,7 +286,7 @@
 
         svg {
           path {
-            fill: var(--tile-icon-button-color);
+            fill: var(--tile-icon-color, var(--tile-icon-button-color));
           }
         }
 
@@ -319,12 +319,12 @@
   .fileTileTop {
     @extend .flexBoxStyles;
 
-    background: var(--tile-background-color);
+    background: var(--tile-bg, var(--tile-background-color));
     justify-content: space-between;
     align-items: baseline;
     height: 156px;
     position: relative;
-    border-radius: 12px 12px 0 0;
+    border-radius: var(--tile-radius, 12px) var(--tile-radius, 12px) 0 0;
     transition: background 0.2s;
 
     &:hover {
@@ -339,7 +339,7 @@
       object-fit: cover;
       object-position: top;
       z-index: 0;
-      border-radius: 12px 12px 0 0;
+      border-radius: var(--tile-radius, 12px) var(--tile-radius, 12px) 0 0;
 
       .isImageOrMedia {
         object-position: top;
@@ -362,8 +362,8 @@
   .fileTileBottom {
     @extend .flexBoxStyles;
 
-    background: var(--tile-background-color);
-    border-radius: 0 0 12px 12px;
+    background: var(--tile-bg, var(--tile-background-color));
+    border-radius: 0 0 var(--tile-radius, 12px) var(--tile-radius, 12px);
 
     padding: 16px 0;
     height: 64px;
