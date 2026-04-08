@@ -45,6 +45,7 @@ const BackButton = ({
   isLoading,
   toggleArticleOpen,
   navigate,
+  onBack,
 }: {
   showText: boolean;
   currentDeviceType: DeviceType;
@@ -52,6 +53,7 @@ const BackButton = ({
   isLoading?: boolean;
   toggleArticleOpen?: () => void;
   navigate?: (path: string) => void;
+  onBack?: () => void;
 }) => {
   const t = useCommonTranslation();
 
@@ -61,8 +63,13 @@ const BackButton = ({
     if (toggleArticleOpen && currentDeviceType === DeviceType.mobile)
       toggleArticleOpen();
 
-    if (navigate) navigate("/");
-    else window.location.href = "/";
+    if (onBack) {
+      onBack();
+    } else if (navigate) {
+      navigate("/");
+    } else {
+      window.location.href = "/";
+    }
   };
 
   const isDesktop = currentDeviceType === DeviceType.desktop;

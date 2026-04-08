@@ -125,6 +125,7 @@ const Article = ({
   officeforiosUrl,
   showBackButton,
   navigate,
+  onBack,
   customSlot,
 }: ArticleProps) => {
   const [articleHeaderContent, setArticleHeaderContent] =
@@ -264,6 +265,7 @@ const Article = ({
           onIconClick={toggleArticleOpen}
           showBackButton={showBackButton}
           navigate={navigate}
+          onBack={onBack}
         >
           {articleHeaderContent ? articleHeaderContent.props.children : null}
         </SubArticleHeader>
@@ -290,6 +292,7 @@ const Article = ({
               onLogoClickAction={onLogoClickAction}
               isLoading={isBurgerLoading}
               navigate={navigate}
+              onBack={onBack}
             />
           ) : null}
           {articleBodyContent
