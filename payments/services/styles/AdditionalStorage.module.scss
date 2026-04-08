@@ -126,9 +126,14 @@
 
 
 .additionalInfo {
-  display: flex;
+  display: grid;
+  grid-template-columns: 16px 1fr;
   gap: 4px;
-  align-items: center;
+  align-items: self-start;
+
+  > :first-child:not(svg) {
+    grid-column: 1 / -1;
+  }
 
   &.warningColor {
     color: var(--payment-warning-color);
