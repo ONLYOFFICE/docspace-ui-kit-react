@@ -41,7 +41,9 @@ export type ArticleHeaderProps = {
   currentDeviceType: DeviceType;
   showBackButton: boolean;
   navigate?: (path: string) => void;
+  onBack?: () => void;
 };
+
 
 export type ArticleAppsProps = {
   showText: boolean;

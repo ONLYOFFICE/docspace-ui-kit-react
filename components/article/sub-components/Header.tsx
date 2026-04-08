@@ -49,6 +49,7 @@ const ArticleHeader = ({
   onIconClick,
   showBackButton,
   navigate,
+  onBack,
   ...rest
 }: ArticleHeaderProps) => {
   const { isBase } = useTheme();
@@ -97,6 +98,7 @@ const ArticleHeader = ({
               currentDeviceType={currentDeviceType}
               toggleArticleOpen={onIconClick}
               navigate={navigate}
+              onBack={onBack}
             />
           ) : null
         }
