@@ -243,7 +243,11 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
           [styles.servicesWrapperTablet]: isTablet,
         })}
       >
-        {(Array.from(servicesQuotasFeatures?.values() || []) as TServiceFeatureWithPrice[]).map((item) => {
+        {(
+          Array.from(
+            servicesQuotasFeatures?.values() || [],
+          ) as TServiceFeatureWithPrice[]
+        ).map((item) => {
           if (!item.title || !item.image) return null;
 
           if (item.serviceName === BACKUP_SERVICE) {
@@ -308,7 +312,9 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               <ServiceCard
                 key={item.id}
                 cardDisabled={
-                  isCardLinkedToPortal ? !hasStorageSubscription : false
+                  isCardLinkedToPortal
+                    ? !hasStorageSubscription && !previousStoragePlanSize
+                    : false
                 }
                 toggleDisabled={!!eventDisabled}
                 onClick={handleClick}
