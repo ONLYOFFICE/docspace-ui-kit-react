@@ -132,6 +132,12 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       <CardInformation />
 
+      {walletCustomerStatusNotActive ? (
+        <Text className={styles.linkNewCardDescription} lineHeight="20px">
+          {t("LinkNewCardDescription")}
+        </Text>
+      ) : null}
+
       {isAlreadyPaid && isStripePortalAvailable ? (
         <div className={styles.buttonWrapper}>
           <Button
