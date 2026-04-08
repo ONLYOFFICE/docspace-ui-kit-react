@@ -25,12 +25,13 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { makeAutoObservable } from "mobx";
-import type {
-  PaymentApi,
-  PortalQuotaApi,
-  Tariff,
-  Quota,
-  CustomerInfoDto,
+import {
+  type PaymentApi,
+  type PortalQuotaApi,
+  type Tariff,
+  type Quota,
+  type CustomerInfoDto,
+  PaymentMethodStatus,
 } from "@onlyoffice/docspace-api-sdk";
 import {
   dateDiff,
@@ -205,10 +206,14 @@ class CurrentTariffStatusStore {
 
   get walletCustomerStatusNotActive() {
     if (!this.walletCustomerEmail) return false;
-    // PaymentMethodStatus: None=0, Expired=2
+
     const status =
       (this.payerInfo.paymentMethodStatus as unknown as number) ?? 0;
-    return status === 0 || status === 2;
+
+    return (
+      status === PaymentMethodStatus.None ||
+      status === PaymentMethodStatus.Expired
+    );
   }
 
   get walletCustomerInfo() {
@@ -230,9 +235,7 @@ class CurrentTariffStatusStore {
 
       this.portalTariffStatus = tariff;
 
-      const walletQuota = tariff.quotas?.find(
-        (q: Quota) => q.wallet === true,
-      );
+      const walletQuota = tariff.quotas?.find((q: Quota) => q.wallet === true);
 
       if (walletQuota) {
         // QuotaState.Overdue = 1
