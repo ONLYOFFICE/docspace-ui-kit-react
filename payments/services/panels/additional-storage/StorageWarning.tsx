@@ -75,7 +75,7 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
       </div>
 
       <Text>
-        {t("Warning", {
+        {t("Payments:Warning", {
           amount: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
           storageUnit: t("Common:Gigabyte"),
         })}
@@ -108,3 +108,4 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
 };
 
 export default observer(StorageWarning);
+
