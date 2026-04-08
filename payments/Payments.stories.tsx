@@ -48,7 +48,7 @@ import AdditionalStoragePageLoader from "./services/pages/additional-storage/Add
 import styles from "./Payments.stories.module.scss";
 
 const meta: Meta = {
-  title: "Components/Payments",
+  title: "Components/Billing",
   decorators: [
     (Story) => (
       <div className={styles.storyWrapper}>
