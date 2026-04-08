@@ -34,6 +34,7 @@ import { AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
 import type { TAiToolsPrices } from "../types";
 import type PaymentStore from "./PaymentStore";
 import type { TApiClient } from "../../providers/api/ApiProvider";
+import { formatterCurrencyWithoutTranction } from "../wallet/utils";
 
 class ServicesStore {
   private paymentApi: PaymentApi;
@@ -224,7 +225,12 @@ class ServicesStore {
   };
 
   formatAiModelsCurrency = (amount: number) => {
-    return formatCurrencyValue(this.language, amount, this.aiModelsCurrency, 0);
+    return formatterCurrencyWithoutTranction(
+      this.language,
+      amount,
+      this.aiModelsCurrency,
+      0,
+    );
   };
 
   formatAiServiceCurrency = (
