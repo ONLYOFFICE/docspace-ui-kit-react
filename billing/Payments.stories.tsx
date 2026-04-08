@@ -158,59 +158,6 @@ export const MainTariff: StoryObj = {
   },
 };
 
-// ── Loading States ──
-
-const loaderTabs = [
-  { key: "mainTariff", label: "Main Tariff", component: <PaymentsLoader /> },
-  { key: "wallet", label: "Wallet", component: <WalletLoader /> },
-  { key: "method", label: "Payment Method", component: <PaymentMethodLoader /> },
-  { key: "services", label: "Services", component: <ServicesLoader /> },
-  { key: "aiTools", label: "AI Tools", component: <AiPageLoader /> },
-  { key: "backup", label: "Backup", component: <BackupPageLoader /> },
-  { key: "storage", label: "Disk Storage", component: <AdditionalStoragePageLoader /> },
-] as const;
-
-const LoadingStatesRender = () => {
-  const [active, setActive] = React.useState("mainTariff");
-
-  return (
-    <div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-        {loaderTabs.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setActive(key)}
-            style={{
-              padding: "6px 16px",
-              borderRadius: 6,
-              border: "1px solid var(--border-service-color, #eceef1)",
-              background: active === key ? "var(--color-scheme-main-accent, #4781D1)" : "transparent",
-              color: active === key ? "#fff" : "inherit",
-              cursor: "pointer",
-              fontSize: 13,
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      {loaderTabs.find((t) => t.key === active)?.component}
-    </div>
-  );
-};
-
-export const LoadingStates: StoryObj = {
-  render: () => <LoadingStatesRender />,
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Skeleton loaders for each payment page. Every page shows its own loading skeleton while fetching data on mount. Switch between tabs to preview each loader: Main Tariff, Wallet, Payment Method, Services, AI Tools, Backup, Disk Storage.",
-      },
-    },
-  },
-};
-
 // ── Wallet ──
 
 export const Wallet: StoryObj = {
@@ -310,6 +257,59 @@ export const DiskStorage: StoryObj = {
       description: {
         story:
           "Additional disk storage page. Allows purchasing extra storage on top of the base tariff plan.\n\n**Features:** subscription card with current storage size and monthly price, edit/cancel subscription actions, scheduled change indicators (upgrade, downgrade, or cancellation pending for next billing cycle), renewal information, transaction history scoped to storage service.",
+      },
+    },
+  },
+};
+
+// ── Loading States ──
+
+const loaderTabs = [
+  { key: "mainTariff", label: "Main Tariff", component: <PaymentsLoader /> },
+  { key: "wallet", label: "Wallet", component: <WalletLoader /> },
+  { key: "method", label: "Payment Method", component: <PaymentMethodLoader /> },
+  { key: "services", label: "Services", component: <ServicesLoader /> },
+  { key: "aiTools", label: "AI Tools", component: <AiPageLoader /> },
+  { key: "backup", label: "Backup", component: <BackupPageLoader /> },
+  { key: "storage", label: "Disk Storage", component: <AdditionalStoragePageLoader /> },
+] as const;
+
+const LoadingStatesRender = () => {
+  const [active, setActive] = React.useState("mainTariff");
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+        {loaderTabs.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setActive(key)}
+            style={{
+              padding: "6px 16px",
+              borderRadius: 6,
+              border: "1px solid var(--border-service-color, #eceef1)",
+              background: active === key ? "var(--color-scheme-main-accent, #4781D1)" : "transparent",
+              color: active === key ? "#fff" : "inherit",
+              cursor: "pointer",
+              fontSize: 13,
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {loaderTabs.find((t) => t.key === active)?.component}
+    </div>
+  );
+};
+
+export const LoadingStates: StoryObj = {
+  render: () => <LoadingStatesRender />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Skeleton loaders for each payment page. Every page shows its own loading skeleton while fetching data on mount. Switch between tabs to preview each loader: Main Tariff, Wallet, Payment Method, Services, AI Tools, Backup, Disk Storage.",
       },
     },
   },

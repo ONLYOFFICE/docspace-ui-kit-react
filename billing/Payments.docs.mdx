@@ -86,14 +86,6 @@ import { PaymentsRoot, PaymentDashboard } from "@docspace/ui-kit/payments";
 
 ---
 
-## Loading States
-
-Each page has its own skeleton loader shown while fetching data on mount. Use the tabs to preview all four loaders.
-
-<Story of={PaymentsStories.LoadingStates} />
-
----
-
 ## Wallet
 
 Portal wallet — the central balance used to pay for all DocSpace services (AI tools, backup, additional disk storage). When a service is active, its costs are automatically deducted from the wallet balance.
@@ -235,6 +227,7 @@ type TPaymentConfig = {
   language: string; // Locale code ("en", "ru", "de", ...)
   routes: TPaymentRoutes; // Navigation routes for all pages
   logoText?: string; // Organization name (shown in AI dialogs)
+  walletHelpUrl?: string; // URL to wallet help/documentation page
   user?: TPaymentUser; // Current user; omit to fetch from API
 };
 ```
@@ -265,4 +258,12 @@ type TPaymentNavigationEvent =
   | { action: "open-ai-services" }
   | { action: "open-backup" };
 ```
+
+---
+
+## Loading States
+
+Each page has its own skeleton loader shown while fetching data on mount. Use the tabs to preview all four loaders.
+
+<Story of={PaymentsStories.LoadingStates} />
 
