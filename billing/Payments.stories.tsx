@@ -104,7 +104,7 @@ import {
   PaymentWallet,
   PaymentMethod,
   PaymentServicesList,
-} from "@docspace/ui-kit/payments";
+} from "@docspace/ui-kit/billing";
 
 // Wrap any payment page in PaymentsRoot
 <PaymentsRoot config={{

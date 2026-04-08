@@ -42,4 +42,4 @@ export * from "./errors";
 
 export * from "./uploader";
 
-export * from "./payments";
+export * from "./billing";
