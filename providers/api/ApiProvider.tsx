@@ -148,7 +148,7 @@ const ApiProvider = ({
       groupSearchApi: new SearchApi(configuration),
       operationsApi: new OperationsApi(configuration),
       apiClient: createApiClient(url, apiKey),
-      rawApiClient: createApiClient(url, apiKey, false),
+      rawApiClient: createApiClient(url, apiKey, useBearerForRawClient),
       baseUrl: url,
       thirdPartyApi: new ThirdPartyApi(configuration),
       paymentApi: new PaymentApi(configuration),

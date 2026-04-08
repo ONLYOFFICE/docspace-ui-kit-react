@@ -28,7 +28,7 @@ import React, { useState, useEffect } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 
 import { Button, ButtonSize } from "../../../../components/button";
 import { Text } from "../../../../components/text";
@@ -94,7 +94,7 @@ const AiPage = (props: AiPageProps) => {
     aiServiceLastCreditDate,
     isAiServiceLowBalance,
     isInitServicesData,
-    wasFirstAiServiceTopUp,
+    // wasFirstAiServiceTopUp,
     initServiceData,
   } = servicesStore;
 
@@ -109,17 +109,17 @@ const AiPage = (props: AiPageProps) => {
 
   const isDisabled = isServiceActionDisabled!;
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     initServiceData(t, AI_TOOLS, AI_ENUM);
   }, []);
 
-  useEffect(() => {
-    if (isInitServicesData && !wasFirstAiServiceTopUp) {
-      navigate(paymentStore.routes.services);
-    }
-  }, [isInitServicesData, wasFirstAiServiceTopUp]);
+  // useEffect(() => {
+  //   if (isInitServicesData && !wasFirstAiServiceTopUp) {
+  //     navigate(paymentStore.routes.services);
+  //   }
+  // }, [isInitServicesData, wasFirstAiServiceTopUp]);
 
   const onRefresh = async () => {
     if (isRefreshing) return;
@@ -264,7 +264,7 @@ const AiPage = (props: AiPageProps) => {
     },
   ];
 
-  if (!isInitServicesData || !wasFirstAiServiceTopUp) return <AiPageLoader />;
+  if (!isInitServicesData) return <AiPageLoader />;
 
   const balance = formatWalletCurrency();
 
