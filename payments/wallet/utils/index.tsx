@@ -87,6 +87,7 @@ export const formatterCurrencyWithoutTranction = (
   language: string,
   amount: number,
   currency: string,
+  wholeFractionDigits?: number,
 ) => {
   const maximumFractionDigits = 8;
 
@@ -103,7 +104,9 @@ export const formatterCurrencyWithoutTranction = (
     effectiveDigits = getEffectiveFraction(amount, isScientific);
   }
 
-  const effectiveFractionDigits = isWholeNumber ? 2 : effectiveDigits;
+  const effectiveFractionDigits = isWholeNumber
+    ? (wholeFractionDigits ?? 2)
+    : effectiveDigits;
 
   const truncated = isScientific
     ? truncateNumberToFractionNumeric(amount, effectiveFractionDigits)
