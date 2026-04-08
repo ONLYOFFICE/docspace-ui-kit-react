@@ -38,11 +38,13 @@ import { Link, LinkTarget } from "../../../components/link";
 import { useState } from "react";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import { useApi } from "../../../providers";
 
 import styles from "./PayerInformation.module.scss";
 
 const PayerInformation = () => {
   const store = usePaymentStore();
+  const { baseUrl } = useApi();
 
   const { accountLink, isStripePortalAvailable, isOwner } = store;
 
@@ -209,7 +211,9 @@ const PayerInformation = () => {
   };
 
   const avatarSource = payerInfo
-    ? (payerInfo.hasAvatar ? payerInfo.avatar : DefaultUserPhoto) ?? undefined
+    ? (payerInfo.hasAvatar && payerInfo.avatar
+        ? `${baseUrl}${payerInfo.avatar}`
+        : DefaultUserPhoto) ?? undefined
     : undefined;
 
   return (
