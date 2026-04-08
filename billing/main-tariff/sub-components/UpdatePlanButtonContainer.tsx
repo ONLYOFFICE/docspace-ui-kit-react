@@ -60,16 +60,12 @@ let previousManagersCount: number | null = null;
 
 type UpdatePlanButtonContainerProps = {
   isDisabled?: boolean;
-  currentTariffPlanTitle?: string;
   t: (key: string, options?: Record<string, unknown>) => string;
-  tariffPlanTitle?: string;
 };
 
 const UpdatePlanButtonContainer = ({
   isDisabled,
-  currentTariffPlanTitle,
   t,
-  tariffPlanTitle,
 }: UpdatePlanButtonContainerProps) => {
   const { paymentApi } = useApi();
   const store = usePaymentStore();
@@ -93,9 +89,15 @@ const UpdatePlanButtonContainer = ({
     canDowngradeTariff,
     cardLinked,
   } = store;
-  const { maxCountManagersByQuota, isYearTariff, setPortalQuotaValue } =
-    store.quotas;
+  const {
+    maxCountManagersByQuota,
+    isYearTariff,
+    setPortalQuotaValue,
+    currentTariffPlanTitle,
+  } = store.quotas;
+  const { tariffPlanTitle } = store.paymentQuotas;
   const { walletCustomerStatusNotActive } = store.tariff;
+
   const [isVisiblePaymentConfirm, setIsVisiblePaymentConfirm] = useState(false);
   const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
     useState(false);
