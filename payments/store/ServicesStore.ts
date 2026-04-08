@@ -476,6 +476,7 @@ class ServicesStore {
       const requests: Promise<unknown>[] = [
         handleServicesQuotas(),
         initWalletPayerAndBalance(isRefresh),
+        this.paymentStore.tariff.fetchPortalTariff(),
         this.fetchAiServiceBalance(),
         this.fetchAiPrices(),
       ];
