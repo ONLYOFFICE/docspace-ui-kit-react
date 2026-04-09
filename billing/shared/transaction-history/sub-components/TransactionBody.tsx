@@ -23,21 +23,22 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import React from "react";
+import { useState } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { observer } from "mobx-react";
 import { useTheme } from "../../../../context/ThemeContext";
 
 import { EmptyView } from "../../../../components/empty-view";
 
-import { DeviceType } from "../../../../enums";
 import { Consumer } from "../../../../utils";
 
 import NoTransactionsIcon from "../../../../assets/no.transactions.react.svg";
 import NoTransactionsFilterIcon from "../../../../assets/no.transactions.filter.react.svg";
 import NoTransactionsFilterDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
 
+import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import useViewEffect from "../../../../hooks/useViewEffect";
+import useDeviceType from "../../../hooks/useDeviceType";
 
 import TableView from "./TableView";
 import RowView from "./RowView";
@@ -45,24 +46,26 @@ import RowView from "./RowView";
 type TransactionHistoryProps = {
   isTransactionHistoryExist: boolean;
   hasAppliedDateFilter: boolean;
-  viewAs?: string;
-  setViewAs?: (view: string) => void;
-  currentDeviceType?: DeviceType;
 };
 
 const TransactionBody = ({
-  viewAs,
-  setViewAs,
-  currentDeviceType,
   hasAppliedDateFilter,
   isTransactionHistoryExist,
 }: TransactionHistoryProps) => {
   const { isBase } = useTheme();
+  const { mobileBreakpoint, desktopBreakpoint } = usePaymentStore();
+
+  const [viewAs, setViewAs] = useState("table");
+
+  const currentDeviceType = useDeviceType({
+    mobile: mobileBreakpoint,
+    desktop: desktopBreakpoint,
+  });
 
   useViewEffect({
-    view: viewAs!,
-    setView: setViewAs!,
-    currentDeviceType: currentDeviceType!,
+    view: viewAs,
+    setView: setViewAs,
+    currentDeviceType,
   });
 
   const t = useCommonTranslation(["Payments", "Settings"]);

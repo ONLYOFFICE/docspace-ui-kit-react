@@ -114,6 +114,8 @@ export type TPaymentConfig = {
   logoText?: string;
   walletHelpUrl?: string;
   user?: TPaymentUser;
+  mobileBreakpoint?: number;
+  desktopBreakpoint?: number;
 };
 
 export type TPaymentNavigationEvent =

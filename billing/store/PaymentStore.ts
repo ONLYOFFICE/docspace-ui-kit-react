@@ -189,6 +189,10 @@ class PaymentStore {
 
   reccomendedAmount = "";
 
+  mobileBreakpoint?: number;
+
+  desktopBreakpoint?: number;
+
   constructor(
     paymentApi: PaymentApi,
     profilesApi: ProfilesApi,
@@ -219,6 +223,10 @@ class PaymentStore {
       this.userId = config.user.id ?? "";
       this.isOwner = config.user.isOwner ?? false;
     }
+    if (config.mobileBreakpoint !== undefined)
+      this.mobileBreakpoint = config.mobileBreakpoint;
+    if (config.desktopBreakpoint !== undefined)
+      this.desktopBreakpoint = config.desktopBreakpoint;
   };
 
   private addAbortController(controller: AbortController) {
