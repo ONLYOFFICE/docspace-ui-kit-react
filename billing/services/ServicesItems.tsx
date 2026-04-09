@@ -312,7 +312,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               <ServiceCard
                 key={item.id}
                 cardDisabled={
-                  isCardLinkedToPortal
+                  isCardLinkedToPortal && !isPayer
                     ? !hasStorageSubscription && !previousStoragePlanSize
                     : false
                 }
