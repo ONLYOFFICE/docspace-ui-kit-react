@@ -37,7 +37,7 @@ import NoTransactionsIcon from "../../../../assets/no.transactions.react.svg";
 import NoTransactionsFilterIcon from "../../../../assets/no.transactions.filter.react.svg";
 import NoTransactionsFilterDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
 
-import useViewEffect from "../../../hooks/useViewEffect";
+import useViewEffect from "../../../../hooks/useViewEffect";
 
 import TableView from "./TableView";
 import RowView from "./RowView";

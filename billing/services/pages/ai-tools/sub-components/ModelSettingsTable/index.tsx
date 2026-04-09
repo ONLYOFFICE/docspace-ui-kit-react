@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { Consumer } from "../../../../../../utils";
 import { DeviceType } from "../../../../../../enums";
 
-import useViewEffect from "../../../../../hooks/useViewEffect";
+import useViewEffect from "../../../../../../hooks/useViewEffect";
 
 import TableView from "./TableView";
 import RowView from "./RowView";
