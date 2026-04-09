@@ -62,7 +62,6 @@ type ServicesItemsProps = {
 const ServicesItems: React.FC<ServicesItemsProps> = ({
   onToggle,
   onClick,
-  storageExpiryDate,
   isMobile,
   isTablet,
   cardDisabled: forceCardDisabled,
@@ -99,6 +98,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     nextStoragePlanSize,
     hasStorageSubscription,
     previousStoragePlanSize,
+    storageExpiryDate,
   } = paymentStore.tariff;
 
   const isDisabled = isServiceActionDisabled;
