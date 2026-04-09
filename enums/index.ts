@@ -239,6 +239,11 @@ export const enum ParseErrorTypes {
   IncorrectEmail = 2,
 }
 
+export const enum PortalFeaturesLimitations {
+  Limitless = -1,
+  Unavailable = 0,
+}
+
 export const enum ErrorKeys {
   LocalDomain = "LocalDomain",
   IncorrectDomain = "IncorrectDomain",

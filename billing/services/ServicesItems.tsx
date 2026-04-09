@@ -1,0 +1,351 @@
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+import React from "react";
+import { observer } from "mobx-react";
+import classNames from "classnames";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
+
+import { Text } from "../../components/text";
+import {
+  AI_ENUM,
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  DISK_STORAGE,
+  TOTAL_SIZE,
+} from "../constants";
+import { calculateTotalPrice, getConvertedSize } from "../utils/common";
+import type { TServiceFeatureWithPrice } from "../types";
+
+import PriceIcon from "../../assets/icons/16/price.react.svg";
+
+import styles from "./styles/AdditionalStorage.module.scss";
+import { useServicesActions } from "./hooks/useServicesActions";
+
+import ServiceCard from "./sub-components/ServiceCard";
+
+import { usePaymentStore } from "../store/PaymentStoreProvider";
+import { useServicesStore } from "../store/ServicesStoreProvider";
+
+type ServicesItemsProps = {
+  onToggle?: (id: string, enabled: boolean) => void;
+  onClick?: (id: string) => void;
+  storageExpiryDate?: string;
+  isMobile?: boolean;
+  isTablet?: boolean;
+  cardDisabled?: boolean;
+};
+
+const ServicesItems: React.FC<ServicesItemsProps> = ({
+  onToggle,
+  onClick,
+  isMobile,
+  isTablet,
+  cardDisabled: forceCardDisabled,
+}) => {
+  const paymentStore = usePaymentStore();
+  const servicesStore = useServicesStore();
+
+  const {
+    isServiceActionDisabled,
+    isPayer,
+    isCardLinkedToPortal,
+    servicesQuotasFeatures,
+    storageSizeIncrement,
+    storagePriceIncrement,
+    formatWalletCurrency,
+    availableBackupsCount,
+    isBackupServiceOn,
+    isStorageDeactivationVisited,
+  } = paymentStore;
+
+  const {
+    aiServiceBalance,
+    formatAiServiceCurrency,
+    isAiServiceLowBalance,
+    wasFirstAiServiceTopUp,
+  } = servicesStore;
+
+  const {
+    isGracePeriod,
+    hasScheduledStorageChange,
+    walletCustomerInfo,
+    walletCustomerEmail,
+    currentStoragePlanSize,
+    nextStoragePlanSize,
+    hasStorageSubscription,
+    previousStoragePlanSize,
+    storageExpiryDate,
+  } = paymentStore.tariff;
+
+  const isDisabled = isServiceActionDisabled;
+  const { t } = useServicesActions();
+
+  const permissionTooltipText = (
+    <CommonTrans
+      namespaces={["Services"]}
+      i18nKey="InsufficientPermissionsMessage"
+      values={{
+        payerContact:
+          (walletCustomerInfo as { displayName?: string })?.displayName ||
+          walletCustomerEmail ||
+          "",
+      }}
+      components={{ 1: <strong /> }}
+    />
+  );
+
+  const handleToggle = (
+    e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const dataset = (e.currentTarget as HTMLElement).dataset;
+    const handleDisabled = dataset.disabled?.toLowerCase() === "true";
+
+    if (handleDisabled) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const isEnabled = dataset.enabled?.toLowerCase() === "true";
+    const id = dataset.id;
+
+    onToggle?.(id!, isEnabled);
+  };
+
+  const handleClick = (
+    e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const dataset = (e.currentTarget as HTMLElement).dataset;
+    const id = dataset.id;
+
+    onClick?.(id!);
+  };
+
+  const textTooltip = (
+    <>
+      <Text fontWeight={600} fontSize="12px">
+        {t("StorageUpgradeMessage", {
+          fromSize: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
+          toSize: `${nextStoragePlanSize} ${t("Common:Gigabyte")}`,
+        })}
+      </Text>
+      <Text fontSize="12px">
+        {nextStoragePlanSize === 0
+          ? t("SubscriptionAutoCancellation", {
+              finalDate: storageExpiryDate,
+            })
+          : t("SubscriptionAutoRenewed", {
+              finalDate: storageExpiryDate,
+            })}
+      </Text>
+    </>
+  );
+
+  const priceDescription = (
+    serviceName: string | null | undefined,
+    priceValue?: number,
+    enabled?: boolean,
+  ) => {
+    switch (serviceName) {
+      case TOTAL_SIZE:
+        if (previousStoragePlanSize && !isStorageDeactivationVisited) {
+          return t("Services:SubscriptionDeactivated");
+        }
+
+        if (hasScheduledStorageChange) {
+          return t("ChangeShedule");
+        }
+
+        if (!hasScheduledStorageChange && currentStoragePlanSize! > 0) {
+          return t("CurrentPaymentMonth", {
+            price: formatWalletCurrency(
+              calculateTotalPrice(
+                currentStoragePlanSize!,
+                storagePriceIncrement,
+              ),
+              2,
+            ),
+            size: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
+          });
+        }
+
+        return t("PerStorage", {
+          currency: formatWalletCurrency(storagePriceIncrement, 2),
+          amount: getConvertedSize(t, storageSizeIncrement || 0),
+        });
+
+      case BACKUP_SERVICE:
+        if (isBackupServiceOn && availableBackupsCount === 0) {
+          return t("Services:BackupsNotAvailable");
+        }
+
+        if (isBackupServiceOn) {
+          return t("Services:BackupsAvailable", {
+            currency: formatWalletCurrency(priceValue!, 2),
+          });
+        }
+
+        return t("PerBackup", {
+          currency: formatWalletCurrency(priceValue!, 2),
+        });
+
+      case AI_ENUM:
+        if (isAiServiceLowBalance) {
+          return t("Services:AIPricingAvailableCreditsLowBalance", {
+            price: formatAiServiceCurrency(),
+          });
+        }
+
+        if (aiServiceBalance && aiServiceBalance > 0) {
+          return t("Services:AIPricingAvailableCredits", {
+            price: formatAiServiceCurrency(),
+          });
+        }
+
+        return t("Services:AIPricingBilledPerUsage");
+      default:
+        return "";
+    }
+  };
+
+  return (
+    <div style={{ width: "100%" }}>
+      <Text className={styles.storageDescription}>
+        {isPayer || !isCardLinkedToPortal
+          ? t("ConnectAndConfigureServices")
+          : t("ServiceConfigurationNotice")}
+      </Text>
+
+      <div
+        className={classNames(styles.servicesWrapper, {
+          [styles.servicesWrapperMobile]: isMobile,
+          [styles.servicesWrapperTablet]: isTablet,
+        })}
+      >
+        {(
+          Array.from(
+            servicesQuotasFeatures?.values() || [],
+          ) as TServiceFeatureWithPrice[]
+        ).map((item) => {
+          if (!item.title || !item.image) return null;
+
+          if (item.serviceName === BACKUP_SERVICE) {
+            return (
+              <ServiceCard
+                key={item.id}
+                cardDisabled={forceCardDisabled}
+                toggleDisabled={isDisabled}
+                priceTitle={item.priceTitle}
+                id={item.id}
+                image={item.image}
+                isEnabled={item.value}
+                serviceTitle={item.title}
+                onClick={handleClick}
+                onToggle={handleToggle}
+                priceDescription={priceDescription(
+                  item.serviceName,
+                  item.price.value,
+                )}
+                tooltip={isDisabled ? permissionTooltipText : undefined}
+                isWarningColor={
+                  item.value && walletCustomerEmail
+                    ? availableBackupsCount === 0
+                    : false
+                }
+              />
+            );
+          }
+
+          if (item.serviceName === AI_TOOLS) {
+            return (
+              <ServiceCard
+                key={item.id}
+                cardDisabled={
+                  forceCardDisabled ||
+                  (isCardLinkedToPortal
+                    ? !wasFirstAiServiceTopUp && !isPayer
+                    : false)
+                }
+                toggleDisabled={isDisabled}
+                onClick={handleClick}
+                onToggle={handleToggle}
+                serviceTitle={item.title}
+                priceDescription={priceDescription(item.id, 0, item.value)}
+                priceTitle={item.priceTitle}
+                id={item.id}
+                image={item.image}
+                isEnabled={item.value}
+                tooltip={isDisabled ? permissionTooltipText : undefined}
+                isInactiveColor={
+                  aiServiceBalance ? aiServiceBalance > 0 && !item.value : false
+                }
+                isErrorColor={isAiServiceLowBalance}
+                icon={<PriceIcon />}
+              />
+            );
+          }
+
+          if (item.serviceName?.includes(DISK_STORAGE)) {
+            const eventDisabled =
+              isGracePeriod || isDisabled || hasScheduledStorageChange;
+
+            return (
+              <ServiceCard
+                key={item.id}
+                cardDisabled={
+                  forceCardDisabled ||
+                  (isCardLinkedToPortal && !isPayer
+                    ? !hasStorageSubscription && !previousStoragePlanSize
+                    : false)
+                }
+                toggleDisabled={!!eventDisabled}
+                onClick={handleClick}
+                onToggle={handleToggle}
+                serviceTitle={item.title}
+                priceDescription={priceDescription(item.id)}
+                priceTitle={item.priceTitle}
+                id={item.id}
+                image={item.image}
+                isEnabled={hasStorageSubscription}
+                tooltip={isDisabled ? permissionTooltipText : undefined}
+                priceTooltip={
+                  hasScheduledStorageChange ? textTooltip : undefined
+                }
+                isWarningColor={hasScheduledStorageChange}
+                isErrorColor={
+                  !!previousStoragePlanSize && !isStorageDeactivationVisited
+                }
+              />
+            );
+          }
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default observer(ServicesItems);
+
