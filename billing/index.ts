@@ -24,11 +24,11 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { default as PaymentDashboard } from "./main-tariff";
-export { default as PaymentWallet } from "./wallet";
+export { default as MainTariff } from "./main-tariff";
+export { default as Wallet } from "./wallet";
 export { default as PaymentMethod } from "./payment-method";
-export { default as PaymentServicesList } from "./services";
-export { default as PaymentsRoot } from "./PaymentsRoot";
+export { default as ServicesList } from "./services";
+export { default as BillingRoot } from "./BillingRoot";
 
 export {
   PaymentStoreProvider,

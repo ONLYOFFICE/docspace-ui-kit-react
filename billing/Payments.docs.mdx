@@ -47,12 +47,12 @@ Handles tariff plans, wallet operations, payment methods, and service subscripti
 
 ## Quick start
 
-Every payment page must be wrapped in `PaymentsRoot`, which provides the store context:
+Every payment page must be wrapped in `BillingRoot`, which provides the store context:
 
 ```tsx
-import { PaymentsRoot, PaymentDashboard } from "@docspace/ui-kit/payments";
+import { BillingRoot, MainTariff } from "@docspace/ui-kit/billing";
 
-<PaymentsRoot
+<BillingRoot
   config={{
     language: "en",
     routes: {
@@ -64,8 +64,8 @@ import { PaymentsRoot, PaymentDashboard } from "@docspace/ui-kit/payments";
     },
   }}
 >
-  <PaymentDashboard />
-</PaymentsRoot>;
+  <MainTariff />
+</BillingRoot>;
 ```
 
 ---
@@ -77,11 +77,11 @@ Main billing page. Shows the current tariff plan with a pricing slider for adjus
 **Non-payer admins:** the pricing slider is disabled and upgrade/downgrade actions are hidden. The page is read-only — only the payer can modify the tariff.
 
 ```tsx
-import { PaymentsRoot, PaymentDashboard } from "@docspace/ui-kit/payments";
+import { BillingRoot, MainTariff } from "@docspace/ui-kit/billing";
 
-<PaymentsRoot config={config}>
-  <PaymentDashboard />
-</PaymentsRoot>;
+<BillingRoot config={config}>
+  <MainTariff />
+</BillingRoot>;
 ```
 
 ---
@@ -95,11 +95,11 @@ Portal wallet — the central balance used to pay for all DocSpace services (AI 
 <Story of={PaymentsStories.Wallet} />
 
 ```tsx
-import { PaymentsRoot, PaymentWallet } from "@docspace/ui-kit/payments";
+import { BillingRoot, Wallet } from "@docspace/ui-kit/billing";
 
-<PaymentsRoot config={config}>
-  <PaymentWallet showPortalSettingsLoader={false} />
-</PaymentsRoot>;
+<BillingRoot config={config}>
+  <Wallet showPortalSettingsLoader={false} />
+</BillingRoot>;
 ```
 
 ### Key capabilities
@@ -124,11 +124,11 @@ Payment card and payer management page. Adapts to multiple states:
 <Story of={PaymentsStories.Method} />
 
 ```tsx
-import { PaymentsRoot, PaymentMethod } from "@docspace/ui-kit/payments";
+import { BillingRoot, PaymentMethod } from "@docspace/ui-kit/billing";
 
-<PaymentsRoot config={config}>
+<BillingRoot config={config}>
   <PaymentMethod />
-</PaymentsRoot>;
+</BillingRoot>;
 ```
 
 ### Payer management
@@ -148,16 +148,16 @@ Service subscription management with three service cards:
 <Story of={PaymentsStories.Services} />
 
 ```tsx
-import { PaymentsRoot, PaymentServicesList } from "@docspace/ui-kit/payments";
+import { BillingRoot, ServicesList } from "@docspace/ui-kit/billing";
 
-<PaymentsRoot config={config}>
-  <PaymentServicesList
+<BillingRoot config={config}>
+  <ServicesList
     showPortalSettingsLoader={false}
     getAIConfig={async () => {
       /* refresh AI config */
     }}
   />
-</PaymentsRoot>;
+</BillingRoot>;
 ```
 
 ### Service toggle flow

@@ -30,10 +30,10 @@ import React from "react";
 import { withPaymentsSetup } from "./storybook-helpers/decorators/withPaymentsSetup";
 import { Toast } from "../components/toast";
 
-import PaymentDashboard from "./main-tariff";
-import PaymentWallet from "./wallet";
-import PaymentMethod from "./payment-method";
-import PaymentServicesList from "./services";
+import MainTariffPage from "./main-tariff";
+import WalletPage from "./wallet";
+import PaymentMethodPage from "./payment-method";
+import ServicesListPage from "./services";
 import AiPage from "./services/pages/ai-tools/AiPage";
 import BackupPage from "./services/pages/backup/BackupPage";
 import AdditionalStoragePage from "./services/pages/additional-storage/AdditionalStoragePage";
@@ -63,14 +63,14 @@ const meta: Meta = {
     layout: "fullscreen",
     docs: {
       description: {
-        component: `Payments is the complete billing and subscription management system for DocSpace SaaS. It consists of four self-contained pages, each handling a specific area of payment operations, all sharing a common store layer provided by \`PaymentsRoot\`.
+        component: `Payments is the complete billing and subscription management system for DocSpace SaaS. It consists of four self-contained pages, each handling a specific area of payment operations, all sharing a common store layer provided by \`BillingRoot\`.
 
 ### Architecture
 
-All pages must be wrapped in \`PaymentsRoot\`, which initializes \`PaymentStore\` and \`ServicesStore\` via React context. The stores handle all API communication, caching, and reactive state — pages are pure observers.
+All pages must be wrapped in \`BillingRoot\`, which initializes \`PaymentStore\` and \`ServicesStore\` via React context. The stores handle all API communication, caching, and reactive state — pages are pure observers.
 
 \`\`\`
-PaymentsRoot (config)
+BillingRoot (config)
   \u251C\u2500 PaymentStoreProvider  \u2192 tariff, quotas, balance, payer info
   \u2514\u2500 ServicesStoreProvider  \u2192 AI tools, backup, storage services
        \u2514\u2500 <Page />           \u2192 Main Tariff | Wallet | Method | Services
@@ -80,10 +80,10 @@ PaymentsRoot (config)
 
 | Page | Component | Description |
 |------|-----------|-------------|
-| **Main Tariff** | \`PaymentDashboard\` | Current plan, pricing slider, upgrade/downgrade |
-| **Wallet** | \`PaymentWallet\` | Portal wallet for paying services, top-up, transaction history |
+| **Main Tariff** | \`MainTariff\` | Current plan, pricing slider, upgrade/downgrade |
+| **Wallet** | \`Wallet\` | Portal wallet for paying services, top-up, transaction history |
 | **Payment Method** | \`PaymentMethod\` | Payer info, linked card, Stripe portal |
-| **Services** | \`PaymentServicesList\` | AI tools, backup, disk storage toggles |
+| **Services** | \`ServicesList\` | AI tools, backup, disk storage toggles |
 
 ### Shared components
 
@@ -99,15 +99,15 @@ Reusable building blocks used across pages:
 
 \`\`\`tsx
 import {
-  PaymentsRoot,
-  PaymentDashboard,
-  PaymentWallet,
+  BillingRoot,
+  MainTariff,
+  Wallet,
   PaymentMethod,
-  PaymentServicesList,
+  ServicesList,
 } from "@docspace/ui-kit/billing";
 
-// Wrap any payment page in PaymentsRoot
-<PaymentsRoot config={{
+// Wrap any payment page in BillingRoot
+<BillingRoot config={{
   language: "en",
   routes: {
     portalPayments: "/portal-settings/payments",
@@ -117,13 +117,13 @@ import {
     diskStorage: "/portal-settings/payments/services/disk-storage",
   },
 }}>
-  <PaymentDashboard />
-</PaymentsRoot>
+  <MainTariff />
+</BillingRoot>
 \`\`\`
 
 ### Configuration
 
-\`PaymentsRoot\` accepts a \`TPaymentConfig\`:
+\`BillingRoot\` accepts a \`TPaymentConfig\`:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -142,7 +142,7 @@ export default meta;
 // ── Main Tariff ──
 
 export const MainTariff: StoryObj = {
-  render: () => <PaymentDashboard />,
+  render: () => <MainTariffPage />,
   parameters: {
     docs: {
       description: {
@@ -150,9 +150,9 @@ export const MainTariff: StoryObj = {
           "Main billing dashboard. Displays the current tariff plan with a manager count slider, per-user pricing, total cost, and upgrade/downgrade actions. On mount it fetches tariff status, portal quotas, payment plans, and payer information. Shows a skeleton loader until all data is ready.\n\n**Non-payer admins:** the pricing slider is disabled and upgrade/downgrade actions are hidden. The page is read-only — only the payer can modify the tariff.",
       },
       source: {
-        code: `<PaymentsRoot config={config}>
-  <PaymentDashboard />
-</PaymentsRoot>`,
+        code: `<BillingRoot config={config}>
+  <MainTariff />
+</BillingRoot>`,
       },
     },
   },
@@ -161,7 +161,7 @@ export const MainTariff: StoryObj = {
 // ── Wallet ──
 
 export const Wallet: StoryObj = {
-  render: () => <PaymentWallet showPortalSettingsLoader={false} />,
+  render: () => <WalletPage showPortalSettingsLoader={false} />,
   parameters: {
     docs: {
       description: {
@@ -170,9 +170,9 @@ export const Wallet: StoryObj = {
       },
       source: {
         code: `<div style={{ maxHeight: 1500, overflow: "hidden" }}>
-  <PaymentsRoot config={config}>
-    <PaymentWallet showPortalSettingsLoader={false} />
-  </PaymentsRoot>
+  <BillingRoot config={config}>
+    <Wallet showPortalSettingsLoader={false} />
+  </BillingRoot>
 </div>`,
       },
     },
@@ -182,7 +182,7 @@ export const Wallet: StoryObj = {
 // ── Payment Method ──
 
 export const Method: StoryObj = {
-  render: () => <PaymentMethod />,
+  render: () => <PaymentMethodPage />,
   parameters: {
     docs: {
       description: {
@@ -190,9 +190,9 @@ export const Method: StoryObj = {
           "Payment method page with multiple states. **Card linked**: shows payer details (avatar, name, email), card status with check/warning icon, and a button to the Stripe customer portal. **Payer not found**: if the payer email doesn't match any portal user, a message is shown suggesting to choose a new payer (for owners) or contact the owner (for admins). **No card**: shows an \"Add payment method\" button that redirects to card linking.\n\n**Non-payer admins:** the Stripe customer portal button is hidden. Only the portal owner or the payer themselves can access Stripe to manage payment details or reassign the payer role.",
       },
       source: {
-        code: `<PaymentsRoot config={config}>
+        code: `<BillingRoot config={config}>
   <PaymentMethod />
-</PaymentsRoot>`,
+</BillingRoot>`,
       },
     },
   },
@@ -201,7 +201,7 @@ export const Method: StoryObj = {
 // ── Services ──
 
 export const Services: StoryObj = {
-  render: () => <PaymentServicesList showPortalSettingsLoader={false} />,
+  render: () => <ServicesListPage showPortalSettingsLoader={false} />,
   parameters: {
     docs: {
       description: {
@@ -209,12 +209,12 @@ export const Services: StoryObj = {
           "Services management page with three service cards: **AI Tools** (enable/disable, balance top-up, model pricing), **Backup** (enable/disable, available backup count), and **Disk Storage** (purchase additional storage on top of the base tariff, manage or cancel the subscription). Each service has toggles with confirmation dialogs, and enabling a service without a linked card triggers the top-up flow.",
       },
       source: {
-        code: `<PaymentsRoot config={config}>
-  <PaymentServicesList
+        code: `<BillingRoot config={config}>
+  <ServicesList
     showPortalSettingsLoader={false}
     getAIConfig={refreshAIConfig}
   />
-</PaymentsRoot>`,
+</BillingRoot>`,
       },
     },
   },

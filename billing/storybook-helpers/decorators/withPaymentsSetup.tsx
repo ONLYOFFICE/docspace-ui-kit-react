@@ -30,7 +30,7 @@ import { MemoryRouter } from "react-router";
 
 import { useApi } from "../../../providers";
 import { Provider } from "../../../utils/context";
-import PaymentsRoot from "../../PaymentsRoot";
+import BillingRoot from "../../BillingRoot";
 import type { TPaymentConfig } from "../../types";
 
 import styles from "./withPaymentsSetup.module.scss";
@@ -102,9 +102,9 @@ const PaymentsSetupWrapper: React.FC<{
   }
 
   return (
-    <PaymentsRoot config={config}>
+    <BillingRoot config={config}>
       {children}
-    </PaymentsRoot>
+    </BillingRoot>
   );
 };
 
