@@ -26,7 +26,7 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { ReactNode, ReactElement, cloneElement, Fragment, createElement } from "react";
+import { type ReactNode, type ReactElement, cloneElement, Fragment, createElement } from "react";
 import { getCommonTranslation } from ".";
 
 export type CommonTransComponent =
@@ -98,14 +98,16 @@ type CommonTransProps = {
   i18nKey: string;
   values?: Record<string, ReactNode>;
   components?: Record<number, CommonTransComponent>;
+  namespaces?: string[];
 };
 
 export function CommonTrans({
   i18nKey,
   values = {},
   components = {},
+  namespaces,
 }: CommonTransProps) {
-  const template = getCommonTranslation(i18nKey);
+  const template = getCommonTranslation(i18nKey, undefined, namespaces);
 
   return <Fragment>{renderCommonTrans(template, values, components)}</Fragment>;
 }
