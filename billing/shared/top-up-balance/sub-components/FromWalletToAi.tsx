@@ -27,7 +27,7 @@
 import { Text } from "../../../../components/text";
 import modalStyles from "../styles/TopUpAiModal.module.scss";
 import WalletInfo from "./WalletInfo";
-import AiAgents from "../../../../assets/icons/16/ai-agents.svg?url";
+import AiAgentsIcon from "../../../../assets/icons/16/ai-agents.svg";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { useAmountValue } from "../../../wallet/context";
 import { observer } from "mobx-react";
@@ -92,7 +92,7 @@ const FromWalletToAi = (props: IFromWalletToAi) => {
             organizationName: logoText,
           })}
           balance={aiServiceBalanceValue}
-          iconUrl={AiAgents}
+          icon={<AiAgentsIcon />}
         />
       </div>
     </div>
