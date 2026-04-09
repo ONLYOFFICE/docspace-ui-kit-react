@@ -36,7 +36,7 @@ import StorageTariffDeactivated from "../dialogs/StorageTariffDeactivated";
 
 type WalletProps = {
   onSetDocumentTitle?: (title: string) => void;
-  showPortalSettingsLoader: boolean;
+  showPortalSettingsLoader?: boolean;
   isUpdatingTariff?: boolean;
 };
 
