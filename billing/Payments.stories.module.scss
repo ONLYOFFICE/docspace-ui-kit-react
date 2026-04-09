@@ -2,4 +2,8 @@
   max-width: 1024px;
   width: 100%;
   flex-shrink: 0;
+  padding: 8px;
+  border: 4px dashed #d0d5dd;
+  position: relative;
+  overflow: hidden;
 }
