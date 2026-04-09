@@ -56,6 +56,7 @@ type ServicesItemsProps = {
   storageExpiryDate?: string;
   isMobile?: boolean;
   isTablet?: boolean;
+  cardDisabled?: boolean;
 };
 
 const ServicesItems: React.FC<ServicesItemsProps> = ({
@@ -64,6 +65,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   storageExpiryDate,
   isMobile,
   isTablet,
+  cardDisabled: forceCardDisabled,
 }) => {
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
@@ -254,6 +256,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             return (
               <ServiceCard
                 key={item.id}
+                cardDisabled={forceCardDisabled}
                 toggleDisabled={isDisabled}
                 priceTitle={item.priceTitle}
                 id={item.id}
@@ -281,9 +284,10 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               <ServiceCard
                 key={item.id}
                 cardDisabled={
-                  isCardLinkedToPortal
+                  forceCardDisabled ||
+                  (isCardLinkedToPortal
                     ? !wasFirstAiServiceTopUp && !isPayer
-                    : false
+                    : false)
                 }
                 toggleDisabled={isDisabled}
                 onClick={handleClick}
@@ -312,9 +316,10 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               <ServiceCard
                 key={item.id}
                 cardDisabled={
-                  isCardLinkedToPortal && !isPayer
+                  forceCardDisabled ||
+                  (isCardLinkedToPortal && !isPayer
                     ? !hasStorageSubscription && !previousStoragePlanSize
-                    : false
+                    : false)
                 }
                 toggleDisabled={!!eventDisabled}
                 onClick={handleClick}

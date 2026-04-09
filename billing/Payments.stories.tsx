@@ -201,7 +201,7 @@ export const Method: StoryObj = {
 // ── Services ──
 
 export const Services: StoryObj = {
-  render: () => <ServicesListPage showPortalSettingsLoader={false} />,
+  render: () => <ServicesListPage showPortalSettingsLoader={false} cardDisabled />,
   parameters: {
     docs: {
       description: {

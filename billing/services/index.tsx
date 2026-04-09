@@ -60,6 +60,7 @@ type TServicesProps = {
   showPortalSettingsLoader?: boolean;
   initialOpenDialog?: string;
   getAIConfig?: () => Promise<void>;
+  cardDisabled?: boolean;
 };
 
 const Services = observer(
@@ -67,6 +68,7 @@ const Services = observer(
     showPortalSettingsLoader = true,
     initialOpenDialog,
     getAIConfig,
+    cardDisabled,
   }: TServicesProps) => {
     const navigate = useNavigate();
     const paymentStore = usePaymentStore();
@@ -397,7 +399,7 @@ const Services = observer(
       <ServicesLoader />
     ) : (
       <>
-        <ServicesItems onClick={onClick} onToggle={onToggle} />
+        <ServicesItems onClick={onClick} onToggle={onToggle} cardDisabled={cardDisabled} />
         {isShowStorageTariffDeactivatedModal ? (
           <StorageTariffDeactivated
             visible={isShowStorageTariffDeactivatedModal}
