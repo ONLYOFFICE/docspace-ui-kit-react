@@ -53,6 +53,10 @@
   --payment-benefits-icons-color: #{$light-gray-dark};
   --payment-payer-disable-color: #{$gray};
   --payment-link-color: #{$light-gray-dark};
+
+  --billing-card-color-wallet: #{$light-status-positive};
+  --billing-card-color-ai: #{$ai-purple};
+  --billing-card-color-payment: var(--color-scheme-main-accent);
 }
 
 // ── Dark ──
@@ -104,4 +108,8 @@
   --payment-benefits-icons-color: #{$dark-gray-dark};
   --payment-payer-disable-color: #{$gray-dark};
   --payment-link-color: #{$dark-gray-dark};
+
+  --billing-card-color-wallet: #{$dark-status-positive};
+  --billing-card-color-ai: #{$ai-purple};
+  --billing-card-color-payment: var(--color-scheme-main-accent);
 }
