@@ -128,6 +128,8 @@ const Tags: FC<TagsProps> = ({
             isLast={idx === renderedTags.length - 1}
             label={tag.label}
             roomType={tag.roomType}
+            labelSuffix={tag.labelSuffix}
+            labelSuffixColor={tag.labelSuffixColor}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             dataTestId={`tag_item_${tag.label}`}
