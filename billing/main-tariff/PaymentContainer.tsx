@@ -145,7 +145,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     if (isNotPaidPeriod) {
       return (
         <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
-          <CommonTrans i18nKey="RenewSubscription" values={{ planName: tariffPlanTitle }} />
+          <CommonTrans i18nKey="RenewSubscriptionPlanName" values={{ planName: tariffPlanTitle }} />
         </Text>
       );
     }
