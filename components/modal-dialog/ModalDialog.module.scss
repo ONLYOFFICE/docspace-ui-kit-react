@@ -53,6 +53,12 @@
   --modal-dialog-content-transform-x: 100%;
 
   /* CSS customization vars */
+  --aside-header-justify: var(--modal-dialog-header-justify, space-between);
+  --aside-header-border-display: var(--modal-dialog-header-border-display, "");
+  --aside-header-title-position: var(--modal-dialog-header-title-position, static);
+  --aside-header-title-inset: var(--modal-dialog-header-title-inset, auto);
+  --aside-header-title-transform: var(--modal-dialog-header-title-transform, none);
+  --aside-header-title-text-align: var(--modal-dialog-header-title-text-align, start);
   --modal-dialog-padding-x: var(--modal-dialog-horizontal-padding, 16px);
   --modal-dialog-padding-y: var(--modal-dialog-vertical-padding, 16px);
   --modal-dialog-footer-gap: var(--modal-dialog-buttons-gap, 8px);

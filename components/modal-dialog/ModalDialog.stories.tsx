@@ -645,6 +645,11 @@ export const CssCustomization: Story = {
 --modal-dialog-lg-max-height         /* large modal max-height (default: 400px) */
 --modal-dialog-xl-max-width          /* huge modal max-width (default: 730px) */
 --modal-dialog-aside-default-width   /* aside width (default: 480px) */
+--modal-dialog-header-border-display /* show/hide header bottom border (default: block) */
+--modal-dialog-header-title-position /* header title position (default: static) */
+--modal-dialog-header-title-inset    /* header title inset for centered layout */
+--modal-dialog-header-title-transform /* header title transform for centered layout */
+--modal-dialog-header-title-text-align /* header title text alignment */
 \`\`\``,
       },
       source: {
