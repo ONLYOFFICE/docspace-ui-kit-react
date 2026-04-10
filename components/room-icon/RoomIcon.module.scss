@@ -311,16 +311,20 @@
     margin-inline: 80px 0;
   }
 
-  .roomIconButton {
-    svg {
-      path {
-        fill: var(--room-icon-background-color) !important;
-      }
-      rect {
-        stroke: var(--room-icon-background-color) !important;
+  &:not(.coloredBadge) {
+    .roomIconButton {
+      svg {
+        path {
+          fill: var(--room-icon-background-color) !important;
+        }
+        rect {
+          stroke: var(--room-icon-background-color) !important;
+        }
       }
     }
+  }
 
+  .roomIconButton {
     :global {
       .link {
         path {
