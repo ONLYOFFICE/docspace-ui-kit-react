@@ -29,9 +29,9 @@
 :global(.dark) {
   :local {
     .label {
-      --checkbox-fill-color: #{variables.$dark-gray-light};
-      --checkbox-border-color: #{variables.$gray-dark-strong};
-      --checkbox-arrow-color: #{variables.$white};
+      --checkbox-fill-color-default: #{variables.$dark-gray-light};
+      --checkbox-border-color-default: #{variables.$gray-dark-strong};
+      --checkbox-arrow-color-default: #{variables.$white};
       --checkbox-indeterminate-color: #{variables.$white};
       --checkbox-disable-arrow-color: #{variables.$gray-dark-strong};
       --checkbox-disable-border-color: #{variables.$gray-dark-mid};
@@ -51,9 +51,9 @@
 }
 
 .label {
-  --checkbox-fill-color: #{variables.$white};
-  --checkbox-border-color: #{variables.$gray-strong};
-  --checkbox-arrow-color: #{variables.$black};
+  --checkbox-fill-color-default: #{variables.$white};
+  --checkbox-border-color-default: #{variables.$gray-strong};
+  --checkbox-arrow-color-default: #{variables.$black};
   --checkbox-indeterminate-color: #{variables.$black};
   --checkbox-disable-arrow-color: #{variables.$gray-strong};
   --checkbox-disable-border-color: #{variables.$gray-light-mid};
@@ -96,13 +96,18 @@
     margin-top: -2px;
   }
 
+  &:has(input[type="checkbox"]:checked) {
+    --checkbox-fill-color-default: var(--checkbox-fill-color, #{variables.$white});
+    --checkbox-arrow-color-default: var(--checkbox-arrow-color, #{variables.$black});
+  }
+
   svg {
     rect {
-      fill: var(--checkbox-fill-color);
-      stroke: var(--checkbox-border-color);
+      fill: var(--checkbox-fill-color-default);
+      stroke: var(--checkbox-border-color, var(--checkbox-border-color-default));
     }
     path {
-      fill: var(--checkbox-arrow-color);
+      fill: var(--checkbox-arrow-color-default);
     }
     &:focus {
       outline: none;
