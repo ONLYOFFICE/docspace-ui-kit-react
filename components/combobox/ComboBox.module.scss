@@ -36,11 +36,11 @@
   -webkit-tap-highlight-color: variables.$tap-highlight;
 
   :global(.light) & {
-    --combobox-background: #{colors.$light-gray-selected};
+    --combobox-background: var(--combobox-bg, #{colors.$light-gray-selected});
   }
 
   :global(.dark) & {
-    --combobox-background: #{colors.$black};
+    --combobox-background: var(--combobox-bg, #{colors.$black});
   }
 
   --combobox-bg-open: var(--combobox-open-bg, var(--combobox-background));

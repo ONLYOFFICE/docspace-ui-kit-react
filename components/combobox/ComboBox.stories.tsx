@@ -506,10 +506,26 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--combobox-open-bg\` | Background when open (noBorder mode) | theme token |
-| \`--combobox-radius\` | Border radius in noBorder open state | \`3px\` |
-| \`--combobox-inner-padding\` | Inner padding | \`4px 0\` |
-| \`--combobox-base-width\` | Width for base size | \`173px\` |`,
+| \`--combobox-bg\` | Dropdown list background | theme-based |
+| \`--combobox-radius\` | Border radius | \`3px\` |
+| \`--combobox-inner-padding\` | Inner dropdown padding | \`4px 0\` |
+| \`--combobox-base-width\` | Width for base size | \`173px\` |
+| \`--combobox-open-bg\` | Background when open (noBorder mode) | theme-based |
+| \`--combobox-border-color\` | Button border color (normal) | theme-based |
+| \`--combobox-hover-border-color\` | Button border color on hover | theme-based |
+| \`--combobox-focus-border-color\` | Button border color when open/focused | theme-based |`,
+      },
+      source: {
+        code: `// Customize combobox via CSS variables
+<div style={{
+  "--combobox-bg": "#ffffff",
+  "--combobox-radius": "8px",
+  "--combobox-border-color": "#7d7d7d",
+  "--combobox-hover-border-color": "#00679e",
+  "--combobox-focus-border-color": "#00679e",
+}}>
+  <ComboBox options={options} selectedOption={selected} onSelect={handleSelect} />
+</div>`,
       },
     },
   },
