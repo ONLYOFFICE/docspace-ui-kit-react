@@ -7,6 +7,10 @@ import type { TTranslations } from "./translation";
 
 import Providers from "./Providers";
 
+vi.mock("../api/ai", () => ({
+  AiApi: class MockAiApi {},
+}));
+
 vi.mock("@onlyoffice/docspace-api-sdk", () => {
   class MockConfiguration {}
   class MockProfilesApi {
@@ -28,6 +32,8 @@ vi.mock("@onlyoffice/docspace-api-sdk", () => {
   class MockSearchApi {}
   class MockOperationsApi {}
   class MockThirdPartyApi {}
+  class MockPaymentApi {}
+  class MockPortalQuotaApi {}
   return {
     Configuration: MockConfiguration,
     ProfilesApi: MockProfilesApi,
@@ -44,6 +50,8 @@ vi.mock("@onlyoffice/docspace-api-sdk", () => {
     SearchApi: MockSearchApi,
     OperationsApi: MockOperationsApi,
     ThirdPartyApi: MockThirdPartyApi,
+    PaymentApi: MockPaymentApi,
+    PortalQuotaApi: MockPortalQuotaApi,
   };
 });
 

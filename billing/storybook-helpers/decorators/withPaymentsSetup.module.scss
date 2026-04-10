@@ -1,0 +1,73 @@
+@use "../../../styles/variables/colors" as *;
+
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card {
+  background: var(--background-content, #{$white});
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 500px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  :global(.dark) & {
+    background: var(--background-content, #{$gray-dark-mid});
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-color, #{$black});
+  text-align: center;
+
+  :global(.dark) & {
+    color: var(--text-color, #{$white});
+  }
+}
+
+.description {
+  font-size: 14px;
+  color: var(--text-secondary, #{$gray-text});
+  margin-bottom: 32px;
+  text-align: center;
+  line-height: 1.5;
+
+  :global(.dark) & {
+    color: var(--text-secondary, #{$dark-gray-dark});
+  }
+}
+
+.error {
+  font-size: 14px;
+  color: var(--error-color, #{$main-red});
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(242, 28, 14, 0.05);
+  border-radius: 8px;
+  width: 100%;
+  justify-content: center;
+
+  :global(.dark) & {
+    color: var(--error-color, #{$dark-error-status});
+    background: rgba(224, 100, 81, 0.1);
+  }
+}
+
+.spinner {
+  font-size: 14px;
+  color: var(--text-secondary, #{$gray-text});
+}
