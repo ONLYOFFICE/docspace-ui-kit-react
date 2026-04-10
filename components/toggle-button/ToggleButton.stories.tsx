@@ -261,13 +261,21 @@ export const CssCustomization: Story = {
       description: {
         story: `CSS Custom Properties for external customization:
 
-\`\`\`css
---toggle-button-spacing  /* gap between toggle and label (default 8px) */
-\`\`\``,
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--toggle-button-spacing\` | Gap between toggle and label | \`8px\` |
+| \`--toggle-button-checked-color\` | Track color when checked | theme accent |
+| \`--toggle-button-off-color\` | Track color when unchecked | theme gray |
+| \`--toggle-button-off-hover-color\` | Track color on hover when unchecked | theme gray |`,
       },
       source: {
-        code: `<div style={{ "--toggle-button-spacing": "16px" }}>
-  <ToggleButton label="Increased gap" isChecked />
+        code: `<div style={{
+  "--toggle-button-checked-color": "#00679e",
+  "--toggle-button-off-color": "#7d7d7d",
+  "--toggle-button-off-hover-color": "#7d7d7d",
+}}>
+  <ToggleButton label="Off" isChecked={false} />
+  <ToggleButton label="On" isChecked />
 </div>`,
       },
     },
