@@ -399,8 +399,17 @@ export const CssCustomization: Story = {
 |----------|-------------|---------|
 | \`--loader-stroke\` | Stroke color of the oval/dualRing loader | theme loader color |
 | \`--loader-size\` | Width and height of the loader | \`40px\` |
-| \`--loader-track-primary\` | Track loader color in primary mode | white |
-| \`--loader-track-base\` | Track loader color in base mode | accent |`,
+| \`--loader-track-primary\` | Track loader spinning arc color | white |
+| \`--loader-track-base\` | Track loader track (background ring) color | accent |`,
+      },
+      source: {
+        code: `// Customize track loader colors via CSS variables
+<div style={{
+  "--loader-track-primary": "#cccccc",
+  "--loader-track-base": "#444444",
+}}>
+  <Loader type={LoaderTypes.track} size="30px" />
+</div>`,
       },
     },
   },
