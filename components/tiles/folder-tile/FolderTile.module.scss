@@ -70,7 +70,7 @@
 
   cursor: pointer;
   box-sizing: border-box;
-  border: var(--tile-border-style, var(--tile-border));
+  border: var(--folder-tile-border-style, var(--tile-border-style, var(--tile-border)));
   border-radius: var(--tile-radius, var(--tile-border-radius));
 
   border-start-start-radius: var(--tile-radius, var(--tile-border-radius));
@@ -117,7 +117,7 @@
   &:hover:not(.isDragging, .isEdit) {
     .content {
       a {
-        text-decoration: var(--link-hover-page-text-decoration);
+        text-decoration: var(--tile-hover-text-decoration, var(--link-hover-page-text-decoration));
       }
     }
   }
@@ -224,6 +224,8 @@
       word-break: break-word;
 
       font-size: var(--tile-text-size, var(--tile-font-size));
+      font-weight: var(--tile-text-weight, normal) !important;
+      color: var(--tile-text-color) !important;
       line-height: var(--tile-text-line-height, var(--tile-line-height));
     }
 
