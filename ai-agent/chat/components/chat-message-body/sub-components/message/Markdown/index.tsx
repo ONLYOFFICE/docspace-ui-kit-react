@@ -67,11 +67,20 @@ import {
 //     .replace(/<\/think>/g, "`</think>`");
 // };
 
+const LATEX_COMMAND_RE =
+  /\\(?:frac|sum|int|prod|lim|left|right|sqrt|over|partial|nabla|infty|Gamma|Delta|Theta|Lambda|Xi|Pi|Sigma|Upsilon|Phi|Psi|Omega|alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|mathbf|mathrm|mathcal|mathbb|text|begin|end|cdot|times|pm|mp|leq|geq|neq|approx|equiv|sim|propto|forall|exists|in|notin|subset|supset|cup|cap|wedge|vee|neg|hat|vec|bar|tilde|dot|ddot|overline|underbrace|overbrace|binom|pmatrix|bmatrix|vmatrix)[^a-zA-Z]/;
+
 // Normalize all common LaTeX delimiters to remark-math format
 const normalizeMathDelimiters = (text: string): string =>
   text
+    // \[...\] → $$...$$
     .replace(/\\\[([\s\S]*?)\\\]/g, (_, inner) => `$$${inner}$$`)
-    .replace(/\\\(([\s\S]*?)\\\)/g, (_, inner) => `$${inner}$`);
+    // \(...\) → $...$
+    .replace(/\\\(([\s\S]*?)\\\)/g, (_, inner) => `$${inner}$`)
+    // Lines that look like bare LaTeX (no delimiters) → $$...$$
+    .replace(/^([^\n$]*\\[A-Za-z]+[^\n$]*)$/gm, (line) =>
+      LATEX_COMMAND_RE.test(line) ? `$$${line}$$` : line,
+    );
 
 const MarkdownField = React.memo(
   ({
