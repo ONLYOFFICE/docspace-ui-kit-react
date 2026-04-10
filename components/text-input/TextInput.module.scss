@@ -4,15 +4,30 @@
   @include mixins.common-input-styles;
 
   --text-input-background: var(--text-input-bg, var(--input-bg));
-  --text-input-fs-base: var(--text-input-font-size, var(--text-input-font-size-base));
-  --text-input-fs-middle: var(--text-input-font-size, var(--text-input-font-size-middle));
-  --text-input-fs-large: var(--text-input-font-size, var(--text-input-font-size-large));
-  --input-border-color: var(--text-input-border-color, var(--input-border-color));
+  --text-input-fs-base: var(
+    --text-input-font-size,
+    var(--text-input-font-size-base)
+  );
+  --text-input-fs-middle: var(
+    --text-input-font-size,
+    var(--text-input-font-size-middle)
+  );
+  --text-input-fs-large: var(
+    --text-input-font-size,
+    var(--text-input-font-size-large)
+  );
+  --input-border-color: var(
+    --text-input-border-color,
+    var(--input-border-color)
+  );
   --input-border-radius: var(--text-input-radius, var(--input-border-radius));
   --input-color: var(--text-input-color, var(--input-color));
 
   :global(.dark) & {
-    --input-border-color: var(--text-input-border-color, var(--input-border-color));
+    --input-border-color: var(
+      --text-input-border-color,
+      var(--input-border-color)
+    );
     --input-border-radius: var(--text-input-radius, var(--input-border-radius));
     --input-color: var(--text-input-color, var(--input-color));
   }
@@ -59,10 +74,12 @@
   }
 
   &:disabled {
-    box-shadow: inset 0 0 0 30px var(--text-input-disabled-bg, var(--input-disabled-bg));
+    box-shadow: inset 0 0 0 30px
+      var(--text-input-disabled-bg, var(--input-disabled-bg));
   }
 
   &[data-without-border="true"] {
     border: none;
   }
 }
+
