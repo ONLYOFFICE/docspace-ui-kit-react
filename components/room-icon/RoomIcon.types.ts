@@ -85,12 +85,14 @@ type RoomIconImage = {
 type RoomIconBadge = {
 	badgeUrl?: string;
 	badgeIconNode?: React.ReactNode;
+	badgeIconColor?: string;
 	onBadgeClick?: () => void;
 };
 
 type RoomIconNonBadge = {
 	badgeUrl?: undefined;
 	badgeIconNode?: undefined;
+	badgeIconColor?: undefined;
 	onBadgeClick?: undefined;
 };
 

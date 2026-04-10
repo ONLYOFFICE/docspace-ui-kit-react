@@ -70,6 +70,7 @@ const RoomIcon = ({
 	logo,
 	badgeUrl,
 	badgeIconNode,
+  badgeIconColor,
 	onBadgeClick,
 	className,
 	withEditing,
@@ -334,6 +335,7 @@ const RoomIcon = ({
 					<div
 						className={classNames(styles.roomIconBadge, {
 							[styles.isBig]: isBigSize,
+              [styles.coloredBadge]: !!badgeIconColor,
 						})}
 						data-testid="badge-container"
 					>
@@ -351,7 +353,7 @@ const RoomIcon = ({
 								},
 								"room-icon_button",
 							)}
-							isFill
+							isFill={!badgeIconColor}
 						/>
 
 						{tooltipContent ? (
