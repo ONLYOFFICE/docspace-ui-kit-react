@@ -260,11 +260,11 @@
 
   &:not(:disabled):not(&[data-disabled="true"]):not(&[data-error="true"]) {
     &:hover {
-      border-color: var(--input-border-hover);
+      border-color: var(--text-input-border-hover, var(--input-border-hover));
     }
     &:focus,
     &[data-focus="true"] {
-      border-color: var(--input-border-focus);
+      border-color: var(--text-input-border-focus, var(--input-border-focus));
     }
     cursor: text;
   }
