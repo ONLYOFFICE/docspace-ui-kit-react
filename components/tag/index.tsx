@@ -69,6 +69,8 @@ const TagPure: FC<TagProps> = ({
   onMouseLeave,
   iconClassName,
   withLabel = true,
+  labelSuffix,
+  labelSuffixColor,
 }) => {
   const onClickAction = React.useCallback(() => {
     if (onClick && !isDisabled && !isDeleted) {
@@ -124,6 +126,9 @@ const TagPure: FC<TagProps> = ({
       {withLabel ? (
         <Text title={label} fontSize="13px" noSelect truncate>
           {label}
+          {labelSuffix ? (
+            <span style={{ color: labelSuffixColor }}>{labelSuffix}</span>
+          ) : null}
         </Text>
       ) : null}
       {isNewTag && !!onDelete ? (
