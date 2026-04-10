@@ -68,7 +68,7 @@ const TransactionBody = ({
     currentDeviceType,
   });
 
-  const t = useCommonTranslation(["Payments", "Settings"]);
+  const t = useCommonTranslation();
 
   const filterIcon = isBase ? (
     <NoTransactionsFilterIcon />

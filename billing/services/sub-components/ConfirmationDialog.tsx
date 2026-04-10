@@ -49,7 +49,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   title,
   onConfirm,
 }) => {
-  const t = useCommonTranslation(["Common"]);
+  const t = useCommonTranslation();
 
   const bodyItems = Array.isArray(bodyText) ? bodyText : [bodyText];
 
@@ -72,7 +72,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       </ModalDialog.Body>
       <ModalDialog.Footer>
         <Button
-          label={t("Common:ContinueButton")}
+          label={t("ContinueButton")}
           size={ButtonSize.normal}
           onClick={onConfirm}
           primary
@@ -80,7 +80,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           testId="service-confirmation-dialog-continue-button"
         />
         <Button
-          label={t("Common:CancelButton")}
+          label={t("CancelButton")}
           size={ButtonSize.normal}
           onClick={onClose}
           testId="service-confirmation-dialog-close-button"

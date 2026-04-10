@@ -49,7 +49,7 @@ const FromWalletToAi = (props: IFromWalletToAi) => {
   const { walletBalance, formatWalletCurrency, logoText } = store;
   const { formatAiServiceCurrency } = servicesStore;
   const { walletCustomerEmail } = store.tariff;
-  const t = useCommonTranslation(["Payments", "Services", "Common"]);
+  const t = useCommonTranslation();
   const aiServiceBalanceValue = formatAiServiceCurrency!();
   const { amount, setIsBalanceInsufficient } = useAmountValue();
   const balanceValue = formatWalletCurrency!();
@@ -75,7 +75,7 @@ const FromWalletToAi = (props: IFromWalletToAi) => {
   return (
     <div className={modalStyles.transferSection}>
       <div className={modalStyles.transferBlock}>
-        <Text fontWeight="600">{t("Payments:TopUpFrom")}</Text>
+        <Text fontWeight="600">{t("TopUpFrom")}</Text>
 
         <WalletInfo
           balance={balanceValue}
@@ -85,10 +85,10 @@ const FromWalletToAi = (props: IFromWalletToAi) => {
       </div>
 
       <div className={modalStyles.transferBlock}>
-        <Text fontWeight="600">{t("Payments:TopUpTo")}</Text>
+        <Text fontWeight="600">{t("TopUpTo")}</Text>
 
         <WalletInfo
-          title={t("Services:OrganizationAI", {
+          title={t("OrganizationAI", {
             organizationName: logoText,
           })}
           balance={aiServiceBalanceValue}

@@ -42,7 +42,7 @@ const RequestButtonContainer = observer(
     const { isLoading } = paymentStore;
 
     const [isVisibleDialog, setIsVisibleDialog] = useState(false);
-    const t = useCommonTranslation(["Common"]);
+    const t = useCommonTranslation();
 
     const toDoRequest = () => {
       setIsVisibleDialog(true);
@@ -62,7 +62,7 @@ const RequestButtonContainer = observer(
         ) : null}
         <Button
           className="send-request-button"
-          label={t("Common:SendRequest")}
+          label={t("SendRequest")}
           size={ButtonSize.medium}
           primary
           isDisabled={isLoading || isDisabled}

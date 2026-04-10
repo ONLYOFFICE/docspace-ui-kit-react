@@ -67,7 +67,7 @@ const StorageTariffDeactivated = observer(
       isStorageTariffLimit,
     } = store.quotas;
 
-    const t = useCommonTranslation(["Payments", "Services", "Common"]);
+    const t = useCommonTranslation();
 
     const totalPrice = calculateTotalPrice(
       previousStoragePlanSize,
@@ -100,7 +100,7 @@ const StorageTariffDeactivated = observer(
       >
         <ModalDialog.Header>
           <Text fontSize="21px" isBold>
-            {t("Common:Warning")}
+            {t("Warning")}
           </Text>
         </ModalDialog.Header>
         <ModalDialog.Body>
@@ -109,9 +109,9 @@ const StorageTariffDeactivated = observer(
           <Text as="span">
             <CommonTrans
               i18nKey="PreviousPlan"
-              namespaces={["Payments"]}
+             
               values={{
-                amount: `${previousStoragePlanSize} ${t("Common:Gigabyte")}`,
+                amount: `${previousStoragePlanSize} ${t("Gigabyte")}`,
                 price: formatWalletCurrency(totalPrice, 2),
               }}
               components={{
@@ -123,7 +123,7 @@ const StorageTariffDeactivated = observer(
           <Text>
             <CommonTrans
               i18nKey="StorageUsed"
-              namespaces={["Payments"]}
+             
               values={{
                 amount: getConvertedSize(t, usedTotalStorageSizeCount!),
               }}
@@ -135,7 +135,7 @@ const StorageTariffDeactivated = observer(
           <Text>
             <CommonTrans
               i18nKey="AvailableLimit"
-              namespaces={["Payments"]}
+             
               values={{
                 amount: getConvertedSize(t, maxTotalSizeByQuota!),
               }}
@@ -154,7 +154,7 @@ const StorageTariffDeactivated = observer(
           <Button
             className="send-button"
             label={
-              onOpenPanel ? t("Services:BuyStorage") : t("GoToService")
+              onOpenPanel ? t("BuyStorage") : t("GoToService")
             }
             size={ButtonSize.normal}
             primary
@@ -163,7 +163,7 @@ const StorageTariffDeactivated = observer(
           />
           <Button
             className="cancel-button"
-            label={t("Common:CancelButton")}
+            label={t("CancelButton")}
             size={ButtonSize.normal}
             onClick={onCloseModal}
             testId="close_storage_tariff_deactivated_button"

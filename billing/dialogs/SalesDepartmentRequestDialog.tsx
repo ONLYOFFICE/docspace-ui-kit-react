@@ -54,11 +54,7 @@ const SalesDepartmentRequestDialog = observer(
     const paymentStore = usePaymentStore();
     const { sendPaymentRequest } = paymentStore;
 
-    const t = useCommonTranslation([
-      "SalesDepartmentRequestDialog",
-      "Common",
-      "SMTPSettings",
-    ]);
+    const t = useCommonTranslation();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -124,27 +120,27 @@ const SalesDepartmentRequestDialog = observer(
       const translatedErrors = result.errors?.map((errorKey: string) => {
         switch (errorKey) {
           case ErrorKeys.LocalDomain:
-            return t("Common:LocalDomain");
+            return t("LocalDomain");
           case ErrorKeys.IncorrectDomain:
-            return t("Common:IncorrectDomain");
+            return t("IncorrectDomain");
           case ErrorKeys.DomainIpAddress:
-            return t("Common:DomainIpAddress");
+            return t("DomainIpAddress");
           case ErrorKeys.PunycodeDomain:
-            return t("Common:PunycodeDomain");
+            return t("PunycodeDomain");
           case ErrorKeys.PunycodeLocalPart:
-            return t("Common:PunycodeLocalPart");
+            return t("PunycodeLocalPart");
           case ErrorKeys.IncorrectLocalPart:
-            return t("Common:IncorrectLocalPart");
+            return t("IncorrectLocalPart");
           case ErrorKeys.SpacesInLocalPart:
-            return t("Common:SpacesInLocalPart");
+            return t("SpacesInLocalPart");
           case ErrorKeys.MaxLengthExceeded:
-            return t("Common:MaxLengthExceeded");
+            return t("MaxLengthExceeded");
           case ErrorKeys.IncorrectEmail:
-            return t("Common:IncorrectEmail");
+            return t("IncorrectEmail");
           case ErrorKeys.ManyEmails:
-            return t("Common:ManyEmails");
+            return t("ManyEmails");
           case ErrorKeys.EmptyEmail:
-            return t("Common:EmptyEmail");
+            return t("EmptyEmail");
           default:
             throw new Error("Unknown translation key");
         }
@@ -182,7 +178,7 @@ const SalesDepartmentRequestDialog = observer(
             isVertical
             hasError={!isValidName}
             labelVisible={false}
-            errorMessage={t("Common:RequiredField")}
+            errorMessage={t("RequiredField")}
             dataTestId="request_name_field"
           >
             <TextInput
@@ -219,7 +215,7 @@ const SalesDepartmentRequestDialog = observer(
               onChange={onChangeEmail}
               onValidateInput={onValidateEmailInput}
               hasError={!isValidEmail}
-              placeholder={t("SMTPSettings:EnterEmail")}
+              placeholder={t("EnterEmail")}
               dataTestId="request_email_input"
             />
           </FieldContainer>
@@ -230,7 +226,7 @@ const SalesDepartmentRequestDialog = observer(
             isVertical
             hasError={!isValidDescription}
             labelVisible={false}
-            errorMessage={t("Common:RequiredField")}
+            errorMessage={t("RequiredField")}
             dataTestId="request_description_field"
           >
             <Textarea
@@ -251,7 +247,7 @@ const SalesDepartmentRequestDialog = observer(
         <ModalDialog.Footer>
           <Button
             className="send-button"
-            label={isLoading ? t("Common:Sending") : t("Common:SendButton")}
+            label={isLoading ? t("Sending") : t("SendButton")}
             size={ButtonSize.normal}
             primary
             onClick={onSendRequest}
@@ -262,7 +258,7 @@ const SalesDepartmentRequestDialog = observer(
           />
           <Button
             className="cancel-button"
-            label={t("Common:CancelButton")}
+            label={t("CancelButton")}
             size={ButtonSize.normal}
             onClick={onCloseModal}
             isLoading={isLoading}

@@ -98,7 +98,7 @@ const AiPage = (props: AiPageProps) => {
     initServiceData,
   } = servicesStore;
 
-  const t = useCommonTranslation(["Services"]);
+  const t = useCommonTranslation();
 
   const [selectedTabId, setSelectedTabId] = useState("usage");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -162,31 +162,31 @@ const AiPage = (props: AiPageProps) => {
       const result = await paymentApi.changeTenantWalletServiceState(raw);
 
       if (!result) {
-        toastr.error(t("Common:UnexpectedError"));
+        toastr.error(t("UnexpectedError"));
         changeServiceState(AI_ENUM);
         return;
       }
 
-      if (!isAiToolsServiceOn) toastr.success(t("Services:AIToolsEnabled"));
+      if (!isAiToolsServiceOn) toastr.success(t("AIToolsEnabled"));
 
       await getAIConfig?.();
     } catch (error) {
       console.error(error);
-      toastr.error(t("Common:UnexpectedError"));
+      toastr.error(t("UnexpectedError"));
       changeServiceState(AI_ENUM);
     }
   };
 
   const confirmationDialogContent = isAiToolsServiceOn
     ? {
-        title: t("Common:Confirmation"),
+        title: t("Confirmation"),
         body: [
-          t("Services:DisableAIToolsConfirm", {
+          t("DisableAIToolsConfirm", {
             organizationName: logoText,
           }),
           <CommonTrans
             key="DisableAIToolsConfirmBalance"
-            namespaces={["Services"]}
+           
             i18nKey="DisableAIToolsConfirmBalance"
             values={{
               balance: formatAiServiceCurrency(
@@ -199,17 +199,17 @@ const AiPage = (props: AiPageProps) => {
               1: <span style={{ fontWeight: 600 }} />,
             }}
           />,
-          t("Services:DisableAIToolsConfirmReEnable"),
+          t("DisableAIToolsConfirmReEnable"),
         ],
       }
     : {
-        title: t("Common:Confirmation"),
+        title: t("Confirmation"),
         body: [
-          t("Services:AIToolsDescription", {
-            productName: t("Common:ProductName"),
+          t("AIToolsDescription", {
+            productName: t("ProductName"),
             organizationName: logoText,
           }),
-          t("Common:WantToContinue"),
+          t("WantToContinue"),
         ],
       };
 
@@ -325,7 +325,7 @@ const AiPage = (props: AiPageProps) => {
         {aiServiceLastCreditAmount ? (
           <Text className={styles.lastTopUpLabel}>
             <CommonTrans
-              namespaces={["Services"]}
+             
               i18nKey="LastTopUp"
               components={{
                 1: (

@@ -885,7 +885,7 @@ class PaymentStore {
       this.setRangeStepByQuota();
       this.setBasicTariffContainer();
     } catch (error) {
-      toastr.error(t("Common:UnexpectedError"));
+      toastr.error(t("UnexpectedError"));
       console.error(error);
       return;
     }
@@ -925,7 +925,7 @@ class PaymentStore {
       this.setPaymentMethodInit(true);
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
-      toastr.error(t("Common:UnexpectedError"));
+      toastr.error(t("UnexpectedError"));
       console.error(error);
     }
   };
@@ -995,7 +995,7 @@ class PaymentStore {
       }
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
-      toastr.error(t("Common:UnexpectedError"));
+      toastr.error(t("UnexpectedError"));
       console.error(error);
     }
   };

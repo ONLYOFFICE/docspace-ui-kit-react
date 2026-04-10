@@ -460,7 +460,7 @@ class ServicesStore {
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
-      toastr.error(t("Common:UnexpectedError"));
+      toastr.error(t("UnexpectedError"));
     }
   };
 
@@ -551,7 +551,7 @@ class ServicesStore {
       }
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
-      toastr.error(t("Common:UnexpectedError"));
+      toastr.error(t("UnexpectedError"));
       console.error(e);
     }
   };

@@ -58,7 +58,7 @@ const TableView = (props: ModelSettingsTableViewProps) => {
       <Text className={styles.introText}>
         <CommonTrans
           i18nKey="AIModelsIntro"
-          namespaces={["Services"]}
+         
           components={{
             1: (
               <Link

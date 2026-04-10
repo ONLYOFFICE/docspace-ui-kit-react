@@ -75,9 +75,9 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
       </div>
 
       <Text>
-        {t("Payments:Warning", {
-          amount: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
-          storageUnit: t("Common:Gigabyte"),
+        {t("StorageWarning", {
+          amount: `${currentStoragePlanSize} ${t("Gigabyte")}`,
+          storageUnit: t("Gigabyte"),
         })}
       </Text>
 
@@ -89,7 +89,7 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
             fontWeight={600}
             color="accent"
           >
-            {t("Payments:CancelChange")}
+            {t("CancelChange")}
           </Link>
           {isCancelLoading ? (
             <div className={styles.loaderContainer}>

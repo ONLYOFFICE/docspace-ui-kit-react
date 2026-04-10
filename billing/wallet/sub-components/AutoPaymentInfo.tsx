@@ -56,7 +56,7 @@ const AutoPaymentInfo = (props: AutoPaymentInfoProps) => {
   const minBalance = autoPayments?.minBalance ?? 0;
   const upToBalance = autoPayments?.upToBalance ?? 0;
 
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   if (
     !isAutoPaymentExist ||
@@ -82,7 +82,7 @@ const AutoPaymentInfo = (props: AutoPaymentInfoProps) => {
               textDecoration="underline"
               dataTestId="auto_edit_button"
             >
-              {t("Common:EditButton")}
+              {t("EditButton")}
             </Link>
           ) : null}
         </Text>

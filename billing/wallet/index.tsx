@@ -47,7 +47,7 @@ const Wallet = observer((props: WalletProps) => {
   const { isInitWalletPage, isShowStorageTariffDeactivatedModal, walletInit } =
     paymentStore;
 
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const shouldShowLoader = !isInitWalletPage;
 

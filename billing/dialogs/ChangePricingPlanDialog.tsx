@@ -47,7 +47,7 @@ const ChangePricingPlanDialog = observer(
     const { managersCount, allowedStorageSizeByQuota } = store;
     const { addedManagersCount, usedTotalStorageSizeCount } = store.quotas;
 
-    const t = useCommonTranslation(["DowngradePlanDialog", "Common"]);
+    const t = useCommonTranslation();
 
     const onCloseModal = () => {
       onClose?.();
@@ -60,10 +60,10 @@ const ChangePricingPlanDialog = observer(
       <Text as="span" fontSize="13px">
         <CommonTrans
           i18nKey="PlanUsersLimit"
-          namespaces={["DowngradePlanDialog"]}
+         
           values={{
             usersCount: managersCount,
-            productName: t("Common:ProductName"),
+            productName: t("ProductName"),
             currentUsersCount: addedManagersCount,
           }}
           components={{
@@ -77,7 +77,7 @@ const ChangePricingPlanDialog = observer(
       <Text as="span" fontSize="13px">
         <CommonTrans
           i18nKey="PlanStorageLimit"
-          namespaces={["DowngradePlanDialog"]}
+         
           values={{
             storageValue: allowedStorageSpace,
             currentStorageValue: currentStorageSpace,
@@ -114,7 +114,7 @@ const ChangePricingPlanDialog = observer(
         <ModalDialog.Footer>
           <Button
             className="ok-button"
-            label={t("Common:OKButton")}
+            label={t("OKButton")}
             size={ButtonSize.normal}
             primary
             onClick={onCloseModal}

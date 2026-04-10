@@ -36,7 +36,7 @@ import {
 } from "./resourceUtils";
 
 export const useServicesActions = () => {
-  const t = useCommonTranslation(["Payments", "Common", "Services"]);
+  const t = useCommonTranslation();
 
   const paymentStore = usePaymentStore();
   const { walletBalance } = paymentStore;

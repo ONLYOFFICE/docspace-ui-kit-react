@@ -78,7 +78,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   const daysUntilStorageExpiry = paymentStore.tariff.daysUntilStorageExpiry ?? 0;
   const { setPartialUpgradeFee, partialUpgradeFee } = servicesStore;
 
-  const t = useCommonTranslation(["Services", "Payments", "Common"]);
+  const t = useCommonTranslation();
   const { isRTL } = useInterfaceDirection();
   const { setIsWaitingCalculation } = usePaymentContext();
   const { calculateDifferenceBetweenPlan, maxStorageLimit } =
@@ -114,7 +114,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         const result = calcRes?.data?.response as unknown as { amount: number } | null;
 
         if (!result) {
-          toastr.error(t("Common:UnexpectedError"));
+          toastr.error(t("UnexpectedError"));
           return;
         }
 
@@ -138,19 +138,19 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
     <>
       <Text as="span">
         {daysUntilStorageExpiry === 0
-          ? t("Payments:PartialPaymentNoDate", {
-              storageUnit: t("Common:Gigabyte"),
+          ? t("PartialPaymentNoDate", {
+              storageUnit: t("Gigabyte"),
             })
-          : t("Payments:PartialPaymentWithDate", {
+          : t("PartialPaymentWithDate", {
               startDate: formatDateLocalized(
                 now().setZone(window.timezone),
                 "DATE_MED",
               ),
               endDate: storageExpiryDate,
-              storageUnit: t("Common:Gigabyte"),
+              storageUnit: t("Gigabyte"),
             })}
       </Text>{" "}
-      <Text as="span">{t("Payments:PartialPaymentDescription")}</Text>
+      <Text as="span">{t("PartialPaymentDescription")}</Text>
     </>
   );
 
@@ -167,7 +167,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
           { days: daysUntilStorageExpiry },
           { locale: language },
         ).toHuman()
-      : t("Services:LessThanOneDay");
+      : t("LessThanOneDay");
 
   return (
     <div className={styles.orderSummaryWrapper}>
@@ -186,11 +186,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 fontSize="14px"
                 className={styles.rowValue}
               >
-                {t("Payments:StorageUpgradeMessage", {
-                  fromSize: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
+                {t("StorageUpgradeMessage", {
+                  fromSize: `${currentStoragePlanSize} ${t("Gigabyte")}`,
                   toSize: isExceedingStorageLimit
-                    ? `${maxStorageLimit}+ ${t("Common:Gigabyte")}`
-                    : `${amount} ${t("Common:Gigabyte")}`,
+                    ? `${maxStorageLimit}+ ${t("Gigabyte")}`
+                    : `${amount} ${t("Gigabyte")}`,
                 })}
               </Text>
             </div>
@@ -208,8 +208,8 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 className={styles.rowValue}
               >
                 {(isNewSubscription && !amount) || hasMinError
-                  ? `0 ${t("Common:Gigabyte")}`
-                  : `${isDowngradeStoragePlan ? "-" : isNewSubscription ? "" : "+"}${additionalStorage} ${t("Common:Gigabyte")}`}
+                  ? `0 ${t("Gigabyte")}`
+                  : `${isDowngradeStoragePlan ? "-" : isNewSubscription ? "" : "+"}${additionalStorage} ${t("Gigabyte")}`}
               </Text>
             </div>
           ) : null}
@@ -226,7 +226,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
           !isNewSubscription ? (
             <div className={styles.summaryRow}>
               <Text fontSize="14px" className={styles.rowLabel}>
-                {t("Services:NewMonthlyPrice")}
+                {t("NewMonthlyPrice")}
               </Text>
               <Text
                 fontWeight="600"
@@ -274,8 +274,8 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 fontSize="14px"
                 className={styles.rowLabel}
               >
-                {t("Payments:StorageUponRequest", {
-                  amount: `${maxStorageLimit} ${t("Common:Gigabyte")}`,
+                {t("StorageUponRequest", {
+                  amount: `${maxStorageLimit} ${t("Gigabyte")}`,
                 })}
               </Text>
             ) : (

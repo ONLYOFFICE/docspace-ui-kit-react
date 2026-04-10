@@ -58,7 +58,7 @@ const BenefitsContainer = observer(({ t }: { t: TTranslation }) => {
         tooltipContent={
           <CommonTrans
             i18nKey="NeedMoreGoToServices"
-            namespaces={["Payments"]}
+           
             components={{
               1: (
                 <Link

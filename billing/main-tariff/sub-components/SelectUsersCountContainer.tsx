@@ -53,7 +53,7 @@ const SelectUsersCountContainer = observer(
     const { addedManagersCountTitle, usedTotalStorageSizeTitle } =
       store.paymentQuotas;
 
-    const t = useCommonTranslation(["Payments", "Common"]);
+    const t = useCommonTranslation();
 
     const sizeValue = getConvertedSize(t, allowedStorageSizeByQuota);
     formattedSizeTitle = `${usedTotalStorageSizeTitle ?? ""}: ${sizeValue}${isNeedPlusSign ? "+" : ""}`;

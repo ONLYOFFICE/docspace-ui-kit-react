@@ -45,7 +45,7 @@ const CardInfoComponent = ({
 }: CardInfoComponentProps) => {
   const store = usePaymentStore();
   const { walletCustomerStatusNotActive } = store.tariff;
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   return (
     <div

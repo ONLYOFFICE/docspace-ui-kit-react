@@ -47,10 +47,7 @@ import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./AdditionalStoragePage.module.scss";
 import { DISK_STORAGE, STORAGE_ENUM } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
-import {
-  calculateTotalPrice,
-  getConvertedSize,
-} from "../../../utils/common";
+import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
 import type { DateTime } from "luxon";
 import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components/toast";
@@ -100,7 +97,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
 
   const { isInitServicesData, initServiceData } = servicesStore;
 
-  const t = useCommonTranslation(["Payments", "Common", "Services"]);
+  const t = useCommonTranslation();
   const contextMenuRef = useRef<ContextMenuRefType>(null);
   const [isStorageDialogVisible, setIsStorageDialogVisible] = useState(false);
   const [isCancelDialogVisible, setIsCancelDialogVisible] = useState(false);
@@ -143,13 +140,13 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
   const isDowngrade = isScheduled && !isStorageCancellation();
 
   const warningTitle = isStorageCancellation()
-    ? t("Services:CancellationScheduled", {
-        fromSize: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
-        toSize: `${nextStoragePlanSize ?? 0} ${t("Common:Gigabyte")}`,
+    ? t("CancellationScheduled", {
+        fromSize: `${currentStoragePlanSize} ${t("Gigabyte")}`,
+        toSize: `${nextStoragePlanSize ?? 0} ${t("Gigabyte")}`,
       })
-    : t("Services:DowngradeScheduled", {
-        fromSize: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
-        toSize: `${nextStoragePlanSize ?? 0} ${t("Common:Gigabyte")}`,
+    : t("DowngradeScheduled", {
+        fromSize: `${currentStoragePlanSize} ${t("Gigabyte")}`,
+        toSize: `${nextStoragePlanSize ?? 0} ${t("Gigabyte")}`,
       });
 
   const handleToggleChange = () => {
@@ -165,7 +162,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
         productQuantityType: 0,
       });
       const res = walletRes?.data?.response;
-      if (res === false) throw new Error(t("Common:UnexpectedError"));
+      if (res === false) throw new Error(t("UnexpectedError"));
 
       await Promise.all([
         fetchPortalTariff?.(),
@@ -200,13 +197,13 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
   const contextMenuItems = [
     {
       key: "edit",
-      label: t("Services:EditSubscription"),
+      label: t("EditSubscription"),
       icon: PencilIcon,
       onClick: openUpgradeDialog,
     },
     {
       key: "cancel",
-      label: t("Services:CancelSubscription"),
+      label: t("CancelSubscription"),
       icon: RemoveSessionIcon,
       onClick: openCancelDialog,
     },
@@ -224,12 +221,12 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
         isEnabled={hasStorageSubscription}
         isDisabled={isDisabled || isScheduled}
         onToggle={handleToggleChange}
-        title={t("Payments:AdditionalDiskStorage")}
+        title={t("AdditionalDiskStorage")}
         priceText={t("PerStorage", {
           currency: formatWalletCurrency(storagePriceIncrement, 2),
           amount: getConvertedSize(t, storageSizeIncrement || 0),
         })}
-        description={t("Payments:AdjustStorageToExactAmount")}
+        description={t("AdjustStorageToExactAmount")}
       />
 
       <WalletInfo shortView withoutBackground balance={balance} />
@@ -249,8 +246,8 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
         <div className={styles.subscriptionHeader}>
           <Text fontWeight={700} fontSize="14px">
             {previousStoragePlanSize
-              ? t("Services:NoActiveSubscription")
-              : t("Payments:CurrentSubscription")}
+              ? t("NoActiveSubscription")
+              : t("CurrentSubscription")}
           </Text>
           {isDisabled || isScheduled || previousStoragePlanSize ? null : (
             <>
@@ -277,10 +274,9 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
             />
             <Text fontWeight={700} fontSize="20px">
               <CommonTrans
-                namespaces={["Payments"]}
                 i18nKey="SizePerMonth"
                 values={{
-                  size: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
+                  size: `${currentStoragePlanSize} ${t("Gigabyte")}`,
                 }}
                 components={{
                   1: (
@@ -301,9 +297,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
           <Button
             className={styles.increaseButton}
             label={
-              previousStoragePlanSize
-                ? t("Services:BuyStorage")
-                : t("Services:EditSubscription")
+              previousStoragePlanSize ? t("BuyStorage") : t("EditSubscription")
             }
             size={ButtonSize.small}
             primary
@@ -317,12 +311,11 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
         <Text className={styles.renewalText}>
           {isDowngrade ? (
             <CommonTrans
-              namespaces={["Payments"]}
               i18nKey="SubscriptionAutoRenewedWithUpdate"
               values={{
                 finalDate: storageExpiryDate,
                 price: formatWalletCurrency(monthlyPrice, 2),
-                amount: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
+                amount: `${currentStoragePlanSize} ${t("Gigabyte")}`,
               }}
               components={{
                 1: <Text fontWeight="600" as="span" />,
@@ -330,7 +323,6 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
             />
           ) : (
             <CommonTrans
-              namespaces={["Payments"]}
               i18nKey={keyProp.tKey}
               values={{
                 finalDate: storageExpiryDate,

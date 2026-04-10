@@ -40,7 +40,7 @@ const ContactContainer = observer(({ t }: { t: TTranslation }) => {
 		<div className={styles.contactContainer}>
 			{salesEmail ? (
 				<Text as="span" fontWeight={600}>
-					{t("Common:ContactUs")}
+					{t("ContactUs")}
 					<Link
 						className="sales-email-link"
 						tag="a"

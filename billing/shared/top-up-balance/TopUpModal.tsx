@@ -87,7 +87,7 @@ const TopUpModal = (props: TopUpModalProps) => {
   const { walletCustomerStatusNotActive, walletCustomerEmail } =
     store.tariff;
 
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const balanceValue = formatWalletCurrency!();
 

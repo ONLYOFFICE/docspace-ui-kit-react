@@ -47,16 +47,16 @@ export const getConvertedSize = (
   let resultSize = bytes;
 
   const sizeNames = [
-    t("Common:Bytes"),
-    t("Common:Kilobyte"),
-    t("Common:Megabyte"),
-    t("Common:Gigabyte"),
-    t("Common:Terabyte"),
-    t("Common:Petabyte"),
-    t("Common:Exabyte"),
+    t("Bytes"),
+    t("Kilobyte"),
+    t("Megabyte"),
+    t("Gigabyte"),
+    t("Terabyte"),
+    t("Petabyte"),
+    t("Exabyte"),
   ];
 
-  if (bytes <= 0) return `${`0 ${t("Common:Bytes")}`}`;
+  if (bytes <= 0) return `${`0 ${t("Bytes")}`}`;
 
   if (bytes >= 1024) {
     power = getPowerFromBytes(bytes, sizeNames.length - 1);

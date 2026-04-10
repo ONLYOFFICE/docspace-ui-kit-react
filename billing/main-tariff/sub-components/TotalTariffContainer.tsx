@@ -63,14 +63,14 @@ const TotalTariffContainer = observer(({
             fontWeight={600}
             className={styles.totalTariffDescription}
           >
-            <CommonTrans i18nKey="BusinessRequestDescription" namespaces={["Payments"]} values={{ peopleNumber: maxAvailableManagersCount }} />
+            <CommonTrans i18nKey="BusinessRequestDescription" values={{ peopleNumber: maxAvailableManagersCount }} />
           </Text>
         ) : (
           <Text fontWeight={600} fontSize="16px">
             {isYearTariff ? (
               <CommonTrans
                 i18nKey="TotalPricePerYear"
-                namespaces={["Payments"]}
+               
                 values={{ price: formatPaymentCurrency(totalPrice) }}
                 components={{
                   2: <span key="large-font-year" className={styles.largerFontSize} />,
@@ -80,7 +80,7 @@ const TotalTariffContainer = observer(({
             ) : (
               <CommonTrans
                 i18nKey="TotalPricePerMonth"
-                namespaces={["Payments"]}
+               
                 values={{ price: formatPaymentCurrency(totalPrice) }}
                 components={{
                   2: <span key="large-font-month" className={styles.largerFontSize} />,

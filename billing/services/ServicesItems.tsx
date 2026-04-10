@@ -106,7 +106,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
   const permissionTooltipText = (
     <CommonTrans
-      namespaces={["Services"]}
+     
       i18nKey="InsufficientPermissionsMessage"
       values={{
         payerContact:
@@ -148,8 +148,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     <>
       <Text fontWeight={600} fontSize="12px">
         {t("StorageUpgradeMessage", {
-          fromSize: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
-          toSize: `${nextStoragePlanSize} ${t("Common:Gigabyte")}`,
+          fromSize: `${currentStoragePlanSize} ${t("Gigabyte")}`,
+          toSize: `${nextStoragePlanSize} ${t("Gigabyte")}`,
         })}
       </Text>
       <Text fontSize="12px">
@@ -172,7 +172,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     switch (serviceName) {
       case TOTAL_SIZE:
         if (previousStoragePlanSize && !isStorageDeactivationVisited) {
-          return t("Services:SubscriptionDeactivated");
+          return t("SubscriptionDeactivated");
         }
 
         if (hasScheduledStorageChange) {
@@ -188,7 +188,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               ),
               2,
             ),
-            size: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
+            size: `${currentStoragePlanSize} ${t("Gigabyte")}`,
           });
         }
 
@@ -199,11 +199,11 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
       case BACKUP_SERVICE:
         if (isBackupServiceOn && availableBackupsCount === 0) {
-          return t("Services:BackupsNotAvailable");
+          return t("BackupsNotAvailable");
         }
 
         if (isBackupServiceOn) {
-          return t("Services:BackupsAvailable", {
+          return t("BackupsAvailable", {
             currency: formatWalletCurrency(priceValue!, 2),
           });
         }
@@ -214,18 +214,18 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
       case AI_ENUM:
         if (isAiServiceLowBalance) {
-          return t("Services:AIPricingAvailableCreditsLowBalance", {
+          return t("AIPricingAvailableCreditsLowBalance", {
             price: formatAiServiceCurrency(),
           });
         }
 
         if (aiServiceBalance && aiServiceBalance > 0) {
-          return t("Services:AIPricingAvailableCredits", {
+          return t("AIPricingAvailableCredits", {
             price: formatAiServiceCurrency(),
           });
         }
 
-        return t("Services:AIPricingBilledPerUsage");
+        return t("AIPricingBilledPerUsage");
       default:
         return "";
     }

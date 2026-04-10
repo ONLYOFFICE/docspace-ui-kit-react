@@ -51,7 +51,7 @@ interface PaymentMethodProps {
 const PaymentMethod: React.FC<PaymentMethodProps> = ({
   showPortalSettingsLoader,
 }) => {
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
   const paymentStore = usePaymentStore();
 
   const { paymentMethodInit } = paymentStore;
@@ -78,13 +78,13 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const goToStripePortal = () => {
     accountLink
       ? window.open(toAbsoluteUrl(accountLink), "_blank")
-      : toastr.error(t("Common:UnexpectedError"));
+      : toastr.error(t("UnexpectedError"));
   };
 
   const goLinkCard = () => {
     cardLinked
       ? window.open(toAbsoluteUrl(cardLinked), "_self")
-      : toastr.error(t("Common:UnexpectedError"));
+      : toastr.error(t("UnexpectedError"));
   };
 
   const renderTooltip = (
@@ -96,7 +96,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <>
           <Text isBold>{t("Payer")}</Text>
           <Text>
-            {t("PayerDescription", { productName: t("Common:ProductName") })}
+            {t("PayerDescription", { productName: t("ProductName") })}
           </Text>
         </>
       }
@@ -126,7 +126,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       <Text className={styles.description} lineHeight="20px">
         {t("PaymentMethodDescription", {
-          productName: t("Common:ProductName"),
+          productName: t("ProductName"),
         })}
       </Text>
 

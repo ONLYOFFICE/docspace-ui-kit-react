@@ -98,7 +98,7 @@ const Services = observer(
     const { isFreeTariff } = paymentStore.quotas;
     const { logoText } = paymentStore;
 
-    const t = useCommonTranslation(["Payments", "Services", "Common"]);
+    const t = useCommonTranslation();
 
     useEffect(() => {
       servicesInit(t);
@@ -167,52 +167,52 @@ const Services = observer(
       { title: string; body: string | React.ReactNode[] }
     > = {
       [BACKUP_SERVICE]: {
-        title: t("Common:Confirmation"),
+        title: t("Confirmation"),
         body: !isCurrentConfirmState
-          ? t("Services:EnableBackupConfirm", {
-              productName: t("Common:ProductName"),
+          ? t("EnableBackupConfirm", {
+              productName: t("ProductName"),
             })
           : isFreeTariff
-            ? t("Services:DisableBackupConfirmWithoutQuota", {
-                productName: t("Common:ProductName"),
+            ? t("DisableBackupConfirmWithoutQuota", {
+                productName: t("ProductName"),
               })
-            : t("Services:DisableBackupConfirm", {
-                productName: t("Common:ProductName"),
+            : t("DisableBackupConfirm", {
+                productName: t("ProductName"),
               }),
       },
       [AI_ENUM]: {
-        title: t("Common:Confirmation"),
+        title: t("Confirmation"),
         body: isCurrentConfirmState
           ? [
-              t("Services:DisableAIToolsConfirm", {
+              t("DisableAIToolsConfirm", {
                 organizationName: logoText,
               }),
               <CommonTrans
                 key="DisableAIToolsConfirmBalance"
-                namespaces={["Services"]}
+               
                 i18nKey="DisableAIToolsConfirmBalance"
                 values={{ balance: formatAiServiceCurrency() }}
                 components={{
                   1: <span style={{ fontWeight: 600 }} />,
                 }}
               />,
-              t("Services:DisableAIToolsConfirmReEnable"),
+              t("DisableAIToolsConfirmReEnable"),
             ]
           : [
-              t("Services:AIToolsDescription", {
-                productName: t("Common:ProductName"),
+              t("AIToolsDescription", {
+                productName: t("ProductName"),
                 organizationName: logoText,
               }),
               <CommonTrans
                 key="CurrentBalance"
-                namespaces={["Payments"]}
+               
                 i18nKey="CurrentBalance"
                 values={{ balance: formatAiServiceCurrency() }}
                 components={{
                   1: <span style={{ fontWeight: 600 }} />,
                 }}
               />,
-              t("Common:WantToContinue"),
+              t("WantToContinue"),
             ],
       },
     };
@@ -315,7 +315,7 @@ const Services = observer(
           await paymentApi.changeTenantWalletServiceState(raw);
         } catch (error) {
           console.error(error);
-          toastr.error(t("Common:UnexpectedError"));
+          toastr.error(t("UnexpectedError"));
           changeServiceState(id);
         }
       }
@@ -359,10 +359,10 @@ const Services = observer(
 
       const getSuccessMessage = () => {
         if (confirmActionType === BACKUP_SERVICE) {
-          return t("Services:BackupServiceEnabled");
+          return t("BackupServiceEnabled");
         }
         if (confirmActionType === AI_ENUM) {
-          return t("Services:AIToolsEnabled");
+          return t("AIToolsEnabled");
         }
       };
 
@@ -370,7 +370,7 @@ const Services = observer(
         const result = await paymentApi.changeTenantWalletServiceState(raw);
 
         if (!result) {
-          toastr.error(t("Common:UnexpectedError"));
+          toastr.error(t("UnexpectedError"));
           changeServiceState(confirmActionType);
           return;
         }
@@ -382,7 +382,7 @@ const Services = observer(
         }
       } catch (error) {
         console.error(error);
-        toastr.error(t("Common:UnexpectedError"));
+        toastr.error(t("UnexpectedError"));
         changeServiceState(confirmActionType);
       }
     };

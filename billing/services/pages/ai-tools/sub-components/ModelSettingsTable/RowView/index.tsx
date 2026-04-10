@@ -35,7 +35,7 @@ const RowView = (props: ModelSettingsRowViewProps) => {
   } = servicesStore;
 
   const models = aiToolsPrices?.chat ?? [];
-  const t = useCommonTranslation(["Services"]);
+  const t = useCommonTranslation();
 
   const onToggle = async (modelId: string, enabled: boolean) => {
     await setAiModelAvailability(modelId, enabled);
@@ -48,7 +48,7 @@ const RowView = (props: ModelSettingsRowViewProps) => {
       <Text className={styles.introText}>
         <CommonTrans
           i18nKey="AIModelsIntro"
-          namespaces={["Services"]}
+         
           components={{
             1: (
               <Link

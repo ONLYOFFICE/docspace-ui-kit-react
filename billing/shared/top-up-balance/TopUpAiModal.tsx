@@ -75,14 +75,14 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
   const { walletCustomerStatusNotActive, walletCustomerEmail } =
     store.tariff;
 
-  const t = useCommonTranslation(["Payments", "Services", "Common"]);
+  const t = useCommonTranslation();
 
   const isDisabled = (isLoading || walletCustomerStatusNotActive) ?? false;
 
   return (
     <>
       <Text className={modalStyles.description}>
-        {t("Services:CreditsFromWalletDescription", {
+        {t("CreditsFromWalletDescription", {
           organizationName: logoText,
         })}
       </Text>
@@ -93,7 +93,7 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
         color="accent"
         fontWeight={600}
       >
-        {t("Services:HowDoesItWork")}
+        {t("HowDoesItWork")}
       </Link>
 
       <FromWalletToAi
@@ -111,7 +111,7 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
       />
 
       <Text fontSize="12px" className={modalStyles.helperText}>
-        {t("Payments:AICreditsHelper")}
+        {t("AICreditsHelper")}
       </Text>
 
       <Link
@@ -121,7 +121,7 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
         color="accent"
         fontWeight={600}
       >
-        {t("Services:AIPricingAndBilling")}
+        {t("AIPricingAndBilling")}
       </Link>
     </>
   );

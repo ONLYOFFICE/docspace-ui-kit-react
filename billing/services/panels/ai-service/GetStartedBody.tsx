@@ -48,14 +48,14 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
   const paymentStore = usePaymentStore();
   const { logoText } = paymentStore;
 
-  const t = useCommonTranslation(["Services", "Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const serviceOptions: ServiceOption[] = [
     {
       id: "ai-tools",
-      title: t("Common:AIAgents"),
+      title: t("AIAgents"),
       description: t("AIAgentsDescription", {
-        mcpServer: t("Common:MCPServer"),
+        mcpServer: t("MCPServer"),
       }),
       icon: <AIAgentsIcon />,
     },
@@ -114,7 +114,7 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
       withBodyScroll
     >
       <ModalDialog.Header>
-        {t("Payments:AddCreditsToAI", { organizationName: logoText })}
+        {t("AddCreditsToAI", { organizationName: logoText })}
       </ModalDialog.Header>
       <ModalDialog.Body>
         <div className={styles.getStartedSteps}>
@@ -130,7 +130,7 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
                 className={styles.stepDescription}
               >
                 {t("AIGetStartedStep1Description", {
-                  productName: t("Common:ProductName"),
+                  productName: t("ProductName"),
                   organizationName: logoText,
                 })}
               </Text>
@@ -146,7 +146,7 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
                     fontSize={"12px"}
                     className={styles.payForItemTextMuted}
                   >
-                    {t("Payments:TopUpFrom")}
+                    {t("TopUpFrom")}
                   </Text>
                 </div>
                 <div></div>
@@ -156,7 +156,7 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
                     fontSize={"12px"}
                     className={styles.payForItemTextMuted}
                   >
-                    {t("Payments:TopUpTo")}
+                    {t("TopUpTo")}
                   </Text>
                 </div>
 
@@ -252,7 +252,7 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
                   </div>
                   <Text fontSize="12px" fontWeight={600} as="span">
                     <CommonTrans
-                      namespaces={["Services"]}
+                     
                       i18nKey="AIWhatYouPayForVectorization"
                       components={{
                         1: (

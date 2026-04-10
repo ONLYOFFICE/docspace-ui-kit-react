@@ -77,8 +77,8 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
   const title = !hasStorageSubscription
     ? t("Buy")
     : isExceedingStorageLimit
-      ? t("Common:SendRequest")
-      : t("Common:Update");
+      ? t("SendRequest")
+      : t("Update");
 
   return (
     <div className={styles.buttonWrapper}>
@@ -89,7 +89,7 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
       !isExceedingStorageLimit &&
       totalPrice > 0 ? (
         <Text>
-          {t("Services:NextMonthBillDate", {
+          {t("NextMonthBillDate", {
             currency: formatWalletCurrency(totalPrice, 2),
             date: storageExpiryDate,
           })}
@@ -116,7 +116,7 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
         />
         <Button
           key="CancelButton"
-          label={t("Common:CancelButton")}
+          label={t("CancelButton")}
           size={ButtonSize.normal}
           scale
           onClick={onClose}

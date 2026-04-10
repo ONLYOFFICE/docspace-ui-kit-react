@@ -56,7 +56,7 @@ const WalletInfo = (props: WalletInfoProps) => {
     shortView,
     withoutBackground,
   } = props;
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const keyProp = isBalanceInsufficient
     ? { tKey: "BalanceInsufficient" }
@@ -79,7 +79,7 @@ const WalletInfo = (props: WalletInfoProps) => {
           fontSize="14px"
         >
           {title ??
-            t("ProductNameWallet", { productName: t("Common:ProductName") })}
+            t("ProductNameWallet", { productName: t("ProductName") })}
         </Text>
         <div
           className={classNames(styles.walletInfoBalance, {
@@ -87,7 +87,7 @@ const WalletInfo = (props: WalletInfoProps) => {
           })}
         >
           <CommonTrans
-            namespaces={["Payments"]}
+           
             i18nKey={keyProp.tKey}
             values={{ balance }}
             components={{

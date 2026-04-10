@@ -35,7 +35,7 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./MainTariff.module.scss";
 
 const CurrentTariffContainer = observer(({ style }: { style?: React.CSSProperties }) => {
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
   const store = usePaymentStore();
   const { quotaCharacteristics } = store.quotas;
 
