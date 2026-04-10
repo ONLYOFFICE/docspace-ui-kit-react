@@ -77,7 +77,7 @@ const TransactionBody = ({
   );
 
   const title = hasAppliedDateFilter
-    ? t("NoFindingsFound")
+    ? t("NoFindingsFound2")
     : t("NoWalletTransaction");
   const description = hasAppliedDateFilter
     ? t("NoTransactionsFilter")
