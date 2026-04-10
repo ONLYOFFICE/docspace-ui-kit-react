@@ -458,6 +458,7 @@ class ServicesStore {
 
       this.setIsInitServiceData(true);
     } catch (error) {
+      if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
       toastr.error(t("Common:UnexpectedError"));
     }

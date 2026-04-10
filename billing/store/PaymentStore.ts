@@ -924,6 +924,7 @@ class PaymentStore {
 
       this.setPaymentMethodInit(true);
     } catch (error) {
+      if (error instanceof Error && error.name === "CanceledError") return;
       toastr.error(t("Common:UnexpectedError"));
       console.error(error);
     }
@@ -993,6 +994,7 @@ class PaymentStore {
         this.setVisibleWalletSetting(true);
       }
     } catch (error) {
+      if (error instanceof Error && error.name === "CanceledError") return;
       toastr.error(t("Common:UnexpectedError"));
       console.error(error);
     }

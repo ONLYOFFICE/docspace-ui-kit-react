@@ -28,12 +28,11 @@ import React from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import classNames from "classnames";
-import { ReactSVG } from "react-svg";
 
 import { Text } from "../../../../components/text";
 import { Link } from "../../../../components/link";
 
-import WalletReactSvgUrl from "../../../../assets/icons/16/wallet.react.svg?url";
+import WalletIcon from "../../../../assets/icons/16/wallet.react.svg";
 
 import styles from "../styles/TopUpModal.module.scss";
 
@@ -42,7 +41,7 @@ type WalletInfoProps = {
   onTopUp?: () => void;
   isBalanceInsufficient?: boolean;
   title?: string;
-  iconUrl?: string;
+  icon?: React.ReactNode;
   shortView?: boolean;
   withoutBackground?: boolean;
 };
@@ -53,7 +52,7 @@ const WalletInfo = (props: WalletInfoProps) => {
     onTopUp,
     isBalanceInsufficient,
     title,
-    iconUrl,
+    icon,
     shortView,
     withoutBackground,
   } = props;
@@ -71,7 +70,7 @@ const WalletInfo = (props: WalletInfoProps) => {
       })}
     >
       <div className={styles.walletInfoIcon}>
-        <ReactSVG src={iconUrl ?? WalletReactSvgUrl} />
+        {icon ?? <WalletIcon />}
       </div>
       <div className={styles.walletInfoBody}>
         <Text
