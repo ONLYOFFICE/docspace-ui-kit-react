@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import classNames from "classnames";
 
 import {
@@ -134,38 +134,26 @@ export function TableContainer<TData = unknown>({
   }, [hideColumns, setHideColumns]);
 
   // ─── Column visibility ────────────────────────────────────────────────────
-  // Derived from the `enable` flag on each column. Synced synchronously when
-  // `columns` prop changes (useState only initialises once).
+  // Derived purely from `columns` prop every render — no internal state, no
+  // extra re-render. Visibility changes are always driven by the consumer via
+  // the `columns` prop (enable flag), so a single synchronous derivation is
+  // sufficient and eliminates the flicker caused by setState-triggered renders.
 
-  const derivedVisibility = columnsToVisibility(columns);
-  const prevDerivedVisRef = useRef(derivedVisibility);
-
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    derivedVisibility,
+  const effectiveVisibility = useMemo(
+    () => columnsToVisibility(columns),
+    [columns],
   );
-
-  // Detect prop-driven visibility changes (e.g. toggle from store)
-  let effectiveVisibility = columnVisibility;
-  if (
-    JSON.stringify(derivedVisibility) !==
-    JSON.stringify(prevDerivedVisRef.current)
-  ) {
-    prevDerivedVisRef.current = derivedVisibility;
-    effectiveVisibility = derivedVisibility;
-    setColumnVisibility(derivedVisibility);
-  }
 
   const handleColumnVisibilityChange: OnChangeFn<VisibilityState> =
     useCallback(
       (updater) => {
-        setColumnVisibility((prev) => {
-          const next =
-            typeof updater === "function" ? updater(prev) : updater;
-          onColumnVisibilityChange?.(next);
-          return next;
-        });
+        const next =
+          typeof updater === "function"
+            ? updater(effectiveVisibility)
+            : updater;
+        onColumnVisibilityChange?.(next);
       },
-      [onColumnVisibilityChange],
+      [effectiveVisibility, onColumnVisibilityChange],
     );
 
   // ─── TanStack table instance ──────────────────────────────────────────────

@@ -278,16 +278,17 @@ export function useColumnDistribution(
   const saveSizingRef = useRef(saveSizing);
   saveSizingRef.current = saveSizing;
 
-  // Track the visible-column key set as a stable string for change detection.
+  // Recompute distribution when the visible column set changes (e.g. user
+  // toggles a column). Runs as useLayoutEffect so React batches the resulting
+  // setColumnSizing update with any other pending state work — no extra paint,
+  // no flicker. (The previous setColumnVisibility render that caused the
+  // original flicker has been removed from TableContainer.)
   const visibleColKeysStr = cols
     .filter((c) => c.enable !== false)
     .map((c) => c.key)
     .join(",");
   const prevVisibleColKeysRef = useRef(visibleColKeysStr);
 
-  // Recompute distribution whenever visible columns change (e.g. user toggles
-  // a column via settings). The ResizeObserver handles the initial computation,
-  // so we skip until it has run at least once.
   useLayoutEffect(() => {
     if (visibleColKeysStr === prevVisibleColKeysRef.current) return;
     prevVisibleColKeysRef.current = visibleColKeysStr;
