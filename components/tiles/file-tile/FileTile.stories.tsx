@@ -324,16 +324,51 @@ export const CssCustomization: Story = {
 | Variable | Description | Default |
 |----------|-------------|---------|
 | \`--tile-bg\` | Tile background color | theme-based |
-| \`--tile-border-style\` | Tile border | theme-based |
+| \`--file-tile-border-style\` | FileTile-specific border (overrides \`--tile-border-style\`) | theme-based |
+| \`--tile-border-style\` | Shared tile border fallback | theme-based |
 | \`--tile-radius\` | Tile border radius | \`12px\` |
 | \`--tile-hover-bg\` | Hover/checked background | theme-based |
 | \`--tile-icon-color\` | Icon button color | theme-based |
+| \`--tile-icon-display\` | Show/hide the file icon (\`flex\` or \`none\`) | \`flex\` |
 | \`--tile-hotkey-color\` | Hotkey navigation border color | theme-based |
 | \`--tile-badge-bg\` | Badge background color | theme-based |
 | \`--tile-badge-radius\` | Badge border radius | \`3px\` |
 | \`--tile-badge-box-shadow\` | Badge box shadow | theme-based |
 | \`--tile-text-size\` | File name font size | \`14px\` |
-| \`--tile-text-line-height\` | File name line height | \`16px\` |`,
+| \`--tile-text-weight\` | File name font weight | \`normal\` |
+| \`--tile-text-color\` | File name text color | theme-based |
+| \`--tile-text-line-height\` | File name line height | \`16px\` |
+| \`--tile-hover-text-decoration\` | Text decoration on hover | theme-based |
+| \`--tile-bottom-padding-inline\` | Inline padding of the bottom info section | \`0\` |
+| \`--tile-thumbnail-padding-inline\` | Horizontal inset of thumbnail inside container | \`0\` |
+| \`--tile-thumbnail-height\` | Height of the thumbnail container | \`156px\` |
+| \`--tile-thumbnail-bg\` | Thumbnail background color | transparent |
+| \`--tile-thumbnail-image-radius\` | Thumbnail image border radius | theme-based |
+| \`--tile-thumbnail-image-hover-bg\` | Thumbnail background on tile hover | transparent |
+| \`--tile-thumbnail-transition\` | Thumbnail background transition | \`background 0.2s\` |
+| \`--tile-option-button-padding-end\` | Trailing padding of the context menu button | \`16px\` |
+| \`--tile-grid-padding-inline\` | Horizontal padding applied to the grid container | \`0\` |
+| \`--tile-min-width\` | Minimum tile width in the grid | \`clamp(216px, 13.4vw, 360px)\` |`,
+      },
+      source: {
+        code: `// Nextcloud-style flat tiles — no border, hidden icon, padding
+<div style={{
+  "--tile-bg": "transparent",
+  "--file-tile-border-style": "none",
+  "--tile-radius": "8px",
+  "--tile-hover-bg": "#f5f5f5",
+  "--tile-icon-display": "none",
+  "--tile-bottom-padding-inline": "16px",
+  "--tile-thumbnail-padding-inline": "16px",
+  "--tile-text-weight": "400",
+  "--tile-text-color": "#222222",
+  "--tile-badge-box-shadow": "none",
+  "--tile-min-width": "198px",
+}}>
+  <FileTile item={item} element={element} contextOptions={options} onSelect={handleSelect}>
+    <TileContent><Link>Document.docx</Link></TileContent>
+  </FileTile>
+</div>`,
       },
     },
   },
