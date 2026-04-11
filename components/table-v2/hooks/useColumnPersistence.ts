@@ -198,7 +198,6 @@ export function useColumnPersistence(
   // Stable callback — cols and storage key are read from refs.
   const saveSizing = useCallback((sizing: ColumnSizingState) => {
     writePercents(storageKeyRef.current, sizing, colsRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // columnKeys kept in signature for API compatibility; not used directly here.

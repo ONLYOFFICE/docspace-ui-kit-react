@@ -145,17 +145,14 @@ export function TableContainer<TData = unknown>({
     [columns],
   );
 
-  const handleColumnVisibilityChange: OnChangeFn<VisibilityState> =
-    useCallback(
-      (updater) => {
-        const next =
-          typeof updater === "function"
-            ? updater(effectiveVisibility)
-            : updater;
-        onColumnVisibilityChange?.(next);
-      },
-      [effectiveVisibility, onColumnVisibilityChange],
-    );
+  const handleColumnVisibilityChange: OnChangeFn<VisibilityState> = useCallback(
+    (updater) => {
+      const next =
+        typeof updater === "function" ? updater(effectiveVisibility) : updater;
+      onColumnVisibilityChange?.(next);
+    },
+    [effectiveVisibility, onColumnVisibilityChange],
+  );
 
   // ─── TanStack table instance ──────────────────────────────────────────────
   // Column resizing is handled via DOM mutations in useColumnResize; TanStack
@@ -191,7 +188,6 @@ export function TableContainer<TData = unknown>({
   // final px widths string back to a ColumnSizingState object.
   const visibleColumnKeys = useMemo(
     () => columnKeys.filter((key) => effectiveVisibility[key] !== false),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [columnKeys, effectiveVisibility],
   );
 
@@ -223,8 +219,14 @@ export function TableContainer<TData = unknown>({
       headerRef,
       onResizeMouseDown,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [table, containerWidth, columnSizing, hideColumns, isIndexEditingMode, onResizeMouseDown],
+    [
+      table,
+      containerWidth,
+      columnSizing,
+      hideColumns,
+      isIndexEditingMode,
+      onResizeMouseDown,
+    ],
   );
 
   return (
@@ -244,3 +246,4 @@ export function TableContainer<TData = unknown>({
     </TableProvider>
   );
 }
+

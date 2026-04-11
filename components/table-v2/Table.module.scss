@@ -38,10 +38,12 @@
   height: 100%;
   margin-top: -25px;
   overflow-x: clip; // clip overflow without creating a scroll container (preserves sticky header)
+  & * {
+    user-select: none;
+  }
 
   &.isResizing,
   &.isResizing * {
-    user-select: none !important;
     cursor: col-resize !important;
   }
 }
@@ -378,15 +380,16 @@
     --background-color: #{colors.$white};
     --table-group-menu-border-bottom: 1px solid transparent;
     --table-group-menu-border-right: 1px solid #{colors.$gray-strong};
-    --table-group-menu-box-shadow: 0px 8px 16px #{colors.$popup-shadow},
-      0px 0px 4px #{colors.$menu-shadow};
+    --table-group-menu-box-shadow:
+      0px 8px 16px #{colors.$popup-shadow}, 0px 0px 4px #{colors.$menu-shadow};
   }
 
   :global(.dark) & {
     --background-color: #{colors.$black};
     --table-group-menu-border-bottom: 1px solid #{colors.$gray-dark-strong};
     --table-group-menu-border-right: 1px solid #{colors.$gray-dark-strong};
-    --table-group-menu-box-shadow: 0px 8px 16px #{colors.$badge-shadow},
+    --table-group-menu-box-shadow:
+      0px 8px 16px #{colors.$badge-shadow},
       0px 0px 4px #{colors.$menu-shadow-dark};
   }
 
@@ -527,3 +530,4 @@
     }
   }
 }
+

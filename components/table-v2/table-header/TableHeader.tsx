@@ -30,7 +30,11 @@ import classNames from "classnames";
 import type { Header } from "@tanstack/react-table";
 
 import { useTableCtx } from "../context/TableContext";
-import { SETTINGS_COLUMN_SIZE, MIN_COLUMN_SIZE, MIN_NAME_COLUMN_SIZE } from "../Table.constants";
+import {
+  SETTINGS_COLUMN_SIZE,
+  MIN_COLUMN_SIZE,
+  MIN_NAME_COLUMN_SIZE,
+} from "../Table.constants";
 import { TableSettings } from "../sub-components/table-settings";
 import styles from "../Table.module.scss";
 
@@ -44,7 +48,9 @@ export interface TableHeaderProps {
   /** Title attribute for the settings icon button */
   settingsTitle?: string;
   /** Custom render prop for the settings dropdown content */
-  renderSettings?: (table: ReturnType<typeof useTableCtx>["table"]) => React.ReactNode;
+  renderSettings?: (
+    table: ReturnType<typeof useTableCtx>["table"],
+  ) => React.ReactNode;
   /** Forwarded ref for width measurement (e.g. tag-based dynamic width) */
   tagRef?: React.Ref<HTMLDivElement>;
   /** Additional CSS class */
@@ -60,13 +66,8 @@ export function TableHeader({
   tagRef,
   className,
 }: TableHeaderProps) {
-  const {
-    table,
-    columnSizing,
-    hideColumns,
-    isIndexEditingMode,
-    headerRef,
-  } = useTableCtx();
+  const { table, columnSizing, hideColumns, isIndexEditingMode, headerRef } =
+    useTableCtx();
 
   const gridTemplateColumns = useMemo(() => {
     const visibleCols = table.getVisibleLeafColumns();
@@ -86,7 +87,9 @@ export function TableHeader({
 
       // Flex columns: minmax(min, Xfr) — browser scales proportionally,
       // column never shrinks below its minimum.
-      const minSize = col.columnDef.minSize ?? (isDefault ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE);
+      const minSize =
+        col.columnDef.minSize ??
+        (isDefault ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE);
       return `minmax(${minSize}px, ${col.getSize()}fr)`;
     });
 
@@ -196,6 +199,7 @@ function HeaderCell({
 
   const sortBy = meta?.sortBy as string | undefined;
   const isDefault = (meta?.isDefault as boolean) ?? false;
+  const isShort = (meta?.isShort as boolean) ?? false;
   const defaultSize = meta?.defaultSize as number | undefined;
   const onClick = meta?.onClick as
     | ((sortBy: string, e: React.MouseEvent) => void)
@@ -245,6 +249,7 @@ function HeaderCell({
       id={`column_${visualIndex}`}
       data-enable={header.column.getIsVisible()}
       data-default={isDefault}
+      data-is-short={isShort}
       data-min-width={header.column.columnDef.minSize}
       data-default-size={defaultSize ?? undefined}
       data-testid={`column-${header.id}`}
@@ -264,12 +269,11 @@ function HeaderCell({
       ) : (
         <div className={styles.headerItem}>
           <div className={styles.textWrapper} onClick={handleSortClick}>
-            <span
-              className={classNames(styles.text, "header-container-text")}
-            >
+            <span className={classNames(styles.text, "header-container-text")}>
               {header.isPlaceholder
                 ? null
-                : (meta?.title as string) ?? header.column.columnDef.header as string}
+                : ((meta?.title as string) ??
+                  (header.column.columnDef.header as string))}
             </span>
           </div>
           {sortBy && (
@@ -298,3 +302,4 @@ function HeaderCell({
     </div>
   );
 }
+

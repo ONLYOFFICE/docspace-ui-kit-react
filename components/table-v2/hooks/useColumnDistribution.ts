@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useState, useCallback, useLayoutEffect, useRef } from "react";
+import { useState, useLayoutEffect, useRef, useEffect, useMemo, useEffectEvent } from "react";
 
 import type { ColumnSizingState } from "@tanstack/react-table";
 
@@ -36,16 +36,16 @@ import {
   NAME_COLUMN_PERCENT,
 } from "../Table.constants";
 
-// ─── Distribution helpers ─────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
- * Computes the initial column distribution for a given container width.
+ * Computes default column fr-values for a given container width.
+ * Used when no localStorage data exists or it is invalid.
  *
- * Distribution rules:
- * - `defaultSize` columns: fixed px, excluded from the flexible pool
- * - `isShort` columns: exactly their `minWidth` (excluded from flexible pool)
+ * - `defaultSize` columns: fixed px (not in fr pool)
+ * - `isShort` columns: their `minWidth` px (not in fr pool)
  * - `default` column: NAME_COLUMN_PERCENT % of the flexible area
- * - All other enabled columns: split equally from the remaining 60%
+ * - All other enabled columns: split equally from the remaining space
  */
 function computeDistribution(
   cols: TTableColumn[],
@@ -92,15 +92,10 @@ function computeDistribution(
 
   const sizing: ColumnSizingState = {};
 
-  for (const col of fixedCols) {
-    sizing[col.key] = col.defaultSize!;
-  }
-  for (const col of shortCols) {
+  for (const col of fixedCols) sizing[col.key] = col.defaultSize!;
+  for (const col of shortCols)
     sizing[col.key] = col.minWidth ?? MIN_COLUMN_SIZE;
-  }
-  if (defaultCol) {
-    sizing[defaultCol.key] = nameWidth;
-  }
+  if (defaultCol) sizing[defaultCol.key] = nameWidth;
   otherCols.forEach((col, i) => {
     const extra = i === 0 ? remainingWidth - perOther * otherCols.length : 0;
     sizing[col.key] = perOther + extra;
@@ -110,36 +105,8 @@ function computeDistribution(
 }
 
 /**
- * Converts a px sizing state to percentages of the flex pool.
- * Mirrors writePercents in useColumnPersistence, but without localStorage I/O.
- * Returns null when the flex pool is empty (all columns fixed/short/hidden).
- */
-function percentsFromSizing(
-  sizing: ColumnSizingState,
-  cols: TTableColumn[],
-): Record<string, number> | null {
-  const flexCols = cols.filter(
-    (c) => c.enable !== false && !c.defaultSize && !c.isShort,
-  );
-  const flexTotal = flexCols.reduce((sum, c) => sum + (sizing[c.key] ?? 0), 0);
-  if (flexTotal <= 0) return null;
-
-  const percents: Record<string, number> = {};
-  for (const col of flexCols) {
-    percents[col.key] = ((sizing[col.key] ?? 0) / flexTotal) * 100;
-  }
-  return percents;
-}
-
-/**
- * Converts stored percentages back to px for the current container width.
- *
- * The percentages were saved relative to the flex pool
- * (containerWidth - SETTINGS_COLUMN_SIZE - fixedWidth - shortWidth).
- * Fixed and short columns are restored from their column definitions.
- *
- * Falls back to computeDistribution when a flex column has no stored percent
- * (e.g. a new column was added after the data was last saved).
+ * Converts stored percentages → fr values for the current container width.
+ * Falls back to computeDistribution when data is missing or invalid.
  */
 function percentsToSizing(
   cols: TTableColumn[],
@@ -160,13 +127,9 @@ function percentsToSizing(
   );
   const flexCols = visibleCols.filter((c) => !c.defaultSize && !c.isShort);
 
-  // Fall back to fresh compute when a flex column is absent from stored percents
-  // (e.g. a new column was added since the data was last saved).
   const hasAll = flexCols.every((c) => percents[c.key] != null);
   if (!hasAll) return computeDistribution(cols, containerWidth);
 
-  // Second-layer validation: each stored percent must be a finite positive
-  // number. If any value is NaN / null / undefined / ≤ 0, discard everything.
   for (const col of flexCols) {
     const pct = percents[col.key];
     if (typeof pct !== "number" || !Number.isFinite(pct) || pct <= 0) {
@@ -179,18 +142,14 @@ function percentsToSizing(
 
   const sizing: ColumnSizingState = {};
 
-  for (const col of fixedCols) {
-    sizing[col.key] = col.defaultSize!;
-  }
-  for (const col of shortCols) {
+  for (const col of fixedCols) sizing[col.key] = col.defaultSize!;
+  for (const col of shortCols)
     sizing[col.key] = col.minWidth ?? MIN_COLUMN_SIZE;
-  }
   for (const col of flexCols) {
     const pct = percents[col.key];
     const minSize =
       col.minWidth ?? (col.default ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE);
     const px = Math.floor((flexArea * pct) / 100);
-    // Guard against computed NaN/negative (e.g. zero flex area on tiny screens)
     sizing[col.key] =
       Number.isFinite(px) && px > 0 ? Math.max(px, minSize) : minSize;
   }
@@ -199,7 +158,7 @@ function percentsToSizing(
 }
 
 /**
- * Computes whether the container is too narrow to show all non-essential columns.
+ * True when the container is too narrow to show all non-essential columns.
  */
 function computeHideColumns(
   cols: TTableColumn[],
@@ -208,32 +167,26 @@ function computeHideColumns(
   if (containerWidth === 0) return false;
 
   const visibleCols = cols.filter((c) => c.enable !== false);
-
   const defaultCol = visibleCols.find((c) => c.default);
   const defaultMinWidth = defaultCol?.minWidth ?? MIN_NAME_COLUMN_SIZE;
-
-  const shortCols = visibleCols.filter((c) => c.isShort && !c.default);
-  const shortWidth = shortCols.reduce(
-    (sum, c) => sum + (c.minWidth ?? MIN_COLUMN_SIZE),
-    0,
-  );
-
+  const shortWidth = visibleCols
+    .filter((c) => c.isShort && !c.default)
+    .reduce((sum, c) => sum + (c.minWidth ?? MIN_COLUMN_SIZE), 0);
   const fixedWidth = visibleCols
     .filter((c) => c.defaultSize != null)
     .reduce((sum, c) => sum + (c.defaultSize ?? 0), 0);
-
-  const otherCols = visibleCols.filter(
+  const otherCount = visibleCols.filter(
     (c) => !c.default && !c.isShort && c.defaultSize == null,
-  );
+  ).length;
 
-  const minRequired =
+  return (
+    containerWidth <
     defaultMinWidth +
-    shortWidth +
-    fixedWidth +
-    otherCols.length * MIN_COLUMN_SIZE +
-    SETTINGS_COLUMN_SIZE;
-
-  return containerWidth < minRequired;
+      shortWidth +
+      fixedWidth +
+      otherCount * MIN_COLUMN_SIZE +
+      SETTINGS_COLUMN_SIZE
+  );
 }
 
 export interface UseColumnDistributionResult {
@@ -245,16 +198,13 @@ export interface UseColumnDistributionResult {
 }
 
 /**
- * Measures the container via ResizeObserver and manages column sizing.
+ * Initializes column sizing from localStorage percents (or defaults) and
+ * tracks containerWidth / hideColumns via ResizeObserver.
  *
- * Sizing lifecycle:
- * 1. First measurement:
- *    - Persisted percents → convert to px via percentsToSizing (scales to any
- *      container width without stale values)
- *    - No persisted data → compute fresh proportional distribution
- * 2. Subsequent container resizes → scale columns proportionally (mirrors
- *    legacy table `onResize` behavior) and persist the new sizes
- * 3. Column visibility change → recompute distribution and persist
+ * CSS uses `fr` units — the browser scales columns on container resize
+ * automatically. ResizeObserver is only needed for:
+ * 1. First render — read containerWidth, convert percents → fr sizing
+ * 2. hideColumns — detect when the container is too narrow
  */
 export function useColumnDistribution(
   cols: TTableColumn[],
@@ -270,148 +220,95 @@ export function useColumnDistribution(
   const [containerWidth, setContainerWidth] = useState(0);
   const [hideColumns, setHideColumns] = useState(false);
 
-  const lastWidthRef = useRef(0);
   const initializedRef = useRef(false);
 
-  // Tracks the most recently *intended* sizing — updated synchronously every
-  // time we call setColumnSizing. Used by scaleColumnsToWidth so it always
-  // sees the latest value regardless of React commit timing.
-  const sizingRef = useRef<ColumnSizingState>({});
-
-  // Percentages are the persistent source of truth for window resizes.
-  // Populated from localStorage on init; updated when the user drags a column.
-  // On every ResizeObserver callback that has percents available, we convert
-  // them directly to px — this means both the init call and any subsequent
-  // layout-shift call (scrollbar, flex settle) produce the same correct result
-  // without any risk of scaleColumnsToWidth overwriting localStorage values.
-  const percentsRef = useRef<Record<string, number> | null>(initialPercents);
-
-  // Keep refs current so the ResizeObserver callback (created once, with []
-  // deps) always sees the latest cols and saveSizing without stale closures.
-  const colsRef = useRef(cols);
-  colsRef.current = cols;
-  const saveSizingRef = useRef(saveSizing);
-  saveSizingRef.current = saveSizing;
-  // Keep in sync so percentsToSizing uses latest percents on first call.
-  const initialPercentsRef = useRef(initialPercents);
-  initialPercentsRef.current = initialPercents;
-
-  /** Set sizing in both the ref (immediately) and React state (async commit). */
-  const applySizing = useCallback((sized: ColumnSizingState, save = false) => {
-    sizingRef.current = sized;
-    setColumnSizing(sized);
-    if (save) {
-      saveSizingRef.current(sized);
-      // Keep percentsRef up to date so subsequent ResizeObserver calls
-      // convert the latest user-defined proportions, not stale ones.
-      percentsRef.current = percentsFromSizing(sized, colsRef.current);
-    }
-  }, []);
-
-  // Recompute distribution when the visible column set changes (e.g. user
-  // toggles a column). Runs as useLayoutEffect so React batches the resulting
-  // setColumnSizing update with any other pending state work — no extra paint,
-  // no flicker.
-  const visibleColKeysStr = cols
-    .filter((c) => c.enable !== false)
-    .map((c) => c.key)
-    .join(",");
-
+  // Column visibility toggle — recompute distribution and save.
+  const visibleColKeysStr = useMemo(
+    () =>
+      cols
+        .filter((c) => c.enable !== false)
+        .map((c) => c.key)
+        .join(","),
+    [cols],
+  );
   const prevVisibleColKeysRef = useRef(visibleColKeysStr);
 
+  // ── useEffectEvent callbacks — always see latest cols/percents/saveSizing ─
+  // No manual refs needed; deps arrays are clean without suppression.
+
+  const onInit = useEffectEvent((width: number) => {
+    initializedRef.current = true;
+    setContainerWidth(width);
+    setHideColumns(computeHideColumns(cols, width));
+
+    const sized =
+      initialPercents && Object.keys(initialPercents).length > 0
+        ? percentsToSizing(cols, initialPercents, width)
+        : computeDistribution(cols, width);
+
+    setColumnSizing(sized);
+    saveSizing(sized);
+  });
+
+  const onVisibilityChange = useEffectEvent((width: number) => {
+    setHideColumns(computeHideColumns(cols, width));
+    const sized = computeDistribution(cols, width);
+    setColumnSizing(sized);
+    saveSizing(sized);
+  });
+
+  const onResize = useEffectEvent((width: number) => {
+    setContainerWidth(width);
+    setHideColumns(computeHideColumns(cols, width));
+  });
+
+  // ── First-render init (synchronous, before paint) ────────────────────────
+  // useLayoutEffect fires after DOM is ready but before the browser paints,
+  // so columnSizing is set correctly on the very first frame — no flicker.
+  useLayoutEffect(() => {
+    const el = (containerRef as React.RefObject<HTMLDivElement>).current;
+    if (!el) return;
+
+    const width = el.clientWidth;
+    if (width === 0) return;
+
+    onInit(width);
+  }, []);
+
+  // ── Column visibility toggle — recompute distribution and save ────────────
   useLayoutEffect(() => {
     if (visibleColKeysStr === prevVisibleColKeysRef.current) return;
     prevVisibleColKeysRef.current = visibleColKeysStr;
+    if (!initializedRef.current) return;
 
-    if (!initializedRef.current || lastWidthRef.current === 0) return;
+    const el = (containerRef as React.RefObject<HTMLDivElement>).current;
+    const width = el?.clientWidth ?? 0;
+    if (width === 0) return;
 
-    const width = lastWidthRef.current;
-    setHideColumns(computeHideColumns(colsRef.current, width));
+    onVisibilityChange(width);
+  }, [visibleColKeysStr]);
 
-    const sized = computeDistribution(colsRef.current, width);
-    applySizing(sized, true);
-  }, [visibleColKeysStr, applySizing]);
-
-  const distribute = useCallback(
-    (width: number) => {
-      const sized = computeDistribution(colsRef.current, width);
-      applySizing(sized, true);
-    },
-    [applySizing],
-  );
-
-  useLayoutEffect(() => {
-    const el = containerRef.current;
+  // ── ResizeObserver — tracks containerWidth and hideColumns only ───────────
+  // CSS fr units handle proportional scaling automatically; we only need JS
+  // to detect when the container becomes too narrow (hideColumns).
+  useEffect(() => {
+    const el = (containerRef as React.RefObject<HTMLDivElement>).current;
     if (!el) return;
 
-    // ResizeObserver handles both initialization and subsequent resizes.
-    //
-    // Why not call init synchronously + observe?
-    // useLayoutEffect runs before paint but after browser layout — however
-    // el.clientWidth at that moment can differ from the width reported by the
-    // first ResizeObserver callback (e.g. scrollbar appears, flex container
-    // settles). If we init synchronously with width A and ResizeObserver fires
-    // with width B ≠ A, the "subsequent resize" branch runs scaleColumnsToWidth
-    // on sizingRef that contains localStorage values — overwriting them.
-    //
-    // Letting ResizeObserver do everything avoids the race: the first callback
-    // always fires with the stable layout width and is treated as initialization.
     const ro = new ResizeObserver(() => {
       const width = el.clientWidth;
       if (width === 0) return;
 
-      if (!initializedRef.current) {
-        // ── First valid measurement — initialize from localStorage ─────────────
-        initializedRef.current = true;
-        lastWidthRef.current = width;
-
-        setContainerWidth(width);
-        setHideColumns(computeHideColumns(colsRef.current, width));
-
-        const percents = percentsRef.current;
-        if (percents && Object.keys(percents).length > 0) {
-          const sized = percentsToSizing(colsRef.current, percents, width);
-          applySizing(sized, true);
-        } else {
-          distribute(width);
-        }
-        return;
-      }
-
-      // ── Width unchanged — nothing to do ───────────────────────────────────
-      if (width === lastWidthRef.current) return;
-      lastWidthRef.current = width;
-
-      // Column px sizes are kept fixed on container resize — only
-      // containerWidth (for useColumnResize init) and hideColumns are updated.
-      setContainerWidth(width);
-      setHideColumns(computeHideColumns(colsRef.current, width));
+      onResize(width);
     });
 
-    ro.observe(el);
+    ro.observe(el, {});
     return () => ro.disconnect();
   }, []);
 
-  // Wrap the raw setter so external callers (useColumnResize onMouseUp) also
-  // keep sizingRef in sync — otherwise a resize-drag followed by a window
-  // resize would scale from stale ref values.
-  const setColumnSizingWrapped = useCallback(
-    (
-      action:
-        | ColumnSizingState
-        | ((prev: ColumnSizingState) => ColumnSizingState),
-    ) => {
-      const next =
-        typeof action === "function" ? action(sizingRef.current) : action;
-      sizingRef.current = next;
-      setColumnSizing(next);
-    },
-    [],
-  );
-
   return {
     columnSizing,
-    setColumnSizing: setColumnSizingWrapped,
+    setColumnSizing,
     containerWidth,
     hideColumns,
     containerRef,
