@@ -201,4 +201,12 @@
       color: var(--payment-price-container-disable-price-color);
     }
   }
+
+  .cardUnlinkedWarning {
+    margin: 16px 0;
+  }
+
+  .warningColor {
+    color: var(--warning-color);
+  }
 }

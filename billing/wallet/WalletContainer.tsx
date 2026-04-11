@@ -176,7 +176,6 @@ const Wallet = (props: WalletProps) => {
               t("LinkNewCard")
             ) : (
               <CommonTrans
-               
                 i18nKey="LinkNewCardEmail"
                 values={{
                   email: payerEmail,

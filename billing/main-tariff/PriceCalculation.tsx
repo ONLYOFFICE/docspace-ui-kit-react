@@ -27,14 +27,17 @@
 import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 import { Text } from "../../components/text";
+import { Link } from "../../components/link";
 import { observer } from "mobx-react";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
+import { toastr } from "../../components/toast";
 import SelectUsersCountContainer from "./sub-components/SelectUsersCountContainer";
 import TotalTariffContainer from "./sub-components/TotalTariffContainer";
 import ButtonContainer from "./sub-components/ButtonContainer";
 import CurrentUsersCountContainer from "./sub-components/CurrentUsersCount";
 
 import type { TTranslation } from "../../utils/common";
+import { toAbsoluteUrl } from "../utils/url";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./MainTariff.module.scss";
@@ -51,11 +54,14 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
     canUpdateTariff,
     managersCount,
     isAlreadyPaid,
+    isPayer,
+    cardLinked,
     getPaymentLink,
     formatPaymentCurrency,
   } = store;
 
-  const { isGracePeriod, isNotPaidPeriod } = store.tariff;
+  const { isGracePeriod, isNotPaidPeriod, walletCustomerStatusNotActive } =
+    store.tariff;
   const { isYearTariff } = store.quotas;
   const { planCost, addedManagersCountTitle } = store.paymentQuotas;
 
@@ -97,6 +103,12 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
 
   const isDisabled = !canUpdateTariff;
 
+  const goLinkCard = () => {
+    cardLinked
+      ? window.open(toAbsoluteUrl(cardLinked), "_self")
+      : toastr.error(t("UnexpectedError"));
+  };
+
   const priceInfoPerManager = (
     <div className={styles.paymentPriceUser}>
       <Text
@@ -107,7 +119,6 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
         {isYearTariff ? (
           <CommonTrans
             i18nKey="PerUserYear"
-           
             values={{ price: formatPaymentCurrency(priceManagerPerMonth) }}
             components={{
               1: <strong key="price-year" style={{ fontSize: "16px" }} />,
@@ -116,7 +127,6 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
         ) : (
           <CommonTrans
             i18nKey="PerUserMonth"
-           
             values={{ price: formatPaymentCurrency(priceManagerPerMonth) }}
             components={{
               1: <strong key="price-month" style={{ fontSize: "16px" }} />,
@@ -158,9 +168,35 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
       {priceInfoPerManager}
 
       <TotalTariffContainer t={t} isDisabled={isDisabled} />
-      <ButtonContainer isDisabled={isDisabled} t={t} />
+
+      {isPayer && walletCustomerStatusNotActive ? (
+        <div className={styles.cardUnlinkedWarning}>
+          <Text fontWeight={600} className={styles.warningColor}>
+            {t("CardUnlinked")}
+          </Text>
+          <Text as="span" className={styles.warningColor}>
+            {t("LinkNewCard")}
+          </Text>
+          <div>
+            <Link
+              onClick={goLinkCard}
+              fontWeight={600}
+              textDecoration="underline"
+              color="accent"
+            >
+              {t("AddPaymentMethod")}
+            </Link>
+          </div>
+        </div>
+      ) : null}
+
+      <ButtonContainer
+        isDisabled={walletCustomerStatusNotActive || isDisabled}
+        t={t}
+      />
     </div>
   );
 });
 
 export default PriceCalculation;
+
