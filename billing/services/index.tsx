@@ -56,6 +56,7 @@ import StoragePlanCancel from "./panels/additional-storage/StoragePlanCancel";
 import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
 import AIServiceDialog from "./panels/ai-service/AIServiceDialog";
+import { getBrandName } from "../../../../packages/shared/constants/brands";
 type TServicesProps = {
   showPortalSettingsLoader?: boolean;
   initialOpenDialog?: string;
@@ -170,14 +171,14 @@ const Services = observer(
         title: t("Confirmation"),
         body: !isCurrentConfirmState
           ? t("EnableBackupConfirm", {
-              productName: t("ProductName"),
+              productName: getBrandName("ProductName"),
             })
           : isFreeTariff
             ? t("DisableBackupConfirmWithoutQuota", {
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
               })
             : t("DisableBackupConfirm", {
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
               }),
       },
       [AI_ENUM]: {
@@ -200,7 +201,7 @@ const Services = observer(
             ]
           : [
               t("AIToolsDescription", {
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
                 organizationName: logoText,
               }),
               <CommonTrans

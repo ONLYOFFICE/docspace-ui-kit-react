@@ -45,6 +45,7 @@ import { Link, LinkType } from "../link";
 import type { DropDownItemProps } from "./DropDownItem.types";
 import styles from "./DropDownItem.module.scss";
 import { TooltipContainer } from "../tooltip";
+import { getConstName } from "../../../../packages/shared/constants/consts";
 
 export type { DropDownItemProps };
 
@@ -147,7 +148,7 @@ const DropDownItem = ({
   const { isRTL } = useInterfaceDirection();
   const { isBase } = useTheme();
 
-  const resolvedBetaLabel = betaLabel || t("BetaLabel") || "";
+  const resolvedBetaLabel = betaLabel || getConstName("BetaLabel") || "";
   const resolvedPaidLabel = paidLabel || t("Paid") || "";
 
   const withDisabledTooltip = disabled && tooltip;

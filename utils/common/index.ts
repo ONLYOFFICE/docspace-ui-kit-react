@@ -28,6 +28,7 @@ import { FolderType } from "@onlyoffice/docspace-api-sdk";
 import { EmployeeType, RoomsType } from "../../enums";
 import { AvatarRole } from "../../components/avatar/Avatar.enums";
 import { getCommonTranslation } from "../i18n";
+import { getBrandName } from "../../../../packages/shared/constants/brands";
 
 export type TTranslation = (
   key: string,
@@ -65,7 +66,7 @@ export const getUserTypeTranslation = (
       return translate("Common:Owner");
     case EmployeeType.Admin:
       return translate("Common:PortalAdmin", {
-        productName: translate("Common:ProductName"),
+        productName: getBrandName("ProductName"),
       });
     case EmployeeType.RoomAdmin:
       return translate("Common:RoomAdmin");

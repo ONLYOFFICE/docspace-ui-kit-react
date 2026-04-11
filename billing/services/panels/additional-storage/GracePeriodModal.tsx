@@ -38,6 +38,7 @@ import { Text } from "../../../../components/text";
 import { Button, ButtonSize } from "../../../../components/button";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
+import { getBrandName } from "../../../../../../packages/shared/constants/brands";
 
 type GracePeriodModalProps = {
   visible: boolean;
@@ -90,7 +91,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
         </Text>{" "}
         <Text as="span">
           {t("GracePeriodActivatedDescription", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           })}
         </Text>
       </ModalDialog.Body>

@@ -24,6 +24,8 @@ import { ModalDialog, ModalDialogType } from "../../../../components";
 import { observer } from "mobx-react";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
+import { getBrandName } from "../../../../../../packages/shared/constants/brands";
+import { getConstName } from "../../../../../../packages/shared/constants/consts";
 
 interface ServiceOption {
   id: string;
@@ -79,7 +81,7 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
     },
     {
       id: "ocr",
-      title: t("OCR"),
+      title: getConstName("OCR"),
       description: t("OCRDescription"),
       icon: <OcrIcon />,
     },
@@ -130,7 +132,7 @@ const GetStartedBody: React.FC<GetStartedBodyProps> = ({
                 className={styles.stepDescription}
               >
                 {t("AIGetStartedStep1Description", {
-                  productName: t("ProductName"),
+                  productName: getBrandName("ProductName"),
                   organizationName: logoText,
                 })}
               </Text>

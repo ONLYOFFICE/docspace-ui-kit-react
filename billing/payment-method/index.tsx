@@ -43,6 +43,7 @@ import PaymentMethodLoader from "./PaymentMethodLoader";
 import PayerInformation from "../shared/payer-information";
 import { CardInformation } from "../shared/card-information";
 import StorageTariffDeactivated from "../dialogs/StorageTariffDeactivated";
+import { getBrandName } from "../../../../packages/shared/constants/brands";
 
 interface PaymentMethodProps {
   showPortalSettingsLoader?: boolean;
@@ -96,7 +97,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <>
           <Text isBold>{t("Payer")}</Text>
           <Text>
-            {t("PayerDescription", { productName: t("ProductName") })}
+            {t("PayerDescription", { productName: getBrandName("ProductName") })}
           </Text>
         </>
       }
@@ -126,7 +127,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       <Text className={styles.description} lineHeight="20px">
         {t("PaymentMethodDescription", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         })}
       </Text>
 

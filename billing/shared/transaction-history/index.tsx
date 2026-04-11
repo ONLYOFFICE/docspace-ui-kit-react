@@ -56,6 +56,7 @@ import TableLoader from "./sub-components/TableLoader";
 import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { AI_TOOLS } from "../../constants";
+import { getBrandName } from "../../../../../packages/shared/constants/brands";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -664,11 +665,11 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
       filter={filter}
       withInfo
       infoText={t("OnlyPortalAdminsShown", {
-        productName: t("ProductName"),
+        productName: getBrandName("ProductName"),
       })}
       emptyScreenHeader={t("NotFoundMembers")}
       emptyScreenDescription={t("PeopleSelectorInfo", {
-        productName: t("ProductName"),
+        productName: getBrandName("ProductName"),
       })}
     />
   ) : null;

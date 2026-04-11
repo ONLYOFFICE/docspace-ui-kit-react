@@ -33,6 +33,7 @@ import PublicRoomBar from "../../../../components/public-room-bar";
 import { ChatInfoBlockProps } from "../../Chat.types";
 import styles from "./ChatInfoBlock.module.scss";
 import { useCommonTranslation } from "../../../../utils/i18n";
+import { getBrandName } from "../../../../../../packages/shared/constants/brands";
 
 export const ChatInfoBlock = ({
   standalone,
@@ -41,14 +42,14 @@ export const ChatInfoBlock = ({
   const t = useCommonTranslation();
   const bodyText = !isPortalAdmin
     ? t("AIDisabledInfoBlockUserDescription", {
-        productName: t("ProductName"),
+        productName: getBrandName("ProductName"),
       })
     : standalone
       ? t("AIDisabledInfoBlockAdminStandaloneDescription", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         })
       : t("AIDisabledInfoBlockAdminSaasDescription", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         });
 
   return (

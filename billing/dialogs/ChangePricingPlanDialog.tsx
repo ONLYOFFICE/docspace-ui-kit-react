@@ -35,6 +35,7 @@ import { getConvertedSize } from "../utils/common";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./ChangePricingPlan.module.scss";
+import { getBrandName } from "../../../../packages/shared/constants/brands";
 
 type ChangePricingPlanDialogProps = {
   visible: boolean;
@@ -63,7 +64,7 @@ const ChangePricingPlanDialog = observer(
          
           values={{
             usersCount: managersCount,
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
             currentUsersCount: addedManagersCount,
           }}
           components={{

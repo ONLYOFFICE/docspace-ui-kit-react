@@ -33,6 +33,7 @@ import { EmptyView } from "../../../../components/empty-view";
 import { useTheme } from "../../../../context/ThemeContext";
 import { match, P } from "ts-pattern";
 import { useCommonTranslation } from "../../../../utils/i18n";
+import { getBrandName } from "../../../../../../packages/shared/constants/brands";
 
 type Props = {
   aiReady: boolean;
@@ -69,7 +70,7 @@ export const ChatNoAccessScreen = ({
       t(
         "EmptyAIAgentsAIDisabledStandaloneAdminDescription",
         {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
           aiChats: t("AIChats"),
         },
       ),
@@ -77,13 +78,13 @@ export const ChatNoAccessScreen = ({
     // saas admin
     .with([false, true], () =>
       t("EmptyChatAIDisabledSaasAdminDescription", {
-        productName: t("ProductName"),
+        productName: getBrandName("ProductName"),
       }),
     )
     // standalone/saas user
     .with([P._, false], () =>
       t("EmptyChatAIDisabledUserDescription", {
-        productName: t("ProductName"),
+        productName: getBrandName("ProductName"),
       }),
     )
     .otherwise(() => "");

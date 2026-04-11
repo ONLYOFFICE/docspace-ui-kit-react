@@ -67,6 +67,7 @@ import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
 import styles from "./PeopleSelector.module.scss";
 import { Encoder } from "../../utils/encoder";
+import { getBrandName } from "../../../../packages/shared/constants/brands";
 
 const PEOPLE_TAB_ID = "0";
 const GROUP_TAB_ID = "1";
@@ -778,7 +779,7 @@ const PeopleSelector = ({
             : t("NotFoundGuestsDescription")
           : activeTabId === PEOPLE_TAB_ID
             ? t("EmptyDescription", {
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
               })
             : t("GroupsNotFoundDescription"))
       }

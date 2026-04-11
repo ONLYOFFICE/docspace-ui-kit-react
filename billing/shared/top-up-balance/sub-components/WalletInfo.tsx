@@ -35,6 +35,7 @@ import { Link } from "../../../../components/link";
 import WalletIcon from "../../../../assets/icons/16/wallet.react.svg";
 
 import styles from "../styles/TopUpModal.module.scss";
+import { getBrandName } from "../../../../../../packages/shared/constants/brands";
 
 type WalletInfoProps = {
   balance?: string;
@@ -79,7 +80,7 @@ const WalletInfo = (props: WalletInfoProps) => {
           fontSize="14px"
         >
           {title ??
-            t("ProductNameWallet", { productName: t("ProductName") })}
+            t("ProductNameWallet", { productName: getBrandName("ProductName") })}
         </Text>
         <div
           className={classNames(styles.walletInfoBalance, {

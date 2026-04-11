@@ -39,6 +39,7 @@ import {
 } from "../../components/selector";
 import { useTheme } from "../../context/ThemeContext";
 import { useApi } from "../../providers/api/ApiProvider";
+import { getBrandName } from "../../../../packages/shared/constants/brands";
 
 const getServerIcon = (type: ServerType, _isBase: boolean) => {
   switch (type) {
@@ -112,7 +113,7 @@ const MCPServersSelector = ({
     (server: TServer): TSelectorItem => {
       const name =
         server.serverType === ServerType.Portal
-          ? `${t("OrganizationName")} ${t("ProductName")}`
+          ? `${getBrandName("OrganizationName")} ${getBrandName("ProductName")}`
           : server.name;
 
       return {
@@ -229,7 +230,7 @@ const MCPServersSelector = ({
       })}
       emptyScreenDescription={t("NoMCPServersDescription", {
         mcpServers: t("MCPSettingTitle"),
-        productName: t("ProductName"),
+        productName: getBrandName("ProductName"),
         aiAgent: t("AIAgent"),
       })}
       searchEmptyScreenImage={

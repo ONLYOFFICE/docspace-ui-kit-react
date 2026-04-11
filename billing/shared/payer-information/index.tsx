@@ -41,6 +41,7 @@ import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useApi } from "../../../providers";
 
 import styles from "./PayerInformation.module.scss";
+import { getBrandName } from "../../../../../packages/shared/constants/brands";
 
 const PayerInformation = () => {
   const store = usePaymentStore();
@@ -95,19 +96,19 @@ const PayerInformation = () => {
 
     let invalidEmailDescription = isOwner
       ? t("UnknownPayerForOwner", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         })
       : t("UnknownPayerForAdmin", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         });
 
     if (isNotPaidPeriod) {
       invalidEmailDescription = isOwner
         ? t("InvalidEmailWithoutActiveSubscription", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           })
         : t("InvalidEmailWithoutActiveSubscriptionByAdmin", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           });
 
       return userNotFound + invalidEmailDescription;

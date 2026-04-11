@@ -67,6 +67,7 @@ import {
 } from "../../../../../components/context-menu";
 import { useApi } from "../../../../../providers";
 import { HelpButton } from "../../../../../components";
+import { getBrandName } from "../../../../../../../packages/shared/constants/brands";
 
 const ThinkingHelpButton = () => {
   const t = useCommonTranslation();
@@ -349,7 +350,7 @@ const ToolsSettings = ({
             .filter(Boolean),
         ];
 
-        const portalServerName = t("OrganizationName") + " " + t("ProductName");
+        const portalServerName = getBrandName("OrganizationName") + " " + getBrandName("ProductName");
 
         const name =
           server.serverType === ServerType.Portal
@@ -389,7 +390,7 @@ const ToolsSettings = ({
             <Text>
               {t("ConnectWebSearch", {
                 webSearch: t("WebSearchAI"),
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
               })}
             </Text>
             {isAdmin && goToWebSearchSettings ? (
