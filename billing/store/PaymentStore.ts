@@ -99,6 +99,8 @@ class PaymentStore {
 
   logoText = "";
 
+  openOnNewPage = true;
+
   utcOffset = "";
 
   routes: TPaymentRoutes = {
@@ -223,6 +225,8 @@ class PaymentStore {
       this.userId = config.user.id ?? "";
       this.isOwner = config.user.isOwner ?? false;
     }
+    if (config.openOnNewPage !== undefined)
+      this.openOnNewPage = config.openOnNewPage;
     if (config.mobileBreakpoint !== undefined)
       this.mobileBreakpoint = config.mobileBreakpoint;
     if (config.desktopBreakpoint !== undefined)

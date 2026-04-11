@@ -66,7 +66,6 @@ type TransactionHistoryReportResponse = {
 type TContact = Pick<TSelectorItem, "displayName" | "label"> & { id: string };
 
 type TransactionHistoryProps = {
-  openOnNewPage?: boolean;
   isMobile?: boolean;
   isTablet?: boolean;
   withoutHeader?: boolean;
@@ -161,7 +160,6 @@ const fetchTransactions = async (
 
 const TransactionHistory = (props: TransactionHistoryProps) => {
   const {
-    openOnNewPage,
     isMobile,
     isTablet,
     withoutHeader,
@@ -179,6 +177,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     isTransactionHistoryExist,
     formatDate,
     fetchTransactionHistory,
+    openOnNewPage,
   } = store;
 
   const { isNotPaidPeriod } = store.tariff;
@@ -471,9 +470,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         debit: isDebit,
         participantName: selectedContact?.id,
         serviceName,
-        ...(serviceName === AI_TOOLS
-          ? { writeOffServiceQuota: true }
-          : {}),
+        ...(serviceName === AI_TOOLS ? { writeOffServiceQuota: true } : {}),
       });
 
       const result = await new Promise<TransactionHistoryReportResponse>(
@@ -529,7 +526,6 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
   const datesComponent = (
     <div className={styles.transactionDates}>
       <CommonTrans
-       
         i18nKey="FromTo"
         components={{
           1: (
