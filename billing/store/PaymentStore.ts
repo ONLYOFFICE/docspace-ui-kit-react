@@ -48,6 +48,7 @@ import { formatCurrencyValue } from "../utils/common";
 import { combineUrl } from "../../utils/combineUrl";
 import {
   AI_ENUM,
+  AI_TOOLS,
   BACKUP_SERVICE,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
@@ -568,7 +569,13 @@ class PaymentStore {
         undefined,
         undefined,
         undefined,
-        { signal: abortController.signal },
+        {
+          signal: abortController.signal,
+          params:
+            serviceName === AI_TOOLS
+              ? { writeOffServiceQuota: true }
+              : undefined,
+        },
       );
 
       if (!res?.data?.response) return;
