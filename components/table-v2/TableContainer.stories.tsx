@@ -30,9 +30,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TableContainer } from "./table-container";
 import { TableHeader } from "./table-header";
 import { TableBody } from "./table-body";
-import { TableCell } from "./sub-components/table-cell";
 import { TableGroupMenu } from "./table-group-menu";
-import type { TTableColumn, TGroupMenuItem } from "./Table.types";
+import type { TTableColumnDef, TGroupMenuItem } from "./Table.types";
 
 // ─── Mock data ──────────────────────────────────────────────────────────────
 
@@ -66,7 +65,6 @@ function TableDemo({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [membersVisible, setMembersVisible] = useState(true);
   const [managerVisible, setManagerVisible] = useState(true);
-  const [hideColumns, setHideColumns] = useState(false);
 
   const allChecked = selected.size === MOCK_DATA.length;
   const isIndeterminate = selected.size > 0 && !allChecked;
@@ -87,7 +85,7 @@ function TableDemo({
     setSelected(checked ? new Set(MOCK_DATA.map((r) => r.id)) : new Set());
   };
 
-  const columns: TTableColumn[] = [
+  const columns: TTableColumnDef<MockGroup>[] = [
     {
       key: "name",
       title: "Name",
@@ -95,20 +93,37 @@ function TableDemo({
       enable: true,
       minWidth: 210,
       sortBy: "name",
+      render: (_value, row) => {
+        const isChecked = selected.has(row.id);
+        return (
+          <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={isChecked}
+              onChange={() => toggleRow(row.id)}
+            />
+            <span>{row.name}</span>
+          </label>
+        );
+      },
     },
     {
       key: "members",
       title: "Members",
       enable: membersVisible,
       sortBy: "members",
+      dataIndex: "members",
       onChange: () => setMembersVisible((v) => !v),
+      render: (value) => <span>{value as number}</span>,
     },
     {
       key: "manager",
       title: "Manager",
       enable: managerVisible,
       sortBy: "manager",
+      dataIndex: "manager",
       onChange: () => setManagerVisible((v) => !v),
+      render: (value) => <span>{value as string}</span>,
     },
   ];
 
@@ -146,11 +161,9 @@ function TableDemo({
 
       <TableContainer
         columns={columns}
-        data={MOCK_DATA}
         columnStorageName="storybook-table-v2-sizing"
         infoPanelVisible={infoPanelVisible}
         isIndexEditingMode={isIndexEditingMode}
-        setHideColumns={setHideColumns}
       >
         <TableHeader
           activeSortBy={sortBy}
@@ -159,43 +172,14 @@ function TableDemo({
         />
 
         <TableBody
-          itemCount={MOCK_DATA.length}
+          data={MOCK_DATA}
+          columns={columns}
           scrollContainerSelector=".section-scroll"
-        >
-          {(index) => {
-            const row = MOCK_DATA[index];
-            const isChecked = selected.has(row.id);
-            return (
-              <>
-                <TableCell
-                  className={isChecked ? "table-row-selected" : undefined}
-                >
-                  <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => toggleRow(row.id)}
-                    />
-                    <span>{row.name}</span>
-                  </label>
-                </TableCell>
-
-                {!hideColumns && (
-                  <>
-                    <TableCell>{row.members}</TableCell>
-                    <TableCell>{row.manager}</TableCell>
-                  </>
-                )}
-
-                {/* Context menu placeholder */}
-                <div
-                  className="table-container_row-context-menu-wrapper"
-                  style={{ width: 24 }}
-                />
-              </>
-            );
-          }}
-        </TableBody>
+          onRow={(row) => ({
+            className: selected.has(row.id) ? "table-row-selected" : undefined,
+            onClick: () => toggleRow(row.id),
+          })}
+        />
       </TableContainer>
     </div>
   );

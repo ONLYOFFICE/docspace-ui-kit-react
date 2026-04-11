@@ -187,21 +187,25 @@ export interface UseColumnResizeOptions {
  * there is no subpixel jump when React re-renders after mouseUp.
  */
 export function useColumnResize(options: UseColumnResizeOptions): {
-  headerRef: React.RefObject<HTMLDivElement | null>;
   onResizeMouseDown: (colIndex: number) => (e: React.MouseEvent) => void;
 } {
-  const headerRef = useRef<HTMLDivElement | null>(null);
-
   // Always-current options — no stale closures in drag handlers
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
-  /** Apply a new gridTemplateColumns string to the header and all body rows. */
+  /**
+   * Write a new grid string directly to the header and all virtual rows.
+   * Direct inline style writes avoid CSS-variable cascade overhead — the browser
+   * only reflows the specific elements rather than walking the entire subtree.
+   */
   const applyGridStr = useCallback((str: string) => {
-    if (headerRef.current) {
-      headerRef.current.style.gridTemplateColumns = str;
-    }
-    document
+    const container = optionsRef.current.containerRef.current;
+    if (!container) return;
+
+    const header = container.querySelector<HTMLElement>(".table-container_header");
+    if (header) header.style.gridTemplateColumns = str;
+
+    container
       .querySelectorAll<HTMLElement>(".table-container_row")
       .forEach((el) => {
         el.style.gridTemplateColumns = str;
@@ -255,8 +259,6 @@ export function useColumnResize(options: UseColumnResizeOptions): {
         // same references passed to add/removeEventListener.
 
         const onMouseMove = (evt: MouseEvent) => {
-          if (!headerRef.current) return;
-
           const column = document.getElementById(`column_${colIndex}`);
           if (!column) return;
 
@@ -266,7 +268,9 @@ export function useColumnResize(options: UseColumnResizeOptions): {
             ? rect.right - evt.clientX
             : evt.clientX - rect.left;
 
-          const currentStr = headerRef.current.style.gridTemplateColumns;
+          const container = optionsRef.current.containerRef.current;
+          const headerEl = container?.querySelector<HTMLElement>(".table-container_header");
+          const currentStr = headerEl?.style.gridTemplateColumns ?? "";
           if (!currentStr) return;
 
           const widths = currentStr.split(" ");
@@ -292,18 +296,28 @@ export function useColumnResize(options: UseColumnResizeOptions): {
         };
 
         const onMouseUp = () => {
-          const { saveSizing, setColumnSizing, columnKeys: keys } =
+          const { saveSizing, setColumnSizing, columnKeys: keys, containerRef } =
             optionsRef.current;
 
-          if (headerRef.current) {
-            const str = headerRef.current.style.gridTemplateColumns;
-            if (str) {
-              // parseSizingFromStr uses parseFloat which works for both
-              // "300fr" and "300px" — fr values are saved as columnSizing.
-              const sizing = parseSizingFromStr(str, keys);
-              setColumnSizing(sizing);
-              saveSizing(sizing);
-            }
+          const container = containerRef.current;
+          const headerEl = container?.querySelector<HTMLElement>(".table-container_header");
+          const str = headerEl?.style.gridTemplateColumns ?? "";
+
+          if (str && container) {
+            // Handoff: write final value into --table-gtc, then clear all inline
+            // gridTemplateColumns so elements fall back to var(--table-gtc).
+            container.style.setProperty("--table-gtc", str);
+            if (headerEl) headerEl.style.gridTemplateColumns = "";
+            container
+              .querySelectorAll<HTMLElement>(".table-container_row")
+              .forEach((el) => {
+                el.style.gridTemplateColumns = "";
+              });
+
+            // One React state update + localStorage.
+            const sizing = parseSizingFromStr(str, keys);
+            setColumnSizing(sizing);
+            saveSizing(sizing);
           }
 
           window.removeEventListener("mousemove", onMouseMove);
@@ -316,5 +330,5 @@ export function useColumnResize(options: UseColumnResizeOptions): {
     [applyGridStr],
   );
 
-  return { headerRef, onResizeMouseDown };
+  return { onResizeMouseDown };
 }

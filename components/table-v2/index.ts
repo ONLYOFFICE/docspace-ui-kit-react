@@ -50,4 +50,4 @@ export { GroupMenuItem } from "./sub-components/group-menu-item";
 export { TableGroupMenu } from "./table-group-menu";
 export type { TableGroupMenuProps } from "./table-group-menu";
 
-export type { TTableColumn, TGroupMenuItem } from "./Table.types";
+export type { TTableColumn, TTableColumnDef, TGroupMenuItem } from "./Table.types";

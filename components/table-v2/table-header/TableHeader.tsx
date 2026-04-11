@@ -30,11 +30,6 @@ import classNames from "classnames";
 import type { Header } from "@tanstack/react-table";
 
 import { useTableCtx } from "../context/TableContext";
-import {
-  SETTINGS_COLUMN_SIZE,
-  MIN_COLUMN_SIZE,
-  MIN_NAME_COLUMN_SIZE,
-} from "../Table.constants";
 import { TableSettings } from "../sub-components/table-settings";
 import styles from "../Table.module.scss";
 
@@ -42,7 +37,7 @@ export interface TableHeaderProps {
   /** External sort key (e.g. "title", "membersCount") */
   activeSortBy?: string;
   /** External sort direction */
-  activeSortOrder?: "ascending" | "descending";
+  activeSortOrder?: string;
   /** Whether to render the settings gear button (default: true) */
   showSettings?: boolean;
   /** Title attribute for the settings icon button */
@@ -66,36 +61,8 @@ export function TableHeader({
   tagRef,
   className,
 }: TableHeaderProps) {
-  const { table, columnSizing, hideColumns, isIndexEditingMode, headerRef } =
+  const { table, columnSizing, hideColumns, isIndexEditingMode, onResizeMouseDown } =
     useTableCtx();
-
-  const gridTemplateColumns = useMemo(() => {
-    const visibleCols = table.getVisibleLeafColumns();
-
-    const parts = visibleCols.map((col) => {
-      const meta = col.columnDef.meta as Record<string, unknown> | undefined;
-      const isDefault = meta?.isDefault as boolean | undefined;
-      const isShort = meta?.isShort as boolean | undefined;
-      const defaultSize = meta?.defaultSize as number | undefined;
-
-      // Fixed and short columns: always px, never scale
-      if (defaultSize != null) return `${defaultSize}px`;
-      if (isShort) return `${col.getSize()}px`;
-
-      // Collapse non-essential columns when container is too narrow
-      if (hideColumns && !isDefault) return "0px";
-
-      // Flex columns: minmax(min, Xfr) — browser scales proportionally,
-      // column never shrinks below its minimum.
-      const minSize =
-        col.columnDef.minSize ??
-        (isDefault ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE);
-      return `minmax(${minSize}px, ${col.getSize()}fr)`;
-    });
-
-    parts.push(`${SETTINGS_COLUMN_SIZE}px`);
-    return parts.join(" ");
-  }, [table, columnSizing, hideColumns]);
 
   // Build settings columns list from table columns that have onChange meta
   const settingsColumns = useMemo(() => {
@@ -118,21 +85,12 @@ export function TableHeader({
 
   return (
     <div
-      ref={(node) => {
-        // Attach both the DOM-resize ref and the optional external tagRef
-        (headerRef as { current: HTMLDivElement | null }).current = node;
-        if (typeof tagRef === "function") {
-          tagRef(node);
-        } else if (tagRef && "current" in tagRef) {
-          (tagRef as { current: HTMLDivElement | null }).current = node;
-        }
-      }}
+      ref={tagRef}
       className={classNames(
         styles.tableHeader,
         "table-container_header",
         className,
       )}
-      style={{ gridTemplateColumns }}
       data-testid="table-header"
     >
       {table.getHeaderGroups().map((headerGroup) => {
@@ -149,6 +107,7 @@ export function TableHeader({
             isLastColumn={idx === visibleHeaders.length - 1}
             hideColumns={hideColumns}
             isIndexEditingMode={isIndexEditingMode}
+            onResizeMouseDown={onResizeMouseDown}
           />
         ));
       })}
@@ -176,10 +135,11 @@ interface HeaderCellProps {
   /** Visual (zero-based) index within the visible headers array */
   visualIndex: number;
   activeSortBy?: string;
-  activeSortOrder?: "ascending" | "descending";
+  activeSortOrder?: string;
   isLastColumn?: boolean;
   hideColumns: boolean;
   isIndexEditingMode: boolean;
+  onResizeMouseDown: (colIndex: number) => (e: React.MouseEvent) => void;
 }
 
 function HeaderCell({
@@ -190,9 +150,8 @@ function HeaderCell({
   isLastColumn,
   hideColumns,
   isIndexEditingMode,
+  onResizeMouseDown,
 }: HeaderCellProps) {
-  const { onResizeMouseDown } = useTableCtx();
-
   const meta = header.column.columnDef.meta as
     | Record<string, unknown>
     | undefined;
@@ -234,7 +193,6 @@ function HeaderCell({
     },
   );
 
-  // Determine checkbox from meta
   const checkboxMeta = meta?.checkbox as
     | {
         value: boolean;
@@ -255,7 +213,6 @@ function HeaderCell({
       data-testid={`column-${header.id}`}
     >
       {checkboxMeta ? (
-        // Checkbox header cell (e.g. selection column)
         <input
           type="checkbox"
           checked={checkboxMeta.value}
@@ -302,4 +259,3 @@ function HeaderCell({
     </div>
   );
 }
-

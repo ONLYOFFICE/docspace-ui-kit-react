@@ -24,7 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { createContext, use } from "react";
+import type React from "react";
+import { createContext, use } from "react";
 
 import type { Table, ColumnSizingState } from "@tanstack/react-table";
 
@@ -43,8 +44,6 @@ interface TableContextValue {
   hideColumns: boolean;
   /** True when table is in inline-editing mode (hides resize handles) */
   isIndexEditingMode: boolean;
-  /** Ref attached to the header div — used by useColumnResize for DOM mutations */
-  headerRef: React.RefObject<HTMLDivElement | null>;
   /**
    * Returns the mousedown handler for the resize handle at visual column index
    * `colIndex`. Called by TableHeader for each non-last, resizable column.

@@ -29,6 +29,12 @@
 @use "../../styles/mixins";
 @use "../../styles/variables/colors";
 
+@property --table-gtc {
+  syntax: "<string>";
+  inherits: false;
+  initial-value: none;
+}
+
 // ===== Container =====
 
 .tableContainer {
@@ -39,7 +45,7 @@
   margin-top: -25px;
   overflow-x: clip; // clip overflow without creating a scroll container (preserves sticky header)
   & * {
-    user-select: none;
+    user-select: none !important;
   }
 
   &.isResizing,
@@ -78,6 +84,7 @@
   position: sticky;
   top: 0;
   display: grid;
+  grid-template-columns: var(--table-gtc);
   z-index: 200;
   height: 39px;
   background: var(--header-bg);
@@ -223,6 +230,7 @@
   left: 0;
   width: 100%;
   display: grid;
+  grid-template-columns: var(--table-gtc);
 
   :global(.table-container_cell) {
     display: flex;

@@ -29,12 +29,19 @@ import classNames from "classnames";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { useTableCtx } from "../context/TableContext";
-import { SETTINGS_COLUMN_SIZE, MIN_COLUMN_SIZE, MIN_NAME_COLUMN_SIZE } from "../Table.constants";
+import type { TTableColumnDef } from "../Table.types";
 import styles from "../Table.module.scss";
 
-export interface TableBodyProps {
-  /** Total number of rows (may exceed loaded data for infinite scroll) */
-  itemCount: number;
+export interface TableBodyProps<TData> {
+  /** Row data array. When omitted, itemCount must be provided for infinite scroll. */
+  data: TData[];
+  /** Column definitions with typed render functions. */
+  columns: TTableColumnDef<TData>[];
+  /**
+   * Total number of rows for the virtualizer.
+   * Defaults to data.length. Override for infinite scroll with a server total.
+   */
+  itemCount?: number;
   /** Whether there are more rows to load */
   hasMore?: boolean;
   /** Whether a load is currently in progress */
@@ -53,19 +60,23 @@ export interface TableBodyProps {
   /** Additional CSS class for the body wrapper */
   className?: string;
   /**
-   * Optional extra HTML attributes injected into each virtual row container div.
-   * Use this to attach onClick, onContextMenu, className, data-*, etc.
+   * antd-style row event handler — mirrors Table onRow.
+   * Returns HTML attributes applied to the virtual row div.
    */
-  getRowProps?: (index: number) => React.HTMLAttributes<HTMLDivElement>;
+  onRow?: (
+    record: TData,
+    index: number,
+  ) => React.HTMLAttributes<HTMLDivElement> & Record<string, unknown>;
   /**
-   * Children-as-function — receives the row index and returns the row node.
-   * This decouples the body from row data: the consumer renders whatever it
-   * needs (including checkboxes, context menus, etc.) using its own data.
+   * Renders content inside the last (settings/actions) column for each row.
+   * Typically a ContextMenuButton.
    */
-  children: (index: number) => React.ReactNode;
+  rowActions?: (record: TData, index: number) => React.ReactNode;
 }
 
-export function TableBody({
+export function TableBody<TData>({
+  data,
+  columns,
   itemCount,
   hasMore = false,
   isLoading = false,
@@ -74,35 +85,25 @@ export function TableBody({
   overscan = 20,
   scrollContainerSelector = ".section-scroll",
   className,
-  getRowProps,
-  children,
-}: TableBodyProps) {
-  const { table, columnSizing, hideColumns } = useTableCtx();
+  onRow,
+  rowActions,
+}: TableBodyProps<TData>) {
+  const { table, columnSizing } = useTableCtx();
 
-  const gridTemplateColumns = useMemo(() => {
-    const visibleCols = table.getVisibleLeafColumns();
+  const resolvedItemCount = itemCount ?? data.length;
 
-    const parts = visibleCols.map((col) => {
-      const meta = col.columnDef.meta as Record<string, unknown> | undefined;
-      const isDefault = meta?.isDefault as boolean | undefined;
-      const isShort = meta?.isShort as boolean | undefined;
-      const defaultSize = meta?.defaultSize as number | undefined;
-
-      if (defaultSize != null) return `${defaultSize}px`;
-      if (isShort) return `${col.getSize()}px`;
-
-      if (hideColumns && !isDefault) return "0px";
-
-      const minSize = col.columnDef.minSize ?? (isDefault ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE);
-      return `minmax(${minSize}px, ${col.getSize()}fr)`;
-    });
-
-    parts.push(`${SETTINGS_COLUMN_SIZE}px`);
-    return parts.join(" ");
-  }, [table, columnSizing, hideColumns]);
+  // Visible columns matched to TTableColumnDef entries by key.
+  // grid-template-columns is applied via --table-gtc CSS variable set on the
+  // container; rows inherit it automatically — no inline style needed here.
+  const visibleColumns = useMemo(() => {
+    const visibleIds = new Set(
+      table.getVisibleLeafColumns().map((c) => c.id),
+    );
+    return columns.filter((c) => visibleIds.has(c.key));
+  }, [table, columns, columnSizing]);
 
   const virtualizer = useVirtualizer({
-    count: itemCount,
+    count: resolvedItemCount,
     estimateSize: () => itemHeight,
     overscan,
     getScrollElement: () =>
@@ -111,18 +112,16 @@ export function TableBody({
 
   const virtualItems = virtualizer.getVirtualItems();
 
-  // Infinite scroll: trigger fetchMore when the last virtual item approaches
-  // the end of the loaded data
   useEffect(() => {
     if (!fetchMore || !hasMore || isLoading) return;
 
     const lastItem = virtualItems[virtualItems.length - 1];
     if (!lastItem) return;
 
-    if (lastItem.index >= itemCount - 1) {
+    if (lastItem.index >= resolvedItemCount - 1) {
       fetchMore();
     }
-  }, [virtualItems, itemCount, hasMore, isLoading, fetchMore]);
+  }, [virtualItems, resolvedItemCount, hasMore, isLoading, fetchMore]);
 
   return (
     <div
@@ -135,8 +134,12 @@ export function TableBody({
       style={{ height: `${virtualizer.getTotalSize()}px` }}
     >
       {virtualItems.map((virtualItem) => {
-        const rowProps = getRowProps?.(virtualItem.index) ?? {};
+        const index = virtualItem.index;
+        const record = data[index];
+
+        const rowProps = onRow?.(record, index) ?? {};
         const { className: rowClassName, ...restRowProps } = rowProps;
+
         return (
           <div
             key={virtualItem.key}
@@ -146,19 +149,40 @@ export function TableBody({
               rowClassName,
             )}
             style={{
-              gridTemplateColumns,
               transform: `translateY(${virtualItem.start}px)`,
               height: `${virtualItem.size}px`,
             }}
-            data-index={virtualItem.index}
+            data-index={index}
             data-testid="table-virtual-row"
             {...restRowProps}
           >
-            {children(virtualItem.index)}
+            {visibleColumns.map((col) => {
+              const value = col.dataIndex ? record[col.dataIndex] : record;
+
+              const extraClass =
+                typeof col.cellClassName === "function"
+                  ? col.cellClassName(record, index)
+                  : col.cellClassName;
+
+              return (
+                <div
+                  key={col.key}
+                  className={classNames("table-container_cell", extraClass)}
+                >
+                  {col.render
+                    ? col.render(value, record, index)
+                    : String(value ?? "")}
+                </div>
+              );
+            })}
+
+            {/* Settings / actions column — always rendered last */}
+            <div className="table-container_row-context-menu-wrapper">
+              {rowActions?.(record, index)}
+            </div>
           </div>
         );
       })}
     </div>
   );
 }
-

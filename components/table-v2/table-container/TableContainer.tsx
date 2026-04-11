@@ -49,10 +49,20 @@ import {
   columnsToVisibility,
   columnsToKeys,
 } from "../Table.utils";
-import { MIN_COLUMN_SIZE } from "../Table.constants";
+import {
+  MIN_COLUMN_SIZE,
+  MIN_NAME_COLUMN_SIZE,
+  SETTINGS_COLUMN_SIZE,
+} from "../Table.constants";
 import type { TTableColumn } from "../Table.types";
 
 import styles from "../Table.module.scss";
+
+// ─── CSS custom property type ─────────────────────────────────────────────────
+// React.CSSProperties doesn't include custom properties by default.
+interface TableContainerStyle extends React.CSSProperties {
+  "--table-gtc": string;
+}
 
 export interface TableContainerProps<TData = unknown> {
   /** Column definitions (TTableColumn shape) */
@@ -154,6 +164,33 @@ export function TableContainer<TData = unknown>({
     [effectiveVisibility, onColumnVisibilityChange],
   );
 
+  // ─── gridTemplateColumns CSS variable ────────────────────────────────────
+  // Computed once here from typed `columns` prop — no TanStack meta access needed.
+  // Set as --table-gtc on the container; header and rows read it via var(--table-gtc).
+  // During drag useColumnResize writes the same property directly, zero React renders.
+
+  const gridTemplateColumns = useMemo(() => {
+    const visibleCols = columns.filter(
+      (c) => effectiveVisibility[c.key] !== false,
+    );
+    const parts = visibleCols.map((col) => {
+      if (col.defaultSize != null) return `${col.defaultSize}px`;
+      if (col.isShort) {
+        const sz = columnSizing[col.key] ?? col.minWidth ?? MIN_COLUMN_SIZE;
+        return `${sz}px`;
+      }
+      if (hideColumns && !col.default) return "0px";
+      const size =
+        columnSizing[col.key] ??
+        (col.default ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE);
+      const minSize =
+        col.minWidth ?? (col.default ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE);
+      return `minmax(${minSize}px, ${size}fr)`;
+    });
+    parts.push(`${SETTINGS_COLUMN_SIZE}px`);
+    return parts.join(" ");
+  }, [columns, columnSizing, effectiveVisibility, hideColumns]);
+
   // ─── TanStack table instance ──────────────────────────────────────────────
   // Column resizing is handled via DOM mutations in useColumnResize; TanStack
   // is used only for column definitions, visibility, and sorting.
@@ -191,7 +228,7 @@ export function TableContainer<TData = unknown>({
     [columnKeys, effectiveVisibility],
   );
 
-  const { headerRef, onResizeMouseDown } = useColumnResize({
+  const { onResizeMouseDown } = useColumnResize({
     containerRef,
     columnSizing,
     containerWidth,
@@ -216,7 +253,6 @@ export function TableContainer<TData = unknown>({
       columnSizing,
       hideColumns,
       isIndexEditingMode,
-      headerRef,
       onResizeMouseDown,
     }),
     [
@@ -229,6 +265,8 @@ export function TableContainer<TData = unknown>({
     ],
   );
 
+  const gtcStyle: TableContainerStyle = { "--table-gtc": gridTemplateColumns };
+
   return (
     <TableProvider value={contextValue}>
       <div
@@ -238,6 +276,7 @@ export function TableContainer<TData = unknown>({
           "table-container",
           className,
         )}
+        style={gtcStyle}
         data-testid="table-container"
         data-container-width={containerWidth}
       >
@@ -246,4 +285,3 @@ export function TableContainer<TData = unknown>({
     </TableProvider>
   );
 }
-
