@@ -20,9 +20,7 @@ type ModelSettingsRowViewProps = {
 };
 
 const RowView = (props: ModelSettingsRowViewProps) => {
-  const {
-    isDisabled,
-  } = props;
+  const { isDisabled } = props;
 
   const servicesStore = useServicesStore();
 
@@ -48,7 +46,6 @@ const RowView = (props: ModelSettingsRowViewProps) => {
       <Text className={styles.introText}>
         <CommonTrans
           i18nKey="AIModelsIntro"
-         
           components={{
             1: (
               <Link
@@ -89,7 +86,7 @@ const RowView = (props: ModelSettingsRowViewProps) => {
               <div className={styles.content}>
                 <div className={styles.titleRow}>
                   <Text
-                    fontSize="13px"
+                    fontSize="14px"
                     fontWeight={600}
                     className={styles.title}
                   >
@@ -136,3 +133,4 @@ const RowView = (props: ModelSettingsRowViewProps) => {
 };
 
 export default observer(RowView);
+
