@@ -732,7 +732,7 @@ class PaymentStore {
 
   initWalletPayerAndBalance = async (isRefresh: boolean) => {
     await Promise.all([
-      this.tariff.fetchCustomerInfo(),
+      this.tariff.fetchCustomerInfo(isRefresh),
       this.fetchBalance(isRefresh),
     ]);
   };
@@ -934,6 +934,14 @@ class PaymentStore {
       await Promise.all(requests);
 
       this.setPaymentMethodInit(true);
+
+      if (isRefresh) {
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname,
+        );
+      }
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
       toastr.error(t("UnexpectedError"));
