@@ -165,35 +165,37 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
         />
       )}
 
-      {priceInfoPerManager}
+      <div className={styles.priceBottomSection}>
+        {priceInfoPerManager}
 
-      <TotalTariffContainer t={t} isDisabled={isDisabled} />
+        <TotalTariffContainer t={t} isDisabled={isDisabled} />
 
-      {isPayer && walletCustomerStatusNotActive ? (
-        <div className={styles.cardUnlinkedWarning}>
-          <Text fontWeight={600} className={styles.warningColor}>
-            {t("CardUnlinked")}
-          </Text>
-          <Text as="span" className={styles.warningColor}>
-            {t("LinkNewCard")}
-          </Text>
-          <div>
-            <Link
-              onClick={goLinkCard}
-              fontWeight={600}
-              textDecoration="underline"
-              color="accent"
-            >
-              {t("AddPaymentMethod")}
-            </Link>
+        {isPayer && walletCustomerStatusNotActive ? (
+          <div className={styles.cardUnlinkedWarning}>
+            <Text fontWeight={600} className={styles.warningColor}>
+              {t("CardUnlinked")}
+            </Text>
+            <Text as="span" className={styles.warningColor}>
+              {t("LinkNewCard")}
+            </Text>
+            <div>
+              <Link
+                onClick={goLinkCard}
+                fontWeight={600}
+                textDecoration="underline"
+                color="accent"
+              >
+                {t("AddPaymentMethod")}
+              </Link>
+            </div>
           </div>
-        </div>
-      ) : null}
+        ) : null}
 
-      <ButtonContainer
-        isDisabled={walletCustomerStatusNotActive || isDisabled}
-        t={t}
-      />
+        <ButtonContainer
+          isDisabled={walletCustomerStatusNotActive || isDisabled}
+          t={t}
+        />
+      </div>
     </div>
   );
 });
