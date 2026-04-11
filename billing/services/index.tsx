@@ -56,7 +56,7 @@ import StoragePlanCancel from "./panels/additional-storage/StoragePlanCancel";
 import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
 import AIServiceDialog from "./panels/ai-service/AIServiceDialog";
-import { getBrandName } from "../../../../packages/shared/constants/brands";
+import { getBrandName } from "@docspace/shared/constants/brands";
 type TServicesProps = {
   showPortalSettingsLoader?: boolean;
   initialOpenDialog?: string;

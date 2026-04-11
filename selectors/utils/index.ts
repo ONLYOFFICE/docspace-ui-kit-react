@@ -43,7 +43,7 @@ import { getTitleWithoutExtension } from "../../utils/getTitleWithoutExtension";
 import type { TSelectorItem } from "../../components/selector";
 
 import { DEFAULT_FILE_EXTS } from "./constants";
-import { getBrandName } from "../../../../packages/shared/constants/brands";
+import { getBrandName } from "@docspace/shared/constants/brands";
 
 export const convertRoomsToItems = (
   rooms: FolderDtoInteger[],

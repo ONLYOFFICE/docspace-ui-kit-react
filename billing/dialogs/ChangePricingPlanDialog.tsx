@@ -35,7 +35,7 @@ import { getConvertedSize } from "../utils/common";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./ChangePricingPlan.module.scss";
-import { getBrandName } from "../../../../packages/shared/constants/brands";
+import { getBrandName } from "@docspace/shared/constants/brands";
 
 type ChangePricingPlanDialogProps = {
   visible: boolean;

@@ -41,7 +41,7 @@ import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useApi } from "../../../providers";
 
 import styles from "./PayerInformation.module.scss";
-import { getBrandName } from "../../../../../packages/shared/constants/brands";
+import { getBrandName } from "@docspace/shared/constants/brands";
 
 const PayerInformation = () => {
   const store = usePaymentStore();

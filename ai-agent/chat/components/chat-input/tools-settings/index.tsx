@@ -67,7 +67,7 @@ import {
 } from "../../../../../components/context-menu";
 import { useApi } from "../../../../../providers";
 import { HelpButton } from "../../../../../components";
-import { getBrandName } from "../../../../../../../packages/shared/constants/brands";
+import { getBrandName } from "@docspace/shared/constants/brands";
 
 const ThinkingHelpButton = () => {
   const t = useCommonTranslation();

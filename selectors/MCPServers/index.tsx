@@ -39,7 +39,7 @@ import {
 } from "../../components/selector";
 import { useTheme } from "../../context/ThemeContext";
 import { useApi } from "../../providers/api/ApiProvider";
-import { getBrandName } from "../../../../packages/shared/constants/brands";
+import { getBrandName } from "@docspace/shared/constants/brands";
 
 const getServerIcon = (type: ServerType, _isBase: boolean) => {
   switch (type) {

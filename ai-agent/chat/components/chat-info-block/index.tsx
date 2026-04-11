@@ -33,7 +33,7 @@ import PublicRoomBar from "../../../../components/public-room-bar";
 import { ChatInfoBlockProps } from "../../Chat.types";
 import styles from "./ChatInfoBlock.module.scss";
 import { useCommonTranslation } from "../../../../utils/i18n";
-import { getBrandName } from "../../../../../../packages/shared/constants/brands";
+import { getBrandName } from "@docspace/shared/constants/brands";
 
 export const ChatInfoBlock = ({
   standalone,

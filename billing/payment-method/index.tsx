@@ -43,7 +43,7 @@ import PaymentMethodLoader from "./PaymentMethodLoader";
 import PayerInformation from "../shared/payer-information";
 import { CardInformation } from "../shared/card-information";
 import StorageTariffDeactivated from "../dialogs/StorageTariffDeactivated";
-import { getBrandName } from "../../../../packages/shared/constants/brands";
+import { getBrandName } from "@docspace/shared/constants/brands";
 
 interface PaymentMethodProps {
   showPortalSettingsLoader?: boolean;

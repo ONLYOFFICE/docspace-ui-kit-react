@@ -42,7 +42,7 @@ import PriceCalculation from "./PriceCalculation";
 import BenefitsContainer from "./BenefitsContainer";
 import ContactContainer from "./ContactContainer";
 import styles from "./MainTariff.module.scss";
-import { getBrandName } from "../../../../packages/shared/constants/brands";
+import { getBrandName } from "@docspace/shared/constants/brands";
 
 const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
 
