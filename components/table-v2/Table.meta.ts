@@ -24,28 +24,24 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { Table } from "./table";
-export type { TableProps } from "./table";
+import type { Column } from "@tanstack/react-table";
 
-export { TableContainer } from "./table-container";
-export type { TableContainerProps } from "./table-container";
+import type { TTableColumn } from "./Table.types";
 
-export { TableHeader } from "./table-header";
-export type { TableHeaderProps } from "./table-header";
+/**
+ * Safely extracts TTableColumn fields from a TanStack column's meta object.
+ *
+ * TanStack's ColumnMeta is an empty interface by default. We store TTableColumn
+ * fields in it at column-def creation time (Table.utils.ts). This type guard
+ * confirms meta is a non-null object so we can treat it as Partial<TTableColumn>
+ * without unsafe double-casting every individual field.
+ */
+function isColumnMeta(meta: unknown): meta is Partial<TTableColumn> {
+  return meta !== null && typeof meta === "object";
+}
 
-export { TableBody } from "./table-body";
-export type { TableBodyProps } from "./table-body";
-
-
-export { TableSettings } from "./sub-components/table-settings";
-export type {
-  TableSettingsProps,
-  TableSettingsColumn,
-} from "./sub-components/table-settings";
-
-export { GroupMenuItem } from "./sub-components/group-menu-item";
-
-export { TableGroupMenu } from "./table-group-menu";
-export type { TableGroupMenuProps } from "./table-group-menu";
-
-export type { TTableColumn, TTableColumnDef, TGroupMenuItem } from "./Table.types";
+// biome-ignore lint: Column<any, any> needed — meta type is erased at context boundary
+export function getColumnMeta(col: Column<any, any>): Partial<TTableColumn> {
+  const meta = col.columnDef.meta;
+  return isColumnMeta(meta) ? meta : {};
+}

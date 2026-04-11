@@ -26,7 +26,6 @@
 
 import React, { memo, useRef, useState } from "react";
 import { ReactSVG } from "react-svg";
-import { isChrome, browserVersion } from "react-device-detect";
 import classNames from "classnames";
 
 import { Button, ButtonSize } from "../../../button";

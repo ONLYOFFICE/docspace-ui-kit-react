@@ -26,7 +26,12 @@
 
 import React from "react";
 
-import type { SortingState, OnChangeFn, VisibilityState, ColumnSizingState } from "@tanstack/react-table";
+import type {
+  SortingState,
+  OnChangeFn,
+  VisibilityState,
+  ColumnSizingState,
+} from "@tanstack/react-table";
 
 import { TableContainer } from "../table-container";
 import { TableHeader, type TableHeaderProps } from "../table-header";
@@ -57,7 +62,7 @@ export interface TableProps<TData> {
   /** Additional CSS class for the container div */
   className?: string;
   /** Forwarded ref for the container div */
-  forwardedRef?: React.Ref<HTMLDivElement>;
+  forwardedRef?: React.RefObject<HTMLDivElement | null>;
   /** Notifies parent when hideColumns state changes */
   setHideColumns?: (hide: boolean) => void;
 
@@ -105,6 +110,8 @@ export interface TableProps<TData> {
   itemHeight?: number;
   /** Virtualizer overscan count (default: 20) */
   overscan?: number;
+  /** Ref to the scroll container (takes priority over scrollContainerSelector) */
+  scrollElementRef?: React.RefObject<HTMLElement | null>;
   /** CSS selector for the scroll container element */
   scrollContainerSelector?: string;
   /** Additional CSS class for the body wrapper */
@@ -126,22 +133,6 @@ export interface TableProps<TData> {
  * Wraps TableContainer + TableHeader + TableBody and exposes their combined
  * API as a flat props object so consumers never need to import or compose the
  * sub-components directly.
- *
- * @example
- * ```tsx
- * <Table
- *   columns={columns}
- *   data={groups}
- *   columnStorageName="groups-table"
- *   activeSortBy={filter.sortBy}
- *   activeSortOrder={filter.sortOrder}
- *   showSettings
- *   hasMore={hasMoreGroups}
- *   fetchMore={fetchMoreGroups}
- *   onRow={onRow}
- *   rowActions={rowActions}
- * />
- * ```
  */
 export function Table<TData>({
   // data & columns
@@ -178,6 +169,7 @@ export function Table<TData>({
   fetchMore,
   itemHeight,
   overscan,
+  scrollElementRef,
   scrollContainerSelector,
   bodyClassName,
   onRow,
@@ -217,6 +209,7 @@ export function Table<TData>({
         fetchMore={fetchMore}
         itemHeight={itemHeight}
         overscan={overscan}
+        scrollElementRef={scrollElementRef}
         scrollContainerSelector={scrollContainerSelector}
         className={bodyClassName}
         onRow={onRow}

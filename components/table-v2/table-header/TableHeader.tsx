@@ -30,6 +30,7 @@ import classNames from "classnames";
 import type { Header } from "@tanstack/react-table";
 
 import { useTableCtx } from "../context/TableContext";
+import { getColumnMeta } from "../Table.meta";
 import { TableSettings } from "../sub-components/table-settings";
 import styles from "../Table.module.scss";
 
@@ -67,18 +68,13 @@ export function TableHeader({
   // Build settings columns list from table columns that have onChange meta
   const settingsColumns = useMemo(() => {
     return table.getAllColumns().map((col) => {
-      const meta = col.columnDef.meta as Record<string, unknown> | undefined;
+      const meta = getColumnMeta(col);
       return {
         key: col.id,
-        title: (meta?.title as string) ?? col.id,
+        title: meta.title ?? col.id,
         enable: col.getIsVisible(),
-        isDisabled: (meta?.isDisabled as boolean) ?? false,
-        onChange: meta?.onChange
-          ? () => {
-              const fn = meta.onChange as (key: string) => void;
-              fn(col.id);
-            }
-          : undefined,
+        isDisabled: meta.isDisabled ?? false,
+        onChange: meta.onChange ? () => meta.onChange!(col.id) : undefined,
       };
     });
   }, [table, columnSizing]);
@@ -152,17 +148,11 @@ function HeaderCell({
   isIndexEditingMode,
   onResizeMouseDown,
 }: HeaderCellProps) {
-  const meta = header.column.columnDef.meta as
-    | Record<string, unknown>
-    | undefined;
+  const meta = getColumnMeta(header.column);
 
-  const sortBy = meta?.sortBy as string | undefined;
-  const isDefault = (meta?.isDefault as boolean) ?? false;
-  const isShort = (meta?.isShort as boolean) ?? false;
-  const defaultSize = meta?.defaultSize as number | undefined;
-  const onClick = meta?.onClick as
-    | ((sortBy: string, e: React.MouseEvent) => void)
-    | undefined;
+  const { sortBy, onClick, defaultSize } = meta;
+  const isDefault = meta.default ?? false;
+  const isShort = meta.isShort ?? false;
 
   const tanstackSorted = header.column.getIsSorted();
   const isExternalSorted = sortBy ? activeSortBy === sortBy : false;
@@ -193,13 +183,7 @@ function HeaderCell({
     },
   );
 
-  const checkboxMeta = meta?.checkbox as
-    | {
-        value: boolean;
-        isIndeterminate: boolean;
-        onChange: (e?: React.ChangeEvent<HTMLInputElement>) => void;
-      }
-    | undefined;
+  const checkboxMeta = meta.checkbox;
 
   return (
     <div
@@ -229,8 +213,7 @@ function HeaderCell({
             <span className={classNames(styles.text, "header-container-text")}>
               {header.isPlaceholder
                 ? null
-                : ((meta?.title as string) ??
-                  (header.column.columnDef.header as string))}
+                : (meta.title ?? String(header.column.columnDef.header ?? ""))}
             </span>
           </div>
           {sortBy && (

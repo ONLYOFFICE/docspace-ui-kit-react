@@ -92,7 +92,7 @@ export interface TableContainerProps<TData = unknown> {
   /** Additional CSS class for the container div */
   className?: string;
   /** Forwarded ref for the container div */
-  forwardedRef?: React.Ref<HTMLDivElement>;
+  forwardedRef?: React.RefObject<HTMLDivElement | null>;
   children: React.ReactNode;
 }
 
@@ -270,7 +270,7 @@ export function TableContainer<TData = unknown>({
   return (
     <TableProvider value={contextValue}>
       <div
-        ref={containerRef as React.RefObject<HTMLDivElement>}
+        ref={containerRef}
         className={classNames(
           styles.tableContainer,
           "table-container",

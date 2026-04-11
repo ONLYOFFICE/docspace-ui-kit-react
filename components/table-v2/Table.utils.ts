@@ -46,7 +46,7 @@ export function columnDefsFromColumns<TData>(
       (col.default ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE),
     enableResizing: !col.defaultSize && col.resizable !== false,
     meta: {
-      isDefault: col.default ?? false,
+      default: col.default ?? false,
       isShort: col.isShort ?? false,
       isDisabled: col.isDisabled ?? false,
       defaultSize: col.defaultSize,

@@ -46,6 +46,10 @@ import type { TGroupMenuItem } from "../Table.types";
 
 import styles from "../Table.module.scss";
 
+interface TableGroupMenuStyle extends React.CSSProperties {
+  "--table-group-menu-checkbox-margin"?: string;
+}
+
 export interface TableGroupMenuProps {
   headerMenu: TGroupMenuItem[];
   isChecked: boolean;
@@ -114,6 +118,10 @@ export const TableGroupMenu = memo((props: TableGroupMenuProps) => {
     onChange?.(!isChecked);
   }, [isChecked, onChange]);
 
+  const groupMenuStyle: TableGroupMenuStyle = {
+    "--table-group-menu-checkbox-margin": checkboxMargin,
+  };
+
   const toggleIconColor = isInfoPanelVisible ? "accent" : undefined;
 
   return (
@@ -122,9 +130,7 @@ export const TableGroupMenu = memo((props: TableGroupMenuProps) => {
         styles.tableGroupMenu,
         "table-container_group-menu",
       )}
-      style={
-        { "--table-group-menu-checkbox-margin": checkboxMargin } as React.CSSProperties
-      }
+      style={groupMenuStyle}
       onClick={onClick}
       data-testid="table-group-menu"
     >

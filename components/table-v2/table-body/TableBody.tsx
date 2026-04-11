@@ -53,7 +53,13 @@ export interface TableBodyProps<TData> {
   /** Virtualizer overscan count (default: 20) */
   overscan?: number;
   /**
+   * Ref to the scroll container element.
+   * Takes priority over scrollContainerSelector when provided.
+   */
+  scrollElementRef?: React.RefObject<HTMLElement | null>;
+  /**
    * CSS selector for the scroll container element.
+   * Used as fallback when scrollElementRef is not provided.
    * Defaults to ".section-scroll" (DocSpace section scroll).
    */
   scrollContainerSelector?: string;
@@ -83,6 +89,7 @@ export function TableBody<TData>({
   fetchMore,
   itemHeight = 48,
   overscan = 20,
+  scrollElementRef,
   scrollContainerSelector = ".section-scroll",
   className,
   onRow,
@@ -96,9 +103,7 @@ export function TableBody<TData>({
   // grid-template-columns is applied via --table-gtc CSS variable set on the
   // container; rows inherit it automatically — no inline style needed here.
   const visibleColumns = useMemo(() => {
-    const visibleIds = new Set(
-      table.getVisibleLeafColumns().map((c) => c.id),
-    );
+    const visibleIds = new Set(table.getVisibleLeafColumns().map((c) => c.id));
     return columns.filter((c) => visibleIds.has(c.key));
   }, [table, columns, columnSizing]);
 
@@ -107,6 +112,7 @@ export function TableBody<TData>({
     estimateSize: () => itemHeight,
     overscan,
     getScrollElement: () =>
+      scrollElementRef?.current ??
       document.querySelector<HTMLElement>(scrollContainerSelector),
   });
 
@@ -186,3 +192,4 @@ export function TableBody<TData>({
     </div>
   );
 }
+

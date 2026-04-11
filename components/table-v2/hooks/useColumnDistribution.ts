@@ -210,11 +210,10 @@ export function useColumnDistribution(
   cols: TTableColumn[],
   initialPercents: Record<string, number> | null,
   saveSizing: (s: ColumnSizingState) => void,
-  forwardedRef?: React.Ref<HTMLDivElement>,
+  forwardedRef?: React.RefObject<HTMLDivElement | null>,
 ): UseColumnDistributionResult {
   const internalRef = useRef<HTMLDivElement>(null);
-  const containerRef =
-    (forwardedRef as React.RefObject<HTMLDivElement>) ?? internalRef;
+  const containerRef = forwardedRef ?? internalRef;
 
   const [columnSizing, setColumnSizing] = useState<ColumnSizingState>({});
   const [containerWidth, setContainerWidth] = useState(0);
@@ -241,13 +240,17 @@ export function useColumnDistribution(
     setContainerWidth(width);
     setHideColumns(computeHideColumns(cols, width));
 
+    const hasStoredData =
+      initialPercents != null && Object.keys(initialPercents).length > 0;
+
     const sized =
-      initialPercents && Object.keys(initialPercents).length > 0
+      hasStoredData && initialPercents
         ? percentsToSizing(cols, initialPercents, width)
         : computeDistribution(cols, width);
 
     setColumnSizing(sized);
-    saveSizing(sized);
+    // Only persist when we computed defaults — skip if user already had saved sizing
+    if (!hasStoredData) saveSizing(sized);
   });
 
   const onVisibilityChange = useEffectEvent((width: number) => {
@@ -266,7 +269,7 @@ export function useColumnDistribution(
   // useLayoutEffect fires after DOM is ready but before the browser paints,
   // so columnSizing is set correctly on the very first frame — no flicker.
   useLayoutEffect(() => {
-    const el = (containerRef as React.RefObject<HTMLDivElement>).current;
+    const el = containerRef.current;
     if (!el) return;
 
     const width = el.clientWidth;
@@ -281,7 +284,7 @@ export function useColumnDistribution(
     prevVisibleColKeysRef.current = visibleColKeysStr;
     if (!initializedRef.current) return;
 
-    const el = (containerRef as React.RefObject<HTMLDivElement>).current;
+    const el = containerRef.current;
     const width = el?.clientWidth ?? 0;
     if (width === 0) return;
 
@@ -292,7 +295,7 @@ export function useColumnDistribution(
   // CSS fr units handle proportional scaling automatically; we only need JS
   // to detect when the container becomes too narrow (hideColumns).
   useEffect(() => {
-    const el = (containerRef as React.RefObject<HTMLDivElement>).current;
+    const el = containerRef.current;
     if (!el) return;
 
     const ro = new ResizeObserver(() => {
