@@ -115,9 +115,10 @@ export function TableContainer<TData = unknown>({
     infoPanelVisible,
   };
 
-  const { initialSizing, saveSizing } = useColumnPersistence(
+  const { initialPercents, saveSizing } = useColumnPersistence(
     persistenceConfig,
     columnKeys,
+    columns,
   );
 
   const {
@@ -126,7 +127,7 @@ export function TableContainer<TData = unknown>({
     containerWidth,
     hideColumns,
     containerRef,
-  } = useColumnDistribution(columns, initialSizing, saveSizing, forwardedRef);
+  } = useColumnDistribution(columns, initialPercents, saveSizing, forwardedRef);
 
   // Notify parent when hideColumns changes
   useEffect(() => {

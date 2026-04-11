@@ -30,7 +30,7 @@ import classNames from "classnames";
 import type { Header } from "@tanstack/react-table";
 
 import { useTableCtx } from "../context/TableContext";
-import { SETTINGS_COLUMN_SIZE } from "../Table.constants";
+import { SETTINGS_COLUMN_SIZE, MIN_COLUMN_SIZE, MIN_NAME_COLUMN_SIZE } from "../Table.constants";
 import { TableSettings } from "../sub-components/table-settings";
 import styles from "../Table.module.scss";
 
@@ -71,24 +71,23 @@ export function TableHeader({
   const gridTemplateColumns = useMemo(() => {
     const visibleCols = table.getVisibleLeafColumns();
 
-    const parts = visibleCols.map((col, i) => {
+    const parts = visibleCols.map((col) => {
       const meta = col.columnDef.meta as Record<string, unknown> | undefined;
       const isDefault = meta?.isDefault as boolean | undefined;
       const isShort = meta?.isShort as boolean | undefined;
+      const defaultSize = meta?.defaultSize as number | undefined;
 
-      // When hiding columns: collapse non-essential columns to 0px
-      if (
-        hideColumns &&
-        !isDefault &&
-        !isShort &&
-        i !== visibleCols.length - 1
-      ) {
-        return "0px";
-      }
+      // Fixed and short columns: always px, never scale
+      if (defaultSize != null) return `${defaultSize}px`;
+      if (isShort) return `${col.getSize()}px`;
 
-      // Last visible column fills remaining space
-      if (i === visibleCols.length - 1) return "1fr";
-      return `${col.getSize()}px`;
+      // Collapse non-essential columns when container is too narrow
+      if (hideColumns && !isDefault) return "0px";
+
+      // Flex columns: minmax(min, Xfr) — browser scales proportionally,
+      // column never shrinks below its minimum.
+      const minSize = col.columnDef.minSize ?? (isDefault ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE);
+      return `minmax(${minSize}px, ${col.getSize()}fr)`;
     });
 
     parts.push(`${SETTINGS_COLUMN_SIZE}px`);

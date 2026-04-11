@@ -29,7 +29,7 @@ import classNames from "classnames";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { useTableCtx } from "../context/TableContext";
-import { SETTINGS_COLUMN_SIZE } from "../Table.constants";
+import { SETTINGS_COLUMN_SIZE, MIN_COLUMN_SIZE, MIN_NAME_COLUMN_SIZE } from "../Table.constants";
 import styles from "../Table.module.scss";
 
 export interface TableBodyProps {
@@ -82,22 +82,19 @@ export function TableBody({
   const gridTemplateColumns = useMemo(() => {
     const visibleCols = table.getVisibleLeafColumns();
 
-    const parts = visibleCols.map((col, i) => {
+    const parts = visibleCols.map((col) => {
       const meta = col.columnDef.meta as Record<string, unknown> | undefined;
       const isDefault = meta?.isDefault as boolean | undefined;
       const isShort = meta?.isShort as boolean | undefined;
+      const defaultSize = meta?.defaultSize as number | undefined;
 
-      if (
-        hideColumns &&
-        !isDefault &&
-        !isShort &&
-        i !== visibleCols.length - 1
-      ) {
-        return "0px";
-      }
+      if (defaultSize != null) return `${defaultSize}px`;
+      if (isShort) return `${col.getSize()}px`;
 
-      if (i === visibleCols.length - 1) return "1fr";
-      return `${col.getSize()}px`;
+      if (hideColumns && !isDefault) return "0px";
+
+      const minSize = col.columnDef.minSize ?? (isDefault ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE);
+      return `minmax(${minSize}px, ${col.getSize()}fr)`;
     });
 
     parts.push(`${SETTINGS_COLUMN_SIZE}px`);
@@ -129,7 +126,11 @@ export function TableBody({
 
   return (
     <div
-      className={classNames(styles.tableBody, "table-container_body", className)}
+      className={classNames(
+        styles.tableBody,
+        "table-container_body",
+        className,
+      )}
       data-testid="table-body"
       style={{ height: `${virtualizer.getTotalSize()}px` }}
     >
@@ -160,3 +161,4 @@ export function TableBody({
     </div>
   );
 }
+

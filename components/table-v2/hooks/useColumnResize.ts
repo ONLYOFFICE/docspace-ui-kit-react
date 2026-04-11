@@ -97,12 +97,12 @@ function moveToRight(
 
   if (column2Width + offset - HANDLE_OFFSET >= minSize) {
     // Normal case: right column absorbs the change
-    widths[columnIndex] = `${newWidth + HANDLE_OFFSET}px`;
-    widths[colIndex] = `${column2Width + offset - HANDLE_OFFSET}px`;
+    widths[columnIndex] = `${newWidth + HANDLE_OFFSET}fr`;
+    widths[colIndex] = `${column2Width + offset - HANDLE_OFFSET}fr`;
   } else if (column2Width !== minSize) {
     // Right column would go below min — clamp it, give remainder to current
-    widths[columnIndex] = `${getSubstring(widths[columnIndex]) + column2Width - minSize}px`;
-    widths[colIndex] = `${minSize}px`;
+    widths[columnIndex] = `${getSubstring(widths[columnIndex]) + column2Width - minSize}fr`;
+    widths[colIndex] = `${minSize}fr`;
   } else {
     // Right column already at min — cascade further right
     moveToRight(widths, columnIndex, newWidth, colIndex + 1);
@@ -145,9 +145,9 @@ function moveToLeft(
   const newLeftWidth = Math.max(leftColumnWidth, minSize);
   const actualTaken = leftWidth - newLeftWidth; // how much left col actually gave
 
-  widths[colIndex] = `${newLeftWidth}px`;
+  widths[colIndex] = `${newLeftWidth}fr`;
   // Current column gains exactly what was taken from the left column
-  widths[columnIndex] = `${getSubstring(widths[columnIndex]) + actualTaken}px`;
+  widths[columnIndex] = `${getSubstring(widths[columnIndex]) + actualTaken}fr`;
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
@@ -215,26 +215,36 @@ export function useColumnResize(options: UseColumnResizeOptions): {
 
         // ── Initialise all column widths to exact px values ───────────────────
         //
-        // Use columnSizing + containerWidth (from React state) rather than
-        // getBoundingClientRect() to avoid subpixel rounding.  The last data
-        // column is computed as "whatever fills the remaining space" so that
-        // the sum equals containerWidth exactly — matching what "1fr" renders to.
-        const { columnSizing, containerWidth, columnKeys } = optionsRef.current;
+        // CSS uses `fr` units so columnSizing px values don't match rendered
+        // widths. Read actual rendered widths from the header cell elements via
+        // getBoundingClientRect — this is the only reliable source when fr is
+        // in use. The last column gets whatever space remains so the sum is
+        // always exact.
+        const { containerWidth, columnKeys } = optionsRef.current;
 
         if (columnKeys.length > 0 && containerWidth > 0) {
           let sumOtherPx = 0;
-          const parts: string[] = columnKeys.map((key, i) => {
+          const parts: string[] = columnKeys.map((_key, i) => {
             if (i === columnKeys.length - 1) {
-              // Last data column: fill the remainder so widths sum precisely
-              const lastPx = Math.max(
+              // Last flex column: fill the remainder exactly.
+              const lastFr = Math.max(
                 containerWidth - sumOtherPx - SETTINGS_COLUMN_SIZE,
                 MIN_COLUMN_SIZE,
               );
-              return `${lastPx}px`;
+              return `${lastFr}fr`;
             }
-            const w = columnSizing[key] ?? MIN_COLUMN_SIZE;
+            // Read the actual rendered width from the header cell DOM element.
+            // This is required because CSS uses `fr` units — columnSizing px
+            // values don't match the rendered widths after container resize.
+            const el = document.getElementById(`column_${i}`);
+            const w = el
+              ? Math.round(el.getBoundingClientRect().width)
+              : MIN_COLUMN_SIZE;
             sumOtherPx += w;
-            return `${w}px`;
+            // Fixed/short columns keep px; flex columns use fr.
+            return el?.dataset.defaultSize || el?.dataset.isShort
+              ? `${w}px`
+              : `${w}fr`;
           });
           parts.push(`${SETTINGS_COLUMN_SIZE}px`);
           applyGridStr(parts.join(" "));
@@ -287,7 +297,9 @@ export function useColumnResize(options: UseColumnResizeOptions): {
 
           if (headerRef.current) {
             const str = headerRef.current.style.gridTemplateColumns;
-            if (str && !str.includes("1fr")) {
+            if (str) {
+              // parseSizingFromStr uses parseFloat which works for both
+              // "300fr" and "300px" — fr values are saved as columnSizing.
               const sizing = parseSizingFromStr(str, keys);
               setColumnSizing(sizing);
               saveSizing(sizing);
