@@ -28,7 +28,7 @@ import { useCallback, useRef } from "react";
 
 import type { ColumnSizingState } from "@tanstack/react-table";
 
-import type { TTableColumn } from "../Table.types";
+import type { TTableColumn, ColumnPersistenceConfig } from "../Table.types";
 
 // ─── Storage format ────────────────────────────────────────────────────────────
 //
@@ -137,12 +137,6 @@ function writePercents(
 }
 
 // ─── Hook ──────────────────────────────────────────────────────────────────────
-
-export interface ColumnPersistenceConfig {
-  columnStorageName: string;
-  columnInfoPanelStorageName?: string;
-  infoPanelVisible?: boolean;
-}
 
 /**
  * Manages column sizing persistence to localStorage.

@@ -24,31 +24,38 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import classNames from "classnames";
+import type React from "react";
 
-import type { TableCellProps } from "./TableCell.types";
+// biome-ignore lint: Table<any> is the correct generic here
+import type { Table, Header } from "@tanstack/react-table";
 
-/**
- * TableCell — a single data cell in a table row.
- *
- * Uses the global class `table-container_cell` so that SelectionArea and other
- * external CSS selectors can target it regardless of CSS Module hashing.
- */
-export function TableCell({
-  children,
-  className,
-  style,
-  forwardedRef,
-  dataTestId,
-}: TableCellProps) {
-  return (
-    <div
-      ref={forwardedRef}
-      className={classNames("table-container_cell", className)}
-      style={style}
-      data-testid={dataTestId ?? "table-cell"}
-    >
-      {children}
-    </div>
-  );
+export interface TableHeaderProps {
+  /** External sort key (e.g. "title", "membersCount") */
+  activeSortBy?: string;
+  /** External sort direction */
+  activeSortOrder?: string;
+  /** Whether to render the settings gear button (default: true) */
+  showSettings?: boolean;
+  /** Title attribute for the settings icon button */
+  settingsTitle?: string;
+  /** Custom render prop for the settings dropdown content */
+  // biome-ignore lint: Table<any> is the correct generic here
+  renderSettings?: (table: Table<any>) => React.ReactNode;
+  /** Forwarded ref for width measurement (e.g. tag-based dynamic width) */
+  tagRef?: React.Ref<HTMLDivElement>;
+  /** Additional CSS class */
+  className?: string;
+}
+
+export interface HeaderCellProps {
+  // biome-ignore lint: Header<any, any> is acceptable here
+  header: Header<any, any>;
+  /** Visual (zero-based) index within the visible headers array */
+  visualIndex: number;
+  activeSortBy?: string;
+  activeSortOrder?: string;
+  isLastColumn?: boolean;
+  hideColumns: boolean;
+  isIndexEditingMode: boolean;
+  onResizeMouseDown: (colIndex: number) => (e: React.MouseEvent) => void;
 }

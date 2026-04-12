@@ -32,18 +32,12 @@ import { Button, ButtonSize } from "../../../button";
 import { DropDown } from "../../../drop-down";
 import { DropDownItem } from "../../../drop-down-item";
 
-import type { TGroupMenuItem } from "../../Table.types";
 import styles from "../../Table.module.scss";
+import type { GroupMenuItemProps } from "./GroupMenuItem.types";
 
 const DESKTOP_WIDTH = 1024;
 const ITEM_HEIGHT_DESKTOP = 32;
 const ITEM_HEIGHT_TABLET_MOBILE = 36;
-
-interface GroupMenuItemProps {
-  item: TGroupMenuItem;
-  isBlocked?: boolean;
-  dataTestId?: string;
-}
 
 export const GroupMenuItem = memo(function GroupMenuItem({
   item,

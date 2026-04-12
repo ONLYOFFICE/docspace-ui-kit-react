@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import classNames from "classnames";
 
 import {
@@ -33,15 +33,11 @@ import {
   getSortedRowModel,
   type ColumnSizingState,
   type VisibilityState,
-  type SortingState,
   type OnChangeFn,
 } from "@tanstack/react-table";
 
 import { TableProvider } from "../context/TableContext";
-import {
-  useColumnPersistence,
-  type ColumnPersistenceConfig,
-} from "../hooks/useColumnPersistence";
+import { useColumnPersistence } from "../hooks/useColumnPersistence";
 import { useColumnDistribution } from "../hooks/useColumnDistribution";
 import { useColumnResize } from "../hooks/useColumnResize";
 import {
@@ -54,47 +50,10 @@ import {
   MIN_NAME_COLUMN_SIZE,
   SETTINGS_COLUMN_SIZE,
 } from "../Table.constants";
-import type { TTableColumn } from "../Table.types";
-
 import styles from "../Table.module.scss";
+import type { ColumnPersistenceConfig } from "../Table.types";
+import type { TableContainerStyle, TableContainerProps } from "./TableContainer.types";
 
-// ─── CSS custom property type ─────────────────────────────────────────────────
-// React.CSSProperties doesn't include custom properties by default.
-interface TableContainerStyle extends React.CSSProperties {
-  "--table-gtc": string;
-}
-
-export interface TableContainerProps<TData = unknown> {
-  /** Column definitions (TTableColumn shape) */
-  columns: TTableColumn[];
-  /** Row data (optional — body uses children-as-function for actual rendering) */
-  data?: TData[];
-  /** localStorage key for column sizing */
-  columnStorageName: string;
-  /** localStorage key used when info panel is open */
-  columnInfoPanelStorageName?: string;
-  /** Whether the info panel is currently visible */
-  infoPanelVisible?: boolean;
-  /** Inline editing mode — hides resize handles */
-  isIndexEditingMode?: boolean;
-  /** Controlled sorting state */
-  sorting?: SortingState;
-  /** Sorting change handler */
-  onSortingChange?: OnChangeFn<SortingState>;
-  /** Called when column visibility changes */
-  onColumnVisibilityChange?: (visibility: VisibilityState) => void;
-  /** Called when a resize gesture ends */
-  onColumnSizingChange?: (sizing: ColumnSizingState) => void;
-  /** Notifies parent when hideColumns state changes */
-  setHideColumns?: (hide: boolean) => void;
-  /** RTL resize direction */
-  columnResizeDirection?: "ltr" | "rtl";
-  /** Additional CSS class for the container div */
-  className?: string;
-  /** Forwarded ref for the container div */
-  forwardedRef?: React.RefObject<HTMLDivElement | null>;
-  children: React.ReactNode;
-}
 
 export function TableContainer<TData = unknown>({
   columns,

@@ -24,30 +24,9 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
 import classNames from "classnames";
 
-export interface TableRowProps {
-  /** Whether this row is checked (selected) */
-  checked?: boolean;
-  /** Whether this row is the active/focused row */
-  isActive?: boolean;
-  /** Whether this row is being dragged */
-  dragging?: boolean;
-  /** Whether non-essential columns are collapsed (narrow container) */
-  hideColumns?: boolean;
-  /** Inline editing mode — adds .isIndexEditingMode class */
-  isIndexEditingMode?: boolean;
-  onClick?: (e: React.MouseEvent) => void;
-  onDoubleClick?: (e: React.MouseEvent) => void;
-  onMouseEnter?: (e: React.MouseEvent) => void;
-  onMouseLeave?: (e: React.MouseEvent) => void;
-  /** Additional CSS class */
-  className?: string;
-  style?: React.CSSProperties;
-  dataTestId?: string;
-  children: React.ReactNode;
-}
+import type { TableRowProps } from "./TableRow.types";
 
 /**
  * TableRow wraps row content. It lives inside the virtualRow container

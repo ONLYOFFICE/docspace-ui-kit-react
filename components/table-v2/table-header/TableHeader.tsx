@@ -27,31 +27,11 @@
 import React, { useMemo } from "react";
 import classNames from "classnames";
 
-import type { Header } from "@tanstack/react-table";
-
 import { useTableCtx } from "../context/TableContext";
 import { getColumnMeta } from "../Table.meta";
 import { TableSettings } from "../sub-components/table-settings";
 import styles from "../Table.module.scss";
-
-export interface TableHeaderProps {
-  /** External sort key (e.g. "title", "membersCount") */
-  activeSortBy?: string;
-  /** External sort direction */
-  activeSortOrder?: string;
-  /** Whether to render the settings gear button (default: true) */
-  showSettings?: boolean;
-  /** Title attribute for the settings icon button */
-  settingsTitle?: string;
-  /** Custom render prop for the settings dropdown content */
-  renderSettings?: (
-    table: ReturnType<typeof useTableCtx>["table"],
-  ) => React.ReactNode;
-  /** Forwarded ref for width measurement (e.g. tag-based dynamic width) */
-  tagRef?: React.Ref<HTMLDivElement>;
-  /** Additional CSS class */
-  className?: string;
-}
+import type { TableHeaderProps, HeaderCellProps } from "./TableHeader.types";
 
 export function TableHeader({
   activeSortBy,
@@ -125,18 +105,6 @@ export function TableHeader({
   );
 }
 
-interface HeaderCellProps {
-  // biome-ignore lint: Header<any, any> is acceptable here
-  header: Header<any, any>;
-  /** Visual (zero-based) index within the visible headers array */
-  visualIndex: number;
-  activeSortBy?: string;
-  activeSortOrder?: string;
-  isLastColumn?: boolean;
-  hideColumns: boolean;
-  isIndexEditingMode: boolean;
-  onResizeMouseDown: (colIndex: number) => (e: React.MouseEvent) => void;
-}
 
 function HeaderCell({
   header,

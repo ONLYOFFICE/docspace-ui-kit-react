@@ -24,31 +24,36 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import classNames from "classnames";
+import type React from "react";
 
-import type { TableCellProps } from "./TableCell.types";
+import type { TGroupMenuItem } from "../Table.types";
 
-/**
- * TableCell — a single data cell in a table row.
- *
- * Uses the global class `table-container_cell` so that SelectionArea and other
- * external CSS selectors can target it regardless of CSS Module hashing.
- */
-export function TableCell({
-  children,
-  className,
-  style,
-  forwardedRef,
-  dataTestId,
-}: TableCellProps) {
-  return (
-    <div
-      ref={forwardedRef}
-      className={classNames("table-container_cell", className)}
-      style={style}
-      data-testid={dataTestId ?? "table-cell"}
-    >
-      {children}
-    </div>
-  );
+export interface TableGroupMenuStyle extends React.CSSProperties {
+  "--table-group-menu-checkbox-margin"?: string;
+}
+
+export interface TableGroupMenuProps {
+  headerMenu: TGroupMenuItem[];
+  isChecked: boolean;
+  isIndeterminate: boolean;
+  onChange?: (checked: boolean) => void;
+  /** ComboBox content for "select all variants" */
+  checkboxOptions?: React.ReactElement<{ children?: React.ReactNode }>;
+  withoutInfoPanelToggler: boolean;
+  isInfoPanelVisible?: boolean;
+  toggleInfoPanel?: () => void;
+  isMobileView?: boolean;
+  isBlocked?: boolean;
+  isCloseable?: boolean;
+  onCloseClick?: () => void;
+  withComboBox?: boolean;
+  checkboxMargin?: string;
+  headerLabel?: string;
+  onClick?: (e: React.MouseEvent) => void;
+}
+
+export interface GroupMenuBodyProps {
+  headerMenu: TGroupMenuItem[];
+  isBlocked?: boolean;
+  isMobileView?: boolean;
 }

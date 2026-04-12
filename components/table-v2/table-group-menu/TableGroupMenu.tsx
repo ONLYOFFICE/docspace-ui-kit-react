@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { memo, useCallback } from "react";
+import { memo, useCallback } from "react";
 import classNames from "classnames";
 import equal from "fast-deep-equal";
 
@@ -42,39 +42,14 @@ import { Scrollbar } from "../../scrollbar";
 import { useCommonTranslation } from "../../../utils";
 
 import { GroupMenuItem } from "../sub-components/group-menu-item";
-import type { TGroupMenuItem } from "../Table.types";
 
 import styles from "../Table.module.scss";
+import type {
+  TableGroupMenuStyle,
+  TableGroupMenuProps,
+  GroupMenuBodyProps,
+} from "./TableGroupMenu.types";
 
-interface TableGroupMenuStyle extends React.CSSProperties {
-  "--table-group-menu-checkbox-margin"?: string;
-}
-
-export interface TableGroupMenuProps {
-  headerMenu: TGroupMenuItem[];
-  isChecked: boolean;
-  isIndeterminate: boolean;
-  onChange?: (checked: boolean) => void;
-  /** ComboBox content for "select all variants" */
-  checkboxOptions?: React.ReactElement<{ children?: React.ReactNode }>;
-  withoutInfoPanelToggler: boolean;
-  isInfoPanelVisible?: boolean;
-  toggleInfoPanel?: () => void;
-  isMobileView?: boolean;
-  isBlocked?: boolean;
-  isCloseable?: boolean;
-  onCloseClick?: () => void;
-  withComboBox?: boolean;
-  checkboxMargin?: string;
-  headerLabel?: string;
-  onClick?: (e: React.MouseEvent) => void;
-}
-
-interface GroupMenuBodyProps {
-  headerMenu: TGroupMenuItem[];
-  isBlocked?: boolean;
-  isMobileView?: boolean;
-}
 
 const GroupMenuBody = memo(
   ({ headerMenu, isBlocked, isMobileView }: GroupMenuBodyProps) => (

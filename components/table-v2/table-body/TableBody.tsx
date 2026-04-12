@@ -24,61 +24,13 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import classNames from "classnames";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { useTableCtx } from "../context/TableContext";
-import type { TTableColumnDef } from "../Table.types";
 import styles from "../Table.module.scss";
-
-export interface TableBodyProps<TData> {
-  /** Row data array. When omitted, itemCount must be provided for infinite scroll. */
-  data: TData[];
-  /** Column definitions with typed render functions. */
-  columns: TTableColumnDef<TData>[];
-  /**
-   * Total number of rows for the virtualizer.
-   * Defaults to data.length. Override for infinite scroll with a server total.
-   */
-  itemCount?: number;
-  /** Whether there are more rows to load */
-  hasMore?: boolean;
-  /** Whether a load is currently in progress */
-  isLoading?: boolean;
-  /** Called when the user scrolls near the end of loaded rows */
-  fetchMore?: () => void;
-  /** Row height in pixels (default: 48) */
-  itemHeight?: number;
-  /** Virtualizer overscan count (default: 20) */
-  overscan?: number;
-  /**
-   * Ref to the scroll container element.
-   * Takes priority over scrollContainerSelector when provided.
-   */
-  scrollElementRef?: React.RefObject<HTMLElement | null>;
-  /**
-   * CSS selector for the scroll container element.
-   * Used as fallback when scrollElementRef is not provided.
-   * Defaults to ".section-scroll" (DocSpace section scroll).
-   */
-  scrollContainerSelector?: string;
-  /** Additional CSS class for the body wrapper */
-  className?: string;
-  /**
-   * antd-style row event handler — mirrors Table onRow.
-   * Returns HTML attributes applied to the virtual row div.
-   */
-  onRow?: (
-    record: TData,
-    index: number,
-  ) => React.HTMLAttributes<HTMLDivElement> & Record<string, unknown>;
-  /**
-   * Renders content inside the last (settings/actions) column for each row.
-   * Typically a ContextMenuButton.
-   */
-  rowActions?: (record: TData, index: number) => React.ReactNode;
-}
+import type { TableBodyProps } from "./TableBody.types";
 
 export function TableBody<TData>({
   data,

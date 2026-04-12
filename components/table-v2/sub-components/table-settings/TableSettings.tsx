@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import classNames from "classnames";
 
 import SettingsDescReactSvg from "../../../../assets/settings.desc.react.svg";
@@ -34,20 +34,7 @@ import { DropDown } from "../../../drop-down";
 import { Checkbox } from "../../../checkbox";
 
 import styles from "../../Table.module.scss";
-
-export interface TableSettingsColumn {
-  key: string;
-  title: string;
-  enable: boolean;
-  isDisabled?: boolean;
-  onChange?: () => void;
-}
-
-export interface TableSettingsProps {
-  columns: TableSettingsColumn[];
-  /** Disable the settings gear (disables toggling) */
-  disableSettings?: boolean;
-}
+import type { TableSettingsColumn, TableSettingsProps } from "./TableSettings.types";
 
 export function TableSettings({ columns, disableSettings }: TableSettingsProps) {
   const [isOpen, setIsOpen] = useState(false);

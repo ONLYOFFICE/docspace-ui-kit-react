@@ -24,32 +24,9 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type React from "react";
 import { createContext, use } from "react";
 
-import type { Table, ColumnSizingState } from "@tanstack/react-table";
-
-interface TableContextValue {
-  // biome-ignore lint: Table<any> is the correct generic here
-  table: Table<any>;
-  /** Measured container width in pixels */
-  containerWidth: number;
-  /**
-   * Current column sizing state — included so consumers re-render when sizing
-   * changes (e.g. after mouseUp). TanStack v8 mutates `table` in place; without
-   * this field the context object never changes and header/body never re-render.
-   */
-  columnSizing: ColumnSizingState;
-  /** True when container is narrower than the minimum required width */
-  hideColumns: boolean;
-  /** True when table is in inline-editing mode (hides resize handles) */
-  isIndexEditingMode: boolean;
-  /**
-   * Returns the mousedown handler for the resize handle at visual column index
-   * `colIndex`. Called by TableHeader for each non-last, resizable column.
-   */
-  onResizeMouseDown: (colIndex: number) => (e: React.MouseEvent) => void;
-}
+import type { TableContextValue } from "../Table.types";
 
 const TableContext = createContext<TableContextValue | null>(null);
 

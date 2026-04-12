@@ -24,31 +24,10 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import classNames from "classnames";
+import type { TGroupMenuItem } from "../../Table.types";
 
-import type { TableCellProps } from "./TableCell.types";
-
-/**
- * TableCell — a single data cell in a table row.
- *
- * Uses the global class `table-container_cell` so that SelectionArea and other
- * external CSS selectors can target it regardless of CSS Module hashing.
- */
-export function TableCell({
-  children,
-  className,
-  style,
-  forwardedRef,
-  dataTestId,
-}: TableCellProps) {
-  return (
-    <div
-      ref={forwardedRef}
-      className={classNames("table-container_cell", className)}
-      style={style}
-      data-testid={dataTestId ?? "table-cell"}
-    >
-      {children}
-    </div>
-  );
+export interface GroupMenuItemProps {
+  item: TGroupMenuItem;
+  isBlocked?: boolean;
+  dataTestId?: string;
 }

@@ -24,28 +24,19 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { Table } from "./table";
-export type { TableProps } from "./table";
+export { Table } from "./Table";
 
-export { TableContainer } from "./table-container";
 export type { TableContainerProps } from "./table-container";
-
-export { TableHeader } from "./table-header";
 export type { TableHeaderProps } from "./table-header";
-
-export { TableBody } from "./table-body";
 export type { TableBodyProps } from "./table-body";
-
-
-export { TableSettings } from "./sub-components/table-settings";
 export type {
   TableSettingsProps,
   TableSettingsColumn,
 } from "./sub-components/table-settings";
-
-export { GroupMenuItem } from "./sub-components/group-menu-item";
-
-export { TableGroupMenu } from "./table-group-menu";
 export type { TableGroupMenuProps } from "./table-group-menu";
-
-export type { TTableColumn, TTableColumnDef, TGroupMenuItem } from "./Table.types";
+export type {
+  TTableColumn,
+  TTableColumnDef,
+  TGroupMenuItem,
+  TableProps,
+} from "./Table.types";

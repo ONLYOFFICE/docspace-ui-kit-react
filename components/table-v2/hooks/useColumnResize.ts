@@ -27,6 +27,8 @@
 import React, { useCallback, useRef } from "react";
 import type { ColumnSizingState } from "@tanstack/react-table";
 
+import type { UseColumnResizeOptions } from "../Table.types";
+
 import {
   HANDLE_OFFSET,
   MIN_COLUMN_SIZE,
@@ -151,26 +153,6 @@ function moveToLeft(
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
-
-export interface UseColumnResizeOptions {
-  /** Outer container ref (used for scroll-container identification) */
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  /** Current column sizing state — used to initialise accurate px widths on drag start */
-  columnSizing: ColumnSizingState;
-  /** Current container width in pixels — used to compute last column size exactly */
-  containerWidth: number;
-  /** Persist final sizing to localStorage */
-  saveSizing: (sizing: ColumnSizingState) => void;
-  /** Update React column sizing state (one call per drag, on mouseUp) */
-  setColumnSizing: React.Dispatch<React.SetStateAction<ColumnSizingState>>;
-  /**
-   * Visible column keys in visual order.
-   * Must match positions in gridTemplateColumns (0…n-1; position n = settings).
-   */
-  columnKeys: string[];
-  /** Whether the interface direction is RTL */
-  isRTL?: boolean;
-}
 
 /**
  * DOM-based column resize hook — zero React renders during drag.

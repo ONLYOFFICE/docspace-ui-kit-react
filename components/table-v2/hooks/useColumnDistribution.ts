@@ -28,7 +28,7 @@ import { useState, useLayoutEffect, useRef, useEffect, useMemo, useEffectEvent }
 
 import type { ColumnSizingState } from "@tanstack/react-table";
 
-import type { TTableColumn } from "../Table.types";
+import type { TTableColumn, UseColumnDistributionResult } from "../Table.types";
 import {
   MIN_COLUMN_SIZE,
   MIN_NAME_COLUMN_SIZE,
@@ -187,14 +187,6 @@ function computeHideColumns(
       otherCount * MIN_COLUMN_SIZE +
       SETTINGS_COLUMN_SIZE
   );
-}
-
-export interface UseColumnDistributionResult {
-  columnSizing: ColumnSizingState;
-  setColumnSizing: React.Dispatch<React.SetStateAction<ColumnSizingState>>;
-  containerWidth: number;
-  hideColumns: boolean;
-  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 /**
