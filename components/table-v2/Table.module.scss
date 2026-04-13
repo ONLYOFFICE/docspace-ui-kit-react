@@ -340,6 +340,13 @@
   }
 }
 
+// ===== Skeleton row — no borders =====
+
+.skeletonRow :global(.table-container_cell),
+.skeletonRow :global(.table-container_row-context-menu-wrapper) {
+  border: none;
+}
+
 // ===== hideColumns mode — collapse non-essential columns =====
 
 .hideColumnsRow :global(.table-container_cell):not(.isDefault):not(.isShort) {

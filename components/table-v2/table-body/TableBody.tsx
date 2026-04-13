@@ -30,6 +30,7 @@ import { match, P } from "ts-pattern";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { useTableCtx } from "../context/TableContext";
+import { TableSkeleton } from "../sub-components/table-skeleton";
 import styles from "../Table.module.scss";
 import type { TableBodyProps } from "./TableBody.types";
 
@@ -78,6 +79,8 @@ export function TableBody<TData>({
     const lastItem = virtualItems[virtualItems.length - 1];
     if (!lastItem) return;
 
+    // Trigger fetch when scrolling near the end of loaded data,
+    // not the end of total — data may not be fully loaded yet.
     if (lastItem.index >= resolvedItemCount - 1) {
       fetchMore();
     }
@@ -96,6 +99,21 @@ export function TableBody<TData>({
       {virtualItems.map((virtualItem) => {
         const index = virtualItem.index;
         const record = data[index];
+
+        // Data not yet loaded for this index — render empty placeholder row
+        if (!record) {
+          return (
+            <div
+              key={virtualItem.key}
+              className={classNames(styles.virtualRow, "table-container_row")}
+              style={{
+                transform: `translateY(${virtualItem.start}px)`,
+                height: `${virtualItem.size}px`,
+              }}
+              data-index={index}
+            />
+          );
+        }
 
         const rowProps = onRow?.(record, index) ?? {};
         const { className: rowClassName, ...restRowProps } = rowProps;
@@ -147,6 +165,15 @@ export function TableBody<TData>({
           </div>
         );
       })}
+
+      {/* Skeleton loader — shown at the bottom while fetching more rows */}
+      {isLoading && (
+        <TableSkeleton
+          rowHeight={itemHeight}
+          columnCount={visibleColumns.length}
+          offsetTop={virtualizer.getTotalSize()}
+        />
+      )}
     </div>
   );
 }
