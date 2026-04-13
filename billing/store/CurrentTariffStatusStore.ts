@@ -265,9 +265,12 @@ class CurrentTariffStatusStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getCustomerInfo(isRefresh, {
-        signal: abortController.signal,
-      });
+      const res = await this.paymentApi.getCustomerInfo(
+        isRefresh || undefined,
+        {
+          signal: abortController.signal,
+        },
+      );
 
       if (!res?.data?.response) return;
 
