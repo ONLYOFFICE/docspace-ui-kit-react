@@ -75,10 +75,9 @@
     );
   }
 
-  position: sticky;
-  top: 0;
-  display: grid;
+  position: fixed;
   grid-template-columns: var(--table-gtc);
+  display: grid;
   z-index: 200;
   height: 39px;
   background: var(--header-bg);

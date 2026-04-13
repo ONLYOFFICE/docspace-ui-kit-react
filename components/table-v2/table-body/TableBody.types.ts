@@ -74,4 +74,6 @@ export interface TableBodyProps<TData> {
    * Typically a ContextMenuButton.
    */
   rowActions?: (record: TData, index: number) => React.ReactNode;
+  isRtl?: boolean;
 }
+

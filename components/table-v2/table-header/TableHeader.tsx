@@ -42,8 +42,13 @@ export function TableHeader({
   tagRef,
   className,
 }: TableHeaderProps) {
-  const { table, hideColumns, isIndexEditingMode, onResizeMouseDown } =
-    useTableCtx();
+  const {
+    table,
+    containerWidth,
+    hideColumns,
+    isIndexEditingMode,
+    onResizeMouseDown,
+  } = useTableCtx();
 
   // Build settings columns list from table columns that have onChange meta
   const settingsColumns = useMemo(() => {
@@ -59,6 +64,10 @@ export function TableHeader({
     });
   }, [table]);
 
+  const headerStyle: React.CSSProperties = {
+    width: `${containerWidth}px`,
+  };
+
   return (
     <div
       ref={tagRef}
@@ -67,6 +76,7 @@ export function TableHeader({
         "table-container_header",
         className,
       )}
+      style={headerStyle}
       data-testid="table-header"
     >
       {table.getHeaderGroups().map((headerGroup) => {
@@ -104,7 +114,6 @@ export function TableHeader({
     </div>
   );
 }
-
 
 function HeaderCell({
   header,
@@ -210,3 +219,4 @@ function HeaderCell({
     </div>
   );
 }
+

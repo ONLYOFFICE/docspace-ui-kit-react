@@ -32,6 +32,8 @@ import { useTableCtx } from "../context/TableContext";
 import { TableSkeleton } from "../sub-components/table-skeleton";
 import { TableRow } from "../table-row";
 import styles from "../Table.module.scss";
+import { HEADER_HEIGHT } from "../Table.constants";
+
 import type { TableBodyProps } from "./TableBody.types";
 
 export function TableBody<TData>({
@@ -48,6 +50,7 @@ export function TableBody<TData>({
   className,
   onRow,
   rowActions,
+  isRtl,
 }: TableBodyProps<TData>) {
   const { table } = useTableCtx();
 
@@ -62,6 +65,7 @@ export function TableBody<TData>({
   }, [table, columns]);
 
   const virtualizer = useVirtualizer({
+    isRtl,
     useFlushSync: false,
     count: resolvedItemCount,
     estimateSize: () => itemHeight,
@@ -69,6 +73,7 @@ export function TableBody<TData>({
     getScrollElement: () =>
       scrollElementRef?.current ??
       document.querySelector<HTMLElement>(scrollContainerSelector),
+    paddingStart: HEADER_HEIGHT,
   });
 
   const virtualItems = virtualizer.getVirtualItems();

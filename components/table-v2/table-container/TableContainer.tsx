@@ -170,7 +170,7 @@ export function TableContainer<TData = unknown>({
     },
     enableColumnResizing: true,
     columnResizeDirection,
-    onColumnSizingChange: setColumnSizing as OnChangeFn<ColumnSizingState>,
+    onColumnSizingChange: setColumnSizing,
     onColumnVisibilityChange: handleColumnVisibilityChange,
     onSortingChange,
     getCoreRowModel: getCoreRowModel(),

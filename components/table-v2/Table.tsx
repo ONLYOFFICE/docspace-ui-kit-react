@@ -77,6 +77,7 @@ export function Table<TData>({
   onRow,
   rowActions,
 }: TableProps<TData>) {
+  const isRtl = columnResizeDirection === "rtl";
   return (
     <TableContainer
       columns={columns}
@@ -116,6 +117,7 @@ export function Table<TData>({
         className={bodyClassName}
         onRow={onRow}
         rowActions={rowActions}
+        isRtl={isRtl}
       />
     </TableContainer>
   );
