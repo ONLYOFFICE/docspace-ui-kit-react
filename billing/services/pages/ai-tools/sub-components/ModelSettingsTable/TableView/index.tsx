@@ -1,8 +1,12 @@
 import React, { useRef } from "react";
 import { observer } from "mobx-react";
 
-import { TableBody, TableContainer } from "../../../../../../../components/table";
+import {
+  TableBody,
+  TableContainer,
+} from "../../../../../../../components/table";
 import { Text } from "../../../../../../../components/text";
+import { Tooltip } from "../../../../../../../components/tooltip";
 import { CommonTrans } from "../../../../../../../utils/i18n/CommonTrans";
 
 import type { TAiToolsPrices } from "../../../../../../types";
@@ -14,6 +18,9 @@ import { Link, LinkTarget } from "../../../../../../../components";
 
 import { useServicesStore } from "../../../../../../store/ServicesStoreProvider";
 import { usePaymentStore } from "../../../../../../store/PaymentStoreProvider";
+import { usePermissionTooltipText } from "../../../../../hooks/usePermissionTooltipText";
+
+const PERMISSION_TOOLTIP_ID = "aiModelPermissionTooltip";
 
 const TABLE_VERSION = "1";
 const COLUMNS_SIZE = `aiModelsColumnsSize_ver-${TABLE_VERSION}`;
@@ -25,13 +32,12 @@ type ModelSettingsTableViewProps = {
 };
 
 const TableView = (props: ModelSettingsTableViewProps) => {
-  const {
-    sectionWidth,
-    isDisabled,
-  } = props;
+  const { sectionWidth, isDisabled } = props;
 
   const servicesStore = useServicesStore();
   const paymentStore = usePaymentStore();
+
+  const permissionTooltipText = usePermissionTooltipText();
 
   const {
     aiToolsPrices,
@@ -58,7 +64,6 @@ const TableView = (props: ModelSettingsTableViewProps) => {
       <Text className={styles.introText}>
         <CommonTrans
           i18nKey="AIModelsIntro"
-         
           components={{
             1: (
               <Link
@@ -108,12 +113,24 @@ const TableView = (props: ModelSettingsTableViewProps) => {
               onToggle={onToggle}
               image={m.image}
               isDisabled={isDisabled}
+              tooltipId={PERMISSION_TOOLTIP_ID}
             />
           ))}
         </TableBody>
       </TableContainer>
+
+      {isDisabled ? (
+        <Tooltip
+          id={PERMISSION_TOOLTIP_ID}
+          place="bottom"
+          maxWidth="300px"
+          float
+          getContent={() => permissionTooltipText}
+        />
+      ) : null}
     </div>
   );
 };
 
 export default observer(TableView);
+
