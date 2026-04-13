@@ -38,12 +38,12 @@ type TableHeaderProps = {
 };
 
 const TransactionHistoryTableHeader = (props: TableHeaderProps) => {
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const defaultColumns = [
     {
       key: "Date",
-      title: t("Common:Date"),
+      title: t("Date"),
       enable: true,
       resizable: true,
       default: true,
@@ -53,28 +53,28 @@ const TransactionHistoryTableHeader = (props: TableHeaderProps) => {
     },
     {
       key: "Type",
-      title: t("Common:Type"),
+      title: t("Type"),
       enable: true,
       resizable: true,
       minWidth: 120,
     },
     {
       key: "Contact",
-      title: t("Payments:Contact"),
+      title: t("Contact"),
       enable: true,
       resizable: true,
       minWidth: 120,
     },
     {
       key: "Quantity",
-      title: t("Common:Quantity"),
+      title: t("Quantity"),
       enable: true,
       resizable: true,
       minWidth: 150,
     },
     {
       key: "Amount",
-      title: t("Payments:Amount"),
+      title: t("Amount"),
       enable: true,
       resizable: true,
       minWidth: 120,

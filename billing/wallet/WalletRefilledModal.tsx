@@ -62,7 +62,7 @@ const WalletRefilledModal = (props: WalletRefilledModalProps) => {
     formatWalletCurrency,
   } = paymentStore;
 
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -105,7 +105,7 @@ const WalletRefilledModal = (props: WalletRefilledModalProps) => {
             <br />
             <Text as="span">
               <CommonTrans
-                namespaces={["Payments"]}
+               
                 i18nKey="CurrentBalance"
                 values={{ balance: formattedBalance }}
                 components={{
@@ -125,7 +125,7 @@ const WalletRefilledModal = (props: WalletRefilledModalProps) => {
       <ModalDialog.Footer>
         <Button
           key="EnableButton"
-          label={t("Common:SaveButton")}
+          label={t("SaveButton")}
           size={ButtonSize.normal}
           primary
           scale
@@ -142,7 +142,7 @@ const WalletRefilledModal = (props: WalletRefilledModalProps) => {
         />
         <Button
           key="CancelButton"
-          label={t("Common:CancelButton")}
+          label={t("CancelButton")}
           size={ButtonSize.normal}
           scale
           onClick={onCloseDialog}

@@ -57,7 +57,7 @@ const CurrentPaymentSettings = ({
   autoPayments,
   formatWalletCurrency,
 }: CurrentPaymentSettingsProps) => {
-  const t = useCommonTranslation(["Payments"]);
+  const t = useCommonTranslation();
 
   const { minBalance, upToBalance } = autoPayments!;
 
@@ -105,7 +105,7 @@ const AutoPayments = ({
   } = store;
 
   const { walletCustomerEmail } = store.tariff;
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const showCurrentSettings = isAutoPaymentExist && !isEditAutoPayment;
 
@@ -272,7 +272,7 @@ const AutoPayments = ({
         <div className={styles.inputButtons}>
           <Button
             key="OkButton"
-            label={t("Common:SaveButton")}
+            label={t("SaveButton")}
             size={ButtonSize.small}
             primary
             onClick={onSaveAutoPayment}
@@ -288,7 +288,7 @@ const AutoPayments = ({
           />
           <Button
             key="CancelButton"
-            label={t("Common:CancelButton")}
+            label={t("CancelButton")}
             size={ButtonSize.small}
             onClick={onClose}
             isDisabled={isDisabled || isLoading}
@@ -312,7 +312,7 @@ const AutoPayments = ({
       />
       <Button
         key="EditButton"
-        label={t("Common:EditButton")}
+        label={t("EditButton")}
         size={ButtonSize.small}
         onClick={onEditClick}
         isDisabled={isDisabled}

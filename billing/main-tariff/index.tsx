@@ -58,7 +58,7 @@ const SaaSPage = observer(
       init,
     } = paymentStore;
 
-    const t = useCommonTranslation(["Payments", "Common", "Settings"]);
+    const t = useCommonTranslation();
     const shouldShowLoader =
       !isInitPaymentPage ||
       isUpdatingTariff ||
@@ -70,7 +70,7 @@ const SaaSPage = observer(
     }, []);
 
     useEffect(() => {
-      const title = t("Common:Billing");
+      const title = t("Billing");
       if (onSetDocumentTitle) {
         onSetDocumentTitle(title);
       } else {

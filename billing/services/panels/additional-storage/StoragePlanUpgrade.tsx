@@ -101,7 +101,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     setPartialUpgradeFee,
   } = servicesStore;
 
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
   const [amount, setAmount] = useState<string>(
     isVisibleWalletSettings
       ? featureCountData.toString()
@@ -287,7 +287,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         const res = walletRes?.data?.response;
 
         if (res === false) {
-          throw new Error(t("Common:UnexpectedError"));
+          throw new Error(t("UnexpectedError"));
         }
 
         if (isNewSubscription) {
@@ -378,7 +378,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         <ModalDialog.Container>{container}</ModalDialog.Container>
         <ModalDialog.Header>
           {hasStorageSubscription
-            ? t("Services:EditSubscription")
+            ? t("EditSubscription")
             : t("AdditionalDiskStorage")}
         </ModalDialog.Header>
         <ModalDialog.Body>
@@ -396,11 +396,11 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
             <div className={styles.inputSection}>
               <Text fontWeight={600}>
                 {!hasStorageSubscription
-                  ? t("Services:AmoutWithStorageUnit", {
-                      storageUnit: t("Common:Gigabyte"),
+                  ? t("AmoutWithStorageUnit", {
+                      storageUnit: t("Gigabyte"),
                     })
-                  : t("Services:NewTotalStorage", {
-                      storageUnit: t("Common:Gigabyte"),
+                  : t("NewTotalStorage", {
+                      storageUnit: t("Gigabyte"),
                     })}
               </Text>
               <FieldContainer
@@ -408,7 +408,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
                 errorMessage={
                   hasMinError
                     ? t("MinCurrency", {
-                        currency: `${MIN_VALUE} ${t("Common:Gigabyte")}`,
+                        currency: `${MIN_VALUE} ${t("Gigabyte")}`,
                       })
                     : ""
                 }
@@ -431,13 +431,13 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
               {!hasMinError ? (
                 <Text className={styles.perStorageInfo} fontSize="12px">
                   <CommonTrans
-                    namespaces={["Payments"]}
+                   
                     i18nKey="PerStorageWitnMinValue"
                     values={{
                       currency: formatWalletCurrency(storagePriceIncrement, 2),
-                      amount: `1 ${t("Common:Gigabyte")}`,
+                      amount: `1 ${t("Gigabyte")}`,
                       minValue: MIN_VALUE,
-                      storageUnit: t("Common:Gigabyte"),
+                      storageUnit: t("Gigabyte"),
                     }}
                     components={{
                       1: <Text as="span" fontSize="12px" fontWeight={600} />,

@@ -68,7 +68,7 @@ const TransactionBody = ({
     currentDeviceType,
   });
 
-  const t = useCommonTranslation(["Payments", "Settings"]);
+  const t = useCommonTranslation();
 
   const filterIcon = isBase ? (
     <NoTransactionsFilterIcon />
@@ -77,7 +77,7 @@ const TransactionBody = ({
   );
 
   const title = hasAppliedDateFilter
-    ? t("NoFindingsFound")
+    ? t("NoFindingsFound2")
     : t("NoWalletTransaction");
   const description = hasAppliedDateFilter
     ? t("NoTransactionsFilter")

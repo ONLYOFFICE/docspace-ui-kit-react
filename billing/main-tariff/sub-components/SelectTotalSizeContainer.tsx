@@ -42,7 +42,7 @@ const SelectTotalSizeContainer = observer(({
   const paymentStore = usePaymentStore();
   const { allowedStorageSizeByQuota } = paymentStore;
 
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const convertedSize = getConvertedSize(t, allowedStorageSizeByQuota);
 

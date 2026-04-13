@@ -73,7 +73,7 @@ const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
   const { isRTL } = useInterfaceDirection();
 
   const { setIsWaitingCalculation } = usePaymentContext();
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
   const { calculateDifferenceBetweenPlan } = useServicesActions();
@@ -83,14 +83,14 @@ const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
       <>
         <Text as="span">
           {daysUntilStorageExpiry === 0
-            ? t("PartialPaymentNoDate", { storageUnit: t("Common:Gigabyte") })
+            ? t("PartialPaymentNoDate", { storageUnit: t("Gigabyte") })
             : t("PartialPaymentWithDate", {
                 startDate: formatDateLocalized(
                   now().setZone(window.timezone),
                   "DATE_MED",
                 ),
                 endDate: storageExpiryDate,
-                storageUnit: t("Common:Gigabyte"),
+                storageUnit: t("Gigabyte"),
               })}
         </Text>{" "}
         <Text as="span">{t("PartialPaymentDescription")}</Text>
@@ -118,7 +118,7 @@ const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
           const currentWriteOff = calcRes?.data?.response as unknown as { amount: number } | null;
 
           if (!currentWriteOff) {
-            toastr.error(t("Common:UnexpectedError"));
+            toastr.error(t("UnexpectedError"));
             return;
           }
 
@@ -166,7 +166,7 @@ const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
         <div className={styles.planInfoBody}>
           <Text fontWeight={600}>
             {t("AdditionalStorage", {
-              amount: `${calculateDifference(amount, currentStoragePlanSize!)} ${t("Common:Gigabyte")}`,
+              amount: `${calculateDifference(amount, currentStoragePlanSize!)} ${t("Gigabyte")}`,
             })}
           </Text>
           <Text

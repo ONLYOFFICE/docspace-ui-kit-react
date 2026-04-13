@@ -54,13 +54,13 @@ const PayerInformation = () => {
     walletCustomerInfo: payerInfo,
     fetchCustomerInfo,
   } = store.tariff;
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const [isDisabled, setDisabled] = useState(false);
   const goToStripePortal = () => {
     accountLink
       ? window.open(toAbsoluteUrl(accountLink), "_blank")
-      : toastr.error(t("Common:UnexpectedError"));
+      : toastr.error(t("UnexpectedError"));
   };
 
   const onRefreshData = async () => {
@@ -85,7 +85,7 @@ const PayerInformation = () => {
         errorMessage = error;
       }
 
-      toastr.error(errorMessage || t("Common:UnexpectedError"));
+      toastr.error(errorMessage || t("UnexpectedError"));
     }
     setDisabled(false);
   };
@@ -95,19 +95,19 @@ const PayerInformation = () => {
 
     let invalidEmailDescription = isOwner
       ? t("UnknownPayerForOwner", {
-          productName: t("Common:ProductName"),
+          productName: t("ProductName"),
         })
       : t("UnknownPayerForAdmin", {
-          productName: t("Common:ProductName"),
+          productName: t("ProductName"),
         });
 
     if (isNotPaidPeriod) {
       invalidEmailDescription = isOwner
         ? t("InvalidEmailWithoutActiveSubscription", {
-            productName: t("Common:ProductName"),
+            productName: t("ProductName"),
           })
         : t("InvalidEmailWithoutActiveSubscriptionByAdmin", {
-            productName: t("Common:ProductName"),
+            productName: t("ProductName"),
           });
 
       return userNotFound + invalidEmailDescription;
@@ -125,7 +125,7 @@ const PayerInformation = () => {
         {isStripePortalAvailable ? (
           <div className={styles.infoContainer}>
             <CommonTrans
-              namespaces={["Payments"]}
+             
               i18nKey="ChooseNewPayerOrRefrashData"
               components={{
                 1: (
@@ -191,7 +191,7 @@ const PayerInformation = () => {
           payerInfo.displayName
         ) : (
           <CommonTrans
-            namespaces={["Payments"]}
+           
             i18nKey="UserNotFound"
             values={{ email: emailUnfoundedUser }}
             components={{

@@ -40,7 +40,7 @@ const CurrentSubscription: React.FC = () => {
   const { formatWalletCurrency, storagePriceIncrement } = paymentStore;
   const { currentStoragePlanSize, storageExpiryDate } = paymentStore.tariff;
 
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const totalPrice =
     (currentStoragePlanSize || 0) * (storagePriceIncrement || 0);
@@ -62,7 +62,7 @@ const CurrentSubscription: React.FC = () => {
                 fontSize="14px"
                 className={styles.storageName}
               >
-                {currentStoragePlanSize} {t("Common:Gigabyte")}
+                {currentStoragePlanSize} {t("Gigabyte")}
               </Text>
             </div>
           </div>

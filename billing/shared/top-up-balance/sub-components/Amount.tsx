@@ -63,7 +63,7 @@ const Amount = (props: AmountProps) => {
   const { amount, setAmount, hasError, setHasError } = useAmountValue();
   const [hasMinError, setHasMinError] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<string | undefined>();
-  const t = useCommonTranslation(["Payments"]);
+  const t = useCommonTranslation();
 
   const getAmountTabs = () => {
     const amounts = [10, 20, 30, 50, 100];

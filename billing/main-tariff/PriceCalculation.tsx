@@ -107,7 +107,7 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
         {isYearTariff ? (
           <CommonTrans
             i18nKey="PerUserYear"
-            namespaces={["Common"]}
+           
             values={{ price: formatPaymentCurrency(priceManagerPerMonth) }}
             components={{
               1: <strong key="price-year" style={{ fontSize: "16px" }} />,
@@ -116,7 +116,7 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
         ) : (
           <CommonTrans
             i18nKey="PerUserMonth"
-            namespaces={["Common"]}
+           
             values={{ price: formatPaymentCurrency(priceManagerPerMonth) }}
             components={{
               1: <strong key="price-month" style={{ fontSize: "16px" }} />,

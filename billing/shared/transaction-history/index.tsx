@@ -66,7 +66,6 @@ type TransactionHistoryReportResponse = {
 type TContact = Pick<TSelectorItem, "displayName" | "label"> & { id: string };
 
 type TransactionHistoryProps = {
-  openOnNewPage?: boolean;
   isMobile?: boolean;
   isTablet?: boolean;
   withoutHeader?: boolean;
@@ -161,7 +160,6 @@ const fetchTransactions = async (
 
 const TransactionHistory = (props: TransactionHistoryProps) => {
   const {
-    openOnNewPage,
     isMobile,
     isTablet,
     withoutHeader,
@@ -179,11 +177,12 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     isTransactionHistoryExist,
     formatDate,
     fetchTransactionHistory,
+    openOnNewPage,
   } = store;
 
   const { isNotPaidPeriod } = store.tariff;
 
-  const t = useCommonTranslation(["Payments", "Settings"]);
+  const t = useCommonTranslation();
 
   const typeOfHistoty: TOption[] = [
     {
@@ -471,9 +470,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         debit: isDebit,
         participantName: selectedContact?.id,
         serviceName,
-        ...(serviceName === AI_TOOLS
-          ? { writeOffServiceQuota: true }
-          : {}),
+        ...(serviceName === AI_TOOLS ? { writeOffServiceQuota: true } : {}),
       });
 
       const result = await new Promise<TransactionHistoryReportResponse>(
@@ -485,7 +482,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
                 ?.response as unknown as TransactionHistoryReportResponse;
 
               if (!response) {
-                reject(new Error(t("Common:UnexpectedError")));
+                reject(new Error(t("UnexpectedError")));
                 return;
               }
 
@@ -510,7 +507,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
       );
 
       if (!result || !result.resultFileUrl) {
-        throw new Error(t("Common:UnexpectedError"));
+        throw new Error(t("UnexpectedError"));
       }
 
       setTimeout(
@@ -529,7 +526,6 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
   const datesComponent = (
     <div className={styles.transactionDates}>
       <CommonTrans
-        namespaces={["Payments"]}
         i18nKey="FromTo"
         components={{
           1: (
@@ -539,7 +535,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
                 isFilterDialogVisible ? mobileFilterState.startDate : startDate
               }
               onChange={onStartDateChange}
-              selectDateText={t("Common:SelectDate")}
+              selectDateText={t("SelectDate")}
               locale={getCookie(LANGUAGE) ?? "en"}
               openDate={
                 isFilterDialogVisible ? mobileFilterState.startDate : startDate
@@ -563,7 +559,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
                 isFilterDialogVisible ? mobileFilterState.endDate : endDate
               }
               onChange={onEndDateChange}
-              selectDateText={t("Common:SelectDate")}
+              selectDateText={t("SelectDate")}
               locale={getCookie(LANGUAGE) ?? "en"}
               openDate={
                 isFilterDialogVisible ? mobileFilterState.endDate : endDate
@@ -629,7 +625,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           dataTestId="clear_filter_button"
           className={styles.clearFilter}
         >
-          {t("Common:ClearFilter")}
+          {t("ClearFilter")}
         </Link>
       ) : null}
     </div>
@@ -653,7 +649,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
       onCancel={onCloseContactSelector}
       cancelButtonLabel=""
       disableSubmitButton={false}
-      submitButtonLabel={t("Common:SelectAction")}
+      submitButtonLabel={t("SelectAction")}
       onSubmit={onSubmitContactSelector}
       withHeader
       headerProps={{
@@ -664,11 +660,11 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
       filter={filter}
       withInfo
       infoText={t("OnlyPortalAdminsShown", {
-        productName: t("Common:ProductName"),
+        productName: t("ProductName"),
       })}
-      emptyScreenHeader={t("Common:NotFoundMembers")}
-      emptyScreenDescription={t("CreateEditRoomDialog:PeopleSelectorInfo", {
-        productName: t("Common:ProductName"),
+      emptyScreenHeader={t("NotFoundMembers")}
+      emptyScreenDescription={t("PeopleSelectorInfo", {
+        productName: t("ProductName"),
       })}
     />
   ) : null;
@@ -702,7 +698,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         <>
           <Text className={styles.transactionsLimit}>
             {t("TransactionsLimit", {
-              buttonName: t("Settings:DownloadReportBtnText"),
+              buttonName: t("DownloadReportBtnText"),
             })}
           </Text>
 
@@ -712,7 +708,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
             })}
           >
             <Button
-              label={t("Settings:DownloadReportBtnText")}
+              label={t("DownloadReportBtnText")}
               size={isMobile ? ButtonSize.normal : ButtonSize.small}
               minWidth="auto"
               onClick={getReport}
@@ -722,8 +718,8 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
               testId="download_report_button"
             />
             <Text as="span" className={styles.downloadReportDescription}>
-              {t("Settings:ReportSaveLocation", {
-                sectionName: t("Common:MyDocuments"),
+              {t("ReportSaveLocation", {
+                sectionName: t("MyDocuments"),
               })}
             </Text>
           </div>

@@ -77,7 +77,7 @@ const Wallet = (props: WalletProps) => {
     walletCustomerEmail: payerEmail,
   } = store.tariff;
 
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const [visible, setVisible] = useState(isVisibleWalletSettings);
   const [isEditAutoPayment, setIsEditAutoPayment] = useState(false);
@@ -119,14 +119,14 @@ const Wallet = (props: WalletProps) => {
   const goLinkCard = () => {
     cardLinked
       ? window.open(toAbsoluteUrl(cardLinked), "_self")
-      : toastr.error(t("Common:UnexpectedError"));
+      : toastr.error(t("UnexpectedError"));
   };
 
   return (
     <div className={styles.walletContainer}>
       <Text className={styles.walletDescription}>
         {t("WalletSectionDescription", {
-          productName: t("Common:ProductName"),
+          productName: t("ProductName"),
         })}
       </Text>
 
@@ -138,7 +138,7 @@ const Wallet = (props: WalletProps) => {
           className={styles.learnMoreLink}
           dataTestId="wallet_learn_more_link"
         >
-          {t("Common:LearnMore")}
+          {t("LearnMore")}
         </Link>
       ) : null}
 
@@ -176,7 +176,7 @@ const Wallet = (props: WalletProps) => {
               t("LinkNewCard")
             ) : (
               <CommonTrans
-                namespaces={["Payments"]}
+               
                 i18nKey="LinkNewCardEmail"
                 values={{
                   email: payerEmail,

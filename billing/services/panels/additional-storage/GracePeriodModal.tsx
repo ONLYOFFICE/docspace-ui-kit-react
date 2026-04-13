@@ -53,7 +53,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
     paymentStore.tariff;
   const { tariffPlanTitle } = paymentStore.paymentQuotas;
 
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
   const navigate = useNavigate();
   const onClick = () => {
     navigate(paymentStore.routes.portalPayments);
@@ -67,7 +67,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
       autoMaxHeight
       isLarge
     >
-      <ModalDialog.Header>{t("Common:Warning")}</ModalDialog.Header>
+      <ModalDialog.Header>{t("Warning")}</ModalDialog.Header>
       <ModalDialog.Body>
         <Text fontWeight={600}>
           {t("ServiceManagementUnavailable", { planName: tariffPlanTitle })}
@@ -76,7 +76,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
         <Text fontWeight={600}>{t("Reminder")}</Text>
         <Text as="span" dataTestId="grace_period_info">
           <CommonTrans
-            namespaces={["Payments"]}
+           
             i18nKey="GracePeriodActivatedInfo"
             values={{
               fromDate: paymentDate,
@@ -90,7 +90,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
         </Text>{" "}
         <Text as="span">
           {t("GracePeriodActivatedDescription", {
-            productName: t("Common:ProductName"),
+            productName: t("ProductName"),
           })}
         </Text>
       </ModalDialog.Body>
@@ -105,7 +105,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
         />
         <Button
           key="CancelButton"
-          label={t("Common:CancelButton")}
+          label={t("CancelButton")}
           size={ButtonSize.normal}
           onClick={onClose}
           testId="grace_period_cancel_button"

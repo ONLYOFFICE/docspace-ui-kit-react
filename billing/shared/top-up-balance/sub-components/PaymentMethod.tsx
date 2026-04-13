@@ -69,7 +69,7 @@ const PaymentMethod = (props: PaymentMethodProps) => {
   const { fetchCardLinked } = paymentStore;
   const { confirmActionType } = servicesStore;
 
-  const t = useCommonTranslation(["Payments", "Common"]);
+  const t = useCommonTranslation();
 
   const [isLoading, setIsLoading] = useState(!walletCustomerEmail);
 
@@ -99,13 +99,13 @@ const PaymentMethod = (props: PaymentMethodProps) => {
   const goLinkCard = () => {
     cardLinked
       ? window.open(toAbsoluteUrl(cardLinked), "_self")
-      : toastr.error(t("Common:UnexpectedError"));
+      : toastr.error(t("UnexpectedError"));
   };
 
   const goStripeAccount = () => {
     accountLink
       ? window.open(toAbsoluteUrl(accountLink), "_blank")
-      : toastr.error(t("Common:UnexpectedError"));
+      : toastr.error(t("UnexpectedError"));
   };
 
   return (

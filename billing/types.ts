@@ -116,6 +116,7 @@ export type TPaymentConfig = {
   user?: TPaymentUser;
   mobileBreakpoint?: number;
   desktopBreakpoint?: number;
+  openOnNewPage?: boolean;
 };
 
 export type TPaymentNavigationEvent =

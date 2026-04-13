@@ -161,7 +161,7 @@ const UpdatePlanButtonContainer = ({
   const goLinkCard = () => {
     cardLinked
       ? window.open(cardLinked, "_self")
-      : toastr.error(t("Common:UnexpectedError"));
+      : toastr.error(t("UnexpectedError"));
   };
 
   const onUpdateTariff = async () => {
@@ -363,7 +363,7 @@ const UpdatePlanButtonContainer = ({
               <Text>
                 <CommonTrans
                   i18nKey="SwitchPlan"
-                  namespaces={["Payments"]}
+                 
                   values={{ planName: tariffPlanTitle }}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
@@ -373,7 +373,7 @@ const UpdatePlanButtonContainer = ({
               <Text>
                 <CommonTrans
                   i18nKey="ChargeAmount"
-                  namespaces={["Payments"]}
+                 
                   values={{ price: formatPaymentCurrency(totalPrice) }}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
@@ -383,7 +383,7 @@ const UpdatePlanButtonContainer = ({
               <Text className="text-warning">
                 <CommonTrans
                   i18nKey="ActionCannotBeUndone"
-                  namespaces={["Payments"]}
+                 
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
                   }}
@@ -403,7 +403,7 @@ const UpdatePlanButtonContainer = ({
             />
             <Button
               key="CancelButton"
-              label={t("Common:CancelButton")}
+              label={t("CancelButton")}
               size={ButtonSize.normal}
               scale
               onClick={onClose}

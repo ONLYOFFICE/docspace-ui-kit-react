@@ -54,7 +54,7 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
   const paymentStore = usePaymentStore();
   const { language } = paymentStore;
   const { credit, debit, currency, date } = transaction;
-  const t = useCommonTranslation(["Payments"]);
+  const t = useCommonTranslation();
   const creditValue = credit ?? 0;
   const debitValue = debit ?? 0;
 

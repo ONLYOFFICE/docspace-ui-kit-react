@@ -48,6 +48,7 @@ import { formatCurrencyValue } from "../utils/common";
 import { combineUrl } from "../../utils/combineUrl";
 import {
   AI_ENUM,
+  AI_TOOLS,
   BACKUP_SERVICE,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
@@ -98,6 +99,8 @@ class PaymentStore {
   walletHelpUrl = "";
 
   logoText = "";
+
+  openOnNewPage = true;
 
   utcOffset = "";
 
@@ -223,6 +226,8 @@ class PaymentStore {
       this.userId = config.user.id ?? "";
       this.isOwner = config.user.isOwner ?? false;
     }
+    if (config.openOnNewPage !== undefined)
+      this.openOnNewPage = config.openOnNewPage;
     if (config.mobileBreakpoint !== undefined)
       this.mobileBreakpoint = config.mobileBreakpoint;
     if (config.desktopBreakpoint !== undefined)
@@ -564,7 +569,13 @@ class PaymentStore {
         undefined,
         undefined,
         undefined,
-        { signal: abortController.signal },
+        {
+          signal: abortController.signal,
+          params:
+            serviceName === AI_TOOLS
+              ? { writeOffServiceQuota: true }
+              : undefined,
+        },
       );
 
       if (!res?.data?.response) return;
@@ -721,7 +732,7 @@ class PaymentStore {
 
   initWalletPayerAndBalance = async (isRefresh: boolean) => {
     await Promise.all([
-      this.tariff.fetchCustomerInfo(),
+      this.tariff.fetchCustomerInfo(isRefresh),
       this.fetchBalance(isRefresh),
     ]);
   };
@@ -885,7 +896,7 @@ class PaymentStore {
       this.setRangeStepByQuota();
       this.setBasicTariffContainer();
     } catch (error) {
-      toastr.error(t("Common:UnexpectedError"));
+      toastr.error(t("UnexpectedError"));
       console.error(error);
       return;
     }
@@ -923,9 +934,17 @@ class PaymentStore {
       await Promise.all(requests);
 
       this.setPaymentMethodInit(true);
+
+      if (isRefresh) {
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname,
+        );
+      }
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
-      toastr.error(t("Common:UnexpectedError"));
+      toastr.error(t("UnexpectedError"));
       console.error(error);
     }
   };
@@ -995,7 +1014,7 @@ class PaymentStore {
       }
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
-      toastr.error(t("Common:UnexpectedError"));
+      toastr.error(t("UnexpectedError"));
       console.error(error);
     }
   };

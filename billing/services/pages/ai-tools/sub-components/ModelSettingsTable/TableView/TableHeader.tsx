@@ -18,7 +18,7 @@ const ModelSettingsTableHeader = (props: TableHeaderProps) => {
   const servicesStore = useServicesStore();
   const { aiModelsCurrencySymbol } = servicesStore;
 
-  const t = useCommonTranslation(["Services"]);
+  const t = useCommonTranslation();
 
   const defaultColumns = [
     {

@@ -79,7 +79,7 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
 
   const { handleServicesQuotas } = paymentStore;
   const { logoText } = paymentStore;
-  const t = useCommonTranslation(["Payments", "Services", "Common"]);
+  const t = useCommonTranslation();
 
   const { amount, isBalanceInsufficient, hasError } = useAmountValue();
 
@@ -97,7 +97,7 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
       const res = await onTopUpBalance(+amount, serviceName ?? currency);
 
       if (!res) {
-        throw new Error(t("Common:UnexpectedError"));
+        throw new Error(t("UnexpectedError"));
       }
 
       const requests: Promise<unknown>[] = [
@@ -114,7 +114,7 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
 
       const toastMessage =
         serviceName === AI_TOOLS
-          ? t("Services:AIServiceToppedUp", { organizationName: logoText })
+          ? t("AIServiceToppedUp", { organizationName: logoText })
           : t("WalletToppedUp");
 
       toastr.success(toastMessage);
@@ -143,7 +143,7 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
         />
         <Button
           key="CancelButton"
-          label={t("Common:CancelButton")}
+          label={t("CancelButton")}
           size={ButtonSize.normal}
           scale
           onClick={() => onClose(false)}

@@ -45,6 +45,7 @@ const defaultConfig: TPaymentConfig = {
     diskStorage: "/portal-settings/payments/services/disk-storage",
   },
   logoText: "DocSpace",
+  openOnNewPage: true,
 };
 
 const PaymentsSetupWrapper: React.FC<{

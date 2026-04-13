@@ -76,7 +76,7 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
   const { fetchAiServiceBalance, featureCountData, wasFirstAiServiceTopUp } =
     servicesStore;
 
-  const t = useCommonTranslation(["Services", "Common", "Payments"]);
+  const t = useCommonTranslation();
 
   const [view, setView] = useState<DialogView>("top-up");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -177,7 +177,7 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
       >
         <ModalDialog.Container>{container}</ModalDialog.Container>
         <ModalDialog.Header>
-          {t("Payments:AddCreditsToAI", { organizationName: logoText })}
+          {t("AddCreditsToAI", { organizationName: logoText })}
         </ModalDialog.Header>
         <ModalDialog.Body>
           <div className={styles.dialogBody}>

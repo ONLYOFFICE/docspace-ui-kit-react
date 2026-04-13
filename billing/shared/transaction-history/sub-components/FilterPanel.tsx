@@ -75,7 +75,7 @@ const FilterPanel = ({
   shouldShowClearButton,
   hideTypeFilter,
 }: FilterPanelProps) => {
-  const t = useCommonTranslation(["Payments", "Settings"]);
+  const t = useCommonTranslation();
   return (
     <ModalDialog
       visible={isFilterDialogVisible}
@@ -103,7 +103,7 @@ const FilterPanel = ({
             <>
               <div className={styles.filterDialogSection}>
                 <Text fontWeight={600} fontSize="15px">
-                  {t("Common:Type")}
+                  {t("Type")}
                 </Text>
                 <ComboBox
                   options={typeOfHistoty}
@@ -141,7 +141,7 @@ const FilterPanel = ({
         <Button
           onClick={onApplyFilter}
           size={ButtonSize.medium}
-          label={t("Common:ApplyButton")}
+          label={t("ApplyButton")}
           isDisabled={!isChanged}
           primary
           scale
@@ -150,7 +150,7 @@ const FilterPanel = ({
         <Button
           onClick={closeFilterDialog}
           size={ButtonSize.medium}
-          label={t("Common:CancelButton")}
+          label={t("CancelButton")}
           scale
           testId="cancel_filter_button"
         />

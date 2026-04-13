@@ -92,7 +92,7 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
       const res = walletRes?.data?.response;
 
       if (res === false) {
-        toastr.error(t("Common:UnexpectedError"));
+        toastr.error(t("UnexpectedError"));
 
         clearTimeout(timerId);
         setIsLoading(false);
@@ -130,9 +130,9 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
             <Text as="span">
               <CommonTrans
                 i18nKey="YourCurrentPlan"
-                namespaces={["Payments"]}
+               
                 values={{
-                  amount: `${currentStoragePlanSize} ${t("Common:Gigabyte")}`,
+                  amount: `${currentStoragePlanSize} ${t("Gigabyte")}`,
                   price: formatWalletCurrency(totalPrice, 2),
                 }}
                 components={{
@@ -144,7 +144,7 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
             <Text>
               <CommonTrans
                 i18nKey="StorageUsed"
-                namespaces={["Payments"]}
+               
                 values={{
                   amount: getConvertedSize(t, usedTotalStorageSizeCount),
                 }}
@@ -159,7 +159,7 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
         <ModalDialog.Footer>
           <Button
             key="OkButton"
-            label={t("Common:Yes")}
+            label={t("Yes")}
             size={ButtonSize.normal}
             primary
             onClick={handleStoragePlanChange}
@@ -168,7 +168,7 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
           />
           <Button
             key="CancelButton"
-            label={t("Common:No")}
+            label={t("No")}
             size={ButtonSize.normal}
             onClick={onClose}
             testId="storage_plan_cancel_no_button"

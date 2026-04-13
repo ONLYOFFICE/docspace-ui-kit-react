@@ -66,7 +66,7 @@ const BackupPage: React.FC = () => {
   const { usedBackupsCount, isInitServicesData, initServiceData } =
     servicesStore;
 
-  const t = useCommonTranslation(["Payments", "Services", "Common"]);
+  const t = useCommonTranslation();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
@@ -101,7 +101,7 @@ const BackupPage: React.FC = () => {
       await paymentApi.changeTenantWalletServiceState(raw);
     } catch (error) {
       console.error(error);
-      toastr.error(t("Common:UnexpectedError"));
+      toastr.error(t("UnexpectedError"));
       changeServiceState(BACKUP_SERVICE);
     } finally {
       setIsLoading(false);
@@ -109,18 +109,18 @@ const BackupPage: React.FC = () => {
   };
 
   const confirmationDialogContent = {
-    title: t("Common:Confirmation"),
+    title: t("Confirmation"),
 
     body: !isBackupServiceOn
-      ? t("Services:EnableBackupConfirm", {
-          productName: t("Common:ProductName"),
+      ? t("EnableBackupConfirm", {
+          productName: t("ProductName"),
         })
       : isFreeTariff
-        ? t("Services:DisableBackupConfirmWithoutQuota", {
-            productName: t("Common:ProductName"),
+        ? t("DisableBackupConfirmWithoutQuota", {
+            productName: t("ProductName"),
           })
-        : t("Services:DisableBackupConfirm", {
-            productName: t("Common:ProductName"),
+        : t("DisableBackupConfirm", {
+            productName: t("ProductName"),
           }),
   };
 
@@ -146,7 +146,7 @@ const BackupPage: React.FC = () => {
         title={
           <Text fontSize="12px" fontWeight={400}>
             <CommonTrans
-              namespaces={["Payments"]}
+             
               i18nKey="BackupTitle"
               values={{
                 currency: formatWalletCurrency(backupServicePrice, 2),
@@ -157,7 +157,7 @@ const BackupPage: React.FC = () => {
             />
           </Text>
         }
-        description={t("Payments:BackupDescription")}
+        description={t("BackupDescription")}
         isDisabled={isDisabled || isLoading}
       />
       <WalletInfo
@@ -168,15 +168,15 @@ const BackupPage: React.FC = () => {
       />
       {isLowBalance ? (
         <Text className={styles.lowBalance} fontSize="15px" fontWeight={600}>
-          {t("Services:NeedTopUpWallet")}
+          {t("NeedTopUpWallet")}
         </Text>
       ) : null}
       <div className={styles.backupsCard}>
         <div className={styles.backupsHeader}>
           <Text fontWeight="700" fontSize="14px">
             {isFreeTariff && !isBackupServiceOn
-              ? t("Services:PaidBackupDisabled")
-              : t("Payments:AvailableBackups")}
+              ? t("PaidBackupDisabled")
+              : t("AvailableBackups")}
           </Text>
         </div>
 
@@ -190,7 +190,7 @@ const BackupPage: React.FC = () => {
                 /{maxFreeBackups}
               </Text>
             </div>
-            <Text className={styles.grayText}>{t("Services:FreeMonthly")}</Text>
+            <Text className={styles.grayText}>{t("FreeMonthly")}</Text>
           </div>
         ) : null}
         {isBackupServiceOn ? (
@@ -201,7 +201,7 @@ const BackupPage: React.FC = () => {
                 {availableBackupsCount}
               </Text>
               <Text className={styles.grayText}>
-                {t("Payments:CurrencyPerBackup", {
+                {t("CurrencyPerBackup", {
                   currency: formatWalletCurrency(backupServicePrice, 2),
                 })}
               </Text>
@@ -213,8 +213,8 @@ const BackupPage: React.FC = () => {
             size={ButtonSize.small}
             label={
               !isFreeTariff
-                ? t("Services:EnablePaidBackup")
-                : t("Common:Enable")
+                ? t("EnablePaidBackup")
+                : t("Enable")
             }
             onClick={handleToggleChange}
             isDisabled={isDisabled}
@@ -226,7 +226,7 @@ const BackupPage: React.FC = () => {
       {!isFreeTariff ? (
         <Text className={styles.backupPaidInfo}>
           <CommonTrans
-            namespaces={["Services"]}
+           
             i18nKey="FreeBackupsRenewsDate"
             values={{
               date: formatDateLocalized(
@@ -245,7 +245,7 @@ const BackupPage: React.FC = () => {
       ) : null}
       {isFreeTariff && !isBackupServiceOn ? (
         <Text className={styles.backupPaidInfo}>
-          {t("Services:ActivateServiceToAllow")}
+          {t("ActivateServiceToAllow")}
         </Text>
       ) : null}
       <div>
