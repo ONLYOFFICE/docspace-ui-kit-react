@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import throttle from "lodash/throttle";
 
@@ -1162,11 +1162,13 @@ export const TableHeader = (props: TableHeaderProps) => {
     }
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isMountedRef.current) {
       onResize();
     }
+  });
 
+  useEffect(() => {
     const throttledResize = throttle(() => onResize(true), 300);
 
     window.addEventListener("resize", throttledResize);

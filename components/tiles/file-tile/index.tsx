@@ -257,7 +257,8 @@ const FileTile = ({
     item?.viewAccessibility?.ImageView || item?.viewAccessibility?.MediaView;
 
   const isTouchDevice =
-    "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
   const fileTileClassNames = classNames(styles.fileTile, {
     [styles.isBlocked]: isBlockingOperation,
