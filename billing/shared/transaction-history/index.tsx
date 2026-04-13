@@ -504,6 +504,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         <TransactionBody
           hasAppliedDateFilter={isTransactionFilterModified}
           isTransactionHistoryExist={isTransactionHistoryExist!}
+          serviceName={serviceName}
         />
       )}
 

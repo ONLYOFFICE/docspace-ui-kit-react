@@ -46,11 +46,13 @@ import RowView from "./RowView";
 type TransactionHistoryProps = {
   isTransactionHistoryExist: boolean;
   hasAppliedDateFilter: boolean;
+  serviceName?: string;
 };
 
 const TransactionBody = ({
   hasAppliedDateFilter,
   isTransactionHistoryExist,
+  serviceName,
 }: TransactionHistoryProps) => {
   const { isBase } = useTheme();
   const { mobileBreakpoint, desktopBreakpoint } = usePaymentStore();
@@ -96,9 +98,15 @@ const TransactionBody = ({
     <Consumer>
       {(context) =>
         viewAs === "table" ? (
-          <TableView sectionWidth={context.sectionWidth || 0} />
+          <TableView
+            sectionWidth={context.sectionWidth || 0}
+            serviceName={serviceName}
+          />
         ) : (
-          <RowView sectionWidth={context.sectionWidth || 0} />
+          <RowView
+            sectionWidth={context.sectionWidth || 0}
+            serviceName={serviceName}
+          />
         )
       }
     </Consumer>

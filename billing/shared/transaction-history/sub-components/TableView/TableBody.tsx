@@ -41,12 +41,17 @@ import {
   getServiceQuantity,
 } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
+import { AI_TOOLS } from "../../../../constants";
 
 interface TransactionRowProps {
   transaction: WalletOperationDto;
+  serviceName?: string;
 }
 
-const TransactionRow: React.FC<TransactionRowProps> = ({ transaction }) => {
+const TransactionRow: React.FC<TransactionRowProps> = ({
+  transaction,
+  serviceName,
+}) => {
   const paymentStore = usePaymentStore();
   const { language } = paymentStore;
   const { credit, debit, currency } = transaction;
@@ -63,10 +68,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({ transaction }) => {
     currency ?? "",
   );
 
-  const correctDate = getCorrectDate(
-    language,
-    transaction.date,
-  );
+  const correctDate = getCorrectDate(language, transaction.date);
 
   return (
     <TableRow>
@@ -75,6 +77,15 @@ const TransactionRow: React.FC<TransactionRowProps> = ({ transaction }) => {
           {correctDate}
         </Text>
       </TableCell>
+      {serviceName === AI_TOOLS ? (
+        <TableCell>
+          <Text fontWeight={600} fontSize="11px">
+            {transaction.agentTitle
+              ? t("AIAgentName", { AgentName: transaction.agentTitle })
+              : "—"}
+          </Text>
+        </TableCell>
+      ) : null}
       <TableCell>
         <Text
           fontWeight={600}
@@ -86,6 +97,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({ transaction }) => {
           {transaction.details ? ` (${transaction.details})` : ""}
         </Text>
       </TableCell>
+
       <TableCell>
         <Text fontWeight={600} fontSize="11px">
           {transaction.participantDisplayName

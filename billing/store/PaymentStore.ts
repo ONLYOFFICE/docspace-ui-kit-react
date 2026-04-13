@@ -40,7 +40,10 @@ import type {
 /** SDK types date as ApiDateTime but API returns an ISO string. */
 export type WalletOperationDto = Omit<OperationDto, "date"> & {
   date?: string;
+  agentId?: string | null;
+  agentTitle?: string | null;
 };
+
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
 import type { TBalance } from "../types";
