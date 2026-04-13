@@ -558,9 +558,12 @@ class PaymentStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getCustomerBalance(isRefresh, {
-        signal: abortController.signal,
-      });
+      const res = await this.paymentApi.getCustomerBalance(
+        isRefresh || undefined,
+        {
+          signal: abortController.signal,
+        },
+      );
 
       if (!res?.data?.response) return;
 
