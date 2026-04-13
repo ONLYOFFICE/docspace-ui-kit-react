@@ -253,6 +253,7 @@ const AiPage = (props: AiPageProps) => {
             withoutHeader={currentDeviceType !== DeviceType.mobile}
             serviceName={AI_TOOLS}
             hideTypeFilter
+            withoutRoleFilter
           />
         </div>
       ),

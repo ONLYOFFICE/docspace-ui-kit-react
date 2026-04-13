@@ -47,7 +47,7 @@ import { SelectedItemPure } from "../../../components/selected-item";
 import { TSelectorItem } from "../../../components/selector";
 import PeopleSelector from "../../../selectors/People";
 import type { PeopleFilter } from "../../../selectors/People/PeopleSelector.types";
-
+import { EmployeeType } from "../../../enums";
 import FilterPanel from "./sub-components/FilterPanel";
 import TransactionBody from "./sub-components/TransactionBody";
 import styles from "./styles/TransactionHistory.module.scss";
@@ -71,11 +71,12 @@ type TransactionHistoryProps = {
   serviceName?: string;
   headerTitle?: string;
   hideTypeFilter?: boolean;
+  withoutRoleFilter?: boolean;
 };
 
-const filter = (): PeopleFilter => ({
+const filter = (withoutRoleFilter?: boolean): PeopleFilter => ({
   employeeStatus: EmployeeStatus.Active,
-  // newFilter.role = [EmployeeType.Admin];
+  ...(withoutRoleFilter ? {} : { role: [EmployeeType.Admin] }),
 });
 
 const TransactionHistory = (props: TransactionHistoryProps) => {
@@ -86,6 +87,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     serviceName,
     headerTitle,
     hideTypeFilter,
+    withoutRoleFilter,
   } = props;
 
   const { paymentApi } = useApi();
@@ -455,6 +457,15 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     </div>
   );
 
+  const infoProps = withoutRoleFilter
+    ? {}
+    : {
+        withInfo: true as const,
+        infoText: t("OnlyPortalAdminsShown", {
+          productName: t("ProductName"),
+        }),
+      };
+
   const selectorComponent = isSelectorVisible ? (
     <PeopleSelector
       withCancelButton
@@ -469,11 +480,8 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         isCloseable: true,
         headerLabel: t("ListContacts"),
       }}
-      filter={filter}
-      withInfo
-      infoText={t("OnlyPortalAdminsShown", {
-        productName: t("ProductName"),
-      })}
+      filter={() => filter(withoutRoleFilter)}
+      {...infoProps}
       emptyScreenHeader={t("NotFoundMembers")}
       emptyScreenDescription={t("PeopleSelectorInfo", {
         productName: t("ProductName"),
