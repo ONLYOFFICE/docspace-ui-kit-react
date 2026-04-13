@@ -26,11 +26,11 @@
 
 import { useEffect, useMemo } from "react";
 import classNames from "classnames";
-import { match, P } from "ts-pattern";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { useTableCtx } from "../context/TableContext";
 import { TableSkeleton } from "../sub-components/table-skeleton";
+import { TableRow } from "../table-row";
 import styles from "../Table.module.scss";
 import type { TableBodyProps } from "./TableBody.types";
 
@@ -96,75 +96,17 @@ export function TableBody<TData>({
       data-testid="table-body"
       style={{ height: `${virtualizer.getTotalSize()}px` }}
     >
-      {virtualItems.map((virtualItem) => {
-        const index = virtualItem.index;
-        const record = data[index];
-
-        // Data not yet loaded for this index — render empty placeholder row
-        if (!record) {
-          return (
-            <div
-              key={virtualItem.key}
-              className={classNames(styles.virtualRow, "table-container_row")}
-              style={{
-                transform: `translateY(${virtualItem.start}px)`,
-                height: `${virtualItem.size}px`,
-              }}
-              data-index={index}
-            />
-          );
-        }
-
-        const rowProps = onRow?.(record, index) ?? {};
-        const { className: rowClassName, ...restRowProps } = rowProps;
-
-        return (
-          <div
-            key={virtualItem.key}
-            className={classNames(
-              styles.virtualRow,
-              "table-container_row",
-              rowClassName,
-            )}
-            style={{
-              transform: `translateY(${virtualItem.start}px)`,
-              height: `${virtualItem.size}px`,
-            }}
-            data-index={index}
-            data-testid="table-virtual-row"
-            {...restRowProps}
-          >
-            {visibleColumns.map((col) => {
-              const extraClass =
-                typeof col.cellClassName === "function"
-                  ? col.cellClassName(record, index)
-                  : col.cellClassName;
-
-              return (
-                <div
-                  key={col.key}
-                  className={classNames("table-container_cell", extraClass)}
-                >
-                  {match(col)
-                    .with({ render: P.not(P.nullish) }, (c) =>
-                      c.render(record, index),
-                    )
-                    .when(
-                      (c) => !!c.dataIndex,
-                      (c) => String(record[c.dataIndex!] ?? ""),
-                    )
-                    .otherwise(() => "")}
-                </div>
-              );
-            })}
-
-            {/* Settings / actions column — always rendered last */}
-            <div className="table-container_row-context-menu-wrapper">
-              {rowActions?.(record, index)}
-            </div>
-          </div>
-        );
-      })}
+      {virtualItems.map((virtualItem) => (
+        <TableRow<TData>
+          key={virtualItem.key}
+          virtualItem={virtualItem}
+          record={data[virtualItem.index]}
+          index={virtualItem.index}
+          columns={visibleColumns}
+          onRow={onRow}
+          rowActions={rowActions}
+        />
+      ))}
 
       {/* Skeleton loader — shown at the bottom while fetching more rows */}
       {isLoading && (

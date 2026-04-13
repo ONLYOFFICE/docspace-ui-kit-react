@@ -28,6 +28,7 @@ import classNames from "classnames";
 
 import { RectangleSkeleton } from "../../../rectangle";
 import styles from "../../Table.module.scss";
+
 import type { TableSkeletonProps } from "./TableSkeleton.types";
 
 const SKELETON_ROW_COUNT = 2;
@@ -40,7 +41,11 @@ export function TableSkeleton({
   return Array.from({ length: SKELETON_ROW_COUNT }, (_, i) => (
     <div
       key={`skeleton-${i}`}
-      className={classNames(styles.virtualRow, styles.skeletonRow, "table-container_row")}
+      className={classNames(
+        styles.virtualRow,
+        styles.skeletonRow,
+        "table-container_row",
+      )}
       style={{
         transform: `translateY(${offsetTop + i * rowHeight}px)`,
         height: `${rowHeight}px`,
@@ -71,7 +76,11 @@ export function TableSkeleton({
       </div>
       <div
         className="table-container_row-context-menu-wrapper"
-        style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+        }}
       >
         <RectangleSkeleton
           width="16px"

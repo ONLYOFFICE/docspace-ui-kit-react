@@ -25,8 +25,6 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-
-// biome-ignore lint: Table<any> is the correct generic here
 import type { Table, Header } from "@tanstack/react-table";
 
 export interface TableHeaderProps {
@@ -59,3 +57,4 @@ export interface HeaderCellProps {
   isIndexEditingMode: boolean;
   onResizeMouseDown: (colIndex: number) => (e: React.MouseEvent) => void;
 }
+

@@ -52,8 +52,10 @@ import {
 } from "../Table.constants";
 import styles from "../Table.module.scss";
 import type { ColumnPersistenceConfig } from "../Table.types";
-import type { TableContainerStyle, TableContainerProps } from "./TableContainer.types";
-
+import type {
+  TableContainerStyle,
+  TableContainerProps,
+} from "./TableContainer.types";
 
 export function TableContainer<TData = unknown>({
   columns,
@@ -155,7 +157,7 @@ export function TableContainer<TData = unknown>({
   // is used only for column definitions, visibility, and sorting.
 
   const table = useReactTable({
-    data: data as TData[],
+    data,
     columns: columnDefs,
     defaultColumn: {
       minSize: MIN_COLUMN_SIZE,
@@ -244,3 +246,4 @@ export function TableContainer<TData = unknown>({
     </TableProvider>
   );
 }
+

@@ -25,25 +25,18 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
+import type { VirtualItem } from "@tanstack/react-virtual";
 
-export interface TableRowProps {
-  /** Whether this row is checked (selected) */
-  checked?: boolean;
-  /** Whether this row is the active/focused row */
-  isActive?: boolean;
-  /** Whether this row is being dragged */
-  dragging?: boolean;
-  /** Whether non-essential columns are collapsed (narrow container) */
-  hideColumns?: boolean;
-  /** Inline editing mode — adds .isIndexEditingMode class */
-  isIndexEditingMode?: boolean;
-  onClick?: (e: React.MouseEvent) => void;
-  onDoubleClick?: (e: React.MouseEvent) => void;
-  onMouseEnter?: (e: React.MouseEvent) => void;
-  onMouseLeave?: (e: React.MouseEvent) => void;
-  /** Additional CSS class */
-  className?: string;
-  style?: React.CSSProperties;
-  dataTestId?: string;
-  children: React.ReactNode;
+import type { TTableColumnDef } from "../Table.types";
+
+export interface TableRowProps<TData> {
+  virtualItem: VirtualItem;
+  record: TData | undefined;
+  index: number;
+  columns: TTableColumnDef<TData>[];
+  onRow?: (
+    record: TData,
+    index: number,
+  ) => React.HTMLAttributes<HTMLDivElement> & Record<string, unknown>;
+  rowActions?: (record: TData, index: number) => React.ReactNode;
 }

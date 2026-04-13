@@ -29,12 +29,6 @@
 @use "../../styles/mixins";
 @use "../../styles/variables/colors";
 
-@property --table-gtc {
-  syntax: "<string>";
-  inherits: false;
-  initial-value: none;
-}
-
 // ===== Container =====
 
 .tableContainer {

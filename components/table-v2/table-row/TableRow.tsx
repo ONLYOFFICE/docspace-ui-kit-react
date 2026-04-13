@@ -25,51 +25,79 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import classNames from "classnames";
+import { match, P } from "ts-pattern";
 
+import styles from "../Table.module.scss";
 import type { TableRowProps } from "./TableRow.types";
 
-/**
- * TableRow wraps row content. It lives inside the virtualRow container
- * (which owns gridTemplateColumns + absolute positioning) rendered by TableBody.
- * TableRow itself does not apply grid layout — just semantic classes.
- */
-export function TableRow({
-  checked,
-  isActive,
-  dragging,
-  hideColumns,
-  isIndexEditingMode,
-  onClick,
-  onDoubleClick,
-  onMouseEnter,
-  onMouseLeave,
-  className,
-  style,
-  dataTestId,
-  children,
-}: TableRowProps) {
+export function TableRow<TData>({
+  virtualItem,
+  record,
+  index,
+  columns,
+  onRow,
+  rowActions,
+}: TableRowProps<TData>) {
+  if (!record) {
+    return (
+      <div
+        className={classNames(styles.virtualRow, "table-container_row")}
+        style={{
+          transform: `translateY(${virtualItem.start}px)`,
+          height: `${virtualItem.size}px`,
+        }}
+        data-index={index}
+      />
+    );
+  }
+
+  const rowProps = onRow?.(record, index) ?? {};
+  const { className: rowClassName, ...restRowProps } = rowProps;
+
   return (
     <div
       className={classNames(
+        styles.virtualRow,
         "table-container_row",
-        "table-row",
-        className,
-        {
-          checked: checked,
-          "table-row-selected": checked || isActive,
-          dragging: dragging,
-          hideColumns: hideColumns,
-          isIndexEditingMode: isIndexEditingMode,
-        },
+        rowClassName,
       )}
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={style}
-      data-testid={dataTestId ?? "table-row"}
+      style={{
+        transform: `translateY(${virtualItem.start}px)`,
+        height: `${virtualItem.size}px`,
+      }}
+      data-index={index}
+      data-testid="table-virtual-row"
+      {...restRowProps}
     >
-      {children}
+      {columns.map((col) => {
+        const extraClass =
+          typeof col.cellClassName === "function"
+            ? col.cellClassName(record, index)
+            : col.cellClassName;
+
+        return (
+          <div
+            key={col.key}
+            className={classNames("table-container_cell", extraClass)}
+          >
+            {match(col)
+              .with({ render: P.not(P.nullish) }, (c) =>
+                c.render(record, index),
+              )
+              .when(
+                (c) => !!c.dataIndex,
+                (c) => String(record[c.dataIndex!] ?? ""),
+              )
+              .otherwise(() => "")}
+          </div>
+        );
+      })}
+
+      {/* Settings / actions column — always rendered last */}
+      <div className="table-container_row-context-menu-wrapper">
+        {rowActions?.(record, index)}
+      </div>
     </div>
   );
 }
+
