@@ -312,6 +312,15 @@ class PaymentStore {
     return this.autoPayments?.enabled;
   }
 
+  get isAutoTopUpInProgress() {
+    if (!this.isAutoPaymentExist) return false;
+
+    const minBalance = this.autoPayments?.minBalance;
+    if (minBalance === undefined || minBalance === null) return false;
+
+    return this.walletBalance < minBalance;
+  }
+
   private get balanceData() {
     if (this.balance && typeof this.balance !== "number") return this.balance;
     return null;
