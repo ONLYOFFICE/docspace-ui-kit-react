@@ -48,7 +48,6 @@ import styles from "./AdditionalStoragePage.module.scss";
 import { DISK_STORAGE, STORAGE_ENUM } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
-import type { DateTime } from "luxon";
 import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components/toast";
 import StoragePlanUpgrade from "../../panels/additional-storage/StoragePlanUpgrade";
@@ -167,7 +166,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
       await Promise.all([
         fetchPortalTariff?.(),
         fetchBalance?.(),
-        fetchTransactionHistory(null, null, true, true, "", DISK_STORAGE),
+        fetchTransactionHistory(DISK_STORAGE),
       ]);
 
       toastr.success(t("StorageCapacityUpdated"));

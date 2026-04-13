@@ -1,30 +1,32 @@
-import React from "react";
+import { useState } from "react";
 import { observer } from "mobx-react";
 import { Consumer } from "../../../../../../utils";
-import { DeviceType } from "../../../../../../enums";
 
 import useViewEffect from "../../../../../../hooks/useViewEffect";
+import useDeviceType from "../../../../../hooks/useDeviceType";
+import { usePaymentStore } from "../../../../../store/PaymentStoreProvider";
 
 import TableView from "./TableView";
 import RowView from "./RowView";
 
 type ModelSettingsTableProps = {
-  viewAs?: string;
-  setViewAs?: (view: string) => void;
-  currentDeviceType?: DeviceType;
   isDisabled: boolean;
 };
 
-const ModelSettingsTable = ({
-  viewAs,
-  setViewAs,
-  currentDeviceType,
-  isDisabled,
-}: ModelSettingsTableProps) => {
+const ModelSettingsTable = ({ isDisabled }: ModelSettingsTableProps) => {
+  const { mobileBreakpoint, desktopBreakpoint } = usePaymentStore();
+
+  const [viewAs, setViewAs] = useState("row");
+
+  const currentDeviceType = useDeviceType({
+    mobile: mobileBreakpoint,
+    desktop: desktopBreakpoint,
+  });
+
   useViewEffect({
-    view: viewAs!,
-    setView: setViewAs!,
-    currentDeviceType: currentDeviceType!,
+    view: viewAs,
+    setView: setViewAs,
+    currentDeviceType,
   });
 
   return (
@@ -47,3 +49,4 @@ const ModelSettingsTable = ({
 };
 
 export default observer(ModelSettingsTable);
+

@@ -41,15 +41,18 @@ import {
   getServiceQuantity,
 } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
+import { AI_TOOLS } from "../../../../constants";
 
 type TransactionRowViewProps = {
   transaction: WalletOperationDto;
   sectionWidth: number;
+  serviceName?: string;
 };
 
 const TransactionRowView: React.FC<TransactionRowViewProps> = ({
   transaction,
   sectionWidth,
+  serviceName,
 }) => {
   const paymentStore = usePaymentStore();
   const { language } = paymentStore;
@@ -97,6 +100,14 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
       </Text>,
     ];
 
+    if (serviceName === AI_TOOLS && transaction.agentTitle) {
+      children.push(
+        <Text key="source" fontWeight={600} fontSize="11px">
+          {t("AIAgentName", { AgentName: transaction.agentTitle })}
+        </Text>,
+      );
+    }
+
     if (transaction.participantDisplayName) {
       children.push(
         <Text key="participant" fontWeight={600} fontSize="11px">
@@ -135,9 +146,7 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
         </Text>
       }
     >
-      <RowContent sectionWidth={sectionWidth}>
-        {getRowChildren()}
-      </RowContent>
+      <RowContent sectionWidth={sectionWidth}>{getRowChildren()}</RowContent>
     </Row>
   );
 };

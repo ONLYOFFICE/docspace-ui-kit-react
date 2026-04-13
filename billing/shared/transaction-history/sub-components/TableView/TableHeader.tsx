@@ -28,6 +28,7 @@ import React from "react";
 import { useCommonTranslation } from "../../../../../utils/i18n";
 
 import { TableHeader } from "../../../../../components/table";
+import { AI_TOOLS } from "../../../../constants";
 
 type TableHeaderProps = {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -35,10 +36,14 @@ type TableHeaderProps = {
   columnInfoPanelStorageName: string;
   sectionWidth: number;
   itemHeight: number;
+  serviceName?: string;
 };
 
 const TransactionHistoryTableHeader = (props: TableHeaderProps) => {
+  const { serviceName, ...rest } = props;
   const t = useCommonTranslation();
+
+  const isAiTools = serviceName === AI_TOOLS;
 
   const defaultColumns = [
     {
@@ -46,11 +51,21 @@ const TransactionHistoryTableHeader = (props: TableHeaderProps) => {
       title: t("Date"),
       enable: true,
       resizable: true,
-      default: true,
       sortBy: "AZ",
       active: true,
       minWidth: 150,
     },
+    ...(isAiTools
+      ? [
+          {
+            key: "Source",
+            title: t("Source"),
+            enable: true,
+            resizable: true,
+            minWidth: 150,
+          },
+        ]
+      : []),
     {
       key: "Type",
       title: t("Type"),
@@ -86,9 +101,10 @@ const TransactionHistoryTableHeader = (props: TableHeaderProps) => {
       columns={defaultColumns}
       showSettings={false}
       useReactWindow
-      {...props}
+      {...rest}
     />
   );
 };
 
 export default TransactionHistoryTableHeader;
+

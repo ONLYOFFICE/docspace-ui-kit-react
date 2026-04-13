@@ -20,6 +20,8 @@ type BalanceAmountProps = {
   title?: React.ReactNode;
   onRefresh?: () => void;
   isRefreshing?: boolean;
+  progressText?: string;
+  isProgressTextVisible?: boolean;
   showRefresh?: boolean;
   amount?: number;
   currency?: string;
@@ -46,6 +48,8 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     title,
     onRefresh,
     isRefreshing = false,
+    progressText,
+    isProgressTextVisible = false,
     showRefresh = true,
     amount = 0,
     currency = "USD",
@@ -94,14 +98,33 @@ const BalanceAmount = (props: BalanceAmountProps) => {
               })}
             />
           ) : null}
+
+          {progressText ? (
+            <Text
+              fontWeight={600}
+              className={classNames(styles.progressText, {
+                [styles.progressTextHidden]: !isProgressTextVisible,
+              })}
+            >
+              {progressText}
+            </Text>
+          ) : null}
         </div>
       ) : null}
 
       <div
-        className={classNames(styles.balanceAmountContainer, { [styles.withoutMargin]: withoutMargin })}
+        className={classNames(styles.balanceAmountContainer, {
+          [styles.withoutMargin]: withoutMargin,
+        })}
         style={{
-          ...(mainFontSize && { "--balance-main-font-size": mainFontSize } as React.CSSProperties),
-          ...(fractionFontSize && { "--balance-fraction-font-size": fractionFontSize } as React.CSSProperties),
+          ...(mainFontSize &&
+            ({
+              "--balance-main-font-size": mainFontSize,
+            } as React.CSSProperties)),
+          ...(fractionFontSize &&
+            ({
+              "--balance-fraction-font-size": fractionFontSize,
+            } as React.CSSProperties)),
         }}
       >
         {tokens.map((token) => (
@@ -118,3 +141,4 @@ const BalanceAmount = (props: BalanceAmountProps) => {
 };
 
 export default observer(BalanceAmount);
+

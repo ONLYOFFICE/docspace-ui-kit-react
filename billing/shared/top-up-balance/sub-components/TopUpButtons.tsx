@@ -36,7 +36,6 @@ import { useAmountValue } from "../../../wallet/context";
 import styles from "../styles/TopUpModal.module.scss";
 import { AI_TOOLS } from "../../../constants";
 import { observer } from "mobx-react";
-import { DateTime } from "luxon";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
 interface TopUpButtonsProps {
@@ -45,14 +44,7 @@ interface TopUpButtonsProps {
   isLoading: boolean;
   fetchBalance?: () => Promise<void>;
   fetchServiceBalance?: () => Promise<void>;
-  fetchTransactionHistory?: (
-    startDate: DateTime | null,
-    endDate: DateTime | null,
-    credit: boolean,
-    debit: boolean,
-    participantName?: string,
-    serviceName?: string,
-  ) => Promise<void>;
+  fetchTransactionHistory?: (serviceName?: string) => Promise<void>;
   onClose: (isTopUp: boolean) => void;
   walletCustomerEmail?: string;
   walletCustomerStatusNotActive?: boolean;
@@ -102,7 +94,7 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
 
       const requests: Promise<unknown>[] = [
         fetchBalance!(),
-        fetchTransactionHistory!(null, null, true, true, "", serviceName),
+        fetchTransactionHistory!(serviceName),
       ];
 
       if (serviceName) {

@@ -32,9 +32,10 @@ import { EmptyView } from "../../../../components/empty-view";
 
 import { Consumer } from "../../../../utils";
 
-import NoTransactionsIcon from "../../../../assets/no.transactions.react.svg";
-import NoTransactionsFilterIcon from "../../../../assets/no.transactions.filter.react.svg";
-import NoTransactionsFilterDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
+import NoTransactionsFilterIcon from "../../../../assets/no.transactions.react.svg";
+import NoTransactionsFilterDarkIcon from "../../../../assets/no.transactions.dark.theme.react.svg";
+import NoTransactionsIcon from "../../../../assets/no.transactions.filter.react.svg";
+import NoTransactionsDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import useViewEffect from "../../../../hooks/useViewEffect";
@@ -46,11 +47,13 @@ import RowView from "./RowView";
 type TransactionHistoryProps = {
   isTransactionHistoryExist: boolean;
   hasAppliedDateFilter: boolean;
+  serviceName?: string;
 };
 
 const TransactionBody = ({
   hasAppliedDateFilter,
   isTransactionHistoryExist,
+  serviceName,
 }: TransactionHistoryProps) => {
   const { isBase } = useTheme();
   const { mobileBreakpoint, desktopBreakpoint } = usePaymentStore();
@@ -70,6 +73,12 @@ const TransactionBody = ({
 
   const t = useCommonTranslation();
 
+  const emptyIcon = isBase ? (
+    <NoTransactionsIcon />
+  ) : (
+    <NoTransactionsDarkIcon />
+  );
+
   const filterIcon = isBase ? (
     <NoTransactionsFilterIcon />
   ) : (
@@ -85,7 +94,7 @@ const TransactionBody = ({
 
   const emptyView = (
     <EmptyView
-      icon={hasAppliedDateFilter ? filterIcon : <NoTransactionsIcon />}
+      icon={hasAppliedDateFilter ? filterIcon : emptyIcon}
       title={title}
       description={description}
       options={null}
@@ -96,9 +105,15 @@ const TransactionBody = ({
     <Consumer>
       {(context) =>
         viewAs === "table" ? (
-          <TableView sectionWidth={context.sectionWidth || 0} />
+          <TableView
+            sectionWidth={context.sectionWidth || 0}
+            serviceName={serviceName}
+          />
         ) : (
-          <RowView sectionWidth={context.sectionWidth || 0} />
+          <RowView
+            sectionWidth={context.sectionWidth || 0}
+            serviceName={serviceName}
+          />
         )
       }
     </Consumer>

@@ -99,7 +99,7 @@ const TopUpModal = (props: TopUpModalProps) => {
   };
 
   const onFetchHistory = async () => {
-    await fetchTransactionHistory?.(null, null, true, true, "", serviceName);
+    await fetchTransactionHistory?.(serviceName);
   };
 
   return (
