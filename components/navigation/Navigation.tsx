@@ -86,6 +86,7 @@ const Navigation = ({
   isPlusButtonVisible,
   showBackButton,
   contextMenuHeader,
+  titleTooltip,
 
   ...rest
 }: TNavigationProps) => {
@@ -183,6 +184,7 @@ const Navigation = ({
         onClick={toggleDropBox}
         isRootFolderTitle={false}
         badgeLabel={!showRootFolderNavigation ? badgeLabel : ""}
+        titleTooltip={!showRootFolderNavigation ? titleTooltip : undefined}
       />
     </div>
   );
