@@ -178,6 +178,7 @@ const Wallet = (props: WalletProps) => {
           showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
           isRefreshing={isRefreshing || isAutoSpinning}
           progressText={t("TopUpInProgress")}
+          isProgressTextVisible={isAutoSpinning}
           onRefresh={onClick}
           amount={walletBalance}
           currency={walletCodeCurrency}

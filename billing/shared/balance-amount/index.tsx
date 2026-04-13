@@ -21,6 +21,7 @@ type BalanceAmountProps = {
   onRefresh?: () => void;
   isRefreshing?: boolean;
   progressText?: string;
+  isProgressTextVisible?: boolean;
   showRefresh?: boolean;
   amount?: number;
   currency?: string;
@@ -48,6 +49,7 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     onRefresh,
     isRefreshing = false,
     progressText,
+    isProgressTextVisible = false,
     showRefresh = true,
     amount = 0,
     currency = "USD",
@@ -101,7 +103,7 @@ const BalanceAmount = (props: BalanceAmountProps) => {
             <Text
               fontWeight={600}
               className={classNames(styles.progressText, {
-                [styles.progressTextHidden]: !isRefreshing,
+                [styles.progressTextHidden]: !isProgressTextVisible,
               })}
             >
               {progressText}
