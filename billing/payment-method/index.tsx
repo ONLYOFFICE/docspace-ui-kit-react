@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useCommonTranslation } from "../../utils/i18n";
 import { observer } from "mobx-react";
 
@@ -37,11 +37,13 @@ import HelpReactSvgUrl from "../../assets/help.react.svg?url";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { toAbsoluteUrl } from "../utils/url";
+import { finishRefreshingWithMinCycle } from "../utils/refreshing";
 
 import styles from "./PaymentMethod.module.scss";
 import PaymentMethodLoader from "./PaymentMethodLoader";
 import PayerInformation from "../shared/payer-information";
 import { CardInformation } from "../shared/card-information";
+import RefreshIconButton from "../shared/refresh-icon-button";
 import StorageTariffDeactivated from "../dialogs/StorageTariffDeactivated";
 
 interface PaymentMethodProps {
@@ -56,6 +58,8 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const { paymentMethodInit } = paymentStore;
 
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   useEffect(() => {
     paymentMethodInit(t);
   }, []);
@@ -69,8 +73,11 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     isShowStorageTariffDeactivatedModal,
   } = paymentStore;
 
-  const { walletCustomerStatusNotActive, walletCustomerEmail } =
-    paymentStore.tariff;
+  const {
+    walletCustomerStatusNotActive,
+    walletCustomerEmail,
+    fetchCustomerInfo,
+  } = paymentStore.tariff;
 
   if (!isPaymentMethodInit || showPortalSettingsLoader)
     return <PaymentMethodLoader />;
@@ -85,6 +92,25 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     cardLinked
       ? window.open(toAbsoluteUrl(cardLinked), "_self")
       : toastr.error(t("UnexpectedError"));
+  };
+
+  const onRefreshPaymentMethod = async () => {
+    if (isRefreshing) return;
+
+    setIsRefreshing(true);
+
+    const startTime = Date.now();
+
+    try {
+      await fetchCustomerInfo(true);
+    } catch (e) {
+      toastr.error(e as Error);
+    } finally {
+      finishRefreshingWithMinCycle({
+        startTime,
+        setRefreshing: setIsRefreshing,
+      });
+    }
   };
 
   const renderTooltip = (
@@ -122,6 +148,10 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <Text fontSize="16px" fontWeight={700} lineHeight="22px">
           {t("PaymentMethod")}
         </Text>
+        <RefreshIconButton
+          onRefresh={onRefreshPaymentMethod}
+          isRefreshing={isRefreshing}
+        />
       </div>
 
       <Text className={styles.description} lineHeight="20px">
