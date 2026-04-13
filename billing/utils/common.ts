@@ -47,13 +47,13 @@ export const getConvertedSize = (
   let resultSize = bytes;
 
   const sizeNames = [
-    t("Bytes"),
-    t("Kilobyte"),
-    t("Megabyte"),
-    t("Gigabyte"),
-    t("Terabyte"),
-    t("Petabyte"),
-    t("Exabyte"),
+    t("Common:Bytes"),
+    t("Common:Kilobyte"),
+    t("Common:Megabyte"),
+    t("Common:Gigabyte"),
+    t("Common:Terabyte"),
+    t("Common:Petabyte"),
+    t("Common:Exabyte"),
   ];
 
   if (bytes <= 0) return `${`0 ${t("Bytes")}`}`;
@@ -102,3 +102,4 @@ export const formatCurrencyValue = (
 
   return formatter.format(truncated);
 };
+
