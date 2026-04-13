@@ -231,6 +231,7 @@
   width: 100%;
   display: grid;
   grid-template-columns: var(--table-gtc);
+  contain: layout style;
 
   :global(.table-container_cell) {
     display: flex;

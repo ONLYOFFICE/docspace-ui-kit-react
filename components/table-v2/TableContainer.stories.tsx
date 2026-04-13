@@ -42,7 +42,7 @@ interface MockGroup {
   manager: string;
 }
 
-const MOCK_DATA: MockGroup[] = Array.from({ length: 30 }, (_, i) => ({
+const MOCK_DATA: MockGroup[] = Array.from({ length: 250 }, (_, i) => ({
   id: `group-${i}`,
   name: `Group ${i + 1}`,
   members: Math.floor(Math.random() * 50) + 1,
@@ -93,7 +93,7 @@ function TableDemo({
       enable: true,
       minWidth: 210,
       sortBy: "name",
-      render: (_value, row) => {
+      render: (row) => {
         const isChecked = selected.has(row.id);
         return (
           <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -114,7 +114,7 @@ function TableDemo({
       sortBy: "members",
       dataIndex: "members",
       onChange: () => setMembersVisible((v) => !v),
-      render: (value) => <span>{value as number}</span>,
+      render: (record) => <span>{record.members}</span>,
     },
     {
       key: "manager",
@@ -123,7 +123,7 @@ function TableDemo({
       sortBy: "manager",
       dataIndex: "manager",
       onChange: () => setManagerVisible((v) => !v),
-      render: (value) => <span>{value as string}</span>,
+      render: (record) => <span>{record.manager}</span>,
     },
   ];
 

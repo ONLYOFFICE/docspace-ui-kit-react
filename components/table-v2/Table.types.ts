@@ -133,26 +133,11 @@ export interface TTableColumn {
   withTagRef?: boolean;
 }
 
-/**
- * Typed column definition for consumers.
- *
- * Extends TTableColumn by ADDING render/cellClassName/dataIndex (not overriding
- * anything), so TTableColumnDef<TData>[] is assignable to TTableColumn[] and
- * there is no function-parameter variance conflict.
- */
 export interface TTableColumnDef<TData> extends TTableColumn {
-  /** Type-safe field name — limits dataIndex to actual keys of TData. */
-  dataIndex?: keyof TData & string;
-
-  /**
-   * Cell renderer — mirrors antd Table column.render.
-   * @param value   record[dataIndex] when dataIndex is set; otherwise the full record
-   * @param record  full row data object (typed as TData)
-   * @param index   row index in the data array
-   */
-  render?: (value: unknown, record: TData, index: number) => React.ReactNode;
-
-  /** Extra CSS class for the cell wrapper div. */
+  /** Field key for default cell rendering (when `render` is absent). */
+  dataIndex?: keyof TData;
+  /** Cell renderer — receives the full record and row index. */
+  render?(record: TData, index: number): React.ReactNode;
   cellClassName?:
     | string
     | ((record: TData, index: number) => string | undefined);

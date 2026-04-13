@@ -26,6 +26,7 @@
 
 import { useEffect, useMemo } from "react";
 import classNames from "classnames";
+import { match, P } from "ts-pattern";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import { useTableCtx } from "../context/TableContext";
@@ -47,7 +48,7 @@ export function TableBody<TData>({
   onRow,
   rowActions,
 }: TableBodyProps<TData>) {
-  const { table, columnSizing } = useTableCtx();
+  const { table } = useTableCtx();
 
   const resolvedItemCount = itemCount ?? data.length;
 
@@ -57,9 +58,10 @@ export function TableBody<TData>({
   const visibleColumns = useMemo(() => {
     const visibleIds = new Set(table.getVisibleLeafColumns().map((c) => c.id));
     return columns.filter((c) => visibleIds.has(c.key));
-  }, [table, columns, columnSizing]);
+  }, [table, columns]);
 
   const virtualizer = useVirtualizer({
+    useFlushSync: false,
     count: resolvedItemCount,
     estimateSize: () => itemHeight,
     overscan,
@@ -115,8 +117,6 @@ export function TableBody<TData>({
             {...restRowProps}
           >
             {visibleColumns.map((col) => {
-              const value = col.dataIndex ? record[col.dataIndex] : record;
-
               const extraClass =
                 typeof col.cellClassName === "function"
                   ? col.cellClassName(record, index)
@@ -127,9 +127,15 @@ export function TableBody<TData>({
                   key={col.key}
                   className={classNames("table-container_cell", extraClass)}
                 >
-                  {col.render
-                    ? col.render(value, record, index)
-                    : String(value ?? "")}
+                  {match(col)
+                    .with({ render: P.not(P.nullish) }, (c) =>
+                      c.render(record, index),
+                    )
+                    .when(
+                      (c) => !!c.dataIndex,
+                      (c) => String(record[c.dataIndex!] ?? ""),
+                    )
+                    .otherwise(() => "")}
                 </div>
               );
             })}

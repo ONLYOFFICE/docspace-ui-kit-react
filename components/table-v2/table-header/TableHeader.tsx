@@ -42,7 +42,7 @@ export function TableHeader({
   tagRef,
   className,
 }: TableHeaderProps) {
-  const { table, columnSizing, hideColumns, isIndexEditingMode, onResizeMouseDown } =
+  const { table, hideColumns, isIndexEditingMode, onResizeMouseDown } =
     useTableCtx();
 
   // Build settings columns list from table columns that have onChange meta
@@ -57,7 +57,7 @@ export function TableHeader({
         onChange: meta.onChange ? () => meta.onChange!(col.id) : undefined,
       };
     });
-  }, [table, columnSizing]);
+  }, [table]);
 
   return (
     <div

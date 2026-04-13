@@ -36,14 +36,11 @@ export function columnDefsFromColumns<TData>(
   return cols.map((col) => ({
     id: col.key,
     // Stub accessor — table-v2 uses children-as-function cell rendering
-    // biome-ignore lint: accessorFn must return something; null is fine here
-    accessorFn: () => null as unknown,
     header: col.title,
     minSize:
       col.minWidth ?? (col.default ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE),
     size:
-      col.defaultSize ??
-      (col.default ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE),
+      col.defaultSize ?? (col.default ? MIN_NAME_COLUMN_SIZE : MIN_COLUMN_SIZE),
     enableResizing: !col.defaultSize && col.resizable !== false,
     meta: {
       default: col.default ?? false,
