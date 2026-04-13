@@ -409,14 +409,7 @@ class ServicesStore {
       const requests: Promise<unknown>[] = [
         ...serviceQuotaRequest,
         this.paymentStore.tariff.fetchPortalTariff(),
-        fetchTransactionHistory(
-          null,
-          null,
-          true,
-          true,
-          "",
-          resolvedServiceName,
-        ),
+        fetchTransactionHistory(resolvedServiceName),
         initWalletPayerAndBalance(isRefresh),
       ];
 

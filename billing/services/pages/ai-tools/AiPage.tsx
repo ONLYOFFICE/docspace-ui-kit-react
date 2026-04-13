@@ -130,7 +130,7 @@ const AiPage = (props: AiPageProps) => {
     try {
       await Promise.all([
         fetchAiServiceBalance(),
-        fetchTransactionHistory(null, null, true, true, "", AI_TOOLS),
+        fetchTransactionHistory(AI_TOOLS),
       ]);
     } finally {
       finishRefreshingWithMinCycle({
