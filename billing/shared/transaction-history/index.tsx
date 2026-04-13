@@ -144,6 +144,45 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
   const [isFilterDialogVisible, setIsFilterDialogVisible] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
 
+  const [reservedSpacer, setReservedSpacer] = useState<number | undefined>();
+  const isReserveActive = reservedSpacer !== undefined;
+
+  const getScrollEl = (): HTMLElement | null =>
+    (document.querySelector(
+      "#sectionScroll .scroll-wrapper > .scroller",
+    ) as HTMLElement | null) ??
+    (document.querySelector(
+      "#customScrollBar .scroll-wrapper > .scroller",
+    ) as HTMLElement | null);
+
+  const runFetch = () => {
+    const scrollEl = getScrollEl();
+    if (scrollEl) {
+      setReservedSpacer(scrollEl.scrollTop + scrollEl.clientHeight);
+    }
+    return fetchTransactionHistory(serviceName);
+  };
+
+  useEffect(() => {
+    if (isTransactionLoading || !isReserveActive) return;
+
+    const scrollEl = getScrollEl();
+    if (!scrollEl) return;
+
+    const onScroll = () => {
+      setReservedSpacer((prev) => {
+        if (prev === undefined) return prev;
+        const required = scrollEl.scrollTop + scrollEl.clientHeight;
+        const contentOnly = scrollEl.scrollHeight - prev;
+        const next = Math.max(0, required - contentOnly);
+        if (next >= prev) return prev;
+        return next > 0 ? next : undefined;
+      });
+    };
+    scrollEl.addEventListener("scroll", onScroll, { passive: true });
+    return () => scrollEl.removeEventListener("scroll", onScroll);
+  }, [isTransactionLoading, isReserveActive]);
+
   // Mobile filter local state — applied to store only via onApplyFilter
   const [mobileFilterState, setMobileFilterState] = useState({
     selectedType: selectedType,
@@ -179,7 +218,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 
     if (isMobile) closeFilterDialog();
 
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onCloseContactSelector = () => {
@@ -201,7 +240,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     }
 
     setFilterSelectedTypeKey(option.key as string);
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onStartDateChange = async (date: DateTime | null): Promise<void> => {
@@ -217,7 +256,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     }
 
     setFilterStartDate(date);
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onEndDateChange = async (date: DateTime | null): Promise<void> => {
@@ -233,7 +272,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     }
 
     setFilterEndDate(date);
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onSubmitContactSelector = async (contacts: TSelectorItem[]) => {
@@ -250,7 +289,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     }
 
     setFilterContact(contact);
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onCloseSelectedContact = async () => {
@@ -264,7 +303,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     }
 
     setFilterContact(null);
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onApplyFilter = async () => {
@@ -276,7 +315,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     setIsFilterDialogVisible(false);
     setIsChanged(false);
 
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const getReport = async () => {
@@ -546,6 +585,10 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
             </Text>
           </div>
         </>
+      ) : null}
+
+      {reservedSpacer ? (
+        <div style={{ height: reservedSpacer }} aria-hidden="true" />
       ) : null}
 
       {isFilterDialogVisible ? (

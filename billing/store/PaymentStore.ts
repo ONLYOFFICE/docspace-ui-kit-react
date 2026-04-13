@@ -630,17 +630,13 @@ class PaymentStore {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
-    const showLoader = this.transactionHistory.length === 0;
-
-    if (showLoader) {
-      this._transactionTimerId = setTimeout(() => {
-        runInAction(() => {
-          if (this._transactionTimerId !== null) {
-            this.isTransactionLoading = true;
-          }
-        });
-      }, 500);
-    }
+    this._transactionTimerId = setTimeout(() => {
+      runInAction(() => {
+        if (this._transactionTimerId !== null) {
+          this.isTransactionLoading = true;
+        }
+      });
+    }, 500);
 
     const { isCredit, isDebit } = getTransactionType(
       this.filterSelectedTypeKey,
