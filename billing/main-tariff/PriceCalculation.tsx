@@ -170,7 +170,7 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
 
         <TotalTariffContainer t={t} isDisabled={isDisabled} />
 
-        {isPayer && walletCustomerStatusNotActive ? (
+        {!isNotPaidPeriod && isPayer && walletCustomerStatusNotActive ? (
           <div className={styles.cardUnlinkedWarning}>
             <Text fontWeight={600} className={styles.warningColor}>
               {t("CardUnlinked")}
@@ -192,7 +192,9 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
         ) : null}
 
         <ButtonContainer
-          isDisabled={walletCustomerStatusNotActive || isDisabled}
+          isDisabled={
+            (!isNotPaidPeriod && walletCustomerStatusNotActive) || isDisabled
+          }
           t={t}
         />
       </div>

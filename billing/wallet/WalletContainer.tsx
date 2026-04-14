@@ -198,7 +198,7 @@ const Wallet = (props: WalletProps) => {
         />
       </div>
 
-      {walletCustomerStatusNotActive ? (
+      {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
         <div className={styles.walletCustomerStatusNotActive}>
           <Text fontWeight={600} className={styles.warningColor}>
             {t("CardUnlinked")}

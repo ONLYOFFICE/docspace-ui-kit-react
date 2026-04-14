@@ -32,33 +32,33 @@ import { getConvertedSize } from "../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import styles from "./SubComponents.module.scss";
 
-const SelectTotalSizeContainer = observer(({
-  usedTotalStorageSizeTitle,
-  isNeedPlusSign,
-}: {
-  usedTotalStorageSizeTitle?: string;
-  isNeedPlusSign: boolean;
-}) => {
-  const paymentStore = usePaymentStore();
-  const { allowedStorageSizeByQuota } = paymentStore;
+const SelectTotalSizeContainer = observer(
+  ({ isNeedPlusSign }: { isNeedPlusSign: boolean }) => {
+    const paymentStore = usePaymentStore();
+    const { allowedStorageSizeByQuota } = paymentStore;
 
-  const t = useCommonTranslation();
+    const { usedTotalStorageSizeTitle } = paymentStore.paymentQuotas;
 
-  const convertedSize = getConvertedSize(t, allowedStorageSizeByQuota);
+    const t = useCommonTranslation();
 
-  return (
-    <div className={styles.selectTotalSizeContainer}>
-      <Text
-        textAlign="center"
-        fontWeight={600}
-        fontSize="11px"
-        className={styles.selectTotalSizeTitle}
-        color="var(--payment-storage-size-title)"
-      >
-        {usedTotalStorageSizeTitle}: {convertedSize} {isNeedPlusSign ? "+" : ""}
-      </Text>
-    </div>
-  );
-});
+    const convertedSize = getConvertedSize(t, allowedStorageSizeByQuota);
+
+    return (
+      <div className={styles.selectTotalSizeContainer}>
+        <Text
+          textAlign="center"
+          fontWeight={600}
+          fontSize="11px"
+          className={styles.selectTotalSizeTitle}
+          color="var(--payment-storage-size-title)"
+        >
+          {usedTotalStorageSizeTitle}: {convertedSize}{" "}
+          {isNeedPlusSign ? "+" : ""}
+        </Text>
+      </div>
+    );
+  },
+);
 
 export default SelectTotalSizeContainer;
+
