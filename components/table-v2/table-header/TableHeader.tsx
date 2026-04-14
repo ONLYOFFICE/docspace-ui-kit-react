@@ -29,9 +29,10 @@ import classNames from "classnames";
 
 import { useTableCtx } from "../context/TableContext";
 import { getColumnMeta } from "../Table.meta";
+import { HeaderCell } from "../sub-components/header-cell";
 import { TableSettings } from "../sub-components/table-settings";
 import styles from "../Table.module.scss";
-import type { TableHeaderProps, HeaderCellProps } from "./TableHeader.types";
+import type { TableHeaderProps } from "./TableHeader.types";
 
 export function TableHeader({
   activeSortBy,
@@ -114,109 +115,3 @@ export function TableHeader({
     </div>
   );
 }
-
-function HeaderCell({
-  header,
-  visualIndex,
-  activeSortBy,
-  activeSortOrder,
-  isLastColumn,
-  hideColumns,
-  isIndexEditingMode,
-  onResizeMouseDown,
-}: HeaderCellProps) {
-  const meta = getColumnMeta(header.column);
-
-  const { sortBy, onClick, defaultSize } = meta;
-  const isDefault = meta.default ?? false;
-  const isShort = meta.isShort ?? false;
-
-  const tanstackSorted = header.column.getIsSorted();
-  const isExternalSorted = sortBy ? activeSortBy === sortBy : false;
-  const isSorted = tanstackSorted || isExternalSorted;
-  const sortDirection = tanstackSorted
-    ? tanstackSorted
-    : activeSortOrder === "descending"
-      ? "desc"
-      : "asc";
-
-  // Resize handle: not on last column, not in editing mode, not on fixed-size columns
-  const canResize = !isLastColumn && !isIndexEditingMode && !defaultSize;
-
-  const handleSortClick = (e: React.MouseEvent) => {
-    if (sortBy && onClick) {
-      onClick(sortBy, e);
-    }
-  };
-
-  const cellClasses = classNames(
-    styles.headerCell,
-    "table-container_header-cell",
-    {
-      [styles.isActive]: isSorted,
-      [styles.isDefault]: isDefault,
-      [styles.sortable]: !!sortBy,
-      [styles.sorted]: sortDirection === "desc",
-    },
-  );
-
-  const checkboxMeta = meta.checkbox;
-
-  return (
-    <div
-      className={cellClasses}
-      id={`column_${visualIndex}`}
-      data-enable={header.column.getIsVisible()}
-      data-default={isDefault}
-      data-is-short={isShort}
-      data-min-width={header.column.columnDef.minSize}
-      data-default-size={defaultSize ?? undefined}
-      data-testid={`column-${header.id}`}
-    >
-      {checkboxMeta ? (
-        <input
-          type="checkbox"
-          checked={checkboxMeta.value}
-          ref={(el) => {
-            if (el) el.indeterminate = checkboxMeta.isIndeterminate;
-          }}
-          onChange={checkboxMeta.onChange}
-          className="table-container_row-checkbox"
-          data-testid="header-checkbox"
-        />
-      ) : (
-        <div className={styles.headerItem}>
-          <div className={styles.textWrapper} onClick={handleSortClick}>
-            <span className={classNames(styles.text, "header-container-text")}>
-              {header.isPlaceholder
-                ? null
-                : (meta.title ?? String(header.column.columnDef.header ?? ""))}
-            </span>
-          </div>
-          {sortBy && (
-            <span className={styles.sortIcon} data-testid="sort-icon">
-              <svg width="12" height="12" viewBox="0 0 12 12">
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M6.14453 10.8536C6.33979 11.0488 6.65638 11.0488 6.85164 10.8536L10.3516 7.35355L9.64453 6.64645L6.99808 9.29289V2H5.99808V9.29289L3.35164 6.64645L2.64453 7.35355L6.14453 10.8536Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </span>
-          )}
-        </div>
-      )}
-
-      {canResize && !hideColumns && (
-        <div
-          className={classNames(styles.resizeHandle, "not-selectable")}
-          onMouseDown={onResizeMouseDown(visualIndex)}
-          data-testid="resize-handle"
-          data-column={visualIndex}
-        />
-      )}
-    </div>
-  );
-}
-

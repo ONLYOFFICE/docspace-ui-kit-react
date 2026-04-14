@@ -72,7 +72,7 @@ export function TableBody<TData>({
     overscan,
     getScrollElement: () =>
       scrollElementRef?.current ??
-      document.querySelector<HTMLElement>(scrollContainerSelector),
+      document?.querySelector<HTMLElement>(scrollContainerSelector),
     paddingStart: HEADER_HEIGHT,
   });
 

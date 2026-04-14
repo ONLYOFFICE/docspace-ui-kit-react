@@ -25,19 +25,17 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { VirtualItem } from "@tanstack/react-virtual";
+import type { Header } from "@tanstack/react-table";
 
-import type { TTableColumnDef } from "../Table.types";
-
-export interface TableRowProps<TData> {
-  virtualItem: VirtualItem;
-  record: TData | undefined;
-  index: number;
-  columns: TTableColumnDef<TData>[];
-  onRow?: (
-    record: TData,
-    index: number,
-  ) => React.HTMLAttributes<HTMLDivElement> & Record<string, unknown>;
-  rowActions?: (record: TData, index: number) => React.ReactNode;
+export interface HeaderCellProps {
+  // biome-ignore lint: Header<any, any> is acceptable here
+  header: Header<any, any>;
+  /** Visual (zero-based) index within the visible headers array */
+  visualIndex: number;
+  activeSortBy?: string;
+  activeSortOrder?: string;
+  isLastColumn?: boolean;
+  hideColumns: boolean;
+  isIndexEditingMode: boolean;
+  onResizeMouseDown: (colIndex: number) => (e: React.MouseEvent) => void;
 }
-

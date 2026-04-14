@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { Table, Header } from "@tanstack/react-table";
+import type { Table } from "@tanstack/react-table";
 
 export interface TableHeaderProps {
   /** External sort key (e.g. "title", "membersCount") */
@@ -43,18 +43,5 @@ export interface TableHeaderProps {
   tagRef?: React.Ref<HTMLDivElement>;
   /** Additional CSS class */
   className?: string;
-}
-
-export interface HeaderCellProps {
-  // biome-ignore lint: Header<any, any> is acceptable here
-  header: Header<any, any>;
-  /** Visual (zero-based) index within the visible headers array */
-  visualIndex: number;
-  activeSortBy?: string;
-  activeSortOrder?: string;
-  isLastColumn?: boolean;
-  hideColumns: boolean;
-  isIndexEditingMode: boolean;
-  onResizeMouseDown: (colIndex: number) => (e: React.MouseEvent) => void;
 }
 
