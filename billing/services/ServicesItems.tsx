@@ -27,7 +27,6 @@
 import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
-import { CommonTrans } from "../../utils/i18n/CommonTrans";
 
 import { Text } from "../../components/text";
 import {
@@ -44,6 +43,7 @@ import PriceIcon from "../../assets/icons/16/price.react.svg";
 
 import styles from "./styles/AdditionalStorage.module.scss";
 import { useServicesActions } from "./hooks/useServicesActions";
+import { usePermissionTooltipText } from "./hooks/usePermissionTooltipText";
 
 import ServiceCard from "./sub-components/ServiceCard";
 
@@ -92,7 +92,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   const {
     isGracePeriod,
     hasScheduledStorageChange,
-    walletCustomerInfo,
     walletCustomerEmail,
     currentStoragePlanSize,
     nextStoragePlanSize,
@@ -104,19 +103,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   const isDisabled = isServiceActionDisabled;
   const { t } = useServicesActions();
 
-  const permissionTooltipText = (
-    <CommonTrans
-     
-      i18nKey="InsufficientPermissionsMessage"
-      values={{
-        payerContact:
-          (walletCustomerInfo as { displayName?: string })?.displayName ||
-          walletCustomerEmail ||
-          "",
-      }}
-      components={{ 1: <strong /> }}
-    />
-  );
+  const permissionTooltipText = usePermissionTooltipText();
 
   const handleToggle = (
     e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>,

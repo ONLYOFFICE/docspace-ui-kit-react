@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useCommonTranslation } from "../../utils/i18n";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
@@ -69,6 +69,7 @@ const Wallet = (props: WalletProps) => {
     isPayer,
     reccomendedAmount,
     walletHelpUrl,
+    isAutoTopUpInProgress,
   } = store;
 
   const {
@@ -82,6 +83,35 @@ const Wallet = (props: WalletProps) => {
   const [visible, setVisible] = useState(isVisibleWalletSettings);
   const [isEditAutoPayment, setIsEditAutoPayment] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [isAutoSpinning, setIsAutoSpinning] = useState(isAutoTopUpInProgress);
+  const autoStartTimeRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (isAutoTopUpInProgress) {
+      autoStartTimeRef.current ??= Date.now();
+      setIsAutoSpinning(true);
+      return;
+    }
+
+    const startTime = autoStartTimeRef.current;
+
+    if (startTime === null) {
+      setIsAutoSpinning(false);
+      return;
+    }
+
+    autoStartTimeRef.current = null;
+
+    const timerId = finishRefreshingWithMinCycle({
+      startTime,
+      setRefreshing: setIsAutoSpinning,
+    });
+
+    return () => {
+      if (timerId !== undefined) window.clearTimeout(timerId);
+    };
+  }, [isAutoTopUpInProgress]);
 
   const onClose = () => {
     setVisible(false);
@@ -146,7 +176,9 @@ const Wallet = (props: WalletProps) => {
         <BalanceAmount
           title={t("BalanceText")}
           showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
-          isRefreshing={isRefreshing}
+          isRefreshing={isRefreshing || isAutoSpinning}
+          progressText={t("TopUpInProgress")}
+          isProgressTextVisible={isAutoSpinning}
           onRefresh={onClick}
           amount={walletBalance}
           currency={walletCodeCurrency}
@@ -176,7 +208,6 @@ const Wallet = (props: WalletProps) => {
               t("LinkNewCard")
             ) : (
               <CommonTrans
-               
                 i18nKey="LinkNewCardEmail"
                 values={{
                   email: payerEmail,

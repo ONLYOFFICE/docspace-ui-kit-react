@@ -163,6 +163,8 @@
 // ===== PriceCalculation =====
 
 .priceCalculationContainer {
+  display: flex;
+  flex-direction: column;
   border-radius: 12px;
   border: var(--payment-price-container-border);
   background: var(--payment-price-container-bg);
@@ -183,7 +185,6 @@
     align-items: center;
     justify-content: center;
     background: var(--payment-price-container-bg-text);
-    margin-top: 24px;
     min-height: 38px;
     border-radius: 6px;
 
@@ -200,5 +201,18 @@
     &.isDisabled {
       color: var(--payment-price-container-disable-price-color);
     }
+  }
+
+  .priceBottomSection {
+    margin-top: auto;
+    padding-top: 24px;
+  }
+
+  .cardUnlinkedWarning {
+    margin: 16px 0;
+  }
+
+  .warningColor {
+    color: var(--warning-color);
   }
 }

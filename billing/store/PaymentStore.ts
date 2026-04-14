@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import type {
   PaymentApi,
   ProfilesApi,
@@ -40,7 +40,10 @@ import type {
 /** SDK types date as ApiDateTime but API returns an ISO string. */
 export type WalletOperationDto = Omit<OperationDto, "date"> & {
   date?: string;
+  agentId?: string | null;
+  agentTitle?: string | null;
 };
+
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
 import type { TBalance } from "../types";
@@ -59,6 +62,7 @@ import {
   now,
   subtractFromDate,
   formatDate as formatDateUtil,
+  isSameDay,
 } from "../../utils/date";
 import type { DateTime } from "luxon";
 import type {
@@ -72,6 +76,16 @@ import CurrentQuotasStore from "./CurrentQuotasStore";
 import PaymentQuotasStore from "./PaymentQuotasStore";
 
 export const TOTAL_SIZE = "total_size";
+
+export type TTransactionFilterContact = {
+  id: string;
+  displayName?: string;
+};
+
+const getTransactionType = (key: string) => ({
+  isCredit: key !== "debit",
+  isDebit: key !== "credit",
+});
 
 class PaymentStore {
   private paymentApi: PaymentApi;
@@ -190,6 +204,25 @@ class PaymentStore {
 
   isStorageDeactivationVisited = false;
 
+  filterSelectedTypeKey = "allTransactions";
+
+  filterStartDate: DateTime = subtractFromDate(now(), 4, "weeks") ?? now();
+
+  filterEndDate: DateTime = now();
+
+  filterContact: TTransactionFilterContact | null = null;
+
+  isTransactionLoading = false;
+
+  lastTransactionServiceName: string | undefined = undefined;
+
+  defaultFilterStartDate: DateTime =
+    subtractFromDate(now(), 4, "weeks") ?? now();
+
+  defaultFilterEndDate: DateTime = now();
+
+  private _transactionTimerId: ReturnType<typeof setTimeout> | null = null;
+
   reccomendedAmount = "";
 
   mobileBreakpoint?: number;
@@ -246,6 +279,11 @@ class PaymentStore {
       controller.abort();
     }
     this.abortControllers = [];
+
+    if (this._transactionTimerId) {
+      clearTimeout(this._transactionTimerId);
+      this._transactionTimerId = null;
+    }
   };
 
   get isAlreadyPaid() {
@@ -310,6 +348,15 @@ class PaymentStore {
 
   get isAutoPaymentExist() {
     return this.autoPayments?.enabled;
+  }
+
+  get isAutoTopUpInProgress() {
+    if (!this.isAutoPaymentExist) return false;
+
+    const minBalance = this.autoPayments?.minBalance;
+    if (minBalance === undefined || minBalance === null) return false;
+
+    return this.walletBalance < minBalance;
   }
 
   private get balanceData() {
@@ -511,9 +558,12 @@ class PaymentStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getCustomerBalance(isRefresh, {
-        signal: abortController.signal,
-      });
+      const res = await this.paymentApi.getCustomerBalance(
+        isRefresh || undefined,
+        {
+          signal: abortController.signal,
+        },
+      );
 
       if (!res?.data?.response) return;
 
@@ -522,6 +572,38 @@ class PaymentStore {
       if (e instanceof Error && e.name === "CanceledError") return;
       throw e;
     }
+  };
+
+  get isTransactionFilterModified(): boolean {
+    return (
+      this.filterSelectedTypeKey !== "allTransactions" ||
+      !isSameDay(this.filterStartDate, this.defaultFilterStartDate) ||
+      !isSameDay(this.filterEndDate, this.defaultFilterEndDate) ||
+      this.filterContact !== null
+    );
+  }
+
+  setFilterSelectedTypeKey = (key: string) => {
+    this.filterSelectedTypeKey = key;
+  };
+
+  setFilterStartDate = (date: DateTime) => {
+    this.filterStartDate = date;
+  };
+
+  setFilterEndDate = (date: DateTime) => {
+    this.filterEndDate = date;
+  };
+
+  setFilterContact = (contact: TTransactionFilterContact | null) => {
+    this.filterContact = contact;
+  };
+
+  resetTransactionFilter = () => {
+    this.filterStartDate = this.defaultFilterStartDate;
+    this.filterEndDate = this.defaultFilterEndDate;
+    this.filterSelectedTypeKey = "allTransactions";
+    this.filterContact = null;
   };
 
   getEndTransactionDate = (format = "yyyy-MM-dd'T'HH:mm:ss") => {
@@ -544,27 +626,32 @@ class PaymentStore {
     return `${dateStr}T${timeTypeValue}`;
   };
 
-  fetchTransactionHistory = async (
-    startDate: DateTime | null = subtractFromDate(now(), 4, "weeks"),
-    endDate: DateTime | null = now(),
-    credit = true,
-    debit = true,
-    participantName?: string,
-    serviceName?: string,
-  ) => {
+  fetchTransactionHistory = async (serviceName?: string) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
+
+    this._transactionTimerId = setTimeout(() => {
+      runInAction(() => {
+        if (this._transactionTimerId !== null) {
+          this.isTransactionLoading = true;
+        }
+      });
+    }, 500);
+
+    const { isCredit, isDebit } = getTransactionType(
+      this.filterSelectedTypeKey,
+    );
 
     try {
       const res = await this.paymentApi.getCustomerOperations(
         0,
         25,
         serviceName,
-        startDate ? this.formatDate(startDate, "start") : undefined,
-        endDate ? this.formatDate(endDate, "end") : undefined,
-        participantName,
-        credit,
-        debit,
+        this.formatDate(this.filterStartDate, "start"),
+        this.formatDate(this.filterEndDate, "end"),
+        this.filterContact?.id,
+        isCredit,
+        isDebit,
         undefined,
         undefined,
         undefined,
@@ -587,7 +674,15 @@ class PaymentStore {
       this.isTransactionHistoryExist = data.collection.length > 0;
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
-      console.error(error);
+      toastr.error(error as Error);
+      this.isTransactionLoading = true;
+    } finally {
+      if (this._transactionTimerId) {
+        clearTimeout(this._transactionTimerId);
+        this._transactionTimerId = null;
+      }
+
+      this.isTransactionLoading = false;
     }
   };
 

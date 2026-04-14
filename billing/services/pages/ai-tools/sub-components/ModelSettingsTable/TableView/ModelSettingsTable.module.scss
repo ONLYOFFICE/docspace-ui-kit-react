@@ -80,4 +80,16 @@
 .toggleCell {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+}
+
+.toggleWrapper {
+  position: relative;
+  width: 28px;
+  height: 16px;
+
+  :global(label) {
+    top: 0 !important;
+    left: 0 !important;
+  }
 }

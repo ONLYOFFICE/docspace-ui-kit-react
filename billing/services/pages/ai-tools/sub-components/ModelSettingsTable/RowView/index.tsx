@@ -7,12 +7,16 @@ import { RowContainer } from "../../../../../../../components/rows";
 import { Text } from "../../../../../../../components/text";
 import { Link, LinkTarget } from "../../../../../../../components";
 import { ToggleButton } from "../../../../../../../components/toggle-button";
+import { Tooltip } from "../../../../../../../components/tooltip";
 
 import type { TAiToolsPrices } from "../../../../../../types";
 
 import styles from "./ModelSettingsRowView.module.scss";
 
 import { useServicesStore } from "../../../../../../store/ServicesStoreProvider";
+import { usePermissionTooltipText } from "../../../../../hooks/usePermissionTooltipText";
+
+const PERMISSION_TOOLTIP_ID = "aiModelPermissionTooltipRow";
 
 type ModelSettingsRowViewProps = {
   sectionWidth: number;
@@ -20,11 +24,10 @@ type ModelSettingsRowViewProps = {
 };
 
 const RowView = (props: ModelSettingsRowViewProps) => {
-  const {
-    isDisabled,
-  } = props;
+  const { isDisabled } = props;
 
   const servicesStore = useServicesStore();
+  const permissionTooltipText = usePermissionTooltipText();
 
   const {
     aiToolsPrices,
@@ -48,7 +51,6 @@ const RowView = (props: ModelSettingsRowViewProps) => {
       <Text className={styles.introText}>
         <CommonTrans
           i18nKey="AIModelsIntro"
-         
           components={{
             1: (
               <Link
@@ -89,7 +91,7 @@ const RowView = (props: ModelSettingsRowViewProps) => {
               <div className={styles.content}>
                 <div className={styles.titleRow}>
                   <Text
-                    fontSize="13px"
+                    fontSize="14px"
                     fontWeight={600}
                     className={styles.title}
                   >
@@ -119,7 +121,12 @@ const RowView = (props: ModelSettingsRowViewProps) => {
                 </Text>
               </div>
 
-              <div className={styles.toggle}>
+              <div
+                className={styles.toggle}
+                {...(isDisabled
+                  ? { "data-tooltip-id": PERMISSION_TOOLTIP_ID }
+                  : {})}
+              >
                 <ToggleButton
                   isChecked={enabled}
                   onChange={() => onToggle(m.id, !enabled)}
@@ -131,8 +138,19 @@ const RowView = (props: ModelSettingsRowViewProps) => {
           );
         })}
       </RowContainer>
+
+      {isDisabled ? (
+        <Tooltip
+          id={PERMISSION_TOOLTIP_ID}
+          place="bottom"
+          maxWidth="300px"
+          float
+          getContent={() => permissionTooltipText}
+        />
+      ) : null}
     </div>
   );
 };
 
 export default observer(RowView);
+

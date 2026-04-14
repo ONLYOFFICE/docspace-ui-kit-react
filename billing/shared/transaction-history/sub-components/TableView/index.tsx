@@ -33,17 +33,16 @@ import TableHeader from "./TableHeader";
 import TransactionRow from "./TableBody";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 
-const TABLE_VERSION = "3";
+const TABLE_VERSION = "4";
 const COLUMNS_SIZE = `walletColumnsSize_ver-${TABLE_VERSION}`;
 const INFO_PANEL_COLUMNS_SIZE = `infoPanelWalletColumnsSize_ver-${TABLE_VERSION}`;
 
 type TransactionHistoryProps = {
   sectionWidth: number;
+  serviceName?: string;
 };
 
-const TableView = ({
-  sectionWidth,
-}: TransactionHistoryProps) => {
+const TableView = ({ sectionWidth, serviceName }: TransactionHistoryProps) => {
   const paymentStore = usePaymentStore();
   const history = paymentStore.transactionHistory ?? [];
   const userId = paymentStore.userId;
@@ -63,6 +62,7 @@ const TableView = ({
           columnStorageName={columnStorageName}
           columnInfoPanelStorageName={columnInfoPanelStorageName}
           itemHeight={48}
+          serviceName={serviceName}
         />
         <TableBody
           useReactWindow
@@ -78,6 +78,7 @@ const TableView = ({
             <TransactionRow
               transaction={transaction}
               key={`transaction-${transaction.date || index}`}
+              serviceName={serviceName}
             />
           ))}
         </TableBody>
@@ -87,3 +88,4 @@ const TableView = ({
 };
 
 export default observer(TableView);
+
