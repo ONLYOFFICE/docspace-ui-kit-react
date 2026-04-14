@@ -278,6 +278,7 @@ declare global {
         value: unknown,
         callback: unknown,
       ) => void;
+      getCloudKeys?: (domain: string) => Array<{ id: string }>;
       getViewportSettings?: () => {
         widgetType: "window" | "tab";
         captionHeight: number;
