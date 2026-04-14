@@ -48,6 +48,7 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
     headerText,
     bodyText,
     iconName = defaultIcon,
+    hideHeader,
     onClose,
     barIsVisible,
     className,
@@ -76,12 +77,14 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
       data-testid={dataTestId ?? "public_room_bar"}
     >
       <div className={styles.textContainer}>
-        <div className={styles.headerBody}>
-          <div className={styles.headerIcon}>{icon}</div>
-          <Text className={styles.header} fontWeight={600} as={headerAs}>
-            {headerText}
-          </Text>
-        </div>
+        {!hideHeader ? (
+          <div className={styles.headerBody}>
+            <div className={styles.headerIcon}>{icon}</div>
+            <Text className={styles.header} fontWeight={600} as={headerAs}>
+              {headerText}
+            </Text>
+          </div>
+        ) : null}
         <Text
           className={styles.body}
           fontSize="12px"
