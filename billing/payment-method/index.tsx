@@ -90,7 +90,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
   const goLinkCard = () => {
     cardLinked
-      ? window.open(toAbsoluteUrl(cardLinked), "_self")
+      ? window.open(toAbsoluteUrl(cardLinked), "_top")
       : toastr.error(t("UnexpectedError"));
   };
 
