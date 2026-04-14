@@ -73,6 +73,8 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     isShowStorageTariffDeactivatedModal,
   } = paymentStore;
 
+  const { fetchCardLinked } = paymentStore;
+
   const {
     walletCustomerStatusNotActive,
     walletCustomerEmail,
@@ -103,6 +105,10 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
     try {
       await fetchCustomerInfo(true);
+
+      if (paymentStore.tariff.walletCustomerStatusNotActive) {
+        await fetchCardLinked();
+      }
     } catch (e) {
       toastr.error(e as Error);
     } finally {
