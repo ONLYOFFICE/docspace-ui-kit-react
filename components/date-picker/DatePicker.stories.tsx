@@ -321,7 +321,10 @@ export const CssCustomization: Story = {
 					"--calendar-arrow": "#0082c9",
 					"--calendar-weekday": "#0082c9",
 					"--calendar-accent": "#0082c9",
+					"--calendar-selected-text": "#ffffff",
 					"--calendar-hover-bg": "#cce5f6",
+					"--calendar-past": "#5ca8d9",
+					"--calendar-disabled-arrow": "#a0c8e8",
 					// AddButton sub-component
 					"--add-button-background": "#e6f3fb",
 					"--add-button-icon": "#0082c9",
@@ -349,8 +352,36 @@ export const CssCustomization: Story = {
 	parameters: {
 		docs: {
 			description: {
-				story:
-					"CSS custom property overrides applied to the date picker and its Calendar, AddButton, and SelectedItem sub-components.",
+				story: `CSS custom property overrides applied to the date picker and its Calendar, AddButton, and SelectedItem sub-components.
+
+**DatePicker variables:**
+- \`--date-picker-bg\` — container background
+- \`--date-picker-padding\` — container padding
+- \`--date-picker-header-border\` — header bottom border
+- \`--date-picker-body-padding\` — body area padding
+- \`--date-picker-dropdown-padding\` — dropdown padding
+
+**Calendar variables:**
+- \`--calendar-bg\` — calendar background color
+- \`--calendar-border\` — calendar border color
+- \`--calendar-shadow\` — calendar box shadow
+- \`--calendar-radius\` — calendar border radius
+- \`--calendar-title\` — month/year title color
+- \`--calendar-title-size\` — month/year title font size
+- \`--calendar-outline\` — nav button outline color
+- \`--calendar-arrow\` — nav arrow color
+- \`--calendar-disabled-arrow\` — disabled nav arrow color
+- \`--calendar-weekday\` — weekday header color
+- \`--calendar-accent\` — selected date / hover outline accent color
+- \`--calendar-selected-text\` — text color on selected (current) date
+- \`--calendar-hover-bg\` — date hover background
+- \`--calendar-past\` — past / out-of-month dates color
+- \`--calendar-disabled\` — disabled dates color
+- \`--calendar-hover-radius\` — date cell border radius on hover
+- \`--calendar-current-radius\` — selected (current) date cell border radius
+- \`--calendar-focused-radius\` — keyboard-focused date cell border radius
+- \`--calendar-focused-bg\` — keyboard-focused date cell background color
+- \`--calendar-focused-text\` — keyboard-focused date cell text color`,
 			},
 		},
 	},
