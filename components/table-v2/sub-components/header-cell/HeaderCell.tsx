@@ -94,7 +94,6 @@ export function HeaderCell({
       data-min-width={header.column.columnDef.minSize}
       data-default-size={defaultSize ?? undefined}
       data-testid={`column-${header.id}`}
-      onClick={handleSortClick}
     >
       {checkboxMeta ? (
         <Checkbox
@@ -105,7 +104,7 @@ export function HeaderCell({
         />
       ) : null}
 
-      <div className={styles.headerItem}>
+      <div className={styles.headerItem} onClick={handleSortClick}>
         <div className={styles.textWrapper}>
           <span className={classNames(styles.text, "header-container-text")}>
             {header.isPlaceholder

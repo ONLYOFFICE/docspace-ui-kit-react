@@ -118,7 +118,8 @@
   display: grid;
   grid-template-columns: auto 22px;
   margin-inline-end: 8px;
-  width: fit-content;
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .headerCell:not(.isDefault) .headerItem {

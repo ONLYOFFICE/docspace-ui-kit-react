@@ -28,9 +28,10 @@ import { useEffect, useMemo } from "react";
 import classNames from "classnames";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
+import { TableRow } from "../table-row";
 import { useTableCtx } from "../context/TableContext";
 import { TableSkeleton } from "../sub-components/table-skeleton";
-import { TableRow } from "../table-row";
+
 import styles from "../Table.module.scss";
 import { HEADER_HEIGHT } from "../Table.constants";
 
@@ -124,4 +125,3 @@ export function TableBody<TData>({
     </div>
   );
 }
-
