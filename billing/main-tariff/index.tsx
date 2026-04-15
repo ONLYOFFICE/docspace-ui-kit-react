@@ -60,14 +60,16 @@ const SaaSPage = observer(
 
     const t = useCommonTranslation();
     const shouldShowLoader =
-      !isInitPaymentPage ||
-      isUpdatingTariff ||
-      showPortalSettingsLoader;
+      !isInitPaymentPage || isUpdatingTariff || showPortalSettingsLoader;
+
+    const isQuotasLoaded = paymentStore.quotas.isLoaded;
 
     useEffect(() => {
+      if (!isQuotasLoaded) return;
+
       init(t);
       return () => resetTariffContainerToBasic();
-    }, []);
+    }, [isQuotasLoaded]);
 
     useEffect(() => {
       const title = t("Billing");

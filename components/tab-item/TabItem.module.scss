@@ -55,7 +55,8 @@
 
   cursor: pointer;
 
-  &.active {
+  &.active,
+  &:not(.disabled):active {
     background: var(--tab-item-selected-background-color);
     border-color: var(--tab-item-selected-background-color);
 
@@ -76,7 +77,8 @@
 .tabItemText {
   height: 20px;
 
-  &.active {
+  &.active,
+  .tabItem:not(.disabled):active & {
     font-weight: 600;
     color: var(--tab-item-selected-item-color);
   }
