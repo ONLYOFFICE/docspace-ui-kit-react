@@ -961,10 +961,11 @@ class PaymentStore {
 
     const requests: Promise<unknown>[] = [];
 
+    await this.tariff.fetchPortalTariff();
+
     requests.push(
       this.getSettingsPayment(),
       this.paymentQuotas.fetchPaymentQuotas(),
-      this.tariff.fetchPortalTariff(),
     );
 
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
