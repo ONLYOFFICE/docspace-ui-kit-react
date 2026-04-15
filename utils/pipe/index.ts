@@ -31,8 +31,11 @@
  */
 export const pipe =
   <T>(...fns: Array<(v: T) => T | Promise<T>>) =>
-  (seed: T): Promise<T> =>
-    fns.reduce((acc: Promise<T>, fn) => acc.then(fn), Promise.resolve(seed));
+  (seed?: T): Promise<T> =>
+    fns.reduce(
+      (acc: Promise<T>, fn) => acc.then(fn),
+      Promise.resolve(seed as T),
+    );
 
 /**
  * Returns a step function that waits `ms` milliseconds before passing the value through.
@@ -58,4 +61,3 @@ export const stopWhen =
   ) =>
   (value: T): Promise<T> =>
     predicate(value) ? Promise.resolve(value).then(onDone) : recurse();
-
