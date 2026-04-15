@@ -91,6 +91,12 @@ export type TMessage = {
 
 export type TMultimodal = { image: { formats: string[] } };
 
+export type TModelCapabilities = {
+  vision: boolean;
+  toolCalling: boolean;
+  thinking: boolean;
+};
+
 export type TChat = {
   id: string;
   title: string;
@@ -152,7 +158,7 @@ export type TAIRoomChatSettings = {
   internal: boolean;
   modelAlias?: string;
   multimodal?: TMultimodal;
-  thinking?: boolean;
+  capabilities?: TModelCapabilities;
 };
 
 export interface UserChatSettingsDto {
