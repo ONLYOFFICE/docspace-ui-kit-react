@@ -247,7 +247,7 @@ const DropDownItem = ({
         <TooltipContainer
           as="span"
           dir="auto"
-          title={typeof label === "string" ? label : undefined}
+          title={!withDisabledTooltip && typeof label === "string" ? label : undefined}
           className={truncateText ? styles.truncateText : undefined}
         >
           {label}
