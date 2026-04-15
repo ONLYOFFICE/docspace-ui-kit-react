@@ -238,6 +238,7 @@ describe("<ToolsSettings />", () => {
     MCPTools: new Map([
       ["s1", [{ name: "tool1", enabled: true }]],
     ]) as unknown as Map<string, TMCPTool[]>,
+    toolCallingSupported: true,
     webSearchAvailable: true,
     webSearchEnabled: true,
     isFetched: true,

@@ -140,7 +140,10 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
   return {
     servers,
     MCPTools,
-    webSearchAvailable: aiConfig?.webSearchEnabled || false,
+    toolCallingSupported: chatSettings?.capabilities?.toolCalling ?? true,
+    webSearchAvailable:
+      (aiConfig?.webSearchEnabled || false) &&
+      (chatSettings?.capabilities?.toolCalling ?? true),
     webSearchEnabled,
     isFetched,
     knowledgeSearchToolName: aiConfig?.knowledgeSearchToolName || "",
@@ -155,7 +158,7 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
     setIsFetched,
     fetchTools,
     initTools,
-    thinkingSupported: chatSettings?.thinking || false,
+    thinkingSupported: chatSettings?.capabilities?.thinking || false,
     thinkingEnabled,
     setThinkingEnabled,
   };
