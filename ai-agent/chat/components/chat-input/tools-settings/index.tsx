@@ -116,6 +116,7 @@ const ToolsSettings = ({
   isAdmin,
   aiReady,
   goToWebSearchSettings,
+  toolCallingSupported,
   thinkingSupported,
   thinkingEnabled,
   setThinkingEnabled,
@@ -384,27 +385,30 @@ const ToolsSettings = ({
         disabled: !webSearchAvailable,
         disabledStylesType: "toggle",
         tooltipTarget: "toggle",
-        getTooltipContent: () => (
-          <>
-            <Text>
-              {t("ConnectWebSearch", {
-                webSearch: t("WebSearchAI"),
-                productName: t("ProductName"),
-              })}
-            </Text>
-            {isAdmin && goToWebSearchSettings ? (
-              <Link
-                type={LinkType.action}
-                isHovered
-                fontWeight={600}
-                onClick={goToWebSearchSettings}
-                dataTestId="go-to-settings-link"
-              >
-                {t("GoToSettings")}
-              </Link>
-            ) : null}
-          </>
-        ),
+        getTooltipContent: () =>
+          !toolCallingSupported ? (
+            <Text>{t("ExtendedThinkingNotSupported")}</Text>
+          ) : (
+            <>
+              <Text>
+                {t("ConnectWebSearch", {
+                  webSearch: t("WebSearchAI"),
+                  productName: t("ProductName"),
+                })}
+              </Text>
+              {isAdmin && goToWebSearchSettings ? (
+                <Link
+                  type={LinkType.action}
+                  isHovered
+                  fontWeight={600}
+                  onClick={goToWebSearchSettings}
+                  dataTestId="go-to-settings-link"
+                >
+                  {t("GoToSettings")}
+                </Link>
+              ) : null}
+            </>
+          ),
       },
       {
         key: "extended-thinking",
@@ -462,6 +466,7 @@ const ToolsSettings = ({
     toggleTool,
     webSearchEnabled,
     webSearchAvailable,
+    toolCallingSupported,
     goToWebSearchSettings,
     onWebSearchToggle,
     thinkingEnabled,

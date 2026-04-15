@@ -69,6 +69,7 @@ describe("<ChatFooter />", () => {
       setIsFetched: vi.fn(),
       fetchTools: vi.fn(),
       initTools: vi.fn(),
+      toolCallingSupported: true,
       thinkingSupported: false,
       thinkingEnabled: false,
       setThinkingEnabled: vi.fn(),

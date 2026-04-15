@@ -157,6 +157,7 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
     setIsFetched,
     fetchTools,
     initTools,
+    toolCallingSupported: chatSettings?.capabilities?.toolCalling ?? true,
     thinkingSupported: chatSettings?.capabilities?.thinking || false,
     thinkingEnabled,
     setThinkingEnabled,
