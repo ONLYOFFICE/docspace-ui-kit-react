@@ -28,7 +28,7 @@
 
 @use "../../styles/mixins";
 
-:global(.dark){
+:global(.dark) {
   :local {
     .dropDownItemIcon,
     .dropDownItem,
@@ -303,6 +303,10 @@
   --dropdown-item-disabled-color: #{$gray};
 
   color: var(--dropdown-item-disabled-color);
+
+  .dropDownItemIcon {
+    --drop-down-item-icon-color: #{$gray};
+  }
 
   &:hover {
     cursor: default;
