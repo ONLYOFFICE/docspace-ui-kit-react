@@ -75,7 +75,6 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
     storagePriceIncrement,
     storageSizeIncrement,
     fetchBalance,
-    fetchTransactionHistory,
     walletCodeCurrency,
     storageServiceName,
     isShowStorageTariffDeactivatedModal,
@@ -163,11 +162,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
       const res = walletRes?.data?.response;
       if (res === false) throw new Error(t("UnexpectedError"));
 
-      await Promise.all([
-        fetchPortalTariff?.(),
-        fetchBalance?.(),
-        fetchTransactionHistory(DISK_STORAGE),
-      ]);
+      await Promise.all([fetchPortalTariff?.(), fetchBalance?.()]);
 
       toastr.success(t("StorageCapacityUpdated"));
     } catch (e) {
