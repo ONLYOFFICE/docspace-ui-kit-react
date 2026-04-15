@@ -426,15 +426,36 @@ const DropDown = ({
       }
     };
 
+    let scrollRafId: number | null = null;
+
+    const scrollListener = (e: Event) => {
+      if (dropDownRef.current?.contains(e.target as Node)) return;
+
+      if (scrollRafId !== null) return;
+
+      scrollRafId = requestAnimationFrame(() => {
+        scrollRafId = null;
+        checkPositionPortal();
+      });
+    };
+
     if (open) {
       enableOnClickOutside?.();
 
       window.addEventListener("resize", resizeListener);
 
+      if (isDefaultMode) {
+        window.addEventListener("scroll", scrollListener, true);
+      }
+
       if (isIOS && isMobile)
         window.visualViewport?.addEventListener("resize", resizeListener);
     } else {
       window.removeEventListener("resize", resizeListener);
+
+      if (isDefaultMode) {
+        window.removeEventListener("scroll", scrollListener, true);
+      }
 
       if (isIOS && isMobile)
         window.visualViewport?.removeEventListener("resize", resizeListener);
@@ -448,6 +469,11 @@ const DropDown = ({
         dynamicMaxHeight: undefined,
       }));
       window.removeEventListener("resize", resizeListener);
+
+      if (isDefaultMode) {
+        window.removeEventListener("scroll", scrollListener, true);
+        if (scrollRafId !== null) cancelAnimationFrame(scrollRafId);
+      }
 
       if (isIOS && isMobile)
         window.visualViewport?.removeEventListener("resize", resizeListener);
