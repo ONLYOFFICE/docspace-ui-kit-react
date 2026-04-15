@@ -140,7 +140,6 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
   return {
     servers,
     MCPTools,
-    toolCallingSupported: chatSettings?.capabilities?.toolCalling ?? true,
     webSearchAvailable:
       (aiConfig?.webSearchEnabled || false) &&
       (chatSettings?.capabilities?.toolCalling ?? true),

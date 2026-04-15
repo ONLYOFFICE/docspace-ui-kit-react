@@ -54,7 +54,6 @@ describe("<ChatFooter />", () => {
     toolsSettings: {
       servers: [],
       MCPTools: new Map(),
-      toolCallingSupported: true,
       webSearchAvailable: false,
       webSearchEnabled: false,
       isFetched: true,
