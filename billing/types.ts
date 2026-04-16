@@ -110,7 +110,7 @@ export type TPaymentRoutes = {
 /** Minimal config provided by the host application. Everything else is fetched internally. */
 export type TPaymentConfig = {
   language: string;
-  routes: TPaymentRoutes;
+  routes?: TPaymentRoutes;
   logoText?: string;
   walletHelpUrl?: string;
   user?: TPaymentUser;
