@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import RefreshReactSvgUrl from "../../../assets/icons/16/refresh.react.svg?url";
+import RefreshIcon from "../../../assets/icons/16/refresh.react.svg";
 import { IconButton } from "../../../components/icon-button";
 
 import styles from "./RefreshIconButton.module.scss";
@@ -21,7 +21,7 @@ const RefreshIconButton = ({
 }: RefreshIconButtonProps) => {
   return (
     <IconButton
-      iconName={RefreshReactSvgUrl}
+      iconNode={<RefreshIcon />}
       size={size}
       onClick={onRefresh}
       className={classNames(styles.refreshIcon, className, {
