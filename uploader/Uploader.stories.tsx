@@ -71,7 +71,7 @@ const UploaderWithFolderUrl = (args: StoryArgs) => {
   };
 
   const getFolderUrl = useCallback(
-    (folderId: number) => getFolderUrlHelper(baseUrl, folderId),
+    (folderId: string | number) => getFolderUrlHelper(baseUrl, folderId),
     [baseUrl],
   );
 
