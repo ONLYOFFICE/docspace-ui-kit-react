@@ -127,6 +127,9 @@
 
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
   gap: 4px;
   font-size: 13px;
   line-height: 20px;
@@ -141,6 +144,9 @@
   &.secondary {
     font-weight: 400;
     color: var(--dropzone-secondary-link);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-align: center;
   }
 
   @include mixins.mobile {
