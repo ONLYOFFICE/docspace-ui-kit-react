@@ -81,7 +81,7 @@ export type UploaderProps = {
   /** Maximum total upload size (e.g. "100MB") */
   maxTotalUploadSize?: string;
   /** Callback to generate folder URL for success toast link. If not provided, no link is shown. */
-  getFolderUrl?: (folderId: number) => string;
+  getFolderUrl?: (folderId: string | number) => string;
 };
 
 export type TFileWithOptionalPath = File & { path?: string };
@@ -89,3 +89,4 @@ export type TFileWithOptionalEmptyDir = File & { isEmptyDirectory?: boolean };
 export type TFileWithOptionalLastModifiedDate = File & {
   lastModifiedDate?: unknown;
 };
+
