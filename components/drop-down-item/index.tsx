@@ -194,7 +194,8 @@ const DropDownItem = ({
           [styles.activeDescendant]: isActiveDescendant && !disabled,
           [styles.textOverflow]: textOverflow,
           [styles.modern]: isModern,
-          [styles.disabled]: disabled && !isSelected,
+          // [styles.disabled]: disabled && !isSelected,
+          [styles.disabled]: disabled,
         },
         className,
       )}
