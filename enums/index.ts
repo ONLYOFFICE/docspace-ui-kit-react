@@ -387,3 +387,11 @@ export enum ToolsPermission {
   AlwaysAllow,
   Deny,
 }
+
+export enum DistributedTaskStatus {
+  Created,
+  Running,
+  Completed,
+  Canceled,
+  Failed,
+}

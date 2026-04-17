@@ -75,6 +75,7 @@ const useSocketHelper = ({
       });
 
       folderSubscribers.current = new Set<string>();
+      subscribedId.current = null;
 
       return;
     }

@@ -490,7 +490,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
   React.useEffect(() => {
     if (!selectedItemId) return;
-    if (selectedItemId && isRoot) return unsubscribe(+selectedItemId);
+    if (selectedItemId && isRoot) return unsubscribe();
 
     subscribe(selectedItemId);
   }, [selectedItemId, isRoot, unsubscribe, subscribe]);
