@@ -24,7 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import classNames from "classnames";
 import throttle from "lodash/throttle";
 
@@ -96,14 +103,14 @@ export const TableHeader = (props: TableHeaderProps) => {
   const updateTableRows = (str: string) => {
     if (!useReactWindow) return;
 
-    const rows = document.querySelectorAll(".table-row, .table-list-item");
+    const container = containerRef.current;
+    if (!container) return;
 
-    if (rows?.length) {
-      for (let i = 0; i < rows.length; i += 1) {
-        const row = rows[i] as HTMLElement;
+    container
+      .querySelectorAll<HTMLElement>(".table-row, .table-list-item")
+      .forEach((row) => {
         row.style.gridTemplateColumns = str;
-      }
-    }
+      });
   };
 
   const moveToLeft = (
@@ -205,78 +212,84 @@ export const TableHeader = (props: TableHeaderProps) => {
     }
   };
 
-  const onMouseMove = (e: MouseEvent) => {
-    const columnIndex = columnIndexRef.current;
-
-    if (columnIndex === null) return;
-    const column = document.getElementById(`column_${columnIndex}`);
-
-    if (!column) return;
-
-    const columnSize = column.getBoundingClientRect();
-    let newWidth = isRTL
-      ? columnSize.right - e.clientX
-      : e.clientX - columnSize.left;
-
-    const tableContainer = containerRef.current?.style.gridTemplateColumns;
-    const widths = tableContainer?.split(" ") as string[];
-
-    const minSize = column.dataset.minWidth
-      ? column.dataset.minWidth
-      : DEFAULT_MIN_COLUMN_SIZE;
-
-    if (newWidth <= +minSize - HANDLE_OFFSET) {
-      const currentWidth = getSubstring(widths[+columnIndex]);
-
-      // Move left
-      if (currentWidth !== +minSize) {
-        newWidth = +minSize - HANDLE_OFFSET;
-        moveToRight(widths, newWidth, isIndexEditingModeProp);
-      } else moveToLeft(widths, newWidth, isIndexEditingModeProp);
-    } else {
-      moveToRight(widths, newWidth, isIndexEditingModeProp);
-    }
-
-    const str = widths.join(" ");
-    if (containerRef.current) {
-      containerRef.current.style.gridTemplateColumns = str;
-    }
-    if (headerRef.current) {
-      headerRef.current.style.gridTemplateColumns = str;
-    }
-
-    updateTableRows(str);
-  };
-
-  const onMouseUp = () => {
-    if (containerRef.current)
-      if (!infoPanelVisible) {
-        localStorage.setItem(
-          columnStorageName,
-          containerRef.current.style.gridTemplateColumns,
-        );
-      } else {
-        localStorage.setItem(
-          columnInfoPanelStorageName || "",
-          containerRef.current.style.gridTemplateColumns,
-        );
-      }
-
-    window.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("mouseup", onMouseUp);
-  };
-
-  const onMouseDown = (event: React.MouseEvent) => {
+  const onMouseDown = useCallback((event: React.MouseEvent) => {
     if (event.target) {
       const target = event.target as HTMLDivElement;
-
       if (target.dataset.column) {
         columnIndexRef.current = +target.dataset.column;
       }
     }
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-  };
+
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const columnIndex = columnIndexRef.current;
+      if (columnIndex === null) return;
+
+      const column = document.getElementById(`column_${columnIndex}`);
+      if (!column) return;
+
+      const columnSize = column.getBoundingClientRect();
+      let newWidth = isRTL
+        ? columnSize.right - e.clientX
+        : e.clientX - columnSize.left;
+
+      const tableContainer = containerRef.current?.style.gridTemplateColumns;
+      const widths = tableContainer?.split(" ") as string[];
+
+      const minSize = column.dataset.minWidth
+        ? column.dataset.minWidth
+        : DEFAULT_MIN_COLUMN_SIZE;
+
+      if (newWidth <= +minSize - HANDLE_OFFSET) {
+        const currentWidth = getSubstring(widths[+columnIndex]);
+
+        // Move left
+        if (currentWidth !== +minSize) {
+          newWidth = +minSize - HANDLE_OFFSET;
+          moveToRight(widths, newWidth, isIndexEditingModeProp);
+        } else moveToLeft(widths, newWidth, isIndexEditingModeProp);
+      } else {
+        moveToRight(widths, newWidth, isIndexEditingModeProp);
+      }
+
+      const str = widths.join(" ");
+      if (containerRef.current) {
+        containerRef.current.style.gridTemplateColumns = str;
+      }
+      if (headerRef.current) {
+        headerRef.current.style.gridTemplateColumns = str;
+      }
+
+      updateTableRows(str);
+    };
+
+    const handleMouseUp = () => {
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+
+      if (containerRef.current) {
+        if (!infoPanelVisible) {
+          localStorage.setItem(
+            columnStorageName,
+            containerRef.current.style.gridTemplateColumns,
+          );
+        } else {
+          localStorage.setItem(
+            columnInfoPanelStorageName || "",
+            containerRef.current.style.gridTemplateColumns,
+          );
+        }
+      }
+
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  }, []);
 
   function resetColumns(isResized: boolean = false) {
     if (!infoPanelVisible) localStorage.removeItem(columnStorageName);
@@ -1162,19 +1175,26 @@ export const TableHeader = (props: TableHeaderProps) => {
     }
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isMountedRef.current) {
       onResize();
     }
+  });
 
-    const throttledResize = throttle(() => onResize(true), 300);
+  const handleWindowResize = useEffectEvent(() => {
+    onResize(true);
+  });
+
+  useEffect(() => {
+    const throttledResize = throttle(handleWindowResize, 300);
 
     window.addEventListener("resize", throttledResize);
 
     return () => {
+      throttledResize.cancel();
       window.removeEventListener("resize", throttledResize);
     };
-  });
+  }, []);
 
   useEffect(() => {
     const prevHeaderData = prevHeaderDataRef.current;
