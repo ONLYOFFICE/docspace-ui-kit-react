@@ -45,9 +45,13 @@ import {
 import { checkingForUnfixedSize, getSubstring } from "../../Table.utils";
 import { isDesktop } from "../../../../utils";
 import {
+  clearColumnSizes,
   distributionOverWidth,
+  getColumnStorageKey,
+  loadColumnSizes,
   moveToLeft,
   moveToRight,
+  saveColumnSizes,
   updateTableRows,
 } from "../TableHeader.utils";
 
@@ -231,10 +235,12 @@ export function useTableHeaderResize(
 
       const opts = optionsRef.current;
       const str = container.style.gridTemplateColumns;
-      const key = opts.infoPanelVisible
-        ? opts.columnInfoPanelStorageName || ""
-        : (opts.columnStorageName ?? "");
-      localStorage.setItem(key, str);
+      const key = getColumnStorageKey(
+        opts.infoPanelVisible,
+        opts.columnStorageName,
+        opts.columnInfoPanelStorageName,
+      );
+      saveColumnSizes(key, str);
 
       cleanup();
     };
@@ -262,8 +268,13 @@ export function useTableHeaderResize(
       withoutWideColumn,
     } = optionsRef.current;
 
-    if (!infoPanelVisible) localStorage.removeItem(columnStorageName ?? "");
-    else localStorage.removeItem(columnInfoPanelStorageName || "");
+    clearColumnSizes(
+      getColumnStorageKey(
+        infoPanelVisible,
+        columnStorageName,
+        columnInfoPanelStorageName,
+      ),
+    );
 
     let str = "";
 
@@ -331,10 +342,14 @@ export function useTableHeaderResize(
     }
 
     if (str) {
-      const saveKey = infoPanelVisible
-        ? columnInfoPanelStorageName || ""
-        : (columnStorageName ?? "");
-      localStorage.setItem(saveKey, str);
+      saveColumnSizes(
+        getColumnStorageKey(
+          infoPanelVisible,
+          columnStorageName,
+          columnInfoPanelStorageName,
+        ),
+        str,
+      );
 
       updateTableRows(containerRef.current, str, useReactWindow);
     }
@@ -431,37 +446,17 @@ export function useTableHeaderResize(
     const containerWidth = container.getBoundingClientRect().width;
 
     const storageSize =
-      !resetColumnsSizeProp && localStorage.getItem(columnStorageName);
+      !resetColumnsSizeProp &&
+      loadColumnSizes(columnStorageName ?? "", columns);
+
+    if (!storageSize && !isResized) {
+      resetColumns();
+      return;
+    }
 
     // TODO: If defaultSize(75px) is less than defaultMinColumnSize(110px) the calculations work correctly
     const defaultSize =
       columns.find((col) => col.defaultSize && col.enable)?.defaultSize || 0;
-
-    const shortSize =
-      columns.find((col) => col.isShort && col.enable)?.minWidth || 0;
-
-    // TODO: Fixed columns size if something went wrong
-    if (storageSize) {
-      const splitStorage = storageSize.split(" ");
-
-      // Reset storage if columns count doesn't match (e.g. stale data from another section)
-      if (splitStorage.length !== columns.length + 1) {
-        localStorage.removeItem(columnStorageName);
-        if (!isResized) {
-          resetColumns();
-          return;
-        }
-      }
-
-      if (
-        !shortSize &&
-        getSubstring(splitStorage[0]) <= DEFAULT_MIN_COLUMN_SIZE
-      ) {
-        localStorage.removeItem(columnStorageName);
-        onResize();
-        return;
-      }
-    }
 
     const containerGridTemplateColumns =
       container.style.gridTemplateColumns.split(" ");
@@ -499,8 +494,9 @@ export function useTableHeaderResize(
       const gridTemplateColumns: string[] = [];
       let hideColumnsConst = false;
 
-      const storageInfoPanelSize = localStorage.getItem(
+      const storageInfoPanelSize = loadColumnSizes(
         columnInfoPanelStorageName || "",
+        columns,
       );
 
       const tableInfoPanelContainer =
@@ -1079,14 +1075,17 @@ export function useTableHeaderResize(
         headerRef.current.style.width = `${containerWidth}px`;
       }
 
-      if (infoPanelVisible) {
-        localStorage.setItem(columnInfoPanelStorageName || "", str);
-      } else {
-        localStorage.setItem(columnStorageName ?? "", str);
-      }
+      saveColumnSizes(
+        getColumnStorageKey(
+          infoPanelVisible,
+          columnStorageName,
+          columnInfoPanelStorageName,
+        ),
+        str,
+      );
 
       if (!infoPanelVisible) {
-        localStorage.removeItem(columnInfoPanelStorageName || "");
+        clearColumnSizes(columnInfoPanelStorageName || "");
       }
     }
   }
@@ -1143,9 +1142,14 @@ export function useTableHeaderResize(
     let shouldReset = false;
 
     if (columnStorageName === prevHeaderData.columnStorageName) {
-      const storageSize = infoPanelVisible
-        ? localStorage.getItem(columnInfoPanelStorageName || "")
-        : localStorage.getItem(columnStorageName ?? "");
+      const storageSize = loadColumnSizes(
+        getColumnStorageKey(
+          infoPanelVisible,
+          columnStorageName,
+          columnInfoPanelStorageName,
+        ),
+        columns,
+      );
 
       if (
         sortBy !== prevHeaderData.sortBy ||
@@ -1170,7 +1174,8 @@ export function useTableHeaderResize(
     }
 
     const storageSize =
-      !resetColumnsSizeProp && localStorage.getItem(columnStorageName ?? "");
+      !resetColumnsSizeProp &&
+      loadColumnSizes(columnStorageName ?? "", columns);
 
     if (columns.length !== prevHeaderData.columns.length && !storageSize) {
       shouldReset = true;

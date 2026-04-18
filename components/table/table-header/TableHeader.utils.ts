@@ -243,3 +243,64 @@ export function distributionOverWidth(
   return newGridTemplateColumns;
 }
 
+export function getColumnStorageKey(
+  infoPanelVisible: boolean,
+  columnStorageName: string | undefined,
+  columnInfoPanelStorageName: string | undefined,
+): string {
+  return infoPanelVisible
+    ? (columnInfoPanelStorageName || "")
+    : (columnStorageName ?? "");
+}
+
+export function saveColumnSizes(key: string, gridStr: string): void {
+  if (!key || !gridStr || typeof gridStr !== "string") return;
+  localStorage.setItem(key, gridStr);
+}
+
+export function loadColumnSizes(
+  key: string,
+  columns: TTableColumn[],
+): string | null {
+  if (!key) return null;
+
+  const raw = localStorage.getItem(key);
+  if (raw == null) return null;
+
+  if (typeof raw !== "string") {
+    localStorage.removeItem(key);
+    return null;
+  }
+
+  if (raw.trim() === "") {
+    localStorage.removeItem(key);
+    return null;
+  }
+
+  const parts = raw.split(" ");
+
+  if (parts.length !== columns.length + 1) {
+    localStorage.removeItem(key);
+    return null;
+  }
+
+  if (parts.some((p) => isNaN(getSubstring(p)) || getSubstring(p) <= 0)) {
+    localStorage.removeItem(key);
+    return null;
+  }
+
+  const shortSize =
+    columns.find((c) => c.isShort && c.enable)?.minWidth || 0;
+
+  if (!shortSize && getSubstring(parts[0]) <= DEFAULT_MIN_COLUMN_SIZE) {
+    localStorage.removeItem(key);
+    return null;
+  }
+
+  return raw;
+}
+
+export function clearColumnSizes(key: string): void {
+  if (!key) return;
+  localStorage.removeItem(key);
+}
