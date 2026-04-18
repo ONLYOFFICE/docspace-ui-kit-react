@@ -500,7 +500,7 @@ describe("<TableHeader />", () => {
       expect(resizeHandles.length).toBeGreaterThan(0);
     });
 
-    it("fires onMouseDown on resize handle mousedown", async () => {
+    it("fires onPointerDown on resize handle pointerdown", async () => {
       render(<TableHeaderWithContainerRef {...defaultProps} />);
 
       const resizeHandles = screen.getAllByTestId("resize-handle");

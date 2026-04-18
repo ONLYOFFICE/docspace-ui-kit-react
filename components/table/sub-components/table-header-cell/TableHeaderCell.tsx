@@ -40,7 +40,7 @@ import styles from "./TableHeaderCell.module.scss";
 const TableHeaderCell = ({
 	column,
 	index,
-	onMouseDown,
+	onPointerDown,
 	resizable,
 	sortBy,
 	sorted,
@@ -131,7 +131,7 @@ const TableHeaderCell = ({
 					<div
 						data-column={`${index}`}
 						className={classNames(styles.resizeHandle, "not-selectable")}
-						onMouseDown={onMouseDown}
+						onPointerDown={onPointerDown}
 						data-testid="resize-handle"
 					/>
 				) : null}

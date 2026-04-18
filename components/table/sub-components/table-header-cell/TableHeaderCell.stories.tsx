@@ -63,7 +63,7 @@ import { TableHeaderCell } from "@docspace/ui-kit/components/table/sub-component
   sorted
   sortingVisible
   resizable
-  onMouseDown={handleResize}
+  onPointerDown={handleResize}
 />
 \`\`\``,
       },
@@ -71,7 +71,7 @@ import { TableHeaderCell } from "@docspace/ui-kit/components/table/sub-component
   },
   argTypes: {
     column: { control: false },
-    onMouseDown: { control: false, table: { disable: true } },
+    onPointerDown: { control: false, table: { disable: true } },
     tagRef: { control: false, table: { disable: true } },
     sortBy: {
       control: "select",
@@ -133,7 +133,7 @@ export const Default: Story = {
       onClick: () => {},
     },
     index: 0,
-    onMouseDown: () => {},
+    onPointerDown: () => {},
     resizable: false,
     sortBy: SortByFieldName.Author,
     sorted: true,
@@ -195,7 +195,7 @@ export const Resizable: Story = {
   sorted
   sortingVisible
   resizable
-  onMouseDown={handleResize}
+  onPointerDown={handleResize}
 />`,
       },
     },

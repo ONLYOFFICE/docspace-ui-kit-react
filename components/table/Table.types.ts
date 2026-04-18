@@ -88,7 +88,7 @@ export interface TableHeaderProps {
 export interface TableHeaderCellProps {
   column: TTableColumn;
   index: number;
-  onMouseDown: (event: React.MouseEvent) => void;
+  onPointerDown: (event: React.PointerEvent) => void;
   resizable?: boolean;
   sorted: boolean;
   sortBy: string;

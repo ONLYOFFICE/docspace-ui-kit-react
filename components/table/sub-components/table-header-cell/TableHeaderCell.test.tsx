@@ -45,7 +45,7 @@ const mockColumn = {
 const defaultProps = {
   column: mockColumn,
   index: 0,
-  onMouseDown: vi.fn(),
+  onPointerDown: vi.fn(),
   resizable: false,
   sortBy: SortByFieldName.Author,
   sorted: true,
@@ -87,13 +87,13 @@ describe("<TableHeaderCell />", () => {
     expect(screen.getByTestId("resize-handle")).toBeInTheDocument();
   });
 
-  it("calls onMouseDown when resize handle is clicked", async () => {
+  it("calls onPointerDown when resize handle is clicked", async () => {
     render(<TableHeaderCell {...defaultProps} resizable />);
 
     const resizeHandle = screen.getByTestId("resize-handle");
     await userEvent.click(resizeHandle);
 
-    expect(defaultProps.onMouseDown).toHaveBeenCalled();
+    expect(defaultProps.onPointerDown).toHaveBeenCalled();
   });
 
   it("show sort icon if sortingVisible is true ", async () => {

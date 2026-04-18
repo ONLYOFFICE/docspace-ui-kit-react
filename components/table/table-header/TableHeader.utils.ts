@@ -67,19 +67,19 @@ export function moveToLeft(
   widths: string[],
   columnIndex: number,
   newWidth: number,
+  columnEls: (HTMLElement | null)[],
   isIndexEditingMode?: boolean,
   index?: number,
 ): boolean | void {
   if (isIndexEditingMode) return;
 
   let leftColumn: HTMLElement | null = null;
-  let colIndex =
-    index !== undefined ? index : columnIndex ? columnIndex - 1 : 0;
+  let colIndex = index !== undefined ? index : columnIndex - 1;
 
   if (colIndex < 0) return;
 
   while (colIndex >= 0) {
-    leftColumn = document.getElementById(`column_${colIndex}`);
+    leftColumn = columnEls[colIndex] ?? null;
     if (leftColumn) {
       if (leftColumn.dataset.enable === "true") break;
       else colIndex -= 1;
@@ -88,25 +88,31 @@ export function moveToLeft(
 
   if (leftColumn) {
     const minSize = leftColumn.dataset.minWidth
-      ? leftColumn.dataset.minWidth
+      ? +leftColumn.dataset.minWidth
       : DEFAULT_MIN_COLUMN_SIZE;
 
-    if (leftColumn.getBoundingClientRect().width <= +minSize) {
+    if (leftColumn.getBoundingClientRect().width <= minSize) {
       if (colIndex < 0) return false;
-      moveToLeft(widths, columnIndex, newWidth, isIndexEditingMode, colIndex - 1);
+      moveToLeft(
+        widths,
+        columnIndex,
+        newWidth,
+        columnEls,
+        isIndexEditingMode,
+        colIndex - 1,
+      );
       return;
     }
 
     const offset = getSubstring(widths[columnIndex]) - newWidth;
     const column2Width = getSubstring(widths[colIndex]);
     const leftColumnWidth = column2Width - offset;
-    const newLeftWidth =
-      leftColumnWidth < +minSize ? minSize : leftColumnWidth;
+    const newLeftWidth = leftColumnWidth < minSize ? minSize : leftColumnWidth;
 
     widths[colIndex] = `${newLeftWidth}px`;
     const width =
       getSubstring(widths[columnIndex]) +
-      (offset - (+newLeftWidth - leftColumnWidth));
+      (offset - (newLeftWidth - leftColumnWidth));
 
     widths[columnIndex] = `${width}px`;
   }
@@ -117,6 +123,7 @@ export function moveToRight(
   columnIndex: number,
   newWidth: number,
   columnsLength: number,
+  columnEls: (HTMLElement | null)[],
   isIndexEditingMode?: boolean,
   index?: number,
 ): boolean | void {
@@ -126,7 +133,7 @@ export function moveToRight(
   let colIndex = index || columnIndex + 1;
 
   while (colIndex !== columnsLength) {
-    rightColumn = document.getElementById(`column_${colIndex}`);
+    rightColumn = columnEls[colIndex] ?? null;
     if (rightColumn) {
       if (rightColumn.dataset.enable === "true") break;
       else colIndex += 1;
@@ -136,14 +143,14 @@ export function moveToRight(
   const offset = getSubstring(widths[columnIndex]) - newWidth;
   const column2Width = getSubstring(widths[colIndex]);
 
-  const defaultColumn = document.getElementById(`column_${colIndex}`);
+  const defaultColumn = columnEls[colIndex] ?? null;
   if (!defaultColumn || defaultColumn.dataset.defaultSize) return;
 
   const minSize = rightColumn?.dataset.minWidth
     ? +rightColumn.dataset.minWidth
     : DEFAULT_MIN_COLUMN_SIZE;
 
-  if (column2Width + offset - HANDLE_OFFSET >= +minSize) {
+  if (column2Width + offset - HANDLE_OFFSET >= minSize) {
     widths[columnIndex] = `${newWidth + HANDLE_OFFSET}px`;
     widths[colIndex] = `${column2Width + offset - HANDLE_OFFSET}px`;
   } else if (column2Width !== minSize) {
@@ -161,6 +168,7 @@ export function moveToRight(
       columnIndex,
       newWidth,
       columnsLength,
+      columnEls,
       isIndexEditingMode,
       colIndex + 1,
     );
@@ -234,3 +242,4 @@ export function distributionOverWidth(
 
   return newGridTemplateColumns;
 }
+

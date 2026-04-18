@@ -59,7 +59,7 @@ export const TableHeader = (props: TableHeaderProps) => {
 
   const { isRTL } = useInterfaceDirection();
 
-  const { hideColumns, onMouseDown, headerRef } = useTableHeaderResize({
+  const { hideColumns, onPointerDown, headerRef } = useTableHeaderResize({
     columns,
     infoPanelVisible: infoPanelVisible ?? false,
     columnStorageName,
@@ -101,7 +101,7 @@ export const TableHeader = (props: TableHeaderProps) => {
                 sortBy={sortBy || ""}
                 resizable={resizable}
                 defaultSize={column.defaultSize}
-                onMouseDown={onMouseDown}
+                onPointerDown={onPointerDown}
                 sortingVisible={sortingVisible || false}
                 tagRef={tagRef}
                 testId={`column-${column.key}`}

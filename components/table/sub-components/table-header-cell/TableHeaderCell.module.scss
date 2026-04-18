@@ -128,6 +128,8 @@
     margin-inline: auto 0;
     z-index: 1;
     border-inline-end: var(--table-container-border-right);
+    // Prevent touch devices from scrolling instead of triggering pointerdown
+    touch-action: none;
 
     &:hover {
       border-color: var(--table-container-border-hover-color);

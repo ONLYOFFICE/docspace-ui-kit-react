@@ -76,7 +76,7 @@ export type UseTableHeaderResizeOptions = {
 
 export type UseTableHeaderResizeResult = {
   hideColumns: boolean;
-  onMouseDown: (e: React.MouseEvent) => void;
+  onPointerDown: (e: React.PointerEvent) => void;
   headerRef: React.RefObject<HTMLDivElement | null>;
 };
 
@@ -96,9 +96,9 @@ export function useTableHeaderResize(
   const [hideColumns, setHideColumns] = useState(false);
   const [minWidthsIndex, setMinWidthsIndex] = useState<number[]>([]);
 
-  // ─── Drag handler — stable identity, reads opts via optionsRef ───────────
+  // ─── Drag handler — pointer events, cached DOM, rAF-batched writes ───────
 
-  const onMouseDown = useCallback((event: React.MouseEvent) => {
+  const onPointerDown = useCallback((event: React.PointerEvent) => {
     if (event.target) {
       const target = event.target as HTMLDivElement;
       if (target.dataset.column) {
@@ -106,40 +106,96 @@ export function useTableHeaderResize(
       }
     }
 
+    const container = optionsRef.current.containerRef.current;
+    if (!container) return;
+
+    const pointerId = event.pointerId;
+
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
 
-    const handleMouseMove = (e: MouseEvent) => {
+    // Cache DOM context — one lookup per drag, indices aligned with columns
+    const cols = optionsRef.current.columns;
+    const columnEls: (HTMLElement | null)[] = [];
+    for (let i = 0; i < cols.length; i++) {
+      columnEls.push(document.getElementById(`column_${i}`));
+    }
+    const rowEls = optionsRef.current.useReactWindow
+      ? Array.from(
+          container.querySelectorAll<HTMLElement>(
+            ".table-row, .table-list-item",
+          ),
+        )
+      : [];
+
+    // Snapshot exact px widths — eliminates subpixel drift and empty grid
+    const initWidths = columnEls.map(
+      (el) => `${Math.round(el?.getBoundingClientRect().width ?? 0)}px`,
+    );
+    initWidths.push(`${SETTINGS_SIZE}px`);
+
+    // Keep widths in closure — avoid parsing gridTemplateColumns on every frame
+    const widths: string[] = [...initWidths];
+    let pendingStr: string | null = initWidths.join(" ");
+    let rafId: number | null = null;
+
+    const applyWidths = () => {
+      rafId = null;
+      if (pendingStr == null) return;
+      const str = pendingStr;
+      pendingStr = null;
+      container.style.gridTemplateColumns = str;
+      if (headerRef.current) headerRef.current.style.gridTemplateColumns = str;
+      for (const r of rowEls) r.style.gridTemplateColumns = str;
+    };
+
+    // Initial write synchronously so first frame is correct
+    applyWidths();
+
+    const schedule = (str: string) => {
+      pendingStr = str;
+      if (rafId == null) rafId = requestAnimationFrame(applyWidths);
+    };
+
+    const cleanup = () => {
+      if (rafId != null) cancelAnimationFrame(rafId);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      window.removeEventListener("pointermove", handleMouseMove);
+      window.removeEventListener("pointerup", handleMouseUp);
+      window.removeEventListener("pointercancel", handleMouseUp);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+
+    const handleMouseMove = (e: PointerEvent) => {
+      if (e.pointerId !== pointerId) return;
+
       const columnIndex = columnIndexRef.current;
       if (columnIndex === null) return;
 
-      const opts = optionsRef.current;
-      const column = document.getElementById(`column_${columnIndex}`);
+      const column = columnEls[columnIndex];
       if (!column) return;
 
+      const opts = optionsRef.current;
       const columnSize = column.getBoundingClientRect();
       let newWidth = opts.isRTL
         ? columnSize.right - e.clientX
         : e.clientX - columnSize.left;
 
-      const tableContainer =
-        opts.containerRef.current?.style.gridTemplateColumns;
-      const widths = tableContainer?.split(" ") as string[];
-
       const minSize = column.dataset.minWidth
-        ? column.dataset.minWidth
+        ? +column.dataset.minWidth
         : DEFAULT_MIN_COLUMN_SIZE;
 
-      if (newWidth <= +minSize - HANDLE_OFFSET) {
+      if (newWidth <= minSize - HANDLE_OFFSET) {
         const currentWidth = getSubstring(widths[columnIndex]);
-
-        if (currentWidth !== +minSize) {
-          newWidth = +minSize - HANDLE_OFFSET;
+        if (currentWidth !== minSize) {
+          newWidth = minSize - HANDLE_OFFSET;
           moveToRight(
             widths,
             columnIndex,
             newWidth,
-            opts.columns.length,
+            cols.length,
+            columnEls,
             opts.isIndexEditingMode,
           );
         } else {
@@ -147,6 +203,7 @@ export function useTableHeaderResize(
             widths,
             columnIndex,
             newWidth,
+            columnEls,
             opts.isIndexEditingMode,
           );
         }
@@ -155,47 +212,41 @@ export function useTableHeaderResize(
           widths,
           columnIndex,
           newWidth,
-          opts.columns.length,
+          cols.length,
+          columnEls,
           opts.isIndexEditingMode,
         );
       }
 
-      const str = widths.join(" ");
-      if (opts.containerRef.current) {
-        opts.containerRef.current.style.gridTemplateColumns = str;
-      }
-      if (headerRef.current) {
-        headerRef.current.style.gridTemplateColumns = str;
-      }
-
-      updateTableRows(opts.containerRef.current, str, opts.useReactWindow);
+      schedule(widths.join(" "));
     };
 
-    const handleMouseUp = () => {
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
+    const handleMouseUp = (e: PointerEvent) => {
+      if (e.pointerId !== pointerId) return;
+
+      // Cancel any pending rAF and flush final state synchronously
+      if (rafId != null) cancelAnimationFrame(rafId);
+      pendingStr = widths.join(" ");
+      applyWidths();
 
       const opts = optionsRef.current;
-      if (opts.containerRef.current) {
-        if (!opts.infoPanelVisible) {
-          localStorage.setItem(
-            opts.columnStorageName ?? "",
-            opts.containerRef.current.style.gridTemplateColumns,
-          );
-        } else {
-          localStorage.setItem(
-            opts.columnInfoPanelStorageName || "",
-            opts.containerRef.current.style.gridTemplateColumns,
-          );
-        }
-      }
+      const str = container.style.gridTemplateColumns;
+      const key = opts.infoPanelVisible
+        ? opts.columnInfoPanelStorageName || ""
+        : (opts.columnStorageName ?? "");
+      localStorage.setItem(key, str);
 
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      cleanup();
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    const onVisibilityChange = () => {
+      if (document.hidden) cleanup();
+    };
+
+    window.addEventListener("pointermove", handleMouseMove);
+    window.addEventListener("pointerup", handleMouseUp);
+    window.addEventListener("pointercancel", handleMouseUp);
+    document.addEventListener("visibilitychange", onVisibilityChange);
   }, []);
 
   // ─── Column distribution ──────────────────────────────────────────────────
@@ -280,11 +331,10 @@ export function useTableHeaderResize(
     }
 
     if (str) {
-      if (!infoPanelVisible) {
-        localStorage.setItem(columnStorageName ?? "", str);
-      } else {
-        localStorage.setItem(columnInfoPanelStorageName || "", str);
-      }
+      const saveKey = infoPanelVisible
+        ? columnInfoPanelStorageName || ""
+        : (columnStorageName ?? "");
+      localStorage.setItem(saveKey, str);
 
       updateTableRows(containerRef.current, str, useReactWindow);
     }
@@ -378,6 +428,8 @@ export function useTableHeaderResize(
 
     if (!container) return;
 
+    const containerWidth = container.getBoundingClientRect().width;
+
     const storageSize =
       !resetColumnsSizeProp && localStorage.getItem(columnStorageName);
 
@@ -433,8 +485,6 @@ export function useTableHeaderResize(
     }
 
     if (!container) return;
-
-    const containerWidth = container.getBoundingClientRect().width;
 
     const defaultWidth = tableContainer
       .map((column) => getSubstring(column))
@@ -612,8 +662,7 @@ export function useTableHeaderResize(
                   index === tableInfoPanelContainer.length - 1 ||
                   (column ? column.dataset.enable === "true" : item !== "0px");
 
-                const defaultColumnSize =
-                  column && column.dataset.defaultSize;
+                const defaultColumnSize = column && column.dataset.defaultSize;
 
                 if (!enable) {
                   gridTemplateColumns.push("0px");
@@ -622,9 +671,7 @@ export function useTableHeaderResize(
                     enabledColumnsCount === 0
                       ? 100
                       : (getSubstring(item) /
-                          (changedWidth -
-                            nameColumnWidth -
-                            indexColumnWidth)) *
+                          (changedWidth - nameColumnWidth - indexColumnWidth)) *
                         100;
 
                   let newItemWidth;
@@ -672,8 +719,7 @@ export function useTableHeaderResize(
                   column !== `${SETTINGS_SIZE}px` &&
                   columnWidth > DEFAULT_MIN_COLUMN_SIZE
                 ) {
-                  const availableWidth =
-                    columnWidth - DEFAULT_MIN_COLUMN_SIZE;
+                  const availableWidth = columnWidth - DEFAULT_MIN_COLUMN_SIZE;
 
                   if (availableWidth < Math.abs(overWidth)) {
                     overWidth = Math.abs(overWidth) - availableWidth;
@@ -703,13 +749,11 @@ export function useTableHeaderResize(
                 index === tableInfoPanelContainer.length - 1 ||
                 (column ? column.dataset.enable === "true" : item !== "0px");
 
-              const defaultColumnSize =
-                column && column.dataset.defaultSize;
+              const defaultColumnSize = column && column.dataset.defaultSize;
               const shortColumSize =
                 column?.dataset?.shortColum && column.dataset.minWidth;
 
-              const percent =
-                (getSubstring(item) / oldWidthIndexAndName) * 100;
+              const percent = (getSubstring(item) / oldWidthIndexAndName) * 100;
 
               if (!enable) {
                 gridTemplateColumns.push("0px");
@@ -801,8 +845,7 @@ export function useTableHeaderResize(
 
             if (overWidth > 0) {
               const shortColumnSize =
-                columns.find((col) => col.isShort && col.enable)?.minWidth ||
-                0;
+                columns.find((col) => col.isShort && col.enable)?.minWidth || 0;
 
               gridTemplateColumns.forEach((column, index) => {
                 const columnWidth = getSubstring(column);
@@ -853,8 +896,7 @@ export function useTableHeaderResize(
             const shortColumSize =
               column?.dataset?.shortColum && column.dataset.minWidth;
 
-            const isSettingColumn =
-              Number(index) === tableContainer.length - 1;
+            const isSettingColumn = Number(index) === tableContainer.length - 1;
 
             const isActiveNow = item === "0px" && enable;
             if (isActiveNow && column) activeColumnIndex = index;
@@ -864,10 +906,7 @@ export function useTableHeaderResize(
               shortColumSize &&
               !minWidthsIndex.includes(+shortColumSize)
             ) {
-              setMinWidthsIndex((prevValue) => [
-                ...prevValue,
-                +shortColumSize,
-              ]);
+              setMinWidthsIndex((prevValue) => [...prevValue, +shortColumSize]);
             }
 
             if (
@@ -938,8 +977,7 @@ export function useTableHeaderResize(
                 getSubstring(newItemWidth) < minSize &&
                 !shortColumSize
               ) {
-                overWidth +=
-                  MIN_SIZE_NAME_COLUMN - getSubstring(newItemWidth);
+                overWidth += MIN_SIZE_NAME_COLUMN - getSubstring(newItemWidth);
                 newItemWidth = `${MIN_SIZE_NAME_COLUMN}px`;
               }
 
@@ -1077,8 +1115,15 @@ export function useTableHeaderResize(
   }, []);
 
   useEffect(() => {
-    const { columns, columnStorageName, sortBy, sorted, infoPanelVisible, columnInfoPanelStorageName, resetColumnsSize: resetColumnsSizeProp } =
-      optionsRef.current;
+    const {
+      columns,
+      columnStorageName,
+      sortBy,
+      sorted,
+      infoPanelVisible,
+      columnInfoPanelStorageName,
+      resetColumnsSize: resetColumnsSizeProp,
+    } = optionsRef.current;
 
     const prevHeaderData = prevHeaderDataRef.current;
     const updatePrevHeaderData = () => {
@@ -1119,13 +1164,7 @@ export function useTableHeaderResize(
       const isColumnsCountMismatch =
         storageSize && storageSize.split(" ").length !== columns.length + 1;
 
-      const isColumnsEnableMismatch = columns.some((_, index) => {
-        return (
-          columns[index]?.enable !== prevHeaderData.columns[index]?.enable
-        );
-      });
-
-      if (isColumnsCountMismatch || isColumnsEnableMismatch) {
+      if (isColumnsCountMismatch) {
         shouldReset = true;
       }
     }
@@ -1150,5 +1189,6 @@ export function useTableHeaderResize(
     isMountedRef.current = true;
   }, []);
 
-  return { hideColumns, onMouseDown, headerRef };
+  return { hideColumns, onPointerDown, headerRef };
 }
+
