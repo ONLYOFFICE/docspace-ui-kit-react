@@ -30,5 +30,6 @@ export { TableRow } from "./table-row";
 export { TableHeader } from "./table-header";
 export { TableGroupMenu } from "./table-group-menu";
 export { TableCell } from "./sub-components/table-cell";
+export { Table } from "./Table";
 
-export type { TTableColumn, TGroupMenuItem } from "./Table.types";
+export type { TTableColumn, TGroupMenuItem, TableProps } from "./Table.types";

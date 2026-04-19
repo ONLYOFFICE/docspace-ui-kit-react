@@ -201,3 +201,42 @@ export type TableGroupMenuProps =
       onCloseClick?: undefined;
     })
   | (TableGroupMenuBased & { isCloseable: boolean; onCloseClick: () => void });
+
+// ── Single Table component type ────────────────────────────────────────────
+
+export interface TableProps {
+  // Shared (passed to both Header and Body)
+  columnStorageName: string;
+  columnInfoPanelStorageName?: string;
+  useReactWindow: boolean;
+  infoPanelVisible?: boolean;
+  isIndexEditingMode?: boolean;
+  // Header-specific
+  columns: TTableColumn[];
+  sectionWidth: number;
+  showSettings: boolean;
+  sortBy?: string;
+  sorted?: boolean;
+  sortingVisible?: boolean;
+  settingsTitle?: string;
+  tagRef?:
+    | React.ForwardedRef<HTMLDivElement>
+    | ((node: HTMLDivElement) => void);
+  withoutWideColumn?: boolean;
+  resetColumnsSize?: boolean;
+  isLengthenHeader?: boolean;
+  setHideColumns?: (value: boolean) => void;
+  onHeaderClick?: () => void;
+  headerStyle?: React.CSSProperties;
+  // Body-specific
+  fetchMoreFiles: (params: IndexRange) => Promise<void>;
+  filesLength: number;
+  hasMoreFiles: boolean;
+  itemCount: number;
+  itemHeight: number;
+  onScroll?: () => void;
+  children: React.ReactNode[];
+  // Container-specific
+  className?: string;
+  noSelect?: boolean;
+}
