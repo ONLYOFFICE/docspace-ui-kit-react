@@ -175,6 +175,13 @@ export function moveToRight(
   }
 }
 
+export function getColumnMinWidth(column: TTableColumn | undefined): number {
+  if (!column) return DEFAULT_MIN_COLUMN_SIZE;
+  if (column.default) return column.minWidth || MIN_SIZE_NAME_COLUMN;
+  if (column.isShort) return column.minWidth || MIN_SIZE_NAME_COLUMN;
+  return DEFAULT_MIN_COLUMN_SIZE;
+}
+
 export function distributionOverWidth(
   overWidth: number,
   gridTemplateColumns: string[],
@@ -192,16 +199,8 @@ export function distributionOverWidth(
     const unfixedSize = checkingForUnfixedSize(item, defaultColumnSize);
     if (!unfixedSize) return;
 
-    const column = document.getElementById(`column_${index}`);
-    const minWidth = column?.dataset?.minWidth;
-    const minSize = minWidth ? +minWidth : MIN_SIZE_NAME_COLUMN;
-
-    if (
-      (columns[index]?.key === "Name" || columns[index]?.key === "Index"
-        ? minSize
-        : DEFAULT_MIN_COLUMN_SIZE) !== getSubstring(item)
-    )
-      countColumns += 1;
+    const colMinSize = getColumnMinWidth(columns[index]);
+    if (colMinSize !== getSubstring(item)) countColumns += 1;
   });
 
   const addWidth = overWidth / countColumns;
@@ -210,33 +209,17 @@ export function distributionOverWidth(
     const unfixedSize = checkingForUnfixedSize(item, defaultColumnSize);
     if (!unfixedSize) return;
 
-    const column = document.getElementById(`column_${index}`);
-    const minWidth = column?.dataset?.minWidth;
-    const minSize = minWidth ? +minWidth : MIN_SIZE_NAME_COLUMN;
-
     const itemSubstring = getSubstring(item);
+    const colMinSize = getColumnMinWidth(columns[index]);
 
-    if (
-      (columns[index]?.key === "Name" || columns[index]?.key === "Index"
-        ? minSize
-        : DEFAULT_MIN_COLUMN_SIZE) === itemSubstring
-    )
-      return;
+    if (colMinSize === itemSubstring) return;
 
-    const differenceWithMinimum =
-      itemSubstring -
-      (columns[index]?.key === "Name" || columns[index]?.key === "Index"
-        ? minSize
-        : DEFAULT_MIN_COLUMN_SIZE);
+    const differenceWithMinimum = itemSubstring - colMinSize;
 
     if (differenceWithMinimum >= addWidth) {
       newGridTemplateColumns[index] = `${itemSubstring - addWidth}px`;
     } else {
-      newGridTemplateColumns[index] = `${
-        columns[index]?.key === "Name" || columns[index]?.key === "Index"
-          ? minSize
-          : DEFAULT_MIN_COLUMN_SIZE
-      }px`;
+      newGridTemplateColumns[index] = `${colMinSize}px`;
     }
   });
 
@@ -249,7 +232,7 @@ export function getColumnStorageKey(
   columnInfoPanelStorageName: string | undefined,
 ): string {
   return infoPanelVisible
-    ? (columnInfoPanelStorageName || "")
+    ? columnInfoPanelStorageName || ""
     : (columnStorageName ?? "");
 }
 
@@ -289,8 +272,7 @@ export function loadColumnSizes(
     return null;
   }
 
-  const shortSize =
-    columns.find((c) => c.isShort && c.enable)?.minWidth || 0;
+  const shortSize = columns.find((c) => c.isShort && c.enable)?.minWidth || 0;
 
   if (!shortSize && getSubstring(parts[0]) <= DEFAULT_MIN_COLUMN_SIZE) {
     localStorage.removeItem(key);
@@ -304,3 +286,4 @@ export function clearColumnSizes(key: string): void {
   if (!key) return;
   localStorage.removeItem(key);
 }
+

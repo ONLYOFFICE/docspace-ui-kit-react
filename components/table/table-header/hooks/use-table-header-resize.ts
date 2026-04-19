@@ -284,9 +284,8 @@ export function useTableHeaderResize(
       .filter((x) => !x.default)
       .filter((x) => !x.isShort);
 
-    const container = containerRef.current
-      ? containerRef.current
-      : document.getElementById("table-container");
+    const container =
+      containerRef.current ?? document.getElementById("table-container");
 
     if (!container) return;
 
@@ -437,9 +436,8 @@ export function useTableHeaderResize(
 
     let activeColumnIndex = null;
 
-    const container = containerRef.current
-      ? containerRef.current
-      : document.getElementById("table-container");
+    const container =
+      containerRef.current ?? document.getElementById("table-container");
 
     if (!container) return;
 
@@ -569,8 +567,8 @@ export function useTableHeaderResize(
 
           tableInfoPanelContainer.forEach((item, index) => {
             if (
-              columns[index]?.key !== "Index" &&
-              columns[index]?.key !== "Name" &&
+              !columns[index]?.isShort &&
+              !columns[index]?.default &&
               item !== "0px" &&
               item !== `${defaultSize}px` &&
               item !== `${SETTINGS_SIZE}px`
@@ -586,14 +584,12 @@ export function useTableHeaderResize(
             defaultSize -
             SETTINGS_SIZE;
 
-          const indexColumnWidth =
-            columns[0].key === "Index"
-              ? getSubstring(tableInfoPanelContainer[0])
-              : 0;
-          const nameColumnWidth =
-            columns[0].key === "Name"
-              ? getSubstring(tableInfoPanelContainer[0])
-              : getSubstring(tableInfoPanelContainer[1]);
+          const indexColumnWidth = columns[0].isShort
+            ? getSubstring(tableInfoPanelContainer[0])
+            : 0;
+          const nameColumnWidth = columns[0].default
+            ? getSubstring(tableInfoPanelContainer[0])
+            : getSubstring(tableInfoPanelContainer[1]);
 
           if (
             contentWidth - enabledColumnsCount * DEFAULT_MIN_COLUMN_SIZE >
@@ -613,12 +609,11 @@ export function useTableHeaderResize(
                 column?.dataset?.shortColum && column.dataset.minWidth;
 
               if (
-                (columns[index]?.key === "Name" ||
-                  columns[index]?.key === "Index") &&
+                (columns[index]?.default || columns[index]?.isShort) &&
                 enabledColumnsCount > 0
               ) {
                 if (
-                  columns[index]?.key === "Index" &&
+                  columns[index]?.isShort &&
                   shortColumSize &&
                   !minWidthsIndex.includes(+shortColumSize)
                 ) {
@@ -631,7 +626,7 @@ export function useTableHeaderResize(
                 let newItemWidth = item;
 
                 if (
-                  columns[index]?.key === "Index" &&
+                  columns[index]?.isShort &&
                   shortColumSize &&
                   getSubstring(item) < +shortColumSize
                 ) {
@@ -639,10 +634,10 @@ export function useTableHeaderResize(
                   newItemWidth = `${shortColumSize}px`;
                 }
 
-                // Set the previous minimum width of the index column
+                // Set the previous minimum width of the short column
                 // if the user has not changed the width of this column
                 if (
-                  columns[index]?.key === "Index" &&
+                  columns[index]?.isShort &&
                   shortColumSize &&
                   getSubstring(item) > +shortColumSize &&
                   minWidthsIndex?.includes(getSubstring(item)) &&
@@ -708,8 +703,8 @@ export function useTableHeaderResize(
                 const columnWidth = getSubstring(column);
 
                 if (
-                  columns[index]?.key !== "Name" &&
-                  columns[index]?.key !== "Index" &&
+                  !columns[index]?.default &&
+                  !columns[index]?.isShort &&
                   column !== "0px" &&
                   column !== `${defaultSize}px` &&
                   column !== `${SETTINGS_SIZE}px` &&
@@ -758,7 +753,7 @@ export function useTableHeaderResize(
 
                 if (defaultColumnSize) {
                   newItemWidth = `${defaultColumnSize}px`;
-                } else if (columns[index]?.key === "Index") {
+                } else if (columns[index]?.isShort) {
                   if (
                     shortColumSize &&
                     !minWidthsIndex.includes(+shortColumSize)
@@ -782,7 +777,7 @@ export function useTableHeaderResize(
                         100,
                     )}px`;
                   }
-                } else if (columns[index]?.key === "Name") {
+                } else if (columns[index]?.default) {
                   let diff = 0;
                   if (shortColumSize && indexColumnWidth === +shortColumSize) {
                     diff = +shortColumSize;
@@ -800,9 +795,9 @@ export function useTableHeaderResize(
                   newItemWidth = `${DEFAULT_MIN_COLUMN_SIZE}px`;
                 }
 
-                // Checking whether the name column is less than the minimum width
+                // Checking whether the wide column is less than the minimum width
                 if (
-                  columns[index]?.key === "Name" &&
+                  columns[index]?.default &&
                   getSubstring(newItemWidth) < MIN_SIZE_NAME_COLUMN
                 ) {
                   overWidth +=
@@ -810,9 +805,9 @@ export function useTableHeaderResize(
                   newItemWidth = `${MIN_SIZE_NAME_COLUMN}px`;
                 }
 
-                // Checking whether the index column is less than the minimum width
+                // Checking whether the short column is less than the minimum width
                 if (
-                  columns[index]?.key === "Index" &&
+                  columns[index]?.isShort &&
                   shortColumSize &&
                   getSubstring(newItemWidth) < +shortColumSize
                 ) {
@@ -820,10 +815,10 @@ export function useTableHeaderResize(
                   newItemWidth = `${shortColumSize}px`;
                 }
 
-                // Set the previous minimum width of the index column
+                // Set the previous minimum width of the short column
                 // if the user has not changed the width of this column
                 if (
-                  columns[index]?.key === "Index" &&
+                  columns[index]?.isShort &&
                   shortColumSize &&
                   getSubstring(item) > +shortColumSize &&
                   minWidthsIndex?.includes(getSubstring(item)) &&
@@ -846,12 +841,9 @@ export function useTableHeaderResize(
               gridTemplateColumns.forEach((column, index) => {
                 const columnWidth = getSubstring(column);
 
-                if (
-                  columns[index]?.key === "Index" ||
-                  columns[index]?.key === "Name"
-                ) {
+                if (columns[index]?.default || columns[index]?.isShort) {
                   if (
-                    columns[index]?.key === "Index" &&
+                    columns[index]?.isShort &&
                     columnWidth === shortColumnSize
                   ) {
                     return columnWidth;
@@ -898,7 +890,7 @@ export function useTableHeaderResize(
             if (isActiveNow && column) activeColumnIndex = index;
 
             if (
-              columns[index]?.key === "Index" &&
+              columns[index]?.isShort &&
               shortColumSize &&
               !minWidthsIndex.includes(+shortColumSize)
             ) {
@@ -906,7 +898,7 @@ export function useTableHeaderResize(
             }
 
             if (
-              columns[index]?.key === "Index" &&
+              columns[index]?.isShort &&
               shortColumSize &&
               getSubstring(item) > +shortColumSize &&
               minWidthsIndex.includes(getSubstring(item)) &&
@@ -966,10 +958,10 @@ export function useTableHeaderResize(
               const minWidth = column?.dataset?.minWidth;
               const minSize = minWidth ? +minWidth : MIN_SIZE_NAME_COLUMN;
 
-              // Checking whether the name column is less than the minimum width
+              // Checking whether the wide column is less than the minimum width
 
               if (
-                columns[index]?.key === "Name" &&
+                columns[index]?.default &&
                 getSubstring(newItemWidth) < minSize &&
                 !shortColumSize
               ) {
@@ -977,9 +969,9 @@ export function useTableHeaderResize(
                 newItemWidth = `${MIN_SIZE_NAME_COLUMN}px`;
               }
 
-              // Checking whether the index column is less than the minimum width
+              // Checking whether the short column is less than the minimum width
               if (
-                columns[index]?.key === "Index" &&
+                columns[index]?.isShort &&
                 shortColumSize &&
                 getSubstring(newItemWidth) < +shortColumSize
               ) {
@@ -987,10 +979,10 @@ export function useTableHeaderResize(
                 newItemWidth = `${shortColumSize}px`;
               }
 
-              // Set the previous minimum width of the index column
+              // Set the previous minimum width of the short column
               // if the user has not changed the width of this column
               if (
-                columns[index]?.key === "Index" &&
+                columns[index]?.isShort &&
                 shortColumSize &&
                 getSubstring(newItemWidth) > +shortColumSize &&
                 minWidthsIndex.includes(getSubstring(newItemWidth)) &&
@@ -1001,8 +993,8 @@ export function useTableHeaderResize(
 
               // Checking whether columns are smaller than the minimum width
               if (
-                columns[index]?.key !== "Index" &&
-                columns[index]?.key !== "Name" &&
+                !columns[index]?.isShort &&
+                !columns[index]?.default &&
                 !defaultColumnSize &&
                 getSubstring(newItemWidth) < DEFAULT_MIN_COLUMN_SIZE
               ) {
