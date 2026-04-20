@@ -182,7 +182,6 @@ const buildTokens = (p: BasePalette): Partial<ThemeTokens> => ({
   "--input-active-border-color": "var(--background-accent-button)",
   "--input-active-background-color": "var(--background-normal)",
   "--input-error-color": "var(--border-error)",
-  "--input-border-radius": "4px",
 
   "--link-color": "var(--text-tertiary)",
   "--link-primary-color": "var(--background-accent-button)",
@@ -460,7 +459,7 @@ const portalDarkPalette: BasePalette = {
 
   buttonShadowFocus: "0px 0px 0px 2px rgba(71, 129, 209, 0.75)",
   buttonDefaultFocusShadow: "0px 0px 0px 2px rgba(71, 129, 209, 0.5)",
-  modalDialogShadows: `0px 8px 16px 0px ${globalColors.boxShadowBlackColor}, 0px 0px 4px 0px rgba(0, 0, 0, 0.3)`,
+  modalDialogShadows: `0px 8px 16px 0px ${globalColors.boxShadowColor}, 0px 0px 4px 0px rgba(0, 0, 0, 0.3)`,
   dropDownMenuBorderColor: globalColors.grayDarkStrong,
   dropDownMenuShadow:
     "0px 8px 16px 0px rgba(0, 0, 0, 0.3), 0px 0px 4px 0px rgba(0, 0, 0, 0.2)",

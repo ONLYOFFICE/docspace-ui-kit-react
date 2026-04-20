@@ -68,7 +68,7 @@ const tx = (transaction: IDBTransaction): Promise<void> =>
 let dbPromise: Promise<IDBDatabase> | null = null;
 
 const openDatabase = (): Promise<IDBDatabase> => {
-  if (dbPromise) return dbPromise;
+  if (dbPromise !== null) return dbPromise;
 
   dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
