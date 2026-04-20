@@ -83,7 +83,7 @@ type BasePalette = {
   tooltipShadow: string;
 };
 
-const buildTokens = (p: BasePalette): Partial<ThemeTokens> => ({
+const buildTokens = (p: BasePalette): Partial<ThemeTokens> & Record<string, string> => ({
   // Base palette
   "--background-normal": p.backgroundNormal,
   "--background-normal-element": p.backgroundNormalElement,
@@ -468,7 +468,7 @@ const portalDarkPalette: BasePalette = {
   tooltipShadow: "0px 1px 4px -1px rgba(0, 0, 0, 0.4)",
 };
 
-export const portalThemes: Record<string, Partial<ThemeTokens>> = {
+export const portalThemes: Record<string, Partial<ThemeTokens> & Record<string, string>> = {
   [PORTAL_BASE_THEME_ID]: buildTokens(portalBasePalette),
   [PORTAL_DARK_THEME_ID]: buildTokens(portalDarkPalette),
 };
