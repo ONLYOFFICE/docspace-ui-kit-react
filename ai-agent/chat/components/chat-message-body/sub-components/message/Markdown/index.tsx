@@ -143,7 +143,7 @@ const MarkdownField = React.memo(
     };
 
     const processedChatMessage = normalizeMathDelimiters(
-      withThinkBlock ? splitedMsg[1] : chatMessage,
+      (withThinkBlock ? splitedMsg[1] : chatMessage) ?? "",
     );
 
     return (
