@@ -76,6 +76,10 @@ export function useColumnLayout({
   const prevHeaderDataRef = useRef<TPrevHeaderData>(null);
   const minWidthsIndex = useRef<number[]>([]);
 
+  const columnsKey = options.columns
+    .map((c) => `${c.key}:${c.enable}`)
+    .join(",");
+
   const [hideColumns, setHideColumns] = useState(false);
 
   // ─── Column distribution ──────────────────────────────────────────────────
@@ -567,8 +571,7 @@ export function useColumnLayout({
               const shortColumSize =
                 column?.dataset?.shortColum && column.dataset.minWidth;
 
-              const percent =
-                (getSubstring(item) / oldWidthIndexAndName) * 100;
+              const percent = (getSubstring(item) / oldWidthIndexAndName) * 100;
 
               if (!enable) {
                 gridTemplateColumns.push("0px");
@@ -1017,6 +1020,7 @@ export function useColumnLayout({
       onResize();
     }
   }, [
+    columnsKey,
     options.columns,
     options.columnStorageName,
     options.sortBy,
