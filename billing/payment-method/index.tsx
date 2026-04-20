@@ -79,6 +79,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     walletCustomerStatusNotActive,
     walletCustomerEmail,
     fetchCustomerInfo,
+    isNotPaidPeriod,
   } = paymentStore.tariff;
 
   if (!isPaymentMethodInit || showPortalSettingsLoader)
@@ -168,7 +169,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 
       <CardInformation />
 
-      {walletCustomerStatusNotActive ? (
+      {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
         <Text className={styles.linkNewCardDescription} lineHeight="20px">
           {t("LinkNewCardDescription")}
         </Text>

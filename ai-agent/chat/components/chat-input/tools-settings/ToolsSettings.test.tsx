@@ -247,6 +247,7 @@ describe("<ToolsSettings />", () => {
     generateDocxToolName: "",
     generateFormToolName: "",
     generatePresentationToolName: "",
+    toolCallingSupported: true,
     thinkingSupported: true,
     thinkingEnabled: false,
     setThinkingEnabled: vi.fn(),

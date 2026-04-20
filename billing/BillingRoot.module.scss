@@ -57,6 +57,7 @@
   --billing-card-color-wallet: #{$light-status-positive};
   --billing-card-color-ai: #{$ai-purple};
   --billing-card-color-payment: var(--color-scheme-main-accent);
+  --billing-card-color-storage: #{$light-gray-dark};
 }
 
 // ── Dark ──
@@ -112,4 +113,5 @@
   --billing-card-color-wallet: #{$dark-status-positive};
   --billing-card-color-ai: #{$ai-purple};
   --billing-card-color-payment: var(--color-scheme-main-accent);
+  --billing-card-color-storage: #{$dark-gray-dark};
 }

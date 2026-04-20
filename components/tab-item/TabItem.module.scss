@@ -40,8 +40,14 @@
   --tab-item-selected-item-color: #{$white};
   --tab-item-tag-border: 1px solid #{$gray-light-mid};
 
-  --tab-item-active-bg-value: var(--tab-item-active-bg, var(--tab-item-selected-background-color));
-  --tab-item-active-text-value: var(--tab-item-active-text, var(--tab-item-selected-item-color));
+  --tab-item-active-bg-value: var(
+    --tab-item-active-bg,
+    var(--tab-item-selected-background-color)
+  );
+  --tab-item-active-text-value: var(
+    --tab-item-active-text,
+    var(--tab-item-selected-item-color)
+  );
   --tab-item-border-value: var(--tab-item-border, var(--tab-item-tag-border));
   --tab-item-border-radius: var(--tab-item-radius, 16px);
   --tab-item-inner-padding: var(--tab-item-padding, 4px 16px);
@@ -62,7 +68,8 @@
 
   cursor: pointer;
 
-  &.active {
+  &.active,
+  &:not(.disabled):active {
     background: var(--tab-item-active-bg-value);
     border-color: var(--tab-item-active-bg-value);
 
@@ -83,8 +90,10 @@
 .tabItemText {
   height: 20px;
 
-  &.active {
+  &.active,
+  .tabItem:not(.disabled):active & {
     font-weight: 600;
     color: var(--tab-item-active-text-value);
   }
 }
+

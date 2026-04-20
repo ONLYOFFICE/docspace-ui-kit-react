@@ -649,6 +649,9 @@ const ContextMenu = (props: ContextMenuProps) => {
             style={style}
             onClick={onMenuClick}
             onMouseEnter={onMenuMouseEnter}
+            onDoubleClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+            }}
           >
             {changeView && (withHeader || isHeaderMobileSubMenu) ? (
               <div className="contextmenu-header">

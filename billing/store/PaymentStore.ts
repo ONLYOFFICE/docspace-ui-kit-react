@@ -961,20 +961,23 @@ class PaymentStore {
 
     const requests: Promise<unknown>[] = [];
 
+    await this.tariff.fetchPortalTariff();
+
     requests.push(
       this.getSettingsPayment(),
       this.paymentQuotas.fetchPaymentQuotas(),
-      this.tariff.fetchPortalTariff(),
     );
 
-    if (this.tariff.isGracePeriod || this.tariff.isNotPaidPeriod) {
-      requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
-    }
-
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
-      requests.push(this.setPaymentAccount());
+      if (this.tariff.isGracePeriod || this.tariff.isNotPaidPeriod) {
+        requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
+      }
 
-      if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
+      if (
+        !this.tariff.isNotPaidPeriod &&
+        this.isPayer &&
+        this.tariff.walletCustomerStatusNotActive
+      ) {
         requests.push(this.fetchCardLinked());
       }
     } else {

@@ -64,13 +64,22 @@
 
   // bridge vars — bind public overrides to internal theme tokens
   --dropzone-border-v: var(--dropzone-border-style, var(--dropzone-border));
-  --dropzone-drag-active-bg-v: var(--dropzone-drag-bg, var(--dropzone-drag-active-bg));
-  --dropzone-hover-bg-v: var(--dropzone-hover-bg-override, var(--dropzone-hover-bg));
+  --dropzone-drag-active-bg-v: var(
+    --dropzone-drag-bg,
+    var(--dropzone-drag-active-bg)
+  );
+  --dropzone-hover-bg-v: var(
+    --dropzone-hover-bg-override,
+    var(--dropzone-hover-bg)
+  );
   --dropzone-secondary-link-v: var(
     --dropzone-link-secondary-color,
     var(--dropzone-secondary-link)
   );
-  --dropzone-exsts-color-v: var(--dropzone-text-color, var(--dropzone-exsts-color));
+  --dropzone-exsts-color-v: var(
+    --dropzone-text-color,
+    var(--dropzone-exsts-color)
+  );
   --dropzone-exsts-bg-hover-v: var(
     --dropzone-text-hover-bg,
     var(--dropzone-exsts-color-background-hover)
@@ -87,7 +96,10 @@
     --dropzone-text-focus-color,
     var(--dropzone-exsts-color-focus)
   );
-  --dropzone-badge-focus-v: var(--dropzone-badge-focus-color, var(--dropzone-exsts-badge-focus));
+  --dropzone-badge-focus-v: var(
+    --dropzone-badge-focus-color,
+    var(--dropzone-exsts-badge-focus)
+  );
   --dropzone-arrow-focus-v: var(
     --dropzone-arrow-focus-color,
     var(--dropzone-arrow-icon-color-focus)
@@ -169,6 +181,9 @@
 
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
   gap: var(--dropzone-gap-v);
   font-size: var(--dropzone-font-size-v);
   line-height: 20px;
@@ -183,6 +198,9 @@
   &.secondary {
     font-weight: 400;
     color: var(--dropzone-secondary-link-v);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-align: center;
   }
 
   @include mixins.mobile {
@@ -279,11 +297,13 @@
 
 .dropzoneFormatsDropdown {
   :global(.light) & {
-    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-color};
+    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px
+      #{colors.$box-shadow-color};
   }
 
   :global(.dark) & {
-    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-color};
+    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px
+      #{colors.$box-shadow-color};
   }
 
   position: absolute !important;
@@ -320,3 +340,4 @@
   padding: 16px;
   box-sizing: border-box;
 }
+
