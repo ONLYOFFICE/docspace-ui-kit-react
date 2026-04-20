@@ -208,12 +208,12 @@
 .rowContainer {
   :global(.light) & {
     --row-border-color: #{colors.$gray-light-mid};
-    --row-bg-active: #f3f4f4;
+    --row-bg-active: #{colors.$light-gray-hover};
   }
 
   :global(.dark) & {
     --row-border-color: #{colors.$gray-dark-strong};
-    --row-bg-active: #3d3d3d;
+    --row-bg-active: #{colors.$light-dark-gray-hover};
   }
 
 
