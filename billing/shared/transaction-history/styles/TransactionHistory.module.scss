@@ -49,6 +49,14 @@
   :global(.table-container_header) {
     position: absolute;
   }
+
+  :global(.table-container_cell) {
+    height: auto;
+    max-height: none;
+    min-height: 48px;
+    overflow: visible;
+    white-space: normal;
+  }
 }
 
 .transactionDates {
