@@ -81,6 +81,7 @@ export function useColumnLayout({
     .join(",");
 
   const [hideColumns, setHideColumns] = useState(false);
+  const hideColumnsRef = useRef(false);
 
   // ─── Column distribution ──────────────────────────────────────────────────
 
@@ -292,7 +293,7 @@ export function useColumnLayout({
 
     if (
       containerGridTemplateColumns.length === 1 &&
-      !hideColumns &&
+      !hideColumnsRef.current &&
       storageSize
     ) {
       const hasContent = !!storageSize.split(" ").find((item, index) => {
@@ -356,7 +357,8 @@ export function useColumnLayout({
         hideColumnsConst = true;
       }
 
-      if (hideColumns !== hideColumnsConst) {
+      if (hideColumnsRef.current !== hideColumnsConst) {
+        hideColumnsRef.current = hideColumnsConst;
         setHideColumns(hideColumnsConst);
         setHideColumnsProp?.(hideColumnsConst);
       }
@@ -387,7 +389,7 @@ export function useColumnLayout({
 
       let hasGridTemplateColumnsWithoutOverfilling = false;
       if (infoPanelVisible) {
-        if (!hideColumns) {
+        if (!hideColumnsRef.current) {
           const contentWidth = containerWidth - defaultSize - SETTINGS_SIZE;
 
           let enabledColumnsCount = 0;
@@ -433,7 +435,7 @@ export function useColumnLayout({
               const column = document.getElementById(`column_${index}`);
 
               const shortColumSize =
-                column?.dataset?.shortColum && column.dataset.minWidth;
+                column?.dataset?.shortColumn && column.dataset.minWidth;
 
               if (
                 (columns[index]?.default || columns[index]?.isShort) &&
@@ -569,7 +571,7 @@ export function useColumnLayout({
 
               const defaultColumnSize = column && column.dataset.defaultSize;
               const shortColumSize =
-                column?.dataset?.shortColum && column.dataset.minWidth;
+                column?.dataset?.shortColumn && column.dataset.minWidth;
 
               const percent = (getSubstring(item) / oldWidthIndexAndName) * 100;
 
@@ -699,7 +701,7 @@ export function useColumnLayout({
       } else {
         let overWidth = 0;
 
-        if (!hideColumns && !hideColumnsConst) {
+        if (!hideColumnsRef.current && !hideColumnsConst) {
           for (const index in tableContainer) {
             const item = tableContainer[index];
 
@@ -709,7 +711,7 @@ export function useColumnLayout({
               (column ? column.dataset.enable === "true" : item !== "0px");
             const defaultColumnSize = column && column.dataset.defaultSize;
             const shortColumSize =
-              column?.dataset?.shortColum && column.dataset.minWidth;
+              column?.dataset?.shortColumn && column.dataset.minWidth;
 
             const isSettingColumn = Number(index) === tableContainer.length - 1;
 
@@ -917,7 +919,7 @@ export function useColumnLayout({
     if (!isMountedRef.current) {
       onResize();
     }
-  });
+  }, []);
 
   const handleWindowResize = useEffectEvent(() => {
     onResize(true);

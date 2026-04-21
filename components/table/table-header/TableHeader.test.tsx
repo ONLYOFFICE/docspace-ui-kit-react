@@ -161,9 +161,9 @@ describe("<TableHeader />", () => {
   });
 
   it("does not render settings if showSettings is false", () => {
-    render(<TableHeader {...defaultProps} />);
+    render(<TableHeader {...defaultProps} showSettings={false} />);
 
-    expect(screen.queryByTestId(`settings-block`)).toBeInTheDocument();
+    expect(screen.queryByTestId(`settings-block`)).not.toBeInTheDocument();
   });
 
   it("sets columnStorageName to localStorage if infoPanelVisible is false (default)", () => {

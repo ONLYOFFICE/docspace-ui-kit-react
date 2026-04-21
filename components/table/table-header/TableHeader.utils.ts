@@ -39,7 +39,7 @@ export function getNextColumn(
 ): TTableColumn | null | undefined {
   let i = 1;
 
-  while (array.length !== i) {
+  while (index + i < array.length) {
     const item = array[index + i];
 
     if (!item || hideColumns) return null;
@@ -130,7 +130,7 @@ export function moveToRight(
   if (isIndexEditingMode) return;
 
   let rightColumn: HTMLElement | null = null;
-  let colIndex = index || columnIndex + 1;
+  let colIndex = index !== undefined ? index : columnIndex + 1;
 
   while (colIndex !== columnsLength) {
     rightColumn = columnEls[colIndex] ?? null;
@@ -187,9 +187,7 @@ export function distributionOverWidth(
   gridTemplateColumns: string[],
   columns: TTableColumn[],
 ): string[] {
-  const newGridTemplateColumns: string[] = JSON.parse(
-    JSON.stringify(gridTemplateColumns),
-  );
+  const newGridTemplateColumns: string[] = [...gridTemplateColumns];
 
   let countColumns = 0;
   const defaultColumnSize =
