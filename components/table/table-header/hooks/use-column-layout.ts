@@ -33,7 +33,6 @@ import {
   useState,
   type RefObject,
 } from "react";
-import throttle from "lodash/throttle";
 
 import type { TTableColumn } from "../../Table.types";
 import type { Nullable } from "../../../../types";
@@ -287,13 +286,18 @@ export function useColumnLayout({
   });
 
   useEffect(() => {
-    const throttledResize = throttle(handleWindowResize, 300);
+    let rafId = 0;
 
-    window.addEventListener("resize", throttledResize);
+    const onWindowResize = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(handleWindowResize);
+    };
+
+    window.addEventListener("resize", onWindowResize, { passive: true });
 
     return () => {
-      throttledResize.cancel();
-      window.removeEventListener("resize", throttledResize);
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", onWindowResize);
     };
   }, []);
 

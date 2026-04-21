@@ -26,122 +26,123 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
- @use "../../../styles/variables";
- @use "../../../styles/variables/colors";
+@use "../../../styles/variables";
+@use "../../../styles/variables/colors";
 
- .tableContainer {
-   :global(.light) & {
-     --table-header-border-image-source: linear-gradient(
-       to right,
-       #{colors.$white} 21px,
-       #{colors.$gray-light-mid} 21px,
-       #{colors.$gray-light-mid} calc(100% - 20px),
-       #{colors.$white} calc(100% - 20px)
-     );
-     --table-header-border-hover-image-source: linear-gradient(
-       to right,
-       #{colors.$white} 0px,
-       #{colors.$gray-light-mid} 0px,
-       #{colors.$gray-light-mid} 100%,
-       #{colors.$white} 100%
-     );
-     --table-container-indexing-separator: #{colors.$light-blue-main};
-   }
+.tableContainer {
+  :global(.light) & {
+    --table-header-border-image-source: linear-gradient(
+      to right,
+      #{colors.$white} 21px,
+      #{colors.$gray-light-mid} 21px,
+      #{colors.$gray-light-mid} calc(100% - 20px),
+      #{colors.$white} calc(100% - 20px)
+    );
+    --table-header-border-hover-image-source: linear-gradient(
+      to right,
+      #{colors.$white} 0px,
+      #{colors.$gray-light-mid} 0px,
+      #{colors.$gray-light-mid} 100%,
+      #{colors.$white} 100%
+    );
+    --table-container-indexing-separator: #{colors.$light-blue-main};
+  }
 
-   :global(.dark) & {
-     --table-header-border-image-source: linear-gradient(
-       to right,
-       #{colors.$black} 21px,
-       #{colors.$gray-dark-strong} 21px,
-       #{colors.$gray-dark-strong} calc(100% - 20px),
-       #{colors.$black} calc(100% - 20px)
-     );
-     --table-header-border-hover-image-source: linear-gradient(
-       to right,
-       #{colors.$black} 0px,
-       #{colors.$gray-dark-strong} 0px,
-       #{colors.$gray-dark-strong} 100%,
-       #{colors.$black} 100%
-     );
-     --table-container-indexing-separator: #{colors.$white};
-   }
+  :global(.dark) & {
+    --table-header-border-image-source: linear-gradient(
+      to right,
+      #{colors.$black} 21px,
+      #{colors.$gray-dark-strong} 21px,
+      #{colors.$gray-dark-strong} calc(100% - 20px),
+      #{colors.$black} calc(100% - 20px)
+    );
+    --table-header-border-hover-image-source: linear-gradient(
+      to right,
+      #{colors.$black} 0px,
+      #{colors.$gray-dark-strong} 0px,
+      #{colors.$gray-dark-strong} 100%,
+      #{colors.$black} 100%
+    );
+    --table-container-indexing-separator: #{colors.$white};
+  }
 
-   display: grid;
-   width: 100%;
-   max-width: 100%;
-   margin-top: -25px;
- 
-   user-select: text;
- 
-   & *:not(img) {
-     user-select: text;
-   }
- 
-   &.noSelect {
-     user-select: none;
- 
-     & *:not(img) {
-       user-select: none;
-     }
-   }
- 
-   &.useReactWindow {
-     display: block;
-     height: 100%;
-   }
- 
-   // =============================== GLOBAL SELECTORS ===============================
- 
-   :global {
-     .table-column {
-       user-select: none;
-       position: relative;
-       min-width: 10%;
-     }
- 
-     .indexing-separator {
-       background-color: var(--table-container-indexing-separator);
-     }
- 
-     .table-container_group-menu,
-     .table-container_header {
-       z-index: 200;
-       padding: 0 20px;
- 
-       border-bottom: 1px solid;
-       border-image-slice: 1;
-       border-image-source: var(--table-header-border-image-source);
-       border-top: 0;
- 
-       border-inline-start: 0;
-     }
- 
-     .hotkeys-lengthen-header {
-       border-bottom: 1px solid colors.$light-second-main;
-       border-image-source: none;
-     }
- 
-     .table-container_group-menu {
-       .table-container_group-menu-checkbox {
-         width: 22px;
-       }
-     }
-   }
- 
-   @media (hover: hover) {
-     &:has(
-         :global(#table-container_caption-header):not(
-             :global(.hotkeys-lengthen-header)
-           )
-       ):has(
-         :global(.table-list-item:first-child)
-           :global(.table-container_row):hover
-       ) {
-       :global(.table-container_header),
-       :global(.table-container_group-menu) {
-         border-image-source: var(--table-header-border-hover-image-source);
-       }
-     }
-   }
- }
- 
+  will-change: grid-template-columns;
+
+  display: grid;
+  width: 100%;
+  max-width: 100%;
+  margin-top: -25px;
+
+  user-select: text;
+
+  & *:not(img) {
+    user-select: text;
+  }
+
+  &.noSelect {
+    user-select: none;
+
+    & *:not(img) {
+      user-select: none;
+    }
+  }
+
+  &.useReactWindow {
+    display: block;
+    height: 100%;
+  }
+
+  // =============================== GLOBAL SELECTORS ===============================
+
+  :global {
+    .table-column {
+      user-select: none;
+      position: relative;
+      min-width: 10%;
+    }
+
+    .indexing-separator {
+      background-color: var(--table-container-indexing-separator);
+    }
+
+    .table-container_group-menu,
+    .table-container_header {
+      z-index: 200;
+      padding: 0 20px;
+
+      border-bottom: 1px solid;
+      border-image-slice: 1;
+      border-image-source: var(--table-header-border-image-source);
+      border-top: 0;
+
+      border-inline-start: 0;
+    }
+
+    .hotkeys-lengthen-header {
+      border-bottom: 1px solid colors.$light-second-main;
+      border-image-source: none;
+    }
+
+    .table-container_group-menu {
+      .table-container_group-menu-checkbox {
+        width: 22px;
+      }
+    }
+  }
+
+  @media (hover: hover) {
+    &:has(
+        :global(#table-container_caption-header):not(
+          :global(.hotkeys-lengthen-header)
+        )
+      ):has(
+        :global(.table-list-item:first-child)
+          :global(.table-container_row):hover
+      ) {
+      :global(.table-container_header),
+      :global(.table-container_group-menu) {
+        border-image-source: var(--table-header-border-hover-image-source);
+      }
+    }
+  }
+}
