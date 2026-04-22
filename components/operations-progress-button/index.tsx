@@ -453,12 +453,11 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
               alert={operationsAlert}
               completed={operationsCompleted}
               onClick={handleFloatingButtonClick}
-              {...(!isSeveralOperations &&
-                !isMobile && {
-                  showCancelButton,
-                  clearUploadedFilesHistory: onCancelOperation,
-                })}
+              {...(!isSeveralOperations && {
+                showCancelButton,
                 showCloseIcon: isMobile && isHovered,
+                clearUploadedFilesHistory: onCancelOperation,
+              })}
               withoutStatus={withoutStatus}
               percent={getPercent()}
             />
