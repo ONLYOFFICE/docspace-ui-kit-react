@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import {
   EventsProvider,
@@ -57,6 +57,14 @@ import { platformAdapter, notifyEnvironmentChange } from "./platform";
 import { storeKeys } from "./stores";
 import { normalizeAiChatLocale } from "./locale";
 import { portalThemes } from "./themes";
+import {
+  EDITOR_TOOLS_EVENT,
+  attachHostToolsRuntime,
+  buildEditorToolGroup,
+  fileManagementTools,
+  type EditorToolsChangedDetail,
+} from "./host-tool-groups";
+import type { HostTool } from "@onlyoffice/ai-chat";
 
 type AiAgentProvidersProps = {
   locale: string;
@@ -92,6 +100,27 @@ const AiAgentProviders = ({
     if (theme) notifyEnvironmentChange({ theme });
   }, [theme]);
 
+  // Tools that occupy the "editor" host group. `open_file` swaps this to the
+  // editor's native tool list (addImage, checkSpelling, ...) once the panel
+  // is up, and restores it back on close. A DOM CustomEvent drives the swap
+  // so handlers (which run outside React) can trigger a re-render.
+  const [editorTools, setEditorTools] =
+    useState<HostTool[]>(fileManagementTools);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { detail } = e as CustomEvent<EditorToolsChangedDetail>;
+      setEditorTools(detail.tools);
+    };
+    window.addEventListener(EDITOR_TOOLS_EVENT, handler);
+    return () => window.removeEventListener(EDITOR_TOOLS_EVENT, handler);
+  }, []);
+
+  const hostToolGroups = useMemo(
+    () => [buildEditorToolGroup(editorTools)],
+    [editorTools],
+  );
+
   const { stores, ctx } = useMemo(() => {
     const provider = new Provider();
     provider.setSettings(settingsAdapter);
@@ -120,6 +149,15 @@ const AiAgentProviders = ({
     return { stores: appStores, ctx: appCtx };
   }, []);
 
+  useEffect(() => {
+    attachHostToolsRuntime({
+      servers: ctx.servers,
+      useServersStore: stores.useServersStore,
+      provider: ctx.provider,
+      eventBus: ctx.eventBus,
+    });
+  }, [ctx.servers, ctx.provider, ctx.eventBus, stores.useServersStore]);
+
   return (
     <EventsProvider
       callbacksManager={ctx.callbacksManager}
@@ -133,7 +171,7 @@ const AiAgentProviders = ({
                 <ThemeProvider theme={theme} customThemes={portalThemes}>
                   <ImagesProvider>
                     <ToolsProvider
-                      hostToolGroups={[]}
+                      hostToolGroups={hostToolGroups}
                       servers={ctx.servers}
                       eventBus={ctx.eventBus}
                     >
