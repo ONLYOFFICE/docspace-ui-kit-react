@@ -338,7 +338,7 @@ const openEditorPanel = (
       left: "0",
       width: "calc(100dvw - 400px)",
       height: "100vh",
-      background: "#fff",
+      background: "var(--background-normal)",
       boxShadow: "2px 0 8px rgba(0, 0, 0, 0.15)",
       zIndex: "9999",
       display: "flex",
@@ -347,7 +347,7 @@ const openEditorPanel = (
 
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
-    closeBtn.textContent = "×";
+    closeBtn.textContent = "\u00D7";
     closeBtn.setAttribute("aria-label", "Close editor panel");
     Object.assign(closeBtn.style, {
       position: "absolute",
