@@ -55,6 +55,7 @@ import TableLoader from "./sub-components/TableLoader";
 import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { AI_TOOLS } from "../../constants";
+import { Encoder } from "../../../utils/encoder";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -444,7 +445,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     <SelectedItemPure
       key={`${currentContact}`}
       propKey={currentContact.id}
-      label={currentContact.displayName}
+      label={Encoder.htmlDecode(currentContact.displayName ?? "")}
       onClose={onCloseSelectedContact}
       className={styles.selectedContactItem}
     />
