@@ -171,9 +171,9 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
 
   const handleTooltipOpen = () => {
     clearTimers();
-    setIsHovered(false);
 
     hideTimerRef.current = setTimeout(() => {
+      setIsHovered(false);
       setIsHideTooltip(true);
 
       resetTimerRef.current = setTimeout(() => {
@@ -469,11 +469,11 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
               alert={operationsAlert}
               completed={operationsCompleted}
               onClick={handleFloatingButtonClick}
-              {...(!isSeveralOperations &&
-                !isMobile && {
-                  showCancelButton,
-                  clearUploadedFilesHistory: onCancelOperation,
-                })}
+              {...(!isSeveralOperations && {
+                showCancelButton,
+                showCloseIcon: isMobile && isHovered,
+                clearUploadedFilesHistory: onCancelOperation,
+              })}
               withoutStatus={withoutStatus}
               percent={getPercent()}
             />

@@ -72,8 +72,9 @@ const useInputItemHelper = ({
 
       try {
         // if (isAgent) await createAIAgent({ title: value });
+        // NOTE: currentSelectedItemId can be string but types cannot be fixed right now, using type assertion
         if (currentSelectedItemId)
-          await foldersApi.createFolder(Number(currentSelectedItemId), {
+          await foldersApi.createFolder(currentSelectedItemId as number, {
             title: value.trimEnd(),
           });
         else if (roomType) {

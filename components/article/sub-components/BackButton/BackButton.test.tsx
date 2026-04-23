@@ -52,9 +52,13 @@ describe("BackButton", () => {
   });
 
   it("uses tablet arrow icon for non-desktop devices", () => {
-    render(<BackButton showText currentDeviceType={DeviceType.tablet} navigate={vi.fn()} />);
+    const { container } = render(
+      <BackButton showText currentDeviceType={DeviceType.tablet} navigate={vi.fn()} />,
+    );
 
-    expect(screen.getByTestId("tablet-arrow")).toBeInTheDocument();
+    const backButton = container.querySelector("[data-arrow-type='tablet']");
+
+    expect(backButton).toBeInTheDocument();
   });
 
   it("calls onLogoClickAction and navigates on click", () => {

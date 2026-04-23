@@ -94,6 +94,7 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
       clearUploadedFilesHistory,
       withoutProgress,
       showCancelButton,
+      showCloseIcon,
       withoutStatus = false,
       percent,
     },
@@ -134,6 +135,7 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
         className={classNames(
           styles.floatingButtonWrapper,
           "layout-progress-bar_wrapper",
+          { [styles.showCloseIcon]: showCloseIcon },
         )}
       >
         <div

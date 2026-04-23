@@ -122,7 +122,7 @@ const MainButton = (props: MainButtonProps) => {
               className={styles.menu}
               model={model}
               ref={menuRef}
-              appendTo={document.body}
+              appendTo={typeof document !== "undefined" ? document.body : undefined}
               containerRef={buttonRef}
               style={{
                 position: "fixed",
