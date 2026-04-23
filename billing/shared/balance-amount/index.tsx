@@ -2,13 +2,11 @@ import React, { useMemo } from "react";
 
 import classNames from "classnames";
 
-import RefreshReactSvgUrl from "../../../assets/icons/16/refresh.react.svg?url";
-
-import { IconButton } from "../../../components/icon-button";
 import { Text } from "../../../components/text";
 import { truncateNumberToFraction } from "../../utils/common";
 import { observer } from "mobx-react";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import RefreshIconButton from "../refresh-icon-button";
 import styles from "./BalanceAmount.module.scss";
 
 type BalanceAmountToken = {
@@ -89,13 +87,9 @@ const BalanceAmount = (props: BalanceAmountProps) => {
           </Text>
 
           {showRefresh && onRefresh ? (
-            <IconButton
-              iconName={RefreshReactSvgUrl}
-              size={16}
-              onClick={onRefresh}
-              className={classNames(styles.refreshIcon, {
-                [styles.spinning]: isRefreshing,
-              })}
+            <RefreshIconButton
+              onRefresh={onRefresh}
+              isRefreshing={isRefreshing}
             />
           ) : null}
 

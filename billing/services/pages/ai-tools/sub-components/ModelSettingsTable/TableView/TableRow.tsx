@@ -17,6 +17,7 @@ type ModelSettingsRowProps = {
   enabled: boolean;
   isUpdating: boolean;
   onToggle: (modelId: string, enabled: boolean) => Promise<void>;
+  tooltipId?: string;
 };
 
 const ModelSettingsRow: React.FC<ModelSettingsRowProps> = ({
@@ -30,6 +31,7 @@ const ModelSettingsRow: React.FC<ModelSettingsRowProps> = ({
   onToggle,
   image,
   isDisabled,
+  tooltipId,
 }) => {
   const onChange = useCallback(() => {
     void onToggle(modelId, !enabled);
@@ -79,12 +81,19 @@ const ModelSettingsRow: React.FC<ModelSettingsRowProps> = ({
       </TableCell>
       <TableCell>
         <div className={styles.toggleCell}>
-          <ToggleButton
-            isChecked={enabled}
-            onChange={onChange}
-            isDisabled={isDisabled || isUpdating}
-            dataTestId={`ai_model_toggle_${modelId}`}
-          />
+          <div
+            className={styles.toggleWrapper}
+            {...(isDisabled && tooltipId
+              ? { "data-tooltip-id": tooltipId }
+              : {})}
+          >
+            <ToggleButton
+              isChecked={enabled}
+              onChange={onChange}
+              isDisabled={isDisabled || isUpdating}
+              dataTestId={`ai_model_toggle_${modelId}`}
+            />
+          </div>
         </div>
       </TableCell>
     </TableRow>

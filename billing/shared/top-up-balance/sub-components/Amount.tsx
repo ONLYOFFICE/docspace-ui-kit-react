@@ -139,6 +139,7 @@ const Amount = (props: AmountProps) => {
                 data-id={item.id}
                 label={item.name}
                 isActive={selectedAmount === item.id}
+                allowNoSelection
                 onSelect={onSelectAmount}
                 isDisabled={item.isDisabled}
                 dataTestId={`tab_item_${item.id}`}

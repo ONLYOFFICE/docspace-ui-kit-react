@@ -41,6 +41,7 @@ import { toastr } from "../../../../components/toast";
 import { useApi } from "../../../../providers";
 import { calculateTotalPrice } from "../../../utils/common";
 import {
+  DISK_STORAGE,
   STORAGE_DEACTIVATION_VISITED,
   STORAGE_TARIFF_DEACTIVATED,
 } from "../../../constants";
@@ -89,6 +90,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
   const {
     fetchBalance,
+    fetchTransactionHistory,
+    storageServiceName,
     storagePriceIncrement,
     formatWalletCurrency,
     walletBalance,
@@ -299,7 +302,10 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
           return;
         }
 
-        if (isUpgradeStoragePlan) fetchBalance();
+        if (isUpgradeStoragePlan) {
+          fetchBalance();
+          fetchTransactionHistory(storageServiceName ?? DISK_STORAGE);
+        }
         const tariff = await fetchPortalTariff!(true);
         const quotas = tariff?.quotas ?? [];
 
@@ -431,7 +437,6 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
               {!hasMinError ? (
                 <Text className={styles.perStorageInfo} fontSize="12px">
                   <CommonTrans
-                   
                     i18nKey="PerStorageWitnMinValue"
                     values={{
                       currency: formatWalletCurrency(storagePriceIncrement, 2),

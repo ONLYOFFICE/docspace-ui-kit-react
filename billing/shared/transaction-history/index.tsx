@@ -47,7 +47,7 @@ import { SelectedItemPure } from "../../../components/selected-item";
 import { TSelectorItem } from "../../../components/selector";
 import PeopleSelector from "../../../selectors/People";
 import type { PeopleFilter } from "../../../selectors/People/PeopleSelector.types";
-
+import { EmployeeType } from "../../../enums";
 import FilterPanel from "./sub-components/FilterPanel";
 import TransactionBody from "./sub-components/TransactionBody";
 import styles from "./styles/TransactionHistory.module.scss";
@@ -56,6 +56,7 @@ import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { AI_TOOLS } from "../../constants";
 import { getBrandName } from "@docspace/shared/constants/brands";
+import { Encoder } from "../../../utils/encoder";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -72,11 +73,12 @@ type TransactionHistoryProps = {
   serviceName?: string;
   headerTitle?: string;
   hideTypeFilter?: boolean;
+  withoutRoleFilter?: boolean;
 };
 
-const filter = (): PeopleFilter => ({
+const filter = (withoutRoleFilter?: boolean): PeopleFilter => ({
   employeeStatus: EmployeeStatus.Active,
-  // newFilter.role = [EmployeeType.Admin];
+  ...(withoutRoleFilter ? {} : { role: [EmployeeType.Admin] }),
 });
 
 const TransactionHistory = (props: TransactionHistoryProps) => {
@@ -87,6 +89,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     serviceName,
     headerTitle,
     hideTypeFilter,
+    withoutRoleFilter,
   } = props;
 
   const { paymentApi } = useApi();
@@ -143,6 +146,45 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
   const [isFilterDialogVisible, setIsFilterDialogVisible] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
 
+  const [reservedSpacer, setReservedSpacer] = useState<number | undefined>();
+  const isReserveActive = reservedSpacer !== undefined;
+
+  const getScrollEl = (): HTMLElement | null =>
+    (document.querySelector(
+      "#sectionScroll .scroll-wrapper > .scroller",
+    ) as HTMLElement | null) ??
+    (document.querySelector(
+      "#customScrollBar .scroll-wrapper > .scroller",
+    ) as HTMLElement | null);
+
+  const runFetch = () => {
+    const scrollEl = getScrollEl();
+    if (scrollEl) {
+      setReservedSpacer(scrollEl.scrollTop + scrollEl.clientHeight);
+    }
+    return fetchTransactionHistory(serviceName);
+  };
+
+  useEffect(() => {
+    if (isTransactionLoading || !isReserveActive) return;
+
+    const scrollEl = getScrollEl();
+    if (!scrollEl) return;
+
+    const onScroll = () => {
+      setReservedSpacer((prev) => {
+        if (prev === undefined) return prev;
+        const required = scrollEl.scrollTop + scrollEl.clientHeight;
+        const contentOnly = scrollEl.scrollHeight - prev;
+        const next = Math.max(0, required - contentOnly);
+        if (next >= prev) return prev;
+        return next > 0 ? next : undefined;
+      });
+    };
+    scrollEl.addEventListener("scroll", onScroll, { passive: true });
+    return () => scrollEl.removeEventListener("scroll", onScroll);
+  }, [isTransactionLoading, isReserveActive]);
+
   // Mobile filter local state — applied to store only via onApplyFilter
   const [mobileFilterState, setMobileFilterState] = useState({
     selectedType: selectedType,
@@ -178,7 +220,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 
     if (isMobile) closeFilterDialog();
 
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onCloseContactSelector = () => {
@@ -200,7 +242,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     }
 
     setFilterSelectedTypeKey(option.key as string);
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onStartDateChange = async (date: DateTime | null): Promise<void> => {
@@ -216,7 +258,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     }
 
     setFilterStartDate(date);
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onEndDateChange = async (date: DateTime | null): Promise<void> => {
@@ -232,7 +274,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     }
 
     setFilterEndDate(date);
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onSubmitContactSelector = async (contacts: TSelectorItem[]) => {
@@ -249,7 +291,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     }
 
     setFilterContact(contact);
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onCloseSelectedContact = async () => {
@@ -263,7 +305,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     }
 
     setFilterContact(null);
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const onApplyFilter = async () => {
@@ -275,7 +317,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     setIsFilterDialogVisible(false);
     setIsChanged(false);
 
-    await fetchTransactionHistory(serviceName);
+    await runFetch();
   };
 
   const getReport = async () => {
@@ -404,7 +446,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     <SelectedItemPure
       key={`${currentContact}`}
       propKey={currentContact.id}
-      label={currentContact.displayName}
+      label={Encoder.htmlDecode(currentContact.displayName ?? "")}
       onClose={onCloseSelectedContact}
       className={styles.selectedContactItem}
     />
@@ -456,6 +498,15 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     </div>
   );
 
+  const infoProps = withoutRoleFilter
+    ? {}
+    : {
+        withInfo: true as const,
+        infoText: t("OnlyPortalAdminsShown", {
+          productName: t("ProductName"),
+        }),
+      };
+
   const selectorComponent = isSelectorVisible ? (
     <PeopleSelector
       withCancelButton
@@ -470,11 +521,8 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         isCloseable: true,
         headerLabel: t("ListContacts"),
       }}
-      filter={filter}
-      withInfo
-      infoText={t("OnlyPortalAdminsShown", {
-        productName: getBrandName("ProductName"),
-      })}
+      filter={() => filter(withoutRoleFilter)}
+      {...infoProps}
       emptyScreenHeader={t("NotFoundMembers")}
       emptyScreenDescription={t("PeopleSelectorInfo", {
         productName: getBrandName("ProductName"),
@@ -539,6 +587,10 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
             </Text>
           </div>
         </>
+      ) : null}
+
+      {reservedSpacer ? (
+        <div style={{ height: reservedSpacer }} aria-hidden="true" />
       ) : null}
 
       {isFilterDialogVisible ? (

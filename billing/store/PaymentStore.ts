@@ -49,6 +49,8 @@ import type { TData } from "../../components/toast";
 import type { TBalance } from "../types";
 import { formatCurrencyValue } from "../utils/common";
 import { combineUrl } from "../../utils/combineUrl";
+import { getCookie } from "../../utils/cookie";
+import { LANGUAGE } from "../../constants";
 import {
   AI_ENUM,
   AI_TOOLS,
@@ -206,9 +208,11 @@ class PaymentStore {
 
   filterSelectedTypeKey = "allTransactions";
 
-  filterStartDate: DateTime = subtractFromDate(now(), 4, "weeks") ?? now();
+  filterStartDate: DateTime = (
+    subtractFromDate(now(), 4, "weeks") ?? now()
+  ).setLocale(getCookie(LANGUAGE) ?? "en");
 
-  filterEndDate: DateTime = now();
+  filterEndDate: DateTime = now().setLocale(getCookie(LANGUAGE) ?? "en");
 
   filterContact: TTransactionFilterContact | null = null;
 
@@ -216,10 +220,13 @@ class PaymentStore {
 
   lastTransactionServiceName: string | undefined = undefined;
 
-  defaultFilterStartDate: DateTime =
-    subtractFromDate(now(), 4, "weeks") ?? now();
+  defaultFilterStartDate: DateTime = (
+    subtractFromDate(now(), 4, "weeks") ?? now()
+  ).setLocale(getCookie(LANGUAGE) ?? "en");
 
-  defaultFilterEndDate: DateTime = now();
+  defaultFilterEndDate: DateTime = now().setLocale(
+    getCookie(LANGUAGE) ?? "en",
+  );
 
   private _transactionTimerId: ReturnType<typeof setTimeout> | null = null;
 
@@ -630,17 +637,13 @@ class PaymentStore {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
-    const showLoader = this.transactionHistory.length === 0;
-
-    if (showLoader) {
-      this._transactionTimerId = setTimeout(() => {
-        runInAction(() => {
-          if (this._transactionTimerId !== null) {
-            this.isTransactionLoading = true;
-          }
-        });
-      }, 500);
-    }
+    this._transactionTimerId = setTimeout(() => {
+      runInAction(() => {
+        if (this._transactionTimerId !== null) {
+          this.isTransactionLoading = true;
+        }
+      });
+    }, 500);
 
     const { isCredit, isDebit } = getTransactionType(
       this.filterSelectedTypeKey,
@@ -965,20 +968,23 @@ class PaymentStore {
 
     const requests: Promise<unknown>[] = [];
 
+    await this.tariff.fetchPortalTariff();
+
     requests.push(
       this.getSettingsPayment(),
       this.paymentQuotas.fetchPaymentQuotas(),
-      this.tariff.fetchPortalTariff(),
     );
 
-    if (this.tariff.isGracePeriod || this.tariff.isNotPaidPeriod) {
-      requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
-    }
-
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
-      requests.push(this.setPaymentAccount());
+      if (this.tariff.isGracePeriod || this.tariff.isNotPaidPeriod) {
+        requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
+      }
 
-      if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
+      if (
+        !this.tariff.isNotPaidPeriod &&
+        this.isPayer &&
+        this.tariff.walletCustomerStatusNotActive
+      ) {
         requests.push(this.fetchCardLinked());
       }
     } else {

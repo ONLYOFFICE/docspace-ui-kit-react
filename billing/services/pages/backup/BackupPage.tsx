@@ -40,6 +40,8 @@ import { BACKUP_SERVICE } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import { useApi } from "../../../../providers";
 import { now, formatDateLocalized } from "../../../../utils/date";
+import { getCookie } from "../../../../utils/cookie";
+import { LANGUAGE } from "../../../../constants";
 import { toastr } from "../../../../components";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
 import TopUpModal from "../../../shared/top-up-balance/TopUpModal";
@@ -236,6 +238,7 @@ const BackupPage: React.FC = () => {
                   .startOf("month")
                   .plus({ months: 1 }),
                 "DATE_MED",
+                { locale: getCookie(LANGUAGE) ?? "en" },
               ),
             }}
             components={{

@@ -182,7 +182,13 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
     setError(shouldSetIncrementError(numberValue, enableZero, minValue));
   };
 
-  const buttonProps = isDisabled ? {} : { onClick: handleButtonClick };
+  const handleButtonMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const buttonProps = isDisabled
+    ? {}
+    : { onClick: handleButtonClick, onMouseDown: handleButtonMouseDown };
   const sliderProps = isDisabled ? {} : { onChange: handleSliderChange };
   const inputProps = isDisabled ? {} : { onChange: handleInputChange };
 

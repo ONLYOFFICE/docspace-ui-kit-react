@@ -33,13 +33,13 @@ import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 import { Avatar, AvatarRole, AvatarSize } from "../../../components/avatar";
 import { toastr } from "../../../components/toast";
-import DefaultUserPhoto from "../../../assets/default_user_photo_size_82-82.png";
+import DefaultUserPhoto from "../../../assets/default_user_photo_size_82-82.png?url";
 import { Link, LinkTarget } from "../../../components/link";
 import { useState } from "react";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useApi } from "../../../providers";
-
+import { Encoder } from "../../../utils/encoder";
 import styles from "./PayerInformation.module.scss";
 import { getBrandName } from "@docspace/shared/constants/brands";
 
@@ -126,7 +126,6 @@ const PayerInformation = () => {
         {isStripePortalAvailable ? (
           <div className={styles.infoContainer}>
             <CommonTrans
-             
               i18nKey="ChooseNewPayerOrRefrashData"
               components={{
                 1: (
@@ -189,10 +188,9 @@ const PayerInformation = () => {
     return (
       <Text as="span" fontWeight={600} fontSize="14px">
         {payerInfo ? (
-          payerInfo.displayName
+          Encoder.htmlDecode(payerInfo.displayName ?? "")
         ) : (
           <CommonTrans
-           
             i18nKey="UserNotFound"
             values={{ email: emailUnfoundedUser }}
             components={{
@@ -212,9 +210,9 @@ const PayerInformation = () => {
   };
 
   const avatarSource = payerInfo
-    ? (payerInfo.hasAvatar && payerInfo.avatar
+    ? ((payerInfo.hasAvatar && payerInfo.avatar
         ? `${baseUrl}${payerInfo.avatar}`
-        : DefaultUserPhoto) ?? undefined
+        : DefaultUserPhoto) ?? undefined)
     : undefined;
 
   return (
@@ -239,3 +237,4 @@ const PayerInformation = () => {
 };
 
 export default observer(PayerInformation);
+
