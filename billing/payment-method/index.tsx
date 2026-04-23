@@ -45,7 +45,7 @@ import PayerInformation from "../shared/payer-information";
 import { CardInformation } from "../shared/card-information";
 import RefreshIconButton from "../shared/refresh-icon-button";
 import StorageTariffDeactivated from "../dialogs/StorageTariffDeactivated";
-import { getBrandName } from "@docspace/shared/constants/brands";
+import { getBrandName } from "../../constants/brands";
 
 interface PaymentMethodProps {
   showPortalSettingsLoader?: boolean;

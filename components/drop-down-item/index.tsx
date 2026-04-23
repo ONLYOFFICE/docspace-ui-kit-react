@@ -45,7 +45,7 @@ import { Link, LinkType } from "../link";
 import type { DropDownItemProps } from "./DropDownItem.types";
 import styles from "./DropDownItem.module.scss";
 import { TooltipContainer } from "../tooltip";
-import { getConstName } from "@docspace/shared/constants/consts";
+import { getConstName } from "../../constants/consts";
 
 export type { DropDownItemProps };
 

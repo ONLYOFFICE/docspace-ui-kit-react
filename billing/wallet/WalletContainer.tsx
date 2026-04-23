@@ -46,7 +46,7 @@ import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
 import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
-import { getBrandName } from "@docspace/shared/constants/brands";
+import { getBrandName } from "../../constants/brands";
 
 type WalletProps = {
   isMobile?: boolean;

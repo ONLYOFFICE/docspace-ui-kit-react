@@ -24,8 +24,8 @@ import { ModalDialog, ModalDialogType } from "../../../../components";
 import { observer } from "mobx-react";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
-import { getBrandName } from "@docspace/shared/constants/brands";
-import { getConstName } from "@docspace/shared/constants/consts";
+import { getBrandName } from "../../../../constants/brands";
+import { getConstName } from "../../../../constants/consts";
 
 interface ServiceOption {
   id: string;

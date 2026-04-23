@@ -28,7 +28,7 @@ import { FolderType } from "@onlyoffice/docspace-api-sdk";
 import { EmployeeType, RoomsType } from "../../enums";
 import { AvatarRole } from "../../components/avatar/Avatar.enums";
 import { getCommonTranslation } from "../i18n";
-import { getBrandName } from "@docspace/shared/constants/brands";
+import { getBrandName } from "../../constants/brands";
 
 export type TTranslation = (
   key: string,

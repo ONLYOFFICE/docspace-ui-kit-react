@@ -33,7 +33,7 @@ import { EmptyView } from "../../../../components/empty-view";
 import { useTheme } from "../../../../context/ThemeContext";
 import { match, P } from "ts-pattern";
 import { useCommonTranslation } from "../../../../utils/i18n";
-import { getBrandName } from "@docspace/shared/constants/brands";
+import { getBrandName } from "../../../../constants/brands";
 
 type Props = {
   aiReady: boolean;

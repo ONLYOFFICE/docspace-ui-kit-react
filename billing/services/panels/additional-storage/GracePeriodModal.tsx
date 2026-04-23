@@ -38,7 +38,7 @@ import { Text } from "../../../../components/text";
 import { Button, ButtonSize } from "../../../../components/button";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
-import { getBrandName } from "@docspace/shared/constants/brands";
+import { getBrandName } from "../../../../constants/brands";
 
 type GracePeriodModalProps = {
   visible: boolean;

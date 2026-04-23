@@ -24,26 +24,17 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useCommonTranslation, getTranslationReady } from "../utils/i18n";
-import ErrorContainer from "../components/error-container/ErrorContainer";
-import styles from "./Errors.module.scss";
-import { getBrandName } from "../constants/brands";
+// Pluggable constant-name lookup (BetaLabel, OCR, PDF, SSO, etc.).
+// See constants/brands.ts for the registration pattern.
 
-const ErrorUnavailable = () => {
-  const t = useCommonTranslation();
-  const ready = getTranslationReady();
+export type ConstLookup = (key: string, locale?: string) => string;
 
-  return (
-    ready && (
-      <div className={styles.errorUnavailableWrapper}>
-        <ErrorContainer
-          headerText={t("ErrorDeactivatedText", {
-            productName: getBrandName("ProductName") ?? "",
-          })}
-        />
-      </div>
-    )
-  );
-};
+let lookup: ConstLookup = (key) => key;
 
-export default ErrorUnavailable;
+export function setConstLookup(fn: ConstLookup): void {
+  lookup = fn;
+}
+
+export function getConstName(key: string, locale?: string): string {
+  return lookup(key, locale);
+}

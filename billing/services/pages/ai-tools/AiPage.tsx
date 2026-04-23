@@ -61,7 +61,7 @@ import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
-import { getBrandName } from "@docspace/shared/constants/brands";
+import { getBrandName } from "../../../../constants/brands";
 
 type AiPageProps = {
   currentDeviceType?: string;

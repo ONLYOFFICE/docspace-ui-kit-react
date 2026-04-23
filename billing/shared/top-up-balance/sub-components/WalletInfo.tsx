@@ -35,7 +35,7 @@ import { Link } from "../../../../components/link";
 import WalletIcon from "../../../../assets/icons/16/wallet.react.svg";
 
 import styles from "../styles/TopUpModal.module.scss";
-import { getBrandName } from "@docspace/shared/constants/brands";
+import { getBrandName } from "../../../../constants/brands";
 
 type WalletInfoProps = {
   balance?: string;
