@@ -40,4 +40,6 @@ export const storeKeys: StoreKeys = {
   deepMode: `${PREFIX}.deepMode`,
   mcpServers: `${PREFIX}.mcpServers`,
   disabledTools: `${PREFIX}.disabledTools`,
+  systemPromptAppendix: `${PREFIX}.systemPromptAppendix`,
 };
+
