@@ -209,3 +209,5 @@ const AiAgentProviders = ({
 
 export default AiAgentProviders;
 
+export { useStores } from "@onlyoffice/ai-chat";
+
