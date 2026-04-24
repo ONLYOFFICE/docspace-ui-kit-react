@@ -83,6 +83,7 @@ const ControlButtons = ({
 
   isPlusButtonVisible,
   contextMenuHeader,
+  analyzeResponsesButton,
 }: TControlButtonProps) => {
   const toggleInfoPanelAction = () => {
     toggleInfoPanel?.();
@@ -201,6 +202,7 @@ const ControlButtons = ({
       {!isTabletView ? renderNavigationButton() : null}
       {renderTariffBar()}
       {isTabletView ? renderNavigationButton() : null}
+      {analyzeResponsesButton ?? null}
     </div>
   );
 };
