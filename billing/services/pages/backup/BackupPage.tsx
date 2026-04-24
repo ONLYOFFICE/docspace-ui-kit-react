@@ -49,6 +49,7 @@ import BackupPageLoader from "./BackupPageLoader";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
+import { getBrandName } from "../../../../constants/brands";
 
 const BackupPage: React.FC = () => {
   const { paymentApi } = useApi();
@@ -115,14 +116,14 @@ const BackupPage: React.FC = () => {
 
     body: !isBackupServiceOn
       ? t("EnableBackupConfirm", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         })
       : isFreeTariff
         ? t("DisableBackupConfirmWithoutQuota", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           })
         : t("DisableBackupConfirm", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           }),
   };
 
