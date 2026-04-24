@@ -26,7 +26,7 @@
 
 @use "../../styles/variables/colors.scss" as *;
 
-:global(.dark){
+:global(.dark) {
   :local {
     .button {
       --button-color-base: #{$white};
@@ -64,7 +64,8 @@
       --button-border-base-active: 1px solid #{$gray-dark-strong};
       --button-border-base-disabled: 1px solid #{$gray-dark-strong};
 
-      --button-border-primary: 1px solid var(--accent-button, #{$light-second-main});
+      --button-border-primary: 1px solid
+        var(--accent-button, #{$light-second-main});
       --button-border-primary-active:
         linear-gradient(0deg, #{$light-second-main}, #{$light-second-main}),
         linear-gradient(0deg, #{$on-white-color}, #{$on-white-color});
@@ -82,6 +83,20 @@
 
       --filled-button-icon-color-hover: #{$white};
       --filled-button-text-color-hover: #{$white};
+
+      --button-background-accent: color-mix(in srgb, white 15%, transparent);
+      --button-background-accent-hover: color-mix(
+        in srgb,
+        white 25%,
+        transparent
+      );
+      --button-background-accent-active: color-mix(
+        in srgb,
+        white 35%,
+        transparent
+      );
+      --button-color-accent: white;
+      --button-border-accent: 1px solid transparent;
     }
   }
 }
@@ -140,6 +155,32 @@
   --filled-button-icon-color-hover: #{$light-gray-dark};
   --filled-button-text-color-hover: #{$gray-text};
 
+  --button-background-accent: var(
+    --accent-button-tint,
+    color-mix(
+      in srgb,
+      var(--accent-button, #{$light-second-main}) 10%,
+      transparent
+    )
+  );
+  --button-background-accent-hover: var(
+    --accent-button-tint-hover,
+    color-mix(
+      in srgb,
+      var(--accent-button, #{$light-second-main}) 18%,
+      transparent
+    )
+  );
+  --button-background-accent-active: var(
+    --accent-button-tint-active,
+    color-mix(
+      in srgb,
+      var(--accent-button, #{$light-second-main}) 26%,
+      transparent
+    )
+  );
+  --button-color-accent: var(--accent-button, #{$light-second-main});
+  --button-border-accent: 1px solid transparent;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -297,6 +338,40 @@
     }
   }
 
+  // Accent variant (tinted accent background)
+  &.accent {
+    background: var(--button-background-accent);
+    color: var(--button-color-accent);
+    border: var(--button-border-accent);
+    border-radius: 6px;
+
+    svg path {
+      fill: var(--button-color-accent);
+    }
+
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background: var(--button-background-accent-hover);
+        color: var(--button-color-accent);
+        border: var(--button-border-accent);
+
+        svg path {
+          fill: var(--button-color-accent);
+        }
+      }
+    }
+
+    &:active:not(:disabled) {
+      background: var(--button-background-accent-active);
+      color: var(--button-color-accent);
+      border: var(--button-border-accent);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+
   // Disabled state
   &:disabled {
     cursor: default;
@@ -383,7 +458,10 @@
     border-color: var(--button-border-base-disabled);
 
     &.primary {
-      background: var(--accent-button, var(--button-background-primary-disabled));
+      background: var(
+        --accent-button,
+        var(--button-background-primary-disabled)
+      );
       color: var(--button-color-primary-disabled);
       border: var(--button-border-primary-disabled);
     }
