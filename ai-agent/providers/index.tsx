@@ -47,7 +47,11 @@ import {
   useServers,
   useThread,
 } from "@onlyoffice/ai-chat";
-import type { ChatCallbacks } from "@onlyoffice/ai-chat";
+import type {
+  ChatCallbacks,
+  ProviderType,
+  WebSearchProviderId,
+} from "@onlyoffice/ai-chat";
 
 import "@onlyoffice/ai-chat/styles";
 
@@ -70,6 +74,7 @@ type AiAgentProvidersProps = {
   locale: string;
   theme?: string;
   callbacks?: ChatCallbacks;
+  isStandalone?: boolean;
   children: ReactNode;
 };
 
@@ -88,6 +93,7 @@ const AiAgentProviders = ({
   locale,
   theme,
   callbacks,
+  isStandalone,
   children,
 }: AiAgentProvidersProps) => {
   const aiChatLocale = normalizeAiChatLocale(locale);
@@ -139,15 +145,25 @@ const AiAgentProviders = ({
       eventBus,
       callbacksManager,
       middlewareRunner,
-      // Auto-register an ONLYOFFICE AI cloud provider pointing at the
-      // current portal origin. No API key — the backend uses the session.
-      onlyofficeConfig: { baseUrl: window.location.origin },
+      // Standalone portals don't ship with the ONLYOFFICE AI cloud — skip
+      // the auto-register, hide the built-in "onlyoffice" provider type
+      // from Add/Edit model dropdowns, and hide the matching row in
+      // Web Search settings.
+      onlyofficeConfig: isStandalone
+        ? undefined
+        : { baseUrl: window.location.origin },
+      hiddenProviders: isStandalone
+        ? (["onlyoffice"] as ProviderType[])
+        : undefined,
+      hiddenWebSearchProviders: isStandalone
+        ? (["ONLYOFFICE"] as WebSearchProviderId[])
+        : undefined,
     };
 
     const appStores = createStores({ keys: storeKeys, ctx: appCtx });
 
     return { stores: appStores, ctx: appCtx };
-  }, []);
+  }, [isStandalone]);
 
   useEffect(() => {
     attachHostToolsRuntime({
@@ -192,4 +208,6 @@ const AiAgentProviders = ({
 };
 
 export default AiAgentProviders;
+
+export { useStores } from "@onlyoffice/ai-chat";
 
