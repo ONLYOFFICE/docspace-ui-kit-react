@@ -26,27 +26,20 @@
 
 import { ChatPage } from "@onlyoffice/ai-chat";
 
-import AiAgentProviders from "../providers";
-
-type NewChatProps = {
-  locale?: string;
-};
-
-const NewChat = ({ locale = "en" }: NewChatProps) => {
+const NewChat = () => {
   return (
-    <AiAgentProviders locale={locale}>
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <ChatPage />
-      </div>
-    </AiAgentProviders>
+    <div
+      style={{
+        flex: 1,
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <ChatPage />
+    </div>
   );
 };
 
 export default NewChat;
+
