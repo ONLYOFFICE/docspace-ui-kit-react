@@ -51,15 +51,15 @@
 
 :global(.light) {
   :local {
-    .controlButtonContainer, 
-    .heading, 
-    .titleBlockBadge, 
-    .expanderIcon, 
-    .arrowIcon, 
-    .warningText, 
-    .infoPanelToggleWrapper, 
-    .box, 
-    .container, 
+    .controlButtonContainer,
+    .heading,
+    .titleBlockBadge,
+    .expanderIcon,
+    .arrowIcon,
+    .warningText,
+    .infoPanelToggleWrapper,
+    .box,
+    .container,
     .chatButton {
       --section-header-trash-erasure-label-background: #{colors.$gray-light};
       --section-header-trash-erasure-label-text: #{colors.$gray-text};
@@ -87,15 +87,15 @@
 
 :global(.dark) {
   :local {
-    .controlButtonContainer, 
-    .heading, 
-    .titleBlockBadge, 
-    .expanderIcon, 
-    .arrowIcon, 
-    .warningText, 
-    .infoPanelToggleWrapper, 
-    .box, 
-    .container, 
+    .controlButtonContainer,
+    .heading,
+    .titleBlockBadge,
+    .expanderIcon,
+    .arrowIcon,
+    .warningText,
+    .infoPanelToggleWrapper,
+    .box,
+    .container,
     .chatButton {
       --section-header-trash-erasure-label-background: #{colors.$dark-gray-light};
       --section-header-trash-erasure-label-text: #{colors.$dark-gray-dark};
@@ -111,8 +111,8 @@
         var(--accent-main, #{colors.$light-second-main});
       --navigation-guid-animation-icon-color: var(
         --accent-main,
-      #{colors.$light-second-main}
-    );
+        #{colors.$light-second-main}
+      );
       --navigation-header-icon-fill: #{colors.$dark-gray-dark};
       --navigation-lifetime-enabled-fill: none;
       --navigation-lifetime-enabled-stroke: #{colors.$main-red};
@@ -126,7 +126,8 @@
   align-items: center;
   gap: 16px;
   height: 32px;
-  min-width: 0;
+  min-width: 90px;
+  overflow: hidden;
 
   &[data-show-title="true"] {
     margin-inline-start: 16px;
@@ -352,6 +353,10 @@
   justify-content: flex-end;
   margin-inline-start: auto;
 
+  &:empty {
+    display: none;
+  }
+
   @include mixins.tablet-and-below {
     flex-direction: row-reverse;
   }
@@ -406,7 +411,6 @@
 .infoPanelToggleWrapper {
   align-self: center;
   margin-inline-start: 20px;
-  margin-bottom: 1px;
   padding: 0;
 
   :global {
