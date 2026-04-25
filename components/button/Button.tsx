@@ -118,7 +118,7 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
           {icon ? (
             <div className={classNames(styles.icon, "icon")}>{icon}</div>
           ) : null}
-          {label}
+          <span>{label}</span>
         </div>
       </button>
       {tooltipText ? (
