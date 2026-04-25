@@ -61,6 +61,7 @@ import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
+import { getBrandName } from "../../../../constants/brands";
 
 type AiPageProps = {
   currentDeviceType?: string;
@@ -206,7 +207,7 @@ const AiPage = (props: AiPageProps) => {
         title: t("Confirmation"),
         body: [
           t("AIToolsDescription", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
             organizationName: logoText,
           }),
           t("WantToContinue"),
