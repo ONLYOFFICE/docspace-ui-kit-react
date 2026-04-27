@@ -67,6 +67,7 @@ import {
 } from "../../../../../components/context-menu";
 import { useApi } from "../../../../../providers";
 import { HelpButton } from "../../../../../components";
+import { getBrandName } from "../../../../../constants/brands";
 
 const ThinkingHelpButton = () => {
   const t = useCommonTranslation();
@@ -116,6 +117,7 @@ const ToolsSettings = ({
   isAdmin,
   aiReady,
   goToWebSearchSettings,
+  toolCallingSupported,
   thinkingSupported,
   thinkingEnabled,
   setThinkingEnabled,
@@ -349,7 +351,8 @@ const ToolsSettings = ({
             .filter(Boolean),
         ];
 
-        const portalServerName = t("OrganizationName") + " " + t("ProductName");
+        const portalServerName =
+          getBrandName("OrganizationName") + " " + getBrandName("ProductName");
 
         const name =
           server.serverType === ServerType.Portal
@@ -384,27 +387,30 @@ const ToolsSettings = ({
         disabled: !webSearchAvailable,
         disabledStylesType: "toggle",
         tooltipTarget: "toggle",
-        getTooltipContent: () => (
-          <>
-            <Text>
-              {t("ConnectWebSearch", {
-                webSearch: t("WebSearchAI"),
-                productName: t("ProductName"),
-              })}
-            </Text>
-            {isAdmin && goToWebSearchSettings ? (
-              <Link
-                type={LinkType.action}
-                isHovered
-                fontWeight={600}
-                onClick={goToWebSearchSettings}
-                dataTestId="go-to-settings-link"
-              >
-                {t("GoToSettings")}
-              </Link>
-            ) : null}
-          </>
-        ),
+        getTooltipContent: () =>
+          !toolCallingSupported ? (
+            <Text>{t("ExtendedThinkingNotSupported")}</Text>
+          ) : (
+            <>
+              <Text>
+                {t("ConnectWebSearch", {
+                  webSearch: t("WebSearchAI"),
+                  productName: getBrandName("ProductName"),
+                })}
+              </Text>
+              {isAdmin && goToWebSearchSettings ? (
+                <Link
+                  type={LinkType.action}
+                  isHovered
+                  fontWeight={600}
+                  onClick={goToWebSearchSettings}
+                  dataTestId="go-to-settings-link"
+                >
+                  {t("GoToSettings")}
+                </Link>
+              ) : null}
+            </>
+          ),
       },
       {
         key: "extended-thinking",
@@ -462,6 +468,7 @@ const ToolsSettings = ({
     toggleTool,
     webSearchEnabled,
     webSearchAvailable,
+    toolCallingSupported,
     goToWebSearchSettings,
     onWebSearchToggle,
     thinkingEnabled,
@@ -572,3 +579,4 @@ const ToolsSettings = ({
 };
 
 export default observer(ToolsSettings);
+

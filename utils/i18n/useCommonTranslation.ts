@@ -157,14 +157,16 @@ const getServerSnapshot = (): string => "en";
  * ensuring that translated strings update when the language changes.
  *
  * If the i18n instance is not available yet, waits for the host application to expose it.
+ *
+ * @param namespaces - Namespaces to search in order (defaults to ["Common"])
  */
-export const useCommonTranslation = () => {
+export const useCommonTranslation = (namespaces?: string[]) => {
   const lang = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const t = useCallback(
-    (key: string, interpolation?: Record<string, string | number>) =>
-      getCommonTranslation(key, interpolation),
-    [lang],
+    (key: string, interpolation?: Record<string, unknown>) =>
+      getCommonTranslation(key, interpolation, namespaces),
+    [lang, namespaces],
   );
 
   return t;

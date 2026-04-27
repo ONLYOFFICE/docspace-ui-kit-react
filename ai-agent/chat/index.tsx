@@ -309,7 +309,11 @@ const ChatInternalInit = (props: ChatInternalInitProps) => {
       initChats={initChats}
       messagesSettings={messagesSettings}
       toolsSettings={toolsSettings}
-      multimodal={chatSettings?.multimodal}
+      multimodal={
+        chatSettings?.capabilities?.vision !== false
+          ? chatSettings?.multimodal
+          : undefined
+      }
       isLoadingChat={isLoading || !isInitialized || isLoadingGetIcon}
       aiReady={!!aiConfig?.aiReady}
       modelAliases={aiConfig?.modelAliases}

@@ -30,11 +30,7 @@ import type {
   GroupDto,
 } from "@onlyoffice/docspace-api-sdk";
 
-export type {
-  EmployeeFullDto,
-  FileDtoInteger,
-  GroupDto,
-}
+export type { EmployeeFullDto, FileDtoInteger, GroupDto };
 
 import type {
   ShareAccessRights,
@@ -100,6 +96,7 @@ export type TFileSecurity = {
   Review: boolean;
   SubmitToFormGallery: boolean;
   StopFilling?: boolean;
+  StartFilling?: boolean;
   ResetFilling?: boolean;
   EditForm: boolean;
   Comment: boolean;
@@ -108,6 +105,7 @@ export type TFileSecurity = {
   Embed: boolean;
   Vectorization: boolean;
   AskAi?: boolean;
+  UpdateXlsx?: boolean;
 };
 
 // Folder security type
@@ -133,6 +131,7 @@ export type TFolderSecurity = {
   Embed: boolean;
   ChangeOwner: boolean;
   IndexExport: boolean;
+  UpdateXlsx?: boolean;
 };
 
 // Room security type
@@ -279,6 +278,7 @@ declare global {
         value: unknown,
         callback: unknown,
       ) => void;
+      getCloudKeys?: (domain: string) => Array<{ id: string }>;
       getViewportSettings?: () => {
         widgetType: "window" | "tab";
         captionHeight: number;
@@ -397,6 +397,7 @@ export type TFile = {
   dimensions?: TDimensions;
   editingBy?: Record<string, string>;
   activeEditors?: Record<string, string>;
+  isFillingPreparing?: boolean;
 };
 
 export type TPathParts = {
