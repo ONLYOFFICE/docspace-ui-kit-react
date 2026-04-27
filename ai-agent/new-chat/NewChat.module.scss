@@ -24,27 +24,37 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { ChatPage } from "@onlyoffice/ai-chat";
+.newChat {
+  // Pin composer to bottom once messages appear (scrollable thread becomes visible).
+  // Without this, h-full on ChatPage's inner divs doesn't resolve because the flex
+  // parent has no explicit height — flex: 1 + min-height: 0 propagates the constraint.
+  :global(div:has([data-role="user"])),
+  :global(div:has([data-role="assistant"])) {
+    flex: 1;
+    min-height: 0;
+  }
 
-import styles from "./NewChat.module.scss";
+  :global(.composer-root) {
+    padding: 8px !important;
+    border-radius: 3px !important;
+    border: none;
+    background: var(--chat-input-background-color) !important;
+  }
 
-const NewChat = () => {
-  return (
-    <div
-      className={styles.newChat}
-      style={{
-        marginTop: "48px",
-        flex: 1,
-        minHeight: 0,
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      <ChatPage />
-    </div>
-  );
-};
+  :global([style*="--chat-welcome-color"]) {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 24px !important;
+  }
 
-export default NewChat;
+  :global([style*="--chat-welcome-description-color"]) {
+    display: none !important;
+  }
+
+  :global(.text-\[var\(--text-tertiary\)\]) {
+    font-size: 10px !important;
+    font-weight: 400 !important;
+    color: var(--text-color) !important;
+  }
+}
 
