@@ -54,10 +54,12 @@ import type {
 } from "@onlyoffice/ai-chat";
 
 import "@onlyoffice/ai-chat/styles";
+//import "./ai-chat-styles-reset.css";
 
 import { settingsAdapter } from "./settings";
 import { storageAdapter } from "./storage";
 import { platformAdapter, notifyEnvironmentChange } from "./platform";
+import { componentOverrides } from "./components-overrides";
 import { storeKeys } from "./stores";
 import { normalizeAiChatLocale } from "./locale";
 import { portalThemes } from "./themes";
@@ -182,7 +184,7 @@ const AiAgentProviders = ({
       <SettingsProvider settings={settingsAdapter}>
         <PlatformProvider platform={platformAdapter}>
           <I18nProvider locale={aiChatLocale}>
-            <ComponentsProvider>
+            <ComponentsProvider overrides={componentOverrides}>
               <StoresProvider stores={stores}>
                 <ThemeProvider theme={theme} customThemes={portalThemes}>
                   <ImagesProvider>
