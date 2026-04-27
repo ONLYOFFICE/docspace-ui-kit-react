@@ -29,13 +29,14 @@ import classNames from "classnames";
 import styles from "./Card.module.scss";
 import type { CardProps } from "./Card.types";
 
-const Card = ({
+export const Card = ({
   title,
   extra,
   children,
   className,
   style,
   dataTestId,
+  footer,
 }: CardProps) => {
   const hasHeader = title != null || extra != null;
 
@@ -45,17 +46,15 @@ const Card = ({
       style={style}
       data-testid={dataTestId ?? "card"}
     >
-      {hasHeader && (
-        <div className={styles.header}>
-          {title != null && <div className={styles.title}>{title}</div>}
-          {extra != null && <div className={styles.extra}>{extra}</div>}
-        </div>
-      )}
-      {children != null && <div className={styles.body}>{children}</div>}
+      {hasHeader ? (
+        <header className={styles.header}>
+          {title ? <div className={styles.title}>{title}</div> : null}
+          {extra ? <div className={styles.extra}>{extra}</div> : null}
+        </header>
+      ) : null}
+      {children ? <div className={styles.body}>{children}</div> : null}
+      {footer ? <footer className={styles.footer}>{footer}</footer> : null}
     </div>
   );
 };
 
-Card.displayName = "Card";
-
-export { Card };

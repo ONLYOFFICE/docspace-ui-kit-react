@@ -36,4 +36,6 @@ export interface CardProps {
   className?: string;
   style?: React.CSSProperties;
   dataTestId?: string;
+  footer?: React.ReactNode;
 }
+
