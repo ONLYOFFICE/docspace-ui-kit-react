@@ -47,6 +47,7 @@ export type FloatingButtonProps = {
   clearUploadedFilesHistory?: () => void;
   withoutProgress?: boolean;
   showCancelButton?: boolean;
+  showCloseIcon?: boolean;
   completed?: boolean;
   withoutStatus?: boolean;
   /** Loading indicator */
