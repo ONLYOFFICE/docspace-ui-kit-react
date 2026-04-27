@@ -10,7 +10,7 @@ import enCommon from "../locales/en/Common.json";
 import type { TTranslations } from "../providers/translation/i18n";
 import { getI18NInstance } from "../providers/translation/i18n";
 import { setBrandLookup } from "../constants/brands";
-import { parseLocaleConstants } from "@docspace/shared/constants/parse-locale-constants";
+import { parseLocaleConstants } from "../utils/parse-locale-constants";
 import brandsData from "../../../public/locales/.constants/brands.json";
 
 const { get: getBrand } = parseLocaleConstants(
