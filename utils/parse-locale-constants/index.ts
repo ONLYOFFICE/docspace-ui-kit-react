@@ -24,36 +24,47 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export * from "./device";
+// Shared parser for JSON files with locale-suffix overrides.
+//
+// Format:
+//   "ProviderApple": "Apple"        — default for all languages
+//   "ProviderApple-si": "..."       — override for Sinhala
+//
+// Returns a lookup function: (key, locale?) => string
 
-export * from "./uuid";
+type Entry = { defaultValue: string; overrides: Record<string, string> };
 
-export * from "./common-icons-style";
+export function parseLocaleConstants(rawData: Record<string, string>) {
+  const parsed: Record<string, Entry> = {};
 
-export * from "./use-click-outside";
+  for (const [rawKey, value] of Object.entries(rawData)) {
+    const match = rawKey.match(
+      /^(.+?)-((?:[a-z]{2,3})(?:-[A-Z][a-zA-Z]+-[A-Z]{2}|-[A-Z]{2})?)$/,
+    );
 
-export { default as DomHelpers } from "./dom-helpers";
+    if (match) {
+      const [, baseKey, locale] = match;
+      if (!parsed[baseKey]) {
+        parsed[baseKey] = { defaultValue: "", overrides: {} };
+      }
+      parsed[baseKey].overrides[locale] = value;
+    } else {
+      if (!parsed[rawKey]) {
+        parsed[rawKey] = { defaultValue: value, overrides: {} };
+      } else {
+        parsed[rawKey].defaultValue = value;
+      }
+    }
+  }
 
-export * from "./get-text-color";
+  const keys = new Set(Object.keys(parsed));
 
-export * from "./trim-separator";
+  function get(key: string, locale?: string): string {
+    const entry = parsed[key];
+    if (!entry) return key;
+    if (locale && entry.overrides[locale]) return entry.overrides[locale];
+    return entry.defaultValue;
+  }
 
-export * from "./i18n";
-
-export * from "./common";
-
-export * from "./email";
-
-export * from "./context";
-
-export * from "./edge-scrolling";
-
-export * from "./hasOwnProperty";
-
-export * from "./encoder";
-
-export * from "./getErrorMessage";
-
-export * from "./pipe";
-
-export * from "./parse-locale-constants";
+  return { get, keys, parsed };
+}
