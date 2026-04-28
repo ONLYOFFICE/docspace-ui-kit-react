@@ -111,6 +111,7 @@ const ContextMenu = (props: ContextMenuProps) => {
     withBackdrop,
     model: propsModel,
     badgeUrl,
+    badgeIconColor,
     headerOnlyMobile = false,
     dataTestId,
     maxHeightLowerSubmenu,
@@ -703,6 +704,7 @@ const ContextMenu = (props: ContextMenuProps) => {
                           isArchive={isArchive}
                           showDefault={defaultIcon ?? false}
                           badgeUrl={badgeUrl}
+                          badgeIconColor={badgeIconColor}
                         />
                       )}
                     </div>
