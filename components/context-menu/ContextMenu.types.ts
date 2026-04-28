@@ -113,7 +113,7 @@ export type HeaderType =
       badgeUrl?: string;
       badgeIconColor?: string;
     })
-  | { title: string; icon: string; badgeUrl?: string };
+  | { title: string; icon: string; badgeUrl?: string; badgeIconColor?: string };
 
 export type ContextMenuModel = ContextMenuType | SeparatorType;
 
