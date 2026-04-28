@@ -23,7 +23,7 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { observer } from "mobx-react";
 import { useTheme } from "../../../../context/ThemeContext";
@@ -41,6 +41,8 @@ import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import useViewEffect from "../../../../hooks/useViewEffect";
 import useDeviceType from "../../../hooks/useDeviceType";
 
+import styles from "../styles/TransactionHistory.module.scss";
+
 import TableView from "./TableView";
 import RowView from "./RowView";
 
@@ -48,12 +50,14 @@ type TransactionHistoryProps = {
   isTransactionHistoryExist: boolean;
   hasAppliedDateFilter: boolean;
   serviceName?: string;
+  maxWidth?: number | string;
 };
 
 const TransactionBody = ({
   hasAppliedDateFilter,
   isTransactionHistoryExist,
   serviceName,
+  maxWidth,
 }: TransactionHistoryProps) => {
   const { isBase } = useTheme();
   const { mobileBreakpoint, desktopBreakpoint } = usePaymentStore();
@@ -119,7 +123,19 @@ const TransactionBody = ({
     </Consumer>
   );
 
-  return isTransactionHistoryExist ? renderContent : emptyView;
+  const wrapperStyle =
+    maxWidth !== undefined
+      ? ({
+          "--transaction-body-max-width":
+            typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth,
+        } as CSSProperties)
+      : undefined;
+
+  return (
+    <div className={styles.transactionBodyWrapper} style={wrapperStyle}>
+      {isTransactionHistoryExist ? renderContent : emptyView}
+    </div>
+  );
 };
 
 export default observer(TransactionBody);
