@@ -386,6 +386,7 @@ class ServicesStore {
     t: TTranslation,
     serviceName: string,
     serviceEnum?: string,
+    integrationUrl?: string,
   ) => {
     const isRefresh = window.location.href.includes("complete=true");
 
@@ -438,7 +439,7 @@ class ServicesStore {
             this.paymentStore.isPayer &&
             this.paymentStore.tariff.walletCustomerStatusNotActive
           ) {
-            await fetchCardLinked();
+            await fetchCardLinked(integrationUrl);
           }
 
           if (
