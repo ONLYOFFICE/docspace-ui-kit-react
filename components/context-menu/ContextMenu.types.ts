@@ -120,6 +120,7 @@ export type HeaderType =
       logo?: string;
       icon?: string;
       badgeUrl?: string;
+      badgeIconColor?: string;
     })
   | { title: string; icon: string; badgeUrl?: string };
 
@@ -193,6 +194,7 @@ export interface ContextMenuProps {
   isArchive?: boolean;
   ref?: React.RefObject<ContextMenuRefType | null>;
   badgeUrl?: string;
+  badgeIconColor?: string;
   headerOnlyMobile?: boolean;
   dataTestId?: string;
   maxHeightLowerSubmenu?: number;
