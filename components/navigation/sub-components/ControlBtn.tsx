@@ -101,6 +101,7 @@ const ControlButtons = ({
       <Button
         ref={buttonRef}
         className="navigation_button"
+        testId="navigation_button"
         label={navigationButtonLabel}
         size={ButtonSize.extraSmall}
         onClick={onNavigationButtonClick}
