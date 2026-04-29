@@ -205,7 +205,7 @@ const callEditorTool = async (
     return JSON.stringify({ error: "No document is currently open" });
   }
 
-  if (editorReadyPromise) {
+  if (editorReadyPromise != null) {
     await Promise.race([
       editorReadyPromise,
       new Promise<void>((r) => setTimeout(r, EDITOR_READY_TIMEOUT_MS)),
