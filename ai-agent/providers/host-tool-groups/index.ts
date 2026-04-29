@@ -507,13 +507,13 @@ export const openEditorPanel = (fileId: number | string): void => {
     right: "400px",
     bottom: "0",
     zIndex: "201",
-    background: "var(--section-header-bg, #fff)",
+    background: "var(--section-header-bg)",
   });
 
   const closeBtn = document.createElement("button");
   closeBtn.type = "button";
   closeBtn.setAttribute("aria-label", "Close editor");
-  closeBtn.textContent = "×";
+  closeBtn.textContent = "\u00D7";
   Object.assign(closeBtn.style, {
     position: "absolute",
     insetBlockStart: "8px",
