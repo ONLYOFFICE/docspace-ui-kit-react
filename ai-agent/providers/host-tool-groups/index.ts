@@ -30,6 +30,8 @@ import type {
   HostToolGroup,
   ServersStoreState,
 } from "@onlyoffice/ai-chat";
+import type { FilesApi, FoldersApi } from "@onlyoffice/docspace-api-sdk";
+import { SearchArea } from "@onlyoffice/docspace-api-sdk";
 
 type ServersLike = {
   hostToolSource: { setGroups: (groups: HostToolGroup[]) => void };
@@ -61,6 +63,64 @@ export const attachHostToolsRuntime = (runtime: ToolsRuntime) => {
   toolsRuntime = runtime;
 };
 
+// API instances injected from the React tree (inside ApiProvider).
+// Handlers run outside React context so we store the references here.
+let filesApi: FilesApi | null = null;
+let foldersApi: FoldersApi | null = null;
+
+export const attachFilesApi = (api: FilesApi) => {
+  filesApi = api;
+};
+
+export const attachFoldersApi = (api: FoldersApi) => {
+  foldersApi = api;
+};
+
+// Returns the ID of the current agent room. Injected from AiAgentProviders.
+let agentRoomIdGetter: (() => number | null) | null = null;
+
+export const attachAgentRoomId = (getter: () => number | null) => {
+  agentRoomIdGetter = getter;
+};
+
+const resolveResultStorageFolderId = async (): Promise<number | null> => {
+  const roomId = agentRoomIdGetter?.();
+  if (roomId == null || !foldersApi) return null;
+  try {
+    const res = await foldersApi.getFolderByFolderId(
+      roomId,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      SearchArea.ResultStorage,
+    );
+    return res.data?.response?.current?.id ?? null;
+  } catch {
+    return null;
+  }
+};
+
+// Called by open_file / create_and_open to switch the client to the result
+// storage tab and show the document in the inline iframe. Injected from
+// Shell so it has access to React Router navigate and MobX stores.
+let openResultFileCallback: ((fileId: number | string) => void) | null = null;
+
+export const attachOpenResultFile = (cb: (fileId: number | string) => void) => {
+  openResultFileCallback = cb;
+};
+
+// Called when the editor panel is closed to let the host clear any state
+// tied to the open document (e.g. selectedResultFileId in AiRoomStore).
+let closeEditorPanelCallback: (() => void) | null = null;
+
+export const attachCloseEditorPanel = (cb: () => void) => {
+  closeEditorPanelCallback = cb;
+};
+
 const syncChatLibTools = async (groups: HostToolGroup[]) => {
   if (!toolsRuntime) {
     console.warn(
@@ -74,14 +134,15 @@ const syncChatLibTools = async (groups: HostToolGroup[]) => {
   await useServersStore.getState().getTools();
   const storeTools = useServersStore.getState().tools;
   provider.setCurrentProviderTools(storeTools);
-  // Notify the chat lib's own listeners (ChatInput's tools settings dropdown,
-  // etc.) — this is the event the lib fires internally when MCP tools change.
   eventBus.emit("tools-changed");
   console.log(
     "%c[host-tool-groups] syncChatLibTools done",
     "color: green; font-weight: bold",
     {
-      groups: groups.map((g) => ({ id: g.id, tools: g.tools.map((t) => t.name) })),
+      groups: groups.map((g) => ({
+        id: g.id,
+        tools: g.tools.map((t) => t.name),
+      })),
       storeTools: storeTools.map((t) => t.name),
     },
   );
@@ -107,29 +168,57 @@ const dispatchEditorTools = (tools: HostTool[]) => {
   );
 };
 
-const EDITOR_PANEL_ID = "ai-agent-editor-panel";
 const INIT_MESSAGE = "initedAiPlugin";
 const CALL_TOOL_MESSAGE = "callEditorTool";
 const TOOL_RESULT_MESSAGE = "editorToolResult";
 
-// Reference to the currently-open editor iframe's content window. Dynamic
-// tool handlers (mounted after the editor posts its tool list) use this to
-// forward calls into the iframe. Cleared when the panel closes.
+// Reference to the currently-open editor iframe's content window.
 let editorPanelWindow: Window | null = null;
+
+// Resolves when the editor iframe's onParentMessage listener is registered.
+let editorReadyPromise: Promise<void> | null = null;
+let editorReadyResolve: (() => void) | null = null;
+
+const createEditorReadyPromise = () => {
+  editorReadyPromise = new Promise<void>((r) => {
+    editorReadyResolve = r;
+  });
+};
+
+const markEditorReady = () => {
+  editorReadyResolve?.();
+  editorReadyResolve = null;
+};
 
 let nextCallId = 0;
 const generateCallId = () => `editor-tool-call-${Date.now()}-${nextCallId++}`;
 
-const callEditorTool = (
+const EDITOR_TOOL_TIMEOUT_MS = 10_000;
+const EDITOR_READY_TIMEOUT_MS = 60_000;
+
+const callEditorTool = async (
   name: string,
   args: Record<string, unknown>,
 ): Promise<unknown> => {
   const target = editorPanelWindow;
   if (!target) {
-    return Promise.resolve(JSON.stringify({ result: "" }));
+    return JSON.stringify({ error: "No document is currently open" });
   }
+
+  if (editorReadyPromise) {
+    await Promise.race([
+      editorReadyPromise,
+      new Promise<void>((r) => setTimeout(r, EDITOR_READY_TIMEOUT_MS)),
+    ]);
+  }
+
   const callId = generateCallId();
   return new Promise<unknown>((resolve) => {
+    const finish = (value: unknown) => {
+      clearTimeout(timeoutId);
+      window.removeEventListener("message", onMessage);
+      resolve(value);
+    };
     const onMessage = (event: MessageEvent) => {
       if (event.source !== target) return;
       const payload = event.data;
@@ -140,10 +229,16 @@ const callEditorTool = (
         (payload as { callId?: unknown }).callId !== callId
       )
         return;
-      window.removeEventListener("message", onMessage);
-      resolve((payload as { result?: unknown }).result ?? "");
+      finish((payload as { result?: unknown }).result ?? "");
     };
     window.addEventListener("message", onMessage);
+    const timeoutId = setTimeout(() => {
+      finish(
+        JSON.stringify({
+          error: `Editor tool "${name}" did not respond in time`,
+        }),
+      );
+    }, EDITOR_TOOL_TIMEOUT_MS);
     target.postMessage(
       { type: CALL_TOOL_MESSAGE, callId, name, arguments: args },
       "*",
@@ -166,12 +261,46 @@ export const fileManagementTools: HostTool[] = [
           description:
             "Identifier of the DocSpace folder in which the new file will be created.",
         },
+        title: {
+          type: "string",
+          description:
+            "Title for the new file. Defaults to 'New document' if not provided.",
+        },
       },
-      required: ["folder_id"],
+      required: [],
     },
     handler: async (args) => {
-      console.log("[editor.create_file] called with args:", args);
-      return JSON.stringify({ result: "" });
+      const { folder_id, title } = args as {
+        folder_id?: string;
+        title?: string;
+      };
+      if (!filesApi) {
+        console.warn("[editor.create_file] filesApi not attached");
+        return JSON.stringify({ error: "File creation API is not available" });
+      }
+      let targetFolderId: number | undefined;
+      if (folder_id !== undefined) {
+        targetFolderId = Number(folder_id);
+      } else {
+        const resultStorageId = await resolveResultStorageFolderId();
+        if (resultStorageId == null) {
+          console.warn(
+            "[editor.create_file] result storage folder ID not available",
+          );
+          return JSON.stringify({ error: "Target folder is not available" });
+        }
+        targetFolderId = resultStorageId;
+      }
+      try {
+        const res = await filesApi.createFile(targetFolderId, {
+          title: title ?? "New document",
+        });
+        const fileId = res.data?.response?.id;
+        return JSON.stringify({ result: fileId ?? "" });
+      } catch (e) {
+        console.error("[editor.create_file] error:", e);
+        return JSON.stringify({ error: String(e) });
+      }
     },
   },
   {
@@ -198,20 +327,7 @@ export const fileManagementTools: HostTool[] = [
       );
       const fileId = (args as { id?: string | number }).id;
       if (fileId === undefined) return JSON.stringify({ result: "" });
-
-      const data = await openEditorPanel(fileId, () => {
-        void restoreFileManagementTools();
-      });
-      console.log(
-        "%c[editor.open_file] initedAiPlugin payload received",
-        "color: blue",
-        data,
-      );
-      await mountEditorDynamicTools(data);
-      console.log(
-        "%c[editor.open_file] returning to chat lib",
-        "color: blue; font-weight: bold",
-      );
+      openEditorPanel(fileId);
       return JSON.stringify({ result: "" });
     },
   },
@@ -230,12 +346,53 @@ export const fileManagementTools: HostTool[] = [
             "Identifier of the DocSpace folder in which the new file will be created " +
             "and then opened.",
         },
+        title: {
+          type: "string",
+          description:
+            "Title for the new file. Defaults to 'New document' if not provided.",
+        },
       },
-      required: ["folder_id"],
+      required: [],
     },
     handler: async (args) => {
-      console.log("[editor.create_and_open] called with args:", args);
-      return JSON.stringify({ result: "" });
+      const { folder_id, title } = args as {
+        folder_id?: string;
+        title?: string;
+      };
+      if (!filesApi) {
+        console.warn("[editor.create_and_open] filesApi not attached");
+        return JSON.stringify({ error: "File creation API is not available" });
+      }
+      let targetFolderId: number | undefined;
+      if (folder_id !== undefined) {
+        targetFolderId = Number(folder_id);
+      } else {
+        const resultStorageId = await resolveResultStorageFolderId();
+        if (resultStorageId == null) {
+          console.warn(
+            "[editor.create_and_open] result storage folder ID not available",
+          );
+          return JSON.stringify({ error: "Target folder is not available" });
+        }
+        targetFolderId = resultStorageId;
+      }
+      let fileId: number | undefined;
+      try {
+        const res = await filesApi.createFile(targetFolderId, {
+          title: title ?? "New document",
+        });
+        fileId = res.data?.response?.id;
+      } catch (e) {
+        console.error("[editor.create_and_open] create error:", e);
+        return JSON.stringify({ error: String(e) });
+      }
+      if (fileId === undefined) {
+        return JSON.stringify({
+          error: "File was created but ID was not returned",
+        });
+      }
+      openEditorPanel(fileId);
+      return JSON.stringify({ result: fileId });
     },
   },
 ];
@@ -316,106 +473,143 @@ const restoreFileManagementTools = async () => {
   await syncChatLibTools([buildEditorToolGroup(fileManagementTools)]);
 };
 
-// Opens a fixed panel on the left side of the viewport (full height,
-// `calc(100dvw - 400px)` wide) containing an iframe pointing at the DocSpace
-// editor for `fileId`. Resolves once the iframe posts an `initedAiPlugin`
-// message back to this window, so callers can wait for the editor's AI
-// plugin to finish initializing before returning a tool result. `onClose`
-// fires once when the panel is dismissed (close button or external remove),
-// so callers can tear down any state they registered while the panel was up.
-const openEditorPanel = (
-  fileId: string | number,
-  onClose?: () => void,
-): Promise<unknown> =>
-  new Promise<unknown>((resolve) => {
-    document.getElementById(EDITOR_PANEL_ID)?.remove();
+const isInitMessage = (data: unknown): boolean => {
+  if (data === INIT_MESSAGE) return true;
+  if (typeof data === "object" && data !== null) {
+    const payload = data as { type?: unknown; event?: unknown };
+    return payload.type === INIT_MESSAGE || payload.event === INIT_MESSAGE;
+  }
+  return false;
+};
 
-    const panel = document.createElement("div");
-    panel.id = EDITOR_PANEL_ID;
-    Object.assign(panel.style, {
-      position: "fixed",
-      top: "0",
-      left: "0",
-      width: "calc(100dvw - 400px)",
-      height: "100vh",
-      background: "var(--background-normal)",
-      boxShadow: "2px 0 8px rgba(0, 0, 0, 0.15)",
-      zIndex: "9999",
-      display: "flex",
-      flexDirection: "column",
-    } satisfies Partial<CSSStyleDeclaration>);
+export const EDITOR_PANEL_ID = "ai-agent-editor-panel";
 
-    const closeBtn = document.createElement("button");
-    closeBtn.type = "button";
-    closeBtn.textContent = "\u00D7";
-    closeBtn.setAttribute("aria-label", "Close editor panel");
-    Object.assign(closeBtn.style, {
-      position: "absolute",
-      top: "8px",
-      right: "8px",
-      width: "32px",
-      height: "32px",
-      border: "none",
-      background: "transparent",
-      fontSize: "20px",
-      lineHeight: "1",
-      cursor: "pointer",
-      zIndex: "1",
-    } satisfies Partial<CSSStyleDeclaration>);
+// Creates a DOM overlay containing the document editor iframe, positioned
+// over the section body (.section-body has position:relative via DragAndDrop).
+// Calling this also triggers navigation to the Result Storage tab via
+// openResultFileCallback. The close button removes the panel and notifies
+// the host app to clear related state via closeEditorPanelCallback.
+export const openEditorPanel = (fileId: number | string): void => {
+  document.getElementById(EDITOR_PANEL_ID)?.remove();
 
-    const iframe = document.createElement("iframe");
-    iframe.src = `${window.location.origin}/doceditor?fileId=${encodeURIComponent(String(fileId))}`;
-    Object.assign(iframe.style, {
-      flex: "1",
-      width: "100%",
-      height: "100%",
-      border: "none",
-    } satisfies Partial<CSSStyleDeclaration>);
-    iframe.addEventListener(
-      "load",
-      () => {
-        editorPanelWindow = iframe.contentWindow;
-      },
-      { once: true },
-    );
+  openResultFileCallback?.(fileId);
+  createEditorReadyPromise();
 
-    const isInitMessage = (data: unknown): boolean => {
-      if (data === INIT_MESSAGE) return true;
-      if (typeof data === "object" && data !== null) {
-        const payload = data as { type?: unknown; event?: unknown };
-        return payload.type === INIT_MESSAGE || payload.event === INIT_MESSAGE;
-      }
-      return false;
-    };
-
-    const onMessage = (event: MessageEvent) => {
-      if (event.source !== iframe.contentWindow) return;
-      if (!isInitMessage(event.data)) return;
-      console.log(
-        "[host-tool-groups] initedAiPlugin received, raw event.data:",
-        event.data,
-      );
-      window.removeEventListener("message", onMessage);
-      const payload =
-        typeof event.data === "object" && event.data !== null
-          ? (event.data as { data?: unknown }).data
-          : undefined;
-      resolve(payload);
-    };
-    window.addEventListener("message", onMessage);
-
-    let closed = false;
-    const handleClose = () => {
-      if (closed) return;
-      closed = true;
-      window.removeEventListener("message", onMessage);
-      editorPanelWindow = null;
-      panel.remove();
-      onClose?.();
-    };
-    closeBtn.addEventListener("click", handleClose);
-
-    panel.appendChild(closeBtn);
-    panel.appendChild(iframe);
-    document.body.appendChild(panel);
+  const panel = document.createElement("div");
+  panel.id = EDITOR_PANEL_ID;
+  // position: fixed; inset: 0 — full screen. The article sidebar (z-index 209)
+  // is a positioned element and naturally appears above our z-index 201 overlay.
+  // right: 400px leaves the info panel (400px wide) uncovered on the right.
+  Object.assign(panel.style, {
+    position: "fixed",
+    top: "0",
+    left: "0",
+    right: "400px",
+    bottom: "0",
+    zIndex: "201",
+    background: "var(--section-header-bg, #fff)",
   });
+
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.setAttribute("aria-label", "Close editor");
+  closeBtn.textContent = "×";
+  Object.assign(closeBtn.style, {
+    position: "absolute",
+    insetBlockStart: "8px",
+    insetInlineEnd: "8px",
+    zIndex: "1",
+    width: "28px",
+    height: "28px",
+    border: "none",
+    borderRadius: "4px",
+    background: "var(--background-normal)",
+    color: "var(--icon-normal)",
+    fontSize: "18px",
+    lineHeight: "1",
+    cursor: "pointer",
+  });
+
+  const iframe = document.createElement("iframe");
+  iframe.src = `${window.location.origin}/doceditor?fileId=${encodeURIComponent(fileId)}`;
+  iframe.title = "Document editor";
+  iframe.setAttribute("allowfullscreen", "");
+  Object.assign(iframe.style, {
+    position: "absolute",
+    inset: "0",
+    width: "100%",
+    height: "100%",
+    border: "none",
+  });
+
+  iframe.addEventListener(
+    "load",
+    () => {
+      editorPanelWindow = iframe.contentWindow;
+    },
+    { once: true },
+  );
+
+  // Set up message listeners for editor ready + dynamic tool registration.
+  let listenerActive = true;
+  const onMessage = (event: MessageEvent) => {
+    const sourceWindow = event.source as Window | null;
+    if (sourceWindow) {
+      try {
+        let w: Window | null = sourceWindow;
+        let isDescendant = false;
+        while (w && w !== window) {
+          if (w === iframe.contentWindow) {
+            isDescendant = true;
+            break;
+          }
+          w = w.parent === w ? null : w.parent;
+        }
+        if (!isDescendant) return;
+      } catch {
+        // Cross-origin: accept and rely on message type as guard.
+      }
+    }
+
+    const isReady =
+      typeof event.data === "object" &&
+      event.data !== null &&
+      (event.data as { type?: unknown }).type === "editorDocumentReady";
+    if (isReady) markEditorReady();
+
+    if (!isInitMessage(event.data)) return;
+    markEditorReady();
+    if (listenerActive) {
+      listenerActive = false;
+      window.removeEventListener("message", onMessage);
+    }
+    const payload =
+      typeof event.data === "object" && event.data !== null
+        ? (event.data as { data?: unknown }).data
+        : undefined;
+    void mountEditorDynamicTools(payload);
+  };
+  window.addEventListener("message", onMessage);
+
+  const cleanup = () => {
+    if (listenerActive) {
+      listenerActive = false;
+      window.removeEventListener("message", onMessage);
+    }
+    editorPanelWindow = null;
+    editorReadyPromise = null;
+    editorReadyResolve = null;
+  };
+
+  closeBtn.addEventListener("click", () => {
+    cleanup();
+    panel.remove();
+    void restoreFileManagementTools();
+    closeEditorPanelCallback?.();
+  });
+
+  panel.appendChild(closeBtn);
+  panel.appendChild(iframe);
+  document.body.appendChild(panel);
+};
+
