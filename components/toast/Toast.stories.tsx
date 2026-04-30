@@ -24,7 +24,6 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useEffect } from "react";
 import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -341,10 +340,9 @@ toastr.info("Info message", "Info", 0, true);`,
 };
 
 const CssCustomizationTemplate = () => {
-  useEffect(() => {
+  const showToasts = () => {
     toastr.success("Custom success notification", "Styled Toast", 0, true);
-    toastr.error("Custom error notification", "Styled Error", 0, true);
-  }, []);
+  };
 
   return (
     <div
@@ -359,6 +357,12 @@ const CssCustomizationTemplate = () => {
       }
     >
       <Toast />
+      <Button
+        label="Show Custom Toasts"
+        primary
+        size={ButtonSize.small}
+        onClick={showToasts}
+      />
     </div>
   );
 };
@@ -381,3 +385,4 @@ export const CssCustomization: Story = {
     },
   },
 };
+
