@@ -133,9 +133,7 @@ export const Default: Story = {
 };
 
 const WithProgressTemplate = () => {
-  return (
-    <FloatingButton icon={FloatingButtonIcons.upload} percent={45} />
-  );
+  return <FloatingButton icon={FloatingButtonIcons.upload} percent={45} />;
 };
 
 export const WithProgress: Story = {
@@ -154,9 +152,7 @@ export const WithProgress: Story = {
 };
 
 const WithAlertTemplate = () => {
-  return (
-    <FloatingButton icon={FloatingButtonIcons.upload} alert />
-  );
+  return <FloatingButton icon={FloatingButtonIcons.upload} alert />;
 };
 
 export const WithAlert: Story = {
@@ -176,11 +172,7 @@ export const WithAlert: Story = {
 
 const CompletedTemplate = () => {
   return (
-    <FloatingButton
-      icon={FloatingButtonIcons.upload}
-      completed
-      percent={100}
-    />
+    <FloatingButton icon={FloatingButtonIcons.upload} completed percent={100} />
   );
 };
 
@@ -264,7 +256,6 @@ export const CssCustomization: Story = {
         {
           "--floating-circle-button-background": "#7c3aed",
           "--floating-button-shadow": "0 4px 20px rgba(124,58,237,0.5)",
-          "--floating-button-button-size": "56px",
           "--floating-button-icon": "#ffffff",
         } as CSSProperties
       }
@@ -287,3 +278,4 @@ export const CssCustomization: Story = {
     },
   },
 };
+
