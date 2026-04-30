@@ -124,6 +124,7 @@
   border: var(--dropzone-border-v);
   border-radius: var(--dropzone-radius-v);
   display: flex;
+  align-items: center;
   box-sizing: border-box;
 
   &.hasChildren {
