@@ -155,6 +155,7 @@ const CssCustomizationTemplate = () => {
           "--time-input-error-border": "#c0392b",
           "--time-input-radius": "8px",
           "--time-input-height": "36px",
+          "--time-input-width": "68px",
           "--time-input-padding": "0px 10px",
           // === TextInput (inner number inputs) ===
           "--text-input-color": "#004f82",
@@ -322,3 +323,4 @@ export const FocusOnRender: Story = {
     },
   },
 };
+
