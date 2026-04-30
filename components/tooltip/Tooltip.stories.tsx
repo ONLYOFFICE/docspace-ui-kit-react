@@ -373,7 +373,6 @@ export const CssCustomization: Story = {
       </div>
       <Tooltip
         id="css-customization-tooltip"
-        isOpen
         place="top"
         style={
           {
