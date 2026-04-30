@@ -76,8 +76,7 @@ import { ColorPicker } from "@docspace/ui-kit/components/color-picker";
     },
     isPickerOnly: {
       control: "boolean",
-      description:
-        "Show only the color picker without hex input and buttons",
+      description: "Show only the color picker without hex input and buttons",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -138,6 +137,7 @@ const CssCustomizationTemplate = () => {
           "--button-root-border": "1px solid #0082c9",
           "--button-root-hover-bg": "#006ba6",
           "--button-root-border-radius": "8px",
+          "--button-root-color": "#fff",
         } as CSSProperties
       }
     >
@@ -343,3 +343,4 @@ export const PresetColor: Story = {
     },
   },
 };
+
