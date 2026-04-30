@@ -225,7 +225,9 @@ type Story = StoryObj<ComponentProps<typeof ComboBox>>;
 export default meta;
 
 const Wrapper = (props: { children: React.ReactNode }) => {
-  return <div style={{ height: "240px", padding: "20px" }}>{props.children}</div>;
+  return (
+    <div style={{ height: "240px", padding: "20px" }}>{props.children}</div>
+  );
 };
 
 const defaultOptions = [
@@ -432,10 +434,30 @@ const CustomStylingTemplate = () => {
     <Wrapper>
       <ComboBox
         options={[
-          { key: 1, label: "Critical", backgroundColor: "#FF4444", color: "#FFFFFF" },
-          { key: 2, label: "High", backgroundColor: "#FF8C00", color: "#FFFFFF" },
-          { key: 3, label: "Medium", backgroundColor: "#FFD700", color: "#000000" },
-          { key: 4, label: "Low", backgroundColor: "#90EE90", color: "#000000" },
+          {
+            key: 1,
+            label: "Critical",
+            backgroundColor: "#FF4444",
+            color: "#FFFFFF",
+          },
+          {
+            key: 2,
+            label: "High",
+            backgroundColor: "#FF8C00",
+            color: "#FFFFFF",
+          },
+          {
+            key: 3,
+            label: "Medium",
+            backgroundColor: "#FFD700",
+            color: "#000000",
+          },
+          {
+            key: 4,
+            label: "Low",
+            backgroundColor: "#90EE90",
+            color: "#000000",
+          },
         ]}
         selectedOption={{ key: 0, label: "Select Priority" }}
         noBorder
@@ -483,7 +505,11 @@ export const CssCustomization: Story = {
     <div
       style={
         {
+          "--combobox-bg": "#f0f8ff",
           "--combobox-open-bg": "#ede9fe",
+          "--combobox-border-color": "#0082c9",
+          "--combobox-hover-border-color": "#006ba6",
+          "--combobox-focus-border-color": "#006ba6",
           "--combobox-radius": "12px",
           "--combobox-inner-padding": "8px 0",
           "--combobox-base-width": "220px",
@@ -494,7 +520,6 @@ export const CssCustomization: Story = {
         options={baseOptions}
         selectedOption={{ key: 0, label: "Select option" }}
         size={ComboBoxSize.base}
-        noBorder
         onSelect={() => {}}
       />
     </div>
@@ -530,3 +555,4 @@ export const CssCustomization: Story = {
     },
   },
 };
+
