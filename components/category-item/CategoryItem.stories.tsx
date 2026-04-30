@@ -104,7 +104,8 @@ export const Default: Story = {
   render: (args) => <CategoryItem {...args} />,
   args: {
     title: "Category Title",
-    subtitle: "This is a description of the category that provides more details",
+    subtitle:
+      "This is a description of the category that provides more details",
     url: "#",
     isDisabled: false,
     withPaidBadge: false,
@@ -177,7 +178,14 @@ export const DisabledState: Story = {
 };
 
 const Wrapper = (props: { children: React.ReactNode }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "600px" }}>
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "16px",
+      maxWidth: "600px",
+    }}
+  >
     {props.children}
   </div>
 );
@@ -217,7 +225,8 @@ export const AllVariants: Story = {
   parameters: {
     docs: {
       description: {
-        story: "All category item variants: default, with paid badge, and disabled.",
+        story:
+          "All category item variants: default, with paid badge, and disabled.",
       },
       source: {
         code: `<CategoryItem title="General Settings" subtitle="Manage settings" />
@@ -233,6 +242,7 @@ export const CssCustomization: Story = {
     <div
       style={
         {
+          "--category-item-title-color": "#0082c9",
           "--category-item-description-color": "#0082c9",
           "--category-item-arrow-color": "#0082c9",
           "--category-item-subheader-size": "14px",
@@ -265,6 +275,7 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| \`--category-item-title-color\` | Title link color | inherited |
 | \`--category-item-description-color\` | Description text color | theme gray |
 | \`--category-item-arrow-color\` | Arrow icon fill color | theme black/white |
 | \`--category-item-disabled-color\` | Disabled text color | theme gray |
@@ -274,3 +285,4 @@ export const CssCustomization: Story = {
     },
   },
 };
+

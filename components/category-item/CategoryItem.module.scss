@@ -76,6 +76,7 @@
   margin-inline-end: 7px;
   font-size: 16px;
   font-weight: 600;
+  color: var(--category-item-title-color);
 
   &.disabled {
     color: var(--category-item-disabled-color-value);
