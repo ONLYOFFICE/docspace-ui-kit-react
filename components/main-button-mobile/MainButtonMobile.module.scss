@@ -12,6 +12,9 @@
     6px 23px
   );
 
+  --floating-circle-button-background: var(--main-button-mobile-button-color);
+  --floating-button-icon: var(--main-button-mobile-icon-fill);
+
   position: relative;
   z-index: var(--main-button-mobile-z-index-value);
   background: var(--main-button-mobile-button-color);

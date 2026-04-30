@@ -36,10 +36,7 @@ import DownloadReactSvgUrl from "../../assets/icons/16/download.react.svg?url";
 import { MainButtonMobile } from ".";
 import styles from "./MainButtonMobile.stories.module.scss";
 
-import {
-  isDesktop as checkIsDesktop,
-  size,
-} from "../../utils/device";
+import { isDesktop as checkIsDesktop, size } from "../../utils/device";
 
 const useIsDesktop = () => {
   const [isDesktopView, setIsDesktopView] = useState(checkIsDesktop);
@@ -325,9 +322,9 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--main-button-mobile-button-color": "#0082c9",
+          "--main-button-mobile-button-color": "#7c3aed",
           "--main-button-mobile-icon-fill": "#ffffff",
-          "--main-button-mobile-circle-background": "#0082c9",
+          "--main-button-mobile-circle-background": "#7c3aed",
           "--main-button-mobile-z-index": "100",
           "--main-button-mobile-badge-size": "14px",
           "--main-button-mobile-badge-offset": "8px",
@@ -369,3 +366,4 @@ export const CssCustomization: Story = {
     },
   },
 };
+
