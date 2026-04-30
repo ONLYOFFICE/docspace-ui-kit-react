@@ -77,6 +77,7 @@
   --slider-thumb-bg: var(--slider-handle-color, var(--slider-thumb-background));
   --slider-track-color: var(--slider-background-color, var(--slider-background));
   --slider-filled-color: var(--slider-fill-color, var(--slider-range-track-background));
+  --slider-fill-image: var(--slider-pouring-image, var(--slider-background-image));
 
   width: 100%;
   margin: 24px 0;
@@ -90,7 +91,7 @@
   }
 
   &.withPouring {
-    background-image: var(--slider-background-image);
+    background-image: var(--slider-fill-image);
     background-size: var(--size-prop) 100%;
     background-repeat: no-repeat;
     background-position: left center;

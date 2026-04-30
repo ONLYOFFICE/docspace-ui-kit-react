@@ -296,6 +296,7 @@ export const CssCustomization: Story = {
             width: "300px",
             padding: "20px",
             "--slider-handle-color": "#7c3aed",
+            "--slider-pouring-image": "linear-gradient(#7c3aed, #7c3aed)",
             "--slider-fill-color": "#e9d5ff",
             "--slider-size": "12px",
             "--slider-handle-size": "28px",
@@ -323,7 +324,8 @@ export const CssCustomization: Story = {
 | Variable | Description | Default |
 |----------|-------------|---------|
 | \`--slider-handle-color\` | Thumb background color | theme token |
-| \`--slider-fill-color\` | Filled track color (moz range) | theme token |
+| \`--slider-pouring-image\` | Fill image for the poured portion (must be a \`linear-gradient\` or other \`<image>\`) | theme token |
+| \`--slider-fill-color\` | Filled track color (Firefox / moz range) | theme token |
 | \`--slider-background-color\` | Track (unfilled) background color | theme token |
 | \`--slider-size\` | Track height | \`8px\` |
 | \`--slider-handle-size\` | Thumb width and height | \`24px\` |
@@ -332,3 +334,4 @@ export const CssCustomization: Story = {
     },
   },
 };
+
