@@ -319,6 +319,9 @@
         path {
           fill: var(--ops-progress-error-icon-value) !important;
         }
+        path:not([fill="white"]) {
+          fill: var(--status-icon-color-negative) !important;
+        }
       }
     }
 
@@ -326,6 +329,9 @@
       svg {
         path {
           fill: var(--ops-progress-success-icon-value) !important;
+        }
+        path:not([fill="white"]) {
+          fill: var(--status-icon-color-positive) !important;
         }
       }
     }

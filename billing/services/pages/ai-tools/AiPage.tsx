@@ -61,14 +61,16 @@ import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
+import { getBrandName } from "../../../../constants/brands";
 
 type AiPageProps = {
   currentDeviceType?: string;
   getAIConfig?: () => Promise<void>;
+  integrationUrl?: string;
 };
 
 const AiPage = (props: AiPageProps) => {
-  const { currentDeviceType, getAIConfig } = props;
+  const { currentDeviceType, getAIConfig, integrationUrl } = props;
 
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
@@ -112,7 +114,7 @@ const AiPage = (props: AiPageProps) => {
   // const navigate = useNavigate();
 
   useEffect(() => {
-    initServiceData(t, AI_TOOLS, AI_ENUM);
+    initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
   }, []);
 
   // useEffect(() => {
@@ -206,7 +208,7 @@ const AiPage = (props: AiPageProps) => {
         title: t("Confirmation"),
         body: [
           t("AIToolsDescription", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
             organizationName: logoText,
           }),
           t("WantToContinue"),

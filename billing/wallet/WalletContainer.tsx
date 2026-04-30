@@ -46,6 +46,7 @@ import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
 import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
+import { getBrandName } from "../../constants/brands";
 
 type WalletProps = {
   isMobile?: boolean;
@@ -156,7 +157,7 @@ const Wallet = (props: WalletProps) => {
     <div className={styles.walletContainer}>
       <Text className={styles.walletDescription}>
         {t("WalletSectionDescription", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         })}
       </Text>
 

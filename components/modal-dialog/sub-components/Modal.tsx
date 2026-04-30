@@ -41,6 +41,7 @@ const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";
 
 const Modal = ({
   ref,
+  sheetRef,
   id,
   style,
   className,
@@ -80,7 +81,8 @@ const Modal = ({
   closeOnBackdropClick = true,
   ...rest
 }: ModalSubComponentsProps) => {
-  const contentRef = React.useRef<null | HTMLDivElement>(null);
+  const internalContentRef = React.useRef<null | HTMLDivElement>(null);
+  const contentRef = sheetRef ?? internalContentRef;
 
   const headerComponent = React.isValidElement(header)
     ? (header.props as { children: React.ReactNode }).children

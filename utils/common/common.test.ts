@@ -95,12 +95,12 @@ describe("Common Utilities", () => {
       const spy = vi.spyOn(i18n, "getCommonTranslation");
       spy.mockImplementation((key) => {
         if (key === "PortalAdmin") return "Administrator of {{productName}}";
-        if (key === "ProductName") return "MyPortal";
         return key;
       });
 
+      // productName comes from getBrandName("ProductName") which returns "DocSpace"
       expect(getUserTypeTranslation(EmployeeType.Admin)).toBe(
-        "Administrator of MyPortal",
+        "Administrator of DocSpace",
       );
       spy.mockRestore();
     });

@@ -49,6 +49,8 @@ import type { TData } from "../../components/toast";
 import type { TBalance } from "../types";
 import { formatCurrencyValue } from "../utils/common";
 import { combineUrl } from "../../utils/combineUrl";
+import { getCookie } from "../../utils/cookie";
+import { LANGUAGE } from "../../constants";
 import {
   AI_ENUM,
   AI_TOOLS,
@@ -206,9 +208,11 @@ class PaymentStore {
 
   filterSelectedTypeKey = "allTransactions";
 
-  filterStartDate: DateTime = subtractFromDate(now(), 4, "weeks") ?? now();
+  filterStartDate: DateTime = (
+    subtractFromDate(now(), 4, "weeks") ?? now()
+  ).setLocale(getCookie(LANGUAGE) ?? "en");
 
-  filterEndDate: DateTime = now();
+  filterEndDate: DateTime = now().setLocale(getCookie(LANGUAGE) ?? "en");
 
   filterContact: TTransactionFilterContact | null = null;
 
@@ -216,10 +220,13 @@ class PaymentStore {
 
   lastTransactionServiceName: string | undefined = undefined;
 
-  defaultFilterStartDate: DateTime =
-    subtractFromDate(now(), 4, "weeks") ?? now();
+  defaultFilterStartDate: DateTime = (
+    subtractFromDate(now(), 4, "weeks") ?? now()
+  ).setLocale(getCookie(LANGUAGE) ?? "en");
 
-  defaultFilterEndDate: DateTime = now();
+  defaultFilterEndDate: DateTime = now().setLocale(
+    getCookie(LANGUAGE) ?? "en",
+  );
 
   private _transactionTimerId: ReturnType<typeof setTimeout> | null = null;
 
@@ -1002,7 +1009,7 @@ class PaymentStore {
     this.setIsInitPaymentPage(true);
   };
 
-  paymentMethodInit = async (t: TTranslation) => {
+  paymentMethodInit = async (t: TTranslation, integrationUrl?: string) => {
     const isRefresh = window.location.href.includes("complete=true");
 
     try {
@@ -1015,11 +1022,11 @@ class PaymentStore {
           requests.push(this.setPaymentAccount());
 
           if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
-            requests.push(this.fetchCardLinked());
+            requests.push(this.fetchCardLinked(integrationUrl));
           }
         }
       } else {
-        requests.push(this.fetchCardLinked());
+        requests.push(this.fetchCardLinked(integrationUrl));
       }
 
       if (this.isShowStorageTariffDeactivated() && this.isPayer) {
@@ -1047,7 +1054,7 @@ class PaymentStore {
     }
   };
 
-  walletInit = async (t: TTranslation) => {
+  walletInit = async (t: TTranslation, integrationUrl?: string) => {
     const isRefresh = window.location.href.includes("complete=true");
 
     if (!isRefresh) {
@@ -1064,13 +1071,13 @@ class PaymentStore {
           requests.push(this.setPaymentAccount());
 
           if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
-            requests.push(this.fetchCardLinked());
+            requests.push(this.fetchCardLinked(integrationUrl));
           }
         }
 
         requests.push(this.fetchAutoPayments(), this.fetchTransactionHistory());
       } else {
-        requests.push(this.fetchCardLinked());
+        requests.push(this.fetchCardLinked(integrationUrl));
       }
 
       if (this.isShowStorageTariffDeactivated() && this.isPayer) {

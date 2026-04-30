@@ -212,11 +212,21 @@
       visibility 0s linear 0.4s;
   }
 
-  &:hover {
+  @mixin close-icon-visible {
     :global(.layout-progress-bar_close-icon) {
       opacity: 1;
       visibility: visible;
       transition: opacity 0.4s ease;
     }
+  }
+
+  @include mixins.can-hover {
+    &:hover {
+      @include close-icon-visible;
+    }
+  }
+
+  &.showCloseIcon {
+    @include close-icon-visible;
   }
 }

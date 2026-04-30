@@ -40,6 +40,8 @@ import { BACKUP_SERVICE } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import { useApi } from "../../../../providers";
 import { now, formatDateLocalized } from "../../../../utils/date";
+import { getCookie } from "../../../../utils/cookie";
+import { LANGUAGE } from "../../../../constants";
 import { toastr } from "../../../../components";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
 import TopUpModal from "../../../shared/top-up-balance/TopUpModal";
@@ -47,6 +49,7 @@ import BackupPageLoader from "./BackupPageLoader";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
+import { getBrandName } from "../../../../constants/brands";
 
 const BackupPage: React.FC = () => {
   const { paymentApi } = useApi();
@@ -113,14 +116,14 @@ const BackupPage: React.FC = () => {
 
     body: !isBackupServiceOn
       ? t("EnableBackupConfirm", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         })
       : isFreeTariff
         ? t("DisableBackupConfirmWithoutQuota", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           })
         : t("DisableBackupConfirm", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           }),
   };
 
@@ -235,6 +238,7 @@ const BackupPage: React.FC = () => {
                   .startOf("month")
                   .plus({ months: 1 }),
                 "DATE_MED",
+                { locale: getCookie(LANGUAGE) ?? "en" },
               ),
             }}
             components={{

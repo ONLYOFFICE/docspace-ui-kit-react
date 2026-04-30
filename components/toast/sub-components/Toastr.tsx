@@ -196,7 +196,7 @@ const createToastMethod =
   (type: ToastType) =>
   (
     data: string | TData | React.ReactNode,
-    title?: string,
+    title?: string | null,
     timeout?: number,
     withCross?: boolean,
     centerPosition?: boolean,
@@ -204,7 +204,9 @@ const createToastMethod =
     const message = processErrorData(data);
     const config = TOAST_CONFIGS[type];
     const finalTitle =
-      title || getCommonTranslation(config.defaultTitleKey) || "";
+      title === null
+        ? ""
+        : (title ?? getCommonTranslation(config.defaultTitleKey) ?? "");
 
     return notify(
       type,

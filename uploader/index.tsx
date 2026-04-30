@@ -422,7 +422,7 @@ const Uploader = ({
         isFolderUpload={isFolderUpload}
         isMultipleUpload={isMultipleUpload}
         onSingleUploadError={() => {
-          toastr.warning(getCommonTranslation("SingleUploadWarning"));
+          toastr.warning(getCommonTranslation("SingleUploadWarning"), null);
         }}
         onDrop={onDrop}
         onDropRejected={onDropRejected}

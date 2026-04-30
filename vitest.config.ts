@@ -5,6 +5,10 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        find: /^@docspace\/shared\/(.*)/,
+        replacement: path.resolve(__dirname, "../../packages/shared/$1"),
+      },
+      {
         find: /^(.*)\.react\.svg$/,
         replacement: path.resolve(__dirname, "./test/__mocks__/svgMock.tsx"),
       },
