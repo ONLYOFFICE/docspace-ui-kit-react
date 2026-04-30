@@ -293,7 +293,7 @@ export const CssCustomization: Story = {
         {
           width: "400px",
           "--snackbar-bg": "#1e1b4b",
-          "--snackbar-text-color": "#e0e7ff",
+          "--snackbar-text-color": "#ef4444",
           "--snackbar-accent-color": "#818cf8",
           "--snackbar-accent-width": "6px",
           "--snackbar-text-size": "13px",
@@ -306,6 +306,7 @@ export const CssCustomization: Story = {
         text="Custom styled notification with CSS variables"
         headerText="Custom Theme"
         showIcon
+        opacity={1}
         countDownTime={0}
         sectionWidth={400}
         onAction={() => {}}
@@ -352,3 +353,4 @@ export const Maintenance: Story = {
     },
   },
 };
+
