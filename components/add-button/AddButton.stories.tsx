@@ -317,8 +317,13 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <AddButton title="Custom add" onClick={() => {}} />
-      <AddButton title="With label" label="Add item" onClick={() => {}} />
+      <AddButton title="Custom add" iconSize={20} onClick={() => {}} />
+      <AddButton
+        title="With label"
+        label="Add item"
+        iconSize={20}
+        onClick={() => {}}
+      />
     </div>
   ),
   parameters: {
@@ -357,3 +362,4 @@ export const CustomIconSize: Story = {
     },
   },
 };
+
