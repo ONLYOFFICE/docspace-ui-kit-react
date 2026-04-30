@@ -398,6 +398,7 @@ export type TFile = {
   editingBy?: Record<string, string>;
   activeEditors?: Record<string, string>;
   isFillingPreparing?: boolean;
+  resultsFolderId?: number;
 };
 
 export type TPathParts = {
