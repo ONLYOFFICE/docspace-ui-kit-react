@@ -82,7 +82,7 @@ export default meta;
 
 export const CssCustomization: Story = {
   render: () => (
-    // Group 1 — mobile header bar (visible when viewport ≤ 600 px)
+    // Group 1 — mobile header bar (visible when viewport <= 600 px)
     //   --portal-logo-mobile-bg      header bar background
     //   --portal-logo-mobile-height  bar height
     //   --portal-logo-mobile-img-height  logo image height inside the bar
@@ -109,7 +109,7 @@ export const CssCustomization: Story = {
       description: {
         story: `CSS Custom Properties for external customization:
 
-**Mobile header bar** (shown when viewport ≤ 600 px)
+**Mobile header bar** (shown when viewport <= 600 px)
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -171,3 +171,4 @@ export const WithClassName: Story = {
     },
   },
 };
+
