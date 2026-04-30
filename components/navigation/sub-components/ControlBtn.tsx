@@ -197,11 +197,11 @@ const ControlButtons = ({
     >
       {isPlusButtonVisible ? renderPlusButton() : null}
       {renderContextButton((isContextButtonVisible && !isPublicRoom) ?? false)}
-      {analyzeResponsesButton ?? null}
       {renderToggleInfoPanel()}
       {renderContextButton((isPublicRoom && containVisible) ?? false)}
       {renderWarning()}
       {!isTabletView ? renderNavigationButton() : null}
+      {analyzeResponsesButton ?? null}
       {renderTariffBar()}
       {isTabletView ? renderNavigationButton() : null}
     </div>
