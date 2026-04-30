@@ -581,6 +581,7 @@ export const ContextMenu: Story = {
 
 const CssCustomizationTemplate = () => {
   const parentRef = React.useRef<HTMLButtonElement>(null);
+  const [isOpen, setIsOpen] = React.useState(false);
   return (
     <div
       style={
@@ -590,23 +591,25 @@ const CssCustomizationTemplate = () => {
           "--dropdown-shadow": "0 4px 20px rgba(124, 58, 237, 0.25)",
           "--dropdown-text-size": "14px",
           position: "relative",
-          padding: "20px",
-          height: "180px",
         } as CSSProperties
       }
     >
-      <Button ref={parentRef} label="Dropdown trigger" />
+      <Button
+        ref={parentRef}
+        label="Dropdown trigger"
+        onClick={() => setIsOpen((v) => !v)}
+      />
       <DropDown
-        open
+        open={isOpen}
         isDefaultMode={false}
         forwardedRef={parentRef}
         directionY="bottom"
-        directionX="right"
         fixedDirection
+        clickOutsideAction={() => setIsOpen(false)}
       >
-        <DropDownItem label="Option 1" />
-        <DropDownItem label="Option 2" />
-        <DropDownItem label="Option 3" />
+        <DropDownItem label="Option 1" onClick={() => setIsOpen(false)} />
+        <DropDownItem label="Option 2" onClick={() => setIsOpen(false)} />
+        <DropDownItem label="Option 3" onClick={() => setIsOpen(false)} />
       </DropDown>
     </div>
   );
@@ -647,3 +650,4 @@ Use \`isDefaultMode={false}\` (inline mode) so CSS vars from the parent cascade 
     },
   },
 };
+
