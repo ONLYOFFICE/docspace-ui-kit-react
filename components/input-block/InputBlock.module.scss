@@ -52,22 +52,6 @@
 .inputGroup {
   @include mixins.common-input-color-styles;
 
-  --input-border-radius: var(--text-input-radius, var(--input-border-radius));
-  --input-border-color: var(--text-input-border-color, var(--input-border-color));
-  --input-border-hover: var(--text-input-border-hover, var(--input-border-hover));
-  --input-border-focus: var(--text-input-border-focus, var(--input-border-focus));
-  --input-color: var(--text-input-color, var(--input-color));
-  --input-bg: var(--text-input-bg, var(--input-bg));
-
-  :global(.dark) & {
-    --input-border-radius: var(--text-input-radius, var(--input-border-radius));
-    --input-border-color: var(--text-input-border-color, var(--input-border-color));
-    --input-border-hover: var(--text-input-border-hover, var(--input-border-hover));
-    --input-border-focus: var(--text-input-border-focus, var(--input-border-focus));
-    --input-color: var(--text-input-color, var(--input-color));
-    --input-bg: var(--text-input-bg, var(--input-bg));
-  }
-
   width: 100%;
 
   display: flex;

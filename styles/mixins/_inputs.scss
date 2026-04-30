@@ -160,19 +160,28 @@
     @include input-theme-variables-dark;
   }
 
-  background-color: var(--input-bg);
-  color: var(--input-color);
-  caret-color: var(--input-color);
-  -webkit-text-fill-color: var(--input-color);
+  // Internal aliases that respect public --text-input-* customization tokens
+  // without creating circular references on the --input-* theme variables.
+  --_input-bg: var(--text-input-bg, var(--input-bg));
+  --_input-color: var(--text-input-color, var(--input-color));
+  --_input-border-color: var(--text-input-border-color, var(--input-border-color));
+  --_input-border-radius: var(--text-input-radius, var(--input-border-radius));
+  --_input-border-hover: var(--text-input-border-hover, var(--input-border-hover));
+  --_input-border-focus: var(--text-input-border-focus, var(--input-border-focus));
 
-  border-radius: var(--input-border-radius);
-  -moz-border-radius: var(--input-border-radius);
-  -webkit-border-radius: var(--input-border-radius);
+  background-color: var(--_input-bg);
+  color: var(--_input-color);
+  caret-color: var(--_input-color);
+  -webkit-text-fill-color: var(--_input-color);
+
+  border-radius: var(--_input-border-radius);
+  -moz-border-radius: var(--_input-border-radius);
+  -webkit-border-radius: var(--_input-border-radius);
 
   box-shadow: var(--input-box-shadow);
   box-sizing: var(--input-box-sizing);
   border: var(--input-border);
-  border-color: var(--input-border-color);
+  border-color: var(--_input-border-color);
 
   -webkit-background-clip: text !important;
 
@@ -260,11 +269,11 @@
 
   &:not(:disabled):not(&[data-disabled="true"]):not(&[data-error="true"]) {
     &:hover {
-      border-color: var(--text-input-border-hover, var(--input-border-hover));
+      border-color: var(--_input-border-hover);
     }
     &:focus,
     &[data-focus="true"] {
-      border-color: var(--text-input-border-focus, var(--input-border-focus));
+      border-color: var(--_input-border-focus);
     }
     cursor: text;
   }

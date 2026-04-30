@@ -16,22 +16,6 @@
     --text-input-font-size,
     var(--text-input-font-size-large)
   );
-  --input-border-color: var(
-    --text-input-border-color,
-    var(--input-border-color)
-  );
-  --input-border-radius: var(--text-input-radius, var(--input-border-radius));
-  --input-color: var(--text-input-color, var(--input-color));
-
-  :global(.dark) & {
-    --input-border-color: var(
-      --text-input-border-color,
-      var(--input-border-color)
-    );
-    --input-border-radius: var(--text-input-radius, var(--input-border-radius));
-    --input-color: var(--text-input-color, var(--input-color));
-  }
-
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
