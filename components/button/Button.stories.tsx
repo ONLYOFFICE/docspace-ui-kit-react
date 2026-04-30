@@ -673,6 +673,8 @@ const CustomizationTemplate = () => {
             "--button-primary-color": "#fff",
             "--button-primary-border": "1px solid #7c3aed",
             "--button-primary-bg-hover": "#6d28d9",
+            "--button-primary-bg-active": "#5b21b6",
+            "--button-primary-border-active": "1px solid #5b21b6",
             "--button-root-border-radius": "8px",
           } as React.CSSProperties
         }
@@ -698,6 +700,8 @@ const CustomizationTemplate = () => {
             "--button-primary-color": "#000",
             "--button-primary-border": "1px solid #f59e0b",
             "--button-primary-bg-hover": "#d97706",
+            "--button-primary-bg-active": "#b45309",
+            "--button-primary-border-active": "1px solid #b45309",
             "--button-root-border-radius": "0",
           } as React.CSSProperties
         }
@@ -758,3 +762,4 @@ All color variables support \`-hover\`, \`-active\`, \`-disabled\` suffixes.`,
     },
   },
 };
+
