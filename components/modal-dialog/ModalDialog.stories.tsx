@@ -596,33 +596,58 @@ export const AsideNonCloseable: Story = {
   },
 };
 
+const CssCustomizationTemplate = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return (
+    <>
+      <Button
+        label="Show"
+        primary
+        size={ButtonSize.medium}
+        onClick={() => setIsVisible(true)}
+      />
+      <ModalDialog
+        visible={isVisible}
+        onClose={() => setIsVisible(false)}
+        displayType={ModalDialogType.modal}
+        style={
+          {
+            "--modal-dialog-radius": "16px",
+            "--modal-dialog-bg": "#1e1b4b",
+            "--modal-dialog-color": "#e0e7ff",
+            "--modal-dialog-default-width": "460px",
+            "--modal-dialog-horizontal-padding": "24px",
+            "--modal-dialog-buttons-gap": "12px",
+          } as CSSProperties
+        }
+      >
+        <ModalDialog.Header>Custom styled dialog</ModalDialog.Header>
+        <ModalDialog.Body>
+          <p>This dialog uses CSS custom properties for theming.</p>
+        </ModalDialog.Body>
+        <ModalDialog.Footer>
+          <Button
+            label="Confirm"
+            primary
+            size={ButtonSize.normal}
+            scale
+            onClick={() => setIsVisible(false)}
+          />
+          <Button
+            label="Cancel"
+            size={ButtonSize.normal}
+            scale
+            onClick={() => setIsVisible(false)}
+          />
+        </ModalDialog.Footer>
+      </ModalDialog>
+    </>
+  );
+};
+
 export const CssCustomization: Story = {
-  render: () => (
-    <ModalDialog
-      visible
-      onClose={() => {}}
-      displayType={ModalDialogType.modal}
-      style={
-        {
-          "--modal-dialog-radius": "16px",
-          "--modal-dialog-bg": "#1e1b4b",
-          "--modal-dialog-color": "#e0e7ff",
-          "--modal-dialog-default-width": "460px",
-          "--modal-dialog-horizontal-padding": "24px",
-          "--modal-dialog-buttons-gap": "12px",
-        } as CSSProperties
-      }
-    >
-      <ModalDialog.Header>Custom styled dialog</ModalDialog.Header>
-      <ModalDialog.Body>
-        <p>This dialog uses CSS custom properties for theming.</p>
-      </ModalDialog.Body>
-      <ModalDialog.Footer>
-        <Button label="Confirm" primary size={ButtonSize.normal} scale />
-        <Button label="Cancel" size={ButtonSize.normal} scale />
-      </ModalDialog.Footer>
-    </ModalDialog>
-  ),
+  render: () => <CssCustomizationTemplate />,
   parameters: {
     docs: {
       description: {
