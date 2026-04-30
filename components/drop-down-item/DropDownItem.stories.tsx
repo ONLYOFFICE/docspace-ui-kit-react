@@ -436,7 +436,7 @@ export const CssCustomization: Story = {
       style={
         {
           position: "relative",
-          height: "200px",
+          height: "20px",
           width: "240px",
           "--drop-down-item-color": "#4c1d95",
           "--drop-down-item-hover-bg": "#ede9fe",
@@ -447,7 +447,7 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <DropDown open directionY="bottom" fixedDirection>
+      <DropDown open directionY="bottom" fixedDirection isDefaultMode={false}>
         <DropDownItem label="Custom Item" icon={SettingsReactSvgUrl} />
         <DropDownItem label="Another Item" icon={SettingsReactSvgUrl} />
         <DropDownItem isSeparator />
@@ -475,3 +475,4 @@ export const CssCustomization: Story = {
     },
   },
 };
+
