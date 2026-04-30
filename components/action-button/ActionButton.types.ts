@@ -42,4 +42,3 @@ export type ActionButtonProps<C extends ElementType = "button"> =
   ActionButtonOwnProps &
     AsProp<C> &
     Omit<ComponentPropsWithRef<C>, keyof ActionButtonOwnProps | "as">;
-

@@ -27,8 +27,6 @@
 import type { ElementType } from "react";
 import classNames from "classnames";
 
-import { Loader, LoaderTypes } from "../loader";
-
 import styles from "./ActionButton.module.scss";
 import type { ActionButtonProps } from "./ActionButton.types";
 
@@ -48,4 +46,3 @@ export function ActionButton<C extends ElementType = "button">({
     </Component>
   );
 }
-
