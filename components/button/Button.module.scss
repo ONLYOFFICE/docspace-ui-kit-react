@@ -345,8 +345,10 @@
     border: var(--button-border-accent);
     border-radius: 6px;
 
-    svg path {
-      fill: var(--button-color-accent);
+    &:not(.isLoading) {
+      svg path {
+        fill: var(--button-color-accent);
+      }
     }
 
     @media (hover: hover) {
@@ -367,7 +369,7 @@
       border: var(--button-border-accent);
     }
 
-    &:disabled {
+    &:disabled:not(.isLoading) {
       opacity: 0.5;
     }
   }
