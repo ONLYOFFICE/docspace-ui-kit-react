@@ -10,14 +10,20 @@
     --selector-add-button-text-disabled: #{colors.$gray-dark-text};
   }
 
+  --add-button-label-color-disabled: var(
+    --add-button-text-disabled,
+    var(--selector-add-button-text-disabled)
+  );
+  --add-button-label-spacing: var(--add-button-text-gap, 8px);
+
   .selectorText {
-    padding-inline-start: 8px;
+    padding-inline-start: var(--add-button-label-spacing);
     cursor: pointer;
   }
 
   &.isDisabled {
     .selectorText {
-      color: var(--selector-add-button-text-disabled);
+      color: var(--add-button-label-color-disabled);
       cursor: default;
     }
   }
@@ -39,17 +45,6 @@
 }
 
 .selectorButton {
-  display: inline-block;
-  overflow: hidden;
-  background: var(--selector-add-button-background);
-  border: var(--selector-add-button-border);
-  box-sizing: var(--selector-add-button-box-sizing);
-  border-radius: var(--selector-add-button-border-radius);
-  height: var(--selector-add-button-size, --selector-add-button-height);
-  width: var(--selector-add-button-size, --selector-add-button-width);
-  padding: var(--selector-add-button-padding);
-  cursor: pointer;
-
   --selector-add-button-background: #{colors.$gray-light-mid};
   --selector-add-button-hover-background: #{colors.$light-gray-selected};
   --selector-add-button-active-background: #{colors.$gray-strong};
@@ -64,7 +59,7 @@
   --selector-add-button-height: 32px;
   --selector-add-button-width: 32px;
   --selector-add-button-padding: 10px;
-  
+
   :global(.dark) & {
     --selector-add-button-background: #{colors.$gray-dark-mid};
     --selector-add-button-hover-background: #{colors.$gray-dark-strong};
@@ -82,6 +77,51 @@
     --selector-add-button-padding: 10px;
   }
 
+  // Public override bridging vars (defined after internals so --selector-* are resolved)
+  --add-button-border-radius: var(
+    --add-button-radius,
+    var(--selector-add-button-border-radius)
+  );
+  --add-button-size: var(
+    --add-button-dimension,
+    var(--selector-add-button-height)
+  );
+  --add-button-background: var(
+    --add-button-bg,
+    var(--selector-add-button-background)
+  );
+  --add-button-background-hover: var(
+    --add-button-bg-hover,
+    var(--selector-add-button-hover-background)
+  );
+  --add-button-background-active: var(
+    --add-button-bg-active,
+    var(--selector-add-button-active-background)
+  );
+  --add-button-icon: var(
+    --add-button-icon-color,
+    var(--selector-add-button-icon-color)
+  );
+  --add-button-icon-hover: var(
+    --add-button-icon-color-hover,
+    var(--selector-add-button-icon-color-hover)
+  );
+  --add-button-icon-active: var(
+    --add-button-icon-color-active,
+    var(--selector-add-button-icon-color-active)
+  );
+
+  display: inline-block;
+  overflow: hidden;
+  background: var(--add-button-background);
+  border: var(--selector-add-button-border);
+  box-sizing: var(--selector-add-button-box-sizing);
+  border-radius: var(--add-button-border-radius);
+  height: var(--selector-add-button-size, var(--add-button-size));
+  width: var(--selector-add-button-size, var(--add-button-size));
+  padding: var(--selector-add-button-padding);
+  cursor: pointer;
+
   &.isLoading {
     padding: 6px;
   }
@@ -89,30 +129,30 @@
   :global(.icon-button_svg) {
     svg {
       path {
-        fill: var(--selector-add-button-icon-color);
+        fill: var(--add-button-icon);
       }
     }
   }
 
   &:hover {
-    background: var(--selector-add-button-hover-background);
+    background: var(--add-button-background-hover);
 
     :global(.icon-button_svg) {
       svg {
         path {
-          fill: var(--selector-add-button-icon-color-hover);
+          fill: var(--add-button-icon-hover);
         }
       }
     }
   }
 
   &:active {
-    background: var(--selector-add-button-active-background);
+    background: var(--add-button-background-active);
 
     :global(.icon-button_svg) {
       svg {
         path {
-          fill: var(--selector-add-button-icon-color-active);
+          fill: var(--add-button-icon-active);
         }
       }
     }
@@ -150,7 +190,7 @@
 
   &.isAction {
     --accent-main: var(--color-scheme-main-accent, #{colors.$light-blue-main});
-    
+
     background-color: var(--main-accent-button) !important;
 
     :global(.icon-button_svg) {

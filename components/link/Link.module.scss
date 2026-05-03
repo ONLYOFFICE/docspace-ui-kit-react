@@ -4,29 +4,29 @@
 :global(.dark){
   :local {
     .link {
-      --link-color: #{variables.$white};
+      --_link-color: #{variables.$white};
       --link-line-height: calc(100% + 6px);
-      --link-hover-text-decoration: underline dashed;
-      --link-hover-page-text-decoration: underline;
+      --_link-hover-text-decoration: underline dashed;
+      --_link-hover-page-text-decoration: underline;
     }
   }
 }
 
 .link {
-  --link-color: #{variables.$black};
+  --_link-color: #{variables.$black};
   --link-line-height: calc(100% + 6px);
   --link-text-decoration: none;
   --link-cursor: pointer;
   --link-display: inline-block;
-  --link-hover-text-decoration: underline dashed;
-  --link-hover-page-text-decoration: underline;
+  --_link-hover-text-decoration: underline dashed;
+  --_link-hover-page-text-decoration: underline;
 
   text-decoration: var(--link-text-decoration);
   -webkit-text-decoration: var(--link-text-decoration);
   text-underline-offset: 2px;
   text-decoration-skip-ink: auto;
   cursor: pointer;
-  color: var(--link-color);
+  color: var(--link-color, var(--_link-color));
   line-height: var(--link-line-height);
 
   &.semitransparent {
@@ -47,24 +47,24 @@
   }
 
   &:hover:not(.noHover) {
-    text-decoration: var(--link-hover-text-decoration);
-    -webkit-text-decoration: var(--link-hover-text-decoration);
+    text-decoration: var(--link-hover-text-decoration, var(--_link-hover-text-decoration));
+    -webkit-text-decoration: var(--link-hover-text-decoration, var(--_link-hover-text-decoration));
   }
 
   &.isHovered:not(.noHover) {
-    text-decoration: var(--link-hover-text-decoration);
-    -webkit-text-decoration: var(--link-hover-text-decoration);
+    text-decoration: var(--link-hover-text-decoration, var(--_link-hover-text-decoration));
+    -webkit-text-decoration: var(--link-hover-text-decoration, var(--_link-hover-text-decoration));
   }
 
   &.page {
     &:hover:not(.noHover) {
-      text-decoration: var(--link-hover-page-text-decoration);
-      -webkit-text-decoration: var(--link-hover-page-text-decoration);
+      text-decoration: var(--link-hover-page-text-decoration, var(--_link-hover-page-text-decoration));
+      -webkit-text-decoration: var(--link-hover-page-text-decoration, var(--_link-hover-page-text-decoration));
     }
 
     &.isHovered:not(.noHover) {
-      text-decoration: var(--link-hover-page-text-decoration);
-      -webkit-text-decoration: var(--link-hover-page-text-decoration);
+      text-decoration: var(--link-hover-page-text-decoration, var(--_link-hover-page-text-decoration));
+      -webkit-text-decoration: var(--link-hover-page-text-decoration, var(--_link-hover-page-text-decoration));
     }
   }
 }

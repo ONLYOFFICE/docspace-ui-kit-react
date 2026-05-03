@@ -69,11 +69,11 @@
   box-sizing: border-box;
   position: relative;
 
-  height: 222px;
+  height: var(--tile-height, 222px);
 
-  background: var(--tile-background-color);
-  border: var(--tile-border);
-  border-radius: var(--tile-border-radius);
+  background: var(--tile-bg, var(--tile-background-color));
+  border: var(--file-tile-border-style, var(--tile-border-style, var(--tile-border)));
+  border-radius: var(--tile-radius, var(--tile-border-radius));
 
   @include mixins.mobile {
     margin-inline-start: 2px;
@@ -84,7 +84,10 @@
   &.isActive {
     .content {
       a {
-        text-decoration: var(--link-hover-page-text-decoration);
+        text-decoration: var(
+          --tile-hover-text-decoration,
+          var(--link-hover-page-text-decoration)
+        );
       }
     }
   }
@@ -101,13 +104,20 @@
   &.checked,
   &.isActive {
     .fileTileBottom {
-      background: var(--tile-checked-background);
+      background: var(--tile-hover-bg, var(--tile-checked-background));
+    }
+
+    .fileTileTop {
+      background: var(
+        --tile-thumbnail-image-hover-bg,
+        var(--tile-bg, var(--tile-background-color))
+      );
     }
   }
 
   &.checked {
     .fileTileTop {
-      background: var(--tile-checked-background);
+      background: var(--tile-hover-bg, var(--tile-checked-background));
     }
   }
 
@@ -116,11 +126,11 @@
   }
 
   &.showHotkeyBorder {
-    border-color: var(--tile-show-hotkey-border);
+    border-color: var(--tile-hotkey-color, var(--tile-show-hotkey-border));
 
     &:before,
     &:after {
-      border-color: var(--tile-show-hotkey-border);
+      border-color: var(--tile-hotkey-color, var(--tile-show-hotkey-border));
     }
   }
 
@@ -141,9 +151,9 @@
         align-items: center;
         justify-content: center;
         padding: 8px;
-        background: var(--tile-background-badge-color);
-        border-radius: 3px;
-        box-shadow: var(--tile-badge-shadow);
+        background: var(--tile-badge-bg, var(--tile-background-badge-color));
+        border-radius: var(--tile-badge-radius, 3px);
+        box-shadow: var(--tile-badge-box-shadow, var(--tile-badge-shadow));
       }
     }
   }
@@ -183,6 +193,7 @@
     height: 32px;
     margin-inline-start: 16px;
     margin-inline-end: 8px;
+    display: var(--tile-icon-display, flex);
 
     &:hover:not(.isDragging, .inProgress) {
       .icon {
@@ -197,7 +208,7 @@
 
     &:hover:not(.isDragging, .inProgress),
     &.checked {
-      background: var(--tile-background-color);
+      background: var(--tile-bg, var(--tile-background-color));
       border-radius: 6px;
     }
 
@@ -260,8 +271,10 @@
       white-space: normal;
       word-break: break-word;
 
-      font-size: var(--tile-font-size);
-      line-height: var(--tile-line-height);
+      font-size: var(--tile-text-size, var(--tile-font-size));
+      font-weight: var(--tile-text-weight, normal) !important;
+      color: var(--tile-text-color) !important;
+      line-height: var(--tile-text-line-height, var(--tile-line-height));
 
       text-underline-offset: 2px;
       text-decoration-thickness: 1px;
@@ -286,7 +299,7 @@
 
         svg {
           path {
-            fill: var(--tile-icon-button-color);
+            fill: var(--tile-icon-color, var(--tile-icon-button-color));
           }
         }
 
@@ -312,20 +325,20 @@
 
     .expandButton > div:first-child {
       padding-block: 8px;
-      padding-inline: 8px 16px;
+      padding-inline: 8px var(--tile-option-button-padding-end, 16px);
     }
   }
 
   .fileTileTop {
     @extend .flexBoxStyles;
 
-    background: var(--tile-background-color);
+    background: var(--tile-bg, var(--tile-background-color));
     justify-content: space-between;
     align-items: baseline;
     height: 156px;
     position: relative;
-    border-radius: 12px 12px 0 0;
-    transition: background 0.2s;
+    border-radius: var(--tile-radius, 12px) var(--tile-radius, 12px) 0 0;
+    transition: var(--tile-thumbnail-transition, background 0.2s);
 
     &:hover {
       cursor: pointer;
@@ -334,12 +347,17 @@
     .thumbnailImage {
       pointer-events: none;
       position: absolute;
-      height: 100%;
-      width: 100%;
+      inset-block: 0;
+      inset-inline: var(--tile-thumbnail-padding-inline, 0);
+      height: var(--tile-thumbnail-height, 100%);
+      width: calc(100% - 2 * var(--tile-thumbnail-padding-inline, 0px));
       object-fit: cover;
       object-position: top;
       z-index: 0;
-      border-radius: 12px 12px 0 0;
+      border-radius: var(
+        --tile-thumbnail-image-radius,
+        var(--tile-radius, 12px) var(--tile-radius, 12px) 0 0
+      );
 
       .isImageOrMedia {
         object-position: top;
@@ -362,10 +380,10 @@
   .fileTileBottom {
     @extend .flexBoxStyles;
 
-    background: var(--tile-background-color);
-    border-radius: 0 0 12px 12px;
+    background: var(--tile-bg, var(--tile-background-color));
+    border-radius: 0 0 var(--tile-radius, 12px) var(--tile-radius, 12px);
 
-    padding: 16px 0;
+    padding: 16px var(--tile-bottom-padding-inline, 0);
     height: 64px;
     box-sizing: border-box;
 
@@ -383,3 +401,4 @@
     }
   }
 }
+

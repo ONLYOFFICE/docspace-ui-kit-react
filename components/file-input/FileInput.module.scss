@@ -60,6 +60,26 @@
   --file-input-focus-error-border-color: #{$light-error-status};
   --file-input-disabled-placeholder-color: #{$gray-strong};
 
+  // bridge vars — bind public overrides to internal theme tokens
+  --file-input-border-v: var(--file-input-border, var(--file-input-border-color));
+  --file-input-border-hover-v: var(--file-input-hover-border, var(--file-input-hover-border-color));
+  --file-input-border-focus-v: var(--file-input-focus-border, var(--file-input-focus-border-color));
+  --file-input-border-disabled-v: var(
+    --file-input-disabled-border,
+    var(--file-input-disabled-border-color)
+  );
+  --file-input-border-warning-v: var(
+    --file-input-warning-border,
+    var(--file-input-warning-border-color)
+  );
+  --file-input-border-error-v: var(--file-input-error-border, var(--file-input-error-border-color));
+  --file-input-placeholder-v: var(
+    --file-input-placeholder-color,
+    var(--file-input-disabled-placeholder-color)
+  );
+  // new bridge var for hardcoded icon border-radius
+  --file-input-radius-v: var(--file-input-radius, 3px);
+
   display: flex;
   position: relative;
   outline: none;
@@ -89,49 +109,49 @@
     text-overflow: ellipsis;
     margin: 0;
 
-    border-color: var(--file-input-border-color);
+    border-color: var(--file-input-border-v);
 
     &:focus {
-      border-color: var(--file-input-border-color) !important;
+      border-color: var(--file-input-border-v) !important;
     }
 
     &:hover:not(&.disabled):not(&.warning):not(&.error) {
-      border-color: var(--file-input-border-color);
+      border-color: var(--file-input-border-v);
     }
 
     &.disabled {
       cursor: default !important;
-      border-color: var(--file-input-disabled-border-color);
+      border-color: var(--file-input-border-disabled-v);
 
       &::placeholder {
-        color: var(--file-input-disabled-placeholder-color);
-        -webkit-text-fill-color: var(--file-input-disabled-placeholder-color);
+        color: var(--file-input-placeholder-v);
+        -webkit-text-fill-color: var(--file-input-placeholder-v);
       }
 
       &::-webkit-input-placeholder {
-        color: var(--file-input-disabled-placeholder-color);
-        -webkit-text-fill-color: var(--file-input-disabled-placeholder-color);
+        color: var(--file-input-placeholder-v);
+        -webkit-text-fill-color: var(--file-input-placeholder-v);
       }
       &::-moz-placeholder {
-        color: var(--file-input-disabled-placeholder-color);
-        -webkit-text-fill-color: var(--file-input-disabled-placeholder-color);
+        color: var(--file-input-placeholder-v);
+        -webkit-text-fill-color: var(--file-input-placeholder-v);
       }
       &:-ms-input-placeholder {
-        color: var(--file-input-disabled-placeholder-color);
-        -webkit-text-fill-color: var(--file-input-disabled-placeholder-color);
+        color: var(--file-input-placeholder-v);
+        -webkit-text-fill-color: var(--file-input-placeholder-v);
       }
       &:-moz-placeholder {
-        color: var(--file-input-disabled-placeholder-color);
-        -webkit-text-fill-color: var(--file-input-disabled-placeholder-color);
+        color: var(--file-input-placeholder-v);
+        -webkit-text-fill-color: var(--file-input-placeholder-v);
       }
     }
 
     &.warning {
-      border-color: var(--file-input-warning-border-color) !important;
+      border-color: var(--file-input-border-warning-v) !important;
     }
 
     &.error {
-      border-color: var(--file-input-error-border-color) !important;
+      border-color: var(--file-input-border-error-v) !important;
     }
 
     padding-inline-end: 40px;
@@ -151,36 +171,36 @@
 
   &:hover {
     .icon {
-      border-color: var(--file-input-hover-border-color);
+      border-color: var(--file-input-border-hover-v);
 
       &.disabled {
-        border-color: var(--file-input-hover-disabled-border-color);
+        border-color: var(--file-input-border-disabled-v);
       }
 
       &.warning {
-        border-color: var(--file-input-hover-warning-border-color);
+        border-color: var(--file-input-border-warning-v);
       }
 
       &.error {
-        border-color: var(--file-input-hover-error-border-color);
+        border-color: var(--file-input-border-error-v);
       }
     }
   }
 
   &:active {
     .icon {
-      border-color: var(--file-input-focus-border-color);
+      border-color: var(--file-input-border-focus-v);
 
       &.disabled {
-        border-color: var(--file-input-focus-disabled-border-color);
+        border-color: var(--file-input-border-disabled-v);
       }
 
       &.warning {
-        border-color: var(--file-input-focus-warning-border-color);
+        border-color: var(--file-input-border-warning-v);
       }
 
       &.error {
-        border-color: var(--file-input-focus-error-border-color);
+        border-color: var(--file-input-border-error-v);
       }
     }
   }
@@ -195,6 +215,8 @@
   margin: 0;
 
   @include mixins.logical-border-radius(0 3px 3px 0);
+  border-start-end-radius: var(--file-input-radius-v);
+  border-end-end-radius: var(--file-input-radius-v);
 
   &.base,
   &.middle {
@@ -210,14 +232,14 @@
   border: 1px solid;
   cursor: pointer;
 
-  border-color: var(--file-input-border-color);
+  border-color: var(--file-input-border-v);
 
   .iconButton {
     cursor: pointer;
   }
 
   &.disabled {
-    border-color: var(--file-input-disabled-border-color);
+    border-color: var(--file-input-border-disabled-v);
     cursor: default;
 
     .iconButton {
@@ -226,11 +248,11 @@
   }
 
   &.warning {
-    border-color: var(--file-input-warning-border-color);
+    border-color: var(--file-input-border-warning-v);
   }
 
   &.error {
-    border-color: var(--file-input-error-border-color);
+    border-color: var(--file-input-border-error-v);
   }
 
   .loader {

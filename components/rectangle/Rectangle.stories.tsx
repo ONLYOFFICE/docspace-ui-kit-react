@@ -140,6 +140,59 @@ type Story = StoryObj<ComponentProps<typeof RectangleSkeleton>>;
 
 export default meta;
 
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+    >
+      <RectangleSkeleton
+        width="280px"
+        height="40px"
+        borderRadius="20px"
+        backgroundColor="#0082c9"
+        foregroundColor="#cce5f6"
+        backgroundOpacity={0.15}
+        foregroundOpacity={0.3}
+      />
+      <RectangleSkeleton
+        width="200px"
+        height="40px"
+        borderRadius="20px"
+        backgroundColor="#0082c9"
+        foregroundColor="#cce5f6"
+        backgroundOpacity={0.15}
+        foregroundOpacity={0.3}
+      />
+      <RectangleSkeleton
+        width="160px"
+        height="40px"
+        borderRadius="20px"
+        backgroundColor="#0082c9"
+        foregroundColor="#cce5f6"
+        backgroundOpacity={0.15}
+        foregroundOpacity={0.3}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `The RectangleSkeleton component uses props for styling (no CSS custom properties):
+
+| Prop | Description | Default |
+|------|-------------|---------|
+| \`backgroundColor\` | Skeleton background color | theme-based |
+| \`foregroundColor\` | Skeleton shimmer color | theme-based |
+| \`backgroundOpacity\` | Background opacity | \`0.1\` |
+| \`foregroundOpacity\` | Foreground opacity | \`0.15\` |
+| \`borderRadius\` | Shape corner radius | \`0\` |
+| \`speed\` | Animation speed (seconds) | \`2\` |
+| \`animate\` | Toggle animation | \`true\` |`,
+      },
+    },
+  },
+};
+
 export const Default: Story = {
   render: (args) => <RectangleSkeleton {...args} />,
   args: {

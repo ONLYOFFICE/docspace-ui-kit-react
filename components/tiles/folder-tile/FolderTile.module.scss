@@ -70,10 +70,10 @@
 
   cursor: pointer;
   box-sizing: border-box;
-  border: var(--tile-border);
-  border-radius: var(--tile-border-radius);
+  border: var(--folder-tile-border-style, var(--tile-border-style, var(--tile-border)));
+  border-radius: var(--tile-radius, var(--tile-border-radius));
 
-  border-start-start-radius: var(--tile-border-radius);
+  border-start-start-radius: var(--tile-radius, var(--tile-border-radius));
   -webkit-tap-highlight-color: transparent;
 
   height: 64px;
@@ -98,18 +98,18 @@
   &.checked,
   &.isActive,
   &:hover:not(.isDragging, .isEdit) {
-    background: var(--tile-checked-background);
+    background: var(--tile-hover-bg, var(--tile-checked-background));
 
     .fileTileBottom {
       &.isBig {
-        background: var(--tile-checked-background);
+        background: var(--tile-hover-bg, var(--tile-checked-background));
       }
     }
   }
 
   &.checked {
     .fileTileTop {
-      background: var(--tile-checked-background);
+      background: var(--tile-hover-bg, var(--tile-checked-background));
     }
   }
 
@@ -117,7 +117,7 @@
   &:hover:not(.isDragging, .isEdit) {
     .content {
       a {
-        text-decoration: var(--link-hover-page-text-decoration);
+        text-decoration: var(--tile-hover-text-decoration, var(--link-hover-page-text-decoration));
       }
     }
   }
@@ -127,11 +127,11 @@
   }
 
   &.showHotkeyBorder {
-    border-color: var(--tile-show-hotkey-border);
+    border-color: var(--tile-hotkey-color, var(--tile-show-hotkey-border));
 
     &:before,
     &:after {
-      border-color: var(--tile-show-hotkey-border);
+      border-color: var(--tile-hotkey-color, var(--tile-show-hotkey-border));
     }
   }
 
@@ -160,7 +160,7 @@
 
     &:hover:not(.isDragging, .inProgress),
     &.checked {
-      background: var(--tile-background-color);
+      background: var(--tile-bg, var(--tile-background-color));
       border-radius: 6px;
     }
 
@@ -223,8 +223,10 @@
       white-space: normal;
       word-break: break-word;
 
-      font-size: var(--tile-font-size);
-      line-height: var(--tile-line-height);
+      font-size: var(--tile-text-size, var(--tile-font-size));
+      font-weight: var(--tile-text-weight, normal) !important;
+      color: var(--tile-text-color) !important;
+      line-height: var(--tile-text-line-height, var(--tile-line-height));
     }
 
     &.isHovered {
@@ -246,7 +248,7 @@
 
         svg {
           path {
-            fill: var(--tile-icon-button-color);
+            fill: var(--tile-icon-color, var(--tile-icon-button-color));
           }
         }
 
@@ -286,9 +288,9 @@
         align-items: center;
         justify-content: center;
         padding: 8px;
-        background: var(--tile-background-badge-color);
-        border-radius: 4px;
-        box-shadow: var(--tile-badge-shadow);
+        background: var(--tile-badge-bg, var(--tile-background-badge-color));
+        border-radius: var(--tile-badge-radius, 4px);
+        box-shadow: var(--tile-badge-box-shadow, var(--tile-badge-shadow));
       }
     }
   }
@@ -316,12 +318,12 @@
   .fileTileTop {
     @extend .flexBoxStyles;
 
-    background: var(--tile-background-color);
+    background: var(--tile-bg, var(--tile-background-color));
     justify-content: space-between;
     align-items: baseline;
     height: 156px;
     position: relative;
-    border-radius: 12px 12px 0 0;
+    border-radius: var(--tile-radius, 12px) var(--tile-radius, 12px) 0 0;
     transition: background 0.2s;
 
     width: 100%;
@@ -338,7 +340,7 @@
       object-fit: cover;
       object-position: top;
       z-index: 0;
-      border-radius: 12px 12px 0 0;
+      border-radius: var(--tile-radius, 12px) var(--tile-radius, 12px) 0 0;
     }
 
     .temporaryIcon > div > :global(.injected-svg) {
@@ -360,8 +362,8 @@
 
     &.isBig {
       border-top: 1px solid transparent;
-      background: var(--tile-background-color);
-      border-radius: 0 0 12px 12px;
+      background: var(--tile-bg, var(--tile-background-color));
+      border-radius: 0 0 var(--tile-radius, 12px) var(--tile-radius, 12px);
 
       padding: 16px 0;
       height: 62px;

@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import React from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -309,6 +310,71 @@ export const HiddenCross: Story = {
   hideCross
   onChange={(date) => console.log(date)}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          height: "500px",
+          // DateTimePicker time cell
+          "--date-time-picker-cell-bg": "#cce5f6",
+          "--date-time-picker-icon": "#0082c9",
+          "--date-time-picker-cell-radius": "6px",
+          "--date-time-picker-cell-padding": "6px 12px",
+          // DatePicker sub-component
+          "--date-picker-bg": "#e6f3fb",
+          "--date-picker-header-border": "1px solid #0082c9",
+          // AddButton sub-component
+          "--add-button-background": "#e6f3fb",
+          "--add-button-icon": "#0082c9",
+          // SelectedItem sub-component
+          "--selected-item-background": "#cce5f6",
+          "--selected-item-background-hover": "#b3d9f0",
+          "--selected-item-active-background": "#0082c9",
+          "--selected-item-active-color": "#ffffff",
+          // TimePicker sub-component
+          "--time-input-border": "1px solid #0082c9",
+          "--time-input-bg": "#e6f3fb",
+          "--time-input-radius": "6px",
+          // Calendar sub-component
+          "--calendar-bg": "#e6f3fb",
+          "--calendar-border": "#0082c9",
+          "--calendar-title": "#0082c9",
+          "--calendar-accent": "#0082c9",
+          "--calendar-hover-bg": "#cce5f6",
+          // ComboBox sub-component (AM/PM selector)
+          "--combobox-background": "#e6f3fb",
+          // IconButton (in SelectedItem close button)
+          "--icon-button-color": "#0082c9",
+          "--icon-button-hover-color": "#006fa6",
+        } as React.CSSProperties
+      }
+    >
+      <DateTimePicker
+        locale="en"
+        maxDate={new Date(`${new Date().getFullYear() + 10}/01/01`)}
+        minDate={new Date("1970/01/01")}
+        openDate={now()}
+        initialDate={now()}
+        selectDateText="Select date"
+        className="date-time-picker"
+        id="css-customization-date-time-picker"
+        hasError={false}
+        onChange={() => {}}
+        translations={{ AM: "AM", PM: "PM" }}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "CSS custom property overrides for the date-time picker and its DatePicker, TimePicker, Calendar, AddButton, SelectedItem, and ComboBox sub-components.",
       },
     },
   },

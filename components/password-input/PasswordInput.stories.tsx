@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import { useState, useEffect } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -384,6 +384,57 @@ export const Sizes: Story = {
 				code: `<PasswordInput size={InputSize.base} placeholder="Base size" simpleView />
 <PasswordInput size={InputSize.middle} placeholder="Middle size" simpleView />
 <PasswordInput size={InputSize.large} placeholder="Large size" simpleView />`,
+			},
+		},
+	},
+};
+
+export const CssCustomization: Story = {
+	render: () => (
+		<div
+			style={
+				{
+					width: "320px",
+					"--text-input-bg": "#f5f3ff",
+					"--text-input-border-color": "#7c3aed",
+					"--text-input-color": "#4c1d95",
+					"--text-input-radius": "8px",
+					"--password-input-icon-hover": "#7c3aed",
+					"--password-input-icon-disabled": "#c4b5fd",
+					"--password-input-tooltip-text": "#4c1d95",
+					"--password-input-tooltip-width": "280px",
+					"--password-input-border-radius": "8px",
+				} as CSSProperties
+			}
+		>
+			<PasswordInput
+				inputValue="Passw0rd!"
+				onChange={() => {}}
+				inputName="css-custom-demo"
+				placeholder="Custom styled password"
+				passwordSettings={basePasswordSettings}
+				{...baseTooltipProps}
+				scale
+				size={InputSize.base}
+			/>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--text-input-bg\` | Background color | theme token |
+| \`--text-input-border-color\` | Border color | theme token |
+| \`--text-input-color\` | Text color | theme token |
+| \`--text-input-radius\` | Input border radius | theme token |
+| \`--password-input-icon-hover\` | Eye icon hover color | theme token |
+| \`--password-input-icon-disabled\` | Eye icon disabled color | theme token |
+| \`--password-input-tooltip-text\` | Tooltip text color | theme token |
+| \`--password-input-tooltip-width\` | Tooltip width | \`294px\` |
+| \`--password-input-border-radius\` | Input container border radius | \`3px\` |`,
 			},
 		},
 	},

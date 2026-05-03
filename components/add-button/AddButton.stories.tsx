@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -300,6 +300,53 @@ const CustomSizeTemplate = () => {
   );
 };
 
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          gap: "12px",
+          alignItems: "center",
+          "--add-button-radius": "50%",
+          "--add-button-dimension": "40px",
+          "--add-button-bg": "#7c3aed",
+          "--add-button-bg-hover": "#6d28d9",
+          "--add-button-icon-color": "#ffffff",
+          "--add-button-icon-color-hover": "#ffffff",
+        } as CSSProperties
+      }
+    >
+      <AddButton title="Custom add" iconSize={20} onClick={() => {}} />
+      <AddButton
+        title="With label"
+        label="Add item"
+        iconSize={20}
+        onClick={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--add-button-radius\` | Border radius | \`3px\` |
+| \`--add-button-dimension\` | Width and height | \`32px\` |
+| \`--add-button-bg\` | Background color | theme token |
+| \`--add-button-bg-hover\` | Hover background color | theme token |
+| \`--add-button-bg-active\` | Active background color | theme token |
+| \`--add-button-icon-color\` | Icon fill color | theme token |
+| \`--add-button-icon-color-hover\` | Icon fill on hover | theme token |
+| \`--add-button-text-disabled\` | Label color when disabled | theme token |
+| \`--add-button-text-gap\` | Gap between button and label | \`8px\` |`,
+      },
+    },
+  },
+};
+
 export const CustomIconSize: Story = {
   render: () => <CustomSizeTemplate />,
   parameters: {
@@ -315,3 +362,4 @@ export const CustomIconSize: Story = {
     },
   },
 };
+

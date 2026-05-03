@@ -29,9 +29,18 @@
 @use "../../styles/mixins";
 
 .paging {
+  --paging-gap-size: var(--paging-gap, 8px);
+  --paging-button-gap-size: var(--paging-button-gap, 8px);
+  --paging-nav-font-size: var(--paging-font-size, 13px);
+  --paging-nav-padding: var(--paging-button-padding, 6px 28px);
+  --paging-prev-max-width: var(--paging-prev-width, 111px);
+  --paging-next-max-width: var(--paging-next-width, 86px);
+  --paging-button-height: var(--paging-nav-height, 40px);
+  --paging-on-page-width: var(--paging-count-width, 125px);
+
   display: flex;
   justify-content: flex-start;
-  gap: 8px;
+  gap: var(--paging-gap-size);
   flex-wrap: wrap;
 
   @include mixins.mobile {
@@ -48,15 +57,15 @@
     }
 
     > button:not(:last-child) {
-      margin-inline-end: 8px;
+      margin-inline-end: var(--paging-button-gap-size);
     }
   }
 
   .prevButton,
   .nextButton {
-    font-size: 13px;
+    font-size: var(--paging-nav-font-size);
     line-height: 20px;
-    padding: 6px 28px;
+    padding: var(--paging-nav-padding);
 
     @include mixins.tablet-and-below {
       font-size: 14px;
@@ -64,25 +73,25 @@
   }
 
   .prevButton {
-    max-width: 111px;
+    max-width: var(--paging-prev-max-width);
 
     @include mixins.tablet-and-below {
-      max-width: 115px;
-      height: 40px;
+      max-width: calc(var(--paging-prev-max-width) + 4px);
+      height: var(--paging-button-height);
     }
   }
 
   .nextButton {
-    max-width: 86px;
+    max-width: var(--paging-next-max-width);
 
     @include mixins.tablet-and-below {
-      max-width: 89px;
-      height: 40px;
+      max-width: calc(var(--paging-next-max-width) + 3px);
+      height: var(--paging-button-height);
     }
   }
 
   .page {
-    margin-inline-end: 8px;
+    margin-inline-end: var(--paging-button-gap-size);
 
     @include mixins.mobile {
       flex-grow: 1;
@@ -118,10 +127,10 @@
   }
 
   .onPage {
-    width: 125px;
+    width: var(--paging-on-page-width);
 
     @include mixins.tablet-and-below {
-      height: 40px;
+      height: var(--paging-button-height);
     }
 
     @include mixins.mobile {

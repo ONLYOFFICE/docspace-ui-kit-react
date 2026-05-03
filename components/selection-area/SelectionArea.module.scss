@@ -26,13 +26,17 @@
 @use "../../styles/variables/colors";
 
 .selectionArea {
+  --selection-area-bg-value: var(--selection-area-bg, rgba(68, 170, 255, 0.5));
+  --selection-area-border-value: var(--selection-area-border, 1px solid #{colors.$light-second-main});
+  --selection-area-z-index-value: var(--selection-area-z-index, 1000);
+
   top: 0;
   // doesn't require mirroring for RTL
   left: 0;
   position: fixed;
   margin: 0;
   display: none;
-  background: rgba(68, 170, 255, 0.5);
-  border: 1px solid #{colors.$light-second-main};
-  z-index: 1000;
+  background: var(--selection-area-bg-value);
+  border: var(--selection-area-border-value);
+  z-index: var(--selection-area-z-index-value);
 }

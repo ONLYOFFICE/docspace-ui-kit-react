@@ -57,17 +57,25 @@
     --date-picker-icon-color: #{colors.$dark-gray-dark};
   }
 
+  // bridge vars — bind public overrides to internal theme tokens
+  --date-time-picker-cell-bg-v: var(--date-time-picker-cell-bg, var(--date-picker-cell-background));
+  --date-time-picker-icon-v: var(--date-time-picker-icon, var(--date-picker-icon-color));
+  // new bridge vars for hardcoded values
+  --date-time-picker-cell-height-v: var(--date-time-picker-cell-height, 32px);
+  --date-time-picker-cell-radius-v: var(--date-time-picker-cell-radius, 3px);
+  --date-time-picker-cell-padding-v: var(--date-time-picker-cell-padding, 6px 8px);
+
   display: flex;
   align-items: center;
 
   box-sizing: border-box;
 
-  height: 32px;
+  height: var(--date-time-picker-cell-height-v);
 
-  background-color: var(--date-picker-cell-background);
-  border-radius: 3px;
+  background-color: var(--date-time-picker-cell-bg-v);
+  border-radius: var(--date-time-picker-cell-radius-v);
 
-  padding: 6px 8px;
+  padding: var(--date-time-picker-cell-padding-v);
 
   cursor: pointer;
 
@@ -77,7 +85,7 @@
     padding-inline: 2px 10px;
 
     path {
-      fill: var(--date-picker-icon-color);
+      fill: var(--date-time-picker-icon-v);
     }
 
     circle {

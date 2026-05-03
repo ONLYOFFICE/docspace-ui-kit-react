@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -94,6 +94,52 @@ import PublicRoomBar from "@docspace/ui-kit/components/public-room-bar";
 type Story = StoryObj<ComponentProps<typeof PublicRoomBar>>;
 
 export default meta;
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--public-room-bar-bg": "#e6f3fb",
+          "--public-room-bar-header-color": "#0082c9",
+          "--public-room-bar-header-icon": "#0082c9",
+          "--public-room-bar-radius": "12px",
+          "--public-room-bar-padding": "16px 20px",
+          "--public-room-bar-text-size": "13px",
+        } as CSSProperties
+      }
+    >
+      <PublicRoomBar
+        headerText="Public Room"
+        bodyText="This room is accessible to anyone with the link"
+        barIsVisible={false}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--public-room-bar-bg\` | Background color | theme-based |
+| \`--public-room-bar-header-color\` | Header text color | theme-based |
+| \`--public-room-bar-body-color\` | Body text color | theme-based |
+| \`--public-room-bar-close-icon\` | Close icon fill | theme-based |
+| \`--public-room-bar-text\` | Container text color | \`#000\` |
+| \`--public-room-bar-header-icon\` | Header icon fill | \`#a3a9ae\` |
+| \`--public-room-bar-text-size\` | Font size | \`12px\` |
+| \`--public-room-bar-padding\` | Inner padding | \`12px 16px\` |
+| \`--public-room-bar-radius\` | Border radius | \`6px\` |
+| \`--public-room-bar-bottom-margin\` | Bottom margin | \`10px\` |
+| \`--public-room-bar-top-margin\` | Top margin (no bar) | \`20px\` |
+| \`--public-room-bar-header-gap\` | Header icon/text gap | \`8px\` |
+| \`--public-room-bar-header-weight\` | Header font weight | \`600\` |`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   render: (args) => <PublicRoomBar {...args} />,

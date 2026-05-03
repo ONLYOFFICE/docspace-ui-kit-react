@@ -29,6 +29,8 @@
 @use "../../styles/mixins";
 
 .dropDownStyle {
+  --date-picker-dropdown-padding-v: var(--date-picker-dropdown-padding, 16px 16px 16px 17px);
+
   position: relative;
 
   .drop-down {
@@ -38,7 +40,7 @@
       }
       margin: auto;
     }
-    padding: 16px 16px 16px 17px;
+    padding: var(--date-picker-dropdown-padding-v);
 
     @include mixins.mobile {
       position: fixed;
@@ -68,11 +70,15 @@
     --date-picker-background: #{colors.$black};
   }
 
+  // bridge vars — bind public overrides to internal theme tokens
+  --date-picker-bg-v: var(--date-picker-bg, var(--date-picker-background));
+  --date-picker-padding-v: var(--date-picker-padding, 0 16px 16px);
+
   box-sizing: border-box;
   position: relative;
   width: 100%;
-  background-color: var(--date-picker-background);
-  padding: 0 16px 16px;
+  background-color: var(--date-picker-bg-v);
+  padding: var(--date-picker-padding-v);
 
   .header {
     max-width: 500px;
@@ -91,14 +97,19 @@
     --date-picker-border: 1px solid #{colors.$gray-dark-strong};
   }
 
+  // bridge vars
+  --date-picker-header-border-v: var(--date-picker-header-border, var(--date-picker-border));
+
   display: flex;
   align-items: center;
-  border-bottom: var(--date-picker-border);
+  border-bottom: var(--date-picker-header-border-v);
 }
 
 .body {
+  --date-picker-body-padding-v: var(--date-picker-body-padding, 16px 0);
+
   position: relative;
-  padding: 16px 0;
+  padding: var(--date-picker-body-padding-v);
 }
 
 .wrapper {
