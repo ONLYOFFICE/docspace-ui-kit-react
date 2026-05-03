@@ -30,77 +30,134 @@
 :global(.light) {
   :local {
     .articleItemText.active {
-      color: var(--color-scheme-main-accent);
+      color: var(
+        --article-item-text-active-color,
+        var(--color-scheme-main-accent)
+      );
 
       &:hover {
-        color: var(--color-scheme-main-accent);
+        color: var(
+          --article-item-text-active-color,
+          var(--color-scheme-main-accent)
+        );
       }
     }
 
     .articleItemImg.active {
       svg {
         path {
-          fill: var(--color-scheme-main-accent) !important;
+          fill: var(
+            --article-item-img-svg-active-fill,
+            var(--color-scheme-main-accent)
+          ) !important;
         }
         circle {
-          fill: var(--color-scheme-main-accent) !important;
+          fill: var(
+            --article-item-img-svg-active-fill,
+            var(--color-scheme-main-accent)
+          ) !important;
         }
       }
 
       &:hover {
         svg {
           path {
-            fill: var(--color-scheme-main-accent) !important;
+            fill: var(
+              --article-item-img-svg-active-fill,
+              var(--color-scheme-main-accent)
+            ) !important;
           }
         }
       }
     }
 
-  .articleItemHeaderContainer, 
-  .articleItemBadgeWrapper, 
-  .articleItemInitialText,
-  .articleItemText, 
-  .articleItemImg, 
-  .articleItemSibling, 
-  .articleItemContainer, 
-  .storyCatalogWrapper {
-    --article-item-header-color: #{colors.$gray};
-    --article-item-header-bg-color: #{colors.$gray-strong};
-    --article-item-badge-without-text-bg-color: #{colors.$light-status-warning};
-    --article-item-initial-text-color: #{colors.$white};
-    --article-item-text-color: #{colors.$gray-text};
-    --article-item-text-active-color: #{colors.$light-blue-main};
-    --article-item-img-svg-fill: #{colors.$light-gray-dark};
-    --article-item-img-svg-active-fill: #{colors.$light-blue-main};
-    --article-item-sibling-active-bg-color: #{colors.$light-gray-selected};
-    --article-item-sibling-hover-bg-color: #{colors.$gray-light-mid};
-    --article-item-dnd-bg-color: #{colors.$dnd-color};
-    --article-item-dnd-hover-bg-color: #{colors.$dnd-hover-color};
-    --article-item-trash-icon-fill: #{colors.$gray};
-    --story-wrapper-bg-color: #{colors.$gray-light};
-  }}
+    .articleItemHeaderContainer,
+    .articleItemBadgeWrapper,
+    .articleItemInitialText,
+    .articleItemText,
+    .articleItemImg,
+    .articleItemSibling,
+    .articleItemContainer,
+    .storyCatalogWrapper {
+      --article-item-header-color: #{colors.$gray};
+      --article-item-header-bg-color: #{colors.$gray-strong};
+      --article-item-badge-without-text-bg-color: #{colors.$light-status-warning};
+      --article-item-initial-text-color: #{colors.$white};
+      --article-item-text-color: var(--article-item-text, #{colors.$gray-text});
+      --article-item-text-active-color: var(
+        --article-item-text-active,
+        #{colors.$light-blue-main}
+      );
+      --article-item-img-svg-fill: var(
+        --article-item-icon,
+        #{colors.$light-gray-dark}
+      );
+      --article-item-img-svg-active-fill: var(
+        --article-item-icon-active,
+        #{colors.$light-blue-main}
+      );
+      --article-item-sibling-active-bg-color: var(
+        --article-item-active-bg,
+        #{colors.$light-gray-selected}
+      );
+      --article-item-sibling-active-hover-bg-color: var(
+        --article-item-active-hover-bg,
+        #{colors.$light-gray-selected}
+      );
+      --article-item-sibling-hover-bg-color: var(
+        --article-item-hover-bg,
+        #{colors.$gray-light-mid}
+      );
+      --article-item-dnd-bg-color: #{colors.$dnd-color};
+      --article-item-dnd-hover-bg-color: #{colors.$dnd-hover-color};
+      --article-item-trash-icon-fill: #{colors.$gray};
+      --story-wrapper-bg-color: #{colors.$gray-light};
+    }
+  }
 }
 
 :global(.dark) {
   :local {
-    .articleItemHeaderContainer, 
-    .articleItemBadgeWrapper, 
+    .articleItemHeaderContainer,
+    .articleItemBadgeWrapper,
     .articleItemInitialText,
-    .articleItemText, 
-    .articleItemImg, 
-    .articleItemSibling, 
-    .articleItemContainer, 
+    .articleItemText,
+    .articleItemImg,
+    .articleItemSibling,
+    .articleItemContainer,
     .storyCatalogWrapper {
       --article-item-header-color: #{colors.$gray-dark};
       --article-item-header-bg-color: #{colors.$gray-dark-strong};
       --article-item-badge-without-text-bg-color: #{colors.$main-orange};
       --article-item-initial-text-color: #{colors.$black};
-      --article-item-text-color: #{colors.$dark-gray-dark};
-      --article-item-text-active-color: #{colors.$white};
-      --article-item-img-svg-fill: #{colors.$dark-gray-dark};
-      --article-item-img-svg-active-fill: #{colors.$white};
-      --article-item-sibling-active-bg-color: #{colors.$black};
-      --article-item-sibling-hover-bg-color: #{colors.$black};
+      --article-item-text-color: var(
+        --article-item-text,
+        #{colors.$dark-gray-dark}
+      );
+      --article-item-text-active-color: var(
+        --article-item-text-active,
+        #{colors.$white}
+      );
+      --article-item-img-svg-fill: var(
+        --article-item-icon,
+        #{colors.$dark-gray-dark}
+      );
+      --article-item-img-svg-active-fill: var(
+        --article-item-icon-active,
+        #{colors.$white}
+      );
+      --article-item-sibling-active-bg-color: var(
+        --article-item-active-bg,
+        #{colors.$black}
+      );
+      --article-item-sibling-active-hover-bg-color: var(
+        --article-item-active-hover-bg,
+        #{colors.$black}
+      );
+      --article-item-sibling-hover-bg-color: var(
+        --article-item-hover-bg,
+        #{colors.$black}
+      );
       --article-item-dnd-bg-color: #{colors.$dnd-dark-color};
       --article-item-dnd-hover-bg-color: #{colors.$dnd-dark-hover};
       --article-item-trash-icon-fill: #{colors.$gray-dark};
@@ -254,7 +311,7 @@
   color: var(--article-item-text-color);
 
   font-size: 13px;
-  font-weight: 600;
+  font-weight: var(--article-item-text-weight, 600);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -267,7 +324,7 @@
     margin-inline-start: 12px !important;
     line-height: 20px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: var(--article-item-text-weight, 600);
   }
 }
 
@@ -345,7 +402,8 @@
   width: 100%;
   height: 100%;
 
-  border-radius: 3px;
+  border-radius: var(--article-item-border-radius, 3px);
+  background-color: var(--article-item-bg, transparent);
 
   min-height: 36px;
   max-height: 36px;
@@ -381,6 +439,10 @@
     &:hover:not(.animationReady):not(.animatedProgress) {
       background-color: var(--article-item-sibling-hover-bg-color);
     }
+
+    &.active:hover:not(.animationReady):not(.animatedProgress) {
+      background-color: var(--article-item-sibling-active-hover-bg-color);
+    }
   }
 
   &.dragging {
@@ -411,6 +473,7 @@
 
   position: relative;
   box-sizing: border-box;
+  margin-block-end: var(--sidebar-item-gap, 0);
 
   cursor: pointer;
 
@@ -496,3 +559,4 @@
     width: 100%;
   }
 }
+

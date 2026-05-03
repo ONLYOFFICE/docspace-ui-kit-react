@@ -50,41 +50,53 @@
   --toast-warning-bg: #{$light-toast-alert};
   --toast-warning-border: none;
 
+  --status-message-background: var(--status-message-bg, var(--toast-error-bg));
+  --status-message-box-shadow: var(--status-message-shadow, var(--toast-box-shadow));
+  --status-message-border-style: var(--status-message-border, var(--toast-error-border));
+  --status-message-color: var(--status-message-text, var(--toastr-text-color));
+  --status-message-icon-fill: var(--status-message-icon, var(--toastr-svg-error-color));
+  --status-message-icon-warning-fill: var(--status-message-warning-icon, var(--toastr-svg-warning-color));
+  --status-message-border-radius: var(--status-message-radius, 6px);
+  --status-message-inner-padding: var(--status-message-padding, 8px 12px);
+  --status-message-inner-gap: var(--status-message-gap, 12px);
+  --status-message-bottom-margin: var(--status-message-margin-bottom, 16px);
+  --status-message-width: var(--status-message-max-width, 1200px);
+
   box-sizing: border-box;
   width: 100%;
-  max-width: 1200px;
-  padding: 8px 12px;
-  background: var(--toast-error-bg);
-  box-shadow: var(--toast-box-shadow);
-  border-radius: 6px;
-  border: var(--toast-error-border);
+  max-width: var(--status-message-width);
+  padding: var(--status-message-inner-padding);
+  background: var(--status-message-background);
+  box-shadow: var(--status-message-box-shadow);
+  border-radius: var(--status-message-border-radius);
+  border: var(--status-message-border-style);
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: var(--status-message-inner-gap);
+  margin-bottom: var(--status-message-bottom-margin);
   color: black;
   animation: SlideIn 0.3s ease-in-out;
   opacity: 1;
   transition: opacity 0.3s ease-in-out;
 
   p {
-    color: var(--toastr-text-color);
+    color: var(--status-message-color);
   }
   &.hide {
     opacity: 0;
   }
 
   svg path {
-    fill: var(--toastr-svg-error-color);
+    fill: var(--status-message-icon-fill);
   }
 }
 
 .warning {
-  background: var(--toast-warning-bg);
-  border: var(--toast-warning-border);
+  background: var(--status-message-warning-bg, var(--toast-warning-bg));
+  border: var(--status-message-warning-border-style, var(--toast-warning-border));
 
   svg path {
-    fill: var(--toastr-svg-warning-color);
+    fill: var(--status-message-icon-warning-fill);
   }
 }
 

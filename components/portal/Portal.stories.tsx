@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -90,6 +90,65 @@ import { Portal } from "@docspace/ui-kit/components/portal";
 type Story = StoryObj<ComponentProps<typeof Portal>>;
 
 export default meta;
+
+const CssCustomizationTemplate = () => {
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+
+  return (
+    <div
+      ref={setContainer}
+      className={styles.customContainer}
+      style={
+        {
+          // === Portal popup element ===
+          "--portal-popup-bg": "#e6f3fb",
+          "--portal-popup-shadow": "0 4px 16px rgba(0, 130, 201, 0.3)",
+          "--portal-popup-radius": "12px",
+          "--portal-popup-padding": "24px 32px",
+          "--portal-popup-color": "#004f82",
+        } as CSSProperties
+      }
+    >
+      <p>Portal target container</p>
+      {container && (
+        <Portal
+          element={
+            <div className={styles.popup}>
+              Custom styled portal content
+            </div>
+          }
+          appendTo={container}
+        />
+      )}
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for the popup demo element used in Portal stories:
+
+**Portal popup (demo element)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--portal-popup-bg\` | Popup background color | \`#ffffff\` |
+| \`--portal-popup-shadow\` | Popup box shadow | \`0 4px 12px rgba(0,0,0,0.15)\` |
+| \`--portal-popup-radius\` | Popup border radius | \`6px\` |
+| \`--portal-popup-padding\` | Popup inner padding | \`20px\` |
+| \`--portal-popup-color\` | Popup text color | theme-based |
+| \`--portal-popup-z-index\` | Popup z-index | \`1000\` |
+
+> The Portal component itself is a DOM escape hatch — it has no visual styling of its own.
+> These CSS vars apply to the \`.popup\` demo element used in stories.
+> Set them on the portal target container or on \`document.body\` to customize portal content.`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   render: (args) => {

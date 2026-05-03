@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -261,6 +261,44 @@ const CustomStylingTemplate = () => {
       />
     </Wrapper>
   );
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          flexDirection: "column",
+          gap: "8px",
+          "--radio-button-dot-color": "#7c3aed",
+          "--radio-button-circle-color": "#7c3aed",
+          "--radio-button-circle-hover-color": "#6d28d9",
+          "--radio-button-gap": "16px",
+        } as CSSProperties
+      }
+    >
+      <RadioButton name="custom" value="1" label="Custom option 1" isChecked />
+      <RadioButton name="custom" value="2" label="Custom option 2" />
+      <RadioButton name="custom" value="3" label="Custom option 3" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--radio-button-dot-color\` | Fill color of the selected dot | theme token |
+| \`--radio-button-circle-color\` | Stroke color of the radio circle | theme token |
+| \`--radio-button-circle-hover-color\` | Circle stroke color on hover | theme token |
+| \`--radio-button-background\` | Background fill of the radio circle | theme token |
+| \`--radio-button-label-color\` | Label text color | theme token |
+| \`--radio-button-gap\` | Gap between icon and label | \`8px\` |`,
+      },
+    },
+  },
 };
 
 export const CustomStyling: Story = {

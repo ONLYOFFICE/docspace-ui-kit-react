@@ -32,7 +32,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 640px;
 
   :global(.light) & {
     --empty-content-header-color: #{colors.$black};
@@ -47,6 +46,14 @@
     --empty-content-button-color-link: #{colors.$dark-link};
     --empty-content-button-color-text: #{colors.$white};
   }
+
+  --empty-content-header-color-value: var(--empty-screen-header-color, var(--empty-content-header-color));
+  --empty-content-description-color-value: var(--empty-screen-description-color, var(--empty-content-description-color));
+  --empty-content-button-link-value: var(--empty-screen-link-color, var(--empty-content-button-color-link));
+  --empty-content-button-text-value: var(--empty-screen-text-color, var(--empty-content-button-color-text));
+  --empty-screen-max-width: var(--empty-screen-width, 640px);
+
+  width: var(--empty-screen-max-width);
 
   & > * {
     margin-bottom: 0;
@@ -82,14 +89,14 @@
 
   .header {
     font-size: 16px;
-    color: var(--empty-content-header-color);
+    color: var(--empty-content-header-color-value);
     text-align: center;
   }
 
   .description {
     line-height: 18px;
     margin-top: 8px;
-    color: var(--empty-content-description-color);
+    color: var(--empty-content-description-color-value);
     text-align: center;
   }
 
@@ -102,15 +109,15 @@
 
     svg {
       path {
-        fill: var(--empty-content-button-color-link);
+        fill: var(--empty-content-button-link-value);
       }
     }
 
     a {
-      color: var(--empty-content-button-color-link);
+      color: var(--empty-content-button-link-value);
     }
     span {
-      color: var(--empty-content-button-color-text);
+      color: var(--empty-content-button-text-value);
     }
   }
 

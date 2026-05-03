@@ -139,6 +139,64 @@ type Story = StoryObj<ComponentProps<typeof CircleSkeleton>>;
 
 export default meta;
 
+export const CssCustomization: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+      <CircleSkeleton
+        width="40"
+        height="40"
+        radius="20"
+        x="20"
+        y="20"
+        backgroundColor="#0082c9"
+        foregroundColor="#cce5f6"
+        backgroundOpacity={0.15}
+        foregroundOpacity={0.3}
+      />
+      <CircleSkeleton
+        width="56"
+        height="56"
+        radius="28"
+        x="28"
+        y="28"
+        backgroundColor="#0082c9"
+        foregroundColor="#cce5f6"
+        backgroundOpacity={0.15}
+        foregroundOpacity={0.3}
+      />
+      <CircleSkeleton
+        width="80"
+        height="80"
+        radius="40"
+        x="40"
+        y="40"
+        backgroundColor="#0082c9"
+        foregroundColor="#cce5f6"
+        backgroundOpacity={0.15}
+        foregroundOpacity={0.3}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `The CircleSkeleton component uses props for styling (no CSS custom properties):
+
+| Prop | Description | Default |
+|------|-------------|---------|
+| \`backgroundColor\` | Skeleton background color | theme-based |
+| \`foregroundColor\` | Skeleton shimmer color | theme-based |
+| \`backgroundOpacity\` | Background opacity | \`0.1\` |
+| \`foregroundOpacity\` | Foreground opacity | \`0.15\` |
+| \`radius\` | Circle radius in SVG units | \`12\` |
+| \`x\` / \`y\` | Circle center coordinates | \`3\` / \`12\` |
+| \`speed\` | Animation speed (seconds) | \`2\` |
+| \`animate\` | Toggle animation | \`true\` |`,
+      },
+    },
+  },
+};
+
 export const Default: Story = {
   render: (args) => <CircleSkeleton {...args} />,
   args: {

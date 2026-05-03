@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -351,6 +351,49 @@ export const WithCustomWidth: Story = {
       },
       source: {
         code: `<LinkWithDropdown data={items} manualWidth="300px">Custom Width Link</LinkWithDropdown>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--link-with-dropdown-color": "#7c3aed",
+          "--link-with-dropdown-hover-color": "#5b21b6",
+          "--link-with-dropdown-hover-bg": "#ede9fe",
+          "--link-with-dropdown-radius": "8px",
+          "--link-with-dropdown-padding": "6px 12px",
+        } as CSSProperties
+      }
+    >
+      <LinkWithDropdown
+        data={dropdownItems}
+        fontSize="13px"
+        withExpander
+        directionY="bottom"
+        fixedDirection
+        isDefaultMode={false}
+      >
+        Customized Link
+      </LinkWithDropdown>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--link-with-dropdown-color\` | Default text color | theme gray |
+| \`--link-with-dropdown-hover-color\` | Hover text color | theme dark gray |
+| \`--link-with-dropdown-hover-bg\` | Hover/open background | theme light mid |
+| \`--link-with-dropdown-disabled-color\` | Disabled text color | theme gray |
+| \`--link-with-dropdown-radius\` | Border radius | \`3px\` |
+| \`--link-with-dropdown-padding\` | Inner padding | \`4px 8px\` |`,
       },
     },
   },

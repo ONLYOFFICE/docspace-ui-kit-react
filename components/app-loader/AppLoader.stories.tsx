@@ -24,6 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { CSSProperties } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import AppLoader from "./index";
@@ -58,6 +60,35 @@ import AppLoader from "@docspace/ui-kit/components/app-loader";
 type Story = StoryObj<typeof AppLoader>;
 
 export default meta;
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--app-loader-bg": "#e6f3fb",
+          "--app-loader-z-index": "100",
+        } as CSSProperties
+      }
+    >
+      <div style={{ width: "500px", height: "500px", position: "relative" }}>
+        <AppLoader />
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--app-loader-bg\` | Background color of the overlay | white / black |
+| \`--app-loader-z-index\` | Stack order of the overlay | \`5000\` |`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   render: () => (

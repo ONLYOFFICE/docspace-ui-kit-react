@@ -40,10 +40,11 @@ type WalletProps = {
   onSetDocumentTitle?: (title: string) => void;
   showPortalSettingsLoader?: boolean;
   isUpdatingTariff?: boolean;
+  integrationUrl?: string;
 };
 
 const Wallet = observer((props: WalletProps) => {
-  const { showPortalSettingsLoader } = props;
+  const { showPortalSettingsLoader, integrationUrl } = props;
 
   const paymentStore = usePaymentStore();
   const {
@@ -59,7 +60,7 @@ const Wallet = observer((props: WalletProps) => {
   const shouldShowLoader = !isInitWalletPage;
 
   useEffect(() => {
-    walletInit(t);
+    walletInit(t, integrationUrl);
   }, []);
 
   useEffect(() => {

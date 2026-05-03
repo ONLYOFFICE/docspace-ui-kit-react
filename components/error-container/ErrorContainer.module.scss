@@ -39,7 +39,11 @@
     --error-container-link-color: #{colors.$dark-link};
   }
 
-  background: var(--error-container-background);
+  --error-container-bg-value: var(--error-container-bg, var(--error-container-background));
+  --error-container-text-value: var(--error-container-text, var(--error-container-body-text));
+  --error-container-link-value: var(--error-container-link, var(--error-container-link-color));
+
+  background: var(--error-container-bg-value);
   cursor: default;
   width: auto;
   height: 100%;
@@ -86,7 +90,7 @@
   }
 
   :global(#customized-text) {
-    color: var(--error-container-body-text);
+    color: var(--error-container-text-value);
   }
 
   @media (min-width: 1024px) {

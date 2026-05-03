@@ -28,6 +28,13 @@
   color: var(--payment-credit-color);
 }
 
+.transactionBodyWrapper {
+  width: 100%;
+  min-width: 0;
+  contain: inline-size;
+  max-width: var(--transaction-body-max-width, 1280px);
+}
+
 .transactionHistoryTitle {
   margin-bottom: 10px;
 }

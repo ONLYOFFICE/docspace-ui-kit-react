@@ -46,11 +46,19 @@
     --section-tablet-padding: -24px;
   }
 
+  // bridge vars — bind public overrides to internal theme tokens
+  --section-header-height-v: var(--section-header-size, var(--section-header-height));
+  --section-header-height-tablet-v: var(--section-header-tablet-size, var(--section-header-height-tablet));
+  --section-header-height-mobile-v: var(--section-header-mobile-size, var(--section-header-height-mobile));
+  --section-bg-v: var(--section-bg, var(--section-header-bg));
+  --section-desktop-padding-v: var(--section-content-padding, var(--section-desktop-padding));
+  --section-tablet-padding-v: var(--section-content-tablet-padding, var(--section-tablet-padding));
+
   position: relative;
   display: flex;
 
-  height: var(--section-header-height);
-  min-height: var(--section-header-height);
+  height: var(--section-header-height-v);
+  min-height: var(--section-header-height-v);
 
   box-sizing: border-box;
 
@@ -61,8 +69,8 @@
   max-width: 100%;
 
   @include mixins.tablet-and-below {
-    height: var(--section-header-height-tablet);
-    min-height: var(--section-header-height-tablet);
+    height: var(--section-header-height-tablet-v);
+    min-height: var(--section-header-height-tablet-v);
 
     :global {
       .header-container {
@@ -73,8 +81,8 @@
   }
 
   @include mixins.mobile {
-    height: var(--section-header-height-mobile);
-    min-height: var(--section-header-height-mobile);
+    height: var(--section-header-height-mobile-v);
+    min-height: var(--section-header-height-mobile-v);
     margin-inline-end: 0;
   }
 
@@ -86,10 +94,13 @@
 }
 
 .footer {
-  margin-top: 40px;
+  --section-footer-margin-v: var(--section-footer-margin, 40px);
+  --section-footer-margin-mobile-v: var(--section-footer-margin-mobile, 32px);
+
+  margin-top: var(--section-footer-margin-v);
 
   @include mixins.mobile {
-    margin-top: 32px;
+    margin-top: var(--section-footer-margin-mobile-v);
   }
 }
 
@@ -124,9 +135,14 @@
     --info-panel-border: #{colors.$gray-dark-strong};
   }
 
+  // bridge vars — bind public overrides to internal theme tokens
+  --info-panel-blur-v: var(--info-panel-backdrop, var(--info-panel-blur-color));
+  --info-panel-bg-v: var(--info-panel-background, var(--info-panel-bg));
+  --info-panel-border-v: var(--info-panel-border-color, var(--info-panel-border));
+
   height: auto;
   width: auto;
-  background: var(--info-panel-blur-color);
+  background: var(--info-panel-blur-v);
   z-index: 300;
 
   @include mixins.tablet-and-below {
@@ -141,10 +157,14 @@
 }
 
 .infoPanel {
+  // bridge vars for hardcoded widths
+  --info-panel-width-v: var(--info-panel-width, 400px);
+  --info-panel-tablet-width-v: var(--info-panel-tablet-width, 480px);
+
   height: 100%;
-  width: 400px;
-  background-color: var(--info-panel-bg);
-  border-inline-start: 1px solid var(--info-panel-border);
+  width: var(--info-panel-width-v);
+  background-color: var(--info-panel-bg-v);
+  border-inline-start: 1px solid var(--info-panel-border-v);
   display: flex;
   flex-direction: column;
 
@@ -158,7 +178,7 @@
     position: absolute;
     border: none;
     inset-inline-end: 0;
-    width: 480px;
+    width: var(--info-panel-tablet-width-v);
     max-width: calc(100vw - 69px);
   }
 
@@ -173,7 +193,7 @@
     position: absolute;
     border: none;
     inset-inline-end: 0;
-    width: 480px;
+    width: var(--info-panel-tablet-width-v);
     max-width: calc(100vw - 69px);
 
     @include mixins.mobile {
@@ -186,7 +206,7 @@
 
 .spacer {
   display: none;
-  min-height: 64px;
+  min-height: var(--section-mobile-footer-height, 64px);
 
   @include mixins.tablet-and-below {
     display: block;
@@ -194,7 +214,9 @@
 }
 
 .submenu {
-  background: var(--section-header-bg);
+  --section-bg-v: var(--section-bg, var(--section-header-bg));
+
+  background: var(--section-bg-v);
   width: 100%;
   z-index: 1;
 
@@ -349,10 +371,10 @@
   }
 
   &.withScroll {
-    margin-inline-start: var(--section-desktop-padding);
+    margin-inline-start: var(--section-desktop-padding-v, var(--section-desktop-padding));
 
     @include mixins.tablet-and-below {
-      margin-inline-start: var(--section-tablet-padding);
+      margin-inline-start: var(--section-tablet-padding-v, var(--section-tablet-padding));
     }
   }
 }
@@ -361,10 +383,10 @@
   max-width: 100vw !important;
 
   &.withScroll {
-    margin-inline-start: var(--section-desktop-padding);
+    margin-inline-start: var(--section-desktop-padding-v, var(--section-desktop-padding));
 
     @include mixins.tablet-and-below {
-      margin-inline-start: var(--section-tablet-padding);
+      margin-inline-start: var(--section-tablet-padding-v, var(--section-tablet-padding));
     }
   }
 
@@ -379,7 +401,7 @@
       width: 100%;
       position: sticky;
       top: var(--nav-offset, 0);
-      background: var(--section-header-bg);
+      background: var(--section-bg-v, var(--section-header-bg));
       padding-inline-end: 0;
       z-index: 201;
 
@@ -402,9 +424,11 @@
 }
 
 .isFixed {
+  --section-bg-v: var(--section-bg, var(--section-header-bg));
+
   position: sticky;
   top: 61px;
-  background: var(--section-header-bg);
+  background: var(--section-bg-v);
   z-index: 200;
   padding: 0 16px;
   margin: 0 -16px !important;
@@ -423,6 +447,8 @@
 // }
 
 .sectionContainer {
+  --section-bg-v: var(--section-bg, var(--section-header-bg));
+
   position: relative;
 
   flex-grow: 1;
@@ -474,7 +500,7 @@
     .section-sticky-container {
       position: sticky;
       top: 0;
-      background: var(--section-header-bg);
+      background: var(--section-bg-v, var(--section-header-bg));
       z-index: 201;
       padding-inline: 20px;
       margin-inline: -20px -17px;
