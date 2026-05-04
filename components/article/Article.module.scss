@@ -99,7 +99,7 @@
   flex-direction: column;
   gap: 8px;
   position: relative;
-  margin-bottom: 11px;
+  margin-bottom: 16px;
 
   &[data-with-dev-tools="false"]:not([data-with-custom-slot="true"]) {
     margin-top: auto;
@@ -576,7 +576,7 @@
 
   &[data-with-main-button="false"] {
     :global(.article-body__scrollbar) {
-      height: calc(100% - 150px) !important;
+      height: calc(100% - 142px) !important;
 
       @include mixins.tablet {
         height: calc(100% - 190px) !important;
