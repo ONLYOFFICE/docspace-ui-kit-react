@@ -31,6 +31,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import PeopleIcon from "../../assets/icons/16/people.react.svg";
 
 import { Card } from "./Card";
+import styles from "./Card.module.scss";
 
 const meta = {
   title: "UI/Data display/Card",
@@ -55,7 +56,7 @@ import { Card } from "@docspace/ui-kit/components/card";
 
 <Card
   title="Card title"
-  extra={<span style={{ color: "#2db482" }}>✓ Connected</span>}
+  extra={<span className="card-connected-status">Connected</span>}
 >
   Description text goes here.
 </Card>
@@ -84,11 +85,7 @@ export const Default: Story = {
 export const WithExtra: Story = {
   args: {
     title: "AI analysis is ready",
-    extra: (
-      <span style={{ color: "#2db482", fontSize: "12px", fontWeight: 600 }}>
-        ✓ Connected
-      </span>
-    ),
+    extra: <span className={styles.connectedStatus}>Connected</span>,
     children: "Analyze data with Ask AI, create charts, and uncover insights.",
   },
   parameters: {
@@ -172,9 +169,7 @@ const FullExampleTemplate = () => (
       </span>
     }
     extra={
-      <span style={{ color: "#2db482", fontSize: "12px", fontWeight: 600 }}>
-        ✓ Connected
-      </span>
+      <span className={styles.connectedStatus}>Connected</span>
     }
   >
     <p style={{ margin: 0 }}>

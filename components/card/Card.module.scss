@@ -72,3 +72,11 @@
   font-size: 12px;
   color: var(--card-body-color);
 }
+
+.connectedStatus {
+  --card-connected-color: var(--status-positive-color, #{colors.$main-green});
+
+  color: var(--card-connected-color);
+  font-size: 12px;
+  font-weight: 600;
+}
