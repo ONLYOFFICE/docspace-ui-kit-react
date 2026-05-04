@@ -112,7 +112,7 @@ const ProgressList = ({
       {operations.map((item) => (
         <div
           key={getOperationKey(item)}
-          className="progress-list"
+          className={`progress-list ${item.showPanel ? "withHover" : ""}`}
         >
           <ProgressBar
             completed={item.completed}
@@ -120,7 +120,12 @@ const ProgressList = ({
             alert={item.alert}
             open
             icon={getIcon(item.operation)}
-            onClickAction={() => {}}
+            onOpenPanel={() => {
+              if (item.showPanel) {
+                item.showPanel(true);
+                onOpenPanel();
+              }
+            }}
             withoutProgress
             onClearProgress={(operationId, operation) =>
               clearOperationsData?.(operationId, operation, item)
