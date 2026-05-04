@@ -224,7 +224,6 @@
 }
 
 .heading {
-  // bridge vars — bind public overrides to internal theme tokens / hardcoded values
   --navigation-heading-weight-v: var(--navigation-heading-weight, 700);
   --navigation-heading-size-v: var(--navigation-heading-size, 18px);
   --navigation-title-color-v: var(--navigation-title-color, var(--navigation-root-folder-title-color));
@@ -271,7 +270,6 @@
 }
 
 .titleBlockBadge {
-  // bridge vars
   --navigation-badge-fill-v: var(--navigation-badge-fill, var(--navigation-header-icon-fill));
   --navigation-title-color-v: var(--navigation-title-color, var(--navigation-root-folder-title-color));
 
@@ -289,7 +287,6 @@
 }
 
 .expanderIcon {
-  // bridge var
   --navigation-expander-fill-v: var(--navigation-expander-fill, var(--navigation-expander-color));
 
   min-width: 8px !important;
@@ -309,7 +306,6 @@
 }
 
 .arrowIcon {
-  // bridge var
   --navigation-arrow-fill-v: var(--navigation-arrow-fill, var(--navigation-root-folder-title-color));
 
   height: 12px;
