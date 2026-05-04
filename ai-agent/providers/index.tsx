@@ -27,21 +27,22 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import {
-  EventsProvider,
-  SettingsProvider,
-  PlatformProvider,
-  I18nProvider,
-  ComponentsProvider,
-  StoresProvider,
-  ThemeProvider,
-  ImagesProvider,
-  ToolsProvider,
-  StorageProvider,
+  ApiProvider,
   CallbacksManager,
   ChatEventBus,
+  ComponentsProvider,
+  DEFAULT_SERVER_API_ROUTES,
+  EventsProvider,
+  I18nProvider,
+  ImagesProvider,
   MiddlewareRunner,
+  PlatformProvider,
   Servers,
-  Provider,
+  StoresProvider,
+  ThemeProvider,
+  ToolsProvider,
+  WidgetConfigProvider,
+  createServerAPI,
   createStores,
   useProfiles,
   useServers,
@@ -49,13 +50,14 @@ import {
 } from "@onlyoffice/ai-chat";
 import type {
   ChatCallbacks,
+  HostTool,
   ProviderType,
+  ServerAPIConfig,
   WebSearchProviderId,
 } from "@onlyoffice/ai-chat";
 
 import "@onlyoffice/ai-chat/styles";
 
-import { settingsAdapter } from "./settings";
 import { storageAdapter } from "./storage";
 import { platformAdapter, notifyEnvironmentChange } from "./platform";
 import { storeKeys } from "./stores";
@@ -68,7 +70,6 @@ import {
   fileManagementTools,
   type EditorToolsChangedDetail,
 } from "./host-tool-groups";
-import type { HostTool } from "@onlyoffice/ai-chat";
 
 type AiAgentProvidersProps = {
   locale: string;
@@ -78,9 +79,20 @@ type AiAgentProvidersProps = {
   children: ReactNode;
 };
 
+// Server-mode API config: backend is mounted at the same origin as the
+// client under /api/2.0/new-ai. Engines are intentionally not constructed
+// — every method call goes over HTTP via createServerAPI / ApiProvider.
+const SERVER_API_BASE_URL = "/api/2.0/new-ai";
+
+const buildServerApiConfig = (): ServerAPIConfig => ({
+  origin: window.location.origin,
+  baseUrl: SERVER_API_BASE_URL,
+  routes: DEFAULT_SERVER_API_ROUTES,
+});
+
 // Hydrates Zustand stores (profiles, threads, prompts, servers/tools) from
-// the storage adapter on mount. Lives inside StoresProvider + ToolsProvider
-// so it can read the stores/servers context. Without this, persisted data
+// the server on mount. Lives inside StoresProvider + ToolsProvider so it
+// can read the stores/servers context. Without this, persisted data
 // (like AI profiles) would only appear after the first in-session write.
 const StoresHydrator = () => {
   useProfiles({ isReady: true });
@@ -127,20 +139,15 @@ const AiAgentProviders = ({
     [editorTools],
   );
 
-  const { stores, ctx } = useMemo(() => {
-    const provider = new Provider();
-    provider.setSettings(settingsAdapter);
-
+  const { stores, ctx, serverApiConfig } = useMemo(() => {
     const eventBus = new ChatEventBus();
     const callbacksManager = new CallbacksManager();
     const middlewareRunner = new MiddlewareRunner([]);
-    const servers = new Servers(settingsAdapter, platformAdapter, eventBus);
+    const servers = new Servers(platformAdapter, eventBus);
 
     const appCtx = {
-      settings: settingsAdapter,
       storage: storageAdapter,
       platform: platformAdapter,
-      provider,
       servers,
       eventBus,
       callbacksManager,
@@ -160,49 +167,52 @@ const AiAgentProviders = ({
         : undefined,
     };
 
-    const appStores = createStores({ keys: storeKeys, ctx: appCtx });
+    const config = buildServerApiConfig();
+    // No `engines` argument → every method call routes over HTTP to the
+    // backend mounted at `${origin}${baseUrl}`.
+    const api = createServerAPI(config);
+    const appStores = createStores({ keys: storeKeys, ctx: appCtx, api });
 
-    return { stores: appStores, ctx: appCtx };
+    return { stores: appStores, ctx: appCtx, serverApiConfig: config };
   }, [isStandalone]);
 
   useEffect(() => {
     attachHostToolsRuntime({
       servers: ctx.servers,
       useServersStore: stores.useServersStore,
-      provider: ctx.provider,
       eventBus: ctx.eventBus,
     });
-  }, [ctx.servers, ctx.provider, ctx.eventBus, stores.useServersStore]);
+  }, [ctx.servers, ctx.eventBus, stores.useServersStore]);
 
   return (
     <EventsProvider
       callbacksManager={ctx.callbacksManager}
       callbacks={callbacks}
     >
-      <SettingsProvider settings={settingsAdapter}>
-        <PlatformProvider platform={platformAdapter}>
-          <I18nProvider locale={aiChatLocale}>
-            <ComponentsProvider>
-              <StoresProvider stores={stores}>
-                <ThemeProvider theme={theme} customThemes={portalThemes}>
-                  <ImagesProvider>
-                    <ToolsProvider
-                      hostToolGroups={hostToolGroups}
-                      servers={ctx.servers}
-                      eventBus={ctx.eventBus}
-                    >
-                      <StorageProvider storage={storageAdapter}>
+      <PlatformProvider platform={platformAdapter}>
+        <I18nProvider locale={aiChatLocale}>
+          <ComponentsProvider>
+            <WidgetConfigProvider config={{}}>
+              <ApiProvider config={serverApiConfig}>
+                <StoresProvider stores={stores}>
+                  <ThemeProvider theme={theme} customThemes={portalThemes}>
+                    <ImagesProvider>
+                      <ToolsProvider
+                        hostToolGroups={hostToolGroups}
+                        servers={ctx.servers}
+                        eventBus={ctx.eventBus}
+                      >
                         <StoresHydrator />
                         {children}
-                      </StorageProvider>
-                    </ToolsProvider>
-                  </ImagesProvider>
-                </ThemeProvider>
-              </StoresProvider>
-            </ComponentsProvider>
-          </I18nProvider>
-        </PlatformProvider>
-      </SettingsProvider>
+                      </ToolsProvider>
+                    </ImagesProvider>
+                  </ThemeProvider>
+                </StoresProvider>
+              </ApiProvider>
+            </WidgetConfigProvider>
+          </ComponentsProvider>
+        </I18nProvider>
+      </PlatformProvider>
     </EventsProvider>
   );
 };

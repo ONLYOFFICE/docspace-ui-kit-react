@@ -35,10 +35,6 @@ type ServersLike = {
   hostToolSource: { setGroups: (groups: HostToolGroup[]) => void };
 };
 
-type ProviderLike = {
-  setCurrentProviderTools: (tools: ServersStoreState["tools"]) => void;
-};
-
 type ServersStoreHook = {
   getState: () => ServersStoreState;
 };
@@ -46,7 +42,6 @@ type ServersStoreHook = {
 type ToolsRuntime = {
   servers: ServersLike;
   useServersStore: ServersStoreHook;
-  provider: ProviderLike;
   eventBus: ChatEventBus;
 };
 
@@ -69,13 +64,13 @@ const syncChatLibTools = async (groups: HostToolGroup[]) => {
     );
     return;
   }
-  const { servers, useServersStore, provider, eventBus } = toolsRuntime;
+  const { servers, useServersStore, eventBus } = toolsRuntime;
   servers.hostToolSource.setGroups(groups);
   await useServersStore.getState().getTools();
   const storeTools = useServersStore.getState().tools;
-  provider.setCurrentProviderTools(storeTools);
-  // Notify the chat lib's own listeners (ChatInput's tools settings dropdown,
-  // etc.) — this is the event the lib fires internally when MCP tools change.
+  // 0.2.5 reads tools fresh from the servers store on each send — no
+  // provider singleton to push into. Just notify the chat lib's listeners
+  // (ChatInput's tools settings dropdown, etc.) that the list changed.
   eventBus.emit("tools-changed");
   console.log(
     "%c[host-tool-groups] syncChatLibTools done",
