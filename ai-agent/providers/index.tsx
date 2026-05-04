@@ -60,12 +60,18 @@ import "@onlyoffice/ai-chat/styles";
 
 import { storageAdapter } from "./storage";
 import { platformAdapter, notifyEnvironmentChange } from "./platform";
+import { componentOverrides } from "./components-overrides";
 import { storeKeys } from "./stores";
 import { normalizeAiChatLocale } from "./locale";
 import { portalThemes } from "./themes";
 import {
   EDITOR_TOOLS_EVENT,
   attachHostToolsRuntime,
+  attachFilesApi,
+  attachFoldersApi,
+  attachAgentRoomId,
+  attachOpenResultFile,
+  attachCloseEditorPanel,
   buildEditorToolGroup,
   fileManagementTools,
   type EditorToolsChangedDetail,
@@ -76,6 +82,9 @@ type AiAgentProvidersProps = {
   theme?: string;
   callbacks?: ChatCallbacks;
   isStandalone?: boolean;
+  getAgentRoomId?: () => number | null;
+  openResultFile?: (fileId: number | string) => void;
+  closeEditorPanel?: () => void;
   children: ReactNode;
 };
 
@@ -106,6 +115,9 @@ const AiAgentProviders = ({
   theme,
   callbacks,
   isStandalone,
+  getAgentRoomId,
+  openResultFile,
+  closeEditorPanel,
   children,
 }: AiAgentProvidersProps) => {
   const aiChatLocale = normalizeAiChatLocale(locale);
@@ -183,6 +195,18 @@ const AiAgentProviders = ({
       eventBus: ctx.eventBus,
     });
   }, [ctx.servers, ctx.eventBus, stores.useServersStore]);
+
+  useEffect(() => {
+    if (getAgentRoomId) attachAgentRoomId(getAgentRoomId);
+  }, [getAgentRoomId]);
+
+  useEffect(() => {
+    if (openResultFile) attachOpenResultFile(openResultFile);
+  }, [openResultFile]);
+
+  useEffect(() => {
+    if (closeEditorPanel) attachCloseEditorPanel(closeEditorPanel);
+  }, [closeEditorPanel]);
 
   return (
     <EventsProvider

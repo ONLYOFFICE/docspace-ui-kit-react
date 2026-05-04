@@ -24,27 +24,16 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { ChatPage } from "@onlyoffice/ai-chat";
+.iconButtonWithLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  height: 32px;
 
-import styles from "./NewChat.module.scss";
-
-const NewChat = () => {
-  return (
-    <div
-      className={styles.newChat}
-      style={{
-        marginTop: "48px",
-        flex: 1,
-        minHeight: 0,
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      <ChatPage />
-    </div>
-  );
-};
-
-export default NewChat;
-
+  &:hover {
+    background-color: var(--chat-input-tools-button-hover-background);
+  }
+}
