@@ -75,6 +75,7 @@ const getIcon = (icon: string): React.ReactNode => {
     case OPERATIONS_NAME.move:
       return <MoveIcon />;
     case OPERATIONS_NAME.upload:
+    case OPERATIONS_NAME.syncDatabase:
       return <UploadIcon />;
     case OPERATIONS_NAME.trash:
     case OPERATIONS_NAME.deleteVersionFile:
@@ -146,7 +147,6 @@ const ProgressList = ({
             percent={item.percent}
             open
             icon={getIcon(item.operation)}
-            onClickAction={() => {}}
             onClearProgress={clearPanelOperationsData}
             operation={item.operation}
             onCancel={onCancel}
