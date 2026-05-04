@@ -30,7 +30,7 @@
   "dependencies": {
     "@babel/runtime": "7.28.3",
     "@floating-ui/dom": "1.6.13",
-    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.2.5.tgz",
+    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.2.8.tgz",
     "@onlyoffice/docspace-api-sdk": "file:onlyoffice-docspace-api-sdk-3.6.0.tgz",
     "@onlyoffice/document-editor-react": "2.1.1",
     "@socket.io/component-emitter": "3.1.2",
