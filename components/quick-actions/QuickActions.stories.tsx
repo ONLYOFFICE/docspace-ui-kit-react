@@ -27,10 +27,17 @@
 import type { ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import BlankPdfIcon from "../../assets/blank.pdf.react.svg";
+import CreateAgentIcon from "../../assets/create.agent.react.svg";
 import CreateDocumentIcon from "../../assets/create.document.react.svg";
 import CreateFormIcon from "../../assets/create.form.react.svg";
+import CreateFromTemplateIcon from "../../assets/create.from.template.react.svg";
+import CreateFromTextIcon from "../../assets/create.from.text.react.svg";
 import CreatePresentationIcon from "../../assets/create.presentation.react.svg";
 import CreateSpreadsheetIcon from "../../assets/create.spreadsheet.react.svg";
+import GeneratePdfAiIcon from "../../assets/generate.pdf.ai.react.svg";
+import GenerateWithAiIcon from "../../assets/generate.with.ai.react.svg";
+import UseTemplateIcon from "../../assets/use.template.react.svg";
 
 import { QuickActions } from "./index";
 import type { QuickActionItem } from "./QuickActions.types";
@@ -93,7 +100,7 @@ type Story = StoryObj<ComponentProps<typeof QuickActions>>;
 export default meta;
 
 const Wrapper = (props: { children: React.ReactNode }) => (
-  <div style={{ maxWidth: 720 }}>{props.children}</div>
+  <div style={{ maxWidth: 752 }}>{props.children}</div>
 );
 
 const documentItems: QuickActionItem[] = [
@@ -114,8 +121,49 @@ const documentItems: QuickActionItem[] = [
   },
   {
     icon: <CreateFormIcon />,
-    label: "Form",
-    onClick: () => console.log("New form"),
+    label: "PDF",
+    onClick: () => console.log("New PDF"),
+  },
+];
+
+const aiFormsItems: QuickActionItem[] = [
+  {
+    icon: <BlankPdfIcon />,
+    label: "Blank PDF form",
+    onClick: () => console.log("Blank PDF"),
+  },
+  {
+    icon: <GeneratePdfAiIcon />,
+    label: "Generate with AI",
+    onClick: () => console.log("Generate PDF with AI"),
+  },
+  {
+    icon: <CreateFromTextIcon />,
+    label: "From text file",
+    onClick: () => console.log("From text"),
+  },
+  {
+    icon: <CreateFromTemplateIcon />,
+    label: "Use template",
+    onClick: () => console.log("From template"),
+  },
+];
+
+const aiChatItems: QuickActionItem[] = [
+  {
+    icon: <CreateAgentIcon />,
+    label: "Create agent",
+    onClick: () => console.log("Create AI agent"),
+  },
+  {
+    icon: <GenerateWithAiIcon />,
+    label: "Generate with AI",
+    onClick: () => console.log("Generate with AI"),
+  },
+  {
+    icon: <UseTemplateIcon />,
+    label: "Use template",
+    onClick: () => console.log("Use template"),
   },
 ];
 
@@ -147,3 +195,59 @@ export const Default: Story = {
     },
   },
 };
+
+export const InAIForms: Story = {
+  render: (args) => (
+    <Wrapper>
+      <QuickActions {...args} />
+    </Wrapper>
+  ),
+  args: {
+    items: aiFormsItems,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Grid with PDF form creation tiles in AI Forms context.",
+      },
+      source: {
+        code: `<QuickActions
+  items={[
+    { icon: <BlankPdfIcon />, label: "Blank PDF form", onClick: () => {} },
+    { icon: <GeneratePdfAiIcon />, label: "Generate with AI", onClick: () => {} },
+    { icon: <CreateFromTextIcon />, label: "From text file", onClick: () => {} },
+    { icon: <CreateFromTemplateIcon />, label: "Use template", onClick: () => {} },
+  ]}
+/>`,
+      },
+    },
+  },
+};
+
+export const InAIChat: Story = {
+  render: (args) => (
+    <Wrapper>
+      <QuickActions {...args} />
+    </Wrapper>
+  ),
+  args: {
+    items: aiChatItems,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Grid with AI-powered action tiles in AI Chat context.",
+      },
+      source: {
+        code: `<QuickActions
+  items={[
+    { icon: <CreateAgentIcon />, label: "Create agent", onClick: () => {} },
+    { icon: <GenerateWithAiIcon />, label: "Generate with AI", onClick: () => {} },
+    { icon: <UseTemplateIcon />, label: "Use template", onClick: () => {} },
+  ]}
+/>`,
+      },
+    },
+  },
+};
+
