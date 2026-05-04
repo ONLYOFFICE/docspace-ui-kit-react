@@ -35,12 +35,17 @@ export function ActionButton<C extends ElementType = "button">({
   icon,
   className,
   label,
+  ref,
   ...rest
 }: ActionButtonProps<C>) {
   const Component: ElementType = as ?? "button";
 
   return (
-    <Component className={classNames(styles.actionButton, className)} {...rest}>
+    <Component
+      ref={ref}
+      className={classNames(styles.actionButton, className)}
+      {...rest}
+    >
       {icon ? <span className={styles.icon}>{icon}</span> : null}
       {label}
     </Component>
