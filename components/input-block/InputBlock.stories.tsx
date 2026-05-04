@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -350,6 +350,61 @@ export const WithIconClick: Story = {
   iconName={SearchIcon}
   onIconClick={() => alert("Icon clicked!")}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+          width: "300px",
+          "--text-input-bg": "#f5f3ff",
+          "--text-input-border-color": "#7c3aed",
+          "--text-input-color": "#4c1d95",
+          "--text-input-font-size": "14px",
+          "--text-input-radius": "8px",
+          "--input-block-icon-padding": "0 12px",
+        } as CSSProperties
+      }
+    >
+      <InputBlock
+        type={InputType.text}
+        iconName={SearchReactSvgUrl}
+        placeholder="Custom styled input"
+        value=""
+        onChange={() => {}}
+      />
+      <InputBlock
+        type={InputType.text}
+        iconName={SearchReactSvgUrl}
+        placeholder="With value"
+        value="Search term"
+        onChange={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--text-input-bg\` | Background color | theme token |
+| \`--text-input-border-color\` | Border color | theme token |
+| \`--text-input-color\` | Text color | theme token |
+| \`--text-input-font-size\` | Font size | \`13px\` |
+| \`--text-input-radius\` | Border radius | theme token |
+| \`--input-block-icon-padding\` | Icon end padding (base/middle) | \`8px\` |
+| \`--input-block-icon-padding-lg\` | Icon end padding (large) | \`12px\` |
+| \`--input-block-icon-start\` | Icon start padding | \`1px\` |
+| \`--input-block-children-padding\` | Children block padding | \`2px 0 2px 2px\` |`,
       },
     },
   },

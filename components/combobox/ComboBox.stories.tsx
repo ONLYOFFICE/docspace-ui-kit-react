@@ -26,7 +26,7 @@
 
 import type React from "react";
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -225,7 +225,9 @@ type Story = StoryObj<ComponentProps<typeof ComboBox>>;
 export default meta;
 
 const Wrapper = (props: { children: React.ReactNode }) => {
-  return <div style={{ height: "240px", padding: "20px" }}>{props.children}</div>;
+  return (
+    <div style={{ height: "240px", padding: "20px" }}>{props.children}</div>
+  );
 };
 
 const defaultOptions = [
@@ -432,10 +434,30 @@ const CustomStylingTemplate = () => {
     <Wrapper>
       <ComboBox
         options={[
-          { key: 1, label: "Critical", backgroundColor: "#FF4444", color: "#FFFFFF" },
-          { key: 2, label: "High", backgroundColor: "#FF8C00", color: "#FFFFFF" },
-          { key: 3, label: "Medium", backgroundColor: "#FFD700", color: "#000000" },
-          { key: 4, label: "Low", backgroundColor: "#90EE90", color: "#000000" },
+          {
+            key: 1,
+            label: "Critical",
+            backgroundColor: "#FF4444",
+            color: "#FFFFFF",
+          },
+          {
+            key: 2,
+            label: "High",
+            backgroundColor: "#FF8C00",
+            color: "#FFFFFF",
+          },
+          {
+            key: 3,
+            label: "Medium",
+            backgroundColor: "#FFD700",
+            color: "#000000",
+          },
+          {
+            key: 4,
+            label: "Low",
+            backgroundColor: "#90EE90",
+            color: "#000000",
+          },
         ]}
         selectedOption={{ key: 0, label: "Select Priority" }}
         noBorder
@@ -471,3 +493,66 @@ export const CustomStyling: Story = {
     },
   },
 };
+
+const baseOptions = [
+  { key: 1, label: "Option 1" },
+  { key: 2, label: "Option 2" },
+  { key: 3, label: "Option 3" },
+];
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--combobox-bg": "#f0f8ff",
+          "--combobox-open-bg": "#ede9fe",
+          "--combobox-border-color": "#0082c9",
+          "--combobox-hover-border-color": "#006ba6",
+          "--combobox-focus-border-color": "#006ba6",
+          "--combobox-radius": "12px",
+          "--combobox-inner-padding": "8px 0",
+          "--combobox-base-width": "220px",
+        } as CSSProperties
+      }
+    >
+      <ComboBox
+        options={baseOptions}
+        selectedOption={{ key: 0, label: "Select option" }}
+        size={ComboBoxSize.base}
+        onSelect={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--combobox-bg\` | Dropdown list background | theme-based |
+| \`--combobox-radius\` | Border radius | \`3px\` |
+| \`--combobox-inner-padding\` | Inner dropdown padding | \`4px 0\` |
+| \`--combobox-base-width\` | Width for base size | \`173px\` |
+| \`--combobox-open-bg\` | Background when open (noBorder mode) | theme-based |
+| \`--combobox-border-color\` | Button border color (normal) | theme-based |
+| \`--combobox-hover-border-color\` | Button border color on hover | theme-based |
+| \`--combobox-focus-border-color\` | Button border color when open/focused | theme-based |`,
+      },
+      source: {
+        code: `// Customize combobox via CSS variables
+<div style={{
+  "--combobox-bg": "#ffffff",
+  "--combobox-radius": "8px",
+  "--combobox-border-color": "#7d7d7d",
+  "--combobox-hover-border-color": "#00679e",
+  "--combobox-focus-border-color": "#00679e",
+}}>
+  <ComboBox options={options} selectedOption={selected} onSelect={handleSelect} />
+</div>`,
+      },
+    },
+  },
+};
+

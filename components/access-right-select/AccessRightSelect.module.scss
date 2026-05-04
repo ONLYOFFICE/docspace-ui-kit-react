@@ -32,12 +32,18 @@
 .wrapper {
   --text-color: #{colors.$black};
   --combobox-children-button-default-disabled-color: #{colors.$gray-strong};
-  
 
   :global(.dark) & {
     --text-color: #{colors.$white};
     --combobox-children-button-default-disabled-color: #{colors.$gray-dark};
   }
+
+  // bridge vars — bind public overrides to internal theme tokens
+  --access-right-select-text-v: var(--access-right-select-text, var(--text-color));
+  --access-right-select-disabled-icon-v: var(
+    --access-right-select-disabled-icon,
+    var(--combobox-children-button-default-disabled-color)
+  );
 
   &:not(.descriptive) {
     :global(.combo-button) {
@@ -57,7 +63,7 @@
     :global(.combo-buttons_arrow-icon),
     :global(.combo-button_selected-icon-container) {
       svg path {
-        fill: var(--text-color);
+        fill: var(--access-right-select-text-v);
       }
     }
 
@@ -65,7 +71,7 @@
       :global(.combo-buttons_arrow-icon),
       :global(.combo-button_selected-icon-container) {
         svg path {
-          fill: var(--combobox-children-button-default-disabled-color);
+          fill: var(--access-right-select-disabled-icon-v);
         }
       }
     }
@@ -87,11 +93,21 @@
   --access-right-select-description-color: #{colors.$gray};
   --drop-down-item-icon-color: #{colors.$black};
 
-
   :global(.dark) & {
     --access-right-select-description-color: #{colors.$gray-dark};
     --drop-down-item-icon-color: #{colors.$white};
   }
+
+  // bridge vars — bind public overrides to internal theme tokens
+  --access-right-select-description-v: var(
+    --access-right-select-description,
+    var(--access-right-select-description-color)
+  );
+  --access-right-select-icon-v: var(--access-right-select-icon, var(--drop-down-item-icon-color));
+  // new bridge vars for hardcoded values
+  --access-right-select-gap-v: var(--access-right-select-gap, 8px);
+  --access-right-select-padding-v: var(--access-right-select-item-padding, 7px 0);
+  --access-right-select-description-size-v: var(--access-right-select-description-size, 13px);
 
   width: auto;
 
@@ -99,9 +115,9 @@
   align-items: flex-start;
   justify-content: flex-start;
   align-content: center;
-  gap: 8px;
+  gap: var(--access-right-select-gap-v);
 
-  padding: 7px 0;
+  padding: var(--access-right-select-padding-v);
 
   line-height: 16px;
   font-style: normal;
@@ -109,17 +125,17 @@
   .itemDescription {
     margin: 1px 0;
 
-    font-size: 13px;
+    font-size: var(--access-right-select-description-size-v);
     font-style: normal;
     font-weight: 400;
     line-height: 16px;
-    color: var(--access-right-select-description-color);
+    color: var(--access-right-select-description-v);
     white-space: pre-line;
   }
 
   .itemIcon {
     path[fill] {
-      fill: var(--drop-down-item-icon-color);
+      fill: var(--access-right-select-icon-v);
     }
 
     &.isShortenIcon {

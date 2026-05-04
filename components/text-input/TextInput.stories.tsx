@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -438,6 +438,46 @@ const BoldTemplate = () => {
       <ControlledInput initialValue="Bold weight" isBold />
     </Wrapper>
   );
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+          width: "300px",
+          "--text-input-bg": "#f5f3ff",
+          "--text-input-border-color": "#7c3aed",
+          "--text-input-font-size": "14px",
+          "--text-input-radius": "8px",
+          "--text-input-color": "#4c1d95",
+        } as CSSProperties
+      }
+    >
+      <TextInput type={InputType.text} value="Custom styled input" onChange={() => {}} />
+      <TextInput type={InputType.text} value="" placeholder="Placeholder text" onChange={() => {}} />
+      <TextInput type={InputType.text} value="Disabled" isDisabled onChange={() => {}} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--text-input-bg\` | Background color | theme token |
+| \`--text-input-border-color\` | Border color | theme token |
+| \`--text-input-color\` | Text color | theme token |
+| \`--text-input-font-size\` | Font size (all sizes) | \`13px\` / \`16px\` |
+| \`--text-input-radius\` | Border radius | theme token |
+| \`--text-input-placeholder-color\` | Placeholder text color | theme token |`,
+      },
+    },
+  },
 };
 
 export const BoldText: Story = {

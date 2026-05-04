@@ -32,8 +32,8 @@
     .label.checked.disabled svg {
       rect {
         fill: var(
-          --color-scheme-main-accent,
-          var(--toggle-button-fill-color-default)
+          --toggle-button-checked-color,
+          var(--color-scheme-main-accent, var(--toggle-button-fill-color-default))
         ) !important;
       }
       circle {
@@ -66,13 +66,15 @@
 
 .container {
   --toggle-button-fill-color-default: #{$light-blue-main};
-  --toggle-button-fill-color-off: #{$gray-strong};
-  --toggle-button-hover-fill-color-off: #{$gray};
+  --toggle-button-fill-color-off: var(--toggle-button-off-color, #{$gray-strong});
+  --toggle-button-hover-fill-color-off: var(--toggle-button-off-hover-color, #{$gray});
   --toggle-button-fill-circle-color: #{$white};
   --toggle-button-fill-circle-color-off: #{$white};
 
   --toggle-button-text-color: #{$black};
   --toggle-button-text-disable-color: #{$gray};
+
+  --toggle-button-gap: var(--toggle-button-spacing, 8px);
 
   display: inline-block;
 }
@@ -88,7 +90,7 @@
 
   display: grid;
   grid-template-columns: min-content auto;
-  grid-gap: 8px;
+  grid-gap: var(--toggle-button-gap);
 
   cursor: pointer;
 
@@ -122,8 +124,8 @@
     svg {
       rect {
         fill: var(
-          --color-scheme-main-accent,
-          var(--toggle-button-fill-color-default)
+          --toggle-button-checked-color,
+          var(--color-scheme-main-accent, var(--toggle-button-fill-color-default))
         ) !important;
 
         &:hover {
@@ -163,8 +165,8 @@
 
       rect {
         fill: var(
-          --color-scheme-main-accent,
-          var(--toggle-button-fill-color-default)
+          --toggle-button-checked-color,
+          var(--color-scheme-main-accent, var(--toggle-button-fill-color-default))
         ) !important;
       }
 

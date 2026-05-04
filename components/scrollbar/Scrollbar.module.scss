@@ -51,9 +51,16 @@
   --scrollbar-hover-bg-color: #{$light-scroll-hover};
   --scrollbar-press-bg-color: #{$light-scroll-active};
 
-  --scrollbar-padding-inline-end: 17px;
-  --scrollbar-padding-inline-end-mobile: 8px;
-  --scrollbar-padding-after-last-item: unset;
+  --scrollbar-thumb-color: var(--scrollbar-bg, var(--scrollbar-bg-color));
+  --scrollbar-thumb-hover-color: var(--scrollbar-bg-hover, var(--scrollbar-hover-bg-color));
+  --scrollbar-thumb-active-color: var(--scrollbar-bg-active, var(--scrollbar-press-bg-color));
+  --scrollbar-track-border-radius: var(--scrollbar-radius, 8px);
+  --scrollbar-thumb-default-size: var(--scrollbar-thumb-size, 4px);
+  --scrollbar-track-inner-padding: var(--scrollbar-track-padding, 4px);
+
+  --scrollbar-padding-inline-end: var(--scrollbar-padding-end, 17px);
+  --scrollbar-padding-inline-end-mobile: var(--scrollbar-padding-end-mobile, 8px);
+  --scrollbar-padding-after-last-item: var(--scrollbar-last-padding, unset);
 
   &:global(.trackYVisible.trackXVisible) {
     .trackVertical {
@@ -100,8 +107,8 @@
 .track {
   box-sizing: border-box;
   display: flex;
-  padding: 4px;
-  border-radius: 8px !important;
+  padding: var(--scrollbar-track-inner-padding);
+  border-radius: var(--scrollbar-track-border-radius) !important;
   background: transparent !important;
   z-index: 201;
 
@@ -144,23 +151,23 @@
 
 .thumb {
   touch-action: none;
-  background-color: var(--scrollbar-bg-color) !important;
+  background-color: var(--scrollbar-thumb-color) !important;
   position: relative;
   cursor: default !important;
 
   &:hover {
-    background-color: var(--scrollbar-hover-bg-color) !important;
+    background-color: var(--scrollbar-thumb-hover-color) !important;
   }
 
   &:active,
   &:global(.dragging) {
     touch-action: none;
-    background-color: var(--scrollbar-press-bg-color) !important;
+    background-color: var(--scrollbar-thumb-active-color) !important;
   }
 }
 
 .thumbVertical {
-  width: 4px !important;
+  width: var(--scrollbar-thumb-default-size) !important;
   transition: width linear 0.1s;
 
   @include mixins.desktop {
@@ -170,12 +177,12 @@
   }
 
   @include mixins.tablet-and-below {
-    width: 4px !important;
+    width: var(--scrollbar-thumb-default-size) !important;
   }
 }
 
 .thumbHorizontal {
-  height: 4px !important;
+  height: var(--scrollbar-thumb-default-size) !important;
   transition: height linear 0.1s;
 
   @include mixins.desktop {
@@ -185,7 +192,7 @@
   }
 
   @include mixins.tablet-and-below {
-    height: 4px !important;
+    height: var(--scrollbar-thumb-default-size) !important;
   }
 }
 

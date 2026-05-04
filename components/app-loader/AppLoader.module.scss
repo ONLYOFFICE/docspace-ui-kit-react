@@ -37,6 +37,9 @@
 .loaderContainer {
   --app-loader-background-color: #{$white};
 
+  --app-loader-bg-value: var(--app-loader-bg, var(--app-loader-background-color));
+  --app-loader-z-index-value: var(--app-loader-z-index, 5000);
+
   width: 100vw;
   height: 100vh;
 
@@ -44,8 +47,8 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--app-loader-background-color);
-  z-index: 5000;
+  background: var(--app-loader-bg-value);
+  z-index: var(--app-loader-z-index-value);
   position: fixed;
   top: 0;
   inset-inline-start: 0;

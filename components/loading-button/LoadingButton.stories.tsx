@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -241,6 +241,42 @@ export const CustomColors: Story = {
         code: `<LoadingButton percent={60} loaderColor="#2DA7DB" />
 <LoadingButton percent={60} loaderColor="#4CAF50" />
 <LoadingButton percent={60} loaderColor="#FF5722" />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          gap: "16px",
+          alignItems: "center",
+          "--loading-button-accent": "#7c3aed",
+          "--loading-button-idle": "#a78bfa",
+          "--loading-button-hover-fill": "#4c1d95",
+          "--loading-button-custom-bg": "#ede9fe",
+        } as CSSProperties
+      }
+    >
+      <LoadingButton percent={60} />
+      <LoadingButton percent={30} />
+      <LoadingButton percent={0} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--loading-button-accent\` | Progress fill color | \`--accent-main\` |
+| \`--loading-button-idle\` | Default mode fill color | theme token |
+| \`--loading-button-hover-fill\` | Hover fill color | theme token |
+| \`--loading-button-custom-bg\` | Center circle background | theme token |`,
       },
     },
   },

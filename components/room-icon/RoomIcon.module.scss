@@ -34,6 +34,12 @@
     --room-icon-edit-icon-background: #{colors.$gray-dark-mid};
   }
 
+  --room-icon-bg-value: var(--room-icon-bg, var(--room-icon-fill));
+  --room-icon-bg-color-value: var(--room-icon-bg, var(--room-icon-background-color));
+  --room-icon-button-icon-color-value: var(--room-icon-button-icon-color, var(--room-icon-button-color));
+  --room-icon-bg-opacity-value: var(--room-icon-bg-opacity, var(--room-icon-opacity));
+  --room-icon-edit-bg-value: var(--room-icon-edit-bg, var(--room-icon-edit-icon-background));
+
   img {
     max-width: 100%;
     height: auto;
@@ -54,7 +60,7 @@
 
       vertical-align: middle;
       background: var(--room-icon-color);
-      opacity: var(--room-icon-opacity);
+      opacity: var(--room-icon-bg-opacity-value);
 
       position: absolute;
     }
@@ -76,7 +82,7 @@
           height: var(--room-icon-size);
 
           path {
-            fill: var(--room-icon-color, var(--room-icon-button-color));
+            fill: var(--room-icon-color, var(--room-icon-button-icon-color-value));
           }
         }
       }
@@ -93,7 +99,7 @@
         }
 
         svg path {
-          fill: var(--room-icon-color, var(--room-icon-button-color));
+          fill: var(--room-icon-color, var(--room-icon-button-icon-color-value));
         }
       }
 
@@ -121,7 +127,7 @@
         width: 16px;
         height: 16px;
         path {
-          fill: var(--room-icon-button-color);
+          fill: var(--room-icon-button-icon-color-value);
         }
       }
     }
@@ -184,7 +190,7 @@
   }
 
   &.isEditIcon {
-    background-color: var(--room-icon-edit-icon-background);
+    background-color: var(--room-icon-edit-bg-value);
   }
 
   &.size20 {
@@ -209,13 +215,13 @@
     .open-plus-logo-icon {
       svg {
         path {
-          fill: var(--room-icon-fill);
+          fill: var(--room-icon-bg-value);
         }
       }
       &:hover {
         svg {
           path {
-            fill: var(--room-icon-fill) !important;
+            fill: var(--room-icon-bg-value) !important;
           }
         }
       }
@@ -253,7 +259,7 @@
       }
 
       .template-hover {
-        background-color: var(--room-icon-background-color);
+        background-color: var(--room-icon-bg-color-value);
         filter: brightness(80%);
       }
 
@@ -314,10 +320,10 @@
   .roomIconButton {
     svg {
       path {
-        fill: var(--room-icon-background-color) !important;
+        fill: var(--room-icon-bg-color-value) !important;
       }
       rect {
-        stroke: var(--room-icon-background-color) !important;
+        stroke: var(--room-icon-bg-color-value) !important;
       }
     }
 
@@ -344,7 +350,7 @@
   .roomIconButton:has(svg:not(:global(.link))) {
     width: 12px;
     height: 12px;
-    border: 1px solid var(--room-icon-background-color);
+    border: 1px solid var(--room-icon-bg-color-value);
     border-radius: 50%;
 
     &.isBig {
@@ -374,8 +380,11 @@
   position: relative;
   box-sizing: border-box;
 
-  border: var(--room-icon-empty-border);
-  border-radius: 10px;
+  --room-icon-empty-border-value: var(--room-icon-dashed-border, var(--room-icon-empty-border));
+  --room-icon-empty-radius-value: var(--room-icon-empty-radius, 10px);
+
+  border: var(--room-icon-empty-border-value);
+  border-radius: var(--room-icon-empty-radius-value);
   min-width: 64px;
 
   :global(.light) & {

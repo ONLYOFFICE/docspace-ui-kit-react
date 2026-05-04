@@ -28,22 +28,22 @@
 
 .samples {
   width: 100%;
-  max-width: 700px;
+  max-width: var(--chat-content-max-width);
 
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: var(--chat-samples-gap);
 
-  margin-bottom: 12px;
+  margin-bottom: var(--chat-samples-margin-bottom);
 
   box-sizing: border-box;
 }
 
 .sampleItem {
-  padding: 10px 12px;
+  padding: var(--chat-samples-padding);
 
   border: 1px solid var(--accent-main);
-  border-radius: 6px;
+  border-radius: var(--chat-border-radius);
 
   background: transparent;
 
