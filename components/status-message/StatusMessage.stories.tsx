@@ -26,7 +26,7 @@
 
 import { useState } from "react";
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -192,6 +192,48 @@ export const MessageSwap: Story = {
 <Button label="Message A" onClick={() => setMessage("First message")} />
 <Button label="Message B" onClick={() => setMessage("Second message")} />
 <Button label="Clear" onClick={() => setMessage("")} />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          width: "400px",
+          "--status-message-bg": "#1e1b4b",
+          "--status-message-border": "2px solid #7c3aed",
+          "--status-message-text": "#e0e7ff",
+          "--status-message-icon": "#a78bfa",
+          "--status-message-radius": "12px",
+          "--status-message-padding": "12px 16px",
+          "--status-message-gap": "16px",
+          "--status-message-shadow": "0 4px 20px rgba(124,58,237,0.3)",
+        } as CSSProperties
+      }
+    >
+      <StatusMessage message="Custom styled status message with CSS variables." />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--status-message-bg\` | Background color | theme token |
+| \`--status-message-border\` | Border style | theme token |
+| \`--status-message-text\` | Text color | theme token |
+| \`--status-message-icon\` | Icon fill color | theme token |
+| \`--status-message-shadow\` | Box shadow | theme token |
+| \`--status-message-radius\` | Border radius | \`6px\` |
+| \`--status-message-padding\` | Inner padding | \`8px 12px\` |
+| \`--status-message-gap\` | Gap between icon and text | \`12px\` |
+| \`--status-message-margin-bottom\` | Bottom margin | \`16px\` |
+| \`--status-message-max-width\` | Max width | \`1200px\` |`,
       },
     },
   },

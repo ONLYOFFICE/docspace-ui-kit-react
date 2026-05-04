@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -313,6 +313,58 @@ export const WithBottomContent: Story = {
   topContent={<TileContent><Link>Document.docx</Link></TileContent>}
   bottomContent={<div>Additional information</div>}
 />`,
+			},
+		},
+	},
+};
+
+export const CssCustomization: Story = {
+	render: () => (
+		<div
+			style={
+				{
+					"--tile-bg": "#e6f3fb",
+					"--tile-border-style": "1px solid #0082c9",
+					"--tile-radius": "16px",
+					"--tile-hover-bg": "#cce5f6",
+					"--tile-icon-color": "#0082c9",
+					"--tile-hotkey-color": "#0082c9",
+					"--tile-padding": "12px 0",
+					"--tile-row-gap": "12px",
+				} as CSSProperties
+			}
+		>
+			<div style={{ maxWidth: "300px", margin: "30px" }}>
+				<BaseTile
+					item={{ id: "tile-1", title: "Document.docx", fileExst: ".docx" }}
+					element={wordElement}
+					contextOptions={contextOptions}
+					topContent={
+						<TileContent>
+							<Link>Document.docx</Link>
+						</TileContent>
+					}
+					onSelect={() => {}}
+					getContextModel={() => contextOptions}
+				/>
+			</div>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--tile-bg\` | Tile background color | theme-based |
+| \`--tile-border-style\` | Tile border | theme-based |
+| \`--tile-radius\` | Tile border radius | \`12px\` |
+| \`--tile-hover-bg\` | Hover/checked background | theme-based |
+| \`--tile-icon-color\` | Icon button color | theme-based |
+| \`--tile-hotkey-color\` | Hotkey navigation border color | theme-based |
+| \`--tile-padding\` | Tile vertical padding | \`16px 0\` |
+| \`--tile-row-gap\` | Gap between top and bottom content | \`16px\` |`,
 			},
 		},
 	},

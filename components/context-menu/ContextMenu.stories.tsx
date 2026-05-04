@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { CSSProperties } from "react";
 import { useRef } from "react";
 
 import type { ComponentProps } from "react";
@@ -306,6 +307,100 @@ export const WithBackdrop: Story = {
       },
       source: {
         code: `<ContextMenu ref={cm} model={items} withBackdrop />`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => {
+  const cm = useRef<ContextMenuRefType>(null);
+
+  const items: ContextMenuModel[] = [
+    { key: 0, label: "Cut", icon: CatalogFolderReactSvgUrl },
+    { key: 1, label: "Copy", icon: CatalogFolderReactSvgUrl },
+    { key: 2, label: "Paste", icon: CatalogFolderReactSvgUrl },
+    { key: 3, isSeparator: true, disabled: false },
+    { key: 4, label: "Delete", icon: CatalogFolderReactSvgUrl },
+  ];
+
+  return (
+    <div style={{ height: "260px" }}>
+      <ContextMenu
+        ref={cm}
+        model={items}
+        style={
+          {
+            "--context-menu-radius": "12px",
+            "--context-menu-bg": "#1e1b4b",
+            "--context-menu-border-style": "1px solid #4338ca",
+            "--context-menu-text": "#e0e7ff",
+            "--context-menu-item-hover-bg": "rgba(255,255,255,0.1)",
+            "--context-menu-header-border-style": "1px solid #4338ca",
+            "--context-menu-item-text-size": "14px",
+          } as CSSProperties
+        }
+      />
+      <button
+        type="button"
+        data-testid="trigger"
+        style={{
+          width: "200px",
+          height: "100px",
+          backgroundColor: globalColors.lightSecondMain,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          color: globalColors.white,
+          border: "none",
+          cursor: "context-menu",
+        }}
+        onContextMenu={(e) => cm.current?.show(e)}
+      >
+        Right click to open
+      </button>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization. Pass via the \`style\` prop on \`<ContextMenu>\`:
+
+\`\`\`css
+--context-menu-bg                  /* background color */
+--context-menu-border-style        /* border (default: none in light, 1px solid in dark) */
+--context-menu-header-border-style /* header/separator border */
+--context-menu-shadow              /* box-shadow */
+--context-menu-text                /* text/icon color */
+--context-menu-item-hover-bg       /* item hover background */
+--context-menu-item-disabled-text  /* disabled item text */
+--context-menu-item-disabled-bg    /* disabled item hover background */
+--context-menu-active-item-bg      /* keyboard-active item background */
+--context-menu-radius              /* border-radius (default: 6px) */
+--context-menu-menu-item-padding   /* item padding (default: 0 16px) */
+--context-menu-header-row-height   /* header height (default: 55px) */
+--context-menu-header-inner-padding /* header padding (default: 6px 16px) */
+--context-menu-divider-margin      /* separator margin (default: 6px 16px) */
+--context-menu-item-text-size      /* item font-size (default: 13px) */
+--context-menu-item-text-weight    /* item font-weight (default: 600) */
+--context-menu-header-text-size    /* header font-size (default: 15px) */
+--context-menu-item-height         /* item line-height (default: 36px) */
+\`\`\``,
+      },
+      source: {
+        code: `<ContextMenu
+  ref={cm}
+  model={items}
+  style={{
+    "--context-menu-radius": "12px",
+    "--context-menu-bg": "#1e1b4b",
+    "--context-menu-text": "#e0e7ff",
+    "--context-menu-item-hover-bg": "rgba(255,255,255,0.1)",
+  }}
+/>`,
       },
     },
   },

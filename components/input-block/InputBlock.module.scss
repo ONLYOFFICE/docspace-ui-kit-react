@@ -1,12 +1,16 @@
 @use "../../styles/mixins";
 
 .iconBlock {
+  --input-block-icon-end-padding: var(--input-block-icon-padding, 8px);
+  --input-block-icon-end-padding-lg: var(--input-block-icon-padding-lg, 12px);
+  --input-block-icon-start-padding: var(--input-block-icon-start, 1px);
+
   display: flex;
   align-items: center;
   /* Match icon container height to text line-height for perfect vertical centering */
   height: auto;
-  padding-inline-end: 8px;
-  padding-inline-start: 1px;
+  padding-inline-end: var(--input-block-icon-end-padding);
+  padding-inline-start: var(--input-block-icon-start-padding);
 
   &[data-size="base"] {
     height: var(--text-input-line-height-base);
@@ -17,16 +21,18 @@
   // Large uses same right padding, only height differs
   &[data-size="large"] {
     height: var(--text-input-line-height-large);
-    padding-inline-end: 12px;
+    padding-inline-end: var(--input-block-icon-end-padding-lg);
   }
 
   background-color: inherit;
 }
 
 .childrenBlock {
+  --input-block-children-pad: var(--input-block-children-padding, 2px 0 2px 2px);
+
   display: flex;
   align-items: center;
-  padding: 2px 0 2px 2px;
+  padding: var(--input-block-children-pad);
   background-color: inherit;
 }
 

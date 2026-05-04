@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Link, LinkType, LinkTarget } from ".";
@@ -407,6 +407,49 @@ export const NoHoverEffect: Story = {
       },
       source: {
         code: `<Link type={LinkType.page} href="https://github.com" noHover>No hover effect link</Link>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--link-color": "#9C27B0",
+          "--link-hover-text-decoration": "none",
+        } as CSSProperties
+      }
+    >
+      <Link type={LinkType.page} href="https://github.com">
+        Custom color link
+      </Link>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+\`\`\`css
+--link-color                  /* link text color */
+--link-text-decoration        /* text decoration (default none) */
+--link-cursor                 /* cursor style */
+--link-hover-text-decoration  /* text decoration on hover (default underline) */
+\`\`\``,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--link-color": "#9C27B0",
+    "--link-hover-text-decoration": "none",
+  }}
+>
+  <Link type={LinkType.page} href="https://github.com">
+    Custom color link
+  </Link>
+</div>`,
       },
     },
   },

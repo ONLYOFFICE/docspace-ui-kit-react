@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { useState } from "react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -76,8 +76,7 @@ import { ColorPicker } from "@docspace/ui-kit/components/color-picker";
     },
     isPickerOnly: {
       control: "boolean",
-      description:
-        "Show only the color picker without hex input and buttons",
+      description: "Show only the color picker without hex input and buttons",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -118,6 +117,82 @@ import { ColorPicker } from "@docspace/ui-kit/components/color-picker";
 type Story = StoryObj<ComponentProps<typeof ColorPicker>>;
 
 export default meta;
+
+const CssCustomizationTemplate = () => {
+  return (
+    <div
+      style={
+        {
+          // === ColorPicker — hex input field ===
+          "--color-picker-border-style": "1px solid #0082c9",
+          "--color-picker-bg": "#f0f8ff",
+          "--color-picker-text-color": "#004f82",
+          "--color-picker-input-radius": "8px",
+          "--color-picker-input-height": "36px",
+          // === ColorPicker — hue slider ===
+          "--color-picker-hue-height": "16px",
+          "--color-picker-hue-radius": "8px",
+          // === Button (Apply/Cancel buttons) ===
+          "--button-root-bg": "#0082c9",
+          "--button-root-border": "1px solid #0082c9",
+          "--button-root-hover-bg": "#006ba6",
+          "--button-root-border-radius": "8px",
+          "--button-root-color": "#fff",
+        } as CSSProperties
+      }
+    >
+      <ColorPicker
+        isPickerOnly={false}
+        appliedColor={globalColors.lightBlueMain}
+        applyButtonLabel="Apply"
+        cancelButtonLabel="Cancel"
+        hexCodeLabel="Hex code"
+        onApply={() => {}}
+        onClose={() => {}}
+        handleChange={() => {}}
+      />
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**ColorPicker — hex input**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--color-picker-border-style\` | Hex input border | theme-based |
+| \`--color-picker-bg\` | Hex input background | theme-based |
+| \`--color-picker-text-color\` | Hex input text color | theme-based |
+| \`--color-picker-input-height\` | Hex input height | \`32px\` |
+| \`--color-picker-input-padding\` | Hex input padding | \`6px 8px\` |
+| \`--color-picker-input-radius\` | Hex input border radius | \`3px\` |
+| \`--color-picker-width\` | Picker container width | \`195px\` |
+
+**ColorPicker — hue slider**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--color-picker-hue-height\` | Hue slider height | \`12px\` |
+| \`--color-picker-hue-radius\` | Hue slider border radius | \`6px\` |
+
+**Button (Apply/Cancel)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--button-root-bg\` | Primary button background | theme accent |
+| \`--button-root-border\` | Primary button border | theme accent |
+| \`--button-root-hover-bg\` | Primary button hover background | theme accent |
+| \`--button-root-border-radius\` | Button border radius | \`3px\` |`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   render: (args) => <ColorPicker {...args} />,
@@ -268,3 +343,4 @@ export const PresetColor: Story = {
     },
   },
 };
+

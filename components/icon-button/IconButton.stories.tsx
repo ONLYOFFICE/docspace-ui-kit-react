@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -403,6 +403,46 @@ export const WithCustomNode: Story = {
   isFill
   iconNode={<div style={{ ... }}>IC</div>}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--icon-button-color": "#9C27B0",
+          "--icon-button-hover-color": "#6A1B9A",
+          "--icon-button-size": "32px",
+        } as CSSProperties
+      }
+    >
+      <IconButton iconName={SearchReactSvgUrl} isFill />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+\`\`\`css
+--icon-button-color        /* default icon color */
+--icon-button-hover-color  /* icon color on hover */
+--icon-button-size         /* icon button size */
+\`\`\``,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--icon-button-color": "#9C27B0",
+    "--icon-button-hover-color": "#6A1B9A",
+    "--icon-button-size": "32px",
+  }}
+>
+  <IconButton iconName={SearchReactSvgUrl} isFill />
+</div>`,
       },
     },
   },

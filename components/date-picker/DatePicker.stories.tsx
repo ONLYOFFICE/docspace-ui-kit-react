@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import React from "react";
 import type { ComponentProps } from "react";
 import { useState } from "react";
 
@@ -293,6 +294,94 @@ export const WithoutCalendarIcon: Story = {
   showCalendarIcon={false}
   selectDateText="No calendar icon"
 />`,
+			},
+		},
+	},
+};
+
+export const CssCustomization: Story = {
+	render: () => (
+		<div
+			style={
+				{
+					height: "350px",
+					padding: "20px",
+					// DatePicker container
+					"--date-picker-bg": "#e6f3fb",
+					"--date-picker-header-border": "1px solid #0082c9",
+					"--date-picker-padding": "0 16px 16px",
+					"--date-picker-body-padding": "12px 0",
+					// Calendar sub-component
+					"--calendar-bg": "#e6f3fb",
+					"--calendar-border": "#0082c9",
+					"--calendar-shadow": "0 4px 16px rgba(0,130,201,0.25)",
+					"--calendar-radius": "12px",
+					"--calendar-title": "#0082c9",
+					"--calendar-outline": "#0082c9",
+					"--calendar-arrow": "#0082c9",
+					"--calendar-weekday": "#0082c9",
+					"--calendar-accent": "#0082c9",
+					"--calendar-selected-text": "#ffffff",
+					"--calendar-hover-bg": "#cce5f6",
+					"--calendar-past": "#5ca8d9",
+					"--calendar-disabled-arrow": "#a0c8e8",
+					// AddButton sub-component
+					"--add-button-background": "#e6f3fb",
+					"--add-button-icon": "#0082c9",
+					// SelectedItem sub-component
+					"--selected-item-background": "#cce5f6",
+					"--selected-item-background-hover": "#b3d9f0",
+					"--selected-item-active-background": "#0082c9",
+					"--selected-item-active-color": "#ffffff",
+					// IconButton (used in SelectedItem close button)
+					"--icon-button-color": "#0082c9",
+					"--icon-button-hover-color": "#006fa6",
+				} as React.CSSProperties
+			}
+		>
+			<ControlledDatePicker
+				locale="en"
+				openDate={now()}
+				initialDate={now()}
+				maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
+				minDate={createDateTime(1970, 1, 1)}
+				selectDateText="Select date"
+			/>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: `CSS custom property overrides applied to the date picker and its Calendar, AddButton, and SelectedItem sub-components.
+
+**DatePicker variables:**
+- \`--date-picker-bg\` — container background
+- \`--date-picker-padding\` — container padding
+- \`--date-picker-header-border\` — header bottom border
+- \`--date-picker-body-padding\` — body area padding
+- \`--date-picker-dropdown-padding\` — dropdown padding
+
+**Calendar variables:**
+- \`--calendar-bg\` — calendar background color
+- \`--calendar-border\` — calendar border color
+- \`--calendar-shadow\` — calendar box shadow
+- \`--calendar-radius\` — calendar border radius
+- \`--calendar-title\` — month/year title color
+- \`--calendar-title-size\` — month/year title font size
+- \`--calendar-outline\` — nav button outline color
+- \`--calendar-arrow\` — nav arrow color
+- \`--calendar-disabled-arrow\` — disabled nav arrow color
+- \`--calendar-weekday\` — weekday header color
+- \`--calendar-accent\` — selected date / hover outline accent color
+- \`--calendar-selected-text\` — text color on selected (current) date
+- \`--calendar-hover-bg\` — date hover background
+- \`--calendar-past\` — past / out-of-month dates color
+- \`--calendar-disabled\` — disabled dates color
+- \`--calendar-hover-radius\` — date cell border radius on hover
+- \`--calendar-current-radius\` — selected (current) date cell border radius
+- \`--calendar-focused-radius\` — keyboard-focused date cell border radius
+- \`--calendar-focused-bg\` — keyboard-focused date cell background color
+- \`--calendar-focused-text\` — keyboard-focused date cell text color`,
 			},
 		},
 	},

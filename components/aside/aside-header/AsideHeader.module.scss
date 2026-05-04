@@ -41,11 +41,7 @@
 .container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  margin: 0 16px;
-  height: 53px;
-  min-height: 53px;
+  justify-content: var(--aside-header-justify-v);
   position: relative;
 
   :global(.light) & {
@@ -59,6 +55,26 @@
     --aside-header-border-color: #{colors.$gray-dark-strong};
     --aside-header-custom-height: 53px;
   }
+
+  // bridge vars — bind public overrides to internal theme tokens
+  --aside-header-text-v: var(--aside-header-color, var(--aside-header-text-color));
+  --aside-header-border-v: var(--aside-header-border, var(--aside-header-border-color));
+  // new bridge vars for hardcoded values
+  --aside-header-height-v: var(--aside-header-height, 53px);
+  --aside-header-font-size-v: var(--aside-header-font-size, 21px);
+  --aside-header-margin-v: var(--aside-header-margin, 0 16px);
+  --aside-header-gap-v: var(--aside-header-gap, 6px);
+  --aside-header-justify-v: var(--aside-header-justify, space-between);
+  --aside-header-border-display-v: var(--aside-header-border-display, "");
+  --aside-header-title-position-v: var(--aside-header-title-position, static);
+  --aside-header-title-inset-v: var(--aside-header-title-inset, auto);
+  --aside-header-title-transform-v: var(--aside-header-title-transform, none);
+  --aside-header-title-text-align-v: var(--aside-header-title-text-align, start);
+
+  gap: var(--aside-header-gap-v);
+  margin: var(--aside-header-margin-v);
+  height: var(--aside-header-height-v);
+  min-height: var(--aside-header-height-v);
 
   &.customHeaderHeight {
     height: var(--aside-header-custom-height);
@@ -76,10 +92,18 @@
     }
   }
 
+  .heading,
+  .headerComponent {
+    position: var(--aside-header-title-position-v);
+    inset-inline-start: var(--aside-header-title-inset-v);
+    transform: var(--aside-header-title-transform-v);
+    text-align: var(--aside-header-title-text-align-v);
+  }
+
   .heading {
-    color: var(--aside-header-text-color);
+    color: var(--aside-header-text-v);
     font-weight: 700;
-    font-size: 21px;
+    font-size: var(--aside-header-font-size-v);
   }
 
   .arrowButton {
@@ -97,8 +121,8 @@
   }
 
   &:not(.withoutBorder)::after {
-    content: "";
-    border-bottom: 1px solid var(--aside-header-border-color);
+    content: var(--aside-header-border-display-v);
+    border-bottom: 1px solid var(--aside-header-border-v);
     width: calc(100% + 32px);
     position: absolute;
     inset-inline-end: -16px;

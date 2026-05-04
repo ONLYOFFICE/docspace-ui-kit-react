@@ -28,7 +28,7 @@
 .light {
   --status-warning: #{colors.$light-status-warning};
   --main-button-mobile-text-color: #{colors.$light-gray-dark};
-  --main-button-mobile-button-color: #{colors.$light-status-warning};
+  --main-button-mobile-button-color: #{colors.$light-blue-main};
   --main-button-mobile-icon-fill: #{colors.$white};
   --main-button-mobile-circle-background: #{colors.$white};
   --main-button-mobile-mobile-progress-bar-background: #{colors.$gray-strong};
@@ -55,7 +55,7 @@
 .dark {
   --status-warning: #{colors.$dark-status-warning};
   --main-button-mobile-text-color: #{colors.$dark-gray-dark};
-  --main-button-mobile-button-color: #{colors.$dark-status-warning};
+  --main-button-mobile-button-color: #{colors.$light-blue-main};
   --main-button-mobile-icon-fill: #{colors.$black};
   --main-button-mobile-circle-background: #{colors.$black};
   --main-button-mobile-mobile-progress-bar-background: #{colors.$gray-dark-strong};

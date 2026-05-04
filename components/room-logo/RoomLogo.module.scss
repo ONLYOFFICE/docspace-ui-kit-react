@@ -29,11 +29,13 @@
 .container {
   @include mixins.no-user-select;
 
-  width: 32px;
-  height: 32px;
+  --room-logo-size-value: var(--room-logo-size, 32px);
 
-  min-width: 32px;
-  min-height: 32px;
+  width: var(--room-logo-size-value);
+  height: var(--room-logo-size-value);
+
+  min-width: var(--room-logo-size-value);
+  min-height: var(--room-logo-size-value);
 
   display: flex;
   align-items: center;
@@ -52,12 +54,14 @@
 }
 
 .logoContainer {
-  width: 32px;
-  height: 32px;
+  --room-logo-radius-value: var(--room-logo-radius, 6px);
+
+  width: var(--room-logo-size-value, 32px);
+  height: var(--room-logo-size-value, 32px);
 
   :global {
     .room-logo_icon {
-      border-radius: 6px;
+      border-radius: var(--room-logo-radius-value);
     }
   }
 }

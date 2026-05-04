@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -296,6 +296,49 @@ const WithoutCountTemplate = () => {
       style={{ justifyContent: "center", alignItems: "center" }}
     />
   );
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--paging-gap": "16px",
+          "--paging-button-gap": "12px",
+          "--paging-font-size": "14px",
+          "--paging-button-padding": "8px 32px",
+        } as CSSProperties
+      }
+    >
+      <Paging
+        previousLabel="Previous"
+        nextLabel="Next"
+        disablePrevious={false}
+        disableNext={false}
+        openDirection="bottom"
+        pageItems={createPageItems(10)}
+        countItems={countItems}
+        selectedCountItem={{ key: 25, label: "25 per page" }}
+        selectedPageItem={{ key: 1, label: "1 of 10" }}
+        previousAction={() => {}}
+        nextAction={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--paging-gap\` | Gap between paging elements | \`8px\` |
+| \`--paging-button-gap\` | Gap between prev/next buttons | \`8px\` |
+| \`--paging-font-size\` | Font size of nav buttons | \`13px\` |
+| \`--paging-button-padding\` | Padding of nav buttons | \`6px 28px\` |`,
+      },
+    },
+  },
 };
 
 export const WithoutCountSelector: Story = {

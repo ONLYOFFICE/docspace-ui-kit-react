@@ -39,6 +39,9 @@
 }
 
 .subtext {
-  margin-top: 16px;
-  margin-bottom: 8px;
+  --rbg-subtext-margin-top: var(--radio-button-group-subtext-top, 16px);
+  --rbg-subtext-margin-bottom: var(--radio-button-group-subtext-bottom, 8px);
+
+  margin-top: var(--rbg-subtext-margin-top);
+  margin-bottom: var(--rbg-subtext-margin-bottom);
 }

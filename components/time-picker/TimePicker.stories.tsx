@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { DateTime } from "luxon";
@@ -143,6 +143,78 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+const CssCustomizationTemplate = () => {
+  return (
+    <div
+      style={
+        {
+          // === TimePicker — input box ===
+          "--time-input-border": "#0082c9",
+          "--time-input-bg": "#f0f8ff",
+          "--time-input-focus-border": "#004f82",
+          "--time-input-error-border": "#c0392b",
+          "--time-input-radius": "8px",
+          "--time-input-height": "36px",
+          "--time-input-width": "68px",
+          "--time-input-padding": "0px 10px",
+          // === TextInput (inner number inputs) ===
+          "--text-input-color": "#004f82",
+          "--text-input-bg": "#f0f8ff",
+        } as CSSProperties
+      }
+    >
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        <TimePicker
+          initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
+          onChange={() => {}}
+        />
+        <TimePicker
+          initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
+          hasError
+          onChange={() => {}}
+        />
+        <TimePicker
+          initialTime={createDateTime(2025, 1, 27, 14, 45, 0)}
+          isTwelveHourFormat
+          meridiem="PM"
+          onChange={() => {}}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**TimePicker — input box**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--time-input-border\` | Default border color | theme-based |
+| \`--time-input-bg\` | Background color | theme-based |
+| \`--time-input-focus-border\` | Focus/active border color | theme-based |
+| \`--time-input-error-border\` | Error state border color | theme-based |
+| \`--time-input-width\` | Input box width | \`60px\` |
+| \`--time-input-height\` | Input box height | \`32px\` |
+| \`--time-input-radius\` | Border radius | \`3px\` |
+| \`--time-input-padding\` | Inline padding | \`0px 6px\` |
+
+**TextInput (inner number inputs)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--text-input-color\` | Text color | theme-based |
+| \`--text-input-bg\` | Background color | theme-based |`,
+      },
+    },
+  },
+};
+
 export const Default: Story = {
   render: (args) => <TimePicker {...args} />,
   args: {
@@ -251,3 +323,4 @@ export const FocusOnRender: Story = {
     },
   },
 };
+
