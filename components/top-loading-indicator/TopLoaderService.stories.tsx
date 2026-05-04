@@ -72,6 +72,78 @@ type Story = StoryObj;
 
 export default meta;
 
+// Helper that mounts a styled #ipl-progress-indicator and cleans up on unmount
+const useProgressBar = (styles: Partial<CSSStyleDeclaration>) => {
+  useEffect(() => {
+    const bar = document.createElement("div");
+    bar.id = "ipl-progress-indicator";
+    Object.assign(bar.style, styles);
+    document.body.appendChild(bar);
+    return () => {
+      if (document.body.contains(bar)) document.body.removeChild(bar);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+};
+
+// ─── CSS Customization ───────────────────────────────────────────────────────
+
+const CssCustomizationTemplate = () => {
+  // Progress bar 1 — Nextcloud blue, 4 px height, glow shadow (65% progress)
+  useProgressBar({
+    position: "fixed",
+    top: "0",
+    left: "0",
+    width: "65%",
+    height: "4px",
+    backgroundColor: "#0082c9",
+    borderRadius: "0 2px 2px 0",
+    boxShadow: "0 0 8px rgba(0, 130, 201, 0.5)",
+    zIndex: "9999",
+    transition: "width 0.2s ease-in-out",
+  });
+
+  return (
+    <div style={{ padding: "40px 20px" }}>
+      <p style={{ margin: 0, fontSize: "13px", color: "#555" }}>
+        Progress bar at 65% — styled via inline CSS on{" "}
+        <code>#ipl-progress-indicator</code>
+      </p>
+      <p style={{ marginTop: "8px", fontSize: "12px", color: "#888" }}>
+        Customizable properties: <strong>height</strong>,{" "}
+        <strong>backgroundColor</strong>, <strong>borderRadius</strong>,{" "}
+        <strong>boxShadow</strong>, <strong>transition</strong>,{" "}
+        <strong>zIndex</strong>
+      </p>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `\`TopLoaderService\` uses direct DOM manipulation on \`#ipl-progress-indicator\`.
+Style the element freely via CSS — the service only sets \`width\` and ARIA attributes at runtime.
+
+**Recommended inline style properties:**
+
+| Property | Description | Example |
+|----------|-------------|---------|
+| \`height\` | Bar thickness | \`4px\` (default \`2px\`) |
+| \`backgroundColor\` | Bar fill color | \`#0082c9\` |
+| \`borderRadius\` | Right-edge rounding | \`0 2px 2px 0\` |
+| \`boxShadow\` | Glow / elevation | \`0 0 8px rgba(0,130,201,0.5)\` |
+| \`transition\` | Smooth width animation | \`width 0.2s ease-in-out\` |
+| \`zIndex\` | Stacking order | \`9999\` |`,
+      },
+    },
+  },
+};
+
+// ─── Default ─────────────────────────────────────────────────────────────────
+
 const DefaultTemplate = () => {
   useEffect(() => {
     const progressBar = document.createElement("div");

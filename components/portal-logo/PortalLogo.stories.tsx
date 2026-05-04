@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import PortalLogo from "./PortalLogo";
@@ -80,6 +80,54 @@ type Story = StoryObj<ComponentProps<typeof PortalLogo>>;
 
 export default meta;
 
+export const CssCustomization: Story = {
+  render: () => (
+    // Group 1 — mobile header bar (visible when viewport <= 600 px)
+    //   --portal-logo-mobile-bg      header bar background
+    //   --portal-logo-mobile-height  bar height
+    //   --portal-logo-mobile-img-height  logo image height inside the bar
+    //
+    // Group 2 — desktop logo image (visible when viewport > 600 px)
+    //   --portal-logo-desktop-img-height  image height
+    //   --portal-logo-desktop-img-width   image width
+    <div
+      style={
+        {
+          "--portal-logo-mobile-bg": "#e6f3fb",
+          "--portal-logo-mobile-height": "56px",
+          "--portal-logo-mobile-img-height": "28px",
+          "--portal-logo-desktop-img-height": "44px",
+          "--portal-logo-desktop-img-width": "320px",
+        } as CSSProperties
+      }
+    >
+      <PortalLogo isResizable />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**Mobile header bar** (shown when viewport <= 600 px)
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--portal-logo-mobile-bg\` | Header bar background | theme-based |
+| \`--portal-logo-mobile-height\` | Bar height | \`48px\` |
+| \`--portal-logo-mobile-img-height\` | Logo image height | \`24px\` |
+
+**Desktop logo image** (shown when viewport > 600 px)
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--portal-logo-desktop-img-height\` | Logo height | \`44px\` |
+| \`--portal-logo-desktop-img-width\` | Logo width | \`386px\` |`,
+      },
+    },
+  },
+};
+
 export const Default: Story = {
   render: (args) => <PortalLogo {...args} />,
   args: {
@@ -123,3 +171,4 @@ export const WithClassName: Story = {
     },
   },
 };
+

@@ -38,15 +38,22 @@
     --form-wrapper-box-shadow: 0px 5px 20px #{colors.$badge-shadow};
   }
 
+  --form-wrapper-bg-value: var(--form-wrapper-bg, var(--form-wrapper-background));
+  --form-wrapper-shadow-value: var(--form-wrapper-shadow, var(--form-wrapper-box-shadow));
+  --form-wrapper-border-radius: var(--form-wrapper-radius, 12px);
+  --form-wrapper-inner-padding: var(--form-wrapper-padding, 32px);
+  --form-wrapper-width-max: var(--form-wrapper-max-width, 320px);
+  --form-wrapper-width-min: var(--form-wrapper-min-width, 320px);
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px;
-  background: var(--form-wrapper-background);
-  box-shadow: var(--form-wrapper-box-shadow);
-  border-radius: 12px;
-  max-width: 320px;
-  min-width: 320px;
+  padding: var(--form-wrapper-inner-padding);
+  background: var(--form-wrapper-bg-value);
+  box-shadow: var(--form-wrapper-shadow-value);
+  border-radius: var(--form-wrapper-border-radius);
+  max-width: var(--form-wrapper-width-max);
+  min-width: var(--form-wrapper-width-min);
 
   @include mixins.tablet-and-below {
     max-width: 416px;

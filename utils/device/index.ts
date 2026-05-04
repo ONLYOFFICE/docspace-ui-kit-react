@@ -87,3 +87,17 @@ export const isTouchDevice = !!(
   typeof navigator !== "undefined" &&
   ("ontouchstart" in window || navigator.maxTouchPoints > 0)
 );
+
+/**
+ * True for Android Chrome/Firefox/Samsung Internet — browsers where
+ * `visualViewport` reliably tracks the virtual keyboard. Edge Android is
+ * excluded because its viewport geometry is unstable during keyboard
+ * transitions.
+ */
+export const isReliableAndroidViewport = () => {
+  if (checkIsSSR()) return false;
+  const ua = navigator.userAgent;
+  if (!/Android/i.test(ua)) return false;
+  if (/EdgA?\//i.test(ua)) return false;
+  return true;
+};

@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -307,6 +307,43 @@ export const CustomStyling: Story = {
   width="300px"
   onClick={handleClick}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--radio-button-group-subtext-top": "24px",
+          "--radio-button-group-subtext-bottom": "12px",
+        } as CSSProperties
+      }
+    >
+      <RadioButtonGroup
+        options={[
+          { type: "text", label: "Choose an option:", value: "" },
+          { value: "option1", label: "Option 1" },
+          { value: "option2", label: "Option 2" },
+          { value: "option3", label: "Option 3" },
+        ]}
+        selected="option1"
+        orientation="vertical"
+        onClick={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--radio-button-group-subtext-top\` | Subtext top margin | \`16px\` |
+| \`--radio-button-group-subtext-bottom\` | Subtext bottom margin | \`8px\` |`,
       },
     },
   },

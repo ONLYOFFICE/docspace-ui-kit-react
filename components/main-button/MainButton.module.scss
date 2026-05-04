@@ -79,6 +79,15 @@
     --main-button-svg-height: 100%;
   }
 
+  --main-button-bg-value: var(--main-button-bg, var(--main-button-background-color));
+  --main-button-text-value: var(--main-button-color, var(--main-button-text-color));
+  --main-button-icon-fill-value: var(--main-button-icon-color, var(--main-button-svg-fill));
+  --main-button-radius-value: var(--main-button-radius, var(--main-button-border-radius));
+  --main-button-padding-value: var(--main-button-inner-padding, var(--main-button-padding));
+  --main-button-font-size-value: var(--main-button-text-size, var(--main-button-font-size));
+  --main-button-font-weight-value: var(--main-button-text-weight, var(--main-button-font-weight));
+  --main-button-line-height-value: var(--main-button-text-line-height, var(--main-button-line-height));
+
   -webkit-tap-highlight-color: var(--tap-highlight-color);
   position: relative;
   display: flex;
@@ -86,12 +95,12 @@
   vertical-align: middle;
   box-sizing: border-box;
 
-  background-color: var(--main-button-background-color);
-  padding: var(--main-button-padding);
-  border-radius: var(--main-button-border-radius);
-  -moz-border-radius: var(--main-button-border-radius);
-  -webkit-border-radius: var(--main-button-border-radius);
-  line-height: var(--main-button-line-height);
+  background-color: var(--main-button-bg-value);
+  padding: var(--main-button-padding-value);
+  border-radius: var(--main-button-radius-value);
+  -moz-border-radius: var(--main-button-radius-value);
+  -webkit-border-radius: var(--main-button-radius-value);
+  line-height: var(--main-button-line-height-value);
 
   &:not(.disabled) {
     &:hover {
@@ -149,16 +158,16 @@
     svg {
       padding-bottom: 1px;
       path {
-        fill: var(--main-button-svg-fill);
+        fill: var(--main-button-icon-fill-value);
       }
     }
   }
   
   .text {
     display: inline;
-    font-size: var(--main-button-font-size);
-    font-weight: var(--main-button-font-weight);
-    color: var(--main-button-text-color);
+    font-size: var(--main-button-font-size-value);
+    font-weight: var(--main-button-font-weight-value);
+    color: var(--main-button-text-value);
   
     .disabled & {
       color: var(--main-button-text-color-disabled);

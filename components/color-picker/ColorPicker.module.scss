@@ -56,10 +56,15 @@
   }
 
   .hexColorPicker {
+    // bridge vars for hardcoded dimensions
+    --color-picker-width-v: var(--color-picker-width, 195px);
+    --color-picker-hue-height-v: var(--color-picker-hue-height, 12px);
+    --color-picker-hue-radius-v: var(--color-picker-hue-radius, 6px);
+
     display: flex;
     flex-direction: column;
     padding-bottom: 16px;
-    width: 195px;
+    width: var(--color-picker-width-v);
 
     @include mixins.mobile {
       width: calc(100vw - 32px);
@@ -108,8 +113,8 @@
       }
 
       .react-colorful__hue {
-        border-radius: 6px;
-        height: 12px;
+        border-radius: var(--color-picker-hue-radius-v);
+        height: var(--color-picker-hue-height-v);
       }
 
       .react-colorful__hue-pointer {
@@ -130,15 +135,24 @@
     --color-picker-background: #{variables.$white};
     --color-picker-color: #{variables.$gray-text};
 
-    height: 32px;
+    // bridge vars — bind public overrides to internal theme tokens
+    --color-picker-border-v: var(--color-picker-border-style, var(--color-picker-border));
+    --color-picker-bg-v: var(--color-picker-bg, var(--color-picker-background));
+    --color-picker-color-v: var(--color-picker-text-color, var(--color-picker-color));
+    // new bridge vars for hardcoded values
+    --color-picker-input-height-v: var(--color-picker-input-height, 32px);
+    --color-picker-input-padding-v: var(--color-picker-input-padding, 6px 8px);
+    --color-picker-input-radius-v: var(--color-picker-input-radius, 3px);
+
+    height: var(--color-picker-input-height-v);
     outline: none;
-    padding: 6px 8px;
-    border: var(--color-picker-border);
-    border-radius: 3px;
+    padding: var(--color-picker-input-padding-v);
+    border: var(--color-picker-border-v);
+    border-radius: var(--color-picker-input-radius-v);
     width: 100%;
     box-sizing: border-box;
-    background: var(--color-picker-background);
-    color: var(--color-picker-color);
+    background: var(--color-picker-bg-v);
+    color: var(--color-picker-color-v);
   }
 
   .hexValueLabel {

@@ -36,6 +36,7 @@
 
 .dropdownText {
   --tag-dropdown-text-margin: 8px;
+  --tags-overflow-margin: var(--tags-overflow-text-margin, var(--tag-dropdown-text-margin));
 
   line-height: 30px;
   display: block;
@@ -43,10 +44,10 @@
 
   &:not(.removeTagIcon) {
     [dir="rtl"] & {
-      margin-right: var(--tag-dropdown-text-margin) !important;
+      margin-right: var(--tags-overflow-margin) !important;
     }
     [dir="ltr"] & {
-      margin-left: var(--tag-dropdown-text-margin) !important;
+      margin-left: var(--tags-overflow-margin) !important;
     }
   }
 }

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -378,6 +378,44 @@ export const WithCustomZIndex: Story = {
       },
       source: {
         code: `<Backdrop visible={isVisible} withBackground zIndex={500} onClick={handleClose} />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--backdrop-bg": "rgba(0, 130, 201, 0.4)",
+          "--backdrop-z-index": "10",
+        } as CSSProperties
+      }
+    >
+      <Backdrop visible withBackground onClick={() => {}} />
+      <div
+        style={{
+          position: "relative",
+          zIndex: 11,
+          color: "#fff",
+          padding: "16px",
+          fontWeight: 600,
+        }}
+      >
+        Custom blue backdrop
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--backdrop-bg\` | Background overlay color | theme blur color |
+| \`--backdrop-z-index\` | Stack order | \`203\` |`,
       },
     },
   },

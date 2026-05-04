@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -296,6 +296,46 @@ export const WithTitle: Story = {
 			},
 			source: {
 				code: `<Checkbox label="Hover me" title="This is a tooltip that appears on hover" />`,
+			},
+		},
+	},
+};
+
+export const CssCustomization: Story = {
+	render: () => (
+		<div
+			style={
+				{
+					"--checkbox-gap": "20px",
+					"--checkbox-lh": "20px",
+				} as CSSProperties
+			}
+		>
+			<Checkbox label="Increased spacing" isChecked />
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: `CSS Custom Properties for external customization:
+
+\`\`\`css
+--checkbox-gap          /* spacing between box and label (default 12px) */
+--checkbox-lh           /* line-height (default 16px) */
+--checkbox-fill-color   /* fill color of the checked box */
+--checkbox-border-color /* border color of the box */
+--checkbox-arrow-color  /* checkmark arrow color */
+\`\`\``,
+			},
+			source: {
+				code: `<div
+  style={{
+    "--checkbox-gap": "20px",
+    "--checkbox-lh": "20px",
+  }}
+>
+  <Checkbox label="Increased spacing" isChecked />
+</div>`,
 			},
 		},
 	},

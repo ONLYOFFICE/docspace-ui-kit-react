@@ -1009,7 +1009,7 @@ class PaymentStore {
     this.setIsInitPaymentPage(true);
   };
 
-  paymentMethodInit = async (t: TTranslation) => {
+  paymentMethodInit = async (t: TTranslation, integrationUrl?: string) => {
     const isRefresh = window.location.href.includes("complete=true");
 
     try {
@@ -1022,11 +1022,11 @@ class PaymentStore {
           requests.push(this.setPaymentAccount());
 
           if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
-            requests.push(this.fetchCardLinked());
+            requests.push(this.fetchCardLinked(integrationUrl));
           }
         }
       } else {
-        requests.push(this.fetchCardLinked());
+        requests.push(this.fetchCardLinked(integrationUrl));
       }
 
       if (this.isShowStorageTariffDeactivated() && this.isPayer) {
@@ -1054,7 +1054,7 @@ class PaymentStore {
     }
   };
 
-  walletInit = async (t: TTranslation) => {
+  walletInit = async (t: TTranslation, integrationUrl?: string) => {
     const isRefresh = window.location.href.includes("complete=true");
 
     if (!isRefresh) {
@@ -1071,13 +1071,13 @@ class PaymentStore {
           requests.push(this.setPaymentAccount());
 
           if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
-            requests.push(this.fetchCardLinked());
+            requests.push(this.fetchCardLinked(integrationUrl));
           }
         }
 
         requests.push(this.fetchAutoPayments(), this.fetchTransactionHistory());
       } else {
-        requests.push(this.fetchCardLinked());
+        requests.push(this.fetchCardLinked(integrationUrl));
       }
 
       if (this.isShowStorageTariffDeactivated() && this.isPayer) {

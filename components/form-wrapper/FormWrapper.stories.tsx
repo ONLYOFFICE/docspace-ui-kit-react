@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { FormWrapper } from "./index";
@@ -184,6 +184,48 @@ export const WithRegistrationForm: Story = {
     <Button primary label="Create Account" />
   </form>
 </FormWrapper>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--form-wrapper-bg": "#1e1b4b",
+          "--form-wrapper-shadow": "0 8px 32px rgba(124,58,237,0.4)",
+          "--form-wrapper-radius": "24px",
+          "--form-wrapper-padding": "40px",
+          "--form-wrapper-max-width": "400px",
+          "--form-wrapper-min-width": "400px",
+        } as CSSProperties
+      }
+    >
+      <FormWrapper>
+        <div className={styles.demoContent}>
+          <h3 style={{ color: "#e0e7ff", margin: 0 }}>Custom Styled Form</h3>
+          <p style={{ color: "#a78bfa", margin: "8px 0 0" }}>
+            Customized with CSS variables
+          </p>
+        </div>
+      </FormWrapper>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--form-wrapper-bg\` | Background color | theme token |
+| \`--form-wrapper-shadow\` | Box shadow | theme token |
+| \`--form-wrapper-radius\` | Border radius | \`12px\` |
+| \`--form-wrapper-padding\` | Inner padding | \`32px\` |
+| \`--form-wrapper-max-width\` | Maximum width | \`320px\` |
+| \`--form-wrapper-min-width\` | Minimum width | \`320px\` |`,
       },
     },
   },

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -191,6 +191,87 @@ export default meta;
 
 const Wrapper = (props: { children: React.ReactNode }) => {
   return <div style={{ height: "200px" }}>{props.children}</div>;
+};
+
+// DropDown is portaled to body — inject its vars there so they're inherited
+const CssCustomizationTemplate = () => {
+  return (
+    <div
+      style={
+        {
+          "--dropdown-bg": "#e6f3fb",
+          "--dropdown-border-style": "1px solid #0082c9",
+          "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
+          "--dropdown-radius": "12px",
+          "--dropdown-text-size": "13px",
+          "--dropdown-text-weight": "600",
+          // === ContextMenuButton own vars ===
+          "--cmb-border": "1px solid #0082c9",
+          "--cmb-hover-border": "#006ba6",
+          "--cmb-size": "36px",
+          "--cmb-radius": "8px",
+          "--cmb-icon-padding": "8px 9px",
+          // === IconButton (trigger icon) ===
+          "--icon-button-color": "#0082c9",
+          "--icon-button-hover-color": "#006ba6",
+        } as CSSProperties
+      }
+    >
+      <Wrapper>
+        {/* opened + data pre-loaded so the dropdown panel is visible */}
+        <ContextMenuButton
+          title="Actions"
+          iconName={VerticalDotsReactSvgUrl}
+          getData={getMenuData}
+          data={menuData}
+          opened
+          displayIconBorder
+          usePortal={false}
+        />
+      </Wrapper>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS vars grouped by the internal part they target:
+
+**ContextMenuButton — button border wrapper**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--cmb-border\` | Border shorthand | theme-based |
+| \`--cmb-hover-border\` | Hover border color | theme-based |
+| \`--cmb-size\` | Button width and height | \`32px\` |
+| \`--cmb-radius\` | Border radius | \`3px\` |
+| \`--cmb-icon-padding\` | SVG icon padding | \`6px 7px\` |
+
+**IconButton (trigger icon)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--icon-button-color\` | Icon fill/stroke color | theme-based |
+| \`--icon-button-hover-color\` | Icon hover color | theme-based |
+| \`--icon-button-size\` | Icon element size | \`20px\` |
+
+**DropDown (dropdown panel) — set on a parent or \`document.body\` since it renders via portal**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--dropdown-bg\` | Panel background | theme-based |
+| \`--dropdown-border-style\` | Panel border | theme-based |
+| \`--dropdown-shadow\` | Panel shadow | theme-based |
+| \`--dropdown-radius\` | Panel border radius | \`6px\` |
+| \`--dropdown-text-size\` | Item font size | \`13px\` |
+| \`--dropdown-text-weight\` | Item font weight | \`600\` |
+| \`--dropdown-inner-padding\` | Panel inner padding | \`8px 0\` |`,
+      },
+    },
+  },
 };
 
 export const Default: Story = {

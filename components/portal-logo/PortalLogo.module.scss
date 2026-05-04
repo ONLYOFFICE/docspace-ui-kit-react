@@ -36,6 +36,12 @@
     --header-background-color: #{colors.$dark-gray-light};
   }
 
+  --portal-logo-mobile-bg-value: var(--portal-logo-mobile-bg, var(--header-background-color));
+  --portal-logo-mobile-height-value: var(--portal-logo-mobile-height, 48px);
+  --portal-logo-mobile-img-height-value: var(--portal-logo-mobile-img-height, 24px);
+  --portal-logo-desktop-img-height-value: var(--portal-logo-desktop-img-height, 44px);
+  --portal-logo-desktop-img-width-value: var(--portal-logo-desktop-img-width, 386px);
+
   @include mixins.mobile {
     &:not(.resizable) {
       display: none;
@@ -43,8 +49,8 @@
 
     &.mobile.resizable {
       display: flex;
-      background-color: var(--header-background-color);
-      height: 48px;
+      background-color: var(--portal-logo-mobile-bg-value);
+      height: var(--portal-logo-mobile-height-value);
       position: fixed;
       top: 0;
       left: 0;
@@ -53,7 +59,7 @@
       text-align: center;
 
       img {
-        height: 24px;
+        height: var(--portal-logo-mobile-img-height-value);
         margin: auto;
       }
 
@@ -65,8 +71,8 @@
 
   &:global(.not-mobile) {
     img {
-      height: 44px;
-      width: 386px;
+      height: var(--portal-logo-desktop-img-height-value);
+      width: var(--portal-logo-desktop-img-width-value);
     }
   }
 }

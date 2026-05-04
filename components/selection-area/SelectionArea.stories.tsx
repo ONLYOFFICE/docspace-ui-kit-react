@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { SelectionAreaProps } from "./SelectionArea.types";
 
@@ -236,6 +236,42 @@ export const Default: Story = {
   countTilesInRow={4}
   arrayTypes={[{ type: "item", itemHeight: 150, rowGap: 16 }]}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: (args) => (
+    <div
+      style={
+        {
+          "--selection-area-bg": "rgba(0, 130, 201, 0.25)",
+          "--selection-area-border": "1px solid #0082c9",
+        } as CSSProperties
+      }
+    >
+      <SelectionTemplate {...args} />
+    </div>
+  ),
+  args: {
+    viewAs: "tile",
+    folderHeaderHeight: 0,
+    defaultHeaderHeight: 0,
+    countTilesInRow: 4,
+    arrayTypes: [{ type: "item", itemHeight: 150, rowGap: 16 }],
+    isRooms: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--selection-area-bg\` | Selection rectangle fill | \`rgba(68, 170, 255, 0.5)\` |
+| \`--selection-area-border\` | Selection rectangle border | \`1px solid theme blue\` |
+| \`--selection-area-z-index\` | Stack order | \`1000\` |`,
       },
     },
   },

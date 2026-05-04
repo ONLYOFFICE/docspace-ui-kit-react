@@ -41,38 +41,44 @@
   --tooltip-text-color: #{colors.$black};
   --tooltip-max-width: 320px;
 
+  --tooltip-border-radius: var(--tooltip-radius, 6px);
+  --tooltip-box-shadow: var(--tooltip-shadow, 0 2px 4px rgba(0, 0, 0, 0.15));
+  --tooltip-padding: var(--tooltip-inner-padding, 8px 12px);
+  --tooltip-font-size: var(--tooltip-text-size, 12px);
+  --tooltip-z-index: var(--tooltip-layer, 999);
+
   &.noUserSelect {
     user-select: none;
   }
 
   :global(.__react_component_tooltip) {
-    background-color: var(--tooltip-bg-color);
-    border-radius: 6px;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    padding: 8px 12px;
-    max-width: min(100vw, var(--tooltip-max-width));
-    color: var(--tooltip-text-color);
-    font-size: 12px;
-    z-index: 999;
+    background-color: var(--tooltip-bg, var(--tooltip-bg-color));
+    border-radius: var(--tooltip-border-radius);
+    -moz-border-radius: var(--tooltip-border-radius);
+    -webkit-border-radius: var(--tooltip-border-radius);
+    box-shadow: var(--tooltip-box-shadow);
+    -moz-box-shadow: var(--tooltip-box-shadow);
+    -webkit-box-shadow: var(--tooltip-box-shadow);
+    padding: var(--tooltip-padding);
+    max-width: min(100vw, var(--tooltip-max-width-value, var(--tooltip-max-width)));
+    color: var(--tooltip-color, var(--tooltip-text-color));
+    font-size: var(--tooltip-font-size);
+    z-index: var(--tooltip-z-index);
     box-sizing: border-box;
 
     p,
     div,
     span {
-      color: var(--tooltip-text-color);
+      color: var(--tooltip-color, var(--tooltip-text-color));
     }
 
     &:before {
-      border: 1px solid var(--tooltip-bg-color);
+      border: 1px solid var(--tooltip-bg, var(--tooltip-bg-color));
     }
 
     &:after {
-      border: 1px solid var(--tooltip-bg-color);
-      background-color: var(--tooltip-bg-color) !important;
+      border: 1px solid var(--tooltip-bg, var(--tooltip-bg-color));
+      background-color: var(--tooltip-bg, var(--tooltip-bg-color)) !important;
     }
 
     &.place-left {

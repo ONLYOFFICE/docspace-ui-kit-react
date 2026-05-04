@@ -51,12 +51,29 @@
 }
 
 .item {
+  --infinite-loader-tile-gap-value: var(--infinite-loader-tile-gap, 14px 16px);
+  --infinite-loader-tile-min-size-value: var(
+    --infinite-loader-tile-min-size,
+    216px
+  );
+  --infinite-loader-tile-max-size-value: var(
+    --infinite-loader-tile-max-size,
+    360px
+  );
+
   display: grid;
   grid-template-columns: repeat(
     auto-fill,
-    minmax(clamp(216px, 13.4vw, 360px), 1fr)
+    minmax(
+      clamp(
+        var(--infinite-loader-tile-min-size-value),
+        13.4vw,
+        var(--infinite-loader-tile-max-size-value)
+      ),
+      1fr
+    )
   );
-  gap: 14px 16px;
+  gap: var(--infinite-loader-tile-gap-value);
   width: 100%;
 
   @include mixins.desktop {
@@ -71,24 +88,33 @@
 }
 
 .row {
+  --infinite-loader-table-width-value: var(
+    --infinite-loader-list-width,
+    var(--infinite-loader-table-width, 100%)
+  );
+
   margin-inline-start: -20px;
-  width: calc(var(--infinite-loader-table-width) + 40px) !important;
+  width: calc(var(--infinite-loader-table-width-value) + 40px) !important;
 
   :global {
     .ReactVirtualized__Grid__innerScrollContainer {
       :local {
-        max-width: calc(var(--infinite-loader-table-width) + 40px) !important;
+        max-width: calc(
+          var(--infinite-loader-table-width-value) + 40px
+        ) !important;
       }
     }
   }
 
   @include mixins.tablet-and-below {
-    width: calc(var(--infinite-loader-table-width) + 36px) !important;
+    width: calc(var(--infinite-loader-table-width-value) + 36px) !important;
 
     :global {
       .ReactVirtualized__Grid__innerScrollContainer {
         :local {
-          max-width: calc(var(--infinite-loader-table-width) + 36px) !important;
+          max-width: calc(
+            var(--infinite-loader-table-width-value) + 36px
+          ) !important;
         }
       }
     }
@@ -97,12 +123,14 @@
   @include mixins.mobile {
     margin-inline-start: -16px;
 
-    width: calc(var(--infinite-loader-table-width) + 32px) !important;
+    width: calc(var(--infinite-loader-table-width-value) + 32px) !important;
 
     :global {
       .ReactVirtualized__Grid__innerScrollContainer {
         :local {
-          max-width: calc(var(--infinite-loader-table-width) + 32px) !important;
+          max-width: calc(
+            var(--infinite-loader-table-width-value) + 32px
+          ) !important;
         }
       }
     }
@@ -128,13 +156,20 @@
 }
 
 .table {
+  --infinite-loader-table-width-value: var(
+    --infinite-loader-list-width,
+    var(--infinite-loader-table-width, 100%)
+  );
+
   margin-inline-start: -20px;
-  width: calc(var(--infinite-loader-table-width) + 40px) !important;
+  width: calc(var(--infinite-loader-table-width-value) + 40px) !important;
 
   :global {
     .ReactVirtualized__Grid__innerScrollContainer {
       :local {
-        max-width: calc(var(--infinite-loader-table-width) + 40px) !important;
+        max-width: calc(
+          var(--infinite-loader-table-width-value) + 40px
+        ) !important;
       }
     }
 

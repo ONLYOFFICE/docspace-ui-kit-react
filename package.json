@@ -21,7 +21,15 @@
     "format:fix": "pnpm run copy-assets && prettier --write .",
     "tsc": "pnpm run copy-assets && tsc",
     "prepublishOnly": "pnpm run build",
-    "prepare": "node -e \"if (!process.env.CI) { try { require('child_process').execSync('git --version', {stdio: 'ignore'}); require('child_process').execSync('lefthook install', {stdio: 'inherit'}); } catch (e) { console.error('Lefthook installation skipped:', e.message); } }\""
+    "prepare": "node -e \"if (!process.env.CI) { try { require('child_process').execSync('git --version', {stdio: 'ignore'}); require('child_process').execSync('lefthook install', {stdio: 'inherit'}); } catch (e) { console.error('Lefthook installation skipped:', e.message); } }\"",
+    "test:e2e:docker:build": "docker-compose build",
+    "test:e2e:docker:start": "docker-compose run --rm tests-local pnpm exec playwright test",
+    "test:e2e:docker:update-screenshots": "docker-compose run --rm tests-local pnpm exec playwright test --update-snapshots",
+    "test:e2e:docker:clear": "docker rmi ui-kit-tests",
+    "test:e2e:docker:dev": "docker-compose run --rm tests-dev pnpm exec playwright test",
+    "test:e2e:docker:dev:update-screenshots": "docker-compose run --rm tests-dev pnpm exec playwright test --update-snapshots",
+    "test:e2e": "pnpm run storybook-build && pnpm exec playwright test",
+    "test:e2e:ui": "pnpm exec playwright test --ui"
   },
   "peerDependencies": {
     "react": ">=19.0.0",
@@ -129,7 +137,8 @@
     "typescript": "5.9.3",
     "vite": "^8.0.8",
     "vite-plugin-svgr": "^4.5.0",
-    "vitest": "4.1.0"
+    "vitest": "4.1.0",
+    "@playwright/test": "1.58.1"
   },
   "keywords": [
     "react",
