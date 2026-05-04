@@ -71,7 +71,7 @@ const Uploader = ({
 }: UploaderProps) => {
   const { operationsApi, foldersApi } = useApi();
 
-  const folderTargetId = +(targetId ?? 0);
+  const folderTargetId: string | number = targetId ?? 0;
   const chunkUploadSize =
     filesSettings?.chunkUploadSize || DEFAULT_CHUNK_UPLOAD_SIZE;
   const maxUploadThreadCount =
@@ -104,7 +104,7 @@ const Uploader = ({
           : new Date().toISOString();
 
         const sessionRes = await operationsApi.createUploadSessionInFolder(
-          targetFolderId,
+          targetFolderId as unknown as number,
           {
             fileName: file.name,
             fileSize: file.size,
@@ -132,21 +132,21 @@ const Uploader = ({
           percent: 0,
         });
 
-        await runWithConcurrency(
-          chunks,
-          maxUploadThreadCount,
-          async (chunk) => {
-            const chunkFile = new File(
-              [chunk.data.get("file") as Blob],
-              file.name,
+        const isThirdPartyFolder = typeof targetFolderId === "string";
+
+        if (isThirdPartyFolder) {
+          let lastChunkResult: unknown = null;
+
+          for (const chunk of chunks) {
+            const chunkBlob = chunk.data.get("file") as Blob;
+
+            const res = await operationsApi.uploadSession(
+              targetFolderId as unknown as number,
+              sessionId,
+              chunkBlob as unknown as File,
             );
 
-            await operationsApi.uploadAsyncSession(
-              targetFolderId,
-              sessionId,
-              chunk.index,
-              chunkFile,
-            );
+            lastChunkResult = res.data;
 
             uploadedChunks += 1;
             uploadedBytes += chunk.size;
@@ -165,14 +165,49 @@ const Uploader = ({
               totalChunks: chunks.length,
               percent: filePercent,
             });
-          },
-        );
+          }
 
-        const result = await operationsApi.finalizeSession(
-          targetFolderId,
-          sessionId,
-        );
-        uploadedFiles.push(result.data);
+          uploadedFiles.push(lastChunkResult);
+        } else {
+          await runWithConcurrency(
+            chunks,
+            maxUploadThreadCount,
+            async (chunk) => {
+              const chunkBlob = chunk.data.get("file") as Blob;
+
+              await operationsApi.uploadAsyncSession(
+                targetFolderId as unknown as number,
+                sessionId,
+                chunk.index,
+                chunkBlob as unknown as File,
+              );
+
+              uploadedChunks += 1;
+              uploadedBytes += chunk.size;
+              const filePercent = Math.round(
+                (uploadedChunks / chunks.length) * 100,
+              );
+              const overallPercent = Math.round(
+                (uploadedBytes / totalBytes) * 100,
+              );
+              setUploadPercent(overallPercent);
+
+              onUploadProgress?.({
+                sessionId,
+                fileName: file.name,
+                uploadedChunks,
+                totalChunks: chunks.length,
+                percent: filePercent,
+              });
+            },
+          );
+
+          const result = await operationsApi.finalizeSession(
+            targetFolderId as unknown as number,
+            sessionId,
+          );
+          uploadedFiles.push(result.data);
+        }
       });
 
       return uploadedFiles;
@@ -395,7 +430,7 @@ const Uploader = ({
         linkMainText={linkMainText ?? getCommonTranslation("Upload")}
         linkSecondaryText={getSecondaryText()}
         exstsText={
-          extensionsText ?? shortText ?? getCommonTranslation("AnyFiles")
+          extensionsText ?? (shortText || getCommonTranslation("AnyFiles"))
         }
         fullExstsText={fullText}
         formatsPlusBadgeValue={badgeValue}
@@ -411,3 +446,4 @@ const Uploader = ({
 export { Uploader };
 
 export { createChunks, runWithConcurrency } from "./utils/upload";
+

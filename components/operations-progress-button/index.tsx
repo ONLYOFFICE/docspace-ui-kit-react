@@ -74,10 +74,13 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   operations = [],
   panelOperations = [],
   operationsAlert,
+  operationsCanceled,
   operationsCompleted = false,
+  operationsStopped = false,
   clearOperationsData,
   clearPanelOperationsData,
   cancelUpload,
+  cancelSecondaryOperationById,
   mainButtonVisible,
   needErrorChecking,
   showCancelButton,
@@ -168,9 +171,9 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
 
   const handleTooltipOpen = () => {
     clearTimers();
-    setIsHovered(false);
 
     hideTimerRef.current = setTimeout(() => {
+      setIsHovered(false);
       setIsHideTooltip(true);
 
       resetTimerRef.current = setTimeout(() => {
@@ -296,6 +299,27 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       );
     }
 
+    if (operationsStopped) {
+      const operationName = operationsLength
+        ? operations[0].label
+        : panelOperations[0].label;
+
+      return (
+        <Text fontWeight={600}>
+          {t("StoppedOperation", {
+            operationName,
+          })}
+        </Text>
+      );
+    }
+    if (operationsCanceled) {
+      const canceledLabel = operationsLength
+        ? operations[0].label
+        : panelOperations[0].label;
+
+      return <Text fontWeight={600}>{canceledLabel}</Text>;
+    }
+
     if (operationsAlert) {
       const operationName = operationsLength
         ? operations[0].label
@@ -314,6 +338,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
           <Text fontWeight={600}>
             {operationName}
             <br />
+            {/* t("Common:ErrorUploadingFiles", { count: getErrorCount() }) */}
             {t("ErrorUploadingFiles", {
               count: getErrorCount()!,
             })}
@@ -444,11 +469,11 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
               alert={operationsAlert}
               completed={operationsCompleted}
               onClick={handleFloatingButtonClick}
-              {...(!isSeveralOperations &&
-                !isMobile && {
-                  showCancelButton,
-                  clearUploadedFilesHistory: onCancelOperation,
-                })}
+              {...(!isSeveralOperations && {
+                showCancelButton,
+                showCloseIcon: isMobile && isHovered,
+                clearUploadedFilesHistory: onCancelOperation,
+              })}
               withoutStatus={withoutStatus}
               percent={getPercent()}
             />
@@ -476,6 +501,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
                 clearPanelOperationsData?.(operationName);
               }}
               onCancel={onCancelOperation}
+              cancelSecondaryOperationById={cancelSecondaryOperationById}
               onOpenPanel={handleOperationClick}
             />
           </DropDown>

@@ -26,13 +26,18 @@
 
 import { makeAutoObservable } from "mobx";
 import React from "react";
-import { ContentType, EventType, RoleType } from "../../../enums";
+import {
+  ContentType,
+  EventType,
+  RoleType,
+} from "../../../enums";
 import type {
   TContent,
   TMessage,
   TToolCallContent,
   TMultimodal,
 } from "../../../types/ai";
+
 
 import type { TFile } from "../../../types";
 
@@ -63,6 +68,8 @@ export default class MessageStore {
 
   isStreamRunning: boolean = false;
 
+  isAnalyzing: boolean = false;
+
   isGetMessageRequestRunning: boolean = false;
 
   knowledgeSearchToolName: string = "";
@@ -79,6 +86,9 @@ export default class MessageStore {
 
   toolsConfirmQueue: string[] = [];
 
+  openFileConfirmQueue: Array<{ fileId: number; title: string }> =
+    [];
+
   onStreamData?: (chunk: string) => void;
 
   constructor(aiApi: AiApi) {
@@ -94,6 +104,20 @@ export default class MessageStore {
     this.toolsConfirmQueue = this.toolsConfirmQueue.filter(
       (item) => item !== id,
     );
+  };
+
+  addToOpenFileConfirmQueue = (entry: {
+    fileId: number;
+    title: string;
+  }) => {
+    this.openFileConfirmQueue.push(entry);
+  };
+
+  removeFromOpenFileConfirmQueue = (fileId: number) => {
+    this.openFileConfirmQueue =
+      this.openFileConfirmQueue.filter(
+        (item) => item.fileId !== fileId,
+      );
   };
 
   addMessage = (message: TMessage) => {
@@ -171,6 +195,11 @@ export default class MessageStore {
     this.isStreamRunning = isStreamRunning;
   };
 
+  setIsAnalyzing = (isAnalyzing: boolean) => {
+    this.isAnalyzing = isAnalyzing;
+  };
+
+
   startNewChat = async () => {
     this.setCurrentChatId("");
     this.setMessages([]);
@@ -246,6 +275,7 @@ export default class MessageStore {
 
     this.setIsStreamRunning(false);
     this.setIsRequestRunning(false);
+    this.setIsAnalyzing(false);
   };
 
   addUserMessage = (message: string, files: Partial<TFile>[]) => {
@@ -387,14 +417,10 @@ export default class MessageStore {
     const fileId = Number(data?.id);
     if (!Number.isInteger(fileId) || fileId <= 0) return;
 
-    const webSearchParams = new URLSearchParams();
-
-    webSearchParams.append("fileId", String(fileId));
-    webSearchParams.append("withTool", "true");
-
-    const url = `${window.location.origin}/doceditor?${webSearchParams.toString()}`;
-
-    window.open(url, "_blank");
+    this.addToOpenFileConfirmQueue({
+      fileId,
+      title: data.title,
+    });
   };
 
   handleToolCall = (jsonData: string) => {
@@ -501,7 +527,8 @@ export default class MessageStore {
   };
 
   handleStreamError = (jsonData: string, error?: unknown) => {
-    this.setIsStreamRunning(true);
+    this.setIsStreamRunning(false);
+    this.setIsAnalyzing(false);
     let message = "";
     try {
       const parsed = JSON.parse(jsonData);
@@ -541,6 +568,9 @@ export default class MessageStore {
       return;
     }
 
+    let analyzeTimer: ReturnType<typeof setTimeout> | null =
+      null;
+
     try {
       const textDecoder = new TextDecoder();
 
@@ -551,13 +581,47 @@ export default class MessageStore {
 
       let buffer = "";
       let chunkIdx = -1;
+      let isReasoningRunning = false;
+
+      const hasPendingToolCall = () => {
+        const lastMsg = this.getLastMessage();
+        if (!lastMsg) return false;
+        return lastMsg.contents.some(
+          (c) =>
+            (c as TToolCallContent).type ===
+              ContentType.Tool &&
+            !(c as TToolCallContent).result,
+        );
+      };
+
+      const resetAnalyzeTimer = () => {
+        if (analyzeTimer) clearTimeout(analyzeTimer);
+        analyzeTimer = setTimeout(() => {
+          if (
+            this.toolsConfirmQueue.length > 0 ||
+            this.openFileConfirmQueue.length > 0 ||
+            hasPendingToolCall()
+          ) {
+            return;
+          }
+          this.setIsAnalyzing(true);
+        }, 1000);
+      };
 
       const streamHandler = async () => {
         const { done, value } = await reader.read();
 
         if (done) {
+          if (analyzeTimer) clearTimeout(analyzeTimer);
           this.setIsRequestRunning(false);
           this.setIsStreamRunning(false);
+          this.setIsAnalyzing(false);
+
+          if (isReasoningRunning) {
+            msg += "\n</think>\n";
+            this.continueAIMessage(msg);
+            isReasoningRunning = false;
+          }
 
           try {
             reader.cancel();
@@ -579,6 +643,12 @@ export default class MessageStore {
               JSON.stringify(jsonData.error),
               jsonData.error,
             );
+
+            if (isReasoningRunning) {
+              msg += "\n</think>\n";
+              this.continueAIMessage(msg);
+              isReasoningRunning = false;
+            }
 
             reader.cancel();
 
@@ -614,10 +684,54 @@ export default class MessageStore {
               return;
             }
 
+            if (isReasoningRunning && !event.includes(EventType.Reasoning)) {
+              msg += "\n</think>\n";
+              this.continueAIMessage(msg);
+              isReasoningRunning = false;
+            }
+
+            if (!event.includes(EventType.MessageStart)) {
+              this.setIsAnalyzing(false);
+            }
+
             if (event.includes(EventType.MessageStart)) {
               this.setIsStreamRunning(true);
 
               this.handleMetadata(jsonData);
+
+              return;
+            }
+
+            if (event.includes(EventType.Reasoning)) {
+              try {
+                const parsed = JSON.parse(jsonData);
+                if (
+                  !parsed ||
+                  typeof parsed !== "object" ||
+                  typeof parsed.text !== "string"
+                ) {
+                  return;
+                }
+                const { text } = parsed;
+
+                if (!isReasoningRunning) {
+                  isReasoningRunning = true;
+                  msg += "<think>\n";
+                }
+
+                msg += text;
+
+                if (msg) {
+                  if (prevMsg) {
+                    this.continueAIMessage(msg);
+                  } else {
+                    this.addNewAIMessage(msg);
+                  }
+                  prevMsg = msg;
+                }
+              } catch {
+                // ignore
+              }
 
               return;
             }
@@ -702,6 +816,8 @@ export default class MessageStore {
             }
           });
 
+          resetAnalyzeTimer();
+
           await streamHandler();
         } catch (e) {
           console.error(e);
@@ -716,8 +832,10 @@ export default class MessageStore {
       console.error(e);
       toastr.error(e as string);
     } finally {
+      if (analyzeTimer) clearTimeout(analyzeTimer);
       this.setIsRequestRunning(false);
       this.setIsStreamRunning(false);
+      this.setIsAnalyzing(false);
     }
   };
 
@@ -726,6 +844,7 @@ export default class MessageStore {
       this.addUserMessage(message, files);
 
       this.setIsRequestRunning(true);
+      this.setIsAnalyzing(true);
 
       this.abortController.abort("Start new chat");
 
@@ -749,6 +868,7 @@ export default class MessageStore {
       this.addUserMessage(message, files);
 
       this.setIsRequestRunning(true);
+      this.setIsAnalyzing(true);
 
       this.abortController.abort("Start new message");
 
@@ -773,6 +893,7 @@ export default class MessageStore {
         this.abortController.abort("Stop message");
         this.setIsRequestRunning(false);
         this.setIsStreamRunning(false);
+        this.setIsAnalyzing(false);
       } catch {
         // ignore abort error
       }
@@ -855,6 +976,7 @@ export const MessageStoreContextProvider = ({
   React.useEffect(() => {
     store.onStreamData = onStreamData;
   }, [store, onStreamData]);
+
 
   return (
     <MessageStoreContext.Provider value={store}>

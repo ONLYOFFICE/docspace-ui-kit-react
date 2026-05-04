@@ -296,7 +296,7 @@
 
     &.alert {
       svg {
-        path {
+        path:not([fill="white"]) {
           fill: var(--status-icon-color-negative) !important;
         }
       }
@@ -304,7 +304,7 @@
 
     &.complete {
       svg {
-        path {
+        path:not([fill="white"]) {
           fill: var(--status-icon-color-positive) !important;
         }
       }

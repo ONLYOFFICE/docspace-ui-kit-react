@@ -24,16 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useRef, useEffect, useCallback, type RefObject } from "react";
+import { useEffect, useEffectEvent, type RefObject } from "react";
 
-import { useEventListener } from "../useEventListener";
 import { isElementCovered as defaultIsElementCovered } from "./useCloseOnAnchorCovered.utils";
 
 export { isElementCovered } from "./useCloseOnAnchorCovered.utils";
 
 type UseCloseOnAnchorCoveredProps = {
   anchorRef: RefObject<HTMLElement | null>;
-  popupRef: RefObject<HTMLElement | null>;
   onClose: VoidFunction;
   isElementCovered?: (element: HTMLElement) => boolean;
   enabled?: boolean;
@@ -41,52 +39,31 @@ type UseCloseOnAnchorCoveredProps = {
 
 export const useCloseOnAnchorCovered = ({
   anchorRef,
-  popupRef,
   onClose,
   isElementCovered = defaultIsElementCovered,
   enabled = true,
 }: UseCloseOnAnchorCoveredProps) => {
-  const rafIdRef = useRef<number | null>(null);
-
-  const cancelScheduledCheck = useCallback(() => {
-    if (rafIdRef.current !== null) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
+  const checkAndClose = useEffectEvent(() => {
+    if (!anchorRef.current) return false;
+    if (isElementCovered(anchorRef.current)) {
+      onClose();
+      return true;
     }
-  }, []);
-
-  const scheduleCheck = useCallback(() => {
-    if (rafIdRef.current !== null) return;
-
-    rafIdRef.current = requestAnimationFrame(() => {
-      rafIdRef.current = null;
-
-      if (!anchorRef.current) return;
-
-      if (isElementCovered(anchorRef.current)) {
-        onClose();
-      }
-    });
-  }, [anchorRef, isElementCovered, onClose]);
-
-  const handleWheel = useCallback(
-    (event: WheelEvent) => {
-      if (!enabled) return;
-
-      const isScrollInsidePopup =
-        event.target instanceof HTMLElement &&
-        popupRef.current?.contains(event.target);
-
-      if (isScrollInsidePopup) return;
-
-      scheduleCheck();
-    },
-    [enabled, popupRef, scheduleCheck],
-  );
-
-  useEventListener("wheel", handleWheel, undefined, { passive: true });
+    return false;
+  });
 
   useEffect(() => {
-    return cancelScheduledCheck;
-  }, [cancelScheduledCheck]);
+    if (!enabled) return;
+
+    let rafId: number;
+
+    const loop = () => {
+      if (checkAndClose()) return;
+      rafId = requestAnimationFrame(loop);
+    };
+
+    rafId = requestAnimationFrame(loop);
+
+    return () => cancelAnimationFrame(rafId);
+  }, [enabled]);
 };

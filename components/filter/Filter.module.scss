@@ -833,6 +833,14 @@
   }
 }
 
+.rowGroupingRooms :global(.group-tag-room) {
+  overflow: hidden;
+
+  @include mixins.tablet-and-below {
+    max-width: 150px;
+  }
+}
+
 .groupTagsMeasure {
   position: absolute;
   visibility: hidden;

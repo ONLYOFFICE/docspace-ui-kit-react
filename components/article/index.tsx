@@ -125,6 +125,7 @@ const Article = ({
   officeforiosUrl,
   showBackButton,
   navigate,
+  onBack,
   customSlot,
 }: ArticleProps) => {
   const [articleHeaderContent, setArticleHeaderContent] =
@@ -237,15 +238,13 @@ const Article = ({
 
   const hideDevTools =
     user?.isVisitor ||
-    (!user?.isAdmin && limitedAccessDevToolsForUsers) ||
-    window.location.pathname.includes("portal-settings") ||
+    (!isAdmin && limitedAccessDevToolsForUsers) ||
+    window.location.pathname.includes("developer-tools") ||
     (window.location.pathname.includes("management") &&
       !window.location.pathname.includes("profile")) ||
     window.location.pathname.includes("accounts");
 
-  const pathDevTools = user?.isAdmin
-    ? "/portal-settings/developer-tools"
-    : "/developer-tools";
+  const pathDevTools = "/developer-tools";
 
   const articleComponent = (
     <>
@@ -266,6 +265,7 @@ const Article = ({
           onIconClick={toggleArticleOpen}
           showBackButton={showBackButton}
           navigate={navigate}
+          onBack={onBack}
         >
           {articleHeaderContent ? articleHeaderContent.props.children : null}
         </SubArticleHeader>
@@ -292,6 +292,7 @@ const Article = ({
               onLogoClickAction={onLogoClickAction}
               isLoading={isBurgerLoading}
               navigate={navigate}
+              onBack={onBack}
             />
           ) : null}
           {articleBodyContent

@@ -88,6 +88,9 @@ export enum SocketEvents {
   ExportChat = "s:export-chat",
   QuotaExceeded = "s:quota_exceeded",
   ExternalDbSettings = "s:external-db-settings",
+  ChangeWebPlugin = "s:change-web-plugin",
+  ChangeAiConfig = "s:change-ai-config",
+  TopUpWallet = "s:top-up-wallet",
 }
 
 /**
@@ -265,6 +268,16 @@ export type TEditFileData =
   | string
   | { fileId: number | string; editingBy: Record<string, string> };
 
+
+export type TChangeWebPluginData = {
+  webPluginName: string;
+  enabled: boolean;
+};
+
+export type TTopUpWalletData = {
+  auto: boolean;
+};
+
 export type TListenEventCallbackMap = {
   [SocketEvents.LogoutSession]: (data: {
     loginEventId: unknown;
@@ -355,6 +368,9 @@ export type TListenEventCallbackMap = {
   [SocketEvents.ExternalDbSettings]: (
     settings: Partial<Record<string, unknown>>,
   ) => void;
+  [SocketEvents.ChangeWebPlugin]: (data: TChangeWebPluginData) => void;
+  [SocketEvents.ChangeAiConfig]: () => void;
+  [SocketEvents.TopUpWallet]: (data: TTopUpWalletData) => void;
 };
 
 /**

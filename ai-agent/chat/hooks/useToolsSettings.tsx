@@ -35,7 +35,7 @@ import {
   TAIRoomChatSettings,
 } from "../../../types/ai";
 import { Nullable } from "../../../types";
-import { RoomsType } from "../../../enums";
+import { RoomsType, ChatReasoningEffort } from "../../../enums";
 import { useApi } from "../../../providers";
 
 type Props = {
@@ -50,8 +50,9 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
     new Map(),
   );
   const [webSearchEnabled, setWebSearchEnabled] = React.useState(false);
+  const [thinkingEnabled, setThinkingEnabled] = React.useState(false);
   const [isFetched, setIsFetched] = React.useState(false);
-  const { aiApi, foldersApi } = useApi();
+  const { aiApi } = useApi();
 
   const fetchServerTools = React.useCallback(
     async (res: TServer[], agentId: string | number) => {
@@ -89,14 +90,20 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
     if (!agentId) return;
 
     const promises: Promise<unknown>[] = [
-      aiApi.getWebSearchInRoom(Number(agentId)).then((res) => {
+      aiApi.getUserChatSettings(Number(agentId)).then((res) => {
         setWebSearchEnabled(res?.webSearchEnabled ?? false);
+
+        const isThinkingEnabled =
+          res?.reasoningEffort !== undefined &&
+          res?.reasoningEffort !== null &&
+          res?.reasoningEffort !== ChatReasoningEffort.None;
+        setThinkingEnabled(isThinkingEnabled);
       }),
       fetchTools(),
     ];
 
     await Promise.all(promises);
-  }, [fetchTools, agentId, aiApi, foldersApi]);
+  }, [fetchTools, agentId, aiApi]);
 
   const onModifyFolder = React.useCallback(
     (data?: TOptSocket) => {
@@ -133,7 +140,9 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
   return {
     servers,
     MCPTools,
-    webSearchAvailable: aiConfig?.webSearchEnabled || false,
+    webSearchAvailable:
+      (aiConfig?.webSearchEnabled || false) &&
+      (chatSettings?.capabilities?.toolCalling ?? true),
     webSearchEnabled,
     isFetched,
     knowledgeSearchToolName: aiConfig?.knowledgeSearchToolName || "",
@@ -148,6 +157,10 @@ const useToolsSettings = ({ agentId, aiConfig, chatSettings }: Props) => {
     setIsFetched,
     fetchTools,
     initTools,
+    toolCallingSupported: chatSettings?.capabilities?.toolCalling ?? true,
+    thinkingSupported: chatSettings?.capabilities?.thinking || false,
+    thinkingEnabled,
+    setThinkingEnabled,
   };
 };
 

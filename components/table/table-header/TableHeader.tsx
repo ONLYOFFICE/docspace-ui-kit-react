@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import throttle from "lodash/throttle";
 
@@ -513,6 +513,16 @@ export const TableHeader = (props: TableHeaderProps) => {
     // TODO: Fixed columns size if something went wrong
     if (storageSize) {
       const splitStorage = storageSize.split(" ");
+
+      // Reset storage if columns count doesn't match (e.g. stale data from another section)
+      if (splitStorage.length !== columns.length + 1) {
+        localStorage.removeItem(columnStorageName);
+        if (!isResized) {
+          resetColumns();
+          return;
+        }
+      }
+
       if (
         !shortSize &&
         getSubstring(splitStorage[0]) <= DEFAULT_MIN_COLUMN_SIZE
@@ -1152,11 +1162,13 @@ export const TableHeader = (props: TableHeaderProps) => {
     }
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isMountedRef.current) {
       onResize();
     }
+  });
 
+  useEffect(() => {
     const throttledResize = throttle(() => onResize(true), 300);
 
     window.addEventListener("resize", throttledResize);

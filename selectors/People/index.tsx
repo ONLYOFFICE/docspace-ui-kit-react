@@ -52,6 +52,7 @@ import {
   type EmployeeFullDto,
   type GroupDto,
   type EmployeeType as SdkEmployeeType,
+  type SearchUsersByExtendedFilterEmployeeTypesEnum,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../providers/api/ApiProvider";
 import { useCommonTranslation } from "../../utils/i18n";
@@ -66,6 +67,7 @@ import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
 import styles from "./PeopleSelector.module.scss";
 import { Encoder } from "../../utils/encoder";
+import { getBrandName } from "../../constants/brands";
 
 const PEOPLE_TAB_ID = "0";
 const GROUP_TAB_ID = "1";
@@ -353,12 +355,15 @@ const PeopleSelector = ({
         let responseTotal = 0;
 
         if (!roomId) {
+          const employeeType =
+            currentFilter.role as SearchUsersByExtendedFilterEmployeeTypesEnum[];
+
           const res = await peopleSearchApi.searchUsersByExtendedFilter(
             currentFilter.employeeStatus,
             undefined,
             undefined,
             undefined,
-            undefined,
+            employeeType,
             undefined,
             undefined,
             undefined,
@@ -379,7 +384,8 @@ const PeopleSelector = ({
           items = res.data.response ?? [];
           responseTotal = res.data.count ?? 0;
         } else if (isGroupsTab) {
-          const id = Number(roomId);
+          // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
+          const id = roomId as number;
           const fetcher =
             targetEntityType === "file"
               ? groupSearchApi.getGroupsWithFilesShared.bind(groupSearchApi)
@@ -401,7 +407,8 @@ const PeopleSelector = ({
           }));
           responseTotal = res.data.count ?? 0;
         } else {
-          const id = Number(roomId);
+          // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
+          const id = roomId as number;
           const fetcher =
             targetEntityType === "file"
               ? peopleSearchApi.getUsersWithFilesShared.bind(peopleSearchApi)
@@ -772,7 +779,7 @@ const PeopleSelector = ({
             : t("NotFoundGuestsDescription")
           : activeTabId === PEOPLE_TAB_ID
             ? t("EmptyDescription", {
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
               })
             : t("GroupsNotFoundDescription"))
       }
@@ -810,3 +817,4 @@ const PeopleSelector = ({
 };
 
 export default PeopleSelector;
+

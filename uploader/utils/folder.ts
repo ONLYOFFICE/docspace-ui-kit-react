@@ -36,7 +36,7 @@ import {
 
 export const buildParentFolderMap = async (
   files: File[],
-  rootFolderId: number,
+  rootFolderId: string | number,
   foldersApi: FoldersApi,
 ) => {
   const dirSet = new Set<string>();
@@ -58,7 +58,7 @@ export const buildParentFolderMap = async (
     (a, b) => getPathSegments(a).length - getPathSegments(b).length,
   );
 
-  const dirToId = new Map<string, number>();
+  const dirToId = new Map<string, string | number>();
 
   for (const dir of dirs) {
     const segs = getPathSegments(dir);
@@ -70,7 +70,10 @@ export const buildParentFolderMap = async (
       throw new Error("Failed to resolve parent folder");
     }
 
-    const res = await foldersApi.createFolder(parentId, { title: name });
+    const res = await foldersApi.createFolder(
+      parentId as unknown as number,
+      { title: name },
+    );
     const created = res.data?.response;
     if (!created?.id) {
       throw new Error("Failed to create folder");
@@ -83,9 +86,9 @@ export const buildParentFolderMap = async (
 
 export const prepareFolderUpload = async (
   files: File[],
-  rootFolderId: number,
+  rootFolderId: string | number,
   foldersApi: FoldersApi,
-): Promise<{ files: File[]; parentFolderMap: Map<File, number> }> => {
+): Promise<{ files: File[]; parentFolderMap: Map<File, string | number> }> => {
   const normalizedFiles = files.filter((f) => {
     const p = getFilePath(f);
     if (!p) return true;
@@ -98,7 +101,7 @@ export const prepareFolderUpload = async (
     foldersApi,
   );
 
-  const parentFolderMap = new Map<File, number>();
+  const parentFolderMap = new Map<File, string | number>();
 
   normalizedFiles.forEach((f) => {
     if (isEmptyDirectoryFile(f)) return;

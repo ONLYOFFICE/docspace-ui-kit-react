@@ -138,7 +138,7 @@
 
       margin-top: -4px;
 
-      margin-left: var(--context-menu-submenu-list-margin);
+      margin-inline-start: var(--context-menu-submenu-list-margin);
     }
 
     .p-contextmenu .p-menuitem-link {
@@ -172,7 +172,9 @@
       }
 
       &.p-disabled {
-        color: var(--sub-menu-item-disabled-color);
+        &:not(.p-disabled-styles-toggle) {
+          color: var(--sub-menu-item-disabled-color);
+        }
 
         &:hover {
           cursor: default;

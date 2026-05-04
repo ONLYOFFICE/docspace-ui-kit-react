@@ -26,7 +26,7 @@
  * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  */
 
-import { ContentType, RoleType, ServerType } from "../enums";
+import { ContentType, RoleType, ServerType, ChatReasoningEffort } from "../enums";
 import { TCreatedBy } from "./index";
 
 export type TToolCallResultSourceData = {
@@ -91,6 +91,12 @@ export type TMessage = {
 
 export type TMultimodal = { image: { formats: string[] } };
 
+export type TModelCapabilities = {
+  vision: boolean;
+  toolCalling: boolean;
+  thinking: boolean;
+};
+
 export type TChat = {
   id: string;
   title: string;
@@ -152,5 +158,10 @@ export type TAIRoomChatSettings = {
   internal: boolean;
   modelAlias?: string;
   multimodal?: TMultimodal;
+  capabilities?: TModelCapabilities;
 };
 
+export interface UserChatSettingsDto {
+  webSearchEnabled: boolean;
+  reasoningEffort: ChatReasoningEffort | null;
+}

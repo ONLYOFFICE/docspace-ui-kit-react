@@ -43,6 +43,7 @@ import { getTitleWithoutExtension } from "../../utils/getTitleWithoutExtension";
 import type { TSelectorItem } from "../../components/selector";
 
 import { DEFAULT_FILE_EXTS } from "./constants";
+import { getBrandName } from "../../constants/brands";
 
 export const convertRoomsToItems = (
   rooms: FolderDtoInteger[],
@@ -220,7 +221,7 @@ export const convertFoldersToItems: (
 
 export const getDefaultBreadCrumb = (t: (key: string) => string) => {
   return {
-    label: t("ProductName"),
+    label: getBrandName("ProductName"),
     id: 0,
     isRoom: false,
   };
