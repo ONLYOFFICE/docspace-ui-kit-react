@@ -207,7 +207,6 @@
     outline: none;
   }
 
-  // Size variants
   &.extraSmall {
     height: var(--button-height-xs, 24px);
     font-size: var(--button-font-size-xs, 12px);
@@ -236,7 +235,6 @@
     padding: 0 32px;
   }
 
-  // Default variant
   background: var(--button-root-bg, var(--button-background-base));
   color: var(--button-root-color, var(--button-color-base));
   border: var(--button-root-border, var(--button-border-base));
@@ -271,7 +269,6 @@
     );
   }
 
-  // Primary variant
   &.primary {
     background: var(--button-primary-bg, var(--button-background-primary));
     color: var(--button-primary-color, var(--button-color-primary));
