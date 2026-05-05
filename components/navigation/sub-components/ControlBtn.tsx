@@ -201,8 +201,8 @@ const ControlButtons = ({
       {renderContextButton((isPublicRoom && containVisible) ?? false)}
       {renderWarning()}
       {!isTabletView ? renderNavigationButton() : null}
-      {analyzeResponsesButton ?? null}
       {renderTariffBar()}
+      {analyzeResponsesButton ?? null}
       {isTabletView ? renderNavigationButton() : null}
     </div>
   );
