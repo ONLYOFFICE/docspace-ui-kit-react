@@ -26,6 +26,12 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
+import i18nextSingleton from "i18next";
+import {
+  I18nextProvider as ReactI18nextProvider,
+  useTranslation,
+} from "react-i18next";
+
 import {
   ApiProvider,
   CallbacksManager,
@@ -76,6 +82,35 @@ import {
   fileManagementTools,
   type EditorToolsChangedDetail,
 } from "./host-tool-groups";
+
+// The host app (DocSpace) uses `i18n.createInstance()` and provides that
+// instance via `<I18nextProvider>` at the app root. ai-chat, however, calls
+// `i18n.use(initReactI18next).init(...)` on the default i18next singleton.
+// Result: ai-chat's resources land in the singleton, but its `useI18n` hook
+// resolves through `useTranslation()` which reads the host's instance from
+// React context — so all ai-chat keys come back as raw keys.
+//
+// We bracket ai-chat's `<I18nProvider>` with two `<I18nextProvider>`s: the
+// outer one swaps the singleton in so ai-chat's internal `I18nBridge`
+// (which calls `useTranslation()`) sees its own resources, and the inner
+// one restores the host's instance for `children`, so the rest of the app
+// keeps using DocSpace translations.
+const AiChatI18nIsolator = ({
+  locale,
+  children,
+}: {
+  locale: string;
+  children: ReactNode;
+}) => {
+  const { i18n: hostI18n } = useTranslation();
+  return (
+    <ReactI18nextProvider i18n={i18nextSingleton}>
+      <I18nProvider locale={locale}>
+        <ReactI18nextProvider i18n={hostI18n}>{children}</ReactI18nextProvider>
+      </I18nProvider>
+    </ReactI18nextProvider>
+  );
+};
 
 type AiAgentProvidersProps = {
   locale: string;
@@ -214,7 +249,7 @@ const AiAgentProviders = ({
       callbacks={callbacks}
     >
       <PlatformProvider platform={platformAdapter}>
-        <I18nProvider locale={aiChatLocale}>
+        <AiChatI18nIsolator locale={aiChatLocale}>
           <ComponentsProvider>
             <WidgetConfigProvider config={{}}>
               <ApiProvider config={serverApiConfig}>
@@ -235,7 +270,7 @@ const AiAgentProviders = ({
               </ApiProvider>
             </WidgetConfigProvider>
           </ComponentsProvider>
-        </I18nProvider>
+        </AiChatI18nIsolator>
       </PlatformProvider>
     </EventsProvider>
   );
@@ -243,5 +278,6 @@ const AiAgentProviders = ({
 
 export default AiAgentProviders;
 
-export { useStores } from "@onlyoffice/ai-chat";
+export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
+export type { Profile } from "@onlyoffice/ai-chat";
 
