@@ -32,6 +32,9 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { InputSize } from "../text-input";
+import { ButtonSize } from "../button";
+
+import PlusReactSvg from "../../assets/icons/12/plus.svg";
 
 import { SearchInput } from ".";
 
@@ -120,6 +123,18 @@ import { InputSize } from "@docspace/ui-kit/components/text-input";
     placeholder: {
       control: "text",
       description: "Placeholder text",
+    },
+    searchButtonProps: {
+      control: false,
+      description:
+        "Props for the action button displayed to the left of the search field (ButtonProps)",
+    },
+    showSearchButton: {
+      control: "boolean",
+      description: "Show a button to the left of the search field",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
 } satisfies Meta<typeof SearchInput>;
@@ -292,6 +307,59 @@ export const AutoRefreshMode: Story = {
   },
 };
 
+const PlusIcon = () => (
+  <span
+    style={{
+      display: "inline-flex",
+      filter: "brightness(0) invert(1)",
+    }}
+  >
+    <PlusReactSvg />
+  </span>
+);
+
+export const WithButton: Story = {
+  render: (args) => {
+    const [value, setValue] = useState(args.value || "");
+
+    const buttonProps = {
+      label: "New room",
+      primary: true,
+      size: ButtonSize.small,
+      icon: <PlusIcon />,
+    };
+
+    return (
+      <div style={{ width: "500px" }}>
+        <SearchInput
+          {...args}
+          value={value}
+          onChange={(v) => setValue(v)}
+          showClearButton={!!value}
+          onClearSearch={() => setValue("")}
+          searchButtonProps={buttonProps}
+        />
+      </div>
+    );
+  },
+  args: {
+    size: InputSize.base,
+    value: "",
+    scale: true,
+    placeholder: "Search",
+    showSearchButton: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "SearchInput with an action button to the left. " +
+          "Use `showSearchButton` and `searchButtonProps` to control visibility and all Button props.",
+      },
+    },
+  },
+};
+
 export const CssCustomization: Story = {
   render: () => (
     <div
@@ -311,8 +379,18 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <SearchInput size={InputSize.base} placeholder="Custom styled search" value="" onChange={() => {}} />
-      <SearchInput size={InputSize.base} placeholder="With value" value="Search term" onChange={() => {}} />
+      <SearchInput
+        size={InputSize.base}
+        placeholder="Custom styled search"
+        value=""
+        onChange={() => {}}
+      />
+      <SearchInput
+        size={InputSize.base}
+        placeholder="With value"
+        value="Search term"
+        onChange={() => {}}
+      />
     </div>
   ),
   parameters: {

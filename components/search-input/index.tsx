@@ -38,6 +38,7 @@ import SearchIconReactSvg from "../../assets/search.react.svg";
 
 import { useDebounce } from "../../hooks/useDebounce";
 
+import { Button } from "../button";
 import { InputBlock } from "../input-block";
 import { InputType } from "../text-input";
 
@@ -65,6 +66,8 @@ const SearchInput = ({
   children,
   dataTestId,
   tabIndex,
+  showSearchButton = false,
+  searchButtonProps,
 }: SearchInputProps) => {
   const [inputValue, setInputValue] = useState(value);
 
@@ -133,34 +136,39 @@ const SearchInput = ({
       style={style}
       data-testid={dataTestId ?? "search-input"}
     >
-      <InputBlock
-        className="search-input-block"
-        forwardedRef={forwardedRef}
-        onClick={onClick}
-        id={id}
-        name={name}
-        value={inputValue}
-        size={size}
-        scale={scale}
-        isDisabled={isDisabled}
-        onChange={handleInputChange}
-        onFocus={onFocus}
-        // onBlur={handleBlur}
-        type={InputType.text}
-        iconNode={iconNode}
-        iconButtonClassName={
-          !!inputValue || showClearButton ? "search-cross" : "search-loupe"
-        }
-        isIconFill
-        iconSize={iconSizeValue}
-        onIconClick={
-          !!inputValue || showClearButton ? handleClearSearch : undefined
-        }
-        placeholder={placeholder}
-        tabIndex={tabIndex}
-      >
-        {children}
-      </InputBlock>
+      {showSearchButton && searchButtonProps ? (
+        <Button {...searchButtonProps} />
+      ) : null}
+      <div className={styles.searchInputField}>
+        <InputBlock
+          className="search-input-block"
+          forwardedRef={forwardedRef}
+          onClick={onClick}
+          id={id}
+          name={name}
+          value={inputValue}
+          size={size}
+          scale={scale}
+          isDisabled={isDisabled}
+          onChange={handleInputChange}
+          onFocus={onFocus}
+          // onBlur={handleBlur}
+          type={InputType.text}
+          iconNode={iconNode}
+          iconButtonClassName={
+            !!inputValue || showClearButton ? "search-cross" : "search-loupe"
+          }
+          isIconFill
+          iconSize={iconSizeValue}
+          onIconClick={
+            !!inputValue || showClearButton ? handleClearSearch : undefined
+          }
+          placeholder={placeholder}
+          tabIndex={tabIndex}
+        >
+          {children}
+        </InputBlock>
+      </div>
     </div>
   );
 };

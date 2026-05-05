@@ -43,8 +43,11 @@
   --search-input-icon-filled-color: var(--search-input-icon-filled-fill, var(--search-input-filled-icon-fill));
   --search-input-max-h: var(--search-input-max-height, 32px);
   --search-input-icon-border-radius: var(--search-input-radius, 3px);
+  --search-input-button-gap: var(--search-input-gap, 8px);
 
-  max-height: var(--search-input-max-h);
+  display: flex;
+  align-items: center;
+  gap: var(--search-input-button-gap);
 
   &.scale {
     width: 100%;
@@ -65,4 +68,10 @@
       fill: var(--search-input-icon-color) !important;
     }
   }
+}
+
+.searchInputField {
+  max-height: var(--search-input-max-h);
+  flex: 1 1 auto;
+  min-width: 0;
 }

@@ -154,6 +154,33 @@ describe("<SearchInput />", () => {
 		expect(input).toHaveValue("updated");
 	});
 
+	it("renders button when showSearchButton and searchButtonProps are provided", () => {
+		render(
+			<SearchInput
+				{...baseProps}
+				showSearchButton
+				searchButtonProps={{ label: "New room", primary: true }}
+			/>,
+		);
+		expect(screen.getByText("New room")).toBeInTheDocument();
+	});
+
+	it("does not render button when showSearchButton is false", () => {
+		render(
+			<SearchInput
+				{...baseProps}
+				showSearchButton={false}
+				searchButtonProps={{ label: "New room" }}
+			/>,
+		);
+		expect(screen.queryByText("New room")).not.toBeInTheDocument();
+	});
+
+	it("does not render button when searchButtonProps is not provided", () => {
+		render(<SearchInput {...baseProps} showSearchButton />);
+		expect(screen.queryByRole("button")).not.toBeInTheDocument();
+	});
+
 	it("clears input and calls onClearSearch when clear button is clicked", async () => {
 		const onClearSearch = vi.fn();
 		const { container } = render(
