@@ -215,6 +215,8 @@
 
 .submenu {
   --section-bg-v: var(--section-bg, var(--section-header-bg));
+  --section-header-height-tablet-v: var(--section-header-tablet-size, var(--section-header-height-tablet));
+  --section-header-height-mobile-v: var(--section-header-mobile-size, var(--section-header-height-mobile));
 
   background: var(--section-bg-v);
   width: 100%;
@@ -223,7 +225,7 @@
   @include mixins.tablet-and-below {
     width: calc(100% + 32px);
     position: sticky;
-    top: var(--section-header-height-tablet);
+    top: var(--section-header-height-tablet-v);
     margin: 0 -16px;
     & > div {
       padding: 0 16px;
@@ -232,7 +234,7 @@
 
   @include mixins.mobile {
     position: sticky;
-    top: var(--section-header-height-mobile);
+    top: var(--section-header-height-mobile-v);
   }
 }
 
