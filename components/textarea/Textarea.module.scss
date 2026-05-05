@@ -34,7 +34,9 @@
 
 .numeration {
   --textarea-numeration-color: #{$gray};
-  
+  --textarea-numeration-text: var(--textarea-numeration-text-color, var(--textarea-numeration-color));
+  --textarea-numeration-fs: var(--textarea-font-size, 13px);
+
   display: block;
   position: absolute;
   line-height: 1.5;
@@ -42,9 +44,9 @@
   top: 6px;
   text-align: end;
 
-  color: var(--textarea-numeration-color);
+  color: var(--textarea-numeration-text);
 
-  font-size: 13px;
+  font-size: var(--textarea-numeration-fs);
 
   inset-inline-start: 18px;
 
@@ -52,23 +54,29 @@
 }
 
 .wrapper {
+  --textarea-max-width: var(--textarea-width, 1200px);
+  --textarea-default-height: var(--textarea-height, 89px);
+  --textarea-scale-height: var(--textarea-height-scale, 65vh);
+  --textarea-full-height: var(--textarea-height-full, var(--full-height));
+  --textarea-prop-height: var(--textarea-height-custom, var(--height-textarea));
+
   position: relative;
 
-  max-width: 1200px;
-  height: 89px;
-  min-height: 89px;
+  max-width: var(--textarea-max-width);
+  height: var(--textarea-default-height);
+  min-height: var(--textarea-default-height);
 
   &.heightScale {
-    height: 65vh;
+    height: var(--textarea-scale-height);
   }
 
   &.isFullHeight {
-    height: var(--full-height);
+    height: var(--textarea-full-height);
   }
 
   &.defaultHeight {
-    height: var(--height-textarea);
-    min-height: var(--height-textarea);
+    height: var(--textarea-prop-height);
+    min-height: var(--textarea-prop-height);
   }
 
   @supports (-moz-appearance: none) {
@@ -101,6 +109,9 @@
 .textarea {
   @include mixins.common-input-color-styles;
 
+  --textarea-text-pad: var(--textarea-padding, 5px 8px 2px);
+  --textarea-fs: var(--textarea-font-size, var(--text-input-font-size-base));
+
   width: 100%;
   display: block;
   width: -webkit-fill-available;
@@ -108,10 +119,11 @@
   outline: none;
   resize: none;
   white-space: pre-line;
-  padding: 5px 8px 2px;
+  padding: var(--textarea-text-pad);
   box-sizing: border-box;
   overflow: hidden;
   line-height: 1.5;
+  font-size: var(--textarea-fs);
   padding-inline-start: var(--padding-inline-start);
   -webkit-background-clip: unset !important;
 
@@ -142,21 +154,26 @@
   @include mixins.common-input-styles;
   -webkit-background-clip: unset !important;
 
+  --textarea-scrollbar-h: var(--textarea-height, 93px);
+  --textarea-scrollbar-scale-h: var(--textarea-scrollbar-height-scale, 67vh);
+  --textarea-scrollbar-full-h: var(--textarea-height-full, var(--full-height));
+  --textarea-scrollbar-prop-h: var(--textarea-height-custom, var(--height-textarea));
+
   width: 100% !important;
-  height: 93px;
-  min-height: 93px;
+  height: var(--textarea-scrollbar-h);
+  min-height: var(--textarea-scrollbar-h);
 
   &.defaultHeight {
-    height: var(--height-textarea);
-    min-height: var(--height-textarea);
+    height: var(--textarea-scrollbar-prop-h);
+    min-height: var(--textarea-scrollbar-prop-h);
   }
 
   &.isFullHeight {
-    height: var(--full-height);
+    height: var(--textarea-scrollbar-full-h);
   }
 
   &.heightScale {
-    height: 67vh;
+    height: var(--textarea-scrollbar-scale-h);
   }
 
   @supports (-moz-appearance: none) {

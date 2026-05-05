@@ -37,13 +37,19 @@
 
 .wrapper {
   position: relative;
+
+  // bridge vars for hardcoded values
+  --color-input-height-v: var(--color-input-height, 32px);
+  --color-input-padding-v: var(--color-input-padding, 6px 8px);
+  --color-input-swatch-size-v: var(--color-input-swatch-size, 20px);
+  --color-input-swatch-radius-v: var(--color-input-swatch-radius, 2px);
 }
 
 .hexValue {
   @include mixins.common-input-styles;
   box-sizing: border-box;
-  height: 32px;
-  padding: 6px 8px;
+  height: var(--color-input-height-v);
+  padding: var(--color-input-padding-v);
 
   :focus-visible {
     outline: none;
@@ -76,9 +82,9 @@
   position: absolute;
   inset-inline-end: 8px;
   cursor: pointer;
-  width: 20px;
-  height: 20px;
-  border-radius: 2px;
+  width: var(--color-input-swatch-size-v);
+  height: var(--color-input-swatch-size-v);
+  border-radius: var(--color-input-swatch-radius-v);
   background-color: var(--block-color);
 
   &.disabled {

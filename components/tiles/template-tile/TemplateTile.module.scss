@@ -117,7 +117,7 @@
   }
 
   .text {
-    color: var(--tile-sub-text);
+    color: var(--tile-sub-color, var(--tile-sub-text));
   }
 
   .spaceQuota {

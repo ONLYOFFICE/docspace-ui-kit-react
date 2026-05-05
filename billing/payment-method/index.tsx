@@ -49,10 +49,12 @@ import { getBrandName } from "../../constants/brands";
 
 interface PaymentMethodProps {
   showPortalSettingsLoader?: boolean;
+  integrationUrl?: string;
 }
 
 const PaymentMethod: React.FC<PaymentMethodProps> = ({
   showPortalSettingsLoader,
+  integrationUrl,
 }) => {
   const t = useCommonTranslation();
   const paymentStore = usePaymentStore();
@@ -62,7 +64,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    paymentMethodInit(t);
+    paymentMethodInit(t, integrationUrl);
   }, []);
 
   const {
@@ -109,7 +111,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
       await fetchCustomerInfo(true);
 
       if (paymentStore.tariff.walletCustomerStatusNotActive) {
-        await fetchCardLinked();
+        await fetchCardLinked(integrationUrl);
       }
     } catch (e) {
       toastr.error(e as Error);

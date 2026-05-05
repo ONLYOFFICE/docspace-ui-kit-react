@@ -17,10 +17,15 @@
 
   --heading-color: #{$black};
 
+  --heading-content-font-size: var(--heading-size-content, 18px);
+  --heading-menu-font-size: var(--heading-size-menu, 23px);
+  --heading-header-font-size: var(--heading-size-header, 28px);
+  --heading-line-height: var(--heading-lh, 50px);
+
   @include mixins.common-text-styles;
 
-  font-weight: var(--heading-font-weight);
-  color: var(--heading-color);
+  font-weight: var(--heading-weight, var(--heading-font-weight));
+  color: var(--heading-text-color, var(--heading-color));
   margin: 0;
 
   &.small {
@@ -54,20 +59,20 @@
   }
 
   &.content {
-    font-size: 18px;
+    font-size: var(--heading-content-font-size);
     font-weight: bold;
-    line-height: 50px;
+    line-height: var(--heading-line-height);
   }
 
   &.menu {
-    font-size: 23px;
+    font-size: var(--heading-menu-font-size);
     font-weight: bold;
-    line-height: 50px;
+    line-height: var(--heading-line-height);
   }
 
   &.header {
-    font-size: 28px;
+    font-size: var(--heading-header-font-size);
     font-weight: var(--heading-font-weight);
-    line-height: 50px;
+    line-height: var(--heading-line-height);
   }
 }

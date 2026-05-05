@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -169,6 +169,70 @@ export const Default: Story = {
     <TileContent><Link>Spreadsheet.xlsx</Link></TileContent>
   </FileTile>
 </TileContainer>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--tile-bg": "#e6f3fb",
+          "--tile-border-style": "1px solid #0082c9",
+          "--tile-radius": "16px",
+          "--tile-hover-bg": "#cce5f6",
+          "--tile-icon-color": "#0082c9",
+          "--tile-container-gap": "20px",
+          "--tile-container-sort-label": "#0082c9",
+          "--tile-container-sort-icon": "#0082c9",
+          "--tile-container-sort-font-size": "13px",
+        } as CSSProperties
+      }
+    >
+      <TileContainer useReactWindow={false} headingFiles="Files">
+        {mockFiles.map((file) => (
+          <FileTile
+            key={file.id}
+            item={file}
+            contextOptions={mockContextOptions}
+            temporaryIcon={<ImageReactSvg />}
+            element={
+              file.fileType === FileType.Spreadsheet
+                ? slideElement
+                : file.fileType === FileType.Presentation
+                  ? pdfElement
+                  : wordElement
+            }
+          >
+            <TileContent>
+              <Link>{file.title}</Link>
+            </TileContent>
+          </FileTile>
+        ))}
+      </TileContainer>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--tile-bg\` | Tile background color | theme-based |
+| \`--tile-border-style\` | Tile border | theme-based |
+| \`--tile-radius\` | Tile border radius | \`12px\` |
+| \`--tile-hover-bg\` | Hover/checked background | theme-based |
+| \`--tile-icon-color\` | Icon button color | theme-based |
+| \`--tile-container-gap\` | Grid gap between tiles | \`16px\` |
+| \`--tile-container-sort-label\` | Sort label text color | theme-based |
+| \`--tile-container-sort-icon\` | Sort icon fill color | theme-based |
+| \`--tile-container-sort-option-fill\` | Option item icon fill color | theme-based |
+| \`--tile-container-selected-bg\` | Selected option background | theme-based |
+| \`--tile-container-sort-font-size\` | Sort label font size | \`12px\` |
+| \`--tile-container-sort-font-weight\` | Sort label font weight | \`600\` |`,
       },
     },
   },

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Loader } from ".";
@@ -372,6 +372,44 @@ export const DifferentSizes: Story = {
         code: `<Loader type={LoaderTypes.oval} size="24px" />
 <Loader type={LoaderTypes.oval} size="40px" />
 <Loader type={LoaderTypes.oval} size="60px" />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--loader-stroke": "#7c3aed",
+          "--loader-size": "50px",
+        } as CSSProperties
+      }
+    >
+      <Loader type={LoaderTypes.oval} label="Custom loader" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--loader-stroke\` | Stroke color of the oval/dualRing loader | theme loader color |
+| \`--loader-size\` | Width and height of the loader | \`40px\` |
+| \`--loader-track-primary\` | Track loader spinning arc color | white |
+| \`--loader-track-base\` | Track loader track (background ring) color | accent |`,
+      },
+      source: {
+        code: `// Customize track loader colors via CSS variables
+<div style={{
+  "--loader-track-primary": "#cccccc",
+  "--loader-track-base": "#444444",
+}}>
+  <Loader type={LoaderTypes.track} size="30px" />
+</div>`,
       },
     },
   },

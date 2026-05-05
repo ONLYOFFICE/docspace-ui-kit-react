@@ -45,14 +45,14 @@
     opacity: 1;
     background-image:
       linear-gradient(
-        var(--color-scheme-main-accent),
-        var(--color-scheme-main-accent)
+        var(--floating-circle-button-background, var(--color-scheme-main-accent)),
+        var(--floating-circle-button-background, var(--color-scheme-main-accent))
       ),
       conic-gradient(
         from 0.25turn at 50% 30%,
-        var(--color-scheme-main-accent),
+        var(--floating-circle-button-background, var(--color-scheme-main-accent)),
         10deg,
-        var(--color-scheme-main-accent),
+        var(--floating-circle-button-background, var(--color-scheme-main-accent)),
         140deg,
         white
       );
@@ -65,14 +65,14 @@
       transition: all 0.3s ease-out;
       background-image:
         linear-gradient(
-          var(--color-scheme-main-accent),
-          var(--color-scheme-main-accent)
+          var(--floating-circle-button-background, var(--color-scheme-main-accent)),
+          var(--floating-circle-button-background, var(--color-scheme-main-accent))
         ),
         conic-gradient(
           from 0turn at 50% 50%,
           white var(--percent-percentage, 0%),
           white var(--percent-percentage, 0%),
-          var(--color-scheme-main-accent) var(--percent-percentage, 0%)
+          var(--floating-circle-button-background, var(--color-scheme-main-accent)) var(--percent-percentage, 0%)
         );
     }
   }
@@ -126,17 +126,21 @@
   :global(.dark) & {
     --floating-button-box-shadow: 0px 12px 24px #{colors.$popup-shadow};
   }
+
+  --floating-button-shadow-value: var(--floating-button-shadow, var(--floating-button-box-shadow));
+  --floating-button-size: var(--floating-button-button-size, 48px);
+
   position: relative;
   z-index: 500;
-  width: 48px;
-  height: 48px;
+  width: var(--floating-button-size);
+  height: var(--floating-button-size);
   background: var(
     --floating-circle-button-background,
     var(--color-scheme-main-accent)
   ) !important;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: var(--floating-button-box-shadow);
+  box-shadow: var(--floating-button-shadow-value);
 
   &.completed {
     animation: highlight 0.5s ease-out;
@@ -148,15 +152,17 @@
   align-items: center;
   justify-content: center;
 
+  --floating-button-icon-fill: var(--floating-button-icon, var(--color-scheme-text-accent));
+
   svg {
     path {
-      fill: var(--color-scheme-text-accent);
+      fill: var(--floating-button-icon-fill);
     }
   }
 
   &.accentIcon {
     svg path {
-      fill: var(--color-scheme-main-accent);
+      fill: var(--floating-circle-button-background, var(--color-scheme-main-accent));
     }
   }
 }

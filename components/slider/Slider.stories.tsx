@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ChangeEvent, ComponentProps } from "react";
+import type { CSSProperties, ChangeEvent, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -285,3 +285,53 @@ export const RTL: Story = {
     },
   },
 };
+
+export const CssCustomization: Story = {
+  render: () => {
+    const [value, setValue] = useState(60);
+    return (
+      <div
+        style={
+          {
+            width: "300px",
+            padding: "20px",
+            "--slider-handle-color": "#7c3aed",
+            "--slider-pouring-image": "linear-gradient(#7c3aed, #7c3aed)",
+            "--slider-fill-color": "#e9d5ff",
+            "--slider-size": "12px",
+            "--slider-handle-size": "28px",
+            "--slider-track-radius": "6px",
+          } as CSSProperties
+        }
+      >
+        <Slider
+          min={0}
+          max={100}
+          value={value}
+          withPouring
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setValue(Number(e.target.value))
+          }
+        />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--slider-handle-color\` | Thumb background color | theme token |
+| \`--slider-pouring-image\` | Fill image for the poured portion (must be a \`linear-gradient\` or other \`<image>\`) | theme token |
+| \`--slider-fill-color\` | Filled track color (Firefox / moz range) | theme token |
+| \`--slider-background-color\` | Track (unfilled) background color | theme token |
+| \`--slider-size\` | Track height | \`8px\` |
+| \`--slider-handle-size\` | Thumb width and height | \`24px\` |
+| \`--slider-track-radius\` | Border radius of track and thumb | \`5.6px\` |`,
+      },
+    },
+  },
+};
+

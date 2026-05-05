@@ -56,6 +56,12 @@
   --radio-button-hover-border-color: #{colors.$gray};
 
   --radio-button-spacing: unset;
+  --radio-button-icon-gap: var(--radio-button-gap, 8px);
+  --radio-button-bg-color: var(--radio-button-background, var(--radio-button-bg));
+  --radio-button-text: var(--radio-button-label-color, var(--radio-button-text-color));
+  --radio-button-dot: var(--radio-button-dot-color, var(--radio-button-fill-color));
+  --radio-button-circle: var(--radio-button-circle-color, var(--radio-button-border-color));
+  --radio-button-circle-hover: var(--radio-button-circle-hover-color, var(--radio-button-hover-border-color));
 
   display: flex;
   align-items: center;
@@ -68,18 +74,18 @@
 
   .radioButtonIcon {
     path:first-child {
-      stroke: var(--radio-button-border-color);
+      stroke: var(--radio-button-circle);
     }
 
     path:nth-child(even) {
-      fill: var(--radio-button-fill-color);
+      fill: var(--radio-button-dot);
     }
   }
 
   &:hover {
     .radioButtonIcon {
       path:first-child {
-        stroke: var(--radio-button-hover-border-color);
+        stroke: var(--radio-button-circle-hover);
       }
     }
   }
@@ -98,7 +104,7 @@
     }
 
     .radioButtonIcon {
-      margin-inline-end: 8px;
+      margin-inline-end: var(--radio-button-icon-gap);
 
       path {
         fill: var(--radio-button-disable-bg);
@@ -121,15 +127,15 @@
   }
 
   .radioButtonIcon {
-    margin-inline-end: 8px;
+    margin-inline-end: var(--radio-button-icon-gap);
 
     path {
-      fill: var(--radio-button-bg);
+      fill: var(--radio-button-bg-color);
     }
   }
 
   .radioButtonText {
-    color: var(--radio-button-text-color);
+    color: var(--radio-button-text);
   }
 }
 

@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React, { useState } from "react";
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { InputSize, InputType, TextInput } from "../text-input";
@@ -385,6 +385,81 @@ export const CustomStyling: Story = {
 >
   <TextInput value={value} onChange={handleChange} />
 </FieldContainer>`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => {
+  const [value1, setValue1] = useState("");
+  const [value2, setValue2] = useState("");
+
+  return (
+    <div
+      style={
+        {
+          width: "500px",
+          "--field-container-margin": "0 0 32px 0",
+          "--field-container-error-top": "8px",
+          "--error-color": "#7c3aed",
+          "--error-width": "400px",
+        } as CSSProperties
+      }
+    >
+      <FieldContainer
+        labelText="Full Name:"
+        labelVisible
+        maxLabelWidth="140px"
+        hasError
+        errorMessage="Name must be at least 3 characters"
+        tooltipContent="Enter your full name"
+        place="top"
+      >
+        <TextInput
+          value={value1}
+          hasError
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setValue1(e.target.value)
+          }
+          type={InputType.text}
+          size={InputSize.base}
+        />
+      </FieldContainer>
+      <FieldContainer
+        labelText="Email:"
+        labelVisible
+        maxLabelWidth="140px"
+        hasError={false}
+        tooltipContent="Enter your email address"
+        place="top"
+      >
+        <TextInput
+          value={value2}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setValue2(e.target.value)
+          }
+          type={InputType.text}
+          size={InputSize.base}
+        />
+      </FieldContainer>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--field-container-margin\` | Container margin | \`0 0 16px 0\` |
+| \`--field-container-error-top\` | Error message top padding | \`4px\` |
+| \`--error-color\` | Error message text color | theme token |
+| \`--error-width\` | Error message max width | \`293px\` |
+| \`--label-width\` | Label min/max width in horizontal mode | component prop |`,
       },
     },
   },

@@ -34,7 +34,7 @@ $mobile-footer-height: 64px;
     .aside {
       left: 0;
       right: unset;
-      transform: translateX(-480px);
+      transform: translateX(calc(-1 * var(--aside-width-v, 480px)));
 
       &.scale {
         transform: translateX(-100%);
@@ -48,18 +48,6 @@ $mobile-footer-height: 64px;
 }
 
 .aside {
-  background-color: var(--aside-bg-color);
-  height: 100%;
-
-  position: fixed;
-  top: 0;
-
-  right: 0;
-  transform: translateX(480px);
-  transition: transform 0.3s ease-in-out;
-  width: 480px;
-  box-sizing: border-box;
-
   :global(.light) & {
     --aside-bg-color: #{colors.$white};
   }
@@ -67,6 +55,25 @@ $mobile-footer-height: 64px;
   :global(.dark) & {
     --aside-bg-color: #{colors.$black};
   }
+
+  // bridge vars — bind public overrides to internal theme tokens
+  --aside-bg-v: var(--aside-bg, var(--aside-bg-color));
+  // new bridge vars for hardcoded values
+  --aside-width-v: var(--aside-width, 480px);
+  --aside-transition-v: var(--aside-transition, transform 0.3s ease-in-out);
+  --aside-mobile-footer-height-v: var(--aside-mobile-footer-height, #{$mobile-footer-height});
+
+  background-color: var(--aside-bg-v);
+  height: 100%;
+
+  position: fixed;
+  top: 0;
+
+  right: 0;
+  transform: translateX(var(--aside-width-v));
+  transition: var(--aside-transition-v);
+  width: var(--aside-width-v);
+  box-sizing: border-box;
 
   &.scale {
     transform: translateX(100%);
@@ -80,7 +87,7 @@ $mobile-footer-height: 64px;
   @include mixins.mobile {
     bottom: 0;
     top: unset;
-    height: calc(100% - $mobile-footer-height);
+    height: calc(100% - var(--aside-mobile-footer-height-v));
 
     width: 100%;
     max-width: 100%;

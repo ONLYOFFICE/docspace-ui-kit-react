@@ -38,6 +38,10 @@
     --drag-and-drop-accept-bg: #{variables.$dnd-dark-hover};
   }
 
+  --dnd-bg-value: var(--dnd-dragging-bg, var(--drag-and-drop-bg));
+  --dnd-accept-bg-value: var(--dnd-accept-bg, var(--drag-and-drop-accept-bg));
+  --dnd-disabled-opacity-value: var(--dnd-disabled-opacity, 0.4);
+
   height: 100%;
   margin-inline-start: -2px;
   position: relative;
@@ -48,15 +52,15 @@
   }
 
   &.dragging {
-    background: var(--drag-and-drop-bg);
+    background: var(--dnd-bg-value);
 
     &.dragAccept {
-      background: var(--drag-and-drop-accept-bg);
+      background: var(--dnd-accept-bg-value);
     }
   }
 
   &.dragDisabled {
-    opacity: 0.4;
+    opacity: var(--dnd-disabled-opacity-value);
   }
 
   &:not(.dragging):not(.dragDisabled) {
@@ -65,5 +69,5 @@
 }
 
 .droppableHover {
-  background: var(--drag-and-drop-accept-bg);
+  background: var(--dnd-accept-bg-value);
 }

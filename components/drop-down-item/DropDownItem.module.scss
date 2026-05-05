@@ -52,6 +52,33 @@
   --drop-down-item-icon-color-disabled: #{$black};
   --drop-down-item-hover-color: #{$gray-light};
   --dropdown-item-separator-border: #{$gray-light-mid};
+
+  --drop-down-item-text: var(
+    --drop-down-item-color,
+    var(--drop-down-item-icon-color)
+  );
+  --drop-down-item-icon: var(
+    --drop-down-item-icon-fill,
+    var(--drop-down-item-icon-color)
+  );
+  --drop-down-item-icon-disabled: var(
+    --drop-down-item-icon-fill-disabled,
+    var(--drop-down-item-icon-color-disabled)
+  );
+  --drop-down-item-bg-hover: var(
+    --drop-down-item-hover-bg,
+    var(--drop-down-item-hover-color)
+  );
+  --drop-down-item-divider-color: var(
+    --drop-down-item-divider,
+    var(--dropdown-item-separator-border)
+  );
+  --drop-down-item-item-height: var(--drop-down-item-height, 32px);
+  --drop-down-item-item-font-size: var(--drop-down-item-font-size, 13px);
+  --drop-down-item-item-font-weight: var(--drop-down-item-font-weight, 600);
+  --drop-down-item-item-padding: var(--drop-down-item-padding, 0 12px);
+  --drop-down-item-header-h: var(--drop-down-item-header-height, 48px);
+  --drop-down-item-header-fs: var(--drop-down-item-header-font-size, 15px);
 }
 
 .externalLink {
@@ -131,32 +158,32 @@
 .dropDownItemIcon {
   svg {
     path[fill] {
-      fill: var(--drop-down-item-icon-color);
+      fill: var(--drop-down-item-icon);
     }
     path[stroke] {
-      stroke: var(--drop-down-item-icon-color);
+      stroke: var(--drop-down-item-icon);
     }
     circle[fill] {
-      fill: var(--drop-down-item-icon-color);
+      fill: var(--drop-down-item-icon);
     }
     rect[fill] {
-      fill: var(--drop-down-item-icon-color);
+      fill: var(--drop-down-item-icon);
     }
   }
 
   &.disabled {
     svg {
       path[fill] {
-        fill: var(--drop-down-item-icon-color-disabled);
+        fill: var(--drop-down-item-icon-disabled);
       }
       path[stroke] {
-        stroke: var(--drop-down-item-icon-color-disabled);
+        stroke: var(--drop-down-item-icon-disabled);
       }
       circle[fill] {
-        fill: var(--drop-down-item-icon-color-disabled);
+        fill: var(--drop-down-item-icon-disabled);
       }
       rect[fill] {
-        fill: var(--drop-down-item-icon-color-disabled);
+        fill: var(--drop-down-item-icon-disabled);
       }
     }
   }
@@ -197,26 +224,26 @@
   cursor: pointer;
 
   margin: 0px;
-  padding: 0 12px;
+  padding: var(--drop-down-item-item-padding);
   box-sizing: border-box;
   text-decoration: none;
   user-select: none;
   outline: 0 !important;
 
-  line-height: 32px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--drop-down-item-icon-color);
+  line-height: var(--drop-down-item-item-height);
+  font-size: var(--drop-down-item-item-font-size);
+  font-weight: var(--drop-down-item-item-font-weight);
+  color: var(--drop-down-item-text);
 
   -webkit-tap-highlight-color: #{$tap-highlight};
   text-transform: none;
 
   &:hover:not(.separator) {
-    background-color: var(--drop-down-item-hover-color);
+    background-color: var(--drop-down-item-bg-hover);
   }
 
   &:active:not(.separator) {
-    background-color: var(--drop-down-item-hover-color);
+    background-color: var(--drop-down-item-bg-hover);
   }
 
   @include mixins.tablet-and-below {
@@ -227,7 +254,7 @@
 
 .separator {
   padding: 0 16px;
-  background-color: var(--dropdown-item-separator-border);
+  background-color: var(--drop-down-item-divider-color);
   cursor: default;
   margin: 4px 16px 4px;
   line-height: 1px;
@@ -241,12 +268,12 @@
 
 .headerItem {
   align-items: center;
-  height: 48px;
+  height: var(--drop-down-item-header-h);
   padding: 13px 16px 18.2px;
   margin: 0 0 6px;
-  border-bottom: 1px solid var(--dropdown-item-separator-border);
-  font-size: 15px;
-  font-weight: 600;
+  border-bottom: 1px solid var(--drop-down-item-divider-color);
+  font-size: var(--drop-down-item-header-fs);
+  font-weight: var(--drop-down-item-item-font-weight);
   line-height: 16px !important;
   cursor: default;
 
@@ -296,13 +323,17 @@
 }
 
 .activeDescendant {
-  background-color: var(--drop-down-item-hover-color);
+  background-color: var(--drop-down-item-bg-hover);
 }
 
 .disabled {
   --dropdown-item-disabled-color: #{$gray};
+  --drop-down-item-disabled-text: var(
+    --drop-down-item-disabled-color,
+    var(--dropdown-item-disabled-color)
+  );
 
-  color: var(--dropdown-item-disabled-color);
+  color: var(--drop-down-item-disabled-text);
 
   .dropDownItemIcon {
     --drop-down-item-icon-color: #{$gray};
@@ -324,6 +355,10 @@
 
 .selected {
   --dropdown-item-selected-color: #{$light-gray-hover};
+  --drop-down-item-selected-bg: var(
+    --drop-down-item-selected-background,
+    var(--dropdown-item-selected-color)
+  );
 
-  background-color: var(--dropdown-item-selected-color);
+  background-color: var(--drop-down-item-selected-bg);
 }

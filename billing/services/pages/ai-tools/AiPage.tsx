@@ -66,10 +66,11 @@ import { getBrandName } from "../../../../constants/brands";
 type AiPageProps = {
   currentDeviceType?: string;
   getAIConfig?: () => Promise<void>;
+  integrationUrl?: string;
 };
 
 const AiPage = (props: AiPageProps) => {
-  const { currentDeviceType, getAIConfig } = props;
+  const { currentDeviceType, getAIConfig, integrationUrl } = props;
 
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
@@ -113,7 +114,7 @@ const AiPage = (props: AiPageProps) => {
   // const navigate = useNavigate();
 
   useEffect(() => {
-    initServiceData(t, AI_TOOLS, AI_ENUM);
+    initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
   }, []);
 
   // useEffect(() => {

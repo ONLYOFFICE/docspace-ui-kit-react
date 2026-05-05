@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Label } from ".";
@@ -146,6 +146,41 @@ export const Default: Story = {
     text: "First name",
     title: "Enter your first name",
     htmlFor: "firstName",
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--label-required-color": "#0082c9",
+          "--label-error-color": "#d0021b",
+          "--text-size": "14px",
+          "--text-weight": "700",
+        } as CSSProperties
+      }
+    >
+      <Wrapper>
+        <Label text="Display name" htmlFor="displayName" isRequired />
+        <Label text="Email address" htmlFor="email" isRequired error />
+        <Label text="Bio" htmlFor="bio" />
+      </Wrapper>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--label-required-color\` | Color of the required asterisk (*) | error status color |
+| \`--label-error-color\` | Label text color in error state | error status color |
+| \`--text-size\` | Font size (via Text component) | \`13px\` |
+| \`--text-weight\` | Font weight (via Text component) | \`400\` |`,
+      },
+    },
   },
 };
 

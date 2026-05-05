@@ -88,7 +88,9 @@
 }
 
 .container {
-  margin: 0 0 16px 0;
+  --field-container-bottom-margin: var(--field-container-margin, 0 0 16px 0);
+
+  margin: var(--field-container-bottom-margin);
 
   &.horizontal {
     @include displayHorizontal();
@@ -118,7 +120,9 @@
     --input-error-color: #{colors.$dark-error-status};
   }
 
+  --field-container-error-padding: var(--field-container-error-top, 4px);
+
   color: var(--error-color, var(--input-error-color));
-  padding-top: 4px;
+  padding-top: var(--field-container-error-padding);
   max-width: var(--error-width, 293px);
 }

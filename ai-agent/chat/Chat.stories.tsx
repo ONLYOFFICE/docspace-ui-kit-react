@@ -441,3 +441,376 @@ export const ExternalScroll: Story = {
     },
   },
 };
+
+const card: React.CSSProperties = {
+  padding: "20px",
+  borderRadius: "12px",
+  border: "1px solid #e5e7eb",
+  background: "#fff",
+};
+
+const darkCard: React.CSSProperties = {
+  ...card,
+  background: "#111118",
+  border: "1px solid #27272a",
+};
+
+const title: React.CSSProperties = {
+  margin: "0 0 4px",
+  fontSize: "14px",
+  fontWeight: 600,
+  color: "#111827",
+};
+
+const darkTitle: React.CSSProperties = {
+  ...title,
+  color: "#e5e7eb",
+};
+
+const subtitle: React.CSSProperties = {
+  margin: "0 0 16px",
+  fontSize: "12px",
+  color: "#9ca3af",
+  fontWeight: 400,
+};
+
+const frame: React.CSSProperties = {
+  width: "100%",
+  height: "420px",
+  overflow: "hidden",
+  display: "flex",
+  borderRadius: "8px",
+  border: "1px solid #e5e7eb",
+};
+
+const CssCustomizationTemplate = (props: Partial<ChatProps>) => (
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "20px",
+      padding: "20px",
+      background: "#f4f4f5",
+      minHeight: "100%",
+    }}
+  >
+    {/* 1. Default — no overrides */}
+    <div style={card}>
+      <h4 style={title}>Default</h4>
+      <p style={subtitle}>No CSS variables set</p>
+      <div style={frame}>
+        <Toast />
+        <Chat {...(props as ChatProps)} />
+      </div>
+    </div>
+
+    {/* 2. Accent only — minimal override */}
+    <div style={card}>
+      <h4 style={title}>Accent only</h4>
+      <p style={subtitle}>
+        2 variables: --chat-accent-color, --chat-send-button-background
+      </p>
+      <div
+        style={
+          {
+            ...frame,
+            "--chat-accent-color": "#7c3aed",
+            "--chat-send-button-background": "#7c3aed",
+          } as React.CSSProperties
+        }
+      >
+        <Chat {...(props as ChatProps)} />
+      </div>
+    </div>
+
+    {/* 3. Dark theme — full color override */}
+    <div style={darkCard}>
+      <h4 style={darkTitle}>Dark custom theme</h4>
+      <p style={subtitle}>Colors + code blocks + input</p>
+      <div
+        style={
+          {
+            ...frame,
+            border: "1px solid #27272a",
+            "--chat-background": "#18181b",
+            "--chat-text-color": "#e4e4e7",
+            "--chat-accent-color": "#a78bfa",
+            "--chat-message-text-color": "#a1a1aa",
+            "--chat-icon-color": "#71717a",
+            "--chat-input-background": "#27272a",
+            "--chat-input-border-style": "1px solid #3f3f46",
+            "--chat-send-button-background": "#a78bfa",
+            "--chat-send-button-color": "#18181b",
+            "--chat-code-background": "#27272a",
+            "--chat-code-border": "1px solid #3f3f46",
+            "--chat-header-button-color": "#a1a1aa",
+            "--chat-header-button-hover-background-color": "#27272a",
+            "--chat-tool-block-background": "#27272a",
+            "--chat-divider-color": "#3f3f46",
+          } as React.CSSProperties
+        }
+      >
+        <Chat {...(props as ChatProps)} />
+      </div>
+    </div>
+
+    {/* 4. Shape + spacing — layout override */}
+    <div style={card}>
+      <h4 style={title}>Rounded & spacious</h4>
+      <p style={subtitle}>
+        Shape, typography, spacing — no color changes
+      </p>
+      <div
+        style={
+          {
+            ...frame,
+            "--chat-border-radius-base": "20px",
+            "--chat-border-radius-small": "14px",
+            "--chat-bubble-border-radius": "28px",
+            "--chat-bubble-padding": "4px 18px",
+            "--chat-font-size": "16px",
+            "--chat-line-height": "26px",
+            "--chat-message-spacing": "40px",
+            "--chat-padding": "28px",
+            "--chat-max-width": "560px",
+            "--chat-samples-item-padding": "14px 20px",
+            "--chat-samples-spacing": "12px",
+          } as React.CSSProperties
+        }
+      >
+        <Chat {...(props as ChatProps)} />
+      </div>
+    </div>
+
+    {/* 5. Full rebrand — every category */}
+    <div
+      style={{
+        ...darkCard,
+        gridColumn: "1 / -1",
+        background: "#0c0a09",
+        border: "1px solid #292524",
+      }}
+    >
+      <h4 style={darkTitle}>Full rebrand — all categories</h4>
+      <p style={subtitle}>
+        Colors + shape + typography + layout + spacing + sizes
+      </p>
+      <div
+        style={
+          {
+            ...frame,
+            height: "500px",
+            border: "1px solid #292524",
+
+            // ── Colors ──
+            "--chat-background": "#1c1917",
+            "--chat-text-color": "#fafaf9",
+            "--chat-accent-color": "#f97316",
+            "--chat-icon-color": "#78716c",
+            "--chat-message-text-color": "#d6d3d1",
+            "--chat-user-message-background": "#f97316",
+            "--chat-error-background": "#451a03",
+            "--chat-input-background": "#292524",
+            "--chat-input-border-style": "1px solid #44403c",
+            "--chat-send-button-background": "#f97316",
+            "--chat-send-button-color": "#1c1917",
+            "--chat-code-background": "#292524",
+            "--chat-code-border": "1px solid #44403c",
+            "--chat-code-separator-color": "#44403c",
+            "--chat-tool-block-background": "#292524",
+            "--chat-divider-color": "#44403c",
+            "--chat-table-border-color": "#44403c",
+            "--chat-blockquote-background": "#f97316",
+            "--chat-blockquote-text-color": "#d6d3d1",
+            "--chat-source-url-color": "#a8a29e",
+            "--chat-source-hover-background": "#292524",
+            "--chat-source-pressed-background": "#1c1917",
+            "--chat-link-icon-color": "#78716c",
+            "--chat-file-border-color": "#44403c",
+            "--chat-file-background": "#292524",
+            "--chat-file-extension-color": "#78716c",
+            "--chat-header-model-text-color": "#78716c",
+            "--chat-header-button-color": "#d6d3d1",
+            "--chat-header-button-hover-background-color": "#292524",
+            "--chat-header-button-active-background-color": "#44403c",
+            "--chat-header-button-disabled-text-color": "#57534e",
+            "--chat-toolbar-button-color": "#a8a29e",
+            "--chat-toolbar-button-disabled-color": "#57534e",
+            "--chat-toolbar-button-hover-background": "#292524",
+            "--chat-toolbar-button-active-color": "#fafaf9",
+            "--chat-toolbar-button-active-background": "#44403c",
+            "--chat-placeholder-disabled-color": "#57534e",
+
+            // ── Shape ──
+            "--chat-border-radius-base": "16px",
+            "--chat-border-radius-small": "10px",
+            "--chat-bubble-border-radius": "24px",
+
+            // ── Typography ──
+            "--chat-font-size": "14px",
+            "--chat-line-height": "22px",
+
+            // ── Layout ──
+            "--chat-max-width": "800px",
+            "--chat-padding": "24px",
+            "--chat-message-spacing": "28px",
+            "--chat-bubble-padding": "2px 14px",
+            "--chat-header-padding-value": "12px 0",
+            "--chat-header-height": "44px",
+            "--chat-header-spacing": "12px",
+            "--chat-input-height": "36px",
+            "--chat-samples-spacing": "10px",
+            "--chat-samples-item-padding": "12px 16px",
+            "--chat-samples-bottom-margin": "16px",
+
+            // ── Spacing scale ──
+            "--chat-spacing-extra-small": "3px",
+            "--chat-spacing-small": "5px",
+            "--chat-spacing-base-value": "7px",
+            "--chat-spacing-medium": "10px",
+            "--chat-spacing-large": "14px",
+
+            // ── Element sizes ──
+            "--chat-button-height": "28px",
+            "--chat-icon-extra-small": "10px",
+            "--chat-icon-small": "14px",
+            "--chat-icon-medium": "28px",
+            "--chat-image-thumbnail-size": "72px",
+            "--chat-file-item-width": "260px",
+
+            // ── Component-specific ──
+            "--chat-content-block-margin": "6px 0",
+            "--chat-code-block-max-height": "360px",
+            "--chat-table-cell-inner-padding": "6px 10px",
+            "--chat-table-column-width": "150px",
+            "--chat-error-inner-padding": "6px",
+            "--chat-blockquote-inner-padding": "4px 10px",
+            "--chat-info-block-inner-padding": "10px 14px",
+          } as React.CSSProperties
+        }
+      >
+        <Chat {...(props as ChatProps)} />
+      </div>
+    </div>
+  </div>
+);
+
+export const CssCustomization: Story = {
+  render: (args) => <CssCustomizationTemplate {...args} />,
+  args: {
+    width: "100%",
+    height: "100%",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `Chat can be customized via CSS Custom Properties on a parent element.
+
+**Available variables:**
+
+**Colors:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| \`--chat-background\` | white / black | Container background |
+| \`--chat-text-color\` | black / white | Main text color |
+| \`--chat-accent-color\` | blue | Accent (links, user bubble, send button) |
+| \`--chat-icon-color\` | gray | Icon button color |
+| \`--chat-message-text-color\` | gray | Message body text |
+| \`--chat-user-message-background\` | accent | User message bubble background |
+| \`--chat-error-background\` | red-tint | Error message background |
+| \`--chat-input-background\` | light-gray | Input area background |
+| \`--chat-input-border-style\` | unset | Input area border |
+| \`--chat-send-button-background\` | accent | Send button background |
+| \`--chat-send-button-color\` | white | Send button icon color |
+| \`--chat-code-background\` | white | Code block background |
+| \`--chat-code-border\` | 1px solid | Code block border |
+| \`--chat-tool-block-background\` | light-gray | Tool call block background |
+| \`--chat-divider-color\` | gray | Horizontal rule color |
+| \`--chat-header-button-color\` | text-color | Header button icon |
+| \`--chat-header-button-hover-background-color\` | light-gray | Header button hover |
+
+**Shape:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| \`--chat-border-radius-base\` | 6px | Default border-radius |
+| \`--chat-border-radius-small\` | 3px | Small border-radius |
+| \`--chat-bubble-border-radius\` | 16px | User message bubble radius |
+
+**Typography:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| \`--chat-font-size\` | 15px | Message font size |
+| \`--chat-line-height\` | 22px | Message line height |
+
+**Layout:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| \`--chat-max-width\` | 700px | Content max-width |
+| \`--chat-padding\` | 20px | Content padding |
+| \`--chat-message-spacing\` | 32px | Gap between messages |
+| \`--chat-bubble-padding\` | 0 12px | User bubble inner padding |
+| \`--chat-header-height\` | 48px | Header min-height |
+| \`--chat-header-spacing\` | 16px | Header elements gap |
+| \`--chat-input-height\` | 40px | Input field min-height |
+| \`--chat-samples-spacing\` | 8px | Samples grid gap |
+| \`--chat-samples-item-padding\` | 10px 12px | Sample button padding |
+
+**Spacing scale:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| \`--chat-spacing-extra-small\` | 4px | Micro spacing |
+| \`--chat-spacing-small\` | 6px | Small spacing |
+| \`--chat-spacing-base\` | 8px | Base spacing unit |
+| \`--chat-spacing-medium\` | 12px | Medium spacing |
+| \`--chat-spacing-large\` | 16px | Large spacing |
+
+**Element sizes:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| \`--chat-button-height\` | 32px | Standard button height |
+| \`--chat-icon-extra-small\` | 12px | Tiny icon size |
+| \`--chat-icon-small\` | 16px | Small icon size |
+| \`--chat-icon-medium\` | 32px | Default icon size |
+| \`--chat-image-thumbnail-size\` | 80px | Image preview size |
+| \`--chat-file-item-width\` | 300px | File item max-width |`,
+      },
+      source: {
+        code: `// Minimal: just change accent color
+<div style={{ "--chat-accent-color": "#7c3aed", "--chat-send-button-background": "#7c3aed" }}>
+  <Chat agentId={123} />
+</div>
+
+// Full dark theme
+<div style={{
+  "--chat-background": "#18181b",
+  "--chat-text-color": "#e4e4e7",
+  "--chat-accent-color": "#a78bfa",
+  "--chat-input-background": "#27272a",
+  "--chat-input-border-style": "1px solid #3f3f46",
+  "--chat-send-button-background": "#a78bfa",
+  "--chat-send-button-color": "#18181b",
+  "--chat-code-background": "#27272a",
+  "--chat-code-border": "1px solid #3f3f46",
+}}>
+  <Chat agentId={123} />
+</div>
+
+// Shape + spacing only (no color changes)
+<div style={{
+  "--chat-border-radius-base": "14px",
+  "--chat-bubble-border-radius": "22px",
+  "--chat-font-size": "16px",
+  "--chat-message-spacing": "40px",
+}}>
+  <Chat agentId={123} />
+</div>`,
+      },
+    },
+  },
+};
