@@ -42,6 +42,7 @@ import PeopleReactSvgUrl from "../../assets/icons/16/people.react.svg?url";
 import VerticalDotsSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
 import PaymentReactSvgUrl from "../../assets/icons/16/payment.react.svg?url";
 import ArticleHideMenuIconReactSvg from "../../assets/article-hide-menu-icon.react.svg";
+import DarkLeftMenuLogo from "../../assets/logo/dark_leftmenu.svg";
 
 import { Avatar, AvatarRole, AvatarSize } from "../avatar";
 import { Badge } from "../badge";
@@ -242,7 +243,6 @@ const meta = {
         className={styles.storyWrapper}
         style={{
           width: "250px",
-          borderInlineEnd: "1px solid var(--border-color, rgba(0, 0, 0, 0.08))",
           padding: 15,
         }}
       >
@@ -497,7 +497,7 @@ const profileMenu = [
 
 const SidebarDemo = () => {
   const [activeId, setActiveId] = useState("agents-favorites");
-  const [collapsed, setCollapsed] = useState(false);
+  const [iconOnly, setIconOnly] = useState(false);
   const menuRef = useRef<ContextMenuRefType>(null);
 
   const mainGroups = withHandlers(fullEnabledAppsData, setActiveId);
@@ -508,15 +508,29 @@ const SidebarDemo = () => {
       style={{
         display: "flex",
         flexDirection: "column",
-        width: "252px",
+        width: iconOnly ? "60px" : "252px",
+        overflow: "hidden",
         height: "100vh",
         backgroundColor: "var(--nav-menu-story-bg)",
+        borderInlineEnd: "1px solid var(--border-color, rgba(0, 0, 0, 0.08))",
+        padding: iconOnly ? 0 : "0 16",
       }}
     >
       <div
-        style={{ width: 211, height: 24, marginBottom: 15, padding: "0 12px" }}
+        style={{
+          height: 24,
+          marginBottom: 15,
+          padding: "0 12px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: iconOnly ? "center" : "flex-start",
+        }}
       >
-        <PortalLogo className={storyStyles.logo} />
+        {iconOnly ? (
+          <DarkLeftMenuLogo width={24} height={24} />
+        ) : (
+          <PortalLogo className={storyStyles.logo} />
+        )}
       </div>
 
       <div style={{ flex: 1, overflowY: "auto" }}>
@@ -525,12 +539,14 @@ const SidebarDemo = () => {
           activeItemId={activeId}
           defaultExpandedId="ai-agents"
           withAnimation
+          iconOnly={iconOnly}
         />
       </div>
       <NavMenu
         groups={bottomGroupsWithHandlers}
         activeItemId={activeId}
         withAnimation
+        iconOnly={iconOnly}
       />
       <div
         style={{
@@ -543,11 +559,11 @@ const SidebarDemo = () => {
           size={20}
           isFill={false}
           iconNode={
-            <div style={{ transform: collapsed ? "scaleX(-1)" : "none" }}>
+            <div style={{ transform: iconOnly ? "scaleX(-1)" : "none" }}>
               <ArticleHideMenuIconReactSvg />
             </div>
           }
-          onClick={() => setCollapsed((c) => !c)}
+          onClick={() => setIconOnly((v) => !v)}
         />
       </div>
       <div
@@ -556,7 +572,8 @@ const SidebarDemo = () => {
           alignItems: "center",
           gap: "8px",
           paddingBlock: "12px",
-          paddingInline: "16px",
+          paddingInline: iconOnly ? "0" : "16px",
+          justifyContent: iconOnly ? "center" : "flex-start",
           borderBlockStart:
             "1px solid var(--border-color, rgba(0, 0, 0, 0.08))",
           background: "#F3F4F4",
@@ -572,12 +589,16 @@ const SidebarDemo = () => {
           userName="Paula Miller"
           onClick={(e: React.MouseEvent) => menuRef.current?.show(e)}
         />
-        <span style={{ flex: 1, fontSize: "14px" }}>Paula Miller</span>
-        <IconButton
-          size={16}
-          iconName={VerticalDotsSvgUrl}
-          onClick={(e) => menuRef.current?.show(e)}
-        />
+        {!iconOnly && (
+          <span style={{ flex: 1, fontSize: "14px" }}>Paula Miller</span>
+        )}
+        {!iconOnly && (
+          <IconButton
+            size={16}
+            iconName={VerticalDotsSvgUrl}
+            onClick={(e) => menuRef.current?.show(e)}
+          />
+        )}
         <ContextMenu ref={menuRef} model={profileMenu} />
       </div>
     </div>

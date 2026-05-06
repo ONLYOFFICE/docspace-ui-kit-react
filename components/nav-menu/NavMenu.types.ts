@@ -69,4 +69,5 @@ export type NavMenuProps = {
   withAnimation?: boolean;
   className?: string;
   LinkRouter?: React.ComponentType<LinkRouterProps>;
+  iconOnly?: boolean;
 };

@@ -121,6 +121,7 @@ type NavMenuItemWrapperProps = {
   hasChildren: boolean;
   activeItemId?: string;
   withAnimation: boolean;
+  iconOnly: boolean;
   onItemClick: (item: NavMenuItem) => void;
   onSubItemClick: (sub: NavSubItem) => void;
   LinkRouter?: NavMenuProps["LinkRouter"];
@@ -133,6 +134,7 @@ const NavMenuItemWrapper = ({
   hasChildren,
   activeItemId,
   withAnimation,
+  iconOnly,
   onItemClick,
   onSubItemClick,
   LinkRouter,
@@ -205,14 +207,15 @@ const NavMenuItemWrapper = ({
           <button
             type="button"
             className={itemClassName}
-            aria-expanded={hasChildren ? isExpanded : undefined}
+            aria-expanded={hasChildren && !iconOnly ? isExpanded : undefined}
+            title={iconOnly ? item.label : undefined}
             onClick={handleClick}
           >
             {content}
           </button>
         )}
       </div>
-      {hasChildren && (
+      {hasChildren && !iconOnly && (
         <div
           className={classNames(styles.subItems, {
             [styles.expanded]: isExpanded,
@@ -245,6 +248,7 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       withAnimation = false,
       className,
       LinkRouter,
+      iconOnly = false,
     },
     ref,
   ) => {
@@ -254,7 +258,7 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
 
     const handleItemClick = (item: NavMenuItem) => {
       item.onClick?.(item);
-      if (item.children?.length) {
+      if (!iconOnly && item.children?.length) {
         setExpandedId((prev) =>
           prev === item.id && activeItemId === item.id ? null : item.id,
         );
@@ -266,7 +270,10 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
     };
 
     return (
-      <nav ref={ref} className={classNames(styles.root, className)}>
+      <nav
+        ref={ref}
+        className={classNames(styles.root, { [styles.iconOnly]: iconOnly }, className)}
+      >
         {groups.map((group) => (
           <div key={group.id} className={styles.group}>
             {group.label && (
@@ -282,6 +289,7 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
                   hasChildren={!!item.children?.length}
                   activeItemId={activeItemId}
                   withAnimation={withAnimation}
+                  iconOnly={iconOnly}
                   onItemClick={handleItemClick}
                   onSubItemClick={handleSubItemClick}
                   LinkRouter={LinkRouter}

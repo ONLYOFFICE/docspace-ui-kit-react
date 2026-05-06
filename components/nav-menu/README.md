@@ -65,6 +65,7 @@ const groups: NavMenuGroup[] = [
 | `withAnimation` | `boolean` | `false` | Enables progress-bar animation on item click |
 | `className` | `string` | — | Additional CSS class on the root element |
 | `LinkRouter` | `React.ComponentType<LinkRouterProps>` | — | Router link component; when provided, items with `linkData` render as links instead of buttons |
+| `iconOnly` | `boolean` | `false` | Collapses the menu to icons only — hides text labels, badges, and group labels; sub-items are not rendered |
 
 ## Types
 
@@ -124,6 +125,18 @@ Set `showBadge: true` on any `NavMenuItem` to display a badge after the item lab
   onClickBadge: (id) => console.log("badge clicked on", id),
 }
 ```
+
+## Icon-only mode
+
+Set `iconOnly` to collapse the menu to icons. Text labels, badges, and group labels are hidden;
+sub-items are not rendered. Items still fire `onClick`.
+
+```tsx
+<NavMenu groups={groups} activeItemId={activeId} iconOnly />
+```
+
+In icon-only mode each button receives a `title` attribute equal to the item label, providing
+a native hover tooltip. Pair with a toggle button to let users expand and collapse the sidebar.
 
 ## CSS Custom Properties
 

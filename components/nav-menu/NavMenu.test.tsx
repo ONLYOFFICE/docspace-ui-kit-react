@@ -371,6 +371,49 @@ describe("<NavMenu />", () => {
     });
   });
 
+  describe("iconOnly", () => {
+    it("applies iconOnly class to the root element", () => {
+      render(<NavMenu groups={groups} iconOnly />);
+      const nav = screen.getByRole("navigation");
+      expect(nav.className).toMatch(/iconOnly/);
+    });
+
+    it("does not set aria-expanded on items with children when iconOnly", () => {
+      render(<NavMenu groups={groups} iconOnly />);
+      const button = screen.getByRole("button", { name: "AI Files" });
+      expect(button).not.toHaveAttribute("aria-expanded");
+    });
+
+    it("sets title attribute on items when iconOnly", () => {
+      render(<NavMenu groups={groups} iconOnly />);
+      expect(screen.getByRole("button", { name: "AI Files" })).toHaveAttribute(
+        "title",
+        "AI Files",
+      );
+    });
+
+    it("does not render sub-items on item click when iconOnly", async () => {
+      render(<NavMenu groups={groups} iconOnly />);
+      await userEvent.click(screen.getByRole("button", { name: "AI Files" }));
+      expect(
+        screen.queryByRole("button", { name: "Shared with me" }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("still calls item onClick when iconOnly", async () => {
+      const onClick = vi.fn();
+      const groupsWithHandler: NavMenuGroup[] = [
+        {
+          id: "g1",
+          items: [{ id: "item-1", label: "Item One", onClick }],
+        },
+      ];
+      render(<NavMenu groups={groupsWithHandler} iconOnly />);
+      await userEvent.click(screen.getByRole("button", { name: "Item One" }));
+      expect(onClick).toHaveBeenCalledOnce();
+    });
+  });
+
   describe("withAnimation", () => {
     it("does not dispatch ANIMATION_STARTED on item click when withAnimation is false", async () => {
       const spy = vi.spyOn(window, "dispatchEvent");
