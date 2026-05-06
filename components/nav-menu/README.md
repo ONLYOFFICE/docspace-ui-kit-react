@@ -46,6 +46,7 @@ const groups: NavMenuGroup[] = [
 - **Groups**: items are organized into named groups with a section label
 - **Collapsible sub-items**: clicking an item with children expands the list with a smooth animation
 - **Single expanded section**: opening a new section automatically collapses the previously expanded one
+- **Collapse behavior**: an expanded item can only be collapsed by clicking it again when it is also the active item; clicking a non-active expanded item re-activates it without collapsing
 - **Open-only animation**: expanding is animated (0.25s ease-in-out), collapsing is instant
 - **Active item**: controlled via `activeItemId`, highlights the icon with the accent color
 - **Icons**: accepted as a URL string (`icon`) or a React node (`iconNode`)

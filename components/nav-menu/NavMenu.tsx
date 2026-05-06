@@ -207,6 +207,7 @@ const NavMenuItemWrapper = ({
           <div
             className={styles.itemBadge}
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
             {item.badgeComponent ?? (
               <Badge
