@@ -95,6 +95,7 @@ const useFilesHelper = ({
   setIsInsideResultStorage,
 
   disableBySecurity,
+  withSubFolders,
 }: UseFilesHelpersProps) => {
   const t = useCommonTranslation();
   const {
@@ -197,6 +198,7 @@ const useFilesHelper = ({
           count: PAGE_COUNT,
           startIndex,
           filterValue: currentSearch,
+          withSubFolders,
         });
         const currentFolder = folderRes.data.response!;
 

@@ -116,6 +116,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     renderInPortal,
     disableBySecurity,
+    withSubFolders,
   } = props;
 
   const t = useCommonTranslation();
@@ -303,6 +304,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withInit,
     applyFilterOption,
     disableBySecurity,
+    withSubFolders,
   });
 
   const onClickBreadCrumb = React.useCallback(
