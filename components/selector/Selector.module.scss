@@ -215,11 +215,11 @@
         background-color: var(--empty-view-link-bg-color);
 
         .empty-folder_link {
-          color: var(--accent-main, --empty-view-link-color);
+          color: var(--accent-main, var(--empty-view-link-color));
         }
 
         svg path {
-          fill: var(--accent-main, --empty-view-link-color) !important;
+          fill: var(--accent-main, var(--empty-view-link-color)) !important;
         }
 
         &:hover:not(:active) {
