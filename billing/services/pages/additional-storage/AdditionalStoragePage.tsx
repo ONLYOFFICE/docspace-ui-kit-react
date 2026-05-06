@@ -156,8 +156,10 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
     setIsCancelLoading(true);
     try {
       const walletRes = await paymentApi.updateWalletPayment({
-        quantity: { storage: null },
-        productQuantityType: 0,
+        walletQuantityRequestDto: {
+          quantity: { storage: null },
+          productQuantityType: 0,
+        },
       });
       const res = walletRes?.data?.response;
       if (res === false) throw new Error(t("UnexpectedError"));
@@ -368,4 +370,3 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
 };
 
 export default observer(AdditionalStoragePage);
-
