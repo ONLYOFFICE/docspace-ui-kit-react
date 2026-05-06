@@ -53,8 +53,7 @@ export const Card = ({
         </header>
       ) : null}
       {children ? <div className={styles.body}>{children}</div> : null}
-      {footer ? <footer className={styles.footer}>{footer}</footer> : null}
+      {footer ? <footer>{footer}</footer> : null}
     </div>
   );
 };
-
