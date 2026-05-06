@@ -194,9 +194,9 @@ const ToolsSettings = ({
   );
 
   const openOauthWindow = async (serverId: string, type: string) => {
-    const url = await thirdPartyApi.getThirdPartyCode(
-      type as unknown as LoginProvider,
-    );
+    const url = await thirdPartyApi.getThirdPartyCode({
+      provider: type as unknown as LoginProvider,
+    });
 
     const newWindow = window.open(
       "",
@@ -579,4 +579,3 @@ const ToolsSettings = ({
 };
 
 export default observer(ToolsSettings);
-

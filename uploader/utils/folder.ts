@@ -70,10 +70,10 @@ export const buildParentFolderMap = async (
       throw new Error("Failed to resolve parent folder");
     }
 
-    const res = await foldersApi.createFolder(
-      parentId as unknown as number,
-      { title: name },
-    );
+    const res = await foldersApi.createFolder({
+      folderId: parentId as number,
+      createFolder: { title: name },
+    });
     const created = res.data?.response;
     if (!created?.id) {
       throw new Error("Failed to create folder");

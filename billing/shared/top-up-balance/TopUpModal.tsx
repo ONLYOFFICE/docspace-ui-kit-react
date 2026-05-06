@@ -28,10 +28,7 @@ import React, { useState } from "react";
 import { useCommonTranslation } from "../../../utils/i18n";
 import { observer } from "mobx-react";
 
-import {
-  ModalDialog,
-  ModalDialogType,
-} from "../../../components/modal-dialog";
+import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 
 import WalletInfo from "./sub-components/WalletInfo";
 import PaymentMethod from "./sub-components/PaymentMethod";
@@ -84,8 +81,7 @@ const TopUpModal = (props: TopUpModalProps) => {
     formatWalletCurrency,
   } = store;
 
-  const { walletCustomerStatusNotActive, walletCustomerEmail } =
-    store.tariff;
+  const { walletCustomerStatusNotActive, walletCustomerEmail } = store.tariff;
 
   const t = useCommonTranslation();
 
@@ -94,7 +90,9 @@ const TopUpModal = (props: TopUpModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const topUpDeposit = async (amount: number, currency: string) => {
-    const res = await paymentApi.topUpDeposit({ amount, currency });
+    const res = await paymentApi.topUpDeposit({
+      topUpDepositRequestDto: { amount, currency },
+    });
     return res?.data?.response as unknown as string;
   };
 
