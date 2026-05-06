@@ -86,6 +86,8 @@
 
 .itemWrapper {
   position: relative;
+  display: flex;
+  align-items: stretch;
 }
 
 .itemSibling {
@@ -140,7 +142,8 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   height: 36px;
   padding: 0 12px;
   box-sizing: border-box;
@@ -151,6 +154,11 @@
   text-align: start;
   text-decoration: none;
   outline: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--nav-menu-item-icon-active-color);
+    outline-offset: -2px;
+  }
 
   .itemIcon {
     > div {
@@ -189,9 +197,12 @@
 }
 
 .itemBadge {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  padding-inline-end: 12px;
 }
 
 .itemText {
@@ -277,6 +288,11 @@
   text-align: start;
   text-decoration: none;
   outline: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--nav-menu-item-icon-active-color);
+    outline-offset: -2px;
+  }
 
   .subItemIcon {
     > div {

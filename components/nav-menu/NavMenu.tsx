@@ -163,17 +163,6 @@ const NavMenuItemWrapper = ({
         <ReactSVG className={styles.itemIcon} src={item.icon} />
       ) : null}
       <span className={styles.itemText}>{item.label}</span>
-      {item.showBadge && (
-        <div
-          className={styles.itemBadge}
-          onClick={(e) => {
-            e.stopPropagation();
-            item.onClickBadge?.(item.id);
-          }}
-        >
-          {item.badgeComponent ?? <Badge label={item.labelBadge} />}
-        </div>
-      )}
     </>
   );
 
@@ -214,6 +203,19 @@ const NavMenuItemWrapper = ({
             {content}
           </button>
         )}
+        {item.showBadge && (
+          <div
+            className={styles.itemBadge}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {item.badgeComponent ?? (
+              <Badge
+                label={item.labelBadge}
+                onClick={() => item.onClickBadge?.(item.id)}
+              />
+            )}
+          </div>
+        )}
       </div>
       {hasChildren && !iconOnly && (
         <div
@@ -222,7 +224,7 @@ const NavMenuItemWrapper = ({
           })}
         >
           <ul className={styles.subItemsInner}>
-            {item.children!.map((subItem) => (
+            {(item.children ?? []).map((subItem) => (
               <NavMenuSubItemWrapper
                 key={subItem.id}
                 subItem={subItem}
@@ -259,6 +261,8 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
     const handleItemClick = (item: NavMenuItem) => {
       item.onClick?.(item);
       if (!iconOnly && item.children?.length) {
+        // Collapse only when the item is also active; non-active expanded
+        // items stay open until another item is clicked (by design).
         setExpandedId((prev) =>
           prev === item.id && activeItemId === item.id ? null : item.id,
         );

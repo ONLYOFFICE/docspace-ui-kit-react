@@ -25,4 +25,4 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 export { NavMenu } from "./NavMenu";
-export type { NavMenuProps, NavMenuGroup, NavMenuItem, NavSubItem } from "./NavMenu.types";
+export type { NavMenuProps, NavMenuGroup, NavMenuItem, NavSubItem, NavMenuLinkData } from "./NavMenu.types";

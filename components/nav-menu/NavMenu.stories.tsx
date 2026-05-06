@@ -513,7 +513,7 @@ const SidebarDemo = () => {
         height: "100vh",
         backgroundColor: "var(--nav-menu-story-bg)",
         borderInlineEnd: "1px solid var(--border-color, rgba(0, 0, 0, 0.08))",
-        padding: iconOnly ? 0 : "0 16",
+        padding: iconOnly ? 0 : "0 16px",
       }}
     >
       <div
