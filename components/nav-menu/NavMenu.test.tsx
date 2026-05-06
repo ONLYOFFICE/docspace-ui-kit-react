@@ -93,6 +93,17 @@ describe("<NavMenu />", () => {
       expect(screen.getByRole("button", { name: "Favorites" })).toBeInTheDocument();
     });
 
+    it("does not render group label element when label is omitted", () => {
+      const groupsNoLabel: NavMenuGroup[] = [
+        {
+          id: "g1",
+          items: [{ id: "item-1", label: "Item One" }],
+        },
+      ];
+      render(<NavMenu groups={groupsNoLabel} />);
+      expect(screen.queryByText("Enabled Apps")).not.toBeInTheDocument();
+    });
+
     it("applies custom className to the root element", () => {
       render(<NavMenu groups={groups} className="custom-nav" />);
       expect(screen.getByRole("navigation")).toHaveClass("custom-nav");
@@ -118,8 +129,14 @@ describe("<NavMenu />", () => {
       expect(screen.getByRole("button", { name: "Shared with me" })).toBeInTheDocument();
     });
 
-    it("collapses already-expanded item on second click", async () => {
-      render(<NavMenu groups={groups} defaultExpandedId="ai-files" />);
+    it("collapses already-expanded item on second click when it is active", async () => {
+      render(
+        <NavMenu
+          groups={groups}
+          defaultExpandedId="ai-files"
+          activeItemId="ai-files"
+        />,
+      );
       const button = screen.getByRole("button", { name: "AI Files" });
 
       expect(button).toHaveAttribute("aria-expanded", "true");
@@ -127,6 +144,23 @@ describe("<NavMenu />", () => {
       await userEvent.click(button);
 
       expect(button).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("keeps expanded item open on second click when it is not active", async () => {
+      render(
+        <NavMenu
+          groups={groups}
+          defaultExpandedId="ai-files"
+          activeItemId="shared"
+        />,
+      );
+      const button = screen.getByRole("button", { name: "AI Files" });
+
+      expect(button).toHaveAttribute("aria-expanded", "true");
+
+      await userEvent.click(button);
+
+      expect(button).toHaveAttribute("aria-expanded", "true");
     });
 
     it("collapses previous item when a different item is expanded", async () => {
