@@ -68,7 +68,7 @@
 
 .groupLabel {
   display: block;
-  padding: 8px 16px 4px;
+  padding: 8px 12px 4px;
   font-size: 11px;
   font-weight: 600;
   line-height: 14px;
@@ -254,7 +254,8 @@
   }
 }
 
-.subItemWrapper:hover .subItemSibling:not(.animatedProgress):not(.animatedFinish) {
+.subItemWrapper:hover
+  .subItemSibling:not(.animatedProgress):not(.animatedFinish) {
   background-color: var(--nav-menu-item-bg-hover);
 }
 
@@ -318,9 +319,3 @@
   user-select: none;
   pointer-events: none;
 }
-
-.storyWrapper {
-  background-color: var(--nav-menu-story-bg);
-  padding: 15px;
-}
-

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Meta, StoryObj } from "@storybook/react-vite";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
@@ -37,12 +37,23 @@ import CatalogDocumentsSvgUrl from "../../assets/icons/16/catalog.documents.reac
 import CatalogAiAgentsSvgUrl from "../../assets/icons/16/catalog.ai-agents.react.svg?url";
 import CatalogPortfolioSvgUrl from "../../assets/icons/16/catalog.portfolio.react.svg?url";
 import CatalogDeveloperSvgUrl from "../../assets/icons/16/catalog.developer.react.svg?url";
+import CatalogSettingsSvgUrl from "../../assets/icons/16/catalog-settings-common.svg?url";
+import PeopleReactSvgUrl from "../../assets/icons/16/people.react.svg?url";
+import VerticalDotsSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
+import PaymentReactSvgUrl from "../../assets/icons/16/payment.react.svg?url";
+import ArticleHideMenuIconReactSvg from "../../assets/article-hide-menu-icon.react.svg";
 
+import { Avatar, AvatarRole, AvatarSize } from "../avatar";
 import { Badge } from "../badge";
+import { ContextMenu } from "../context-menu";
+import type { ContextMenuRefType } from "../context-menu";
+import { IconButton } from "../icon-button";
 
 import { NavMenu } from "./NavMenu";
 import { NavMenuGroup, NavMenuLinkData, NavMenuProps } from "./NavMenu.types";
 import styles from "./NavMenu.module.scss";
+import storyStyles from "./NavMenu.stories.module.scss";
+import PortalLogo from "../portal-logo/PortalLogo";
 
 const twoGroupsData: NavMenuGroup[] = [
   {
@@ -113,6 +124,105 @@ const noChildrenData: NavMenuGroup[] = [
   },
 ];
 
+const fullEnabledAppsData: NavMenuGroup[] = [
+  {
+    id: "enabled",
+    label: "Enabled Apps",
+    items: [
+      {
+        id: "ai-files",
+        label: "AI Files",
+        icon: CatalogFolderReactSvgUrl,
+        children: [
+          {
+            id: "files-shared",
+            label: "Shared with me",
+            icon: CatalogSharedSvgUrl,
+          },
+          {
+            id: "files-favorites",
+            label: "Favorites",
+            icon: CatalogFavoritesSvgUrl,
+          },
+          { id: "files-recent", label: "Recent", icon: CatalogArchiveSvgUrl },
+          { id: "files-trash", label: "Trash", icon: CatalogTrashSvgUrl },
+        ],
+      },
+      {
+        id: "ai-rooms",
+        label: "AI Rooms",
+        icon: CatalogRoomsSvgUrl,
+        children: [
+          {
+            id: "rooms-favorites",
+            label: "Favorites",
+            icon: CatalogFavoritesSvgUrl,
+          },
+          { id: "rooms-recent", label: "Recent", icon: CatalogArchiveSvgUrl },
+          {
+            id: "rooms-templates",
+            label: "Templates",
+            icon: CatalogPortfolioSvgUrl,
+          },
+          {
+            id: "rooms-archive",
+            label: "Archive",
+            icon: CatalogDocumentsSvgUrl,
+          },
+        ],
+      },
+      {
+        id: "ai-forms",
+        label: "AI Forms",
+        icon: CatalogDocumentsSvgUrl,
+        children: [
+          {
+            id: "forms-in-progress",
+            label: "In Progress",
+            icon: CatalogDeveloperSvgUrl,
+          },
+          {
+            id: "forms-complete",
+            label: "Complete",
+            icon: CatalogFavoritesSvgUrl,
+          },
+        ],
+      },
+      {
+        id: "ai-agents",
+        label: "AI Agents",
+        icon: CatalogAiAgentsSvgUrl,
+        children: [
+          {
+            id: "agents-favorites",
+            label: "Favorites",
+            icon: CatalogFavoritesSvgUrl,
+          },
+          { id: "agents-recent", label: "Recent", icon: CatalogArchiveSvgUrl },
+          { id: "agents-trash", label: "Trash", icon: CatalogTrashSvgUrl },
+        ],
+      },
+    ],
+  },
+];
+
+function withHandlers(
+  groups: NavMenuGroup[],
+  onSelect: (id: string) => void,
+): NavMenuGroup[] {
+  return groups.map((group) => ({
+    ...group,
+    items: group.items.map((item) => ({
+      ...item,
+      onClick: () => onSelect(item.id),
+      children: item.children?.map((sub) => ({
+        ...sub,
+        onClick: () => onSelect(sub.id),
+      })),
+    })),
+  }));
+}
+
 const meta = {
   title: "UI/Navigation/NavMenu",
   component: NavMenu,
@@ -128,7 +238,14 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className={styles.storyWrapper} style={{ width: "250px" }}>
+      <div
+        className={styles.storyWrapper}
+        style={{
+          width: "250px",
+          borderInlineEnd: "1px solid var(--border-color, rgba(0, 0, 0, 0.08))",
+          padding: 15,
+        }}
+      >
         <Story />
       </div>
     ),
@@ -237,128 +354,9 @@ export const FullEnabledApps: Story = {
   render: () => {
     const [activeId, setActiveId] = useState("files-shared");
 
-    const groups: NavMenuGroup[] = [
-      {
-        id: "enabled",
-        label: "Enabled Apps",
-        items: [
-          {
-            id: "ai-files",
-            label: "AI Files",
-            icon: CatalogFolderReactSvgUrl,
-            onClick: (item) => setActiveId(item.id),
-            children: [
-              {
-                id: "files-shared",
-                label: "Shared with me",
-                icon: CatalogSharedSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-              {
-                id: "files-favorites",
-                label: "Favorites",
-                icon: CatalogFavoritesSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-              {
-                id: "files-recent",
-                label: "Recent",
-                icon: CatalogArchiveSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-              {
-                id: "files-trash",
-                label: "Trash",
-                icon: CatalogTrashSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-            ],
-          },
-          {
-            id: "ai-rooms",
-            label: "AI Rooms",
-            icon: CatalogRoomsSvgUrl,
-            onClick: (item) => setActiveId(item.id),
-            children: [
-              {
-                id: "rooms-favorites",
-                label: "Favorites",
-                icon: CatalogFavoritesSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-              {
-                id: "rooms-recent",
-                label: "Recent",
-                icon: CatalogArchiveSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-              {
-                id: "rooms-templates",
-                label: "Templates",
-                icon: CatalogPortfolioSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-              {
-                id: "rooms-archive",
-                label: "Archive",
-                icon: CatalogDocumentsSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-            ],
-          },
-          {
-            id: "ai-forms",
-            label: "AI Forms",
-            icon: CatalogDocumentsSvgUrl,
-            onClick: (item) => setActiveId(item.id),
-            children: [
-              {
-                id: "forms-in-progress",
-                label: "In Progress",
-                icon: CatalogDeveloperSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-              {
-                id: "forms-complete",
-                label: "Complete",
-                icon: CatalogFavoritesSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-            ],
-          },
-          {
-            id: "ai-agents",
-            label: "AI Agents",
-            icon: CatalogAiAgentsSvgUrl,
-            onClick: (item) => setActiveId(item.id),
-            children: [
-              {
-                id: "agents-favorites",
-                label: "Favorites",
-                icon: CatalogFavoritesSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-              {
-                id: "agents-recent",
-                label: "Recent",
-                icon: CatalogArchiveSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-              {
-                id: "agents-trash",
-                label: "Trash",
-                icon: CatalogTrashSvgUrl,
-                onClick: (sub) => setActiveId(sub.id),
-              },
-            ],
-          },
-        ],
-      },
-    ];
-
     return (
       <NavMenu
-        groups={groups}
+        groups={withHandlers(fullEnabledAppsData, setActiveId)}
         activeItemId={activeId}
         defaultExpandedId="ai-files"
         withAnimation
@@ -394,7 +392,9 @@ const MockLinkRouter = ({
 export const WithLinkData: Story = {
   render: () => {
     const [activeId, setActiveId] = useState("rooms");
-    const [navigatedTo, setNavigatedTo] = useState<NavMenuLinkData | null>(null);
+    const [navigatedTo, setNavigatedTo] = useState<NavMenuLinkData | null>(
+      null,
+    );
 
     const groups: NavMenuGroup[] = [
       {
@@ -425,7 +425,10 @@ export const WithLinkData: Story = {
                   setActiveId(sub.id);
                   setNavigatedTo(sub.linkData ?? null);
                 },
-                linkData: { path: "/rooms/favorites", state: { title: "Favorites" } },
+                linkData: {
+                  path: "/rooms/favorites",
+                  state: { title: "Favorites" },
+                },
               },
               {
                 id: "rooms-archive",
@@ -435,7 +438,10 @@ export const WithLinkData: Story = {
                   setActiveId(sub.id);
                   setNavigatedTo(sub.linkData ?? null);
                 },
-                linkData: { path: "/rooms/archive", state: { title: "Archive" } },
+                linkData: {
+                  path: "/rooms/archive",
+                  state: { title: "Archive" },
+                },
               },
             ],
           },
@@ -469,4 +475,122 @@ export const WithLinkData: Story = {
       </div>
     );
   },
+};
+
+const bottomGroups: NavMenuGroup[] = [
+  {
+    id: "bottom",
+    items: [
+      { id: "contacts", label: "Contacts", icon: PeopleReactSvgUrl },
+      { id: "billing", label: "Billing", icon: PaymentReactSvgUrl },
+      { id: "settings", label: "Settings", icon: CatalogSettingsSvgUrl },
+    ],
+  },
+];
+
+const profileMenu = [
+  { key: "profile", label: "Profile" },
+  { key: "settings-item", label: "Settings" },
+  { key: "sep", isSeparator: true },
+  { key: "signout", label: "Sign out" },
+];
+
+const SidebarDemo = () => {
+  const [activeId, setActiveId] = useState("agents-favorites");
+  const [collapsed, setCollapsed] = useState(false);
+  const menuRef = useRef<ContextMenuRefType>(null);
+
+  const mainGroups = withHandlers(fullEnabledAppsData, setActiveId);
+  const bottomGroupsWithHandlers = withHandlers(bottomGroups, setActiveId);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "252px",
+        height: "100vh",
+        backgroundColor: "var(--nav-menu-story-bg)",
+      }}
+    >
+      <div
+        style={{ width: 211, height: 24, marginBottom: 15, padding: "0 12px" }}
+      >
+        <PortalLogo className={storyStyles.logo} />
+      </div>
+
+      <div style={{ flex: 1, overflowY: "auto" }}>
+        <NavMenu
+          groups={mainGroups}
+          activeItemId={activeId}
+          defaultExpandedId="ai-agents"
+          withAnimation
+        />
+      </div>
+      <NavMenu
+        groups={bottomGroupsWithHandlers}
+        activeItemId={activeId}
+        withAnimation
+      />
+      <div
+        style={{
+          paddingInline: "12px",
+          paddingBlock: "4px",
+          margin: "28px 0 12px",
+        }}
+      >
+        <IconButton
+          size={20}
+          isFill={false}
+          iconNode={
+            <div style={{ transform: collapsed ? "scaleX(-1)" : "none" }}>
+              <ArticleHideMenuIconReactSvg />
+            </div>
+          }
+          onClick={() => setCollapsed((c) => !c)}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          paddingBlock: "12px",
+          paddingInline: "16px",
+          borderBlockStart:
+            "1px solid var(--border-color, rgba(0, 0, 0, 0.08))",
+          background: "#F3F4F4",
+          height: 48,
+          margin: "0 -16px",
+          fontSize: "13px",
+          fontWeight: 600,
+        }}
+      >
+        <Avatar
+          size={AvatarSize.min}
+          role={AvatarRole.user}
+          userName="Paula Miller"
+          onClick={(e: React.MouseEvent) => menuRef.current?.show(e)}
+        />
+        <span style={{ flex: 1, fontSize: "14px" }}>Paula Miller</span>
+        <IconButton
+          size={16}
+          iconName={VerticalDotsSvgUrl}
+          onClick={(e) => menuRef.current?.show(e)}
+        />
+        <ContextMenu ref={menuRef} model={profileMenu} />
+      </div>
+    </div>
+  );
+};
+
+export const FullSidebar: Story = {
+  decorators: [
+    (Story) => (
+      <div style={{ height: "100vh", display: "flex" }}>
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => <SidebarDemo />,
 };

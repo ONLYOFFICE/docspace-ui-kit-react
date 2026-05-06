@@ -63,7 +63,9 @@ const NavMenuSubItemWrapper = ({
     if (withAnimation) triggerAnimation();
   };
 
-  const itemClassName = classNames(styles.subItem, { [styles.active]: isActive });
+  const itemClassName = classNames(styles.subItem, {
+    [styles.active]: isActive,
+  });
 
   const content = (
     <>
@@ -87,7 +89,8 @@ const NavMenuSubItemWrapper = ({
           className={classNames(styles.subItemSibling, {
             [styles.active]: isActive,
             [styles.animationReady]: isAnimationReady,
-            [styles.animatedProgress]: isActive && animationPhase === "progress",
+            [styles.animatedProgress]:
+              isActive && animationPhase === "progress",
             [styles.animatedFinish]: isActive && animationPhase === "finish",
           })}
           style={{ "--end-width": `${endWidth}%` } as React.CSSProperties}
@@ -102,11 +105,7 @@ const NavMenuSubItemWrapper = ({
             {content}
           </LinkRouter>
         ) : (
-          <button
-            type="button"
-            className={itemClassName}
-            onClick={handleClick}
-          >
+          <button type="button" className={itemClassName} onClick={handleClick}>
             {content}
           </button>
         )}
@@ -187,7 +186,8 @@ const NavMenuItemWrapper = ({
           className={classNames(styles.itemSibling, {
             [styles.active]: isActive,
             [styles.animationReady]: isAnimationReady,
-            [styles.animatedProgress]: isActive && animationPhase === "progress",
+            [styles.animatedProgress]:
+              isActive && animationPhase === "progress",
             [styles.animatedFinish]: isActive && animationPhase === "finish",
           })}
           style={{ "--end-width": `${endWidth}%` } as React.CSSProperties}
@@ -255,7 +255,9 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
     const handleItemClick = (item: NavMenuItem) => {
       item.onClick?.(item);
       if (item.children?.length) {
-        setExpandedId((prev) => (prev === item.id ? null : item.id));
+        setExpandedId((prev) =>
+          prev === item.id && activeItemId === item.id ? null : item.id,
+        );
       }
     };
 
@@ -267,7 +269,9 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       <nav ref={ref} className={classNames(styles.root, className)}>
         {groups.map((group) => (
           <div key={group.id} className={styles.group}>
-            <span className={styles.groupLabel}>{group.label}</span>
+            {group.label && (
+              <span className={styles.groupLabel}>{group.label}</span>
+            )}
             <ul className={styles.itemList}>
               {group.items.map((item) => (
                 <NavMenuItemWrapper

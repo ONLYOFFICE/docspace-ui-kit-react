@@ -24,49 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
+.logo {
+  width: 211px;
+  height: 24px;
+  object-fit: contain;
+}
 
-import type { LinkRouterProps } from "../../types";
+.storyWrapper {
+  background-color: var(--nav-menu-story-bg);
+  padding: 15px 15px 0 15px;
+}
 
-export type NavMenuLinkData = {
-  path: string;
-  state?: unknown;
-};
-
-export type NavSubItem = {
-  id: string;
-  label: string;
-  icon?: string;
-  iconNode?: React.ReactNode;
-  onClick?: (item: NavSubItem) => void;
-  linkData?: NavMenuLinkData;
-};
-
-export type NavMenuItem = {
-  id: string;
-  label: string;
-  icon?: string;
-  iconNode?: React.ReactNode;
-  onClick?: (item: NavMenuItem) => void;
-  children?: NavSubItem[];
-  showBadge?: boolean;
-  labelBadge?: string | number;
-  badgeComponent?: React.ReactNode;
-  onClickBadge?: (id: string) => void;
-  linkData?: NavMenuLinkData;
-};
-
-export type NavMenuGroup = {
-  id: string;
-  label?: string;
-  items: NavMenuItem[];
-};
-
-export type NavMenuProps = {
-  groups: NavMenuGroup[];
-  activeItemId?: string;
-  defaultExpandedId?: string;
-  withAnimation?: boolean;
-  className?: string;
-  LinkRouter?: React.ComponentType<LinkRouterProps>;
-};
