@@ -27,7 +27,7 @@
 import React from "react";
 
 import { InputSize } from "../text-input";
-import type { ButtonProps } from "../button";
+import type { MainButtonProps } from "../main-button/MainButton.types";
 
 export type SearchInputProps = {
 	/** Used as HTML `id` property */
@@ -69,8 +69,10 @@ export type SearchInputProps = {
 	dataTestId?: string;
 	/** HTML tabindex property */
 	tabIndex?: number;
-	/** Shows a button to the left of the search field */
-	showSearchButton?: boolean;
-	/** Props for the button displayed to the left of the search field */
-	searchButtonProps?: ButtonProps;
+	/** Shows a MainButton to the left of the search field */
+	showMainButton?: boolean;
+	/** Props for the MainButton displayed to the left of the search field */
+	mainButtonProps?: MainButtonProps;
+	/** Icon node rendered inside the MainButton (12x12) */
+	mainButtonIcon?: React.ReactNode;
 };

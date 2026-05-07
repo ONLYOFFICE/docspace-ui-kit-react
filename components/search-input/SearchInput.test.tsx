@@ -154,31 +154,31 @@ describe("<SearchInput />", () => {
 		expect(input).toHaveValue("updated");
 	});
 
-	it("renders button when showSearchButton and searchButtonProps are provided", () => {
+	it("renders main button when showMainButton and mainButtonProps are provided", () => {
 		render(
 			<SearchInput
 				{...baseProps}
-				showSearchButton
-				searchButtonProps={{ label: "New room", primary: true }}
+				showMainButton
+				mainButtonProps={{ text: "New room", model: [] }}
 			/>,
 		);
 		expect(screen.getByText("New room")).toBeInTheDocument();
 	});
 
-	it("does not render button when showSearchButton is false", () => {
+	it("does not render main button when showMainButton is false", () => {
 		render(
 			<SearchInput
 				{...baseProps}
-				showSearchButton={false}
-				searchButtonProps={{ label: "New room" }}
+				showMainButton={false}
+				mainButtonProps={{ text: "New room", model: [] }}
 			/>,
 		);
 		expect(screen.queryByText("New room")).not.toBeInTheDocument();
 	});
 
-	it("does not render button when searchButtonProps is not provided", () => {
-		render(<SearchInput {...baseProps} showSearchButton />);
-		expect(screen.queryByRole("button")).not.toBeInTheDocument();
+	it("does not render main button when mainButtonProps is not provided", () => {
+		render(<SearchInput {...baseProps} showMainButton />);
+		expect(screen.queryByTestId("main-button")).not.toBeInTheDocument();
 	});
 
 	it("clears input and calls onClearSearch when clear button is clicked", async () => {

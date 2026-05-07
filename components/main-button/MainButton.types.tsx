@@ -48,6 +48,8 @@ export type MainButtonProps = {
   style?: React.CSSProperties;
   /** Data model menu */
   model: ContextMenuModel[];
+  /** Hide the dropdown arrow while keeping dropdown functionality */
+  hideArrow?: boolean;
   /** Function to set reference map */
   setRefMap?: (
     key: GuidanceRefKey,

@@ -34,11 +34,12 @@ import React, {
 import classNames from "classnames";
 
 import CrossIconReactSvg from "../../assets/icons/12/cross.react.svg";
+import PlusIconSvg from "../../assets/icons/12/plus.svg";
 import SearchIconReactSvg from "../../assets/search.react.svg";
 
 import { useDebounce } from "../../hooks/useDebounce";
 
-import { Button } from "../button";
+import { MainButton } from "../main-button";
 import { InputBlock } from "../input-block";
 import { InputType } from "../text-input";
 
@@ -66,8 +67,9 @@ const SearchInput = ({
   children,
   dataTestId,
   tabIndex,
-  showSearchButton = false,
-  searchButtonProps,
+  showMainButton = false,
+  mainButtonProps,
+  mainButtonIcon = <PlusIconSvg />,
 }: SearchInputProps) => {
   const [inputValue, setInputValue] = useState(value);
 
@@ -136,8 +138,11 @@ const SearchInput = ({
       style={style}
       data-testid={dataTestId ?? "search-input"}
     >
-      {showSearchButton && searchButtonProps ? (
-        <Button {...searchButtonProps} />
+      {showMainButton && mainButtonProps ? (
+        <div className={styles.mainButtonWrapper}>
+          <span className={styles.mainButtonIcon}>{mainButtonIcon}</span>
+          <MainButton {...mainButtonProps} hideArrow />
+        </div>
       ) : null}
       <div className={styles.searchInputField}>
         <InputBlock

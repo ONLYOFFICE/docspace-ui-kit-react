@@ -31,12 +31,29 @@ import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { InputSize } from "../text-input";
-import { ButtonSize } from "../button";
+import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
 
-import PlusReactSvg from "../../assets/icons/12/plus.svg";
+import { InputSize } from "../text-input";
 
 import { SearchInput } from ".";
+
+const itemsModel = [
+  { key: 0, label: "New document", icon: CatalogFolderReactSvgUrl },
+  { key: 1, label: "New spreadsheet", icon: CatalogFolderReactSvgUrl },
+  { key: 2, label: "New presentation", icon: CatalogFolderReactSvgUrl },
+  {
+    key: 3,
+    label: "Master form",
+    icon: CatalogFolderReactSvgUrl,
+    items: [
+      { key: 4, label: "From blank" },
+      { key: 5, label: "From an existing text file" },
+    ],
+  },
+  { key: 6, label: "New folder", icon: CatalogFolderReactSvgUrl },
+  { key: 7, isSeparator: true },
+  { key: 8, label: "Upload", icon: CatalogFolderReactSvgUrl },
+];
 
 const meta = {
   title: "UI/Interactive elements/SearchInput",
@@ -124,14 +141,14 @@ import { InputSize } from "@docspace/ui-kit/components/text-input";
       control: "text",
       description: "Placeholder text",
     },
-    searchButtonProps: {
+    mainButtonProps: {
       control: false,
       description:
-        "Props for the action button displayed to the left of the search field (ButtonProps)",
+        "Props for the MainButton displayed to the left of the search field (MainButtonProps)",
     },
-    showSearchButton: {
+    showMainButton: {
       control: "boolean",
-      description: "Show a button to the left of the search field",
+      description: "Show a MainButton to the left of the search field",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -307,26 +324,13 @@ export const AutoRefreshMode: Story = {
   },
 };
 
-const PlusIcon = () => (
-  <span
-    style={{
-      display: "inline-flex",
-      filter: "brightness(0) invert(1)",
-    }}
-  >
-    <PlusReactSvg />
-  </span>
-);
-
 export const WithButton: Story = {
   render: (args) => {
     const [value, setValue] = useState(args.value || "");
 
-    const buttonProps = {
-      label: "New room",
-      primary: true,
-      size: ButtonSize.small,
-      icon: <PlusIcon />,
+    const mainButtonProps = {
+      text: "New room",
+      model: [],
     };
 
     return (
@@ -337,7 +341,7 @@ export const WithButton: Story = {
           onChange={(v) => setValue(v)}
           showClearButton={!!value}
           onClearSearch={() => setValue("")}
-          searchButtonProps={buttonProps}
+          mainButtonProps={mainButtonProps}
         />
       </div>
     );
@@ -347,14 +351,55 @@ export const WithButton: Story = {
     value: "",
     scale: true,
     placeholder: "Search",
-    showSearchButton: true,
+    showMainButton: true,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "SearchInput with an action button to the left. " +
-          "Use `showSearchButton` and `searchButtonProps` to control visibility and all Button props.",
+          "SearchInput with a MainButton to the left. " +
+          "Use `showMainButton` and `mainButtonProps` to control visibility and all MainButton props.",
+      },
+    },
+  },
+};
+
+export const WithButtonAndMenu: Story = {
+  render: (args) => {
+    const [value, setValue] = useState(args.value || "");
+
+    const mainButtonProps = {
+      text: "New",
+      model: itemsModel,
+      hideArrow: true,
+    };
+
+    return (
+      <div style={{ width: "500px" }}>
+        <SearchInput
+          {...args}
+          value={value}
+          onChange={(v) => setValue(v)}
+          showClearButton={!!value}
+          onClearSearch={() => setValue("")}
+          mainButtonProps={mainButtonProps}
+        />
+      </div>
+    );
+  },
+  args: {
+    size: InputSize.base,
+    value: "",
+    scale: true,
+    placeholder: "Search",
+    showMainButton: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "SearchInput with a 'New' MainButton that opens a dropdown menu. " +
+          "Pass `model` inside `mainButtonProps` to populate the menu items.",
       },
     },
   },
