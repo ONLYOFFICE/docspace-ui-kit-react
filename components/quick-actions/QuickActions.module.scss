@@ -38,8 +38,7 @@
   }
 
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: nowrap;
   gap: 16px;
   width: 100%;
 }
@@ -51,9 +50,10 @@
   justify-content: center;
   gap: 12px;
   padding: 16px;
-  width: 172px;
-  height: 172px;
-  flex-shrink: 0;
+  flex: 1 1 0;
+  min-width: 0;
+  aspect-ratio: 1;
+  max-width: 172px;
   background-color: var(--quick-actions-tile-bg);
   border: none;
   border-radius: 12px;
@@ -83,9 +83,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: 108px;
-  height: 100px;
+  flex-shrink: 1;
+  width: 63%; // ~108px at max tile width of 172px
+  aspect-ratio: 108 / 100;
+  min-width: 0;
 
   svg {
     width: 100%;
