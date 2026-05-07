@@ -27,16 +27,15 @@
 @use "../../styles/mixins";
 @use "../../styles/variables/colors";
 
-:global {
-  .p-contextmenu {
-    position: fixed;
-    margin: 0;
-    padding: 0;
-    transform-origin: top left;
-    box-sizing: border-box;
-    [dir="rtl"] & {
-      transform-origin: top right;
-    }
+.menu:global(.p-contextmenu) {
+  position: fixed;
+  margin: 0;
+  padding: 0;
+  transform-origin: top left;
+  box-sizing: border-box;
+
+  [dir="rtl"] & {
+    transform-origin: top right;
   }
 }
 
