@@ -53,6 +53,7 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
     filledStroke,
     style,
     tooltipText,
+    children,
     ...rest
   } = props;
 
@@ -98,6 +99,7 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
         style={buttonStyle}
         data-tooltip-id={tooltipId}
         data-tooltip-content={tooltipText}
+        onClick={(e) => {}}
       >
         {isLoading ? (
           <Loader
@@ -116,7 +118,7 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
           {icon ? (
             <div className={classNames(styles.icon, "icon")}>{icon}</div>
           ) : null}
-          {label}
+          {label || children}
         </div>
       </button>
       {tooltipText ? (

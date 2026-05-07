@@ -24,13 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { PropsWithChildren } from "react";
 import type { ButtonSize } from "./Button.enums";
 
-type BaseButtonProps = {
+type BaseButtonProps = PropsWithChildren<{
   /** Ref to access the DOM element or React component instance */
   ref?: React.Ref<HTMLElement>;
   /** Button text */
-  label: string;
+  label?: string;
   /** Optional title attribute */
   title?: string;
   /** Sets the button primary */
@@ -68,7 +69,7 @@ type BaseButtonProps = {
   type?: HTMLButtonElement["type"];
   /** HTML data-testid attribute */
   testId?: string;
-};
+}>;
 
 /** Props for the Button component */
 export type ButtonProps = BaseButtonProps & {
