@@ -54,7 +54,7 @@ const meta = {
 
 - **Icon + label**: Each tile accepts a custom icon (any \`ReactNode\`) and a string label.
 - **Action or link**: Pass \`onClick\` to render a \`<button>\`, or \`href\` to render an \`<a>\`. When \`target="_blank"\` is set, \`rel="noopener noreferrer"\` is added automatically.
-- **Responsive layout**: Tiles are laid out on an auto-fit grid with a minimum tile width of 160px and a 16px gap.
+- **Responsive layout**: Tiles are laid out using flex (no wrapping) with a 16px gap — they shrink proportionally and always stay in a single row.
 - **16px padding**: Each tile has 16px padding on all sides.
 
 ### Accessibility
