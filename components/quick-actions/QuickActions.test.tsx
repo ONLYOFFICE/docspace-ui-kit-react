@@ -33,10 +33,10 @@ import type { QuickActionItem } from "./QuickActions.types";
 
 const buildItems = (overrides: Partial<QuickActionItem>[] = []) => {
   const base: QuickActionItem[] = [
-    { icon: <svg data-testid="icon-doc" />, label: "Document" },
-    { icon: <svg data-testid="icon-xls" />, label: "Spreadsheet" },
-    { icon: <svg data-testid="icon-ppt" />, label: "Presentation" },
-    { icon: <svg data-testid="icon-pdf" />, label: "PDF" },
+    { id: "doc", icon: <svg data-testid="icon-doc" />, label: "Document" },
+    { id: "xls", icon: <svg data-testid="icon-xls" />, label: "Spreadsheet" },
+    { id: "ppt", icon: <svg data-testid="icon-ppt" />, label: "Presentation" },
+    { id: "pdf", icon: <svg data-testid="icon-pdf" />, label: "PDF" },
   ];
 
   return base.map((item, i) => ({ ...item, ...overrides[i] }));
@@ -76,7 +76,7 @@ describe("QuickActions", () => {
   it("invokes onClick when a tile is clicked", () => {
     const onClick = vi.fn();
     const items: QuickActionItem[] = [
-      { icon: <svg />, label: "Action", onClick },
+      { id: "action", icon: <svg />, label: "Action", onClick },
     ];
 
     render(<QuickActions items={items} />);
@@ -89,6 +89,7 @@ describe("QuickActions", () => {
   it("renders an anchor when href is provided", () => {
     const items: QuickActionItem[] = [
       {
+        id: "open",
         icon: <svg />,
         label: "Open",
         href: "https://example.com",
@@ -105,7 +106,7 @@ describe("QuickActions", () => {
   });
 
   it("renders a button when no href is provided", () => {
-    const items: QuickActionItem[] = [{ icon: <svg />, label: "Run" }];
+    const items: QuickActionItem[] = [{ id: "run", icon: <svg />, label: "Run" }];
 
     render(<QuickActions items={items} />);
 
@@ -114,8 +115,8 @@ describe("QuickActions", () => {
 
   it("forwards dataTestId to individual tiles", () => {
     const items: QuickActionItem[] = [
-      { icon: <svg />, label: "Tile A", dataTestId: "tile-a" },
-      { icon: <svg />, label: "Tile B", dataTestId: "tile-b" },
+      { id: "tile-a", icon: <svg />, label: "Tile A", dataTestId: "tile-a" },
+      { id: "tile-b", icon: <svg />, label: "Tile B", dataTestId: "tile-b" },
     ];
 
     render(<QuickActions items={items} />);

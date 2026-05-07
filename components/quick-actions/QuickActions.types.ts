@@ -27,6 +27,7 @@
 import type { MouseEvent, ReactNode } from "react";
 
 export type QuickActionItem = {
+  id: string;
   icon: ReactNode;
   label: string;
   onClick?: (e: MouseEvent<HTMLElement>) => void;

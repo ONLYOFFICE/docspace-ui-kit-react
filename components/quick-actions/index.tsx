@@ -86,11 +86,8 @@ export const QuickActions = ({
       className={classNames(styles.quickActions, className)}
       data-testid={dataTestId}
     >
-      {items.map((item, index) => (
-        <QuickActionTile
-          key={`${item.label}-${index}`}
-          item={item}
-        />
+      {items.map((item) => (
+        <QuickActionTile key={item.id} item={item} />
       ))}
     </div>
   );

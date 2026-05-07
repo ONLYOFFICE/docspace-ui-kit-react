@@ -105,21 +105,25 @@ const Wrapper = (props: { children: React.ReactNode }) => (
 
 const documentItems: QuickActionItem[] = [
   {
+    id: "document",
     icon: <CreateDocumentIcon />,
     label: "Document",
     onClick: () => console.log("New document"),
   },
   {
+    id: "spreadsheet",
     icon: <CreateSpreadsheetIcon />,
     label: "Spreadsheet",
     onClick: () => console.log("New spreadsheet"),
   },
   {
+    id: "presentation",
     icon: <CreatePresentationIcon />,
     label: "Presentation",
     onClick: () => console.log("New presentation"),
   },
   {
+    id: "pdf",
     icon: <CreateFormIcon />,
     label: "PDF",
     onClick: () => console.log("New PDF"),
@@ -128,21 +132,25 @@ const documentItems: QuickActionItem[] = [
 
 const aiFormsItems: QuickActionItem[] = [
   {
+    id: "blank-pdf",
     icon: <BlankPdfIcon />,
     label: "Blank PDF form",
     onClick: () => console.log("Blank PDF"),
   },
   {
+    id: "generate-ai",
     icon: <GeneratePdfAiIcon />,
     label: "Generate with AI",
     onClick: () => console.log("Generate PDF with AI"),
   },
   {
+    id: "from-text",
     icon: <CreateFromTextIcon />,
     label: "From text file",
     onClick: () => console.log("From text"),
   },
   {
+    id: "use-template",
     icon: <CreateFromTemplateIcon />,
     label: "Use template",
     onClick: () => console.log("From template"),
@@ -151,16 +159,19 @@ const aiFormsItems: QuickActionItem[] = [
 
 const aiChatItems: QuickActionItem[] = [
   {
+    id: "create-agent",
     icon: <CreateAgentIcon />,
     label: "Create agent",
     onClick: () => console.log("Create AI agent"),
   },
   {
+    id: "generate-ai",
     icon: <GenerateWithAiIcon />,
     label: "Generate with AI",
     onClick: () => console.log("Generate with AI"),
   },
   {
+    id: "use-template",
     icon: <UseTemplateIcon />,
     label: "Use template",
     onClick: () => console.log("Use template"),

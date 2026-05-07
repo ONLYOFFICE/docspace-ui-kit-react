@@ -27,11 +27,9 @@
 @use "../../styles/variables/colors";
 
 .quickActions {
-  :global(.light) & {
-    --quick-actions-tile-bg: #{colors.$gray-light};
-    --quick-actions-tile-bg-hover: #{colors.$gray-light-mid};
-    --quick-actions-tile-color: #{colors.$black};
-  }
+  --quick-actions-tile-bg: #{colors.$gray-light};
+  --quick-actions-tile-bg-hover: #{colors.$gray-light-mid};
+  --quick-actions-tile-color: #{colors.$black};
 
   :global(.dark) & {
     --quick-actions-tile-bg: #{colors.$dark-gray-light};
@@ -66,13 +64,18 @@
   cursor: pointer;
   transition: background-color 0.15s ease;
 
-  &:hover,
-  &:focus-visible {
+  &:hover {
     background-color: var(--quick-actions-tile-bg-hover);
   }
 
   &:focus {
     outline: none;
+  }
+
+  &:focus-visible {
+    background-color: var(--quick-actions-tile-bg-hover);
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
   }
 }
 
