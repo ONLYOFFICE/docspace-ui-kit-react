@@ -40,8 +40,8 @@ import CatalogDeveloperSvgUrl from "../../assets/icons/16/catalog.developer.reac
 import CatalogSettingsSvgUrl from "../../assets/icons/16/catalog-settings-common.svg?url";
 import PeopleReactSvgUrl from "../../assets/icons/16/people.react.svg?url";
 import VerticalDotsSvgUrl from "../../assets/icons/16/vertical-dots.react.svg?url";
-import PaymentReactSvgUrl from "../../assets/icons/16/payment.react.svg?url";
-import ArticleHideMenuIconReactSvg from "../../assets/article-hide-menu-icon.react.svg";
+import PaymentReactSvgUrl from "../../assets/icons/16/catalog-settings-payment.svg?url";
+import { ArticleHideMenuIcon as ArticleHideMenuIconReactSvg } from "./icons";
 import DarkLeftMenuLogo from "../../assets/logo/dark_leftmenu.svg";
 
 import { Avatar, AvatarRole, AvatarSize } from "../avatar";

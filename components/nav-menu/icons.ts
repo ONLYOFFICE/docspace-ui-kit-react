@@ -24,7 +24,5 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { NavMenu } from "./NavMenu";
-export type { NavMenuProps, NavMenuGroup, NavMenuItem, NavSubItem, NavMenuLinkData } from "./NavMenu.types";
-
-export * from "./icons";
+export { default as ArticleHideMenuIcon } from "../../assets/article-hide-menu-icon.react.svg";
+export { default as CatalogSettingsPaymentIcon } from "../../assets/icons/16/catalog-settings-payment.svg";
