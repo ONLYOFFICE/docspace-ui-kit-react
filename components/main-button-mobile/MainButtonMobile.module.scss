@@ -2,21 +2,11 @@
 @use "../../styles/mixins";
 
 .floatingButton {
-  --main-button-mobile-z-index-value: var(--main-button-mobile-z-index, 1010);
-  --main-button-mobile-alert-size-value: var(--main-button-mobile-badge-size, 12px);
-  --main-button-mobile-alert-offset-value: var(--main-button-mobile-badge-offset, 10px);
-  --main-button-mobile-bar-height-value: var(--main-button-mobile-progress-height, 4px);
-  --main-button-mobile-bar-radius-value: var(--main-button-mobile-progress-radius, 2px);
-  --main-button-mobile-item-padding-value: var(
-    --main-button-mobile-dropdown-item-padding,
-    6px 23px
-  );
-
   --floating-circle-button-background: var(--main-button-mobile-button-color);
   --floating-button-icon: var(--main-button-mobile-icon-fill);
 
   position: relative;
-  z-index: var(--main-button-mobile-z-index-value);
+  z-index: var(--main-button-mobile-z-index, 1010);
   background: var(--main-button-mobile-button-color);
   -webkit-tap-highlight-color: #{colors.$tap-highlight};
 
@@ -145,7 +135,7 @@
 }
 
 .dropDownItem {
-  padding: var(--main-button-mobile-item-padding-value);
+  padding: var(--main-button-mobile-dropdown-item-padding, 6px 23px);
 
   :global {
     .drop-down-icon {
@@ -189,7 +179,8 @@
   }
 }
 
-:where(.containerAction, .buttonOptions) {
+.containerAction,
+.buttonOptions {
   padding: 16px 0px;
 
   .sublevel {
@@ -216,10 +207,10 @@
 .wrapperAlertIcon {
   position: absolute;
   z-index: 1010;
-  width: var(--main-button-mobile-alert-size-value);
-  height: var(--main-button-mobile-alert-size-value);
-  top: var(--main-button-mobile-alert-offset-value);
-  inset-inline-end: var(--main-button-mobile-alert-offset-value);
+  width: var(--main-button-mobile-badge-size, 12px);
+  height: var(--main-button-mobile-badge-size, 12px);
+  top: var(--main-button-mobile-badge-offset, 10px);
+  inset-inline-end: var(--main-button-mobile-badge-offset, 10px);
 }
 
 .alertIcon {
@@ -295,15 +286,15 @@
 
 .mobileProgressBar {
   width: 100%;
-  height: var(--main-button-mobile-bar-height-value);
+  height: var(--main-button-mobile-progress-height, 4px);
   background-color: var(--main-button-mobile-mobile-progress-bar-background);
-  border-radius: var(--main-button-mobile-bar-radius-value);
+  border-radius: var(--main-button-mobile-progress-radius, 2px);
   margin-top: 14px;
 }
 
 .progressBar {
   width: var(--upload-percent);
-  height: var(--main-button-mobile-bar-height-value);
+  height: var(--main-button-mobile-progress-height, 4px);
   opacity: 1;
   background: var(--main-button-mobile-progress-bar-color);
   &.error {
