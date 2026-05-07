@@ -250,7 +250,7 @@ const AiAgentProviders = ({
     >
       <PlatformProvider platform={platformAdapter}>
         <AiChatI18nIsolator locale={aiChatLocale}>
-          <ComponentsProvider>
+          <ComponentsProvider overrides={componentOverrides}>
             <WidgetConfigProvider config={{}}>
               <ApiProvider config={serverApiConfig}>
                 <StoresProvider stores={stores}>
@@ -280,4 +280,3 @@ export default AiAgentProviders;
 
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
 export type { Profile } from "@onlyoffice/ai-chat";
-

@@ -24,12 +24,4 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentOverrides } from "@onlyoffice/ai-chat";
-
-import { ButtonOverride } from "./button";
-import { IconButtonOverride } from "./icon-button/IconButton";
-
-export const componentOverrides: ComponentOverrides = {
-  Button: ButtonOverride,
-  // IconButton: IconButtonOverride,
-};
+export { ButtonOverride } from "./Button";

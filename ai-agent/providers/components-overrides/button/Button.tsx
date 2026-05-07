@@ -24,12 +24,50 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentOverrides } from "@onlyoffice/ai-chat";
+import React from "react";
 
-import { ButtonOverride } from "./button";
-import { IconButtonOverride } from "./icon-button/IconButton";
+import type { ButtonProps as AiChatButtonProps } from "@onlyoffice/ai-chat";
 
-export const componentOverrides: ComponentOverrides = {
-  Button: ButtonOverride,
-  // IconButton: IconButtonOverride,
+import { Button, ButtonSize } from "../../../../components/button";
+
+const ButtonOverride: React.FC<AiChatButtonProps> = (props) => {
+  const {
+    children,
+    variant,
+    scale,
+    disabled,
+    onClick,
+    className,
+    id,
+    style,
+    tabIndex,
+    type,
+  } = props;
+
+  const isStringChild =
+    typeof children === "string" || typeof children === "number";
+  const label = isStringChild ? String(children) : "";
+
+  return (
+    <Button
+      id={id}
+      type={type}
+      label={label}
+      style={style}
+      tabIndex={tabIndex}
+      className={className}
+      isDisabled={disabled}
+      size={ButtonSize.small}
+      scale={scale === "scale"}
+      primary={variant !== "default"}
+      onClick={onClick as unknown as (e: React.MouseEvent<HTMLElement>) => void}
+    >
+      {isStringChild ? null : children}
+    </Button>
+  );
 };
+
+ButtonOverride.displayName = "ButtonOverride";
+
+export { ButtonOverride };
+
