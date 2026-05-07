@@ -144,4 +144,7 @@ export * from "./rows";
 
 export * from "./filter";
 
+export * from "./quick-actions";
+
 export * from "./nav-menu";
+
