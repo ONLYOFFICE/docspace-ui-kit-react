@@ -68,6 +68,9 @@ export const storageAdapter: StorageAdapter = {
   webSearch: new Proxy({} as StorageAdapter["webSearch"], {
     get: (_t, p) => unsupported(`webSearch.${String(p)}`),
   }),
+  attachments: new Proxy({} as StorageAdapter["attachments"], {
+    get: (_t, p) => unsupported(`attachments.${String(p)}`),
+  }),
   async init() {},
   async close() {},
 };
