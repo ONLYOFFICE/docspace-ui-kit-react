@@ -27,17 +27,19 @@
 import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import BlankPdfIcon from "../../assets/blank.pdf.react.svg";
-import CreateAgentIcon from "../../assets/create.agent.react.svg";
-import CreateDocumentIcon from "../../assets/create.document.react.svg";
-import CreateFormIcon from "../../assets/create.form.react.svg";
-import CreateFromTemplateIcon from "../../assets/create.from.template.react.svg";
-import CreateFromTextIcon from "../../assets/create.from.text.react.svg";
-import CreatePresentationIcon from "../../assets/create.presentation.react.svg";
-import CreateSpreadsheetIcon from "../../assets/create.spreadsheet.react.svg";
-import GeneratePdfAiIcon from "../../assets/generate.pdf.ai.react.svg";
-import GenerateWithAiIcon from "../../assets/generate.with.ai.react.svg";
-import UseTemplateIcon from "../../assets/use.template.react.svg";
+import {
+  BlankPdfIcon,
+  CreateAgentIcon,
+  CreateDocumentIcon,
+  CreateFormIcon,
+  CreateFromTemplateIcon,
+  CreateFromTextIcon,
+  CreatePresentationIcon,
+  CreateSpreadsheetIcon,
+  GeneratePdfAiIcon,
+  GenerateWithAiIcon,
+  UseTemplateIcon,
+} from "./icons";
 
 import { QuickActions } from "./index";
 import type { QuickActionItem } from "./QuickActions.types";

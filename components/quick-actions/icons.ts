@@ -24,75 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
-import classNames from "classnames";
-
-import type { QuickActionItem, QuickActionsProps } from "./QuickActions.types";
-
-import styles from "./QuickActions.module.scss";
-
-const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
-  const { icon, label, onClick, href, target, dataTestId } = item;
-
-  const content = (
-    <>
-      <span className={styles.icon} aria-hidden="true">
-        {icon}
-      </span>
-      <span className={styles.label}>{label}</span>
-    </>
-  );
-
-  if (href) {
-    const rel = target === "_blank" ? "noopener noreferrer" : undefined;
-
-    return (
-      <a
-        className={styles.tile}
-        href={href}
-        target={target}
-        rel={rel}
-        onClick={onClick}
-        aria-label={label}
-        data-testid={dataTestId}
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      className={styles.tile}
-      onClick={onClick}
-      aria-label={label}
-      data-testid={dataTestId}
-    >
-      {content}
-    </button>
-  );
-};
-
-export const QuickActions = ({
-  items,
-  className,
-  dataTestId,
-}: QuickActionsProps) => {
-  if (items.length === 0) return null;
-
-  return (
-    <div
-      className={classNames(styles.quickActions, className)}
-      data-testid={dataTestId}
-    >
-      {items.map((item) => (
-        <QuickActionTile key={item.id} item={item} />
-      ))}
-    </div>
-  );
-};
-
-export type { QuickActionItem, QuickActionsProps };
-
-export * from "./icons";
+export { default as BlankPdfIcon } from "../../assets/blank.pdf.react.svg";
+export { default as CreateAgentIcon } from "../../assets/create.agent.react.svg";
+export { default as CreateDocumentIcon } from "../../assets/create.document.react.svg";
+export { default as CreateFormIcon } from "../../assets/create.form.react.svg";
+export { default as CreateFromTemplateIcon } from "../../assets/create.from.template.react.svg";
+export { default as CreateFromTextIcon } from "../../assets/create.from.text.react.svg";
+export { default as CreatePresentationIcon } from "../../assets/create.presentation.react.svg";
+export { default as CreateSpreadsheetIcon } from "../../assets/create.spreadsheet.react.svg";
+export { default as GeneratePdfAiIcon } from "../../assets/generate.pdf.ai.react.svg";
+export { default as GenerateWithAiIcon } from "../../assets/generate.with.ai.react.svg";
+export { default as UseTemplateIcon } from "../../assets/use.template.react.svg";
