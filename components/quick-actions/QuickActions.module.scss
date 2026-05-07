@@ -27,14 +27,14 @@
 @use "../../styles/variables/colors";
 
 .quickActions {
-  --quick-actions-tile-bg: #{colors.$gray-light};
-  --quick-actions-tile-bg-hover: #{colors.$gray-light-mid};
-  --quick-actions-tile-color: #{colors.$black};
+  --_tile-bg: var(--quick-actions-tile-bg, #{colors.$gray-light});
+  --_tile-bg-hover: var(--quick-actions-tile-bg-hover, #{colors.$gray-light-mid});
+  --_tile-color: var(--quick-actions-tile-color, #{colors.$black});
 
   :global(.dark) & {
-    --quick-actions-tile-bg: #{colors.$dark-gray-light};
-    --quick-actions-tile-bg-hover: #{colors.$gray-dark-mid};
-    --quick-actions-tile-color: #{colors.$white};
+    --_tile-bg: var(--quick-actions-tile-bg, #{colors.$dark-gray-light});
+    --_tile-bg-hover: var(--quick-actions-tile-bg-hover, #{colors.$gray-dark-mid});
+    --_tile-color: var(--quick-actions-tile-color, #{colors.$white});
   }
 
   display: flex;
@@ -54,10 +54,10 @@
   min-width: 0;
   aspect-ratio: 1;
   max-width: 172px;
-  background-color: var(--quick-actions-tile-bg);
+  background-color: var(--_tile-bg);
   border: none;
   border-radius: 12px;
-  color: var(--quick-actions-tile-color);
+  color: var(--_tile-color);
   font: inherit;
   text-align: center;
   text-decoration: none;
@@ -65,7 +65,7 @@
   transition: background-color 0.15s ease;
 
   &:hover {
-    background-color: var(--quick-actions-tile-bg-hover);
+    background-color: var(--_tile-bg-hover);
   }
 
   &:focus {
@@ -73,7 +73,7 @@
   }
 
   &:focus-visible {
-    background-color: var(--quick-actions-tile-bg-hover);
+    background-color: var(--_tile-bg-hover);
     outline: 2px solid currentColor;
     outline-offset: 2px;
   }

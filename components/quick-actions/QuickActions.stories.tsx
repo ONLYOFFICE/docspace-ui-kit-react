@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import BlankPdfIcon from "../../assets/blank.pdf.react.svg";
@@ -257,6 +257,50 @@ export const InAIChat: Story = {
     { icon: <UseTemplateIcon />, label: "Use template", onClick: () => {} },
   ]}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          maxWidth: 752,
+          "--quick-actions-tile-bg": "#1e1b4b",
+          "--quick-actions-tile-bg-hover": "#2d2a6e",
+          "--quick-actions-tile-color": "#e0e7ff",
+        } as CSSProperties
+      }
+    >
+      <QuickActions items={documentItems} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default (light) |
+|----------|-------------|-----------------|
+| \`--quick-actions-tile-bg\` | Tile background color | \`colors.$gray-light\` |
+| \`--quick-actions-tile-bg-hover\` | Tile background on hover / focus | \`colors.$gray-light-mid\` |
+| \`--quick-actions-tile-color\` | Tile text and icon color | \`colors.$black\` |
+
+Set the variables on any ancestor element — they cascade down to all tiles:
+
+\`\`\`tsx
+<div
+  style={{
+    "--quick-actions-tile-bg": "#1e1b4b",
+    "--quick-actions-tile-bg-hover": "#2d2a6e",
+    "--quick-actions-tile-color": "#e0e7ff",
+  } as CSSProperties}
+>
+  <QuickActions items={items} />
+</div>
+\`\`\``,
       },
     },
   },
