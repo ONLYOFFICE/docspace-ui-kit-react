@@ -39,12 +39,21 @@
   --search-input-default-icon-fill: #{$gray-strong};
   --search-input-filled-icon-fill: #{$gray};
 
-  --search-input-icon-color: var(--search-input-icon-fill, var(--search-input-default-icon-fill));
-  --search-input-icon-filled-color: var(--search-input-icon-filled-fill, var(--search-input-filled-icon-fill));
+  --search-input-icon-color: var(
+    --search-input-icon-fill,
+    var(--search-input-default-icon-fill)
+  );
+  --search-input-icon-filled-color: var(
+    --search-input-icon-filled-fill,
+    var(--search-input-filled-icon-fill)
+  );
   --search-input-max-h: var(--search-input-max-height, 32px);
   --search-input-icon-border-radius: var(--search-input-radius, 3px);
+  --search-input-button-gap: var(--search-input-gap, 8px);
 
-  max-height: var(--search-input-max-h);
+  display: flex;
+  align-items: center;
+  gap: var(--search-input-button-gap);
 
   &.scale {
     width: 100%;
@@ -52,6 +61,43 @@
 
   &.isFilled :global(svg path) {
     fill: var(--search-input-icon-filled-color) !important;
+  }
+
+  --main-button-text-size: 13px;
+  --main-button-text-weight: 600;
+
+  .mainButtonWrapper {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 28px;
+    gap: 8px;
+    background-color: var(--accent-main, #{$light-blue-main});
+    border-radius: 3px;
+    cursor: pointer;
+
+    --main-button-bg: transparent;
+    --main-button-inner-padding: 0;
+
+    &:hover {
+      opacity: 0.85;
+    }
+    &:active {
+      opacity: 1;
+    }
+
+    &:hover :global([data-testid="main-button"]:not(.disabled)) {
+      opacity: 1;
+    }
+  }
+
+  .mainButtonIcon {
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    pointer-events: none;
+    filter: brightness(0) invert(1);
   }
 
   :global {
@@ -65,4 +111,10 @@
       fill: var(--search-input-icon-color) !important;
     }
   }
+}
+
+.searchInputField {
+  max-height: var(--search-input-max-h);
+  flex: 1 1 auto;
+  min-width: 0;
 }

@@ -42,6 +42,7 @@ const MainButton = (props: MainButtonProps) => {
     text = "Button",
     isDropdown = true,
     isDisabled = false,
+    hideArrow = false,
     className,
     id,
     setRefMap,
@@ -115,9 +116,11 @@ const MainButton = (props: MainButtonProps) => {
         <Text className={styles.text}>{text}</Text>
         {isDropdown ? (
           <>
-            <div className={styles.img}>
-              <TriangleNavigationDownReactSvgUrl />
-            </div>
+            {hideArrow ? null : (
+              <div className={styles.img}>
+                <TriangleNavigationDownReactSvgUrl />
+              </div>
+            )}
             <ContextMenu
               className={styles.menu}
               model={model}
