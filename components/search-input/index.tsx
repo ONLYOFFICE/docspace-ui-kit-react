@@ -124,6 +124,21 @@ const SearchInput = ({
     return iconNode;
   };
 
+  const handleMainButtonWrapperClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const target = e.target as HTMLElement;
+      const mainBtnEl = (
+        e.currentTarget as HTMLElement
+      ).querySelector<HTMLElement>('[data-testid="main-button"]');
+      if (mainBtnEl && !mainBtnEl.contains(target)) {
+        (mainBtnEl.firstElementChild as HTMLElement)?.click();
+      }
+
+      e.preventDefault();
+    },
+    [],
+  );
+
   const iconNode = getIconNode();
   const iconSizeValue = !!inputValue || showClearButton ? 12 : 14;
 
@@ -139,7 +154,10 @@ const SearchInput = ({
       data-testid={dataTestId ?? "search-input"}
     >
       {showMainButton && mainButtonProps ? (
-        <div className={styles.mainButtonWrapper}>
+        <div
+          className={styles.mainButtonWrapper}
+          onClick={handleMainButtonWrapperClick}
+        >
           <span className={styles.mainButtonIcon}>{mainButtonIcon}</span>
           <MainButton {...mainButtonProps} hideArrow />
         </div>
