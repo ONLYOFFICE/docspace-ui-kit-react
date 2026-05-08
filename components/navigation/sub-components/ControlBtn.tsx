@@ -191,6 +191,7 @@ const ControlButtons = ({
 
   return (
     <div
+      id="control-buttons-container"
       className={styles.controlButtonContainer}
       data-is-frame={isFrame}
       data-show-title={showTitle}
