@@ -42,6 +42,9 @@ const useSearch = ({
   isIndexEditingMode,
 
   initSearchValue,
+  showMainButton,
+  mainButtonProps,
+  mainButtonIcon,
 }: SearchInputProps) => {
   const searchRef = React.useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = React.useState(initSearchValue ?? "");
@@ -112,6 +115,9 @@ const useSearch = ({
       onFocus={onInputFocus}
       scale
       dataTestId="filter_search_input"
+      showMainButton={showMainButton}
+      mainButtonProps={mainButtonProps}
+      mainButtonIcon={mainButtonIcon}
     />
   );
   return { searchComponent };
