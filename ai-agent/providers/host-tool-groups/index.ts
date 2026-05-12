@@ -82,17 +82,10 @@ const resolveResultStorageFolderId = async (): Promise<number | null> => {
   const roomId = agentRoomIdGetter?.();
   if (roomId == null || !foldersApi) return null;
   try {
-    const res = await foldersApi.getFolderByFolderId(
-      roomId,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      SearchArea.ResultStorage,
-    );
+    const res = await foldersApi.getFolderByFolderId({
+      folderId: roomId,
+      searchArea: SearchArea.ResultStorage,
+    });
     return res.data?.response?.current?.id ?? null;
   } catch {
     return null;
@@ -289,8 +282,11 @@ export const fileManagementTools: HostTool[] = [
         targetFolderId = resultStorageId;
       }
       try {
-        const res = await filesApi.createFile(targetFolderId, {
-          title: title ?? "New document",
+        const res = await filesApi.createFile({
+          folderId: targetFolderId,
+          createFileJsonElement: {
+            title: title ?? "New document",
+          },
         });
         const fileId = res.data?.response?.id;
         return JSON.stringify({ result: fileId ?? "" });
@@ -375,8 +371,11 @@ export const fileManagementTools: HostTool[] = [
       }
       let fileId: number | undefined;
       try {
-        const res = await filesApi.createFile(targetFolderId, {
-          title: title ?? "New document",
+        const res = await filesApi.createFile({
+          folderId: targetFolderId,
+          createFileJsonElement: {
+            title: title ?? "New document",
+          },
         });
         fileId = res.data?.response?.id;
       } catch (e) {
@@ -609,4 +608,3 @@ export const openEditorPanel = (fileId: number | string): void => {
   panel.appendChild(iframe);
   document.body.appendChild(panel);
 };
-
