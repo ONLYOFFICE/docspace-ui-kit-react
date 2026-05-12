@@ -1,0 +1,57 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.heroSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 660px;
+}
+
+.heroTitle {
+  color: var(--text-color);
+}
+
+.heroSubtitle {
+  color: var(--text-disable-color);
+}
+
+.balanceSection {
+  width: 100%;
+}
+
+.balanceCard {
+  width: 320px;
+  border: 1px solid var(--aside-header-border-color);
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.balanceLabel {
+  color: var(--text-color);
+}
+
+.secureNote {
+  color: var(--text-disable-color);
+  line-height: 16px;
+}
+
+.pricingRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.pricingLink {
+  padding: 2px 0;
+}
