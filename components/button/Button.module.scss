@@ -26,7 +26,7 @@
 
 @use "../../styles/variables/colors.scss" as *;
 
-:global(.dark){
+:global(.dark) {
   :local {
     .button {
       --button-color-base: #{$white};
@@ -64,7 +64,8 @@
       --button-border-base-active: 1px solid #{$gray-dark-strong};
       --button-border-base-disabled: 1px solid #{$gray-dark-strong};
 
-      --button-border-primary: 1px solid var(--accent-button, #{$light-second-main});
+      --button-border-primary: 1px solid
+        var(--accent-button, #{$light-second-main});
       --button-border-primary-active:
         linear-gradient(0deg, #{$light-second-main}, #{$light-second-main}),
         linear-gradient(0deg, #{$on-white-color}, #{$on-white-color});
@@ -82,6 +83,20 @@
 
       --filled-button-icon-color-hover: #{$white};
       --filled-button-text-color-hover: #{$white};
+
+      --button-background-accent: color-mix(in srgb, white 15%, transparent);
+      --button-background-accent-hover: color-mix(
+        in srgb,
+        white 25%,
+        transparent
+      );
+      --button-background-accent-active: color-mix(
+        in srgb,
+        white 35%,
+        transparent
+      );
+      --button-color-accent: white;
+      --button-border-accent: 1px solid transparent;
     }
   }
 }
@@ -140,12 +155,40 @@
   --filled-button-icon-color-hover: #{$light-gray-dark};
   --filled-button-text-color-hover: #{$gray-text};
 
+  --button-background-accent: var(
+    --accent-button-tint,
+    color-mix(
+      in srgb,
+      var(--accent-button, #{$light-second-main}) 10%,
+      transparent
+    )
+  );
+  --button-background-accent-hover: var(
+    --accent-button-tint-hover,
+    color-mix(
+      in srgb,
+      var(--accent-button, #{$light-second-main}) 18%,
+      transparent
+    )
+  );
+  --button-background-accent-active: var(
+    --accent-button-tint-active,
+    color-mix(
+      in srgb,
+      var(--accent-button, #{$light-second-main}) 26%,
+      transparent
+    )
+  );
+  --button-color-accent: var(--accent-button, #{$light-second-main});
+  --button-border-accent: 1px solid transparent;
+  --button-font-weight: var(--button-text-weight, 600);
+
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  border-radius: 3px;
+  font-weight: var(--button-font-weight);
+  border-radius: var(--button-root-border-radius, 3px);
   cursor: pointer;
   margin: 0;
   text-align: center;
@@ -164,85 +207,118 @@
     outline: none;
   }
 
-  // Size variants
   &.extraSmall {
-    height: 24px;
-    font-size: 12px;
+    height: var(--button-height-xs, 24px);
+    font-size: var(--button-font-size-xs, 12px);
     line-height: 15px;
     padding: 0 11.5px;
   }
 
   &.small {
-    height: 32px;
-    font-size: 13px;
+    height: var(--button-height-sm, 32px);
+    font-size: var(--button-font-size-sm, 13px);
     line-height: 20px;
     padding: 0 28px;
   }
 
   &.normal {
-    height: 40px;
-    font-size: 14px;
+    height: var(--button-height-md, 40px);
+    font-size: var(--button-font-size-md, 14px);
     line-height: 16px;
     padding: 0 28px;
   }
 
   &.medium {
-    height: 44px;
-    font-size: 16px;
+    height: var(--button-height-lg, 44px);
+    font-size: var(--button-font-size-lg, 16px);
     line-height: 22px;
     padding: 0 32px;
   }
 
-  // Default variant
-  background: var(--button-background-base);
-  color: var(--button-color-base);
-  border: var(--button-border-base);
+  background: var(--button-root-bg, var(--button-background-base));
+  color: var(--button-root-color, var(--button-color-base));
+  border: var(--button-root-border, var(--button-border-base));
 
   &:hover:not(:disabled) {
-    background: var(--button-background-base-hover);
-    color: var(--button-color-base-hover);
-    border: var(--button-border-base-hover);
+    background: var(
+      --button-root-bg-hover,
+      var(--button-background-base-hover)
+    );
+    color: var(--button-root-color-hover, var(--button-color-base-hover));
+    border: var(--button-root-border-hover, var(--button-border-base-hover));
   }
 
   &:active:not(:disabled) {
-    background: var(--button-background-base-active);
-    color: var(--button-color-base-active);
-    border: var(--button-border-base-active);
+    background: var(
+      --button-root-bg-active,
+      var(--button-background-base-active)
+    );
+    color: var(--button-root-color-active, var(--button-color-base-active));
+    border: var(--button-root-border-active, var(--button-border-base-active));
   }
 
   &:disabled {
-    background: var(--button-background-base-disabled);
-    color: var(--button-color-base-disabled);
-    border: var(--button-border-base-disabled);
+    background: var(
+      --button-root-bg-disabled,
+      var(--button-background-base-disabled)
+    );
+    color: var(--button-root-color-disabled, var(--button-color-base-disabled));
+    border: var(
+      --button-root-border-disabled,
+      var(--button-border-base-disabled)
+    );
   }
 
-  // Primary variant
   &.primary {
-    background: var(--button-background-primary);
-    color: var(--button-color-primary);
-    border: var(--button-border-primary);
+    background: var(--button-primary-bg, var(--button-background-primary));
+    color: var(--button-primary-color, var(--button-color-primary));
+    border: var(--button-primary-border, var(--button-border-primary));
     opacity: 1;
 
     &:hover:not(:disabled) {
-      background: var(--button-background-primary-hover);
-      color: var(--button-color-primary-hover);
-      border: var(--button-border-primary);
+      background: var(
+        --button-primary-bg-hover,
+        var(--button-background-primary-hover)
+      );
+      color: var(
+        --button-primary-color-hover,
+        var(--button-color-primary-hover)
+      );
+      border: var(--button-primary-border, var(--button-border-primary));
       opacity: 0.85;
     }
 
     &:active:not(:disabled) {
-      background: var(--accent-button, var(--button-background-primary-active));
-      color: var(--button-color-primary-active);
-      border-color: var(--button-border-primary-active);
+      background: var(
+        --button-primary-bg-active,
+        var(--accent-button, var(--button-background-primary-active))
+      );
+      color: var(
+        --button-primary-color-active,
+        var(--button-color-primary-active)
+      );
+      border-color: var(
+        --button-primary-border-active,
+        var(--button-border-primary-active)
+      );
 
       filter: var(--button-brightness);
       opacity: 1;
     }
 
     &:disabled {
-      background: var(--button-background-primary-disabled);
-      color: var(--button-color-primary-disabled);
-      border: var(--button-border-primary-disabled);
+      background: var(
+        --button-primary-bg-disabled,
+        var(--button-background-primary-disabled)
+      );
+      color: var(
+        --button-primary-color-disabled,
+        var(--button-color-primary-disabled)
+      );
+      border: var(
+        --button-primary-border-disabled,
+        var(--button-border-primary-disabled)
+      );
       opacity: 0.6;
     }
   }
@@ -294,6 +370,42 @@
       color: var(--filled-button-text-color-hover);
 
       border: none;
+    }
+  }
+
+  // Accent variant (tinted accent background)
+  &.accent {
+    background: var(--button-background-accent);
+    color: var(--button-color-accent);
+    border: var(--button-border-accent);
+    border-radius: 6px;
+
+    &:not(.isLoading) {
+      svg path {
+        fill: var(--button-color-accent);
+      }
+    }
+
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background: var(--button-background-accent-hover);
+        color: var(--button-color-accent);
+        border: var(--button-border-accent);
+
+        svg path {
+          fill: var(--button-color-accent);
+        }
+      }
+    }
+
+    &:active:not(:disabled) {
+      background: var(--button-background-accent-active);
+      color: var(--button-color-accent);
+      border: var(--button-border-accent);
+    }
+
+    &:disabled:not(.isLoading) {
+      opacity: 0.5;
     }
   }
 
@@ -353,24 +465,42 @@
   }
 
   &.isHovered {
-    background-color: var(--button-background-base-hover);
-    color: var(--button-color-base-hover);
-    border: var(--button-border-base-hover);
+    background-color: var(
+      --button-root-bg-hover,
+      var(--button-background-base-hover)
+    );
+    color: var(--button-root-color-hover, var(--button-color-base-hover));
+    border: var(--button-root-border-hover, var(--button-border-base-hover));
 
     &.primary {
-      background-color: var(--button-background-primary-hover);
-      color: var(--button-color-primary-hover);
+      background-color: var(
+        --button-primary-bg-hover,
+        var(--button-background-primary-hover)
+      );
+      color: var(
+        --button-primary-color-hover,
+        var(--button-color-primary-hover)
+      );
       border: none;
     }
   }
 
   &.isClicked {
-    background-color: var(--button-background-base-active);
-    color: var(--button-color-base-active);
+    background-color: var(
+      --button-root-bg-active,
+      var(--button-background-base-active)
+    );
+    color: var(--button-root-color-active, var(--button-color-base-active));
 
     &.primary {
-      background: var(--button-background-primary-active);
-      color: var(--button-color-primary-active);
+      background: var(
+        --button-primary-bg-active,
+        var(--button-background-primary-active)
+      );
+      color: var(
+        --button-primary-color-active,
+        var(--button-color-primary-active)
+      );
       filter: brightness(90%);
     }
   }
@@ -378,14 +508,29 @@
   &.isDisabled {
     cursor: default;
     // pointer-events: none;
-    background-color: var(--button-background-base-disabled);
-    color: var(--button-color-base-disabled);
-    border-color: var(--button-border-base-disabled);
+    background-color: var(
+      --button-root-bg-disabled,
+      var(--button-background-base-disabled)
+    );
+    color: var(--button-root-color-disabled, var(--button-color-base-disabled));
+    border-color: var(
+      --button-root-border-disabled,
+      var(--button-border-base-disabled)
+    );
 
     &.primary {
-      background: var(--accent-button, var(--button-background-primary-disabled));
-      color: var(--button-color-primary-disabled);
-      border: var(--button-border-primary-disabled);
+      background: var(
+        --button-primary-bg-disabled,
+        var(--accent-button, var(--button-background-primary-disabled))
+      );
+      color: var(
+        --button-primary-color-disabled,
+        var(--button-color-primary-disabled)
+      );
+      border: var(
+        --button-primary-border-disabled,
+        var(--button-border-primary-disabled)
+      );
     }
 
     .loader {

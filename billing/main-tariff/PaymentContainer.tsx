@@ -42,6 +42,7 @@ import PriceCalculation from "./PriceCalculation";
 import BenefitsContainer from "./BenefitsContainer";
 import ContactContainer from "./ContactContainer";
 import styles from "./MainTariff.module.scss";
+import { getBrandName } from "../../constants/brands";
 
 const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
 
@@ -75,12 +76,12 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
             <br />
             <Text isBold>
               {t("PortalAdmin", {
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
               })}
             </Text>
             <Text>
               {t("AdministratorDescription", {
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
               })}
             </Text>
             <br />
@@ -185,7 +186,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
 
           <Text as="span" fontSize="14px" lineHeight="16px">
             {t("GracePeriodActivatedDescription", {
-              productName: t("ProductName"),
+              productName: getBrandName("ProductName"),
             })}
           </Text>
         </Text>

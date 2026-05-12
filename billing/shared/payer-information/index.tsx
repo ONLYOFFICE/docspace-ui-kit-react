@@ -39,8 +39,9 @@ import { useState } from "react";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useApi } from "../../../providers";
-
+import { Encoder } from "../../../utils/encoder";
 import styles from "./PayerInformation.module.scss";
+import { getBrandName } from "../../../constants/brands";
 
 const PayerInformation = () => {
   const store = usePaymentStore();
@@ -95,19 +96,19 @@ const PayerInformation = () => {
 
     let invalidEmailDescription = isOwner
       ? t("UnknownPayerForOwner", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         })
       : t("UnknownPayerForAdmin", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         });
 
     if (isNotPaidPeriod) {
       invalidEmailDescription = isOwner
         ? t("InvalidEmailWithoutActiveSubscription", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           })
         : t("InvalidEmailWithoutActiveSubscriptionByAdmin", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           });
 
       return userNotFound + invalidEmailDescription;
@@ -125,7 +126,6 @@ const PayerInformation = () => {
         {isStripePortalAvailable ? (
           <div className={styles.infoContainer}>
             <CommonTrans
-             
               i18nKey="ChooseNewPayerOrRefrashData"
               components={{
                 1: (
@@ -188,10 +188,9 @@ const PayerInformation = () => {
     return (
       <Text as="span" fontWeight={600} fontSize="14px">
         {payerInfo ? (
-          payerInfo.displayName
+          Encoder.htmlDecode(payerInfo.displayName ?? "")
         ) : (
           <CommonTrans
-           
             i18nKey="UserNotFound"
             values={{ email: emailUnfoundedUser }}
             components={{
@@ -211,9 +210,9 @@ const PayerInformation = () => {
   };
 
   const avatarSource = payerInfo
-    ? (payerInfo.hasAvatar && payerInfo.avatar
+    ? ((payerInfo.hasAvatar && payerInfo.avatar
         ? `${baseUrl}${payerInfo.avatar}`
-        : DefaultUserPhoto) ?? undefined
+        : DefaultUserPhoto) ?? undefined)
     : undefined;
 
   return (
@@ -238,3 +237,4 @@ const PayerInformation = () => {
 };
 
 export default observer(PayerInformation);
+

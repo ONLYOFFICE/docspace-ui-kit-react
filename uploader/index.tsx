@@ -103,9 +103,9 @@ const Uploader = ({
           ? new Date(file.lastModified).toISOString()
           : new Date().toISOString();
 
-        const sessionRes = await operationsApi.createUploadSessionInFolder(
-          targetFolderId as unknown as number,
-          {
+        const sessionRes = await operationsApi.createUploadSessionInFolder({
+          folderId: targetFolderId as number,
+          sessionRequest: {
             fileName: file.name,
             fileSize: file.size,
             relativePath: "",
@@ -113,7 +113,7 @@ const Uploader = ({
             createOn: createOn as unknown as ApiDateTime,
             createNewIfExist: true,
           },
-        );
+        });
 
         const sessionId = sessionRes.data?.response?.id;
 
@@ -140,11 +140,11 @@ const Uploader = ({
           for (const chunk of chunks) {
             const chunkBlob = chunk.data.get("file") as Blob;
 
-            const res = await operationsApi.uploadSession(
-              targetFolderId as unknown as number,
+            const res = await operationsApi.uploadSession({
+              folderId: targetFolderId as unknown as number,
               sessionId,
-              chunkBlob as unknown as File,
-            );
+              file: chunkBlob as File,
+            });
 
             lastChunkResult = res.data;
 
@@ -175,12 +175,12 @@ const Uploader = ({
             async (chunk) => {
               const chunkBlob = chunk.data.get("file") as Blob;
 
-              await operationsApi.uploadAsyncSession(
-                targetFolderId as unknown as number,
+              await operationsApi.uploadAsyncSession({
+                folderId: targetFolderId as unknown as number,
                 sessionId,
-                chunk.index,
-                chunkBlob as unknown as File,
-              );
+                chunkNumber: chunk.index,
+                file: chunkBlob as File,
+              });
 
               uploadedChunks += 1;
               uploadedBytes += chunk.size;
@@ -202,10 +202,10 @@ const Uploader = ({
             },
           );
 
-          const result = await operationsApi.finalizeSession(
-            targetFolderId as unknown as number,
+          const result = await operationsApi.finalizeSession({
+            folderId: targetFolderId as unknown as number,
             sessionId,
-          );
+          });
           uploadedFiles.push(result.data);
         }
       });
@@ -422,7 +422,7 @@ const Uploader = ({
         isFolderUpload={isFolderUpload}
         isMultipleUpload={isMultipleUpload}
         onSingleUploadError={() => {
-          toastr.warning(getCommonTranslation("SingleUploadWarning"));
+          toastr.warning(getCommonTranslation("SingleUploadWarning"), null);
         }}
         onDrop={onDrop}
         onDropRejected={onDropRejected}
@@ -446,4 +446,3 @@ const Uploader = ({
 export { Uploader };
 
 export { createChunks, runWithConcurrency } from "./utils/upload";
-

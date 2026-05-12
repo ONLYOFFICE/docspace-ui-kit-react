@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -321,6 +321,44 @@ export const MultiSelect: Story = {
         code: `<TabItem label="Documents" isActive withMultiSelect onSelect={handleToggle} />
 <TabItem label="Images" withMultiSelect onSelect={handleToggle} />
 <TabItem label="Videos" withMultiSelect onSelect={handleToggle} />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          gap: "8px",
+          "--tab-item-active-bg": "#0082c9",
+          "--tab-item-active-text": "#ffffff",
+          "--tab-item-border": "1px solid #0082c9",
+          "--tab-item-radius": "6px",
+          "--tab-item-padding": "6px 20px",
+        } as CSSProperties
+      }
+    >
+      <TabItem label="Files" isActive onSelect={() => {}} />
+      <TabItem label="Photos" isActive={false} onSelect={() => {}} />
+      <TabItem label="Talk" isActive={false} onSelect={() => {}} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--tab-item-active-bg\` | Active tab background | accent color |
+| \`--tab-item-active-text\` | Active tab text color | white |
+| \`--tab-item-border\` | Tab border style | theme gray border |
+| \`--tab-item-radius\` | Border radius | \`16px\` |
+| \`--tab-item-padding\` | Inner padding | \`4px 16px\` |
+| \`--tab-item-disabled-opacity\` | Disabled state opacity | \`0.5\` |`,
       },
     },
   },

@@ -154,6 +154,33 @@ describe("<SearchInput />", () => {
 		expect(input).toHaveValue("updated");
 	});
 
+	it("renders main button when showMainButton and mainButtonProps are provided", () => {
+		render(
+			<SearchInput
+				{...baseProps}
+				showMainButton
+				mainButtonProps={{ text: "New room", model: [] }}
+			/>,
+		);
+		expect(screen.getByText("New room")).toBeInTheDocument();
+	});
+
+	it("does not render main button when showMainButton is false", () => {
+		render(
+			<SearchInput
+				{...baseProps}
+				showMainButton={false}
+				mainButtonProps={{ text: "New room", model: [] }}
+			/>,
+		);
+		expect(screen.queryByText("New room")).not.toBeInTheDocument();
+	});
+
+	it("does not render main button when mainButtonProps is not provided", () => {
+		render(<SearchInput {...baseProps} showMainButton />);
+		expect(screen.queryByTestId("main-button")).not.toBeInTheDocument();
+	});
+
 	it("clears input and calls onClearSearch when clear button is clicked", async () => {
 		const onClearSearch = vi.fn();
 		const { container } = render(

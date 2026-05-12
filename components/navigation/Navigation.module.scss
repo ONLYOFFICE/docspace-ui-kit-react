@@ -51,15 +51,15 @@
 
 :global(.light) {
   :local {
-    .controlButtonContainer, 
-    .heading, 
-    .titleBlockBadge, 
-    .expanderIcon, 
-    .arrowIcon, 
-    .warningText, 
-    .infoPanelToggleWrapper, 
-    .box, 
-    .container, 
+    .controlButtonContainer,
+    .heading,
+    .titleBlockBadge,
+    .expanderIcon,
+    .arrowIcon,
+    .warningText,
+    .infoPanelToggleWrapper,
+    .box,
+    .container,
     .chatButton {
       --section-header-trash-erasure-label-background: #{colors.$gray-light};
       --section-header-trash-erasure-label-text: #{colors.$gray-text};
@@ -87,15 +87,15 @@
 
 :global(.dark) {
   :local {
-    .controlButtonContainer, 
-    .heading, 
-    .titleBlockBadge, 
-    .expanderIcon, 
-    .arrowIcon, 
-    .warningText, 
-    .infoPanelToggleWrapper, 
-    .box, 
-    .container, 
+    .controlButtonContainer,
+    .heading,
+    .titleBlockBadge,
+    .expanderIcon,
+    .arrowIcon,
+    .warningText,
+    .infoPanelToggleWrapper,
+    .box,
+    .container,
     .chatButton {
       --section-header-trash-erasure-label-background: #{colors.$dark-gray-light};
       --section-header-trash-erasure-label-text: #{colors.$dark-gray-dark};
@@ -111,8 +111,8 @@
         var(--accent-main, #{colors.$light-second-main});
       --navigation-guid-animation-icon-color: var(
         --accent-main,
-      #{colors.$light-second-main}
-    );
+        #{colors.$light-second-main}
+      );
       --navigation-header-icon-fill: #{colors.$dark-gray-dark};
       --navigation-lifetime-enabled-fill: none;
       --navigation-lifetime-enabled-stroke: #{colors.$main-red};
@@ -126,7 +126,8 @@
   align-items: center;
   gap: 16px;
   height: 32px;
-  min-width: 0;
+  min-width: 90px;
+  overflow: hidden;
 
   &[data-show-title="true"] {
     margin-inline-start: 16px;
@@ -223,13 +224,20 @@
 }
 
 .heading {
-  font-weight: 700 !important;
-  font-size: 18px !important;
+  --navigation-heading-weight-v: var(--navigation-heading-weight, 700);
+  --navigation-heading-size-v: var(--navigation-heading-size, 18px);
+  --navigation-title-color-v: var(
+    --navigation-title-color,
+    var(--navigation-root-folder-title-color)
+  );
+
+  font-weight: var(--navigation-heading-weight-v) !important;
+  font-size: var(--navigation-heading-size-v) !important;
   line-height: 24px !important;
   margin: 0 !important;
 
   &.rootFolderTitle {
-    color: var(--navigation-root-folder-title-color);
+    color: var(--navigation-title-color-v);
   }
 
   @include mixins.tablet-and-below {
@@ -238,7 +246,7 @@
   }
 
   @include mixins.mobile {
-    font-size: 18px !important;
+    font-size: var(--navigation-heading-size-v) !important;
     line-height: 24px !important;
   }
 }
@@ -265,20 +273,34 @@
 }
 
 .titleBlockBadge {
+  --navigation-badge-fill-v: var(
+    --navigation-badge-fill,
+    var(--navigation-header-icon-fill)
+  );
+  --navigation-title-color-v: var(
+    --navigation-title-color,
+    var(--navigation-root-folder-title-color)
+  );
+
   margin-inline-start: 8px;
 
   div {
-    background-color: var(--navigation-header-icon-fill) !important;
+    background-color: var(--navigation-badge-fill-v) !important;
   }
 
   &.rootFolderTitle {
     div {
-      background-color: var(--navigation-root-folder-title-color) !important;
+      background-color: var(--navigation-title-color-v) !important;
     }
   }
 }
 
 .expanderIcon {
+  --navigation-expander-fill-v: var(
+    --navigation-expander-fill,
+    var(--navigation-expander-color)
+  );
+
   min-width: 8px !important;
   width: 8px !important;
   min-height: 18px !important;
@@ -286,7 +308,7 @@
   padding-inline: 4px 2px;
 
   path {
-    fill: var(--navigation-expander-color);
+    fill: var(--navigation-expander-fill-v);
   }
 
   &.rotated {
@@ -296,12 +318,17 @@
 }
 
 .arrowIcon {
+  --navigation-arrow-fill-v: var(
+    --navigation-arrow-fill,
+    var(--navigation-root-folder-title-color)
+  );
+
   height: 12px;
   min-width: 12px;
   padding-inline-start: 6px;
 
   path {
-    fill: var(--navigation-root-folder-title-color);
+    fill: var(--navigation-arrow-fill-v);
   }
 }
 
@@ -312,18 +339,29 @@
 }
 
 .warningText {
+  // bridge vars
+  --navigation-warning-bg-v: var(
+    --navigation-warning-bg,
+    var(--section-header-trash-erasure-label-background)
+  );
+  --navigation-warning-text-v: var(
+    --navigation-warning-text,
+    var(--section-header-trash-erasure-label-text)
+  );
+  --navigation-warning-radius-v: var(--navigation-warning-radius, 6px);
+
   @include mixins.no-user-select;
 
   box-sizing: border-box;
   height: 32px;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--navigation-warning-radius-v);
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
   overflow: hidden;
-  background: var(--section-header-trash-erasure-label-background);
+  background: var(--navigation-warning-bg-v);
 
   @include mixins.tablet-and-below {
     margin-bottom: 16px;
@@ -331,7 +369,7 @@
 
   :global {
     .warning-text {
-      color: var(--section-header-trash-erasure-label-text);
+      color: var(--navigation-warning-text-v);
       font-weight: 400;
       font-size: 12px;
       line-height: 16px;
@@ -351,6 +389,10 @@
   align-items: center;
   justify-content: flex-end;
   margin-inline-start: auto;
+
+  // &:empty {
+  //   display: none;
+  // }
 
   @include mixins.tablet-and-below {
     flex-direction: row-reverse;
@@ -404,9 +446,14 @@
 }
 
 .infoPanelToggleWrapper {
+  // bridge var
+  --navigation-info-panel-bg-v: var(
+    --navigation-info-panel-bg,
+    var(--background-and-substrate-color)
+  );
+
   align-self: center;
   margin-inline-start: 20px;
-  margin-bottom: 1px;
   padding: 0;
 
   :global {
@@ -420,8 +467,8 @@
       .info-panel-toggle-bg {
         height: 30px;
         width: 30px;
-        background: var(--background-and-substrate-color);
-        border: 1px solid var(--background-and-substrate-color);
+        background: var(--navigation-info-panel-bg-v);
+        border: 1px solid var(--navigation-info-panel-bg-v);
         border-radius: 50%;
 
         .info-panel-toggle {
@@ -453,6 +500,17 @@
 }
 
 .box {
+  // bridge vars
+  --navigation-dropdown-bg-v: var(
+    --navigation-dropdown-bg,
+    var(--navigation-background)
+  );
+  --navigation-dropdown-shadow-v: var(
+    --navigation-dropdown-shadow,
+    var(--navigation-box-shadow)
+  );
+  --navigation-dropdown-radius-v: var(--navigation-dropdown-radius, 6px);
+
   position: absolute;
   top: 0px;
   padding: 0 20px;
@@ -462,9 +520,10 @@
   display: table;
   margin: auto;
   flex-direction: column;
-  background: var(--navigation-background);
-  box-shadow: var(--navigation-box-shadow);
-  border-radius: 0px 0px 6px 6px;
+  background: var(--navigation-dropdown-bg-v);
+  box-shadow: var(--navigation-dropdown-shadow-v);
+  border-radius: 0px 0px var(--navigation-dropdown-radius-v)
+    var(--navigation-dropdown-radius-v);
 
   height: var(--drop-box-height, "fit-content");
   max-height: calc(100vh - 48px);
@@ -641,7 +700,8 @@
     .navigation-header-separator {
       display: block;
       padding-inline-start: 16px;
-      border-inline-end: 1px solid var(--navigation-icon-stroke);
+      border-inline-end: 1px solid
+        var(--navigation-separator, var(--navigation-icon-stroke));
       height: 21px;
     }
 
@@ -745,6 +805,13 @@
 }
 
 .chatButton {
+  // bridge vars
+  --navigation-chat-open-bg-v: var(
+    --navigation-chat-open-bg,
+    var(--chat-button-open-background-color)
+  );
+  --navigation-chat-radius-v: var(--navigation-chat-radius, 6px);
+
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -758,11 +825,11 @@
 
   box-sizing: border-box;
 
-  border-radius: 6px;
+  border-radius: var(--navigation-chat-radius-v);
 
   cursor: pointer;
 
   &.chatButtonOpen {
-    background-color: var(--chat-button-open-background-color);
+    background-color: var(--navigation-chat-open-bg-v);
   }
 }

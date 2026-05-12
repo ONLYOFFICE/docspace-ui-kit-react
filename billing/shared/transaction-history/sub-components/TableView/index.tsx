@@ -65,7 +65,7 @@ const TableView = ({ sectionWidth, serviceName }: TransactionHistoryProps) => {
           serviceName={serviceName}
         />
         <TableBody
-          useReactWindow
+          useReactWindow={false}
           columnStorageName={columnStorageName}
           columnInfoPanelStorageName={columnInfoPanelStorageName}
           itemHeight={48}

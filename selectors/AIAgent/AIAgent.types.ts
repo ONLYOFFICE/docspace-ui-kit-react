@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
-import type { TSelectorItem } from "../../components/selector";
+import type { TInfoBarData, TSelectorItem } from "../../components/selector";
 import type { WithFlag } from "../../types";
 
 export type TInitValue = WithFlag<
@@ -53,4 +53,5 @@ export type AIAgentSelectorProps = {
   onClose: () => void;
 
   disableBySecurity?: string;
+  externalInfoBarData?: TInfoBarData;
 } & TInitValue;

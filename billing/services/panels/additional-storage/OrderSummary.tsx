@@ -71,11 +71,16 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
-  const { formatWalletCurrency, storagePriceIncrement, walletBalance, language } =
-    paymentStore;
+  const {
+    formatWalletCurrency,
+    storagePriceIncrement,
+    walletBalance,
+    language,
+  } = paymentStore;
   const { currentStoragePlanSize, hasStorageSubscription, storageExpiryDate } =
     paymentStore.tariff;
-  const daysUntilStorageExpiry = paymentStore.tariff.daysUntilStorageExpiry ?? 0;
+  const daysUntilStorageExpiry =
+    paymentStore.tariff.daysUntilStorageExpiry ?? 0;
   const { setPartialUpgradeFee, partialUpgradeFee } = servicesStore;
 
   const t = useCommonTranslation();
@@ -108,10 +113,17 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       const quantity = calculateDifferenceBetweenPlan(amount);
       try {
         const calcRes = await paymentApi.calculateWalletPayment(
-          { quantity: { storage: quantity }, productQuantityType: 1 },
+          {
+            walletQuantityRequestDto: {
+              quantity: { storage: quantity },
+              productQuantityType: 1,
+            },
+          },
           { signal: controllerRef.current.signal },
         );
-        const result = calcRes?.data?.response as unknown as { amount: number } | null;
+        const result = calcRes?.data?.response as unknown as {
+          amount: number;
+        } | null;
 
         if (!result) {
           toastr.error(t("UnexpectedError"));

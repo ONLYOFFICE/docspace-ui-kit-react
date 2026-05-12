@@ -116,6 +116,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     renderInPortal,
     disableBySecurity,
+    withSubFolders,
   } = props;
 
   const t = useCommonTranslation();
@@ -303,6 +304,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withInit,
     applyFilterOption,
     disableBySecurity,
+    withSubFolders,
   });
 
   const onClickBreadCrumb = React.useCallback(
@@ -431,14 +433,20 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
         if (checkCreating && item.id) {
           try {
-            const res = await filesApi.createFile(Number(item.id), {
-              title: t("NewDocument"),
+            const res = await filesApi.createFile({
+              folderId: Number(item.id),
+              createFileJsonElement: {
+                title: t("NewDocument"),
+              },
             });
             const fileId = res.data.response?.id;
             if (fileId != null) {
-              await filesApi.deleteFile(fileId, {
-                deleteAfter: true,
-                immediately: true,
+              await filesApi.deleteFile({
+                fileId,
+                _delete: {
+                  deleteAfter: true,
+                  immediately: true,
+                },
               });
             }
             setIsDisabledFolder(false);

@@ -71,7 +71,9 @@ const UpdatePlanButtonContainer = ({
   const store = usePaymentStore();
 
   const fetchQuotaInfo = async () => {
-    const r = await paymentApi.getQuotaPaymentInformation(true);
+    const r = await paymentApi.getQuotaPaymentInformation({
+      refresh: true,
+    });
     return r.data.response as unknown as QuotaDto;
   };
 
@@ -173,7 +175,11 @@ const UpdatePlanButtonContainer = ({
       const data: { [key: string]: number } = isYearTariff
         ? { adminyear: managersCount }
         : { admin: managersCount };
-      const updateRes = await paymentApi.updatePayment({ quantity: data });
+      const updateRes = await paymentApi.updatePayment({
+        quantityRequestDto: {
+          quantity: data,
+        },
+      });
       const res = updateRes?.data?.response;
 
       if (res === false) {
@@ -207,7 +213,9 @@ const UpdatePlanButtonContainer = ({
 
       previousManagersCount = maxCountManagersByQuota;
       const quotaRes = await paymentApi
-        .getQuotaPaymentInformation(true)
+        .getQuotaPaymentInformation({
+          refresh: true,
+        })
         .then((r) => r.data.response as unknown as QuotaDto);
       const managersObject = quotaRes.features?.find(
         (obj) => obj.id === MANAGER,
@@ -363,7 +371,6 @@ const UpdatePlanButtonContainer = ({
               <Text>
                 <CommonTrans
                   i18nKey="SwitchPlan"
-                 
                   values={{ planName: tariffPlanTitle }}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
@@ -373,7 +380,6 @@ const UpdatePlanButtonContainer = ({
               <Text>
                 <CommonTrans
                   i18nKey="ChargeAmount"
-                 
                   values={{ price: formatPaymentCurrency(totalPrice) }}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
@@ -383,7 +389,6 @@ const UpdatePlanButtonContainer = ({
               <Text className="text-warning">
                 <CommonTrans
                   i18nKey="ActionCannotBeUndone"
-                 
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
                   }}
@@ -417,4 +422,3 @@ const UpdatePlanButtonContainer = ({
 };
 
 export default observer(UpdatePlanButtonContainer);
-

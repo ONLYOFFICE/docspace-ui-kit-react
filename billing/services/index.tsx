@@ -56,6 +56,7 @@ import StoragePlanCancel from "./panels/additional-storage/StoragePlanCancel";
 import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
 import AIServiceDialog from "./panels/ai-service/AIServiceDialog";
+import { getBrandName } from "../../constants/brands";
 type TServicesProps = {
   showPortalSettingsLoader?: boolean;
   initialOpenDialog?: string;
@@ -170,14 +171,14 @@ const Services = observer(
         title: t("Confirmation"),
         body: !isCurrentConfirmState
           ? t("EnableBackupConfirm", {
-              productName: t("ProductName"),
+              productName: getBrandName("ProductName"),
             })
           : isFreeTariff
             ? t("DisableBackupConfirmWithoutQuota", {
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
               })
             : t("DisableBackupConfirm", {
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
               }),
       },
       [AI_ENUM]: {
@@ -189,7 +190,6 @@ const Services = observer(
               }),
               <CommonTrans
                 key="DisableAIToolsConfirmBalance"
-               
                 i18nKey="DisableAIToolsConfirmBalance"
                 values={{ balance: formatAiServiceCurrency() }}
                 components={{
@@ -200,12 +200,11 @@ const Services = observer(
             ]
           : [
               t("AIToolsDescription", {
-                productName: t("ProductName"),
+                productName: getBrandName("ProductName"),
                 organizationName: logoText,
               }),
               <CommonTrans
                 key="CurrentBalance"
-               
                 i18nKey="CurrentBalance"
                 values={{ balance: formatAiServiceCurrency() }}
                 components={{
@@ -312,7 +311,9 @@ const Services = observer(
         changeServiceState(id);
 
         try {
-          await paymentApi.changeTenantWalletServiceState(raw);
+          await paymentApi.changeTenantWalletServiceState({
+            changeWalletServiceStateRequestDto: raw,
+          });
         } catch (error) {
           console.error(error);
           toastr.error(t("UnexpectedError"));
@@ -367,7 +368,9 @@ const Services = observer(
       };
 
       try {
-        const result = await paymentApi.changeTenantWalletServiceState(raw);
+        const result = await paymentApi.changeTenantWalletServiceState({
+          changeWalletServiceStateRequestDto: raw,
+        });
 
         if (!result) {
           toastr.error(t("UnexpectedError"));
@@ -399,7 +402,11 @@ const Services = observer(
       <ServicesLoader />
     ) : (
       <>
-        <ServicesItems onClick={onClick} onToggle={onToggle} cardDisabled={cardDisabled} />
+        <ServicesItems
+          onClick={onClick}
+          onToggle={onToggle}
+          cardDisabled={cardDisabled}
+        />
         {isShowStorageTariffDeactivatedModal ? (
           <StorageTariffDeactivated
             visible={isShowStorageTariffDeactivatedModal}
@@ -451,4 +458,3 @@ const Services = observer(
 );
 
 export default Services;
-

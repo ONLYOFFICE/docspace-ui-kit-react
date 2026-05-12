@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -285,6 +285,85 @@ export const InProgress: Story = {
 >
   <TileContent><Link>Folder Content</Link></TileContent>
 </FolderTile>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--tile-bg": "#e6f3fb",
+          "--tile-border-style": "1px solid #0082c9",
+          "--tile-radius": "16px",
+          "--tile-hover-bg": "#cce5f6",
+          "--tile-icon-color": "#0082c9",
+          "--tile-hotkey-color": "#0082c9",
+          "--tile-badge-bg": "#e6f3fb",
+          "--tile-badge-radius": "6px",
+          "--tile-badge-box-shadow": "0 2px 8px rgba(0,130,201,0.2)",
+          "--tile-text-size": "13px",
+        } as CSSProperties
+      }
+    >
+      <div style={{ maxWidth: "300px", margin: "30px" }}>
+        <FolderTile
+          item={{
+            id: "folder-1",
+            title: "My Folder",
+            isFolder: true,
+            contextOptions: ["copy-to", "move-to"],
+          }}
+          element={element}
+          contextOptions={contextOptions}
+          onSelect={() => {}}
+          getContextModel={() => contextOptions}
+        >
+          <TileContent>
+            <Link>My Folder</Link>
+          </TileContent>
+        </FolderTile>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--tile-bg\` | Tile background color | theme-based |
+| \`--folder-tile-border-style\` | FolderTile-specific border (overrides \`--tile-border-style\`) | theme-based |
+| \`--tile-border-style\` | Shared tile border fallback | theme-based |
+| \`--tile-radius\` | Tile border radius | \`12px\` |
+| \`--tile-hover-bg\` | Hover/checked background | theme-based |
+| \`--tile-icon-color\` | Icon button color | theme-based |
+| \`--tile-badge-bg\` | Badge background color | theme-based |
+| \`--tile-badge-radius\` | Badge border radius | \`4px\` |
+| \`--tile-badge-box-shadow\` | Badge box shadow | theme-based |
+| \`--tile-text-size\` | Folder name font size | \`14px\` |
+| \`--tile-text-weight\` | Folder name font weight | \`normal\` |
+| \`--tile-text-color\` | Folder name text color | theme-based |
+| \`--tile-hover-text-decoration\` | Text decoration on hover | theme-based |
+
+> **Note:** \`--folder-tile-border-style\` and \`--file-tile-border-style\` allow per-component border control
+> while sharing the \`--tile-border-style\` fallback between both tile types.`,
+      },
+      source: {
+        code: `// Keep folder border while removing file tile border
+<div style={{
+  "--folder-tile-border-style": "1px solid #dbdbdb",
+  "--file-tile-border-style": "none",
+  "--tile-radius": "8px",
+  "--tile-text-weight": "400",
+}}>
+  <FolderTile item={item} element={element} contextOptions={options} onSelect={handleSelect}>
+    <TileContent><Link>My Folder</Link></TileContent>
+  </FolderTile>
+</div>`,
       },
     },
   },

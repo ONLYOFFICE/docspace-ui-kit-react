@@ -42,7 +42,7 @@
   --tile-tag-checked-background: #{$white};
   :global {
     .iconContainer {
-      background: var(--tile-background-color);
+      background: var(--tile-bg, var(--tile-background-color));
       border-radius: 6px;
     }
 
@@ -72,7 +72,7 @@
 
         svg {
           path {
-            fill: var(--tile-icon-button-color);
+            fill: var(--tile-icon-color, var(--tile-icon-button-color));
           }
         }
       }
@@ -85,7 +85,7 @@
     :global {
       .tag,
       .advanced-tag {
-        background: var(--tile-tag-checked-background);
+        background: var(--tile-tag-hover-bg, var(--tile-tag-checked-background));
       }
     }
   }

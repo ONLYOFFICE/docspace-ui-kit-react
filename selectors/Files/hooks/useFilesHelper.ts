@@ -95,6 +95,7 @@ const useFilesHelper = ({
   setIsInsideResultStorage,
 
   disableBySecurity,
+  withSubFolders,
 }: UseFilesHelpersProps) => {
   const t = useCommonTranslation();
   const {
@@ -155,10 +156,10 @@ const useFilesHelper = ({
         isErrorPath = false,
       ) => {
         if (initRef.current && getRootData && folderId !== "@my") {
-        // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
-          const folderInfoRes = await foldersApi.getFolderInfo(
-           folderId as number,
-          );
+          // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
+          const folderInfoRes = await foldersApi.getFolderInfo({
+            folderId: folderId as number,
+          });
           const folder = folderInfoRes.data.response!;
 
           const isArchive = folder.rootFolderType === FolderType.Archive;
@@ -189,24 +190,16 @@ const useFilesHelper = ({
         const currentSearch = searchValue || "";
 
         // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
-        const folderRes = await foldersApi.getFolderByFolderId(
-          folderId as number,
-          undefined,
-          undefined,
-          filterParams.filterType,
-          undefined,
-          undefined,
-          filterParams.applyFilterOption,
-          filterParams.extension,
-          undefined,
-          undefined,
-          undefined,
-          PAGE_COUNT,
+        const folderRes = await foldersApi.getFolderByFolderId({
+          folderId: folderId as number,
+          filterType: filterParams.filterType,
+          applyFilterOption: filterParams.applyFilterOption,
+          extension: filterParams.extension,
+          count: PAGE_COUNT,
           startIndex,
-          undefined,
-          undefined,
-          currentSearch,
-        );
+          filterValue: currentSearch,
+          withSubFolders,
+        });
         const currentFolder = folderRes.data.response!;
 
         const { folders, files, total, count, pathParts, current } =

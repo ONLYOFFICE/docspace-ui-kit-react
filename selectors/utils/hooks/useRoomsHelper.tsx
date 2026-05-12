@@ -30,6 +30,7 @@ import {
   StorageFilter,
   type RoomType as RoomTypeEnum,
   type FolderDtoInteger,
+  type SearchArea,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers/api";
 import { RoomsTypeValues } from "../../../utils/common";
@@ -144,23 +145,14 @@ const useRoomsHelper = ({
         typeFilter = types.length > 0 ? types : undefined;
       }
 
-      const res = await roomsApi.getRoomsFolder(
-        typeFilter,
-        undefined,
-        searchArea as unknown as import("@onlyoffice/docspace-api-sdk").SearchArea,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        disableThirdParty ? StorageFilter.Internal : undefined,
-        PAGE_COUNT,
+      const res = await roomsApi.getRoomsFolder({
+        type: typeFilter,
+        searchArea: searchArea as SearchArea,
+        storageFilter: disableThirdParty ? StorageFilter.Internal : undefined,
+        count: PAGE_COUNT,
         startIndex,
-        undefined,
-        undefined,
         filterValue,
-      );
+      });
       const roomsFromApi = res.data.response!;
 
       const { folders, total, count, current } = roomsFromApi;

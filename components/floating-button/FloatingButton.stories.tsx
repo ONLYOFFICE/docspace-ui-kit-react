@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -133,9 +133,7 @@ export const Default: Story = {
 };
 
 const WithProgressTemplate = () => {
-  return (
-    <FloatingButton icon={FloatingButtonIcons.upload} percent={45} />
-  );
+  return <FloatingButton icon={FloatingButtonIcons.upload} percent={45} />;
 };
 
 export const WithProgress: Story = {
@@ -154,9 +152,7 @@ export const WithProgress: Story = {
 };
 
 const WithAlertTemplate = () => {
-  return (
-    <FloatingButton icon={FloatingButtonIcons.upload} alert />
-  );
+  return <FloatingButton icon={FloatingButtonIcons.upload} alert />;
 };
 
 export const WithAlert: Story = {
@@ -176,11 +172,7 @@ export const WithAlert: Story = {
 
 const CompletedTemplate = () => {
   return (
-    <FloatingButton
-      icon={FloatingButtonIcons.upload}
-      completed
-      percent={100}
-    />
+    <FloatingButton icon={FloatingButtonIcons.upload} completed percent={100} />
   );
 };
 
@@ -256,3 +248,34 @@ export const IconVariants: Story = {
     },
   },
 };
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--floating-circle-button-background": "#7c3aed",
+          "--floating-button-shadow": "0 4px 20px rgba(124,58,237,0.5)",
+          "--floating-button-icon": "#ffffff",
+        } as CSSProperties
+      }
+    >
+      <FloatingButton icon={FloatingButtonIcons.upload} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--floating-circle-button-background\` | Button background color | \`--color-scheme-main-accent\` |
+| \`--floating-button-shadow\` | Box shadow | theme token |
+| \`--floating-button-button-size\` | Button size (width & height) | \`48px\` |
+| \`--floating-button-icon\` | Icon fill color | \`--color-scheme-text-accent\` |`,
+      },
+    },
+  },
+};
+

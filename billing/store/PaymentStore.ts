@@ -49,6 +49,8 @@ import type { TData } from "../../components/toast";
 import type { TBalance } from "../types";
 import { formatCurrencyValue } from "../utils/common";
 import { combineUrl } from "../../utils/combineUrl";
+import { getCookie } from "../../utils/cookie";
+import { LANGUAGE } from "../../constants";
 import {
   AI_ENUM,
   AI_TOOLS,
@@ -206,9 +208,11 @@ class PaymentStore {
 
   filterSelectedTypeKey = "allTransactions";
 
-  filterStartDate: DateTime = subtractFromDate(now(), 4, "weeks") ?? now();
+  filterStartDate: DateTime = (
+    subtractFromDate(now(), 4, "weeks") ?? now()
+  ).setLocale(getCookie(LANGUAGE) ?? "en");
 
-  filterEndDate: DateTime = now();
+  filterEndDate: DateTime = now().setLocale(getCookie(LANGUAGE) ?? "en");
 
   filterContact: TTransactionFilterContact | null = null;
 
@@ -216,10 +220,11 @@ class PaymentStore {
 
   lastTransactionServiceName: string | undefined = undefined;
 
-  defaultFilterStartDate: DateTime =
-    subtractFromDate(now(), 4, "weeks") ?? now();
+  defaultFilterStartDate: DateTime = (
+    subtractFromDate(now(), 4, "weeks") ?? now()
+  ).setLocale(getCookie(LANGUAGE) ?? "en");
 
-  defaultFilterEndDate: DateTime = now();
+  defaultFilterEndDate: DateTime = now().setLocale(getCookie(LANGUAGE) ?? "en");
 
   private _transactionTimerId: ReturnType<typeof setTimeout> | null = null;
 
@@ -559,7 +564,9 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getCustomerBalance(
-        isRefresh || undefined,
+        {
+          refresh: isRefresh || undefined,
+        },
         {
           signal: abortController.signal,
         },
@@ -644,18 +651,15 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getCustomerOperations(
-        0,
-        25,
-        serviceName,
-        this.formatDate(this.filterStartDate, "start"),
-        this.formatDate(this.filterEndDate, "end"),
-        this.filterContact?.id,
-        isCredit,
-        isDebit,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
+        {
+          offset: 0,
+          limit: 25,
+          serviceName,
+          startDate: this.formatDate(this.filterStartDate, "start"),
+          endDate: this.formatDate(this.filterEndDate, "end"),
+          credit: isCredit,
+          debit: isDebit,
+        },
         {
           signal: abortController.signal,
           params:
@@ -721,9 +725,14 @@ class PaymentStore {
     const backUrl = url || `${window.location.href}?complete=true`;
 
     try {
-      const res = await this.paymentApi.getCheckoutSetupUrl(backUrl, {
-        signal: abortController.signal,
-      });
+      const res = await this.paymentApi.getCheckoutSetupUrl(
+        {
+          backUrl,
+        },
+        {
+          signal: abortController.signal,
+        },
+      );
 
       if (!res?.data?.response) return;
 
@@ -737,11 +746,13 @@ class PaymentStore {
   updateAutoPayments = async () => {
     try {
       const res = await this.paymentApi.setTenantWalletSettings({
-        settings: {
-          enabled: this.isAutomaticPaymentsEnabled,
-          minBalance: +this.minBalance,
-          upToBalance: +this.upToBalance,
-          currency: this.walletCodeCurrency || "",
+        tenantWalletSettingsWrapper: {
+          settings: {
+            enabled: this.isAutomaticPaymentsEnabled,
+            minBalance: +this.minBalance,
+            upToBalance: +this.upToBalance,
+            currency: this.walletCodeCurrency || "",
+          },
         },
       });
 
@@ -837,7 +848,9 @@ class PaymentStore {
     this.addAbortController(abortController);
 
     const res = await this.paymentApi.getWalletService(
-      serviceName as unknown as TenantWalletService,
+      {
+        service: serviceName as unknown as TenantWalletService,
+      },
       { signal: abortController.signal },
     );
 
@@ -879,7 +892,9 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getPaymentUrl(
-        { quantity: { admin: managersCount }, backUrl },
+        {
+          paymentUrlRequestDto: { quantity: { admin: managersCount }, backUrl },
+        },
         { signal: abortController.signal },
       );
 
@@ -899,7 +914,12 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getPaymentUrl(
-        { quantity: { admin: this.managersCount }, backUrl },
+        {
+          paymentUrlRequestDto: {
+            quantity: { admin: this.managersCount },
+            backUrl,
+          },
+        },
         token ? { signal: token } : undefined,
       );
 
@@ -1002,7 +1022,7 @@ class PaymentStore {
     this.setIsInitPaymentPage(true);
   };
 
-  paymentMethodInit = async (t: TTranslation) => {
+  paymentMethodInit = async (t: TTranslation, integrationUrl?: string) => {
     const isRefresh = window.location.href.includes("complete=true");
 
     try {
@@ -1015,11 +1035,11 @@ class PaymentStore {
           requests.push(this.setPaymentAccount());
 
           if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
-            requests.push(this.fetchCardLinked());
+            requests.push(this.fetchCardLinked(integrationUrl));
           }
         }
       } else {
-        requests.push(this.fetchCardLinked());
+        requests.push(this.fetchCardLinked(integrationUrl));
       }
 
       if (this.isShowStorageTariffDeactivated() && this.isPayer) {
@@ -1047,7 +1067,7 @@ class PaymentStore {
     }
   };
 
-  walletInit = async (t: TTranslation) => {
+  walletInit = async (t: TTranslation, integrationUrl?: string) => {
     const isRefresh = window.location.href.includes("complete=true");
 
     if (!isRefresh) {
@@ -1064,13 +1084,13 @@ class PaymentStore {
           requests.push(this.setPaymentAccount());
 
           if (this.isPayer && this.tariff.walletCustomerStatusNotActive) {
-            requests.push(this.fetchCardLinked());
+            requests.push(this.fetchCardLinked(integrationUrl));
           }
         }
 
         requests.push(this.fetchAutoPayments(), this.fetchTransactionHistory());
       } else {
-        requests.push(this.fetchCardLinked());
+        requests.push(this.fetchCardLinked(integrationUrl));
       }
 
       if (this.isShowStorageTariffDeactivated() && this.isPayer) {
@@ -1247,9 +1267,11 @@ class PaymentStore {
   ) => {
     try {
       await this.paymentApi.sendPaymentRequest({
-        email,
-        userName,
-        message,
+        salesRequestsDto: {
+          email,
+          userName,
+          message,
+        },
       });
       toastr.success(t("SuccessfullySentMessage"));
     } catch (e) {
@@ -1259,4 +1281,3 @@ class PaymentStore {
 }
 
 export default PaymentStore;
-

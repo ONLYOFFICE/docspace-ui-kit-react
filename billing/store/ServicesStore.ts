@@ -267,9 +267,10 @@ class ServicesStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getPaymentQuotas(undefined, {
+      const res = await this.paymentApi.getRestrictedAiModels({
         signal: abortController.signal,
       });
+
       if (!res?.data?.response) return;
 
       const data = res.data.response as unknown as { models?: string[] };
@@ -320,8 +321,14 @@ class ServicesStore {
         restrictedModels.push(modelId);
       }
 
-      // TODO: Map to correct SDK method when available
-      // await this.paymentApi.setAiModelRestrictions(restrictedModels, abortController.signal);
+      await this.paymentApi.setRestrictedAiModels(
+        {
+          setRestrictedAiModelsRequestDto: {
+            models: new Set(restrictedModels),
+          },
+        },
+        { signal: abortController.signal },
+      );
 
       const nextMap = new Map(this.aiModelAvailabilityMap);
       if (enabled) nextMap.delete(modelId);
@@ -383,6 +390,7 @@ class ServicesStore {
     t: TTranslation,
     serviceName: string,
     serviceEnum?: string,
+    integrationUrl?: string,
   ) => {
     const isRefresh = window.location.href.includes("complete=true");
 
@@ -435,7 +443,7 @@ class ServicesStore {
             this.paymentStore.isPayer &&
             this.paymentStore.tariff.walletCustomerStatusNotActive
           ) {
-            await fetchCardLinked();
+            await fetchCardLinked(integrationUrl);
           }
 
           if (
@@ -551,4 +559,3 @@ class ServicesStore {
 }
 
 export default ServicesStore;
-

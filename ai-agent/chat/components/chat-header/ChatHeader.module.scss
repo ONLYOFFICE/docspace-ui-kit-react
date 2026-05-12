@@ -29,7 +29,7 @@
 .chatHeader {
   width: 100%;
 
-  padding: 16px 0;
+  padding: var(--chat-header-padding);
 
   box-sizing: border-box;
 
@@ -37,9 +37,9 @@
   align-items: center;
   flex-shrink: 0;
 
-  gap: 16px;
+  gap: var(--chat-header-gap);
 
-  min-height: 48px;
+  min-height: var(--chat-header-min-height);
   position: sticky;
   top: var(--chat-header-top, 0);
 
@@ -51,18 +51,18 @@
 .createChat {
   width: fit-content;
   min-width: fit-content;
-  height: 32px;
+  height: var(--chat-header-button-size);
 
   box-sizing: border-box;
 
-  border-radius: 6px;
+  border-radius: var(--chat-header-button-border-radius);
 
-  padding: 8px;
+  padding: var(--chat-header-button-padding);
 
   display: flex;
   align-items: center;
 
-  gap: 8px;
+  gap: var(--chat-header-button-padding);
 
   &:hover:not(.disabled) {
     background-color: var(--chat-header-button-hover-background);
@@ -92,14 +92,14 @@
 }
 
 .selectChat {
-  width: 32px;
-  height: 32px;
+  width: var(--chat-header-icon-button-size);
+  height: var(--chat-header-icon-button-size);
 
-  min-width: 32px;
+  min-width: var(--chat-header-icon-button-size);
 
   box-sizing: border-box;
 
-  border-radius: 3px;
+  border-radius: var(--chat-header-icon-button-border-radius);
 
   &:hover {
     background-color: var(--chat-header-button-hover-background);
@@ -130,7 +130,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--chat-header-dropdown-gap);
 
   .chatListItemTitle {
     text-align: var(--input-text-align);
@@ -138,8 +138,8 @@
   }
 
   .iconButtonWrapper {
-    width: 16px;
-    height: 16px;
+    width: var(--chat-header-dropdown-icon-size);
+    height: var(--chat-header-dropdown-icon-size);
 
     display: flex;
     align-items: center;

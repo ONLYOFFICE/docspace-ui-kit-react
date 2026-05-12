@@ -44,7 +44,8 @@ const Label = (props: LabelProps) => {
 		style,
 		children,
 	} = props;
-	const errorProp = error ? { color: globalColors.lightErrorStatus } : {};
+	const errorColor = `var(--label-error-color, ${globalColors.lightErrorStatus})`;
+	const errorProp = error ? { color: errorColor } : {};
 
 	return (
 		<Text
@@ -69,7 +70,9 @@ const Label = (props: LabelProps) => {
 			{text}{" "}
 			{isRequired ? (
 				<span
-					style={{ color: globalColors.lightErrorStatus }}
+					style={{
+						color: `var(--label-required-color, ${globalColors.lightErrorStatus})`,
+					}}
 					aria-hidden="true"
 					data-testid="required-mark"
 				>

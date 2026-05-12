@@ -39,7 +39,8 @@
     --loading-button-hover-color: #{colors.$white};
   }
 
-  --circle-fill-color: var(--accent-main);
+  --loading-button-fill: var(--loading-button-accent, var(--accent-main));
+  --circle-fill-color: var(--loading-button-fill);
 
   width: 16px;
   height: 16px;
@@ -59,20 +60,20 @@
 
   &.defaultMode {
     .circleMask .circleFill {
-      background-color: var(--loading-button-default-bg);
+      background-color: var(--loading-button-idle, var(--loading-button-default-bg));
     }
     .loadingButton {
       cursor: pointer;
 
       svg path {
-        fill: var(--loading-button-default-bg);
+        fill: var(--loading-button-idle, var(--loading-button-default-bg));
       }
     }
 
     &:hover {
       .loadingButton {
         svg path {
-          fill: var(--loading-button-hover-color);
+          fill: var(--loading-button-hover-fill, var(--loading-button-hover-color));
         }
       }
     }

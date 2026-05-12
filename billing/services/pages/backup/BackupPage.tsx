@@ -40,6 +40,8 @@ import { BACKUP_SERVICE } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import { useApi } from "../../../../providers";
 import { now, formatDateLocalized } from "../../../../utils/date";
+import { getCookie } from "../../../../utils/cookie";
+import { LANGUAGE } from "../../../../constants";
 import { toastr } from "../../../../components";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
 import TopUpModal from "../../../shared/top-up-balance/TopUpModal";
@@ -47,6 +49,7 @@ import BackupPageLoader from "./BackupPageLoader";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
+import { getBrandName } from "../../../../constants/brands";
 
 const BackupPage: React.FC = () => {
   const { paymentApi } = useApi();
@@ -98,7 +101,9 @@ const BackupPage: React.FC = () => {
     changeServiceState(BACKUP_SERVICE);
 
     try {
-      await paymentApi.changeTenantWalletServiceState(raw);
+      await paymentApi.changeTenantWalletServiceState({
+        changeWalletServiceStateRequestDto: raw,
+      });
     } catch (error) {
       console.error(error);
       toastr.error(t("UnexpectedError"));
@@ -113,14 +118,14 @@ const BackupPage: React.FC = () => {
 
     body: !isBackupServiceOn
       ? t("EnableBackupConfirm", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         })
       : isFreeTariff
         ? t("DisableBackupConfirmWithoutQuota", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           })
         : t("DisableBackupConfirm", {
-            productName: t("ProductName"),
+            productName: getBrandName("ProductName"),
           }),
   };
 
@@ -146,7 +151,6 @@ const BackupPage: React.FC = () => {
         title={
           <Text fontSize="12px" fontWeight={400}>
             <CommonTrans
-             
               i18nKey="BackupTitle"
               values={{
                 currency: formatWalletCurrency(backupServicePrice, 2),
@@ -211,11 +215,7 @@ const BackupPage: React.FC = () => {
           <Button
             className={styles.backupButton}
             size={ButtonSize.small}
-            label={
-              !isFreeTariff
-                ? t("EnablePaidBackup")
-                : t("Enable")
-            }
+            label={!isFreeTariff ? t("EnablePaidBackup") : t("Enable")}
             onClick={handleToggleChange}
             isDisabled={isDisabled}
             primary
@@ -226,7 +226,6 @@ const BackupPage: React.FC = () => {
       {!isFreeTariff ? (
         <Text className={styles.backupPaidInfo}>
           <CommonTrans
-           
             i18nKey="FreeBackupsRenewsDate"
             values={{
               date: formatDateLocalized(
@@ -235,6 +234,7 @@ const BackupPage: React.FC = () => {
                   .startOf("month")
                   .plus({ months: 1 }),
                 "DATE_MED",
+                { locale: getCookie(LANGUAGE) ?? "en" },
               ),
             }}
             components={{
@@ -273,4 +273,3 @@ const BackupPage: React.FC = () => {
 };
 
 export default observer(BackupPage);
-

@@ -55,6 +55,8 @@ import TableLoader from "./sub-components/TableLoader";
 import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { AI_TOOLS } from "../../constants";
+import { getBrandName } from "../../../constants/brands";
+import { Encoder } from "../../../utils/encoder";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -72,6 +74,7 @@ type TransactionHistoryProps = {
   headerTitle?: string;
   hideTypeFilter?: boolean;
   withoutRoleFilter?: boolean;
+  maxWidth?: number | string;
 };
 
 const filter = (withoutRoleFilter?: boolean): PeopleFilter => ({
@@ -88,6 +91,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     headerTitle,
     hideTypeFilter,
     withoutRoleFilter,
+    maxWidth,
   } = props;
 
   const { paymentApi } = useApi();
@@ -326,13 +330,15 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 
     try {
       await paymentApi.createCustomerOperationsReport({
-        startDate: formatDate!(filterStartDate),
-        endDate: formatDate!(filterEndDate),
-        credit: isCredit,
-        debit: isDebit,
-        participantName: filterContact?.id,
-        serviceName,
-        ...(serviceName === AI_TOOLS ? { writeOffServiceQuota: true } : {}),
+        customerOperationsReportRequestDto: {
+          startDate: formatDate!(filterStartDate),
+          endDate: formatDate!(filterEndDate),
+          credit: isCredit,
+          debit: isDebit,
+          participantName: filterContact?.id,
+          serviceName,
+          ...(serviceName === AI_TOOLS ? { writeOffServiceQuota: true } : {}),
+        },
       });
 
       const result = await new Promise<TransactionHistoryReportResponse>(
@@ -444,7 +450,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     <SelectedItemPure
       key={`${currentContact}`}
       propKey={currentContact.id}
-      label={currentContact.displayName}
+      label={Encoder.htmlDecode(currentContact.displayName ?? "")}
       onClose={onCloseSelectedContact}
       className={styles.selectedContactItem}
     />
@@ -501,7 +507,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     : {
         withInfo: true as const,
         infoText: t("OnlyPortalAdminsShown", {
-          productName: t("ProductName"),
+          productName: getBrandName("ProductName"),
         }),
       };
 
@@ -523,7 +529,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
       {...infoProps}
       emptyScreenHeader={t("NotFoundMembers")}
       emptyScreenDescription={t("PeopleSelectorInfo", {
-        productName: t("ProductName"),
+        productName: getBrandName("ProductName"),
       })}
     />
   ) : null;
@@ -552,6 +558,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           hasAppliedDateFilter={isTransactionFilterModified}
           isTransactionHistoryExist={isTransactionHistoryExist!}
           serviceName={serviceName}
+          maxWidth={maxWidth}
         />
       )}
 
@@ -629,4 +636,3 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 };
 
 export default observer(TransactionHistory);
-

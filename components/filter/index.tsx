@@ -134,6 +134,10 @@ const FilterInput = React.memo(
     isRoomsFolder,
     organizeRoomsGrouping,
     isFilterOrSearchActive,
+
+    showMainButton,
+    mainButtonProps,
+    mainButtonIcon,
   }: FilterProps) => {
     const t = useCommonTranslation();
 
@@ -146,6 +150,9 @@ const FilterInput = React.memo(
       placeholder,
       isIndexEditingMode,
       initSearchValue,
+      showMainButton,
+      mainButtonProps,
+      mainButtonIcon,
     });
 
     const [viewSettings, setViewSettings] = React.useState<

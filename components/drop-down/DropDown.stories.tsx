@@ -26,7 +26,7 @@
 
 import React from "react";
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -578,3 +578,76 @@ export const ContextMenu: Story = {
     },
   },
 };
+
+const CssCustomizationTemplate = () => {
+  const parentRef = React.useRef<HTMLButtonElement>(null);
+  const [isOpen, setIsOpen] = React.useState(false);
+  return (
+    <div
+      style={
+        {
+          "--dropdown-radius": "12px",
+          "--dropdown-bg": "#f5f3ff",
+          "--dropdown-shadow": "0 4px 20px rgba(124, 58, 237, 0.25)",
+          "--dropdown-text-size": "14px",
+          position: "relative",
+        } as CSSProperties
+      }
+    >
+      <Button
+        ref={parentRef}
+        label="Dropdown trigger"
+        onClick={() => setIsOpen((v) => !v)}
+      />
+      <DropDown
+        open={isOpen}
+        isDefaultMode={false}
+        forwardedRef={parentRef}
+        directionY="bottom"
+        fixedDirection
+        clickOutsideAction={() => setIsOpen(false)}
+      >
+        <DropDownItem label="Option 1" onClick={() => setIsOpen(false)} />
+        <DropDownItem label="Option 2" onClick={() => setIsOpen(false)} />
+        <DropDownItem label="Option 3" onClick={() => setIsOpen(false)} />
+      </DropDown>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization. Set on a parent wrapper element:
+
+\`\`\`css
+--dropdown-bg            /* background (replaces theme color) */
+--dropdown-border-style  /* border (replaces theme border) */
+--dropdown-shadow        /* box-shadow (replaces theme shadow) */
+--dropdown-radius        /* border radius (default: 6px) */
+--dropdown-inner-padding /* padding (default: 8px 0) */
+--dropdown-text-size     /* font-size (default: 13px) */
+--dropdown-text-weight   /* font-weight (default: 600) */
+\`\`\`
+
+Use \`isDefaultMode={false}\` (inline mode) so CSS vars from the parent cascade to the dropdown.`,
+      },
+      source: {
+        code: `<div style={{
+  "--dropdown-radius": "12px",
+  "--dropdown-bg": "#f5f3ff",
+  "--dropdown-shadow": "0 4px 20px rgba(124,58,237,0.25)",
+  position: "relative",
+}}>
+  <DropDown open isDefaultMode={false} forwardedRef={ref}>
+    <DropDownItem label="Option 1" />
+    <DropDownItem label="Option 2" />
+  </DropDown>
+</div>`,
+      },
+    },
+  },
+};
+

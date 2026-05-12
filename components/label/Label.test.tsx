@@ -28,7 +28,6 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import { Label } from ".";
-import { globalColors } from "../../providers/theme";
 
 const baseProps = {
 	text: "First name:",
@@ -52,7 +51,8 @@ describe("Label Component", () => {
 	it("applies error styles when error prop is true", () => {
 		render(<Label {...baseProps} error />);
 		const label = screen.getByTestId("label");
-		expect(label).toHaveStyle({ color: globalColors.lightErrorStatus });
+		// Component applies color as a CSS variable for external customization
+		expect(label.style.color).toMatch(/var\(--label-error-color/);
 	});
 
 	it("renders with custom className", () => {

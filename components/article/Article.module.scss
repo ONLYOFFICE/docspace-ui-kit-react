@@ -99,7 +99,7 @@
   flex-direction: column;
   gap: 8px;
   position: relative;
-  margin-bottom: 11px;
+  margin-bottom: 16px;
 
   &[data-with-dev-tools="false"]:not([data-with-custom-slot="true"]) {
     margin-top: auto;
@@ -245,7 +245,7 @@
   position: absolute;
   height: 44px;
   z-index: 209;
-  background: var(--article-catalog-background);
+  background: var(--article-catalog-bg-v);
   inset-inline-start: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: #{colors.$tap-highlight};
@@ -380,7 +380,7 @@
   }
 
   @include mixins.mobile {
-    border-bottom: var(--article-catalog-header-border-bottom);
+    border-bottom: var(--article-header-border-v);
     padding: 12px 0;
   }
 }
@@ -399,7 +399,7 @@
   :global(.logo-icon_svg) {
     svg {
       path:last-child {
-        fill: var(--article-client-home-logo-color);
+        fill: var(--article-logo-color-v);
       }
     }
   }
@@ -453,7 +453,7 @@
   inset-inline-start: 0;
   min-width: 251px;
   max-width: 251px;
-  background-color: var(--article-catalog-profile-background);
+  background-color: var(--article-profile-bg-v);
 
   @include mixins.tablet {
     &[data-show-text="true"] {
@@ -474,9 +474,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-top: var(--article-catalog-profile-border-top);
-  border-inline-end: var(--article-catalog-vertical-line);
-  background-color: var(--article-catalog-profile-background);
+  border-top: var(--article-profile-border-v);
+  border-inline-end: var(--article-catalog-border-v);
+  background-color: var(--article-profile-bg-v);
 
   @include mixins.tablet {
     padding: 16px 14px;
@@ -514,15 +514,30 @@
 }
 
 .article {
+  // bridge vars — bind public overrides to internal theme tokens
+  --article-catalog-bg-v: var(--article-bg, var(--article-catalog-background));
+  --article-catalog-border-v: var(--article-border, var(--article-catalog-vertical-line));
+  --article-header-border-v: var(--article-header-border, var(--article-catalog-header-border-bottom));
+  --article-profile-bg-v: var(--article-profile-bg, var(--article-catalog-profile-background));
+  --article-profile-border-v: var(--article-profile-border, var(--article-catalog-profile-border-top));
+  --article-logo-color-v: var(--article-logo-color, var(--article-client-home-logo-color));
+  --article-desktop-width-v: var(--article-width, var(--article-desktop-width));
+  --article-tablet-width-v: var(--article-sidebar-width, var(--article-tablet-width));
+  --article-tablet-width-collapsed-v: var(
+    --article-sidebar-collapsed-width,
+    var(--article-tablet-width-collapsed)
+  );
+  --back-button-color-v: var(--article-back-color, var(--back-button-text-color));
+
   position: relative;
   overflow: hidden;
   height: 100%;
-  background: var(--article-catalog-background);
-  min-width: var(--article-desktop-width);
-  max-width: var(--article-desktop-width);
+  background: var(--article-catalog-bg-v);
+  min-width: var(--article-desktop-width-v);
+  max-width: var(--article-desktop-width-v);
   box-sizing: border-box;
   user-select: none;
-  border-inline-end: var(--article-catalog-vertical-line);
+  border-inline-end: var(--article-catalog-border-v);
   z-index: 205;
 
   @include mixins.tablet {
@@ -531,15 +546,15 @@
 
   &[data-show-text="false"] {
     @include mixins.tablet {
-      min-width: var(--article-tablet-width-collapsed);
-      max-width: var(--article-tablet-width-collapsed);
+      min-width: var(--article-tablet-width-collapsed-v);
+      max-width: var(--article-tablet-width-collapsed-v);
     }
   }
 
   &[data-show-text="true"] {
     @include mixins.tablet {
-      min-width: var(--article-tablet-width);
-      max-width: var(--article-tablet-width);
+      min-width: var(--article-tablet-width-v);
+      max-width: var(--article-tablet-width-v);
     }
   }
 
@@ -576,7 +591,7 @@
 
   &[data-with-main-button="false"] {
     :global(.article-body__scrollbar) {
-      height: calc(100% - 150px) !important;
+      height: calc(100% - 142px) !important;
 
       @include mixins.tablet {
         height: calc(100% - 190px) !important;
@@ -639,7 +654,7 @@
   margin-bottom: 22px;
   margin-top: 8px;
   cursor: pointer;
-  color: var(--back-button-text-color);
+  color: var(--back-button-color-v);
 
   p {
     font-size: 15px;

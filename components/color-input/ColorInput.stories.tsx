@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -128,6 +128,81 @@ const Wrapper = (props: { children: React.ReactNode }) => {
       {props.children}
     </div>
   );
+};
+
+const CssCustomizationTemplate = () => {
+  return (
+    <div
+      style={
+        {
+          // === ColorInput — input field ===
+          "--color-input-height": "36px",
+          "--color-input-padding": "6px 12px",
+          "--color-input-swatch-size": "24px",
+          "--color-input-swatch-radius": "6px",
+          // === TextInput (hex text field) ===
+          "--text-input-bg": "#f0f8ff",
+          "--text-input-color": "#004f82",
+          "--text-input-border-color": "#0082c9",
+          "--text-input-radius": "8px",
+          // === DropDown (color picker popup) ===
+          "--dropdown-bg": "#e6f3fb",
+          "--dropdown-border-style": "1px solid #0082c9",
+          "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
+          "--dropdown-radius": "12px",
+        } as CSSProperties
+      }
+    >
+      <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
+        <ColorInput
+          defaultColor="#0082c9"
+          handleChange={() => {}}
+        />
+        <ColorInput
+          defaultColor="#4CAF50"
+          handleChange={() => {}}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**ColorInput — input and swatch**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--color-input-height\` | Input field height | \`32px\` |
+| \`--color-input-padding\` | Input field padding | \`6px 8px\` |
+| \`--color-input-swatch-size\` | Color swatch width and height | \`20px\` |
+| \`--color-input-swatch-radius\` | Color swatch border radius | \`2px\` |
+
+**TextInput (hex text field)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--text-input-bg\` | Input background color | theme-based |
+| \`--text-input-color\` | Input text color | theme-based |
+| \`--text-input-border-color\` | Input border color | theme-based |
+| \`--text-input-radius\` | Input border radius | theme-based |
+
+**DropDown (color picker popup)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--dropdown-bg\` | Popup background | theme-based |
+| \`--dropdown-border-style\` | Popup border | theme-based |
+| \`--dropdown-shadow\` | Popup shadow | theme-based |
+| \`--dropdown-radius\` | Popup border radius | \`6px\` |`,
+      },
+    },
+  },
 };
 
 export const Default: Story = {

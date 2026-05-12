@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -356,6 +356,53 @@ const CustomHeightTemplate = () => {
       />
     </Wrapper>
   );
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          width: "300px",
+          "--textarea-bg": "#f5f3ff",
+          "--textarea-border-color": "#7c3aed",
+          "--textarea-text-color": "#4c1d95",
+          "--textarea-font-size": "14px",
+          "--textarea-radius": "8px",
+          "--textarea-numeration-text-color": "#a78bfa",
+          "--textarea-padding": "8px 12px 4px",
+          "--textarea-height-custom": "120px",
+        } as CSSProperties
+      }
+    >
+      <Textarea
+        value="Custom styled textarea with CSS variables"
+        onChange={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--textarea-bg\` | Background color | theme token |
+| \`--textarea-border-color\` | Border color | theme token |
+| \`--textarea-text-color\` | Text color | theme token |
+| \`--textarea-font-size\` | Font size | \`13px\` |
+| \`--textarea-radius\` | Border radius | theme token |
+| \`--textarea-padding\` | Textarea padding | \`5px 8px 2px\` |
+| \`--textarea-numeration-text-color\` | Line number color | theme token |
+| \`--textarea-width\` | Max width | \`1200px\` |
+| \`--textarea-height\` | Fixed height | \`89px\` |
+| \`--textarea-height-scale\` | Height when heightScale is true | \`65vh\` |
+| \`--textarea-height-full\` | Height when isFullHeight is true | \`--full-height\` |
+| \`--textarea-height-custom\` | Height when heightTextArea prop is set | prop value |`,
+      },
+    },
+  },
 };
 
 export const CustomHeights: Story = {

@@ -43,32 +43,43 @@
     --input-border-focus: #{colors.$white};
   }
 
-  width: 60px;
-  height: 32px;
+  // bridge vars — bind public overrides to internal theme tokens
+  --time-input-border-v: var(--time-input-border, var(--input-border-color));
+  --time-input-bg-v: var(--time-input-bg, var(--input-bg));
+  --time-input-error-border-v: var(--time-input-error-border, var(--input-error-border));
+  --time-input-focus-border-v: var(--time-input-focus-border, var(--input-border-focus));
+  // new bridge vars for hardcoded values
+  --time-input-width-v: var(--time-input-width, 60px);
+  --time-input-height-v: var(--time-input-height, 32px);
+  --time-input-radius-v: var(--time-input-radius, 3px);
+  --time-input-padding-v: var(--time-input-padding, 0px 6px);
+
+  width: var(--time-input-width-v);
+  height: var(--time-input-height-v);
   box-sizing: border-box;
-  padding: 0px 6px;
+  padding: var(--time-input-padding-v);
   direction: ltr;
 
-  border: 1px solid var(--input-border-color);
-  border-radius: 3px;
+  border: 1px solid var(--time-input-border-v);
+  border-radius: var(--time-input-radius-v);
 
   transition: "all 0.2s ease 0s";
 
   display: flex;
   align-items: center;
 
-  background-color: var(--input-bg);
+  background-color: var(--time-input-bg-v);
 
   &.hasError {
-    border-color: var(--input-error-border);
+    border-color: var(--time-input-error-border-v);
   }
 
   &.isFocused {
-    border-color: var(--input-border-focus);
+    border-color: var(--time-input-focus-border-v);
   }
 
   :focus {
-    border-color: var(--input-border-focus);
+    border-color: var(--time-input-focus-border-v);
   }
 
   & > input {

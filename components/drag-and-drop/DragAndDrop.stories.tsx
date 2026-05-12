@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type React from "react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -183,6 +183,73 @@ const InteractiveDropZone = (args: ComponentProps<typeof DragAndDrop>) => {
       </div>
     </DragAndDrop>
   );
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "400px" }}>
+      {/* Dragging state — shows --dnd-dragging-bg */}
+      <div
+        style={
+          {
+            "--dnd-dragging-bg": "#e6f3fb",
+            "--dnd-accept-bg": "#cce5f6",
+            "--dnd-disabled-opacity": "0.3",
+          } as CSSProperties
+        }
+      >
+        <DragAndDrop isDropZone dragging style={{ height: "120px", borderRadius: "8px" }}>
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "13px",
+            }}
+          >
+            Dragging — custom bg via --dnd-dragging-bg
+          </div>
+        </DragAndDrop>
+      </div>
+
+      {/* Disabled state — shows --dnd-disabled-opacity */}
+      <div
+        style={
+          {
+            "--dnd-disabled-opacity": "0.25",
+          } as CSSProperties
+        }
+      >
+        <DragAndDrop isDropZone isDragDisabled style={{ height: "80px", borderRadius: "8px", border: "2px dashed #0082c9" }}>
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "13px",
+            }}
+          >
+            Disabled — reduced via --dnd-disabled-opacity: 0.25
+          </div>
+        </DragAndDrop>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--dnd-dragging-bg\` | Background during active drag | theme-based |
+| \`--dnd-accept-bg\` | Background when accepting a drop | theme-based |
+| \`--dnd-disabled-opacity\` | Opacity when drag is disabled | \`0.4\` |`,
+      },
+    },
+  },
 };
 
 export const Default: Story = {

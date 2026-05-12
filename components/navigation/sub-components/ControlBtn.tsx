@@ -83,6 +83,7 @@ const ControlButtons = ({
 
   isPlusButtonVisible,
   contextMenuHeader,
+  analyzeResponsesButton,
 }: TControlButtonProps) => {
   const toggleInfoPanelAction = () => {
     toggleInfoPanel?.();
@@ -100,6 +101,7 @@ const ControlButtons = ({
       <Button
         ref={buttonRef}
         className="navigation_button"
+        testId="navigation_button"
         label={navigationButtonLabel}
         size={ButtonSize.extraSmall}
         onClick={onNavigationButtonClick}
@@ -189,6 +191,7 @@ const ControlButtons = ({
 
   return (
     <div
+      id="control-buttons-container"
       className={styles.controlButtonContainer}
       data-is-frame={isFrame}
       data-show-title={showTitle}
@@ -200,6 +203,7 @@ const ControlButtons = ({
       {renderWarning()}
       {!isTabletView ? renderNavigationButton() : null}
       {renderTariffBar()}
+      {analyzeResponsesButton ?? null}
       {isTabletView ? renderNavigationButton() : null}
     </div>
   );

@@ -136,7 +136,9 @@ const useSocketHelper = ({
       let item: TSelectorItem = {} as TSelectorItem;
 
       if (opt?.type === "file" && "folderId" in data) {
-        const fileRes = await filesApi.getFileInfo(data.id!);
+        const fileRes = await filesApi.getFileInfo({
+          fileId: data.id!,
+        });
         const file = fileRes.data.response!;
         [item] = convertFilesToItems(
           [file],
@@ -147,11 +149,15 @@ const useSocketHelper = ({
         );
       } else if (opt?.type === "folder" && !("folderId" in data)) {
         if ("roomType" in data) {
-          const roomRes = await roomsApi.getRoomInfo(data.id!);
+          const roomRes = await roomsApi.getRoomInfo({
+            id: data.id!,
+          });
           const room = roomRes.data.response!;
           item = convertRoomsToItems([room])[0];
         } else {
-          const folderRes = await foldersApi.getFolderInfo(data.id!);
+          const folderRes = await foldersApi.getFolderInfo({
+            folderId: data.id!,
+          });
           const folder = folderRes.data.response!;
           item = convertFoldersToItems(
             [folder],
@@ -244,7 +250,9 @@ const useSocketHelper = ({
       let item: TSelectorItem = {} as TSelectorItem;
 
       if (opt?.type === "file" && "folderId" in data) {
-        const fileRes = await filesApi.getFileInfo(data.id!);
+        const fileRes = await filesApi.getFileInfo({
+          fileId: data.id!,
+        });
         const file = fileRes.data.response!;
         [item] = convertFilesToItems(
           [file],
@@ -255,11 +263,15 @@ const useSocketHelper = ({
         );
       } else if (opt?.type === "folder") {
         if ("roomType" in data) {
-          const roomRes = await roomsApi.getRoomInfo(data.id!);
+          const roomRes = await roomsApi.getRoomInfo({
+            id: data.id!,
+          });
           const room = roomRes.data.response!;
           item = convertRoomsToItems([room])[0];
         } else {
-          const folderRes = await foldersApi.getFolderInfo(data.id!);
+          const folderRes = await foldersApi.getFolderInfo({
+            folderId: data.id!,
+          });
           const folder = folderRes.data.response!;
           item = convertFoldersToItems(
             [folder],
