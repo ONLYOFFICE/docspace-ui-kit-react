@@ -101,7 +101,6 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
         style={buttonStyle}
         data-tooltip-id={tooltipId}
         data-tooltip-content={tooltipText}
-        onClick={(e) => {}}
       >
         {isLoading ? (
           <Loader
