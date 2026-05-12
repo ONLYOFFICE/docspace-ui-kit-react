@@ -399,6 +399,7 @@ export type TFile = {
   activeEditors?: Record<string, string>;
   isFillingPreparing?: boolean;
   resultsFolderId?: number;
+  externalDbTableName?: string;
 };
 
 export type TPathParts = {
