@@ -355,31 +355,21 @@ const PeopleSelector = ({
         let responseTotal = 0;
 
         if (!roomId) {
-          const employeeType =
+          const employeeTypes =
             currentFilter.role as SearchUsersByExtendedFilterEmployeeTypesEnum[];
 
           const res = await peopleSearchApi.searchUsersByExtendedFilter(
-            currentFilter.employeeStatus,
-            undefined,
-            undefined,
-            undefined,
-            employeeType,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            area,
-            pageCount,
-            startIndex,
-            undefined,
-            undefined,
-            undefined,
-            filterValue,
-            { signal },
+            {
+              employeeStatus: currentFilter.employeeStatus,
+              employeeTypes,
+              area,
+              count: pageCount,
+              startIndex,
+              filterValue,
+            },
+            {
+              signal,
+            },
           );
           items = res.data.response ?? [];
           responseTotal = res.data.count ?? 0;
@@ -394,11 +384,12 @@ const PeopleSelector = ({
                 : groupSearchApi.getGroupsWithRoomsShared.bind(groupSearchApi);
 
           const res = await fetcher(
-            id,
-            undefined,
-            pageCount,
-            startIndex,
-            filterValue,
+            {
+              id,
+              count: pageCount,
+              startIndex,
+              filterValue,
+            },
             { signal },
           );
           items = (res.data.response ?? []).map((g) => ({
@@ -419,19 +410,15 @@ const PeopleSelector = ({
                 : peopleSearchApi.getUsersWithRoomShared.bind(peopleSearchApi);
 
           const res = await fetcher(
-            id,
-            currentFilter.employeeStatus,
-            undefined,
-            undefined,
-            includeShared,
-            undefined,
-            undefined,
-            area,
-            undefined,
-            pageCount,
-            startIndex,
-            undefined,
-            filterValue,
+            {
+              id,
+              employeeStatus: currentFilter.employeeStatus,
+              includeShared,
+              area,
+              count: pageCount,
+              startIndex,
+              filterValue,
+            },
             { signal },
           );
           items = res.data.response ?? [];
@@ -817,4 +804,3 @@ const PeopleSelector = ({
 };
 
 export default PeopleSelector;
-

@@ -24,34 +24,5 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
-import type { TInfoBarData, TSelectorItem } from "../../components/selector";
-import type { WithFlag } from "../../types";
-
-export type TInitValue = WithFlag<
-  "withInit",
-  {
-    withInit: true;
-    initItems: FolderDtoInteger[];
-    initTotal: number;
-    initHasNextPage: boolean;
-    initSearchValue?: string;
-  }
->;
-
-export type AIAgentSelectorProps = {
-  id?: string;
-  className?: string;
-  style?: React.CSSProperties;
-
-  onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
-  excludeItems?: (number | string | undefined)[];
-  setIsDataReady?: (value: boolean) => void;
-
-  withPadding?: boolean;
-
-  onClose: () => void;
-
-  disableBySecurity?: string;
-  externalInfoBarData?: TInfoBarData;
-} & TInitValue;
+export type { CardProps } from "./Card.types";
+export { Card } from "./Card";

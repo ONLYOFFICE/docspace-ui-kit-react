@@ -173,6 +173,7 @@ export type UseFilesHelpersProps = {
   applyFilterOption?: ApplyFilterOption;
 
   disableBySecurity?: string;
+  withSubFolders?: boolean;
 };
 
 export type TUseInputItemHelper = {
@@ -304,4 +305,5 @@ export type FilesSelectorProps = TInfoBar &
     renderInPortal?: boolean;
     disableBySecurity?: string;
     folderFormValidation?: RegExp;
+    withSubFolders?: boolean;
   };

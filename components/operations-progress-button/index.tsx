@@ -68,6 +68,7 @@ const operationToIconMap: Record<
   upload: FloatingButtonIcons.upload,
   deleteVersionFile: FloatingButtonIcons.trash,
   backup: FloatingButtonIcons.backup,
+  syncDatabase: FloatingButtonIcons.upload,
 };
 
 const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
@@ -200,6 +201,18 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       resetTimerRef.current = setTimeout(() => {
         setIsHideTooltip(false);
       }, 100);
+
+      return;
+    }
+
+    if (operationsLength && operations[0].showPanel) {
+      setIsHideTooltip(true);
+      operations[0].showPanel(true);
+      clearTimers();
+
+      resetTimerRef.current = setTimeout(() => {
+        setIsHideTooltip(false);
+      }, 100);
     }
   };
 
@@ -305,14 +318,23 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       return <Text fontWeight={600}>{canceledLabel}</Text>;
     }
 
-    if (operationsAlert) {
-      const operationName = operationsLength
-        ? operations[0].label
-        : panelOperations[0].label;
+    const currentOperation = operationsLength
+      ? operations[0]
+      : panelOperations[0];
 
-      const operation = operationsLength
-        ? operations[0].operation
-        : panelOperations[0].operation;
+    if (currentOperation.description) {
+      return (
+        <Text fontWeight={600}>
+          {currentOperation.label}
+          <br />
+          {currentOperation.description}
+        </Text>
+      );
+    }
+
+    if (operationsAlert) {
+      const operationName = currentOperation.label;
+      const operation = currentOperation.operation;
 
       if (
         operation === OPERATIONS_NAME.upload &&
@@ -340,9 +362,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
     }
 
     if (operationsCompleted) {
-      const operationName = operationsLength
-        ? operations[0].label
-        : panelOperations[0].label;
+      const operationName = currentOperation.label;
 
       return (
         <Text fontWeight={600}>
@@ -353,11 +373,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       );
     }
 
-    const operationName = operationsLength
-      ? operations[0].label
-      : panelOperations[0].label;
-
-    return <Text fontWeight={600}>{operationName}</Text>;
+    return <Text fontWeight={600}>{currentOperation.label}</Text>;
   };
 
   const getIconUrl = () => {
@@ -446,7 +462,8 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
             <FloatingButton
               className={classNames(styles.floatingButton, {
                 [styles.cursorDefault]:
-                  !panelOperationsLength || disableOpenPanel,
+                  (!panelOperationsLength && !operations[0]?.showPanel) ||
+                  disableOpenPanel,
               })}
               icon={getIcons()}
               iconUrl={getIconUrl()}

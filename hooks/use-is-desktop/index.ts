@@ -23,35 +23,25 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+import { useState, useEffect } from "react";
+import { desktop, isDesktop as isDesktopUtil } from "../../utils/device";
 
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
-import type { TInfoBarData, TSelectorItem } from "../../components/selector";
-import type { WithFlag } from "../../types";
+export function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState<boolean>(
+    () => typeof window !== "undefined" && isDesktopUtil(),
+  );
 
-export type TInitValue = WithFlag<
-  "withInit",
-  {
-    withInit: true;
-    initItems: FolderDtoInteger[];
-    initTotal: number;
-    initHasNextPage: boolean;
-    initSearchValue?: string;
-  }
->;
+  useEffect(() => {
+    const mql = window.matchMedia(desktop);
+    const onChange = (event: MediaQueryListEvent) => {
+      setIsDesktop(event.matches);
+    };
 
-export type AIAgentSelectorProps = {
-  id?: string;
-  className?: string;
-  style?: React.CSSProperties;
+    setIsDesktop(mql.matches);
+    mql.addEventListener("change", onChange);
 
-  onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
-  excludeItems?: (number | string | undefined)[];
-  setIsDataReady?: (value: boolean) => void;
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
 
-  withPadding?: boolean;
-
-  onClose: () => void;
-
-  disableBySecurity?: string;
-  externalInfoBarData?: TInfoBarData;
-} & TInitValue;
+  return isDesktop;
+}

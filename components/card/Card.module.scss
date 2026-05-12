@@ -24,34 +24,59 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
-import type { TInfoBarData, TSelectorItem } from "../../components/selector";
-import type { WithFlag } from "../../types";
+@use "../../styles/variables/colors";
 
-export type TInitValue = WithFlag<
-  "withInit",
-  {
-    withInit: true;
-    initItems: FolderDtoInteger[];
-    initTotal: number;
-    initHasNextPage: boolean;
-    initSearchValue?: string;
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--info-block-background);
+  border-radius: 6px;
+  padding: 12px 16px;
+
+  :global(.light) & {
+    --info-block-background: #{colors.$gray-light};
+    --card-title-color: #{colors.$black};
+    --card-body-color: #{colors.$gray-text};
   }
->;
 
-export type AIAgentSelectorProps = {
-  id?: string;
-  className?: string;
-  style?: React.CSSProperties;
+  :global(.dark) & {
+    --info-block-background: #{colors.$dark-gray-light};
+    --card-title-color: #{colors.$white};
+    --card-body-color: #{colors.$dark-gray-dark};
+  }
+}
 
-  onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
-  excludeItems?: (number | string | undefined)[];
-  setIsDataReady?: (value: boolean) => void;
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
 
-  withPadding?: boolean;
+.title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--card-title-color);
+}
 
-  onClose: () => void;
+.extra {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 
-  disableBySecurity?: string;
-  externalInfoBarData?: TInfoBarData;
-} & TInitValue;
+.body {
+  font-size: 12px;
+  color: var(--card-body-color);
+}
+
+.connectedStatus {
+  --card-connected-color: var(--status-positive-color, #{colors.$main-green});
+
+  color: var(--card-connected-color);
+  font-size: 12px;
+  font-weight: 600;
+}

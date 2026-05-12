@@ -24,34 +24,30 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
-import type { TInfoBarData, TSelectorItem } from "../../components/selector";
-import type { WithFlag } from "../../types";
+import type { ElementType } from "react";
+import classNames from "classnames";
 
-export type TInitValue = WithFlag<
-  "withInit",
-  {
-    withInit: true;
-    initItems: FolderDtoInteger[];
-    initTotal: number;
-    initHasNextPage: boolean;
-    initSearchValue?: string;
-  }
->;
+import styles from "./ActionButton.module.scss";
+import type { ActionButtonProps } from "./ActionButton.types";
 
-export type AIAgentSelectorProps = {
-  id?: string;
-  className?: string;
-  style?: React.CSSProperties;
+export function ActionButton<C extends ElementType = "button">({
+  as,
+  icon,
+  className,
+  label,
+  ref,
+  ...rest
+}: ActionButtonProps<C>) {
+  const Component: ElementType = as ?? "button";
 
-  onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
-  excludeItems?: (number | string | undefined)[];
-  setIsDataReady?: (value: boolean) => void;
-
-  withPadding?: boolean;
-
-  onClose: () => void;
-
-  disableBySecurity?: string;
-  externalInfoBarData?: TInfoBarData;
-} & TInitValue;
+  return (
+    <Component
+      ref={ref}
+      className={classNames(styles.actionButton, className)}
+      {...rest}
+    >
+      {icon ? <span className={styles.icon}>{icon}</span> : null}
+      {label}
+    </Component>
+  );
+}

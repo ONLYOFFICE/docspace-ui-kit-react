@@ -24,34 +24,18 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
-import type { TInfoBarData, TSelectorItem } from "../../components/selector";
-import type { WithFlag } from "../../types";
+import type React from "react";
 
-export type TInitValue = WithFlag<
-  "withInit",
-  {
-    withInit: true;
-    initItems: FolderDtoInteger[];
-    initTotal: number;
-    initHasNextPage: boolean;
-    initSearchValue?: string;
-  }
->;
-
-export type AIAgentSelectorProps = {
-  id?: string;
+export interface CardProps {
+  /** Left side of the card header. Hidden if both title and extra are undefined. */
+  title?: React.ReactNode;
+  /** Right side of the card header (e.g. a status badge). */
+  extra?: React.ReactNode;
+  /** Card body content. */
+  children?: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  dataTestId?: string;
+  footer?: React.ReactNode;
+}
 
-  onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
-  excludeItems?: (number | string | undefined)[];
-  setIsDataReady?: (value: boolean) => void;
-
-  withPadding?: boolean;
-
-  onClose: () => void;
-
-  disableBySecurity?: string;
-  externalInfoBarData?: TInfoBarData;
-} & TInitValue;

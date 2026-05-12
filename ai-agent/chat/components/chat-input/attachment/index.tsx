@@ -31,10 +31,7 @@ import React from "react";
 import AttachmentReactSvg from "../../../../../assets/attachment.react.svg";
 
 import { DeviceType, FolderType } from "../../../../../enums";
-import {
-  isDesktop,
-  isTablet,
-} from "../../../../../utils";
+import { isDesktop, isTablet } from "../../../../../utils";
 import { useCommonTranslation } from "../../../../../utils/i18n";
 
 import type { TFile } from "../../../../../types";
@@ -134,6 +131,7 @@ const Attachment = ({
       withoutBackButton
       withCancelButton
       withCreate={false}
+      withSubFolders={false}
       withFooterCheckbox={false}
       withFooterInput={false}
       cancelButtonLabel={t("CancelButton")}

@@ -24,34 +24,69 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
-import type { TInfoBarData, TSelectorItem } from "../../components/selector";
-import type { WithFlag } from "../../types";
+@use "../../styles/variables/colors";
 
-export type TInitValue = WithFlag<
-  "withInit",
-  {
-    withInit: true;
-    initItems: FolderDtoInteger[];
-    initTotal: number;
-    initHasNextPage: boolean;
-    initSearchValue?: string;
+:global(.dark) {
+  .actionButton {
+    --ab-bg: #{colors.$black};
+    --ab-bg-hover: #{colors.$dark-gray-light};
+    --ab-bg-active: #{colors.$gray-dark-strong};
+    --ab-color: #{colors.$light-second-main};
   }
->;
+}
 
-export type AIAgentSelectorProps = {
-  id?: string;
-  className?: string;
-  style?: React.CSSProperties;
+.actionButton {
+  --ab-bg: #{colors.$white};
+  --ab-bg-hover: #{colors.$light-gray-hover};
+  --ab-bg-active: #{colors.$light-gray-selected};
+  --ab-color: #{colors.$light-blue-main};
 
-  onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
-  excludeItems?: (number | string | undefined)[];
-  setIsDataReady?: (value: boolean) => void;
+  display: inline-flex;
+  align-items: center;
 
-  withPadding?: boolean;
+  gap: 8px;
+  padding: 6px 10px;
 
-  onClose: () => void;
+  border: none;
+  border-radius: 6px;
 
-  disableBySecurity?: string;
-  externalInfoBarData?: TInfoBarData;
-} & TInitValue;
+  color: var(--ab-color);
+  background-color: var(--ab-bg);
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--ab-bg-hover);
+    }
+  }
+
+  &:active {
+    background-color: var(--ab-bg-active);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 12px;
+    height: 12px;
+    path {
+      fill: var(--ab-color);
+    }
+  }
+}
+

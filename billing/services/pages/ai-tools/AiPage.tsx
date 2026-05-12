@@ -161,7 +161,9 @@ const AiPage = (props: AiPageProps) => {
     changeServiceState(AI_ENUM);
 
     try {
-      const result = await paymentApi.changeTenantWalletServiceState(raw);
+      const result = await paymentApi.changeTenantWalletServiceState({
+        changeWalletServiceStateRequestDto: raw,
+      });
 
       if (!result) {
         toastr.error(t("UnexpectedError"));
@@ -188,7 +190,6 @@ const AiPage = (props: AiPageProps) => {
           }),
           <CommonTrans
             key="DisableAIToolsConfirmBalance"
-           
             i18nKey="DisableAIToolsConfirmBalance"
             values={{
               balance: formatAiServiceCurrency(
@@ -328,7 +329,6 @@ const AiPage = (props: AiPageProps) => {
         {aiServiceLastCreditAmount ? (
           <Text className={styles.lastTopUpLabel}>
             <CommonTrans
-             
               i18nKey="LastTopUp"
               components={{
                 1: (
@@ -411,4 +411,3 @@ const AiPage = (props: AiPageProps) => {
 };
 
 export default observer(AiPage);
-

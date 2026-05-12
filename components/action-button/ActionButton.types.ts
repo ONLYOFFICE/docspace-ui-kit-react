@@ -24,34 +24,21 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
-import type { TInfoBarData, TSelectorItem } from "../../components/selector";
-import type { WithFlag } from "../../types";
+import type { ElementType, ReactNode, ComponentPropsWithRef } from "react";
 
-export type TInitValue = WithFlag<
-  "withInit",
-  {
-    withInit: true;
-    initItems: FolderDtoInteger[];
-    initTotal: number;
-    initHasNextPage: boolean;
-    initSearchValue?: string;
-  }
->;
+type AsProp<C extends ElementType> = {
+  /** Renders as the given element or component. Defaults to `button`. */
+  as?: C;
+};
 
-export type AIAgentSelectorProps = {
-  id?: string;
+type ActionButtonOwnProps = {
+  /** Icon node rendered before the label text. */
+  icon?: ReactNode;
+  label?: ReactNode;
   className?: string;
-  style?: React.CSSProperties;
+};
 
-  onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
-  excludeItems?: (number | string | undefined)[];
-  setIsDataReady?: (value: boolean) => void;
-
-  withPadding?: boolean;
-
-  onClose: () => void;
-
-  disableBySecurity?: string;
-  externalInfoBarData?: TInfoBarData;
-} & TInitValue;
+export type ActionButtonProps<C extends ElementType = "button"> =
+  ActionButtonOwnProps &
+    AsProp<C> &
+    Omit<ComponentPropsWithRef<C>, keyof ActionButtonOwnProps | "as">;

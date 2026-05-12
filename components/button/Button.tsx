@@ -51,6 +51,7 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
     minWidth,
     filled,
     filledStroke,
+    accent,
     style,
     tooltipText,
     ...rest
@@ -64,6 +65,7 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
       [styles[size]]: size,
       [styles.filled]: filled,
       [styles.filledStroke]: filledStroke,
+      [styles.accent]: accent,
       [styles.isLoading]: isLoading,
       [styles.isHovered]: isHovered,
       [styles.isClicked]: isClicked,
@@ -116,7 +118,7 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
           {icon ? (
             <div className={classNames(styles.icon, "icon")}>{icon}</div>
           ) : null}
-          {label}
+          <span>{label}</span>
         </div>
       </button>
       {tooltipText ? (

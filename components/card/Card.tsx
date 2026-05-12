@@ -24,34 +24,36 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { FolderDtoInteger } from "@onlyoffice/docspace-api-sdk";
-import type { TInfoBarData, TSelectorItem } from "../../components/selector";
-import type { WithFlag } from "../../types";
+import classNames from "classnames";
 
-export type TInitValue = WithFlag<
-  "withInit",
-  {
-    withInit: true;
-    initItems: FolderDtoInteger[];
-    initTotal: number;
-    initHasNextPage: boolean;
-    initSearchValue?: string;
-  }
->;
+import styles from "./Card.module.scss";
+import type { CardProps } from "./Card.types";
 
-export type AIAgentSelectorProps = {
-  id?: string;
-  className?: string;
-  style?: React.CSSProperties;
+export const Card = ({
+  title,
+  extra,
+  children,
+  className,
+  style,
+  dataTestId,
+  footer,
+}: CardProps) => {
+  const hasHeader = title != null || extra != null;
 
-  onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
-  excludeItems?: (number | string | undefined)[];
-  setIsDataReady?: (value: boolean) => void;
-
-  withPadding?: boolean;
-
-  onClose: () => void;
-
-  disableBySecurity?: string;
-  externalInfoBarData?: TInfoBarData;
-} & TInitValue;
+  return (
+    <div
+      className={classNames(styles.container, className)}
+      style={style}
+      data-testid={dataTestId ?? "card"}
+    >
+      {hasHeader ? (
+        <header className={styles.header}>
+          {title ? <div className={styles.title}>{title}</div> : null}
+          {extra ? <div className={styles.extra}>{extra}</div> : null}
+        </header>
+      ) : null}
+      {children ? <div className={styles.body}>{children}</div> : null}
+      {footer ? <footer>{footer}</footer> : null}
+    </div>
+  );
+};
