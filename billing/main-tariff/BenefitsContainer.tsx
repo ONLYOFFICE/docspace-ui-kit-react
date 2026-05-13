@@ -36,7 +36,7 @@ import type { TTranslation } from "../../utils/common";
 import type { TenantQuotaFeatureDto } from "@onlyoffice/docspace-api-sdk";
 import { FREE_BACKUP } from "../constants";
 
-import HelpReactSvgUrl from "../../assets/help.react.svg?url";
+import HelpReactSvg from "../../assets/help.react.svg";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./MainTariff.module.scss";
@@ -54,11 +54,10 @@ const BenefitsContainer = observer(({ t }: { t: TTranslation }) => {
       <HelpButton
         className="payment-tooltip"
         offsetRight={0}
-        iconName={HelpReactSvgUrl}
+        iconNode={<HelpReactSvg />}
         tooltipContent={
           <CommonTrans
             i18nKey="NeedMoreGoToServices"
-           
             components={{
               1: (
                 <Link
@@ -84,7 +83,10 @@ const BenefitsContainer = observer(({ t }: { t: TTranslation }) => {
         Array.from(features.values()).map((item: TenantQuotaFeatureDto) => {
           if (!item.title || !item.image) return;
           return (
-            <div className={styles.paymentBenefits} key={item.title || item.image}>
+            <div
+              className={styles.paymentBenefits}
+              key={item.title || item.image}
+            >
               <div
                 // biome-ignore lint/security/noDangerouslySetInnerHtml: TODO fix
                 dangerouslySetInnerHTML={{ __html: item.image }}
@@ -102,4 +104,3 @@ const BenefitsContainer = observer(({ t }: { t: TTranslation }) => {
 });
 
 export default BenefitsContainer;
-

@@ -22,15 +22,15 @@
   color: var(--portal-popup-color-v);
 
   &.blue {
-    background-color: #{variables.$portal-blue};
+    background-color: var(--portal-popup-bg-blue, #{variables.$portal-blue});
   }
 
   &.purple {
-    background-color: #{variables.$portal-purple};
+    background-color: var(--portal-popup-bg-purple, #{variables.$portal-purple});
   }
 
   &.green {
-    background-color: #{variables.$portal-green};
+    background-color: var(--portal-popup-bg-green, #{variables.$portal-green});
   }
 
   &.top30 {

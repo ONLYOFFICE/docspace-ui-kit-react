@@ -54,7 +54,9 @@ import styles from "./FloatingButton.module.scss";
 
 const ICON_COMPONENTS = {
   [FloatingButtonIcons.upload]: <UploadIcon data-testid="icon-upload" />,
-  [FloatingButtonIcons.other]: <FileIcon data-testid="icon-other" />,
+  [FloatingButtonIcons.other]: (
+    <FileIcon className="icon-other" data-testid="icon-other" />
+  ),
   [FloatingButtonIcons.trash]: <TrashIcon data-testid="icon-trash" />,
   [FloatingButtonIcons.move]: <MoveIcon data-testid="icon-move" />,
   [FloatingButtonIcons.plus]: <PlusIcon data-testid="icon-plus" />,

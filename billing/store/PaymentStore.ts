@@ -224,9 +224,7 @@ class PaymentStore {
     subtractFromDate(now(), 4, "weeks") ?? now()
   ).setLocale(getCookie(LANGUAGE) ?? "en");
 
-  defaultFilterEndDate: DateTime = now().setLocale(
-    getCookie(LANGUAGE) ?? "en",
-  );
+  defaultFilterEndDate: DateTime = now().setLocale(getCookie(LANGUAGE) ?? "en");
 
   private _transactionTimerId: ReturnType<typeof setTimeout> | null = null;
 
@@ -566,7 +564,9 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getCustomerBalance(
-        isRefresh || undefined,
+        {
+          refresh: isRefresh || undefined,
+        },
         {
           signal: abortController.signal,
         },
@@ -651,18 +651,15 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getCustomerOperations(
-        0,
-        25,
-        serviceName,
-        this.formatDate(this.filterStartDate, "start"),
-        this.formatDate(this.filterEndDate, "end"),
-        this.filterContact?.id,
-        isCredit,
-        isDebit,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
+        {
+          offset: 0,
+          limit: 25,
+          serviceName,
+          startDate: this.formatDate(this.filterStartDate, "start"),
+          endDate: this.formatDate(this.filterEndDate, "end"),
+          credit: isCredit,
+          debit: isDebit,
+        },
         {
           signal: abortController.signal,
           params:
@@ -728,9 +725,14 @@ class PaymentStore {
     const backUrl = url || `${window.location.href}?complete=true`;
 
     try {
-      const res = await this.paymentApi.getCheckoutSetupUrl(backUrl, {
-        signal: abortController.signal,
-      });
+      const res = await this.paymentApi.getCheckoutSetupUrl(
+        {
+          backUrl,
+        },
+        {
+          signal: abortController.signal,
+        },
+      );
 
       if (!res?.data?.response) return;
 
@@ -744,11 +746,13 @@ class PaymentStore {
   updateAutoPayments = async () => {
     try {
       const res = await this.paymentApi.setTenantWalletSettings({
-        settings: {
-          enabled: this.isAutomaticPaymentsEnabled,
-          minBalance: +this.minBalance,
-          upToBalance: +this.upToBalance,
-          currency: this.walletCodeCurrency || "",
+        tenantWalletSettingsWrapper: {
+          settings: {
+            enabled: this.isAutomaticPaymentsEnabled,
+            minBalance: +this.minBalance,
+            upToBalance: +this.upToBalance,
+            currency: this.walletCodeCurrency || "",
+          },
         },
       });
 
@@ -844,7 +848,9 @@ class PaymentStore {
     this.addAbortController(abortController);
 
     const res = await this.paymentApi.getWalletService(
-      serviceName as unknown as TenantWalletService,
+      {
+        service: serviceName as unknown as TenantWalletService,
+      },
       { signal: abortController.signal },
     );
 
@@ -886,7 +892,9 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getPaymentUrl(
-        { quantity: { admin: managersCount }, backUrl },
+        {
+          paymentUrlRequestDto: { quantity: { admin: managersCount }, backUrl },
+        },
         { signal: abortController.signal },
       );
 
@@ -906,7 +914,12 @@ class PaymentStore {
 
     try {
       const res = await this.paymentApi.getPaymentUrl(
-        { quantity: { admin: this.managersCount }, backUrl },
+        {
+          paymentUrlRequestDto: {
+            quantity: { admin: this.managersCount },
+            backUrl,
+          },
+        },
         token ? { signal: token } : undefined,
       );
 
@@ -1254,9 +1267,11 @@ class PaymentStore {
   ) => {
     try {
       await this.paymentApi.sendPaymentRequest({
-        email,
-        userName,
-        message,
+        salesRequestsDto: {
+          email,
+          userName,
+          message,
+        },
       });
       toastr.success(t("SuccessfullySentMessage"));
     } catch (e) {
@@ -1266,4 +1281,3 @@ class PaymentStore {
 }
 
 export default PaymentStore;
-

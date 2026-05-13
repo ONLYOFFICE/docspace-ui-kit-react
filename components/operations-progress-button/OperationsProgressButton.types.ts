@@ -28,6 +28,7 @@ export interface Operation {
   id?: string;
   operation: string;
   label: string;
+  description?: string;
   alert: boolean;
   canceled?: boolean;
   completed: boolean;

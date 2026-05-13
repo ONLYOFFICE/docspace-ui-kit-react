@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { TGroupMenuItem } from "../Table.types";
 
@@ -366,6 +366,34 @@ export const Blocked: Story = {
   onClick={handleClick}
   withComboBox
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: (args: TableGroupMenuProps) => (
+    <div
+      style={
+        {
+          "--table-group-menu-checkbox-margin": "12px",
+        } as CSSProperties
+      }
+    >
+      <TableGroupMenu {...args} />
+    </div>
+  ),
+  args: {
+    ...Default.args,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--table-group-menu-checkbox-margin\` | \`margin-inline-start\` of the checkbox / label element on desktop | \`28px\` |`,
       },
     },
   },

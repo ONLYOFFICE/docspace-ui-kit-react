@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import type { CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { AsideHeader } from ".";
@@ -179,5 +180,52 @@ export const BackAndClose: Story = {
     header: "Navigation Header",
     isBackButton: true,
     isCloseable: true,
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          width: "450px",
+          border: "1px solid #eee",
+          "--aside-header-color": "#004f82",
+          "--aside-header-border": "#0082c9",
+          "--aside-header-font-size": "18px",
+          "--aside-header-height": "60px",
+          "--aside-header-margin": "0 20px",
+          "--aside-header-gap": "10px",
+          "--aside-header-justify": "center",
+          "--aside-header-title-position": "absolute",
+          "--aside-header-title-inset": "0",
+          "--aside-header-title-text-align": "center",
+        } as CSSProperties
+      }
+    >
+      <AsideHeader header="Customized Header" isCloseable />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--aside-header-color\` | Title text color | theme-based |
+| \`--aside-header-border\` | Bottom border color | theme-based |
+| \`--aside-header-height\` | Header height | \`53px\` |
+| \`--aside-header-font-size\` | Title font size | \`21px\` |
+| \`--aside-header-margin\` | Header horizontal margins | \`0 16px\` |
+| \`--aside-header-gap\` | Gap between header elements | \`6px\` |
+| \`--aside-header-justify\` | \`justify-content\` of the header row | \`space-between\` |
+| \`--aside-header-border-display\` | \`content\` of bottom border pseudo-element (\`""\` to hide, \`"normal"\` to show) | \`""\` |
+| \`--aside-header-title-position\` | \`position\` of the title element | \`static\` |
+| \`--aside-header-title-inset\` | \`inset-inline-start\` of the title | \`auto\` |
+| \`--aside-header-title-transform\` | \`transform\` of the title | \`none\` |
+| \`--aside-header-title-text-align\` | \`text-align\` of the title | \`start\` |`,
+      },
+    },
   },
 };

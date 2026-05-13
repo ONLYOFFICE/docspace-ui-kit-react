@@ -31,7 +31,8 @@ type PickedDivProps = Pick<
 
 type HeaderIcon = {
   key: string;
-  url: string;
+  url?: string;
+  iconNode?: React.ReactNode;
   onClick: () => void;
 };
 

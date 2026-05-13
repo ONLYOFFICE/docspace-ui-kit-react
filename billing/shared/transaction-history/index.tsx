@@ -330,13 +330,15 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 
     try {
       await paymentApi.createCustomerOperationsReport({
-        startDate: formatDate!(filterStartDate),
-        endDate: formatDate!(filterEndDate),
-        credit: isCredit,
-        debit: isDebit,
-        participantName: filterContact?.id,
-        serviceName,
-        ...(serviceName === AI_TOOLS ? { writeOffServiceQuota: true } : {}),
+        customerOperationsReportRequestDto: {
+          startDate: formatDate!(filterStartDate),
+          endDate: formatDate!(filterEndDate),
+          credit: isCredit,
+          debit: isDebit,
+          participantName: filterContact?.id,
+          serviceName,
+          ...(serviceName === AI_TOOLS ? { writeOffServiceQuota: true } : {}),
+        },
       });
 
       const result = await new Promise<TransactionHistoryReportResponse>(
@@ -634,4 +636,3 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 };
 
 export default observer(TransactionHistory);
-

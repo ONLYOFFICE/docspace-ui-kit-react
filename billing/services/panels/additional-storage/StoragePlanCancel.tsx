@@ -35,10 +35,7 @@ import {
 import { toastr } from "../../../../components/toast";
 import { useApi } from "../../../../providers";
 import { Button, ButtonSize } from "../../../../components/button";
-import {
-  calculateTotalPrice,
-  getConvertedSize,
-} from "../../../utils/common";
+import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
 import { Text } from "../../../../components/text";
 
 import { useServicesActions } from "../../hooks/useServicesActions";
@@ -86,8 +83,10 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
 
     try {
       const walletRes = await paymentApi.updateWalletPayment({
-        quantity: { storage: 0 },
-        productQuantityType: 0,
+        walletQuantityRequestDto: {
+          quantity: { storage: 0 },
+          productQuantityType: 0,
+        },
       });
       const res = walletRes?.data?.response;
 
@@ -130,7 +129,6 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
             <Text as="span">
               <CommonTrans
                 i18nKey="YourCurrentPlan"
-               
                 values={{
                   amount: `${currentStoragePlanSize} ${t("Gigabyte")}`,
                   price: formatWalletCurrency(totalPrice, 2),
@@ -144,7 +142,6 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
             <Text>
               <CommonTrans
                 i18nKey="StorageUsed"
-               
                 values={{
                   amount: getConvertedSize(t, usedTotalStorageSizeCount),
                 }}
@@ -180,4 +177,3 @@ const StoragePlanCancel: React.FC<StorageDialogProps> = ({
 };
 
 export default observer(StoragePlanCancel);
-

@@ -33,7 +33,7 @@ import { Button, ButtonSize } from "../../components/button";
 import { toastr } from "../../components/toast";
 import { HelpButton } from "../../components";
 
-import HelpReactSvgUrl from "../../assets/help.react.svg?url";
+import HelpReactSvg from "../../assets/help.react.svg";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { toAbsoluteUrl } from "../utils/url";
@@ -126,13 +126,15 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const renderTooltip = (
     <HelpButton
       className="payer-tooltip"
-      iconName={HelpReactSvgUrl}
+      iconNode={<HelpReactSvg />}
       style={{ height: "15px", margin: "0" }}
       tooltipContent={
         <>
           <Text isBold>{t("Payer")}</Text>
           <Text>
-            {t("PayerDescription", { productName: getBrandName("ProductName") })}
+            {t("PayerDescription", {
+              productName: getBrandName("ProductName"),
+            })}
           </Text>
         </>
       }
@@ -233,4 +235,3 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 };
 
 export default observer(PaymentMethod);
-

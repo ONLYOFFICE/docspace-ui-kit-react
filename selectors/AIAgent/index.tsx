@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 
 import InfoIconSvgUrl from "../../assets/info.outline.react.svg";
 import EmptyScreenAIAgentsSelectorLight from "../../assets/ai.agents.selector.light.react.svg";
@@ -74,6 +74,7 @@ const AIAgentSelectorComponent = ({
   initHasNextPage,
   initSearchValue,
   disableBySecurity,
+  externalInfoBarData,
 }: AIAgentSelectorProps) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
@@ -230,6 +231,19 @@ const AIAgentSelectorComponent = ({
     isSearchLoading: isFirstLoad && !searchValue && !afterSearch.current,
   };
 
+  const infoBarData = useMemo(() => {
+    if (externalInfoBarData) return externalInfoBarData;
+
+    return {
+      title: t("ChooseAIAgent", {
+        aiAgent: t("AIAgent"),
+      }),
+      icon: <InfoIconSvgUrl />,
+      onClose: () => setWithInfo((prev) => !prev),
+      description: t("ChooseAIAgentDescription"),
+    };
+  }, [externalInfoBarData, t, setWithInfo]);
+
   return (
     <Selector
       id={id}
@@ -284,15 +298,8 @@ const AIAgentSelectorComponent = ({
       dataTestId="ai_agent_selector"
       useAside
       onClose={onClose}
-      withInfoBar={withInfo}
-      infoBarData={{
-        title: t("ChooseAIAgent", {
-          aiAgent: t("AIAgent"),
-        }),
-        icon: <InfoIconSvgUrl />,
-        onClose: () => setWithInfo(!withInfo),
-        description: t("ChooseAIAgentDescription"),
-      }}
+      withInfoBar={Boolean(externalInfoBarData) || withInfo}
+      infoBarData={infoBarData}
       hideBackButton
     />
   );

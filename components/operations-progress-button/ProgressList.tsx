@@ -79,6 +79,7 @@ const getIcon = (icon: string): React.ReactNode => {
     case OPERATIONS_NAME.move:
       return <MoveIcon />;
     case OPERATIONS_NAME.upload:
+    case OPERATIONS_NAME.syncDatabase:
       return <UploadIcon />;
     case OPERATIONS_NAME.trash:
     case OPERATIONS_NAME.deleteVersionFile:
@@ -117,17 +118,23 @@ const ProgressList = ({
       {operations.map((item) => {
         const operationId = item.items?.[0]?.operationId;
         return (
-          <div key={getOperationKey(item)} className="progress-list">
+          <div
+            key={getOperationKey(item)}
+            className={`progress-list ${item.showPanel ? "withHover" : ""}`}
+          >
             <ProgressBar
               completed={item.completed}
-              stopped={item.stopped}
               label={item.label}
               alert={item.alert}
               open
               icon={getIcon(item.operation)}
-              onClickAction={() => {}}
-              withoutProgress={item.completed}
-              percent={item.percent}
+              onOpenPanel={() => {
+                if (item.showPanel) {
+                  item.showPanel(true);
+                  onOpenPanel();
+                }
+              }}
+              withoutProgress
               onClearProgress={(operationId, operation) =>
                 clearOperationsData?.(operationId, operation, item)
               }
@@ -155,7 +162,6 @@ const ProgressList = ({
             percent={item.percent}
             open
             icon={getIcon(item.operation)}
-            onClickAction={() => {}}
             onClearProgress={clearPanelOperationsData}
             operation={item.operation}
             onCancel={onCancel}
@@ -170,3 +176,4 @@ const ProgressList = ({
 };
 
 export default ProgressList;
+

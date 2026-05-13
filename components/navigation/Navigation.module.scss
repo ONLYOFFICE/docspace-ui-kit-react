@@ -51,15 +51,15 @@
 
 :global(.light) {
   :local {
-    .controlButtonContainer, 
-    .heading, 
-    .titleBlockBadge, 
-    .expanderIcon, 
-    .arrowIcon, 
-    .warningText, 
-    .infoPanelToggleWrapper, 
-    .box, 
-    .container, 
+    .controlButtonContainer,
+    .heading,
+    .titleBlockBadge,
+    .expanderIcon,
+    .arrowIcon,
+    .warningText,
+    .infoPanelToggleWrapper,
+    .box,
+    .container,
     .chatButton {
       --section-header-trash-erasure-label-background: #{colors.$gray-light};
       --section-header-trash-erasure-label-text: #{colors.$gray-text};
@@ -87,15 +87,15 @@
 
 :global(.dark) {
   :local {
-    .controlButtonContainer, 
-    .heading, 
-    .titleBlockBadge, 
-    .expanderIcon, 
-    .arrowIcon, 
-    .warningText, 
-    .infoPanelToggleWrapper, 
-    .box, 
-    .container, 
+    .controlButtonContainer,
+    .heading,
+    .titleBlockBadge,
+    .expanderIcon,
+    .arrowIcon,
+    .warningText,
+    .infoPanelToggleWrapper,
+    .box,
+    .container,
     .chatButton {
       --section-header-trash-erasure-label-background: #{colors.$dark-gray-light};
       --section-header-trash-erasure-label-text: #{colors.$dark-gray-dark};
@@ -111,8 +111,8 @@
         var(--accent-main, #{colors.$light-second-main});
       --navigation-guid-animation-icon-color: var(
         --accent-main,
-      #{colors.$light-second-main}
-    );
+        #{colors.$light-second-main}
+      );
       --navigation-header-icon-fill: #{colors.$dark-gray-dark};
       --navigation-lifetime-enabled-fill: none;
       --navigation-lifetime-enabled-stroke: #{colors.$main-red};
@@ -126,7 +126,8 @@
   align-items: center;
   gap: 16px;
   height: 32px;
-  min-width: 0;
+  min-width: 90px;
+  overflow: hidden;
 
   &[data-show-title="true"] {
     margin-inline-start: 16px;
@@ -223,10 +224,12 @@
 }
 
 .heading {
-  // bridge vars — bind public overrides to internal theme tokens / hardcoded values
   --navigation-heading-weight-v: var(--navigation-heading-weight, 700);
   --navigation-heading-size-v: var(--navigation-heading-size, 18px);
-  --navigation-title-color-v: var(--navigation-title-color, var(--navigation-root-folder-title-color));
+  --navigation-title-color-v: var(
+    --navigation-title-color,
+    var(--navigation-root-folder-title-color)
+  );
 
   font-weight: var(--navigation-heading-weight-v) !important;
   font-size: var(--navigation-heading-size-v) !important;
@@ -270,9 +273,14 @@
 }
 
 .titleBlockBadge {
-  // bridge vars
-  --navigation-badge-fill-v: var(--navigation-badge-fill, var(--navigation-header-icon-fill));
-  --navigation-title-color-v: var(--navigation-title-color, var(--navigation-root-folder-title-color));
+  --navigation-badge-fill-v: var(
+    --navigation-badge-fill,
+    var(--navigation-header-icon-fill)
+  );
+  --navigation-title-color-v: var(
+    --navigation-title-color,
+    var(--navigation-root-folder-title-color)
+  );
 
   margin-inline-start: 8px;
 
@@ -288,8 +296,10 @@
 }
 
 .expanderIcon {
-  // bridge var
-  --navigation-expander-fill-v: var(--navigation-expander-fill, var(--navigation-expander-color));
+  --navigation-expander-fill-v: var(
+    --navigation-expander-fill,
+    var(--navigation-expander-color)
+  );
 
   min-width: 8px !important;
   width: 8px !important;
@@ -308,8 +318,10 @@
 }
 
 .arrowIcon {
-  // bridge var
-  --navigation-arrow-fill-v: var(--navigation-arrow-fill, var(--navigation-root-folder-title-color));
+  --navigation-arrow-fill-v: var(
+    --navigation-arrow-fill,
+    var(--navigation-root-folder-title-color)
+  );
 
   height: 12px;
   min-width: 12px;
@@ -328,8 +340,14 @@
 
 .warningText {
   // bridge vars
-  --navigation-warning-bg-v: var(--navigation-warning-bg, var(--section-header-trash-erasure-label-background));
-  --navigation-warning-text-v: var(--navigation-warning-text, var(--section-header-trash-erasure-label-text));
+  --navigation-warning-bg-v: var(
+    --navigation-warning-bg,
+    var(--section-header-trash-erasure-label-background)
+  );
+  --navigation-warning-text-v: var(
+    --navigation-warning-text,
+    var(--section-header-trash-erasure-label-text)
+  );
   --navigation-warning-radius-v: var(--navigation-warning-radius, 6px);
 
   @include mixins.no-user-select;
@@ -371,6 +389,10 @@
   align-items: center;
   justify-content: flex-end;
   margin-inline-start: auto;
+
+  // &:empty {
+  //   display: none;
+  // }
 
   @include mixins.tablet-and-below {
     flex-direction: row-reverse;
@@ -425,11 +447,13 @@
 
 .infoPanelToggleWrapper {
   // bridge var
-  --navigation-info-panel-bg-v: var(--navigation-info-panel-bg, var(--background-and-substrate-color));
+  --navigation-info-panel-bg-v: var(
+    --navigation-info-panel-bg,
+    var(--background-and-substrate-color)
+  );
 
   align-self: center;
   margin-inline-start: 20px;
-  margin-bottom: 1px;
   padding: 0;
 
   :global {
@@ -477,8 +501,14 @@
 
 .box {
   // bridge vars
-  --navigation-dropdown-bg-v: var(--navigation-dropdown-bg, var(--navigation-background));
-  --navigation-dropdown-shadow-v: var(--navigation-dropdown-shadow, var(--navigation-box-shadow));
+  --navigation-dropdown-bg-v: var(
+    --navigation-dropdown-bg,
+    var(--navigation-background)
+  );
+  --navigation-dropdown-shadow-v: var(
+    --navigation-dropdown-shadow,
+    var(--navigation-box-shadow)
+  );
   --navigation-dropdown-radius-v: var(--navigation-dropdown-radius, 6px);
 
   position: absolute;
@@ -492,7 +522,8 @@
   flex-direction: column;
   background: var(--navigation-dropdown-bg-v);
   box-shadow: var(--navigation-dropdown-shadow-v);
-  border-radius: 0px 0px var(--navigation-dropdown-radius-v) var(--navigation-dropdown-radius-v);
+  border-radius: 0px 0px var(--navigation-dropdown-radius-v)
+    var(--navigation-dropdown-radius-v);
 
   height: var(--drop-box-height, "fit-content");
   max-height: calc(100vh - 48px);
@@ -669,7 +700,8 @@
     .navigation-header-separator {
       display: block;
       padding-inline-start: 16px;
-      border-inline-end: 1px solid var(--navigation-separator, var(--navigation-icon-stroke));
+      border-inline-end: 1px solid
+        var(--navigation-separator, var(--navigation-icon-stroke));
       height: 21px;
     }
 
@@ -774,7 +806,10 @@
 
 .chatButton {
   // bridge vars
-  --navigation-chat-open-bg-v: var(--navigation-chat-open-bg, var(--chat-button-open-background-color));
+  --navigation-chat-open-bg-v: var(
+    --navigation-chat-open-bg,
+    var(--chat-button-open-background-color)
+  );
   --navigation-chat-radius-v: var(--navigation-chat-radius, 6px);
 
   display: flex;

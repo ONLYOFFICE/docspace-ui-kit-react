@@ -225,9 +225,14 @@ class CurrentTariffStatusStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.portalQuotaApi.getPortalTariff(isRefresh, {
-        signal: abortController.signal,
-      });
+      const res = await this.portalQuotaApi.getPortalTariff(
+        {
+          refresh: isRefresh,
+        },
+        {
+          signal: abortController.signal,
+        },
+      );
 
       if (!res?.data?.response) return;
 
@@ -266,7 +271,9 @@ class CurrentTariffStatusStore {
 
     try {
       const res = await this.paymentApi.getCustomerInfo(
-        isRefresh || undefined,
+        {
+          refresh: isRefresh || undefined,
+        },
         {
           signal: abortController.signal,
         },
@@ -282,6 +289,8 @@ class CurrentTariffStatusStore {
         email: info.email ?? null,
         payer: info.payer,
       };
+
+      return this.payerInfo;
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -290,4 +299,3 @@ class CurrentTariffStatusStore {
 }
 
 export default CurrentTariffStatusStore;
-

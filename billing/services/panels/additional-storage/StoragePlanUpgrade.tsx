@@ -284,8 +284,10 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
       try {
         const walletRes = await paymentApi.updateWalletPayment({
-          quantity: value !== null ? { storage: value } : null,
-          productQuantityType: productType,
+          walletQuantityRequestDto: {
+            quantity: value !== null ? { storage: value } : null,
+            productQuantityType: productType,
+          },
         });
         const res = walletRes?.data?.response;
 
@@ -496,4 +498,3 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 };
 
 export default observer(StoragePlanUpgrade);
-

@@ -33,7 +33,7 @@ import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 import { Avatar, AvatarRole, AvatarSize } from "../../../components/avatar";
 import { toastr } from "../../../components/toast";
-import DefaultUserPhoto from "../../../assets/default_user_photo_size_82-82.png?url";
+
 import { Link, LinkTarget } from "../../../components/link";
 import { useState } from "react";
 import { Loader, LoaderTypes } from "../../../components/loader";
@@ -210,9 +210,9 @@ const PayerInformation = () => {
   };
 
   const avatarSource = payerInfo
-    ? ((payerInfo.hasAvatar && payerInfo.avatar
+    ? (payerInfo.hasAvatar && payerInfo.avatar
         ? `${baseUrl}${payerInfo.avatar}`
-        : DefaultUserPhoto) ?? undefined)
+        : "default_user_photo")
     : undefined;
 
   return (

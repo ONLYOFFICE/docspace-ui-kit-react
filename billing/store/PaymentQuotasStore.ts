@@ -112,9 +112,14 @@ class PaymentQuotasStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getPaymentQuotas(false, {
-        signal: abortController.signal,
-      });
+      const res = await this.paymentApi.getPaymentQuotas(
+        {
+          wallet: false,
+        },
+        {
+          signal: abortController.signal,
+        },
+      );
 
       if (!res?.data?.response) return;
 
@@ -173,4 +178,3 @@ class PaymentQuotasStore {
 }
 
 export default PaymentQuotasStore;
-

@@ -86,6 +86,7 @@ const Navigation = ({
   isPlusButtonVisible,
   showBackButton,
   contextMenuHeader,
+  analyzeResponsesButton,
 
   ...rest
 }: TNavigationProps) => {
@@ -334,6 +335,7 @@ const Navigation = ({
               isContextButtonVisible={isContextButtonVisible}
               isPlusButtonVisible={isPlusButtonVisible}
               contextMenuHeader={contextMenuHeader}
+              analyzeResponsesButton={analyzeResponsesButton}
             />
           </div>
 
