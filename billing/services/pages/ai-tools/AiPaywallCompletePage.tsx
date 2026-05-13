@@ -37,11 +37,7 @@ import CheckIcon from "../../../../assets/check.react.svg";
 import DangerIcon from "../../../../assets/danger.toast.react.svg";
 import InfoIcon from "../../../../assets/info.outline.react.svg";
 
-import {
-  AI_TOOLS,
-  AI_PAYWALL_START_AMOUNT,
-  AI_PAYWALL_COMPLETE_MESSAGE,
-} from "../../../constants";
+import { AI_TOOLS, AI_PAYWALL_START_AMOUNT } from "../../../constants";
 import { formatCurrencyValue } from "../../../utils/common";
 
 import styles from "./AiPaywallCompletePage.module.scss";

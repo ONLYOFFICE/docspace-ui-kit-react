@@ -40,7 +40,7 @@ import PricingBillingBody from "../../panels/ai-service/PricingBillingBody";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import { toAbsoluteUrl } from "../../../utils/url";
-import { AI_PAYWALL_START_AMOUNT, AI_TOOLS } from "../../../constants";
+import { AI_PAYWALL_START_AMOUNT, AI_TOOLS, AI_ENUM } from "../../../constants";
 
 import AiPageLoader from "./AiPageLoader";
 import styles from "./AiPaywallPage.module.scss";
@@ -54,7 +54,9 @@ const PRESET_AMOUNTS = [AI_PAYWALL_START_AMOUNT, 50, 100];
 const POLL_INTERVAL_MS = 3000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 const ANIMATION_STEP_MS = 80;
+const ANIMATION_TARGET_TICKS = 25;
 const POST_ANIMATION_HOLD_MS = 500;
+const COMPLETED_READ_DELAY_MS = 1500;
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
@@ -75,7 +77,7 @@ const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
     aiPaywallInit,
   } = servicesStore;
 
-  type WaitingPhase = "idle" | "payment" | "topup";
+  type WaitingPhase = "idle" | "payment" | "topup" | "completed";
 
   const [isPricingBillingVisible, setIsPricingBillingVisible] = useState(false);
   const [waitingPhase, setWaitingPhase] = useState<WaitingPhase>("idle");
@@ -87,7 +89,29 @@ const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
 
   useEffect(() => {
     isMountedRef.current = true;
-    aiPaywallInit(t);
+
+    (async () => {
+      await aiPaywallInit(t);
+
+      if (!isMountedRef.current) return;
+
+      if (servicesStore.wasFirstAiServiceTopUp) {
+        setWaitingPhase("completed");
+        try {
+          await sleep(COMPLETED_READ_DELAY_MS);
+          if (!isMountedRef.current) return;
+          await servicesStore.initServiceData(
+            t,
+            AI_TOOLS,
+            AI_ENUM,
+            integrationUrl,
+          );
+        } catch (e) {
+          console.error("[ai-paywall] initServiceData failed", e);
+        }
+      }
+    })();
+
     return () => {
       isMountedRef.current = false;
     };
@@ -133,12 +157,18 @@ const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
 
   const animateBalanceTo = async (target: number) => {
     const intTarget = Math.floor(target);
+    const step = Math.max(1, Math.ceil(intTarget / ANIMATION_TARGET_TICKS));
+
     setAnimatedBalance(0);
-    for (let current = 1; current <= intTarget; current += 1) {
+
+    let current = 0;
+    while (current < intTarget) {
       if (!isMountedRef.current) return;
+      current = Math.min(current + step, intTarget);
       setAnimatedBalance(current);
       await sleep(ANIMATION_STEP_MS);
     }
+
     if (isMountedRef.current) setAnimatedBalance(target);
   };
 
@@ -177,10 +207,15 @@ const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
 
       await animateBalanceTo(balanceValue);
 
+      await sleep(POST_ANIMATION_HOLD_MS);
+
+      setWaitingPhase("completed");
+
+      await sleep(COMPLETED_READ_DELAY_MS);
+
       if (!isMountedRef.current) return;
 
-      await sleep(POST_ANIMATION_HOLD_MS);
-      await servicesStore.fetchAiServiceBalance();
+      await servicesStore.initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
     } catch (e) {
       console.error("[ai-paywall] onEnableAI flow failed", e);
       if (isMountedRef.current) {
@@ -211,60 +246,78 @@ const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
           lineHeight="24px"
           className={styles.heroTitle}
         >
-          {t("AIPaywallHeroTitle", { price: START_AMOUNT })}
+          {waitingPhase === "completed"
+            ? t("AIPaywallHeroTitleCompleted")
+            : t("AIPaywallHeroTitle", { price: START_AMOUNT })}
         </Text>
       </div>
 
       <div className={styles.balanceSection}>
         <div className={styles.balanceCard}>
-          <BalanceAmount
-            amount={balanceToShow}
-            currency={aiServiceCodeCurrency || "USD"}
-            withoutMargin
-            showRefresh={false}
-          />
+          {waitingPhase === "completed" ? null : (
+            <BalanceAmount
+              amount={balanceToShow}
+              currency={aiServiceCodeCurrency || "USD"}
+              maximumFractionDigits={2}
+              withoutMargin
+              showRefresh={false}
+            />
+          )}
 
-          <div className={styles.amountChips} role="radiogroup">
-            {PRESET_AMOUNTS.map((amount) => {
-              const isSelected = amount === selectedAmount;
-              return (
-                <button
-                  key={amount}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  className={`${styles.amountChip} ${
-                    isSelected ? styles.amountChipSelected : ""
-                  }`}
-                  disabled={isWaiting}
-                  onClick={() => setSelectedAmount(amount)}
-                >
-                  ${amount}
-                </button>
-              );
-            })}
-          </div>
+          {waitingPhase === "completed" ? (
+            <div className={styles.completedBlock} role="status">
+              <div className={styles.completedBadge} aria-hidden="true" />
+              <Text fontSize="14px" fontWeight={600}>
+                {t("AIPaywallCompletedTitle")}
+              </Text>
+              <Text fontSize="12px" className={styles.completedHint}>
+                {t("AIPaywallCompletedHint")}
+              </Text>
+            </div>
+          ) : (
+            <>
+              <div className={styles.amountChips} role="radiogroup">
+                {PRESET_AMOUNTS.map((amount) => {
+                  const isSelected = amount === selectedAmount;
+                  return (
+                    <button
+                      key={amount}
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
+                      className={`${styles.amountChip} ${
+                        isSelected ? styles.amountChipSelected : ""
+                      }`}
+                      disabled={isWaiting}
+                      onClick={() => setSelectedAmount(amount)}
+                    >
+                      ${amount}
+                    </button>
+                  );
+                })}
+              </div>
 
-          <Button
-            size={ButtonSize.small}
-            primary
-            label={
-              waitingPhase === "payment"
-                ? t("AIPaywallWaitingPayment")
-                : waitingPhase === "topup"
-                  ? t("AIPaywallWaitingTopUp")
-                  : t("AIPaywallEnableButton", { price: selectedAmount })
-            }
-            onClick={onEnableAI}
-            scale
-            // isLoading={isWaiting}
-            isDisabled={isWaiting}
-            testId="enable_ai_button"
-          />
+              <Button
+                size={ButtonSize.small}
+                primary
+                label={
+                  waitingPhase === "payment"
+                    ? t("AIPaywallWaitingPayment")
+                    : waitingPhase === "topup"
+                      ? t("AIPaywallWaitingTopUp")
+                      : t("AIPaywallEnableButton", { price: selectedAmount })
+                }
+                onClick={onEnableAI}
+                scale
+                isDisabled={isWaiting}
+                testId="enable_ai_button"
+              />
 
-          <Text fontSize="12px" className={styles.secureNote}>
-            {t("AIPaywallSecureNote")}
-          </Text>
+              <Text fontSize="12px" className={styles.secureNote}>
+                {t("AIPaywallSecureNote")}
+              </Text>
+            </>
+          )}
         </div>
       </div>
 

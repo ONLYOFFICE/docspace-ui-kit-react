@@ -67,10 +67,12 @@ type AiPageProps = {
   currentDeviceType?: string;
   getAIConfig?: () => Promise<void>;
   integrationUrl?: string;
+  withoutWallet?: boolean;
 };
 
 const AiPage = (props: AiPageProps) => {
-  const { currentDeviceType, getAIConfig, integrationUrl } = props;
+  const { currentDeviceType, getAIConfig, integrationUrl, withoutWallet } =
+    props;
 
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
@@ -114,7 +116,9 @@ const AiPage = (props: AiPageProps) => {
   // const navigate = useNavigate();
 
   useEffect(() => {
-    initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
+    if (!isInitServicesData) {
+      initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
+    }
   }, []);
 
   // useEffect(() => {
@@ -294,7 +298,9 @@ const AiPage = (props: AiPageProps) => {
           isDisabled={isDisabled}
         />
 
-        <WalletInfo shortView withoutBackground balance={balance} />
+        {withoutWallet ? null : (
+          <WalletInfo shortView withoutBackground balance={balance} />
+        )}
 
         {isAiToolsServiceOn && isAiServiceLowBalance ? (
           <Text fontSize="15px" fontWeight={600} className={styles.lowBalance}>
