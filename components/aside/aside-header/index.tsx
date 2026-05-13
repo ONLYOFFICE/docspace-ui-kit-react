@@ -113,6 +113,7 @@ const AsideHeader = (props: AsideHeaderProps) => {
               size={17}
               className={styles.closeButton}
               iconName={item.url}
+              iconNode={item.iconNode}
               onClick={item.onClick}
               isClickable
               isFill
