@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import DefaultUserPhoto from "../../assets/default_user_photo_size_82-82.png";
+
 import EmptyScreenPersonsLight from "../../assets/emptyFilter/empty.filter.people.light.svg";
 import EmptyScreenPersonsDark from "../../assets/emptyFilter/empty.filter.people.dark.svg";
 
@@ -59,7 +59,7 @@ import { useCommonTranslation } from "../../utils/i18n";
 import { getUserAvatarRoleByType, getUserType } from "../../utils/common";
 import { Text } from "../../components/text";
 import { globalColors } from "../../providers/theme";
-import { isNextImage } from "../../utils/typeGuards";
+
 import { toastr } from "../../components/toast";
 import { useTheme } from "../../context/ThemeContext";
 
@@ -106,11 +106,7 @@ const toListItem = (
 
     const role = getUserType(item);
 
-    const defaultUserPhotoURL = isNextImage(DefaultUserPhoto)
-      ? DefaultUserPhoto.src
-      : DefaultUserPhoto;
-
-    const avatarPath = hasAvatar && avatar ? avatar : defaultUserPhotoURL;
+    const avatarPath = hasAvatar && avatar ? avatar : "default_user_photo";
     const userAvatar =
       typeof avatarPath === "string" && avatarPath.startsWith("/")
         ? `${baseUrl}${avatarPath}`

@@ -4,7 +4,7 @@ import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 import { Text } from "../../../../components/text";
 import { HelpButton } from "../../../../components/help-button";
-import HelpReactSvgUrl from "../../../../assets/help.react.svg?url";
+import HelpReactSvg from "../../../../assets/help.react.svg";
 import InputTokensIcon from "../../../../assets/icons/16/input-tokens.svg";
 import OutputTokensIcon from "../../../../assets/icons/16/output-tokens.svg";
 
@@ -77,12 +77,11 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                 {t("AIPricingTokensTitle")}
               </Text>
               <HelpButton
-                iconName={HelpReactSvgUrl}
+                iconNode={<HelpReactSvg />}
                 style={{ height: "15px", margin: "0" }}
                 tooltipContent={
                   <>
                     <CommonTrans
-                     
                       i18nKey="AIPricingTokensTooltipInput"
                       components={{
                         1: <strong />,
@@ -90,7 +89,6 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                     />
                     <br />
                     <CommonTrans
-                     
                       i18nKey="AIPricingTokensTooltipOutput"
                       components={{
                         1: <strong />,
@@ -109,7 +107,6 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                 </div>
                 <Text fontSize="12px" fontWeight="600">
                   <CommonTrans
-                   
                     i18nKey="AIPricingInputTokensPrice"
                     components={{
                       1: (
@@ -133,7 +130,6 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                 </div>
                 <Text fontSize="12px" fontWeight="600">
                   <CommonTrans
-                   
                     i18nKey="AIPricingOutputTokensPrice"
                     components={{
                       1: (
@@ -155,7 +151,6 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
 
             <Text className={styles.payForItemTextMuted}>
               <CommonTrans
-               
                 i18nKey="AIPricingFeeNoteUsage"
                 components={{
                   1: (
@@ -179,12 +174,11 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                 {t("AIPricingAdditionalFeaturesTitle")}
               </Text>
               <HelpButton
-                iconName={HelpReactSvgUrl}
+                iconNode={<HelpReactSvg />}
                 style={{ height: "15px", margin: "0" }}
                 tooltipContent={
                   <>
                     <CommonTrans
-                     
                       i18nKey="AIPricingAdditionalTooltipVectorization"
                       components={{
                         1: <strong />,
@@ -192,7 +186,6 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                     />
                     <br />
                     <CommonTrans
-                     
                       i18nKey="AIPricingAdditionalTooltipWebSearch"
                       components={{
                         1: <strong />,
@@ -200,7 +193,6 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                     />
                     <br />
                     <CommonTrans
-                     
                       i18nKey="AIPricingAdditionalTooltipWebCrawling"
                       components={{
                         1: <strong />,
@@ -236,7 +228,6 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                   <Text className={styles.pricingRowPrice}>
                     <Text fontWeight="600" as="span">
                       <CommonTrans
-                       
                         i18nKey="AIPricingPricePerTokens"
                         components={{
                           1: (
@@ -280,7 +271,6 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
                     </div>
                     <Text fontSize="12px" fontWeight="600">
                       <CommonTrans
-                       
                         i18nKey="AIPricingPricePerRequest"
                         components={{
                           1: (
@@ -312,7 +302,6 @@ const PricingBillingBody: React.FC<PricingBillingBodyProps> = ({
 
             <Text className={styles.payForItemTextMuted}>
               <CommonTrans
-               
                 i18nKey="AIPricingFeeNoteUsage"
                 components={{
                   1: (
