@@ -392,9 +392,9 @@ describe("<NavMenu />", () => {
       );
     });
 
-    it("flattens sub-items into the top-level list when iconOnly", () => {
-      render(<NavMenu groups={groups} iconOnly />);
-      // Parent and its children all render as siblings, without an expand step.
+    it("flattens sub-items of the active parent into the top-level list when iconOnly", () => {
+      render(<NavMenu groups={groups} iconOnly activeItemId="ai-files" />);
+      // Active parent and its children render as siblings, without an expand step.
       expect(
         screen.getByRole("button", { name: "AI Files" }),
       ).toBeInTheDocument();
@@ -404,6 +404,28 @@ describe("<NavMenu />", () => {
       expect(
         screen.getByRole("button", { name: "Favorites" }),
       ).toBeInTheDocument();
+      // Non-active parent's children are not flattened.
+      expect(
+        screen.queryByRole("button", { name: "Recent" }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("flattens sub-items when active item is a child (sibling active)", () => {
+      render(<NavMenu groups={groups} iconOnly activeItemId="shared" />);
+      // Parent whose child is active gets its children flattened.
+      expect(
+        screen.getByRole("button", { name: "AI Files" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Shared with me" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Favorites" }),
+      ).toBeInTheDocument();
+      // Other parent's children are not shown.
+      expect(
+        screen.queryByRole("button", { name: "Recent" }),
+      ).not.toBeInTheDocument();
     });
 
     it("invokes sub-item onClick directly when iconOnly (no expand step)", async () => {
@@ -422,7 +444,7 @@ describe("<NavMenu />", () => {
           ],
         },
       ];
-      render(<NavMenu groups={groupsFlat} iconOnly />);
+      render(<NavMenu groups={groupsFlat} iconOnly activeItemId="parent" />);
       await userEvent.click(screen.getByRole("button", { name: "Child" }));
       expect(subOnClick).toHaveBeenCalledOnce();
     });

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useState, useEffect } from "react";
 import { ReactSVG } from "react-svg";
 import classNames from "classnames";
 
@@ -259,6 +259,22 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       defaultExpandedId ?? null,
     );
 
+    // Keep the parent item expanded whenever the active item changes.
+    // Needed when navigation happens outside the menu (URL change, page load).
+    useEffect(() => {
+      if (!activeItemId) return;
+      const allItems = groups.flatMap((g) => g.items);
+      const parent = allItems.find((item) =>
+        item.children?.some((sub) => sub.id === activeItemId),
+      );
+      if (parent) setExpandedId(parent.id);
+      else if (allItems.some((item) => item.id === activeItemId)) {
+        // Active item is a top-level item — expand it if it has children.
+        const item = allItems.find((i) => i.id === activeItemId);
+        if (item?.children?.length) setExpandedId(item.id);
+      }
+    }, [activeItemId, groups]);
+
     const handleItemClick = (item: NavMenuItem) => {
       item.onClick?.(item);
       if (!iconOnly && item.children?.length) {
@@ -274,22 +290,28 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       subItem.onClick?.(subItem);
     };
 
-    // When iconOnly, flatten parent + children into a single icon-tile list so
-    // previously-nested sub-items remain reachable without an expand affordance.
+    // When iconOnly, flatten only the active parent's children into the list
+    // so the collapsed sidebar shows the active section's sub-items without
+    // exposing all other groups' children.
     const flatten = (items: NavMenuItem[]): NavMenuItem[] => {
       if (!iconOnly) return items;
       const flat: NavMenuItem[] = [];
       for (const item of items) {
         flat.push({ ...item, children: undefined });
-        for (const sub of item.children ?? []) {
-          flat.push({
-            id: sub.id,
-            label: sub.label,
-            icon: sub.icon,
-            iconNode: sub.iconNode,
-            onClick: sub.onClick ? () => sub.onClick?.(sub) : undefined,
-            linkData: sub.linkData,
-          });
+        const isActiveParent =
+          item.id === activeItemId ||
+          item.children?.some((sub) => sub.id === activeItemId);
+        if (isActiveParent) {
+          for (const sub of item.children ?? []) {
+            flat.push({
+              id: sub.id,
+              label: sub.label,
+              icon: sub.icon,
+              iconNode: sub.iconNode,
+              onClick: sub.onClick ? () => sub.onClick?.(sub) : undefined,
+              linkData: sub.linkData,
+            });
+          }
         }
       }
       return flat;

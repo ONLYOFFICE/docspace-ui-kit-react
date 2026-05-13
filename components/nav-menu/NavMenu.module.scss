@@ -25,6 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 @use "../../styles/variables/colors";
+@use "../../styles/mixins";
 
 :global(.light) {
   :local {
@@ -398,11 +399,14 @@
     padding: 0;
     gap: 0;
 
-    .itemIcon > div,
-    .itemIcon svg,
-    .nodeIcon {
-      width: 20px;
-      height: 20px;
+    // Icons grow to 20px only on tablet and below; desktop keeps 16px.
+    @include mixins.tablet-and-below {
+      .itemIcon > div,
+      .itemIcon svg,
+      .nodeIcon {
+        width: 20px;
+        height: 20px;
+      }
     }
   }
 }
