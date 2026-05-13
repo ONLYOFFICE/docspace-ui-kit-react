@@ -63,7 +63,8 @@ export type THeaderBackButton =
 
 export type TInfoBarData = {
   title: string;
-  description: string;
+  description: React.ReactNode;
+  className?: string;
   icon?: string | React.ReactElement;
   onClose?: VoidFunction;
 };

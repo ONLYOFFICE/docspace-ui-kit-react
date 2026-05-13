@@ -122,15 +122,11 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       const pageCount = 100;
       setIsNextPageLoading(true);
 
-      const res = await groupApi.getGroups(
-        undefined,
-        undefined,
-        pageCount,
+      const res = await groupApi.getGroups({
+        count: pageCount,
         startIndex,
-        undefined,
-        undefined,
-        searchValue,
-      );
+        filterValue: searchValue,
+      });
 
       const items = res.data.response ?? [];
       const total = res.data.count ?? 0;

@@ -398,6 +398,8 @@ export type TFile = {
   editingBy?: Record<string, string>;
   activeEditors?: Record<string, string>;
   isFillingPreparing?: boolean;
+  resultsFolderId?: number;
+  externalDbTableName?: string;
 };
 
 export type TPathParts = {
@@ -449,6 +451,7 @@ export type TFolder = {
   sharedForUser?: boolean;
   isLinkExpired?: boolean;
   external?: boolean;
+  originalFormId?: number;
 };
 
 export type TSortOrder = "descending" | "ascending";

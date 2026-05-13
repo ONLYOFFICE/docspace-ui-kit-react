@@ -45,14 +45,26 @@
     opacity: 1;
     background-image:
       linear-gradient(
-        var(--floating-circle-button-background, var(--color-scheme-main-accent)),
-        var(--floating-circle-button-background, var(--color-scheme-main-accent))
+        var(
+          --floating-circle-button-background,
+          var(--color-scheme-main-accent)
+        ),
+        var(
+          --floating-circle-button-background,
+          var(--color-scheme-main-accent)
+        )
       ),
       conic-gradient(
         from 0.25turn at 50% 30%,
-        var(--floating-circle-button-background, var(--color-scheme-main-accent)),
+        var(
+          --floating-circle-button-background,
+          var(--color-scheme-main-accent)
+        ),
         10deg,
-        var(--floating-circle-button-background, var(--color-scheme-main-accent)),
+        var(
+          --floating-circle-button-background,
+          var(--color-scheme-main-accent)
+        ),
         140deg,
         white
       );
@@ -65,14 +77,24 @@
       transition: all 0.3s ease-out;
       background-image:
         linear-gradient(
-          var(--floating-circle-button-background, var(--color-scheme-main-accent)),
-          var(--floating-circle-button-background, var(--color-scheme-main-accent))
+          var(
+            --floating-circle-button-background,
+            var(--color-scheme-main-accent)
+          ),
+          var(
+            --floating-circle-button-background,
+            var(--color-scheme-main-accent)
+          )
         ),
         conic-gradient(
           from 0turn at 50% 50%,
           white var(--percent-percentage, 0%),
           white var(--percent-percentage, 0%),
-          var(--floating-circle-button-background, var(--color-scheme-main-accent)) var(--percent-percentage, 0%)
+          var(
+              --floating-circle-button-background,
+              var(--color-scheme-main-accent)
+            )
+            var(--percent-percentage, 0%)
         );
     }
   }
@@ -127,7 +149,10 @@
     --floating-button-box-shadow: 0px 12px 24px #{colors.$popup-shadow};
   }
 
-  --floating-button-shadow-value: var(--floating-button-shadow, var(--floating-button-box-shadow));
+  --floating-button-shadow-value: var(
+    --floating-button-shadow,
+    var(--floating-button-box-shadow)
+  );
   --floating-button-size: var(--floating-button-button-size, 48px);
 
   position: relative;
@@ -152,7 +177,10 @@
   align-items: center;
   justify-content: center;
 
-  --floating-button-icon-fill: var(--floating-button-icon, var(--color-scheme-text-accent));
+  --floating-button-icon-fill: var(
+    --floating-button-icon,
+    var(--color-scheme-text-accent)
+  );
 
   svg {
     path {
@@ -162,7 +190,18 @@
 
   &.accentIcon {
     svg path {
-      fill: var(--floating-circle-button-background, var(--color-scheme-main-accent));
+      fill: var(
+        --floating-circle-button-background,
+        var(--color-scheme-main-accent)
+      );
+    }
+  }
+
+  :global {
+    .icon-other {
+      path {
+        stroke: #{colors.$white};
+      }
     }
   }
 }

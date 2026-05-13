@@ -15,8 +15,8 @@ importers:
         specifier: 1.6.13
         version: 1.6.13
       '@onlyoffice/docspace-api-sdk':
-        specifier: file:onlyoffice-docspace-api-sdk-3.6.0.tgz
-        version: file:onlyoffice-docspace-api-sdk-3.6.0.tgz
+        specifier: file:onlyoffice-docspace-api-sdk-3.7.0.tgz
+        version: file:onlyoffice-docspace-api-sdk-3.7.0.tgz
       '@onlyoffice/document-editor-react':
         specifier: 2.1.1
         version: 2.1.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1253,9 +1253,9 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
-  '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-3.6.0.tgz':
-    resolution: {integrity: sha512-Cgg11ZXTNKrsp8VwYB4HmkixD+xPJZk0fDaYksNIAyFGWDG1oxMk6NW9axclCcqDCUUVNRzg/MUyk4OL5MbsiA==, tarball: file:onlyoffice-docspace-api-sdk-3.6.0.tgz}
-    version: 3.6.0
+  '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-3.7.0.tgz':
+    resolution: {integrity: sha512-Sp2tFtcc8Yq9BrO8fnaFst6uJYR7LJYmvFuvj3J2QWHaA2ugVnauTUAfwg7dIbzdmpyD8IzM8iIct1EdXvnJkQ==, tarball: file:onlyoffice-docspace-api-sdk-3.7.0.tgz}
+    version: 3.7.0
 
   '@onlyoffice/document-editor-react@2.1.1':
     resolution: {integrity: sha512-b0SnFPmT+OEyJons18PPHpwtFABVCI4nr3gPtAAImar1PhN9tNc9703Yo5KPYsHhIgVq+FqHSWgunI9GJnKa5w==}
@@ -5773,7 +5773,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
-  '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-3.6.0.tgz':
+  '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-3.7.0.tgz':
     dependencies:
       axios: 1.13.5
     transitivePeerDependencies:

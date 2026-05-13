@@ -190,7 +190,6 @@ const Services = observer(
               }),
               <CommonTrans
                 key="DisableAIToolsConfirmBalance"
-               
                 i18nKey="DisableAIToolsConfirmBalance"
                 values={{ balance: formatAiServiceCurrency() }}
                 components={{
@@ -206,7 +205,6 @@ const Services = observer(
               }),
               <CommonTrans
                 key="CurrentBalance"
-               
                 i18nKey="CurrentBalance"
                 values={{ balance: formatAiServiceCurrency() }}
                 components={{
@@ -313,7 +311,9 @@ const Services = observer(
         changeServiceState(id);
 
         try {
-          await paymentApi.changeTenantWalletServiceState(raw);
+          await paymentApi.changeTenantWalletServiceState({
+            changeWalletServiceStateRequestDto: raw,
+          });
         } catch (error) {
           console.error(error);
           toastr.error(t("UnexpectedError"));
@@ -368,7 +368,9 @@ const Services = observer(
       };
 
       try {
-        const result = await paymentApi.changeTenantWalletServiceState(raw);
+        const result = await paymentApi.changeTenantWalletServiceState({
+          changeWalletServiceStateRequestDto: raw,
+        });
 
         if (!result) {
           toastr.error(t("UnexpectedError"));
@@ -400,7 +402,11 @@ const Services = observer(
       <ServicesLoader />
     ) : (
       <>
-        <ServicesItems onClick={onClick} onToggle={onToggle} cardDisabled={cardDisabled} />
+        <ServicesItems
+          onClick={onClick}
+          onToggle={onToggle}
+          cardDisabled={cardDisabled}
+        />
         {isShowStorageTariffDeactivatedModal ? (
           <StorageTariffDeactivated
             visible={isShowStorageTariffDeactivatedModal}
@@ -452,4 +458,3 @@ const Services = observer(
 );
 
 export default Services;
-

@@ -178,7 +178,7 @@
       }
     }
 
-    :active {
+    &:active {
       background: var(--empty-view-link-bg-color-press);
       & > * {
         filter: brightness(90%);

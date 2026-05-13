@@ -172,9 +172,12 @@ class CurrentQuotasStore {
     this.addAbortController(abortController);
 
     try {
-      const res = await this.paymentApi.getQuotaPaymentInformation(isRefresh, {
-        signal: abortController.signal,
-      });
+      const res = await this.paymentApi.getQuotaPaymentInformation(
+        { refresh: isRefresh },
+        {
+          signal: abortController.signal,
+        },
+      );
 
       if (!res?.data?.response) return;
 
@@ -188,4 +191,3 @@ class CurrentQuotasStore {
 }
 
 export default CurrentQuotasStore;
-

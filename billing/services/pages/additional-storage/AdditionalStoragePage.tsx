@@ -40,8 +40,8 @@ import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import BalanceAmount from "../../../shared/balance-amount";
 
 import SettingsIcon from "../../../../assets/icons/16/catalog-settings-common.svg";
-import PencilIcon from "../../../../assets/pencil.react.svg?url";
-import RemoveSessionIcon from "../../../../assets/remove.session.svg?url";
+import PencilIcon from "../../../../assets/pencil.react.svg";
+import RemoveSessionIcon from "../../../../assets/remove.session.svg";
 
 import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./AdditionalStoragePage.module.scss";
@@ -156,8 +156,10 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
     setIsCancelLoading(true);
     try {
       const walletRes = await paymentApi.updateWalletPayment({
-        quantity: { storage: null },
-        productQuantityType: 0,
+        walletQuantityRequestDto: {
+          quantity: { storage: null },
+          productQuantityType: 0,
+        },
       });
       const res = walletRes?.data?.response;
       if (res === false) throw new Error(t("UnexpectedError"));
@@ -192,13 +194,13 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
     {
       key: "edit",
       label: t("EditSubscription"),
-      icon: PencilIcon,
+      iconNode: <PencilIcon />,
       onClick: openUpgradeDialog,
     },
     {
       key: "cancel",
       label: t("CancelSubscription"),
-      icon: RemoveSessionIcon,
+      iconNode: <RemoveSessionIcon />,
       onClick: openCancelDialog,
     },
   ];
@@ -368,4 +370,3 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
 };
 
 export default observer(AdditionalStoragePage);
-
