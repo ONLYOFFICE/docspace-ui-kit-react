@@ -68,11 +68,17 @@ type AiPageProps = {
   getAIConfig?: () => Promise<void>;
   integrationUrl?: string;
   withoutWallet?: boolean;
+  simpleTopUp?: boolean;
 };
 
 const AiPage = (props: AiPageProps) => {
-  const { currentDeviceType, getAIConfig, integrationUrl, withoutWallet } =
-    props;
+  const {
+    currentDeviceType,
+    getAIConfig,
+    integrationUrl,
+    withoutWallet,
+    simpleTopUp,
+  } = props;
 
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
@@ -285,7 +291,14 @@ const AiPage = (props: AiPageProps) => {
       />
 
       {isTopUpVisible ? (
-        <AIServiceDialog visible={isTopUpVisible} onClose={onCloseTopUp} />
+        simpleTopUp ? (
+          <AiSimpleTopUpDialog
+            visible={isTopUpVisible}
+            onClose={onCloseTopUp}
+          />
+        ) : (
+          <AIServiceDialog visible={isTopUpVisible} onClose={onCloseTopUp} />
+        )
       ) : null}
 
       <div className={styles.toggleSection}>

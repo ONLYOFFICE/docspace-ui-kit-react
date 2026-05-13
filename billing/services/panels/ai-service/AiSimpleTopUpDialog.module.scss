@@ -1,0 +1,119 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.brandIcon {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+
+  svg {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.balanceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--aside-header-background-color, rgba(71, 129, 209, 0.04));
+}
+
+.balanceRowLabel {
+  color: var(--text-disable-color);
+}
+
+.label {
+  color: var(--text-color);
+  margin-top: 2px;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.chip {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--aside-header-border-color);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-color);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.1s ease;
+  box-sizing: border-box;
+
+  &:hover:not(:disabled) {
+    border-color: #4781d1;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.chipSelected {
+  border-color: #4781d1;
+  background: rgba(71, 129, 209, 0.08);
+  color: #4781d1;
+
+  &:hover:not(:disabled) {
+    border-color: #4781d1;
+  }
+}
+
+.inputWrapper {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.minHint {
+  color: var(--text-disable-color);
+  margin-top: -4px;
+}
+
+.afterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(46, 174, 124, 0.08);
+  margin-top: 4px;
+}
+
+.afterValue {
+  color: #2eae7c;
+}
+
+.fundsNote {
+  color: var(--text-disable-color);
+  margin-top: 4px;
+}
+
+.footerButtons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
