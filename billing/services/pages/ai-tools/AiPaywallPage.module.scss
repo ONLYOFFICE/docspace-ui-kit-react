@@ -40,6 +40,12 @@
   color: var(--text-color);
 }
 
+.balanceAmount {
+  color: var(--text-color);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
 .amountChips {
   display: flex;
   gap: 8px;
@@ -131,7 +137,7 @@
   box-sizing: border-box;
 
   &:hover:not(:disabled) {
-    border-color: #4781d1;
+    border-color: var(--color-scheme-main-buttons);
   }
 
   &:disabled {
@@ -141,12 +147,12 @@
 }
 
 .amountChipSelected {
-  border-color: #4781d1;
+  border-color: var(--color-scheme-main-buttons);
   background: rgba(71, 129, 209, 0.08);
-  color: #4781d1;
+  color: var(--color-scheme-main-buttons);
 
   &:hover:not(:disabled) {
-    border-color: #4781d1;
+    border-color: var(--color-scheme-main-buttons);
   }
 }
 

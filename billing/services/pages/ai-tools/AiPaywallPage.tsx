@@ -40,6 +40,7 @@ import PricingBillingBody from "../../panels/ai-service/PricingBillingBody";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import { toAbsoluteUrl } from "../../../utils/url";
+import { formatCurrencyValue } from "../../../utils/common";
 import { AI_PAYWALL_START_AMOUNT, AI_TOOLS, AI_ENUM } from "../../../constants";
 
 import AiPageLoader from "./AiPageLoader";
@@ -49,6 +50,8 @@ type AiPaywallPageProps = {
   integrationUrl?: string;
   onCompleted?: () => void;
 };
+
+type WaitingPhase = "idle" | "payment" | "topup" | "completed";
 
 const START_AMOUNT = AI_PAYWALL_START_AMOUNT;
 const PRESET_AMOUNTS = [AI_PAYWALL_START_AMOUNT, 50, 100];
@@ -71,14 +74,10 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
-  const {
-    aiServiceBalance,
-    aiServiceCodeCurrency,
-    isAiPaywallInit,
-    aiPaywallInit,
-  } = servicesStore;
+  const { aiServiceBalance, isAiPaywallInit, aiPaywallInit } = servicesStore;
 
-  type WaitingPhase = "idle" | "payment" | "topup" | "completed";
+  const currency = paymentStore.walletCodeCurrency || "USD";
+  const language = paymentStore.language || "en";
 
   const [isPricingBillingVisible, setIsPricingBillingVisible] = useState(false);
   const [waitingPhase, setWaitingPhase] = useState<WaitingPhase>("idle");
@@ -88,33 +87,35 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
   const isWaiting = waitingPhase !== "idle";
   const isMountedRef = useRef(true);
 
+  const bootstrap = async () => {
+    await aiPaywallInit(t);
+
+    if (!isMountedRef.current) return;
+
+    if (!servicesStore.wasFirstAiServiceTopUp) return;
+
+    setWaitingPhase("completed");
+
+    try {
+      await sleep(COMPLETED_READ_DELAY_MS);
+
+      await servicesStore.initServiceData(
+        t,
+        AI_TOOLS,
+        AI_ENUM,
+        integrationUrl,
+      );
+
+      onCompleted?.();
+    } catch (e) {
+      console.error("[ai-paywall] initServiceData failed", e);
+    }
+  };
+
   useEffect(() => {
     isMountedRef.current = true;
 
-    (async () => {
-      await aiPaywallInit(t);
-
-      if (!isMountedRef.current) return;
-
-      if (servicesStore.wasFirstAiServiceTopUp) {
-        setWaitingPhase("completed");
-
-        try {
-          await sleep(COMPLETED_READ_DELAY_MS);
-
-          await servicesStore.initServiceData(
-            t,
-            AI_TOOLS,
-            AI_ENUM,
-            integrationUrl,
-          );
-
-          onCompleted?.();
-        } catch (e) {
-          console.error("[ai-paywall] initServiceData failed", e);
-        }
-      }
-    })();
+    bootstrap();
 
     return () => {
       isMountedRef.current = false;
@@ -265,7 +266,7 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
           {waitingPhase === "completed" ? null : (
             <BalanceAmount
               amount={balanceToShow}
-              currency={aiServiceCodeCurrency || "USD"}
+              currency={currency}
               maximumFractionDigits={2}
               withoutMargin
               showRefresh={false}
@@ -299,7 +300,7 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
                       disabled={isWaiting}
                       onClick={() => setSelectedAmount(amount)}
                     >
-                      ${amount}
+                      {formatCurrencyValue(language, amount, currency, 0)}
                     </button>
                   );
                 })}
