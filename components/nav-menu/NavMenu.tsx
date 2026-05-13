@@ -274,35 +274,59 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       subItem.onClick?.(subItem);
     };
 
+    // When iconOnly, flatten parent + children into a single icon-tile list so
+    // previously-nested sub-items remain reachable without an expand affordance.
+    const flatten = (items: NavMenuItem[]): NavMenuItem[] => {
+      if (!iconOnly) return items;
+      const flat: NavMenuItem[] = [];
+      for (const item of items) {
+        flat.push({ ...item, children: undefined });
+        for (const sub of item.children ?? []) {
+          flat.push({
+            id: sub.id,
+            label: sub.label,
+            icon: sub.icon,
+            iconNode: sub.iconNode,
+            onClick: sub.onClick ? () => sub.onClick?.(sub) : undefined,
+            linkData: sub.linkData,
+          });
+        }
+      }
+      return flat;
+    };
+
     return (
       <nav
         ref={ref}
         className={classNames(styles.root, { [styles.iconOnly]: iconOnly }, className)}
       >
-        {groups.map((group) => (
-          <div key={group.id} className={styles.group}>
-            {group.label && (
-              <span className={styles.groupLabel}>{group.label}</span>
-            )}
-            <ul className={styles.itemList}>
-              {group.items.map((item) => (
-                <NavMenuItemWrapper
-                  key={item.id}
-                  item={item}
-                  isActive={item.id === activeItemId}
-                  isExpanded={item.id === expandedId}
-                  hasChildren={!!item.children?.length}
-                  activeItemId={activeItemId}
-                  withAnimation={withAnimation}
-                  iconOnly={iconOnly}
-                  onItemClick={handleItemClick}
-                  onSubItemClick={handleSubItemClick}
-                  LinkRouter={LinkRouter}
-                />
-              ))}
-            </ul>
-          </div>
-        ))}
+        {groups.map((group) => {
+          const items = flatten(group.items);
+          return (
+            <div key={group.id} className={styles.group}>
+              {group.label && (
+                <span className={styles.groupLabel}>{group.label}</span>
+              )}
+              <ul className={styles.itemList}>
+                {items.map((item) => (
+                  <NavMenuItemWrapper
+                    key={item.id}
+                    item={item}
+                    isActive={item.id === activeItemId}
+                    isExpanded={item.id === expandedId}
+                    hasChildren={!!item.children?.length}
+                    activeItemId={activeItemId}
+                    withAnimation={withAnimation}
+                    iconOnly={iconOnly}
+                    onItemClick={handleItemClick}
+                    onSubItemClick={handleSubItemClick}
+                    LinkRouter={LinkRouter}
+                  />
+                ))}
+              </ul>
+            </div>
+          );
+        })}
       </nav>
     );
   },
