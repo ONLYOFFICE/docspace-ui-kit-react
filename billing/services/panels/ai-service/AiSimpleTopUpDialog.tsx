@@ -112,8 +112,7 @@ const AiSimpleTopUpDialog: React.FC<AiSimpleTopUpDialogProps> = ({
 
     try {
       await paymentApi.topUpDeposit({
-        amount: parsedAmount,
-        currency,
+        topUpDepositRequestDto: { amount: parsedAmount, currency },
       });
 
       await rawApiClient.instance.post(
@@ -123,8 +122,10 @@ const AiSimpleTopUpDialog: React.FC<AiSimpleTopUpDialogProps> = ({
 
       if (!paymentStore.isAiToolsServiceOn) {
         await paymentApi.changeTenantWalletServiceState({
-          service: TenantWalletService.AITools,
-          enabled: true,
+          changeWalletServiceStateRequestDto: {
+            service: TenantWalletService.AITools,
+            enabled: true,
+          },
         });
         paymentStore.changeServiceState(AI_ENUM);
         await servicesStore.initServiceData(
