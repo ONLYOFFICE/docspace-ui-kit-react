@@ -478,10 +478,13 @@ class ServicesStore {
       ]);
 
       this.setIsAiPaywallInit(true);
+
+      return this.wasFirstAiServiceTopUp;
     } catch (error) {
-      if (error instanceof Error && error.name === "CanceledError") return;
+      if (error instanceof Error && error.name === "CanceledError") return false;
       console.error(error);
       toastr.error(t("UnexpectedError"));
+      return false;
     }
   };
 

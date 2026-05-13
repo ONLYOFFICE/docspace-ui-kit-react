@@ -282,6 +282,8 @@ class CurrentTariffStatusStore {
         email: info.email ?? null,
         payer: info.payer,
       };
+
+      return this.payerInfo;
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);

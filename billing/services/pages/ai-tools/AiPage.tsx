@@ -57,6 +57,7 @@ import { formatDateLocalized, getAppTimezone } from "../../../../utils/date";
 import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components";
 import AIServiceDialog from "../../panels/ai-service/AIServiceDialog";
+import AiSimpleTopUpDialog from "../../panels/ai-service/AiSimpleTopUpDialog";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";

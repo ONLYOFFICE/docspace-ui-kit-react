@@ -47,6 +47,7 @@ import styles from "./AiPaywallPage.module.scss";
 
 type AiPaywallPageProps = {
   integrationUrl?: string;
+  onCompleted?: () => void;
 };
 
 const START_AMOUNT = AI_PAYWALL_START_AMOUNT;
@@ -63,7 +64,7 @@ const sleep = (ms: number) =>
     setTimeout(resolve, ms);
   });
 
-const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
+const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
   const t = useCommonTranslation();
   const { rawApiClient } = useApi();
 
@@ -97,15 +98,18 @@ const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
 
       if (servicesStore.wasFirstAiServiceTopUp) {
         setWaitingPhase("completed");
+
         try {
           await sleep(COMPLETED_READ_DELAY_MS);
-          if (!isMountedRef.current) return;
+
           await servicesStore.initServiceData(
             t,
             AI_TOOLS,
             AI_ENUM,
             integrationUrl,
           );
+
+          onCompleted?.();
         } catch (e) {
           console.error("[ai-paywall] initServiceData failed", e);
         }
@@ -216,6 +220,10 @@ const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
       if (!isMountedRef.current) return;
 
       await servicesStore.initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
+
+      if (!isMountedRef.current) return;
+
+      onCompleted?.();
     } catch (e) {
       console.error("[ai-paywall] onEnableAI flow failed", e);
       if (isMountedRef.current) {
