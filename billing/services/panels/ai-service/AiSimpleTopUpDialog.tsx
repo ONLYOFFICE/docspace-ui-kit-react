@@ -40,9 +40,11 @@ import { useApi } from "../../../../providers";
 
 import AiAgentsIcon from "../../../../assets/icons/32/ai-agents.svg";
 
+import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
+
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
-import { AI_TOOLS } from "../../../constants";
+import { AI_ENUM, AI_TOOLS } from "../../../constants";
 import { formatCurrencyValue } from "../../../utils/common";
 
 import styles from "./AiSimpleTopUpDialog.module.scss";
@@ -119,7 +121,20 @@ const AiSimpleTopUpDialog: React.FC<AiSimpleTopUpDialogProps> = ({
         { quantity: parsedAmount, serviceName: AI_TOOLS },
       );
 
-      await servicesStore.fetchAiServiceBalance();
+      if (!paymentStore.isAiToolsServiceOn) {
+        await paymentApi.changeTenantWalletServiceState({
+          service: TenantWalletService.AITools,
+          enabled: true,
+        });
+        paymentStore.changeServiceState(AI_ENUM);
+        await servicesStore.initServiceData(
+          t,
+          AI_TOOLS,
+          AI_ENUM,
+        );
+      } else {
+        await servicesStore.fetchAiServiceBalance();
+      }
 
       toastr.success(t("AIServiceTopUpSuccess"));
 
