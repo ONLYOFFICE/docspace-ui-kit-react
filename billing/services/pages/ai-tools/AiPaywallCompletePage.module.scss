@@ -27,7 +27,7 @@
   z-index: 1;
   width: 100%;
   max-width: 440px;
-  background: var(--background-color, #ffffff);
+  background: var(--background-color, white);
   border: 1px solid var(--aside-header-border-color);
   border-radius: 12px;
   padding: 40px 32px;
@@ -209,7 +209,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--background-color, #fff);
+  background: var(--background-color, white);
   border: 2px solid var(--aside-header-border-color);
   display: flex;
   align-items: center;

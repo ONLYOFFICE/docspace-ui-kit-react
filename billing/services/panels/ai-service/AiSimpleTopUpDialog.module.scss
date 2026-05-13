@@ -60,7 +60,7 @@
   box-sizing: border-box;
 
   &:hover:not(:disabled) {
-    border-color: #4781d1;
+    border-color: var(--color-scheme-main-buttons);
   }
 
   &:active:not(:disabled) {
@@ -74,12 +74,12 @@
 }
 
 .chipSelected {
-  border-color: #4781d1;
+  border-color: var(--color-scheme-main-buttons);
   background: rgba(71, 129, 209, 0.08);
-  color: #4781d1;
+  color: var(--color-scheme-main-buttons);
 
   &:hover:not(:disabled) {
-    border-color: #4781d1;
+    border-color: var(--color-scheme-main-buttons);
   }
 }
 
@@ -104,7 +104,7 @@
 }
 
 .afterValue {
-  color: #2eae7c;
+  color: var(--status-icon-color-positive);
 }
 
 .fundsNote {

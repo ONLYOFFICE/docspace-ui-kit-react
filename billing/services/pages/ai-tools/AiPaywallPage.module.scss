@@ -66,8 +66,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--background-color, #fff);
-  border: 2px solid #2eae7c;
+  background: var(--background-color,white);
+  border: 2px solid var(--status-icon-color-positive);
   box-sizing: border-box;
   margin-bottom: 4px;
 
@@ -76,7 +76,7 @@
     position: absolute;
     inset: 5px;
     border-radius: 50%;
-    background: #2eae7c;
+    background: var(--status-icon-color-positive);
     animation: completedPulseDot 1.4s ease-in-out infinite;
   }
 
@@ -85,7 +85,7 @@
     position: absolute;
     inset: -2px;
     border-radius: 50%;
-    border: 2px solid #2eae7c;
+    border: 2px solid var(--status-icon-color-positive);
     animation: completedPulseRing 1.6s ease-out infinite;
   }
 }
