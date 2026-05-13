@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 
 import { useCommonTranslation } from "../../../../utils/i18n";
@@ -32,7 +32,6 @@ import { Button, ButtonSize } from "../../../../components/button";
 import { Text } from "../../../../components/text";
 import { Link } from "../../../../components/link";
 import { toastr } from "../../../../components/toast";
-
 import { useApi } from "../../../../providers";
 
 import BalanceAmount from "../../../shared/balance-amount";
@@ -41,7 +40,7 @@ import PricingBillingBody from "../../panels/ai-service/PricingBillingBody";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import { toAbsoluteUrl } from "../../../utils/url";
-import { AI_ENUM, AI_TOOLS } from "../../../constants";
+import { AI_PAYWALL_START_AMOUNT, AI_TOOLS } from "../../../constants";
 
 import AiPageLoader from "./AiPageLoader";
 import styles from "./AiPaywallPage.module.scss";
@@ -50,7 +49,17 @@ type AiPaywallPageProps = {
   integrationUrl?: string;
 };
 
-const START_AMOUNT = 20;
+const START_AMOUNT = AI_PAYWALL_START_AMOUNT;
+const PRESET_AMOUNTS = [AI_PAYWALL_START_AMOUNT, 50, 100];
+const POLL_INTERVAL_MS = 3000;
+const POLL_TIMEOUT_MS = 5 * 60 * 1000;
+const ANIMATION_STEP_MS = 80;
+const POST_ANIMATION_HOLD_MS = 500;
+
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
 const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
   const t = useCommonTranslation();
@@ -59,51 +68,132 @@ const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
 
-  const { paymentMethodInit, isPaymentMethodInit } = paymentStore;
-
   const {
     aiServiceBalance,
     aiServiceCodeCurrency,
-    isInitServicesData,
-    initServiceData,
+    isAiPaywallInit,
+    aiPaywallInit,
   } = servicesStore;
 
+  type WaitingPhase = "idle" | "payment" | "topup";
+
   const [isPricingBillingVisible, setIsPricingBillingVisible] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [waitingPhase, setWaitingPhase] = useState<WaitingPhase>("idle");
+  const [animatedBalance, setAnimatedBalance] = useState<number | null>(null);
+  const [selectedAmount, setSelectedAmount] = useState<number>(START_AMOUNT);
+
+  const isWaiting = waitingPhase !== "idle";
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
-    paymentMethodInit(t, integrationUrl);
-    initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
+    isMountedRef.current = true;
+    aiPaywallInit(t);
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
+
+  const buildBackUrl = (amount: number) => {
+    if (!integrationUrl) return undefined;
+    const sep = integrationUrl.includes("?") ? "&" : "?";
+    const currency = paymentStore.walletCodeCurrency || "USD";
+    return `${integrationUrl}${sep}currency=${currency}&amount=${amount}`;
+  };
 
   const onOpenPricingBilling = () => setIsPricingBillingVisible(true);
   const onClosePricingBilling = () => setIsPricingBillingVisible(false);
 
-  const onEnableAI = async () => {
-    if (isRedirecting) return;
-
+  const fetchAiBalanceRaw = async (): Promise<number> => {
     try {
-      setIsRedirecting(true);
-
-      const { data } = await rawApiClient.instance.post(
-        "api/2.0/portal/payment/buywalletservice",
-        { quantity: START_AMOUNT, serviceName: AI_TOOLS },
+      const { data } = await rawApiClient.instance.get(
+        "api/2.0/portal/payment/customer/servicequota",
+        { params: { serviceName: AI_TOOLS } },
       );
-
-      const url = data as unknown as string;
-
-      if (!url) {
-        throw new Error(t("UnexpectedError"));
-      }
-
-      window.open(toAbsoluteUrl(url), "_top");
-    } catch (e) {
-      toastr.error(e as Error);
-      setIsRedirecting(false);
+      const balance = data?.response as
+        | { subAccounts?: { amount?: number }[] }
+        | number
+        | undefined;
+      if (!balance || typeof balance === "number") return 0;
+      return balance.subAccounts?.[0]?.amount ?? 0;
+    } catch {
+      return 0;
     }
   };
 
-  if (!isPaymentMethodInit || !isInitServicesData) return <AiPageLoader />;
+  const pollUntil = async (check: () => Promise<boolean>) => {
+    const startedAt = Date.now();
+    while (isMountedRef.current) {
+      if (await check()) return;
+      if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
+        throw new Error("Polling timeout");
+      }
+      await sleep(POLL_INTERVAL_MS);
+    }
+  };
+
+  const animateBalanceTo = async (target: number) => {
+    const intTarget = Math.floor(target);
+    setAnimatedBalance(0);
+    for (let current = 1; current <= intTarget; current += 1) {
+      if (!isMountedRef.current) return;
+      setAnimatedBalance(current);
+      await sleep(ANIMATION_STEP_MS);
+    }
+    if (isMountedRef.current) setAnimatedBalance(target);
+  };
+
+  const onEnableAI = async () => {
+    if (isWaiting) return;
+
+    setWaitingPhase("payment");
+
+    try {
+      const backUrl = buildBackUrl(selectedAmount);
+      await paymentStore.fetchCardLinked(backUrl);
+
+      const linkUrl = paymentStore.cardLinked;
+      if (!linkUrl) {
+        throw new Error("Missing Stripe checkout URL");
+      }
+
+      window.open(toAbsoluteUrl(linkUrl), "_blank");
+
+      await pollUntil(async () => {
+        await paymentStore.tariff.fetchCustomerInfo(true);
+        return !!paymentStore.tariff.walletCustomerEmail;
+      });
+
+      if (!isMountedRef.current) return;
+
+      setWaitingPhase("topup");
+
+      let balanceValue = 0;
+      await pollUntil(async () => {
+        balanceValue = await fetchAiBalanceRaw();
+        return balanceValue > 0;
+      });
+
+      if (!isMountedRef.current) return;
+
+      await animateBalanceTo(balanceValue);
+
+      if (!isMountedRef.current) return;
+
+      await sleep(POST_ANIMATION_HOLD_MS);
+      await servicesStore.fetchAiServiceBalance();
+    } catch (e) {
+      console.error("[ai-paywall] onEnableAI flow failed", e);
+      if (isMountedRef.current) {
+        toastr.error(t("UnexpectedError"));
+        setWaitingPhase("idle");
+      }
+    }
+  };
+
+  if (!isAiPaywallInit) return <AiPageLoader />;
+
+  const balanceToShow =
+    animatedBalance !== null ? animatedBalance : (aiServiceBalance ?? 0);
 
   return (
     <div className={styles.container}>
@@ -123,32 +213,52 @@ const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
         >
           {t("AIPaywallHeroTitle", { price: START_AMOUNT })}
         </Text>
-
-        <Text fontSize="13px" lineHeight="18px" className={styles.heroSubtitle}>
-          {t("AIPaywallHeroSubtitle")}
-        </Text>
       </div>
 
       <div className={styles.balanceSection}>
         <div className={styles.balanceCard}>
-          <Text isBold fontSize="18px" className={styles.balanceLabel}>
-            {t("AIPaywallBalanceLabel")}
-          </Text>
-
           <BalanceAmount
-            amount={aiServiceBalance ?? 0}
+            amount={balanceToShow}
             currency={aiServiceCodeCurrency || "USD"}
             withoutMargin
             showRefresh={false}
           />
 
+          <div className={styles.amountChips} role="radiogroup">
+            {PRESET_AMOUNTS.map((amount) => {
+              const isSelected = amount === selectedAmount;
+              return (
+                <button
+                  key={amount}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  className={`${styles.amountChip} ${
+                    isSelected ? styles.amountChipSelected : ""
+                  }`}
+                  disabled={isWaiting}
+                  onClick={() => setSelectedAmount(amount)}
+                >
+                  ${amount}
+                </button>
+              );
+            })}
+          </div>
+
           <Button
             size={ButtonSize.small}
             primary
-            label={t("AIPaywallEnableButton", { price: START_AMOUNT })}
+            label={
+              waitingPhase === "payment"
+                ? t("AIPaywallWaitingPayment")
+                : waitingPhase === "topup"
+                  ? t("AIPaywallWaitingTopUp")
+                  : t("AIPaywallEnableButton", { price: selectedAmount })
+            }
             onClick={onEnableAI}
             scale
-            isLoading={isRedirecting}
+            // isLoading={isWaiting}
+            isDisabled={isWaiting}
             testId="enable_ai_button"
           />
 
@@ -156,6 +266,15 @@ const AiPaywallPage = ({ integrationUrl }: AiPaywallPageProps) => {
             {t("AIPaywallSecureNote")}
           </Text>
         </div>
+      </div>
+
+      <div className={styles.featuresBlock}>
+        <Text fontSize="12px" className={styles.featuresLine}>
+          {t("AIPaywallIncludedFeaturesLine1")}
+        </Text>
+        <Text fontSize="12px" className={styles.featuresLine}>
+          {t("AIPaywallIncludedFeaturesLine2")}
+        </Text>
       </div>
 
       <div className={styles.pricingRow}>
