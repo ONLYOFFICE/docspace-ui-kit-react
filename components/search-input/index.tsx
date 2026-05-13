@@ -141,6 +141,7 @@ const SearchInput = ({
 
   const iconNode = getIconNode();
   const iconSizeValue = !!inputValue || showClearButton ? 12 : 14;
+  const mainButtonWrapperRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
@@ -155,11 +156,16 @@ const SearchInput = ({
     >
       {showMainButton && mainButtonProps ? (
         <div
+          ref={mainButtonWrapperRef}
           className={styles.mainButtonWrapper}
           onClick={handleMainButtonWrapperClick}
         >
           <span className={styles.mainButtonIcon}>{mainButtonIcon}</span>
-          <MainButton {...mainButtonProps} hideArrow />
+          <MainButton
+            {...mainButtonProps}
+            hideArrow
+            anchorRef={mainButtonWrapperRef}
+          />
         </div>
       ) : null}
       <div className={styles.searchInputField}>
