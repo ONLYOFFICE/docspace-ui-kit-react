@@ -392,12 +392,39 @@ describe("<NavMenu />", () => {
       );
     });
 
-    it("does not render sub-items on item click when iconOnly", async () => {
+    it("flattens sub-items into the top-level list when iconOnly", () => {
       render(<NavMenu groups={groups} iconOnly />);
-      await userEvent.click(screen.getByRole("button", { name: "AI Files" }));
+      // Parent and its children all render as siblings, without an expand step.
       expect(
-        screen.queryByRole("button", { name: "Shared with me" }),
-      ).not.toBeInTheDocument();
+        screen.getByRole("button", { name: "AI Files" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Shared with me" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Favorites" }),
+      ).toBeInTheDocument();
+    });
+
+    it("invokes sub-item onClick directly when iconOnly (no expand step)", async () => {
+      const subOnClick = vi.fn();
+      const groupsFlat: NavMenuGroup[] = [
+        {
+          id: "g1",
+          items: [
+            {
+              id: "parent",
+              label: "Parent",
+              children: [
+                { id: "child", label: "Child", onClick: subOnClick },
+              ],
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsFlat} iconOnly />);
+      await userEvent.click(screen.getByRole("button", { name: "Child" }));
+      expect(subOnClick).toHaveBeenCalledOnce();
     });
 
     it("still calls item onClick when iconOnly", async () => {
