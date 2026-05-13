@@ -199,7 +199,6 @@ const AiPage = (props: AiPageProps) => {
           }),
           <CommonTrans
             key="DisableAIToolsConfirmBalance"
-           
             i18nKey="DisableAIToolsConfirmBalance"
             values={{
               balance: formatAiServiceCurrency(
@@ -235,7 +234,7 @@ const AiPage = (props: AiPageProps) => {
   };
 
   const onOpenTopUp = () => {
-    if (!isAiToolsServiceOn) {
+    if (!isAiToolsServiceOn && !simpleTopUp) {
       setIsTopUpConfirmVisible(true);
       return;
     }
@@ -348,7 +347,6 @@ const AiPage = (props: AiPageProps) => {
         {aiServiceLastCreditAmount ? (
           <Text className={styles.lastTopUpLabel}>
             <CommonTrans
-             
               i18nKey="LastTopUp"
               components={{
                 1: (
