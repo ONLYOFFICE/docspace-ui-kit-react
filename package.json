@@ -134,7 +134,6 @@
     "sass": "1.79.6",
     "serve": "14.2.5",
     "storybook": "^10.2.19",
-    "tslib": "^2.8.1",
     "typescript": "5.9.3",
     "vite": "^8.0.8",
     "vite-plugin-svgr": "^4.5.0",
