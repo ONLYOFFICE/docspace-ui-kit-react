@@ -167,6 +167,8 @@ export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
     tariffBar?: React.ReactElement;
     /** Controls visibility of TrashWarning */
     isEmptyPage?: boolean;
+    /** Optional button shown in the header control area (e.g. Analyze responses for SubFolderDone) */
+    analyzeResponsesButton?: React.ReactNode;
 
     isMobile?: boolean;
     isMobileOnly?: boolean;
@@ -186,6 +188,7 @@ export type TDropBoxProps = TArrowButtonProps &
     | "navigationButtonLabel"
     | "showTitle"
     | "isMobile"
+    | "analyzeResponsesButton"
   > &
   TRowParam & {
     ref?: React.RefObject<HTMLDivElement | null>;

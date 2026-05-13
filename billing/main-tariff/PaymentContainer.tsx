@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import HelpReactSvgUrl from "../../assets/help.react.svg?url";
+import HelpReactSvg from "../../assets/help.react.svg";
 import React from "react";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
@@ -45,7 +45,6 @@ import styles from "./MainTariff.module.scss";
 import { getBrandName } from "../../constants/brands";
 
 const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
-
   const store = usePaymentStore();
   const { formatPaymentCurrency } = store;
 
@@ -69,7 +68,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
       <HelpButton
         className="payment-tooltip"
         offsetRight={0}
-        iconName={HelpReactSvgUrl}
+        iconNode={<HelpReactSvg />}
         tooltipContent={
           <>
             <Text isBold>{t("ManagerTypesDescription")}</Text>
@@ -98,7 +97,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     if (isFreeTariff) {
       return (
         <Text fontSize="16px" isBold>
-          <CommonTrans i18nKey="StartupTitle" values={{ planName: currentTariffPlanTitle }} />
+          <CommonTrans
+            i18nKey="StartupTitle"
+            values={{ planName: currentTariffPlanTitle }}
+          />
         </Text>
       );
     }
@@ -107,7 +109,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     if (isPaidPeriod || isGracePeriod) {
       return (
         <Text fontSize="16px" isBold>
-          <CommonTrans i18nKey="BusinessTitle" values={{ planName: currentTariffPlanTitle }} />
+          <CommonTrans
+            i18nKey="BusinessTitle"
+            values={{ planName: currentTariffPlanTitle }}
+          />
         </Text>
       );
     }
@@ -121,7 +126,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
         color="var(--settings-payment-warning-color)"
         dataTestId="expired_subscription_text"
       >
-        <CommonTrans i18nKey="BusinessExpired" values={{ date: gracePeriodEndDate, planName: tariffPlanTitle }} />
+        <CommonTrans
+          i18nKey="BusinessExpired"
+          values={{ date: gracePeriodEndDate, planName: tariffPlanTitle }}
+        />
       </Text>
     );
   };
@@ -130,7 +138,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     if (isFreeTariff && !isNonProfit) {
       return (
         <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
-          <CommonTrans i18nKey="StartupSuggestion" values={{ planName: tariffPlanTitle }} />
+          <CommonTrans
+            i18nKey="StartupSuggestion"
+            values={{ planName: tariffPlanTitle }}
+          />
         </Text>
       );
     }
@@ -138,7 +149,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     if (isPaidPeriod && !isNonProfit) {
       return (
         <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
-          <CommonTrans i18nKey="BusinessSuggestion" values={{ planName: tariffPlanTitle }} />
+          <CommonTrans
+            i18nKey="BusinessSuggestion"
+            values={{ planName: tariffPlanTitle }}
+          />
         </Text>
       );
     }
@@ -146,7 +160,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     if (isNotPaidPeriod) {
       return (
         <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
-          <CommonTrans i18nKey="RenewSubscriptionPlanName" values={{ planName: tariffPlanTitle }} />
+          <CommonTrans
+            i18nKey="RenewSubscriptionPlanName"
+            values={{ planName: tariffPlanTitle }}
+          />
         </Text>
       );
     }
@@ -159,7 +176,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           className={styles.paymentInfoGracePeriod}
           color="var(--settings-payment-warning-color)"
         >
-          <CommonTrans i18nKey="DelayedPayment" values={{ date: paymentDate, planName: currentTariffPlanTitle }} />
+          <CommonTrans
+            i18nKey="DelayedPayment"
+            values={{ date: paymentDate, planName: currentTariffPlanTitle }}
+          />
         </Text>
       );
     }
@@ -173,7 +193,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
         <Text fontSize="14px" lineHeight="16px">
           <CommonTrans
             i18nKey="GracePeriodActivatedInfo"
-           
             values={{
               fromDate: paymentDate,
               byDate: gracePeriodEndDate,
@@ -199,7 +218,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           lineHeight="16px"
           className={styles.paymentInfoManagersPrice}
         >
-          <CommonTrans i18nKey="BusinessFinalDateInfo" values={{ finalDate: paymentDate }} />
+          <CommonTrans
+            i18nKey="BusinessFinalDateInfo"
+            values={{ finalDate: paymentDate }}
+          />
         </Text>
       );
   };
@@ -223,14 +245,12 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
             {isYearTariff ? (
               <CommonTrans
                 i18nKey="PerUserYear"
-               
                 values={{ price: formatPaymentCurrency(startValue) }}
                 components={{ 1: <span key="price-span" /> }}
               />
             ) : (
               <CommonTrans
                 i18nKey="PerUserMonth"
-               
                 values={{ price: formatPaymentCurrency(startValue) }}
                 components={{ 1: <span key="price-span" /> }}
               />
@@ -252,4 +272,3 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
 });
 
 export default PaymentContainer;
-

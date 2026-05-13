@@ -172,7 +172,9 @@ const AiPage = (props: AiPageProps) => {
     changeServiceState(AI_ENUM);
 
     try {
-      const result = await paymentApi.changeTenantWalletServiceState(raw);
+      const result = await paymentApi.changeTenantWalletServiceState({
+        changeWalletServiceStateRequestDto: raw,
+      });
 
       if (!result) {
         toastr.error(t("UnexpectedError"));
@@ -429,4 +431,3 @@ const AiPage = (props: AiPageProps) => {
 };
 
 export default observer(AiPage);
-

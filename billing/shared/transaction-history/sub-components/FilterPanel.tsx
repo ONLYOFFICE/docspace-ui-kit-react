@@ -26,7 +26,7 @@
 
 import { useCommonTranslation } from "../../../../utils/i18n";
 
-import ClearReactSvgUrl from "../../../../assets/icons/17/clear.react.svg?url";
+import ClearReactSvg from "../../../../assets/icons/17/clear.react.svg";
 
 import { Button, ButtonSize } from "../../../../components/button";
 import {
@@ -88,7 +88,7 @@ const FilterPanel = ({
           ? [
               {
                 key: "clear-filter",
-                url: ClearReactSvgUrl,
+                iconNode: <ClearReactSvg />,
                 onClick: clearFilter,
               },
             ]

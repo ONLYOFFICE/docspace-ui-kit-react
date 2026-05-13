@@ -328,7 +328,11 @@ class ServicesStore {
       }
 
       await this.paymentApi.setRestrictedAiModels(
-        { models: new Set(restrictedModels) },
+        {
+          setRestrictedAiModelsRequestDto: {
+            models: new Set(restrictedModels),
+          },
+        },
         { signal: abortController.signal },
       );
 
@@ -582,4 +586,3 @@ class ServicesStore {
 }
 
 export default ServicesStore;
-

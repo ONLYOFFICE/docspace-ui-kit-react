@@ -101,7 +101,9 @@ const BackupPage: React.FC = () => {
     changeServiceState(BACKUP_SERVICE);
 
     try {
-      await paymentApi.changeTenantWalletServiceState(raw);
+      await paymentApi.changeTenantWalletServiceState({
+        changeWalletServiceStateRequestDto: raw,
+      });
     } catch (error) {
       console.error(error);
       toastr.error(t("UnexpectedError"));
@@ -149,7 +151,6 @@ const BackupPage: React.FC = () => {
         title={
           <Text fontSize="12px" fontWeight={400}>
             <CommonTrans
-             
               i18nKey="BackupTitle"
               values={{
                 currency: formatWalletCurrency(backupServicePrice, 2),
@@ -214,11 +215,7 @@ const BackupPage: React.FC = () => {
           <Button
             className={styles.backupButton}
             size={ButtonSize.small}
-            label={
-              !isFreeTariff
-                ? t("EnablePaidBackup")
-                : t("Enable")
-            }
+            label={!isFreeTariff ? t("EnablePaidBackup") : t("Enable")}
             onClick={handleToggleChange}
             isDisabled={isDisabled}
             primary
@@ -229,7 +226,6 @@ const BackupPage: React.FC = () => {
       {!isFreeTariff ? (
         <Text className={styles.backupPaidInfo}>
           <CommonTrans
-           
             i18nKey="FreeBackupsRenewsDate"
             values={{
               date: formatDateLocalized(
@@ -277,4 +273,3 @@ const BackupPage: React.FC = () => {
 };
 
 export default observer(BackupPage);
-

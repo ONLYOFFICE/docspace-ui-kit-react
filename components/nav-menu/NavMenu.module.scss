@@ -25,6 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 @use "../../styles/variables/colors";
+@use "../../styles/mixins";
 
 :global(.light) {
   :local {
@@ -337,14 +338,75 @@
 }
 
 .iconOnly {
-  .groupLabel,
   .itemText,
   .itemBadge {
     display: none;
   }
 
-  .item {
+  // Render the group label as a thin divider line; hide first group's divider.
+  .groupLabel {
+    display: flex;
     justify-content: center;
-    padding: 0 12px;
+    padding: 16px 12px 4px;
+    color: transparent;
+    user-select: none;
+    pointer-events: none;
+    font-size: 0;
+    line-height: 0;
+
+    &::before {
+      content: "";
+      width: 20px;
+      height: 1px;
+      background: var(--nav-menu-group-label-color);
+    }
+  }
+
+  .group:first-child .groupLabel {
+    display: none;
+  }
+
+  .itemWrapper {
+    justify-content: center;
+    padding-block: 2px;
+  }
+
+  // Highlight becomes an icon-sized centered tile instead of full-width.
+  .itemSibling {
+    top: 50%;
+    inset-inline-start: 50%;
+    inset-inline-end: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+
+    :global([dir="rtl"]) & {
+      transform: translate(50%, -50%);
+    }
+  }
+
+  .itemWrapper:hover .itemSibling:not(.animatedProgress):not(.animatedFinish) {
+    background-color: var(--nav-menu-item-bg-hover);
+  }
+
+  .item {
+    flex: 0 0 auto;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    gap: 0;
+
+    // Icons grow to 20px only on tablet and below; desktop keeps 16px.
+    @include mixins.tablet-and-below {
+      .itemIcon > div,
+      .itemIcon svg,
+      .nodeIcon {
+        width: 20px;
+        height: 20px;
+      }
+    }
   }
 }

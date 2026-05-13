@@ -67,7 +67,11 @@ export const DocumentEditor = (props: DocumentEditorProps) => {
       try {
         const [docServiceLocation, result] = await Promise.all([
           api.filesSettingsApi.getDocServiceUrl(),
-          api.filesApi.openEditFile(props.fileId || 1, fileVersion, isView),
+          api.filesApi.openEditFile({
+            fileId: props.fileId || 1,
+            version: fileVersion,
+            view: isView,
+          }),
         ]);
 
         if (!result.data.response) {
