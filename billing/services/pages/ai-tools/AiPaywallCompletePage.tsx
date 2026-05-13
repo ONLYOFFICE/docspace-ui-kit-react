@@ -82,8 +82,7 @@ const AiPaywallCompletePage = () => {
         setStepIndex(1);
 
         await paymentApi.topUpDeposit({
-          amount,
-          currency,
+          topUpDepositRequestDto: { amount, currency },
         });
 
         await rawApiClient.instance.post(
@@ -94,8 +93,10 @@ const AiPaywallCompletePage = () => {
         setStepIndex(2);
 
         await paymentApi.changeTenantWalletServiceState({
-          service: TenantWalletService.AITools,
-          enabled: true,
+          changeWalletServiceStateRequestDto: {
+            service: TenantWalletService.AITools,
+            enabled: true,
+          },
         });
 
         setStepIndex(3);
