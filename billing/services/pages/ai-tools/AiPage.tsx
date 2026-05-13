@@ -57,6 +57,7 @@ import { formatDateLocalized, getAppTimezone } from "../../../../utils/date";
 import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components";
 import AIServiceDialog from "../../panels/ai-service/AIServiceDialog";
+import AiSimpleTopUpDialog from "../../panels/ai-service/AiSimpleTopUpDialog";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
@@ -67,10 +68,18 @@ type AiPageProps = {
   currentDeviceType?: string;
   getAIConfig?: () => Promise<void>;
   integrationUrl?: string;
+  withoutWallet?: boolean;
+  simpleTopUp?: boolean;
 };
 
 const AiPage = (props: AiPageProps) => {
-  const { currentDeviceType, getAIConfig, integrationUrl } = props;
+  const {
+    currentDeviceType,
+    getAIConfig,
+    integrationUrl,
+    withoutWallet,
+    simpleTopUp,
+  } = props;
 
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
@@ -114,7 +123,9 @@ const AiPage = (props: AiPageProps) => {
   // const navigate = useNavigate();
 
   useEffect(() => {
-    initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
+    if (!isInitServicesData) {
+      initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
+    }
   }, []);
 
   // useEffect(() => {
@@ -225,7 +236,7 @@ const AiPage = (props: AiPageProps) => {
   };
 
   const onOpenTopUp = () => {
-    if (!isAiToolsServiceOn) {
+    if (!isAiToolsServiceOn && !simpleTopUp) {
       setIsTopUpConfirmVisible(true);
       return;
     }
@@ -282,7 +293,14 @@ const AiPage = (props: AiPageProps) => {
       />
 
       {isTopUpVisible ? (
-        <AIServiceDialog visible={isTopUpVisible} onClose={onCloseTopUp} />
+        simpleTopUp ? (
+          <AiSimpleTopUpDialog
+            visible={isTopUpVisible}
+            onClose={onCloseTopUp}
+          />
+        ) : (
+          <AIServiceDialog visible={isTopUpVisible} onClose={onCloseTopUp} />
+        )
       ) : null}
 
       <div className={styles.toggleSection}>
@@ -295,7 +313,9 @@ const AiPage = (props: AiPageProps) => {
           isDisabled={isDisabled}
         />
 
-        <WalletInfo shortView withoutBackground balance={balance} />
+        {withoutWallet ? null : (
+          <WalletInfo shortView withoutBackground balance={balance} />
+        )}
 
         {isAiToolsServiceOn && isAiServiceLowBalance ? (
           <Text fontSize="15px" fontWeight={600} className={styles.lowBalance}>

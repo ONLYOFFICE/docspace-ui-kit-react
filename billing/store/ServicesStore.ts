@@ -49,6 +49,8 @@ class ServicesStore {
 
   isInitServicesData = false;
 
+  isAiPaywallInit = false;
+
   isVisibleWalletSettings = false;
 
   partialUpgradeFee: number = 0;
@@ -210,6 +212,10 @@ class ServicesStore {
 
   setIsInitServiceData = (isInitServicesData: boolean) => {
     this.isInitServicesData = isInitServicesData;
+  };
+
+  setIsAiPaywallInit = (value: boolean) => {
+    this.isAiPaywallInit = value;
   };
 
   setConfirmActionType = (value: string) => {
@@ -462,6 +468,27 @@ class ServicesStore {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
       toastr.error(t("UnexpectedError"));
+    }
+  };
+
+  aiPaywallInit = async (t: TTranslation) => {
+    const { initWalletPayerAndBalance } = this.paymentStore;
+
+    try {
+      await Promise.all([
+        initWalletPayerAndBalance(false),
+        this.fetchAiPrices(),
+        this.fetchAiServiceBalance(),
+      ]);
+
+      this.setIsAiPaywallInit(true);
+
+      return this.wasFirstAiServiceTopUp;
+    } catch (error) {
+      if (error instanceof Error && error.name === "CanceledError") return false;
+      console.error(error);
+      toastr.error(t("UnexpectedError"));
+      return false;
     }
   };
 
