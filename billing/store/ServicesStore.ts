@@ -351,15 +351,15 @@ class ServicesStore {
   };
 
   // TODO: Replace with SDK method once it is available in the API SDK
-  fetchAiServiceBalance = async () => {
+  fetchAiServiceBalance = async (refresh?: boolean) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
     try {
       const { data } = await this.#rawApiClient.instance.get(
-        `api/2.0/portal/payment/customer/servicequota`,
+        `api/2.0/portal/payment/customer/aibalance`,
         {
-          params: { serviceName: AI_TOOLS },
+          params: refresh ? { refresh: true } : {},
           signal: abortController.signal,
         },
       );
