@@ -123,10 +123,10 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
     setView("top-up");
   };
 
-  const buyWalletService = async (quantity: number, serviceName: string) => {
+  const creditAiBalance = async (amount: number) => {
     const { data } = await rawApiClient.instance.post(
-      "api/2.0/portal/payment/buywalletservice",
-      { quantity, serviceName },
+      "api/2.0/portal/payment/creditaibalance",
+      { amount },
     );
     return data as string;
   };
@@ -201,7 +201,7 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
             setIsLoading={setIsLoading}
             isLoading={isLoading}
             walletCustomerStatusNotActive={walletCustomerStatusNotActive}
-            onTopUpBalance={buyWalletService}
+            onTopUpBalance={creditAiBalance}
             serviceName={AI_TOOLS}
             afterTopUp={onRedirect}
           />
