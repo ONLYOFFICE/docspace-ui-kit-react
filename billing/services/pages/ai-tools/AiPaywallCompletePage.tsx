@@ -37,7 +37,7 @@ import CheckIcon from "../../../../assets/check.react.svg";
 import DangerIcon from "../../../../assets/danger.toast.react.svg";
 import InfoIcon from "../../../../assets/info.outline.react.svg";
 
-import { AI_TOOLS, AI_PAYWALL_START_AMOUNT } from "../../../constants";
+import { AI_PAYWALL_START_AMOUNT } from "../../../constants";
 import { formatCurrencyValue } from "../../../utils/common";
 
 import styles from "./AiPaywallCompletePage.module.scss";
@@ -86,8 +86,8 @@ const AiPaywallCompletePage = () => {
         });
 
         await rawApiClient.instance.post(
-          "api/2.0/portal/payment/buywalletservice",
-          { quantity: amount, serviceName: AI_TOOLS },
+          "api/2.0/portal/payment/creditaibalance",
+          { amount },
         );
 
         setStepIndex(2);

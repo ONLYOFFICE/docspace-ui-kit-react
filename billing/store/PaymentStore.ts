@@ -53,7 +53,6 @@ import { getCookie } from "../../utils/cookie";
 import { LANGUAGE } from "../../constants";
 import {
   AI_ENUM,
-  AI_TOOLS,
   BACKUP_SERVICE,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
@@ -660,13 +659,7 @@ class PaymentStore {
           credit: isCredit,
           debit: isDebit,
         },
-        {
-          signal: abortController.signal,
-          params:
-            serviceName === AI_TOOLS
-              ? { writeOffServiceQuota: true }
-              : undefined,
-        },
+        { signal: abortController.signal },
       );
 
       if (!res?.data?.response) return;

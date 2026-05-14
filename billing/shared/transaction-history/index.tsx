@@ -54,7 +54,6 @@ import styles from "./styles/TransactionHistory.module.scss";
 import TableLoader from "./sub-components/TableLoader";
 import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import { AI_TOOLS } from "../../constants";
 import { getBrandName } from "../../../constants/brands";
 import { Encoder } from "../../../utils/encoder";
 
@@ -337,7 +336,6 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           debit: isDebit,
           participantName: filterContact?.id,
           serviceName,
-          ...(serviceName === AI_TOOLS ? { writeOffServiceQuota: true } : {}),
         },
       });
 

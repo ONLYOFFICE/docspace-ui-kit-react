@@ -135,8 +135,7 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
   const fetchAiBalanceRaw = async (): Promise<number> => {
     try {
       const { data } = await rawApiClient.instance.get(
-        "api/2.0/portal/payment/customer/servicequota",
-        { params: { serviceName: AI_TOOLS } },
+        "api/2.0/portal/payment/customer/aibalance",
       );
       const balance = data?.response as
         | { subAccounts?: { amount?: number }[] }
