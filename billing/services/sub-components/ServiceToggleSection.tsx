@@ -38,6 +38,7 @@ interface ServiceToggleSectionProps {
   description?: string;
   testId?: string;
   isDisabled?: boolean;
+  withBottomMargin?: boolean;
 }
 
 const ServiceToggleSection: React.FC<ServiceToggleSectionProps> = ({
@@ -48,9 +49,13 @@ const ServiceToggleSection: React.FC<ServiceToggleSectionProps> = ({
   description,
   testId,
   isDisabled,
+  withBottomMargin,
 }) => {
   return (
-    <div className={styles.serviceToggleSection}>
+    <div
+      className={styles.serviceToggleSection}
+      style={withBottomMargin ? { marginBottom: "20px" } : undefined}
+    >
       <div className={styles.toggleButton}>
         <ToggleButton
           isChecked={isEnabled}
