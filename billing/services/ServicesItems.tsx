@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
@@ -58,6 +58,9 @@ import ServiceCard from "./sub-components/ServiceCard";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
+import {Link, LinkTarget} from "../../components/link";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
+import PricingBillingBody from "./panels/ai-service/PricingBillingBody";
 
 type ServicesItemsProps = {
   onToggle?: (id: string, enabled: boolean) => void;
@@ -112,6 +115,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   const isDisabled = isServiceActionDisabled;
   const { t } = useServicesActions();
 
+  const [isPricingBillingVisible, setIsPricingBillingVisible] = useState(false);
+
   const permissionTooltipText = usePermissionTooltipText();
 
   const handleToggle = (
@@ -138,6 +143,17 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     const id = dataset.id;
 
     onClick?.(id!);
+  };
+
+  const onOpenPricingBilling = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setIsPricingBillingVisible(true);
+  };
+
+ const onClosePricingBilling = () => {
+    setIsPricingBillingVisible(false);
   };
 
   const textTooltip = (
@@ -221,7 +237,23 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
           });
         }
 
-        return t("AIPricingBilledPerUsage");
+
+
+       return    <CommonTrans
+                     i18nKey="AIPricingBilledPerUsageAndPricing"
+                     components={{
+                       1: (
+                         <Link
+                           fontSize="13px"
+                           fontWeight={600}
+                           className={styles.accountLink}
+                           color="accent"
+                           onClick={onOpenPricingBilling}
+                           textDecoration="underline dotted"
+                         />
+                       ),
+                     }}
+                   />
       default:
         return "";
     }
@@ -229,6 +261,13 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
   return (
     <div style={{ width: "100%" }}>
+      <PricingBillingBody
+        visible={isPricingBillingVisible}
+        onClose={onClosePricingBilling}
+        isBackButton={false}
+        withoutFooter
+      />
+
       <Text className={styles.storageDescription}>
         {isPayer || !isCardLinkedToPortal
           ? t("ConnectAndConfigureServices")
@@ -300,6 +339,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 }
                 isErrorColor={isAiServiceLowBalance}
                 icon={<PriceIcon />}
+                withoutIcon={!wasFirstAiServiceTopUp }
               />
             );
           }
