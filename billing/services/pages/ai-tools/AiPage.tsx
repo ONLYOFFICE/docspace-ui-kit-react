@@ -70,6 +70,7 @@ type AiPageProps = {
   integrationUrl?: string;
   withoutWallet?: boolean;
   simpleTopUp?: boolean;
+  withBottomMargin?:boolean;
 };
 
 const AiPage = (props: AiPageProps) => {
@@ -79,6 +80,7 @@ const AiPage = (props: AiPageProps) => {
     integrationUrl,
     withoutWallet,
     simpleTopUp,
+    withBottomMargin
   } = props;
 
   const { paymentApi } = useApi();
@@ -142,7 +144,7 @@ const AiPage = (props: AiPageProps) => {
     const startTime = Date.now();
     try {
       await Promise.all([
-        fetchAiServiceBalance(),
+        fetchAiServiceBalance(true),
         fetchTransactionHistory(AI_TOOLS),
       ]);
     } finally {
@@ -311,6 +313,7 @@ const AiPage = (props: AiPageProps) => {
           description={t("EnableAIDescription")}
           testId="service-ai-toggle-button"
           isDisabled={isDisabled}
+          withBottomMargin={withBottomMargin}
         />
 
         {withoutWallet ? null : (

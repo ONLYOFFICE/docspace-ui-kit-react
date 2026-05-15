@@ -63,9 +63,12 @@ import StorageTariffDeactivated from "../../../dialogs/StorageTariffDeactivated"
 
 type AdditionalStoragePageProps = {
   fetchPortalTariff?: () => Promise<void>;
+  withBottomMargin?: boolean;
 };
 
-const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
+const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
+  withBottomMargin,
+}) => {
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
@@ -214,6 +217,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = () => {
   return (
     <div className={styles.container}>
       <ServiceToggleSection
+        withBottomMargin={withBottomMargin}
         isEnabled={hasStorageSubscription}
         isDisabled={isDisabled || isScheduled}
         onToggle={handleToggleChange}

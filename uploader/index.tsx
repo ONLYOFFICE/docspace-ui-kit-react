@@ -430,7 +430,7 @@ const Uploader = ({
         linkMainText={linkMainText ?? getCommonTranslation("Upload")}
         linkSecondaryText={getSecondaryText()}
         exstsText={
-          extensionsText ?? shortText ?? getCommonTranslation("AnyFiles")
+          extensionsText ?? (shortText || getCommonTranslation("AnyFiles"))
         }
         fullExstsText={fullText}
         formatsPlusBadgeValue={badgeValue}

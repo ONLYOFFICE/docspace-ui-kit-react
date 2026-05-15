@@ -51,7 +51,11 @@ import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import { getBrandName } from "../../../../constants/brands";
 
-const BackupPage: React.FC = () => {
+type BackupPageProps = {
+  withBottomMargin?: boolean;
+};
+
+const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
@@ -146,6 +150,7 @@ const BackupPage: React.FC = () => {
   return (
     <div className={styles.container}>
       <ServiceToggleSection
+        withBottomMargin={withBottomMargin}
         isEnabled={isBackupServiceOn!}
         onToggle={handleToggleChange}
         title={

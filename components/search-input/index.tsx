@@ -70,6 +70,7 @@ const SearchInput = ({
   showMainButton = false,
   mainButtonProps,
   mainButtonIcon = <PlusIconSvg />,
+  mainButtonDataTestId,
 }: SearchInputProps) => {
   const [inputValue, setInputValue] = useState(value);
 
@@ -159,6 +160,7 @@ const SearchInput = ({
           ref={mainButtonWrapperRef}
           className={styles.mainButtonWrapper}
           onClick={handleMainButtonWrapperClick}
+          data-testid={mainButtonDataTestId}
         >
           <span className={styles.mainButtonIcon}>{mainButtonIcon}</span>
           <MainButton

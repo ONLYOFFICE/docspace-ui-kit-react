@@ -77,9 +77,11 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   operationsAlert,
   operationsCanceled,
   operationsCompleted = false,
+  operationsStopped = false,
   clearOperationsData,
   clearPanelOperationsData,
   cancelUpload,
+  cancelSecondaryOperationById,
   mainButtonVisible,
   needErrorChecking,
   showCancelButton,
@@ -310,6 +312,19 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       );
     }
 
+    if (operationsStopped) {
+      const operationName = operationsLength
+        ? operations[0].label
+        : panelOperations[0].label;
+
+      return (
+        <Text fontWeight={600}>
+          {t("StoppedOperation", {
+            operationName,
+          })}
+        </Text>
+      );
+    }
     if (operationsCanceled) {
       const canceledLabel = operationsLength
         ? operations[0].label
@@ -345,6 +360,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
           <Text fontWeight={600}>
             {operationName}
             <br />
+            {/* t("Common:ErrorUploadingFiles", { count: getErrorCount() }) */}
             {t("ErrorUploadingFiles", {
               count: getErrorCount()!,
             })}
@@ -502,6 +518,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
                 clearPanelOperationsData?.(operationName);
               }}
               onCancel={onCancelOperation}
+              cancelSecondaryOperationById={cancelSecondaryOperationById}
               onOpenPanel={handleOperationClick}
             />
           </DropDown>
