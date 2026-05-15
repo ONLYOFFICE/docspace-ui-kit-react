@@ -144,7 +144,7 @@ const AiPage = (props: AiPageProps) => {
     const startTime = Date.now();
     try {
       await Promise.all([
-        fetchAiServiceBalance(),
+        fetchAiServiceBalance(true),
         fetchTransactionHistory(AI_TOOLS),
       ]);
     } finally {
