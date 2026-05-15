@@ -54,6 +54,10 @@ interface ProgressListProps {
     operation: string,
   ) => void;
   onCancel?: () => void;
+  cancelSecondaryOperationById?: (
+    operation: string,
+    operationId: string,
+  ) => void;
 }
 
 const getIcon = (icon: string): React.ReactNode => {
@@ -75,6 +79,7 @@ const getIcon = (icon: string): React.ReactNode => {
     case OPERATIONS_NAME.move:
       return <MoveIcon />;
     case OPERATIONS_NAME.upload:
+    case OPERATIONS_NAME.syncDatabase:
       return <UploadIcon />;
     case OPERATIONS_NAME.trash:
     case OPERATIONS_NAME.deleteVersionFile:
@@ -98,6 +103,7 @@ const ProgressList = ({
   clearOperationsData,
   clearPanelOperationsData,
   onCancel,
+  cancelSecondaryOperationById,
   onOpenPanel,
 }: ProgressListProps) => {
   const onOpenPanelOperation = (item: Operation) => {
@@ -109,26 +115,41 @@ const ProgressList = ({
 
   return (
     <div className="progress-container">
-      {operations.map((item) => (
-        <div
-          key={getOperationKey(item)}
-          className="progress-list"
-        >
-          <ProgressBar
-            completed={item.completed}
-            label={item.label}
-            alert={item.alert}
-            open
-            icon={getIcon(item.operation)}
-            onClickAction={() => {}}
-            withoutProgress
-            onClearProgress={(operationId, operation) =>
-              clearOperationsData?.(operationId, operation, item)
-            }
-            operation={item.operation}
-          />
-        </div>
-      ))}
+      {operations.map((item) => {
+        const operationId = item.items?.[0]?.operationId;
+        return (
+          <div
+            key={getOperationKey(item)}
+            className={`progress-list ${item.showPanel ? "withHover" : ""}`}
+          >
+            <ProgressBar
+              completed={item.completed}
+              label={item.label}
+              alert={item.alert}
+              open
+              icon={getIcon(item.operation)}
+              onOpenPanel={() => {
+                if (item.showPanel) {
+                  item.showPanel(true);
+                  onOpenPanel();
+                }
+              }}
+              withoutProgress
+              onClearProgress={(operationId, operation) =>
+                clearOperationsData?.(operationId, operation, item)
+              }
+              onCancel={
+                !item.completed && cancelSecondaryOperationById && operationId
+                  ? () =>
+                      cancelSecondaryOperationById(item.operation, operationId)
+                  : undefined
+              }
+              operation={item.operation}
+              operationId={operationId}
+            />
+          </div>
+        );
+      })}
       {panelOperations?.map((item) => (
         <div
           key={`${item.operation}`}
@@ -141,7 +162,6 @@ const ProgressList = ({
             percent={item.percent}
             open
             icon={getIcon(item.operation)}
-            onClickAction={() => {}}
             onClearProgress={clearPanelOperationsData}
             operation={item.operation}
             onCancel={onCancel}
@@ -156,3 +176,4 @@ const ProgressList = ({
 };
 
 export default ProgressList;
+

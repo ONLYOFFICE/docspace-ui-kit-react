@@ -168,3 +168,79 @@ export const EndOfBlock: Story = {
     </>
   ),
 };
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--article-item-border-radius": "8px",
+          "--article-item-text": "#222222",
+          "--article-item-text-active": "#ffffff",
+          "--article-item-text-weight": "400",
+          "--article-item-icon": "#222222",
+          "--article-item-icon-active": "#ffffff",
+          "--article-item-active-bg": "#00679e",
+          "--article-item-active-hover-bg": "#00507a",
+          "--article-item-hover-bg": "#f5f5f5",
+          "--sidebar-item-gap": "4px",
+        } as React.CSSProperties
+      }
+    >
+      <ArticleItemPure
+        icon={CatalogFolderReactSvgUrl}
+        text="Documents"
+        showText
+        linkData={defaultLinkData}
+      />
+      <ArticleItemPure
+        icon={CatalogFolderReactSvgUrl}
+        text="Active Item"
+        showText
+        isActive
+        linkData={defaultLinkData}
+      />
+      <ArticleItemPure
+        icon={CatalogTrashReactSvgUrl}
+        text="Trash"
+        showText
+        linkData={defaultLinkData}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--article-item-border-radius\` | Background pill border radius | \`3px\` |
+| \`--article-item-text\` | Item text color (normal) | theme-based |
+| \`--article-item-text-active\` | Item text color (active/selected) | theme-based |
+| \`--article-item-text-weight\` | Item text font weight | \`600\` |
+| \`--article-item-icon\` | Icon fill color (normal) | theme-based |
+| \`--article-item-icon-active\` | Icon fill color (active/selected) | theme-based |
+| \`--article-item-active-bg\` | Background when item is active | theme-based |
+| \`--article-item-active-hover-bg\` | Background when hovering an active item | theme-based |
+| \`--article-item-hover-bg\` | Background on hover | theme-based |
+| \`--sidebar-item-gap\` | Gap between items (set on parent container) | \`0\` |`,
+      },
+      source: {
+        code: `// Sidebar with Nextcloud-style active state and gaps
+<div style={{
+  "--article-item-border-radius": "8px",
+  "--article-item-text": "#222222",
+  "--article-item-text-active": "#ffffff",
+  "--article-item-text-weight": "400",
+  "--article-item-active-bg": "#00679e",
+  "--article-item-hover-bg": "#f5f5f5",
+  "--sidebar-item-gap": "4px",
+}}>
+  <ArticleItemPure icon={folderIcon} text="Documents" showText linkData={linkData} />
+  <ArticleItemPure icon={folderIcon} text="Active" showText isActive linkData={linkData} />
+</div>`,
+      },
+    },
+  },
+};

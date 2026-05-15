@@ -25,10 +25,10 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import EmptyRoomsLightSvg from "../../assets/empty.rooms.root.light.svg";
+import EmptyRoomsLightSvg from "../../assets/emptyview/empty.rooms.root.light.svg";
 import CrossSvg from "../../assets/icons/12/cross.react.svg";
 import { EmptyView } from ".";
 import type { EmptyViewProps } from "./EmptyView.types";
@@ -182,6 +182,82 @@ export const NoOptions: Story = {
   description="There are no files matching your search criteria."
   options={null}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--empty-view-title-color": "#0082c9",
+          "--empty-view-header-font-size": "18px",
+          "--empty-view-link-accent": "#0082c9",
+          "--empty-view-link-background": "#e6f3fb",
+          "--empty-view-link-hover-background": "#cce5f6",
+          "--empty-view-link-radius": "50px",
+          "--empty-view-link-padding": "8px 16px",
+          "--empty-view-link-text-size": "14px",
+          "--empty-view-item-radius": "12px",
+          "--empty-view-item-hover-background": "#e6f3fb",
+          "--empty-view-item-gap": "16px",
+          "--empty-view-width": "400px",
+          "--empty-view-gap": "12px",
+        } as CSSProperties
+      }
+    >
+      <EmptyView
+        icon={<EmptyRoomsLightSvg />}
+        title="No Files Found"
+        description="Upload or create files to get started."
+        options={[
+          {
+            key: "upload",
+            icon: <CrossSvg />,
+            to: "#",
+            description: "Upload files",
+          },
+          {
+            key: "create",
+            icon: <CrossSvg />,
+            to: "#",
+            description: "Create new document",
+          },
+        ]}
+        LinkRouter={MockLinkRouter}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--empty-view-title-color\` | Title text color | theme black/white |
+| \`--empty-view-header-font-size\` | Title font size | \`16px\` |
+| \`--empty-view-desc-color\` | Description text color | theme gray |
+| \`--empty-view-link-accent\` | Link text and icon color | theme accent |
+| \`--empty-view-link-background\` | Link button background | theme background |
+| \`--empty-view-link-hover-background\` | Link hover background | theme hover |
+| \`--empty-view-link-radius\` | Link button border-radius | \`6px\` |
+| \`--empty-view-link-padding\` | Link button padding | \`6px 10px\` |
+| \`--empty-view-link-text-size\` | Link font size | \`13px\` |
+| \`--empty-view-link-text-weight\` | Link font weight | \`600\` |
+| \`--empty-view-item-radius\` | Item row border-radius | \`6px\` |
+| \`--empty-view-item-padding\` | Item row padding | \`12px 16px\` |
+| \`--empty-view-item-gap\` | Gap between icon and text | \`20px\` |
+| \`--empty-view-icon-size\` | Item icon size | \`36px\` |
+| \`--empty-view-item-hover-background\` | Item hover background | theme hover |
+| \`--empty-view-item-title-color\` | Item title color | theme black/white |
+| \`--empty-view-item-desc-color\` | Item description color | theme gray |
+| \`--empty-view-divider-color\` | Separator color | theme gray |
+| \`--empty-view-width\` | Container max-width | \`480px\` |
+| \`--empty-view-gap\` | Gap between sections | \`18px\` |
+| \`--empty-view-padding-top\` | Top padding | \`61px\` |`,
       },
     },
   },

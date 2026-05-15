@@ -18,6 +18,7 @@ vi.mock("../../../../assets/arrow-left.long.react.svg", () => ({
 vi.mock("../../../../utils", () => ({
   __esModule: true,
   getCommonTranslation: vi.fn((key: string) => key),
+  useCommonTranslation: () => (key: string) => key,
 }));
 
 describe("BackButton", () => {
@@ -39,21 +40,55 @@ describe("BackButton", () => {
   });
 
   it("shows text when showText is true", () => {
-    render(<BackButton showText currentDeviceType={DeviceType.desktop} navigate={vi.fn()} />);
+    render(
+      <BackButton
+        showText
+        currentDeviceType={DeviceType.desktop}
+        navigate={vi.fn()}
+      />,
+    );
 
     expect(screen.getByText("Back")).toBeInTheDocument();
   });
 
   it("hides text when showText is false", () => {
-    render(<BackButton showText={false} currentDeviceType={DeviceType.desktop} navigate={vi.fn()} />);
+    render(
+      <BackButton
+        showText={false}
+        currentDeviceType={DeviceType.desktop}
+        navigate={vi.fn()}
+      />,
+    );
 
     expect(screen.queryByText("Back")).not.toBeInTheDocument();
   });
 
-  it("uses tablet arrow icon for non-desktop devices", () => {
-    render(<BackButton showText currentDeviceType={DeviceType.tablet} navigate={vi.fn()} />);
+  it("renders an icon button for non-desktop devices", () => {
+    render(
+      <BackButton
+        showText
+        currentDeviceType={DeviceType.tablet}
+        navigate={vi.fn()}
+      />,
+    );
 
-    expect(screen.getByTestId("tablet-arrow")).toBeInTheDocument();
+    // All SVGs are aliased to the same mock in the test environment, so we
+    // verify that the icon button is rendered rather than checking the specific SVG.
+    expect(screen.getByTestId("icon-button")).toBeInTheDocument();
+  });
+
+  it("uses tablet arrow icon for non-desktop devices", () => {
+    const { container } = render(
+      <BackButton
+        showText
+        currentDeviceType={DeviceType.tablet}
+        navigate={vi.fn()}
+      />,
+    );
+
+    const backButton = container.querySelector("[data-arrow-type='tablet']");
+
+    expect(backButton).toBeInTheDocument();
   });
 
   it("calls onLogoClickAction and navigates on click", () => {
@@ -96,5 +131,5 @@ describe("BackButton", () => {
     expect(toggleArticleOpen).toHaveBeenCalledTimes(1);
     expect(navigate).toHaveBeenCalledWith("/");
   });
-
 });
+

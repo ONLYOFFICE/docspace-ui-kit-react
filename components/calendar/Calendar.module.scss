@@ -55,15 +55,53 @@
     --calendar-disabled-color: #{colors.$gray-dark-strong};
   }
 
+  // bridge vars — bind public overrides to internal theme tokens
+  --calendar-title-v: var(--calendar-title, var(--calendar-title-color));
+  --calendar-outline-v: var(--calendar-outline, var(--calendar-outline-color));
+  --calendar-arrow-v: var(--calendar-arrow, var(--calendar-arrow-color));
+  --calendar-disabled-arrow-v: var(
+    --calendar-disabled-arrow,
+    var(--calendar-disabled-arrow-color)
+  );
+  --calendar-shadow-v: var(--calendar-shadow, var(--calendar-box-shadow));
+  --calendar-border-v: var(--calendar-border, var(--calendar-border-color));
+  --calendar-weekday-v: var(--calendar-weekday, var(--calendar-weekday-color));
+  --calendar-hover-bg-v: var(
+    --calendar-hover-bg,
+    var(--calendar-on-hover-background)
+  );
+  --calendar-past-v: var(--calendar-past, var(--calendar-past-color));
+  --calendar-disabled-v: var(
+    --calendar-disabled,
+    var(--calendar-disabled-color)
+  );
+  --calendar-bg-v: var(--calendar-bg, var(--background-color));
+  --calendar-accent-v: var(--calendar-accent, var(--color-scheme-main-accent));
+  --calendar-selected-text-v: var(
+    --calendar-selected-text,
+    #{variables.$white}
+  );
+  --calendar-focused-radius-v: var(--calendar-focused-radius, 50%);
+  --calendar-focused-bg-v: var(--calendar-focused-bg, transparent);
+  --calendar-focused-text-v: var(--calendar-focused-text, var(--text-color));
+  --calendar-hover-radius-v: var(--calendar-hover-radius, 50%);
+  --calendar-current-radius-v: var(--calendar-current-radius, 50%);
+  // new bridge vars for hardcoded values
+  --calendar-width-v: var(--calendar-width, 362px);
+  --calendar-height-v: var(--calendar-height, 376px);
+  --calendar-padding-v: var(--calendar-padding, 30px 28px 28px 28px);
+  --calendar-radius-v: var(--calendar-radius, 6px);
+  --calendar-title-size-v: var(--calendar-title-size, 18px);
+
   box-sizing: border-box;
-  width: 362px;
-  height: 376px;
-  padding: 30px 28px 28px 28px;
-  box-shadow: var(--calendar-box-shadow);
-  border: 1px solid var(--calendar-border-color);
-  border-radius: 6px;
+  width: var(--calendar-width-v);
+  height: var(--calendar-height-v);
+  padding: var(--calendar-padding-v);
+  box-shadow: var(--calendar-shadow-v);
+  border: 1px solid var(--calendar-border-v);
+  border-radius: var(--calendar-radius-v);
   z-index: 320;
-  background-color: var(--background-color);
+  background-color: var(--calendar-bg-v);
 
   &.isScroll {
     padding: 0px 0px 0px 28px;
@@ -96,9 +134,9 @@
 .title {
   position: relative;
   font-weight: 700;
-  font-size: 18px;
+  font-size: var(--calendar-title-size-v);
   line-height: 24px;
-  color: var(--calendar-title-color);
+  color: var(--calendar-title-v);
   border-bottom: 1px dashed transparent;
   margin: 0;
   display: inline-block;
@@ -111,7 +149,7 @@
   }
 
   &:hover {
-    border-color: var(--calendar-title-color);
+    border-color: var(--calendar-title-v);
     cursor: pointer;
 
     &.disabled {
@@ -161,33 +199,33 @@
   box-sizing: border-box;
   border-radius: 50%;
   outline: 1px solid;
-  outline-color: var(--calendar-outline-color);
+  outline-color: var(--calendar-outline-v);
   border: none;
   background-color: transparent;
   position: relative;
   transition: all ease-in-out 0.05s;
 
   span {
-    border-color: var(--calendar-arrow-color);
+    border-color: var(--calendar-arrow-v);
 
     &.disabled {
-      border-color: var(--calendar-disabled-arrow-color);
+      border-color: var(--calendar-disabled-arrow-v);
     }
   }
 
   &:hover {
     cursor: pointer;
-    outline: 2px solid var(--color-scheme-main-accent);
+    outline: 2px solid var(--calendar-accent-v);
     span {
-      border-color: var(--color-scheme-main-accent);
+      border-color: var(--calendar-accent-v);
     }
 
     &.disabled {
       cursor: auto;
-      outline: 1px solid var(--calendar-outline-color);
+      outline: 1px solid var(--calendar-outline-v);
 
       span {
-        border-color: var(--calendar-disabled-arrow-color);
+        border-color: var(--calendar-disabled-arrow-v);
       }
     }
   }
@@ -204,7 +242,7 @@
   font-size: 13px;
   line-height: 16px;
 
-  color: var(--calendar-weekday-color);
+  color: var(--calendar-weekday-v);
   width: 30px;
 
   text-align: center;
@@ -259,7 +297,7 @@
   transform: rotate(225deg);
   top: 8.5px;
   left: 104%;
-  border-color: var(--color-scheme-main-accent);
+  border-color: var(--calendar-accent-v);
 
   @include mixins.mobile {
     width: 5px;
@@ -286,17 +324,18 @@
 
   &.disabled {
     background: transparent;
-    color: var(--calendar-disabled-color);
+    color: var(--calendar-disabled-v);
   }
 
   &:hover {
     &.disabled {
       cursor: default;
       background: transparent;
-      color: var(--calendar-disabled-color);
+      color: var(--calendar-disabled-v);
     }
     cursor: pointer;
-    background: var(--calendar-on-hover-background);
+    background: var(--calendar-hover-bg-v);
+    border-radius: var(--calendar-hover-radius-v);
   }
 
   &.big {
@@ -310,35 +349,41 @@
   }
 
   &.isCurrent {
-    background: var(--color-scheme-main-accent);
-    color: #{variables.$white} !important;
+    background: var(--calendar-accent-v);
+    color: var(--calendar-selected-text-v) !important;
+    border-radius: var(--calendar-current-radius-v);
     &:hover {
-      background-color: var(--color-scheme-main-accent);
+      background-color: var(--calendar-accent-v);
+      border-radius: var(--calendar-current-radius-v);
     }
     &:focus {
-      background-color: var(--color-scheme-main-accent);
+      background-color: var(--calendar-accent-v);
     }
   }
 
   &.isSecondary {
-    color: var(--calendar-past-color);
+    color: var(--calendar-past-v);
 
     :hover {
       cursor: pointer;
-      color: var(--calendar-past-color);
+      color: var(--calendar-past-v);
     }
 
     &.disabled {
-      color: var(--calendar-disabled-color);
+      color: var(--calendar-disabled-v);
       :hover {
         cursor: auto;
-        color: var(--calendar-disabled-color) !important;
+        color: var(--calendar-disabled-v) !important;
       }
     }
   }
 
   &.focused {
-    border-color: var(--color-scheme-main-accent);
+    border-color: var(--calendar-accent-v);
+
+    border-radius: var(--calendar-focused-radius-v);
+    background-color: var(--calendar-focused-bg-v);
+    color: var(--calendar-focused-text-v);
   }
 
   @include mixins.mobile {
@@ -347,3 +392,4 @@
     height: 40px;
   }
 }
+

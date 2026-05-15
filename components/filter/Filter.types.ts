@@ -32,6 +32,7 @@ import { TSortBy, TViewAs } from "../../types";
 import { TViewSelectorOption } from "./sub-components/ViewSelector";
 import { TSelectorItem as TSelectorItemBase } from "../selector";
 import { TOption } from "../combobox";
+import type { MainButtonProps } from "../main-button/MainButton.types";
 
 export type SelectorRenderProps = {
   selectorType: string | null;
@@ -229,6 +230,13 @@ export type SearchInputProps = {
   isIndexEditingMode: boolean;
 
   initSearchValue?: string;
+
+  /** Shows a MainButton to the left of the search field */
+  showMainButton?: boolean;
+  /** Props for the MainButton displayed to the left of the search field */
+  mainButtonProps?: MainButtonProps;
+  /** Icon node rendered inside the MainButton (12x12) */
+  mainButtonIcon?: React.ReactNode;
 };
 
 export type TRoomGroupIcon = {

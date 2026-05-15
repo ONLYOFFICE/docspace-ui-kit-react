@@ -5,7 +5,10 @@ if (process.env.CI) {
   const dest = path.resolve(__dirname, "../locales/en");
   fs.mkdirSync(dest, { recursive: true });
   fs.writeFileSync(path.join(dest, "Common.json"), "{}\n");
-  console.log("CI detected – created stub locales/en/Common.json");
+  fs.writeFileSync(path.join(dest, "Payments.json"), "{}\n");
+  fs.writeFileSync(path.join(dest, "Services.json"), "{}\n");
+  fs.writeFileSync(path.join(dest, "Settings.json"), "{}\n");
+  console.log("CI detected - created stub locale files");
   process.exit(0);
 }
 
@@ -20,8 +23,11 @@ function collectUsedKeys() {
   const patterns = [
     // getCommonTranslation("Key") or getCommonTranslation('Key'), possibly multiline
     /getCommonTranslation\(\s*["']([^"']+)["']/g,
-    // t("Common:Key") or translate("Common:Key"), possibly multiline
-    /(?:translate|\.t)\(\s*["']Common:([^"']+)["']/g,
+    // match t("Key"), t("Common:Key"), translate("Key"), etc.
+    // \b handles standalone "t" and avoids "alert", "start", etc.
+    /\b(?:translate|t)\(\s*["'](?:Common:)?([^"']+)["']/g,
+    // CommonTrans i18nKey="Key" or i18nKey='Key'
+    /i18nKey=["'](?:Common:)?([^"']+)["']/g,
   ];
 
   function scan(dir) {
@@ -104,6 +110,26 @@ for (const lang of langs) {
 console.log(
   `Copied Common.json (${USED_KEYS.size} keys) for ${langs.length} locales into locales/`,
 );
+
+// --- Copy Payments.json, Services.json, Settings.json (full files, no key filtering) ---
+const CLIENT_LOCALES = path.resolve(
+  __dirname,
+  "../../../packages/client/public/locales",
+);
+const EXTRA_NS = ["Payments", "Services", "Settings"];
+for (const ns of EXTRA_NS) {
+  let copiedCount = 0;
+  for (const lang of langs) {
+    const src = path.join(CLIENT_LOCALES, lang, `${ns}.json`);
+    if (!fs.existsSync(src)) continue;
+
+    const destDir = path.join(DEST, lang);
+    fs.mkdirSync(destDir, { recursive: true });
+    fs.copyFileSync(src, path.join(destDir, `${ns}.json`));
+    copiedCount++;
+  }
+  console.log(`Copied ${ns}.json for ${copiedCount} locales into locales/`);
+}
 // --- Copy fonts ---
 const FONTS_CSS_SRC = path.resolve(__dirname, "../../../public/css/fonts.css");
 const FONTS_CSS_DEST = path.resolve(__dirname, "../css");
@@ -137,3 +163,4 @@ if (fs.existsSync(FONTS_DIR_SRC)) {
 } else {
   console.error(`fonts directory not found: ${FONTS_DIR_SRC}`);
 }
+

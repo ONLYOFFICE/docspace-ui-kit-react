@@ -52,16 +52,16 @@
 
   box-sizing: content-box;
 
-  background: var(--tile-background-color);
-  border: var(--tile-room-border);
-  border-radius: var(--tile-room-border-radius);
+  background: var(--tile-bg, var(--tile-background-color));
+  border: var(--tile-border-style, var(--tile-room-border));
+  border-radius: var(--tile-radius, var(--tile-room-border-radius));
 
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  row-gap: 16px;
+  row-gap: var(--tile-row-gap, 16px);
 
-  padding: 16px 0;
+  padding: var(--tile-padding, 16px 0);
 
   @include mixins.mobile {
     margin-inline-start: 2px;
@@ -97,11 +97,11 @@
   &.checked,
   &.isActive,
   &:hover:not(.isEdit) {
-    background: var(--tile-checked-background);
+    background: var(--tile-hover-bg, var(--tile-checked-background));
 
     .tag,
     .advanced-tag {
-      background: var(--tile-checked-background);
+      background: var(--tile-hover-bg, var(--tile-checked-background));
     }
   }
 
@@ -178,11 +178,11 @@
 }
 
 .showHotkeyBorder {
-  border-color: var(--tile-show-hotkey-border);
+  border-color: var(--tile-hotkey-color, var(--tile-show-hotkey-border));
 
   &:before,
   &:after {
-    border-color: var(--tile-show-hotkey-border);
+    border-color: var(--tile-hotkey-color, var(--tile-show-hotkey-border));
   }
 }
 
@@ -241,10 +241,10 @@
     padding-block: 8px;
     padding-inline: 0 16px;
 
-    color: var(--tile-icon-button-color);
+    color: var(--tile-icon-color, var(--tile-icon-button-color));
 
     path {
-      fill: var(--tile-icon-button-color);
+      fill: var(--tile-icon-color, var(--tile-icon-button-color));
     }
   }
 }

@@ -37,6 +37,8 @@ type BaseButtonProps = {
   primary?: boolean;
   filled?: boolean;
   filledStroke?: boolean;
+  /** Sets the button accent (tinted accent background with accent border/text) */
+  accent?: boolean;
   /** Size of the button.
    * The normal size equals 36px and 40px in height on the Desktop and Touchscreen devices. */
   size?: ButtonSize;

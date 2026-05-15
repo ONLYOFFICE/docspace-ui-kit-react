@@ -86,6 +86,7 @@ const Navigation = ({
   isPlusButtonVisible,
   showBackButton,
   contextMenuHeader,
+  analyzeResponsesButton,
 
   ...rest
 }: TNavigationProps) => {
@@ -236,6 +237,7 @@ const Navigation = ({
               <Backdrop
                 visible={isOpen}
                 withBackground={false}
+                withoutBackground
                 zIndex={400}
                 onClick={onCloseDropBox}
               />
@@ -333,6 +335,7 @@ const Navigation = ({
               isContextButtonVisible={isContextButtonVisible}
               isPlusButtonVisible={isPlusButtonVisible}
               contextMenuHeader={contextMenuHeader}
+              analyzeResponsesButton={analyzeResponsesButton}
             />
           </div>
 

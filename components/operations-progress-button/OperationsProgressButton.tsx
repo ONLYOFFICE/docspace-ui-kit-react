@@ -40,7 +40,7 @@ import { OPERATIONS_NAME } from "../../constants/index";
 import { HelpButton } from "../help-button";
 import { Backdrop } from "../backdrop";
 import { Text } from "../text";
-import { getCommonTranslation } from "../../utils";
+import { useCommonTranslation } from "../../utils";
 
 import PreviewButton from "./PreviewButton";
 import ProgressList from "./ProgressList";
@@ -68,16 +68,20 @@ const operationToIconMap: Record<
   upload: FloatingButtonIcons.upload,
   deleteVersionFile: FloatingButtonIcons.trash,
   backup: FloatingButtonIcons.backup,
+  syncDatabase: FloatingButtonIcons.upload,
 };
 
 const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   operations = [],
   panelOperations = [],
   operationsAlert,
+  operationsCanceled,
   operationsCompleted = false,
+  operationsStopped = false,
   clearOperationsData,
   clearPanelOperationsData,
   cancelUpload,
+  cancelSecondaryOperationById,
   mainButtonVisible,
   needErrorChecking,
   showCancelButton,
@@ -86,6 +90,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   isDragging,
   clearDropPreviewLocation,
 }) => {
+  const t = useCommonTranslation();
   const [isOpenDropdown, setIsOpenDropdown] = useState<boolean>(false);
   const [isHideTooltip, setIsHideTooltip] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -167,9 +172,9 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
 
   const handleTooltipOpen = () => {
     clearTimers();
-    setIsHovered(false);
 
     hideTimerRef.current = setTimeout(() => {
+      setIsHovered(false);
       setIsHideTooltip(true);
 
       resetTimerRef.current = setTimeout(() => {
@@ -193,6 +198,18 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       setIsHideTooltip(true);
 
       panelOperations[0].showPanel?.(true);
+      clearTimers();
+
+      resetTimerRef.current = setTimeout(() => {
+        setIsHideTooltip(false);
+      }, 100);
+
+      return;
+    }
+
+    if (operationsLength && operations[0].showPanel) {
+      setIsHideTooltip(true);
+      operations[0].showPanel(true);
       clearTimers();
 
       resetTimerRef.current = setTimeout(() => {
@@ -290,20 +307,49 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
     if (isSeveralOperations) {
       return (
         <Text fontWeight={600}>
-          {/* t("Common:Processes", { count: allOperationsLength }) */}
-          {getCommonTranslation("Processes", { count: allOperationsLength })}
+          {t("Processes", { count: allOperationsLength })}
+        </Text>
+      );
+    }
+
+    if (operationsStopped) {
+      const operationName = operationsLength
+        ? operations[0].label
+        : panelOperations[0].label;
+
+      return (
+        <Text fontWeight={600}>
+          {t("StoppedOperation", {
+            operationName,
+          })}
+        </Text>
+      );
+    }
+    if (operationsCanceled) {
+      const canceledLabel = operationsLength
+        ? operations[0].label
+        : panelOperations[0].label;
+
+      return <Text fontWeight={600}>{canceledLabel}</Text>;
+    }
+
+    const currentOperation = operationsLength
+      ? operations[0]
+      : panelOperations[0];
+
+    if (currentOperation.description) {
+      return (
+        <Text fontWeight={600}>
+          {currentOperation.label}
+          <br />
+          {currentOperation.description}
         </Text>
       );
     }
 
     if (operationsAlert) {
-      const operationName = operationsLength
-        ? operations[0].label
-        : panelOperations[0].label;
-
-      const operation = operationsLength
-        ? operations[0].operation
-        : panelOperations[0].operation;
+      const operationName = currentOperation.label;
+      const operation = currentOperation.operation;
 
       if (
         operation === OPERATIONS_NAME.upload &&
@@ -315,7 +361,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
             {operationName}
             <br />
             {/* t("Common:ErrorUploadingFiles", { count: getErrorCount() }) */}
-            {getCommonTranslation("ErrorUploadingFiles", {
+            {t("ErrorUploadingFiles", {
               count: getErrorCount()!,
             })}
           </Text>
@@ -324,8 +370,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
 
       return (
         <Text fontWeight={600}>
-          {/* t("Common:ErrorOperation", { operationName }) */}
-          {getCommonTranslation("ErrorOperation", {
+          {t("ErrorOperation", {
             operationName,
           })}
         </Text>
@@ -333,25 +378,18 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
     }
 
     if (operationsCompleted) {
-      const operationName = operationsLength
-        ? operations[0].label
-        : panelOperations[0].label;
+      const operationName = currentOperation.label;
 
       return (
         <Text fontWeight={600}>
-          {/* t("Common:SuccessOperation", { operationName }) */}
-          {getCommonTranslation("SuccessOperation", {
+          {t("SuccessOperation", {
             operationName,
           })}
         </Text>
       );
     }
 
-    const operationName = operationsLength
-      ? operations[0].label
-      : panelOperations[0].label;
-
-    return <Text fontWeight={600}>{operationName}</Text>;
+    return <Text fontWeight={600}>{currentOperation.label}</Text>;
   };
 
   const getIconUrl = () => {
@@ -367,7 +405,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   };
 
   const onCancelOperation = () => {
-    cancelUpload?.(getCommonTranslation);
+    cancelUpload?.(t);
   };
 
   const disableOpenPanel =
@@ -440,18 +478,19 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
             <FloatingButton
               className={classNames(styles.floatingButton, {
                 [styles.cursorDefault]:
-                  !panelOperationsLength || disableOpenPanel,
+                  (!panelOperationsLength && !operations[0]?.showPanel) ||
+                  disableOpenPanel,
               })}
               icon={getIcons()}
               iconUrl={getIconUrl()}
               alert={operationsAlert}
               completed={operationsCompleted}
               onClick={handleFloatingButtonClick}
-              {...(!isSeveralOperations &&
-                !isMobile && {
-                  showCancelButton,
-                  clearUploadedFilesHistory: onCancelOperation,
-                })}
+              {...(!isSeveralOperations && {
+                showCancelButton,
+                showCloseIcon: isMobile && isHovered,
+                clearUploadedFilesHistory: onCancelOperation,
+              })}
               withoutStatus={withoutStatus}
               percent={getPercent()}
             />
@@ -479,6 +518,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
                 clearPanelOperationsData?.(operationName);
               }}
               onCancel={onCancelOperation}
+              cancelSecondaryOperationById={cancelSecondaryOperationById}
               onOpenPanel={handleOperationClick}
             />
           </DropDown>
@@ -489,4 +529,3 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
 };
 
 export { OperationsProgressButton };
-

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -462,6 +462,43 @@ export const NoSelectText: Story = {
       source: {
         code: `<Text>This text can be selected</Text>
 <Text noSelect>This text cannot be selected</Text>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--text-size": "18px",
+          "--text-weight": "600",
+        } as CSSProperties
+      }
+    >
+      <Text>Semi-bold larger text via CSS vars</Text>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+\`\`\`css
+--text-size    /* font-size (default 13px) */
+--text-weight  /* font-weight (default 400) */
+\`\`\``,
+      },
+      source: {
+        code: `<div
+  style={{
+    "--text-size": "18px",
+    "--text-weight": "600",
+  }}
+>
+  <Text>Semi-bold larger text via CSS vars</Text>
+</div>`,
       },
     },
   },

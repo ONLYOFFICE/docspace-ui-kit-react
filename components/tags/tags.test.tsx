@@ -87,7 +87,7 @@ describe("<Tags />", () => {
   it("handles a single tag as an object with isThirdParty", () => {
     const tags = [{ label: "TP Tag", isThirdParty: true }];
     render(<Tags {...baseProps} tags={tags} columnCount={1} />);
-    const tag = screen.getByTestId("tag_item");
+    const tag = screen.getByTestId("tag_item_TP Tag");
     expect(tag).toHaveAttribute("aria-label", "TP Tag");
   });
 
@@ -207,16 +207,16 @@ describe("<Tags />", () => {
   it("calls onMouseEnter when mouse enters", () => {
     const onMouseEnterMock = vi.fn();
     render(<Tags {...baseProps} onMouseEnter={onMouseEnterMock} />);
-    const tags = screen.getAllByTestId("tag_item");
-    fireEvent.mouseEnter(tags[0]);
+    const tag = screen.getByTestId("tag_item_tag1");
+    fireEvent.mouseEnter(tag);
     expect(onMouseEnterMock).toHaveBeenCalled();
   });
 
   it("calls onMouseLeave when mouse leaves", () => {
     const onMouseLeaveMock = vi.fn();
     render(<Tags {...baseProps} onMouseLeave={onMouseLeaveMock} />);
-    const tags = screen.getAllByTestId("tag_item");
-    fireEvent.mouseLeave(tags[0]);
+    const tag = screen.getByTestId("tag_item_tag1");
+    fireEvent.mouseLeave(tag);
     expect(onMouseLeaveMock).toHaveBeenCalled();
   });
 

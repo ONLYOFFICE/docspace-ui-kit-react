@@ -47,7 +47,10 @@ import type {
   TSelectorHeader,
 } from "../../components/selector";
 import type { WithFlag, Nullable } from "../../types";
-import type { ApplyFilterOption, SearchArea } from "@onlyoffice/docspace-api-sdk";
+import type {
+  ApplyFilterOption,
+  SearchArea,
+} from "@onlyoffice/docspace-api-sdk";
 import type { DeviceType } from "../../enums";
 import type { TGetIcon } from "../utils/types";
 
@@ -112,7 +115,10 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   >;
   setSelectedItemSecurity?: React.Dispatch<
     React.SetStateAction<
-      FileEntryDtoIntegerAllOfSecurity | FileEntryDtoIntegerAllOfSecurity | FileEntryDtoIntegerAllOfSecurity | undefined
+      | FileEntryDtoIntegerAllOfSecurity
+      | FileEntryDtoIntegerAllOfSecurity
+      | FileEntryDtoIntegerAllOfSecurity
+      | undefined
     >
   >;
   searchArea?: SearchArea;
@@ -132,7 +138,9 @@ export type UseFilesHelpersProps = {
   disabledItems: (string | number)[];
   disabledFolderType?: FolderType;
   includedItems?: (string | number)[];
-  setSelectedItemSecurity: (value: FileEntryDtoIntegerAllOfSecurity | FileEntryDtoIntegerAllOfSecurity) => void;
+  setSelectedItemSecurity: (
+    value: FileEntryDtoIntegerAllOfSecurity | FileEntryDtoIntegerAllOfSecurity,
+  ) => void;
   isThirdParty: boolean;
   setSelectedTreeNode: (treeNode: FolderDtoInteger) => void;
   filterParam?: string | number;
@@ -165,6 +173,7 @@ export type UseFilesHelpersProps = {
   applyFilterOption?: ApplyFilterOption;
 
   disableBySecurity?: string;
+  withSubFolders?: boolean;
 };
 
 export type TUseInputItemHelper = {
@@ -296,4 +305,5 @@ export type FilesSelectorProps = TInfoBar &
     renderInPortal?: boolean;
     disableBySecurity?: string;
     folderFormValidation?: RegExp;
+    withSubFolders?: boolean;
   };

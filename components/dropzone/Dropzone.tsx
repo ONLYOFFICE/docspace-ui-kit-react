@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
-import { useDropzone, DropEvent } from "react-dropzone";
+import { useDropzone } from "react-dropzone";
 import classNames from "classnames";
 
 import TriangleDownIcon from "../../assets/triangle.down.react.svg";
@@ -53,6 +53,7 @@ const Dropzone = ({
   isMultipleUpload = true,
   onSingleUploadError,
   onDrop,
+  onDropRejected,
   accept,
   maxFiles = 0,
   getFilesFromEvent,
@@ -101,10 +102,44 @@ const Dropzone = ({
     noDrag: isDisabled,
     ...(!isFolderUpload && accept ? { accept } : {}),
     onDrop: handleDrop,
+    onDropRejected,
     getFilesFromEvent: customGetFilesFromEvent,
   } as Parameters<typeof useDropzone>[0];
 
-  const { getRootProps, getInputProps, open } = useDropzone(dropzoneOptions);
+  const { getRootProps, getInputProps, open, isDragActive } =
+    useDropzone(dropzoneOptions);
+
+  const [isDraggingOnPage, setIsDraggingOnPage] = React.useState(false);
+  const pageDragCounter = React.useRef(0);
+
+  React.useEffect(() => {
+    const handleDragEnter = () => {
+      pageDragCounter.current += 1;
+      setIsDraggingOnPage(true);
+    };
+
+    const handleDragLeave = () => {
+      pageDragCounter.current -= 1;
+      if (pageDragCounter.current === 0) {
+        setIsDraggingOnPage(false);
+      }
+    };
+
+    const handleDrop = () => {
+      pageDragCounter.current = 0;
+      setIsDraggingOnPage(false);
+    };
+
+    document.addEventListener("dragenter", handleDragEnter);
+    document.addEventListener("dragleave", handleDragLeave);
+    document.addEventListener("drop", handleDrop);
+
+    return () => {
+      document.removeEventListener("dragenter", handleDragEnter);
+      document.removeEventListener("dragleave", handleDragLeave);
+      document.removeEventListener("drop", handleDrop);
+    };
+  }, []);
 
   const folderInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -154,6 +189,8 @@ const Dropzone = ({
     <div
       className={classNames(styles.dropzoneWrapper, className, {
         [styles.isLoading]: isLoading,
+        [styles.isDraggingOnPage]: isDraggingOnPage && !isDragActive,
+        [styles.isDragOver]: isDragActive,
       })}
       data-testid={dataTestId ?? "dropzone"}
       aria-busy={isLoading}
@@ -165,7 +202,7 @@ const Dropzone = ({
             className={classNames(
               styles.dropzoneLoader,
               styles.dropzoneProgress,
-              loaderClassName
+              loaderClassName,
             )}
             percent={uploadPercent}
           />
@@ -210,14 +247,20 @@ const Dropzone = ({
               })}
             />
           )}
-          {icon && (
-            <img
-              src={icon}
-              alt="Upload"
-              className={classNames(styles.dropzoneIcon, iconClassName)}
-              data-testid="dropzone-icon"
-            />
-          )}
+          {icon &&
+            (typeof icon === "string" ? (
+              <img
+                src={icon}
+                alt="Upload"
+                className={classNames(styles.dropzoneIcon, iconClassName)}
+                data-testid="dropzone-icon"
+              />
+            ) : (
+              React.createElement(icon, {
+                className: classNames(styles.dropzoneIcon, iconClassName),
+                "data-testid": "dropzone-icon",
+              } as React.SVGProps<SVGSVGElement>)
+            ))}
           <div
             className={styles.dropzoneLink}
             data-testid="dropzone-text"
@@ -302,3 +345,4 @@ const Dropzone = ({
 };
 
 export default Dropzone;
+

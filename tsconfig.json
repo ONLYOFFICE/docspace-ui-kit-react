@@ -12,6 +12,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "types": ["vite/client"],
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -24,6 +25,9 @@
       ],
       "PUBLIC_DIR/*": [
         "../../public/*"
+      ],
+      "@docspace/shared/*": [
+        "../../packages/shared/*"
       ]
     }
   },
@@ -41,7 +45,9 @@
     "styles/**/*",
     "providers/**/*",
     "selectors/**/*",
-    "document-editor"
+    "document-editor",
+    "uploader",
+    "ai-agent/**/*"
   ],
   "exclude": [
     "node_modules",

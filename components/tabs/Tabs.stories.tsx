@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -251,6 +251,83 @@ export const Loading: Story = {
       },
       source: {
         code: `<Tabs items={tabItems} selectedItemId={selectedId} isLoading />`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => {
+  const [selectedId, setSelectedId] = useState(data[0].id);
+
+  return (
+    <Wrapper>
+      <div
+        style={
+          {
+            "--tabs-secondary-radius": "20px",
+            "--tabs-secondary-tab-radius": "16px",
+            "--tabs-secondary-bg": "#f5f3ff",
+            "--tabs-secondary-active-bg": "#7c3aed",
+            "--tabs-secondary-active-text": "#ffffff",
+            "--tabs-secondary-text": "#6d28d9",
+            "--tabs-secondary-hover-bg": "#ede9fe",
+          } as CSSProperties
+        }
+      >
+        <Tabs
+          items={data}
+          selectedItemId={selectedId}
+          type={TabsTypes.Secondary}
+          scaled
+          onSelect={(item) => setSelectedId(item.id)}
+        />
+      </div>
+    </Wrapper>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization. Pass via a wrapper element:
+
+\`\`\`css
+--tabs-primary-height       /* primary tabs height (default: 32px) */
+--tabs-secondary-height     /* secondary tabs height (default: 36px) */
+--tabs-primary-gap          /* gap between primary tabs (default: 20px) */
+--tabs-secondary-gap        /* gap between secondary tabs (default: 4px) */
+--tabs-secondary-padding    /* secondary tabs container padding (default: 4px) */
+--tabs-secondary-radius     /* secondary tabs container radius (default: 5px) */
+--tabs-secondary-tab-radius /* individual secondary tab radius (default: 3px) */
+--tabs-text-weight          /* font weight (default: 600) */
+--tabs-underline-thickness  /* primary indicator height (default: 4px) */
+--tabs-underline-radius     /* primary indicator border-radius (default: 4px 4px 0 0) */
+--tabs-fade                 /* gradient fade color override */
+--tabs-underline            /* primary border-bottom color override */
+--tabs-primary-bg           /* primary tabs background */
+--tabs-primary-text         /* primary tab text color */
+--tabs-primary-active-text  /* primary selected tab text color */
+--tabs-primary-hover-text   /* primary hovered tab text color */
+--tabs-secondary-bg         /* secondary tabs container background */
+--tabs-secondary-active-bg  /* secondary selected tab background */
+--tabs-secondary-text       /* secondary tab text color */
+--tabs-secondary-active-text /* secondary selected tab text color */
+--tabs-secondary-hover-bg   /* secondary hovered tab background */
+--tabs-secondary-hover-icon /* secondary hovered arrow icon color */
+\`\`\``,
+      },
+      source: {
+        code: `<div style={{
+  "--tabs-secondary-radius": "20px",
+  "--tabs-secondary-tab-radius": "16px",
+  "--tabs-secondary-bg": "#f5f3ff",
+  "--tabs-secondary-active-bg": "#7c3aed",
+  "--tabs-secondary-active-text": "#ffffff",
+}}>
+  <Tabs items={tabItems} type={TabsTypes.Secondary} scaled />
+</div>`,
       },
     },
   },

@@ -42,7 +42,7 @@ import styles from "./FileInput.module.scss";
 
 import { FileInputProps } from "./FileInput.types";
 import { globalColors } from "../../providers/theme/themes";
-import { getCommonTranslation } from "../../utils";
+import { useCommonTranslation } from "../../utils";
 
 const FileInputPure = ({
   onInput,
@@ -65,13 +65,14 @@ const FileInputPure = ({
   "data-test-id": dataTestId,
   ...rest
 }: FileInputProps) => {
+  const t = useCommonTranslation();
   const inputRef = React.useRef<null | HTMLInputElement>(null);
 
   const [fileName, setFileName] = React.useState("");
 
   const onDrop = (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) {
-      toastr.error(getCommonTranslation("NotSupportedFormat"));
+      toastr.error(t("NotSupportedFormat"));
       return;
     }
 

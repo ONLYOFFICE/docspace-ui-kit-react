@@ -31,15 +31,11 @@
 .wrapper {
   margin-inline: auto;
 
-  max-width: 480px;
   width: 100%;
 
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 18px;
-
-  padding-top: 61px;
 
   :global(.light) & {
     --empty-view-header-color: #{colors.$black};
@@ -71,6 +67,32 @@
     --empty-view-action-secondary-color: #{colors.$gray-dark};
   }
 
+  --empty-view-title-color-value: var(--empty-view-title-color, var(--empty-view-header-color));
+  --empty-view-description-color-value: var(--empty-view-desc-color, var(--empty-view-description-color));
+  --empty-view-link-color-value: var(--empty-view-link-accent, var(--empty-view-link-color));
+  --empty-view-link-bg-value: var(--empty-view-link-background, var(--empty-view-link-bg-color));
+  --empty-view-link-hover-bg-value: var(--empty-view-link-hover-background, var(--empty-view-link-bg-color-hover));
+  --empty-view-separator-color-value: var(--empty-view-divider-color, var(--empty-view-separator-color));
+  --empty-view-item-hover-bg-value: var(--empty-view-item-hover-background, var(--empty-view-items-hover));
+  --empty-view-items-header-value: var(--empty-view-item-title-color, var(--empty-view-items-header));
+  --empty-view-items-subheading-value: var(--empty-view-item-desc-color, var(--empty-view-items-subheading));
+  --empty-view-max-width: var(--empty-view-width, 480px);
+  --empty-view-top-padding: var(--empty-view-padding-top, 61px);
+  --empty-view-items-gap: var(--empty-view-gap, 18px);
+  --empty-view-title-size: var(--empty-view-header-font-size, 16px);
+  --empty-view-link-border-radius: var(--empty-view-link-radius, 6px);
+  --empty-view-link-inner-padding: var(--empty-view-link-padding, 6px 10px);
+  --empty-view-link-font-size-value: var(--empty-view-link-text-size, 13px);
+  --empty-view-link-font-weight-value: var(--empty-view-link-text-weight, 600);
+  --empty-view-item-border-radius: var(--empty-view-item-radius, 6px);
+  --empty-view-item-inner-padding: var(--empty-view-item-padding, 12px 16px);
+  --empty-view-item-icon-size: var(--empty-view-icon-size, 36px);
+  --empty-view-item-cols-gap: var(--empty-view-item-gap, 20px);
+
+  max-width: var(--empty-view-max-width);
+  padding-top: var(--empty-view-top-padding);
+  gap: var(--empty-view-items-gap);
+
   @include mixins.mobile {
     padding-top: 40px;
   }
@@ -90,16 +112,16 @@
   }
 
   .headerTitle {
-    font-size: 16px;
+    font-size: var(--empty-view-title-size);
     text-align: center;
     margin-bottom: 8px;
     margin-top: 20px;
-    color: var(--empty-view-header-color);
+    color: var(--empty-view-title-color-value);
   }
 
   .subheading {
     text-align: center;
-    color: var(--empty-view-description-color);
+    color: var(--empty-view-description-color-value);
   }
 
   .body {
@@ -124,15 +146,14 @@
     flex-wrap: nowrap;
     align-self: center;
 
-    padding: 6px 10px;
-
     max-width: fit-content;
     text-decoration: none;
 
-    color: var(--accent-main, --empty-view-link-color);
+    color: var(--accent-main, var(--empty-view-link-color-value));
 
-    background-color: var(--empty-view-link-bg-color);
-    border-radius: 6px;
+    background-color: var(--empty-view-link-bg-value);
+    border-radius: var(--empty-view-link-border-radius);
+    padding: var(--empty-view-link-inner-padding);
 
     svg {
       color: inherit;
@@ -143,21 +164,21 @@
     }
 
     span {
-      font-weight: 600;
-      font-size: 13px;
+      font-weight: var(--empty-view-link-font-weight-value);
+      font-size: var(--empty-view-link-font-size-value);
       line-height: 15px;
     }
 
     @media (hover: hover) {
       &:hover:not(:active) {
-        background: var(--empty-view-link-bg-color-hover);
+        background: var(--empty-view-link-hover-bg-value);
         & > * {
           opacity: 0.86;
         }
       }
     }
 
-    :active {
+    &:active {
       background: var(--empty-view-link-bg-color-press);
       & > * {
         filter: brightness(90%);
@@ -174,7 +195,7 @@
     align-self: center;
     font-size: 12px;
     line-height: 16px;
-    color: var(--empty-view-separator-color);
+    color: var(--empty-view-separator-color-value);
   }
 
   .action {
@@ -205,16 +226,16 @@
   .itemWrapper {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: var(--empty-view-item-cols-gap);
 
     cursor: pointer;
-    border-radius: 6px;
-    padding: 12px 16px;
+    border-radius: var(--empty-view-item-border-radius);
+    padding: var(--empty-view-item-inner-padding);
 
     .itemIcon {
-      width: 36px;
-      height: 36px;
-      flex: 0 0 36px;
+      width: var(--empty-view-item-icon-size);
+      height: var(--empty-view-item-icon-size);
+      flex: 0 0 var(--empty-view-item-icon-size);
     }
 
     &:nth-child(1) .itemIcon {
@@ -252,11 +273,11 @@
 
     .itemHeader {
       font-size: 13px;
-      color: var(--empty-view-items-header);
+      color: var(--empty-view-items-header-value);
     }
 
     .itemSubheading {
-      color: var(--empty-view-items-subheading);
+      color: var(--empty-view-items-subheading-value);
     }
 
     .arrowIcon {
@@ -269,7 +290,7 @@
 
     @media (hover: hover) {
       &:hover {
-        background-color: var(--empty-view-items-hover);
+        background-color: var(--empty-view-item-hover-bg-value);
       }
     }
 

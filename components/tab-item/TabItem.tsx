@@ -55,11 +55,12 @@ const TabItem = ({
 
   const onItemClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isDisabled) return;
+    if (lockLastSelection && isActive) return;
+
     if (!(isActive && !withMultiSelect)) {
-      if (lockLastSelection && isActive) return;
       onSelectItem(!isActive);
-      onSelect?.(e);
     }
+    onSelect?.(e);
   };
 
   useEffect(() => {

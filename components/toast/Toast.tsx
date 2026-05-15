@@ -43,7 +43,7 @@ const Slide = cssTransition({
   exit: "SlideOut",
 });
 
-const Toast = ({ className, style, isSSR }: ToastProps) => {
+const Toast = React.memo(({ className, style, isSSR }: ToastProps) => {
   const isServer = useIsServer();
   const offset = useMobileViewport();
 
@@ -86,6 +86,8 @@ const Toast = ({ className, style, isSSR }: ToastProps) => {
   return (
     <Portal element={element} appendTo={rootElement || undefined} visible />
   );
-};
+});
+
+Toast.displayName = "Toast";
 
 export { Toast };

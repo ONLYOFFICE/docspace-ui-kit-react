@@ -12,6 +12,9 @@ import { globalColors } from "../providers/theme/themes/globalColors";
 import globalTypes from "./globals";
 import withApiProvider from "./decorators/withApiProvider";
 import enCommon from "../locales/en/Common.json";
+import enPayments from "../locales/en/Payments.json";
+import enServices from "../locales/en/Services.json";
+import enSettings from "../locales/en/Settings.json";
 
 import "./styles.css";
 import "../css/fonts.css";
@@ -86,7 +89,15 @@ const preview: Preview = {
           ["Welcome", "Structure", "Translation", "Themes", "API"],
           "Samples",
           "Components",
-          ["Document Editor", "Selectors", "Providers", "Errors"],
+          [
+            "AI Agent",
+            "Payments",
+            "Document Editor",
+            "Uploader",
+            "Selectors",
+            "Providers",
+            "Errors"
+          ],
         ],
       },
     },
@@ -106,10 +117,16 @@ const preview: Preview = {
       const currentColorScheme = isDark ? darkColorScheme : lightColorScheme;
 
       const translations: TTranslations = new Map([
-        ["en", new Map([["Common", enCommon]])],
+        ["en", new Map([
+          ["Common", enCommon],
+          ["Payments", enPayments],
+          ["Services", enServices],
+          ["Settings", enSettings],
+        ])],
       ]);
 
       const isDocs = context.viewMode === "docs";
+      const noPadding = context.parameters?.noPadding;
 
       return (
         <TranslationProvider locale="en" translations={translations}>
@@ -123,7 +140,7 @@ const preview: Preview = {
                   ? globalColors.black
                   : globalColors.white,
                 color: isDark ? globalColors.white : globalColors.black,
-                padding: isDocs ? "0" : "20px",
+                padding: isDocs || noPadding ? "0" : "20px",
               }}
             >
               <Story />

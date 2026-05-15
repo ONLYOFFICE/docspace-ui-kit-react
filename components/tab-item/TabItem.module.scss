@@ -40,34 +40,48 @@
   --tab-item-selected-item-color: #{$white};
   --tab-item-tag-border: 1px solid #{$gray-light-mid};
 
+  --tab-item-active-bg-value: var(
+    --tab-item-active-bg,
+    var(--tab-item-selected-background-color)
+  );
+  --tab-item-active-text-value: var(
+    --tab-item-active-text,
+    var(--tab-item-selected-item-color)
+  );
+  --tab-item-border-value: var(--tab-item-border, var(--tab-item-tag-border));
+  --tab-item-border-radius: var(--tab-item-radius, 16px);
+  --tab-item-inner-padding: var(--tab-item-padding, 4px 16px);
+  --tab-item-opacity-disabled: var(--tab-item-disabled-opacity, 0.5);
+
   max-width: 100%;
 
   display: flex;
   flex-direction: row;
   align-items: center;
 
-  border: var(--tab-item-tag-border);
-  border-radius: 16px;
+  border: var(--tab-item-border-value);
+  border-radius: var(--tab-item-border-radius);
 
   box-sizing: border-box;
 
-  padding: 4px 16px;
+  padding: var(--tab-item-inner-padding);
 
   cursor: pointer;
 
-  &.active {
-    background: var(--tab-item-selected-background-color);
-    border-color: var(--tab-item-selected-background-color);
+  &.active,
+  &:not(.disabled):active {
+    background: var(--tab-item-active-bg-value);
+    border-color: var(--tab-item-active-bg-value);
 
     &:hover {
-      background: var(--tab-item-selected-background-color);
-      border-color: var(--tab-item-selected-background-color);
+      background: var(--tab-item-active-bg-value);
+      border-color: var(--tab-item-active-bg-value);
     }
   }
 
   &.disabled:not(&.active) {
     pointer-events: none;
-    opacity: 0.5;
+    opacity: var(--tab-item-opacity-disabled);
   }
 
   --webkit-tap-highlight-color: #{$tap-highlight};
@@ -76,8 +90,10 @@
 .tabItemText {
   height: 20px;
 
-  &.active {
+  &.active,
+  .tabItem:not(.disabled):active & {
     font-weight: 600;
-    color: var(--tab-item-selected-item-color);
+    color: var(--tab-item-active-text-value);
   }
 }
+

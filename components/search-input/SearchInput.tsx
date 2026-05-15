@@ -34,10 +34,12 @@ import React, {
 import classNames from "classnames";
 
 import CrossIconReactSvg from "../../assets/icons/12/cross.react.svg";
+import PlusIconSvg from "../../assets/icons/12/plus.svg";
 import SearchIconReactSvg from "../../assets/search.react.svg";
 
 import { useDebounce } from "../../hooks/useDebounce";
 
+import { MainButton } from "../main-button";
 import { InputBlock } from "../input-block";
 import { InputType } from "../text-input";
 
@@ -65,6 +67,9 @@ const SearchInput = ({
   children,
   dataTestId,
   tabIndex,
+  showMainButton = false,
+  mainButtonProps,
+  mainButtonIcon = <PlusIconSvg />,
 }: SearchInputProps) => {
   const [inputValue, setInputValue] = useState(value);
 
@@ -119,8 +124,24 @@ const SearchInput = ({
     return iconNode;
   };
 
+  const handleMainButtonWrapperClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const target = e.target as HTMLElement;
+      const mainBtnEl = (
+        e.currentTarget as HTMLElement
+      ).querySelector<HTMLElement>('[data-testid="main-button"]');
+      if (mainBtnEl && !mainBtnEl.contains(target)) {
+        (mainBtnEl.firstElementChild as HTMLElement)?.click();
+      }
+
+      e.preventDefault();
+    },
+    [],
+  );
+
   const iconNode = getIconNode();
   const iconSizeValue = !!inputValue || showClearButton ? 12 : 14;
+  const mainButtonWrapperRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
@@ -133,34 +154,50 @@ const SearchInput = ({
       style={style}
       data-testid={dataTestId ?? "search-input"}
     >
-      <InputBlock
-        className="search-input-block"
-        forwardedRef={forwardedRef}
-        onClick={onClick}
-        id={id}
-        name={name}
-        value={inputValue}
-        size={size}
-        scale={scale}
-        isDisabled={isDisabled}
-        onChange={handleInputChange}
-        onFocus={onFocus}
-        // onBlur={handleBlur}
-        type={InputType.text}
-        iconNode={iconNode}
-        iconButtonClassName={
-          !!inputValue || showClearButton ? "search-cross" : "search-loupe"
-        }
-        isIconFill
-        iconSize={iconSizeValue}
-        onIconClick={
-          !!inputValue || showClearButton ? handleClearSearch : undefined
-        }
-        placeholder={placeholder}
-        tabIndex={tabIndex}
-      >
-        {children}
-      </InputBlock>
+      {showMainButton && mainButtonProps ? (
+        <div
+          ref={mainButtonWrapperRef}
+          className={styles.mainButtonWrapper}
+          onClick={handleMainButtonWrapperClick}
+        >
+          <span className={styles.mainButtonIcon}>{mainButtonIcon}</span>
+          <MainButton
+            {...mainButtonProps}
+            hideArrow
+            anchorRef={mainButtonWrapperRef}
+          />
+        </div>
+      ) : null}
+      <div className={styles.searchInputField}>
+        <InputBlock
+          className="search-input-block"
+          forwardedRef={forwardedRef}
+          onClick={onClick}
+          id={id}
+          name={name}
+          value={inputValue}
+          size={size}
+          scale={scale}
+          isDisabled={isDisabled}
+          onChange={handleInputChange}
+          onFocus={onFocus}
+          // onBlur={handleBlur}
+          type={InputType.text}
+          iconNode={iconNode}
+          iconButtonClassName={
+            !!inputValue || showClearButton ? "search-cross" : "search-loupe"
+          }
+          isIconFill
+          iconSize={iconSizeValue}
+          onIconClick={
+            !!inputValue || showClearButton ? handleClearSearch : undefined
+          }
+          placeholder={placeholder}
+          tabIndex={tabIndex}
+        >
+          {children}
+        </InputBlock>
+      </div>
     </div>
   );
 };

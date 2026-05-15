@@ -24,11 +24,11 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
-import EmptyImageReactSvg from "../../assets/empty.rooms.root.light.svg?url";
+import EmptyImageReactSvg from "../../assets/emptyview/empty.rooms.root.light.svg?url";
 
 import { IconSizeType } from "../../utils";
 import { Link, LinkType } from "../link";
@@ -261,6 +261,44 @@ export const WithoutFilter: Story = {
   buttons={<HomeButton />}
   withoutFilter
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--empty-screen-header-color": "#0082c9",
+          "--empty-screen-description-color": "#1d2d44",
+          "--empty-screen-link-color": "#0082c9",
+          "--empty-screen-width": "480px",
+        } as CSSProperties
+      }
+    >
+      <EmptyScreenContainer
+        imageSrc={EmptyImageReactSvg}
+        imageAlt="Empty"
+        headerText="No files found"
+        descriptionText="Create your first file to get started."
+        buttons={<HomeButton />}
+        withoutFilter
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--empty-screen-header-color\` | Header text color | theme black/white |
+| \`--empty-screen-description-color\` | Description text color | theme gray |
+| \`--empty-screen-link-color\` | Button link/icon color | theme link |
+| \`--empty-screen-width\` | Container max width | \`640px\` |`,
       },
     },
   },

@@ -36,12 +36,18 @@ import { IconButton } from "../icon-button";
 import styles from "./PublicRoomBar.module.scss";
 import type { PublicRoomBarProps } from "./PublicRoomBar.types";
 
+const defaultIcon = (
+  <div>
+    <PeopleIcon />
+  </div>
+);
+
 const PublicRoomBar = (props: PublicRoomBarProps) => {
   const {
     ref,
     headerText,
     bodyText,
-    iconName,
+    iconName = defaultIcon,
     onClose,
     barIsVisible,
     className,
@@ -51,6 +57,9 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
 
   const headerAs = typeof headerText !== "string" ? "div" : undefined;
   const bodyAs = typeof bodyText !== "string" ? "div" : undefined;
+
+  const icon =
+    typeof iconName === "string" ? <ReactSVG src={iconName} /> : iconName;
 
   return (
     <div
@@ -68,19 +77,7 @@ const PublicRoomBar = (props: PublicRoomBarProps) => {
     >
       <div className={styles.textContainer}>
         <div className={styles.headerBody}>
-          <div className={styles.headerIcon}>
-            {iconName ? (
-              typeof iconName === "string" ? (
-                <ReactSVG src={iconName} />
-              ) : (
-                iconName
-              )
-            ) : (
-              <div>
-                <PeopleIcon />
-              </div>
-            )}
-          </div>
+          <div className={styles.headerIcon}>{icon}</div>
           <Text className={styles.header} fontWeight={600} as={headerAs}>
             {headerText}
           </Text>

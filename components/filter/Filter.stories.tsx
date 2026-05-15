@@ -708,3 +708,73 @@ export const ViewSelectorFilterMode: Story = {
     },
   },
 };
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          height: "140px",
+          // Filter button (funnel icon)
+          "--filter-btn-border": "1px solid #0082c9",
+          "--filter-btn-hover-border": "1px solid #006fa6",
+          "--filter-btn-open-fill": "#ffffff",
+          "--filter-btn-radius": "6px",
+          // Filter block sidebar
+          "--filter-bg": "#e6f3fb",
+          "--filter-width": "420px",
+          // Sort button background
+          "--filter-sort-bg": "#e6f3fb",
+          "--filter-sort-selected-bg": "#cce5f6",
+          "--filter-sort-fill": "#0082c9",
+          "--filter-sort-selected-icon": "#0082c9",
+          "--filter-sort-unselected-icon": "#5ab4e5",
+          // View selector
+          "--filter-view-fill": "#e6f3fb",
+          "--filter-view-checked": "#0082c9",
+          "--filter-view-border": "#0082c9",
+          "--filter-view-hover-border": "#006fa6",
+          "--filter-view-hover-icon": "#006fa6",
+          // Filter tags
+          "--filter-tag-border": "1px solid #0082c9",
+          "--filter-tag-selected": "#0082c9",
+          "--filter-tag-radius": "8px",
+          // Filter separator
+          "--filter-separator": "#cce5f6",
+          // SearchInput sub-component
+          "--search-input-icon-color": "#0082c9",
+          "--search-input-icon-filled-color": "#006fa6",
+          // IconButton sub-component
+          "--icon-button-color": "#0082c9",
+          "--icon-button-hover-color": "#006fa6",
+          // SelectedItem sub-component (selected filter chips)
+          "--selected-item-background": "#cce5f6",
+          "--selected-item-background-hover": "#b3d9f0",
+          "--selected-item-active-background": "#0082c9",
+          "--selected-item-active-color": "#ffffff",
+          // ComboBox sub-component (sort)
+          "--combobox-background": "#e6f3fb",
+          // Button sub-component (apply/clear in filter panel)
+          "--button-hover-background-color": "#006fa6",
+          // TextInput sub-component (search field)
+          "--text-input-border-color": "#0082c9",
+          "--text-input-border-hover-color": "#006fa6",
+          "--text-input-border-focus-color": "#0082c9",
+        } as React.CSSProperties
+      }
+    >
+      <Filter
+        {...(baseFilterArgs as FilterProps)}
+        getFilterData={() => Promise.resolve([])}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "CSS custom property overrides for the filter bar and its SearchInput, IconButton, ComboBox, ViewSelector, SelectedItem, and Button sub-components.",
+      },
+    },
+  },
+};

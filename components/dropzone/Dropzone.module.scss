@@ -30,6 +30,8 @@
 .dropzoneWrapper {
   :global(.light) & {
     --dropzone-border: 2px dashed #{colors.$gray-light-mid};
+    --dropzone-drag-active-bg: #{colors.$light-blue-dropzone-active};
+    --dropzone-hover-bg: #{colors.$light-blue-dropzone-hover};
 
     --dropzone-secondary-link: #{colors.$black};
     --dropzone-exsts-color: #{colors.$gray};
@@ -45,6 +47,8 @@
 
   :global(.dark) & {
     --dropzone-border: 2px dashed #{colors.$gray-dark-strong};
+    --dropzone-drag-active-bg: #{colors.$light-blue-dropzone-active};
+    --dropzone-hover-bg: #{colors.$light-blue-dropzone-hover};
 
     --dropzone-secondary-link: #{colors.$white};
     --dropzone-exsts-color: #{colors.$gray};
@@ -58,17 +62,81 @@
     --dropzone-arrow-icon-color-focus: #{colors.$white};
   }
 
+  // bridge vars — bind public overrides to internal theme tokens
+  --dropzone-border-v: var(--dropzone-border-style, var(--dropzone-border));
+  --dropzone-drag-active-bg-v: var(
+    --dropzone-drag-bg,
+    var(--dropzone-drag-active-bg)
+  );
+  --dropzone-hover-bg-v: var(
+    --dropzone-hover-bg-override,
+    var(--dropzone-hover-bg)
+  );
+  --dropzone-secondary-link-v: var(
+    --dropzone-link-secondary-color,
+    var(--dropzone-secondary-link)
+  );
+  --dropzone-exsts-color-v: var(
+    --dropzone-text-color,
+    var(--dropzone-exsts-color)
+  );
+  --dropzone-exsts-bg-hover-v: var(
+    --dropzone-text-hover-bg,
+    var(--dropzone-exsts-color-background-hover)
+  );
+  --dropzone-exsts-bg-pressed-v: var(
+    --dropzone-text-pressed-bg,
+    var(--dropzone-exsts-color-background-pressed)
+  );
+  --dropzone-exsts-bg-focus-v: var(
+    --dropzone-text-focus-bg,
+    var(--dropzone-exsts-color-background-focus)
+  );
+  --dropzone-exsts-color-focus-v: var(
+    --dropzone-text-focus-color,
+    var(--dropzone-exsts-color-focus)
+  );
+  --dropzone-badge-focus-v: var(
+    --dropzone-badge-focus-color,
+    var(--dropzone-exsts-badge-focus)
+  );
+  --dropzone-arrow-focus-v: var(
+    --dropzone-arrow-focus-color,
+    var(--dropzone-arrow-icon-color-focus)
+  );
+  --dropzone-formats-shadow-v: var(
+    --dropzone-formats-shadow,
+    var(--dropzone-context-menu-box-shadow)
+  );
+  // bridge vars for hardcoded values
+  --dropzone-radius-v: var(--dropzone-radius, 6px);
+  --dropzone-min-height-v: var(--dropzone-min-height, 150px);
+  --dropzone-gap-v: var(--dropzone-gap, 4px);
+  --dropzone-font-size-v: var(--dropzone-text-size, 13px);
+  --dropzone-exsts-radius-v: var(--dropzone-exsts-radius, 3px);
+  --dropzone-formats-radius-v: var(--dropzone-formats-radius, 6px);
+
   cursor: pointer;
   box-sizing: border-box;
   width: 100%;
-  height: 150px;
-  border: var(--dropzone-border);
-  border-radius: 6px;
+  height: 100%;
+  min-height: var(--dropzone-min-height-v);
+  border: var(--dropzone-border-v);
+  border-radius: var(--dropzone-radius-v);
   display: flex;
+  align-items: center;
   box-sizing: border-box;
 
   &.hasChildren {
     height: auto;
+  }
+
+  &.isDraggingOnPage {
+    background-color: var(--dropzone-drag-active-bg-v);
+  }
+
+  &.isDragOver {
+    background-color: var(--dropzone-hover-bg-v);
   }
 }
 
@@ -94,7 +162,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--dropzone-gap-v);
 
   user-select: none;
 
@@ -114,8 +182,11 @@
 
   display: flex;
   flex-direction: row;
-  gap: 4px;
-  font-size: 13px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+  gap: var(--dropzone-gap-v);
+  font-size: var(--dropzone-font-size-v);
   line-height: 20px;
 
   &.main {
@@ -127,7 +198,10 @@
 
   &.secondary {
     font-weight: 400;
-    color: var(--dropzone-secondary-link);
+    color: var(--dropzone-secondary-link-v);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-align: center;
   }
 
   @include mixins.mobile {
@@ -147,9 +221,9 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
+  gap: var(--dropzone-gap-v);
 
-  color: var(--dropzone-exsts-color);
+  color: var(--dropzone-exsts-color-v);
 }
 
 .dropzoneExstsTextContainer {
@@ -157,8 +231,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
-  border-radius: 3px;
+  gap: var(--dropzone-gap-v);
+  border-radius: var(--dropzone-exsts-radius-v);
 
   padding-inline: 8px;
   padding-block: 4px;
@@ -167,25 +241,25 @@
     cursor: pointer;
 
     &:hover {
-      background-color: var(--dropzone-exsts-color-background-hover);
+      background-color: var(--dropzone-exsts-bg-hover-v);
     }
 
     &:active {
-      background-color: var(--dropzone-exsts-color-background-pressed);
+      background-color: var(--dropzone-exsts-bg-pressed-v);
     }
   }
 
   &.isOpen {
     cursor: pointer;
-    background-color: var(--dropzone-exsts-color-background-focus);
+    background-color: var(--dropzone-exsts-bg-focus-v);
 
     .dropzoneExstsText {
-      color: var(--dropzone-exsts-color-focus);
+      color: var(--dropzone-exsts-color-focus-v);
     }
 
     .dropzoneExstsBadge {
       [data-testid="badge-inner"] {
-        background-color: var(--dropzone-exsts-badge-focus);
+        background-color: var(--dropzone-badge-focus-v);
       }
     }
   }
@@ -193,7 +267,7 @@
 
 .dropzoneExstsText {
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--dropzone-font-size-v);
   line-height: 20px;
 }
 
@@ -211,24 +285,26 @@
   transition: transform 0.2s ease;
 
   path {
-    fill: var(--dropzone-exsts-color);
+    fill: var(--dropzone-exsts-color-v);
   }
 
   &.isOpen {
     transform: rotate(180deg);
     path {
-      fill: var(--dropzone-arrow-icon-color-focus);
+      fill: var(--dropzone-arrow-focus-v);
     }
   }
 }
 
 .dropzoneFormatsDropdown {
   :global(.light) & {
-    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-color};
+    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px
+      #{colors.$box-shadow-color};
   }
 
   :global(.dark) & {
-    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-color};
+    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px
+      #{colors.$box-shadow-color};
   }
 
   position: absolute !important;
@@ -240,8 +316,8 @@
   width: 100%;
   background: var(--background-content);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-shadow: var(--dropzone-context-menu-box-shadow);
+  border-radius: var(--dropzone-formats-radius-v);
+  box-shadow: var(--dropzone-formats-shadow-v);
 }
 
 .dropzoneFormatsContent {
@@ -265,3 +341,4 @@
   padding: 16px;
   box-sizing: border-box;
 }
+

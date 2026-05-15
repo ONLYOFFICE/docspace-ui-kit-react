@@ -38,6 +38,8 @@ export type ModalDialogTypeDetailed = {
 export type ModalSubComponentsProps = AsideHeaderProps & {
   /** Reference to the modal element */
   ref?: RefObject<HTMLDivElement | null>;
+  /** Reference to the inner sheet/content element (`<div id="modal-dialog">`) */
+  sheetRef?: RefObject<HTMLDivElement | null>;
   /** Unique identifier for the modal */
   id?: string;
   /** Custom styles for the modal */

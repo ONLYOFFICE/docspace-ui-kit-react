@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import React from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -340,6 +341,55 @@ export const WithNavigationButton: Story = {
   navigationButtonLabel="Go to Room"
   onNavigationButtonClick={handleClick}
 />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          height: "240px",
+          // Navigation heading
+          "--navigation-heading-size": "20px",
+          "--navigation-heading-weight": "700",
+          "--navigation-title-color": "#0082c9",
+          // Expander / arrow icons
+          "--navigation-expander-fill": "#0082c9",
+          "--navigation-arrow-fill": "#0082c9",
+          // Badge
+          "--navigation-badge-fill": "#0082c9",
+          // Dropdown box
+          "--navigation-dropdown-bg": "#e6f3fb",
+          "--navigation-dropdown-shadow": "0 4px 16px rgba(0,130,201,0.25)",
+          "--navigation-dropdown-radius": "8px",
+          // Separator between logo and title
+          "--navigation-separator": "#0082c9",
+          // Info-panel toggle active background
+          "--navigation-info-panel-bg": "#cce5f6",
+          // Chat button open state
+          "--navigation-chat-open-bg": "#cce5f6",
+          "--navigation-chat-radius": "8px",
+          // Warning / trash label
+          "--navigation-warning-bg": "#e6f3fb",
+          "--navigation-warning-text": "#0082c9",
+          "--navigation-warning-radius": "8px",
+          // IconButton (context menu, info panel toggle)
+          "--icon-button-color": "#0082c9",
+          "--icon-button-hover-color": "#006fa6",
+        } as React.CSSProperties
+      }
+    >
+      <Navigation {...defaultArgs} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "CSS custom property overrides for the navigation heading, dropdown box, icons, separator, and sub-components (IconButton).",
       },
     },
   },

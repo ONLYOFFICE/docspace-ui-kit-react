@@ -275,6 +275,7 @@ const FilterBlockItem = ({
     if (
       item.group === FilterGroups.filterAuthor ||
       item.group === FilterGroups.roomFilterSubject ||
+      item.group === FilterGroups.roomFilterOwner ||
       item.group === FilterGroups.filterGroup ||
       item.group === FilterGroups.groupsFilterMember ||
       item.group === FilterGroups.filterInviter
@@ -353,16 +354,47 @@ const FilterBlockItem = ({
         })}
         data-testid={`filter_block_item_content_${group}`}
       >
-        {groupItem.map((item: TGroupItem) => {
-          if ("displaySelectorType" in item && item.displaySelectorType)
-            return getSelectorItem(item);
-          if ("isToggle" in item && item.isToggle) return getToggleItem(item);
-          if ("withOptions" in item && item.withOptions)
-            return getWithOptionsItem(item);
-          if ("isCheckbox" in item && item.isCheckbox)
-            return getCheckboxItem(item);
-          return getTagItem(item as TTagItem);
-        })}
+        {(() => {
+          // For filter-subject and filter-owner groups, check if selector is selected
+          if (
+            group === FilterGroups.roomFilterSubject ||
+            group === FilterGroups.roomFilterOwner
+          ) {
+            const hasSelectorSelected = groupItem.some(
+              (gi) =>
+                "selectedKey" in gi &&
+                gi.selectedKey &&
+                gi.selectedKey !== FilterKeys.me &&
+                gi.isSelected &&
+                "displaySelectorType" in gi &&
+                gi.displaySelectorType,
+            );
+
+            // If selector is selected, show only the selected selector item
+            if (hasSelectorSelected) {
+              return groupItem
+                .filter(
+                  (item): item is TSelectorItem =>
+                    "displaySelectorType" in item &&
+                    !!item.displaySelectorType &&
+                    item.isSelected === true,
+                )
+                .map((item) => getSelectorItem(item));
+            }
+          }
+
+          // Otherwise show all items
+          return groupItem.map((item: TGroupItem) => {
+            if ("displaySelectorType" in item && item.displaySelectorType)
+              return getSelectorItem(item);
+            if ("isToggle" in item && item.isToggle) return getToggleItem(item);
+            if ("withOptions" in item && item.withOptions)
+              return getWithOptionsItem(item);
+            if ("isCheckbox" in item && item.isCheckbox)
+              return getCheckboxItem(item);
+            return getTagItem(item as TTagItem);
+          });
+        })()}
       </div>
       {!isLast && !withoutSeparator ? (
         <div className={styles.filterBlockItemSeparator} />

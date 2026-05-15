@@ -29,11 +29,8 @@ import classNames from "classnames";
 
 import { Text } from "../text";
 import { HelpButton } from "../help-button";
-import {
-  FloatingButton,
-  FloatingButtonIcons,
-} from "../floating-button";
-import { getCommonTranslation } from "../../utils";
+import { FloatingButton, FloatingButtonIcons } from "../floating-button";
+import { useCommonTranslation } from "../../utils";
 
 import styles from "./OperationsProgressButton.module.scss";
 
@@ -56,12 +53,14 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
   allOperationsLength,
   setShowSeveralOperationsIcon,
 }) => {
+  const t = useCommonTranslation();
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [animationState, setAnimationState] = useState<
     "raising" | "dropping" | "hidingUnder"
   >("raising");
   const [lastKnownTitle, setLastKnownTitle] = useState<string | null>(null);
 
+  const isHidingUnderRef = useRef(false);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const previewMainContainerRef = useRef<HTMLDivElement>(null);
   const previewHideTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -164,9 +163,13 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
     if (isDragging) return;
 
     const shouldHideUnder = hasUploadOperationByDrag();
-    const animationType = shouldHideUnder ? "hidingUnder" : "dropping";
 
-    setAnimationState(animationType);
+    if (shouldHideUnder) {
+      isHidingUnderRef.current = true;
+      setAnimationState("hidingUnder");
+    } else if (!isHidingUnderRef.current) {
+      setAnimationState("dropping");
+    }
 
     if (previewButtonWasVisible.current) {
       // Dragging stopped
@@ -239,6 +242,7 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
           animation.includes("hideUnderProgressBarTablet")) &&
         !isDragging
       ) {
+        isHidingUnderRef.current = false;
         onHideAnimationComplete();
       }
     },
@@ -299,7 +303,7 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
           (dropTargetFolderName || lastKnownTitle) ? (
             <Text fontWeight={600} fontSize="14px">
               {/* t("Common:DropToLocation", { folderName: dropTargetFolderName || lastKnownTitle }) */}
-              {getCommonTranslation("DropToLocation", {
+              {t("DropToLocation", {
                 folderName: dropTargetFolderName! || lastKnownTitle!,
               })}
             </Text>
@@ -325,3 +329,4 @@ const PreviewButton: React.FC<PreviewButtonProps> = ({
 };
 
 export default PreviewButton;
+

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -201,6 +201,53 @@ export const AllVariants: Story = {
         code: `<SelectedItem label="Inline enabled" propKey="1" isInline onClose={handleRemove} />
 <SelectedItem label="Inline disabled" propKey="2" isInline isDisabled onClose={handleRemove} />
 <SelectedItem label="Block item" propKey="3" isInline={false} onClose={handleRemove} />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          gap: "8px",
+          flexWrap: "wrap",
+          "--selected-item-bg": "#ede9fe",
+          "--selected-item-bg-hover": "#ddd6fe",
+          "--selected-item-text": "#4c1d95",
+          "--selected-item-disabled-text": "#a78bfa",
+          "--selected-item-radius": "16px",
+          "--selected-item-padding": "6px 12px",
+          "--selected-item-height": "28px",
+        } as CSSProperties
+      }
+    >
+      <SelectedItem label="Custom item" propKey="1" isInline onClose={() => {}} />
+      <SelectedItem label="Disabled" propKey="2" isInline isDisabled onClose={() => {}} />
+      <SelectedItem label="Another tag" propKey="3" isInline onClose={() => {}} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--selected-item-bg\` | Background color | theme token |
+| \`--selected-item-bg-hover\` | Hover background | theme token |
+| \`--selected-item-text\` | Label text color | theme token |
+| \`--selected-item-disabled-text\` | Disabled label color | theme token |
+| \`--selected-item-active-bg\` | Active state background | theme token |
+| \`--selected-item-active-text\` | Active state text color | theme token |
+| \`--selected-item-radius\` | Border radius | \`3px\` |
+| \`--selected-item-padding\` | Inner padding | \`6px 8px\` |
+| \`--selected-item-height\` | Item height | \`32px\` |
+| \`--selected-item-margin-inline\` | Inline-end margin | \`4px\` |
+| \`--selected-item-margin-bottom\` | Bottom margin | \`4px\` |
+| \`--selected-item-label-margin\` | Label inline-end margin | \`10px\` |`,
       },
     },
   },

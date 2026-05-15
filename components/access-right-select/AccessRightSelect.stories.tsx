@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, CSSProperties, ReactNode } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -224,6 +224,85 @@ import { AccessRightSelect } from "@docspace/ui-kit/components/access-right-sele
 type Story = StoryObj<ComponentProps<typeof AccessRightSelect>>;
 
 export default meta;
+
+const CssCustomizationTemplate = () => {
+  return (
+    <div
+      style={
+        {
+          // === AccessRightSelect — item icon and text ===
+          "--access-right-select-text": "#0082c9",
+          "--access-right-select-icon": "#0082c9",
+          "--access-right-select-description": "#5aa9d0",
+          "--access-right-select-description-size": "12px",
+          "--access-right-select-gap": "12px",
+          "--access-right-select-item-padding": "10px 0",
+          // === Combobox (trigger button) ===
+          "--combobox-radius": "8px",
+          "--combobox-open-bg": "#e6f3fb",
+          // === DropDown (options panel) ===
+          "--dropdown-bg": "#e6f3fb",
+          "--dropdown-border-style": "1px solid #0082c9",
+          "--dropdown-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
+          "--dropdown-radius": "12px",
+          "--dropdown-text-size": "13px",
+        } as CSSProperties
+      }
+    >
+      <div style={{ height: "420px" }}>
+        <AccessRightSelect
+          accessOptions={data}
+          selectedOption={data[0]}
+          scaledOptions={false}
+          scaled={false}
+          directionX="right"
+          size={ComboBoxSize.content}
+          manualWidth="fit-content"
+        />
+      </div>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**AccessRightSelect — items**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--access-right-select-text\` | Icon fill color in onlyIcon mode | theme-based |
+| \`--access-right-select-disabled-icon\` | Disabled icon color | theme-based |
+| \`--access-right-select-icon\` | Item icon color | theme-based |
+| \`--access-right-select-description\` | Item description text color | theme-based |
+| \`--access-right-select-description-size\` | Description font size | \`13px\` |
+| \`--access-right-select-gap\` | Gap between icon and text | \`8px\` |
+| \`--access-right-select-item-padding\` | Item vertical padding | \`7px 0\` |
+
+**Combobox (trigger button)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--combobox-radius\` | Combobox border radius | \`3px\` |
+| \`--combobox-open-bg\` | Background when open | theme-based |
+
+**DropDown (options panel)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--dropdown-bg\` | Panel background | theme-based |
+| \`--dropdown-border-style\` | Panel border | theme-based |
+| \`--dropdown-shadow\` | Panel shadow | theme-based |
+| \`--dropdown-radius\` | Panel border radius | \`6px\` |
+| \`--dropdown-text-size\` | Item font size | \`13px\` |`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   args: {

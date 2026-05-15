@@ -32,7 +32,7 @@ import ArrowTabletIcon from "../../../../assets/arrow-left.long.react.svg";
 import { IconButton } from "../../../icon-button";
 import { Text } from "../../../text";
 import { DeviceType } from "../../../../enums";
-import { getCommonTranslation } from "../../../../utils";
+import { useCommonTranslation } from "../../../../utils";
 
 import { ArticleHeaderLoader } from "../../skeletons";
 
@@ -45,6 +45,7 @@ const BackButton = ({
   isLoading,
   toggleArticleOpen,
   navigate,
+  onBack,
 }: {
   showText: boolean;
   currentDeviceType: DeviceType;
@@ -52,23 +53,27 @@ const BackButton = ({
   isLoading?: boolean;
   toggleArticleOpen?: () => void;
   navigate?: (path: string) => void;
+  onBack?: () => void;
 }) => {
+  const t = useCommonTranslation();
+
   const onClickBack = () => {
     onLogoClickAction?.();
 
     if (toggleArticleOpen && currentDeviceType === DeviceType.mobile)
       toggleArticleOpen();
 
-    if (navigate) navigate("/");
-    else window.location.href = "/";
+    if (onBack) {
+      onBack();
+    } else if (navigate) {
+      navigate("/");
+    } else {
+      window.location.href = "/";
+    }
   };
 
-  const icon =
-    currentDeviceType === DeviceType.desktop ? (
-      <ArrowIcon />
-    ) : (
-      <ArrowTabletIcon />
-    );
+  const isDesktop = currentDeviceType === DeviceType.desktop;
+  const icon = isDesktop ? <ArrowIcon /> : <ArrowTabletIcon />;
 
   if (isLoading)
     return (
@@ -83,10 +88,11 @@ const BackButton = ({
     <div
       className={styles.backButton}
       data-show-article={showText ? "true" : "false"}
+      data-arrow-type={isDesktop ? "desktop" : "tablet"}
       onClick={onClickBack}
     >
       <IconButton className={styles.arrowIcon} iconNode={icon} isClickable />
-      {showText ? <Text truncate>{getCommonTranslation("Back")}</Text> : null}
+      {showText ? <Text truncate>{t("Back")}</Text> : null}
     </div>
   );
 };

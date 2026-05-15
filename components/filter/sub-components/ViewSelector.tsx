@@ -28,7 +28,7 @@ import React from "react";
 import { ReactSVG } from "react-svg";
 import classNames from "classnames";
 
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils/i18n";
 import { TooltipContainer } from "../../tooltip";
 import styles from "../Filter.module.scss";
 
@@ -67,6 +67,7 @@ const ViewSelector = ({
   style,
   ...rest
 }: ViewSelectorProps) => {
+  const t = useCommonTranslation();
   const onChangeViewHandler = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isDisabled) return;
 
@@ -107,8 +108,8 @@ const ViewSelector = ({
           data-view={value}
           title={
             value === "row"
-              ? getCommonTranslation("SwitchViewToCompact") ?? ""
-              : getCommonTranslation("SwitchToThumbnails") ?? ""
+              ? (t("SwitchViewToCompact") ?? "")
+              : (t("SwitchToThumbnails") ?? "")
           }
           data-testid="view-selector-icon"
         >
@@ -137,8 +138,8 @@ const ViewSelector = ({
           data-view={value}
           title={
             value === "row"
-              ? getCommonTranslation("SwitchViewToCompact") ?? ""
-              : getCommonTranslation("SwitchToThumbnails") ?? ""
+              ? (t("SwitchViewToCompact") ?? "")
+              : (t("SwitchToThumbnails") ?? "")
           }
           data-testid="view-selector-icon"
         >

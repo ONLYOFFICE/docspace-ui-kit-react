@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -104,7 +104,8 @@ export const Default: Story = {
   render: (args) => <CategoryItem {...args} />,
   args: {
     title: "Category Title",
-    subtitle: "This is a description of the category that provides more details",
+    subtitle:
+      "This is a description of the category that provides more details",
     url: "#",
     isDisabled: false,
     withPaidBadge: false,
@@ -177,7 +178,14 @@ export const DisabledState: Story = {
 };
 
 const Wrapper = (props: { children: React.ReactNode }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "600px" }}>
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "16px",
+      maxWidth: "600px",
+    }}
+  >
     {props.children}
   </div>
 );
@@ -217,7 +225,8 @@ export const AllVariants: Story = {
   parameters: {
     docs: {
       description: {
-        story: "All category item variants: default, with paid badge, and disabled.",
+        story:
+          "All category item variants: default, with paid badge, and disabled.",
       },
       source: {
         code: `<CategoryItem title="General Settings" subtitle="Manage settings" />
@@ -227,3 +236,53 @@ export const AllVariants: Story = {
     },
   },
 };
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--category-item-title-color": "#0082c9",
+          "--category-item-description-color": "#0082c9",
+          "--category-item-arrow-color": "#0082c9",
+          "--category-item-subheader-size": "14px",
+          "--category-item-margin": "16px",
+        } as CSSProperties
+      }
+    >
+      <CategoryItem
+        title="Files"
+        subtitle="Manage files and storage settings"
+        url="/settings/files"
+        onClickLink={() => {}}
+        withPaidBadge={false}
+        badgeLabel=""
+      />
+      <CategoryItem
+        title="Security"
+        subtitle="Configure passwords and two-factor authentication"
+        url="/settings/security"
+        onClickLink={() => {}}
+        withPaidBadge={false}
+        badgeLabel=""
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--category-item-title-color\` | Title link color | inherited |
+| \`--category-item-description-color\` | Description text color | theme gray |
+| \`--category-item-arrow-color\` | Arrow icon fill color | theme black/white |
+| \`--category-item-disabled-color\` | Disabled text color | theme gray |
+| \`--category-item-subheader-size\` | Subheader font size | \`13px\` |
+| \`--category-item-margin\` | Bottom margin between items | \`20px\` |`,
+      },
+    },
+  },
+};
+

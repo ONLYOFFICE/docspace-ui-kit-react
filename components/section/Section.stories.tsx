@@ -476,3 +476,79 @@ export const Default: Story = {
     },
   },
 };
+
+export const CssCustomization: Story = {
+  render: (args) => (
+    <div
+      style={
+        {
+          width: "100%",
+          height: "600px",
+          // Section header background
+          "--section-bg": "#e6f3fb",
+          // Section header size
+          "--section-header-size": "56px",
+          // Section footer
+          "--section-footer-margin": "24px",
+          // Info panel customization
+          "--info-panel-background": "#e6f3fb",
+          "--info-panel-border-color": "#0082c9",
+          "--info-panel-backdrop": "rgba(0, 130, 201, 0.08)",
+          "--info-panel-width": "360px",
+          // Navigation sub-component
+          "--navigation-root-folder-title-color": "#0082c9",
+          "--navigation-background": "#e6f3fb",
+          "--navigation-box-shadow": "0 2px 8px rgba(0,130,201,0.15)",
+          // Filter sub-component
+          "--filter-button-border": "1px solid #0082c9",
+          "--filter-button-hover-border": "1px solid #006fa6",
+          "--filter-block-background": "#e6f3fb",
+          "--filter-sort-button-background": "#e6f3fb",
+          // Table sub-component (used in SectionBody)
+          "--table-header-border-bottom": "1px solid #0082c9",
+          // IconButton (used in Navigation and Filter)
+          "--icon-button-color": "#0082c9",
+          "--icon-button-hover-color": "#006fa6",
+        } as React.CSSProperties
+      }
+    >
+      <Section {...args}>
+        <Section.SectionHeader>
+          <NavigationHeader />
+        </Section.SectionHeader>
+        <Section.SectionFilter>
+          <FilterContent />
+        </Section.SectionFilter>
+        <Section.SectionBody>
+          <TableContent />
+        </Section.SectionBody>
+        <Section.InfoPanelHeader>
+          <div style={{ padding: "8px 0", fontWeight: 600, color: "#0082c9" }}>
+            Info Panel
+          </div>
+        </Section.InfoPanelHeader>
+        <Section.InfoPanelBody>
+          <div style={{ padding: "16px", color: "#0082c9" }}>
+            Info panel content with custom Nextcloud-style blue theme.
+          </div>
+        </Section.InfoPanelBody>
+        <Section.SectionFooter>{null}</Section.SectionFooter>
+      </Section>
+    </div>
+  ),
+  args: {
+    currentDeviceType: DeviceType.desktop,
+    withBodyScroll: true,
+    isHeaderVisible: true,
+    isInfoPanelAvailable: true,
+    isInfoPanelVisible: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "CSS custom property overrides. Set on any ancestor element. Navigation and Filter sub-components can be customized via their own CSS vars.",
+      },
+    },
+  },
+};

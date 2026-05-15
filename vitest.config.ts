@@ -5,6 +5,10 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        find: /^@docspace\/shared\/(.*)/,
+        replacement: path.resolve(__dirname, "../../packages/shared/$1"),
+      },
+      {
         find: /^(.*)\.react\.svg$/,
         replacement: path.resolve(__dirname, "./test/__mocks__/svgMock.tsx"),
       },
@@ -20,6 +24,7 @@ export default defineConfig({
     setupFiles: ["./test/setup.ts"],
     include: [
       "components/**/*.test.{ts,tsx}",
+      "ai-agent/**/*.test.{ts,tsx}",
       "errors/**/*.test.{ts,tsx}",
       "ui/**/*.test.{ts,tsx}",
       "utils/**/*.test.{ts,tsx}",

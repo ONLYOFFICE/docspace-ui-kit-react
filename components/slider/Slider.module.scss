@@ -71,10 +71,18 @@
     );
   }
 
+  --slider-track-h: var(--slider-size, var(--slider-track-height));
+  --slider-thumb-s: var(--slider-handle-size, var(--slider-thumb-size));
+  --slider-radius: var(--slider-track-radius, var(--slider-border-radius));
+  --slider-thumb-bg: var(--slider-handle-color, var(--slider-thumb-background));
+  --slider-track-color: var(--slider-background-color, var(--slider-background));
+  --slider-filled-color: var(--slider-fill-color, var(--slider-range-track-background));
+  --slider-fill-image: var(--slider-pouring-image, var(--slider-background-image));
+
   width: 100%;
   margin: 24px 0;
-  background: var(--slider-background);
-  border-radius: var(--slider-border-radius);
+  background: var(--slider-track-color);
+  border-radius: var(--slider-radius);
   -webkit-appearance: none;
   appearance: none;
 
@@ -83,7 +91,7 @@
   }
 
   &.withPouring {
-    background-image: var(--slider-background-image);
+    background-image: var(--slider-fill-image);
     background-size: var(--size-prop) 100%;
     background-repeat: no-repeat;
     background-position: left center;
@@ -99,9 +107,9 @@
 
   &::-webkit-slider-runnable-track {
     border: 1.4px solid var(--slider-runnable-track-border);
-    border-radius: var(--slider-border-radius);
+    border-radius: var(--slider-radius);
     width: 100%;
-    height: var(--runnable-track-height, var(--slider-track-height));
+    height: var(--runnable-track-height, var(--slider-track-h));
     cursor: pointer;
 
     .disabled & {
@@ -111,9 +119,9 @@
 
   &::-webkit-slider-thumb {
     margin-top: -9.4px;
-    width: var(--thumb-width, var(--slider-thumb-size));
-    height: var(--thumb-height, var(--slider-thumb-size));
-    background: var(--slider-thumb-background);
+    width: var(--thumb-width, var(--slider-thumb-s));
+    height: var(--thumb-height, var(--slider-thumb-s));
+    background: var(--slider-thumb-bg);
     border: var(--thumb-border-width, var(--slider-thumb-border)) solid
       var(--slider-thumb-border-color);
     border-radius: 24px;
@@ -130,9 +138,9 @@
 
   &::-moz-range-thumb {
     box-sizing: border-box;
-    width: var(--thumb-width, var(--slider-thumb-size));
-    height: var(--thumb-height, var(--slider-thumb-size));
-    background: var(--slider-thumb-background);
+    width: var(--thumb-width, var(--slider-thumb-s));
+    height: var(--thumb-height, var(--slider-thumb-s));
+    background: var(--slider-thumb-bg);
     border: var(--thumb-border-width, var(--slider-thumb-border)) solid
       var(--slider-thumb-border-color);
     border-radius: 30px;
@@ -149,11 +157,11 @@
   :global {
     ::-moz-range-track {
       border: 1.4px solid var(--slider-range-track-border);
-      border-radius: var(--slider-border-radius);
+      border-radius: var(--slider-radius);
       width: 100%;
-      height: var(--runnable-track-height, var(--slider-track-height));
+      height: var(--runnable-track-height, var(--slider-track-h));
       cursor: pointer;
-      background: var(--slider-range-track-background);
+      background: var(--slider-filled-color);
 
       .disabled & {
         cursor: default;

@@ -1,0 +1,117 @@
+@use "../styles/variables/colors" as *;
+
+// Payment CSS custom properties — same pattern as ChatContainer.module.scss.
+// Defined on .paymentsRoot for inline content, and duplicated on
+// :global(.light) / :global(.dark) so that React portals (modals, dialogs)
+// mounted on <body> also inherit them.
+
+// ── Light ──
+
+.paymentsRoot,
+:global(.light) {
+  --aside-header-border-color: #{$gray-light-mid};
+  --text-disable-color: #{$gray};
+  --link-color: #{$black};
+
+  --payment-background-color: #{$gray-light};
+  --payment-backgroud-color-warning: #{$gray-light};
+  --payment-text-color: #{$light-gray-dark};
+  --payment-credit-color: #{$light-status-positive};
+  --payment-icon-background: #{$gray-light-mid};
+  --payment-icon-color: #{$light-gray-dark};
+  --payment-dialog-text: #{$gray};
+  --payment-devider-color: #{$gray-light-mid};
+  --payment-contact-container-text-color: #{$gray};
+  --payment-contact-container-link-color: #{$light-gray-dark};
+  --payment-inactive-color: #{$gray};
+  --payment-error-color: #{$light-error-status};
+  --warning-color: #{$light-error-status};
+  --background-service-color: #{$light-gray-hover};
+  --border-service-color: #{$gray-light-mid};
+  --services-additional-info: #{$gray};
+  --services-link-color: #{$gray};
+  --services-text-description: #{$gray-text};
+
+  --payment-rectangle-color: #{$light-gray-hover};
+  --payment-price-container-disable-background: #{$gray-light};
+  --payment-warning-color: #{$light-status-warning};
+  --payment-accent-color: var(--color-scheme-main-buttons);
+
+  --settings-payment-warning-color: #{$light-error-status};
+  --settings-payment-color: #{$light-status-warning};
+  --settings-payment-border: 1px solid #{$gray-light};
+  --settings-payment-bg-benefits-color: #{$gray-light};
+  --payment-price-color: #{$gray-text};
+  --payment-storage-size-title: #{$gray};
+  --payment-tariff-text: #{$gray-text};
+  --payment-price-container-bg-text: #{$light-gray-hover};
+  --payment-price-container-bg: transparent;
+  --payment-price-container-border: 1px solid #{$gray-strong};
+  --payment-price-container-feature-text: #{$gray};
+  --payment-price-container-disable-color: #{$gray};
+  --payment-price-container-disable-price-color: #{$gray};
+  --payment-benefits-icons-color: #{$light-gray-dark};
+  --payment-payer-disable-color: #{$gray};
+  --payment-link-color: #{$light-gray-dark};
+
+  --billing-card-color-wallet: #{$light-status-positive};
+  --billing-card-color-ai: #{$ai-purple};
+  --billing-card-color-payment: var(--color-scheme-main-accent);
+  --billing-card-color-storage: #{$light-gray-dark};
+}
+
+// ── Dark ──
+
+:global(.dark) .paymentsRoot,
+:global(.dark) {
+  --aside-header-border-color: #{$gray-dark-strong};
+  --text-disable-color: #{$gray-dark-text};
+  --link-color: #{$white};
+
+  --payment-background-color: #{$light-dark-gray-hover};
+  --payment-backgroud-color-warning: #{$dark-gray-light};
+  --payment-text-color: #{$dark-gray-dark};
+  --payment-credit-color: #{$dark-status-positive};
+  --payment-icon-background: #{$gray-dark-mid};
+  --payment-icon-color: #{$dark-gray-dark};
+  --payment-dialog-text: #{$gray-dark};
+  --payment-devider-color: #{$gray-dark-mid};
+  --payment-contact-container-text-color: #{$dark-gray-dark};
+  --payment-contact-container-link-color: #{$gray-dark};
+  --payment-inactive-color: #{$gray-dark};
+  --payment-error-color: #{$dark-error-status};
+  --warning-color: #{$dark-error-status};
+  --background-service-color: #{$light-dark-gray-hover};
+  --border-service-color: #{$gray-dark-strong};
+  --modal-dialog-border-color: #{$gray-dark-strong};
+  --services-additional-info: #{$gray-dark};
+  --services-link-color: #{$dark-gray-dark};
+  --services-text-description: #{$gray-dark};
+
+  --payment-rectangle-color: #{$light-dark-gray-hover};
+  --payment-price-container-disable-background: #{$dark-gray-light};
+  --payment-warning-color: #{$dark-status-warning};
+  --payment-accent-color: var(--color-scheme-main-buttons);
+
+  --settings-payment-warning-color: #{$dark-error-status};
+  --settings-payment-color: #{$dark-status-warning};
+  --settings-payment-border: 1px solid #{$gray-dark-strong};
+  --settings-payment-bg-benefits-color: #{$black};
+  --payment-price-color: #{$dark-gray-dark};
+  --payment-storage-size-title: #{$gray};
+  --payment-tariff-text: #{$gray-dark-pressed};
+  --payment-price-container-bg-text: #{$light-dark-gray-hover};
+  --payment-price-container-bg: #{$dark-gray-light};
+  --payment-price-container-border: 1px solid #{$dark-gray-light};
+  --payment-price-container-feature-text: #{$gray-dark};
+  --payment-price-container-disable-color: #{$gray-dark};
+  --payment-price-container-disable-price-color: #{$gray-dark-text};
+  --payment-benefits-icons-color: #{$dark-gray-dark};
+  --payment-payer-disable-color: #{$gray-dark};
+  --payment-link-color: #{$dark-gray-dark};
+
+  --billing-card-color-wallet: #{$dark-status-positive};
+  --billing-card-color-ai: #{$ai-purple};
+  --billing-card-color-payment: var(--color-scheme-main-accent);
+  --billing-card-color-storage: #{$dark-gray-dark};
+}

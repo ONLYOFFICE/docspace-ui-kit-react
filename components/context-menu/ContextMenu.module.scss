@@ -46,14 +46,31 @@
   :global {
     .p-contextmenu {
       position: absolute;
-      background: var(--context-menu-background);
-      border: var(--context-menu-border);
-      border-radius: 6px;
-      -moz-border-radius: 6px;
-      -webkit-border-radius: 6px;
-      box-shadow: var(--context-menu-box-shadow);
-      -moz-box-shadow: var(--context-menu-box-shadow);
-      -webkit-box-shadow: var(--context-menu-box-shadow);
+
+      --context-menu-border-radius: var(--context-menu-radius, 6px);
+      --context-menu-item-padding: var(--context-menu-menu-item-padding, 0 16px);
+      --context-menu-header-height: var(--context-menu-header-row-height, 55px);
+      --context-menu-header-padding: var(
+        --context-menu-header-inner-padding,
+        6px 16px
+      );
+      --context-menu-separator-margin: var(--context-menu-divider-margin, 6px 16px);
+      --context-menu-item-font-size: var(--context-menu-item-text-size, 13px);
+      --context-menu-item-font-weight: var(--context-menu-item-text-weight, 600);
+      --context-menu-header-font-size: var(--context-menu-header-text-size, 15px);
+      --context-menu-item-line-height: var(--context-menu-item-height, 36px);
+
+      background: var(--context-menu-bg, var(--context-menu-background));
+      border: var(--context-menu-border-style, var(--context-menu-border));
+      border-radius: var(--context-menu-border-radius);
+      -moz-border-radius: var(--context-menu-border-radius);
+      -webkit-border-radius: var(--context-menu-border-radius);
+      box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
+      -moz-box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
+      -webkit-box-shadow: var(
+        --context-menu-shadow,
+        var(--context-menu-box-shadow)
+      );
 
       .scroll-body {
         display: flex;
@@ -67,14 +84,17 @@
       display: flex;
       align-items: center;
       width: 100%;
-      height: 55px;
-      max-height: 55px;
+      height: var(--context-menu-header-height);
+      max-height: var(--context-menu-header-height);
 
-      border-bottom: var(--context-menu-header-border);
+      border-bottom: var(
+        --context-menu-header-border-style,
+        var(--context-menu-header-border)
+      );
 
       margin: 0;
       margin-bottom: 6px;
-      padding: 6px 16px;
+      padding: var(--context-menu-header-padding);
 
       cursor: default;
 
@@ -107,9 +127,9 @@
 
       .text {
         width: 100%;
-        font-size: 15px;
+        font-size: var(--context-menu-header-font-size);
         font-weight: 600;
-        color: var(--context-menu-header-text-color);
+        color: var(--context-menu-text, var(--context-menu-header-text-color));
         text-align: var(--input-text-align);
         text-transform: none;
         text-decoration: none;
@@ -127,18 +147,21 @@
     .p-contextmenu .p-submenu-list {
       position: absolute;
 
-      background: var(--context-menu-background);
-      border: var(--context-menu-border);
-      border-radius: 6px;
-      -moz-border-radius: 6px;
-      -webkit-border-radius: 6px;
-      box-shadow: var(--context-menu-box-shadow);
-      -moz-box-shadow: var(--context-menu-box-shadow);
-      -webkit-box-shadow: var(--context-menu-box-shadow);
+      background: var(--context-menu-bg, var(--context-menu-background));
+      border: var(--context-menu-border-style, var(--context-menu-border));
+      border-radius: var(--context-menu-border-radius);
+      -moz-border-radius: var(--context-menu-border-radius);
+      -webkit-border-radius: var(--context-menu-border-radius);
+      box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
+      -moz-box-shadow: var(--context-menu-shadow, var(--context-menu-box-shadow));
+      -webkit-box-shadow: var(
+        --context-menu-shadow,
+        var(--context-menu-box-shadow)
+      );
 
       margin-top: -4px;
 
-      margin-left: var(--context-menu-submenu-list-margin);
+      margin-inline-start: var(--context-menu-submenu-list-margin);
     }
 
     .p-contextmenu .p-menuitem-link {
@@ -150,7 +173,7 @@
       position: relative;
       border: 0px;
       margin: 0px;
-      padding: 0 16px;
+      padding: var(--context-menu-item-padding);
       background: none;
 
       @include mixins.no-user-select;
@@ -159,34 +182,48 @@
 
       -webkit-tap-highlight-color: #{colors.$tap-highlight};
 
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--context-menu-header-text-color);
+      font-size: var(--context-menu-item-font-size);
+      font-weight: var(--context-menu-item-font-weight);
+      color: var(--context-menu-text, var(--context-menu-header-text-color));
 
       text-transform: none;
 
       -webkit-touch-callout: none;
 
       &:hover {
-        background-color: var(--sub-menu-item-hover-background-color);
+        background-color: var(
+          --context-menu-item-hover-bg,
+          var(--sub-menu-item-hover-background-color)
+        );
       }
 
       &.p-disabled {
-        color: var(--sub-menu-item-disabled-color);
+        &:not(.p-disabled-styles-toggle) {
+          color: var(
+            --context-menu-item-disabled-text,
+            var(--sub-menu-item-disabled-color)
+          );
+        }
 
         &:hover {
           cursor: default;
-          background-color: var(--sub-menu-item-disabled-background-color);
+          background-color: var(
+            --context-menu-item-disabled-bg,
+            var(--sub-menu-item-disabled-background-color)
+          );
         }
       }
     }
 
     .p-contextmenu .p-menuitem.p-menuitem-active > .p-menuitem-link {
-      background-color: var(--sub-menu-item-hover-background-color);
+      background-color: var(
+        --context-menu-item-hover-bg,
+        var(--sub-menu-item-hover-background-color)
+      );
     }
 
     .p-contextmenu .p-menuitem-text {
-      line-height: 36px;
+      line-height: var(--context-menu-item-line-height);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -195,8 +232,11 @@
     .p-contextmenu .p-menu-separator {
       cursor: default !important;
       height: 1px !important;
-      margin: 6px 16px !important;
-      border-bottom: var(--context-menu-header-border) !important;
+      margin: var(--context-menu-separator-margin) !important;
+      border-bottom: var(
+        --context-menu-header-border-style,
+        var(--context-menu-header-border)
+      ) !important;
 
       &:hover {
         cursor: default !important;
@@ -235,10 +275,16 @@
 
       &.p-disabled {
         path[fill] {
-          fill: var(--context-menu-header-text-color) !important;
+          fill: var(
+            --context-menu-text,
+            var(--context-menu-header-text-color)
+          ) !important;
         }
         path[stroke] {
-          stroke: var(--context-menu-header-text-color) !important;
+          stroke: var(
+            --context-menu-text,
+            var(--context-menu-header-text-color)
+          ) !important;
         }
       }
       margin-inline-end: 8px;
@@ -267,11 +313,11 @@
       transform: var(--context-menu-submenu-transoform, unset);
 
       path[fill] {
-        fill: var(--context-menu-header-text-color);
+        fill: var(--context-menu-text, var(--context-menu-header-text-color));
       }
 
       path[stroke] {
-        stroke: var(--context-menu-header-text-color);
+        stroke: var(--context-menu-text, var(--context-menu-header-text-color));
       }
     }
 
@@ -295,13 +341,16 @@
           path[fill],
           circle[fill],
           rect[fill] {
-            fill: var(--context-menu-header-text-color);
+            fill: var(--context-menu-text, var(--context-menu-header-text-color));
           }
 
           path[stroke],
           circle[stroke],
           rect[stroke] {
-            stroke: var(--context-menu-header-text-color);
+            stroke: var(
+              --context-menu-text,
+              var(--context-menu-header-text-color)
+            );
           }
         }
       }
@@ -361,7 +410,8 @@
           max-height: calc(100vh - 64px);
           inset-inline-start: 0px;
           bottom: 0px;
-          border-radius: 6px 6px 0 0;
+          border-radius: var(--context-menu-border-radius)
+            var(--context-menu-border-radius) 0 0;
         }
       }
     }
@@ -420,12 +470,18 @@
   }
 
   &:not(.noHover):hover {
-    background-color: var(--sub-menu-item-hover-background-color);
+    background-color: var(
+      --context-menu-item-hover-bg,
+      var(--sub-menu-item-hover-background-color)
+    );
   }
 
   /* Keep root item highlighted while submenu is open */
   &.p-menuitem-active:not(.noHover) {
-    background-color: var(--sub-menu-item-hover-background-color);
+    background-color: var(
+      --context-menu-item-hover-bg,
+      var(--sub-menu-item-hover-background-color)
+    );
   }
 
   &.noHover:hover {
@@ -434,7 +490,10 @@
 }
 
 .activeDescendant {
-  background-color: var(--drop-down-item-hover-color);
+  background-color: var(
+    --context-menu-active-item-bg,
+    var(--drop-down-item-hover-color)
+  );
 
   :global(.light) & {
     --drop-down-item-hover-color: #{colors.$gray-light};

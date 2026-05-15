@@ -35,7 +35,7 @@ import { FilterGroups } from "../../../enums";
 import { Button, ButtonSize } from "../../button";
 import { ModalDialog, ModalDialogType } from "../../modal-dialog";
 import { IconButton } from "../../icon-button";
-import { getCommonTranslation } from "../../../utils";
+import { useCommonTranslation } from "../../../utils/i18n";
 import styles from "../Filter.module.scss";
 import { FilterBlockProps, TGroupItem, TItem } from "../Filter.types";
 import {
@@ -62,6 +62,7 @@ const FilterBlock = ({
   disableThirdParty,
   renderSelector,
 }: FilterBlockProps) => {
+  const t = useCommonTranslation();
   const [showSelector, setShowSelector] = React.useState<{
     show: boolean;
     type: string | null;
@@ -77,26 +78,6 @@ const FilterBlock = ({
   const [isLoading, setIsLoading] = React.useState(isRooms);
 
   const setFilterDataFn = (data: TItem[]) => {
-    const filterSubject = data.find(
-      (f) => f.group === FilterGroups.roomFilterSubject,
-    );
-
-    if (filterSubject && filterSubject.groupItem) {
-      const filterOwner = data.find(
-        (f) => f.group === FilterGroups.roomFilterOwner,
-      );
-
-      const isSelected =
-        filterSubject.groupItem.findIndex((i) => i.isSelected) > -1;
-
-      if (
-        filterOwner &&
-        filterOwner.groupItem &&
-        "isDisabled" in filterOwner.groupItem[0]
-      )
-        filterOwner.groupItem[0].isDisabled = !isSelected;
-    }
-
     syncGroupManagerCheckBox(data);
 
     setFilterData(data);
@@ -280,9 +261,11 @@ const FilterBlock = ({
             ) {
               value[idx].key.push(key);
             } else {
-              value[idx].key = isSelected && isFilterOwner ? "1" : key;
+              value[idx].key = key;
               if (label) {
                 value[idx].label = label;
+              } else if (!key) {
+                delete value[idx].label;
               }
             }
           }
@@ -569,7 +552,7 @@ const FilterBlock = ({
           id="filter_apply-button"
           size={ButtonSize.normal}
           primary
-          label={getCommonTranslation("ApplyButton") ?? ""}
+          label={t("ApplyButton") ?? ""}
           scale
           onClick={onFilterAction}
           isDisabled={!showFooter}
@@ -578,7 +561,7 @@ const FilterBlock = ({
         <Button
           id="filter_cancel-button"
           size={ButtonSize.normal}
-          label={getCommonTranslation("CancelButton") ?? ""}
+          label={t("CancelButton") ?? ""}
           scale
           onClick={hideFilterBlock}
           isDisabled={isLoading}

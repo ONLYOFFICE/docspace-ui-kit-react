@@ -32,9 +32,8 @@ import type { SelectorProps, TSelectorItem } from "./Selector.types";
 
 import React from "react";
 import { EmployeeStatus, EmployeeType } from "@onlyoffice/docspace-api-sdk";
-import ArchiveSvgUrl from "../../assets/room.archive.react.svg?url";
-import FolderSvgUrl from "../../assets/icons/32/folder.react.svg?url";
-import EmptyScreenFilter from "../../assets/empty.filter.rooms.light.react.svg?url";
+import FolderSvgUrl from "../../assets/icons/32/folder.svg?url";
+import EmptyScreenFilter from "../../assets/emptyFilter/empty.filter.rooms.light.svg?url";
 import { globalColors } from "../../providers/theme";
 import { AvatarRole } from "../avatar";
 import { Selector } from "./Selector";
@@ -268,16 +267,14 @@ import { Selector } from "@docspace/ui-kit/components/selector";
     },
     withSelectAll: {
       control: "boolean",
-      description:
-        'Show a "Select All" option at the top of the list',
+      description: 'Show a "Select All" option at the top of the list',
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withAccessRights: {
       control: "boolean",
-      description:
-        "Show access rights dropdown for selected items",
+      description: "Show access rights dropdown for selected items",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -312,16 +309,14 @@ import { Selector } from "@docspace/ui-kit/components/selector";
     },
     hasNextPage: {
       control: "boolean",
-      description:
-        "Indicates more items are available for infinite scrolling",
+      description: "Indicates more items are available for infinite scrolling",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     alwaysShowFooter: {
       control: "boolean",
-      description:
-        "Always display the footer, even when no items are selected",
+      description: "Always display the footer, even when no items are selected",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -355,7 +350,7 @@ export const Default: Story = {
     onSubmit: () => {},
     withSelectAll: false,
     selectAllLabel: "All accounts",
-    selectAllIcon: ArchiveSvgUrl,
+    selectAllIcon: "",
     onSelectAll: () => {},
     withAccessRights: false,
     accessRights,
@@ -425,7 +420,7 @@ export const BreadCrumbs: Story = {
     onSubmit: () => {},
     withSelectAll: false,
     selectAllLabel: "All accounts",
-    selectAllIcon: ArchiveSvgUrl,
+    selectAllIcon: "",
     onSelectAll: () => {},
     withAccessRights: false,
     accessRights,
@@ -508,7 +503,7 @@ export const NewName: Story = {
     onSubmit: () => {},
     withSelectAll: false,
     selectAllLabel: "All accounts",
-    selectAllIcon: ArchiveSvgUrl,
+    selectAllIcon: "",
     onSelectAll: () => {},
     withAccessRights: false,
     accessRights,

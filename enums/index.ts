@@ -24,6 +24,20 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import {
+  SortedByType as SdkSortedByType,
+  DateToAutoCleanUp as SdkDateToAutoCleanUp,
+  FilesSettingsDtoDefaultSharingAccessRightsEnum as SdkFilesSettingsDtoDefaultSharingAccessRightsEnum,
+} from "@onlyoffice/docspace-api-sdk";
+
+export {
+  SdkSortedByType,
+  SdkDateToAutoCleanUp,
+  SdkFilesSettingsDtoDefaultSharingAccessRightsEnum,
+};
+
+export * from "./ai";
+
 export enum ShareAccessRights {
   None = 0,
   FullAccess = 1,
@@ -225,6 +239,11 @@ export const enum ParseErrorTypes {
   IncorrectEmail = 2,
 }
 
+export const enum PortalFeaturesLimitations {
+  Limitless = -1,
+  Unavailable = 0,
+}
+
 export const enum ErrorKeys {
   LocalDomain = "LocalDomain",
   IncorrectDomain = "IncorrectDomain",
@@ -361,4 +380,18 @@ export const enum Events {
   ROOM_CREATE = "create_room",
   ROOM_EDIT = "edit_room",
   CHANGE_COLUMN = "change_column",
+}
+
+export enum ToolsPermission {
+  Allow,
+  AlwaysAllow,
+  Deny,
+}
+
+export enum DistributedTaskStatus {
+  Created,
+  Running,
+  Completed,
+  Canceled,
+  Failed,
 }

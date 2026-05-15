@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import React from "react";
 import type { ComponentProps } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -286,6 +287,50 @@ export const TooltipPositions: Story = {
 <HelpButton tooltipContent={<div>Right</div>} place="right" />
 <HelpButton tooltipContent={<div>Bottom</div>} place="bottom" />
 <HelpButton tooltipContent={<div>Left</div>} place="left" />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          padding: "40px 20px",
+          display: "flex",
+          gap: "32px",
+          alignItems: "center",
+          // IconButton (the help icon itself)
+          "--icon-button-color": "#0082c9",
+          "--icon-button-hover-color": "#006fa6",
+          // Tooltip
+          "--tooltip-bg": "#1e3a5f",
+          "--tooltip-color": "#e6f3fb",
+          "--tooltip-radius": "10px",
+          "--tooltip-inner-padding": "10px 16px",
+          "--tooltip-shadow": "0 4px 16px rgba(0,130,201,0.35)",
+        } as React.CSSProperties
+      }
+    >
+      <HelpButton
+        tooltipContent={<div>Customized tooltip</div>}
+        place="right"
+        offset={8}
+      />
+      <HelpButton
+        tooltipContent={<div>Another tooltip</div>}
+        size={20}
+        place="right"
+        offset={8}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "CSS custom property overrides for the HelpButton icon (IconButton) and its Tooltip sub-component.",
       },
     },
   },

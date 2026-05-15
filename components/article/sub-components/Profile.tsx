@@ -31,6 +31,7 @@ import VerticalDotsReactSvg from "../../../assets/icons/16/vertical-dots.react.s
 import { DeviceType } from "../../../enums";
 import { Nullable } from "../../../types";
 import { useInterfaceDirection } from "../../../context/InterfaceDirectionContext";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import { Avatar, AvatarRole, AvatarSize } from "../../avatar";
 import { Text } from "../../text";
@@ -55,6 +56,7 @@ const ArticleProfile = (props: ArticleProfileProps) => {
   const buttonMenuRef = useRef<ContextMenuRefType>(null);
   const menuRef = useRef<ContextMenuRefType>(null);
   const { isRTL } = useInterfaceDirection();
+  const t = useCommonTranslation();
 
   const isTabletView = currentDeviceType === DeviceType.tablet;
   const avatarSize = isTabletView ? AvatarSize.min : AvatarSize.base;
@@ -93,7 +95,7 @@ const ArticleProfile = (props: ArticleProfileProps) => {
     setIsOpen(false);
   };
 
-  const model = getActions?.();
+  const model = getActions?.(t);
 
   const displayName = user?.displayName;
 

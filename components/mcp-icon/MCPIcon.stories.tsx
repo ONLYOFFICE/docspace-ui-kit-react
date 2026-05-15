@@ -24,10 +24,10 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import LogoUrl from "../../assets/dark_leftmenu.svg?url";
+import LogoUrl from "../../assets/logo/dark_leftmenu.svg?url";
 
 import { MCPIcon, MCPIconSize } from ".";
 
@@ -124,6 +124,69 @@ const LabeledItem = (props: { label: string; children: React.ReactNode }) => {
       <span style={{ fontSize: "12px", color: "#666" }}>{props.label}</span>
     </div>
   );
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {/* Group 1 — icon background, text color, border radius */}
+      <div
+        style={
+          {
+            "--mcp-icon-bg": "#0082c9",
+            "--mcp-icon-color": "#ffffff",
+            "--mcp-icon-radius": "50%",
+          } as CSSProperties
+        }
+      >
+        <Wrapper>
+          {(Object.keys(MCPIconSize) as Array<keyof typeof MCPIconSize>).map(
+            (key) => (
+              <LabeledItem key={key} label={key}>
+                <MCPIcon title="D" size={MCPIconSize[key]} />
+              </LabeledItem>
+            ),
+          )}
+        </Wrapper>
+      </div>
+
+      {/* Group 2 — bg opacity override (useful in dark mode where default is 0.1) */}
+      <div
+        style={
+          {
+            "--mcp-icon-bg": "#0082c9",
+            "--mcp-icon-opacity": "0.6",
+            "--mcp-icon-radius": "8px",
+          } as CSSProperties
+        }
+      >
+        <Wrapper>
+          {(Object.keys(MCPIconSize) as Array<keyof typeof MCPIconSize>).map(
+            (key) => (
+              <LabeledItem key={key} label={key}>
+                <MCPIcon title="D" size={MCPIconSize[key]} />
+              </LabeledItem>
+            ),
+          )}
+        </Wrapper>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--mcp-icon-bg\` | Background color of the icon tile | \`#a3a9ae\` |
+| \`--mcp-icon-color\` | Text (initial) color | \`#fff\` |
+| \`--mcp-icon-opacity\` | Background opacity (bridges dark-mode \`--mcp-icon-bg-opacity\`) | \`1\` / \`0.1\` dark |
+| \`--mcp-icon-weight\` | Font weight of the initial | \`700\` |
+| \`--mcp-icon-radius\` | Border radius (applied to all sizes) | size-specific |`,
+      },
+    },
+  },
 };
 
 export const Default: Story = {

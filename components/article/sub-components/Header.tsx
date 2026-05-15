@@ -49,6 +49,7 @@ const ArticleHeader = ({
   onIconClick,
   showBackButton,
   navigate,
+  onBack,
   ...rest
 }: ArticleHeaderProps) => {
   const { isBase } = useTheme();
@@ -57,6 +58,15 @@ const ArticleHeader = ({
     onLogoClickAction?.();
     if (navigate) navigate("/");
     else window.location.href = "/";
+  };
+
+  const onLogoAuxClick = (e: React.MouseEvent) => {
+    const isMouseWheelClick = e.button === 1;
+
+    if (!isMouseWheelClick) return;
+
+    e.preventDefault();
+    window.open("/", "_blank");
   };
 
   const burgerLogo = getLogoUrl(
@@ -88,6 +98,7 @@ const ArticleHeader = ({
               currentDeviceType={currentDeviceType}
               toggleArticleOpen={onIconClick}
               navigate={navigate}
+              onBack={onBack}
             />
           ) : null
         }
@@ -117,6 +128,7 @@ const ArticleHeader = ({
             className="burger-logo"
             alt="burger-logo"
             onClick={onLogoClick}
+            onAuxClick={onLogoAuxClick}
           />
         </div>
       ) : null}
@@ -130,9 +142,10 @@ const ArticleHeader = ({
             alt="burger-logo"
             src={logo}
             onClick={onLogoClick}
+            onAuxClick={onLogoAuxClick}
           />
         ) : (
-          <div onClick={onLogoClick}>
+          <div onClick={onLogoClick} onAuxClick={onLogoAuxClick}>
             <img className="logo-icon_svg" alt="burger-logo" src={logo} />
           </div>
         )}

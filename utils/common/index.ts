@@ -28,6 +28,7 @@ import { FolderType } from "@onlyoffice/docspace-api-sdk";
 import { EmployeeType, RoomsType } from "../../enums";
 import { AvatarRole } from "../../components/avatar/Avatar.enums";
 import { getCommonTranslation } from "../i18n";
+import { getBrandName } from "../../constants/brands";
 
 export type TTranslation = (
   key: string,
@@ -65,7 +66,7 @@ export const getUserTypeTranslation = (
       return translate("Common:Owner");
     case EmployeeType.Admin:
       return translate("Common:PortalAdmin", {
-        productName: translate("Common:ProductName"),
+        productName: getBrandName("ProductName"),
       });
     case EmployeeType.RoomAdmin:
       return translate("Common:RoomAdmin");
@@ -129,16 +130,20 @@ export const getUserType = (user: TUserLike) => {
   return EmployeeType.Guest;
 };
 
-export const getLifetimePeriodTranslation = (period: number) => {
+export const getLifetimePeriodTranslation = (
+  period: number,
+  t?: (key: string, interpolation?: Record<string, string | number>) => string,
+) => {
+  const translate = t ?? getCommonTranslation;
   switch (period) {
     case 0:
-      return getCommonTranslation("Days").toLowerCase();
+      return translate("Days").toLowerCase();
     case 1:
-      return getCommonTranslation("Months").toLowerCase();
+      return translate("Months").toLowerCase();
     case 2:
-      return getCommonTranslation("Years").toLowerCase();
+      return translate("Years").toLowerCase();
     default:
-      return getCommonTranslation("Days").toLowerCase();
+      return translate("Days").toLowerCase();
   }
 };
 

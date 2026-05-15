@@ -4,6 +4,10 @@ import { render, screen, renderHook } from "@testing-library/react";
 
 import ApiProvider, { useApi } from "./ApiProvider";
 
+vi.mock("../../api/ai", () => ({
+  AiApi: class MockAiApi {},
+}));
+
 vi.mock("@onlyoffice/docspace-api-sdk", () => {
   class MockConfiguration {}
   class MockProfilesApi {
@@ -19,6 +23,10 @@ vi.mock("@onlyoffice/docspace-api-sdk", () => {
   class MockGroupApi {}
   class MockPeopleSearchApi {}
   class MockSearchApi {}
+  class MockOperationsApi {}
+  class MockThirdPartyApi {}
+  class MockPaymentApi {}
+  class MockPortalQuotaApi {}
   return {
     Configuration: MockConfiguration,
     ProfilesApi: MockProfilesApi,
@@ -30,6 +38,10 @@ vi.mock("@onlyoffice/docspace-api-sdk", () => {
     GroupApi: MockGroupApi,
     PeopleSearchApi: MockPeopleSearchApi,
     SearchApi: MockSearchApi,
+    OperationsApi: MockOperationsApi,
+    ThirdPartyApi: MockThirdPartyApi,
+    PaymentApi: MockPaymentApi,
+    PortalQuotaApi: MockPortalQuotaApi,
   };
 });
 

@@ -1,0 +1,82 @@
+// ===== CurrentUsersCountContainer =====
+
+.currentUsersContainer {
+  height: fit-content;
+
+  .currentAdminsNumber {
+    &.isDisabled {
+      color: var(--payment-price-container-disable-color);
+    }
+  }
+}
+
+// ===== DowngradePlanButtonContainer =====
+
+.downgradePlanButton {
+  button {
+    width: 100%;
+  }
+}
+
+// ===== RequestButtonContainer =====
+
+.requestButton {
+  button {
+    width: 100%;
+  }
+}
+
+// ===== SelectTotalSizeContainer =====
+
+.selectTotalSizeContainer {
+  .selectTotalSizeTitle {
+    margin-bottom: 8px;
+    margin-inline: auto;
+    color: var(--payment-price-container-feature-text);
+
+    &.isDisabled {
+      color: var(--payment-price-container-disable-color);
+    }
+  }
+}
+
+// ===== TotalTariffContainer =====
+
+.totalTariffContainer {
+  max-width: 272px;
+  margin: 0 auto;
+  word-break: break-word;
+  text-align: center;
+
+  @media (max-width: 600px) {
+    max-width: 520px;
+  }
+
+  .paymentPriceTotalPrice {
+    display: flex;
+    justify-content: center;
+    min-height: 65px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+
+    &.isDisabled {
+      color: var(--payment-price-container-disable-color);
+    }
+
+    .largerFontSize {
+      font-size: 48px;
+    }
+
+    .totalTariffDescription {
+      margin: auto;
+    }
+
+    p {
+      margin-bottom: 0;
+    }
+  }
+
+  button {
+    width: 100%;
+  }
+}

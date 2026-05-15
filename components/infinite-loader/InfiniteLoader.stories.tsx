@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps, ReactNode } from "react";
+import type { CSSProperties, ComponentProps, ReactNode } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -218,6 +218,37 @@ import { InfiniteLoaderComponent } from "@docspace/ui-kit/components/infinite-lo
 type Story = StoryObj<ComponentProps<typeof InfiniteLoaderComponent>>;
 
 export default meta;
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--infinite-loader-tile-gap": "20px 24px",
+          "--infinite-loader-tile-min-size": "180px",
+          "--infinite-loader-tile-max-size": "280px",
+        } as CSSProperties
+      }
+    >
+      <InfiniteLoaderDemo />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--infinite-loader-tile-gap\` | Gap between tiles in tile view | \`14px 16px\` |
+| \`--infinite-loader-tile-min-size\` | Minimum tile width in grid | \`216px\` |
+| \`--infinite-loader-tile-max-size\` | Maximum tile width in grid | \`360px\` |
+| \`--infinite-loader-list-width\` | Override row/table layout width (dev override) | — |
+| \`--infinite-loader-table-width\` | Width basis for row/table layouts (set by parent) | \`100%\` |`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   args: {},

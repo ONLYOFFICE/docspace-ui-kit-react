@@ -26,11 +26,11 @@
 
 import { useCallback, useRef, useState } from "react";
 
-import EmptyScreenGroupLight from "../../assets/empty.groups.light.react.svg";
-import EmptyScreenGroupDark from "../../assets/empty.groups.dark.react.svg";
+import EmptyScreenGroupLight from "../../assets/emptyview/empty.groups.light.svg";
+import EmptyScreenGroupDark from "../../assets/emptyview/empty.groups.dark.svg";
 
 import { useApi } from "../../providers/api/ApiProvider";
-import { getCommonTranslation } from "../../utils/i18n";
+import { useCommonTranslation } from "../../utils/i18n";
 import {
   RowLoader,
   SearchLoader,
@@ -57,6 +57,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
     onSubmit,
   } = props;
 
+  const t = useCommonTranslation();
   const { groupApi } = useApi();
   const { isBase } = useTheme();
 
@@ -121,15 +122,11 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       const pageCount = 100;
       setIsNextPageLoading(true);
 
-      const res = await groupApi.getGroups(
-        undefined,
-        undefined,
-        pageCount,
+      const res = await groupApi.getGroups({
+        count: pageCount,
         startIndex,
-        undefined,
-        undefined,
-        searchValue,
-      );
+        filterValue: searchValue,
+      });
 
       const items = res.data.response ?? [];
       const total = res.data.count ?? 0;
@@ -174,11 +171,11 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       headerProps={{
         ...headerProps,
         onCloseClick: headerProps?.onCloseClick ?? onClose ?? (() => {}),
-        headerLabel: headerProps?.headerLabel || getCommonTranslation("Groups"),
+        headerLabel: headerProps?.headerLabel || t("Groups"),
       }}
       alwaysShowFooter={itemsList.length !== 0 || Boolean(searchValue)}
       withSearch
-      searchPlaceholder={getCommonTranslation("Search")}
+      searchPlaceholder={t("Search")}
       onSearch={onSearch}
       searchValue={searchValue}
       onClearSearch={onClearSearch}
@@ -186,16 +183,14 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       disableSubmitButton={!selectedItem}
       isMultiSelect={false}
       items={itemsList}
-      submitButtonLabel={getCommonTranslation("SelectAction")}
+      submitButtonLabel={t("SelectAction")}
       onSubmit={onSubmitAction}
       emptyScreenImage={emptyScreenImg}
-      emptyScreenHeader={getCommonTranslation("NotFoundGroups")}
-      emptyScreenDescription={getCommonTranslation("GroupsNotFoundDescription")}
+      emptyScreenHeader={t("NotFoundGroups")}
+      emptyScreenDescription={t("GroupsNotFoundDescription")}
       searchEmptyScreenImage={emptyScreenImg}
-      searchEmptyScreenHeader={getCommonTranslation("NotFoundGroups")}
-      searchEmptyScreenDescription={getCommonTranslation(
-        "GroupsNotFoundDescription",
-      )}
+      searchEmptyScreenHeader={t("NotFoundGroups")}
+      searchEmptyScreenDescription={t("GroupsNotFoundDescription")}
       totalItems={totalRef.current}
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}

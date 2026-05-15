@@ -1,0 +1,990 @@
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+import { makeAutoObservable } from "mobx";
+import React from "react";
+import {
+  ContentType,
+  EventType,
+  RoleType,
+} from "../../../enums";
+import type {
+  TContent,
+  TMessage,
+  TToolCallContent,
+  TMultimodal,
+} from "../../../types/ai";
+
+
+import type { TFile } from "../../../types";
+
+import { toastr } from "../../../components/toast";
+
+import type { TMessageStoreProps } from "../Chat.types";
+import { AiApi } from "../../../api/ai";
+import { useApi } from "../../../providers";
+
+export default class MessageStore {
+  private aiApi: AiApi;
+
+  messages: TMessage[] = [];
+
+  startIndex: number = 0;
+
+  totalMessages: number = 0;
+
+  currentChatId: string = "";
+
+  agentId: number | string = "";
+
+  multimodal?: TMultimodal;
+
+  abortController: AbortController = new AbortController();
+
+  isRequestRunning: boolean = false;
+
+  isStreamRunning: boolean = false;
+
+  isAnalyzing: boolean = false;
+
+  isGetMessageRequestRunning: boolean = false;
+
+  knowledgeSearchToolName: string = "";
+
+  webSearchToolName: string = "";
+
+  webCrawlingToolName: string = "";
+
+  generateDocxToolName: string = "";
+
+  generatePresentationToolName: string = "";
+
+  generateFormToolName: string = "";
+
+  toolsConfirmQueue: string[] = [];
+
+  openFileConfirmQueue: Array<{ fileId: number; title: string }> =
+    [];
+
+  onStreamData?: (chunk: string) => void;
+
+  constructor(aiApi: AiApi) {
+    this.aiApi = aiApi;
+    makeAutoObservable(this);
+  }
+
+  addToToolsConfirmQueue = (id: string) => {
+    this.toolsConfirmQueue.push(id);
+  };
+
+  removeFromToolsConfirmQueue = (id: string) => {
+    this.toolsConfirmQueue = this.toolsConfirmQueue.filter(
+      (item) => item !== id,
+    );
+  };
+
+  addToOpenFileConfirmQueue = (entry: {
+    fileId: number;
+    title: string;
+  }) => {
+    this.openFileConfirmQueue.push(entry);
+  };
+
+  removeFromOpenFileConfirmQueue = (fileId: number) => {
+    this.openFileConfirmQueue =
+      this.openFileConfirmQueue.filter(
+        (item) => item.fileId !== fileId,
+      );
+  };
+
+  addMessage = (message: TMessage) => {
+    this.messages.push(message);
+  };
+
+  replaceLastMessage = (newMessage: TMessage) => {
+    const lastIndex = this.messages.length - 1;
+    if (lastIndex < 0) return;
+
+    this.messages[lastIndex] = newMessage;
+  };
+
+  getLastMessage() {
+    return this.messages.at(-1) ?? null;
+  }
+
+  setAgentId = (agentId: number | string) => {
+    this.agentId = agentId;
+  };
+
+  setMultimodal = (multimodal?: TMultimodal) => {
+    this.multimodal = multimodal;
+  };
+
+  setCurrentChatId = (chatId: string) => {
+    this.currentChatId = chatId;
+  };
+
+  setMessages = (messages: TMessage[]) => {
+    this.messages = messages;
+  };
+
+  setKnowledgeSearchToolName = (knowledgeSearchToolName: string) => {
+    this.knowledgeSearchToolName = knowledgeSearchToolName;
+  };
+
+  setWebSearchToolName = (webSearchToolName: string) => {
+    this.webSearchToolName = webSearchToolName;
+  };
+
+  setWebCrawlingToolName = (webCrawlingToolName: string) => {
+    this.webCrawlingToolName = webCrawlingToolName;
+  };
+
+  setGenerateDocxToolName = (generateDocxToolName: string) => {
+    this.generateDocxToolName = generateDocxToolName;
+  };
+
+  setGeneratePresentationToolName = (generatePresentationToolName: string) => {
+    this.generatePresentationToolName = generatePresentationToolName;
+  };
+
+  setGenerateFormToolName = (generateFormToolName: string) => {
+    this.generateFormToolName = generateFormToolName;
+  };
+
+  setStartIndex = (startIndex: number) => {
+    this.startIndex = startIndex;
+  };
+
+  setTotalMessages = (totalMessages: number) => {
+    this.totalMessages = totalMessages;
+  };
+
+  setIsGetMessageRequestRunning = (isGetMessageRequestRunning: boolean) => {
+    this.isGetMessageRequestRunning = isGetMessageRequestRunning;
+  };
+
+  setIsRequestRunning = (isRequestRunning: boolean) => {
+    this.isRequestRunning = isRequestRunning;
+  };
+
+  setIsStreamRunning = (isStreamRunning: boolean) => {
+    this.isStreamRunning = isStreamRunning;
+  };
+
+  setIsAnalyzing = (isAnalyzing: boolean) => {
+    this.isAnalyzing = isAnalyzing;
+  };
+
+
+  startNewChat = async () => {
+    this.setCurrentChatId("");
+    this.setMessages([]);
+    this.setStartIndex(0);
+    this.setTotalMessages(0);
+  };
+
+  setInitMessages = (
+    messages: TMessage[],
+    totalMessages: number,
+    chatId: string,
+  ) => {
+    this.setMessages(messages);
+    this.setStartIndex(totalMessages > 100 ? 100 : totalMessages);
+    this.setTotalMessages(totalMessages);
+    this.setCurrentChatId(chatId);
+  };
+
+  fetchMessages = async (chatId: string) => {
+    if (this.isGetMessageRequestRunning) return;
+
+    this.setIsGetMessageRequestRunning(true);
+
+    try {
+      const { items, total } = await this.aiApi.getChatMessages(chatId, 0);
+      const reversedItems = items.reverse();
+
+      this.setMessages(reversedItems);
+      this.setStartIndex(total > 100 ? 100 : total);
+      this.setTotalMessages(total);
+      this.setCurrentChatId(chatId);
+    } catch (error) {
+      console.error(error);
+      toastr.error(error as string);
+    } finally {
+      this.setIsGetMessageRequestRunning(false);
+    }
+  };
+
+  fetchNextMessages = async () => {
+    if (!this.currentChatId) return;
+
+    if (this.isGetMessageRequestRunning) return;
+
+    if (this.totalMessages <= this.startIndex) return;
+
+    this.setIsGetMessageRequestRunning(true);
+
+    try {
+      const { items, total } = await this.aiApi.getChatMessages(
+        this.currentChatId,
+        this.startIndex,
+      );
+      const reversedItems = items.reverse();
+
+      this.setMessages([...reversedItems, ...this.messages]);
+      this.setStartIndex(this.startIndex + 100);
+      this.setTotalMessages(total);
+    } catch (error) {
+      console.error(error);
+      toastr.error(error as string);
+    } finally {
+      this.setIsGetMessageRequestRunning(false);
+    }
+  };
+
+  addMessageId = (id: number) => {
+    const lastMessage = this.getLastMessage();
+
+    if (!lastMessage) return;
+
+    this.replaceLastMessage({ ...lastMessage, id });
+
+    this.setIsStreamRunning(false);
+    this.setIsRequestRunning(false);
+    this.setIsAnalyzing(false);
+  };
+
+  addUserMessage = (message: string, files: Partial<TFile>[]) => {
+    const imageFormats = this.multimodal?.image.formats || [];
+
+    const filesContent: TContent[] = files
+      .map((f) => {
+        const isImage =
+          f.fileExst && imageFormats.includes(f.fileExst.toLowerCase());
+
+        if (isImage && f.viewUrl) {
+          return {
+            type: ContentType.Images,
+            id: f.id ? Number(f.id) : 0,
+            url: f.viewUrl,
+            fileType: f.fileType || 0,
+          };
+        }
+
+        return {
+          type: ContentType.Files,
+          extension: f.fileExst ? f.fileExst : "",
+          title: f.title ? f.title : "",
+          id: f.id ? Number(f.id) : 0,
+        };
+      })
+      .filter(Boolean) as TContent[];
+
+    const newMsg: TMessage = {
+      role: RoleType.UserMessage,
+      createdOn: new Date().toString(),
+      contents: [{ type: ContentType.Text, text: message }, ...filesContent],
+    };
+
+    const lastMessage = this.getLastMessage();
+
+    if (lastMessage?.role === RoleType.Error) {
+      this.replaceLastMessage(newMsg);
+    } else {
+      this.addMessage(newMsg);
+    }
+
+    this.setTotalMessages(this.totalMessages + 1);
+    this.setStartIndex(this.startIndex + 1);
+  };
+
+  addNewAIMessage = (message: string) => {
+    const lastMessage = this.getLastMessage();
+
+    if (lastMessage?.role === RoleType.AssistantMessage) {
+      const newMsg: TMessage = {
+        ...lastMessage,
+        contents: [
+          ...lastMessage.contents,
+          { type: ContentType.Text, text: message },
+        ],
+      };
+
+      this.replaceLastMessage(newMsg);
+      return;
+    } else {
+      const newMsg: TMessage = {
+        role: RoleType.AssistantMessage,
+        createdOn: new Date().toString(),
+        contents: [{ type: ContentType.Text, text: message }],
+      };
+
+      this.addMessage(newMsg);
+
+      this.setTotalMessages(this.totalMessages + 1);
+      this.setStartIndex(this.startIndex + 1);
+    }
+  };
+
+  continueAIMessage = (message: string) => {
+    const lastMessage = this.getLastMessage();
+    if (!lastMessage) return;
+
+    const msg: TMessage = {
+      ...lastMessage,
+      contents: [
+        ...lastMessage.contents.slice(0, -1),
+        {
+          type: ContentType.Text,
+          text: message,
+        },
+      ],
+    };
+
+    this.replaceLastMessage(msg);
+  };
+
+  handleMetadata = (jsonData: string) => {
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonData);
+    } catch {
+      console.error("Failed to parse metadata", jsonData);
+      return;
+    }
+
+    if (!parsed || typeof parsed !== "object") {
+      console.error("Unexpected metadata shape", parsed);
+      return;
+    }
+
+    const { chatId, error } = parsed;
+
+    if (chatId) {
+      this.setCurrentChatId(chatId);
+    }
+
+    if (error) {
+      toastr.error(typeof error === "string" ? error : JSON.stringify(error));
+    }
+  };
+
+  handleGenerateDoc = (content: TToolCallContent) => {
+    const { type } = content;
+
+    if (type !== ContentType.Tool) return;
+
+    const { name, result } = content;
+
+    if (
+      name !== this.generateDocxToolName &&
+      name !== this.generateFormToolName &&
+      name !== this.generatePresentationToolName
+    )
+      return;
+
+    const data = (result as { data?: { id?: number; title?: string } })?.data;
+
+    if (typeof data?.id !== "number" || typeof data?.title !== "string") {
+      console.error("Unexpected generateDoc result shape", data);
+      return;
+    }
+
+    const fileId = Number(data?.id);
+    if (!Number.isInteger(fileId) || fileId <= 0) return;
+
+    this.addToOpenFileConfirmQueue({
+      fileId,
+      title: data.title,
+    });
+  };
+
+  handleToolCall = (jsonData: string) => {
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonData);
+    } catch {
+      console.error("Failed to parse tool call", jsonData);
+      return;
+    }
+
+    if (!parsed || typeof parsed !== "object") {
+      console.error("Unexpected tool call shape", parsed);
+      return;
+    }
+
+    const { name, arguments: args, callId, ...rest } = parsed;
+
+    if (typeof name !== "string" || typeof callId !== "string") {
+      console.error("Unexpected tool call properties", parsed);
+      return;
+    }
+    const lastMessage = this.getLastMessage();
+
+    const shouldCreateNewMessage =
+      lastMessage?.role !== RoleType.AssistantMessage;
+
+    const content = {
+      type: ContentType.Tool,
+      name,
+      arguments: args,
+      callId,
+      ...rest,
+    };
+
+    if (shouldCreateNewMessage) {
+      const newMsg: TMessage = {
+        role: RoleType.AssistantMessage,
+        createdOn: new Date().toString(),
+        contents: [content],
+      };
+
+      this.addMessage(newMsg);
+      this.setTotalMessages(this.totalMessages + 1);
+      this.setStartIndex(this.startIndex + 1);
+    } else {
+      const newMsg: TMessage = {
+        ...lastMessage,
+        contents: [...lastMessage.contents, content],
+      };
+
+      this.replaceLastMessage(newMsg);
+    }
+  };
+
+  handleToolResult = (jsonData: string) => {
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonData);
+    } catch {
+      console.error("Failed to parse tool result", jsonData);
+      return;
+    }
+
+    if (!parsed || typeof parsed !== "object") {
+      console.error("Unexpected tool result shape", parsed);
+      return;
+    }
+
+    const { result, callId } = parsed;
+
+    if (typeof callId !== "string") {
+      console.error("Unexpected tool result properties", parsed);
+      return;
+    }
+    const lastMessage = this.getLastMessage();
+    if (!lastMessage) return;
+
+    const lstMsgContents = lastMessage.contents;
+
+    const idx = lstMsgContents?.findIndex(
+      (c) => (c as TToolCallContent).callId === callId,
+    );
+
+    const content = {
+      ...lstMsgContents[idx],
+      managed: false,
+      result,
+    } as TToolCallContent;
+
+    const newMsg: TMessage = {
+      ...lastMessage,
+
+      contents: [
+        ...lstMsgContents.slice(0, idx),
+        content,
+        ...lstMsgContents.slice(idx + 1),
+      ],
+    };
+
+    this.replaceLastMessage(newMsg);
+
+    this.handleGenerateDoc(content);
+  };
+
+  handleStreamError = (jsonData: string, error?: unknown) => {
+    this.setIsStreamRunning(false);
+    this.setIsAnalyzing(false);
+    let message = "";
+    try {
+      const parsed = JSON.parse(jsonData);
+      message =
+        parsed &&
+        typeof parsed === "object" &&
+        typeof parsed.message === "string"
+          ? parsed.message
+          : String(jsonData);
+    } catch {
+      message = jsonData;
+    }
+
+    if (!message && error) {
+      message =
+        typeof error === "object" &&
+        "message" in error &&
+        typeof error.message === "string"
+          ? error.message
+          : "";
+    }
+
+    const newMsg: TMessage = {
+      role: RoleType.Error,
+      createdOn: new Date().toString(),
+      contents: [{ type: ContentType.Text, text: message }],
+    };
+
+    this.addMessage(newMsg);
+  };
+
+  startStream = async (stream?: ReadableStream<Uint8Array> | null) => {
+    if (!stream) {
+      this.setIsRequestRunning(false);
+      this.setIsStreamRunning(false);
+
+      return;
+    }
+
+    let analyzeTimer: ReturnType<typeof setTimeout> | null =
+      null;
+
+    try {
+      const textDecoder = new TextDecoder();
+
+      const reader = stream.getReader();
+
+      let prevMsg = "";
+      let msg = "";
+
+      let buffer = "";
+      let chunkIdx = -1;
+      let isReasoningRunning = false;
+
+      const hasPendingToolCall = () => {
+        const lastMsg = this.getLastMessage();
+        if (!lastMsg) return false;
+        return lastMsg.contents.some(
+          (c) =>
+            (c as TToolCallContent).type ===
+              ContentType.Tool &&
+            !(c as TToolCallContent).result,
+        );
+      };
+
+      const resetAnalyzeTimer = () => {
+        if (analyzeTimer) clearTimeout(analyzeTimer);
+        analyzeTimer = setTimeout(() => {
+          if (
+            this.toolsConfirmQueue.length > 0 ||
+            this.openFileConfirmQueue.length > 0 ||
+            hasPendingToolCall()
+          ) {
+            return;
+          }
+          this.setIsAnalyzing(true);
+        }, 1000);
+      };
+
+      const streamHandler = async () => {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          if (analyzeTimer) clearTimeout(analyzeTimer);
+          this.setIsRequestRunning(false);
+          this.setIsStreamRunning(false);
+          this.setIsAnalyzing(false);
+
+          if (isReasoningRunning) {
+            msg += "\n</think>\n";
+            this.continueAIMessage(msg);
+            isReasoningRunning = false;
+          }
+
+          try {
+            reader.cancel();
+          } catch {
+            // Ignore cancel errors
+          }
+          return;
+        }
+
+        const decodedChunk = textDecoder.decode(value);
+
+        buffer += decodedChunk;
+
+        try {
+          const jsonData = JSON.parse(decodedChunk);
+
+          if (jsonData && typeof jsonData === "object" && jsonData.error) {
+            this.handleStreamError(
+              JSON.stringify(jsonData.error),
+              jsonData.error,
+            );
+
+            if (isReasoningRunning) {
+              msg += "\n</think>\n";
+              this.continueAIMessage(msg);
+              isReasoningRunning = false;
+            }
+
+            reader.cancel();
+
+            return;
+          }
+        } catch {
+          // ignore
+        }
+
+        try {
+          const chunks = buffer.split("\n\n");
+
+          chunks.pop();
+
+          chunks.forEach(async (chunk, idx) => {
+            if (!chunk || idx <= chunkIdx) return;
+
+            chunkIdx = idx;
+
+            this.onStreamData?.(chunk);
+
+            const [event, data] = chunk.split("\n");
+
+            const dataKey = "data:";
+
+            if (!data || !data.startsWith(dataKey)) {
+              return;
+            }
+
+            const jsonData = data.slice(dataKey.length).trim();
+
+            if (!jsonData) {
+              return;
+            }
+
+            if (isReasoningRunning && !event.includes(EventType.Reasoning)) {
+              msg += "\n</think>\n";
+              this.continueAIMessage(msg);
+              isReasoningRunning = false;
+            }
+
+            if (!event.includes(EventType.MessageStart)) {
+              this.setIsAnalyzing(false);
+            }
+
+            if (event.includes(EventType.MessageStart)) {
+              this.setIsStreamRunning(true);
+
+              this.handleMetadata(jsonData);
+
+              return;
+            }
+
+            if (event.includes(EventType.Reasoning)) {
+              try {
+                const parsed = JSON.parse(jsonData);
+                if (
+                  !parsed ||
+                  typeof parsed !== "object" ||
+                  typeof parsed.text !== "string"
+                ) {
+                  return;
+                }
+                const { text } = parsed;
+
+                if (!isReasoningRunning) {
+                  isReasoningRunning = true;
+                  msg += "<think>\n";
+                }
+
+                msg += text;
+
+                if (msg) {
+                  if (prevMsg) {
+                    this.continueAIMessage(msg);
+                  } else {
+                    this.addNewAIMessage(msg);
+                  }
+                  prevMsg = msg;
+                }
+              } catch {
+                // ignore
+              }
+
+              return;
+            }
+
+            if (event.includes(EventType.NewToken)) {
+              try {
+                const parsed = JSON.parse(jsonData);
+                if (
+                  !parsed ||
+                  typeof parsed !== "object" ||
+                  typeof parsed.text !== "string"
+                ) {
+                  return;
+                }
+                const { text } = parsed;
+
+                msg += text;
+
+                if (msg) {
+                  if (prevMsg) {
+                    this.continueAIMessage(msg);
+                  } else {
+                    this.addNewAIMessage(msg);
+                  }
+                  prevMsg = msg;
+                }
+              } catch {
+                // ignore
+              }
+            }
+
+            if (event.includes(EventType.ToolCall)) {
+              try {
+                msg = "";
+                prevMsg = "";
+
+                this.handleToolCall(jsonData);
+              } catch {
+                // ignore
+              }
+
+              return;
+            }
+
+            if (event.includes(EventType.ToolResult)) {
+              msg = "";
+              prevMsg = "";
+
+              try {
+                this.handleToolResult(jsonData);
+              } catch {
+                // ignore
+              }
+
+              return;
+            }
+
+            if (event.includes(EventType.Error)) {
+              this.handleStreamError(jsonData);
+            }
+
+            if (event.includes(EventType.MessageStop)) {
+              try {
+                try {
+                  const parsed = JSON.parse(jsonData);
+
+                  if (
+                    parsed &&
+                    typeof parsed === "object" &&
+                    typeof parsed.messageId === "number"
+                  ) {
+                    this.addMessageId(parsed.messageId);
+                  }
+                } catch {
+                  // ignore
+                }
+
+                reader.cancel();
+              } catch {
+                // ignore
+              }
+            }
+          });
+
+          resetAnalyzeTimer();
+
+          await streamHandler();
+        } catch (e) {
+          console.error(e);
+        } finally {
+          this.setIsRequestRunning(false);
+          this.setIsStreamRunning(false);
+        }
+      };
+
+      await streamHandler();
+    } catch (e) {
+      console.error(e);
+      toastr.error(e as string);
+    } finally {
+      if (analyzeTimer) clearTimeout(analyzeTimer);
+      this.setIsRequestRunning(false);
+      this.setIsStreamRunning(false);
+      this.setIsAnalyzing(false);
+    }
+  };
+
+  startChat = async (message: string, files: Partial<TFile>[]) => {
+    try {
+      this.addUserMessage(message, files);
+
+      this.setIsRequestRunning(true);
+      this.setIsAnalyzing(true);
+
+      this.abortController.abort("Start new chat");
+
+      this.abortController = new AbortController();
+
+      const stream = await this.aiApi.startNewChat(
+        this.agentId,
+        message,
+        files.map((f) => (f.id ? f.id.toString() : "")),
+        this.abortController,
+      );
+
+      await this.startStream(stream);
+    } catch (e) {
+      this.handleStreamError("", e);
+    }
+  };
+
+  sendMessage = async (message: string, files: Partial<TFile>[]) => {
+    try {
+      this.addUserMessage(message, files);
+
+      this.setIsRequestRunning(true);
+      this.setIsAnalyzing(true);
+
+      this.abortController.abort("Start new message");
+
+      this.abortController = new AbortController();
+
+      const stream = await this.aiApi.sendMessageToChat(
+        this.currentChatId,
+        message,
+        files.map((f) => (f.id ? f.id.toString() : "")),
+        this.abortController,
+      );
+
+      await this.startStream(stream);
+    } catch (e) {
+      this.handleStreamError("", e);
+    }
+  };
+
+  stopMessage = () => {
+    if (this.isRequestRunning) {
+      try {
+        this.abortController.abort("Stop message");
+        this.setIsRequestRunning(false);
+        this.setIsStreamRunning(false);
+        this.setIsAnalyzing(false);
+      } catch {
+        // ignore abort error
+      }
+    }
+  };
+
+  findPreviousUserMessage = (fromIndex: number) => {
+    for (let i = fromIndex - 1; i >= 0; i--) {
+      if (this.messages[i].role === RoleType.UserMessage)
+        return this.messages[i];
+    }
+    return undefined;
+  };
+}
+
+export const MessageStoreContext = React.createContext<MessageStore>(
+  {} as MessageStore,
+);
+
+export const MessageStoreContextProvider = ({
+  children,
+  agentId,
+  messages,
+  chatId,
+  total,
+  multimodal,
+  knowledgeSearchToolName,
+  webSearchToolName,
+  webCrawlingToolName,
+  generateDocxToolName,
+  generateFormToolName,
+  generatePresentationToolName,
+  onStreamData,
+}: TMessageStoreProps) => {
+  const { aiApi } = useApi();
+  const store = React.useMemo(() => new MessageStore(aiApi), [aiApi]);
+
+  React.useEffect(() => {
+    store.setAgentId(agentId);
+  }, [store, agentId]);
+
+  React.useEffect(() => {
+    store.setMultimodal(multimodal);
+  }, [store, multimodal]);
+
+  React.useEffect(() => {
+    if (store.isRequestRunning) return;
+
+    if (chatId) store.setInitMessages(messages, total, chatId);
+  }, [chatId, store, messages, total]);
+
+  React.useEffect(() => {
+    if (knowledgeSearchToolName)
+      store.setKnowledgeSearchToolName(knowledgeSearchToolName);
+  }, [store, knowledgeSearchToolName]);
+
+  React.useEffect(() => {
+    if (webSearchToolName) store.setWebSearchToolName(webSearchToolName);
+  }, [store, webSearchToolName]);
+
+  React.useEffect(() => {
+    if (webCrawlingToolName) store.setWebCrawlingToolName(webCrawlingToolName);
+  }, [store, webCrawlingToolName]);
+
+  React.useEffect(() => {
+    if (generateDocxToolName)
+      store.setGenerateDocxToolName(generateDocxToolName);
+  }, [store, generateDocxToolName]);
+
+  React.useEffect(() => {
+    if (generateFormToolName)
+      store.setGenerateFormToolName(generateFormToolName);
+  }, [store, generateFormToolName]);
+
+  React.useEffect(() => {
+    if (generatePresentationToolName)
+      store.setGeneratePresentationToolName(generatePresentationToolName);
+  }, [store, generatePresentationToolName]);
+
+  React.useEffect(() => {
+    store.onStreamData = onStreamData;
+  }, [store, onStreamData]);
+
+
+  return (
+    <MessageStoreContext.Provider value={store}>
+      {children}
+    </MessageStoreContext.Provider>
+  );
+};
+
+export const useMessageStore = () => {
+  return React.useContext(MessageStoreContext);
+};

@@ -43,7 +43,7 @@ import DownloadIcon from "../../assets/icons/24/download.react.svg";
 import DuplicateIcon from "../../assets/icons/24/duplicate.react.svg";
 import MarkAsReadIcon from "../../assets/icons/24/mark-as-read.react.svg";
 import MoveIcon from "../../assets/icons/24/move.react.svg";
-import FileIcon from "../../assets/icons/24/file.react.svg";
+import FileIcon from "../../assets/icons/24/file.svg";
 import BackupIcon from "../../assets/icons/24/backup.react.svg";
 
 import classNames from "classnames";
@@ -54,7 +54,9 @@ import styles from "./FloatingButton.module.scss";
 
 const ICON_COMPONENTS = {
   [FloatingButtonIcons.upload]: <UploadIcon data-testid="icon-upload" />,
-  [FloatingButtonIcons.other]: <FileIcon data-testid="icon-other" />,
+  [FloatingButtonIcons.other]: (
+    <FileIcon className="icon-other" data-testid="icon-other" />
+  ),
   [FloatingButtonIcons.trash]: <TrashIcon data-testid="icon-trash" />,
   [FloatingButtonIcons.move]: <MoveIcon data-testid="icon-move" />,
   [FloatingButtonIcons.plus]: <PlusIcon data-testid="icon-plus" />,
@@ -94,14 +96,15 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
       clearUploadedFilesHistory,
       withoutProgress,
       showCancelButton,
+      showCloseIcon,
       withoutStatus = false,
       percent,
     },
     ref,
   ) => {
     const iconComponent = useMemo(() => {
-        if (iconUrl) {
-        return <img width={20} src={iconUrl} alt="icon"/>;
+      if (iconUrl) {
+        return <img width={20} src={iconUrl} alt="icon" />;
       }
       return (
         ICON_COMPONENTS[icon] ?? ICON_COMPONENTS[FloatingButtonIcons.other]
@@ -134,6 +137,7 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
         className={classNames(
           styles.floatingButtonWrapper,
           "layout-progress-bar_wrapper",
+          { [styles.showCloseIcon]: showCloseIcon },
         )}
       >
         <div

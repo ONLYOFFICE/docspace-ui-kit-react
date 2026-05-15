@@ -174,8 +174,7 @@ const SubMenu = (props: SubMenuProps) => {
     onClick?.({ originalEvent: e, action, item });
 
     if ((items || item.onLoad) && isMobileDevice) {
-      setActiveItems([item]);
-      // setActiveItemKey(item.key);
+      setActiveHotkeysModel(item, model, menuLevel);
 
       e.stopPropagation();
       return;
@@ -397,9 +396,11 @@ const SubMenu = (props: SubMenuProps) => {
 
     const linkClassName = classNames("p-menuitem-link", "not-selectable", {
       "p-disabled": item.disabled || item.disableColor,
+      "p-disabled-styles-toggle": item.disabled && item.disabledStylesType === "toggle",
     });
     const iconClassName = classNames("p-menuitem-icon", {
       "p-disabled": item.disabled || item.disableColor,
+      "p-disabled-styles-toggle": item.disabled && item.disabledStylesType === "toggle",
     });
     const subMenuIconClassName = "p-submenu-icon";
 
@@ -410,9 +411,14 @@ const SubMenu = (props: SubMenuProps) => {
             title={item.label as string}
             size={MCPIconSize.Small}
             imgSrc={item.icon}
+            imgNode={item.iconNode}
             className={iconClassName || ""}
           />
         );
+      }
+
+      if (item.iconNode) {
+        return <span className={iconClassName || ""}>{item.iconNode}</span>
       }
 
       if (!item.icon) return null;

@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { CSSProperties, ComponentProps } from "react";
 import { useEffect, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -239,6 +239,44 @@ export const WithoutAnimation: Story = {
       source: {
         code: `<ToggleButton label="No animation" noAnimation />
 <ToggleButton label="No animation on" noAnimation isChecked />`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--toggle-button-spacing": "16px",
+        } as CSSProperties
+      }
+    >
+      <ToggleButton label="Increased gap" isChecked />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--toggle-button-spacing\` | Gap between toggle and label | \`8px\` |
+| \`--toggle-button-checked-color\` | Track color when checked | theme accent |
+| \`--toggle-button-off-color\` | Track color when unchecked | theme gray |
+| \`--toggle-button-off-hover-color\` | Track color on hover when unchecked | theme gray |`,
+      },
+      source: {
+        code: `<div style={{
+  "--toggle-button-checked-color": "#00679e",
+  "--toggle-button-off-color": "#7d7d7d",
+  "--toggle-button-off-hover-color": "#7d7d7d",
+}}>
+  <ToggleButton label="Off" isChecked={false} />
+  <ToggleButton label="On" isChecked />
+</div>`,
       },
     },
   },

@@ -35,6 +35,12 @@ import type {
 
 import { addLog } from "../add-log";
 
+export const enum SocketCommandsRoomParts {
+  ExternalDbSettings = "external-db-settings",
+  StorageEncryption = "storage-encryption",
+  Restore = "restore",
+}
+
 /**
  * Enum representing various socket events used in the application.
  * These events are used for communication between the client and server.
@@ -81,6 +87,10 @@ export enum SocketEvents {
   ChaneFolderAccessRights = "s:change-access-rights-folder",
   ExportChat = "s:export-chat",
   QuotaExceeded = "s:quota_exceeded",
+  ExternalDbSettings = "s:external-db-settings",
+  ChangeWebPlugin = "s:change-web-plugin",
+  ChangeAiConfig = "s:change-ai-config",
+  TopUpWallet = "s:top-up-wallet",
 }
 
 /**
@@ -258,6 +268,16 @@ export type TEditFileData =
   | string
   | { fileId: number | string; editingBy: Record<string, string> };
 
+
+export type TChangeWebPluginData = {
+  webPluginName: string;
+  enabled: boolean;
+};
+
+export type TTopUpWalletData = {
+  auto: boolean;
+};
+
 export type TListenEventCallbackMap = {
   [SocketEvents.LogoutSession]: (data: {
     loginEventId: unknown;
@@ -345,6 +365,12 @@ export type TListenEventCallbackMap = {
       scope: "room" | "user" | "tenant";
     };
   }) => void;
+  [SocketEvents.ExternalDbSettings]: (
+    settings: Partial<Record<string, unknown>>,
+  ) => void;
+  [SocketEvents.ChangeWebPlugin]: (data: TChangeWebPluginData) => void;
+  [SocketEvents.ChangeAiConfig]: () => void;
+  [SocketEvents.TopUpWallet]: (data: TTopUpWalletData) => void;
 };
 
 /**
@@ -535,7 +561,7 @@ class SocketHelper {
       }
 
       const config: TConfig = {
-        withCredentials: true,
+        withCredentials: !authToken,
         transports: ["websocket", "polling"],
         eio: 4,
         path: socketPath,
@@ -549,9 +575,7 @@ class SocketHelper {
 
       if (authToken) {
         const isBearer = authToken.toLowerCase().startsWith("bearer");
-        const formattedToken = isBearer
-          ? authToken
-          : `bearer ${authToken}`;
+        const formattedToken = isBearer ? authToken : `bearer ${authToken}`;
 
         config.extraHeaders = {
           Authorization: formattedToken,

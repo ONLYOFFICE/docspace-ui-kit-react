@@ -15,6 +15,9 @@ const config: StorybookConfig = {
     "../providers/**/*.stories.@(js|jsx|ts|tsx)",
     "../selectors/**/*.stories.@(js|jsx|ts|tsx)",
     "../document-editor/**/*.stories.@(js|jsx|ts|tsx)",
+		"../uploader/**/*.stories.@(js|jsx|ts|tsx)",
+    "../ai-agent/**/*.stories.@(js|jsx|ts|tsx)",
+    "../billing/**/*.stories.@(js|jsx|ts|tsx)",
   ],
 
   staticDirs: [{ from: "../../../public", to: "/static" }],

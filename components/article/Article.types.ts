@@ -41,7 +41,9 @@ export type ArticleHeaderProps = {
   currentDeviceType: DeviceType;
   showBackButton: boolean;
   navigate?: (path: string) => void;
+  onBack?: () => void;
 };
+
 
 export type ArticleAppsProps = {
   showText: boolean;
@@ -85,7 +87,9 @@ export type ArticleZendeskProps = {
 export type ArticleProfileProps = {
   user?: TUser;
   showText: boolean;
-  getActions?: () => ContextMenuModel[];
+  getActions?: (
+    t?: (key: string, options?: Record<string, string | number>) => string,
+  ) => ContextMenuModel[];
   onProfileClick?: (obj: { originalEvent: React.MouseEvent }) => void;
   currentDeviceType: DeviceType;
 };

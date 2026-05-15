@@ -29,19 +29,19 @@ import classNames from "classnames";
 
 import { isMobile } from "react-device-detect";
 
-import ArchiveSvg from "../../assets/icons/32/room/archive.react.svg";
-import CustomSvg from "../../assets/icons/32/room/custom.react.svg";
-import EditingSvg from "../../assets/icons/32/room/editing.react.svg";
-import PublicRoomSvg from "../../assets/icons/32/room/public.react.svg";
-import FormRoomSvg from "../../assets/icons/32/room/form.react.svg";
-import VirtualDataRoomSvg from "../../assets/icons/32/room/virtual-data.react.svg";
+import ArchiveSvg from "../../assets/icons/32/room/archive.svg";
+import CustomSvg from "../../assets/icons/32/room/custom.svg";
+import EditingSvg from "../../assets/icons/32/room/editing.svg";
+import PublicRoomSvg from "../../assets/icons/32/room/public.svg";
+import FormRoomSvg from "../../assets/icons/32/room/form.svg";
+import VirtualDataRoomSvg from "../../assets/icons/32/room/virtual-data.svg";
 import TemplateRoomsSvg from "../../assets/icons/32/room/template.react.svg";
-import AIRoomSvg from "../../assets/icons/32/room/ai.react.svg";
-import CollaborationTemplateSvg from "../../assets/icons/32/template/collaboration.react.svg";
-import CustomTemplateSvg from "../../assets/icons/32/template/custom.react.svg";
-import FormTemplateSvg from "../../assets/icons/32/template/form.react.svg";
-import PublicTemplateSvg from "../../assets/icons/32/template/public.react.svg";
-import VirtualDataTemplateSvg from "../../assets/icons/32/template/virtual-data.react.svg";
+import AIRoomSvg from "../../assets/icons/32/room/ai.svg";
+import CollaborationTemplateSvg from "../../assets/icons/32/template/collaboration.svg";
+import CustomTemplateSvg from "../../assets/icons/32/template/custom.svg";
+import FormTemplateSvg from "../../assets/icons/32/template/form.svg";
+import PublicTemplateSvg from "../../assets/icons/32/template/public.svg";
+import VirtualDataTemplateSvg from "../../assets/icons/32/template/virtual-data.svg";
 
 import { RoomsType } from "../../enums";
 

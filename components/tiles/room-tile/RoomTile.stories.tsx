@@ -24,15 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import type { RoomTileProps } from "./RoomTile.types";
 
 import { useState } from "react";
-import { TFunction } from "i18next";
-import PublicRoomIconReactSvg from "../../../assets/icons/32/room/public.react.svg";
+import PublicRoomIconReactSvg from "../../../assets/icons/32/room/public.svg";
 import UnpinReactSvg from "../../../assets/unpin.react.svg";
 
 import { RoomsType } from "../../../enums";
@@ -170,7 +169,6 @@ const Template = ({ checked: initialChecked, ...args }: RoomTileProps) => {
 export const Default: Story = {
 	render: Template,
 	args: {
-		t: ((key: string) => key) as TFunction,
 		item: {
 			id: "room-1",
 			title: "Sample Room",
@@ -285,6 +283,64 @@ export const BlockingOperation: Story = {
 >
   <TileContent><Link>Room Content</Link></TileContent>
 </RoomTile>`,
+			},
+		},
+	},
+};
+
+export const CssCustomization: Story = {
+	render: () => (
+		<div
+			style={
+				{
+					"--tile-bg": "#e6f3fb",
+					"--tile-border-style": "1px solid #0082c9",
+					"--tile-radius": "16px",
+					"--tile-hover-bg": "#cce5f6",
+					"--tile-icon-color": "#0082c9",
+					"--tile-tag-hover-bg": "#cce5f6",
+				} as CSSProperties
+			}
+		>
+			<div style={{ maxWidth: "300px", margin: "30px" }}>
+				<RoomTile
+					item={{
+						id: "room-1",
+						title: "Sample Room",
+						roomType: "collaboration",
+						tags: [{ label: "Collaboration", roomType: RoomsType.EditingRoom }],
+						contextOptions,
+					}}
+					element={element}
+					contextOptions={contextOptions}
+					badges={badges}
+					thumbnailClick={() => {}}
+					getContextModel={() => contextOptions}
+					selectTag={() => {}}
+					selectOption={() => {}}
+					getRoomTypeName={(type: string) => type}
+					columnCount={1}
+				>
+					<TileContent>
+						<Link>Sample Room</Link>
+					</TileContent>
+				</RoomTile>
+			</div>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--tile-bg\` | Tile background color | theme-based |
+| \`--tile-border-style\` | Tile border | theme-based |
+| \`--tile-radius\` | Tile border radius | \`12px\` |
+| \`--tile-hover-bg\` | Hover/checked background | theme-based |
+| \`--tile-icon-color\` | Icon button color | theme-based |
+| \`--tile-tag-hover-bg\` | Tag background on hover/checked | theme-based |`,
 			},
 		},
 	},

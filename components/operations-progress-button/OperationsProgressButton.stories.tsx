@@ -24,7 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -168,6 +168,106 @@ const singleUploadOperation: Operation[] = [
     percent: 45,
   },
 ];
+
+export const CssCustomization: Story = {
+  render: () => (
+    // CSS vars grouped by the internal part they target:
+    //
+    // Group 1 — OperationsProgressButton › dropdown list area
+    //   --ops-progress-dropdown-bg       dropdown background
+    //   --ops-progress-dropdown-hover    item hover background
+    //   --ops-progress-list-padding      each row padding
+    //
+    // Group 2 — OperationsProgressButton › progress-list icon SVGs
+    //   --ops-progress-icon-color        default icon fill
+    //   --ops-progress-icon-hover        icon fill on hover
+    //   --ops-progress-success-icon      success-state badge
+    //   --ops-progress-error-icon        error-state badge
+    //
+    // Group 3 — FloatingButton (inner sub-component)
+    //   --floating-circle-button-background  circle fill
+    //   --floating-button-icon               circle icon fill
+    //   --floating-button-button-size        circle diameter
+    //   --floating-button-shadow             circle box-shadow
+    <div
+      style={
+        {
+          "--ops-progress-dropdown-bg": "#e6f3fb",
+          "--ops-progress-dropdown-hover": "#cce5f6",
+          "--ops-progress-list-padding": "0px 12px",
+          "--ops-progress-icon-color": "#0082c9",
+          "--ops-progress-icon-hover": "#006ba6",
+          "--ops-progress-success-icon": "#0082c9",
+          "--ops-progress-error-icon": "#f03032",
+          "--floating-circle-button-background": "#0082c9",
+          "--floating-button-icon": "#ffffff",
+          "--floating-button-shadow": "0 4px 16px rgba(0, 130, 201, 0.4)",
+        } as CSSProperties
+      }
+    >
+      <OperationsProgressButton
+        operations={[
+          {
+            id: "op-1",
+            operation: "upload",
+            label: "Uploading files",
+            alert: false,
+            completed: false,
+            percent: 65,
+          },
+          {
+            id: "op-2",
+            operation: "copy",
+            label: "Copying documents",
+            alert: false,
+            completed: false,
+            percent: 30,
+          },
+        ]}
+        operationsAlert={false}
+        operationsCompleted={false}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**OperationsProgressButton — dropdown list area**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--ops-progress-dropdown-bg\` | Dropdown background | theme-based |
+| \`--ops-progress-dropdown-hover\` | Item hover background | theme-based |
+| \`--ops-progress-list-padding\` | Row padding | \`0px 8px\` |
+| \`--ops-progress-dropdown-margin\` | Bottom margin | \`8px\` |
+
+**OperationsProgressButton — progress list icon SVGs**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--ops-progress-icon-color\` | Icon fill | \`#fff\` |
+| \`--ops-progress-icon-hover\` | Icon hover fill | theme-based |
+| \`--ops-progress-success-icon\` | Success badge color | theme-based |
+| \`--ops-progress-error-icon\` | Error badge color | theme-based |
+| \`--ops-progress-items-gap\` | Container item gap | \`8px\` |
+| \`--ops-progress-label-gap\` | Label items gap | \`8px\` |
+| \`--ops-progress-bar-padding\` | Bar wrapper padding | \`8px 16px\` |
+| \`--ops-progress-header-margin\` | Header right margin | \`8px\` |
+| \`--ops-progress-wrapper-margin\` | Progress wrapper margin | \`4px\` |
+
+**FloatingButton (inner sub-component)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--floating-circle-button-background\` | Circle fill | accent color |
+| \`--floating-button-icon\` | Circle icon fill | accent text color |
+| \`--floating-button-shadow\` | Circle box-shadow | theme-based |`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   render: (args) => <OperationsProgressButton {...args} />,

@@ -25,6 +25,14 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type {
+  EmployeeFullDto,
+  FileDtoInteger,
+  GroupDto,
+} from "@onlyoffice/docspace-api-sdk";
+
+export type { EmployeeFullDto, FileDtoInteger, GroupDto };
+
+import type {
   ShareAccessRights,
   EmployeeStatus,
   EmployeeActivationStatus,
@@ -38,6 +46,11 @@ import type {
   RoomsType,
 } from "../enums";
 import type { TooltipRefProps } from "react-tooltip";
+
+export type TGetIcon = (
+  size: number,
+  fileExst: string,
+) => React.FC<React.SVGProps<SVGSVGElement>> | null | string;
 
 export type TDirectionX = "left" | "right";
 export type TDirectionY = "bottom" | "top" | "both";
@@ -83,6 +96,7 @@ export type TFileSecurity = {
   Review: boolean;
   SubmitToFormGallery: boolean;
   StopFilling?: boolean;
+  StartFilling?: boolean;
   ResetFilling?: boolean;
   EditForm: boolean;
   Comment: boolean;
@@ -91,6 +105,7 @@ export type TFileSecurity = {
   Embed: boolean;
   Vectorization: boolean;
   AskAi?: boolean;
+  UpdateXlsx?: boolean;
 };
 
 // Folder security type
@@ -116,6 +131,7 @@ export type TFolderSecurity = {
   Embed: boolean;
   ChangeOwner: boolean;
   IndexExport: boolean;
+  UpdateXlsx?: boolean;
 };
 
 // Room security type
@@ -253,6 +269,7 @@ declare global {
         string,
         { data: Record<string, string>; namespaces: string }
       >;
+      instance?: import("i18next").i18n;
     };
     AscDesktopEditor?: {
       execCommand: (key: string, value: string) => void;
@@ -261,6 +278,7 @@ declare global {
         value: unknown,
         callback: unknown,
       ) => void;
+      getCloudKeys?: (domain: string) => Array<{ id: string }>;
       getViewportSettings?: () => {
         widgetType: "window" | "tab";
         captionHeight: number;
@@ -379,6 +397,9 @@ export type TFile = {
   dimensions?: TDimensions;
   editingBy?: Record<string, string>;
   activeEditors?: Record<string, string>;
+  isFillingPreparing?: boolean;
+  resultsFolderId?: number;
+  externalDbTableName?: string;
 };
 
 export type TPathParts = {
@@ -430,6 +451,7 @@ export type TFolder = {
   sharedForUser?: boolean;
   isLinkExpired?: boolean;
   external?: boolean;
+  originalFormId?: number;
 };
 
 export type TSortOrder = "descending" | "ascending";
