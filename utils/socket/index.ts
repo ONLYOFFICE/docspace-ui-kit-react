@@ -90,6 +90,7 @@ export enum SocketEvents {
   ExternalDbSettings = "s:external-db-settings",
   ChangeWebPlugin = "s:change-web-plugin",
   ChangeAiConfig = "s:change-ai-config",
+  ChangeAppEnabled = "s:change-app-enabled",
   TopUpWallet = "s:top-up-wallet",
 }
 
@@ -274,6 +275,11 @@ export type TChangeWebPluginData = {
   enabled: boolean;
 };
 
+export type TChangeAppEnabledData = {
+  id: string;
+  enabled: boolean;
+};
+
 export type TTopUpWalletData = {
   auto: boolean;
 };
@@ -370,6 +376,7 @@ export type TListenEventCallbackMap = {
   ) => void;
   [SocketEvents.ChangeWebPlugin]: (data: TChangeWebPluginData) => void;
   [SocketEvents.ChangeAiConfig]: () => void;
+  [SocketEvents.ChangeAppEnabled]: (data: TChangeAppEnabledData) => void;
   [SocketEvents.TopUpWallet]: (data: TTopUpWalletData) => void;
 };
 
