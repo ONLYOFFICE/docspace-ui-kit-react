@@ -31,6 +31,7 @@ export { default as CreateFormIcon } from "../../assets/create.form.react.svg";
 export { default as CreateFromTemplateIcon } from "../../assets/create.from.template.react.svg";
 export { default as CreateFromTextIcon } from "../../assets/create.from.text.react.svg";
 export { default as CreatePresentationIcon } from "../../assets/create.presentation.react.svg";
+export { default as CreateRoomIcon } from "../../assets/create.room.react.svg";
 export { default as CreateSpreadsheetIcon } from "../../assets/create.spreadsheet.react.svg";
 export { default as GeneratePdfAiIcon } from "../../assets/generate.pdf.ai.react.svg";
 export { default as GenerateWithAiIcon } from "../../assets/generate.with.ai.react.svg";
