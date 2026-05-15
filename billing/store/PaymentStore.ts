@@ -658,6 +658,7 @@ class PaymentStore {
           endDate: this.formatDate(this.filterEndDate, "end"),
           credit: isCredit,
           debit: isDebit,
+          participantName: this.filterContact?.id,
         },
         { signal: abortController.signal },
       );
