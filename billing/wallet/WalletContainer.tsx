@@ -263,7 +263,7 @@ const Wallet = (props: WalletProps) => {
         <WalletRefilledModal visible={wasChangeBalance} />
       ) : null}
 
-      <TransactionHistory />
+      <TransactionHistory withoutRoleFilter/>
     </div>
   );
 };
