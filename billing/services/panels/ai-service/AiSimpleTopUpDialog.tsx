@@ -116,8 +116,8 @@ const AiSimpleTopUpDialog: React.FC<AiSimpleTopUpDialogProps> = ({
       });
 
       await rawApiClient.instance.post(
-        "api/2.0/portal/payment/buywalletservice",
-        { quantity: parsedAmount, serviceName: AI_TOOLS },
+        "api/2.0/portal/payment/creditaibalance",
+        { amount: parsedAmount },
       );
 
       if (!paymentStore.isAiToolsServiceOn) {

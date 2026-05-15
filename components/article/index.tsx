@@ -416,3 +416,5 @@ Article.MainButton = ArticleMainButton;
 Article.Body = ArticleBody;
 
 export default Article;
+export { ArticleProfile };
+export type { ArticleProfileProps } from "./Article.types";
