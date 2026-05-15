@@ -72,8 +72,7 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
   const store = usePaymentStore();
 
   const { formatWalletCurrency, logoText, isAlreadyPaid } = store;
-  const { walletCustomerStatusNotActive, walletCustomerEmail } =
-    store.tariff;
+  const { walletCustomerEmail } = store.tariff;
 
   const t = useCommonTranslation();
 

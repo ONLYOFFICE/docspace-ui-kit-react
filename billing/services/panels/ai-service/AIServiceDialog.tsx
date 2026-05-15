@@ -70,8 +70,6 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
     paymentStore;
 
   const { logoText } = paymentStore;
-  const { walletCustomerEmail, walletCustomerStatusNotActive } =
-    paymentStore.tariff;
 
   const { fetchAiServiceBalance, featureCountData, wasFirstAiServiceTopUp } =
     servicesStore;
