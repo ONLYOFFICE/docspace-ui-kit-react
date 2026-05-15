@@ -63,7 +63,7 @@ const TableView = (props: ModelSettingsTableViewProps) => {
     <div className={styles.tableWrapper}>
       <Text className={styles.introText}>
         <CommonTrans
-          i18nKey="AIModelsIntro"
+          i18nKey="AIModelsIntroduction"
           components={{
             1: (
               <Link

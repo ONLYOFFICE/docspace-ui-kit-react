@@ -154,10 +154,9 @@ const TopUpModal = (props: TopUpModalProps) => {
             fetchBalance={fetchBalance}
             fetchTransactionHistory={onFetchHistory}
             onClose={onClose}
-            walletCustomerEmail={walletCustomerEmail}
             setIsLoading={setIsLoading}
             isLoading={isLoading}
-            walletCustomerStatusNotActive={walletCustomerStatusNotActive}
+            isDisabled={walletCustomerStatusNotActive}
             onTopUpBalance={topUpDeposit}
             afterTopUp={afterTopUp}
           />

@@ -80,13 +80,12 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
 
   const store = usePaymentStore();
 
-  const { formatWalletCurrency, logoText } = store;
-  const { walletCustomerStatusNotActive, walletCustomerEmail } =
-    store.tariff;
+  const { formatWalletCurrency, logoText, isAlreadyPaid } = store;
+  const { walletCustomerEmail } = store.tariff;
 
   const t = useCommonTranslation();
 
-  const isDisabled = (isLoading || walletCustomerStatusNotActive) ?? false;
+  const isDisabled = (isLoading || !isAlreadyPaid) ?? false;
 
   return (
     <>
@@ -114,7 +113,6 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
         formatWalletCurrency={formatWalletCurrency}
         walletCustomerEmail={walletCustomerEmail}
         isDisabled={isDisabled}
-        walletCustomerStatusNotActive={walletCustomerStatusNotActive}
         reccomendedAmount={reccomendedAmount}
         minValue={"10"}
       />
