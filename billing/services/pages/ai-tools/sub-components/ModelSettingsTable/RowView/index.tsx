@@ -50,7 +50,7 @@ const RowView = (props: ModelSettingsRowViewProps) => {
     <div className={styles.rowContainer}>
       <Text className={styles.introText}>
         <CommonTrans
-          i18nKey="AIModelsIntro"
+          i18nKey="AIModelsIntroduction"
           components={{
             1: (
               <Link
