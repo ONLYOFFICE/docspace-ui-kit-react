@@ -28,6 +28,8 @@ export * from "./action-button";
 
 export * from "./avatar";
 
+export * from "./avatar-editor-dialog";
+
 export * from "./aside";
 
 export * from "./add-button";
