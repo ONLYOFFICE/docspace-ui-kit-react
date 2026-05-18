@@ -88,6 +88,8 @@ export * from "./input-block";
 
 export * from "./room-icon";
 
+export * from "./room-logo-cover-dialog";
+
 export * from "./context-menu";
 
 export * from "./combobox";

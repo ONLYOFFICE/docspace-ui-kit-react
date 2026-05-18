@@ -1,0 +1,211 @@
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+import React, { useState, useRef } from "react";
+
+import { isMobile } from "../../../utils/device";
+import { useClickOutside } from "../../../utils/use-click-outside";
+import { ModalDialog, ModalDialogType } from "../../modal-dialog";
+import { IconButton } from "../../icon-button";
+import { DropDown } from "../../drop-down";
+import { DropDownItem } from "../../drop-down-item";
+import { ColorPicker } from "../../color-picker";
+import { globalColors } from "../../../providers/theme/themes";
+
+import PlusSvgUrl from "../../../assets/icons/16/button.plus.react.svg?url";
+import PencilSvgUrl from "../../../assets/pencil.react.svg?url";
+
+import type { SelectColorProps } from "../RoomLogoCoverDialog.types";
+import styles from "../RoomLogoCoverDialog.module.scss";
+
+export const SelectColor = ({
+  logoColors,
+  selectedColor,
+  t,
+  onChangeColor,
+  customColor,
+  openColorPicker,
+  setOpenColorPicker,
+}: SelectColorProps) => {
+  const isDefaultColor = logoColors.includes(customColor!);
+  const [pickerColor, setPickerColor] = useState<string | null>(
+    isDefaultColor ? "" : customColor || "",
+  );
+
+  React.useEffect(() => {
+    setPickerColor(customColor);
+  }, [customColor]);
+
+  const iconRef = useRef<HTMLDivElement>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  useClickOutside(pickerRef, () => {
+    setOpenColorPicker(false);
+  });
+
+  const onApply = (color: string) => {
+    setPickerColor(color);
+    onChangeColor(color);
+  };
+
+  const onOpenColorPicker = () => {
+    if (pickerColor && pickerColor !== selectedColor) {
+      return onChangeColor(pickerColor);
+    }
+    setOpenColorPicker(true);
+  };
+
+  const isSelectedColorPicker = pickerColor === selectedColor;
+
+  return (
+    <div className="select-color-container">
+      <div className="color-name">{t("Common:Color")}</div>
+      <div className="colors-container">
+        {logoColors.map((color, index) =>
+          color === selectedColor ? (
+            <div
+              key={color}
+              className={styles.selectedColorItem}
+              style={{ "--item-color": color } as React.CSSProperties}
+              data-testid={`color_item_selected_${index}`}
+            >
+              <div className="circle" />
+            </div>
+          ) : (
+            <div
+              key={color}
+              className={styles.colorItem}
+              style={{ "--item-color": color } as React.CSSProperties}
+              onClick={() => onChangeColor(color)}
+              data-testid={`color_item_${index}`}
+            />
+          ),
+        )}
+        {customColor ? (
+          <div
+            className={`${styles.customSelectedColor}${isSelectedColorPicker ? ` ${styles.isSelected}` : ""}${pickerColor === globalColors.white ? ` ${styles.whiteBorder}` : ""}`}
+            style={
+              {
+                "--item-color": pickerColor,
+                "--item-border-color":
+                  pickerColor === globalColors.white
+                    ? globalColors.black
+                    : pickerColor,
+                "--icon-fill":
+                  pickerColor === globalColors.white
+                    ? globalColors.black
+                    : globalColors.white,
+              } as React.CSSProperties
+            }
+            ref={iconRef}
+            data-testid="color_item_custom_selected"
+          >
+            {isSelectedColorPicker ? (
+              <div className="color-picker-circle">
+                <IconButton
+                  className="select-color-plus-icon"
+                  size={12}
+                  iconName={PencilSvgUrl}
+                  onClick={onOpenColorPicker}
+                  isFill
+                />
+              </div>
+            ) : (
+              <IconButton
+                className="select-color-plus-icon"
+                size={12}
+                iconName={PencilSvgUrl}
+                onClick={onOpenColorPicker}
+                isFill
+              />
+            )}
+          </div>
+        ) : (
+          <div
+            className={`${styles.colorItem}${openColorPicker ? ` ${styles.isSelected}` : ""}`}
+            ref={iconRef}
+            data-testid="color_item_add_custom"
+          >
+            <IconButton
+              className="select-color-plus-icon"
+              size={16}
+              iconName={PlusSvgUrl}
+              onClick={onOpenColorPicker}
+              isFill
+            />
+          </div>
+        )}
+        {isMobile() ? (
+          <ModalDialog
+            className={styles.colorPickerModal}
+            displayType={ModalDialogType.modal}
+            visible={openColorPicker}
+            onClose={() => setOpenColorPicker(false)}
+            blur={8}
+          >
+            <ModalDialog.Body>
+              <ColorPicker
+                id="buttons-hex"
+                onClose={() => setOpenColorPicker(false)}
+                onApply={onApply}
+                isPickerOnly
+                handleChange={onApply}
+                appliedColor={selectedColor}
+                applyButtonLabel={t("Common:ApplyButton")}
+                cancelButtonLabel={t("Common:CancelButton")}
+              />
+            </ModalDialog.Body>
+          </ModalDialog>
+        ) : (
+          <DropDown
+            directionY="both"
+            topSpace={16}
+            forwardedRef={iconRef}
+            withBackdrop={false}
+            isDefaultMode
+            open={openColorPicker}
+            clickOutsideAction={() => setOpenColorPicker(false)}
+          >
+            <div ref={pickerRef}>
+              <DropDownItem className="drop-down-item-hex" noHover noActive>
+                <ColorPicker
+                  id="accent-hex"
+                  onClose={() => setOpenColorPicker(false)}
+                  onApply={onApply}
+                  isPickerOnly
+                  handleChange={onApply}
+                  appliedColor={selectedColor}
+                  applyButtonLabel={t("Common:ApplyButton")}
+                  cancelButtonLabel={t("Common:CancelButton")}
+                />
+              </DropDownItem>
+            </div>
+          </DropDown>
+        )}
+      </div>
+    </div>
+  );
+};
