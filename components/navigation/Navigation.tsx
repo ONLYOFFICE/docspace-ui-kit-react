@@ -96,6 +96,7 @@ const Navigation = ({
   showBackButton,
   contextMenuHeader,
   analyzeResponsesButton,
+  aiChatButton,
 
   ...rest
 }: TNavigationProps) => {
@@ -347,7 +348,7 @@ const Navigation = ({
               analyzeResponsesButton={analyzeResponsesButton}
             />
           </div>
-
+          {isDesktop ? aiChatButton : null}
           {isDesktop && !hideInfoPanel ? (
             <ToggleInfoPanelButton
               id="info-panel-toggle--open"
