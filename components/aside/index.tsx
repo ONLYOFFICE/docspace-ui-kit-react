@@ -70,7 +70,12 @@ const AsidePure = (props: AsideProps) => {
   );
 
   return (
-    <aside className={asideClasses} style={{ zIndex }} data-testid="aside">
+    <aside
+      className={asideClasses}
+      style={{ zIndex }}
+      data-testid="aside"
+      {...rest}
+    >
       {!withoutHeader ? (
         <AsideHeader isCloseable onCloseClick={onClose} {...rest} />
       ) : null}
