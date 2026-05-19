@@ -43,7 +43,7 @@ import { useCommonTranslation } from "../../../../../utils/i18n";
 
 import type { TFile } from "../../../../../types";
 
-import FilesSelector from "../../../../chat/../../selectors/Files";
+import { FilesSelector } from "../../../../chat/../../selectors/Files";
 
 import type { TSelectorItem } from "../../../../../components/selector";
 

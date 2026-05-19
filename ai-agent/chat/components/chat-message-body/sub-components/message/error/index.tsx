@@ -35,7 +35,7 @@
 
 import React from "react";
 
-import StatusMessage from "../../../../../../../components/status-message";
+import { StatusMessage } from "../../../../../../../components/status-message";
 
 import { ContentType } from "../../../../../../../enums";
 

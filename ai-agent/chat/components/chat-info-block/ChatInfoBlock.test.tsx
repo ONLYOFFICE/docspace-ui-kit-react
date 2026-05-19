@@ -38,11 +38,11 @@ import { render, screen } from "@testing-library/react";
 import React from "react";
 
 import { ChatInfoBlock } from "./index";
-import PublicRoomBar from "../../../../components/public-room-bar";
+import { PublicRoomBar } from "../../../../components/public-room-bar";
 
 // Mock PublicRoomBar to verify props
 vi.mock("../../../../components/public-room-bar", () => ({
-  default: vi.fn(({ headerText, bodyText, dataTestId }) => (
+  PublicRoomBar: vi.fn(({ headerText, bodyText, dataTestId }) => (
     <div data-testid={dataTestId}>
       <div data-testid="bar-header">{headerText}</div>
       <div data-testid="bar-body">{bodyText}</div>

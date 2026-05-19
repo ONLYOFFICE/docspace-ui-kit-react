@@ -36,7 +36,7 @@
 import React from "react";
 
 import { Button, ButtonSize } from "../../../../components/button";
-import AIAgentSelector from "../../../../selectors/AIAgent";
+import { AIAgentsSelector } from "../../../../selectors/AIAgent";
 import { useApi } from "../../../../providers";
 import type { TSelectorItem } from "../../../../components/selector";
 
@@ -110,7 +110,7 @@ const AgentIdSetup = ({
         </div>
       </div>
       {isSelectorOpen && (
-        <AIAgentSelector
+        <AIAgentsSelector
           onSubmit={handleAgentSelected}
           onClose={() => setIsSelectorOpen(false)}
         />

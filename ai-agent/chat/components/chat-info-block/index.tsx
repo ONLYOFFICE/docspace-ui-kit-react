@@ -35,7 +35,7 @@
 
 import InfoIcon from "../../../../assets/info.outline.react.svg";
 
-import PublicRoomBar from "../../../../components/public-room-bar";
+import { PublicRoomBar } from "../../../../components/public-room-bar";
 
 import { ChatInfoBlockProps } from "../../Chat.types";
 import styles from "./ChatInfoBlock.module.scss";

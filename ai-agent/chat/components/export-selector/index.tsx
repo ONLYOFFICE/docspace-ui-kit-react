@@ -31,7 +31,7 @@ import { useCommonTranslation } from "../../../../utils/i18n";
 import { FOLDER_FORM_VALIDATION } from "../../../../constants";
 import { TGetIcon } from "../../../../types";
 import { TBreadCrumb } from "../../../../components/selector";
-import FilesSelector from "../../../../selectors/Files";
+import { FilesSelector } from "../../../../selectors/Files";
 
 type ExportSelectorProps = {
   showFolderSelector: boolean;
