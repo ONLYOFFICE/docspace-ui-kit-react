@@ -43,7 +43,7 @@ import { createChunks, runWithConcurrency } from "./utils/upload";
 import { parseSizeLimit } from "./utils/sizeLimit";
 
 import { toastr } from "../components/toast";
-import Dropzone from "../components/dropzone";
+import { Dropzone } from "../components/dropzone";
 import {
   DEFAULT_CHUNK_UPLOAD_SIZE,
   DEFAULT_MAX_UPLOAD_THREAD_COUNT,
@@ -455,3 +455,13 @@ const Uploader = ({
 export { Uploader };
 
 export { createChunks, runWithConcurrency } from "./utils/upload";
+
+export type {
+  UploaderFilesSettings,
+  UploadProgressData,
+  RejectedFile,
+  UploaderProps,
+  TFileWithOptionalPath,
+  TFileWithOptionalEmptyDir,
+  TFileWithOptionalLastModifiedDate,
+} from "./Uploader.types";
