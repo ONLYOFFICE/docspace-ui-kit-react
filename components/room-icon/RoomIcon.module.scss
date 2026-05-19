@@ -396,13 +396,15 @@
   }
 }
 
-.roomTitle {
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 16px;
-  transition: all 0.2s ease;
-  opacity: 1;
-  transform: translateY(0);
-  position: relative;
-  color: var(--room-icon-text-color, #{colors.$black});
+.roomIcon {
+  .roomTitle {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 16px;
+    transition: all 0.2s ease;
+    opacity: 1;
+    transform: translateY(0);
+    position: relative;
+    color: var(--room-icon-text-color, #{colors.$black});
+  }
 }
