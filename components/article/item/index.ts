@@ -35,3 +35,4 @@
 
 
 export * from "./Item";
+export { ArticleItemPure } from "./ArticleItem";

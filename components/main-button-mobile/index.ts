@@ -26,3 +26,4 @@
 
 
 export * from "./MainButtonMobile";
+export type * from "./MainButtonMobile.types";
