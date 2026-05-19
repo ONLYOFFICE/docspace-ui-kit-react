@@ -182,11 +182,23 @@ const Section = (props: SectionProps) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const computedStyles = window.getComputedStyle(containerRef.current, null);
-    const width = +computedStyles.getPropertyValue("width").replace("px", "");
-    const height = +computedStyles.getPropertyValue("height").replace("px", "");
+    const measure = () => {
+      if (!containerRef.current) return;
+      const computedStyles = window.getComputedStyle(
+        containerRef.current,
+        null,
+      );
+      const width = +computedStyles.getPropertyValue("width").replace("px", "");
+      const height = +computedStyles
+        .getPropertyValue("height")
+        .replace("px", "");
+      setSectionSize(() => ({ width, height }));
+      window.dispatchEvent(new Event("resize"));
+    };
 
-    setSectionSize(() => ({ width, height }));
+    measure();
+    const raf = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(raf);
   }, [isInfoPanelVisible]);
 
   const onResize = React.useCallback(() => {
