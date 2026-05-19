@@ -41,8 +41,15 @@
     .root {
       --nav-menu-group-label-color: #{colors.$gray};
       --nav-menu-item-text-color: #{colors.$gray-text};
+      --nav-menu-item-text-active-color: var(
+        --color-scheme-main-accent,
+        #{colors.$light-blue-main}
+      );
       --nav-menu-item-icon-color: #{colors.$light-gray-dark};
-      --nav-menu-item-icon-active-color: #{colors.$light-blue-main};
+      --nav-menu-item-icon-active-color: var(
+        --color-scheme-main-accent,
+        #{colors.$light-blue-main}
+      );
       --nav-menu-item-bg-hover: #{colors.$gray-light-mid};
       --nav-menu-item-bg-active: #{colors.$light-gray-selected};
       --nav-menu-story-bg: #{colors.$gray-light};
@@ -55,6 +62,7 @@
     .root {
       --nav-menu-group-label-color: #{colors.$gray-dark};
       --nav-menu-item-text-color: #{colors.$dark-gray-dark};
+      --nav-menu-item-text-active-color: #{colors.$white};
       --nav-menu-item-icon-color: #{colors.$dark-gray-dark};
       --nav-menu-item-icon-active-color: #{colors.$white};
       --nav-menu-item-bg-hover: #{colors.$dark-gray-light};
@@ -204,6 +212,10 @@
       fill: var(--nav-menu-item-icon-active-color) !important;
     }
   }
+
+  &.active .itemText {
+    color: var(--nav-menu-item-text-active-color);
+  }
 }
 
 .itemBadge {
@@ -330,6 +342,17 @@
     justify-content: center;
     width: 16px;
     height: 16px;
+  }
+
+  &.active .subItemIcon svg {
+    path,
+    circle {
+      fill: var(--nav-menu-item-icon-active-color) !important;
+    }
+  }
+
+  &.active .subItemText {
+    color: var(--nav-menu-item-text-active-color);
   }
 }
 
