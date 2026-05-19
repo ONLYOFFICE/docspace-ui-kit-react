@@ -41,7 +41,7 @@ import { ContentType } from "../../../../../../../enums";
 import type { TMessage, TContent } from "../../../../../../../types/ai";
 
 vi.mock("../../../../../../../components/status-message", () => ({
-  default: ({ message }: { message: string }) => (
+  StatusMessage: ({ message }: { message: string }) => (
     <div data-testid="status-message">{message}</div>
   ),
 }));
