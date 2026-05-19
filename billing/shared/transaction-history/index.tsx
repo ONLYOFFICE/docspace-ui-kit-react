@@ -54,7 +54,7 @@ import FilterIcon from "../../../components/filter/sub-components/FilterIcon";
 import { AddButton } from "../../../components/add-button";
 import { SelectedItemPure } from "../../../components/selected-item";
 import { TSelectorItem } from "../../../components/selector";
-import PeopleSelector from "../../../selectors/People";
+import { PeopleSelector } from "../../../selectors/People";
 import type { PeopleFilter } from "../../../selectors/People/PeopleSelector.types";
 import { EmployeeType } from "../../../enums";
 import FilterPanel from "./sub-components/FilterPanel";

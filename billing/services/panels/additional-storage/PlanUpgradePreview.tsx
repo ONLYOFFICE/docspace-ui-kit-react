@@ -121,7 +121,7 @@ const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
         const quantity = calculateDifferenceBetweenPlan(amount);
         try {
           const calcRes = await paymentApi.calculateWalletPayment(
-            { quantity: { storage: quantity }, productQuantityType: 1 },
+            { walletQuantityRequestDto: { quantity: { storage: quantity }, productQuantityType: 1 } },
             { signal: controller.signal },
           );
           const currentWriteOff = calcRes?.data?.response as unknown as { amount: number } | null;
