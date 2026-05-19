@@ -45,9 +45,13 @@
     "styles/**/*",
     "providers/**/*",
     "selectors/**/*",
-    "document-editor",
-    "uploader",
-    "ai-agent/**/*"
+    "document-editor/**/*",
+    "uploader/**/*",
+    "ai-agent/**/*",
+    "billing/**/*",
+    "enums/**/*",
+    "constants/**/*",
+    "errors/**/*"
   ],
   "exclude": [
     "node_modules",

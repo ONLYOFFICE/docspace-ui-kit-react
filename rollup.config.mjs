@@ -8,59 +8,36 @@ import postcss from "rollup-plugin-postcss";
 import terser from "@rollup/plugin-terser";
 import nodePolyfills from "rollup-plugin-polyfill-node";
 import url from "@rollup/plugin-url";
+import alias from "@rollup/plugin-alias";
 import { glob } from "glob";
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import path from "path";
 
-// get all index.ts files from subfolders
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const publicDir = path.resolve(__dirname, "../../public");
+
 const ignorePatterns = [
   "**/*.test.{ts,tsx}",
   "**/*.spec.{ts,tsx}",
   "**/*.stories.{ts,tsx}",
+  "**/*.d.ts",
 ];
 
-const componentEntries = glob.sync("components/*/index.ts", {
-  ignore: ignorePatterns,
-});
-const hookEntries = glob.sync("hooks/*/index.ts", { ignore: ignorePatterns });
-const providerEntries = glob.sync("providers/*/index.ts", {
-  ignore: ignorePatterns,
-});
-const utilEntries = glob.sync("utils/*/index.ts", { ignore: ignorePatterns });
-const contextEntries = glob.sync("context/*/index.ts", {
-  ignore: ignorePatterns,
-});
-const enumEntries = glob.sync("enums/*/index.ts", { ignore: ignorePatterns });
-const constantEntries = glob.sync("constants/*/index.ts", {
-  ignore: ignorePatterns,
-});
-const typeEntries = glob.sync("types/*/index.ts", { ignore: ignorePatterns });
-const errorEntries = glob.sync("errors/*/index.ts", { ignore: ignorePatterns });
-const selectorsEntries = glob.sync("selectors/*/index.ts", {
-  ignore: ignorePatterns,
-});
+const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
 
-// merge all entry points
+// Derive entry points from package.json exports — single source of truth
 const allEntries = [
-  "index.ts",
-  "components/index.ts",
-  "hooks/index.ts",
-  "providers/index.ts",
-  "utils/index.ts",
-  "context/index.ts",
-  "enums/index.ts",
-  "constants/index.ts",
-  "types/index.ts",
-  "errors/index.ts",
-  "document-editor/index.ts",
-  ...componentEntries,
-  ...hookEntries,
-  ...providerEntries,
-  ...utilEntries,
-  ...contextEntries,
-  ...enumEntries,
-  ...constantEntries,
-  ...typeEntries,
-  ...errorEntries,
-  ...selectorsEntries,
+  ...new Set(
+    Object.values(pkg.exports).flatMap((entry) => {
+      const source = entry.source?.replace(/^\.\//, "");
+      if (!source) return [];
+      if (source.includes("*")) {
+        return glob.sync(source, { ignore: ignorePatterns });
+      }
+      return [source];
+    }),
+  ),
 ];
 
 export default [
@@ -83,6 +60,9 @@ export default [
       },
     ],
     plugins: [
+      alias({
+        entries: [{ find: "PUBLIC_DIR", replacement: publicDir }],
+      }),
       peerDepsExternal(),
       resolve({
         extensions: [".ts", ".tsx", ".js", ".jsx"],
@@ -90,7 +70,16 @@ export default [
         preferBuiltins: false,
       }),
       nodePolyfills(),
-      url(),
+      url({
+        include: [
+          "**/*.png",
+          "**/*.jpg",
+          "**/*.jpeg",
+          "**/*.gif",
+          "**/*.webp",
+          "**/*.ico",
+        ],
+      }),
       svgr(),
       json(),
       commonjs(),
@@ -146,6 +135,6 @@ export default [
         },
       },
     ],
-    external: [/\.scss$/, /\.css$/, /\.svg$/, /node_modules/],
+    external: [/\.scss$/, /\.css$/, /\.svg$/, /\.ico$/, /node_modules/],
   },
 ];
