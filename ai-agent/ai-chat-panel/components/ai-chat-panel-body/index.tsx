@@ -26,14 +26,8 @@
 
 import NewChat from "../../../new-chat";
 
-import styles from "./AiChatPanelBody.module.scss";
-
 const AiChatPanelBody = () => {
-  return (
-    <div className={styles.body}>
-      <NewChat />
-    </div>
-  );
+  return <NewChat />;
 };
 
 export default AiChatPanelBody;

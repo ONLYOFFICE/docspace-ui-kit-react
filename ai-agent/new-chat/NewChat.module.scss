@@ -24,10 +24,18 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-.newChat {
-  // Pin composer to bottom once messages appear (scrollable thread becomes visible).
-  // Without this, h-full on ChatPage's inner divs doesn't resolve because the flex
-  // parent has no explicit height — flex: 1 + min-height: 0 propagates the constraint.
+.chat {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  box-sizing: border-box;
+
+  :global(.aui-root) {
+    height: 100%;
+    box-sizing: border-box;
+  }
+
   :global(div:has([data-role="user"])),
   :global(div:has([data-role="assistant"])) {
     flex: 1;
@@ -57,4 +65,3 @@
     color: var(--text-color) !important;
   }
 }
-

@@ -24,27 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { ChatPage } from "@onlyoffice/ai-chat";
+import {
+  ChatPage,
+  SettingsPage,
+  useStores,
+  ChatList,
+} from "@onlyoffice/ai-chat";
+
+import { ChatToolbar } from "../chat-toolbar";
 
 import styles from "./NewChat.module.scss";
 
 const NewChat = () => {
-  return (
-    <div
-      className={styles.newChat}
-      style={{
-        marginTop: "48px",
-        flex: 1,
-        minHeight: 0,
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      <ChatPage />
-    </div>
-  );
+  const stores = useStores();
+  const currentPage = stores.useRouter((s) => s.currentPage);
+
+  switch (currentPage) {
+    case "settings":
+      return <SettingsPage />;
+    case "history":
+      return <ChatList />;
+
+    default:
+      return (
+        <section className={styles.chat}>
+          <ChatToolbar />
+          <ChatPage />
+        </section>
+      );
+  }
 };
 
 export default NewChat;
-

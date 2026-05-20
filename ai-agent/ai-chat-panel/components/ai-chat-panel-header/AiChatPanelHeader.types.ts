@@ -38,6 +38,10 @@ export type AiChatPanelHeaderProps = {
   isFullscreen?: boolean;
   /** When omitted, the fullscreen toggle is not rendered. */
   onToggleFullscreen?: () => void;
+  /** When true, the fullscreen toggle renders disabled (button stays
+   *  visible so the layout doesn't jump). Used when a child view requires
+   *  fullscreen and the user must not be able to exit it. */
+  isFullscreenToggleDisabled?: boolean;
   /** When omitted, the close button is not rendered. */
   onClose?: () => void;
 

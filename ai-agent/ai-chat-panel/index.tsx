@@ -24,18 +24,6 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-// Pieces of the AI Chat Panel, designed to be composed by the host:
-//   - <AiChatPanelHeader/> — for Section.InfoPanelHeader slot
-//   - <AiChatPanelBody/>   — for Section.InfoPanelBody slot (renders <NewChat />)
-//
-// Fullscreen is achieved by the consumer via CSS — override the
-// `--info-panel-width` variable on a higher DOM ancestor to expand the
-// InfoPanel from its default width to `100vw`. The chat DOM never moves,
-// so scroll position, input focus and in-flight HTTP all survive.
-//
-// Plus a headless state hook (`useAiChatPanelState`) and two helpers
-// (`useFullscreen`, `useEscapeKey`) for non-MobX consumers / tests.
-
 export { default as AiChatPanelHeader } from "./components/ai-chat-panel-header";
 export type { AiChatPanelHeaderProps } from "./components/ai-chat-panel-header/AiChatPanelHeader.types";
 

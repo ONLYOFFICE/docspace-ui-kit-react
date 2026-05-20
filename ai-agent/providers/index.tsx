@@ -251,7 +251,7 @@ const AiAgentProviders = ({
       <PlatformProvider platform={platformAdapter}>
         <AiChatI18nIsolator locale={aiChatLocale}>
           <ComponentsProvider overrides={componentOverrides}>
-            <WidgetConfigProvider config={{}}>
+            <WidgetConfigProvider>
               <ApiProvider config={serverApiConfig}>
                 <StoresProvider stores={stores}>
                   <ThemeProvider theme={theme} customThemes={portalThemes}>
