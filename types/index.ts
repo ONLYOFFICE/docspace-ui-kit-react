@@ -391,6 +391,7 @@ export type TFile = {
   fileEntryType: number;
   hasDraft?: boolean;
   order?: string;
+  locked?: boolean;
   lockedBy?: string;
   originId?: number;
   originRoomId?: number;
