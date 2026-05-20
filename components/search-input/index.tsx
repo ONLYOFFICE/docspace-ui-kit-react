@@ -157,7 +157,9 @@ const SearchInput = ({
       {showMainButton && mainButtonProps ? (
         <div
           ref={mainButtonWrapperRef}
-          className={styles.mainButtonWrapper}
+          className={classNames(styles.mainButtonWrapper, {
+            [styles.mainButtonWrapperDisabled]: mainButtonProps.isDisabled,
+          })}
           onClick={handleMainButtonWrapperClick}
         >
           <span className={styles.mainButtonIcon}>{mainButtonIcon}</span>
