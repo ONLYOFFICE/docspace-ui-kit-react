@@ -105,6 +105,7 @@ const Section = (props: SectionProps) => {
     isInfoPanelAvailable = true,
     settingsStudio = false,
     isInfoPanelScrollLocked,
+    infoPanelWithoutScroll,
     currentDeviceType,
 
     isInfoPanelVisible,
@@ -421,9 +422,13 @@ const Section = (props: SectionProps) => {
           viewAs={viewAs}
           currentDeviceType={currentDeviceType}
           asideInfoPanel={asideInfoPanel}
+          withoutBodyScroll={infoPanelWithoutScroll}
         >
           <SubInfoPanelHeader>{infoPanelHeaderContent}</SubInfoPanelHeader>
-          <SubInfoPanelBody isInfoPanelScrollLocked={isInfoPanelScrollLocked}>
+          <SubInfoPanelBody
+            isInfoPanelScrollLocked={isInfoPanelScrollLocked}
+            withoutScroll={infoPanelWithoutScroll}
+          >
             {infoPanelBodyContent}
           </SubInfoPanelBody>
         </InfoPanel>

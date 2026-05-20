@@ -46,6 +46,7 @@ export type SubInfoPanelHeaderProps = {
 export type SubInfoPanelBodyProps = {
   children: React.JSX.Element | null;
   isInfoPanelScrollLocked?: boolean;
+  withoutScroll?: boolean;
 };
 
 export type InfoPanelProps = {
@@ -60,6 +61,7 @@ export type InfoPanelProps = {
   asideInfoPanel?: boolean;
   topInfoPanel?: boolean;
   onClose?: () => void;
+  withoutBodyScroll?: boolean;
 };
 
 export type SectionBodyContentProps = {
@@ -127,7 +129,10 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
   Omit<SectionWarningProps, "children"> &
   Omit<SectionFooterProps, "children"> &
   Omit<SectionFilterProps, "children" | "className"> &
-  Omit<InfoPanelProps, "children" | "setIsVisible" | "isVisible"> &
+  Omit<
+    InfoPanelProps,
+    "children" | "setIsVisible" | "isVisible" | "withoutBodyScroll"
+  > &
   Omit<SectionHeaderProps, "children" | "className"> &
   Omit<SectionContainerProps, "children" | "isSectionHeaderAvailable"> &
   Omit<
@@ -140,6 +145,7 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     isTabletView?: boolean;
     isHeaderVisible?: boolean;
     isInfoPanelAvailable?: boolean;
+    infoPanelWithoutScroll?: boolean;
     isEmptyPage?: boolean;
     maintenanceExist?: boolean;
     snackbarExist?: boolean;
