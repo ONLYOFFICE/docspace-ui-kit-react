@@ -33,17 +33,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export enum IconSizeType {
-	extraSmall = "extraSmall",
-	small = "small",
-	medium = "medium",
-	big = "big",
-	scale = "scale",
+.button {
+  width: 100%;
 }
 
-export const isIconSizeType = (size: unknown): size is IconSizeType => {
-	return (
-		typeof size === "string" &&
-		Object.values(IconSizeType).includes(size as IconSizeType)
-	);
-};
+.modalBody .textWarning {
+  margin-top: 16px;
+}

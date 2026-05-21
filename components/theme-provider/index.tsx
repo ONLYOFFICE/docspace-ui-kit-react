@@ -36,10 +36,6 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-	type DefaultTheme,
-	ThemeProvider as Provider,
-} from "styled-components";
 
 import { InterfaceDirectionProvider } from "../../context/InterfaceDirectionContext";
 import { ThemeContextProvider as CustomThemeProvider } from "../../context/ThemeContext";
@@ -130,16 +126,7 @@ export const ThemeProviderComponent = ({
 				theme={theme.isBase ? "Base" : "Dark"}
 				currentColorScheme={currentColorScheme}
 			>
-				<Provider
-					theme={
-						{
-							...theme,
-							currentColorScheme,
-						} as DefaultTheme
-					}
-				>
-					{children}
-				</Provider>
+				{children}
 			</CustomThemeProvider>
 		</InterfaceDirectionProvider>
 	);
