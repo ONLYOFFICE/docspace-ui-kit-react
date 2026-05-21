@@ -24,18 +24,4 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import type { ComponentOverrides } from "@onlyoffice/ai-chat";
-
-import { ButtonOverride } from "./button";
-import { ComboBoxOverride } from "./combo-box";
-import { DropdownMenuOverride } from "./dropdown-menu";
-import { IconButtonOverride } from "./icon-button/IconButton";
-import { TabsOverride } from "./tabs";
-
-export const componentOverrides: ComponentOverrides = {
-  Button: ButtonOverride,
-  ComboBox: ComboBoxOverride,
-  DropdownMenu: DropdownMenuOverride,
-  Tabs: TabsOverride,
-  // IconButton: IconButtonOverride,
-};
+export { TabsOverride } from "./Tabs";
