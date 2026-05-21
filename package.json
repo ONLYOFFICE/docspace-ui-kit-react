@@ -153,6 +153,10 @@
     "dist",
     "locales"
   ],
+  "sideEffects": [
+    "**/*.scss",
+    "**/*.css"
+  ],
   "publishConfig": {
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",

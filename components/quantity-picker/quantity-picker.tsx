@@ -36,8 +36,8 @@
 import React, { ChangeEvent, MouseEvent, useState } from "react";
 import classNames from "classnames";
 
-import PlusIcon from "PUBLIC_DIR/images/payment.plus.react.svg";
-import MinusIcon from "PUBLIC_DIR/images/minus.react.svg";
+import PlusIcon from "../../assets/payment.plus.react.svg";
+import MinusIcon from "../../assets/minus.react.svg";
 
 import { Text } from "../text";
 import { Slider } from "../slider";
@@ -340,4 +340,3 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
 };
 
 export default QuantityPicker;
-
