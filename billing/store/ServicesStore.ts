@@ -494,7 +494,8 @@ class ServicesStore {
 
       return this.wasFirstAiServiceTopUp;
     } catch (error) {
-      if (error instanceof Error && error.name === "CanceledError") return false;
+      if (error instanceof Error && error.name === "CanceledError")
+        return false;
       console.error(error);
       toastr.error(t("UnexpectedError"));
       return false;
@@ -519,8 +520,7 @@ class ServicesStore {
     try {
       const quotas = await handleServicesQuotas();
 
-
-      const hasAiService = quotas.some(
+      const hasAiService = quotas?.some(
         (service) => service.serviceName === AI_ENUM,
       );
 
@@ -601,3 +601,4 @@ class ServicesStore {
 }
 
 export default ServicesStore;
+
