@@ -36,18 +36,12 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { Button, ButtonSize } from "../../../components/button";
-import styled from "styled-components";
 import { toastr } from "../../../components/toast";
 import RequestButtonContainer from "./RequestButtonContainer";
 import UpdatePlanButtonContainer from "./UpdatePlanButtonContainer";
 import type { TTranslation } from "../../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-
-const StyledBody = styled.div`
-  button {
-    width: 100%;
-  }
-`;
+import styles from "./ButtonContainer.module.scss";
 
 const ButtonContainer = observer(({ isDisabled, t }: { isDisabled: boolean; t: TTranslation }) => {
   const store = usePaymentStore();
@@ -61,10 +55,10 @@ const ButtonContainer = observer(({ isDisabled, t }: { isDisabled: boolean; t: T
   };
 
   return (
-    <StyledBody>
+    <div className={styles.body}>
       {isNotPaidPeriod || isGracePeriod ? (
         <Button
-          className="pay-button"
+          className={styles.button}
           label={t("Pay")}
           size={ButtonSize.medium}
           primary
@@ -78,7 +72,7 @@ const ButtonContainer = observer(({ isDisabled, t }: { isDisabled: boolean; t: T
       ) : (
         <UpdatePlanButtonContainer t={t} isDisabled={isDisabled} />
       )}
-    </StyledBody>
+    </div>
   );
 });
 

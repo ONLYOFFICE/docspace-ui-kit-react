@@ -33,19 +33,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
-import SendClockIcon from "../../../assets/send.clock.react.svg";
-import styles from "../PeopleSelector.module.scss";
-
-interface SendClockIconProps {
-  className?: string;
+.button {
+  width: 100%;
 }
-
-const StyledSendClockIcon: React.FC<SendClockIconProps> = ({ className }) => {
-  return (
-    <SendClockIcon className={classNames(styles.sendClockIcon, className)} />
-  );
-};
-
-export default StyledSendClockIcon;

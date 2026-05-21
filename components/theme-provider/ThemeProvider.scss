@@ -4,12 +4,14 @@ $font-size: 13px;
 
 .light {
   --background-color: #{$white};
-  --text-color:#{$black};
+  --text-color: #{$black};
+  --info-panel-members-subtitle-color: #{$gray};
 }
 
 .dark {
   --background-color: #{$black};
-  --text-color:#{$white};
+  --text-color: #{$white};
+  --info-panel-members-subtitle-color: #{$gray};
 }
 
 html,
