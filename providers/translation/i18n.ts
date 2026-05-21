@@ -35,8 +35,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import i18n from "i18next";
+import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
+
+// Own instance, not the i18next singleton: @onlyoffice/ai-chat also calls
+// `init()` on the singleton, which would reset `ns`/`defaultNS`/`language`
+// out from under host translations. Keeping a dedicated instance isolates
+// host resources from any other library that touches the global.
+const i18n = i18next.createInstance();
 
 export type TTranslations = Map<string, Map<string, Record<string, string>>>;
 
