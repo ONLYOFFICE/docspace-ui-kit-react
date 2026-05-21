@@ -393,6 +393,8 @@ export type TFile = {
   order?: string;
   locked?: boolean;
   lockedBy?: string;
+  customFilterEnabled?: boolean;
+  customFilterEnabledBy?: string;
   originId?: number;
   originRoomId?: number;
   originRoomTitle?: string;
