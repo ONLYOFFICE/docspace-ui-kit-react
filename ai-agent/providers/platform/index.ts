@@ -33,8 +33,18 @@ type EnvChangeCallback = (info: EnvChangeInfo) => void;
 
 const envSubscribers = new Set<EnvChangeCallback>();
 
-const getSystemTheme = (): "light" | "dark" =>
-  window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+// This module is imported by a Next.js client component, which Next.js still
+// evaluates on the server during SSR. Guard every browser-only API so the
+// module can load in Node — real values get filled in by useEffect-driven
+// notifyEnvironmentChange calls once we hit the client.
+const isBrowser = typeof window !== "undefined";
+
+const getSystemTheme = (): "light" | "dark" => {
+  if (!isBrowser) return "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+};
 
 const themeIdForSystem = (t: "light" | "dark") =>
   t === "dark" ? "theme-portal-dark" : "theme-portal-base";
@@ -47,10 +57,16 @@ export const platformAdapter: PlatformAdapter = {
   env: {
     theme: themeIdForSystem(getSystemTheme()),
     systemTheme: getSystemTheme(),
-    locale: normalizeAiChatLocale(window.navigator.language),
-    devicePixelRatio: window.devicePixelRatio,
+    locale: isBrowser ? normalizeAiChatLocale(window.navigator.language) : "en",
+    devicePixelRatio: isBrowser ? window.devicePixelRatio : 1,
     onEnvironmentChange(callback) {
       envSubscribers.add(callback);
+
+      if (!isBrowser) {
+        return () => {
+          envSubscribers.delete(callback);
+        };
+      }
 
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
       const handler = (e: MediaQueryListEvent) => {
@@ -71,4 +87,3 @@ export const notifyEnvironmentChange = (info: EnvChangeInfo) => {
   if (info.theme) platformAdapter.env.theme = info.theme;
   envSubscribers.forEach((cb) => cb(info));
 };
-

@@ -128,8 +128,14 @@ type AiAgentProvidersProps = {
 // — every method call goes over HTTP via createServerAPI / ApiProvider.
 const SERVER_API_BASE_URL = "/api/2.0/new-ai";
 
+// Next.js evaluates this useMemo during SSR for "use client" components,
+// where `window` is undefined. Fall back to an empty origin — the actual
+// API calls only fire from useEffect-driven code that runs after hydration.
+const getOrigin = () =>
+  typeof window === "undefined" ? "" : window.location.origin;
+
 const buildServerApiConfig = (): ServerAPIConfig => ({
-  origin: window.location.origin,
+  origin: getOrigin(),
   baseUrl: SERVER_API_BASE_URL,
   routes: DEFAULT_SERVER_API_ROUTES,
 });
@@ -203,9 +209,7 @@ const AiAgentProviders = ({
       // the auto-register, hide the built-in "onlyoffice" provider type
       // from Add/Edit model dropdowns, and hide the matching row in
       // Web Search settings.
-      onlyofficeConfig: isStandalone
-        ? undefined
-        : { baseUrl: window.location.origin },
+      onlyofficeConfig: isStandalone ? undefined : { baseUrl: getOrigin() },
       hiddenProviders: isStandalone
         ? (["onlyoffice"] as ProviderType[])
         : undefined,
