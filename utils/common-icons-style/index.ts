@@ -33,8 +33,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { css } from "styled-components";
-
 export enum IconSizeType {
 	extraSmall = "extraSmall",
 	small = "small",
@@ -43,60 +41,9 @@ export enum IconSizeType {
 	scale = "scale",
 }
 
-enum IconSizes {
-	extraSmall = 8,
-	small = 12,
-	medium = 16,
-	big = 24,
-	scale = "scale",
-}
-
-const getSizeStyle = (size?: IconSizeType | number) => {
-	let sizeVar = size;
-	switch (size) {
-		case "scale":
-			return `
-          &:not(:root) {
-            width: 100%;
-            height: 100%;
-          }
-        `;
-		case IconSizeType.extraSmall:
-			sizeVar = IconSizes.extraSmall;
-			break;
-		case IconSizeType.small:
-			sizeVar = IconSizes.small;
-			break;
-		case IconSizeType.medium:
-			sizeVar = IconSizes.medium;
-			break;
-		case IconSizeType.big:
-			sizeVar = IconSizes.big;
-			break;
-
-		default:
-			sizeVar = size;
-	}
-
-	return `
-          width: ${sizeVar}px;
-          min-width: ${sizeVar}px;
-          height: ${sizeVar}px;
-          min-height: ${sizeVar}px;
-        `;
-};
-
-const commonIconsStyles = css<{ size?: IconSizeType | number }>`
-  overflow: hidden;
-  vertical-align: middle;
-  ${(props) => getSizeStyle(props.size)};
-`;
-
 export const isIconSizeType = (size: unknown): size is IconSizeType => {
 	return (
 		typeof size === "string" &&
 		Object.values(IconSizeType).includes(size as IconSizeType)
 	);
 };
-
-export default commonIconsStyles;
