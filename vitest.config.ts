@@ -16,6 +16,10 @@ export default defineConfig({
         find: /^(.*)\.svg$/,
         replacement: path.resolve(__dirname, "./test/__mocks__/svgMock.tsx"),
       },
+      {
+        find: "react-svg",
+        replacement: path.resolve(__dirname, "./test/__mocks__/reactSvgMock.tsx"),
+      },
     ],
   },
   test: {
