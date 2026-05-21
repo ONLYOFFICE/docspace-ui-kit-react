@@ -39,7 +39,7 @@ import { toastr } from "../../components/toast";
 import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "../utils/common";
-import { AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
+import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
 import type { TAiToolsPrices } from "../types";
 import type PaymentStore from "./PaymentStore";
 import type { TApiClient } from "../../providers/api/ApiProvider";
@@ -517,17 +517,23 @@ class ServicesStore {
     } = this.paymentStore;
 
     try {
+      const quotas = await handleServicesQuotas();
+
+
+      const hasAiService = quotas.some(
+        (service) => service.serviceName === AI_ENUM,
+      );
+
       const requests: Promise<unknown>[] = [
-        handleServicesQuotas(),
         initWalletPayerAndBalance(isRefresh),
         this.paymentStore.tariff.fetchPortalTariff(),
-        this.fetchAiServiceBalance(),
-        this.fetchAiPrices(),
       ];
 
-      const [quotas] = await Promise.all(requests);
+      if (hasAiService) {
+        requests.push(this.fetchAiServiceBalance(), this.fetchAiPrices());
+      }
 
-      if (!quotas) throw new Error();
+      await Promise.all(requests);
 
       if (this.paymentStore.isCardLinkedToPortal) {
         if (this.paymentStore.isStripePortalAvailable) {
