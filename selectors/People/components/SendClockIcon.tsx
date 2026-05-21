@@ -35,7 +35,7 @@
 
 import React from "react";
 import classNames from "classnames";
-import SendClockIcon from "PUBLIC_DIR/images/send.clock.react.svg";
+import SendClockIcon from "../../../assets/send.clock.react.svg";
 import styles from "../PeopleSelector.module.scss";
 
 interface SendClockIconProps {
