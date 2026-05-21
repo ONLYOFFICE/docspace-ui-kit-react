@@ -285,7 +285,7 @@ const UpdatePlanButtonContainer = ({
   const payTariffButton = () => {
     return canPayTariff ? (
       <Button
-        className="upgrade-now-button"
+        className={styles.button}
         label={t("UpgradeNow")}
         size={ButtonSize.medium}
         primary
@@ -310,7 +310,7 @@ const UpdatePlanButtonContainer = ({
     if (cardLinkedOnFreeTariff) {
       return (
         <Button
-          className="upgrade-now-button"
+          className={styles.button}
           label={t("UpgradeNow")}
           size={ButtonSize.medium}
           primary
@@ -330,7 +330,7 @@ const UpdatePlanButtonContainer = ({
       />
     ) : (
       <Button
-        className="upgrade-now-button"
+        className={styles.button}
         label={t("UpgradeNow")}
         size={ButtonSize.medium}
         primary
@@ -384,7 +384,7 @@ const UpdatePlanButtonContainer = ({
                   }}
                 />
               </Text>
-              <Text className="text-warning">
+              <Text className={styles.textWarning}>
                 <CommonTrans
                   i18nKey="ActionCannotBeUndone"
                   components={{

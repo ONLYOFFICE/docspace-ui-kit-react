@@ -58,7 +58,7 @@ const ButtonContainer = observer(({ isDisabled, t }: { isDisabled: boolean; t: T
     <div className={styles.body}>
       {isNotPaidPeriod || isGracePeriod ? (
         <Button
-          className="pay-button"
+          className={styles.button}
           label={t("Pay")}
           size={ButtonSize.medium}
           primary
