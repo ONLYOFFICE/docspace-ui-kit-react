@@ -49,6 +49,12 @@ export type NavSubItem = {
   iconNode?: React.ReactNode;
   onClick?: (item: NavSubItem) => void;
   linkData?: NavMenuLinkData;
+  /**
+   * Render a thin separator line above this sub-item. Used to group related
+   * children (e.g., put Trash visually apart from Favorites without
+   * splitting the sub-menu into multiple groups).
+   */
+  withTopSeparator?: boolean;
 };
 
 export type NavMenuItem = {
