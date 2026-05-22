@@ -61,7 +61,6 @@ const AiPaywallCompletePage = () => {
 
   const [status, setStatus] = React.useState<Status>("processing");
   const [stepIndex, setStepIndex] = React.useState(0);
-  const ranRef = React.useRef(false);
 
   const { currency, amount } = React.useMemo(() => {
     if (typeof window === "undefined") {
@@ -83,9 +82,6 @@ const AiPaywallCompletePage = () => {
   const formattedAmount = formatCurrencyValue(language, amount, currency, 2);
 
   React.useEffect(() => {
-    if (ranRef.current) return;
-    ranRef.current = true;
-
     const run = async () => {
       try {
         setStepIndex(1);
@@ -120,7 +116,7 @@ const AiPaywallCompletePage = () => {
     };
 
     run();
-  }, [paymentApi, rawApiClient]);
+  }, []);
 
   const onGoToBillingClick = () => {
     window.location.href = BILLING_REDIRECT_URL;
