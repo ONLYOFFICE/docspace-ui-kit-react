@@ -64,12 +64,10 @@ const TabsOverride: React.FC<AiChatTabsProps> = (props) => {
 
   return (
     <Tabs
-      scaled
       items={mappedItems}
       onSelect={handleSelect}
       selectedItemId={selectedValue ?? items[0]?.value ?? ""}
       className={styles.tabs}
-      type={TabsTypes.Secondary}
       withoutStickyIntend
     />
   );
