@@ -22,7 +22,7 @@
  *
  * All non-code elements of the Product, including illustrations,
  * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * Creative Commons Attribution-ShareAlike 4.0 International License.
  * https://creativecommons.org/licenses/by-sa/4.0/legalcode
  *
  * This license applies only to such non-code elements and does not
@@ -33,17 +33,33 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export enum IconSizeType {
-	extraSmall = "extraSmall",
-	small = "small",
-	medium = "medium",
-	big = "big",
-	scale = "scale",
+import type { FC, HTMLAttributes } from "react";
+
+interface ReactSVGProps extends HTMLAttributes<HTMLDivElement> {
+  src: string;
+  wrapper?: string;
+  afterInjection?: unknown;
+  beforeInjection?: unknown;
+  evalScripts?: unknown;
+  fallback?: unknown;
+  httpRequestWithCredentials?: unknown;
+  loading?: unknown;
+  renumerateIRIElements?: unknown;
+  useRequestCache?: unknown;
 }
 
-export const isIconSizeType = (size: unknown): size is IconSizeType => {
-	return (
-		typeof size === "string" &&
-		Object.values(IconSizeType).includes(size as IconSizeType)
-	);
-};
+export const ReactSVG: FC<ReactSVGProps> = ({
+  src: _src,
+  wrapper: _wrapper,
+  afterInjection: _ai,
+  beforeInjection: _bi,
+  evalScripts: _es,
+  fallback: _f,
+  httpRequestWithCredentials: _http,
+  loading: _l,
+  renumerateIRIElements: _ri,
+  useRequestCache: _urc,
+  ...rest
+}) => <div {...rest} />;
+
+export default ReactSVG;
