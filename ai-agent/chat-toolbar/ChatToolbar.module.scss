@@ -35,6 +35,15 @@
 
 @use "../../styles/variables/colors";
 
+:global(.dark) {
+  .toolbar .button {
+    --ab-bg-hover: #{colors.$light-dark-gray-hover};
+    --ab-bg-active: #{colors.$gray-dark-mid};
+    --ab-color: #{colors.$dark-gray-dark};
+    --ab-color-active: #{colors.$white};
+  }
+}
+
 .toolbar {
   display: flex;
   align-items: center;
@@ -43,6 +52,25 @@
 
   height: 64px;
   box-sizing: border-box;
+
+  .button {
+    height: 32px;
+
+    --ab-bg: transparent;
+    --ab-bg-hover: #{colors.$light-gray-hover};
+    --ab-bg-active: #{colors.$gray-light-mid};
+    --ab-color: #{colors.$gray-text};
+    --ab-color-active: #{colors.$black};
+
+    &:active {
+      --ab-color: var(--ab-color-active);
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
 }
 
 .leftGroup,
@@ -50,32 +78,4 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-:global(.dark) {
-  .button {
-    --ab-bg-hover: #{colors.$light-dark-gray-hover};
-    --ab-bg-active: #{colors.$gray-dark-mid};
-    --ab-color: #{colors.$dark-gray-dark};
-    --ab-color-active: #{colors.$white};
-  }
-}
-
-.button {
-  height: 32px;
-
-  --ab-bg: transparent;
-  --ab-bg-hover: #{colors.$light-gray-hover};
-  --ab-bg-active: #{colors.$gray-light-mid};
-  --ab-color: #{colors.$gray-text};
-  --ab-color-active: #{colors.$black};
-
-  &:active {
-    --ab-color: var(--ab-color-active);
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
 }
