@@ -36,9 +36,9 @@
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { CommonTrans } from "../../../utils/i18n/CommonTrans";
-import styled from "styled-components";
 
 import { Button, ButtonSize } from "../../../components/button";
+import styles from "./UpdatePlanButtonContainer.module.scss";
 import { toastr } from "../../../components/toast";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import type { QuotaDto } from "@onlyoffice/docspace-api-sdk";
@@ -49,17 +49,6 @@ import { Link } from "../../../components/link";
 import DowngradePlanButtonContainer from "./DowngradePlanButtonContainer";
 import ChangePricingPlanDialog from "../../dialogs/ChangePricingPlanDialog";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-
-const StyledBody = styled.div`
-  button {
-    width: 100%;
-  }
-`;
-const StyledModalBody = styled.div`
-  .text-warning {
-    margin-top: 16px;
-  }
-`;
 
 const MANAGER = "manager";
 let timerId: ReturnType<typeof setTimeout> | undefined;
@@ -296,7 +285,7 @@ const UpdatePlanButtonContainer = ({
   const payTariffButton = () => {
     return canPayTariff ? (
       <Button
-        className="upgrade-now-button"
+        className={styles.button}
         label={t("UpgradeNow")}
         size={ButtonSize.medium}
         primary
@@ -321,7 +310,7 @@ const UpdatePlanButtonContainer = ({
     if (cardLinkedOnFreeTariff) {
       return (
         <Button
-          className="upgrade-now-button"
+          className={styles.button}
           label={t("UpgradeNow")}
           size={ButtonSize.medium}
           primary
@@ -341,7 +330,7 @@ const UpdatePlanButtonContainer = ({
       />
     ) : (
       <Button
-        className="upgrade-now-button"
+        className={styles.button}
         label={t("UpgradeNow")}
         size={ButtonSize.medium}
         primary
@@ -356,7 +345,7 @@ const UpdatePlanButtonContainer = ({
   };
 
   return (
-    <StyledBody>
+    <div className={styles.body}>
       {isAlreadyPaid || cardLinkedOnFreeTariff
         ? updatingCurrentTariffButton()
         : payTariffButton()}
@@ -376,7 +365,7 @@ const UpdatePlanButtonContainer = ({
         >
           <ModalDialog.Header>{t("PlanUpgrade")}</ModalDialog.Header>
           <ModalDialog.Body>
-            <StyledModalBody>
+            <div className={styles.modalBody}>
               <Text>
                 <CommonTrans
                   i18nKey="SwitchPlan"
@@ -395,7 +384,7 @@ const UpdatePlanButtonContainer = ({
                   }}
                 />
               </Text>
-              <Text className="text-warning">
+              <Text className={styles.textWarning}>
                 <CommonTrans
                   i18nKey="ActionCannotBeUndone"
                   components={{
@@ -403,7 +392,7 @@ const UpdatePlanButtonContainer = ({
                   }}
                 />
               </Text>
-            </StyledModalBody>
+            </div>
           </ModalDialog.Body>
           <ModalDialog.Footer>
             <Button
@@ -426,7 +415,7 @@ const UpdatePlanButtonContainer = ({
           </ModalDialog.Footer>
         </ModalDialog>
       ) : null}
-    </StyledBody>
+    </div>
   );
 };
 

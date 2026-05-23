@@ -262,6 +262,14 @@
   position: relative;
 }
 
+// Groups sub-items inside a single submenu without splitting them into
+// separate NavMenuGroup entries (e.g., separates Trash from Favorites).
+.subItemWithSeparator {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--nav-menu-separator-color, var(--quick-buttons-color));
+}
+
 .subItemSibling {
   position: absolute;
   inset: 0;

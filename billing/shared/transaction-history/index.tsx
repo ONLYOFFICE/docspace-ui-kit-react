@@ -535,7 +535,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
       filter={() => filter(withoutRoleFilter)}
       {...infoProps}
       emptyScreenHeader={t("NotFoundMembers")}
-      emptyScreenDescription={t("PeopleSelectorInfo", {
+      emptyScreenDescription={t("Common:PeopleSelectorInfo", {
         productName: getBrandName("ProductName"),
       })}
     />
@@ -643,3 +643,4 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 };
 
 export default observer(TransactionHistory);
+

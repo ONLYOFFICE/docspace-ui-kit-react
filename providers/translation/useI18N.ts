@@ -60,22 +60,20 @@ const useI18N = ({ settings, user, locale, translations }: UseI18NProps) => {
     translations ? getI18NInstance(lng ?? portalLng, translations) : null,
   );
 
-  const isInit = React.useRef(false);
-
   React.useEffect(() => {
     if (!settings?.timezone) return;
     window.timezone = settings.timezone;
   }, [settings?.timezone]);
 
+  // Re-run only when language or translations identity changes — same
+  // identity means resources have already been registered above (the
+  // useState initializer ran getI18NInstance for us) and re-invoking the
+  // setup is what was racing with react-i18next's languageChanged event,
+  // letting `t()` snap back to raw keys on background re-renders.
   React.useEffect(() => {
     if (!translations) return;
-    isInit.current = true;
-
     const instance = getI18NInstance(lng ?? portalLng, translations);
-
-    if (instance) {
-      setI18N(instance);
-    }
+    if (instance) setI18N(instance);
   }, [lng, portalLng, translations]);
 
   return { i18n };

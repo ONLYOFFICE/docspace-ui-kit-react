@@ -22,7 +22,7 @@
  *
  * All non-code elements of the Product, including illustrations,
  * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * Creative Commons Attribution-ShareAlike 4.0 International License.
  * https://creativecommons.org/licenses/by-sa/4.0/legalcode
  *
  * This license applies only to such non-code elements and does not
@@ -33,19 +33,33 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
-import SendClockIcon from "../../../assets/send.clock.react.svg";
-import styles from "../PeopleSelector.module.scss";
+import type { FC, HTMLAttributes } from "react";
 
-interface SendClockIconProps {
-  className?: string;
+interface ReactSVGProps extends HTMLAttributes<HTMLDivElement> {
+  src: string;
+  wrapper?: string;
+  afterInjection?: unknown;
+  beforeInjection?: unknown;
+  evalScripts?: unknown;
+  fallback?: unknown;
+  httpRequestWithCredentials?: unknown;
+  loading?: unknown;
+  renumerateIRIElements?: unknown;
+  useRequestCache?: unknown;
 }
 
-const StyledSendClockIcon: React.FC<SendClockIconProps> = ({ className }) => {
-  return (
-    <SendClockIcon className={classNames(styles.sendClockIcon, className)} />
-  );
-};
+export const ReactSVG: FC<ReactSVGProps> = ({
+  src: _src,
+  wrapper: _wrapper,
+  afterInjection: _ai,
+  beforeInjection: _bi,
+  evalScripts: _es,
+  fallback: _f,
+  httpRequestWithCredentials: _http,
+  loading: _l,
+  renumerateIRIElements: _ri,
+  useRequestCache: _urc,
+  ...rest
+}) => <div {...rest} />;
 
-export default StyledSendClockIcon;
+export default ReactSVG;
