@@ -35,24 +35,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import i18n from "i18next";
+import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 
 export type TTranslations = Map<string, Map<string, Record<string, string>>>;
 
+// Build a private i18next instance instead of mutating the default singleton —
+// keeps DocSpace resources isolated from any third-party packages that also
+// `init` i18next.
+let instance: ReturnType<typeof i18next.createInstance> | null = null;
 let isInitialized = false;
 
 function loadResources(translations: TTranslations) {
+  if (!instance) return;
   translations.forEach((nsList, lang) => {
     nsList.forEach((resources, ns) => {
-      i18n.addResourceBundle(lang, ns, resources, true, true);
+      instance?.addResourceBundle(lang, ns, resources, true, true);
     });
   });
 }
 
 export const getI18NInstance = (lng: string, translations: TTranslations) => {
+  if (!instance) {
+    instance = i18next.createInstance();
+  }
   if (!isInitialized) {
-    i18n.use(initReactI18next).init({
+    instance.use(initReactI18next).init({
       lng,
       fallbackLng: "en",
       load: "currentOnly",
@@ -72,11 +80,12 @@ export const getI18NInstance = (lng: string, translations: TTranslations) => {
       initImmediate: false,
     });
     isInitialized = true;
-  } else if (i18n.language !== lng) {
-    i18n.changeLanguage(lng);
+  } else if (instance.language !== lng) {
+    instance.changeLanguage(lng);
   }
 
   loadResources(translations);
+  const i18n = instance;
 
   if (typeof window !== "undefined") {
     const win = window as unknown as {

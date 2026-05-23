@@ -33,6 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useId } from "react";
 import ContentLoader from "react-content-loader";
 
 import { LOADER_STYLE } from "../../constants";
@@ -53,31 +54,37 @@ const RectangleSkeleton = ({
   foregroundOpacity = LOADER_STYLE.foregroundOpacity,
   speed = LOADER_STYLE.speed,
   animate = LOADER_STYLE.animate,
-
+  uniqueKey,
   ...rest
-}: RectangleSkeletonProps) => (
-  <ContentLoader
-    title={title}
-    width={width}
-    height={height}
-    backgroundColor={backgroundColor}
-    foregroundColor={foregroundColor}
-    backgroundOpacity={backgroundOpacity}
-    foregroundOpacity={foregroundOpacity}
-    speed={speed}
-    animate={animate}
-    {...rest}
-    data-testid="rectangle-skeleton"
-  >
-    <rect
-      x={x}
-      y={y}
-      rx={borderRadius}
-      ry={borderRadius}
+}: RectangleSkeletonProps) => {
+  // react-content-loader otherwise picks a random uniqueKey per render, which
+  // produces SSR/client SVG-id mismatches and triggers React hydration errors.
+  const stableKey = useId();
+  return (
+    <ContentLoader
+      title={title}
       width={width}
       height={height}
-    />
-  </ContentLoader>
-);
+      backgroundColor={backgroundColor}
+      foregroundColor={foregroundColor}
+      backgroundOpacity={backgroundOpacity}
+      foregroundOpacity={foregroundOpacity}
+      speed={speed}
+      animate={animate}
+      uniqueKey={uniqueKey ?? stableKey}
+      {...rest}
+      data-testid="rectangle-skeleton"
+    >
+      <rect
+        x={x}
+        y={y}
+        rx={borderRadius}
+        ry={borderRadius}
+        width={width}
+        height={height}
+      />
+    </ContentLoader>
+  );
+};
 
 export { RectangleSkeleton };

@@ -88,7 +88,11 @@ const NavMenuSubItemWrapper = ({
   );
 
   return (
-    <li>
+    <li
+      className={classNames({
+        [styles.subItemWithSeparator]: subItem.withTopSeparator,
+      })}
+    >
       <div
         ref={parentElementRef as React.RefObject<HTMLDivElement>}
         className={styles.subItemWrapper}
