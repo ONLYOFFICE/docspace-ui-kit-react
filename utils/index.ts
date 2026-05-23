@@ -47,6 +47,8 @@ export * from "./get-text-color";
 
 export * from "./trim-separator";
 
+export * from "./calculateRoomLogoParams";
+
 export * from "./i18n";
 
 export * from "./common";

@@ -25,7 +25,7 @@
  * Creative Commons Attribution-ShareAlike 4.0 International License:
  * https://creativecommons.org/licenses/by-sa/4.0/legalcode
  *
- * This license applies only to such non-code elements and does not
+ * This license applies only to their non-code elements and does not
  * modify or replace the licensing terms applicable to the Program's
  * source code, which remains licensed under the GNU Affero General
  * Public License v3.
@@ -56,11 +56,12 @@ const WalletLoader: React.FC<WalletLoaderProps> = ({
   return (
     <div className={loaderClassName}>
       <div className={styles.descriptionRow}>
-        <RectangleSkeleton height="40px" borderRadius="3px" width="100%" />
-        <RectangleSkeleton height="20px" borderRadius="3px" width="73px" />
+        <RectangleSkeleton uniqueKey="wallet-desc-1" height="40px" borderRadius="3px" width="100%" />
+        <RectangleSkeleton uniqueKey="wallet-desc-2" height="20px" borderRadius="3px" width="73px" />
       </div>
 
       <RectangleSkeleton
+        uniqueKey="wallet-payment"
         className={styles.paymentLoader}
         height="72px"
         borderRadius="3px"
@@ -69,18 +70,21 @@ const WalletLoader: React.FC<WalletLoaderProps> = ({
 
       <div className={styles.balanceRow}>
         <RectangleSkeleton
+          uniqueKey="wallet-balance-1"
           className={styles.rectangleSkeleton}
           height="22px"
           borderRadius="3px"
           width="64px"
         />
         <RectangleSkeleton
+          uniqueKey="wallet-balance-2"
           className={styles.rectangleSkeleton}
           height="60px"
           borderRadius="3px"
           width="152px"
         />
         <RectangleSkeleton
+          uniqueKey="wallet-balance-3"
           className={styles.rectangleSkeleton}
           height="32px"
           borderRadius="3px"
@@ -91,6 +95,7 @@ const WalletLoader: React.FC<WalletLoaderProps> = ({
       {!isMobile && !isTablet ? (
         <>
           <RectangleSkeleton
+            uniqueKey="wallet-flexible-label"
             className={styles.flexibleLoader}
             height="22px"
             borderRadius="3px"
@@ -98,16 +103,19 @@ const WalletLoader: React.FC<WalletLoaderProps> = ({
           />
           <div className={classNames(styles.loaderRow, styles.headerRow)}>
             <RectangleSkeleton
+              uniqueKey="wallet-header-1"
               className={styles.flexibleLoader}
               height="32px"
               borderRadius="3px"
             />
             <RectangleSkeleton
+              uniqueKey="wallet-header-2"
               className={styles.flexibleLoader}
               height="32px"
               borderRadius="3px"
             />
             <RectangleSkeleton
+              uniqueKey="wallet-header-3"
               className={styles.flexibleLoader}
               height="32px"
               borderRadius="3px"
@@ -116,21 +124,25 @@ const WalletLoader: React.FC<WalletLoaderProps> = ({
 
           <div className={classNames(styles.loaderRow, styles.dataRow)}>
             <RectangleSkeleton
+              uniqueKey="wallet-row-1"
               className={styles.fixedLoader}
               height="16px"
               borderRadius="3px"
             />
             <RectangleSkeleton
+              uniqueKey="wallet-row-2"
               className={styles.fixedLoader}
               height="16px"
               borderRadius="3px"
             />
             <RectangleSkeleton
+              uniqueKey="wallet-row-3"
               className={styles.fixedLoader}
               height="16px"
               borderRadius="3px"
             />
             <RectangleSkeleton
+              uniqueKey="wallet-row-4"
               className={classNames(styles.fixedLoader, styles.lastChild)}
               height="16px"
               borderRadius="3px"

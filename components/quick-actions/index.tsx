@@ -41,7 +41,7 @@ import type { QuickActionItem, QuickActionsProps } from "./QuickActions.types";
 import styles from "./QuickActions.module.scss";
 
 const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
-  const { icon, label, onClick, href, target, dataTestId } = item;
+  const { icon, label, onClick, href, target, disabled, dataTestId } = item;
 
   const content = (
     <>
@@ -52,12 +52,16 @@ const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
     </>
   );
 
-  if (href) {
+  const tileClassName = classNames(styles.tile, {
+    [styles.disabled]: disabled,
+  });
+
+  if (href && !disabled) {
     const rel = target === "_blank" ? "noopener noreferrer" : undefined;
 
     return (
       <a
-        className={styles.tile}
+        className={tileClassName}
         href={href}
         target={target}
         rel={rel}
@@ -73,8 +77,9 @@ const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
   return (
     <button
       type="button"
-      className={styles.tile}
+      className={tileClassName}
       onClick={onClick}
+      disabled={disabled}
       aria-label={label}
       data-testid={dataTestId}
     >
