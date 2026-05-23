@@ -48,4 +48,5 @@ export type RectangleSkeletonProps = {
   speed?: number;
   animate?: boolean;
   style?: React.CSSProperties;
+  uniqueKey?: string;
 };
