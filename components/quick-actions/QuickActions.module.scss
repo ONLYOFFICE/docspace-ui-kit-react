@@ -96,6 +96,13 @@
     outline: 2px solid currentColor;
     outline-offset: 2px;
   }
+
+  &.disabled,
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 }
 
 .icon {

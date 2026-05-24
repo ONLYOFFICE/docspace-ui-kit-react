@@ -34,7 +34,7 @@
  */
 
 import type React from "react";
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useState } from "react";
 
 import { useTooltipControl } from "../hooks/useTooltipControl";
 import type { MouseEventHandler, WithTooltipProps } from "../Tooltip.types";
@@ -65,6 +65,17 @@ export const createTooltipWrapper = <TProps extends object>(
       const content = tooltipContent || title;
       const contentString = typeof content === "string" ? content : undefined;
 
+      // `data-tooltip-element` and the tooltip event handlers are attached
+      // only after first mount on the client. The server's rendered DOM
+      // therefore always matches the client's *first* render — the upgrade
+      // happens in a follow-up render, so React never reports a hydration
+      // mismatch when `contentString` differs between server/client (e.g.
+      // when the host translation is still warming up on the server pass).
+      const [mounted, setMounted] = useState(false);
+      useEffect(() => {
+        setMounted(true);
+      }, []);
+
       const tooltipHandlers = useTooltipControl(
         onClick,
         onMouseEnter,
@@ -89,7 +100,7 @@ export const createTooltipWrapper = <TProps extends object>(
         );
       }
 
-      if (!contentString) {
+      if (!contentString || !mounted) {
         return (
           <Component
             ref={ref}
