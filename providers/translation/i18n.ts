@@ -42,8 +42,6 @@ import { initReactI18next } from "react-i18next";
 // `init()` on the singleton, which would reset `ns`/`defaultNS`/`language`
 // out from under host translations. Keeping a dedicated instance isolates
 // host resources from any other library that touches the global.
-const i18n = i18next.createInstance();
-
 export type TTranslations = Map<string, Map<string, Record<string, string>>>;
 
 // Build a private i18next instance instead of mutating the default singleton —
