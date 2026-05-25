@@ -58,7 +58,7 @@ import useSelectorBody from "./hooks/useSelectorBody";
 import useSelectorState from "./hooks/useSelectorState";
 
 import { useCommonTranslation } from "../../utils/i18n";
-import type { FilesSelectorProps } from "./FilesSelector.types";
+import type { FilesSelectorProps, TSelectedFileInfo } from "./FilesSelector.types";
 import { SettingsContextProvider } from "../utils/contexts/Settings";
 import {
   LoadersContext,
@@ -136,6 +136,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     undefined,
   );
   const afterSearch = React.useRef(false);
+  const selectedFileInfoRef = React.useRef<TSelectedFileInfo | null>(null);
   const ssrRendered = React.useRef(false);
   const ssrTypeRendered = React.useRef(false);
   const clearSearchCallback = React.useRef<null | VoidFunction>(null);
@@ -363,6 +364,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           });
 
           setSelectedItemId(item.id);
+          selectedFileInfoRef.current = null;
           setSelectedFileInfo(null);
           if (item.isAgent) {
             setSelectedItemType("agents");
@@ -426,6 +428,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         ]);
         setSelectedItemId(item.id);
         setSearchValue("");
+        selectedFileInfoRef.current = null;
         setSelectedFileInfo(null);
 
         if (
@@ -473,14 +476,16 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
               (f.roomType === RoomType.CustomRoom && f.shared),
           ) > -1;
 
-        setSelectedFileInfo({
+        const newFileInfo = {
           id: item.id,
           title: item.label,
           fileExst: item.fileExst,
           fileType: item.fileType,
           viewUrl: item.viewUrl,
           inPublic,
-        });
+        };
+        selectedFileInfoRef.current = newFileInfo as TSelectedFileInfo;
+        setSelectedFileInfo(newFileInfo);
 
         if (isDoubleClick) {
           doubleClickCallback();
@@ -624,7 +629,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         fileName,
         isChecked,
         selectedTreeNode,
-        selectedFileInfo,
+        selectedFileInfoRef.current,
         isInsideKnowledge,
         isInsideResultStorage,
       );
@@ -634,7 +639,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       onSubmit,
       selectedItemId,
       selectedTreeNode,
-      selectedFileInfo,
+      selectedFileInfoRef,
       folderIsShared,
       isInsideKnowledge,
       isInsideResultStorage,
