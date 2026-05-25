@@ -56,6 +56,7 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import { useApi } from "../../providers";
 import TopUpModal from "../shared/top-up-balance/TopUpModal";
+import AIServiceDialog from "./panels/ai-service/AIServiceDialog";
 
 import ServicesItems from "./ServicesItems";
 import ServicesLoader from "./ServicesLoader";
@@ -420,6 +421,9 @@ const Services = observer(
         changeServiceState(confirmActionType);
       }
     };
+    const onCloseAiService = () => {
+      updateDialogVisibility(AI_ENUM, false);
+    };
 
     const onCloseTopUpModal = (isTopUp: boolean | Event) => {
       setIsTopUpBalanceVisible(false);
@@ -460,6 +464,12 @@ const Services = observer(
           <GracePeriodModal
             visible={isGracePeriodModalVisible}
             onClose={onCloseGracePeriodModal}
+          />
+        ) : null}
+        {dialogVisibility[AI_ENUM] ? (
+          <AIServiceDialog
+            visible={dialogVisibility[AI_ENUM]}
+            onClose={onCloseAiService}
           />
         ) : null}
         {isFirstTopUpDialogVisible ? (
