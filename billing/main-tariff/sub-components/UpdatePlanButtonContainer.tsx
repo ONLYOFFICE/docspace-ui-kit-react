@@ -195,8 +195,8 @@ const UpdatePlanButtonContainer = ({
         const errorText =
           cardLinkedOnFreeTariff && walletCustomerStatusNotActive ? (
             <>
-              {t("CardUnlinked")} <br />
-              {t("LinkNewCard")} {"  "}
+              {t("PaymentMethodUnlinked")} <br />
+              {t("LinkPaymentMethod")} {"  "}
               <Link
                 onClick={goLinkCard}
                 fontWeight={600}
@@ -431,3 +431,4 @@ const UpdatePlanButtonContainer = ({
 };
 
 export default observer(UpdatePlanButtonContainer);
+
