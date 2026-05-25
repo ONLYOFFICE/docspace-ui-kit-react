@@ -85,7 +85,7 @@ const Wallet = (props: WalletProps) => {
   const {
     isNotPaidPeriod,
     walletCustomerStatusNotActive,
-    walletCustomerEmail: payerEmail,
+    walletCustomerEmail,
   } = store.tariff;
 
   const t = useCommonTranslation();
@@ -211,28 +211,27 @@ const Wallet = (props: WalletProps) => {
       {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
         <div className={styles.walletCustomerStatusNotActive}>
           <Text fontWeight={600} className={styles.warningColor}>
-            {t("CardUnlinked")}
+            {t("PaymentMethodUnlinked")}
           </Text>
           <Text as="span" className={styles.warningColor}>
             {isPayer ? (
-              t("LinkNewCard")
+              t("LinkPaymentMethod")
             ) : (
-              <CommonTrans
-                i18nKey="LinkNewCardEmail"
-                values={{
-                  email: payerEmail,
-                }}
-                components={{
-                  1: (
-                    <Link
-                      textDecoration="underline"
-                      fontWeight="600"
-                      className="error_description_link"
-                      href={`mailto:${payerEmail}`}
-                    />
-                  ),
-                }}
-              />
+              <Text className={styles.warningColor}>
+                <CommonTrans
+                  i18nKey="LinkNewPaymentMethodEmail"
+                  values={{ email: walletCustomerEmail }}
+                  components={{
+                    1: (
+                      <Link
+                        href={`mailto:${walletCustomerEmail}`}
+                        color="accent"
+                        textDecoration="underline"
+                      />
+                    ),
+                  }}
+                />
+              </Text>
             )}
           </Text>{" "}
           {isPayer ? (
@@ -263,7 +262,7 @@ const Wallet = (props: WalletProps) => {
         <WalletRefilledModal visible={wasChangeBalance} />
       ) : null}
 
-      <TransactionHistory withoutRoleFilter/>
+      <TransactionHistory withoutRoleFilter />
     </div>
   );
 };
