@@ -64,7 +64,7 @@ import StoragePlanUpgrade from "./panels/additional-storage/StoragePlanUpgrade";
 import StoragePlanCancel from "./panels/additional-storage/StoragePlanCancel";
 import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
-import AIServiceDialog from "./panels/ai-service/AIServiceDialog";
+import FirstTopUpDialog from "../shared/top-up-balance/FirstTopUpDialog";
 import { getBrandName } from "../../constants/brands";
 type TServicesProps = {
   showPortalSettingsLoader?: boolean;
@@ -103,8 +103,12 @@ const Services = observer(
       servicesInit,
     } = servicesStore;
 
-    const { isGracePeriod, previousStoragePlanSize, currentStoragePlanSize } =
-      paymentStore.tariff;
+    const {
+      isGracePeriod,
+      previousStoragePlanSize,
+      currentStoragePlanSize,
+      walletCustomerEmail,
+    } = paymentStore.tariff;
     const { isFreeTariff } = paymentStore.quotas;
     const { logoText } = paymentStore;
 
@@ -141,6 +145,8 @@ const Services = observer(
     const [previousValue, setPreviousValue] = useState("");
 
     const [isTopUpBalanceVisible, setIsTopUpBalanceVisible] = useState(false);
+    const [isFirstTopUpDialogVisible, setIsFirstTopUpDialogVisible] =
+      useState(false);
 
     const shouldShowLoader = !isInitServicesPage;
 
@@ -235,6 +241,11 @@ const Services = observer(
     const onClick = (id: string) => {
       setConfirmActionType(id);
 
+      if (!walletCustomerEmail) {
+        setIsFirstTopUpDialogVisible(true);
+        return;
+      }
+
       if (
         id === TOTAL_SIZE &&
         (currentStoragePlanSize || previousStoragePlanSize)
@@ -287,6 +298,11 @@ const Services = observer(
     const onToggle = async (id: string, currentEnabled: boolean) => {
       setConfirmActionType(id);
       setIsCurrentConfirmState(currentEnabled);
+
+      if (!walletCustomerEmail) {
+        setIsFirstTopUpDialogVisible(true);
+        return;
+      }
 
       if (id === TOTAL_SIZE) {
         if (isGracePeriod) {
@@ -343,10 +359,6 @@ const Services = observer(
 
     const onCloseGracePeriodModal = () => {
       setIsGracePeriodModalVisible(false);
-    };
-
-    const onCloseAiService = () => {
-      updateDialogVisibility(AI_ENUM, false);
     };
 
     const onCloseConfirmDialog = () => {
@@ -450,10 +462,10 @@ const Services = observer(
             onClose={onCloseGracePeriodModal}
           />
         ) : null}
-        {dialogVisibility[AI_ENUM] ? (
-          <AIServiceDialog
-            visible={dialogVisibility[AI_ENUM]}
-            onClose={onCloseAiService}
+        {isFirstTopUpDialogVisible ? (
+          <FirstTopUpDialog
+            visible={isFirstTopUpDialogVisible}
+            onClose={() => setIsFirstTopUpDialogVisible(false)}
           />
         ) : null}
         {isConfirmDialogVisible && confirmActionType ? (
@@ -466,10 +478,17 @@ const Services = observer(
           />
         ) : null}
         {isTopUpBalanceVisible ? (
-          <TopUpModal
-            visible={isTopUpBalanceVisible}
-            onClose={onCloseTopUpModal}
-          />
+          !isCardLinkedToPortal ? (
+            <FirstTopUpDialog
+              visible={isTopUpBalanceVisible}
+              onClose={() => onCloseTopUpModal(false)}
+            />
+          ) : (
+            <TopUpModal
+              visible={isTopUpBalanceVisible}
+              onClose={onCloseTopUpModal}
+            />
+          )
         ) : null}
       </>
     );

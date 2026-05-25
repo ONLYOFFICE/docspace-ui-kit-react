@@ -62,11 +62,12 @@ const AiPaywallCompletePage = () => {
   const [status, setStatus] = React.useState<Status>("processing");
   const [stepIndex, setStepIndex] = React.useState(0);
 
-  const { currency, amount } = React.useMemo(() => {
+  const { currency, amount, type } = React.useMemo(() => {
     if (typeof window === "undefined") {
       return {
         currency: "USD",
         amount: AI_PAYWALL_START_AMOUNT,
+        type: "",
       };
     }
     const urlParams = new URLSearchParams(window.location.search);
@@ -74,8 +75,11 @@ const AiPaywallCompletePage = () => {
     return {
       currency: urlParams.get("currency") || "USD",
       amount: parsedAmount > 0 ? parsedAmount : AI_PAYWALL_START_AMOUNT,
+      type: urlParams.get("type") || "",
     };
   }, []);
+
+  const isWalletOnly = type === "wallet";
 
   const language = typeof navigator !== "undefined" ? navigator.language : "en";
 
@@ -90,28 +94,32 @@ const AiPaywallCompletePage = () => {
           topUpDepositRequestDto: { amount, currency },
         });
 
-        await rawApiClient.instance.post(
-          "api/2.0/portal/payment/creditaibalance",
-          { amount },
-        );
+        if (!isWalletOnly) {
+          await rawApiClient.instance.post(
+            "api/2.0/portal/payment/creditaibalance",
+            { amount },
+          );
 
-        setStepIndex(2);
+          setStepIndex(2);
 
-        await paymentApi.changeTenantWalletServiceState({
-          changeWalletServiceStateRequestDto: {
-            service: TenantWalletService.AITools,
-            enabled: true,
-          },
-        });
+          await paymentApi.changeTenantWalletServiceState({
+            changeWalletServiceStateRequestDto: {
+              service: TenantWalletService.AITools,
+              enabled: true,
+            },
+          });
 
-        setStepIndex(3);
+          setStepIndex(3);
+        } else {
+          setStepIndex(2);
+        }
 
         await new Promise((resolve) => setTimeout(resolve, 700));
 
         setStatus("success");
       } catch (e) {
         console.error("[ai-paywall callback] top-up failed", e);
-        setStatus("error");
+        //  setStatus("error");
       }
     };
 
@@ -122,11 +130,16 @@ const AiPaywallCompletePage = () => {
     window.location.href = BILLING_REDIRECT_URL;
   };
 
-  const steps = [
-    t("AIPaywallCallbackStepLinkCard"),
-    t("AIPaywallCallbackStepTopUp"),
-    t("AIPaywallCallbackStepActivate"),
-  ];
+  const steps = isWalletOnly
+    ? [
+        t("AIPaywallCallbackStepLinkCard"),
+        t("AIPaywallCallbackStepTopUpWallet"),
+      ]
+    : [
+        t("AIPaywallCallbackStepLinkCard"),
+        t("AIPaywallCallbackStepTopUp"),
+        t("AIPaywallCallbackStepActivate"),
+      ];
 
   return (
     <div className={styles.page}>
@@ -137,10 +150,14 @@ const AiPaywallCompletePage = () => {
           <>
             <div className={styles.heroText}>
               <Text fontSize="20px" fontWeight={700} className={styles.title}>
-                {t("AIPaywallCallbackProcessing")}
+                {isWalletOnly
+                  ? t("AIPaywallCallbackProcessingWallet")
+                  : t("AIPaywallCallbackProcessing")}
               </Text>
               <Text fontSize="13px" lineHeight="18px" className={styles.hint}>
-                {t("AIPaywallCallbackProcessingHint")}
+                {isWalletOnly
+                  ? t("AIPaywallCallbackProcessingWalletHint")
+                  : t("AIPaywallCallbackProcessingHint")}
               </Text>
             </div>
 

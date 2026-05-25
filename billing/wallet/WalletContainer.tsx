@@ -56,6 +56,7 @@ import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { getBrandName } from "../../constants/brands";
+import FirstTopUpDialog from "../shared/top-up-balance/FirstTopUpDialog";
 
 type WalletProps = {
   isMobile?: boolean;
@@ -93,6 +94,8 @@ const Wallet = (props: WalletProps) => {
   const [visible, setVisible] = useState(isVisibleWalletSettings);
   const [isEditAutoPayment, setIsEditAutoPayment] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isFirstTopUpDialogVisible, setIsFirstTopUpDialogVisible] =
+    useState(false);
 
   const [isAutoSpinning, setIsAutoSpinning] = useState(isAutoTopUpInProgress);
   const autoStartTimeRef = useRef<number | null>(null);
@@ -128,6 +131,10 @@ const Wallet = (props: WalletProps) => {
   };
 
   const onOpen = () => {
+    if (!walletCustomerEmail) {
+      setIsFirstTopUpDialogVisible(true);
+      return;
+    }
     setVisible(true);
     setIsEditAutoPayment(false);
   };
@@ -255,6 +262,13 @@ const Wallet = (props: WalletProps) => {
           onClose={onClose}
           isEditAutoPayment={isEditAutoPayment}
           reccomendedAmount={reccomendedAmount}
+        />
+      ) : null}
+
+      {isFirstTopUpDialogVisible ? (
+        <FirstTopUpDialog
+          visible={isFirstTopUpDialogVisible}
+          onClose={() => setIsFirstTopUpDialogVisible(false)}
         />
       ) : null}
 
