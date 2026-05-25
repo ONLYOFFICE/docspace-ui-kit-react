@@ -165,7 +165,7 @@ const AiPage = (props: AiPageProps) => {
   };
 
   const onToggleChange = () => {
-    setIsConfirmDialogVisible(true);
+    onConfirm();
   };
 
   const onCloseConfirmDialog = () => {

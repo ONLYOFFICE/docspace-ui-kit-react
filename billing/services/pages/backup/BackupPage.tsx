@@ -95,9 +95,9 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
     initServiceData(t, BACKUP_SERVICE);
   }, []);
 
-  const handleToggleChange = () => {
-    setIsConfirmDialogVisible(true);
-  };
+  // const handleToggleChange = () => {
+  //   setIsConfirmDialogVisible(true);
+  // };
 
   const onCloseConfirmDialog = () => {
     setIsConfirmDialogVisible(false);
@@ -110,7 +110,7 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
     };
 
     setIsLoading(true);
-    setIsConfirmDialogVisible(false);
+    //  setIsConfirmDialogVisible(false);
     changeServiceState(BACKUP_SERVICE);
 
     try {
@@ -161,7 +161,7 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
       <ServiceToggleSection
         withBottomMargin={withBottomMargin}
         isEnabled={isBackupServiceOn!}
-        onToggle={handleToggleChange}
+        onToggle={onConfirm}
         title={
           <Text fontSize="12px" fontWeight={400}>
             <CommonTrans
@@ -230,7 +230,7 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
             className={styles.backupButton}
             size={ButtonSize.small}
             label={!isFreeTariff ? t("EnablePaidBackup") : t("Enable")}
-            onClick={handleToggleChange}
+            onClick={onConfirm}
             isDisabled={isDisabled}
             primary
             scale
@@ -287,3 +287,4 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
 };
 
 export default observer(BackupPage);
+
