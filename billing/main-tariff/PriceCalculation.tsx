@@ -63,7 +63,7 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
     canUpdateTariff,
     managersCount,
     isPayer,
-    isStripePortalAvailable,
+    isAlreadyPaid,
     cardLinked,
     getPaymentLink,
     formatPaymentCurrency,
