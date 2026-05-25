@@ -262,6 +262,11 @@ const Services = observer(
         return;
       }
 
+      if (id === BACKUP_SERVICE && !isCardLinkedToPortal) {
+        setIsTopUpBalanceVisible(true);
+        return;
+      }
+
       // if (id === BACKUP_SERVICE && !isCardLinkedToPortal) {
       //   setConfirmActionType(id);
       //   setIsConfirmDialogVisible(true);
@@ -307,6 +312,11 @@ const Services = observer(
         if (dialogVisibility[id]) {
           previousDialogRef.current = true;
         }
+      }
+
+      if (id === BACKUP_SERVICE && !isCardLinkedToPortal) {
+        setIsTopUpBalanceVisible(true);
+        return;
       }
 
       // if (!currentEnabled || id === BACKUP_SERVICE || id === AI_ENUM) {
