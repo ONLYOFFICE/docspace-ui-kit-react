@@ -79,6 +79,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
   const {
     accountLink,
     isAlreadyPaid,
+    isPayer,
     isStripePortalAvailable,
     cardLinked,
     isPaymentMethodInit,
@@ -176,16 +177,16 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
       </div>
 
       <Text className={styles.description} lineHeight="20px">
-        {t("PaymentMethodDescription", {
+        {t("PaymentMethodDesc", {
           productName: getBrandName("ProductName"),
         })}
       </Text>
 
       <CardInformation />
 
-      {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
+      {!isNotPaidPeriod && walletCustomerStatusNotActive && isPayer ? (
         <Text className={styles.linkNewCardDescription} lineHeight="20px">
-          {t("LinkNewCardDescription")}
+          {t("LinkNewCardDesc")}
         </Text>
       ) : null}
 
@@ -193,20 +194,24 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
         <div className={styles.buttonWrapper}>
           <Button
             label={
-              walletCustomerStatusNotActive
+              walletCustomerStatusNotActive && isPayer
                 ? t("AddPaymentMethod")
                 : t("GoToStripe")
             }
             size={ButtonSize.small}
             primary
             onClick={
-              walletCustomerStatusNotActive ? goLinkCard : goToStripePortal
+              walletCustomerStatusNotActive && isPayer
+                ? goLinkCard
+                : goToStripePortal
             }
             testId="go_to_stripe_button"
           />
         </div>
       ) : walletCustomerStatusNotActive ? (
-        <Text className={styles.reachOutPayer}>{t("ReachOutPayer")}</Text>
+        <Text className={styles.reachOutPayer}>
+          {t("ReachedOutPayerForPayment")}
+        </Text>
       ) : null}
     </>
   );
@@ -217,7 +222,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
         {t("NoPaymentMethod")}
       </Text>
       <Text className={styles.noPaymentDescription}>
-        {t("NoPaymentMethodDescription")}
+        {t("NoPaymentMethodDesc")}
       </Text>
       <div className={styles.buttonWrapper}>
         <Button
@@ -244,3 +249,4 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
 };
 
 export default observer(PaymentMethod);
+
