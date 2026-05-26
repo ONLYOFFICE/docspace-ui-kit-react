@@ -134,7 +134,7 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     SectionBodyProps,
     "children" | "isSectionHeaderAvailable" | "autoFocus" | "withScroll"
   > & {
-    children: React.JSX.Element[];
+    children: (React.JSX.Element | null)[];
     progressBarDropDownContent?: React.ReactNode;
     onOpenUploadPanel?: () => void;
     isTabletView?: boolean;

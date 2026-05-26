@@ -65,6 +65,7 @@ import {
   SECTION_INFO_PANEL_HEADER_NAME,
   SECTION_WARNING_NAME,
   SECTION_SUBMENU_NAME,
+  SECTION_BANNER_NAME,
 } from "./Section.constants";
 import { parseChildren } from "./Section.utils";
 
@@ -75,6 +76,9 @@ SectionHeader.displayName = SECTION_HEADER_NAME;
 
 const SectionFilter: FC<PropsWithChildren> = () => null;
 SectionFilter.displayName = SECTION_FILTER_NAME;
+
+const SectionBanner: FC<PropsWithChildren> = () => null;
+SectionBanner.displayName = SECTION_BANNER_NAME;
 
 const SectionBody: FC<PropsWithChildren> = () => null;
 SectionBody.displayName = SECTION_BODY_NAME;
@@ -167,6 +171,7 @@ const Section = (props: SectionProps) => {
     infoPanelBodyContent,
     infoPanelHeaderContent,
     sectionSubmenuContent,
+    sectionBannerContent,
   ]: (React.JSX.Element | null)[] = parseChildren(children);
 
   const isSectionHeaderAvailable = !!sectionHeaderContent;
@@ -301,6 +306,10 @@ const Section = (props: SectionProps) => {
         withBodyScroll={withBodyScroll}
         currentDeviceType={currentDeviceType}
       >
+        {sectionBannerContent ? (
+          <div className="section-banner">{sectionBannerContent}</div>
+        ) : null}
+
         {currentDeviceType !== DeviceType.mobile ? (
           <div className="section-sticky-container">
             {isSectionHeaderAvailable ? (
@@ -430,6 +439,7 @@ type SectionComponentType = FC<SectionProps> & {
   InfoPanelHeader: typeof InfoPanelHeader;
   SectionWarning: typeof SectionWarning;
   SectionSubmenu: typeof SectionSubmenu;
+  SectionBanner: typeof SectionBanner;
 };
 
 // Create the memoized component with explicit type assertion
@@ -443,5 +453,6 @@ MemoizedSection.InfoPanelBody = InfoPanelBody;
 MemoizedSection.InfoPanelHeader = InfoPanelHeader;
 MemoizedSection.SectionWarning = SectionWarning;
 MemoizedSection.SectionSubmenu = SectionSubmenu;
+MemoizedSection.SectionBanner = SectionBanner;
 
 export default MemoizedSection;
