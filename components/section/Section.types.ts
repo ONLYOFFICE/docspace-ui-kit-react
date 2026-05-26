@@ -96,6 +96,7 @@ export type SectionContainerProps = {
   children: React.ReactNode;
   withBodyScroll: boolean;
   currentDeviceType?: DeviceType;
+  bannerContent?: React.ReactNode;
 };
 
 export type SectionFilterProps = {

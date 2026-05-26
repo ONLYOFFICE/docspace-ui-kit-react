@@ -305,11 +305,8 @@ const Section = (props: SectionProps) => {
         isInfoPanelVisible={isInfoPanelVisible}
         withBodyScroll={withBodyScroll}
         currentDeviceType={currentDeviceType}
+        bannerContent={sectionBannerContent}
       >
-        {sectionBannerContent ? (
-          <div className="section-banner">{sectionBannerContent}</div>
-        ) : null}
-
         {currentDeviceType !== DeviceType.mobile ? (
           <div className="section-sticky-container">
             {isSectionHeaderAvailable ? (

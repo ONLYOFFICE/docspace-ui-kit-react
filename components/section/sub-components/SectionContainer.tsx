@@ -48,6 +48,7 @@ const SectionContainer = ({
   currentDeviceType,
   isInfoPanelVisible,
   isSectionHeaderAvailable,
+  bannerContent,
 }: SectionContainerProps) => {
   return (
     <div
@@ -59,6 +60,9 @@ const SectionContainer = ({
         [styles.withoutSectionHeader]: !isSectionHeaderAvailable,
       })}
     >
+      {bannerContent ? (
+        <div className="section-banner">{bannerContent}</div>
+      ) : null}
       {withBodyScroll && currentDeviceType !== DeviceType.mobile ? (
         <Scrollbar id="sectionScroll" scrollClass="section-scroll" fixedSize>
           {children}
