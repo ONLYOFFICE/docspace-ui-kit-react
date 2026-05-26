@@ -28,20 +28,12 @@
 
 import { useEffect } from "react";
 
-import { attachAgentRoomId } from "../host-tool-groups";
-
 import { useAiChatStore } from "./AiChatStoreProvider";
 
-// Lets host code inside <AiAgentProviders> pull `agentId` from AiChatStore
-// without anyone outside needing to read it (which would require the store
-// provider above AiAgentProviders). Registers a getter via the existing
-// `attachAgentRoomId` ref so callers get the latest value lazily.
 const AgentRoomIdSync = () => {
   const store = useAiChatStore();
 
-  useEffect(() => {
-    attachAgentRoomId(() => store.agentId);
-  }, [store, store.agentId]);
+  useEffect(() => {}, [store, store.agentId]);
 
   return null;
 };

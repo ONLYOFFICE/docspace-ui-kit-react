@@ -30,8 +30,6 @@ import type {
   HostToolGroup,
   ServersStoreState,
 } from "@onlyoffice/ai-chat";
-import type { FilesApi, FoldersApi } from "@onlyoffice/docspace-api-sdk";
-import { SearchArea } from "@onlyoffice/docspace-api-sdk";
 
 type ServersLike = {
   hostToolSource: { setGroups: (groups: HostToolGroup[]) => void };
@@ -56,40 +54,6 @@ let toolsRuntime: ToolsRuntime | null = null;
 
 export const attachHostToolsRuntime = (runtime: ToolsRuntime) => {
   toolsRuntime = runtime;
-};
-
-// API instances injected from the React tree (inside ApiProvider).
-// Handlers run outside React context so we store the references here.
-let filesApi: FilesApi | null = null;
-let foldersApi: FoldersApi | null = null;
-
-export const attachFilesApi = (api: FilesApi) => {
-  filesApi = api;
-};
-
-export const attachFoldersApi = (api: FoldersApi) => {
-  foldersApi = api;
-};
-
-// Returns the ID of the current agent room. Injected from AiAgentProviders.
-let agentRoomIdGetter: (() => number | null) | null = null;
-
-export const attachAgentRoomId = (getter: () => number | null) => {
-  agentRoomIdGetter = getter;
-};
-
-const resolveResultStorageFolderId = async (): Promise<number | null> => {
-  const roomId = agentRoomIdGetter?.();
-  if (roomId == null || !foldersApi) return null;
-  try {
-    const res = await foldersApi.getFolderByFolderId({
-      folderId: roomId,
-      searchArea: SearchArea.ResultStorage,
-    });
-    return res.data?.response?.current?.id ?? null;
-  } catch {
-    return null;
-  }
 };
 
 // Called by open_file / create_and_open to switch the client to the result
@@ -236,162 +200,7 @@ const callEditorTool = async (
   });
 };
 
-export const fileManagementTools: HostTool[] = [
-  {
-    name: "create_file",
-    description:
-      "Creates a new empty document inside the specified DocSpace folder. " +
-      "The caller must provide the target folder_id where the file will be placed. " +
-      "Use this tool when the user asks to create a new document without opening it immediately.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        folder_id: {
-          type: "string",
-          description:
-            "Identifier of the DocSpace folder in which the new file will be created.",
-        },
-        title: {
-          type: "string",
-          description:
-            "Title for the new file. Defaults to 'New document' if not provided.",
-        },
-      },
-      required: [],
-    },
-    handler: async (args) => {
-      const { folder_id, title } = args as {
-        folder_id?: string;
-        title?: string;
-      };
-      if (!filesApi) {
-        console.warn("[editor.create_file] filesApi not attached");
-        return JSON.stringify({ error: "File creation API is not available" });
-      }
-      let targetFolderId: number | undefined;
-      if (folder_id !== undefined) {
-        targetFolderId = Number(folder_id);
-      } else {
-        const resultStorageId = await resolveResultStorageFolderId();
-        if (resultStorageId == null) {
-          console.warn(
-            "[editor.create_file] result storage folder ID not available",
-          );
-          return JSON.stringify({ error: "Target folder is not available" });
-        }
-        targetFolderId = resultStorageId;
-      }
-      try {
-        const res = await filesApi.createFile({
-          folderId: targetFolderId,
-          createFileJsonElement: {
-            title: title ?? "New document",
-          },
-        });
-        const fileId = res.data?.response?.id;
-        return JSON.stringify({ result: fileId ?? "" });
-      } catch (e) {
-        console.error("[editor.create_file] error:", e);
-        return JSON.stringify({ error: String(e) });
-      }
-    },
-  },
-  {
-    name: "open_file",
-    description:
-      "Opens an existing file in the DocSpace editor by its identifier. " +
-      "The caller must provide the id of the file to open. " +
-      "Use this tool when the user asks to open a specific document they already have.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        id: {
-          type: "string",
-          description: "Identifier of the file to open in the editor.",
-        },
-      },
-      required: ["id"],
-    },
-    handler: async (args) => {
-      console.log(
-        "%c[editor.open_file] HANDLER INVOKED",
-        "color: blue; font-weight: bold",
-        args,
-      );
-      const fileId = (args as { id?: string | number }).id;
-      if (fileId === undefined) return JSON.stringify({ result: "" });
-      openEditorPanel(fileId);
-      return JSON.stringify({ result: "" });
-    },
-  },
-  {
-    name: "create_and_open",
-    description:
-      "Creates a new document inside the specified DocSpace folder and immediately " +
-      "opens it in the editor. The caller must provide the target folder_id. " +
-      "Use this tool when the user wants to start editing a brand-new document right away.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        folder_id: {
-          type: "string",
-          description:
-            "Identifier of the DocSpace folder in which the new file will be created " +
-            "and then opened.",
-        },
-        title: {
-          type: "string",
-          description:
-            "Title for the new file. Defaults to 'New document' if not provided.",
-        },
-      },
-      required: [],
-    },
-    handler: async (args) => {
-      const { folder_id, title } = args as {
-        folder_id?: string;
-        title?: string;
-      };
-      if (!filesApi) {
-        console.warn("[editor.create_and_open] filesApi not attached");
-        return JSON.stringify({ error: "File creation API is not available" });
-      }
-      let targetFolderId: number | undefined;
-      if (folder_id !== undefined) {
-        targetFolderId = Number(folder_id);
-      } else {
-        const resultStorageId = await resolveResultStorageFolderId();
-        if (resultStorageId == null) {
-          console.warn(
-            "[editor.create_and_open] result storage folder ID not available",
-          );
-          return JSON.stringify({ error: "Target folder is not available" });
-        }
-        targetFolderId = resultStorageId;
-      }
-      let fileId: number | undefined;
-      try {
-        const res = await filesApi.createFile({
-          folderId: targetFolderId,
-          createFileJsonElement: {
-            title: title ?? "New document",
-          },
-        });
-        fileId = res.data?.response?.id;
-      } catch (e) {
-        console.error("[editor.create_and_open] create error:", e);
-        return JSON.stringify({ error: String(e) });
-      }
-      if (fileId === undefined) {
-        return JSON.stringify({
-          error: "File was created but ID was not returned",
-        });
-      }
-      openEditorPanel(fileId);
-      return JSON.stringify({ result: fileId });
-    },
-  },
-];
+export const fileManagementTools: HostTool[] = [];
 
 export const buildEditorToolGroup = (tools: HostTool[]): HostToolGroup => ({
   id: EDITOR_GROUP_ID,

@@ -78,9 +78,6 @@ import {
 import {
   EDITOR_TOOLS_EVENT,
   attachHostToolsRuntime,
-  attachFilesApi,
-  attachFoldersApi,
-  attachAgentRoomId,
   attachOpenResultFile,
   attachCloseEditorPanel,
   buildEditorToolGroup,
@@ -239,10 +236,6 @@ const AiAgentProviders = ({
       eventBus: ctx.eventBus,
     });
   }, [ctx.servers, ctx.eventBus, stores.useServersStore]);
-
-  useEffect(() => {
-    if (getAgentRoomId) attachAgentRoomId(getAgentRoomId);
-  }, [getAgentRoomId]);
 
   useEffect(() => {
     if (openResultFile) attachOpenResultFile(openResultFile);
