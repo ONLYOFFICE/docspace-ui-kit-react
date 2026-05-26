@@ -1,30 +1,39 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -251,6 +260,83 @@ export const Loading: Story = {
       },
       source: {
         code: `<Tabs items={tabItems} selectedItemId={selectedId} isLoading />`,
+      },
+    },
+  },
+};
+
+const CssCustomizationTemplate = () => {
+  const [selectedId, setSelectedId] = useState(data[0].id);
+
+  return (
+    <Wrapper>
+      <div
+        style={
+          {
+            "--tabs-secondary-radius": "20px",
+            "--tabs-secondary-tab-radius": "16px",
+            "--tabs-secondary-bg": "#f5f3ff",
+            "--tabs-secondary-active-bg": "#7c3aed",
+            "--tabs-secondary-active-text": "#ffffff",
+            "--tabs-secondary-text": "#6d28d9",
+            "--tabs-secondary-hover-bg": "#ede9fe",
+          } as CSSProperties
+        }
+      >
+        <Tabs
+          items={data}
+          selectedItemId={selectedId}
+          type={TabsTypes.Secondary}
+          scaled
+          onSelect={(item) => setSelectedId(item.id)}
+        />
+      </div>
+    </Wrapper>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization. Pass via a wrapper element:
+
+\`\`\`css
+--tabs-primary-height       /* primary tabs height (default: 32px) */
+--tabs-secondary-height     /* secondary tabs height (default: 36px) */
+--tabs-primary-gap          /* gap between primary tabs (default: 20px) */
+--tabs-secondary-gap        /* gap between secondary tabs (default: 4px) */
+--tabs-secondary-padding    /* secondary tabs container padding (default: 4px) */
+--tabs-secondary-radius     /* secondary tabs container radius (default: 5px) */
+--tabs-secondary-tab-radius /* individual secondary tab radius (default: 3px) */
+--tabs-text-weight          /* font weight (default: 600) */
+--tabs-underline-thickness  /* primary indicator height (default: 4px) */
+--tabs-underline-radius     /* primary indicator border-radius (default: 4px 4px 0 0) */
+--tabs-fade                 /* gradient fade color override */
+--tabs-underline            /* primary border-bottom color override */
+--tabs-primary-bg           /* primary tabs background */
+--tabs-primary-text         /* primary tab text color */
+--tabs-primary-active-text  /* primary selected tab text color */
+--tabs-primary-hover-text   /* primary hovered tab text color */
+--tabs-secondary-bg         /* secondary tabs container background */
+--tabs-secondary-active-bg  /* secondary selected tab background */
+--tabs-secondary-text       /* secondary tab text color */
+--tabs-secondary-active-text /* secondary selected tab text color */
+--tabs-secondary-hover-bg   /* secondary hovered tab background */
+--tabs-secondary-hover-icon /* secondary hovered arrow icon color */
+\`\`\``,
+      },
+      source: {
+        code: `<div style={{
+  "--tabs-secondary-radius": "20px",
+  "--tabs-secondary-tab-radius": "16px",
+  "--tabs-secondary-bg": "#f5f3ff",
+  "--tabs-secondary-active-bg": "#7c3aed",
+  "--tabs-secondary-active-text": "#ffffff",
+}}>
+  <Tabs items={tabItems} type={TabsTypes.Secondary} scaled />
+</div>`,
       },
     },
   },

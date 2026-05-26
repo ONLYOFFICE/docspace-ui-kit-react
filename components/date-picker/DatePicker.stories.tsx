@@ -1,29 +1,39 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
+import React from "react";
 import type { ComponentProps } from "react";
 import { useState } from "react";
 
@@ -293,6 +303,94 @@ export const WithoutCalendarIcon: Story = {
   showCalendarIcon={false}
   selectDateText="No calendar icon"
 />`,
+			},
+		},
+	},
+};
+
+export const CssCustomization: Story = {
+	render: () => (
+		<div
+			style={
+				{
+					height: "350px",
+					padding: "20px",
+					// DatePicker container
+					"--date-picker-bg": "#e6f3fb",
+					"--date-picker-header-border": "1px solid #0082c9",
+					"--date-picker-padding": "0 16px 16px",
+					"--date-picker-body-padding": "12px 0",
+					// Calendar sub-component
+					"--calendar-bg": "#e6f3fb",
+					"--calendar-border": "#0082c9",
+					"--calendar-shadow": "0 4px 16px rgba(0,130,201,0.25)",
+					"--calendar-radius": "12px",
+					"--calendar-title": "#0082c9",
+					"--calendar-outline": "#0082c9",
+					"--calendar-arrow": "#0082c9",
+					"--calendar-weekday": "#0082c9",
+					"--calendar-accent": "#0082c9",
+					"--calendar-selected-text": "#ffffff",
+					"--calendar-hover-bg": "#cce5f6",
+					"--calendar-past": "#5ca8d9",
+					"--calendar-disabled-arrow": "#a0c8e8",
+					// AddButton sub-component
+					"--add-button-background": "#e6f3fb",
+					"--add-button-icon": "#0082c9",
+					// SelectedItem sub-component
+					"--selected-item-background": "#cce5f6",
+					"--selected-item-background-hover": "#b3d9f0",
+					"--selected-item-active-background": "#0082c9",
+					"--selected-item-active-color": "#ffffff",
+					// IconButton (used in SelectedItem close button)
+					"--icon-button-color": "#0082c9",
+					"--icon-button-hover-color": "#006fa6",
+				} as React.CSSProperties
+			}
+		>
+			<ControlledDatePicker
+				locale="en"
+				openDate={now()}
+				initialDate={now()}
+				maxDate={startOf(addToDate(now(), 10, "years")!, "year")!}
+				minDate={createDateTime(1970, 1, 1)}
+				selectDateText="Select date"
+			/>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: `CSS custom property overrides applied to the date picker and its Calendar, AddButton, and SelectedItem sub-components.
+
+**DatePicker variables:**
+- \`--date-picker-bg\` — container background
+- \`--date-picker-padding\` — container padding
+- \`--date-picker-header-border\` — header bottom border
+- \`--date-picker-body-padding\` — body area padding
+- \`--date-picker-dropdown-padding\` — dropdown padding
+
+**Calendar variables:**
+- \`--calendar-bg\` — calendar background color
+- \`--calendar-border\` — calendar border color
+- \`--calendar-shadow\` — calendar box shadow
+- \`--calendar-radius\` — calendar border radius
+- \`--calendar-title\` — month/year title color
+- \`--calendar-title-size\` — month/year title font size
+- \`--calendar-outline\` — nav button outline color
+- \`--calendar-arrow\` — nav arrow color
+- \`--calendar-disabled-arrow\` — disabled nav arrow color
+- \`--calendar-weekday\` — weekday header color
+- \`--calendar-accent\` — selected date / hover outline accent color
+- \`--calendar-selected-text\` — text color on selected (current) date
+- \`--calendar-hover-bg\` — date hover background
+- \`--calendar-past\` — past / out-of-month dates color
+- \`--calendar-disabled\` — disabled dates color
+- \`--calendar-hover-radius\` — date cell border radius on hover
+- \`--calendar-current-radius\` — selected (current) date cell border radius
+- \`--calendar-focused-radius\` — keyboard-focused date cell border radius
+- \`--calendar-focused-bg\` — keyboard-focused date cell background color
+- \`--calendar-focused-text\` — keyboard-focused date cell text color`,
 			},
 		},
 	},

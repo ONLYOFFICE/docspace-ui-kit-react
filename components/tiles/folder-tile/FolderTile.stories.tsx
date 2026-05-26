@@ -1,30 +1,39 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -285,6 +294,85 @@ export const InProgress: Story = {
 >
   <TileContent><Link>Folder Content</Link></TileContent>
 </FolderTile>`,
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          "--tile-bg": "#e6f3fb",
+          "--tile-border-style": "1px solid #0082c9",
+          "--tile-radius": "16px",
+          "--tile-hover-bg": "#cce5f6",
+          "--tile-icon-color": "#0082c9",
+          "--tile-hotkey-color": "#0082c9",
+          "--tile-badge-bg": "#e6f3fb",
+          "--tile-badge-radius": "6px",
+          "--tile-badge-box-shadow": "0 2px 8px rgba(0,130,201,0.2)",
+          "--tile-text-size": "13px",
+        } as CSSProperties
+      }
+    >
+      <div style={{ maxWidth: "300px", margin: "30px" }}>
+        <FolderTile
+          item={{
+            id: "folder-1",
+            title: "My Folder",
+            isFolder: true,
+            contextOptions: ["copy-to", "move-to"],
+          }}
+          element={element}
+          contextOptions={contextOptions}
+          onSelect={() => {}}
+          getContextModel={() => contextOptions}
+        >
+          <TileContent>
+            <Link>My Folder</Link>
+          </TileContent>
+        </FolderTile>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--tile-bg\` | Tile background color | theme-based |
+| \`--folder-tile-border-style\` | FolderTile-specific border (overrides \`--tile-border-style\`) | theme-based |
+| \`--tile-border-style\` | Shared tile border fallback | theme-based |
+| \`--tile-radius\` | Tile border radius | \`12px\` |
+| \`--tile-hover-bg\` | Hover/checked background | theme-based |
+| \`--tile-icon-color\` | Icon button color | theme-based |
+| \`--tile-badge-bg\` | Badge background color | theme-based |
+| \`--tile-badge-radius\` | Badge border radius | \`4px\` |
+| \`--tile-badge-box-shadow\` | Badge box shadow | theme-based |
+| \`--tile-text-size\` | Folder name font size | \`14px\` |
+| \`--tile-text-weight\` | Folder name font weight | \`normal\` |
+| \`--tile-text-color\` | Folder name text color | theme-based |
+| \`--tile-hover-text-decoration\` | Text decoration on hover | theme-based |
+
+> **Note:** \`--folder-tile-border-style\` and \`--file-tile-border-style\` allow per-component border control
+> while sharing the \`--tile-border-style\` fallback between both tile types.`,
+      },
+      source: {
+        code: `// Keep folder border while removing file tile border
+<div style={{
+  "--folder-tile-border-style": "1px solid #dbdbdb",
+  "--file-tile-border-style": "none",
+  "--tile-radius": "8px",
+  "--tile-text-weight": "400",
+}}>
+  <FolderTile item={item} element={element} contextOptions={options} onSelect={handleSelect}>
+    <TileContent><Link>My Folder</Link></TileContent>
+  </FolderTile>
+</div>`,
       },
     },
   },

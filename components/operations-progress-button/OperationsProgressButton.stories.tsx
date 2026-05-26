@@ -1,30 +1,39 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -168,6 +177,106 @@ const singleUploadOperation: Operation[] = [
     percent: 45,
   },
 ];
+
+export const CssCustomization: Story = {
+  render: () => (
+    // CSS vars grouped by the internal part they target:
+    //
+    // Group 1 — OperationsProgressButton › dropdown list area
+    //   --ops-progress-dropdown-bg       dropdown background
+    //   --ops-progress-dropdown-hover    item hover background
+    //   --ops-progress-list-padding      each row padding
+    //
+    // Group 2 — OperationsProgressButton › progress-list icon SVGs
+    //   --ops-progress-icon-color        default icon fill
+    //   --ops-progress-icon-hover        icon fill on hover
+    //   --ops-progress-success-icon      success-state badge
+    //   --ops-progress-error-icon        error-state badge
+    //
+    // Group 3 — FloatingButton (inner sub-component)
+    //   --floating-circle-button-background  circle fill
+    //   --floating-button-icon               circle icon fill
+    //   --floating-button-button-size        circle diameter
+    //   --floating-button-shadow             circle box-shadow
+    <div
+      style={
+        {
+          "--ops-progress-dropdown-bg": "#e6f3fb",
+          "--ops-progress-dropdown-hover": "#cce5f6",
+          "--ops-progress-list-padding": "0px 12px",
+          "--ops-progress-icon-color": "#0082c9",
+          "--ops-progress-icon-hover": "#006ba6",
+          "--ops-progress-success-icon": "#0082c9",
+          "--ops-progress-error-icon": "#f03032",
+          "--floating-circle-button-background": "#0082c9",
+          "--floating-button-icon": "#ffffff",
+          "--floating-button-shadow": "0 4px 16px rgba(0, 130, 201, 0.4)",
+        } as CSSProperties
+      }
+    >
+      <OperationsProgressButton
+        operations={[
+          {
+            id: "op-1",
+            operation: "upload",
+            label: "Uploading files",
+            alert: false,
+            completed: false,
+            percent: 65,
+          },
+          {
+            id: "op-2",
+            operation: "copy",
+            label: "Copying documents",
+            alert: false,
+            completed: false,
+            percent: 30,
+          },
+        ]}
+        operationsAlert={false}
+        operationsCompleted={false}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**OperationsProgressButton — dropdown list area**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--ops-progress-dropdown-bg\` | Dropdown background | theme-based |
+| \`--ops-progress-dropdown-hover\` | Item hover background | theme-based |
+| \`--ops-progress-list-padding\` | Row padding | \`0px 8px\` |
+| \`--ops-progress-dropdown-margin\` | Bottom margin | \`8px\` |
+
+**OperationsProgressButton — progress list icon SVGs**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--ops-progress-icon-color\` | Icon fill | \`#fff\` |
+| \`--ops-progress-icon-hover\` | Icon hover fill | theme-based |
+| \`--ops-progress-success-icon\` | Success badge color | theme-based |
+| \`--ops-progress-error-icon\` | Error badge color | theme-based |
+| \`--ops-progress-items-gap\` | Container item gap | \`8px\` |
+| \`--ops-progress-label-gap\` | Label items gap | \`8px\` |
+| \`--ops-progress-bar-padding\` | Bar wrapper padding | \`8px 16px\` |
+| \`--ops-progress-header-margin\` | Header right margin | \`8px\` |
+| \`--ops-progress-wrapper-margin\` | Progress wrapper margin | \`4px\` |
+
+**FloatingButton (inner sub-component)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--floating-circle-button-background\` | Circle fill | accent color |
+| \`--floating-button-icon\` | Circle icon fill | accent text color |
+| \`--floating-button-shadow\` | Circle box-shadow | theme-based |`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   render: (args) => <OperationsProgressButton {...args} />,

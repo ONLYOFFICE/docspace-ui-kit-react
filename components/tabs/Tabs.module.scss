@@ -47,6 +47,21 @@
   --tabs-active-background-color-secondary: #{$white};
   --tabs-hover-background-icon-color-secondary: #{$black};
 
+  /* CSS customization vars */
+  --tabs-height-primary: var(--tabs-primary-height, 32px);
+  --tabs-height-secondary: var(--tabs-secondary-height, 36px);
+  --tabs-gap-primary: var(--tabs-primary-gap, 20px);
+  --tabs-gap-secondary: var(--tabs-secondary-gap, 4px);
+  --tabs-padding-secondary: var(--tabs-secondary-padding, 4px);
+  --tabs-border-radius-secondary: var(--tabs-secondary-radius, 5px);
+  --tabs-tab-border-radius-secondary: var(--tabs-secondary-tab-radius, 3px);
+  --tabs-font-weight: var(--tabs-text-weight, 600);
+  --tabs-indicator-height: var(--tabs-underline-thickness, 4px);
+  --tabs-indicator-border-radius: var(--tabs-underline-radius, 4px 4px 0 0);
+  --tabs-motion-height: calc(
+    var(--tabs-height-secondary) - 2 * var(--tabs-padding-secondary)
+  );
+
   font-family: var(--font-family);
 }
 
@@ -56,13 +71,13 @@
 
 .blurAhead {
   position: absolute;
-  height: 32px;
+  height: var(--tabs-height-primary);
   width: 60px;
   pointer-events: none;
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 20.48%,
-    var(--tabs-gradient-color) 100%
+    var(--tabs-fade, var(--tabs-gradient-color)) 100%
   );
   transform: matrix(-1, 0, 0, 1, 0, 0);
   z-index: 1;
@@ -71,56 +86,56 @@
     background: linear-gradient(
       270deg,
       rgba(255, 255, 255, 0) 20.48%,
-      var(--tabs-gradient-color) 100%
+      var(--tabs-fade, var(--tabs-gradient-color)) 100%
     );
   }
 
   &.secondary {
-    height: 36px;
+    height: var(--tabs-height-secondary);
   }
 }
 
 .blurBack {
   position: absolute;
-  height: 32px;
+  height: var(--tabs-height-primary);
   width: 60px;
   inset-inline-end: 0;
   pointer-events: none;
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 20.48%,
-    var(--tabs-gradient-color) 100%
+    var(--tabs-fade, var(--tabs-gradient-color)) 100%
   );
 
   &[data-direction="rtl"] {
     background: linear-gradient(
       270deg,
       rgba(255, 255, 255, 0) 20.48%,
-      var(--tabs-gradient-color) 100%
+      var(--tabs-fade, var(--tabs-gradient-color)) 100%
     );
   }
 
   &.secondary {
-    height: 36px;
+    height: var(--tabs-height-secondary);
   }
 }
 
 .sticky {
-  height: 32px;
+  height: var(--tabs-height-primary);
   position: sticky;
   position: -webkit-sticky;
   top: 0;
-  background: var(--tabs-background-color-primary);
+  background: var(--tabs-primary-bg, var(--tabs-background-color-primary));
   z-index: 1;
 
   display: flex;
   flex-direction: row;
 
   &.primary {
-    border-bottom: 1px solid var(--tabs-line-color);
+    border-bottom: 1px solid var(--tabs-underline, var(--tabs-line-color));
   }
   &.secondary {
-    height: 36px;
+    height: var(--tabs-height-secondary);
   }
 }
 
@@ -177,21 +192,24 @@
     margin: 0 auto;
   }
   width: 100%;
-  height: 32px;
+  height: var(--tabs-height-primary);
 
   &.primary {
-    gap: 20px;
+    gap: var(--tabs-gap-primary);
   }
 
   &.secondary {
     box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(var(--tabs-count), 1fr);
-    background-color: var(--tabs-background-color-secondary);
-    gap: 4px;
-    padding: 4px;
-    border-radius: 5px;
-    height: 36px;
+    background-color: var(
+      --tabs-secondary-bg,
+      var(--tabs-background-color-secondary)
+    );
+    gap: var(--tabs-gap-secondary);
+    padding: var(--tabs-padding-secondary);
+    border-radius: var(--tabs-border-radius-secondary);
+    height: var(--tabs-height-secondary);
     width: var(--tabs-width, 100%);
   }
 
@@ -217,7 +235,7 @@
   gap: 4px;
 
   width: max-content;
-  font-weight: 600;
+  font-weight: var(--tabs-font-weight);
   line-height: 20px;
   cursor: pointer;
   user-select: none;
@@ -229,18 +247,24 @@
     padding: 4px 0 0;
 
     .tabText {
-      color: var(--tabs-text-color-primary);
+      color: var(--tabs-primary-text, var(--tabs-text-color-primary));
     }
 
     &.selected {
       .tabText {
-        color: var(--tabs-active-text-color-primary);
+        color: var(
+          --tabs-primary-active-text,
+          var(--tabs-active-text-color-primary)
+        );
       }
     }
 
     &:hover:not(.selected) {
       .tabText {
-        color: var(--tabs-hover-text-color-primary);
+        color: var(
+          --tabs-primary-hover-text,
+          var(--tabs-hover-text-color-primary)
+        );
       }
     }
   }
@@ -252,45 +276,66 @@
     justify-content: center;
     height: 20px;
     padding: 4px 16px;
-    border-radius: 3px;
+    border-radius: var(--tabs-tab-border-radius-secondary);
     gap: 6px;
     width: calc(100% - 32px);
 
     .tabText {
-      color: var(--tabs-text-color-secondary);
+      color: var(--tabs-secondary-text, var(--tabs-text-color-secondary));
       z-index: 102;
     }
 
     &.selected {
       .tabText {
-        color: var(--tabs-active-text-color-secondary);
+        color: var(
+          --tabs-secondary-active-text,
+          var(--tabs-active-text-color-secondary)
+        );
       }
 
       .tabIcon {
         z-index: 102;
         svg path {
-          fill: var(--tabs-active-text-color-secondary);
+          fill: var(
+            --tabs-secondary-active-text,
+            var(--tabs-active-text-color-secondary)
+          );
         }
         svg circle {
-          stroke: var(--tabs-active-text-color-secondary);
+          stroke: var(
+            --tabs-secondary-active-text,
+            var(--tabs-active-text-color-secondary)
+          );
         }
       }
     }
 
     &.focused,
     &:hover:not(.selected) {
-      background-color: var(--tabs-hover-background-color-secondary);
+      background-color: var(
+        --tabs-secondary-hover-bg,
+        var(--tabs-hover-background-color-secondary)
+      );
 
       .tabText {
-        color: var(--tabs-active-text-color-secondary);
+        color: var(
+          --tabs-secondary-active-text,
+          var(--tabs-active-text-color-secondary)
+        );
       }
 
       .tabIcon {
         svg path {
-          fill: var(--tabs-active-text-color-secondary);
+          fill: var(
+            --tabs-secondary-active-text,
+            var(--tabs-active-text-color-secondary)
+          );
         }
         svg circle {
-          stroke: var(--tabs-active-text-color-secondary);
+          stroke: var(
+            --tabs-secondary-active-text,
+            var(--tabs-active-text-color-secondary)
+          );
         }
       }
     }
@@ -310,10 +355,10 @@
   max-height: 16px;
 
   svg path {
-    fill: var(--tabs-text-color-secondary);
+    fill: var(--tabs-secondary-text, var(--tabs-text-color-secondary));
   }
   svg circle {
-    stroke: var(--tabs-text-color-secondary);
+    stroke: var(--tabs-secondary-text, var(--tabs-text-color-secondary));
   }
 }
 
@@ -329,9 +374,9 @@
   grid-area: 2/1;
   z-index: 1;
   width: 100%;
-  height: 4px;
+  height: var(--tabs-indicator-height);
   bottom: 0px;
-  border-radius: 4px 4px 0 0;
+  border-radius: var(--tabs-indicator-border-radius);
   transform-origin: left;
 
   position: relative;
@@ -345,11 +390,11 @@
         background-color: var(--accent-main);
 
         width: 100%;
-        height: 4px;
+        height: var(--tabs-indicator-height);
 
         position: absolute;
         top: 0;
-        border-radius: 4px 4px 0 0;
+        border-radius: var(--tabs-indicator-border-radius);
 
         // Animated progress background when animating
         &.animatedProgress {
@@ -404,9 +449,12 @@
   position: absolute;
   inset: 0;
   z-index: 101;
-  background-color: var(--tabs-active-background-color-secondary);
-  height: 28px;
-  border-radius: 3px;
+  background-color: var(
+    --tabs-secondary-active-bg,
+    var(--tabs-active-background-color-secondary)
+  );
+  height: var(--tabs-motion-height);
+  border-radius: var(--tabs-tab-border-radius-secondary);
 }
 
 .arrowIcon {
@@ -415,7 +463,7 @@
   cursor: pointer;
   min-width: 24px;
   width: 32px;
-  height: 36px;
+  height: var(--tabs-height-secondary);
 
   svg {
     width: 16px !important;
@@ -423,9 +471,15 @@
   }
 
   &:hover:not(.disabled) {
-    background-color: var(--tabs-hover-background-color-secondary);
+    background-color: var(
+      --tabs-secondary-hover-bg,
+      var(--tabs-hover-background-color-secondary)
+    );
     svg path {
-      fill: var(--tabs-hover-background-icon-color-secondary);
+      fill: var(
+        --tabs-secondary-hover-icon,
+        var(--tabs-hover-background-icon-color-secondary)
+      );
     }
   }
 
@@ -435,8 +489,8 @@
 
   div {
     width: 28px;
-    height: 28px;
-    margin: 4px 2px;
+    height: var(--tabs-motion-height);
+    margin: var(--tabs-padding-secondary) 2px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -444,12 +498,18 @@
 }
 
 .arrowLeft {
-  background-color: var(--tabs-background-color-secondary);
+  background-color: var(
+    --tabs-secondary-bg,
+    var(--tabs-background-color-secondary)
+  );
   inset-inline-start: 0px;
 }
 
 .arrowRight {
-  background-color: var(--tabs-background-color-secondary);
+  background-color: var(
+    --tabs-secondary-bg,
+    var(--tabs-background-color-secondary)
+  );
   inset-inline-end: 0px;
   rotate: 180deg;
 }

@@ -51,6 +51,7 @@
 
 .introText{
   margin: 20px 0;
+  max-width: 660px;
 }
 
 .modelTitleRow {
@@ -67,7 +68,7 @@
 }
 
 .modelProvider {
-  color: var(--text-disable-color);
+  color: var(--services-additional-info);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

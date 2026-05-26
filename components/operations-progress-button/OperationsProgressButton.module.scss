@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 @use "../../styles/variables/colors";
 @use "../../styles/mixins";
@@ -38,25 +47,36 @@
     --progress-bar-background-hover: #{colors.$light-gray-dark};
   }
 
-  margin-bottom: 8px;
+  --ops-progress-dropdown-bg-value: var(
+    --ops-progress-dropdown-bg,
+    var(--progress-bar-background-dropdown-color)
+  );
+  --ops-progress-dropdown-hover-value: var(
+    --ops-progress-dropdown-hover,
+    var(--progress-bar-background-hover)
+  );
+  --ops-progress-dropdown-margin-value: var(--ops-progress-dropdown-margin, 8px);
+  --ops-progress-list-padding-value: var(--ops-progress-list-padding, 0px 8px);
 
-  background-color: var(--progress-bar-background-dropdown-color);
+  margin-bottom: var(--ops-progress-dropdown-margin-value);
+
+  background-color: var(--ops-progress-dropdown-bg-value);
 
   :global {
     .progress-list {
-      padding: 0px 8px;
+      padding: var(--ops-progress-list-padding-value);
     }
 
     .progress-list.withHover:hover {
-      background-color: var(--progress-bar-background-hover);
+      background-color: var(--ops-progress-dropdown-hover-value);
     }
   }
 
   &:active {
-    background-color: var(--progress-bar-background-dropdown-color);
+    background-color: var(--ops-progress-dropdown-bg-value);
   }
   @media (hover: hover) {
-    background-color: var(--progress-bar-background-dropdown-color);
+    background-color: var(--ops-progress-dropdown-bg-value);
   }
 }
 
@@ -282,6 +302,15 @@
       --status-icon-color-negative: #{colors.$dark-error-status};
     }
 
+    --ops-progress-success-icon-value: var(
+      --ops-progress-success-icon,
+      var(--status-icon-color-positive)
+    );
+    --ops-progress-error-icon-value: var(
+      --ops-progress-error-icon,
+      var(--status-icon-color-negative)
+    );
+
     position: absolute;
     width: 12px;
     height: 12px;
@@ -296,6 +325,9 @@
 
     &.alert {
       svg {
+        path {
+          fill: var(--ops-progress-error-icon-value) !important;
+        }
         path:not([fill="white"]) {
           fill: var(--status-icon-color-negative) !important;
         }
@@ -304,6 +336,9 @@
 
     &.complete {
       svg {
+        path {
+          fill: var(--ops-progress-success-icon-value) !important;
+        }
         path:not([fill="white"]) {
           fill: var(--status-icon-color-positive) !important;
         }
@@ -314,7 +349,7 @@
   .labelWrapper {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: var(--ops-progress-label-gap, 8px);
   }
 
   :global {
@@ -341,13 +376,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: var(--ops-progress-wrapper-margin, 4px);
   width: 100%;
 }
 
 .progressHeader {
   color: var(--text-primary);
-  margin-right: 8px;
+  margin-right: var(--ops-progress-header-margin, 8px);
 
   &.withClick {
     cursor: pointer;
@@ -365,6 +400,15 @@
     --progress-bar-hover-icon: #{colors.$gray};
   }
 
+  --ops-progress-icon-color-value: var(
+    --ops-progress-icon-color,
+    var(--progress-bar-icon-color)
+  );
+  --ops-progress-icon-hover-value: var(
+    --ops-progress-icon-hover,
+    var(--progress-bar-hover-icon)
+  );
+
   display: flex;
 
   align-items: center;
@@ -372,19 +416,19 @@
 
   svg {
     path {
-      fill: var(--progress-bar-icon-color) !important;
+      fill: var(--ops-progress-icon-color-value) !important;
     }
     &:hover {
       cursor: pointer;
       path {
-        fill: var(--progress-bar-hover-icon) !important;
+        fill: var(--ops-progress-icon-hover-value) !important;
       }
     }
   }
 }
 .progressMainContainer {
   display: flex;
-  gap: 8px;
+  gap: var(--ops-progress-items-gap, 8px);
   width: 100%;
   align-items: center;
   div:first-child {
@@ -422,7 +466,7 @@
   align-items: center;
   flex-wrap: wrap;
 
-  padding: 8px 16px;
+  padding: var(--ops-progress-bar-padding, 8px 16px);
   background: var(--background-primary);
   border-top: 1px solid var(--progress-bar-border);
   border-bottom: 1px solid var(--progress-bar-border);

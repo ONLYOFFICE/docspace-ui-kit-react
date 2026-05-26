@@ -1,32 +1,41 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 .chatInput {
   width: 100%;
-  max-width: 700px;
+  max-width: var(--chat-content-max-width);
 
   position: relative;
 
@@ -39,7 +48,7 @@
     padding: 0;
     background-color: var(--chat-input-background-color);
 
-    min-height: 40px;
+    min-height: var(--chat-input-min-height);
 
     text-align: var(--input-text-align);
   }
@@ -63,7 +72,7 @@
   }
 
   .chatInputTextAreaWrapper {
-    padding: 6px 8px 44px;
+    padding: var(--chat-input-padding);
 
     min-height: 116px !important;
     max-height: 172px !important;
@@ -92,11 +101,11 @@
 
   position: absolute;
 
-  bottom: 6px;
+  bottom: var(--chat-input-buttons-bottom);
 
   box-sizing: border-box;
 
-  padding: 0 8px;
+  padding: var(--chat-input-buttons-padding);
   width: 100%;
 }
 
@@ -105,21 +114,21 @@
   flex-direction: row;
   align-items: center;
 
-  gap: 4px;
+  gap: var(--chat-input-toolbar-gap);
 
   .chatInputButton {
-    height: 32px;
+    height: var(--chat-input-button-height);
 
-    padding: 0 8px;
+    padding: var(--chat-input-button-padding);
 
     box-sizing: border-box;
 
-    border-radius: 3px;
+    border-radius: var(--chat-radius-sm);
 
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: var(--chat-input-button-gap);
 
     cursor: pointer;
 
@@ -198,14 +207,14 @@
 }
 
 .chatInputButtonsSend {
-  width: 32px;
-  height: 32px;
+  width: var(--chat-input-send-button-size);
+  height: var(--chat-input-send-button-size);
 
   border: none;
 
   background-color: var(--chat-input-send-button-background);
 
-  border-radius: 3px;
+  border-radius: var(--chat-radius-sm);
 
   cursor: pointer;
 
@@ -231,8 +240,8 @@
   }
 
   .square {
-    width: 12px;
-    height: 12px;
+    width: var(--chat-icon-xs);
+    height: var(--chat-icon-xs);
 
     background-color: var(--chat-input-send-button-color);
 
@@ -241,29 +250,29 @@
 }
 
 .toolSettingsWrapper {
-  width: calc(100% + 16px);
+  width: calc(100% + var(--chat-spacing-lg));
   height: fit-content;
 
   display: flex;
   flex-direction: column;
   gap: 0;
 
-  padding-top: 16px;
+  padding-top: var(--chat-spacing-lg);
 
-  margin-inline-end: -16px;
+  margin-inline-end: calc(-1 * var(--chat-spacing-lg));
 
   box-sizing: border-box;
 
   .toolSettingsItem {
     width: 100%;
-    height: 48px;
+    height: var(--chat-header-min-height);
 
     display: flex;
     align-items: center;
     flex-direction: row;
     justify-content: space-between;
 
-    padding: 0 16px;
+    padding: 0 var(--chat-spacing-lg);
 
     box-sizing: border-box;
 
@@ -272,11 +281,11 @@
       align-items: center;
       flex-direction: row;
 
-      gap: 8px;
+      gap: var(--chat-spacing-base);
 
       img {
-        width: 32px;
-        height: 32px;
+        width: var(--chat-icon-md);
+        height: var(--chat-icon-md);
       }
     }
   }
@@ -287,11 +296,11 @@
 
   position: absolute;
 
-  height: 44px;
+  height: var(--chat-file-list-height);
 
-  top: 6px;
+  top: var(--chat-spacing-sm);
 
-  padding: 0 8px;
+  padding: 0 var(--chat-spacing-base);
 
   display: flex;
   flex-direction: row;
@@ -302,14 +311,14 @@
   .filesListWrapper {
     width: fit-content;
     display: flex;
-    gap: 6px;
+    gap: var(--chat-file-list-gap);
 
     .filesListItem {
       width: fit-content;
       min-width: fit-content;
-      height: 32px;
+      height: var(--chat-file-item-height);
 
-      padding-inline-end: 8px;
+      padding-inline-end: var(--chat-spacing-base);
 
       display: flex;
       align-items: center;
@@ -317,19 +326,19 @@
       border: 1px solid var(--chat-input-file-border-color);
       background-color: var(--chat-input-file-background-color);
 
-      border-radius: 6px;
+      border-radius: var(--chat-border-radius);
 
       .filesListItemIcon {
-        width: 32px;
-        height: 32px;
+        width: var(--chat-icon-md);
+        height: var(--chat-icon-md);
 
         display: flex;
         align-items: center;
         justify-content: center;
 
         div {
-          width: 32px;
-          height: 32px;
+          width: var(--chat-icon-md);
+          height: var(--chat-icon-md);
 
           display: flex;
           align-items: center;
@@ -342,31 +351,31 @@
       display: flex;
       align-items: center;
 
-      gap: 8px;
+      gap: var(--chat-spacing-base);
 
-      max-width: 300px;
+      max-width: var(--chat-message-file-max-width);
 
       .filesListItemImage {
-        height: 32px;
-        width: 32px;
+        height: var(--chat-icon-md);
+        width: var(--chat-icon-md);
         margin: 0;
         padding: 0;
-        border-start-start-radius: 6px;
-        border-end-start-radius: 6px;
+        border-start-start-radius: var(--chat-border-radius);
+        border-end-start-radius: var(--chat-border-radius);
         object-fit: fill;
         display: flex;
         align-items: center;
         justify-content: center;
 
         &:has(div) {
-          padding: 6px;
+          padding: var(--chat-spacing-sm);
           box-sizing: border-box;
         }
       }
 
       .loader {
         height: 20px;
-        margin: 6px;
+        margin: var(--chat-spacing-sm);
       }
 
       .filesListItemInfoText {
@@ -384,13 +393,13 @@
 }
 
 .chatInputText {
-  margin-top: 4px;
+  margin-top: var(--chat-spacing-xs);
 }
 
 .extendedThinkingLabel {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--chat-spacing-base);
 }
 
 .extendedThinkingHelpButton {

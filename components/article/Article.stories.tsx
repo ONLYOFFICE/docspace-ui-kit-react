@@ -1,31 +1,40 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 import React from "react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -234,6 +243,83 @@ const Template = (args: ArticleProps) => (
     <Article {...args} />
   </div>
 );
+
+const CssCustomizationTemplate = () => (
+  <div
+    style={
+      {
+        height: "600px",
+        position: "relative",
+        // === Article — sidebar background and borders ===
+        "--article-bg": "#e6f3fb",
+        "--article-border": "1px solid #0082c9",
+        "--article-header-border": "1px solid #0082c9",
+        "--article-logo-color": "#0082c9",
+        // === Article — profile section ===
+        "--article-profile-bg": "#cce5f6",
+        "--article-profile-border": "1px solid #0082c9",
+        // === Article — back button ===
+        "--article-back-color": "#0082c9",
+        // === Article — sidebar width ===
+        "--article-width": "260px",
+      } as CSSProperties
+    }
+  >
+    <Article
+      {...defaultProps}
+      user={mockUser}
+      getActions={() =>
+        [
+          { key: "profile", label: "Profile", onClick: () => {} },
+          { key: "logout", label: "Logout", onClick: () => {} },
+        ] as ContextMenuModel[]
+      }
+    >
+      <Article.Header key="header">
+        <h2>Sidebar</h2>
+      </Article.Header>
+      <Article.Body key="body">
+        <div>Navigation items</div>
+      </Article.Body>
+    </Article>
+  </div>
+);
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**Article — sidebar**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--article-bg\` | Sidebar background color | theme-based |
+| \`--article-border\` | Sidebar right border | theme-based |
+| \`--article-header-border\` | Header bottom border (mobile) | theme-based |
+| \`--article-logo-color\` | Logo path fill color | theme-based |
+| \`--article-width\` | Sidebar width (desktop) | \`252px\` |
+| \`--article-sidebar-width\` | Sidebar width (tablet) | \`243px\` |
+| \`--article-sidebar-collapsed-width\` | Collapsed sidebar width (tablet) | \`60px\` |
+
+**Article — profile section**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--article-profile-bg\` | Profile block background | theme-based |
+| \`--article-profile-border\` | Profile block top border | theme-based |
+
+**Article — back button**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--article-back-color\` | Back button text/icon color | theme-based |`,
+      },
+    },
+  },
+};
 
 export const Default: Story = {
   render: (args) => <Template {...args} />,

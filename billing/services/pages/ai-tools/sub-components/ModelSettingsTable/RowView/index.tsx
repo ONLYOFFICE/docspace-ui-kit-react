@@ -50,7 +50,7 @@ const RowView = (props: ModelSettingsRowViewProps) => {
     <div className={styles.rowContainer}>
       <Text className={styles.introText}>
         <CommonTrans
-          i18nKey="AIModelsIntro"
+          i18nKey="AIModelsIntroduction"
           components={{
             1: (
               <Link
@@ -109,11 +109,7 @@ const RowView = (props: ModelSettingsRowViewProps) => {
                   ) : null}
                 </div>
 
-                <Text
-                  fontSize="12px"
-                  fontWeight={600}
-                  className={styles.prices}
-                >
+                <Text fontSize="12px" className={styles.prices}>
                   {t("AIModelPrice", {
                     inputPrice,
                     outputPrice,

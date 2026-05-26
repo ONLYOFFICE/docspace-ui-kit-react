@@ -11,10 +11,13 @@
 .backdrop {
   --backdrop-background-color: #{$blur-light};
 
+  --backdrop-bg-value: var(--backdrop-bg, var(--backdrop-background-color));
+  --backdrop-z-index-value: var(--backdrop-z-index, 203);
+
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 203;
+  z-index: var(--backdrop-z-index-value);
   display: none;
   height: 100vh;
   width: 100vw;
@@ -24,7 +27,7 @@
   }
 
   &.withBackground {
-    background-color: var(--backdrop-background-color);
+    background-color: var(--backdrop-bg-value);
   }
 
   &.withoutBackground {

@@ -1,35 +1,44 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { CommonTrans } from "../../../utils/i18n/CommonTrans";
-import styled from "styled-components";
 
 import { Button, ButtonSize } from "../../../components/button";
+import styles from "./UpdatePlanButtonContainer.module.scss";
 import { toastr } from "../../../components/toast";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import type { QuotaDto } from "@onlyoffice/docspace-api-sdk";
@@ -40,17 +49,6 @@ import { Link } from "../../../components/link";
 import DowngradePlanButtonContainer from "./DowngradePlanButtonContainer";
 import ChangePricingPlanDialog from "../../dialogs/ChangePricingPlanDialog";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-
-const StyledBody = styled.div`
-  button {
-    width: 100%;
-  }
-`;
-const StyledModalBody = styled.div`
-  .text-warning {
-    margin-top: 16px;
-  }
-`;
 
 const MANAGER = "manager";
 let timerId: ReturnType<typeof setTimeout> | undefined;
@@ -71,7 +69,9 @@ const UpdatePlanButtonContainer = ({
   const store = usePaymentStore();
 
   const fetchQuotaInfo = async () => {
-    const r = await paymentApi.getQuotaPaymentInformation(true);
+    const r = await paymentApi.getQuotaPaymentInformation({
+      refresh: true,
+    });
     return r.data.response as unknown as QuotaDto;
   };
 
@@ -173,7 +173,11 @@ const UpdatePlanButtonContainer = ({
       const data: { [key: string]: number } = isYearTariff
         ? { adminyear: managersCount }
         : { admin: managersCount };
-      const updateRes = await paymentApi.updatePayment({ quantity: data });
+      const updateRes = await paymentApi.updatePayment({
+        quantityRequestDto: {
+          quantity: data,
+        },
+      });
       const res = updateRes?.data?.response;
 
       if (res === false) {
@@ -207,7 +211,9 @@ const UpdatePlanButtonContainer = ({
 
       previousManagersCount = maxCountManagersByQuota;
       const quotaRes = await paymentApi
-        .getQuotaPaymentInformation(true)
+        .getQuotaPaymentInformation({
+          refresh: true,
+        })
         .then((r) => r.data.response as unknown as QuotaDto);
       const managersObject = quotaRes.features?.find(
         (obj) => obj.id === MANAGER,
@@ -279,7 +285,7 @@ const UpdatePlanButtonContainer = ({
   const payTariffButton = () => {
     return canPayTariff ? (
       <Button
-        className="upgrade-now-button"
+        className={styles.button}
         label={t("UpgradeNow")}
         size={ButtonSize.medium}
         primary
@@ -304,7 +310,7 @@ const UpdatePlanButtonContainer = ({
     if (cardLinkedOnFreeTariff) {
       return (
         <Button
-          className="upgrade-now-button"
+          className={styles.button}
           label={t("UpgradeNow")}
           size={ButtonSize.medium}
           primary
@@ -324,7 +330,7 @@ const UpdatePlanButtonContainer = ({
       />
     ) : (
       <Button
-        className="upgrade-now-button"
+        className={styles.button}
         label={t("UpgradeNow")}
         size={ButtonSize.medium}
         primary
@@ -339,7 +345,7 @@ const UpdatePlanButtonContainer = ({
   };
 
   return (
-    <StyledBody>
+    <div className={styles.body}>
       {isAlreadyPaid || cardLinkedOnFreeTariff
         ? updatingCurrentTariffButton()
         : payTariffButton()}
@@ -359,11 +365,10 @@ const UpdatePlanButtonContainer = ({
         >
           <ModalDialog.Header>{t("PlanUpgrade")}</ModalDialog.Header>
           <ModalDialog.Body>
-            <StyledModalBody>
+            <div className={styles.modalBody}>
               <Text>
                 <CommonTrans
                   i18nKey="SwitchPlan"
-                 
                   values={{ planName: tariffPlanTitle }}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
@@ -373,23 +378,21 @@ const UpdatePlanButtonContainer = ({
               <Text>
                 <CommonTrans
                   i18nKey="ChargeAmount"
-                 
                   values={{ price: formatPaymentCurrency(totalPrice) }}
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
                   }}
                 />
               </Text>
-              <Text className="text-warning">
+              <Text className={styles.textWarning}>
                 <CommonTrans
                   i18nKey="ActionCannotBeUndone"
-                 
                   components={{
                     1: <span style={{ fontWeight: 600 }} />,
                   }}
                 />
               </Text>
-            </StyledModalBody>
+            </div>
           </ModalDialog.Body>
           <ModalDialog.Footer>
             <Button
@@ -412,9 +415,8 @@ const UpdatePlanButtonContainer = ({
           </ModalDialog.Footer>
         </ModalDialog>
       ) : null}
-    </StyledBody>
+    </div>
   );
 };
 
 export default observer(UpdatePlanButtonContainer);
-

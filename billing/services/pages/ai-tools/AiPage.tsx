@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 import React, { useState, useEffect } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
@@ -57,6 +66,7 @@ import { formatDateLocalized, getAppTimezone } from "../../../../utils/date";
 import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components";
 import AIServiceDialog from "../../panels/ai-service/AIServiceDialog";
+import AiSimpleTopUpDialog from "../../panels/ai-service/AiSimpleTopUpDialog";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
@@ -66,10 +76,21 @@ import { getBrandName } from "../../../../constants/brands";
 type AiPageProps = {
   currentDeviceType?: string;
   getAIConfig?: () => Promise<void>;
+  integrationUrl?: string;
+  withoutWallet?: boolean;
+  simpleTopUp?: boolean;
+  withBottomMargin?:boolean;
 };
 
 const AiPage = (props: AiPageProps) => {
-  const { currentDeviceType, getAIConfig } = props;
+  const {
+    currentDeviceType,
+    getAIConfig,
+    integrationUrl,
+    withoutWallet,
+    simpleTopUp,
+    withBottomMargin
+  } = props;
 
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
@@ -113,7 +134,9 @@ const AiPage = (props: AiPageProps) => {
   // const navigate = useNavigate();
 
   useEffect(() => {
-    initServiceData(t, AI_TOOLS, AI_ENUM);
+    if (!isInitServicesData) {
+      initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
+    }
   }, []);
 
   // useEffect(() => {
@@ -130,7 +153,7 @@ const AiPage = (props: AiPageProps) => {
     const startTime = Date.now();
     try {
       await Promise.all([
-        fetchAiServiceBalance(),
+        fetchAiServiceBalance(true),
         fetchTransactionHistory(AI_TOOLS),
       ]);
     } finally {
@@ -160,7 +183,9 @@ const AiPage = (props: AiPageProps) => {
     changeServiceState(AI_ENUM);
 
     try {
-      const result = await paymentApi.changeTenantWalletServiceState(raw);
+      const result = await paymentApi.changeTenantWalletServiceState({
+        changeWalletServiceStateRequestDto: raw,
+      });
 
       if (!result) {
         toastr.error(t("UnexpectedError"));
@@ -187,7 +212,6 @@ const AiPage = (props: AiPageProps) => {
           }),
           <CommonTrans
             key="DisableAIToolsConfirmBalance"
-           
             i18nKey="DisableAIToolsConfirmBalance"
             values={{
               balance: formatAiServiceCurrency(
@@ -223,7 +247,7 @@ const AiPage = (props: AiPageProps) => {
   };
 
   const onOpenTopUp = () => {
-    if (!isAiToolsServiceOn) {
+    if (!isAiToolsServiceOn && !simpleTopUp) {
       setIsTopUpConfirmVisible(true);
       return;
     }
@@ -253,7 +277,6 @@ const AiPage = (props: AiPageProps) => {
           <TransactionHistory
             withoutHeader={currentDeviceType !== DeviceType.mobile}
             serviceName={AI_TOOLS}
-            hideTypeFilter
             withoutRoleFilter
           />
         </div>
@@ -280,7 +303,14 @@ const AiPage = (props: AiPageProps) => {
       />
 
       {isTopUpVisible ? (
-        <AIServiceDialog visible={isTopUpVisible} onClose={onCloseTopUp} />
+        simpleTopUp ? (
+          <AiSimpleTopUpDialog
+            visible={isTopUpVisible}
+            onClose={onCloseTopUp}
+          />
+        ) : (
+          <AIServiceDialog visible={isTopUpVisible} onClose={onCloseTopUp} />
+        )
       ) : null}
 
       <div className={styles.toggleSection}>
@@ -291,9 +321,12 @@ const AiPage = (props: AiPageProps) => {
           description={t("EnableAIDescription")}
           testId="service-ai-toggle-button"
           isDisabled={isDisabled}
+          withBottomMargin={withBottomMargin}
         />
 
-        <WalletInfo shortView withoutBackground balance={balance} />
+        {withoutWallet ? null : (
+          <WalletInfo shortView withoutBackground balance={balance} />
+        )}
 
         {isAiToolsServiceOn && isAiServiceLowBalance ? (
           <Text fontSize="15px" fontWeight={600} className={styles.lowBalance}>
@@ -327,7 +360,6 @@ const AiPage = (props: AiPageProps) => {
         {aiServiceLastCreditAmount ? (
           <Text className={styles.lastTopUpLabel}>
             <CommonTrans
-             
               i18nKey="LastTopUp"
               components={{
                 1: (
@@ -410,4 +442,3 @@ const AiPage = (props: AiPageProps) => {
 };
 
 export default observer(AiPage);
-

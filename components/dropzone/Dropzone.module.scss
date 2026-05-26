@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 @use "../../styles/variables/colors";
 @use "../../styles/mixins";
@@ -62,14 +71,69 @@
     --dropzone-arrow-icon-color-focus: #{colors.$white};
   }
 
+  // bridge vars — bind public overrides to internal theme tokens
+  --dropzone-border-v: var(--dropzone-border-style, var(--dropzone-border));
+  --dropzone-drag-active-bg-v: var(
+    --dropzone-drag-bg,
+    var(--dropzone-drag-active-bg)
+  );
+  --dropzone-hover-bg-v: var(
+    --dropzone-hover-bg-override,
+    var(--dropzone-hover-bg)
+  );
+  --dropzone-secondary-link-v: var(
+    --dropzone-link-secondary-color,
+    var(--dropzone-secondary-link)
+  );
+  --dropzone-exsts-color-v: var(
+    --dropzone-text-color,
+    var(--dropzone-exsts-color)
+  );
+  --dropzone-exsts-bg-hover-v: var(
+    --dropzone-text-hover-bg,
+    var(--dropzone-exsts-color-background-hover)
+  );
+  --dropzone-exsts-bg-pressed-v: var(
+    --dropzone-text-pressed-bg,
+    var(--dropzone-exsts-color-background-pressed)
+  );
+  --dropzone-exsts-bg-focus-v: var(
+    --dropzone-text-focus-bg,
+    var(--dropzone-exsts-color-background-focus)
+  );
+  --dropzone-exsts-color-focus-v: var(
+    --dropzone-text-focus-color,
+    var(--dropzone-exsts-color-focus)
+  );
+  --dropzone-badge-focus-v: var(
+    --dropzone-badge-focus-color,
+    var(--dropzone-exsts-badge-focus)
+  );
+  --dropzone-arrow-focus-v: var(
+    --dropzone-arrow-focus-color,
+    var(--dropzone-arrow-icon-color-focus)
+  );
+  --dropzone-formats-shadow-v: var(
+    --dropzone-formats-shadow,
+    var(--dropzone-context-menu-box-shadow)
+  );
+  // bridge vars for hardcoded values
+  --dropzone-radius-v: var(--dropzone-radius, 6px);
+  --dropzone-min-height-v: var(--dropzone-min-height, 150px);
+  --dropzone-gap-v: var(--dropzone-gap, 4px);
+  --dropzone-font-size-v: var(--dropzone-text-size, 13px);
+  --dropzone-exsts-radius-v: var(--dropzone-exsts-radius, 3px);
+  --dropzone-formats-radius-v: var(--dropzone-formats-radius, 6px);
+
   cursor: pointer;
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  min-height: 150px;
-  border: var(--dropzone-border);
-  border-radius: 6px;
+  min-height: var(--dropzone-min-height-v);
+  border: var(--dropzone-border-v);
+  border-radius: var(--dropzone-radius-v);
   display: flex;
+  align-items: center;
   box-sizing: border-box;
 
   &.hasChildren {
@@ -77,11 +141,11 @@
   }
 
   &.isDraggingOnPage {
-    background-color: var(--dropzone-drag-active-bg);
+    background-color: var(--dropzone-drag-active-bg-v);
   }
 
   &.isDragOver {
-    background-color: var(--dropzone-hover-bg);
+    background-color: var(--dropzone-hover-bg-v);
   }
 }
 
@@ -107,7 +171,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--dropzone-gap-v);
 
   user-select: none;
 
@@ -130,8 +194,8 @@
   flex-wrap: wrap;
   justify-content: center;
   max-width: 100%;
-  gap: 4px;
-  font-size: 13px;
+  gap: var(--dropzone-gap-v);
+  font-size: var(--dropzone-font-size-v);
   line-height: 20px;
 
   &.main {
@@ -143,7 +207,7 @@
 
   &.secondary {
     font-weight: 400;
-    color: var(--dropzone-secondary-link);
+    color: var(--dropzone-secondary-link-v);
     overflow-wrap: break-word;
     word-break: break-word;
     text-align: center;
@@ -166,9 +230,9 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
+  gap: var(--dropzone-gap-v);
 
-  color: var(--dropzone-exsts-color);
+  color: var(--dropzone-exsts-color-v);
 }
 
 .dropzoneExstsTextContainer {
@@ -176,8 +240,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
-  border-radius: 3px;
+  gap: var(--dropzone-gap-v);
+  border-radius: var(--dropzone-exsts-radius-v);
 
   padding-inline: 8px;
   padding-block: 4px;
@@ -186,25 +250,25 @@
     cursor: pointer;
 
     &:hover {
-      background-color: var(--dropzone-exsts-color-background-hover);
+      background-color: var(--dropzone-exsts-bg-hover-v);
     }
 
     &:active {
-      background-color: var(--dropzone-exsts-color-background-pressed);
+      background-color: var(--dropzone-exsts-bg-pressed-v);
     }
   }
 
   &.isOpen {
     cursor: pointer;
-    background-color: var(--dropzone-exsts-color-background-focus);
+    background-color: var(--dropzone-exsts-bg-focus-v);
 
     .dropzoneExstsText {
-      color: var(--dropzone-exsts-color-focus);
+      color: var(--dropzone-exsts-color-focus-v);
     }
 
     .dropzoneExstsBadge {
       [data-testid="badge-inner"] {
-        background-color: var(--dropzone-exsts-badge-focus);
+        background-color: var(--dropzone-badge-focus-v);
       }
     }
   }
@@ -212,7 +276,7 @@
 
 .dropzoneExstsText {
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--dropzone-font-size-v);
   line-height: 20px;
 }
 
@@ -230,24 +294,26 @@
   transition: transform 0.2s ease;
 
   path {
-    fill: var(--dropzone-exsts-color);
+    fill: var(--dropzone-exsts-color-v);
   }
 
   &.isOpen {
     transform: rotate(180deg);
     path {
-      fill: var(--dropzone-arrow-icon-color-focus);
+      fill: var(--dropzone-arrow-focus-v);
     }
   }
 }
 
 .dropzoneFormatsDropdown {
   :global(.light) & {
-    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-color};
+    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px
+      #{colors.$box-shadow-color};
   }
 
   :global(.dark) & {
-    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px #{colors.$box-shadow-color};
+    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px
+      #{colors.$box-shadow-color};
   }
 
   position: absolute !important;
@@ -259,8 +325,8 @@
   width: 100%;
   background: var(--background-content);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-shadow: var(--dropzone-context-menu-box-shadow);
+  border-radius: var(--dropzone-formats-radius-v);
+  box-shadow: var(--dropzone-formats-shadow-v);
 }
 
 .dropzoneFormatsContent {
@@ -284,3 +350,4 @@
   padding: 16px;
   box-sizing: border-box;
 }
+

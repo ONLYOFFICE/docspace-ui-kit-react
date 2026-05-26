@@ -1,38 +1,68 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 import type React from "react";
+import type { CSSProperties } from "react";
 import type { ComponentProps } from "react";
 import { useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg?url";
+
 import { InputSize } from "../text-input";
 
 import { SearchInput } from ".";
+
+const itemsModel = [
+  { key: 0, label: "New document", icon: CatalogFolderReactSvgUrl },
+  { key: 1, label: "New spreadsheet", icon: CatalogFolderReactSvgUrl },
+  { key: 2, label: "New presentation", icon: CatalogFolderReactSvgUrl },
+  {
+    key: 3,
+    label: "Master form",
+    icon: CatalogFolderReactSvgUrl,
+    items: [
+      { key: 4, label: "From blank" },
+      { key: 5, label: "From an existing text file" },
+    ],
+  },
+  { key: 6, label: "New folder", icon: CatalogFolderReactSvgUrl },
+  { key: 7, isSeparator: true },
+  { key: 8, label: "Upload", icon: CatalogFolderReactSvgUrl },
+];
 
 const meta = {
   title: "UI/Interactive elements/SearchInput",
@@ -119,6 +149,18 @@ import { InputSize } from "@docspace/ui-kit/components/text-input";
     placeholder: {
       control: "text",
       description: "Placeholder text",
+    },
+    mainButtonProps: {
+      control: false,
+      description:
+        "Props for the MainButton displayed to the left of the search field (MainButtonProps)",
+    },
+    showMainButton: {
+      control: "boolean",
+      description: "Show a MainButton to the left of the search field",
+      table: {
+        defaultValue: { summary: "false" },
+      },
     },
   },
 } satisfies Meta<typeof SearchInput>;
@@ -286,6 +328,140 @@ export const AutoRefreshMode: Story = {
 
 // Without auto-refresh
 <SearchInput placeholder="No auto-refresh" />`,
+      },
+    },
+  },
+};
+
+export const WithButton: Story = {
+  render: (args) => {
+    const [value, setValue] = useState(args.value || "");
+
+    const mainButtonProps = {
+      text: "New room",
+      model: [],
+    };
+
+    return (
+      <div style={{ width: "500px" }}>
+        <SearchInput
+          {...args}
+          value={value}
+          onChange={(v) => setValue(v)}
+          showClearButton={!!value}
+          onClearSearch={() => setValue("")}
+          mainButtonProps={mainButtonProps}
+        />
+      </div>
+    );
+  },
+  args: {
+    size: InputSize.base,
+    value: "",
+    scale: true,
+    placeholder: "Search",
+    showMainButton: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "SearchInput with a MainButton to the left. " +
+          "Use `showMainButton` and `mainButtonProps` to control visibility and all MainButton props.",
+      },
+    },
+  },
+};
+
+export const WithButtonAndMenu: Story = {
+  render: (args) => {
+    const [value, setValue] = useState(args.value || "");
+
+    const mainButtonProps = {
+      text: "New",
+      model: itemsModel,
+      hideArrow: true,
+    };
+
+    return (
+      <div style={{ width: "500px" }}>
+        <SearchInput
+          {...args}
+          value={value}
+          onChange={(v) => setValue(v)}
+          showClearButton={!!value}
+          onClearSearch={() => setValue("")}
+          mainButtonProps={mainButtonProps}
+        />
+      </div>
+    );
+  },
+  args: {
+    size: InputSize.base,
+    value: "",
+    scale: true,
+    placeholder: "Search",
+    showMainButton: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "SearchInput with a 'New' MainButton that opens a dropdown menu. " +
+          "Pass `model` inside `mainButtonProps` to populate the menu items.",
+      },
+    },
+  },
+};
+
+export const CssCustomization: Story = {
+  render: () => (
+    <div
+      style={
+        {
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+          width: "300px",
+          "--text-input-bg": "#f5f3ff",
+          "--text-input-border-color": "#7c3aed",
+          "--text-input-color": "#4c1d95",
+          "--text-input-radius": "8px",
+          "--search-input-icon-fill": "#7c3aed",
+          "--search-input-max-height": "40px",
+          "--search-input-radius": "8px",
+        } as CSSProperties
+      }
+    >
+      <SearchInput
+        size={InputSize.base}
+        placeholder="Custom styled search"
+        value=""
+        onChange={() => {}}
+      />
+      <SearchInput
+        size={InputSize.base}
+        placeholder="With value"
+        value="Search term"
+        onChange={() => {}}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--text-input-bg\` | Background color | theme token |
+| \`--text-input-border-color\` | Border color | theme token |
+| \`--text-input-color\` | Text color | theme token |
+| \`--text-input-radius\` | Input border radius | theme token |
+| \`--search-input-icon-fill\` | Default icon color | theme token |
+| \`--search-input-icon-filled-fill\` | Icon color when input has value | theme token |
+| \`--search-input-max-height\` | Max height of the input | \`32px\` |
+| \`--search-input-radius\` | Icon container border radius | \`3px\` |`,
       },
     },
   },

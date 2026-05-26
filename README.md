@@ -217,7 +217,7 @@ import { Error401, Error403, Error404, ErrorOfflineContainer, ErrorInvalidLink, 
 
 ```js
 import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/utils";
-import commonIconsStyles, { IconSizeType, isIconSizeType } from "@docspace/ui-kit/utils/common-icons-style";
+import { IconSizeType, isIconSizeType } from "@docspace/ui-kit/utils/common-icons-style";
 import DomHelpers from "@docspace/ui-kit/utils/dom-helpers";
 import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
 import { getCommonTranslation } from "@docspace/ui-kit/utils/i18n";

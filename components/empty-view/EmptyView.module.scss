@@ -1,45 +1,48 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
-
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 @use "../../styles/variables/colors";
 @use "../../styles/mixins";
 
 .wrapper {
   margin-inline: auto;
 
-  max-width: 480px;
   width: 100%;
 
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 18px;
-
-  padding-top: 61px;
 
   :global(.light) & {
     --empty-view-header-color: #{colors.$black};
@@ -71,6 +74,32 @@
     --empty-view-action-secondary-color: #{colors.$gray-dark};
   }
 
+  --empty-view-title-color-value: var(--empty-view-title-color, var(--empty-view-header-color));
+  --empty-view-description-color-value: var(--empty-view-desc-color, var(--empty-view-description-color));
+  --empty-view-link-color-value: var(--empty-view-link-accent, var(--empty-view-link-color));
+  --empty-view-link-bg-value: var(--empty-view-link-background, var(--empty-view-link-bg-color));
+  --empty-view-link-hover-bg-value: var(--empty-view-link-hover-background, var(--empty-view-link-bg-color-hover));
+  --empty-view-separator-color-value: var(--empty-view-divider-color, var(--empty-view-separator-color));
+  --empty-view-item-hover-bg-value: var(--empty-view-item-hover-background, var(--empty-view-items-hover));
+  --empty-view-items-header-value: var(--empty-view-item-title-color, var(--empty-view-items-header));
+  --empty-view-items-subheading-value: var(--empty-view-item-desc-color, var(--empty-view-items-subheading));
+  --empty-view-max-width: var(--empty-view-width, 480px);
+  --empty-view-top-padding: var(--empty-view-padding-top, 61px);
+  --empty-view-items-gap: var(--empty-view-gap, 18px);
+  --empty-view-title-size: var(--empty-view-header-font-size, 16px);
+  --empty-view-link-border-radius: var(--empty-view-link-radius, 6px);
+  --empty-view-link-inner-padding: var(--empty-view-link-padding, 6px 10px);
+  --empty-view-link-font-size-value: var(--empty-view-link-text-size, 13px);
+  --empty-view-link-font-weight-value: var(--empty-view-link-text-weight, 600);
+  --empty-view-item-border-radius: var(--empty-view-item-radius, 6px);
+  --empty-view-item-inner-padding: var(--empty-view-item-padding, 12px 16px);
+  --empty-view-item-icon-size: var(--empty-view-icon-size, 36px);
+  --empty-view-item-cols-gap: var(--empty-view-item-gap, 20px);
+
+  max-width: var(--empty-view-max-width);
+  padding-top: var(--empty-view-top-padding);
+  gap: var(--empty-view-items-gap);
+
   @include mixins.mobile {
     padding-top: 40px;
   }
@@ -90,16 +119,16 @@
   }
 
   .headerTitle {
-    font-size: 16px;
+    font-size: var(--empty-view-title-size);
     text-align: center;
     margin-bottom: 8px;
     margin-top: 20px;
-    color: var(--empty-view-header-color);
+    color: var(--empty-view-title-color-value);
   }
 
   .subheading {
     text-align: center;
-    color: var(--empty-view-description-color);
+    color: var(--empty-view-description-color-value);
   }
 
   .body {
@@ -124,15 +153,14 @@
     flex-wrap: nowrap;
     align-self: center;
 
-    padding: 6px 10px;
-
     max-width: fit-content;
     text-decoration: none;
 
-    color: var(--accent-main, --empty-view-link-color);
+    color: var(--accent-main, var(--empty-view-link-color-value));
 
-    background-color: var(--empty-view-link-bg-color);
-    border-radius: 6px;
+    background-color: var(--empty-view-link-bg-value);
+    border-radius: var(--empty-view-link-border-radius);
+    padding: var(--empty-view-link-inner-padding);
 
     svg {
       color: inherit;
@@ -143,21 +171,21 @@
     }
 
     span {
-      font-weight: 600;
-      font-size: 13px;
+      font-weight: var(--empty-view-link-font-weight-value);
+      font-size: var(--empty-view-link-font-size-value);
       line-height: 15px;
     }
 
     @media (hover: hover) {
       &:hover:not(:active) {
-        background: var(--empty-view-link-bg-color-hover);
+        background: var(--empty-view-link-hover-bg-value);
         & > * {
           opacity: 0.86;
         }
       }
     }
 
-    :active {
+    &:active {
       background: var(--empty-view-link-bg-color-press);
       & > * {
         filter: brightness(90%);
@@ -174,7 +202,7 @@
     align-self: center;
     font-size: 12px;
     line-height: 16px;
-    color: var(--empty-view-separator-color);
+    color: var(--empty-view-separator-color-value);
   }
 
   .action {
@@ -205,16 +233,16 @@
   .itemWrapper {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: var(--empty-view-item-cols-gap);
 
     cursor: pointer;
-    border-radius: 6px;
-    padding: 12px 16px;
+    border-radius: var(--empty-view-item-border-radius);
+    padding: var(--empty-view-item-inner-padding);
 
     .itemIcon {
-      width: 36px;
-      height: 36px;
-      flex: 0 0 36px;
+      width: var(--empty-view-item-icon-size);
+      height: var(--empty-view-item-icon-size);
+      flex: 0 0 var(--empty-view-item-icon-size);
     }
 
     &:nth-child(1) .itemIcon {
@@ -252,11 +280,11 @@
 
     .itemHeader {
       font-size: 13px;
-      color: var(--empty-view-items-header);
+      color: var(--empty-view-items-header-value);
     }
 
     .itemSubheading {
-      color: var(--empty-view-items-subheading);
+      color: var(--empty-view-items-subheading-value);
     }
 
     .arrowIcon {
@@ -269,7 +297,7 @@
 
     @media (hover: hover) {
       &:hover {
-        background-color: var(--empty-view-items-hover);
+        background-color: var(--empty-view-item-hover-bg-value);
       }
     }
 

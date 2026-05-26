@@ -9,7 +9,7 @@ import { Text } from "../../../../../../../components/text";
 import { Tooltip } from "../../../../../../../components/tooltip";
 import { CommonTrans } from "../../../../../../../utils/i18n/CommonTrans";
 
-import type { TAiToolsPrices } from "../../../../../../types";
+
 
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
@@ -63,7 +63,7 @@ const TableView = (props: ModelSettingsTableViewProps) => {
     <div className={styles.tableWrapper}>
       <Text className={styles.introText}>
         <CommonTrans
-          i18nKey="AIModelsIntro"
+          i18nKey="AIModelsIntroduction"
           components={{
             1: (
               <Link
