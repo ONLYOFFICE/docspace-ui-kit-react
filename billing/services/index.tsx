@@ -373,31 +373,19 @@ const Services = observer(
       setIsConfirmDialogVisible(false);
     };
 
-    const onConfirm = async () => {
-      if (!confirmActionType) return;
+    const getServiceSuccessMessage = (id: string) => {
+      if (id === BACKUP_SERVICE) return t("BackupServiceEnabled");
+      if (id === AI_ENUM) return t("AIToolsEnabled");
+      return undefined;
+    };
 
+    const applyServiceStateChange = async (id: string, enabled: boolean) => {
       const raw: ChangeWalletServiceStateRequestDto = {
-        service: toWalletService(confirmActionType),
-        enabled: !isCurrentConfirmState,
+        service: toWalletService(id),
+        enabled,
       };
 
-      setIsConfirmDialogVisible(false);
-
-      if (confirmActionType === BACKUP_SERVICE && !isCardLinkedToPortal) {
-        setIsTopUpBalanceVisible(true);
-        return;
-      }
-
-      changeServiceState(confirmActionType);
-
-      const getSuccessMessage = () => {
-        if (confirmActionType === BACKUP_SERVICE) {
-          return t("BackupServiceEnabled");
-        }
-        if (confirmActionType === AI_ENUM) {
-          return t("AIToolsEnabled");
-        }
-      };
+      changeServiceState(id);
 
       try {
         const result = await paymentApi.changeTenantWalletServiceState({
@@ -406,21 +394,52 @@ const Services = observer(
 
         if (!result) {
           toastr.error(t("UnexpectedError"));
-          changeServiceState(confirmActionType);
-          return;
+          changeServiceState(id);
+          return false;
         }
 
-        if (!isCurrentConfirmState) toastr.success(getSuccessMessage());
+        if (enabled) {
+          const successMessage = getServiceSuccessMessage(id);
+          if (successMessage) toastr.success(successMessage);
+        }
 
-        if (confirmActionType === AI_ENUM) {
+        if (id === AI_ENUM) {
           await getAIConfig?.();
         }
+
+        return true;
       } catch (error) {
         console.error(error);
         toastr.error(t("UnexpectedError"));
-        changeServiceState(confirmActionType);
+        changeServiceState(id);
+        return false;
       }
     };
+
+    const onConfirm = async () => {
+      if (!confirmActionType) return;
+
+      setIsConfirmDialogVisible(false);
+
+      if (confirmActionType === BACKUP_SERVICE && !isCardLinkedToPortal) {
+        setIsTopUpBalanceVisible(true);
+        return;
+      }
+
+      await applyServiceStateChange(confirmActionType, !isCurrentConfirmState);
+    };
+
+    const onFirstTopUpConfirmed = async () => {
+      if (!confirmActionType) return;
+
+      if (confirmActionType !== BACKUP_SERVICE) {
+        updateDialogVisibility(confirmActionType, true);
+        return;
+      }
+
+      await applyServiceStateChange(confirmActionType, !isCurrentConfirmState);
+    };
+
     const onCloseAiService = () => {
       updateDialogVisibility(AI_ENUM, false);
     };
@@ -476,6 +495,7 @@ const Services = observer(
           <FirstTopUpDialog
             visible={isFirstTopUpDialogVisible}
             onClose={() => setIsFirstTopUpDialogVisible(false)}
+            onConfirm={onFirstTopUpConfirmed}
           />
         ) : null}
         {isConfirmDialogVisible && confirmActionType ? (
@@ -492,6 +512,7 @@ const Services = observer(
             <FirstTopUpDialog
               visible={isTopUpBalanceVisible}
               onClose={() => onCloseTopUpModal(false)}
+              onConfirm={onConfirm}
             />
           ) : (
             <TopUpModal

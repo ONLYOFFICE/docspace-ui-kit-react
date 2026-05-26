@@ -119,10 +119,11 @@ const waitForTopUpCompletion = async (
 type FirstTopUpDialogProps = {
   visible: boolean;
   onClose: () => void;
+  onConfirm?: () => Promise<void> | void;
 };
 
 const FirstTopUpDialogContent = observer(
-  ({ visible, onClose }: FirstTopUpDialogProps) => {
+  ({ visible, onClose, onConfirm }: FirstTopUpDialogProps) => {
     const t = useCommonTranslation();
     const paymentStore = usePaymentStore();
 
@@ -153,6 +154,10 @@ const FirstTopUpDialogContent = observer(
         await openStripeCheckout(paymentStore, amount);
 
         await waitForTopUpCompletion(paymentStore, isMountedRef);
+
+        if (!isMountedRef.current) return;
+
+        await onConfirm?.();
 
         if (!isMountedRef.current) return;
 
