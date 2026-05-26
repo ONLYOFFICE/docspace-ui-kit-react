@@ -24,38 +24,27 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import {
-  ChatPage,
-  SettingsPage,
-  useStores,
-  ChatList,
-} from "@onlyoffice/ai-chat";
+"use client";
 
-import { ChatToolbar } from "../chat-toolbar";
+import { useEffect } from "react";
 
-import styles from "./NewChat.module.scss";
+import { attachAgentRoomId } from "../host-tool-groups";
 
-const NewChat = () => {
-  const stores = useStores();
-  const currentPage = stores.useRouter((s) => s.currentPage);
-  const profiles = stores.useProfilesStore((s) => s.profiles);
-  const hasProfiles = profiles.length > 0;
+import { useAiChatStore } from "./AiChatStoreProvider";
 
-  switch (currentPage) {
-    case "settings":
-    case "initial-setup":
-      return <SettingsPage />;
-    case "history":
-      return <ChatList />;
-    default: {
-      return (
-        <section className={styles.chat}>
-          {hasProfiles ? <ChatToolbar /> : null}
-          <ChatPage />
-        </section>
-      );
-    }
-  }
+// Lets host code inside <AiAgentProviders> pull `agentId` from AiChatStore
+// without anyone outside needing to read it (which would require the store
+// provider above AiAgentProviders). Registers a getter via the existing
+// `attachAgentRoomId` ref so callers get the latest value lazily.
+const AgentRoomIdSync = () => {
+  const store = useAiChatStore();
+
+  useEffect(() => {
+    attachAgentRoomId(() => store.agentId);
+  }, [store, store.agentId]);
+
+  return null;
 };
 
-export default NewChat;
+export default AgentRoomIdSync;
+

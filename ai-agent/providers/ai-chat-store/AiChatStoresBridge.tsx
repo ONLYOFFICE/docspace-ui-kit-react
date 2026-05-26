@@ -24,38 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import {
-  ChatPage,
-  SettingsPage,
-  useStores,
-  ChatList,
-} from "@onlyoffice/ai-chat";
+"use client";
 
-import { ChatToolbar } from "../chat-toolbar";
+import { useEffect } from "react";
 
-import styles from "./NewChat.module.scss";
+import { useStores } from "@onlyoffice/ai-chat";
 
-const NewChat = () => {
+import { useAiChatStore } from "./AiChatStoreProvider";
+
+// Sole Zustand → MobX sync point. Mirrors upstream router page and
+// profiles presence into AiChatStore so every consumer can derive
+// fullscreen/header/aiReady through computed getters on a single
+// observable store.
+//
+// Mounted inside <AiAgentProviders> (which owns <StoresProvider>).
+const AiChatStoresBridge = () => {
+  const store = useAiChatStore();
   const stores = useStores();
   const currentPage = stores.useRouter((s) => s.currentPage);
   const profiles = stores.useProfilesStore((s) => s.profiles);
-  const hasProfiles = profiles.length > 0;
 
-  switch (currentPage) {
-    case "settings":
-    case "initial-setup":
-      return <SettingsPage />;
-    case "history":
-      return <ChatList />;
-    default: {
-      return (
-        <section className={styles.chat}>
-          {hasProfiles ? <ChatToolbar /> : null}
-          <ChatPage />
-        </section>
-      );
-    }
-  }
+  useEffect(() => {
+    store.setCurrentPage(currentPage);
+  }, [store, currentPage]);
+
+  useEffect(() => {
+    store.setHasProfiles(profiles.length > 0);
+  }, [store, profiles]);
+
+  return null;
 };
 
-export default NewChat;
+export default AiChatStoresBridge;

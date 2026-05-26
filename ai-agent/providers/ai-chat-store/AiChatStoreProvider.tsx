@@ -24,38 +24,33 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import {
-  ChatPage,
-  SettingsPage,
-  useStores,
-  ChatList,
-} from "@onlyoffice/ai-chat";
+"use client";
 
-import { ChatToolbar } from "../chat-toolbar";
+import React from "react";
 
-import styles from "./NewChat.module.scss";
+import AiChatStore from "./AiChatStore";
 
-const NewChat = () => {
-  const stores = useStores();
-  const currentPage = stores.useRouter((s) => s.currentPage);
-  const profiles = stores.useProfilesStore((s) => s.profiles);
-  const hasProfiles = profiles.length > 0;
+const AiChatStoreContext = React.createContext<AiChatStore | null>(null);
 
-  switch (currentPage) {
-    case "settings":
-    case "initial-setup":
-      return <SettingsPage />;
-    case "history":
-      return <ChatList />;
-    default: {
-      return (
-        <section className={styles.chat}>
-          {hasProfiles ? <ChatToolbar /> : null}
-          <ChatPage />
-        </section>
-      );
-    }
-  }
+export const AiChatStoreProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const store = React.useMemo(() => new AiChatStore(), []);
+  return (
+    <AiChatStoreContext.Provider value={store}>
+      {children}
+    </AiChatStoreContext.Provider>
+  );
 };
 
-export default NewChat;
+export const useAiChatStore = () => {
+  const store = React.useContext(AiChatStoreContext);
+  if (!store) {
+    throw new Error(
+      "useAiChatStore must be used within an AiChatStoreProvider",
+    );
+  }
+  return store;
+};

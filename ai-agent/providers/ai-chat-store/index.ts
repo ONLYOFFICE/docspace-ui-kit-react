@@ -24,38 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import {
-  ChatPage,
-  SettingsPage,
-  useStores,
-  ChatList,
-} from "@onlyoffice/ai-chat";
-
-import { ChatToolbar } from "../chat-toolbar";
-
-import styles from "./NewChat.module.scss";
-
-const NewChat = () => {
-  const stores = useStores();
-  const currentPage = stores.useRouter((s) => s.currentPage);
-  const profiles = stores.useProfilesStore((s) => s.profiles);
-  const hasProfiles = profiles.length > 0;
-
-  switch (currentPage) {
-    case "settings":
-    case "initial-setup":
-      return <SettingsPage />;
-    case "history":
-      return <ChatList />;
-    default: {
-      return (
-        <section className={styles.chat}>
-          {hasProfiles ? <ChatToolbar /> : null}
-          <ChatPage />
-        </section>
-      );
-    }
-  }
-};
-
-export default NewChat;
+export { default as AiChatStore } from "./AiChatStore";
+export type { AiChatRouterPage } from "./AiChatStore";
+export { AiChatStoreProvider, useAiChatStore } from "./AiChatStoreProvider";
+export { default as AiChatStoresBridge } from "./AiChatStoresBridge";
+export { default as AgentRoomIdSync } from "./AgentRoomIdSync";

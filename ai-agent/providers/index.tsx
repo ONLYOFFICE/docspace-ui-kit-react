@@ -71,6 +71,11 @@ import { storeKeys } from "./stores";
 import { normalizeAiChatLocale } from "./locale";
 import { portalThemes } from "./themes";
 import {
+  AgentRoomIdSync,
+  AiChatStoreProvider,
+  AiChatStoresBridge,
+} from "./ai-chat-store";
+import {
   EDITOR_TOOLS_EVENT,
   attachHostToolsRuntime,
   attachFilesApi,
@@ -266,7 +271,11 @@ const AiAgentProviders = ({
                         eventBus={ctx.eventBus}
                       >
                         <StoresHydrator />
-                        {children}
+                        <AiChatStoreProvider>
+                          <AiChatStoresBridge />
+                          {getAgentRoomId ? null : <AgentRoomIdSync />}
+                          {children}
+                        </AiChatStoreProvider>
                       </ToolsProvider>
                     </ImagesProvider>
                   </ThemeProvider>
@@ -284,3 +293,10 @@ export default AiAgentProviders;
 
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
 export type { Profile } from "@onlyoffice/ai-chat";
+
+export {
+  AiChatStore,
+  AiChatStoreProvider,
+  useAiChatStore,
+} from "./ai-chat-store";
+export type { AiChatRouterPage } from "./ai-chat-store";
