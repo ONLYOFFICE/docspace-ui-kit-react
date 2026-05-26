@@ -223,6 +223,12 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
 
   if (shouldShowLoader) return <AdditionalStoragePageLoader />;
 
+  const getTotalNextStoragePrice = () => {
+    if (!nextStoragePlanSize) return;
+
+    return calculateTotalPrice(+nextStoragePlanSize, storagePriceIncrement);
+  };
+
   return (
     <div className={styles.container}>
       <ServiceToggleSection
@@ -323,8 +329,8 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
               i18nKey="SubscriptionAutoRenewedWithUpdate"
               values={{
                 finalDate: storageExpiryDate,
-                price: formatWalletCurrency(monthlyPrice, 2),
-                amount: `${currentStoragePlanSize} ${t("Gigabyte")}`,
+                price: formatWalletCurrency(getTotalNextStoragePrice(), 2),
+                amount: `${nextStoragePlanSize} ${t("Gigabyte")}`,
               }}
               components={{
                 1: <Text fontWeight="600" as="span" />,
@@ -383,3 +389,4 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
 };
 
 export default observer(AdditionalStoragePage);
+

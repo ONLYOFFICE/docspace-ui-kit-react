@@ -84,7 +84,7 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
   const { isWaitingCalculation } = usePaymentContext();
 
   const title = !hasStorageSubscription
-    ? t("Buy")
+    ? t("UpgradeNow")
     : isExceedingStorageLimit
       ? t("SendRequest")
       : t("Update");
@@ -138,3 +138,4 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
 };
 
 export default observer(ButtonContainer);
+
