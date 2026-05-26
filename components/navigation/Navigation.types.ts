@@ -242,7 +242,7 @@ export type TNavigationProps = Omit<
     isCurrentFolderInfo: boolean;
 
     isRoom: boolean;
-    hideInfoPanel: () => void;
+    hideInfoPanel?: () => void;
     burgerLogo: string;
     showRootFolderTitle: boolean;
     titleIcon: string;

@@ -122,6 +122,20 @@ const NavMenuSubItemWrapper = ({
             {content}
           </button>
         )}
+        {subItem.showBadge && (
+          <div
+            className={styles.subItemBadge}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            {subItem.badgeComponent ?? (
+              <Badge
+                label={subItem.labelBadge}
+                onClick={() => subItem.onClickBadge?.(subItem.id)}
+              />
+            )}
+          </div>
+        )}
       </div>
     </li>
   );
@@ -170,10 +184,17 @@ const NavMenuItemWrapper = ({
 
   const content = (
     <>
-      {item.iconNode ? (
-        <div className={styles.nodeIcon}>{item.iconNode}</div>
-      ) : item.icon ? (
-        <ReactSVG className={styles.itemIcon} src={item.icon} />
+      {item.iconNode || item.icon ? (
+        <div className={styles.itemIconWrapper}>
+          {item.iconNode ? (
+            <div className={styles.nodeIcon}>{item.iconNode}</div>
+          ) : (
+            <ReactSVG className={styles.itemIcon} src={item.icon!} />
+          )}
+          {item.showBadge && (
+            <span className={styles.itemSignalDot} />
+          )}
+        </div>
       ) : null}
       <span className={styles.itemText}>{item.label}</span>
     </>
@@ -323,6 +344,10 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
               iconNode: sub.iconNode,
               onClick: sub.onClick ? () => sub.onClick?.(sub) : undefined,
               linkData: sub.linkData,
+              showBadge: sub.showBadge,
+              labelBadge: sub.labelBadge,
+              badgeComponent: sub.badgeComponent,
+              onClickBadge: sub.onClickBadge,
             });
           }
         }

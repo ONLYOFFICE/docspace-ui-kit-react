@@ -323,6 +323,7 @@ export const DarkTheme: Story = {
 export const WithBadge: Story = {
   render: () => {
     const [activeId, setActiveId] = useState("rooms");
+    const [iconOnly, setIconOnly] = useState(false);
 
     const groups: NavMenuGroup[] = [
       {
@@ -355,7 +356,18 @@ export const WithBadge: Story = {
       },
     ];
 
-    return <NavMenu groups={groups} activeItemId={activeId} />;
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <NavMenu groups={groups} activeItemId={activeId} iconOnly={iconOnly} />
+        <button
+          type="button"
+          style={{ alignSelf: "flex-start", fontSize: 12 }}
+          onClick={() => setIconOnly((v) => !v)}
+        >
+          Toggle iconOnly (signal dot)
+        </button>
+      </div>
+    );
   },
 };
 
