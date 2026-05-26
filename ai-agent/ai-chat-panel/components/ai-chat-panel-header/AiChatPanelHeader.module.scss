@@ -41,6 +41,11 @@
   @include mixins.mobile {
     height: var(--section-header-height-mobile, 53px);
   }
+
+  .disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .left {

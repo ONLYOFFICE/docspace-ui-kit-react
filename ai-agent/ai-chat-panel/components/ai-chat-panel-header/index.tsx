@@ -87,6 +87,9 @@ const AiChatPanelHeader = ({
           <IconButton
             iconNode={isFullscreen ? <CollapseIcon /> : <ExpandIcon />}
             size={17}
+            className={classNames(styles.fullscreenToggle, {
+              [styles.disabled]: isFullscreenToggleDisabled,
+            })}
             onClick={onToggleFullscreen}
             isDisabled={isFullscreenToggleDisabled}
             tooltipId={
