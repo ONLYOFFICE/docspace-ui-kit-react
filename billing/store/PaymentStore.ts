@@ -315,7 +315,10 @@ class PaymentStore {
     if (!this._currentUserEmail || !this.tariff.walletCustomerEmail)
       return false;
 
-    return this._currentUserEmail === this.tariff.walletCustomerEmail;
+    return (
+      this._currentUserEmail.toLowerCase() ===
+      this.tariff.walletCustomerEmail.toLowerCase()
+    );
   }
 
   get isServiceActionDisabled() {
@@ -1284,3 +1287,4 @@ class PaymentStore {
 }
 
 export default PaymentStore;
+
