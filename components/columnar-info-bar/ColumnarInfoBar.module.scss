@@ -1,0 +1,134 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors" as colors;
+@use "../../styles/variables/devices" as devices;
+
+.bar {
+  :global(.light) & {
+    --cib-bg: #{colors.$snackbar-light-background};
+    --cib-color: #{colors.$black};
+    --cib-accent: #{colors.$light-status-warning};
+  }
+
+  :global(.dark) & {
+    --cib-bg: #{colors.$light-dark-gray-hover};
+    --cib-color: #{colors.$white};
+    --cib-accent: #{colors.$light-status-warning};
+  }
+}
+
+.neutral {
+  :global(.light) & {
+    --cib-bg: #{colors.$gray-light};
+    --cib-accent: transparent;
+  }
+
+  :global(.dark) & {
+    --cib-bg: #{colors.$dark-gray-light};
+    --cib-accent: transparent;
+  }
+}
+
+.bar {
+
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  background-color: var(--cib-bg);
+  color: var(--cib-color);
+  border-inline-start: 4px solid var(--cib-accent);
+  box-sizing: border-box;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.header {
+  padding: 14px 16px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cib-accent);
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.column {
+  box-sizing: border-box;
+  min-height: 56px;
+  padding: 8px 16px 16px;
+
+  @media (max-width: #{devices.$mobile}) {
+    width: 100%;
+  }
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cib-color);
+  opacity: 0.6;
+  margin-bottom: 10px;
+}
+
+.value {
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.closeBtn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}

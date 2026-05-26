@@ -62,15 +62,19 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
     maxAvailableManagersCount,
     canUpdateTariff,
     managersCount,
-    isAlreadyPaid,
     isPayer,
+    isAlreadyPaid,
     cardLinked,
     getPaymentLink,
     formatPaymentCurrency,
   } = store;
 
-  const { isGracePeriod, isNotPaidPeriod, walletCustomerStatusNotActive } =
-    store.tariff;
+  const {
+    isGracePeriod,
+    isNotPaidPeriod,
+    walletCustomerStatusNotActive,
+    walletCustomerEmail,
+  } = store.tariff;
   const { isYearTariff } = store.quotas;
   const { planCost, addedManagersCountTitle } = store.paymentQuotas;
 
@@ -179,24 +183,44 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
 
         <TotalTariffContainer t={t} isDisabled={isDisabled} />
 
-        {!isNotPaidPeriod && isPayer && walletCustomerStatusNotActive ? (
+        {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
           <div className={styles.cardUnlinkedWarning}>
             <Text fontWeight={600} className={styles.warningColor}>
-              {t("CardUnlinked")}
+              {t("PaymentMethodUnlinked")}
             </Text>
-            <Text as="span" className={styles.warningColor}>
-              {t("LinkNewCard")}
-            </Text>
-            <div>
-              <Link
-                onClick={goLinkCard}
-                fontWeight={600}
-                textDecoration="underline"
-                color="accent"
-              >
-                {t("AddPaymentMethod")}
-              </Link>
-            </div>
+            {isPayer ? (
+              <Text as="span" className={styles.warningColor}>
+                {t("LinkPaymentMethod")}
+              </Text>
+            ) : (
+              <Text className={styles.warningColor}>
+                <CommonTrans
+                  i18nKey="LinkNewPaymentMethodEmail"
+                  values={{ email: walletCustomerEmail }}
+                  components={{
+                    1: (
+                      <Link
+                        href={`mailto:${walletCustomerEmail}`}
+                        color="accent"
+                        textDecoration="underline"
+                      />
+                    ),
+                  }}
+                />
+              </Text>
+            )}
+            {isPayer ? (
+              <div>
+                <Link
+                  onClick={goLinkCard}
+                  fontWeight={600}
+                  textDecoration="underline"
+                  color="accent"
+                >
+                  {t("AddPaymentMethod")}
+                </Link>
+              </div>
+            ) : null}
           </div>
         ) : null}
 

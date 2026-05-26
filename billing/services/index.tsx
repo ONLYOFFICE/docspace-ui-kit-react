@@ -263,10 +263,15 @@ const Services = observer(
       }
 
       if (id === BACKUP_SERVICE && !isCardLinkedToPortal) {
-        setConfirmActionType(id);
-        setIsConfirmDialogVisible(true);
+        setIsTopUpBalanceVisible(true);
         return;
       }
+
+      // if (id === BACKUP_SERVICE && !isCardLinkedToPortal) {
+      //   setConfirmActionType(id);
+      //   setIsConfirmDialogVisible(true);
+      //   return;
+      // }
 
       updateDialogVisibility(id, true);
     };
@@ -309,26 +314,31 @@ const Services = observer(
         }
       }
 
-      if (!currentEnabled || id === BACKUP_SERVICE || id === AI_ENUM)
-        setIsConfirmDialogVisible(true);
-      else {
-        const raw: ChangeWalletServiceStateRequestDto = {
-          service: toWalletService(confirmActionType!),
-          enabled: false,
-        };
-
-        changeServiceState(id);
-
-        try {
-          await paymentApi.changeTenantWalletServiceState({
-            changeWalletServiceStateRequestDto: raw,
-          });
-        } catch (error) {
-          console.error(error);
-          toastr.error(t("UnexpectedError"));
-          changeServiceState(id);
-        }
+      if (id === BACKUP_SERVICE && !isCardLinkedToPortal) {
+        setIsTopUpBalanceVisible(true);
+        return;
       }
+
+      // if (!currentEnabled || id === BACKUP_SERVICE || id === AI_ENUM) {
+      //   setIsConfirmDialogVisible(true);
+      // } else {
+      const raw: ChangeWalletServiceStateRequestDto = {
+        service: toWalletService(id),
+        enabled: !currentEnabled,
+      };
+
+      changeServiceState(id);
+
+      try {
+        await paymentApi.changeTenantWalletServiceState({
+          changeWalletServiceStateRequestDto: raw,
+        });
+      } catch (error) {
+        console.error(error);
+        toastr.error(t("UnexpectedError"));
+        changeServiceState(id);
+      }
+      //}
     };
 
     const onCloseGracePeriodModal = () => {
@@ -467,3 +477,4 @@ const Services = observer(
 );
 
 export default Services;
+
