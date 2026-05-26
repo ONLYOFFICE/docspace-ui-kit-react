@@ -61,8 +61,13 @@ class AiChatStore {
     return this.hasProfiles;
   }
 
+  // Both `settings` and `initial-setup` are settings-like flows that
+  // must occupy the full panel and disable the user-facing fullscreen
+  // toggle.
   get isOnSettingsPage(): boolean {
-    return this.currentPage === "settings";
+    return (
+      this.currentPage === "settings" || this.currentPage === "initial-setup"
+    );
   }
 
   // Fullscreen is forced when:
