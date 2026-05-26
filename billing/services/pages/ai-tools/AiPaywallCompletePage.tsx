@@ -152,7 +152,7 @@ const AiPaywallCompletePage = () => {
         setStatus("success");
       } catch (e) {
         console.error("[ai-paywall callback] top-up failed", e);
-        toastr.error(e);
+        toastr.error(e as Error);
         setStatus("error");
       }
     };
