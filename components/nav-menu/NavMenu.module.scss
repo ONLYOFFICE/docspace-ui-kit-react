@@ -260,6 +260,8 @@
 
 .subItemWrapper {
   position: relative;
+  display: flex;
+  align-items: stretch;
 }
 
 // Groups sub-items inside a single submenu without splitting them into
@@ -362,6 +364,15 @@
   &.active .subItemText {
     color: var(--nav-menu-item-text-active-color);
   }
+}
+
+.subItemBadge {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-inline-end: 12px;
 }
 
 .subItemText {

@@ -55,6 +55,10 @@ export type NavSubItem = {
    * splitting the sub-menu into multiple groups).
    */
   withTopSeparator?: boolean;
+  showBadge?: boolean;
+  labelBadge?: string | number;
+  badgeComponent?: React.ReactNode;
+  onClickBadge?: (id: string) => void;
 };
 
 export type NavMenuItem = {

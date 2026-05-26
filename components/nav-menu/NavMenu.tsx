@@ -122,6 +122,20 @@ const NavMenuSubItemWrapper = ({
             {content}
           </button>
         )}
+        {subItem.showBadge && (
+          <div
+            className={styles.subItemBadge}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            {subItem.badgeComponent ?? (
+              <Badge
+                label={subItem.labelBadge}
+                onClick={() => subItem.onClickBadge?.(subItem.id)}
+              />
+            )}
+          </div>
+        )}
       </div>
     </li>
   );
