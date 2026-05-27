@@ -35,7 +35,8 @@ import { TabsOverride } from "./tabs";
 export const componentOverrides: ComponentOverrides = {
   Button: ButtonOverride,
   ComboBox: ComboBoxOverride,
-  DropdownMenu: DropdownMenuOverride,
+  // DropdownMenu: DropdownMenuOverride,
   Tabs: TabsOverride,
   // IconButton: IconButtonOverride,
 };
+
