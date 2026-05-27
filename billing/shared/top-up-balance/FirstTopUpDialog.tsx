@@ -57,25 +57,41 @@ import styles from "./styles/FirstTopUpDialog.module.scss";
 
 const MIN_AMOUNT = "10";
 const PAYMENT_CALLBACK_PATH = "/billing/payment-complete";
-const POLL_INTERVAL_MS = 3000;
+const POLL_INITIAL_INTERVAL_MS = 3000;
+const POLL_MAX_INTERVAL_MS = 30000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 
-const sleep = (ms: number) =>
+const sleep = (ms: number, signal: AbortSignal) =>
   new Promise<void>((resolve) => {
-    setTimeout(resolve, ms);
+    if (signal.aborted) {
+      resolve();
+      return;
+    }
+    const timer = setTimeout(resolve, ms);
+    signal.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timer);
+        resolve();
+      },
+      { once: true },
+    );
   });
 
 const pollUntil = async (
   check: () => Promise<boolean>,
-  isMountedRef: React.RefObject<boolean>,
+  signal: AbortSignal,
 ) => {
   const startedAt = Date.now();
-  while (isMountedRef.current) {
+  let interval = POLL_INITIAL_INTERVAL_MS;
+  while (!signal.aborted) {
     if (await check()) return;
+    if (signal.aborted) return;
     if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
       throw new Error("Polling timeout");
     }
-    await sleep(POLL_INTERVAL_MS);
+    await sleep(interval, signal);
+    interval = Math.min(interval * 2, POLL_MAX_INTERVAL_MS);
   }
 };
 
@@ -101,19 +117,19 @@ const openStripeCheckout = async (
 
 const waitForTopUpCompletion = async (
   paymentStore: PaymentStore,
-  isMountedRef: React.RefObject<boolean>,
+  signal: AbortSignal,
 ) => {
   const initialBalance = paymentStore.walletBalance;
 
   await pollUntil(async () => {
     await paymentStore.tariff.fetchCustomerInfo(true);
     return !!paymentStore.tariff.walletCustomerEmail;
-  }, isMountedRef);
+  }, signal);
 
   await pollUntil(async () => {
     await paymentStore.fetchBalance(true);
     return paymentStore.walletBalance > initialBalance;
-  }, isMountedRef);
+  }, signal);
 };
 
 type FirstTopUpDialogProps = {
@@ -134,12 +150,11 @@ const FirstTopUpDialogContent = observer(
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const isMountedRef = useRef(true);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
-      isMountedRef.current = true;
       return () => {
-        isMountedRef.current = false;
+        abortControllerRef.current?.abort();
       };
     }, []);
 
@@ -148,25 +163,29 @@ const FirstTopUpDialogContent = observer(
     const onContinue = async () => {
       if (isDisabled) return;
 
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+      const { signal } = controller;
+
       setIsLoading(true);
 
       try {
         await openStripeCheckout(paymentStore, amount);
 
-        await waitForTopUpCompletion(paymentStore, isMountedRef);
+        await waitForTopUpCompletion(paymentStore, signal);
 
-        if (!isMountedRef.current) return;
+        if (signal.aborted) return;
 
         await onConfirm?.();
 
-        if (!isMountedRef.current) return;
+        if (signal.aborted) return;
 
         onClose();
       } catch (error) {
         console.error("[first-topup] flow failed", error);
-        if (isMountedRef.current) toastr.error(t("UnexpectedError"));
+        if (!signal.aborted) toastr.error(t("UnexpectedError"));
       } finally {
-        if (isMountedRef.current) setIsLoading(false);
+        if (!signal.aborted) setIsLoading(false);
       }
     };
 
