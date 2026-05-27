@@ -56,6 +56,7 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import { useApi } from "../../providers";
 import TopUpModal from "../shared/top-up-balance/TopUpModal";
+import AIServiceDialog from "./panels/ai-service/AIServiceDialog";
 
 import ServicesItems from "./ServicesItems";
 import ServicesLoader from "./ServicesLoader";
@@ -64,7 +65,7 @@ import StoragePlanUpgrade from "./panels/additional-storage/StoragePlanUpgrade";
 import StoragePlanCancel from "./panels/additional-storage/StoragePlanCancel";
 import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
-import AIServiceDialog from "./panels/ai-service/AIServiceDialog";
+import FirstTopUpDialog from "../shared/top-up-balance/FirstTopUpDialog";
 import { getBrandName } from "../../constants/brands";
 type TServicesProps = {
   showPortalSettingsLoader?: boolean;
@@ -103,8 +104,12 @@ const Services = observer(
       servicesInit,
     } = servicesStore;
 
-    const { isGracePeriod, previousStoragePlanSize, currentStoragePlanSize } =
-      paymentStore.tariff;
+    const {
+      isGracePeriod,
+      previousStoragePlanSize,
+      currentStoragePlanSize,
+      walletCustomerEmail,
+    } = paymentStore.tariff;
     const { isFreeTariff } = paymentStore.quotas;
     const { logoText } = paymentStore;
 
@@ -141,6 +146,8 @@ const Services = observer(
     const [previousValue, setPreviousValue] = useState("");
 
     const [isTopUpBalanceVisible, setIsTopUpBalanceVisible] = useState(false);
+    const [isFirstTopUpDialogVisible, setIsFirstTopUpDialogVisible] =
+      useState(false);
 
     const shouldShowLoader = !isInitServicesPage;
 
@@ -235,6 +242,11 @@ const Services = observer(
     const onClick = (id: string) => {
       setConfirmActionType(id);
 
+      if (!walletCustomerEmail) {
+        setIsFirstTopUpDialogVisible(true);
+        return;
+      }
+
       if (
         id === TOTAL_SIZE &&
         (currentStoragePlanSize || previousStoragePlanSize)
@@ -267,12 +279,6 @@ const Services = observer(
         return;
       }
 
-      // if (id === BACKUP_SERVICE && !isCardLinkedToPortal) {
-      //   setConfirmActionType(id);
-      //   setIsConfirmDialogVisible(true);
-      //   return;
-      // }
-
       updateDialogVisibility(id, true);
     };
 
@@ -287,6 +293,11 @@ const Services = observer(
     const onToggle = async (id: string, currentEnabled: boolean) => {
       setConfirmActionType(id);
       setIsCurrentConfirmState(currentEnabled);
+
+      if (!walletCustomerEmail) {
+        setIsFirstTopUpDialogVisible(true);
+        return;
+      }
 
       if (id === TOTAL_SIZE) {
         if (isGracePeriod) {
@@ -319,9 +330,6 @@ const Services = observer(
         return;
       }
 
-      // if (!currentEnabled || id === BACKUP_SERVICE || id === AI_ENUM) {
-      //   setIsConfirmDialogVisible(true);
-      // } else {
       const raw: ChangeWalletServiceStateRequestDto = {
         service: toWalletService(id),
         enabled: !currentEnabled,
@@ -338,15 +346,10 @@ const Services = observer(
         toastr.error(t("UnexpectedError"));
         changeServiceState(id);
       }
-      //}
     };
 
     const onCloseGracePeriodModal = () => {
       setIsGracePeriodModalVisible(false);
-    };
-
-    const onCloseAiService = () => {
-      updateDialogVisibility(AI_ENUM, false);
     };
 
     const onCloseConfirmDialog = () => {
@@ -360,31 +363,19 @@ const Services = observer(
       setIsConfirmDialogVisible(false);
     };
 
-    const onConfirm = async () => {
-      if (!confirmActionType) return;
+    const getServiceSuccessMessage = (id: string) => {
+      if (id === BACKUP_SERVICE) return t("BackupServiceEnabled");
+      if (id === AI_ENUM) return t("AIToolsEnabled");
+      return undefined;
+    };
 
+    const applyServiceStateChange = async (id: string, enabled: boolean) => {
       const raw: ChangeWalletServiceStateRequestDto = {
-        service: toWalletService(confirmActionType),
-        enabled: !isCurrentConfirmState,
+        service: toWalletService(id),
+        enabled,
       };
 
-      setIsConfirmDialogVisible(false);
-
-      if (confirmActionType === BACKUP_SERVICE && !isCardLinkedToPortal) {
-        setIsTopUpBalanceVisible(true);
-        return;
-      }
-
-      changeServiceState(confirmActionType);
-
-      const getSuccessMessage = () => {
-        if (confirmActionType === BACKUP_SERVICE) {
-          return t("BackupServiceEnabled");
-        }
-        if (confirmActionType === AI_ENUM) {
-          return t("AIToolsEnabled");
-        }
-      };
+      changeServiceState(id);
 
       try {
         const result = await paymentApi.changeTenantWalletServiceState({
@@ -393,20 +384,54 @@ const Services = observer(
 
         if (!result) {
           toastr.error(t("UnexpectedError"));
-          changeServiceState(confirmActionType);
-          return;
+          changeServiceState(id);
+          return false;
         }
 
-        if (!isCurrentConfirmState) toastr.success(getSuccessMessage());
+        if (enabled) {
+          const successMessage = getServiceSuccessMessage(id);
+          if (successMessage) toastr.success(successMessage);
+        }
 
-        if (confirmActionType === AI_ENUM) {
+        if (id === AI_ENUM) {
           await getAIConfig?.();
         }
+
+        return true;
       } catch (error) {
         console.error(error);
         toastr.error(t("UnexpectedError"));
-        changeServiceState(confirmActionType);
+        changeServiceState(id);
+        return false;
       }
+    };
+
+    const onConfirm = async () => {
+      if (!confirmActionType) return;
+
+      setIsConfirmDialogVisible(false);
+
+      if (confirmActionType === BACKUP_SERVICE && !isCardLinkedToPortal) {
+        setIsTopUpBalanceVisible(true);
+        return;
+      }
+
+      await applyServiceStateChange(confirmActionType, !isCurrentConfirmState);
+    };
+
+    const onFirstTopUpConfirmed = async () => {
+      if (!confirmActionType) return;
+
+      if (confirmActionType !== BACKUP_SERVICE) {
+        updateDialogVisibility(confirmActionType, true);
+        return;
+      }
+
+      await applyServiceStateChange(confirmActionType, !isCurrentConfirmState);
+    };
+
+    const onCloseAiService = () => {
+      updateDialogVisibility(AI_ENUM, false);
     };
 
     const onCloseTopUpModal = (isTopUp: boolean | Event) => {
@@ -456,6 +481,13 @@ const Services = observer(
             onClose={onCloseAiService}
           />
         ) : null}
+        {isFirstTopUpDialogVisible ? (
+          <FirstTopUpDialog
+            visible={isFirstTopUpDialogVisible}
+            onClose={() => setIsFirstTopUpDialogVisible(false)}
+            onConfirm={onFirstTopUpConfirmed}
+          />
+        ) : null}
         {isConfirmDialogVisible && confirmActionType ? (
           <ConfirmationDialog
             visible={isConfirmDialogVisible}
@@ -466,10 +498,18 @@ const Services = observer(
           />
         ) : null}
         {isTopUpBalanceVisible ? (
-          <TopUpModal
-            visible={isTopUpBalanceVisible}
-            onClose={onCloseTopUpModal}
-          />
+          !isCardLinkedToPortal ? (
+            <FirstTopUpDialog
+              visible={isTopUpBalanceVisible}
+              onClose={() => onCloseTopUpModal(false)}
+              onConfirm={onConfirm}
+            />
+          ) : (
+            <TopUpModal
+              visible={isTopUpBalanceVisible}
+              onClose={onCloseTopUpModal}
+            />
+          )
         ) : null}
       </>
     );
