@@ -175,7 +175,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const isWaitingRef = useRef(false);
 
-  const reccomendedAmount = isPaymentBlockedByBalance
+  const recommendedAmount = isPaymentBlockedByBalance
     ? hasStorageSubscription && isUpgradeStoragePlan
       ? Math.ceil(partialUpgradeFee - walletBalance)
       : Math.ceil(totalPrice - walletBalance)
@@ -370,7 +370,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       isVisibleContainer={isVisibleContainer}
       onCloseTopUpModal={onCloseTopUpModal}
       amount={+amount}
-      initialAmount={reccomendedAmount}
+      initialAmount={recommendedAmount}
     />
   ) : null;
 
@@ -473,7 +473,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
                   totalPrice={totalPrice}
                   isUpgradeStoragePlan={isUpgradeStoragePlan}
                   isDowngradeStoragePlan={isDowngradeStoragePlan}
-                  reccomendedAmount={reccomendedAmount}
+                  recommendedAmount={recommendedAmount}
                   hasMinError={hasMinError}
                   isExceedingStorageLimit={isExceedingStorageLimit}
                 />

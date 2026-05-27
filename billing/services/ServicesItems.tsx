@@ -101,6 +101,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     wasFirstAiServiceTopUp,
   } = servicesStore;
 
+  const { isFreeTariff } = paymentStore.quotas;
+
   const {
     isGracePeriod,
     hasScheduledStorageChange,
@@ -211,7 +213,9 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
       case BACKUP_SERVICE:
         if (isBackupServiceOn && availableBackupsCount === 0) {
-          return t("BackupsNotAvailable");
+          return isFreeTariff
+            ? t("BackupsNotAvailable")
+            : t("AdditionalBackupsNotAvailable");
         }
 
         if (isBackupServiceOn) {

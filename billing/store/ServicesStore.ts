@@ -64,7 +64,7 @@ class ServicesStore {
 
   partialUpgradeFee: number = 0;
 
-  reccomendedAmount: number = 0;
+  recommendedAmount: number = 0;
 
   featureCountData: number = 0;
 
@@ -231,8 +231,8 @@ class ServicesStore {
     this.confirmActionType = value;
   };
 
-  setReccomendedAmount = (amount: number) => {
-    this.reccomendedAmount = amount;
+  setRecommendedAmount = (amount: number) => {
+    this.recommendedAmount = amount;
   };
 
   setFeatureCountData = (featureCountData: number) => {
@@ -572,7 +572,7 @@ class ServicesStore {
           const amount = Number(amountParam);
           const recommendedAmount = Number(recommendedAmountParam);
 
-          this.setReccomendedAmount(Math.ceil(recommendedAmount));
+          this.setRecommendedAmount(Math.ceil(recommendedAmount));
           this.setFeatureCountData(amount);
         }
 
