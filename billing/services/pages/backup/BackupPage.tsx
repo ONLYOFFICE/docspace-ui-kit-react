@@ -165,7 +165,7 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
         title={
           <Text fontSize="12px" fontWeight={400}>
             <CommonTrans
-              i18nKey="BackupTitle"
+              i18nKey={isFreeTariff ? "BackupTitle" : "AdditionalBackupTitle"}
               values={{
                 currency: formatWalletCurrency(backupServicePrice, 2),
               }}
