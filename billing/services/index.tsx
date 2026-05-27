@@ -279,12 +279,6 @@ const Services = observer(
         return;
       }
 
-      // if (id === BACKUP_SERVICE && !isCardLinkedToPortal) {
-      //   setConfirmActionType(id);
-      //   setIsConfirmDialogVisible(true);
-      //   return;
-      // }
-
       updateDialogVisibility(id, true);
     };
 
@@ -336,9 +330,6 @@ const Services = observer(
         return;
       }
 
-      // if (!currentEnabled || id === BACKUP_SERVICE || id === AI_ENUM) {
-      //   setIsConfirmDialogVisible(true);
-      // } else {
       const raw: ChangeWalletServiceStateRequestDto = {
         service: toWalletService(id),
         enabled: !currentEnabled,
@@ -355,7 +346,6 @@ const Services = observer(
         toastr.error(t("UnexpectedError"));
         changeServiceState(id);
       }
-      //}
     };
 
     const onCloseGracePeriodModal = () => {
