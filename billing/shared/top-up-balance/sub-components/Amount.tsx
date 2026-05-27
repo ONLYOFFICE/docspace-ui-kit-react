@@ -50,7 +50,7 @@ type AmountProps = {
   isDisabled: boolean;
   walletCustomerEmail?: string;
   walletCustomerStatusNotActive?: boolean;
-  reccomendedAmount?: string;
+  recommendedAmount?: string;
   formatWalletCurrency?: (item: number, fractionDigits?: number) => string;
   minValue?: string;
   maxValue?: string;
@@ -64,7 +64,7 @@ const Amount = (props: AmountProps) => {
     walletCustomerEmail,
     isDisabled,
     walletCustomerStatusNotActive,
-    reccomendedAmount,
+    recommendedAmount,
     formatWalletCurrency,
     minValue,
     maxValue,
@@ -187,10 +187,10 @@ const Amount = (props: AmountProps) => {
             testId="top_up_amount_input"
             hasError={hasError}
           />
-          {reccomendedAmount ? (
-            <Text className={styles.reccomendedAmount}>
+          {recommendedAmount ? (
+            <Text className={styles.recommendedAmount}>
               {t("RecommendedTopUpAmount", {
-                amount: formatWalletCurrency!(+reccomendedAmount, 0),
+                amount: formatWalletCurrency!(+recommendedAmount, 0),
               })}
             </Text>
           ) : null}

@@ -78,7 +78,7 @@ const Wallet = (props: WalletProps) => {
     canUpdateTariff,
     cardLinked,
     isPayer,
-    reccomendedAmount,
+    recommendedAmount,
     walletHelpUrl,
     isAutoTopUpInProgress,
   } = store;
@@ -261,7 +261,7 @@ const Wallet = (props: WalletProps) => {
           visible={visible}
           onClose={onClose}
           isEditAutoPayment={isEditAutoPayment}
-          reccomendedAmount={reccomendedAmount}
+          recommendedAmount={recommendedAmount}
         />
       ) : null}
 

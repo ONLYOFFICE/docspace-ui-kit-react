@@ -60,9 +60,9 @@ const TopUpContainer = (props: TopUpContainerTypes) => {
   const servicesStore = useServicesStore();
 
   const { storageServiceName } = paymentStore;
-  const { reccomendedAmount = 0 } = servicesStore;
+  const { recommendedAmount = 0 } = servicesStore;
 
-  const reccomended = initialAmount ?? reccomendedAmount;
+  const recommended = initialAmount ?? recommendedAmount;
 
   return isVisibleContainer ? (
     <TopUpModal
@@ -73,8 +73,8 @@ const TopUpContainer = (props: TopUpContainerTypes) => {
         onBackClick: onCloseTopUpModal,
         onCloseClick: onCloseTopUpModal,
       }}
-      {...(reccomended > 0 && {
-        reccomendedAmount: reccomended.toString(),
+      {...(recommended > 0 && {
+        recommendedAmount: recommended.toString(),
         amount: amount!.toString(),
       })}
       serviceName={storageServiceName ?? DISK_STORAGE}

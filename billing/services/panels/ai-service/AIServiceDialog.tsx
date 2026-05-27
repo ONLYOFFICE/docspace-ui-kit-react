@@ -150,7 +150,7 @@ const AIServiceDialog: React.FC<AIServiceDialogProps> = ({
           onCloseClick: onClose,
         }}
         {...(recommendedAmount > 0 && {
-          reccomendedAmount: recommendedAmount.toString(),
+          recommendedAmount: recommendedAmount.toString(),
           amount: selectedAmount.toString(),
         })}
         serviceName={AI_TOOLS}
