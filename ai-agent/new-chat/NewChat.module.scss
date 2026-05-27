@@ -28,11 +28,22 @@
   display: flex;
   flex-direction: column;
 
-  height: 100%;
+  // Rendered directly inside `.infoPanel` (flex column with the chat
+  // header as a fixed-height sibling). `flex: 1; min-height: 0` keeps it
+  // bounded to the remaining space so inner overflow can scroll instead
+  // of pushing the panel past the viewport.
+  flex: 1 1 0;
+  min-height: 0;
   box-sizing: border-box;
 
+  // Library applies `h-full` (height: 100%) on `.aui-root`; with the
+  // 64px ChatToolbar above it the column overflows the parent by exactly
+  // 64px and the inner Thread.Viewport never gets a bounded height to
+  // scroll inside. Switch to flex-grow so it takes the remainder instead.
   :global(.aui-root) {
-    height: 100%;
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
     box-sizing: border-box;
   }
 
