@@ -56,6 +56,7 @@ import {
 } from "@onlyoffice/ai-chat";
 import type {
   ChatCallbacks,
+  ComposerAction,
   HostTool,
   ProviderType,
   ServerAPIConfig,
@@ -122,6 +123,7 @@ type AiAgentProvidersProps = {
   getAgentRoomId?: () => number | null;
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
+  composerActions?: ComposerAction[];
   children: ReactNode;
 };
 
@@ -161,6 +163,7 @@ const AiAgentProviders = ({
   getAgentRoomId,
   openResultFile,
   closeEditorPanel,
+  composerActions,
   children,
 }: AiAgentProvidersProps) => {
   const aiChatLocale = normalizeAiChatLocale(locale);
@@ -192,6 +195,11 @@ const AiAgentProviders = ({
   const hostToolGroups = useMemo(
     () => [buildEditorToolGroup(editorTools)],
     [editorTools],
+  );
+
+  const widgetConfig = useMemo(
+    () => ({ composerActions }),
+    [composerActions],
   );
 
   const { stores, ctx, serverApiConfig } = useMemo(() => {
@@ -253,7 +261,7 @@ const AiAgentProviders = ({
       <PlatformProvider platform={platformAdapter}>
         <AiChatI18nIsolator locale={aiChatLocale}>
           <ComponentsProvider overrides={componentOverrides}>
-            <WidgetConfigProvider>
+            <WidgetConfigProvider config={widgetConfig}>
               <ApiProvider config={serverApiConfig}>
                 <StoresProvider stores={stores}>
                   <ThemeProvider theme={theme} customThemes={portalThemes}>
@@ -285,7 +293,7 @@ const AiAgentProviders = ({
 export default AiAgentProviders;
 
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
-export type { Profile } from "@onlyoffice/ai-chat";
+export type { ComposerAction, Profile } from "@onlyoffice/ai-chat";
 
 export {
   AiChatStore,
