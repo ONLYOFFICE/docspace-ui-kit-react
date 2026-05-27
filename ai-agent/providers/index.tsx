@@ -124,6 +124,7 @@ type AiAgentProvidersProps = {
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
   composerActions?: ComposerAction[];
+  entityId?: string;
   children: ReactNode;
 };
 
@@ -164,6 +165,7 @@ const AiAgentProviders = ({
   openResultFile,
   closeEditorPanel,
   composerActions,
+  entityId,
   children,
 }: AiAgentProvidersProps) => {
   const aiChatLocale = normalizeAiChatLocale(locale);
@@ -198,8 +200,8 @@ const AiAgentProviders = ({
   );
 
   const widgetConfig = useMemo(
-    () => ({ composerActions }),
-    [composerActions],
+    () => ({ composerActions, entityId }),
+    [composerActions, entityId],
   );
 
   const { stores, ctx, serverApiConfig } = useMemo(() => {
@@ -232,10 +234,15 @@ const AiAgentProviders = ({
     // No `engines` argument → every method call routes over HTTP to the
     // backend mounted at `${origin}${baseUrl}`.
     const api = createServerAPI(config);
-    const appStores = createStores({ keys: storeKeys, ctx: appCtx, api });
+    const appStores = createStores({
+      keys: storeKeys,
+      ctx: appCtx,
+      api,
+      entityId,
+    });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
-  }, [isStandalone]);
+  }, [isStandalone, entityId]);
 
   useEffect(() => {
     attachHostToolsRuntime({
