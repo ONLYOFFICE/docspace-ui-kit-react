@@ -70,16 +70,32 @@ export enum ButtonKeys {
   space = "Space",
 }
 
+/**
+ * Canonical mapping of numeric roomType codes used in WebSocket messages
+ * (e.g. `s:modify-folder` payload field `roomType`).
+ *
+ * This enum is the single source of truth. When adding a new value,
+ * notify the analytics team so they can update their event tracking.
+ *
+ * | Code | Name            |
+ * |------|-----------------|
+ * |  1   | FormRoom        |
+ * |  2   | EditingRoom     |
+ * |  5   | CustomRoom      |
+ * |  6   | PublicRoom      |
+ * |  8   | VirtualDataRoom |
+ * |  9   | AIRoom          |
+ */
 export enum RoomsType {
-  AIRoom = 9,
-  PublicRoom = 6,
   FormRoom = 1,
-  // FillingFormsRoom= 1, //TODO: Restore when certs will be done
+  // FillingFormsRoom = 1, // TODO: Restore when certs will be done
   EditingRoom = 2,
-  // ReviewRoom: 3, //TODO: Restore when certs will be done
-  // ReadOnlyRoom: 4, //TODO: Restore when certs will be done
-  VirtualDataRoom = 8,
+  // ReviewRoom = 3,   // TODO: Restore when certs will be done
+  // ReadOnlyRoom = 4, // TODO: Restore when certs will be done
   CustomRoom = 5,
+  PublicRoom = 6,
+  VirtualDataRoom = 8,
+  AIRoom = 9,
 }
 
 /**
