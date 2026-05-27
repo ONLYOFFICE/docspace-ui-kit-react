@@ -59,7 +59,7 @@ type TopUpModalProps = {
     onBackClick: () => void;
     onCloseClick: () => void;
   };
-  reccomendedAmount?: string;
+  recommendedAmount?: string;
   amount?: string;
   afterTopUp?: () => void;
   serviceName?: string;
@@ -71,7 +71,7 @@ const TopUpModal = (props: TopUpModalProps) => {
     onClose,
     isEditAutoPayment,
     headerProps,
-    reccomendedAmount,
+    recommendedAmount,
     amount,
     afterTopUp,
     serviceName,
@@ -110,7 +110,7 @@ const TopUpModal = (props: TopUpModalProps) => {
   };
 
   return (
-    <AmountProvider initialAmount={reccomendedAmount}>
+    <AmountProvider initialAmount={recommendedAmount}>
       <ModalDialog
         visible={visible}
         onClose={() => onClose(false)}
@@ -128,7 +128,7 @@ const TopUpModal = (props: TopUpModalProps) => {
               accountLink={accountLink!}
               isDisabled={isLoading}
               walletCustomerStatusNotActive={walletCustomerStatusNotActive!}
-              reccomendedAmount={reccomendedAmount}
+              recommendedAmount={recommendedAmount}
               amount={amount}
             />
 
@@ -137,7 +137,7 @@ const TopUpModal = (props: TopUpModalProps) => {
               walletCustomerEmail={walletCustomerEmail!}
               isDisabled={(isLoading || walletCustomerStatusNotActive) ?? false}
               walletCustomerStatusNotActive={walletCustomerStatusNotActive}
-              reccomendedAmount={reccomendedAmount}
+              recommendedAmount={recommendedAmount}
             />
 
             {wasFirstTopUp && walletCustomerEmail ? (

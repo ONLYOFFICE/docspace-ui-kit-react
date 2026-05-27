@@ -236,7 +236,7 @@ class PaymentStore {
 
   private _transactionTimerId: ReturnType<typeof setTimeout> | null = null;
 
-  reccomendedAmount = "";
+  recommendedAmount = "";
 
   mobileBreakpoint?: number;
 
@@ -535,8 +535,8 @@ class PaymentStore {
     this.isLoading = isLoading;
   };
 
-  setReccomendedAmount = (amount: string) => {
-    this.reccomendedAmount = amount;
+  setRecommendedAmount = (amount: string) => {
+    this.recommendedAmount = amount;
   };
 
   updatePreviousBalance = () => {
@@ -1116,13 +1116,13 @@ class PaymentStore {
       const priceParam = params.get("price");
 
       if (priceParam) {
-        const reccomendedAmount = this.walletBalance - Number(priceParam);
-        if (reccomendedAmount < 0)
-          this.setReccomendedAmount(
-            Math.ceil(Math.abs(reccomendedAmount)).toString(),
+        const recommendedAmount = this.walletBalance - Number(priceParam);
+        if (recommendedAmount < 0)
+          this.setRecommendedAmount(
+            Math.ceil(Math.abs(recommendedAmount)).toString(),
           );
       } else {
-        this.setReccomendedAmount("");
+        this.setRecommendedAmount("");
       }
 
       if (

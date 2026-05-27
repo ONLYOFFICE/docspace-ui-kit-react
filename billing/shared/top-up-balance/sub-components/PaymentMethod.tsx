@@ -57,7 +57,7 @@ type PaymentMethodProps = {
   accountLink: string;
   isDisabled: boolean;
   walletCustomerStatusNotActive: boolean;
-  reccomendedAmount?: string;
+  recommendedAmount?: string;
   amount?: string;
 };
 
@@ -68,7 +68,7 @@ const PaymentMethod = (props: PaymentMethodProps) => {
     accountLink,
     isDisabled,
     walletCustomerStatusNotActive,
-    reccomendedAmount,
+    recommendedAmount,
     amount,
   } = props;
 
@@ -88,8 +88,8 @@ const PaymentMethod = (props: PaymentMethodProps) => {
     const basicUrl = `${window.location.href}?complete=true&actionType=${confirmActionType ?? ""}`;
     let url = basicUrl;
 
-    if (reccomendedAmount && amount) {
-      url = `${basicUrl}&amount=${amount}&recommendedAmount=${reccomendedAmount}`;
+    if (recommendedAmount && amount) {
+      url = `${basicUrl}&amount=${amount}&recommendedAmount=${recommendedAmount}`;
     }
 
     try {

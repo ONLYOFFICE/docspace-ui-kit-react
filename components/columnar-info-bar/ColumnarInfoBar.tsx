@@ -33,53 +33,56 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { DISK_STORAGE } from "../../../constants";
-import { observer } from "mobx-react";
+import React, { useEffect } from "react";
 
-import TopUpModal from "../../../shared/top-up-balance/TopUpModal";
+import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
 
-import { usePaymentStore } from "../../../store/PaymentStoreProvider";
-import { useServicesStore } from "../../../store/ServicesStoreProvider";
+import type { ColumnarInfoBarProps } from "./ColumnarInfoBar.types";
+import styles from "./ColumnarInfoBar.module.scss";
 
-type TopUpContainerTypes = {
-  isVisibleContainer: boolean;
-  onCloseTopUpModal: () => void;
-  amount?: number;
-  initialAmount?: number;
+const ColumnarInfoBar = ({
+  headerText,
+  columns,
+  onAction,
+  onLoad,
+  style,
+  variant = "default",
+}: ColumnarInfoBarProps) => {
+  useEffect(() => {
+    onLoad?.();
+  }, []);
+
+  const className = [styles.bar, variant === "neutral" ? styles.neutral : ""]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div className={className} style={style}>
+      <div className={styles.content}>
+        {headerText ? (
+          <div className={styles.header}>{headerText}</div>
+        ) : null}
+        <div className={styles.columns}>
+          {columns.map(({ label, value }, i) => (
+            <div key={i} className={styles.column}>
+              <div className={styles.label}>{label}</div>
+              <div className={styles.value}>{value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {onAction ? (
+        <button
+          type="button"
+          className={styles.closeBtn}
+          onClick={onAction}
+          aria-label="Close"
+        >
+          <CrossReactSvg />
+        </button>
+      ) : null}
+    </div>
+  );
 };
 
-const TopUpContainer = (props: TopUpContainerTypes) => {
-  const {
-    isVisibleContainer,
-    onCloseTopUpModal,
-    amount,
-    initialAmount,
-  } = props;
-
-  const paymentStore = usePaymentStore();
-  const servicesStore = useServicesStore();
-
-  const { storageServiceName } = paymentStore;
-  const { recommendedAmount = 0 } = servicesStore;
-
-  const recommended = initialAmount ?? recommendedAmount;
-
-  return isVisibleContainer ? (
-    <TopUpModal
-      visible={isVisibleContainer}
-      onClose={onCloseTopUpModal}
-      headerProps={{
-        isBackButton: true,
-        onBackClick: onCloseTopUpModal,
-        onCloseClick: onCloseTopUpModal,
-      }}
-      {...(recommended > 0 && {
-        recommendedAmount: recommended.toString(),
-        amount: amount!.toString(),
-      })}
-      serviceName={storageServiceName ?? DISK_STORAGE}
-    />
-  ) : null;
-};
-
-export default observer(TopUpContainer);
+export { ColumnarInfoBar };
