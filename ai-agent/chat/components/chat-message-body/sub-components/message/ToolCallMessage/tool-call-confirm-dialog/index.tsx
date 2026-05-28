@@ -67,18 +67,45 @@ export const ToolCallConfirmDialog = observer(
       toolsConfirmQueue,
       addToToolsConfirmQueue,
       removeFromToolsConfirmQueue,
+      generateDocxToolName,
+      generateFormToolName,
+      generatePresentationToolName,
     } = useMessageStore();
     const { aiApi } = useApi();
     const t = useCommonTranslation();
 
-    const onClickAction = (decision: ToolsPermission) => {
+    const isGenerateTool =
+      content.name === generateDocxToolName ||
+      content.name === generateFormToolName ||
+      content.name === generatePresentationToolName;
+
+    const onClickAction = async (decision: ToolsPermission) => {
       if (content.callId) {
-        aiApi.updateToolsPermission(
-          content.callId,
-          alwaysAllow && decision === ToolsPermission.Allow
-            ? ToolsPermission.AlwaysAllow
-            : decision,
-        );
+        if (isGenerateTool) {
+          const allow = decision === ToolsPermission.Allow;
+          const result = await aiApi.updateToolFileDecision(
+            content.callId,
+            allow,
+          );
+
+          if (allow && typeof result?.id === "number") {
+            const searchParams = new URLSearchParams();
+            searchParams.append("fileId", String(result.id));
+            searchParams.append("withTool", "true");
+
+            window.open(
+              `${window.location.origin}/doceditor?${searchParams.toString()}`,
+              "_blank",
+            );
+          }
+        } else {
+          aiApi.updateToolsPermission(
+            content.callId,
+            alwaysAllow && decision === ToolsPermission.Allow
+              ? ToolsPermission.AlwaysAllow
+              : decision,
+          );
+        }
       }
 
       onClose();
@@ -86,7 +113,11 @@ export const ToolCallConfirmDialog = observer(
 
     const onCloseAction = () => {
       if (content.callId) {
-        aiApi.updateToolsPermission(content.callId, ToolsPermission.Deny);
+        if (isGenerateTool) {
+          aiApi.updateToolFileDecision(content.callId, false);
+        } else {
+          aiApi.updateToolsPermission(content.callId, ToolsPermission.Deny);
+        }
       }
 
       onClose();
@@ -122,24 +153,32 @@ export const ToolCallConfirmDialog = observer(
               placement={ToolCallPlacement.ConfirmDialog}
             />
             <div>
-              <Text>{t("ReviewAction")}</Text>
-              <Text>{t("CannotGuaranteeSecurity")}</Text>
+              {isGenerateTool ? (
+                <Text>{t("AIGenerateDocumentDescription")}</Text>
+              ) : (
+                <>
+                  <Text>{t("ReviewAction")}</Text>
+                  <Text>{t("CannotGuaranteeSecurity")}</Text>
+                </>
+              )}
             </div>
           </div>
         </ModalDialog.Body>
 
         <ModalDialog.Footer>
           <div className={styles.toolCallFooter}>
-            <Checkbox
-              isChecked={alwaysAllow}
-              onChange={(e) => setAlwaysAllow(e.target.checked)}
-              label={t("AlwaysAllowToolCall")}
-              data-testid="always-allow-checkbox"
-            />
+            {!isGenerateTool ? (
+              <Checkbox
+                isChecked={alwaysAllow}
+                onChange={(e) => setAlwaysAllow(e.target.checked)}
+                label={t("AlwaysAllowToolCall")}
+                data-testid="always-allow-checkbox"
+              />
+            ) : null}
             <div className={styles.buttonsBlockContainer}>
                <Button
                 primary
-                label={t("Allow")}
+                label={isGenerateTool ? t("Create") : t("Allow")}
                 onClick={() => onClickAction(ToolsPermission.Allow)}
                 scale={isMobile()}
                 size={ButtonSize.normal}
@@ -147,7 +186,7 @@ export const ToolCallConfirmDialog = observer(
               />
               <Button
                 className={styles.denyButton}
-                label={t("Deny")}
+                label={isGenerateTool ? t("CancelButton") : t("Deny")}
                 onClick={() => onClickAction(ToolsPermission.Deny)}
                 size={ButtonSize.normal}
                 scale={isMobile()}
