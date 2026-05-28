@@ -51,6 +51,7 @@ import { formatCurrencyValue } from "../../../utils/common";
 
 import styles from "./AiPaywallCompletePage.module.scss";
 import { toastr } from "../../../../components/toast";
+import { AnalyticsEvents } from "../../../../enums";
 
 type Status = "processing" | "success" | "error";
 
@@ -115,6 +116,12 @@ const AiPaywallCompletePage = () => {
   React.useEffect(() => {
     const run = async () => {
       try {
+        window.dataLayer = window.dataLayer || [];
+
+        window.dataLayer.push({
+          event: AnalyticsEvents.AddPaymentMethod,
+        });
+
         setStepIndex(1);
 
         await withRetry(
@@ -126,6 +133,9 @@ const AiPaywallCompletePage = () => {
           TOPUP_RETRY_DELAY_MS,
         );
 
+        window.dataLayer.push({
+          event: AnalyticsEvents.WalletTopUp,
+        });
 
         if (!isWalletOnly) {
           await rawApiClient.instance.post(

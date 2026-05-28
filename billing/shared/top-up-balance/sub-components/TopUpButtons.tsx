@@ -34,6 +34,10 @@
  */
 
 import React from "react";
+import { observer } from "mobx-react";
+
+import { AnalyticsEvents } from "../../../../enums";
+
 import { useCommonTranslation } from "../../../../utils/i18n";
 
 import { Button, ButtonSize } from "../../../../components/button";
@@ -44,7 +48,6 @@ import { Text } from "../../../../components/text";
 import { useAmountValue } from "../../../wallet/context";
 import styles from "../styles/TopUpModal.module.scss";
 import { AI_TOOLS } from "../../../constants";
-import { observer } from "mobx-react";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
 interface TopUpButtonsProps {
@@ -72,7 +75,7 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
   onTopUpBalance,
   serviceName,
   afterTopUp,
-  isDisabled
+  isDisabled,
 }) => {
   const paymentStore = usePaymentStore();
 
@@ -97,6 +100,13 @@ const TopUpButtons: React.FC<TopUpButtonsProps> = ({
 
       if (!res) {
         throw new Error(t("UnexpectedError"));
+      }
+
+      if (!serviceName) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: AnalyticsEvents.WalletTopUp,
+        });
       }
 
       const requests: Promise<unknown>[] = [
