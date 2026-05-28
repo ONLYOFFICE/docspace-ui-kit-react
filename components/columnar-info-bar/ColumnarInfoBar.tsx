@@ -93,9 +93,7 @@ const ColumnarInfoBar = ({
   return (
     <div className={className} style={style}>
       <div className={styles.content}>
-        {headerText ? (
-          <div className={styles.header}>{headerText}</div>
-        ) : null}
+        {headerText ? <div className={styles.header}>{headerText}</div> : null}
         <div className={styles.columns}>
           {columns.map(({ label, value }, i) => (
             <div key={i} className={styles.column}>
@@ -120,3 +118,4 @@ const ColumnarInfoBar = ({
 };
 
 export { ColumnarInfoBar };
+
