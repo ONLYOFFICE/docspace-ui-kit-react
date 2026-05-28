@@ -117,7 +117,7 @@ const createToastContent = (
   title: string,
 ) => (
   <div
-    data-testId="toast-content"
+    data-testid="toast-content"
     className={styles.toastContent}
     data-type={type}
   >
