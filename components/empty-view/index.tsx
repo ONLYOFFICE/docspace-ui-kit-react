@@ -48,6 +48,7 @@ const EmptyView = ({
   LinkRouter,
   className,
   bodyClassName,
+  extraContent,
 }: EmptyViewProps) => {
   return (
     <div
@@ -68,6 +69,7 @@ const EmptyView = ({
           {description}
         </Text>
       </div>
+      {extraContent ? extraContent : null}
       {options ? (
         <div
           className={`${styles.body}${bodyClassName ? ` ${bodyClassName}` : ""}`}

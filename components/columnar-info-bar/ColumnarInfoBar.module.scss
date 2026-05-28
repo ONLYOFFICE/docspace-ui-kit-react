@@ -44,20 +44,7 @@
   }
 }
 
-.neutral {
-  :global(.light) & {
-    --cib-bg: #{colors.$gray-light};
-    --cib-accent: transparent;
-  }
-
-  :global(.dark) & {
-    --cib-bg: #{colors.$dark-gray-light};
-    --cib-accent: transparent;
-  }
-}
-
 .bar {
-
   width: 100%;
   display: flex;
   align-items: flex-start;
@@ -77,7 +64,7 @@
   padding: 14px 16px 0;
   font-size: 13px;
   font-weight: 600;
-  color: var(--cib-accent);
+  color: var(--cib-header-color, var(--cib-accent));
 }
 
 .columns {
@@ -130,5 +117,118 @@
   svg {
     width: 12px;
     height: 12px;
+  }
+}
+
+@keyframes barReveal {
+  from {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+  to {
+    opacity: 1;
+    max-height: 150px;
+    margin: 4px;
+  }
+}
+
+// Must come after .bar to override border-inline-start
+.page {
+  flex-direction: column;
+  align-items: stretch;
+  border-inline-start: none;
+  border-radius: 6px;
+  padding: 20px;
+  gap: 12px;
+
+  :global(.light) & {
+    --cib-bg: #{colors.$gray-light};
+    --cib-accent: transparent;
+    --cib-header-color: #{colors.$black};
+  }
+
+  :global(.dark) & {
+    --cib-bg: #{colors.$dark-gray-light};
+    --cib-accent: transparent;
+    --cib-header-color: #{colors.$white};
+  }
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+
+  .header {
+    flex: 1;
+    padding: 0;
+    font-size: 14px;
+    line-height: 16px;
+    color: var(--cib-header-color);
+  }
+
+  .closeBtn {
+    flex-shrink: 0;
+    padding: 0;
+    opacity: 1;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.page .columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 0;
+}
+
+.page .column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  min-height: unset;
+}
+
+.page .label {
+  opacity: 1;
+  margin-bottom: 0;
+  color: #{colors.$gray};
+  line-height: 16px;
+}
+
+.page .value {
+  gap: 4px;
+  line-height: 20px;
+}
+
+// Must come after .bar to override border-inline-start
+.neutral {
+  border-inline-start: none;
+  border-radius: 8px;
+  margin: 4px;
+  width: calc(100% - 8px);
+  animation: barReveal 0.4s ease-out both;
+
+  :global(.light) & {
+    --cib-bg: #{colors.$gray-light};
+    --cib-accent: transparent;
+    --cib-header-color: #{colors.$light-blue-main};
+    border: 2px solid #{colors.$light-blue-main-disabled};
+  }
+
+  :global(.dark) & {
+    --cib-bg: #{colors.$dark-gray-light};
+    --cib-accent: transparent;
+    --cib-header-color: #{colors.$light-blue-main};
+    border: 2px solid #{colors.$light-blue-main-disabled};
   }
 }
