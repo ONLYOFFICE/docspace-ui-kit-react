@@ -34,6 +34,7 @@
  */
 
 import React from "react";
+import classNames from "classnames";
 import { observer } from "mobx-react";
 
 import { ToolsPermission } from "../../../../../../../../enums";
@@ -48,6 +49,7 @@ import {
 } from "../../../../../../../../components/modal-dialog";
 
 import styles from "../../../../ChatMessageBody.module.scss";
+import chatStyles from "../../../../../chat-container/ChatContainer.module.scss";
 import { ToolCall } from "../tool-call";
 import { isMobile } from "../../../../../../../../utils";
 import { useCommonTranslation } from "../../../../../../../../utils/i18n";
@@ -145,7 +147,9 @@ export const ToolCallConfirmDialog = observer(
         </ModalDialog.Header>
 
         <ModalDialog.Body>
-          <div className={styles.toolCallManage}>
+          <div
+            className={classNames(styles.toolCallManage, chatStyles.chatTokens)}
+          >
             <Text>{t("AIWouldLikeToUseThisTool")}</Text>
             <ToolCall
               content={content}
@@ -166,7 +170,9 @@ export const ToolCallConfirmDialog = observer(
         </ModalDialog.Body>
 
         <ModalDialog.Footer>
-          <div className={styles.toolCallFooter}>
+          <div
+            className={classNames(styles.toolCallFooter, chatStyles.chatTokens)}
+          >
             {!isGenerateTool ? (
               <Checkbox
                 isChecked={alwaysAllow}
