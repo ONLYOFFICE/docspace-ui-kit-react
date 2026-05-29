@@ -1254,7 +1254,7 @@ packages:
       '@emnapi/runtime': ^1.7.1
 
   '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-3.7.0.tgz':
-    resolution: {integrity: sha512-Sp2tFtcc8Yq9BrO8fnaFst6uJYR7LJYmvFuvj3J2QWHaA2ugVnauTUAfwg7dIbzdmpyD8IzM8iIct1EdXvnJkQ==, tarball: file:onlyoffice-docspace-api-sdk-3.7.0.tgz}
+    resolution: {integrity: sha512-QllfkKJOZzgVmN+VMD9+r/vCwY2xHmxdFIZN9TNpg7Ea7fi9Q3UNAZQPmnTMu6DlEuBb0Ztc188Bca2RK0nhrg==, tarball: file:onlyoffice-docspace-api-sdk-3.7.0.tgz}
     version: 3.7.0
 
   '@onlyoffice/document-editor-react@2.1.1':
