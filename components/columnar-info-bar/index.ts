@@ -33,47 +33,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import classNames from "classnames";
-
-import { Scrollbar } from "../../scrollbar";
-import { DeviceType } from "../../../enums";
-
-import { SectionContainerProps } from "../Section.types";
-import styles from "../Section.module.scss";
-
-const SectionContainer = ({
-  ref: forwardRef,
-  withBodyScroll,
-  children,
-  currentDeviceType,
-  isInfoPanelVisible,
-  isSectionHeaderAvailable,
-  bannerContent,
-}: SectionContainerProps) => {
-  return (
-    <div
-      ref={forwardRef}
-      id="section"
-      className={classNames(styles.sectionContainer, {
-        [styles.withBodyScroll]: withBodyScroll,
-        [styles.infoPanelVisible]: isInfoPanelVisible,
-        [styles.withoutSectionHeader]: !isSectionHeaderAvailable,
-      })}
-    >
-      {bannerContent ? (
-        <div className="section-banner">{bannerContent}</div>
-      ) : null}
-      {withBodyScroll && currentDeviceType !== DeviceType.mobile ? (
-        <Scrollbar id="sectionScroll" scrollClass="section-scroll" fixedSize>
-          {children}
-        </Scrollbar>
-      ) : (
-        children
-      )}
-    </div>
-  );
-};
-
-SectionContainer.displayName = "SectionContainer";
-
-export default SectionContainer;
+export type {
+  ColumnarInfoBarColumn,
+  ColumnarInfoBarProps,
+} from "./ColumnarInfoBar.types";
+export { ColumnarInfoBar } from "./ColumnarInfoBar";

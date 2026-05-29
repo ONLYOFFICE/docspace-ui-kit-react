@@ -98,6 +98,7 @@ export type SectionContainerProps = {
   children: React.ReactNode;
   withBodyScroll: boolean;
   currentDeviceType?: DeviceType;
+  bannerContent?: React.ReactNode;
 };
 
 export type SectionFilterProps = {
@@ -139,7 +140,7 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     SectionBodyProps,
     "children" | "isSectionHeaderAvailable" | "autoFocus" | "withScroll"
   > & {
-    children: React.JSX.Element[];
+    children: React.ReactNode;
     progressBarDropDownContent?: React.ReactNode;
     onOpenUploadPanel?: () => void;
     isTabletView?: boolean;

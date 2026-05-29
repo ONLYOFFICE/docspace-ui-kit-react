@@ -491,6 +491,22 @@
     padding-inline-start: 16px;
   }
 
+  :global(.section-banner) {
+    padding-inline: 20px;
+    flex-shrink: 0;
+
+    @include mixins.tablet-and-below {
+      padding-inline: 16px;
+    }
+  }
+
+  &:has(:global(.section-banner)) {
+    :global(#sectionScroll) {
+      flex: 1 1 0 !important;
+      height: 0 !important;
+    }
+  }
+
   :global {
     .section-scroll {
       > .scroll-body {

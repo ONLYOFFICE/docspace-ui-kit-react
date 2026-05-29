@@ -33,47 +33,18 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import classNames from "classnames";
+import type React from "react";
 
-import { Scrollbar } from "../../scrollbar";
-import { DeviceType } from "../../../enums";
-
-import { SectionContainerProps } from "../Section.types";
-import styles from "../Section.module.scss";
-
-const SectionContainer = ({
-  ref: forwardRef,
-  withBodyScroll,
-  children,
-  currentDeviceType,
-  isInfoPanelVisible,
-  isSectionHeaderAvailable,
-  bannerContent,
-}: SectionContainerProps) => {
-  return (
-    <div
-      ref={forwardRef}
-      id="section"
-      className={classNames(styles.sectionContainer, {
-        [styles.withBodyScroll]: withBodyScroll,
-        [styles.infoPanelVisible]: isInfoPanelVisible,
-        [styles.withoutSectionHeader]: !isSectionHeaderAvailable,
-      })}
-    >
-      {bannerContent ? (
-        <div className="section-banner">{bannerContent}</div>
-      ) : null}
-      {withBodyScroll && currentDeviceType !== DeviceType.mobile ? (
-        <Scrollbar id="sectionScroll" scrollClass="section-scroll" fixedSize>
-          {children}
-        </Scrollbar>
-      ) : (
-        children
-      )}
-    </div>
-  );
+export type ColumnarInfoBarColumn = {
+  label: React.ReactNode;
+  value: React.ReactNode;
 };
 
-SectionContainer.displayName = "SectionContainer";
-
-export default SectionContainer;
+export type ColumnarInfoBarProps = {
+  headerText?: string;
+  columns: ColumnarInfoBarColumn[];
+  onAction?: () => void;
+  onLoad?: () => void;
+  style?: React.CSSProperties;
+  variant?: "default" | "neutral";
+};

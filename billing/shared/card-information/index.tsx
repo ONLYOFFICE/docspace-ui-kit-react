@@ -70,7 +70,7 @@ const CardInfoComponent = ({
 
       <div className={styles.cardContent}>
         <Text fontSize="14px" fontWeight={600} lineHeight="16px">
-          {walletCustomerStatusNotActive ? t("CardUnlinked") : t("CardLinked")}
+          {walletCustomerStatusNotActive ? t("Unlinked") : t("Linked")}
         </Text>
       </div>
 
@@ -90,3 +90,4 @@ const CardInfoComponent = ({
 };
 
 export const CardInformation = observer(CardInfoComponent);
+
