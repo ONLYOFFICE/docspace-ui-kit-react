@@ -57,7 +57,7 @@ export const parseChildren = (children: React.ReactNode) => {
   let sectionSubmenuContent: React.JSX.Element | null = null;
   let sectionBannerContent: React.JSX.Element | null = null;
 
-  React.Children.forEach(children, (child: React.JSX.Element) => {
+  React.Children.forEach(children as React.ReactElement[], (child: React.JSX.Element) => {
     if (!React.isValidElement(child)) return;
 
     const type = child.type as { displayName?: string; name?: string };
