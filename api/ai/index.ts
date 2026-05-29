@@ -211,6 +211,22 @@ export class AiApi extends BaseCustomApi {
     }
   }
 
+  async updateToolFileDecision(callId: string, allow: boolean) {
+    try {
+      return await this.request<{
+        id: number;
+        title: string;
+        extension: string;
+      }>(`/ai/chats/tool-files/${callId}/decision`, {
+        method: "POST",
+        data: { allow },
+      });
+    } catch (e) {
+      console.log(e);
+      toastr.error(e as string);
+    }
+  }
+
   startNewChat(
     roomId: number | string,
     message: string,
