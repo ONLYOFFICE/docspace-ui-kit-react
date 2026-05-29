@@ -46,10 +46,7 @@ import {
   SECTION_BANNER_NAME,
 } from "./Section.constants";
 
-export const parseChildren = (children: (React.JSX.Element | null)[]) => {
-  const validChildren = children.filter(
-    (c): c is React.JSX.Element => c !== null,
-  );
+export const parseChildren = (children: React.ReactNode) => {
   let sectionHeaderContent: React.JSX.Element | null = null;
   let sectionFilterContent: React.JSX.Element | null = null;
   let sectionBodyContent: React.JSX.Element | null = null;
@@ -60,7 +57,7 @@ export const parseChildren = (children: (React.JSX.Element | null)[]) => {
   let sectionSubmenuContent: React.JSX.Element | null = null;
   let sectionBannerContent: React.JSX.Element | null = null;
 
-  React.Children.forEach(validChildren, (child: React.JSX.Element) => {
+  React.Children.forEach(children, (child: React.JSX.Element) => {
     if (!React.isValidElement(child)) return;
 
     const type = child.type as { displayName?: string; name?: string };

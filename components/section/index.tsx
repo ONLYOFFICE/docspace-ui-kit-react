@@ -172,7 +172,7 @@ const Section = (props: SectionProps) => {
     infoPanelHeaderContent,
     sectionSubmenuContent,
     sectionBannerContent,
-  ]: (React.JSX.Element | null)[] = parseChildren(children);
+  ] = parseChildren(children);
 
   const isSectionHeaderAvailable = !!sectionHeaderContent;
   const isSectionFilterAvailable = !!sectionFilterContent;
