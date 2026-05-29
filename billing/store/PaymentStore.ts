@@ -36,7 +36,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type {
   PaymentApi,
-  PaymentApiGetCheckoutSetupUrlRequest,
   PaymentUrlRequestDto,
   ProfilesApi,
   PortalQuotaApi,
@@ -736,15 +735,14 @@ class PaymentStore {
       window.location.origin,
       "/portal-settings/payments/wallet?complete=true&type=wallet",
     );
-
     try {
       const res = await this.paymentApi.getCheckoutSetupUrl(
-        {
-          backUrl,
-          successUrl,
-        } as PaymentApiGetCheckoutSetupUrlRequest & { successUrl: string },
+        { backUrl },
         {
           signal: abortController.signal,
+          // TEMP: SDK schema lacks `successUrl`; passing it via axios `params`
+          // until the SDK is regenerated to include it in the request type.
+          params: { successUrl },
         },
       );
 
