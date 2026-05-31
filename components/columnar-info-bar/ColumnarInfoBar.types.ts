@@ -46,5 +46,5 @@ export type ColumnarInfoBarProps = {
   onAction?: () => void;
   onLoad?: () => void;
   style?: React.CSSProperties;
-  variant?: "default" | "neutral";
+  variant?: "default" | "neutral" | "page";
 };

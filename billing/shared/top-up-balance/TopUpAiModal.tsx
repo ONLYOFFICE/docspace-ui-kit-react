@@ -64,7 +64,7 @@ type TopUpAiModalProps = {
   onGetStartedClick: () => void;
   onAmountDifferenceChange?: (diff: number, amount: number) => void;
   visible: boolean;
-  reccomendedAmount?: string;
+  recommendedAmount?: string;
   isLoading?: boolean;
 };
 
@@ -75,7 +75,7 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
     onPricingBillingClick,
     onGetStartedClick,
     isLoading,
-    reccomendedAmount,
+    recommendedAmount,
   } = props;
 
   const store = usePaymentStore();
@@ -113,7 +113,7 @@ const TopUpAiModal = (props: TopUpAiModalProps) => {
         formatWalletCurrency={formatWalletCurrency}
         walletCustomerEmail={walletCustomerEmail}
         isDisabled={isDisabled}
-        reccomendedAmount={reccomendedAmount}
+        recommendedAmount={recommendedAmount}
         minValue={"10"}
       />
 

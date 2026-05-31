@@ -33,13 +33,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import {
-  ApplyFilterOption,
-  FilterType,
-} from "@onlyoffice/docspace-api-sdk";
-import {
-  FilesSelectorFilterTypes,
-} from "../../enums";
+import { ApplyFilterOption, FilterType } from "@onlyoffice/docspace-api-sdk";
+import { FilesSelectorFilterTypes } from "../../enums";
 import { TEMPLATE_GALLERY_FORMATS } from "../../constants";
 
 export const getFilterParams = (
@@ -56,7 +51,7 @@ export const getFilterParams = (
     extension?: string;
     applyFilterOption?: ApplyFilterOption;
   } = {
-    applyFilterOption: applyFilterOption ?? ApplyFilterOption.Files,
+    applyFilterOption: applyFilterOption,
   };
 
   switch (filterParam) {
@@ -150,3 +145,4 @@ export const getFilterParams = (
 
   return result;
 };
+

@@ -95,9 +95,6 @@ export default class MessageStore {
 
   toolsConfirmQueue: string[] = [];
 
-  openFileConfirmQueue: Array<{ fileId: number; title: string }> =
-    [];
-
   onStreamData?: (chunk: string) => void;
 
   constructor(aiApi: AiApi) {
@@ -113,20 +110,6 @@ export default class MessageStore {
     this.toolsConfirmQueue = this.toolsConfirmQueue.filter(
       (item) => item !== id,
     );
-  };
-
-  addToOpenFileConfirmQueue = (entry: {
-    fileId: number;
-    title: string;
-  }) => {
-    this.openFileConfirmQueue.push(entry);
-  };
-
-  removeFromOpenFileConfirmQueue = (fileId: number) => {
-    this.openFileConfirmQueue =
-      this.openFileConfirmQueue.filter(
-        (item) => item.fileId !== fileId,
-      );
   };
 
   addMessage = (message: TMessage) => {
@@ -402,36 +385,6 @@ export default class MessageStore {
     }
   };
 
-  handleGenerateDoc = (content: TToolCallContent) => {
-    const { type } = content;
-
-    if (type !== ContentType.Tool) return;
-
-    const { name, result } = content;
-
-    if (
-      name !== this.generateDocxToolName &&
-      name !== this.generateFormToolName &&
-      name !== this.generatePresentationToolName
-    )
-      return;
-
-    const data = (result as { data?: { id?: number; title?: string } })?.data;
-
-    if (typeof data?.id !== "number" || typeof data?.title !== "string") {
-      console.error("Unexpected generateDoc result shape", data);
-      return;
-    }
-
-    const fileId = Number(data?.id);
-    if (!Number.isInteger(fileId) || fileId <= 0) return;
-
-    this.addToOpenFileConfirmQueue({
-      fileId,
-      title: data.title,
-    });
-  };
-
   handleToolCall = (jsonData: string) => {
     let parsed;
     try {
@@ -457,12 +410,18 @@ export default class MessageStore {
     const shouldCreateNewMessage =
       lastMessage?.role !== RoleType.AssistantMessage;
 
+    const isGenerateTool =
+      name === this.generateDocxToolName ||
+      name === this.generateFormToolName ||
+      name === this.generatePresentationToolName;
+
     const content = {
       type: ContentType.Tool,
       name,
       arguments: args,
       callId,
       ...rest,
+      ...(isGenerateTool ? { managed: true } : {}),
     };
 
     if (shouldCreateNewMessage) {
@@ -531,8 +490,6 @@ export default class MessageStore {
     };
 
     this.replaceLastMessage(newMsg);
-
-    this.handleGenerateDoc(content);
   };
 
   handleStreamError = (jsonData: string, error?: unknown) => {
@@ -608,7 +565,6 @@ export default class MessageStore {
         analyzeTimer = setTimeout(() => {
           if (
             this.toolsConfirmQueue.length > 0 ||
-            this.openFileConfirmQueue.length > 0 ||
             hasPendingToolCall()
           ) {
             return;

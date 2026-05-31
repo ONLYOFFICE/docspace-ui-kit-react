@@ -49,6 +49,7 @@ import { Link } from "../../../components/link";
 import DowngradePlanButtonContainer from "./DowngradePlanButtonContainer";
 import ChangePricingPlanDialog from "../../dialogs/ChangePricingPlanDialog";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import { AnalyticsEvents } from "../../../enums";
 
 const MANAGER = "manager";
 let timerId: ReturnType<typeof setTimeout> | undefined;
@@ -173,11 +174,13 @@ const UpdatePlanButtonContainer = ({
       const data: { [key: string]: number } = isYearTariff
         ? { adminyear: managersCount }
         : { admin: managersCount };
+
       const updateRes = await paymentApi.updatePayment({
         quantityRequestDto: {
           quantity: data,
         },
       });
+
       const res = updateRes?.data?.response;
 
       if (res === false) {
@@ -208,6 +211,15 @@ const UpdatePlanButtonContainer = ({
 
         return;
       }
+
+      window.dataLayer = window.dataLayer || [];
+
+      window.dataLayer.push({
+        event: AnalyticsEvents.Purchase,
+        ecommerce: {
+          items: [{ item_name: "DocSpace Business" }],
+        },
+      });
 
       previousManagersCount = maxCountManagersByQuota;
       const quotaRes = await paymentApi
