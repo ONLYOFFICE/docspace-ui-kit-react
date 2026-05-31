@@ -56,6 +56,22 @@ import {
 
 import type { UseSocketHelperProps } from "../types";
 import { SettingsContext } from "../contexts/Settings";
+
+// Folder ids can be either numeric (server returns number, breadcrumbs/items
+// sometimes carry the same id as a string) or non-numeric strings for
+// third-party providers. Compare numerically when both sides parse as a
+// finite number; otherwise fall back to a strict string compare.
+const idsEqual = (
+  a: number | string | null | undefined,
+  b: number | string | null | undefined,
+) => {
+  if (a == null || b == null) return false;
+  const na = Number(a);
+  const nb = Number(b);
+  if (Number.isFinite(na) && Number.isFinite(nb)) return na === nb;
+  return String(a) === String(b);
+};
+
 const useSocketHelper = ({
   disabledItems,
   disabledFolderType,
@@ -91,10 +107,7 @@ const useSocketHelper = ({
 
     const path = `DIR-${id}`;
 
-    if (
-      socket?.socketSubscribers.has(path) &&
-      folderSubscribers.current.has(path)
-    ) {
+    if (folderSubscribers.current.has(path)) {
       socket?.emit(SocketCommands.Unsubscribe, {
         roomParts: path,
         individual: true,
@@ -102,22 +115,22 @@ const useSocketHelper = ({
 
       folderSubscribers.current.delete(path);
     }
+
+    if (subscribedId.current === id) subscribedId.current = null;
   }, []);
 
   const subscribe = React.useCallback(
     (id: number | string) => {
       const roomParts = `DIR-${id}`;
 
-      if (socket?.socketSubscribers.has(roomParts)) {
-        subscribedId.current = id;
+      if (subscribedId.current && subscribedId.current !== id)
+        unsubscribe(subscribedId.current);
 
-        return;
-      }
+      subscribedId.current = id;
 
-      if (subscribedId.current) unsubscribe(subscribedId.current);
+      if (folderSubscribers.current.has(roomParts)) return;
 
       folderSubscribers.current.add(roomParts);
-      subscribedId.current = id;
 
       socket?.emit(SocketCommands.Subscribe, {
         roomParts,
@@ -134,10 +147,10 @@ const useSocketHelper = ({
 
       if (
         "folderId" in data && data.folderId
-          ? data.folderId !== subscribedId.current
+          ? !idsEqual(data.folderId, subscribedId.current)
           : "parentId" in data &&
             !("roomType" in data) &&
-            data.parentId !== subscribedId.current
+            !idsEqual(data.parentId, subscribedId.current)
       ) {
         return;
       }
@@ -248,13 +261,14 @@ const useSocketHelper = ({
       if (
         (("folderId" in data &&
           data.folderId &&
-          data.folderId !== subscribedId.current) ||
+          !idsEqual(data.folderId, subscribedId.current)) ||
           ("parentId" in data &&
             data.parentId &&
-            data.parentId !== subscribedId.current)) &&
-        data.id !== subscribedId.current
-      )
+            !idsEqual(data.parentId, subscribedId.current))) &&
+        !idsEqual(data.id, subscribedId.current)
+      ) {
         return;
+      }
 
       let item: TSelectorItem = {} as TSelectorItem;
 
@@ -291,7 +305,7 @@ const useSocketHelper = ({
         }
       }
 
-      if (item?.id === subscribedId.current) {
+      if (idsEqual(item?.id, subscribedId.current)) {
         return setBreadCrumbs?.((value) => {
           if (!value) return value;
 

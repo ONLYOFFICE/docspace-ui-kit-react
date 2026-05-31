@@ -1,0 +1,19 @@
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
+.description {
+  color: var(--text-color);
+}
+
+.helperText {
+  color: var(--text-disable-color);
+  margin-top: -10px;
+}
+
+.footerButtons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
