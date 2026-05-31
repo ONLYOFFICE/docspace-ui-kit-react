@@ -71,8 +71,7 @@
   padding: 16px;
   flex: 1 1 0;
   min-width: 0;
-  aspect-ratio: 1;
-  max-width: 172px;
+  height: 172px;
   background-color: var(--_tile-bg);
   border: none;
   border-radius: 12px;
@@ -110,7 +109,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 1;
-  width: 63%; // ~108px at max tile width of 172px
+  height: 100px;
   aspect-ratio: 108 / 100;
   min-width: 0;
 
@@ -140,5 +139,6 @@
   @include media-queries.mobile {
     flex: 0 0 80px;
     max-width: 80px;
+    height: 80px;
   }
 }
