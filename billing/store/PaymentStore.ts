@@ -726,15 +726,17 @@ class PaymentStore {
     }
   };
 
-  fetchCardLinked = async (url?: string) => {
+  fetchCardLinked = async (url?: string, successUrl?: string) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
     const backUrl = url || `${window.location.href}?complete=true`;
-    const successUrl = combineUrl(
-      window.location.origin,
-      "/portal-settings/payments/wallet?complete=true&type=wallet",
-    );
+    const resolvedSuccessUrl =
+      successUrl ||
+      combineUrl(
+        window.location.origin,
+        "/portal-settings/payments/wallet?complete=true&type=wallet",
+      );
     try {
       const res = await this.paymentApi.getCheckoutSetupUrl(
         { backUrl },
@@ -742,7 +744,7 @@ class PaymentStore {
           signal: abortController.signal,
           // TEMP: SDK schema lacks `successUrl`; passing it via axios `params`
           // until the SDK is regenerated to include it in the request type.
-          params: { successUrl },
+          params: { successUrl: resolvedSuccessUrl },
         },
       );
 
