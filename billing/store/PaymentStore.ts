@@ -998,7 +998,9 @@ class PaymentStore {
 
   init = async (t: TTranslation) => {
     const url = window.location.href;
-    if (url.includes("complete=true") && url.includes("type=tariff")) {
+    const isRefresh = url.includes("complete=true");
+
+    if (isRefresh && url.includes("type=tariff")) {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: AnalyticsEvents.Purchase,
@@ -1008,7 +1010,7 @@ class PaymentStore {
       });
     }
 
-    await this.tariff.fetchCustomerInfo();
+    await this.tariff.fetchCustomerInfo(isRefresh);
 
     if (this.isInitPaymentPage) {
       await this.basicSettings();
@@ -1017,7 +1019,7 @@ class PaymentStore {
 
     const requests: Promise<unknown>[] = [];
 
-    await this.tariff.fetchPortalTariff();
+    await this.tariff.fetchPortalTariff(isRefresh);
 
     requests.push(
       this.getSettingsPayment(),
