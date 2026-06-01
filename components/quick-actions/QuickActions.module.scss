@@ -53,12 +53,7 @@
   width: 100%;
 
   @include media-queries.mobile {
-    overflow-x: auto;
-    scrollbar-width: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
+    flex-wrap: wrap;
   }
 }
 
@@ -119,8 +114,7 @@
   }
 
   @include media-queries.mobile {
-    width: 80%;
-    aspect-ratio: 1;
+    height: 60px;
   }
 }
 
@@ -129,16 +123,16 @@
   font-weight: 400;
   line-height: 20px;
   word-break: break-word;
-
-  @include media-queries.mobile {
-    display: none;
-  }
 }
 
 .tile {
+  // Two tiles per row on mobile: each takes half the width minus half the gap.
+  // Tiles also shrink to a more compact height on small screens.
   @include media-queries.mobile {
-    flex: 0 0 80px;
-    max-width: 80px;
-    height: 80px;
+    flex: 1 1 calc(50% - 8px);
+    max-width: calc(50% - 8px);
+    height: 120px;
+    gap: 8px;
+    padding: 12px;
   }
 }
