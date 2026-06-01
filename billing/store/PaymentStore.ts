@@ -36,7 +36,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type {
   PaymentApi,
-  PaymentApiGetCheckoutSetupUrlRequest,
   PaymentUrlRequestDto,
   ProfilesApi,
   PortalQuotaApi,
@@ -736,15 +735,14 @@ class PaymentStore {
       window.location.origin,
       "/portal-settings/payments/wallet?complete=true&type=wallet",
     );
-
     try {
       const res = await this.paymentApi.getCheckoutSetupUrl(
-        {
-          backUrl,
-          successUrl,
-        } as PaymentApiGetCheckoutSetupUrlRequest & { successUrl: string },
+        { backUrl },
         {
           signal: abortController.signal,
+          // TEMP: SDK schema lacks `successUrl`; passing it via axios `params`
+          // until the SDK is regenerated to include it in the request type.
+          params: { successUrl },
         },
       );
 
@@ -1000,7 +998,9 @@ class PaymentStore {
 
   init = async (t: TTranslation) => {
     const url = window.location.href;
-    if (url.includes("complete=true") && url.includes("type=tariff")) {
+    const isRefresh = url.includes("complete=true");
+
+    if (isRefresh && url.includes("type=tariff")) {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: AnalyticsEvents.Purchase,
@@ -1010,7 +1010,7 @@ class PaymentStore {
       });
     }
 
-    await this.tariff.fetchCustomerInfo();
+    await this.tariff.fetchCustomerInfo(isRefresh);
 
     if (this.isInitPaymentPage) {
       await this.basicSettings();
@@ -1019,7 +1019,7 @@ class PaymentStore {
 
     const requests: Promise<unknown>[] = [];
 
-    await this.tariff.fetchPortalTariff();
+    await this.tariff.fetchPortalTariff(isRefresh);
 
     requests.push(
       this.getSettingsPayment(),

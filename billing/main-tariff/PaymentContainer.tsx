@@ -114,7 +114,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
       );
     }
 
-    console.log("isPaidPeriod", isPaidPeriod, "isFreeTariff", isFreeTariff);
     if (isPaidPeriod || isGracePeriod) {
       return (
         <Text fontSize="16px" isBold>
@@ -281,3 +280,4 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
 });
 
 export default PaymentContainer;
+
