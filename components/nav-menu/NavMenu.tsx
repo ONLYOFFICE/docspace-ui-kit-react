@@ -201,7 +201,19 @@ const NavMenuItemWrapper = ({
   );
 
   return (
-    <li>
+    <li
+      className={classNames({
+        [styles.endOfActiveSection]: item.endOfActiveSection,
+        [styles.flattenedChild]: item.isFlattenedChild,
+      })}
+      style={
+        item.isFlattenedChild
+          ? ({
+              "--flatten-index": item.flattenIndex ?? 0,
+            } as React.CSSProperties)
+          : undefined
+      }
+    >
       <div
         ref={parentElementRef as React.RefObject<HTMLDivElement>}
         className={styles.itemWrapper}
@@ -336,7 +348,8 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
           item.id === activeItemId ||
           item.children?.some((sub) => sub.id === activeItemId);
         if (isActiveParent) {
-          for (const sub of item.children ?? []) {
+          const children = item.children ?? [];
+          children.forEach((sub, index) => {
             flat.push({
               id: sub.id,
               label: sub.label,
@@ -348,8 +361,13 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
               labelBadge: sub.labelBadge,
               badgeComponent: sub.badgeComponent,
               onClickBadge: sub.onClickBadge,
+              // Reveal animation for flattened children in icon-only mode.
+              isFlattenedChild: true,
+              flattenIndex: index,
+              // Spacer below the active section's last item in icon-only mode.
+              endOfActiveSection: index === children.length - 1,
             });
-          }
+          });
         }
       }
       return flat;

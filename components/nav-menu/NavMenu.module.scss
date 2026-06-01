@@ -160,6 +160,17 @@
   }
 }
 
+@keyframes flattenReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .item {
   position: relative;
   z-index: 1;
@@ -270,10 +281,11 @@
 .subItems {
   display: grid;
   grid-template-rows: 0fr;
-  // transition: grid-template-rows 0.25s ease-in-out;
+  transition: grid-template-rows 0.25s ease-in-out;
 
   &.expanded {
     grid-template-rows: 1fr;
+    margin-bottom: 32px;
   }
 }
 
@@ -282,6 +294,19 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+
+  .expanded & {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subItems,
+  .subItemsInner {
+    transition: none;
+  }
 }
 
 .subItemWrapper {
@@ -470,6 +495,23 @@
 
   .itemWrapper:hover .itemSibling:not(.animatedProgress):not(.animatedFinish) {
     background-color: var(--nav-menu-item-bg-hover);
+  }
+
+  // 32px spacer below the active section's last item in collapsed sidebar.
+  .endOfActiveSection {
+    margin-bottom: 32px;
+  }
+
+  // Flattened children of the active section reveal with a staggered fade-in.
+  .flattenedChild {
+    animation: flattenReveal 0.25s ease-in-out both;
+    animation-delay: calc(var(--flatten-index, 0) * 0.04s);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flattenedChild {
+      animation: none;
+    }
   }
 
   .item {
