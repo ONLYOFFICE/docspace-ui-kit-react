@@ -36,6 +36,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type {
   PaymentApi,
+  PaymentUrlRequestDto,
   ProfilesApi,
   PortalQuotaApi,
   CommonSettingsApi,
@@ -60,6 +61,7 @@ import { formatCurrencyValue } from "../utils/common";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
 import { LANGUAGE } from "../../constants";
+import { AnalyticsEvents } from "../../enums";
 import {
   AI_ENUM,
   BACKUP_SERVICE,
@@ -236,7 +238,7 @@ class PaymentStore {
 
   private _transactionTimerId: ReturnType<typeof setTimeout> | null = null;
 
-  reccomendedAmount = "";
+  recommendedAmount = "";
 
   mobileBreakpoint?: number;
 
@@ -535,8 +537,8 @@ class PaymentStore {
     this.isLoading = isLoading;
   };
 
-  setReccomendedAmount = (amount: string) => {
-    this.reccomendedAmount = amount;
+  setRecommendedAmount = (amount: string) => {
+    this.recommendedAmount = amount;
   };
 
   updatePreviousBalance = () => {
@@ -724,19 +726,25 @@ class PaymentStore {
     }
   };
 
-  fetchCardLinked = async (url?: string) => {
+  fetchCardLinked = async (url?: string, successUrl?: string) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
     const backUrl = url || `${window.location.href}?complete=true`;
-
+    const resolvedSuccessUrl =
+      successUrl ||
+      combineUrl(
+        window.location.origin,
+        "/portal-settings/payments/wallet?complete=true&type=wallet",
+      );
     try {
       const res = await this.paymentApi.getCheckoutSetupUrl(
-        {
-          backUrl,
-        },
+        { backUrl },
         {
           signal: abortController.signal,
+          // TEMP: SDK schema lacks `successUrl`; passing it via axios `params`
+          // until the SDK is regenerated to include it in the request type.
+          params: { successUrl: resolvedSuccessUrl },
         },
       );
 
@@ -890,7 +898,11 @@ class PaymentStore {
   getBasicPaymentLink = async (managersCount: number) => {
     const backUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?complete=true",
+      "/portal-settings/payments/portal-payments?cancel=true&type=tariff",
+    );
+    const successUrl = combineUrl(
+      window.location.origin,
+      "/portal-settings/payments/portal-payments?complete=true&type=tariff",
     );
 
     const abortController = new AbortController();
@@ -899,7 +911,11 @@ class PaymentStore {
     try {
       const res = await this.paymentApi.getPaymentUrl(
         {
-          paymentUrlRequestDto: { quantity: { admin: managersCount }, backUrl },
+          paymentUrlRequestDto: {
+            quantity: { admin: managersCount },
+            backUrl,
+            successUrl,
+          } as PaymentUrlRequestDto & { successUrl: string },
         },
         { signal: abortController.signal },
       );
@@ -915,7 +931,11 @@ class PaymentStore {
   getPaymentLink = async (token?: AbortSignal) => {
     const backUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?complete=true",
+      "/portal-settings/payments/portal-payments?cancel=true&type=tariff",
+    );
+    const successUrl = combineUrl(
+      window.location.origin,
+      "/portal-settings/payments/portal-payments?complete=true&type=tariff",
     );
 
     try {
@@ -924,7 +944,8 @@ class PaymentStore {
           paymentUrlRequestDto: {
             quantity: { admin: this.managersCount },
             backUrl,
-          },
+            successUrl,
+          } as PaymentUrlRequestDto & { successUrl: string },
         },
         token ? { signal: token } : undefined,
       );
@@ -978,7 +999,20 @@ class PaymentStore {
   };
 
   init = async (t: TTranslation) => {
-    await this.tariff.fetchCustomerInfo();
+    const url = window.location.href;
+    const isRefresh = url.includes("complete=true");
+
+    if (isRefresh && url.includes("type=tariff")) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: AnalyticsEvents.Purchase,
+        ecommerce: {
+          items: [{ item_name: "DocSpace Business" }],
+        },
+      });
+    }
+
+    await this.tariff.fetchCustomerInfo(isRefresh);
 
     if (this.isInitPaymentPage) {
       await this.basicSettings();
@@ -987,7 +1021,7 @@ class PaymentStore {
 
     const requests: Promise<unknown>[] = [];
 
-    await this.tariff.fetchPortalTariff();
+    await this.tariff.fetchPortalTariff(isRefresh);
 
     requests.push(
       this.getSettingsPayment(),
@@ -1029,7 +1063,15 @@ class PaymentStore {
   };
 
   paymentMethodInit = async (t: TTranslation, integrationUrl?: string) => {
-    const isRefresh = window.location.href.includes("complete=true");
+    const url = window.location.href;
+    const isRefresh = url.includes("complete=true");
+
+    if (isRefresh && url.includes("type=wallet")) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: AnalyticsEvents.AddPaymentMethod,
+      });
+    }
 
     try {
       const requests: Promise<unknown>[] = [];
@@ -1116,13 +1158,13 @@ class PaymentStore {
       const priceParam = params.get("price");
 
       if (priceParam) {
-        const reccomendedAmount = this.walletBalance - Number(priceParam);
-        if (reccomendedAmount < 0)
-          this.setReccomendedAmount(
-            Math.ceil(Math.abs(reccomendedAmount)).toString(),
+        const recommendedAmount = this.walletBalance - Number(priceParam);
+        if (recommendedAmount < 0)
+          this.setRecommendedAmount(
+            Math.ceil(Math.abs(recommendedAmount)).toString(),
           );
       } else {
-        this.setReccomendedAmount("");
+        this.setRecommendedAmount("");
       }
 
       if (

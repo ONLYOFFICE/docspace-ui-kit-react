@@ -108,4 +108,6 @@ export type EmptyViewProps = Omit<
   className?: string;
   /** Optional CSS class name for body styling */
   bodyClassName?: string;
+  /** Optional content rendered between header and options body */
+  extraContent?: React.ReactNode;
 };
