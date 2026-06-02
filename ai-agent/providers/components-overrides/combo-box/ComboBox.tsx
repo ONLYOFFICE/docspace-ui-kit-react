@@ -58,9 +58,15 @@ const ComboBoxOverride: React.FC<AiChatComboBoxProps> = (props) => {
     ): string | React.ElementType | undefined => {
       if (icon == null) return undefined;
       if (typeof icon !== "string") {
+        // DocSpace ComboBox expects a URL string or a component reference, not
+        // rendered JSX. Wrapping JSX in an inline component would allocate a new
+        // reference on every call (breaking memoization downstream) and still
+        // isn't a shape DropDownItem renders, so we don't support it here.
         if (React.isValidElement(icon)) {
-          const Wrapped: React.FC = () => icon;
-          return Wrapped;
+          console.warn(
+            "[ComboBoxOverride] JSX element passed as icon is not supported; " +
+              "pass an icon URL or component reference instead.",
+          );
         }
         return undefined;
       }

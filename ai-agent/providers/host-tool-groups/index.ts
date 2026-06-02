@@ -45,6 +45,15 @@ type ToolsRuntime = {
   eventBus: ChatEventBus;
 };
 
+// SINGLE-MOUNT ASSUMPTION: the mutable state below (toolsRuntime, the two
+// callbacks, editorPanelWindow, editorReady*, nextCallId) is module-level and
+// therefore a singleton shared across every import. This module assumes exactly
+// one live AiAgentProviders at a time. Mounting a second instance concurrently
+// (micro-frontend re-mount, etc.) would share and corrupt this state. Each
+// `attach*` setter overwrites the previous handle, so a remount that re-runs
+// the attach effects re-points cleanly to the latest instance — but two
+// instances alive at once is not supported.
+
 // Handlers run outside React, so a state update via `window.dispatchEvent` +
 // React re-render doesn't commit before the chat lib fires the next LLM
 // request. We keep a direct runtime handle to the chat's servers, store, and
@@ -53,6 +62,17 @@ type ToolsRuntime = {
 let toolsRuntime: ToolsRuntime | null = null;
 
 export const attachHostToolsRuntime = (runtime: ToolsRuntime) => {
+  if (toolsRuntime && toolsRuntime !== runtime) {
+    // A different runtime is already attached — either a remount (expected,
+    // the old instance is gone) or two concurrent providers (unsupported,
+    // see the single-mount note above). Warn so the latter is visible.
+    console.warn(
+      "%c[host-tool-groups] attachHostToolsRuntime called while a runtime " +
+        "was already attached; overwriting. Concurrent AiAgentProviders " +
+        "mounts share module state and are not supported.",
+      "color: orange",
+    );
+  }
   toolsRuntime = runtime;
 };
 
@@ -133,6 +153,12 @@ let editorPanelWindow: Window | null = null;
 let editorReadyPromise: Promise<void> | null = null;
 let editorReadyResolve: (() => void) | null = null;
 
+// Cleanup for the currently-open editor panel (removes its `message` listener
+// and resets the editor state). Held at module scope so a subsequent
+// openEditorPanel() can tear down the previous panel's listener before
+// attaching a new one — otherwise each reopen would leak one listener.
+let activeEditorPanelCleanup: (() => void) | null = null;
+
 const createEditorReadyPromise = () => {
   editorReadyPromise = new Promise<void>((r) => {
     editorReadyResolve = r;
@@ -193,6 +219,12 @@ const callEditorTool = async (
         }),
       );
     }, EDITOR_TOOL_TIMEOUT_MS);
+    // SECURITY: targetOrigin is "*", which broadcasts the tool-call payload
+    // (callId + arguments) to any frame loaded in the editor panel window,
+    // including cross-origin iframes (violates postMessage same-origin guidance,
+    // flagged by MDN). The editor iframe src is built from window.location.origin,
+    // so it is same-origin in practice — capture that origin when the iframe
+    // loads and pass it here instead of "*" to scope the message to the editor.
     target.postMessage(
       { type: CALL_TOOL_MESSAGE, callId, name, arguments: args },
       "*",
@@ -295,6 +327,10 @@ export const EDITOR_PANEL_ID = "ai-agent-editor-panel";
 // openResultFileCallback. The close button removes the panel and notifies
 // the host app to clear related state via closeEditorPanelCallback.
 export const openEditorPanel = (fileId: number | string): void => {
+  // Tear down any previous panel's message listener + editor state first, so
+  // reopening (new file) doesn't accumulate stale listeners. Removing the DOM
+  // node below alone wouldn't detach the window `message` listener.
+  activeEditorPanelCleanup?.();
   document.getElementById(EDITOR_PANEL_ID)?.remove();
 
   openResultFileCallback?.(fileId);
@@ -404,7 +440,11 @@ export const openEditorPanel = (fileId: number | string): void => {
     editorPanelWindow = null;
     editorReadyPromise = null;
     editorReadyResolve = null;
+    // Only clear the module handle if it still points at this panel's cleanup
+    // (a later openEditorPanel may have already replaced it).
+    if (activeEditorPanelCleanup === cleanup) activeEditorPanelCleanup = null;
   };
+  activeEditorPanelCleanup = cleanup;
 
   closeBtn.addEventListener("click", () => {
     cleanup();
@@ -417,3 +457,4 @@ export const openEditorPanel = (fileId: number | string): void => {
   panel.appendChild(iframe);
   document.body.appendChild(panel);
 };
+

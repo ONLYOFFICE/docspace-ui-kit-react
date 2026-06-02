@@ -28,15 +28,11 @@ import type { ComponentOverrides } from "@onlyoffice/ai-chat";
 
 import { ButtonOverride } from "./button";
 import { ComboBoxOverride } from "./combo-box";
-import { DropdownMenuOverride } from "./dropdown-menu";
-import { IconButtonOverride } from "./icon-button/IconButton";
 import { TabsOverride } from "./tabs";
 
 export const componentOverrides: ComponentOverrides = {
   Button: ButtonOverride,
   ComboBox: ComboBoxOverride,
-  // DropdownMenu: DropdownMenuOverride,
   Tabs: TabsOverride,
-  // IconButton: IconButtonOverride,
 };
 
