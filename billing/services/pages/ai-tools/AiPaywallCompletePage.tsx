@@ -116,7 +116,12 @@ const AiPaywallCompletePage = () => {
 
   const formattedAmount = formatCurrencyValue(language, amount, currency, 2);
 
+  const hasStartedRef = React.useRef(false);
+
   React.useEffect(() => {
+    if (hasStartedRef.current) return;
+    hasStartedRef.current = true;
+
     const run = async () => {
       try {
         window.dataLayer = window.dataLayer || [];
