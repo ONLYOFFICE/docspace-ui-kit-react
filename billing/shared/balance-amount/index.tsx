@@ -4,8 +4,6 @@ import classNames from "classnames";
 
 import { Text } from "../../../components/text";
 import { truncateNumberToFraction } from "../../utils/common";
-import { observer } from "mobx-react";
-import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import RefreshIconButton from "../refresh-icon-button";
 import styles from "./BalanceAmount.module.scss";
 
@@ -41,7 +39,6 @@ const typeClassMap: Record<string, string> = {
 };
 
 const BalanceAmount = (props: BalanceAmountProps) => {
-  const paymentStore = usePaymentStore();
   const {
     title,
     onRefresh,
@@ -51,7 +48,7 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     showRefresh = true,
     amount = 0,
     currency = "USD",
-    language = paymentStore.language || "en",
+    language = "en",
     maximumFractionDigits = 3,
     className,
     withoutMargin = false,
@@ -134,5 +131,5 @@ const BalanceAmount = (props: BalanceAmountProps) => {
   );
 };
 
-export default observer(BalanceAmount);
+export default BalanceAmount;
 

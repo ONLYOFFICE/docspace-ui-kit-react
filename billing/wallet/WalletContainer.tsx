@@ -199,6 +199,7 @@ const Wallet = (props: WalletProps) => {
           onRefresh={onClick}
           amount={walletBalance}
           currency={walletCodeCurrency}
+          language={store.language}
         />
 
         <Button

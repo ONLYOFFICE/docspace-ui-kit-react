@@ -97,8 +97,9 @@ const openStripeCheckout = async (
   amount: string,
 ) => {
   const currency = paymentStore.walletCodeCurrency || "USD";
+  const language = paymentStore.language || "en";
   const backUrl = `${window.location.origin}${window.location.pathname}`;
-  const successUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}?currency=${currency}&amount=${amount}&type=wallet`;
+  const successUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}?currency=${currency}&amount=${amount}&type=wallet&language=${language}`;
 
   await paymentStore.fetchCardLinked(backUrl, successUrl);
 
