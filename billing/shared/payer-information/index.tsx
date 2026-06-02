@@ -103,16 +103,8 @@ const PayerInformation = () => {
   const unknownPayerDescription = () => {
     const userNotFound = `${t("UserNotFoundMatchingEmail")} `;
 
-    let invalidEmailDescription = isOwner
-      ? t("UnknownPayerForOwner", {
-          productName: getBrandName("ProductName"),
-        })
-      : t("UnknownPayerForAdmin", {
-          productName: getBrandName("ProductName"),
-        });
-
     if (isNotPaidPeriod) {
-      invalidEmailDescription = isOwner
+      const invalidEmailDescription = isOwner
         ? t("InvalidEmailWithoutActiveSubscription", {
             productName: getBrandName("ProductName"),
           })
@@ -123,7 +115,13 @@ const PayerInformation = () => {
       return userNotFound + invalidEmailDescription;
     }
 
-    return userNotFound + invalidEmailDescription;
+    return isOwner
+      ? t("UnknownPayerForOwner", {
+          productName: getBrandName("ProductName"),
+        })
+      : t("UnknownPayerForAdmin", {
+          productName: getBrandName("ProductName"),
+        });
   };
 
   const unknownPayerInformation = (

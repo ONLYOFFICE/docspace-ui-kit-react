@@ -275,6 +275,7 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
             <BalanceAmount
               amount={balanceToShow}
               currency={currency}
+              language={language}
               maximumFractionDigits={2}
               withoutMargin
               showRefresh={false}

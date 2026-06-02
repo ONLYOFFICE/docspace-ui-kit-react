@@ -91,7 +91,10 @@ const PaymentStoreProviderInner = ({
 
   React.useEffect(() => {
     if (!store.quotas.isLoaded) {
-      store.quotas.fetchPortalQuota();
+      const url =
+        typeof window !== "undefined" ? window.location.search : "";
+      const isRefresh = url.includes("complete=true");
+      store.quotas.fetchPortalQuota(isRefresh);
     }
   }, [store]);
 
