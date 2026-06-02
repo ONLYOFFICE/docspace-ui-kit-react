@@ -165,4 +165,6 @@ export * from "./nav-menu";
 
 export * from "./card";
 
+export * from "./collapsible-card";
+
 export * from "./two-state-toggle";

@@ -33,67 +33,69 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Text } from "../text";
+import React from "react";
+import classNames from "classnames";
 
-import EmptyViewOption from "./sub-components/EmptyViewOption";
+import ArrowIcon from "../../assets/arrow.react.svg";
 
-import styles from "./EmptyView.module.scss";
-import type { EmptyViewProps } from "./EmptyView.types";
+import styles from "./CollapsibleCard.module.scss";
+import type { CollapsibleCardProps } from "./CollapsibleCard.types";
 
-const EmptyView = ({
-  description,
-  icon,
-  options,
+const useUniqueId = (prefix: string) =>
+  React.useId().replace(/:/g, "-").concat(`-${prefix}`);
+
+export const CollapsibleCard = ({
   title,
-  LinkRouter,
+  description,
+  children,
+  isOpen,
+  defaultOpen = false,
+  onToggle,
   className,
-  bodyClassName,
-  extraContent,
-}: EmptyViewProps) => {
+  style,
+  dataTestId,
+}: CollapsibleCardProps) => {
+  const isControlled = isOpen !== undefined;
+  const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
+  const open = isControlled ? isOpen : internalOpen;
+
+  const bodyId = useUniqueId("body");
+
+  const handleToggle = () => {
+    const next = !open;
+    if (!isControlled) setInternalOpen(next);
+    onToggle?.(next);
+  };
+
   return (
     <div
-      className={`${styles.wrapper}${className ? ` ${className}` : ""}`}
-      data-testid="empty-view"
+      className={classNames(styles.container, className)}
+      style={style}
+      data-testid={dataTestId ?? "collapsible-card"}
+      data-open={open ? "true" : "false"}
     >
-      <div className={styles.header}>
-        {icon}
-        <Text
-          as="h3"
-          fontWeight="700"
-          lineHeight="22px"
-          className={styles.headerTitle}
-        >
-          {title}
-        </Text>
-        <Text as="p" fontSize="12px" className={styles.subheading}>
-          {description}
-        </Text>
-      </div>
-      {extraContent ? extraContent : null}
-      {options ? (
-        <div
-          className={`${styles.body}${bodyClassName ? ` ${bodyClassName}` : ""}`}
-          data-testid="empty-view-body"
-        >
-          {options.map((option) => (
-            <EmptyViewOption
-              key={option.key}
-              option={option}
-              LinkRouter={LinkRouter}
-            />
-          ))}
+      <button
+        type="button"
+        className={styles.header}
+        onClick={handleToggle}
+        aria-expanded={open}
+        aria-controls={bodyId}
+      >
+        <span className={styles.heading}>
+          <span className={styles.title}>{title}</span>
+          {description ? (
+            <span className={styles.description}>{description}</span>
+          ) : null}
+        </span>
+        <span className={styles.chevron} aria-hidden="true">
+          <ArrowIcon />
+        </span>
+      </button>
+      {open && children ? (
+        <div id={bodyId} className={styles.body}>
+          {children}
         </div>
       ) : null}
     </div>
   );
 };
-
-export { EmptyView };
-export type {
-  EmptyViewButtonType,
-  EmptyViewItemType,
-  EmptyViewLinkType,
-  EmptyViewOptionsType,
-  EmptyViewProps,
-  EmptyViewSeparatorType,
-} from "./EmptyView.types";

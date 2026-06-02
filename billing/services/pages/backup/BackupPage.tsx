@@ -164,15 +164,27 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
         onToggle={onConfirm}
         title={
           <Text fontSize="12px" fontWeight={400}>
-            <CommonTrans
-              i18nKey="BackupTitle"
-              values={{
-                currency: formatWalletCurrency(backupServicePrice, 2),
-              }}
-              components={{
-                1: <Text as="span" fontSize="13px" fontWeight={600} />,
-              }}
-            />
+            {isFreeTariff ? (
+              <CommonTrans
+                i18nKey="BackupTitle"
+                values={{
+                  currency: formatWalletCurrency(backupServicePrice, 2),
+                }}
+                components={{
+                  1: <Text as="span" fontSize="13px" fontWeight={600} />,
+                }}
+              />
+            ) : (
+              <CommonTrans
+                i18nKey="AdditionalBackupTitle"
+                values={{
+                  currency: formatWalletCurrency(backupServicePrice, 2),
+                }}
+                components={{
+                  1: <Text as="span" fontSize="13px" fontWeight={600} />,
+                }}
+              />
+            )}
           </Text>
         }
         description={t("BackupDescription")}
