@@ -100,6 +100,7 @@ export enum SocketEvents {
   ChangeWebPlugin = "s:change-web-plugin",
   ChangeAiConfig = "s:change-ai-config",
   TopUpWallet = "s:top-up-wallet",
+  UpdateExternalShareSettings = "s:change-external-sharing-settings",
 }
 
 /**
