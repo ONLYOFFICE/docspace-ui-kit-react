@@ -43,6 +43,8 @@ import AiAgentsIcon from "../../assets/icons/16/ai-agents.svg";
 import { Text } from "../../components/text";
 import { Link, LinkType } from "../../components/link";
 import { IconButton } from "../../components/icon-button";
+import { useCommonTranslation } from "../../utils/i18n";
+import { CommonTrans } from "../../utils/i18n/CommonTrans";
 
 import "./RecomendedModel.scss";
 
@@ -73,7 +75,7 @@ export const RecomendedModel = ({
   onOpenEdit,
   onSelectModel,
 }: RecomendedModelProps) => {
-  const recomendedModelName = recomendedModel;
+  const t = useCommonTranslation();
 
   // The recommended model is already selected — nothing to recommend.
   if (selectedModel === recomendedModel) return null;
@@ -98,12 +100,11 @@ export const RecomendedModel = ({
   const isNotAvailableAdminState = !isChat && !isRecomendedAvailable && isAdmin;
   const isNotAvailableUserState = !isChat && !isRecomendedAvailable && !isAdmin;
 
-  let title = "Tested model for form processing is not available";
-  if (isChatAdminState) title = "Use the tested model for form results";
-  else if (isChatUserState)
-    title = "Tested model for form results is not selected";
+  let title = t("RecommendedModelNotAvailableTitle");
+  if (isChatAdminState) title = t("RecommendedModelChatTitle");
+  else if (isChatUserState) title = t("RecommendedModelChatNotSelectedTitle");
   else if (isSelectModelState)
-    title = "Tested model for form processing is not selected";
+    title = t("RecommendedModelNotSelectedTitle");
 
   return (
     <div className="recomendedModel">
@@ -121,39 +122,46 @@ export const RecomendedModel = ({
 
       {isChatAdminState ? (
         <Text fontSize="12px" lineHeight="16px">
-          For better discussion of submitted form data, we recommend using{" "}
-          <strong>{recomendedModelName}</strong> — a model we tested for
-          form-related tasks.
+          <CommonTrans
+            i18nKey="RecommendedModelChatAdminDescription"
+            values={{ model: recomendedModel }}
+          />
         </Text>
       ) : null}
 
       {isChatUserState ? (
         <Text fontSize="12px" lineHeight="16px">
-          For better discussion of submitted form data, ask the agent admin to
-          switch this agent to <strong>{recomendedModelName}</strong> — a model
-          we tested for form-related tasks.
+          <CommonTrans
+            i18nKey="RecommendedModelChatUserDescription"
+            values={{ model: recomendedModel }}
+          />
         </Text>
       ) : null}
 
       {isSelectModelState ? (
         <Text fontSize="12px" lineHeight="16px">
-          For better discussion of submitted form data, we recommend using{" "}
-          <strong>{recomendedModelName}</strong> for this agent.
+          <CommonTrans
+            i18nKey="RecommendedModelSelectDescription"
+            values={{ model: recomendedModel }}
+          />
         </Text>
       ) : null}
 
       {isNotAvailableAdminState ? (
         <Text fontSize="12px" lineHeight="16px">
-          To use <strong>{recomendedModelName}</strong>, a model we tested for
-          form-related tasks, add OpenRouter in AI settings.
+          <CommonTrans
+            i18nKey="RecommendedModelNotAvailableAdminDescription"
+            values={{ model: recomendedModel }}
+          />
         </Text>
       ) : null}
 
       {isNotAvailableUserState ? (
         <Text fontSize="12px" lineHeight="16px">
-          To use <strong>{recomendedModelName}</strong>, a model we tested for
-          form-related tasks, ask the portal admin to add OpenRouter in AI
-          settings.
+          <CommonTrans
+            i18nKey="RecommendedModelNotAvailableUserDescription"
+            values={{ model: recomendedModel }}
+          />
         </Text>
       ) : null}
 
@@ -165,7 +173,7 @@ export const RecomendedModel = ({
           isHovered
           onClick={onOpenEdit}
         >
-          Open agent settings
+          {t("OpenAgentSettings")}
         </Link>
       ) : null}
 
@@ -177,7 +185,7 @@ export const RecomendedModel = ({
           isHovered
           onClick={onSelectModel}
         >
-          Select model
+          {t("SelectModel")}
         </Link>
       ) : null}
 
@@ -189,7 +197,7 @@ export const RecomendedModel = ({
           isHovered
           onClick={onOpenSettings}
         >
-          Open AI settings
+          {t("OpenAISettings")}
         </Link>
       ) : null}
     </div>
