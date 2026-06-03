@@ -105,7 +105,7 @@ const ChatUI = observer(
     samples,
     onOpenEdit,
     canEditAgent,
-    recomendedModelForForms,
+    recommendedModelForForms,
     chatRecommendedModelVisible,
     onCloseRecomendation,
   }: ChatCoreProps) => {
@@ -145,7 +145,7 @@ const ChatUI = observer(
               isChat
               isAdmin={!!canEditAgent}
               selectedModel={selectedModel ?? ""}
-              recomendedModel={recomendedModelForForms ?? ""}
+              recomendedModel={recommendedModelForForms ?? ""}
               onClose={onCloseRecomendation}
               onOpenEdit={onOpenEdit}
             />

@@ -192,7 +192,10 @@ export type MessageBodyProps = {
   getResultStorageId?: () => number | null;
   openFile?: (fileId: string) => void;
   openLink?: (url: string) => void;
-} & Pick<MessageProps, "setAiPlaylistImages" | "setMediaViewerVisible" | "userAvatar">;
+} & Pick<
+  MessageProps,
+  "setAiPlaylistImages" | "setMediaViewerVisible" | "userAvatar"
+>;
 
 export type FilesListProps = {
   files: Partial<TFile>[];
@@ -295,7 +298,7 @@ export type ChatProps = {
   goToWebSearchSettings?: () => void;
   onOpenEdit?: () => void;
   canEditAgent?: boolean;
-  recomendedModelForForms?: string;
+  recommendedModelForForms?: string;
   chatRecommendedModelVisible?: boolean;
   onCloseRecomendation?: () => void;
 
@@ -346,3 +349,4 @@ export type ChatExternalInitProps = ChatProps & {
   messagesSettings: NonNullable<ChatProps["messagesSettings"]>;
   toolsSettings: NonNullable<ChatProps["toolsSettings"]>;
 };
+

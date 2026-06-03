@@ -33,7 +33,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContentType, RoleType, ServerType, ChatReasoningEffort } from "../enums";
+import {
+  ContentType,
+  RoleType,
+  ServerType,
+  ChatReasoningEffort,
+} from "../enums";
 import { TCreatedBy } from "./index";
 
 export type TToolCallResultSourceData = {
@@ -133,7 +138,7 @@ export type TAIConfig = {
 
   systemAiEnabled?: boolean;
 
-  recomendedModelForForms?: string;
+  recommendedModelForForms?: string;
 };
 
 export type TMCPTool = {
@@ -174,3 +179,4 @@ export interface UserChatSettingsDto {
   webSearchEnabled: boolean;
   reasoningEffort: ChatReasoningEffort | null;
 }
+

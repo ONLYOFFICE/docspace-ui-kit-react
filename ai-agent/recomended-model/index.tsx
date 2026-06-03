@@ -103,8 +103,7 @@ export const RecomendedModel = ({
   let title = t("RecommendedModelNotAvailableTitle");
   if (isChatAdminState) title = t("RecommendedModelChatTitle");
   else if (isChatUserState) title = t("RecommendedModelChatNotSelectedTitle");
-  else if (isSelectModelState)
-    title = t("RecommendedModelNotSelectedTitle");
+  else if (isSelectModelState) title = t("RecommendedModelNotSelectedTitle");
 
   return (
     <div className="recomendedModel">
