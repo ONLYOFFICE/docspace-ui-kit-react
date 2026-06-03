@@ -282,6 +282,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
             <BalanceAmount
               amount={monthlyPrice}
               currency={walletCodeCurrency}
+              language={paymentStore.language}
               showRefresh={false}
               withoutMargin
               mainFontSize="28px"
