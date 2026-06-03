@@ -344,6 +344,10 @@
 
   color: var(--drop-down-item-disabled-text);
 
+  .dropDownItemIcon {
+    --drop-down-item-icon-color: #{$gray};
+  }
+
   &:hover {
     cursor: default;
     background-color: unset !important;

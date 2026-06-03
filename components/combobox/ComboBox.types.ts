@@ -66,6 +66,7 @@ export type TBaseOption = {
   pageNumber?: number;
   count?: number;
   tooltip?: string;
+  fillIcon?: boolean;
   withExternalLink?: boolean;
   externalLinkPath?: string;
   onExternalLinkClick?: () => void;

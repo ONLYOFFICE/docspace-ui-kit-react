@@ -51,6 +51,7 @@ const Text = ({
   onClick,
   badgeLabel,
   className,
+  titleTooltip,
   ...rest
 }: TTextProps) => {
   return (
@@ -61,7 +62,11 @@ const Text = ({
       data-root-folder-title={isRootFolderTitle}
       {...rest}
     >
-      <Heading title={title} truncate isRootFolderTitle={isRootFolderTitle}>
+      <Heading
+        title={titleTooltip ?? title}
+        truncate
+        isRootFolderTitle={isRootFolderTitle}
+      >
         {title}
       </Heading>
       {badgeLabel ? (
