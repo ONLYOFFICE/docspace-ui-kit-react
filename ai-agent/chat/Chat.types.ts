@@ -293,6 +293,9 @@ export type ChatProps = {
   multimodal?: TMultimodal;
   goToAISettings?: () => void;
   goToWebSearchSettings?: () => void;
+  onOpenEdit?: () => void;
+  canEditAgent?: boolean;
+  recomendedModelForForms?: string;
 
   emptyScreenText?: string;
   setAiPlaylistImages?: (value: TChatPlaylistImage[]) => void;

@@ -36,8 +36,15 @@
 import React from "react";
 import { observer } from "mobx-react";
 
-import { MessageStoreContextProvider } from "./store/messageStore";
+import {
+  MessageStoreContextProvider,
+  useMessageStore,
+} from "./store/messageStore";
 import { ChatStoreContextProvider, useChatStore } from "./store/chatStore";
+
+import { RecomendedModel } from "../recomended-model";
+
+import styles from "./Chat.module.scss";
 
 import type {
   ChatProps,
@@ -96,8 +103,15 @@ const ChatUI = observer(
     modelAliases,
     withSamples,
     samples,
+    onOpenEdit,
+    canEditAgent,
+    recomendedModelForForms,
   }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
+    const { hasFormAttached } = useMessageStore();
+
+    const [isRecomendationClosed, setIsRecomendationClosed] =
+      React.useState(false);
 
     const showEmptyScreen = !isLoadingChat && !aiReady && !currentChat;
 
@@ -126,6 +140,18 @@ const ChatUI = observer(
           onSelectChat={onSelectChat}
           modelAliases={modelAliases}
         />
+        {hasFormAttached && !isRecomendationClosed ? (
+          <div className={styles.recomendedModelWrapper}>
+            <RecomendedModel
+              isChat
+              isAdmin={!!canEditAgent}
+              selectedModel={selectedModel ?? ""}
+              recomendedModel={recomendedModelForForms ?? ""}
+              onClose={() => setIsRecomendationClosed(true)}
+              onOpenEdit={onOpenEdit}
+            />
+          </div>
+        ) : null}
         {showEmptyScreen ? (
           <ChatNoAccessScreen
             aiReady={aiReady}

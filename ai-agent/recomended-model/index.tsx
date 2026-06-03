@@ -53,7 +53,7 @@ export type RecomendedModelProps = {
   providerType?: ProviderType;
   availableProviders?: ProviderType[];
   modelList?: string[];
-  recomendedModel: string[];
+  recomendedModel: string;
   onClose?: () => void;
   onOpenSettings?: () => void;
   onOpenEdit?: () => void;
@@ -73,18 +73,16 @@ export const RecomendedModel = ({
   onOpenEdit,
   onSelectModel,
 }: RecomendedModelProps) => {
-  const recomendedModelName = recomendedModel[0];
+  const recomendedModelName = recomendedModel;
 
-  // A recommended model is already selected — nothing to recommend.
-  if (recomendedModel.includes(selectedModel)) return null;
+  // The recommended model is already selected — nothing to recommend.
+  if (selectedModel === recomendedModel) return null;
 
   const hasOpenRouterProvider = !!availableProviders?.includes(
     ProviderType.OpenRouter,
   );
   const isCurrentOpenRouter = providerType === ProviderType.OpenRouter;
-  const hasRecomendedInModelList = !!modelList?.some((model) =>
-    recomendedModel.includes(model),
-  );
+  const hasRecomendedInModelList = !!modelList?.includes(recomendedModel);
 
   // The recommended model can be selected: OpenRouter is among the available
   // providers, or it's the current provider and its model list contains one.
