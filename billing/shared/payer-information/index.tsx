@@ -101,18 +101,14 @@ const PayerInformation = () => {
   };
 
   const unknownPayerDescription = () => {
-    const userNotFound = `${t("UserNotFoundMatchingEmail")} `;
-
     if (isNotPaidPeriod) {
-      const invalidEmailDescription = isOwner
-        ? t("InvalidEmailWithoutActiveSubscription", {
+      return isOwner
+        ? t("UnknownPayerOwnerUnpaid", {
             productName: getBrandName("ProductName"),
           })
-        : t("InvalidEmailWithoutActiveSubscriptionByAdmin", {
+        : t("UnknownPayerAdminUnpaid", {
             productName: getBrandName("ProductName"),
           });
-
-      return userNotFound + invalidEmailDescription;
     }
 
     return isOwner
@@ -198,15 +194,16 @@ const PayerInformation = () => {
           Encoder.htmlDecode(payerInfo.displayName ?? "")
         ) : (
           <CommonTrans
-            i18nKey="UserNotFound"
+            i18nKey="ContactNotFound"
             values={{ email: emailUnfoundedUser }}
             components={{
               1: (
-                <Text
+                <Link
                   as="span"
-                  className={styles.refreshData}
+                  className={styles.contactEmail}
                   fontWeight={600}
                   fontSize="14px"
+                  href={`mailto:${email}`}
                 />
               ),
             }}
@@ -217,9 +214,9 @@ const PayerInformation = () => {
   };
 
   const avatarSource = payerInfo
-    ? (payerInfo.hasAvatar && payerInfo.avatar
-        ? `${baseUrl}${payerInfo.avatar}`
-        : "default_user_photo")
+    ? payerInfo.hasAvatar && payerInfo.avatar
+      ? `${baseUrl}${payerInfo.avatar}`
+      : "default_user_photo"
     : undefined;
 
   return (
