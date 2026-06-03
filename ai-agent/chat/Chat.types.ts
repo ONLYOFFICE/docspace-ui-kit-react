@@ -296,7 +296,7 @@ export type ChatProps = {
   onOpenEdit?: () => void;
   canEditAgent?: boolean;
   recomendedModelForForms?: string;
-  chatRecomendedModelVisible?: boolean;
+  chatRecommendedModelVisible?: boolean;
   onCloseRecomendation?: () => void;
 
   emptyScreenText?: string;

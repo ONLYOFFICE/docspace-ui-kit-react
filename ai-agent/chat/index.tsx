@@ -106,7 +106,7 @@ const ChatUI = observer(
     onOpenEdit,
     canEditAgent,
     recomendedModelForForms,
-    chatRecomendedModelVisible,
+    chatRecommendedModelVisible,
     onCloseRecomendation,
   }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
@@ -139,7 +139,7 @@ const ChatUI = observer(
           onSelectChat={onSelectChat}
           modelAliases={modelAliases}
         />
-        {chatRecomendedModelVisible !== false && hasFormAttached ? (
+        {chatRecommendedModelVisible !== false && hasFormAttached ? (
           <div className={styles.recomendedModelWrapper}>
             <RecomendedModel
               isChat
