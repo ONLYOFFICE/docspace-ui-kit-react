@@ -103,10 +103,10 @@ const PayerInformation = () => {
   const unknownPayerDescription = () => {
     if (isNotPaidPeriod) {
       return isOwner
-        ? t("InvalidEmailWithoutActiveSubscriptionBilling", {
+        ? t("UnknownPayerOwnerUnpaid", {
             productName: getBrandName("ProductName"),
           })
-        : t("InvalidEmailWithoutActiveSubscriptionByAdminBilling", {
+        : t("UnknownPayerAdminUnpaid", {
             productName: getBrandName("ProductName"),
           });
     }
