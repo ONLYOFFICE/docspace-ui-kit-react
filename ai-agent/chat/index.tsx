@@ -106,26 +106,11 @@ const ChatUI = observer(
     onOpenEdit,
     canEditAgent,
     recomendedModelForForms,
+    chatRecomendedModelVisible,
+    onCloseRecomendation,
   }: ChatCoreProps) => {
     const { currentChat } = useChatStore();
     const { hasFormAttached } = useMessageStore();
-
-    // Persist the banner dismissal per agent so it doesn't reappear.
-    const recomendationDismissKey = `recomended-model-dismissed-${agentId}`;
-    const [isRecomendationClosed, setIsRecomendationClosed] = React.useState(
-      () => localStorage.getItem(recomendationDismissKey) === "true",
-    );
-
-    React.useEffect(() => {
-      setIsRecomendationClosed(
-        localStorage.getItem(recomendationDismissKey) === "true",
-      );
-    }, [recomendationDismissKey]);
-
-    const onCloseRecomendation = React.useCallback(() => {
-      setIsRecomendationClosed(true);
-      localStorage.setItem(recomendationDismissKey, "true");
-    }, [recomendationDismissKey]);
 
     const showEmptyScreen = !isLoadingChat && !aiReady && !currentChat;
 
@@ -154,7 +139,7 @@ const ChatUI = observer(
           onSelectChat={onSelectChat}
           modelAliases={modelAliases}
         />
-        {hasFormAttached && !isRecomendationClosed ? (
+        {chatRecomendedModelVisible !== false && hasFormAttached ? (
           <div className={styles.recomendedModelWrapper}>
             <RecomendedModel
               isChat

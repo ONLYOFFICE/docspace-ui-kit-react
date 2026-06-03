@@ -296,6 +296,8 @@ export type ChatProps = {
   onOpenEdit?: () => void;
   canEditAgent?: boolean;
   recomendedModelForForms?: string;
+  chatRecomendedModelVisible?: boolean;
+  onCloseRecomendation?: () => void;
 
   emptyScreenText?: string;
   setAiPlaylistImages?: (value: TChatPlaylistImage[]) => void;
