@@ -110,8 +110,22 @@ const ChatUI = observer(
     const { currentChat } = useChatStore();
     const { hasFormAttached } = useMessageStore();
 
-    const [isRecomendationClosed, setIsRecomendationClosed] =
-      React.useState(false);
+    // Persist the banner dismissal per agent so it doesn't reappear.
+    const recomendationDismissKey = `recomended-model-dismissed-${agentId}`;
+    const [isRecomendationClosed, setIsRecomendationClosed] = React.useState(
+      () => localStorage.getItem(recomendationDismissKey) === "true",
+    );
+
+    React.useEffect(() => {
+      setIsRecomendationClosed(
+        localStorage.getItem(recomendationDismissKey) === "true",
+      );
+    }, [recomendationDismissKey]);
+
+    const onCloseRecomendation = React.useCallback(() => {
+      setIsRecomendationClosed(true);
+      localStorage.setItem(recomendationDismissKey, "true");
+    }, [recomendationDismissKey]);
 
     const showEmptyScreen = !isLoadingChat && !aiReady && !currentChat;
 
@@ -147,7 +161,7 @@ const ChatUI = observer(
               isAdmin={!!canEditAgent}
               selectedModel={selectedModel ?? ""}
               recomendedModel={recomendedModelForForms ?? ""}
-              onClose={() => setIsRecomendationClosed(true)}
+              onClose={onCloseRecomendation}
               onOpenEdit={onOpenEdit}
             />
           </div>
