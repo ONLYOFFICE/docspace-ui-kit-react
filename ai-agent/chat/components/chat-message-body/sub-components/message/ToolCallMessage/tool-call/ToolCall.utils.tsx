@@ -39,6 +39,51 @@ import CellCommonIcon from "../../../../../../../../assets/icons/16/cellCommon.s
 import TextIcon from "../../../../../../../../assets/icons/16/text.svg";
 import PdfIcon from "../../../../../../../../assets/icons/16/pdf.svg";
 
+import type {
+  TToolCallContent,
+  TToolCallResultSource,
+  TToolCallResultSourceData,
+} from "../../../../../../../../types/ai";
+
+/**
+ * Safely extracts the first (or only) normalized source from a tool call
+ * result. Returns undefined when the result is missing or doesn't match the
+ * expected DTO shape, so callers never dereference an unexpected payload.
+ */
+export const getToolResultData = (
+  content: TToolCallContent,
+): TToolCallResultSourceData | undefined => {
+  const data = (content.result as TToolCallResultSource | undefined)?.data;
+
+  const source = Array.isArray(data) ? data[0] : data;
+
+  return source && typeof source === "object" ? source : undefined;
+};
+
+/**
+ * A tool call is treated as failed when the backend reports an explicit error,
+ * or when a result arrived for one of the known DocSpace tools (knowledge /
+ * web search, web crawling) without the expected `data` DTO — e.g. a raw MCP
+ * error payload like `{ Content: [{ Text: "Error: ..." }] }`. The loading
+ * state (no result yet) is never treated as an error, and tools whose result
+ * shape is unknown (arbitrary MCP tools) keep their explicit-error-only check.
+ */
+export const hasToolResultError = (
+  content: TToolCallContent,
+  knownToolNames: (string | undefined)[] = [],
+): boolean => {
+  const result = content.result as TToolCallResultSource | undefined;
+
+  if (!result) return false;
+
+  if (typeof result.error === "string" && result.error.length > 0) return true;
+
+  const isKnownTool =
+    !!content.name && knownToolNames.includes(content.name);
+
+  return isKnownTool && !("data" in result);
+};
+
 export const getRootDomain = (url: string) => {
   try {
     const hostname = new URL(url).hostname;
