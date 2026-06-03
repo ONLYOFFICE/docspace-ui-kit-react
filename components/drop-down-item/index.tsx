@@ -204,7 +204,8 @@ const DropDownItem = ({
           [styles.activeDescendant]: isActiveDescendant && !disabled,
           [styles.textOverflow]: textOverflow,
           [styles.modern]: isModern,
-          [styles.disabled]: disabled && !isSelected,
+          // [styles.disabled]: disabled && !isSelected,
+          [styles.disabled]: disabled,
         },
         className,
       )}
@@ -247,7 +248,7 @@ const DropDownItem = ({
         <TooltipContainer
           as="span"
           dir="auto"
-          title={typeof label === "string" ? label : undefined}
+          title={!withDisabledTooltip && typeof label === "string" ? label : undefined}
           className={truncateText ? styles.truncateText : undefined}
         >
           {label}

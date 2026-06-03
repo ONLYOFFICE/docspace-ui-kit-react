@@ -108,6 +108,7 @@ export type TTextProps = {
   onClick: () => void;
   className?: string;
   badgeLabel?: string;
+  titleTooltip?: string;
 };
 
 export type TNavigationLogoProps = {
@@ -252,4 +253,5 @@ export type TNavigationProps = Omit<
     onLogoClick?: () => void;
     contextMenuHeader?: HeaderType;
     showBackButton?: boolean;
+    titleTooltip?: string;
   };

@@ -153,6 +153,8 @@ const Section = (props: SectionProps) => {
     pluginOperationsCompleted,
     pluginOperationsAlert,
     pluginShowCancelButton,
+    scrollableBanner,
+    stickyTableHeader,
   } = props;
 
   const [sectionSize, setSectionSize] = React.useState<{
@@ -319,6 +321,8 @@ const Section = (props: SectionProps) => {
         withBodyScroll={withBodyScroll}
         currentDeviceType={currentDeviceType}
         bannerContent={sectionBannerContent}
+        scrollableBanner={scrollableBanner}
+        stickyTableHeader={stickyTableHeader}
       >
         {currentDeviceType !== DeviceType.mobile ? (
           <div className="section-sticky-container">
@@ -333,6 +337,7 @@ const Section = (props: SectionProps) => {
             ) : null}
 
             {isSectionFilterAvailable &&
+            !stickyTableHeader &&
             currentDeviceType === DeviceType.desktop ? (
               <SubSectionFilter className="section-header_filter">
                 {sectionFilterContent}
@@ -363,6 +368,16 @@ const Section = (props: SectionProps) => {
               <SubSectionHeader className="section-body_header">
                 {sectionHeaderContent}
               </SubSectionHeader>
+            ) : null}
+            {scrollableBanner && sectionBannerContent ? (
+              <div className="section-banner">{sectionBannerContent}</div>
+            ) : null}
+            {isSectionFilterAvailable &&
+            stickyTableHeader &&
+            currentDeviceType === DeviceType.desktop ? (
+              <SubSectionFilter className="section-body_sticky-filter">
+                {sectionFilterContent}
+              </SubSectionFilter>
             ) : null}
             {currentDeviceType !== DeviceType.desktop ? (
               <SubSectionWarning>{sectionWarningContent}</SubSectionWarning>

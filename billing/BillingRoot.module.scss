@@ -53,7 +53,7 @@
   --payment-benefits-icons-color: #{$light-gray-dark};
   --payment-payer-disable-color: #{$gray};
   --payment-link-color: #{$light-gray-dark};
-
+  --payment-error-email: #{$light-error-status};
   --billing-card-color-wallet: #{$light-status-positive};
   --billing-card-color-ai: #{$ai-purple};
   --billing-card-color-payment: var(--color-scheme-main-accent);
@@ -92,6 +92,7 @@
   --payment-price-container-disable-background: #{$dark-gray-light};
   --payment-warning-color: #{$dark-status-warning};
   --payment-accent-color: var(--color-scheme-main-buttons);
+  --payment-error-email: #{$dark-error-status};
 
   --settings-payment-warning-color: #{$dark-error-status};
   --settings-payment-color: #{$dark-status-warning};
