@@ -132,6 +132,8 @@ export type TAIConfig = {
   modelAliases: Record<string, string>;
 
   systemAiEnabled?: boolean;
+
+  recomendedModelForForms?: string;
 };
 
 export type TMCPTool = {
