@@ -85,6 +85,7 @@ const ChatInput = ({
     isRequestRunning,
     agentId,
     messages,
+    setHasFormAttached,
   } = useMessageStore();
   const { fetchChat, currentChat } = useChatStore();
 
@@ -284,6 +285,7 @@ const ChatInput = ({
             id: Number(attachmentFile.id),
             title: attachmentFile.title,
             fileExst: attachmentFile.fileExst,
+            isForm: attachmentFile.isForm,
             viewUrl: attachmentFile.viewUrl,
           },
         ];
@@ -298,6 +300,12 @@ const ChatInput = ({
   const handleSampleSelect = (sample: string) => {
     setValue(sample);
   };
+
+  const hasFormAttached = selectedFiles.some((file) => file.isForm);
+
+  React.useEffect(() => {
+    setHasFormAttached(hasFormAttached);
+  }, [hasFormAttached, setHasFormAttached]);
 
   return (
     <>
