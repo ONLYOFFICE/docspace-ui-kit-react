@@ -645,6 +645,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         selectedFileInfoRef.current,
         isInsideKnowledge,
         isInsideResultStorage,
+        isInsidePrivateRoom,
       );
     },
     [
@@ -656,6 +657,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       folderIsShared,
       isInsideKnowledge,
       isInsideResultStorage,
+      isInsidePrivateRoom,
     ],
   );
 

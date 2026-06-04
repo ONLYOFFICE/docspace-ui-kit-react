@@ -269,6 +269,7 @@ export type FilesSelectorProps = TInfoBar &
       selectedFileInfo: TSelectedFileInfo,
       isInsideKnowledge?: boolean,
       isInsideResultStorage?: boolean,
+      isInsidePrivateRoom?: boolean,
     ) => void | Promise<void>;
     getIsDisabled: (
       isFirstLoad: boolean,
