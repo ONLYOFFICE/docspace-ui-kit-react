@@ -75,6 +75,7 @@ const useFilesHelper = ({
   searchValue,
   disabledItems,
   disabledFolderType,
+  pinnedRootId,
   includedItems,
   setSelectedItemSecurity,
   isThirdParty,
@@ -102,6 +103,7 @@ const useFilesHelper = ({
 
   setIsInsideKnowledge,
   setIsInsideResultStorage,
+  setIsInsidePrivateRoom,
 
   disableBySecurity,
   withSubFolders,
@@ -128,6 +130,9 @@ const useFilesHelper = ({
   const initRef = React.useRef(isInit);
   const firstLoadRef = React.useRef(isFirstLoad);
   const disabledItemsRef = React.useRef(disabledItems);
+  const privateRoomCacheRef = React.useRef<Map<number | string, boolean>>(
+    new Map(),
+  );
 
   React.useEffect(() => {
     disabledItemsRef.current = disabledItems;
@@ -252,6 +257,34 @@ const useFilesHelper = ({
         setIsInsideKnowledge(isInsideKnowledge);
         setIsInsideResultStorage(isInsideResultStorage);
 
+        const roomPart = (
+          pathParts as { id: number | string; roomType?: number }[]
+        ).find((p) => typeof p.roomType !== "undefined");
+
+        let isInsidePrivateRoom = false;
+        if (roomPart) {
+          if (current?.id === roomPart.id) {
+            isInsidePrivateRoom = current?.private === true;
+            privateRoomCacheRef.current.set(roomPart.id, isInsidePrivateRoom);
+          } else if (privateRoomCacheRef.current.has(roomPart.id)) {
+            isInsidePrivateRoom =
+              privateRoomCacheRef.current.get(roomPart.id) ?? false;
+          } else {
+            try {
+              const roomInfoRes = await foldersApi.getFolderInfo({
+                folderId: roomPart.id as number,
+              });
+              isInsidePrivateRoom =
+                roomInfoRes.data.response?.private === true;
+              privateRoomCacheRef.current.set(roomPart.id, isInsidePrivateRoom);
+            } catch {
+              isInsidePrivateRoom = false;
+            }
+          }
+        }
+
+        setIsInsidePrivateRoom(isInsidePrivateRoom);
+
         if (initRef.current) {
           let foundParentId = false;
           let currentFolderIndex = -1;
@@ -302,8 +335,14 @@ const useFilesHelper = ({
           //   if (item.roomType) breadCrumbs[idx].isRoom = true;
           // });
 
-          if (!isThirdParty && !isRoomsOnly && !isUserOnly)
+          if (pinnedRootId != null) {
+            const pinIndex = breadCrumbs.findIndex(
+              (bc) => bc.id.toString() === pinnedRootId.toString(),
+            );
+            if (pinIndex > 0) breadCrumbs.splice(0, pinIndex);
+          } else if (!isThirdParty && !isRoomsOnly && !isUserOnly) {
             breadCrumbs.unshift({ ...getDefaultBreadCrumb(t) });
+          }
 
           onSetBaseFolderPath?.(isErrorPath ? [] : breadCrumbs);
 

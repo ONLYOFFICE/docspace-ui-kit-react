@@ -38,6 +38,7 @@ import classNames from "classnames";
 import { RoomType } from "@onlyoffice/docspace-api-sdk";
 
 import Planet12ReactSvg from "../../../assets/icons/12/planet.react.svg";
+import SecurityShieldReactSvg from "../../../assets/icons/16/catalog-settings-security.react.svg";
 import LifetimeRoomIcon from "../../../assets/lifetime-room.react.svg";
 import EveryoneIconUrl from "../../../assets/icons/16/departments.react.svg";
 
@@ -207,7 +208,17 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
         item.roomType === RoomType.CustomRoom) &&
       item.shared;
 
-    const badgeIconNode = showPlanetIcon ? <Planet12ReactSvg /> : null;
+    const showSecurityIcon = !!item.private;
+
+    const badgeIconNode = showSecurityIcon ? (
+      <SecurityShieldReactSvg />
+    ) : showPlanetIcon ? (
+      <Planet12ReactSvg />
+    ) : null;
+
+    const badgeIconColor = showSecurityIcon
+      ? globalColors.lightStatusPositive
+      : undefined;
 
     const currentRole = role || AvatarRole.user;
 
@@ -279,6 +290,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
             logo={{ cover, large: "", original: "", small: "", medium: "" }}
             showDefault={false}
             badgeIconNode={badgeIconNode ?? undefined}
+            badgeIconColor={badgeIconColor}
             className={styles.itemLogo}
             isTemplate={isTemplate}
           />
@@ -288,6 +300,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
             title={label}
             showDefault
             badgeIconNode={badgeIconNode ?? undefined}
+            badgeIconColor={badgeIconColor}
             className={styles.itemLogo}
             isTemplate={isTemplate}
           />
@@ -300,6 +313,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
               logo={icon}
               showDefault={false}
               badgeIconNode={badgeIconNode ?? undefined}
+              badgeIconColor={badgeIconColor}
               isTemplate={isTemplate}
             />
           ) : React.isValidElement(icon) ? (

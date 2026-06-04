@@ -146,6 +146,7 @@ export type UseFilesHelpersProps = {
   searchValue?: string;
   disabledItems: (string | number)[];
   disabledFolderType?: FolderType;
+  pinnedRootId?: number | string;
   includedItems?: (string | number)[];
   setSelectedItemSecurity: (
     value: FileEntryDtoIntegerAllOfSecurity | FileEntryDtoIntegerAllOfSecurity,
@@ -178,6 +179,7 @@ export type UseFilesHelpersProps = {
 
   setIsInsideKnowledge: (value: boolean) => void;
   setIsInsideResultStorage: (value: boolean) => void;
+  setIsInsidePrivateRoom: (value: boolean) => void;
 
   applyFilterOption?: ApplyFilterOption;
 
@@ -226,6 +228,8 @@ export type FilesSelectorProps = TInfoBar &
   ) & {
     disabledItems: (string | number)[];
     disabledFolderType?: FolderType;
+    isRoomDisabled?: (room: FolderDtoInteger) => boolean;
+    pinnedRootId?: number | string;
     includedItems?: (string | number)[];
     filterParam?: string | number;
     withoutBackButton: boolean;
@@ -281,6 +285,7 @@ export type FilesSelectorProps = TInfoBar &
       isDisabledFolder?: boolean,
       isInsideKnowledge?: boolean,
       isInsideResultStorage?: boolean,
+      isInsidePrivateRoom?: boolean,
     ) => boolean;
     setIsDataReady?: (value: boolean) => void;
     submitButtonLabel: string;
