@@ -726,15 +726,17 @@ class PaymentStore {
     }
   };
 
-  fetchCardLinked = async (url?: string) => {
+  fetchCardLinked = async (url?: string, successUrl?: string) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
     const backUrl = url || `${window.location.href}?complete=true`;
-    const successUrl = combineUrl(
-      window.location.origin,
-      "/portal-settings/payments/wallet?complete=true&type=wallet",
-    );
+    const resolvedSuccessUrl =
+      successUrl ||
+      combineUrl(
+        window.location.origin,
+        "/portal-settings/payments/wallet?complete=true&type=wallet",
+      );
     try {
       const res = await this.paymentApi.getCheckoutSetupUrl(
         { backUrl },
@@ -742,7 +744,7 @@ class PaymentStore {
           signal: abortController.signal,
           // TEMP: SDK schema lacks `successUrl`; passing it via axios `params`
           // until the SDK is regenerated to include it in the request type.
-          params: { successUrl },
+          params: { successUrl: resolvedSuccessUrl },
         },
       );
 
@@ -998,7 +1000,9 @@ class PaymentStore {
 
   init = async (t: TTranslation) => {
     const url = window.location.href;
-    if (url.includes("complete=true") && url.includes("type=tariff")) {
+    const isRefresh = url.includes("complete=true");
+
+    if (isRefresh && url.includes("type=tariff")) {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: AnalyticsEvents.Purchase,
@@ -1008,7 +1012,7 @@ class PaymentStore {
       });
     }
 
-    await this.tariff.fetchCustomerInfo();
+    await this.tariff.fetchCustomerInfo(isRefresh);
 
     if (this.isInitPaymentPage) {
       await this.basicSettings();
@@ -1017,7 +1021,7 @@ class PaymentStore {
 
     const requests: Promise<unknown>[] = [];
 
-    await this.tariff.fetchPortalTariff();
+    await this.tariff.fetchPortalTariff(isRefresh);
 
     requests.push(
       this.getSettingsPayment(),

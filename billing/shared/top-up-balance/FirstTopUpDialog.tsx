@@ -36,10 +36,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 
-import {
-  ModalDialog,
-  ModalDialogType,
-} from "../../../components/modal-dialog";
+import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import { Button, ButtonSize } from "../../../components/button";
 import { Text } from "../../../components/text";
 import { toastr } from "../../../components/toast";
@@ -95,19 +92,16 @@ const pollUntil = async (
   }
 };
 
-const buildBackUrl = (amount: string, currency: string) => {
-  const integrationUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}`;
-  return `${integrationUrl}?currency=${currency}&amount=${amount}&type=wallet`;
-};
-
 const openStripeCheckout = async (
   paymentStore: PaymentStore,
   amount: string,
 ) => {
   const currency = paymentStore.walletCodeCurrency || "USD";
-  const backUrl = buildBackUrl(amount, currency);
+  const language = paymentStore.language || "en";
+  const backUrl = `${window.location.origin}${window.location.pathname}`;
+  const successUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}?currency=${currency}&amount=${amount}&type=wallet&language=${language}`;
 
-  await paymentStore.fetchCardLinked(backUrl);
+  await paymentStore.fetchCardLinked(backUrl, successUrl);
 
   const linkUrl = paymentStore.cardLinked;
   if (!linkUrl) throw new Error("Missing Stripe checkout URL");
@@ -255,3 +249,4 @@ const FirstTopUpDialog: React.FC<FirstTopUpDialogProps> = (props) => (
 );
 
 export default FirstTopUpDialog;
+

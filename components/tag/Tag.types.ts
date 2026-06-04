@@ -80,6 +80,10 @@ export type TagProps = {
   onMouseLeave?: () => void;
   /** Accepts the tag label */
   withLabel?: boolean;
+  /** Accepts an optional suffix to append after the label */
+  labelSuffix?: string;
+  /** Accepts the color for the label suffix */
+  labelSuffixColor?: string;
 };
 
 export type TagType = {
@@ -107,6 +111,10 @@ export type TagType = {
   onClick?: () => void;
   /** Indicates if the tag is an overflow trigger */
   isOptionTag?: boolean;
+  /** Accepts an optional suffix to append after the label */
+  labelSuffix?: string;
+  /** Accepts the color for the label suffix */
+  labelSuffixColor?: string;
 };
 
 export type TagClickEvent = {

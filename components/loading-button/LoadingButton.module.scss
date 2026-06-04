@@ -161,12 +161,17 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  text-align: center;
-  line-height: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--loading-button-custom-bg, var(--loading-button-bg));
 
   position: absolute;
   margin: 2px;
+
+  svg {
+    display: block;
+  }
 
   svg path {
     font-weight: bold;
