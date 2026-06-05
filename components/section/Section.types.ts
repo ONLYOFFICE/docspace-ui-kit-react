@@ -64,6 +64,20 @@ export type InfoPanelProps = {
   withoutBodyScroll?: boolean;
 };
 
+/**
+ * The AI Chat panel occupies the same right-side area as the Info Panel but,
+ * unlike it, never switches into the portal-based "Aside" overlay: it renders
+ * inline on every device (so its React subtree — and the live chat state — is
+ * never remounted across a resize) and goes full-screen on tablet/mobile purely
+ * via CSS. Kept as a separate region so the Info Panel's behavior is untouched.
+ */
+export type ChatPanelProps = {
+  children: React.ReactNode;
+  isVisible?: boolean;
+  currentDeviceType?: DeviceType;
+  setIsVisible?: (value: boolean) => void;
+};
+
 export type SectionBodyContentProps = {
   children: React.ReactNode;
 };
@@ -164,6 +178,9 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     isHeaderVisible?: boolean;
     isInfoPanelAvailable?: boolean;
     infoPanelWithoutScroll?: boolean;
+    isChatPanelAvailable?: boolean;
+    isChatPanelVisible?: boolean;
+    setIsChatPanelVisible?: (value: boolean) => void;
     isEmptyPage?: boolean;
     maintenanceExist?: boolean;
     snackbarExist?: boolean;

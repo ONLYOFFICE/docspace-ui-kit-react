@@ -350,7 +350,7 @@ const Navigation = ({
               analyzeResponsesButton={analyzeResponsesButton}
             />
           </div>
-          {isDesktop ? aiChatButton : null}
+          {aiChatButton}
           {isDesktop && !hideInfoPanel ? (
             <ToggleInfoPanelButton
               id="info-panel-toggle--open"
@@ -367,4 +367,3 @@ const Navigation = ({
 };
 
 export default React.memo(Navigation);
-
