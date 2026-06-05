@@ -351,12 +351,14 @@ const Body = ({
       {isLoading ? (
         <Scrollbar style={{ height: listHeight }}>{rowLoader}</Scrollbar>
       ) : itemsCount === 0 ? (
-        <EmptyScreen
-          withSearch={isSearch}
-          items={items}
-          inputItemVisible={inputItemVisible}
-          hideBackButton={hideBackButton}
-        />
+        <div style={{ height: listHeight }}>
+          <EmptyScreen
+            withSearch={isSearch}
+            items={items}
+            inputItemVisible={inputItemVisible}
+            hideBackButton={hideBackButton}
+          />
+        </div>
       ) : (
         <>
           {descriptionText ? (
