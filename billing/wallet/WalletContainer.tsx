@@ -50,6 +50,7 @@ import TransactionHistory from "../shared/transaction-history";
 import TopUpModal from "../shared/top-up-balance/TopUpModal";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
+import PluginIncompatibleSvg from "../../assets/plugin.incompatible.react.svg";
 import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
@@ -85,6 +86,7 @@ const Wallet = (props: WalletProps) => {
     autoPayments,
     isAutoPaymentExist,
     language,
+    wasFirstTopUp,
   } = store;
 
   const isAutoPaymentSetup = Boolean(
@@ -243,7 +245,7 @@ const Wallet = (props: WalletProps) => {
               className={styles.cardButton}
               testId="top_up_balance_button"
             />
-            {!isAutoPaymentSetup ? (
+            {wasFirstTopUp ? (
               <Button
                 size={isMobile ? ButtonSize.normal : ButtonSize.small}
                 label={t("AutoTopUp")}
@@ -294,41 +296,46 @@ const Wallet = (props: WalletProps) => {
       </div>
 
       {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
-        <div className={styles.walletCustomerStatusNotActive}>
-          <Text fontWeight={600} className={styles.warningColor}>
-            {t("PaymentMethodUnlinked")}
-          </Text>
-          <Text as="span" className={styles.warningColor}>
+        <div className={styles.autoPaymentBanner}>
+          <PluginIncompatibleSvg className={styles.warningBannerIcon} />
+          <Text
+            as="span"
+            fontSize="12px"
+            lineHeight="16px"
+            className={styles.autoPaymentBannerText}
+          >
             {isPayer ? (
-              t("LinkPaymentMethod")
+              <CommonTrans
+                i18nKey="PaymentMethodUnlinkedBanner"
+                components={{
+                  1: <Text as="span" fontWeight={600} />,
+                  2: (
+                    <Link
+                      as="span"
+                      onClick={goLinkCard}
+                      color="accent"
+                      textDecoration="underline"
+                    />
+                  ),
+                }}
+              />
             ) : (
-              <Text className={styles.warningColor}>
-                <CommonTrans
-                  i18nKey="LinkNewPaymentMethodEmail"
-                  values={{ email: walletCustomerEmail }}
-                  components={{
-                    1: (
-                      <Link
-                        href={`mailto:${walletCustomerEmail}`}
-                        color="accent"
-                        textDecoration="underline"
-                      />
-                    ),
-                  }}
-                />
-              </Text>
+              <CommonTrans
+                i18nKey="PaymentMethodUnlinkedEmailBanner"
+                values={{ email: walletCustomerEmail }}
+                components={{
+                  1: <Text as="span" fontWeight={600} />,
+                  2: (
+                    <Link
+                      href={`mailto:${walletCustomerEmail}`}
+                      color="accent"
+                      textDecoration="underline"
+                    />
+                  ),
+                }}
+              />
             )}
-          </Text>{" "}
-          {isPayer ? (
-            <Link
-              as="span"
-              onClick={goLinkCard}
-              fontWeight={600}
-              textDecoration="underline"
-            >
-              {t("AddPaymentMethod")}
-            </Link>
-          ) : null}
+          </Text>
         </div>
       ) : isAutoPaymentSetup ? (
         <AutoPaymentInfo />

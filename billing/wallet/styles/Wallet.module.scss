@@ -131,8 +131,17 @@
     }
   }
 
+  .warningBannerIcon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+  }
+
+ 
+
   .autoPaymentBannerText {
     flex: 1;
+    color: var(--warning-color);
   }
 
   .autoPaymentBannerEdit {
