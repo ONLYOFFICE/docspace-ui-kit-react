@@ -33,14 +33,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useCommonTranslation } from "../../utils/i18n";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 
 import { toAbsoluteUrl } from "../utils/url";
-
-import classNames from "classnames";
 
 import { Text } from "../../components/text";
 import { Button, ButtonSize } from "../../components/button";
@@ -60,15 +58,17 @@ import FirstTopUpDialog from "../shared/top-up-balance/FirstTopUpDialog";
 
 type WalletProps = {
   isMobile?: boolean;
+  onViewUsage?: () => void;
 };
 
 const Wallet = (props: WalletProps) => {
-  const { isMobile } = props;
+  const { isMobile, onViewUsage } = props;
 
   const store = usePaymentStore();
 
   const {
     walletBalance,
+    walletMonthToDateSpend,
     walletCodeCurrency,
     isCardLinkedToPortal,
     isVisibleWalletSettings,
@@ -99,6 +99,15 @@ const Wallet = (props: WalletProps) => {
 
   const [isAutoSpinning, setIsAutoSpinning] = useState(isAutoTopUpInProgress);
   const autoStartTimeRef = useRef<number | null>(null);
+
+  const monthLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(store.language || "en", {
+        month: "long",
+        year: "numeric",
+      }).format(new Date()),
+    [store.language],
+  );
 
   useEffect(() => {
     if (isAutoTopUpInProgress) {
@@ -189,31 +198,69 @@ const Wallet = (props: WalletProps) => {
         </Link>
       ) : null}
 
-      <div className={styles.balanceWrapper}>
-        <BalanceAmount
-          title={t("BalanceText")}
-          showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
-          isRefreshing={isRefreshing || isAutoSpinning}
-          progressText={t("TopUpInProgress")}
-          isProgressTextVisible={isAutoSpinning}
-          onRefresh={onClick}
-          amount={walletBalance}
-          currency={walletCodeCurrency}
-          language={store.language}
-        />
+      <div className={styles.summaryGrid}>
+        <div className={`${styles.summaryCard} ${styles.summaryCardBalance}`}>
+          <BalanceAmount
+            title={t("AvailableCredits")}
+            titleFontSize="14px"
+            mainFontSize="28px"
+            fractionFontSize="18px"
+            showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
+            isRefreshing={isRefreshing || isAutoSpinning}
+            progressText={t("TopUpInProgress")}
+            isProgressTextVisible={isAutoSpinning}
+            onRefresh={onClick}
+            amount={walletBalance}
+            currency={walletCodeCurrency}
+            language={store.language}
+          />
 
-        <Button
-          size={isMobile ? ButtonSize.normal : ButtonSize.small}
-          primary
-          label={t("TopUpBalance")}
-          onClick={onOpen}
-          isDisabled={!canUpdateTariff || isNotPaidPeriod}
-          scale={isMobile}
-          className={classNames(styles.topUpButton, {
-            [styles.isMobileButton]: isMobile,
-          })}
-          testId="top_up_balance_button"
-        />
+          <Button
+            size={isMobile ? ButtonSize.normal : ButtonSize.small}
+            primary
+            label={t("TopUpBalance")}
+            onClick={onOpen}
+            isDisabled={!canUpdateTariff || isNotPaidPeriod}
+            scale
+            className={styles.topUpButton}
+            testId="top_up_balance_button"
+          />
+        </div>
+
+        <div className={`${styles.summaryCard} ${styles.summaryCardSpend}`}>
+          <Text
+            fontSize="14px"
+            lineHeight="16px"
+            fontWeight={600}
+            className={styles.spendTitle}
+          >
+            {t("CurrentMonthToDateSpend")}
+          </Text>
+          <BalanceAmount
+            showRefresh={false}
+            amount={walletMonthToDateSpend}
+            currency={walletCodeCurrency}
+            language={store.language}
+            mainFontSize="18px"
+            fractionFontSize="12px"
+            withoutMargin
+            className={styles.spendAmount}
+          />
+          <Text fontSize="12px" lineHeight="16px">
+            {t("ForMonth", { month: monthLabel })}
+          </Text>
+          {onViewUsage ? (
+            <Link
+              onClick={onViewUsage}
+              textDecoration="underline"
+              color="accent"
+              className={styles.viewUsageLink}
+              dataTestId="wallet_view_usage_link"
+            >
+              {t("ViewUsage")}
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       {!isNotPaidPeriod && walletCustomerStatusNotActive ? (

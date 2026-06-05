@@ -398,6 +398,10 @@ class PaymentStore {
     return 0.0;
   }
 
+  get walletMonthToDateSpend(): number {
+    return 0;
+  }
+
   get wasFirstTopUp() {
     return typeof this.balance !== "number";
   }

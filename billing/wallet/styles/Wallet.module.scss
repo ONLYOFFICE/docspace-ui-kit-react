@@ -43,22 +43,56 @@
     line-height: 20px;
   }
 
-  .balanceWrapper {
-    margin-top: 24px;
-    margin-bottom: 16px;
-    .balanceTitle {
-      height: 24px;
+  .summaryGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 24px 0 16px;
+    max-width: 660px;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
     }
   }
 
-  .topUpButton {
-    max-width: 152px;
-    width: 152px;
+  .summaryCard {
+    display: flex;
+    flex-direction: column;
+    background: var(--background-color, #ffffff);
+    border: 1px solid var(--border-color, #dfe2e3);
+    border-radius: 6px;
+  }
 
-    &.isMobileButton {
-      max-width: 100%;
-      width: 100%;
-    }
+  .summaryCardBalance {
+    padding: 12px;
+  }
+
+  .summaryCardSpend {
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .topUpButton {
+    width: 100%;
+    max-width: 100%;
+    margin-top: auto;
+  }
+
+  .spendTitle {
+    color: var(--payment-text-color);
+  }
+
+  .spendAmount {
+    margin: 0;
+  }
+
+
+
+  .viewUsageLink {
+    color: var(--color-scheme-main-accent);
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 600;
   }
   .autoPaymentInformation {
     margin-bottom: 24px;
