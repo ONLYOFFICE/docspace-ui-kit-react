@@ -338,7 +338,7 @@ const AutoPayments = ({
     >
       <div className={styles.autoPaymentHeader}>
         <Text isBold fontSize="16px">
-          {t("AutomaticPayments")}
+          {t("AutomaticTopUps")}
         </Text>
         <ToggleButton
           isChecked={isAutomaticPaymentsEnabled}
@@ -350,7 +350,7 @@ const AutoPayments = ({
       </div>
 
       <Text fontSize="12px" className={styles.autoPaymentDescription}>
-        {t("AutomaticallyTopUpCard")}
+        {t("AutomaticallyAddCredits")}
       </Text>
 
       {isAutomaticPaymentsEnabled

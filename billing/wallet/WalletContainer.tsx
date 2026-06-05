@@ -82,7 +82,18 @@ const Wallet = (props: WalletProps) => {
     recommendedAmount,
     walletHelpUrl,
     isAutoTopUpInProgress,
+    autoPayments,
+    isAutoPaymentExist,
+    language,
   } = store;
+
+  const isAutoPaymentSetup = Boolean(
+    isAutoPaymentExist &&
+    language &&
+    walletCodeCurrency &&
+    autoPayments?.minBalance &&
+    autoPayments?.upToBalance,
+  );
 
   const {
     isNotPaidPeriod,
@@ -97,6 +108,7 @@ const Wallet = (props: WalletProps) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isFirstTopUpDialogVisible, setIsFirstTopUpDialogVisible] =
     useState(false);
+  const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
 
   const [isAutoSpinning, setIsAutoSpinning] = useState(isAutoTopUpInProgress);
   const autoStartTimeRef = useRef<number | null>(null);
@@ -147,11 +159,6 @@ const Wallet = (props: WalletProps) => {
     }
     setVisible(true);
     setIsEditAutoPayment(false);
-  };
-
-  const onOpenLink = () => {
-    setVisible(true);
-    setIsEditAutoPayment(true);
   };
 
   const onClick = async () => {
@@ -226,16 +233,27 @@ const Wallet = (props: WalletProps) => {
             language={store.language}
           />
 
-          <Button
-            size={isMobile ? ButtonSize.normal : ButtonSize.small}
-            primary
-            label={t("TopUpBalance")}
-            onClick={onOpen}
-            isDisabled={!canUpdateTariff || isNotPaidPeriod}
-            scale
-            className={styles.topUpButton}
-            testId="top_up_balance_button"
-          />
+          <div className={styles.cardButtons}>
+            <Button
+              size={isMobile ? ButtonSize.normal : ButtonSize.small}
+              primary
+              label={t("TopUp")}
+              onClick={onOpen}
+              isDisabled={!canUpdateTariff || isNotPaidPeriod}
+              className={styles.cardButton}
+              testId="top_up_balance_button"
+            />
+            {!isAutoPaymentSetup ? (
+              <Button
+                size={isMobile ? ButtonSize.normal : ButtonSize.small}
+                label={t("AutoTopUp")}
+                onClick={() => setIsWalletRefilledOpen(true)}
+                isDisabled={!canUpdateTariff || isNotPaidPeriod}
+                className={styles.cardButton}
+                testId="auto_top_up_button"
+              />
+            ) : null}
+          </div>
         </div>
 
         <div className={`${styles.summaryCard} ${styles.summaryCardSpend}`}>
@@ -312,9 +330,9 @@ const Wallet = (props: WalletProps) => {
             </Link>
           ) : null}
         </div>
-      ) : (
-        <AutoPaymentInfo onOpen={onOpenLink} />
-      )}
+      ) : isAutoPaymentSetup ? (
+        <AutoPaymentInfo />
+      ) : null}
 
       {visible ? (
         <TopUpModal
@@ -332,8 +350,11 @@ const Wallet = (props: WalletProps) => {
         />
       ) : null}
 
-      {wasChangeBalance ? (
-        <WalletRefilledModal visible={wasChangeBalance} />
+      {wasChangeBalance || isWalletRefilledOpen ? (
+        <WalletRefilledModal
+          visible={wasChangeBalance || isWalletRefilledOpen}
+          onClose={() => setIsWalletRefilledOpen(false)}
+        />
       ) : null}
 
       <TransactionHistory withoutRoleFilter />
