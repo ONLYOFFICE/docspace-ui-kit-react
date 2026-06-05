@@ -1,0 +1,39 @@
+.recomendedModel {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 6px;
+  padding: 12px 16px;
+  width: 100%;
+
+  // Accent color at 5% as a background underlay. Using a pseudo-element with
+  // opacity (instead of color-mix) keeps wide browser support — the project's
+  // minimum supported browsers are below color-mix availability. Opacity is
+  // applied to the underlay only, so the content stays fully opaque.
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: var(--accent-main);
+    opacity: 0.05;
+    pointer-events: none;
+  }
+
+  > * {
+    position: relative;
+  }
+}
+
+.recomendedModel-header {
+  display: flex;
+  justify-content: space-between;
+  height: 16px;
+}
+
+.recomendedModel-header-title {
+  display: flex;
+  gap: 8px;
+}

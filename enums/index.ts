@@ -426,6 +426,7 @@ export enum DistributedTaskStatus {
  * @readonly
  */
 export enum AnalyticsEvents {
+  PortalCreated = "portal_created",
   RoomCreated = "room_created",
   RoomDeleted = "room_deleted",
   RoomShared = "room_shared",

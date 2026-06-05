@@ -34,7 +34,7 @@
  */
 
 import { type ReactNode, type ReactElement, cloneElement, Fragment, createElement } from "react";
-import { getCommonTranslation } from ".";
+import { getCommonTranslation } from "./i18n-utils";
 
 export type CommonTransComponent =
   ReactElement<{ children?: ReactNode }>;
