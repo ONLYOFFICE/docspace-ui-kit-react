@@ -95,6 +95,8 @@ export default class MessageStore {
 
   toolsConfirmQueue: string[] = [];
 
+  hasFormAttached: boolean = false;
+
   onStreamData?: (chunk: string) => void;
 
   constructor(aiApi: AiApi) {
@@ -137,6 +139,10 @@ export default class MessageStore {
 
   setCurrentChatId = (chatId: string) => {
     this.currentChatId = chatId;
+  };
+
+  setHasFormAttached = (hasFormAttached: boolean) => {
+    this.hasFormAttached = hasFormAttached;
   };
 
   setMessages = (messages: TMessage[]) => {

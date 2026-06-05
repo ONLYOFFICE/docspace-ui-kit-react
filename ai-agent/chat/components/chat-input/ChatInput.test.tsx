@@ -122,6 +122,7 @@ describe("<ChatInput />", () => {
       currentChatId: null,
       isRequestRunning: false,
       agentId: "agent-1",
+      setHasFormAttached: vi.fn(),
     } as unknown as ReturnType<typeof useMessageStore>);
     vi.mocked(useChatStore).mockReturnValue({
       fetchChat: mockFetchChat,
@@ -184,6 +185,7 @@ describe("<ChatInput />", () => {
       sendMessage: mockSendMessage,
       currentChatId: "chat-1",
       agentId: "agent-1",
+      setHasFormAttached: vi.fn(),
     } as unknown as ReturnType<typeof useMessageStore>);
     render(<ChatInput {...defaultProps} />);
     const textarea = screen.getByTestId("chat-input-textarea");
@@ -234,6 +236,7 @@ describe("<ChatInput />", () => {
       currentChatId: "chat-1",
       isRequestRunning: false,
       agentId: "agent-1",
+      setHasFormAttached: vi.fn(),
     } as unknown as ReturnType<typeof useMessageStore>);
 
     render(<ChatInput {...defaultProps} persistDraft={true} />);

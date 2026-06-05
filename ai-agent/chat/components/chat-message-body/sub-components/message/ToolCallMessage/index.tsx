@@ -37,12 +37,14 @@ import React from "react";
 import { observer } from "mobx-react";
 
 import { MessageToolCallProps } from "../../../../../Chat.types";
+import { useMessageStore } from "../../../../../store/messageStore";
 
 import styles from "../../../ChatMessageBody.module.scss";
 
 import { ToolCallConfirmDialog } from "./tool-call-confirm-dialog";
 import { ToolCall } from "./tool-call";
 import { ToolCallPlacement, ToolCallStatus } from "./tool-call/ToolCall.enum";
+import { hasToolResultError } from "./tool-call/ToolCall.utils";
 
 const ToolCallMessage = observer(({
   content,
@@ -55,7 +57,14 @@ const ToolCallMessage = observer(({
 
   const hideConfirmDialog = () => setNeedConfirmation(false);
 
-  const hasError = !!content.result?.error;
+  const { knowledgeSearchToolName, webSearchToolName, webCrawlingToolName } =
+    useMessageStore();
+
+  const hasError = hasToolResultError(content, [
+    knowledgeSearchToolName,
+    webSearchToolName,
+    webCrawlingToolName,
+  ]);
 
   const toolCallStatus: ToolCallStatus = needConfirmation
     ? ToolCallStatus.Confirmation

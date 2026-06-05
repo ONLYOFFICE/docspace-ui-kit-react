@@ -35,10 +35,22 @@
   }
 
   --room-icon-bg-value: var(--room-icon-bg, var(--room-icon-fill));
-  --room-icon-bg-color-value: var(--room-icon-bg, var(--room-icon-background-color));
-  --room-icon-button-icon-color-value: var(--room-icon-button-icon-color, var(--room-icon-button-color));
-  --room-icon-bg-opacity-value: var(--room-icon-bg-opacity, var(--room-icon-opacity));
-  --room-icon-edit-bg-value: var(--room-icon-edit-bg, var(--room-icon-edit-icon-background));
+  --room-icon-bg-color-value: var(
+    --room-icon-bg,
+    var(--room-icon-background-color)
+  );
+  --room-icon-button-icon-color-value: var(
+    --room-icon-button-icon-color,
+    var(--room-icon-button-color)
+  );
+  --room-icon-bg-opacity-value: var(
+    --room-icon-bg-opacity,
+    var(--room-icon-opacity)
+  );
+  --room-icon-edit-bg-value: var(
+    --room-icon-edit-bg,
+    var(--room-icon-edit-icon-background)
+  );
 
   img {
     max-width: 100%;
@@ -82,7 +94,10 @@
           height: var(--room-icon-size);
 
           path {
-            fill: var(--room-icon-color, var(--room-icon-button-icon-color-value));
+            fill: var(
+              --room-icon-color,
+              var(--room-icon-button-icon-color-value)
+            );
           }
         }
       }
@@ -99,7 +114,10 @@
         }
 
         svg path {
-          fill: var(--room-icon-color, var(--room-icon-button-icon-color-value));
+          fill: var(
+            --room-icon-color,
+            var(--room-icon-button-icon-color-value)
+          );
         }
       }
 
@@ -327,6 +345,19 @@
           stroke: var(--room-icon-bg-color-value) !important;
         }
       }
+
+      :global {
+        .link {
+          path {
+            fill: var(--room-icon-link-icon-path) !important;
+          }
+
+          .link-background {
+            stroke: var(--room-icon-link-icon-background) !important;
+            fill: var(--room-icon-link-icon-background) !important;
+          }
+        }
+      }
     }
   }
 
@@ -384,7 +415,10 @@
   position: relative;
   box-sizing: border-box;
 
-  --room-icon-empty-border-value: var(--room-icon-dashed-border, var(--room-icon-empty-border));
+  --room-icon-empty-border-value: var(
+    --room-icon-dashed-border,
+    var(--room-icon-empty-border)
+  );
   --room-icon-empty-radius-value: var(--room-icon-empty-radius, 10px);
 
   border: var(--room-icon-empty-border-value);

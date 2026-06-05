@@ -559,6 +559,7 @@ export type TSelectorItemFile = MergeTypes<
   {
     fileExst: string;
     fileType: FileType;
+    isForm?: boolean;
     parentId: string | number;
     rootFolderType: string | number;
     security: FileEntryDtoIntegerAllOfSecurity;

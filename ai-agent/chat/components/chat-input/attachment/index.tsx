@@ -88,6 +88,7 @@ const Attachment = ({
           id: Number(item.id),
           title: item.label,
           fileExst: item.fileExst,
+          isForm: item.isForm,
           viewUrl: item.viewUrl,
         },
       ];
