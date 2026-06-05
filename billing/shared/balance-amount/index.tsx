@@ -81,7 +81,7 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     <div className={className}>
       {title ? (
         <div className={styles.headerContainer}>
-          <Text isBold fontSize={titleFontSize} className={styles.balanceTitle}>
+          <Text isBold fontSize={titleFontSize}>
             {title}
           </Text>
 

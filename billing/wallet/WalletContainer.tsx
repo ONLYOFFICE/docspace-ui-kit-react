@@ -59,10 +59,11 @@ import FirstTopUpDialog from "../shared/top-up-balance/FirstTopUpDialog";
 type WalletProps = {
   isMobile?: boolean;
   onViewUsage?: () => void;
+  onAddonsClick?: () => void;
 };
 
 const Wallet = (props: WalletProps) => {
-  const { isMobile, onViewUsage } = props;
+  const { isMobile, onViewUsage, onAddonsClick } = props;
 
   const store = usePaymentStore();
 
@@ -181,9 +182,19 @@ const Wallet = (props: WalletProps) => {
   return (
     <div className={styles.walletContainer}>
       <Text className={styles.walletDescription}>
-        {t("WalletSectionDescription", {
-          productName: getBrandName("ProductName"),
-        })}
+        <CommonTrans
+          i18nKey="WalletSectionDescriptionAddons"
+          components={{
+            1: (
+              <Link
+                as="span"
+                onClick={onAddonsClick}
+                color="accent"
+                textDecoration="underline"
+              />
+            ),
+          }}
+        />
       </Text>
 
       {walletHelpUrl ? (
@@ -229,7 +240,7 @@ const Wallet = (props: WalletProps) => {
 
         <div className={`${styles.summaryCard} ${styles.summaryCardSpend}`}>
           <Text
-            fontSize="14px"
+            fontSize="12px"
             lineHeight="16px"
             fontWeight={600}
             className={styles.spendTitle}
@@ -256,6 +267,7 @@ const Wallet = (props: WalletProps) => {
               color="accent"
               className={styles.viewUsageLink}
               dataTestId="wallet_view_usage_link"
+              fontWeight={600}
             >
               {t("ViewUsage")}
             </Link>
