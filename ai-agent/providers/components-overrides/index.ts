@@ -28,11 +28,12 @@ import type { ComponentOverrides } from "@onlyoffice/ai-chat";
 
 import { ButtonOverride } from "./button";
 import { ComboBoxOverride } from "./combo-box";
+import { DialogContentOverride } from "./dialog-content";
 import { TabsOverride } from "./tabs";
 
 export const componentOverrides: ComponentOverrides = {
   Button: ButtonOverride,
   ComboBox: ComboBoxOverride,
+  DialogContent: DialogContentOverride,
   Tabs: TabsOverride,
 };
-
