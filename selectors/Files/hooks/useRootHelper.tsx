@@ -71,6 +71,30 @@ const catalogIcons: Partial<Record<FolderType, React.FC>> = {
   [FolderType.AiAgents]: CatalogAiAgentsSvg,
 };
 
+// Canonical display order of root folders, matching the left-side Article menu.
+const rootFolderDisplayOrder: FolderType[] = [
+  FolderType.AiAgents,
+  FolderType.USER,
+  FolderType.VirtualRooms,
+  FolderType.SHARE,
+  FolderType.Favorites,
+  FolderType.Recent,
+  FolderType.Archive,
+  FolderType.Privacy,
+  FolderType.COMMON,
+  FolderType.TRASH,
+];
+
+const getRootFolderOrder = (folder: FolderDtoInteger) => {
+  const index =
+    folder.rootFolderType != null
+      ? rootFolderDisplayOrder.indexOf(folder.rootFolderType)
+      : -1;
+
+  // Unknown types go to the end, keeping their original relative order.
+  return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+};
+
 const useRootHelper = ({
   setBreadCrumbs,
 
@@ -116,7 +140,11 @@ const useRootHelper = ({
         .filter((f): f is FolderDtoInteger => f != null);
     }
 
-    currentTree?.forEach((folder) => {
+    const orderedTree = [...(currentTree ?? [])].sort(
+      (a, b) => getRootFolderOrder(a) - getRootFolderOrder(b),
+    );
+
+    orderedTree.forEach((folder) => {
       const IconComponent = folder.rootFolderType
         ? catalogIcons[folder.rootFolderType]
         : undefined;

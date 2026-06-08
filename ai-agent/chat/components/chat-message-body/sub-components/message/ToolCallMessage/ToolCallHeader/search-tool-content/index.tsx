@@ -39,11 +39,12 @@ import DocumentsIcon from "../../../../../../../../../assets/icons/16/catalog.do
 import UniverseIcon from "../../../../../../../../../assets/universe.react.svg";
 import ExternalLinkIcon from "../../../../../../../../../assets/external.link.svg";
 
-import {
-  TToolCallContent,
-  TToolCallResultSourceData,
-} from "../../../../../../../../../types/ai";
+import { TToolCallContent } from "../../../../../../../../../types/ai";
 import { useMessageStore } from "../../../../../../../store/messageStore";
+import {
+  getToolResultData,
+  hasToolResultError,
+} from "../../tool-call/ToolCall.utils";
 import styles from "../../../../../ChatMessageBody.module.scss";
 import { Text } from "../../../../../../../../../components/text";
 import { Link, LinkTarget } from "../../../../../../../../../components/link";
@@ -57,15 +58,21 @@ const WebCrawlingToolContent = ({
   openLink?: (url: string) => void;
 }) => {
   const t = useCommonTranslation();
-  const toolInfo = ((content.result?.data as TToolCallResultSourceData)
-    ?.title || content.arguments.url) as string;
+  const { webCrawlingToolName } = useMessageStore();
 
-  const hasError = !!content.result?.error;
+  const url =
+    typeof content.arguments?.url === "string" ? content.arguments.url : "";
+
+  const resultTitle = getToolResultData(content)?.title;
+  const toolInfo =
+    (typeof resultTitle === "string" && resultTitle) || url;
+
+  const hasError = hasToolResultError(content, [webCrawlingToolName]);
 
   const handleClick = (e: React.MouseEvent) => {
-    if (openLink && content.arguments?.url) {
+    if (openLink && url) {
       e.preventDefault();
-      openLink(content.arguments.url as string);
+      openLink(url);
     }
   };
 
@@ -83,7 +90,7 @@ const WebCrawlingToolContent = ({
   ) : (
     <Link
       style={{ display: "contents" }}
-      href={content.arguments?.url as string}
+      href={url}
       target={LinkTarget.blank}
       textDecoration="none"
       onClick={handleClick}
@@ -106,7 +113,10 @@ const WebCrawlingToolContent = ({
 
 const WebSearchToolContent = ({ content }: { content: TToolCallContent }) => {
   const t = useCommonTranslation();
-  const toolInfo = content.arguments.query as string;
+  const toolInfo =
+    typeof content.arguments?.query === "string"
+      ? content.arguments.query
+      : "";
 
   return (
     <>
@@ -128,7 +138,10 @@ const KnowledgeSearchToolContent = ({
   content: TToolCallContent;
 }) => {
   const t = useCommonTranslation();
-  const toolInfo = content.arguments.query as string;
+  const toolInfo =
+    typeof content.arguments?.query === "string"
+      ? content.arguments.query
+      : "";
 
   return (
     <>

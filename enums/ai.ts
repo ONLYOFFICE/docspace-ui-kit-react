@@ -40,6 +40,20 @@ export enum ServerType {
   Box,
 }
 
+// Canonical AI provider type. Re-exported from @docspace/shared/api/ai/enums
+// for shared consumers; lives here because ui-kit must not depend on shared.
+export enum ProviderType {
+  PortalAi = 0,
+  OpenAi = 1,
+  TogetherAi = 2,
+  OpenAiCompatible = 3,
+  Anthropic = 4,
+  OpenRouter = 5,
+  DeepSeek = 6,
+  XAi = 7,
+  Google = 8,
+}
+
 export enum ContentType {
   Text = 0,
   Tool = 1,

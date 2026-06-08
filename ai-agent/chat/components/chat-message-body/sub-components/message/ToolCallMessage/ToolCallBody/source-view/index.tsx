@@ -173,11 +173,16 @@ export const SourceView = ({
 }) => {
   if (!content.result) return null;
 
-  const sources: TToolCallResultSourceData[] = Array.isArray(
-    content.result?.data,
-  )
-    ? content.result?.data
-    : [content.result?.data];
+  const data = (content.result as { data?: unknown })?.data;
+
+  const sources: TToolCallResultSourceData[] = (
+    Array.isArray(data) ? data : [data]
+  ).filter(
+    (source): source is TToolCallResultSourceData =>
+      !!source && typeof source === "object",
+  );
+
+  if (sources.length === 0) return null;
 
   return (
     <div className={styles.sourceView} data-testid="source-view">

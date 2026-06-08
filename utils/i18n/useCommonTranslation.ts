@@ -35,8 +35,8 @@
 
 import { useSyncExternalStore, useCallback } from "react";
 
-import { getCurrentCommonLanguage, getCommonTranslation } from "./index";
-import type { WindowI18n } from "./index";
+import { getCurrentCommonLanguage, getCommonTranslation } from "./i18n-utils";
+import type { WindowI18n } from "./i18n-utils";
 
 const getI18nInstance = (): WindowI18n["instance"] | undefined => {
   if (typeof window === "undefined") return undefined;
