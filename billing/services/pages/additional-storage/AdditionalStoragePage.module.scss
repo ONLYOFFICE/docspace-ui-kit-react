@@ -10,16 +10,16 @@
   margin-bottom: 8px;
 }
 
-.subscriptionCard {
+.subscriptionSection {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid var(--border-service-color);
-  border-radius: 6px;
-box-sizing: border-box;
-  max-width: 320px;
-  margin: 16px 0 12px 0 ;
+  gap: 16px;
+  max-width: 660px;
+  margin-top: 16px;
+}
+
+.edit-subscription{
+  margin-top:4px;
 }
 
 .subscriptionHeader {
@@ -44,54 +44,62 @@ box-sizing: border-box;
   }
 }
 
-.priceContainer {
+.summaryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summaryCard {
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--payment-card-background-color);
+  border: 1px solid var(--payment-card-border-color);
+  border-radius: 6px;
+  box-sizing: border-box;
 }
 
-.sizeText {
-  color: var(--payment-dialog-text);
+.cardLabel {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--payment-inactive-color);
 }
 
-.priceText {
-
+.cardValue {
+  font-size: 18px;
   font-weight: 700;
-
-  .mainPrice {
-    font-size: 28px;
-    line-height: normal;
-  }
-
-  .perMonth {
-    font-size: 20px;
-    line-height: normal;
-  }
-
-  .storage {
-    font-size: 20px;
-    line-height: normal;
-
-    font-weight: 400;
-  }
+  line-height: 24px;
+  color: var(--text-color);
 }
 
-.increaseButton {
-  width: 100%;
-  margin-top:4px;
+.cardCaption {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--text-color);
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .renewalText {
-
   font-weight: 400;
-  font-size: 12px;
-  line-height: 16px;
-
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-color);
 
   .renewalDate {
     font-weight: 600;
   }
 }
 
-.transactionSection {
-  margin-top: 8px;
-}
