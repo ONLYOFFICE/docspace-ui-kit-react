@@ -259,27 +259,36 @@ const Wallet = (props: WalletProps) => {
         </div>
 
         <div className={`${styles.summaryCard} ${styles.summaryCardSpend}`}>
-          <Text
-            fontSize="12px"
-            lineHeight="16px"
-            fontWeight={600}
-            className={styles.spendTitle}
-          >
-            {t("CurrentMonthToDateSpend")}
-          </Text>
-          <BalanceAmount
-            showRefresh={false}
-            amount={walletMonthToDateSpend}
-            currency={walletCodeCurrency}
-            language={store.language}
-            mainFontSize="18px"
-            fractionFontSize="12px"
-            withoutMargin
-            className={styles.spendAmount}
+          <CommonTrans
+            i18nKey="CurrentMonthToDateSpendForMonth"
+            values={{
+              month: monthLabel,
+              spend: (
+                <BalanceAmount
+                  key="spend"
+                  showRefresh={false}
+                  amount={walletMonthToDateSpend}
+                  currency={walletCodeCurrency}
+                  language={store.language}
+                  mainFontSize="18px"
+                  fractionFontSize="12px"
+                  withoutMargin
+                  className={styles.spendAmount}
+                />
+              ),
+            }}
+            components={{
+              1: (
+                <Text
+                  fontSize="12px"
+                  lineHeight="16px"
+                  fontWeight={600}
+                  className={styles.spendTitle}
+                />
+              ),
+              2: <Text fontSize="12px" lineHeight="16px" />,
+            }}
           />
-          <Text fontSize="12px" lineHeight="16px">
-            {t("ForMonth", { month: monthLabel })}
-          </Text>
           {onViewUsage ? (
             <Link
               onClick={onViewUsage}
