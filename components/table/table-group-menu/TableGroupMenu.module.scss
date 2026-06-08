@@ -120,13 +120,13 @@
      }
    }
  
-   .combobox {
+   :global(#menu-combobox) {
      height: 24px;
      width: 16px;
      margin-block: 7px 0;
      margin-inline: 9px 2px;
      background: transparent;
- 
+
      :global(.combo-button) {
        :global(.combo-buttons_arrow-icon) {
          margin-block: 1px 0;

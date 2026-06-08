@@ -169,6 +169,9 @@ export const convertFilesToItems: (
       isDisabled: !filterParam || isDisabled || isDisabledBySecurity,
       fileExst,
       fileType,
+      // isForm isn't declared on the SDK file DTO yet, but the backend returns
+      // it for PDF forms — surface it so consumers (e.g. chat) can detect forms.
+      isForm: (file as { isForm?: boolean }).isForm,
       viewUrl,
     } as TSelectorItem;
   });

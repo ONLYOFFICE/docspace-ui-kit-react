@@ -131,6 +131,11 @@ const useSocketHelper = ({
 
       if (folderSubscribers.current.has(roomParts)) return;
 
+      // If already subscribed externally (e.g. main view), don't take
+      // ownership — adding to folderSubscribers would cause cleanup to
+      // unsubscribe it when the selector closes, breaking the main view.
+      if (socket?.socketSubscribers.has(roomParts)) return;
+
       folderSubscribers.current.add(roomParts);
 
       socket?.emit(SocketCommands.Subscribe, {

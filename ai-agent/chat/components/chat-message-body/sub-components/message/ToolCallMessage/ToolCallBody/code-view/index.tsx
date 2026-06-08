@@ -60,8 +60,8 @@ export const CodeView = observer(
       if (content?.result?.data) return JSON.stringify(content.result.data);
 
       if (content.result && "content" in content.result) {
-        return (content.result?.content as Record<string, unknown>[])?.[0]
-          .text as string;
+        return ((content.result?.content as Record<string, unknown>[])?.[0]
+          ?.text ?? "") as string;
       }
 
       return "";
@@ -95,7 +95,7 @@ export const CodeView = observer(
             {t("ToolCallArg")}
           </Text>
           <MarkdownField
-            chatMessage={formatJsonWithMarkdown(content.arguments)}
+            chatMessage={formatJsonWithMarkdown(content.arguments ?? {})}
             successCopyMessage={t("ToolCallArgCopied")}
           />
         </div>

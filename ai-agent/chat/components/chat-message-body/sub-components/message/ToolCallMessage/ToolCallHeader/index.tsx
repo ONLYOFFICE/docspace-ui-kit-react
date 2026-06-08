@@ -48,6 +48,7 @@ import { useMessageStore } from "../../../../../../store/messageStore";
 
 import styles from "../../../../ChatMessageBody.module.scss";
 import { ToolCallPlacement, ToolCallStatus } from "../tool-call/ToolCall.enum";
+import { hasToolResultError } from "../tool-call/ToolCall.utils";
 import { SearchToolContent } from "./search-tool-content";
 import { MCPToolContent } from "./mcp-tool-content";
 
@@ -97,7 +98,11 @@ export const ToolCallHeader = observer(
         : statusIcons[status];
 
     const onClick = () => {
-      if (isWebCrawlingTool && !content.result?.error) return;
+      if (
+        isWebCrawlingTool &&
+        !hasToolResultError(content, [webCrawlingToolName])
+      )
+        return;
 
       setCollapsed(!collapsed);
     };

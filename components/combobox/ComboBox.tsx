@@ -262,6 +262,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     noSelect = true,
     useImageIcon = false,
     withoutArrow = false,
+    id,
   } = props;
 
   React.useEffect(() => {
@@ -506,6 +507,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
   return (
     <TooltipContainer
       as="div"
+      id={id}
       className={comboboxClasses}
       ref={ref}
       onClick={comboBoxClick}
