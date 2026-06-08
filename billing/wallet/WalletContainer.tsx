@@ -49,7 +49,6 @@ import { finishRefreshingWithMinCycle } from "../utils/refreshing";
 
 import TransactionHistory from "../shared/transaction-history";
 import UpcomingPayments from "./sub-components/UpcomingPayments";
-import TopUpModal from "../shared/top-up-balance/TopUpModal";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
 import PluginIncompatibleSvg from "../../assets/plugin.incompatible.react.svg";
@@ -57,7 +56,7 @@ import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { getBrandName } from "../../constants/brands";
-import FirstTopUpDialog from "../shared/top-up-balance/FirstTopUpDialog";
+import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialog";
 
 type WalletProps = {
   isMobile?: boolean;
@@ -107,11 +106,9 @@ const Wallet = (props: WalletProps) => {
 
   const t = useCommonTranslation();
 
-  const [visible, setVisible] = useState(isVisibleWalletSettings);
-  const [isEditAutoPayment, setIsEditAutoPayment] = useState(false);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] =
+    useState(isVisibleWalletSettings);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isFirstTopUpDialogVisible, setIsFirstTopUpDialogVisible] =
-    useState(false);
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
   const [selectedTabId, setSelectedTabId] = useState("transaction-history");
 
@@ -154,16 +151,11 @@ const Wallet = (props: WalletProps) => {
   }, [isAutoTopUpInProgress]);
 
   const onClose = () => {
-    setVisible(false);
+    setIsTopUpDialogVisible(false);
   };
 
   const onOpen = () => {
-    if (!walletCustomerEmail) {
-      setIsFirstTopUpDialogVisible(true);
-      return;
-    }
-    setVisible(true);
-    setIsEditAutoPayment(false);
+    setIsTopUpDialogVisible(true);
   };
 
   const onClick = async () => {
@@ -370,19 +362,12 @@ const Wallet = (props: WalletProps) => {
         <AutoPaymentInfo />
       ) : null}
 
-      {visible ? (
-        <TopUpModal
-          visible={visible}
+      {isTopUpDialogVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpDialogVisible}
           onClose={onClose}
-          isEditAutoPayment={isEditAutoPayment}
+          isFirstTopUp={!walletCustomerEmail}
           recommendedAmount={recommendedAmount}
-        />
-      ) : null}
-
-      {isFirstTopUpDialogVisible ? (
-        <FirstTopUpDialog
-          visible={isFirstTopUpDialogVisible}
-          onClose={() => setIsFirstTopUpDialogVisible(false)}
         />
       ) : null}
 

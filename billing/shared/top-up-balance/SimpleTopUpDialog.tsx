@@ -43,6 +43,8 @@ import { toastr } from "../../../components/toast";
 
 import { useCommonTranslation } from "../../../utils/i18n";
 import { toAbsoluteUrl } from "../../utils/url";
+import { useApi } from "../../../providers";
+import { AnalyticsEvents } from "../../../enums";
 
 import Amount from "./sub-components/Amount";
 import { AmountProvider, useAmountValue } from "../../wallet/context";
@@ -50,7 +52,7 @@ import { AmountProvider, useAmountValue } from "../../wallet/context";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import type PaymentStore from "../../store/PaymentStore";
 
-import styles from "./styles/FirstTopUpDialog.module.scss";
+import styles from "./styles/SimpleTopUpDialog.module.scss";
 
 const MIN_AMOUNT = "10";
 const PAYMENT_CALLBACK_PATH = "/billing/payment-complete";
@@ -126,18 +128,31 @@ const waitForTopUpCompletion = async (
   }, signal);
 };
 
-type FirstTopUpDialogProps = {
+type SimpleTopUpDialogProps = {
   visible: boolean;
   onClose: () => void;
   onConfirm?: () => Promise<void> | void;
+  isFirstTopUp?: boolean;
+  recommendedAmount?: string;
 };
 
-const FirstTopUpDialogContent = observer(
-  ({ visible, onClose, onConfirm }: FirstTopUpDialogProps) => {
+const SimpleTopUpDialogContent = observer(
+  ({
+    visible,
+    onClose,
+    onConfirm,
+    isFirstTopUp = true,
+  }: SimpleTopUpDialogProps) => {
     const t = useCommonTranslation();
+    const { paymentApi } = useApi();
     const paymentStore = usePaymentStore();
 
-    const { formatWalletCurrency } = paymentStore;
+    const {
+      formatWalletCurrency,
+      walletCodeCurrency,
+      fetchBalance,
+      fetchTransactionHistory,
+    } = paymentStore;
     const { walletCustomerStatusNotActive } = paymentStore.tariff;
 
     const { amount, hasError } = useAmountValue();
@@ -154,9 +169,7 @@ const FirstTopUpDialogContent = observer(
 
     const isDisabled = isLoading || !amount || hasError;
 
-    const onContinue = async () => {
-      if (isDisabled) return;
-
+    const onStripeContinue = async () => {
       const controller = new AbortController();
       abortControllerRef.current = controller;
       const { signal } = controller;
@@ -183,6 +196,46 @@ const FirstTopUpDialogContent = observer(
       }
     };
 
+    const onInstantTopUp = async () => {
+      setIsLoading(true);
+
+      try {
+        const res = await paymentApi.topUpDeposit({
+          topUpDepositRequestDto: {
+            amount: +amount,
+            currency: walletCodeCurrency,
+          },
+        });
+
+        if (!res?.data?.response) throw new Error(t("UnexpectedError"));
+
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: AnalyticsEvents.WalletTopUp });
+
+        await Promise.allSettled([
+          fetchBalance(true),
+          fetchTransactionHistory(),
+        ]);
+
+        toastr.success(t("WalletToppedUp"));
+
+        await onConfirm?.();
+
+        onClose();
+      } catch (error) {
+        toastr.error(error as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const onContinue = async () => {
+      if (isDisabled) return;
+
+      if (isFirstTopUp) await onStripeContinue();
+      else await onInstantTopUp();
+    };
+
     return (
       <ModalDialog
         visible={visible}
@@ -196,7 +249,9 @@ const FirstTopUpDialogContent = observer(
         <ModalDialog.Body>
           <div className={styles.body}>
             <Text className={styles.description}>
-              {t("TopUpCreditsDescription")}
+              {isFirstTopUp
+                ? t("TopUpCreditsDescription")
+                : t("TopUpCreditsAmountDescription")}
             </Text>
 
             <Amount
@@ -207,9 +262,15 @@ const FirstTopUpDialogContent = observer(
               withoutCustomerCheck
             />
 
-            <Text fontSize="12px" className={styles.helperText}>
-              {t("TopUpCreditsChargeHint")}
-            </Text>
+            {isFirstTopUp ? (
+              <Text fontSize="12px" className={styles.helperText}>
+                {t("TopUpCreditsChargeHint")}
+              </Text>
+            ) : (
+              <Text fontSize="12px" className={styles.helperText}>
+                {t("TopUpTakeSomeTimeToComplete")}
+              </Text>
+            )}
           </div>
         </ModalDialog.Body>
 
@@ -217,7 +278,7 @@ const FirstTopUpDialogContent = observer(
           <div className={styles.footerButtons}>
             <Button
               key="ContinueToStripeButton"
-              label={t("ContinueToStripe")}
+              label={isFirstTopUp ? t("ContinueToStripe") : t("TopUp")}
               size={ButtonSize.normal}
               primary
               scale
@@ -242,11 +303,11 @@ const FirstTopUpDialogContent = observer(
   },
 );
 
-const FirstTopUpDialog: React.FC<FirstTopUpDialogProps> = (props) => (
-  <AmountProvider>
-    <FirstTopUpDialogContent {...props} />
+const SimpleTopUpDialog: React.FC<SimpleTopUpDialogProps> = (props) => (
+  <AmountProvider initialAmount={props.recommendedAmount}>
+    <SimpleTopUpDialogContent {...props} />
   </AmountProvider>
 );
 
-export default FirstTopUpDialog;
+export default SimpleTopUpDialog;
 

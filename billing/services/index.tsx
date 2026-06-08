@@ -65,7 +65,7 @@ import StoragePlanUpgrade from "./panels/additional-storage/StoragePlanUpgrade";
 import StoragePlanCancel from "./panels/additional-storage/StoragePlanCancel";
 import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
-import FirstTopUpDialog from "../shared/top-up-balance/FirstTopUpDialog";
+import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialog";
 import { getBrandName } from "../../constants/brands";
 type TServicesProps = {
   showPortalSettingsLoader?: boolean;
@@ -482,7 +482,7 @@ const Services = observer(
           />
         ) : null}
         {isFirstTopUpDialogVisible ? (
-          <FirstTopUpDialog
+          <SimpleTopUpDialog
             visible={isFirstTopUpDialogVisible}
             onClose={() => setIsFirstTopUpDialogVisible(false)}
             onConfirm={onFirstTopUpConfirmed}
@@ -499,7 +499,7 @@ const Services = observer(
         ) : null}
         {isTopUpBalanceVisible ? (
           !isCardLinkedToPortal ? (
-            <FirstTopUpDialog
+            <SimpleTopUpDialog
               visible={isTopUpBalanceVisible}
               onClose={() => onCloseTopUpModal(false)}
               onConfirm={onConfirm}
