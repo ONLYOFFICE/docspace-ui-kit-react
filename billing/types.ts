@@ -108,6 +108,17 @@ export type TPaymentUser = {
   isOwner: boolean;
 };
 
+export type TUpcomingPaymentActionType = "edit-plan" | "edit-subscription";
+
+export type TUpcomingPayment = {
+  id: string;
+  renewalDate: string;
+  type: string;
+  details: string;
+  amount: number;
+  actionType?: TUpcomingPaymentActionType;
+};
+
 export type TPaymentRoutes = {
   portalPayments: string;
   services: string;
@@ -116,7 +127,6 @@ export type TPaymentRoutes = {
   diskStorage: string;
 };
 
-/** Minimal config provided by the host application. Everything else is fetched internally. */
 export type TPaymentConfig = {
   language: string;
   routes?: TPaymentRoutes;

@@ -44,9 +44,11 @@ import { Text } from "../../components/text";
 import { Button, ButtonSize } from "../../components/button";
 import { toastr } from "../../components/toast";
 import { Link } from "../../components/link";
+import { Tabs, type TTabItem } from "../../components/tabs";
 import { finishRefreshingWithMinCycle } from "../utils/refreshing";
 
 import TransactionHistory from "../shared/transaction-history";
+import UpcomingPayments from "./sub-components/UpcomingPayments";
 import TopUpModal from "../shared/top-up-balance/TopUpModal";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
@@ -111,6 +113,7 @@ const Wallet = (props: WalletProps) => {
   const [isFirstTopUpDialogVisible, setIsFirstTopUpDialogVisible] =
     useState(false);
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
+  const [selectedTabId, setSelectedTabId] = useState("transaction-history");
 
   const [isAutoSpinning, setIsAutoSpinning] = useState(isAutoTopUpInProgress);
   const autoStartTimeRef = useRef<number | null>(null);
@@ -187,6 +190,23 @@ const Wallet = (props: WalletProps) => {
       ? window.open(toAbsoluteUrl(cardLinked), "_self")
       : toastr.error(t("UnexpectedError"));
   };
+
+  const tabsItems: TTabItem[] = [
+    {
+      id: "transaction-history",
+      name: t("TransactionHistory"),
+      content: (
+        <div>
+          <TransactionHistory withoutRoleFilter withoutHeader />
+        </div>
+      ),
+    },
+    {
+      id: "upcoming-payments",
+      name: t("UpcomingPayments"),
+      content: <UpcomingPayments />,
+    },
+  ];
 
   return (
     <div className={styles.walletContainer}>
@@ -373,7 +393,14 @@ const Wallet = (props: WalletProps) => {
         />
       ) : null}
 
-      <TransactionHistory withoutRoleFilter />
+      <div className={styles.tabsWrapper}>
+        <Tabs
+          items={tabsItems}
+          selectedItemId={selectedTabId}
+          onSelect={(item) => setSelectedTabId(item.id)}
+          withoutStickyIntend
+        />
+      </div>
     </div>
   );
 };

@@ -81,6 +81,7 @@ import type {
   TPaymentConfig,
   TPaymentRoutes,
   TServiceFeatureWithPrice,
+  TUpcomingPayment,
   TWalletServiceQuota,
 } from "../types";
 import CurrentTariffStatusStore from "./CurrentTariffStatusStore";
@@ -548,6 +549,10 @@ class PaymentStore {
   updatePreviousBalance = () => {
     this.previousBalance = this.balance;
   };
+
+  get upcomingPayments(): TUpcomingPayment[] {
+    return [];
+  }
 
   formatWalletCurrency = (
     item: number | null = null,

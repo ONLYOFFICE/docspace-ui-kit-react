@@ -1,0 +1,24 @@
+.tableWrapper {
+  width: 100%;
+}
+
+.tableContainer :global(.table-container_header) {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+}
+
+.tableContainer :global([class*="emptyTableContainer"]) {
+  height: 0 !important;
+}
+
+.cellText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actionLink {
+  white-space: nowrap;
+}
