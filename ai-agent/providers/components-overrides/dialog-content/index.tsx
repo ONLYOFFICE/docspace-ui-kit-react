@@ -58,6 +58,7 @@ const DialogContentOverride: React.FC<DialogContentProps> = ({
   return (
     <ModalDialog
       visible
+      autoMaxHeight
       withoutPadding
       displayType={ModalDialogType.modal}
       isHuge={isHuge}
