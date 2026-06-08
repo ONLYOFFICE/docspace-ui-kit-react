@@ -1200,8 +1200,21 @@ export const TableHeader = (props: TableHeaderProps) => {
 
     window.addEventListener("resize", throttledResize);
 
+    // Also recompute on container-driven width changes that never fire a window
+    // resize — e.g. a host collapsing/expanding #section for a fullscreen
+    // overlay, or a side panel opening next to the table. Observing the
+    // container makes the table self-sufficient regardless of what moved it; a
+    // collapsed (width 0) container is handled by the guards in onResize.
+    // Setting gridTemplateColumns doesn't change the container's own box, so
+    // this can't feed back into itself.
+    const container = containerRef.current;
+    const resizeObserver = new ResizeObserver(throttledResize);
+    if (container) resizeObserver.observe(container);
+
     return () => {
       window.removeEventListener("resize", throttledResize);
+      resizeObserver.disconnect();
+      throttledResize.cancel();
     };
   });
 
