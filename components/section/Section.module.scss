@@ -213,6 +213,55 @@
   }
 }
 
+// AI Chat panel region. Renders inline on every device (no portal / no Aside),
+// so the chat subtree is never remounted across a resize. On tablet/mobile it
+// becomes a full-screen overlay purely via CSS. Desktop width is windowed
+// (400px) by default; the host sets `--chat-panel-width: 100vw` to make it
+// fill the section in its fullscreen mode.
+.chatPanel {
+  // bridge vars — bind public overrides to internal theme tokens, with a final
+  // fallback to the global background so the panel is never transparent.
+  --chat-panel-bg-v: var(--chat-panel-background, var(--chat-panel-bg, var(--background-color)));
+  --chat-panel-border-v: var(--chat-panel-border-color, var(--chat-panel-border));
+  --chat-panel-width-v: var(--chat-panel-width, 400px);
+
+  height: 100%;
+  width: var(--chat-panel-width-v);
+  // Hold the desktop width firm (400px by default) — as a flex child it would
+  // otherwise shrink when the section needs room. The host overrides
+  // `--chat-panel-width` to 100vw for fullscreen, where #section is collapsed.
+  flex-shrink: 0;
+  background-color: var(--chat-panel-bg-v);
+  border-inline-start: 1px solid var(--chat-panel-border-v);
+  display: flex;
+  flex-direction: column;
+
+  // The theme class (`light`/`dark`) lives on `body`, an ancestor, so target it
+  // as an ancestor (`:global(.light) &`) — a nested `:global(.light){}` would
+  // compile to a descendant selector and never match.
+  :global(.light) & {
+    --chat-panel-bg: #{colors.$white};
+    --chat-panel-border: #{colors.$gray-light-mid};
+  }
+
+  :global(.dark) & {
+    --chat-panel-bg: #{colors.$black};
+    --chat-panel-border: #{colors.$gray-dark-strong};
+  }
+
+  // Tablet/mobile: full-screen overlay above the section. No Aside switch, no
+  // 480px width and no bottom-sheet offset — the chat owns the whole viewport.
+  @include mixins.tablet-and-below {
+    position: fixed;
+    inset: 0;
+    z-index: 309;
+    width: 100vw;
+    max-width: 100vw;
+    height: 100%;
+    border: none;
+  }
+}
+
 .spacer {
   display: none;
   min-height: var(--section-mobile-footer-height, 64px);

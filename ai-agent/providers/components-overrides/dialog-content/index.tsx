@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) Ascensio System SIA, 2009-2026
  *
  * This program is a free software product. You can redistribute it and/or
@@ -33,21 +33,51 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { DeviceType } from "../../enums";
+import React from "react";
+import classNames from "classnames";
 
-export const SECTION_HEADER_NAME = "SectionHeader";
-export const SECTION_FILTER_NAME = "SectionFilter";
-export const SECTION_BODY_NAME = "SectionBody";
-export const SECTION_FOOTER_NAME = "SectionFooter";
-export const SECTION_INFO_PANEL_BODY_NAME = "InfoPanelBody";
-export const SECTION_INFO_PANEL_HEADER_NAME = "InfoPanelHeader";
-export const SECTION_CHAT_PANEL_NAME = "ChatPanel";
-export const SECTION_WARNING_NAME = "SectionWarning";
-export const SECTION_SUBMENU_NAME = "SectionSubmenu";
-export const SECTION_BANNER_NAME = "SectionBanner";
+import { useTheme } from "@onlyoffice/ai-chat";
+import type { DialogContentProps } from "@onlyoffice/ai-chat";
 
-export const SECTION_HEADER_HEIGHT: Readonly<Record<DeviceType, string>> = {
-  [DeviceType.desktop]: "69px",
-  [DeviceType.tablet]: "61px",
-  [DeviceType.mobile]: "53px",
-} as const;
+import {
+  ModalDialog,
+  ModalDialogType,
+} from "../../../../components/modal-dialog";
+
+import styles from "./DialogContent.module.scss";
+
+const DialogContentOverride: React.FC<DialogContentProps> = ({
+  children,
+  header,
+  onClose,
+  isHuge = false,
+  withWarningIcon = false,
+}) => {
+  const { themeId } = useTheme();
+
+  return (
+    <ModalDialog
+      visible
+      withoutPadding
+      displayType={ModalDialogType.modal}
+      isHuge={isHuge}
+      onClose={onClose}
+    >
+      <ModalDialog.Header>{header}</ModalDialog.Header>
+      <ModalDialog.Body>
+        <div
+          className={classNames("aui-root", themeId, styles.body, {
+            [styles.warning]: withWarningIcon,
+          })}
+        >
+          {children}
+        </div>
+      </ModalDialog.Body>
+    </ModalDialog>
+  );
+};
+
+DialogContentOverride.displayName = "DialogContentOverride";
+
+export { DialogContentOverride };
+
