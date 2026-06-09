@@ -74,6 +74,8 @@ import {
   now,
   subtractFromDate,
   formatDate as formatDateUtil,
+  formatDateLocalized,
+  getAppTimezone,
   isSameDay,
 } from "../../utils/date";
 import type { DateTime } from "luxon";
@@ -82,8 +84,10 @@ import type {
   TPaymentRoutes,
   TServiceFeatureWithPrice,
   TUpcomingPayment,
+  TUpcomingPaymentResponse,
   TWalletServiceQuota,
 } from "../types";
+import type { TApiClient } from "../../providers/api/ApiProvider";
 import CurrentTariffStatusStore from "./CurrentTariffStatusStore";
 import CurrentQuotasStore from "./CurrentQuotasStore";
 import PaymentQuotasStore from "./PaymentQuotasStore";
@@ -106,6 +110,8 @@ class PaymentStore {
   private profilesApi: ProfilesApi;
 
   private commonSettingsApi: CommonSettingsApi;
+
+  #rawApiClient: TApiClient;
 
   private abortControllers: AbortController[] = [];
 
@@ -192,6 +198,8 @@ class PaymentStore {
 
   isTransactionHistoryExist = false;
 
+  upcomingPaymentsData: TUpcomingPaymentResponse[] = [];
+
   autoPayments: TenantWalletSettings | null = null;
 
   minBalance: string = "";
@@ -250,10 +258,12 @@ class PaymentStore {
     profilesApi: ProfilesApi,
     portalQuotaApi: PortalQuotaApi,
     commonSettingsApi: CommonSettingsApi,
+    rawApiClient: TApiClient,
   ) {
     this.paymentApi = paymentApi;
     this.profilesApi = profilesApi;
     this.commonSettingsApi = commonSettingsApi;
+    this.#rawApiClient = rawApiClient;
 
     this.tariff = new CurrentTariffStatusStore(portalQuotaApi, paymentApi);
     this.quotas = new CurrentQuotasStore(paymentApi);
@@ -550,8 +560,36 @@ class PaymentStore {
     this.previousBalance = this.balance;
   };
 
+  fetchUpcomingPayments = async () => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/tariff/upcoming",
+        { signal: abortController.signal },
+      );
+
+      this.upcomingPaymentsData =
+        (data?.response as TUpcomingPaymentResponse[]) ?? [];
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
   get upcomingPayments(): TUpcomingPayment[] {
-    return [];
+    return this.upcomingPaymentsData.map((item) => ({
+      id: String(item.id),
+      renewalDate: formatDateLocalized(item.dueDate, "DATE_FULL", {
+        locale: this.language,
+        timezone: getAppTimezone(),
+      }),
+      type: item.name,
+      quantity: item.quantity,
+      amount: item.amount,
+      actionType: item.wallet ? "edit-subscription" : "edit-plan",
+    }));
   }
 
   formatWalletCurrency = (
@@ -1155,7 +1193,10 @@ class PaymentStore {
         requests.push(this.handleServicesQuotas());
       }
 
-      requests.push(this.tariff.fetchPortalTariff());
+      requests.push(
+        this.tariff.fetchPortalTariff(),
+        this.fetchUpcomingPayments(),
+      );
 
       await Promise.all(requests);
 

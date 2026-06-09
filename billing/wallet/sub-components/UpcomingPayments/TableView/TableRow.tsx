@@ -45,7 +45,7 @@ const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
   return (
     <TableRow>
       <TableCell>
-        <Text fontSize="12px" className={styles.cellText}>
+        <Text fontSize="12px" fontWeight={600} className={styles.cellText}>
           {renewalDate}
         </Text>
       </TableCell>
@@ -55,7 +55,7 @@ const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
         </Text>
       </TableCell>
       <TableCell>
-        <Text fontSize="12px" className={styles.cellText}>
+        <Text fontSize="12px" fontWeight={600} className={styles.cellText}>
           {details}
         </Text>
       </TableCell>
@@ -70,7 +70,6 @@ const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
             fontSize="12px"
             fontWeight={600}
             textDecoration="underline"
-            color="accent"
             onClick={onAction}
             className={styles.actionLink}
           >

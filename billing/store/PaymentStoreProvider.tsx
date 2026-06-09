@@ -61,8 +61,13 @@ const PaymentStoreProviderInner = ({
   children,
   config,
 }: TPaymentStoreProviderProps) => {
-  const { paymentApi, profilesApi, portalQuotaApi, commonSettingsApi } =
-    useApi();
+  const {
+    paymentApi,
+    profilesApi,
+    portalQuotaApi,
+    commonSettingsApi,
+    rawApiClient,
+  } = useApi();
 
   const store = React.useMemo(
     () =>
@@ -71,8 +76,9 @@ const PaymentStoreProviderInner = ({
         profilesApi,
         portalQuotaApi,
         commonSettingsApi,
+        rawApiClient,
       ),
-    [paymentApi, profilesApi, portalQuotaApi, commonSettingsApi],
+    [paymentApi, profilesApi, portalQuotaApi, commonSettingsApi, rawApiClient],
   );
 
   React.useEffect(() => {

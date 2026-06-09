@@ -2,9 +2,10 @@ import React, { useRef } from "react";
 import { observer } from "mobx-react";
 
 import { TableBody, TableContainer } from "../../../../../components/table";
-import { formatDateLocalized, getAppTimezone } from "../../../../../utils/date";
+import { useCommonTranslation } from "../../../../../utils/i18n";
 
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
+import { getServiceQuantity } from "../../../utils";
 
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
@@ -20,9 +21,15 @@ type UpcomingPaymentsTableViewProps = {
 
 const TableView = ({ sectionWidth }: UpcomingPaymentsTableViewProps) => {
   const paymentStore = usePaymentStore();
+  const t = useCommonTranslation();
 
-  const { upcomingPayments, formatWalletCurrency, language, userId } =
-    paymentStore;
+  const { upcomingPayments, formatWalletCurrency, userId } = paymentStore;
+
+  const getUnitLabel = (name: string) => {
+    if (name === "storage") return t("Gigabyte");
+    if (name.includes("admin")) return t("Admins");
+    return undefined;
+  };
 
   const columnStorageName = `${COLUMNS_SIZE}=${userId}`;
   const columnInfoPanelStorageName = `${INFO_PANEL_COLUMNS_SIZE}=${userId}`;
@@ -55,16 +62,13 @@ const TableView = ({ sectionWidth }: UpcomingPaymentsTableViewProps) => {
           {upcomingPayments.map((payment) => (
             <TableRow
               key={payment.id}
-              renewalDate={formatDateLocalized(
-                payment.renewalDate,
-                "DATE_FULL",
-                {
-                  locale: language,
-                  timezone: getAppTimezone(),
-                },
-              )}
+              renewalDate={payment.renewalDate}
               type={payment.type}
-              details={payment.details}
+              details={getServiceQuantity(
+                t,
+                payment.quantity,
+                getUnitLabel(payment.type),
+              )}
               amount={formatWalletCurrency(payment.amount, 2)}
               actionType={payment.actionType}
             />

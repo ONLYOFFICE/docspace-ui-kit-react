@@ -114,9 +114,19 @@ export type TUpcomingPayment = {
   id: string;
   renewalDate: string;
   type: string;
-  details: string;
+  quantity: number;
   amount: number;
   actionType?: TUpcomingPaymentActionType;
+};
+
+export type TUpcomingPaymentResponse = {
+  id: number;
+  name: string;
+  quantity: number;
+  wallet: boolean;
+  dueDate: string;
+  amount: number;
+  currency: string;
 };
 
 export type TPaymentRoutes = {
