@@ -57,6 +57,7 @@ import { getBrandName } from "../../constants/brands";
 export const convertRoomsToItems = (
   rooms: FolderDtoInteger[],
   t?: (key: string, interpolation?: Record<string, string | number>) => string,
+  isRoomDisabled?: (room: FolderDtoInteger) => boolean,
 ): TSelectorItem[] => {
   const translate = t ?? getCommonTranslation;
   const items = rooms.map((room) => {
@@ -73,6 +74,7 @@ export const convertRoomsToItems = (
       shared,
       lifetime,
       quotaLimit,
+      private: isPrivate,
     } = room;
 
     const icon = logo?.medium || "";
@@ -102,6 +104,8 @@ export const convertRoomsToItems = (
       lifetimeTooltip,
       cover,
       disableMultiSelect: true,
+      isDisabled: isRoomDisabled ? isRoomDisabled(room) : false,
+      private: isPrivate ?? false,
 
       quotaLimit,
       ...iconProp,

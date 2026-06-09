@@ -194,6 +194,8 @@ const useSelectorState = ({
     React.useState<boolean>(false);
   const [isInsideResultStorage, setIsInsideResultStorage] =
     React.useState<boolean>(false);
+  const [isInsidePrivateRoom, setIsInsidePrivateRoom] =
+    React.useState<boolean>(false);
 
   const [withCreateState, setWithCreateState] =
     React.useState<boolean>(withCreate);
@@ -243,6 +245,8 @@ const useSelectorState = ({
     setIsInsideKnowledge,
     isInsideResultStorage,
     setIsInsideResultStorage,
+    isInsidePrivateRoom,
+    setIsInsidePrivateRoom,
     withCreateState,
   };
 };
