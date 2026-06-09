@@ -46,6 +46,7 @@ export type SubInfoPanelHeaderProps = {
 export type SubInfoPanelBodyProps = {
   children: React.JSX.Element | null;
   isInfoPanelScrollLocked?: boolean;
+  withoutScroll?: boolean;
 };
 
 export type InfoPanelProps = {
@@ -60,6 +61,21 @@ export type InfoPanelProps = {
   asideInfoPanel?: boolean;
   topInfoPanel?: boolean;
   onClose?: () => void;
+  withoutBodyScroll?: boolean;
+};
+
+/**
+ * The AI Chat panel occupies the same right-side area as the Info Panel but,
+ * unlike it, never switches into the portal-based "Aside" overlay: it renders
+ * inline on every device (so its React subtree — and the live chat state — is
+ * never remounted across a resize) and goes full-screen on tablet/mobile purely
+ * via CSS. Kept as a separate region so the Info Panel's behavior is untouched.
+ */
+export type ChatPanelProps = {
+  children: React.ReactNode;
+  isVisible?: boolean;
+  currentDeviceType?: DeviceType;
+  setIsVisible?: (value: boolean) => void;
 };
 
 export type SectionBodyContentProps = {
@@ -145,7 +161,10 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
   Omit<SectionWarningProps, "children"> &
   Omit<SectionFooterProps, "children"> &
   Omit<SectionFilterProps, "children" | "className"> &
-  Omit<InfoPanelProps, "children" | "setIsVisible" | "isVisible"> &
+  Omit<
+    InfoPanelProps,
+    "children" | "setIsVisible" | "isVisible" | "withoutBodyScroll"
+  > &
   Omit<SectionHeaderProps, "children" | "className"> &
   Omit<SectionContainerProps, "children" | "isSectionHeaderAvailable"> &
   Omit<
@@ -158,6 +177,10 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     isTabletView?: boolean;
     isHeaderVisible?: boolean;
     isInfoPanelAvailable?: boolean;
+    infoPanelWithoutScroll?: boolean;
+    isChatPanelAvailable?: boolean;
+    isChatPanelVisible?: boolean;
+    setIsChatPanelVisible?: (value: boolean) => void;
     isEmptyPage?: boolean;
     maintenanceExist?: boolean;
     snackbarExist?: boolean;

@@ -65,6 +65,7 @@ const SecondaryTabs = (props: TabsProps) => {
     isLoading,
     scaled,
     hotkeysId,
+    className,
     ...rest
   } = props;
 
@@ -273,6 +274,7 @@ const SecondaryTabs = (props: TabsProps) => {
                 [styles.disabled]: item.isDisabled,
               },
               classes,
+              "tab",
             )}
             onClick={() => {
               if (index === selectedItemIndex) return;
@@ -318,7 +320,7 @@ const SecondaryTabs = (props: TabsProps) => {
   return (
     <div
       ref={tabsContainerRef}
-      className={classNames(styles.tabs, classes)}
+      className={classNames(styles.tabs, classes, className)}
       {...rest}
     >
       <div

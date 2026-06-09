@@ -57,6 +57,7 @@ const InfoPanel = ({
   currentDeviceType,
   topInfoPanel,
   onClose,
+  withoutBodyScroll,
 }: InfoPanelProps) => {
   const infoPanelRef = useRef<null | HTMLDivElement>(null);
 
@@ -82,7 +83,12 @@ const InfoPanel = ({
   const infoPanelComponent = topInfoPanel ? (
     <>
       <Backdrop visible isAside withBackground zIndex={310} onClick={onClose} />
-      <Aside visible zIndex={310} withoutHeader>
+      <Aside
+        visible
+        zIndex={310}
+        withoutHeader
+        withoutBodyScroll={withoutBodyScroll}
+      >
         <div
           className={classNames(styles.infoPanel, styles.infoPanelWrapper, {
             [styles.topInfoPanel]: topInfoPanel,

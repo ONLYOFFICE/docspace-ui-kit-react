@@ -33,13 +33,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { PropsWithChildren } from "react";
 import type { ButtonSize } from "./Button.enums";
 
-type BaseButtonProps = {
+type BaseButtonProps = PropsWithChildren<{
   /** Ref to access the DOM element or React component instance */
   ref?: React.Ref<HTMLElement>;
   /** Button text */
-  label: string;
+  label?: string;
   /** Optional title attribute */
   title?: string;
   /** Sets the button primary */
@@ -79,7 +80,7 @@ type BaseButtonProps = {
   type?: HTMLButtonElement["type"];
   /** HTML data-testid attribute */
   testId?: string;
-};
+}>;
 
 /** Props for the Button component */
 export type ButtonProps = BaseButtonProps & {

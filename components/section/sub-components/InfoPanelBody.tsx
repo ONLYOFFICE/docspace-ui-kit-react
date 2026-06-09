@@ -42,6 +42,7 @@ import styles from "../Section.module.scss";
 const SubInfoPanelBody = ({
   children,
   isInfoPanelScrollLocked,
+  withoutScroll,
 }: SubInfoPanelBodyProps) => {
   const scrollRef = useRef<ScrollbarType>(null);
   const [scrollYPossible, setScrollYPossible] = useState(false);
@@ -80,6 +81,8 @@ const SubInfoPanelBody = ({
       scrollBody?.removeEventListener("keydown", onKeyDown);
     };
   }, []);
+
+  if (withoutScroll) return children;
 
   return (
     <Scrollbar
