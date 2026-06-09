@@ -90,7 +90,7 @@ const BackupPage: React.FC<BackupPageProps> = ({
   } = paymentStore;
 
   const { isFreeTariff, maxFreeBackups } = paymentStore.quotas;
-  const { usedBackupsCount, isInitServicesData, initServiceData } =
+  const { usedBackupsCount, backupUsage, isInitServicesData, initServiceData } =
     servicesStore;
 
   const t = useCommonTranslation();
@@ -176,10 +176,9 @@ const BackupPage: React.FC<BackupPageProps> = ({
     timezone: getAppTimezone(),
   });
 
-  const monthSpend = 0;
-  const monthUsage = 0;
-  const freeBackupsUsed = 0;
-  const billedBackupsUsed = 0;
+  const monthSpend = backupUsage?.totalAmount ?? 0;
+  const billedBackupsUsed = backupUsage?.totalQuantity ?? 0;
+  const freeBackupsUsed = Math.max(usedBackupsCount - billedBackupsUsed, 0);
 
   if (shouldShowLoader) return <BackupPageLoader />;
 
@@ -315,12 +314,14 @@ const BackupPage: React.FC<BackupPageProps> = ({
 
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthUsage")}</Text>
-            <Text className={styles.cardValue}>{monthUsage}</Text>
-            {monthUsage > 0 ? (
+            <Text className={styles.cardValue}>{usedBackupsCount}</Text>
+            {usedBackupsCount > 0 ? (
               <>
-                <Text className={styles.cardCaption}>
-                  {t("FreeBackups", { count: freeBackupsUsed })}
-                </Text>
+                {!isFreeTariff ? (
+                  <Text className={styles.cardCaption}>
+                    {t("FreeBackups", { count: freeBackupsUsed })}
+                  </Text>
+                ) : null}
                 <Text className={styles.cardCaption}>
                   {t("BilledBackups", { count: billedBackupsUsed })}
                 </Text>

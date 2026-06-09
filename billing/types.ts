@@ -129,6 +129,15 @@ export type TUpcomingPaymentResponse = {
   currency: string;
 };
 
+export type TServiceUsage = {
+  service: string;
+  serviceUnit: string;
+  currency: string;
+  totalQuantity: number;
+  totalAmount: number;
+  operationCount: number;
+};
+
 export type TPaymentRoutes = {
   portalPayments: string;
   services: string;

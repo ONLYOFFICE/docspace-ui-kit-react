@@ -40,7 +40,9 @@ import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "../utils/common";
 import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
-import type { TAiToolsPrices } from "../types";
+import type { TAiToolsPrices, TServiceUsage } from "../types";
+import type { DateTime } from "luxon";
+import { now } from "../../utils/date";
 import type PaymentStore from "./PaymentStore";
 import type { TApiClient } from "../../providers/api/ApiProvider";
 import { formatterCurrencyWithoutTranction } from "../wallet/utils";
@@ -75,6 +77,8 @@ class ServicesStore {
   aiToolsPrices: TAiToolsPrices | null = null;
 
   usedBackupsCount: number = 0;
+
+  serviceUsage: TServiceUsage[] = [];
 
   aiModelAvailabilityMap: Map<string, boolean> = new Map();
 
@@ -382,14 +386,22 @@ class ServicesStore {
     }
   };
 
-  fetchBackupsCount = async () => {
+  fetchBackupsCount = async (from?: DateTime, to?: DateTime) => {
     const abortController = new AbortController();
     this.abortControllers.push(abortController);
 
     try {
       const { data } = await this.#rawApiClient.instance.get(
         "api/2.0/backup/getbackupscount",
-        { signal: abortController.signal },
+        {
+          signal: abortController.signal,
+          params: {
+            from: from
+              ? this.paymentStore.formatDate(from, "start")
+              : undefined,
+            to: to ? this.paymentStore.formatDate(to, "end") : undefined,
+          },
+        },
       );
 
       if (data?.response == null) return;
@@ -400,6 +412,53 @@ class ServicesStore {
       console.error(error);
     }
   };
+
+  fetchServiceUsage = async ({
+    serviceName,
+    from,
+    to,
+    participantName,
+  }: {
+    serviceName?: string;
+    from?: DateTime;
+    to?: DateTime;
+    participantName?: string;
+  } = {}) => {
+    const abortController = new AbortController();
+    this.abortControllers.push(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/customer/usage",
+        {
+          signal: abortController.signal,
+          params: {
+            offset: 0,
+            limit: 25,
+            ServiceName: serviceName,
+            StartDate: from
+              ? this.paymentStore.formatDate(from, "start")
+              : undefined,
+            EndDate: to ? this.paymentStore.formatDate(to, "end") : undefined,
+            ParticipantName: participantName,
+          },
+        },
+      );
+
+      this.serviceUsage = (data?.response?.collection ??
+        []) as TServiceUsage[];
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
+  get backupUsage() {
+    return (
+      this.serviceUsage.find((usage) => usage.service === BACKUP_SERVICE) ??
+      null
+    );
+  }
 
   initServiceData = async (
     t: TTranslation,
@@ -445,7 +504,14 @@ class ServicesStore {
       }
 
       if (serviceName === BACKUP_SERVICE) {
-        requests.push(this.fetchBackupsCount());
+        requests.push(
+          this.fetchBackupsCount(now().startOf("month"), now().endOf("month")),
+          this.fetchServiceUsage({
+            serviceName: BACKUP_SERVICE,
+            from: now().startOf("month"),
+            to: now().endOf("month"),
+          }),
+        );
       }
 
       await Promise.all(requests);
