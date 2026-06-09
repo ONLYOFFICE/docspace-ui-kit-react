@@ -25,13 +25,12 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import type { PlatformAdapter } from "@onlyoffice/ai-chat";
+import { useEffect, useMemo, useRef, useState, useEffectEvent } from "react";
 
-import { normalizeAiChatLocale } from "../locale";
+import { PORTAL_BASE_THEME_ID, PORTAL_DARK_THEME_ID } from "../themes";
 
 type EnvChangeInfo = { theme?: string; lang?: string };
 type EnvChangeCallback = (info: EnvChangeInfo) => void;
-
-const envSubscribers = new Set<EnvChangeCallback>();
 
 // This module is imported by a Next.js client component, which Next.js still
 // evaluates on the server during SSR. Guard every browser-only API so the
@@ -47,43 +46,98 @@ const getSystemTheme = (): "light" | "dark" => {
 };
 
 const themeIdForSystem = (t: "light" | "dark") =>
-  t === "dark" ? "theme-portal-dark" : "theme-portal-base";
+  t === "dark" ? PORTAL_DARK_THEME_ID : PORTAL_BASE_THEME_ID;
 
-export const platformAdapter: PlatformAdapter = {
-  file: null,
-  process: null,
-  hostTools: null,
-  clouds: null,
-  env: {
-    theme: themeIdForSystem(getSystemTheme()),
-    systemTheme: getSystemTheme(),
-    locale: isBrowser ? normalizeAiChatLocale(window.navigator.language) : "en",
-    devicePixelRatio: isBrowser ? window.devicePixelRatio : 1,
-    onEnvironmentChange(callback) {
-      envSubscribers.add(callback);
+export type SaveAsFileHandler = (
+  content: string,
+  defaultName: string,
+) => Promise<void>;
 
-      if (!isBrowser) {
-        return () => {
-          envSubscribers.delete(callback);
-        };
-      }
+type PlatformFileOperations = NonNullable<PlatformAdapter["file"]>;
 
-      const mq = window.matchMedia("(prefers-color-scheme: dark)");
-      const handler = (e: MediaQueryListEvent) => {
-        platformAdapter.env.systemTheme = e.matches ? "dark" : "light";
-      };
-      mq.addEventListener("change", handler);
-
-      return () => {
-        envSubscribers.delete(callback);
-        mq.removeEventListener("change", handler);
-      };
+const createFileOperations = (
+  getHandler: () => SaveAsFileHandler | null | undefined,
+): PlatformFileOperations =>
+  ({
+    saveAsFile: async (content, defaultName) => {
+      await getHandler()?.(content, defaultName);
     },
-  },
+    getRecentFiles: async () => "[]",
+  }) as PlatformFileOperations;
+
+type UsePlatformAdapterArgs = {
+  // Host UI locale and theme. Changes are pushed into the (stable) adapter and
+  // broadcast to the chat library via its onEnvironmentChange subscribers.
+  locale: string;
+  theme?: string;
+  onSaveAsFile?: SaveAsFileHandler;
 };
 
-export const notifyEnvironmentChange = (info: EnvChangeInfo) => {
-  if (info.lang) platformAdapter.env.locale = info.lang;
-  if (info.theme) platformAdapter.env.theme = info.theme;
-  envSubscribers.forEach((cb) => cb(info));
+// Returns the platform adapter the chat library needs. The adapter object is
+// built once and kept stable (its identity never changes), so downstream chat
+// stores aren't rebuilt; host locale/theme and OS theme changes mutate its
+// `env` in place and notify subscribers. The save handler is read through a ref
+// so the latest `onSaveAsFile` is always used without rebuilding the adapter.
+export const usePlatformAdapter = ({
+  locale,
+  theme,
+  onSaveAsFile,
+}: UsePlatformAdapterArgs): PlatformAdapter => {
+  const [systemTheme, setSystemTheme] = useState(() => getSystemTheme());
+
+  const saveAsFileEvent = useEffectEvent<SaveAsFileHandler>(
+    (content, defaultName) =>
+      onSaveAsFile?.(content, defaultName) ?? Promise.resolve(),
+  );
+
+  // Subscribers registered by the library via onEnvironmentChange; stable.
+  const subscribers = useRef(new Set<EnvChangeCallback>());
+
+  const adapter = useMemo<PlatformAdapter>(() => {
+    const instance: PlatformAdapter = {
+      file: createFileOperations(() => saveAsFileEvent),
+      process: null,
+      hostTools: null,
+      clouds: null,
+      env: {
+        theme: theme ?? themeIdForSystem(getSystemTheme()),
+        systemTheme,
+        locale,
+        devicePixelRatio: isBrowser ? window.devicePixelRatio : 1,
+        onEnvironmentChange(callback) {
+          subscribers.current.add(callback);
+
+          if (!isBrowser) {
+            return () => {
+              subscribers.current.delete(callback);
+            };
+          }
+
+          const mq = window.matchMedia("(prefers-color-scheme: dark)");
+          const handler = (e: MediaQueryListEvent) => {
+            setSystemTheme(e.matches ? "dark" : "light");
+          };
+          mq.addEventListener("change", handler);
+
+          return () => {
+            subscribers.current.delete(callback);
+            mq.removeEventListener("change", handler);
+          };
+        },
+      },
+    };
+
+    return instance;
+  }, [systemTheme, theme, locale]);
+
+  useEffect(() => {
+    subscribers.current.forEach((cb) => cb({ lang: locale }));
+  }, [locale]);
+
+  useEffect(() => {
+    if (!theme) return;
+    subscribers.current.forEach((cb) => cb({ theme }));
+  }, [theme]);
+
+  return adapter;
 };

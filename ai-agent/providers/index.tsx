@@ -66,7 +66,7 @@ import type {
 import "@onlyoffice/ai-chat/styles";
 
 import { storageAdapter } from "./storage";
-import { platformAdapter, notifyEnvironmentChange } from "./platform";
+import { usePlatformAdapter, type SaveAsFileHandler } from "./platform";
 import { componentOverrides } from "./components-overrides";
 import { storeKeys } from "./stores";
 import { normalizeAiChatLocale } from "./locale";
@@ -125,6 +125,10 @@ type AiAgentProvidersProps = {
   closeEditorPanel?: () => void;
   composerActions?: ComposerAction[];
   entityId?: string;
+  // Handles the message "Save" action: shows a folder selector and saves the
+  // message (markdown `content`, `defaultName` like "<title>.docx") as a file.
+  // Wired into platform.file.saveAsFile.
+  onSaveAsFile?: SaveAsFileHandler;
   children: ReactNode;
 };
 
@@ -166,17 +170,19 @@ const AiAgentProviders = ({
   closeEditorPanel,
   composerActions,
   entityId,
+  onSaveAsFile,
   children,
 }: AiAgentProvidersProps) => {
   const aiChatLocale = normalizeAiChatLocale(locale);
 
-  useEffect(() => {
-    notifyEnvironmentChange({ lang: aiChatLocale });
-  }, [aiChatLocale]);
-
-  useEffect(() => {
-    if (theme) notifyEnvironmentChange({ theme });
-  }, [theme]);
+  // Platform adapter passed downstream. Its `file` adapter is wired to the
+  // host's save handler, and it tracks the host locale/theme internally (the
+  // adapter identity stays stable, so chat stores aren't rebuilt).
+  const platform = usePlatformAdapter({
+    locale: aiChatLocale,
+    theme,
+    onSaveAsFile,
+  });
 
   // Tools that occupy the "editor" host group. `open_file` swaps this to the
   // editor's native tool list (addImage, checkSpelling, ...) once the panel
@@ -208,11 +214,11 @@ const AiAgentProviders = ({
     const eventBus = new ChatEventBus();
     const callbacksManager = new CallbacksManager();
     const middlewareRunner = new MiddlewareRunner([]);
-    const servers = new Servers(platformAdapter, eventBus);
+    const servers = new Servers(platform, eventBus);
 
     const appCtx = {
       storage: storageAdapter,
-      platform: platformAdapter,
+      platform,
       servers,
       eventBus,
       callbacksManager,
@@ -242,7 +248,7 @@ const AiAgentProviders = ({
     });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
-  }, [isStandalone, entityId]);
+  }, [isStandalone, entityId, platform]);
 
   useEffect(() => {
     attachHostToolsRuntime({
@@ -265,7 +271,7 @@ const AiAgentProviders = ({
       callbacksManager={ctx.callbacksManager}
       callbacks={callbacks}
     >
-      <PlatformProvider platform={platformAdapter}>
+      <PlatformProvider platform={platform}>
         <AiChatI18nIsolator locale={aiChatLocale}>
           <ComponentsProvider overrides={componentOverrides}>
             <WidgetConfigProvider config={widgetConfig}>
@@ -301,6 +307,7 @@ export default AiAgentProviders;
 
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
 export type { ComposerAction, Profile } from "@onlyoffice/ai-chat";
+export type { SaveAsFileHandler } from "./platform";
 
 export {
   AiChatStore,
