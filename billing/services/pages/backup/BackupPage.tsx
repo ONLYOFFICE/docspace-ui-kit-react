@@ -59,7 +59,7 @@ import { getCookie } from "../../../../utils/cookie";
 import { LANGUAGE } from "../../../../constants";
 import { toastr } from "../../../../components";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
-import TopUpModal from "../../../shared/top-up-balance/TopUpModal";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialog";
 import BackupPageLoader from "./BackupPageLoader";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
@@ -349,10 +349,10 @@ const BackupPage: React.FC<BackupPageProps> = ({
         />
       ) : null}
       {isTopUpVisible ? (
-        <TopUpModal
+        <SimpleTopUpDialog
           visible={isTopUpVisible}
           onClose={onCloseTopUpModal}
-          serviceName={BACKUP_SERVICE}
+          isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
         />
       ) : null}
     </div>
