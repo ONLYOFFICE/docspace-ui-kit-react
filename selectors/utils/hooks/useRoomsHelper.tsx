@@ -80,6 +80,7 @@ const useRoomsHelper = ({
   subscribe,
   setSelectedItemSecurity,
   setSelectedTreeNode,
+  isRoomDisabled,
 }: UseRoomsHelperProps) => {
   const t = useCommonTranslation();
   const {
@@ -187,6 +188,7 @@ const useRoomsHelper = ({
       const itemList: TSelectorItem[] = convertRoomsToItems(
         folders ?? [],
         t,
+        isRoomDisabled,
       ).filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true));
 
       setHasNextPage(count === PAGE_COUNT);
