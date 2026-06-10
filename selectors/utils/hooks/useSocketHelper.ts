@@ -88,7 +88,6 @@ const useSocketHelper = ({
 
   const folderSubscribers = React.useRef(new Set<string>());
 
-  const initRef = React.useRef(false);
   const subscribedId = React.useRef<null | number | string>(null);
 
   const unsubscribe = React.useCallback((id?: number | string) => {
@@ -407,7 +406,11 @@ const useSocketHelper = ({
     [setItems, setTotal],
   );
 
-  const handleSocketEvent = React.useEffectEvent((opt?: TOptSocket) => {
+  const socketHandlerRef = React.useRef<((opt?: TOptSocket) => void) | null>(
+    null,
+  );
+
+  socketHandlerRef.current = (opt?: TOptSocket) => {
     switch (opt?.cmd) {
       case "create":
         addItem(opt);
@@ -420,17 +423,13 @@ const useSocketHelper = ({
         break;
       default:
     }
-  });
+  };
 
   React.useEffect(() => {
-    if (initRef.current) return;
-
-    initRef.current = true;
-
-    socket?.on(SocketEvents.ModifyFolder, handleSocketEvent);
-
+    const handler = (opt?: TOptSocket) => socketHandlerRef.current?.(opt);
+    socket?.on(SocketEvents.ModifyFolder, handler);
     return () => {
-      socket?.off(SocketEvents.ModifyFolder, handleSocketEvent);
+      socket?.off(SocketEvents.ModifyFolder, handler);
     };
   }, []);
 
