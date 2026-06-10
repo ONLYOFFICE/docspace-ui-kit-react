@@ -90,8 +90,13 @@ const BackupPage: React.FC<BackupPageProps> = ({
   } = paymentStore;
 
   const { isFreeTariff, maxFreeBackups } = paymentStore.quotas;
-  const { usedBackupsCount, backupUsage, isInitServicesData, initServiceData } =
-    servicesStore;
+  const {
+    freeBackupsUsed,
+    paidBackupsUsed,
+    backupUsage,
+    isInitServicesData,
+    initServiceData,
+  } = servicesStore;
 
   const t = useCommonTranslation();
 
@@ -177,8 +182,7 @@ const BackupPage: React.FC<BackupPageProps> = ({
   });
 
   const monthSpend = backupUsage?.totalAmount ?? 0;
-  const billedBackupsUsed = backupUsage?.totalQuantity ?? 0;
-  const freeBackupsUsed = Math.max(usedBackupsCount - billedBackupsUsed, 0);
+  const totalBackupsUsed = freeBackupsUsed + paidBackupsUsed;
 
   if (shouldShowLoader) return <BackupPageLoader />;
 
@@ -237,7 +241,7 @@ const BackupPage: React.FC<BackupPageProps> = ({
                   {t("FreeMonthlyBackups")}
                 </Text>
                 <Text className={styles.cardValue}>
-                  {`${usedBackupsCount}/${maxFreeBackups}`}
+                  {`${freeBackupsUsed}/${maxFreeBackups}`}
                 </Text>
                 <Text className={styles.cardCaption}>
                   {t("RenewsOnDate", { date: renewsDate })}
@@ -308,14 +312,14 @@ const BackupPage: React.FC<BackupPageProps> = ({
               {formatWalletCurrency(monthSpend, 2)}
             </Text>
             <Text className={styles.cardCaption}>
-              {t("BilledBackups", { count: billedBackupsUsed })}
+              {t("BilledBackups", { count: paidBackupsUsed })}
             </Text>
           </div>
 
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthUsage")}</Text>
-            <Text className={styles.cardValue}>{usedBackupsCount}</Text>
-            {usedBackupsCount > 0 ? (
+            <Text className={styles.cardValue}>{totalBackupsUsed}</Text>
+            {totalBackupsUsed > 0 ? (
               <>
                 {!isFreeTariff ? (
                   <Text className={styles.cardCaption}>
@@ -323,7 +327,7 @@ const BackupPage: React.FC<BackupPageProps> = ({
                   </Text>
                 ) : null}
                 <Text className={styles.cardCaption}>
-                  {t("BilledBackups", { count: billedBackupsUsed })}
+                  {t("BilledBackups", { count: paidBackupsUsed })}
                 </Text>
               </>
             ) : (

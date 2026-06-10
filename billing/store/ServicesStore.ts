@@ -78,6 +78,10 @@ class ServicesStore {
 
   usedBackupsCount: number = 0;
 
+  freeBackupsUsed: number = 0;
+
+  paidBackupsUsed: number = 0;
+
   serviceUsage: TServiceUsage[] = [];
 
   aiModelAvailabilityMap: Map<string, boolean> = new Map();
@@ -413,6 +417,38 @@ class ServicesStore {
     }
   };
 
+  fetchBackupsCountByPaid = async (from?: DateTime, to?: DateTime) => {
+    const abortController = new AbortController();
+    this.abortControllers.push(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/backup/getbackupscountbypaid",
+        {
+          signal: abortController.signal,
+          params: {
+            from: from
+              ? this.paymentStore.formatDate(from, "start")
+              : undefined,
+            to: to ? this.paymentStore.formatDate(to, "end") : undefined,
+          },
+        },
+      );
+
+      const response = data?.response as
+        | { free?: number; paid?: number }
+        | undefined;
+
+      if (response == null) return;
+
+      this.freeBackupsUsed = response.free ?? 0;
+      this.paidBackupsUsed = response.paid ?? 0;
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
   fetchServiceUsage = async ({
     serviceName,
     from,
@@ -505,7 +541,10 @@ class ServicesStore {
 
       if (serviceName === BACKUP_SERVICE) {
         requests.push(
-          this.fetchBackupsCount(now().startOf("month"), now().endOf("month")),
+          this.fetchBackupsCountByPaid(
+            now().startOf("month"),
+            now().endOf("month"),
+          ),
           this.fetchServiceUsage({
             serviceName: BACKUP_SERVICE,
             from: now().startOf("month"),
