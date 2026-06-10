@@ -38,6 +38,10 @@
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 
+// Own instance, not the i18next singleton: @onlyoffice/ai-chat also calls
+// `init()` on the singleton, which would reset `ns`/`defaultNS`/`language`
+// out from under host translations. Keeping a dedicated instance isolates
+// host resources from any other library that touches the global.
 export type TTranslations = Map<string, Map<string, Record<string, string>>>;
 
 // Build a private i18next instance instead of mutating the default singleton —

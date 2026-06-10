@@ -81,6 +81,7 @@ const useSocketHelper = ({
   setBreadCrumbs,
   setTotal,
   disableBySecurity,
+  isRoomDisabled,
 }: UseSocketHelperProps) => {
   const { getIcon } = React.use(SettingsContext);
   const { filesApi, foldersApi, roomsApi } = useApi();
@@ -180,7 +181,7 @@ const useSocketHelper = ({
             id: data.id!,
           });
           const room = roomRes.data.response!;
-          item = convertRoomsToItems([room])[0];
+          item = convertRoomsToItems([room], undefined, isRoomDisabled)[0];
         } else {
           const folderRes = await foldersApi.getFolderInfo({
             folderId: data.id!,
@@ -254,6 +255,7 @@ const useSocketHelper = ({
       setTotal,
       withCreate,
       disableBySecurity,
+      isRoomDisabled,
     ],
   );
 
@@ -295,7 +297,7 @@ const useSocketHelper = ({
             id: data.id!,
           });
           const room = roomRes.data.response!;
-          item = convertRoomsToItems([room])[0];
+          item = convertRoomsToItems([room], undefined, isRoomDisabled)[0];
         } else {
           const folderRes = await foldersApi.getFolderInfo({
             folderId: data.id!,
@@ -369,6 +371,7 @@ const useSocketHelper = ({
       setBreadCrumbs,
       setItems,
       disableBySecurity,
+      isRoomDisabled,
     ],
   );
 

@@ -63,6 +63,7 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
     accent,
     style,
     tooltipText,
+    children,
     ...rest
   } = props;
 
@@ -127,7 +128,7 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
           {icon ? (
             <div className={classNames(styles.icon, "icon")}>{icon}</div>
           ) : null}
-          <span>{label}</span>
+          {label ? <span>{label}</span> : children}
         </div>
       </button>
       {tooltipText ? (

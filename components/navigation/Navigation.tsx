@@ -96,6 +96,7 @@ const Navigation = ({
   showBackButton,
   contextMenuHeader,
   analyzeResponsesButton,
+  aiChatButton,
   titleTooltip,
 
   ...rest
@@ -349,7 +350,7 @@ const Navigation = ({
               analyzeResponsesButton={analyzeResponsesButton}
             />
           </div>
-
+          {aiChatButton}
           {isDesktop && !hideInfoPanel ? (
             <ToggleInfoPanelButton
               id="info-panel-toggle--open"

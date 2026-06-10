@@ -70,6 +70,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const {
     disabledItems,
     disabledFolderType,
+    isRoomDisabled,
+    pinnedRootId,
     includedItems,
     filterParam,
 
@@ -186,6 +188,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setIsInsideResultStorage,
     isInsideKnowledge,
     isInsideResultStorage,
+    setIsInsidePrivateRoom,
+    isInsidePrivateRoom,
   } = useSelectorState({
     checkCreating,
     disabledItems,
@@ -201,6 +205,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     filterParam,
     withCreate: withCreateState,
     disableBySecurity,
+    isRoomDisabled,
     setItems,
     setBreadCrumbs,
     setTotal,
@@ -273,6 +278,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     createDefineRoomLabel,
     createDefineRoomType,
     searchArea,
+    isRoomDisabled,
 
     withInit,
   });
@@ -295,11 +301,13 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setSelectedItemType,
     setIsInsideKnowledge,
     setIsInsideResultStorage,
+    setIsInsidePrivateRoom,
 
     selectedItemId,
     searchValue,
     disabledItems,
     disabledFolderType,
+    pinnedRootId,
     includedItems,
     isThirdParty,
     filterParam,
@@ -324,6 +332,10 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         setSearchValue("");
         setIsFirstLoad(true);
         if (+item.id === 0) {
+          if (pinnedRootId != null) {
+            setIsFirstLoad(false);
+            return;
+          }
           setSelectedItemSecurity(undefined);
           setSelectedItemType(undefined);
           getRootData();
@@ -381,6 +393,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       getRootData,
       isFirstLoad,
       isSelectedParentFolder,
+      pinnedRootId,
       setBreadCrumbs,
       setIsFirstLoad,
       setIsSelectedParentFolder,
@@ -632,6 +645,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         selectedFileInfoRef.current,
         isInsideKnowledge,
         isInsideResultStorage,
+        isInsidePrivateRoom,
       );
     },
     [
@@ -643,6 +657,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       folderIsShared,
       isInsideKnowledge,
       isInsideResultStorage,
+      isInsidePrivateRoom,
     ],
   );
 
@@ -717,6 +732,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       isDisabledFolder,
       isInsideKnowledge,
       isInsideResultStorage,
+      isInsidePrivateRoom,
     ),
 
     selectedTreeNode,

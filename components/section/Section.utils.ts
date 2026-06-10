@@ -41,6 +41,7 @@ import {
   SECTION_FOOTER_NAME,
   SECTION_INFO_PANEL_BODY_NAME,
   SECTION_INFO_PANEL_HEADER_NAME,
+  SECTION_CHAT_PANEL_NAME,
   SECTION_WARNING_NAME,
   SECTION_SUBMENU_NAME,
   SECTION_BANNER_NAME,
@@ -53,6 +54,7 @@ export const parseChildren = (children: React.ReactNode) => {
   let sectionFooterContent: React.JSX.Element | null = null;
   let infoPanelBodyContent: React.JSX.Element | null = null;
   let infoPanelHeaderContent: React.JSX.Element | null = null;
+  let chatPanelContent: React.JSX.Element | null = null;
   let sectionWarningContent: React.JSX.Element | null = null;
   let sectionSubmenuContent: React.JSX.Element | null = null;
   let sectionBannerContent: React.JSX.Element | null = null;
@@ -85,6 +87,9 @@ export const parseChildren = (children: React.ReactNode) => {
       case SECTION_INFO_PANEL_HEADER_NAME:
         infoPanelHeaderContent = props.children;
         break;
+      case SECTION_CHAT_PANEL_NAME:
+        chatPanelContent = props.children;
+        break;
       case SECTION_WARNING_NAME:
         sectionWarningContent = props.children;
         break;
@@ -107,6 +112,7 @@ export const parseChildren = (children: React.ReactNode) => {
     sectionWarningContent,
     infoPanelBodyContent,
     infoPanelHeaderContent,
+    chatPanelContent,
     sectionSubmenuContent,
     sectionBannerContent,
   ];

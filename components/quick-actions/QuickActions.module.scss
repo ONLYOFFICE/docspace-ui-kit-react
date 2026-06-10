@@ -66,6 +66,10 @@
   padding: 16px;
   flex: 1 1 0;
   min-width: 0;
+  // Cap the tile so a lone tile doesn't stretch across the whole banner: it
+  // stays at the same size as the dashboard tiles (4 tiles * 172px + 3 * 16px
+  // gap = 736px banner). With several tiles they grow up to 172px and stop.
+  max-width: 172px;
   height: 172px;
   background-color: var(--_tile-bg);
   border: none;
