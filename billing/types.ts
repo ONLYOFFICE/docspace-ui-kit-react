@@ -113,8 +113,9 @@ export type TUpcomingPaymentActionType = "edit-plan" | "edit-subscription";
 export type TUpcomingPayment = {
   id: string;
   renewalDate: string;
-  type: string;
+  title: string;
   quantity: number;
+  unitOfMeasure: string;
   amount: number;
   actionType?: TUpcomingPaymentActionType;
 };
@@ -122,6 +123,8 @@ export type TUpcomingPayment = {
 export type TUpcomingPaymentResponse = {
   id: number;
   name: string;
+  title: string;
+  unitOfMeasure: string;
   quantity: number;
   wallet: boolean;
   dueDate: string;

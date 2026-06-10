@@ -25,12 +25,6 @@ const TableView = ({ sectionWidth }: UpcomingPaymentsTableViewProps) => {
 
   const { upcomingPayments, formatWalletCurrency, userId } = paymentStore;
 
-  const getUnitLabel = (name: string) => {
-    if (name === "storage") return t("Gigabyte");
-    if (name.includes("admin")) return t("Admins");
-    return undefined;
-  };
-
   const columnStorageName = `${COLUMNS_SIZE}=${userId}`;
   const columnInfoPanelStorageName = `${INFO_PANEL_COLUMNS_SIZE}=${userId}`;
   const ref = useRef<HTMLDivElement>(null);
@@ -63,11 +57,11 @@ const TableView = ({ sectionWidth }: UpcomingPaymentsTableViewProps) => {
             <TableRow
               key={payment.id}
               renewalDate={payment.renewalDate}
-              type={payment.type}
+              type={payment.title}
               details={getServiceQuantity(
                 t,
                 payment.quantity,
-                getUnitLabel(payment.type),
+                payment.unitOfMeasure,
               )}
               amount={formatWalletCurrency(payment.amount, 2)}
               actionType={payment.actionType}

@@ -585,8 +585,9 @@ class PaymentStore {
         locale: this.language,
         timezone: getAppTimezone(),
       }),
-      type: item.name,
+      title: item.title,
       quantity: item.quantity,
+      unitOfMeasure: item.unitOfMeasure,
       amount: item.amount,
       actionType: item.wallet ? "edit-subscription" : "edit-plan",
     }));
