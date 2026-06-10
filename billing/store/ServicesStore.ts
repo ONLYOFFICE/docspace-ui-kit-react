@@ -40,7 +40,13 @@ import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "../utils/common";
 import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
-import type { TAiToolsPrices, TServiceUsage } from "../types";
+import type {
+  TAiToolsPrices,
+  TServiceUsage,
+  TServiceUsageMonthly,
+  TUsagePeriodKey,
+} from "../types";
+import { getUsageRange } from "../usage/utils";
 import type { DateTime } from "luxon";
 import { now } from "../../utils/date";
 import type PaymentStore from "./PaymentStore";
@@ -83,6 +89,8 @@ class ServicesStore {
   paidBackupsUsed: number = 0;
 
   serviceUsage: TServiceUsage[] = [];
+
+  serviceUsageMonthly: TServiceUsageMonthly[] = [];
 
   aiModelAvailabilityMap: Map<string, boolean> = new Map();
 
@@ -487,6 +495,50 @@ class ServicesStore {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
     }
+  };
+
+  fetchServiceUsageMonthly = async ({
+    from,
+    to,
+  }: {
+    from?: DateTime;
+    to?: DateTime;
+  } = {}) => {
+    const abortController = new AbortController();
+    this.abortControllers.push(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/customer/usage/monthly",
+        {
+          signal: abortController.signal,
+          params: {
+            StartDate: from
+              ? this.paymentStore.formatDate(from, "start")
+              : undefined,
+            EndDate: to ? this.paymentStore.formatDate(to, "end") : undefined,
+          },
+        },
+      );
+
+      const response = data?.response;
+
+      this.serviceUsageMonthly = (
+        Array.isArray(response) ? response : (response?.collection ?? [])
+      ) as TServiceUsageMonthly[];
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
+  initUsageData = async (period: TUsagePeriodKey) => {
+    const range = getUsageRange(period);
+
+    await Promise.all([
+      this.fetchServiceUsage(range),
+      this.fetchServiceUsageMonthly(range),
+    ]);
   };
 
   get backupUsage() {

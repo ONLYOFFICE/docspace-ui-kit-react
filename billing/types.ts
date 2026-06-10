@@ -141,6 +141,25 @@ export type TServiceUsage = {
   operationCount: number;
 };
 
+/** A single month bucket from the monthly usage endpoint. */
+export type TServiceUsageMonthly = {
+  year: number;
+  month: number;
+  currency: string;
+  totalAmount: number;
+  operationCount: number;
+};
+
+/** Selectable period for the Usage page spending breakdown. */
+export type TUsagePeriodKey =
+  | "thisMonth"
+  | "lastMonth"
+  | "last3Months"
+  | "last6Months"
+  | "last12Months"
+  | "thisYear"
+  | "lastYear";
+
 export type TPaymentRoutes = {
   portalPayments: string;
   services: string;

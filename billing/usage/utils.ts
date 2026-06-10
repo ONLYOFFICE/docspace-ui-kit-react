@@ -33,25 +33,54 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export { default as MainTariff } from "./main-tariff";
-export { default as Wallet } from "./wallet";
-export { default as Usage } from "./usage";
-export { default as PaymentMethod } from "./payment-method";
-export { default as ServicesList } from "./services";
-export { default as BillingRoot } from "./BillingRoot";
+import type { DateTime } from "luxon";
 
-export {
-  PaymentStoreProvider,
-  usePaymentStore,
-} from "./store/PaymentStoreProvider";
-export {
-  ServicesStoreProvider,
-  useServicesStore,
-} from "./store/ServicesStoreProvider";
+import type { TUsagePeriodKey } from "../types";
+import { now } from "../../utils/date";
 
-export type {
-  TPaymentNavigationEvent,
-  TAiToolsPrices,
-  TServiceFeatureWithPrice,
-} from "./types";
+export const USAGE_PERIODS: TUsagePeriodKey[] = [
+  "thisMonth",
+  "lastMonth",
+  "last3Months",
+  "last6Months",
+  "last12Months",
+  "thisYear",
+  "lastYear",
+];
+
+export const getUsageRange = (
+  period: TUsagePeriodKey,
+): { from: DateTime; to: DateTime } => {
+  const current = now();
+
+  switch (period) {
+    case "lastMonth": {
+      const lastMonth = current.minus({ months: 1 });
+      return { from: lastMonth.startOf("month"), to: lastMonth.endOf("month") };
+    }
+    case "last3Months":
+      return {
+        from: current.minus({ months: 2 }).startOf("month"),
+        to: current.endOf("month"),
+      };
+    case "last6Months":
+      return {
+        from: current.minus({ months: 5 }).startOf("month"),
+        to: current.endOf("month"),
+      };
+    case "last12Months":
+      return {
+        from: current.minus({ months: 11 }).startOf("month"),
+        to: current.endOf("month"),
+      };
+    case "thisYear":
+      return { from: current.startOf("year"), to: current.endOf("year") };
+    case "lastYear": {
+      const lastYear = current.minus({ years: 1 });
+      return { from: lastYear.startOf("year"), to: lastYear.endOf("year") };
+    }
+    default:
+      return { from: current.startOf("month"), to: current.endOf("month") };
+  }
+};
 
