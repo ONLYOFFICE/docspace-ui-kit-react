@@ -249,6 +249,16 @@
     --chat-panel-border: #{colors.$gray-dark-strong};
   }
 
+  // Same ai-chat ThemeProvider passthrough as in `.fullHeightBody` — the
+  // panel is a flex column, but the theme wrapper between it and the chat
+  // doesn't grow, so the chat didn't fill the panel height immediately.
+  :global([class*="theme-portal-"]) {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
   // Tablet/mobile: full-screen overlay above the section. No Aside switch, no
   // 480px width and no bottom-sheet offset — the chat owns the whole viewport.
   @include mixins.tablet-and-below {
@@ -394,6 +404,18 @@
       display: flex;
       flex-direction: column;
       flex-grow: 1;
+    }
+
+    // The ai-chat ThemeProvider wraps the body content in a plain div
+    // (`theme-portal-* relative`) that doesn't participate in the flex
+    // chain above — the chat inside collapsed to content height until
+    // messages arrived. Make it a transparent flex passthrough so the
+    // chat gets the full body height from the first paint.
+    :global(.section-wrapper-content) > :global([class*="theme-portal-"]) {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
     }
   }
 
