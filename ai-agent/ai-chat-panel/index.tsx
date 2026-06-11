@@ -29,20 +29,6 @@ export type { AiChatPanelHeaderProps } from "./components/ai-chat-panel-header/A
 
 export { default as AiChatPanelBody } from "./components/ai-chat-panel-body";
 
-export { useAiChatPanelState } from "./hooks/useAiChatPanelState";
-export type {
-  UseAiChatPanelStateOptions,
-  UseAiChatPanelStateResult,
-} from "./hooks/useAiChatPanelState";
-
-export { useFullscreen } from "./hooks/useFullscreen";
-export type {
-  UseFullscreenOptions,
-  UseFullscreenResult,
-} from "./hooks/useFullscreen";
-
-export { useEscapeKey } from "./hooks/useEscapeKey";
-
 export { default as AiChatTrigger } from "./components/ai-chat-trigger";
 export { default as AiChatPanelHeaderContainer } from "./components/ai-chat-panel-header-container";
 
