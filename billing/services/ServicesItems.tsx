@@ -322,6 +322,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             return (
               <ServiceCard
                 key={item.id}
+                className={styles.aiCard}
                 cardDisabled={
                   forceCardDisabled ||
                   (isCardLinkedToPortal

@@ -56,7 +56,7 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import { useApi } from "../../providers";
 import TopUpModal from "../shared/top-up-balance/TopUpModal";
-import AIServiceDialog from "./panels/ai-service/AIServiceDialog";
+import AIFeaturesDialog from "./panels/ai-service/AIFeaturesDialog";
 
 import ServicesItems from "./ServicesItems";
 import ServicesLoader from "./ServicesLoader";
@@ -434,6 +434,18 @@ const Services = observer(
       updateDialogVisibility(AI_ENUM, false);
     };
 
+    const onActivateAiFeatures = async () => {
+      updateDialogVisibility(AI_ENUM, false);
+
+      if (isCardLinkedToPortal) {
+        await applyServiceStateChange(AI_ENUM, true);
+        navigate(paymentStore.routes.aiServices);
+        return;
+      }
+
+      setIsFirstTopUpDialogVisible(true);
+    };
+
     const onCloseTopUpModal = (isTopUp: boolean | Event) => {
       setIsTopUpBalanceVisible(false);
       setVisibleWalletSetting(false);
@@ -476,9 +488,10 @@ const Services = observer(
           />
         ) : null}
         {dialogVisibility[AI_ENUM] ? (
-          <AIServiceDialog
+          <AIFeaturesDialog
             visible={dialogVisibility[AI_ENUM]}
             onClose={onCloseAiService}
+            onActivate={onActivateAiFeatures}
           />
         ) : null}
         {isFirstTopUpDialogVisible ? (

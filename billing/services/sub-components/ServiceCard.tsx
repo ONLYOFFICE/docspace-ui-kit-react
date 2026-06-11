@@ -61,6 +61,7 @@ interface ServiceCardProps {
   priceTooltip?: React.ReactNode;
   icon?: React.ReactNode;
   withoutIcon?:boolean;
+  className?: string;
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({
@@ -81,14 +82,15 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   isInactiveColor,
   priceTooltip,
   icon,
-  withoutIcon
+  withoutIcon,
+  className,
 }) => {
   const tooltipId = tooltip ? `serviceCardTooltip_${id}` : undefined;
 
   return (
     <div
       key={id}
-      className={classNames(styles.serviceContainer, {
+      className={classNames(styles.serviceContainer, className, {
         [styles.disabled]: cardDisabled,
       })}
       {...(!cardDisabled ? { onClick } : {})}
