@@ -95,7 +95,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   } = paymentStore;
 
   const {
-    aiServiceBalance,
     formatAiServiceCurrency,
     isAiServiceLowBalance,
     wasFirstAiServiceTopUp,

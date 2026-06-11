@@ -100,7 +100,6 @@ const Services = observer(
       setConfirmActionType,
       confirmActionType,
       setVisibleWalletSetting,
-      wasFirstAiServiceTopUp,
       formatAiServiceCurrency,
       servicesInit,
     } = servicesStore;
