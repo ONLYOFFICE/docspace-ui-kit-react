@@ -79,7 +79,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   cardDisabled: forceCardDisabled,
 }) => {
   const paymentStore = usePaymentStore();
-  const servicesStore = useServicesStore();
 
   const {
     isServiceActionDisabled,
@@ -94,8 +93,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     isStorageDeactivationVisited,
     isLowWalletBalance,
   } = paymentStore;
-
-  const { formatAiServiceCurrency, wasFirstAiServiceTopUp } = servicesStore;
 
   const { isFreeTariff } = paymentStore.quotas;
 
