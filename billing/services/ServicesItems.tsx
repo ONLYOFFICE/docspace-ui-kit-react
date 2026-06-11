@@ -92,13 +92,10 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     availableBackupsCount,
     isBackupServiceOn,
     isStorageDeactivationVisited,
+    isLowWalletBalance,
   } = paymentStore;
 
-  const {
-    formatAiServiceCurrency,
-    isAiServiceLowBalance,
-    wasFirstAiServiceTopUp,
-  } = servicesStore;
+  const { formatAiServiceCurrency, wasFirstAiServiceTopUp } = servicesStore;
 
   const { isFreeTariff } = paymentStore.quotas;
 
@@ -228,10 +225,25 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
         });
 
       case AI_ENUM:
-        if (isAiServiceLowBalance) {
-          return t("AIPricingAvailableCreditsLowBalance", {
-            price: formatAiServiceCurrency(),
-          });
+        if (isLowWalletBalance) {
+          return (
+            <CommonTrans
+              i18nKey="AIPricingLowBalanceWithModels"
+              values={{ price: formatWalletCurrency() }}
+              components={{
+                1: (
+                  <Link
+                    fontSize="13px"
+                    fontWeight={600}
+                    color="accent"
+                    textDecoration="underline dotted"
+                    onClick={onOpenPricingBilling}
+                    dataTestId="ai_supported_models_link"
+                  />
+                ),
+              }}
+            />
+          );
         }
 
         return (
@@ -342,10 +354,10 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 image={item.image}
                 isEnabled={item.value}
                 tooltip={isDisabled ? permissionTooltipText : undefined}
-                // isInactiveColor={!isAiServiceLowBalance}
-                isErrorColor={isAiServiceLowBalance}
+                isErrorColor={isLowWalletBalance}
                 icon={<PriceIcon />}
-                withoutIcon={!wasFirstAiServiceTopUp}
+                withoutIcon={!isLowWalletBalance}
+                withoutGreenColor
               />
             );
           }

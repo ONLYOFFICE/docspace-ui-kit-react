@@ -96,6 +96,7 @@ const AiPage = (props: AiPageProps) => {
     isAiToolsServiceOn,
     isServiceActionDisabled,
     formatWalletCurrency,
+    isLowWalletBalance,
   } = paymentStore;
 
   const { logoText, language } = paymentStore;
@@ -104,7 +105,6 @@ const AiPage = (props: AiPageProps) => {
     aiServiceCodeCurrency,
     aiServiceBalance,
     formatAiServiceCurrency,
-    isAiServiceLowBalance,
     isInitServicesData,
     initServiceData,
     aiUsage,
@@ -272,7 +272,7 @@ const AiPage = (props: AiPageProps) => {
         <WalletInfo withoutBackground balance={balance} onTopUp={onOpenTopUp} />
       )}
 
-      {isAiToolsServiceOn && isAiServiceLowBalance ? (
+      {isAiToolsServiceOn && isLowWalletBalance ? (
         <Text fontSize="15px" fontWeight={600} className={styles.lowBalance}>
           {t("LowBalance")}
         </Text>

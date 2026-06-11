@@ -140,11 +140,11 @@ class ServicesStore {
     return 0.0;
   }
 
-  get isAiServiceLowBalance() {
-    if (!this.wasFirstAiServiceTopUp) return false;
+  // get isAiServiceLowBalance() {
+  //   if (!this.wasFirstAiServiceTopUp) return false;
 
-    return this.aiServiceBalance < 1;
-  }
+  //   return this.aiServiceBalance < 1;
+  // }
 
   get aiServiceCodeCurrency(): string {
     const balance = this.aiBalanceData;
@@ -489,8 +489,7 @@ class ServicesStore {
         },
       );
 
-      this.serviceUsage = (data?.response?.collection ??
-        []) as TServiceUsage[];
+      this.serviceUsage = (data?.response?.collection ?? []) as TServiceUsage[];
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);

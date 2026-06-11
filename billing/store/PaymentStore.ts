@@ -409,6 +409,12 @@ class PaymentStore {
     return 0.0;
   }
 
+  get isLowWalletBalance() {
+    if (!this.isCardLinkedToPortal) return false;
+
+    return this.walletBalance < 1;
+  }
+
   get walletMonthToDateSpend(): number {
     return 0;
   }
