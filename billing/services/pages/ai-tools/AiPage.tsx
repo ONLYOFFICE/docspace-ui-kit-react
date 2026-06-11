@@ -79,7 +79,7 @@ type AiPageProps = {
   integrationUrl?: string;
   withoutWallet?: boolean;
   simpleTopUp?: boolean;
-  withBottomMargin?:boolean;
+  withBottomMargin?: boolean;
 };
 
 const AiPage = (props: AiPageProps) => {
@@ -89,7 +89,7 @@ const AiPage = (props: AiPageProps) => {
     integrationUrl,
     withoutWallet,
     simpleTopUp,
-    withBottomMargin
+    withBottomMargin,
   } = props;
 
   const { paymentApi } = useApi();
@@ -116,7 +116,6 @@ const AiPage = (props: AiPageProps) => {
     aiServiceLastCreditDate,
     isAiServiceLowBalance,
     isInitServicesData,
-    // wasFirstAiServiceTopUp,
     initServiceData,
   } = servicesStore;
 
@@ -131,19 +130,11 @@ const AiPage = (props: AiPageProps) => {
 
   const isDisabled = isServiceActionDisabled!;
 
-  // const navigate = useNavigate();
-
   useEffect(() => {
     if (!isInitServicesData) {
       initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
     }
   }, []);
-
-  // useEffect(() => {
-  //   if (isInitServicesData && !wasFirstAiServiceTopUp) {
-  //     navigate(paymentStore.routes.services);
-  //   }
-  // }, [isInitServicesData, wasFirstAiServiceTopUp]);
 
   const onRefresh = async () => {
     if (isRefreshing) return;
@@ -443,3 +434,4 @@ const AiPage = (props: AiPageProps) => {
 };
 
 export default observer(AiPage);
+

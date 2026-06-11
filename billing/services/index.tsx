@@ -91,6 +91,7 @@ const Services = observer(
       changeServiceState,
       isCardLinkedToPortal,
       isServiceActionDisabled,
+      isAiToolsServiceOn,
     } = paymentStore;
 
     const {
@@ -104,12 +105,8 @@ const Services = observer(
       servicesInit,
     } = servicesStore;
 
-    const {
-      isGracePeriod,
-      previousStoragePlanSize,
-      currentStoragePlanSize,
-      walletCustomerEmail,
-    } = paymentStore.tariff;
+    const { isGracePeriod, previousStoragePlanSize, currentStoragePlanSize } =
+      paymentStore.tariff;
     const { isFreeTariff } = paymentStore.quotas;
     const { logoText } = paymentStore;
 
@@ -242,7 +239,7 @@ const Services = observer(
     const onClick = (id: string) => {
       setConfirmActionType(id);
 
-      if (!walletCustomerEmail) {
+      if (!isCardLinkedToPortal) {
         setIsFirstTopUpDialogVisible(true);
         return;
       }
@@ -261,9 +258,9 @@ const Services = observer(
       }
 
       if (id === AI_ENUM) {
-        if (isServiceActionDisabled && !wasFirstAiServiceTopUp) return;
+        if (isServiceActionDisabled && !isAiToolsServiceOn) return;
 
-        if (wasFirstAiServiceTopUp) {
+        if (isAiToolsServiceOn) {
           navigate(paymentStore.routes.aiServices);
           return;
         }
@@ -294,7 +291,7 @@ const Services = observer(
       setConfirmActionType(id);
       setIsCurrentConfirmState(currentEnabled);
 
-      if (!walletCustomerEmail) {
+      if (!isCardLinkedToPortal) {
         setIsFirstTopUpDialogVisible(true);
         return;
       }
@@ -312,22 +309,19 @@ const Services = observer(
         return;
       }
 
-      if (id === AI_ENUM && !wasFirstAiServiceTopUp) {
+      if (id === AI_ENUM) {
         if (isServiceActionDisabled) return;
 
-        updateDialogVisibility(AI_ENUM, true);
-        return;
+        if (!isAiToolsServiceOn) {
+          updateDialogVisibility(AI_ENUM, true);
+          return;
+        }
       }
 
       if (id !== TOTAL_SIZE) {
         if (dialogVisibility[id]) {
           previousDialogRef.current = true;
         }
-      }
-
-      if (id === BACKUP_SERVICE && !isCardLinkedToPortal) {
-        setIsTopUpBalanceVisible(true);
-        return;
       }
 
       const raw: ChangeWalletServiceStateRequestDto = {
