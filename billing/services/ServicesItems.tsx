@@ -338,12 +338,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               <ServiceCard
                 key={item.id}
                 className={styles.aiCard}
-                cardDisabled={
-                  forceCardDisabled ||
-                  (isCardLinkedToPortal
-                    ? !wasFirstAiServiceTopUp && !isPayer
-                    : false)
-                }
+                cardDisabled={forceCardDisabled}
                 toggleDisabled={isDisabled}
                 onClick={handleClick}
                 onToggle={handleToggle}
