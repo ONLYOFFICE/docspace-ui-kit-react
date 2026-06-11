@@ -590,9 +590,6 @@ class ServicesStore {
 
       if (serviceName === AI_TOOLS) {
         requests.push(
-          this.fetchAiPrices(),
-          this.fetchAiServiceBalance(),
-          this.fetchAiModelAvailabilitySettings(),
           this.fetchServiceUsage({
             serviceName: AI_TOOLS,
             from: now().startOf("month"),
