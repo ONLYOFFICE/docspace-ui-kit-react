@@ -112,3 +112,9 @@ export const formatCurrencyValue = (
   return formatter.format(truncated);
 };
 
+export const formatCompactNumber = (value: number, language = "en"): string =>
+  new Intl.NumberFormat(language, {
+    notation: value >= 1_000_000 ? "compact" : "standard",
+    maximumFractionDigits: 2,
+  }).format(value);
+

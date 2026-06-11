@@ -235,24 +235,28 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
           });
         }
 
-        if (aiServiceBalance && aiServiceBalance > 0) {
-          return t("AIPricingAvailableCredits", {
-            price: formatAiServiceCurrency(),
-          });
-        }
-
         return (
           <CommonTrans
-            i18nKey="AIPricingBilledPerUsageAndPricing"
+            i18nKey="AIUsagePricingNote"
             components={{
               1: (
                 <Link
                   fontSize="13px"
                   fontWeight={600}
-                  className={styles.accountLink}
                   color="accent"
-                  onClick={onOpenPricingBilling}
                   textDecoration="underline dotted"
+                  href="https://openrouter.ai/models"
+                  dataTestId="ai_openrouter_pricing_link"
+                />
+              ),
+              2: (
+                <Link
+                  fontSize="13px"
+                  fontWeight={600}
+                  color="accent"
+                  textDecoration="underline dotted"
+                  onClick={onOpenPricingBilling}
+                  dataTestId="ai_supported_models_link"
                 />
               ),
             }}
@@ -339,9 +343,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 image={item.image}
                 isEnabled={item.value}
                 tooltip={isDisabled ? permissionTooltipText : undefined}
-                isInactiveColor={
-                  aiServiceBalance ? aiServiceBalance > 0 && !item.value : false
-                }
+                // isInactiveColor={!isAiServiceLowBalance}
                 isErrorColor={isAiServiceLowBalance}
                 icon={<PriceIcon />}
                 withoutIcon={!wasFirstAiServiceTopUp}

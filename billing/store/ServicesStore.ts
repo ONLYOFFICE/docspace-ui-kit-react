@@ -548,6 +548,12 @@ class ServicesStore {
     );
   }
 
+  get aiUsage() {
+    return (
+      this.serviceUsage.find((usage) => usage.service === AI_TOOLS) ?? null
+    );
+  }
+
   initServiceData = async (
     t: TTranslation,
     serviceName: string,
@@ -588,6 +594,11 @@ class ServicesStore {
           this.fetchAiPrices(),
           this.fetchAiServiceBalance(),
           this.fetchAiModelAvailabilitySettings(),
+          this.fetchServiceUsage({
+            serviceName: AI_TOOLS,
+            from: now().startOf("month"),
+            to: now().endOf("month"),
+          }),
         );
       }
 
