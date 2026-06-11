@@ -24,28 +24,44 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { default as AiChatPanelHeader } from "./components/ai-chat-panel-header";
-export type { AiChatPanelHeaderProps } from "./components/ai-chat-panel-header/AiChatPanelHeader.types";
+"use client";
 
-export { default as AiChatPanelBody } from "./components/ai-chat-panel-body";
+import { observer } from "mobx-react";
+import { useTranslation } from "react-i18next";
 
-export { useAiChatPanelState } from "./hooks/useAiChatPanelState";
-export type {
-  UseAiChatPanelStateOptions,
-  UseAiChatPanelStateResult,
-} from "./hooks/useAiChatPanelState";
+import { Button, ButtonSize } from "../../../../components/button";
 
-export { useFullscreen } from "./hooks/useFullscreen";
-export type {
-  UseFullscreenOptions,
-  UseFullscreenResult,
-} from "./hooks/useFullscreen";
+import AiAgentsReactSvg from "../../../../assets/icons/16/catalog.ai-agents.react.svg";
 
-export { useEscapeKey } from "./hooks/useEscapeKey";
+import { useAiChatStore } from "../../../providers/ai-chat-store";
 
-export { default as AiChatTrigger } from "./components/ai-chat-trigger";
-export { default as AiChatPanelHeaderContainer } from "./components/ai-chat-panel-header-container";
+import { useOpenAiChat } from "../../hooks/useOpenAiChat";
+import styles from "./AiChatTrigger.module.scss";
 
-export { useOpenAiChat } from "./hooks/useOpenAiChat";
-export { useAiChatPanel } from "./hooks/useAiChatPanel";
-export type { AiChatPanelBindings } from "./hooks/useAiChatPanel";
+// Header-mounted button that opens the AI chat panel. Host-agnostic: it reads
+// only the shared AiChatStore and the panel-open helper, so any product section
+// (Personal Files, Rooms, …) can drop it into its header.
+const AiChatTrigger = observer(() => {
+  const { t } = useTranslation(["Common"]);
+  const store = useAiChatStore();
+  const openChat = useOpenAiChat();
+
+  // Hide the trigger while the AI Chat panel is already open — the
+  // panel has its own close control, and the inline header position
+  // would otherwise compete with that.
+  if (store.isVisible) return null;
+
+  return (
+    <Button
+      accent
+      onClick={openChat}
+      size={ButtonSize.small}
+      label={t("Common:AIChatButton")}
+      icon={<AiAgentsReactSvg />}
+      aria-label={t("Common:AIChatButton")}
+      className={styles.trigger}
+    />
+  );
+});
+
+export default AiChatTrigger;
