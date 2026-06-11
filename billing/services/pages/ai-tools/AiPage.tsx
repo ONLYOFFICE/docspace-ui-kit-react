@@ -268,15 +268,15 @@ const AiPage = (props: AiPageProps) => {
         withBottomMargin={withBottomMargin}
       />
 
+      {isAiToolsServiceOn && isLowWalletBalance ? (
+        <Text fontSize="15px" fontWeight={600} className={styles.lowBalance}>
+          {t("LowCreditsBalance")}
+        </Text>
+      ) : null}
+
       {withoutWallet ? null : (
         <WalletInfo withoutBackground balance={balance} onTopUp={onOpenTopUp} />
       )}
-
-      {isAiToolsServiceOn && isLowWalletBalance ? (
-        <Text fontSize="15px" fontWeight={600} className={styles.lowBalance}>
-          {t("LowBalance")}
-        </Text>
-      ) : null}
 
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
