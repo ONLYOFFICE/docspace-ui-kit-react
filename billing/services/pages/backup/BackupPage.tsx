@@ -309,7 +309,9 @@ const BackupPage: React.FC<BackupPageProps> = ({
                   </Text>
                 ) : null}
                 <Text className={styles.cardCaption}>
-                  {t("BilledBackups", { count: paidBackupsUsed })}
+                  {isFreeTariff
+                    ? t("BilledBackupsLabel")
+                    : t("BilledBackups", { count: paidBackupsUsed })}
                 </Text>
               </>
             ) : (
