@@ -6,8 +6,8 @@ import { EmptyView } from "../../../../components/empty-view";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { useTheme } from "../../../../context/ThemeContext";
 
-import NoTransactionsIcon from "../../../../assets/no.transactions.filter.react.svg";
-import NoTransactionsDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
+import NoSpendingIcon from "../../../../assets/no.transactions.react.svg";
+import NoSpendingDarkIcon from "../../../../assets/no.transactions.dark.theme.react.svg";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
@@ -21,24 +21,27 @@ const UpcomingPayments = () => {
 
   const emptyView = (
     <EmptyView
-      icon={isBase ? <NoTransactionsIcon /> : <NoTransactionsDarkIcon />}
-      title={t("NoWalletTransaction")}
-      description={t("NoWalletTransactionDescription")}
+      icon={isBase ? <NoSpendingIcon /> : <NoSpendingDarkIcon />}
+      title={t("NoUpcomingPayments")}
+      description={t("NoUpcomingPaymentsDescription")}
       options={null}
     />
   );
 
   return (
     <div className={styles.upcomingPayments}>
-      <div className={styles.introText}>
-        <Text>{t("UpcomingPaymentsDescription")}</Text>
-        <Text>{t("UpcomingPaymentsAutoChargeNote")}</Text>
-      </div>
-
       {upcomingPayments.length ? (
-        <Consumer>
-          {(context) => <TableView sectionWidth={context.sectionWidth || 0} />}
-        </Consumer>
+        <>
+          <div className={styles.introText}>
+            <Text>{t("UpcomingPaymentsDescription")}</Text>
+            <Text>{t("UpcomingPaymentsAutoChargeNote")}</Text>
+          </div>
+          <Consumer>
+            {(context) => (
+              <TableView sectionWidth={context.sectionWidth || 0} />
+            )}
+          </Consumer>
+        </>
       ) : (
         emptyView
       )}
