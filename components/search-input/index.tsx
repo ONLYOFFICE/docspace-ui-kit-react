@@ -149,7 +149,7 @@ const SearchInput = ({
   );
 
   const iconNode = getIconNode();
-  const iconSizeValue = !!inputValue || showClearButton ? 12 : 14;
+  const iconSizeValue = inputValue || showClearButton ? 12 : 14;
   const mainButtonWrapperRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -194,12 +194,12 @@ const SearchInput = ({
           type={InputType.text}
           iconNode={iconNode}
           iconButtonClassName={
-            !!inputValue || showClearButton ? "search-cross" : "search-loupe"
+            inputValue || showClearButton ? "search-cross" : "search-loupe"
           }
           isIconFill
           iconSize={iconSizeValue}
           onIconClick={
-            !!inputValue || showClearButton ? handleClearSearch : undefined
+            inputValue || showClearButton ? handleClearSearch : undefined
           }
           placeholder={placeholder}
           tabIndex={tabIndex}
