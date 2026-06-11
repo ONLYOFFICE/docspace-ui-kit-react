@@ -65,7 +65,8 @@ const Usage = ({
   onAIServicesClick,
 }: UsageProps) => {
   const t = useCommonTranslation();
-  const { formatWalletCurrency, language } = usePaymentStore();
+  const { formatWalletCurrency, language, fetchTransactionHistory } =
+    usePaymentStore();
   const { serviceUsage, initUsageData } = useServicesStore();
 
   const [period, setPeriod] = useState<TUsagePeriodKey>("thisMonth");
@@ -149,8 +150,9 @@ const Usage = ({
     ),
   };
 
-  // TODO: wire the usage report endpoint when it is available.
-  const onDownloadReport = () => {};
+  const onDownloadReport = () => {
+    fetchTransactionHistory(undefined, from, to);
+  };
 
   return (
     <div className={styles.usage}>

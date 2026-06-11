@@ -694,7 +694,11 @@ class PaymentStore {
     return `${dateStr}T${timeTypeValue}`;
   };
 
-  fetchTransactionHistory = async (serviceName?: string) => {
+  fetchTransactionHistory = async (
+    serviceName?: string,
+    from?: DateTime,
+    to?: DateTime,
+  ) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
@@ -716,8 +720,8 @@ class PaymentStore {
           offset: 0,
           limit: 25,
           serviceName,
-          startDate: this.formatDate(this.filterStartDate, "start"),
-          endDate: this.formatDate(this.filterEndDate, "end"),
+          startDate: this.formatDate(from ?? this.filterStartDate, "start"),
+          endDate: this.formatDate(to ?? this.filterEndDate, "end"),
           credit: isCredit,
           debit: isDebit,
           participantName: this.filterContact?.id,

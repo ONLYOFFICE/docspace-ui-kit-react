@@ -77,7 +77,8 @@ const SpendingBreakdown = ({
 }: SpendingBreakdownProps) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
-  const { formatWalletCurrency, language } = usePaymentStore();
+  const { formatWalletCurrency, language, fetchTransactionHistory } =
+    usePaymentStore();
   const { serviceUsage, serviceUsageMonthly } = useServicesStore();
 
   const [view, setView] = useState<BreakdownView>("services");
@@ -156,8 +157,7 @@ const SpendingBreakdown = ({
           amount={formatWalletCurrency(item.totalAmount, 2)}
           percent={totalSpend > 0 ? (item.totalAmount / totalSpend) * 100 : 0}
           onExpand={serviceHandlers[item.service]}
-          // TODO: wire per-service report download once available.
-          onDownload={undefined}
+          onDownload={() => fetchTransactionHistory(item.service, from, to)}
         />
       ))}
     </div>
