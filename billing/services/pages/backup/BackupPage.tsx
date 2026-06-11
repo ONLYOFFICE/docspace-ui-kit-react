@@ -312,7 +312,7 @@ const BackupPage: React.FC<BackupPageProps> = ({
               {formatWalletCurrency(monthSpend, 2)}
             </Text>
             <Text className={styles.cardCaption}>
-              {t("BilledBackups", { count: paidBackupsUsed })}
+              {t("ForPeriod", { period: monthLabel })}
             </Text>
           </div>
 
