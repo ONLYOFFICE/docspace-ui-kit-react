@@ -265,24 +265,38 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
       ) : null}
 
       <div className={styles.subscriptionSection}>
-        <div className={styles.subscriptionHeader}>
-          <Text fontWeight={700} fontSize="14px">
-            {previousStoragePlanSize
-              ? t("NoActiveSubscription")
-              : t("CurrentSubscription")}
-          </Text>
-          {isDisabled || isScheduled || previousStoragePlanSize ? null : (
-            <>
-              <div
-                className={styles.settingsIcon}
-                onClick={(e) => contextMenuRef.current?.show(e)}
-              >
-                <SettingsIcon />
-              </div>
-              <ContextMenu ref={contextMenuRef} model={contextMenuItems} />
-            </>
-          )}
-        </div>
+        {previousStoragePlanSize ? (
+          <div className={styles.noSubscriptionCard}>
+            <Text fontWeight={700} fontSize="14px">
+              {t("NoActiveSubscription")}
+            </Text>
+            <Button
+              label={t("BuyStorage")}
+              size={ButtonSize.small}
+              primary
+              onClick={openUpgradeDialog}
+              isDisabled={isDisabled}
+              scale
+            />
+          </div>
+        ) : (
+          <div className={styles.subscriptionHeader}>
+            <Text fontWeight={700} fontSize="14px">
+              {t("CurrentSubscription")}
+            </Text>
+            {isDisabled || isScheduled ? null : (
+              <>
+                <div
+                  className={styles.settingsIcon}
+                  onClick={(e) => contextMenuRef.current?.show(e)}
+                >
+                  <SettingsIcon />
+                </div>
+                <ContextMenu ref={contextMenuRef} model={contextMenuItems} />
+              </>
+            )}
+          </div>
+        )}
 
         {currentStoragePlanSize ? (
           <div className={styles.summaryGrid}>
@@ -319,20 +333,16 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
 
         {!isScheduled || currentStoragePlanSize ? (
           <div className={styles.actionRow}>
-            {isScheduled ? null : (
+            {currentStoragePlanSize && !isScheduled ? (
               <Button
-                label={
-                  previousStoragePlanSize
-                    ? t("BuyStorage")
-                    : t("EditSubscription")
-                }
+                label={t("EditSubscription")}
                 size={ButtonSize.small}
                 primary
                 onClick={openUpgradeDialog}
                 isDisabled={isDisabled}
                 className="edit-subscription"
               />
-            )}
+            ) : null}
 
             {currentStoragePlanSize ? (
               <Text className={styles.renewalText}>
