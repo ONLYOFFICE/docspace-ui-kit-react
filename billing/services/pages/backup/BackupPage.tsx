@@ -194,27 +194,15 @@ const BackupPage: React.FC<BackupPageProps> = ({
         onToggle={onConfirm}
         title={
           <Text fontSize="12px" fontWeight={400}>
-            {isFreeTariff ? (
-              <CommonTrans
-                i18nKey="BackupTitle"
-                values={{
-                  currency: formatWalletCurrency(backupServicePrice, 2),
-                }}
-                components={{
-                  1: <Text as="span" fontSize="13px" fontWeight={600} />,
-                }}
-              />
-            ) : (
-              <CommonTrans
-                i18nKey="AdditionalBackupTitle"
-                values={{
-                  currency: formatWalletCurrency(backupServicePrice, 2),
-                }}
-                components={{
-                  1: <Text as="span" fontSize="13px" fontWeight={600} />,
-                }}
-              />
-            )}
+            <CommonTrans
+              i18nKey="AdditionalBackupsTitle"
+              values={{
+                currency: formatWalletCurrency(backupServicePrice, 2),
+              }}
+              components={{
+                1: <Text as="span" fontSize="13px" fontWeight={600} />,
+              }}
+            />
           </Text>
         }
         description={t("BackupDescription")}
@@ -228,29 +216,27 @@ const BackupPage: React.FC<BackupPageProps> = ({
       ) : null}
       <div className={styles.section}>
         <Text fontWeight="700" fontSize="14px">
-          {isFreeTariff && !isBackupServiceOn
-            ? t("PaidBackupDisabled")
-            : t("AvailableBackups")}
+          {t("AvailableBackups")}
         </Text>
 
-        {!isFreeTariff || isBackupServiceOn ? (
-          <div className={styles.cardsGrid}>
-            {!isFreeTariff ? (
-              <div className={styles.card}>
-                <Text className={styles.cardLabel}>
-                  {t("FreeMonthlyBackups")}
-                </Text>
-                <Text className={styles.cardValue}>
-                  {`${freeBackupsUsed}/${maxFreeBackups}`}
-                </Text>
-                <Text className={styles.cardCaption}>
-                  {t("RenewsOnDate", { date: renewsDate })}
-                </Text>
-              </div>
-            ) : null}
+        <div className={styles.cardsGrid}>
+          {!isFreeTariff ? (
+            <div className={styles.card}>
+              <Text className={styles.cardLabel}>
+                {t("FreeMonthlyBackups")}
+              </Text>
+              <Text className={styles.cardValue}>
+                {`${freeBackupsUsed}/${maxFreeBackups}`}
+              </Text>
+              <Text className={styles.cardCaption}>
+                {t("RenewsOnDate", { date: renewsDate })}
+              </Text>
+            </div>
+          ) : null}
 
+          <div className={styles.card}>
             {isBackupServiceOn ? (
-              <div className={styles.card}>
+              <>
                 <Text className={styles.cardLabel}>
                   {t("AdditionalBackups")}
                 </Text>
@@ -262,27 +248,23 @@ const BackupPage: React.FC<BackupPageProps> = ({
                     currency: formatWalletCurrency(backupServicePrice, 2),
                   })}
                 </Text>
-              </div>
-            ) : null}
+              </>
+            ) : (
+              <>
+                <Text fontWeight={600}>{t("AdditionalBackupsDisabled")}</Text>
+                <Button
+                  className={styles.cardEnableButton}
+                  size={ButtonSize.small}
+                  label={t("Enable")}
+                  onClick={onConfirm}
+                  isDisabled={isDisabled}
+                  primary
+                  scale
+                />
+              </>
+            )}
           </div>
-        ) : null}
-
-        {!isBackupServiceOn ? (
-          <Button
-            className={styles.backupButton}
-            size={ButtonSize.small}
-            label={!isFreeTariff ? t("EnablePaidBackup") : t("Enable")}
-            onClick={onConfirm}
-            isDisabled={isDisabled}
-            primary
-          />
-        ) : null}
-
-        {isFreeTariff && !isBackupServiceOn ? (
-          <Text className={styles.backupPaidInfo}>
-            {t("ActivateServiceToAllow")}
-          </Text>
-        ) : null}
+        </div>
       </div>
 
       <div className={styles.section}>
