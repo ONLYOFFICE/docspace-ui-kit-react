@@ -32,14 +32,10 @@ import { useStores } from "@onlyoffice/ai-chat";
 
 import HistoriesIcon from "../../assets/icons/16/clock.svg";
 import PlusIcon from "../../assets/icons/16/button.plus.react.svg";
-import SettingsIcon from "../../assets/icons/16/catalog-settings-common.svg";
 
 import { ActionButton } from "../../components/action-button";
 
 import styles from "./ChatToolbar.module.scss";
-
-// AI configuration lives in DocSpace portal settings, not inside the chat.
-const AI_SETTINGS_URL = "/portal-settings/ai-settings";
 
 export const ChatToolbar = () => {
   const { t } = useTranslation("Common");
@@ -49,12 +45,6 @@ export const ChatToolbar = () => {
 
   const handleNavigateToHistory = () => {
     setCurrentPage("history");
-  };
-
-  // The in-chat settings section is removed — send the user to the portal
-  // AI settings page instead of the widget's internal settings router.
-  const handleOpenSettings = () => {
-    window.DocSpace?.navigate(AI_SETTINGS_URL);
   };
 
   return (
@@ -71,13 +61,6 @@ export const ChatToolbar = () => {
           className={styles.button}
           label={t("Common:AINewChat")}
           onClick={startNewChat}
-        />
-      </div>
-      <div className={styles.rightGroup}>
-        <ActionButton
-          icon={<SettingsIcon />}
-          className={styles.button}
-          onClick={handleOpenSettings}
         />
       </div>
     </nav>
