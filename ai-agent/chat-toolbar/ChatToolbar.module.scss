@@ -48,9 +48,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  // Hosts embedding the chat full-section (agent mode) override this to
-  // drop the side paddings; the side panel keeps the 16px default.
-  padding: var(--chat-toolbar-padding, 16px);
+  padding: 16px;
 
   height: 64px;
   box-sizing: border-box;

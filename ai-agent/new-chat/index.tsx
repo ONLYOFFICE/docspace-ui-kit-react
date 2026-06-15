@@ -24,6 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import React from "react";
+
 import {
   ChatPage,
   SettingsPage,
@@ -35,14 +37,29 @@ import { ChatToolbar } from "../chat-toolbar";
 
 import styles from "./NewChat.module.scss";
 
+// The in-chat AI settings section now lives in DocSpace portal settings.
+const AI_SETTINGS_URL = "/portal-settings/ai-settings";
+
 const NewChat = () => {
   const stores = useStores();
   const currentPage = stores.useRouter((s) => s.currentPage);
+  const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
   const profiles = stores.useProfilesStore((s) => s.profiles);
   const hasProfiles = profiles.length > 0;
 
+  // Whenever the widget router tries to open the settings page (gear button,
+  // "Open settings" actions, etc.), bounce the user to the portal AI settings
+  // page and reset the internal page so returning to the chat doesn't loop.
+  React.useEffect(() => {
+    if (currentPage === "settings") {
+      setCurrentPage("chat");
+      window.DocSpace?.navigate(AI_SETTINGS_URL);
+    }
+  }, [currentPage, setCurrentPage]);
+
   switch (currentPage) {
     case "settings":
+      return null;
     case "initial-setup":
       return <SettingsPage />;
     case "history":

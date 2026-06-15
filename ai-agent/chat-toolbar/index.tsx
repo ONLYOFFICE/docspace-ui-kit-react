@@ -38,15 +38,23 @@ import { ActionButton } from "../../components/action-button";
 
 import styles from "./ChatToolbar.module.scss";
 
+// AI configuration lives in DocSpace portal settings, not inside the chat.
+const AI_SETTINGS_URL = "/portal-settings/ai-settings";
+
 export const ChatToolbar = () => {
   const { t } = useTranslation("Common");
   const stores = useStores();
-  const navigateToSettings = stores.useRouter((s) => s.goToSettings);
   const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
   const startNewChat = stores.useThreadsStore((s) => s.onSwitchToNewThread);
 
   const handleNavigateToHistory = () => {
     setCurrentPage("history");
+  };
+
+  // The in-chat settings section is removed — send the user to the portal
+  // AI settings page instead of the widget's internal settings router.
+  const handleOpenSettings = () => {
+    window.DocSpace?.navigate(AI_SETTINGS_URL);
   };
 
   return (
@@ -69,7 +77,7 @@ export const ChatToolbar = () => {
         <ActionButton
           icon={<SettingsIcon />}
           className={styles.button}
-          onClick={navigateToSettings}
+          onClick={handleOpenSettings}
         />
       </div>
     </nav>
