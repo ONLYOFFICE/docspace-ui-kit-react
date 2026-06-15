@@ -131,7 +131,7 @@ const TagPure: FC<TagProps> = ({
           ) : null}
         </Text>
       ) : null}
-      {isNewTag && !!onDelete ? (
+      {isNewTag && onDelete ? (
         <IconButton
           className={styles.tagIcon}
           iconNode={<CrossIconReactSvgUrl />}
