@@ -325,7 +325,7 @@ const FilterBlock = ({
 
           if (
             "displaySelectorType" in groupItem &&
-            !!groupItem.displaySelectorType
+            groupItem.displaySelectorType
           ) {
             groupItem.selectedLabel = groupSelectedItem
               ?.values()
