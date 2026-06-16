@@ -146,13 +146,13 @@ export const getLifetimePeriodTranslation = (
   const translate = t ?? getCommonTranslation;
   switch (period) {
     case 0:
-      return translate("Days").toLowerCase();
+      return translate("Common:Days").toLowerCase();
     case 1:
-      return translate("Months").toLowerCase();
+      return translate("Common:Months").toLowerCase();
     case 2:
-      return translate("Years").toLowerCase();
+      return translate("Common:Years").toLowerCase();
     default:
-      return translate("Days").toLowerCase();
+      return translate("Common:Days").toLowerCase();
   }
 };
 
