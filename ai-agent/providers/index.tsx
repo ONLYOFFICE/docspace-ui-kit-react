@@ -24,7 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import i18nextSingleton from "i18next";
 import {
@@ -160,6 +167,15 @@ const StoresHydrator = () => {
   return null;
 };
 
+// Server-side document generation tools. The backend creates the file and
+// returns it in the tool result. We hide the "Always allow" checkbox for them
+// (one-off confirmation only) and open the generated file once approved.
+const GENERATE_TOOL_NAMES = [
+  "docspace_generate_docx",
+  "docspace_generate_presentation",
+  "docspace_generate_form",
+];
+
 const AiAgentProviders = ({
   locale,
   theme,
@@ -205,9 +221,39 @@ const AiAgentProviders = ({
     [editorTools],
   );
 
+  // After the user approves a generate tool, the lib resolves its result and
+  // calls this before closing the dialog / resuming the stream. The result
+  // carries the created file (`data.id`); open it in a new tab with
+  // `withTool=true`. Dedupe by file id so a re-emitted result doesn't reopen.
+  const openedGenerateFilesRef = useRef<Set<number | string>>(new Set());
+
+  const onToolCallApproveResult = useCallback((result: unknown) => {
+    const payload = result as {
+      id?: unknown;
+      data?: { id?: unknown };
+    } | null;
+    const rawId = payload?.data?.id ?? payload?.id;
+    if (typeof rawId !== "number" && typeof rawId !== "string") return;
+    if (openedGenerateFilesRef.current.has(rawId)) return;
+
+    openedGenerateFilesRef.current.add(rawId);
+
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams();
+    params.append("fileId", String(rawId));
+    params.append("withTool", "true");
+    window.open(`${getOrigin()}/doceditor?${params.toString()}`, "_blank");
+  }, []);
+
   const widgetConfig = useMemo(
-    () => ({ composerActions, entityId }),
-    [composerActions, entityId],
+    () => ({
+      composerActions,
+      entityId,
+      // Hide "Always allow" only for generate tools (matched by full name).
+      hideToolAllowAlways: GENERATE_TOOL_NAMES,
+      onToolCallApproveResult,
+    }),
+    [composerActions, entityId, onToolCallApproveResult],
   );
 
   const { stores, ctx, serverApiConfig } = useMemo(() => {
