@@ -39,6 +39,7 @@ import { toastr } from "../../components/toast";
 import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "../utils/common";
+import { parseAiPrices } from "../utils/parsers";
 import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
 import type {
   TAiToolsPrices,
@@ -274,7 +275,6 @@ class ServicesStore {
     return formatCurrencyValue(this.language, amount, currency, fractionDigits);
   };
 
-  // TODO: Replace with SDK method once it is available in the API SDK
   fetchAiPrices = async () => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
@@ -285,8 +285,10 @@ class ServicesStore {
         { signal: abortController.signal },
       );
 
-      if (!data?.response) return;
-      this.aiToolsPrices = data.response as unknown as TAiToolsPrices;
+      const prices = parseAiPrices(data?.response);
+      if (!prices) return;
+
+      this.aiToolsPrices = prices;
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);

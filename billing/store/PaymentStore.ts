@@ -58,6 +58,11 @@ import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
 import type { TBalance } from "../types";
 import { formatCurrencyValue } from "../utils/common";
+import {
+  getCardLinkedOnFreeTariff,
+  getCardLinkedOnNonProfit,
+  getIsCardLinkedToPortal,
+} from "../utils/cardStatus";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
 import { LANGUAGE } from "../../constants";
@@ -368,11 +373,11 @@ class PaymentStore {
   }
 
   get isCardLinkedToPortal() {
-    return (
-      this.cardLinkedOnNonProfit ||
-      this.cardLinkedOnFreeTariff ||
-      (!this.quotas.isNonProfit && !this.quotas.isFreeTariff)
-    );
+    return getIsCardLinkedToPortal({
+      isNonProfit: this.quotas.isNonProfit,
+      isFreeTariff: this.quotas.isFreeTariff,
+      walletCustomerEmail: this.tariff.walletCustomerEmail,
+    });
   }
 
   get isAutoPaymentExist() {
@@ -433,14 +438,17 @@ class PaymentStore {
   }
 
   get cardLinkedOnFreeTariff() {
-    return this.quotas.isFreeTariff && !!this.tariff.walletCustomerEmail;
+    return getCardLinkedOnFreeTariff(
+      this.quotas.isFreeTariff,
+      this.tariff.walletCustomerEmail,
+    );
   }
 
   get cardLinkedOnNonProfit() {
-    if (!this.quotas.isNonProfit) return false;
-    if (!this.tariff.walletCustomerEmail) return false;
-
-    return true;
+    return getCardLinkedOnNonProfit(
+      this.quotas.isNonProfit,
+      this.tariff.walletCustomerEmail,
+    );
   }
 
   get storageSizeIncrement() {

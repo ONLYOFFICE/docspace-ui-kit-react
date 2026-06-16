@@ -73,6 +73,7 @@ type TAiToolsChatModelPrice = {
   alias: string;
   provider: string;
   image: string;
+  link?: string;
   price: TAiToolsChatPrice;
 };
 
@@ -81,6 +82,7 @@ type TAiToolsEmbeddingModelPrice = {
   alias: string;
   provider: string;
   image: string;
+  link?: string;
   price: TAiToolsEmbeddingPrice;
 };
 
@@ -89,6 +91,7 @@ type TAiToolsWebSearchPrice = {
   alias: string;
   provider: string;
   image: string;
+  link?: string;
   price: number;
 };
 
