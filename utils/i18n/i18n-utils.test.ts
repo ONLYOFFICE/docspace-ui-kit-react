@@ -2,7 +2,10 @@ import { describe, it, expect, afterEach } from "vitest";
 
 import { getCommonTranslation } from "./i18n-utils";
 
-type MutableWindow = typeof window & { i18n?: unknown };
+// Override the global `window.i18n` type so tests can assign simplified mock
+// shapes (a minimal `instance` and loosely-typed `loaded` entries) instead of
+// the full i18next instance the production type requires.
+type MutableWindow = Omit<typeof window, "i18n"> & { i18n?: unknown };
 
 // `i18n.t` returns the key verbatim so resolution always falls through to the
 // `window.i18n.loaded` scan — this mirrors "identity-value" keys (Paid, Open,
@@ -73,3 +76,4 @@ describe("getCommonTranslation", () => {
     expect(getCommonTranslation("Paid")).toBe("Paid");
   });
 });
+
