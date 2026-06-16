@@ -130,6 +130,12 @@ export type SectionContainerProps = {
    * Defaults to false (legacy fixed-header + sticky-container-filter).
    */
   stickyTableHeader?: boolean;
+  /**
+   * Marks the section root (`#section`) and its whole subtree as inert —
+   * non-focusable and non-interactive. Used when the section is visually
+   * collapsed but kept mounted (e.g. behind the fullscreen AI chat panel).
+   */
+  inert?: boolean;
 };
 
 export type SectionFilterProps = {

@@ -51,11 +51,13 @@ const SectionContainer = ({
   bannerContent,
   scrollableBanner = false,
   stickyTableHeader = false,
+  inert,
 }: SectionContainerProps) => {
   return (
     <div
       ref={forwardRef}
       id="section"
+      inert={inert}
       className={classNames(styles.sectionContainer, {
         [styles.withBodyScroll]: withBodyScroll,
         [styles.infoPanelVisible]: isInfoPanelVisible,
