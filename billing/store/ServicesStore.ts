@@ -724,6 +724,25 @@ class ServicesStore {
 
       this.setIsInitServicesPage(true);
 
+      if (!isRefresh) {
+        const actionTypeParam = new URL(
+          window.location.href,
+        ).searchParams.get("actionType");
+
+        if (actionTypeParam) {
+          this.setConfirmActionType(actionTypeParam);
+          this.setVisibleWalletSetting(true);
+
+          const cleanUrl = new URL(window.location.href);
+          cleanUrl.searchParams.delete("actionType");
+          window.history.replaceState(
+            {},
+            document.title,
+            `${cleanUrl.pathname}${cleanUrl.search}`,
+          );
+        }
+      }
+
       if (isRefresh) {
         const url = new URL(window.location.href);
         const params = url.searchParams;

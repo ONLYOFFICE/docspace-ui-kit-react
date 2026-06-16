@@ -123,6 +123,25 @@ const AiPage = (props: AiPageProps) => {
     if (!isInitServicesData) {
       initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
     }
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("activate") !== AI_TOOLS) return;
+
+    if (
+      !paymentStore.isAiToolsServiceOn &&
+      paymentStore.isCardLinkedToPortal &&
+      !paymentStore.isServiceActionDisabled
+    ) {
+      onConfirm();
+    }
+
+    params.delete("activate");
+    const query = params.toString();
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}${query ? `?${query}` : ""}`,
+    );
   }, []);
 
   const onToggleChange = () => {
