@@ -83,7 +83,7 @@ export const convertRoomsToItems = (
     const iconProp = icon ? { icon } : { color: logo?.color as string };
 
     const lifetimeTooltip = lifetime
-      ? translate("RoomFilesLifetime", {
+      ? translate("Common:RoomFilesLifetime", {
           days: String(lifetime.value),
           period: getLifetimePeriodTranslation(lifetime.period!, t),
         })
@@ -242,3 +242,4 @@ export const getDefaultBreadCrumb = (t: (key: string) => string) => {
     isRoom: false,
   };
 };
+
