@@ -454,6 +454,14 @@
   }
 }
 
+.buttonsContainer {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+  margin-inline-start: 20px;
+}
+
 .infoPanelToggleWrapper {
   // bridge var
   --navigation-info-panel-bg-v: var(
@@ -462,7 +470,6 @@
   );
 
   align-self: center;
-  margin-inline-start: 20px;
   padding: 0;
 
   :global {
