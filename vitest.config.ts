@@ -9,6 +9,16 @@ export default defineConfig({
         replacement: path.resolve(__dirname, "../../packages/shared/$1"),
       },
       {
+        // `react-svg` uses `@tanem/svg-injector`, which schedules timers that
+        // can fire after the test environment is torn down. Mock it to avoid
+        // the resulting "SVGSVGElement is not defined" unhandled errors.
+        find: /^react-svg$/,
+        replacement: path.resolve(
+          __dirname,
+          "./test/__mocks__/reactSvgMock.tsx",
+        ),
+      },
+      {
         find: /^(.*)\.react\.svg$/,
         replacement: path.resolve(__dirname, "./test/__mocks__/svgMock.tsx"),
       },

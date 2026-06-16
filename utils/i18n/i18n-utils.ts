@@ -51,7 +51,12 @@ export const getCookie = (name: string): string | undefined => {
 
 export type WindowI18n = {
   t?: (key: string, options?: Record<string, string | number>) => string;
-  loaded?: Record<string, { data: Record<string, string> }>;
+  // Per-namespace bundles store `{ key: value }`; the production combined
+  // bundle (.../<lang>/_combined.json) stores `{ [namespace]: { key: value } }`.
+  loaded?: Record<
+    string,
+    { data: Record<string, string | Record<string, string>> }
+  >;
   instance?: {
     on: (event: string, callback: (...args: unknown[]) => void) => void;
     off: (event: string, callback: (...args: unknown[]) => void) => void;
@@ -118,28 +123,41 @@ export const getCommonTranslation = (
 
     const langsToTry = lang !== "en" ? [lang, "en"] : [lang];
 
+    const loadedUrls = Object.getOwnPropertyNames(i18n.loaded);
+
+    const interpolate = (value: string): string => {
+      if (!interpolation) return value;
+      let out = value;
+      Object.keys(interpolation).forEach((param) => {
+        out = out.replace(
+          new RegExp(`{{\\s*${param}\\s*}}`, "g"),
+          String(interpolation[param]),
+        );
+      });
+      return out;
+    };
+
     for (const tryLang of langsToTry) {
       for (const ns of searchNamespaces) {
-        const loadedKeys: string[] = Object.getOwnPropertyNames(
-          i18n.loaded,
-        ).filter((k) => k.indexOf(`${tryLang}/${ns}.json`) > -1);
+        // Per-namespace bundle: .../<lang>/<ns>.json with data = { key: value }.
+        const perNsUrls = loadedUrls.filter(
+          (k) => k.indexOf(`${tryLang}/${ns}.json`) > -1,
+        );
+        if (perNsUrls.length > 0) {
+          const i18nKey = perNsUrls.length === 1 ? perNsUrls[0] : perNsUrls[1];
+          const value = i18n.loaded[i18nKey]?.data?.[bareKey];
+          if (typeof value === "string") return interpolate(value);
+        }
 
-        if (loadedKeys.length > 0) {
-          const i18nKey =
-            loadedKeys.length === 1 ? loadedKeys[0] : loadedKeys[1];
-          let translation = i18n.loaded[i18nKey]?.data?.[bareKey];
-
-          if (translation) {
-            if (interpolation) {
-              Object.keys(interpolation).forEach((param) => {
-                translation = translation.replace(
-                  new RegExp(`{{\\s*${param}\\s*}}`, "g"),
-                  String(interpolation[param]),
-                );
-              });
-            }
-            return translation;
-          }
+        // Combined bundle: .../<lang>/_combined.json with
+        // data = { [namespace]: { key: value } }. Emitted by the production
+        // build (copy-locales); every namespace shares this one URL.
+        for (const url of loadedUrls) {
+          if (url.indexOf(`${tryLang}/_combined.json`) === -1) continue;
+          const nsData = i18n.loaded[url]?.data?.[ns];
+          const value =
+            nsData && typeof nsData === "object" ? nsData[bareKey] : undefined;
+          if (typeof value === "string") return interpolate(value);
         }
       }
     }
