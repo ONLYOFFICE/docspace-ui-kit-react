@@ -24,27 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+"use client";
+
 import React from "react";
 
+import { useStores } from "../../providers";
+import { useAiChatStore } from "../../providers/ai-chat-store";
+
 /**
- * Calls `handler` when the user presses Escape, but only while `enabled`
- * is true. Mirrors the pattern used by modal-dialog so panels behave
- * consistently across the codebase.
+ * Opens the AI chat panel, always starting a fresh conversation when the
+ * panel was closed (new empty thread + cleared messages). Opening a panel
+ * that is already visible leaves the current thread untouched — so flows
+ * that drop something into an *open* chat (e.g. "Ask AI") keep the ongoing
+ * conversation instead of resetting it.
+ *
+ * `onSwitchToNewThread` only resets the thread/messages, never the composer
+ * attachments, so attaching a file right after calling this is safe in
+ * either order.
  */
-export const useEscapeKey = (enabled: boolean, handler: () => void) => {
-  const handlerRef = React.useRef(handler);
-  handlerRef.current = handler;
+export const useOpenAiChat = () => {
+  const aiChatStore = useAiChatStore();
+  // `useThreadsStore` is a Zustand store (callable as a hook elsewhere); here we
+  // only need its imperative `.getState()` API, so alias away the `use` prefix
+  // to avoid implying a hook call inside the callback below.
+  const { useThreadsStore: threadsStore } = useStores();
 
-  React.useEffect(() => {
-    if (!enabled) return undefined;
-
-    const onKeyUp = (event: KeyboardEvent) => {
-      if (event.key === "Escape" || event.key === "Esc") {
-        handlerRef.current();
-      }
-    };
-
-    window.addEventListener("keyup", onKeyUp);
-    return () => window.removeEventListener("keyup", onKeyUp);
-  }, [enabled]);
+  return React.useCallback(() => {
+    if (!aiChatStore.isVisible) {
+      threadsStore.getState().onSwitchToNewThread();
+    }
+    aiChatStore.open();
+  }, [aiChatStore, threadsStore]);
 };
