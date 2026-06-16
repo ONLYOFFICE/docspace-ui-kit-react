@@ -41,7 +41,7 @@ import styles from "./AiChatTrigger.module.scss";
 // Header-mounted button that opens the AI chat panel. Host-agnostic: it reads
 // only the shared AiChatStore and the panel-open helper, so any product section
 // (Personal Files, Rooms, …) can drop it into its header.
-const AiChatTrigger = observer(() => {
+const AiChatTrigger: React.FC = observer(() => {
   const { t } = useTranslation(["Common"]);
   const store = useAiChatStore();
   const openChat = useOpenAiChat();
@@ -63,5 +63,7 @@ const AiChatTrigger = observer(() => {
     />
   );
 });
+
+AiChatTrigger.displayName = "AiChatTrigger";
 
 export default AiChatTrigger;

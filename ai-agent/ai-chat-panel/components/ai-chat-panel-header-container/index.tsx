@@ -39,7 +39,7 @@ import AiChatPanelHeader from "../ai-chat-panel-header";
 // Store-connected AI chat panel header: wires the shared AiChatStore to the
 // presentational AiChatPanelHeader (title, close, fullscreen). Host-agnostic, so
 // every product section renders the identical panel header.
-const AiChatPanelHeaderContainer = observer(() => {
+const AiChatPanelHeaderContainer: React.FC = observer(() => {
   const { t } = useTranslation(["Common"]);
   const store = useAiChatStore();
   const stores = useStores();
@@ -73,5 +73,7 @@ const AiChatPanelHeaderContainer = observer(() => {
     />
   );
 });
+
+AiChatPanelHeaderContainer.displayName = "AiChatPanelHeaderContainer";
 
 export default AiChatPanelHeaderContainer;
