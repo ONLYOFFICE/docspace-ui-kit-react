@@ -49,11 +49,17 @@ export type AiChatPanelBindings = {
 };
 
 // `enabled` lets a section opt out (e.g. private rooms) without a conditional
-// hook call: the hook still runs but returns `undefined`, so the layout simply
-// renders no AI button/panel. The overloads keep callers that always enable AI
+// hook call: every hook (here just `useAiChatStore`) runs unconditionally before
+// the guard, so the early `undefined` return is not a Rules-of-Hooks violation —
+// the hook order never changes. The overloads keep callers that always enable AI
 // (default / `true`) free of an undefined check, while a dynamic boolean widens
 // the result to `| undefined`. Consumers must be `observer`s so the returned
 // visibility/fullscreen flags stay reactive.
+//
+// INVARIANT: `enabled` must be stable for the component's lifetime (it is always
+// derived from a per-route value like `isPrivate`). Flipping it after mount is
+// unsupported — the panel/button would mount or unmount mid-session, which no
+// host currently does.
 export function useAiChatPanel(enabled?: true): AiChatPanelBindings;
 export function useAiChatPanel(
   enabled: boolean,

@@ -44,12 +44,15 @@ import { useAiChatStore } from "../../providers/ai-chat-store";
  */
 export const useOpenAiChat = () => {
   const aiChatStore = useAiChatStore();
-  const { useThreadsStore } = useStores();
+  // `useThreadsStore` is a Zustand store (callable as a hook elsewhere); here we
+  // only need its imperative `.getState()` API, so alias away the `use` prefix
+  // to avoid implying a hook call inside the callback below.
+  const { useThreadsStore: threadsStore } = useStores();
 
   return React.useCallback(() => {
     if (!aiChatStore.isVisible) {
-      useThreadsStore.getState().onSwitchToNewThread();
+      threadsStore.getState().onSwitchToNewThread();
     }
     aiChatStore.open();
-  }, [aiChatStore, useThreadsStore]);
+  }, [aiChatStore, threadsStore]);
 };
