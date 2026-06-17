@@ -67,6 +67,9 @@ import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialog";
 import { getBrandName } from "../../constants/brands";
+
+const AI_FEATURES_DIALOG_SHOWN_KEY = "aiFeaturesDialogShown";
+
 type TServicesProps = {
   showPortalSettingsLoader?: boolean;
   initialOpenDialog?: string;
@@ -261,10 +264,17 @@ const Services = observer(
       if (id === AI_ENUM) {
         if (isServiceActionDisabled && !isAiToolsServiceOn) return;
 
-        if (isAiToolsServiceOn) {
+        if (
+          isAiToolsServiceOn ||
+          localStorage.getItem(AI_FEATURES_DIALOG_SHOWN_KEY)
+        ) {
           navigate(paymentStore.routes.aiServices);
           return;
         }
+
+        updateDialogVisibility(AI_ENUM, true);
+
+        return;
       }
 
       if (id === BACKUP_SERVICE && isCardLinkedToPortal) {
@@ -312,6 +322,10 @@ const Services = observer(
 
       if (id === AI_ENUM) {
         if (isServiceActionDisabled) return;
+
+        if (!currentEnabled) {
+          localStorage.setItem(AI_FEATURES_DIALOG_SHOWN_KEY, AI_ENUM);
+        }
       }
 
       if (id !== TOTAL_SIZE) {
@@ -430,6 +444,7 @@ const Services = observer(
       if (isCardLinkedToPortal) {
         await applyServiceStateChange(AI_ENUM, true);
         navigate(paymentStore.routes.aiServices);
+        localStorage.setItem(AI_FEATURES_DIALOG_SHOWN_KEY, AI_ENUM);
         return;
       }
 
