@@ -33,33 +33,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { FC, HTMLAttributes } from "react";
+import type { CSSProperties, FC } from "react";
 
-interface ReactSVGProps extends HTMLAttributes<HTMLDivElement> {
-  src: string;
-  wrapper?: string;
-  afterInjection?: unknown;
-  beforeInjection?: unknown;
-  evalScripts?: unknown;
-  fallback?: unknown;
-  httpRequestWithCredentials?: unknown;
-  loading?: unknown;
-  renumerateIRIElements?: unknown;
-  useRequestCache?: unknown;
-}
+type ReactSVGMockProps = {
+	src?: string;
+	className?: string;
+	style?: CSSProperties;
+	"data-testid"?: string;
+};
 
-export const ReactSVG: FC<ReactSVGProps> = ({
-  src: _src,
-  wrapper: _wrapper,
-  afterInjection: _ai,
-  beforeInjection: _bi,
-  evalScripts: _es,
-  fallback: _f,
-  httpRequestWithCredentials: _http,
-  loading: _l,
-  renumerateIRIElements: _ri,
-  useRequestCache: _urc,
-  ...rest
-}) => <div {...rest} />;
+// Mock for the `react-svg` library. The real `ReactSVG` relies on
+// `@tanem/svg-injector`, which schedules `setTimeout` polls that can fire
+// after the jsdom environment is torn down, throwing
+// `SVGSVGElement is not defined`. Rendering a plain <svg> keeps tests
+// deterministic and free of leaked timers.
+export const ReactSVG: FC<ReactSVGMockProps> = ({
+	src,
+	className,
+	style,
+	"data-testid": dataTestId,
+}) => (
+	<svg
+		data-testid={dataTestId ?? "mocked-react-svg"}
+		data-src={src}
+		className={className}
+		style={style}
+	/>
+);
 
 export default ReactSVG;

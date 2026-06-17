@@ -11,7 +11,7 @@
 :global(.light) {
   --aside-header-border-color: #{$gray-light-mid};
   --text-disable-color: #{$gray};
-  --link-color: #{$black};
+  --link-text-color: #{$black};
 
   --payment-background-color: #{$gray-light};
   --payment-backgroud-color-warning: #{$gray-light};
@@ -66,7 +66,7 @@
 :global(.dark) {
   --aside-header-border-color: #{$gray-dark-strong};
   --text-disable-color: #{$gray-dark-text};
-  --link-color: #{$white};
+  --link-text-color: #{$white};
 
   --payment-background-color: #{$light-dark-gray-hover};
   --payment-backgroud-color-warning: #{$dark-gray-light};
