@@ -44,7 +44,6 @@ import { Button, ButtonSize } from "../../../../components/button";
 import { Text } from "../../../../components/text";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { getConstName } from "../../../../constants/consts";
-import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
 import AIChatIcon from "../../../../assets/icons/32/ai-chat.svg";
 import AIAgentsIcon from "../../../../assets/icons/32/ai-agents.svg";
@@ -60,19 +59,20 @@ import WebSearchTagIcon from "../../../../assets/icons/16/ai-feature-web-search.
 
 import styles from "../../styles/AIFeaturesDialog.module.scss";
 
-interface AIFeaturesDialogProps {
+export interface AIFeaturesDialogProps {
   visible: boolean;
   onClose: () => void;
   onActivate: () => void;
+  isCardLinkedToPortal: boolean;
 }
 
 const AIFeaturesDialog: React.FC<AIFeaturesDialogProps> = ({
   visible,
   onClose,
   onActivate,
+  isCardLinkedToPortal,
 }) => {
   const t = useCommonTranslation();
-  const { isCardLinkedToPortal } = usePaymentStore();
 
   const cards = [
     {

@@ -43,16 +43,31 @@ import { toastr } from "../../../components/toast";
 
 import { useCommonTranslation } from "../../../utils/i18n";
 import { toAbsoluteUrl } from "../../utils/url";
-import { useApi } from "../../../providers";
 import { AnalyticsEvents } from "../../../enums";
 
 import Amount from "./sub-components/Amount";
 import { AmountProvider, useAmountValue } from "../../wallet/context";
 
-import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import type PaymentStore from "../../store/PaymentStore";
+import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 
 import styles from "./styles/SimpleTopUpDialog.module.scss";
+
+export type TSimpleTopUpDeps = {
+  paymentApi: PaymentApi;
+  formatWalletCurrency: PaymentStore["formatWalletCurrency"];
+  walletCodeCurrency: string;
+  fetchBalance: (isRefresh?: boolean) => Promise<number>;
+  fetchTransactionHistory?: PaymentStore["fetchTransactionHistory"];
+  walletCustomerStatusNotActive: boolean;
+  language: string;
+  fetchCardLinked: (
+    backUrl?: string,
+    successUrl?: string,
+  ) => Promise<string | null | undefined>;
+  walletBalance: number;
+  fetchCustomerInfo: (refresh?: boolean) => Promise<string | null | undefined>;
+};
 
 const MIN_AMOUNT = "10";
 const PAYMENT_CALLBACK_PATH = "/billing/payment-complete";
@@ -94,41 +109,52 @@ const pollUntil = async (
   }
 };
 
+type TStripeCheckoutProps = Pick<
+  TSimpleTopUpDeps,
+  "walletCodeCurrency" | "language" | "fetchCardLinked"
+>;
+
 const openStripeCheckout = async (
-  paymentStore: PaymentStore,
+  { walletCodeCurrency, language, fetchCardLinked }: TStripeCheckoutProps,
   amount: string,
 ) => {
-  const currency = paymentStore.walletCodeCurrency || "USD";
-  const language = paymentStore.language || "en";
+  const currency = walletCodeCurrency || "USD";
+  const lang = language || "en";
   const backUrl = `${window.location.origin}${window.location.pathname}`;
-  const successUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}?currency=${currency}&amount=${amount}&type=wallet&language=${language}`;
+  const successUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}?currency=${currency}&amount=${amount}&type=wallet&language=${lang}`;
 
-  await paymentStore.fetchCardLinked(backUrl, successUrl);
+  const linkUrl = await fetchCardLinked(backUrl, successUrl);
 
-  const linkUrl = paymentStore.cardLinked;
   if (!linkUrl) throw new Error("Missing Stripe checkout URL");
 
   window.open(toAbsoluteUrl(linkUrl), "_blank");
 };
 
+type TTopUpCompletionProps = Pick<
+  TSimpleTopUpDeps,
+  "walletBalance" | "fetchCustomerInfo" | "fetchBalance"
+>;
+
 const waitForTopUpCompletion = async (
-  paymentStore: PaymentStore,
+  {
+    walletBalance: initialBalance,
+    fetchCustomerInfo,
+    fetchBalance,
+  }: TTopUpCompletionProps,
   signal: AbortSignal,
 ) => {
-  const initialBalance = paymentStore.walletBalance;
-
   await pollUntil(async () => {
-    await paymentStore.tariff.fetchCustomerInfo(true);
-    return !!paymentStore.tariff.walletCustomerEmail;
+    const email = await fetchCustomerInfo(true);
+    return !!email;
   }, signal);
 
   await pollUntil(async () => {
-    await paymentStore.fetchBalance(true);
-    return paymentStore.walletBalance > initialBalance;
+    const newBalance = await fetchBalance(true);
+    return newBalance > initialBalance;
   }, signal);
 };
 
-type SimpleTopUpDialogProps = {
+type SimpleTopUpDialogBaseProps = {
   visible: boolean;
   onClose: () => void;
   onConfirm?: () => Promise<void> | void;
@@ -136,24 +162,27 @@ type SimpleTopUpDialogProps = {
   recommendedAmount?: string;
 };
 
+export type SimpleTopUpDialogProps = SimpleTopUpDialogBaseProps &
+  TSimpleTopUpDeps;
+
 const SimpleTopUpDialogContent = observer(
   ({
     visible,
     onClose,
     onConfirm,
     isFirstTopUp = true,
+    paymentApi,
+    formatWalletCurrency,
+    walletCodeCurrency,
+    fetchBalance,
+    fetchTransactionHistory,
+    walletCustomerStatusNotActive,
+    language,
+    fetchCardLinked,
+    walletBalance,
+    fetchCustomerInfo,
   }: SimpleTopUpDialogProps) => {
     const t = useCommonTranslation();
-    const { paymentApi } = useApi();
-    const paymentStore = usePaymentStore();
-
-    const {
-      formatWalletCurrency,
-      walletCodeCurrency,
-      fetchBalance,
-      fetchTransactionHistory,
-    } = paymentStore;
-    const { walletCustomerStatusNotActive } = paymentStore.tariff;
 
     const { amount, hasError } = useAmountValue();
 
@@ -177,9 +206,15 @@ const SimpleTopUpDialogContent = observer(
       setIsLoading(true);
 
       try {
-        await openStripeCheckout(paymentStore, amount);
+        await openStripeCheckout(
+          { walletCodeCurrency, language, fetchCardLinked },
+          amount,
+        );
 
-        await waitForTopUpCompletion(paymentStore, signal);
+        await waitForTopUpCompletion(
+          { walletBalance, fetchCustomerInfo, fetchBalance },
+          signal,
+        );
 
         if (signal.aborted) return;
 
@@ -212,10 +247,9 @@ const SimpleTopUpDialogContent = observer(
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ event: AnalyticsEvents.WalletTopUp });
 
-        await Promise.allSettled([
-          fetchBalance(true),
-          fetchTransactionHistory(),
-        ]);
+        const requests: Promise<unknown>[] = [fetchBalance(true)];
+        if (fetchTransactionHistory) requests.push(fetchTransactionHistory());
+        await Promise.allSettled(requests);
 
         toastr.success(t("WalletToppedUp"));
 
@@ -239,7 +273,7 @@ const SimpleTopUpDialogContent = observer(
     return (
       <ModalDialog
         visible={visible}
-        onClose={isLoading ? () => {} : onClose}
+        onClose={onClose}
         displayType={ModalDialogType.modal}
         autoMaxHeight
         withBodyScroll

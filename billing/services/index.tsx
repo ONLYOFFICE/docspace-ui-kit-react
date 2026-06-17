@@ -65,7 +65,7 @@ import StoragePlanUpgrade from "./panels/additional-storage/StoragePlanUpgrade";
 import StoragePlanCancel from "./panels/additional-storage/StoragePlanCancel";
 import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
-import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialog";
+import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import { getBrandName } from "../../constants/brands";
 
 const AI_FEATURES_DIALOG_SHOWN_KEY = "aiFeaturesDialogShown";
@@ -498,6 +498,7 @@ const Services = observer(
             visible={dialogVisibility[AI_ENUM]}
             onClose={onCloseAiService}
             onActivate={onActivateAiFeatures}
+            isCardLinkedToPortal={isCardLinkedToPortal}
           />
         ) : null}
         {isFirstTopUpDialogVisible ? (

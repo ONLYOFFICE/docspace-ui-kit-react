@@ -59,7 +59,7 @@ import { getCookie } from "../../../../utils/cookie";
 import { LANGUAGE } from "../../../../constants";
 import { toastr } from "../../../../components";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
-import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialog";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import BackupPageLoader from "./BackupPageLoader";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";

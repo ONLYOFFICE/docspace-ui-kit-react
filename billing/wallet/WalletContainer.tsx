@@ -56,7 +56,7 @@ import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { getBrandName } from "../../constants/brands";
-import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialog";
+import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 
 type WalletProps = {
   isMobile?: boolean;

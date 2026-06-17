@@ -56,7 +56,7 @@ import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./AdditionalStoragePage.module.scss";
 import { DISK_STORAGE, STORAGE_ENUM } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
-import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialog";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
 import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components/toast";

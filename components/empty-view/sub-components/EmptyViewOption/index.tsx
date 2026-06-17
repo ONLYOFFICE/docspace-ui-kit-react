@@ -118,7 +118,7 @@ const EmptyViewOption = ({ option, LinkRouter }: EmptyViewOptionProps) => {
         id={option.key.toString()}
         onClick={option.onClick}
         label={option.title}
-        primary
+        primary={option.primary ?? true}
         size={ButtonSize.small}
       />
     );

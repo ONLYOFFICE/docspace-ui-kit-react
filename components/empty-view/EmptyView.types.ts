@@ -12,6 +12,8 @@ export type EmptyViewButtonType = {
   onClick?: React.MouseEventHandler<HTMLElement>;
   /** Optional CSS class name for styling */
   className?: string;
+  /** Whether the button uses the primary style (defaults to true) */
+  primary?: boolean;
   /** type of option */
   type: "button";
 };

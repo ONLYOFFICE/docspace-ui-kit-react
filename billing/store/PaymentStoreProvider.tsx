@@ -43,7 +43,7 @@ type TPaymentStoreProviderProps = {
   config: TPaymentConfig;
 };
 
-const PaymentStoreContext = React.createContext<PaymentStore | null>(null);
+export const PaymentStoreContext = React.createContext<PaymentStore | null>(null);
 
 export const usePaymentStore = () => {
   const store = React.useContext(PaymentStoreContext);

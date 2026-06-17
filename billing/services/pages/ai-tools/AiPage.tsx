@@ -60,7 +60,7 @@ import {
 } from "../../../../utils/date";
 import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components";
-import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialog";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
