@@ -123,8 +123,13 @@ const AiPage = (props: AiPageProps) => {
     if (!isInitServicesData) {
       initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
     }
+  }, []);
+
+  useEffect(() => {
+    if (!isInitServicesData) return;
 
     const params = new URLSearchParams(window.location.search);
+
     if (params.get("activate") !== AI_TOOLS) return;
 
     if (
@@ -142,7 +147,7 @@ const AiPage = (props: AiPageProps) => {
       "",
       `${window.location.pathname}${query ? `?${query}` : ""}`,
     );
-  }, []);
+  }, [isInitServicesData]);
 
   const onToggleChange = () => {
     onConfirm();
@@ -254,7 +259,6 @@ const AiPage = (props: AiPageProps) => {
 
   return (
     <div className={styles.container}>
-
       {isTopUpVisible ? (
         <SimpleTopUpDialog
           visible={isTopUpVisible}
