@@ -312,11 +312,6 @@ const Services = observer(
 
       if (id === AI_ENUM) {
         if (isServiceActionDisabled) return;
-
-        if (!isAiToolsServiceOn) {
-          updateDialogVisibility(AI_ENUM, true);
-          return;
-        }
       }
 
       if (id !== TOTAL_SIZE) {

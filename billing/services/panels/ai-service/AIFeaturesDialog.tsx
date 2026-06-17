@@ -44,6 +44,7 @@ import { Button, ButtonSize } from "../../../../components/button";
 import { Text } from "../../../../components/text";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { getConstName } from "../../../../constants/consts";
+import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
 import AIChatIcon from "../../../../assets/icons/32/ai-chat.svg";
 import AIAgentsIcon from "../../../../assets/icons/32/ai-agents.svg";
@@ -71,6 +72,7 @@ const AIFeaturesDialog: React.FC<AIFeaturesDialogProps> = ({
   onActivate,
 }) => {
   const t = useCommonTranslation();
+  const { isCardLinkedToPortal } = usePaymentStore();
 
   const cards = [
     {
@@ -188,7 +190,9 @@ const AIFeaturesDialog: React.FC<AIFeaturesDialogProps> = ({
       </ModalDialog.Body>
       <ModalDialog.Footer>
         <Button
-          label={t("ActivateAIFeatures")}
+          label={t(
+            !isCardLinkedToPortal ? "TopUpAndActivate" : "ActivateAIFeatures",
+          )}
           size={ButtonSize.normal}
           onClick={onActivate}
           primary
