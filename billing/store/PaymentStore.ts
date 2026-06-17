@@ -62,7 +62,12 @@ import {
   getCardLinkedOnFreeTariff,
   getCardLinkedOnNonProfit,
   getIsCardLinkedToPortal,
-} from "../utils/cardStatus";
+  getIsPayer,
+  getWalletBalanceAmount,
+  getWalletBalanceCurrency,
+  formatPaymentDate,
+} from "../utils/paymentSelectors";
+import { applyServiceQuotaToMap, parseServicesQuotasMap } from "../utils/parsers";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
 import { LANGUAGE } from "../../constants";
@@ -330,12 +335,9 @@ class PaymentStore {
   }
 
   get isPayer() {
-    if (!this._currentUserEmail || !this.tariff.walletCustomerEmail)
-      return false;
-
-    return (
-      this._currentUserEmail.toLowerCase() ===
-      this.tariff.walletCustomerEmail.toLowerCase()
+    return getIsPayer(
+      this._currentUserEmail,
+      this.tariff.walletCustomerEmail,
     );
   }
 
@@ -399,19 +401,11 @@ class PaymentStore {
   }
 
   get walletCodeCurrency(): string {
-    const balance = this.balanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].currency ?? "USD";
-
-    return "USD";
+    return getWalletBalanceCurrency(this.balance);
   }
 
   get walletBalance(): number {
-    const balance = this.balanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].amount ?? 0;
-
-    return 0.0;
+    return getWalletBalanceAmount(this.balance);
   }
 
   get isLowWalletBalance() {
@@ -697,16 +691,8 @@ class PaymentStore {
     return date ? formatDateUtil(date, format) : "";
   };
 
-  formatDate = (date: DateTime, timeType?: "start" | "end") => {
-    if (!timeType) {
-      return formatDateUtil(date, "yyyy-MM-dd'T'HH:mm:ss", { locale: "en" });
-    }
-
-    const dateStr = formatDateUtil(date, "yyyy-MM-dd", { locale: "en" });
-    const timeTypeValue = timeType === "start" ? "00:00:00" : "23:59:59";
-
-    return `${dateStr}T${timeTypeValue}`;
-  };
+  formatDate = (date: DateTime, timeType?: "start" | "end") =>
+    formatPaymentDate(date, timeType);
 
   fetchTransactionHistory = async (
     serviceName?: string,
@@ -937,26 +923,8 @@ class PaymentStore {
     if (!res?.data?.response) return;
 
     const service = res.data.response as unknown as TWalletServiceQuota;
-    const feature = service.features?.[0];
 
-    const featureWithPrice = {
-      ...feature,
-      price: service.price,
-      serviceName: service.serviceName,
-    } as TServiceFeatureWithPrice;
-
-    const existingEntry = Array.from(
-      this.servicesQuotasFeatures.entries(),
-    ).find(
-      ([, value]) =>
-        (value as TServiceFeatureWithPrice).serviceName === service.serviceName,
-    );
-
-    const key = existingEntry
-      ? existingEntry[0]
-      : (service.features?.[0]?.id?.toString() ?? "");
-
-    this.servicesQuotasFeatures.set(key, featureWithPrice);
+    applyServiceQuotaToMap(service, this.servicesQuotasFeatures);
 
     return service.serviceName;
   };
