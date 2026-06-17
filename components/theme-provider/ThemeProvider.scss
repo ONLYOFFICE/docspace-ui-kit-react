@@ -4,12 +4,28 @@ $font-size: 13px;
 
 .light {
   --background-color: #{$white};
-  --text-color:#{$black};
+  --text-color: #{$black};
+  --info-panel-members-subtitle-color: #{$gray};
+
+  --payment-callback-success-color: #{$main-green};
+  --payment-callback-success-bg: rgba(45, 180, 130, 0.1);
+  --payment-callback-amount-color: #{$light-status-positive};
+  --payment-callback-error-color: #{$main-red};
+  --payment-callback-error-bg: rgba(242, 103, 90, 0.1);
+  --payment-callback-callout-bg: #{$gray-light};
 }
 
 .dark {
   --background-color: #{$black};
-  --text-color:#{$white};
+  --text-color: #{$white};
+  --info-panel-members-subtitle-color: #{$gray};
+
+  --payment-callback-success-color: #{$main-green};
+  --payment-callback-success-bg: rgba(45, 180, 130, 0.1);
+  --payment-callback-amount-color: #{$dark-status-positive};
+  --payment-callback-error-color: #{$main-red};
+  --payment-callback-error-bg: rgba(242, 103, 90, 0.1);
+  --payment-callback-callout-bg: #{$dark-gray-light};
 }
 
 html,

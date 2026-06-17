@@ -82,6 +82,7 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
     React.SetStateAction<FileEntryDtoIntegerAllOfSecurity | undefined>
   >;
   setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDtoInteger>>;
+  isRoomDisabled?: (room: FolderDtoInteger) => boolean;
 };
 
 export type UseAgentsHelperProps = TUseInputItemHelper & {
@@ -120,4 +121,5 @@ export type UseSocketHelperProps = {
   filterParam?: string | number;
   withCreate?: boolean;
   disableBySecurity?: string;
+  isRoomDisabled?: (room: FolderDtoInteger) => boolean;
 };

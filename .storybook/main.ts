@@ -38,6 +38,14 @@ const config: StorybookConfig = {
   },
 
   async viteFinal(config) {
+    // When proxied behind nginx at /storybook/, Vite must transform all
+    // JS import paths to include the prefix. Nginx strips the prefix before
+    // forwarding to Storybook, and sub_filter handles HTML script tags.
+    // Usage: STORYBOOK_PROXY=1 pnpm storybook
+    if (process.env.STORYBOOK_PROXY) {
+      config.base = "/storybook/";
+    }
+
     config.plugins = config.plugins || [];
 
     // Insert SVGR plugin before other plugins to handle SVG imports as React components

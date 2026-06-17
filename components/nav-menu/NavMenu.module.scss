@@ -41,11 +41,22 @@
     .root {
       --nav-menu-group-label-color: #{colors.$gray};
       --nav-menu-item-text-color: #{colors.$gray-text};
+      --nav-menu-item-text-active-color: var(
+        --color-scheme-main-accent,
+        #{colors.$light-blue-main}
+      );
       --nav-menu-item-icon-color: #{colors.$light-gray-dark};
-      --nav-menu-item-icon-active-color: #{colors.$light-blue-main};
+      --nav-menu-item-icon-active-color: var(
+        --color-scheme-main-accent,
+        #{colors.$light-blue-main}
+      );
       --nav-menu-item-bg-hover: #{colors.$gray-light-mid};
       --nav-menu-item-bg-active: #{colors.$light-gray-selected};
       --nav-menu-story-bg: #{colors.$gray-light};
+      --nav-menu-signal-dot-color: var(
+        --color-scheme-main-accent,
+        #{colors.$light-blue-main}
+      );
     }
   }
 }
@@ -55,11 +66,13 @@
     .root {
       --nav-menu-group-label-color: #{colors.$gray-dark};
       --nav-menu-item-text-color: #{colors.$dark-gray-dark};
+      --nav-menu-item-text-active-color: #{colors.$white};
       --nav-menu-item-icon-color: #{colors.$dark-gray-dark};
       --nav-menu-item-icon-active-color: #{colors.$white};
       --nav-menu-item-bg-hover: #{colors.$dark-gray-light};
       --nav-menu-item-bg-active: #{colors.$dark-gray-light};
       --nav-menu-story-bg: #{colors.$dark-gray-light};
+      --nav-menu-signal-dot-color: #{colors.$white};
     }
   }
 }
@@ -147,6 +160,17 @@
   }
 }
 
+@keyframes flattenReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .item {
   position: relative;
   z-index: 1;
@@ -204,6 +228,31 @@
       fill: var(--nav-menu-item-icon-active-color) !important;
     }
   }
+
+  &.active .itemText {
+    color: var(--nav-menu-item-text-active-color);
+  }
+}
+
+.itemIconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.itemSignalDot {
+  display: none;
+  position: absolute;
+  top: -3px;
+  inset-inline-end: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 1000px;
+  background-color: var(--nav-menu-signal-dot-color);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .itemBadge {
@@ -232,10 +281,11 @@
 .subItems {
   display: grid;
   grid-template-rows: 0fr;
-  // transition: grid-template-rows 0.25s ease-in-out;
+  transition: grid-template-rows 0.25s ease-in-out;
 
   &.expanded {
     grid-template-rows: 1fr;
+    margin-bottom: 32px;
   }
 }
 
@@ -244,10 +294,33 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+
+  .expanded & {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subItems,
+  .subItemsInner {
+    transition: none;
+  }
 }
 
 .subItemWrapper {
   position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+// Groups sub-items inside a single submenu without splitting them into
+// separate NavMenuGroup entries (e.g., separates Trash from Favorites).
+.subItemWithSeparator {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--nav-menu-separator-color, var(--quick-buttons-color));
 }
 
 .subItemSibling {
@@ -331,6 +404,26 @@
     width: 16px;
     height: 16px;
   }
+
+  &.active .subItemIcon svg {
+    path,
+    circle {
+      fill: var(--nav-menu-item-icon-active-color) !important;
+    }
+  }
+
+  &.active .subItemText {
+    color: var(--nav-menu-item-text-active-color);
+  }
+}
+
+.subItemBadge {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-inline-end: 12px;
 }
 
 .subItemText {
@@ -350,6 +443,10 @@
   .itemText,
   .itemBadge {
     display: none;
+  }
+
+  .itemSignalDot {
+    display: block;
   }
 
   // Render the group label as a thin divider line; hide first group's divider.
@@ -398,6 +495,23 @@
 
   .itemWrapper:hover .itemSibling:not(.animatedProgress):not(.animatedFinish) {
     background-color: var(--nav-menu-item-bg-hover);
+  }
+
+  // 32px spacer below the active section's last item in collapsed sidebar.
+  .endOfActiveSection {
+    margin-bottom: 32px;
+  }
+
+  // Flattened children of the active section reveal with a staggered fade-in.
+  .flattenedChild {
+    animation: flattenReveal 0.25s ease-in-out both;
+    animation-delay: calc(var(--flatten-index, 0) * 0.04s);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flattenedChild {
+      animation: none;
+    }
   }
 
   .item {

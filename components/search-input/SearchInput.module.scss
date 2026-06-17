@@ -76,6 +76,8 @@
   .mainButtonWrapper {
     display: inline-flex;
     align-items: center;
+    flex-shrink: 0;
+    white-space: nowrap;
     padding: 5px 28px;
     gap: 8px;
     background-color: var(--accent-main, #{$light-blue-main});
@@ -94,6 +96,15 @@
 
     &:hover :global([data-testid="main-button"]:not(.disabled)) {
       opacity: 1;
+    }
+
+    &.mainButtonWrapperDisabled {
+      cursor: default;
+      opacity: 0.6;
+
+      &:hover {
+        opacity: 0.6;
+      }
     }
   }
 

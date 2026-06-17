@@ -37,6 +37,8 @@ export * from "./action-button";
 
 export * from "./avatar";
 
+export * from "./avatar-editor-dialog";
+
 export * from "./aside";
 
 export * from "./add-button";
@@ -94,6 +96,8 @@ export * from "./mcp-icon";
 export * from "./input-block";
 
 export * from "./room-icon";
+
+export * from "./room-logo-cover-dialog";
 
 export * from "./context-menu";
 
@@ -160,5 +164,7 @@ export * from "./quick-actions";
 export * from "./nav-menu";
 
 export * from "./card";
+
+export * from "./collapsible-card";
 
 export * from "./two-state-toggle";

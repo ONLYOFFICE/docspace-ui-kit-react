@@ -49,6 +49,16 @@ export type NavSubItem = {
   iconNode?: React.ReactNode;
   onClick?: (item: NavSubItem) => void;
   linkData?: NavMenuLinkData;
+  /**
+   * Render a thin separator line above this sub-item. Used to group related
+   * children (e.g., put Trash visually apart from Favorites without
+   * splitting the sub-menu into multiple groups).
+   */
+  withTopSeparator?: boolean;
+  showBadge?: boolean;
+  labelBadge?: string | number;
+  badgeComponent?: React.ReactNode;
+  onClickBadge?: (id: string) => void;
 };
 
 export type NavMenuItem = {
@@ -63,6 +73,18 @@ export type NavMenuItem = {
   badgeComponent?: React.ReactNode;
   onClickBadge?: (id: string) => void;
   linkData?: NavMenuLinkData;
+  /**
+   * Internal flag (icon-only mode): marks the last flattened child of the
+   * active section so a 32px spacer can be rendered below it.
+   */
+  endOfActiveSection?: boolean;
+  /**
+   * Internal flag (icon-only mode): marks an item as a flattened child of the
+   * active section, used to play the reveal animation on mount.
+   */
+  isFlattenedChild?: boolean;
+  /** Internal: child position, used to stagger the reveal animation. */
+  flattenIndex?: number;
 };
 
 export type NavMenuGroup = {

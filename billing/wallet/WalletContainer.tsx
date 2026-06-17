@@ -56,6 +56,7 @@ import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { getBrandName } from "../../constants/brands";
+import FirstTopUpDialog from "../shared/top-up-balance/FirstTopUpDialog";
 
 type WalletProps = {
   isMobile?: boolean;
@@ -77,7 +78,7 @@ const Wallet = (props: WalletProps) => {
     canUpdateTariff,
     cardLinked,
     isPayer,
-    reccomendedAmount,
+    recommendedAmount,
     walletHelpUrl,
     isAutoTopUpInProgress,
   } = store;
@@ -85,7 +86,7 @@ const Wallet = (props: WalletProps) => {
   const {
     isNotPaidPeriod,
     walletCustomerStatusNotActive,
-    walletCustomerEmail: payerEmail,
+    walletCustomerEmail,
   } = store.tariff;
 
   const t = useCommonTranslation();
@@ -93,6 +94,8 @@ const Wallet = (props: WalletProps) => {
   const [visible, setVisible] = useState(isVisibleWalletSettings);
   const [isEditAutoPayment, setIsEditAutoPayment] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isFirstTopUpDialogVisible, setIsFirstTopUpDialogVisible] =
+    useState(false);
 
   const [isAutoSpinning, setIsAutoSpinning] = useState(isAutoTopUpInProgress);
   const autoStartTimeRef = useRef<number | null>(null);
@@ -128,6 +131,10 @@ const Wallet = (props: WalletProps) => {
   };
 
   const onOpen = () => {
+    if (!walletCustomerEmail) {
+      setIsFirstTopUpDialogVisible(true);
+      return;
+    }
     setVisible(true);
     setIsEditAutoPayment(false);
   };
@@ -192,6 +199,7 @@ const Wallet = (props: WalletProps) => {
           onRefresh={onClick}
           amount={walletBalance}
           currency={walletCodeCurrency}
+          language={store.language}
         />
 
         <Button
@@ -211,28 +219,27 @@ const Wallet = (props: WalletProps) => {
       {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
         <div className={styles.walletCustomerStatusNotActive}>
           <Text fontWeight={600} className={styles.warningColor}>
-            {t("CardUnlinked")}
+            {t("PaymentMethodUnlinked")}
           </Text>
           <Text as="span" className={styles.warningColor}>
             {isPayer ? (
-              t("LinkNewCard")
+              t("LinkPaymentMethod")
             ) : (
-              <CommonTrans
-                i18nKey="LinkNewCardEmail"
-                values={{
-                  email: payerEmail,
-                }}
-                components={{
-                  1: (
-                    <Link
-                      textDecoration="underline"
-                      fontWeight="600"
-                      className="error_description_link"
-                      href={`mailto:${payerEmail}`}
-                    />
-                  ),
-                }}
-              />
+              <Text className={styles.warningColor}>
+                <CommonTrans
+                  i18nKey="LinkNewPaymentMethodEmail"
+                  values={{ email: walletCustomerEmail }}
+                  components={{
+                    1: (
+                      <Link
+                        href={`mailto:${walletCustomerEmail}`}
+                        color="accent"
+                        textDecoration="underline"
+                      />
+                    ),
+                  }}
+                />
+              </Text>
             )}
           </Text>{" "}
           {isPayer ? (
@@ -255,7 +262,14 @@ const Wallet = (props: WalletProps) => {
           visible={visible}
           onClose={onClose}
           isEditAutoPayment={isEditAutoPayment}
-          reccomendedAmount={reccomendedAmount}
+          recommendedAmount={recommendedAmount}
+        />
+      ) : null}
+
+      {isFirstTopUpDialogVisible ? (
+        <FirstTopUpDialog
+          visible={isFirstTopUpDialogVisible}
+          onClose={() => setIsFirstTopUpDialogVisible(false)}
         />
       ) : null}
 
@@ -263,7 +277,7 @@ const Wallet = (props: WalletProps) => {
         <WalletRefilledModal visible={wasChangeBalance} />
       ) : null}
 
-      <TransactionHistory withoutRoleFilter/>
+      <TransactionHistory withoutRoleFilter />
     </div>
   );
 };

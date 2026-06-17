@@ -57,6 +57,7 @@ import { getBrandName } from "../../constants/brands";
 export const convertRoomsToItems = (
   rooms: FolderDtoInteger[],
   t?: (key: string, interpolation?: Record<string, string | number>) => string,
+  isRoomDisabled?: (room: FolderDtoInteger) => boolean,
 ): TSelectorItem[] => {
   const translate = t ?? getCommonTranslation;
   const items = rooms.map((room) => {
@@ -73,6 +74,7 @@ export const convertRoomsToItems = (
       shared,
       lifetime,
       quotaLimit,
+      private: isPrivate,
     } = room;
 
     const icon = logo?.medium || "";
@@ -81,7 +83,7 @@ export const convertRoomsToItems = (
     const iconProp = icon ? { icon } : { color: logo?.color as string };
 
     const lifetimeTooltip = lifetime
-      ? translate("RoomFilesLifetime", {
+      ? translate("Common:RoomFilesLifetime", {
           days: String(lifetime.value),
           period: getLifetimePeriodTranslation(lifetime.period!, t),
         })
@@ -102,6 +104,8 @@ export const convertRoomsToItems = (
       lifetimeTooltip,
       cover,
       disableMultiSelect: true,
+      isDisabled: isRoomDisabled ? isRoomDisabled(room) : false,
+      private: isPrivate ?? false,
 
       quotaLimit,
       ...iconProp,
@@ -165,6 +169,9 @@ export const convertFilesToItems: (
       isDisabled: !filterParam || isDisabled || isDisabledBySecurity,
       fileExst,
       fileType,
+      // isForm isn't declared on the SDK file DTO yet, but the backend returns
+      // it for PDF forms — surface it so consumers (e.g. chat) can detect forms.
+      isForm: (file as { isForm?: boolean }).isForm,
       viewUrl,
     } as TSelectorItem;
   });
@@ -235,3 +242,4 @@ export const getDefaultBreadCrumb = (t: (key: string) => string) => {
     isRoom: false,
   };
 };
+

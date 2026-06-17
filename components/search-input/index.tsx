@@ -79,6 +79,7 @@ const SearchInput = ({
   showMainButton = false,
   mainButtonProps,
   mainButtonIcon = <PlusIconSvg />,
+  mainButtonDataTestId,
 }: SearchInputProps) => {
   const [inputValue, setInputValue] = useState(value);
 
@@ -149,7 +150,7 @@ const SearchInput = ({
   );
 
   const iconNode = getIconNode();
-  const iconSizeValue = !!inputValue || showClearButton ? 12 : 14;
+  const iconSizeValue = inputValue || showClearButton ? 12 : 14;
   const mainButtonWrapperRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -166,8 +167,11 @@ const SearchInput = ({
       {showMainButton && mainButtonProps ? (
         <div
           ref={mainButtonWrapperRef}
-          className={styles.mainButtonWrapper}
+          className={classNames(styles.mainButtonWrapper, {
+            [styles.mainButtonWrapperDisabled]: mainButtonProps.isDisabled,
+          })}
           onClick={handleMainButtonWrapperClick}
+          data-testid={mainButtonDataTestId}
         >
           <span className={styles.mainButtonIcon}>{mainButtonIcon}</span>
           <MainButton
@@ -194,12 +198,12 @@ const SearchInput = ({
           type={InputType.text}
           iconNode={iconNode}
           iconButtonClassName={
-            !!inputValue || showClearButton ? "search-cross" : "search-loupe"
+            inputValue || showClearButton ? "search-cross" : "search-loupe"
           }
           isIconFill
           iconSize={iconSizeValue}
           onIconClick={
-            !!inputValue || showClearButton ? handleClearSearch : undefined
+            inputValue || showClearButton ? handleClearSearch : undefined
           }
           placeholder={placeholder}
           tabIndex={tabIndex}

@@ -165,7 +165,7 @@ const AiPage = (props: AiPageProps) => {
   };
 
   const onToggleChange = () => {
-    setIsConfirmDialogVisible(true);
+    onConfirm();
   };
 
   const onCloseConfirmDialog = () => {
@@ -343,6 +343,7 @@ const AiPage = (props: AiPageProps) => {
             title={t("AvailableCredits")}
             onRefresh={onRefresh}
             isRefreshing={isRefreshing}
+            language={language}
           />
 
           <Button

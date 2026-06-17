@@ -58,7 +58,7 @@ import useSelectorBody from "./hooks/useSelectorBody";
 import useSelectorState from "./hooks/useSelectorState";
 
 import { useCommonTranslation } from "../../utils/i18n";
-import type { FilesSelectorProps } from "./FilesSelector.types";
+import type { FilesSelectorProps, TSelectedFileInfo } from "./FilesSelector.types";
 import { SettingsContextProvider } from "../utils/contexts/Settings";
 import {
   LoadersContext,
@@ -70,6 +70,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const {
     disabledItems,
     disabledFolderType,
+    isRoomDisabled,
+    pinnedRootId,
     includedItems,
     filterParam,
 
@@ -136,6 +138,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     undefined,
   );
   const afterSearch = React.useRef(false);
+  const selectedFileInfoRef = React.useRef<TSelectedFileInfo | null>(null);
   const ssrRendered = React.useRef(false);
   const ssrTypeRendered = React.useRef(false);
   const clearSearchCallback = React.useRef<null | VoidFunction>(null);
@@ -185,6 +188,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setIsInsideResultStorage,
     isInsideKnowledge,
     isInsideResultStorage,
+    setIsInsidePrivateRoom,
+    isInsidePrivateRoom,
   } = useSelectorState({
     checkCreating,
     disabledItems,
@@ -200,6 +205,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     filterParam,
     withCreate: withCreateState,
     disableBySecurity,
+    isRoomDisabled,
     setItems,
     setBreadCrumbs,
     setTotal,
@@ -272,6 +278,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     createDefineRoomLabel,
     createDefineRoomType,
     searchArea,
+    isRoomDisabled,
 
     withInit,
   });
@@ -294,11 +301,13 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setSelectedItemType,
     setIsInsideKnowledge,
     setIsInsideResultStorage,
+    setIsInsidePrivateRoom,
 
     selectedItemId,
     searchValue,
     disabledItems,
     disabledFolderType,
+    pinnedRootId,
     includedItems,
     isThirdParty,
     filterParam,
@@ -323,6 +332,10 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         setSearchValue("");
         setIsFirstLoad(true);
         if (+item.id === 0) {
+          if (pinnedRootId != null) {
+            setIsFirstLoad(false);
+            return;
+          }
           setSelectedItemSecurity(undefined);
           setSelectedItemType(undefined);
           getRootData();
@@ -363,6 +376,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           });
 
           setSelectedItemId(item.id);
+          selectedFileInfoRef.current = null;
           setSelectedFileInfo(null);
           if (item.isAgent) {
             setSelectedItemType("agents");
@@ -379,6 +393,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       getRootData,
       isFirstLoad,
       isSelectedParentFolder,
+      pinnedRootId,
       setBreadCrumbs,
       setIsFirstLoad,
       setIsSelectedParentFolder,
@@ -426,6 +441,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         ]);
         setSelectedItemId(item.id);
         setSearchValue("");
+        selectedFileInfoRef.current = null;
         setSelectedFileInfo(null);
 
         if (
@@ -473,14 +489,16 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
               (f.roomType === RoomType.CustomRoom && f.shared),
           ) > -1;
 
-        setSelectedFileInfo({
+        const newFileInfo = {
           id: item.id,
           title: item.label,
           fileExst: item.fileExst,
           fileType: item.fileType,
           viewUrl: item.viewUrl,
           inPublic,
-        });
+        };
+        selectedFileInfoRef.current = newFileInfo as TSelectedFileInfo;
+        setSelectedFileInfo(newFileInfo);
 
         if (isDoubleClick) {
           doubleClickCallback();
@@ -624,9 +642,10 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         fileName,
         isChecked,
         selectedTreeNode,
-        selectedFileInfo,
+        selectedFileInfoRef.current,
         isInsideKnowledge,
         isInsideResultStorage,
+        isInsidePrivateRoom,
       );
     },
     [
@@ -634,10 +653,11 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       onSubmit,
       selectedItemId,
       selectedTreeNode,
-      selectedFileInfo,
+      selectedFileInfoRef,
       folderIsShared,
       isInsideKnowledge,
       isInsideResultStorage,
+      isInsidePrivateRoom,
     ],
   );
 
@@ -712,6 +732,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       isDisabledFolder,
       isInsideKnowledge,
       isInsideResultStorage,
+      isInsidePrivateRoom,
     ),
 
     selectedTreeNode,

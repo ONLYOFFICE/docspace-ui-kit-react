@@ -37,52 +37,27 @@ import { observer } from "mobx-react";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 
 import styles from "../../styles/StorageSummary.module.scss";
-import { usePaymentContext } from "../../context/PaymentContext";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
 type WalletContainerProps = {
-  onTopUp: () => void;
-  isExceedingStorageLimit: boolean;
-  isPaymentBlockedByBalance: boolean;
-  isCurrentStoragePlan: boolean;
-  isDowngradeStoragePlan: boolean;
-  isLoading: boolean;
-  hasMinError: boolean;
+  isBalanceInsufficient: boolean;
 };
 
 const WalletContainer = (props: WalletContainerProps) => {
-  const {
-    onTopUp,
-    isExceedingStorageLimit,
-    isPaymentBlockedByBalance,
-    isCurrentStoragePlan,
-    isDowngradeStoragePlan,
-    isLoading,
-    hasMinError,
-  } = props;
+  const { isBalanceInsufficient } = props;
 
   const paymentStore = usePaymentStore();
   const { hasScheduledStorageChange } = paymentStore.tariff;
   const { formatWalletCurrency } = paymentStore;
 
-  const { isWaitingCalculation } = usePaymentContext();
-
   if (hasScheduledStorageChange) return null;
-
-  const isBalanceInsufficient =
-    !isCurrentStoragePlan &&
-    isPaymentBlockedByBalance &&
-    !isLoading &&
-    !isDowngradeStoragePlan &&
-    !isExceedingStorageLimit && !hasMinError;
 
   return (
     <div className={styles.walletContainer}>
       <WalletInfo
         balance={formatWalletCurrency()}
         isBalanceInsufficient={isBalanceInsufficient}
-        {...(isBalanceInsufficient && !isWaitingCalculation && { onTopUp })}
       />
     </div>
   );

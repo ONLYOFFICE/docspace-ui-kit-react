@@ -41,21 +41,25 @@ import {
   SECTION_FOOTER_NAME,
   SECTION_INFO_PANEL_BODY_NAME,
   SECTION_INFO_PANEL_HEADER_NAME,
+  SECTION_CHAT_PANEL_NAME,
   SECTION_WARNING_NAME,
   SECTION_SUBMENU_NAME,
+  SECTION_BANNER_NAME,
 } from "./Section.constants";
 
-export const parseChildren = (children: React.JSX.Element[]) => {
+export const parseChildren = (children: React.ReactNode) => {
   let sectionHeaderContent: React.JSX.Element | null = null;
   let sectionFilterContent: React.JSX.Element | null = null;
   let sectionBodyContent: React.JSX.Element | null = null;
   let sectionFooterContent: React.JSX.Element | null = null;
   let infoPanelBodyContent: React.JSX.Element | null = null;
   let infoPanelHeaderContent: React.JSX.Element | null = null;
+  let chatPanelContent: React.JSX.Element | null = null;
   let sectionWarningContent: React.JSX.Element | null = null;
   let sectionSubmenuContent: React.JSX.Element | null = null;
+  let sectionBannerContent: React.JSX.Element | null = null;
 
-  React.Children.forEach(children, (child: React.JSX.Element) => {
+  React.Children.forEach(children as React.ReactElement[], (child: React.JSX.Element) => {
     if (!React.isValidElement(child)) return;
 
     const type = child.type as { displayName?: string; name?: string };
@@ -83,11 +87,17 @@ export const parseChildren = (children: React.JSX.Element[]) => {
       case SECTION_INFO_PANEL_HEADER_NAME:
         infoPanelHeaderContent = props.children;
         break;
+      case SECTION_CHAT_PANEL_NAME:
+        chatPanelContent = props.children;
+        break;
       case SECTION_WARNING_NAME:
         sectionWarningContent = props.children;
         break;
       case SECTION_SUBMENU_NAME:
         sectionSubmenuContent = props.children;
+        break;
+      case SECTION_BANNER_NAME:
+        sectionBannerContent = props.children;
         break;
       default:
         break;
@@ -102,7 +112,9 @@ export const parseChildren = (children: React.JSX.Element[]) => {
     sectionWarningContent,
     infoPanelBodyContent,
     infoPanelHeaderContent,
+    chatPanelContent,
     sectionSubmenuContent,
+    sectionBannerContent,
   ];
 
   return arr;

@@ -48,6 +48,9 @@ const SectionContainer = ({
   currentDeviceType,
   isInfoPanelVisible,
   isSectionHeaderAvailable,
+  bannerContent,
+  scrollableBanner = false,
+  stickyTableHeader = false,
 }: SectionContainerProps) => {
   return (
     <div
@@ -57,8 +60,14 @@ const SectionContainer = ({
         [styles.withBodyScroll]: withBodyScroll,
         [styles.infoPanelVisible]: isInfoPanelVisible,
         [styles.withoutSectionHeader]: !isSectionHeaderAvailable,
+        [styles.stickyTableHeader]: stickyTableHeader,
       })}
     >
+      {/* Pinned banner: sits above the scroll container. The scrollable banner
+          variant is rendered inside the section body instead (see Section). */}
+      {bannerContent && !scrollableBanner ? (
+        <div className="section-banner">{bannerContent}</div>
+      ) : null}
       {withBodyScroll && currentDeviceType !== DeviceType.mobile ? (
         <Scrollbar id="sectionScroll" scrollClass="section-scroll" fixedSize>
           {children}

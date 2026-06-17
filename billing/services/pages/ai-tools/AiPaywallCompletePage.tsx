@@ -40,34 +40,66 @@ import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { Text } from "../../../../components/text";
 import { Button, ButtonSize } from "../../../../components/button";
+import { Loader, LoaderTypes } from "../../../../components/loader";
 import { useApi } from "../../../../providers";
 
-import CheckIcon from "../../../../assets/check.react.svg";
-import DangerIcon from "../../../../assets/danger.toast.react.svg";
+import CheckIcon from "../../../../assets/check.edit.react.svg";
 import InfoIcon from "../../../../assets/info.outline.react.svg";
+import XIcon from "../../../../assets/x.alert.react.svg";
+
+import BalanceAmount from "../../../shared/balance-amount";
 
 import { AI_PAYWALL_START_AMOUNT } from "../../../constants";
 import { formatCurrencyValue } from "../../../utils/common";
 
 import styles from "./AiPaywallCompletePage.module.scss";
+import { toastr } from "../../../../components/toast";
+import { AnalyticsEvents } from "../../../../enums";
 
 type Status = "processing" | "success" | "error";
 
 const BILLING_REDIRECT_URL = "/portal-settings/payments/services/ai-services";
+const WALLET_REDIRECT_URL = "/portal-settings/payments/wallet";
+
+const TOPUP_RETRY_ATTEMPTS = 10;
+const TOPUP_RETRY_DELAY_MS = 3000;
+
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
+const withRetry = async <T,>(
+  task: () => Promise<T>,
+  attempts: number,
+  delayMs: number,
+): Promise<T> => {
+  let lastError: unknown;
+  for (let i = 0; i < attempts; i += 1) {
+    try {
+      return await task();
+    } catch (error) {
+      lastError = error;
+      if (i < attempts - 1) await sleep(delayMs);
+    }
+  }
+  throw lastError;
+};
 
 const AiPaywallCompletePage = () => {
   const t = useCommonTranslation();
   const { paymentApi, rawApiClient } = useApi();
 
   const [status, setStatus] = React.useState<Status>("processing");
-  const [stepIndex, setStepIndex] = React.useState(0);
-  const ranRef = React.useRef(false);
+  const [stepIndex, setStepIndex] = React.useState(1);
 
-  const { currency, amount } = React.useMemo(() => {
+  const { currency, amount, type, language } = React.useMemo(() => {
     if (typeof window === "undefined") {
       return {
         currency: "USD",
         amount: AI_PAYWALL_START_AMOUNT,
+        type: "",
+        language: "en",
       };
     }
     const urlParams = new URLSearchParams(window.location.search);
@@ -75,76 +107,109 @@ const AiPaywallCompletePage = () => {
     return {
       currency: urlParams.get("currency") || "USD",
       amount: parsedAmount > 0 ? parsedAmount : AI_PAYWALL_START_AMOUNT,
+      type: urlParams.get("type") || "",
+      language: urlParams.get("language") || "en",
     };
   }, []);
 
-  const language = typeof navigator !== "undefined" ? navigator.language : "en";
+  const isWalletOnly = type === "wallet";
 
   const formattedAmount = formatCurrencyValue(language, amount, currency, 2);
 
+  const hasStartedRef = React.useRef(false);
+
   React.useEffect(() => {
-    if (ranRef.current) return;
-    ranRef.current = true;
+    if (hasStartedRef.current) return;
+    hasStartedRef.current = true;
 
     const run = async () => {
       try {
-        setStepIndex(1);
+        window.dataLayer = window.dataLayer || [];
 
-        await paymentApi.topUpDeposit({
-          topUpDepositRequestDto: { amount, currency },
+        window.dataLayer.push({
+          event: AnalyticsEvents.AddPaymentMethod,
         });
 
-        await rawApiClient.instance.post(
-          "api/2.0/portal/payment/creditaibalance",
-          { amount },
+        await withRetry(
+          () =>
+            paymentApi.topUpDeposit({
+              topUpDepositRequestDto: { amount, currency },
+            }),
+          TOPUP_RETRY_ATTEMPTS,
+          TOPUP_RETRY_DELAY_MS,
         );
 
-        setStepIndex(2);
-
-        await paymentApi.changeTenantWalletServiceState({
-          changeWalletServiceStateRequestDto: {
-            service: TenantWalletService.AITools,
-            enabled: true,
-          },
+        window.dataLayer.push({
+          event: AnalyticsEvents.WalletTopUp,
         });
 
-        setStepIndex(3);
+        if (!isWalletOnly) {
+          await rawApiClient.instance.post(
+            "api/2.0/portal/payment/creditaibalance",
+            { amount },
+          );
+
+          setStepIndex(2);
+
+          await paymentApi.changeTenantWalletServiceState({
+            changeWalletServiceStateRequestDto: {
+              service: TenantWalletService.AITools,
+              enabled: true,
+            },
+          });
+
+          setStepIndex(3);
+        } else {
+          setStepIndex(2);
+        }
 
         await new Promise((resolve) => setTimeout(resolve, 700));
 
         setStatus("success");
       } catch (e) {
-        console.error("[ai-paywall callback] top-up failed", e);
+        console.error("[paywall callback] top-up failed", e);
+        toastr.error(e as Error);
         setStatus("error");
       }
     };
 
     run();
-  }, [paymentApi, rawApiClient]);
+  }, []);
 
   const onGoToBillingClick = () => {
-    window.location.href = BILLING_REDIRECT_URL;
+    window.location.href = isWalletOnly
+      ? WALLET_REDIRECT_URL
+      : BILLING_REDIRECT_URL;
   };
 
-  const steps = [
-    t("AIPaywallCallbackStepLinkCard"),
-    t("AIPaywallCallbackStepTopUp"),
-    t("AIPaywallCallbackStepActivate"),
-  ];
+  const steps = isWalletOnly
+    ? [
+        t("WalletTopUpStepCardSaved"),
+        t("WalletTopUpCallbackStep", { price: formattedAmount }),
+      ]
+    : [
+        t("AIPaywallCallbackStepLinkCard"),
+        t("AIPaywallCallbackStepTopUp"),
+        t("AIPaywallCallbackStepActivate"),
+      ];
 
   return (
     <div className={styles.page}>
       <div className={styles.bgCover} aria-hidden="true" />
 
-      <div className={styles.card}>
+      <div className={styles.card} data-status={status}>
         {status === "processing" ? (
           <>
             <div className={styles.heroText}>
-              <Text fontSize="20px" fontWeight={700} className={styles.title}>
-                {t("AIPaywallCallbackProcessing")}
+              <Text fontSize="16px" fontWeight={600} className={styles.title}>
+                {isWalletOnly
+                  ? t("WalletTopUpCallbackProcessingTitle")
+                  : t("AIPaywallCallbackProcessing")}
               </Text>
-              <Text fontSize="13px" lineHeight="18px" className={styles.hint}>
-                {t("AIPaywallCallbackProcessingHint")}
+              <Text lineHeight="20px">
+                {isWalletOnly
+                  ? t("WalletTopUpCallbackProcessingHint")
+                  : t("AIPaywallCallbackProcessingHint")}
               </Text>
             </div>
 
@@ -153,7 +218,11 @@ const AiPaywallCompletePage = () => {
                 className={styles.keepOpenCalloutIcon}
                 aria-hidden="true"
               />
-              <span>{t("AIPaywallCallbackKeepOpen")}</span>
+              <Text fontSize="12px" fontWeight={600} lineHeight="16px">
+                {isWalletOnly
+                  ? t("WalletTopUpKeepOpen")
+                  : t("AIPaywallCallbackKeepOpen")}
+              </Text>
             </div>
 
             <ol className={styles.timeline}>
@@ -183,10 +252,19 @@ const AiPaywallCompletePage = () => {
                       className={styles.timelineDot}
                       aria-hidden="true"
                       as="span"
+                      data-state={state}
                     >
                       {state === "done" ? <CheckIcon /> : null}
+                      {state === "active" ? (
+                        <Loader type={LoaderTypes.track} size="20px" />
+                      ) : null}
                     </Text>
-                    <Text className={styles.timelineLabel} as="span">
+                    <Text
+                      className={styles.timelineLabel}
+                      as="span"
+                      fontSize="14px"
+                      fontWeight={700}
+                    >
                       {label}
                     </Text>
                   </li>
@@ -194,8 +272,10 @@ const AiPaywallCompletePage = () => {
               })}
             </ol>
 
-            <Text fontSize="12px" className={styles.footerNote}>
-              {t("AIPaywallCallbackProcessingFooter")}
+            <Text className={styles.footerNote}>
+              {isWalletOnly
+                ? t("WalletTopUpSecuredByStripe")
+                : t("AIPaywallCallbackProcessingFooter")}
             </Text>
           </>
         ) : null}
@@ -210,19 +290,48 @@ const AiPaywallCompletePage = () => {
               <CheckIcon />
             </div>
 
-            <div className={styles.successHero}>
-              <Text fontSize="20px" fontWeight={700} className={styles.title}>
-                {t("AIPaywallCallbackSuccess")}
+            <div className={styles.cardBody}>
+              <Text fontSize="16px" fontWeight={600} className={styles.title}>
+                {isWalletOnly
+                  ? t("WalletTopUpSuccessTitle")
+                  : t("AIPaywallCallbackSuccess")}
               </Text>
-              <Text as="span" className={styles.successAmount}>
-                +{formattedAmount}
-              </Text>
-              <Text fontSize="13px" lineHeight="18px" className={styles.hint}>
-                {t("AIPaywallCallbackSuccessHint", {
-                  price: formattedAmount,
-                })}
+              <div className={styles.successAmount}>
+                <Text as="span" fontSize="28px" fontWeight={700}>
+                  +
+                </Text>
+                <BalanceAmount
+                  amount={amount}
+                  currency={currency}
+                  language={language}
+                  maximumFractionDigits={2}
+                  mainFontSize="28px"
+                  fractionFontSize="20px"
+                  withoutMargin
+                  showRefresh={false}
+                />
+              </div>
+              <Text fontSize="13px" lineHeight="18px">
+                {isWalletOnly
+                  ? t("WalletTopUpCallbackSuccessHint")
+                  : t("AIPaywallCallbackSuccessHint", {
+                      price: formattedAmount,
+                    })}
               </Text>
             </div>
+
+            {isWalletOnly ? (
+              <div className={styles.actions}>
+                <Button
+                  size={ButtonSize.medium}
+                  primary
+                  scale
+                  label={t("WalletTopUpGoToWallet")}
+                  onClick={onGoToBillingClick}
+                  testId="ai_paywall_go_to_wallet_button"
+                />
+              </div>
+            ) : null}
           </>
         ) : null}
 
@@ -233,23 +342,33 @@ const AiPaywallCompletePage = () => {
               data-status="error"
               aria-hidden="true"
             >
-              <DangerIcon />
+              <XIcon />
             </div>
 
-            <Text fontSize="20px" fontWeight={700} className={styles.title}>
-              {t("AIPaywallCallbackError")}
-            </Text>
+            <div className={styles.cardBody}>
+              <Text fontSize="16px" fontWeight={600} className={styles.title}>
+                {isWalletOnly
+                  ? t("WalletTopUpErrorTitle")
+                  : t("AIPaywallCallbackError")}
+              </Text>
 
-            <Text fontSize="13px" lineHeight="18px" className={styles.hint}>
-              {t("AIPaywallCallbackErrorHint")}
-            </Text>
+              <Text fontSize="13px" lineHeight="18px">
+                {isWalletOnly
+                  ? t("WalletTopUpCallbackErrorHint")
+                  : t("AIPaywallCallbackErrorHint")}
+              </Text>
+            </div>
 
             <div className={styles.actions}>
               <Button
-                size={ButtonSize.normal}
+                size={ButtonSize.medium}
                 primary
                 scale
-                label={t("AIPaywallCallbackGoToBilling")}
+                label={
+                  isWalletOnly
+                    ? t("WalletTopUpErrorRetry")
+                    : t("AIPaywallCallbackGoToBilling")
+                }
                 onClick={onGoToBillingClick}
                 testId="ai_paywall_go_to_billing_button"
               />

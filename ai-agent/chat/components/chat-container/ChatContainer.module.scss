@@ -37,7 +37,8 @@
 @use "../../../../styles/mixins";
 
 :global(.dark) {
-  .chatContainer {
+  .chatContainer,
+  .chatTokens {
     --accent-main: var(--chat-accent-color, var(--color-scheme-main-accent, #{$light-blue-main}));
     --background-color: var(--chat-background, #{$black});
     --text-color: var(--chat-text-color, #{$white});
@@ -86,7 +87,8 @@
 }
 
 :global(.rtl) {
-  .chatContainer {
+  .chatContainer,
+  .chatTokens {
     --input-text-align: right;
   }
 }
@@ -114,7 +116,8 @@
   padding: 0 var(--chat-content-padding) !important;
 }
 
-.chatContainer {
+.chatContainer,
+.chatTokens {
   // ─── Public API ───────────────────────────────────────────────────────
   // Set any --chat-* variable on a parent element to override the default.
   // If not set, the fallback (second argument) is used.

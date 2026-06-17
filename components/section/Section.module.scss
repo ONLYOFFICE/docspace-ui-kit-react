@@ -213,6 +213,55 @@
   }
 }
 
+// AI Chat panel region. Renders inline on every device (no portal / no Aside),
+// so the chat subtree is never remounted across a resize. On tablet/mobile it
+// becomes a full-screen overlay purely via CSS. Desktop width is windowed
+// (400px) by default; the host sets `--chat-panel-width: 100vw` to make it
+// fill the section in its fullscreen mode.
+.chatPanel {
+  // bridge vars — bind public overrides to internal theme tokens, with a final
+  // fallback to the global background so the panel is never transparent.
+  --chat-panel-bg-v: var(--chat-panel-background, var(--chat-panel-bg, var(--background-color)));
+  --chat-panel-border-v: var(--chat-panel-border-color, var(--chat-panel-border));
+  --chat-panel-width-v: var(--chat-panel-width, 400px);
+
+  height: 100%;
+  width: var(--chat-panel-width-v);
+  // Hold the desktop width firm (400px by default) — as a flex child it would
+  // otherwise shrink when the section needs room. The host overrides
+  // `--chat-panel-width` to 100vw for fullscreen, where #section is collapsed.
+  flex-shrink: 0;
+  background-color: var(--chat-panel-bg-v);
+  border-inline-start: 1px solid var(--chat-panel-border-v);
+  display: flex;
+  flex-direction: column;
+
+  // The theme class (`light`/`dark`) lives on `body`, an ancestor, so target it
+  // as an ancestor (`:global(.light) &`) — a nested `:global(.light){}` would
+  // compile to a descendant selector and never match.
+  :global(.light) & {
+    --chat-panel-bg: #{colors.$white};
+    --chat-panel-border: #{colors.$gray-light-mid};
+  }
+
+  :global(.dark) & {
+    --chat-panel-bg: #{colors.$black};
+    --chat-panel-border: #{colors.$gray-dark-strong};
+  }
+
+  // Tablet/mobile: full-screen overlay above the section. No Aside switch, no
+  // 480px width and no bottom-sheet offset — the chat owns the whole viewport.
+  @include mixins.tablet-and-below {
+    position: fixed;
+    inset: 0;
+    z-index: 309;
+    width: 100vw;
+    max-width: 100vw;
+    height: 100%;
+    border: none;
+  }
+}
+
 .spacer {
   display: none;
   min-height: var(--section-mobile-footer-height, 64px);
@@ -491,6 +540,26 @@
     padding-inline-start: 16px;
   }
 
+  :global(.section-banner) {
+    padding-inline: 20px;
+    flex-shrink: 0;
+
+    @include mixins.tablet-and-below {
+      padding-inline: 16px;
+    }
+  }
+
+  // Pinned banner only: a `.section-banner` rendered as a sibling of the scroll
+  // container is fixed above it, so the scroll container must give up its auto
+  // height. The scrollable-banner variant renders the banner *inside* the
+  // scroll body instead, so this sibling selector never matches it.
+  &:has(> :global(.section-banner)) {
+    :global(#sectionScroll) {
+      flex: 1 1 0 !important;
+      height: 0 !important;
+    }
+  }
+
   :global {
     .section-scroll {
       > .scroll-body {
@@ -527,6 +596,68 @@
     width: 100vw !important;
     max-width: 100vw !important;
     box-sizing: border-box;
+  }
+
+  // Opt-in (stickyTableHeader): the desktop SectionFilter renders inside the
+  // scroll body as a sticky element below the scrollable banner, and the table
+  // header pins below it via `position: sticky` (instead of `position: fixed`),
+  // so the header tracks the filter natively with no host JS. The host supplies
+  // the resting pin offset (section header height + filter height) via the
+  // `--section-filter-bottom` CSS variable. Default consumers never match this.
+  &.stickyTableHeader {
+    :global(.section-body_sticky-filter) {
+      position: sticky;
+      // Rest under the section header; host supplies --section-filter-top.
+      top: var(--section-filter-top, 0);
+      z-index: 201;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      min-height: var(--section-filter-height, 0);
+      background: var(--section-bg-v, var(--section-header-bg));
+      // Bleed to the scroll-body edges so the opaque background fully covers
+      // tiles scrolling beneath it (the scroll body has padding-inline-start:20px).
+      margin-inline: -20px -17px;
+      padding-inline: 20px;
+
+      @include mixins.tablet-and-below {
+        margin-inline: -16px;
+        padding-inline: 16px;
+      }
+
+      > * {
+        width: 100%;
+      }
+    }
+
+    :global(.table-container_header) {
+      position: sticky;
+      // Resting bottom of the sticky filter (= --section-filter-top +
+      // --section-filter-height); resolved natively against #sectionScroll,
+      // no JS measurement.
+      top: var(--section-filter-bottom, 0);
+      // Back in normal flow (vs fixed): span the grid and ignore the
+      // imperative fixed-mode pixel width that TableHeader sets.
+      width: 100% !important;
+    }
+
+    // The grid's default `margin-top: -25px` tucks a *fixed* (out-of-flow)
+    // header that sits at the grid's own top. Here the header is `sticky`, so
+    // it stays IN flow and occupies its own 39px. The negative margin would
+    // slide it up under the in-body filter (hiding the column titles until
+    // scroll), so cancel it.
+    :global(.table-container) {
+      margin-top: 0;
+    }
+
+    // The 40px spacer TableHeader renders to reserve room for the out-of-flow
+    // *fixed* header. A sticky header is IN flow and reserves its own height, so
+    // the spacer is pure double-counting here — remove it. It carries only a
+    // CSS-module class (no global class), so match it by attribute substring,
+    // the same way ModelSettingsTable does.
+    :global([class*="emptyTableContainer"]) {
+      display: none;
+    }
   }
 }
 

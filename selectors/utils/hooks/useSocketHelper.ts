@@ -56,6 +56,22 @@ import {
 
 import type { UseSocketHelperProps } from "../types";
 import { SettingsContext } from "../contexts/Settings";
+
+// Folder ids can be either numeric (server returns number, breadcrumbs/items
+// sometimes carry the same id as a string) or non-numeric strings for
+// third-party providers. Compare numerically when both sides parse as a
+// finite number; otherwise fall back to a strict string compare.
+const idsEqual = (
+  a: number | string | null | undefined,
+  b: number | string | null | undefined,
+) => {
+  if (a == null || b == null) return false;
+  const na = Number(a);
+  const nb = Number(b);
+  if (Number.isFinite(na) && Number.isFinite(nb)) return na === nb;
+  return String(a) === String(b);
+};
+
 const useSocketHelper = ({
   disabledItems,
   disabledFolderType,
@@ -65,13 +81,13 @@ const useSocketHelper = ({
   setBreadCrumbs,
   setTotal,
   disableBySecurity,
+  isRoomDisabled,
 }: UseSocketHelperProps) => {
   const { getIcon } = React.use(SettingsContext);
   const { filesApi, foldersApi, roomsApi } = useApi();
 
   const folderSubscribers = React.useRef(new Set<string>());
 
-  const initRef = React.useRef(false);
   const subscribedId = React.useRef<null | number | string>(null);
 
   const unsubscribe = React.useCallback((id?: number | string) => {
@@ -91,10 +107,7 @@ const useSocketHelper = ({
 
     const path = `DIR-${id}`;
 
-    if (
-      socket?.socketSubscribers.has(path) &&
-      folderSubscribers.current.has(path)
-    ) {
+    if (folderSubscribers.current.has(path)) {
       socket?.emit(SocketCommands.Unsubscribe, {
         roomParts: path,
         individual: true,
@@ -102,22 +115,27 @@ const useSocketHelper = ({
 
       folderSubscribers.current.delete(path);
     }
+
+    if (subscribedId.current === id) subscribedId.current = null;
   }, []);
 
   const subscribe = React.useCallback(
     (id: number | string) => {
       const roomParts = `DIR-${id}`;
 
-      if (socket?.socketSubscribers.has(roomParts)) {
-        subscribedId.current = id;
+      if (subscribedId.current && subscribedId.current !== id)
+        unsubscribe(subscribedId.current);
 
-        return;
-      }
+      subscribedId.current = id;
 
-      if (subscribedId.current) unsubscribe(subscribedId.current);
+      if (folderSubscribers.current.has(roomParts)) return;
+
+      // If already subscribed externally (e.g. main view), don't take
+      // ownership — adding to folderSubscribers would cause cleanup to
+      // unsubscribe it when the selector closes, breaking the main view.
+      if (socket?.socketSubscribers.has(roomParts)) return;
 
       folderSubscribers.current.add(roomParts);
-      subscribedId.current = id;
 
       socket?.emit(SocketCommands.Subscribe, {
         roomParts,
@@ -134,10 +152,10 @@ const useSocketHelper = ({
 
       if (
         "folderId" in data && data.folderId
-          ? data.folderId !== subscribedId.current
+          ? !idsEqual(data.folderId, subscribedId.current)
           : "parentId" in data &&
             !("roomType" in data) &&
-            data.parentId !== subscribedId.current
+            !idsEqual(data.parentId, subscribedId.current)
       ) {
         return;
       }
@@ -162,7 +180,7 @@ const useSocketHelper = ({
             id: data.id!,
           });
           const room = roomRes.data.response!;
-          item = convertRoomsToItems([room])[0];
+          item = convertRoomsToItems([room], undefined, isRoomDisabled)[0];
         } else {
           const folderRes = await foldersApi.getFolderInfo({
             folderId: data.id!,
@@ -236,6 +254,7 @@ const useSocketHelper = ({
       setTotal,
       withCreate,
       disableBySecurity,
+      isRoomDisabled,
     ],
   );
 
@@ -248,13 +267,14 @@ const useSocketHelper = ({
       if (
         (("folderId" in data &&
           data.folderId &&
-          data.folderId !== subscribedId.current) ||
+          !idsEqual(data.folderId, subscribedId.current)) ||
           ("parentId" in data &&
             data.parentId &&
-            data.parentId !== subscribedId.current)) &&
-        data.id !== subscribedId.current
-      )
+            !idsEqual(data.parentId, subscribedId.current))) &&
+        !idsEqual(data.id, subscribedId.current)
+      ) {
         return;
+      }
 
       let item: TSelectorItem = {} as TSelectorItem;
 
@@ -276,7 +296,7 @@ const useSocketHelper = ({
             id: data.id!,
           });
           const room = roomRes.data.response!;
-          item = convertRoomsToItems([room])[0];
+          item = convertRoomsToItems([room], undefined, isRoomDisabled)[0];
         } else {
           const folderRes = await foldersApi.getFolderInfo({
             folderId: data.id!,
@@ -291,7 +311,7 @@ const useSocketHelper = ({
         }
       }
 
-      if (item?.id === subscribedId.current) {
+      if (idsEqual(item?.id, subscribedId.current)) {
         return setBreadCrumbs?.((value) => {
           if (!value) return value;
 
@@ -350,6 +370,7 @@ const useSocketHelper = ({
       setBreadCrumbs,
       setItems,
       disableBySecurity,
+      isRoomDisabled,
     ],
   );
 
@@ -385,7 +406,11 @@ const useSocketHelper = ({
     [setItems, setTotal],
   );
 
-  const handleSocketEvent = React.useEffectEvent((opt?: TOptSocket) => {
+  const socketHandlerRef = React.useRef<((opt?: TOptSocket) => void) | null>(
+    null,
+  );
+
+  socketHandlerRef.current = (opt?: TOptSocket) => {
     switch (opt?.cmd) {
       case "create":
         addItem(opt);
@@ -398,17 +423,13 @@ const useSocketHelper = ({
         break;
       default:
     }
-  });
+  };
 
   React.useEffect(() => {
-    if (initRef.current) return;
-
-    initRef.current = true;
-
-    socket?.on(SocketEvents.ModifyFolder, handleSocketEvent);
-
+    const handler = (opt?: TOptSocket) => socketHandlerRef.current?.(opt);
+    socket?.on(SocketEvents.ModifyFolder, handler);
     return () => {
-      socket?.off(SocketEvents.ModifyFolder, handleSocketEvent);
+      socket?.off(SocketEvents.ModifyFolder, handler);
     };
   }, []);
 

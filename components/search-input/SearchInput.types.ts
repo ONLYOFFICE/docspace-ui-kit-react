@@ -84,4 +84,6 @@ export type SearchInputProps = {
 	mainButtonProps?: MainButtonProps;
 	/** Icon node rendered inside the MainButton (12x12) */
 	mainButtonIcon?: React.ReactNode;
+	/** data-testid for the main button wrapper element */
+	mainButtonDataTestId?: string;
 };

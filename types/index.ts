@@ -391,7 +391,10 @@ export type TFile = {
   fileEntryType: number;
   hasDraft?: boolean;
   order?: string;
+  locked?: boolean;
   lockedBy?: string;
+  customFilterEnabled?: boolean;
+  customFilterEnabledBy?: string;
   originId?: number;
   originRoomId?: number;
   originRoomTitle?: string;
@@ -451,7 +454,7 @@ export type TFolder = {
   parentShared?: boolean;
   parentRoomType?: FolderType;
   order?: string;
-  isRoom?: false;
+  isRoom?: boolean;
   rootRoomType?: RoomsType;
   shareSettings?: TShareSettings;
   availableShareRights?: TAvailableShareRights;

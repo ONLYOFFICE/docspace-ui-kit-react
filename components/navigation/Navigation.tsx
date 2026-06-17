@@ -96,6 +96,8 @@ const Navigation = ({
   showBackButton,
   contextMenuHeader,
   analyzeResponsesButton,
+  aiChatButton,
+  titleTooltip,
 
   ...rest
 }: TNavigationProps) => {
@@ -193,6 +195,7 @@ const Navigation = ({
         onClick={toggleDropBox}
         isRootFolderTitle={false}
         badgeLabel={!showRootFolderNavigation ? badgeLabel : ""}
+        titleTooltip={!showRootFolderNavigation ? titleTooltip : undefined}
       />
     </div>
   );
@@ -347,7 +350,7 @@ const Navigation = ({
               analyzeResponsesButton={analyzeResponsesButton}
             />
           </div>
-
+          {aiChatButton}
           {isDesktop && !hideInfoPanel ? (
             <ToggleInfoPanelButton
               id="info-panel-toggle--open"

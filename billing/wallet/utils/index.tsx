@@ -148,5 +148,5 @@ export const getServiceQuantity = (
   serviceUnit?: string,
 ) => {
   if (!serviceUnit) return "—";
-  return t("UnitCount", { unit: serviceUnit, count: quantity });
+  return t("Common:UnitCount", { unit: serviceUnit, count: quantity });
 };

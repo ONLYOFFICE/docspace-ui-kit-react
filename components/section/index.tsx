@@ -51,6 +51,7 @@ import SubSectionBodyContent from "./sub-components/SectionBodyContent";
 import InfoPanel from "./sub-components/InfoPanel";
 import SubInfoPanelBody from "./sub-components/InfoPanelBody";
 import SubInfoPanelHeader from "./sub-components/InfoPanelHeader";
+import ChatPanelView from "./sub-components/ChatPanel";
 import SubSectionFooter from "./sub-components/SectionFooter";
 import SubSectionWarning from "./sub-components/SectionWarning";
 import SubSectionSubmenu from "./sub-components/SectionSubmenu";
@@ -63,8 +64,10 @@ import {
   SECTION_HEADER_NAME,
   SECTION_INFO_PANEL_BODY_NAME,
   SECTION_INFO_PANEL_HEADER_NAME,
+  SECTION_CHAT_PANEL_NAME,
   SECTION_WARNING_NAME,
   SECTION_SUBMENU_NAME,
+  SECTION_BANNER_NAME,
 } from "./Section.constants";
 import { parseChildren } from "./Section.utils";
 
@@ -75,6 +78,9 @@ SectionHeader.displayName = SECTION_HEADER_NAME;
 
 const SectionFilter: FC<PropsWithChildren> = () => null;
 SectionFilter.displayName = SECTION_FILTER_NAME;
+
+const SectionBanner: FC<PropsWithChildren> = () => null;
+SectionBanner.displayName = SECTION_BANNER_NAME;
 
 const SectionBody: FC<PropsWithChildren> = () => null;
 SectionBody.displayName = SECTION_BODY_NAME;
@@ -87,6 +93,9 @@ InfoPanelBody.displayName = SECTION_INFO_PANEL_BODY_NAME;
 
 const InfoPanelHeader: FC<PropsWithChildren> = () => null;
 InfoPanelHeader.displayName = SECTION_INFO_PANEL_HEADER_NAME;
+
+const ChatPanel: FC<PropsWithChildren> = () => null;
+ChatPanel.displayName = SECTION_CHAT_PANEL_NAME;
 
 const SectionWarning: FC<PropsWithChildren> = () => null;
 SectionWarning.displayName = SECTION_WARNING_NAME;
@@ -105,10 +114,14 @@ const Section = (props: SectionProps) => {
     isInfoPanelAvailable = true,
     settingsStudio = false,
     isInfoPanelScrollLocked,
+    infoPanelWithoutScroll,
     currentDeviceType,
 
     isInfoPanelVisible,
     setIsInfoPanelVisible,
+    isChatPanelAvailable = false,
+    isChatPanelVisible,
+    setIsChatPanelVisible,
     isMobileHidden,
     canDisplay,
     anotherDialogOpen,
@@ -148,6 +161,8 @@ const Section = (props: SectionProps) => {
     pluginOperationsCompleted,
     pluginOperationsAlert,
     pluginShowCancelButton,
+    scrollableBanner,
+    stickyTableHeader,
   } = props;
 
   const [sectionSize, setSectionSize] = React.useState<{
@@ -166,8 +181,10 @@ const Section = (props: SectionProps) => {
     sectionWarningContent,
     infoPanelBodyContent,
     infoPanelHeaderContent,
+    chatPanelContent,
     sectionSubmenuContent,
-  ]: (React.JSX.Element | null)[] = parseChildren(children);
+    sectionBannerContent,
+  ] = parseChildren(children);
 
   const isSectionHeaderAvailable = !!sectionHeaderContent;
   const isSectionFilterAvailable = !!sectionFilterContent;
@@ -182,12 +199,24 @@ const Section = (props: SectionProps) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const computedStyles = window.getComputedStyle(containerRef.current, null);
-    const width = +computedStyles.getPropertyValue("width").replace("px", "");
-    const height = +computedStyles.getPropertyValue("height").replace("px", "");
+    const measure = () => {
+      if (!containerRef.current) return;
+      const computedStyles = window.getComputedStyle(
+        containerRef.current,
+        null,
+      );
+      const width = +computedStyles.getPropertyValue("width").replace("px", "");
+      const height = +computedStyles
+        .getPropertyValue("height")
+        .replace("px", "");
+      setSectionSize(() => ({ width, height }));
+      window.dispatchEvent(new Event("resize"));
+    };
 
-    setSectionSize(() => ({ width, height }));
-  }, [isInfoPanelVisible]);
+    measure();
+    const raf = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(raf);
+  }, [isInfoPanelVisible, isChatPanelVisible]);
 
   const onResize = React.useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -287,7 +316,7 @@ const Section = (props: SectionProps) => {
       secondaryActiveOperations.length === 1 &&
       !secondaryOperationsCompleted);
 
-  const isInfoVisible = canDisplay && isInfoPanelVisible;
+  const isInfoVisible = canDisplay && (isInfoPanelVisible || isChatPanelVisible);
 
   if (!isSectionAvailable) return null;
 
@@ -300,6 +329,9 @@ const Section = (props: SectionProps) => {
         isInfoPanelVisible={isInfoPanelVisible}
         withBodyScroll={withBodyScroll}
         currentDeviceType={currentDeviceType}
+        bannerContent={sectionBannerContent}
+        scrollableBanner={scrollableBanner}
+        stickyTableHeader={stickyTableHeader}
       >
         {currentDeviceType !== DeviceType.mobile ? (
           <div className="section-sticky-container">
@@ -314,6 +346,7 @@ const Section = (props: SectionProps) => {
             ) : null}
 
             {isSectionFilterAvailable &&
+            !stickyTableHeader &&
             currentDeviceType === DeviceType.desktop ? (
               <SubSectionFilter className="section-header_filter">
                 {sectionFilterContent}
@@ -344,6 +377,16 @@ const Section = (props: SectionProps) => {
               <SubSectionHeader className="section-body_header">
                 {sectionHeaderContent}
               </SubSectionHeader>
+            ) : null}
+            {scrollableBanner && sectionBannerContent ? (
+              <div className="section-banner">{sectionBannerContent}</div>
+            ) : null}
+            {isSectionFilterAvailable &&
+            stickyTableHeader &&
+            currentDeviceType === DeviceType.desktop ? (
+              <SubSectionFilter className="section-body_sticky-filter">
+                {sectionFilterContent}
+              </SubSectionFilter>
             ) : null}
             {currentDeviceType !== DeviceType.desktop ? (
               <SubSectionWarning>{sectionWarningContent}</SubSectionWarning>
@@ -409,12 +452,26 @@ const Section = (props: SectionProps) => {
           viewAs={viewAs}
           currentDeviceType={currentDeviceType}
           asideInfoPanel={asideInfoPanel}
+          withoutBodyScroll={infoPanelWithoutScroll}
         >
           <SubInfoPanelHeader>{infoPanelHeaderContent}</SubInfoPanelHeader>
-          <SubInfoPanelBody isInfoPanelScrollLocked={isInfoPanelScrollLocked}>
+          <SubInfoPanelBody
+            isInfoPanelScrollLocked={isInfoPanelScrollLocked}
+            withoutScroll={infoPanelWithoutScroll}
+          >
             {infoPanelBodyContent}
           </SubInfoPanelBody>
         </InfoPanel>
+      ) : null}
+
+      {isChatPanelAvailable ? (
+        <ChatPanelView
+          isVisible={isChatPanelVisible}
+          setIsVisible={setIsChatPanelVisible}
+          currentDeviceType={currentDeviceType}
+        >
+          {chatPanelContent}
+        </ChatPanelView>
       ) : null}
     </Provider>
   );
@@ -428,8 +485,10 @@ type SectionComponentType = FC<SectionProps> & {
   SectionFooter: typeof SectionFooter;
   InfoPanelBody: typeof InfoPanelBody;
   InfoPanelHeader: typeof InfoPanelHeader;
+  ChatPanel: typeof ChatPanel;
   SectionWarning: typeof SectionWarning;
   SectionSubmenu: typeof SectionSubmenu;
+  SectionBanner: typeof SectionBanner;
 };
 
 // Create the memoized component with explicit type assertion
@@ -441,7 +500,9 @@ MemoizedSection.SectionBody = SectionBody;
 MemoizedSection.SectionFooter = SectionFooter;
 MemoizedSection.InfoPanelBody = InfoPanelBody;
 MemoizedSection.InfoPanelHeader = InfoPanelHeader;
+MemoizedSection.ChatPanel = ChatPanel;
 MemoizedSection.SectionWarning = SectionWarning;
 MemoizedSection.SectionSubmenu = SectionSubmenu;
+MemoizedSection.SectionBanner = SectionBanner;
 
 export default MemoizedSection;

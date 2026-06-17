@@ -101,29 +101,23 @@ const PayerInformation = () => {
   };
 
   const unknownPayerDescription = () => {
-    const userNotFound = `${t("UserNotFoundMatchingEmail")} `;
+    if (isNotPaidPeriod) {
+      return isOwner
+        ? t("UnknownPayerOwnerUnpaid", {
+            productName: getBrandName("ProductName"),
+          })
+        : t("UnknownPayerAdminUnpaid", {
+            productName: getBrandName("ProductName"),
+          });
+    }
 
-    let invalidEmailDescription = isOwner
+    return isOwner
       ? t("UnknownPayerForOwner", {
           productName: getBrandName("ProductName"),
         })
       : t("UnknownPayerForAdmin", {
           productName: getBrandName("ProductName"),
         });
-
-    if (isNotPaidPeriod) {
-      invalidEmailDescription = isOwner
-        ? t("InvalidEmailWithoutActiveSubscription", {
-            productName: getBrandName("ProductName"),
-          })
-        : t("InvalidEmailWithoutActiveSubscriptionByAdmin", {
-            productName: getBrandName("ProductName"),
-          });
-
-      return userNotFound + invalidEmailDescription;
-    }
-
-    return userNotFound + invalidEmailDescription;
   };
 
   const unknownPayerInformation = (
@@ -192,7 +186,7 @@ const PayerInformation = () => {
   const payerName = () => {
     let emailUnfoundedUser = "";
 
-    if (email) emailUnfoundedUser = `"${email}"`;
+    if (email) emailUnfoundedUser = `${email}`;
 
     return (
       <Text as="span" fontWeight={600} fontSize="14px">
@@ -200,15 +194,16 @@ const PayerInformation = () => {
           Encoder.htmlDecode(payerInfo.displayName ?? "")
         ) : (
           <CommonTrans
-            i18nKey="UserNotFound"
+            i18nKey="ContactNotFound"
             values={{ email: emailUnfoundedUser }}
             components={{
               1: (
-                <Text
+                <Link
                   as="span"
-                  className={styles.refreshData}
+                  className={styles.contactEmail}
                   fontWeight={600}
                   fontSize="14px"
+                  href={`mailto:${email}`}
                 />
               ),
             }}
@@ -219,9 +214,9 @@ const PayerInformation = () => {
   };
 
   const avatarSource = payerInfo
-    ? (payerInfo.hasAvatar && payerInfo.avatar
-        ? `${baseUrl}${payerInfo.avatar}`
-        : "default_user_photo")
+    ? payerInfo.hasAvatar && payerInfo.avatar
+      ? `${baseUrl}${payerInfo.avatar}`
+      : "default_user_photo"
     : undefined;
 
   return (

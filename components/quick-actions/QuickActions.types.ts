@@ -42,6 +42,7 @@ export type QuickActionItem = {
   onClick?: (e: MouseEvent<HTMLElement>) => void;
   href?: string;
   target?: "_blank" | "_self" | "_parent" | "_top";
+  disabled?: boolean;
   dataTestId?: string;
 };
 

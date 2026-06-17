@@ -510,6 +510,7 @@ type TSelectorItemEmpty = {
   filesCount?: undefined;
   foldersCount?: undefined;
   roomType?: undefined;
+  private?: undefined;
   isGroup?: undefined;
   name?: undefined;
   isCreateNewItem?: undefined;
@@ -559,6 +560,7 @@ export type TSelectorItemFile = MergeTypes<
   {
     fileExst: string;
     fileType: FileType;
+    isForm?: boolean;
     parentId: string | number;
     rootFolderType: string | number;
     security: FileEntryDtoIntegerAllOfSecurity;
@@ -597,6 +599,7 @@ export type TSelectorItemRoom = MergeTypes<
     cover?: ICover;
     tags?: string[];
     title?: string;
+    private?: boolean;
   }
 >;
 

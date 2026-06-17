@@ -62,7 +62,7 @@ type OrderSummaryProps = {
   isUpgradeStoragePlan?: boolean;
   isDowngradeStoragePlan?: boolean;
   totalPrice?: number;
-  reccomendedAmount?: number;
+  recommendedAmount?: number;
   hasMinError?: boolean;
   isExceedingStorageLimit?: boolean;
 };
@@ -72,7 +72,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   totalPrice = 0,
   isUpgradeStoragePlan,
   isDowngradeStoragePlan,
-  reccomendedAmount,
+  recommendedAmount,
   hasMinError,
   isExceedingStorageLimit,
 }) => {
@@ -353,12 +353,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
           <Text
             fontSize="12px"
             className={classNames(styles.balanceInfo, {
-              [styles.warningColor]: reccomendedAmount,
+              [styles.warningColor]: recommendedAmount,
             })}
           >
-            {reccomendedAmount
+            {recommendedAmount
               ? t("WalletTopUpRequired", {
-                  currency: formatWalletCurrency(reccomendedAmount, 2),
+                  currency: formatWalletCurrency(recommendedAmount, 2),
                 })
               : t("RemainingBalanceAfterPurchase", {
                   currency: formatWalletCurrency(remainingBalance, 2),

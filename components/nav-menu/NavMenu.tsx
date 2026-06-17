@@ -88,7 +88,11 @@ const NavMenuSubItemWrapper = ({
   );
 
   return (
-    <li>
+    <li
+      className={classNames({
+        [styles.subItemWithSeparator]: subItem.withTopSeparator,
+      })}
+    >
       <div
         ref={parentElementRef as React.RefObject<HTMLDivElement>}
         className={styles.subItemWrapper}
@@ -117,6 +121,20 @@ const NavMenuSubItemWrapper = ({
           <button type="button" className={itemClassName} onClick={handleClick}>
             {content}
           </button>
+        )}
+        {subItem.showBadge && (
+          <div
+            className={styles.subItemBadge}
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            {subItem.badgeComponent ?? (
+              <Badge
+                label={subItem.labelBadge}
+                onClick={() => subItem.onClickBadge?.(subItem.id)}
+              />
+            )}
+          </div>
         )}
       </div>
     </li>
@@ -166,17 +184,36 @@ const NavMenuItemWrapper = ({
 
   const content = (
     <>
-      {item.iconNode ? (
-        <div className={styles.nodeIcon}>{item.iconNode}</div>
-      ) : item.icon ? (
-        <ReactSVG className={styles.itemIcon} src={item.icon} />
+      {item.iconNode || item.icon ? (
+        <div className={styles.itemIconWrapper}>
+          {item.iconNode ? (
+            <div className={styles.nodeIcon}>{item.iconNode}</div>
+          ) : (
+            <ReactSVG className={styles.itemIcon} src={item.icon!} />
+          )}
+          {item.showBadge && (
+            <span className={styles.itemSignalDot} />
+          )}
+        </div>
       ) : null}
       <span className={styles.itemText}>{item.label}</span>
     </>
   );
 
   return (
-    <li>
+    <li
+      className={classNames({
+        [styles.endOfActiveSection]: item.endOfActiveSection,
+        [styles.flattenedChild]: item.isFlattenedChild,
+      })}
+      style={
+        item.isFlattenedChild
+          ? ({
+              "--flatten-index": item.flattenIndex ?? 0,
+            } as React.CSSProperties)
+          : undefined
+      }
+    >
       <div
         ref={parentElementRef as React.RefObject<HTMLDivElement>}
         className={styles.itemWrapper}
@@ -311,7 +348,8 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
           item.id === activeItemId ||
           item.children?.some((sub) => sub.id === activeItemId);
         if (isActiveParent) {
-          for (const sub of item.children ?? []) {
+          const children = item.children ?? [];
+          children.forEach((sub, index) => {
             flat.push({
               id: sub.id,
               label: sub.label,
@@ -319,8 +357,17 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
               iconNode: sub.iconNode,
               onClick: sub.onClick ? () => sub.onClick?.(sub) : undefined,
               linkData: sub.linkData,
+              showBadge: sub.showBadge,
+              labelBadge: sub.labelBadge,
+              badgeComponent: sub.badgeComponent,
+              onClickBadge: sub.onClickBadge,
+              // Reveal animation for flattened children in icon-only mode.
+              isFlattenedChild: true,
+              flattenIndex: index,
+              // Spacer below the active section's last item in icon-only mode.
+              endOfActiveSection: index === children.length - 1,
             });
-          }
+          });
         }
       }
       return flat;

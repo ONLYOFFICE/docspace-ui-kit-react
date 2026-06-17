@@ -339,8 +339,8 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     try {
       await paymentApi.createCustomerOperationsReport({
         customerOperationsReportRequestDto: {
-          startDate: formatDate!(filterStartDate),
-          endDate: formatDate!(filterEndDate),
+          startDate: formatDate!(filterStartDate, "start"),
+          endDate: formatDate!(filterEndDate, "end"),
           credit: isCredit,
           debit: isDebit,
           participantName: filterContact?.id,
@@ -535,7 +535,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
       filter={() => filter(withoutRoleFilter)}
       {...infoProps}
       emptyScreenHeader={t("NotFoundMembers")}
-      emptyScreenDescription={t("PeopleSelectorInfo", {
+      emptyScreenDescription={t("Common:PeopleSelectorInfo", {
         productName: getBrandName("ProductName"),
       })}
     />
@@ -643,3 +643,4 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 };
 
 export default observer(TransactionHistory);
+

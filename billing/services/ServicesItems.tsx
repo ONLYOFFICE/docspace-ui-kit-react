@@ -58,7 +58,7 @@ import ServiceCard from "./sub-components/ServiceCard";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
-import {Link, LinkTarget} from "../../components/link";
+import { Link, LinkTarget } from "../../components/link";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import PricingBillingBody from "./panels/ai-service/PricingBillingBody";
 
@@ -100,6 +100,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     isAiServiceLowBalance,
     wasFirstAiServiceTopUp,
   } = servicesStore;
+
+  const { isFreeTariff } = paymentStore.quotas;
 
   const {
     isGracePeriod,
@@ -152,7 +154,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     setIsPricingBillingVisible(true);
   };
 
- const onClosePricingBilling = () => {
+  const onClosePricingBilling = () => {
     setIsPricingBillingVisible(false);
   };
 
@@ -211,7 +213,9 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
       case BACKUP_SERVICE:
         if (isBackupServiceOn && availableBackupsCount === 0) {
-          return t("BackupsNotAvailable");
+          return isFreeTariff
+            ? t("BackupsNotAvailable")
+            : t("AdditionalBackupsNotAvailable");
         }
 
         if (isBackupServiceOn) {
@@ -237,23 +241,23 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
           });
         }
 
-
-
-       return    <CommonTrans
-                     i18nKey="AIPricingBilledPerUsageAndPricing"
-                     components={{
-                       1: (
-                         <Link
-                           fontSize="13px"
-                           fontWeight={600}
-                           className={styles.accountLink}
-                           color="accent"
-                           onClick={onOpenPricingBilling}
-                           textDecoration="underline dotted"
-                         />
-                       ),
-                     }}
-                   />
+        return (
+          <CommonTrans
+            i18nKey="AIPricingBilledPerUsageAndPricing"
+            components={{
+              1: (
+                <Link
+                  fontSize="13px"
+                  fontWeight={600}
+                  className={styles.accountLink}
+                  color="accent"
+                  onClick={onOpenPricingBilling}
+                  textDecoration="underline dotted"
+                />
+              ),
+            }}
+          />
+        );
       default:
         return "";
     }
@@ -339,7 +343,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 }
                 isErrorColor={isAiServiceLowBalance}
                 icon={<PriceIcon />}
-                withoutIcon={!wasFirstAiServiceTopUp }
+                withoutIcon={!wasFirstAiServiceTopUp}
               />
             );
           }

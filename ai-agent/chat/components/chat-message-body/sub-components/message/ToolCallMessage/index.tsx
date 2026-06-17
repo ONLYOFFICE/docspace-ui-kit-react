@@ -37,54 +37,34 @@ import React from "react";
 import { observer } from "mobx-react";
 
 import { MessageToolCallProps } from "../../../../../Chat.types";
+import { useMessageStore } from "../../../../../store/messageStore";
 
 import styles from "../../../ChatMessageBody.module.scss";
 
 import { ToolCallConfirmDialog } from "./tool-call-confirm-dialog";
-import { OpenFileConfirmDialog } from "./open-file-confirm-dialog";
 import { ToolCall } from "./tool-call";
 import { ToolCallPlacement, ToolCallStatus } from "./tool-call/ToolCall.enum";
-import { useMessageStore } from "../../../../../store/messageStore";
+import { hasToolResultError } from "./tool-call/ToolCall.utils";
 
 const ToolCallMessage = observer(({
   content,
   openLink,
   openFile,
 }: MessageToolCallProps) => {
-  const {
-    openFileConfirmQueue,
-    removeFromOpenFileConfirmQueue,
-    generateDocxToolName,
-    generateFormToolName,
-    generatePresentationToolName,
-  } = useMessageStore();
-
   const [needConfirmation, setNeedConfirmation] = React.useState(
     () => !!content.managed,
   );
 
   const hideConfirmDialog = () => setNeedConfirmation(false);
 
-  const isGenerateTool =
-    content.name === generateDocxToolName ||
-    content.name === generateFormToolName ||
-    content.name === generatePresentationToolName;
+  const { knowledgeSearchToolName, webSearchToolName, webCrawlingToolName } =
+    useMessageStore();
 
-  const fileData = (
-    content.result as
-      | { data?: { id?: number; title?: string } }
-      | undefined
-  )?.data;
-
-  const needOpenFileConfirm =
-    isGenerateTool &&
-    typeof fileData?.id === "number" &&
-    typeof fileData?.title === "string" &&
-    openFileConfirmQueue.some(
-      (e) => e.fileId === fileData.id,
-    );
-
-  const hasError = !!content.result?.error;
+  const hasError = hasToolResultError(content, [
+    knowledgeSearchToolName,
+    webSearchToolName,
+    webCrawlingToolName,
+  ]);
 
   const toolCallStatus: ToolCallStatus = needConfirmation
     ? ToolCallStatus.Confirmation
@@ -113,16 +93,6 @@ const ToolCallMessage = observer(({
 
       {needConfirmation ? (
         <ToolCallConfirmDialog content={content} onClose={hideConfirmDialog} />
-      ) : null}
-
-      {needOpenFileConfirm && fileData?.id ? (
-        <OpenFileConfirmDialog
-          content={content}
-          fileId={fileData.id}
-          onClose={() =>
-            removeFromOpenFileConfirmQueue(fileData.id!)
-          }
-        />
       ) : null}
     </div>
   );

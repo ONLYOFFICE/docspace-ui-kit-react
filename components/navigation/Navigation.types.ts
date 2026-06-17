@@ -108,6 +108,7 @@ export type TTextProps = {
   onClick: () => void;
   className?: string;
   badgeLabel?: string;
+  titleTooltip?: string;
 };
 
 export type TNavigationLogoProps = {
@@ -178,6 +179,8 @@ export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
     isEmptyPage?: boolean;
     /** Optional button shown in the header control area (e.g. Analyze responses for SubFolderDone) */
     analyzeResponsesButton?: React.ReactNode;
+    /** Optional AI Chat trigger rendered in the header control area. */
+    aiChatButton?: React.ReactNode;
 
     isMobile?: boolean;
     isMobileOnly?: boolean;
@@ -198,6 +201,7 @@ export type TDropBoxProps = TArrowButtonProps &
     | "showTitle"
     | "isMobile"
     | "analyzeResponsesButton"
+    | "aiChatButton"
   > &
   TRowParam & {
     ref?: React.RefObject<HTMLDivElement | null>;
@@ -239,7 +243,7 @@ export type TNavigationProps = Omit<
     isCurrentFolderInfo: boolean;
 
     isRoom: boolean;
-    hideInfoPanel: () => void;
+    hideInfoPanel?: () => void;
     burgerLogo: string;
     showRootFolderTitle: boolean;
     titleIcon: string;
@@ -249,4 +253,5 @@ export type TNavigationProps = Omit<
     onLogoClick?: () => void;
     contextMenuHeader?: HeaderType;
     showBackButton?: boolean;
+    titleTooltip?: string;
   };

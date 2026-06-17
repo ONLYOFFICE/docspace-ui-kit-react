@@ -45,6 +45,7 @@ import styles from "../../styles/index.module.scss";
 import { Text } from "../../../../components";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
+import { Trans } from "react-i18next";
 
 interface ButtonContainerProps {
   onClose: () => void;
@@ -53,6 +54,8 @@ interface ButtonContainerProps {
   isLoading: boolean;
   isExceedingStorageLimit: boolean;
   isPaymentBlockedByBalance: boolean;
+  isBalanceInsufficient: boolean;
+  recommendedAmount: number;
   isCurrentStoragePlan?: boolean;
   isPaymentBlocked?: boolean;
   totalPrice?: number;
@@ -69,6 +72,8 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
     onBuy,
     onSendRequest,
     isPaymentBlockedByBalance,
+    isBalanceInsufficient,
+    recommendedAmount,
     isCurrentStoragePlan,
     isPaymentBlocked,
     totalPrice = 0,
@@ -83,25 +88,46 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
   const { t } = useServicesActions();
   const { isWaitingCalculation } = usePaymentContext();
 
-  const title = !hasStorageSubscription
-    ? t("Buy")
-    : isExceedingStorageLimit
-      ? t("SendRequest")
-      : t("Update");
+  const title = isBalanceInsufficient
+    ? t("TopUpAndUpgrade")
+    : !hasStorageSubscription
+      ? t("UpgradeNow")
+      : isExceedingStorageLimit
+        ? t("SendRequest")
+        : t("Update");
+
+  const showNextBillHint =
+    hasStorageSubscription &&
+    !isDowngradeStoragePlan &&
+    !isCurrentStoragePlan &&
+    !isPaymentBlocked &&
+    !isExceedingStorageLimit &&
+    !isBalanceInsufficient &&
+    totalPrice > 0;
 
   return (
     <div className={styles.buttonWrapper}>
-      {hasStorageSubscription &&
-      !isDowngradeStoragePlan &&
-      !isCurrentStoragePlan &&
-      !isPaymentBlocked &&
-      !isExceedingStorageLimit &&
-      totalPrice > 0 ? (
+      {showNextBillHint ? (
         <Text>
           {t("NextMonthBillDate", {
             currency: formatWalletCurrency(totalPrice, 2),
             date: storageExpiryDate,
           })}
+        </Text>
+      ) : null}
+
+      {isBalanceInsufficient ? (
+        <Text as="span">
+          <Trans
+            ns="Common"
+            i18nKey="TopUpAndUpgradeHint"
+            components={{
+              1: <Text fontWeight="600" as="span"></Text>,
+            }}
+            values={{
+              currency: formatWalletCurrency(recommendedAmount, 2),
+            }}
+          />
         </Text>
       ) : null}
 
@@ -116,7 +142,7 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
           isLoading={isLoading}
           isDisabled={
             isPaymentBlocked ||
-            isPaymentBlockedByBalance ||
+            (isPaymentBlockedByBalance && !isBalanceInsufficient) ||
             isCurrentStoragePlan ||
             isDisabled ||
             isWaitingCalculation
@@ -138,3 +164,4 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
 };
 
 export default observer(ButtonContainer);
+

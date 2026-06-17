@@ -46,6 +46,7 @@ export type SubInfoPanelHeaderProps = {
 export type SubInfoPanelBodyProps = {
   children: React.JSX.Element | null;
   isInfoPanelScrollLocked?: boolean;
+  withoutScroll?: boolean;
 };
 
 export type InfoPanelProps = {
@@ -60,6 +61,21 @@ export type InfoPanelProps = {
   asideInfoPanel?: boolean;
   topInfoPanel?: boolean;
   onClose?: () => void;
+  withoutBodyScroll?: boolean;
+};
+
+/**
+ * The AI Chat panel occupies the same right-side area as the Info Panel but,
+ * unlike it, never switches into the portal-based "Aside" overlay: it renders
+ * inline on every device (so its React subtree — and the live chat state — is
+ * never remounted across a resize) and goes full-screen on tablet/mobile purely
+ * via CSS. Kept as a separate region so the Info Panel's behavior is untouched.
+ */
+export type ChatPanelProps = {
+  children: React.ReactNode;
+  isVisible?: boolean;
+  currentDeviceType?: DeviceType;
+  setIsVisible?: (value: boolean) => void;
 };
 
 export type SectionBodyContentProps = {
@@ -96,6 +112,24 @@ export type SectionContainerProps = {
   children: React.ReactNode;
   withBodyScroll: boolean;
   currentDeviceType?: DeviceType;
+  bannerContent?: React.ReactNode;
+  /**
+   * When true, the banner is rendered inside the scrollable body (as its first
+   * element) instead of being pinned above the scroll container. Lets the
+   * banner scroll away under the sticky section header. Defaults to false to
+   * preserve the legacy pinned-banner behaviour.
+   */
+  scrollableBanner?: boolean;
+  /**
+   * When true, the desktop SectionFilter slot is rendered INSIDE the scroll
+   * body as a sticky element (below the optional scrollable banner) instead of
+   * the always-pinned `.section-sticky-container`, and the table header is
+   * switched from `position: fixed` to `position: sticky` so it pins below the
+   * in-body filter natively (no host JS to measure the header `top`). The host
+   * supplies the pin offset via the `--section-filter-bottom` CSS variable.
+   * Defaults to false (legacy fixed-header + sticky-container-filter).
+   */
+  stickyTableHeader?: boolean;
 };
 
 export type SectionFilterProps = {
@@ -127,19 +161,26 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
   Omit<SectionWarningProps, "children"> &
   Omit<SectionFooterProps, "children"> &
   Omit<SectionFilterProps, "children" | "className"> &
-  Omit<InfoPanelProps, "children" | "setIsVisible" | "isVisible"> &
+  Omit<
+    InfoPanelProps,
+    "children" | "setIsVisible" | "isVisible" | "withoutBodyScroll"
+  > &
   Omit<SectionHeaderProps, "children" | "className"> &
   Omit<SectionContainerProps, "children" | "isSectionHeaderAvailable"> &
   Omit<
     SectionBodyProps,
     "children" | "isSectionHeaderAvailable" | "autoFocus" | "withScroll"
   > & {
-    children: React.JSX.Element[];
+    children: React.ReactNode;
     progressBarDropDownContent?: React.ReactNode;
     onOpenUploadPanel?: () => void;
     isTabletView?: boolean;
     isHeaderVisible?: boolean;
     isInfoPanelAvailable?: boolean;
+    infoPanelWithoutScroll?: boolean;
+    isChatPanelAvailable?: boolean;
+    isChatPanelVisible?: boolean;
+    setIsChatPanelVisible?: (value: boolean) => void;
     isEmptyPage?: boolean;
     maintenanceExist?: boolean;
     snackbarExist?: boolean;

@@ -288,6 +288,19 @@ export const TableHeader = (props: TableHeaderProps) => {
   };
 
   function resetColumns(isResized: boolean = false) {
+    // While the container is collapsed (e.g. the host hides #section behind a
+    // fullscreen overlay, giving it width 0), recomputing against a zero width
+    // yields garbage column sizes that would get persisted and corrupt the
+    // layout once the container is restored — skip until it has a real width.
+    const collapsedContainer = containerRef.current
+      ? containerRef.current
+      : document.getElementById("table-container");
+    if (
+      collapsedContainer &&
+      collapsedContainer.getBoundingClientRect().width < 1
+    )
+      return;
+
     if (!infoPanelVisible) localStorage.removeItem(columnStorageName);
     else localStorage.removeItem(columnInfoPanelStorageName || "");
 
@@ -508,6 +521,11 @@ export const TableHeader = (props: TableHeaderProps) => {
       : document.getElementById("table-container");
 
     if (!container) return;
+
+    // Bail while the container is collapsed (width 0) — see resetColumns. This
+    // also makes the synthetic resize the host fires on fullscreen enter safe:
+    // it lands here at width 0 and is ignored instead of persisting garbage.
+    if (container.getBoundingClientRect().width < 1) return;
 
     const storageSize =
       !resetColumnsSize && localStorage.getItem(columnStorageName);
@@ -1182,8 +1200,21 @@ export const TableHeader = (props: TableHeaderProps) => {
 
     window.addEventListener("resize", throttledResize);
 
+    // Also recompute on container-driven width changes that never fire a window
+    // resize — e.g. a host collapsing/expanding #section for a fullscreen
+    // overlay, or a side panel opening next to the table. Observing the
+    // container makes the table self-sufficient regardless of what moved it; a
+    // collapsed (width 0) container is handled by the guards in onResize.
+    // Setting gridTemplateColumns doesn't change the container's own box, so
+    // this can't feed back into itself.
+    const container = containerRef.current;
+    const resizeObserver = new ResizeObserver(throttledResize);
+    if (container) resizeObserver.observe(container);
+
     return () => {
       window.removeEventListener("resize", throttledResize);
+      resizeObserver.disconnect();
+      throttledResize.cancel();
     };
   });
 
