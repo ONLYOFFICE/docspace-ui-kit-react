@@ -145,6 +145,7 @@ const dispatchEditorTools = (tools: HostTool[]) => {
 const INIT_MESSAGE = "initedAiPlugin";
 const CALL_TOOL_MESSAGE = "callEditorTool";
 const TOOL_RESULT_MESSAGE = "editorToolResult";
+const READY_MESSAGE = "editorDocumentReady";
 
 // Reference to the currently-open editor iframe's content window.
 let editorPanelWindow: Window | null = null;
@@ -456,5 +457,72 @@ export const openEditorPanel = (fileId: number | string): void => {
   panel.appendChild(closeBtn);
   panel.appendChild(iframe);
   document.body.appendChild(panel);
+};
+
+// Open a freshly-generated file in a NEW TAB and, once its editor signals
+// readiness, drive a single tool call inside it via the same postMessage
+// protocol the in-panel iframe uses (CALL_TOOL_MESSAGE → ai_onCallTool).
+//
+// Used by the new-chat generate-document flow: the backend creates the file
+// and returns it in the tool result; we open it and re-run the generation
+// tool with the model's original arguments (replacing the old
+// `?withTool=true` URL flag + server-driven generationToolCallState autocall).
+//
+// Unlike openEditorPanel (an iframe whose contentWindow we hold), the editor
+// here lives in a separate top-level window, so it posts readiness / results
+// to `window.opener` instead of `window.parent` — we listen for the ready
+// message scoped to this exact window and reply to it directly.
+export const openGeneratedFileWithToolCall = (
+  fileId: number | string,
+  toolName: string,
+  toolArgs: Record<string, unknown>,
+): void => {
+  if (typeof window === "undefined") return;
+
+  const url = `${window.location.origin}/doceditor?fileId=${encodeURIComponent(
+    String(fileId),
+  )}`;
+  const editorWindow = window.open(url, "_blank");
+  if (!editorWindow) {
+    console.warn(
+      "[host-tool-groups] openGeneratedFileWithToolCall: window.open blocked",
+    );
+    return;
+  }
+
+  let settled = false;
+  const finish = () => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(timeoutId);
+    window.removeEventListener("message", onReady);
+  };
+
+  const onReady = (event: MessageEvent) => {
+    if (event.source !== editorWindow) return;
+    const data = event.data;
+    if (
+      !data ||
+      typeof data !== "object" ||
+      (data as { type?: unknown }).type !== READY_MESSAGE
+    )
+      return;
+
+    finish();
+    editorWindow.postMessage(
+      {
+        type: CALL_TOOL_MESSAGE,
+        callId: generateCallId(),
+        name: toolName,
+        arguments: toolArgs,
+      },
+      "*",
+    );
+  };
+
+  window.addEventListener("message", onReady);
+
+  // Fail-safe: stop listening if the editor never signals readiness.
+  const timeoutId = setTimeout(finish, EDITOR_READY_TIMEOUT_MS);
 };
 
