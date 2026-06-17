@@ -60,7 +60,6 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import { Link, LinkTarget } from "../../components/link";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
-import PricingBillingBody from "./panels/ai-service/PricingBillingBody";
 
 type ServicesItemsProps = {
   onToggle?: (id: string, enabled: boolean) => void;
@@ -69,6 +68,7 @@ type ServicesItemsProps = {
   isMobile?: boolean;
   isTablet?: boolean;
   cardDisabled?: boolean;
+  onOpenSupportedModels?: () => void;
 };
 
 const ServicesItems: React.FC<ServicesItemsProps> = ({
@@ -77,6 +77,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   isMobile,
   isTablet,
   cardDisabled: forceCardDisabled,
+  onOpenSupportedModels,
 }) => {
   const paymentStore = usePaymentStore();
 
@@ -110,7 +111,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   const isDisabled = isServiceActionDisabled;
   const { t } = useServicesActions();
 
-  const [isPricingBillingVisible, setIsPricingBillingVisible] = useState(false);
 
   const permissionTooltipText = usePermissionTooltipText();
 
@@ -140,15 +140,11 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     onClick?.(id!);
   };
 
-  const onOpenPricingBilling = (e: React.MouseEvent) => {
+  const onSupportedModelsClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    setIsPricingBillingVisible(true);
-  };
-
-  const onClosePricingBilling = () => {
-    setIsPricingBillingVisible(false);
+    onOpenSupportedModels?.();
   };
 
   const textTooltip = (
@@ -234,7 +230,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                     fontWeight={600}
                     color="accent"
                     textDecoration="underline dotted"
-                    onClick={onOpenPricingBilling}
+                    onClick={onSupportedModelsClick}
                     dataTestId="ai_supported_models_link"
                   />
                 ),
@@ -263,7 +259,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                   fontWeight={600}
                   color="accent"
                   textDecoration="underline dotted"
-                  onClick={onOpenPricingBilling}
+                  onClick={onSupportedModelsClick}
                   dataTestId="ai_supported_models_link"
                 />
               ),
@@ -277,13 +273,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
   return (
     <div style={{ width: "100%" }}>
-      <PricingBillingBody
-        visible={isPricingBillingVisible}
-        onClose={onClosePricingBilling}
-        isBackButton={false}
-        withoutFooter
-      />
-
       <Text className={styles.storageDescription}>
         {isPayer || !isCardLinkedToPortal
           ? t("ConnectAndConfigureServices")

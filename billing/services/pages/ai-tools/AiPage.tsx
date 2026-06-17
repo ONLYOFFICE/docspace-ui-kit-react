@@ -49,7 +49,6 @@ import TransactionHistory from "../../../shared/transaction-history";
 
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
-import PricingBillingBody from "../../panels/ai-service/PricingBillingBody";
 
 import AiPageLoader from "./AiPageLoader";
 
@@ -76,6 +75,7 @@ type AiPageProps = {
   simpleTopUp?: boolean;
   withBottomMargin?: boolean;
   onViewMore?: () => void;
+  onOpenSupportedModels?: () => void;
 };
 
 const AiPage = (props: AiPageProps) => {
@@ -85,6 +85,7 @@ const AiPage = (props: AiPageProps) => {
     withoutWallet,
     withBottomMargin,
     onViewMore,
+    onOpenSupportedModels,
   } = props;
 
   const { paymentApi } = useApi();
@@ -112,7 +113,6 @@ const AiPage = (props: AiPageProps) => {
 
   const t = useCommonTranslation();
 
-  const [isPricingBillingVisible, setIsPricingBillingVisible] = useState(false);
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
   const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
   const [isTopUpConfirmVisible, setIsTopUpConfirmVisible] = useState(false);
@@ -218,14 +218,6 @@ const AiPage = (props: AiPageProps) => {
         ],
       };
 
-  const onOpenPricingBilling = () => {
-    setIsPricingBillingVisible(true);
-  };
-
-  const onClosePricingBilling = () => {
-    setIsPricingBillingVisible(false);
-  };
-
   const onOpenTopUp = () => {
     // if (!isAiToolsServiceOn && !simpleTopUp) {
     //   setIsTopUpConfirmVisible(true);
@@ -262,12 +254,6 @@ const AiPage = (props: AiPageProps) => {
 
   return (
     <div className={styles.container}>
-      <PricingBillingBody
-        visible={isPricingBillingVisible}
-        onClose={onClosePricingBilling}
-        isBackButton={false}
-        withoutFooter
-      />
 
       {isTopUpVisible ? (
         <SimpleTopUpDialog
@@ -358,7 +344,7 @@ const AiPage = (props: AiPageProps) => {
                 fontWeight={600}
                 color="accent"
                 textDecoration="underline dotted"
-                onClick={onOpenPricingBilling}
+                onClick={onOpenSupportedModels}
                 dataTestId="ai_supported_models_link"
               />
             ),

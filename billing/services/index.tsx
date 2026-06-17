@@ -72,6 +72,7 @@ type TServicesProps = {
   initialOpenDialog?: string;
   getAIConfig?: () => Promise<void>;
   cardDisabled?: boolean;
+  onOpenSupportedModels?: () => void;
 };
 
 const Services = observer(
@@ -80,6 +81,7 @@ const Services = observer(
     initialOpenDialog,
     getAIConfig,
     cardDisabled,
+    onOpenSupportedModels,
   }: TServicesProps) => {
     const navigate = useNavigate();
     const paymentStore = usePaymentStore();
@@ -455,6 +457,7 @@ const Services = observer(
           onClick={onClick}
           onToggle={onToggle}
           cardDisabled={cardDisabled}
+          onOpenSupportedModels={onOpenSupportedModels}
         />
         {isShowStorageTariffDeactivatedModal ? (
           <StorageTariffDeactivated
