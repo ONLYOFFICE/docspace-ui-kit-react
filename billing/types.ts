@@ -142,6 +142,7 @@ export type TServiceUsage = {
   totalQuantity: number;
   totalAmount: number;
   operationCount: number;
+  title: string;
 };
 
 /** A single month bucket from the monthly usage endpoint. */

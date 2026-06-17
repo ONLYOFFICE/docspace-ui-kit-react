@@ -97,28 +97,33 @@ const SpendingBreakdown = ({
     timezone: getAppTimezone(),
   })}`;
 
-  const getServiceTitle = (service: string) => {
-    switch (service) {
-      case DISK_STORAGE:
-        return t("AdditionalDiskStorage");
-      case BACKUP_SERVICE:
-        return t("Backups");
-      case AI_TOOLS:
-        return t("AIFeatures");
-      default:
-        return service;
-    }
-  };
+  // const getServiceTitle = (service: string) => {
+  //   switch (service) {
+  //     case DISK_STORAGE:
+  //       return t("AdditionalStorageInfo");
+  //     case BACKUP_SERVICE:
+  //       return t("Backups");
+  //     case AI_TOOLS:
+  //       return t("AIFeatures");
+  //     default:
+  //       return service;
+  //   }
+  // };
+
+  const normalizeService = (service: string) =>
+    (service || "").toLowerCase().replace(/[^a-z]/g, "");
 
   const getSubLabel = (item: (typeof serviceUsage)[number]) =>
-    item.service === BACKUP_SERVICE
+    normalizeService(item.service).includes("backup")
       ? t("BilledBackups", { count: item.totalQuantity })
       : getServiceQuantity(t, item.totalQuantity, item.serviceUnit);
 
-  const serviceHandlers: Record<string, (() => void) | undefined> = {
-    [DISK_STORAGE]: onDiskStorageClick,
-    [BACKUP_SERVICE]: onBackupClick,
-    [AI_TOOLS]: onAIServicesClick,
+  const getServiceHandler = (service: string) => {
+    const key = normalizeService(service);
+    if (key.includes("storage")) return onDiskStorageClick;
+    if (key.includes("backup")) return onBackupClick;
+    if (key.includes("ai")) return onAIServicesClick;
+    return undefined;
   };
 
   const emptyView = (
@@ -152,11 +157,11 @@ const SpendingBreakdown = ({
       {serviceUsage.map((item) => (
         <BreakdownRow
           key={item.service}
-          title={getServiceTitle(item.service)}
+          title={item.title}
           subLabel={getSubLabel(item)}
           amount={formatWalletCurrency(item.totalAmount, 2)}
           percent={totalSpend > 0 ? (item.totalAmount / totalSpend) * 100 : 0}
-          onExpand={serviceHandlers[item.service]}
+          onExpand={getServiceHandler(item.service)}
           onDownload={() => fetchTransactionHistory(item.service, from, to)}
         />
       ))}
