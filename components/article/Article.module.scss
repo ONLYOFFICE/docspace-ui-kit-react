@@ -675,16 +675,24 @@
       font-size: 13px;
     }
 
-    margin-inline-start: 12px;
+    &[data-show-article="true"] {
+      margin-inline-start: 12px;
+    }
+  }
+
+  // Collapsed column (tablet width or the desktop collapsed state) — center the
+  // arrow regardless of the active breakpoint so it doesn't drift off.
+  &[data-show-article="false"] {
+    justify-content: center;
+    margin-top: 5px;
+    margin-inline-end: 3px;
   }
 
   @include mixins.tablet {
     margin-top: 9px;
 
     &[data-show-article="false"] {
-      justify-content: center;
       margin-top: 5px;
-      margin-inline-end: 3px;
     }
 
     &[data-show-article="true"] {
@@ -707,6 +715,14 @@
 
     @include mixins.flip-in-rtl;
 
+    svg {
+      height: 20px;
+      width: 20px;
+    }
+  }
+
+  // The short desktop arrow is only used in the expanded state; keep it at 16px.
+  &[data-show-article="true"] .arrowIcon {
     @include mixins.desktop {
       width: 16px !important;
       height: 16px !important;
@@ -715,11 +731,6 @@
         width: 16px !important;
         height: 16px !important;
       }
-    }
-
-    svg {
-      height: 20px;
-      width: 20px;
     }
   }
 }

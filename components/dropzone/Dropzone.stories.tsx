@@ -229,7 +229,7 @@ const CssCustomizationTemplate = () => {
           "--dropzone-formats-radius": "10px",
           "--dropzone-formats-shadow": "0 4px 16px rgba(0, 130, 201, 0.25)",
           // === Link (main/secondary upload link text) ===
-          "--link-color": "#0082c9",
+          "--link-text-color": "#0082c9",
           // === Badge (format count badge) ===
           "--badge-bg": "#0082c9",
           "--badge-radius": "8px",
@@ -289,7 +289,7 @@ export const CssCustomization: Story = {
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| \`--link-color\` | Link text color | theme-based |
+| \`--link-text-color\` | Link text color | theme-based |
 
 **Badge (format count badge)**
 
@@ -503,3 +503,4 @@ export const SingleFileOnly: Story = {
     },
   },
 };
+

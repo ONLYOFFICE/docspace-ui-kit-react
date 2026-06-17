@@ -339,8 +339,7 @@ export const AllVariants: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Side-by-side comparison of all page and action link variants.",
+        story: "Side-by-side comparison of all page and action link variants.",
       },
       source: {
         code: `// Page links
@@ -362,8 +361,7 @@ export const HoveredState: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Link with forced hover state for demonstration purposes.",
+        story: "Link with forced hover state for demonstration purposes.",
       },
       source: {
         code: `<Link type={LinkType.page} href="https://github.com" isHovered>Hovered link</Link>`,
@@ -411,8 +409,7 @@ export const NoHoverEffect: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Link with hover effects disabled via the noHover prop.",
+        story: "Link with hover effects disabled via the noHover prop.",
       },
       source: {
         code: `<Link type={LinkType.page} href="https://github.com" noHover>No hover effect link</Link>`,
@@ -426,7 +423,7 @@ export const CssCustomization: Story = {
     <div
       style={
         {
-          "--link-color": "#9C27B0",
+          "--link-text-color": "#9C27B0",
           "--link-hover-text-decoration": "none",
         } as CSSProperties
       }
@@ -442,7 +439,7 @@ export const CssCustomization: Story = {
         story: `CSS Custom Properties for external customization:
 
 \`\`\`css
---link-color                  /* link text color */
+--link-text-color                  /* link text color */
 --link-text-decoration        /* text decoration (default none) */
 --link-cursor                 /* cursor style */
 --link-hover-text-decoration  /* text decoration on hover (default underline) */
@@ -451,7 +448,7 @@ export const CssCustomization: Story = {
       source: {
         code: `<div
   style={{
-    "--link-color": "#9C27B0",
+    "--link-text-color": "#9C27B0",
     "--link-hover-text-decoration": "none",
   }}
 >
@@ -463,3 +460,4 @@ export const CssCustomization: Story = {
     },
   },
 };
+

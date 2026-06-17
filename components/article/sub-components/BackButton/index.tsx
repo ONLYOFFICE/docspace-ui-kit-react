@@ -79,7 +79,11 @@ const BackButton = ({
     }
   };
 
-  const isDesktop = currentDeviceType === DeviceType.desktop;
+  // When the article is collapsed (showText === false) the column shrinks to
+  // the narrow variant, so use the tablet arrow/layout even on desktop —
+  // otherwise the desktop styling (margin-inline-start) pushes the arrow
+  // off-center in the collapsed column.
+  const isDesktop = currentDeviceType === DeviceType.desktop && showText;
   const icon = isDesktop ? <ArrowIcon /> : <ArrowTabletIcon />;
 
   if (isLoading)
