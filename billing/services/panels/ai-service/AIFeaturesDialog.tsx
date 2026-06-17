@@ -190,9 +190,11 @@ const AIFeaturesDialog: React.FC<AIFeaturesDialogProps> = ({
       </ModalDialog.Body>
       <ModalDialog.Footer>
         <Button
-          label={t(
-            !isCardLinkedToPortal ? "TopUpAndActivate" : "ActivateAIFeatures",
-          )}
+          label={
+            !isCardLinkedToPortal
+              ? t("TopUpAndActivate")
+              : t("ActivateAIFeatures")
+          }
           size={ButtonSize.normal}
           onClick={onActivate}
           primary
