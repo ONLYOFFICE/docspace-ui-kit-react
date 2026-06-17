@@ -175,4 +175,7 @@ export const globalColors = {
   darkEditorBackground: "#222222",
 
   coralPink: "#F2557C",
+  indigoBlue: "#4F6BED",
+
+  docsConnectAccent: "#FF6680",
 };
