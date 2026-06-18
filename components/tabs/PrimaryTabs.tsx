@@ -130,7 +130,7 @@ const PrimaryTabs = (props: TabsProps) => {
             Math.abs(containerElement.scrollLeft)
           ),
         );
-      } else if (rect.right > containerWidth && !!containerElement.scrollLeft) {
+      } else if (rect.right > containerWidth && containerElement.scrollLeft) {
         scrollRef.current.scrollTo(
           rect.right -
             containerWidth +

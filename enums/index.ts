@@ -443,5 +443,5 @@ export enum AnalyticsEvents {
   WalletTopUp = "wallet_topup",
   AddPaymentMethod = "add_payment_method",
   Purchase = "purchase",
+  LimitReached = "limit_reached",
 }
-

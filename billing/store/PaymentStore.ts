@@ -1088,7 +1088,7 @@ class PaymentStore {
       this.setRangeStepByQuota();
       this.setBasicTariffContainer();
     } catch (error) {
-      toastr.error(t("UnexpectedError"));
+      toastr.error(t("Common:UnexpectedError"));
       console.error(error);
       return;
     }
@@ -1144,7 +1144,7 @@ class PaymentStore {
       }
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
-      toastr.error(t("UnexpectedError"));
+      toastr.error(t("Common:UnexpectedError"));
       console.error(error);
     }
   };
@@ -1217,7 +1217,7 @@ class PaymentStore {
       }
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
-      toastr.error(t("UnexpectedError"));
+      toastr.error(t("Common:UnexpectedError"));
       console.error(error);
     }
   };
@@ -1358,7 +1358,7 @@ class PaymentStore {
           message,
         },
       });
-      toastr.success(t("SuccessfullySentMessage"));
+      toastr.success(t("Common:SuccessfullySentMessage"));
     } catch (e) {
       toastr.error(e as TData);
     }

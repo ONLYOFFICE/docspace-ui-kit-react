@@ -642,7 +642,7 @@ class ServicesStore {
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
-      toastr.error(t("UnexpectedError"));
+      toastr.error(t("Common:UnexpectedError"));
     }
   };
 
@@ -663,7 +663,7 @@ class ServicesStore {
       if (error instanceof Error && error.name === "CanceledError")
         return false;
       console.error(error);
-      toastr.error(t("UnexpectedError"));
+      toastr.error(t("Common:UnexpectedError"));
       return false;
     }
   };
@@ -779,7 +779,7 @@ class ServicesStore {
       }
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
-      toastr.error(t("UnexpectedError"));
+      toastr.error(t("Common:UnexpectedError"));
       console.error(e);
     }
   };

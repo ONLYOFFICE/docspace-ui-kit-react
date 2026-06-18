@@ -65,7 +65,7 @@ export const getConvertedSize = (
     t("Common:Exabyte"),
   ];
 
-  if (bytes <= 0) return `${`0 ${t("Bytes")}`}`;
+  if (bytes <= 0) return `${`0 ${t("Common:Bytes")}`}`;
 
   if (bytes >= 1024) {
     power = getPowerFromBytes(bytes, sizeNames.length - 1);
