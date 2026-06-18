@@ -50,4 +50,11 @@ export type QuickActionsProps = {
   items: QuickActionItem[];
   className?: string;
   dataTestId?: string;
+  /**
+   * Label for the "show more" affordance that reveals the hidden tiles. Only
+   * shown when the grid collapses (more than 4 items on tablet/mobile).
+   * Expanding is one-way — there is no "show less". The consumer supplies the
+   * localized string; defaults to "Show more".
+   */
+  showMoreLabel?: string;
 };

@@ -34,11 +34,53 @@
  */
 
 import React from "react";
-import { describe, it, expect, afterEach, vi } from "vitest";
+import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
 import { QuickActions } from "./index";
 import type { QuickActionItem } from "./QuickActions.types";
+
+// jsdom performs no layout, so every element's offsetTop is 0. The collapse
+// logic measures wrapping by comparing tile offsetTop values, so these tests
+// simulate row layout by overriding the offsetTop getter: each tile's row is
+// derived from its index among its siblings and a configurable tiles-per-row.
+// `perRow >= tile count` ⇒ single row (no overflow); a smaller value ⇒ the
+// later tiles land on row 2+ (overflow ⇒ collapse).
+let originalOffsetTop: PropertyDescriptor | undefined;
+
+const ROW_HEIGHT = 172;
+
+const simulateLayout = (perRow: number) => {
+  Object.defineProperty(HTMLElement.prototype, "offsetTop", {
+    configurable: true,
+    get(this: HTMLElement) {
+      const parent = this.parentElement;
+      if (!parent) return 0;
+      const index = Array.prototype.indexOf.call(parent.children, this);
+      if (index < 0) return 0;
+      return Math.floor(index / perRow) * ROW_HEIGHT;
+    },
+  });
+};
+
+beforeEach(() => {
+  originalOffsetTop = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    "offsetTop",
+  );
+});
+
+afterEach(() => {
+  if (originalOffsetTop) {
+    Object.defineProperty(HTMLElement.prototype, "offsetTop", originalOffsetTop);
+  } else {
+    // jsdom's default is a value of 0 on the prototype; restore that.
+    Object.defineProperty(HTMLElement.prototype, "offsetTop", {
+      configurable: true,
+      value: 0,
+    });
+  }
+});
 
 const buildItems = (overrides: Partial<QuickActionItem>[] = []) => {
   const base: QuickActionItem[] = [
@@ -51,7 +93,23 @@ const buildItems = (overrides: Partial<QuickActionItem>[] = []) => {
   return base.map((item, i) => ({ ...item, ...overrides[i] }));
 };
 
+// Five tiles — one past the collapse threshold, so the grid collapses on
+// tablet/mobile but not on desktop.
+const buildFiveItems = (): QuickActionItem[] => [
+  { id: "vdr", icon: <svg data-testid="icon-vdr" />, label: "VDR room" },
+  { id: "collab", icon: <svg data-testid="icon-collab" />, label: "Collaboration room" },
+  { id: "public", icon: <svg data-testid="icon-public" />, label: "Public room" },
+  { id: "custom", icon: <svg data-testid="icon-custom" />, label: "Custom room" },
+  { id: "template", icon: <svg data-testid="icon-template" />, label: "Room template" },
+];
+
 describe("QuickActions", () => {
+  beforeEach(() => {
+    // Default every test to a layout where all tiles fit on one row, so the
+    // grid does not collapse unless a test opts into a wrapped layout.
+    simulateLayout(100);
+  });
+
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -64,7 +122,9 @@ describe("QuickActions", () => {
     expect(screen.getByText("Presentation")).toBeInTheDocument();
     expect(screen.getByText("PDF")).toBeInTheDocument();
 
-    expect(screen.getByTestId("qa").children).toHaveLength(4);
+    // The wrapper holds a single .grid child that contains one tile per item.
+    const grid = screen.getByTestId("qa").firstChild as HTMLElement;
+    expect(grid.children).toHaveLength(4);
   });
 
   it("renders the provided icon for each tile", () => {
@@ -132,5 +192,80 @@ describe("QuickActions", () => {
 
     expect(screen.getByTestId("tile-a")).toBeInTheDocument();
     expect(screen.getByTestId("tile-b")).toBeInTheDocument();
+  });
+
+  describe("collapse behavior", () => {
+    const SHOW_MORE_TESTID = "quick-actions-show-more";
+
+    // Collapse is driven by the tiles wrapping onto more than one row, not by a
+    // fixed breakpoint. CSS clips the overflow, so every tile stays in the DOM;
+    // these assertions check the collapsed wrapper + the "Show more" affordance.
+    it("collapses with a Show more affordance when tiles wrap (3 per row)", () => {
+      simulateLayout(3);
+      render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+
+      const showMore = screen.getByTestId(SHOW_MORE_TESTID);
+      expect(showMore).toHaveTextContent("Show more");
+      expect(screen.getByTestId("qa")).toHaveClass("collapsed");
+      // All five tiles are present (clipped, not removed).
+      expect(screen.getByText("VDR room")).toBeInTheDocument();
+      expect(screen.getByText("Room template")).toBeInTheDocument();
+      // Wrapper holds the grid + the show-more overlay.
+      expect(screen.getByTestId("qa").children).toHaveLength(2);
+    });
+
+    it("collapses with a Show more affordance when tiles wrap (2 per row)", () => {
+      simulateLayout(2);
+      render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+
+      expect(screen.getByTestId(SHOW_MORE_TESTID)).toHaveTextContent(
+        "Show more",
+      );
+      expect(screen.getByTestId("qa")).toHaveClass("collapsed");
+    });
+
+    it("does not collapse when every tile fits on one row", () => {
+      simulateLayout(100);
+      render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+
+      expect(screen.getByText("Custom room")).toBeInTheDocument();
+      expect(screen.getByText("Room template")).toBeInTheDocument();
+      expect(screen.queryByTestId(SHOW_MORE_TESTID)).not.toBeInTheDocument();
+      expect(screen.getByTestId("qa")).not.toHaveClass("collapsed");
+    });
+
+    it("does not collapse when few tiles wrap but still fit one row", () => {
+      // 4 tiles, 4 per row → single row → no overflow even though wrapping is
+      // allowed. Confirms collapse keys off actual overflow, not tile count.
+      simulateLayout(4);
+      render(<QuickActions items={buildItems()} dataTestId="qa" />);
+
+      expect(screen.getByText("PDF")).toBeInTheDocument();
+      expect(screen.queryByTestId(SHOW_MORE_TESTID)).not.toBeInTheDocument();
+      expect(screen.getByTestId("qa")).not.toHaveClass("collapsed");
+    });
+
+    it("expands on click and stays expanded (no show less)", () => {
+      simulateLayout(3);
+      render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+
+      fireEvent.click(screen.getByTestId(SHOW_MORE_TESTID));
+
+      // The affordance is gone, the clip is removed, and tiles remain visible.
+      expect(screen.queryByTestId(SHOW_MORE_TESTID)).not.toBeInTheDocument();
+      expect(screen.getByTestId("qa")).not.toHaveClass("collapsed");
+      expect(screen.getByText("Room template")).toBeInTheDocument();
+    });
+
+    it("uses the provided show more label", () => {
+      simulateLayout(3);
+      render(
+        <QuickActions items={buildFiveItems()} showMoreLabel="Развернуть" />,
+      );
+
+      expect(screen.getByTestId(SHOW_MORE_TESTID)).toHaveTextContent(
+        "Развернуть",
+      );
+    });
   });
 });

@@ -36,27 +36,55 @@
 @use "../../styles/variables/colors";
 @use "../../styles/mixins/media-queries";
 
+// Tile size and the gap between tiles.
+$tile-width: 172px;
+$tile-height: 172px;
+$gap: 16px;
+
+// Compact sizing (tablet and below): shorter tiles, tighter icon/gap. Width
+// still stretches; mobile additionally drops to exactly two tiles per row.
+$compact-tile-height: 120px;
+$compact-gap: 8px;
+
+// How much of the next row peeks out below the first row when collapsed.
+$peek: 86px;
+$compact-peek: 60px;
+
 .quickActions {
   --_tile-bg: var(--quick-actions-tile-bg, #{colors.$gray-light});
   --_tile-bg-hover: var(--quick-actions-tile-bg-hover, #{colors.$gray-light-mid});
   --_tile-color: var(--quick-actions-tile-color, #{colors.$black});
+  // The fade/blur overlay tints toward the surrounding surface; defaults to the
+  // tile background so it reads as the grid dissolving.
+  --_fade-color: var(--quick-actions-tile-bg, #{colors.$white});
 
   :global(.dark) & {
     --_tile-bg: var(--quick-actions-tile-bg, #{colors.$dark-gray-light});
     --_tile-bg-hover: var(--quick-actions-tile-bg-hover, #{colors.$gray-dark-mid});
     --_tile-color: var(--quick-actions-tile-color, #{colors.$white});
+    --_fade-color: var(--quick-actions-tile-bg, #{colors.$black});
   }
 
+  position: relative;
+  width: 100%;
+}
+
+.grid {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: $gap;
   width: 100%;
 
-  @include media-queries.mobile {
-    flex-wrap: wrap;
+  @include media-queries.tablet-and-below {
+    gap: $compact-gap;
   }
 }
 
+// Tiles grow to fill the row so there's no empty space, but never shrink below
+// their natural width — when a row can't fit them all at that width they wrap to
+// the next line instead of squashing. useRowOverflow detects that wrap to
+// trigger the collapse (only with >4 tiles). Because every tile grows, a partial
+// last row (e.g. a lone wrapped tile) stretches to fill the width too.
 .tile {
   display: flex;
   flex-direction: column;
@@ -64,13 +92,9 @@
   justify-content: center;
   gap: 12px;
   padding: 16px;
-  flex: 1 1 0;
-  min-width: 0;
-  // Cap the tile so a lone tile doesn't stretch across the whole banner: it
-  // stays at the same size as the dashboard tiles (4 tiles * 172px + 3 * 16px
-  // gap = 736px banner). With several tiles they grow up to 172px and stop.
-  max-width: 172px;
-  height: 172px;
+  flex: 1 1 $tile-width;
+  min-width: $tile-width;
+  height: $tile-height;
   background-color: var(--_tile-bg);
   border: none;
   border-radius: 12px;
@@ -101,6 +125,77 @@
     cursor: not-allowed;
     pointer-events: none;
   }
+
+  // Tablet and below: smaller tiles (shorter, tighter icon/padding). Width still
+  // grows to fill the row — several reduced tiles per row, no empty space.
+  @include media-queries.tablet-and-below {
+    height: $compact-tile-height;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  // Mobile only: exactly two tiles per row (allowed to shrink below the desktop
+  // minimum so two always fit, even on the narrowest phones).
+  @include media-queries.mobile {
+    flex: 1 1 calc(50% - #{$compact-gap});
+    min-width: 0;
+  }
+}
+
+// Collapsed: clip the grid to the first row plus a peek of the next, and hide
+// the overflow. The .showMore overlay sits on top of the clipped strip. Only
+// reachable with >4 tiles (the component sets .collapsed) and at any width
+// where they wrap.
+.collapsed .grid {
+  max-height: $tile-height + $gap + $peek;
+  overflow: hidden;
+
+  @include media-queries.tablet-and-below {
+    max-height: $compact-tile-height + $compact-gap + $compact-peek;
+  }
+}
+
+// "Show more" overlay: a blurred, fading strip pinned to the bottom of the
+// collapsed grid with the label centered on it. Clicking it expands the grid.
+.showMore {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: $peek + $gap + 24px;
+  padding-bottom: 12px;
+  border: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--_fade-color) 70%, transparent) 55%,
+    var(--_fade-color) 100%
+  );
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  cursor: pointer;
+
+  @include media-queries.tablet-and-below {
+    height: $compact-peek + $compact-gap + 20px;
+    padding-bottom: 8px;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--_tile-color);
+    outline-offset: -2px;
+    border-radius: 12px;
+  }
+}
+
+.showMoreLabel {
+  pointer-events: none;
 }
 
 .icon {
@@ -117,26 +212,14 @@
     height: 100%;
   }
 
-  @include media-queries.mobile {
+  @include media-queries.tablet-and-below {
     height: 60px;
   }
 }
 
 .label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   line-height: 20px;
   word-break: break-word;
-}
-
-.tile {
-  // Two tiles per row on mobile: each takes half the width minus half the gap.
-  // Tiles also shrink to a more compact height on small screens.
-  @include media-queries.mobile {
-    flex: 1 1 calc(50% - 8px);
-    max-width: calc(50% - 8px);
-    height: 120px;
-    gap: 8px;
-    padding: 12px;
-  }
 }
