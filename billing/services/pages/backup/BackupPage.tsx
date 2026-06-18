@@ -48,6 +48,7 @@ import styles from "./BackupPage.module.scss";
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { BACKUP_SERVICE } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
+import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
 import { useApi } from "../../../../providers";
 import {
   now,
@@ -209,6 +210,11 @@ const BackupPage: React.FC<BackupPageProps> = ({
         isDisabled={isDisabled || isLoading}
       />
       <WalletInfo withoutBackground balance={balance} onTopUp={onTopUp} />
+      {!paymentStore.tariff.isNotPaidPeriod && paymentStore.tariff.walletCustomerStatusNotActive ? (
+        <div className={styles.unlinkedBanner}>
+          <UnlinkedCardBanner />
+        </div>
+      ) : null}
       {isLowBalance ? (
         <Text className={styles.lowBalance} fontSize="15px" fontWeight={600}>
           {t("NeedTopUpWallet")}

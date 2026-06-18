@@ -62,6 +62,7 @@ import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components";
 import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
+import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
@@ -284,7 +285,14 @@ const AiPage = (props: AiPageProps) => {
       ) : null}
 
       {withoutWallet ? null : (
-        <WalletInfo withoutBackground balance={balance} onTopUp={onOpenTopUp} />
+        <>
+          <WalletInfo withoutBackground balance={balance} onTopUp={onOpenTopUp} />
+          {!paymentStore.tariff.isNotPaidPeriod && paymentStore.tariff.walletCustomerStatusNotActive ? (
+            <div className={styles.unlinkedBanner}>
+              <UnlinkedCardBanner />
+            </div>
+          ) : null}
+        </>
       )}
 
       <div className={styles.section}>

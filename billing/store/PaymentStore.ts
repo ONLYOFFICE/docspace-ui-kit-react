@@ -67,7 +67,10 @@ import {
   getWalletBalanceCurrency,
   formatPaymentDate,
 } from "../utils/paymentSelectors";
-import { applyServiceQuotaToMap, parseServicesQuotasMap } from "../utils/parsers";
+import {
+  applyServiceQuotaToMap,
+  parseServicesQuotasMap,
+} from "../utils/parsers";
 import { getUsageRange } from "../usage/utils";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
@@ -338,10 +341,7 @@ class PaymentStore {
   }
 
   get isPayer() {
-    return getIsPayer(
-      this._currentUserEmail,
-      this.tariff.walletCustomerEmail,
-    );
+    return getIsPayer(this._currentUserEmail, this.tariff.walletCustomerEmail);
   }
 
   get isServiceActionDisabled() {
@@ -415,10 +415,6 @@ class PaymentStore {
     if (!this.isCardLinkedToPortal) return false;
 
     return this.walletBalance < 1;
-  }
-
-  get walletMonthToDateSpend(): number {
-    return 0;
   }
 
   get wasFirstTopUp() {

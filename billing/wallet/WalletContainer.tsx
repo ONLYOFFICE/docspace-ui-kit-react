@@ -51,7 +51,7 @@ import TransactionHistory from "../shared/transaction-history";
 import UpcomingPayments from "./sub-components/UpcomingPayments";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
-import PluginIncompatibleSvg from "../../assets/plugin.incompatible.react.svg";
+import UnlinkedCardBanner from "../shared/unlinked-card-banner";
 import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
@@ -80,8 +80,6 @@ const Wallet = (props: WalletProps) => {
     fetchBalance,
     fetchTransactionHistory,
     canUpdateTariff,
-    cardLinked,
-    isPayer,
     recommendedAmount,
     walletHelpUrl,
     isAutoTopUpInProgress,
@@ -107,8 +105,9 @@ const Wallet = (props: WalletProps) => {
 
   const t = useCommonTranslation();
 
-  const [isTopUpDialogVisible, setIsTopUpDialogVisible] =
-    useState(isVisibleWalletSettings);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(
+    isVisibleWalletSettings,
+  );
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
   const [selectedTabId, setSelectedTabId] = useState("transaction-history");
@@ -176,12 +175,6 @@ const Wallet = (props: WalletProps) => {
         setRefreshing: setIsRefreshing,
       });
     }
-  };
-
-  const goLinkCard = () => {
-    cardLinked
-      ? window.open(toAbsoluteUrl(cardLinked), "_self")
-      : toastr.error(t("UnexpectedError"));
   };
 
   const tabsItems: TTabItem[] = [
@@ -309,47 +302,7 @@ const Wallet = (props: WalletProps) => {
       </div>
 
       {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
-        <div className={styles.autoPaymentBanner}>
-          <PluginIncompatibleSvg className={styles.warningBannerIcon} />
-          <Text
-            as="span"
-            fontSize="12px"
-            lineHeight="16px"
-            className={styles.autoPaymentBannerText}
-          >
-            {isPayer ? (
-              <CommonTrans
-                i18nKey="PaymentMethodUnlinkedBanner"
-                components={{
-                  1: <Text as="span" fontWeight={600} />,
-                  2: (
-                    <Link
-                      as="span"
-                      onClick={goLinkCard}
-                      color="accent"
-                      textDecoration="underline"
-                    />
-                  ),
-                }}
-              />
-            ) : (
-              <CommonTrans
-                i18nKey="PaymentMethodUnlinkedEmailBanner"
-                values={{ email: walletCustomerEmail }}
-                components={{
-                  1: <Text as="span" fontWeight={600} />,
-                  2: (
-                    <Link
-                      href={`mailto:${walletCustomerEmail}`}
-                      color="accent"
-                      textDecoration="underline"
-                    />
-                  ),
-                }}
-              />
-            )}
-          </Text>
-        </div>
+        <UnlinkedCardBanner />
       ) : isAutoPaymentSetup ? (
         <AutoPaymentInfo />
       ) : null}

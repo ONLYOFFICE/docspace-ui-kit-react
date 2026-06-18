@@ -56,6 +56,7 @@ import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./AdditionalStoragePage.module.scss";
 import { DISK_STORAGE, STORAGE_ENUM } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
+import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
 import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
 import { useApi } from "../../../../providers";
@@ -252,6 +253,11 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         balance={balance}
         onTopUp={() => setIsTopUpDialogVisible(true)}
       />
+      {!paymentStore.tariff.isNotPaidPeriod && paymentStore.tariff.walletCustomerStatusNotActive ? (
+        <div className={styles.unlinkedBanner}>
+          <UnlinkedCardBanner />
+        </div>
+      ) : null}
 
       {isScheduled ? (
         <div style={{ marginTop: 16 }}>
