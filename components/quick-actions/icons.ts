@@ -43,6 +43,10 @@ export { default as CreatePresentationIcon } from "../../assets/create.presentat
 export { default as CreateRoomIcon } from "../../assets/create.room.react.svg";
 export { default as CreateCustomRoomIllustrationIcon } from "../../assets/create.custom.room.illustration.react.svg";
 export { default as UseRoomTemplateIllustrationIcon } from "../../assets/use.room.template.illustration.react.svg";
+export { default as QuickVdrRoomIcon } from "../../assets/quick.vdr.room.react.svg";
+export { default as QuickCollaborationRoomIcon } from "../../assets/quick.collaboration.room.react.svg";
+export { default as QuickPublicRoomIcon } from "../../assets/quick.public.room.react.svg";
+export { default as QuickCustomRoomIcon } from "../../assets/quick.custom.room.react.svg";
 export { default as CreateSpreadsheetIcon } from "../../assets/create.spreadsheet.react.svg";
 export { default as GeneratePdfAiIcon } from "../../assets/generate.pdf.ai.react.svg";
 export { default as GenerateWithAiIcon } from "../../assets/generate.with.ai.react.svg";

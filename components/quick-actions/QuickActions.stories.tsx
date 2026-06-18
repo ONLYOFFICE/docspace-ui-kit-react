@@ -48,6 +48,11 @@ import {
   GeneratePdfAiIcon,
   GenerateWithAiIcon,
   UseTemplateIcon,
+  QuickVdrRoomIcon,
+  QuickCollaborationRoomIcon,
+  QuickPublicRoomIcon,
+  QuickCustomRoomIcon,
+  UseRoomTemplateIllustrationIcon,
 } from "./icons";
 
 import { QuickActions } from "./index";
@@ -66,6 +71,7 @@ const meta = {
 - **Icon + label**: Each tile accepts a custom icon (any \`ReactNode\`) and a string label.
 - **Action or link**: Pass \`onClick\` to render a \`<button>\`, or \`href\` to render an \`<a>\`. When \`target="_blank"\` is set, \`rel="noopener noreferrer"\` is added automatically.
 - **Responsive layout**: Tiles are laid out using flex (no wrapping) with a 16px gap — they shrink proportionally and always stay in a single row.
+- **Overflow collapse**: When there are **more than 4** tiles, the grid collapses on smaller screens — it clips to the first row, the next row peeks through behind a blurred fade, and a centered "Show more" reveals the rest. Expanding is one-way (there is no "Show less"). Desktop always shows every tile in a single row. The label is consumer-provided via \`showMoreLabel\` (default "Show more") so the host app can localize it.
 - **16px padding**: Each tile has 16px padding on all sides.
 
 ### Accessibility
@@ -168,6 +174,41 @@ const aiFormsItems: QuickActionItem[] = [
   },
 ];
 
+// Five room-type tiles — one past the collapse threshold, so the grid collapses
+// on tablet/mobile. Mirrors the Rooms banner in the client.
+const roomItems: QuickActionItem[] = [
+  {
+    id: "vdr-room",
+    icon: <QuickVdrRoomIcon />,
+    label: "VDR room",
+    onClick: () => console.log("Create VDR room"),
+  },
+  {
+    id: "public-room",
+    icon: <QuickPublicRoomIcon />,
+    label: "Public room",
+    onClick: () => console.log("Create public room"),
+  },
+  {
+    id: "collaboration-room",
+    icon: <QuickCollaborationRoomIcon />,
+    label: "Collaboration room",
+    onClick: () => console.log("Create collaboration room"),
+  },
+  {
+    id: "custom-room",
+    icon: <QuickCustomRoomIcon />,
+    label: "Custom room",
+    onClick: () => console.log("Create custom room"),
+  },
+  {
+    id: "room-template",
+    icon: <UseRoomTemplateIllustrationIcon />,
+    label: "Room template",
+    onClick: () => console.log("Use room template"),
+  },
+];
+
 const aiChatItems: QuickActionItem[] = [
   {
     id: "create-agent",
@@ -266,6 +307,39 @@ export const InAIChat: Story = {
     { icon: <CreateAgentIcon />, label: "Create agent", onClick: () => {} },
     { icon: <GenerateWithAiIcon />, label: "Generate with AI", onClick: () => {} },
     { icon: <UseTemplateIcon />, label: "Use template", onClick: () => {} },
+  ]}
+/>`,
+      },
+    },
+  },
+};
+
+export const Collapsible: Story = {
+  render: (args) => (
+    <Wrapper>
+      <QuickActions {...args} />
+    </Wrapper>
+  ),
+  args: {
+    items: roomItems,
+    showMoreLabel: "Show more",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `The Rooms banner with more than 4 tiles. On smaller viewports the grid collapses to its first row, the next row peeks through behind a blurred fade, and a centered "Show more" reveals the rest. Expanding is one-way (no "Show less"). Desktop shows every tile in a single row with no overlay.
+
+Resize the canvas (or use the Viewport toolbar) below 1024px (tablet) and below 600px (mobile) to see the collapsed peek. \`showMoreLabel\` is supplied by the consumer for localization.`,
+      },
+      source: {
+        code: `<QuickActions
+  showMoreLabel={t("Common:ShowMore")}
+  items={[
+    { icon: <QuickVdrRoomIcon />, label: "VDR room", onClick: () => {} },
+    { icon: <QuickCollaborationRoomIcon />, label: "Collaboration room", onClick: () => {} },
+    { icon: <QuickPublicRoomIcon />, label: "Public room", onClick: () => {} },
+    { icon: <QuickCustomRoomIcon />, label: "Custom room", onClick: () => {} },
+    { icon: <UseRoomTemplateIllustrationIcon />, label: "Room template", onClick: () => {} },
   ]}
 />`,
       },
