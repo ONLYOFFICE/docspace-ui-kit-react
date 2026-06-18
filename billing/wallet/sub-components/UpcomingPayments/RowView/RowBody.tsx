@@ -34,41 +34,34 @@
  */
 
 import React from "react";
+import { observer } from "mobx-react";
 
-import { TableCell, TableRow } from "../../../../../components/table";
+import { Row, RowContent } from "../../../../../components/rows";
 import { Text } from "../../../../../components/text";
-import { Link } from "../../../../../components/link";
-import { useCommonTranslation } from "../../../../../utils/i18n";
-
+import PencilIcon from "../../../../../assets/pencil.react.svg";
 import type { TUpcomingPayment } from "../../../../types";
-import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 
-import styles from "./UpcomingPaymentsTable.module.scss";
+import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
+import styles from "./UpcomingPaymentsRow.module.scss";
 
 type UpcomingPaymentRowProps = {
+  sectionWidth: number;
+  title: string;
   renewalDate: string;
-  type: string;
   details: string;
   amount: string;
   actionType?: TUpcomingPayment["actionType"];
 };
 
 const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
+  sectionWidth,
+  title,
   renewalDate,
-  type,
   details,
   amount,
   actionType,
 }) => {
   const store = usePaymentStore();
-  const t = useCommonTranslation();
-
-  const actionLabel =
-    actionType === "edit-plan"
-      ? t("EditPlan")
-      : actionType === "edit-subscription"
-        ? t("EditSubscription")
-        : "";
 
   const onAction = () => {
     if (actionType === "edit-plan")
@@ -77,44 +70,49 @@ const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
       window.DocSpace?.navigate(store.routes.diskStorage);
   };
 
+  const getRowChildren = () => [
+    <Text key="title" fontWeight={600} fontSize="14px">
+      {title}
+    </Text>,
+    <div key="spacer" />,
+    <Text key="date" fontWeight={600} fontSize="12px">
+      {renewalDate}
+    </Text>,
+    <Text key="details" fontWeight={600} fontSize="12px">
+      {details}
+    </Text>,
+  ];
+
   return (
-    <TableRow>
-      <TableCell>
-        <Text fontSize="12px" fontWeight={600} className={styles.cellText}>
-          {renewalDate}
-        </Text>
-      </TableCell>
-      <TableCell>
-        <Text fontSize="12px" fontWeight={600} className={styles.cellText}>
-          {type}
-        </Text>
-      </TableCell>
-      <TableCell>
-        <Text fontSize="12px" fontWeight={600} className={styles.cellText}>
-          {details}
-        </Text>
-      </TableCell>
-      <TableCell>
-        <Text fontSize="12px" fontWeight={600} className={styles.cellText}>
-          {amount}
-        </Text>
-      </TableCell>
-      <TableCell>
-        {actionLabel ? (
-          <Link
-            fontSize="12px"
-            fontWeight={600}
-            textDecoration="underline"
-            onClick={onAction}
-            className={styles.actionLink}
-          >
-            {actionLabel}
-          </Link>
-        ) : null}
-      </TableCell>
-    </TableRow>
+    <Row
+      className={styles.row}
+      badgesComponent={
+        <div className={styles.badges}>
+          <Text fontWeight={600} fontSize="13px">
+            {amount}
+          </Text>
+          {actionType ? (
+            <div
+              className={styles.action}
+              onClick={onAction}
+              role="button"
+              tabIndex={0}
+            >
+              <PencilIcon />
+            </div>
+          ) : null}
+        </div>
+      }
+    >
+      <RowContent
+        sectionWidth={sectionWidth}
+        sideColor="var(--payment-inactive-color)"
+      >
+        {getRowChildren()}
+      </RowContent>
+    </Row>
   );
 };
 
-export default UpcomingPaymentRow;
+export default observer(UpcomingPaymentRow);
 

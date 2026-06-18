@@ -33,72 +33,47 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React from "react";
 import { observer } from "mobx-react";
 
-import { TableHeader } from "../../../../../components/table";
+import { RowContainer } from "../../../../../components/rows";
+import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 import { useCommonTranslation } from "../../../../../utils/i18n";
+import { getServiceQuantity } from "../../../utils";
 
-type TableHeaderProps = {
-  containerRef: React.RefObject<HTMLDivElement>;
-  columnStorageName: string;
-  columnInfoPanelStorageName: string;
-  sectionWidth: number;
-  itemHeight: number;
-};
+import UpcomingPaymentRow from "./RowBody";
 
-const UpcomingPaymentsTableHeader = (props: TableHeaderProps) => {
+const RowView = ({ sectionWidth }: { sectionWidth: number }) => {
+  const store = usePaymentStore();
   const t = useCommonTranslation();
-
-  const defaultColumns = [
-    {
-      key: "RenewalDate",
-      title: t("RenewalDate"),
-      enable: true,
-      resizable: true,
-      default: true,
-      active: true,
-      minWidth: 140,
-    },
-    {
-      key: "Type",
-      title: t("Type"),
-      enable: true,
-      resizable: true,
-      minWidth: 160,
-    },
-    {
-      key: "Details",
-      title: t("Details"),
-      enable: true,
-      resizable: true,
-      minWidth: 140,
-    },
-    {
-      key: "Amount",
-      title: t("Amount"),
-      enable: true,
-      resizable: true,
-      minWidth: 120,
-    },
-    {
-      key: "Action",
-      title: "",
-      enable: true,
-      resizable: false,
-      minWidth: 120,
-    },
-  ];
+  const { upcomingPayments, formatWalletCurrency } = store;
 
   return (
-    <TableHeader
-      columns={defaultColumns}
-      showSettings={false}
+    <RowContainer
       useReactWindow={false}
-      {...props}
-    />
+      fetchMoreFiles={() => Promise.resolve()}
+      hasMoreFiles={false}
+      itemCount={upcomingPayments.length}
+      filesLength={upcomingPayments.length}
+      itemHeight={58}
+    >
+      {upcomingPayments.map((payment) => (
+        <UpcomingPaymentRow
+          key={payment.id}
+          sectionWidth={sectionWidth}
+          title={payment.title}
+          renewalDate={payment.renewalDate}
+          details={getServiceQuantity(
+            t,
+            payment.quantity,
+            payment.unitOfMeasure,
+          )}
+          amount={formatWalletCurrency(payment.amount, 2)}
+          actionType={payment.actionType}
+        />
+      ))}
+    </RowContainer>
   );
 };
 
-export default observer(UpcomingPaymentsTableHeader);
+export default observer(RowView);
 

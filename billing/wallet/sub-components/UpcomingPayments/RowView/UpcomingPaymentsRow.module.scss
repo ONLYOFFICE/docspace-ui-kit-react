@@ -33,72 +33,38 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React from "react";
-import { observer } from "mobx-react";
+.title {
+  color: var(--text-color);
+}
 
-import { TableHeader } from "../../../../../components/table";
-import { useCommonTranslation } from "../../../../../utils/i18n";
+.subtitle {
+  color: var(--payment-inactive-color);
+}
 
-type TableHeaderProps = {
-  containerRef: React.RefObject<HTMLDivElement>;
-  columnStorageName: string;
-  columnInfoPanelStorageName: string;
-  sectionWidth: number;
-  itemHeight: number;
-};
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
 
-const UpcomingPaymentsTableHeader = (props: TableHeaderProps) => {
-  const t = useCommonTranslation();
+.amount {
+  color: var(--text-color);
+  white-space: nowrap;
+}
 
-  const defaultColumns = [
-    {
-      key: "RenewalDate",
-      title: t("RenewalDate"),
-      enable: true,
-      resizable: true,
-      default: true,
-      active: true,
-      minWidth: 140,
-    },
-    {
-      key: "Type",
-      title: t("Type"),
-      enable: true,
-      resizable: true,
-      minWidth: 160,
-    },
-    {
-      key: "Details",
-      title: t("Details"),
-      enable: true,
-      resizable: true,
-      minWidth: 140,
-    },
-    {
-      key: "Amount",
-      title: t("Amount"),
-      enable: true,
-      resizable: true,
-      minWidth: 120,
-    },
-    {
-      key: "Action",
-      title: "",
-      enable: true,
-      resizable: false,
-      minWidth: 120,
-    },
-  ];
+.row {
+  [data-testid="tablet-side-info"] {
+    color: var(--payment-inactive-color);
+  }
+}
 
-  return (
-    <TableHeader
-      columns={defaultColumns}
-      showSettings={false}
-      useReactWindow={false}
-      {...props}
-    />
-  );
-};
+.action {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
 
-export default observer(UpcomingPaymentsTableHeader);
-
+  svg path {
+    fill: var(--payment-inactive-color);
+  }
+}
