@@ -43,8 +43,8 @@ import { EmptyView } from "../../../../components/empty-view";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { useTheme } from "../../../../context/ThemeContext";
 
-import NoSpendingIcon from "../../../../assets/no.transactions.react.svg";
-import NoSpendingDarkIcon from "../../../../assets/no.transactions.dark.theme.react.svg";
+import NoSpendingIcon from "../../../../assets/no.transactions.filter.react.svg";
+import NoSpendingDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import useDeviceType from "../../../hooks/useDeviceType";
