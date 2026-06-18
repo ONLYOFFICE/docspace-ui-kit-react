@@ -274,9 +274,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   return (
     <div style={{ width: "100%" }}>
       <Text className={styles.storageDescription}>
-        {isPayer || !isCardLinkedToPortal
-          ? t("ConnectAndConfigureServices")
-          : t("ServiceConfigurationNotice")}
+        {t("ConnectAndConfigureAddons")}
       </Text>
 
       <div
