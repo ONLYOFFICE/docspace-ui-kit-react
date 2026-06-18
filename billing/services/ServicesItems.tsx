@@ -147,6 +147,10 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     onOpenSupportedModels?.();
   };
 
+  const onPricingLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   const textTooltip = (
     <>
       <Text fontWeight={600} fontSize="12px">
@@ -250,6 +254,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                   color="accent"
                   textDecoration="underline dotted"
                   href="https://openrouter.ai/models"
+                  target={LinkTarget.blank}
+                  onClick={onPricingLinkClick}
                   dataTestId="ai_openrouter_pricing_link"
                 />
               ),
