@@ -39,6 +39,8 @@ import { observer } from "mobx-react";
 import { Text } from "../../components/text";
 import { Link } from "../../components/link";
 import { RectangleSkeleton } from "../../components/rectangle";
+import { Loader } from "../../components/loader";
+import { LoaderTypes } from "../../components/loader/Loader.enums";
 import { useCommonTranslation } from "../../utils/i18n";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { formatDateLocalized, getAppTimezone } from "../../utils/date";
@@ -73,6 +75,7 @@ const Usage = ({
 
   const [period, setPeriod] = useState<TUsagePeriodKey>("thisMonth");
   const [isLoading, setIsLoading] = useState(true);
+  const [isReportLoading, setIsReportLoading] = useState(false);
 
   const loadUsage = async (nextPeriod: TUsagePeriodKey) => {
     setIsLoading(true);
@@ -153,6 +156,7 @@ const Usage = ({
   };
 
   const onDownloadReport = async (serviceName?: string) => {
+    if (!serviceName) setIsReportLoading(true);
     await paymentApi.createCustomerOperationsReport({
       customerOperationsReportRequestDto: {
         startDate: formatDate!(from, "start"),
@@ -169,14 +173,29 @@ const Usage = ({
           try {
             const res = await paymentApi.getCustomerOperationsReport();
             const response = res?.data?.response as
-              | { isCompleted?: boolean; resultFileUrl?: string; error?: string }
+              | {
+                  isCompleted?: boolean;
+                  resultFileUrl?: string;
+                  error?: string;
+                }
               | undefined;
 
-            if (!response) { reject(new Error(t("UnexpectedError"))); return; }
-            if (response.error) { reject(new Error(response.error)); return; }
-            if (response.isCompleted) { resolve(response); return; }
+            if (!response) {
+              reject(new Error(t("UnexpectedError")));
+              return;
+            }
+            if (response.error) {
+              reject(new Error(response.error));
+              return;
+            }
+            if (response.isCompleted) {
+              resolve(response);
+              return;
+            }
             setTimeout(check, 1000);
-          } catch (err) { reject(err); }
+          } catch (err) {
+            reject(err);
+          }
         };
         check();
       },
@@ -185,6 +204,8 @@ const Usage = ({
     if (result.resultFileUrl) {
       window.open(result.resultFileUrl, openOnNewPage ? "_blank" : "_self");
     }
+
+    if (!serviceName) setIsReportLoading(false);
   };
 
   return (
@@ -193,16 +214,24 @@ const Usage = ({
 
       <div className={styles.controls}>
         <PeriodSelect value={period} onSelect={onSelectPeriod} />
-        <Link
-          fontSize="13px"
-          fontWeight={600}
-          color="accent"
-          textDecoration="underline dashed"
-          onClick={() => onDownloadReport()}
-          dataTestId="usage_download_report"
-        >
-          {t("DownloadReportBtnText")}
-        </Link>
+        <div className={styles.downloadReportLink}>
+          <Link
+            fontSize="13px"
+            fontWeight={600}
+            color="accent"
+            textDecoration="underline dashed"
+            onClick={isReportLoading ? undefined : () => onDownloadReport()}
+            dataTestId="usage_download_report"
+            className={
+              isReportLoading ? styles.downloadReportLinkDisabled : undefined
+            }
+          >
+            {t("DownloadReportBtnText")}
+          </Link>
+          {isReportLoading ? (
+            <Loader color="" size="16px" type={LoaderTypes.track} />
+          ) : null}
+        </div>
       </div>
 
       <div className={styles.totalCard}>
