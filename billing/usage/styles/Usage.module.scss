@@ -241,3 +241,31 @@
     }
   }
 }
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--payment-devider-color);
+  height: 60px;
+  box-sizing: border-box;
+}
+
+.skeletonServiceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.skeletonProgress {
+  flex: 1 0 0;
+  min-width: 0;
+  padding: 14px 0;
+}
+
+.skeletonAmount {
+  flex-shrink: 0;
+}

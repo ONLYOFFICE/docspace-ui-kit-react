@@ -157,12 +157,18 @@ const SpendingBreakdown = ({
   const skeleton = (
     <div className={styles.list}>
       {Array.from({ length: 4 }).map((_, index) => (
-        <RectangleSkeleton
-          key={`usage-skeleton-${index}`}
-          width="100%"
-          height="48px"
-          borderRadius="3px"
-        />
+        <div key={`usage-skeleton-${index}`} className={styles.skeletonRow}>
+          <div className={styles.skeletonServiceInfo}>
+            <RectangleSkeleton width="129px" height="16px" borderRadius="3px" />
+            <RectangleSkeleton width="78px" height="16px" borderRadius="3px" />
+          </div>
+          <div className={styles.skeletonProgress}>
+            <RectangleSkeleton width="100%" height="8px" borderRadius="3px" />
+          </div>
+          <div className={styles.skeletonAmount}>
+            <RectangleSkeleton width="91px" height="16px" borderRadius="3px" />
+          </div>
+        </div>
       ))}
     </div>
   );
