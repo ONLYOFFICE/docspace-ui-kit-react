@@ -243,6 +243,22 @@ const Services = observer(
     const onClick = (id: string) => {
       setConfirmActionType(id);
 
+      if (id === AI_ENUM) {
+        if (isServiceActionDisabled && !isAiToolsServiceOn) return;
+
+        if (
+          isAiToolsServiceOn ||
+          localStorage.getItem(AI_FEATURES_DIALOG_SHOWN_KEY)
+        ) {
+          navigate(paymentStore.routes.aiServices);
+          return;
+        }
+
+        updateDialogVisibility(AI_ENUM, true);
+
+        return;
+      }
+
       if (!isCardLinkedToPortal) {
         setIsFirstTopUpDialogVisible(true);
         return;
@@ -258,22 +274,6 @@ const Services = observer(
 
       if (id === TOTAL_SIZE && isGracePeriod) {
         setIsGracePeriodModalVisible(true);
-        return;
-      }
-
-      if (id === AI_ENUM) {
-        if (isServiceActionDisabled && !isAiToolsServiceOn) return;
-
-        if (
-          isAiToolsServiceOn ||
-          localStorage.getItem(AI_FEATURES_DIALOG_SHOWN_KEY)
-        ) {
-          navigate(paymentStore.routes.aiServices);
-          return;
-        }
-
-        updateDialogVisibility(AI_ENUM, true);
-
         return;
       }
 
