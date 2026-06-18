@@ -35,6 +35,8 @@
 
 import { Text } from "../../../components/text";
 import { IconButton } from "../../../components/icon-button";
+import { Loader } from "../../../components/loader";
+import { LoaderTypes } from "../../../components/loader/Loader.enums";
 
 import ChevronIcon from "../../../assets/icons/12/right-arrow.react.svg";
 import DownloadIcon from "../../../assets/icons/16/download.react.svg";
@@ -48,6 +50,7 @@ type BreakdownRowProps = {
   percent?: number;
   onExpand?: () => void;
   onDownload?: () => void;
+  isDownloading?: boolean;
 };
 
 const BreakdownRow = ({
@@ -57,6 +60,7 @@ const BreakdownRow = ({
   percent,
   onExpand,
   onDownload,
+  isDownloading = false,
 }: BreakdownRowProps) => {
   return (
     <div className={styles.row}>
@@ -117,14 +121,20 @@ const BreakdownRow = ({
         {amount}
       </Text>
 
-      <IconButton
-        className={styles.download}
-        size={16}
-        iconNode={<DownloadIcon />}
-        onClick={onDownload}
-        isClickable
-        dataTestId="usage_row_download"
-      />
+      {isDownloading ? (
+        <div className={styles.download}>
+          <Loader type={LoaderTypes.track} size="16px" />
+        </div>
+      ) : (
+        <IconButton
+          className={styles.download}
+          size={16}
+          iconNode={<DownloadIcon />}
+          onClick={onDownload}
+          isClickable
+          dataTestId="usage_row_download"
+        />
+      )}
     </div>
   );
 };

@@ -43,6 +43,7 @@ import { useCommonTranslation } from "../../utils/i18n";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { formatDateLocalized, getAppTimezone } from "../../utils/date";
 
+import { useApi } from "../../providers";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import type { TUsagePeriodKey } from "../types";
@@ -65,7 +66,8 @@ const Usage = ({
   onAIServicesClick,
 }: UsageProps) => {
   const t = useCommonTranslation();
-  const { formatWalletCurrency, language, fetchTransactionHistory } =
+  const { paymentApi } = useApi();
+  const { formatWalletCurrency, language, formatDate, openOnNewPage } =
     usePaymentStore();
   const { serviceUsage, initUsageData } = useServicesStore();
 
@@ -150,8 +152,39 @@ const Usage = ({
     ),
   };
 
-  const onDownloadReport = () => {
-    fetchTransactionHistory(undefined, from, to);
+  const onDownloadReport = async (serviceName?: string) => {
+    await paymentApi.createCustomerOperationsReport({
+      customerOperationsReportRequestDto: {
+        startDate: formatDate!(from, "start"),
+        endDate: formatDate!(to, "end"),
+        credit: true,
+        debit: true,
+        ...(serviceName ? { serviceName } : {}),
+      },
+    });
+
+    const result = await new Promise<{ resultFileUrl?: string }>(
+      (resolve, reject) => {
+        const check = async () => {
+          try {
+            const res = await paymentApi.getCustomerOperationsReport();
+            const response = res?.data?.response as
+              | { isCompleted?: boolean; resultFileUrl?: string; error?: string }
+              | undefined;
+
+            if (!response) { reject(new Error(t("UnexpectedError"))); return; }
+            if (response.error) { reject(new Error(response.error)); return; }
+            if (response.isCompleted) { resolve(response); return; }
+            setTimeout(check, 1000);
+          } catch (err) { reject(err); }
+        };
+        check();
+      },
+    );
+
+    if (result.resultFileUrl) {
+      window.open(result.resultFileUrl, openOnNewPage ? "_blank" : "_self");
+    }
   };
 
   return (
@@ -165,7 +198,7 @@ const Usage = ({
           fontWeight={600}
           color="accent"
           textDecoration="underline dashed"
-          onClick={onDownloadReport}
+          onClick={() => onDownloadReport()}
           dataTestId="usage_download_report"
         >
           {t("DownloadReportBtnText")}
@@ -190,6 +223,7 @@ const Usage = ({
         onDiskStorageClick={onDiskStorageClick}
         onBackupClick={onBackupClick}
         onAIServicesClick={onAIServicesClick}
+        onDownloadReport={onDownloadReport}
       />
     </div>
   );

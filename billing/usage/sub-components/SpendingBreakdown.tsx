@@ -66,6 +66,7 @@ type SpendingBreakdownProps = {
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
   onAIServicesClick?: () => void;
+  onDownloadReport?: (serviceName?: string) => void;
 };
 
 const SpendingBreakdown = ({
@@ -74,14 +75,32 @@ const SpendingBreakdown = ({
   onDiskStorageClick,
   onBackupClick,
   onAIServicesClick,
+  onDownloadReport,
 }: SpendingBreakdownProps) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
-  const { formatWalletCurrency, language, fetchTransactionHistory } =
-    usePaymentStore();
+  const { formatWalletCurrency, language } = usePaymentStore();
   const { serviceUsage, serviceUsageMonthly } = useServicesStore();
 
   const [view, setView] = useState<BreakdownView>("services");
+  const [downloadingServices, setDownloadingServices] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const handleDownload = async (serviceName: string) => {
+    if (downloadingServices.has(serviceName) || !onDownloadReport) return;
+
+    setDownloadingServices((prev) => new Set(prev).add(serviceName));
+    try {
+      await onDownloadReport(serviceName);
+    } finally {
+      setDownloadingServices((prev) => {
+        const next = new Set(prev);
+        next.delete(serviceName);
+        return next;
+      });
+    }
+  };
 
   const totalSpend = serviceUsage.reduce(
     (sum, item) => sum + item.totalAmount,
@@ -162,7 +181,10 @@ const SpendingBreakdown = ({
           amount={formatWalletCurrency(item.totalAmount, 2)}
           percent={totalSpend > 0 ? (item.totalAmount / totalSpend) * 100 : 0}
           onExpand={getServiceHandler(item.service)}
-          onDownload={() => fetchTransactionHistory(item.service, from, to)}
+          onDownload={
+            onDownloadReport ? () => handleDownload(item.service) : undefined
+          }
+          isDownloading={downloadingServices.has(item.service)}
         />
       ))}
     </div>
