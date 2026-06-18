@@ -69,7 +69,7 @@ const Usage = ({
 }: UsageProps) => {
   const t = useCommonTranslation();
   const { paymentApi } = useApi();
-  const { formatWalletCurrency, language, formatDate, openOnNewPage } =
+  const { formatWalletCurrency, language, formatDate, openOnNewPage, isCardLinkedToPortal } =
     usePaymentStore();
   const { serviceUsage, initUsageData } = useServicesStore();
 
@@ -214,24 +214,26 @@ const Usage = ({
 
       <div className={styles.controls}>
         <PeriodSelect value={period} onSelect={onSelectPeriod} />
-        <div className={styles.downloadReportLink}>
-          <Link
-            fontSize="13px"
-            fontWeight={600}
-            color="accent"
-            textDecoration="underline dashed"
-            onClick={isReportLoading ? undefined : () => onDownloadReport()}
-            dataTestId="usage_download_report"
-            className={
-              isReportLoading ? styles.downloadReportLinkDisabled : undefined
-            }
-          >
-            {t("DownloadReportBtnText")}
-          </Link>
-          {isReportLoading ? (
-            <Loader color="" size="16px" type={LoaderTypes.track} />
-          ) : null}
-        </div>
+        {isCardLinkedToPortal ? (
+          <div className={styles.downloadReportLink}>
+            <Link
+              fontSize="13px"
+              fontWeight={600}
+              color="accent"
+              textDecoration="underline dashed"
+              onClick={isReportLoading ? undefined : () => onDownloadReport()}
+              dataTestId="usage_download_report"
+              className={
+                isReportLoading ? styles.downloadReportLinkDisabled : undefined
+              }
+            >
+              {t("DownloadReportBtnText")}
+            </Link>
+            {isReportLoading ? (
+              <Loader color="" size="16px" type={LoaderTypes.track} />
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
       <div className={styles.totalCard}>
