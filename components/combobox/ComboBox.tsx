@@ -497,9 +497,9 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     ? {
         imageIcon: EmptyIcon,
         imageAlt:
-          typeof selectedOption.label === "string"
+          typeof selectedOption?.label === "string"
             ? selectedOption.label
-            : String(selectedOption.key),
+            : String(selectedOption?.key),
       }
     : {};
 
@@ -528,7 +528,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         scaled={scaled}
         comboIcon={comboIcon}
         modernView={modernView}
-        fillIcon={selectedOption.fillIcon ?? fillIcon}
+        fillIcon={selectedOption?.fillIcon ?? fillIcon}
         tabIndex={tabIndex}
         isLoading={isLoading}
         type={type}
