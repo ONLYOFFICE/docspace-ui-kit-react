@@ -83,6 +83,8 @@ export type TabsProps = {
   id?: string;
   /** Enables animation for tab transitions */
   withAnimation?: boolean;
+  /** Content rendered inside the sticky area, above the tab list */
+  stickyHeader?: React.ReactNode;
 };
 
 export type TTabsHotkey = {

@@ -121,22 +121,26 @@
 }
 
 .sticky {
-  height: var(--tabs-height-primary);
   position: sticky;
   position: -webkit-sticky;
   top: 0;
   background: var(--tabs-primary-bg, var(--tabs-background-color-primary));
   z-index: 1;
-
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 
-  &.primary {
+  &.primary .tabsRow {
     border-bottom: 1px solid var(--tabs-underline, var(--tabs-line-color));
   }
-  &.secondary {
+  &.secondary .tabsRow {
     height: var(--tabs-height-secondary);
   }
+}
+
+.tabsRow {
+  height: var(--tabs-height-primary);
+  display: flex;
+  flex-direction: row;
 }
 
 .scroll {

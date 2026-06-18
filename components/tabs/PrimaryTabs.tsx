@@ -57,6 +57,7 @@ const PrimaryTabs = (props: TabsProps) => {
     withoutStickyIntend = false,
     id,
     withAnimation,
+    stickyHeader,
     className,
     ...rest
   } = props;
@@ -252,6 +253,8 @@ const PrimaryTabs = (props: TabsProps) => {
         className={classNames(styles.sticky, classes, "sticky")}
         style={{ top: stickyTop }}
       >
+        {stickyHeader ?? null}
+        <div className={styles.tabsRow}>
         {!isViewFirstTab ? (
           <div
             className={styles.blurAhead}
@@ -275,6 +278,7 @@ const PrimaryTabs = (props: TabsProps) => {
             data-direction={interfaceDirection}
           />
         ) : null}
+        </div>
       </div>
 
       {withoutStickyIntend ? null : (
