@@ -76,8 +76,6 @@ const ArticleDevToolsBar = ({
 
   const t = useCommonTranslation();
 
-  if (!showText) return null;
-
   return (
     <div
       className={classNames(styles.wrapper)}
@@ -85,14 +83,20 @@ const ArticleDevToolsBar = ({
       onMouseDown={onMouseDown}
       data-testid="dev-tools-bar"
       data-show-text={showText ? "true" : "false"}
+      data-icon-only={showText ? "false" : "true"}
       data-with-custom-slot={withCustomSlot ? "true" : "false"}
       data-hide-profile-block={articleOpen ? "true" : "false"}
+      title={showText ? undefined : t("DeveloperTools")}
     >
       <DeveloperReactSvg className="icon" />
-      <Text fontWeight={600} fontSize="12px" className="label">
-        {t("DeveloperTools")}
-      </Text>
-      <ArrowReactSvg className="arrow" />
+      {showText ? (
+        <>
+          <Text fontWeight={600} fontSize="12px" className="label">
+            {t("DeveloperTools")}
+          </Text>
+          <ArrowReactSvg className="arrow" />
+        </>
+      ) : null}
     </div>
   );
 };

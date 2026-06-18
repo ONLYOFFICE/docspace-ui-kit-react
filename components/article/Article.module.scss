@@ -201,6 +201,31 @@
     margin-top: 16px;
   }
 
+  // Collapsed sidebar: a fixed 40x40 clickable tile centered in the narrow rail
+  // via left/transform (so it overflows symmetrically and stays fully clickable,
+  // like the NavMenu icon-only items) instead of a full-width wrapper whose hit
+  // area would shrink to just the icon.
+  &[data-icon-only="true"] {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    justify-content: center;
+    left: 50%;
+    transform: translateX(-50%);
+
+    // Desktop collapsed rail uses a 16px icon; tablet uses 20px to match its
+    // larger NavMenu icon-only items.
+    :global(.icon) {
+      width: 16px;
+      height: 16px;
+
+      @include mixins.tablet {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
   @include mixins.tablet {
     &[data-with-custom-slot="true"] {
       margin-top: 12px;
