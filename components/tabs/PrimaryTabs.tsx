@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 
 import { useAnimation, AnimationEvents } from "../../hooks/useAnimation";
@@ -61,6 +61,19 @@ const PrimaryTabs = (props: TabsProps) => {
     className,
     ...rest
   } = props;
+
+  const [stickyHeaderHeight, setStickyHeaderHeight] = useState(0);
+  const stickyHeaderRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = stickyHeaderRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setStickyHeaderHeight(entry.contentRect.height);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [stickyHeader]);
 
   const { interfaceDirection } = useInterfaceDirection();
 
@@ -248,13 +261,25 @@ const PrimaryTabs = (props: TabsProps) => {
 
   return (
     <div className={classNames(styles.tabs, className, classes)} {...rest}>
+      {stickyHeader ? (
+        <div
+          ref={stickyHeaderRef}
+          className={classNames(styles.stickyHeaderOuter, "sticky")}
+          style={{ top: stickyTop }}
+        >
+          {stickyHeader}
+        </div>
+      ) : null}
+
       <div
         data-sticky
         className={classNames(styles.sticky, classes, "sticky")}
-        style={{ top: stickyTop }}
+        style={{
+          top: stickyHeader
+            ? `calc(${stickyTop ?? "0px"} + ${stickyHeaderHeight}px)`
+            : stickyTop,
+        }}
       >
-        {stickyHeader ?? null}
-        <div className={styles.tabsRow}>
         {!isViewFirstTab ? (
           <div
             className={styles.blurAhead}
@@ -278,7 +303,6 @@ const PrimaryTabs = (props: TabsProps) => {
             data-direction={interfaceDirection}
           />
         ) : null}
-        </div>
       </div>
 
       {withoutStickyIntend ? null : (
