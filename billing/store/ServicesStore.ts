@@ -43,7 +43,7 @@ import { parseAiPrices } from "../utils/parsers";
 import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
 import type {
   TAiToolsPrices,
-  TServiceUsage,
+
   TServiceUsageMonthly,
   TUsagePeriodKey,
 } from "../types";
@@ -89,7 +89,9 @@ class ServicesStore {
 
   paidBackupsUsed: number = 0;
 
-  serviceUsage: TServiceUsage[] = [];
+  get serviceUsage() {
+    return this.paymentStore.serviceUsage;
+  }
 
   serviceUsageMonthly: TServiceUsageMonthly[] = [];
 
@@ -459,44 +461,9 @@ class ServicesStore {
     }
   };
 
-  fetchServiceUsage = async ({
-    serviceName,
-    from,
-    to,
-    participantName,
-  }: {
-    serviceName?: string;
-    from?: DateTime;
-    to?: DateTime;
-    participantName?: string;
-  } = {}) => {
-    const abortController = new AbortController();
-    this.abortControllers.push(abortController);
-
-    try {
-      const { data } = await this.#rawApiClient.instance.get(
-        "api/2.0/portal/payment/customer/usage",
-        {
-          signal: abortController.signal,
-          params: {
-            offset: 0,
-            limit: 25,
-            ServiceName: serviceName,
-            StartDate: from
-              ? this.paymentStore.formatDate(from, "start")
-              : undefined,
-            EndDate: to ? this.paymentStore.formatDate(to, "end") : undefined,
-            ParticipantName: participantName,
-          },
-        },
-      );
-
-      this.serviceUsage = (data?.response?.collection ?? []) as TServiceUsage[];
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
-      console.error(error);
-    }
-  };
+  fetchServiceUsage = (
+    params: Parameters<typeof this.paymentStore.fetchWalletUsage>[0] = {},
+  ) => this.paymentStore.fetchWalletUsage(params);
 
   fetchServiceUsageMonthly = async ({
     from,
@@ -541,6 +508,10 @@ class ServicesStore {
       this.fetchServiceUsageMonthly(range),
     ]);
   };
+
+  get walletMonthToDateSpend(): number {
+    return this.serviceUsage.reduce((sum, item) => sum + item.totalAmount, 0);
+  }
 
   get backupUsage() {
     return (

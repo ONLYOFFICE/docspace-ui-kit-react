@@ -56,7 +56,7 @@ export type WalletOperationDto = Omit<OperationDto, "date"> & {
 
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
-import type { TBalance } from "../types";
+import type { TBalance, TServiceUsage } from "../types";
 import { formatCurrencyValue } from "../utils/common";
 import {
   getCardLinkedOnFreeTariff,
@@ -68,6 +68,7 @@ import {
   formatPaymentDate,
 } from "../utils/paymentSelectors";
 import { applyServiceQuotaToMap, parseServicesQuotasMap } from "../utils/parsers";
+import { getUsageRange } from "../usage/utils";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
 import { LANGUAGE } from "../../constants";
@@ -197,6 +198,8 @@ class PaymentStore {
   isInitWalletPage = false;
 
   isPaymentMethodInit = false;
+
+  serviceUsage: TServiceUsage[] = [];
 
   balance: TBalance = 0;
 
@@ -647,6 +650,43 @@ class PaymentStore {
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
       throw e;
+    }
+  };
+
+  fetchWalletUsage = async ({
+    serviceName,
+    from,
+    to,
+    participantName,
+  }: {
+    serviceName?: string;
+    from?: DateTime;
+    to?: DateTime;
+    participantName?: string;
+  } = {}) => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/customer/usage",
+        {
+          signal: abortController.signal,
+          params: {
+            offset: 0,
+            limit: 25,
+            ServiceName: serviceName,
+            StartDate: from ? this.formatDate(from, "start") : undefined,
+            EndDate: to ? this.formatDate(to, "end") : undefined,
+            ParticipantName: participantName,
+          },
+        },
+      );
+
+      this.serviceUsage = (data?.response?.collection ?? []) as TServiceUsage[];
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
     }
   };
 
@@ -1149,7 +1189,11 @@ class PaymentStore {
     }
   };
 
-  walletInit = async (t: TTranslation, integrationUrl?: string) => {
+  walletInit = async (
+    t: TTranslation,
+    integrationUrl?: string,
+    onInit?: () => Promise<void> | void,
+  ) => {
     const isRefresh = window.location.href.includes("complete=true");
 
     if (!isRefresh) {
@@ -1183,7 +1227,10 @@ class PaymentStore {
       requests.push(
         this.tariff.fetchPortalTariff(),
         this.fetchUpcomingPayments(),
+        this.fetchWalletUsage(getUsageRange("thisMonth")),
       );
+
+      if (onInit) requests.push(Promise.resolve(onInit()));
 
       await Promise.all(requests);
 

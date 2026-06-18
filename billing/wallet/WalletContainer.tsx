@@ -55,6 +55,7 @@ import PluginIncompatibleSvg from "../../assets/plugin.incompatible.react.svg";
 import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
+import { useServicesStore } from "../store/ServicesStoreProvider";
 import { getBrandName } from "../../constants/brands";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 
@@ -68,10 +69,10 @@ const Wallet = (props: WalletProps) => {
   const { isMobile, onViewUsage, onAddonsClick } = props;
 
   const store = usePaymentStore();
+  const { walletMonthToDateSpend } = useServicesStore();
 
   const {
     walletBalance,
-    walletMonthToDateSpend,
     walletCodeCurrency,
     isCardLinkedToPortal,
     isVisibleWalletSettings,
@@ -271,36 +272,27 @@ const Wallet = (props: WalletProps) => {
         </div>
 
         <div className={`${styles.summaryCard} ${styles.summaryCardSpend}`}>
-          <CommonTrans
-            i18nKey="CurrentMonthToDateSpendForMonth"
-            values={{
-              month: monthLabel,
-              spend: (
-                <BalanceAmount
-                  key="spend"
-                  showRefresh={false}
-                  amount={walletMonthToDateSpend}
-                  currency={walletCodeCurrency}
-                  language={store.language}
-                  mainFontSize="18px"
-                  fractionFontSize="12px"
-                  withoutMargin
-                  className={styles.spendAmount}
-                />
-              ),
-            }}
-            components={{
-              1: (
-                <Text
-                  fontSize="12px"
-                  lineHeight="16px"
-                  fontWeight={600}
-                  className={styles.spendTitle}
-                />
-              ),
-              2: <Text fontSize="12px" lineHeight="16px" />,
-            }}
+          <Text
+            fontSize="12px"
+            lineHeight="16px"
+            fontWeight={600}
+            className={styles.spendTitle}
+          >
+            {t("CurrentMonthToDateSpend")}
+          </Text>
+          <BalanceAmount
+            showRefresh={false}
+            amount={walletMonthToDateSpend}
+            currency={walletCodeCurrency}
+            language={store.language}
+            mainFontSize="18px"
+            fractionFontSize="12px"
+            withoutMargin
+            className={styles.spendAmount}
           />
+          <Text fontSize="12px" lineHeight="16px">
+            {t("ForPeriod", { period: monthLabel })}
+          </Text>
           {onViewUsage ? (
             <Link
               onClick={onViewUsage}
