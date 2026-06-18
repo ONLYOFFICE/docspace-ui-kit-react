@@ -24,7 +24,14 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import i18nextSingleton from "i18next";
 import {
@@ -59,6 +66,7 @@ import type {
   HostTool,
   ProviderType,
   ServerAPIConfig,
+  ToolCallApproveContext,
   WebSearchProviderId,
 } from "@onlyoffice/ai-chat";
 
@@ -82,6 +90,7 @@ import {
   attachCloseEditorPanel,
   buildEditorToolGroup,
   fileManagementTools,
+  openGeneratedFileWithToolCall,
   type EditorToolsChangedDetail,
 } from "./host-tool-groups";
 import { useFilesIntegration } from "./files";
@@ -155,6 +164,27 @@ const StoresHydrator = () => {
   return null;
 };
 
+// Server-side document generation tools. The backend creates the file and
+// returns it in the tool result. We hide the "Always allow" checkbox for them
+// (one-off confirmation only) and open the generated file once approved.
+const GENERATE_TOOL_NAMES = [
+  "docspace_generate_docx",
+  "docspace_generate_presentation",
+  "docspace_generate_form",
+];
+
+// The chat-facing tool name (what the LLM calls, e.g. `docspace_generate_docx`)
+// differs from the name the editor's AI plugin expects in `ai_onCallTool`.
+// The backend used to bridge this via `generationToolCallState.toolName`
+// (server: ASC.AI/Core/Tools/Editor/*.cs). Now that we drive the call from the
+// host, we map it here. The model's tool arguments (description / topic /
+// slideCount / style) are forwarded as-is; the plugin reads what it needs.
+const EDITOR_TOOL_NAME_BY_CHAT_TOOL: Record<string, string> = {
+  docspace_generate_docx: "generateDocx",
+  docspace_generate_form: "generateForm",
+  docspace_generate_presentation: "generatePresentationWithTheme",
+};
+
 const AiAgentProviders = ({
   locale,
   theme,
@@ -202,9 +232,46 @@ const AiAgentProviders = ({
     [editorTools],
   );
 
+  // After the user approves a generate tool, the lib resolves its result and
+  // calls this before closing the dialog / resuming the stream. The result
+  // carries the created file (`data.id`) and the second arg carries the
+  // tool-call context (`toolName` + `toolArgs`). We open the file in a new tab
+  // and re-run the same tool inside the editor with the model's original
+  // arguments via postMessage (replacing the old `?withTool=true` URL flag).
+  // Dedupe by file id so a re-emitted result doesn't reopen.
+  const openedGenerateFilesRef = useRef<Set<number | string>>(new Set());
+
+  const onToolCallApproveResult = useCallback(
+    (result: unknown, ctx: ToolCallApproveContext) => {
+      const payload = result as {
+        id?: unknown;
+        data?: { id?: unknown };
+      } | null;
+      const rawId = payload?.data?.id ?? payload?.id;
+      if (typeof rawId !== "number" && typeof rawId !== "string") return;
+      if (openedGenerateFilesRef.current.has(rawId)) return;
+
+      openedGenerateFilesRef.current.add(rawId);
+
+      // Map the chat tool name to the name the editor's AI plugin expects.
+      // Fall back to the raw name if it's not a known generate tool.
+      const editorToolName =
+        EDITOR_TOOL_NAME_BY_CHAT_TOOL[ctx.toolName] ?? ctx.toolName;
+
+      openGeneratedFileWithToolCall(rawId, editorToolName, ctx.toolArgs);
+    },
+    [],
+  );
+
   const widgetConfig = useMemo(
-    () => ({ composerActions, entityId }),
-    [composerActions, entityId],
+    () => ({
+      composerActions,
+      entityId,
+      // Hide "Always allow" only for generate tools (matched by full name).
+      hideToolAllowAlways: GENERATE_TOOL_NAMES,
+      onToolCallApproveResult,
+    }),
+    [composerActions, entityId, onToolCallApproveResult],
   );
 
   const { stores, ctx, serverApiConfig } = useMemo(() => {
@@ -304,7 +371,12 @@ const AiAgentProviders = ({
 export default AiAgentProviders;
 
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
-export type { ComposerAction, Profile } from "@onlyoffice/ai-chat";
+export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
+export type {
+  ComposerAction,
+  Profile,
+  ServerAPIConfig,
+} from "@onlyoffice/ai-chat";
 export type { SaveAsFileHandler } from "./platform";
 
 export {

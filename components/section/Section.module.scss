@@ -388,12 +388,25 @@
   &.fullHeightBody {
     display: flex;
     flex-direction: column;
+    // Fill the free space in the (bounded) section container below the sticky
+    // header instead of sizing to content. `flex: 1 1 0` overrides `.common`'s
+    // bare `flex-grow:1` (basis auto) and `.common.isDesktop`'s `height:auto`,
+    // both of which otherwise collapse the body to its content height and pin
+    // the chat to the top.
+    flex: 1 1 0;
+    min-height: 0;
 
     :global(.section-wrapper),
     :global(.section-wrapper-content) {
       display: flex;
       flex-direction: column;
-      flex-grow: 1;
+      // `flex: 1 1 0` (not just flex-grow) overrides `.common`'s
+      // `flex: 1 0 auto` — without flex-shrink:1 + min-height:0 the wrapper
+      // keeps flex-shrink:0/min-height:auto and grows to fit tall content
+      // (e.g. a long chat thread) instead of staying pinned to the section
+      // height and letting the inner viewport scroll.
+      flex: 1 1 0;
+      min-height: 0;
     }
   }
 
