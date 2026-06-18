@@ -68,8 +68,8 @@ const PrimaryTabs = (props: TabsProps) => {
   useEffect(() => {
     const el = stickyHeaderRef.current;
     if (!el) return;
-    const observer = new ResizeObserver(([entry]) => {
-      setStickyHeaderHeight(entry.contentRect.height);
+    const observer = new ResizeObserver(() => {
+      setStickyHeaderHeight(el.offsetHeight);
     });
     observer.observe(el);
     return () => observer.disconnect();
@@ -276,7 +276,7 @@ const PrimaryTabs = (props: TabsProps) => {
         className={classNames(styles.sticky, classes, "sticky")}
         style={{
           top: stickyHeader
-            ? `calc(${stickyTop ?? "0px"} + ${stickyHeaderHeight}px)`
+            ? `calc(${stickyTop ?? "0px"} + ${stickyHeaderHeight - 1}px)`
             : stickyTop,
         }}
       >
