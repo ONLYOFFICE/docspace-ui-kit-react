@@ -39,7 +39,7 @@ import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
-import { Link } from "../../../../components/link";
+import { Link, LinkTarget } from "../../../../components/link";
 
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { AI_ENUM, AI_TOOLS } from "../../../constants";
@@ -286,8 +286,13 @@ const AiPage = (props: AiPageProps) => {
 
       {withoutWallet ? null : (
         <>
-          <WalletInfo withoutBackground balance={balance} onTopUp={onOpenTopUp} />
-          {!paymentStore.tariff.isNotPaidPeriod && paymentStore.tariff.walletCustomerStatusNotActive ? (
+          <WalletInfo
+            withoutBackground
+            balance={balance}
+            onTopUp={onOpenTopUp}
+          />
+          {!paymentStore.tariff.isNotPaidPeriod &&
+          paymentStore.tariff.walletCustomerStatusNotActive ? (
             <div className={styles.unlinkedBanner}>
               <UnlinkedCardBanner />
             </div>
@@ -348,6 +353,7 @@ const AiPage = (props: AiPageProps) => {
                 textDecoration="underline dotted"
                 href="https://openrouter.ai/models"
                 dataTestId="ai_openrouter_pricing_link"
+                target={LinkTarget.blank}
               />
             ),
             2: (
