@@ -293,8 +293,13 @@ export type ChatProps = {
   isAdmin?: boolean;
   standalone?: boolean;
   isPayer?: boolean;
+  isCardLinkedToPortal?: boolean;
   walletCustomerEmail?: string | null;
   walletCustomerDisplayName?: string | null;
+  onActivateAI?: () => void;
+  onTopUpAndActivateAI?: () => void;
+  onShowAIBenefits?: () => void;
+  isActivatingAI?: boolean;
 
   multimodal?: TMultimodal;
   goToAISettings?: () => void;

@@ -52,9 +52,14 @@ type Props = {
   standalone: boolean;
   isPortalAdmin: boolean;
   isPayer?: boolean;
+  isCardLinkedToPortal?: boolean;
   walletCustomerEmail?: string | null;
   walletCustomerDisplayName?: string | null;
   goToAISettings?: () => void;
+  onActivateAI?: () => void;
+  onTopUpAndActivateAI?: () => void;
+  onShowAIBenefits?: () => void;
+  isActivating?: boolean;
 };
 
 export const ChatNoAccessScreen = ({
@@ -62,9 +67,14 @@ export const ChatNoAccessScreen = ({
   isPortalAdmin,
   standalone,
   isPayer,
+  isCardLinkedToPortal,
   walletCustomerEmail,
   walletCustomerDisplayName,
   goToAISettings,
+  onActivateAI,
+  onTopUpAndActivateAI,
+  onShowAIBenefits,
+  isActivating,
 }: Props) => {
   const { isBase } = useTheme();
   const t = useCommonTranslation();
@@ -152,13 +162,6 @@ export const ChatNoAccessScreen = ({
       </>
     ));
 
-  const goToServices = {
-    type: "button",
-    title: t("GoToSettings"),
-    key: "go-to-services",
-    onClick: goToAISettings,
-  } as const;
-
   const goToAIProviderSettings = {
     type: "button",
     title: t("GoToSettings"),
@@ -166,12 +169,44 @@ export const ChatNoAccessScreen = ({
     onClick: goToAISettings,
   } as const;
 
-  const options =
-    !isPortalAdmin || !goToAISettings
-      ? []
-      : standalone
+  // saas admin: activate AI right away (or top up first) + show benefits.
+  // The actual logic lives on the client and is passed in via callbacks.
+  const activateOrTopUpAI = isCardLinkedToPortal
+    ? ({
+        type: "button",
+        title: t("Activate"),
+        key: "activate-ai",
+        onClick: onActivateAI,
+        isLoading: isActivating,
+      } as const)
+    : ({
+        type: "button",
+        title: t("TopUpAndActivate"),
+        key: "top-up-and-activate-ai",
+        onClick: onTopUpAndActivateAI,
+      } as const);
+
+  const aiBenefits = {
+    type: "button",
+    title: t("Benefits"),
+    key: "ai-benefits",
+    primary: false,
+    onClick: onShowAIBenefits,
+  } as const;
+
+  const getSaasAdminOptions = () => {
+    if (isCardLinkedToPortal && !isPayer) return [];
+    if (!activateOrTopUpAI.onClick) return [];
+    return [activateOrTopUpAI, aiBenefits];
+  };
+
+  const options = !isPortalAdmin
+    ? []
+    : standalone
+      ? goToAISettings
         ? [goToAIProviderSettings]
-        : [goToServices];
+        : []
+      : getSaasAdminOptions();
 
   return (
     <EmptyView

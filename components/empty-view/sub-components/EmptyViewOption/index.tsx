@@ -119,6 +119,7 @@ const EmptyViewOption = ({ option, LinkRouter }: EmptyViewOptionProps) => {
         onClick={option.onClick}
         label={option.title}
         primary={option.primary ?? true}
+        isLoading={option.isLoading}
         size={ButtonSize.small}
       />
     );

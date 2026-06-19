@@ -157,12 +157,19 @@ describe("<ChatNoAccessScreen />", () => {
     );
   });
 
-  it("renders with saas admin description", () => {
+  it("renders saas admin with activate and benefits buttons", () => {
+    const onActivateAI = vi.fn();
+    const onShowAIBenefits = vi.fn();
+
     render(
       <ChatNoAccessScreen
         {...defaultProps}
         isPortalAdmin={true}
         standalone={false}
+        isCardLinkedToPortal={true}
+        isPayer={true}
+        onActivateAI={onActivateAI}
+        onShowAIBenefits={onShowAIBenefits}
       />,
     );
 
@@ -175,16 +182,42 @@ describe("<ChatNoAccessScreen />", () => {
       "EmptyAIAgentsNotActiveYetDescriptionLine2",
     );
 
-    // Check for "Go to Settings" button
-    expect(screen.getByTestId("option-go-to-services")).toBeInTheDocument();
+    expect(screen.getByTestId("option-activate-ai")).toBeInTheDocument();
+    expect(screen.getByTestId("option-ai-benefits")).toBeInTheDocument();
+  });
 
-    expect(EmptyView).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: "EmptyAIAgentsNotActiveYetTitle",
-        options: [expect.objectContaining({ key: "go-to-services" })],
-      }),
-      undefined,
+  it("shows top up button for saas admin without a linked card", () => {
+    render(
+      <ChatNoAccessScreen
+        {...defaultProps}
+        isPortalAdmin={true}
+        standalone={false}
+        isCardLinkedToPortal={false}
+        onTopUpAndActivateAI={vi.fn()}
+        onShowAIBenefits={vi.fn()}
+      />,
     );
+
+    expect(
+      screen.getByTestId("option-top-up-and-activate-ai"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("option-ai-benefits")).toBeInTheDocument();
+  });
+
+  it("hides buttons for saas admin who is not the payer", () => {
+    render(
+      <ChatNoAccessScreen
+        {...defaultProps}
+        isPortalAdmin={true}
+        standalone={false}
+        isCardLinkedToPortal={true}
+        isPayer={false}
+        onActivateAI={vi.fn()}
+        onShowAIBenefits={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
   });
 
   it("hides settings button if goToAISettings is not provided", () => {

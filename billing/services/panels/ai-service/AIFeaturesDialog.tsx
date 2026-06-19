@@ -64,6 +64,7 @@ export interface AIFeaturesDialogProps {
   onClose: () => void;
   onActivate: () => void;
   isCardLinkedToPortal: boolean;
+  isActivating?: boolean;
 }
 
 const AIFeaturesDialog: React.FC<AIFeaturesDialogProps> = ({
@@ -71,6 +72,7 @@ const AIFeaturesDialog: React.FC<AIFeaturesDialogProps> = ({
   onClose,
   onActivate,
   isCardLinkedToPortal,
+  isActivating,
 }) => {
   const t = useCommonTranslation();
 
@@ -198,12 +200,14 @@ const AIFeaturesDialog: React.FC<AIFeaturesDialogProps> = ({
           size={ButtonSize.normal}
           onClick={onActivate}
           primary
+          isLoading={isActivating}
           testId="ai-features-dialog-activate-button"
         />
         <Button
           label={t("CancelButton")}
           size={ButtonSize.normal}
           onClick={onClose}
+          isDisabled={isActivating}
           testId="ai-features-dialog-cancel-button"
         />
       </ModalDialog.Footer>

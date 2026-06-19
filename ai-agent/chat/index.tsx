@@ -83,8 +83,13 @@ const ChatUI = observer(
     isAdmin = false,
     standalone = false,
     isPayer = false,
+    isCardLinkedToPortal = false,
     walletCustomerEmail,
     walletCustomerDisplayName,
+    onActivateAI,
+    onTopUpAndActivateAI,
+    onShowAIBenefits,
+    isActivatingAI,
     aiReady = false,
     getResultStorageId,
     multimodal,
@@ -160,8 +165,13 @@ const ChatUI = observer(
             standalone={standalone}
             isPortalAdmin={isAdmin}
             isPayer={isPayer}
+            isCardLinkedToPortal={isCardLinkedToPortal}
             walletCustomerEmail={walletCustomerEmail}
             walletCustomerDisplayName={walletCustomerDisplayName}
+            onActivateAI={onActivateAI}
+            onTopUpAndActivateAI={onTopUpAndActivateAI}
+            onShowAIBenefits={onShowAIBenefits}
+            isActivating={isActivatingAI}
             goToAISettings={goToAISettings}
           />
         ) : (
@@ -224,8 +234,13 @@ const ChatCore = (props: ChatCoreProps) => {
     standalone = false,
     isAdmin = false,
     isPayer = false,
+    isCardLinkedToPortal = false,
     walletCustomerEmail,
     walletCustomerDisplayName,
+    onActivateAI,
+    onTopUpAndActivateAI,
+    onShowAIBenefits,
+    isActivatingAI,
     goToAISettings,
     toolsSettings,
   } = props;
@@ -248,8 +263,13 @@ const ChatCore = (props: ChatCoreProps) => {
           standalone={standalone}
           isPortalAdmin={isAdmin}
           isPayer={isPayer}
+          isCardLinkedToPortal={isCardLinkedToPortal}
           walletCustomerEmail={walletCustomerEmail}
           walletCustomerDisplayName={walletCustomerDisplayName}
+          onActivateAI={onActivateAI}
+          onTopUpAndActivateAI={onTopUpAndActivateAI}
+          onShowAIBenefits={onShowAIBenefits}
+          isActivating={isActivatingAI}
           goToAISettings={goToAISettings}
         />
       </ChatContainer>
