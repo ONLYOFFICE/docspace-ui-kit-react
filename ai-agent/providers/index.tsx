@@ -72,6 +72,7 @@ import type {
 
 import "@onlyoffice/ai-chat/styles";
 
+import { AiChatAvailabilityContext } from "./availability";
 import { storageAdapter } from "./storage";
 import { usePlatformAdapter } from "./platform";
 import { componentOverrides } from "./components-overrides";
@@ -129,6 +130,11 @@ type AiAgentProvidersProps = {
   theme?: string;
   callbacks?: ChatCallbacks;
   isStandalone?: boolean;
+  /**
+   * Whether the AI chat is offered on the current view. Computed by the host
+   * and shared with descendants via context / `useIsAiChatAvailable()`.
+   */
+  isAvailable?: boolean;
   getAgentRoomId?: () => number | null;
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
@@ -190,6 +196,7 @@ const AiAgentProviders = ({
   theme,
   callbacks,
   isStandalone,
+  isAvailable = false,
   getAgentRoomId,
   openResultFile,
   closeEditorPanel,
@@ -331,45 +338,48 @@ const AiAgentProviders = ({
   }, [closeEditorPanel]);
 
   return (
-    <EventsProvider
-      callbacksManager={ctx.callbacksManager}
-      callbacks={callbacks}
-    >
-      <PlatformProvider platform={platform}>
-        <AiChatI18nIsolator locale={aiChatLocale}>
-          <ComponentsProvider overrides={componentOverrides}>
-            <WidgetConfigProvider config={widgetConfig}>
-              <ApiProvider config={serverApiConfig}>
-                <StoresProvider stores={stores}>
-                  <ThemeProvider theme={theme} customThemes={portalThemes}>
-                    <ImagesProvider>
-                      <ToolsProvider
-                        hostToolGroups={hostToolGroups}
-                        servers={ctx.servers}
-                        eventBus={ctx.eventBus}
-                      >
-                        <StoresHydrator />
-                        <AiChatStoreProvider>
-                          <AiChatStoresBridge />
-                          {getAgentRoomId ? null : <AgentRoomIdSync />}
-                          {children}
-                          {overlay}
-                        </AiChatStoreProvider>
-                      </ToolsProvider>
-                    </ImagesProvider>
-                  </ThemeProvider>
-                </StoresProvider>
-              </ApiProvider>
-            </WidgetConfigProvider>
-          </ComponentsProvider>
-        </AiChatI18nIsolator>
-      </PlatformProvider>
-    </EventsProvider>
+    <AiChatAvailabilityContext.Provider value={isAvailable}>
+      <EventsProvider
+        callbacksManager={ctx.callbacksManager}
+        callbacks={callbacks}
+      >
+        <PlatformProvider platform={platform}>
+          <AiChatI18nIsolator locale={aiChatLocale}>
+            <ComponentsProvider overrides={componentOverrides}>
+              <WidgetConfigProvider config={widgetConfig}>
+                <ApiProvider config={serverApiConfig}>
+                  <StoresProvider stores={stores}>
+                    <ThemeProvider theme={theme} customThemes={portalThemes}>
+                      <ImagesProvider>
+                        <ToolsProvider
+                          hostToolGroups={hostToolGroups}
+                          servers={ctx.servers}
+                          eventBus={ctx.eventBus}
+                        >
+                          <StoresHydrator />
+                          <AiChatStoreProvider>
+                            <AiChatStoresBridge />
+                            {getAgentRoomId ? null : <AgentRoomIdSync />}
+                            {children}
+                            {overlay}
+                          </AiChatStoreProvider>
+                        </ToolsProvider>
+                      </ImagesProvider>
+                    </ThemeProvider>
+                  </StoresProvider>
+                </ApiProvider>
+              </WidgetConfigProvider>
+            </ComponentsProvider>
+          </AiChatI18nIsolator>
+        </PlatformProvider>
+      </EventsProvider>
+    </AiChatAvailabilityContext.Provider>
   );
 };
 
 export default AiAgentProviders;
 
+export { useIsAiChatAvailable } from "./availability";
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
 export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
 export type {
