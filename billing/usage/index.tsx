@@ -69,8 +69,13 @@ const Usage = ({
 }: UsageProps) => {
   const t = useCommonTranslation();
   const { paymentApi } = useApi();
-  const { formatWalletCurrency, language, formatDate, openOnNewPage, isCardLinkedToPortal } =
-    usePaymentStore();
+  const {
+    formatWalletCurrency,
+    language,
+    formatDate,
+    openOnNewPage,
+    isCardLinkedToPortal,
+  } = usePaymentStore();
   const { serviceUsage, initUsageData } = useServicesStore();
 
   const [period, setPeriod] = useState<TUsagePeriodKey>("thisMonth");
@@ -214,7 +219,7 @@ const Usage = ({
 
       <div className={styles.controls}>
         <PeriodSelect value={period} onSelect={onSelectPeriod} />
-        {isCardLinkedToPortal && serviceUsage.length > 0 ? (
+        {!isLoading && isCardLinkedToPortal && serviceUsage.length > 0 ? (
           <div className={styles.downloadReportLink}>
             <Link
               fontSize="13px"
