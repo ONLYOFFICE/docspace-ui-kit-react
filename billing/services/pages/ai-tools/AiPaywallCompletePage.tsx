@@ -128,7 +128,7 @@ const AiPaywallCompletePage = () => {
   const getActivateStepLabel = () => {
     switch (service) {
       case "ai":
-        return t("ActivatingAIFeatures");
+        return t("AIPaywallCallbackStepActivate");
       default:
         return "";
     }
