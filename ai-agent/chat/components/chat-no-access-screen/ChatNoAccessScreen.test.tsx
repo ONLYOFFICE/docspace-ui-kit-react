@@ -96,10 +96,7 @@ describe("<ChatNoAccessScreen />", () => {
     );
     const description = screen.getByTestId("empty-view-description");
     expect(description).toHaveTextContent(
-      "EmptyAIAgentsAIDisabledDescriptionLine1",
-    );
-    expect(description).toHaveTextContent(
-      "EmptyAIAgentsAIDisabledDescriptionLine2",
+      "EmptyAIAgentsAIDisabledContactAdminDescription",
     );
     expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
 

@@ -134,7 +134,11 @@ export const ChatInfoBlock = ({
                       color="accent"
                     />
                   ) : (
-                    <Text key="chat-info-payer-name" as="span" />
+                    <Text
+                      key="chat-info-payer-name"
+                      as="span"
+                      fontWeight={600}
+                    />
                   ),
               }}
             />

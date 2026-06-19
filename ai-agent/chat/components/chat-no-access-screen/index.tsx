@@ -130,7 +130,11 @@ export const ChatNoAccessScreen = ({
                         color="accent"
                       />
                     ) : (
-                      <Text key="chat-no-access-payer-name" as="span" />
+                      <Text
+                        key="chat-no-access-payer-name"
+                        as="span"
+                        fontWeight={600}
+                      />
                     ),
                 }}
               />
@@ -147,20 +151,11 @@ export const ChatNoAccessScreen = ({
       }),
     )
     // saas user
-    .otherwise(() => (
-      <>
-        <Text as="span">
-          {t("EmptyAIAgentsAIDisabledDescriptionLine1", {
-            aiAgents: t("AIAgents"),
-          })}
-        </Text>
-        <Text as="span" style={{ display: "block", marginTop: "8px" }}>
-          {t("EmptyAIAgentsAIDisabledDescriptionLine2", {
-            productName: getBrandName("ProductName"),
-          })}
-        </Text>
-      </>
-    ));
+    .otherwise(() =>
+      t("EmptyAIAgentsAIDisabledContactAdminDescription", {
+        productName: getBrandName("ProductName"),
+      }),
+    );
 
   const goToAIProviderSettings = {
     type: "button",
