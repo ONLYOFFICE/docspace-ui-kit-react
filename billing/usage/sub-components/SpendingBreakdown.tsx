@@ -45,7 +45,7 @@ import { useCommonTranslation } from "../../../utils/i18n";
 import { useTheme } from "../../../context/ThemeContext";
 import { formatDateLocalized, getAppTimezone } from "../../../utils/date";
 
-import NoSpendingIcon from "../../../assets/no.transactions.filter.react.svg";
+import NoSpendingIcon from "../../../assets/no.transactions.react.svg";
 import NoSpendingDarkIcon from "../../../assets/no.transactions.filter.dark.theme.react.svg";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
