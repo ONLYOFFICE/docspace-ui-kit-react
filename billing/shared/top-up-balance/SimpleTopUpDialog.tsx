@@ -117,11 +117,14 @@ type TStripeCheckoutProps = Pick<
 const openStripeCheckout = async (
   { walletCodeCurrency, language, fetchCardLinked }: TStripeCheckoutProps,
   amount: string,
+  service?: string,
 ) => {
   const currency = walletCodeCurrency || "USD";
   const lang = language || "en";
   const backUrl = `${window.location.origin}${window.location.pathname}`;
-  const successUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}?currency=${currency}&amount=${amount}&type=wallet&language=${lang}`;
+
+  const serviceParam = service ? `&service=${service}` : "";
+  const successUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}?currency=${currency}&amount=${amount}&type=wallet&language=${lang}${serviceParam}`;
 
   const linkUrl = await fetchCardLinked(backUrl, successUrl);
 
@@ -160,6 +163,8 @@ type SimpleTopUpDialogBaseProps = {
   onConfirm?: () => Promise<void> | void;
   isFirstTopUp?: boolean;
   recommendedAmount?: string;
+  /** optional service to activate after the top-up (passed to the callback URL) */
+  service?: string;
 };
 
 export type SimpleTopUpDialogProps = SimpleTopUpDialogBaseProps &
@@ -181,6 +186,7 @@ const SimpleTopUpDialogContent = observer(
     fetchCardLinked,
     walletBalance,
     fetchCustomerInfo,
+    service,
   }: SimpleTopUpDialogProps) => {
     const t = useCommonTranslation();
 
@@ -209,6 +215,7 @@ const SimpleTopUpDialogContent = observer(
         await openStripeCheckout(
           { walletCodeCurrency, language, fetchCardLinked },
           amount,
+          service,
         );
 
         await waitForTopUpCompletion(

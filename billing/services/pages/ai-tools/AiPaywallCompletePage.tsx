@@ -64,6 +64,14 @@ const WALLET_REDIRECT_URL = "/portal-settings/payments/wallet";
 const TOPUP_RETRY_ATTEMPTS = 10;
 const TOPUP_RETRY_DELAY_MS = 3000;
 
+const ACTIVATABLE_SERVICES = {
+  ai: {
+    walletService: TenantWalletService.AITools,
+  },
+} as const;
+
+type ActivateService = keyof typeof ACTIVATABLE_SERVICES;
+
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
@@ -93,13 +101,14 @@ const AiPaywallCompletePage = () => {
   const [status, setStatus] = React.useState<Status>("processing");
   const [stepIndex, setStepIndex] = React.useState(1);
 
-  const { currency, amount, type, language } = React.useMemo(() => {
+  const { currency, amount, type, language, service } = React.useMemo(() => {
     if (typeof window === "undefined") {
       return {
         currency: "USD",
         amount: AI_PAYWALL_START_AMOUNT,
         type: "",
         language: "en",
+        service: "",
       };
     }
     const urlParams = new URLSearchParams(window.location.search);
@@ -109,8 +118,21 @@ const AiPaywallCompletePage = () => {
       amount: parsedAmount > 0 ? parsedAmount : AI_PAYWALL_START_AMOUNT,
       type: urlParams.get("type") || "",
       language: urlParams.get("language") || "en",
+      service: urlParams.get("service") || "",
     };
   }, []);
+
+  const activateConfig =
+    ACTIVATABLE_SERVICES[service as ActivateService] ?? null;
+
+  const getActivateStepLabel = () => {
+    switch (service) {
+      case "ai":
+        return t("ActivatingAIFeatures");
+      default:
+        return "";
+    }
+  };
 
   const isWalletOnly = type === "wallet";
 
@@ -143,25 +165,37 @@ const AiPaywallCompletePage = () => {
           event: AnalyticsEvents.WalletTopUp,
         });
 
-        if (!isWalletOnly) {
-          await rawApiClient.instance.post(
-            "api/2.0/portal/payment/creditaibalance",
-            { amount },
-          );
+        setStepIndex(2);
 
-          setStepIndex(2);
+        // if (!isWalletOnly) {
+        //   await rawApiClient.instance.post(
+        //     "api/2.0/portal/payment/creditaibalance",
+        //     { amount },
+        //   );
 
+        //   setStepIndex(2);
+
+        //   await paymentApi.changeTenantWalletServiceState({
+        //     changeWalletServiceStateRequestDto: {
+        //       service: TenantWalletService.AITools,
+        //       enabled: true,
+        //     },
+        //   });
+
+        //   setStepIndex(3);
+        // } else {
+        if (activateConfig) {
           await paymentApi.changeTenantWalletServiceState({
             changeWalletServiceStateRequestDto: {
-              service: TenantWalletService.AITools,
+              service: activateConfig.walletService,
               enabled: true,
             },
           });
 
           setStepIndex(3);
-        } else {
-          setStepIndex(2);
         }
+
+        // }
 
         await new Promise((resolve) => setTimeout(resolve, 700));
 
@@ -182,16 +216,11 @@ const AiPaywallCompletePage = () => {
       : BILLING_REDIRECT_URL;
   };
 
-  const steps = isWalletOnly
-    ? [
-        t("WalletTopUpStepCardSaved"),
-        t("WalletTopUpCallbackStep", { price: formattedAmount }),
-      ]
-    : [
-        t("AIPaywallCallbackStepLinkCard"),
-        t("AIPaywallCallbackStepTopUp"),
-        t("AIPaywallCallbackStepActivate"),
-      ];
+  const steps = [
+    t("WalletTopUpStepCardSaved"),
+    t("WalletTopUpCallbackStep", { price: formattedAmount }),
+    ...(service ? [getActivateStepLabel()] : []),
+  ];
 
   return (
     <div className={styles.page}>
