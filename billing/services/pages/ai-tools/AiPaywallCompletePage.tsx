@@ -96,7 +96,7 @@ const withRetry = async <T,>(
 
 const AiPaywallCompletePage = () => {
   const t = useCommonTranslation();
-  const { paymentApi, rawApiClient } = useApi();
+  const { paymentApi } = useApi();
 
   const [status, setStatus] = React.useState<Status>("processing");
   const [stepIndex, setStepIndex] = React.useState(1);
