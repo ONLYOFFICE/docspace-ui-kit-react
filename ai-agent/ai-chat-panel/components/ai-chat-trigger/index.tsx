@@ -24,50 +24,46 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import React from "react";
+"use client";
 
-export type UseFullscreenOptions = {
-  /** Controlled value. When provided, the hook will not maintain internal state. */
-  value?: boolean;
-  /** Initial value for the uncontrolled mode. */
-  defaultValue?: boolean;
-  /** Fires on every change in both controlled and uncontrolled modes. */
-  onChange?: (next: boolean) => void;
-};
+import { observer } from "mobx-react";
+import { useTranslation } from "react-i18next";
 
-export type UseFullscreenResult = {
-  isFullscreen: boolean;
-  setFullscreen: (next: boolean) => void;
-  toggle: () => void;
-};
+import { Button, ButtonSize } from "../../../../components/button";
 
-/**
- * Tiny controlled-with-uncontrolled-escape state hook for a boolean
- * "fullscreen" flag. Matches the pattern used elsewhere in the codebase:
- * if `value` is provided the hook acts as a pass-through; otherwise it
- * stores state internally seeded from `defaultValue`.
- */
-export const useFullscreen = ({
-  value,
-  defaultValue = false,
-  onChange,
-}: UseFullscreenOptions = {}): UseFullscreenResult => {
-  const [internal, setInternal] = React.useState<boolean>(defaultValue);
+import AiAgentsReactSvg from "../../../../assets/icons/16/catalog.ai-agents.react.svg";
 
-  const isControlled = value !== undefined;
-  const isFullscreen = isControlled ? Boolean(value) : internal;
+import { useAiChatStore } from "../../../providers/ai-chat-store";
 
-  const setFullscreen = React.useCallback(
-    (next: boolean) => {
-      if (!isControlled) setInternal(next);
-      onChange?.(next);
-    },
-    [isControlled, onChange],
+import { useOpenAiChat } from "../../hooks/useOpenAiChat";
+import styles from "./AiChatTrigger.module.scss";
+
+// Header-mounted button that opens the AI chat panel. Host-agnostic: it reads
+// only the shared AiChatStore and the panel-open helper, so any product section
+// (Personal Files, Rooms, …) can drop it into its header.
+const AiChatTrigger: React.FC = observer(() => {
+  const { t } = useTranslation(["Common"]);
+  const store = useAiChatStore();
+  const openChat = useOpenAiChat();
+
+  // Hide the trigger while the AI Chat panel is already open — the
+  // panel has its own close control, and the inline header position
+  // would otherwise compete with that.
+  if (store.isVisible) return null;
+
+  return (
+    <Button
+      accent
+      onClick={openChat}
+      size={ButtonSize.small}
+      label={t("Common:AIChatButton")}
+      icon={<AiAgentsReactSvg />}
+      aria-label={t("Common:AIChatButton")}
+      className={styles.trigger}
+    />
   );
+});
 
-  const toggle = React.useCallback(() => {
-    setFullscreen(!isFullscreen);
-  }, [isFullscreen, setFullscreen]);
+AiChatTrigger.displayName = "AiChatTrigger";
 
-  return { isFullscreen, setFullscreen, toggle };
-};
+export default AiChatTrigger;

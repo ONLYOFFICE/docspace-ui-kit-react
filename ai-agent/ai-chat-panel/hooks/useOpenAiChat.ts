@@ -24,14 +24,35 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { default as AiChatPanelHeader } from "./components/ai-chat-panel-header";
-export type { AiChatPanelHeaderProps } from "./components/ai-chat-panel-header/AiChatPanelHeader.types";
+"use client";
 
-export { default as AiChatPanelBody } from "./components/ai-chat-panel-body";
+import React from "react";
 
-export { default as AiChatTrigger } from "./components/ai-chat-trigger";
-export { default as AiChatPanelHeaderContainer } from "./components/ai-chat-panel-header-container";
+import { useStores } from "../../providers";
+import { useAiChatStore } from "../../providers/ai-chat-store";
 
-export { useOpenAiChat } from "./hooks/useOpenAiChat";
-export { useAiChatPanel } from "./hooks/useAiChatPanel";
-export type { AiChatPanelBindings } from "./hooks/useAiChatPanel";
+/**
+ * Opens the AI chat panel, always starting a fresh conversation when the
+ * panel was closed (new empty thread + cleared messages). Opening a panel
+ * that is already visible leaves the current thread untouched — so flows
+ * that drop something into an *open* chat (e.g. "Ask AI") keep the ongoing
+ * conversation instead of resetting it.
+ *
+ * `onSwitchToNewThread` only resets the thread/messages, never the composer
+ * attachments, so attaching a file right after calling this is safe in
+ * either order.
+ */
+export const useOpenAiChat = () => {
+  const aiChatStore = useAiChatStore();
+  // `useThreadsStore` is a Zustand store (callable as a hook elsewhere); here we
+  // only need its imperative `.getState()` API, so alias away the `use` prefix
+  // to avoid implying a hook call inside the callback below.
+  const { useThreadsStore: threadsStore } = useStores();
+
+  return React.useCallback(() => {
+    if (!aiChatStore.isVisible) {
+      threadsStore.getState().onSwitchToNewThread();
+    }
+    aiChatStore.open();
+  }, [aiChatStore, threadsStore]);
+};

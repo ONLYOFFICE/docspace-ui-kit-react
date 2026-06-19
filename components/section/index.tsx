@@ -122,6 +122,7 @@ const Section = (props: SectionProps) => {
     isChatPanelAvailable = false,
     isChatPanelVisible,
     setIsChatPanelVisible,
+    inert,
     isMobileHidden,
     canDisplay,
     anotherDialogOpen,
@@ -332,6 +333,7 @@ const Section = (props: SectionProps) => {
         bannerContent={sectionBannerContent}
         scrollableBanner={scrollableBanner}
         stickyTableHeader={stickyTableHeader}
+        inert={inert}
       >
         {currentDeviceType !== DeviceType.mobile ? (
           <div className="section-sticky-container">

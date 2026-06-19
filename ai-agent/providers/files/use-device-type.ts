@@ -26,25 +26,36 @@
 
 import React from "react";
 
-/**
- * Calls `handler` when the user presses Escape, but only while `enabled`
- * is true. Mirrors the pattern used by modal-dialog so panels behave
- * consistently across the codebase.
- */
-export const useEscapeKey = (enabled: boolean, handler: () => void) => {
-  const handlerRef = React.useRef(handler);
-  handlerRef.current = handler;
+import { DeviceType } from "../../../enums";
+import { isMobile, isTablet } from "../../../utils/device";
+
+// Self-contained device-type hook for the file selectors/dialogs. Mirrors a
+// resize listener rather than reading a store so the dialogs need no MobX
+// wiring.
+const useDeviceType = () => {
+  const [currentDeviceType, setCurrentDeviceType] = React.useState(
+    DeviceType.desktop,
+  );
+
+  const onResize = React.useCallback(() => {
+    if (isMobile()) return setCurrentDeviceType(DeviceType.mobile);
+    if (isTablet()) return setCurrentDeviceType(DeviceType.tablet);
+
+    return setCurrentDeviceType(DeviceType.desktop);
+  }, []);
 
   React.useEffect(() => {
-    if (!enabled) return undefined;
+    if (typeof window !== "undefined")
+      window.addEventListener("resize", onResize);
 
-    const onKeyUp = (event: KeyboardEvent) => {
-      if (event.key === "Escape" || event.key === "Esc") {
-        handlerRef.current();
-      }
+    onResize();
+
+    return () => {
+      window.removeEventListener("resize", onResize);
     };
+  }, [onResize]);
 
-    window.addEventListener("keyup", onKeyUp);
-    return () => window.removeEventListener("keyup", onKeyUp);
-  }, [enabled]);
+  return { currentDeviceType };
 };
+
+export default useDeviceType;

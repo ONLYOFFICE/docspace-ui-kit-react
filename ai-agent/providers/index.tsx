@@ -63,7 +63,6 @@ import {
 } from "@onlyoffice/ai-chat";
 import type {
   ChatCallbacks,
-  ComposerAction,
   HostTool,
   ProviderType,
   ServerAPIConfig,
@@ -74,7 +73,7 @@ import type {
 import "@onlyoffice/ai-chat/styles";
 
 import { storageAdapter } from "./storage";
-import { usePlatformAdapter, type SaveAsFileHandler } from "./platform";
+import { usePlatformAdapter } from "./platform";
 import { componentOverrides } from "./components-overrides";
 import { storeKeys } from "./stores";
 import { normalizeAiChatLocale } from "./locale";
@@ -94,6 +93,7 @@ import {
   openGeneratedFileWithToolCall,
   type EditorToolsChangedDetail,
 } from "./host-tool-groups";
+import { useFilesIntegration } from "./files";
 
 // The host app (DocSpace) uses `i18n.createInstance()` and provides that
 // instance via `<I18nextProvider>` at the app root. ai-chat, however, calls
@@ -132,12 +132,7 @@ type AiAgentProvidersProps = {
   getAgentRoomId?: () => number | null;
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
-  composerActions?: ComposerAction[];
   entityId?: string;
-  // Handles the message "Save" action: shows a folder selector and saves the
-  // message (markdown `content`, `defaultName` like "<title>.docx") as a file.
-  // Wired into platform.file.saveAsFile.
-  onSaveAsFile?: SaveAsFileHandler;
   children: ReactNode;
 };
 
@@ -198,12 +193,14 @@ const AiAgentProviders = ({
   getAgentRoomId,
   openResultFile,
   closeEditorPanel,
-  composerActions,
   entityId,
-  onSaveAsFile,
   children,
 }: AiAgentProvidersProps) => {
   const aiChatLocale = normalizeAiChatLocale(locale);
+
+  // File-attachment integration: the composer "attach" actions, the message
+  // "Save as file" handler, and the supporting dialogs/device-upload input.
+  const { composerActions, onSaveAsFile, overlay } = useFilesIntegration();
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
   // host's save handler, and it tracks the host locale/theme internally (the
@@ -356,6 +353,7 @@ const AiAgentProviders = ({
                           <AiChatStoresBridge />
                           {getAgentRoomId ? null : <AgentRoomIdSync />}
                           {children}
+                          {overlay}
                         </AiChatStoreProvider>
                       </ToolsProvider>
                     </ImagesProvider>
@@ -387,3 +385,4 @@ export {
   useAiChatStore,
 } from "./ai-chat-store";
 export type { AiChatRouterPage } from "./ai-chat-store";
+

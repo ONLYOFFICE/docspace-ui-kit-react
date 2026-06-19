@@ -350,16 +350,18 @@ const Navigation = ({
               analyzeResponsesButton={analyzeResponsesButton}
             />
           </div>
-          {aiChatButton}
-          {isDesktop && !hideInfoPanel ? (
-            <ToggleInfoPanelButton
-              id="info-panel-toggle--open"
-              isRootFolder={isRootFolder}
-              toggleInfoPanel={toggleInfoPanel}
-              isInfoPanelVisible={isInfoPanelVisible}
-              titles={titles}
-            />
-          ) : null}
+          <div className={styles.buttonsContainer}>
+            {aiChatButton}
+            {isDesktop && !hideInfoPanel ? (
+              <ToggleInfoPanelButton
+                id="info-panel-toggle--open"
+                isRootFolder={isRootFolder}
+                toggleInfoPanel={toggleInfoPanel}
+                isInfoPanelVisible={isInfoPanelVisible}
+                titles={titles}
+              />
+            ) : null}
+          </div>
         </>
       )}
     </Consumer>

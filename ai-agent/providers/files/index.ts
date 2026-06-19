@@ -24,14 +24,9 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { default as AiChatPanelHeader } from "./components/ai-chat-panel-header";
-export type { AiChatPanelHeaderProps } from "./components/ai-chat-panel-header/AiChatPanelHeader.types";
-
-export { default as AiChatPanelBody } from "./components/ai-chat-panel-body";
-
-export { default as AiChatTrigger } from "./components/ai-chat-trigger";
-export { default as AiChatPanelHeaderContainer } from "./components/ai-chat-panel-header-container";
-
-export { useOpenAiChat } from "./hooks/useOpenAiChat";
-export { useAiChatPanel } from "./hooks/useAiChatPanel";
-export type { AiChatPanelBindings } from "./hooks/useAiChatPanel";
+export { getOnlyofficeFileType } from "./file-type";
+export { attachFilesToChat, type AttachFileInput } from "./attach-files";
+export {
+  useFilesIntegration,
+  type FilesIntegration,
+} from "./use-integration";
