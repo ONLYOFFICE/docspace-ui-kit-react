@@ -71,8 +71,8 @@ export type TSimpleTopUpDeps = {
 
 const MIN_AMOUNT = "10";
 const PAYMENT_CALLBACK_PATH = "/billing/payment-complete";
-const POLL_INITIAL_INTERVAL_MS = 3000;
-const POLL_MAX_INTERVAL_MS = 30000;
+const POLL_INITIAL_INTERVAL_MS = 2000;
+const POLL_MAX_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 
 const sleep = (ms: number, signal: AbortSignal) =>
@@ -204,6 +204,8 @@ const SimpleTopUpDialogContent = observer(
 
     const isDisabled = isLoading || !amount || hasError;
 
+    const isStripeFlow = isFirstTopUp || walletCustomerStatusNotActive;
+
     const onStripeContinue = async () => {
       const controller = new AbortController();
       abortControllerRef.current = controller;
@@ -273,7 +275,7 @@ const SimpleTopUpDialogContent = observer(
     const onContinue = async () => {
       if (isDisabled) return;
 
-      if (isFirstTopUp) await onStripeContinue();
+      if (isStripeFlow) await onStripeContinue();
       else await onInstantTopUp();
     };
 
@@ -290,7 +292,7 @@ const SimpleTopUpDialogContent = observer(
         <ModalDialog.Body>
           <div className={styles.body}>
             <Text className={styles.description}>
-              {isFirstTopUp
+              {isStripeFlow
                 ? t("TopUpCreditsDescription")
                 : t("TopUpCreditsAmountDescription")}
             </Text>
@@ -303,7 +305,7 @@ const SimpleTopUpDialogContent = observer(
               withoutCustomerCheck
             />
 
-            {isFirstTopUp ? (
+            {isStripeFlow ? (
               <Text fontSize="12px" className={styles.helperText}>
                 {t("TopUpCreditsChargeHint")}
               </Text>
@@ -319,7 +321,7 @@ const SimpleTopUpDialogContent = observer(
           <div className={styles.footerButtons}>
             <Button
               key="ContinueToStripeButton"
-              label={isFirstTopUp ? t("ContinueToStripe") : t("TopUp")}
+              label={isStripeFlow ? t("ContinueToStripe") : t("TopUp")}
               size={ButtonSize.normal}
               primary
               scale

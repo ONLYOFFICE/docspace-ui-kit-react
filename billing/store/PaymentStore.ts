@@ -818,7 +818,7 @@ class PaymentStore {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
-    const backUrl = url || `${window.location.href}?complete=true`;
+    const backUrl = url || `${window.location.href}`;
     const resolvedSuccessUrl =
       successUrl ||
       combineUrl(
