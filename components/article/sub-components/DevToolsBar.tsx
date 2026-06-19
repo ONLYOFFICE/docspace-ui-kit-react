@@ -42,6 +42,7 @@ import ArrowReactSvg from "../../../assets/arrow.right.react.svg";
 import { DeviceType } from "../../../enums";
 import { openingNewTab } from "../../../utils/openingNewTab";
 import { Text } from "../../text";
+import { TooltipContainer } from "../../tooltip";
 import { useCommonTranslation } from "../../../utils/i18n";
 
 import styles from "../Article.module.scss";
@@ -77,7 +78,8 @@ const ArticleDevToolsBar = ({
   const t = useCommonTranslation();
 
   return (
-    <div
+    <TooltipContainer
+      as="div"
       className={classNames(styles.wrapper)}
       onClick={onClick}
       onMouseDown={onMouseDown}
@@ -97,7 +99,7 @@ const ArticleDevToolsBar = ({
           <ArrowReactSvg className="arrow" />
         </>
       ) : null}
-    </div>
+    </TooltipContainer>
   );
 };
 

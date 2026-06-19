@@ -39,6 +39,7 @@ import classNames from "classnames";
 
 import { useAnimation } from "../../hooks/useAnimation";
 import { Badge } from "../badge";
+import { TooltipContainer } from "../tooltip";
 
 import { NavMenuProps, NavMenuItem, NavSubItem } from "./NavMenu.types";
 import styles from "./NavMenu.module.scss";
@@ -239,7 +240,8 @@ const NavMenuItemWrapper = ({
             {content}
           </LinkRouter>
         ) : (
-          <button
+          <TooltipContainer
+            as="button"
             type="button"
             className={itemClassName}
             aria-expanded={hasChildren && !iconOnly ? isExpanded : undefined}
@@ -247,7 +249,7 @@ const NavMenuItemWrapper = ({
             onClick={handleClick}
           >
             {content}
-          </button>
+          </TooltipContainer>
         )}
         {item.showBadge && (
           <div
