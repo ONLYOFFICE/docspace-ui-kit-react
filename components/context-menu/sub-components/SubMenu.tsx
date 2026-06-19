@@ -671,6 +671,8 @@ const SubMenu = (props: SubMenuProps) => {
     };
 
     model.forEach((item) => {
+      if (!item) return;
+
       const contextMenuTypeItem = item as ContextMenuType;
 
       const level = menuLevel + 1;
