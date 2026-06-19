@@ -214,7 +214,7 @@ const Usage = ({
 
       <div className={styles.controls}>
         <PeriodSelect value={period} onSelect={onSelectPeriod} />
-        {isCardLinkedToPortal ? (
+        {isCardLinkedToPortal && serviceUsage.length > 0 ? (
           <div className={styles.downloadReportLink}>
             <Link
               fontSize="13px"

@@ -45,13 +45,13 @@ import { useCommonTranslation } from "../../../utils/i18n";
 import { useTheme } from "../../../context/ThemeContext";
 import { formatDateLocalized, getAppTimezone } from "../../../utils/date";
 
-import NoSpendingIcon from "../../../assets/no.transactions.react.svg";
-import NoSpendingDarkIcon from "../../../assets/no.transactions.dark.theme.react.svg";
+import NoSpendingIcon from "../../../assets/no.transactions.filter.react.svg";
+import NoSpendingDarkIcon from "../../../assets/no.transactions.filter.dark.theme.react.svg";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import type { TUsagePeriodKey } from "../../types";
-import { AI_TOOLS, BACKUP_SERVICE, DISK_STORAGE } from "../../constants";
+// import { AI_TOOLS, BACKUP_SERVICE, DISK_STORAGE } from "../../constants";
 
 import { getServiceQuantity } from "../../wallet/utils";
 import { getUsageRange } from "../utils";
