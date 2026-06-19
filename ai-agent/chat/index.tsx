@@ -82,6 +82,9 @@ const ChatUI = observer(
     toolsSettings,
     isAdmin = false,
     standalone = false,
+    isPayer = false,
+    walletCustomerEmail,
+    walletCustomerDisplayName,
     aiReady = false,
     getResultStorageId,
     multimodal,
@@ -156,6 +159,9 @@ const ChatUI = observer(
             aiReady={aiReady}
             standalone={standalone}
             isPortalAdmin={isAdmin}
+            isPayer={isPayer}
+            walletCustomerEmail={walletCustomerEmail}
+            walletCustomerDisplayName={walletCustomerDisplayName}
             goToAISettings={goToAISettings}
           />
         ) : (
@@ -217,6 +223,9 @@ const ChatCore = (props: ChatCoreProps) => {
     aiReady = false,
     standalone = false,
     isAdmin = false,
+    isPayer = false,
+    walletCustomerEmail,
+    walletCustomerDisplayName,
     goToAISettings,
     toolsSettings,
   } = props;
@@ -238,6 +247,9 @@ const ChatCore = (props: ChatCoreProps) => {
           aiReady={aiReady}
           standalone={standalone}
           isPortalAdmin={isAdmin}
+          isPayer={isPayer}
+          walletCustomerEmail={walletCustomerEmail}
+          walletCustomerDisplayName={walletCustomerDisplayName}
           goToAISettings={goToAISettings}
         />
       </ChatContainer>

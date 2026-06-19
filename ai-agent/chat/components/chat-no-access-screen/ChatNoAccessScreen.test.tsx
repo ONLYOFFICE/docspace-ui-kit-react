@@ -88,25 +88,40 @@ describe("<ChatNoAccessScreen />", () => {
     goToAISettings: vi.fn(),
   };
 
-  it("renders with user description when not an admin", () => {
+  it("renders with saas user title and description when not an admin", () => {
     render(<ChatNoAccessScreen {...defaultProps} />);
 
     expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
-      "AIFeaturesAreCurrentlyDisabled",
+      "EmptyAIAgentsNotActiveYetTitle",
     );
-    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
-      "EmptyChatAIDisabledUserDescription",
+    const description = screen.getByTestId("empty-view-description");
+    expect(description).toHaveTextContent(
+      "EmptyAIAgentsAIDisabledDescriptionLine1",
+    );
+    expect(description).toHaveTextContent(
+      "EmptyAIAgentsAIDisabledDescriptionLine2",
     );
     expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
 
     expect(EmptyView).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: "AIFeaturesAreCurrentlyDisabled",
-        description: "EmptyChatAIDisabledUserDescription",
+        title: "EmptyAIAgentsNotActiveYetTitle",
         options: [],
       }),
       undefined,
     );
+  });
+
+  it("renders standalone user description", () => {
+    render(<ChatNoAccessScreen {...defaultProps} standalone={true} />);
+
+    expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
+      "AIFeaturesAreCurrentlyDisabled",
+    );
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "EmptyAIAgentsAIDisabledDescription",
+    );
+    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
   });
 
   it("renders with standalone admin title and description", () => {
@@ -152,10 +167,12 @@ describe("<ChatNoAccessScreen />", () => {
     );
 
     expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
-      "AIFeaturesAreCurrentlyDisabled",
+      "EmptyAIAgentsNotActiveYetTitle",
     );
-    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
-      "EmptyChatAIDisabledSaasAdminDescription",
+    const description = screen.getByTestId("empty-view-description");
+    expect(description).toHaveTextContent("EmptyAIAgentsNotActiveYetDescription");
+    expect(description).toHaveTextContent(
+      "EmptyAIAgentsNotActiveYetDescriptionLine2",
     );
 
     // Check for "Go to Settings" button
@@ -163,8 +180,7 @@ describe("<ChatNoAccessScreen />", () => {
 
     expect(EmptyView).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: "AIFeaturesAreCurrentlyDisabled",
-        description: "EmptyChatAIDisabledSaasAdminDescription",
+        title: "EmptyAIAgentsNotActiveYetTitle",
         options: [expect.objectContaining({ key: "go-to-services" })],
       }),
       undefined,

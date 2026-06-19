@@ -34,11 +34,14 @@
  */
 
 import React from "react";
+import { Trans } from "react-i18next";
 
 import ChatNoAccessRightsDarkIcon from "../../../../assets/emptyview/empty.chat.access.rights.dark.svg";
 import ChatNoAccessRightsLightIcon from "../../../../assets/emptyview/empty.chat.access.rights.light.svg";
 
 import { EmptyView } from "../../../../components/empty-view";
+import { Text } from "../../../../components/text";
+import { Link, LinkType } from "../../../../components/link";
 import { useTheme } from "../../../../context/ThemeContext";
 import { match, P } from "ts-pattern";
 import { useCommonTranslation } from "../../../../utils/i18n";
@@ -48,6 +51,9 @@ type Props = {
   aiReady: boolean;
   standalone: boolean;
   isPortalAdmin: boolean;
+  isPayer?: boolean;
+  walletCustomerEmail?: string | null;
+  walletCustomerDisplayName?: string | null;
   goToAISettings?: () => void;
 };
 
@@ -55,6 +61,9 @@ export const ChatNoAccessScreen = ({
   aiReady,
   isPortalAdmin,
   standalone,
+  isPayer,
+  walletCustomerEmail,
+  walletCustomerDisplayName,
   goToAISettings,
 }: Props) => {
   const { isBase } = useTheme();
@@ -66,37 +75,82 @@ export const ChatNoAccessScreen = ({
     <ChatNoAccessRightsDarkIcon />
   );
 
-  const title =
-    isPortalAdmin && standalone
-      ? t("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
-          aiProvider: t("AIProvider"),
-        })
-      : t("AIFeaturesAreCurrentlyDisabled");
+  const title = match([standalone, isPortalAdmin])
+    // standalone admin
+    .with([true, true], () =>
+      t("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
+        aiProvider: t("AIProvider"),
+      }),
+    )
+    // saas (admin + user)
+    .with([false, P._], () => t("EmptyAIAgentsNotActiveYetTitle"))
+    // standalone user
+    .otherwise(() => t("AIFeaturesAreCurrentlyDisabled"));
 
   const description = match([standalone, isPortalAdmin])
     // standalone admin
     .with([true, true], () =>
-      t(
-        "EmptyAIAgentsAIDisabledStandaloneAdminDescription",
-        {
-          productName: getBrandName("ProductName"),
-          aiChats: t("AIChats"),
-        },
-      ),
+      t("EmptyAIAgentsAIDisabledStandaloneAdminDescription", {
+        productName: getBrandName("ProductName"),
+        aiChats: t("AIChats"),
+      }),
     )
     // saas admin
-    .with([false, true], () =>
-      t("EmptyChatAIDisabledSaasAdminDescription", {
+    .with([false, true], () => {
+      const payerLabel = walletCustomerDisplayName || walletCustomerEmail;
+
+      return (
+        <>
+          <Text as="span">{t("EmptyAIAgentsNotActiveYetDescription")}</Text>
+          <Text as="span" style={{ display: "block", marginTop: "8px" }}>
+            {t("EmptyAIAgentsNotActiveYetDescriptionLine2")}
+          </Text>
+          {!isPayer && payerLabel ? (
+            <Text as="span" style={{ display: "block", marginTop: "8px" }}>
+              <Trans
+                i18nKey="Common:EmptyAIAgentsNotActiveYetContactPayer"
+                values={{ payerContact: payerLabel }}
+                components={{
+                  1:
+                    walletCustomerEmail && !walletCustomerDisplayName ? (
+                      <Link
+                        key="chat-no-access-payer-link"
+                        type={LinkType.action}
+                        href={`mailto:${walletCustomerEmail}`}
+                        color="accent"
+                      />
+                    ) : (
+                      <Text key="chat-no-access-payer-name" as="span" />
+                    ),
+                }}
+              />
+            </Text>
+          ) : null}
+        </>
+      );
+    })
+    // standalone user
+    .with([true, false], () =>
+      t("EmptyAIAgentsAIDisabledDescription", {
         productName: getBrandName("ProductName"),
+        aiAgents: t("AIAgents"),
       }),
     )
-    // standalone/saas user
-    .with([P._, false], () =>
-      t("EmptyChatAIDisabledUserDescription", {
-        productName: getBrandName("ProductName"),
-      }),
-    )
-    .otherwise(() => "");
+    // saas user
+    .otherwise(() => (
+      <>
+        <Text as="span">
+          {t("EmptyAIAgentsAIDisabledDescriptionLine1", {
+            aiAgents: t("AIAgents"),
+          })}
+        </Text>
+        <Text as="span" style={{ display: "block", marginTop: "8px" }}>
+          {t("EmptyAIAgentsAIDisabledDescriptionLine2", {
+            productName: getBrandName("ProductName"),
+          })}
+        </Text>
+      </>
+    ));
 
   const goToServices = {
     type: "button",
@@ -129,3 +183,4 @@ export const ChatNoAccessScreen = ({
     />
   );
 };
+

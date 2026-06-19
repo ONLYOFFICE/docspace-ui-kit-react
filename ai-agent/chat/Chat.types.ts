@@ -292,6 +292,9 @@ export type ChatProps = {
   messagesSettings?: Omit<ReturnType<typeof useInitMessages>, "initMessages">;
   isAdmin?: boolean;
   standalone?: boolean;
+  isPayer?: boolean;
+  walletCustomerEmail?: string | null;
+  walletCustomerDisplayName?: string | null;
 
   multimodal?: TMultimodal;
   goToAISettings?: () => void;
