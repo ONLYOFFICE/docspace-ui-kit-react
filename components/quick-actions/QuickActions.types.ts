@@ -57,4 +57,7 @@ export type QuickActionsProps = {
    * localized string; defaults to "Show more".
    */
   showMoreLabel?: string;
+
+  isLoading?: boolean;
 };
+

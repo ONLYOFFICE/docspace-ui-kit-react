@@ -37,6 +37,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { Link, LinkType } from "../link";
+import { RectangleSkeleton } from "../rectangle";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
 
 import type { QuickActionItem, QuickActionsProps } from "./QuickActions.types";
@@ -132,11 +133,25 @@ const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
   );
 };
 
+// Placeholder tile matching `.tile`'s box (size, radius, gap) so the loading
+// grid lines up with the real one and there's no layout shift when it resolves.
+const QuickActionTileSkeleton = () => (
+  <div className={classNames(styles.tile, styles.skeletonTile)} aria-hidden>
+    <RectangleSkeleton
+      className={styles.skeletonIcon}
+      width="100%"
+      height="100%"
+      borderRadius="12px"
+    />
+  </div>
+);
+
 export const QuickActions = ({
   items,
   className,
   dataTestId,
   showMoreLabel = "Show more",
+  isLoading = false,
 }: QuickActionsProps) => {
   const gridRef = React.useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = React.useState(false);
@@ -164,6 +179,22 @@ export const QuickActions = ({
   // blurred "Show more" overlay on top. Expanding removes the clip. Every tile
   // stays mounted either way (the clip is purely visual).
   const isCollapsed = collapsible && !expanded;
+
+  if (isLoading) {
+    const count = items.length || 4;
+    return (
+      <div
+        className={classNames(styles.quickActions, className)}
+        data-testid={dataTestId}
+      >
+        <div className={styles.grid}>
+          {Array.from({ length: count }, (_, index) => (
+            <QuickActionTileSkeleton key={index} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const grid = (
     <div ref={gridRef} className={styles.grid}>
