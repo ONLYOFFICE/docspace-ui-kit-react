@@ -223,3 +223,23 @@ $compact-peek: 60px;
   line-height: 20px;
   word-break: break-word;
 }
+
+// Loading placeholder: keeps the tile's box (size/radius/gap via .tile) but
+// drops the interactive affordances and lets the skeleton fill the whole tile.
+.skeletonTile {
+  padding: 0;
+  background-color: transparent;
+  cursor: default;
+  pointer-events: none;
+  overflow: hidden;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.skeletonIcon {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
