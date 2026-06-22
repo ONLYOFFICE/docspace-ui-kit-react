@@ -51,7 +51,8 @@ import NoSpendingDarkIcon from "../../../assets/no.transactions.filter.dark.them
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import type { TUsagePeriodKey } from "../../types";
-// import { AI_TOOLS, BACKUP_SERVICE, DISK_STORAGE } from "../../constants";
+import { AI_TOOLS, BACKUP_SERVICE } from "../../constants";
+import { formatCompactNumber } from "../../utils/common";
 
 import { getServiceQuantity } from "../../wallet/utils";
 import { getUsageRange } from "../utils";
@@ -158,16 +159,24 @@ const SpendingBreakdown = ({
   const normalizeService = (service: string) =>
     (service || "").toLowerCase().replace(/[^a-z]/g, "");
 
-  const getSubLabel = (item: (typeof serviceUsage)[number]) =>
-    normalizeService(item.service).includes("backup")
-      ? t("BilledBackups", { count: item.totalQuantity })
-      : getServiceQuantity(t, item.totalQuantity, item.serviceUnit);
+  const getSubLabel = (item: (typeof serviceUsage)[number]) => {
+    if (item.service === BACKUP_SERVICE)
+      return t("BilledBackups", { count: item.totalQuantity });
+
+    if (item.service === AI_TOOLS)
+      return t("UnitCount", {
+        unit: item.serviceUnit,
+        count: formatCompactNumber(item.totalQuantity, language),
+      });
+
+    return getServiceQuantity(t, item.totalQuantity, item.serviceUnit);
+  };
 
   const getServiceHandler = (service: string) => {
     const key = normalizeService(service);
     if (key.includes("storage")) return onDiskStorageClick;
-    if (key.includes("backup")) return onBackupClick;
-    if (key.includes("ai")) return onAIServicesClick;
+    if (service === BACKUP_SERVICE) return onBackupClick;
+    if (service === AI_TOOLS) return onAIServicesClick;
     return undefined;
   };
 
