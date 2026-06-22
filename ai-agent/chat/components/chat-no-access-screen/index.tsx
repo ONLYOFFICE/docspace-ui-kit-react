@@ -152,7 +152,7 @@ export const ChatNoAccessScreen = ({
     )
     // saas user
     .otherwise(() =>
-      t("EmptyAIAgentsAIDisabledContactAdminDescription", {
+      t("EmptyAIDisabledContactAdminDesc", {
         productName: getBrandName("ProductName"),
       }),
     );
