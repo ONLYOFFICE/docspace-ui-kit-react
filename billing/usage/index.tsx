@@ -54,6 +54,7 @@ import type { TUsagePeriodKey } from "../types";
 import PeriodSelect from "./sub-components/PeriodSelect";
 import SpendingBreakdown from "./sub-components/SpendingBreakdown";
 import { getUsageRange } from "./utils";
+import { toastr } from "../../components/toast";
 import styles from "./styles/Usage.module.scss";
 
 type UsageProps = {
@@ -166,55 +167,59 @@ const Usage = ({
     range?: { from: DateTime; to: DateTime },
   ) => {
     if (!serviceName && !range) setIsReportLoading(true);
-    await paymentApi.createCustomerOperationsReport({
-      customerOperationsReportRequestDto: {
-        startDate: formatDate!(range?.from ?? from, "start"),
-        endDate: formatDate!(range?.to ?? to, "end"),
-        credit: true,
-        debit: true,
-        ...(serviceName ? { serviceName } : {}),
-      },
-    });
+    try {
+      await paymentApi.createCustomerOperationsReport({
+        customerOperationsReportRequestDto: {
+          startDate: formatDate!(range?.from ?? from, "start"),
+          endDate: formatDate!(range?.to ?? to, "end"),
+          credit: true,
+          debit: true,
+          ...(serviceName ? { serviceName } : {}),
+        },
+      });
 
-    const result = await new Promise<{ resultFileUrl?: string }>(
-      (resolve, reject) => {
-        const check = async () => {
-          try {
-            const res = await paymentApi.getCustomerOperationsReport();
-            const response = res?.data?.response as
-              | {
-                  isCompleted?: boolean;
-                  resultFileUrl?: string;
-                  error?: string;
-                }
-              | undefined;
+      const result = await new Promise<{ resultFileUrl?: string }>(
+        (resolve, reject) => {
+          const check = async () => {
+            try {
+              const res = await paymentApi.getCustomerOperationsReport();
+              const response = res?.data?.response as
+                | {
+                    isCompleted?: boolean;
+                    resultFileUrl?: string;
+                    error?: string;
+                  }
+                | undefined;
 
-            if (!response) {
-              reject(new Error(t("UnexpectedError")));
-              return;
+              if (!response) {
+                reject(new Error(t("UnexpectedError")));
+                return;
+              }
+              if (response.error) {
+                reject(new Error(response.error));
+                return;
+              }
+              if (response.isCompleted) {
+                resolve(response);
+                return;
+              }
+              setTimeout(check, 1000);
+            } catch (err) {
+              reject(err);
             }
-            if (response.error) {
-              reject(new Error(response.error));
-              return;
-            }
-            if (response.isCompleted) {
-              resolve(response);
-              return;
-            }
-            setTimeout(check, 1000);
-          } catch (err) {
-            reject(err);
-          }
-        };
-        check();
-      },
-    );
+          };
+          check();
+        },
+      );
 
-    if (result.resultFileUrl) {
-      window.open(result.resultFileUrl, openOnNewPage ? "_blank" : "_self");
+      if (result.resultFileUrl) {
+        window.open(result.resultFileUrl, openOnNewPage ? "_blank" : "_self");
+      }
+    } catch (e) {
+      toastr.error(e as Error);
+    } finally {
+      if (!serviceName && !range) setIsReportLoading(false);
     }
-
-    if (!serviceName && !range) setIsReportLoading(false);
   };
 
   return (
