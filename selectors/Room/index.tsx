@@ -88,6 +88,7 @@ const RoomSelectorComponent = ({
   cancelButtonLabel,
   onCancel,
 
+  isForms,
   roomType,
   searchArea,
 
@@ -276,6 +277,7 @@ const RoomSelectorComponent = ({
     createDefineRoomLabel,
     createDefineRoomType,
     excludeItems,
+    formsSection: isForms,
     roomType,
     searchValue,
     isRoomsOnly: true,
@@ -293,7 +295,8 @@ const RoomSelectorComponent = ({
         withHeader,
         headerProps: {
           ...headerProps,
-          headerLabel: headerProps.headerLabel || t("RoomList"),
+          headerLabel:
+            headerProps.headerLabel || (isForms ? t("Forms") : t("RoomList")),
         },
       }
     : {};
@@ -345,7 +348,7 @@ const RoomSelectorComponent = ({
       emptyScreenDescription={
         emptyScreenDescription ??
         t("EmptyRoomsDescriptionText", {
-          sectionName: t("Rooms"),
+          sectionName: isForms ? t("Forms") : t("Rooms"),
         })
       }
       searchEmptyScreenImage={

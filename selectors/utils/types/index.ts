@@ -60,6 +60,7 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   disableThirdParty?: boolean;
   isRoomsOnly: boolean;
   roomType?: RoomType | RoomType[];
+  formsSection?: boolean;
   excludeItems?: (number | string | undefined)[];
   isInit: boolean;
   createDefineRoomLabel?: string;

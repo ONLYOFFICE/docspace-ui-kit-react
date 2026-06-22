@@ -66,6 +66,7 @@ export type RoomSelectorProps = TSelectorHeader &
 		isMultiSelect: boolean;
 
 		onSubmit: (items: TSelectorItem[]) => void | Promise<void>;
+		isForms?: boolean;
 		roomType?: RoomType | RoomType[];
 		searchArea?: SearchArea | string;
 		excludeItems?: (number | string | undefined)[];

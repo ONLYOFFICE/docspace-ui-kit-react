@@ -79,6 +79,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withRecentTreeFolder,
     withFavoritesTreeFolder,
     withAIAgentsTreeFolder,
+    withFormsTreeFolder = true,
 
     onSetBaseFolderPath,
     roomType,
@@ -199,6 +200,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     ...withInitProps,
   });
 
+  const [isFormsSection, setIsFormsSection] = React.useState(false);
+
   const { subscribe, unsubscribe } = useSocketHelper({
     disabledItems,
     disabledFolderType,
@@ -223,6 +226,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withRecentTreeFolder,
     withFavoritesTreeFolder,
     withAIAgentsTreeFolder,
+    withFormsTreeFolder,
   });
 
   let rootFolderTypeItem = undefined;
@@ -272,6 +276,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     searchValue,
     roomType,
+    formsSection: withFormsTreeFolder ? isFormsSection : undefined,
     isRoomsOnly,
     isInit,
     withCreate: withCreateState,
@@ -433,7 +438,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             isRoom:
               !isAgent &&
               item.parentId === 0 &&
-              item.rootFolderType === FolderType.VirtualRooms,
+              (item.rootFolderType === FolderType.VirtualRooms ||
+                item.rootFolderType === FolderType.FillingFormsRoom),
             isAgent: isAgent,
             roomType: item.roomType,
             shared: item.shared,
@@ -447,8 +453,12 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         if (
           item.parentId === 0 &&
           (item.rootFolderType === FolderType.VirtualRooms ||
+            item.rootFolderType === FolderType.FillingFormsRoom ||
             item.rootFolderType === FolderType.AiAgents)
         ) {
+          setIsFormsSection(
+            item.rootFolderType === FolderType.FillingFormsRoom,
+          );
           setSelectedItemType(
             item.rootFolderType === FolderType.AiAgents ? "agents" : "rooms",
           );

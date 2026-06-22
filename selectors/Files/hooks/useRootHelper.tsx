@@ -103,6 +103,7 @@ const useRootHelper = ({
   withRecentTreeFolder,
   withFavoritesTreeFolder,
   withAIAgentsTreeFolder,
+  withFormsTreeFolder,
 
   setTotal,
   setHasNextPage,
@@ -195,6 +196,25 @@ const useRootHelper = ({
           avatar,
           disableMultiSelect: true,
         });
+
+        if (
+          withFormsTreeFolder &&
+          !isUserOnly &&
+          folder.rootFolderType === FolderType.VirtualRooms
+        ) {
+          newItems.push({
+            label: t("Forms"),
+            id: "forms-section",
+            parentId: folder.parentId!,
+            rootFolderType: FolderType.FillingFormsRoom,
+            filesCount: folder.filesCount!,
+            foldersCount: folder.foldersCount!,
+            security: folder.security!,
+            isFolder: true,
+            avatar: <CatalogDocumentsSvg />,
+            disableMultiSelect: true,
+          });
+        }
       }
     });
 
@@ -221,6 +241,7 @@ const useRootHelper = ({
     withRecentTreeFolder,
     withFavoritesTreeFolder,
     withAIAgentsTreeFolder,
+    withFormsTreeFolder,
   ]);
 
   return { isRoot, setIsRoot, getRootData };

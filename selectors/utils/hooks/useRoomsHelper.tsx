@@ -36,6 +36,7 @@
 import React, { use } from "react";
 
 import {
+  RoomType as ApiRoomType,
   StorageFilter,
   type RoomType as RoomTypeEnum,
   type FolderDtoInteger,
@@ -66,6 +67,7 @@ const useRoomsHelper = ({
   searchValue,
   searchArea,
   roomType,
+  formsSection,
   isRoomsOnly,
 
   isInit,
@@ -155,6 +157,16 @@ const useRoomsHelper = ({
         typeFilter = types.length > 0 ? types : undefined;
       }
 
+      if (!typeFilter && formsSection !== undefined) {
+        typeFilter = formsSection
+          ? [ApiRoomType.FillingFormsRoom]
+          : Object.values(ApiRoomType).filter(
+              (value) =>
+                value !== ApiRoomType.FillingFormsRoom &&
+                value !== ApiRoomType.AiRoom,
+            );
+      }
+
       const res = await roomsApi.getRoomsFolder({
         type: typeFilter,
         searchArea: searchArea as SearchArea,
@@ -205,6 +217,9 @@ const useRoomsHelper = ({
 
         if (withCreate && security?.Create) {
           setTotal(total + 1);
+          const createRoomType =
+            createDefineRoomType ??
+            (formsSection ? ApiRoomType.FillingFormsRoom : undefined);
           const createItem: TSelectorItem = {
             isCreateNewItem: true,
             label: createDefineRoomLabel ?? t("NewRoom"),
@@ -212,10 +227,8 @@ const useRoomsHelper = ({
             key: "create-room-item",
             hotkey: "r",
             isRoomsOnly,
-            createDefineRoomType,
-            dropDownItems: createDefineRoomType
-              ? undefined
-              : createDropDownItems,
+            createDefineRoomType: createRoomType,
+            dropDownItems: createRoomType ? undefined : createDropDownItems,
 
             onBackClick: () => {
               setIsRoot?.(true);
@@ -231,9 +244,9 @@ const useRoomsHelper = ({
             },
           };
 
-          if (createDefineRoomType) {
+          if (createRoomType) {
             createItem.onCreateClick = () =>
-              addInputItem("", "", createDefineRoomType, createDefineRoomLabel);
+              addInputItem("", "", createRoomType, createDefineRoomLabel);
           }
 
           itemList.unshift(createItem);
@@ -265,6 +278,7 @@ const useRoomsHelper = ({
       setIsFirstLoad,
       setIsNextPageLoading,
       roomType,
+      formsSection,
       isRoomsOnly,
       subscribe,
       onSetBaseFolderPath,

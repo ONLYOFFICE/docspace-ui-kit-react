@@ -85,6 +85,7 @@ export interface UseRootHelperProps {
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
   withAIAgentsTreeFolder?: boolean;
+  withFormsTreeFolder?: boolean;
   isUserOnly?: boolean;
 }
 
@@ -242,6 +243,7 @@ export type FilesSelectorProps = TInfoBar &
     withRecentTreeFolder?: boolean;
     withFavoritesTreeFolder?: boolean;
     withAIAgentsTreeFolder?: boolean;
+    withFormsTreeFolder?: boolean;
 
     onSetBaseFolderPath?: (
       value: number | string | undefined | TBreadCrumb[],
