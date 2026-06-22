@@ -105,7 +105,7 @@ export const ChatInfoBlock = ({
               >
                 {isCardLinkedToPortal ? t("Activate") : t("TopUpAndActivate")}
               </Link>
-              {" | "}
+              {/* {" | "}
               <Link
                 type={LinkType.action}
                 color="accent"
@@ -113,7 +113,7 @@ export const ChatInfoBlock = ({
                 textDecoration={"underline"}
               >
                 {t("Benefits")}
-              </Link>
+              </Link> */}
             </>
           )}
         </>

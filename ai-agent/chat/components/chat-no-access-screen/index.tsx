@@ -181,18 +181,18 @@ export const ChatNoAccessScreen = ({
         onClick: onTopUpAndActivateAI,
       } as const);
 
-  const aiBenefits = {
-    type: "button",
-    title: t("Benefits"),
-    key: "ai-benefits",
-    primary: false,
-    onClick: onShowAIBenefits,
-  } as const;
+  // const aiBenefits = {
+  //   type: "button",
+  //   title: t("Benefits"),
+  //   key: "ai-benefits",
+  //   primary: false,
+  //   onClick: onShowAIBenefits,
+  // } as const;
 
   const getSaasAdminOptions = () => {
     if (isCardLinkedToPortal && !isPayer) return [];
     if (!activateOrTopUpAI.onClick) return [];
-    return [activateOrTopUpAI, aiBenefits];
+    return [activateOrTopUpAI]; // aiBenefits
   };
 
   const options = !isPortalAdmin
