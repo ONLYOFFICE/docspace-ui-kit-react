@@ -88,25 +88,37 @@ describe("<ChatNoAccessScreen />", () => {
     goToAISettings: vi.fn(),
   };
 
-  it("renders with user description when not an admin", () => {
+  it("renders with saas user title and description when not an admin", () => {
     render(<ChatNoAccessScreen {...defaultProps} />);
 
     expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
-      "AIFeaturesAreCurrentlyDisabled",
+      "EmptyAIAgentsNotActiveYetTitle",
     );
-    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
-      "EmptyChatAIDisabledUserDescription",
+    const description = screen.getByTestId("empty-view-description");
+    expect(description).toHaveTextContent(
+      "EmptyAIDisabledContactAdminDesc",
     );
     expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
 
     expect(EmptyView).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: "AIFeaturesAreCurrentlyDisabled",
-        description: "EmptyChatAIDisabledUserDescription",
+        title: "EmptyAIAgentsNotActiveYetTitle",
         options: [],
       }),
       undefined,
     );
+  });
+
+  it("renders standalone user description", () => {
+    render(<ChatNoAccessScreen {...defaultProps} standalone={true} />);
+
+    expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
+      "AIFeaturesAreCurrentlyDisabled",
+    );
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "EmptyAIAgentsAIDisabledDescription",
+    );
+    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
   });
 
   it("renders with standalone admin title and description", () => {
@@ -142,33 +154,67 @@ describe("<ChatNoAccessScreen />", () => {
     );
   });
 
-  it("renders with saas admin description", () => {
+  it("renders saas admin with activate and benefits buttons", () => {
+    const onActivateAI = vi.fn();
+    const onShowAIBenefits = vi.fn();
+
     render(
       <ChatNoAccessScreen
         {...defaultProps}
         isPortalAdmin={true}
         standalone={false}
+        isCardLinkedToPortal={true}
+        isPayer={true}
+        onActivateAI={onActivateAI}
+        onShowAIBenefits={onShowAIBenefits}
       />,
     );
 
     expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
-      "AIFeaturesAreCurrentlyDisabled",
+      "EmptyAIAgentsNotActiveYetTitle",
     );
-    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
-      "EmptyChatAIDisabledSaasAdminDescription",
+    const description = screen.getByTestId("empty-view-description");
+    expect(description).toHaveTextContent("EmptyAIAgentsNotActiveYetDescription");
+    expect(description).toHaveTextContent(
+      "EmptyAIAgentsNotActiveYetDescriptionLine2",
     );
 
-    // Check for "Go to Settings" button
-    expect(screen.getByTestId("option-go-to-services")).toBeInTheDocument();
+    expect(screen.getByTestId("option-activate-ai")).toBeInTheDocument();
+    expect(screen.queryByTestId("option-ai-benefits")).not.toBeInTheDocument();
+  });
 
-    expect(EmptyView).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: "AIFeaturesAreCurrentlyDisabled",
-        description: "EmptyChatAIDisabledSaasAdminDescription",
-        options: [expect.objectContaining({ key: "go-to-services" })],
-      }),
-      undefined,
+  it("shows top up button for saas admin without a linked card", () => {
+    render(
+      <ChatNoAccessScreen
+        {...defaultProps}
+        isPortalAdmin={true}
+        standalone={false}
+        isCardLinkedToPortal={false}
+        onTopUpAndActivateAI={vi.fn()}
+        onShowAIBenefits={vi.fn()}
+      />,
     );
+
+    expect(
+      screen.getByTestId("option-top-up-and-activate-ai"),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId("option-ai-benefits")).not.toBeInTheDocument();
+  });
+
+  it("hides buttons for saas admin who is not the payer", () => {
+    render(
+      <ChatNoAccessScreen
+        {...defaultProps}
+        isPortalAdmin={true}
+        standalone={false}
+        isCardLinkedToPortal={true}
+        isPayer={false}
+        onActivateAI={vi.fn()}
+        onShowAIBenefits={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
   });
 
   it("hides settings button if goToAISettings is not provided", () => {

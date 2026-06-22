@@ -35,69 +35,44 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { useCommonTranslation } from "../../../utils/i18n";
 
+import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { Text } from "../../../components/text";
-import { Link } from "../../../components/link";
-
+import CheckRoundSvg from "../../../assets/icons/16/check.round.react.svg";
 import styles from "../styles/Wallet.module.scss";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 
-type AutoPaymentInfoProps = {
-  onOpen: (e: React.MouseEvent) => void;
-};
-
-const AutoPaymentInfo = (props: AutoPaymentInfoProps) => {
-  const { onOpen } = props;
-
+const AutoPaymentInfo = () => {
   const paymentStore = usePaymentStore();
 
-  const {
-    autoPayments,
-    walletCodeCurrency,
-    isPayer,
-    isAutoPaymentExist,
-    formatWalletCurrency,
-  } = paymentStore;
-
-  const { language } = paymentStore;
+  const { autoPayments, formatWalletCurrency } = paymentStore;
 
   const minBalance = autoPayments?.minBalance ?? 0;
   const upToBalance = autoPayments?.upToBalance ?? 0;
 
-  const t = useCommonTranslation();
-
-  if (
-    !isAutoPaymentExist ||
-    !language ||
-    !walletCodeCurrency ||
-    !minBalance ||
-    !upToBalance
-  )
-    return null;
-
   return (
-    <div className={styles.autoPaymentInformation}>
-      <Text fontWeight={600}>{t("AutoTopUpEnabled")}</Text>
-      <div className={styles.autoPaymentEditing}>
-        <Text>
-          {t("WhenBalanceDropsTo", {
+    <div className={styles.autoPaymentBanner}>
+      <CheckRoundSvg className={styles.autoPaymentBannerIcon} />
+      <Text
+        as="span"
+        fontSize="12px"
+        lineHeight="16px"
+        className={styles.autoPaymentBannerText}
+      >
+        <CommonTrans
+          i18nKey="AutoTopUpBanner"
+          values={{
             min: formatWalletCurrency!(minBalance, 0),
             max: formatWalletCurrency!(upToBalance, 0),
-          })}{" "}
-          {isPayer ? (
-            <Link
-              onClick={onOpen}
-              textDecoration="underline"
-              dataTestId="auto_edit_button"
-            >
-              {t("EditButton")}
-            </Link>
-          ) : null}
-        </Text>
-      </div>
+          }}
+          components={{
+            1: <Text as="span" fontWeight={600} />,
+          }}
+        />
+      </Text>
     </div>
   );
 };
 
 export default observer(AutoPaymentInfo);
+

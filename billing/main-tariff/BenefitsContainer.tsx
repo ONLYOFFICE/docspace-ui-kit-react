@@ -66,7 +66,7 @@ const BenefitsContainer = observer(({ t }: { t: TTranslation }) => {
         iconNode={<HelpReactSvg />}
         tooltipContent={
           <CommonTrans
-            i18nKey="NeedMoreGoToServices"
+            i18nKey="NeedMoreGoToAddons"
             components={{
               1: (
                 <Link

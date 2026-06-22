@@ -197,7 +197,8 @@ const Amount = (props: AmountProps) => {
         </FieldContainer>
       </div>
 
-      {!hasCustomerAccess || walletCustomerStatusNotActive ? (
+      {!hasCustomerAccess ||
+      (walletCustomerEmail && walletCustomerStatusNotActive) ? (
         <Tooltip
           id="iconTooltip"
           place="bottom"
@@ -213,3 +214,4 @@ const Amount = (props: AmountProps) => {
 };
 
 export default Amount;
+

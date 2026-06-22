@@ -73,6 +73,7 @@ type TAiToolsChatModelPrice = {
   alias: string;
   provider: string;
   image: string;
+  link?: string;
   price: TAiToolsChatPrice;
 };
 
@@ -81,6 +82,7 @@ type TAiToolsEmbeddingModelPrice = {
   alias: string;
   provider: string;
   image: string;
+  link?: string;
   price: TAiToolsEmbeddingPrice;
 };
 
@@ -89,6 +91,7 @@ type TAiToolsWebSearchPrice = {
   alias: string;
   provider: string;
   image: string;
+  link?: string;
   price: number;
 };
 
@@ -108,6 +111,59 @@ export type TPaymentUser = {
   isOwner: boolean;
 };
 
+export type TUpcomingPaymentActionType = "edit-plan" | "edit-subscription";
+
+export type TUpcomingPayment = {
+  id: string;
+  renewalDate: string;
+  title: string;
+  quantity: number;
+  unitOfMeasure: string;
+  amount: number;
+  actionType?: TUpcomingPaymentActionType;
+};
+
+export type TUpcomingPaymentResponse = {
+  id: number;
+  name: string;
+  title: string;
+  unitOfMeasure: string;
+  quantity: number;
+  wallet: boolean;
+  dueDate: string;
+  amount: number;
+  currency: string;
+};
+
+export type TServiceUsage = {
+  service: string;
+  serviceUnit: string;
+  currency: string;
+  totalQuantity: number;
+  totalAmount: number;
+  operationCount: number;
+  title: string;
+};
+
+/** A single month bucket from the monthly usage endpoint. */
+export type TServiceUsageMonthly = {
+  year: number;
+  month: number;
+  currency: string;
+  totalAmount: number;
+  operationCount: number;
+};
+
+/** Selectable period for the Usage page spending breakdown. */
+export type TUsagePeriodKey =
+  | "thisMonth"
+  | "lastMonth"
+  | "last3Months"
+  | "last6Months"
+  | "last12Months"
+  | "thisYear"
+  | "lastYear";
+
 export type TPaymentRoutes = {
   portalPayments: string;
   services: string;
@@ -116,7 +172,6 @@ export type TPaymentRoutes = {
   diskStorage: string;
 };
 
-/** Minimal config provided by the host application. Everything else is fetched internally. */
 export type TPaymentConfig = {
   language: string;
   routes?: TPaymentRoutes;

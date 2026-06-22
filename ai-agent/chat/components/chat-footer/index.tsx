@@ -43,6 +43,14 @@ const ChatFooter = ({
   aiReady,
   isPortalAdmin,
   standalone,
+  isPayer,
+  isCardLinkedToPortal,
+  walletCustomerEmail,
+  walletCustomerDisplayName,
+  onActivateAI,
+  onTopUpAndActivateAI,
+  onShowAIBenefits,
+  isActivating,
   attachmentFile,
   clearAttachmentFile,
   hideAttachments,
@@ -63,7 +71,18 @@ const ChatFooter = ({
   return (
     <div className={styles.chatFooter} data-testid="chat-footer">
       {!isLoading && !aiReady ? (
-        <ChatInfoBlock standalone={standalone} isPortalAdmin={isPortalAdmin} />
+        <ChatInfoBlock
+          standalone={standalone}
+          isPortalAdmin={isPortalAdmin}
+          isPayer={isPayer}
+          isCardLinkedToPortal={isCardLinkedToPortal}
+          walletCustomerEmail={walletCustomerEmail}
+          walletCustomerDisplayName={walletCustomerDisplayName}
+          onActivateAI={onActivateAI}
+          onTopUpAndActivateAI={onTopUpAndActivateAI}
+          onShowAIBenefits={onShowAIBenefits}
+          isActivating={isActivating}
+        />
       ) : null}
       <ChatInput
         attachmentFile={attachmentFile}

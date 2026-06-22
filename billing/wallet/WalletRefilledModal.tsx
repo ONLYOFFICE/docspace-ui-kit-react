@@ -38,10 +38,7 @@ import { useCommonTranslation } from "../../utils/i18n";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
-import {
-  ModalDialog,
-  ModalDialogType,
-} from "../../components/modal-dialog";
+import { ModalDialog, ModalDialogType } from "../../components/modal-dialog";
 import { Text } from "../../components/text";
 import { Button, ButtonSize } from "../../components/button";
 import { toastr } from "../../components/toast";
@@ -53,10 +50,11 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 
 type WalletRefilledModalProps = {
   visible: boolean;
+  onClose?: () => void;
 };
 
 const WalletRefilledModal = (props: WalletRefilledModalProps) => {
-  const { visible } = props;
+  const { visible, onClose } = props;
 
   const paymentStore = usePaymentStore();
 
@@ -69,6 +67,7 @@ const WalletRefilledModal = (props: WalletRefilledModalProps) => {
     minBalance,
     updatePreviousBalance,
     formatWalletCurrency,
+    wasChangeBalance,
   } = paymentStore;
 
   const t = useCommonTranslation();
@@ -79,6 +78,7 @@ const WalletRefilledModal = (props: WalletRefilledModalProps) => {
 
   const onCloseDialog = () => {
     updatePreviousBalance!();
+    onClose?.();
   };
 
   const onAdditionalSave = async () => {
@@ -106,24 +106,29 @@ const WalletRefilledModal = (props: WalletRefilledModalProps) => {
       displayType={ModalDialogType.modal}
       autoMaxHeight
     >
-      <ModalDialog.Header>{t("WalletRefilled")}</ModalDialog.Header>
+      <ModalDialog.Header>
+        {wasChangeBalance ? t("WalletRefilled") : t("TopUpCredits")}
+      </ModalDialog.Header>
       <ModalDialog.Body>
         <div className={styles.modalContent}>
-          <div>
-            <Text as="span">{t("ToppedUpWallet")}</Text>
-            <br />
-            <Text as="span">
-              <CommonTrans
-               
-                i18nKey="CurrentBalance"
-                values={{ balance: formattedBalance }}
-                components={{
-                  1: <span style={{ fontWeight: 600 }} />,
-                }}
-              />
-            </Text>
-          </div>
-          <Text>{t("WouldYouLikeToEnableAutoTopUps")}</Text>
+          {wasChangeBalance ? (
+            <>
+              <div>
+                <Text as="span">{t("ToppedUpWallet")}</Text>
+                <br />
+                <Text as="span">
+                  <CommonTrans
+                    i18nKey="AvailableCreditsAmount"
+                    values={{ balance: formattedBalance }}
+                    components={{
+                      1: <span style={{ fontWeight: 600 }} />,
+                    }}
+                  />
+                </Text>
+              </div>
+              <Text>{t("WouldYouLikeToEnableAutoTopUps")}</Text>
+            </>
+          ) : null}
 
           <AutomaticPaymentsBlock
             onAdditionalSave={onAdditionalSave}

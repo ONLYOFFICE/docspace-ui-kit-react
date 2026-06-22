@@ -40,6 +40,7 @@ import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
 import { Button, ButtonSize } from "../../../../components/button";
+import { Link } from "../../../../components/link";
 
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import TransactionHistory from "../../../shared/transaction-history";
@@ -47,13 +48,19 @@ import styles from "./BackupPage.module.scss";
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { BACKUP_SERVICE } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
+import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
 import { useApi } from "../../../../providers";
-import { now, formatDateLocalized } from "../../../../utils/date";
+import {
+  now,
+  formatDateLocalized,
+  formatWithTimezone,
+  getAppTimezone,
+} from "../../../../utils/date";
 import { getCookie } from "../../../../utils/cookie";
 import { LANGUAGE } from "../../../../constants";
 import { toastr } from "../../../../components";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
-import TopUpModal from "../../../shared/top-up-balance/TopUpModal";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import BackupPageLoader from "./BackupPageLoader";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
@@ -62,9 +69,13 @@ import { getBrandName } from "../../../../constants/brands";
 
 type BackupPageProps = {
   withBottomMargin?: boolean;
+  onViewMore?: () => void;
 };
 
-const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
+const BackupPage: React.FC<BackupPageProps> = ({
+  withBottomMargin,
+  onViewMore,
+}) => {
   const { paymentApi } = useApi();
   const paymentStore = usePaymentStore();
   const servicesStore = useServicesStore();
@@ -76,11 +87,17 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
     changeServiceState,
     isBackupServiceOn,
     isServiceActionDisabled,
+    language,
   } = paymentStore;
 
   const { isFreeTariff, maxFreeBackups } = paymentStore.quotas;
-  const { usedBackupsCount, isInitServicesData, initServiceData } =
-    servicesStore;
+  const {
+    freeBackupsUsed,
+    paidBackupsUsed,
+    backupUsage,
+    isInitServicesData,
+    initServiceData,
+  } = servicesStore;
 
   const t = useCommonTranslation();
 
@@ -154,6 +171,20 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
 
   const isLowBalance = isBackupServiceOn && availableBackupsCount === 0;
 
+  const renewsDate = formatDateLocalized(
+    now().setZone(window.timezone).startOf("month").plus({ months: 1 }),
+    "DATE_MED",
+    { locale: getCookie(LANGUAGE) ?? "en" },
+  );
+
+  const monthLabel = formatWithTimezone(now(), "LLLL yyyy", {
+    locale: language,
+    timezone: getAppTimezone(),
+  });
+
+  const monthSpend = backupUsage?.totalAmount ?? 0;
+  const totalBackupsUsed = freeBackupsUsed + paidBackupsUsed;
+
   if (shouldShowLoader) return <BackupPageLoader />;
 
   return (
@@ -164,116 +195,140 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
         onToggle={onConfirm}
         title={
           <Text fontSize="12px" fontWeight={400}>
-            {isFreeTariff ? (
-              <CommonTrans
-                i18nKey="BackupTitle"
-                values={{
-                  currency: formatWalletCurrency(backupServicePrice, 2),
-                }}
-                components={{
-                  1: <Text as="span" fontSize="13px" fontWeight={600} />,
-                }}
-              />
-            ) : (
-              <CommonTrans
-                i18nKey="AdditionalBackupTitle"
-                values={{
-                  currency: formatWalletCurrency(backupServicePrice, 2),
-                }}
-                components={{
-                  1: <Text as="span" fontSize="13px" fontWeight={600} />,
-                }}
-              />
-            )}
+            <CommonTrans
+              i18nKey="AdditionalBackupsTitle"
+              values={{
+                currency: formatWalletCurrency(backupServicePrice, 2),
+              }}
+              components={{
+                1: <Text as="span" fontSize="13px" fontWeight={600} />,
+              }}
+            />
           </Text>
         }
         description={t("BackupDescription")}
         isDisabled={isDisabled || isLoading}
       />
-      <WalletInfo
-        shortView
-        withoutBackground
-        balance={balance}
-        onTopUp={isLowBalance && !isDisabled ? onTopUp : undefined}
-      />
+      <WalletInfo withoutBackground balance={balance} onTopUp={onTopUp} />
+      {!paymentStore.tariff.isNotPaidPeriod && paymentStore.tariff.walletCustomerStatusNotActive ? (
+        <div className={styles.unlinkedBanner}>
+          <UnlinkedCardBanner />
+        </div>
+      ) : null}
       {isLowBalance ? (
         <Text className={styles.lowBalance} fontSize="15px" fontWeight={600}>
           {t("NeedTopUpWallet")}
         </Text>
       ) : null}
-      <div className={styles.backupsCard}>
-        <div className={styles.backupsHeader}>
+      <div className={styles.section}>
+        <Text fontWeight="700" fontSize="14px">
+          {t("AvailableBackups")}
+        </Text>
+
+        <div className={styles.cardsGrid}>
+          {!isFreeTariff ? (
+            <div className={styles.card}>
+              <Text className={styles.cardLabel}>
+                {t("FreeMonthlyBackups")}
+              </Text>
+              <Text className={styles.cardValue}>
+                {`${freeBackupsUsed}/${maxFreeBackups}`}
+              </Text>
+              <Text className={styles.cardCaption}>
+                {t("RenewsOnDate", { date: renewsDate })}
+              </Text>
+            </div>
+          ) : null}
+
+          <div className={styles.card}>
+            {isBackupServiceOn ? (
+              <>
+                <Text className={styles.cardLabel}>
+                  {t("AdditionalBackups")}
+                </Text>
+                <Text className={styles.cardValue}>
+                  {availableBackupsCount}
+                </Text>
+                <Text className={styles.cardCaption}>
+                  {t("PerBackup", {
+                    currency: formatWalletCurrency(backupServicePrice, 2),
+                  })}
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text fontWeight={600}>{t("AdditionalBackupsDisabled")}</Text>
+                <Button
+                  className={styles.cardEnableButton}
+                  size={ButtonSize.small}
+                  label={t("Enable")}
+                  onClick={onConfirm}
+                  isDisabled={isDisabled}
+                  primary
+                  scale
+                />
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
           <Text fontWeight="700" fontSize="14px">
-            {isFreeTariff && !isBackupServiceOn
-              ? t("PaidBackupDisabled")
-              : t("AvailableBackups")}
+            {t("Usage")}
           </Text>
+          {onViewMore ? (
+            <Link
+              className={styles.viewMoreLink}
+              fontSize="13px"
+              fontWeight="600"
+              color="accent"
+              textDecoration="underline"
+              onClick={onViewMore}
+              dataTestId="backup_view_more_link"
+            >
+              {t("ViewMore")}
+            </Link>
+          ) : null}
         </div>
 
-        {!isFreeTariff ? (
-          <div className={styles.freeBackupsAmountContainer}>
-            <div className={styles.backupsCount}>
-              <Text fontSize="28px" fontWeight="700">
-                {usedBackupsCount}
-              </Text>{" "}
-              <Text fontSize="20px" fontWeight="700">
-                /{maxFreeBackups}
-              </Text>
-            </div>
-            <Text className={styles.grayText}>{t("FreeMonthly")}</Text>
+        <div className={styles.cardsGrid}>
+          <div className={styles.card}>
+            <Text className={styles.cardLabel}>{t("MonthSpend")}</Text>
+            <Text className={styles.cardValue}>
+              {formatWalletCurrency(monthSpend, 2)}
+            </Text>
+            <Text className={styles.cardCaption}>
+              {t("ForPeriod", { period: monthLabel })}
+            </Text>
           </div>
-        ) : null}
-        {isBackupServiceOn ? (
-          <>
-            {!isFreeTariff ? <div className={styles.divider} /> : null}
-            <div className={styles.backupsAmountContainer}>
-              <Text fontSize="28px" fontWeight="700">
-                {availableBackupsCount}
+
+          <div className={styles.card}>
+            <Text className={styles.cardLabel}>{t("MonthUsage")}</Text>
+            <Text className={styles.cardValue}>{totalBackupsUsed}</Text>
+            {totalBackupsUsed > 0 ? (
+              <>
+                {!isFreeTariff ? (
+                  <Text className={styles.cardCaption}>
+                    {t("FreeBackups", { count: freeBackupsUsed })}
+                  </Text>
+                ) : null}
+                <Text className={styles.cardCaption}>
+                  {isFreeTariff
+                    ? t("BilledBackupsLabel")
+                    : t("BilledBackups", { count: paidBackupsUsed })}
+                </Text>
+              </>
+            ) : (
+              <Text className={styles.cardCaption}>
+                {t("NoBackupsUsedInMonth", { month: monthLabel })}
               </Text>
-              <Text className={styles.grayText}>
-                {t("CurrencyPerBackup", {
-                  currency: formatWalletCurrency(backupServicePrice, 2),
-                })}
-              </Text>
-            </div>
-          </>
-        ) : (
-          <Button
-            className={styles.backupButton}
-            size={ButtonSize.small}
-            label={!isFreeTariff ? t("EnablePaidBackup") : t("Enable")}
-            onClick={onConfirm}
-            isDisabled={isDisabled}
-            primary
-            scale
-          />
-        )}
+            )}
+          </div>
+        </div>
       </div>
-      {!isFreeTariff ? (
-        <Text className={styles.backupPaidInfo}>
-          <CommonTrans
-            i18nKey="FreeBackupsRenewsDate"
-            values={{
-              date: formatDateLocalized(
-                now()
-                  .setZone(window.timezone)
-                  .startOf("month")
-                  .plus({ months: 1 }),
-                "DATE_MED",
-                { locale: getCookie(LANGUAGE) ?? "en" },
-              ),
-            }}
-            components={{
-              1: <Text fontWeight="600" as="span" />,
-            }}
-          />
-        </Text>
-      ) : null}
-      {isFreeTariff && !isBackupServiceOn ? (
-        <Text className={styles.backupPaidInfo}>
-          {t("ActivateServiceToAllow")}
-        </Text>
-      ) : null}
+
       <div>
         <TransactionHistory serviceName={BACKUP_SERVICE} hideTypeFilter />
       </div>
@@ -288,10 +343,10 @@ const BackupPage: React.FC<BackupPageProps> = ({ withBottomMargin }) => {
         />
       ) : null}
       {isTopUpVisible ? (
-        <TopUpModal
+        <SimpleTopUpDialog
           visible={isTopUpVisible}
           onClose={onCloseTopUpModal}
-          serviceName={BACKUP_SERVICE}
+          isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
         />
       ) : null}
     </div>

@@ -33,9 +33,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { Trans } from "react-i18next";
+import { match } from "ts-pattern";
+
 import InfoIcon from "../../../../assets/info.outline.react.svg";
 
 import PublicRoomBar from "../../../../components/public-room-bar";
+import { Text } from "../../../../components/text";
+import { Link, LinkType } from "../../../../components/link";
+import { Loader, LoaderTypes } from "../../../../components/loader";
 
 import { ChatInfoBlockProps } from "../../Chat.types";
 import styles from "./ChatInfoBlock.module.scss";
@@ -45,27 +51,116 @@ import { getBrandName } from "../../../../constants/brands";
 export const ChatInfoBlock = ({
   standalone,
   isPortalAdmin,
+  isPayer,
+  isCardLinkedToPortal,
+  walletCustomerEmail,
+  walletCustomerDisplayName,
+  onActivateAI,
+  onTopUpAndActivateAI,
+  onShowAIBenefits,
+  isActivating,
 }: ChatInfoBlockProps) => {
   const t = useCommonTranslation();
-  const bodyText = !isPortalAdmin
-    ? t("AIDisabledInfoBlockUserDescription", {
+
+  const payerLabel = walletCustomerDisplayName || walletCustomerEmail;
+
+  const headerText =
+    standalone && isPortalAdmin
+      ? t("AIFeaturesAreCurrentlyDisabled")
+      : t("AIFeaturesNotActive");
+
+  // shared intro for the SaaS admin variants: what AI gives + wallet notice
+  const activateIntro = (
+    <Text as="span">{`${t("AIDisabledInfoBlockActivateWalletDescription")} `}</Text>
+  );
+
+  const bodyText = match([standalone, isPortalAdmin])
+    // standalone admin
+    .with([true, true], () =>
+      t("AIDisabledInfoBlockStandaloneDescription", {
         productName: getBrandName("ProductName"),
-      })
-    : standalone
-      ? t("AIDisabledInfoBlockAdminStandaloneDescription", {
-          productName: getBrandName("ProductName"),
-        })
-      : t("AIDisabledInfoBlockAdminSaasDescription", {
-          productName: getBrandName("ProductName"),
-        });
+      }),
+    )
+    // saas admin
+    .with([false, true], () =>
+      isPayer ? (
+        <>
+          {activateIntro}
+          {isActivating ? (
+            <Text
+              as="span"
+              style={{ display: "inline-flex", verticalAlign: "middle" }}
+            >
+              <Loader type={LoaderTypes.track} size="16px" />
+            </Text>
+          ) : (
+            <>
+              <Link
+                type={LinkType.action}
+                color="accent"
+                textDecoration={"underline"}
+                onClick={
+                  isCardLinkedToPortal ? onActivateAI : onTopUpAndActivateAI
+                }
+              >
+                {isCardLinkedToPortal ? t("Activate") : t("TopUpAndActivate")}
+              </Link>
+              {/* {" | "}
+              <Link
+                type={LinkType.action}
+                color="accent"
+                onClick={onShowAIBenefits}
+                textDecoration={"underline"}
+              >
+                {t("Benefits")}
+              </Link> */}
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          {activateIntro}
+          {payerLabel ? (
+            <Trans
+              i18nKey="Common:EmptyAIAgentsNotActiveYetContactPayer"
+              values={{ payerContact: payerLabel }}
+              components={{
+                1:
+                  walletCustomerEmail && !walletCustomerDisplayName ? (
+                    <Link
+                      key="chat-info-payer-link"
+                      type={LinkType.action}
+                      href={`mailto:${walletCustomerEmail}`}
+                      color="accent"
+                    />
+                  ) : (
+                    <Text
+                      key="chat-info-payer-name"
+                      as="span"
+                      fontWeight={600}
+                    />
+                  ),
+              }}
+            />
+          ) : null}
+        </>
+      ),
+    )
+    // standalone/saas user
+    .otherwise(() =>
+      t("AIDisabledInfoBlockContactAdminDescription", {
+        productName: getBrandName("ProductName"),
+      }),
+    );
 
   return (
     <PublicRoomBar
       className={styles.chatInfoBlock}
-      headerText={t("AIFeaturesAreCurrentlyDisabled")}
+      headerText={headerText}
       bodyText={bodyText}
       iconName={<InfoIcon />}
       dataTestId="chat-info-block"
     />
   );
 };
+

@@ -43,19 +43,36 @@ import { toastr } from "../../../components/toast";
 
 import { useCommonTranslation } from "../../../utils/i18n";
 import { toAbsoluteUrl } from "../../utils/url";
+import { AnalyticsEvents } from "../../../enums";
 
 import Amount from "./sub-components/Amount";
 import { AmountProvider, useAmountValue } from "../../wallet/context";
 
-import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import type PaymentStore from "../../store/PaymentStore";
+import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 
-import styles from "./styles/FirstTopUpDialog.module.scss";
+import styles from "./styles/SimpleTopUpDialog.module.scss";
+
+export type TSimpleTopUpDeps = {
+  paymentApi: PaymentApi;
+  formatWalletCurrency: PaymentStore["formatWalletCurrency"];
+  walletCodeCurrency: string;
+  fetchBalance: (isRefresh?: boolean) => Promise<number>;
+  fetchTransactionHistory?: PaymentStore["fetchTransactionHistory"];
+  walletCustomerStatusNotActive: boolean;
+  language: string;
+  fetchCardLinked: (
+    backUrl?: string,
+    successUrl?: string,
+  ) => Promise<string | null | undefined>;
+  walletBalance: number;
+  fetchCustomerInfo: (refresh?: boolean) => Promise<string | null | undefined>;
+};
 
 const MIN_AMOUNT = "10";
 const PAYMENT_CALLBACK_PATH = "/billing/payment-complete";
-const POLL_INITIAL_INTERVAL_MS = 3000;
-const POLL_MAX_INTERVAL_MS = 30000;
+const POLL_INITIAL_INTERVAL_MS = 2000;
+const POLL_MAX_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 
 const sleep = (ms: number, signal: AbortSignal) =>
@@ -92,53 +109,86 @@ const pollUntil = async (
   }
 };
 
+type TStripeCheckoutProps = Pick<
+  TSimpleTopUpDeps,
+  "walletCodeCurrency" | "language" | "fetchCardLinked"
+>;
+
 const openStripeCheckout = async (
-  paymentStore: PaymentStore,
+  { walletCodeCurrency, language, fetchCardLinked }: TStripeCheckoutProps,
   amount: string,
+  service?: string,
 ) => {
-  const currency = paymentStore.walletCodeCurrency || "USD";
-  const language = paymentStore.language || "en";
+  const currency = walletCodeCurrency || "USD";
+  const lang = language || "en";
   const backUrl = `${window.location.origin}${window.location.pathname}`;
-  const successUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}?currency=${currency}&amount=${amount}&type=wallet&language=${language}`;
 
-  await paymentStore.fetchCardLinked(backUrl, successUrl);
+  const serviceParam = service ? `&service=${service}` : "";
+  const successUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}?currency=${currency}&amount=${amount}&type=wallet&language=${lang}${serviceParam}`;
 
-  const linkUrl = paymentStore.cardLinked;
+  const linkUrl = await fetchCardLinked(backUrl, successUrl);
+
   if (!linkUrl) throw new Error("Missing Stripe checkout URL");
 
   window.open(toAbsoluteUrl(linkUrl), "_blank");
 };
 
+type TTopUpCompletionProps = Pick<
+  TSimpleTopUpDeps,
+  "walletBalance" | "fetchCustomerInfo" | "fetchBalance"
+>;
+
 const waitForTopUpCompletion = async (
-  paymentStore: PaymentStore,
+  {
+    walletBalance: initialBalance,
+    fetchCustomerInfo,
+    fetchBalance,
+  }: TTopUpCompletionProps,
   signal: AbortSignal,
 ) => {
-  const initialBalance = paymentStore.walletBalance;
-
   await pollUntil(async () => {
-    await paymentStore.tariff.fetchCustomerInfo(true);
-    return !!paymentStore.tariff.walletCustomerEmail;
+    const email = await fetchCustomerInfo(true);
+    return !!email;
   }, signal);
 
   await pollUntil(async () => {
-    await paymentStore.fetchBalance(true);
-    return paymentStore.walletBalance > initialBalance;
+    const newBalance = await fetchBalance(true);
+    return newBalance > initialBalance;
   }, signal);
 };
 
-type FirstTopUpDialogProps = {
+type SimpleTopUpDialogBaseProps = {
   visible: boolean;
   onClose: () => void;
   onConfirm?: () => Promise<void> | void;
+  isFirstTopUp?: boolean;
+  recommendedAmount?: string;
+  /** optional service to activate after the top-up (passed to the callback URL) */
+  service?: string;
 };
 
-const FirstTopUpDialogContent = observer(
-  ({ visible, onClose, onConfirm }: FirstTopUpDialogProps) => {
-    const t = useCommonTranslation();
-    const paymentStore = usePaymentStore();
+export type SimpleTopUpDialogProps = SimpleTopUpDialogBaseProps &
+  TSimpleTopUpDeps;
 
-    const { formatWalletCurrency } = paymentStore;
-    const { walletCustomerStatusNotActive } = paymentStore.tariff;
+const SimpleTopUpDialogContent = observer(
+  ({
+    visible,
+    onClose,
+    onConfirm,
+    isFirstTopUp = true,
+    paymentApi,
+    formatWalletCurrency,
+    walletCodeCurrency,
+    fetchBalance,
+    fetchTransactionHistory,
+    walletCustomerStatusNotActive,
+    language,
+    fetchCardLinked,
+    walletBalance,
+    fetchCustomerInfo,
+    service,
+  }: SimpleTopUpDialogProps) => {
+    const t = useCommonTranslation();
 
     const { amount, hasError } = useAmountValue();
 
@@ -154,9 +204,9 @@ const FirstTopUpDialogContent = observer(
 
     const isDisabled = isLoading || !amount || hasError;
 
-    const onContinue = async () => {
-      if (isDisabled) return;
+    const isStripeFlow = isFirstTopUp || walletCustomerStatusNotActive;
 
+    const onStripeContinue = async () => {
       const controller = new AbortController();
       abortControllerRef.current = controller;
       const { signal } = controller;
@@ -164,9 +214,16 @@ const FirstTopUpDialogContent = observer(
       setIsLoading(true);
 
       try {
-        await openStripeCheckout(paymentStore, amount);
+        await openStripeCheckout(
+          { walletCodeCurrency, language, fetchCardLinked },
+          amount,
+          service,
+        );
 
-        await waitForTopUpCompletion(paymentStore, signal);
+        await waitForTopUpCompletion(
+          { walletBalance, fetchCustomerInfo, fetchBalance },
+          signal,
+        );
 
         if (signal.aborted) return;
 
@@ -183,10 +240,49 @@ const FirstTopUpDialogContent = observer(
       }
     };
 
+    const onInstantTopUp = async () => {
+      setIsLoading(true);
+
+      try {
+        const res = await paymentApi.topUpDeposit({
+          topUpDepositRequestDto: {
+            amount: +amount,
+            currency: walletCodeCurrency,
+          },
+        });
+
+        if (!res?.data?.response) throw new Error(t("UnexpectedError"));
+
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: AnalyticsEvents.WalletTopUp });
+
+        const requests: Promise<unknown>[] = [fetchBalance(true)];
+        if (fetchTransactionHistory) requests.push(fetchTransactionHistory());
+        await Promise.allSettled(requests);
+
+        toastr.success(t("WalletToppedUp"));
+
+        await onConfirm?.();
+
+        onClose();
+      } catch (error) {
+        toastr.error(error as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const onContinue = async () => {
+      if (isDisabled) return;
+
+      if (isStripeFlow) await onStripeContinue();
+      else await onInstantTopUp();
+    };
+
     return (
       <ModalDialog
         visible={visible}
-        onClose={isLoading ? () => {} : onClose}
+        onClose={onClose}
         displayType={ModalDialogType.modal}
         autoMaxHeight
         withBodyScroll
@@ -196,7 +292,9 @@ const FirstTopUpDialogContent = observer(
         <ModalDialog.Body>
           <div className={styles.body}>
             <Text className={styles.description}>
-              {t("TopUpCreditsDescription")}
+              {isStripeFlow
+                ? t("TopUpCreditsDescription")
+                : t("TopUpCreditsAmountDescription")}
             </Text>
 
             <Amount
@@ -207,9 +305,15 @@ const FirstTopUpDialogContent = observer(
               withoutCustomerCheck
             />
 
-            <Text fontSize="12px" className={styles.helperText}>
-              {t("TopUpCreditsChargeHint")}
-            </Text>
+            {isStripeFlow ? (
+              <Text fontSize="12px" className={styles.helperText}>
+                {t("TopUpCreditsChargeHint")}
+              </Text>
+            ) : (
+              <Text fontSize="12px" className={styles.helperText}>
+                {t("TopUpTakeSomeTimeToComplete")}
+              </Text>
+            )}
           </div>
         </ModalDialog.Body>
 
@@ -217,7 +321,7 @@ const FirstTopUpDialogContent = observer(
           <div className={styles.footerButtons}>
             <Button
               key="ContinueToStripeButton"
-              label={t("ContinueToStripe")}
+              label={isStripeFlow ? t("ContinueToStripe") : t("TopUp")}
               size={ButtonSize.normal}
               primary
               scale
@@ -242,11 +346,11 @@ const FirstTopUpDialogContent = observer(
   },
 );
 
-const FirstTopUpDialog: React.FC<FirstTopUpDialogProps> = (props) => (
-  <AmountProvider>
-    <FirstTopUpDialogContent {...props} />
+const SimpleTopUpDialog: React.FC<SimpleTopUpDialogProps> = (props) => (
+  <AmountProvider initialAmount={props.recommendedAmount}>
+    <SimpleTopUpDialogContent {...props} />
   </AmountProvider>
 );
 
-export default FirstTopUpDialog;
+export default SimpleTopUpDialog;
 

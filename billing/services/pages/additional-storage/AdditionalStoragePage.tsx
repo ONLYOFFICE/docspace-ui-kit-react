@@ -56,6 +56,8 @@ import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./AdditionalStoragePage.module.scss";
 import { DISK_STORAGE, STORAGE_ENUM } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
+import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
 import { useApi } from "../../../../providers";
 import { toastr } from "../../../../components/toast";
@@ -102,6 +104,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     previousStoragePlanSize,
     isGracePeriod,
     hasStorageSubscription = false,
+    walletCustomerEmail,
     fetchPortalTariff,
   } = paymentStore.tariff;
 
@@ -114,6 +117,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
   const [isCancelLoading, setIsCancelLoading] = useState(false);
   const [isGracePeriodModalVisible, setIsGracePeriodModalVisible] =
     useState(false);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
 
   useEffect(() => {
     initServiceData(t, DISK_STORAGE, STORAGE_ENUM);
@@ -244,7 +248,16 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         description={t("AdjustStorageToExactAmount")}
       />
 
-      <WalletInfo shortView withoutBackground balance={balance} />
+      <WalletInfo
+        withoutBackground
+        balance={balance}
+        onTopUp={() => setIsTopUpDialogVisible(true)}
+      />
+      {!paymentStore.tariff.isNotPaidPeriod && paymentStore.tariff.walletCustomerStatusNotActive ? (
+        <div className={styles.unlinkedBanner}>
+          <UnlinkedCardBanner />
+        </div>
+      ) : null}
 
       {isScheduled ? (
         <div style={{ marginTop: 16 }}>
@@ -257,99 +270,119 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         </div>
       ) : null}
 
-      <div className={styles.subscriptionCard}>
-        <div className={styles.subscriptionHeader}>
-          <Text fontWeight={700} fontSize="14px">
-            {previousStoragePlanSize
-              ? t("NoActiveSubscription")
-              : t("CurrentSubscription")}
-          </Text>
-          {isDisabled || isScheduled || previousStoragePlanSize ? null : (
-            <>
-              <div
-                className={styles.settingsIcon}
-                onClick={(e) => contextMenuRef.current?.show(e)}
-              >
-                <SettingsIcon />
-              </div>
-              <ContextMenu ref={contextMenuRef} model={contextMenuItems} />
-            </>
-          )}
-        </div>
+      <div className={styles.subscriptionSection}>
+        {previousStoragePlanSize ? (
+          <div className={styles.noSubscriptionCard}>
+            <Text fontWeight={700} fontSize="14px">
+              {t("NoActiveSubscription")}
+            </Text>
+            <Button
+              label={t("BuyStorage")}
+              size={ButtonSize.small}
+              primary
+              onClick={openUpgradeDialog}
+              isDisabled={isDisabled}
+              scale
+            />
+          </div>
+        ) : (
+          <div className={styles.subscriptionHeader}>
+            <Text fontWeight={700} fontSize="14px">
+              {t("CurrentSubscription")}
+            </Text>
+            {isDisabled || isScheduled ? null : (
+              <>
+                <div
+                  className={styles.settingsIcon}
+                  onClick={(e) => contextMenuRef.current?.show(e)}
+                >
+                  <SettingsIcon />
+                </div>
+                <ContextMenu ref={contextMenuRef} model={contextMenuItems} />
+              </>
+            )}
+          </div>
+        )}
 
         {currentStoragePlanSize ? (
-          <div className={styles.priceContainer}>
-            <BalanceAmount
-              amount={monthlyPrice}
-              currency={walletCodeCurrency}
-              language={paymentStore.language}
-              showRefresh={false}
-              withoutMargin
-              mainFontSize="28px"
-              fractionFontSize="20px"
-            />
-            <Text fontWeight={700} fontSize="20px">
-              <CommonTrans
-                i18nKey="SizePerMonth"
-                values={{
-                  size: `${currentStoragePlanSize} ${t("Gigabyte")}`,
-                }}
-                components={{
-                  1: (
-                    <Text
-                      as="span"
-                      fontSize="20px"
-                      className={styles.sizeText}
-                      fontWeight={700}
-                    />
-                  ),
-                }}
+          <div className={styles.summaryGrid}>
+            <div className={styles.summaryCard}>
+              <Text className={styles.cardLabel}>{t("MonthlyCharge")}</Text>
+              <BalanceAmount
+                amount={monthlyPrice}
+                currency={walletCodeCurrency}
+                language={paymentStore.language}
+                showRefresh={false}
+                withoutMargin
+                mainFontSize="18px"
+                fractionFontSize="12px"
               />
-            </Text>
+              <Text className={styles.cardCaption}>
+                {t("PerStorage", {
+                  currency: formatWalletCurrency(storagePriceIncrement, 2),
+                  amount: `1 ${t("Gigabyte")}`,
+                })}
+              </Text>
+            </div>
+
+            <div className={styles.summaryCard}>
+              <Text className={styles.cardLabel}>{t("StorageAdded")}</Text>
+              <Text className={styles.cardValue}>
+                {`${currentStoragePlanSize} ${t("Gigabyte")}`}
+              </Text>
+              <Text className={styles.cardCaption}>
+                {t("AdditionalDiskSpace")}
+              </Text>
+            </div>
           </div>
         ) : null}
 
-        {isScheduled ? null : (
-          <Button
-            className={styles.increaseButton}
-            label={
-              previousStoragePlanSize ? t("BuyStorage") : t("EditSubscription")
-            }
-            size={ButtonSize.small}
-            primary
-            onClick={openUpgradeDialog}
-            isDisabled={isDisabled}
-          />
-        )}
-      </div>
+        {!isScheduled || currentStoragePlanSize ? (
+          <div className={styles.actionRow}>
+            {currentStoragePlanSize && !isScheduled ? (
+              <Button
+                label={t("EditSubscription")}
+                size={ButtonSize.small}
+                primary
+                onClick={openUpgradeDialog}
+                isDisabled={isDisabled}
+                className="edit-subscription"
+              />
+            ) : null}
 
-      {currentStoragePlanSize ? (
-        <Text className={styles.renewalText}>
-          {isDowngrade ? (
-            <CommonTrans
-              i18nKey="SubscriptionAutoRenewedWithUpdate"
-              values={{
-                finalDate: storageExpiryDate,
-                price: formatWalletCurrency(getTotalNextStoragePrice(), 2),
-                amount: `${nextStoragePlanSize} ${t("Gigabyte")}`,
-              }}
-              components={{
-                1: <Text fontWeight="600" as="span" />,
-              }}
-            />
-          ) : (
-            <CommonTrans
-              i18nKey={keyProp.tKey}
-              values={{
-                finalDate: storageExpiryDate,
-              }}
-              components={{
-                1: <Text fontWeight="600" as="span" />,
-              }}
-            />
-          )}
-        </Text>
-      ) : null}
+            {currentStoragePlanSize ? (
+              <Text className={styles.renewalText}>
+                {isDowngrade ? (
+                  <CommonTrans
+                    i18nKey="SubscriptionAutoRenewedWithUpdate"
+                    values={{
+                      finalDate: storageExpiryDate,
+                      price: formatWalletCurrency(
+                        getTotalNextStoragePrice(),
+                        2,
+                      ),
+                      amount: `${nextStoragePlanSize} ${t("Gigabyte")}`,
+                    }}
+                    components={{
+                      1: <Text fontWeight="600" as="span" />,
+                    }}
+                  />
+                ) : (
+                  <CommonTrans
+                    i18nKey={keyProp.tKey}
+                    values={{
+                      finalDate: storageExpiryDate,
+                    }}
+                    components={{
+                      1: <Text fontWeight="600" as="span" />,
+                    }}
+                  />
+                )}
+              </Text>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
 
       <div className={styles.transactionSection}>
         <TransactionHistory
@@ -383,6 +416,13 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         <GracePeriodModal
           visible={isGracePeriodModalVisible}
           onClose={onCloseGracePeriod}
+        />
+      ) : null}
+      {isTopUpDialogVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpDialogVisible}
+          onClose={() => setIsTopUpDialogVisible(false)}
+          isFirstTopUp={!walletCustomerEmail}
         />
       ) : null}
     </div>

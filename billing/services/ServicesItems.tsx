@@ -60,7 +60,6 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import { Link, LinkTarget } from "../../components/link";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
-import PricingBillingBody from "./panels/ai-service/PricingBillingBody";
 
 type ServicesItemsProps = {
   onToggle?: (id: string, enabled: boolean) => void;
@@ -69,6 +68,7 @@ type ServicesItemsProps = {
   isMobile?: boolean;
   isTablet?: boolean;
   cardDisabled?: boolean;
+  onOpenSupportedModels?: () => void;
 };
 
 const ServicesItems: React.FC<ServicesItemsProps> = ({
@@ -77,9 +77,9 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   isMobile,
   isTablet,
   cardDisabled: forceCardDisabled,
+  onOpenSupportedModels,
 }) => {
   const paymentStore = usePaymentStore();
-  const servicesStore = useServicesStore();
 
   const {
     isServiceActionDisabled,
@@ -92,14 +92,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     availableBackupsCount,
     isBackupServiceOn,
     isStorageDeactivationVisited,
+    isLowWalletBalance,
   } = paymentStore;
-
-  const {
-    aiServiceBalance,
-    formatAiServiceCurrency,
-    isAiServiceLowBalance,
-    wasFirstAiServiceTopUp,
-  } = servicesStore;
 
   const { isFreeTariff } = paymentStore.quotas;
 
@@ -116,8 +110,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
   const isDisabled = isServiceActionDisabled;
   const { t } = useServicesActions();
-
-  const [isPricingBillingVisible, setIsPricingBillingVisible] = useState(false);
 
   const permissionTooltipText = usePermissionTooltipText();
 
@@ -147,15 +139,15 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     onClick?.(id!);
   };
 
-  const onOpenPricingBilling = (e: React.MouseEvent) => {
+  const onSupportedModelsClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    setIsPricingBillingVisible(true);
+    onOpenSupportedModels?.();
   };
 
-  const onClosePricingBilling = () => {
-    setIsPricingBillingVisible(false);
+  const onPricingLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   const textTooltip = (
@@ -229,30 +221,51 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
         });
 
       case AI_ENUM:
-        if (isAiServiceLowBalance) {
-          return t("AIPricingAvailableCreditsLowBalance", {
-            price: formatAiServiceCurrency(),
-          });
-        }
-
-        if (aiServiceBalance && aiServiceBalance > 0) {
-          return t("AIPricingAvailableCredits", {
-            price: formatAiServiceCurrency(),
-          });
+        if (isLowWalletBalance) {
+          return (
+            <CommonTrans
+              i18nKey="AIPricingLowBalanceWithModels"
+              values={{ price: formatWalletCurrency() }}
+              components={{
+                1: (
+                  <Link
+                    fontSize="13px"
+                    fontWeight={600}
+                    color="accent"
+                    textDecoration="underline dotted"
+                    onClick={onSupportedModelsClick}
+                    dataTestId="ai_supported_models_link"
+                  />
+                ),
+              }}
+            />
+          );
         }
 
         return (
           <CommonTrans
-            i18nKey="AIPricingBilledPerUsageAndPricing"
+            i18nKey="AIUsagePricingNote"
             components={{
               1: (
                 <Link
                   fontSize="13px"
                   fontWeight={600}
-                  className={styles.accountLink}
                   color="accent"
-                  onClick={onOpenPricingBilling}
                   textDecoration="underline dotted"
+                  href="https://openrouter.ai/models"
+                  target={LinkTarget.blank}
+                  onClick={onPricingLinkClick}
+                  dataTestId="ai_openrouter_pricing_link"
+                />
+              ),
+              2: (
+                <Link
+                  fontSize="13px"
+                  fontWeight={600}
+                  color="accent"
+                  textDecoration="underline dotted"
+                  onClick={onSupportedModelsClick}
+                  dataTestId="ai_supported_models_link"
                 />
               ),
             }}
@@ -265,17 +278,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
   return (
     <div style={{ width: "100%" }}>
-      <PricingBillingBody
-        visible={isPricingBillingVisible}
-        onClose={onClosePricingBilling}
-        isBackButton={false}
-        withoutFooter
-      />
-
       <Text className={styles.storageDescription}>
-        {isPayer || !isCardLinkedToPortal
-          ? t("ConnectAndConfigureServices")
-          : t("ServiceConfigurationNotice")}
+        {t("ConnectAndConfigureAddons")}
       </Text>
 
       <div
@@ -322,12 +326,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             return (
               <ServiceCard
                 key={item.id}
-                cardDisabled={
-                  forceCardDisabled ||
-                  (isCardLinkedToPortal
-                    ? !wasFirstAiServiceTopUp && !isPayer
-                    : false)
-                }
+                className={styles.aiCard}
+                cardDisabled={forceCardDisabled}
                 toggleDisabled={isDisabled}
                 onClick={handleClick}
                 onToggle={handleToggle}
@@ -338,12 +338,10 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 image={item.image}
                 isEnabled={item.value}
                 tooltip={isDisabled ? permissionTooltipText : undefined}
-                isInactiveColor={
-                  aiServiceBalance ? aiServiceBalance > 0 && !item.value : false
-                }
-                isErrorColor={isAiServiceLowBalance}
+                isErrorColor={isLowWalletBalance}
                 icon={<PriceIcon />}
-                withoutIcon={!wasFirstAiServiceTopUp}
+                withoutIcon={!isLowWalletBalance}
+                withoutGreenColor
               />
             );
           }
