@@ -125,7 +125,7 @@ const BreakdownRow = ({
         <div className={styles.download}>
           <Loader type={LoaderTypes.track} size="16px" />
         </div>
-      ) : (
+      ) : onDownload ? (
         <IconButton
           className={styles.download}
           size={16}
@@ -134,6 +134,8 @@ const BreakdownRow = ({
           isClickable
           dataTestId="usage_row_download"
         />
+      ) : (
+        <div className={styles.download} />
       )}
     </div>
   );

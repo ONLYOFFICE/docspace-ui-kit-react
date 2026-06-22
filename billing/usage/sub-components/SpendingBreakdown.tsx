@@ -66,7 +66,10 @@ type SpendingBreakdownProps = {
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
   onAIServicesClick?: () => void;
-  onDownloadReport?: (serviceName?: string) => void;
+  onDownloadReport?: (
+    serviceName?: string,
+    range?: { from: DateTime; to: DateTime },
+  ) => void;
 };
 
 const SpendingBreakdown = ({
@@ -86,6 +89,9 @@ const SpendingBreakdown = ({
   const [downloadingServices, setDownloadingServices] = useState<Set<string>>(
     new Set(),
   );
+  const [downloadingMonths, setDownloadingMonths] = useState<Set<string>>(
+    new Set(),
+  );
 
   const handleDownload = async (serviceName: string) => {
     if (downloadingServices.has(serviceName) || !onDownloadReport) return;
@@ -97,6 +103,26 @@ const SpendingBreakdown = ({
       setDownloadingServices((prev) => {
         const next = new Set(prev);
         next.delete(serviceName);
+        return next;
+      });
+    }
+  };
+
+  const handleMonthDownload = async (year: number, month: number) => {
+    const key = `${year}-${month}`;
+    if (downloadingMonths.has(key) || !onDownloadReport) return;
+
+    setDownloadingMonths((prev) => new Set(prev).add(key));
+    try {
+      const monthFrom = DateTime.fromObject({ year, month }).startOf("month");
+      await onDownloadReport(undefined, {
+        from: monthFrom,
+        to: monthFrom.endOf("month"),
+      });
+    } finally {
+      setDownloadingMonths((prev) => {
+        const next = new Set(prev);
+        next.delete(key);
         return next;
       });
     }
@@ -196,28 +222,60 @@ const SpendingBreakdown = ({
     </div>
   );
 
-  const monthRows = [...serviceUsageMonthly].sort(
-    (a, b) => a.year - b.year || a.month - b.month,
-  );
-
   const getMonthLabel = (year: number, month: number) =>
     DateTime.fromObject({ year, month })
       .setLocale(language || "en")
       .toFormat("LLLL yyyy");
 
+  const periodMonths: { year: number; month: number }[] = [];
+  let monthCursor = from.startOf("month");
+  const lastMonth = to.startOf("month");
+
+  while (monthCursor <= lastMonth) {
+    periodMonths.push({ year: monthCursor.year, month: monthCursor.month });
+    monthCursor = monthCursor.plus({ months: 1 });
+  }
+
+  const monthlyMap = new Map(
+    serviceUsageMonthly.map((item) => [`${item.year}-${item.month}`, item]),
+  );
+
+  const fallbackCurrency = serviceUsageMonthly[0]?.currency;
+
+  const monthRows = periodMonths.map(({ year, month }) => {
+    const data = monthlyMap.get(`${year}-${month}`);
+    return {
+      year,
+      month,
+      totalAmount: data?.totalAmount ?? 0,
+      currency: data?.currency ?? fallbackCurrency,
+      hasData: Boolean(data),
+    };
+  });
+
   const monthContent = isLoading ? (
     skeleton
-  ) : monthRows.length === 0 ? (
+  ) : serviceUsageMonthly.length === 0 ? (
     emptyView
   ) : (
     <div className={styles.list}>
-      {monthRows.map((item) => (
-        <BreakdownRow
-          key={`${item.year}-${item.month}`}
-          title={getMonthLabel(item.year, item.month)}
-          amount={formatWalletCurrency(item.totalAmount, 2)}
-        />
-      ))}
+      {monthRows.map((item) => {
+        const key = `${item.year}-${item.month}`;
+
+        return (
+          <BreakdownRow
+            key={key}
+            title={getMonthLabel(item.year, item.month)}
+            amount={formatWalletCurrency(item.totalAmount, 2, item.currency)}
+            onDownload={
+              item.hasData && onDownloadReport
+                ? () => handleMonthDownload(item.year, item.month)
+                : undefined
+            }
+            isDownloading={downloadingMonths.has(key)}
+          />
+        );
+      })}
     </div>
   );
 

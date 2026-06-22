@@ -603,13 +603,14 @@ class PaymentStore {
   formatWalletCurrency = (
     item: number | null = null,
     fractionDigits: number = 3,
+    currency?: string,
   ) => {
     const amount = item ?? this.walletBalance;
 
     return formatCurrencyValue(
       this.language,
       amount,
-      this.walletCodeCurrency,
+      currency || this.walletCodeCurrency,
       fractionDigits,
     );
   };

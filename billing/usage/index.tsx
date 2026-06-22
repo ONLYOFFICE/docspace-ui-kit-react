@@ -35,6 +35,7 @@
 
 import { type ReactNode, useEffect, useState } from "react";
 import { observer } from "mobx-react";
+import type { DateTime } from "luxon";
 
 import { Text } from "../../components/text";
 import { Link } from "../../components/link";
@@ -160,12 +161,15 @@ const Usage = ({
     ),
   };
 
-  const onDownloadReport = async (serviceName?: string) => {
-    if (!serviceName) setIsReportLoading(true);
+  const onDownloadReport = async (
+    serviceName?: string,
+    range?: { from: DateTime; to: DateTime },
+  ) => {
+    if (!serviceName && !range) setIsReportLoading(true);
     await paymentApi.createCustomerOperationsReport({
       customerOperationsReportRequestDto: {
-        startDate: formatDate!(from, "start"),
-        endDate: formatDate!(to, "end"),
+        startDate: formatDate!(range?.from ?? from, "start"),
+        endDate: formatDate!(range?.to ?? to, "end"),
         credit: true,
         debit: true,
         ...(serviceName ? { serviceName } : {}),
@@ -210,7 +214,7 @@ const Usage = ({
       window.open(result.resultFileUrl, openOnNewPage ? "_blank" : "_self");
     }
 
-    if (!serviceName) setIsReportLoading(false);
+    if (!serviceName && !range) setIsReportLoading(false);
   };
 
   return (
