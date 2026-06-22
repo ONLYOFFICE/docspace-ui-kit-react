@@ -260,8 +260,6 @@ const Services = observer(
         // }
 
         // updateDialogVisibility(AI_ENUM, true);
-
-        return;
       }
 
       if (
