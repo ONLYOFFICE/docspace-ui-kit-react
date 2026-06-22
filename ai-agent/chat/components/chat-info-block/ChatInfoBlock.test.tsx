@@ -103,6 +103,6 @@ describe("<ChatInfoBlock />", () => {
       "AIDisabledInfoBlockActivateWalletDescription",
     );
     expect(body).toHaveTextContent("Activate");
-    expect(body).toHaveTextContent("Benefits");
+    expect(body).not.toHaveTextContent("Benefits");
   });
 });

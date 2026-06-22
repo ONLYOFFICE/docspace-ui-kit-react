@@ -180,7 +180,7 @@ describe("<ChatNoAccessScreen />", () => {
     );
 
     expect(screen.getByTestId("option-activate-ai")).toBeInTheDocument();
-    expect(screen.getByTestId("option-ai-benefits")).toBeInTheDocument();
+    expect(screen.queryByTestId("option-ai-benefits")).not.toBeInTheDocument();
   });
 
   it("shows top up button for saas admin without a linked card", () => {
@@ -198,7 +198,7 @@ describe("<ChatNoAccessScreen />", () => {
     expect(
       screen.getByTestId("option-top-up-and-activate-ai"),
     ).toBeInTheDocument();
-    expect(screen.getByTestId("option-ai-benefits")).toBeInTheDocument();
+    expect(screen.queryByTestId("option-ai-benefits")).not.toBeInTheDocument();
   });
 
   it("hides buttons for saas admin who is not the payer", () => {
