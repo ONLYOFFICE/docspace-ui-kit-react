@@ -111,7 +111,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   const isDisabled = isServiceActionDisabled;
   const { t } = useServicesActions();
 
-
   const permissionTooltipText = usePermissionTooltipText();
 
   const handleToggle = (
