@@ -504,6 +504,7 @@ class ServicesStore {
     const range = getUsageRange(period);
 
     await Promise.all([
+      this.paymentStore.initWalletPayerAndBalance(false),
       this.fetchServiceUsage(range),
       this.fetchServiceUsageMonthly(range),
     ]);
