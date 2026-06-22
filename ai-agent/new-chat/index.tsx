@@ -25,6 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import React from "react";
+import { observer } from "mobx-react";
+import classNames from "classnames";
 
 import {
   ChatPage,
@@ -33,24 +35,31 @@ import {
   ChatList,
 } from "@onlyoffice/ai-chat";
 
+import { useIsDesktop } from "../../hooks/use-is-desktop";
+
 import { ChatToolbar } from "../chat-toolbar";
+import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
 
 import styles from "./NewChat.module.scss";
 
 // The in-chat AI settings section now lives in DocSpace portal settings.
 const AI_SETTINGS_URL = "/portal-settings/ai-settings";
 
-const NewChat = () => {
+const NewChat: React.FC = observer(() => {
+  const isDesktop = useIsDesktop();
+
   const stores = useStores();
   const currentPage = stores.useRouter((s) => s.currentPage);
   const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
   const profiles = stores.useProfilesStore((s) => s.profiles);
   const hasProfiles = profiles.length > 0;
 
-  // Whenever the widget router tries to open the settings page (gear button,
-  // "Open settings" actions, etc.), bounce the user to the portal AI settings
-  // page and reset the internal page so returning to the chat doesn't loop.
+  const aiChatStore = useAiChatStore();
+
+  const isFullScreen = aiChatStore.effectiveFullscreen;
+
   React.useEffect(() => {
+    // page and reset the internal page so returning to the chat doesn't loop. // "Open settings" actions, etc.), bounce the user to the portal AI settings // Whenever the widget router tries to open the settings page (gear button,
     if (currentPage === "settings") {
       setCurrentPage("chat");
       window.DocSpace?.navigate(AI_SETTINGS_URL);
@@ -63,6 +72,20 @@ const NewChat = () => {
     case "initial-setup":
       return <SettingsPage />;
     case "history":
+      if (isFullScreen && isDesktop) {
+        return (
+          <section className={styles.container}>
+            <div className={styles.chatList}>
+              <ChatList />
+            </div>
+            <div className={styles.chat}>
+              {hasProfiles ? <ChatToolbar /> : null}
+              <ChatPage />
+            </div>
+          </section>
+        );
+      }
+
       return <ChatList />;
     default: {
       return (
@@ -73,6 +96,8 @@ const NewChat = () => {
       );
     }
   }
-};
+});
+
+NewChat.displayName = "NewChat";
 
 export default NewChat;

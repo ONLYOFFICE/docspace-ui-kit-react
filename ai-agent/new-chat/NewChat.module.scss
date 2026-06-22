@@ -90,9 +90,23 @@
     display: none !important;
   }
 
-  :global(.text-\[var\(--text-tertiary\)\]) {
-    font-size: 10px !important;
-    font-weight: 400 !important;
-    color: var(--text-color) !important;
+  // :global(.text-\[var\(--text-tertiary\)\]) {
+  //   font-size: 10px !important;
+  //   font-weight: 400 !important;
+  //   color: var(--text-color) !important;
+  // }
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+
+  .chatList {
+    height: 100%;
+    min-height: 0;
+    border-inline-end: 1px solid var(--info-panel-border-color);
   }
 }
