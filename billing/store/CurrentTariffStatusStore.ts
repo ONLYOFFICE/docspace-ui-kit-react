@@ -65,8 +65,9 @@ class CurrentTariffStatusStore {
 
   private _tariffWalletQuota: (Quota & { additional?: boolean }) | null = null;
 
-  private _previousTariffWalletQuota: (Quota & { additional?: boolean }) | null =
-    null;
+  private _previousTariffWalletQuota:
+    | (Quota & { additional?: boolean })
+    | null = null;
 
   payerInfo: CustomerInfoDto = {
     portalId: null,
@@ -350,3 +351,4 @@ class CurrentTariffStatusStore {
 }
 
 export default CurrentTariffStatusStore;
+

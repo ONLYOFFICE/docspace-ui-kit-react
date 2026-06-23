@@ -77,21 +77,19 @@ const UpdatePlanButtonContainer = ({
   const {
     setIsLoading,
     paymentLink,
-    isAlreadyPaid,
     managersCount,
     isLoading,
     isLessCountThanAcceptable,
     canPayTariff,
-    cardLinkedOnFreeTariff,
     totalPrice,
     formatPaymentCurrency,
     canDowngradeTariff,
-    cardLinked,
     fetchBalance,
     walletBalance,
     walletCodeCurrency,
     tariffDueTodayAmount,
     isTariffDueTodayCalculating,
+    isCardLinkedToPortal,
   } = store;
   const {
     maxCountManagersByQuota,
@@ -183,7 +181,7 @@ const UpdatePlanButtonContainer = ({
   };
 
   const isPassedByQuota = () => {
-    return isAlreadyPaid ? canDowngradeTariff : canPayTariff;
+    return isCardLinkedToPortal ? canDowngradeTariff : canPayTariff;
   };
 
   const onDowngradeTariff = () => {
@@ -270,9 +268,7 @@ const UpdatePlanButtonContainer = ({
 
   return (
     <StyledBody>
-      {isAlreadyPaid || cardLinkedOnFreeTariff
-        ? updatingCurrentTariffButton()
-        : payTariffButton()}
+      {isCardLinkedToPortal ? updatingCurrentTariffButton() : payTariffButton()}
 
       {isVisibleDowngradePlanDialog ? (
         <ChangePricingPlanDialog
