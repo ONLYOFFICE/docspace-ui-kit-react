@@ -51,6 +51,7 @@ import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 type StorageWarningProps = {
   isDisabled?: boolean;
   title?: string;
+  body?: string;
   onCancelChange?: () => void;
   isCancelLoading?: boolean;
   style?: React.CSSProperties;
@@ -58,6 +59,7 @@ type StorageWarningProps = {
 
 const StorageWarning: React.FC<StorageWarningProps> = ({
   title,
+  body,
   onCancelChange,
   isCancelLoading,
   style,
@@ -84,10 +86,11 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
       </div>
 
       <Text>
-        {t("StorageWarning", {
-          amount: `${currentStoragePlanSize} ${t("Gigabyte")}`,
-          storageUnit: t("Gigabyte"),
-        })}
+        {body ??
+          t("StorageWarning", {
+            amount: `${currentStoragePlanSize} ${t("Gigabyte")}`,
+            storageUnit: t("Gigabyte"),
+          })}
       </Text>
 
       {!isDisabled && isCancellationMode ? (

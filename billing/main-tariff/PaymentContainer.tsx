@@ -45,6 +45,7 @@ import { HelpButton } from "../../components/help-button";
 import type { TTranslation } from "../../utils/common";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
+import { useApi } from "../../providers";
 
 import CurrentTariffContainer from "./CurrentTariffContainer";
 import PriceCalculation from "./PriceCalculation";
@@ -52,10 +53,13 @@ import BenefitsContainer from "./BenefitsContainer";
 import ContactContainer from "./ContactContainer";
 import WalletInfo from "../shared/top-up-balance/sub-components/WalletInfo";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import StorageWarning from "../services/panels/additional-storage/StorageWarning";
+import { getConvertedSize } from "../utils/common";
 import styles from "./MainTariff.module.scss";
 import { getBrandName } from "../../constants/brands";
 
 const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
+  const { paymentApi } = useApi();
   const store = usePaymentStore();
   const {
     formatPaymentCurrency,
@@ -66,12 +70,21 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
   } = store;
 
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
+  const [isCancelDowngradeLoading, setIsCancelDowngradeLoading] =
+    useState(false);
 
   const onTopUp = () => setIsTopUpVisible(true);
   const onCloseTopUp = () => setIsTopUpVisible(false);
 
-  const { isFreeTariff, isNonProfit, currentTariffPlanTitle, isYearTariff } =
-    store.quotas;
+  const {
+    isFreeTariff,
+    isNonProfit,
+    currentTariffPlanTitle,
+    isYearTariff,
+    maxCountManagersByQuota,
+    maxTotalSizeByQuota,
+    fetchPortalQuota,
+  } = store.quotas;
   const {
     isPaidPeriod,
     isPaymentDateValid,
@@ -80,10 +93,33 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     gracePeriodEndDate,
     delayDaysCount,
     paymentDate,
+    hasScheduledTariffAdminsChange,
+    currentTariffAdminsCount,
+    nextTariffAdminsCount,
+    fetchPortalTariff,
   } = store.tariff;
+  const { fetchBalance } = store;
   const { tariffPlanTitle, planCost } = store.paymentQuotas;
 
   const startValue = planCost.value;
+
+  const handleCancelTariffDowngrade = async () => {
+    setIsCancelDowngradeLoading(true);
+    try {
+      const res = await paymentApi.updateWalletPayment({
+        walletQuantityRequestDto: {
+          quantity: { adminwallet: null },
+          productQuantityType: 0,
+        },
+      });
+      if (res?.data?.response === false) throw new Error(t("UnexpectedError"));
+      await Promise.all([fetchPortalTariff(true), fetchBalance(true), fetchPortalQuota(true)]);
+    } catch {
+      // error handled by executeWalletUpdate pattern
+    } finally {
+      setIsCancelDowngradeLoading(false);
+    }
+  };
 
   const renderTooltip = () => {
     return (
@@ -288,6 +324,23 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
             balance={formatWalletCurrency()}
             onTopUp={onTopUp}
             withoutBackground
+          />
+        </div>
+      ) : null}
+
+      {hasScheduledTariffAdminsChange ? (
+        <div style={{ marginTop: 16 }}>
+          <StorageWarning
+            title={t("TariffDowngradeScheduled", {
+              fromCount: currentTariffAdminsCount,
+              toCount: nextTariffAdminsCount ?? 0,
+            })}
+            body={t("TariffDowngradeWarning", {
+              admins: maxCountManagersByQuota,
+              storage: getConvertedSize(t, maxTotalSizeByQuota),
+            })}
+            onCancelChange={handleCancelTariffDowngrade}
+            isCancelLoading={isCancelDowngradeLoading}
           />
         </div>
       ) : null}
