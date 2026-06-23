@@ -52,6 +52,14 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
 ) => {
   const { paymentApi } = useApi();
   const store = usePaymentStore();
+  const {
+    formatWalletCurrency,
+    walletCodeCurrency,
+    fetchTransactionHistory,
+    language,
+    walletBalance,
+  } = store;
+  const { walletCustomerStatusNotActive, fetchCustomerInfo: fetchCustomerInfoTariff, walletCustomerEmail } = store.tariff;
 
   const fetchBalance = async (isRefresh?: boolean) => {
     await store.fetchBalance(isRefresh);
@@ -64,22 +72,22 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
   };
 
   const fetchCustomerInfo = async (isRefresh?: boolean) => {
-    const info = await store.tariff.fetchCustomerInfo(isRefresh);
-    return info?.email ?? store.tariff.walletCustomerEmail;
+    const info = await fetchCustomerInfoTariff(isRefresh);
+    return info?.email ?? walletCustomerEmail;
   };
 
   return (
     <SimpleTopUpDialog
       {...props}
       paymentApi={paymentApi}
-      formatWalletCurrency={store.formatWalletCurrency}
-      walletCodeCurrency={store.walletCodeCurrency ?? ""}
+      formatWalletCurrency={formatWalletCurrency}
+      walletCodeCurrency={walletCodeCurrency ?? ""}
       fetchBalance={fetchBalance}
-      fetchTransactionHistory={store.fetchTransactionHistory}
-      walletCustomerStatusNotActive={store.tariff.walletCustomerStatusNotActive}
-      language={store.language ?? "en"}
+      fetchTransactionHistory={fetchTransactionHistory}
+      walletCustomerStatusNotActive={walletCustomerStatusNotActive}
+      language={language ?? "en"}
       fetchCardLinked={fetchCardLinked}
-      walletBalance={store.walletBalance ?? 0}
+      walletBalance={walletBalance ?? 0}
       fetchCustomerInfo={fetchCustomerInfo}
     />
   );
