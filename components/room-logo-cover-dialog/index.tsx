@@ -35,7 +35,10 @@ import { Button, ButtonSize } from "../button";
 
 import { RoomLogoCover } from "./RoomLogoCover";
 
-import type { RoomLogoCoverDialogProps, ICover } from "./RoomLogoCoverDialog.types";
+import type {
+  RoomLogoCoverDialogProps,
+  ICover,
+} from "./RoomLogoCoverDialog.types";
 import styles from "./RoomLogoCoverDialog.module.scss";
 
 const PADDING_HEIGHT = 84;
@@ -72,7 +75,9 @@ const RoomLogoCoverDialog = ({
     `${isDesktop() ? DESKTOP_HEIGHT : TABLET_HEIGHT}px`,
   );
   const [view, setView] = React.useState(isDesktop() ? "desktop" : "tablet");
-  const [scrollBodyHeight, setScrollBodyHeight] = React.useState<number | null>(null);
+  const [scrollBodyHeight, setScrollBodyHeight] = React.useState<number | null>(
+    null,
+  );
 
   const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -163,7 +168,7 @@ const RoomLogoCoverDialog = ({
       isScrollLocked={openColorPicker}
       dataTestId="room_logo_cover_dialog"
     >
-      <ModalDialog.Header>{t("RoomLogoCover:RoomCover")}</ModalDialog.Header>
+      <ModalDialog.Header>{t("Common:RoomCover")}</ModalDialog.Header>
       <ModalDialog.Body>
         <RoomLogoCover
           key={visible ? "open" : "closed"}
@@ -211,3 +216,4 @@ export { RoomLogoCoverDialog };
 export { RoomLogoCover };
 export type { RoomLogoCoverDialogProps, ICover };
 export type { RoomLogoCoverProps } from "./RoomLogoCover";
+
