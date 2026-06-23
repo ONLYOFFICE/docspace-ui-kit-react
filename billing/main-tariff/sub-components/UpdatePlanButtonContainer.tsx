@@ -113,29 +113,29 @@ const UpdatePlanButtonContainer = ({
   const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
   const isBalanceInsufficient = walletBalance < dueTodayAmount;
 
-  const onUpdateTariff = async () => {
+  const executeWalletUpdate = async (
+    quantity: number,
+    type: (typeof ProductQuantityType)[keyof typeof ProductQuantityType],
+  ) => {
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
-
-      if (isVisiblePaymentConfirm) onClose();
-
-      const recommendedAmount = isBalanceInsufficient
-        ? Math.ceil(dueTodayAmount - walletBalance)
-        : 0;
-
-      if (isBalanceInsufficient && recommendedAmount > 0) {
-        await paymentApi.topUpDeposit({
-          topUpDepositRequestDto: {
-            amount: recommendedAmount,
-            currency: walletCodeCurrency || "USD",
-          },
-        });
+      if (type === ProductQuantityType.Add && isBalanceInsufficient) {
+        const recommendedAmount = Math.ceil(dueTodayAmount - walletBalance);
+        if (recommendedAmount > 0) {
+          await paymentApi.topUpDeposit({
+            topUpDepositRequestDto: {
+              amount: recommendedAmount,
+              currency: walletCodeCurrency || "USD",
+            },
+          });
+        }
       }
 
       const updateRes = await paymentApi.updateWalletPayment({
         walletQuantityRequestDto: {
-          quantity: { adminwallet: managersCount - maxCountManagersByQuota },
-          productQuantityType: ProductQuantityType.Add,
+          quantity: { adminwallet: quantity },
+          productQuantityType: type,
         },
       });
 
@@ -143,20 +143,17 @@ const UpdatePlanButtonContainer = ({
 
       if (res === false) {
         toastr.error(t("ErrorNotification"));
-
         setIsLoading(false);
-
         return;
       }
 
-      window.dataLayer = window.dataLayer || [];
-
-      window.dataLayer.push({
-        event: AnalyticsEvents.Purchase,
-        ecommerce: {
-          items: [{ item_name: "DocSpace Business" }],
-        },
-      });
+      if (type === ProductQuantityType.Add) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: AnalyticsEvents.Purchase,
+          ecommerce: { items: [{ item_name: "DocSpace Business" }] },
+        });
+      }
 
       await Promise.all([
         fetchPortalTariff(true),
@@ -176,13 +173,25 @@ const UpdatePlanButtonContainer = ({
     }
   };
 
+  const onUpdateTariff = () => {
+    if (isVisiblePaymentConfirm) onClose();
+
+    return executeWalletUpdate(
+      managersCount - maxCountManagersByQuota,
+      ProductQuantityType.Add,
+    );
+  };
+
   const isPassedByQuota = () => {
     return isAlreadyPaid ? canDowngradeTariff : canPayTariff;
   };
 
   const onDowngradeTariff = () => {
     if (isPassedByQuota()) {
-      onUpdateTariff();
+      executeWalletUpdate(
+        maxCountManagersByQuota - managersCount,
+        ProductQuantityType.Set,
+      );
       return;
     }
 
