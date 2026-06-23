@@ -69,7 +69,7 @@ const TotalTariffContainer = observer(
       !isFreeTariff && managersCount < maxCountManagersByQuota;
     const isTheSameCount =
       !isFreeTariff && managersCount === maxCountManagersByQuota;
-    const isUpgrade = !isDowngradePlan && !isTheSameCount;
+    const isUpgrade = !isFreeTariff && !isDowngradePlan && !isTheSameCount;
 
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const controllerRef = useRef<AbortController | null>(null);
