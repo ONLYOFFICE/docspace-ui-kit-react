@@ -52,6 +52,37 @@
     max-width: 520px;
   }
 
+  .proratedNow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 18px;
+    margin-top: -8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--payment-price-container-feature-text);
+
+    .proratedNowPrice {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--payment-price-color);
+    }
+
+    .proratedNowLoader {
+      display: flex;
+      align-items: center;
+    }
+
+    &.isDisabled {
+      color: var(--payment-price-container-disable-color);
+
+      .proratedNowPrice {
+        color: var(--payment-price-container-disable-price-color);
+      }
+    }
+  }
+
   .paymentPriceTotalPrice {
     display: flex;
     justify-content: center;
