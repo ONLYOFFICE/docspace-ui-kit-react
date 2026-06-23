@@ -46,6 +46,8 @@ import type { TTranslation } from "../../utils/common";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useApi } from "../../providers";
+import { toastr } from "../../components/toast";
+import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 
 import CurrentTariffContainer from "./CurrentTariffContainer";
 import PriceCalculation from "./PriceCalculation";
@@ -105,17 +107,29 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
 
   const handleCancelTariffDowngrade = async () => {
     setIsCancelDowngradeLoading(true);
+
     try {
       const res = await paymentApi.updateWalletPayment({
         walletQuantityRequestDto: {
           quantity: { adminwallet: null },
-          productQuantityType: 0,
+          productQuantityType: ProductQuantityType.Set,
         },
       });
-      if (res?.data?.response === false) throw new Error(t("UnexpectedError"));
-      await Promise.all([fetchPortalTariff(true), fetchBalance(true), fetchPortalQuota(true)]);
-    } catch {
-      // error handled by executeWalletUpdate pattern
+      if (res?.data?.response === false) {
+        toastr.error(t("ErrorNotification"));
+        return;
+      }
+      await Promise.all([
+        fetchPortalTariff(true),
+        fetchBalance(true),
+        fetchPortalQuota(true),
+      ]);
+      toastr.success(
+        t("BusinessUpdated", { planName: currentTariffPlanTitle }),
+      );
+    } catch (e) {
+      console.error(e);
+      toastr.error(t("ErrorNotification"));
     } finally {
       setIsCancelDowngradeLoading(false);
     }

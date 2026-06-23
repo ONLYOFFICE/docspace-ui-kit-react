@@ -100,7 +100,7 @@ const UpdatePlanButtonContainer = ({
     isFreeTariff,
   } = store.quotas;
   const { tariffPlanTitle } = store.paymentQuotas;
-  const { fetchPortalTariff } = store.tariff;
+  const { fetchPortalTariff, hasScheduledTariffAdminsChange } = store.tariff;
 
   const [isVisiblePaymentConfirm, setIsVisiblePaymentConfirm] = useState(false);
   const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
@@ -238,7 +238,7 @@ const UpdatePlanButtonContainer = ({
     return isDowngradePlan ? (
       <DowngradePlanButtonContainer
         onDowngradeTariff={onDowngradeTariff}
-        isDisabled={isDisabled}
+        isDisabled={isDisabled || hasScheduledTariffAdminsChange}
         buttonLabel={t("DowngradeNow")}
       />
     ) : (
@@ -258,7 +258,8 @@ const UpdatePlanButtonContainer = ({
           isTheSameCount ||
           isLoading ||
           isDisabled ||
-          isTariffDueTodayCalculating
+          isTariffDueTodayCalculating ||
+          hasScheduledTariffAdminsChange
         }
         onClick={onUpdateTariff}
         isLoading={isLoading}
