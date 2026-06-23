@@ -36,6 +36,11 @@
     margin-top:20px;
   }
 
+
+  .unlinkedBanner {
+    margin-top: 10px;
+  }
+  
   .paymentInfoWrapper {
     display: flex;
     margin-top: 11px;
@@ -219,6 +224,7 @@
   .cardUnlinkedWarning {
     margin: 16px 0;
   }
+
 
   .warningColor {
     color: var(--warning-color);

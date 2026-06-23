@@ -56,6 +56,7 @@ import ContactContainer from "./ContactContainer";
 import WalletInfo from "../shared/top-up-balance/sub-components/WalletInfo";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import StorageWarning from "../services/panels/additional-storage/StorageWarning";
+import UnlinkedCardBanner from "../shared/unlinked-card-banner";
 import { getConvertedSize } from "../utils/common";
 import styles from "./MainTariff.module.scss";
 import { getBrandName } from "../../constants/brands";
@@ -99,6 +100,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     currentTariffAdminsCount,
     nextTariffAdminsCount,
     fetchPortalTariff,
+    walletCustomerStatusNotActive,
   } = store.tariff;
   const { fetchBalance } = store;
   const { tariffPlanTitle, planCost } = store.paymentQuotas;
@@ -342,7 +344,13 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
         </div>
       ) : null}
 
-      {hasScheduledTariffAdminsChange ? (
+      {!isNonProfit && !isNotPaidPeriod && walletCustomerStatusNotActive ? (
+        <div className={styles.unlinkedBanner}>
+          <UnlinkedCardBanner />
+        </div>
+      ) : null}
+
+      {!isNonProfit && hasScheduledTariffAdminsChange ? (
         <div style={{ marginTop: 16 }}>
           <StorageWarning
             title={t("TariffDowngradeScheduled", {
