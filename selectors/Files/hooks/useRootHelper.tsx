@@ -166,7 +166,7 @@ const useRootHelper = ({
 
         switch (folder.rootFolderType) {
           case FolderType.USER:
-            title = t("MyDocuments");
+            title = t("Files");
             break;
           case FolderType.VirtualRooms:
             title = t("Rooms");
