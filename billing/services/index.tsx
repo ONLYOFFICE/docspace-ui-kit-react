@@ -263,25 +263,21 @@ const Services = observer(
       }
 
       if (
-        id === TOTAL_SIZE &&
-        (currentStoragePlanSize || previousStoragePlanSize)
+        id === TOTAL_SIZE
+        // &&
+        // (currentStoragePlanSize || previousStoragePlanSize)
       ) {
         navigate(paymentStore.routes.diskStorage);
         return;
       }
 
-      if (id === TOTAL_SIZE && isGracePeriod) {
-        setIsGracePeriodModalVisible(true);
-        return;
-      }
+      // if (id === TOTAL_SIZE && isGracePeriod) {
+      //   setIsGracePeriodModalVisible(true);
+      //   return;
+      // }
 
-      if (id === BACKUP_SERVICE && isCardLinkedToPortal) {
+      if (id === BACKUP_SERVICE) {
         navigate(paymentStore.routes.backup);
-        return;
-      }
-
-      if (id === BACKUP_SERVICE && !isCardLinkedToPortal) {
-        setIsTopUpBalanceVisible(true);
         return;
       }
 
