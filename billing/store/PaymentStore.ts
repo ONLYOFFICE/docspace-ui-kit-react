@@ -1061,7 +1061,7 @@ class PaymentStore {
       requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
     }
 
-    requests.push(this.tariff.fetchPortalTariff());
+    requests.push(this.tariff.fetchPortalTariff(), this.fetchBalance());
 
     try {
       await Promise.all(requests);
@@ -1101,6 +1101,7 @@ class PaymentStore {
     requests.push(
       this.getSettingsPayment(),
       this.paymentQuotas.fetchPaymentQuotas(),
+      this.fetchBalance(isRefresh),
     );
 
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {

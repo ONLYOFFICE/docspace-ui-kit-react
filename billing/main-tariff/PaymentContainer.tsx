@@ -34,7 +34,7 @@
  */
 
 import HelpReactSvg from "../../assets/help.react.svg";
-import React from "react";
+import React, { useState } from "react";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
@@ -50,12 +50,25 @@ import CurrentTariffContainer from "./CurrentTariffContainer";
 import PriceCalculation from "./PriceCalculation";
 import BenefitsContainer from "./BenefitsContainer";
 import ContactContainer from "./ContactContainer";
+import WalletInfo from "../shared/top-up-balance/sub-components/WalletInfo";
+import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import styles from "./MainTariff.module.scss";
 import { getBrandName } from "../../constants/brands";
 
 const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
   const store = usePaymentStore();
-  const { formatPaymentCurrency } = store;
+  const {
+    formatPaymentCurrency,
+    isAlreadyPaid,
+    cardLinkedOnFreeTariff,
+    formatWalletCurrency,
+    isCardLinkedToPortal,
+  } = store;
+
+  const [isTopUpVisible, setIsTopUpVisible] = useState(false);
+
+  const onTopUp = () => setIsTopUpVisible(true);
+  const onCloseTopUp = () => setIsTopUpVisible(false);
 
   const { isFreeTariff, isNonProfit, currentTariffPlanTitle, isYearTariff } =
     store.quotas;
@@ -269,12 +282,31 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
         </div>
       ) : null}
 
+      {!isNonProfit && (isAlreadyPaid || cardLinkedOnFreeTariff) ? (
+        <div className={styles.walletInfoWrapper}>
+          <WalletInfo
+            balance={formatWalletCurrency()}
+            onTopUp={onTopUp}
+            withoutBackground
+          />
+        </div>
+      ) : null}
+
       <div className={styles.paymentInfo}>
         {!isNonProfit ? <PriceCalculation t={t} /> : null}
 
         <BenefitsContainer t={t} />
       </div>
       <ContactContainer t={t} />
+
+      {isTopUpVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpVisible}
+          onClose={onCloseTopUp}
+          onConfirm={onCloseTopUp}
+          isFirstTopUp={!isCardLinkedToPortal}
+        />
+      ) : null}
     </div>
   );
 });

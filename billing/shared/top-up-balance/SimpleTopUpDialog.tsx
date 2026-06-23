@@ -175,7 +175,7 @@ const SimpleTopUpDialogContent = observer(
     visible,
     onClose,
     onConfirm,
-    isFirstTopUp = true,
+    isFirstTopUp,
     paymentApi,
     formatWalletCurrency,
     walletCodeCurrency,

@@ -94,6 +94,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     isShowStorageTariffDeactivatedModal,
     setStorageDeactivationVisited,
     isServiceActionDisabled,
+    isCardLinkedToPortal,
   } = paymentStore;
 
   const {
@@ -104,7 +105,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     previousStoragePlanSize,
     isGracePeriod,
     hasStorageSubscription = false,
-    walletCustomerEmail,
+
     fetchPortalTariff,
   } = paymentStore.tariff;
 
@@ -253,7 +254,8 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         balance={balance}
         onTopUp={() => setIsTopUpDialogVisible(true)}
       />
-      {!paymentStore.tariff.isNotPaidPeriod && paymentStore.tariff.walletCustomerStatusNotActive ? (
+      {!paymentStore.tariff.isNotPaidPeriod &&
+      paymentStore.tariff.walletCustomerStatusNotActive ? (
         <div className={styles.unlinkedBanner}>
           <UnlinkedCardBanner />
         </div>
@@ -422,7 +424,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
-          isFirstTopUp={!walletCustomerEmail}
+          isFirstTopUp={!isCardLinkedToPortal}
         />
       ) : null}
     </div>
