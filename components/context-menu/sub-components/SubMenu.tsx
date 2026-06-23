@@ -565,7 +565,10 @@ const SubMenu = (props: SubMenuProps) => {
       item.tooltipTarget === "toggle" ? toggleTooltipId : itemTooltipId;
 
     const isActiveDescendant =
-      currentIndex === index && activeLevel == menuLevel && !item.disabled;
+      !isMobileDevice &&
+      currentIndex === index &&
+      activeLevel == menuLevel &&
+      !item.disabled;
 
     return (
       <li
