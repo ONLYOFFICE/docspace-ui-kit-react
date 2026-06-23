@@ -182,6 +182,10 @@ class PaymentStore {
 
   totalPrice = 30;
 
+  tariffDueTodayAmount: number | null = null;
+
+  isTariffDueTodayCalculating = false;
+
   managersCount = 1;
 
   maxAvailableManagersCount = 999;
@@ -1341,6 +1345,14 @@ class PaymentStore {
   setTotalPrice = (value: number) => {
     const price = this.getTotalCostByFormula(value);
     if (price !== this.totalPrice && price) this.totalPrice = price;
+  };
+
+  setTariffDueTodayAmount = (value: number | null) => {
+    this.tariffDueTodayAmount = value;
+  };
+
+  setIsTariffDueTodayCalculating = (value: boolean) => {
+    this.isTariffDueTodayCalculating = value;
   };
 
   setManagersCount = (managers: number) => {

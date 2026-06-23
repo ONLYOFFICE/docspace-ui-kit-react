@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { Text } from "../../../components/text";
@@ -56,6 +56,10 @@ const TotalTariffContainer = observer(
       maxAvailableManagersCount,
       managersCount,
       formatPaymentCurrency,
+      tariffDueTodayAmount,
+      setTariffDueTodayAmount,
+      isTariffDueTodayCalculating,
+      setIsTariffDueTodayCalculating,
     } = store;
     const { isYearTariff, maxCountManagersByQuota, isFreeTariff } =
       store.quotas;
@@ -67,20 +71,17 @@ const TotalTariffContainer = observer(
       !isFreeTariff && managersCount === maxCountManagersByQuota;
     const isUpgrade = !isDowngradePlan && !isTheSameCount;
 
-    const [proratedNow, setProratedNow] = useState<number | null>(null);
-    const [isCalculating, setIsCalculating] = useState(false);
-
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const controllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
       if (!isUpgrade || isNeedRequest) {
-        setProratedNow(null);
-        setIsCalculating(false);
+        setTariffDueTodayAmount(null);
+        setIsTariffDueTodayCalculating(false);
         return;
       }
 
-      setIsCalculating(true);
+      setIsTariffDueTodayCalculating(true);
 
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
@@ -103,11 +104,11 @@ const TotalTariffContainer = observer(
             amount: number;
           } | null;
 
-          if (result) setProratedNow(result.amount);
-          setIsCalculating(false);
+          if (result) setTariffDueTodayAmount(Math.ceil(result.amount));
+          setIsTariffDueTodayCalculating(false);
         } catch (e) {
           if (e instanceof Error && e.name === "CanceledError") return;
-          setIsCalculating(false);
+          setIsTariffDueTodayCalculating(false);
           toastr.error(t("ErrorNotification"));
         }
       }, 1000);
@@ -182,7 +183,7 @@ const TotalTariffContainer = observer(
             <Text as="span" fontSize="13px">
               {t("DueToday")}
             </Text>
-            {isCalculating || proratedNow === null ? (
+            {isTariffDueTodayCalculating || tariffDueTodayAmount === null ? (
               <Loader
                 color=""
                 size="16px"
@@ -191,7 +192,7 @@ const TotalTariffContainer = observer(
               />
             ) : (
               <Text as="span" className={styles.proratedNowPrice}>
-                {formatPaymentCurrency(proratedNow)}
+                {formatPaymentCurrency(tariffDueTodayAmount)}
               </Text>
             )}
           </div>

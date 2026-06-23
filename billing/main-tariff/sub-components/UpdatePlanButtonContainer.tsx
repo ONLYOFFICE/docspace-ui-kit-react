@@ -90,6 +90,8 @@ const UpdatePlanButtonContainer = ({
     fetchBalance,
     walletBalance,
     walletCodeCurrency,
+    tariffDueTodayAmount,
+    isTariffDueTodayCalculating,
   } = store;
   const {
     maxCountManagersByQuota,
@@ -108,7 +110,8 @@ const UpdatePlanButtonContainer = ({
     setIsVisiblePaymentConfirm(false);
   };
 
-  const isBalanceInsufficient = walletBalance < totalPrice;
+  const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
+  const isBalanceInsufficient = walletBalance < dueTodayAmount;
 
   const onUpdateTariff = async () => {
     try {
@@ -117,7 +120,7 @@ const UpdatePlanButtonContainer = ({
       if (isVisiblePaymentConfirm) onClose();
 
       const recommendedAmount = isBalanceInsufficient
-        ? Math.ceil(totalPrice - walletBalance)
+        ? Math.ceil(dueTodayAmount - walletBalance)
         : 0;
 
       if (isBalanceInsufficient && recommendedAmount > 0) {
@@ -233,14 +236,20 @@ const UpdatePlanButtonContainer = ({
       <Button
         className="upgrade-now-button"
         label={
-          isBalanceInsufficient && !isTheSameCount
+          tariffDueTodayAmount !== null &&
+          isBalanceInsufficient &&
+          !isTheSameCount
             ? t("TopUpAndUpgrade")
             : t("UpgradeNow")
         }
         size={ButtonSize.medium}
         primary
         isDisabled={
-          isLessCountThanAcceptable || isTheSameCount || isLoading || isDisabled
+          isLessCountThanAcceptable ||
+          isTheSameCount ||
+          isLoading ||
+          isDisabled ||
+          isTariffDueTodayCalculating
         }
         onClick={onUpdateTariff}
         isLoading={isLoading}
