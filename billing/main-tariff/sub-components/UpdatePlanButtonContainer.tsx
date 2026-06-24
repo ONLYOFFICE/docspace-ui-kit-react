@@ -48,6 +48,8 @@ import { Link } from "../../../components/link";
 
 import DowngradePlanButtonContainer from "./DowngradePlanButtonContainer";
 import ChangePricingPlanDialog from "../../dialogs/ChangePricingPlanDialog";
+import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import { getConvertedSize } from "../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { AnalyticsEvents } from "../../../enums";
 
@@ -76,7 +78,6 @@ const UpdatePlanButtonContainer = ({
 
   const {
     setIsLoading,
-    paymentLink,
     managersCount,
     isLoading,
     isLessCountThanAcceptable,
@@ -90,6 +91,7 @@ const UpdatePlanButtonContainer = ({
     tariffDueTodayAmount,
     isTariffDueTodayCalculating,
     isCardLinkedToPortal,
+    allowedStorageSizeByQuota,
   } = store;
   const {
     maxCountManagersByQuota,
@@ -103,6 +105,7 @@ const UpdatePlanButtonContainer = ({
   const [isVisiblePaymentConfirm, setIsVisiblePaymentConfirm] = useState(false);
   const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
     useState(false);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
 
   const onClose = () => {
     setIsVisiblePaymentConfirm(false);
@@ -200,29 +203,32 @@ const UpdatePlanButtonContainer = ({
     setIsVisibleDowngradePlanDialog(false);
   };
 
-  const goToStripePortal = () => {
-    paymentLink
-      ? window.open(paymentLink, "_blank")
-      : toastr.error(t("ErrorNotification"));
-  };
-
   const payTariffButton = () => {
-    return canPayTariff ? (
+    const buttonLabel = isCardLinkedToPortal
+      ? t("UpgradeNow")
+      : t("TopUpAndUpgrade");
+
+    const onClick = () => {
+      if (canPayTariff) {
+        isCardLinkedToPortal
+          ? executeWalletUpdate(managersCount, ProductQuantityType.Add)
+          : setIsTopUpDialogVisible(true);
+        return;
+      }
+
+      setIsVisibleDowngradePlanDialog(true);
+    };
+
+    return (
       <Button
         className="upgrade-now-button"
-        label={t("UpgradeNow")}
+        label={buttonLabel}
         size={ButtonSize.medium}
         primary
         isDisabled={isLessCountThanAcceptable || isLoading || isDisabled}
-        onClick={goToStripePortal}
+        onClick={onClick}
         isLoading={isLoading}
         testId="upgrade_plan_button"
-      />
-    ) : (
-      <DowngradePlanButtonContainer
-        buttonLabel={t("UpgradeNow")}
-        onUpdateTariff={goToStripePortal}
-        isDisabled={isDisabled}
       />
     );
   };
@@ -268,12 +274,31 @@ const UpdatePlanButtonContainer = ({
 
   return (
     <StyledBody>
-      {isCardLinkedToPortal ? updatingCurrentTariffButton() : payTariffButton()}
+      {!isFreeTariff ? updatingCurrentTariffButton() : payTariffButton()}
 
       {isVisibleDowngradePlanDialog ? (
         <ChangePricingPlanDialog
           visible={isVisibleDowngradePlanDialog}
           onClose={onCloseDowngradePlanDialog}
+        />
+      ) : null}
+
+      {isTopUpDialogVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpDialogVisible}
+          onClose={() => setIsTopUpDialogVisible(false)}
+          onConfirm={async () => {
+            setIsTopUpDialogVisible(false);
+            await (isFreeTariff
+              ? executeWalletUpdate(managersCount, ProductQuantityType.Add)
+              : onUpdateTariff());
+          }}
+          isFirstTopUp
+          successParams={{
+            admins: `${managersCount}`,
+            storage: getConvertedSize(t, allowedStorageSizeByQuota),
+            plan: isFreeTariff ? tariffPlanTitle : currentTariffPlanTitle,
+          }}
         />
       ) : null}
 
