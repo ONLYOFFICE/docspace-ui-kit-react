@@ -109,8 +109,7 @@ const Services = observer(
       servicesInit,
     } = servicesStore;
 
-    const { isGracePeriod, previousStoragePlanSize, currentStoragePlanSize } =
-      paymentStore.tariff;
+    const { isGracePeriod, previousStoragePlanSize } = paymentStore.tariff;
     const { isFreeTariff } = paymentStore.quotas;
     const { logoText } = paymentStore;
 

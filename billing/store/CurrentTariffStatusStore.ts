@@ -65,10 +65,6 @@ class CurrentTariffStatusStore {
 
   private _tariffWalletQuota: (Quota & { additional?: boolean }) | null = null;
 
-  private _previousTariffWalletQuota:
-    | (Quota & { additional?: boolean })
-    | null = null;
-
   payerInfo: CustomerInfoDto = {
     portalId: null,
     paymentMethodStatus: 0,
@@ -295,17 +291,10 @@ class CurrentTariffStatusStore {
         this._previousWalletQuota = [];
       }
 
-      if (tariffQuota) {
-        if ((tariffQuota.state as unknown as number) === 1) {
-          this._previousTariffWalletQuota = tariffQuota;
-          this._tariffWalletQuota = null;
-        } else {
-          this._tariffWalletQuota = tariffQuota;
-          this._previousTariffWalletQuota = null;
-        }
+      if (tariffQuota && (tariffQuota.state as unknown as number) !== 1) {
+        this._tariffWalletQuota = tariffQuota;
       } else {
         this._tariffWalletQuota = null;
-        this._previousTariffWalletQuota = null;
       }
 
       this.setIsLoaded(true);
