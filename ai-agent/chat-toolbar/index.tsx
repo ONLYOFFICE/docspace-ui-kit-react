@@ -27,6 +27,7 @@
 "use client";
 
 import { useTranslation } from "react-i18next";
+import classNames from "classnames";
 
 import { useStores } from "@onlyoffice/ai-chat";
 
@@ -40,8 +41,11 @@ import styles from "./ChatToolbar.module.scss";
 export const ChatToolbar = () => {
   const { t } = useTranslation("Common");
   const stores = useStores();
+  const currentPage = stores.useRouter((s) => s.currentPage);
   const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
   const startNewChat = stores.useThreadsStore((s) => s.onSwitchToNewThread);
+
+  const isHistoryActive = currentPage === "history";
 
   const handleNavigateToHistory = () => {
     setCurrentPage("history");
@@ -52,7 +56,9 @@ export const ChatToolbar = () => {
       <div className={styles.leftGroup}>
         <ActionButton
           icon={<HistoriesIcon />}
-          className={styles.button}
+          className={classNames(styles.button, {
+            [styles.active]: isHistoryActive,
+          })}
           label={t("Common:ChatHistory")}
           onClick={handleNavigateToHistory}
         />

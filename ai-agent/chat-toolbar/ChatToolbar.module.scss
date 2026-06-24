@@ -68,6 +68,11 @@
       --ab-color: var(--ab-color-active);
     }
 
+    &.active {
+      --ab-bg: var(--ab-bg-active);
+      --ab-color: var(--ab-color-active);
+    }
+
     svg {
       width: 16px;
       height: 16px;
