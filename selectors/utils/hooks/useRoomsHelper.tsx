@@ -38,6 +38,7 @@ import React, { use } from "react";
 import {
   RoomType as ApiRoomType,
   StorageFilter,
+  FolderType,
   type RoomType as RoomTypeEnum,
   type FolderDtoInteger,
   type SearchArea,
@@ -52,7 +53,11 @@ import { LoadersContext } from "../contexts/Loaders";
 import { PAGE_COUNT } from "../constants";
 import type { UseRoomsHelperProps } from "../types";
 import { useCommonTranslation } from "../../../utils/i18n";
-import { convertRoomsToItems, getDefaultBreadCrumb } from "..";
+import {
+  convertRoomsToItems,
+  getDefaultBreadCrumb,
+  buildSpecialFolderItems,
+} from "..";
 
 import useInputItemHelper from "./useInputItemHelper";
 
@@ -83,6 +88,12 @@ const useRoomsHelper = ({
   setSelectedItemSecurity,
   setSelectedTreeNode,
   isRoomDisabled,
+
+  recentFolder,
+  favoritesFolder,
+  withRecentTreeFolder,
+  withFavoritesTreeFolder,
+  roomsFolderId,
 }: UseRoomsHelperProps) => {
   const t = useCommonTranslation();
   const {
@@ -253,6 +264,31 @@ const useRoomsHelper = ({
         } else {
           setTotal(total);
         }
+
+        if (
+          startIndex === 0 &&
+          !searchValue &&
+          (withRecentTreeFolder || withFavoritesTreeFolder)
+        ) {
+          const specialItems = buildSpecialFolderItems({
+            section: formsSection ? "forms" : "rooms",
+            recentFolder,
+            favoritesFolder,
+            withRecent: withRecentTreeFolder,
+            withFavorites: withFavoritesTreeFolder,
+            parentId: formsSection ? undefined : roomsFolderId,
+            folderType: formsSection ? FolderType.FillingFormsRoom : undefined,
+            withSeparator: itemList.length > 0,
+            t,
+          });
+
+          if (specialItems.length) {
+            itemList.unshift(...specialItems);
+            const base = withCreate && security?.Create ? total + 1 : total;
+            setTotal(base + specialItems.length);
+          }
+        }
+
         setItems?.(itemList);
       } else {
         setItems?.((prevState) => {
@@ -297,6 +333,11 @@ const useRoomsHelper = ({
       excludeItems,
       setSelectedTreeNode,
       t,
+      recentFolder,
+      favoritesFolder,
+      withRecentTreeFolder,
+      withFavoritesTreeFolder,
+      roomsFolderId,
     ],
   );
 

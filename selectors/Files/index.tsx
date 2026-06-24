@@ -39,11 +39,19 @@ import React, { use } from "react";
 
 import { Portal } from "../../components/portal";
 
-import { FolderType, RoomType } from "@onlyoffice/docspace-api-sdk";
+import {
+  FolderType,
+  RoomType,
+  type FolderDtoInteger,
+} from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../providers/api/ApiProvider";
 import { DeviceType } from "../../enums";
 
-import type { TSelectorItem, TBreadCrumb } from "../../components/selector";
+import type {
+  TSelectorItem,
+  TBreadCrumb,
+  SpecialFolderScope,
+} from "../../components/selector";
 import { Aside } from "../../components/aside";
 import { Backdrop } from "../../components/backdrop";
 import { toastr } from "../../components/toast";
@@ -202,6 +210,15 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
   const [isFormsSection, setIsFormsSection] = React.useState(false);
 
+  const [recentFolder, setRecentFolder] = React.useState<
+    FolderDtoInteger | undefined
+  >(undefined);
+  const [favoritesFolder, setFavoritesFolder] = React.useState<
+    FolderDtoInteger | undefined
+  >(undefined);
+  const [activeSpecialScope, setActiveSpecialScope] =
+    React.useState<SpecialFolderScope | null>(null);
+
   const { subscribe, unsubscribe } = useSocketHelper({
     disabledItems,
     disabledFolderType,
@@ -223,10 +240,10 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setItems,
     setHasNextPage,
     setIsInit,
-    withRecentTreeFolder,
-    withFavoritesTreeFolder,
     withAIAgentsTreeFolder,
     withFormsTreeFolder,
+    setRecentFolder,
+    setFavoritesFolder,
   });
 
   let rootFolderTypeItem = undefined;
@@ -257,6 +274,11 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withCreate: withCreateState,
     disableBySecurity,
 
+    recentFolder,
+    favoritesFolder,
+    withRecentTreeFolder,
+    withFavoritesTreeFolder,
+
     withInit,
   });
 
@@ -284,6 +306,12 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     createDefineRoomType,
     searchArea,
     isRoomDisabled,
+
+    recentFolder,
+    favoritesFolder,
+    withRecentTreeFolder,
+    withFavoritesTreeFolder,
+    roomsFolderId,
 
     withInit,
   });
@@ -328,6 +356,12 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     applyFilterOption,
     disableBySecurity,
     withSubFolders,
+
+    recentFolder,
+    favoritesFolder,
+    withRecentTreeFolder,
+    withFavoritesTreeFolder,
+    activeSpecialScope,
   });
 
   const onClickBreadCrumb = React.useCallback(
@@ -341,6 +375,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             setIsFirstLoad(false);
             return;
           }
+          setActiveSpecialScope(null);
           setSelectedItemSecurity(undefined);
           setSelectedItemType(undefined);
           getRootData();
@@ -383,9 +418,13 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           setSelectedItemId(item.id);
           selectedFileInfoRef.current = null;
           setSelectedFileInfo(null);
+          setActiveSpecialScope(null);
           if (item.isAgent) {
             setSelectedItemType("agents");
           } else if (item.isRoom) {
+            setIsFormsSection(
+              item.rootFolderType === FolderType.FillingFormsRoom,
+            );
             setSelectedItemType("rooms");
           } else {
             setSelectedItemType("files");
@@ -420,12 +459,37 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       if (item.isFolder) {
         if (isDoubleClick) return;
 
+        const specialScope = item.specialFolderScope;
+        if (specialScope) {
+          setIsFirstLoad(true);
+          setActiveSpecialScope(specialScope);
+          setBreadCrumbs((value) => [
+            ...value,
+            {
+              label: item.label,
+              id: item.id,
+              rootFolderType:
+                specialScope.kind === "recent"
+                  ? FolderType.Recent
+                  : FolderType.Favorites,
+            } as TBreadCrumb,
+          ]);
+          setSelectedItemId(specialScope.folderId);
+          setSearchValue("");
+          selectedFileInfoRef.current = null;
+          setSelectedFileInfo(null);
+          setSelectedItemType("files");
+          setIsFormsSection(false);
+          return;
+        }
+
         const isFormRoom = item.roomType === RoomType.FillingFormsRoom;
 
         if (isFormRoom && formProps?.isRoomFormAccessible === false)
           return toastr.warning(formProps.message);
 
         setIsFirstLoad(true);
+        setActiveSpecialScope(null);
 
         const isAgent =
           item.parentId === 0 && item.rootFolderType === FolderType.AiAgents;
@@ -443,6 +507,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             isAgent: isAgent,
             roomType: item.roomType,
             shared: item.shared,
+            rootFolderType: item.rootFolderType,
           } as TBreadCrumb,
         ]);
         setSelectedItemId(item.id);

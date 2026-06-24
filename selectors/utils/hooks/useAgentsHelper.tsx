@@ -47,7 +47,7 @@ import { LoadersContext } from "../contexts/Loaders";
 
 import { PAGE_COUNT } from "../constants";
 import type { UseAgentsHelperProps } from "../types";
-import { convertRoomsToItems } from "..";
+import { convertRoomsToItems, buildSpecialFolderItems } from "..";
 import { useCommonTranslation } from "../../../utils/i18n";
 
 // import useInputItemHelper from "./useInputItemHelper";
@@ -75,6 +75,11 @@ const useAgentsHelper = ({
   setSelectedItemSecurity,
   setSelectedTreeNode,
   disableBySecurity,
+
+  recentFolder,
+  favoritesFolder,
+  withRecentTreeFolder,
+  withFavoritesTreeFolder,
 }: UseAgentsHelperProps) => {
   const t = useCommonTranslation();
   const { apiClient } = useApi();
@@ -217,6 +222,28 @@ const useAgentsHelper = ({
         // } else {
         setTotal(total);
         // }
+
+        if (
+          startIndex === 0 &&
+          !searchValue &&
+          (withRecentTreeFolder || withFavoritesTreeFolder)
+        ) {
+          const specialItems = buildSpecialFolderItems({
+            section: "agents",
+            recentFolder,
+            favoritesFolder,
+            withRecent: withRecentTreeFolder,
+            withFavorites: withFavoritesTreeFolder,
+            withSeparator: itemList.length > 0,
+            t,
+          });
+
+          if (specialItems.length) {
+            itemList.unshift(...specialItems);
+            setTotal(total + specialItems.length);
+          }
+        }
+
         setItems?.(itemList);
       } else {
         setItems?.((prevState) => {
@@ -250,6 +277,10 @@ const useAgentsHelper = ({
       setSelectedTreeNode,
       disableBySecurity,
       t,
+      recentFolder,
+      favoritesFolder,
+      withRecentTreeFolder,
+      withFavoritesTreeFolder,
     ],
   );
 

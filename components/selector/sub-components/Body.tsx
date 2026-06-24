@@ -135,6 +135,7 @@ const Body = ({
 
   const bodyRef = React.useRef<HTMLDivElement>(null);
   const listOptionsRef = React.useRef<null | InfiniteLoader>(null);
+  const listRef = React.useRef<List | null>(null);
   const resizeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -164,6 +165,10 @@ const Body = ({
       listOptionsRef.current.resetloadMoreItemsCache(true);
     }
   }, []);
+
+  React.useEffect(() => {
+    listRef.current?.resetAfterIndex(0);
+  }, [items]);
 
   const onBodyResize = React.useCallback(() => {
     if (bodyRef && bodyRef.current) {
@@ -293,8 +298,9 @@ const Body = ({
   const cloneProps = { ref: injectedElementRef };
 
   const getItemSize = (index: number): number => {
-    if (items[index]?.isSeparator) {
-      return 16;
+    const item = items[index];
+    if (item?.isSeparator) {
+      return item?.isSectionSeparator ? 25 : 16;
     }
 
     return 48;
@@ -460,7 +466,12 @@ const Body = ({
                   }}
                   itemSize={getItemSize}
                   onItemsRendered={onItemsRendered}
-                  ref={ref}
+                  ref={(node: List | null) => {
+                    if (typeof ref === "function") {
+                      (ref as (r: List | null) => void)(node);
+                    }
+                    listRef.current = node;
+                  }}
                   outerElementType={VirtualScroll}
                 >
                   {Item}

@@ -39,6 +39,7 @@ import {
   RoomType,
   type FolderDtoInteger,
   type FileDtoInteger,
+  type FolderContentDtoInteger,
 } from "@onlyoffice/docspace-api-sdk";
 
 import FolderSvg from "../../../assets/icons/32/folder.svg";
@@ -60,6 +61,8 @@ import {
   convertFilesToItems,
   convertFoldersToItems,
   getDefaultBreadCrumb,
+  buildSpecialFolderItems,
+  buildScopedFolderUrl,
 } from "../../utils";
 
 import { getFilterParams } from "../FilesSelector.utils";
@@ -107,6 +110,12 @@ const useFilesHelper = ({
 
   disableBySecurity,
   withSubFolders,
+
+  recentFolder,
+  favoritesFolder,
+  withRecentTreeFolder,
+  withFavoritesTreeFolder,
+  activeSpecialScope,
 }: UseFilesHelpersProps) => {
   const t = useCommonTranslation();
   const {
@@ -118,7 +127,7 @@ const useFilesHelper = ({
 
   const { getIcon, extsWebEdited, filesSettingsLoading } = use(SettingsContext);
 
-  const { foldersApi } = useApi();
+  const { foldersApi, apiClient } = useApi();
 
   const { addInputItem } = useInputItemHelper({
     withCreate,
@@ -169,7 +178,12 @@ const useFilesHelper = ({
         folderId: string | number,
         isErrorPath = false,
       ) => {
-        if (initRef.current && getRootData && folderId !== "@my") {
+        if (
+          initRef.current &&
+          getRootData &&
+          folderId !== "@my" &&
+          !activeSpecialScope
+        ) {
           // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
           const folderInfoRes = await foldersApi.getFolderInfo({
             folderId: folderId as number,
@@ -203,18 +217,39 @@ const useFilesHelper = ({
 
         const currentSearch = searchValue || "";
 
-        // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
-        const folderRes = await foldersApi.getFolderByFolderId({
-          folderId: folderId as number,
-          filterType: filterParams.filterType,
-          applyFilterOption: filterParams.applyFilterOption,
-          extension: filterParams.extension,
-          count: PAGE_COUNT,
-          startIndex,
-          filterValue: currentSearch,
-          withSubFolders,
-        });
-        const currentFolder = folderRes.data.response!;
+        let currentFolder: FolderContentDtoInteger;
+
+        if (activeSpecialScope) {
+          const url = buildScopedFolderUrl({
+            folderId: activeSpecialScope.folderId,
+            startIndex,
+            count: PAGE_COUNT,
+            search: currentSearch,
+            filterParams,
+            parentId: activeSpecialScope.parentId,
+            folderType: activeSpecialScope.folderType,
+            withSubFolders,
+          });
+
+          const { response } = await apiClient.request<{
+            response: FolderContentDtoInteger;
+          }>(url);
+
+          currentFolder = response;
+        } else {
+          // NOTE: folderId can be string but types cannot be fixed right now, using type assertion
+          const folderRes = await foldersApi.getFolderByFolderId({
+            folderId: folderId as number,
+            filterType: filterParams.filterType,
+            applyFilterOption: filterParams.applyFilterOption,
+            extension: filterParams.extension,
+            count: PAGE_COUNT,
+            startIndex,
+            filterValue: currentSearch,
+            withSubFolders,
+          });
+          currentFolder = folderRes.data.response!;
+        }
 
         const { folders, files, total, count, pathParts, current } =
           currentFolder;
@@ -383,6 +418,33 @@ const useFilesHelper = ({
           } else {
             setTotal(total);
           }
+
+          if (
+            !activeSpecialScope &&
+            current!.rootFolderType === FolderType.USER &&
+            current!.parentId === 0 &&
+            !searchValue &&
+            startIndex === 0 &&
+            (withRecentTreeFolder || withFavoritesTreeFolder)
+          ) {
+            const specialItems = buildSpecialFolderItems({
+              section: "files",
+              recentFolder,
+              favoritesFolder,
+              withRecent: withRecentTreeFolder,
+              withFavorites: withFavoritesTreeFolder,
+              withSeparator: itemList.length > 0,
+              t,
+            });
+
+            if (specialItems.length) {
+              itemList.unshift(...specialItems);
+              const base =
+                withCreate && security?.Create ? total + 1 : total;
+              setTotal(base + specialItems.length);
+            }
+          }
+
           setItems(itemList);
         } else {
           setItems((prevState) => {
@@ -432,6 +494,12 @@ const useFilesHelper = ({
     },
     [
       foldersApi,
+      apiClient,
+      activeSpecialScope,
+      recentFolder,
+      favoritesFolder,
+      withRecentTreeFolder,
+      withFavoritesTreeFolder,
       filesSettingsLoading,
       setIsNextPageLoading,
       withCreate,

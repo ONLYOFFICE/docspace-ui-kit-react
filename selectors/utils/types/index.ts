@@ -84,6 +84,11 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   >;
   setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDtoInteger>>;
   isRoomDisabled?: (room: FolderDtoInteger) => boolean;
+  recentFolder?: FolderDtoInteger | null;
+  favoritesFolder?: FolderDtoInteger | null;
+  withRecentTreeFolder?: boolean;
+  withFavoritesTreeFolder?: boolean;
+  roomsFolderId?: number;
 };
 
 export type UseAgentsHelperProps = TUseInputItemHelper & {
@@ -111,6 +116,10 @@ export type UseAgentsHelperProps = TUseInputItemHelper & {
   >;
   setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDtoInteger>>;
   disableBySecurity?: string;
+  recentFolder?: FolderDtoInteger | null;
+  favoritesFolder?: FolderDtoInteger | null;
+  withRecentTreeFolder?: boolean;
+  withFavoritesTreeFolder?: boolean;
 };
 
 export type UseSocketHelperProps = {

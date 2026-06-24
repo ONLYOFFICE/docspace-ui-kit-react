@@ -141,6 +141,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
       isTemplate,
       disableMultiSelect,
       isSeparator,
+      isSectionSeparator,
       isSystem,
       isMCP,
       isFolder,
@@ -156,7 +157,11 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
                 ? globalColors.grayLightMid
                 : globalColors.grayDarkStrong,
             }}
-            className={styles.selectorSeparator}
+            className={
+              isSectionSeparator
+                ? styles.sectionSeparator
+                : styles.selectorSeparator
+            }
           >
             {"\u00A0"}
           </div>

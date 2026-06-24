@@ -32,14 +32,16 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import type React from "react";
+import React from "react";
 import type {
   FileDtoInteger,
   FolderDtoInteger,
-  FolderType,
   FileEntryDtoIntegerAllOfSecurity,
 } from "@onlyoffice/docspace-api-sdk";
-import { RoomType } from "@onlyoffice/docspace-api-sdk";
+import { FolderType, RoomType } from "@onlyoffice/docspace-api-sdk";
+
+import CatalogFavoritesSvg from "../../assets/icons/16/catalog.favorites.react.svg";
+import CatalogRecentSvg from "../../assets/icons/16/catalog-settings-restore.svg";
 
 import { getCommonTranslation } from "../../utils/i18n";
 import {
@@ -49,7 +51,10 @@ import {
 import { iconSize32 } from "../../utils/image-helpers";
 import { getTitleWithoutExtension } from "../../utils/getTitleWithoutExtension";
 
-import type { TSelectorItem } from "../../components/selector";
+import type {
+  TSelectorItem,
+  SpecialFolderScope,
+} from "../../components/selector";
 
 import { DEFAULT_FILE_EXTS } from "./constants";
 import { getBrandName } from "../../constants/brands";
@@ -241,5 +246,126 @@ export const getDefaultBreadCrumb = (t: (key: string) => string) => {
     id: 0,
     isRoom: false,
   };
+};
+
+export const buildSpecialFolderItems = ({
+  section,
+  recentFolder,
+  favoritesFolder,
+  withRecent,
+  withFavorites,
+  parentId,
+  folderType,
+  withSeparator,
+  t,
+}: {
+  section: SpecialFolderScope["section"];
+  recentFolder?: FolderDtoInteger | null;
+  favoritesFolder?: FolderDtoInteger | null;
+  withRecent?: boolean;
+  withFavorites?: boolean;
+  parentId?: number;
+  folderType?: number;
+  withSeparator?: boolean;
+  t: (key: string) => string;
+}): TSelectorItem[] => {
+  const items: TSelectorItem[] = [];
+
+  const build = (
+    kind: "recent" | "favorites",
+    folder: FolderDtoInteger,
+    Icon: React.FC,
+    label: string,
+    rootFolderType: FolderType,
+  ): TSelectorItem => ({
+    label,
+    id: `special-${kind}`,
+    key: `special-${kind}`,
+    parentId: folder.parentId ?? 0,
+    rootFolderType,
+    filesCount: folder.filesCount ?? 0,
+    foldersCount: folder.foldersCount ?? 0,
+    security: folder.security ?? ({} as FileEntryDtoIntegerAllOfSecurity),
+    isFolder: true,
+    avatar: React.createElement(Icon),
+    disableMultiSelect: true,
+    specialFolderScope: { kind, folderId: folder.id!, section, parentId, folderType },
+  });
+
+  if (withRecent && recentFolder)
+    items.push(
+      build(
+        "recent",
+        recentFolder,
+        CatalogRecentSvg,
+        t("Recent"),
+        FolderType.Recent,
+      ),
+    );
+
+  if (withFavorites && favoritesFolder)
+    items.push(
+      build(
+        "favorites",
+        favoritesFolder,
+        CatalogFavoritesSvg,
+        t("Favorites"),
+        FolderType.Favorites,
+      ),
+    );
+
+  if (items.length && withSeparator)
+    items.push({
+      label: "",
+      id: "special-separator",
+      key: "special-separator",
+      isSeparator: true,
+      isSectionSeparator: true,
+    } as TSelectorItem);
+
+  return items;
+};
+
+export const buildScopedFolderUrl = ({
+  folderId,
+  startIndex,
+  count,
+  search,
+  filterParams,
+  parentId,
+  folderType,
+  withSubFolders,
+}: {
+  folderId: number | string;
+  startIndex: number;
+  count: number;
+  search?: string;
+  filterParams?: {
+    filterType?: number | string;
+    applyFilterOption?: number | string;
+    extension?: string;
+  };
+  parentId?: number;
+  folderType?: number;
+  withSubFolders?: boolean;
+}): string => {
+  const params = new URLSearchParams();
+
+  params.set("count", String(count));
+  params.set("startIndex", String(startIndex));
+
+  if (search) params.set("filterValue", search);
+  if (filterParams?.filterType != null)
+    params.set("filterType", String(filterParams.filterType));
+  if (filterParams?.applyFilterOption != null)
+    params.set("applyFilterOption", String(filterParams.applyFilterOption));
+  if (filterParams?.extension)
+    params.set("extension", String(filterParams.extension));
+  if (withSubFolders != null)
+    params.set("withSubFolders", String(withSubFolders));
+  if (parentId != null) params.set("parentId", String(parentId));
+  if (folderType != null) params.set("folderType", String(folderType));
+
+  return `/api/2.0/files/${folderId}?${params.toString()}`;
 };
 

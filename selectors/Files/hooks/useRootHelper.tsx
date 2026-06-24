@@ -100,10 +100,10 @@ const useRootHelper = ({
 
   setItems,
   treeFolders,
-  withRecentTreeFolder,
-  withFavoritesTreeFolder,
   withAIAgentsTreeFolder,
   withFormsTreeFolder,
+  setRecentFolder,
+  setFavoritesFolder,
 
   setTotal,
   setHasNextPage,
@@ -146,6 +146,11 @@ const useRootHelper = ({
     );
 
     orderedTree.forEach((folder) => {
+      if (folder.rootFolderType === FolderType.Recent)
+        setRecentFolder?.(folder);
+      if (folder.rootFolderType === FolderType.Favorites)
+        setFavoritesFolder?.(folder);
+
       const IconComponent = folder.rootFolderType
         ? catalogIcons[folder.rootFolderType]
         : undefined;
@@ -156,9 +161,6 @@ const useRootHelper = ({
       if (
         (!isUserOnly && folder.rootFolderType === FolderType.VirtualRooms) ||
         folder.rootFolderType === FolderType.USER ||
-        (withRecentTreeFolder && folder.rootFolderType === FolderType.Recent) ||
-        (withFavoritesTreeFolder &&
-          folder.rootFolderType === FolderType.Favorites) ||
         (withAIAgentsTreeFolder &&
           folder.rootFolderType === FolderType.AiAgents)
       ) {
@@ -170,12 +172,6 @@ const useRootHelper = ({
             break;
           case FolderType.VirtualRooms:
             title = t("Rooms");
-            break;
-          case FolderType.Favorites:
-            title = t("Favorites");
-            break;
-          case FolderType.Recent:
-            title = t("Recent");
             break;
           case FolderType.AiAgents:
             title = t("AIAgents");
@@ -238,10 +234,10 @@ const useRootHelper = ({
     setTotal,
     t,
     treeFolders,
-    withRecentTreeFolder,
-    withFavoritesTreeFolder,
     withAIAgentsTreeFolder,
     withFormsTreeFolder,
+    setRecentFolder,
+    setFavoritesFolder,
   ]);
 
   return { isRoot, setIsRoot, getRootData };

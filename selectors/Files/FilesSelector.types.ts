@@ -54,6 +54,7 @@ import type {
   TBreadCrumb,
   TInfoBar,
   TSelectorHeader,
+  SpecialFolderScope,
 } from "../../components/selector";
 import type { WithFlag, Nullable } from "../../types";
 import type {
@@ -87,6 +88,8 @@ export interface UseRootHelperProps {
   withAIAgentsTreeFolder?: boolean;
   withFormsTreeFolder?: boolean;
   isUserOnly?: boolean;
+  setRecentFolder?: (folder?: FolderDtoInteger) => void;
+  setFavoritesFolder?: (folder?: FolderDtoInteger) => void;
 }
 
 export type UseSocketHelperProps = {
@@ -186,6 +189,12 @@ export type UseFilesHelpersProps = {
 
   disableBySecurity?: string;
   withSubFolders?: boolean;
+
+  recentFolder?: FolderDtoInteger | null;
+  favoritesFolder?: FolderDtoInteger | null;
+  withRecentTreeFolder?: boolean;
+  withFavoritesTreeFolder?: boolean;
+  activeSpecialScope?: SpecialFolderScope | null;
 };
 
 export type TUseInputItemHelper = {

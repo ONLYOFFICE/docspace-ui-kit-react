@@ -532,6 +532,14 @@ type TSelectorItemEmpty = {
   isSystem?: undefined;
 };
 
+export type SpecialFolderScope = {
+  kind: "recent" | "favorites";
+  folderId: number | string;
+  section: "files" | "rooms" | "forms" | "agents";
+  parentId?: number;
+  folderType?: number;
+};
+
 export type TSelectorItemUser = MergeTypes<
   TSelectorItemEmpty,
   {
@@ -676,7 +684,9 @@ export type TSelectorItem = TSelectorItemType & {
   templateIsOwner?: boolean;
   disableMultiSelect?: boolean;
   isSeparator?: boolean;
+  isSectionSeparator?: boolean;
   forceIsMultiSelect?: boolean;
+  specialFolderScope?: SpecialFolderScope;
 };
 
 export type Data = {
