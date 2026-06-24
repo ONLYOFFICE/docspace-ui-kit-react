@@ -100,7 +100,14 @@ const UpdatePlanButtonContainer = ({
     isFreeTariff,
   } = store.quotas;
   const { tariffPlanTitle } = store.paymentQuotas;
-  const { fetchPortalTariff, hasScheduledTariffAdminsChange } = store.tariff;
+  const {
+    fetchPortalTariff,
+    hasScheduledTariffAdminsChange,
+    isGracePeriod,
+    isNotPaidPeriod,
+  } = store.tariff;
+
+  const isRepurchase = isFreeTariff || isGracePeriod || isNotPaidPeriod;
 
   const [isVisiblePaymentConfirm, setIsVisiblePaymentConfirm] = useState(false);
   const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
@@ -204,9 +211,10 @@ const UpdatePlanButtonContainer = ({
   };
 
   const payTariffButton = () => {
-    const buttonLabel = isCardLinkedToPortal
-      ? t("UpgradeNow")
-      : t("TopUpAndUpgrade");
+    const buttonLabel =
+      !isCardLinkedToPortal || isBalanceInsufficient
+        ? t("TopUpAndUpgrade")
+        : t("UpgradeNow");
 
     const onClick = () => {
       if (canPayTariff) {
@@ -274,7 +282,7 @@ const UpdatePlanButtonContainer = ({
 
   return (
     <StyledBody>
-      {!isFreeTariff ? updatingCurrentTariffButton() : payTariffButton()}
+      {isRepurchase ? payTariffButton() : updatingCurrentTariffButton()}
 
       {isVisibleDowngradePlanDialog ? (
         <ChangePricingPlanDialog
@@ -289,7 +297,7 @@ const UpdatePlanButtonContainer = ({
           onClose={() => setIsTopUpDialogVisible(false)}
           onConfirm={async () => {
             setIsTopUpDialogVisible(false);
-            await (isFreeTariff
+            await (isRepurchase
               ? executeWalletUpdate(managersCount, ProductQuantityType.Add)
               : onUpdateTariff());
           }}
