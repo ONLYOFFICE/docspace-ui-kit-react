@@ -47,6 +47,7 @@ export { default as QuickVdrRoomIcon } from "../../assets/quick.vdr.room.react.s
 export { default as QuickCollaborationRoomIcon } from "../../assets/quick.collaboration.room.react.svg";
 export { default as QuickPublicRoomIcon } from "../../assets/quick.public.room.react.svg";
 export { default as QuickCustomRoomIcon } from "../../assets/quick.custom.room.react.svg";
+export { default as QuickFormRoomIcon } from "../../assets/quick.form.room.react.svg";
 export { default as CreateSpreadsheetIcon } from "../../assets/create.spreadsheet.react.svg";
 export { default as GeneratePdfAiIcon } from "../../assets/generate.pdf.ai.react.svg";
 export { default as GenerateWithAiIcon } from "../../assets/generate.with.ai.react.svg";

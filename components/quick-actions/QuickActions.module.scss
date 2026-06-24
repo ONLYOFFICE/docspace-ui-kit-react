@@ -38,6 +38,7 @@
 
 // Tile size and the gap between tiles.
 $tile-width: 172px;
+$tile-max-width: 184px;
 $tile-height: 172px;
 $gap: 16px;
 
@@ -72,6 +73,7 @@ $compact-peek: 60px;
 .grid {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: $gap;
   width: 100%;
 
@@ -94,6 +96,7 @@ $compact-peek: 60px;
   padding: 16px;
   flex: 1 1 $tile-width;
   min-width: $tile-width;
+  max-width: $tile-max-width;
   height: $tile-height;
   background-color: var(--_tile-bg);
   border: none;
