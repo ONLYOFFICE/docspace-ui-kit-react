@@ -210,6 +210,14 @@ const UpdatePlanButtonContainer = ({
     setIsVisibleDowngradePlanDialog(false);
   };
 
+  const onTopUpConfirm = async () => {
+    setIsTopUpDialogVisible(false);
+
+    await (isRepurchase
+      ? executeWalletUpdate(managersCount, ProductQuantityType.Add)
+      : onUpdateTariff());
+  };
+
   const payTariffButton = () => {
     const buttonLabel =
       !isCardLinkedToPortal || isBalanceInsufficient
@@ -295,13 +303,8 @@ const UpdatePlanButtonContainer = ({
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
-          onConfirm={async () => {
-            setIsTopUpDialogVisible(false);
-            await (isRepurchase
-              ? executeWalletUpdate(managersCount, ProductQuantityType.Add)
-              : onUpdateTariff());
-          }}
-          isFirstTopUp
+          onConfirm={onTopUpConfirm}
+          isFirstTopUp={!isCardLinkedToPortal}
           successParams={{
             admins: `${managersCount}`,
             storage: getConvertedSize(t, allowedStorageSizeByQuota),
