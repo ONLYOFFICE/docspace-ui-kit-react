@@ -11,20 +11,34 @@
 
  .headerContainer {
    display: flex;
+   flex-wrap: wrap;
+   align-items: center;
+   gap: 4px 8px;
+ }
+
+ .titleRow {
+   display: flex;
    align-items: center;
    gap: 8px;
  }
 
-
+ .title {
+   white-space: nowrap;
+ }
 
  .progressText {
   color: var(--payment-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
   opacity: 1;
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out, max-width 0.3s ease-in-out;
  }
 
  .progressTextHidden {
   opacity: 0;
+  // collapse width when hidden so it neither reserves space nor forces a wrap
+  max-width: 0;
  }
 
 .integer,

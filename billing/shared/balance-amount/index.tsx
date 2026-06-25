@@ -81,16 +81,18 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     <div className={className}>
       {title ? (
         <div className={styles.headerContainer}>
-          <Text isBold fontSize={titleFontSize}>
-            {title}
-          </Text>
+          <div className={styles.titleRow}>
+            <Text isBold fontSize={titleFontSize} className={styles.title}>
+              {title}
+            </Text>
 
-          {showRefresh && onRefresh ? (
-            <RefreshIconButton
-              onRefresh={onRefresh}
-              isRefreshing={isRefreshing}
-            />
-          ) : null}
+            {showRefresh && onRefresh ? (
+              <RefreshIconButton
+                onRefresh={onRefresh}
+                isRefreshing={isRefreshing}
+              />
+            ) : null}
+          </div>
 
           {progressText ? (
             <Text
