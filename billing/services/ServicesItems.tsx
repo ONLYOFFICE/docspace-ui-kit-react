@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useState } from "react";
+import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
@@ -57,7 +57,6 @@ import { usePermissionTooltipText } from "./hooks/usePermissionTooltipText";
 import ServiceCard from "./sub-components/ServiceCard";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
-import { useServicesStore } from "../store/ServicesStoreProvider";
 import { Link, LinkTarget } from "../../components/link";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 
@@ -76,15 +75,12 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   onClick,
   isMobile,
   isTablet,
-  cardDisabled: forceCardDisabled,
   onOpenSupportedModels,
 }) => {
   const paymentStore = usePaymentStore();
 
   const {
     isServiceActionDisabled,
-    isPayer,
-    isCardLinkedToPortal,
     servicesQuotasFeatures,
     storageSizeIncrement,
     storagePriceIncrement,
@@ -299,7 +295,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             return (
               <ServiceCard
                 key={item.id}
-                cardDisabled={forceCardDisabled}
                 toggleDisabled={isDisabled}
                 priceTitle={item.priceTitle}
                 id={item.id}
@@ -327,7 +322,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               <ServiceCard
                 key={item.id}
                 className={styles.aiCard}
-                cardDisabled={forceCardDisabled}
                 toggleDisabled={isDisabled}
                 onClick={handleClick}
                 onToggle={handleToggle}
@@ -353,12 +347,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             return (
               <ServiceCard
                 key={item.id}
-                cardDisabled={
-                  forceCardDisabled ||
-                  (isCardLinkedToPortal && !isPayer
-                    ? !hasStorageSubscription && !previousStoragePlanSize
-                    : false)
-                }
                 toggleDisabled={!!eventDisabled}
                 onClick={handleClick}
                 onToggle={handleToggle}

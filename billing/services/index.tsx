@@ -314,8 +314,6 @@ const Services = observer(
       }
 
       if (id === AI_ENUM) {
-        if (isServiceActionDisabled) return;
-
         if (!currentEnabled) {
           localStorage.setItem(AI_FEATURES_DIALOG_SHOWN_KEY, AI_ENUM);
         }
