@@ -418,6 +418,8 @@ class PaymentStore {
   get isLowWalletBalance() {
     if (!this.isCardLinkedToPortal) return false;
 
+    if (!this.isAiToolsServiceOn) return false;
+
     return this.walletBalance < 1;
   }
 
