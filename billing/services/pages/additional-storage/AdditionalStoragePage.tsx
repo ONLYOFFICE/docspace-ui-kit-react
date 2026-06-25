@@ -273,7 +273,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
       ) : null}
 
       <div className={styles.subscriptionSection}>
-        {previousStoragePlanSize ? (
+        {!hasStorageSubscription ? (
           <div className={styles.noSubscriptionCard}>
             <Text fontWeight={700} fontSize="14px">
               {t("NoActiveSubscription")}
