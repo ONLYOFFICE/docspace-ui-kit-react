@@ -92,6 +92,7 @@ const UpdatePlanButtonContainer = ({
     isTariffDueTodayCalculating,
     isCardLinkedToPortal,
     allowedStorageSizeByQuota,
+    isCardMissingOrInactive,
   } = store;
   const {
     maxCountManagersByQuota,
@@ -304,7 +305,7 @@ const UpdatePlanButtonContainer = ({
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
           onConfirm={onTopUpConfirm}
-          isFirstTopUp={!isCardLinkedToPortal}
+          isFirstTopUp={isCardMissingOrInactive}
           successParams={{
             admins: `${managersCount}`,
             storage: getConvertedSize(t, allowedStorageSizeByQuota),

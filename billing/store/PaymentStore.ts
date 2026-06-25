@@ -393,6 +393,12 @@ class PaymentStore {
     return this.autoPayments?.enabled;
   }
 
+  get isCardMissingOrInactive() {
+    return (
+      !this.isCardLinkedToPortal || this.tariff.walletCustomerStatusNotActive
+    );
+  }
+
   get isAutoTopUpInProgress() {
     if (!this.isAutoPaymentExist) return false;
 

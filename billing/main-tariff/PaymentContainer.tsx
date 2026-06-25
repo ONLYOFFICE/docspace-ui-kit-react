@@ -69,7 +69,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     isAlreadyPaid,
     cardLinkedOnFreeTariff,
     formatWalletCurrency,
-    isCardLinkedToPortal,
+    isCardMissingOrInactive,
   } = store;
 
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
@@ -379,7 +379,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           visible={isTopUpVisible}
           onClose={onCloseTopUp}
           onConfirm={onCloseTopUp}
-          isFirstTopUp={!isCardLinkedToPortal}
+          isFirstTopUp={isCardMissingOrInactive}
         />
       ) : null}
     </div>
