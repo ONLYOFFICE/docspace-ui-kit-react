@@ -1,0 +1,180 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/mixins";
+@use "../../styles/variables/colors";
+
+.slider {
+  :global(.light) & {
+    --slider-track-height: 8px;
+    --slider-thumb-size: 24px;
+    --slider-thumb-border: 6px;
+    --slider-border-radius: 5.6px;
+    --slider-thumb-disabled-color: #{colors.$gray-strong};
+    --slider-thumb-disabled-border: #{colors.$light-second-main-disabled};
+    --slider-runnable-track-border: #{colors.$gray-light-mid};
+    --slider-thumb-background: var(
+      --color-scheme-main-accent,
+      #{colors.$light-second-main}
+    );
+    --slider-thumb-border-color: #{colors.$white};
+    --slider-thumb-box-shadow: 0px 5px 20px #{colors.$popup-shadow};
+    --slider-range-track-border: #{colors.$white};
+    --slider-range-track-background: #{colors.$light-second-main};
+    --slider-background: #{colors.$gray-light-mid};
+    --slider-background-image: linear-gradient(
+      var(--slider-thumb-background),
+      var(--slider-thumb-background)
+    );
+  }
+
+  :global(.dark) & {
+    --slider-track-height: 8px;
+    --slider-thumb-size: 24px;
+    --slider-thumb-border: 6px;
+    --slider-border-radius: 5.6px;
+    --slider-thumb-disabled-color: #{colors.$gray-dark-strong};
+    --slider-thumb-disabled-border: #{colors.$light-second-main-disabled};
+    --slider-runnable-track-border: #{colors.$gray-dark-mid};
+    --slider-thumb-background: #{colors.$white};
+    --slider-thumb-border-color: #{colors.$black};
+    --slider-thumb-box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.25);
+    --slider-range-track-border: #{colors.$black};
+    --slider-range-track-background: #{colors.$white};
+    --slider-background: #{colors.$gray-dark-mid};
+    --slider-background-image: linear-gradient(
+      var(--slider-thumb-background),
+      var(--slider-thumb-background)
+    );
+  }
+
+  --slider-track-h: var(--slider-size, var(--slider-track-height));
+  --slider-thumb-s: var(--slider-handle-size, var(--slider-thumb-size));
+  --slider-radius: var(--slider-track-radius, var(--slider-border-radius));
+  --slider-thumb-bg: var(--slider-handle-color, var(--slider-thumb-background));
+  --slider-track-color: var(--slider-background-color, var(--slider-background));
+  --slider-filled-color: var(--slider-fill-color, var(--slider-range-track-background));
+  --slider-fill-image: var(--slider-pouring-image, var(--slider-background-image));
+
+  width: 100%;
+  margin: 24px 0;
+  background: var(--slider-track-color);
+  border-radius: var(--slider-radius);
+  -webkit-appearance: none;
+  appearance: none;
+
+  &:focus {
+    outline: none;
+  }
+
+  &.withPouring {
+    background-image: var(--slider-fill-image);
+    background-size: var(--size-prop) 100%;
+    background-repeat: no-repeat;
+    background-position: left center;
+
+    [dir="rtl"] & {
+      background-position: right center;
+    }
+
+    &.disabled {
+      opacity: 0.32;
+    }
+  }
+
+  &::-webkit-slider-runnable-track {
+    border: 1.4px solid var(--slider-runnable-track-border);
+    border-radius: var(--slider-radius);
+    width: 100%;
+    height: var(--runnable-track-height, var(--slider-track-h));
+    cursor: pointer;
+
+    .disabled & {
+      cursor: default;
+    }
+  }
+
+  &::-webkit-slider-thumb {
+    margin-top: -9.4px;
+    width: var(--thumb-width, var(--slider-thumb-s));
+    height: var(--thumb-height, var(--slider-thumb-s));
+    background: var(--slider-thumb-bg);
+    border: var(--thumb-border-width, var(--slider-thumb-border)) solid
+      var(--slider-thumb-border-color);
+    border-radius: 24px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    box-shadow: var(--slider-thumb-box-shadow);
+
+    .disabled & {
+      background: var(--slider-thumb-disabled-color);
+      border-color: var(--slider-thumb-disabled-border);
+      cursor: default;
+    }
+  }
+
+  &::-moz-range-thumb {
+    box-sizing: border-box;
+    width: var(--thumb-width, var(--slider-thumb-s));
+    height: var(--thumb-height, var(--slider-thumb-s));
+    background: var(--slider-thumb-bg);
+    border: var(--thumb-border-width, var(--slider-thumb-border)) solid
+      var(--slider-thumb-border-color);
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: var(--slider-thumb-box-shadow);
+
+    .disabled & {
+      background: var(--slider-thumb-disabled-color);
+      border-color: var(--slider-thumb-disabled-border);
+      cursor: default;
+    }
+  }
+
+  :global {
+    ::-moz-range-track {
+      border: 1.4px solid var(--slider-range-track-border);
+      border-radius: var(--slider-radius);
+      width: 100%;
+      height: var(--runnable-track-height, var(--slider-track-h));
+      cursor: pointer;
+      background: var(--slider-filled-color);
+
+      .disabled & {
+        cursor: default;
+      }
+    }
+  }
+}

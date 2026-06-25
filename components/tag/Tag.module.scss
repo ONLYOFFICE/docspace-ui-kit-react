@@ -1,0 +1,166 @@
+@use "../../styles/variables/colors";
+
+.tag {
+  :global(.light) & {
+    --tag-background: #{colors.$white};
+    --tag-hover-background: #{colors.$light-gray-selected};
+    --tag-active-background: #{colors.$gray-light};
+    --tag-new-background: #{colors.$gray-light-mid};
+    --tag-new-hover-background: #{colors.$light-gray-hover};
+    --tag-deleted-border: #{colors.$gray-light-mid};
+    --tag-color: #{colors.$black};
+    --tag-default-color: #{colors.$black};
+    --tag-deleted-color: #{colors.$gray};
+    --tag-disabled-color: #{colors.$gray};
+    --tag-disabled-border: 1px dashed #{colors.$gray-strong};
+    --tag-border: 1px solid #{colors.$gray-strong};
+
+    --tag-border-radius: 6px;
+    --tag-icon-margin-start: 12px;
+
+    --tag-text-line-height: 20px;
+    --tag-font-size: 13px;
+  }
+
+  :global(.dark) & {
+    --tag-background: #{colors.$black};
+    --tag-hover-background: #{colors.$gray-dark-strong};
+    --tag-active-background: #{colors.$light-dark-gray-hover};
+    --tag-new-background: #{colors.$gray-dark-mid};
+    --tag-new-hover-background: #{colors.$light-dark-gray-hover};
+    --tag-deleted-border: #{colors.$gray-dark-strong};
+    --tag-color: #{colors.$white};
+    --tag-default-color: #{colors.$gray};
+    --tag-deleted-color: #{colors.$gray-dark};
+    --tag-disabled-color: #{colors.$gray-dark};
+    --tag-disabled-border: 1px dashed #{colors.$gray-dark-strong};
+    --tag-border: 1px solid #{colors.$gray-dark-strong};
+
+    --tag-border-radius: 6px;
+    --tag-icon-margin-start: 12px;
+
+    --tag-text-line-height: 20px;
+    --tag-font-size: 13px;
+  }
+
+  --tag-padding: var(--tag-inner-padding, 1px 7px);
+  --tag-margin-end: var(--tag-spacing-end, 4px);
+  --tag-max-height: var(--tag-height, 22px);
+
+  position: relative;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: var(--tag-padding);
+  margin-inline-end: var(--tag-margin-end);
+  background: var(--tag-bg, var(--tag-background));
+
+  max-height: var(--tag-max-height);
+
+  border-radius: var(--tag-radius, var(--tag-border-radius));
+  border: var(--tag-border-style, var(--tag-border));
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+    width: 12px;
+    height: 12px;
+  }
+
+  &.thirdPartyTag {
+    padding: 0;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    height: 28px;
+    inset-block: -3px;
+    inset-inline: -3px;
+  }
+
+  .thirdPartyTag {
+    padding: 4px 12px;
+    width: 16px;
+    height: 16px;
+
+    [data-theme="dark"] & {
+      svg {
+        path[fill] {
+          fill: colors.$white;
+        }
+
+        path[stroke] {
+          stroke: colors.$white;
+        }
+      }
+    }
+  }
+
+  &:active {
+    border-color: transparent;
+    background: var(--tag-active-background);
+  }
+
+  &.isNewTag {
+    background: var(--tag-new-background);
+    border-color: transparent;
+  }
+
+  &.isDeleted {
+    border-color: var(--tag-deleted-border);
+
+    .tagText {
+      text-decoration: line-through;
+      color: var(--tag-deleted-color);
+    }
+  }
+
+  &.isDisabled {
+    border: var(--tag-disabled-border);
+    pointer-events: none;
+
+    .tagText {
+      color: var(--tag-disabled-color);
+    }
+  }
+
+  &.isLast {
+    margin-inline-end: 0;
+  }
+
+  &.isClickable:not(.isDisabled):not(.isDeleted) {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--tag-hover-background);
+      border-color: transparent;
+
+      &.isNewTag {
+        background: var(--tag-new-hover-background);
+      }
+    }
+  }
+}
+
+.tagText {
+  color: var(--tag-text-color, var(--tag-color));
+  line-height: var(--tag-lh, var(--tag-text-line-height));
+  pointer-events: none;
+  font-size: var(--tag-size, var(--tag-font-size));
+
+  &.isDefault {
+    color: var(--tag-default-color);
+  }
+}
+
+.tagIcon {
+  margin-inline-start: var(--tag-icon-margin-start);
+  cursor: pointer;
+  z-index: 1;
+}

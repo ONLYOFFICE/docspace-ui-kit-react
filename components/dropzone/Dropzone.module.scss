@@ -1,0 +1,353 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors";
+@use "../../styles/mixins";
+
+.dropzoneWrapper {
+  :global(.light) & {
+    --dropzone-border: 2px dashed #{colors.$gray-light-mid};
+    --dropzone-drag-active-bg: #{colors.$light-blue-dropzone-active};
+    --dropzone-hover-bg: #{colors.$light-blue-dropzone-hover};
+
+    --dropzone-secondary-link: #{colors.$black};
+    --dropzone-exsts-color: #{colors.$gray};
+
+    --dropzone-exsts-color-background-focus: #{colors.$light-gray-selected};
+    --dropzone-exsts-color-background-hover: #{colors.$gray-light-mid};
+    --dropzone-exsts-color-background-pressed: #{colors.$gray-strong};
+
+    --dropzone-exsts-color-focus: #{colors.$black};
+    --dropzone-exsts-badge-focus: #{colors.$gray-text};
+    --dropzone-arrow-icon-color-focus: #{colors.$black};
+  }
+
+  :global(.dark) & {
+    --dropzone-border: 2px dashed #{colors.$gray-dark-strong};
+    --dropzone-drag-active-bg: #{colors.$light-blue-dropzone-active};
+    --dropzone-hover-bg: #{colors.$light-blue-dropzone-hover};
+
+    --dropzone-secondary-link: #{colors.$white};
+    --dropzone-exsts-color: #{colors.$gray};
+
+    --dropzone-exsts-color-background-focus: #{colors.$gray-dark-mid};
+    --dropzone-exsts-color-background-hover: #{colors.$gray-dark-strong};
+    --dropzone-exsts-color-background-pressed: #{colors.$dark-gray-light};
+
+    --dropzone-exsts-color-focus: #{colors.$white};
+    --dropzone-exsts-badge-focus: #{colors.$gray-dark};
+    --dropzone-arrow-icon-color-focus: #{colors.$white};
+  }
+
+  // bridge vars — bind public overrides to internal theme tokens
+  --dropzone-border-v: var(--dropzone-border-style, var(--dropzone-border));
+  --dropzone-drag-active-bg-v: var(
+    --dropzone-drag-bg,
+    var(--dropzone-drag-active-bg)
+  );
+  --dropzone-hover-bg-v: var(
+    --dropzone-hover-bg-override,
+    var(--dropzone-hover-bg)
+  );
+  --dropzone-secondary-link-v: var(
+    --dropzone-link-secondary-color,
+    var(--dropzone-secondary-link)
+  );
+  --dropzone-exsts-color-v: var(
+    --dropzone-text-color,
+    var(--dropzone-exsts-color)
+  );
+  --dropzone-exsts-bg-hover-v: var(
+    --dropzone-text-hover-bg,
+    var(--dropzone-exsts-color-background-hover)
+  );
+  --dropzone-exsts-bg-pressed-v: var(
+    --dropzone-text-pressed-bg,
+    var(--dropzone-exsts-color-background-pressed)
+  );
+  --dropzone-exsts-bg-focus-v: var(
+    --dropzone-text-focus-bg,
+    var(--dropzone-exsts-color-background-focus)
+  );
+  --dropzone-exsts-color-focus-v: var(
+    --dropzone-text-focus-color,
+    var(--dropzone-exsts-color-focus)
+  );
+  --dropzone-badge-focus-v: var(
+    --dropzone-badge-focus-color,
+    var(--dropzone-exsts-badge-focus)
+  );
+  --dropzone-arrow-focus-v: var(
+    --dropzone-arrow-focus-color,
+    var(--dropzone-arrow-icon-color-focus)
+  );
+  --dropzone-formats-shadow-v: var(
+    --dropzone-formats-shadow,
+    var(--dropzone-context-menu-box-shadow)
+  );
+  // bridge vars for hardcoded values
+  --dropzone-radius-v: var(--dropzone-radius, 6px);
+  --dropzone-min-height-v: var(--dropzone-min-height, 150px);
+  --dropzone-gap-v: var(--dropzone-gap, 4px);
+  --dropzone-font-size-v: var(--dropzone-text-size, 13px);
+  --dropzone-exsts-radius-v: var(--dropzone-exsts-radius, 3px);
+  --dropzone-formats-radius-v: var(--dropzone-formats-radius, 6px);
+
+  cursor: pointer;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: var(--dropzone-min-height-v);
+  border: var(--dropzone-border-v);
+  border-radius: var(--dropzone-radius-v);
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+
+  &.hasChildren {
+    height: auto;
+  }
+
+  &.isDraggingOnPage {
+    background-color: var(--dropzone-drag-active-bg-v);
+  }
+
+  &.isDragOver {
+    background-color: var(--dropzone-hover-bg-v);
+  }
+}
+
+.dropzoneLoader {
+  position: absolute;
+  top: 50%;
+
+  // doesn't require mirroring for RTL
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.dropzoneProgress {
+  width: 60%;
+}
+
+.dropzone {
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  visibility: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dropzone-gap-v);
+
+  user-select: none;
+
+  &.isLoading {
+    visibility: hidden;
+  }
+}
+
+.dropzoneLink {
+  :global(.light) & {
+    --dropzone-secondary-link: #{colors.$black};
+  }
+
+  :global(.dark) & {
+    --dropzone-secondary-link: #{colors.$white};
+  }
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+  gap: var(--dropzone-gap-v);
+  font-size: var(--dropzone-font-size-v);
+  line-height: 20px;
+
+  &.main {
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 1px;
+  }
+
+  &.secondary {
+    font-weight: 400;
+    color: var(--dropzone-secondary-link-v);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-align: center;
+  }
+
+  @include mixins.mobile {
+    &.secondary {
+      display: none;
+    }
+  }
+}
+
+.dropzoneIcon {
+  width: 50px;
+  height: 50px;
+}
+
+.dropzoneExsts {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--dropzone-gap-v);
+
+  color: var(--dropzone-exsts-color-v);
+}
+
+.dropzoneExstsTextContainer {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--dropzone-gap-v);
+  border-radius: var(--dropzone-exsts-radius-v);
+
+  padding-inline: 8px;
+  padding-block: 4px;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--dropzone-exsts-bg-hover-v);
+    }
+
+    &:active {
+      background-color: var(--dropzone-exsts-bg-pressed-v);
+    }
+  }
+
+  &.isOpen {
+    cursor: pointer;
+    background-color: var(--dropzone-exsts-bg-focus-v);
+
+    .dropzoneExstsText {
+      color: var(--dropzone-exsts-color-focus-v);
+    }
+
+    .dropzoneExstsBadge {
+      [data-testid="badge-inner"] {
+        background-color: var(--dropzone-badge-focus-v);
+      }
+    }
+  }
+}
+
+.dropzoneExstsText {
+  font-weight: 600;
+  font-size: var(--dropzone-font-size-v);
+  line-height: 20px;
+}
+
+.dropzoneExstsBadge {
+  [data-testid="badge-text"] {
+    font-weight: 700 !important;
+    font-size: 9px !important;
+  }
+}
+
+.dropzoneArrowIcon {
+  width: 6px;
+  height: 6px;
+  margin-inline-start: 2px;
+  transition: transform 0.2s ease;
+
+  path {
+    fill: var(--dropzone-exsts-color-v);
+  }
+
+  &.isOpen {
+    transform: rotate(180deg);
+    path {
+      fill: var(--dropzone-arrow-focus-v);
+    }
+  }
+}
+
+.dropzoneFormatsDropdown {
+  :global(.light) & {
+    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px
+      #{colors.$box-shadow-color};
+  }
+
+  :global(.dark) & {
+    --dropzone-context-menu-box-shadow: 0px 8px 16px 0px
+      #{colors.$box-shadow-color};
+  }
+
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: 0 !important;
+  right: 0 !important;
+  transform: none !important;
+  z-index: 200;
+  width: 100%;
+  background: var(--background-content);
+  border: 1px solid var(--border-color);
+  border-radius: var(--dropzone-formats-radius-v);
+  box-shadow: var(--dropzone-formats-shadow-v);
+}
+
+.dropzoneFormatsContent {
+  padding-inline: 12px;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-secondary);
+  word-wrap: break-word;
+}
+
+.dropzoneChildren {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.dropzone.hasChildren {
+  justify-content: flex-end;
+  padding: 16px;
+  box-sizing: border-box;
+}
+

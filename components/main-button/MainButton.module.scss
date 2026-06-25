@@ -1,0 +1,184 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/mixins";
+@use "../../styles/variables/colors";
+
+.menu:global(.p-contextmenu) {
+  position: fixed;
+  margin: 0;
+  padding: 0;
+  transform-origin: top left;
+  box-sizing: border-box;
+
+  [dir="rtl"] & {
+    transform-origin: top right;
+  }
+}
+
+.groupMainButton {
+  display: grid;
+  grid-template-columns: 1fr;
+  position: relative;
+}
+
+.mainButton {
+  @include mixins.no-user-select();
+  :global(.light) & {
+    --main-button-background-color: var(--accent-main, #{colors.$light-blue-main});
+    --main-button-padding: 5px 14px 5px 12px;
+    --main-button-border-radius: 3px;
+    --main-button-line-height: 22px;
+    --main-button-font-size: 16px;
+    --main-button-font-weight: 700;
+    --main-button-text-color: #{colors.$white};
+    --main-button-text-color-disabled: #{colors.$white};
+    --main-button-svg-margin: auto;
+    --main-button-svg-height: 100%;
+    --main-button-svg-fill: #{colors.$white};
+    --main-button-arrow-dropdown-border-top-disabled: 5px solid #{colors.$white};
+
+  }
+
+  :global(.dark) & {
+    --main-button-background-color: var(--accent-main, #{colors.$light-blue-main});
+    --main-button-text-color: #{colors.$white};
+    --main-button-text-color-disabled: #{colors.$white};
+    --main-button-svg-fill: #{colors.$white};
+    --main-button-arrow-dropdown-border-top-disabled: 5px solid #{colors.$black};
+    --main-button-padding: 5px 14px 5px 12px;
+    --main-button-border-radius: 3px;
+    --main-button-line-height: 22px;
+    --main-button-font-size: 16px;
+    --main-button-font-weight: 700;
+    --main-button-svg-margin: auto;
+    --main-button-svg-height: 100%;
+  }
+
+  --main-button-bg-value: var(--main-button-bg, var(--main-button-background-color));
+  --main-button-text-value: var(--main-button-color, var(--main-button-text-color));
+  --main-button-icon-fill-value: var(--main-button-icon-color, var(--main-button-svg-fill));
+  --main-button-radius-value: var(--main-button-radius, var(--main-button-border-radius));
+  --main-button-padding-value: var(--main-button-inner-padding, var(--main-button-padding));
+  --main-button-font-size-value: var(--main-button-text-size, var(--main-button-font-size));
+  --main-button-font-weight-value: var(--main-button-text-weight, var(--main-button-font-weight));
+  --main-button-line-height-value: var(--main-button-text-line-height, var(--main-button-line-height));
+
+  -webkit-tap-highlight-color: var(--tap-highlight-color);
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  vertical-align: middle;
+  box-sizing: border-box;
+
+  background-color: var(--main-button-bg-value);
+  padding: var(--main-button-padding-value);
+  border-radius: var(--main-button-radius-value);
+  -moz-border-radius: var(--main-button-radius-value);
+  -webkit-border-radius: var(--main-button-radius-value);
+  line-height: var(--main-button-line-height-value);
+
+  &:not(.disabled) {
+    &:hover {
+      opacity: 0.85;
+      cursor: pointer;
+    }
+
+    &:active {
+      opacity: 1;
+      cursor: pointer;
+
+      &[data-theme="light"] {
+        filter: brightness(90%);
+      }
+
+      &[data-theme="dark"] {
+        filter: brightness(82%);
+      }
+    }
+  }
+
+  &.disabled {
+    opacity: 0.6;
+
+    &:hover {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    &:active {
+      opacity: 0.6;
+      cursor: default;
+      filter: none;
+    }
+  }
+
+  &.dropdown {
+    &.disabled:after {
+      border-top: var(--main-button-arrow-dropdown-border-top-disabled);
+    }
+  }
+
+  &:not(.dropdown) {
+    &:after {
+      display: none;
+    }
+  }
+
+  & > svg {
+    display: block;
+    margin: var(--main-button-svg-margin);
+    height: var(--main-button-svg-height);
+  }
+  .img {
+    svg {
+      padding-bottom: 1px;
+      path {
+        fill: var(--main-button-icon-fill-value);
+      }
+    }
+  }
+  
+  .text {
+    display: inline;
+    font-size: var(--main-button-font-size-value);
+    font-weight: var(--main-button-font-weight-value);
+    color: var(--main-button-text-value);
+  
+    .disabled & {
+      color: var(--main-button-text-color-disabled);
+    }
+  }
+}

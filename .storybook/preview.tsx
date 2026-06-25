@@ -1,51 +1,157 @@
+import React from "react";
 import type { Preview } from "@storybook/react";
-import { useDarkMode } from "storybook-dark-mode";
+import { useDarkMode } from "@vueless/storybook-dark-mode";
 
-import { globalColors } from "../themes/globalColors";
+import { ThemeProviderComponent } from "../components/theme-provider";
+import { TranslationProvider } from "../providers/translation";
+import type { TTranslations } from "../providers/translation";
 
-import "../styles/custom.scss";
+import type { TColorScheme } from "../context/ThemeContext";
+
+import { globalColors } from "../providers/theme/themes/globalColors";
+import globalTypes from "./globals";
+import withApiProvider from "./decorators/withApiProvider";
+import enCommon from "../locales/en/Common.json";
+import enPayments from "../locales/en/Payments.json";
+import enServices from "../locales/en/Services.json";
+import enSettings from "../locales/en/Settings.json";
 
 import "./styles.css";
+import "../css/fonts.css";
 
 import lightTheme from "./lightTheme";
 import darkTheme from "./darkTheme";
+import { DocsContainer } from "./DocsContainer";
+
+const lightColorScheme: TColorScheme = {
+  id: 1,
+  name: "Light",
+  main: {
+    accent: globalColors.lightBlueMain,
+    buttons: globalColors.lightBlueMain,
+  },
+  text: {
+    accent: globalColors.white,
+    buttons: globalColors.white,
+  },
+};
+
+const darkColorScheme: TColorScheme = {
+  id: 2,
+  name: "Dark",
+  main: {
+    accent: globalColors.lightSecondMain,
+    buttons: globalColors.lightSecondMain,
+  },
+  text: {
+    accent: globalColors.white,
+    buttons: globalColors.white,
+  },
+};
+
+document.cookie = "asc_language=en";
+
+const baseTheme = {
+  isBase: true,
+  interfaceDirection: "ltr" as const,
+  fontFamily: "Open Sans, sans-serif, Arial",
+};
+
+const darkThemeConfig = {
+  isBase: false,
+  interfaceDirection: "ltr" as const,
+  fontFamily: "Open Sans, sans-serif, Arial",
+};
 
 const preview: Preview = {
-	parameters: {
-		backgrounds: { disable: true },
-		controls: {
-			expanded: true,
-			matchers: {
-				color: /(background|color)$/i,
-				date: /Date$/i,
-			},
-		},
-		darkMode: {
-			light: lightTheme,
-			dark: darkTheme,
-		},
-	},
+  globalTypes,
+  parameters: {
+    backgrounds: { disabled: true },
+    controls: {
+      expanded: true,
+      matchers: {
+        color: /(background|color)$/i,
+        date: /Date$/i,
+      },
+    },
+    darkMode: {
+      light: lightTheme,
+      dark: darkTheme,
+    },
+    docs: {
+      container: DocsContainer,
+      toc: true,
+    },
+    options: {
+      storySort: {
+        order: [
+          "Getting started",
+          ["Welcome", "Structure", "Translation", "Themes", "API"],
+          "Samples",
+          "Components",
+          [
+            "AI Agent",
+            "Payments",
+            "Document Editor",
+            "Uploader",
+            "Selectors",
+            "Providers",
+            "Errors"
+          ],
+        ],
+      },
+    },
+  },
 
-	decorators: [
-		(Story) => {
-			const isDark = useDarkMode();
+  initialGlobals: {
+    apiConfig: "default",
+  },
 
-			return (
-				<div
-					style={{
-						backgroundColor: isDark ? globalColors.black : globalColors.white,
-						color: isDark ? globalColors.white : globalColors.black,
-						minHeight: "100vh",
-						padding: "20px",
-					}}
-				>
-					<Story />
-				</div>
-			);
-		},
-	],
+  decorators: [
+    withApiProvider,
+    (Story, context) => {
+      const isDark = useDarkMode();
+      const interfaceDirection = context.globals.direction;
 
-	tags: ["autodocs"],
+      const theme = isDark ? darkThemeConfig : baseTheme;
+      const currentColorScheme = isDark ? darkColorScheme : lightColorScheme;
+
+      const translations: TTranslations = new Map([
+        ["en", new Map([
+          ["Common", enCommon],
+          ["Payments", enPayments],
+          ["Services", enServices],
+          ["Settings", enSettings],
+        ])],
+      ]);
+
+      const isDocs = context.viewMode === "docs";
+      const noPadding = context.parameters?.noPadding;
+
+      return (
+        <TranslationProvider locale="en" translations={translations}>
+          <ThemeProviderComponent
+            theme={{ ...theme, interfaceDirection }}
+            currentColorScheme={currentColorScheme}
+          >
+            <div
+              style={{
+                backgroundColor: isDark
+                  ? globalColors.black
+                  : globalColors.white,
+                color: isDark ? globalColors.white : globalColors.black,
+                padding: isDocs || noPadding ? "0" : "20px",
+              }}
+            >
+              <Story />
+            </div>
+          </ThemeProviderComponent>
+        </TranslationProvider>
+      );
+    },
+  ],
+
+  tags: ["autodocs"],
 };
 
 export default preview;

@@ -1,0 +1,29 @@
+.wrapper {
+  height: 500px;
+  width: 100%;
+  position: relative;
+
+  :global(.layout-progress-bar_wrapper) {
+    position: static;
+    width: auto;
+    height: auto;
+  }
+}
+
+.desktopWarning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 16px;
+  color: var(--gray-dark, #657077);
+}
+
+.isAutoDocs {
+  width: calc(100% + 40px);
+  height: 500px;
+  position: relative;
+  margin-block: 0 -20px;
+  right: inherit;
+  margin-inline: -20px 0;
+}

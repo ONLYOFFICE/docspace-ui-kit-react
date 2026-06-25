@@ -1,0 +1,261 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+@use "../../styles/variables";
+@use "../../styles/mixins";
+@use "../../styles/variables/colors" as *;
+
+:global(.rtl) {
+  :local {
+    .trackHorizontal {
+      left: unset !important;
+      right: 0 !important;
+    }
+  }
+}
+
+:global(.dark) {
+  :local {
+    .scrollbar {
+      --scrollbar-bg-color: #{$dark-scroll};
+      --scrollbar-hover-bg-color: #{$dark-scroll-hover};
+      --scrollbar-press-bg-color: #{$dark-scroll-active};
+    }
+  }
+}
+
+.scrollbar {
+  --scrollbar-bg-color: #{$light-scroll};
+  --scrollbar-hover-bg-color: #{$light-scroll-hover};
+  --scrollbar-press-bg-color: #{$light-scroll-active};
+
+  --scrollbar-thumb-color: var(--scrollbar-bg, var(--scrollbar-bg-color));
+  --scrollbar-thumb-hover-color: var(--scrollbar-bg-hover, var(--scrollbar-hover-bg-color));
+  --scrollbar-thumb-active-color: var(--scrollbar-bg-active, var(--scrollbar-press-bg-color));
+  --scrollbar-track-border-radius: var(--scrollbar-radius, 8px);
+  --scrollbar-thumb-default-size: var(--scrollbar-thumb-size, 4px);
+  --scrollbar-track-inner-padding: var(--scrollbar-track-padding, 4px);
+
+  --scrollbar-padding-inline-end: var(--scrollbar-padding-end, 17px);
+  --scrollbar-padding-inline-end-mobile: var(--scrollbar-padding-end-mobile, 8px);
+  --scrollbar-padding-after-last-item: var(--scrollbar-last-padding, unset);
+
+  &:global(.trackYVisible.trackXVisible) {
+    .trackVertical {
+      height: calc(100% - 16px) !important;
+    }
+
+    .trackHorizontal {
+      width: calc(100% - 16px) !important;
+    }
+  }
+
+  &.noScrollY {
+    &:global(.trackYVisible) {
+      .trackVertical {
+        height: 0 !important;
+      }
+    }
+  }
+
+  // fix when iframe breaks dragging scroll
+  &:has(> .track > :global(.dragging)) {
+    iframe {
+      pointer-events: none;
+    }
+  }
+}
+
+.scroller {
+  &.ios::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scrollBody {
+  padding-inline-end: var(--scrollbar-padding-inline-end) !important;
+  position: relative;
+  outline: none;
+
+  @include mixins.mobile {
+    padding-inline-end: var(--scrollbar-padding-inline-end-mobile) !important;
+  }
+}
+
+.track {
+  box-sizing: border-box;
+  display: flex;
+  padding: var(--scrollbar-track-inner-padding);
+  border-radius: var(--scrollbar-track-border-radius) !important;
+  background: transparent !important;
+  z-index: 201;
+
+  @include mixins.desktop {
+    &:hover {
+      .thumbVertical {
+        width: 8px !important;
+      }
+
+      .thumbHorizontal {
+        height: 8px !important;
+      }
+    }
+  }
+
+  @include mixins.tablet-and-below {
+    pointer-events: none;
+
+    .thumb {
+      pointer-events: all;
+    }
+  }
+}
+
+.trackVertical {
+  direction: var(--interface-direction);
+  height: 100% !important;
+  width: 16px !important;
+  top: 0 !important;
+  justify-content: flex-end;
+}
+
+.trackHorizontal {
+  width: 100% !important;
+  height: 16px !important;
+  align-items: flex-end;
+  direction: ltr;
+  left: 0 !important;
+}
+
+.thumb {
+  touch-action: none;
+  background-color: var(--scrollbar-thumb-color) !important;
+  position: relative;
+  cursor: default !important;
+
+  &:hover {
+    background-color: var(--scrollbar-thumb-hover-color) !important;
+  }
+
+  &:active,
+  &:global(.dragging) {
+    touch-action: none;
+    background-color: var(--scrollbar-thumb-active-color) !important;
+  }
+}
+
+.thumbVertical {
+  width: var(--scrollbar-thumb-default-size) !important;
+  transition: width linear 0.1s;
+
+  @include mixins.desktop {
+    &:active {
+      width: 8px !important;
+    }
+  }
+
+  @include mixins.tablet-and-below {
+    width: var(--scrollbar-thumb-default-size) !important;
+  }
+}
+
+.thumbHorizontal {
+  height: var(--scrollbar-thumb-default-size) !important;
+  transition: height linear 0.1s;
+
+  @include mixins.desktop {
+    &:active {
+      height: 8px !important;
+    }
+  }
+
+  @include mixins.tablet-and-below {
+    height: var(--scrollbar-thumb-default-size) !important;
+  }
+}
+
+.fixedSize {
+  @include mixins.desktop {
+    & > .trackVertical > .thumbVertical {
+      width: 8px !important;
+    }
+    & > .trackHorizontal > .thumbHorizontal {
+      height: 8px !important;
+    }
+  }
+}
+
+.paddingAfterLastItem {
+  .scrollBody {
+    padding-bottom: var(--scrollbar-padding-after-last-item) !important;
+  }
+}
+
+// ------- Auto hide styles -------
+
+.autoHide {
+  // tracks hidden by default
+  .track {
+    opacity: 0;
+    transition: opacity 0.35s;
+  }
+
+  // tracks always shown if hovered or thumb dragged
+  .track:is(:hover, :has(> :global(.dragging))) {
+    opacity: 1;
+  }
+
+  // tracks shown if scroll element was not auto hidden, hovered
+  // and there is no another nesting hovered scroll element, dragging thumb or backdrop
+  &.scrollVisible:hover:not(
+      :has(
+        &:hover:global(.trackYVisible),
+        &:hover:global(.trackXVisible),
+        .thumb:global(.dragging),
+        :global(.backdrop-active)
+      )
+    ) {
+    > .track {
+      opacity: 1;
+    }
+  }
+  // no hover logic for touch devices
+  @media (hover: none) {
+    &.scrollVisible:not(:has(:global(.backdrop-active))) {
+      .track {
+        opacity: 1;
+      }
+    }
+  }
+}

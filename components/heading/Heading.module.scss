@@ -1,0 +1,78 @@
+@use "../../styles/variables/colors" as *;
+@use "../../styles/mixins";
+
+:global(.dark) {
+  .heading {
+    --heading-color: #{$white};
+  }
+}
+
+.heading {
+  --heading-font-weight: 600;
+  --heading-font-size-xlarge: 27px;
+  --heading-font-size-large: 23px;
+  --heading-font-size-medium: 21px;
+  --heading-font-size-small: 19px;
+  --heading-font-size-xsmall: 15px;
+
+  --heading-color: #{$black};
+
+  --heading-content-font-size: var(--heading-size-content, 18px);
+  --heading-menu-font-size: var(--heading-size-menu, 23px);
+  --heading-header-font-size: var(--heading-size-header, 28px);
+  --heading-line-height: var(--heading-lh, 50px);
+
+  @include mixins.common-text-styles;
+
+  font-weight: var(--heading-weight, var(--heading-font-weight));
+  color: var(--heading-text-color, var(--heading-color));
+  margin: 0;
+
+  &.small {
+    font-size: var(--heading-font-size-small);
+  }
+
+  &.medium {
+    font-size: var(--heading-font-size-medium);
+  }
+
+  &.large {
+    font-size: var(--heading-font-size-large);
+  }
+
+  &.xlarge {
+    font-size: var(--heading-font-size-xlarge);
+  }
+
+  &.xsmall {
+    font-size: var(--heading-font-size-xsmall);
+  }
+
+  &.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.inline {
+    display: inline;
+  }
+
+  &.content {
+    font-size: var(--heading-content-font-size);
+    font-weight: bold;
+    line-height: var(--heading-line-height);
+  }
+
+  &.menu {
+    font-size: var(--heading-menu-font-size);
+    font-weight: bold;
+    line-height: var(--heading-line-height);
+  }
+
+  &.header {
+    font-size: var(--heading-header-font-size);
+    font-weight: var(--heading-font-weight);
+    line-height: var(--heading-line-height);
+  }
+}

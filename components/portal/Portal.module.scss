@@ -1,0 +1,56 @@
+@use "../../styles/variables";
+@use "../../styles/variables/colors";
+
+.popup {
+  // bridge vars for hardcoded values
+  --portal-popup-bg-v: var(--portal-popup-bg, #{variables.$white});
+  --portal-popup-shadow-v: var(--portal-popup-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
+  --portal-popup-radius-v: var(--portal-popup-radius, 6px);
+  --portal-popup-padding-v: var(--portal-popup-padding, 20px);
+  --portal-popup-color-v: var(--portal-popup-color, #{variables.$dark-black});
+  --portal-popup-z-index-v: var(--portal-popup-z-index, 1000);
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: var(--portal-popup-padding-v);
+  background-color: var(--portal-popup-bg-v);
+  box-shadow: var(--portal-popup-shadow-v);
+  border-radius: var(--portal-popup-radius-v);
+  z-index: var(--portal-popup-z-index-v);
+  color: var(--portal-popup-color-v);
+
+  &.blue {
+    background-color: var(--portal-popup-bg-blue, #{variables.$portal-blue});
+  }
+
+  &.purple {
+    background-color: var(--portal-popup-bg-purple, #{variables.$portal-purple});
+  }
+
+  &.green {
+    background-color: var(--portal-popup-bg-green, #{variables.$portal-green});
+  }
+
+  &.top30 {
+    top: 30%;
+  }
+
+  &.top50 {
+    top: 50%;
+  }
+
+  &.top70 {
+    top: 70%;
+  }
+}
+
+.customContainer {
+  position: relative;
+  width: 300px;
+  height: 200px;
+  border: 2px dashed #{variables.$gray-dark-pressed};
+  margin: 20px;
+  padding: 10px;
+}

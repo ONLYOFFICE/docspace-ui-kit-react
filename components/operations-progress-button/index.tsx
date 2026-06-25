@@ -1,0 +1,523 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import React, {
+  useState,
+  useLayoutEffect,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
+import classNames from "classnames";
+
+import { isMobile } from "react-device-detect";
+import { FloatingButton, FloatingButtonIcons } from "../floating-button";
+import { DropDown } from "../drop-down";
+import { OPERATIONS_NAME } from "../../constants/index";
+import { HelpButton } from "../help-button";
+import { Backdrop } from "../backdrop";
+import { Text } from "../text";
+import { useCommonTranslation } from "../../utils";
+
+import PreviewButton from "./PreviewButton";
+import ProgressList from "./ProgressList";
+import styles from "./OperationsProgressButton.module.scss";
+import { OperationsProgressProps } from "./OperationsProgressButton.types";
+
+import type { ValueOf } from "../../types";
+
+type OperationName = keyof typeof OPERATIONS_NAME;
+
+const operationToIconMap: Record<
+  OperationName,
+  ValueOf<typeof FloatingButtonIcons>
+> = {
+  download: FloatingButtonIcons.download,
+  convert: FloatingButtonIcons.refresh,
+  copy: FloatingButtonIcons.copy,
+  duplicate: FloatingButtonIcons.duplicate,
+  markAsRead: FloatingButtonIcons.markAsRead,
+  deletePermanently: FloatingButtonIcons.deletePermanently,
+  exportIndex: FloatingButtonIcons.exportIndex,
+  move: FloatingButtonIcons.move,
+  trash: FloatingButtonIcons.trash,
+  other: FloatingButtonIcons.other,
+  upload: FloatingButtonIcons.upload,
+  deleteVersionFile: FloatingButtonIcons.trash,
+  backup: FloatingButtonIcons.backup,
+  syncDatabase: FloatingButtonIcons.upload,
+};
+
+const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
+  operations = [],
+  panelOperations = [],
+  operationsAlert,
+  operationsCanceled,
+  operationsCompleted = false,
+  clearOperationsData,
+  clearPanelOperationsData,
+  cancelUpload,
+  mainButtonVisible,
+  needErrorChecking,
+  showCancelButton,
+  isInfoPanelVisible,
+  dropTargetFolderName,
+  isDragging,
+  clearDropPreviewLocation,
+}) => {
+  const t = useCommonTranslation();
+  const [isOpenDropdown, setIsOpenDropdown] = useState<boolean>(false);
+  const [isHideTooltip, setIsHideTooltip] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [hideMainButton, setHideMainButton] = useState<boolean>(false);
+  const [showSeveralOperationsIcon, setShowSeveralOperationsIcon] =
+    useState<boolean>(true);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Track the last seen dragged operation ID to detect new uploads
+  const lastDraggedOperationId = useRef<string | null>(null);
+
+  const panelOperationsLength = panelOperations.length;
+  const operationsLength = operations.length;
+
+  const allOperationsLength = panelOperationsLength + operationsLength;
+  const isSeveralOperations = allOperationsLength > 1;
+
+  const hasUploadOperationByDrag = useCallback(() => {
+    const uploadOperation = panelOperations.find(
+      (operation) =>
+        operation.operation === OPERATIONS_NAME.upload &&
+        operation.dragged &&
+        operation.completed === false,
+    );
+
+    if (!uploadOperation) {
+      return false;
+    }
+
+    const isNewDraggedUpload =
+      uploadOperation.dragged !== lastDraggedOperationId.current;
+
+    if (isNewDraggedUpload) {
+      lastDraggedOperationId.current = uploadOperation.dragged || null;
+    }
+
+    return isNewDraggedUpload;
+  }, [panelOperations]);
+
+  const clearTimers = () => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    if (resetTimerRef.current) {
+      clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+    }
+  };
+
+  const handleAnimationEnd = useCallback(
+    (e: globalThis.AnimationEvent) => {
+      const animation = e.animationName;
+
+      if (
+        animation.includes("hideButton") ||
+        animation.includes("hideButtonImmediate")
+      ) {
+        clearOperationsData?.();
+        clearPanelOperationsData?.();
+      }
+    },
+    [clearOperationsData, clearPanelOperationsData],
+  );
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
+  const onOpenDropdown = () => {
+    setIsOpenDropdown(!isOpenDropdown);
+  };
+
+  const handleTooltipOpen = () => {
+    clearTimers();
+
+    hideTimerRef.current = setTimeout(() => {
+      setIsHovered(false);
+      setIsHideTooltip(true);
+
+      resetTimerRef.current = setTimeout(() => {
+        setIsHideTooltip(false);
+      }, 100);
+    }, 3500);
+  };
+
+  const handleFloatingButtonClick = () => {
+    if (isMobile && !panelOperationsLength) {
+      setIsHovered(true);
+    }
+
+    if (isSeveralOperations) {
+      onOpenDropdown();
+
+      return;
+    }
+
+    if (panelOperationsLength) {
+      setIsHideTooltip(true);
+
+      panelOperations[0].showPanel?.(true);
+      clearTimers();
+
+      resetTimerRef.current = setTimeout(() => {
+        setIsHideTooltip(false);
+      }, 100);
+
+      return;
+    }
+
+    if (operationsLength && operations[0].showPanel) {
+      setIsHideTooltip(true);
+      operations[0].showPanel(true);
+      clearTimers();
+
+      resetTimerRef.current = setTimeout(() => {
+        setIsHideTooltip(false);
+      }, 100);
+    }
+  };
+
+  const handleOperationClick = () => {
+    setIsHideTooltip(true);
+    clearTimers();
+    setIsOpenDropdown(false);
+    setIsHovered(false);
+    resetTimerRef.current = setTimeout(() => {
+      setIsHideTooltip(false);
+    }, 100);
+  };
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+
+    if (!container) return;
+
+    container.addEventListener(
+      "animationend",
+      handleAnimationEnd as EventListener,
+    );
+
+    return () => {
+      container.removeEventListener(
+        "animationend",
+        handleAnimationEnd as EventListener,
+      );
+    };
+  }, [handleAnimationEnd]);
+
+  useEffect(() => {
+    return () => {
+      clearTimers();
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (isOpenDropdown && !isSeveralOperations) {
+      setIsOpenDropdown(false);
+      setIsHovered(false);
+    }
+  }, [isOpenDropdown, isSeveralOperations]);
+
+  useEffect(() => {
+    if (isDragging && operationsLength && !isSeveralOperations) {
+      setShowSeveralOperationsIcon(false);
+    }
+  }, [isDragging, operationsLength, isSeveralOperations]);
+
+  useEffect(() => {
+    if (allOperationsLength === 0) {
+      lastDraggedOperationId.current = null;
+    }
+  }, [allOperationsLength]);
+
+  const getIcons = () => {
+    if (isSeveralOperations && showSeveralOperationsIcon) {
+      return isOpenDropdown
+        ? FloatingButtonIcons.arrow
+        : FloatingButtonIcons.dots;
+    }
+
+    const operation = operationsLength
+      ? operations[0].operation
+      : panelOperations[0].operation;
+
+    return (
+      operationToIconMap[operation as OperationName] ||
+      FloatingButtonIcons.other
+    );
+  };
+  const getPercent = () => {
+    if (isSeveralOperations) {
+      return;
+    }
+
+    return operationsLength
+      ? operations[0].percent
+      : panelOperations[0].percent;
+  };
+
+  const getErrorCount = () => {
+    return operationsLength
+      ? operations[0].errorCount
+      : panelOperations[0].errorCount;
+  };
+
+  const getTooltipLabel = () => {
+    if (isSeveralOperations) {
+      return (
+        <Text fontWeight={600}>
+          {t("Processes", { count: allOperationsLength })}
+        </Text>
+      );
+    }
+
+    if (operationsCanceled) {
+      const canceledLabel = operationsLength
+        ? operations[0].label
+        : panelOperations[0].label;
+
+      return <Text fontWeight={600}>{canceledLabel}</Text>;
+    }
+
+    const currentOperation = operationsLength
+      ? operations[0]
+      : panelOperations[0];
+
+    if (currentOperation.description) {
+      return (
+        <Text fontWeight={600}>
+          {currentOperation.label}
+          <br />
+          {currentOperation.description}
+        </Text>
+      );
+    }
+
+    if (operationsAlert) {
+      const operationName = currentOperation.label;
+      const operation = currentOperation.operation;
+
+      if (
+        operation === OPERATIONS_NAME.upload &&
+        getPercent() &&
+        getErrorCount()
+      ) {
+        return (
+          <Text fontWeight={600}>
+            {operationName}
+            <br />
+            {t("ErrorUploadingFiles", {
+              count: getErrorCount()!,
+            })}
+          </Text>
+        );
+      }
+
+      return (
+        <Text fontWeight={600}>
+          {t("ErrorOperation", {
+            operationName,
+          })}
+        </Text>
+      );
+    }
+
+    if (operationsCompleted) {
+      const operationName = currentOperation.label;
+
+      return (
+        <Text fontWeight={600}>
+          {t("SuccessOperation", {
+            operationName,
+          })}
+        </Text>
+      );
+    }
+
+    return <Text fontWeight={600}>{currentOperation.label}</Text>;
+  };
+
+  const getIconUrl = () => {
+    if (isSeveralOperations && showSeveralOperationsIcon) {
+      return undefined;
+    }
+
+    const customIconUrl = operationsLength
+      ? operations[0].iconUrl
+      : panelOperations[0].iconUrl;
+
+    return customIconUrl;
+  };
+
+  const onCancelOperation = () => {
+    cancelUpload?.(t);
+  };
+
+  const disableOpenPanel =
+    panelOperationsLength === 1 && !panelOperations[0].showPanel;
+
+  const withoutStatus = disableOpenPanel && panelOperations[0].withoutStatus;
+
+  const isLaterHide = () => {
+    if (disableOpenPanel) return false;
+
+    if (panelOperationsLength > 0) return true;
+
+    return false;
+  };
+
+  const checkError = needErrorChecking && !disableOpenPanel;
+
+  const hideMainButtonHandler = useCallback(
+    (flag: boolean) => setHideMainButton(flag),
+    [],
+  );
+  const setShowSeveralOperationsIconHandler = useCallback(
+    (flag: boolean) => setShowSeveralOperationsIcon(flag),
+    [],
+  );
+
+  return (
+    <>
+      <Backdrop
+        zIndex={210}
+        visible={isOpenDropdown}
+        onClick={() => setIsOpenDropdown(false)}
+      />
+
+      <PreviewButton
+        dropTargetFolderName={dropTargetFolderName || null}
+        isDragging={isDragging ?? false}
+        clearDropPreviewLocation={clearDropPreviewLocation}
+        hasUploadOperationByDrag={hasUploadOperationByDrag}
+        setHideMainButton={hideMainButtonHandler}
+        allOperationsLength={allOperationsLength > 0}
+        setShowSeveralOperationsIcon={setShowSeveralOperationsIconHandler}
+      />
+
+      <div
+        ref={containerRef}
+        className={classNames(styles.progressBarContainer, {
+          [styles.autoHide]:
+            !isOpenDropdown && operationsCompleted && !checkError && !isHovered,
+          [styles.laterHide]: isLaterHide(),
+          [styles.immidiateHide]:
+            !isSeveralOperations && operationsCompleted && disableOpenPanel,
+          [styles.mainButtonVisible]: mainButtonVisible,
+          [styles.infoPanelVisible]: isInfoPanelVisible,
+        })}
+        style={{ zIndex: isOpenDropdown ? "211" : "201" }}
+        onMouseEnter={!isMobile ? handleMouseEnter : undefined}
+        onMouseLeave={!isMobile ? handleMouseLeave : undefined}
+      >
+        {allOperationsLength > 0 && !hideMainButton ? (
+          <HelpButton
+            className="layout-progress-bar"
+            place="left"
+            tooltipContent={getTooltipLabel()}
+            openOnClick={isMobile}
+            {...(isMobile && { afterShow: handleTooltipOpen })}
+            {...(isHideTooltip && { isOpen: false })}
+            noUserSelect
+          >
+            <FloatingButton
+              className={classNames(styles.floatingButton, {
+                [styles.cursorDefault]:
+                  (!panelOperationsLength && !operations[0]?.showPanel) ||
+                  disableOpenPanel,
+              })}
+              icon={getIcons()}
+              iconUrl={getIconUrl()}
+              alert={operationsAlert}
+              completed={operationsCompleted}
+              onClick={handleFloatingButtonClick}
+              {...(!isSeveralOperations && {
+                showCancelButton,
+                showCloseIcon: isMobile && isHovered,
+                clearUploadedFilesHistory: onCancelOperation,
+              })}
+              withoutStatus={withoutStatus}
+              percent={getPercent()}
+            />
+          </HelpButton>
+        ) : null}
+        {isOpenDropdown ? (
+          <DropDown
+            open={isOpenDropdown}
+            withBackdrop={false}
+            manualWidth="344px"
+            directionY="top"
+            directionX="left"
+            fixedDirection
+            isDefaultMode={false}
+            className={classNames(styles.styledDropDown)}
+          >
+            <ProgressList
+              operations={operations}
+              panelOperations={panelOperations}
+              clearOperationsData={clearOperationsData}
+              clearPanelOperationsData={(
+                _: string | null,
+                operationName: string | null,
+              ) => {
+                clearPanelOperationsData?.(operationName);
+              }}
+              onCancel={onCancelOperation}
+              onOpenPanel={handleOperationClick}
+            />
+          </DropDown>
+        ) : null}
+      </div>
+    </>
+  );
+};
+
+export default OperationsProgressButton;

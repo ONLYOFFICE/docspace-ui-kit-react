@@ -1,0 +1,211 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../../styles/mixins";
+@use "../../../styles/variables/colors" as *;
+
+:global(.dark) {
+  .tileContainer {
+    --tile-container-sort-fill: #{$white};
+    --tile-container-sort-text: #{$white};
+    --tile-container-sort: #{$dark-gray-dark};
+    --tile-container-hover-background: #{$black};
+  }
+}
+
+.tileContainer {
+  --tile-container-sort-fill: #{$black};
+  --tile-container-sort-text: #{$black};
+  --tile-container-sort: #{$light-gray-dark};
+  --tile-container-hover-background: #{$gray-light};
+
+  position: relative;
+  height: 100%;
+
+  user-select: text;
+
+  & *:not(img) {
+    user-select: text;
+  }
+
+  &.noSelect {
+    user-select: none;
+
+    & *:not(img) {
+      user-select: none;
+    }
+  }
+
+  @include mixins.tablet-and-below {
+    margin-top: 16px;
+    margin-inline-end: -3px;
+  }
+}
+
+.tileItemWrapper {
+  position: relative;
+  width: 100%;
+
+  &.file {
+    padding: 0;
+  }
+  &.folder {
+    padding: 0;
+  }
+}
+
+.gridWrapper {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(clamp(216px, 13.4vw, 360px), 1fr)
+  );
+  grid-gap: var(--tile-container-gap, 16px);
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 23px;
+
+  &.rooms,
+  &.templates {
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(clamp(275px, 13.4vw, 350px), 1fr)
+    );
+  }
+
+  &.files {
+    margin-bottom: 0;
+  }
+
+  @include mixins.desktop {
+    margin-inline-start: 1px;
+    padding-inline-end: 0;
+  }
+
+  @include mixins.tablet-and-below {
+    margin-inline-start: -1px;
+  }
+}
+
+.header {
+  margin: 0;
+  margin-bottom: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: fit-content;
+
+  div {
+    cursor: pointer !important;
+
+    global {
+      .sort-combo-box {
+        margin-inline-end: 3px;
+        .dropdown-container {
+          top: 104%;
+          bottom: auto;
+          min-width: 200px;
+          margin-top: 3px;
+
+          .option-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            min-width: 200px;
+
+            svg {
+              width: 16px;
+              height: 16px;
+            }
+
+            .option-item__icon {
+              display: none;
+              cursor: pointer;
+
+              &.isDesc {
+                transform: rotate(180deg);
+              }
+
+              path {
+                fill: var(--tile-container-sort-option-fill, var(--tile-container-sort));
+              }
+            }
+
+            :hover {
+              .option-item__icon {
+                display: flex;
+              }
+            }
+          }
+
+          .selected-option-item {
+            background: var(--tile-container-selected-bg, var(--tile-container-hover-background));
+            cursor: auto;
+
+            .selected-option-item__icon {
+              display: flex;
+            }
+          }
+        }
+
+        .optionalBlock {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+
+          font-size: var(--tile-container-sort-font-size, 12px);
+          font-weight: var(--tile-container-sort-font-weight, 600);
+
+          color: var(--tile-container-sort-label, var(--tile-container-sort-text));
+
+          .sort-icon {
+            margin-inline-end: 8px;
+            svg {
+              path {
+                fill: var(--tile-container-sort-icon, var(--tile-container-sort-fill));
+              }
+            }
+          }
+        }
+
+        .combo-buttons_arrow-icon {
+          display: none;
+        }
+      }
+    }
+  }
+}

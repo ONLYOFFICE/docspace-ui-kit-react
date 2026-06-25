@@ -25,6 +25,9 @@ $light-blue-main: #4781d1;
 $light-blue-main-hover: rgba(71, 129, 209, 0.85);
 $light-blue-main-disabled: rgba(71, 129, 209, 0.6);
 $light-blue-main-pressed: #4074bc;
+$light-blue-main-active: rgba(71, 129, 209, 0.15);
+$light-blue-dropzone-active: rgba(71, 129, 209, 0.07);
+$light-blue-dropzone-hover: rgba(71, 129, 209, 0.24);
 $light-second-main: #5299e0;
 $light-second-main-hover: rgba(82, 153, 224, 0.85);
 $light-second-main-disabled: rgba(82, 153, 224, 0.6);
@@ -44,6 +47,7 @@ $second-orange: #ff9933;
 $main-red: #f2675a;
 $main-purple: #533ed1;
 $purple: #6d4ec2;
+$ai-purple: #8b59e0;
 $second-purple: #8570bd;
 $second-purple-dark: #544c6a;
 $main-blue-light: #13b7ec;
@@ -90,6 +94,8 @@ $on-black-color: rgba(255, 255, 255, 0.1);
 $box-shadow-color: #040f1b14;
 $box-shadow-dark-color: #040f1b29;
 $box-shadow-black-color: #0000004d;
+$box-shadow-second-color: #040f1b0a;
+
 $loader-light: #e7e7e7;
 $loader-dark: #484848;
 

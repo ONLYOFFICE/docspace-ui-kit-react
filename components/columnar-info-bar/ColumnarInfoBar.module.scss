@@ -1,0 +1,236 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors" as colors;
+@use "../../styles/variables/devices" as devices;
+
+.bar {
+  :global(.light) & {
+    --cib-bg: #{colors.$snackbar-light-background};
+    --cib-color: #{colors.$black};
+    --cib-accent: #{colors.$light-status-warning};
+  }
+
+  :global(.dark) & {
+    --cib-bg: #{colors.$light-dark-gray-hover};
+    --cib-color: #{colors.$white};
+    --cib-accent: #{colors.$light-status-warning};
+  }
+}
+
+.bar {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  background-color: var(--cib-bg);
+  color: var(--cib-color);
+  border-inline-start: 4px solid var(--cib-accent);
+  box-sizing: border-box;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.header {
+  padding: 14px 16px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cib-header-color, var(--cib-accent));
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.column {
+  box-sizing: border-box;
+  min-height: 56px;
+  padding: 8px 16px 16px;
+
+  @media (max-width: #{devices.$mobile}) {
+    width: 100%;
+  }
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cib-color);
+  opacity: 0.6;
+  margin-bottom: 10px;
+}
+
+.value {
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.closeBtn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  opacity: 0.6;
+  width: 12px;
+  height: 12px;
+  fill: var(--gray);
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+@keyframes barReveal {
+  from {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+  to {
+    opacity: 1;
+    max-height: 150px;
+    margin: 4px;
+  }
+}
+
+// Must come after .bar to override border-inline-start
+.page {
+  flex-direction: column;
+  align-items: stretch;
+  border-inline-start: none;
+  border-radius: 6px;
+  padding: 20px;
+  gap: 12px;
+
+  :global(.light) & {
+    --cib-bg: #{colors.$gray-light};
+    --cib-accent: transparent;
+    --cib-header-color: #{colors.$black};
+  }
+
+  :global(.dark) & {
+    --cib-bg: #{colors.$dark-gray-light};
+    --cib-accent: transparent;
+    --cib-header-color: #{colors.$white};
+  }
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+
+  .header {
+    flex: 1;
+    padding: 0;
+    font-size: 14px;
+    line-height: 16px;
+    color: var(--cib-header-color);
+  }
+
+  .closeBtn {
+    flex-shrink: 0;
+    padding: 0;
+    opacity: 1;
+
+    svg {
+      width: 16px;
+      height: 16px;
+
+      path {
+        fill: #{colors.$gray};
+      }
+    }
+  }
+}
+
+.page .columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 0;
+}
+
+.page .column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  min-height: unset;
+}
+
+.page .label {
+  opacity: 1;
+  margin-bottom: 0;
+  color: #{colors.$gray};
+  line-height: 16px;
+}
+
+.page .value {
+  gap: 4px;
+  line-height: 20px;
+}
+
+// Must come after .bar to override border-inline-start
+.neutral {
+  border-inline-start: none;
+  border-radius: 8px;
+  margin: 4px;
+  width: calc(100% - 8px);
+  animation: barReveal 0.4s ease-out both;
+
+  :global(.light) & {
+    --cib-bg: #{colors.$gray-light};
+    --cib-accent: transparent;
+    --cib-header-color: #{colors.$light-blue-main};
+    border: 2px solid #{colors.$light-blue-main-disabled};
+  }
+
+  :global(.dark) & {
+    --cib-bg: #{colors.$dark-gray-light};
+    --cib-accent: transparent;
+    --cib-header-color: #{colors.$light-blue-main};
+    border: 2px solid #{colors.$light-blue-main-disabled};
+  }
+}

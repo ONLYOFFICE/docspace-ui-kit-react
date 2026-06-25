@@ -1,0 +1,198 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+ @use "../../../styles/mixins";
+ @use "../../../styles/variables/colors";
+
+ .tableGroupMenu {
+   :global(.light) & {
+     --background-color: #{colors.$white};
+     --table-group-menu-border-bottom: 1px solid transparent;
+     --table-group-menu-border-right: 1px solid #{colors.$gray-strong};
+     --table-group-menu-box-shadow:
+       0px 8px 16px #{colors.$popup-shadow}, 0px 0px 4px #{colors.$menu-shadow};
+   }
+
+   :global(.dark) & {
+     --background-color: #{colors.$black};
+     --table-group-menu-border-bottom: 1px solid #{colors.$gray-dark-strong};
+     --table-group-menu-border-right: 1px solid #{colors.$gray-dark-strong};
+     --table-group-menu-box-shadow:
+       0px 8px 16px #{colors.$badge-shadow}, 0px 0px 4px #{colors.$menu-shadow-dark};
+   }
+
+   position: relative;
+ 
+   background: var(--background-color);
+   border-bottom: var(--table-group-menu-border-bottom);
+   box-shadow: var(--table-group-menu-box-shadow);
+   border-end-end-radius: 6px;
+   border-end-start-radius: 6px;
+ 
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+ 
+   width: 100%;
+   height: 100%;
+ 
+   z-index: 199;
+ 
+   margin: 0;
+ 
+   .tableHeaderIcon {
+     display: flex;
+ 
+     align-items: center;
+     align-self: center;
+     justify-content: center;
+     margin-block: 0;
+     margin-inline: auto 20px;
+     height: 100%;
+     width: auto;
+ 
+     padding-inline-start: 20px;
+     padding-inline-end: 0;
+ 
+     .tableHeaderIconButton {
+       margin-inline-end: 8px;
+     }
+   }
+ 
+   .labelElement,
+   .checkbox {
+     margin-inline-start: var(--table-group-menu-checkbox-margin, 28px);
+ 
+     @include mixins.tablet-and-below {
+       margin-inline-start: 24px;
+     }
+   }
+ 
+   .labelElement {
+     white-space: nowrap;
+   }
+ 
+   .separator {
+     border-inline-end: var(--table-group-menu-border-right);
+     width: 1px;
+     height: 21px;
+     margin-block: 0;
+     margin-inline: 20px 16px;
+ 
+     @include mixins.tablet-and-below {
+       height: 36px;
+     }
+ 
+     @include mixins.mobile {
+       height: 20px;
+     }
+   }
+ 
+   .combobox {
+     height: 24px;
+     width: 16px;
+     margin-block: 7px 0;
+     margin-inline: 9px 2px;
+     background: transparent;
+ 
+     :global(.combo-button) {
+       :global(.combo-buttons_arrow-icon) {
+         margin-block: 1px 0;
+         margin-inline: 0 16px;
+       }
+     }
+   }
+ 
+   :global(.scroll-body) {
+     display: flex;
+   }
+ }
+ 
+ .scrollBar {
+   :global(.scroller) {
+     display: flex;
+   }
+ 
+   :global(.nav-thumb-vertical) {
+     display: none !important;
+   }
+ 
+   :global(.nav-thumb-horizontal) {
+     @include mixins.tablet-and-below {
+       display: none !important;
+     }
+   }
+ }
+ 
+ .infoPanelToggleWrapper {
+   :global(.light) & {
+     --background-and-substrate-color: #{colors.$gray-light};
+   }
+
+   :global(.dark) & {
+     --background-and-substrate-color: #{colors.$dark-gray-light};
+   }
+
+   margin-top: 1px;
+
+   @include mixins.tablet-and-below {
+     display: none;
+     margin-block: 0;
+     margin-inline: auto 16px;
+   }
+
+   .infoPanelToggleBg {
+     margin-bottom: 1px;
+   }
+
+   .infoPanelToggle svg {
+     @include mixins.flip-in-rtl;
+   }
+
+   &.isInfoPanelVisible {
+     .infoPanelToggleBg {
+       height: 30px;
+       width: 30px;
+       background: var(--background-and-substrate-color);
+       border: 1px solid var(--background-and-substrate-color);
+       border-radius: 50%;
+
+       .infoPanelToggle {
+         margin: 25% auto auto;
+       }
+     }
+   }
+ }
+ 

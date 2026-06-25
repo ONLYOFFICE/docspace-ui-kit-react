@@ -1,0 +1,141 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../../styles/variables";
+@use "../../../styles/variables/colors" as *;
+@use "../../../styles/mixins";
+
+:global(.dark) {
+  .templateTile {
+    --tile-sub-text: #{$gray-dark};
+  }
+}
+
+.templateTile {
+  --tile-sub-text: #{$light-gray-dark};
+  max-height: 128px;
+  row-gap: 12px;
+  padding: 12px 0px;
+
+  :global {
+    .content {
+      margin-inline-end: 16px;
+      overflow: hidden;
+      width: inherit;
+
+      .row-main-wrapper {
+        width: inherit;
+      }
+
+      .row-main-container {
+        width: inherit;
+      }
+
+      a {
+        margin: 0;
+        display: block !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        span {
+          overflow: hidden;
+          display: block;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+
+      p {
+        margin: 0;
+        display: block !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: inherit;
+      }
+
+      .badges {
+        gap: 12px;
+
+        > div {
+          margin: 0;
+        }
+
+        .tablet-row-create-room {
+          cursor: pointer;
+        }
+      }
+    }
+
+    .bottomContent {
+      height: 48px;
+      width: 100%;
+      align-content: center;
+
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .topContent {
+      height: 44px;
+    }
+  }
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .text {
+    color: var(--tile-sub-color, var(--tile-sub-text));
+  }
+
+  .spaceQuota {
+    margin-top: -5px;
+
+    :global {
+      .combobobox-space-quota .combo-button {
+        height: 25px;
+      }
+    }
+  }
+}

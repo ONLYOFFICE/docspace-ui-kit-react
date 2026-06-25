@@ -1,0 +1,172 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../../../styles/mixins";
+@use "../../../../styles/variables/colors";
+
+.groupMenuItem {
+  display: contents;
+}
+
+.button.overrideNativeStyles {
+  :global(.light) & {
+    --button-color-base: #{colors.$black};
+    --button-color-base-hover: #{colors.$black};
+    --button-color-base-active: #{colors.$black};
+    --button-color-base-disabled: #{colors.$gray-strong};
+    --button-background-base: #{colors.$white};
+    --button-background-base-hover: #{colors.$white};
+  }
+
+  :global(.dark) & {
+    --button-color-base: #{colors.$white};
+    --button-color-base-hover: #{colors.$white};
+    --button-color-base-active: #{colors.$white};
+    --button-color-base-disabled: #{colors.$gray-dark-strong};
+    --button-background-base: #{colors.$black};
+    --button-background-base-hover: #{colors.$black};
+  }
+
+  border: none !important;
+  padding: 0 12px;
+  height: 100%;
+  min-width: fit-content;
+
+  background-color: var(--button-background-base);
+ 
+   :global(.combo-button_selected-icon) > div {
+     display: flex;
+     align-items: center;
+   }
+ 
+   svg {
+     path[fill] {
+       fill: var(--button-color-base);
+     }
+ 
+     path[stroke] {
+       stroke: var(--button-color-base);
+     }
+   }
+ 
+   &.isBlocked {
+     svg {
+       path[fill] {
+         fill: var(--button-color-base-disabled);
+       }
+ 
+       path[stroke] {
+         stroke: var(--button-color-base-disabled);
+       }
+     }
+   }
+ 
+   &:hover,
+   &:active {
+     border: none !important;
+     background-color: unset !important;
+   }
+ 
+   &:hover {
+     svg {
+       path[fill] {
+         fill: var(--button-color-base-hover);
+       }
+ 
+       path[stroke] {
+         stroke: var(--button-color-base-hover);
+       }
+     }
+   }
+ 
+   &:active {
+     svg {
+       path[fill] {
+         fill: var(--button-color-base-active);
+       }
+ 
+       path[stroke] {
+         stroke: var(--button-color-base-active);
+       }
+     }
+   }
+ 
+   :global(.btnIcon) {
+     padding-inline-end: 8px;
+   }
+ 
+   :global(.button-content) {
+     @include mixins.tablet-and-below {
+       flex-direction: column;
+       gap: 4px;
+     }
+ 
+     @include mixins.mobile {
+       margin-top: 4px;
+     }
+   }
+ 
+   /* TODO: remove if editors core version 85+ */
+   &.oldChrome {
+     :global(.button-content) {
+       > div {
+         margin-right: 8px;
+ 
+         @include mixins.tablet-and-below {
+           margin-right: 0;
+         }
+       }
+     }
+   }
+ 
+   @include mixins.tablet-and-below {
+     display: flex;
+     justify-content: center;
+     flex-direction: column;
+     padding: 0 12px;
+ 
+     :global(.btnIcon) {
+       padding: 0;
+       margin: 0 auto;
+     }
+   }
+ 
+   @include mixins.mobile {
+     padding: 0 16px;
+     font-size: 0;
+     line-height: 0;
+   }
+ }
+ 

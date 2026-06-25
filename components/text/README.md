@@ -16,22 +16,6 @@ import { Text } from "@docspace/ui-kit";
 </Text>
 ```
 
-## Styling Override
-
-To override styles, use styled-components with forwardedAs prop:
-
-```js
-const StyledText = styled(Text)`
-  &:hover {
-    border-bottom: 1px dotted;
-  }
-`;
-
-<StyledText forwardedAs="span" title="Some title">
-  Some text
-</StyledText>;
-```
-
 ## Component Properties
 
 | Props             |              Type               | Required | Default | Description                                           |

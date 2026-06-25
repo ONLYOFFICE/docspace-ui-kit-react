@@ -1,0 +1,69 @@
+@use "../../styles/mixins";
+
+.textInput {
+  @include mixins.common-input-styles;
+
+  --text-input-background: var(--text-input-bg, var(--input-bg));
+  --text-input-fs-base: var(
+    --text-input-font-size,
+    var(--text-input-font-size-base)
+  );
+  --text-input-fs-middle: var(
+    --text-input-font-size,
+    var(--text-input-font-size-middle)
+  );
+  --text-input-fs-large: var(
+    --text-input-font-size,
+    var(--text-input-font-size-large)
+  );
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  display: flex;
+  flex: 1 1 0%;
+  outline: none;
+  overflow: hidden;
+  opacity: 1;
+  transition: all 0.2s ease 0s;
+  box-shadow: inset 0 0 0 30px var(--text-input-background);
+  font-weight: normal;
+
+  &[data-size="base"] {
+    font-size: var(--text-input-fs-base);
+  }
+
+  &[data-size="middle"] {
+    font-size: var(--text-input-fs-middle);
+  }
+
+  &[data-size="large"] {
+    font-size: var(--text-input-fs-large);
+  }
+
+  &[type="search"]::-webkit-search-decoration,
+  &[type="search"]::-webkit-search-cancel-button,
+  &[type="search"]::-webkit-search-results-button,
+  &[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none !important;
+    margin: 0;
+    display: none;
+  }
+
+  &[type="search"]::-moz-search-cancel-button {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    margin: 0;
+    display: none;
+  }
+
+  &:disabled {
+    box-shadow: inset 0 0 0 30px
+      var(--text-input-disabled-bg, var(--input-disabled-bg));
+  }
+
+  &[data-without-border="true"] {
+    border: none;
+  }
+}
+

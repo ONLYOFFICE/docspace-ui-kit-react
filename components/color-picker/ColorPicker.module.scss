@@ -1,0 +1,175 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables";
+@use "../../styles/mixins";
+
+:global(.dark) {
+  :local {
+    .hexValue {
+      --color-picker-border: 1px solid #{variables.$gray-dark-strong};
+      --color-picker-background: #{variables.$dark-gray-light};
+      --color-picker-color: #{variables.$gray-dark-text};
+    }
+  }
+}
+
+.wrapper {
+  .saveButton {
+    inset-inline-end: 10px;
+  }
+
+  .hexHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+  }
+
+  .hexText {
+    &:hover {
+      cursor: default;
+    }
+  }
+
+  .hexColorPicker {
+    // bridge vars for hardcoded dimensions
+    --color-picker-width-v: var(--color-picker-width, 195px);
+    --color-picker-hue-height-v: var(--color-picker-hue-height, 12px);
+    --color-picker-hue-radius-v: var(--color-picker-hue-radius, 6px);
+
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 16px;
+    width: var(--color-picker-width-v);
+
+    @include mixins.mobile {
+      width: calc(100vw - 32px);
+    }
+
+    :global {
+      .react-colorful {
+        width: auto;
+        height: 250px;
+        padding-bottom: 26px;
+      }
+
+      .react-colorful__saturation {
+        margin-block: 16px 26px;
+        border-radius: 3px;
+
+        &.isPickerOnly {
+          margin-block: 16px 24px;
+        }
+      }
+
+      .react-colorful__interactive {
+        width: 183px;
+
+        :global(.rtl) & {
+          right: 13px;
+        }
+
+        @include mixins.mobile {
+          width: calc(100vw - 44px);
+        }
+      }
+
+      .react-colorful__last-control .react-colorful__interactive {
+        left: 6px;
+
+        :global(.rtl) & {
+          right: 6px;
+        }
+      }
+
+      .react-colorful__saturation-pointer {
+        width: 14px;
+        height: 14px;
+        transform: none !important;
+      }
+
+      .react-colorful__hue {
+        border-radius: var(--color-picker-hue-radius-v);
+        height: var(--color-picker-hue-height-v);
+      }
+
+      .react-colorful__hue-pointer {
+        width: 30px;
+        height: 30px;
+        box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.25);
+        border: 8px solid #{variables.$white};
+      }
+    }
+  }
+
+  .hexValueContainer {
+    padding-bottom: 16px;
+  }
+
+  .hexValue {
+    --color-picker-border: 1px solid #{variables.$gray-strong};
+    --color-picker-background: #{variables.$white};
+    --color-picker-color: #{variables.$gray-text};
+
+    // bridge vars — bind public overrides to internal theme tokens
+    --color-picker-border-v: var(--color-picker-border-style, var(--color-picker-border));
+    --color-picker-bg-v: var(--color-picker-bg, var(--color-picker-background));
+    --color-picker-color-v: var(--color-picker-text-color, var(--color-picker-color));
+    // new bridge vars for hardcoded values
+    --color-picker-input-height-v: var(--color-picker-input-height, 32px);
+    --color-picker-input-padding-v: var(--color-picker-input-padding, 6px 8px);
+    --color-picker-input-radius-v: var(--color-picker-input-radius, 3px);
+
+    height: var(--color-picker-input-height-v);
+    outline: none;
+    padding: var(--color-picker-input-padding-v);
+    border: var(--color-picker-border-v);
+    border-radius: var(--color-picker-input-radius-v);
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--color-picker-bg-v);
+    color: var(--color-picker-color-v);
+  }
+
+  .hexValueLabel {
+    line-height: 20px;
+  }
+
+  .hexButton {
+    display: flex;
+    gap: 8px;
+  }
+}

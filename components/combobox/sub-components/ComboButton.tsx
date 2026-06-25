@@ -1,0 +1,299 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import React from "react";
+import { ReactSVG } from "react-svg";
+import classNames from "classnames";
+
+import TriangleDownIcon from "../../../assets/triangle.down.react.svg";
+
+import { IconSizeType } from "../../../utils";
+
+import { Loader, LoaderTypes } from "../../loader";
+import { Text } from "../../text";
+import { Badge } from "../../badge";
+
+import { ComboBoxSize } from "../ComboBox.enums";
+import type { TComboButtonProps } from "../ComboBox.types";
+
+import styles from "./ComboButton.module.scss";
+
+export const ComboButton: React.FC<TComboButtonProps> = ({
+  onClick,
+
+  innerContainer,
+
+  selectedOption,
+  optionsLength = 0,
+
+  comboIcon,
+  fillIcon,
+
+  type,
+  plusBadgeValue,
+  noBorder = false,
+  isDisabled = false,
+  withOptions = true,
+  withAdvancedOptions = false,
+  innerContainerClassName = "innerContainer",
+  isOpen = false,
+  size = ComboBoxSize.content,
+  scaled = false,
+  modernView = false,
+  tabIndex = -1,
+  isLoading = false,
+  displayArrow: displayArrowProp,
+  noSelect,
+  imageIcon,
+  imageAlt = "",
+  withoutArrow,
+}) => {
+  const defaultOption = selectedOption?.default;
+  // const isSelected = selectedOption?.key !== 0;
+  const displayArrow = withoutArrow
+    ? !withoutArrow
+    : withOptions || withAdvancedOptions || displayArrowProp;
+
+  const comboButtonClasses = classNames(
+    styles.comboButton,
+    "combo-button",
+    `combo-button_${isOpen ? "open" : "closed"}`,
+    styles[size],
+    {
+      [styles.isOpen]: isOpen,
+      [styles.isDisabled]: isDisabled,
+      [styles.noBorder]: noBorder,
+      [styles.containOptions]: optionsLength,
+      [styles.withAdvancedOptions]: withAdvancedOptions,
+      [styles.scaled]: scaled,
+      [styles.modernView]: modernView,
+      [styles.displayArrow]: displayArrow,
+      [styles.isLoading]: isLoading,
+      [styles.type]: type,
+      [styles.descriptive]: type === "descriptive",
+      [styles.plusBadgeValue]: plusBadgeValue,
+      [styles.noSelect]: noSelect,
+    },
+  );
+
+  const optionalItemClasses = classNames(
+    styles.optionalItem,
+    innerContainerClassName,
+    {
+      [styles.isDisabled]: isDisabled,
+      [styles.defaultOption]: defaultOption,
+      [styles.isLoading]: isLoading,
+      [styles.fillIcon]: fillIcon,
+    },
+  );
+
+  const iconClasses = classNames(
+    styles.icon,
+    styles.comboButtonSelectedIconContainer,
+    "combo-button_selected-icon-container",
+    {
+      [styles.isDisabled]: isDisabled,
+      [styles.defaultOption]: defaultOption,
+      [styles.isLoading]: isLoading,
+      [styles.onlyIcon]: type === "onlyIcon",
+    },
+  );
+
+  const Icon = selectedOption?.icon;
+  const isIconReactElement =
+    Icon &&
+    typeof Icon === "function" &&
+    React.isValidElement(React.createElement(Icon));
+
+  return (
+    <div
+      className={comboButtonClasses}
+      onClick={onClick}
+      tabIndex={tabIndex}
+      aria-disabled={isDisabled}
+      aria-expanded={isOpen}
+      aria-pressed={isOpen}
+      aria-haspopup="listbox"
+      role="button"
+      data-test-id="combo-button"
+    >
+      {innerContainer ? (
+        <div className={optionalItemClasses}>{innerContainer}</div>
+      ) : null}
+      {selectedOption?.icon ? (
+        <div className={iconClasses} data-test-id="combo-button-icon">
+          {isIconReactElement ? React.createElement(Icon) : null}
+
+          {imageIcon && typeof imageIcon === "string" ? (
+            <img
+              className={styles.imageIcon}
+              style={{ userSelect: "text" }}
+              src={imageIcon}
+              alt={`\n${imageAlt}`}
+            />
+          ) : null}
+          {typeof selectedOption.icon === "string" ? (
+            <ReactSVG
+              src={selectedOption.icon}
+              className={classNames(styles.selectedIcon, {
+                [styles.comboButtonSelectedIcon]: fillIcon,
+                "combo-button_selected-icon": fillIcon,
+              })}
+            />
+          ) : null}
+        </div>
+      ) : null}
+      {type === "badge" ? (
+        <Badge
+          label={
+            typeof selectedOption.label === "string"
+              ? selectedOption.label
+              : undefined
+          }
+          noHover
+          color={selectedOption.color}
+          backgroundColor={selectedOption.backgroundColor}
+          border={`2px solid ${selectedOption.border}`}
+          data-test-id="combo-button-badge"
+        />
+      ) : type === "descriptive" ? (
+        <div
+          className={styles.descriptiveContainer}
+          data-test-id="combo-button-descriptive"
+        >
+          <Text
+            title={
+              typeof selectedOption?.label === "string"
+                ? selectedOption.label
+                : undefined
+            }
+            as="div"
+            truncate
+            fontWeight={600}
+            className={classNames(
+              styles.comboButtonLabel,
+              "combo-button-label",
+            )}
+            fontSize="14px"
+            lineHeight="16px"
+            dir="auto"
+          >
+            {selectedOption?.label}
+          </Text>
+          <Text
+            title={selectedOption?.description}
+            fontSize="12px"
+            lineHeight="16px"
+            fontWeight={400}
+            dir="auto"
+          >
+            {selectedOption?.description}
+          </Text>
+        </div>
+      ) : type !== "onlyIcon" ? (
+        <Text
+          title={
+            typeof selectedOption?.label === "string"
+              ? selectedOption.label
+              : undefined
+          }
+          as="div"
+          truncate
+          fontWeight={600}
+          className={classNames(styles.comboButtonLabel, "combo-button-label")}
+          dir="auto"
+        >
+          {selectedOption?.label}
+        </Text>
+      ) : null}
+      {plusBadgeValue ? (
+        <div
+          className={classNames(styles.plusBadge, { [styles.isOpen]: isOpen })}
+        >{`+${plusBadgeValue}`}</div>
+      ) : null}
+      <div
+        className={classNames(styles.arrowIcon, "combo-buttons_arrow-icon", {
+          [styles.displayArrow]: displayArrow,
+          [styles.isOpen]: isOpen,
+          [styles.isLoading]: isLoading,
+          [styles.isDisabled]: isDisabled,
+        })}
+        data-test-id="combo-button-arrow"
+        aria-hidden="true"
+      >
+        {displayArrow ? (
+          comboIcon ? (
+            typeof comboIcon === "string" ? (
+              <ReactSVG
+                src={comboIcon}
+                className={classNames(
+                  styles.comboButtonsExpanderIcon,
+                  "combo-buttons_expander-icon",
+                )}
+                data-test-id="combo-button-custom-icon"
+              />
+            ) : (
+              <div
+                className={classNames(
+                  styles.comboButtonsExpanderIcon,
+                  "combo-buttons_expander-icon",
+                )}
+                data-test-id="combo-button-custom-icon"
+              >
+                {comboIcon}
+              </div>
+            )
+          ) : (
+            <TriangleDownIcon
+              data-size={IconSizeType.scale}
+              className={classNames(
+                styles.comboButtonsExpanderIcon,
+                "combo-buttons_expander-icon",
+              )}
+              data-test-id="combo-button-default-icon"
+            />
+          )
+        ) : null}
+      </div>
+      {isLoading ? (
+        <Loader
+          className={styles.loader}
+          type={LoaderTypes.track}
+          size="20px"
+        />
+      ) : null}
+    </div>
+  );
+};

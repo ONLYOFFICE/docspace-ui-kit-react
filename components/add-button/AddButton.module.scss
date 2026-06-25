@@ -1,0 +1,247 @@
+@use "../../styles/variables/colors";
+
+.container {
+  display: flex;
+  align-items: center;
+
+  --selector-add-button-text-disabled: #{colors.$gray-strong};
+
+  :global(.dark) & {
+    --selector-add-button-text-disabled: #{colors.$gray-dark-text};
+  }
+
+  --add-button-label-color-disabled: var(
+    --add-button-text-disabled,
+    var(--selector-add-button-text-disabled)
+  );
+  --add-button-label-spacing: var(--add-button-text-gap, 8px);
+
+  .selectorText {
+    padding-inline-start: var(--add-button-label-spacing);
+    cursor: pointer;
+  }
+
+  &.isDisabled {
+    .selectorText {
+      color: var(--add-button-label-color-disabled);
+      cursor: default;
+    }
+  }
+
+  &.truncate {
+    min-width: 0;
+
+    .selectorButton {
+      flex-shrink: 0;
+    }
+
+    .selectorText {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+  }
+}
+
+.selectorButton {
+  --selector-add-button-background: #{colors.$gray-light-mid};
+  --selector-add-button-hover-background: #{colors.$light-gray-selected};
+  --selector-add-button-active-background: #{colors.$gray-strong};
+  --selector-add-button-disabled-background: #{colors.$light-gray-hover};
+  --selector-add-button-icon-color: #{colors.$light-gray-dark};
+  --selector-add-button-icon-color-hover: #{colors.$light-gray-dark};
+  --selector-add-button-icon-color-active: #{colors.$light-gray-dark};
+  --selector-add-button-icon-color-disabled: #{colors.$gray};
+  --selector-add-button-border: none;
+  --selector-add-button-box-sizing: border-box;
+  --selector-add-button-border-radius: 3px;
+  --selector-add-button-height: 32px;
+  --selector-add-button-width: 32px;
+  --selector-add-button-padding: 10px;
+
+  :global(.dark) & {
+    --selector-add-button-background: #{colors.$gray-dark-mid};
+    --selector-add-button-hover-background: #{colors.$gray-dark-strong};
+    --selector-add-button-active-background: #{colors.$gray-dark-mid};
+    --selector-add-button-disabled-background: #{colors.$light-dark-gray-hover};
+    --selector-add-button-icon-color: #{colors.$dark-gray-dark};
+    --selector-add-button-icon-color-hover: #{colors.$white};
+    --selector-add-button-icon-color-active: #{colors.$gray-dark-pressed};
+    --selector-add-button-icon-color-disabled: #{colors.$gray-dark};
+    --selector-add-button-border: none;
+    --selector-add-button-box-sizing: border-box;
+    --selector-add-button-border-radius: 3px;
+    --selector-add-button-height: 32px;
+    --selector-add-button-width: 32px;
+    --selector-add-button-padding: 10px;
+  }
+
+  // Public override bridging vars (defined after internals so --selector-* are resolved)
+  --add-button-border-radius: var(
+    --add-button-radius,
+    var(--selector-add-button-border-radius)
+  );
+  --add-button-size: var(
+    --add-button-dimension,
+    var(--selector-add-button-height)
+  );
+  --add-button-background: var(
+    --add-button-bg,
+    var(--selector-add-button-background)
+  );
+  --add-button-background-hover: var(
+    --add-button-bg-hover,
+    var(--selector-add-button-hover-background)
+  );
+  --add-button-background-active: var(
+    --add-button-bg-active,
+    var(--selector-add-button-active-background)
+  );
+  --add-button-icon: var(
+    --add-button-icon-color,
+    var(--selector-add-button-icon-color)
+  );
+  --add-button-icon-hover: var(
+    --add-button-icon-color-hover,
+    var(--selector-add-button-icon-color-hover)
+  );
+  --add-button-icon-active: var(
+    --add-button-icon-color-active,
+    var(--selector-add-button-icon-color-active)
+  );
+
+  display: inline-block;
+  overflow: hidden;
+  background: var(--add-button-background);
+  border: var(--selector-add-button-border);
+  box-sizing: var(--selector-add-button-box-sizing);
+  border-radius: var(--add-button-border-radius);
+  height: var(--selector-add-button-size, var(--add-button-size));
+  width: var(--selector-add-button-size, var(--add-button-size));
+  padding: var(--selector-add-button-padding);
+  cursor: pointer;
+
+  &.isLoading {
+    padding: 6px;
+  }
+
+  :global(.icon-button_svg) {
+    svg {
+      path {
+        fill: var(--add-button-icon);
+      }
+    }
+  }
+
+  &:hover {
+    background: var(--add-button-background-hover);
+
+    :global(.icon-button_svg) {
+      svg {
+        path {
+          fill: var(--add-button-icon-hover);
+        }
+      }
+    }
+  }
+
+  &:active {
+    background: var(--add-button-background-active);
+
+    :global(.icon-button_svg) {
+      svg {
+        path {
+          fill: var(--add-button-icon-active);
+        }
+      }
+    }
+  }
+
+  -webkit-tap-highlight-color: #{colors.$tap-highlight};
+
+  &.isDisabled {
+    cursor: default;
+
+    :global(.icon-button_svg) {
+      svg {
+        path {
+          fill: var(--selector-add-button-icon-color);
+        }
+      }
+    }
+
+    &:hover {
+      background: var(--selector-add-button-background);
+
+      svg path {
+        fill: var(--selector-add-button-icon-color);
+      }
+    }
+
+    &:active {
+      background: var(--selector-add-button-background);
+
+      svg path {
+        fill: var(--selector-add-button-icon-color);
+      }
+    }
+  }
+
+  &.isAction {
+    --accent-main: var(--color-scheme-main-accent, #{colors.$light-blue-main});
+
+    background-color: var(--main-accent-button) !important;
+
+    :global(.icon-button_svg) {
+      svg {
+        path {
+          fill: var(--accent-main);
+        }
+      }
+    }
+
+    &:hover {
+      background-color: var(--main-accent-button);
+
+      &:not(.disabled) {
+        :global(.icon-button_svg) {
+          svg {
+            path {
+              fill: var(--accent-main);
+              opacity: 0.85;
+            }
+          }
+        }
+      }
+    }
+
+    &:active {
+      background-color: var(--main-accent-button);
+
+      :global(.icon-button_svg) {
+        svg {
+          path {
+            fill: var(--accent-main);
+            opacity: 1;
+            filter: brightness(90%);
+          }
+        }
+      }
+    }
+
+    div {
+      opacity: 1;
+    }
+  }
+
+  &.isDisabled {
+    cursor: default;
+
+    background: var(--selector-add-button-disabled-background) !important;
+
+    svg path {
+      fill: var(--selector-add-button-icon-color-disabled) !important;
+    }
+  }
+}

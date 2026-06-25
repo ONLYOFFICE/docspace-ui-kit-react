@@ -1,0 +1,210 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables";
+@use "../../styles/mixins";
+
+@keyframes loadingAnimation {
+  0% {
+    transform: translateX(-50%);
+  }
+
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+@keyframes loadingAnimationRtl {
+  0% {
+    transform: translateX(50%);
+  }
+
+  100% {
+    transform: translateX(-400%);
+  }
+}
+
+.container {
+  :global(.light) & {
+    --progress-bar-status-color: #{variables.$black};
+    --progress-bar-error-color: #{variables.$light-error-status};
+  }
+
+  :global(.dark) & {
+    --progress-bar-status-color: #{variables.$white};
+    --progress-bar-error-color: #{variables.$dark-error-status};
+  }
+
+  .fullText {
+    display: block;
+    margin-top: 10px;
+  }
+
+  .statusText {
+    display: block;
+    color: var(--progress-bar-text, var(--progress-bar-status-color));
+  }
+
+  .statusError {
+    display: block;
+    color: var(--progress-bar-error-text, var(--progress-bar-error-color));
+  }
+}
+
+.progressBar {
+  :global(.light) & {
+    --progress-bar-background-color: #{variables.$light-gray-hover};
+    --progress-bar-percent-background: #{variables.$light-blue-main};
+  }
+
+  :global(.dark) & {
+    --progress-bar-background-color: #{variables.$gray-dark};
+    --progress-bar-percent-background: #{variables.$dark-status-warning};
+  }
+
+  --progress-bar-height: var(--progress-bar-size, 4px);
+  --progress-bar-border-radius: var(--progress-bar-radius, 3px);
+  --progress-bar-margin-bottom: var(--progress-bar-bottom-margin, 8px);
+
+  width: 100%;
+  height: var(--progress-bar-height);
+  overflow: hidden;
+  border-radius: var(--progress-bar-border-radius);
+  margin-bottom: var(--progress-bar-margin-bottom);
+  background-color: var(--progress-bar-track, var(--progress-bar-background-color));
+
+  .percent {
+    float: inline-start;
+    overflow: hidden;
+    max-height: var(--progress-bar-height);
+    min-height: var(--progress-bar-height);
+    width: var(--progress-percent, 0%);
+    transition: width 0.6s ease;
+    border-radius: var(--progress-bar-border-radius);
+    background-color: var(--progress-bar-fill, var(--progress-bar-percent-background));
+  }
+
+  .animation {
+    width: 20%;
+    height: 100%;
+    border-radius: var(--progress-bar-border-radius);
+    background-color: var(--progress-bar-fill, var(--progress-bar-percent-background));
+    animation: loadingAnimation 1.5s ease-in-out infinite;
+
+    [dir="rtl"] & {
+      animation-name: loadingAnimationRtl;
+    }
+  }
+}
+
+// PreparationPortalProgress styles
+.preparationPortalProgress {
+  display: flex;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.preparationPortalProgressBar {
+  :global(.light) & {
+    --preparation-portal-progress-bg: #{variables.$light-gray-hover};
+  }
+
+  :global(.dark) & {
+    --preparation-portal-progress-bg: #{variables.$dark-gray-light};
+  }
+
+  padding: 2px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  width: 100%;
+  height: 24px;
+  background-color: var(--preparation-portal-progress-bg);
+}
+
+.preparationPortalProgressLine {
+  :global(.light) & {
+    --preparation-portal-progress-line-bg: var(
+      --color-scheme-main-accent,
+      #{variables.$light-blue-main}
+    );
+  }
+
+  :global(.dark) & {
+    --preparation-portal-progress-line-bg: #{variables.$white};
+  }
+
+  border-radius: 5px;
+  width: var(--preparation-portal-progress-percent, 0);
+  height: 20px;
+  transition: width 0.5s ease-out;
+  background: var(--preparation-portal-progress-line-bg);
+}
+
+.preparationPortalPercent {
+  :global(.light) & {
+    --preparation-portal-progress-color-percent-small: #{variables.$black};
+    --preparation-portal-progress-color-percent-big: #{variables.$white};
+  }
+
+  :global(.dark) & {
+    --preparation-portal-progress-color-percent-small: #{variables.$white};
+    --preparation-portal-progress-color-percent-big: #{variables.$black};
+  }
+
+  position: absolute;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--preparation-portal-progress-color-percent-small);
+  transition: color 0.3s ease;
+  top: 2px;
+  inset-inline-start: calc(50% - 9px);
+
+  &.moreThan50Percent {
+    color: var(--preparation-portal-progress-color-percent-big);
+  }
+}
+
+.preparationPortalText {
+  :global(.light) & {
+    --preparation-portal-description-text-color: #{variables.$gray};
+  }
+
+  :global(.dark) & {
+    --preparation-portal-description-text-color: #{variables.$gray-dark};
+  }
+
+  text-align: center;
+  color: var(--preparation-portal-description-text-color);
+}

@@ -1,0 +1,40 @@
+@use "../../styles/variables/colors";
+
+.outer {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  -webkit-tap-highlight-color: #{colors.$tap-highlight};
+
+  :global(.light) & {
+    --context-menu-button-border: #{colors.$gray-strong};
+    --context-menu-button-hover-border: #{colors.$gray};
+  }
+
+  :global(.dark) & {
+    --context-menu-button-border: #{colors.$gray-dark};
+    --context-menu-button-hover-border: #{colors.$gray-dark};
+  }
+
+  --cmb-border-value: var(--cmb-border, var(--context-menu-button-border));
+  --cmb-hover-border-value: var(--cmb-hover-border, var(--context-menu-button-hover-border));
+  --cmb-size-value: var(--cmb-size, 32px);
+  --cmb-radius-value: var(--cmb-radius, 3px);
+  --cmb-icon-padding-value: var(--cmb-icon-padding, 6px 7px);
+
+  &.displayIconBorder {
+    border: var(--cmb-border-value);
+    width: var(--cmb-size-value);
+    height: var(--cmb-size-value);
+    box-sizing: border-box;
+    border-radius: var(--cmb-radius-value);
+
+    svg {
+      padding: var(--cmb-icon-padding-value);
+    }
+
+    &:hover {
+      border-color: var(--cmb-hover-border-value);
+    }
+  }
+}

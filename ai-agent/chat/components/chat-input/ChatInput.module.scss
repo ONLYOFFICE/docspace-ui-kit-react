@@ -1,0 +1,407 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+.chatInput {
+  width: 100%;
+  max-width: var(--chat-content-max-width);
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+
+  textarea {
+    padding: 0;
+    background-color: var(--chat-input-background-color);
+
+    min-height: var(--chat-input-min-height);
+
+    text-align: var(--input-text-align);
+  }
+
+  .chatInputTextArea {
+    min-height: 56px !important;
+    max-height: 112px !important;
+
+    &.disabled {
+      textarea {
+        background-color: var(--chat-input-background-color) !important;
+      }
+
+      textarea::placeholder {
+        color: var(--chat-input-placeholder-disabled-color) !important;
+        -webkit-text-fill-color: var(
+          --chat-input-placeholder-disabled-color
+        ) !important;
+      }
+    }
+  }
+
+  .chatInputTextAreaWrapper {
+    padding: var(--chat-input-padding);
+
+    min-height: 116px !important;
+    max-height: 172px !important;
+
+    background-color: var(--chat-input-background-color);
+    border: var(--chat-input-border);
+
+    &:hover {
+      border: var(--chat-input-border) !important;
+    }
+  }
+
+  .chatInputTextAreaWrapperFiles {
+    padding: 50px 8px 44px;
+
+    min-height: 160px !important;
+    max-height: 216px !important;
+  }
+}
+
+.chatInputButtons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  position: absolute;
+
+  bottom: var(--chat-input-buttons-bottom);
+
+  box-sizing: border-box;
+
+  padding: var(--chat-input-buttons-padding);
+  width: 100%;
+}
+
+.chatInputButtonsTools {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  gap: var(--chat-input-toolbar-gap);
+
+  .chatInputButton {
+    height: var(--chat-input-button-height);
+
+    padding: var(--chat-input-button-padding);
+
+    box-sizing: border-box;
+
+    border-radius: var(--chat-radius-sm);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--chat-input-button-gap);
+
+    cursor: pointer;
+
+    p {
+      color: var(--chat-input-tools-button-color);
+    }
+
+    svg {
+      cursor: pointer;
+
+      path {
+        fill: var(--chat-input-tools-button-color);
+      }
+    }
+
+    &:hover:not(.disabled) {
+      background-color: var(--chat-input-tools-button-hover-background);
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+
+      svg {
+        cursor: not-allowed;
+
+        path {
+          fill: var(--chat-input-tools-button-disabled-color);
+        }
+      }
+    }
+
+    &.chatInputToolsButton {
+      svg {
+        circle {
+          stroke: var(--chat-input-tools-button-color);
+        }
+      }
+
+      &.activeChatInputButton {
+        svg {
+          circle {
+            stroke: var(--chat-input-tools-button-active-color);
+          }
+        }
+      }
+
+      &.disabled {
+        cursor: not-allowed;
+
+        p {
+          color: var(--chat-input-tools-button-disabled-color);
+        }
+
+        svg {
+          circle {
+            stroke: var(--chat-input-tools-button-disabled-color);
+          }
+        }
+      }
+    }
+  }
+
+  .activeChatInputButton {
+    background-color: var(--chat-input-tools-button-active-background);
+
+    p {
+      color: var(--chat-input-tools-button-active-color);
+    }
+
+    svg {
+      path {
+        fill: var(--chat-input-tools-button-active-color);
+      }
+    }
+  }
+}
+
+.chatInputButtonsSend {
+  width: var(--chat-input-send-button-size);
+  height: var(--chat-input-send-button-size);
+
+  border: none;
+
+  background-color: var(--chat-input-send-button-background);
+
+  border-radius: var(--chat-radius-sm);
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    path {
+      fill: var(--chat-input-send-button-color) !important;
+    }
+  }
+
+  &:not(.disabled):hover {
+    opacity: 0.85;
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .square {
+    width: var(--chat-icon-xs);
+    height: var(--chat-icon-xs);
+
+    background-color: var(--chat-input-send-button-color);
+
+    border-radius: 2px;
+  }
+}
+
+.toolSettingsWrapper {
+  width: calc(100% + var(--chat-spacing-lg));
+  height: fit-content;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  padding-top: var(--chat-spacing-lg);
+
+  margin-inline-end: calc(-1 * var(--chat-spacing-lg));
+
+  box-sizing: border-box;
+
+  .toolSettingsItem {
+    width: 100%;
+    height: var(--chat-header-min-height);
+
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+
+    padding: 0 var(--chat-spacing-lg);
+
+    box-sizing: border-box;
+
+    .toolSettingsItemInfo {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+
+      gap: var(--chat-spacing-base);
+
+      img {
+        width: var(--chat-icon-md);
+        height: var(--chat-icon-md);
+      }
+    }
+  }
+}
+
+.filesList {
+  width: 100%;
+
+  position: absolute;
+
+  height: var(--chat-file-list-height);
+
+  top: var(--chat-spacing-sm);
+
+  padding: 0 var(--chat-spacing-base);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  .filesListWrapper {
+    width: fit-content;
+    display: flex;
+    gap: var(--chat-file-list-gap);
+
+    .filesListItem {
+      width: fit-content;
+      min-width: fit-content;
+      height: var(--chat-file-item-height);
+
+      padding-inline-end: var(--chat-spacing-base);
+
+      display: flex;
+      align-items: center;
+
+      border: 1px solid var(--chat-input-file-border-color);
+      background-color: var(--chat-input-file-background-color);
+
+      border-radius: var(--chat-border-radius);
+
+      .filesListItemIcon {
+        width: var(--chat-icon-md);
+        height: var(--chat-icon-md);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        div {
+          width: var(--chat-icon-md);
+          height: var(--chat-icon-md);
+
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+
+    .filesListItemInfo {
+      display: flex;
+      align-items: center;
+
+      gap: var(--chat-spacing-base);
+
+      max-width: var(--chat-message-file-max-width);
+
+      .filesListItemImage {
+        height: var(--chat-icon-md);
+        width: var(--chat-icon-md);
+        margin: 0;
+        padding: 0;
+        border-start-start-radius: var(--chat-border-radius);
+        border-end-start-radius: var(--chat-border-radius);
+        object-fit: fill;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:has(div) {
+          padding: var(--chat-spacing-sm);
+          box-sizing: border-box;
+        }
+      }
+
+      .loader {
+        height: 20px;
+        margin: var(--chat-spacing-sm);
+      }
+
+      .filesListItemInfoText {
+        display: flex;
+        flex-direction: row;
+
+        max-width: calc(100% - 24px);
+
+        span {
+          color: var(--chat-file-item-exst-color);
+        }
+      }
+    }
+  }
+}
+
+.chatInputText {
+  margin-top: var(--chat-spacing-xs);
+}
+
+.extendedThinkingLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--chat-spacing-base);
+}
+
+.extendedThinkingHelpButton {
+  margin-inline-end: 18px;
+}

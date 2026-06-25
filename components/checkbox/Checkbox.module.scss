@@ -1,0 +1,252 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+@use "../../styles/variables" as variables;
+
+
+:global(.dark) {
+  :local {
+    .label {
+      --checkbox-fill-color-default: #{variables.$dark-gray-light};
+      --checkbox-border-color-default: #{variables.$gray-dark-strong};
+      --checkbox-arrow-color-default: #{variables.$white};
+      --checkbox-indeterminate-color: #{variables.$white};
+      --checkbox-disable-arrow-color: #{variables.$gray-dark-strong};
+      --checkbox-disable-border-color: #{variables.$gray-dark-mid};
+      --checkbox-disable-fill-color: #{variables.$dark-gray-light};
+      --checkbox-disable-indeterminate-color: #{variables.$gray-dark-strong};
+      --checkbox-hover-border-color: #{variables.$gray-dark};
+      --checkbox-hover-indeterminate-color: #{variables.$white};
+      --checkbox-pressed-border-color: #{variables.$gray-dark-strong};
+      --checkbox-pressed-fill-color: #{variables.$black};
+      --checkbox-focus-color: #{variables.$gray-dark};
+      --checkbox-error-color: #{variables.$dark-error-status};
+
+      --text-color: #{variables.$white};
+      --text-disable-color: #{variables.$gray-dark-text};
+    }
+  }
+}
+
+.label {
+  --checkbox-fill-color-default: #{variables.$white};
+  --checkbox-border-color-default: #{variables.$gray-strong};
+  --checkbox-arrow-color-default: #{variables.$black};
+  --checkbox-indeterminate-color: #{variables.$black};
+  --checkbox-disable-arrow-color: #{variables.$gray-strong};
+  --checkbox-disable-border-color: #{variables.$gray-light-mid};
+  --checkbox-disable-fill-color: #{variables.$gray-light};
+  --checkbox-disable-indeterminate-color: #{variables.$gray};
+  --checkbox-hover-border-color: #{variables.$gray};
+  --checkbox-hover-indeterminate-color: #{variables.$black};
+  --checkbox-pressed-border-color: #{variables.$gray-strong};
+  --checkbox-pressed-fill-color: #{variables.$gray-light-mid};
+  --checkbox-focus-color: #{variables.$gray};
+  --checkbox-error-color: #{variables.$light-error-status};
+
+  --text-color: #{variables.$black};
+  --text-disable-color: #{variables.$gray};
+
+  --checkbox-spacing: var(--checkbox-gap, 12px);
+  --checkbox-line-height: var(--checkbox-lh, 16px);
+
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin: 0;
+
+  line-height: var(--checkbox-line-height);
+
+  user-select: none;
+  -o-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: #{variables.$tap-highlight};
+
+  .checkbox {
+    margin-inline-end: var(--checkbox-spacing);
+    overflow: visible;
+    outline: none;
+  }
+
+  .checkboxText {
+    color: var(--text-color);
+    margin-top: -2px;
+  }
+
+  &:has(input[type="checkbox"]:checked) {
+    --checkbox-fill-color-default: var(--checkbox-fill-color, #{variables.$white});
+    --checkbox-arrow-color-default: var(--checkbox-arrow-color, #{variables.$black});
+  }
+
+  svg {
+    rect {
+      fill: var(--checkbox-fill-color-default);
+      stroke: var(--checkbox-border-color, var(--checkbox-border-color-default));
+    }
+    path {
+      fill: var(--checkbox-arrow-color-default);
+    }
+    &:focus {
+      outline: none;
+      rect {
+        stroke: var(--checkbox-focus-color);
+      }
+    }
+  }
+
+  &.error {
+    .checkboxText {
+      color: var(--checkbox-error-color);
+    }
+
+    svg {
+      rect {
+        stroke: var(--checkbox-error-color) !important;
+      }
+    }
+  }
+
+  &.indeterminate {
+    svg {
+      rect {
+        fill: var(--checkbox-fill-color);
+        stroke: var(--checkbox-border-color);
+      }
+      rect:last-child {
+        fill: var(--checkbox-indeterminate-color);
+        stroke: var(--checkbox-fill-color);
+      }
+    }
+  }
+
+  &.disabled {
+    svg {
+      rect {
+        fill: var(--checkbox-disable-fill-color);
+        stroke: var(--checkbox-disable-border-color);
+      }
+      path {
+        fill: var(--checkbox-disable-arrow-color);
+      }
+    }
+
+    .checkboxText {
+      color: var(--text-disable-color);
+    }
+  }
+
+  &.disabled.indeterminate {
+    svg {
+      rect {
+        fill: var(--checkbox-disable-fill-color);
+        stroke: var(--checkbox-disable-border-color);
+      }
+      rect:last-child {
+        fill: var(--checkbox-disable-indeterminate-color);
+      }
+    }
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    svg {
+      rect:nth-child(1) {
+        stroke: var(--checkbox-hover-border-color);
+      }
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+    }
+
+    &.indeterminate {
+      cursor: pointer;
+
+      svg {
+        rect:nth-child(1) {
+          stroke: var(--checkbox-hover-border-color);
+        }
+        rect:last-child {
+          fill: var(--checkbox-hover-indeterminate-color);
+        }
+      }
+    }
+  }
+
+  &:active {
+    cursor: pointer;
+
+    svg {
+      rect:nth-child(1) {
+        stroke: var(--checkbox-pressed-border-color);
+        fill: var(--checkbox-pressed-fill-color);
+      }
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+    }
+
+    &.indeterminate {
+      cursor: pointer;
+      svg {
+        rect:nth-child(1) {
+          stroke: var(--checkbox-pressed-border-color);
+          fill: var(--checkbox-pressed-fill-color);
+        }
+        rect:last-child {
+          fill: var(--checkbox-hover-indeterminate-color);
+        }
+      }
+    }
+  }
+}
+
+.wrapper {
+  display: inline-block;
+}
+
+.helpButton {
+  display: inline-block;
+  margin-inline-start: 4px;
+}
+
+.hiddenInput {
+  opacity: 0.0001;
+  position: absolute;
+  inset-inline-end: 0;
+  z-index: -1;
+}

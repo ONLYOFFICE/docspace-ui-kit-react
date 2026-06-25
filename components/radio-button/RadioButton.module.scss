@@ -1,0 +1,155 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+@use "../../styles/variables/colors";
+@use "../../styles/mixins";
+
+:global(.dark) {
+  .label {
+    --radio-button-bg: #{colors.$black};
+    --radio-button-disable-bg: #{colors.$dark-gray-light};
+    --radio-button-text-color: #{colors.$white};
+    --radio-button-text-disable-color: #{colors.$gray-dark-text};
+    --radio-button-fill-color: #{colors.$white};
+    --radio-button-border-color: #{colors.$gray-dark-strong};
+    --radio-button-disable-fill-color: #{colors.$gray-dark-strong};
+    --radio-button-disable-border-color: none;
+    --radio-button-hover-border-color: #{colors.$white};
+  }
+}
+
+.radioButtonIcon {
+  @include mixins.common-icons-style;
+}
+
+.label {
+  --radio-button-bg: #{colors.$white};
+  --radio-button-disable-bg: #{colors.$gray-light};
+  --radio-button-text-color: #{colors.$black};
+  --radio-button-text-disable-color: #{colors.$gray};
+  --radio-button-fill-color: #{colors.$black};
+  --radio-button-border-color: #{colors.$gray-strong};
+  --radio-button-disable-fill-color: #{colors.$gray-strong};
+  --radio-button-disable-border-color: #{colors.$gray-light-mid};
+  --radio-button-hover-border-color: #{colors.$gray};
+
+  --radio-button-spacing: unset;
+  --radio-button-icon-gap: var(--radio-button-gap, 8px);
+  --radio-button-bg-color: var(--radio-button-background, var(--radio-button-bg));
+  --radio-button-text: var(--radio-button-label-color, var(--radio-button-text-color));
+  --radio-button-dot: var(--radio-button-dot-color, var(--radio-button-fill-color));
+  --radio-button-circle: var(--radio-button-circle-color, var(--radio-button-border-color));
+  --radio-button-circle-hover: var(--radio-button-circle-hover-color, var(--radio-button-hover-border-color));
+
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin: 0;
+
+  @include mixins.no-user-select;
+
+  cursor: pointer;
+
+  .radioButtonIcon {
+    path:first-child {
+      stroke: var(--radio-button-circle);
+    }
+
+    path:nth-child(even) {
+      fill: var(--radio-button-dot);
+    }
+  }
+
+  &:hover {
+    .radioButtonIcon {
+      path:first-child {
+        stroke: var(--radio-button-circle-hover);
+      }
+    }
+  }
+
+  &.disabled {
+    cursor: default;
+
+    .radioButtonIcon {
+      path:first-child {
+        stroke: var(--radio-button-disable-border-color);
+      }
+
+      path:nth-child(even) {
+        fill: var(--radio-button-disable-fill-color);
+      }
+    }
+
+    .radioButtonIcon {
+      margin-inline-end: var(--radio-button-icon-gap);
+
+      path {
+        fill: var(--radio-button-disable-bg);
+      }
+    }
+
+    .radioButtonText {
+      color: var(--radio-button-text-disable-color);
+    }
+  }
+
+  &.spacing {
+    &.orientationHorizontal:not(:first-child) {
+      margin-inline-start: var(--radio-button-spacing);
+    }
+
+    &.orientationVertical:not(:last-child) {
+      margin-block-end: var(--radio-button-spacing);
+    }
+  }
+
+  .radioButtonIcon {
+    margin-inline-end: var(--radio-button-icon-gap);
+
+    path {
+      fill: var(--radio-button-bg-color);
+    }
+  }
+
+  .radioButtonText {
+    color: var(--radio-button-text);
+  }
+}
+
+.input {
+  position: absolute;
+  z-index: -1;
+  opacity: 0.0001;
+}

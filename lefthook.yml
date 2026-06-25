@@ -1,0 +1,19 @@
+output:
+  - meta
+  - summary
+
+pre-push:
+  parallel: false
+  commands:
+    tsc:
+      run: pnpm tsc
+      skip_empty: true
+      follow: true
+    lint:
+      run: pnpm lint
+      skip_empty: true
+      follow: true
+    test:
+      run: pnpm test
+      skip_empty: true
+      follow: true

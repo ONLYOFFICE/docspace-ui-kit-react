@@ -1,0 +1,171 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/mixins";
+@use "../../styles/variables/colors";
+
+.wrapper {
+  --text-color: #{colors.$black};
+  --combobox-children-button-default-disabled-color: #{colors.$gray-strong};
+
+  :global(.dark) & {
+    --text-color: #{colors.$white};
+    --combobox-children-button-default-disabled-color: #{colors.$gray-dark};
+  }
+
+  // bridge vars — bind public overrides to internal theme tokens
+  --access-right-select-text-v: var(--access-right-select-text, var(--text-color));
+  --access-right-select-disabled-icon-v: var(
+    --access-right-select-disabled-icon,
+    var(--combobox-children-button-default-disabled-color)
+  );
+
+  &:not(.descriptive) {
+    :global(.combo-button) {
+      padding-inline: 8px;
+    }
+  }
+
+  &.onlyIcon {
+    :global(.combo-button) {
+      padding-inline-end: 4px;
+    }
+
+    :global(.combo-button_selected-icon-container) {
+      margin-inline-end: 0;
+    }
+
+    :global(.combo-buttons_arrow-icon),
+    :global(.combo-button_selected-icon-container) {
+      svg path {
+        fill: var(--access-right-select-text-v);
+      }
+    }
+
+    &.isDisabled {
+      :global(.combo-buttons_arrow-icon),
+      :global(.combo-button_selected-icon-container) {
+        svg path {
+          fill: var(--access-right-select-disabled-icon-v);
+        }
+      }
+    }
+
+    @include mixins.mobile {
+      :global(.backdrop-active) {
+        top: -64px;
+        z-index: 560;
+      }
+
+      :global(.dropdown-container) {
+        z-index: 561;
+      }
+    }
+  }
+}
+
+.item {
+  --access-right-select-description-color: #{colors.$gray};
+  --drop-down-item-icon-color: #{colors.$black};
+
+  :global(.dark) & {
+    --access-right-select-description-color: #{colors.$gray-dark};
+    --drop-down-item-icon-color: #{colors.$white};
+  }
+
+  // bridge vars — bind public overrides to internal theme tokens
+  --access-right-select-description-v: var(
+    --access-right-select-description,
+    var(--access-right-select-description-color)
+  );
+  --access-right-select-icon-v: var(--access-right-select-icon, var(--drop-down-item-icon-color));
+  // new bridge vars for hardcoded values
+  --access-right-select-gap-v: var(--access-right-select-gap, 8px);
+  --access-right-select-padding-v: var(--access-right-select-item-padding, 7px 0);
+  --access-right-select-description-size-v: var(--access-right-select-description-size, 13px);
+
+  width: auto;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-content: center;
+  gap: var(--access-right-select-gap-v);
+
+  padding: var(--access-right-select-padding-v);
+
+  line-height: 16px;
+  font-style: normal;
+
+  .itemDescription {
+    margin: 1px 0;
+
+    font-size: var(--access-right-select-description-size-v);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+    color: var(--access-right-select-description-v);
+    white-space: pre-line;
+  }
+
+  .itemIcon {
+    path[fill] {
+      fill: var(--access-right-select-icon-v);
+    }
+
+    &.isShortenIcon {
+      padding-top: 2px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .itemContent {
+    width: 100%;
+    white-space: normal;
+  }
+
+  .itemTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.accessRightSelectDropdown:global(.dropdown-container) {
+  @include mixins.mobile {
+    border-radius: 6px 6px 0 0 !important;
+  }
+}

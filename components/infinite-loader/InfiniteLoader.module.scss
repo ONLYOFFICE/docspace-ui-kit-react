@@ -1,0 +1,207 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors";
+@use "../../styles/mixins";
+
+:global(.rtl) {
+  :local {
+    .row {
+      :global {
+        .row-list-item,
+        .row-loade {
+          left: unset !important;
+          right: 0 !important;
+        }
+      }
+    }
+    .table {
+      :global {
+        .table-list-item,
+        .table-container_body-loader {
+          left: unset !important;
+          right: 0 !important;
+        }
+      }
+    }
+  }
+}
+
+.item {
+  --infinite-loader-tile-gap-value: var(--infinite-loader-tile-gap, 14px 16px);
+  --infinite-loader-tile-min-size-value: var(
+    --infinite-loader-tile-min-size,
+    216px
+  );
+  --infinite-loader-tile-max-size-value: var(
+    --infinite-loader-tile-max-size,
+    360px
+  );
+
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(
+      clamp(
+        var(--infinite-loader-tile-min-size-value),
+        13.4vw,
+        var(--infinite-loader-tile-max-size-value)
+      ),
+      1fr
+    )
+  );
+  gap: var(--infinite-loader-tile-gap-value);
+  width: 100%;
+
+  @include mixins.desktop {
+    margin-inline-start: 1px;
+    padding-inline-end: 0;
+  }
+
+  @include mixins.tablet-and-below {
+    margin-inline-start: -1px;
+    gap: 14px;
+  }
+}
+
+.row {
+  --infinite-loader-table-width-value: var(
+    --infinite-loader-list-width,
+    var(--infinite-loader-table-width, 100%)
+  );
+
+  margin-inline-start: -20px;
+  width: calc(var(--infinite-loader-table-width-value) + 40px) !important;
+
+  :global {
+    .ReactVirtualized__Grid__innerScrollContainer {
+      :local {
+        max-width: calc(
+          var(--infinite-loader-table-width-value) + 40px
+        ) !important;
+      }
+    }
+  }
+
+  @include mixins.tablet-and-below {
+    width: calc(var(--infinite-loader-table-width-value) + 36px) !important;
+
+    :global {
+      .ReactVirtualized__Grid__innerScrollContainer {
+        :local {
+          max-width: calc(
+            var(--infinite-loader-table-width-value) + 36px
+          ) !important;
+        }
+      }
+    }
+  }
+
+  @include mixins.mobile {
+    margin-inline-start: -16px;
+
+    width: calc(var(--infinite-loader-table-width-value) + 32px) !important;
+
+    :global {
+      .ReactVirtualized__Grid__innerScrollContainer {
+        :local {
+          max-width: calc(
+            var(--infinite-loader-table-width-value) + 32px
+          ) !important;
+        }
+      }
+    }
+  }
+
+  :global {
+    .row-list-item,
+    .row-loader {
+      padding-inline-start: 20px;
+      width: calc(100% - 40px) !important;
+
+      @include mixins.tablet-and-below {
+        padding-inline-start: 20px;
+        width: calc(100% - 36px) !important;
+      }
+
+      @include mixins.mobile {
+        padding-inline-start: 16px;
+        width: calc(100% - 32px) !important;
+      }
+    }
+  }
+}
+
+.table {
+  --infinite-loader-table-width-value: var(
+    --infinite-loader-list-width,
+    var(--infinite-loader-table-width, 100%)
+  );
+
+  margin-inline-start: -20px;
+  width: calc(var(--infinite-loader-table-width-value) + 40px) !important;
+
+  :global {
+    .ReactVirtualized__Grid__innerScrollContainer {
+      :local {
+        max-width: calc(
+          var(--infinite-loader-table-width-value) + 40px
+        ) !important;
+      }
+    }
+
+    .table-container_body-loader {
+      width: calc(100% - 48px) !important;
+    }
+
+    .table-list-item,
+    .table-container_body-loader {
+      padding-inline-start: 20px;
+    }
+  }
+}
+
+.tile {
+  :global(.files_header) {
+    padding-top: 11px;
+  }
+}
+
+.list {
+  outline: none;
+  overflow: hidden !important;
+  // Override inline direction from react-virtualized
+  direction: inherit !important;
+}

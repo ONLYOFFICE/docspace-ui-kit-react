@@ -1,0 +1,301 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+@use "../../styles/variables/colors" as *;
+@use "../../styles/mixins";
+
+:global(.dark) {
+  .modal {
+    --modal-dialog-bg-color: #{$black};
+    --modal-dialog-text-color: #{$white};
+    --modal-dialog-backdrop-bg-color: #{$blur-dark};
+    --modal-dialog-header-border-color: #{$gray-dark-strong};
+    --modal-dialog-link-underline-color: #{$dark-gray-dark};
+    --modal-dialog-border-color: #{$gray-dark-strong};
+  }
+}
+
+:global(.rtl) {
+  .modal {
+    --modal-dialog-content-transform-x: -100%;
+  }
+}
+
+.modal {
+  --modal-dialog-bg-color: #{$white};
+  --modal-dialog-text-color: #{$black};
+  --modal-dialog-backdrop-bg-color: #{$blur-light};
+  --modal-dialog-header-border-color: #{$gray-light-mid};
+  --modal-dialog-link-underline-color: #{$light-gray-dark};
+  --modal-dialog-border-color: #{$gray-light-mid};
+  --modal-dialog-content-transform-x: 100%;
+
+  /* CSS customization vars */
+  --aside-header-justify: var(--modal-dialog-header-justify, space-between);
+  --aside-header-border-display: var(--modal-dialog-header-border-display, "");
+  --aside-header-title-position: var(--modal-dialog-header-title-position, static);
+  --aside-header-title-inset: var(--modal-dialog-header-title-inset, auto);
+  --aside-header-title-transform: var(--modal-dialog-header-title-transform, none);
+  --aside-header-title-text-align: var(--modal-dialog-header-title-text-align, start);
+  --modal-dialog-padding-x: var(--modal-dialog-horizontal-padding, 16px);
+  --modal-dialog-padding-y: var(--modal-dialog-vertical-padding, 16px);
+  --modal-dialog-footer-gap: var(--modal-dialog-buttons-gap, 8px);
+  --modal-dialog-header-margin-bottom: var(--modal-dialog-header-offset, 16px);
+  --modal-dialog-border-radius: var(--modal-dialog-radius, 6px);
+  --modal-dialog-width: var(--modal-dialog-default-width, 400px);
+  --modal-dialog-max-height: var(--modal-dialog-default-max-height, 280px);
+  --modal-dialog-large-width: var(--modal-dialog-lg-width, 520px);
+  --modal-dialog-large-max-height: var(--modal-dialog-lg-max-height, 400px);
+  --modal-dialog-huge-max-width: var(--modal-dialog-xl-max-width, 730px);
+  --modal-dialog-aside-width: var(--modal-dialog-aside-default-width, 480px);
+
+  #create-text-input::-webkit-search-decoration,
+  #create-text-input::-webkit-search-cancel-button,
+  #create-text-input::-webkit-search-results-button,
+  #create-text-input::-webkit-search-results-decoration {
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  pointer-events: none;
+  &.modalActive {
+    pointer-events: all;
+  }
+
+  .loaderWrapper {
+    padding: 0 var(--modal-dialog-padding-x) var(--modal-dialog-padding-y);
+  }
+}
+
+.dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  margin: 0 auto;
+  min-height: 100%;
+}
+
+.content {
+  box-sizing: border-box;
+  position: relative;
+
+  background-color: var(--modal-dialog-bg, var(--modal-dialog-bg-color));
+  color: var(--modal-dialog-color, var(--modal-dialog-text-color));
+  padding: 0 0 -16px;
+
+  &.withBorder {
+    border-inline-start: 1px solid
+      var(--modal-dialog-aside-border, var(--modal-dialog-border-color));
+  }
+
+  &.displayTypeModal {
+    padding: 0;
+    height: auto;
+    max-height: var(--modal-dialog-max-height);
+    width: var(--modal-dialog-width);
+    border-radius: var(--modal-dialog-border-radius);
+
+    &.large {
+      max-height: var(--modal-dialog-large-max-height);
+      width: var(--modal-dialog-large-width);
+    }
+
+    &.huge {
+      max-width: var(--modal-dialog-huge-max-width);
+    }
+
+    &.autoMaxHeight {
+      max-height: unset;
+    }
+
+    &.autoMaxWidth {
+      width: auto;
+    }
+
+    @include mixins.mobile {
+      transform: translateY(100%);
+      transition: transform 0.3s ease-in-out;
+      position: absolute;
+      bottom: 0;
+      width: 100% !important;
+      height: auto;
+      border-radius: var(--modal-dialog-border-radius)
+        var(--modal-dialog-border-radius) 0 0;
+
+      &.visible {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  &.displayTypeAside {
+    width: var(--modal-dialog-aside-width);
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+
+    inset-inline-end: 0;
+
+    transform: translateX(var(--modal-dialog-content-transform-x));
+    transition: transform 0.3s ease-in-out;
+
+    &.visible {
+      transform: translateX(0);
+    }
+
+    @include mixins.mobile {
+      transform: translateY(100%);
+      height: calc(100% - 64px);
+      width: 100%;
+      inset-inline: 0;
+      top: auto;
+      bottom: 0;
+
+      &.visible {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+.header {
+  &.displayTypeModal:not(&.withoutHeaderMargin) {
+    margin-bottom: var(--modal-dialog-header-margin-bottom);
+  }
+}
+
+.body {
+  position: relative;
+  padding: 0 var(--modal-dialog-padding-x);
+  white-space: pre-line;
+
+  :global(#modal-scroll > .scroll-wrapper > .scroller > .scroll-body) {
+    margin-inline-end: 0 !important;
+    padding-inline-end: var(--modal-dialog-padding-x) !important;
+    height: 100%;
+  }
+
+  &.scrollLocked {
+    :global(#modal-scroll > .scroll-wrapper > .scroller) {
+      overflow: hidden !important;
+    }
+
+    :global(#modal-scroll > .scroll-wrapper > .scroller > .scroll-body) {
+      margin-inline-end: 0 !important;
+    }
+  }
+
+  &.displayTypeModal:not(&.withoutPadding) {
+    padding-bottom: var(--modal-dialog-padding-y);
+
+    &.hasFooter {
+      padding-bottom: calc(var(--modal-dialog-padding-y) / 2);
+    }
+  }
+
+  &.displayTypeAside {
+    margin-inline-end: 0;
+    height: 100%;
+    min-height: auto;
+
+    &.withBodyScroll:not(&.withoutPadding) {
+      margin-inline-end: calc(-1 * var(--modal-dialog-padding-x));
+    }
+  }
+
+  &.withoutPadding {
+    padding: 0;
+  }
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  padding: var(--modal-dialog-padding-y) var(--modal-dialog-padding-x);
+  gap: var(--modal-dialog-footer-gap);
+
+  &.withFooterBorder {
+    border-top: 1px solid
+      var(--modal-dialog-divider, var(--modal-dialog-header-border-color));
+  }
+
+  &.doubleFooterLine {
+    flex-direction: column;
+
+    div {
+      display: flex;
+      gap: var(--modal-dialog-footer-gap);
+    }
+  }
+
+  @include mixins.tablet-and-below {
+    gap: 10px;
+  }
+}
+
+.formWrapper {
+  display: contents;
+}
+
+.modalBackdrop {
+  display: block;
+  height: 100%;
+  min-height: stretch;
+  max-height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: fixed;
+  // doesn't require mirroring for RTL
+  left: 0;
+  top: 0;
+
+  background: var(--modal-dialog-backdrop, var(--modal-dialog-backdrop-bg-color));
+  transition: opacity 0.2s;
+  opacity: 0;
+
+  @include mixins.mobile {
+    position: absolute;
+  }
+
+  &.modalBackdropActive {
+    opacity: 1;
+  }
+
+  &.hideBackdrop {
+    background: none;
+  }
+}

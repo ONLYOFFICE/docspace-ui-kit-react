@@ -1,0 +1,108 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/mixins";
+@use "../../styles/variables/colors" as *;
+
+:global(.dark) {
+  .tabItem {
+    --tab-item-selected-background-color: #{$white};
+    --tab-item-selected-item-color: #{$black};
+    --tab-item-tag-border: 1px solid #{$gray-dark-strong};
+  }
+}
+
+.tabItem {
+  --tab-item-selected-background-color: var(--accent-main, #{$light-blue-main});
+  --tab-item-selected-item-color: #{$white};
+  --tab-item-tag-border: 1px solid #{$gray-light-mid};
+
+  --tab-item-active-bg-value: var(
+    --tab-item-active-bg,
+    var(--tab-item-selected-background-color)
+  );
+  --tab-item-active-text-value: var(
+    --tab-item-active-text,
+    var(--tab-item-selected-item-color)
+  );
+  --tab-item-border-value: var(--tab-item-border, var(--tab-item-tag-border));
+  --tab-item-border-radius: var(--tab-item-radius, 16px);
+  --tab-item-inner-padding: var(--tab-item-padding, 4px 16px);
+  --tab-item-opacity-disabled: var(--tab-item-disabled-opacity, 0.5);
+
+  max-width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  border: var(--tab-item-border-value);
+  border-radius: var(--tab-item-border-radius);
+
+  box-sizing: border-box;
+
+  padding: var(--tab-item-inner-padding);
+
+  cursor: pointer;
+
+  &.active,
+  &:not(.disabled):active {
+    background: var(--tab-item-active-bg-value);
+    border-color: var(--tab-item-active-bg-value);
+
+    &:hover {
+      background: var(--tab-item-active-bg-value);
+      border-color: var(--tab-item-active-bg-value);
+    }
+  }
+
+  &.disabled:not(&.active) {
+    pointer-events: none;
+    opacity: var(--tab-item-opacity-disabled);
+  }
+
+  --webkit-tap-highlight-color: #{$tap-highlight};
+}
+
+.tabItemText {
+  height: 20px;
+
+  &.active,
+  .tabItem:not(.disabled):active & {
+    font-weight: 600;
+    color: var(--tab-item-active-text-value);
+  }
+}
+

@@ -1,0 +1,272 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../../styles/variables";
+@use "../../../styles/variables/colors" as *;
+@use "../../../styles/mixins";
+
+:global(.dark) {
+  .baseTile {
+    --tile-background-color: #{$black};
+    --tile-room-border: 1px solid #{$gray-dark-strong};
+    --tile-room-border-radius: 12px;
+    --tile-checked-background: #{$light-dark-gray-hover};
+    --tile-show-hotkey-border: #{$light-second-main};
+    --tile-icon-button-color: #{$gray-dark};
+  }
+}
+
+.baseTile {
+  --tile-background-color: #{$white};
+  --tile-room-border: 1px solid #{$gray-strong};
+  --tile-room-border-radius: 12px;
+  --tile-checked-background: #{$light-gray-hover};
+  --tile-show-hotkey-border: #{$light-second-main};
+  --tile-icon-button-color: #{$gray};
+
+  cursor: pointer;
+  max-height: 104px;
+
+  box-sizing: content-box;
+
+  background: var(--tile-bg, var(--tile-background-color));
+  border: var(--tile-border-style, var(--tile-room-border));
+  border-radius: var(--tile-radius, var(--tile-room-border-radius));
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  row-gap: var(--tile-row-gap, 16px);
+
+  padding: var(--tile-padding, 16px 0);
+
+  @include mixins.mobile {
+    margin-inline-start: 2px;
+  }
+
+  .topContent {
+    width: 100%;
+    height: 32px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    justify-content: flex-start;
+    align-items: center;
+    align-content: center;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .bottomContent {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 16px;
+    border-radius: 0 0 12px 12px;
+    height: 24px;
+
+    &.isThirdParty {
+      display: flex;
+    }
+  }
+
+  &.checked,
+  &.isActive,
+  &:hover:not(.isEdit) {
+    background: var(--tile-hover-bg, var(--tile-checked-background));
+
+    .tag,
+    .advanced-tag {
+      background: var(--tile-hover-bg, var(--tile-checked-background));
+    }
+  }
+
+  &.isBlockingOperation {
+    pointer-events: none;
+  }
+
+  .iconContainer {
+    width: 32px;
+    height: 32px;
+    margin-inline-start: 16px;
+    margin-inline-end: 12px;
+
+    &:hover:not(.inProgress) {
+      .icon {
+        display: none;
+      }
+      .checkbox {
+        opacity: 1;
+        display: flex;
+      }
+    }
+  }
+
+  .icon {
+    display: flex;
+    flex: 0 0 auto;
+    user-select: none;
+
+    &.checked {
+      display: none;
+    }
+  }
+
+  .loader {
+    width: 32px;
+    height: 32px;
+    margin-inline: 22px 16px;
+
+    display: flex;
+    align-items: center;
+  }
+
+  .checkbox {
+    display: none;
+    flex: 0 0 16px;
+    justify-content: center;
+
+    padding-top: 8px;
+    padding-inline-start: 12px;
+
+    @include mixins.tablet {
+      opacity: 1;
+    }
+
+    &.checked {
+      opacity: 1;
+      display: flex;
+    }
+  }
+
+  @media (hover: hover) {
+    &:hover:has(
+        .optionButton:hover,
+        .iconContainer:hover,
+        .bottomContent [data-testid="tag_item"]:hover,
+        :global(.tile-badges:hover)
+      ) {
+      a {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.showHotkeyBorder {
+  border-color: var(--tile-hotkey-color, var(--tile-show-hotkey-border));
+
+  &:before,
+  &:after {
+    border-color: var(--tile-hotkey-color, var(--tile-show-hotkey-border));
+  }
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-basis: 100%;
+
+  a {
+    display: block;
+    display: -webkit-box;
+    max-width: 400px;
+    height: auto;
+    line-height: 19px;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  &.isHovered {
+    a {
+      text-decoration: none !important;
+    }
+  }
+
+  :global {
+    .badges {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      align-items: center;
+
+      &:hover {
+        svg path {
+          fill: var(--icon-button-hover-color) !important;
+        }
+      }
+    }
+  }
+
+  @include mixins.tablet {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.optionButton {
+  display: block;
+
+  .expandButton > div:first-child {
+    padding-block: 8px;
+    padding-inline: 0 16px;
+
+    color: var(--tile-icon-color, var(--tile-icon-button-color));
+
+    path {
+      fill: var(--tile-icon-color, var(--tile-icon-button-color));
+    }
+  }
+}
+
+@keyframes highlight {
+  0% {
+    background-color: var(--highlightColor);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.highlight {
+  animation: highlight 2s 1;
+}

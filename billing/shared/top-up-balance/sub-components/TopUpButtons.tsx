@@ -1,0 +1,168 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import React from "react";
+import { observer } from "mobx-react";
+
+import { AnalyticsEvents } from "../../../../enums";
+
+import { useCommonTranslation } from "../../../../utils/i18n";
+
+import { Button, ButtonSize } from "../../../../components/button";
+import { toastr } from "../../../../components/toast";
+
+import { Text } from "../../../../components/text";
+
+import { useAmountValue } from "../../../wallet/context";
+import styles from "../styles/TopUpModal.module.scss";
+import { AI_TOOLS } from "../../../constants";
+import { usePaymentStore } from "../../../store/PaymentStoreProvider";
+
+interface TopUpButtonsProps {
+  currency: string;
+  setIsLoading: (value: boolean) => void;
+  isLoading: boolean;
+  fetchBalance?: () => Promise<void>;
+  fetchServiceBalance?: () => Promise<void>;
+  fetchTransactionHistory?: (serviceName?: string) => Promise<void>;
+  onClose: (isTopUp: boolean) => void;
+  isDisabled?: boolean;
+  onTopUpBalance: (amount: number, currency: string) => Promise<string>;
+  serviceName?: string;
+  afterTopUp?: () => void;
+}
+
+const TopUpButtons: React.FC<TopUpButtonsProps> = ({
+  currency,
+  fetchBalance,
+  fetchServiceBalance,
+  fetchTransactionHistory,
+  onClose,
+  setIsLoading,
+  isLoading,
+  onTopUpBalance,
+  serviceName,
+  afterTopUp,
+  isDisabled,
+}) => {
+  const paymentStore = usePaymentStore();
+
+  const { handleServicesQuotas, isAlreadyPaid } = paymentStore;
+  const { logoText } = paymentStore;
+  const t = useCommonTranslation();
+
+  const { amount, isBalanceInsufficient, hasError } = useAmountValue();
+
+  const isButtonDisabled =
+    isDisabled ||
+    !amount ||
+    !isAlreadyPaid ||
+    isBalanceInsufficient ||
+    hasError;
+
+  const onTopUp = async () => {
+    try {
+      setIsLoading(true);
+
+      const res = await onTopUpBalance(+amount, serviceName ?? currency);
+
+      if (!res) {
+        throw new Error(t("UnexpectedError"));
+      }
+
+      if (!serviceName) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: AnalyticsEvents.WalletTopUp,
+        });
+      }
+
+      const requests: Promise<unknown>[] = [
+        fetchBalance!(),
+        fetchTransactionHistory!(serviceName),
+      ];
+
+      if (serviceName) {
+        requests.push(fetchServiceBalance!());
+        requests.push(handleServicesQuotas!());
+      }
+
+      await Promise.allSettled(requests);
+
+      const toastMessage =
+        serviceName === AI_TOOLS
+          ? t("AIServiceToppedUp", { organizationName: logoText })
+          : t("WalletToppedUp");
+
+      toastr.success(toastMessage);
+      afterTopUp ? afterTopUp() : onClose(true);
+    } catch (e) {
+      toastr.error(e as unknown as string);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.buttonContainerWrapper}>
+      {isLoading ? <Text>{t("TopUpTakeSomeTimeToComplete")}</Text> : null}
+      <div className={styles.buttonContainer}>
+        <Button
+          key="OkButton"
+          label={t("TopUp")}
+          size={ButtonSize.normal}
+          primary
+          scale
+          isDisabled={isButtonDisabled}
+          onClick={onTopUp}
+          isLoading={isLoading}
+          testId="top_up_button"
+        />
+        <Button
+          key="CancelButton"
+          label={t("CancelButton")}
+          size={ButtonSize.normal}
+          scale
+          onClick={() => onClose(false)}
+          isDisabled={isLoading}
+          testId="cancel_top_up_button"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default observer(TopUpButtons);
+

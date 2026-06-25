@@ -1,0 +1,373 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors" as *;
+
+@use "../../styles/mixins";
+
+:global(.dark) {
+  :local {
+    .dropDownItemIcon,
+    .dropDownItem,
+    .activeDescendant,
+    .separator,
+    .headerItem {
+      --drop-down-item-icon-color: #{$white};
+      --drop-down-item-icon-color-disabled: #{$white};
+      --drop-down-item-hover-color: #{$light-dark-gray-hover};
+      --dropdown-item-separator-border: #{$gray-dark-strong};
+    }
+  }
+}
+
+.dropDownItemIcon,
+.dropDownItem,
+.activeDescendant,
+.separator,
+.headerItem {
+  --drop-down-item-icon-color: #{$black};
+  --drop-down-item-icon-color-disabled: #{$black};
+  --drop-down-item-hover-color: #{$gray-light};
+  --dropdown-item-separator-border: #{$gray-light-mid};
+
+  --drop-down-item-text: var(
+    --drop-down-item-color,
+    var(--drop-down-item-icon-color)
+  );
+  --drop-down-item-icon: var(
+    --drop-down-item-icon-fill,
+    var(--drop-down-item-icon-color)
+  );
+  --drop-down-item-icon-disabled: var(
+    --drop-down-item-icon-fill-disabled,
+    var(--drop-down-item-icon-color-disabled)
+  );
+  --drop-down-item-bg-hover: var(
+    --drop-down-item-hover-bg,
+    var(--drop-down-item-hover-color)
+  );
+  --drop-down-item-divider-color: var(
+    --drop-down-item-divider,
+    var(--dropdown-item-separator-border)
+  );
+  --drop-down-item-item-height: var(--drop-down-item-height, 32px);
+  --drop-down-item-item-font-size: var(--drop-down-item-font-size, 13px);
+  --drop-down-item-item-font-weight: var(--drop-down-item-font-weight, 600);
+  --drop-down-item-item-padding: var(--drop-down-item-padding, 0 12px);
+  --drop-down-item-header-h: var(--drop-down-item-header-height, 48px);
+  --drop-down-item-header-fs: var(--drop-down-item-header-font-size, 15px);
+}
+
+.externalLink {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  width: 16px;
+  height: 20px;
+  margin-inline-start: auto;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+
+  svg {
+    &:not(:root) {
+      width: 100%;
+      height: 100%;
+    }
+
+    path {
+      fill: var(--drop-down-item-external-link-color, currentColor);
+    }
+  }
+}
+
+.elementWrapper {
+  display: flex;
+  align-items: center;
+  margin-inline-start: auto;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  width: 16px;
+  margin-inline-end: 8px;
+  height: 20px;
+
+  div {
+    height: 16px;
+  }
+
+  svg {
+    &:not(:root) {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  img {
+    width: 100%;
+    max-width: 16px;
+    height: 100%;
+    max-height: 16px;
+    margin-top: 12px;
+  }
+}
+
+.wrapperBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-inline-start: auto;
+}
+
+.wrapperToggle {
+  display: flex;
+  align-items: center;
+  margin-inline-start: auto;
+  width: 36px;
+
+  & label {
+    position: static;
+  }
+}
+
+.dropDownItemIcon {
+  svg {
+    path[fill] {
+      fill: var(--drop-down-item-icon);
+    }
+    path[stroke] {
+      stroke: var(--drop-down-item-icon);
+    }
+    circle[fill] {
+      fill: var(--drop-down-item-icon);
+    }
+    rect[fill] {
+      fill: var(--drop-down-item-icon);
+    }
+  }
+
+  &.disabled {
+    svg {
+      path[fill] {
+        fill: var(--drop-down-item-icon-disabled);
+      }
+      path[stroke] {
+        stroke: var(--drop-down-item-icon-disabled);
+      }
+      circle[fill] {
+        fill: var(--drop-down-item-icon-disabled);
+      }
+      rect[fill] {
+        fill: var(--drop-down-item-icon-disabled);
+      }
+    }
+  }
+}
+
+.submenuArrow {
+  width: 12px;
+  height: 12px;
+  margin-inline-end: 0;
+  align-self: center;
+  line-height: normal;
+  margin-inline-start: auto;
+
+  &.RTL {
+    transform-box: content-box;
+    transform: scaleX(-1);
+  }
+
+  &.active {
+    transform: rotate(90deg);
+    height: auto;
+  }
+
+  :global(.drop-down-item_icon) {
+    height: 12px;
+  }
+}
+
+.dropDownItem {
+  @include mixins.truncate;
+
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: var(--drop-down-min-width, unset);
+
+  border: 0px;
+  cursor: pointer;
+
+  margin: 0px;
+  padding: var(--drop-down-item-item-padding);
+  box-sizing: border-box;
+  text-decoration: none;
+  user-select: none;
+  outline: 0 !important;
+
+  line-height: var(--drop-down-item-item-height);
+  font-size: var(--drop-down-item-item-font-size);
+  font-weight: var(--drop-down-item-item-font-weight);
+  color: var(--drop-down-item-text);
+
+  -webkit-tap-highlight-color: #{$tap-highlight};
+  text-transform: none;
+
+  &:hover:not(.separator) {
+    background-color: var(--drop-down-item-bg-hover);
+  }
+
+  &:active:not(.separator) {
+    background-color: var(--drop-down-item-bg-hover);
+  }
+
+  @include mixins.tablet-and-below {
+    line-height: 36px;
+    padding: 0 16px;
+  }
+}
+
+.separator {
+  padding: 0 16px;
+  background-color: var(--drop-down-item-divider-color);
+  cursor: default;
+  margin: 4px 16px 4px;
+  line-height: 1px;
+  height: 1px;
+  width: calc(100% - 32px);
+
+  &:hover {
+    cursor: default;
+  }
+}
+
+.headerItem {
+  align-items: center;
+  height: var(--drop-down-item-header-h);
+  padding: 13px 16px 18.2px;
+  margin: 0 0 6px;
+  border-bottom: 1px solid var(--drop-down-item-divider-color);
+  font-size: var(--drop-down-item-header-fs);
+  font-weight: var(--drop-down-item-item-font-weight);
+  line-height: 16px !important;
+  cursor: default;
+
+  &:hover {
+    cursor: default;
+    background-color: unset;
+  }
+
+  &:active {
+    cursor: default;
+    background-color: unset;
+  }
+}
+
+.noHover {
+  &:hover {
+    background-color: unset !important;
+  }
+}
+
+.noActive {
+  &:active {
+    background-color: unset !important;
+  }
+}
+
+.rtlItem {
+  &:hover {
+    text-align: right;
+  }
+}
+
+.modern {
+  padding: 0 8px;
+}
+
+.textOverflow {
+  display: block;
+}
+
+.truncateText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.activeDescendant {
+  background-color: var(--drop-down-item-bg-hover);
+}
+
+.disabled {
+  --dropdown-item-disabled-color: #{$gray};
+  --drop-down-item-disabled-text: var(
+    --drop-down-item-disabled-color,
+    var(--dropdown-item-disabled-color)
+  );
+
+  color: var(--drop-down-item-disabled-text);
+
+  .dropDownItemIcon {
+    --drop-down-item-icon-color: #{$gray};
+  }
+
+  &:hover {
+    cursor: default;
+    background-color: unset !important;
+  }
+}
+
+:global(.dark) {
+  :local {
+    .selected {
+      --dropdown-item-selected-color: #{$dark-gray-light};
+    }
+  }
+}
+
+.selected {
+  --dropdown-item-selected-color: #{$light-gray-hover};
+  --drop-down-item-selected-bg: var(
+    --drop-down-item-selected-background,
+    var(--dropdown-item-selected-color)
+  );
+
+  background-color: var(--drop-down-item-selected-bg);
+}

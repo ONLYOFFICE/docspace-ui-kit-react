@@ -1,0 +1,140 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors";
+
+:global(.dark) {
+  :local {
+    .tooltip {
+      --tooltip-bg-color: #{colors.$black};
+      --tooltip-text-color: #{colors.$white};
+      --tooltip-max-width: 320px;
+    }
+  }
+}
+
+.tooltip {
+  --tooltip-bg-color: #{colors.$white};
+  --tooltip-text-color: #{colors.$black};
+  --tooltip-max-width: 320px;
+
+  --tooltip-border-radius: var(--tooltip-radius, 6px);
+  --tooltip-box-shadow: var(--tooltip-shadow, 0 2px 4px rgba(0, 0, 0, 0.15));
+  --tooltip-padding: var(--tooltip-inner-padding, 8px 12px);
+  --tooltip-font-size: var(--tooltip-text-size, 12px);
+  --tooltip-z-index: var(--tooltip-layer, 999);
+
+  &.noUserSelect {
+    user-select: none;
+  }
+
+  :global(.__react_component_tooltip) {
+    background-color: var(--tooltip-bg, var(--tooltip-bg-color));
+    border-radius: var(--tooltip-border-radius);
+    -moz-border-radius: var(--tooltip-border-radius);
+    -webkit-border-radius: var(--tooltip-border-radius);
+    box-shadow: var(--tooltip-box-shadow);
+    -moz-box-shadow: var(--tooltip-box-shadow);
+    -webkit-box-shadow: var(--tooltip-box-shadow);
+    padding: var(--tooltip-padding);
+    max-width: min(100vw, var(--tooltip-max-width-value, var(--tooltip-max-width)));
+    color: var(--tooltip-color, var(--tooltip-text-color));
+    font-size: var(--tooltip-font-size);
+    z-index: var(--tooltip-z-index);
+    box-sizing: border-box;
+
+    p,
+    div,
+    span {
+      color: var(--tooltip-color, var(--tooltip-text-color));
+    }
+
+    &:before {
+      border: 1px solid var(--tooltip-bg, var(--tooltip-bg-color));
+    }
+
+    &:after {
+      border: 1px solid var(--tooltip-bg, var(--tooltip-bg-color));
+      background-color: var(--tooltip-bg, var(--tooltip-bg-color)) !important;
+    }
+
+    &.place-left {
+      &::after {
+        border-inline-start: none !important;
+        display: none;
+      }
+      &::before {
+        background: none !important;
+      }
+    }
+
+    &.place-right {
+      &::after {
+        border-inline-end: none !important;
+        display: none;
+      }
+      &::before {
+        background: none !important;
+      }
+    }
+
+    &.place-top {
+      &::after {
+        border-top: none !important;
+        display: none;
+      }
+      &::before {
+        background: none !important;
+      }
+    }
+
+    &.place-bottom {
+      &::after {
+        border-bottom: none !important;
+        display: none;
+      }
+      &::before {
+        background: none !important;
+      }
+    }
+  }
+
+  :global(#system-tooltip) {
+    max-width: min(100vw, 800px) !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+}

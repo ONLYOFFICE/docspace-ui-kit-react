@@ -1,0 +1,176 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors";
+
+.loadingButtonContainer {
+  :global(.light) & {
+    --loading-button-default-bg: #{colors.$gray};
+    --loading-button-hover-color: #{colors.$light-gray-dark};
+  }
+
+  :global(.dark) & {
+    --loading-button-default-bg: #{colors.$gray-dark};
+    --loading-button-hover-color: #{colors.$white};
+  }
+
+  --loading-button-fill: var(--loading-button-accent, var(--accent-main));
+  --circle-fill-color: var(--loading-button-fill);
+
+  width: 16px;
+  height: 16px;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+
+  & .circleMask .circleFill {
+    background-color: var(--circle-fill-color);
+  }
+
+  .loadingButton {
+    svg path {
+      fill: var(--circle-fill-color);
+    }
+  }
+
+  &.defaultMode {
+    .circleMask .circleFill {
+      background-color: var(--loading-button-idle, var(--loading-button-default-bg));
+    }
+    .loadingButton {
+      cursor: pointer;
+
+      svg path {
+        fill: var(--loading-button-idle, var(--loading-button-default-bg));
+      }
+    }
+
+    &:hover {
+      .loadingButton {
+        svg path {
+          fill: var(--loading-button-hover-fill, var(--loading-button-hover-color));
+        }
+      }
+    }
+  }
+}
+
+.circle {
+  :global(.light) & {
+    --loading-button-color: #{colors.$light-second-main};
+    --loading-button-bg: #{colors.$white};
+  }
+
+  :global(.dark) & {
+    --loading-button-color: #{colors.$white};
+    --loading-button-bg: #{colors.$black};
+  }
+
+  --loading-button-percent: 0;
+  --rotate-angle: calc(var(--loading-button-percent) * 1.8deg);
+
+  .circleMask,
+  .circleFill {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  &.isProgressZero,
+  &.isAnimation.inConversion {
+    .circleFill {
+      animation: rotate360 2s linear infinite;
+      transform: translate(0);
+    }
+  }
+
+  &:not(.isProgressZero):not(.isAnimation.isConversion) {
+    .circleMask {
+      clip: rect(0px, 16px, 16px, 8px);
+    }
+
+    .circleFill {
+      animation: fill-rotate ease-in-out none;
+      transform: rotate(var(--rotate-angle));
+    }
+  }
+
+  .circleMask .circleFill {
+    clip: rect(0px, 8px, 16px, 0px);
+    background-color: var(--circle-fill-color, var(--loading-button-color));
+  }
+
+  .circleMask.circleFull {
+    animation: fill-rotate ease-in-out none;
+    transform: rotate(var(--rotate-angle));
+  }
+
+  @keyframes rotate360 {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes fill-rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(var(--rotate-angle));
+    }
+  }
+}
+
+.loadingButton {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 11px;
+  background: var(--loading-button-custom-bg, var(--loading-button-bg));
+
+  position: absolute;
+  margin: 2px;
+
+  svg path {
+    font-weight: bold;
+
+    fill: var(--loading-button-color);
+  }
+}

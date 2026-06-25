@@ -1,0 +1,109 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors";
+@use "../../styles/mixins";
+
+.categoryItemWrapper {
+  :global(.light) & {
+    --settings-description-color: #{colors.$gray-text};
+    --settings-arrow-fill: #{colors.$black};
+    --text-disable-color: #{colors.$gray-text};
+  }
+
+  :global(.dark) & {
+    --settings-description-color: #{colors.$gray-dark};
+    --settings-arrow-fill: #{colors.$white};
+    --text-disable-color: #{colors.$gray-dark-text};
+  }
+
+  --category-item-description-color-value: var(--category-item-description-color, var(--settings-description-color));
+  --category-item-arrow-color-value: var(--category-item-arrow-color, var(--settings-arrow-fill));
+  --category-item-disabled-color-value: var(--category-item-disabled-color, var(--text-disable-color));
+  --category-item-bottom-margin: var(--category-item-margin, 20px);
+
+  margin-bottom: var(--category-item-bottom-margin);
+}
+
+.categoryItemHeading {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.categoryItemSubheader {
+  --category-item-subheader-font-size: var(--category-item-subheader-size, 13px);
+
+  font-size: var(--category-item-subheader-font-size);
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.categoryItemDescription {
+  color: var(--category-item-description-color-value);
+  font-size: 12px;
+  max-width: 1024px;
+
+  &.disabled {
+    color: var(--category-item-disabled-color-value);
+  }
+}
+
+.inheritTitleLink {
+  margin-inline-end: 7px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--category-item-title-color);
+
+  &.disabled {
+    color: var(--category-item-disabled-color-value);
+  }
+}
+
+.linkText {
+  margin: 0;
+}
+
+.arrowIcon {
+  @include mixins.common-icons-style;
+
+  path {
+    fill: var(--category-item-arrow-color-value);
+  }
+
+  :global(.rtl) & {
+    transform: scaleX(-1);
+  }
+}

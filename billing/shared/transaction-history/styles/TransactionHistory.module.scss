@@ -1,0 +1,316 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+.transactionRowAmountCredit {
+  color: var(--payment-credit-color);
+}
+
+.transactionBodyWrapper {
+  width: 100%;
+  min-width: 0;
+  contain: inline-size;
+  max-width: var(--transaction-body-max-width, 1280px);
+}
+
+.transactionHistoryTitle {
+  margin-bottom: 10px;
+}
+
+.transactionHistoryCombobox {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+  gap: 12px;
+  align-items: start;
+  .transactionTypeCombobox {
+    padding: 0;
+  }
+}
+
+.transactionHistoryBody {
+  margin-top: 27px;
+
+  :global(.table-container_header) {
+    position: absolute;
+  }
+
+  :global(.table-container_cell) {
+    height: auto;
+    max-height: none;
+    min-height: 48px;
+    overflow: visible;
+    white-space: normal;
+  }
+}
+
+.transactionDates {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.downloadWrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  &.isMobileButton {
+    flex-direction: column;
+  }
+}
+
+.transactionsLimit {
+  margin: 20px 0 10px 0;
+  max-width: 660px;
+}
+
+.tableContainerCaptionHeader {
+  position: absolute;
+}
+
+.transactionRowAmount {
+  min-width: fit-content;
+  width: max-content;
+  text-align: end;
+}
+
+.transactionRow {
+  .rowContent {
+    height: 58px;
+  }
+
+  [data-testid="tablet-side-info"] {
+    color: var(--payment-text-color);
+  }
+
+  box-sizing: border-box;
+  margin-top: -1px;
+  position: unset;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.downloadReportDescription {
+  color: var(--payment-text-color);
+}
+
+.filterDialog {
+  .filterDialogContent {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .filterDialogSection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .filterDialogDivider {
+    width: 100%;
+    height: 1px;
+    border-bottom: 1px solid var(--aside-header-border-color);
+  }
+}
+
+.transactionHistoryHeader {
+  display: flex;
+  margin-top: 24px;
+  #filterButton {
+    margin-left: auto;
+  }
+}
+
+.loaderRow {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 12px 0;
+
+  &.headerRow {
+    gap: 12px;
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+
+  &.dataRow {
+    max-width: 920px;
+    padding: 12px 0;
+    justify-content: space-between;
+  }
+}
+
+.bodyRow {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-right: 30px;
+  width: calc(100% - 30px);
+}
+
+.balanceRow {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+  margin-top: 20px;
+
+  .rectangleSkeleton:first-child {
+    margin-bottom: 4px;
+  }
+
+  .rectangleSkeleton:last-child {
+    margin-top: 8px;
+  }
+}
+.selectedContactItem {
+  margin-bottom: 0;
+}
+
+.transactionHistoryLoader {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 920px;
+
+  .flexibleLoader {
+    max-width: 151px;
+  }
+
+  .fixedLoader {
+    width: 51px;
+  }
+
+  .lastChild {
+    padding-right: 30px;
+  }
+
+  .paymentLoader,
+  .descriptionRow {
+    max-width: 660px;
+  }
+
+  .descriptionRow {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+}
+
+.mobileBody {
+  display: flex;
+  margin-bottom: 16px;
+  align-items: center;
+  margin-top: 12px;
+  .mobileBodyLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-right: auto;
+    width: 100%;
+
+    &.isTablet {
+      max-width: 384px;
+    }
+
+    &:not(.isTablet) {
+      max-width: 247px;
+    }
+  }
+}
+
+.loaderItem {
+  height: 16px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0) 23%,
+      rgba(0, 0, 0, 0.1) 50%,
+      rgba(0, 0, 0, 0) 78%
+    );
+    animation: shimmer 1.5s infinite;
+  }
+
+  &.type {
+    width: 120px;
+  }
+
+  &.date {
+    width: 80px;
+  }
+
+  &.amount {
+    width: 70px;
+    margin-left: auto;
+  }
+}
+
+.filterIconWrapper {
+  margin-inline-start: auto;
+}
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.transactionRowDetails {
+  color: var(--payment-dialog-text);
+}
+
+.transactionRowDescription {
+  margin-inline-end: 4px;
+}
+
+.clearFilter {
+  margin: auto 0;
+}

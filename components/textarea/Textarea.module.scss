@@ -1,0 +1,188 @@
+@use "../../styles/variables";
+@use "../../styles/mixins";
+@use "../../styles/variables/colors" as *;
+
+:global(.light) {
+  :local {
+    .numeration {
+      --textarea-numeration-color: #{$gray};
+    }
+  }
+}
+
+:global(.dark) {
+  :local {
+    .numeration {
+      --textarea-numeration-color: #{$gray-dark};
+    }
+  }
+}
+
+.copyIconWrapper {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  z-index: 2;
+
+  inset-inline-end: 18px;
+  top: 6px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.numeration {
+  --textarea-numeration-color: #{$gray};
+  --textarea-numeration-text: var(--textarea-numeration-text-color, var(--textarea-numeration-color));
+  --textarea-numeration-fs: var(--textarea-font-size, 13px);
+
+  display: block;
+  position: absolute;
+  line-height: 1.5;
+  margin: 0;
+  top: 6px;
+  text-align: end;
+
+  color: var(--textarea-numeration-text);
+
+  font-size: var(--textarea-numeration-fs);
+
+  inset-inline-start: 18px;
+
+  @include mixins.no-user-select;
+}
+
+.wrapper {
+  --textarea-max-width: var(--textarea-width, 1200px);
+  --textarea-default-height: var(--textarea-height, 89px);
+  --textarea-scale-height: var(--textarea-height-scale, 65vh);
+  --textarea-full-height: var(--textarea-height-full, var(--full-height));
+  --textarea-prop-height: var(--textarea-height-custom, var(--height-textarea));
+
+  position: relative;
+
+  max-width: var(--textarea-max-width);
+  height: var(--textarea-default-height);
+  min-height: var(--textarea-default-height);
+
+  &.heightScale {
+    height: var(--textarea-scale-height);
+  }
+
+  &.isFullHeight {
+    height: var(--textarea-full-height);
+  }
+
+  &.defaultHeight {
+    height: var(--textarea-prop-height);
+    min-height: var(--textarea-prop-height);
+  }
+
+  @supports (-moz-appearance: none) {
+    &:has(.textarea:placeholder-shown) {
+      min-height: 120px;
+    }
+
+    &.defaultHeight:has(.textarea:placeholder-shown) {
+      min-height: 120px;
+    }
+  }
+
+  :global(.scroll-wrapper) {
+    margin-inline-end: 0;
+  }
+
+  &.enableCopy {
+    :global(.scroll-wrapper) {
+      margin-inline-end: 8px;
+    }
+  }
+
+  &.isJSONField {
+    :global(.scroll-wrapper) {
+      margin-inline-end: 36px;
+    }
+  }
+}
+
+.textarea {
+  @include mixins.common-input-color-styles;
+
+  --textarea-text-pad: var(--textarea-padding, 5px 8px 2px);
+  --textarea-fs: var(--textarea-font-size, var(--text-input-font-size-base));
+
+  width: 100%;
+  display: block;
+  width: -webkit-fill-available;
+  border: none;
+  outline: none;
+  resize: none;
+  white-space: pre-line;
+  padding: var(--textarea-text-pad);
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 1.5;
+  font-size: var(--textarea-fs);
+  padding-inline-start: var(--padding-inline-start);
+  -webkit-background-clip: unset !important;
+
+  &::placeholder {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  @supports (-moz-appearance: none) {
+    &:placeholder-shown {
+      min-height: 104px;
+    }
+  }
+
+  &[data-dir="rtl"] {
+    &:placeholder-shown {
+      text-align: right;
+    }
+  }
+
+  &.isJSONField {
+    white-space: pre;
+    overflow: visible;
+  }
+}
+
+.scrollbar {
+  @include mixins.common-input-styles;
+  -webkit-background-clip: unset !important;
+
+  --textarea-scrollbar-h: var(--textarea-height, 93px);
+  --textarea-scrollbar-scale-h: var(--textarea-scrollbar-height-scale, 67vh);
+  --textarea-scrollbar-full-h: var(--textarea-height-full, var(--full-height));
+  --textarea-scrollbar-prop-h: var(--textarea-height-custom, var(--height-textarea));
+
+  width: 100% !important;
+  height: var(--textarea-scrollbar-h);
+  min-height: var(--textarea-scrollbar-h);
+
+  &.defaultHeight {
+    height: var(--textarea-scrollbar-prop-h);
+    min-height: var(--textarea-scrollbar-prop-h);
+  }
+
+  &.isFullHeight {
+    height: var(--textarea-scrollbar-full-h);
+  }
+
+  &.heightScale {
+    height: var(--textarea-scrollbar-scale-h);
+  }
+
+  @supports (-moz-appearance: none) {
+    &:has(.textarea:placeholder-shown) {
+      min-height: 120px;
+    }
+
+    &.defaultHeight:has(.textarea:placeholder-shown) {
+      min-height: 120px;
+    }
+  }
+}

@@ -1,0 +1,102 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { ChangeEvent, KeyboardEvent } from "react";
+
+export type TextareaProps = {
+  /** Class name */
+  className?: string;
+  /** Wrapper class name */
+  wrapperClassName?: string;
+  /** Used as HTML `id` property  */
+  id?: string;
+  /** Indicates that the field cannot be used */
+  isDisabled?: boolean;
+  /** Indicates that the field is displaying read-only content */
+  isReadOnly?: boolean;
+  /** Indicates the input field has an error  */
+  hasError?: boolean;
+  /** Indicates the input field has scale */
+  heightScale?: boolean;
+  /** Max value length */
+  maxLength?: number;
+  /** Used as HTML `name` property  */
+  name?: string;
+  /** Sets a callback function that allows handling the component's changing events */
+  onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+  /** Sets a callback function that allows handling the component's keyDown events */
+  onKeyDown?: (e: KeyboardEvent<HTMLTextAreaElement>) => void;
+  /** Placeholder for Textarea  */
+  placeholder?: string;
+  /** Accepts css style */
+  style?: React.CSSProperties;
+  /** Used as HTML `tabindex` property */
+  tabIndex?: number;
+  /** Textarea value */
+  value?: string;
+  /** Font-size value */
+  fontSize?: number;
+  /** Text-area height value */
+  heightTextArea?: string | number;
+  /** Specifies the text color */
+  color?: string;
+  /** Default input property */
+  autoFocus?: boolean;
+  /** Allows selecting the textarea */
+  areaSelect?: boolean;
+  /** Prettifies Json and adds lines numeration */
+  isJSONField?: boolean;
+  /** Indicates the text of toast/informational alarm */
+  copyInfoText?: string;
+  /** Shows copy icon */
+  enableCopy?: boolean;
+  /** Inserts numeration */
+  hasNumeration?: boolean;
+  /** Calculating height of content depending on number of lines */
+  isFullHeight?: boolean;
+  /** Calculated height of content depending on number of lines in pixels */
+  fullHeight?: number;
+  /** Minimum height of the textarea. */
+  minHeight?: string;
+
+  classNameCopyIcon?: string;
+  paddingLeftProp?: string;
+
+  isChatMode?: boolean;
+  dataTestId?: string;
+  
+  /** Callback function for handling copy action */
+  onCopy?: (text: string) => void;
+};

@@ -1,0 +1,204 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+.totalWrapper {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: 6px;
+  margin: 0;
+  flex: 0 0 50%;
+  margin-top: 16px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--payment-background-color);
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  &.withBackground {
+    padding: 16px;
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+.warningBlock {
+  background-color: var(--payment-backgroud-color-warning);
+  padding: 16px;
+  margin: 4px 0;
+  max-width: 660px;
+  border-radius: 6px;
+  
+  box-sizing: border-box;
+  
+  .warningTitle {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 4px;
+
+    svg {
+      path {
+        fill: var(--payment-warning-color);
+      }
+    }
+  }
+
+  .warningColor{
+    color:var(--payment-warning-color);
+  }
+
+ 
+}
+
+.cancelChangeLink {
+  color: var(--link-color);
+  cursor: pointer;
+  text-decoration: underline;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.cancelChangeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.loaderContainer {
+  display: flex;
+  align-items: center;
+
+  .refreshLoader {
+    height: 16px;
+  }
+}
+.planInfoContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  margin-top: 12px;
+
+  &.withBottom {
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--aside-header-border-color);
+  }
+}
+
+.planInfoIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--payment-accent-color);
+    opacity: 0.1;
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  svg {
+    position: relative;
+    z-index: 1;
+    path {
+      fill: var(--payment-accent-color);
+    }
+  }
+}
+
+.planInfoBody {
+  flex: 1;
+  height: 35px;
+}
+
+.planInfoDetails {
+  display: flex;
+  flex-direction: column;
+  color: var(--payment-dialog-text);
+}
+
+.planInfoPrice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.priceForEach {
+  color: var(--payment-dialog-text);
+}
+
+.balanceWarning {
+  color: var(--warning-color);
+  margin-top: 4px;
+}
+
+.totalTitle {
+  margin-bottom: 12px;
+}
+
+.walletContainer {
+  padding: 20px 0;
+}
+
+.planInfoHeader {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}

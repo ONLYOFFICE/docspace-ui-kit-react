@@ -1,0 +1,713 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import type React from "react";
+import type {
+  EmployeeStatus,
+  EmployeeType,
+  RoomType,
+  FileShare,
+  FileType,
+  FolderType,
+  FileEntryDtoIntegerAllOfSecurity,
+} from "@onlyoffice/docspace-api-sdk";
+
+import type {
+  ICover,
+  MergeTypes,
+  Nullable,
+  WithFlag,
+  TUserGroup,
+} from "../../types";
+
+import type { AvatarRole } from "../avatar";
+import type { TTabItem } from "../tabs";
+
+import type { SelectorAccessRightsMode } from "./Selector.enums";
+
+// header
+export type THeaderBackButton =
+  | {
+      onBackClick: () => void;
+      withoutBackButton: false;
+      withoutBorder: boolean;
+    }
+  | {
+      onBackClick?: undefined;
+      withoutBackButton?: undefined;
+      withoutBorder?: undefined;
+    };
+
+export type TInfoBarData = {
+  title: string;
+  description: React.ReactNode;
+  className?: string;
+  icon?: string | React.ReactElement;
+  onClose?: VoidFunction;
+};
+
+export type TInfoBar = {
+  withInfoBar?: boolean;
+  infoBarData?: TInfoBarData;
+};
+
+export type InfoBarProps = {
+  ref?: React.RefObject<HTMLDivElement | null>;
+  visible: boolean;
+  className?: string;
+};
+
+export type BreadCrumbsProps = {
+  visible?: boolean;
+};
+
+export type HeaderProps = {
+  headerLabel: string;
+  onCloseClick: () => void;
+  isCloseable?: boolean;
+} & THeaderBackButton;
+
+export type TSelectorHeader = WithFlag<
+  "withHeader",
+  {
+    withHeader: true;
+    headerProps: HeaderProps;
+  }
+>;
+
+// bread crumbs
+type TOnBreadCrumbClick = ({
+  e,
+  open,
+  item,
+}: {
+  e: React.MouseEvent;
+  open: boolean;
+  item: TBreadCrumb;
+}) => void;
+
+export type TBreadCrumb = {
+  id: string | number;
+  label: string;
+  isRoom?: boolean;
+  isAgent?: boolean;
+  minWidth?: string;
+  roomType?: RoomType;
+  shared?: boolean;
+  onClick?: TOnBreadCrumbClick;
+  rootFolderType?: FolderType;
+};
+
+export type TDisplayedItem = {
+  id: string | number;
+  label: string;
+  isArrow: boolean;
+  isList: boolean;
+  isRoom?: boolean;
+  isAgent?: boolean;
+  listItems?: TBreadCrumb[];
+};
+
+export type TSelectorBreadCrumbs = WithFlag<
+  "withBreadCrumbs",
+  {
+    withBreadCrumbs: true;
+    isBreadCrumbsLoading: boolean;
+    breadCrumbs: TBreadCrumb[];
+    breadCrumbsLoader: React.ReactNode;
+    onSelectBreadCrumb: (item: TBreadCrumb) => void;
+    bodyIsLoading: boolean;
+  }
+>;
+
+// tabs
+export type TSelectorTabs = WithFlag<
+  "withTabs",
+  {
+    withTabs: true;
+    tabsData: TTabItem[];
+    activeTabId: string;
+  }
+>;
+
+// select all
+export type SelectAllProps = {
+  show: boolean;
+  isLoading: boolean;
+  rowLoader: React.ReactNode;
+};
+
+export type TSelectorSelectAll = WithFlag<
+  "withSelectAll",
+  {
+    withSelectAll: true;
+    selectAllLabel: string;
+    selectAllIcon: string;
+    onSelectAll: () => void;
+  }
+>;
+// search
+export type SearchProps = {
+  isSearch: boolean;
+};
+
+export type TSelectorSearch = WithFlag<
+  "withSearch",
+  {
+    withSearch: true;
+    searchLoader: React.ReactNode;
+    isSearchLoading: boolean;
+    searchPlaceholder?: string;
+    searchValue?: string;
+    onSearch: (value: string, callback?: VoidFunction) => void;
+    onClearSearch: (callback?: VoidFunction) => void;
+  }
+>;
+
+// empty screen form room
+export type EmptyScreenFormRoomProps = {
+  onCreateClickAction: VoidFunction;
+  createDefineRoomType: RoomType;
+};
+
+// empty screen
+export type EmptyScreenProps = {
+  withSearch: boolean;
+
+  items: TSelectorItem[];
+  inputItemVisible: boolean;
+
+  hideBackButton?: boolean;
+};
+
+export type TSelectorEmptyScreen = {
+  emptyScreenImage: string | React.ReactElement;
+  emptyScreenHeader: string;
+  emptyScreenDescription: string;
+
+  searchEmptyScreenImage: string | React.ReactElement;
+  searchEmptyScreenHeader: string;
+  searchEmptyScreenDescription: string;
+};
+
+// Pagination
+
+type TSelectorPagination = {
+  items: TSelectorItem[];
+  rowLoader: React.ReactNode;
+  hasNextPage: boolean;
+  isNextPageLoading: boolean;
+  totalItems: number;
+  isLoading: boolean;
+};
+
+// NewItem
+export type NewItemProps = {
+  label: string;
+  style: React.CSSProperties;
+  dropDownItems?: React.ReactElement[];
+  onCreateClick?: VoidFunction;
+  hotkey?: string;
+  inputItemVisible?: boolean;
+  listHeight: number;
+};
+
+// NewItemDropDown
+export type NewItemDropDownProps = {
+  dropDownItems: React.ReactElement[];
+  isEmpty?: boolean;
+  onCloseDropDown: (e?: MouseEvent) => void;
+  listHeight?: number;
+};
+
+// InputItem
+type TBaseInputProps = {
+  style: React.CSSProperties;
+  placeholder?: string;
+  color?: string;
+  icon?: string | React.ReactElement;
+};
+
+export type InputItemProps = TBaseInputProps & {
+  defaultInputValue: string;
+  onAcceptInput: (value: string) => void;
+  onCancelInput: VoidFunction;
+  roomType?: RoomType;
+  cover?: ICover;
+  setInputItemVisible: (value: boolean) => void;
+  setSavedInputValue: (value: Nullable<string>) => void;
+};
+
+// submit button
+export type TOnSubmit = (
+  selectedItems: TSelectorItem[],
+  access: TAccessRight | null,
+  fileName: string,
+  isFooterCheckboxChecked: boolean,
+) => void | Promise<void>;
+
+export type TSelectorSubmitButton = {
+  submitButtonLabel: string;
+  disableSubmitButton: boolean;
+  onSubmit: TOnSubmit;
+  submitButtonId?: string;
+};
+
+type TSelectorFooterSubmitButton = Omit<TSelectorSubmitButton, "onSubmit"> & {
+  onSubmit: (item?: TSelectorItem | React.MouseEvent) => Promise<void>;
+};
+
+// cancel button
+
+export type TSelectorCancelButton = WithFlag<
+  "withCancelButton",
+  {
+    withCancelButton: true;
+    cancelButtonLabel: string;
+    onCancel: () => void;
+    cancelButtonId?: string;
+  }
+>;
+
+// access rights
+
+export type TAccessRight = {
+  key: string;
+  label: string;
+  description?: string;
+  access: string | number;
+  isSeparator?: boolean;
+};
+
+type TWithAccessRightsProps = {
+  withAccessRights: true;
+  accessRights: TAccessRight[];
+  selectedAccessRight: TAccessRight | null;
+  onAccessRightsChange: (access: TAccessRight) => void;
+  accessRightsMode?: SelectorAccessRightsMode;
+};
+
+type TAsideCommonProps = {
+  withoutBackground?: boolean;
+  withBlur?: boolean;
+};
+
+export type TSelectorWithAside =
+  | ({ useAside: true; onClose: VoidFunction } & TAsideCommonProps)
+  | ({ useAside?: false; onClose?: VoidFunction } & TAsideCommonProps);
+
+export type TSelectorAccessRights = WithFlag<
+  "withAccessRights",
+  TWithAccessRightsProps
+>;
+
+export type AccessSelectorProps = Omit<
+  TWithAccessRightsProps,
+  "withAccessRights"
+> & {
+  footerRef: React.RefObject<HTMLDivElement | null>;
+};
+
+// footer input
+
+export type TSelectorInput = WithFlag<
+  "withFooterInput",
+  {
+    withFooterInput: true;
+    footerInputHeader: string;
+    currentFooterInputValue: string;
+  }
+>;
+
+export type TSelectorFooterInput = TSelectorInput & {
+  setNewFooterInputValue: React.Dispatch<React.SetStateAction<string>>;
+  withErrorFooter?: boolean;
+};
+
+// footer checkbox
+
+export type TSelectorCheckbox = WithFlag<
+  "withFooterCheckbox",
+  {
+    withFooterCheckbox: true;
+    footerCheckboxLabel: string;
+    isChecked: boolean;
+  }
+>;
+
+export type TSelectorFooterCheckbox = TSelectorCheckbox & {
+  setIsFooterCheckboxChecked: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export type TSelectorInfo = WithFlag<
+  "withInfo",
+  {
+    withInfo: true;
+    infoText: string;
+    withInfoBadge?: boolean;
+  }
+>;
+
+export type TRenderCustomItem = (
+  label: string,
+  role?: string,
+  email?: string,
+  isGroup?: boolean,
+  status?: EmployeeStatus,
+  id?: string | number,
+) => React.ReactNode | null;
+
+export type SelectorProps = TSelectorHeader &
+  TInfoBar &
+  TSelectorInfo &
+  TSelectorTabs &
+  TSelectorSelectAll &
+  TSelectorEmptyScreen &
+  TSelectorSearch &
+  TSelectorBreadCrumbs &
+  TSelectorSubmitButton &
+  TSelectorCancelButton &
+  TSelectorAccessRights &
+  TSelectorInput &
+  TSelectorCheckbox &
+  TSelectorWithAside &
+  TSelectorPagination & {
+    id?: string;
+    className?: string;
+    style?: React.CSSProperties;
+
+    onSelect?: (
+      item: TSelectorItem,
+      isDoubleClick: boolean,
+      doubleClickCallback: () => Promise<void>,
+    ) => void;
+
+    isMultiSelect: boolean;
+    forceIsMultiSelect?: boolean;
+    selectedItems?: TSelectorItem[];
+    maxSelectedItems?: number;
+
+    disableFirstFetch?: boolean;
+    loadNextPage: (startIndex: number) => Promise<void>;
+
+    renderCustomItem?: TRenderCustomItem;
+
+    alwaysShowFooter?: boolean;
+    descriptionText?: string;
+
+    withPadding?: boolean;
+    injectedElement?: React.ReactElement;
+
+    isSSR?: boolean;
+    selectedItem?: TSelectorItem | null; // no multiSelect only
+    dataTestId?: string;
+
+    hideBackButton?: boolean;
+    folderFormValidation?: RegExp;
+
+    displayFileExtension?: boolean;
+  };
+
+export type BodyProps = TSelectorInfo &
+  TSelectorPagination & {
+    footerVisible: boolean;
+    withHeader?: boolean;
+    withPadding?: boolean;
+
+    value?: string;
+
+    isMultiSelect: boolean;
+    forceIsMultiSelect?: boolean;
+
+    inputItemVisible: boolean;
+    setInputItemVisible: (value: boolean) => void;
+
+    renderCustomItem?: TRenderCustomItem;
+    onSelect: (item: TSelectorItem, isDoubleClick: boolean) => void;
+
+    loadMoreItems: (startIndex: number) => void;
+
+    withFooterInput?: boolean;
+    withFooterCheckbox?: boolean;
+    withErrorFooter?: boolean;
+    descriptionText?: string;
+    withInfoBadge?: boolean;
+    injectedElement?: React.ReactElement;
+
+    isSSR?: boolean;
+    hideBackButton?: boolean;
+    isLimitReached?: boolean;
+
+    displayFileExtension?: boolean;
+  };
+
+export type FooterProps = TSelectorFooterSubmitButton &
+  TSelectorCancelButton &
+  TSelectorAccessRights &
+  TSelectorFooterInput &
+  TSelectorFooterCheckbox & {
+    isMultiSelect: boolean;
+    selectedItemsCount: number;
+    requestRunning?: boolean;
+    withErrorFooter?: boolean;
+  };
+
+type TSelectorItemEmpty = {
+  avatar?: undefined;
+  color?: undefined;
+  hasAvatar?: undefined;
+  icon?: undefined;
+  iconOriginal?: undefined;
+  role?: undefined;
+  email?: undefined;
+  groups?: undefined;
+  isOwner?: undefined;
+  isAdmin?: undefined;
+  isVisitor?: undefined;
+  isCollaborator?: undefined;
+  isRoomAdmin?: undefined;
+  status?: undefined;
+  access?: undefined;
+  fileExst?: undefined;
+  fileType?: undefined;
+  shared?: undefined;
+  parentId?: undefined;
+  rootFolderType?: undefined;
+  security?: undefined;
+  isFolder?: undefined;
+  filesCount?: undefined;
+  foldersCount?: undefined;
+  roomType?: undefined;
+  isGroup?: undefined;
+  name?: undefined;
+  isCreateNewItem?: undefined;
+  onCreateClick?: undefined;
+  hotkey?: undefined;
+  onBackClick?: undefined;
+  dropDownItems?: undefined;
+  isInputItem?: undefined;
+  defaultInputValue?: undefined;
+  onAcceptInput?: undefined;
+  onCancelInput?: undefined;
+  placeholder?: undefined;
+  cover?: undefined;
+  userType?: undefined;
+  isMCP?: undefined;
+
+  isRoomsOnly?: undefined;
+  createDefineRoomType?: undefined;
+  isSystem?: undefined;
+};
+
+export type TSelectorItemUser = MergeTypes<
+  TSelectorItemEmpty,
+  {
+    email: string;
+    isOwner: boolean;
+    isAdmin: boolean;
+    isVisitor: boolean;
+    isCollaborator: boolean;
+    isRoomAdmin: boolean;
+    avatar: string;
+    avatarSmall?: string;
+    userName?: string;
+    hasAvatar: boolean;
+    role: AvatarRole;
+    userType: EmployeeType;
+    groups?: TUserGroup[];
+    status: EmployeeStatus;
+    access?: FileShare | string | number;
+  }
+>;
+
+export type TSvgComponent = React.FC<React.SVGProps<SVGSVGElement>>;
+
+export type TSelectorItemFile = MergeTypes<
+  TSelectorItemEmpty,
+  {
+    fileExst: string;
+    fileType: FileType;
+    isForm?: boolean;
+    parentId: string | number;
+    rootFolderType: string | number;
+    security: FileEntryDtoIntegerAllOfSecurity;
+    icon: TSvgComponent | string;
+  }
+>;
+
+export type TSelectorItemFolder = MergeTypes<
+  TSelectorItemEmpty,
+  {
+    isFolder: boolean;
+    parentId: string | number;
+    rootFolderType: string | number;
+    filesCount: number;
+    foldersCount: number;
+    security: FileEntryDtoIntegerAllOfSecurity;
+    icon?: TSvgComponent | string;
+    avatar?: string | React.ReactElement;
+  }
+>;
+
+export type TSelectorItemRoom = MergeTypes<
+  TSelectorItemEmpty,
+  {
+    isFolder: boolean;
+    roomType: RoomType;
+    shared: boolean;
+    parentId: string | number;
+    rootFolderType: string | number;
+    filesCount: number;
+    foldersCount: number;
+    security: FileEntryDtoIntegerAllOfSecurity;
+    icon?: string;
+    color?: string;
+    iconOriginal?: string;
+    cover?: ICover;
+    tags?: string[];
+    title?: string;
+  }
+>;
+
+export type TSelectorItemGroup = MergeTypes<
+  TSelectorItemEmpty,
+  {
+    isGroup: boolean;
+    isSystem?: boolean;
+    name: string;
+  }
+>;
+
+export type TSelectorItemMCP = MergeTypes<
+  TSelectorItemEmpty,
+  {
+    isMCP: boolean;
+    icon?: string;
+  }
+>;
+
+export type TSelectorItemNew = MergeTypes<
+  TSelectorItemEmpty,
+  {
+    isCreateNewItem: boolean;
+    hotkey?: string;
+    dropDownItems?: React.ReactElement[];
+    onCreateClick?: VoidFunction;
+    onBackClick: VoidFunction;
+
+    isRoomsOnly?: boolean;
+    createDefineRoomType?: RoomType;
+  }
+>;
+
+export type TSelectorItemInput = MergeTypes<
+  TSelectorItemEmpty,
+  {
+    isInputItem: boolean;
+    defaultInputValue: string;
+    icon?: string | React.ReactElement;
+    color?: string;
+    roomType?: RoomType;
+    cover?: ICover;
+    placeholder?: string;
+
+    onAcceptInput: (value: string) => void;
+    onCancelInput: VoidFunction;
+  }
+>;
+
+type TSelectorItemType =
+  | TSelectorItemUser
+  | TSelectorItemFile
+  | TSelectorItemFolder
+  | TSelectorItemRoom
+  | TSelectorItemGroup
+  | TSelectorItemNew
+  | TSelectorItemInput
+  | TSelectorItemMCP;
+
+export type TSelectorItem = TSelectorItemType & {
+  label: string;
+
+  key?: string;
+  id?: string | number;
+  displayName?: string;
+  isSelected?: boolean;
+  isDisabled?: boolean;
+  disabledText?: string;
+  lifetimeTooltip?: string | null;
+  viewUrl?: string;
+  isTemplate?: boolean;
+  templateAccess?: FileShare;
+  templateIsOwner?: boolean;
+  disableMultiSelect?: boolean;
+  isSeparator?: boolean;
+  forceIsMultiSelect?: boolean;
+};
+
+export type Data = {
+  items: TSelectorItem[];
+  onSelect?: (item: TSelectorItem, isDoubleClick: boolean) => void;
+  isMultiSelect: boolean;
+  isItemLoaded: (index: number) => boolean;
+  rowLoader: React.ReactNode;
+  renderCustomItem?: TRenderCustomItem;
+  setInputItemVisible: (value: boolean) => void;
+  inputItemVisible: boolean;
+  savedInputValue: Nullable<string>;
+  setSavedInputValue: (value: Nullable<string>) => void;
+  listHeight: number;
+  isLimitReached?: boolean;
+  displayFileExtension?: boolean;
+  forceIsMultiSelect?: boolean;
+};
+
+export interface ItemProps {
+  index: number;
+  style: React.CSSProperties;
+  data: Data;
+}
+
+export type ProvidersProps = {
+  emptyScreenProps: TSelectorEmptyScreen;
+  breadCrumbsProps: TSelectorBreadCrumbs;
+  infoBarProps: TInfoBar;
+  searchProps: TSelectorSearch;
+  selectAllProps: TSelectorSelectAll & {
+    isAllChecked: boolean;
+    isAllIndeterminate: boolean;
+  };
+  tabsProps: TSelectorTabs;
+};

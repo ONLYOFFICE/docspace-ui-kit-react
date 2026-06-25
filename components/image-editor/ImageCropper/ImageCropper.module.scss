@@ -1,0 +1,162 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../../styles/variables/colors";
+@use "../../../styles/mixins";
+
+.imageCropperWrapper {
+  :global(.light) & {
+    --icon-cropper-grid-color: #{colors.$gray-strong};
+    --icon-cropper-delete-button-bg: #{colors.$gray-light};
+    --icon-cropper-delete-button-hover-bg: #{colors.$light-gray-hover};
+    --icon-cropper-delete-button-color: #{colors.$gray-text};
+    --icon-cropper-delete-button-icon-color: #{colors.$light-gray-dark};
+    --icon-cropper-zoom-button-icon-color: #{colors.$gray};
+    --icon-cropper-zoom-button-hover-icon-color: #{colors.$light-gray-dark};
+  }
+
+  :global(.dark) & {
+    --icon-cropper-grid-color: #{colors.$black};
+    --icon-cropper-delete-button-bg: #{colors.$gray-dark-mid};
+    --icon-cropper-delete-button-hover-bg: #{colors.$gray-dark-strong};
+    --icon-cropper-delete-button-color: #{colors.$white};
+    --icon-cropper-delete-button-icon-color: #{colors.$dark-gray-dark};
+    --icon-cropper-zoom-button-icon-color: #{colors.$gray-dark};
+    --icon-cropper-zoom-button-hover-icon-color: #{colors.$dark-gray-dark};
+  }
+
+  max-width: 368px;
+}
+
+.iconCropperCropArea {
+  width: 368px;
+  height: 368px;
+  margin-bottom: 4px;
+  position: relative;
+}
+
+.iconCropperGrid {
+  pointer-events: none;
+  position: absolute;
+  width: 368px;
+  height: 368px;
+  top: 0;
+  bottom: 0;
+  inset-inline: 0;
+
+  svg {
+    opacity: 1;
+    width: 368px;
+    height: 368px;
+    path {
+      fill: var(--icon-cropper-grid-color);
+    }
+  }
+}
+
+.iconCropperAvatarEditor {
+  cursor: default !important;
+}
+
+.iconCropperChangeButton {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 0;
+  background: var(--icon-cropper-delete-button-bg);
+  border-radius: 3px;
+  margin-bottom: 12px;
+
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--icon-cropper-delete-button-hover-bg);
+    color: var(--icon-cropper-delete-button-color);
+  }
+
+  div:first-child {
+    height: 16px;
+  }
+
+  svg {
+    path {
+      fill: var(--icon-cropper-delete-button-icon-color);
+    }
+  }
+}
+
+.iconCropperChangeButtonText {
+  user-select: none;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--icon-cropper-delete-button-color);
+}
+
+.iconCropperZoomContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  gap: 12px;
+
+  svg {
+    rect {
+      fill: var(--icon-cropper-zoom-button-icon-color);
+    }
+  }
+}
+
+.slider {
+  margin: 0;
+}
+
+.button {
+  user-select: none;
+}
+
+.iconCropperZoomContainerButton {
+  &:hover {
+    svg {
+      rect {
+        fill: var(--icon-cropper-zoom-button-hover-icon-color);
+      }
+    }
+  }
+}

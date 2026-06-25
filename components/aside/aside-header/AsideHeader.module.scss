@@ -1,0 +1,140 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../../styles/variables";
+@use "../../../styles/variables/colors";
+@use "../../../styles/mixins";
+
+:global(.rtl) {
+  :local {
+    .container {
+      .arrowButton svg {
+        transform: scaleX(-1);
+      }
+    }
+  }
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: var(--aside-header-justify-v);
+  position: relative;
+
+  :global(.light) & {
+    --aside-header-text-color: #{colors.$black};
+    --aside-header-border-color: #{colors.$gray-light-mid};
+    --aside-header-custom-height: 53px;
+  }
+
+  :global(.dark) & {
+    --aside-header-text-color: #{colors.$white};
+    --aside-header-border-color: #{colors.$gray-dark-strong};
+    --aside-header-custom-height: 53px;
+  }
+
+  // bridge vars — bind public overrides to internal theme tokens
+  --aside-header-text-v: var(--aside-header-color, var(--aside-header-text-color));
+  --aside-header-border-v: var(--aside-header-border, var(--aside-header-border-color));
+  // new bridge vars for hardcoded values
+  --aside-header-height-v: var(--aside-header-height, 53px);
+  --aside-header-font-size-v: var(--aside-header-font-size, 21px);
+  --aside-header-margin-v: var(--aside-header-margin, 0 16px);
+  --aside-header-gap-v: var(--aside-header-gap, 6px);
+  --aside-header-justify-v: var(--aside-header-justify, space-between);
+  --aside-header-border-display-v: var(--aside-header-border-display, "");
+  --aside-header-title-position-v: var(--aside-header-title-position, static);
+  --aside-header-title-inset-v: var(--aside-header-title-inset, auto);
+  --aside-header-title-transform-v: var(--aside-header-title-transform, none);
+  --aside-header-title-text-align-v: var(--aside-header-title-text-align, start);
+
+  gap: var(--aside-header-gap-v);
+  margin: var(--aside-header-margin-v);
+  height: var(--aside-header-height-v);
+  min-height: var(--aside-header-height-v);
+
+  &.customHeaderHeight {
+    height: var(--aside-header-custom-height);
+    min-height: var(--aside-header-custom-height);
+  }
+
+  .additionalIconsContainer {
+    display: flex;
+    margin-inline: 16px 16px;
+    gap: 16px;
+
+    .header-icon {
+      height: 16px;
+      width: 16px;
+    }
+  }
+
+  .heading,
+  .headerComponent {
+    position: var(--aside-header-title-position-v);
+    inset-inline-start: var(--aside-header-title-inset-v);
+    transform: var(--aside-header-title-transform-v);
+    text-align: var(--aside-header-title-text-align-v);
+  }
+
+  .heading {
+    color: var(--aside-header-text-v);
+    font-weight: 700;
+    font-size: var(--aside-header-font-size-v);
+  }
+
+  .arrowButton {
+    margin-inline: 0 12px;
+  }
+
+  .closeButton {
+    margin-inline: auto 0;
+    min-width: 17px;
+  }
+  .headerComponent {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:not(.withoutBorder)::after {
+    content: var(--aside-header-border-display-v);
+    border-bottom: 1px solid var(--aside-header-border-v);
+    width: calc(100% + 32px);
+    position: absolute;
+    inset-inline-end: -16px;
+    bottom: 0;
+  }
+}

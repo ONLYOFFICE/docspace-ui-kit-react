@@ -1,0 +1,16 @@
+import type React from "react";
+import type { RoomsType } from "../../enums";
+
+export type RoomTypeProps = {
+  roomType?: RoomsType;
+  isOpen: boolean;
+
+  type?: "listItem" | "dropdownButton" | "dropdownItem";
+  id?: string;
+  selectedId: string | number;
+
+  onClick: React.MouseEventHandler<HTMLElement>;
+  disabledFormRoom?: boolean;
+  isTemplate?: boolean;
+  isTemplateRoom?: boolean;
+};

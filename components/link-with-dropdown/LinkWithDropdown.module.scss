@@ -1,0 +1,206 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors";
+
+.span {
+  :global(.light) & {
+    --link-dropdown-color-default: #{colors.$gray};
+    --link-dropdown-hover-color: #{colors.$gray-text};
+    --link-dropdown-hover-background: #{colors.$gray-light-mid};
+    --link-dropdown-background-default: transparent;
+    --link-dropdown-disable-color: #{colors.$gray};
+    --link-dropdown-text-decoration: dashed;
+    --link-dropdown-svg-opacity: 1;
+    --link-dropdown-svg-semi-transparent: 0.5;
+    --link-dropdown-padding-right: 20px;
+    --link-dropdown-max-width: 200px;
+    --link-dropdown-expander-width: 6.35px;
+  }
+
+  :global(.dark) & {
+    --link-dropdown-color-default: #{colors.$gray-dark};
+    --link-dropdown-hover-color: #{colors.$dark-gray-dark};
+    --link-dropdown-hover-background: #{colors.$gray-dark-strong};
+    --link-dropdown-background-default: transparent;
+    --link-dropdown-disable-color: #{colors.$gray-dark-text};
+    --link-dropdown-text-decoration: dashed;
+    --link-dropdown-svg-opacity: 1;
+    --link-dropdown-svg-semi-transparent: 0.5;
+    --link-dropdown-padding-right: 20px;
+    --link-dropdown-max-width: 200px;
+    --link-dropdown-expander-width: 6.35px;
+  }
+
+  --link-dropdown-text-color: var(--link-with-dropdown-color, var(--link-dropdown-color-default));
+  --link-dropdown-bg-value: var(--link-with-dropdown-bg, var(--link-dropdown-background-default));
+  --link-dropdown-hover-bg-value: var(--link-with-dropdown-hover-bg, var(--link-dropdown-hover-background));
+  --link-dropdown-hover-text-value: var(--link-with-dropdown-hover-color, var(--link-dropdown-hover-color));
+  --link-dropdown-disabled-color-value: var(--link-with-dropdown-disabled-color, var(--link-dropdown-disable-color));
+  --link-dropdown-padding-value: var(--link-with-dropdown-padding, 4px 8px);
+  --link-dropdown-radius-value: var(--link-with-dropdown-radius, 3px);
+
+  display: inline-block;
+  padding: var(--link-dropdown-padding-value);
+  border-radius: var(--link-dropdown-radius-value);
+  position: relative;
+  color: var(--link-dropdown-text-color);
+  background: var(--link-dropdown-bg-value);
+
+  .dropDownItem {
+    display: block;
+  }
+
+  .fixedMaxWidth {
+    max-width: var(--link-dropdown-max-width);
+  }
+
+  .expander {
+    path {
+      fill: var(--link-dropdown-text-color);
+    }
+  }
+
+  &:hover {
+    color: var(--link-dropdown-hover-text-value);
+    background: var(--link-dropdown-hover-bg-value);
+
+    .expander {
+      path {
+        fill: var(--link-dropdown-text-color);
+      }
+    }
+  }
+
+  &.isOpen {
+    color: var(--link-dropdown-hover-text-value);
+    background: var(--link-dropdown-hover-bg-value);
+  }
+
+  .text {
+    color: inherit;
+
+    &.textOverflow {
+      display: inline-block;
+      max-width: var(--link-dropdown-max-width);
+    }
+  }
+
+  .linkWithDropdown {
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-inline-end: var(--link-dropdown-padding-right);
+
+    &.disabled {
+      cursor: default;
+      color: var(--link-dropdown-disabled-color-value);
+    }
+
+    &.semitransparent {
+      opacity: 0.5;
+    }
+
+    &.alwaysDashed {
+      text-decoration: var(--link-dropdown-text-decoration);
+    }
+
+    &:not([href]):not([tabindex]) {
+      &.alwaysDashed {
+        text-decoration: var(--link-dropdown-text-decoration);
+      }
+
+      &:hover {
+        text-decoration: var(--link-dropdown-text-decoration);
+      }
+
+      &.disabled {
+        color: var(--link-dropdown-disabled-color-value);
+      }
+    }
+
+    &:hover {
+      &.disabled {
+        color: var(--link-dropdown-disabled-color-value);
+      }
+
+      &.appearDashedAfterHover {
+        svg {
+          position: absolute;
+          opacity: var(--link-dropdown-svg-opacity);
+        }
+      }
+
+      &.semitransparent {
+        svg {
+          opacity: var(--link-dropdown-svg-semi-transparent);
+        }
+      }
+    }
+  }
+
+  .textWithExpander {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .expander {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--link-dropdown-expander-width);
+
+      svg {
+        width: var(--link-dropdown-expander-width);
+        height: auto;
+        padding-bottom: 2px;
+      }
+    }
+
+    &.isOpen {
+      svg {
+        transform: rotate(180deg);
+      }
+    }
+
+    &:not(.isOpen) {
+      svg {
+        transform: rotate(0);
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/mixins";
+@use "../../styles/variables/colors";
+
+.wrapper {
+  :global(.light) & {
+    --form-wrapper-background: #{colors.$white};
+    --form-wrapper-box-shadow: 0px 5px 20px #{colors.$popup-shadow};
+  }
+
+  :global(.dark) & {
+    --form-wrapper-background: #{colors.$black};
+    --form-wrapper-box-shadow: 0px 5px 20px #{colors.$badge-shadow};
+  }
+
+  --form-wrapper-bg-value: var(--form-wrapper-bg, var(--form-wrapper-background));
+  --form-wrapper-shadow-value: var(--form-wrapper-shadow, var(--form-wrapper-box-shadow));
+  --form-wrapper-border-radius: var(--form-wrapper-radius, 12px);
+  --form-wrapper-inner-padding: var(--form-wrapper-padding, 32px);
+  --form-wrapper-width-max: var(--form-wrapper-max-width, 320px);
+  --form-wrapper-width-min: var(--form-wrapper-min-width, 320px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--form-wrapper-inner-padding);
+  background: var(--form-wrapper-bg-value);
+  box-shadow: var(--form-wrapper-shadow-value);
+  border-radius: var(--form-wrapper-border-radius);
+  max-width: var(--form-wrapper-width-max);
+  min-width: var(--form-wrapper-width-min);
+
+  @include mixins.tablet-and-below {
+    max-width: 416px;
+    min-width: 416px;
+  }
+
+  @include mixins.mobile {
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none !important;
+    max-width: 100%;
+    min-width: 100%;
+    background: transparent !important;
+  }
+}

@@ -1,0 +1,286 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors" as *;
+@use "../../styles/mixins";
+
+:global(.dark) {
+  .container {
+    --file-input-border-color: #{$gray-dark-strong};
+    --file-input-disabled-border-color: #{$gray-dark-strong};
+    --file-input-warning-border-color: #{$dark-status-warning};
+    --file-input-error-border-color: #{$dark-error-status};
+    --file-input-hover-border-color: #{$gray-dark};
+    --file-input-hover-disabled-border-color: #{$gray-dark-strong};
+    --file-input-hover-warning-border-color: #{$dark-status-warning};
+    --file-input-hover-error-border-color: #{$dark-error-status};
+    --file-input-focus-border-color: #{$white};
+    --file-input-focus-disabled-border-color: #{$gray-dark-strong};
+    --file-input-focus-warning-border-color: #{$dark-status-warning};
+    --file-input-focus-error-border-color: #{$dark-error-status};
+    --file-input-disabled-placeholder-color: #{$gray-dark-text};
+  }
+}
+
+.container {
+  --file-input-border-color: #{$gray-strong};
+  --file-input-disabled-border-color: #{$gray-light-mid};
+  --file-input-warning-border-color: #{$light-status-warning};
+  --file-input-error-border-color: #{$light-error-status};
+  --file-input-hover-border-color: #{$gray};
+  --file-input-hover-disabled-border-color: #{$gray-light-mid};
+  --file-input-hover-warning-border-color: #{$light-status-warning};
+  --file-input-hover-error-border-color: #{$light-error-status};
+  --file-input-focus-border-color: #{$light-second-main};
+  --file-input-focus-disabled-border-color: #{$gray-light-mid};
+  --file-input-focus-warning-border-color: #{$light-status-warning};
+  --file-input-focus-error-border-color: #{$light-error-status};
+  --file-input-disabled-placeholder-color: #{$gray-strong};
+
+  // bridge vars — bind public overrides to internal theme tokens
+  --file-input-border-v: var(--file-input-border, var(--file-input-border-color));
+  --file-input-border-hover-v: var(--file-input-hover-border, var(--file-input-hover-border-color));
+  --file-input-border-focus-v: var(--file-input-focus-border, var(--file-input-focus-border-color));
+  --file-input-border-disabled-v: var(
+    --file-input-disabled-border,
+    var(--file-input-disabled-border-color)
+  );
+  --file-input-border-warning-v: var(
+    --file-input-warning-border,
+    var(--file-input-warning-border-color)
+  );
+  --file-input-border-error-v: var(--file-input-error-border, var(--file-input-error-border-color));
+  --file-input-placeholder-v: var(
+    --file-input-placeholder-color,
+    var(--file-input-disabled-placeholder-color)
+  );
+  // new bridge var for hardcoded icon border-radius
+  --file-input-radius-v: var(--file-input-radius, 3px);
+
+  display: flex;
+  position: relative;
+  outline: none;
+
+  &.base {
+    width: 173px;
+    max-height: 32px;
+  }
+
+  &.middle {
+    width: 300px;
+    max-height: 32px;
+  }
+
+  &.large {
+    width: 550px;
+    max-height: 44px;
+  }
+
+  &.scale {
+    width: 100%;
+  }
+
+  .textInput {
+    cursor: pointer !important;
+
+    text-overflow: ellipsis;
+    margin: 0;
+
+    border-color: var(--file-input-border-v);
+
+    &:focus {
+      border-color: var(--file-input-border-v) !important;
+    }
+
+    &:hover:not(&.disabled):not(&.warning):not(&.error) {
+      border-color: var(--file-input-border-v);
+    }
+
+    &.disabled {
+      cursor: default !important;
+      border-color: var(--file-input-border-disabled-v);
+
+      &::placeholder {
+        color: var(--file-input-placeholder-v);
+        -webkit-text-fill-color: var(--file-input-placeholder-v);
+      }
+
+      &::-webkit-input-placeholder {
+        color: var(--file-input-placeholder-v);
+        -webkit-text-fill-color: var(--file-input-placeholder-v);
+      }
+      &::-moz-placeholder {
+        color: var(--file-input-placeholder-v);
+        -webkit-text-fill-color: var(--file-input-placeholder-v);
+      }
+      &:-ms-input-placeholder {
+        color: var(--file-input-placeholder-v);
+        -webkit-text-fill-color: var(--file-input-placeholder-v);
+      }
+      &:-moz-placeholder {
+        color: var(--file-input-placeholder-v);
+        -webkit-text-fill-color: var(--file-input-placeholder-v);
+      }
+    }
+
+    &.warning {
+      border-color: var(--file-input-border-warning-v) !important;
+    }
+
+    &.error {
+      border-color: var(--file-input-border-error-v) !important;
+    }
+
+    padding-inline-end: 40px;
+
+    &.base {
+      padding-inline-end: 37px;
+    }
+
+    &.middle {
+      padding-inline-end: 48px;
+    }
+
+    &.large {
+      padding-inline-end: 64px;
+    }
+  }
+
+  &:hover {
+    .icon {
+      border-color: var(--file-input-border-hover-v);
+
+      &.disabled {
+        border-color: var(--file-input-border-disabled-v);
+      }
+
+      &.warning {
+        border-color: var(--file-input-border-warning-v);
+      }
+
+      &.error {
+        border-color: var(--file-input-border-error-v);
+      }
+    }
+  }
+
+  &:active {
+    .icon {
+      border-color: var(--file-input-border-focus-v);
+
+      &.disabled {
+        border-color: var(--file-input-border-disabled-v);
+      }
+
+      &.warning {
+        border-color: var(--file-input-border-warning-v);
+      }
+
+      &.error {
+        border-color: var(--file-input-border-error-v);
+      }
+    }
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: absolute;
+  margin: 0;
+
+  @include mixins.logical-border-radius(0 3px 3px 0);
+  border-start-end-radius: var(--file-input-radius-v);
+  border-end-end-radius: var(--file-input-radius-v);
+
+  &.base,
+  &.middle {
+    width: 30px;
+    height: 30px;
+  }
+
+  &.large {
+    width: 48px;
+    height: 42px;
+  }
+
+  border: 1px solid;
+  cursor: pointer;
+
+  border-color: var(--file-input-border-v);
+
+  .iconButton {
+    cursor: pointer;
+  }
+
+  &.disabled {
+    border-color: var(--file-input-border-disabled-v);
+    cursor: default;
+
+    .iconButton {
+      cursor: default;
+    }
+  }
+
+  &.warning {
+    border-color: var(--file-input-border-warning-v);
+  }
+
+  &.error {
+    border-color: var(--file-input-border-error-v);
+  }
+
+  .loader {
+    padding-top: 5px;
+  }
+
+  inset-inline-end: 0;
+
+  .iconButton {
+    &.base {
+      width: 16px;
+    }
+
+    &.middle {
+      width: 16px;
+    }
+
+    &.large {
+      width: 16px;
+    }
+  }
+}

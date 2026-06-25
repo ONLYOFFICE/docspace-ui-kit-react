@@ -1,0 +1,515 @@
+@use "../../styles/variables/colors" as *;
+
+:global(.dark) {
+  .tabs {
+    --accent-main: var(--color-scheme-main-accent, #{$light-blue-main});
+
+    --tabs-gradient-color: #{$black};
+    --tabs-line-color: #{$gray-dark-strong};
+
+    /* Primary tabs */
+    --tabs-text-color-primary: #{$dark-gray-dark};
+    --tabs-active-text-color-primary: #{$white};
+    --tabs-hover-text-color-primary: #{$white};
+    --tabs-pressed-text-color-primary: #{$gray-dark-text};
+    --tabs-background-color-primary: #{$black};
+
+    /* Secondary tabs */
+    --tabs-text-color-secondary: #{$dark-gray-dark};
+    --tabs-active-text-color-secondary: #{$white};
+    --tabs-background-color-secondary: #{$dark-gray-light};
+    --tabs-hover-background-color-secondary: #{$gray-dark-mid};
+    --tabs-pressed-background-color-secondary: #{$dark-gray-light};
+    --tabs-active-background-color-secondary: #{$black};
+    --tabs-hover-background-icon-color-secondary: #{$white};
+  }
+}
+
+.tabs {
+  --accent-main: var(--color-scheme-main-accent, #{$light-blue-main});
+
+  --tabs-gradient-color: #{$white};
+  --tabs-line-color: #{$gray-light-mid};
+
+  /* Primary tabs */
+  --tabs-text-color-primary: #{$light-gray-dark};
+  --tabs-active-text-color-primary: var(--accent-main, #{$black});
+  --tabs-hover-text-color-primary: #{$gray};
+  --tabs-pressed-text-color-primary: #{$gray-text};
+  --tabs-background-color-primary: #{$white};
+
+  /* Secondary tabs */
+  --tabs-text-color-secondary: #{$light-gray-dark};
+  --tabs-active-text-color-secondary: #{$black};
+  --tabs-background-color-secondary: #{$light-gray-hover};
+  --tabs-hover-background-color-secondary: #{$gray-light-mid};
+  --tabs-pressed-background-color-secondary: #{$gray-light-mid};
+  --tabs-active-background-color-secondary: #{$white};
+  --tabs-hover-background-icon-color-secondary: #{$black};
+
+  /* CSS customization vars */
+  --tabs-height-primary: var(--tabs-primary-height, 32px);
+  --tabs-height-secondary: var(--tabs-secondary-height, 36px);
+  --tabs-gap-primary: var(--tabs-primary-gap, 20px);
+  --tabs-gap-secondary: var(--tabs-secondary-gap, 4px);
+  --tabs-padding-secondary: var(--tabs-secondary-padding, 4px);
+  --tabs-border-radius-secondary: var(--tabs-secondary-radius, 5px);
+  --tabs-tab-border-radius-secondary: var(--tabs-secondary-tab-radius, 3px);
+  --tabs-font-weight: var(--tabs-text-weight, 600);
+  --tabs-indicator-height: var(--tabs-underline-thickness, 4px);
+  --tabs-indicator-border-radius: var(--tabs-underline-radius, 4px 4px 0 0);
+  --tabs-motion-height: calc(
+    var(--tabs-height-secondary) - 2 * var(--tabs-padding-secondary)
+  );
+
+  font-family: var(--font-family);
+}
+
+.stickyIndent {
+  height: 20px;
+}
+
+.blurAhead {
+  position: absolute;
+  height: var(--tabs-height-primary);
+  width: 60px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 20.48%,
+    var(--tabs-fade, var(--tabs-gradient-color)) 100%
+  );
+  transform: matrix(-1, 0, 0, 1, 0, 0);
+  z-index: 1;
+
+  &[data-direction="rtl"] {
+    background: linear-gradient(
+      270deg,
+      rgba(255, 255, 255, 0) 20.48%,
+      var(--tabs-fade, var(--tabs-gradient-color)) 100%
+    );
+  }
+
+  &.secondary {
+    height: var(--tabs-height-secondary);
+  }
+}
+
+.blurBack {
+  position: absolute;
+  height: var(--tabs-height-primary);
+  width: 60px;
+  inset-inline-end: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 20.48%,
+    var(--tabs-fade, var(--tabs-gradient-color)) 100%
+  );
+
+  &[data-direction="rtl"] {
+    background: linear-gradient(
+      270deg,
+      rgba(255, 255, 255, 0) 20.48%,
+      var(--tabs-fade, var(--tabs-gradient-color)) 100%
+    );
+  }
+
+  &.secondary {
+    height: var(--tabs-height-secondary);
+  }
+}
+
+.sticky {
+  height: var(--tabs-height-primary);
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  background: var(--tabs-primary-bg, var(--tabs-background-color-primary));
+  z-index: 1;
+
+  display: flex;
+  flex-direction: row;
+
+  &.primary {
+    border-bottom: 1px solid var(--tabs-underline, var(--tabs-line-color));
+  }
+  &.secondary {
+    height: var(--tabs-height-secondary);
+  }
+}
+
+.scroll {
+  :global(.scroller) {
+    scroll-behavior: smooth;
+  }
+
+  .scroll-body {
+    position: absolute;
+    padding-inline-end: 0 !important;
+  }
+
+  :global(.track) {
+    z-index: 0;
+    padding: 0;
+  }
+
+  :global(.track > .thumb-horizontal) {
+    height: 1px !important;
+  }
+
+  :global(.thumb) {
+    background-color: rgba(100, 104, 112, 0.2) !important;
+  }
+
+  &.primary {
+    :global(.thumb) {
+      display: block;
+    }
+  }
+
+  &.secondary {
+    :global(.thumb),
+    :global(.track-horizontal) {
+      display: none;
+    }
+  }
+
+  .thumb:active,
+  .thumb.dragging {
+    background-color: rgba(6, 22, 38, 0.3) !important;
+  }
+}
+
+.tabList {
+  display: flex;
+  align-items: center;
+  justify-content: inherit;
+
+  &.centering {
+    justify-content: center;
+    width: max-content;
+    margin: 0 auto;
+  }
+  width: 100%;
+  height: var(--tabs-height-primary);
+
+  &.primary {
+    gap: var(--tabs-gap-primary);
+  }
+
+  &.secondary {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(var(--tabs-count), 1fr);
+    background-color: var(
+      --tabs-secondary-bg,
+      var(--tabs-background-color-secondary)
+    );
+    gap: var(--tabs-gap-secondary);
+    padding: var(--tabs-padding-secondary);
+    border-radius: var(--tabs-border-radius-secondary);
+    height: var(--tabs-height-secondary);
+    width: var(--tabs-width, 100%);
+  }
+
+  &.withArrows {
+    padding: 4px 32px;
+  }
+
+  &.secondary:not(.scaled) {
+    &.referenceSize {
+      display: flex;
+      visibility: visible;
+      width: fit-content;
+    }
+    &:not(.referenceSize) {
+      visibility: hidden;
+    }
+  }
+}
+
+.tab {
+  white-space: nowrap;
+  display: grid;
+  gap: 4px;
+
+  width: max-content;
+  font-weight: var(--tabs-font-weight);
+  line-height: 20px;
+  cursor: pointer;
+  user-select: none;
+
+  // opacity:
+  // pointer-events:
+
+  &.primary {
+    padding: 4px 0 0;
+
+    .tabText {
+      color: var(--tabs-primary-text, var(--tabs-text-color-primary));
+    }
+
+    &.selected {
+      .tabText {
+        color: var(
+          --tabs-primary-active-text,
+          var(--tabs-active-text-color-primary)
+        );
+      }
+    }
+
+    &:hover:not(.selected) {
+      .tabText {
+        color: var(
+          --tabs-primary-hover-text,
+          var(--tabs-hover-text-color-primary)
+        );
+      }
+    }
+  }
+
+  &.secondary {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 20px;
+    padding: 4px 16px;
+    border-radius: var(--tabs-tab-border-radius-secondary);
+    gap: 6px;
+    width: calc(100% - 32px);
+
+    .tabText {
+      color: var(--tabs-secondary-text, var(--tabs-text-color-secondary));
+      z-index: 102;
+    }
+
+    &.selected {
+      .tabText {
+        color: var(
+          --tabs-secondary-active-text,
+          var(--tabs-active-text-color-secondary)
+        );
+      }
+
+      .tabIcon {
+        z-index: 102;
+        svg path {
+          fill: var(
+            --tabs-secondary-active-text,
+            var(--tabs-active-text-color-secondary)
+          );
+        }
+        svg circle {
+          stroke: var(
+            --tabs-secondary-active-text,
+            var(--tabs-active-text-color-secondary)
+          );
+        }
+      }
+    }
+
+    &.focused,
+    &:hover:not(.selected) {
+      background-color: var(
+        --tabs-secondary-hover-bg,
+        var(--tabs-hover-background-color-secondary)
+      );
+
+      .tabText {
+        color: var(
+          --tabs-secondary-active-text,
+          var(--tabs-active-text-color-secondary)
+        );
+      }
+
+      .tabIcon {
+        svg path {
+          fill: var(
+            --tabs-secondary-active-text,
+            var(--tabs-active-text-color-secondary)
+          );
+        }
+        svg circle {
+          stroke: var(
+            --tabs-secondary-active-text,
+            var(--tabs-active-text-color-secondary)
+          );
+        }
+      }
+    }
+  }
+
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}
+
+.tabIcon {
+  z-index: 99;
+  min-width: 16px;
+  min-height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+
+  svg path {
+    fill: var(--tabs-secondary-text, var(--tabs-text-color-secondary));
+  }
+  svg circle {
+    stroke: var(--tabs-secondary-text, var(--tabs-text-color-secondary));
+  }
+}
+
+.tabText {
+  grid-area: 1/1;
+}
+
+.tabBadge {
+  grid-area: 1/2;
+}
+
+.tabSubLine {
+  grid-area: 2/1;
+  z-index: 1;
+  width: 100%;
+  height: var(--tabs-indicator-height);
+  bottom: 0px;
+  border-radius: var(--tabs-indicator-border-radius);
+  transform-origin: left;
+
+  position: relative;
+  // Remove default transform and background to allow animation
+
+  &.primary {
+    &.selected {
+      // Default: fully filled background when not animating
+
+      .tabSubLineSibling {
+        background-color: var(--accent-main);
+
+        width: 100%;
+        height: var(--tabs-indicator-height);
+
+        position: absolute;
+        top: 0;
+        border-radius: var(--tabs-indicator-border-radius);
+
+        // Animated progress background when animating
+        &.animatedProgress {
+          width: 10%;
+          animation: progressWidth 2s ease-out forwards;
+        }
+
+        &.animatedFinish {
+          width: var(--end-width, 90%);
+          animation: progressWidthFinish 0.4s ease-out forwards;
+        }
+
+        // Show transparent background when ready for animation
+        &.animationReady {
+          background-color: transparent;
+        }
+      }
+    }
+  }
+
+  &.secondary {
+    display: none;
+  }
+}
+
+// Width-based animation from 10% to 90%
+@keyframes progressWidth {
+  0% {
+    width: 10%;
+  }
+  100% {
+    width: 90%;
+  }
+}
+
+@keyframes progressWidthFinish {
+  0% {
+    width: var(--end-width, 90%);
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.tabsBody {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.motionBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 101;
+  background-color: var(
+    --tabs-secondary-active-bg,
+    var(--tabs-active-background-color-secondary)
+  );
+  height: var(--tabs-motion-height);
+  border-radius: var(--tabs-tab-border-radius-secondary);
+}
+
+.arrowIcon {
+  position: absolute;
+  z-index: 103;
+  cursor: pointer;
+  min-width: 24px;
+  width: 32px;
+  height: var(--tabs-height-secondary);
+
+  svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  &:hover:not(.disabled) {
+    background-color: var(
+      --tabs-secondary-hover-bg,
+      var(--tabs-hover-background-color-secondary)
+    );
+    svg path {
+      fill: var(
+        --tabs-secondary-hover-icon,
+        var(--tabs-hover-background-icon-color-secondary)
+      );
+    }
+  }
+
+  &.disabled {
+    cursor: default;
+  }
+
+  div {
+    width: 28px;
+    height: var(--tabs-motion-height);
+    margin: var(--tabs-padding-secondary) 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.arrowLeft {
+  background-color: var(
+    --tabs-secondary-bg,
+    var(--tabs-background-color-secondary)
+  );
+  inset-inline-start: 0px;
+}
+
+.arrowRight {
+  background-color: var(
+    --tabs-secondary-bg,
+    var(--tabs-background-color-secondary)
+  );
+  inset-inline-end: 0px;
+  rotate: 180deg;
+}
