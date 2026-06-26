@@ -250,8 +250,8 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           color="var(--settings-payment-warning-color)"
         >
           <CommonTrans
-            i18nKey="DelayedPayment"
-            values={{ date: paymentDate, planName: currentTariffPlanTitle }}
+            i18nKey="PaymentDelayActivated"
+            values={{ date: paymentDate }}
           />
         </Text>
       );
