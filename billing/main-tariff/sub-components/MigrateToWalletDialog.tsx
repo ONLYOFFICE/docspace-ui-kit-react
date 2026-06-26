@@ -322,11 +322,15 @@ const MigrateToWalletDialog = observer(
             <div className={styles.footerButtons}>
               <Button
                 key="confirm"
-                label={t("MigratePay", {
-                  amount: subscriptionDetails
-                    ? formatPaymentCurrency(cardCharge, 2)
-                    : "",
-                })}
+                label={
+                  cardCharge > 0
+                    ? t("MigratePay", {
+                        amount: subscriptionDetails
+                          ? formatPaymentCurrency(cardCharge, 2)
+                          : "",
+                      })
+                    : t("UpgradeNow")
+                }
                 size={ButtonSize.normal}
                 primary
                 scale
