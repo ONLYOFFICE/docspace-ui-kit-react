@@ -249,10 +249,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           className={styles.paymentInfoGracePeriod}
           color="var(--settings-payment-warning-color)"
         >
-          <CommonTrans
-            i18nKey="PaymentDelayActivated"
-            values={{ date: paymentDate }}
-          />
+          {t("PaymentDelayActive")}
         </Text>
       );
     }
@@ -265,22 +262,17 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
       return (
         <Text fontSize="14px" lineHeight="16px">
           <CommonTrans
-            i18nKey="GracePeriodActivatedInfo"
+            i18nKey="GracePeriodActivatedNotice"
             values={{
               fromDate: paymentDate,
               byDate: gracePeriodEndDate,
               delayDaysCount,
+              productName: getBrandName("ProductName"),
             }}
             components={{
-              1: <Text as="span" />,
+              1: <Text as="span" fontWeight={600} />,
             }}
           />
-
-          <Text as="span" fontSize="14px" lineHeight="16px">
-            {t("GracePeriodActivatedDescription", {
-              productName: getBrandName("ProductName"),
-            })}
-          </Text>
         </Text>
       );
 
