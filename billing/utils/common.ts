@@ -33,6 +33,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { Duration } from "luxon";
+
+import { dateDiff, now } from "../../utils/date";
+
+/**
+ * Whole days from now until `date` (negative if the date is in the past).
+ */
+export const daysUntil = (date: Date | string | null | undefined) =>
+  Math.floor(dateDiff(date, now(), "days"));
+
+/**
+ * Human-readable remaining period, e.g. "15 days" (localized).
+ * Falls back to the "< 1 day" label when there is one day or less left.
+ */
+export const formatRemainingDays = (
+  days: number,
+  language: string,
+  t: (key: string) => string,
+) =>
+  days > 1
+    ? Duration.fromObject({ days }, { locale: language }).toHuman()
+    : t("LessThanOneDay");
+
 // Done in a similar way to server code
 // https://github.com/ONLYOFFICE/DocSpace-server/blob/master/common/ASC.Common/Utils/CommonFileSizeComment.cs
 export const getPowerFromBytes = (bytes: number, maxPower = 6) => {
