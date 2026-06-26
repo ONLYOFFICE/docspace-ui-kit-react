@@ -140,6 +140,12 @@
     &:has(> .link) {
       margin-top: 2px;
     }
+
+    &:has(> .button) {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
   }
 
   .margin {

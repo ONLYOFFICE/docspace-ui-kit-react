@@ -50,7 +50,7 @@ const isAsciiOnly = (str: string): boolean => {
 };
 
 const STRICT_LOCAL_PART_REGEX =
-  /^[_]?([a-zA-Z0-9]+)([_\-\.\+][a-zA-Z0-9]+)*[_]?$/;
+  /^[_]?([a-zA-Z0-9]+)([_\-\.\+]+[a-zA-Z0-9]+)*[_]?$/;
 
 /**
  * Parse address from string

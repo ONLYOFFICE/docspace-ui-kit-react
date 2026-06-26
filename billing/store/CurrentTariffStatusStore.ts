@@ -49,6 +49,7 @@ import {
   isValidDate,
   now,
 } from "../../utils/date";
+import { daysUntil } from "../utils/common";
 
 class CurrentTariffStatusStore {
   private portalQuotaApi: PortalQuotaApi;
@@ -62,6 +63,8 @@ class CurrentTariffStatusStore {
   private _walletQuotas: Quota[] = [];
 
   private _previousWalletQuota: Quota[] = [];
+
+  private _tariffWalletQuota: (Quota & { additional?: boolean }) | null = null;
 
   payerInfo: CustomerInfoDto = {
     portalId: null,
@@ -135,6 +138,12 @@ class CurrentTariffStatusStore {
     });
   }
 
+  get daysUntilPayment() {
+    const dueDate = this.portalTariffStatus?.dueDate;
+    if (!dueDate || !this.isPaymentDateValid) return 0;
+    return Math.max(0, daysUntil(dueDate));
+  }
+
   get gracePeriodEndDate() {
     const tariff = this.portalTariffStatus;
     if (!tariff) return "";
@@ -190,6 +199,24 @@ class CurrentTariffStatusStore {
     return this._walletQuotas[0]?.dueDate;
   }
 
+  get hasTariffWalletSubscription() {
+    return this._tariffWalletQuota !== null;
+  }
+
+  get currentTariffAdminsCount() {
+    return this._tariffWalletQuota?.quantity ?? null;
+  }
+
+  get hasScheduledTariffAdminsChange() {
+    if (!this._tariffWalletQuota) return false;
+    return (this._tariffWalletQuota.nextQuantity ?? -1) >= 0;
+  }
+
+  get nextTariffAdminsCount() {
+    if (!this._tariffWalletQuota) return null;
+    return this._tariffWalletQuota.nextQuantity ?? null;
+  }
+
   get storageExpiryDate() {
     if (!this.storageSubscriptionExpiryDate) return "";
     return formatDateLocalized(
@@ -204,9 +231,7 @@ class CurrentTariffStatusStore {
 
   get daysUntilStorageExpiry() {
     if (!this.storageSubscriptionExpiryDate) return 0;
-    return Math.floor(
-      dateDiff(this.storageSubscriptionExpiryDate, now(), "days"),
-    );
+    return daysUntil(this.storageSubscriptionExpiryDate);
   }
 
   get walletCustomerEmail() {
@@ -249,20 +274,32 @@ class CurrentTariffStatusStore {
 
       this.portalTariffStatus = tariff;
 
-      const walletQuota = tariff.quotas?.find((q: Quota) => q.wallet === true);
+      type WalletQuota = Quota & { additional?: boolean };
+      const walletQuotas: WalletQuota[] =
+        (tariff.quotas as WalletQuota[])?.filter((q) => q.wallet === true) ??
+        [];
 
-      if (walletQuota) {
-        // QuotaState.Overdue = 1
-        if ((walletQuota.state as unknown as number) === 1) {
-          this._previousWalletQuota = [walletQuota];
+      const storageQuota = walletQuotas.find((q) => q.additional !== false);
+      const tariffQuota = walletQuotas.find((q) => q.additional === false);
+
+      // QuotaState.Overdue = 1
+      if (storageQuota) {
+        if ((storageQuota.state as unknown as number) === 1) {
+          this._previousWalletQuota = [storageQuota];
           this._walletQuotas = [];
         } else {
-          this._walletQuotas = [walletQuota];
+          this._walletQuotas = [storageQuota];
           this._previousWalletQuota = [];
         }
       } else {
         this._walletQuotas = [];
         this._previousWalletQuota = [];
+      }
+
+      if (tariffQuota && (tariffQuota.state as unknown as number) !== 1) {
+        this._tariffWalletQuota = tariffQuota;
+      } else {
+        this._tariffWalletQuota = null;
       }
 
       this.setIsLoaded(true);
@@ -308,3 +345,4 @@ class CurrentTariffStatusStore {
 }
 
 export default CurrentTariffStatusStore;
+

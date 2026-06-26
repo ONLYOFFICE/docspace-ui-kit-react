@@ -108,4 +108,10 @@
 
 .perStorageInfo{
   margin-top: 4px;
+  color: var(--payment-dialog-text);
+}
+
+.dialogDescription {
+  padding-top: 20px;
+  color: var(--payment-contact-container-link-color);
 }

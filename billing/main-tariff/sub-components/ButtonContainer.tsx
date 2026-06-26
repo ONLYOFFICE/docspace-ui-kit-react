@@ -35,46 +35,28 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import { Button, ButtonSize } from "../../../components/button";
-import { toastr } from "../../../components/toast";
 import RequestButtonContainer from "./RequestButtonContainer";
 import UpdatePlanButtonContainer from "./UpdatePlanButtonContainer";
 import type { TTranslation } from "../../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import styles from "./ButtonContainer.module.scss";
 
-const ButtonContainer = observer(({ isDisabled, t }: { isDisabled: boolean; t: TTranslation }) => {
-  const store = usePaymentStore();
-  const { isNeedRequest, isLoading, paymentLink } = store;
-  const { isNotPaidPeriod, isGracePeriod } = store.tariff;
+const ButtonContainer = observer(
+  ({ isDisabled, t }: { isDisabled: boolean; t: TTranslation }) => {
+    const store = usePaymentStore();
+    const { isNeedRequest } = store;
 
-  const goToStripePortal = () => {
-    paymentLink
-      ? window.open(paymentLink, "_blank")
-      : toastr.error(t("ErrorNotification"));
-  };
-
-  return (
-    <div className={styles.body}>
-      {isNotPaidPeriod || isGracePeriod ? (
-        <Button
-          className={styles.button}
-          label={t("Pay")}
-          size={ButtonSize.medium}
-          primary
-          isDisabled={isLoading || isDisabled}
-          onClick={goToStripePortal}
-          isLoading={isLoading}
-          testId="pay_button"
-        />
-      ) : isNeedRequest ? (
-        <RequestButtonContainer isDisabled={isDisabled} />
-      ) : (
-        <UpdatePlanButtonContainer t={t} isDisabled={isDisabled} />
-      )}
-    </div>
-  );
-});
+    return (
+      <div className={styles.body}>
+        {isNeedRequest ? (
+          <RequestButtonContainer isDisabled={isDisabled} />
+        ) : (
+          <UpdatePlanButtonContainer t={t} isDisabled={isDisabled} />
+        )}
+      </div>
+    );
+  },
+);
 
 export default ButtonContainer;
 

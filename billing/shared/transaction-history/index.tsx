@@ -541,7 +541,6 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     />
   ) : null;
 
-  console.log("isTransactionLoading", isTransactionLoading);
   return (
     <>
       <div className={styles.transactionHistoryHeader}>

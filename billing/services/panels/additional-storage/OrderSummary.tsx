@@ -36,7 +36,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { observer } from "mobx-react";
 import { useCommonTranslation } from "../../../../utils/i18n";
-import { Duration } from "luxon";
+import { formatRemainingDays } from "../../../utils/common";
 
 import { Text } from "../../../../components/text";
 import { useInterfaceDirection } from "../../../../context/InterfaceDirectionContext";
@@ -182,13 +182,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   const remainingBalance = partialUpgradeFee
     ? walletBalance - partialUpgradeFee
     : walletBalance - totalPrice;
-  const daysDisplay =
-    daysUntilStorageExpiry > 1
-      ? Duration.fromObject(
-          { days: daysUntilStorageExpiry },
-          { locale: language },
-        ).toHuman()
-      : t("LessThanOneDay");
+  const daysDisplay = formatRemainingDays(daysUntilStorageExpiry, language, t);
 
   return (
     <div className={styles.orderSummaryWrapper}>

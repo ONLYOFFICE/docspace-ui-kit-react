@@ -34,7 +34,7 @@
  */
 
 import HelpReactSvg from "../../assets/help.react.svg";
-import React from "react";
+import React, { useState } from "react";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
 
@@ -45,20 +45,49 @@ import { HelpButton } from "../../components/help-button";
 import type { TTranslation } from "../../utils/common";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
+import { useApi } from "../../providers";
+import { toastr } from "../../components/toast";
+import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 
 import CurrentTariffContainer from "./CurrentTariffContainer";
 import PriceCalculation from "./PriceCalculation";
 import BenefitsContainer from "./BenefitsContainer";
 import ContactContainer from "./ContactContainer";
+import WalletInfo from "../shared/top-up-balance/sub-components/WalletInfo";
+import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import StorageWarning from "../services/panels/additional-storage/StorageWarning";
+import UnlinkedCardBanner from "../shared/unlinked-card-banner";
+import { getConvertedSize } from "../utils/common";
 import styles from "./MainTariff.module.scss";
 import { getBrandName } from "../../constants/brands";
 
 const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
+  const { paymentApi } = useApi();
   const store = usePaymentStore();
-  const { formatPaymentCurrency } = store;
+  const {
+    formatPaymentCurrency,
+    isAlreadyPaid,
+    cardLinkedOnFreeTariff,
+    formatWalletCurrency,
+    isCardMissingOrInactive,
+  } = store;
 
-  const { isFreeTariff, isNonProfit, currentTariffPlanTitle, isYearTariff } =
-    store.quotas;
+  const [isTopUpVisible, setIsTopUpVisible] = useState(false);
+  const [isCancelDowngradeLoading, setIsCancelDowngradeLoading] =
+    useState(false);
+
+  const onTopUp = () => setIsTopUpVisible(true);
+  const onCloseTopUp = () => setIsTopUpVisible(false);
+
+  const {
+    isFreeTariff,
+    isNonProfit,
+    currentTariffPlanTitle,
+    isYearTariff,
+    maxCountManagersByQuota,
+    maxTotalSizeByQuota,
+    fetchPortalQuota,
+  } = store.quotas;
   const {
     isPaidPeriod,
     isPaymentDateValid,
@@ -67,10 +96,46 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     gracePeriodEndDate,
     delayDaysCount,
     paymentDate,
+    hasScheduledTariffAdminsChange,
+    currentTariffAdminsCount,
+    nextTariffAdminsCount,
+    fetchPortalTariff,
+    walletCustomerStatusNotActive,
   } = store.tariff;
+  const { fetchBalance } = store;
   const { tariffPlanTitle, planCost } = store.paymentQuotas;
 
   const startValue = planCost.value;
+
+  const handleCancelTariffDowngrade = async () => {
+    setIsCancelDowngradeLoading(true);
+
+    try {
+      const res = await paymentApi.updateWalletPayment({
+        walletQuantityRequestDto: {
+          quantity: { adminwallet: null },
+          productQuantityType: ProductQuantityType.Set,
+        },
+      });
+      if (res?.data?.response === false) {
+        toastr.error(t("ErrorNotification"));
+        return;
+      }
+      await Promise.all([
+        fetchPortalTariff(true),
+        fetchBalance(true),
+        fetchPortalQuota(true),
+      ]);
+      toastr.success(
+        t("BusinessUpdated", { planName: currentTariffPlanTitle }),
+      );
+    } catch (e) {
+      console.error(e);
+      toastr.error(t("ErrorNotification"));
+    } finally {
+      setIsCancelDowngradeLoading(false);
+    }
+  };
 
   const renderTooltip = () => {
     return (
@@ -185,8 +250,8 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           color="var(--settings-payment-warning-color)"
         >
           <CommonTrans
-            i18nKey="DelayedPayment"
-            values={{ date: paymentDate, planName: currentTariffPlanTitle }}
+            i18nKey="PaymentDelayActivated"
+            values={{ date: paymentDate }}
           />
         </Text>
       );
@@ -269,12 +334,54 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
         </div>
       ) : null}
 
+      {!isNonProfit && (isAlreadyPaid || cardLinkedOnFreeTariff) ? (
+        <div className={styles.walletInfoWrapper}>
+          <WalletInfo
+            balance={formatWalletCurrency()}
+            onTopUp={onTopUp}
+            withoutBackground
+          />
+        </div>
+      ) : null}
+
+      {!isNonProfit && !isNotPaidPeriod && walletCustomerStatusNotActive ? (
+        <div className={styles.unlinkedBanner}>
+          <UnlinkedCardBanner />
+        </div>
+      ) : null}
+
+      {!isNonProfit && hasScheduledTariffAdminsChange ? (
+        <div style={{ marginTop: 16 }}>
+          <StorageWarning
+            title={t("TariffDowngradeScheduled", {
+              fromCount: currentTariffAdminsCount,
+              toCount: nextTariffAdminsCount ?? 0,
+            })}
+            body={t("TariffDowngradeWarning", {
+              admins: maxCountManagersByQuota,
+              storage: getConvertedSize(t, maxTotalSizeByQuota),
+            })}
+            onCancelChange={handleCancelTariffDowngrade}
+            isCancelLoading={isCancelDowngradeLoading}
+          />
+        </div>
+      ) : null}
+
       <div className={styles.paymentInfo}>
         {!isNonProfit ? <PriceCalculation t={t} /> : null}
 
         <BenefitsContainer t={t} />
       </div>
       <ContactContainer t={t} />
+
+      {isTopUpVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpVisible}
+          onClose={onCloseTopUp}
+          onConfirm={onCloseTopUp}
+          isFirstTopUp={isCardMissingOrInactive}
+        />
+      ) : null}
     </div>
   );
 });

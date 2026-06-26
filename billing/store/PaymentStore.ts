@@ -56,8 +56,22 @@ export type WalletOperationDto = Omit<OperationDto, "date"> & {
 
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
-import type { TBalance } from "../types";
+import type { TBalance, TServiceUsage } from "../types";
 import { formatCurrencyValue } from "../utils/common";
+import {
+  getCardLinkedOnFreeTariff,
+  getCardLinkedOnNonProfit,
+  getIsCardLinkedToPortal,
+  getIsPayer,
+  getWalletBalanceAmount,
+  getWalletBalanceCurrency,
+  formatPaymentDate,
+} from "../utils/paymentSelectors";
+import {
+  applyServiceQuotaToMap,
+  parseServicesQuotasMap,
+} from "../utils/parsers";
+import { getUsageRange } from "../usage/utils";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
 import { LANGUAGE } from "../../constants";
@@ -74,6 +88,8 @@ import {
   now,
   subtractFromDate,
   formatDate as formatDateUtil,
+  formatDateLocalized,
+  getAppTimezone,
   isSameDay,
 } from "../../utils/date";
 import type { DateTime } from "luxon";
@@ -81,8 +97,11 @@ import type {
   TPaymentConfig,
   TPaymentRoutes,
   TServiceFeatureWithPrice,
+  TUpcomingPayment,
+  TUpcomingPaymentResponse,
   TWalletServiceQuota,
 } from "../types";
+import type { TApiClient } from "../../providers/api/ApiProvider";
 import CurrentTariffStatusStore from "./CurrentTariffStatusStore";
 import CurrentQuotasStore from "./CurrentQuotasStore";
 import PaymentQuotasStore from "./PaymentQuotasStore";
@@ -105,6 +124,8 @@ class PaymentStore {
   private profilesApi: ProfilesApi;
 
   private commonSettingsApi: CommonSettingsApi;
+
+  #rawApiClient: TApiClient;
 
   private abortControllers: AbortController[] = [];
 
@@ -161,6 +182,10 @@ class PaymentStore {
 
   totalPrice = 30;
 
+  tariffDueTodayAmount: number | null = null;
+
+  isTariffDueTodayCalculating = false;
+
   managersCount = 1;
 
   maxAvailableManagersCount = 999;
@@ -181,6 +206,8 @@ class PaymentStore {
 
   isPaymentMethodInit = false;
 
+  serviceUsage: TServiceUsage[] = [];
+
   balance: TBalance = 0;
 
   previousBalance: TBalance = 0;
@@ -190,6 +217,8 @@ class PaymentStore {
   transactionHistory: WalletOperationDto[] = [];
 
   isTransactionHistoryExist = false;
+
+  upcomingPaymentsData: TUpcomingPaymentResponse[] = [];
 
   autoPayments: TenantWalletSettings | null = null;
 
@@ -249,10 +278,12 @@ class PaymentStore {
     profilesApi: ProfilesApi,
     portalQuotaApi: PortalQuotaApi,
     commonSettingsApi: CommonSettingsApi,
+    rawApiClient: TApiClient,
   ) {
     this.paymentApi = paymentApi;
     this.profilesApi = profilesApi;
     this.commonSettingsApi = commonSettingsApi;
+    this.#rawApiClient = rawApiClient;
 
     this.tariff = new CurrentTariffStatusStore(portalQuotaApi, paymentApi);
     this.quotas = new CurrentQuotasStore(paymentApi);
@@ -314,13 +345,7 @@ class PaymentStore {
   }
 
   get isPayer() {
-    if (!this._currentUserEmail || !this.tariff.walletCustomerEmail)
-      return false;
-
-    return (
-      this._currentUserEmail.toLowerCase() ===
-      this.tariff.walletCustomerEmail.toLowerCase()
-    );
+    return getIsPayer(this._currentUserEmail, this.tariff.walletCustomerEmail);
   }
 
   get isServiceActionDisabled() {
@@ -357,15 +382,27 @@ class PaymentStore {
   }
 
   get isCardLinkedToPortal() {
-    return (
-      this.cardLinkedOnNonProfit ||
-      this.cardLinkedOnFreeTariff ||
-      (!this.quotas.isNonProfit && !this.quotas.isFreeTariff)
-    );
+    return getIsCardLinkedToPortal({
+      isNonProfit: this.quotas.isNonProfit,
+      isFreeTariff: this.quotas.isFreeTariff,
+      walletCustomerEmail: this.tariff.walletCustomerEmail,
+    });
   }
 
   get isAutoPaymentExist() {
     return this.autoPayments?.enabled;
+  }
+
+  get isCardMissingOrInactive() {
+    return (
+      !this.isCardLinkedToPortal || this.tariff.walletCustomerStatusNotActive
+    );
+  }
+
+  get needsWalletMigration() {
+    return (
+      !this.quotas.isFreeTariff && !this.tariff.hasTariffWalletSubscription
+    );
   }
 
   get isAutoTopUpInProgress() {
@@ -383,19 +420,19 @@ class PaymentStore {
   }
 
   get walletCodeCurrency(): string {
-    const balance = this.balanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].currency ?? "USD";
-
-    return "USD";
+    return getWalletBalanceCurrency(this.balance);
   }
 
   get walletBalance(): number {
-    const balance = this.balanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].amount ?? 0;
+    return getWalletBalanceAmount(this.balance);
+  }
 
-    return 0.0;
+  get isLowWalletBalance() {
+    if (!this.isCardLinkedToPortal) return false;
+
+    if (!this.isAiToolsServiceOn) return false;
+
+    return this.walletBalance < 1;
   }
 
   get wasFirstTopUp() {
@@ -412,14 +449,17 @@ class PaymentStore {
   }
 
   get cardLinkedOnFreeTariff() {
-    return this.quotas.isFreeTariff && !!this.tariff.walletCustomerEmail;
+    return getCardLinkedOnFreeTariff(
+      this.quotas.isFreeTariff,
+      this.tariff.walletCustomerEmail,
+    );
   }
 
   get cardLinkedOnNonProfit() {
-    if (!this.quotas.isNonProfit) return false;
-    if (!this.tariff.walletCustomerEmail) return false;
-
-    return true;
+    return getCardLinkedOnNonProfit(
+      this.quotas.isNonProfit,
+      this.tariff.walletCustomerEmail,
+    );
   }
 
   get storageSizeIncrement() {
@@ -545,16 +585,50 @@ class PaymentStore {
     this.previousBalance = this.balance;
   };
 
+  fetchUpcomingPayments = async () => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/tariff/upcoming",
+        { signal: abortController.signal },
+      );
+
+      this.upcomingPaymentsData =
+        (data?.response as TUpcomingPaymentResponse[]) ?? [];
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
+  get upcomingPayments(): TUpcomingPayment[] {
+    return this.upcomingPaymentsData.map((item) => ({
+      id: String(item.id),
+      renewalDate: formatDateLocalized(item.dueDate, "DATE_FULL", {
+        locale: this.language,
+        timezone: getAppTimezone(),
+      }),
+      title: item.title,
+      quantity: item.quantity,
+      unitOfMeasure: item.unitOfMeasure,
+      amount: item.amount,
+      actionType: item.wallet ? "edit-subscription" : "edit-plan",
+    }));
+  }
+
   formatWalletCurrency = (
     item: number | null = null,
     fractionDigits: number = 3,
+    currency?: string,
   ) => {
     const amount = item ?? this.walletBalance;
 
     return formatCurrencyValue(
       this.language,
       amount,
-      this.walletCodeCurrency,
+      currency || this.walletCodeCurrency,
       fractionDigits,
     );
   };
@@ -591,6 +665,43 @@ class PaymentStore {
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
       throw e;
+    }
+  };
+
+  fetchWalletUsage = async ({
+    serviceName,
+    from,
+    to,
+    participantName,
+  }: {
+    serviceName?: string;
+    from?: DateTime;
+    to?: DateTime;
+    participantName?: string;
+  } = {}) => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/customer/usage",
+        {
+          signal: abortController.signal,
+          params: {
+            offset: 0,
+            limit: 25,
+            ServiceName: serviceName,
+            StartDate: from ? this.formatDate(from, "start") : undefined,
+            EndDate: to ? this.formatDate(to, "end") : undefined,
+            ParticipantName: participantName,
+          },
+        },
+      );
+
+      this.serviceUsage = (data?.response?.collection ?? []) as TServiceUsage[];
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
     }
   };
 
@@ -635,18 +746,14 @@ class PaymentStore {
     return date ? formatDateUtil(date, format) : "";
   };
 
-  formatDate = (date: DateTime, timeType?: "start" | "end") => {
-    if (!timeType) {
-      return formatDateUtil(date, "yyyy-MM-dd'T'HH:mm:ss", { locale: "en" });
-    }
+  formatDate = (date: DateTime, timeType?: "start" | "end") =>
+    formatPaymentDate(date, timeType);
 
-    const dateStr = formatDateUtil(date, "yyyy-MM-dd", { locale: "en" });
-    const timeTypeValue = timeType === "start" ? "00:00:00" : "23:59:59";
-
-    return `${dateStr}T${timeTypeValue}`;
-  };
-
-  fetchTransactionHistory = async (serviceName?: string) => {
+  fetchTransactionHistory = async (
+    serviceName?: string,
+    from?: DateTime,
+    to?: DateTime,
+  ) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
@@ -668,8 +775,8 @@ class PaymentStore {
           offset: 0,
           limit: 25,
           serviceName,
-          startDate: this.formatDate(this.filterStartDate, "start"),
-          endDate: this.formatDate(this.filterEndDate, "end"),
+          startDate: this.formatDate(from ?? this.filterStartDate, "start"),
+          endDate: this.formatDate(to ?? this.filterEndDate, "end"),
           credit: isCredit,
           debit: isDebit,
           participantName: this.filterContact?.id,
@@ -730,7 +837,7 @@ class PaymentStore {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
-    const backUrl = url || `${window.location.href}?complete=true`;
+    const backUrl = url || `${window.location.href}`;
     const resolvedSuccessUrl =
       successUrl ||
       combineUrl(
@@ -871,26 +978,8 @@ class PaymentStore {
     if (!res?.data?.response) return;
 
     const service = res.data.response as unknown as TWalletServiceQuota;
-    const feature = service.features?.[0];
 
-    const featureWithPrice = {
-      ...feature,
-      price: service.price,
-      serviceName: service.serviceName,
-    } as TServiceFeatureWithPrice;
-
-    const existingEntry = Array.from(
-      this.servicesQuotasFeatures.entries(),
-    ).find(
-      ([, value]) =>
-        (value as TServiceFeatureWithPrice).serviceName === service.serviceName,
-    );
-
-    const key = existingEntry
-      ? existingEntry[0]
-      : (service.features?.[0]?.id?.toString() ?? "");
-
-    this.servicesQuotasFeatures.set(key, featureWithPrice);
+    applyServiceQuotaToMap(service, this.servicesQuotasFeatures);
 
     return service.serviceName;
   };
@@ -986,7 +1075,7 @@ class PaymentStore {
       requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
     }
 
-    requests.push(this.tariff.fetchPortalTariff());
+    requests.push(this.tariff.fetchPortalTariff(), this.fetchBalance());
 
     try {
       await Promise.all(requests);
@@ -1026,6 +1115,7 @@ class PaymentStore {
     requests.push(
       this.getSettingsPayment(),
       this.paymentQuotas.fetchPaymentQuotas(),
+      this.fetchBalance(isRefresh),
     );
 
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
@@ -1115,7 +1205,11 @@ class PaymentStore {
     }
   };
 
-  walletInit = async (t: TTranslation, integrationUrl?: string) => {
+  walletInit = async (
+    t: TTranslation,
+    integrationUrl?: string,
+    onInit?: () => Promise<void> | void,
+  ) => {
     const isRefresh = window.location.href.includes("complete=true");
 
     if (!isRefresh) {
@@ -1146,7 +1240,13 @@ class PaymentStore {
         requests.push(this.handleServicesQuotas());
       }
 
-      requests.push(this.tariff.fetchPortalTariff());
+      requests.push(
+        this.tariff.fetchPortalTariff(),
+        this.fetchUpcomingPayments(),
+        this.fetchWalletUsage(getUsageRange("thisMonth")),
+      );
+
+      if (onInit) requests.push(Promise.resolve(onInit()));
 
       await Promise.all(requests);
 
@@ -1260,6 +1360,14 @@ class PaymentStore {
   setTotalPrice = (value: number) => {
     const price = this.getTotalCostByFormula(value);
     if (price !== this.totalPrice && price) this.totalPrice = price;
+  };
+
+  setTariffDueTodayAmount = (value: number | null) => {
+    this.tariffDueTodayAmount = value;
+  };
+
+  setIsTariffDueTodayCalculating = (value: boolean) => {
+    this.isTariffDueTodayCalculating = value;
   };
 
   setManagersCount = (managers: number) => {

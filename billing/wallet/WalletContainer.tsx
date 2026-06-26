@@ -33,39 +33,43 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useCommonTranslation } from "../../utils/i18n";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 
 import { toAbsoluteUrl } from "../utils/url";
 
-import classNames from "classnames";
-
 import { Text } from "../../components/text";
 import { Button, ButtonSize } from "../../components/button";
 import { toastr } from "../../components/toast";
 import { Link } from "../../components/link";
+import { Tabs, type TTabItem } from "../../components/tabs";
 import { finishRefreshingWithMinCycle } from "../utils/refreshing";
 
 import TransactionHistory from "../shared/transaction-history";
-import TopUpModal from "../shared/top-up-balance/TopUpModal";
+import UpcomingPayments from "./sub-components/UpcomingPayments";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
+import UnlinkedCardBanner from "../shared/unlinked-card-banner";
 import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
+import { useServicesStore } from "../store/ServicesStoreProvider";
 import { getBrandName } from "../../constants/brands";
-import FirstTopUpDialog from "../shared/top-up-balance/FirstTopUpDialog";
+import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 
 type WalletProps = {
   isMobile?: boolean;
+  onViewUsage?: () => void;
+  onAddonsClick?: () => void;
 };
 
 const Wallet = (props: WalletProps) => {
-  const { isMobile } = props;
+  const { isMobile, onViewUsage, onAddonsClick } = props;
 
   const store = usePaymentStore();
+  const { walletMonthToDateSpend } = useServicesStore();
 
   const {
     walletBalance,
@@ -76,12 +80,22 @@ const Wallet = (props: WalletProps) => {
     fetchBalance,
     fetchTransactionHistory,
     canUpdateTariff,
-    cardLinked,
-    isPayer,
     recommendedAmount,
     walletHelpUrl,
     isAutoTopUpInProgress,
+    autoPayments,
+    isAutoPaymentExist,
+    language,
+    wasFirstTopUp,
   } = store;
+
+  const isAutoPaymentSetup = Boolean(
+    isAutoPaymentExist &&
+    language &&
+    walletCodeCurrency &&
+    autoPayments?.minBalance &&
+    autoPayments?.upToBalance,
+  );
 
   const {
     isNotPaidPeriod,
@@ -91,14 +105,24 @@ const Wallet = (props: WalletProps) => {
 
   const t = useCommonTranslation();
 
-  const [visible, setVisible] = useState(isVisibleWalletSettings);
-  const [isEditAutoPayment, setIsEditAutoPayment] = useState(false);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(
+    isVisibleWalletSettings,
+  );
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isFirstTopUpDialogVisible, setIsFirstTopUpDialogVisible] =
-    useState(false);
+  const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
+  const [selectedTabId, setSelectedTabId] = useState("transaction-history");
 
   const [isAutoSpinning, setIsAutoSpinning] = useState(isAutoTopUpInProgress);
   const autoStartTimeRef = useRef<number | null>(null);
+
+  const monthLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(store.language || "en", {
+        month: "long",
+        year: "numeric",
+      }).format(new Date()),
+    [store.language],
+  );
 
   useEffect(() => {
     if (isAutoTopUpInProgress) {
@@ -127,21 +151,11 @@ const Wallet = (props: WalletProps) => {
   }, [isAutoTopUpInProgress]);
 
   const onClose = () => {
-    setVisible(false);
+    setIsTopUpDialogVisible(false);
   };
 
   const onOpen = () => {
-    if (!walletCustomerEmail) {
-      setIsFirstTopUpDialogVisible(true);
-      return;
-    }
-    setVisible(true);
-    setIsEditAutoPayment(false);
-  };
-
-  const onOpenLink = () => {
-    setVisible(true);
-    setIsEditAutoPayment(true);
+    setIsTopUpDialogVisible(true);
   };
 
   const onClick = async () => {
@@ -163,18 +177,39 @@ const Wallet = (props: WalletProps) => {
     }
   };
 
-  const goLinkCard = () => {
-    cardLinked
-      ? window.open(toAbsoluteUrl(cardLinked), "_self")
-      : toastr.error(t("UnexpectedError"));
-  };
+  const tabsItems: TTabItem[] = [
+    {
+      id: "transaction-history",
+      name: t("TransactionHistory"),
+      content: (
+        <div>
+          <TransactionHistory withoutRoleFilter withoutHeader />
+        </div>
+      ),
+    },
+    {
+      id: "upcoming-payments",
+      name: t("UpcomingPayments"),
+      content: <UpcomingPayments />,
+    },
+  ];
 
   return (
     <div className={styles.walletContainer}>
       <Text className={styles.walletDescription}>
-        {t("WalletSectionDescription", {
-          productName: getBrandName("ProductName"),
-        })}
+        <CommonTrans
+          i18nKey="WalletSectionDescriptionAddons"
+          components={{
+            1: (
+              <Link
+                as="span"
+                onClick={onAddonsClick}
+                color="accent"
+                textDecoration="underline"
+              />
+            ),
+          }}
+        />
       </Text>
 
       {walletHelpUrl ? (
@@ -189,95 +224,113 @@ const Wallet = (props: WalletProps) => {
         </Link>
       ) : null}
 
-      <div className={styles.balanceWrapper}>
-        <BalanceAmount
-          title={t("BalanceText")}
-          showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
-          isRefreshing={isRefreshing || isAutoSpinning}
-          progressText={t("TopUpInProgress")}
-          isProgressTextVisible={isAutoSpinning}
-          onRefresh={onClick}
-          amount={walletBalance}
-          currency={walletCodeCurrency}
-          language={store.language}
-        />
+      <div className={styles.summaryGrid}>
+        <div className={`${styles.summaryCard} ${styles.summaryCardBalance}`}>
+          <BalanceAmount
+            title={t("AvailableCredits")}
+            titleFontSize="14px"
+            mainFontSize="28px"
+            fractionFontSize="18px"
+            showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
+            isRefreshing={isRefreshing || isAutoSpinning}
+            progressText={t("TopUpInProgress")}
+            isProgressTextVisible={isAutoSpinning}
+            onRefresh={onClick}
+            amount={walletBalance}
+            currency={walletCodeCurrency}
+            language={store.language}
+          />
 
-        <Button
-          size={isMobile ? ButtonSize.normal : ButtonSize.small}
-          primary
-          label={t("TopUpBalance")}
-          onClick={onOpen}
-          isDisabled={!canUpdateTariff || isNotPaidPeriod}
-          scale={isMobile}
-          className={classNames(styles.topUpButton, {
-            [styles.isMobileButton]: isMobile,
-          })}
-          testId="top_up_balance_button"
-        />
-      </div>
+          <div className={styles.cardButtons}>
+            <Button
+              size={isMobile ? ButtonSize.normal : ButtonSize.small}
+              primary
+              label={t("TopUp")}
+              onClick={onOpen}
+              isDisabled={!canUpdateTariff || isNotPaidPeriod}
+              className={styles.cardButton}
+              testId="top_up_balance_button"
+            />
+            {wasFirstTopUp ? (
+              <Button
+                size={isMobile ? ButtonSize.normal : ButtonSize.small}
+                label={t("AutoTopUp")}
+                onClick={() => setIsWalletRefilledOpen(true)}
+                isDisabled={!canUpdateTariff || isNotPaidPeriod}
+                className={styles.cardButton}
+                testId="auto_top_up_button"
+              />
+            ) : null}
+          </div>
+        </div>
 
-      {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
-        <div className={styles.walletCustomerStatusNotActive}>
-          <Text fontWeight={600} className={styles.warningColor}>
-            {t("PaymentMethodUnlinked")}
+        <div className={`${styles.summaryCard} ${styles.summaryCardSpend}`}>
+          <Text
+            fontSize="12px"
+            lineHeight="16px"
+            fontWeight={600}
+            className={styles.spendTitle}
+          >
+            {t("CurrentMonthToDateSpend")}
           </Text>
-          <Text as="span" className={styles.warningColor}>
-            {isPayer ? (
-              t("LinkPaymentMethod")
-            ) : (
-              <Text className={styles.warningColor}>
-                <CommonTrans
-                  i18nKey="LinkNewPaymentMethodEmail"
-                  values={{ email: walletCustomerEmail }}
-                  components={{
-                    1: (
-                      <Link
-                        href={`mailto:${walletCustomerEmail}`}
-                        color="accent"
-                        textDecoration="underline"
-                      />
-                    ),
-                  }}
-                />
-              </Text>
-            )}
-          </Text>{" "}
-          {isPayer ? (
+          <BalanceAmount
+            showRefresh={false}
+            amount={walletMonthToDateSpend}
+            currency={walletCodeCurrency}
+            language={store.language}
+            mainFontSize="18px"
+            fractionFontSize="12px"
+            withoutMargin
+            className={styles.spendAmount}
+          />
+          <Text fontSize="12px" lineHeight="16px">
+            {t("ForPeriod", { period: monthLabel })}
+          </Text>
+          {onViewUsage ? (
             <Link
-              as="span"
-              onClick={goLinkCard}
-              fontWeight={600}
+              onClick={onViewUsage}
               textDecoration="underline"
+              color="accent"
+              className={styles.viewUsageLink}
+              dataTestId="wallet_view_usage_link"
+              fontWeight={600}
             >
-              {t("AddPaymentMethod")}
+              {t("ViewUsage")}
             </Link>
           ) : null}
         </div>
-      ) : (
-        <AutoPaymentInfo onOpen={onOpenLink} />
-      )}
+      </div>
 
-      {visible ? (
-        <TopUpModal
-          visible={visible}
+      {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
+        <UnlinkedCardBanner />
+      ) : isAutoPaymentSetup ? (
+        <AutoPaymentInfo />
+      ) : null}
+
+      {isTopUpDialogVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpDialogVisible}
           onClose={onClose}
-          isEditAutoPayment={isEditAutoPayment}
+          isFirstTopUp={!walletCustomerEmail}
           recommendedAmount={recommendedAmount}
         />
       ) : null}
 
-      {isFirstTopUpDialogVisible ? (
-        <FirstTopUpDialog
-          visible={isFirstTopUpDialogVisible}
-          onClose={() => setIsFirstTopUpDialogVisible(false)}
+      {wasChangeBalance || isWalletRefilledOpen ? (
+        <WalletRefilledModal
+          visible={wasChangeBalance || isWalletRefilledOpen}
+          onClose={() => setIsWalletRefilledOpen(false)}
         />
       ) : null}
 
-      {wasChangeBalance ? (
-        <WalletRefilledModal visible={wasChangeBalance} />
-      ) : null}
-
-      <TransactionHistory withoutRoleFilter />
+      <div className={styles.tabsWrapper}>
+        <Tabs
+          items={tabsItems}
+          selectedItemId={selectedTabId}
+          onSelect={(item) => setSelectedTabId(item.id)}
+          withoutStickyIntend
+        />
+      </div>
     </div>
   );
 };
