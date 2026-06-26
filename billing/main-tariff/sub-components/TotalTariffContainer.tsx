@@ -33,12 +33,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { Text } from "../../../components/text";
 import { Loader, LoaderTypes } from "../../../components/loader";
+import { IconButton } from "../../../components/icon-button";
 import { toastr } from "../../../components/toast";
+import InfoIcon from "../../../assets/info.outline.react.svg";
+
+import PriceDetailsDialog from "./PriceDetailsDialog";
 import { observer } from "mobx-react";
 import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 import type { TTranslation } from "../../../utils/common";
@@ -60,16 +64,25 @@ const TotalTariffContainer = observer(
       setTariffDueTodayAmount,
       isTariffDueTodayCalculating,
       setIsTariffDueTodayCalculating,
+      needsWalletMigration,
     } = store;
     const { isYearTariff, maxCountManagersByQuota, isFreeTariff } =
       store.quotas;
+
+    const [isPriceDetailsVisible, setIsPriceDetailsVisible] = useState(false);
 
     const managersDiff = managersCount - maxCountManagersByQuota;
     const isDowngradePlan =
       !isFreeTariff && managersCount < maxCountManagersByQuota;
     const isTheSameCount =
       !isFreeTariff && managersCount === maxCountManagersByQuota;
-    const isUpgrade = !isFreeTariff && !isDowngradePlan && !isTheSameCount;
+    // Migration flow has its own dialog/price breakdown — skip the prorated
+    // "due today" calculation and pill here.
+    const isUpgrade =
+      !isFreeTariff &&
+      !isDowngradePlan &&
+      !isTheSameCount &&
+      !needsWalletMigration;
 
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const controllerRef = useRef<AbortController | null>(null);
@@ -118,8 +131,44 @@ const TotalTariffContainer = observer(
       };
     }, [managersDiff, isUpgrade, isNeedRequest, paymentApi]);
 
+    const dueTodayPill =
+      isUpgrade && !isNeedRequest ? (
+        <div
+          className={classNames(styles.proratedNow, {
+            [styles.isDisabled]: isDisabled,
+          })}
+        >
+          <div className={styles.proratedNowLabel}>
+            <Text as="span" fontSize="13px">
+              {t("TotalDueToday")}
+            </Text>
+            <IconButton
+              iconNode={<InfoIcon />}
+              size={12}
+              onClick={() => setIsPriceDetailsVisible(true)}
+              className={styles.proratedNowInfo}
+              dataTestId="due_today_info_button"
+            />
+          </div>
+          {isTariffDueTodayCalculating || tariffDueTodayAmount === null ? (
+            <Loader
+              color=""
+              size="16px"
+              type={LoaderTypes.track}
+              className={styles.proratedNowLoader}
+            />
+          ) : (
+            <Text as="span" className={styles.proratedNowPrice}>
+              {formatPaymentCurrency(tariffDueTodayAmount)}
+            </Text>
+          )}
+        </div>
+      ) : null;
+
     return (
       <div className={styles.totalTariffContainer}>
+        {dueTodayPill}
+
         <div
           className={classNames(styles.paymentPriceTotalPrice, {
             [styles.isDisabled]: isDisabled,
@@ -174,28 +223,11 @@ const TotalTariffContainer = observer(
           )}
         </div>
 
-        {isUpgrade && !isNeedRequest ? (
-          <div
-            className={classNames(styles.proratedNow, {
-              [styles.isDisabled]: isDisabled,
-            })}
-          >
-            <Text as="span" fontSize="13px">
-              {t("DueToday")}
-            </Text>
-            {isTariffDueTodayCalculating || tariffDueTodayAmount === null ? (
-              <Loader
-                color=""
-                size="16px"
-                type={LoaderTypes.track}
-                className={styles.proratedNowLoader}
-              />
-            ) : (
-              <Text as="span" className={styles.proratedNowPrice}>
-                {formatPaymentCurrency(tariffDueTodayAmount)}
-              </Text>
-            )}
-          </div>
+        {isPriceDetailsVisible ? (
+          <PriceDetailsDialog
+            visible={isPriceDetailsVisible}
+            onClose={() => setIsPriceDetailsVisible(false)}
+          />
         ) : null}
       </div>
     );
