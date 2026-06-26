@@ -48,6 +48,10 @@ export const ChatToolbar = () => {
   const isHistoryActive = currentPage === "history";
 
   const handleNavigateToHistory = () => {
+    if (isHistoryActive) {
+      return setCurrentPage("chat");
+    }
+
     setCurrentPage("history");
   };
 

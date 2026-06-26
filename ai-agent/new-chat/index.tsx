@@ -76,7 +76,7 @@ const NewChat: React.FC = observer(() => {
         return (
           <section className={styles.container}>
             <div className={styles.chatList}>
-              <ChatList />
+              <ChatList hideHeader />
             </div>
             <div className={styles.chat}>
               {hasProfiles ? <ChatToolbar /> : null}
