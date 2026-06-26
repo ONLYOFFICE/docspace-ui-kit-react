@@ -57,7 +57,6 @@ import WalletInfo from "../shared/top-up-balance/sub-components/WalletInfo";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import StorageWarning from "../services/panels/additional-storage/StorageWarning";
 import UnlinkedCardBanner from "../shared/unlinked-card-banner";
-import { getConvertedSize } from "../utils/common";
 import styles from "./MainTariff.module.scss";
 import { getBrandName } from "../../constants/brands";
 
@@ -85,7 +84,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     currentTariffPlanTitle,
     isYearTariff,
     maxCountManagersByQuota,
-    maxTotalSizeByQuota,
     fetchPortalQuota,
   } = store.quotas;
   const {
@@ -345,13 +343,12 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
       {!isNonProfit && hasScheduledTariffAdminsChange ? (
         <div style={{ marginTop: 16 }}>
           <StorageWarning
-            title={t("TariffDowngradeScheduled", {
+            title={t("TariffAdminAdjustmentScheduled", {
               fromCount: currentTariffAdminsCount,
               toCount: nextTariffAdminsCount ?? 0,
             })}
-            body={t("TariffDowngradeWarning", {
+            body={t("TariffAdminAdjustmentWarning", {
               admins: maxCountManagersByQuota,
-              storage: getConvertedSize(t, maxTotalSizeByQuota),
             })}
             onCancelChange={handleCancelTariffDowngrade}
             isCancelLoading={isCancelDowngradeLoading}
