@@ -151,13 +151,15 @@ const MigrateToWalletDialog = observer(
     const newAdmins = managersCount;
     const pricePerAdmin = planCost.value;
     const newSubscriptionAmount = totalPrice;
-    // Known from the store — no need to wait for the balance request.
+
     const currentTariffCost = maxCountManagersByQuota * pricePerAdmin;
     const daysDisplay = formatRemainingDays(daysUntilPayment, language, t);
 
-    // Comes from the balance request and recalculates server-side.
     const walletCredit = subscriptionDetails?.remainingBalance ?? 0;
-    const walletApplied = walletBalance + walletCredit;
+    const walletApplied = Math.min(
+      newSubscriptionAmount,
+      walletCredit + walletBalance,
+    );
     const cardCharge = Math.max(0, newSubscriptionAmount - walletApplied);
 
     const isDetailsReady = !isLoading && !!subscriptionDetails;
@@ -320,11 +322,15 @@ const MigrateToWalletDialog = observer(
             <div className={styles.footerButtons}>
               <Button
                 key="confirm"
-                label={t("MigratePay", {
-                  amount: subscriptionDetails
-                    ? formatPaymentCurrency(cardCharge, 2)
-                    : "",
-                })}
+                label={
+                  cardCharge > 0
+                    ? t("MigratePay", {
+                        amount: subscriptionDetails
+                          ? formatPaymentCurrency(cardCharge, 2)
+                          : "",
+                      })
+                    : t("UpgradeNow")
+                }
                 size={ButtonSize.normal}
                 primary
                 scale

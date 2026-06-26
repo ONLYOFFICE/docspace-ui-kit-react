@@ -169,6 +169,8 @@ type SimpleTopUpDialogBaseProps = {
   onConfirm?: () => Promise<void> | void;
   isFirstTopUp?: boolean;
   recommendedAmount?: string;
+  /** minimum allowed top-up; also pre-fills the input */
+  minValue?: string;
   /** optional service to activate after the top-up (passed to the callback URL) */
   service?: string;
   /** optional extra query params appended to the success/callback URL */
@@ -184,6 +186,7 @@ const SimpleTopUpDialogContent = observer(
     onClose,
     onConfirm,
     isFirstTopUp,
+    minValue,
     paymentApi,
     formatWalletCurrency,
     walletCodeCurrency,
@@ -311,7 +314,7 @@ const SimpleTopUpDialogContent = observer(
               formatWalletCurrency={formatWalletCurrency}
               isDisabled={isLoading}
               walletCustomerStatusNotActive={walletCustomerStatusNotActive}
-              minValue={MIN_AMOUNT}
+              minValue={minValue ?? MIN_AMOUNT}
               withoutCustomerCheck
             />
 
@@ -357,7 +360,7 @@ const SimpleTopUpDialogContent = observer(
 );
 
 const SimpleTopUpDialog: React.FC<SimpleTopUpDialogProps> = (props) => (
-  <AmountProvider initialAmount={props.recommendedAmount}>
+  <AmountProvider initialAmount={props.minValue ?? props.recommendedAmount}>
     <SimpleTopUpDialogContent {...props} />
   </AmountProvider>
 );
