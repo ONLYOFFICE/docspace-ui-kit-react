@@ -633,8 +633,8 @@ class PaymentStore {
     );
   };
 
-  formatPaymentCurrency = (item: number = 0, fractionDigits: number = 0) => {
-    const amount = item || this.walletBalance;
+  formatPaymentCurrency = (item?: number, fractionDigits: number = 0) => {
+    const amount = item ?? this.walletBalance;
     const { isoCurrencySymbol } = this.paymentQuotas.planCost;
 
     return formatCurrencyValue(
