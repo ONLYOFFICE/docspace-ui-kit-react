@@ -269,7 +269,11 @@ const UpdatePlanButtonContainer = ({
 
     return isDowngradePlan ? (
       <DowngradePlanButtonContainer
-        onDowngradeTariff={onDowngradeTariff}
+        onDowngradeTariff={
+          needsWalletMigration
+            ? () => setIsMigrateDialogVisible(true)
+            : onDowngradeTariff
+        }
         isDisabled={isDisabled || hasScheduledTariffAdminsChange}
         buttonLabel={t("DowngradeNow")}
       />
