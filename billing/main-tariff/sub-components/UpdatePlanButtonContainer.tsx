@@ -132,6 +132,7 @@ const UpdatePlanButtonContainer = ({
 
   const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
   const isBalanceInsufficient = walletBalance < dueTodayAmount;
+  const topUpShortfall = Math.max(0, Math.ceil(dueTodayAmount - walletBalance));
 
   const executeWalletUpdate = async (
     quantity: number,
@@ -208,10 +209,7 @@ const UpdatePlanButtonContainer = ({
 
   const onDowngradeTariff = () => {
     if (isPassedByQuota()) {
-      executeWalletUpdate(
-        maxCountManagersByQuota - managersCount,
-        ProductQuantityType.Set,
-      );
+      executeWalletUpdate(managersCount, ProductQuantityType.Set);
       return;
     }
 
@@ -331,8 +329,9 @@ const UpdatePlanButtonContainer = ({
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
-          onConfirm={onTopUpConfirm}
+          onConfirm={isCardMissingOrInactive ? undefined : onTopUpConfirm}
           isFirstTopUp={isCardMissingOrInactive}
+          minValue={topUpShortfall > 0 ? `${topUpShortfall}` : undefined}
           successParams={{
             admins: `${managersCount}`,
             storage: getConvertedSize(t, allowedStorageSizeByQuota),
