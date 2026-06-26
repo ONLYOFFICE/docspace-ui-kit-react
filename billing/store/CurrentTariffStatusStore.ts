@@ -49,6 +49,7 @@ import {
   isValidDate,
   now,
 } from "../../utils/date";
+import { daysUntil } from "../utils/common";
 
 class CurrentTariffStatusStore {
   private portalQuotaApi: PortalQuotaApi;
@@ -135,6 +136,12 @@ class CurrentTariffStatusStore {
       locale: this.language,
       timezone: getAppTimezone(),
     });
+  }
+
+  get daysUntilPayment() {
+    const dueDate = this.portalTariffStatus?.dueDate;
+    if (!dueDate || !this.isPaymentDateValid) return 0;
+    return Math.max(0, daysUntil(dueDate));
   }
 
   get gracePeriodEndDate() {
@@ -224,9 +231,7 @@ class CurrentTariffStatusStore {
 
   get daysUntilStorageExpiry() {
     if (!this.storageSubscriptionExpiryDate) return 0;
-    return Math.floor(
-      dateDiff(this.storageSubscriptionExpiryDate, now(), "days"),
-    );
+    return daysUntil(this.storageSubscriptionExpiryDate);
   }
 
   get walletCustomerEmail() {

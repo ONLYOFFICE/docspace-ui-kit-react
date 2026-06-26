@@ -399,6 +399,12 @@ class PaymentStore {
     );
   }
 
+  get needsWalletMigration() {
+    return (
+      !this.quotas.isFreeTariff && !this.tariff.hasTariffWalletSubscription
+    );
+  }
+
   get isAutoTopUpInProgress() {
     if (!this.isAutoPaymentExist) return false;
 
