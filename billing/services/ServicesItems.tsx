@@ -94,7 +94,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   const { isFreeTariff } = paymentStore.quotas;
 
   const {
-    isGracePeriod,
     hasScheduledStorageChange,
     walletCustomerEmail,
     currentStoragePlanSize,
