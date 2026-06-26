@@ -48,6 +48,7 @@ import { Link } from "../../../components/link";
 
 import DowngradePlanButtonContainer from "./DowngradePlanButtonContainer";
 import ChangePricingPlanDialog from "../../dialogs/ChangePricingPlanDialog";
+import MigrateToWalletDialog from "./MigrateToWalletDialog";
 import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import { getConvertedSize } from "../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
@@ -93,6 +94,7 @@ const UpdatePlanButtonContainer = ({
     isCardLinkedToPortal,
     allowedStorageSizeByQuota,
     isCardMissingOrInactive,
+    needsWalletMigration,
   } = store;
   const {
     maxCountManagersByQuota,
@@ -114,9 +116,18 @@ const UpdatePlanButtonContainer = ({
   const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
     useState(false);
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const [isMigrateDialogVisible, setIsMigrateDialogVisible] = useState(false);
 
   const onClose = () => {
     setIsVisiblePaymentConfirm(false);
+  };
+
+  const refreshAfterUpdate = async () => {
+    await Promise.all([
+      fetchPortalTariff(true),
+      fetchBalance(true),
+      fetchPortalQuota(true),
+    ]);
   };
 
   const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
@@ -282,7 +293,11 @@ const UpdatePlanButtonContainer = ({
           isTariffDueTodayCalculating ||
           hasScheduledTariffAdminsChange
         }
-        onClick={onUpdateTariff}
+        onClick={
+          needsWalletMigration
+            ? () => setIsMigrateDialogVisible(true)
+            : onUpdateTariff
+        }
         isLoading={isLoading}
         testId="upgrade_plan_button"
       />
@@ -297,6 +312,14 @@ const UpdatePlanButtonContainer = ({
         <ChangePricingPlanDialog
           visible={isVisibleDowngradePlanDialog}
           onClose={onCloseDowngradePlanDialog}
+        />
+      ) : null}
+
+      {isMigrateDialogVisible ? (
+        <MigrateToWalletDialog
+          visible={isMigrateDialogVisible}
+          onClose={() => setIsMigrateDialogVisible(false)}
+          onMigrated={refreshAfterUpdate}
         />
       ) : null}
 
