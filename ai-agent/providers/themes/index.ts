@@ -83,7 +83,9 @@ type BasePalette = {
   tooltipShadow: string;
 };
 
-const buildTokens = (p: BasePalette): Partial<ThemeTokens> & Record<string, string> => ({
+const buildTokens = (
+  p: BasePalette,
+): Partial<ThemeTokens> & Record<string, string> => ({
   // Base palette
   "--background-normal": p.backgroundNormal,
   "--background-normal-element": p.backgroundNormalElement,
@@ -143,8 +145,7 @@ const buildTokens = (p: BasePalette): Partial<ThemeTokens> & Record<string, stri
 
   "--chat-list-item-color": "var(--text-normal)",
   "--chat-list-item-hover-background-color": "var(--highlight-button-hover)",
-  "--chat-list-item-active-background-color":
-    "var(--highlight-button-pressed)",
+  "--chat-list-item-active-background-color": "var(--highlight-button-pressed)",
 
   "--icon-button-color": "var(--icon-normal)",
   "--icon-button-background-color": "transparent",
@@ -341,6 +342,9 @@ const buildTokens = (p: BasePalette): Partial<ThemeTokens> & Record<string, stri
   "--chat-message-tool-call-pre-background-color": "var(--background-normal)",
   "--chat-message-tool-call-pre-color": "var(--text-normal)",
   "--chat-message-analyze-color": "var(--text-normal)",
+  "--chat-list-item-font-size": "12px",
+  "--chat-list-title-font-size": "16px",
+  "--chat-list-group-header-font-size": "14px",
 });
 
 // DocSpace Base — light palette. Mapped from globalColors to mirror the
@@ -468,7 +472,10 @@ const portalDarkPalette: BasePalette = {
   tooltipShadow: "0px 1px 4px -1px rgba(0, 0, 0, 0.4)",
 };
 
-export const portalThemes: Record<string, Partial<ThemeTokens> & Record<string, string>> = {
+export const portalThemes: Record<
+  string,
+  Partial<ThemeTokens> & Record<string, string>
+> = {
   [PORTAL_BASE_THEME_ID]: buildTokens(portalBasePalette),
   [PORTAL_DARK_THEME_ID]: buildTokens(portalDarkPalette),
 };
