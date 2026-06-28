@@ -76,6 +76,7 @@ import { AiChatAvailabilityContext } from "./availability";
 import { storageAdapter } from "./storage";
 import { usePlatformAdapter } from "./platform";
 import { componentOverrides } from "./components-overrides";
+import { imageOverrides } from "./images-overrides";
 import { storeKeys } from "./stores";
 import { normalizeAiChatLocale } from "./locale";
 import { portalThemes } from "./themes";
@@ -350,7 +351,7 @@ const AiAgentProviders = ({
                 <ApiProvider config={serverApiConfig}>
                   <StoresProvider stores={stores}>
                     <ThemeProvider theme={theme} customThemes={portalThemes}>
-                      <ImagesProvider>
+                      <ImagesProvider overrides={imageOverrides}>
                         <ToolsProvider
                           hostToolGroups={hostToolGroups}
                           servers={ctx.servers}

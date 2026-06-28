@@ -65,6 +65,8 @@ type BasePalette = {
   iconNormal: string;
   iconSuccess: string;
   iconSecondary: string;
+  iconButtonColor: string;
+  iconButtonHoverColor: string;
 
   textNormal: string;
   textNormalPressed: string;
@@ -151,7 +153,8 @@ const buildTokens = (
   "--chat-list-item-hover-background-color": "var(--highlight-button-hover)",
   "--chat-list-item-active-background-color": "var(--highlight-button-pressed)",
 
-  "--icon-button-color": "var(--icon-normal)",
+  "--icon-button-color": p.iconButtonColor,
+  "--icon-button-hover-color": p.iconButtonHoverColor,
   "--icon-button-background-color": "transparent",
   "--icon-button-hover-background-color": "var(--highlight-button-hover)",
   "--icon-button-pressed-background-color": "var(--highlight-button-pressed)",
@@ -418,6 +421,10 @@ const portalBasePalette: BasePalette = {
 
   iconSecondary: globalColors.gray,
   chatListGroupHeaderColor: globalColors.gray,
+
+  // IconButton.module.scss (light): rest = gray, hover = lightGrayDark.
+  iconButtonColor: globalColors.gray,
+  iconButtonHoverColor: globalColors.lightGrayDark,
 };
 
 // DocSpace Dark — dark palette.
@@ -484,6 +491,10 @@ const portalDarkPalette: BasePalette = {
 
   iconSecondary: globalColors.gray,
   chatListGroupHeaderColor: globalColors.gray,
+
+  // IconButton.module.scss (dark): rest = grayDark, hover = white.
+  iconButtonColor: globalColors.grayDark,
+  iconButtonHoverColor: globalColors.white,
 };
 
 export const portalThemes: Record<
