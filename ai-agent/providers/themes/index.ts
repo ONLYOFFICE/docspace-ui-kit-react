@@ -64,6 +64,7 @@ type BasePalette = {
 
   iconNormal: string;
   iconSuccess: string;
+  iconSecondary: string;
 
   textNormal: string;
   textNormalPressed: string;
@@ -81,6 +82,8 @@ type BasePalette = {
   dropDownMenuShadow: string;
   aiProviderItemShadow: string;
   tooltipShadow: string;
+
+  chatListGroupHeaderColor: string;
 };
 
 const buildTokens = (
@@ -120,6 +123,7 @@ const buildTokens = (
 
   "--icon-normal": p.iconNormal,
   "--icon-success": p.iconSuccess,
+  "--icon-gray-secondary": p.iconSecondary,
 
   "--text-normal": p.textNormal,
   "--text-normal-pressed": p.textNormalPressed,
@@ -345,6 +349,10 @@ const buildTokens = (
   "--chat-list-item-font-size": "12px",
   "--chat-list-title-font-size": "16px",
   "--chat-list-group-header-font-size": "14px",
+  "--chat-list-group-header-color": p.chatListGroupHeaderColor,
+  "--chat-list-title-font-weight": "600",
+  "--chat-list-group-header-font-weight": "600",
+  "--chat-list-item-font-weight": "600",
 });
 
 // DocSpace Base — light palette. Mapped from globalColors to mirror the
@@ -407,6 +415,9 @@ const portalBasePalette: BasePalette = {
   dropDownMenuShadow: `0px 8px 16px 0px ${globalColors.boxShadowColor}, 0px 0px 4px 0px #040f1b0a`,
   aiProviderItemShadow: "0px 1px 2px 0px #0000000f, 0px 1px 3px 0px #0000001a",
   tooltipShadow: "0px 1px 4px -1px rgba(0, 0, 0, 0.2)",
+
+  iconSecondary: globalColors.gray,
+  chatListGroupHeaderColor: globalColors.gray,
 };
 
 // DocSpace Dark — dark palette.
@@ -470,6 +481,9 @@ const portalDarkPalette: BasePalette = {
   aiProviderItemShadow:
     "0px 1px 2px 0px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.3)",
   tooltipShadow: "0px 1px 4px -1px rgba(0, 0, 0, 0.4)",
+
+  iconSecondary: globalColors.gray,
+  chatListGroupHeaderColor: globalColors.gray,
 };
 
 export const portalThemes: Record<

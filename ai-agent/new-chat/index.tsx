@@ -26,7 +26,6 @@
 
 import React from "react";
 import { observer } from "mobx-react";
-import classNames from "classnames";
 
 import {
   ChatPage,
@@ -76,7 +75,7 @@ const NewChat: React.FC = observer(() => {
         return (
           <section className={styles.container}>
             <div className={styles.chatList}>
-              <ChatList hideHeader />
+              <ChatList hideHeader className={styles.chatListView} />
             </div>
             <div className={styles.chat}>
               {hasProfiles ? <ChatToolbar /> : null}
@@ -86,7 +85,7 @@ const NewChat: React.FC = observer(() => {
         );
       }
 
-      return <ChatList />;
+      return <ChatList className={styles.chatListView} />;
     default: {
       return (
         <section className={styles.chat}>

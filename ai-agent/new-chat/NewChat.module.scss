@@ -97,6 +97,51 @@
   // }
 }
 
+// ── ChatList: match the design mockup ──────────────────────────────────
+// Scoped to our own wrapper around `<ChatList />` so these overrides can't
+// leak into the chat thread, composer or any portaled dropdowns. The widget
+// builds the list from Tailwind arbitrary-value utilities (no stable class
+// names), so we target the tokens baked into those utility strings.
+.chatListView {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  :global([class*="--chat-list-group-header-font-size"]) {
+    height: 16px;
+    margin-block: 12px;
+  }
+
+  :global([class*="chat-list-item-active-marker-bg"]) {
+    background-color: var(--chat-list-item-active-background-color);
+    font-weight: 600;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  :global([class*="--chat-list-item-font-size"]) {
+    font-feature-settings:
+      "liga" off,
+      "clig" off;
+  }
+
+  :global([class*="--input-border-color"]) {
+    height: 32px;
+    border-radius: 3px;
+    padding: 6px 8px;
+    box-sizing: border-box;
+  }
+
+  :global([class*="min-h-[28px]"]) {
+    height: 36px;
+    padding-block: 4px;
+    box-sizing: border-box;
+  }
+}
+
 .container {
   display: grid;
   grid-template-columns: 380px 1fr;
