@@ -75,7 +75,11 @@ const NewChat: React.FC = observer(() => {
         return (
           <section className={styles.container}>
             <div className={styles.chatList}>
-              <ChatList hideHeader className={styles.chatListView} />
+              <ChatList
+                hideHeader
+                alwaysShowActions
+                className={styles.chatListView}
+              />
             </div>
             <div className={styles.chat}>
               {hasProfiles ? <ChatToolbar /> : null}
@@ -85,7 +89,7 @@ const NewChat: React.FC = observer(() => {
         );
       }
 
-      return <ChatList className={styles.chatListView} />;
+      return <ChatList alwaysShowActions className={styles.chatListView} />;
     default: {
       return (
         <section className={styles.chat}>
