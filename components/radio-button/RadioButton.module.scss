@@ -37,7 +37,7 @@
 
 :global(.dark) {
   .label {
-    --radio-button-bg: #{colors.$black};
+    --radio-button-bg: #{colors.$dark-gray-light};
     --radio-button-disable-bg: #{colors.$dark-gray-light};
     --radio-button-text-color: #{colors.$white};
     --radio-button-text-disable-color: #{colors.$gray-dark-text};
