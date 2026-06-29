@@ -40,7 +40,7 @@ import { Text } from "../../../components/text";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { IconButton } from "../../../components/icon-button";
 import { toastr } from "../../../components/toast";
-import InfoIcon from "../../../assets/info.outline.react.svg";
+import InfoIcon from "../../../assets/info.react.svg";
 
 import PriceDetailsDialog from "./PriceDetailsDialog";
 import { observer } from "mobx-react";
@@ -139,7 +139,7 @@ const TotalTariffContainer = observer(
           })}
         >
           <div className={styles.proratedNowLabel}>
-            <Text as="span" fontSize="13px">
+            <Text as="span" fontSize="13px" fontWeight={600}>
               {t("TotalDueToday")}
             </Text>
             <IconButton
