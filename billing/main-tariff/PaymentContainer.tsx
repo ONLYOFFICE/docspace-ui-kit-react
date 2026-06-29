@@ -229,17 +229,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
       );
     }
 
-    if (isNotPaidPeriod) {
-      return (
-        <Text fontSize="16px" isBold className={styles.paymentInfoSuggestion}>
-          <CommonTrans
-            i18nKey="RenewSubscriptionPlanName"
-            values={{ planName: tariffPlanTitle }}
-          />
-        </Text>
-      );
-    }
-
     if (isGracePeriod) {
       return (
         <Text
@@ -307,7 +296,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     <div className={styles.paymentBody}>
       {isNotPaidPeriod ? expiredTitleSubscriptionWarning() : currentPlanTitle()}
 
-      <CurrentTariffContainer />
+      {isNotPaidPeriod ? null : <CurrentTariffContainer />}
 
       {planSuggestion()}
 
