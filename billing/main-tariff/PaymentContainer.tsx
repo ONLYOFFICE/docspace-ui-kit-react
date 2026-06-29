@@ -84,6 +84,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     currentTariffPlanTitle,
     isYearTariff,
     maxCountManagersByQuota,
+    currentPlanCost,
     fetchPortalQuota,
   } = store.quotas;
   const {
@@ -281,10 +282,23 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           lineHeight="16px"
           className={styles.paymentInfoManagersPrice}
         >
-          <CommonTrans
-            i18nKey="BusinessFinalDateInfo"
-            values={{ finalDate: paymentDate }}
-          />
+          {hasScheduledTariffAdminsChange ? (
+            <CommonTrans
+              i18nKey="BusinessRenewalPricingInfo"
+              values={{
+                finalDate: paymentDate,
+                price: formatPaymentCurrency(currentPlanCost.value ?? 0),
+                adminsCount: currentTariffAdminsCount ?? 0,
+                perAdminPrice: formatPaymentCurrency(startValue),
+              }}
+              components={{ 1: <Text fontWeight={600} as="span" /> }}
+            />
+          ) : (
+            <CommonTrans
+              i18nKey="BusinessRenewalNotice"
+              values={{ finalDate: paymentDate }}
+            />
+          )}
         </Text>
       );
   };
@@ -296,9 +310,29 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
       <CurrentTariffContainer />
 
       {planSuggestion()}
+
+      {!isNonProfit && hasScheduledTariffAdminsChange ? (
+        <div style={{ marginTop: 16, marginBottom: 12 }}>
+          <StorageWarning
+            title={t("TariffAdminAdjustmentScheduled", {
+              fromCount: currentTariffAdminsCount,
+              toCount: nextTariffAdminsCount ?? 0,
+            })}
+            body={t("TariffAdminAdjustmentWarning", {
+              admins: maxCountManagersByQuota,
+            })}
+            onCancelChange={handleCancelTariffDowngrade}
+            isCancelLoading={isCancelDowngradeLoading}
+          />
+        </div>
+      ) : null}
+
       {planDescription()}
 
-      {!isNonProfit && !isGracePeriod && !isNotPaidPeriod ? (
+      {!isNonProfit &&
+      !isGracePeriod &&
+      !isNotPaidPeriod &&
+      !hasScheduledTariffAdminsChange ? (
         <div className={styles.paymentInfoWrapper}>
           <Text
             fontWeight={600}
@@ -337,22 +371,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
       {!isNonProfit && !isNotPaidPeriod && walletCustomerStatusNotActive ? (
         <div className={styles.unlinkedBanner}>
           <UnlinkedCardBanner />
-        </div>
-      ) : null}
-
-      {!isNonProfit && hasScheduledTariffAdminsChange ? (
-        <div style={{ marginTop: 16 }}>
-          <StorageWarning
-            title={t("TariffAdminAdjustmentScheduled", {
-              fromCount: currentTariffAdminsCount,
-              toCount: nextTariffAdminsCount ?? 0,
-            })}
-            body={t("TariffAdminAdjustmentWarning", {
-              admins: maxCountManagersByQuota,
-            })}
-            onCancelChange={handleCancelTariffDowngrade}
-            isCancelLoading={isCancelDowngradeLoading}
-          />
         </div>
       ) : null}
 
