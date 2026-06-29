@@ -32,7 +32,7 @@ import classNames from "classnames";
 import { useStores } from "@onlyoffice/ai-chat";
 
 import HistoriesIcon from "../../assets/icons/16/clock.svg";
-import PlusIcon from "../../assets/icons/16/button.plus.react.svg";
+// import PlusIcon from "../../assets/icons/16/button.plus.react.svg";
 
 import { ActionButton } from "../../components/action-button";
 
@@ -43,7 +43,7 @@ export const ChatToolbar = () => {
   const stores = useStores();
   const currentPage = stores.useRouter((s) => s.currentPage);
   const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
-  const startNewChat = stores.useThreadsStore((s) => s.onSwitchToNewThread);
+  // const startNewChat = stores.useThreadsStore((s) => s.onSwitchToNewThread);
 
   const isHistoryActive = currentPage === "history";
 
@@ -66,12 +66,12 @@ export const ChatToolbar = () => {
           label={t("Common:ChatHistory")}
           onClick={handleNavigateToHistory}
         />
-        <ActionButton
+        {/* <ActionButton
           icon={<PlusIcon />}
           className={styles.button}
           label={t("Common:AINewChat")}
           onClick={startNewChat}
-        />
+        /> */}
       </div>
     </nav>
   );

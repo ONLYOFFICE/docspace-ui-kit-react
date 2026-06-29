@@ -25,13 +25,17 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import classNames from "classnames";
+import { useTranslation } from "react-i18next";
+import { useStores } from "@onlyoffice/ai-chat";
 
 import { IconButton } from "../../../../components/icon-button";
+import { Button, ButtonSize } from "../../../../components/button";
 import { Text } from "../../../../components/text";
 
 import ExpandIcon from "../../../../assets/icons/17/expand.svg";
 import CollapseIcon from "../../../../assets/icons/17/collapse.svg";
 import CrossIcon from "../../../../assets/icons/17/cross.react.svg";
+import PlusIcon from "../../../../assets/icons/12/plus.svg";
 
 import type { AiChatPanelHeaderProps } from "./AiChatPanelHeader.types";
 import styles from "./AiChatPanelHeader.module.scss";
@@ -52,6 +56,10 @@ const AiChatPanelHeader = ({
   closeTooltip,
   className,
 }: AiChatPanelHeaderProps) => {
+  const { t } = useTranslation("Common");
+  const stores = useStores();
+  const startNewChat = stores.useThreadsStore((s) => s.onSwitchToNewThread);
+
   const renderTitle = () => {
     if (title === undefined || title === null) return null;
     if (typeof title === "string") {
@@ -78,6 +86,15 @@ const AiChatPanelHeader = ({
     <div className={classNames(styles.header, className)}>
       <div className={styles.left}>
         {renderTitle()}
+        <Button
+          primary
+          icon={<PlusIcon />}
+          onClick={startNewChat}
+          size={ButtonSize.small}
+          className={styles.newChatButton}
+          label={t("Common:AINewChat")}
+          aria-label={t("Common:AINewChat")}
+        />
         {extras ? <div className={styles.extras}>{extras}</div> : null}
       </div>
 
