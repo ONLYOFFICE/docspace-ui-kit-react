@@ -112,6 +112,18 @@
       font-size: 48px;
     }
 
+    .totalPriceLine {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      max-width: 100%;
+    }
+
+    .totalPriceSuffix {
+      white-space: nowrap;
+      margin-inline-start: auto;
+    }
+
     .totalTariffDescription {
       margin: auto;
     }

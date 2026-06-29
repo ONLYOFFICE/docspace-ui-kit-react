@@ -187,7 +187,11 @@ const TotalTariffContainer = observer(
               />
             </Text>
           ) : (
-            <Text fontWeight={600} fontSize="16px">
+            <Text
+              fontWeight={600}
+              fontSize="16px"
+              className={styles.totalPriceLine}
+            >
               {isYearTariff ? (
                 <CommonTrans
                   i18nKey="TotalPricePerYear"
@@ -199,7 +203,14 @@ const TotalTariffContainer = observer(
                         className={styles.largerFontSize}
                       />
                     ),
-                    3: <Text fontWeight={600} as="span" key="bold-text-year" />,
+                    3: (
+                      <Text
+                        fontWeight={600}
+                        as="span"
+                        key="bold-text-year"
+                        className={styles.totalPriceSuffix}
+                      />
+                    ),
                   }}
                 />
               ) : (
@@ -214,7 +225,12 @@ const TotalTariffContainer = observer(
                       />
                     ),
                     3: (
-                      <Text fontWeight={600} as="span" key="bold-text-month" />
+                      <Text
+                        fontWeight={600}
+                        as="span"
+                        key="bold-text-month"
+                        className={styles.totalPriceSuffix}
+                      />
                     ),
                   }}
                 />
