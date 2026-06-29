@@ -52,6 +52,12 @@
 .body {
   width: 100%;
 
+  // Allow the body to shrink below its content's min-content size inside the
+  // flex-column selector. Without this, an empty view whose content has a rigid
+  // height (the EmptyScreen wrapper) cannot shrink, so the body + footer overflow
+  // the container and push the footer's bottom padding off-screen.
+  min-height: 0;
+
   &.withHeaderAndFooter {
     height: calc(100% - var(--footer-height) - var(--header-height));
   }

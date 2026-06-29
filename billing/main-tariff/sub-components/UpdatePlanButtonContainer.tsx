@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react";
 import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 
@@ -41,21 +41,18 @@ import { Button, ButtonSize } from "../../../components/button";
 import styles from "./UpdatePlanButtonContainer.module.scss";
 import { toastr } from "../../../components/toast";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
-import type { QuotaDto } from "@onlyoffice/docspace-api-sdk";
+import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers";
 import { Text } from "../../../components/text";
 import { Link } from "../../../components/link";
 
 import DowngradePlanButtonContainer from "./DowngradePlanButtonContainer";
 import ChangePricingPlanDialog from "../../dialogs/ChangePricingPlanDialog";
+import MigrateToWalletDialog from "./MigrateToWalletDialog";
+import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import { getConvertedSize } from "../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { AnalyticsEvents } from "../../../enums";
-
-const MANAGER = "manager";
-let timerId: ReturnType<typeof setTimeout> | undefined;
-let intervalId: ReturnType<typeof setInterval> | undefined;
-let isWaitRequest = false;
-let previousManagersCount: number | null = null;
 
 type UpdatePlanButtonContainerProps = {
   isDisabled?: boolean;
@@ -69,199 +66,139 @@ const UpdatePlanButtonContainer = ({
   const { paymentApi } = useApi();
   const store = usePaymentStore();
 
-  const fetchQuotaInfo = async () => {
-    const r = await paymentApi.getQuotaPaymentInformation({
-      refresh: true,
-    });
-    return r.data.response as unknown as QuotaDto;
-  };
-
   const {
     setIsLoading,
-    paymentLink,
-    isAlreadyPaid,
     managersCount,
     isLoading,
     isLessCountThanAcceptable,
     canPayTariff,
-    cardLinkedOnFreeTariff,
     totalPrice,
     formatPaymentCurrency,
     canDowngradeTariff,
-    cardLinked,
+    fetchBalance,
+    walletBalance,
+    walletCodeCurrency,
+    tariffDueTodayAmount,
+    isTariffDueTodayCalculating,
+    isCardLinkedToPortal,
+    allowedStorageSizeByQuota,
+    isCardMissingOrInactive,
+    needsWalletMigration,
   } = store;
   const {
     maxCountManagersByQuota,
-    isYearTariff,
-    setPortalQuotaValue,
     currentTariffPlanTitle,
+    fetchPortalQuota,
+    isFreeTariff,
   } = store.quotas;
   const { tariffPlanTitle } = store.paymentQuotas;
-  const { walletCustomerStatusNotActive } = store.tariff;
+  const {
+    fetchPortalTariff,
+    hasScheduledTariffAdminsChange,
+    isGracePeriod,
+    isNotPaidPeriod,
+  } = store.tariff;
+
+  const isRepurchase = isFreeTariff || isGracePeriod || isNotPaidPeriod;
 
   const [isVisiblePaymentConfirm, setIsVisiblePaymentConfirm] = useState(false);
   const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
     useState(false);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const [isMigrateDialogVisible, setIsMigrateDialogVisible] = useState(false);
 
-  const resetIntervalSuccess = () => {
-    intervalId &&
-      toastr.success(
-        t("BusinessUpdated", { planName: currentTariffPlanTitle }),
-      );
-    clearInterval(intervalId);
-    intervalId = undefined;
-    setIsLoading(false);
-  };
-
-  const waitingForQuota = () => {
-    isWaitRequest = false;
-    let requestsCount = 0;
-    intervalId = setInterval(async () => {
-      try {
-        if (requestsCount === 30) {
-          setIsLoading(false);
-
-          intervalId && toastr.error(t("ErrorNotification"));
-          clearInterval(intervalId);
-          intervalId = undefined;
-
-          return;
-        }
-
-        requestsCount++;
-
-        if (isWaitRequest) {
-          return;
-        }
-
-        isWaitRequest = true;
-        const res = await fetchQuotaInfo();
-
-        const managersObject = res.features?.find((obj) => obj.id === MANAGER);
-
-        if (managersObject?.value !== previousManagersCount) {
-          setPortalQuotaValue(res);
-
-          resetIntervalSuccess();
-        }
-      } catch (e) {
-        setIsLoading(false);
-
-        intervalId && toastr.error(e as string);
-        clearInterval(intervalId);
-        intervalId = undefined;
-      }
-
-      isWaitRequest = false;
-    }, 2000);
-  };
   const onClose = () => {
     setIsVisiblePaymentConfirm(false);
   };
 
-  const goLinkCard = () => {
-    cardLinked
-      ? window.open(cardLinked, "_self")
-      : toastr.error(t("UnexpectedError"));
+  const refreshAfterUpdate = async () => {
+    await Promise.all([
+      fetchPortalTariff(true),
+      fetchBalance(true),
+      fetchPortalQuota(true),
+    ]);
   };
 
-  const onUpdateTariff = async () => {
+  const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
+  const isBalanceInsufficient = walletBalance < dueTodayAmount;
+  const topUpShortfall = Math.max(0, Math.ceil(dueTodayAmount - walletBalance));
+
+  const executeWalletUpdate = async (
+    quantity: number,
+    type: (typeof ProductQuantityType)[keyof typeof ProductQuantityType],
+  ) => {
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
+      if (type === ProductQuantityType.Add && isBalanceInsufficient) {
+        const recommendedAmount = Math.ceil(dueTodayAmount - walletBalance);
+        if (recommendedAmount > 0) {
+          await paymentApi.topUpDeposit({
+            topUpDepositRequestDto: {
+              amount: recommendedAmount,
+              currency: walletCodeCurrency || "USD",
+            },
+          });
+        }
+      }
 
-      if (isVisiblePaymentConfirm) onClose();
-
-      const data: { [key: string]: number } = isYearTariff
-        ? { adminyear: managersCount }
-        : { admin: managersCount };
-
-      const updateRes = await paymentApi.updatePayment({
-        quantityRequestDto: {
-          quantity: data,
+      const updateRes = await paymentApi.updateWalletPayment({
+        walletQuantityRequestDto: {
+          quantity: { adminwallet: quantity },
+          productQuantityType: type,
         },
       });
 
       const res = updateRes?.data?.response;
 
       if (res === false) {
-        const errorText =
-          cardLinkedOnFreeTariff && walletCustomerStatusNotActive ? (
-            <>
-              {t("PaymentMethodUnlinked")} <br />
-              {t("LinkPaymentMethod")} {"  "}
-              <Link
-                onClick={goLinkCard}
-                fontWeight={600}
-                style={{ textDecoration: "underline" }}
-                data-testid="add_payment_method_link"
-                color="accent"
-              >
-                {t("AddPaymentMethod")}
-              </Link>
-            </>
-          ) : (
-            t("ErrorNotification")
-          );
-
-        toastr.error(errorText);
-
+        toastr.error(t("ErrorNotification"));
         setIsLoading(false);
-        clearTimeout(timerId);
-        timerId = undefined;
-
         return;
       }
 
-      window.dataLayer = window.dataLayer || [];
+      if (type === ProductQuantityType.Add) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: AnalyticsEvents.Purchase,
+          ecommerce: { items: [{ item_name: "DocSpace Business" }] },
+        });
+      }
 
-      window.dataLayer.push({
-        event: AnalyticsEvents.Purchase,
-        ecommerce: {
-          items: [{ item_name: "DocSpace Business" }],
-        },
-      });
+      await Promise.all([
+        fetchPortalTariff(true),
+        fetchBalance(true),
+        fetchPortalQuota(true),
+      ]);
 
-      previousManagersCount = maxCountManagersByQuota;
-      const quotaRes = await paymentApi
-        .getQuotaPaymentInformation({
-          refresh: true,
-        })
-        .then((r) => r.data.response as unknown as QuotaDto);
-      const managersObject = quotaRes.features?.find(
-        (obj) => obj.id === MANAGER,
+      toastr.success(
+        t("BusinessUpdated", { planName: currentTariffPlanTitle }),
       );
 
-      if (managersObject?.value !== previousManagersCount) {
-        setPortalQuotaValue(quotaRes);
-        resetIntervalSuccess();
-      } else {
-        waitingForQuota();
-      }
+      setIsLoading(false);
     } catch (e) {
       console.error(e);
       toastr.error(t("ErrorNotification"));
       setIsLoading(false);
-      clearTimeout(timerId);
-      timerId = undefined;
     }
   };
 
+  const onUpdateTariff = () => {
+    if (isVisiblePaymentConfirm) onClose();
+
+    return executeWalletUpdate(
+      managersCount - maxCountManagersByQuota,
+      ProductQuantityType.Add,
+    );
+  };
+
   const isPassedByQuota = () => {
-    return isAlreadyPaid ? canDowngradeTariff : canPayTariff;
+    return isCardLinkedToPortal ? canDowngradeTariff : canPayTariff;
   };
 
   const onDowngradeTariff = () => {
     if (isPassedByQuota()) {
-      onUpdateTariff();
-      return;
-    }
-
-    setIsVisibleDowngradePlanDialog(true);
-  };
-
-  const onOpenPaymentDialog = () => {
-    if (isPassedByQuota()) {
-      setIsVisiblePaymentConfirm(true);
+      executeWalletUpdate(managersCount, ProductQuantityType.Set);
       return;
     }
 
@@ -272,84 +209,86 @@ const UpdatePlanButtonContainer = ({
     setIsVisibleDowngradePlanDialog(false);
   };
 
-  useEffect(() => {
-    if (intervalId && maxCountManagersByQuota !== previousManagersCount) {
-      resetIntervalSuccess();
-    }
-  }, [maxCountManagersByQuota, intervalId, previousManagersCount]);
+  const onTopUpConfirm = async () => {
+    setIsTopUpDialogVisible(false);
 
-  const goToStripePortal = () => {
-    paymentLink
-      ? window.open(paymentLink, "_blank")
-      : toastr.error(t("ErrorNotification"));
+    await (isRepurchase
+      ? executeWalletUpdate(managersCount, ProductQuantityType.Add)
+      : onUpdateTariff());
   };
 
-  useEffect(() => {
-    return () => {
-      timerId && clearTimeout(timerId);
-      timerId = undefined;
-
-      intervalId && clearInterval(intervalId);
-      intervalId = undefined;
-    };
-  }, []);
-
   const payTariffButton = () => {
-    return canPayTariff ? (
+    const buttonLabel =
+      !isCardLinkedToPortal || isBalanceInsufficient
+        ? t("TopUpAndUpgrade")
+        : t("UpgradeNow");
+
+    const onClick = () => {
+      if (canPayTariff) {
+        isCardLinkedToPortal
+          ? executeWalletUpdate(managersCount, ProductQuantityType.Add)
+          : setIsTopUpDialogVisible(true);
+        return;
+      }
+
+      setIsVisibleDowngradePlanDialog(true);
+    };
+
+    return (
       <Button
         className={styles.button}
-        label={t("UpgradeNow")}
+        label={buttonLabel}
         size={ButtonSize.medium}
         primary
         isDisabled={isLessCountThanAcceptable || isLoading || isDisabled}
-        onClick={goToStripePortal}
+        onClick={onClick}
         isLoading={isLoading}
         testId="upgrade_plan_button"
-      />
-    ) : (
-      <DowngradePlanButtonContainer
-        buttonLabel={t("UpgradeNow")}
-        onUpdateTariff={goToStripePortal}
-        isDisabled={isDisabled}
       />
     );
   };
 
   const updatingCurrentTariffButton = () => {
-    const isDowngradePlan = managersCount < maxCountManagersByQuota;
-    const isTheSameCount = managersCount === maxCountManagersByQuota;
-
-    if (cardLinkedOnFreeTariff) {
-      return (
-        <Button
-          className={styles.button}
-          label={t("UpgradeNow")}
-          size={ButtonSize.medium}
-          primary
-          isDisabled={isLoading || isDisabled}
-          onClick={onOpenPaymentDialog}
-          isLoading={isLoading}
-          testId="upgrade_plan_button"
-        />
-      );
-    }
+    const isDowngradePlan =
+      !isFreeTariff && managersCount < maxCountManagersByQuota;
+    const isTheSameCount =
+      !isFreeTariff && managersCount === maxCountManagersByQuota;
 
     return isDowngradePlan ? (
       <DowngradePlanButtonContainer
-        onDowngradeTariff={onDowngradeTariff}
-        isDisabled={isDisabled}
+        onDowngradeTariff={
+          needsWalletMigration
+            ? () => setIsMigrateDialogVisible(true)
+            : onDowngradeTariff
+        }
+        isDisabled={isDisabled || hasScheduledTariffAdminsChange}
         buttonLabel={t("DowngradeNow")}
       />
     ) : (
       <Button
         className={styles.button}
-        label={t("UpgradeNow")}
+        label={
+          tariffDueTodayAmount !== null &&
+          isBalanceInsufficient &&
+          !isTheSameCount
+            ? t("TopUpAndUpgrade")
+            : t("UpgradeNow")
+        }
         size={ButtonSize.medium}
         primary
         isDisabled={
-          isLessCountThanAcceptable || isTheSameCount || isLoading || isDisabled
+          isLessCountThanAcceptable ||
+          isTheSameCount ||
+          isLoading ||
+          isDisabled ||
+          isTariffDueTodayCalculating ||
+          hasScheduledTariffAdminsChange
         }
-        onClick={onUpdateTariff}
+        onClick={
+          needsWalletMigration
+            ? () => setIsMigrateDialogVisible(true)
+            : onUpdateTariff
+        }
         isLoading={isLoading}
         testId="upgrade_plan_button"
       />
@@ -358,14 +297,35 @@ const UpdatePlanButtonContainer = ({
 
   return (
     <div className={styles.body}>
-      {isAlreadyPaid || cardLinkedOnFreeTariff
-        ? updatingCurrentTariffButton()
-        : payTariffButton()}
+      {isRepurchase ? payTariffButton() : updatingCurrentTariffButton()}
 
       {isVisibleDowngradePlanDialog ? (
         <ChangePricingPlanDialog
           visible={isVisibleDowngradePlanDialog}
           onClose={onCloseDowngradePlanDialog}
+        />
+      ) : null}
+
+      {isMigrateDialogVisible ? (
+        <MigrateToWalletDialog
+          visible={isMigrateDialogVisible}
+          onClose={() => setIsMigrateDialogVisible(false)}
+          onMigrated={refreshAfterUpdate}
+        />
+      ) : null}
+
+      {isTopUpDialogVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpDialogVisible}
+          onClose={() => setIsTopUpDialogVisible(false)}
+          onConfirm={isCardMissingOrInactive ? undefined : onTopUpConfirm}
+          isFirstTopUp={isCardMissingOrInactive}
+          minValue={topUpShortfall > 0 ? `${topUpShortfall}` : undefined}
+          successParams={{
+            admins: `${managersCount}`,
+            storage: getConvertedSize(t, allowedStorageSizeByQuota),
+            plan: isFreeTariff ? tariffPlanTitle : currentTariffPlanTitle,
+          }}
         />
       ) : null}
 

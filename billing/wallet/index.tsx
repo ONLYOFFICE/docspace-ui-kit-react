@@ -50,6 +50,8 @@ type WalletProps = {
   showPortalSettingsLoader?: boolean;
   isUpdatingTariff?: boolean;
   integrationUrl?: string;
+  onViewUsage?: () => void;
+  onAddonsClick?: () => void;
 };
 
 const Wallet = observer((props: WalletProps) => {
@@ -74,7 +76,6 @@ const Wallet = observer((props: WalletProps) => {
 
   useEffect(() => {
     const onTopUpWallet = (data: { auto: boolean }) => {
-
       if (!data || data?.auto === false) return;
 
       fetchBalance(true);
@@ -92,7 +93,7 @@ const Wallet = observer((props: WalletProps) => {
     <WalletLoader />
   ) : (
     <>
-      <WalletContainer />
+      <WalletContainer {...props} />
       {isShowStorageTariffDeactivatedModal ? (
         <StorageTariffDeactivated
           visible={isShowStorageTariffDeactivatedModal}

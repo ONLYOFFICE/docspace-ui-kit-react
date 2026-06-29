@@ -150,6 +150,16 @@
   color: var(--text-color);
 }
 
+.tariffActivation {
+  display: flex;
+  flex-direction: column;
+  word-break: break-word;
+}
+
+.tariffActivationDetails {
+  color: var(--text-disable-color);
+}
+
 .heroText {
   display: flex;
   flex-direction: column;

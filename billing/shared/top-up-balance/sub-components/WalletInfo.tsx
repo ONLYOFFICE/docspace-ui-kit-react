@@ -34,17 +34,19 @@
  */
 
 import React from "react";
+import { observer } from "mobx-react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import classNames from "classnames";
 
 import { Text } from "../../../../components/text";
-import { Link } from "../../../../components/link";
+import { Button, ButtonSize } from "../../../../components/button";
 
 import WalletIcon from "../../../../assets/icons/16/wallet.react.svg";
 
+import { usePaymentStore } from "../../../store/PaymentStoreProvider";
+
 import styles from "../styles/TopUpModal.module.scss";
-import { getBrandName } from "../../../../constants/brands";
 
 type WalletInfoProps = {
   balance?: string;
@@ -67,6 +69,7 @@ const WalletInfo = (props: WalletInfoProps) => {
     withoutBackground,
   } = props;
   const t = useCommonTranslation();
+  const { isPayer } = usePaymentStore();
 
   const keyProp = isBalanceInsufficient
     ? { tKey: "BalanceInsufficient" }
@@ -79,17 +82,14 @@ const WalletInfo = (props: WalletInfoProps) => {
         [styles.withoutBackground]: withoutBackground,
       })}
     >
-      <div className={styles.walletInfoIcon}>
-        {icon ?? <WalletIcon />}
-      </div>
+      <div className={styles.walletInfoIcon}>{icon ?? <WalletIcon />}</div>
       <div className={styles.walletInfoBody}>
         <Text
           className={styles.walletInfoTitle}
           fontWeight="600"
           fontSize="14px"
         >
-          {title ??
-            t("ProductNameWallet", { productName: getBrandName("ProductName") })}
+          {title ?? t("Wallet")}
         </Text>
         <div
           className={classNames(styles.walletInfoBalance, {
@@ -97,7 +97,6 @@ const WalletInfo = (props: WalletInfoProps) => {
           })}
         >
           <CommonTrans
-           
             i18nKey={keyProp.tKey}
             values={{ balance }}
             components={{
@@ -115,22 +114,18 @@ const WalletInfo = (props: WalletInfoProps) => {
           />
         </div>
       </div>
-      {onTopUp ? (
-        <Link
+      {onTopUp && isPayer ? (
+        <Button
           className={styles.walletInfoTopUp}
-          fontSize="13px"
-          fontWeight="600"
+          size={ButtonSize.small}
+          label={t("TopUp")}
           onClick={onTopUp}
-          textDecoration="underline"
-          dataTestId="top_up_wallet_link"
-          color="accent"
-        >
-          {t("TopUp")}
-        </Link>
+          testId="top_up_wallet_button"
+        />
       ) : null}
     </div>
   );
 };
 
-export default WalletInfo;
+export default observer(WalletInfo);
 

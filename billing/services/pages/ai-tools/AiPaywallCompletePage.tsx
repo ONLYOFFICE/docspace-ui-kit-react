@@ -35,7 +35,10 @@
 
 import React from "react";
 
-import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
+import {
+  TenantWalletService,
+  ProductQuantityType,
+} from "@onlyoffice/docspace-api-sdk";
 
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { Text } from "../../../../components/text";
@@ -64,6 +67,14 @@ const WALLET_REDIRECT_URL = "/portal-settings/payments/wallet";
 const TOPUP_RETRY_ATTEMPTS = 10;
 const TOPUP_RETRY_DELAY_MS = 3000;
 
+const ACTIVATABLE_SERVICES = {
+  ai: {
+    walletService: TenantWalletService.AITools,
+  },
+} as const;
+
+type ActivateService = keyof typeof ACTIVATABLE_SERVICES;
+
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
@@ -88,29 +99,50 @@ const withRetry = async <T,>(
 
 const AiPaywallCompletePage = () => {
   const t = useCommonTranslation();
-  const { paymentApi, rawApiClient } = useApi();
+  const { paymentApi } = useApi();
 
   const [status, setStatus] = React.useState<Status>("processing");
   const [stepIndex, setStepIndex] = React.useState(1);
 
-  const { currency, amount, type, language } = React.useMemo(() => {
-    if (typeof window === "undefined") {
+  const { currency, amount, type, language, service, admins, storage, plan } =
+    React.useMemo(() => {
+      if (typeof window === "undefined") {
+        return {
+          currency: "USD",
+          amount: AI_PAYWALL_START_AMOUNT,
+          type: "",
+          language: "en",
+          service: "",
+          admins: "",
+          storage: "",
+          plan: "",
+        };
+      }
+      const urlParams = new URLSearchParams(window.location.search);
+      const parsedAmount = Number(urlParams.get("amount"));
       return {
-        currency: "USD",
-        amount: AI_PAYWALL_START_AMOUNT,
-        type: "",
-        language: "en",
+        currency: urlParams.get("currency") || "USD",
+        amount: parsedAmount > 0 ? parsedAmount : AI_PAYWALL_START_AMOUNT,
+        type: urlParams.get("type") || "",
+        language: urlParams.get("language") || "en",
+        service: urlParams.get("service") || "",
+        admins: urlParams.get("admins") || "",
+        storage: urlParams.get("storage") || "",
+        plan: urlParams.get("plan") || "",
       };
+    }, []);
+
+  const activateConfig =
+    ACTIVATABLE_SERVICES[service as ActivateService] ?? null;
+
+  const getActivateStepLabel = () => {
+    switch (service) {
+      case "ai":
+        return t("AIPaywallCallbackStepActivate");
+      default:
+        return "";
     }
-    const urlParams = new URLSearchParams(window.location.search);
-    const parsedAmount = Number(urlParams.get("amount"));
-    return {
-      currency: urlParams.get("currency") || "USD",
-      amount: parsedAmount > 0 ? parsedAmount : AI_PAYWALL_START_AMOUNT,
-      type: urlParams.get("type") || "",
-      language: urlParams.get("language") || "en",
-    };
-  }, []);
+  };
 
   const isWalletOnly = type === "wallet";
 
@@ -143,24 +175,28 @@ const AiPaywallCompletePage = () => {
           event: AnalyticsEvents.WalletTopUp,
         });
 
-        if (!isWalletOnly) {
-          await rawApiClient.instance.post(
-            "api/2.0/portal/payment/creditaibalance",
-            { amount },
-          );
+        setStepIndex(2);
 
-          setStepIndex(2);
-
+        if (activateConfig) {
           await paymentApi.changeTenantWalletServiceState({
             changeWalletServiceStateRequestDto: {
-              service: TenantWalletService.AITools,
+              service: activateConfig.walletService,
               enabled: true,
             },
           });
 
           setStepIndex(3);
-        } else {
-          setStepIndex(2);
+        }
+
+        if (admins) {
+          await paymentApi.updateWalletPayment({
+            walletQuantityRequestDto: {
+              quantity: { adminwallet: Number(admins) },
+              productQuantityType: ProductQuantityType.Add,
+            },
+          });
+
+          setStepIndex(3);
         }
 
         await new Promise((resolve) => setTimeout(resolve, 700));
@@ -182,16 +218,35 @@ const AiPaywallCompletePage = () => {
       : BILLING_REDIRECT_URL;
   };
 
-  const steps = isWalletOnly
-    ? [
-        t("WalletTopUpStepCardSaved"),
-        t("WalletTopUpCallbackStep", { price: formattedAmount }),
-      ]
-    : [
-        t("AIPaywallCallbackStepLinkCard"),
-        t("AIPaywallCallbackStepTopUp"),
-        t("AIPaywallCallbackStepActivate"),
-      ];
+  const tariffStep =
+    admins && storage ? (
+      <span className={styles.tariffActivation}>
+        <Text as="span" fontSize="14px" fontWeight={700}>
+          {t("ActivatingPlan", { planName: plan })}
+        </Text>
+        <Text
+          as="span"
+          fontSize="12px"
+          fontWeight={400}
+          className={styles.tariffActivationDetails}
+        >
+          {t("TariffActivationDetails", { admins, storage })}
+        </Text>
+      </span>
+    ) : null;
+
+  const steps: { key: string; label: React.ReactNode }[] = [
+    { key: "card", label: t("WalletTopUpStepCardSaved") },
+    {
+      key: "topup",
+      label: t("WalletTopUpCallbackStep", { price: formattedAmount }),
+    },
+    ...(tariffStep
+      ? [{ key: "tariff", label: tariffStep }]
+      : service
+        ? [{ key: "service", label: getActivateStepLabel() }]
+        : []),
+  ];
 
   return (
     <div className={styles.page}>
@@ -226,7 +281,7 @@ const AiPaywallCompletePage = () => {
             </div>
 
             <ol className={styles.timeline}>
-              {steps.map((label, index) => {
+              {steps.map((step, index) => {
                 const state =
                   index < stepIndex
                     ? "done"
@@ -237,7 +292,7 @@ const AiPaywallCompletePage = () => {
 
                 return (
                   <li
-                    key={label}
+                    key={step.key}
                     className={styles.timelineItem}
                     data-state={state}
                   >
@@ -265,7 +320,7 @@ const AiPaywallCompletePage = () => {
                       fontSize="14px"
                       fontWeight={700}
                     >
-                      {label}
+                      {step.label}
                     </Text>
                   </li>
                 );

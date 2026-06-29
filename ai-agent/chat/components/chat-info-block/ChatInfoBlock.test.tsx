@@ -60,52 +60,49 @@ describe("<ChatInfoBlock />", () => {
     vi.clearAllMocks();
   });
 
-  it("renders with user description when not a portal admin", () => {
+  it("renders contact-admin description when not a portal admin", () => {
     render(<ChatInfoBlock isPortalAdmin={false} standalone={false} />);
 
     expect(screen.getByTestId("chat-info-block")).toBeInTheDocument();
     expect(screen.getByTestId("bar-header")).toHaveTextContent(
+      "AIFeaturesNotActive",
+    );
+    expect(screen.getByTestId("bar-body")).toHaveTextContent(
+      "AIDisabledInfoBlockContactAdminDescription",
+    );
+  });
+
+  it("renders admin standalone description when portal admin and standalone", () => {
+    render(<ChatInfoBlock isPortalAdmin={true} standalone={true} />);
+
+    expect(screen.getByTestId("bar-header")).toHaveTextContent(
       "AIFeaturesAreCurrentlyDisabled",
     );
     expect(screen.getByTestId("bar-body")).toHaveTextContent(
-      "AIDisabledInfoBlockUserDescription",
-    );
-
-    expect(PublicRoomBar).toHaveBeenCalledWith(
-      expect.objectContaining({
-        bodyText: "AIDisabledInfoBlockUserDescription",
-      }),
-      undefined,
+      "AIDisabledInfoBlockStandaloneDescription",
     );
   });
 
-  it("renders with admin standalone description when portal admin and standalone", () => {
-    render(<ChatInfoBlock isPortalAdmin={true} standalone={true} />);
-
-    expect(screen.getByTestId("bar-body")).toHaveTextContent(
-      "AIDisabledInfoBlockAdminStandaloneDescription",
+  it("renders activate and benefits links for a saas payer admin", () => {
+    render(
+      <ChatInfoBlock
+        isPortalAdmin={true}
+        standalone={false}
+        isPayer={true}
+        isCardLinkedToPortal={true}
+        onActivateAI={vi.fn()}
+        onShowAIBenefits={vi.fn()}
+      />,
     );
 
-    expect(PublicRoomBar).toHaveBeenCalledWith(
-      expect.objectContaining({
-        bodyText: "AIDisabledInfoBlockAdminStandaloneDescription",
-      }),
-      undefined,
+    expect(screen.getByTestId("bar-header")).toHaveTextContent(
+      "AIFeaturesNotActive",
     );
-  });
-
-  it("renders with admin saas description when portal admin and not standalone", () => {
-    render(<ChatInfoBlock isPortalAdmin={true} standalone={false} />);
-
-    expect(screen.getByTestId("bar-body")).toHaveTextContent(
-      "AIDisabledInfoBlockAdminSaasDescription",
+    const body = screen.getByTestId("bar-body");
+    expect(body).toHaveTextContent(
+      "AIDisabledInfoBlockActivateWalletDescription",
     );
-
-    expect(PublicRoomBar).toHaveBeenCalledWith(
-      expect.objectContaining({
-        bodyText: "AIDisabledInfoBlockAdminSaasDescription",
-      }),
-      undefined,
-    );
+    expect(body).toHaveTextContent("Activate");
+    expect(body).not.toHaveTextContent("Benefits");
   });
 });

@@ -35,6 +35,7 @@
 
 export { default as MainTariff } from "./main-tariff";
 export { default as Wallet } from "./wallet";
+export { default as Usage } from "./usage";
 export { default as PaymentMethod } from "./payment-method";
 export { default as ServicesList } from "./services";
 export { default as BillingRoot } from "./BillingRoot";

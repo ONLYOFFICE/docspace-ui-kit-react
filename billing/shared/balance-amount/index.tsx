@@ -27,6 +27,7 @@ type BalanceAmountProps = {
   withoutMargin?: boolean;
   mainFontSize?: string;
   fractionFontSize?: string;
+  titleFontSize?: string;
 };
 
 const typeClassMap: Record<string, string> = {
@@ -49,11 +50,12 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     amount = 0,
     currency = "USD",
     language = "en",
-    maximumFractionDigits = 3,
+    maximumFractionDigits = 2,
     className,
     withoutMargin = false,
     mainFontSize,
     fractionFontSize,
+    titleFontSize = "18px",
   } = props;
 
   const tokens: BalanceAmountToken[] = useMemo(() => {
@@ -79,16 +81,18 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     <div className={className}>
       {title ? (
         <div className={styles.headerContainer}>
-          <Text isBold fontSize="18px" className={styles.balanceTitle}>
-            {title}
-          </Text>
+          <div className={styles.titleRow}>
+            <Text isBold fontSize={titleFontSize} className={styles.title}>
+              {title}
+            </Text>
 
-          {showRefresh && onRefresh ? (
-            <RefreshIconButton
-              onRefresh={onRefresh}
-              isRefreshing={isRefreshing}
-            />
-          ) : null}
+            {showRefresh && onRefresh ? (
+              <RefreshIconButton
+                onRefresh={onRefresh}
+                isRefreshing={isRefreshing}
+              />
+            ) : null}
+          </div>
 
           {progressText ? (
             <Text

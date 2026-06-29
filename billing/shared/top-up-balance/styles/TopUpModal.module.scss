@@ -60,6 +60,7 @@
   border-radius: 6px;
   align-items: center;
   position: relative;
+  max-width: 660px;
 }
 
  .shortView {
@@ -118,13 +119,6 @@
 
 .walletInfoTopUp {
   margin-left: auto;
-  color: var(--payment-link-color);
-  cursor: pointer;
-  font-weight: 600;
-
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
 .balanceValue {

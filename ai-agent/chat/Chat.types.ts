@@ -259,6 +259,14 @@ export type ChatInputProps = {
 export type ChatInfoBlockProps = {
   standalone: boolean;
   isPortalAdmin: boolean;
+  isPayer?: boolean;
+  isCardLinkedToPortal?: boolean;
+  walletCustomerEmail?: string | null;
+  walletCustomerDisplayName?: string | null;
+  onActivateAI?: () => void;
+  onTopUpAndActivateAI?: () => void;
+  onShowAIBenefits?: () => void;
+  isActivating?: boolean;
 };
 
 export type ChatFooterProps = ChatInputProps & ChatInfoBlockProps;
@@ -292,6 +300,14 @@ export type ChatProps = {
   messagesSettings?: Omit<ReturnType<typeof useInitMessages>, "initMessages">;
   isAdmin?: boolean;
   standalone?: boolean;
+  isPayer?: boolean;
+  isCardLinkedToPortal?: boolean;
+  walletCustomerEmail?: string | null;
+  walletCustomerDisplayName?: string | null;
+  onActivateAI?: () => void;
+  onTopUpAndActivateAI?: () => void;
+  onShowAIBenefits?: () => void;
+  isActivatingAI?: boolean;
 
   multimodal?: TMultimodal;
   goToAISettings?: () => void;

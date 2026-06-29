@@ -1,71 +1,80 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
   box-sizing: border-box;
 }
 
-.toggleSection  {
-  max-width: 660px;
-}
-
-
-
-.balanceSection {
-  width: 100%;
-}
-
-.balanceCard {
-  width: 320px;
-  border: 1px solid var(--aside-header-border-color);
-  border-radius: 6px;
-  padding: 12px;
+.section {
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-  overflow: hidden;
+  gap: 16px;
+  max-width: 660px;
+  margin-top: 16px;
 }
 
-.lowBalance{
-  color: var(--warning-color);
-  margin-top:16px;
-}
-
-
-.lastTopUpRow {
+.sectionHeader {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
-.lastTopUpLabel {
-  color: var(--text-disable-color);
-}
+.cardsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 
-.lastTopUpLabel{
-  color: var(--payment-contact-container-link-color)
-}
-
-.lastTopUpValue{
-  color: var(--text-color)
-}
-
-.lastTopUpValue {
-  color: var(--text-color);
-}
-
-.lastTopUpDate {
-  color: var(--text-disable-color);
-}
-
-.pricingLink {
-  padding: 2px 0;
-}
-
-.tabsWrapper {
-  :global(.tabs-body) {
-    display: block;
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
   }
 }
 
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--payment-card-background-color);
+  border: 1px solid var(--payment-card-border-color);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.cardLabel {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--payment-inactive-color);
+}
+
+.cardValue {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  color: var(--text-color);
+}
+
+.cardCaption {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--text-color);
+}
+
+.viewMoreLink {
+  color: var(--color-scheme-main-accent);
+}
+
+.pricingRow {
+  margin-top: 16px;
+  line-height: 20px;
+  color: var(--text-color);
+}
+
+.lowBalance {
+  margin-bottom: 16px;
+  color: var(--warning-color);
+}
+
+.unlinkedBanner {
+  margin-top: 10px;
+}

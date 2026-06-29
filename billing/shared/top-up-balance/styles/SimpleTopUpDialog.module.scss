@@ -1,6 +1,12 @@
 .body {
   display: flex;
   flex-direction: column;
+
+  --field-container-margin: 0;
+
+  :global([class*="amountContainer"]) {
+    margin-top: 16px;
+  }
 }
 
 .description {
@@ -9,7 +15,7 @@
 
 .helperText {
   color: var(--text-disable-color);
-  margin-top: -10px;
+  margin-top: 6px;
 }
 
 .footerButtons {

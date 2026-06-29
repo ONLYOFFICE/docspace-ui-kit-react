@@ -36,17 +36,14 @@
 import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 import { Text } from "../../components/text";
-import { Link } from "../../components/link";
 import { observer } from "mobx-react";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
-import { toastr } from "../../components/toast";
 import SelectUsersCountContainer from "./sub-components/SelectUsersCountContainer";
 import TotalTariffContainer from "./sub-components/TotalTariffContainer";
 import ButtonContainer from "./sub-components/ButtonContainer";
 import CurrentUsersCountContainer from "./sub-components/CurrentUsersCount";
 
 import type { TTranslation } from "../../utils/common";
-import { toAbsoluteUrl } from "../utils/url";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import styles from "./MainTariff.module.scss";
@@ -62,19 +59,13 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
     maxAvailableManagersCount,
     canUpdateTariff,
     managersCount,
-    isPayer,
     isAlreadyPaid,
-    cardLinked,
     getPaymentLink,
     formatPaymentCurrency,
   } = store;
 
-  const {
-    isGracePeriod,
-    isNotPaidPeriod,
-    walletCustomerStatusNotActive,
-    walletCustomerEmail,
-  } = store.tariff;
+  const { isGracePeriod, isNotPaidPeriod, walletCustomerStatusNotActive } =
+    store.tariff;
   const { isYearTariff } = store.quotas;
   const { planCost, addedManagersCountTitle } = store.paymentQuotas;
 
@@ -115,12 +106,6 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
   }, []);
 
   const isDisabled = !canUpdateTariff;
-
-  const goLinkCard = () => {
-    cardLinked
-      ? window.open(toAbsoluteUrl(cardLinked), "_self")
-      : toastr.error(t("UnexpectedError"));
-  };
 
   const priceInfoPerManager = (
     <div className={styles.paymentPriceUser}>
@@ -182,47 +167,6 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
         {priceInfoPerManager}
 
         <TotalTariffContainer t={t} isDisabled={isDisabled} />
-
-        {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
-          <div className={styles.cardUnlinkedWarning}>
-            <Text fontWeight={600} className={styles.warningColor}>
-              {t("PaymentMethodUnlinked")}
-            </Text>
-            {isPayer ? (
-              <Text as="span" className={styles.warningColor}>
-                {t("LinkPaymentMethod")}
-              </Text>
-            ) : (
-              <Text className={styles.warningColor}>
-                <CommonTrans
-                  i18nKey="LinkNewPaymentMethodEmail"
-                  values={{ email: walletCustomerEmail }}
-                  components={{
-                    1: (
-                      <Link
-                        href={`mailto:${walletCustomerEmail}`}
-                        color="accent"
-                        textDecoration="underline"
-                      />
-                    ),
-                  }}
-                />
-              </Text>
-            )}
-            {isPayer ? (
-              <div>
-                <Link
-                  onClick={goLinkCard}
-                  fontWeight={600}
-                  textDecoration="underline"
-                  color="accent"
-                >
-                  {t("AddPaymentMethod")}
-                </Link>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
 
         <ButtonContainer
           isDisabled={

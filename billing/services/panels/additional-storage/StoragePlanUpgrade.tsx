@@ -422,6 +422,10 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         </ModalDialog.Header>
         <ModalDialog.Body>
           <div className={styles.dialogBody}>
+            <Text className={styles.dialogDescription} fontSize="12px">
+              {t("AdjustStorageToExactAmount")}
+            </Text>
+
             <WalletContainer isBalanceInsufficient={isBalanceInsufficient} />
 
             <div className={styles.inputSection}>

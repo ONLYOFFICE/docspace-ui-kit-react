@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useState } from "react";
+import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
@@ -57,10 +57,8 @@ import { usePermissionTooltipText } from "./hooks/usePermissionTooltipText";
 import ServiceCard from "./sub-components/ServiceCard";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
-import { useServicesStore } from "../store/ServicesStoreProvider";
 import { Link, LinkTarget } from "../../components/link";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
-import PricingBillingBody from "./panels/ai-service/PricingBillingBody";
 
 type ServicesItemsProps = {
   onToggle?: (id: string, enabled: boolean) => void;
@@ -69,6 +67,7 @@ type ServicesItemsProps = {
   isMobile?: boolean;
   isTablet?: boolean;
   cardDisabled?: boolean;
+  onOpenSupportedModels?: () => void;
 };
 
 const ServicesItems: React.FC<ServicesItemsProps> = ({
@@ -76,15 +75,12 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   onClick,
   isMobile,
   isTablet,
-  cardDisabled: forceCardDisabled,
+  onOpenSupportedModels,
 }) => {
   const paymentStore = usePaymentStore();
-  const servicesStore = useServicesStore();
 
   const {
     isServiceActionDisabled,
-    isPayer,
-    isCardLinkedToPortal,
     servicesQuotasFeatures,
     storageSizeIncrement,
     storagePriceIncrement,
@@ -92,19 +88,12 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     availableBackupsCount,
     isBackupServiceOn,
     isStorageDeactivationVisited,
+    isLowWalletBalance,
   } = paymentStore;
-
-  const {
-    aiServiceBalance,
-    formatAiServiceCurrency,
-    isAiServiceLowBalance,
-    wasFirstAiServiceTopUp,
-  } = servicesStore;
 
   const { isFreeTariff } = paymentStore.quotas;
 
   const {
-    isGracePeriod,
     hasScheduledStorageChange,
     walletCustomerEmail,
     currentStoragePlanSize,
@@ -116,8 +105,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
   const isDisabled = isServiceActionDisabled;
   const { t } = useServicesActions();
-
-  const [isPricingBillingVisible, setIsPricingBillingVisible] = useState(false);
 
   const permissionTooltipText = usePermissionTooltipText();
 
@@ -147,15 +134,15 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     onClick?.(id!);
   };
 
-  const onOpenPricingBilling = (e: React.MouseEvent) => {
+  const onSupportedModelsClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    setIsPricingBillingVisible(true);
+    onOpenSupportedModels?.();
   };
 
-  const onClosePricingBilling = () => {
-    setIsPricingBillingVisible(false);
+  const onPricingLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   const textTooltip = (
@@ -229,30 +216,51 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
         });
 
       case AI_ENUM:
-        if (isAiServiceLowBalance) {
-          return t("AIPricingAvailableCreditsLowBalance", {
-            price: formatAiServiceCurrency(),
-          });
-        }
-
-        if (aiServiceBalance && aiServiceBalance > 0) {
-          return t("AIPricingAvailableCredits", {
-            price: formatAiServiceCurrency(),
-          });
+        if (isLowWalletBalance) {
+          return (
+            <CommonTrans
+              i18nKey="AIPricingLowBalanceWithModels"
+              values={{ price: formatWalletCurrency() }}
+              components={{
+                1: (
+                  <Link
+                    fontSize="13px"
+                    fontWeight={600}
+                    color="accent"
+                    textDecoration="underline dotted"
+                    onClick={onSupportedModelsClick}
+                    dataTestId="ai_supported_models_link"
+                  />
+                ),
+              }}
+            />
+          );
         }
 
         return (
           <CommonTrans
-            i18nKey="AIPricingBilledPerUsageAndPricing"
+            i18nKey="AIUsagePricingNote"
             components={{
               1: (
                 <Link
                   fontSize="13px"
                   fontWeight={600}
-                  className={styles.accountLink}
                   color="accent"
-                  onClick={onOpenPricingBilling}
                   textDecoration="underline dotted"
+                  href="https://openrouter.ai/models"
+                  target={LinkTarget.blank}
+                  onClick={onPricingLinkClick}
+                  dataTestId="ai_openrouter_pricing_link"
+                />
+              ),
+              2: (
+                <Link
+                  fontSize="13px"
+                  fontWeight={600}
+                  color="accent"
+                  textDecoration="underline dotted"
+                  onClick={onSupportedModelsClick}
+                  dataTestId="ai_supported_models_link"
                 />
               ),
             }}
@@ -265,17 +273,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
   return (
     <div style={{ width: "100%" }}>
-      <PricingBillingBody
-        visible={isPricingBillingVisible}
-        onClose={onClosePricingBilling}
-        isBackButton={false}
-        withoutFooter
-      />
-
       <Text className={styles.storageDescription}>
-        {isPayer || !isCardLinkedToPortal
-          ? t("ConnectAndConfigureServices")
-          : t("ServiceConfigurationNotice")}
+        {t("ConnectAndConfigureAddons")}
       </Text>
 
       <div
@@ -295,7 +294,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             return (
               <ServiceCard
                 key={item.id}
-                cardDisabled={forceCardDisabled}
                 toggleDisabled={isDisabled}
                 priceTitle={item.priceTitle}
                 id={item.id}
@@ -322,12 +320,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             return (
               <ServiceCard
                 key={item.id}
-                cardDisabled={
-                  forceCardDisabled ||
-                  (isCardLinkedToPortal
-                    ? !wasFirstAiServiceTopUp && !isPayer
-                    : false)
-                }
+                className={styles.aiCard}
                 toggleDisabled={isDisabled}
                 onClick={handleClick}
                 onToggle={handleToggle}
@@ -338,29 +331,20 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 image={item.image}
                 isEnabled={item.value}
                 tooltip={isDisabled ? permissionTooltipText : undefined}
-                isInactiveColor={
-                  aiServiceBalance ? aiServiceBalance > 0 && !item.value : false
-                }
-                isErrorColor={isAiServiceLowBalance}
+                isErrorColor={isLowWalletBalance}
                 icon={<PriceIcon />}
-                withoutIcon={!wasFirstAiServiceTopUp}
+                withoutIcon={!isLowWalletBalance}
+                withoutGreenColor
               />
             );
           }
 
           if (item.serviceName?.includes(DISK_STORAGE)) {
-            const eventDisabled =
-              isGracePeriod || isDisabled || hasScheduledStorageChange;
+            const eventDisabled = isDisabled || hasScheduledStorageChange;
 
             return (
               <ServiceCard
                 key={item.id}
-                cardDisabled={
-                  forceCardDisabled ||
-                  (isCardLinkedToPortal && !isPayer
-                    ? !hasStorageSubscription && !previousStoragePlanSize
-                    : false)
-                }
                 toggleDisabled={!!eventDisabled}
                 onClick={handleClick}
                 onToggle={handleToggle}

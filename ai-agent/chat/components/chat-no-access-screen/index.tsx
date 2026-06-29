@@ -34,11 +34,14 @@
  */
 
 import React from "react";
+import { Trans } from "react-i18next";
 
 import ChatNoAccessRightsDarkIcon from "../../../../assets/emptyview/empty.chat.access.rights.dark.svg";
 import ChatNoAccessRightsLightIcon from "../../../../assets/emptyview/empty.chat.access.rights.light.svg";
 
 import { EmptyView } from "../../../../components/empty-view";
+import { Text } from "../../../../components/text";
+import { Link, LinkType } from "../../../../components/link";
 import { useTheme } from "../../../../context/ThemeContext";
 import { match, P } from "ts-pattern";
 import { useCommonTranslation } from "../../../../utils/i18n";
@@ -48,14 +51,30 @@ type Props = {
   aiReady: boolean;
   standalone: boolean;
   isPortalAdmin: boolean;
+  isPayer?: boolean;
+  isCardLinkedToPortal?: boolean;
+  walletCustomerEmail?: string | null;
+  walletCustomerDisplayName?: string | null;
   goToAISettings?: () => void;
+  onActivateAI?: () => void;
+  onTopUpAndActivateAI?: () => void;
+  onShowAIBenefits?: () => void;
+  isActivating?: boolean;
 };
 
 export const ChatNoAccessScreen = ({
   aiReady,
   isPortalAdmin,
   standalone,
+  isPayer,
+  isCardLinkedToPortal,
+  walletCustomerEmail,
+  walletCustomerDisplayName,
   goToAISettings,
+  onActivateAI,
+  onTopUpAndActivateAI,
+  onShowAIBenefits,
+  isActivating,
 }: Props) => {
   const { isBase } = useTheme();
   const t = useCommonTranslation();
@@ -66,44 +85,77 @@ export const ChatNoAccessScreen = ({
     <ChatNoAccessRightsDarkIcon />
   );
 
-  const title =
-    isPortalAdmin && standalone
-      ? t("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
-          aiProvider: t("AIProvider"),
-        })
-      : t("AIFeaturesAreCurrentlyDisabled");
+  const title = match([standalone, isPortalAdmin])
+    // standalone admin
+    .with([true, true], () =>
+      t("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
+        aiProvider: t("AIProvider"),
+      }),
+    )
+    // saas (admin + user)
+    .with([false, P._], () => t("EmptyAIAgentsNotActiveYetTitle"))
+    // standalone user
+    .otherwise(() => t("AIFeaturesAreCurrentlyDisabled"));
 
   const description = match([standalone, isPortalAdmin])
     // standalone admin
     .with([true, true], () =>
-      t(
-        "EmptyAIAgentsAIDisabledStandaloneAdminDescription",
-        {
-          productName: getBrandName("ProductName"),
-          aiChats: t("AIChats"),
-        },
-      ),
+      t("EmptyAIAgentsAIDisabledStandaloneAdminDescription", {
+        productName: getBrandName("ProductName"),
+        aiChats: t("AIChats"),
+      }),
     )
     // saas admin
-    .with([false, true], () =>
-      t("EmptyChatAIDisabledSaasAdminDescription", {
-        productName: getBrandName("ProductName"),
-      }),
-    )
-    // standalone/saas user
-    .with([P._, false], () =>
-      t("EmptyChatAIDisabledUserDescription", {
-        productName: getBrandName("ProductName"),
-      }),
-    )
-    .otherwise(() => "");
+    .with([false, true], () => {
+      const payerLabel = walletCustomerDisplayName || walletCustomerEmail;
 
-  const goToServices = {
-    type: "button",
-    title: t("GoToSettings"),
-    key: "go-to-services",
-    onClick: goToAISettings,
-  } as const;
+      return (
+        <>
+          <Text as="span">{t("EmptyAIAgentsNotActiveYetDescription")}</Text>
+          <Text as="span" style={{ display: "block", marginTop: "8px" }}>
+            {t("EmptyAIAgentsNotActiveYetDescriptionLine2")}
+          </Text>
+          {!isPayer && payerLabel ? (
+            <Text as="span" style={{ display: "block", marginTop: "8px" }}>
+              <Trans
+                i18nKey="Common:EmptyAIAgentsNotActiveYetContactPayer"
+                values={{ payerContact: payerLabel }}
+                components={{
+                  1:
+                    walletCustomerEmail && !walletCustomerDisplayName ? (
+                      <Link
+                        key="chat-no-access-payer-link"
+                        type={LinkType.action}
+                        href={`mailto:${walletCustomerEmail}`}
+                        color="accent"
+                      />
+                    ) : (
+                      <Text
+                        key="chat-no-access-payer-name"
+                        as="span"
+                        fontWeight={600}
+                      />
+                    ),
+                }}
+              />
+            </Text>
+          ) : null}
+        </>
+      );
+    })
+    // standalone user
+    .with([true, false], () =>
+      t("EmptyAIAgentsAIDisabledDescription", {
+        productName: getBrandName("ProductName"),
+        aiAgents: t("AIAgents"),
+      }),
+    )
+    // saas user
+    .otherwise(() =>
+      t("EmptyAIDisabledContactAdminDesc", {
+        productName: getBrandName("ProductName"),
+      }),
+    );
 
   const goToAIProviderSettings = {
     type: "button",
@@ -112,12 +164,44 @@ export const ChatNoAccessScreen = ({
     onClick: goToAISettings,
   } as const;
 
-  const options =
-    !isPortalAdmin || !goToAISettings
-      ? []
-      : standalone
+  // saas admin: activate AI right away (or top up first) + show benefits.
+  // The actual logic lives on the client and is passed in via callbacks.
+  const activateOrTopUpAI = isCardLinkedToPortal
+    ? ({
+        type: "button",
+        title: t("Activate"),
+        key: "activate-ai",
+        onClick: onActivateAI,
+        isLoading: isActivating,
+      } as const)
+    : ({
+        type: "button",
+        title: t("TopUpAndActivate"),
+        key: "top-up-and-activate-ai",
+        onClick: onTopUpAndActivateAI,
+      } as const);
+
+  // const aiBenefits = {
+  //   type: "button",
+  //   title: t("Benefits"),
+  //   key: "ai-benefits",
+  //   primary: false,
+  //   onClick: onShowAIBenefits,
+  // } as const;
+
+  const getSaasAdminOptions = () => {
+    if (isCardLinkedToPortal && !isPayer) return [];
+    if (!activateOrTopUpAI.onClick) return [];
+    return [activateOrTopUpAI]; // aiBenefits
+  };
+
+  const options = !isPortalAdmin
+    ? []
+    : standalone
+      ? goToAISettings
         ? [goToAIProviderSettings]
-        : [goToServices];
+        : []
+      : getSaasAdminOptions();
 
   return (
     <EmptyView
@@ -129,3 +213,4 @@ export const ChatNoAccessScreen = ({
     />
   );
 };
+
