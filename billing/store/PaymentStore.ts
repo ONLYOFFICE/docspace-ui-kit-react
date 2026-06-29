@@ -620,7 +620,7 @@ class PaymentStore {
 
   formatWalletCurrency = (
     item: number | null = null,
-    fractionDigits: number = 3,
+    fractionDigits: number = 2,
     currency?: string,
   ) => {
     const amount = item ?? this.walletBalance;
