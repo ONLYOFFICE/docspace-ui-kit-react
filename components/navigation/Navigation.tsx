@@ -97,6 +97,7 @@ const Navigation = ({
   contextMenuHeader,
   analyzeResponsesButton,
   aiChatButton,
+  newChatButton,
   titleTooltip,
 
   ...rest
@@ -348,6 +349,7 @@ const Navigation = ({
               isPlusButtonVisible={isPlusButtonVisible}
               contextMenuHeader={contextMenuHeader}
               analyzeResponsesButton={analyzeResponsesButton}
+              newChatButton={newChatButton}
             />
           </div>
           <div className={styles.buttonsContainer}>

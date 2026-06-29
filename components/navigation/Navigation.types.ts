@@ -181,6 +181,8 @@ export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
     analyzeResponsesButton?: React.ReactNode;
     /** Optional AI Chat trigger rendered in the header control area. */
     aiChatButton?: React.ReactNode;
+    /** Optional "New chat" trigger rendered in the header control area (AI agent chat view). */
+    newChatButton?: React.ReactNode;
 
     isMobile?: boolean;
     isMobileOnly?: boolean;
@@ -202,6 +204,7 @@ export type TDropBoxProps = TArrowButtonProps &
     | "isMobile"
     | "analyzeResponsesButton"
     | "aiChatButton"
+    | "newChatButton"
   > &
   TRowParam & {
     ref?: React.RefObject<HTMLDivElement | null>;
