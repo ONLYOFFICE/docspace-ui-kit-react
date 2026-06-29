@@ -76,7 +76,9 @@ function resolveTheme(
   const fontFamily = getFontFamilyDependingOnLanguage(lang);
 
   const resolvedSystemTheme =
-    initialTheme === ThemeKeys.SystemStr ? getSystemTheme() : systemTheme;
+    initialTheme === ThemeKeys.SystemStr || systemTheme === undefined
+      ? getSystemTheme()
+      : systemTheme;
 
   const baseTheme = match<MatchType>([initialTheme, resolvedSystemTheme])
     .returnType<TTheme>()
@@ -167,3 +169,4 @@ const useTheme = ({
 };
 
 export default useTheme;
+
