@@ -325,11 +325,13 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         if (isNewSubscription) {
           await fetchPortalTariff!(true);
 
-          const targetPath = `${paymentStore.routes.diskStorage}?complete=true`;
-
           if (!window.location.pathname.includes("/disk-storage")) {
+            const targetPath = `${paymentStore.routes.diskStorage}?complete=true`;
             navigate(targetPath);
+            return;
           }
+
+          onClose();
           return;
         }
 

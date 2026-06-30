@@ -72,8 +72,8 @@ const WalletInfo = (props: WalletInfoProps) => {
   const { isPayer } = usePaymentStore();
 
   const keyProp = isBalanceInsufficient
-    ? { tKey: "BalanceInsufficient" }
-    : { tKey: "Balance" };
+    ? { tKey: "AvailableCreditsInsufficient" }
+    : { tKey: "AvailableCreditsAmount" };
 
   return (
     <div

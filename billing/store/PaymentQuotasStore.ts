@@ -44,6 +44,9 @@ import { MANAGER, YEAR_KEY } from "../constants";
 import { TOTAL_SIZE } from "./CurrentQuotasStore";
 import type CurrentQuotasStore from "./CurrentQuotasStore";
 
+/** Quota id of the future tariff used by MigrateToWalletDialog. */
+const FUTURE_TARIFF_QUOTA_ID = -14;
+
 class PaymentQuotasStore {
   private paymentApi: PaymentApi;
 
@@ -54,6 +57,11 @@ class PaymentQuotasStore {
   portalPaymentQuotas: QuotaDto | null = null;
 
   portalPaymentQuotasFeatures: Map<string, TenantQuotaFeatureDto> = new Map();
+
+  /** Future tariff quota (id -14), kept for MigrateToWalletDialog. */
+  futurePaymentQuotas: QuotaDto | null = null;
+
+  futurePaymentQuotasFeatures: Map<string, TenantQuotaFeatureDto> = new Map();
 
   isLoaded = false;
 
@@ -102,6 +110,14 @@ class PaymentQuotasStore {
     };
   }
 
+  get futurePlanCost() {
+    const price = this.futurePaymentQuotas?.price;
+    return {
+      value: price?.value ?? 0,
+      isoCurrencySymbol: price?.isoCurrencySymbol ?? "USD",
+    };
+  }
+
   get stepAddingQuotaManagers() {
     const result = this.portalPaymentQuotasFeatures.get(MANAGER) as
       | TNumericPaymentFeature
@@ -122,11 +138,13 @@ class PaymentQuotasStore {
 
     try {
       const res = await this.paymentApi.getPaymentQuotas(
-        {
-          wallet: false,
-        },
+        {},
         {
           signal: abortController.signal,
+          // TODO: move `additional` into the typed request once the SDK
+          // regenerates PaymentApiGetPaymentQuotasRequest with this field.
+          // Passed via axios params so it is appended to the query string.
+          params: { additional: false },
         },
       );
 
@@ -162,6 +180,16 @@ class PaymentQuotasStore {
       const isFreeTariff = this.currentQuotasStore?.isFreeTariff ?? true;
       const currentQuotaId = this.currentQuotasStore?.currentQuotaId ?? null;
 
+
+      if (currentQuotaId !== FUTURE_TARIFF_QUOTA_ID) {
+        const futureQuota = quotasById.get(FUTURE_TARIFF_QUOTA_ID);
+        this.futurePaymentQuotas = futureQuota ?? null;
+        this.futurePaymentQuotasFeatures = futureQuota?.featuresMap ?? new Map();
+      } else {
+        this.futurePaymentQuotas = null;
+        this.futurePaymentQuotasFeatures = new Map();
+      }
+
       let matchedQuota: QuotaWithMap | undefined;
 
       if (isFreeTariff) {
@@ -187,3 +215,4 @@ class PaymentQuotasStore {
 }
 
 export default PaymentQuotasStore;
+

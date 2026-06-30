@@ -182,6 +182,8 @@ class PaymentStore {
 
   totalPrice = 30;
 
+  futureTotalPrice = 0;
+
   tariffDueTodayAmount: number | null = null;
 
   isTariffDueTodayCalculating = false;
@@ -620,7 +622,7 @@ class PaymentStore {
 
   formatWalletCurrency = (
     item: number | null = null,
-    fractionDigits: number = 3,
+    fractionDigits: number = 2,
     currency?: string,
   ) => {
     const amount = item ?? this.walletBalance;
@@ -636,6 +638,21 @@ class PaymentStore {
   formatPaymentCurrency = (item?: number, fractionDigits: number = 0) => {
     const amount = item ?? this.walletBalance;
     const { isoCurrencySymbol } = this.paymentQuotas.planCost;
+
+    return formatCurrencyValue(
+      this.language,
+      amount,
+      isoCurrencySymbol || "USD",
+      fractionDigits,
+    );
+  };
+
+  formatFuturePaymentCurrency = (
+    item?: number,
+    fractionDigits: number = 0,
+  ) => {
+    const amount = item ?? this.walletBalance;
+    const { isoCurrencySymbol } = this.paymentQuotas.futurePlanCost;
 
     return formatCurrencyValue(
       this.language,
@@ -833,7 +850,11 @@ class PaymentStore {
     }
   };
 
-  fetchCardLinked = async (url?: string, successUrl?: string) => {
+  fetchCardLinked = async (
+    url?: string,
+    successUrl?: string,
+    persist: boolean = true,
+  ) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
@@ -855,13 +876,22 @@ class PaymentStore {
         },
       );
 
-      if (!res?.data?.response) return;
+      if (!res?.data?.response) return "";
 
-      this.cardLinked = res.data.response as unknown as string;
+      const linkUrl = res.data.response as unknown as string;
+
+      // The top-up flow passes persist=false so its checkout URL (built with a
+      // top-up successUrl) is only returned, not written to the shared
+      // this.cardLinked that UnlinkedCardBanner and other consumers rely on.
+      if (persist) this.cardLinked = linkUrl;
+
+      return linkUrl;
     } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
+      if (error instanceof Error && error.name === "CanceledError") return "";
       console.error(error);
     }
+
+    return "";
   };
 
   updateAutoPayments = async () => {
@@ -1329,6 +1359,15 @@ class PaymentStore {
     if (costValuePerManager) return value * +costValuePerManager;
   };
 
+  getFutureTotalCostByFormula = (value: number) => {
+    const costValuePerManager = this.paymentQuotas.futurePlanCost.value;
+    if (costValuePerManager) return value * +costValuePerManager;
+  };
+
+  get futureSubscriptionAmount() {
+    return this.getFutureTotalCostByFormula(this.managersCount) ?? 0;
+  }
+
   resetTariffContainerToBasic = () => {
     this.setBasicTariffContainer();
   };
@@ -1360,6 +1399,11 @@ class PaymentStore {
   setTotalPrice = (value: number) => {
     const price = this.getTotalCostByFormula(value);
     if (price !== this.totalPrice && price) this.totalPrice = price;
+  };
+
+  setFutureTotalPrice = (value: number) => {
+    const price = this.getFutureTotalCostByFormula(value);
+    if (price !== this.futureTotalPrice && price) this.futureTotalPrice = price;
   };
 
   setTariffDueTodayAmount = (value: number | null) => {

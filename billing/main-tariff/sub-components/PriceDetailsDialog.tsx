@@ -42,6 +42,7 @@ import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { Text } from "../../../components/text";
 import { Button, ButtonSize } from "../../../components/button";
 import { HelpButton } from "../../../components/help-button";
+import { Loader, LoaderTypes } from "../../../components/loader";
 import { ModalDialog } from "../../../components/modal-dialog";
 import { toastr } from "../../../components/toast";
 
@@ -73,13 +74,17 @@ const PriceDetailsDialog = observer(
       walletBalance,
       walletCodeCurrency,
       tariffDueTodayAmount,
+      isTariffDueTodayCalculating,
       formatPaymentCurrency,
       formatWalletCurrency,
       fetchBalance,
       language,
     } = store;
-    const { maxCountManagersByQuota, currentTariffPlanTitle, fetchPortalQuota } =
-      store.quotas;
+    const {
+      maxCountManagersByQuota,
+      currentTariffPlanTitle,
+      fetchPortalQuota,
+    } = store.quotas;
     const { planCost } = store.paymentQuotas;
     const { paymentDate, daysUntilPayment, fetchPortalTariff } = store.tariff;
 
@@ -164,7 +169,7 @@ const PriceDetailsDialog = observer(
           <div className={styles.content}>
             <WalletInfo balance={formatWalletCurrency()} />
 
-            <Text fontSize="16px" fontWeight={700} textAlign="center">
+            <Text fontSize="16px" fontWeight={700}>
               {t("OrderSummary")}
             </Text>
 
@@ -198,14 +203,20 @@ const PriceDetailsDialog = observer(
                   <HelpButton
                     iconNode={<InfoIcon />}
                     tooltipContent={
-                      <Text fontSize="12px">{t("DueTodayTooltip")}</Text>
+                      <Text fontSize="12px">
+                        {t("DueTodayProrationTooltip")}
+                      </Text>
                     }
                     dataTestId="price_details_due_today_help"
                   />
                 </div>
-                <Text as="span" fontSize="14px" fontWeight={600}>
-                  {formatPaymentCurrency(dueToday)}
-                </Text>
+                {isTariffDueTodayCalculating || tariffDueTodayAmount === null ? (
+                  <Loader color="" size="16px" type={LoaderTypes.track} />
+                ) : (
+                  <Text as="span" fontSize="14px" fontWeight={600}>
+                    {formatPaymentCurrency(dueToday)}
+                  </Text>
+                )}
               </div>
             </div>
 
@@ -233,7 +244,11 @@ const PriceDetailsDialog = observer(
             size={ButtonSize.normal}
             primary
             scale
-            isDisabled={isLoading}
+            isDisabled={
+              isLoading ||
+              isTariffDueTodayCalculating ||
+              tariffDueTodayAmount === null
+            }
             isLoading={isSubmitting}
             onClick={onConfirm}
             testId="price_details_pay_button"
@@ -253,3 +268,4 @@ const PriceDetailsDialog = observer(
 );
 
 export default PriceDetailsDialog;
+

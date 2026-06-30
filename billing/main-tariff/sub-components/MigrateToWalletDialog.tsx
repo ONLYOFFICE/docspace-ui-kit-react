@@ -63,6 +63,10 @@ type TSubscriptionBalance = {
   periodUsedUntil: string;
   /** unused part of the current subscription, credited to the wallet */
   remainingBalance: number;
+  /** wallet currency code the remaining balance is converted to */
+  walletCurrency: string;
+  /** unused subscription part, expressed in the wallet currency */
+  remainingBalanceInWalletCurrency: number;
   /** amount paid for the current subscription period */
   totalCost: number;
 };
@@ -81,13 +85,15 @@ const MigrateToWalletDialog = observer(
     const store = usePaymentStore();
     const {
       formatPaymentCurrency,
+      formatFuturePaymentCurrency,
       formatWalletCurrency,
+      futureSubscriptionAmount,
       language,
-      totalPrice,
       walletBalance,
+      walletCodeCurrency,
       managersCount,
     } = store;
-    const { planCost } = store.paymentQuotas;
+    const { planCost, futurePlanCost } = store.paymentQuotas;
     const { maxCountManagersByQuota } = store.quotas;
     const { paymentDate, daysUntilPayment } = store.tariff;
 
@@ -150,12 +156,15 @@ const MigrateToWalletDialog = observer(
 
     const newAdmins = managersCount;
     const pricePerAdmin = planCost.value;
-    const newSubscriptionAmount = totalPrice;
+    const futurePricePerAdmin = futurePlanCost.value;
+    const newSubscriptionAmount = futureSubscriptionAmount;
 
     const currentTariffCost = maxCountManagersByQuota * pricePerAdmin;
     const daysDisplay = formatRemainingDays(daysUntilPayment, language, t);
 
-    const walletCredit = subscriptionDetails?.remainingBalance ?? 0;
+    const walletCredit =
+      subscriptionDetails?.remainingBalanceInWalletCurrency ?? 0;
+    const walletCurrency = subscriptionDetails?.walletCurrency;
     const walletApplied = Math.min(
       newSubscriptionAmount,
       walletCredit + walletBalance,
@@ -224,7 +233,9 @@ const MigrateToWalletDialog = observer(
         <ModalDialog.Header>{t("MigrateDialogTitle")}</ModalDialog.Header>
         <ModalDialog.Body>
           <div className={styles.content}>
-            <WalletInfo balance={formatWalletCurrency()} />
+            <div style={{ marginTop: 16 }}>
+              <WalletInfo balance={formatWalletCurrency()} />
+            </div>
 
             <div className={styles.banner}>
               <InfoIcon className={styles.bannerIcon} />
@@ -246,7 +257,8 @@ const MigrateToWalletDialog = observer(
               {renderStep(
                 1,
                 t("MigrateStep1Title"),
-                <div className={styles.card}>
+                <>
+                  <div className={styles.card}>
                   {renderRow(
                     t("MigrateCurrentTariff"),
                     t("MigratePerMonth", {
@@ -262,13 +274,30 @@ const MigrateToWalletDialog = observer(
                       </Text>
                     </>,
                   )}
+                  {renderRow(
+                    t("MigrateUnusedValueRefund"),
+                    withLoader(
+                      formatPaymentCurrency(
+                        subscriptionDetails?.remainingBalance ?? 0,
+                        2,
+                      ),
+                    ),
+                  )}
                   <div className={styles.cardDivider} />
                   {renderRow(
                     t("MigrateRefundToWallet"),
-                    withLoader(`+ ${formatPaymentCurrency(walletCredit, 2)}`),
+                    withLoader(
+                      `+ ${formatWalletCurrency(walletCredit, 2, walletCurrency)}`,
+                    ),
                     styles.positive,
                   )}
-                </div>,
+                  </div>
+                  <Text fontSize="13px" className={styles.muted}>
+                    {t("MigrateWalletCurrencyNote", {
+                      currency: walletCodeCurrency,
+                    })}
+                  </Text>
+                </>,
               )}
 
               {renderStep(
@@ -278,15 +307,17 @@ const MigrateToWalletDialog = observer(
                   {renderRow(
                     t("MigratePlanLine", {
                       count: newAdmins,
-                      price: formatPaymentCurrency(pricePerAdmin),
+                      price: formatFuturePaymentCurrency(futurePricePerAdmin),
                     }),
                     t("MigratePerMonth", {
-                      price: formatPaymentCurrency(newSubscriptionAmount),
+                      price: formatFuturePaymentCurrency(newSubscriptionAmount),
                     }),
                   )}
                   {renderRow(
                     t("MigrateFromWallet"),
-                    withLoader(`- ${formatPaymentCurrency(walletApplied, 2)}`),
+                    withLoader(
+                      `- ${formatWalletCurrency(walletApplied, 2, walletCurrency)}`,
+                    ),
                     styles.positive,
                   )}
                   <div className={styles.cardDivider} />
@@ -294,7 +325,7 @@ const MigrateToWalletDialog = observer(
                     <Text as="span" fontSize="14px" fontWeight={600}>
                       {t("MigrateDueOnCard")}
                     </Text>,
-                    withLoader(formatPaymentCurrency(cardCharge, 2)),
+                    withLoader(formatFuturePaymentCurrency(cardCharge, 2)),
                   )}
                 </div>,
               )}
@@ -302,9 +333,12 @@ const MigrateToWalletDialog = observer(
               {renderStep(
                 3,
                 t("MigrateActiveUntil", { date: paymentDate }),
-                <Text fontSize="13px" className={styles.muted}>
+                <Text
+                  fontSize="13px"
+                  color="var(--payment-benefits-icons-color)"
+                >
                   {t("MigrateAutoRenews", {
-                    price: formatPaymentCurrency(newSubscriptionAmount),
+                    price: formatFuturePaymentCurrency(newSubscriptionAmount),
                   })}
                 </Text>,
               )}
@@ -326,7 +360,7 @@ const MigrateToWalletDialog = observer(
                   cardCharge > 0
                     ? t("MigratePay", {
                         amount: subscriptionDetails
-                          ? formatPaymentCurrency(cardCharge, 2)
+                          ? formatFuturePaymentCurrency(cardCharge, 2)
                           : "",
                       })
                     : t("UpgradeNow")
