@@ -162,15 +162,17 @@ const PriceDetailsDialog = observer(
                   <Text as="span" fontSize="14px" fontWeight={600}>
                     {t("TotalDueToday")}
                   </Text>
-                  <HelpButton
-                    iconNode={<InfoIcon />}
-                    tooltipContent={
-                      <Text fontSize="12px">
-                        {t("DueTodayProrationTooltip")}
-                      </Text>
-                    }
-                    dataTestId="price_details_due_today_help"
-                  />
+                  {isDowngradePlan ? null : (
+                    <HelpButton
+                      iconNode={<InfoIcon />}
+                      tooltipContent={
+                        <Text fontSize="12px">
+                          {t("DueTodayProrationTooltip")}
+                        </Text>
+                      }
+                      dataTestId="price_details_due_today_help"
+                    />
+                  )}
                 </div>
                 {isTariffDueTodayCalculating || tariffDueTodayAmount === null ? (
                   <Loader color="" size="16px" type={LoaderTypes.track} />
