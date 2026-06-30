@@ -44,14 +44,11 @@ import { Button, ButtonSize } from "../../../components/button";
 import { HelpButton } from "../../../components/help-button";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { ModalDialog } from "../../../components/modal-dialog";
-import { toastr } from "../../../components/toast";
 
-import { useApi } from "../../../providers";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import WalletInfo from "../../shared/top-up-balance/sub-components/WalletInfo";
 import StorageWarning from "../../services/panels/additional-storage/StorageWarning";
 import { formatRemainingDays } from "../../utils/common";
-import { AnalyticsEvents } from "../../../enums";
 
 import InfoIcon from "../../../assets/info.outline.react.svg";
 
@@ -73,29 +70,20 @@ const PriceDetailsDialog = observer(
     confirmLabel,
   }: PriceDetailsDialogProps) => {
     const t = useCommonTranslation();
-    const { paymentApi } = useApi();
     const store = usePaymentStore();
     const {
-      setIsLoading,
       isLoading,
       managersCount,
       totalPrice,
-      walletBalance,
-      walletCodeCurrency,
       tariffDueTodayAmount,
       isTariffDueTodayCalculating,
       formatPaymentCurrency,
       formatWalletCurrency,
-      fetchBalance,
       language,
     } = store;
-    const {
-      maxCountManagersByQuota,
-      currentTariffPlanTitle,
-      fetchPortalQuota,
-    } = store.quotas;
+    const { maxCountManagersByQuota } = store.quotas;
     const { planCost } = store.paymentQuotas;
-    const { paymentDate, daysUntilPayment, fetchPortalTariff } = store.tariff;
+    const { paymentDate, daysUntilPayment } = store.tariff;
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -108,60 +96,16 @@ const PriceDetailsDialog = observer(
 
     const onConfirm = async () => {
       setIsSubmitting(true);
-      setIsLoading(true);
-      try {
-        const isBalanceInsufficient = walletBalance < dueToday;
-        if (isBalanceInsufficient) {
-          const recommendedAmount = Math.ceil(dueToday - walletBalance);
-          if (recommendedAmount > 0) {
-            await paymentApi.topUpDeposit({
-              topUpDepositRequestDto: {
-                amount: recommendedAmount,
-                currency: walletCodeCurrency || "USD",
-              },
-            });
-          }
-        }
 
-        const updateRes = await paymentApi.updateWalletPayment({
-          walletQuantityRequestDto: {
-            quantity: {
-              adminwallet: isDowngradePlan ? newAdmins : additionalAdmins,
-            },
-            productQuantityType: isDowngradePlan
-              ? ProductQuantityType.Set
-              : ProductQuantityType.Add,
-          },
-        });
+      const isSuccess = await store.executeWalletUpdate(
+        isDowngradePlan ? newAdmins : additionalAdmins,
+        isDowngradePlan ? ProductQuantityType.Set : ProductQuantityType.Add,
+        t,
+      );
 
-        if (updateRes?.data?.response === false) {
-          toastr.error(t("ErrorNotification"));
-          return;
-        }
+      setIsSubmitting(false);
 
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: AnalyticsEvents.Purchase,
-          ecommerce: { items: [{ item_name: "DocSpace Business" }] },
-        });
-
-        await Promise.all([
-          fetchPortalTariff(true),
-          fetchBalance(true),
-          fetchPortalQuota(true),
-        ]);
-
-        toastr.success(
-          t("BusinessUpdated", { planName: currentTariffPlanTitle }),
-        );
-        onClose();
-      } catch (e) {
-        console.error(e);
-        toastr.error(t("ErrorNotification"));
-      } finally {
-        setIsSubmitting(false);
-        setIsLoading(false);
-      }
+      if (isSuccess) onClose();
     };
 
     const renderRow = (label: React.ReactNode, value: React.ReactNode) => (

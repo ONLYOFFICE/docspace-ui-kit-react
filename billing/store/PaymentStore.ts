@@ -34,6 +34,7 @@
  */
 
 import { makeAutoObservable, runInAction } from "mobx";
+import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 import type {
   PaymentApi,
   PaymentUrlRequestDto,
@@ -1367,6 +1368,69 @@ class PaymentStore {
   get futureSubscriptionAmount() {
     return this.getFutureTotalCostByFormula(this.managersCount) ?? 0;
   }
+
+  executeWalletUpdate = async (
+    quantity: number,
+    type: (typeof ProductQuantityType)[keyof typeof ProductQuantityType],
+    t: TTranslation,
+  ) => {
+    this.setIsLoading(true);
+
+    try {
+      const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
+      const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
+
+      if (type === ProductQuantityType.Add && isBalanceInsufficient) {
+        const recommendedAmount = Math.ceil(dueTodayAmount - this.walletBalance);
+        if (recommendedAmount > 0) {
+          await this.paymentApi.topUpDeposit({
+            topUpDepositRequestDto: {
+              amount: recommendedAmount,
+              currency: this.walletCodeCurrency || "USD",
+            },
+          });
+        }
+      }
+
+      const updateRes = await this.paymentApi.updateWalletPayment({
+        walletQuantityRequestDto: {
+          quantity: { adminwallet: quantity },
+          productQuantityType: type,
+        },
+      });
+
+      if (updateRes?.data?.response === false) {
+        toastr.error(t("ErrorNotification"));
+        return false;
+      }
+
+      if (type === ProductQuantityType.Add) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: AnalyticsEvents.Purchase,
+          ecommerce: { items: [{ item_name: "DocSpace Business" }] },
+        });
+      }
+
+      await Promise.all([
+        this.tariff.fetchPortalTariff(true),
+        this.fetchBalance(true),
+        this.quotas.fetchPortalQuota(true),
+      ]);
+
+      toastr.success(
+        t("BusinessUpdated", { planName: this.quotas.currentTariffPlanTitle }),
+      );
+
+      return true;
+    } catch (e) {
+      console.error(e);
+      toastr.error(t("ErrorNotification"));
+      return false;
+    } finally {
+      this.setIsLoading(false);
+    }
+  };
 
   getConfirmButtonLabel = (t: TTranslation) => {
     const { isFreeTariff, maxCountManagersByQuota } = this.quotas;
