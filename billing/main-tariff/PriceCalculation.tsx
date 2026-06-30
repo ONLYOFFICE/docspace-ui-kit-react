@@ -62,10 +62,15 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
     isAlreadyPaid,
     getPaymentLink,
     formatPaymentCurrency,
+    resetTariffContainerToBasic,
   } = store;
 
-  const { isGracePeriod, isNotPaidPeriod, walletCustomerStatusNotActive } =
-    store.tariff;
+  const {
+    isGracePeriod,
+    isNotPaidPeriod,
+    walletCustomerStatusNotActive,
+    hasScheduledTariffAdminsChange,
+  } = store.tariff;
   const { isYearTariff } = store.quotas;
   const { planCost, addedManagersCountTitle } = store.paymentQuotas;
 
@@ -105,7 +110,11 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
     };
   }, []);
 
-  const isDisabled = !canUpdateTariff;
+  useEffect(() => {
+    if (hasScheduledTariffAdminsChange) resetTariffContainerToBasic();
+  }, [hasScheduledTariffAdminsChange]);
+
+  const isDisabled = !canUpdateTariff || hasScheduledTariffAdminsChange;
 
   const priceInfoPerManager = (
     <div className={styles.paymentPriceUser}>
