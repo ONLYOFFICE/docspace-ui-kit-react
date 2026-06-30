@@ -122,7 +122,7 @@ class PaymentQuotasStore {
 
     try {
       const res = await this.paymentApi.getPaymentQuotas(
-        { wallet: true },
+        {},
         {
           signal: abortController.signal,
           // TODO: move `additional` into the typed request once the SDK
