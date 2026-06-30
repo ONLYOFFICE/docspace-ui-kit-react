@@ -70,7 +70,7 @@ const Usage = ({
   onAIServicesClick,
 }: UsageProps) => {
   const t = useCommonTranslation();
-  const { paymentApi } = useApi();
+  const { rawApiClient } = useApi();
   const {
     formatWalletCurrency,
     language,
@@ -167,22 +167,25 @@ const Usage = ({
     range?: { from: DateTime; to: DateTime },
   ) => {
     if (!serviceName && !range) setIsReportLoading(true);
+
+    const reportPath = range
+      ? "api/2.0/portal/payment/customer/usage/monthly/report"
+      : "api/2.0/portal/payment/customer/usage/report";
+      
     try {
-      await paymentApi.createCustomerOperationsReport({
-        customerOperationsReportRequestDto: {
-          startDate: formatDate!(range?.from ?? from, "start"),
-          endDate: formatDate!(range?.to ?? to, "end"),
-          credit: true,
-          debit: true,
-          ...(serviceName ? { serviceName } : {}),
-        },
+      await rawApiClient.instance.post(reportPath, {
+        startDate: formatDate!(range?.from ?? from, "start"),
+        endDate: formatDate!(range?.to ?? to, "end"),
+        credit: true,
+        debit: true,
+        ...(serviceName ? { serviceName } : {}),
       });
 
       const result = await new Promise<{ resultFileUrl?: string }>(
         (resolve, reject) => {
           const check = async () => {
             try {
-              const res = await paymentApi.getCustomerOperationsReport();
+              const res = await rawApiClient.instance.get(reportPath);
               const response = res?.data?.response as
                 | {
                     isCompleted?: boolean;
