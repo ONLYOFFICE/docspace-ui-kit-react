@@ -1368,6 +1368,24 @@ class PaymentStore {
     return this.getFutureTotalCostByFormula(this.managersCount) ?? 0;
   }
 
+  getConfirmButtonLabel = (t: TTranslation) => {
+    const { isFreeTariff, maxCountManagersByQuota } = this.quotas;
+    const isDowngrade =
+      !isFreeTariff && this.managersCount < maxCountManagersByQuota;
+    if (isDowngrade) return t("ScheduleChange");
+
+    const isTheSameCount =
+      !isFreeTariff && this.managersCount === maxCountManagersByQuota;
+    const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
+    const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
+
+    return this.tariffDueTodayAmount !== null &&
+      isBalanceInsufficient &&
+      !isTheSameCount
+      ? t("TopUpAndUpgrade")
+      : t("UpgradeNow");
+  };
+
   resetTariffContainerToBasic = () => {
     this.setBasicTariffContainer();
   };

@@ -61,10 +61,17 @@ type PriceDetailsDialogProps = {
   visible: boolean;
   onClose: () => void;
   isDowngradePlan: boolean;
+  /** Confirm button label, computed by the parent to match the main button. */
+  confirmLabel: string;
 };
 
 const PriceDetailsDialog = observer(
-  ({ visible, onClose, isDowngradePlan }: PriceDetailsDialogProps) => {
+  ({
+    visible,
+    onClose,
+    isDowngradePlan,
+    confirmLabel,
+  }: PriceDetailsDialogProps) => {
     const t = useCommonTranslation();
     const { paymentApi } = useApi();
     const store = usePaymentStore();
@@ -257,13 +264,7 @@ const PriceDetailsDialog = observer(
         <ModalDialog.Footer>
           <Button
             key="confirm"
-            label={
-              isDowngradePlan
-                ? t("ScheduleChange")
-                : t("PayAndUpgrade", {
-                    amount: formatPaymentCurrency(dueToday),
-                  })
-            }
+            label={confirmLabel}
             size={ButtonSize.normal}
             primary
             scale

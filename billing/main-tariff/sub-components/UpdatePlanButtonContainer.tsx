@@ -95,6 +95,7 @@ const UpdatePlanButtonContainer = ({
     allowedStorageSizeByQuota,
     isCardMissingOrInactive,
     needsWalletMigration,
+    getConfirmButtonLabel,
   } = store;
   const {
     maxCountManagersByQuota,
@@ -265,6 +266,8 @@ const UpdatePlanButtonContainer = ({
     const isTheSameCount =
       !isFreeTariff && managersCount === maxCountManagersByQuota;
 
+    const confirmLabel = getConfirmButtonLabel(t);
+
     return isDowngradePlan ? (
       <DowngradePlanButtonContainer
         onDowngradeTariff={
@@ -273,18 +276,12 @@ const UpdatePlanButtonContainer = ({
             : onDowngradeTariff
         }
         isDisabled={isDisabled || hasScheduledTariffAdminsChange}
-        buttonLabel={t("ScheduleChange")}
+        buttonLabel={confirmLabel}
       />
     ) : (
       <Button
         className="upgrade-now-button"
-        label={
-          tariffDueTodayAmount !== null &&
-          isBalanceInsufficient &&
-          !isTheSameCount
-            ? t("TopUpAndUpgrade")
-            : t("UpgradeNow")
-        }
+        label={confirmLabel}
         size={ButtonSize.medium}
         primary
         isDisabled={
