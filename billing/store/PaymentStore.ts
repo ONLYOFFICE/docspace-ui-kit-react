@@ -182,6 +182,8 @@ class PaymentStore {
 
   totalPrice = 30;
 
+  futureTotalPrice = 0;
+
   tariffDueTodayAmount: number | null = null;
 
   isTariffDueTodayCalculating = false;
@@ -636,6 +638,21 @@ class PaymentStore {
   formatPaymentCurrency = (item?: number, fractionDigits: number = 0) => {
     const amount = item ?? this.walletBalance;
     const { isoCurrencySymbol } = this.paymentQuotas.planCost;
+
+    return formatCurrencyValue(
+      this.language,
+      amount,
+      isoCurrencySymbol || "USD",
+      fractionDigits,
+    );
+  };
+
+  formatFuturePaymentCurrency = (
+    item?: number,
+    fractionDigits: number = 0,
+  ) => {
+    const amount = item ?? this.walletBalance;
+    const { isoCurrencySymbol } = this.paymentQuotas.futurePlanCost;
 
     return formatCurrencyValue(
       this.language,
@@ -1342,6 +1359,15 @@ class PaymentStore {
     if (costValuePerManager) return value * +costValuePerManager;
   };
 
+  getFutureTotalCostByFormula = (value: number) => {
+    const costValuePerManager = this.paymentQuotas.futurePlanCost.value;
+    if (costValuePerManager) return value * +costValuePerManager;
+  };
+
+  get futureSubscriptionAmount() {
+    return this.getFutureTotalCostByFormula(this.managersCount) ?? 0;
+  }
+
   resetTariffContainerToBasic = () => {
     this.setBasicTariffContainer();
   };
@@ -1373,6 +1399,11 @@ class PaymentStore {
   setTotalPrice = (value: number) => {
     const price = this.getTotalCostByFormula(value);
     if (price !== this.totalPrice && price) this.totalPrice = price;
+  };
+
+  setFutureTotalPrice = (value: number) => {
+    const price = this.getFutureTotalCostByFormula(value);
+    if (price !== this.futureTotalPrice && price) this.futureTotalPrice = price;
   };
 
   setTariffDueTodayAmount = (value: number | null) => {
