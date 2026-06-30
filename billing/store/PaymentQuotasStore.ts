@@ -122,11 +122,13 @@ class PaymentQuotasStore {
 
     try {
       const res = await this.paymentApi.getPaymentQuotas(
-        {
-          wallet: false,
-        },
+        {},
         {
           signal: abortController.signal,
+          // TODO: move `additional` into the typed request once the SDK
+          // regenerates PaymentApiGetPaymentQuotasRequest with this field.
+          // Passed via axios params so it is appended to the query string.
+          params: { additional: false },
         },
       );
 
@@ -187,3 +189,4 @@ class PaymentQuotasStore {
 }
 
 export default PaymentQuotasStore;
+

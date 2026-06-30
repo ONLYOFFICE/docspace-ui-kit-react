@@ -63,6 +63,10 @@ type TSubscriptionBalance = {
   periodUsedUntil: string;
   /** unused part of the current subscription, credited to the wallet */
   remainingBalance: number;
+  /** wallet currency code the remaining balance is converted to */
+  walletCurrency: string;
+  /** unused subscription part, expressed in the wallet currency */
+  remainingBalanceInWalletCurrency: number;
   /** amount paid for the current subscription period */
   totalCost: number;
 };
@@ -155,7 +159,9 @@ const MigrateToWalletDialog = observer(
     const currentTariffCost = maxCountManagersByQuota * pricePerAdmin;
     const daysDisplay = formatRemainingDays(daysUntilPayment, language, t);
 
-    const walletCredit = subscriptionDetails?.remainingBalance ?? 0;
+    const walletCredit =
+      subscriptionDetails?.remainingBalanceInWalletCurrency ?? 0;
+    const walletCurrency = subscriptionDetails?.walletCurrency;
     const walletApplied = Math.min(
       newSubscriptionAmount,
       walletCredit + walletBalance,
@@ -265,7 +271,9 @@ const MigrateToWalletDialog = observer(
                   <div className={styles.cardDivider} />
                   {renderRow(
                     t("MigrateRefundToWallet"),
-                    withLoader(`+ ${formatPaymentCurrency(walletCredit, 2)}`),
+                    withLoader(
+                      `+ ${formatWalletCurrency(walletCredit, 2, walletCurrency)}`,
+                    ),
                     styles.positive,
                   )}
                 </div>,
@@ -286,7 +294,9 @@ const MigrateToWalletDialog = observer(
                   )}
                   {renderRow(
                     t("MigrateFromWallet"),
-                    withLoader(`- ${formatPaymentCurrency(walletApplied, 2)}`),
+                    withLoader(
+                      `- ${formatWalletCurrency(walletApplied, 2, walletCurrency)}`,
+                    ),
                     styles.positive,
                   )}
                   <div className={styles.cardDivider} />

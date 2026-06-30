@@ -40,7 +40,7 @@ import { Text } from "../../../components/text";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { IconButton } from "../../../components/icon-button";
 import { toastr } from "../../../components/toast";
-import InfoIcon from "../../../assets/info.outline.react.svg";
+import InfoIcon from "../../../assets/info.react.svg";
 
 import PriceDetailsDialog from "./PriceDetailsDialog";
 import { observer } from "mobx-react";
@@ -139,7 +139,7 @@ const TotalTariffContainer = observer(
           })}
         >
           <div className={styles.proratedNowLabel}>
-            <Text as="span" fontSize="13px">
+            <Text as="span" fontSize="13px" fontWeight={600}>
               {t("TotalDueToday")}
             </Text>
             <IconButton
@@ -187,7 +187,11 @@ const TotalTariffContainer = observer(
               />
             </Text>
           ) : (
-            <Text fontWeight={600} fontSize="16px">
+            <Text
+              fontWeight={600}
+              fontSize="16px"
+              className={styles.totalPriceLine}
+            >
               {isYearTariff ? (
                 <CommonTrans
                   i18nKey="TotalPricePerYear"
@@ -199,7 +203,14 @@ const TotalTariffContainer = observer(
                         className={styles.largerFontSize}
                       />
                     ),
-                    3: <Text fontWeight={600} as="span" key="bold-text-year" />,
+                    3: (
+                      <Text
+                        fontWeight={600}
+                        as="span"
+                        key="bold-text-year"
+                        className={styles.totalPriceSuffix}
+                      />
+                    ),
                   }}
                 />
               ) : (
@@ -214,7 +225,12 @@ const TotalTariffContainer = observer(
                       />
                     ),
                     3: (
-                      <Text fontWeight={600} as="span" key="bold-text-month" />
+                      <Text
+                        fontWeight={600}
+                        as="span"
+                        key="bold-text-month"
+                        className={styles.totalPriceSuffix}
+                      />
                     ),
                   }}
                 />

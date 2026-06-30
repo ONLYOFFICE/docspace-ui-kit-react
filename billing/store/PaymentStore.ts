@@ -620,7 +620,7 @@ class PaymentStore {
 
   formatWalletCurrency = (
     item: number | null = null,
-    fractionDigits: number = 3,
+    fractionDigits: number = 2,
     currency?: string,
   ) => {
     const amount = item ?? this.walletBalance;
@@ -833,7 +833,11 @@ class PaymentStore {
     }
   };
 
-  fetchCardLinked = async (url?: string, successUrl?: string) => {
+  fetchCardLinked = async (
+    url?: string,
+    successUrl?: string,
+    persist: boolean = true,
+  ) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
 
@@ -855,13 +859,22 @@ class PaymentStore {
         },
       );
 
-      if (!res?.data?.response) return;
+      if (!res?.data?.response) return "";
 
-      this.cardLinked = res.data.response as unknown as string;
+      const linkUrl = res.data.response as unknown as string;
+
+      // The top-up flow passes persist=false so its checkout URL (built with a
+      // top-up successUrl) is only returned, not written to the shared
+      // this.cardLinked that UnlinkedCardBanner and other consumers rely on.
+      if (persist) this.cardLinked = linkUrl;
+
+      return linkUrl;
     } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
+      if (error instanceof Error && error.name === "CanceledError") return "";
       console.error(error);
     }
+
+    return "";
   };
 
   updateAutoPayments = async () => {

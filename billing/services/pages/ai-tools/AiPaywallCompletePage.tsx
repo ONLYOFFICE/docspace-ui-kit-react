@@ -63,6 +63,7 @@ type Status = "processing" | "success" | "error";
 
 const BILLING_REDIRECT_URL = "/portal-settings/payments/services/ai-services";
 const WALLET_REDIRECT_URL = "/portal-settings/payments/wallet";
+const TARIFF_REDIRECT_URL = "/portal-settings/payments/portal-payments";
 
 const TOPUP_RETRY_ATTEMPTS = 10;
 const TOPUP_RETRY_DELAY_MS = 3000;
@@ -104,33 +105,44 @@ const AiPaywallCompletePage = () => {
   const [status, setStatus] = React.useState<Status>("processing");
   const [stepIndex, setStepIndex] = React.useState(1);
 
-  const { currency, amount, type, language, service, admins, storage, plan } =
-    React.useMemo(() => {
-      if (typeof window === "undefined") {
-        return {
-          currency: "USD",
-          amount: AI_PAYWALL_START_AMOUNT,
-          type: "",
-          language: "en",
-          service: "",
-          admins: "",
-          storage: "",
-          plan: "",
-        };
-      }
-      const urlParams = new URLSearchParams(window.location.search);
-      const parsedAmount = Number(urlParams.get("amount"));
+  const {
+    currency,
+    amount,
+    type,
+    language,
+    service,
+    admins,
+    storage,
+    plan,
+    price,
+  } = React.useMemo(() => {
+    if (typeof window === "undefined") {
       return {
-        currency: urlParams.get("currency") || "USD",
-        amount: parsedAmount > 0 ? parsedAmount : AI_PAYWALL_START_AMOUNT,
-        type: urlParams.get("type") || "",
-        language: urlParams.get("language") || "en",
-        service: urlParams.get("service") || "",
-        admins: urlParams.get("admins") || "",
-        storage: urlParams.get("storage") || "",
-        plan: urlParams.get("plan") || "",
+        currency: "USD",
+        amount: AI_PAYWALL_START_AMOUNT,
+        type: "",
+        language: "en",
+        service: "",
+        admins: "",
+        storage: "",
+        plan: "",
+        price: "",
       };
-    }, []);
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const parsedAmount = Number(urlParams.get("amount"));
+    return {
+      currency: urlParams.get("currency") || "USD",
+      amount: parsedAmount > 0 ? parsedAmount : AI_PAYWALL_START_AMOUNT,
+      type: urlParams.get("type") || "",
+      language: urlParams.get("language") || "en",
+      service: urlParams.get("service") || "",
+      admins: urlParams.get("admins") || "",
+      storage: urlParams.get("storage") || "",
+      plan: urlParams.get("plan") || "",
+      price: urlParams.get("price") || "",
+    };
+  }, []);
 
   const activateConfig =
     ACTIVATABLE_SERVICES[service as ActivateService] ?? null;
@@ -213,6 +225,10 @@ const AiPaywallCompletePage = () => {
   }, []);
 
   const onGoToBillingClick = () => {
+    if (admins) {
+      window.location.href = TARIFF_REDIRECT_URL;
+      return;
+    }
     window.location.href = isWalletOnly
       ? WALLET_REDIRECT_URL
       : BILLING_REDIRECT_URL;
@@ -347,41 +363,61 @@ const AiPaywallCompletePage = () => {
 
             <div className={styles.cardBody}>
               <Text fontSize="16px" fontWeight={600} className={styles.title}>
-                {isWalletOnly
-                  ? t("WalletTopUpSuccessTitle")
-                  : t("AIPaywallCallbackSuccess")}
+                {admins
+                  ? t("PlanActivated", { planName: plan })
+                  : isWalletOnly
+                    ? t("WalletTopUpSuccessTitle")
+                    : t("AIPaywallCallbackSuccess")}
               </Text>
-              <div className={styles.successAmount}>
-                <Text as="span" fontSize="28px" fontWeight={700}>
-                  +
-                </Text>
-                <BalanceAmount
-                  amount={amount}
-                  currency={currency}
-                  language={language}
-                  maximumFractionDigits={2}
-                  mainFontSize="28px"
-                  fractionFontSize="20px"
-                  withoutMargin
-                  showRefresh={false}
-                />
-              </div>
-              <Text fontSize="13px" lineHeight="18px">
-                {isWalletOnly
-                  ? t("WalletTopUpCallbackSuccessHint")
-                  : t("AIPaywallCallbackSuccessHint", {
-                      price: formattedAmount,
-                    })}
-              </Text>
+              {admins ? (
+                <>
+                  <Text as="span" className={styles.adminsAmount}>
+                    {t("AdminsAddedAmount", { admins })}
+                  </Text>
+                  <Text
+                    fontSize="14px"
+                    className={styles.tariffActivationDetails}
+                  >
+                    {t("TariffSuccessDetails", { storage, price })}
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <div className={styles.successAmount}>
+                    <Text as="span" fontSize="28px" fontWeight={700}>
+                      +
+                    </Text>
+                    <BalanceAmount
+                      amount={amount}
+                      currency={currency}
+                      language={language}
+                      maximumFractionDigits={2}
+                      mainFontSize="28px"
+                      fractionFontSize="20px"
+                      withoutMargin
+                      showRefresh={false}
+                    />
+                  </div>
+                  <Text fontSize="13px" lineHeight="18px">
+                    {isWalletOnly
+                      ? t("WalletTopUpCallbackSuccessHint")
+                      : t("AIPaywallCallbackSuccessHint", {
+                          price: formattedAmount,
+                        })}
+                  </Text>
+                </>
+              )}
             </div>
 
-            {isWalletOnly ? (
+            {isWalletOnly || admins ? (
               <div className={styles.actions}>
                 <Button
                   size={ButtonSize.medium}
                   primary
                   scale
-                  label={t("WalletTopUpGoToWallet")}
+                  label={
+                    admins ? t("GoToTariffPlan") : t("WalletTopUpGoToWallet")
+                  }
                   onClick={onGoToBillingClick}
                   testId="ai_paywall_go_to_wallet_button"
                 />
