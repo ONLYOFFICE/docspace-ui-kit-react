@@ -49,6 +49,7 @@ import { toastr } from "../../../components/toast";
 import { useApi } from "../../../providers";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import WalletInfo from "../../shared/top-up-balance/sub-components/WalletInfo";
+import StorageWarning from "../../services/panels/additional-storage/StorageWarning";
 import { formatRemainingDays } from "../../utils/common";
 import { AnalyticsEvents } from "../../../enums";
 
@@ -59,10 +60,11 @@ import styles from "./PriceDetailsDialog.module.scss";
 type PriceDetailsDialogProps = {
   visible: boolean;
   onClose: () => void;
+  isDowngradePlan: boolean;
 };
 
 const PriceDetailsDialog = observer(
-  ({ visible, onClose }: PriceDetailsDialogProps) => {
+  ({ visible, onClose, isDowngradePlan }: PriceDetailsDialogProps) => {
     const t = useCommonTranslation();
     const { paymentApi } = useApi();
     const store = usePaymentStore();
@@ -116,8 +118,12 @@ const PriceDetailsDialog = observer(
 
         const updateRes = await paymentApi.updateWalletPayment({
           walletQuantityRequestDto: {
-            quantity: { adminwallet: additionalAdmins },
-            productQuantityType: ProductQuantityType.Add,
+            quantity: {
+              adminwallet: isDowngradePlan ? newAdmins : additionalAdmins,
+            },
+            productQuantityType: isDowngradePlan
+              ? ProductQuantityType.Set
+              : ProductQuantityType.Add,
           },
         });
 
@@ -178,7 +184,12 @@ const PriceDetailsDialog = observer(
                 t("AdminAdjustment"),
                 `${currentAdmins} → ${newAdmins}`,
               )}
-              {renderRow(t("AdditionalAdmins"), `+${additionalAdmins}`)}
+              {renderRow(
+                isDowngradePlan ? t("ReducedAdmins") : t("AdditionalAdmins"),
+                isDowngradePlan
+                  ? `${additionalAdmins}`
+                  : `+${additionalAdmins}`,
+              )}
               {renderRow(
                 t("PricePerAdmin"),
                 formatPaymentCurrency(pricePerAdmin),
@@ -220,27 +231,39 @@ const PriceDetailsDialog = observer(
               </div>
             </div>
 
-            <Text fontSize="13px">
-              <CommonTrans
-                i18nKey="PriceDetailsNextBill"
-                values={{
-                  price: formatPaymentCurrency(totalPrice),
-                  date: paymentDate,
-                }}
-                components={{
-                  1: <Text as="span" fontSize="13px" fontWeight={600} />,
-                  2: <Text as="span" fontSize="13px" fontWeight={600} />,
-                }}
+            {isDowngradePlan ? (
+              <StorageWarning
+                body={t("TariffAdminAdjustmentWarning", {
+                  admins: currentAdmins,
+                })}
               />
-            </Text>
+            ) : (
+              <Text fontSize="13px">
+                <CommonTrans
+                  i18nKey="PriceDetailsNextBill"
+                  values={{
+                    price: formatPaymentCurrency(totalPrice),
+                    date: paymentDate,
+                  }}
+                  components={{
+                    1: <Text as="span" fontSize="13px" fontWeight={600} />,
+                    2: <Text as="span" fontSize="13px" fontWeight={600} />,
+                  }}
+                />
+              </Text>
+            )}
           </div>
         </ModalDialog.Body>
         <ModalDialog.Footer>
           <Button
             key="confirm"
-            label={t("PayAndUpgrade", {
-              amount: formatPaymentCurrency(dueToday),
-            })}
+            label={
+              isDowngradePlan
+                ? t("ScheduleChange")
+                : t("PayAndUpgrade", {
+                    amount: formatPaymentCurrency(dueToday),
+                  })
+            }
             size={ButtonSize.normal}
             primary
             scale

@@ -273,7 +273,7 @@ const UpdatePlanButtonContainer = ({
             : onDowngradeTariff
         }
         isDisabled={isDisabled || hasScheduledTariffAdminsChange}
-        buttonLabel={t("DowngradeNow")}
+        buttonLabel={t("ScheduleChange")}
       />
     ) : (
       <Button
