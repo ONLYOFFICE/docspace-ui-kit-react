@@ -1443,11 +1443,15 @@ class PaymentStore {
     const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
     const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
 
-    return this.tariffDueTodayAmount !== null &&
-      isBalanceInsufficient &&
-      !isTheSameCount
-      ? t("TopUpAndUpgrade")
-      : t("UpgradeNow");
+    if (this.tariffDueTodayAmount !== null && !isTheSameCount) {
+      return isBalanceInsufficient
+        ? t("TopUpAndUpgrade")
+        : t("PayAndUpgrade", {
+            amount: this.formatPaymentCurrency(dueTodayAmount),
+          });
+    }
+
+    return t("UpgradeNow");
   };
 
   resetTariffContainerToBasic = () => {
