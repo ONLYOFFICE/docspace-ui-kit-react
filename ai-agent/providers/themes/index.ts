@@ -86,6 +86,10 @@ type BasePalette = {
   tooltipShadow: string;
 
   chatListGroupHeaderColor: string;
+  dropdownTriggerColor: string;
+  dropdownTriggerHoverColor: string;
+  attachmentButtonColor: string;
+  promptButtonColor: string;
 };
 
 const buildTokens = (
@@ -158,8 +162,7 @@ const buildTokens = (
   "--icon-button-background-color": "transparent",
   "--icon-button-hover-background-color": "var(--highlight-button-hover)",
   "--icon-button-pressed-background-color": "var(--highlight-button-pressed)",
-  "--icon-button-hover-on-active-background-color":
-    "var(--highlight-button-hover-on-active)",
+  "--icon-button-hover-on-active-background-color": "transparent",
   "--icon-button-pressed-on-active-background-color":
     "var(--highlight-button-pressed-on-active)",
 
@@ -356,6 +359,13 @@ const buildTokens = (
   "--chat-list-title-font-weight": "600",
   "--chat-list-group-header-font-weight": "600",
   "--chat-list-item-font-weight": "600",
+  "--dropdown-trigger-color": p.dropdownTriggerColor,
+  "--dropdown-trigger-hover-color": p.dropdownTriggerHoverColor,
+  "--chat-input-min-height": "40px",
+  "--chat-input-actions-height": "32px",
+  "--action-gap": "16px",
+  "--attachment-button-color": p.attachmentButtonColor,
+  "--prompt-button-color": p.promptButtonColor,
 });
 
 // DocSpace Base — light palette. Mapped from globalColors to mirror the
@@ -425,6 +435,11 @@ const portalBasePalette: BasePalette = {
   // IconButton.module.scss (light): rest = gray, hover = lightGrayDark.
   iconButtonColor: globalColors.gray,
   iconButtonHoverColor: globalColors.lightGrayDark,
+
+  dropdownTriggerColor: globalColors.gray,
+  dropdownTriggerHoverColor: globalColors.lightGrayDark,
+  attachmentButtonColor: globalColors.lightGrayDark,
+  promptButtonColor: globalColors.lightGrayDark,
 };
 
 // DocSpace Dark — dark palette.
@@ -495,6 +510,11 @@ const portalDarkPalette: BasePalette = {
   // IconButton.module.scss (dark): rest = grayDark, hover = white.
   iconButtonColor: globalColors.grayDark,
   iconButtonHoverColor: globalColors.white,
+
+  dropdownTriggerColor: globalColors.grayDark,
+  dropdownTriggerHoverColor: globalColors.white,
+  attachmentButtonColor: globalColors.lightSilver,
+  promptButtonColor: globalColors.lightSilver,
 };
 
 export const portalThemes: Record<

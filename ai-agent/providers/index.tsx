@@ -278,6 +278,7 @@ const AiAgentProviders = ({
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
+      composerActionSendSize: 32,
     }),
     [composerActions, entityId, onToolCallApproveResult],
   );
@@ -396,4 +397,3 @@ export {
   useAiChatStore,
 } from "./ai-chat-store";
 export type { AiChatRouterPage } from "./ai-chat-store";
-

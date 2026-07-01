@@ -155,3 +155,17 @@
     border-inline-end: 1px solid var(--info-panel-border-color);
   }
 }
+
+:global(.aui-root) {
+  --aui-font-base: 13px;
+}
+
+// :global(.icon-button) {
+//   color: var(--icon-button-color);
+
+//   @media (hover: hover) {
+//     &:not(:disabled):hover {
+//       color: var(--icon-button-hover-color);
+//     }
+//   }
+// }
