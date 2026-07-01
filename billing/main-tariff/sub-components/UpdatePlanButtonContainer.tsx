@@ -91,6 +91,7 @@ const UpdatePlanButtonContainer = ({
     needsWalletMigration,
     getConfirmButtonLabel,
     executeWalletUpdate,
+    resetTariffContainerToBasic,
   } = store;
   const {
     maxCountManagersByQuota,
@@ -98,7 +99,7 @@ const UpdatePlanButtonContainer = ({
     fetchPortalQuota,
     isFreeTariff,
   } = store.quotas;
-  const { tariffPlanTitle } = store.paymentQuotas;
+  const { tariffPlanTitle, fetchPaymentQuotas } = store.paymentQuotas;
   const {
     fetchPortalTariff,
     hasScheduledTariffAdminsChange,
@@ -123,7 +124,10 @@ const UpdatePlanButtonContainer = ({
       fetchPortalTariff(true),
       fetchBalance(true),
       fetchPortalQuota(true),
+      fetchPaymentQuotas(),
     ]);
+
+    resetTariffContainerToBasic();
   };
 
   const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
