@@ -65,6 +65,7 @@ const TotalTariffContainer = observer(
       isTariffDueTodayCalculating,
       setIsTariffDueTodayCalculating,
       needsWalletMigration,
+      getConfirmButtonLabel,
     } = store;
     const { isYearTariff, maxCountManagersByQuota, isFreeTariff } =
       store.quotas;
@@ -84,12 +85,20 @@ const TotalTariffContainer = observer(
       !isTheSameCount &&
       !needsWalletMigration;
 
+    const confirmLabel = getConfirmButtonLabel(t);
+
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const controllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
-      if (!isUpgrade || isNeedRequest) {
+      if (isNeedRequest || (!isUpgrade && !isDowngradePlan)) {
         setTariffDueTodayAmount(null);
+        setIsTariffDueTodayCalculating(false);
+        return;
+      }
+
+      if (isDowngradePlan) {
+        setTariffDueTodayAmount(0);
         setIsTariffDueTodayCalculating(false);
         return;
       }
@@ -129,10 +138,10 @@ const TotalTariffContainer = observer(
       return () => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
       };
-    }, [managersDiff, isUpgrade, isNeedRequest, paymentApi]);
+    }, [managersDiff, isUpgrade, isDowngradePlan, isNeedRequest, paymentApi]);
 
     const dueTodayPill =
-      isUpgrade && !isNeedRequest ? (
+      (isUpgrade || isDowngradePlan) && !isNeedRequest ? (
         <div
           className={classNames(styles.proratedNow, {
             [styles.isDisabled]: isDisabled,
@@ -243,6 +252,8 @@ const TotalTariffContainer = observer(
           <PriceDetailsDialog
             visible={isPriceDetailsVisible}
             onClose={() => setIsPriceDetailsVisible(false)}
+            isDowngradePlan={isDowngradePlan}
+            confirmLabel={confirmLabel}
           />
         ) : null}
       </div>

@@ -39,10 +39,8 @@ import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 
 import { Button, ButtonSize } from "../../../components/button";
 import styles from "./UpdatePlanButtonContainer.module.scss";
-import { toastr } from "../../../components/toast";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
-import { useApi } from "../../../providers";
 import { Text } from "../../../components/text";
 import { Link } from "../../../components/link";
 
@@ -52,7 +50,6 @@ import MigrateToWalletDialog from "./MigrateToWalletDialog";
 import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import { getConvertedSize } from "../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import { AnalyticsEvents } from "../../../enums";
 
 type UpdatePlanButtonContainerProps = {
   isDisabled?: boolean;
@@ -63,11 +60,9 @@ const UpdatePlanButtonContainer = ({
   isDisabled,
   t,
 }: UpdatePlanButtonContainerProps) => {
-  const { paymentApi } = useApi();
   const store = usePaymentStore();
 
   const {
-    setIsLoading,
     managersCount,
     isLoading,
     isLessCountThanAcceptable,
@@ -77,13 +72,15 @@ const UpdatePlanButtonContainer = ({
     canDowngradeTariff,
     fetchBalance,
     walletBalance,
-    walletCodeCurrency,
     tariffDueTodayAmount,
     isTariffDueTodayCalculating,
     isCardLinkedToPortal,
     allowedStorageSizeByQuota,
     isCardMissingOrInactive,
     needsWalletMigration,
+    getConfirmButtonLabel,
+    executeWalletUpdate,
+    resetTariffContainerToBasic,
   } = store;
   const {
     maxCountManagersByQuota,
@@ -91,7 +88,7 @@ const UpdatePlanButtonContainer = ({
     fetchPortalQuota,
     isFreeTariff,
   } = store.quotas;
-  const { tariffPlanTitle } = store.paymentQuotas;
+  const { tariffPlanTitle, fetchPaymentQuotas } = store.paymentQuotas;
   const {
     fetchPortalTariff,
     hasScheduledTariffAdminsChange,
@@ -116,72 +113,15 @@ const UpdatePlanButtonContainer = ({
       fetchPortalTariff(true),
       fetchBalance(true),
       fetchPortalQuota(true),
+      fetchPaymentQuotas(),
     ]);
+
+    resetTariffContainerToBasic();
   };
 
   const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
   const isBalanceInsufficient = walletBalance < dueTodayAmount;
   const topUpShortfall = Math.max(0, Math.ceil(dueTodayAmount - walletBalance));
-
-  const executeWalletUpdate = async (
-    quantity: number,
-    type: (typeof ProductQuantityType)[keyof typeof ProductQuantityType],
-  ) => {
-    setIsLoading(true);
-
-    try {
-      if (type === ProductQuantityType.Add && isBalanceInsufficient) {
-        const recommendedAmount = Math.ceil(dueTodayAmount - walletBalance);
-        if (recommendedAmount > 0) {
-          await paymentApi.topUpDeposit({
-            topUpDepositRequestDto: {
-              amount: recommendedAmount,
-              currency: walletCodeCurrency || "USD",
-            },
-          });
-        }
-      }
-
-      const updateRes = await paymentApi.updateWalletPayment({
-        walletQuantityRequestDto: {
-          quantity: { adminwallet: quantity },
-          productQuantityType: type,
-        },
-      });
-
-      const res = updateRes?.data?.response;
-
-      if (res === false) {
-        toastr.error(t("ErrorNotification"));
-        setIsLoading(false);
-        return;
-      }
-
-      if (type === ProductQuantityType.Add) {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: AnalyticsEvents.Purchase,
-          ecommerce: { items: [{ item_name: "DocSpace Business" }] },
-        });
-      }
-
-      await Promise.all([
-        fetchPortalTariff(true),
-        fetchBalance(true),
-        fetchPortalQuota(true),
-      ]);
-
-      toastr.success(
-        t("BusinessUpdated", { planName: currentTariffPlanTitle }),
-      );
-
-      setIsLoading(false);
-    } catch (e) {
-      console.error(e);
-      toastr.error(t("ErrorNotification"));
-      setIsLoading(false);
-    }
-  };
 
   const onUpdateTariff = () => {
     if (isVisiblePaymentConfirm) onClose();
@@ -189,6 +129,7 @@ const UpdatePlanButtonContainer = ({
     return executeWalletUpdate(
       managersCount - maxCountManagersByQuota,
       ProductQuantityType.Add,
+      t,
     );
   };
 
@@ -198,7 +139,7 @@ const UpdatePlanButtonContainer = ({
 
   const onDowngradeTariff = () => {
     if (isPassedByQuota()) {
-      executeWalletUpdate(managersCount, ProductQuantityType.Set);
+      executeWalletUpdate(managersCount, ProductQuantityType.Set, t);
       return;
     }
 
@@ -213,7 +154,7 @@ const UpdatePlanButtonContainer = ({
     setIsTopUpDialogVisible(false);
 
     await (isRepurchase
-      ? executeWalletUpdate(managersCount, ProductQuantityType.Add)
+      ? executeWalletUpdate(managersCount, ProductQuantityType.Add, t)
       : onUpdateTariff());
   };
 
@@ -226,7 +167,7 @@ const UpdatePlanButtonContainer = ({
     const onClick = () => {
       if (canPayTariff) {
         isCardLinkedToPortal
-          ? executeWalletUpdate(managersCount, ProductQuantityType.Add)
+          ? executeWalletUpdate(managersCount, ProductQuantityType.Add, t)
           : setIsTopUpDialogVisible(true);
         return;
       }
@@ -254,6 +195,8 @@ const UpdatePlanButtonContainer = ({
     const isTheSameCount =
       !isFreeTariff && managersCount === maxCountManagersByQuota;
 
+    const confirmLabel = getConfirmButtonLabel(t);
+
     return isDowngradePlan ? (
       <DowngradePlanButtonContainer
         onDowngradeTariff={
@@ -262,18 +205,12 @@ const UpdatePlanButtonContainer = ({
             : onDowngradeTariff
         }
         isDisabled={isDisabled || hasScheduledTariffAdminsChange}
-        buttonLabel={t("DowngradeNow")}
+        buttonLabel={confirmLabel}
       />
     ) : (
       <Button
         className={styles.button}
-        label={
-          tariffDueTodayAmount !== null &&
-          isBalanceInsufficient &&
-          !isTheSameCount
-            ? t("TopUpAndUpgrade")
-            : t("UpgradeNow")
-        }
+        label={confirmLabel}
         size={ButtonSize.medium}
         primary
         isDisabled={
