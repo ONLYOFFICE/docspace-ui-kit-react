@@ -36,7 +36,7 @@ import TrashIcon from "../../../assets/icons/16/trash.react.svg";
 import RefreshIcon from "../../../assets/icons/16/refresh.react.svg";
 import VerticalDotsIcon from "../../../assets/icons/16/vertical-dots.react.svg";
 import PenEditIcon from "../../../assets/icons/12/pen-edit.react.svg";
-import SaveIcon from "../../../assets/icons/16/catalog-settings-data-management.svg";
+import SaveIcon from "../../../assets/icons/16/download-file.svg";
 import PlusIcon from "../../../assets/icons/16/plus.svg";
 import PromptIcon from "../../../assets/icons/16/prompt.svg";
 
