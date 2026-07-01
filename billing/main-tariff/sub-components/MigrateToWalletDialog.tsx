@@ -103,6 +103,8 @@ const MigrateToWalletDialog = observer(
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isAgreed, setIsAgreed] = useState(false);
     const initialWalletBalance = useRef(walletBalance).current;
+    const initialDaysUntilPayment = useRef(daysUntilPayment).current;
+    const initialPaymentDate = useRef(paymentDate).current;
 
     const organizationName = getBrandName("ProductName");
 
@@ -145,12 +147,12 @@ const MigrateToWalletDialog = observer(
             quantity: { adminwallet: managersCount },
           },
         );
-        await onMigrated();
-        onClose();
       } catch (e) {
         console.error("[migrate-to-wallet] migration failed", e);
         toastr.error(t("ErrorNotification"));
       } finally {
+        await onMigrated();
+        onClose();
         setIsSubmitting(false);
       }
     };
@@ -161,7 +163,11 @@ const MigrateToWalletDialog = observer(
     const newSubscriptionAmount = futureSubscriptionAmount;
 
     const currentTariffCost = maxCountManagersByQuota * pricePerAdmin;
-    const daysDisplay = formatRemainingDays(daysUntilPayment, language, t);
+    const daysDisplay = formatRemainingDays(
+      initialDaysUntilPayment,
+      language,
+      t,
+    );
 
     const walletCredit =
       subscriptionDetails?.remainingBalanceInWalletCurrency ?? 0;
@@ -278,7 +284,7 @@ const MigrateToWalletDialog = observer(
                           fontSize="14px"
                           className={styles.muted}
                         >
-                          ({t("UntilDate", { date: paymentDate })})
+                          ({t("UntilDate", { date: initialPaymentDate })})
                         </Text>
                       </>,
                     )}
@@ -342,7 +348,7 @@ const MigrateToWalletDialog = observer(
 
               {renderStep(
                 3,
-                t("MigrateActiveUntil", { date: paymentDate }),
+                t("MigrateActiveUntil", { date: initialPaymentDate }),
                 <Text
                   fontSize="13px"
                   color="var(--payment-benefits-icons-color)"
