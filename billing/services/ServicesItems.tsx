@@ -43,6 +43,7 @@ import {
   AI_TOOLS,
   BACKUP_SERVICE,
   DISK_STORAGE,
+  DOCS_CONNECT_SERVICE,
   TOTAL_SIZE,
 } from "../constants";
 import { calculateTotalPrice, getConvertedSize } from "../utils/common";
@@ -362,6 +363,24 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 isErrorColor={
                   !!previousStoragePlanSize && !isStorageDeactivationVisited
                 }
+              />
+            );
+          }
+
+          if (item.serviceName === DOCS_CONNECT_SERVICE) {
+            return (
+              <ServiceCard
+                key={item.id}
+                withoutToggle
+                onClick={handleClick}
+                serviceTitle={item.title}
+                priceTitle={item.priceTitle}
+                priceDescription={t("CurrencyPerMonth", {
+                  currency: formatWalletCurrency(item.price.value, 2),
+                })}
+                id={item.id}
+                image={item.image}
+                isEnabled={!!item.value}
               />
             );
           }

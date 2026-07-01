@@ -150,6 +150,8 @@ class PaymentStore {
 
   openOnNewPage = true;
 
+  onServicesInit: (() => Promise<unknown>) | undefined = undefined;
+
   utcOffset = "";
 
   routes: TPaymentRoutes = {
@@ -314,6 +316,8 @@ class PaymentStore {
       this.mobileBreakpoint = config.mobileBreakpoint;
     if (config.desktopBreakpoint !== undefined)
       this.desktopBreakpoint = config.desktopBreakpoint;
+    if (config.onServicesInit !== undefined)
+      this.onServicesInit = config.onServicesInit;
   };
 
   private addAbortController(controller: AbortController) {

@@ -667,6 +667,10 @@ class ServicesStore {
         this.paymentStore.tariff.fetchPortalTariff(),
       ];
 
+      if (this.paymentStore.onServicesInit) {
+        requests.push(this.paymentStore.onServicesInit());
+      }
+
       if (hasAiService) {
         requests.push(this.fetchAiServiceBalance(), this.fetchAiPrices());
       }

@@ -44,7 +44,12 @@ import {
 } from "@onlyoffice/docspace-api-sdk";
 
 import { toastr } from "../../components/toast";
-import { AI_ENUM, BACKUP_SERVICE, TOTAL_SIZE } from "../constants";
+import {
+  AI_ENUM,
+  BACKUP_SERVICE,
+  DOCS_CONNECT_SERVICE,
+  TOTAL_SIZE,
+} from "../constants";
 
 const toWalletService = (id: string): TenantWalletService => {
   if (id === BACKUP_SERVICE) return TenantWalletService.Backup;
@@ -76,6 +81,7 @@ type TServicesProps = {
   getAIConfig?: () => Promise<void>;
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
+  onDocsConnectClick?: () => void;
 };
 
 const Services = observer(
@@ -85,6 +91,7 @@ const Services = observer(
     getAIConfig,
     cardDisabled,
     onOpenSupportedModels,
+    onDocsConnectClick,
   }: TServicesProps) => {
     const navigate = useNavigate();
     const paymentStore = usePaymentStore();
@@ -241,6 +248,11 @@ const Services = observer(
 
     const onClick = (id: string) => {
       setConfirmActionType(id);
+
+      if (id === DOCS_CONNECT_SERVICE) {
+        onDocsConnectClick?.();
+        return;
+      }
 
       if (!isCardLinkedToPortal) {
         setIsFirstTopUpDialogVisible(true);

@@ -181,6 +181,7 @@ export type TPaymentConfig = {
   mobileBreakpoint?: number;
   desktopBreakpoint?: number;
   openOnNewPage?: boolean;
+  onServicesInit?: () => Promise<unknown>;
 };
 
 export type TPaymentNavigationEvent =
