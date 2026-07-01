@@ -125,6 +125,7 @@ const ComboBoxOverride: React.FC<AiChatComboBoxProps> = (props) => {
       scaledOptions
       showDisabledItems
       dropDownMaxHeight={400}
+      directionY="both"
     />
   );
 };
@@ -132,4 +133,3 @@ const ComboBoxOverride: React.FC<AiChatComboBoxProps> = (props) => {
 ComboBoxOverride.displayName = "ComboBoxOverride";
 
 export { ComboBoxOverride };
-
