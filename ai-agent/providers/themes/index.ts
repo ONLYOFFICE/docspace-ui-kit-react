@@ -90,6 +90,8 @@ type BasePalette = {
   dropdownTriggerHoverColor: string;
   attachmentButtonColor: string;
   promptButtonColor: string;
+  chatComposerActionSendColor: string;
+  toggleButtonOffCircleColor: string;
 };
 
 const buildTokens = (
@@ -247,7 +249,9 @@ const buildTokens = (
   "--toggle-button-background-hover-color":
     "var(--highlight-accent-button-hover)",
   "--toggle-button-off-background-color": "var(--checkbox-border-normal)",
-  "--toggle-button-circle-color": "var(--background-normal)",
+  "--toggle-button-circle-color": p.toggleButtonOffCircleColor,
+  "--toggle-button-off-circle-color": p.toggleButtonOffCircleColor,
+  "--toggle-button-off-border-color": "transparent",
 
   "--file-items-background-color": "var(--background-normal)",
   "--file-items-color": "var(--text-normal)",
@@ -318,7 +322,7 @@ const buildTokens = (
   "--chat-composer-active-border-color": "var(--background-accent-button)",
   "--chat-composer-text-color": "var(--text-normal)",
   "--chat-composer-placeholder-color": "var(--text-secondary)",
-  "--chat-composer-action-send-color": "var(--text-contrast-background)",
+  "--chat-composer-action-send-color": p.chatComposerActionSendColor,
   "--chat-composer-action-send-background-color":
     "var(--background-accent-button)",
   "--chat-composer-action-send-background-hover-color":
@@ -352,6 +356,7 @@ const buildTokens = (
   "--chat-message-tool-call-pre-background-color": "var(--background-normal)",
   "--chat-message-tool-call-pre-color": "var(--text-normal)",
   "--chat-message-analyze-color": "var(--text-normal)",
+  "--chat-message-actions-gap": "20px",
   "--chat-list-item-font-size": "12px",
   "--chat-list-title-font-size": "16px",
   "--chat-list-group-header-font-size": "14px",
@@ -440,6 +445,9 @@ const portalBasePalette: BasePalette = {
   dropdownTriggerHoverColor: globalColors.lightGrayDark,
   attachmentButtonColor: globalColors.lightGrayDark,
   promptButtonColor: globalColors.lightGrayDark,
+  chatComposerActionSendColor: globalColors.white,
+  // DocSpace toggleButton.fillCircleColorOff = white (base.ts).
+  toggleButtonOffCircleColor: globalColors.white,
 };
 
 // DocSpace Dark — dark palette.
@@ -515,6 +523,9 @@ const portalDarkPalette: BasePalette = {
   dropdownTriggerHoverColor: globalColors.white,
   attachmentButtonColor: globalColors.lightSilver,
   promptButtonColor: globalColors.lightSilver,
+  chatComposerActionSendColor: globalColors.black,
+  // DocSpace toggleButton.fillCircleColorOff = white (dark.ts).
+  toggleButtonOffCircleColor: globalColors.white,
 };
 
 export const portalThemes: Record<
