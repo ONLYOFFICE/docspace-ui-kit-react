@@ -102,6 +102,7 @@ const MigrateToWalletDialog = observer(
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isAgreed, setIsAgreed] = useState(false);
+    const initialWalletBalance = useRef(walletBalance).current;
 
     const organizationName = getBrandName("ProductName");
 
@@ -167,7 +168,7 @@ const MigrateToWalletDialog = observer(
     const walletCurrency = subscriptionDetails?.walletCurrency;
     const walletApplied = Math.min(
       newSubscriptionAmount,
-      walletCredit + walletBalance,
+      walletCredit + initialWalletBalance,
     );
     const cardCharge = Math.max(0, newSubscriptionAmount - walletApplied);
 
@@ -259,38 +260,42 @@ const MigrateToWalletDialog = observer(
                 t("MigrateStep1Title"),
                 <>
                   <div className={styles.card}>
-                  {renderRow(
-                    t("MigrateCurrentTariff"),
-                    t("MigratePerMonth", {
-                      price: formatPaymentCurrency(currentTariffCost),
-                    }),
-                  )}
-                  {renderRow(
-                    t("RemainingPeriod"),
-                    <>
-                      {`${daysDisplay} `}
-                      <Text as="span" fontSize="14px" className={styles.muted}>
-                        ({t("UntilDate", { date: paymentDate })})
-                      </Text>
-                    </>,
-                  )}
-                  {renderRow(
-                    t("MigrateUnusedValueRefund"),
-                    withLoader(
-                      formatPaymentCurrency(
-                        subscriptionDetails?.remainingBalance ?? 0,
-                        2,
+                    {renderRow(
+                      t("MigrateCurrentTariff"),
+                      t("MigratePerMonth", {
+                        price: formatPaymentCurrency(currentTariffCost),
+                      }),
+                    )}
+                    {renderRow(
+                      t("RemainingPeriod"),
+                      <>
+                        {`${daysDisplay} `}
+                        <Text
+                          as="span"
+                          fontSize="14px"
+                          className={styles.muted}
+                        >
+                          ({t("UntilDate", { date: paymentDate })})
+                        </Text>
+                      </>,
+                    )}
+                    {renderRow(
+                      t("MigrateUnusedValueRefund"),
+                      withLoader(
+                        formatPaymentCurrency(
+                          subscriptionDetails?.remainingBalance ?? 0,
+                          2,
+                        ),
                       ),
-                    ),
-                  )}
-                  <div className={styles.cardDivider} />
-                  {renderRow(
-                    t("MigrateRefundToWallet"),
-                    withLoader(
-                      `+ ${formatWalletCurrency(walletCredit, 2, walletCurrency)}`,
-                    ),
-                    styles.positive,
-                  )}
+                    )}
+                    <div className={styles.cardDivider} />
+                    {renderRow(
+                      t("MigrateRefundToWallet"),
+                      withLoader(
+                        `+ ${formatWalletCurrency(walletCredit, 2, walletCurrency)}`,
+                      ),
+                      styles.positive,
+                    )}
                   </div>
                   <Text fontSize="13px" className={styles.muted}>
                     {t("MigrateWalletCurrencyNote", {
