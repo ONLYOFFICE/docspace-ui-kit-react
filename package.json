@@ -43,7 +43,7 @@
     "@floating-ui/dom": "1.6.13",
     "@google/genai": "1.52.0",
     "@mistralai/mistralai": "1.15.1",
-    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.4.145-docspace.11.tgz",
+    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.4.145-docspace.18.tgz",
     "@onlyoffice/docspace-api-sdk": "file:onlyoffice-docspace-api-sdk-3.7.0.tgz",
     "@onlyoffice/document-editor-react": "2.1.1",
     "@radix-ui/react-dialog": "1.1.15",
