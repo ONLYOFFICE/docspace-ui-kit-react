@@ -166,6 +166,9 @@ const MigrateToWalletDialog = observer(
     const walletCredit =
       subscriptionDetails?.remainingBalanceInWalletCurrency ?? 0;
     const walletCurrency = subscriptionDetails?.walletCurrency;
+
+    const isSameCurrency = planCost.isoCurrencySymbol === walletCodeCurrency;
+
     const walletApplied = Math.min(
       newSubscriptionAmount,
       walletCredit + initialWalletBalance,
@@ -279,15 +282,17 @@ const MigrateToWalletDialog = observer(
                         </Text>
                       </>,
                     )}
-                    {renderRow(
-                      t("MigrateUnusedValueRefund"),
-                      withLoader(
-                        formatPaymentCurrency(
-                          subscriptionDetails?.remainingBalance ?? 0,
-                          2,
-                        ),
-                      ),
-                    )}
+                    {isSameCurrency
+                      ? null
+                      : renderRow(
+                          t("MigrateUnusedValueRefund"),
+                          withLoader(
+                            formatPaymentCurrency(
+                              subscriptionDetails?.remainingBalance ?? 0,
+                              2,
+                            ),
+                          ),
+                        )}
                     <div className={styles.cardDivider} />
                     {renderRow(
                       t("MigrateRefundToWallet"),
