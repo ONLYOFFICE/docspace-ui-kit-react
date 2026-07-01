@@ -37,6 +37,8 @@ import RefreshIcon from "../../../assets/icons/16/refresh.react.svg";
 import VerticalDotsIcon from "../../../assets/icons/16/vertical-dots.react.svg";
 import PenEditIcon from "../../../assets/icons/12/pen-edit.react.svg";
 import SaveIcon from "../../../assets/icons/16/catalog-settings-data-management.svg";
+import PlusIcon from "../../../assets/icons/16/plus.svg";
+import PromptIcon from "../../../assets/icons/16/prompt.svg";
 
 import styles from "./Icon.module.scss";
 
@@ -81,5 +83,6 @@ export const imageOverrides: ImageOverrides = {
   "btn-edit": makeIcon(PenEditIcon),
   "btn-rename": makeIcon(PenEditIcon),
   "btn-save": makeIcon(SaveIcon),
+  "btn-zoomup": makeIcon(PlusIcon),
+  "btn-prompt": makeIcon(PromptIcon),
 };
-
