@@ -192,6 +192,43 @@ describe("<NavMenu />", () => {
       const button = screen.getByRole("button", { name: "AI Agents" });
       expect(button).not.toHaveAttribute("aria-expanded");
     });
+
+    it("does not expand when onClick returns false (e.g. opens a modal)", async () => {
+      const onClick = vi.fn(() => false);
+      const groupsWithModal: NavMenuGroup[] = [
+        {
+          id: "g1",
+          items: [
+            {
+              id: "ai-files",
+              label: "AI Files",
+              onClick,
+              children: [{ id: "shared", label: "Shared with me" }],
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsWithModal} />);
+      const button = screen.getByRole("button", { name: "AI Files" });
+
+      await userEvent.click(button);
+
+      expect(onClick).toHaveBeenCalledOnce();
+      expect(button).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("collapses the expanded section when a childless item becomes active", () => {
+      const { rerender } = render(
+        <NavMenu groups={groups} activeItemId="shared" />,
+      );
+      const filesButton = screen.getByRole("button", { name: "AI Files" });
+      expect(filesButton).toHaveAttribute("aria-expanded", "true");
+
+      // Navigate to a top-level item with no sub-menu (e.g. Overview).
+      rerender(<NavMenu groups={groups} activeItemId="ai-agents" />);
+
+      expect(filesButton).toHaveAttribute("aria-expanded", "false");
+    });
   });
 
   describe("click handlers", () => {

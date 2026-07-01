@@ -64,8 +64,6 @@
     padding: 8px 16px;
     border-radius: 6px;
     background: var(--payment-price-container-bg-text);
-    font-size: 13px;
-    color: var(--payment-price-container-feature-text);
 
     .proratedNowLabel {
       display: flex;
@@ -110,6 +108,18 @@
 
     .largerFontSize {
       font-size: 48px;
+    }
+
+    .totalPriceLine {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      max-width: 100%;
+    }
+
+    .totalPriceSuffix {
+      white-space: nowrap;
+      margin-inline-start: auto;
     }
 
     .totalTariffDescription {

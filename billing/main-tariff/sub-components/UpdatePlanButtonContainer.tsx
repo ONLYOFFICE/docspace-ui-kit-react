@@ -325,6 +325,7 @@ const UpdatePlanButtonContainer = ({
             admins: `${managersCount}`,
             storage: getConvertedSize(t, allowedStorageSizeByQuota),
             plan: isFreeTariff ? tariffPlanTitle : currentTariffPlanTitle,
+            price: formatPaymentCurrency(totalPrice, 2),
           }}
         />
       ) : null}

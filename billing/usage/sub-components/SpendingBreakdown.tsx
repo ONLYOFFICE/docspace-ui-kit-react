@@ -71,6 +71,8 @@ type SpendingBreakdownProps = {
     serviceName?: string,
     range?: { from: DateTime; to: DateTime },
   ) => void;
+  /** Notifies the parent when the services/month view changes. */
+  onViewChange?: (view: BreakdownView) => void;
 };
 
 const SpendingBreakdown = ({
@@ -80,6 +82,7 @@ const SpendingBreakdown = ({
   onBackupClick,
   onAIServicesClick,
   onDownloadReport,
+  onViewChange,
 }: SpendingBreakdownProps) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
@@ -308,7 +311,11 @@ const SpendingBreakdown = ({
           type={TabsTypes.Secondary}
           items={items}
           selectedItemId={view}
-          onSelect={(item) => setView(item.id as BreakdownView)}
+          onSelect={(item) => {
+            const nextView = item.id as BreakdownView;
+            setView(nextView);
+            onViewChange?.(nextView);
+          }}
           withoutStickyIntend
           scaled
         />

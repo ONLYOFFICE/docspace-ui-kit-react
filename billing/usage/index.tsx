@@ -70,7 +70,7 @@ const Usage = ({
   onAIServicesClick,
 }: UsageProps) => {
   const t = useCommonTranslation();
-  const { paymentApi } = useApi();
+  const { paymentApi, rawApiClient } = useApi();
   const {
     formatWalletCurrency,
     language,
@@ -83,6 +83,9 @@ const Usage = ({
   const [period, setPeriod] = useState<TUsagePeriodKey>("thisMonth");
   const [isLoading, setIsLoading] = useState(true);
   const [isReportLoading, setIsReportLoading] = useState(false);
+  const [breakdownView, setBreakdownView] = useState<"services" | "month">(
+    "services",
+  );
 
   const loadUsage = async (nextPeriod: TUsagePeriodKey) => {
     setIsLoading(true);
@@ -166,23 +169,39 @@ const Usage = ({
     serviceName?: string,
     range?: { from: DateTime; to: DateTime },
   ) => {
-    if (!serviceName && !range) setIsReportLoading(true);
+    const isMainReport = !serviceName && !range;
+
+    if (isMainReport) setIsReportLoading(true);
+
+    const reportPath =
+      breakdownView === "month"
+        ? "api/2.0/portal/payment/customer/usage/monthly/report"
+        : "api/2.0/portal/payment/customer/usage/report";
+
+    const reportRequest = {
+      startDate: formatDate!(range?.from ?? from, "start"),
+      endDate: formatDate!(range?.to ?? to, "end"),
+      credit: true,
+      debit: true,
+      ...(serviceName ? { serviceName } : {}),
+    };
+
     try {
-      await paymentApi.createCustomerOperationsReport({
-        customerOperationsReportRequestDto: {
-          startDate: formatDate!(range?.from ?? from, "start"),
-          endDate: formatDate!(range?.to ?? to, "end"),
-          credit: true,
-          debit: true,
-          ...(serviceName ? { serviceName } : {}),
-        },
-      });
+      if (isMainReport) {
+        await rawApiClient.instance.post(reportPath, reportRequest);
+      } else {
+        await paymentApi.createCustomerOperationsReport({
+          customerOperationsReportRequestDto: reportRequest,
+        });
+      }
 
       const result = await new Promise<{ resultFileUrl?: string }>(
         (resolve, reject) => {
           const check = async () => {
             try {
-              const res = await paymentApi.getCustomerOperationsReport();
+              const res = isMainReport
+                ? await rawApiClient.instance.get(reportPath)
+                : await paymentApi.getCustomerOperationsReport();
               const response = res?.data?.response as
                 | {
                     isCompleted?: boolean;
@@ -218,7 +237,7 @@ const Usage = ({
     } catch (e) {
       toastr.error(e as Error);
     } finally {
-      if (!serviceName && !range) setIsReportLoading(false);
+      if (isMainReport) setIsReportLoading(false);
     }
   };
 
@@ -269,6 +288,7 @@ const Usage = ({
         onBackupClick={onBackupClick}
         onAIServicesClick={onAIServicesClick}
         onDownloadReport={onDownloadReport}
+        onViewChange={setBreakdownView}
       />
     </div>
   );

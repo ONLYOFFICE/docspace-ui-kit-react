@@ -59,7 +59,11 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
     language,
     walletBalance,
   } = store;
-  const { walletCustomerStatusNotActive, fetchCustomerInfo: fetchCustomerInfoTariff, walletCustomerEmail } = store.tariff;
+  const {
+    walletCustomerStatusNotActive,
+    fetchCustomerInfo: fetchCustomerInfoTariff,
+    walletCustomerEmail,
+  } = store.tariff;
 
   const fetchBalance = async (isRefresh?: boolean) => {
     await store.fetchBalance(isRefresh);
@@ -67,8 +71,7 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
   };
 
   const fetchCardLinked = async (backUrl?: string, successUrl?: string) => {
-    await store.fetchCardLinked(backUrl, successUrl);
-    return store.cardLinked;
+    return store.fetchCardLinked(backUrl, successUrl, false);
   };
 
   const fetchCustomerInfo = async (isRefresh?: boolean) => {

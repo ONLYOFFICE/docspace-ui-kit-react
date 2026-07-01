@@ -66,7 +66,13 @@ export type NavMenuItem = {
   label: string;
   icon?: string;
   iconNode?: React.ReactNode;
-  onClick?: (item: NavMenuItem) => void;
+  /**
+   * Fired when the item is clicked. Return `false` to suppress the default
+   * expand/collapse of this item's sub-menu — used when the click opens a
+   * modal instead of navigating, so the sub-menu shouldn't toggle behind it.
+   * Any other return value (incl. a promise) keeps the default behavior.
+   */
+  onClick?: (item: NavMenuItem) => void | boolean | Promise<void>;
   children?: NavSubItem[];
   showBadge?: boolean;
   labelBadge?: string | number;

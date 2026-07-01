@@ -315,17 +315,27 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       const parent = allItems.find((item) =>
         item.children?.some((sub) => sub.id === activeItemId),
       );
-      if (parent) setExpandedId(parent.id);
-      else if (allItems.some((item) => item.id === activeItemId)) {
-        // Active item is a top-level item — expand it if it has children.
-        const item = allItems.find((i) => i.id === activeItemId);
-        if (item?.children?.length) setExpandedId(item.id);
+      if (parent) {
+        setExpandedId(parent.id);
+        return;
       }
+      const item = allItems.find((i) => i.id === activeItemId);
+      // Active item is a top-level item with children — expand it.
+      if (item?.children?.length) {
+        setExpandedId(item.id);
+        return;
+      }
+      // Active item is a top-level item with no sub-menu (e.g. Overview) —
+      // collapse any previously expanded section.
+      if (item) setExpandedId(null);
     }, [activeItemId, groups]);
 
     const handleItemClick = (item: NavMenuItem) => {
-      item.onClick?.(item);
-      if (!iconOnly && item.children?.length) {
+      // An onClick that returns `false` handled the interaction itself (e.g.
+      // opened a modal) and opts out of the default expand/collapse so the
+      // sub-menu doesn't toggle behind the modal.
+      const handled = item.onClick?.(item) === false;
+      if (!handled && !iconOnly && item.children?.length) {
         // Collapse only when the item is also active; non-active expanded
         // items stay open until another item is clicked (by design).
         setExpandedId((prev) =>
