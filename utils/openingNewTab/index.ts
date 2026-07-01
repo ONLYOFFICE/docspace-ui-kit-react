@@ -62,6 +62,7 @@ declare global {
       };
       campaigns?: string[];
       isFrame?: boolean;
+      isOAuthFrame?: boolean;
       management: {
         checkDomain?: boolean;
       };
