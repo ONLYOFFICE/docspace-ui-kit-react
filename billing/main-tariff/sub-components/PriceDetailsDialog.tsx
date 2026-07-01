@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 
@@ -44,13 +44,11 @@ import { Button, ButtonSize } from "../../../components/button";
 import { HelpButton } from "../../../components/help-button";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { ModalDialog } from "../../../components/modal-dialog";
-import { toastr } from "../../../components/toast";
 
-import { useApi } from "../../../providers";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import WalletInfo from "../../shared/top-up-balance/sub-components/WalletInfo";
+import StorageWarning from "../../services/panels/additional-storage/StorageWarning";
 import { formatRemainingDays } from "../../utils/common";
-import { AnalyticsEvents } from "../../../enums";
 
 import InfoIcon from "../../../assets/info.outline.react.svg";
 
@@ -59,96 +57,63 @@ import styles from "./PriceDetailsDialog.module.scss";
 type PriceDetailsDialogProps = {
   visible: boolean;
   onClose: () => void;
+  isDowngradePlan: boolean;
+  confirmLabel: string;
 };
 
 const PriceDetailsDialog = observer(
-  ({ visible, onClose }: PriceDetailsDialogProps) => {
+  ({
+    visible,
+    onClose,
+    isDowngradePlan: isDowngradePlanProp,
+    confirmLabel: confirmLabelProp,
+  }: PriceDetailsDialogProps) => {
     const t = useCommonTranslation();
-    const { paymentApi } = useApi();
     const store = usePaymentStore();
     const {
-      setIsLoading,
       isLoading,
       managersCount,
       totalPrice,
-      walletBalance,
-      walletCodeCurrency,
       tariffDueTodayAmount,
       isTariffDueTodayCalculating,
       formatPaymentCurrency,
       formatWalletCurrency,
-      fetchBalance,
       language,
     } = store;
-    const {
-      maxCountManagersByQuota,
-      currentTariffPlanTitle,
-      fetchPortalQuota,
-    } = store.quotas;
+    const { maxCountManagersByQuota } = store.quotas;
     const { planCost } = store.paymentQuotas;
-    const { paymentDate, daysUntilPayment, fetchPortalTariff } = store.tariff;
+    const { paymentDate, daysUntilPayment } = store.tariff;
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const currentAdmins = maxCountManagersByQuota;
-    const newAdmins = managersCount;
+    const isDowngradePlan = useRef(isDowngradePlanProp).current;
+    const confirmLabel = useRef(confirmLabelProp).current;
+    const currentAdmins = useRef(maxCountManagersByQuota).current;
+    const newAdmins = useRef(managersCount).current;
+    const pricePerAdmin = useRef(planCost.value).current;
+    const initialPaymentDate = useRef(paymentDate).current;
+    const initialDaysUntilPayment = useRef(daysUntilPayment).current;
+
     const additionalAdmins = newAdmins - currentAdmins;
-    const pricePerAdmin = planCost.value;
     const dueToday = tariffDueTodayAmount ?? 0;
-    const daysDisplay = formatRemainingDays(daysUntilPayment, language, t);
+    const daysDisplay = formatRemainingDays(
+      initialDaysUntilPayment,
+      language,
+      t,
+    );
 
     const onConfirm = async () => {
       setIsSubmitting(true);
-      setIsLoading(true);
-      try {
-        const isBalanceInsufficient = walletBalance < dueToday;
-        if (isBalanceInsufficient) {
-          const recommendedAmount = Math.ceil(dueToday - walletBalance);
-          if (recommendedAmount > 0) {
-            await paymentApi.topUpDeposit({
-              topUpDepositRequestDto: {
-                amount: recommendedAmount,
-                currency: walletCodeCurrency || "USD",
-              },
-            });
-          }
-        }
 
-        const updateRes = await paymentApi.updateWalletPayment({
-          walletQuantityRequestDto: {
-            quantity: { adminwallet: additionalAdmins },
-            productQuantityType: ProductQuantityType.Add,
-          },
-        });
+      const isSuccess = await store.executeWalletUpdate(
+        isDowngradePlan ? newAdmins : additionalAdmins,
+        isDowngradePlan ? ProductQuantityType.Set : ProductQuantityType.Add,
+        t,
+      );
 
-        if (updateRes?.data?.response === false) {
-          toastr.error(t("ErrorNotification"));
-          return;
-        }
+      setIsSubmitting(false);
 
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: AnalyticsEvents.Purchase,
-          ecommerce: { items: [{ item_name: "DocSpace Business" }] },
-        });
-
-        await Promise.all([
-          fetchPortalTariff(true),
-          fetchBalance(true),
-          fetchPortalQuota(true),
-        ]);
-
-        toastr.success(
-          t("BusinessUpdated", { planName: currentTariffPlanTitle }),
-        );
-        onClose();
-      } catch (e) {
-        console.error(e);
-        toastr.error(t("ErrorNotification"));
-      } finally {
-        setIsSubmitting(false);
-        setIsLoading(false);
-      }
+      if (isSuccess) onClose();
     };
 
     const renderRow = (label: React.ReactNode, value: React.ReactNode) => (
@@ -164,7 +129,9 @@ const PriceDetailsDialog = observer(
 
     return (
       <ModalDialog visible={visible} onClose={onClose} autoMaxHeight isLarge>
-        <ModalDialog.Header>{t("PriceDetails")}</ModalDialog.Header>
+        <ModalDialog.Header>
+          {isDowngradePlan ? t("Confirmation") : t("PriceDetails")}
+        </ModalDialog.Header>
         <ModalDialog.Body>
           <div className={styles.content}>
             <WalletInfo balance={formatWalletCurrency()} />
@@ -178,20 +145,33 @@ const PriceDetailsDialog = observer(
                 t("AdminAdjustment"),
                 `${currentAdmins} → ${newAdmins}`,
               )}
-              {renderRow(t("AdditionalAdmins"), `+${additionalAdmins}`)}
+              {renderRow(
+                isDowngradePlan ? t("ReducedAdmins") : t("AdditionalAdmins"),
+                isDowngradePlan
+                  ? `${additionalAdmins}`
+                  : `+${additionalAdmins}`,
+              )}
               {renderRow(
                 t("PricePerAdmin"),
                 formatPaymentCurrency(pricePerAdmin),
               )}
-              {renderRow(
-                t("RemainingPeriod"),
-                <>
-                  {`${daysDisplay} `}
-                  <Text as="span" fontSize="14px" className={styles.muted}>
-                    ({t("UntilDate", { date: paymentDate })})
-                  </Text>
-                </>,
-              )}
+              {isDowngradePlan
+                ? renderRow(
+                    t("NewMonthlyPrice"),
+                    formatPaymentCurrency(newAdmins * pricePerAdmin),
+                  )
+                : null}
+              {isDowngradePlan
+                ? renderRow(t("EffectiveDate"), initialPaymentDate)
+                : renderRow(
+                    t("RemainingPeriod"),
+                    <>
+                      {`${daysDisplay} `}
+                      <Text as="span" fontSize="14px" className={styles.muted}>
+                        ({t("UntilDate", { date: initialPaymentDate })})
+                      </Text>
+                    </>,
+                  )}
 
               <div className={styles.divider} />
 
@@ -200,17 +180,20 @@ const PriceDetailsDialog = observer(
                   <Text as="span" fontSize="14px" fontWeight={600}>
                     {t("TotalDueToday")}
                   </Text>
-                  <HelpButton
-                    iconNode={<InfoIcon />}
-                    tooltipContent={
-                      <Text fontSize="12px">
-                        {t("DueTodayProrationTooltip")}
-                      </Text>
-                    }
-                    dataTestId="price_details_due_today_help"
-                  />
+                  {isDowngradePlan ? null : (
+                    <HelpButton
+                      iconNode={<InfoIcon />}
+                      tooltipContent={
+                        <Text fontSize="12px">
+                          {t("DueTodayProrationTooltip")}
+                        </Text>
+                      }
+                      dataTestId="price_details_due_today_help"
+                    />
+                  )}
                 </div>
-                {isTariffDueTodayCalculating || tariffDueTodayAmount === null ? (
+                {isTariffDueTodayCalculating ||
+                tariffDueTodayAmount === null ? (
                   <Loader color="" size="16px" type={LoaderTypes.track} />
                 ) : (
                   <Text as="span" fontSize="14px" fontWeight={600}>
@@ -220,27 +203,33 @@ const PriceDetailsDialog = observer(
               </div>
             </div>
 
-            <Text fontSize="13px">
-              <CommonTrans
-                i18nKey="PriceDetailsNextBill"
-                values={{
-                  price: formatPaymentCurrency(totalPrice),
-                  date: paymentDate,
-                }}
-                components={{
-                  1: <Text as="span" fontSize="13px" fontWeight={600} />,
-                  2: <Text as="span" fontSize="13px" fontWeight={600} />,
-                }}
+            {isDowngradePlan ? (
+              <StorageWarning
+                body={t("TariffAdminAdjustmentWarning", {
+                  admins: currentAdmins,
+                })}
               />
-            </Text>
+            ) : (
+              <Text fontSize="13px">
+                <CommonTrans
+                  i18nKey="PriceDetailsNextBill"
+                  values={{
+                    price: formatPaymentCurrency(totalPrice),
+                    date: paymentDate,
+                  }}
+                  components={{
+                    1: <Text as="span" fontSize="13px" fontWeight={600} />,
+                    2: <Text as="span" fontSize="13px" fontWeight={600} />,
+                  }}
+                />
+              </Text>
+            )}
           </div>
         </ModalDialog.Body>
         <ModalDialog.Footer>
           <Button
             key="confirm"
-            label={t("PayAndUpgrade", {
-              amount: formatPaymentCurrency(dueToday),
-            })}
+            label={confirmLabel}
             size={ButtonSize.normal}
             primary
             scale
