@@ -99,6 +99,7 @@ const AiPage = (props: AiPageProps) => {
     isServiceActionDisabled,
     formatWalletCurrency,
     isLowWalletBalance,
+    isCardMissingOrInactive,
   } = paymentStore;
 
   const { logoText, language } = paymentStore;
@@ -264,7 +265,7 @@ const AiPage = (props: AiPageProps) => {
         <SimpleTopUpDialog
           visible={isTopUpVisible}
           onClose={onCloseTopUp}
-          isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
+          isFirstTopUp={isCardMissingOrInactive}
         />
       ) : null}
 

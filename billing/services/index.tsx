@@ -97,6 +97,7 @@ const Services = observer(
       isCardLinkedToPortal,
       isServiceActionDisabled,
       isAiToolsServiceOn,
+      isCardMissingOrInactive,
     } = paymentStore;
 
     const {
@@ -497,6 +498,7 @@ const Services = observer(
             visible={isFirstTopUpDialogVisible}
             onClose={() => setIsFirstTopUpDialogVisible(false)}
             onConfirm={onFirstTopUpConfirmed}
+            isFirstTopUp={isCardMissingOrInactive}
           />
         ) : null}
         {isConfirmDialogVisible && confirmActionType ? (
