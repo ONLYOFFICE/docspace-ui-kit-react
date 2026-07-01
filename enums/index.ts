@@ -191,6 +191,7 @@ export const enum FolderType {
   ResultStorage = 33,
   AIAgents = 34,
   DefaultTemplates = 35,
+  Forms = 36,
 }
 
 export enum GuidanceRefKey {

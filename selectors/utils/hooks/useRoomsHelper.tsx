@@ -178,9 +178,13 @@ const useRoomsHelper = ({
             );
       }
 
+      const effectiveSearchArea = formsSection
+        ? ("Forms" as unknown as SearchArea)
+        : (searchArea as SearchArea);
+
       const res = await roomsApi.getRoomsFolder({
         type: typeFilter,
-        searchArea: searchArea as SearchArea,
+        searchArea: effectiveSearchArea,
         storageFilter: disableThirdParty ? StorageFilter.Internal : undefined,
         count: PAGE_COUNT,
         startIndex,
