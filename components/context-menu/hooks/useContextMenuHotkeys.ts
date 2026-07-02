@@ -77,6 +77,7 @@ const useContextMenuHotkeys = ({
   const onOpenSubMenu = () => {
     const currentItem = menuModel[currentIndex];
     if (
+      !currentItem ||
       !("items" in currentItem) ||
       !currentItem.items ||
       !currentItem.items.length
@@ -99,6 +100,8 @@ const useContextMenuHotkeys = ({
     for (const index in menuModel) {
       const item = menuModel[index];
 
+      if (!item) continue;
+
       const withDisabled = showDisabledItems ? true : !item.disabled;
       if (!item.isSeparator && withDisabled) {
         clearModel.push({ ...item, index: Number(index) });
@@ -107,8 +110,9 @@ const useContextMenuHotkeys = ({
 
     if (!clearModel.length) return e;
 
+    const currentKey = menuModel[currentIndex]?.key;
     const clearModelIndex = clearModel.findIndex(
-      (elem) => elem.key === menuModel[currentIndex].key,
+      (elem) => elem.key === currentKey,
     );
 
     switch (e.code) {
@@ -154,7 +158,7 @@ const useContextMenuHotkeys = ({
 
           const prevModel = prevActiveItems?.items ?? model;
           const prevModelIndex = prevModel?.findIndex(
-            (x) => x.key === prevItem?.key,
+            (x) => x?.key === prevItem?.key,
           );
 
           setCurrentIndex(prevModelIndex > -1 ? prevModelIndex : 0);
@@ -171,6 +175,7 @@ const useContextMenuHotkeys = ({
         break;
       case "Enter": {
         const currentItem = clearModel[clearModelIndex];
+        if (!currentItem) break;
         if ("items" in currentItem && currentItem.items) {
           onOpenSubMenu();
         } else if ("onClick" in currentItem && currentItem.onClick) {

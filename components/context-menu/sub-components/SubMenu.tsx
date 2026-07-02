@@ -393,7 +393,7 @@ const SubMenu = (props: SubMenuProps) => {
     if (showDisabledItems ? false : item.disabled) return;
     // TODO: Not render disabled items
 
-    const activeItem = activeItems?.find((x) => x.key === item.key);
+    const activeItem = activeItems?.find((x) => x?.key === item.key);
 
     const active = !!activeItem;
 
@@ -680,7 +680,7 @@ const SubMenu = (props: SubMenuProps) => {
 
       const level = menuLevel + 1;
 
-      const activeItem = activeItems?.find((x) => x.key === item.key);
+      const activeItem = activeItems?.find((x) => x?.key === item.key);
 
       if (contextMenuTypeItem?.items || contextMenuTypeItem?.onLoad) {
         submenu.push(
