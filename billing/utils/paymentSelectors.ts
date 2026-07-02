@@ -49,6 +49,7 @@ export type TCardStatusInput = {
   isNonProfit?: boolean;
   isFreeTariff?: boolean;
   walletCustomerEmail?: string | null;
+  walletCustomerStatusNotActive?: boolean;
 };
 
 export const getCardLinkedOnFreeTariff = (
@@ -74,6 +75,12 @@ export const getIsCardLinkedToPortal = ({
   getCardLinkedOnNonProfit(isNonProfit, walletCustomerEmail) ||
   getCardLinkedOnFreeTariff(isFreeTariff, walletCustomerEmail) ||
   (!isNonProfit && !isFreeTariff);
+
+export const getIsCardMissingOrInactive = ({
+  walletCustomerStatusNotActive,
+  ...cardStatus
+}: TCardStatusInput): boolean =>
+  !getIsCardLinkedToPortal(cardStatus) || !!walletCustomerStatusNotActive;
 
 export const getIsPayer = (
   userEmail?: string | null,

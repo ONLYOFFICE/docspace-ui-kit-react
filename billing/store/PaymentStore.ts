@@ -63,6 +63,7 @@ import {
   getCardLinkedOnFreeTariff,
   getCardLinkedOnNonProfit,
   getIsCardLinkedToPortal,
+  getIsCardMissingOrInactive,
   getIsPayer,
   getWalletBalanceAmount,
   getWalletBalanceCurrency,
@@ -397,9 +398,12 @@ class PaymentStore {
   }
 
   get isCardMissingOrInactive() {
-    return (
-      !this.isCardLinkedToPortal || this.tariff.walletCustomerStatusNotActive
-    );
+    return getIsCardMissingOrInactive({
+      isNonProfit: this.quotas.isNonProfit,
+      isFreeTariff: this.quotas.isFreeTariff,
+      walletCustomerEmail: this.tariff.walletCustomerEmail,
+      walletCustomerStatusNotActive: this.tariff.walletCustomerStatusNotActive,
+    });
   }
 
   get needsWalletMigration() {
