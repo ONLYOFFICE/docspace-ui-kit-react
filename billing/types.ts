@@ -65,6 +65,7 @@ export type TDocsConnectCardState = {
   trialDaysLeft: number;
   trialEndingSoon: boolean;
   trialExpired: boolean;
+  trialEndDate: string;
 };
 
 type TAiToolsChatPrice = {

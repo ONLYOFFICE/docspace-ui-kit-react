@@ -47,6 +47,7 @@ import {
   TOTAL_SIZE,
 } from "../constants";
 import { calculateTotalPrice, getConvertedSize } from "../utils/common";
+import { formatDateLocalized } from "../../utils/date";
 import type {
   TDocsConnectCardState,
   TServiceFeatureWithPrice,
@@ -95,6 +96,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     isBackupServiceOn,
     isStorageDeactivationVisited,
     isLowWalletBalance,
+    language,
   } = paymentStore;
 
   const { isFreeTariff } = paymentStore.quotas;
@@ -138,6 +140,19 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     const id = dataset.id;
 
     onClick?.(id!);
+  };
+
+  const handleDocsConnectToggle = (
+    e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const dataset = (e.currentTarget as HTMLElement).dataset;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (dataset.disabled?.toLowerCase() === "true") return;
+
+    onClick?.(dataset.id!);
   };
 
   const onSupportedModelsClick = (e: React.MouseEvent) => {
@@ -378,6 +393,17 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             const trialDaysLeft = docsConnectState?.trialDaysLeft ?? 0;
             const trialEndingSoon = docsConnectState?.trialEndingSoon ?? false;
             const trialExpired = docsConnectState?.trialExpired ?? false;
+            const trialActive = subscribed && isTrial && !trialExpired;
+
+            const trialToggleTooltip = trialActive
+              ? t("DocsConnectTrialToggleDisabled", {
+                  date: formatDateLocalized(
+                    docsConnectState?.trialEndDate,
+                    "DATE_MED",
+                    { locale: language },
+                  ),
+                })
+              : undefined;
 
             let docsConnectPrice;
             if (!subscribed) {
@@ -418,7 +444,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               <ServiceCard
                 key={item.id}
                 onClick={handleClick}
-                onToggle={handleClick}
+                onToggle={handleDocsConnectToggle}
                 serviceTitle={item.title}
                 priceTitle={item.priceTitle}
                 priceDescription={docsConnectPrice}
@@ -427,6 +453,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 isEnabled={subscribed && !trialExpired}
                 isWarningColor={isTrial && !trialExpired && trialEndingSoon}
                 isErrorColor={trialExpired}
+                toggleDisabled={trialActive}
+                tooltip={trialToggleTooltip}
               />
             );
           }

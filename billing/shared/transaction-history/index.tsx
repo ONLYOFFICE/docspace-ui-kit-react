@@ -81,6 +81,7 @@ type TransactionHistoryProps = {
   serviceName?: string;
   headerTitle?: string;
   hideTypeFilter?: boolean;
+  hideContactFilter?: boolean;
   withoutRoleFilter?: boolean;
   maxWidth?: number | string;
 };
@@ -98,6 +99,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     serviceName,
     headerTitle,
     hideTypeFilter,
+    hideContactFilter,
     withoutRoleFilter,
     maxWidth,
   } = props;
@@ -483,7 +485,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         />
       ) : null}
       {datesComponent}
-      {contactSelector}
+      {hideContactFilter ? null : contactSelector}
       {isTransactionFilterModified ? (
         <Link
           onClick={onClearFilter}
@@ -611,7 +613,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           isSelectorVisible={isSelectorVisible}
           selectorComponent={selectorComponent}
           datesComponent={datesComponent}
-          contactSelector={contactSelector}
+          contactSelector={hideContactFilter ? null : contactSelector}
           typeOfHistoty={typeOfHistoty}
           selectedType={
             isFilterDialogVisible
