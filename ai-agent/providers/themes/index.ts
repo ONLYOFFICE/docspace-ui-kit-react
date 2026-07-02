@@ -329,6 +329,8 @@ const buildTokens = (
     "var(--highlight-accent-button-hover)",
   "--chat-composer-action-send-background-pressed-color":
     "var(--highlight-accent-button-pressed)",
+  "--chat-thread-max-width": "824px",
+  "--chat-thread-padding-x": "16px",
 
   "--chat-user-message-background": "var(--highlight-button-hover)",
   "--chat-user-message-color": "var(--text-normal)",
