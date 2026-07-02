@@ -138,6 +138,24 @@ describe("getTextColor", () => {
 		});
 	});
 
+	describe("invalid input", () => {
+		it("returns white for an empty string", () => {
+			expect(getTextColor("")).toBe(white);
+		});
+
+		it("returns white for a non-hex string", () => {
+			expect(getTextColor("not-a-color")).toBe(white);
+		});
+
+		it("returns white for a truncated hex value", () => {
+			expect(getTextColor("#ff")).toBe(white);
+		});
+
+		it("returns white for a hex value with invalid characters", () => {
+			expect(getTextColor("#zzzzzz")).toBe(white);
+		});
+	});
+
 	describe("brand colors", () => {
 		it("returns appropriate color for main blue (#4781D1)", () => {
 			expect(getTextColor("#4781D1")).toBe(white);
