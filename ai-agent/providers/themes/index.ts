@@ -92,6 +92,7 @@ type BasePalette = {
   promptButtonColor: string;
   chatComposerActionSendColor: string;
   toggleButtonOffCircleColor: string;
+  inputPlaceholderColor: string;
 };
 
 const buildTokens = (
@@ -332,6 +333,10 @@ const buildTokens = (
   "--chat-thread-max-width": "824px",
   "--chat-thread-padding-x": "16px",
 
+  "--chat-input-font-size": "15px",
+  "--chat-input-font-weight": "400",
+  "--chat-input-placeholder": p.inputPlaceholderColor,
+
   "--chat-user-message-background": "var(--highlight-button-hover)",
   "--chat-user-message-color": "var(--text-normal)",
   "--chat-message-color": "var(--text-normal)",
@@ -450,6 +455,7 @@ const portalBasePalette: BasePalette = {
   chatComposerActionSendColor: globalColors.white,
   // DocSpace toggleButton.fillCircleColorOff = white (base.ts).
   toggleButtonOffCircleColor: globalColors.white,
+  inputPlaceholderColor: globalColors.gray,
 };
 
 // DocSpace Dark — dark palette.
@@ -528,6 +534,7 @@ const portalDarkPalette: BasePalette = {
   chatComposerActionSendColor: globalColors.black,
   // DocSpace toggleButton.fillCircleColorOff = white (dark.ts).
   toggleButtonOffCircleColor: globalColors.white,
+  inputPlaceholderColor: globalColors.grayDarkText,
 };
 
 export const portalThemes: Record<
