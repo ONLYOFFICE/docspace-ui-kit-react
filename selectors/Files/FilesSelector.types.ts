@@ -195,6 +195,7 @@ export type UseFilesHelpersProps = {
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
   activeSpecialScope?: SpecialFolderScope | null;
+  formsSection?: boolean;
 };
 
 export type TUseInputItemHelper = {
