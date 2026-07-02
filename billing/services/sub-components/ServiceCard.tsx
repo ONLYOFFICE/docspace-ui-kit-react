@@ -88,6 +88,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   withoutGreenColor,
 }) => {
   const tooltipId = tooltip ? `serviceCardTooltip_${id}` : undefined;
+  const priceTooltipId = priceTooltip
+    ? `servicePriceTooltip_${id}`
+    : undefined;
 
   return (
     <div
@@ -155,7 +158,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
                   !withoutGreenColor,
                 [styles.inactiveColor]: isInactiveColor,
               })}
-              {...(priceTooltip && { "data-tooltip-id": "serviceTooltip" })}
+              {...(priceTooltipId && { "data-tooltip-id": priceTooltipId })}
             >
               {withoutIcon ? null : icon ? (
                 icon
@@ -167,12 +170,13 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
               <Text fontWeight={600} fontSize="12px">
                 {priceDescription}
               </Text>
-              {priceTooltip ? (
+              {priceTooltipId ? (
                 <Tooltip
-                  id="serviceTooltip"
+                  id={priceTooltipId}
                   place="bottom"
                   maxWidth="300px"
                   float
+                  offset={20}
                   getContent={() => priceTooltip}
                   dataTestId="service_change_shedule_tooltip"
                 />

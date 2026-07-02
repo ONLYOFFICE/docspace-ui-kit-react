@@ -66,6 +66,10 @@ export type TDocsConnectCardState = {
   trialEndingSoon: boolean;
   trialExpired: boolean;
   trialEndDate: string;
+  tariffPrice: number;
+  tariffUsers: number;
+  scheduledUsers: number | null;
+  scheduledDate: string;
 };
 
 type TAiToolsChatPrice = {

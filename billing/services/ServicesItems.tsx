@@ -394,6 +394,9 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             const trialEndingSoon = docsConnectState?.trialEndingSoon ?? false;
             const trialExpired = docsConnectState?.trialExpired ?? false;
             const trialActive = subscribed && isTrial && !trialExpired;
+            const scheduledUsers = docsConnectState?.scheduledUsers ?? null;
+            const hasScheduledChange =
+              subscribed && !isTrial && scheduledUsers != null;
 
             const trialToggleTooltip = trialActive
               ? t("DocsConnectTrialToggleDisabled", {
@@ -404,6 +407,26 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                   ),
                 })
               : undefined;
+
+            const scheduledTooltip = hasScheduledChange ? (
+              <>
+                <Text fontWeight={600} fontSize="12px">
+                  {t("UserAdjustment", {
+                    fromCount: docsConnectState?.tariffUsers ?? 0,
+                    toCount: scheduledUsers,
+                  })}
+                </Text>
+                <Text fontSize="12px">
+                  {t("TariffPlanAutoRenewedWithUpdate", {
+                    date: formatDateLocalized(
+                      docsConnectState?.scheduledDate,
+                      "DATE_MED",
+                      { locale: language },
+                    ),
+                  })}
+                </Text>
+              </>
+            ) : undefined;
 
             let docsConnectPrice;
             if (!subscribed) {
@@ -434,9 +457,15 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               docsConnectPrice = t("DocsConnectTrialDaysLeft", {
                 count: trialDaysLeft,
               });
+            } else if (hasScheduledChange) {
+              docsConnectPrice = t("ChangeShedule");
             } else {
-              docsConnectPrice = t("CurrencyPerMonth", {
-                currency: formatWalletCurrency(item.price.value, 2),
+              docsConnectPrice = t("DocsConnectCurrentTariffPlan", {
+                price: formatWalletCurrency(
+                  docsConnectState?.tariffPrice ?? 0,
+                  2,
+                ),
+                count: docsConnectState?.tariffUsers ?? 0,
               });
             }
 
@@ -451,10 +480,14 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 id={item.id}
                 image={item.image}
                 isEnabled={subscribed && !trialExpired}
-                isWarningColor={isTrial && !trialExpired && trialEndingSoon}
+                isWarningColor={
+                  (isTrial && !trialExpired && trialEndingSoon) ||
+                  hasScheduledChange
+                }
                 isErrorColor={trialExpired}
                 toggleDisabled={trialActive}
                 tooltip={trialToggleTooltip}
+                priceTooltip={scheduledTooltip}
               />
             );
           }
