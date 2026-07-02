@@ -39,6 +39,7 @@ import PenEditIcon from "../../../assets/icons/12/pen-edit.react.svg";
 import SaveIcon from "../../../assets/icons/16/download-file.svg";
 import PlusIcon from "../../../assets/icons/16/plus.svg";
 import PromptIcon from "../../../assets/icons/16/prompt.svg";
+import ArrowUpIcon from "../../../assets/icons/16/upgrade.react.svg";
 
 import styles from "./Icon.module.scss";
 
@@ -85,4 +86,5 @@ export const imageOverrides: ImageOverrides = {
   "btn-save": makeIcon(SaveIcon),
   "btn-zoomup": makeIcon(PlusIcon),
   "btn-prompt": makeIcon(PromptIcon),
+  send: makeIcon(ArrowUpIcon),
 };
