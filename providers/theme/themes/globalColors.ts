@@ -42,6 +42,7 @@ export const globalColors = {
   grayLight: "#F8F9F9",
   darkGrayLight: "#282828",
   lightGrayHover: "#F3F4F4",
+  paleGray: "#F1F2F4",
   lightDarkGrayHover: "#3D3D3D",
   grayLightMid: "#ECEEF1",
   grayDarkMid: "#242424",

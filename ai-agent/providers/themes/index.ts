@@ -93,6 +93,9 @@ type BasePalette = {
   chatComposerActionSendColor: string;
   toggleButtonOffCircleColor: string;
   inputPlaceholderColor: string;
+  chatComposerActionSendBackgroundColor: string;
+  chatComposerActionSendBackgroundHoverColor: string;
+  chatComposerActionSendBackgroundPressedColor: string;
 };
 
 const buildTokens = (
@@ -325,11 +328,11 @@ const buildTokens = (
   "--chat-composer-placeholder-color": "var(--text-secondary)",
   "--chat-composer-action-send-color": p.chatComposerActionSendColor,
   "--chat-composer-action-send-background-color":
-    "var(--background-accent-button)",
+    p.chatComposerActionSendBackgroundColor,
   "--chat-composer-action-send-background-hover-color":
-    "var(--highlight-accent-button-hover)",
+    p.chatComposerActionSendBackgroundHoverColor,
   "--chat-composer-action-send-background-pressed-color":
-    "var(--highlight-accent-button-pressed)",
+    p.chatComposerActionSendBackgroundPressedColor,
   "--chat-thread-max-width": "824px",
   "--chat-thread-padding-x": "16px",
 
@@ -456,6 +459,10 @@ const portalBasePalette: BasePalette = {
   // DocSpace toggleButton.fillCircleColorOff = white (base.ts).
   toggleButtonOffCircleColor: globalColors.white,
   inputPlaceholderColor: globalColors.gray,
+  chatComposerActionSendBackgroundColor: globalColors.lightBlueMain,
+  chatComposerActionSendBackgroundHoverColor: globalColors.lightBlueMainHover,
+  chatComposerActionSendBackgroundPressedColor:
+    globalColors.lightBlueMainPressed,
 };
 
 // DocSpace Dark — dark palette.
@@ -535,6 +542,9 @@ const portalDarkPalette: BasePalette = {
   // DocSpace toggleButton.fillCircleColorOff = white (dark.ts).
   toggleButtonOffCircleColor: globalColors.white,
   inputPlaceholderColor: globalColors.grayDarkText,
+  chatComposerActionSendBackgroundColor: globalColors.paleGray,
+  chatComposerActionSendBackgroundHoverColor: globalColors.grayLightMid,
+  chatComposerActionSendBackgroundPressedColor: globalColors.lightGraySelected,
 };
 
 export const portalThemes: Record<
