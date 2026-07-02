@@ -50,6 +50,7 @@ import {
   DOCS_CONNECT_SERVICE,
   TOTAL_SIZE,
 } from "../constants";
+import type { TDocsConnectCardState } from "../types";
 
 const toWalletService = (id: string): TenantWalletService => {
   if (id === BACKUP_SERVICE) return TenantWalletService.Backup;
@@ -82,6 +83,7 @@ type TServicesProps = {
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
   onDocsConnectClick?: () => void;
+  docsConnectState?: TDocsConnectCardState;
 };
 
 const Services = observer(
@@ -92,6 +94,7 @@ const Services = observer(
     cardDisabled,
     onOpenSupportedModels,
     onDocsConnectClick,
+    docsConnectState,
   }: TServicesProps) => {
     const navigate = useNavigate();
     const paymentStore = usePaymentStore();
@@ -471,6 +474,7 @@ const Services = observer(
           onToggle={onToggle}
           cardDisabled={cardDisabled}
           onOpenSupportedModels={onOpenSupportedModels}
+          docsConnectState={docsConnectState}
         />
         {isShowStorageTariffDeactivatedModal ? (
           <StorageTariffDeactivated

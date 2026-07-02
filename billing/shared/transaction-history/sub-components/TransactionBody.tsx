@@ -41,14 +41,15 @@ import { EmptyView } from "../../../../components/empty-view";
 
 import { Consumer } from "../../../../utils";
 
-import NoTransactionsFilterIcon from "../../../../assets/no.transactions.react.svg";
-import NoTransactionsFilterDarkIcon from "../../../../assets/no.transactions.dark.theme.react.svg";
-import NoTransactionsIcon from "../../../../assets/no.transactions.filter.react.svg";
-import NoTransactionsDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
+import NoTransactionsIcon from "../../../../assets/no.transactions.react.svg";
+import NoTransactionsDarkIcon from "../../../../assets/no.transactions.dark.theme.react.svg";
+import NoTransactionsFilterIcon from "../../../../assets/no.transactions.filter.react.svg";
+import NoTransactionsFilterDarkIcon from "../../../../assets/no.transactions.filter.dark.theme.react.svg";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import useViewEffect from "../../../../hooks/useViewEffect";
 import useDeviceType from "../../../hooks/useDeviceType";
+import { DOCS_CONNECT_SERVICE } from "../../../constants";
 
 import styles from "../styles/TransactionHistory.module.scss";
 
@@ -98,12 +99,18 @@ const TransactionBody = ({
     <NoTransactionsFilterDarkIcon />
   );
 
+  const isDocsConnect = serviceName === DOCS_CONNECT_SERVICE;
+
   const title = hasAppliedDateFilter
     ? t("NoFindingsFound2")
-    : t("NoWalletTransaction");
+    : isDocsConnect
+      ? t("NoDocsConnectTransaction")
+      : t("NoWalletTransaction");
   const description = hasAppliedDateFilter
     ? t("NoTransactionsFilter")
-    : t("NoWalletTransactionDescription");
+    : isDocsConnect
+      ? t("NoDocsConnectTransactionDescription")
+      : t("NoWalletTransactionDescription");
 
   const emptyView = (
     <EmptyView

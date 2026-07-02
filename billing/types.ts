@@ -59,6 +59,14 @@ export type TServiceFeatureWithPrice = TNumericPaymentFeature & {
   serviceName?: string;
 };
 
+export type TDocsConnectCardState = {
+  subscribed: boolean;
+  isTrial: boolean;
+  trialDaysLeft: number;
+  trialEndingSoon: boolean;
+  trialExpired: boolean;
+};
+
 type TAiToolsChatPrice = {
   prompt: number;
   completion: number;

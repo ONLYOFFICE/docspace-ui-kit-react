@@ -47,7 +47,10 @@ import {
   TOTAL_SIZE,
 } from "../constants";
 import { calculateTotalPrice, getConvertedSize } from "../utils/common";
-import type { TServiceFeatureWithPrice } from "../types";
+import type {
+  TDocsConnectCardState,
+  TServiceFeatureWithPrice,
+} from "../types";
 
 import PriceIcon from "../../assets/icons/16/price.react.svg";
 
@@ -69,6 +72,7 @@ type ServicesItemsProps = {
   isTablet?: boolean;
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
+  docsConnectState?: TDocsConnectCardState;
 };
 
 const ServicesItems: React.FC<ServicesItemsProps> = ({
@@ -77,6 +81,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   isMobile,
   isTablet,
   onOpenSupportedModels,
+  docsConnectState,
 }) => {
   const paymentStore = usePaymentStore();
 
@@ -368,19 +373,60 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
           }
 
           if (item.serviceName === DOCS_CONNECT_SERVICE) {
+            const subscribed = docsConnectState?.subscribed ?? false;
+            const isTrial = docsConnectState?.isTrial ?? false;
+            const trialDaysLeft = docsConnectState?.trialDaysLeft ?? 0;
+            const trialEndingSoon = docsConnectState?.trialEndingSoon ?? false;
+            const trialExpired = docsConnectState?.trialExpired ?? false;
+
+            let docsConnectPrice;
+            if (!subscribed) {
+              docsConnectPrice = t("DocsConnectTrialAvailable", {
+                price: formatWalletCurrency(item.price.value, 0),
+              });
+            } else if (trialExpired) {
+              docsConnectPrice = (
+                <>
+                  {t("TrialExpired")}
+                  <Link
+                    fontSize="13px"
+                    fontWeight={600}
+                    color="accent"
+                    textDecoration="underline dotted"
+                    style={{ marginInlineStart: "8px" }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClick?.(item.id!);
+                    }}
+                    dataTestId="docs_connect_buy_plan_link"
+                  >
+                    {t("BuyPlan")}
+                  </Link>
+                </>
+              );
+            } else if (isTrial) {
+              docsConnectPrice = t("DocsConnectTrialDaysLeft", {
+                count: trialDaysLeft,
+              });
+            } else {
+              docsConnectPrice = t("CurrencyPerMonth", {
+                currency: formatWalletCurrency(item.price.value, 2),
+              });
+            }
+
             return (
               <ServiceCard
                 key={item.id}
-                withoutToggle
                 onClick={handleClick}
+                onToggle={handleClick}
                 serviceTitle={item.title}
                 priceTitle={item.priceTitle}
-                priceDescription={t("CurrencyPerMonth", {
-                  currency: formatWalletCurrency(item.price.value, 2),
-                })}
+                priceDescription={docsConnectPrice}
                 id={item.id}
                 image={item.image}
-                isEnabled={!!item.value}
+                isEnabled={subscribed && !trialExpired}
+                isWarningColor={isTrial && !trialExpired && trialEndingSoon}
+                isErrorColor={trialExpired}
               />
             );
           }

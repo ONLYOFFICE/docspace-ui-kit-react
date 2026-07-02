@@ -45,7 +45,6 @@ import InfoIcon from "../../../assets/info.outline.react.svg";
 interface ServiceCardProps {
   onClick: (e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>) => void;
   onToggle?: (e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>) => void;
-  withoutToggle?: boolean;
   priceTitle?: string | null;
   id?: string | null;
   image?: string | null;
@@ -70,7 +69,6 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   cardDisabled,
   onClick,
   onToggle,
-  withoutToggle,
   priceTitle,
   children,
   toggleDisabled,
@@ -111,23 +109,21 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
           />
         </div>
 
-        {withoutToggle ? null : (
-          <div
-            onClick={onToggle}
-            className={styles.toggleWrapper}
-            data-id={id}
-            data-enabled={isEnabled}
-            data-disabled={toggleDisabled}
-            {...(tooltipId ? { "data-tooltip-id": tooltipId } : {})}
-          >
-            <ToggleButton
-              isChecked={isEnabled}
-              className={styles.serviceToggle}
-              isDisabled={toggleDisabled}
-              dataTestId={`storage_service_${id}_toggle`}
-            />
-          </div>
-        )}
+        <div
+          onClick={onToggle}
+          className={styles.toggleWrapper}
+          data-id={id}
+          data-enabled={isEnabled}
+          data-disabled={toggleDisabled}
+          {...(tooltipId ? { "data-tooltip-id": tooltipId } : {})}
+        >
+          <ToggleButton
+            isChecked={isEnabled}
+            className={styles.serviceToggle}
+            isDisabled={toggleDisabled}
+            dataTestId={`storage_service_${id}_toggle`}
+          />
+        </div>
       </div>
 
       <div className={styles.contentContainer}>
