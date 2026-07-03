@@ -191,7 +191,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   const priceDescription = (
     serviceName: string | null | undefined,
     priceValue?: number,
-    enabled?: boolean,
   ) => {
     switch (serviceName) {
       case TOTAL_SIZE:
@@ -348,7 +347,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 onClick={handleClick}
                 onToggle={handleToggle}
                 serviceTitle={item.title}
-                priceDescription={priceDescription(item.id, 0, item.value)}
+                priceDescription={priceDescription(item.id, 0)}
                 priceTitle={item.priceTitle}
                 id={item.id}
                 image={item.image}
@@ -407,6 +406,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               hasScheduledChange &&
               scheduledUsers !== (docsConnectState?.tariffUsers ?? 0);
             const deactivated = docsConnectState?.deactivated ?? false;
+            const canceled = docsConnectState?.canceled ?? false;
 
             const trialToggleTooltip = trialActive
               ? t("DocsConnectTrialToggleDisabled", {
@@ -484,6 +484,10 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               });
             } else if (deactivated) {
               docsConnectPrice = t("TariffPlanDeactivatedNonPayment");
+            } else if (canceled) {
+              docsConnectPrice = t("FromPricePerUserMonth", {
+                price: formatWalletCurrency(item.price.value, 0),
+              });
             } else if (hasScheduledChange) {
               docsConnectPrice = t("ChangeShedule");
             } else {
@@ -506,7 +510,9 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 priceDescription={docsConnectPrice}
                 id={item.id}
                 image={item.image}
-                isEnabled={subscribed && !trialExpired && !deactivated}
+                isEnabled={
+                  subscribed && !trialExpired && !deactivated && !canceled
+                }
                 isWarningColor={
                   (isTrial && !trialExpired && trialEndingSoon) ||
                   hasScheduledChange

@@ -72,6 +72,7 @@ export type TDocsConnectCardState = {
   scheduledDate: string;
   scheduledDevPackDisabled: boolean;
   deactivated: boolean;
+  canceled: boolean;
 };
 
 type TAiToolsChatPrice = {

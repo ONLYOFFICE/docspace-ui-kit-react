@@ -43,6 +43,7 @@ export const AI_ENUM = "aitools";
 export const STORAGE_ENUM = "storage";
 export const DISK_STORAGE = "disk-storage";
 export const DOCS_CONNECT_SERVICE = "docscloud";
+export const DOCS_CONNECT_DEVPACK_SERVICE = "docscloud-devpack";
 export const WEB_SEARCH = "websearch";
 export const FREE_BACKUP = "free_backup";
 export const STORAGE_TARIFF_DEACTIVATED = "storageTariffDeactivated";
