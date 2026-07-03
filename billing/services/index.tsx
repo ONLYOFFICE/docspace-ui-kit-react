@@ -105,7 +105,6 @@ const Services = observer(
       isShowStorageTariffDeactivatedModal,
       changeServiceState,
       isCardLinkedToPortal,
-      isServiceActionDisabled,
       isAiToolsServiceOn,
     } = paymentStore;
 
@@ -258,40 +257,15 @@ const Services = observer(
         return;
       }
 
-      if (id === AI_ENUM) {
-        if (isServiceActionDisabled && !isAiToolsServiceOn) return;
+      const { routes } = paymentStore;
+      const routeByService: Record<string, string> = {
+        [AI_ENUM]: routes.aiServices,
+        [TOTAL_SIZE]: routes.diskStorage,
+        [BACKUP_SERVICE]: routes.backup,
+      };
 
-        // if (
-        //   isAiToolsServiceOn ||
-        //   localStorage.getItem(AI_FEATURES_DIALOG_SHOWN_KEY)
-        // ) {
-        navigate(paymentStore.routes.aiServices);
-        return;
-        // }
-
-        // updateDialogVisibility(AI_ENUM, true);
-      }
-
-      if (
-        id === TOTAL_SIZE
-        // &&
-        // (currentStoragePlanSize || previousStoragePlanSize)
-      ) {
-        navigate(paymentStore.routes.diskStorage);
-        return;
-      }
-
-      // if (id === TOTAL_SIZE && isGracePeriod) {
-      //   setIsGracePeriodModalVisible(true);
-      //   return;
-      // }
-
-      if (id === BACKUP_SERVICE) {
-        navigate(paymentStore.routes.backup);
-        return;
-      }
-
-      updateDialogVisibility(id, true);
+      const route = routeByService[id];
+      if (route) navigate(route);
     };
 
     const onClose = () => {
