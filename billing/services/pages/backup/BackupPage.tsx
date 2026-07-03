@@ -349,6 +349,7 @@ const BackupPage: React.FC<BackupPageProps> = ({
           visible={isTopUpVisible}
           onClose={onCloseTopUpModal}
           isFirstTopUp={isCardMissingOrInactive}
+          serviceName={BACKUP_SERVICE}
         />
       ) : null}
     </div>

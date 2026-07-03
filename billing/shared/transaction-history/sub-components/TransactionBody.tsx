@@ -60,6 +60,8 @@ type TransactionHistoryProps = {
   hasAppliedDateFilter: boolean;
   serviceName?: string;
   maxWidth?: number | string;
+  emptyTitle?: string;
+  emptyDescription?: string;
 };
 
 const TransactionBody = ({
@@ -67,6 +69,8 @@ const TransactionBody = ({
   isTransactionHistoryExist,
   serviceName,
   maxWidth,
+  emptyTitle,
+  emptyDescription,
 }: TransactionHistoryProps) => {
   const { isBase } = useTheme();
   const { mobileBreakpoint, desktopBreakpoint } = usePaymentStore();
@@ -100,10 +104,10 @@ const TransactionBody = ({
 
   const title = hasAppliedDateFilter
     ? t("NoFindingsFound2")
-    : t("NoWalletTransaction");
+    : (emptyTitle ?? t("NoWalletTransaction"));
   const description = hasAppliedDateFilter
     ? t("NoTransactionsFilter")
-    : t("NoWalletTransactionDescription");
+    : (emptyDescription ?? t("NoWalletTransactionDescription"));
 
   const emptyView = (
     <EmptyView

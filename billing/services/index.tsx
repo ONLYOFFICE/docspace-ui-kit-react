@@ -44,18 +44,30 @@ import {
 } from "@onlyoffice/docspace-api-sdk";
 
 import { toastr } from "../../components/toast";
-import { AI_ENUM, BACKUP_SERVICE, TOTAL_SIZE } from "../constants";
+import {
+  AI_ENUM,
+  AI_SEARCH,
+  AI_SEARCH_ENUM,
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  DISK_STORAGE,
+  TOTAL_SIZE,
+} from "../constants";
+
+// AI search isn't part of the SDK's TenantWalletService enum yet; the backend
+// identifies it by -18.
+const AI_SEARCH_WALLET_SERVICE = -18 as TenantWalletService;
 
 const toWalletService = (id: string): TenantWalletService => {
   if (id === BACKUP_SERVICE) return TenantWalletService.Backup;
   if (id === AI_ENUM) return TenantWalletService.AITools;
+  if (id === AI_SEARCH_ENUM) return AI_SEARCH_WALLET_SERVICE;
   return TenantWalletService.Storage;
 };
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import { useApi } from "../../providers";
-import TopUpModal from "../shared/top-up-balance/TopUpModal";
 import AIFeaturesDialog from "./panels/ai-service/AIFeaturesDialog";
 
 import ServicesItems from "./ServicesItems";
@@ -95,9 +107,9 @@ const Services = observer(
       isShowStorageTariffDeactivatedModal,
       changeServiceState,
       isCardLinkedToPortal,
-      isServiceActionDisabled,
       isAiToolsServiceOn,
       isCardMissingOrInactive,
+      storageServiceName,
     } = paymentStore;
 
     const {
@@ -124,6 +136,7 @@ const Services = observer(
       [TOTAL_SIZE]: false,
       [BACKUP_SERVICE]: false,
       [AI_ENUM]: false,
+      [AI_SEARCH_ENUM]: false,
     };
     const [dialogVisibility, setDialogVisibility] = useState(
       initialDialogVisibility,
@@ -248,40 +261,16 @@ const Services = observer(
         return;
       }
 
-      if (id === AI_ENUM) {
-        if (isServiceActionDisabled && !isAiToolsServiceOn) return;
+      const { routes } = paymentStore;
+      const routeByService: Record<string, string> = {
+        [AI_ENUM]: routes.aiServices,
+        [AI_SEARCH_ENUM]: routes.aiSearch,
+        [TOTAL_SIZE]: routes.diskStorage,
+        [BACKUP_SERVICE]: routes.backup,
+      };
 
-        // if (
-        //   isAiToolsServiceOn ||
-        //   localStorage.getItem(AI_FEATURES_DIALOG_SHOWN_KEY)
-        // ) {
-        navigate(paymentStore.routes.aiServices);
-        return;
-        // }
-
-        // updateDialogVisibility(AI_ENUM, true);
-      }
-
-      if (
-        id === TOTAL_SIZE
-        // &&
-        // (currentStoragePlanSize || previousStoragePlanSize)
-      ) {
-        navigate(paymentStore.routes.diskStorage);
-        return;
-      }
-
-      // if (id === TOTAL_SIZE && isGracePeriod) {
-      //   setIsGracePeriodModalVisible(true);
-      //   return;
-      // }
-
-      if (id === BACKUP_SERVICE) {
-        navigate(paymentStore.routes.backup);
-        return;
-      }
-
-      updateDialogVisibility(id, true);
+      const route = routeByService[id];
+      if (route) navigate(route);
     };
 
     const onClose = () => {
@@ -301,6 +290,11 @@ const Services = observer(
         return;
       }
 
+      if (id === AI_SEARCH_ENUM && !currentEnabled && !isAiToolsServiceOn) {
+        updateDialogVisibility(AI_SEARCH_ENUM, true);
+        return;
+      }
+
       if (id === TOTAL_SIZE) {
         if (isGracePeriod) {
           setIsGracePeriodModalVisible(true);
@@ -314,11 +308,11 @@ const Services = observer(
         return;
       }
 
-      if (id === AI_ENUM) {
-        if (!currentEnabled) {
-          localStorage.setItem(AI_FEATURES_DIALOG_SHOWN_KEY, AI_ENUM);
-        }
-      }
+      // if (id === AI_ENUM) {
+      //   if (!currentEnabled) {
+      //     localStorage.setItem(AI_FEATURES_DIALOG_SHOWN_KEY, AI_ENUM);
+      //   }
+      // }
 
       if (id !== TOTAL_SIZE) {
         if (dialogVisibility[id]) {
@@ -337,6 +331,14 @@ const Services = observer(
         await paymentApi.changeTenantWalletServiceState({
           changeWalletServiceStateRequestDto: raw,
         });
+
+        if (
+          id === AI_ENUM &&
+          currentEnabled &&
+          paymentStore.servicesQuotasFeatures.get(AI_SEARCH_ENUM)?.value
+        ) {
+          changeServiceState(AI_SEARCH_ENUM);
+        }
       } catch (error) {
         console.error(error);
         toastr.error(t("UnexpectedError"));
@@ -346,6 +348,15 @@ const Services = observer(
 
     const onCloseGracePeriodModal = () => {
       setIsGracePeriodModalVisible(false);
+    };
+
+    const onConfirmEnableAITools = async () => {
+      updateDialogVisibility(AI_SEARCH_ENUM, false);
+
+      const aiToolsEnabled = await applyServiceStateChange(AI_ENUM, true);
+      if (!aiToolsEnabled) return;
+
+      await applyServiceStateChange(AI_SEARCH_ENUM, true);
     };
 
     const onCloseConfirmDialog = () => {
@@ -451,6 +462,17 @@ const Services = observer(
       }
     };
 
+    const serviceNameByToggle: Record<string, string> = {
+      [AI_ENUM]: AI_TOOLS,
+      [AI_SEARCH_ENUM]: AI_SEARCH,
+      [BACKUP_SERVICE]: BACKUP_SERVICE,
+      [TOTAL_SIZE]: storageServiceName ?? DISK_STORAGE,
+    };
+
+    const topUpServiceName = confirmActionType
+      ? (serviceNameByToggle[confirmActionType] ?? confirmActionType)
+      : undefined;
+
     return shouldShowLoader && showPortalSettingsLoader ? (
       <ServicesLoader />
     ) : (
@@ -499,6 +521,21 @@ const Services = observer(
             onClose={() => setIsFirstTopUpDialogVisible(false)}
             onConfirm={onFirstTopUpConfirmed}
             isFirstTopUp={isCardMissingOrInactive}
+            serviceName={topUpServiceName}
+            service={topUpServiceName}
+          />
+        ) : null}
+        {dialogVisibility[AI_SEARCH_ENUM] ? (
+          <ConfirmationDialog
+            visible={dialogVisibility[AI_SEARCH_ENUM]}
+            onClose={() => updateDialogVisibility(AI_SEARCH_ENUM, false)}
+            onConfirm={onConfirmEnableAITools}
+            title={t("ActivateAIFeatures")}
+            bodyText={[
+              t("AISearchRequiresAIFeatures"),
+              t("EnableAISearchDescription"),
+            ]}
+            acceptLabel={t("Activate")}
           />
         ) : null}
         {isConfirmDialogVisible && confirmActionType ? (
@@ -511,18 +548,13 @@ const Services = observer(
           />
         ) : null}
         {isTopUpBalanceVisible ? (
-          !isCardLinkedToPortal ? (
-            <SimpleTopUpDialog
-              visible={isTopUpBalanceVisible}
-              onClose={() => onCloseTopUpModal(false)}
-              onConfirm={onConfirm}
-            />
-          ) : (
-            <TopUpModal
-              visible={isTopUpBalanceVisible}
-              onClose={onCloseTopUpModal}
-            />
-          )
+          <SimpleTopUpDialog
+            visible={isTopUpBalanceVisible}
+            onClose={() => onCloseTopUpModal(false)}
+            onConfirm={onConfirm}
+            serviceName={topUpServiceName}
+            service={topUpServiceName}
+          />
         ) : null}
       </>
     );

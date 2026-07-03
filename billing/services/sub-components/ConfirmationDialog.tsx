@@ -49,6 +49,7 @@ interface ConfirmationDialogProps {
   bodyText: React.ReactNode | React.ReactNode[];
   title: string;
   onConfirm: () => void;
+  acceptLabel?: string;
 }
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
@@ -57,6 +58,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   bodyText,
   title,
   onConfirm,
+  acceptLabel,
 }) => {
   const t = useCommonTranslation();
 
@@ -81,7 +83,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       </ModalDialog.Body>
       <ModalDialog.Footer>
         <Button
-          label={t("ContinueButton")}
+          label={acceptLabel ?? t("ContinueButton")}
           size={ButtonSize.normal}
           onClick={onConfirm}
           primary
