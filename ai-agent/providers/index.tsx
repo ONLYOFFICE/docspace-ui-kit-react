@@ -141,6 +141,7 @@ type AiAgentProvidersProps = {
   closeEditorPanel?: () => void;
   entityId?: string;
   composerHeader?: ReactNode;
+  composerDisabled?: boolean;
   children: ReactNode;
 };
 
@@ -204,6 +205,7 @@ const AiAgentProviders = ({
   closeEditorPanel,
   entityId,
   composerHeader,
+  composerDisabled,
   children,
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
@@ -278,6 +280,7 @@ const AiAgentProviders = ({
     () => ({
       composerActions,
       composerHeader,
+      composerDisabled,
       entityId,
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
@@ -285,7 +288,13 @@ const AiAgentProviders = ({
       composerActionSendSize: 32,
       composerPlaceholder: t("AskAnyQuestion"),
     }),
-    [composerActions, composerHeader, entityId, onToolCallApproveResult],
+    [
+      composerActions,
+      composerHeader,
+      composerDisabled,
+      entityId,
+      onToolCallApproveResult,
+    ],
   );
 
   const { stores, ctx, serverApiConfig } = useMemo(() => {
