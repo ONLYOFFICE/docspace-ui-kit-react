@@ -52,6 +52,7 @@ const AI_SETTINGS_URL = "/portal-settings/ai-settings";
 export type NewChatProps = {
   aiReady?: boolean;
   noAccessProps?: ChatNoAccessScreenProps;
+  isAgent?: boolean;
 };
 
 const NewChat: React.FC<NewChatProps> = observer(
