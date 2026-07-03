@@ -74,6 +74,7 @@ type ServicesItemsProps = {
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
   docsConnectState?: TDocsConnectCardState;
+  onDocsConnectToggle?: () => void;
 };
 
 const ServicesItems: React.FC<ServicesItemsProps> = ({
@@ -83,6 +84,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   isTablet,
   onOpenSupportedModels,
   docsConnectState,
+  onDocsConnectToggle,
 }) => {
   const paymentStore = usePaymentStore();
 
@@ -152,7 +154,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
     if (dataset.disabled?.toLowerCase() === "true") return;
 
-    onClick?.(dataset.id!);
+    onDocsConnectToggle?.();
   };
 
   const onSupportedModelsClick = (e: React.MouseEvent) => {
@@ -397,6 +399,14 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             const scheduledUsers = docsConnectState?.scheduledUsers ?? null;
             const hasScheduledChange =
               subscribed && !isTrial && scheduledUsers != null;
+            const isCancellation = hasScheduledChange && scheduledUsers === 0;
+            const scheduledDevPackOff =
+              hasScheduledChange &&
+              (docsConnectState?.scheduledDevPackDisabled ?? false);
+            const scheduledUsersChanged =
+              hasScheduledChange &&
+              scheduledUsers !== (docsConnectState?.tariffUsers ?? 0);
+            const deactivated = docsConnectState?.deactivated ?? false;
 
             const trialToggleTooltip = trialActive
               ? t("DocsConnectTrialToggleDisabled", {
@@ -408,22 +418,37 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 })
               : undefined;
 
+            const scheduledDateLocalized = formatDateLocalized(
+              docsConnectState?.scheduledDate,
+              "DATE_MED",
+              { locale: language },
+            );
+
             const scheduledTooltip = hasScheduledChange ? (
               <>
                 <Text fontWeight={600} fontSize="12px">
-                  {t("UserAdjustment", {
-                    fromCount: docsConnectState?.tariffUsers ?? 0,
-                    toCount: scheduledUsers,
-                  })}
+                  {isCancellation
+                    ? t("PlanCancellation")
+                    : scheduledDevPackOff && scheduledUsersChanged
+                      ? t("DevPackUserAdjustment", {
+                          fromCount: docsConnectState?.tariffUsers ?? 0,
+                          toCount: scheduledUsers,
+                        })
+                      : scheduledDevPackOff
+                        ? t("DevPackDeactivation")
+                        : t("UserAdjustment", {
+                            fromCount: docsConnectState?.tariffUsers ?? 0,
+                            toCount: scheduledUsers,
+                          })}
                 </Text>
                 <Text fontSize="12px">
-                  {t("TariffPlanAutoRenewedWithUpdate", {
-                    date: formatDateLocalized(
-                      docsConnectState?.scheduledDate,
-                      "DATE_MED",
-                      { locale: language },
-                    ),
-                  })}
+                  {isCancellation
+                    ? t("TariffPlanAutoCanceledOn", {
+                        date: scheduledDateLocalized,
+                      })
+                    : t("TariffPlanAutoRenewedWithUpdate", {
+                        date: scheduledDateLocalized,
+                      })}
                 </Text>
               </>
             ) : undefined;
@@ -457,6 +482,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               docsConnectPrice = t("DocsConnectTrialDaysLeft", {
                 count: trialDaysLeft,
               });
+            } else if (deactivated) {
+              docsConnectPrice = t("TariffPlanDeactivatedNonPayment");
             } else if (hasScheduledChange) {
               docsConnectPrice = t("ChangeShedule");
             } else {
@@ -479,13 +506,13 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 priceDescription={docsConnectPrice}
                 id={item.id}
                 image={item.image}
-                isEnabled={subscribed && !trialExpired}
+                isEnabled={subscribed && !trialExpired && !deactivated}
                 isWarningColor={
                   (isTrial && !trialExpired && trialEndingSoon) ||
                   hasScheduledChange
                 }
-                isErrorColor={trialExpired}
-                toggleDisabled={trialActive}
+                isErrorColor={trialExpired || deactivated}
+                toggleDisabled={trialActive || hasScheduledChange}
                 tooltip={trialToggleTooltip}
                 priceTooltip={scheduledTooltip}
               />

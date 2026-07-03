@@ -83,6 +83,7 @@ type TServicesProps = {
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
   onDocsConnectClick?: () => void;
+  onDocsConnectToggle?: () => void;
   docsConnectState?: TDocsConnectCardState;
 };
 
@@ -94,6 +95,7 @@ const Services = observer(
     cardDisabled,
     onOpenSupportedModels,
     onDocsConnectClick,
+    onDocsConnectToggle,
     docsConnectState,
   }: TServicesProps) => {
     const navigate = useNavigate();
@@ -475,6 +477,7 @@ const Services = observer(
           cardDisabled={cardDisabled}
           onOpenSupportedModels={onOpenSupportedModels}
           docsConnectState={docsConnectState}
+          onDocsConnectToggle={onDocsConnectToggle}
         />
         {isShowStorageTariffDeactivatedModal ? (
           <StorageTariffDeactivated

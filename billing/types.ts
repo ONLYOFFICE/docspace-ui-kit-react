@@ -70,6 +70,8 @@ export type TDocsConnectCardState = {
   tariffUsers: number;
   scheduledUsers: number | null;
   scheduledDate: string;
+  scheduledDevPackDisabled: boolean;
+  deactivated: boolean;
 };
 
 type TAiToolsChatPrice = {
