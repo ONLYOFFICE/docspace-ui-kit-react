@@ -137,6 +137,9 @@ export type TDisplayedItem = {
   isList: boolean;
   isRoom?: boolean;
   isAgent?: boolean;
+  roomType?: RoomType;
+  shared?: boolean;
+  rootFolderType?: FolderType;
   listItems?: TBreadCrumb[];
 };
 
