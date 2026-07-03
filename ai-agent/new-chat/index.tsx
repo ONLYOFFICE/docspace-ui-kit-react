@@ -40,11 +40,12 @@ import { ChatToolbar } from "../chat-toolbar";
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
 
 import styles from "./NewChat.module.scss";
+import type { ChatProps } from "./chat.types";
 
 // The in-chat AI settings section now lives in DocSpace portal settings.
 const AI_SETTINGS_URL = "/portal-settings/ai-settings";
 
-const NewChat: React.FC = observer(() => {
+const NewChat: React.FC<ChatProps> = observer(({ isAgent }) => {
   const isDesktop = useIsDesktop();
 
   const stores = useStores();
@@ -56,6 +57,8 @@ const NewChat: React.FC = observer(() => {
   const aiChatStore = useAiChatStore();
 
   const isFullScreen = aiChatStore.effectiveFullscreen;
+
+  console.log({ isFullScreen, aiChatStore });
 
   React.useEffect(() => {
     // page and reset the internal page so returning to the chat doesn't loop. // "Open settings" actions, etc.), bounce the user to the portal AI settings // Whenever the widget router tries to open the settings page (gear button,
@@ -71,7 +74,7 @@ const NewChat: React.FC = observer(() => {
     case "initial-setup":
       return <SettingsPage />;
     case "history":
-      if (isFullScreen && isDesktop) {
+      if ((isFullScreen || isAgent) && isDesktop) {
         return (
           <section className={styles.container}>
             <div className={styles.chatList}>
