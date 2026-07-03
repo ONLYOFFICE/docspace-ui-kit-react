@@ -321,7 +321,7 @@ class CurrentTariffStatusStore {
       if (walletQuotas.length > 1) await this.resolveWalletServiceIds();
 
       const candidates = walletQuotas.filter(
-        (q) => !this._docsConnectServiceIds.includes(q.id),
+        (q) => q.id == null || !this._docsConnectServiceIds.includes(q.id),
       );
 
       const storageQuota =
