@@ -52,7 +52,6 @@ import PriceIcon from "../../assets/icons/16/price.react.svg";
 
 import styles from "./styles/AdditionalStorage.module.scss";
 import { useServicesActions } from "./hooks/useServicesActions";
-import { usePermissionTooltipText } from "./hooks/usePermissionTooltipText";
 
 import ServiceCard from "./sub-components/ServiceCard";
 
@@ -105,8 +104,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
   const isDisabled = isServiceActionDisabled;
   const { t } = useServicesActions();
-
-  const permissionTooltipText = usePermissionTooltipText();
 
   const handleToggle = (
     e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>,
@@ -306,7 +303,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                   item.serviceName,
                   item.price.value,
                 )}
-                tooltip={isDisabled ? permissionTooltipText : undefined}
                 isWarningColor={
                   item.value && walletCustomerEmail
                     ? availableBackupsCount === 0
@@ -330,7 +326,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 id={item.id}
                 image={item.image}
                 isEnabled={item.value}
-                tooltip={isDisabled ? permissionTooltipText : undefined}
                 isErrorColor={isLowWalletBalance}
                 icon={<PriceIcon />}
                 withoutIcon={!isLowWalletBalance}
@@ -354,7 +349,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 id={item.id}
                 image={item.image}
                 isEnabled={hasStorageSubscription}
-                tooltip={isDisabled ? permissionTooltipText : undefined}
                 priceTooltip={
                   hasScheduledStorageChange ? textTooltip : undefined
                 }
