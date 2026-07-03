@@ -65,6 +65,8 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
   const store = usePaymentStore();
   const {
     formatPaymentCurrency,
+    formatFuturePaymentCurrency,
+    getTotalCostByFormula,
     isAlreadyPaid,
     cardLinkedOnFreeTariff,
     formatWalletCurrency,
@@ -84,7 +86,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     currentTariffPlanTitle,
     isYearTariff,
     maxCountManagersByQuota,
-    currentPlanCost,
     fetchPortalQuota,
   } = store.quotas;
   const {
@@ -271,13 +272,15 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           lineHeight="16px"
           className={styles.paymentInfoManagersPrice}
         >
-          {hasScheduledTariffAdminsChange ? (
+          {hasScheduledTariffAdminsChange && nextTariffAdminsCount? (
             <CommonTrans
               i18nKey="BusinessRenewalPricingInfo"
               values={{
                 finalDate: paymentDate,
-                price: formatPaymentCurrency(currentPlanCost.value ?? 0),
-                adminsCount: currentTariffAdminsCount ?? 0,
+                price: formatFuturePaymentCurrency(
+                  getTotalCostByFormula(nextTariffAdminsCount),
+                ),
+                adminsCount: nextTariffAdminsCount,
                 perAdminPrice: formatPaymentCurrency(startValue),
               }}
               components={{ 1: <Text fontWeight={600} as="span" /> }}

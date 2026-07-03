@@ -204,6 +204,7 @@ const AiAgentProviders = ({
   entityId,
   children,
 }: AiAgentProvidersProps) => {
+  const { t } = useTranslation("Common");
   const aiChatLocale = normalizeAiChatLocale(locale);
 
   // File-attachment integration: the composer "attach" actions, the message
@@ -278,6 +279,8 @@ const AiAgentProviders = ({
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
+      composerActionSendSize: 32,
+      composerPlaceholder: t("AskAnyQuestion"),
     }),
     [composerActions, entityId, onToolCallApproveResult],
   );
@@ -396,4 +399,3 @@ export {
   useAiChatStore,
 } from "./ai-chat-store";
 export type { AiChatRouterPage } from "./ai-chat-store";
-

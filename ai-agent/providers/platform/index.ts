@@ -57,13 +57,11 @@ type PlatformFileOperations = NonNullable<PlatformAdapter["file"]>;
 
 const createFileOperations = (
   getHandler: () => SaveAsFileHandler | null | undefined,
-): PlatformFileOperations =>
-  ({
-    saveAsFile: async (content, defaultName) => {
-      await getHandler()?.(content, defaultName);
-    },
-    getRecentFiles: async () => "[]",
-  }) as PlatformFileOperations;
+): Partial<PlatformFileOperations> => ({
+  saveAsFile: async (content, defaultName) => {
+    await getHandler()?.(content, defaultName);
+  },
+});
 
 type UsePlatformAdapterArgs = {
   // Host UI locale and theme. Changes are pushed into the (stable) adapter and

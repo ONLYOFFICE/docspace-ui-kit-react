@@ -39,21 +39,8 @@
 // `fill` attribute loses to this CSS rule, so no `!important` is needed;
 // `white` knockouts and `none` are left intact.
 .icon {
-  display: block;
-  color: var(--icon-button-color);
-
-  path:not([fill="white"]):not([fill="none"]) {
-    fill: currentColor;
-  }
-
-  // DocSpace-style hover: recolor the whole icon when its IconButton is
-  // hovered. Driven by the button ancestor (not the svg itself) so the icon
-  // follows `currentColor` consistently — matching DocSpace IconButton, where
-  // hover swaps the icon color. Disabled buttons don't react, same as there.
-  @media (hover: hover) {
-    :global(button):not(:disabled):hover & {
-      color: var(--icon-button-hover-color);
-    }
-  }
+  // path:not([fill="white"]):not([fill="none"]) {
+  //   fill: currentColor;
+  // }
 }
 

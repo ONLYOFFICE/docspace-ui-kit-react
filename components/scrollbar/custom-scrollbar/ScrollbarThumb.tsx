@@ -100,7 +100,7 @@ class ScrollbarThumb extends React.Component<ScrollbarThumbProps, unknown> {
       return;
     }
 
-    if (isBrowser) {
+    if (isBrowser && document.body) {
       this.prevUserSelect = document.body.style.userSelect;
       document.body.style.userSelect = "none";
 
@@ -163,7 +163,7 @@ class ScrollbarThumb extends React.Component<ScrollbarThumbProps, unknown> {
 
     if (this.element) this.element.classList.remove("dragging");
 
-    if (isBrowser) {
+    if (isBrowser && document.body) {
       document.body.style.userSelect = this.prevUserSelect;
 
       if (this.prevOnSelectStart) {

@@ -23,6 +23,7 @@
 // All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+@use "../../styles/variables/colors";
 
 .chat {
   display: flex;
@@ -74,10 +75,46 @@
   }
 
   :global(.composer-root) {
-    padding: 8px !important;
+    height: 90px;
+    padding: 6px 8px;
     border-radius: 3px !important;
     border: none;
     background: var(--chat-input-background-color) !important;
+
+    // padding-block-end: 0px;
+
+    :global(.combo-button) {
+      padding-inline-end: 3px;
+
+      :global(.light) :is(&, :global(.combo-buttons_arrow-icon)) {
+        --combobox-label-selected-color: #{colors.$light-gray-dark};
+      }
+    }
+
+    :global(.composer-input) {
+      line-height: 22px;
+      padding: 0px;
+
+      &::placeholder {
+        color: var(--chat-input-placeholder);
+      }
+    }
+
+    :global([class*="--action-gap"]) {
+      margin-inline-start: 6px;
+    }
+
+    :global([class*="--chat-composer-action-send-background-color"]):disabled {
+      opacity: 0.6;
+    }
+  }
+
+  :global([class*="--text-tertiary"]) {
+    font-weight: 400;
+    font-size: 10px;
+    leading-trim: none;
+    line-height: 14px;
+    letter-spacing: 0px;
   }
 
   :global([style*="--chat-welcome-color"]) {
@@ -155,3 +192,17 @@
     border-inline-end: 1px solid var(--info-panel-border-color);
   }
 }
+
+:global(.aui-root) {
+  --aui-font-base: 15px;
+}
+
+// :global(.icon-button) {
+//   color: var(--icon-button-color);
+
+//   @media (hover: hover) {
+//     &:not(:disabled):hover {
+//       color: var(--icon-button-hover-color);
+//     }
+//   }
+// }

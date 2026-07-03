@@ -225,6 +225,7 @@ $compact-peek: 60px;
   font-weight: 400;
   line-height: 20px;
   word-break: break-word;
+  user-select: none;
 }
 
 // Loading placeholder: keeps the tile's box (size/radius/gap via .tile) but

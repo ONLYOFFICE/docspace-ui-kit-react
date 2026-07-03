@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 
@@ -58,7 +58,6 @@ type PriceDetailsDialogProps = {
   visible: boolean;
   onClose: () => void;
   isDowngradePlan: boolean;
-  /** Confirm button label, computed by the parent to match the main button. */
   confirmLabel: string;
 };
 
@@ -66,8 +65,8 @@ const PriceDetailsDialog = observer(
   ({
     visible,
     onClose,
-    isDowngradePlan,
-    confirmLabel,
+    isDowngradePlan: isDowngradePlanProp,
+    confirmLabel: confirmLabelProp,
   }: PriceDetailsDialogProps) => {
     const t = useCommonTranslation();
     const store = usePaymentStore();
@@ -87,12 +86,21 @@ const PriceDetailsDialog = observer(
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const currentAdmins = maxCountManagersByQuota;
-    const newAdmins = managersCount;
+    const isDowngradePlan = useRef(isDowngradePlanProp).current;
+    const confirmLabel = useRef(confirmLabelProp).current;
+    const currentAdmins = useRef(maxCountManagersByQuota).current;
+    const newAdmins = useRef(managersCount).current;
+    const pricePerAdmin = useRef(planCost.value).current;
+    const initialPaymentDate = useRef(paymentDate).current;
+    const initialDaysUntilPayment = useRef(daysUntilPayment).current;
+
     const additionalAdmins = newAdmins - currentAdmins;
-    const pricePerAdmin = planCost.value;
     const dueToday = tariffDueTodayAmount ?? 0;
-    const daysDisplay = formatRemainingDays(daysUntilPayment, language, t);
+    const daysDisplay = formatRemainingDays(
+      initialDaysUntilPayment,
+      language,
+      t,
+    );
 
     const onConfirm = async () => {
       setIsSubmitting(true);
@@ -121,7 +129,9 @@ const PriceDetailsDialog = observer(
 
     return (
       <ModalDialog visible={visible} onClose={onClose} autoMaxHeight isLarge>
-        <ModalDialog.Header>{t("PriceDetails")}</ModalDialog.Header>
+        <ModalDialog.Header>
+          {isDowngradePlan ? t("Confirmation") : t("PriceDetails")}
+        </ModalDialog.Header>
         <ModalDialog.Body>
           <div className={styles.content}>
             <WalletInfo balance={formatWalletCurrency()} />
@@ -145,15 +155,23 @@ const PriceDetailsDialog = observer(
                 t("PricePerAdmin"),
                 formatPaymentCurrency(pricePerAdmin),
               )}
-              {renderRow(
-                t("RemainingPeriod"),
-                <>
-                  {`${daysDisplay} `}
-                  <Text as="span" fontSize="14px" className={styles.muted}>
-                    ({t("UntilDate", { date: paymentDate })})
-                  </Text>
-                </>,
-              )}
+              {isDowngradePlan
+                ? renderRow(
+                    t("NewMonthlyPrice"),
+                    formatPaymentCurrency(newAdmins * pricePerAdmin),
+                  )
+                : null}
+              {isDowngradePlan
+                ? renderRow(t("EffectiveDate"), initialPaymentDate)
+                : renderRow(
+                    t("RemainingPeriod"),
+                    <>
+                      {`${daysDisplay} `}
+                      <Text as="span" fontSize="14px" className={styles.muted}>
+                        ({t("UntilDate", { date: initialPaymentDate })})
+                      </Text>
+                    </>,
+                  )}
 
               <div className={styles.divider} />
 
@@ -174,7 +192,8 @@ const PriceDetailsDialog = observer(
                     />
                   )}
                 </div>
-                {isTariffDueTodayCalculating || tariffDueTodayAmount === null ? (
+                {isTariffDueTodayCalculating ||
+                tariffDueTodayAmount === null ? (
                   <Loader color="" size="16px" type={LoaderTypes.track} />
                 ) : (
                   <Text as="span" fontSize="14px" fontWeight={600}>

@@ -33,8 +33,7 @@ import { TabsOverride } from "./tabs";
 
 export const componentOverrides: ComponentOverrides = {
   Button: ButtonOverride,
-  // ComboBox: ComboBoxOverride,
+  ComboBox: ComboBoxOverride,
   DialogContent: DialogContentOverride,
   Tabs: TabsOverride,
 };
-
