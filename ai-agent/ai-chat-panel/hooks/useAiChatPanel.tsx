@@ -32,7 +32,9 @@ import { useAiChatStore } from "../../providers/ai-chat-store";
 
 import AiChatTrigger from "../components/ai-chat-trigger";
 import AiChatPanelHeaderContainer from "../components/ai-chat-panel-header-container";
-import AiChatPanelBody from "../components/ai-chat-panel-body";
+import AiChatPanelBody, {
+  type AiChatPanelBodyProps,
+} from "../components/ai-chat-panel-body";
 
 // Everything a host layout needs to mount the AI chat panel: the header trigger
 // button, the panel content (header + body), and the reactive visibility/
@@ -60,12 +62,17 @@ export type AiChatPanelBindings = {
 // derived from a per-route value like `isPrivate`). Flipping it after mount is
 // unsupported — the panel/button would mount or unmount mid-session, which no
 // host currently does.
-export function useAiChatPanel(enabled?: true): AiChatPanelBindings;
+export function useAiChatPanel(
+  enabled?: true,
+  chatProps?: AiChatPanelBodyProps,
+): AiChatPanelBindings;
 export function useAiChatPanel(
   enabled: boolean,
+  chatProps?: AiChatPanelBodyProps,
 ): AiChatPanelBindings | undefined;
 export function useAiChatPanel(
   enabled = true,
+  chatProps?: AiChatPanelBodyProps,
 ): AiChatPanelBindings | undefined {
   const aiChatStore = useAiChatStore();
 
@@ -78,7 +85,7 @@ export function useAiChatPanel(
     chatPanelContent: (
       <>
         <AiChatPanelHeaderContainer />
-        <AiChatPanelBody />
+        <AiChatPanelBody {...chatProps} />
       </>
     ),
     closeChatPanel: () => aiChatStore.close(),
