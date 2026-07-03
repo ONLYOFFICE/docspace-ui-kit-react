@@ -44,11 +44,21 @@ import {
 } from "@onlyoffice/docspace-api-sdk";
 
 import { toastr } from "../../components/toast";
-import { AI_ENUM, BACKUP_SERVICE, TOTAL_SIZE } from "../constants";
+import {
+  AI_ENUM,
+  AI_SEARCH_ENUM,
+  BACKUP_SERVICE,
+  TOTAL_SIZE,
+} from "../constants";
+
+// AI search isn't part of the SDK's TenantWalletService enum yet; the backend
+// identifies it by -18.
+const AI_SEARCH_WALLET_SERVICE = -18 as TenantWalletService;
 
 const toWalletService = (id: string): TenantWalletService => {
   if (id === BACKUP_SERVICE) return TenantWalletService.Backup;
   if (id === AI_ENUM) return TenantWalletService.AITools;
+  if (id === AI_SEARCH_ENUM) return AI_SEARCH_WALLET_SERVICE;
   return TenantWalletService.Storage;
 };
 
@@ -123,6 +133,7 @@ const Services = observer(
       [TOTAL_SIZE]: false,
       [BACKUP_SERVICE]: false,
       [AI_ENUM]: false,
+      [AI_SEARCH_ENUM]: false,
     };
     const [dialogVisibility, setDialogVisibility] = useState(
       initialDialogVisibility,
@@ -300,6 +311,11 @@ const Services = observer(
         return;
       }
 
+      if (id === AI_SEARCH_ENUM && !currentEnabled && !isAiToolsServiceOn) {
+        updateDialogVisibility(AI_SEARCH_ENUM, true);
+        return;
+      }
+
       if (id === TOTAL_SIZE) {
         if (isGracePeriod) {
           setIsGracePeriodModalVisible(true);
@@ -313,11 +329,11 @@ const Services = observer(
         return;
       }
 
-      if (id === AI_ENUM) {
-        if (!currentEnabled) {
-          localStorage.setItem(AI_FEATURES_DIALOG_SHOWN_KEY, AI_ENUM);
-        }
-      }
+      // if (id === AI_ENUM) {
+      //   if (!currentEnabled) {
+      //     localStorage.setItem(AI_FEATURES_DIALOG_SHOWN_KEY, AI_ENUM);
+      //   }
+      // }
 
       if (id !== TOTAL_SIZE) {
         if (dialogVisibility[id]) {
@@ -336,6 +352,14 @@ const Services = observer(
         await paymentApi.changeTenantWalletServiceState({
           changeWalletServiceStateRequestDto: raw,
         });
+
+        if (
+          id === AI_ENUM &&
+          currentEnabled &&
+          paymentStore.servicesQuotasFeatures.get(AI_SEARCH_ENUM)?.value
+        ) {
+          changeServiceState(AI_SEARCH_ENUM);
+        }
       } catch (error) {
         console.error(error);
         toastr.error(t("UnexpectedError"));
@@ -345,6 +369,15 @@ const Services = observer(
 
     const onCloseGracePeriodModal = () => {
       setIsGracePeriodModalVisible(false);
+    };
+
+    const onConfirmEnableAITools = async () => {
+      updateDialogVisibility(AI_SEARCH_ENUM, false);
+
+      const aiToolsEnabled = await applyServiceStateChange(AI_ENUM, true);
+      if (!aiToolsEnabled) return;
+
+      await applyServiceStateChange(AI_SEARCH_ENUM, true);
     };
 
     const onCloseConfirmDialog = () => {
@@ -497,6 +530,15 @@ const Services = observer(
             visible={isFirstTopUpDialogVisible}
             onClose={() => setIsFirstTopUpDialogVisible(false)}
             onConfirm={onFirstTopUpConfirmed}
+          />
+        ) : null}
+        {dialogVisibility[AI_SEARCH_ENUM] ? (
+          <ConfirmationDialog
+            visible={dialogVisibility[AI_SEARCH_ENUM]}
+            onClose={() => updateDialogVisibility(AI_SEARCH_ENUM, false)}
+            onConfirm={onConfirmEnableAITools}
+            title={t("EnableAIToolsForAISearchTitle")}
+            bodyText={t("EnableAIToolsForAISearchDescription")}
           />
         ) : null}
         {isConfirmDialogVisible && confirmActionType ? (

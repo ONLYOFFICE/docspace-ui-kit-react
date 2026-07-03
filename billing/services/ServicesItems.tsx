@@ -290,28 +290,26 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     }
   };
 
-  const orderedServices = React.useMemo(() => {
-    const order = [AI_TOOLS, AI_SEARCH, BACKUP_SERVICE, DISK_STORAGE];
-    const rankOf = (serviceName?: string) => {
-      const index = order.findIndex(
-        (name) => serviceName === name || serviceName?.includes(name),
-      );
-      return index === -1 ? order.length : index;
-    };
+  const order = [AI_TOOLS, AI_SEARCH, BACKUP_SERVICE, DISK_STORAGE];
+  const rankOf = (serviceName?: string) => {
+    const index = order.findIndex(
+      (name) => serviceName === name || serviceName?.includes(name),
+    );
+    return index === -1 ? order.length : index;
+  };
 
-    return (
-      Array.from(
-        servicesQuotasFeatures?.values() || [],
-      ) as TServiceFeatureWithPrice[]
+  const orderedServices = (
+    Array.from(
+      servicesQuotasFeatures?.values() || [],
+    ) as TServiceFeatureWithPrice[]
+  )
+    .map((item, index) => ({ item, index }))
+    .sort(
+      (a, b) =>
+        rankOf(a.item.serviceName) - rankOf(b.item.serviceName) ||
+        a.index - b.index,
     )
-      .map((item, index) => ({ item, index }))
-      .sort(
-        (a, b) =>
-          rankOf(a.item.serviceName) - rankOf(b.item.serviceName) ||
-          a.index - b.index,
-      )
-      .map(({ item }) => item);
-  }, [servicesQuotasFeatures]);
+    .map(({ item }) => item);
 
   return (
     <div style={{ width: "100%" }}>
