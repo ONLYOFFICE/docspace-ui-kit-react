@@ -244,7 +244,7 @@ const AiSearchPage = (props: AiSearchPageProps) => {
       <ServiceToggleSection
         isEnabled={isAiSearchServiceOn}
         onToggle={onToggleChange}
-        title={t("EnableAISearch")}
+        title={t("AISearch")}
         description={t("EnableAISearchDescription")}
         testId="service-ai-search-toggle-button"
         isDisabled={isDisabled}
