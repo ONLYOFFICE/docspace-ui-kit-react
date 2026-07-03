@@ -35,9 +35,13 @@
 import hexRgb from "hex-rgb";
 import { globalColors } from "../../providers/theme";
 
+const HEX_COLOR_REGEX = /^#?(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+
 export const getTextColor = (color: string, brightnessDiff: number = 128) => {
 	const { black } = globalColors;
 	const { white } = globalColors;
+
+	if (!color || !HEX_COLOR_REGEX.test(color)) return white;
 
 	const rgba = hexRgb(color);
 
