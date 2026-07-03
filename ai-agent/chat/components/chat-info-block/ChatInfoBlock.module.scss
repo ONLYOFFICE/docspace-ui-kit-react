@@ -41,7 +41,7 @@
   width: 100%;
   max-width: var(--chat-content-max-width);
 
-  padding: var(--chat-info-block-padding);
+  padding: var(--chat-info-block-padding, 12px 16px);
 
   svg {
     path {

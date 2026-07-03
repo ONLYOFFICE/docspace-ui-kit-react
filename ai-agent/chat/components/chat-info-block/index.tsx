@@ -52,12 +52,10 @@ export const ChatInfoBlock = ({
   standalone,
   isPortalAdmin,
   isPayer,
-  isCardLinkedToPortal,
   walletCustomerEmail,
   walletCustomerDisplayName,
   onActivateAI,
-  onTopUpAndActivateAI,
-  onShowAIBenefits,
+  // onShowAIBenefits,
   isActivating,
 }: ChatInfoBlockProps) => {
   const t = useCommonTranslation();
@@ -99,11 +97,9 @@ export const ChatInfoBlock = ({
                 type={LinkType.action}
                 color="accent"
                 textDecoration={"underline"}
-                onClick={
-                  isCardLinkedToPortal ? onActivateAI : onTopUpAndActivateAI
-                }
+                onClick={onActivateAI}
               >
-                {isCardLinkedToPortal ? t("Activate") : t("TopUpAndActivate")}
+                {t("Activate")}
               </Link>
               {/* {" | "}
               <Link
