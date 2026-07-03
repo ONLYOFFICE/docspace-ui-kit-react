@@ -265,6 +265,7 @@ const AiPage = (props: AiPageProps) => {
           visible={isTopUpVisible}
           onClose={onCloseTopUp}
           isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
+          serviceName={AI_TOOLS}
         />
       ) : null}
 
