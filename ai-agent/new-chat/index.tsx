@@ -44,6 +44,7 @@ import {
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
 
 import styles from "./NewChat.module.scss";
+import type { ChatProps } from "./chat.types";
 
 // The in-chat AI settings section now lives in DocSpace portal settings.
 const AI_SETTINGS_URL = "/portal-settings/ai-settings";
@@ -54,7 +55,7 @@ export type NewChatProps = {
 };
 
 const NewChat: React.FC<NewChatProps> = observer(
-  ({ aiReady = true, noAccessProps }) => {
+  ({ aiReady = true, noAccessProps, isAgent }) => {
     const isDesktop = useIsDesktop();
 
     const stores = useStores();
