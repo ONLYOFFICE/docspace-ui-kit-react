@@ -116,6 +116,7 @@ const useFilesHelper = ({
   withRecentTreeFolder,
   withFavoritesTreeFolder,
   activeSpecialScope,
+  formsSection,
 }: UseFilesHelpersProps) => {
   const t = useCommonTranslation();
   const {
@@ -139,6 +140,7 @@ const useFilesHelper = ({
   const initRef = React.useRef(isInit);
   const firstLoadRef = React.useRef(isFirstLoad);
   const disabledItemsRef = React.useRef(disabledItems);
+  const formsSectionRef = React.useRef(formsSection);
   const privateRoomCacheRef = React.useRef<Map<number | string, boolean>>(
     new Map(),
   );
@@ -146,6 +148,10 @@ const useFilesHelper = ({
   React.useEffect(() => {
     disabledItemsRef.current = disabledItems;
   }, [disabledItems]);
+
+  React.useEffect(() => {
+    formsSectionRef.current = formsSection;
+  }, [formsSection]);
 
   React.useEffect(() => {
     firstLoadRef.current = isFirstLoad;
@@ -377,6 +383,19 @@ const useFilesHelper = ({
             if (pinIndex > 0) breadCrumbs.splice(0, pinIndex);
           } else if (!isThirdParty && !isRoomsOnly && !isUserOnly) {
             breadCrumbs.unshift({ ...getDefaultBreadCrumb(t) });
+          }
+
+          // The Forms section is a client-only root that is not part of the
+          // server path, so it is missing from pathParts. Re-insert it after
+          // the root crumb so returning to it keeps searchArea=Forms.
+          if (formsSectionRef.current && !isThirdParty) {
+            const insertIndex = breadCrumbs.findIndex((bc) => +bc.id === 0) + 1;
+            breadCrumbs.splice(insertIndex, 0, {
+              label: t("Forms"),
+              id: "forms-section",
+              isRoom: true,
+              rootFolderType: FolderType.FillingFormsRoom,
+            });
           }
 
           onSetBaseFolderPath?.(isErrorPath ? [] : breadCrumbs);

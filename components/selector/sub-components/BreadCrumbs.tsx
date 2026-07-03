@@ -273,6 +273,9 @@ const BreadCrumbs = ({ visible = true }: BreadCrumbsProps) => {
 								label: item.label,
 								isRoom: item.isRoom,
 								isAgent: item.isAgent,
+								roomType: item.roomType,
+								shared: item.shared,
+								rootFolderType: item.rootFolderType,
 							});
 						}}
 					>

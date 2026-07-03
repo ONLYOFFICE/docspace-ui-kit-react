@@ -362,6 +362,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withRecentTreeFolder,
     withFavoritesTreeFolder,
     activeSpecialScope,
+    formsSection: withFormsTreeFolder ? isFormsSection : undefined,
   });
 
   const onClickBreadCrumb = React.useCallback(
