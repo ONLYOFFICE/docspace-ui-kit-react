@@ -386,6 +386,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 id={item.id}
                 image={item.image}
                 isEnabled={item.value}
+                withoutIcon
+                withoutGreenColor
               />
             );
           }

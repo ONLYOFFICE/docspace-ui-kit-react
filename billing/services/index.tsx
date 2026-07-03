@@ -260,6 +260,7 @@ const Services = observer(
       const { routes } = paymentStore;
       const routeByService: Record<string, string> = {
         [AI_ENUM]: routes.aiServices,
+        [AI_SEARCH_ENUM]: routes.aiSearch,
         [TOTAL_SIZE]: routes.diskStorage,
         [BACKUP_SERVICE]: routes.backup,
       };
@@ -511,8 +512,12 @@ const Services = observer(
             visible={dialogVisibility[AI_SEARCH_ENUM]}
             onClose={() => updateDialogVisibility(AI_SEARCH_ENUM, false)}
             onConfirm={onConfirmEnableAITools}
-            title={t("EnableAIToolsForAISearchTitle")}
-            bodyText={t("EnableAIToolsForAISearchDescription")}
+            title={t("ActivateAIFeatures")}
+            bodyText={[
+              t("AISearchRequiresAIFeatures"),
+              t("EnableAISearchDescription"),
+            ]}
+            acceptLabel={t("Activate")}
           />
         ) : null}
         {isConfirmDialogVisible && confirmActionType ? (

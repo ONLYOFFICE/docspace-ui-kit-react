@@ -83,6 +83,8 @@ type TransactionHistoryProps = {
   hideTypeFilter?: boolean;
   withoutRoleFilter?: boolean;
   maxWidth?: number | string;
+  emptyTitle?: string;
+  emptyDescription?: string;
 };
 
 const filter = (withoutRoleFilter?: boolean): PeopleFilter => ({
@@ -100,6 +102,8 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     hideTypeFilter,
     withoutRoleFilter,
     maxWidth,
+    emptyTitle,
+    emptyDescription,
   } = props;
 
   const { paymentApi } = useApi();
@@ -565,6 +569,8 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           isTransactionHistoryExist={isTransactionHistoryExist!}
           serviceName={serviceName}
           maxWidth={maxWidth}
+          emptyTitle={emptyTitle}
+          emptyDescription={emptyDescription}
         />
       )}
 
