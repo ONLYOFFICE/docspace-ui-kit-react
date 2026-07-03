@@ -46,8 +46,11 @@ import {
 import { toastr } from "../../components/toast";
 import {
   AI_ENUM,
+  AI_SEARCH,
   AI_SEARCH_ENUM,
+  AI_TOOLS,
   BACKUP_SERVICE,
+  DISK_STORAGE,
   TOTAL_SIZE,
 } from "../constants";
 
@@ -65,7 +68,6 @@ const toWalletService = (id: string): TenantWalletService => {
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import { useApi } from "../../providers";
-import TopUpModal from "../shared/top-up-balance/TopUpModal";
 import AIFeaturesDialog from "./panels/ai-service/AIFeaturesDialog";
 
 import ServicesItems from "./ServicesItems";
@@ -106,6 +108,7 @@ const Services = observer(
       changeServiceState,
       isCardLinkedToPortal,
       isAiToolsServiceOn,
+      storageServiceName,
     } = paymentStore;
 
     const {
@@ -458,6 +461,17 @@ const Services = observer(
       }
     };
 
+    const serviceNameByToggle: Record<string, string> = {
+      [AI_ENUM]: AI_TOOLS,
+      [AI_SEARCH_ENUM]: AI_SEARCH,
+      [BACKUP_SERVICE]: BACKUP_SERVICE,
+      [TOTAL_SIZE]: storageServiceName ?? DISK_STORAGE,
+    };
+
+    const topUpServiceName = confirmActionType
+      ? (serviceNameByToggle[confirmActionType] ?? confirmActionType)
+      : undefined;
+
     return shouldShowLoader && showPortalSettingsLoader ? (
       <ServicesLoader />
     ) : (
@@ -505,6 +519,8 @@ const Services = observer(
             visible={isFirstTopUpDialogVisible}
             onClose={() => setIsFirstTopUpDialogVisible(false)}
             onConfirm={onFirstTopUpConfirmed}
+            serviceName={topUpServiceName}
+            service={topUpServiceName}
           />
         ) : null}
         {dialogVisibility[AI_SEARCH_ENUM] ? (
@@ -530,18 +546,13 @@ const Services = observer(
           />
         ) : null}
         {isTopUpBalanceVisible ? (
-          !isCardLinkedToPortal ? (
-            <SimpleTopUpDialog
-              visible={isTopUpBalanceVisible}
-              onClose={() => onCloseTopUpModal(false)}
-              onConfirm={onConfirm}
-            />
-          ) : (
-            <TopUpModal
-              visible={isTopUpBalanceVisible}
-              onClose={onCloseTopUpModal}
-            />
-          )
+          <SimpleTopUpDialog
+            visible={isTopUpBalanceVisible}
+            onClose={() => onCloseTopUpModal(false)}
+            onConfirm={onConfirm}
+            serviceName={topUpServiceName}
+            service={topUpServiceName}
+          />
         ) : null}
       </>
     );

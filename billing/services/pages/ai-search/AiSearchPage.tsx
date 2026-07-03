@@ -237,6 +237,7 @@ const AiSearchPage = (props: AiSearchPageProps) => {
           onClose={onCloseTopUp}
           isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
           serviceName={AI_SEARCH}
+          service={AI_SEARCH}
         />
       ) : null}
 
