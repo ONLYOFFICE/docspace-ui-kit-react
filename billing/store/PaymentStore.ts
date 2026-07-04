@@ -63,6 +63,7 @@ import {
   getCardLinkedOnFreeTariff,
   getCardLinkedOnNonProfit,
   getIsCardLinkedToPortal,
+  getIsCardMissingOrInactive,
   getIsPayer,
   getWalletBalanceAmount,
   getWalletBalanceCurrency,
@@ -79,6 +80,7 @@ import { LANGUAGE } from "../../constants";
 import { AnalyticsEvents } from "../../enums";
 import {
   AI_ENUM,
+  AI_SEARCH_ENUM,
   BACKUP_SERVICE,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
@@ -156,6 +158,7 @@ class PaymentStore {
     portalPayments: "",
     services: "",
     aiServices: "",
+    aiSearch: "",
     backup: "",
     diskStorage: "",
   };
@@ -397,9 +400,12 @@ class PaymentStore {
   }
 
   get isCardMissingOrInactive() {
-    return (
-      !this.isCardLinkedToPortal || this.tariff.walletCustomerStatusNotActive
-    );
+    return getIsCardMissingOrInactive({
+      isNonProfit: this.quotas.isNonProfit,
+      isFreeTariff: this.quotas.isFreeTariff,
+      walletCustomerEmail: this.tariff.walletCustomerEmail,
+      walletCustomerStatusNotActive: this.tariff.walletCustomerStatusNotActive,
+    });
   }
 
   get needsWalletMigration() {
@@ -508,6 +514,10 @@ class PaymentStore {
 
   get isAiToolsServiceOn() {
     return this.servicesQuotasFeatures.get(AI_ENUM)?.value;
+  }
+
+  get isAiSearchServiceOn() {
+    return this.servicesQuotasFeatures.get(AI_SEARCH_ENUM)?.value;
   }
 
   get availableBackupsCount() {

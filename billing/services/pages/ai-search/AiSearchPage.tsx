@@ -42,7 +42,7 @@ import { Text } from "../../../../components/text";
 import { Link, LinkTarget } from "../../../../components/link";
 
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
-import { AI_ENUM, AI_TOOLS } from "../../../constants";
+import { AI_ENUM, AI_SEARCH, AI_SEARCH_ENUM } from "../../../constants";
 import { formatCompactNumber } from "../../../utils/common";
 
 import TransactionHistory from "../../../shared/transaction-history";
@@ -50,9 +50,9 @@ import TransactionHistory from "../../../shared/transaction-history";
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
 
-import AiPageLoader from "./AiPageLoader";
+import AiPageLoader from "../ai-tools/AiPageLoader";
 
-import styles from "./AiPage.module.scss";
+import styles from "../ai-tools/AiPage.module.scss";
 import {
   now,
   formatWithTimezone,
@@ -66,9 +66,12 @@ import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
-import { getBrandName } from "../../../../constants/brands";
 
-type AiPageProps = {
+// AI search isn't part of the SDK's TenantWalletService enum yet; the backend
+// identifies it by -18.
+const AI_SEARCH_WALLET_SERVICE = -18 as TenantWalletService;
+
+type AiSearchPageProps = {
   currentDeviceType?: string;
   getAIConfig?: () => Promise<void>;
   integrationUrl?: string;
@@ -76,17 +79,15 @@ type AiPageProps = {
   simpleTopUp?: boolean;
   withBottomMargin?: boolean;
   onViewMore?: () => void;
-  onOpenSupportedModels?: () => void;
 };
 
-const AiPage = (props: AiPageProps) => {
+const AiSearchPage = (props: AiSearchPageProps) => {
   const {
     getAIConfig,
     integrationUrl,
     withoutWallet,
     withBottomMargin,
     onViewMore,
-    onOpenSupportedModels,
   } = props;
 
   const { paymentApi } = useApi();
@@ -95,35 +96,27 @@ const AiPage = (props: AiPageProps) => {
 
   const {
     changeServiceState,
+    isAiSearchServiceOn,
     isAiToolsServiceOn,
     isServiceActionDisabled,
     formatWalletCurrency,
-    isLowWalletBalance,
-    isCardMissingOrInactive,
   } = paymentStore;
 
-  const { logoText, language } = paymentStore;
+  const { language } = paymentStore;
 
-  const {
-    aiServiceCodeCurrency,
-    aiServiceBalance,
-    formatAiServiceCurrency,
-    isInitServicesData,
-    initServiceData,
-    aiUsage,
-  } = servicesStore;
+  const { isInitServicesData, initServiceData, aiUsage } = servicesStore;
 
   const t = useCommonTranslation();
 
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
-  const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
-  const [isTopUpConfirmVisible, setIsTopUpConfirmVisible] = useState(false);
+  const [isEnableAIToolsDialogVisible, setIsEnableAIToolsDialogVisible] =
+    useState(false);
 
   const isDisabled = isServiceActionDisabled!;
 
   useEffect(() => {
     if (!isInitServicesData) {
-      initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
+      initServiceData(t, AI_SEARCH, AI_SEARCH_ENUM, integrationUrl);
     }
   }, []);
 
@@ -132,10 +125,10 @@ const AiPage = (props: AiPageProps) => {
 
     const params = new URLSearchParams(window.location.search);
 
-    if (params.get("activate") !== AI_TOOLS) return;
+    if (params.get("activate") !== AI_SEARCH) return;
 
     if (
-      !paymentStore.isAiToolsServiceOn &&
+      !paymentStore.isAiSearchServiceOn &&
       paymentStore.isCardLinkedToPortal &&
       !paymentStore.isServiceActionDisabled
     ) {
@@ -151,95 +144,72 @@ const AiPage = (props: AiPageProps) => {
     );
   }, [isInitServicesData]);
 
-  const onToggleChange = () => {
-    onConfirm();
-  };
-
-  const onCloseConfirmDialog = () => {
-    setIsConfirmDialogVisible(false);
-  };
-
-  const onConfirm = async () => {
-    setIsConfirmDialogVisible(false);
-
-    const raw = {
-      service: TenantWalletService.AITools,
-      enabled: !isAiToolsServiceOn,
-    };
-
-    changeServiceState(AI_ENUM);
+  const applyServiceStateChange = async (
+    enumId: string,
+    walletService: TenantWalletService,
+    enabled: boolean,
+  ) => {
+    changeServiceState(enumId);
 
     try {
       const result = await paymentApi.changeTenantWalletServiceState({
-        changeWalletServiceStateRequestDto: raw,
+        changeWalletServiceStateRequestDto: { service: walletService, enabled },
       });
 
       if (!result) {
         toastr.error(t("UnexpectedError"));
-        changeServiceState(AI_ENUM);
-        return;
+        changeServiceState(enumId);
+        return false;
       }
 
-      if (!isAiToolsServiceOn) toastr.success(t("AIToolsEnabled"));
+      if (enabled && enumId === AI_SEARCH_ENUM)
+        toastr.success(t("AISearchEnabled"));
 
       await getAIConfig?.();
+      return true;
     } catch (error) {
       console.error(error);
       toastr.error(t("UnexpectedError"));
-      changeServiceState(AI_ENUM);
+      changeServiceState(enumId);
+      return false;
     }
   };
 
-  const confirmationDialogContent = isAiToolsServiceOn
-    ? {
-        title: t("Confirmation"),
-        body: [
-          t("DisableAIToolsConfirm", {
-            organizationName: logoText,
-          }),
-          <CommonTrans
-            key="DisableAIToolsConfirmBalance"
-            i18nKey="DisableAIToolsConfirmBalance"
-            values={{
-              balance: formatAiServiceCurrency(
-                aiServiceBalance ?? 0,
-                3,
-                aiServiceCodeCurrency,
-              ),
-            }}
-            components={{
-              1: <span style={{ fontWeight: 600 }} />,
-            }}
-          />,
-          t("DisableAIToolsConfirmReEnable"),
-        ],
-      }
-    : {
-        title: t("Confirmation"),
-        body: [
-          t("AIToolsDescription", {
-            productName: getBrandName("ProductName"),
-            organizationName: logoText,
-          }),
-          t("WantToContinue"),
-        ],
-      };
+  const onConfirm = () =>
+    applyServiceStateChange(
+      AI_SEARCH_ENUM,
+      AI_SEARCH_WALLET_SERVICE,
+      !isAiSearchServiceOn,
+    );
+
+  const onToggleChange = () => {
+    // Enabling AI search requires AI tools; ask to enable them first.
+    if (!isAiSearchServiceOn && !isAiToolsServiceOn) {
+      setIsEnableAIToolsDialogVisible(true);
+      return;
+    }
+
+    onConfirm();
+  };
+
+  const onConfirmEnableAITools = async () => {
+    setIsEnableAIToolsDialogVisible(false);
+
+    const aiToolsEnabled = await applyServiceStateChange(
+      AI_ENUM,
+      TenantWalletService.AITools,
+      true,
+    );
+    if (!aiToolsEnabled) return;
+
+    await applyServiceStateChange(
+      AI_SEARCH_ENUM,
+      AI_SEARCH_WALLET_SERVICE,
+      true,
+    );
+  };
 
   const onOpenTopUp = () => {
-    // if (!isAiToolsServiceOn && !simpleTopUp) {
-    //   setIsTopUpConfirmVisible(true);
-    //   return;
-    // }
-
-    setIsTopUpVisible(true);
-  };
-
-  const onCloseTopUpConfirm = () => {
-    setIsTopUpConfirmVisible(false);
-  };
-
-  const onConfirmTopUp = () => {
-    setIsTopUpConfirmVisible(false);
     setIsTopUpVisible(true);
   };
 
@@ -265,26 +235,21 @@ const AiPage = (props: AiPageProps) => {
         <SimpleTopUpDialog
           visible={isTopUpVisible}
           onClose={onCloseTopUp}
-          isFirstTopUp={isCardMissingOrInactive}
-          serviceName={AI_TOOLS}
+          isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
+          serviceName={AI_SEARCH}
+          service={AI_SEARCH}
         />
       ) : null}
 
       <ServiceToggleSection
-        isEnabled={isAiToolsServiceOn}
+        isEnabled={isAiSearchServiceOn}
         onToggle={onToggleChange}
-        title={t("EnableAIFeatures")}
-        description={t("EnableAIFeaturesDescription")}
-        testId="service-ai-toggle-button"
+        title={t("AISearch")}
+        description={t("EnableAISearchDescription")}
+        testId="service-ai-search-toggle-button"
         isDisabled={isDisabled}
         withBottomMargin={withBottomMargin}
       />
-
-      {isAiToolsServiceOn && isLowWalletBalance ? (
-        <Text fontSize="15px" fontWeight={600} className={styles.lowBalance}>
-          {t("LowCreditsBalance")}
-        </Text>
-      ) : null}
 
       {withoutWallet ? null : (
         <>
@@ -315,7 +280,7 @@ const AiPage = (props: AiPageProps) => {
               color="accent"
               textDecoration="underline"
               onClick={onViewMore}
-              dataTestId="ai_view_more_link"
+              dataTestId="ai_search_view_more_link"
             >
               {t("ViewMore")}
             </Link>
@@ -329,7 +294,7 @@ const AiPage = (props: AiPageProps) => {
               {formatWalletCurrency(monthSpend, 2)}
             </Text>
             <Text className={styles.cardCaption}>
-              {t("ChargedFromCredits")}
+              {t("AISearchSpendMonth", { month: monthLabel })}
             </Text>
           </div>
 
@@ -337,7 +302,9 @@ const AiPage = (props: AiPageProps) => {
             <Text className={styles.cardLabel}>{t("MonthUsage")}</Text>
             <Text className={styles.cardValue}>{monthTokensText}</Text>
             <Text className={styles.cardCaption}>
-              {t("TokensProcessedInMonth", { month: monthLabel })}
+              {monthTokens > 0
+                ? t("BilledAISearch", { count: monthTokens })
+                : t("AISearchUsedInMonth", { month: monthLabel })}
             </Text>
           </div>
         </div>
@@ -345,7 +312,7 @@ const AiPage = (props: AiPageProps) => {
 
       <Text as="span" fontSize="13px" className={styles.pricingRow}>
         <CommonTrans
-          i18nKey="AIUsagePricingNote"
+          i18nKey="AIExaPricingNote"
           components={{
             1: (
               <Link
@@ -353,19 +320,9 @@ const AiPage = (props: AiPageProps) => {
                 fontWeight={600}
                 color="accent"
                 textDecoration="underline dotted"
-                href="https://openrouter.ai/models"
-                dataTestId="ai_openrouter_pricing_link"
+                href="https://exa.ai/pricing"
+                dataTestId="ai_search_exa_pricing_link"
                 target={LinkTarget.blank}
-              />
-            ),
-            2: (
-              <Link
-                fontSize="13px"
-                fontWeight={600}
-                color="accent"
-                textDecoration="underline dotted"
-                onClick={onOpenSupportedModels}
-                dataTestId="ai_supported_models_link"
               />
             ),
           }}
@@ -374,34 +331,30 @@ const AiPage = (props: AiPageProps) => {
 
       <div>
         <TransactionHistory
-          serviceName={AI_TOOLS}
+          serviceName={AI_SEARCH}
           withoutRoleFilter
           hideTypeFilter
+          emptyTitle={t("NoAISearchTransactions")}
+          emptyDescription={t("NoAISearchTransactionsDescription")}
         />
       </div>
 
-      {isConfirmDialogVisible ? (
+      {isEnableAIToolsDialogVisible ? (
         <ConfirmationDialog
-          visible={isConfirmDialogVisible}
-          onClose={onCloseConfirmDialog}
-          onConfirm={onConfirm}
-          title={confirmationDialogContent.title}
-          bodyText={confirmationDialogContent.body}
-        />
-      ) : null}
-
-      {isTopUpConfirmVisible ? (
-        <ConfirmationDialog
-          visible={isTopUpConfirmVisible}
-          onClose={onCloseTopUpConfirm}
-          onConfirm={onConfirmTopUp}
-          title={t("ServiceIsDisabled")}
-          bodyText={t("AddCreditsToEnableAI", { organizationName: logoText })}
+          visible={isEnableAIToolsDialogVisible}
+          onClose={() => setIsEnableAIToolsDialogVisible(false)}
+          onConfirm={onConfirmEnableAITools}
+          title={t("ActivateAIFeatures")}
+          bodyText={[
+            t("AISearchRequiresAIFeatures"),
+            t("EnableAISearchDescription"),
+          ]}
+          acceptLabel={t("Activate")}
         />
       ) : null}
     </div>
   );
 };
 
-export default observer(AiPage);
+export default observer(AiSearchPage);
 

@@ -88,6 +88,7 @@ const BackupPage: React.FC<BackupPageProps> = ({
     isBackupServiceOn,
     isServiceActionDisabled,
     language,
+    isCardMissingOrInactive,
   } = paymentStore;
 
   const { isFreeTariff, maxFreeBackups } = paymentStore.quotas;
@@ -210,7 +211,8 @@ const BackupPage: React.FC<BackupPageProps> = ({
         isDisabled={isDisabled || isLoading}
       />
       <WalletInfo withoutBackground balance={balance} onTopUp={onTopUp} />
-      {!paymentStore.tariff.isNotPaidPeriod && paymentStore.tariff.walletCustomerStatusNotActive ? (
+      {!paymentStore.tariff.isNotPaidPeriod &&
+      paymentStore.tariff.walletCustomerStatusNotActive ? (
         <div className={styles.unlinkedBanner}>
           <UnlinkedCardBanner />
         </div>
@@ -346,7 +348,8 @@ const BackupPage: React.FC<BackupPageProps> = ({
         <SimpleTopUpDialog
           visible={isTopUpVisible}
           onClose={onCloseTopUpModal}
-          isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
+          isFirstTopUp={isCardMissingOrInactive}
+          serviceName={BACKUP_SERVICE}
         />
       ) : null}
     </div>
