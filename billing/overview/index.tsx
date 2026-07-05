@@ -48,8 +48,9 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 
 import BalanceAmount from "../shared/balance-amount";
-import { getConvertedSize } from "../utils/common";
+import { getConvertedSize, formatCompactNumber } from "../utils/common";
 import { MANAGER, ROOM, TOTAL_SIZE } from "../constants";
+import type { TServiceFeatureWithPrice } from "../types";
 import { CardInformation } from "../shared/card-information";
 import AutoPaymentInfo from "../wallet/sub-components/AutoPaymentInfo";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
@@ -97,6 +98,7 @@ const BillingOverview = ({
     wasFirstTopUp,
     upcomingPayments,
     language,
+    servicesQuotasFeatures,
   } = store;
 
   const { isNotPaidPeriod, walletCustomerEmail } = store.tariff;
@@ -160,6 +162,19 @@ const BillingOverview = ({
     0,
   );
   const upcomingSummary = upcomingPayments.map((item) => item.title).join(", ");
+
+  const enabledAddons = (
+    Array.from(servicesQuotasFeatures?.values() ?? []) as TServiceFeatureWithPrice[]
+  ).filter((f) => f.value && f.title && f.image);
+
+  const usageForService = (serviceName?: string) =>
+    serviceUsage.find(
+      (u) =>
+        u.service === serviceName ||
+        (!!serviceName &&
+          !!u.service &&
+          (serviceName.includes(u.service) || u.service.includes(serviceName))),
+    );
 
   return (
     <div className={styles.overviewRoot}>
@@ -313,7 +328,7 @@ const BillingOverview = ({
               </Link>
             ) : null}
           </div>
-          {serviceUsage.length === 0 ? (
+          {enabledAddons.length === 0 ? (
             <div className={styles.emptyState}>
               <Text fontSize="12px" className={styles.mutedTitle}>
                 {t("NoActiveAddons")}
@@ -321,18 +336,44 @@ const BillingOverview = ({
             </div>
           ) : (
             <div className={styles.rows}>
-              {serviceUsage.map((item) => (
-                <div className={styles.row} key={item.service}>
-                  <div className={styles.rowInfo}>
-                    <Text fontSize="14px" fontWeight={600} truncate>
-                      {item.title}
-                    </Text>
+              {enabledAddons.map((feature) => {
+                const usage = usageForService(feature.serviceName);
+                return (
+                  <div className={styles.row} key={feature.id}>
+                    <div className={styles.addonLeft}>
+                      <div
+                        className={styles.addonIcon}
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml: service icon markup comes from the payment API
+                        dangerouslySetInnerHTML={{ __html: feature.image ?? "" }}
+                      />
+                      <div className={styles.rowInfo}>
+                        <Text fontSize="14px" fontWeight={600} truncate>
+                          {feature.title}
+                        </Text>
+                        {usage ? (
+                          <Text
+                            fontSize="12px"
+                            truncate
+                            className={styles.mutedTitle}
+                          >
+                            {formatCompactNumber(usage.totalQuantity)}{" "}
+                            {usage.serviceUnit}
+                          </Text>
+                        ) : null}
+                      </div>
+                    </div>
+                    {usage ? (
+                      <Text fontSize="14px" fontWeight={700}>
+                        {formatWalletCurrency(
+                          usage.totalAmount,
+                          2,
+                          usage.currency,
+                        )}
+                      </Text>
+                    ) : null}
                   </div>
-                  <Text fontSize="14px" fontWeight={700}>
-                    {formatWalletCurrency(item.totalAmount, 2, item.currency)}
-                  </Text>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

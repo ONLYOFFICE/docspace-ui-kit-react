@@ -113,6 +113,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top:12px;
 }
 
 .row {
@@ -126,6 +127,35 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+}
+
+.addonLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.addonIcon {
+  display: flex;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  rect {
+    fill: var(--color-scheme-main-buttons);
+    opacity: 0.1;
+  }
+
+  path {
+    fill: var(--color-scheme-main-buttons);
+    opacity: 1;
+  }
 }
 
 .linked {
