@@ -119,11 +119,11 @@ import {
 <BillingRoot config={{
   language: "en",
   routes: {
-    portalPayments: "/portal-settings/payments",
-    services: "/portal-settings/payments/services",
-    aiServices: "/portal-settings/payments/services/ai",
-    backup: "/portal-settings/payments/services/backup",
-    diskStorage: "/portal-settings/payments/services/disk-storage",
+    portalPayments: "/billing/tariff-plan",
+    services: "/billing/addons",
+    aiServices: "/billing/addons/ai-services",
+    backup: "/billing/addons/backup",
+    diskStorage: "/billing/addons/disk-storage",
   },
 }}>
   <MainTariff />

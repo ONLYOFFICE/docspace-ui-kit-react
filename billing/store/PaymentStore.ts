@@ -874,7 +874,7 @@ class PaymentStore {
       successUrl ||
       combineUrl(
         window.location.origin,
-        "/portal-settings/payments/wallet?complete=true&type=wallet",
+        "/billing/wallet?complete=true&type=wallet",
       );
     try {
       const res = await this.paymentApi.getCheckoutSetupUrl(
@@ -1028,11 +1028,11 @@ class PaymentStore {
   getBasicPaymentLink = async (managersCount: number) => {
     const backUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?cancel=true&type=tariff",
+      "/billing/tariff-plan?cancel=true&type=tariff",
     );
     const successUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?complete=true&type=tariff",
+      "/billing/tariff-plan?complete=true&type=tariff",
     );
 
     const abortController = new AbortController();
@@ -1061,11 +1061,11 @@ class PaymentStore {
   getPaymentLink = async (token?: AbortSignal) => {
     const backUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?cancel=true&type=tariff",
+      "/billing/tariff-plan?cancel=true&type=tariff",
     );
     const successUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?complete=true&type=tariff",
+      "/billing/tariff-plan?complete=true&type=tariff",
     );
 
     try {
