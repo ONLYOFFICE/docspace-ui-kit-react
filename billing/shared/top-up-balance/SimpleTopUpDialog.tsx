@@ -173,6 +173,8 @@ type SimpleTopUpDialogBaseProps = {
   minValue?: string;
   /** optional service to activate after the top-up (passed to the callback URL) */
   service?: string;
+  /** current service whose transaction history is refetched after the top-up */
+  serviceName?: string;
   /** optional extra query params appended to the success/callback URL */
   successParams?: Record<string, string>;
 };
@@ -198,6 +200,7 @@ const SimpleTopUpDialogContent = observer(
     walletBalance,
     fetchCustomerInfo,
     service,
+    serviceName,
     successParams,
   }: SimpleTopUpDialogProps) => {
     const t = useCommonTranslation();
@@ -270,7 +273,8 @@ const SimpleTopUpDialogContent = observer(
         window.dataLayer.push({ event: AnalyticsEvents.WalletTopUp });
 
         const requests: Promise<unknown>[] = [fetchBalance(true)];
-        if (fetchTransactionHistory) requests.push(fetchTransactionHistory());
+        if (fetchTransactionHistory)
+          requests.push(fetchTransactionHistory(serviceName));
         await Promise.allSettled(requests);
 
         toastr.success(t("WalletToppedUp"));

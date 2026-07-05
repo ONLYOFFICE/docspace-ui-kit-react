@@ -425,6 +425,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
           isFirstTopUp={isCardMissingOrInactive}
+          serviceName={storageServiceName ?? DISK_STORAGE}
         />
       ) : null}
     </div>

@@ -52,7 +52,12 @@ import XIcon from "../../../../assets/x.alert.react.svg";
 
 import BalanceAmount from "../../../shared/balance-amount";
 
-import { AI_PAYWALL_START_AMOUNT } from "../../../constants";
+import {
+  AI_PAYWALL_START_AMOUNT,
+  AI_SEARCH,
+  BACKUP_SERVICE,
+  DISK_STORAGE,
+} from "../../../constants";
 import { formatCurrencyValue } from "../../../utils/common";
 
 import styles from "./AiPaywallCompletePage.module.scss";
@@ -68,13 +73,21 @@ const TARIFF_REDIRECT_URL = "/portal-settings/payments/portal-payments";
 const TOPUP_RETRY_ATTEMPTS = 10;
 const TOPUP_RETRY_DELAY_MS = 3000;
 
-const ACTIVATABLE_SERVICES = {
-  ai: {
-    walletService: TenantWalletService.AITools,
-  },
-} as const;
+// AI search isn't part of the SDK's TenantWalletService enum yet; the backend
+// identifies it by -18.
+const AI_SEARCH_WALLET_SERVICE = -18 as TenantWalletService;
 
-type ActivateService = keyof typeof ACTIVATABLE_SERVICES;
+const resolveWalletService = (
+  service: string,
+): TenantWalletService | null => {
+  if (service.includes(AI_SEARCH)) return AI_SEARCH_WALLET_SERVICE;
+  if (service.includes("ai")) return TenantWalletService.AITools;
+  if (service.includes(DISK_STORAGE)) return TenantWalletService.Storage;
+  if (service.includes(BACKUP_SERVICE)) return TenantWalletService.Backup;
+  return null;
+};
+
+const isAIService = (service: string) => service.includes("ai");
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
@@ -144,17 +157,10 @@ const AiPaywallCompletePage = () => {
     };
   }, []);
 
-  const activateConfig =
-    ACTIVATABLE_SERVICES[service as ActivateService] ?? null;
+  const activateWalletService = service ? resolveWalletService(service) : null;
 
-  const getActivateStepLabel = () => {
-    switch (service) {
-      case "ai":
-        return t("AIPaywallCallbackStepActivate");
-      default:
-        return "";
-    }
-  };
+  const getActivateStepLabel = () =>
+    isAIService(service) ? t("AIPaywallCallbackStepActivate") : "";
 
   const isWalletOnly = type === "wallet";
 
@@ -189,10 +195,10 @@ const AiPaywallCompletePage = () => {
 
         setStepIndex(2);
 
-        if (activateConfig) {
+        if (activateWalletService !== null) {
           await paymentApi.changeTenantWalletServiceState({
             changeWalletServiceStateRequestDto: {
-              service: activateConfig.walletService,
+              service: activateWalletService,
               enabled: true,
             },
           });
@@ -224,6 +230,12 @@ const AiPaywallCompletePage = () => {
     run();
   }, []);
 
+  const serviceRedirectUrl = service.includes(AI_SEARCH)
+    ? "/portal-settings/payments/services/ai-search"
+    : service.includes(DISK_STORAGE)
+      ? "/portal-settings/payments/services/disk-storage"
+      : BILLING_REDIRECT_URL;
+
   const onGoToBillingClick = () => {
     if (admins) {
       window.location.href = TARIFF_REDIRECT_URL;
@@ -231,7 +243,7 @@ const AiPaywallCompletePage = () => {
     }
     window.location.href = isWalletOnly
       ? WALLET_REDIRECT_URL
-      : BILLING_REDIRECT_URL;
+      : serviceRedirectUrl;
   };
 
   const tariffStep =

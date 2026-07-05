@@ -24,10 +24,16 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import NewChat from "../../../new-chat";
+import NewChat, { type NewChatProps } from "../../../new-chat";
 
-const AiChatPanelBody = () => {
-  return <NewChat />;
+export type AiChatPanelBodyProps = Pick<
+  NewChatProps,
+  "aiReady" | "noAccessProps"
+>;
+
+const AiChatPanelBody = ({ aiReady, noAccessProps }: AiChatPanelBodyProps) => {
+  return <NewChat aiReady={aiReady} noAccessProps={noAccessProps} />;
 };
 
 export default AiChatPanelBody;
+

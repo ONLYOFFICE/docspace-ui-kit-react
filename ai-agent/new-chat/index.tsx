@@ -37,6 +37,10 @@ import {
 import { useIsDesktop } from "../../hooks/use-is-desktop";
 
 import { ChatToolbar } from "../chat-toolbar";
+import {
+  ChatNoAccessScreen,
+  type ChatNoAccessScreenProps,
+} from "../chat/components/chat-no-access-screen";
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
 
 import styles from "./NewChat.module.scss";
@@ -45,65 +49,83 @@ import type { ChatProps } from "./chat.types";
 // The in-chat AI settings section now lives in DocSpace portal settings.
 const AI_SETTINGS_URL = "/portal-settings/ai-settings";
 
-const NewChat: React.FC<ChatProps> = observer(({ isAgent }) => {
-  const isDesktop = useIsDesktop();
+export type NewChatProps = {
+  aiReady?: boolean;
+  noAccessProps?: ChatNoAccessScreenProps;
+  isAgent?: boolean;
+};
 
-  const stores = useStores();
-  const currentPage = stores.useRouter((s) => s.currentPage);
-  const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
-  const profiles = stores.useProfilesStore((s) => s.profiles);
-  const hasProfiles = profiles.length > 0;
+const NewChat: React.FC<NewChatProps> = observer(
+  ({ aiReady = true, noAccessProps, isAgent }) => {
+    const isDesktop = useIsDesktop();
 
-  const aiChatStore = useAiChatStore();
+    const stores = useStores();
+    const currentPage = stores.useRouter((s) => s.currentPage);
+    const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
+    const profiles = stores.useProfilesStore((s) => s.profiles);
+    const hasProfiles = profiles.length > 0;
+    // Empty string when no thread is selected (see ThreadsStoreState.threadId).
+    const threadId = stores.useThreadsStore((s) => s.threadId);
 
-  const isFullScreen = aiChatStore.effectiveFullscreen;
+    const aiChatStore = useAiChatStore();
 
-  console.log({ isFullScreen, aiChatStore });
+    const isFullScreen = aiChatStore.effectiveFullscreen;
 
-  React.useEffect(() => {
-    // page and reset the internal page so returning to the chat doesn't loop. // "Open settings" actions, etc.), bounce the user to the portal AI settings // Whenever the widget router tries to open the settings page (gear button,
-    if (currentPage === "settings") {
-      setCurrentPage("chat");
-      window.DocSpace?.navigate(AI_SETTINGS_URL);
-    }
-  }, [currentPage, setCurrentPage]);
+    const showActivationScreen = !!noAccessProps && !aiReady && !threadId;
+    const showToolbar = hasProfiles || showActivationScreen;
 
-  switch (currentPage) {
-    case "settings":
-      return null;
-    case "initial-setup":
-      return <SettingsPage />;
-    case "history":
-      if ((isFullScreen || isAgent) && isDesktop) {
+    const chatBody = showActivationScreen ? (
+      <ChatNoAccessScreen {...noAccessProps} />
+    ) : (
+      <ChatPage />
+    );
+
+    React.useEffect(() => {
+      // page and reset the internal page so returning to the chat doesn't loop. // "Open settings" actions, etc.), bounce the user to the portal AI settings // Whenever the widget router tries to open the settings page (gear button,
+      if (currentPage === "settings") {
+        setCurrentPage("chat");
+        window.DocSpace?.navigate(AI_SETTINGS_URL);
+      }
+    }, [currentPage, setCurrentPage]);
+
+    switch (currentPage) {
+      case "settings":
+        return null;
+      case "initial-setup":
+        return <SettingsPage />;
+      case "history":
+        if (isFullScreen && isDesktop) {
+          return (
+            <section className={styles.container}>
+              <div className={styles.chatList}>
+                <ChatList
+                  hideHeader
+                  alwaysShowActions
+                  className={styles.chatListView}
+                />
+              </div>
+              <div className={styles.chat}>
+                {showToolbar ? <ChatToolbar /> : null}
+                {chatBody}
+              </div>
+            </section>
+          );
+        }
+
+        return <ChatList alwaysShowActions className={styles.chatListView} />;
+      default: {
         return (
-          <section className={styles.container}>
-            <div className={styles.chatList}>
-              <ChatList
-                hideHeader
-                alwaysShowActions
-                className={styles.chatListView}
-              />
-            </div>
-            <div className={styles.chat}>
-              {hasProfiles ? <ChatToolbar /> : null}
-              <ChatPage />
-            </div>
+          <section className={styles.chat}>
+            {showToolbar ? <ChatToolbar /> : null}
+            {chatBody}
           </section>
         );
       }
-
-      return <ChatList alwaysShowActions className={styles.chatListView} />;
-    default: {
-      return (
-        <section className={styles.chat}>
-          {hasProfiles ? <ChatToolbar /> : null}
-          <ChatPage />
-        </section>
-      );
     }
-  }
-});
+  },
+);
 
 NewChat.displayName = "NewChat";
 
 export default NewChat;
+

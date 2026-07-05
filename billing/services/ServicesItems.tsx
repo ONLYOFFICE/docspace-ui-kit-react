@@ -40,6 +40,8 @@ import classNames from "classnames";
 import { Text } from "../../components/text";
 import {
   AI_ENUM,
+  AI_SEARCH,
+  AI_SEARCH_ENUM,
   AI_TOOLS,
   BACKUP_SERVICE,
   DISK_STORAGE,
@@ -52,7 +54,6 @@ import PriceIcon from "../../assets/icons/16/price.react.svg";
 
 import styles from "./styles/AdditionalStorage.module.scss";
 import { useServicesActions } from "./hooks/useServicesActions";
-import { usePermissionTooltipText } from "./hooks/usePermissionTooltipText";
 
 import ServiceCard from "./sub-components/ServiceCard";
 
@@ -105,8 +106,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
   const isDisabled = isServiceActionDisabled;
   const { t } = useServicesActions();
-
-  const permissionTooltipText = usePermissionTooltipText();
 
   const handleToggle = (
     e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>,
@@ -266,10 +265,51 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             }}
           />
         );
+      case AI_SEARCH_ENUM:
+        return (
+          <CommonTrans
+            i18nKey="AIExaPricingNote"
+            components={{
+              1: (
+                <Link
+                  fontSize="13px"
+                  fontWeight={600}
+                  color="accent"
+                  textDecoration="underline dotted"
+                  href="https://exa.ai/pricing"
+                  target={LinkTarget.blank}
+                  onClick={onPricingLinkClick}
+                  dataTestId="ai_search_exa_pricing_link"
+                />
+              ),
+            }}
+          />
+        );
       default:
         return "";
     }
   };
+
+  const order = [AI_TOOLS, AI_SEARCH, BACKUP_SERVICE, DISK_STORAGE];
+  const rankOf = (serviceName?: string) => {
+    const index = order.findIndex(
+      (name) => serviceName === name || serviceName?.includes(name),
+    );
+    return index === -1 ? order.length : index;
+  };
+
+  const orderedServices = (
+    Array.from(
+      servicesQuotasFeatures?.values() || [],
+    ) as TServiceFeatureWithPrice[]
+  )
+    .map((item, index) => ({ item, index }))
+    .sort(
+      (a, b) =>
+        rankOf(a.item.serviceName) - rankOf(b.item.serviceName) ||
+        a.index - b.index,
+    )
+    .map(({ item }) => item);
 
   return (
     <div style={{ width: "100%" }}>
@@ -283,11 +323,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
           [styles.servicesWrapperTablet]: isTablet,
         })}
       >
-        {(
-          Array.from(
-            servicesQuotasFeatures?.values() || [],
-          ) as TServiceFeatureWithPrice[]
-        ).map((item) => {
+        {orderedServices.map((item) => {
           if (!item.title || !item.image) return null;
 
           if (item.serviceName === BACKUP_SERVICE) {
@@ -306,7 +342,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                   item.serviceName,
                   item.price.value,
                 )}
-                tooltip={isDisabled ? permissionTooltipText : undefined}
                 isWarningColor={
                   item.value && walletCustomerEmail
                     ? availableBackupsCount === 0
@@ -330,10 +365,28 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 id={item.id}
                 image={item.image}
                 isEnabled={item.value}
-                tooltip={isDisabled ? permissionTooltipText : undefined}
                 isErrorColor={isLowWalletBalance}
                 icon={<PriceIcon />}
                 withoutIcon={!isLowWalletBalance}
+                withoutGreenColor
+              />
+            );
+          }
+
+          if (item.serviceName === AI_SEARCH) {
+            return (
+              <ServiceCard
+                key={item.id}
+                toggleDisabled={isDisabled}
+                onClick={handleClick}
+                onToggle={handleToggle}
+                serviceTitle={item.title}
+                priceDescription={priceDescription(item.id)}
+                priceTitle={item.priceTitle}
+                id={item.id}
+                image={item.image}
+                isEnabled={item.value}
+                withoutIcon
                 withoutGreenColor
               />
             );
@@ -354,7 +407,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 id={item.id}
                 image={item.image}
                 isEnabled={hasStorageSubscription}
-                tooltip={isDisabled ? permissionTooltipText : undefined}
                 priceTooltip={
                   hasScheduledStorageChange ? textTooltip : undefined
                 }

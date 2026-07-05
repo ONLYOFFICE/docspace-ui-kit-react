@@ -168,6 +168,7 @@ export type TPaymentRoutes = {
   portalPayments: string;
   services: string;
   aiServices: string;
+  aiSearch: string;
   backup: string;
   diskStorage: string;
 };
