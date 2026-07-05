@@ -109,6 +109,10 @@
   color: var(--payment-secondary-text-color, #a3a9ae);
 }
 
+.cardLink {
+  margin-block-start: auto;
+}
+
 .rows {
   display: flex;
   flex-direction: column;

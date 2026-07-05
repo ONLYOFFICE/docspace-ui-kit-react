@@ -247,6 +247,7 @@ const BillingOverview = ({
               textDecoration="underline"
               color="accent"
               fontWeight={600}
+              className={styles.cardLink}
               dataTestId="overview_edit_plan_link"
             >
               {isFreeTariff ? t("UpgradePlan") : t("EditPlan")}
@@ -274,6 +275,7 @@ const BillingOverview = ({
               textDecoration="underline"
               color="accent"
               fontWeight={600}
+              className={styles.cardLink}
               dataTestId="overview_view_usage_link"
             >
               {t("ViewUsage")}
@@ -301,6 +303,7 @@ const BillingOverview = ({
               textDecoration="underline"
               color="accent"
               fontWeight={600}
+              className={styles.cardLink}
               dataTestId="overview_upcoming_details_link"
             >
               {t("Details")}
