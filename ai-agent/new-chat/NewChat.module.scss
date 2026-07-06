@@ -26,6 +26,10 @@
 @use "../../styles/variables/colors";
 
 .chat {
+  :global(.aui-root) {
+    --aui-font-base: 15px;
+  }
+
   display: flex;
   flex-direction: column;
 
@@ -194,7 +198,7 @@
 }
 
 :global(.aui-root) {
-  --aui-font-base: 15px;
+  --aui-font-base: 13px;
 }
 
 // :global(.icon-button) {

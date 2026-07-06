@@ -47,7 +47,7 @@ import { match, P } from "ts-pattern";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { getBrandName } from "../../../../constants/brands";
 
-type Props = {
+export type ChatNoAccessScreenProps = {
   aiReady: boolean;
   standalone: boolean;
   isPortalAdmin: boolean;
@@ -75,7 +75,7 @@ export const ChatNoAccessScreen = ({
   onTopUpAndActivateAI,
   onShowAIBenefits,
   isActivating,
-}: Props) => {
+}: ChatNoAccessScreenProps) => {
   const { isBase } = useTheme();
   const t = useCommonTranslation();
 

@@ -61,6 +61,8 @@ type TransactionHistoryProps = {
   hasAppliedDateFilter: boolean;
   serviceName?: string;
   maxWidth?: number | string;
+  emptyTitle?: string;
+  emptyDescription?: string;
 };
 
 const TransactionBody = ({
@@ -68,6 +70,8 @@ const TransactionBody = ({
   isTransactionHistoryExist,
   serviceName,
   maxWidth,
+  emptyTitle,
+  emptyDescription,
 }: TransactionHistoryProps) => {
   const { isBase } = useTheme();
   const { mobileBreakpoint, desktopBreakpoint } = usePaymentStore();
@@ -103,12 +107,12 @@ const TransactionBody = ({
 
   const title = hasAppliedDateFilter
     ? t("NoFindingsFound2")
-    : isDocsConnect
+    : (emptyTitle ?? isDocsConnect)
       ? t("NoDocsConnectTransaction")
       : t("NoWalletTransaction");
   const description = hasAppliedDateFilter
     ? t("NoTransactionsFilter")
-    : isDocsConnect
+    : (emptyDescription ?? isDocsConnect)
       ? t("NoDocsConnectTransactionDescription")
       : t("NoWalletTransactionDescription");
 
@@ -155,4 +159,3 @@ const TransactionBody = ({
 };
 
 export default observer(TransactionBody);
-
