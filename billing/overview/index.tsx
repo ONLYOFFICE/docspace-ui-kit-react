@@ -161,7 +161,13 @@ const BillingOverview = ({
     (sum, item) => sum + item.amount,
     0,
   );
-  const upcomingSummary = upcomingPayments.map((item) => item.title).join(", ");
+  const upcomingTitles = upcomingPayments.map((item) => item.title);
+  const upcomingSummary =
+    upcomingTitles.length <= 2
+      ? upcomingTitles.join(" | ")
+      : `${upcomingTitles.slice(0, 2).join(" | ")} | ${t("CountMore", {
+          count: upcomingTitles.length - 2,
+        })}`;
 
   const enabledAddons = (
     Array.from(servicesQuotasFeatures?.values() ?? []) as TServiceFeatureWithPrice[]
