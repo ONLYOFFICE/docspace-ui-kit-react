@@ -1326,6 +1326,20 @@ class PaymentStore {
     }
   };
 
+  overviewInit = async (t: TTranslation, integrationUrl?: string) => {
+    try {
+      await Promise.all([
+        this.walletInit(t, integrationUrl),
+        this.handleServicesQuotas(),
+        this.paymentQuotas.fetchPaymentQuotas(),
+        this.quotas.fetchPortalQuota(),
+      ]);
+    } catch (error) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
   getSettingsPayment = async () => {
     const abortController = new AbortController();
     this.addAbortController(abortController);

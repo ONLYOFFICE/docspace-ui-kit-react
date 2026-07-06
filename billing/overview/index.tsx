@@ -91,7 +91,7 @@ const BillingOverview = ({
     canUpdateTariff,
     recommendedAmount,
     fetchBalance,
-    walletInit,
+    overviewInit,
     formatWalletCurrency,
     isAutoPaymentExist,
     autoPayments,
@@ -115,7 +115,7 @@ const BillingOverview = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    walletInit?.(t).catch((e: unknown) => console.error(e));
+    overviewInit?.(t).catch((e: unknown) => console.error(e));
   }, []);
 
   const isAutoPaymentSetup = Boolean(
