@@ -187,40 +187,47 @@ const BillingOverview = ({
 
       {/* Available credits */}
       <div className={`${styles.card} ${styles.creditsCard}`}>
-        <BalanceAmount
-          title={t("AvailableCredits")}
-          titleFontSize="14px"
-          mainFontSize="28px"
-          fractionFontSize="18px"
-          showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
-          isRefreshing={isRefreshing}
-          onRefresh={onRefreshBalance}
-          amount={walletBalance}
-          currency={walletCodeCurrency}
-          language={language}
-        />
-        <div className={styles.cardButtons}>
-          <Button
-            size={isMobile ? ButtonSize.normal : ButtonSize.small}
-            primary
-            label={t("TopUp")}
-            onClick={() => setIsTopUpDialogVisible(true)}
-            isDisabled={!canUpdateTariff || isNotPaidPeriod}
-            className={styles.cardButton}
-            testId="overview_top_up_button"
+        <div className={styles.creditsTop}>
+          <BalanceAmount
+            title={t("AvailableCredits")}
+            titleFontSize="14px"
+            mainFontSize="28px"
+            fractionFontSize="18px"
+            showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
+            isRefreshing={isRefreshing}
+            onRefresh={onRefreshBalance}
+            amount={walletBalance}
+            currency={walletCodeCurrency}
+            language={language}
+            withoutMargin
           />
-          {wasFirstTopUp ? (
+          <div className={styles.cardButtons}>
             <Button
               size={isMobile ? ButtonSize.normal : ButtonSize.small}
-              label={t("AutoTopUp")}
-              onClick={() => setIsWalletRefilledOpen(true)}
+              primary
+              label={t("TopUp")}
+              onClick={() => setIsTopUpDialogVisible(true)}
               isDisabled={!canUpdateTariff || isNotPaidPeriod}
               className={styles.cardButton}
-              testId="overview_auto_top_up_button"
+              testId="overview_top_up_button"
             />
-          ) : null}
+            {wasFirstTopUp ? (
+              <Button
+                size={isMobile ? ButtonSize.normal : ButtonSize.small}
+                label={t("AutoTopUp")}
+                onClick={() => setIsWalletRefilledOpen(true)}
+                isDisabled={!canUpdateTariff || isNotPaidPeriod}
+                className={styles.cardButton}
+                testId="overview_auto_top_up_button"
+              />
+            ) : null}
+          </div>
         </div>
-        {isAutoPaymentSetup ? <AutoPaymentInfo /> : null}
+        {isAutoPaymentSetup ? (
+          <div className={styles.autoPaymentWrap}>
+            <AutoPaymentInfo />
+          </div>
+        ) : null}
       </div>
 
       {/* Plan / spend / upcoming */}

@@ -91,10 +91,17 @@
   gap: 8px;
 }
 
+.creditsTop {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .cardButtons {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
 }
 
 .cardButton {
@@ -103,6 +110,15 @@
 
 .creditsCard {
   gap: 4px;
+}
+
+.autoPaymentWrap {
+  margin-top: 12px;
+
+
+  > div {
+    margin-bottom: 0;
+  }
 }
 
 .mutedTitle {
