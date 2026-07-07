@@ -114,12 +114,18 @@ const NavMenuSubItemWrapper = ({
             to={subItem.linkData.path}
             state={subItem.linkData.state}
             className={itemClassName}
+            data-item-id={subItem.id}
             onClick={handleClick}
           >
             {content}
           </LinkRouter>
         ) : (
-          <button type="button" className={itemClassName} onClick={handleClick}>
+          <button
+            type="button"
+            className={itemClassName}
+            data-item-id={subItem.id}
+            onClick={handleClick}
+          >
             {content}
           </button>
         )}
@@ -235,6 +241,7 @@ const NavMenuItemWrapper = ({
             to={item.linkData.path}
             state={item.linkData.state}
             className={itemClassName}
+            data-item-id={item.id}
             onClick={handleClick}
           >
             {content}
@@ -244,6 +251,7 @@ const NavMenuItemWrapper = ({
             as="button"
             type="button"
             className={itemClassName}
+            data-item-id={item.id}
             aria-expanded={hasChildren && !iconOnly ? isExpanded : undefined}
             title={iconOnly ? item.label : undefined}
             onClick={handleClick}

@@ -33,6 +33,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { ChatNoAccessScreenProps } from "../chat/components/chat-no-access-screen";
+
 export interface ChatProps {
   isAgent?: boolean;
+  aiReady?: boolean;
+  noAccessProps?: ChatNoAccessScreenProps;
 }
