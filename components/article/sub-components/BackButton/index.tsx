@@ -53,6 +53,7 @@ const BackButton = ({
   toggleArticleOpen,
   navigate,
   onBack,
+  label,
 }: {
   showText: boolean;
   currentDeviceType: DeviceType;
@@ -61,6 +62,7 @@ const BackButton = ({
   toggleArticleOpen?: () => void;
   navigate?: (path: string) => void;
   onBack?: () => void;
+  label?: string;
 }) => {
   const t = useCommonTranslation();
 
@@ -103,7 +105,7 @@ const BackButton = ({
       onClick={onClickBack}
     >
       <IconButton className={styles.arrowIcon} iconNode={icon} isClickable />
-      {showText ? <Text truncate>{t("Back")}</Text> : null}
+      {showText ? <Text truncate>{label ?? t("Back")}</Text> : null}
     </div>
   );
 };
