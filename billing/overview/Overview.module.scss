@@ -57,7 +57,7 @@
 
 .headerDescription {
   max-width: 560px;
-  color: var(--payment-secondary-text-color, #a3a9ae);
+  color: var(--payment-secondary-text-color);
 }
 
 .grid3 {
@@ -129,7 +129,7 @@
 }
 
 .mutedTitle {
-  color: var(--payment-secondary-text-color, #a3a9ae);
+  color: var(--payment-secondary-text-color);
 }
 
 .cardLink {

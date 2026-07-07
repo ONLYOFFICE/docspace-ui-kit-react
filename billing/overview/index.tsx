@@ -86,7 +86,9 @@ const BillingOverview = ({
   return (
     <div className={styles.overviewRoot}>
       <div className={styles.header}>
-        <Heading type="content">{t("Billing")}</Heading>
+        <Text fontSize="23px" fontWeight={700}>
+          {t("Billing")}
+        </Text>
         <Text className={styles.headerDescription}>
           {t("BillingOverviewDescription")}
         </Text>
