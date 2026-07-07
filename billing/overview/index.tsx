@@ -93,6 +93,7 @@ const BillingOverview = ({
     fetchBalance,
     overviewInit,
     formatWalletCurrency,
+    formatPaymentCurrency,
     isAutoPaymentExist,
     autoPayments,
     wasFirstTopUp,
@@ -151,8 +152,6 @@ const BillingOverview = ({
       });
     }
   };
-
-  const planPrice = `${currentPlanCost?.currencySymbol ?? ""}${currentPlanCost?.value ?? 0}`;
 
   const limitValue = (id: string) =>
     quotaCharacteristics.find((f) => f.id === id)?.value ?? 0;
@@ -252,7 +251,10 @@ const BillingOverview = ({
                   rooms: limitValue(ROOM),
                   storage: getConvertedSize(t, limitValue(TOTAL_SIZE)),
                 })
-              : t("MigratePerMonth", { price: planPrice })}
+              : t("PlanCost", {
+                  admins: limitValue(MANAGER),
+                  price: formatPaymentCurrency(currentPlanCost?.value ?? 0, 2),
+                })}
           </Text>
           {onEditPlan ? (
             <Link
@@ -378,15 +380,13 @@ const BillingOverview = ({
                         ) : null}
                       </div>
                     </div>
-                    {usage ? (
-                      <Text fontSize="14px" fontWeight={700}>
-                        {formatWalletCurrency(
-                          usage.totalAmount,
-                          2,
-                          usage.currency,
-                        )}
-                      </Text>
-                    ) : null}
+                    <Text fontSize="14px" fontWeight={700}>
+                      {formatWalletCurrency(
+                        usage?.totalAmount ?? 0,
+                        2,
+                        usage?.currency || walletCodeCurrency,
+                      )}
+                    </Text>
                   </div>
                 );
               })}
