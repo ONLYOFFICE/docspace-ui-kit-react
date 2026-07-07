@@ -55,6 +55,7 @@ import { CardInformation } from "../shared/card-information";
 import AutoPaymentInfo from "../wallet/sub-components/AutoPaymentInfo";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import WalletRefilledModal from "../wallet/WalletRefilledModal";
+import OverviewLoader from "./OverviewLoader";
 
 import styles from "./Overview.module.scss";
 
@@ -92,6 +93,7 @@ const BillingOverview = ({
     recommendedAmount,
     fetchBalance,
     overviewInit,
+    isInitOverviewPage,
     formatWalletCurrency,
     formatPaymentCurrency,
     isAutoPaymentExist,
@@ -190,8 +192,12 @@ const BillingOverview = ({
         </Text>
       </div>
 
-      {/* Available credits */}
-      <div className={`${styles.card} ${styles.creditsCard}`}>
+      {!isInitOverviewPage ? (
+        <OverviewLoader />
+      ) : (
+        <>
+          {/* Available credits */}
+          <div className={`${styles.card} ${styles.creditsCard}`}>
         <div className={styles.creditsTop}>
           <BalanceAmount
             title={t("AvailableCredits")}
@@ -429,6 +435,8 @@ const BillingOverview = ({
           )}
         </div>
       </div>
+        </>
+      )}
 
       {isTopUpDialogVisible ? (
         <SimpleTopUpDialog

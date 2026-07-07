@@ -210,6 +210,8 @@ class PaymentStore {
 
   isInitWalletPage = false;
 
+  isInitOverviewPage = false;
+
   isPaymentMethodInit = false;
 
   serviceUsage: TServiceUsage[] = [];
@@ -563,6 +565,10 @@ class PaymentStore {
 
   setIsInitWalletPage = (value: boolean) => {
     this.isInitWalletPage = value;
+  };
+
+  setIsInitOverviewPage = (value: boolean) => {
+    this.isInitOverviewPage = value;
   };
 
   setPaymentMethodInit = (value: boolean) => {
@@ -1337,6 +1343,8 @@ class PaymentStore {
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
+    } finally {
+      this.setIsInitOverviewPage(true);
     }
   };
 
