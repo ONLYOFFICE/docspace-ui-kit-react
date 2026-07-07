@@ -115,9 +115,10 @@
 .autoPaymentWrap {
   margin-top: 12px;
 
-
   > div {
     margin-bottom: 0;
+    max-width: none;
+    width: 100%;
   }
 }
 
