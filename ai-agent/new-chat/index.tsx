@@ -37,10 +37,7 @@ import {
 import { useIsDesktop } from "../../hooks/use-is-desktop";
 
 import { ChatToolbar } from "../chat-toolbar";
-import {
-  ChatNoAccessScreen,
-  type ChatNoAccessScreenProps,
-} from "../chat/components/chat-no-access-screen";
+import { ChatNoAccessScreen } from "../chat/components/chat-no-access-screen";
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
 
 import styles from "./NewChat.module.scss";
@@ -49,13 +46,7 @@ import type { ChatProps } from "./chat.types";
 // The in-chat AI settings section now lives in DocSpace portal settings.
 const AI_SETTINGS_URL = "/portal-settings/ai-settings";
 
-export type NewChatProps = {
-  aiReady?: boolean;
-  noAccessProps?: ChatNoAccessScreenProps;
-  isAgent?: boolean;
-};
-
-const NewChat: React.FC<NewChatProps> = observer(
+const NewChat: React.FC<ChatProps> = observer(
   ({ aiReady = true, noAccessProps, isAgent }) => {
     const isDesktop = useIsDesktop();
 
@@ -80,6 +71,19 @@ const NewChat: React.FC<NewChatProps> = observer(
       <ChatPage />
     );
 
+    // Toolbar + chat body — the same pane is used both standalone and inside
+    // the split-screen history layout, so it lives in one place.
+    const chatPanel = (
+      <>
+        {showToolbar ? <ChatToolbar /> : null}
+        {chatBody}
+      </>
+    );
+
+    // Desktop full-screen / agent view puts the chat list beside the active
+    // chat; every other case shows one surface at a time.
+    const isSplitView = (isFullScreen || isAgent) && isDesktop;
+
     React.useEffect(() => {
       // page and reset the internal page so returning to the chat doesn't loop. // "Open settings" actions, etc.), bounce the user to the portal AI settings // Whenever the widget router tries to open the settings page (gear button,
       if (currentPage === "settings") {
@@ -90,37 +94,31 @@ const NewChat: React.FC<NewChatProps> = observer(
 
     switch (currentPage) {
       case "settings":
+        // The effect above redirects to portal AI settings; render nothing.
         return null;
+
       case "initial-setup":
         return <SettingsPage />;
-      case "history":
-        if (isFullScreen && isDesktop) {
-          return (
-            <section className={styles.container}>
-              <div className={styles.chatList}>
-                <ChatList
-                  hideHeader
-                  alwaysShowActions
-                  className={styles.chatListView}
-                />
-              </div>
-              <div className={styles.chat}>
-                {showToolbar ? <ChatToolbar /> : null}
-                {chatBody}
-              </div>
-            </section>
-          );
-        }
 
-        return <ChatList alwaysShowActions className={styles.chatListView} />;
-      default: {
+      case "history":
+        if (!isSplitView) {
+          return <ChatList alwaysShowActions className={styles.chatListView} />;
+        }
         return (
-          <section className={styles.chat}>
-            {showToolbar ? <ChatToolbar /> : null}
-            {chatBody}
+          <section className={styles.container}>
+            <div className={styles.chatList}>
+              <ChatList
+                hideHeader
+                alwaysShowActions
+                className={styles.chatListView}
+              />
+            </div>
+            <div className={styles.chat}>{chatPanel}</div>
           </section>
         );
-      }
+
+      default:
+        return <section className={styles.chat}>{chatPanel}</section>;
     }
   },
 );
@@ -128,4 +126,3 @@ const NewChat: React.FC<NewChatProps> = observer(
 NewChat.displayName = "NewChat";
 
 export default NewChat;
-
