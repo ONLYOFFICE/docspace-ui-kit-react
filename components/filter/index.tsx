@@ -503,9 +503,12 @@ const FilterInput = React.memo(
       calculateOverflow();
     }, [calculateOverflow]);
 
-    // Poll for icon loading completion
+    // Poll until the row is measured and ready. Also covers the empty-groups
+    // case: the initial layout-effect measurement can see a zero-width row
+    // (e.g. fonts/layout not settled yet), and without groups there are no
+    // icon loads to retrigger it, so poll until calculateOverflow succeeds.
     React.useEffect(() => {
-      if (isRowReady || roomGroupsWithIcons.length === 0) return;
+      if (isRowReady) return;
 
       const checkIcons = () => {
         if (areIconsReady()) {
