@@ -24,10 +24,42 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import { useTranslation } from "react-i18next";
+
 import { ModelAssignmentPage } from "@onlyoffice/ai-chat";
 
+import { Heading } from "../../../components/heading";
+import { Text } from "../../../components/text";
+
+import styles from "./ModelAssignment.module.scss";
+
 const ModelAssignment = () => {
-  return <ModelAssignmentPage hideHeader noPadding />;
+  const { t } = useTranslation(["Common"]);
+
+  return (
+    <ModelAssignmentPage
+      hideHeader
+      noPadding
+      className={styles.modelAssignment}
+      defaultModelLabel={t("Common:Model")}
+      defaultSetupHeader={
+        <>
+          <Heading
+            level={3}
+            fontWeight={700}
+            fontSize="16px"
+            lineHeight="22px"
+            className={styles.defaultSetupTitle}
+          >
+            {t("Common:DefaultAISetupTitle")}
+          </Heading>
+          <Text lineHeight="20px" className={styles.defaultSetupDescription}>
+            {t("Common:DefaultAISetupDescription")}
+          </Text>
+        </>
+      }
+    />
+  );
 };
 
 export default ModelAssignment;

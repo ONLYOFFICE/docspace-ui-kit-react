@@ -30,8 +30,8 @@ importers:
         specifier: 1.15.1
         version: 1.15.1
       '@onlyoffice/ai-chat':
-        specifier: file:onlyoffice-ai-chat-0.4.145-docspace.8.tgz
-        version: file:onlyoffice-ai-chat-0.4.145-docspace.8.tgz(ea3da58d18ee4452d74ee9ebaf36621e)
+        specifier: file:onlyoffice-ai-chat-0.4.146-docspace.40.tgz
+        version: file:onlyoffice-ai-chat-0.4.146-docspace.40.tgz(5b1ff7be631a9a104de607d9649450ba)
       '@onlyoffice/docspace-api-sdk':
         specifier: file:onlyoffice-docspace-api-sdk-3.7.0.tgz
         version: file:onlyoffice-docspace-api-sdk-3.7.0.tgz
@@ -108,11 +108,11 @@ importers:
         specifier: 3.7.2
         version: 3.7.2
       mobx:
-        specifier: 6.13.5
-        version: 6.13.5
+        specifier: 6.16.1
+        version: 6.16.1
       mobx-react:
-        specifier: 7.6.0
-        version: 7.6.0(mobx@6.13.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: 9.2.2
+        version: 9.2.2(mobx@6.16.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       openai:
         specifier: 5.23.2
         version: 5.23.2(ws@8.19.0)(zod@4.4.3)
@@ -1375,9 +1375,9 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.4.145-docspace.8.tgz':
-    resolution: {integrity: sha512-Gze5/dn25cEyngRHkA1LvoOVu+L3RpmoCWJpv8ElJJeHVJbZkYEYmz8Pr8LwebgePu4YdSGcXJ49xzp20domCw==, tarball: file:onlyoffice-ai-chat-0.4.145-docspace.8.tgz}
-    version: 0.4.145-docspace.8
+  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.4.146-docspace.40.tgz':
+    resolution: {integrity: sha512-967vUE37ATBhhO1uzuRVRHyhh27uWfPxVLLN7ZXiVoULNCCpdrYUl4U79YqYzgjoE5WGUHnxHaiPydW65Aae0g==, tarball: file:onlyoffice-ai-chat-0.4.146-docspace.40.tgz}
+    version: 0.4.146-docspace.40
     peerDependencies:
       '@anthropic-ai/sdk': ^0.60.0
       '@assistant-ui/react': ^0.11.0
@@ -4363,11 +4363,11 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  mobx-react-lite@3.4.3:
-    resolution: {integrity: sha512-NkJREyFTSUXR772Qaai51BnE1voWx56LOL80xG7qkZr6vo8vEaLF3sz1JNUVh+rxmUzxYaqOhfuxTfqUh0FXUg==}
+  mobx-react-lite@4.1.1:
+    resolution: {integrity: sha512-iUxiMpsvNraCKXU+yPotsOncNNmyeS2B5DKL+TL6Tar/xm+wwNJAubJmtRSeAoYawdZqwv8Z/+5nPRHeQxTiXg==}
     peerDependencies:
-      mobx: ^6.1.0
-      react: ^16.8.0 || ^17 || ^18
+      mobx: ^6.9.0
+      react: ^16.8.0 || ^17 || ^18 || ^19
       react-dom: '*'
       react-native: '*'
     peerDependenciesMeta:
@@ -4376,11 +4376,11 @@ packages:
       react-native:
         optional: true
 
-  mobx-react@7.6.0:
-    resolution: {integrity: sha512-+HQUNuh7AoQ9ZnU6c4rvbiVVl+wEkb9WqYsVDzGLng+Dqj1XntHu79PvEWKtSMoMj67vFp/ZPXcElosuJO8ckA==}
+  mobx-react@9.2.2:
+    resolution: {integrity: sha512-ShszmQzR/VrhU3M0cQ7DA/s8qNcLcF2emSuudJ/TnDILS3C1Im48mdaG6CpyjZHy8+WqgXUCC9mPqSRIwPPMuQ==}
     peerDependencies:
-      mobx: ^6.1.0
-      react: ^16.8.0 || ^17 || ^18
+      mobx: ^6.9.0
+      react: ^16.8.0 || ^17 || ^18 || ^19
       react-dom: '*'
       react-native: '*'
     peerDependenciesMeta:
@@ -4389,8 +4389,8 @@ packages:
       react-native:
         optional: true
 
-  mobx@6.13.5:
-    resolution: {integrity: sha512-/HTWzW2s8J1Gqt+WmUj5Y0mddZk+LInejADc79NJadrWla3rHzmRHki/mnEUH1AvOmbNTZ1BRbKxr8DSgfdjMA==}
+  mobx@6.16.1:
+    resolution: {integrity: sha512-syNcDdX3KT+Jq3je6eGjBhuc24Z68td2VG0zNFqRswaE433D9SNH5VRy/xrGbJsUixfppLLccXhAW9JSf6n+SQ==}
 
   motion-dom@12.38.0:
     resolution: {integrity: sha512-pdkHLD8QYRp8VfiNLb8xIBJis1byQ9gPT3Jnh2jqfFtAsWUA3dEepDlsWe/xMpO8McV+VdpKVcp+E+TGJEtOoA==}
@@ -7005,10 +7005,10 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
-  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.4.145-docspace.8.tgz(ea3da58d18ee4452d74ee9ebaf36621e)':
+  '@onlyoffice/ai-chat@file:onlyoffice-ai-chat-0.4.146-docspace.40.tgz(5b1ff7be631a9a104de607d9649450ba)':
     dependencies:
       '@assistant-ui/react': 0.11.58(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
-      assistant-stream: 0.2.47
+      assistant-stream: 0.3.24
       lodash.clonedeep: 4.5.0
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
@@ -10068,22 +10068,23 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  mobx-react-lite@3.4.3(mobx@6.13.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  mobx-react-lite@4.1.1(mobx@6.16.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
-      mobx: 6.13.5
+      mobx: 6.16.1
+      react: 19.2.4
+      use-sync-external-store: 1.6.0(react@19.2.4)
+    optionalDependencies:
+      react-dom: 19.2.4(react@19.2.4)
+
+  mobx-react@9.2.2(mobx@6.16.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+    dependencies:
+      mobx: 6.16.1
+      mobx-react-lite: 4.1.1(mobx@6.16.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react: 19.2.4
     optionalDependencies:
       react-dom: 19.2.4(react@19.2.4)
 
-  mobx-react@7.6.0(mobx@6.13.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
-    dependencies:
-      mobx: 6.13.5
-      mobx-react-lite: 3.4.3(mobx@6.13.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react: 19.2.4
-    optionalDependencies:
-      react-dom: 19.2.4(react@19.2.4)
-
-  mobx@6.13.5: {}
+  mobx@6.16.1: {}
 
   motion-dom@12.38.0:
     dependencies:

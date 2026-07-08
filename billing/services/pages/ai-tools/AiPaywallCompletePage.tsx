@@ -66,9 +66,9 @@ import { AnalyticsEvents } from "../../../../enums";
 
 type Status = "processing" | "success" | "error";
 
-const BILLING_REDIRECT_URL = "/portal-settings/payments/services/ai-services";
-const WALLET_REDIRECT_URL = "/portal-settings/payments/wallet";
-const TARIFF_REDIRECT_URL = "/portal-settings/payments/portal-payments";
+const BILLING_REDIRECT_URL = "/billing/addons/ai-services";
+const WALLET_REDIRECT_URL = "/billing/wallet";
+const TARIFF_REDIRECT_URL = "/billing/tariff-plan";
 
 const TOPUP_RETRY_ATTEMPTS = 10;
 const TOPUP_RETRY_DELAY_MS = 3000;
@@ -231,9 +231,9 @@ const AiPaywallCompletePage = () => {
   }, []);
 
   const serviceRedirectUrl = service.includes(AI_SEARCH)
-    ? "/portal-settings/payments/services/ai-search"
+    ? "/billing/addons/ai-search"
     : service.includes(DISK_STORAGE)
-      ? "/portal-settings/payments/services/disk-storage"
+      ? "/billing/addons/disk-storage"
       : BILLING_REDIRECT_URL;
 
   const onGoToBillingClick = () => {

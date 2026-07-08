@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) Ascensio System SIA, 2009-2026
  *
  * This program is a free software product. You can redistribute it and/or
@@ -33,10 +33,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ChatNoAccessScreenProps } from "../chat/components/chat-no-access-screen";
-
-export interface ChatProps {
-  isAgent?: boolean;
-  aiReady?: boolean;
-  noAccessProps?: ChatNoAccessScreenProps;
-}
+export { default as AvailableCredits } from "./AvailableCredits";
+export { default as CurrentPlan } from "./CurrentPlan";
+export { default as MonthToDateSpend } from "./MonthToDateSpend";
+export { default as UpcomingPayments } from "./UpcomingPayments";
+export { default as ActiveAddons } from "./ActiveAddons";
+export { default as PaymentMethod } from "./PaymentMethod";
