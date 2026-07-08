@@ -26,6 +26,7 @@
 
 import React from "react";
 import { observer } from "mobx-react";
+import classNames from "classnames";
 
 import {
   ChatPage,
@@ -102,23 +103,31 @@ const NewChat: React.FC<ChatProps> = observer(
 
       case "history":
         if (!isSplitView) {
-          return <ChatList alwaysShowActions className={styles.chatListView} />;
+          return (
+            <ChatList
+              alwaysShowActions
+              className={classNames(
+                styles.chatListWrapper,
+                styles.chatListInset,
+              )}
+            />
+          );
         }
         return (
-          <section className={styles.container}>
-            <div className={styles.chatList}>
+          <section className={styles.splitView}>
+            <div className={styles.historyColumn}>
               <ChatList
                 hideHeader
                 alwaysShowActions
-                className={styles.chatListView}
+                className={styles.chatListWrapper}
               />
             </div>
-            <div className={styles.chat}>{chatPanel}</div>
+            <div className={styles.chatPanel}>{chatPanel}</div>
           </section>
         );
 
       default:
-        return <section className={styles.chat}>{chatPanel}</section>;
+        return <section className={styles.chatPanel}>{chatPanel}</section>;
     }
   },
 );
