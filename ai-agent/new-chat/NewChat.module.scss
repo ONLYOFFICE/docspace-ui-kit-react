@@ -157,6 +157,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 
   :global([class*="--chat-list-title-font-weight"]) {
     margin-block-start: 12px;
