@@ -89,7 +89,7 @@ export const imageOverrides: ImageOverrides = {
   "btn-rename": makeIcon(PenEditIcon),
   "btn-save": makeIcon(SaveIcon),
   "btn-save.small": makeIcon(SaveIcon),
-  "btn-zoomup": makeIcon(PlusIcon),
+  "btn-attach.small": makeIcon(PlusIcon),
   "btn-prompt": makeIcon(PromptIcon),
   send: makeIcon(ArrowUpIcon),
   "btn-clear": makeIcon(ClearIcon),
