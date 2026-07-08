@@ -87,11 +87,16 @@
 
     // padding-block-end: 0px;
 
-    :global(.combo-button) {
-      padding-inline-end: 3px;
+    :global([data-testid="model-selector"]) {
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 20px;
+      letter-spacing: 0px;
+      vertical-align: middle;
 
       :global(.light) :is(&, :global(.combo-buttons_arrow-icon)) {
-        --combobox-label-selected-color: #{colors.$light-gray-dark};
+        --input-color: #{colors.$light-gray-dark};
+        --icon-normal: var(--input-color);
       }
     }
 
