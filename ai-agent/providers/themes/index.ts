@@ -200,6 +200,11 @@ const buildTokens = (
   "--input-hover-border-color": p.inputBorderHoverColor,
   "--input-placeholder-color": "var(--text-tertiary)",
 
+  // Combo box
+
+  "--combo-box-height": "32px",
+  "--combo-box-padding-end": "8px",
+  "--combo-box-padding-start": "8px",
 
   // Checkbox
   "--checkbox-active-color": "var(--background-accent-button)",
