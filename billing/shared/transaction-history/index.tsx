@@ -65,6 +65,10 @@ import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { getBrandName } from "../../../constants/brands";
 import { Encoder } from "../../../utils/encoder";
+import {
+  DOCS_CONNECT_SERVICE,
+  DOCS_CONNECT_DEVPACK_SERVICE,
+} from "../../constants";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -342,6 +346,11 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     const isCredit = filterSelectedTypeKey !== "debit";
     const isDebit = filterSelectedTypeKey !== "credit";
 
+    const serviceNames: string | string[] | undefined =
+      serviceName === DOCS_CONNECT_SERVICE
+        ? [DOCS_CONNECT_SERVICE, DOCS_CONNECT_DEVPACK_SERVICE]
+        : serviceName;
+
     try {
       await paymentApi.createCustomerOperationsReport({
         customerOperationsReportRequestDto: {
@@ -350,7 +359,9 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           credit: isCredit,
           debit: isDebit,
           participantName: filterContact?.id,
-          serviceName,
+          // TODO: remove the cast once the SDK types serviceName as
+          // string | string[] — the API accepts a repeated ServiceName param.
+          serviceName: serviceNames as string,
         },
       });
 

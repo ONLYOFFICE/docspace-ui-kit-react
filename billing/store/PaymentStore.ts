@@ -85,6 +85,8 @@ import {
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
   WEB_SEARCH,
+  DOCS_CONNECT_SERVICE,
+  DOCS_CONNECT_DEVPACK_SERVICE,
 } from "../constants";
 import type { TTranslation } from "../../utils/common";
 import {
@@ -807,12 +809,19 @@ class PaymentStore {
       this.filterSelectedTypeKey,
     );
 
+    const serviceNames: string | string[] | undefined =
+      serviceName === DOCS_CONNECT_SERVICE
+        ? [DOCS_CONNECT_SERVICE, DOCS_CONNECT_DEVPACK_SERVICE]
+        : serviceName;
+
     try {
       const res = await this.paymentApi.getCustomerOperations(
         {
           offset: 0,
           limit: 25,
-          serviceName,
+          // TODO: remove the cast once the SDK types serviceName as
+          // string | string[] — the API accepts a repeated ServiceName param.
+          serviceName: serviceNames as string,
           startDate: this.formatDate(from ?? this.filterStartDate, "start"),
           endDate: this.formatDate(to ?? this.filterEndDate, "end"),
           credit: isCredit,
