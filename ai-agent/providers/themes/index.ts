@@ -77,6 +77,11 @@ type BasePalette = {
   textContrastBackground: string;
   textNegative: string;
 
+  inputBackgroundColor: string;
+  inputBorderHoverColor: string;
+  inputBorderFocusColor: string;
+  inputErrorColor: string;
+
   buttonShadowFocus: string;
   buttonDefaultFocusShadow: string;
   modalDialogShadows: string;
@@ -190,15 +195,15 @@ const buildTokens = (
   "--button-default-disabled-color": "var(--text-normal)",
   "--button-default-disabled-background-color": "var(--background-normal)",
 
-  "--input-background-color": "var(--background-normal-element)",
+  "--input-background-color": p.inputBackgroundColor,
   "--input-placeholder-color": "var(--text-tertiary)",
   "--input-color": "var(--text-normal)",
   "--input-border-color": "var(--border-regular-control)",
-  "--input-hover-background-color": "var(--highlight-button-hover)",
-  "--input-hover-border-color": "var(--checkbox-border-normal)",
-  "--input-active-border-color": "var(--background-accent-button)",
-  "--input-active-background-color": "var(--background-normal)",
-  "--input-error-color": "var(--border-error)",
+  "--input-hover-background-color": p.inputBackgroundColor,
+  "--input-hover-border-color": p.inputBorderHoverColor,
+  "--input-active-border-color": p.inputBorderFocusColor,
+  "--input-active-background-color": p.inputBackgroundColor,
+  "--input-error-color": p.inputErrorColor,
 
   "--link-color": "var(--text-tertiary)",
   "--link-primary-color": "var(--background-accent-button)",
@@ -381,6 +386,7 @@ const buildTokens = (
   "--action-gap": "16px",
   "--attachment-button-color": p.attachmentButtonColor,
   "--prompt-button-color": p.promptButtonColor,
+  "--input-height": "32px",
 });
 
 // DocSpace Base — light palette. Mapped from globalColors to mirror the
@@ -435,6 +441,11 @@ const portalBasePalette: BasePalette = {
   textInverse: globalColors.white,
   textContrastBackground: globalColors.white,
   textNegative: globalColors.mainRed,
+
+  inputBackgroundColor: globalColors.white,
+  inputBorderHoverColor: globalColors.gray,
+  inputBorderFocusColor: globalColors.lightSecondMain,
+  inputErrorColor: globalColors.lightErrorStatus,
 
   buttonShadowFocus: "0px 0px 0px 2px rgba(71, 129, 209, 0.75)",
   buttonDefaultFocusShadow: "0px 0px 0px 2px rgba(71, 129, 209, 0.5)",
@@ -516,6 +527,11 @@ const portalDarkPalette: BasePalette = {
   textInverse: globalColors.black,
   textContrastBackground: globalColors.white,
   textNegative: globalColors.darkErrorStatus,
+
+  inputBackgroundColor: globalColors.darkGrayLight,
+  inputBorderHoverColor: globalColors.grayDark,
+  inputBorderFocusColor: globalColors.white,
+  inputErrorColor: globalColors.darkErrorStatus,
 
   buttonShadowFocus: "0px 0px 0px 2px rgba(71, 129, 209, 0.75)",
   buttonDefaultFocusShadow: "0px 0px 0px 2px rgba(71, 129, 209, 0.5)",
