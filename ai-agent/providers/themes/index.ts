@@ -199,6 +199,8 @@ const buildTokens = (
   "--input-hover-background-color": p.inputBackgroundColor,
   "--input-hover-border-color": p.inputBorderHoverColor,
   "--input-placeholder-color": "var(--text-tertiary)",
+  "--input-padding-start": "8px",
+  "--input-padding-end": "8px",
 
   // Combo box
 
