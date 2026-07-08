@@ -42,6 +42,7 @@ const ButtonOverride: React.FC<AiChatButtonProps> = (props) => {
     style,
     tabIndex,
     type,
+    isLoading,
   } = props;
 
   const isStringChild =
@@ -61,6 +62,7 @@ const ButtonOverride: React.FC<AiChatButtonProps> = (props) => {
       scale={scale === "scale"}
       primary={variant !== "default"}
       onClick={onClick as unknown as (e: React.MouseEvent<HTMLElement>) => void}
+      isLoading={isLoading}
     >
       {isStringChild ? null : children}
     </Button>
@@ -70,4 +72,3 @@ const ButtonOverride: React.FC<AiChatButtonProps> = (props) => {
 ButtonOverride.displayName = "ButtonOverride";
 
 export { ButtonOverride };
-
