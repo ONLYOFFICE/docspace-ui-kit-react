@@ -451,12 +451,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             const hasScheduledChange =
               subscribed && !isTrial && scheduledUsers != null;
             const isCancellation = hasScheduledChange && scheduledUsers === 0;
-            const scheduledDevPackOff =
-              hasScheduledChange &&
-              (docsConnectState?.scheduledDevPackDisabled ?? false);
-            const scheduledUsersChanged =
-              hasScheduledChange &&
-              scheduledUsers !== (docsConnectState?.tariffUsers ?? 0);
             const deactivated = docsConnectState?.deactivated ?? false;
             const canceled = docsConnectState?.canceled ?? false;
 
@@ -481,17 +475,10 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 <Text fontWeight={600} fontSize="12px">
                   {isCancellation
                     ? t("PlanCancellation")
-                    : scheduledDevPackOff && scheduledUsersChanged
-                      ? t("DevPackUserAdjustment", {
-                          fromCount: docsConnectState?.tariffUsers ?? 0,
-                          toCount: scheduledUsers,
-                        })
-                      : scheduledDevPackOff
-                        ? t("DevPackDeactivation")
-                        : t("UserAdjustment", {
-                            fromCount: docsConnectState?.tariffUsers ?? 0,
-                            toCount: scheduledUsers,
-                          })}
+                    : t("UserAdjustment", {
+                        fromCount: docsConnectState?.tariffUsers ?? 0,
+                        toCount: scheduledUsers,
+                      })}
                 </Text>
                 <Text fontSize="12px">
                   {isCancellation
