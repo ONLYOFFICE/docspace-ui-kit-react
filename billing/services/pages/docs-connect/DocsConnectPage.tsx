@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
@@ -50,6 +50,7 @@ import { formatDateLocalized } from "../../../../utils/date";
 import { getBrandName } from "../../../../constants/brands";
 
 import TransactionHistory from "../../../shared/transaction-history";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import StorageWarning from "../../panels/additional-storage/StorageWarning";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
@@ -100,6 +101,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
   const paymentStore = usePaymentStore();
   const { initServiceData } = useServicesStore();
   const contextMenuRef = useRef<ContextMenuRefType>(null);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
 
   useEffect(() => {
     initServiceData(t, DOCS_CONNECT_SERVICE);
@@ -254,7 +256,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
         <Button
           size={ButtonSize.small}
           label={t("Common:TopUp")}
-          onClick={onTopUp}
+          onClick={() => setIsTopUpDialogVisible(true)}
         />
       </div>
 
@@ -475,6 +477,16 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
           hideContactFilter
         />
       </div>
+
+      {isTopUpDialogVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpDialogVisible}
+          onClose={() => setIsTopUpDialogVisible(false)}
+          isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
+          recommendedAmount={paymentStore.recommendedAmount}
+          serviceName={DOCS_CONNECT_SERVICE}
+        />
+      ) : null}
     </div>
   );
 };
