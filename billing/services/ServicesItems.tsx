@@ -50,10 +50,7 @@ import {
 } from "../constants";
 import { calculateTotalPrice, getConvertedSize } from "../utils/common";
 import { formatDateLocalized } from "../../utils/date";
-import type {
-  TDocsConnectCardState,
-  TServiceFeatureWithPrice,
-} from "../types";
+import type { TDocsConnectCardState, TServiceFeatureWithPrice } from "../types";
 
 import PriceIcon from "../../assets/icons/16/price.react.svg";
 
@@ -474,7 +471,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               <>
                 <Text fontWeight={600} fontSize="12px">
                   {isCancellation
-                    ? t("PlanCancellation")
+                    ? t("SubscriptionCancellation")
                     : t("UserAdjustment", {
                         fromCount: docsConnectState?.tariffUsers ?? 0,
                         toCount: scheduledUsers,
@@ -482,8 +479,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 </Text>
                 <Text fontSize="12px">
                   {isCancellation
-                    ? t("TariffPlanAutoCanceledOn", {
-                        date: scheduledDateLocalized,
+                    ? t("SubscriptionAutoCancellation", {
+                        finalDate: scheduledDateLocalized,
                       })
                     : t("TariffPlanAutoRenewedWithUpdate", {
                         date: scheduledDateLocalized,
@@ -513,7 +510,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                     }}
                     dataTestId="docs_connect_buy_plan_link"
                   >
-                    {t("BuyPlan")}
+                    {t("Upgrade")}
                   </Link>
                 </>
               );
@@ -522,7 +519,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 count: trialDaysLeft,
               });
             } else if (deactivated) {
-              docsConnectPrice = t("TariffPlanDeactivatedNonPayment");
+              docsConnectPrice = t("SubscriptionDeactivatedNonPayment");
             } else if (canceled) {
               docsConnectPrice = t("FromPricePerUserMonth", {
                 price: formatWalletCurrency(item.price.value, 0),
@@ -570,4 +567,3 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 };
 
 export default observer(ServicesItems);
-

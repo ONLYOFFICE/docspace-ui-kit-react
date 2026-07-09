@@ -74,6 +74,30 @@ export type TDocsConnectCardState = {
   canceled: boolean;
 };
 
+export type TDocsConnectScheduledChange = {
+  nextUsers: number;
+  dueDate: string;
+};
+
+export type TDocsConnectPageState = {
+  isPaid: boolean;
+  expired: boolean;
+  daysLeft: number;
+  totalDays: number;
+  spentPercent: number;
+  endDate: string;
+  currency: string;
+  credits: number;
+  planUsers: number;
+  pricePerUser: number;
+  basePricePerUser: number;
+  devPackEnabled: boolean;
+  monthlyCharge: number;
+  scheduledChange: TDocsConnectScheduledChange | null;
+  deactivated: boolean;
+  canceled: boolean;
+};
+
 type TAiToolsChatPrice = {
   prompt: number;
   completion: number;
