@@ -33,26 +33,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export { default as MainTariff } from "./main-tariff";
-export { default as Wallet } from "./wallet";
-export { default as Usage } from "./usage";
-export { default as PaymentMethod } from "./payment-method";
-export { default as ServicesList } from "./services";
-export { default as BillingOverview } from "./overview";
-export { default as BillingRoot } from "./BillingRoot";
-
-export {
-  PaymentStoreProvider,
-  usePaymentStore,
-} from "./store/PaymentStoreProvider";
-export {
-  ServicesStoreProvider,
-  useServicesStore,
-} from "./store/ServicesStoreProvider";
-
-export type {
-  TPaymentNavigationEvent,
-  TAiToolsPrices,
-  TServiceFeatureWithPrice,
-} from "./types";
-
+export { default as AvailableCredits } from "./AvailableCredits";
+export { default as CurrentPlan } from "./CurrentPlan";
+export { default as MonthToDateSpend } from "./MonthToDateSpend";
+export { default as UpcomingPayments } from "./UpcomingPayments";
+export { default as ActiveAddons } from "./ActiveAddons";
+export { default as PaymentMethod } from "./PaymentMethod";

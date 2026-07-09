@@ -115,43 +115,9 @@
     display: flex;
   }
 
-  .autoPaymentBanner {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    max-width: 660px;
-    background: var(--payment-background-color);
-    border-radius: 6px;
-    box-sizing: border-box;
-  }
-
-  .autoPaymentBannerIcon {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-
-    path {
-      fill: var(--payment-credit-color);
-    }
-  }
-
-  .warningBannerIcon {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-  }
 
  
 
-  .autoPaymentBannerText {
-    flex: 1;
-  }
-
-  .autoPaymentBannerEdit {
-    flex-shrink: 0;
-  }
 
   .headerContainer {
     display: flex;
@@ -174,6 +140,42 @@
   }
 }
 
+
+.autoPaymentBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  max-width: 660px;
+  background: var(--payment-background-color);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.autoPaymentBannerIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  path {
+    fill: var(--payment-credit-color);
+  }
+}
+
+.warningBannerIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.autoPaymentBannerText {
+  flex: 1;
+}
+
+.autoPaymentBannerEdit {
+  flex-shrink: 0;
+}
 
 .modalContent {
   display: flex;

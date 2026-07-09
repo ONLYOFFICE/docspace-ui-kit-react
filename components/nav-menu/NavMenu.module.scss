@@ -224,8 +224,13 @@
 
   &.active .itemIcon svg {
     path,
-    circle {
+    circle,
+    rect[fill] {
       fill: var(--nav-menu-item-icon-active-color) !important;
+    }
+
+    [stroke]:not([stroke="none"]) {
+      stroke: var(--nav-menu-item-icon-active-color) !important;
     }
   }
 
@@ -407,8 +412,13 @@
 
   &.active .subItemIcon svg {
     path,
-    circle {
+    circle,
+    rect[fill] {
       fill: var(--nav-menu-item-icon-active-color) !important;
+    }
+
+    [stroke]:not([stroke="none"]) {
+      stroke: var(--nav-menu-item-icon-active-color) !important;
     }
   }
 

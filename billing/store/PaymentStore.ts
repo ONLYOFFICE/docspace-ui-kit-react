@@ -210,6 +210,8 @@ class PaymentStore {
 
   isInitWalletPage = false;
 
+  isInitOverviewPage = false;
+
   isPaymentMethodInit = false;
 
   serviceUsage: TServiceUsage[] = [];
@@ -565,6 +567,10 @@ class PaymentStore {
     this.isInitWalletPage = value;
   };
 
+  setIsInitOverviewPage = (value: boolean) => {
+    this.isInitOverviewPage = value;
+  };
+
   setPaymentMethodInit = (value: boolean) => {
     this.isPaymentMethodInit = value;
   };
@@ -874,7 +880,7 @@ class PaymentStore {
       successUrl ||
       combineUrl(
         window.location.origin,
-        "/portal-settings/payments/wallet?complete=true&type=wallet",
+        "/billing/wallet?complete=true&type=wallet",
       );
     try {
       const res = await this.paymentApi.getCheckoutSetupUrl(
@@ -1028,11 +1034,11 @@ class PaymentStore {
   getBasicPaymentLink = async (managersCount: number) => {
     const backUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?cancel=true&type=tariff",
+      "/billing/tariff-plan?cancel=true&type=tariff",
     );
     const successUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?complete=true&type=tariff",
+      "/billing/tariff-plan?complete=true&type=tariff",
     );
 
     const abortController = new AbortController();
@@ -1061,11 +1067,11 @@ class PaymentStore {
   getPaymentLink = async (token?: AbortSignal) => {
     const backUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?cancel=true&type=tariff",
+      "/billing/tariff-plan?cancel=true&type=tariff",
     );
     const successUrl = combineUrl(
       window.location.origin,
-      "/portal-settings/payments/portal-payments?complete=true&type=tariff",
+      "/billing/tariff-plan?complete=true&type=tariff",
     );
 
     try {
@@ -1323,6 +1329,22 @@ class PaymentStore {
       if (error instanceof Error && error.name === "CanceledError") return;
       toastr.error(t("Common:UnexpectedError"));
       console.error(error);
+    }
+  };
+
+  overviewInit = async (t: TTranslation, integrationUrl?: string) => {
+    try {
+      await Promise.all([
+        this.walletInit(t, integrationUrl),
+        this.handleServicesQuotas(),
+        this.paymentQuotas.fetchPaymentQuotas(),
+        this.quotas.fetchPortalQuota(),
+      ]);
+    } catch (error) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    } finally {
+      this.setIsInitOverviewPage(true);
     }
   };
 
