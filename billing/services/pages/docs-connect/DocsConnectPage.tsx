@@ -79,6 +79,7 @@ const formatDocsConnectDate = (iso?: string): string => {
 type DocsConnectPageProps = {
   state: TDocsConnectPageState;
   onTopUp: () => void;
+  onTopUpComplete: () => Promise<void> | void;
   onViewUsage: () => void;
   onBuyPlan: () => void;
   onEditPlan: () => void;
@@ -90,6 +91,7 @@ type DocsConnectPageProps = {
 const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
   state,
   onTopUp,
+  onTopUpComplete,
   onViewUsage,
   onBuyPlan,
   onEditPlan,
@@ -482,6 +484,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
+          onConfirm={onTopUpComplete}
           isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
           recommendedAmount={paymentStore.recommendedAmount}
           serviceName={DOCS_CONNECT_SERVICE}
