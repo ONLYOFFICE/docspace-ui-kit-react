@@ -42,7 +42,10 @@ import { Text } from "../../../components/text";
 import { toastr } from "../../../components/toast";
 
 import { useCommonTranslation } from "../../../utils/i18n";
-import { toAbsoluteUrl } from "../../utils/url";
+import {
+  openStripeCheckout,
+  waitForTopUpCompletion,
+} from "../../utils/stripe-flow";
 import { AnalyticsEvents } from "../../../enums";
 
 import Amount from "./sub-components/Amount";
@@ -70,98 +73,6 @@ export type TSimpleTopUpDeps = {
 };
 
 const MIN_AMOUNT = "10";
-const PAYMENT_CALLBACK_PATH = "/billing/payment-complete";
-const POLL_INITIAL_INTERVAL_MS = 2000;
-const POLL_MAX_INTERVAL_MS = 5000;
-const POLL_TIMEOUT_MS = 5 * 60 * 1000;
-
-const sleep = (ms: number, signal: AbortSignal) =>
-  new Promise<void>((resolve) => {
-    if (signal.aborted) {
-      resolve();
-      return;
-    }
-    const timer = setTimeout(resolve, ms);
-    signal.addEventListener(
-      "abort",
-      () => {
-        clearTimeout(timer);
-        resolve();
-      },
-      { once: true },
-    );
-  });
-
-const pollUntil = async (
-  check: () => Promise<boolean>,
-  signal: AbortSignal,
-) => {
-  const startedAt = Date.now();
-  let interval = POLL_INITIAL_INTERVAL_MS;
-  while (!signal.aborted) {
-    if (await check()) return;
-    if (signal.aborted) return;
-    if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
-      throw new Error("Polling timeout");
-    }
-    await sleep(interval, signal);
-    interval = Math.min(interval * 2, POLL_MAX_INTERVAL_MS);
-  }
-};
-
-type TStripeCheckoutProps = Pick<
-  TSimpleTopUpDeps,
-  "walletCodeCurrency" | "language" | "fetchCardLinked"
->;
-
-const openStripeCheckout = async (
-  { walletCodeCurrency, language, fetchCardLinked }: TStripeCheckoutProps,
-  amount: string,
-  service?: string,
-  successParams?: Record<string, string>,
-) => {
-  const currency = walletCodeCurrency || "USD";
-  const lang = language || "en";
-  const backUrl = `${window.location.origin}${window.location.pathname}`;
-
-  const serviceParam = service ? `&service=${service}` : "";
-  const extraParams = successParams
-    ? Object.entries(successParams)
-        .map(([key, value]) => `&${key}=${encodeURIComponent(value)}`)
-        .join("")
-    : "";
-  const successUrl = `${window.location.origin}${PAYMENT_CALLBACK_PATH}?currency=${currency}&amount=${amount}&type=wallet&language=${lang}${serviceParam}${extraParams}`;
-
-  const linkUrl = await fetchCardLinked(backUrl, successUrl);
-
-  if (!linkUrl) throw new Error("Missing Stripe checkout URL");
-
-  window.open(toAbsoluteUrl(linkUrl), "_blank");
-};
-
-type TTopUpCompletionProps = Pick<
-  TSimpleTopUpDeps,
-  "walletBalance" | "fetchCustomerInfo" | "fetchBalance"
->;
-
-const waitForTopUpCompletion = async (
-  {
-    walletBalance: initialBalance,
-    fetchCustomerInfo,
-    fetchBalance,
-  }: TTopUpCompletionProps,
-  signal: AbortSignal,
-) => {
-  await pollUntil(async () => {
-    const email = await fetchCustomerInfo(true);
-    return !!email;
-  }, signal);
-
-  await pollUntil(async () => {
-    const newBalance = await fetchBalance(true);
-    return newBalance > initialBalance;
-  }, signal);
-};
 
 type SimpleTopUpDialogBaseProps = {
   visible: boolean;
