@@ -525,9 +525,11 @@ const AiPaywallCompletePage = () => {
 
             <div className={styles.cardBody}>
               <Text fontSize="16px" fontWeight={600} className={styles.title}>
-                {isWalletOnly
-                  ? t("WalletTopUpErrorTitle")
-                  : t("AIPaywallCallbackError")}
+                {isDocsConnect
+                  ? t("DocsConnectCallbackErrorTitle")
+                  : isWalletOnly
+                    ? t("WalletTopUpErrorTitle")
+                    : t("AIPaywallCallbackError")}
               </Text>
 
               <Text fontSize="13px" lineHeight="18px">
