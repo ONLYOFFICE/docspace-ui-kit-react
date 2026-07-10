@@ -46,7 +46,7 @@ import styles from "../../styles/StorageSummary.module.scss";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { Link } from "../../../../components";
 
-import { PaymentStoreContext } from "../../../store/PaymentStoreProvider";
+import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
 type StorageWarningProps = {
   isDisabled?: boolean;
@@ -65,9 +65,9 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
   style,
   isDisabled,
 }) => {
-  const paymentStore = React.useContext(PaymentStoreContext);
+  const paymentStore = usePaymentStore();
   const currentStoragePlanSize =
-    paymentStore?.tariff?.currentStoragePlanSize ?? 0;
+    paymentStore.tariff?.currentStoragePlanSize ?? 0;
 
   const t = useCommonTranslation();
 

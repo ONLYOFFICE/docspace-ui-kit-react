@@ -66,16 +66,6 @@ import CircleCrossIcon from "../../../../assets/icons/16/circle.cross.svg";
 
 import styles from "./DocsConnectPage.module.scss";
 
-const formatDocsConnectDate = (iso?: string): string => {
-  if (!iso) return "";
-  const ms = new Date(iso).getTime();
-  if (Number.isNaN(ms)) return "";
-  const date = new Date(ms);
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  return `${dd}.${mm}.${date.getFullYear()}`;
-};
-
 type DocsConnectPageProps = {
   state: TDocsConnectPageState;
   onTopUp: () => void;
@@ -464,7 +454,9 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
               />
               <Text className={styles.trialEnds}>
                 {t("DocsConnect:TrialEndsOn", {
-                  date: formatDocsConnectDate(endDate),
+                  date: formatDateLocalized(endDate, "DATE_MED", {
+                    locale: language,
+                  }),
                 })}
               </Text>
             </div>
