@@ -116,9 +116,60 @@
   margin-top: 4px;
 }
 
-.sectionTitleError {
-  font-size: 14px;
+.deactivatedBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  box-sizing: border-box;
+  max-width: 660px;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: var(--dev-tools-card-bg);
+}
+
+.deactivatedBannerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+
+  svg path {
+    fill: var(--payment-error-color);
+  }
+}
+
+.deactivatedBannerText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.deactivatedTitle {
+  font-size: 13px;
+  font-weight: 600;
   color: var(--payment-error-color);
+}
+
+.deactivatedDescription {
+  font-size: 12px;
+  color: var(--payment-text-color);
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--payment-error-color);
+  background: color-mix(
+    in srgb,
+    var(--payment-error-color) 12%,
+    transparent
+  );
 }
 
 .tariffHeader {
@@ -139,6 +190,14 @@
 
   @include mixins.mobile {
     grid-template-columns: 1fr;
+  }
+}
+
+.summaryGridMuted {
+  .cardValue,
+  .quantityValue,
+  .cardCaption {
+    color: var(--payment-inactive-color);
   }
 }
 

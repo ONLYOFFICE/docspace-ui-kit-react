@@ -63,6 +63,7 @@ import SettingsIcon from "../../../../assets/icons/16/catalog-settings-common.sv
 import PencilIcon from "../../../../assets/pencil.react.svg";
 import StatisticsIcon from "../../../../assets/icons/16/statistics.react.svg";
 import CircleCrossIcon from "../../../../assets/icons/16/circle.cross.svg";
+import AlertIcon from "../../../../assets/plugin.incompatible.react.svg";
 
 import styles from "./DocsConnectPage.module.scss";
 
@@ -75,6 +76,7 @@ type DocsConnectPageProps = {
   onEditPlan: () => void;
   onGoToTenant: () => void;
   onCancelPlan: () => void;
+  onRemovePlan: () => void;
   onCancelChange: () => void;
 };
 
@@ -87,6 +89,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
   onEditPlan,
   onGoToTenant,
   onCancelPlan,
+  onRemovePlan,
   onCancelChange,
 }) => {
   const t = useCommonTranslation();
@@ -238,6 +241,22 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
         />
       ) : null}
 
+      {isPaid && deactivated ? (
+        <div className={styles.deactivatedBanner}>
+          <span className={styles.deactivatedBannerIcon} aria-hidden="true">
+            <AlertIcon />
+          </span>
+          <div className={styles.deactivatedBannerText}>
+            <Text className={styles.deactivatedTitle}>
+              {t("Common:SubscriptionDeactivated")}
+            </Text>
+            <Text className={styles.deactivatedDescription}>
+              {t("Common:SubscriptionDeactivatedDescription")}
+            </Text>
+          </div>
+        </div>
+      ) : null}
+
       <div className={styles.walletCard}>
         <div className={styles.walletLeft}>
           <span className={styles.walletIcon} aria-hidden="true">
@@ -285,25 +304,28 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
       ) : (
         <>
           {isPaid ? (
-            <div className={styles.tariffHeader}>
-              {deactivated ? (
-                <Text
-                  className={`${styles.sectionTitle} ${styles.sectionTitleError}`}
-                >
-                  {t("Common:SubscriptionDeactivated")}
+            deactivated ? (
+              <div className={styles.tariffHeader}>
+                <Text className={styles.sectionTitle}>
+                  {t("Common:PreviousSubscription")}
                 </Text>
-              ) : (
+                <span className={styles.statusBadge}>
+                  {t("Common:Inactive")}
+                </span>
+              </div>
+            ) : (
+              <div className={styles.tariffHeader}>
                 <Text className={styles.sectionTitle}>
                   {t("Common:CurrentSubscription")}
                 </Text>
-              )}
-              <IconButton
-                iconNode={<SettingsIcon />}
-                size={16}
-                onClick={(e) => contextMenuRef.current?.show(e)}
-              />
-              <ContextMenu ref={contextMenuRef} model={contextMenuItems} />
-            </div>
+                <IconButton
+                  iconNode={<SettingsIcon />}
+                  size={16}
+                  onClick={(e) => contextMenuRef.current?.show(e)}
+                />
+                <ContextMenu ref={contextMenuRef} model={contextMenuItems} />
+              </div>
+            )
           ) : expired ? (
             <div className={styles.expiredBanner}>
               <div className={styles.expiredBannerText}>
@@ -327,7 +349,11 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
             </Text>
           )}
 
-          <div className={styles.summaryGrid}>
+          <div
+            className={`${styles.summaryGrid} ${
+              deactivated ? styles.summaryGridMuted : ""
+            }`}
+          >
             {isPaid ? (
               <div className={styles.summaryCard}>
                 <Text className={styles.cardLabel}>
@@ -384,8 +410,13 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
                 <Button
                   primary
                   size={ButtonSize.small}
-                  label={t("Common:TopUpAndPay")}
+                  label={t("Common:TopUpAndRenew")}
                   onClick={onEditPlan}
+                />
+                <Button
+                  size={ButtonSize.small}
+                  label={t("Common:RemoveSubscription")}
+                  onClick={onRemovePlan}
                 />
               </div>
             ) : scheduledChange ? (
