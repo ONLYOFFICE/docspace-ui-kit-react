@@ -389,38 +389,54 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
                 />
               </div>
             ) : scheduledChange ? (
-              <Text className={styles.renewalText}>
-                {isCancellation ? (
-                  <CommonTrans
-                    i18nKey="DocsConnect:TariffPlanAutoCanceled"
-                    values={{
-                      date: formatDateLocalized(
-                        scheduledChange.dueDate,
-                        "DATE_MED",
-                        { locale: language },
-                      ),
-                    }}
-                    components={{ 1: <Text as="span" fontWeight={600} /> }}
+              isCancellation ? (
+                <div className={styles.actionsRow}>
+                  <Button
+                    size={ButtonSize.small}
+                    label={t("Settings:Statistics")}
+                    onClick={onGoToTenant}
                   />
-                ) : (
-                  <CommonTrans
-                    i18nKey="Common:SubscriptionAutoRenewedWithUpdate"
-                    values={{
-                      finalDate: formatDateLocalized(
-                        scheduledChange.dueDate,
-                        "DATE_MED",
-                        { locale: language },
-                      ),
-                      price: formatCurrency(
-                        scheduledChange.nextUsers * pricePerUser,
-                        2,
-                      ),
-                      amount: `${t("DocsConnect:PlanUsers")}: ${scheduledChange.nextUsers}`,
-                    }}
-                    components={{ 1: <Text as="span" fontWeight={600} /> }}
+                  <Text className={styles.renewalText}>
+                    <CommonTrans
+                      i18nKey="DocsConnect:TariffPlanAutoCanceled"
+                      values={{
+                        date: formatDateLocalized(
+                          scheduledChange.dueDate,
+                          "DATE_MED",
+                          { locale: language },
+                        ),
+                      }}
+                      components={{ 1: <Text as="span" fontWeight={600} /> }}
+                    />
+                  </Text>
+                </div>
+              ) : (
+                <div className={styles.actionsRow}>
+                  <Button
+                    size={ButtonSize.small}
+                    label={t("Settings:Statistics")}
+                    onClick={onGoToTenant}
                   />
-                )}
-              </Text>
+                  <Text className={styles.renewalText}>
+                    <CommonTrans
+                      i18nKey="Common:SubscriptionAutoRenewedWithUpdate"
+                      values={{
+                        finalDate: formatDateLocalized(
+                          scheduledChange.dueDate,
+                          "DATE_MED",
+                          { locale: language },
+                        ),
+                        price: formatCurrency(
+                          scheduledChange.nextUsers * pricePerUser,
+                          2,
+                        ),
+                        amount: `${t("DocsConnect:PlanUsers")}: ${scheduledChange.nextUsers}`,
+                      }}
+                      components={{ 1: <Text as="span" fontWeight={600} /> }}
+                    />
+                  </Text>
+                </div>
+              )
             ) : (
               <div className={styles.actionsRow}>
                 <Button
