@@ -35,6 +35,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
+import classNames from "classnames";
 
 import { useCommonTranslation } from "../../../utils/i18n";
 import { Text } from "../../../components/text";
@@ -173,7 +174,7 @@ const MigrateToWalletDialog = observer(
       subscriptionDetails?.remainingBalanceInWalletCurrency ?? 0;
     const walletCurrency = subscriptionDetails?.walletCurrency;
 
-    const isSameCurrency = planCost.isoCurrencySymbol === walletCodeCurrency;
+    const isSameCurrency = subscriptionDetails?.currency === walletCodeCurrency;
 
     const walletApplied = Math.min(
       newSubscriptionAmount,
@@ -197,8 +198,9 @@ const MigrateToWalletDialog = observer(
       label: React.ReactNode,
       value: React.ReactNode,
       valueClassName?: string,
+      rowClassName?: string,
     ) => (
-      <div className={styles.row}>
+      <div className={classNames(styles.row, rowClassName)}>
         <Text as="span" fontSize="14px">
           {label}
         </Text>
@@ -288,17 +290,18 @@ const MigrateToWalletDialog = observer(
                         </Text>
                       </>,
                     )}
-                    {isSameCurrency
-                      ? null
-                      : renderRow(
+                    {isDetailsReady && !isSameCurrency
+                      ? renderRow(
                           t("MigrateUnusedValueRefund"),
-                          withLoader(
-                            formatPaymentCurrency(
-                              subscriptionDetails?.remainingBalance ?? 0,
-                              2,
-                            ),
+                          formatWalletCurrency(
+                            subscriptionDetails?.remainingBalance ?? 0,
+                            2,
+                            subscriptionDetails?.currency,
                           ),
-                        )}
+                          undefined,
+                          styles.revealRow,
+                        )
+                      : null}
                     <div className={styles.cardDivider} />
                     {renderRow(
                       t("MigrateRefundToWallet"),
