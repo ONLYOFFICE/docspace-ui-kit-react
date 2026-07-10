@@ -215,15 +215,23 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
           body={
             isCancellation
               ? t("Common:PlanCancellationBillingPeriodNote", {
-                  date: formatDateLocalized(scheduledChange.dueDate, "DATE_MED", {
-                    locale: language,
-                  }),
+                  date: formatDateLocalized(
+                    scheduledChange.dueDate,
+                    "DATE_MED",
+                    {
+                      locale: language,
+                    },
+                  ),
                   service: t("DocsConnect:DocsConnect"),
                 })
               : t("Common:ScheduledChangeBillingPeriodNote", {
-                  date: formatDateLocalized(scheduledChange.dueDate, "DATE_MED", {
-                    locale: language,
-                  }),
+                  date: formatDateLocalized(
+                    scheduledChange.dueDate,
+                    "DATE_MED",
+                    {
+                      locale: language,
+                    },
+                  ),
                 })
           }
           onCancelChange={onCancelChange}
@@ -423,7 +431,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
                 />
                 <Button
                   size={ButtonSize.small}
-                  label={t("DocsConnect:GoToTenant")}
+                  label={t("Settings:Statistics")}
                   onClick={onGoToTenant}
                 />
                 <Text className={styles.renewalText}>
@@ -449,7 +457,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
               />
               <Button
                 size={ButtonSize.small}
-                label={t("DocsConnect:GoToTenant")}
+                label={t("Settings:Statistics")}
                 onClick={onGoToTenant}
               />
               <Text className={styles.trialEnds}>
