@@ -210,6 +210,7 @@ export type TPaymentRoutes = {
   aiSearch: string;
   backup: string;
   diskStorage: string;
+  wallet?: string;
 };
 
 export type TPaymentConfig = {

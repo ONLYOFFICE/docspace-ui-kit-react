@@ -165,6 +165,7 @@ class PaymentStore {
     aiSearch: "",
     backup: "",
     diskStorage: "",
+    wallet: "",
   };
 
   licenseQuota: Record<string, unknown> | null = null;
