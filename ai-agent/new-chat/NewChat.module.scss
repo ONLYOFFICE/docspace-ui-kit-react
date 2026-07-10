@@ -25,7 +25,7 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 @use "../../styles/variables/colors";
 
-.chat {
+.chatPanel {
   :global(.aui-root) {
     --aui-font-base: 15px;
   }
@@ -87,11 +87,16 @@
 
     // padding-block-end: 0px;
 
-    :global(.combo-button) {
-      padding-inline-end: 3px;
+    :global([data-testid="model-selector"]) {
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 20px;
+      letter-spacing: 0px;
+      vertical-align: middle;
 
       :global(.light) :is(&, :global(.combo-buttons_arrow-icon)) {
-        --combobox-label-selected-color: #{colors.$light-gray-dark};
+        --input-color: #{colors.$light-gray-dark};
+        --icon-normal: var(--input-color);
       }
     }
 
@@ -138,16 +143,25 @@
   // }
 }
 
+.chatListInset {
+  padding-inline-start: 4px;
+}
+
 // ── ChatList: match the design mockup ──────────────────────────────────
 // Scoped to our own wrapper around `<ChatList />` so these overrides can't
 // leak into the chat thread, composer or any portaled dropdowns. The widget
 // builds the list from Tailwind arbitrary-value utilities (no stable class
 // names), so we target the tokens baked into those utility strings.
-.chatListView {
+.chatListWrapper {
   height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+
+  :global([class*="--chat-list-title-font-weight"]) {
+    margin-block-start: 12px;
+  }
 
   :global([class*="--chat-list-group-header-font-size"]) {
     height: 16px;
@@ -183,14 +197,14 @@
   }
 }
 
-.container {
+.splitView {
   display: grid;
   grid-template-columns: 380px 1fr;
   height: 100%;
   min-height: 0;
   box-sizing: border-box;
 
-  .chatList {
+  .historyColumn {
     height: 100%;
     min-height: 0;
     border-inline-end: 1px solid var(--info-panel-border-color);
