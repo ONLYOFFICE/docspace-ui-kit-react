@@ -274,128 +274,29 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
             />
           </div>
         </>
-      ) : isPaid ? (
-        <>
-          <div className={styles.tariffHeader}>
-            {deactivated ? (
-              <Text
-                className={`${styles.sectionTitle} ${styles.sectionTitleError}`}
-              >
-                {t("Common:SubscriptionDeactivated")}
-              </Text>
-            ) : (
-              <Text className={styles.sectionTitle}>
-                {t("Common:CurrentSubscription")}
-              </Text>
-            )}
-            <IconButton
-              iconNode={<SettingsIcon />}
-              size={16}
-              onClick={(e) => contextMenuRef.current?.show(e)}
-            />
-            <ContextMenu ref={contextMenuRef} model={contextMenuItems} />
-          </div>
-
-          <div className={styles.summaryGrid}>
-            <div className={styles.summaryCard}>
-              <Text className={styles.cardLabel}>
-                {t("Common:MonthlyCharge")}
-              </Text>
-              <Text className={styles.cardValue}>
-                {formatCurrency(monthlyCharge, 2)}
-              </Text>
-              <Text className={styles.cardCaption}>
-                {devPackEnabled
-                  ? t("DocsConnect:PricePerUserDevPackShort", {
-                      price: formatCurrency(pricePerUser, 0),
-                    })
-                  : t("DocsConnect:PricePerUserShort", {
-                      price: formatCurrency(pricePerUser, 0),
-                    })}
-              </Text>
-            </div>
-
-            <div className={styles.summaryCard}>
-              <Text className={styles.cardLabel}>{t("Common:Quantity")}</Text>
-              <Text className={styles.cardValue}>{planUsers}</Text>
-              <Text className={styles.cardCaption}>
-                {t("DocsConnect:PlanUsers")}
-              </Text>
-            </div>
-          </div>
-
-          {deactivated ? (
-            <div className={styles.actionsRow}>
-              <Button
-                primary
-                size={ButtonSize.small}
-                label={t("Common:TopUpAndPay")}
-                onClick={onEditPlan}
-              />
-            </div>
-          ) : scheduledChange ? (
-            <Text className={styles.renewalText}>
-              {isCancellation ? (
-                <CommonTrans
-                  i18nKey="DocsConnect:TariffPlanAutoCanceled"
-                  values={{
-                    date: formatDateLocalized(
-                      scheduledChange.dueDate,
-                      "DATE_MED",
-                      { locale: language },
-                    ),
-                  }}
-                  components={{ 1: <Text as="span" fontWeight={600} /> }}
-                />
-              ) : (
-                <CommonTrans
-                  i18nKey="Common:SubscriptionAutoRenewedWithUpdate"
-                  values={{
-                    finalDate: formatDateLocalized(
-                      scheduledChange.dueDate,
-                      "DATE_MED",
-                      { locale: language },
-                    ),
-                    price: formatCurrency(
-                      scheduledChange.nextUsers * pricePerUser,
-                      2,
-                    ),
-                    amount: `${t("DocsConnect:PlanUsers")}: ${scheduledChange.nextUsers}`,
-                  }}
-                  components={{ 1: <Text as="span" fontWeight={600} /> }}
-                />
-              )}
-            </Text>
-          ) : (
-            <div className={styles.actionsRow}>
-              <Button
-                primary
-                size={ButtonSize.small}
-                label={t("Common:EditSubscription")}
-                onClick={onEditPlan}
-              />
-              <Button
-                size={ButtonSize.small}
-                label={t("DocsConnect:GoToTenant")}
-                onClick={onGoToTenant}
-              />
-              <Text className={styles.renewalText}>
-                <CommonTrans
-                  i18nKey="DocsConnect:TariffPlanAutoRenewed"
-                  values={{
-                    date: formatDateLocalized(endDate, "DATE_MED", {
-                      locale: language,
-                    }),
-                  }}
-                  components={{ 1: <Text as="span" fontWeight={600} /> }}
-                />
-              </Text>
-            </div>
-          )}
-        </>
       ) : (
         <>
-          {expired ? (
+          {isPaid ? (
+            <div className={styles.tariffHeader}>
+              {deactivated ? (
+                <Text
+                  className={`${styles.sectionTitle} ${styles.sectionTitleError}`}
+                >
+                  {t("Common:SubscriptionDeactivated")}
+                </Text>
+              ) : (
+                <Text className={styles.sectionTitle}>
+                  {t("Common:CurrentSubscription")}
+                </Text>
+              )}
+              <IconButton
+                iconNode={<SettingsIcon />}
+                size={16}
+                onClick={(e) => contextMenuRef.current?.show(e)}
+              />
+              <ContextMenu ref={contextMenuRef} model={contextMenuItems} />
+            </div>
+          ) : expired ? (
             <div className={styles.expiredBanner}>
               <div className={styles.expiredBannerText}>
                 <Text className={styles.expiredTitle}>
@@ -418,28 +319,127 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
             </Text>
           )}
 
-          <div className={styles.trialCard}>
-            <Text className={styles.trialLabel}>
-              {t("DocsConnect:DaysLeft")}
-            </Text>
-            <Text className={styles.trialDays}>{daysLeft}</Text>
-            <Text className={styles.trialTotal}>
-              {t("DocsConnect:OfDays", { count: totalDays })}
-            </Text>
-            <div
-              className={`${styles.progress} ${
-                expired
-                  ? styles.progressExpired
-                  : trialLow
-                    ? styles.progressLow
-                    : ""
-              }`}
-            >
-              <ProgressBar percent={spentPercent} />
+          <div className={styles.summaryGrid}>
+            {isPaid ? (
+              <div className={styles.summaryCard}>
+                <Text className={styles.cardLabel}>
+                  {t("Common:MonthlyCharge")}
+                </Text>
+                <Text className={styles.cardValue}>
+                  {formatCurrency(monthlyCharge, 2)}
+                </Text>
+                <Text className={styles.cardCaption}>
+                  {devPackEnabled
+                    ? t("DocsConnect:PricePerUserDevPackShort", {
+                        price: formatCurrency(pricePerUser, 0),
+                      })
+                    : t("DocsConnect:PricePerUserShort", {
+                        price: formatCurrency(pricePerUser, 0),
+                      })}
+                </Text>
+              </div>
+            ) : (
+              <div className={styles.trialCard}>
+                <Text className={styles.trialLabel}>
+                  {t("DocsConnect:DaysLeft")}
+                </Text>
+                <Text className={styles.trialDays}>{daysLeft}</Text>
+                <Text className={styles.trialTotal}>
+                  {t("DocsConnect:OfDays", { count: totalDays })}
+                </Text>
+                <div
+                  className={`${styles.progress} ${
+                    expired
+                      ? styles.progressExpired
+                      : trialLow
+                        ? styles.progressLow
+                        : ""
+                  }`}
+                >
+                  <ProgressBar percent={spentPercent} />
+                </div>
+              </div>
+            )}
+
+            <div className={styles.summaryCard}>
+              <Text className={styles.cardLabel}>{t("Common:Quantity")}</Text>
+              <Text className={styles.quantityValue}>{planUsers}</Text>
+              <Text className={styles.cardCaption}>
+                {t("DocsConnect:PlanUsers")}
+              </Text>
             </div>
           </div>
 
-          {expired ? null : (
+          {isPaid ? (
+            deactivated ? (
+              <div className={styles.actionsRow}>
+                <Button
+                  primary
+                  size={ButtonSize.small}
+                  label={t("Common:TopUpAndPay")}
+                  onClick={onEditPlan}
+                />
+              </div>
+            ) : scheduledChange ? (
+              <Text className={styles.renewalText}>
+                {isCancellation ? (
+                  <CommonTrans
+                    i18nKey="DocsConnect:TariffPlanAutoCanceled"
+                    values={{
+                      date: formatDateLocalized(
+                        scheduledChange.dueDate,
+                        "DATE_MED",
+                        { locale: language },
+                      ),
+                    }}
+                    components={{ 1: <Text as="span" fontWeight={600} /> }}
+                  />
+                ) : (
+                  <CommonTrans
+                    i18nKey="Common:SubscriptionAutoRenewedWithUpdate"
+                    values={{
+                      finalDate: formatDateLocalized(
+                        scheduledChange.dueDate,
+                        "DATE_MED",
+                        { locale: language },
+                      ),
+                      price: formatCurrency(
+                        scheduledChange.nextUsers * pricePerUser,
+                        2,
+                      ),
+                      amount: `${t("DocsConnect:PlanUsers")}: ${scheduledChange.nextUsers}`,
+                    }}
+                    components={{ 1: <Text as="span" fontWeight={600} /> }}
+                  />
+                )}
+              </Text>
+            ) : (
+              <div className={styles.actionsRow}>
+                <Button
+                  primary
+                  size={ButtonSize.small}
+                  label={t("Common:EditSubscription")}
+                  onClick={onEditPlan}
+                />
+                <Button
+                  size={ButtonSize.small}
+                  label={t("DocsConnect:GoToTenant")}
+                  onClick={onGoToTenant}
+                />
+                <Text className={styles.renewalText}>
+                  <CommonTrans
+                    i18nKey="DocsConnect:TariffPlanAutoRenewed"
+                    values={{
+                      date: formatDateLocalized(endDate, "DATE_MED", {
+                        locale: language,
+                      }),
+                    }}
+                    components={{ 1: <Text as="span" fontWeight={600} /> }}
+                  />
+                </Text>
+              </div>
+            )
+          ) : expired ? null : (
             <div className={styles.actionsRow}>
               <Button
                 primary
