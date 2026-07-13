@@ -157,6 +157,31 @@
   gap: 12px;
 }
 
+@keyframes revealRow {
+  from {
+    opacity: 0;
+    max-height: 0;
+    margin-top: -12px;
+  }
+
+  to {
+    opacity: 1;
+    max-height: 60px;
+    margin-top: 0;
+  }
+}
+
+.revealRow {
+  overflow: hidden;
+  animation: revealRow 0.4s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealRow {
+    animation: none;
+  }
+}
+
 .cardDivider {
   height: 1px;
   background: var(--payment-price-container-bg);

@@ -540,7 +540,10 @@ class ServicesStore {
       initWalletPayerAndBalance,
       setServiceQuota,
       fetchCardLinked,
+      resetTransactionHistory,
     } = this.paymentStore;
+
+    resetTransactionHistory();
 
     try {
       let resolvedServiceName = serviceName;

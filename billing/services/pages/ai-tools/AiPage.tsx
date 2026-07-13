@@ -122,9 +122,7 @@ const AiPage = (props: AiPageProps) => {
   const isDisabled = isServiceActionDisabled!;
 
   useEffect(() => {
-    if (!isInitServicesData) {
-      initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
-    }
+    initServiceData(t, AI_TOOLS, AI_ENUM, integrationUrl);
   }, []);
 
   useEffect(() => {
