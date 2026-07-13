@@ -425,6 +425,8 @@ const buildTokens = (
   "--chat-message-tool-call-pre-background-color": "var(--background-normal)",
   "--chat-message-tool-call-pre-border-color": "var(--border-divider)",
   "--chat-message-tool-call-pre-color": "var(--text-normal)",
+  "--chat-scroll-to-bottom-background-color": "var(--highlight-button-pressed)",
+  "--chat-scroll-to-bottom-border-color": "transparent",
 
   // Composer action buttons
   "--attachment-button-color": p.attachmentButtonColor,
