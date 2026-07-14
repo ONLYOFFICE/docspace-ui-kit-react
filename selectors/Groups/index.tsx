@@ -47,7 +47,9 @@ import {
   type TSelectorItem,
   type TSelectorWithAside,
 } from "../../components/selector";
+import { toastr, type TData } from "../../components/toast";
 import { useTheme } from "../../context/ThemeContext";
+import useContentLoading from "../utils/hooks/useContentLoading";
 
 import type { GroupsSelectorProps } from "./GroupsSelector.types";
 
@@ -81,15 +83,8 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [itemsList, setItemsList] = useState<TSelectorItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<TSelectorItem | null>(null);
-  const [isContentLoading, setIsContentLoadingRaw] = useState(false);
-  const [wasEmptyScreen, setWasEmptyScreen] = useState(false);
-
-  const setIsContentLoading = useCallback((value: boolean) => {
-    setIsContentLoadingRaw(value);
-    if (!value) {
-      setWasEmptyScreen(false);
-    }
-  }, []);
+  const { isContentLoading, startContentLoading, finishContentLoading } =
+    useContentLoading();
 
   const isFirstLoad = useRef(true);
   const afterSearch = useRef(false);
@@ -113,32 +108,25 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   const onSearch = useCallback(
     (value: string, callback?: () => void) => {
       afterSearch.current = true;
-      if (!isFirstLoad.current) {
-        setIsContentLoading(true);
-      }
+      startContentLoading();
       setSearchValue(() => {
         return value;
       });
       callback?.();
     },
-    [setIsContentLoading],
+    [startContentLoading],
   );
 
   const onClearSearch = useCallback(
     (callback?: () => void) => {
       afterSearch.current = true;
-      if (!isFirstLoad.current) {
-        if (itemsList.length === 0) {
-          setWasEmptyScreen(true);
-        }
-        setIsContentLoading(true);
-      }
+      startContentLoading();
       setSearchValue(() => {
         return "";
       });
       callback?.();
     },
-    [setIsContentLoading, itemsList.length],
+    [startContentLoading],
   );
 
   const onSubmitAction = useCallback(
@@ -153,39 +141,43 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       const pageCount = 100;
       setIsNextPageLoading(true);
 
-      const res = await groupApi.getGroups({
-        count: pageCount,
-        startIndex,
-        filterValue: searchValue,
-      });
-
-      const items = res.data.response ?? [];
-      const total = res.data.count ?? 0;
-
-      const convertedItems: TSelectorItem[] = items.map((group) => ({
-        id: group.id,
-        label: group.name ?? "",
-        name: group.name ?? "",
-        isGroup: true,
-      }));
-
-      if (isFirstLoad.current) {
-        totalRef.current = total;
-        setItemsList([...convertedItems]);
-        setHasNextPage(convertedItems.length < total);
-
-        isFirstLoad.current = false;
-      } else {
-        setItemsList((value) => {
-          const arr = [...value, ...convertedItems];
-          setHasNextPage(arr.length < total);
-          return arr;
+      try {
+        const res = await groupApi.getGroups({
+          count: pageCount,
+          startIndex,
+          filterValue: searchValue,
         });
-        isFirstLoad.current = false;
-      }
 
-      setIsNextPageLoading(false);
-      setIsContentLoading(false);
+        const items = res.data.response ?? [];
+        const total = res.data.count ?? 0;
+
+        const convertedItems: TSelectorItem[] = items.map((group) => ({
+          id: group.id,
+          label: group.name ?? "",
+          name: group.name ?? "",
+          isGroup: true,
+        }));
+
+        if (isFirstLoad.current) {
+          totalRef.current = total;
+          setItemsList([...convertedItems]);
+          setHasNextPage(convertedItems.length < total);
+
+          isFirstLoad.current = false;
+        } else {
+          setItemsList((value) => {
+            const arr = [...value, ...convertedItems];
+            setHasNextPage(arr.length < total);
+            return arr;
+          });
+          isFirstLoad.current = false;
+        }
+      } catch (error) {
+        toastr.error(error as TData);
+      } finally {
+        setIsNextPageLoading(false);
+        finishContentLoading();
+      }
     },
     [searchValue, groupApi],
   );
@@ -227,9 +219,8 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
       loadNextPage={onLoadNextPage}
-      isLoading={isFirstLoad.current || isContentLoading}
+      isLoading={isFirstLoad.current}
       isContentLoading={isContentLoading}
-      wasEmptyScreen={wasEmptyScreen}
       searchLoader={<SearchLoader />}
       onSelect={onSelect}
       rowLoader={

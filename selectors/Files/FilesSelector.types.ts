@@ -196,7 +196,6 @@ export type UseFilesHelpersProps = {
   withFavoritesTreeFolder?: boolean;
   activeSpecialScope?: SpecialFolderScope | null;
   formsSection?: boolean;
-  setIsContentLoading?: (value: boolean) => void;
 };
 
 export type TUseInputItemHelper = {
@@ -285,7 +284,7 @@ export type FilesSelectorProps = TInfoBar &
       isInsidePrivateRoom?: boolean,
     ) => void | Promise<void>;
     getIsDisabled: (
-      isFirstLoad: boolean,
+      isLoading: boolean,
       isSelectedParentFolder: boolean,
       selectedItemId: string | number | undefined,
       selectedItemType: "rooms" | "files" | "agents" | undefined,

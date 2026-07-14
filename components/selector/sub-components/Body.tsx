@@ -83,29 +83,18 @@ const DimmedEmptyScreen = ({
   displayItems: TSelectorItem[];
   inputItemVisible: boolean;
   hideBackButton?: boolean;
-}) => {
-  const [dimmed, setDimmed] = React.useState(false);
-
-  React.useEffect(() => {
-    const id = requestAnimationFrame(() => setDimmed(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
-  return (
-    <div
-      className={classNames(styles.dimmedEmptyScreen, dimmed && styles.dimmed)}
-    >
-      <EmptyScreenProvider {...emptyScreenCtx}>
-        <EmptyScreen
-          withSearch={wasSearchActive}
-          items={displayItems}
-          inputItemVisible={inputItemVisible}
-          hideBackButton={hideBackButton}
-        />
-      </EmptyScreenProvider>
-    </div>
-  );
-};
+}) => (
+  <div className={styles.dimmedEmptyScreen}>
+    <EmptyScreenProvider {...emptyScreenCtx}>
+      <EmptyScreen
+        withSearch={wasSearchActive}
+        items={displayItems}
+        inputItemVisible={inputItemVisible}
+        hideBackButton={hideBackButton}
+      />
+    </EmptyScreenProvider>
+  </div>
+);
 
 const CONTAINER_PADDING = 16;
 const HEADER_HEIGHT = 54;
@@ -133,7 +122,6 @@ const Body = ({
   renderCustomItem,
   isLoading,
   isContentLoading,
-  wasEmptyScreen,
 
   rowLoader,
 
@@ -187,6 +175,14 @@ const Body = ({
     null,
   );
 
+  // A content refresh dims the body and wins over the skeleton
+  const loadingMode: "skeleton" | "dimmed" | "none" = isContentLoading
+    ? "dimmed"
+    : isLoading
+      ? "skeleton"
+      : "none";
+  const isDimmed = loadingMode === "dimmed";
+
   // Store previous items for dimming display during content loading
   const previousItemsRef = React.useRef(items);
   const previousTotalRef = React.useRef(totalItems);
@@ -196,24 +192,22 @@ const Body = ({
 
   // Track whether search was active before content loading started
   const wasSearchActiveRef = React.useRef(false);
-  React.useEffect(() => {
-    if (!isContentLoading) {
-      wasSearchActiveRef.current = isSearch;
-      previousItemsRef.current = items;
-      previousTotalRef.current = totalItems;
-      savedEmptyScreenCtxRef.current = emptyScreenCtx;
-    }
-  }, [isContentLoading, isSearch, items, totalItems, emptyScreenCtx]);
 
-  // Use previous items when content is loading and current items are empty
-  // but only if EmptyScreen was NOT previously shown (wasEmptyScreen is explicit from parent)
+  // Track whether the last settled render displayed the EmptyScreen, so a
+  // refresh started from it dims that empty screen, not a stale list
+  const wasEmptyScreenRef = React.useRef(false);
+
+  const wasEmptyScreen = wasEmptyScreenRef.current;
+
+  // Use previous items when content is loading and current items are empty,
+  // but only if the EmptyScreen was not displayed before the refresh
   const displayItems =
-    isContentLoading && items.length === 0 && !wasEmptyScreen
+    isDimmed && items.length === 0 && !wasEmptyScreen
       ? previousItemsRef.current
       : items;
 
   const displayTotal =
-    isContentLoading && items.length === 0 && !wasEmptyScreen
+    isDimmed && items.length === 0 && !wasEmptyScreen
       ? previousTotalRef.current
       : totalItems;
 
@@ -222,7 +216,7 @@ const Body = ({
     displayItems[1].isInputItem &&
     displayItems[0].isCreateNewItem;
 
-  const displayHasNextPage = isContentLoading ? false : hasNextPage;
+  const displayHasNextPage = isDimmed ? false : hasNextPage;
 
   const itemsCount = displayHasNextPage
     ? displayItems.length + 1
@@ -231,6 +225,18 @@ const Body = ({
       : isEmptyInput
         ? 1
         : displayItems.length;
+
+  const showsEmptyScreen = itemsCount === 0 && loadingMode === "none";
+
+  React.useEffect(() => {
+    if (!isDimmed) {
+      wasSearchActiveRef.current = isSearch;
+      previousItemsRef.current = items;
+      previousTotalRef.current = totalItems;
+      savedEmptyScreenCtxRef.current = emptyScreenCtx;
+      wasEmptyScreenRef.current = showsEmptyScreen;
+    }
+  }, [isDimmed, isSearch, items, totalItems, emptyScreenCtx, showsEmptyScreen]);
 
   const isShareFormEmpty =
     itemsCount === 0 &&
@@ -339,7 +345,7 @@ const Body = ({
   let listHeight = bodyHeight - infoBarHeight - injectedElementHeight;
 
   const effectiveIsSearch =
-    isSearch || (isContentLoading && wasSearchActiveRef.current);
+    isSearch || (isDimmed && wasSearchActiveRef.current);
   const showSearch = withSearch && (effectiveIsSearch || itemsCount > 0);
   const showSelectAll = (isMultiSelect && withSelectAll && !isSearch) || false;
 
@@ -429,7 +435,7 @@ const Body = ({
 
       <Search isSearch={itemsCount > 0 || !!effectiveIsSearch} />
 
-      {withInfo && (!isLoading || isContentLoading) ? (
+      {withInfo && loadingMode !== "skeleton" ? (
         <Info
           withInfo={withInfo}
           infoText={infoText}
@@ -437,11 +443,11 @@ const Body = ({
         />
       ) : null}
 
-      {isLoading && !isContentLoading ? (
+      {loadingMode === "skeleton" ? (
         <Scrollbar style={{ height: listHeight > 0 ? listHeight : "100%" }}>
           {rowLoader}
         </Scrollbar>
-      ) : itemsCount === 0 && !isContentLoading ? (
+      ) : showsEmptyScreen ? (
         <div style={{ height: listHeight }}>
           <EmptyScreen
             withSearch={isSearch}
@@ -450,7 +456,7 @@ const Body = ({
             hideBackButton={hideBackButton}
           />
         </div>
-      ) : isContentLoading && wasEmptyScreen ? (
+      ) : isDimmed && wasEmptyScreen ? (
         <DimmedEmptyScreen
           emptyScreenCtx={savedEmptyScreenCtxRef.current}
           wasSearchActive={wasSearchActiveRef.current}
@@ -462,7 +468,7 @@ const Body = ({
         <div
           className={classNames(
             styles.bodyContentWrapper,
-            isContentLoading && styles.bodyContentDimmed,
+            isDimmed && styles.bodyContentDimmed,
           )}
         >
           {descriptionText ? (

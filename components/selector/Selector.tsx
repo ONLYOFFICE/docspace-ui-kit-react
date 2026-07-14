@@ -144,7 +144,6 @@ const Selector = ({
   totalItems,
   isLoading,
   isContentLoading,
-  wasEmptyScreen,
   disableFirstFetch,
 
   alwaysShowFooter,
@@ -732,7 +731,6 @@ const Selector = ({
           totalItems={totalItems || 0}
           isLoading={isLoading}
           isContentLoading={isContentLoading}
-          wasEmptyScreen={wasEmptyScreen}
           rowLoader={rowLoader}
           withFooterInput={withFooterInput}
           withFooterCheckbox={withFooterCheckbox}

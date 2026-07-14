@@ -67,7 +67,6 @@ const useAgentsHelper = ({
   setSelectedItemSecurity,
   setSelectedTreeNode,
   disableBySecurity,
-  setIsContentLoading,
 
   recentFolder,
   favoritesFolder,
@@ -78,19 +77,20 @@ const useAgentsHelper = ({
   const { apiClient } = useApi();
   const {
     setIsNextPageLoading,
-    setIsLoading,
-    setIsFirstLoad,
+    hideSectionLoader,
+    finishFullLoad,
+    finishContentLoading,
 
-    isFirstLoad,
+    isFullLoadActive,
   } = use(LoadersContext);
 
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
-  const firstLoadRef = React.useRef(isFirstLoad);
+  const firstLoadRef = React.useRef(isFullLoadActive);
 
   React.useEffect(() => {
-    firstLoadRef.current = isFirstLoad;
-  }, [isFirstLoad]);
+    firstLoadRef.current = isFullLoadActive;
+  }, [isFullLoadActive]);
 
   React.useEffect(() => {
     initRef.current = isInit;
@@ -145,7 +145,7 @@ const useAgentsHelper = ({
 
           setBreadCrumbs?.(breadCrumbs);
 
-          setIsLoading("breadcrumbs", false);
+          hideSectionLoader("breadcrumbs");
         }
 
         const itemList: TSelectorItem[] = convertRoomsToItems(folders, t)
@@ -208,11 +208,11 @@ const useAgentsHelper = ({
 
         setIsRoot?.(false);
         setIsInit(false);
-        setIsFirstLoad(false);
+        finishFullLoad();
       } finally {
         requestRunning.current = false;
         setIsNextPageLoading(false);
-        setIsContentLoading?.(false);
+        finishContentLoading();
       }
     },
     [
@@ -222,12 +222,11 @@ const useAgentsHelper = ({
       setSelectedItemSecurity,
       setIsRoot,
       setIsInit,
-      setIsFirstLoad,
       setIsNextPageLoading,
       subscribe,
       onSetBaseFolderPath,
       setBreadCrumbs,
-      setIsLoading,
+      hideSectionLoader,
       setItems,
       setTotal,
       excludeItems,
@@ -238,7 +237,8 @@ const useAgentsHelper = ({
       favoritesFolder,
       withRecentTreeFolder,
       withFavoritesTreeFolder,
-      setIsContentLoading,
+      finishFullLoad,
+      finishContentLoading,
     ],
   );
 

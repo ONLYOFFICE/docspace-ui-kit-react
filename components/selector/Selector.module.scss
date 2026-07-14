@@ -667,11 +667,19 @@
   transition-delay: 0.2s;
 }
 
+// Mount-time dim with the same delay/duration as .bodyContentDimmed,
+// so fast loads don't flash
 .dimmedEmptyScreen {
   pointer-events: none;
-  transition: opacity 0.3s ease-in-out;
+  animation: dim-fade 0.3s ease-in-out 0.2s both;
+}
 
-  &.dimmed {
+@keyframes dim-fade {
+  from {
+    opacity: 1;
+  }
+
+  to {
     opacity: 0.5;
   }
 }

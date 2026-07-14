@@ -71,6 +71,7 @@ import { globalColors } from "../../providers/theme";
 
 import { toastr } from "../../components/toast";
 import { useTheme } from "../../context/ThemeContext";
+import useContentLoading from "../utils/hooks/useContentLoading";
 
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
@@ -268,15 +269,8 @@ const PeopleSelector = ({
   const [hasNextPage, setHasNextPage] = useState(true);
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [selectedItems, setSelectedItems] = useState<TSelectorItem[]>([]);
-  const [isContentLoading, setIsContentLoadingRaw] = useState(false);
-  const [wasEmptyScreen, setWasEmptyScreen] = useState(false);
-
-  const setIsContentLoading = useCallback((value: boolean) => {
-    setIsContentLoadingRaw(value);
-    if (!value) {
-      setWasEmptyScreen(false);
-    }
-  }, []);
+  const { isContentLoading, startContentLoading, finishContentLoading } =
+    useContentLoading();
   const isFirstLoadRef = useRef(true);
   const afterSearch = useRef(false);
   const totalRef = useRef(0);
@@ -500,12 +494,17 @@ const PeopleSelector = ({
 
         setIsNextPageLoading(false);
         isFirstLoadRef.current = false;
-        setIsContentLoading(false);
+        finishContentLoading();
       } catch (error) {
+        // On cancel a superseding request is already running and owns the
+        // loading flags, so they must not be reset here
         if (axios.isCancel(error)) return;
 
         console.error(error);
         toastr.error(error as Error);
+
+        setIsNextPageLoading(false);
+        finishContentLoading();
       }
     },
     [
@@ -536,9 +535,8 @@ const PeopleSelector = ({
     setHasNextPage(true);
     setTotal(-1);
     totalRef.current = 0;
-    if (isFirstLoadRef.current) return;
-    setIsContentLoading(true);
-  }, []);
+    startContentLoading();
+  }, [startContentLoading]);
 
   const onSearch = useCallback(
     (value: string, callback?: VoidFunction) => {
@@ -557,9 +555,6 @@ const PeopleSelector = ({
   const onClearSearch = useCallback(
     (callback?: VoidFunction) => {
       afterSearch.current = true;
-      if (itemsList.length === 0) {
-        setWasEmptyScreen(true);
-      }
       resetSelectorList();
       setSearchValue(() => {
         return "";
@@ -567,7 +562,7 @@ const PeopleSelector = ({
 
       callback?.();
     },
-    [resetSelectorList, itemsList.length],
+    [resetSelectorList],
   );
 
   const emptyScreenImage = isBase ? (
@@ -683,14 +678,10 @@ const PeopleSelector = ({
   const changeActiveTab = useCallback(
     (tab: number | string) => {
       if (setActiveTab) setActiveTab(`${tab}`);
-      if (itemsList.length === 0) {
-        setWasEmptyScreen(true);
-      }
       setActiveTabId(`${tab}`);
       onSearch("");
-      resetSelectorList();
     },
-    [onSearch, resetSelectorList, setActiveTab, itemsList.length],
+    [onSearch, setActiveTab],
   );
 
   const withTabsProps: TSelectorTabs =
@@ -809,9 +800,8 @@ const PeopleSelector = ({
       loadNextPage={loadNextPage}
       isMultiSelect={isMultiSelect ?? false}
       totalItems={total}
-      isLoading={isFirstLoadRef.current || isContentLoading}
+      isLoading={isFirstLoadRef.current}
       isContentLoading={isContentLoading}
-      wasEmptyScreen={wasEmptyScreen}
       rowLoader={
         <RowLoader
           isUser

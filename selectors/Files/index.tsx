@@ -141,22 +141,13 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
   const t = useCommonTranslation();
   const { filesApi } = useApi();
-  const { isFirstLoad, setIsFirstLoad, showBodyLoader } = use(LoadersContext);
-
-  const [isContentLoading, setIsContentLoadingRaw] = React.useState(false);
-  const [wasEmptyScreen, setWasEmptyScreen] = React.useState(false);
-
-  const setIsContentLoading = React.useCallback((value: boolean) => {
-    setIsContentLoadingRaw(value);
-    if (!value) {
-      setWasEmptyScreen(false);
-    }
-  }, []);
-
-  const resetContentLoading = React.useCallback(() => {
-    if (isFirstLoad) return;
-    setIsContentLoading(true);
-  }, [isFirstLoad, setIsContentLoading]);
+  const {
+    isFullLoadActive,
+    startFullLoad,
+    finishFullLoad,
+    startContentLoading,
+    showBodyLoader,
+  } = use(LoadersContext);
 
   const navigatingRef = React.useRef(false);
   const currentSelectedItemId = React.useRef<undefined | number | string>(
@@ -296,7 +287,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withFavoritesTreeFolder,
 
     withInit,
-    setIsContentLoading,
   });
 
   const { getRoomList } = useRoomsHelper({
@@ -331,7 +321,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     roomsFolderId,
 
     withInit,
-    setIsContentLoading,
   });
 
   const { getFileList } = useFilesHelper({
@@ -381,28 +370,18 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withFavoritesTreeFolder,
     activeSpecialScope,
     formsSection: withFormsTreeFolder ? isFormsSection : undefined,
-    setIsContentLoading,
   });
 
   const onClickBreadCrumb = React.useCallback(
     (item: TBreadCrumb) => {
-      if (!isFirstLoad) {
+      if (!isFullLoadActive) {
         afterSearch.current = false;
         setSearchValue("");
         // Don't dim when navigating to root
-        if (+item.id !== 0) {
-          const hasOnlyServiceItems =
-            items.length === 0 ||
-            (items.length === 1 && items[0]?.isCreateNewItem);
-          if (hasOnlyServiceItems) {
-            setWasEmptyScreen(true);
-          }
-          resetContentLoading();
-        }
-        setIsFirstLoad(true);
+        startFullLoad(+item.id === 0 ? { dim: false } : undefined);
         if (+item.id === 0) {
           if (pinnedRootId != null) {
-            setIsFirstLoad(false);
+            finishFullLoad();
             return;
           }
           setActiveSpecialScope(null);
@@ -465,19 +444,18 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     [
       disabledItems,
       getRootData,
-      isFirstLoad,
+      isFullLoadActive,
       isSelectedParentFolder,
       pinnedRootId,
-      items,
       setBreadCrumbs,
-      setIsFirstLoad,
+      startFullLoad,
+      finishFullLoad,
       setIsSelectedParentFolder,
       setSearchValue,
       setSelectedFileInfo,
       setSelectedItemId,
       setSelectedItemSecurity,
       setSelectedItemType,
-      resetContentLoading,
     ],
   );
 
@@ -494,7 +472,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
         const specialScope = item.specialFolderScope;
         if (specialScope) {
-          setIsFirstLoad(true);
+          startFullLoad({ dim: false });
           setActiveSpecialScope(specialScope);
           setBreadCrumbs((value) => [
             ...value,
@@ -526,8 +504,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
         navigatingRef.current = true;
 
-        resetContentLoading();
-        setIsFirstLoad(true);
+        startFullLoad();
         setActiveSpecialScope(null);
 
         setBreadCrumbs((value) => [
@@ -619,7 +596,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     [
       formProps?.isRoomFormAccessible,
       formProps?.message,
-      setIsFirstLoad,
+      startFullLoad,
       setBreadCrumbs,
       setSelectedItemId,
       setSearchValue,
@@ -631,15 +608,14 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       onSelectItem,
       filesApi,
       t,
-      resetContentLoading,
     ],
   );
 
   React.useEffect(() => {
-    if (!isFirstLoad) {
+    if (!isFullLoadActive) {
       navigatingRef.current = false;
     }
-  }, [isFirstLoad]);
+  }, [isFullLoadActive]);
 
   React.useEffect(() => {
     if (!selectedItemId) return;
@@ -660,7 +636,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       return;
     }
 
-    setIsFirstLoad(true);
+    startFullLoad({ dim: false });
 
     const needRoomList = isRoomsOnly && !currentFolderId;
 
@@ -692,7 +668,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     roomsFolderId,
     rootFolderType,
     openRoot,
-    setIsFirstLoad,
+    startFullLoad,
     setSelectedItemType,
     withInit,
   ]);
@@ -717,27 +693,15 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     if (searchValue) {
       // Only dim content, don't show skeleton
-      resetContentLoading();
+      startContentLoading();
     }
-  }, [searchValue, selectedItemType, resetContentLoading]);
+  }, [searchValue, selectedItemType, startContentLoading]);
 
   const onClearSearchAction = React.useCallback(
     (callback?: VoidFunction) => {
       if (!searchValue) return;
 
-      if (isFirstLoad) {
-        setIsFirstLoad(true);
-      } else {
-        // Set wasEmptyScreen if we're clearing search that returned empty results
-        // Check if items are empty or contain only service items (like "Create new folder")
-        const hasOnlyServiceItems =
-          items.length === 0 ||
-          (items.length === 1 && items[0]?.isCreateNewItem);
-        if (hasOnlyServiceItems) {
-          setWasEmptyScreen(true);
-        }
-        setIsContentLoading(true);
-      }
+      startContentLoading();
 
       setSearchValue("");
 
@@ -747,14 +711,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         clearSearchCallback.current = callback;
       }
     },
-    [
-      searchValue,
-      isFirstLoad,
-      setIsFirstLoad,
-      setSearchValue,
-      setIsContentLoading,
-      items,
-    ],
+    [searchValue, setSearchValue, startContentLoading],
   );
 
   React.useEffect(() => {
@@ -835,18 +792,18 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   ]);
 
   React.useEffect(() => {
-    if (clearSearchCallback.current && !isFirstLoad && !searchValue) {
+    if (clearSearchCallback.current && !isFullLoadActive && !searchValue) {
       clearSearchCallback.current();
       clearSearchCallback.current = null;
     }
-  }, [isFirstLoad, searchValue]);
+  }, [isFullLoadActive, searchValue]);
 
   const withSearch = withSearchProp
     ? isRoot
       ? false
       : searchValue
         ? true
-        : isFirstLoad
+        : isFullLoadActive
           ? true
           : afterSearch.current || !!items.length
     : false;
@@ -861,7 +818,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     onSubmit: onSubmitAction,
     disableSubmitButton: getIsDisabled(
-      isFirstLoad && showBodyLoader,
+      isFullLoadActive && showBodyLoader,
       isSelectedParentFolder,
       selectedItemId,
       selectedItemType,
@@ -892,8 +849,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     hasNextPage,
     totalItems: total,
-    isContentLoading,
-    wasEmptyScreen,
 
     isRoot,
 

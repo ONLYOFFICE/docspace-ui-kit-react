@@ -111,7 +111,7 @@ const useRootHelper = ({
   setIsInit,
 }: UseRootHelperProps) => {
   const t = useCommonTranslation();
-  const { setIsLoading, setIsNextPageLoading, setIsFirstLoad } =
+  const { hideSectionLoader, setIsNextPageLoading, finishFullLoad } =
     use(LoadersContext);
 
   const { foldersApi } = useApi();
@@ -126,7 +126,7 @@ const useRootHelper = ({
     setBreadCrumbs([getDefaultBreadCrumb(t)]);
     setIsRoot(true);
     setIsNextPageLoading(true);
-    setIsLoading("breadcrumbs", false);
+    hideSectionLoader("breadcrumbs");
     const newItems: TSelectorItem[] = [];
 
     let currentTree: FolderDtoInteger[] | null = null;
@@ -219,15 +219,15 @@ const useRootHelper = ({
     setHasNextPage(false);
     setIsNextPageLoading(false);
     setIsInit(false);
-    setIsFirstLoad(false);
+    finishFullLoad();
     requestRunning.current = false;
   }, [
     foldersApi,
     isUserOnly,
-    setIsFirstLoad,
+    finishFullLoad,
     setBreadCrumbs,
     setHasNextPage,
-    setIsLoading,
+    hideSectionLoader,
     setIsInit,
     setIsNextPageLoading,
     setItems,

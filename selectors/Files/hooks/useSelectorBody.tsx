@@ -146,17 +146,12 @@ const useSelectorBody = ({
 
   selectedItemType,
   selectedTreeNode,
-  isContentLoading: externalIsContentLoading,
-  wasEmptyScreen,
 }: Omit<FilesSelectorProps, "withSearch" | "onSubmit"> &
   PickedSearchProps &
   PickedSubmitButtonProps &
   PickedBreadCrumbsProps &
   PickedSelectorBodyProps &
-  SelectedTreeNodeProps & {
-    isContentLoading?: boolean;
-    wasEmptyScreen?: boolean;
-  }) => {
+  SelectedTreeNodeProps) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
 
@@ -165,6 +160,7 @@ const useSelectorBody = ({
     showSearchLoader,
     isNextPageLoading,
     showBodyLoader,
+    isContentLoading,
   } = use(LoadersContext);
   const { displayFileExtension } = use(SettingsContext);
 
@@ -288,8 +284,7 @@ const useSelectorBody = ({
       searchEmptyScreenHeader={t("NotFoundTitle")}
       searchEmptyScreenDescription={t("EmptyFilterDescriptionText")}
       isLoading={showBodyLoader}
-      isContentLoading={externalIsContentLoading}
-      wasEmptyScreen={wasEmptyScreen}
+      isContentLoading={isContentLoading}
       rowLoader={
         <RowLoader
           isMultiSelect={false}

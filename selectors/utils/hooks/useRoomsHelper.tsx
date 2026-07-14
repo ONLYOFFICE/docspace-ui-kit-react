@@ -87,7 +87,6 @@ const useRoomsHelper = ({
   subscribe,
   setSelectedItemSecurity,
   setSelectedTreeNode,
-  setIsContentLoading,
   isRoomDisabled,
 
   recentFolder,
@@ -99,10 +98,11 @@ const useRoomsHelper = ({
   const t = useCommonTranslation();
   const {
     setIsNextPageLoading,
-    setIsLoading,
-    setIsFirstLoad,
+    hideSectionLoader,
+    finishFullLoad,
+    finishContentLoading,
 
-    isFirstLoad,
+    isFullLoadActive,
   } = use(LoadersContext);
 
   const { roomsApi } = useApi();
@@ -111,11 +111,11 @@ const useRoomsHelper = ({
 
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
-  const firstLoadRef = React.useRef(isFirstLoad);
+  const firstLoadRef = React.useRef(isFullLoadActive);
 
   React.useEffect(() => {
-    firstLoadRef.current = isFirstLoad;
-  }, [isFirstLoad]);
+    firstLoadRef.current = isFullLoadActive;
+  }, [isFullLoadActive]);
 
   React.useEffect(() => {
     initRef.current = isInit;
@@ -213,7 +213,7 @@ const useRoomsHelper = ({
 
           setBreadCrumbs?.(breadCrumbs);
 
-          setIsLoading("breadcrumbs", false);
+          hideSectionLoader("breadcrumbs");
         }
 
         const itemList: TSelectorItem[] = convertRoomsToItems(
@@ -309,11 +309,11 @@ const useRoomsHelper = ({
 
         setIsRoot?.(false);
         setIsInit(false);
-        setIsFirstLoad(false);
+        finishFullLoad();
       } finally {
         requestRunning.current = false;
         setIsNextPageLoading(false);
-        setIsContentLoading?.(false);
+        finishContentLoading();
       }
     },
     [
@@ -324,7 +324,6 @@ const useRoomsHelper = ({
       setSelectedItemSecurity,
       setIsRoot,
       setIsInit,
-      setIsFirstLoad,
       setIsNextPageLoading,
       roomType,
       formsSection,
@@ -332,7 +331,7 @@ const useRoomsHelper = ({
       subscribe,
       onSetBaseFolderPath,
       setBreadCrumbs,
-      setIsLoading,
+      hideSectionLoader,
       withCreate,
       setItems,
       setTotal,
@@ -352,7 +351,8 @@ const useRoomsHelper = ({
       withFavoritesTreeFolder,
       roomsFolderId,
       isRoomDisabled,
-      setIsContentLoading,
+      finishFullLoad,
+      finishContentLoading,
     ],
   );
 

@@ -33,7 +33,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export const SHOW_LOADER_TIMER = 200;
 export const MIN_LOADER_TIMER = 500;
 
 export const PAGE_COUNT = 100;

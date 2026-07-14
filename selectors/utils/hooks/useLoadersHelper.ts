@@ -35,7 +35,8 @@
 
 import React from "react";
 
-import { MIN_LOADER_TIMER, SHOW_LOADER_TIMER } from "../constants";
+import { MIN_LOADER_TIMER } from "../constants";
+import useContentLoading from "./useContentLoading";
 
 export type SelectorSectionType = "breadcrumbs" | "body";
 
@@ -44,15 +45,32 @@ interface SectionLoaderState {
   startTime: Date | null;
 }
 
+/**
+ * Owns the loading state of a selector. Two loading modes exist:
+ *
+ * - Full load (`startFullLoad`/`finishFullLoad`): the section skeleton
+ *   loaders own the screen. They are shown by the initial mount state and
+ *   hidden together on `finishFullLoad`; on repeated full loads (folder
+ *   navigation) the previous content stays on screen dimmed instead.
+ * - Content refresh (`startContentLoading`): a soft reload (search, tab
+ *   change) that only dims the current content.
+ *
+ * `finishFullLoad` ends both modes.
+ */
 const useLoadersHelper = ({ withInit }: { withInit?: boolean }) => {
   const [isNextPageLoading, setIsNextPageLoading] =
     React.useState<boolean>(false);
-  const [isFirstLoad, setIsFirstLoadState] = React.useState(!withInit);
+  const [isFullLoadActive, setIsFullLoadActiveState] = React.useState(
+    !withInit,
+  );
 
   const [showBreadCrumbsLoader, setShowBreadCrumbsLoader] =
     React.useState<boolean>(!withInit);
   const [showBodyLoader, setShowBodyLoader] =
     React.useState<boolean>(!withInit);
+
+  const { isContentLoading, startContentLoading, finishContentLoading } =
+    useContentLoading({ initiallyLoaded: withInit });
 
   const isMount = React.useRef<boolean>(true);
 
@@ -69,11 +87,7 @@ const useLoadersHelper = ({ withInit }: { withInit?: boolean }) => {
     },
   });
 
-  const isFirstLoadRef = React.useRef(!withInit);
-
-  React.useEffect(() => {
-    isFirstLoadRef.current = isFirstLoad;
-  }, [isFirstLoad]);
+  const isFullLoadActiveRef = React.useRef(!withInit);
 
   React.useEffect(() => {
     isMount.current = true;
@@ -99,92 +113,88 @@ const useLoadersHelper = ({ withInit }: { withInit?: boolean }) => {
     [],
   );
 
-  const setIsLoading = React.useCallback(
-    (section: SelectorSectionType, isLoading: boolean) => {
-      // On first load, don't hide sections individually — wait for setIsFirstLoad
-      if (!isLoading && isFirstLoadRef.current) return;
-
+  // Hides a section loader, keeping it visible for at least MIN_LOADER_TIMER
+  // since it appeared so it doesn't flash
+  const hideSection = React.useCallback(
+    (section: SelectorSectionType) => {
       const state = loaderStates.current[section];
 
-      if (isLoading) {
-        if (state.timer) {
-          clearTimeout(state.timer);
-          state.timer = null;
-        }
-
-        if (isFirstLoadRef.current) {
-          state.startTime = new Date();
-          setVisibility(section, true);
-          return;
-        }
-
-        state.timer = setTimeout(() => {
-          state.startTime = new Date();
-          setVisibility(section, true);
-        }, SHOW_LOADER_TIMER);
-      } else {
-        if (state.timer && !state.startTime) {
-          clearTimeout(state.timer);
-          state.timer = null;
-          state.startTime = null;
-          setVisibility(section, false);
-          return;
-        }
-
-        if (state.startTime) {
-          const ms = Math.abs(state.startTime.getTime() - new Date().getTime());
-
-          if (state.timer) {
-            clearTimeout(state.timer);
-            state.timer = null;
-          }
-
-          if (ms >= MIN_LOADER_TIMER) {
-            state.startTime = null;
-            setVisibility(section, false);
-            return;
-          }
-
-          state.timer = setTimeout(() => {
-            if (isMount.current) {
-              state.startTime = null;
-              state.timer = null;
-              setVisibility(section, false);
-            }
-          }, MIN_LOADER_TIMER - ms);
-        } else if (state.timer) {
-          clearTimeout(state.timer);
-          state.timer = null;
-        }
+      if (state.timer) {
+        clearTimeout(state.timer);
+        state.timer = null;
       }
+
+      if (!state.startTime) {
+        setVisibility(section, false);
+        return;
+      }
+
+      const ms = Math.abs(state.startTime.getTime() - new Date().getTime());
+
+      if (ms >= MIN_LOADER_TIMER) {
+        state.startTime = null;
+        setVisibility(section, false);
+        return;
+      }
+
+      state.timer = setTimeout(() => {
+        if (isMount.current) {
+          state.startTime = null;
+          state.timer = null;
+          setVisibility(section, false);
+        }
+      }, MIN_LOADER_TIMER - ms);
     },
     [setVisibility],
   );
 
-  const setIsFirstLoad = React.useCallback(
-    (value: boolean) => {
-      setIsFirstLoadState(value);
-      if (!value) {
-        // Update ref synchronously so setIsLoading won't ignore these calls
-        isFirstLoadRef.current = false;
-        setIsLoading("breadcrumbs", false);
-        setIsLoading("body", false);
-      }
+  const hideSectionLoader = React.useCallback(
+    (section: SelectorSectionType) => {
+      // During a full load sections hide together — wait for finishFullLoad
+      if (isFullLoadActiveRef.current) return;
+
+      hideSection(section);
     },
-    [setIsLoading],
+    [hideSection],
   );
 
+  const startFullLoad = React.useCallback(
+    (options?: { dim?: boolean }) => {
+      // Repeated full loads keep the previous content on screen dimmed
+      if (options?.dim !== false) startContentLoading();
+
+      isFullLoadActiveRef.current = true;
+      setIsFullLoadActiveState(true);
+    },
+    [startContentLoading],
+  );
+
+  const finishFullLoad = React.useCallback(() => {
+    isFullLoadActiveRef.current = false;
+    setIsFullLoadActiveState(false);
+
+    hideSection("breadcrumbs");
+    hideSection("body");
+
+    finishContentLoading();
+  }, [hideSection, finishContentLoading]);
+
   const showSearchLoader =
-    isFirstLoad && (showBreadCrumbsLoader || showBodyLoader);
+    isFullLoadActive && (showBreadCrumbsLoader || showBodyLoader);
 
   return {
-    setIsLoading,
-
     isNextPageLoading,
     setIsNextPageLoading,
 
-    isFirstLoad,
-    setIsFirstLoad,
+    isFullLoadActive,
+    startFullLoad,
+    finishFullLoad,
+
+    isContentLoading,
+    startContentLoading,
+    finishContentLoading,
+
+    hideSectionLoader,
 
     showBreadCrumbsLoader,
     showSearchLoader,
@@ -193,4 +203,3 @@ const useLoadersHelper = ({ withInit }: { withInit?: boolean }) => {
 };
 
 export default useLoadersHelper;
-

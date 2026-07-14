@@ -89,7 +89,6 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
   roomsFolderId?: number;
-  setIsContentLoading?: (value: boolean) => void;
 };
 
 export type UseAgentsHelperProps = TUseInputItemHelper & {
@@ -121,7 +120,6 @@ export type UseAgentsHelperProps = TUseInputItemHelper & {
   favoritesFolder?: FolderDtoInteger | null;
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
-  setIsContentLoading?: (value: boolean) => void;
 };
 
 export type UseSocketHelperProps = {
