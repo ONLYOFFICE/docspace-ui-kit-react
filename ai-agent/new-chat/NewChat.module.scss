@@ -79,7 +79,11 @@
   }
 
   :global(.composer-root) {
-    height: 90px;
+    // Minimum, not a fixed height: the composer is a flex column and the
+    // attachment-chips row is its only child whose min-height resolves to 0
+    // (it has overflow-x: auto), so with a hard height the chips collapse
+    // to 0px and get clipped. Let the composer grow when chips appear.
+    min-height: 90px;
     padding: 6px 8px;
     border-radius: 3px !important;
     border: none;
