@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 import {
   SortedByType as SdkSortedByType,
@@ -61,16 +70,32 @@ export enum ButtonKeys {
   space = "Space",
 }
 
+/**
+ * Canonical mapping of numeric roomType codes used in WebSocket messages
+ * (e.g. `s:modify-folder` payload field `roomType`).
+ *
+ * This enum is the single source of truth. When adding a new value,
+ * notify the analytics team so they can update their event tracking.
+ *
+ * | Code | Name            |
+ * |------|-----------------|
+ * |  1   | FormRoom        |
+ * |  2   | EditingRoom     |
+ * |  5   | CustomRoom      |
+ * |  6   | PublicRoom      |
+ * |  8   | VirtualDataRoom |
+ * |  9   | AIRoom          |
+ */
 export enum RoomsType {
-  AIRoom = 9,
-  PublicRoom = 6,
   FormRoom = 1,
-  // FillingFormsRoom= 1, //TODO: Restore when certs will be done
+  // FillingFormsRoom = 1, // TODO: Restore when certs will be done
   EditingRoom = 2,
-  // ReviewRoom: 3, //TODO: Restore when certs will be done
-  // ReadOnlyRoom: 4, //TODO: Restore when certs will be done
-  VirtualDataRoom = 8,
+  // ReviewRoom = 3,   // TODO: Restore when certs will be done
+  // ReadOnlyRoom = 4, // TODO: Restore when certs will be done
   CustomRoom = 5,
+  PublicRoom = 6,
+  VirtualDataRoom = 8,
+  AIRoom = 9,
 }
 
 /**
@@ -166,6 +191,7 @@ export const enum FolderType {
   ResultStorage = 33,
   AIAgents = 34,
   DefaultTemplates = 35,
+  Forms = 36,
 }
 
 export enum GuidanceRefKey {
@@ -237,6 +263,11 @@ export const enum ParseErrorTypes {
   None = 0,
   EmptyRecipients = 1,
   IncorrectEmail = 2,
+}
+
+export const enum PortalFeaturesLimitations {
+  Limitless = -1,
+  Unavailable = 0,
 }
 
 export const enum ErrorKeys {
@@ -381,4 +412,37 @@ export enum ToolsPermission {
   Allow,
   AlwaysAllow,
   Deny,
+}
+
+export enum DistributedTaskStatus {
+  Created,
+  Running,
+  Completed,
+  Canceled,
+  Failed,
+}
+
+/**
+ * Enum for GTM dataLayer analytics events.
+ * @readonly
+ */
+export enum AnalyticsEvents {
+  PortalCreated = "portal_created",
+  RoomCreated = "room_created",
+  RoomDeleted = "room_deleted",
+  RoomShared = "room_shared",
+  RoomArchived = "room_archived",
+  AgentCreated = "agent_created",
+  AgentDeleted = "agent_deleted",
+  FileCreated = "file_created",
+  FileUploaded = "file_uploaded",
+  FileDownloaded = "file_downloaded",
+  FileShared = "file_shared",
+  FileDeleted = "file_deleted",
+  UserInvited = "user_invited",
+  AiProviderAdded = "ai_provider_added",
+  WalletTopUp = "wallet_topup",
+  AddPaymentMethod = "add_payment_method",
+  Purchase = "purchase",
+  LimitReached = "limit_reached",
 }

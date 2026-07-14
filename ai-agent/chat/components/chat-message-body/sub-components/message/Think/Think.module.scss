@@ -26,13 +26,13 @@
   // margin-bottom: 16px;
 
   &.withMarginTop {
-    margin-top: 16px;
+    margin-top: var(--chat-message-gap, 16px);
   }
 
   .thinkBlock {
     background-color: var(--chat-message-tool-block-color);
-    padding: 12px;
-    border-radius: 6px;
+    padding: var(--chat-tool-call-body-padding);
+    border-radius: var(--chat-border-radius);
   }
 
   .thinkTitle {
@@ -41,19 +41,19 @@
     display: flex;
     align-items: center;
 
-    gap: 8px;
+    gap: var(--chat-message-content-gap);
 
-    height: 32px;
+    height: var(--chat-icon-md);
 
     cursor: pointer;
 
     .toolFinishIcon {
-      width: 12px;
-      height: 12px;
+      width: var(--chat-icon-xs);
+      height: var(--chat-icon-xs);
 
       div {
-        width: 12px;
-        height: 12px;
+        width: var(--chat-icon-xs);
+        height: var(--chat-icon-xs);
 
         display: flex;
         align-items: center;
@@ -61,7 +61,7 @@
       }
 
       svg {
-        height: 12px;
+        height: var(--chat-icon-xs);
 
         path {
           fill: var(--chat-input-send-button-background);
@@ -71,14 +71,14 @@
   }
 
   .thinkTitleOpened {
-    margin-bottom: 6px;
+    margin-bottom: var(--chat-spacing-sm);
   }
 
   .icon {
     transition: transform 0.2s ease;
 
-    width: 12px;
-    height: 12px;
+    width: var(--chat-icon-xs);
+    height: var(--chat-icon-xs);
 
     path {
       fill: var(--text-color) !important;

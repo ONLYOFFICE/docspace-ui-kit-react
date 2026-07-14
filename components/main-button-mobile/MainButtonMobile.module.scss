@@ -2,8 +2,11 @@
 @use "../../styles/mixins";
 
 .floatingButton {
+  --floating-circle-button-background: var(--main-button-mobile-button-color);
+  --floating-button-icon: var(--main-button-mobile-icon-fill);
+
   position: relative;
-  z-index: 1010;
+  z-index: var(--main-button-mobile-z-index, 1010);
   background: var(--main-button-mobile-button-color);
   -webkit-tap-highlight-color: #{colors.$tap-highlight};
 
@@ -132,7 +135,7 @@
 }
 
 .dropDownItem {
-  padding: 6px 23px;
+  padding: var(--main-button-mobile-dropdown-item-padding, 6px 23px);
 
   :global {
     .drop-down-icon {
@@ -176,7 +179,8 @@
   }
 }
 
-:where(.containerAction, .buttonOptions) {
+.containerAction,
+.buttonOptions {
   padding: 16px 0px;
 
   .sublevel {
@@ -203,10 +207,10 @@
 .wrapperAlertIcon {
   position: absolute;
   z-index: 1010;
-  width: 12px;
-  height: 12px;
-  top: 10px;
-  inset-inline-end: 10px;
+  width: var(--main-button-mobile-badge-size, 12px);
+  height: var(--main-button-mobile-badge-size, 12px);
+  top: var(--main-button-mobile-badge-offset, 10px);
+  inset-inline-end: var(--main-button-mobile-badge-offset, 10px);
 }
 
 .alertIcon {
@@ -282,15 +286,15 @@
 
 .mobileProgressBar {
   width: 100%;
-  height: 4px;
+  height: var(--main-button-mobile-progress-height, 4px);
   background-color: var(--main-button-mobile-mobile-progress-bar-background);
-  border-radius: 2px;
+  border-radius: var(--main-button-mobile-progress-radius, 2px);
   margin-top: 14px;
 }
 
 .progressBar {
   width: var(--upload-percent);
-  height: 4px;
+  height: var(--main-button-mobile-progress-height, 4px);
   opacity: 1;
   background: var(--main-button-mobile-progress-bar-color);
   &.error {

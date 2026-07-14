@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 import React from "react";
 
@@ -47,6 +56,22 @@ import {
 
 import type { UseSocketHelperProps } from "../types";
 import { SettingsContext } from "../contexts/Settings";
+
+// Folder ids can be either numeric (server returns number, breadcrumbs/items
+// sometimes carry the same id as a string) or non-numeric strings for
+// third-party providers. Compare numerically when both sides parse as a
+// finite number; otherwise fall back to a strict string compare.
+const idsEqual = (
+  a: number | string | null | undefined,
+  b: number | string | null | undefined,
+) => {
+  if (a == null || b == null) return false;
+  const na = Number(a);
+  const nb = Number(b);
+  if (Number.isFinite(na) && Number.isFinite(nb)) return na === nb;
+  return String(a) === String(b);
+};
+
 const useSocketHelper = ({
   disabledItems,
   disabledFolderType,
@@ -56,13 +81,13 @@ const useSocketHelper = ({
   setBreadCrumbs,
   setTotal,
   disableBySecurity,
+  isRoomDisabled,
 }: UseSocketHelperProps) => {
   const { getIcon } = React.use(SettingsContext);
   const { filesApi, foldersApi, roomsApi } = useApi();
 
   const folderSubscribers = React.useRef(new Set<string>());
 
-  const initRef = React.useRef(false);
   const subscribedId = React.useRef<null | number | string>(null);
 
   const unsubscribe = React.useCallback((id?: number | string) => {
@@ -75,16 +100,14 @@ const useSocketHelper = ({
       });
 
       folderSubscribers.current = new Set<string>();
+      subscribedId.current = null;
 
       return;
     }
 
     const path = `DIR-${id}`;
 
-    if (
-      socket?.socketSubscribers.has(path) &&
-      folderSubscribers.current.has(path)
-    ) {
+    if (folderSubscribers.current.has(path)) {
       socket?.emit(SocketCommands.Unsubscribe, {
         roomParts: path,
         individual: true,
@@ -92,22 +115,27 @@ const useSocketHelper = ({
 
       folderSubscribers.current.delete(path);
     }
+
+    if (subscribedId.current === id) subscribedId.current = null;
   }, []);
 
   const subscribe = React.useCallback(
     (id: number | string) => {
       const roomParts = `DIR-${id}`;
 
-      if (socket?.socketSubscribers.has(roomParts)) {
-        subscribedId.current = id;
+      if (subscribedId.current && subscribedId.current !== id)
+        unsubscribe(subscribedId.current);
 
-        return;
-      }
+      subscribedId.current = id;
 
-      if (subscribedId.current) unsubscribe(subscribedId.current);
+      if (folderSubscribers.current.has(roomParts)) return;
+
+      // If already subscribed externally (e.g. main view), don't take
+      // ownership — adding to folderSubscribers would cause cleanup to
+      // unsubscribe it when the selector closes, breaking the main view.
+      if (socket?.socketSubscribers.has(roomParts)) return;
 
       folderSubscribers.current.add(roomParts);
-      subscribedId.current = id;
 
       socket?.emit(SocketCommands.Subscribe, {
         roomParts,
@@ -124,10 +152,10 @@ const useSocketHelper = ({
 
       if (
         "folderId" in data && data.folderId
-          ? data.folderId !== subscribedId.current
+          ? !idsEqual(data.folderId, subscribedId.current)
           : "parentId" in data &&
             !("roomType" in data) &&
-            data.parentId !== subscribedId.current
+            !idsEqual(data.parentId, subscribedId.current)
       ) {
         return;
       }
@@ -135,7 +163,9 @@ const useSocketHelper = ({
       let item: TSelectorItem = {} as TSelectorItem;
 
       if (opt?.type === "file" && "folderId" in data) {
-        const fileRes = await filesApi.getFileInfo(data.id!);
+        const fileRes = await filesApi.getFileInfo({
+          fileId: data.id!,
+        });
         const file = fileRes.data.response!;
         [item] = convertFilesToItems(
           [file],
@@ -146,11 +176,15 @@ const useSocketHelper = ({
         );
       } else if (opt?.type === "folder" && !("folderId" in data)) {
         if ("roomType" in data) {
-          const roomRes = await roomsApi.getRoomInfo(data.id!);
+          const roomRes = await roomsApi.getRoomInfo({
+            id: data.id!,
+          });
           const room = roomRes.data.response!;
-          item = convertRoomsToItems([room])[0];
+          item = convertRoomsToItems([room], undefined, isRoomDisabled)[0];
         } else {
-          const folderRes = await foldersApi.getFolderInfo(data.id!);
+          const folderRes = await foldersApi.getFolderInfo({
+            folderId: data.id!,
+          });
           const folder = folderRes.data.response!;
           item = convertFoldersToItems(
             [folder],
@@ -220,6 +254,7 @@ const useSocketHelper = ({
       setTotal,
       withCreate,
       disableBySecurity,
+      isRoomDisabled,
     ],
   );
 
@@ -232,18 +267,21 @@ const useSocketHelper = ({
       if (
         (("folderId" in data &&
           data.folderId &&
-          data.folderId !== subscribedId.current) ||
+          !idsEqual(data.folderId, subscribedId.current)) ||
           ("parentId" in data &&
             data.parentId &&
-            data.parentId !== subscribedId.current)) &&
-        data.id !== subscribedId.current
-      )
+            !idsEqual(data.parentId, subscribedId.current))) &&
+        !idsEqual(data.id, subscribedId.current)
+      ) {
         return;
+      }
 
       let item: TSelectorItem = {} as TSelectorItem;
 
       if (opt?.type === "file" && "folderId" in data) {
-        const fileRes = await filesApi.getFileInfo(data.id!);
+        const fileRes = await filesApi.getFileInfo({
+          fileId: data.id!,
+        });
         const file = fileRes.data.response!;
         [item] = convertFilesToItems(
           [file],
@@ -254,11 +292,15 @@ const useSocketHelper = ({
         );
       } else if (opt?.type === "folder") {
         if ("roomType" in data) {
-          const roomRes = await roomsApi.getRoomInfo(data.id!);
+          const roomRes = await roomsApi.getRoomInfo({
+            id: data.id!,
+          });
           const room = roomRes.data.response!;
-          item = convertRoomsToItems([room])[0];
+          item = convertRoomsToItems([room], undefined, isRoomDisabled)[0];
         } else {
-          const folderRes = await foldersApi.getFolderInfo(data.id!);
+          const folderRes = await foldersApi.getFolderInfo({
+            folderId: data.id!,
+          });
           const folder = folderRes.data.response!;
           item = convertFoldersToItems(
             [folder],
@@ -269,7 +311,7 @@ const useSocketHelper = ({
         }
       }
 
-      if (item?.id === subscribedId.current) {
+      if (idsEqual(item?.id, subscribedId.current)) {
         return setBreadCrumbs?.((value) => {
           if (!value) return value;
 
@@ -328,6 +370,7 @@ const useSocketHelper = ({
       setBreadCrumbs,
       setItems,
       disableBySecurity,
+      isRoomDisabled,
     ],
   );
 
@@ -363,7 +406,11 @@ const useSocketHelper = ({
     [setItems, setTotal],
   );
 
-  const handleSocketEvent = React.useEffectEvent((opt?: TOptSocket) => {
+  const socketHandlerRef = React.useRef<((opt?: TOptSocket) => void) | null>(
+    null,
+  );
+
+  socketHandlerRef.current = (opt?: TOptSocket) => {
     switch (opt?.cmd) {
       case "create":
         addItem(opt);
@@ -376,17 +423,13 @@ const useSocketHelper = ({
         break;
       default:
     }
-  });
+  };
 
   React.useEffect(() => {
-    if (initRef.current) return;
-
-    initRef.current = true;
-
-    socket?.on(SocketEvents.ModifyFolder, handleSocketEvent);
-
+    const handler = (opt?: TOptSocket) => socketHandlerRef.current?.(opt);
+    socket?.on(SocketEvents.ModifyFolder, handler);
     return () => {
-      socket?.off(SocketEvents.ModifyFolder, handleSocketEvent);
+      socket?.off(SocketEvents.ModifyFolder, handler);
     };
   }, []);
 

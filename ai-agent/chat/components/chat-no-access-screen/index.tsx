@@ -1,52 +1,81 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 import React from "react";
+import { Trans } from "react-i18next";
 
 import ChatNoAccessRightsDarkIcon from "../../../../assets/emptyview/empty.chat.access.rights.dark.svg";
 import ChatNoAccessRightsLightIcon from "../../../../assets/emptyview/empty.chat.access.rights.light.svg";
 
 import { EmptyView } from "../../../../components/empty-view";
+import { Text } from "../../../../components/text";
+import { Link, LinkType } from "../../../../components/link";
 import { useTheme } from "../../../../context/ThemeContext";
 import { match, P } from "ts-pattern";
 import { useCommonTranslation } from "../../../../utils/i18n";
+import { getBrandName } from "../../../../constants/brands";
 
-type Props = {
+export type ChatNoAccessScreenProps = {
   aiReady: boolean;
   standalone: boolean;
   isPortalAdmin: boolean;
+  isPayer?: boolean;
+  isCardLinkedToPortal?: boolean;
+  walletCustomerEmail?: string | null;
+  walletCustomerDisplayName?: string | null;
   goToAISettings?: () => void;
+  onActivateAI?: () => void;
+  onTopUpAndActivateAI?: () => void;
+  onShowAIBenefits?: () => void;
+  isActivating?: boolean;
 };
 
 export const ChatNoAccessScreen = ({
   aiReady,
   isPortalAdmin,
   standalone,
+  isPayer,
+  isCardLinkedToPortal,
+  walletCustomerEmail,
+  walletCustomerDisplayName,
   goToAISettings,
-}: Props) => {
+  onActivateAI,
+  onTopUpAndActivateAI,
+  onShowAIBenefits,
+  isActivating,
+}: ChatNoAccessScreenProps) => {
   const { isBase } = useTheme();
   const t = useCommonTranslation();
 
@@ -56,44 +85,77 @@ export const ChatNoAccessScreen = ({
     <ChatNoAccessRightsDarkIcon />
   );
 
-  const title =
-    isPortalAdmin && standalone
-      ? t("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
-          aiProvider: t("AIProvider"),
-        })
-      : t("AIFeaturesAreCurrentlyDisabled");
+  const title = match([standalone, isPortalAdmin])
+    // standalone admin
+    .with([true, true], () =>
+      t("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
+        aiProvider: t("AIProvider"),
+      }),
+    )
+    // saas (admin + user)
+    .with([false, P._], () => t("EmptyAIAgentsNotActiveYetTitle"))
+    // standalone user
+    .otherwise(() => t("AIFeaturesAreCurrentlyDisabled"));
 
   const description = match([standalone, isPortalAdmin])
     // standalone admin
     .with([true, true], () =>
-      t(
-        "EmptyAIAgentsAIDisabledStandaloneAdminDescription",
-        {
-          productName: t("ProductName"),
-          aiChats: t("AIChats"),
-        },
-      ),
+      t("EmptyAIAgentsAIDisabledStandaloneAdminDescription", {
+        productName: getBrandName("ProductName"),
+        aiChats: t("AIChats"),
+      }),
     )
     // saas admin
-    .with([false, true], () =>
-      t("EmptyChatAIDisabledSaasAdminDescription", {
-        productName: t("ProductName"),
-      }),
-    )
-    // standalone/saas user
-    .with([P._, false], () =>
-      t("EmptyChatAIDisabledUserDescription", {
-        productName: t("ProductName"),
-      }),
-    )
-    .otherwise(() => "");
+    .with([false, true], () => {
+      const payerLabel = walletCustomerDisplayName || walletCustomerEmail;
 
-  const goToServices = {
-    type: "button",
-    title: t("GoToSettings"),
-    key: "go-to-services",
-    onClick: goToAISettings,
-  } as const;
+      return (
+        <>
+          <Text as="span">{t("EmptyAIAgentsNotActiveYetDescription")}</Text>
+          <Text as="span" style={{ display: "block", marginTop: "8px" }}>
+            {t("EmptyAIAgentsNotActiveYetDescriptionLine2")}
+          </Text>
+          {!isPayer && payerLabel ? (
+            <Text as="span" style={{ display: "block", marginTop: "8px" }}>
+              <Trans
+                i18nKey="Common:EmptyAIAgentsNotActiveYetContactPayer"
+                values={{ payerContact: payerLabel }}
+                components={{
+                  1:
+                    walletCustomerEmail && !walletCustomerDisplayName ? (
+                      <Link
+                        key="chat-no-access-payer-link"
+                        type={LinkType.action}
+                        href={`mailto:${walletCustomerEmail}`}
+                        color="accent"
+                      />
+                    ) : (
+                      <Text
+                        key="chat-no-access-payer-name"
+                        as="span"
+                        fontWeight={600}
+                      />
+                    ),
+                }}
+              />
+            </Text>
+          ) : null}
+        </>
+      );
+    })
+    // standalone user
+    .with([true, false], () =>
+      t("EmptyAIAgentsAIDisabledDescription", {
+        productName: getBrandName("ProductName"),
+        aiAgents: t("AIAgents"),
+      }),
+    )
+    // saas user
+    .otherwise(() =>
+      t("EmptyAIDisabledContactAdminDesc", {
+        productName: getBrandName("ProductName"),
+      }),
+    );
 
   const goToAIProviderSettings = {
     type: "button",
@@ -102,12 +164,44 @@ export const ChatNoAccessScreen = ({
     onClick: goToAISettings,
   } as const;
 
-  const options =
-    !isPortalAdmin || !goToAISettings
-      ? []
-      : standalone
+  // saas admin: activate AI right away (or top up first) + show benefits.
+  // The actual logic lives on the client and is passed in via callbacks.
+  const activateOrTopUpAI = isCardLinkedToPortal
+    ? ({
+        type: "button",
+        title: t("Activate"),
+        key: "activate-ai",
+        onClick: onActivateAI,
+        isLoading: isActivating,
+      } as const)
+    : ({
+        type: "button",
+        title: t("TopUpAndActivate"),
+        key: "top-up-and-activate-ai",
+        onClick: onTopUpAndActivateAI,
+      } as const);
+
+  // const aiBenefits = {
+  //   type: "button",
+  //   title: t("Benefits"),
+  //   key: "ai-benefits",
+  //   primary: false,
+  //   onClick: onShowAIBenefits,
+  // } as const;
+
+  const getSaasAdminOptions = () => {
+    if (isCardLinkedToPortal && !isPayer) return [];
+    if (!activateOrTopUpAI.onClick) return [];
+    return [activateOrTopUpAI]; // aiBenefits
+  };
+
+  const options = !isPortalAdmin
+    ? []
+    : standalone
+      ? goToAISettings
         ? [goToAIProviderSettings]
-        : [goToServices];
+        : []
+      : getSaasAdminOptions();
 
   return (
     <EmptyView
@@ -119,3 +213,4 @@ export const ChatNoAccessScreen = ({
     />
   );
 };
+

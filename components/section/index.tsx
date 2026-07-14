@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 "use client";
 
@@ -42,6 +51,7 @@ import SubSectionBodyContent from "./sub-components/SectionBodyContent";
 import InfoPanel from "./sub-components/InfoPanel";
 import SubInfoPanelBody from "./sub-components/InfoPanelBody";
 import SubInfoPanelHeader from "./sub-components/InfoPanelHeader";
+import ChatPanelView from "./sub-components/ChatPanel";
 import SubSectionFooter from "./sub-components/SectionFooter";
 import SubSectionWarning from "./sub-components/SectionWarning";
 import SubSectionSubmenu from "./sub-components/SectionSubmenu";
@@ -54,8 +64,10 @@ import {
   SECTION_HEADER_NAME,
   SECTION_INFO_PANEL_BODY_NAME,
   SECTION_INFO_PANEL_HEADER_NAME,
+  SECTION_CHAT_PANEL_NAME,
   SECTION_WARNING_NAME,
   SECTION_SUBMENU_NAME,
+  SECTION_BANNER_NAME,
 } from "./Section.constants";
 import { parseChildren } from "./Section.utils";
 
@@ -66,6 +78,9 @@ SectionHeader.displayName = SECTION_HEADER_NAME;
 
 const SectionFilter: FC<PropsWithChildren> = () => null;
 SectionFilter.displayName = SECTION_FILTER_NAME;
+
+const SectionBanner: FC<PropsWithChildren> = () => null;
+SectionBanner.displayName = SECTION_BANNER_NAME;
 
 const SectionBody: FC<PropsWithChildren> = () => null;
 SectionBody.displayName = SECTION_BODY_NAME;
@@ -78,6 +93,9 @@ InfoPanelBody.displayName = SECTION_INFO_PANEL_BODY_NAME;
 
 const InfoPanelHeader: FC<PropsWithChildren> = () => null;
 InfoPanelHeader.displayName = SECTION_INFO_PANEL_HEADER_NAME;
+
+const ChatPanel: FC<PropsWithChildren> = () => null;
+ChatPanel.displayName = SECTION_CHAT_PANEL_NAME;
 
 const SectionWarning: FC<PropsWithChildren> = () => null;
 SectionWarning.displayName = SECTION_WARNING_NAME;
@@ -96,10 +114,15 @@ const Section = (props: SectionProps) => {
     isInfoPanelAvailable = true,
     settingsStudio = false,
     isInfoPanelScrollLocked,
+    infoPanelWithoutScroll,
     currentDeviceType,
 
     isInfoPanelVisible,
     setIsInfoPanelVisible,
+    isChatPanelAvailable = false,
+    isChatPanelVisible,
+    setIsChatPanelVisible,
+    inert,
     isMobileHidden,
     canDisplay,
     anotherDialogOpen,
@@ -110,14 +133,17 @@ const Section = (props: SectionProps) => {
     secondaryOperationsCompleted,
     secondaryActiveOperations = [],
     clearSecondaryProgressData,
+    cancelSecondaryOperationById,
     primaryOperationsArray = [],
     clearPrimaryProgressData,
     primaryOperationsCompleted,
     cancelUpload,
+    secondaryOperationsStopped,
     secondaryOperationsAlert,
     mainButtonVisible,
 
     primaryOperationsAlert,
+    primaryOperationsCanceled,
     needErrorChecking,
 
     withTabs,
@@ -136,6 +162,8 @@ const Section = (props: SectionProps) => {
     pluginOperationsCompleted,
     pluginOperationsAlert,
     pluginShowCancelButton,
+    scrollableBanner,
+    stickyTableHeader,
   } = props;
 
   const [sectionSize, setSectionSize] = React.useState<{
@@ -154,8 +182,10 @@ const Section = (props: SectionProps) => {
     sectionWarningContent,
     infoPanelBodyContent,
     infoPanelHeaderContent,
+    chatPanelContent,
     sectionSubmenuContent,
-  ]: (React.JSX.Element | null)[] = parseChildren(children);
+    sectionBannerContent,
+  ] = parseChildren(children);
 
   const isSectionHeaderAvailable = !!sectionHeaderContent;
   const isSectionFilterAvailable = !!sectionFilterContent;
@@ -170,12 +200,24 @@ const Section = (props: SectionProps) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const computedStyles = window.getComputedStyle(containerRef.current, null);
-    const width = +computedStyles.getPropertyValue("width").replace("px", "");
-    const height = +computedStyles.getPropertyValue("height").replace("px", "");
+    const measure = () => {
+      if (!containerRef.current) return;
+      const computedStyles = window.getComputedStyle(
+        containerRef.current,
+        null,
+      );
+      const width = +computedStyles.getPropertyValue("width").replace("px", "");
+      const height = +computedStyles
+        .getPropertyValue("height")
+        .replace("px", "");
+      setSectionSize(() => ({ width, height }));
+      window.dispatchEvent(new Event("resize"));
+    };
 
-    setSectionSize(() => ({ width, height }));
-  }, [isInfoPanelVisible]);
+    measure();
+    const raf = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(raf);
+  }, [isInfoPanelVisible, isChatPanelVisible]);
 
   const onResize = React.useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -261,13 +303,21 @@ const Section = (props: SectionProps) => {
     pluginOperations,
   ]);
 
+  const totalOperationsCount =
+    (secondaryActiveOperations?.length || 0) +
+    (primaryOperationsArray?.length || 0) +
+    (pluginOperations?.length || 0);
+
   const showCancelButton =
     (primaryOperationsArray.length > 0 &&
       !primaryOperationsCompleted &&
       primaryOperationsArray.some((op) => op.operation === "upload")) ||
-    pluginShowCancelButton;
+    pluginShowCancelButton ||
+    (totalOperationsCount === 1 &&
+      secondaryActiveOperations.length === 1 &&
+      !secondaryOperationsCompleted);
 
-  const isInfoVisible = canDisplay && isInfoPanelVisible;
+  const isInfoVisible = canDisplay && (isInfoPanelVisible || isChatPanelVisible);
 
   if (!isSectionAvailable) return null;
 
@@ -280,6 +330,10 @@ const Section = (props: SectionProps) => {
         isInfoPanelVisible={isInfoPanelVisible}
         withBodyScroll={withBodyScroll}
         currentDeviceType={currentDeviceType}
+        bannerContent={sectionBannerContent}
+        scrollableBanner={scrollableBanner}
+        stickyTableHeader={stickyTableHeader}
+        inert={inert}
       >
         {currentDeviceType !== DeviceType.mobile ? (
           <div className="section-sticky-container">
@@ -294,6 +348,7 @@ const Section = (props: SectionProps) => {
             ) : null}
 
             {isSectionFilterAvailable &&
+            !stickyTableHeader &&
             currentDeviceType === DeviceType.desktop ? (
               <SubSectionFilter className="section-header_filter">
                 {sectionFilterContent}
@@ -325,6 +380,16 @@ const Section = (props: SectionProps) => {
                 {sectionHeaderContent}
               </SubSectionHeader>
             ) : null}
+            {scrollableBanner && sectionBannerContent ? (
+              <div className="section-banner">{sectionBannerContent}</div>
+            ) : null}
+            {isSectionFilterAvailable &&
+            stickyTableHeader &&
+            currentDeviceType === DeviceType.desktop ? (
+              <SubSectionFilter className="section-body_sticky-filter">
+                {sectionFilterContent}
+              </SubSectionFilter>
+            ) : null}
             {currentDeviceType !== DeviceType.desktop ? (
               <SubSectionWarning>{sectionWarningContent}</SubSectionWarning>
             ) : null}
@@ -351,6 +416,7 @@ const Section = (props: SectionProps) => {
         {isShowOperationButton ? (
           <OperationsProgressButton
             clearOperationsData={clearSecondaryProgressData}
+            cancelSecondaryOperationById={cancelSecondaryOperationById}
             operations={[
               ...(secondaryActiveOperations || []),
               ...(pluginOperations || []),
@@ -358,11 +424,13 @@ const Section = (props: SectionProps) => {
             operationsCompleted={isCompletedOperations}
             clearPanelOperationsData={clearPrimaryProgressData}
             clearDropPreviewLocation={clearDropPreviewLocation}
+            operationsStopped={secondaryOperationsStopped}
             operationsAlert={
               primaryOperationsAlert ||
               secondaryOperationsAlert ||
               pluginOperationsAlert
             }
+            operationsCanceled={primaryOperationsCanceled}
             needErrorChecking={needErrorChecking}
             panelOperations={primaryOperationsArray}
             cancelUpload={cancelUpload}
@@ -386,12 +454,26 @@ const Section = (props: SectionProps) => {
           viewAs={viewAs}
           currentDeviceType={currentDeviceType}
           asideInfoPanel={asideInfoPanel}
+          withoutBodyScroll={infoPanelWithoutScroll}
         >
           <SubInfoPanelHeader>{infoPanelHeaderContent}</SubInfoPanelHeader>
-          <SubInfoPanelBody isInfoPanelScrollLocked={isInfoPanelScrollLocked}>
+          <SubInfoPanelBody
+            isInfoPanelScrollLocked={isInfoPanelScrollLocked}
+            withoutScroll={infoPanelWithoutScroll}
+          >
             {infoPanelBodyContent}
           </SubInfoPanelBody>
         </InfoPanel>
+      ) : null}
+
+      {isChatPanelAvailable ? (
+        <ChatPanelView
+          isVisible={isChatPanelVisible}
+          setIsVisible={setIsChatPanelVisible}
+          currentDeviceType={currentDeviceType}
+        >
+          {chatPanelContent}
+        </ChatPanelView>
       ) : null}
     </Provider>
   );
@@ -405,8 +487,10 @@ type SectionComponentType = FC<SectionProps> & {
   SectionFooter: typeof SectionFooter;
   InfoPanelBody: typeof InfoPanelBody;
   InfoPanelHeader: typeof InfoPanelHeader;
+  ChatPanel: typeof ChatPanel;
   SectionWarning: typeof SectionWarning;
   SectionSubmenu: typeof SectionSubmenu;
+  SectionBanner: typeof SectionBanner;
 };
 
 // Create the memoized component with explicit type assertion
@@ -418,7 +502,9 @@ MemoizedSection.SectionBody = SectionBody;
 MemoizedSection.SectionFooter = SectionFooter;
 MemoizedSection.InfoPanelBody = InfoPanelBody;
 MemoizedSection.InfoPanelHeader = InfoPanelHeader;
+MemoizedSection.ChatPanel = ChatPanel;
 MemoizedSection.SectionWarning = SectionWarning;
 MemoizedSection.SectionSubmenu = SectionSubmenu;
+MemoizedSection.SectionBanner = SectionBanner;
 
 export default MemoizedSection;

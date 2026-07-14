@@ -1,6 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useTheme } from "styled-components";
+import { useTheme } from "../../context/ThemeContext";
 
 import { ThemeKeys } from "../../enums";
 
@@ -42,8 +42,8 @@ export default meta;
 type Story = StoryObj<typeof ThemeProvider>;
 
 const ThemedContent = () => {
-  const theme = useTheme();
-  const isDark = !theme.isBase;
+  const { isBase } = useTheme();
+  const isDark = !isBase;
 
   return (
     <div
@@ -69,8 +69,8 @@ const ThemedContent = () => {
           backgroundColor: isDark ? "#444" : "#f5f5f5",
         }}
       >
-        <p>Theme styling is applied via styled-components context.</p>
-        <p>Background color changes based on theme.isBase property.</p>
+        <p>Theme styling is applied via ThemeContext.</p>
+        <p>Background color changes based on isBase property.</p>
       </div>
     </div>
   );

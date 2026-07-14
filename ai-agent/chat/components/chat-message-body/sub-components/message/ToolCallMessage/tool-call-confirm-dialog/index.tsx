@@ -1,32 +1,40 @@
 /*
- * (c) Copyright Ascensio System SIA 2009-2026
+ * Copyright (C) Ascensio System SIA, 2009-2026
  *
- * This program is a free software product.
- * You can redistribute it and/or modify it under the terms
- * of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
- * Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
- * to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
- * any third-party rights.
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
  *
- * This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
- * the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
  *
- * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
  *
- * The  interactive user interfaces in modified source and object code versions of the Program must
- * display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
  *
- * Pursuant to Section 7(b) of the License you must retain the original Product logo when
- * distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
- * trademark law for use of our trademarks.
+ * No trademark rights are granted under this License.
  *
- * All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
- * content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
- * International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
  */
 
 import React from "react";
+import classNames from "classnames";
 import { observer } from "mobx-react";
 
 import { ToolsPermission } from "../../../../../../../../enums";
@@ -41,6 +49,7 @@ import {
 } from "../../../../../../../../components/modal-dialog";
 
 import styles from "../../../../ChatMessageBody.module.scss";
+import chatStyles from "../../../../../chat-container/ChatContainer.module.scss";
 import { ToolCall } from "../tool-call";
 import { isMobile } from "../../../../../../../../utils";
 import { useCommonTranslation } from "../../../../../../../../utils/i18n";
@@ -60,18 +69,45 @@ export const ToolCallConfirmDialog = observer(
       toolsConfirmQueue,
       addToToolsConfirmQueue,
       removeFromToolsConfirmQueue,
+      generateDocxToolName,
+      generateFormToolName,
+      generatePresentationToolName,
     } = useMessageStore();
     const { aiApi } = useApi();
     const t = useCommonTranslation();
 
-    const onClickAction = (decision: ToolsPermission) => {
+    const isGenerateTool =
+      content.name === generateDocxToolName ||
+      content.name === generateFormToolName ||
+      content.name === generatePresentationToolName;
+
+    const onClickAction = async (decision: ToolsPermission) => {
       if (content.callId) {
-        aiApi.updateToolsPermission(
-          content.callId,
-          alwaysAllow && decision === ToolsPermission.Allow
-            ? ToolsPermission.AlwaysAllow
-            : decision,
-        );
+        if (isGenerateTool) {
+          const allow = decision === ToolsPermission.Allow;
+          const result = await aiApi.updateToolFileDecision(
+            content.callId,
+            allow,
+          );
+
+          if (allow && typeof result?.id === "number") {
+            const searchParams = new URLSearchParams();
+            searchParams.append("fileId", String(result.id));
+            searchParams.append("withTool", "true");
+
+            window.open(
+              `${window.location.origin}/doceditor?${searchParams.toString()}`,
+              "_blank",
+            );
+          }
+        } else {
+          aiApi.updateToolsPermission(
+            content.callId,
+            alwaysAllow && decision === ToolsPermission.Allow
+              ? ToolsPermission.AlwaysAllow
+              : decision,
+          );
+        }
       }
 
       onClose();
@@ -79,7 +115,11 @@ export const ToolCallConfirmDialog = observer(
 
     const onCloseAction = () => {
       if (content.callId) {
-        aiApi.updateToolsPermission(content.callId, ToolsPermission.Deny);
+        if (isGenerateTool) {
+          aiApi.updateToolFileDecision(content.callId, false);
+        } else {
+          aiApi.updateToolsPermission(content.callId, ToolsPermission.Deny);
+        }
       }
 
       onClose();
@@ -107,7 +147,9 @@ export const ToolCallConfirmDialog = observer(
         </ModalDialog.Header>
 
         <ModalDialog.Body>
-          <div className={styles.toolCallManage}>
+          <div
+            className={classNames(styles.toolCallManage, chatStyles.chatTokens)}
+          >
             <Text>{t("AIWouldLikeToUseThisTool")}</Text>
             <ToolCall
               content={content}
@@ -115,24 +157,34 @@ export const ToolCallConfirmDialog = observer(
               placement={ToolCallPlacement.ConfirmDialog}
             />
             <div>
-              <Text>{t("ReviewAction")}</Text>
-              <Text>{t("CannotGuaranteeSecurity")}</Text>
+              {isGenerateTool ? (
+                <Text>{t("AIGenerateDocumentDescription")}</Text>
+              ) : (
+                <>
+                  <Text>{t("ReviewAction")}</Text>
+                  <Text>{t("CannotGuaranteeSecurity")}</Text>
+                </>
+              )}
             </div>
           </div>
         </ModalDialog.Body>
 
         <ModalDialog.Footer>
-          <div className={styles.toolCallFooter}>
-            <Checkbox
-              isChecked={alwaysAllow}
-              onChange={(e) => setAlwaysAllow(e.target.checked)}
-              label={t("AlwaysAllowToolCall")}
-              data-testid="always-allow-checkbox"
-            />
+          <div
+            className={classNames(styles.toolCallFooter, chatStyles.chatTokens)}
+          >
+            {!isGenerateTool ? (
+              <Checkbox
+                isChecked={alwaysAllow}
+                onChange={(e) => setAlwaysAllow(e.target.checked)}
+                label={t("AlwaysAllowToolCall")}
+                data-testid="always-allow-checkbox"
+              />
+            ) : null}
             <div className={styles.buttonsBlockContainer}>
                <Button
                 primary
-                label={t("Allow")}
+                label={isGenerateTool ? t("Create") : t("Allow")}
                 onClick={() => onClickAction(ToolsPermission.Allow)}
                 scale={isMobile()}
                 size={ButtonSize.normal}
@@ -140,7 +192,7 @@ export const ToolCallConfirmDialog = observer(
               />
               <Button
                 className={styles.denyButton}
-                label={t("Deny")}
+                label={isGenerateTool ? t("CancelButton") : t("Deny")}
                 onClick={() => onClickAction(ToolsPermission.Deny)}
                 size={ButtonSize.normal}
                 scale={isMobile()}

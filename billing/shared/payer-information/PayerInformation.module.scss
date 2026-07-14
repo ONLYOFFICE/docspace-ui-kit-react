@@ -1,0 +1,68 @@
+.container {
+  display: flex;
+  background: var(--payment-background-color);
+  min-height: 72px;
+  padding: 16px;
+  box-sizing: border-box;
+  margin-top: 16px;
+  border-radius: 6px;
+  max-width: 660px;
+}
+
+.avatar {
+  margin-inline-end: 16px;
+}
+
+.infoContainer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.loaderContainer {
+  .refreshDataLoader {
+    height: 16px;
+  }
+}
+
+.wrapper {
+  height: max-content;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: max-content max-content;
+  grid-gap: 4px;
+}
+
+.description {
+  display: flex;
+  align-items: center;
+
+  p {
+    margin-inline-end: 4px;
+  }
+
+  div {
+    display: inline-block;
+    margin: auto 0;
+  }
+}
+
+.accountLink {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.contactEmail {
+ color: var(--payment-error-email);
+}
+
+.refreshData {
+  cursor: pointer;
+
+  &.disabled {
+    cursor: default;
+    color: var(--payment-payer-disable-color);
+  }
+}

@@ -1,0 +1,179 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 768px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.introTitle {
+  color: var(--text-color);
+}
+
+.introDescription {
+  line-height: 20px;
+  color: var(--payment-text-color);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+  background: var(--background-cards-color);
+  border-radius: 6px;
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardTitle {
+  color: var(--text-color);
+}
+
+.cardDescription {
+  line-height: 16px;
+  color: var(--payment-text-color);
+}
+
+.mcpIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent-main) 10%, transparent);
+
+  svg path {
+    fill: var(--accent-main);
+  }
+}
+
+.cardIcon {
+  display: flex;
+  width: 32px;
+  height: 32px;
+
+  svg rect,
+  svg path {
+    fill: var(--accent-main);
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--payment-card-border-color);
+}
+
+.dividerLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--payment-inactive-color);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  line-height: 20px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent-main) 15%, transparent);
+  color: var(--accent-main);
+}
+
+.tagIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  svg {
+    width: auto;
+    height: 16px;
+  }
+
+  svg path,
+  svg rect,
+  svg circle {
+    fill: var(--accent-main);
+  }
+}
+
+.andMore {
+  padding: 7px 12px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--accent-main);
+}

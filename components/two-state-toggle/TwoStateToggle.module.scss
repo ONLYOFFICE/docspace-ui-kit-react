@@ -1,0 +1,137 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors" as *;
+
+$pill-h: 36px;
+$pill-w: 152px;
+$pill-p: 3px;
+$thumb-h: calc($pill-h - $pill-p * 2);
+$thumb-w: calc(($pill-w - $pill-p * 2) / 2);
+
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title {
+  font-size: 13px;
+  line-height: 20px;
+  white-space: nowrap;
+  color: var(--text-color);
+}
+
+.pill {
+  position: relative;
+  height: $pill-h;
+  width: $pill-w;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: var(--button-root-border-radius, 6px);
+  background-color: var(--color-scheme-main-accent, #{$light-second-main});
+  padding: $pill-p;
+  border: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-scheme-main-accent, #{$light-second-main}) 30%, transparent);
+  }
+}
+
+.thumb {
+  position: absolute;
+  inset-inline-start: $pill-p;
+  top: $pill-p;
+  z-index: 10;
+  height: $thumb-h;
+  width: $thumb-w;
+  border-radius: calc(var(--button-root-border-radius, 6px) - 2px);
+  background: #{$white};
+  transition: transform 0.25s ease-out;
+
+  &.thumbNew {
+    transform: translateX($thumb-w);
+  }
+
+  :global(.rtl) & {
+    &.thumbNew {
+      transform: translateX(calc(-1 * $thumb-w));
+    }
+  }
+}
+
+.labels {
+  position: absolute;
+  inset: $pill-p;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  transition: color 0.25s ease;
+  color: #{$white};
+
+  &.onThumb {
+    color: var(--color-scheme-main-accent, #{$light-second-main});
+  }
+}
+
+.confirmBody {
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.confirmHint {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 18px;
+
+  :global(.light) & {
+    color: $light-gray-dark;
+  }
+
+  :global(.dark) & {
+    color: $gray-dark;
+  }
+}

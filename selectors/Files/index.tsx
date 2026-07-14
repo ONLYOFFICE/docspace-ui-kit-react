@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 "use client";
 
@@ -30,11 +39,19 @@ import React, { use } from "react";
 
 import { Portal } from "../../components/portal";
 
-import { FolderType, RoomType } from "@onlyoffice/docspace-api-sdk";
+import {
+  FolderType,
+  RoomType,
+  type FolderDtoInteger,
+} from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../providers/api/ApiProvider";
 import { DeviceType } from "../../enums";
 
-import type { TSelectorItem, TBreadCrumb } from "../../components/selector";
+import type {
+  TSelectorItem,
+  TBreadCrumb,
+  SpecialFolderScope,
+} from "../../components/selector";
 import { Aside } from "../../components/aside";
 import { Backdrop } from "../../components/backdrop";
 import { toastr } from "../../components/toast";
@@ -49,7 +66,7 @@ import useSelectorBody from "./hooks/useSelectorBody";
 import useSelectorState from "./hooks/useSelectorState";
 
 import { useCommonTranslation } from "../../utils/i18n";
-import type { FilesSelectorProps } from "./FilesSelector.types";
+import type { FilesSelectorProps, TSelectedFileInfo } from "./FilesSelector.types";
 import { SettingsContextProvider } from "../utils/contexts/Settings";
 import {
   LoadersContext,
@@ -61,6 +78,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const {
     disabledItems,
     disabledFolderType,
+    isRoomDisabled,
+    pinnedRootId,
     includedItems,
     filterParam,
 
@@ -68,6 +87,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withRecentTreeFolder,
     withFavoritesTreeFolder,
     withAIAgentsTreeFolder,
+    withFormsTreeFolder = true,
 
     onSetBaseFolderPath,
     roomType,
@@ -116,6 +136,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     renderInPortal,
     disableBySecurity,
+    withSubFolders,
   } = props;
 
   const t = useCommonTranslation();
@@ -142,6 +163,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     undefined,
   );
   const afterSearch = React.useRef(false);
+  const selectedFileInfoRef = React.useRef<TSelectedFileInfo | null>(null);
   const ssrRendered = React.useRef(false);
   const ssrTypeRendered = React.useRef(false);
   const clearSearchCallback = React.useRef<null | VoidFunction>(null);
@@ -191,6 +213,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setIsInsideResultStorage,
     isInsideKnowledge,
     isInsideResultStorage,
+    setIsInsidePrivateRoom,
+    isInsidePrivateRoom,
   } = useSelectorState({
     checkCreating,
     disabledItems,
@@ -200,12 +224,24 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     ...withInitProps,
   });
 
+  const [isFormsSection, setIsFormsSection] = React.useState(false);
+
+  const [recentFolder, setRecentFolder] = React.useState<
+    FolderDtoInteger | undefined
+  >(undefined);
+  const [favoritesFolder, setFavoritesFolder] = React.useState<
+    FolderDtoInteger | undefined
+  >(undefined);
+  const [activeSpecialScope, setActiveSpecialScope] =
+    React.useState<SpecialFolderScope | null>(null);
+
   const { subscribe, unsubscribe } = useSocketHelper({
     disabledItems,
     disabledFolderType,
     filterParam,
     withCreate: withCreateState,
     disableBySecurity,
+    isRoomDisabled,
     setItems,
     setBreadCrumbs,
     setTotal,
@@ -220,9 +256,10 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setItems,
     setHasNextPage,
     setIsInit,
-    withRecentTreeFolder,
-    withFavoritesTreeFolder,
     withAIAgentsTreeFolder,
+    withFormsTreeFolder,
+    setRecentFolder,
+    setFavoritesFolder,
   });
 
   let rootFolderTypeItem = undefined;
@@ -253,6 +290,11 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withCreate: withCreateState,
     disableBySecurity,
 
+    recentFolder,
+    favoritesFolder,
+    withRecentTreeFolder,
+    withFavoritesTreeFolder,
+
     withInit,
     setIsContentLoading,
   });
@@ -273,12 +315,20 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     searchValue,
     roomType,
+    formsSection: withFormsTreeFolder ? isFormsSection : undefined,
     isRoomsOnly,
     isInit,
     withCreate: withCreateState,
     createDefineRoomLabel,
     createDefineRoomType,
     searchArea,
+    isRoomDisabled,
+
+    recentFolder,
+    favoritesFolder,
+    withRecentTreeFolder,
+    withFavoritesTreeFolder,
+    roomsFolderId,
 
     withInit,
     setIsContentLoading,
@@ -302,11 +352,13 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setSelectedItemType,
     setIsInsideKnowledge,
     setIsInsideResultStorage,
+    setIsInsidePrivateRoom,
 
     selectedItemId,
     searchValue,
     disabledItems,
     disabledFolderType,
+    pinnedRootId,
     includedItems,
     isThirdParty,
     filterParam,
@@ -321,6 +373,14 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withInit,
     applyFilterOption,
     disableBySecurity,
+    withSubFolders,
+
+    recentFolder,
+    favoritesFolder,
+    withRecentTreeFolder,
+    withFavoritesTreeFolder,
+    activeSpecialScope,
+    formsSection: withFormsTreeFolder ? isFormsSection : undefined,
     setIsContentLoading,
   });
 
@@ -341,6 +401,11 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         }
         setIsFirstLoad(true);
         if (+item.id === 0) {
+          if (pinnedRootId != null) {
+            setIsFirstLoad(false);
+            return;
+          }
+          setActiveSpecialScope(null);
           setSelectedItemSecurity(undefined);
           setSelectedItemType(undefined);
           getRootData();
@@ -381,10 +446,15 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           });
 
           setSelectedItemId(item.id);
+          selectedFileInfoRef.current = null;
           setSelectedFileInfo(null);
+          setActiveSpecialScope(null);
           if (item.isAgent) {
             setSelectedItemType("agents");
           } else if (item.isRoom) {
+            setIsFormsSection(
+              item.rootFolderType === FolderType.FillingFormsRoom,
+            );
             setSelectedItemType("rooms");
           } else {
             setSelectedItemType("files");
@@ -397,6 +467,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       getRootData,
       isFirstLoad,
       isSelectedParentFolder,
+      pinnedRootId,
       items,
       setBreadCrumbs,
       setIsFirstLoad,
@@ -421,6 +492,30 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         if (isDoubleClick) return;
         if (navigatingRef.current) return;
 
+        const specialScope = item.specialFolderScope;
+        if (specialScope) {
+          setIsFirstLoad(true);
+          setActiveSpecialScope(specialScope);
+          setBreadCrumbs((value) => [
+            ...value,
+            {
+              label: item.label,
+              id: item.id,
+              rootFolderType:
+                specialScope.kind === "recent"
+                  ? FolderType.Recent
+                  : FolderType.Favorites,
+            } as TBreadCrumb,
+          ]);
+          setSelectedItemId(specialScope.folderId);
+          setSearchValue("");
+          selectedFileInfoRef.current = null;
+          setSelectedFileInfo(null);
+          setSelectedItemType("files");
+          setIsFormsSection(false);
+          return;
+        }
+
         const isFormRoom = item.roomType === RoomType.FillingFormsRoom;
 
         if (isFormRoom && formProps?.isRoomFormAccessible === false)
@@ -433,6 +528,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
         resetContentLoading();
         setIsFirstLoad(true);
+        setActiveSpecialScope(null);
 
         setBreadCrumbs((value) => [
           ...value,
@@ -442,21 +538,28 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             isRoom:
               !isAgent &&
               item.parentId === 0 &&
-              item.rootFolderType === FolderType.VirtualRooms,
+              (item.rootFolderType === FolderType.VirtualRooms ||
+                item.rootFolderType === FolderType.FillingFormsRoom),
             isAgent: isAgent,
             roomType: item.roomType,
             shared: item.shared,
+            rootFolderType: item.rootFolderType,
           } as TBreadCrumb,
         ]);
         setSelectedItemId(item.id);
         setSearchValue("");
+        selectedFileInfoRef.current = null;
         setSelectedFileInfo(null);
 
         if (
           item.parentId === 0 &&
           (item.rootFolderType === FolderType.VirtualRooms ||
+            item.rootFolderType === FolderType.FillingFormsRoom ||
             item.rootFolderType === FolderType.AiAgents)
         ) {
+          setIsFormsSection(
+            item.rootFolderType === FolderType.FillingFormsRoom,
+          );
           setSelectedItemType(
             item.rootFolderType === FolderType.AiAgents ? "agents" : "rooms",
           );
@@ -466,14 +569,20 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
         if (checkCreating && item.id) {
           try {
-            const res = await filesApi.createFile(Number(item.id), {
-              title: t("NewDocument"),
+            const res = await filesApi.createFile({
+              folderId: Number(item.id),
+              createFileJsonElement: {
+                title: t("NewDocument"),
+              },
             });
             const fileId = res.data.response?.id;
             if (fileId != null) {
-              await filesApi.deleteFile(fileId, {
-                deleteAfter: true,
-                immediately: true,
+              await filesApi.deleteFile({
+                fileId,
+                _delete: {
+                  deleteAfter: true,
+                  immediately: true,
+                },
               });
             }
             setIsDisabledFolder(false);
@@ -491,14 +600,16 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
               (f.roomType === RoomType.CustomRoom && f.shared),
           ) > -1;
 
-        setSelectedFileInfo({
+        const newFileInfo = {
           id: item.id,
           title: item.label,
           fileExst: item.fileExst,
           fileType: item.fileType,
           viewUrl: item.viewUrl,
           inPublic,
-        });
+        };
+        selectedFileInfoRef.current = newFileInfo as TSelectedFileInfo;
+        setSelectedFileInfo(newFileInfo);
 
         if (isDoubleClick) {
           doubleClickCallback();
@@ -532,7 +643,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
   React.useEffect(() => {
     if (!selectedItemId) return;
-    if (selectedItemId && isRoot) return unsubscribe(+selectedItemId);
+    if (selectedItemId && isRoot) return unsubscribe();
 
     subscribe(selectedItemId);
   }, [selectedItemId, isRoot, unsubscribe, subscribe]);
@@ -670,9 +781,10 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         fileName,
         isChecked,
         selectedTreeNode,
-        selectedFileInfo,
+        selectedFileInfoRef.current,
         isInsideKnowledge,
         isInsideResultStorage,
+        isInsidePrivateRoom,
       );
     },
     [
@@ -680,10 +792,11 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       onSubmit,
       selectedItemId,
       selectedTreeNode,
-      selectedFileInfo,
+      selectedFileInfoRef,
       folderIsShared,
       isInsideKnowledge,
       isInsideResultStorage,
+      isInsidePrivateRoom,
     ],
   );
 
@@ -758,6 +871,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       isDisabledFolder,
       isInsideKnowledge,
       isInsideResultStorage,
+      isInsidePrivateRoom,
     ),
 
     selectedTreeNode,

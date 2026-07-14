@@ -6,9 +6,29 @@ if (typeof SVGSVGElement === "undefined") {
     class SVGSVGElement {} as unknown as typeof globalThis.SVGSVGElement;
 }
 
+// jsdom doesn't provide ResizeObserver, used by components that observe
+// container-driven size changes (e.g. TableHeader).
+if (typeof ResizeObserver === "undefined") {
+  (globalThis as Record<string, unknown>).ResizeObserver = class ResizeObserver {
+    observe(): void {}
+
+    unobserve(): void {}
+
+    disconnect(): void {}
+  };
+}
+
 import enCommon from "../locales/en/Common.json";
 import type { TTranslations } from "../providers/translation/i18n";
 import { getI18NInstance } from "../providers/translation/i18n";
+import { setBrandLookup } from "../constants/brands";
+import { parseLocaleConstants } from "../utils/parse-locale-constants";
+import brandsData from "../../../public/locales/.constants/brands.json";
+
+const { get: getBrand } = parseLocaleConstants(
+  brandsData as Record<string, string>,
+);
+setBrandLookup(getBrand);
 
 // Node.js 22+ exposes a built-in `localStorage` that lacks standard Web Storage
 // methods (clear, setItem, etc.), which shadows the jsdom implementation.

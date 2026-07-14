@@ -43,20 +43,24 @@
     --tag-font-size: 13px;
   }
 
+  --tag-padding: var(--tag-inner-padding, 1px 7px);
+  --tag-margin-end: var(--tag-spacing-end, 4px);
+  --tag-max-height: var(--tag-height, 22px);
+
   position: relative;
   width: fit-content;
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  padding: 1px 7px;
-  margin-inline-end: 4px;
-  background: var(--tag-background);
+  padding: var(--tag-padding);
+  margin-inline-end: var(--tag-margin-end);
+  background: var(--tag-bg, var(--tag-background));
 
-  max-height: 22px;
+  max-height: var(--tag-max-height);
 
-  border-radius: var(--tag-border-radius);
-  border: var(--tag-border);
+  border-radius: var(--tag-radius, var(--tag-border-radius));
+  border: var(--tag-border-style, var(--tag-border));
 
   .icon {
     display: flex;
@@ -145,10 +149,10 @@
 }
 
 .tagText {
-  color: var(--tag-color);
-  line-height: var(--tag-text-line-height);
+  color: var(--tag-text-color, var(--tag-color));
+  line-height: var(--tag-lh, var(--tag-text-line-height));
   pointer-events: none;
-  font-size: var(--tag-font-size);
+  font-size: var(--tag-size, var(--tag-font-size));
 
   &.isDefault {
     color: var(--tag-default-color);

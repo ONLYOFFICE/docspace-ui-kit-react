@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 import { makeAutoObservable } from "mobx";
 import React from "react";
@@ -86,6 +95,8 @@ export default class MessageStore {
 
   toolsConfirmQueue: string[] = [];
 
+  hasFormAttached: boolean = false;
+
   onStreamData?: (chunk: string) => void;
 
   constructor(aiApi: AiApi) {
@@ -128,6 +139,10 @@ export default class MessageStore {
 
   setCurrentChatId = (chatId: string) => {
     this.currentChatId = chatId;
+  };
+
+  setHasFormAttached = (hasFormAttached: boolean) => {
+    this.hasFormAttached = hasFormAttached;
   };
 
   setMessages = (messages: TMessage[]) => {
@@ -376,40 +391,6 @@ export default class MessageStore {
     }
   };
 
-  handleGenerateDoc = (content: TToolCallContent) => {
-    const { type } = content;
-
-    if (type !== ContentType.Tool) return;
-
-    const { name, result } = content;
-
-    if (
-      name !== this.generateDocxToolName &&
-      name !== this.generateFormToolName &&
-      name !== this.generatePresentationToolName
-    )
-      return;
-
-    const data = (result as { data?: { id?: number; title?: string } })?.data;
-
-    if (typeof data?.id !== "number" || typeof data?.title !== "string") {
-      console.error("Unexpected generateDoc result shape", data);
-      return;
-    }
-
-    const fileId = Number(data?.id);
-    if (!Number.isInteger(fileId) || fileId <= 0) return;
-
-    const webSearchParams = new URLSearchParams();
-
-    webSearchParams.append("fileId", String(fileId));
-    webSearchParams.append("withTool", "true");
-
-    const url = `${window.location.origin}/doceditor?${webSearchParams.toString()}`;
-
-    window.open(url, "_blank");
-  };
-
   handleToolCall = (jsonData: string) => {
     let parsed;
     try {
@@ -435,12 +416,18 @@ export default class MessageStore {
     const shouldCreateNewMessage =
       lastMessage?.role !== RoleType.AssistantMessage;
 
+    const isGenerateTool =
+      name === this.generateDocxToolName ||
+      name === this.generateFormToolName ||
+      name === this.generatePresentationToolName;
+
     const content = {
       type: ContentType.Tool,
       name,
       arguments: args,
       callId,
       ...rest,
+      ...(isGenerateTool ? { managed: true } : {}),
     };
 
     if (shouldCreateNewMessage) {
@@ -509,8 +496,6 @@ export default class MessageStore {
     };
 
     this.replaceLastMessage(newMsg);
-
-    this.handleGenerateDoc(content);
   };
 
   handleStreamError = (jsonData: string, error?: unknown) => {
@@ -555,6 +540,9 @@ export default class MessageStore {
       return;
     }
 
+    let analyzeTimer: ReturnType<typeof setTimeout> | null =
+      null;
+
     try {
       const textDecoder = new TextDecoder();
 
@@ -567,10 +555,35 @@ export default class MessageStore {
       let chunkIdx = -1;
       let isReasoningRunning = false;
 
+      const hasPendingToolCall = () => {
+        const lastMsg = this.getLastMessage();
+        if (!lastMsg) return false;
+        return lastMsg.contents.some(
+          (c) =>
+            (c as TToolCallContent).type ===
+              ContentType.Tool &&
+            !(c as TToolCallContent).result,
+        );
+      };
+
+      const resetAnalyzeTimer = () => {
+        if (analyzeTimer) clearTimeout(analyzeTimer);
+        analyzeTimer = setTimeout(() => {
+          if (
+            this.toolsConfirmQueue.length > 0 ||
+            hasPendingToolCall()
+          ) {
+            return;
+          }
+          this.setIsAnalyzing(true);
+        }, 1000);
+      };
+
       const streamHandler = async () => {
         const { done, value } = await reader.read();
 
         if (done) {
+          if (analyzeTimer) clearTimeout(analyzeTimer);
           this.setIsRequestRunning(false);
           this.setIsStreamRunning(false);
           this.setIsAnalyzing(false);
@@ -774,6 +787,8 @@ export default class MessageStore {
             }
           });
 
+          resetAnalyzeTimer();
+
           await streamHandler();
         } catch (e) {
           console.error(e);
@@ -788,6 +803,7 @@ export default class MessageStore {
       console.error(e);
       toastr.error(e as string);
     } finally {
+      if (analyzeTimer) clearTimeout(analyzeTimer);
       this.setIsRequestRunning(false);
       this.setIsStreamRunning(false);
       this.setIsAnalyzing(false);

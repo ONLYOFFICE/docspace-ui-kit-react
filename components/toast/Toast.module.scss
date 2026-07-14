@@ -107,15 +107,18 @@
   --toastr-title-info-color: #{$dark-black};
   --toastr-svg-info-color: #{$black};
 
+  --toast-container-width: var(--toast-width, 320px);
+  --toast-container-inset-end: var(--toast-inset-end, 24px);
+
   z-index: 9999;
   -webkit-transform: translateZ(9999px);
   position: fixed;
   padding: 4px;
-  width: 320px;
+  width: var(--toast-container-width);
   box-sizing: border-box;
   color: var(--toast-text-color-comp);
   top: var(--toast-top-offset);
-  inset-inline-end: 24px;
+  inset-inline-end: var(--toast-container-inset-end);
   margin-top: 0;
   -webkit-tap-highlight-color: var(--toast-tap-highlight);
 
@@ -208,14 +211,18 @@
       overflow: hidden;
       cursor: pointer;
 
-      border-radius: 6px;
-      -moz-border-radius: 6px;
-      -webkit-border-radius: 6px;
+      --toast-border-radius: var(--toast-radius, 6px);
+      --toast-inner-padding: var(--toast-padding, 12px);
+      --toast-font-size-value: var(--toast-text-size, 12px);
+
+      border-radius: var(--toast-border-radius);
+      -moz-border-radius: var(--toast-border-radius);
+      -webkit-border-radius: var(--toast-border-radius);
       color: var(--toast-text-color);
       margin: 0 0 12px;
-      padding: 12px;
+      padding: var(--toast-inner-padding);
       min-height: 32px;
-      font-size: 12px;
+      font-size: var(--toast-font-size-value);
       font-weight: normal;
       width: 100%;
       inset-inline-end: 0;

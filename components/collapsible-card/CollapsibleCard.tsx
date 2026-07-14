@@ -1,0 +1,101 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import React from "react";
+import classNames from "classnames";
+
+import ArrowIcon from "../../assets/arrow.react.svg";
+
+import styles from "./CollapsibleCard.module.scss";
+import type { CollapsibleCardProps } from "./CollapsibleCard.types";
+
+const useUniqueId = (prefix: string) =>
+  React.useId().replace(/:/g, "-").concat(`-${prefix}`);
+
+export const CollapsibleCard = ({
+  title,
+  description,
+  children,
+  isOpen,
+  defaultOpen = false,
+  onToggle,
+  className,
+  style,
+  dataTestId,
+}: CollapsibleCardProps) => {
+  const isControlled = isOpen !== undefined;
+  const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
+  const open = isControlled ? isOpen : internalOpen;
+
+  const bodyId = useUniqueId("body");
+
+  const handleToggle = () => {
+    const next = !open;
+    if (!isControlled) setInternalOpen(next);
+    onToggle?.(next);
+  };
+
+  return (
+    <div
+      className={classNames(styles.container, className)}
+      style={style}
+      data-testid={dataTestId ?? "collapsible-card"}
+      data-open={open ? "true" : "false"}
+    >
+      <button
+        type="button"
+        className={styles.header}
+        onClick={handleToggle}
+        aria-expanded={open}
+        aria-controls={bodyId}
+      >
+        <span className={styles.heading}>
+          <span className={styles.title}>{title}</span>
+          {description ? (
+            <span className={styles.description}>{description}</span>
+          ) : null}
+        </span>
+        <span className={styles.chevron} aria-hidden="true">
+          <ArrowIcon />
+        </span>
+      </button>
+      {open && children ? (
+        <div id={bodyId} className={styles.body}>
+          {children}
+        </div>
+      ) : null}
+    </div>
+  );
+};

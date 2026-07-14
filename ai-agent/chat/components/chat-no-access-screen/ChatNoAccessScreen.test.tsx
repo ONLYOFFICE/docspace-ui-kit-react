@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -79,25 +88,37 @@ describe("<ChatNoAccessScreen />", () => {
     goToAISettings: vi.fn(),
   };
 
-  it("renders with user description when not an admin", () => {
+  it("renders with saas user title and description when not an admin", () => {
     render(<ChatNoAccessScreen {...defaultProps} />);
 
     expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
-      "AIFeaturesAreCurrentlyDisabled",
+      "EmptyAIAgentsNotActiveYetTitle",
     );
-    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
-      "EmptyChatAIDisabledUserDescription",
+    const description = screen.getByTestId("empty-view-description");
+    expect(description).toHaveTextContent(
+      "EmptyAIDisabledContactAdminDesc",
     );
     expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
 
     expect(EmptyView).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: "AIFeaturesAreCurrentlyDisabled",
-        description: "EmptyChatAIDisabledUserDescription",
+        title: "EmptyAIAgentsNotActiveYetTitle",
         options: [],
       }),
       undefined,
     );
+  });
+
+  it("renders standalone user description", () => {
+    render(<ChatNoAccessScreen {...defaultProps} standalone={true} />);
+
+    expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
+      "AIFeaturesAreCurrentlyDisabled",
+    );
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "EmptyAIAgentsAIDisabledDescription",
+    );
+    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
   });
 
   it("renders with standalone admin title and description", () => {
@@ -133,33 +154,67 @@ describe("<ChatNoAccessScreen />", () => {
     );
   });
 
-  it("renders with saas admin description", () => {
+  it("renders saas admin with activate and benefits buttons", () => {
+    const onActivateAI = vi.fn();
+    const onShowAIBenefits = vi.fn();
+
     render(
       <ChatNoAccessScreen
         {...defaultProps}
         isPortalAdmin={true}
         standalone={false}
+        isCardLinkedToPortal={true}
+        isPayer={true}
+        onActivateAI={onActivateAI}
+        onShowAIBenefits={onShowAIBenefits}
       />,
     );
 
     expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
-      "AIFeaturesAreCurrentlyDisabled",
+      "EmptyAIAgentsNotActiveYetTitle",
     );
-    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
-      "EmptyChatAIDisabledSaasAdminDescription",
+    const description = screen.getByTestId("empty-view-description");
+    expect(description).toHaveTextContent("EmptyAIAgentsNotActiveYetDescription");
+    expect(description).toHaveTextContent(
+      "EmptyAIAgentsNotActiveYetDescriptionLine2",
     );
 
-    // Check for "Go to Settings" button
-    expect(screen.getByTestId("option-go-to-services")).toBeInTheDocument();
+    expect(screen.getByTestId("option-activate-ai")).toBeInTheDocument();
+    expect(screen.queryByTestId("option-ai-benefits")).not.toBeInTheDocument();
+  });
 
-    expect(EmptyView).toHaveBeenCalledWith(
-      expect.objectContaining({
-        title: "AIFeaturesAreCurrentlyDisabled",
-        description: "EmptyChatAIDisabledSaasAdminDescription",
-        options: [expect.objectContaining({ key: "go-to-services" })],
-      }),
-      undefined,
+  it("shows top up button for saas admin without a linked card", () => {
+    render(
+      <ChatNoAccessScreen
+        {...defaultProps}
+        isPortalAdmin={true}
+        standalone={false}
+        isCardLinkedToPortal={false}
+        onTopUpAndActivateAI={vi.fn()}
+        onShowAIBenefits={vi.fn()}
+      />,
     );
+
+    expect(
+      screen.getByTestId("option-top-up-and-activate-ai"),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId("option-ai-benefits")).not.toBeInTheDocument();
+  });
+
+  it("hides buttons for saas admin who is not the payer", () => {
+    render(
+      <ChatNoAccessScreen
+        {...defaultProps}
+        isPortalAdmin={true}
+        standalone={false}
+        isCardLinkedToPortal={true}
+        isPayer={false}
+        onActivateAI={vi.fn()}
+        onShowAIBenefits={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
   });
 
   it("hides settings button if goToAISettings is not provided", () => {
