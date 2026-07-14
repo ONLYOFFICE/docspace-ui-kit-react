@@ -33,31 +33,59 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-/*
- * The chrome (overlay, header, close, sizing) comes from the DocSpace
- * `ModalDialog`. This wrapper only owns the body padding around the widget's
- * own children, which `ModalDialog` renders with `withoutPadding`.
- *
- * Non-warning dialogs keep the 32px inset the library assumes, so consumer
- * footers that bleed full-width via `mx-[-32px]` stay aligned. The warning /
- * confirmation variant uses the tighter 16px inset and the DocSpace 13px body
- * text.
- */
+import React from "react";
+import classNames from "classnames";
 
-.body {
-  padding: 0 32px 16px;
+import type { DialogFooterProps } from "@onlyoffice/ai-chat";
 
-  :global([class*="h-[40px]"]) {
-    height: 100%;
-    padding-block-end: 8px;
-  }
-}
+import { Button, ButtonSize } from "../../../../components/button";
 
-.warning {
-  padding-inline: 16px;
-}
+import styles from "./DialogFooter.module.scss";
 
-.warning p {
-  font-size: var(--modal-dialog-body-font-size, 13px);
-  line-height: var(--modal-dialog-body-line-height, 20px);
-}
+const DialogFooterOverride: React.FC<DialogFooterProps> = ({
+  cancelLabel,
+  onCancel,
+  cancelType = "button",
+  cancelDisabled,
+  submitLabel,
+  onSubmit,
+  submitType = "button",
+  submitDisabled,
+  submitLoading,
+  className,
+  buttonClassName,
+}) => {
+  // Rendered as a <footer> (not a <div>) on purpose: the DocSpace
+  // `DialogContent` override styles legacy inline footers via a
+  // `.body div:has(> button)` rule. Using a non-div element keeps this
+  // override's layout self-contained instead of being reset by that rule.
+  return (
+    <footer className={classNames(styles.footer, className)}>
+      <Button
+        primary
+        scale
+        type={submitType}
+        label={submitLabel}
+        size={ButtonSize.normal}
+        isDisabled={submitDisabled}
+        isLoading={submitLoading}
+        onClick={onSubmit}
+        className={buttonClassName}
+      />
+      <Button
+        scale
+        type={cancelType}
+        label={cancelLabel}
+        size={ButtonSize.normal}
+        isDisabled={cancelDisabled}
+        onClick={onCancel}
+        className={buttonClassName}
+      />
+    </footer>
+  );
+};
+
+DialogFooterOverride.displayName = "DialogFooterOverride";
+
+export { DialogFooterOverride };
+

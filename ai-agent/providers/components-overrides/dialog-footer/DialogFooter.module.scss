@@ -34,30 +34,15 @@
  */
 
 /*
- * The chrome (overlay, header, close, sizing) comes from the DocSpace
- * `ModalDialog`. This wrapper only owns the body padding around the widget's
- * own children, which `ModalDialog` renders with `withoutPadding`.
- *
- * Non-warning dialogs keep the 32px inset the library assumes, so consumer
- * footers that bleed full-width via `mx-[-32px]` stay aligned. The warning /
- * confirmation variant uses the tighter 16px inset and the DocSpace 13px body
- * text.
+ * DocSpace footer for the widget's dialogs: the primary (submit) and
+ * secondary (cancel) actions sit side by side and share the row width
+ * (each button opts into full width via its own `scale` prop).
  */
-
-.body {
-  padding: 0 32px 16px;
-
-  :global([class*="h-[40px]"]) {
-    height: 100%;
-    padding-block-end: 8px;
-  }
+.footer {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block-start: 16px;
 }
 
-.warning {
-  padding-inline: 16px;
-}
-
-.warning p {
-  font-size: var(--modal-dialog-body-font-size, 13px);
-  line-height: var(--modal-dialog-body-line-height, 20px);
-}
