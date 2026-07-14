@@ -257,13 +257,39 @@ const AiAgentProviders = ({
 
   const onToolCallApproveResult = useCallback(
     (result: unknown, ctx: ToolCallApproveContext) => {
-      const payload = result as {
-        id?: unknown;
-        data?: { id?: unknown };
-      } | null;
+      console.log(
+        "%c[ai-agent] onToolCallApproveResult",
+        "color: green; font-weight: bold",
+        { toolName: ctx.toolName, toolArgs: ctx.toolArgs, result },
+      );
+      // The tool result arrives as a JSON string (the backend serializes it
+      // for the LLM); parse it before reading the created file id, but keep
+      // accepting a ready object in case the lib changes the contract.
+      type GenerateResult = { id?: unknown; data?: { id?: unknown } } | null;
+      let payload: GenerateResult = null;
+      if (typeof result === "string") {
+        try {
+          payload = JSON.parse(result) as GenerateResult;
+        } catch {
+          payload = null;
+        }
+      } else {
+        payload = result as GenerateResult;
+      }
       const rawId = payload?.data?.id ?? payload?.id;
-      if (typeof rawId !== "number" && typeof rawId !== "string") return;
-      if (openedGenerateFilesRef.current.has(rawId)) return;
+      if (typeof rawId !== "number" && typeof rawId !== "string") {
+        console.warn(
+          "[ai-agent] onToolCallApproveResult: no file id in result — skip",
+          result,
+        );
+        return;
+      }
+      if (openedGenerateFilesRef.current.has(rawId)) {
+        console.log(
+          `[ai-agent] onToolCallApproveResult: file ${rawId} already opened — skip`,
+        );
+        return;
+      }
 
       openedGenerateFilesRef.current.add(rawId);
 
@@ -272,6 +298,9 @@ const AiAgentProviders = ({
       const editorToolName =
         EDITOR_TOOL_NAME_BY_CHAT_TOOL[ctx.toolName] ?? ctx.toolName;
 
+      console.log(
+        `[ai-agent] opening generated file ${rawId} with editor tool "${editorToolName}"`,
+      );
       openGeneratedFileWithToolCall(rawId, editorToolName, ctx.toolArgs);
     },
     [],

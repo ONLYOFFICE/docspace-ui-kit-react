@@ -479,6 +479,12 @@ export const openGeneratedFileWithToolCall = (
 ): void => {
   if (typeof window === "undefined") return;
 
+  console.log(
+    "%c[host-tool-groups] openGeneratedFileWithToolCall",
+    "color: green; font-weight: bold",
+    { fileId, toolName, toolArgs },
+  );
+
   const url = `${window.location.origin}/doceditor?fileId=${encodeURIComponent(
     String(fileId),
   )}`;
@@ -489,6 +495,10 @@ export const openGeneratedFileWithToolCall = (
     );
     return;
   }
+  console.log(
+    "[host-tool-groups] editor tab opened, waiting for editorDocumentReady",
+    { url },
+  );
 
   let settled = false;
   const finish = () => {
@@ -509,6 +519,10 @@ export const openGeneratedFileWithToolCall = (
       return;
 
     finish();
+    console.log(
+      `[host-tool-groups] editor ready, sending tool call "${toolName}"`,
+      { fileId, toolArgs },
+    );
     editorWindow.postMessage(
       {
         type: CALL_TOOL_MESSAGE,
@@ -523,6 +537,15 @@ export const openGeneratedFileWithToolCall = (
   window.addEventListener("message", onReady);
 
   // Fail-safe: stop listening if the editor never signals readiness.
-  const timeoutId = setTimeout(finish, EDITOR_READY_TIMEOUT_MS);
+  const timeoutId = setTimeout(() => {
+    if (!settled) {
+      console.warn(
+        "[host-tool-groups] openGeneratedFileWithToolCall: editor never " +
+          `signaled readiness within ${EDITOR_READY_TIMEOUT_MS}ms — giving up`,
+        { fileId, toolName },
+      );
+    }
+    finish();
+  }, EDITOR_READY_TIMEOUT_MS);
 };
 
