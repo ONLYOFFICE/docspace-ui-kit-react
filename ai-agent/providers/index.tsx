@@ -97,6 +97,7 @@ import {
   type EditorToolsChangedDetail,
 } from "./host-tool-groups";
 import { useFilesIntegration } from "./files";
+import { openAttachedFile } from "./files/open-file";
 
 // The host app (DocSpace) uses `i18n.createInstance()` and provides that
 // instance via `<I18nextProvider>` at the app root. ai-chat, however, calls
@@ -223,6 +224,7 @@ const AiAgentProviders = ({
     locale: aiChatLocale,
     theme,
     onSaveAsFile,
+    onOpenFile: openAttachedFile,
   });
 
   // Tools that occupy the "editor" host group. `open_file` swaps this to the
