@@ -204,6 +204,12 @@
 .splitView {
   display: grid;
   grid-template-columns: 380px 1fr;
+  // Without an explicit row track the single implicit row is `auto`: it
+  // sizes to the tallest column's content, so a long chat history makes
+  // the whole grid overflow the section and history + chat scroll
+  // together. `minmax(0, 1fr)` pins the row to the grid height so each
+  // column stays bounded and scrolls internally.
+  grid-template-rows: minmax(0, 1fr);
   height: 100%;
   min-height: 0;
   box-sizing: border-box;
@@ -211,6 +217,9 @@
   .historyColumn {
     height: 100%;
     min-height: 0;
+    // The ChatList inside owns the vertical scroll; clip anything else so
+    // the column itself never becomes a second scroller.
+    overflow: hidden;
     border-inline-end: 1px solid var(--info-panel-border-color);
   }
 }
