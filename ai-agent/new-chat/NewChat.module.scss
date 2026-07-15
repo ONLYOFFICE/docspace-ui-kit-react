@@ -130,6 +130,15 @@
     letter-spacing: 0px;
   }
 
+  // The lib's "Analyzing" indicator is the only thread element sized with a
+  // fixed w-[var(--thread-max-width)] (687px) instead of w-full + max-w. In
+  // chat columns narrower than that it inflates the grid track, so the chat
+  // visibly widens while the indicator is shown and snaps back when it goes.
+  // Fill the available width instead; its own max-w utility keeps the cap.
+  :global([class*="w-[var(--thread-max-width)]"]:not([class*="w-full"])) {
+    width: 100%;
+  }
+
   :global([style*="--chat-welcome-color"]) {
     font-size: 18px !important;
     font-weight: 700 !important;
@@ -203,7 +212,10 @@
 
 .splitView {
   display: grid;
-  grid-template-columns: 380px 1fr;
+  // minmax(0, 1fr), not bare 1fr: a bare fr track has an auto minimum, so
+  // any fixed-width descendant (like the lib's Analyzing row) widens the
+  // chat column past the free space instead of overflowing inside it.
+  grid-template-columns: 380px minmax(0, 1fr);
   // Without an explicit row track the single implicit row is `auto`: it
   // sizes to the tallest column's content, so a long chat history makes
   // the whole grid overflow the section and history + chat scroll
