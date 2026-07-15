@@ -33,24 +33,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-/*
- * The chrome (overlay, header, close, sizing) comes from the DocSpace
- * `ModalDialog`. This wrapper only owns the body padding around the widget's
- * own children, which `ModalDialog` renders with `withoutPadding`.
- *
- * Non-warning dialogs keep the 32px inset the library assumes, so consumer
- * footers that bleed full-width via `mx-[-32px]` stay aligned. The warning /
- * confirmation variant uses the tighter 16px inset and the DocSpace 13px body
- * text.
- */
-
 .body {
-  padding: 0 32px 16px;
-
-  :global([class*="h-[40px]"]) {
-    height: 100%;
-    padding-block-end: 8px;
-  }
+  padding-inline: 16px;
+  padding-block: 0px 16px;
 }
 
 .warning {

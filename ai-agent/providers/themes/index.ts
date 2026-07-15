@@ -434,6 +434,14 @@ const buildTokens = (
 
   // Misc
   "--action-gap": "16px",
+
+  "--delete-chat-dialog-message-height": "100%",
+  "--delete-profile-dialog-message-height": "100%",
+  "--delete-folder-dialog-message-height": "100%",
+
+  "--new-folder-dialog-body-padding-y": "0px",
+  "--edit-prompt-dialog-body-padding-y": "0px",
+  "--rename-folder-dialog-body-padding-y": "0px",
 });
 
 // DocSpace Base — light palette. Mapped from globalColors to mirror the
