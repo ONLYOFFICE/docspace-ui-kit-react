@@ -115,9 +115,7 @@ const AiSearchPage = (props: AiSearchPageProps) => {
   const isDisabled = isServiceActionDisabled!;
 
   useEffect(() => {
-    if (!isInitServicesData) {
-      initServiceData(t, AI_SEARCH, AI_SEARCH_ENUM, integrationUrl);
-    }
+    initServiceData(t, AI_SEARCH, AI_SEARCH_ENUM, integrationUrl);
   }, []);
 
   useEffect(() => {
