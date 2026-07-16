@@ -38,6 +38,13 @@ import { attachFilesToChat, type AttachFileInput } from "./attach-files";
 
 export type DeviceUploaderHandle = { open: () => void };
 
+// Archives make no sense as chat attachments: the AI backend cannot extract
+// text from them, so they are rejected up front with the same "unsupported
+// file type" toast the uploader always showed. Extension-based on purpose —
+// browsers report unreliable (often empty) mime types for archives.
+const ARCHIVE_EXTENSION =
+  /\.(zip|rar|7z|tar|gz|tgz|bz2|tbz2?|xz|txz|zst|lz|lzma|cab|iso)$/i;
+
 type DeviceUploaderProps = {
   // Chat scope (current room/folder id). Device files are uploaded there as
   // real portal files; when absent they land in My documents.
@@ -74,7 +81,22 @@ const DeviceUploader = React.forwardRef<DeviceUploaderHandle, DeviceUploaderProp
 
     const onChange = React.useCallback(
       async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const picked = Array.from(e.target.files ?? []);
+        const allPicked = Array.from(e.target.files ?? []);
+        if (allPicked.length === 0) return;
+
+        const unsupported = allPicked
+          .filter((f) => ARCHIVE_EXTENSION.test(f.name))
+          .map((f) => f.name);
+        if (unsupported.length > 0) {
+          toastr.error(
+            t("Common:UnsupportedFileType", {
+              files: unsupported.join(", "),
+              defaultValue: "Unsupported file type: {{files}}",
+            }),
+          );
+        }
+
+        const picked = allPicked.filter((f) => !ARCHIVE_EXTENSION.test(f.name));
         if (picked.length === 0) return;
 
         const inputs: AttachFileInput[] = [];
