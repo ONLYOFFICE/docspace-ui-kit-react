@@ -199,15 +199,15 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
         }
 
         if (!hasScheduledStorageChange && currentStoragePlanSize! > 0) {
-          return t("CurrentPaymentMonth", {
-            price: formatWalletCurrency(
+          return t("CurrentSubscriptionInfo", {
+            amount: formatWalletCurrency(
               calculateTotalPrice(
                 currentStoragePlanSize!,
                 storagePriceIncrement,
               ),
               2,
             ),
-            size: `${currentStoragePlanSize} ${t("Gigabyte")}`,
+            info: `${currentStoragePlanSize} ${t("Gigabyte")}`,
           });
         }
 

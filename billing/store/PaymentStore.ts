@@ -778,6 +778,12 @@ class PaymentStore {
     this.filterContact = null;
   };
 
+  resetTransactionHistory = () => {
+    this.transactionHistory = [];
+    this.isTransactionHistoryExist = false;
+    this.isTransactionLoading = true;
+  };
+
   getEndTransactionDate = (format = "yyyy-MM-dd'T'HH:mm:ss") => {
     return formatDateUtil(now(), format);
   };

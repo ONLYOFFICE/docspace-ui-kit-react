@@ -60,6 +60,7 @@ import {
   useProfiles,
   useServers,
   useThread,
+  type WidgetConfig,
 } from "@onlyoffice/ai-chat";
 import type {
   ChatCallbacks,
@@ -276,7 +277,7 @@ const AiAgentProviders = ({
     [],
   );
 
-  const widgetConfig = useMemo(
+  const widgetConfig = useMemo<WidgetConfig>(
     () => ({
       composerActions,
       composerHeader,
@@ -287,6 +288,7 @@ const AiAgentProviders = ({
       onToolCallApproveResult,
       composerActionSendSize: 32,
       composerPlaceholder: t("AskAnyQuestion"),
+      webSearchSaveMode: "button",
     }),
     [
       composerActions,

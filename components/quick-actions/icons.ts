@@ -52,3 +52,4 @@ export { default as CreateSpreadsheetIcon } from "../../assets/create.spreadshee
 export { default as GeneratePdfAiIcon } from "../../assets/generate.pdf.ai.react.svg";
 export { default as GenerateWithAiIcon } from "../../assets/generate.with.ai.react.svg";
 export { default as UseTemplateIcon } from "../../assets/use.template.react.svg";
+export { default as AIChatIcon } from "../../assets/ai.chat.svg";
