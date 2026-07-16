@@ -33,11 +33,79 @@ import { FolderType } from "@onlyoffice/docspace-api-sdk";
 import { useApi as useFilesApi } from "../../../providers/api";
 import FilesSelector from "../../../selectors/Files";
 import { toastr, type TData } from "../../../components/toast";
+import SocketHelper, {
+  SocketCommands,
+  SocketEvents,
+  type TOptSocket,
+} from "../../../utils/socket";
+import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import useGetIcon from "../../chat/hooks/useGetIcon";
 
 import useDeviceType from "./use-device-type";
 
 const stripDocxExt = (name: string) => name.replace(/\.docx$/i, "");
+
+// How long to wait for the AI Worker to deliver the converted .docx before
+// silently dropping the completion watcher (no error toast — the file may
+// still arrive later; the user just won't get the notification).
+const EXPORT_WATCH_TIMEOUT_MS = 2 * 60 * 1000;
+
+// The export is asynchronous: `startTextToDocx` only queues the conversion,
+// and the saved file surfaces as the standard `s:modify-folder` create
+// event. Watch that event for a file with the expected name in the target
+// folder and toast once it lands. Module-level on purpose — the dialog
+// closes right after the export starts, so the watcher must outlive it.
+const watchForExportedFile = (
+  folderId: number,
+  title: string,
+  onCreated: (createdTitle: string) => void,
+) => {
+  const roomPart = `DIR-${folderId}`;
+  // Join the folder's socket room if nobody has yet — and never leave it.
+  // SocketHelper's subscription map is flat (no ref-counting), so an
+  // unsubscribe here would also kill the room for any consumer that
+  // subscribed after us (e.g. the files view navigating into this folder).
+  // A lingering joined room is cheap: its events just go unhandled once
+  // the watcher below detaches, and the natural owner's own lifecycle
+  // (subscribe on enter / unsubscribe on leave) keeps working.
+  if (!SocketHelper?.socketSubscribers.has(roomPart)) {
+    SocketHelper?.emit(SocketCommands.Subscribe, {
+      roomParts: roomPart,
+      individual: true,
+    });
+  }
+
+  const expectedBase = stripDocxExt(title);
+  let timer: ReturnType<typeof setTimeout> | null = null;
+
+  const cleanup = () => {
+    if (timer) clearTimeout(timer);
+    timer = null;
+    SocketHelper?.off(SocketEvents.ModifyFolder, handler);
+  };
+
+  const handler = (opt?: TOptSocket) => {
+    if (opt?.cmd !== "create" || opt?.type !== "file" || !opt?.data) return;
+    try {
+      const file = JSON.parse(opt.data) as { folderId?: unknown; title?: unknown };
+      if (String(file.folderId) !== String(folderId)) return;
+      // The converter dedupes clashing names ("name (1).docx"), so match by
+      // the base-name prefix rather than exact equality.
+      if (
+        typeof file.title !== "string" ||
+        !stripDocxExt(file.title).startsWith(expectedBase)
+      )
+        return;
+      cleanup();
+      onCreated(file.title);
+    } catch {
+      // malformed payload — keep watching
+    }
+  };
+
+  SocketHelper?.on(SocketEvents.ModifyFolder, handler);
+  timer = setTimeout(cleanup, EXPORT_WATCH_TIMEOUT_MS);
+};
 
 type SaveDialogProps = {
   // Markdown body of the message to save, and the library's default file name
@@ -57,7 +125,7 @@ const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
   const { t } = useTranslation(["Common"]);
   const { currentDeviceType } = useDeviceType();
   const { getIcon } = useGetIcon();
-  const { filesApi } = useFilesApi();
+  const { filesApi, aiApi } = useFilesApi();
 
   const onSubmit = React.useCallback<
     React.ComponentProps<typeof FilesSelector>["onSubmit"]
@@ -65,18 +133,43 @@ const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
     async (selectedItemId, _folderTitle, _isPublic, _breadCrumbs, fileName) => {
       if (selectedItemId != null) {
         const title = /\.docx$/i.test(fileName) ? fileName : `${fileName}.docx`;
+        const folderId = Number(selectedItemId);
+        // Reuse the message-export toast key from the legacy chat (it has
+        // translations for every locale); without a `components` entry the
+        // <1>…</1> file name renders as plain text.
+        const exportedToast = (createdTitle: string) =>
+          toastr.success(
+            <CommonTrans
+              i18nKey="MessageExported"
+              values={{ fileName: createdTitle }}
+            />,
+          );
         try {
-          await filesApi.createTextFile({
-            folderId: Number(selectedItemId),
-            createTextOrHtmlFile: { title, content },
-          });
-        } catch (e) {
-          toastr.error(e as TData);
+          // Real md → docx conversion via the AI Worker. The call only
+          // queues the job; the toast fires when the converted file lands
+          // in the folder (files socket create event). Arm the watcher only
+          // after the queueing succeeded so a fallback save can't trigger a
+          // duplicate toast.
+          await aiApi.startTextToDocx(folderId, title, content);
+          watchForExportedFile(folderId, title, exportedToast);
+        } catch {
+          // Legacy fallback: write the raw markdown as a text file, exactly
+          // as this dialog behaved before the async export existed. The
+          // creation is synchronous here, so toast right away.
+          try {
+            await filesApi.createTextFile({
+              folderId,
+              createTextOrHtmlFile: { title, content },
+            });
+            exportedToast(title);
+          } catch (e) {
+            toastr.error(e as TData);
+          }
         }
       }
       onFinish();
     },
-    [content, filesApi, onFinish],
+    [content, filesApi, aiApi, onFinish],
   );
 
   const getIsDisabled = React.useCallback<
