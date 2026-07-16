@@ -84,7 +84,7 @@
   }
 
   :global(.composer-root) {
-    height: 90px;
+    max-height: max(30svh, 5rem);
     padding: 6px 8px;
     border-radius: 3px !important;
     border: none;
