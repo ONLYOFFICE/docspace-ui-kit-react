@@ -228,6 +228,24 @@ $compact-peek: 60px;
   user-select: none;
 }
 
+.tileTooltipAnchor {
+  display: flex;
+  flex: 1 1 $tile-width;
+  min-width: $tile-width;
+  max-width: $tile-max-width;
+
+  .tile {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+  }
+
+  @include media-queries.mobile {
+    flex: 1 1 calc(50% - #{$compact-gap});
+    min-width: 0;
+  }
+}
+
 // Loading placeholder: keeps the tile's box (size/radius/gap via .tile) but
 // drops the interactive affordances and lets the skeleton fill the whole tile.
 .skeletonTile {
