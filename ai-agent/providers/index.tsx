@@ -142,6 +142,13 @@ type AiAgentProvidersProps = {
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
   entityId?: string;
+  /**
+   * Explicitly controls the composer model picker. The chat lib hides the
+   * picker whenever `entityId` is set, but DocSpace scopes the chat by the
+   * current folder/room, so `entityId` alone no longer means "agent chat".
+   * Pass `true` only where the model is fixed (AI agent rooms).
+   */
+  hideProfilePicker?: boolean;
   composerHeader?: ReactNode;
   composerDisabled?: boolean;
   children: ReactNode;
@@ -206,6 +213,7 @@ const AiAgentProviders = ({
   openResultFile,
   closeEditorPanel,
   entityId,
+  hideProfilePicker = false,
   composerHeader,
   composerDisabled,
   children,
@@ -311,6 +319,10 @@ const AiAgentProviders = ({
       composerHeader,
       composerDisabled,
       entityId,
+      // Host-driven model-picker visibility: the lib falls back to hiding
+      // whenever entityId is set, but here entityId means "current
+      // folder/room scope", not "agent chat" — only agents fix the model.
+      hideProfilePicker,
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
@@ -323,6 +335,7 @@ const AiAgentProviders = ({
       composerHeader,
       composerDisabled,
       entityId,
+      hideProfilePicker,
       onToolCallApproveResult,
     ],
   );
