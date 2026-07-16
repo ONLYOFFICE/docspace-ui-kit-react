@@ -179,8 +179,6 @@ export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
     isEmptyPage?: boolean;
     /** Optional button shown in the header control area (e.g. Analyze responses for SubFolderDone) */
     analyzeResponsesButton?: React.ReactNode;
-    /** Optional AI Chat trigger rendered in the header control area. */
-    aiChatButton?: React.ReactNode;
     /** Optional "New chat" trigger rendered in the header control area (AI agent chat view). */
     newChatButton?: React.ReactNode;
 
@@ -203,7 +201,6 @@ export type TDropBoxProps = TArrowButtonProps &
     | "showTitle"
     | "isMobile"
     | "analyzeResponsesButton"
-    | "aiChatButton"
     | "newChatButton"
   > &
   TRowParam & {

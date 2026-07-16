@@ -28,6 +28,11 @@
 .chatPanel {
   :global(.aui-root) {
     --aui-font-base: 15px;
+
+    --chat-scroll-to-bottom-gap: 24px;
+    --chat-scroll-to-bottom-width: 40px;
+    --chat-scroll-to-bottom-height: 40px;
+    --chat-scroll-to-bottom-border-radius: 50%;
   }
 
   display: flex;
@@ -154,6 +159,14 @@
   //   font-weight: 400 !important;
   //   color: var(--text-color) !important;
   // }
+
+  :global(.scroll-to-bottom) {
+    :global(.light) :is(&, :global(.scroll-to-bottom_icon)) {
+      --icon-normal: #{colors.$light-gray-dark};
+    }
+
+    justify-content: center;
+  }
 }
 
 .chatListInset {
