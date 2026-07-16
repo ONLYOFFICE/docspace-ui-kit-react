@@ -268,7 +268,8 @@ const mapEditorToolToHostTool = (tool: EditorTool): HostTool => ({
   description: tool.description ?? "",
   inputSchema: tool.parameters ?? { type: "object", properties: {} },
   handler: async (args) => {
-    console.log(`[editor.${tool.name}] called with args:`, args);
+    // Names only — tool args may carry user content.
+    console.log(`[editor.${tool.name}] called`);
     const result = await callEditorTool(tool.name, args);
     return typeof result === "string" ? result : JSON.stringify({ result });
   },
@@ -479,10 +480,10 @@ export const openGeneratedFileWithToolCall = (
 ): void => {
   if (typeof window === "undefined") return;
 
+  // Trace the flow with tool names / file ids only — tool args may carry
+  // user content and must not be dumped to the console.
   console.log(
-    "%c[host-tool-groups] openGeneratedFileWithToolCall",
-    "color: green; font-weight: bold",
-    { fileId, toolName, toolArgs },
+    `[host-tool-groups] openGeneratedFileWithToolCall: file ${fileId}, tool "${toolName}"`,
   );
 
   const url = `${window.location.origin}/doceditor?fileId=${encodeURIComponent(
@@ -496,8 +497,7 @@ export const openGeneratedFileWithToolCall = (
     return;
   }
   console.log(
-    "[host-tool-groups] editor tab opened, waiting for editorDocumentReady",
-    { url },
+    `[host-tool-groups] editor tab opened for file ${fileId}, waiting for editorDocumentReady`,
   );
 
   let settled = false;
@@ -520,8 +520,7 @@ export const openGeneratedFileWithToolCall = (
 
     finish();
     console.log(
-      `[host-tool-groups] editor ready, sending tool call "${toolName}"`,
-      { fileId, toolArgs },
+      `[host-tool-groups] editor ready, sending tool call "${toolName}" for file ${fileId}`,
     );
     editorWindow.postMessage(
       {

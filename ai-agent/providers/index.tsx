@@ -259,11 +259,9 @@ const AiAgentProviders = ({
 
   const onToolCallApproveResult = useCallback(
     (result: unknown, ctx: ToolCallApproveContext) => {
-      console.log(
-        "%c[ai-agent] onToolCallApproveResult",
-        "color: green; font-weight: bold",
-        { toolName: ctx.toolName, toolArgs: ctx.toolArgs, result },
-      );
+      // Trace the flow only — never dump tool args or the result payload
+      // (they may carry user content).
+      console.log(`[ai-agent] onToolCallApproveResult: ${ctx.toolName}`);
       // The tool result arrives as a JSON string (the backend serializes it
       // for the LLM); parse it before reading the created file id, but keep
       // accepting a ready object in case the lib changes the contract.
@@ -281,8 +279,7 @@ const AiAgentProviders = ({
       const rawId = payload?.data?.id ?? payload?.id;
       if (typeof rawId !== "number" && typeof rawId !== "string") {
         console.warn(
-          "[ai-agent] onToolCallApproveResult: no file id in result — skip",
-          result,
+          `[ai-agent] onToolCallApproveResult: no file id in the "${ctx.toolName}" result — skip`,
         );
         return;
       }
