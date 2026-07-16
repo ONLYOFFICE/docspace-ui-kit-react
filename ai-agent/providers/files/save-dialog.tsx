@@ -38,6 +38,7 @@ import SocketHelper, {
   SocketEvents,
   type TOptSocket,
 } from "../../../utils/socket";
+import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import useGetIcon from "../../chat/hooks/useGetIcon";
 
 import useDeviceType from "./use-device-type";
@@ -135,12 +136,15 @@ const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
       if (selectedItemId != null) {
         const title = /\.docx$/i.test(fileName) ? fileName : `${fileName}.docx`;
         const folderId = Number(selectedItemId);
+        // Reuse the message-export toast key from the legacy chat (it has
+        // translations for every locale); without a `components` entry the
+        // <1>…</1> file name renders as plain text.
         const exportedToast = (createdTitle: string) =>
           toastr.success(
-            t("Common:ExportToDocxComplete", {
-              defaultValue: 'File "{{title}}" has been saved',
-              title: createdTitle,
-            }),
+            <CommonTrans
+              i18nKey="MessageExported"
+              values={{ fileName: createdTitle }}
+            />,
           );
         try {
           // Real md → docx conversion via the AI Worker. The call only
@@ -167,7 +171,7 @@ const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
       }
       onFinish();
     },
-    [content, filesApi, aiApi, onFinish, t],
+    [content, filesApi, aiApi, onFinish],
   );
 
   const getIsDisabled = React.useCallback<
