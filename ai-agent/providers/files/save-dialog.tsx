@@ -61,10 +61,14 @@ const watchForExportedFile = (
   onCreated: (createdTitle: string) => void,
 ) => {
   const roomPart = `DIR-${folderId}`;
-  // Don't disturb an existing subscription (e.g. the files view showing
-  // this folder) — only subscribe/unsubscribe when we own the room.
-  const ownsSubscription = !SocketHelper?.socketSubscribers.has(roomPart);
-  if (ownsSubscription) {
+  // Join the folder's socket room if nobody has yet — and never leave it.
+  // SocketHelper's subscription map is flat (no ref-counting), so an
+  // unsubscribe here would also kill the room for any consumer that
+  // subscribed after us (e.g. the files view navigating into this folder).
+  // A lingering joined room is cheap: its events just go unhandled once
+  // the watcher below detaches, and the natural owner's own lifecycle
+  // (subscribe on enter / unsubscribe on leave) keeps working.
+  if (!SocketHelper?.socketSubscribers.has(roomPart)) {
     SocketHelper?.emit(SocketCommands.Subscribe, {
       roomParts: roomPart,
       individual: true,
@@ -78,12 +82,6 @@ const watchForExportedFile = (
     if (timer) clearTimeout(timer);
     timer = null;
     SocketHelper?.off(SocketEvents.ModifyFolder, handler);
-    if (ownsSubscription) {
-      SocketHelper?.emit(SocketCommands.Unsubscribe, {
-        roomParts: roomPart,
-        individual: true,
-      });
-    }
   };
 
   const handler = (opt?: TOptSocket) => {
