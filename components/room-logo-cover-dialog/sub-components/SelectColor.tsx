@@ -35,8 +35,8 @@ import { DropDownItem } from "../../drop-down-item";
 import { ColorPicker } from "../../color-picker";
 import { globalColors } from "../../../providers/theme/themes";
 
-import PlusSvgUrl from "../../../assets/icons/16/button.plus.react.svg?url";
-import PencilSvgUrl from "../../../assets/pencil.react.svg?url";
+import PlusIcon from "../../../assets/icons/16/button.plus.react.svg";
+import PencilIcon from "../../../assets/pencil.react.svg";
 
 import type { SelectColorProps } from "../RoomLogoCoverDialog.types";
 import styles from "../RoomLogoCoverDialog.module.scss";
@@ -128,7 +128,7 @@ export const SelectColor = ({
                 <IconButton
                   className="select-color-plus-icon"
                   size={12}
-                  iconName={PencilSvgUrl}
+                  iconNode={<PencilIcon />}
                   onClick={onOpenColorPicker}
                   isFill
                 />
@@ -137,7 +137,7 @@ export const SelectColor = ({
               <IconButton
                 className="select-color-plus-icon"
                 size={12}
-                iconName={PencilSvgUrl}
+                iconNode={<PencilIcon />}
                 onClick={onOpenColorPicker}
                 isFill
               />
@@ -152,7 +152,7 @@ export const SelectColor = ({
             <IconButton
               className="select-color-plus-icon"
               size={16}
-              iconName={PlusSvgUrl}
+              iconNode={<PlusIcon />}
               onClick={onOpenColorPicker}
               isFill
             />
