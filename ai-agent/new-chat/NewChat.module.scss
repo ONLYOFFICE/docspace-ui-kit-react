@@ -28,6 +28,11 @@
 .chatPanel {
   :global(.aui-root) {
     --aui-font-base: 15px;
+
+    --chat-scroll-to-bottom-gap: 24px;
+    --chat-scroll-to-bottom-width: 40px;
+    --chat-scroll-to-bottom-height: 40px;
+    --chat-scroll-to-bottom-border-radius: 50%;
   }
 
   display: flex;
@@ -79,7 +84,11 @@
   }
 
   :global(.composer-root) {
-    height: 90px;
+    // Minimum, not a fixed height: the composer is a flex column and the
+    // attachment-chips row is its only child whose min-height resolves to 0
+    // (it has overflow-x: auto), so with a hard height the chips collapse
+    // to 0px and get clipped. Let the composer grow when chips appear.
+    min-height: 90px;
     padding: 6px 8px;
     border-radius: 3px !important;
     border: none;
@@ -126,6 +135,15 @@
     letter-spacing: 0px;
   }
 
+  // The lib's "Analyzing" indicator is the only thread element sized with a
+  // fixed w-[var(--thread-max-width)] (687px) instead of w-full + max-w. In
+  // chat columns narrower than that it inflates the grid track, so the chat
+  // visibly widens while the indicator is shown and snaps back when it goes.
+  // Fill the available width instead; its own max-w utility keeps the cap.
+  :global([class*="w-[var(--thread-max-width)]"]:not([class*="w-full"])) {
+    width: 100%;
+  }
+
   :global([style*="--chat-welcome-color"]) {
     font-size: 18px !important;
     font-weight: 700 !important;
@@ -141,6 +159,14 @@
   //   font-weight: 400 !important;
   //   color: var(--text-color) !important;
   // }
+
+  :global(.scroll-to-bottom) {
+    :global(.light) :is(&, :global(.scroll-to-bottom_icon)) {
+      --icon-normal: #{colors.$light-gray-dark};
+    }
+
+    justify-content: center;
+  }
 }
 
 .chatListInset {
@@ -199,7 +225,16 @@
 
 .splitView {
   display: grid;
-  grid-template-columns: 380px 1fr;
+  // minmax(0, 1fr), not bare 1fr: a bare fr track has an auto minimum, so
+  // any fixed-width descendant (like the lib's Analyzing row) widens the
+  // chat column past the free space instead of overflowing inside it.
+  grid-template-columns: 380px minmax(0, 1fr);
+  // Without an explicit row track the single implicit row is `auto`: it
+  // sizes to the tallest column's content, so a long chat history makes
+  // the whole grid overflow the section and history + chat scroll
+  // together. `minmax(0, 1fr)` pins the row to the grid height so each
+  // column stays bounded and scrolls internally.
+  grid-template-rows: minmax(0, 1fr);
   height: 100%;
   min-height: 0;
   box-sizing: border-box;
@@ -207,6 +242,9 @@
   .historyColumn {
     height: 100%;
     min-height: 0;
+    // The ChatList inside owns the vertical scroll; clip anything else so
+    // the column itself never becomes a second scroller.
+    overflow: hidden;
     border-inline-end: 1px solid var(--info-panel-border-color);
   }
 }

@@ -425,6 +425,8 @@ const buildTokens = (
   "--chat-message-tool-call-pre-background-color": "var(--background-normal)",
   "--chat-message-tool-call-pre-border-color": "var(--border-divider)",
   "--chat-message-tool-call-pre-color": "var(--text-normal)",
+  "--chat-scroll-to-bottom-background-color": "var(--highlight-button-pressed)",
+  "--chat-scroll-to-bottom-border-color": "transparent",
 
   // Composer action buttons
   "--attachment-button-color": p.attachmentButtonColor,
@@ -432,6 +434,14 @@ const buildTokens = (
 
   // Misc
   "--action-gap": "16px",
+
+  "--delete-chat-dialog-message-height": "100%",
+  "--delete-profile-dialog-message-height": "100%",
+  "--delete-folder-dialog-message-height": "100%",
+
+  "--new-folder-dialog-body-padding-y": "0px",
+  "--edit-prompt-dialog-body-padding-y": "0px",
+  "--rename-folder-dialog-body-padding-y": "0px",
 });
 
 // DocSpace Base — light palette. Mapped from globalColors to mirror the

@@ -30,124 +30,161 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useStores } from "@onlyoffice/ai-chat";
 
+import { useApi as useFilesApi } from "../../../providers/api";
 import { toastr, type TData } from "../../../components/toast";
 
 import { getOnlyofficeFileType } from "./file-type";
+import { attachFilesToChat, type AttachFileInput } from "./attach-files";
 
 export type DeviceUploaderHandle = { open: () => void };
 
-// Mirrors `useChatDropAttachments` from @onlyoffice/ai-chat:
-//   - image/* → readAsDataURL → addAttachmentImage
-//   - text/*, application/json, empty mime → readAsText → addAttachmentFile (type=Unknown)
-//   - anything else (DOCX/PDF/XLSX without host text extractor) → skipped with a toast
-// Owns a hidden <input type="file" multiple>; the parent triggers the picker
-// via the imperative `open()` handle attached through `React.forwardRef`.
-const DeviceUploader = React.forwardRef<DeviceUploaderHandle>((_, ref) => {
-  const { t } = useTranslation(["Common"]);
-  const { useAttachmentsStore } = useStores();
-  const inputRef = React.useRef<HTMLInputElement>(null);
+// Archives make no sense as chat attachments: the AI backend cannot extract
+// text from them, so they are rejected up front with the same "unsupported
+// file type" toast the uploader always showed. Extension-based on purpose —
+// browsers report unreliable (often empty) mime types for archives.
+const ARCHIVE_EXTENSION =
+  /\.(zip|rar|7z|tar|gz|tgz|bz2|tbz2?|xz|txz|zst|lz|lzma|cab|iso)$/i;
 
-  React.useImperativeHandle(
-    ref,
-    () => ({
-      open: () => {
-        const el = inputRef.current;
-        if (!el) return;
-        // Reset so re-picking the same file fires onChange again.
-        el.value = "";
-        el.click();
-      },
-    }),
-    [],
-  );
+type DeviceUploaderProps = {
+  // Chat scope (current room/folder id). Device files are uploaded there as
+  // real portal files; when absent they land in My documents.
+  entityId?: string;
+};
 
-  const onChange = React.useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const picked = Array.from(e.target.files ?? []);
-      if (picked.length === 0) return;
+// Device upload = portal upload + regular DocSpace attach. Every picked file
+// (any type — DOCX/PDF/XLSX/images included) is first inserted into the
+// chat's entity folder via the files API, then attached by its file id, so
+// the AI backend works with a stored portal file instead of a raw in-memory
+// draft. Owns a hidden <input type="file" multiple>; the parent triggers the
+// picker via the imperative `open()` handle attached through
+// `React.forwardRef`.
+const DeviceUploader = React.forwardRef<DeviceUploaderHandle, DeviceUploaderProps>(
+  ({ entityId }, ref) => {
+    const { t } = useTranslation(["Common"]);
+    const { useAttachmentsStore } = useStores();
+    const { foldersApi } = useFilesApi();
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
-      const fileInputs: {
-        path: string;
-        content: string;
-        type: number;
-        title: string;
-      }[] = [];
-      const imageInputs: { name: string; base64: string }[] = [];
-      const skipped: string[] = [];
+    React.useImperativeHandle(
+      ref,
+      () => ({
+        open: () => {
+          const el = inputRef.current;
+          if (!el) return;
+          // Reset so re-picking the same file fires onChange again.
+          el.value = "";
+          el.click();
+        },
+      }),
+      [],
+    );
 
-      await Promise.all(
-        picked.map(
-          (f) =>
-            new Promise<void>((resolve) => {
-              const reader = new FileReader();
-              reader.onerror = () => {
-                skipped.push(f.name);
-                resolve();
-              };
+    const onChange = React.useCallback(
+      async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const allPicked = Array.from(e.target.files ?? []);
+        if (allPicked.length === 0) return;
 
-              if (f.type.startsWith("image/")) {
-                reader.onload = () => {
-                  imageInputs.push({
-                    name: f.name,
-                    base64: String(reader.result ?? ""),
-                  });
-                  resolve();
-                };
-                reader.readAsDataURL(f);
-                return;
-              }
-
-              const isTextish =
-                f.type.startsWith("text/") ||
-                f.type === "" ||
-                f.type === "application/json";
-              if (isTextish) {
-                reader.onload = () => {
-                  fileInputs.push({
-                    // Empty path → raw-payload draft (not a stored file entry).
-                    // Backend resolves the content from `content` directly
-                    // once the raw-attachment path is wired up.
-                    path: "",
-                    content: String(reader.result ?? ""),
-                    type: getOnlyofficeFileType(f.name),
-                    title: f.name,
-                  });
-                  resolve();
-                };
-                reader.readAsText(f);
-                return;
-              }
-
-              skipped.push(f.name);
-              resolve();
+        const unsupported = allPicked
+          .filter((f) => ARCHIVE_EXTENSION.test(f.name))
+          .map((f) => f.name);
+        if (unsupported.length > 0) {
+          toastr.error(
+            t("Common:UnsupportedFileType", {
+              files: unsupported.join(", "),
+              defaultValue: "Unsupported file type: {{files}}",
             }),
-        ),
-      );
+          );
+        }
 
-      if (skipped.length > 0) {
-        toastr.error(
-          t("Common:UnsupportedFileType", {
-            files: skipped.join(", "),
-            defaultValue: "Unsupported file type: {{files}}",
-          }),
-        );
-      }
+        const picked = allPicked.filter((f) => !ARCHIVE_EXTENSION.test(f.name));
+        if (picked.length === 0) return;
 
-      try {
-        const store = useAttachmentsStore.getState();
-        if (fileInputs.length > 0) await store.addAttachmentFile(fileInputs);
-        if (imageInputs.length > 0) await store.addAttachmentImage(imageInputs);
-      } catch (err) {
-        toastr.error(err as TData);
-      }
-    },
-    [useAttachmentsStore, t],
-  );
+        const inputs: AttachFileInput[] = [];
+        const imageIndices = new Set<number>();
+        const failed: string[] = [];
 
-  return (
-    <input ref={inputRef} type="file" multiple hidden onChange={onChange} />
-  );
-});
+        // Where to store the uploads. The chat scope is only a candidate:
+        // the user may lack Create rights there (e.g. chat-only access to
+        // an AI agent room), which surfaces as a 403 on the first insert —
+        // then the whole batch falls back to the My documents section
+        // (404 too: a scope folder that disappeared mid-flight).
+        let targetFolderId = entityId ? Number(entityId) : undefined;
+
+        const uploadOne = async (file: File) => {
+          if (targetFolderId !== undefined) {
+            try {
+              return await foldersApi.insertFile({
+                folderId: targetFolderId,
+                insertFileFile: file,
+                insertFileTitle: file.name,
+                insertFileCreateNewIfExist: true,
+              });
+            } catch (err) {
+              const status = (err as { response?: { status?: number } })
+                .response?.status;
+              if (status !== 403 && status !== 404) throw err;
+              targetFolderId = undefined;
+            }
+          }
+          return foldersApi.insertFileToMyFromBody({
+            file,
+            title: file.name,
+            createNewIfExist: true,
+          });
+        };
+
+        // Sequential on purpose: `insertFile` streams the whole file body,
+        // and parallel multi-file uploads of large documents gain little
+        // while making partial-failure reporting messier.
+        for (const file of picked) {
+          try {
+            const res = await uploadOne(file);
+
+            const created = res.data.response;
+            if (created?.id === undefined) {
+              failed.push(file.name);
+              continue;
+            }
+
+            if (file.type.startsWith("image/")) {
+              imageIndices.add(inputs.length);
+            }
+            inputs.push({
+              path: String(created.id),
+              title: created.title ?? file.name,
+              type: getOnlyofficeFileType(file.name),
+              content: "",
+            });
+          } catch {
+            failed.push(file.name);
+          }
+        }
+
+        if (failed.length > 0) {
+          toastr.error(
+            t("Common:ErrorUploadingFiles", {
+              count: failed.length,
+              defaultValue: "Error uploading files: {{count}}",
+            }),
+          );
+        }
+
+        if (inputs.length === 0) return;
+
+        try {
+          await attachFilesToChat(useAttachmentsStore, inputs, imageIndices);
+        } catch (err) {
+          toastr.error(err as TData);
+        }
+      },
+      [useAttachmentsStore, foldersApi, entityId, t],
+    );
+
+    return (
+      <input ref={inputRef} type="file" multiple hidden onChange={onChange} />
+    );
+  },
+);
 DeviceUploader.displayName = "DeviceUploader";
 
 export default DeviceUploader;

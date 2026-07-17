@@ -33,36 +33,59 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export const LoaderWrapper = ({
-  children,
-  isLoading,
-  testId,
-}: {
-  children: React.ReactNode;
-  isLoading: boolean;
-  testId?: string;
+import React from "react";
+import classNames from "classnames";
+
+import type { DialogFooterProps } from "@onlyoffice/ai-chat";
+
+import { Button, ButtonSize } from "../../../../components/button";
+
+import styles from "./DialogFooter.module.scss";
+
+const DialogFooterOverride: React.FC<DialogFooterProps> = ({
+  cancelLabel,
+  onCancel,
+  cancelType = "button",
+  cancelDisabled,
+  submitLabel,
+  onSubmit,
+  submitType = "button",
+  submitDisabled,
+  submitLoading,
+  className,
+  buttonClassName,
 }) => {
+  // Rendered as a <footer> (not a <div>) on purpose: the DocSpace
+  // `DialogContent` override styles legacy inline footers via a
+  // `.body div:has(> button)` rule. Using a non-div element keeps this
+  // override's layout self-contained instead of being reset by that rule.
   return (
-    <div
-      style={{
-        opacity: isLoading
-          ? "var(--loader-wrapper-loading-opacity, 0.5)"
-          : "var(--loader-wrapper-idle-opacity, 1)",
-        pointerEvents: isLoading ? "none" : "auto",
-        transition: "var(--loader-wrapper-transition, opacity 0.3s ease-in-out)",
-        display: "flex",
-        flexDirection: "column",
-        flexGrow: 1,
-        // Without this the wrapper cannot shrink below its content height
-        // (min-height: auto) and blows out bounded flex parents like the
-        // section body in fullHeightBody (chat) mode, so the section scroller
-        // scrolls the whole chat instead of the inner viewports. In
-        // content-sized parents a zero min-height changes nothing.
-        minHeight: 0,
-      }}
-      data-testid={testId || "loader-wrapper"}
-    >
-      {children}
-    </div>
+    <footer className={classNames(styles.footer, className)}>
+      <Button
+        primary
+        scale
+        type={submitType}
+        label={submitLabel}
+        size={ButtonSize.normal}
+        isDisabled={submitDisabled}
+        isLoading={submitLoading}
+        onClick={onSubmit}
+        className={buttonClassName}
+      />
+      <Button
+        scale
+        type={cancelType}
+        label={cancelLabel}
+        size={ButtonSize.normal}
+        isDisabled={cancelDisabled}
+        onClick={onCancel}
+        className={buttonClassName}
+      />
+    </footer>
   );
 };
+
+DialogFooterOverride.displayName = "DialogFooterOverride";
+
+export { DialogFooterOverride };
+

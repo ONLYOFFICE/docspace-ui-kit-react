@@ -179,7 +179,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
         finishContentLoading();
       }
     },
-    [searchValue, groupApi],
+    [searchValue, groupApi, finishContentLoading],
   );
 
   const withAside: TSelectorWithAside = useAside

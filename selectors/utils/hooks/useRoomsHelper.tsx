@@ -47,6 +47,7 @@ import { useApi } from "../../../providers/api";
 import { RoomsTypeValues } from "../../../utils/common";
 import RoomType from "../../../components/room-type";
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
+import { toastr, type TData } from "../../../components/toast";
 
 import { LoadersContext } from "../contexts/Loaders";
 
@@ -310,6 +311,8 @@ const useRoomsHelper = ({
         setIsRoot?.(false);
         setIsInit(false);
         finishFullLoad();
+      } catch (error) {
+        toastr.error(error as TData);
       } finally {
         requestRunning.current = false;
         setIsNextPageLoading(false);

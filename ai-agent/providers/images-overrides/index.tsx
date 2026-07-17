@@ -42,7 +42,8 @@ import PromptIcon from "../../../assets/icons/16/prompt.svg";
 import ArrowUpIcon from "../../../assets/icons/16/upgrade.react.svg";
 import ClearIcon from "../../../assets/icons/16/clear.react.svg";
 import OpenIcon from "../../../assets/external.link.svg";
-import ArrowIcon from "../../../assets/triangle.down.react.svg";
+import DropdownIcon from "../../../assets/triangle.down.react.svg";
+import ArrowDownIcon from "../../../assets/icons/16/output-tokens.svg";
 
 import styles from "./Icon.module.scss";
 
@@ -94,5 +95,6 @@ export const imageOverrides: ImageOverrides = {
   send: makeIcon(ArrowUpIcon),
   "btn-clear": makeIcon(ClearIcon),
   "btn-open": makeIcon(OpenIcon),
-  arrow: makeIcon(ArrowIcon),
+  arrow: makeIcon(DropdownIcon),
+  "dropdown-toggle": makeIcon(ArrowDownIcon),
 };

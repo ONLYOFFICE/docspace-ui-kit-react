@@ -268,7 +268,8 @@ const mapEditorToolToHostTool = (tool: EditorTool): HostTool => ({
   description: tool.description ?? "",
   inputSchema: tool.parameters ?? { type: "object", properties: {} },
   handler: async (args) => {
-    console.log(`[editor.${tool.name}] called with args:`, args);
+    // Names only — tool args may carry user content.
+    console.log(`[editor.${tool.name}] called`);
     const result = await callEditorTool(tool.name, args);
     return typeof result === "string" ? result : JSON.stringify({ result });
   },
@@ -479,6 +480,12 @@ export const openGeneratedFileWithToolCall = (
 ): void => {
   if (typeof window === "undefined") return;
 
+  // Trace the flow with tool names / file ids only — tool args may carry
+  // user content and must not be dumped to the console.
+  console.log(
+    `[host-tool-groups] openGeneratedFileWithToolCall: file ${fileId}, tool "${toolName}"`,
+  );
+
   const url = `${window.location.origin}/doceditor?fileId=${encodeURIComponent(
     String(fileId),
   )}`;
@@ -489,6 +496,9 @@ export const openGeneratedFileWithToolCall = (
     );
     return;
   }
+  console.log(
+    `[host-tool-groups] editor tab opened for file ${fileId}, waiting for editorDocumentReady`,
+  );
 
   let settled = false;
   const finish = () => {
@@ -509,6 +519,9 @@ export const openGeneratedFileWithToolCall = (
       return;
 
     finish();
+    console.log(
+      `[host-tool-groups] editor ready, sending tool call "${toolName}" for file ${fileId}`,
+    );
     editorWindow.postMessage(
       {
         type: CALL_TOOL_MESSAGE,
@@ -523,6 +536,15 @@ export const openGeneratedFileWithToolCall = (
   window.addEventListener("message", onReady);
 
   // Fail-safe: stop listening if the editor never signals readiness.
-  const timeoutId = setTimeout(finish, EDITOR_READY_TIMEOUT_MS);
+  const timeoutId = setTimeout(() => {
+    if (!settled) {
+      console.warn(
+        "[host-tool-groups] openGeneratedFileWithToolCall: editor never " +
+          `signaled readiness within ${EDITOR_READY_TIMEOUT_MS}ms — giving up`,
+        { fileId, toolName },
+      );
+    }
+    finish();
+  }, EDITOR_READY_TIMEOUT_MS);
 };
 

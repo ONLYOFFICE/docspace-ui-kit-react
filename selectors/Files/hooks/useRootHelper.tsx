@@ -42,6 +42,7 @@ import {
 import { useApi } from "../../../providers/api";
 import { useCommonTranslation } from "../../../utils/i18n";
 import type { TSelectorItem } from "../../../components/selector";
+import { toastr, type TData } from "../../../components/toast";
 import { getDefaultBreadCrumb } from "../../utils";
 import { LoadersContext } from "../../utils/contexts/Loaders";
 
@@ -127,100 +128,106 @@ const useRootHelper = ({
     setIsRoot(true);
     setIsNextPageLoading(true);
     hideSectionLoader("breadcrumbs");
-    const newItems: TSelectorItem[] = [];
 
-    let currentTree: FolderDtoInteger[] | null = null;
+    try {
+      const newItems: TSelectorItem[] = [];
 
-    if (treeFolders && treeFolders?.length > 0) {
-      currentTree = treeFolders;
-    } else {
-      const res = await foldersApi.getRootFolders();
-      const rootFolders = res.data.response ?? [];
-      currentTree = rootFolders
-        .map((item) => item.current)
-        .filter((f): f is FolderDtoInteger => f != null);
-    }
+      let currentTree: FolderDtoInteger[] | null = null;
 
-    const orderedTree = [...(currentTree ?? [])].sort(
-      (a, b) => getRootFolderOrder(a) - getRootFolderOrder(b),
-    );
+      if (treeFolders && treeFolders?.length > 0) {
+        currentTree = treeFolders;
+      } else {
+        const res = await foldersApi.getRootFolders();
+        const rootFolders = res.data.response ?? [];
+        currentTree = rootFolders
+          .map((item) => item.current)
+          .filter((f): f is FolderDtoInteger => f != null);
+      }
 
-    orderedTree.forEach((folder) => {
-      if (folder.rootFolderType === FolderType.Recent)
-        setRecentFolder?.(folder);
-      if (folder.rootFolderType === FolderType.Favorites)
-        setFavoritesFolder?.(folder);
+      const orderedTree = [...(currentTree ?? [])].sort(
+        (a, b) => getRootFolderOrder(a) - getRootFolderOrder(b),
+      );
 
-      const IconComponent = folder.rootFolderType
-        ? catalogIcons[folder.rootFolderType]
-        : undefined;
-      const avatar = IconComponent ? (
-        <IconComponent key={folder.rootFolderType} />
-      ) : undefined;
+      orderedTree.forEach((folder) => {
+        if (folder.rootFolderType === FolderType.Recent)
+          setRecentFolder?.(folder);
+        if (folder.rootFolderType === FolderType.Favorites)
+          setFavoritesFolder?.(folder);
 
-      if (
-        (!isUserOnly && folder.rootFolderType === FolderType.VirtualRooms) ||
-        folder.rootFolderType === FolderType.USER ||
-        (withAIAgentsTreeFolder &&
-          folder.rootFolderType === FolderType.AiAgents)
-      ) {
-        let title = "";
-
-        switch (folder.rootFolderType) {
-          case FolderType.USER:
-            title = t("Files");
-            break;
-          case FolderType.VirtualRooms:
-            title = t("Rooms");
-            break;
-          case FolderType.AiAgents:
-            title = t("AIAgents");
-            break;
-          default:
-            break;
-        }
-
-        newItems.push({
-          label: title,
-          id: folder.id!,
-          parentId: folder.parentId!,
-          rootFolderType: folder.rootFolderType,
-          filesCount: folder.filesCount!,
-          foldersCount: folder.foldersCount!,
-          security: folder.security!,
-          isFolder: true,
-          avatar,
-          disableMultiSelect: true,
-        });
+        const IconComponent = folder.rootFolderType
+          ? catalogIcons[folder.rootFolderType]
+          : undefined;
+        const avatar = IconComponent ? (
+          <IconComponent key={folder.rootFolderType} />
+        ) : undefined;
 
         if (
-          withFormsTreeFolder &&
-          !isUserOnly &&
-          folder.rootFolderType === FolderType.VirtualRooms
+          (!isUserOnly && folder.rootFolderType === FolderType.VirtualRooms) ||
+          folder.rootFolderType === FolderType.USER ||
+          (withAIAgentsTreeFolder &&
+            folder.rootFolderType === FolderType.AiAgents)
         ) {
+          let title = "";
+
+          switch (folder.rootFolderType) {
+            case FolderType.USER:
+              title = t("Files");
+              break;
+            case FolderType.VirtualRooms:
+              title = t("Rooms");
+              break;
+            case FolderType.AiAgents:
+              title = t("AIAgents");
+              break;
+            default:
+              break;
+          }
+
           newItems.push({
-            label: t("Forms"),
-            id: "forms-section",
+            label: title,
+            id: folder.id!,
             parentId: folder.parentId!,
-            rootFolderType: FolderType.FillingFormsRoom,
+            rootFolderType: folder.rootFolderType,
             filesCount: folder.filesCount!,
             foldersCount: folder.foldersCount!,
             security: folder.security!,
             isFolder: true,
-            avatar: <CatalogDocumentsSvg />,
+            avatar,
             disableMultiSelect: true,
           });
-        }
-      }
-    });
 
-    setItems(newItems);
-    setTotal(newItems.length);
-    setHasNextPage(false);
-    setIsNextPageLoading(false);
-    setIsInit(false);
-    finishFullLoad();
-    requestRunning.current = false;
+          if (
+            withFormsTreeFolder &&
+            !isUserOnly &&
+            folder.rootFolderType === FolderType.VirtualRooms
+          ) {
+            newItems.push({
+              label: t("Forms"),
+              id: "forms-section",
+              parentId: folder.parentId!,
+              rootFolderType: FolderType.FillingFormsRoom,
+              filesCount: folder.filesCount!,
+              foldersCount: folder.foldersCount!,
+              security: folder.security!,
+              isFolder: true,
+              avatar: <CatalogDocumentsSvg />,
+              disableMultiSelect: true,
+            });
+          }
+        }
+      });
+
+      setItems(newItems);
+      setTotal(newItems.length);
+      setHasNextPage(false);
+      setIsInit(false);
+    } catch (error) {
+      toastr.error(error as TData);
+    } finally {
+      requestRunning.current = false;
+      setIsNextPageLoading(false);
+      finishFullLoad();
+    }
   }, [
     foldersApi,
     isUserOnly,
