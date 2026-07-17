@@ -273,4 +273,17 @@ export class AiApi extends BaseCustomApi {
   async getAgentFolder(agentId: number) {
     return this.request<FolderContentDtoInteger>(`/files/${agentId}`);
   }
+
+  // Async markdown → docx export via the Node AI service
+  // (`POST /new-ai/text-to-docx` → .NET `integration/text-to-docx/start`).
+  // Fire-and-forget: the AI Worker converts the markdown and saves the
+  // .docx into the folder; completion arrives as the `s:modify-folder`
+  // create-file socket event. Errors propagate to the caller — the save
+  // dialog falls back to the legacy plain-text file creation.
+  startTextToDocx(folderId: number | string, title: string, content: string) {
+    return this.request(`/new-ai/text-to-docx`, {
+      method: "POST",
+      data: { folderId, title, content },
+    });
+  }
 }

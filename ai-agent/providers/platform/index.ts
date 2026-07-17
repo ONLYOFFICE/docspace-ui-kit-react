@@ -53,13 +53,20 @@ export type SaveAsFileHandler = (
   defaultName: string,
 ) => Promise<void>;
 
+export type OpenFileHandler = (path: string, name: string) => void;
+
 type PlatformFileOperations = NonNullable<PlatformAdapter["file"]>;
 
 const createFileOperations = (
-  getHandler: () => SaveAsFileHandler | null | undefined,
+  getSaveHandler: () => SaveAsFileHandler | null | undefined,
+  getOpenHandler: () => OpenFileHandler | null | undefined,
 ): Partial<PlatformFileOperations> => ({
   saveAsFile: async (content, defaultName) => {
-    await getHandler()?.(content, defaultName);
+    await getSaveHandler()?.(content, defaultName);
+  },
+  // Fired by the library when the user clicks a file chip on a sent message.
+  openFile: (path, name) => {
+    getOpenHandler()?.(path, name);
   },
 });
 
@@ -69,6 +76,7 @@ type UsePlatformAdapterArgs = {
   locale: string;
   theme?: string;
   onSaveAsFile?: SaveAsFileHandler;
+  onOpenFile?: OpenFileHandler;
 };
 
 // Returns the platform adapter the chat library needs. The adapter object is
@@ -80,6 +88,7 @@ export const usePlatformAdapter = ({
   locale,
   theme,
   onSaveAsFile,
+  onOpenFile,
 }: UsePlatformAdapterArgs): PlatformAdapter => {
   const [systemTheme, setSystemTheme] = useState(() => getSystemTheme());
 
@@ -88,12 +97,19 @@ export const usePlatformAdapter = ({
       onSaveAsFile?.(content, defaultName) ?? Promise.resolve(),
   );
 
+  const openFileEvent = useEffectEvent<OpenFileHandler>((path, name) => {
+    onOpenFile?.(path, name);
+  });
+
   // Subscribers registered by the library via onEnvironmentChange; stable.
   const subscribers = useRef(new Set<EnvChangeCallback>());
 
   const adapter = useMemo<PlatformAdapter>(() => {
     const instance: PlatformAdapter = {
-      file: createFileOperations(() => saveAsFileEvent),
+      file: createFileOperations(
+        () => saveAsFileEvent,
+        () => openFileEvent,
+      ),
       process: null,
       hostTools: null,
       clouds: null,

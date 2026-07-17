@@ -57,8 +57,13 @@ export type FilesIntegration = {
 // handler, and the supporting dialogs/device-upload input. <AiAgentProviders>
 // calls this hook and wires the result into the composer config, platform save
 // handler, and its rendered tree — so the integration lives in one place
-// without a wrapper component.
-export const useFilesIntegration = (): FilesIntegration => {
+// without a wrapper component. `entityId` (the chat scope) is where device
+// uploads land as portal files.
+export const useFilesIntegration = ({
+  entityId,
+}: {
+  entityId?: string;
+} = {}): FilesIntegration => {
   const { t, i18n } = useTranslation(["Common"]);
 
   const [pickerVisible, setPickerVisible] = React.useState(false);
@@ -123,7 +128,7 @@ export const useFilesIntegration = (): FilesIntegration => {
           onFinish={finishSave}
         />
       ) : null}
-      <DeviceUploader ref={deviceUploaderRef} />
+      <DeviceUploader ref={deviceUploaderRef} entityId={entityId} />
     </>
   );
 
