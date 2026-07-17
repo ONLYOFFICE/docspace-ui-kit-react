@@ -138,7 +138,7 @@ describe("<NavMenu />", () => {
       expect(screen.getByRole("button", { name: "Shared with me" })).toBeInTheDocument();
     });
 
-    it("collapses already-expanded item on second click when it is active", async () => {
+    it("keeps active item expanded on second click", async () => {
       render(
         <NavMenu
           groups={groups}
@@ -152,10 +152,10 @@ describe("<NavMenu />", () => {
 
       await userEvent.click(button);
 
-      expect(button).toHaveAttribute("aria-expanded", "false");
+      expect(button).toHaveAttribute("aria-expanded", "true");
     });
 
-    it("keeps expanded item open on second click when it is not active", async () => {
+    it("collapses already-expanded item on second click when it is not active", async () => {
       render(
         <NavMenu
           groups={groups}
@@ -169,7 +169,7 @@ describe("<NavMenu />", () => {
 
       await userEvent.click(button);
 
-      expect(button).toHaveAttribute("aria-expanded", "true");
+      expect(button).toHaveAttribute("aria-expanded", "false");
     });
 
     it("collapses previous item when a different item is expanded", async () => {

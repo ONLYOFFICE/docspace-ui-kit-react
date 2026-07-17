@@ -96,7 +96,9 @@ import {
   openGeneratedFileWithToolCall,
   type EditorToolsChangedDetail,
 } from "./host-tool-groups";
+import { useApi as useFilesApi } from "../../providers/api";
 import { useFilesIntegration } from "./files";
+import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
 
 // The host app (DocSpace) uses `i18n.createInstance()` and provides that
@@ -220,6 +222,7 @@ const AiAgentProviders = ({
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
   const aiChatLocale = normalizeAiChatLocale(locale);
+  const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
 
   // File-attachment integration: the composer "attach" actions, the message
   // "Save as file" handler, and the supporting dialogs/device-upload input.
@@ -316,33 +319,6 @@ const AiAgentProviders = ({
     [],
   );
 
-  const widgetConfig = useMemo<WidgetConfig>(
-    () => ({
-      composerActions,
-      composerHeader,
-      composerDisabled,
-      entityId,
-      // Host-driven model-picker visibility: the lib falls back to hiding
-      // whenever entityId is set, but here entityId means "current
-      // folder/room scope", not "agent chat" — only agents fix the model.
-      hideProfilePicker,
-      // Hide "Always allow" only for generate tools (matched by full name).
-      hideToolAllowAlways: GENERATE_TOOL_NAMES,
-      onToolCallApproveResult,
-      composerActionSendSize: 32,
-      composerPlaceholder: t("AskAnyQuestion"),
-      webSearchSaveMode: "button",
-    }),
-    [
-      composerActions,
-      composerHeader,
-      composerDisabled,
-      entityId,
-      hideProfilePicker,
-      onToolCallApproveResult,
-    ],
-  );
-
   const { stores, ctx, serverApiConfig } = useMemo(() => {
     const eventBus = new ChatEventBus();
     const callbacksManager = new CallbacksManager();
@@ -382,6 +358,51 @@ const AiAgentProviders = ({
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
   }, [isStandalone, entityId, platform]);
+
+  const onDropFiles = useCallback(
+    (files: File[]) =>
+      uploadFilesToChat(files, {
+        entityId,
+        foldersApi,
+        operationsApi,
+        filesSettingsApi,
+        useAttachmentsStore: stores.useAttachmentsStore,
+        t,
+      }),
+    [entityId, foldersApi, operationsApi, filesSettingsApi, stores, t],
+  );
+
+  const widgetConfig = useMemo<WidgetConfig>(
+    () => ({
+      composerActions,
+      composerHeader,
+      composerDisabled,
+      entityId,
+      // Host-driven model-picker visibility: the lib falls back to hiding
+      // whenever entityId is set, but here entityId means "current
+      // folder/room scope", not "agent chat" — only agents fix the model.
+      hideProfilePicker,
+      // Hide "Always allow" only for generate tools (matched by full name).
+      hideToolAllowAlways: GENERATE_TOOL_NAMES,
+      onToolCallApproveResult,
+      composerActionSendSize: 32,
+      composerPlaceholder: t("AskAnyQuestion"),
+      webSearchSaveMode: "button",
+      // Route drag-and-drop through the portal-upload + attach flow (same as
+      // the "Upload from device" button) instead of the library's in-memory
+      // default, so dropped DOCX/PDF/XLSX are supported too.
+      onDropFiles,
+    }),
+    [
+      composerActions,
+      composerHeader,
+      composerDisabled,
+      entityId,
+      hideProfilePicker,
+      onToolCallApproveResult,
+      onDropFiles,
+    ],
+  );
 
   useEffect(() => {
     attachHostToolsRuntime({

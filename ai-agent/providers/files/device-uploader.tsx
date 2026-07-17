@@ -31,26 +31,13 @@ import { useTranslation } from "react-i18next";
 import { useStores } from "@onlyoffice/ai-chat";
 
 import { useApi as useFilesApi } from "../../../providers/api";
-import { toastr, type TData } from "../../../components/toast";
 
-import { getOnlyofficeFileType } from "./file-type";
-import { attachFilesToChat, type AttachFileInput } from "./attach-files";
+import { uploadFilesToChat } from "./upload-files";
 
-export type DeviceUploaderHandle = { open: () => void };
-
-// Archives make no sense as chat attachments: the AI backend cannot extract
-// text from them, so they are rejected up front with the same "unsupported
-// file type" toast the uploader always showed. Extension-based on purpose —
-// browsers report unreliable (often empty) mime types for archives.
-const ARCHIVE_EXTENSION =
-  /\.(zip|rar|7z|tar|gz|tgz|bz2|tbz2?|xz|txz|zst|lz|lzma|cab|iso)$/i;
-
-// Mirrors the server-side default (SetupInfo.ChunkUploadSize); used only
-// when the portal files settings cannot be fetched.
-const DEFAULT_CHUNK_UPLOAD_SIZE = 10 * 1024 * 1024;
-
-// Normalized result of a portal upload, whichever endpoint produced it.
-type UploadedPortalFile = { id?: number; title?: string | null };
+export type DeviceUploaderHandle = {
+  // Open the hidden file picker (composer "Upload from device" action).
+  open: () => void;
+};
 
 type DeviceUploaderProps = {
   // Chat scope (current room/folder id). Device files are uploaded there as
@@ -58,204 +45,66 @@ type DeviceUploaderProps = {
   entityId?: string;
 };
 
-// Device upload = portal upload + regular DocSpace attach. Every picked file
-// (any type — DOCX/PDF/XLSX/images included) is first uploaded into the
-// chat's entity folder through a chunked upload session (the same flow the
-// portal's own uploader uses), then attached by its file id, so the AI
-// backend works with a stored portal file instead of a raw in-memory draft.
-// Owns a hidden <input type="file" multiple>; the parent triggers the
-// picker via the imperative `open()` handle attached through
-// `React.forwardRef`.
-const DeviceUploader = React.forwardRef<DeviceUploaderHandle, DeviceUploaderProps>(
-  ({ entityId }, ref) => {
-    const { t } = useTranslation(["Common"]);
-    const { useAttachmentsStore } = useStores();
-    const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
-    const inputRef = React.useRef<HTMLInputElement>(null);
+// Thin React wrapper around the framework-free `uploadFilesToChat` flow (see
+// upload-files.ts): it owns a hidden <input type="file" multiple> and the
+// imperative handle, gathers the host context (translation, API clients, chat
+// scope, attachments store), and hands picked/dropped files to that shared
+// flow so the picker and drag-and-drop behave identically. The parent triggers
+// the picker via the `open()` handle attached through `React.forwardRef`.
+const DeviceUploader = React.forwardRef<
+  DeviceUploaderHandle,
+  DeviceUploaderProps
+>(({ entityId }, ref) => {
+  const { t } = useTranslation(["Common"]);
+  const { useAttachmentsStore } = useStores();
+  const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
-    React.useImperativeHandle(
-      ref,
-      () => ({
-        open: () => {
-          const el = inputRef.current;
-          if (!el) return;
-          // Reset so re-picking the same file fires onChange again.
-          el.value = "";
-          el.click();
-        },
-      }),
-      [],
-    );
-
-    const onChange = React.useCallback(
-      async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const allPicked = Array.from(e.target.files ?? []);
-        if (allPicked.length === 0) return;
-
-        const unsupported = allPicked
-          .filter((f) => ARCHIVE_EXTENSION.test(f.name))
-          .map((f) => f.name);
-        if (unsupported.length > 0) {
-          toastr.error(
-            t("Common:UnsupportedFileType", {
-              files: unsupported.join(", "),
-              defaultValue: "Unsupported file type: {{files}}",
-            }),
-          );
-        }
-
-        const picked = allPicked.filter((f) => !ARCHIVE_EXTENSION.test(f.name));
-        if (picked.length === 0) return;
-
-        const inputs: AttachFileInput[] = [];
-        const imageIndices = new Set<number>();
-        const failed: string[] = [];
-
-        // Where to store the uploads. The chat scope is only a candidate:
-        // the user may lack Create rights there (e.g. chat-only access to
-        // an AI agent room), which surfaces as a 403 when the upload
-        // session is created — then the whole batch falls back to the My
-        // documents section (404 too: a scope folder that disappeared
-        // mid-flight).
-        let targetFolderId = entityId ? Number(entityId) : undefined;
-
-        // The server rejects chunks above its configured limit, so the
-        // chunk size comes from the portal files settings.
-        let chunkSize = DEFAULT_CHUNK_UPLOAD_SIZE;
-        try {
-          const settingsRes = await filesSettingsApi.getFilesSettings();
-          chunkSize =
-            settingsRes.data.response?.chunkUploadSize ??
-            DEFAULT_CHUNK_UPLOAD_SIZE;
-        } catch {
-          // Keep the default; worst case an oversized chunk is rejected
-          // and the file is reported as failed.
-        }
-
-        // Folder uploads go through the chunked upload session — the same
-        // flow the portal's own uploader uses. The simpler
-        // `foldersApi.insertFile` cannot be used here: its generated form
-        // fields ("InsertFile.Title", …) don't match the flat names the
-        // server model binder reads, so the folder variant of /insert
-        // always fails with 400.
-        const uploadToFolder = async (
-          file: File,
-          folderId: number,
-        ): Promise<UploadedPortalFile> => {
-          const sessionRes = await operationsApi.createUploadSessionInFolder({
-            folderId,
-            sessionRequest: {
-              fileName: file.name,
-              fileSize: file.size,
-              relativePath: "",
-              createNewIfExist: true,
-            },
-          });
-          const sessionId = sessionRes.data.response?.id;
-          if (!sessionId) return {};
-
-          // Chunks go strictly in order: the server finalizes the session
-          // with the last chunk and returns the created file in that
-          // response.
-          const chunkCount =
-            file.size === 0 ? 1 : Math.ceil(file.size / chunkSize);
-          let lastChunkRes;
-          for (let i = 0; i < chunkCount; i += 1) {
-            const chunk = file.slice(i * chunkSize, (i + 1) * chunkSize);
-            lastChunkRes = await operationsApi.uploadSession({
-              folderId,
-              sessionId,
-              file: new File([chunk], file.name, { type: file.type }),
-            });
-          }
-
-          const uploaded = lastChunkRes?.data.response;
-          return {
-            id: uploaded?.file?.id ?? uploaded?.id,
-            title: uploaded?.file?.title ?? uploaded?.title,
-          };
-        };
-
-        const uploadOne = async (file: File): Promise<UploadedPortalFile> => {
-          if (targetFolderId !== undefined) {
-            try {
-              return await uploadToFolder(file, targetFolderId);
-            } catch (err) {
-              const status = (err as { response?: { status?: number } })
-                .response?.status;
-              if (status !== 403 && status !== 404) throw err;
-              targetFolderId = undefined;
-            }
-          }
-          const res = await foldersApi.insertFileToMyFromBody({
-            file,
-            title: file.name,
-            createNewIfExist: true,
-          });
-          return {
-            id: res.data.response?.id,
-            title: res.data.response?.title,
-          };
-        };
-
-        // Sequential on purpose: parallel multi-file uploads of large
-        // documents gain little while making partial-failure reporting
-        // messier.
-        for (const file of picked) {
-          try {
-            const created = await uploadOne(file);
-
-            if (created.id === undefined) {
-              failed.push(file.name);
-              continue;
-            }
-
-            if (file.type.startsWith("image/")) {
-              imageIndices.add(inputs.length);
-            }
-            inputs.push({
-              path: String(created.id),
-              title: created.title ?? file.name,
-              type: getOnlyofficeFileType(file.name),
-              content: "",
-            });
-          } catch {
-            failed.push(file.name);
-          }
-        }
-
-        if (failed.length > 0) {
-          toastr.error(
-            t("Common:ErrorUploadingFiles", {
-              count: failed.length,
-              defaultValue: "Error uploading files: {{count}}",
-            }),
-          );
-        }
-
-        if (inputs.length === 0) return;
-
-        try {
-          await attachFilesToChat(useAttachmentsStore, inputs, imageIndices);
-        } catch (err) {
-          toastr.error(err as TData);
-        }
-      },
-      [
-        useAttachmentsStore,
+  const uploadFiles = React.useCallback(
+    (files: File[]) =>
+      uploadFilesToChat(files, {
+        entityId,
         foldersApi,
         operationsApi,
         filesSettingsApi,
-        entityId,
+        useAttachmentsStore,
         t,
-      ],
-    );
+      }),
+    [
+      useAttachmentsStore,
+      foldersApi,
+      operationsApi,
+      filesSettingsApi,
+      entityId,
+      t,
+    ],
+  );
 
-    return (
-      <input ref={inputRef} type="file" multiple hidden onChange={onChange} />
-    );
-  },
-);
+  const onChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      uploadFiles(Array.from(e.target.files ?? [])),
+    [uploadFiles],
+  );
+
+  React.useImperativeHandle(
+    ref,
+    () => ({
+      open: () => {
+        const el = inputRef.current;
+        if (!el) return;
+        // Reset so re-picking the same file fires onChange again.
+        el.value = "";
+        el.click();
+      },
+    }),
+    [],
+  );
+
+  return (
+    <input ref={inputRef} type="file" multiple hidden onChange={onChange} />
+  );
+});
 DeviceUploader.displayName = "DeviceUploader";
 
 export default DeviceUploader;
+
