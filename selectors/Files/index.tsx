@@ -143,6 +143,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const { filesApi } = useApi();
   const {
     isFullLoadActive,
+    isContentLoading,
     startFullLoad,
     finishFullLoad,
     startContentLoading,
@@ -792,11 +793,16 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
   ]);
 
   React.useEffect(() => {
-    if (clearSearchCallback.current && !isFullLoadActive && !searchValue) {
+    if (
+      clearSearchCallback.current &&
+      !isFullLoadActive &&
+      !isContentLoading &&
+      !searchValue
+    ) {
       clearSearchCallback.current();
       clearSearchCallback.current = null;
     }
-  }, [isFullLoadActive, searchValue]);
+  }, [isFullLoadActive, isContentLoading, searchValue]);
 
   const withSearch = withSearchProp
     ? isRoot
