@@ -97,6 +97,7 @@ import {
   type EditorToolsChangedDetail,
 } from "./host-tool-groups";
 import { useFilesIntegration } from "./files";
+import { openAttachedFile } from "./files/open-file";
 
 // The host app (DocSpace) uses `i18n.createInstance()` and provides that
 // instance via `<I18nextProvider>` at the app root. ai-chat, however, calls
@@ -141,6 +142,13 @@ type AiAgentProvidersProps = {
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
   entityId?: string;
+  /**
+   * Explicitly controls the composer model picker. The chat lib hides the
+   * picker whenever `entityId` is set, but DocSpace scopes the chat by the
+   * current folder/room, so `entityId` alone no longer means "agent chat".
+   * Pass `true` only where the model is fixed (AI agent rooms).
+   */
+  hideProfilePicker?: boolean;
   composerHeader?: ReactNode;
   composerDisabled?: boolean;
   children: ReactNode;
@@ -205,6 +213,7 @@ const AiAgentProviders = ({
   openResultFile,
   closeEditorPanel,
   entityId,
+  hideProfilePicker = false,
   composerHeader,
   composerDisabled,
   children,
@@ -214,7 +223,10 @@ const AiAgentProviders = ({
 
   // File-attachment integration: the composer "attach" actions, the message
   // "Save as file" handler, and the supporting dialogs/device-upload input.
-  const { composerActions, onSaveAsFile, overlay } = useFilesIntegration();
+  // Device uploads are stored as portal files in the chat's entity scope.
+  const { composerActions, onSaveAsFile, overlay } = useFilesIntegration({
+    entityId,
+  });
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
   // host's save handler, and it tracks the host locale/theme internally (the
@@ -223,6 +235,7 @@ const AiAgentProviders = ({
     locale: aiChatLocale,
     theme,
     onSaveAsFile,
+    onOpenFile: openAttachedFile,
   });
 
   // Tools that occupy the "editor" host group. `open_file` swaps this to the
@@ -257,13 +270,36 @@ const AiAgentProviders = ({
 
   const onToolCallApproveResult = useCallback(
     (result: unknown, ctx: ToolCallApproveContext) => {
-      const payload = result as {
-        id?: unknown;
-        data?: { id?: unknown };
-      } | null;
+      // Trace the flow only — never dump tool args or the result payload
+      // (they may carry user content).
+      console.log(`[ai-agent] onToolCallApproveResult: ${ctx.toolName}`);
+      // The tool result arrives as a JSON string (the backend serializes it
+      // for the LLM); parse it before reading the created file id, but keep
+      // accepting a ready object in case the lib changes the contract.
+      type GenerateResult = { id?: unknown; data?: { id?: unknown } } | null;
+      let payload: GenerateResult = null;
+      if (typeof result === "string") {
+        try {
+          payload = JSON.parse(result) as GenerateResult;
+        } catch {
+          payload = null;
+        }
+      } else {
+        payload = result as GenerateResult;
+      }
       const rawId = payload?.data?.id ?? payload?.id;
-      if (typeof rawId !== "number" && typeof rawId !== "string") return;
-      if (openedGenerateFilesRef.current.has(rawId)) return;
+      if (typeof rawId !== "number" && typeof rawId !== "string") {
+        console.warn(
+          `[ai-agent] onToolCallApproveResult: no file id in the "${ctx.toolName}" result — skip`,
+        );
+        return;
+      }
+      if (openedGenerateFilesRef.current.has(rawId)) {
+        console.log(
+          `[ai-agent] onToolCallApproveResult: file ${rawId} already opened — skip`,
+        );
+        return;
+      }
 
       openedGenerateFilesRef.current.add(rawId);
 
@@ -272,6 +308,9 @@ const AiAgentProviders = ({
       const editorToolName =
         EDITOR_TOOL_NAME_BY_CHAT_TOOL[ctx.toolName] ?? ctx.toolName;
 
+      console.log(
+        `[ai-agent] opening generated file ${rawId} with editor tool "${editorToolName}"`,
+      );
       openGeneratedFileWithToolCall(rawId, editorToolName, ctx.toolArgs);
     },
     [],
@@ -283,6 +322,10 @@ const AiAgentProviders = ({
       composerHeader,
       composerDisabled,
       entityId,
+      // Host-driven model-picker visibility: the lib falls back to hiding
+      // whenever entityId is set, but here entityId means "current
+      // folder/room scope", not "agent chat" — only agents fix the model.
+      hideProfilePicker,
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
@@ -295,6 +338,7 @@ const AiAgentProviders = ({
       composerHeader,
       composerDisabled,
       entityId,
+      hideProfilePicker,
       onToolCallApproveResult,
     ],
   );

@@ -113,28 +113,26 @@ const MCPServersSelector = ({
     React.useState<TSelectorItem[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const startCurrentIndexRef = React.useRef(0);
   const [totalServers, setTotalServers] = React.useState(0);
 
   const isRequestLoading = React.useRef(false);
 
+  // Servers are keyed by name in the new-ai model: system servers come from
+  // the service config (list-system-tools groups), the rest are portal-level
+  // custom servers (list-custom-servers without an entityId).
   const convertServerToOption = React.useCallback(
-    (server: TServer): TSelectorItem => {
-      const name =
-        server.serverType === ServerType.Portal
-          ? `${getBrandName("OrganizationName")} ${getBrandName("ProductName")}`
-          : server.name;
-
+    (name: string, isSystem: boolean): TSelectorItem => {
       return {
-        key: server.id,
-        id: server.id,
-        label: name,
+        key: name,
+        id: name,
+        label: isSystem
+          ? `${getBrandName("OrganizationName")} ${getBrandName("ProductName")}`
+          : name,
         icon:
-          (server.icon?.icon32 || getServerIcon(server.serverType, isBase)) ??
+          getServerIcon(isSystem ? ServerType.Portal : ServerType.Custom, isBase) ??
           "",
         isMCP: true,
-        isSelected: initedSelectedServers?.includes(server.id),
-        isDisabled: server.needReset,
+        isSelected: initedSelectedServers?.includes(name),
       };
     },
     [isBase, initedSelectedServers, t],
@@ -147,12 +145,31 @@ const MCPServersSelector = ({
     setIsLoading(true);
 
     try {
-      const response = await apiClient.request<{
-        response: TServer[];
-        total: number;
-      }>(`/api/2.0/ai/servers/available?startIndex=0&count=100`);
+      const [systemTools, customServers] = await Promise.all([
+        apiClient.request<Record<string, unknown>>(
+          `/api/2.0/new-ai/tools/list-system-tools`,
+        ),
+        apiClient.request<Record<string, unknown>>(
+          `/api/2.0/new-ai/tools/list-custom-servers`,
+        ),
+      ]);
 
-      const items = response.response.map(convertServerToOption);
+      // A system server that failed tool enumeration (down, misconfigured)
+      // still gets a group in the response — just an empty one (the lib's
+      // listTools returns [] on error). Hide those: a server with no tools
+      // is useless to attach.
+      const systemNames = Object.keys(systemTools ?? {}).filter((name) => {
+        const tools = systemTools?.[name];
+        return Array.isArray(tools) && tools.length > 0;
+      });
+      const customNames = Object.keys(customServers ?? {}).filter(
+        (name) => !systemNames.includes(name),
+      );
+
+      const items = [
+        ...systemNames.map((name) => convertServerToOption(name, true)),
+        ...customNames.map((name) => convertServerToOption(name, false)),
+      ];
 
       const selectedItems = items.filter((i) => i.isSelected);
 
@@ -160,8 +177,7 @@ const MCPServersSelector = ({
       setInitedSelectedServersItems(selectedItems);
       setSelectedServers(selectedItems);
 
-      setTotalServers(response.total);
-      startCurrentIndexRef.current = 100;
+      setTotalServers(items.length);
     } catch (e) {
       console.error(e);
     }
@@ -170,36 +186,8 @@ const MCPServersSelector = ({
     setIsLoading(false);
   }, [apiClient, convertServerToOption]);
 
-  const fetchMoreServer = React.useCallback(async () => {
-    if (isRequestLoading.current) return;
-    isRequestLoading.current = true;
-
-    try {
-      const response = await apiClient.request<{
-        response: TServer[];
-        total: number;
-      }>(
-        `/api/2.0/ai/servers/available?startIndex=${startCurrentIndexRef.current}&count=100`,
-      );
-
-      const items = response.response.map(convertServerToOption);
-
-      setServers((prev) => [...prev, ...items]);
-
-      const selectedItems = items.filter((i) => i.isSelected);
-
-      setInitedSelectedServersItems((prev) => [...prev, ...selectedItems]);
-      setSelectedServers((prev) => [...prev, ...selectedItems]);
-
-      startCurrentIndexRef.current += 100;
-      setTotalServers(response.total);
-    } catch (e) {
-      console.error(e);
-    }
-
-    isRequestLoading.current = false;
-    setIsLoading(false);
-  }, [apiClient, convertServerToOption]);
+  // The new-ai lists are not paginated — everything arrives in one response.
+  const fetchMoreServer = React.useCallback(async () => {}, []);
 
   const onSelect = (item: TSelectorItem) => {
     const isIncluded = selectedServers.some((i) => i.id === item.id);
