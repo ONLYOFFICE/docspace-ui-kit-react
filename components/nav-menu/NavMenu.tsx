@@ -344,10 +344,10 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       // sub-menu doesn't toggle behind the modal.
       const handled = item.onClick?.(item) === false;
       if (!handled && !iconOnly && item.children?.length) {
-        // Collapse only when the item is also active; non-active expanded
-        // items stay open until another item is clicked (by design).
+        // Re-clicking the active section must not collapse it; only
+        // clicking a different (non-active) expanded item toggles it shut.
         setExpandedId((prev) =>
-          prev === item.id && activeItemId === item.id ? null : item.id,
+          prev === item.id && activeItemId !== item.id ? null : item.id,
         );
       }
     };
