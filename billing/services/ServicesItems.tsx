@@ -45,10 +45,12 @@ import {
   AI_TOOLS,
   BACKUP_SERVICE,
   DISK_STORAGE,
+  DOCS_CONNECT_SERVICE,
   TOTAL_SIZE,
 } from "../constants";
 import { calculateTotalPrice, getConvertedSize } from "../utils/common";
-import type { TServiceFeatureWithPrice } from "../types";
+import { formatDateLocalized } from "../../utils/date";
+import type { TDocsConnectCardState, TServiceFeatureWithPrice } from "../types";
 
 import PriceIcon from "../../assets/icons/16/price.react.svg";
 
@@ -69,6 +71,8 @@ type ServicesItemsProps = {
   isTablet?: boolean;
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
+  docsConnectState?: TDocsConnectCardState;
+  onDocsConnectToggle?: () => void;
 };
 
 const ServicesItems: React.FC<ServicesItemsProps> = ({
@@ -77,6 +81,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   isMobile,
   isTablet,
   onOpenSupportedModels,
+  docsConnectState,
+  onDocsConnectToggle,
 }) => {
   const paymentStore = usePaymentStore();
 
@@ -90,6 +96,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     isBackupServiceOn,
     isStorageDeactivationVisited,
     isLowWalletBalance,
+    language,
   } = paymentStore;
 
   const { isFreeTariff } = paymentStore.quotas;
@@ -133,6 +140,19 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     onClick?.(id!);
   };
 
+  const handleDocsConnectToggle = (
+    e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const dataset = (e.currentTarget as HTMLElement).dataset;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (dataset.disabled?.toLowerCase() === "true") return;
+
+    onDocsConnectToggle?.();
+  };
+
   const onSupportedModelsClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -167,7 +187,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   const priceDescription = (
     serviceName: string | null | undefined,
     priceValue?: number,
-    enabled?: boolean,
   ) => {
     switch (serviceName) {
       case TOTAL_SIZE:
@@ -360,7 +379,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 onClick={handleClick}
                 onToggle={handleToggle}
                 serviceTitle={item.title}
-                priceDescription={priceDescription(item.id, 0, item.value)}
+                priceDescription={priceDescription(item.id, 0)}
                 priceTitle={item.priceTitle}
                 id={item.id}
                 image={item.image}
@@ -417,6 +436,130 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               />
             );
           }
+
+          if (item.serviceName === DOCS_CONNECT_SERVICE) {
+            const subscribed = docsConnectState?.subscribed ?? false;
+            const isTrial = docsConnectState?.isTrial ?? false;
+            const trialDaysLeft = docsConnectState?.trialDaysLeft ?? 0;
+            const trialEndingSoon = docsConnectState?.trialEndingSoon ?? false;
+            const trialExpired = docsConnectState?.trialExpired ?? false;
+            const trialActive = subscribed && isTrial && !trialExpired;
+            const scheduledUsers = docsConnectState?.scheduledUsers ?? null;
+            const hasScheduledChange =
+              subscribed && !isTrial && scheduledUsers != null;
+            const isCancellation = hasScheduledChange && scheduledUsers === 0;
+            const deactivated = docsConnectState?.deactivated ?? false;
+            const canceled = docsConnectState?.canceled ?? false;
+
+            const trialToggleTooltip = trialActive
+              ? t("DocsConnectTrialToggleDisabled", {
+                  date: formatDateLocalized(
+                    docsConnectState?.trialEndDate,
+                    "DATE_MED",
+                    { locale: language },
+                  ),
+                })
+              : undefined;
+
+            const scheduledDateLocalized = formatDateLocalized(
+              docsConnectState?.scheduledDate,
+              "DATE_MED",
+              { locale: language },
+            );
+
+            const scheduledTooltip = hasScheduledChange ? (
+              <>
+                <Text fontWeight={600} fontSize="12px">
+                  {isCancellation
+                    ? t("SubscriptionCancellation")
+                    : t("UserAdjustment", {
+                        fromCount: docsConnectState?.tariffUsers ?? 0,
+                        toCount: scheduledUsers,
+                      })}
+                </Text>
+                <Text fontSize="12px">
+                  {isCancellation
+                    ? t("SubscriptionAutoCancellation", {
+                        finalDate: scheduledDateLocalized,
+                      })
+                    : t("TariffPlanAutoRenewedWithUpdate", {
+                        date: scheduledDateLocalized,
+                      })}
+                </Text>
+              </>
+            ) : undefined;
+
+            let docsConnectPrice;
+            if (!subscribed) {
+              docsConnectPrice = t("DocsConnectTrialAvailable", {
+                price: formatWalletCurrency(item.price.value, 0),
+              });
+            } else if (trialExpired) {
+              docsConnectPrice = (
+                <>
+                  {t("TrialExpired")}
+                  <Link
+                    fontSize="13px"
+                    fontWeight={600}
+                    color="accent"
+                    textDecoration="underline dotted"
+                    style={{ marginInlineStart: "8px" }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClick?.(item.id!);
+                    }}
+                    dataTestId="docs_connect_buy_plan_link"
+                  >
+                    {t("Upgrade")}
+                  </Link>
+                </>
+              );
+            } else if (isTrial) {
+              docsConnectPrice = t("DocsConnectTrialDaysLeft", {
+                count: trialDaysLeft,
+              });
+            } else if (deactivated) {
+              docsConnectPrice = t("SubscriptionDeactivatedNonPayment");
+            } else if (canceled) {
+              docsConnectPrice = t("FromPricePerUserMonth", {
+                price: formatWalletCurrency(item.price.value, 0),
+              });
+            } else if (hasScheduledChange) {
+              docsConnectPrice = t("ChangeShedule");
+            } else {
+              docsConnectPrice = t("DocsConnectCurrentTariffPlan", {
+                price: formatWalletCurrency(
+                  docsConnectState?.tariffPrice ?? 0,
+                  2,
+                ),
+                count: docsConnectState?.tariffUsers ?? 0,
+              });
+            }
+
+            return (
+              <ServiceCard
+                key={item.id}
+                onClick={handleClick}
+                onToggle={handleDocsConnectToggle}
+                serviceTitle={item.title}
+                priceTitle={item.priceTitle}
+                priceDescription={docsConnectPrice}
+                id={item.id}
+                image={item.image}
+                isEnabled={
+                  subscribed && !trialExpired && !deactivated && !canceled
+                }
+                isWarningColor={
+                  (isTrial && !trialExpired && trialEndingSoon) ||
+                  hasScheduledChange
+                }
+                isErrorColor={trialExpired || deactivated}
+                toggleDisabled={trialActive || hasScheduledChange}
+                tooltip={trialToggleTooltip}
+                priceTooltip={scheduledTooltip}
+              />
+            );
+          }
         })}
       </div>
     </div>
@@ -424,4 +567,3 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 };
 
 export default observer(ServicesItems);
-

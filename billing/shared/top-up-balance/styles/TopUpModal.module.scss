@@ -117,8 +117,15 @@
   }
 }
 
-.walletInfoTopUp {
-  margin-left: auto;
+.walletInfoActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-inline-start: auto;
+}
+
+.walletInfoOpenBilling {
+  flex-shrink: 0;
 }
 
 .balanceValue {
