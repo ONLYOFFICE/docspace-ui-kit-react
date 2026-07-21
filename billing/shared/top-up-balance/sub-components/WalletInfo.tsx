@@ -41,10 +41,13 @@ import classNames from "classnames";
 
 import { Text } from "../../../../components/text";
 import { Button, ButtonSize } from "../../../../components/button";
+import { IconButton } from "../../../../components/icon-button";
 
 import WalletIcon from "../../../../assets/icons/16/wallet.react.svg";
+import ExternalLinkIcon from "../../../../assets/external.link.svg";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
+import { toAbsoluteUrl } from "../../../utils/url";
 
 import styles from "../styles/TopUpModal.module.scss";
 
@@ -56,6 +59,7 @@ type WalletInfoProps = {
   icon?: React.ReactNode;
   shortView?: boolean;
   withoutBackground?: boolean;
+  withOpenBilling?: boolean;
 };
 
 const WalletInfo = (props: WalletInfoProps) => {
@@ -67,9 +71,15 @@ const WalletInfo = (props: WalletInfoProps) => {
     icon,
     shortView,
     withoutBackground,
+    withOpenBilling,
   } = props;
   const t = useCommonTranslation();
-  const { isPayer } = usePaymentStore();
+  const { isPayer, routes } = usePaymentStore();
+
+  const walletRoute = routes?.wallet;
+  const showOpenBilling = withOpenBilling && !!walletRoute;
+  const onOpenWallet = () =>
+    window.open(toAbsoluteUrl(walletRoute ?? ""), "_blank");
 
   const keyProp = isBalanceInsufficient
     ? { tKey: "AvailableCreditsInsufficient" }
@@ -114,15 +124,28 @@ const WalletInfo = (props: WalletInfoProps) => {
           />
         </div>
       </div>
-      {onTopUp && isPayer ? (
-        <Button
-          className={styles.walletInfoTopUp}
-          size={ButtonSize.small}
-          label={t("TopUp")}
-          onClick={onTopUp}
-          testId="top_up_wallet_button"
-        />
-      ) : null}
+      <div className={styles.walletInfoActions}>
+        {onTopUp && isPayer ? (
+          <Button
+            size={ButtonSize.small}
+            label={t("TopUp")}
+            onClick={onTopUp}
+            testId="top_up_wallet_button"
+          />
+        ) : null}
+        {showOpenBilling ? (
+          <IconButton
+            className={styles.walletInfoOpenBilling}
+            iconNode={<ExternalLinkIcon />}
+            size={16}
+            isFill
+            isClickable
+            onClick={onOpenWallet}
+            title={t("OpenPortalBilling")}
+            dataTestId="open_wallet_button"
+          />
+        ) : null}
+      </div>
     </div>
   );
 };

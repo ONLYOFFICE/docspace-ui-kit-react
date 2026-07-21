@@ -65,6 +65,10 @@ import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { getBrandName } from "../../../constants/brands";
 import { Encoder } from "../../../utils/encoder";
+import {
+  DOCS_CONNECT_SERVICE,
+  DOCS_CONNECT_DEVPACK_SERVICE,
+} from "../../constants";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -81,6 +85,7 @@ type TransactionHistoryProps = {
   serviceName?: string;
   headerTitle?: string;
   hideTypeFilter?: boolean;
+  hideContactFilter?: boolean;
   withoutRoleFilter?: boolean;
   maxWidth?: number | string;
   emptyTitle?: string;
@@ -100,6 +105,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     serviceName,
     headerTitle,
     hideTypeFilter,
+    hideContactFilter,
     withoutRoleFilter,
     maxWidth,
     emptyTitle,
@@ -340,6 +346,11 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     const isCredit = filterSelectedTypeKey !== "debit";
     const isDebit = filterSelectedTypeKey !== "credit";
 
+    const serviceNames: string | string[] | undefined =
+      serviceName === DOCS_CONNECT_SERVICE
+        ? [DOCS_CONNECT_SERVICE, DOCS_CONNECT_DEVPACK_SERVICE]
+        : serviceName;
+
     try {
       await paymentApi.createCustomerOperationsReport({
         customerOperationsReportRequestDto: {
@@ -348,7 +359,9 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           credit: isCredit,
           debit: isDebit,
           participantName: filterContact?.id,
-          serviceName,
+          // TODO: remove the cast once the SDK types serviceName as
+          // string | string[] — the API accepts a repeated ServiceName param.
+          serviceName: serviceNames as string,
         },
       });
 
@@ -487,7 +500,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
         />
       ) : null}
       {datesComponent}
-      {contactSelector}
+      {hideContactFilter ? null : contactSelector}
       {isTransactionFilterModified ? (
         <Link
           onClick={onClearFilter}
@@ -617,7 +630,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           isSelectorVisible={isSelectorVisible}
           selectorComponent={selectorComponent}
           datesComponent={datesComponent}
-          contactSelector={contactSelector}
+          contactSelector={hideContactFilter ? null : contactSelector}
           typeOfHistoty={typeOfHistoty}
           selectedType={
             isFilterDialogVisible

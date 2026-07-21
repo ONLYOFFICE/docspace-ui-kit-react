@@ -50,6 +50,12 @@ import {
   now,
 } from "../../utils/date";
 import { daysUntil } from "../utils/common";
+import {
+  DOCS_CONNECT_DEVPACK_SERVICE,
+  DOCS_CONNECT_SERVICE,
+  TOTAL_SIZE,
+} from "../constants";
+import type { TWalletServiceQuota } from "../types";
 
 class CurrentTariffStatusStore {
   private portalQuotaApi: PortalQuotaApi;
@@ -65,6 +71,12 @@ class CurrentTariffStatusStore {
   private _previousWalletQuota: Quota[] = [];
 
   private _tariffWalletQuota: (Quota & { additional?: boolean }) | null = null;
+
+  private _storageServiceId: number | null = null;
+
+  private _docsConnectServiceIds: number[] = [];
+
+  private _walletServicesResolved = false;
 
   payerInfo: CustomerInfoDto = {
     portalId: null,
@@ -254,6 +266,33 @@ class CurrentTariffStatusStore {
     return this.payerInfo.payer ?? null;
   }
 
+  private resolveWalletServiceIds = async () => {
+    if (this._walletServicesResolved) return;
+
+    try {
+      const res = await this.paymentApi.getWalletServices({});
+      const services = (res?.data?.response ??
+        []) as unknown as TWalletServiceQuota[];
+
+      this._storageServiceId =
+        services.find((service) =>
+          (service.features ?? []).some(
+            (feature) => feature.id === TOTAL_SIZE,
+          ),
+        )?.id ?? null;
+      this._docsConnectServiceIds = services
+        .filter(
+          (service) =>
+            service.serviceName === DOCS_CONNECT_SERVICE ||
+            service.serviceName === DOCS_CONNECT_DEVPACK_SERVICE,
+        )
+        .map((service) => service.id);
+      this._walletServicesResolved = true;
+    } catch {
+      this._walletServicesResolved = false;
+    }
+  };
+
   fetchPortalTariff = async (isRefresh?: boolean) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
@@ -279,8 +318,17 @@ class CurrentTariffStatusStore {
         (tariff.quotas as WalletQuota[])?.filter((q) => q.wallet === true) ??
         [];
 
-      const storageQuota = walletQuotas.find((q) => q.additional !== false);
-      const tariffQuota = walletQuotas.find((q) => q.additional === false);
+      if (walletQuotas.length > 0) await this.resolveWalletServiceIds();
+
+      const candidates = walletQuotas.filter(
+        (q) => q.id == null || !this._docsConnectServiceIds.includes(q.id),
+      );
+
+      const storageQuota =
+        this._storageServiceId != null
+          ? walletQuotas.find((q) => q.id === this._storageServiceId)
+          : candidates.find((q) => q.additional !== false);
+      const tariffQuota = candidates.find((q) => q.additional === false);
 
       // QuotaState.Overdue = 1
       if (storageQuota) {
