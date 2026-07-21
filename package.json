@@ -185,7 +185,8 @@
     "overrides": {
       "minimatch@3.1.2": "3.1.4",
       "brace-expansion@1.1.12": "1.1.16",
-      "picomatch@4.0.3": "4.0.4"
+      "picomatch@4.0.3": "4.0.4",
+      "form-data@4.0.5": "4.0.6"
     }
   }
 }
