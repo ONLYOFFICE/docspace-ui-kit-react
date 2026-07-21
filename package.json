@@ -180,5 +180,10 @@
       "cjs": "dist/cjs/index.js",
       "types": "dist/types/index.d.ts"
     }
+  },
+  "pnpm": {
+    "overrides": {
+      "minimatch@3.1.2": "3.1.4"
+    }
   }
 }
