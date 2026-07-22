@@ -58,6 +58,7 @@ const WalletContainer = (props: WalletContainerProps) => {
       <WalletInfo
         balance={formatWalletCurrency()}
         isBalanceInsufficient={isBalanceInsufficient}
+        withOpenBilling
       />
     </div>
   );

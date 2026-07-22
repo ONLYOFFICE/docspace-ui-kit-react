@@ -25,7 +25,8 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 import { WebSearchPage } from "@onlyoffice/ai-chat";
-// import styles from "./WebSearch.module.scss";
+
+import styles from "./WebSearch.module.scss";
 
 const WebSearch = () => {
   return (
@@ -33,7 +34,7 @@ const WebSearch = () => {
       hideHeader
       noPadding
       isHorizontal={false}
-      // className={styles.webSearch}
+      className={styles.webSearch}
     />
   );
 };

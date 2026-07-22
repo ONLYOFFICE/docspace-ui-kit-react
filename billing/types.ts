@@ -59,6 +59,45 @@ export type TServiceFeatureWithPrice = TNumericPaymentFeature & {
   serviceName?: string;
 };
 
+export type TDocsConnectCardState = {
+  subscribed: boolean;
+  isTrial: boolean;
+  trialDaysLeft: number;
+  trialEndingSoon: boolean;
+  trialExpired: boolean;
+  trialEndDate: string;
+  tariffPrice: number;
+  tariffUsers: number;
+  scheduledUsers: number | null;
+  scheduledDate: string;
+  deactivated: boolean;
+  canceled: boolean;
+};
+
+export type TDocsConnectScheduledChange = {
+  nextUsers: number;
+  dueDate: string;
+};
+
+export type TDocsConnectPageState = {
+  isPaid: boolean;
+  expired: boolean;
+  daysLeft: number;
+  totalDays: number;
+  spentPercent: number;
+  endDate: string;
+  currency: string;
+  credits: number;
+  planUsers: number;
+  pricePerUser: number;
+  basePricePerUser: number;
+  devPackEnabled: boolean;
+  monthlyCharge: number;
+  scheduledChange: TDocsConnectScheduledChange | null;
+  deactivated: boolean;
+  canceled: boolean;
+};
+
 type TAiToolsChatPrice = {
   prompt: number;
   completion: number;
@@ -171,6 +210,7 @@ export type TPaymentRoutes = {
   aiSearch: string;
   backup: string;
   diskStorage: string;
+  wallet?: string;
 };
 
 export type TPaymentConfig = {
@@ -182,6 +222,7 @@ export type TPaymentConfig = {
   mobileBreakpoint?: number;
   desktopBreakpoint?: number;
   openOnNewPage?: boolean;
+  onServicesInit?: () => Promise<unknown>;
 };
 
 export type TPaymentNavigationEvent =

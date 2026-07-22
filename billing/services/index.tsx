@@ -50,9 +50,11 @@ import {
   AI_SEARCH_ENUM,
   AI_TOOLS,
   BACKUP_SERVICE,
+  DOCS_CONNECT_SERVICE,
   DISK_STORAGE,
   TOTAL_SIZE,
 } from "../constants";
+import type { TDocsConnectCardState } from "../types";
 
 // AI search isn't part of the SDK's TenantWalletService enum yet; the backend
 // identifies it by -18.
@@ -88,6 +90,9 @@ type TServicesProps = {
   getAIConfig?: () => Promise<void>;
   cardDisabled?: boolean;
   onOpenSupportedModels?: () => void;
+  onDocsConnectClick?: () => void;
+  onDocsConnectToggle?: () => void;
+  docsConnectState?: TDocsConnectCardState;
 };
 
 const Services = observer(
@@ -97,6 +102,9 @@ const Services = observer(
     getAIConfig,
     cardDisabled,
     onOpenSupportedModels,
+    onDocsConnectClick,
+    onDocsConnectToggle,
+    docsConnectState,
   }: TServicesProps) => {
     const navigate = useNavigate();
     const paymentStore = usePaymentStore();
@@ -255,6 +263,11 @@ const Services = observer(
 
     const onClick = (id: string) => {
       setConfirmActionType(id);
+
+      if (id === DOCS_CONNECT_SERVICE) {
+        onDocsConnectClick?.();
+        return;
+      }
 
       if (!isCardLinkedToPortal) {
         setIsFirstTopUpDialogVisible(true);
@@ -482,6 +495,8 @@ const Services = observer(
           onToggle={onToggle}
           cardDisabled={cardDisabled}
           onOpenSupportedModels={onOpenSupportedModels}
+          docsConnectState={docsConnectState}
+          onDocsConnectToggle={onDocsConnectToggle}
         />
         {isShowStorageTariffDeactivatedModal ? (
           <StorageTariffDeactivated
@@ -562,4 +577,3 @@ const Services = observer(
 );
 
 export default Services;
-

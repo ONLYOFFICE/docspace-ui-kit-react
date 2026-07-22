@@ -71,6 +71,8 @@ type QuantityPickerProps = {
   underContorlsTitle?: string | React.ReactNode;
   isZeroAllowed?: boolean;
   enableZero?: boolean;
+  minusTooltipId?: string;
+  minusDisabled?: boolean;
 };
 
 const shouldSetIncrementError = (
@@ -102,6 +104,8 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
   disableValue,
   underContorlsTitle,
   enableZero = false,
+  minusTooltipId,
+  minusDisabled,
 }) => {
   const displayValue = showPlusSign
     ? value > maxValue
@@ -198,6 +202,10 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
   const buttonProps = isDisabled
     ? {}
     : { onClick: handleButtonClick, onMouseDown: handleButtonMouseDown };
+  const minusButtonProps = isDisabled || minusDisabled ? {} : buttonProps;
+  const minusCircleClass = classNames(circleClass, styles.minusIcon, {
+    [styles.disabled]: minusDisabled,
+  });
   const sliderProps = isDisabled ? {} : { onChange: handleSliderChange };
   const inputProps = isDisabled ? {} : { onChange: handleInputChange };
 
@@ -258,8 +266,9 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
       <div className={styles.countControls}>
         {withoutContorls ? null : (
           <div
-            className={`${circleClass} ${styles.minusIcon}`}
-            {...buttonProps}
+            className={minusCircleClass}
+            {...minusButtonProps}
+            {...(minusTooltipId ? { "data-tooltip-id": minusTooltipId } : {})}
             data-operation="minus"
             data-testid="quantity_picker_minus_icon"
           >
