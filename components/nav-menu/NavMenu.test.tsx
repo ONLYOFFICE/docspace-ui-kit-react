@@ -417,6 +417,111 @@ describe("<NavMenu />", () => {
     });
   });
 
+  describe("collapsedBadgeComponent", () => {
+    const collapsedGroups: NavMenuGroup[] = [
+      {
+        id: "g",
+        label: "Group",
+        items: [
+          {
+            id: "parent",
+            label: "Parent",
+            showBadge: true,
+            badgeComponent: <span data-testid="own-badge">2</span>,
+            collapsedBadgeComponent: <span data-testid="agg-badge">7</span>,
+            children: [
+              {
+                id: "child",
+                label: "Child",
+                showBadge: true,
+                badgeComponent: <span data-testid="child-badge">5</span>,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    it("shows the aggregated badge on a collapsed parent", () => {
+      render(<NavMenu groups={collapsedGroups} />);
+      expect(screen.getByTestId("agg-badge")).toBeInTheDocument();
+      expect(screen.queryByTestId("own-badge")).not.toBeInTheDocument();
+    });
+
+    it("swaps to the parent's own badge once expanded", () => {
+      render(<NavMenu groups={collapsedGroups} defaultExpandedId="parent" />);
+      expect(screen.getByTestId("own-badge")).toBeInTheDocument();
+      expect(screen.queryByTestId("agg-badge")).not.toBeInTheDocument();
+      // Child reveals its own badge alongside the parent's.
+      expect(screen.getByTestId("child-badge")).toBeInTheDocument();
+    });
+
+    it("switches from aggregated to own badge on expand click", async () => {
+      render(<NavMenu groups={collapsedGroups} />);
+      expect(screen.getByTestId("agg-badge")).toBeInTheDocument();
+      await userEvent.click(screen.getByRole("button", { name: "Parent" }));
+      expect(screen.getByTestId("own-badge")).toBeInTheDocument();
+      expect(screen.queryByTestId("agg-badge")).not.toBeInTheDocument();
+    });
+
+    it("shows the aggregated badge even when showBadge is not set", () => {
+      const groupsNoOwn: NavMenuGroup[] = [
+        {
+          id: "g",
+          items: [
+            {
+              id: "parent",
+              label: "Parent",
+              collapsedBadgeComponent: <span data-testid="agg-badge">3</span>,
+              children: [{ id: "child", label: "Child" }],
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsNoOwn} />);
+      expect(screen.getByTestId("agg-badge")).toBeInTheDocument();
+    });
+
+    it("falls back to badgeComponent when no collapsed badge is provided", () => {
+      const groupsNoCollapsed: NavMenuGroup[] = [
+        {
+          id: "g",
+          items: [
+            {
+              id: "parent",
+              label: "Parent",
+              showBadge: true,
+              badgeComponent: <span data-testid="own-badge">2</span>,
+              children: [{ id: "child", label: "Child" }],
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsNoCollapsed} />);
+      expect(screen.getByTestId("own-badge")).toBeInTheDocument();
+    });
+
+    it("ignores collapsedBadgeComponent on a childless item", () => {
+      const groupsNoChildren: NavMenuGroup[] = [
+        {
+          id: "g",
+          items: [
+            {
+              id: "leaf",
+              label: "Leaf",
+              showBadge: true,
+              badgeComponent: <span data-testid="own-badge">2</span>,
+              collapsedBadgeComponent: <span data-testid="agg-badge">9</span>,
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsNoChildren} />);
+      expect(screen.getByTestId("own-badge")).toBeInTheDocument();
+      expect(screen.queryByTestId("agg-badge")).not.toBeInTheDocument();
+    });
+  });
+
   describe("iconOnly", () => {
     it("applies iconOnly class to the root element", () => {
       render(<NavMenu groups={groups} iconOnly />);
