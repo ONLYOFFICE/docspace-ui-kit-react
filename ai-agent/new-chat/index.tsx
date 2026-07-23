@@ -38,7 +38,7 @@ import {
 import { useIsDesktop } from "../../hooks/use-is-desktop";
 
 import { ChatToolbar } from "../chat-toolbar";
-import { ChatNoAccessScreen } from "../chat/components/chat-no-access-screen";
+import { ChatNoAccessScreen } from "./components/chat-no-access-screen";
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
 
 import styles from "./NewChat.module.scss";

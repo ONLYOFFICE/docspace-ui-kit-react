@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) Ascensio System SIA, 2009-2026
  *
  * This program is a free software product. You can redistribute it and/or
@@ -33,10 +33,5 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ChatNoAccessScreenProps } from "./components/chat-no-access-screen";
-
-export interface ChatProps {
-  isAgent?: boolean;
-  aiReady?: boolean;
-  noAccessProps?: ChatNoAccessScreenProps;
-}
+// Document formats the AI chat can consume as attachments / context.
+export const CHAT_SUPPORTED_FORMATS = "doc,docx,txt,pdf,xls,xlsx";

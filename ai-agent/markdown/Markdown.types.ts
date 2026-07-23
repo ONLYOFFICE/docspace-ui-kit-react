@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) Ascensio System SIA, 2009-2026
  *
  * This program is a free software product. You can redistribute it and/or
@@ -33,10 +33,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ChatNoAccessScreenProps } from "./components/chat-no-access-screen";
+export type MessageMarkdownFieldProps = {
+  chatMessage: string;
+  propLanguage?: string;
+  isFirst?: boolean;
+  successCopyMessage?: string;
+  openLink?: (url: string) => void;
+  openFile?: (fileId: string) => void;
+};
 
-export interface ChatProps {
-  isAgent?: boolean;
-  aiReady?: boolean;
-  noAccessProps?: ChatNoAccessScreenProps;
-}
+export type MessageCodeBlockProps = {
+  language?: string;
+  content: string;
+  successCopyMessage?: string;
+};
