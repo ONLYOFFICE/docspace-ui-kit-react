@@ -67,11 +67,16 @@ import type {
   HostTool,
   ProviderType,
   ServerAPIConfig,
+  Suggestion,
   ToolCallApproveContext,
   WebSearchProviderId,
 } from "@onlyoffice/ai-chat";
 
 import "@onlyoffice/ai-chat/styles";
+
+// Re-exported so the host can type the `suggestions` array it builds and
+// passes in (the section→chips logic lives in the host, not here).
+export type { Suggestion } from "@onlyoffice/ai-chat";
 
 import { AiChatAvailabilityContext } from "./availability";
 import { storageAdapter } from "./storage";
@@ -153,6 +158,12 @@ type AiAgentProvidersProps = {
   hideProfilePicker?: boolean;
   composerHeader?: ReactNode;
   composerDisabled?: boolean;
+  /**
+   * Welcome-screen suggestion chips. The host builds this list for the current
+   * section (room / folder context) and passes it in ready-made; the provider
+   * just forwards it to the widget.
+   */
+  suggestions?: Suggestion[];
   children: ReactNode;
 };
 
@@ -218,6 +229,7 @@ const AiAgentProviders = ({
   hideProfilePicker = false,
   composerHeader,
   composerDisabled,
+  suggestions,
   children,
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
@@ -388,10 +400,16 @@ const AiAgentProviders = ({
       composerActionSendSize: 32,
       composerPlaceholder: t("AskAnyQuestion"),
       webSearchSaveMode: "button",
+      welcomeDescription: t("Common:WelcomeAiChatDescription"),
+      // Section-specific chips: the host builds the list for the current
+      // section (room / folder context) and passes it in ready-made.
+      suggestions,
+
       // Route drag-and-drop through the portal-upload + attach flow (same as
       // the "Upload from device" button) instead of the library's in-memory
       // default, so dropped DOCX/PDF/XLSX are supported too.
       onDropFiles,
+      showWelcome: true,
     }),
     [
       composerActions,
@@ -401,6 +419,8 @@ const AiAgentProviders = ({
       hideProfilePicker,
       onToolCallApproveResult,
       onDropFiles,
+      suggestions,
+      t,
     ],
   );
 
@@ -478,3 +498,4 @@ export {
   useAiChatStore,
 } from "./ai-chat-store";
 export type { AiChatRouterPage } from "./ai-chat-store";
+
