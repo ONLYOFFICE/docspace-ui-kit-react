@@ -107,4 +107,5 @@ export type NavMenuProps = {
   className?: string;
   LinkRouter?: React.ComponentType<LinkRouterProps>;
   iconOnly?: boolean;
+  withExpandControl?: boolean;
 };
