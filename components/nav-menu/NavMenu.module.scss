@@ -282,6 +282,52 @@
   pointer-events: none;
 }
 
+// Mobile-only expand/collapse control sitting at the item's inline end. Sized
+// as a comfortable touch target while the chevron itself stays small.
+.expandButton {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--nav-menu-item-icon-active-color);
+    outline-offset: -2px;
+  }
+}
+
+.expandIcon {
+  width: 12px;
+  height: 12px;
+  // Base chevron points right; rotate it to point down when collapsed.
+  transform: rotate(90deg);
+  transition: transform 0.2s ease-in-out;
+
+  path {
+    fill: var(--nav-menu-item-icon-color);
+  }
+
+  &.expandIconExpanded {
+    // Point up when expanded.
+    transform: rotate(-90deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expandIcon {
+    transition: none;
+  }
+}
+
 // CSS Grid trick for smooth height animation without knowing content height
 .subItems {
   display: grid;

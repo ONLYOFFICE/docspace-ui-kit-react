@@ -509,6 +509,126 @@ describe("<NavMenu />", () => {
     });
   });
 
+  describe("withExpandControl (mobile)", () => {
+    it("renders a chevron toggle only on items that have children", () => {
+      render(<NavMenu groups={groups} withExpandControl />);
+      // Item body button carries no aria-expanded; the chevron does.
+      expect(
+        screen.getByRole("button", { name: "AI Files", expanded: false }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "AI Rooms", expanded: false }),
+      ).toBeInTheDocument();
+      // Childless top-level item has no chevron.
+      expect(
+        screen.queryByRole("button", { name: "AI Agents", expanded: false }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("expands via the chevron without invoking the item onClick", async () => {
+      const onClick = vi.fn();
+      const groupsWithHandler: NavMenuGroup[] = [
+        {
+          id: "g1",
+          items: [
+            {
+              id: "ai-files",
+              label: "AI Files",
+              onClick,
+              children: [{ id: "shared", label: "Shared with me" }],
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsWithHandler} withExpandControl />);
+
+      const chevron = screen.getByRole("button", {
+        name: "AI Files",
+        expanded: false,
+      });
+      await userEvent.click(chevron);
+
+      expect(chevron).toHaveAttribute("aria-expanded", "true");
+      expect(
+        screen.getByRole("button", { name: "Shared with me" }),
+      ).toBeInTheDocument();
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it("navigates from the item body without toggling the sub-menu", async () => {
+      const onClick = vi.fn();
+      const groupsWithHandler: NavMenuGroup[] = [
+        {
+          id: "g1",
+          items: [
+            {
+              id: "ai-files",
+              label: "AI Files",
+              onClick,
+              children: [{ id: "shared", label: "Shared with me" }],
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsWithHandler} withExpandControl />);
+
+      // Two buttons share the name; the body is the one without aria-expanded.
+      const [body] = screen
+        .getAllByRole("button", { name: "AI Files" })
+        .filter((el) => !el.hasAttribute("aria-expanded"));
+      await userEvent.click(body);
+
+      expect(onClick).toHaveBeenCalledOnce();
+      expect(
+        screen.getByRole("button", { name: "AI Files", expanded: false }),
+      ).toBeInTheDocument();
+    });
+
+    it("keeps several sections expanded at once", async () => {
+      render(<NavMenu groups={groups} withExpandControl />);
+
+      const filesChevron = screen.getByRole("button", {
+        name: "AI Files",
+        expanded: false,
+      });
+      const roomsChevron = screen.getByRole("button", {
+        name: "AI Rooms",
+        expanded: false,
+      });
+
+      await userEvent.click(filesChevron);
+      await userEvent.click(roomsChevron);
+
+      expect(filesChevron).toHaveAttribute("aria-expanded", "true");
+      expect(roomsChevron).toHaveAttribute("aria-expanded", "true");
+    });
+
+    it("collapses an expanded section when its chevron is clicked again", async () => {
+      render(
+        <NavMenu
+          groups={groups}
+          withExpandControl
+          defaultExpandedId="ai-files"
+        />,
+      );
+      const chevron = screen.getByRole("button", {
+        name: "AI Files",
+        expanded: true,
+      });
+
+      await userEvent.click(chevron);
+
+      expect(chevron).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("does not render a chevron when iconOnly", () => {
+      render(<NavMenu groups={groups} withExpandControl iconOnly />);
+      expect(
+        screen.queryByRole("button", { name: "AI Files", expanded: false }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
   describe("withAnimation", () => {
     it("does not dispatch ANIMATION_STARTED on item click when withAnimation is false", async () => {
       const spy = vi.spyOn(window, "dispatchEvent");
