@@ -417,6 +417,111 @@ describe("<NavMenu />", () => {
     });
   });
 
+  describe("collapsedBadgeComponent", () => {
+    const collapsedGroups: NavMenuGroup[] = [
+      {
+        id: "g",
+        label: "Group",
+        items: [
+          {
+            id: "parent",
+            label: "Parent",
+            showBadge: true,
+            badgeComponent: <span data-testid="own-badge">2</span>,
+            collapsedBadgeComponent: <span data-testid="agg-badge">7</span>,
+            children: [
+              {
+                id: "child",
+                label: "Child",
+                showBadge: true,
+                badgeComponent: <span data-testid="child-badge">5</span>,
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    it("shows the aggregated badge on a collapsed parent", () => {
+      render(<NavMenu groups={collapsedGroups} />);
+      expect(screen.getByTestId("agg-badge")).toBeInTheDocument();
+      expect(screen.queryByTestId("own-badge")).not.toBeInTheDocument();
+    });
+
+    it("swaps to the parent's own badge once expanded", () => {
+      render(<NavMenu groups={collapsedGroups} defaultExpandedId="parent" />);
+      expect(screen.getByTestId("own-badge")).toBeInTheDocument();
+      expect(screen.queryByTestId("agg-badge")).not.toBeInTheDocument();
+      // Child reveals its own badge alongside the parent's.
+      expect(screen.getByTestId("child-badge")).toBeInTheDocument();
+    });
+
+    it("switches from aggregated to own badge on expand click", async () => {
+      render(<NavMenu groups={collapsedGroups} />);
+      expect(screen.getByTestId("agg-badge")).toBeInTheDocument();
+      await userEvent.click(screen.getByRole("button", { name: "Parent" }));
+      expect(screen.getByTestId("own-badge")).toBeInTheDocument();
+      expect(screen.queryByTestId("agg-badge")).not.toBeInTheDocument();
+    });
+
+    it("shows the aggregated badge even when showBadge is not set", () => {
+      const groupsNoOwn: NavMenuGroup[] = [
+        {
+          id: "g",
+          items: [
+            {
+              id: "parent",
+              label: "Parent",
+              collapsedBadgeComponent: <span data-testid="agg-badge">3</span>,
+              children: [{ id: "child", label: "Child" }],
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsNoOwn} />);
+      expect(screen.getByTestId("agg-badge")).toBeInTheDocument();
+    });
+
+    it("falls back to badgeComponent when no collapsed badge is provided", () => {
+      const groupsNoCollapsed: NavMenuGroup[] = [
+        {
+          id: "g",
+          items: [
+            {
+              id: "parent",
+              label: "Parent",
+              showBadge: true,
+              badgeComponent: <span data-testid="own-badge">2</span>,
+              children: [{ id: "child", label: "Child" }],
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsNoCollapsed} />);
+      expect(screen.getByTestId("own-badge")).toBeInTheDocument();
+    });
+
+    it("ignores collapsedBadgeComponent on a childless item", () => {
+      const groupsNoChildren: NavMenuGroup[] = [
+        {
+          id: "g",
+          items: [
+            {
+              id: "leaf",
+              label: "Leaf",
+              showBadge: true,
+              badgeComponent: <span data-testid="own-badge">2</span>,
+              collapsedBadgeComponent: <span data-testid="agg-badge">9</span>,
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsNoChildren} />);
+      expect(screen.getByTestId("own-badge")).toBeInTheDocument();
+      expect(screen.queryByTestId("agg-badge")).not.toBeInTheDocument();
+    });
+  });
+
   describe("iconOnly", () => {
     it("applies iconOnly class to the root element", () => {
       render(<NavMenu groups={groups} iconOnly />);
@@ -506,6 +611,126 @@ describe("<NavMenu />", () => {
       render(<NavMenu groups={groupsWithHandler} iconOnly />);
       await userEvent.click(screen.getByRole("button", { name: "Item One" }));
       expect(onClick).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe("withExpandControl (mobile)", () => {
+    it("renders a chevron toggle only on items that have children", () => {
+      render(<NavMenu groups={groups} withExpandControl />);
+      // Item body button carries no aria-expanded; the chevron does.
+      expect(
+        screen.getByRole("button", { name: "AI Files", expanded: false }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "AI Rooms", expanded: false }),
+      ).toBeInTheDocument();
+      // Childless top-level item has no chevron.
+      expect(
+        screen.queryByRole("button", { name: "AI Agents", expanded: false }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("expands via the chevron without invoking the item onClick", async () => {
+      const onClick = vi.fn();
+      const groupsWithHandler: NavMenuGroup[] = [
+        {
+          id: "g1",
+          items: [
+            {
+              id: "ai-files",
+              label: "AI Files",
+              onClick,
+              children: [{ id: "shared", label: "Shared with me" }],
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsWithHandler} withExpandControl />);
+
+      const chevron = screen.getByRole("button", {
+        name: "AI Files",
+        expanded: false,
+      });
+      await userEvent.click(chevron);
+
+      expect(chevron).toHaveAttribute("aria-expanded", "true");
+      expect(
+        screen.getByRole("button", { name: "Shared with me" }),
+      ).toBeInTheDocument();
+      expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it("navigates from the item body without toggling the sub-menu", async () => {
+      const onClick = vi.fn();
+      const groupsWithHandler: NavMenuGroup[] = [
+        {
+          id: "g1",
+          items: [
+            {
+              id: "ai-files",
+              label: "AI Files",
+              onClick,
+              children: [{ id: "shared", label: "Shared with me" }],
+            },
+          ],
+        },
+      ];
+      render(<NavMenu groups={groupsWithHandler} withExpandControl />);
+
+      // Two buttons share the name; the body is the one without aria-expanded.
+      const [body] = screen
+        .getAllByRole("button", { name: "AI Files" })
+        .filter((el) => !el.hasAttribute("aria-expanded"));
+      await userEvent.click(body);
+
+      expect(onClick).toHaveBeenCalledOnce();
+      expect(
+        screen.getByRole("button", { name: "AI Files", expanded: false }),
+      ).toBeInTheDocument();
+    });
+
+    it("keeps several sections expanded at once", async () => {
+      render(<NavMenu groups={groups} withExpandControl />);
+
+      const filesChevron = screen.getByRole("button", {
+        name: "AI Files",
+        expanded: false,
+      });
+      const roomsChevron = screen.getByRole("button", {
+        name: "AI Rooms",
+        expanded: false,
+      });
+
+      await userEvent.click(filesChevron);
+      await userEvent.click(roomsChevron);
+
+      expect(filesChevron).toHaveAttribute("aria-expanded", "true");
+      expect(roomsChevron).toHaveAttribute("aria-expanded", "true");
+    });
+
+    it("collapses an expanded section when its chevron is clicked again", async () => {
+      render(
+        <NavMenu
+          groups={groups}
+          withExpandControl
+          defaultExpandedId="ai-files"
+        />,
+      );
+      const chevron = screen.getByRole("button", {
+        name: "AI Files",
+        expanded: true,
+      });
+
+      await userEvent.click(chevron);
+
+      expect(chevron).toHaveAttribute("aria-expanded", "false");
+    });
+
+    it("does not render a chevron when iconOnly", () => {
+      render(<NavMenu groups={groups} withExpandControl iconOnly />);
+      expect(
+        screen.queryByRole("button", { name: "AI Files", expanded: false }),
+      ).not.toBeInTheDocument();
     });
   });
 

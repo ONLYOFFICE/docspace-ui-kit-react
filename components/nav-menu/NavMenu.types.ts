@@ -77,6 +77,7 @@ export type NavMenuItem = {
   showBadge?: boolean;
   labelBadge?: string | number;
   badgeComponent?: React.ReactNode;
+  collapsedBadgeComponent?: React.ReactNode;
   onClickBadge?: (id: string) => void;
   linkData?: NavMenuLinkData;
   /**
@@ -107,4 +108,6 @@ export type NavMenuProps = {
   className?: string;
   LinkRouter?: React.ComponentType<LinkRouterProps>;
   iconOnly?: boolean;
+  withExpandControl?: boolean;
 };
+
