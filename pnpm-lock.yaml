@@ -98,9 +98,6 @@ importers:
       katex:
         specifier: ^0.16.45
         version: 0.16.45
-      linkify-react:
-        specifier: ^4.3.2
-        version: 4.3.2(linkifyjs@4.3.2)(react@19.2.4)
       lodash:
         specifier: 4.18.1
         version: 4.18.1
@@ -4087,15 +4084,6 @@ packages:
 
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
-
-  linkify-react@4.3.2:
-    resolution: {integrity: sha512-mi744h1hf+WDsr+paJgSBBgYNLMWNSHyM9V9LVUo03RidNGdw1VpI7Twnt+K3pEh3nIzB4xiiAgZxpd61ItKpQ==}
-    peerDependencies:
-      linkifyjs: ^4.0.0
-      react: '>= 15.0.0'
-
-  linkifyjs@4.3.2:
-    resolution: {integrity: sha512-NT1CJtq3hHIreOianA8aSXn6Cw0JzYOuDQbOrSPe7gqFnCpKP++MQe3ODgO3oh2GJFORkAAdqredOa60z63GbA==}
 
   loader-utils@3.3.1:
     resolution: {integrity: sha512-FMJTLMXfCLMLfJxcX9PFqX5qD88Z5MRGaZCVzfuqeZSPsyiBzs+pahDQjbIWz2QIzPZz0NX9Zy4FX3lmK6YHIg==}
@@ -9593,13 +9581,6 @@ snapshots:
       computed-style: 0.1.4
 
   lines-and-columns@1.2.4: {}
-
-  linkify-react@4.3.2(linkifyjs@4.3.2)(react@19.2.4):
-    dependencies:
-      linkifyjs: 4.3.2
-      react: 19.2.4
-
-  linkifyjs@4.3.2: {}
 
   loader-utils@3.3.1: {}
 
