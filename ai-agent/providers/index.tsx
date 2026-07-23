@@ -157,9 +157,9 @@ type AiAgentProvidersProps = {
 };
 
 // Server-mode API config: backend is mounted at the same origin as the
-// client under /api/2.0/new-ai. Engines are intentionally not constructed
+// client under /api/2.0/ai. Engines are intentionally not constructed
 // — every method call goes over HTTP via createServerAPI / ApiProvider.
-const SERVER_API_BASE_URL = "/api/2.0/new-ai";
+const SERVER_API_BASE_URL = "/api/2.0/ai";
 
 // Next.js evaluates this useMemo during SSR for "use client" components,
 // where `window` is undefined. Fall back to an empty origin — the actual
