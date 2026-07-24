@@ -59,12 +59,15 @@ import {
   createStores,
   useProfiles,
   useServers,
+  useStores,
   useThread,
   type WidgetConfig,
 } from "@onlyoffice/ai-chat";
 import type {
   ChatCallbacks,
   HostTool,
+  Profile,
+  ProfilePickerAction,
   ProviderType,
   ServerAPIConfig,
   ToolCallApproveContext,
@@ -151,6 +154,25 @@ type AiAgentProvidersProps = {
    * Pass `true` only where the model is fixed (AI agent rooms).
    */
   hideProfilePicker?: boolean;
+  /**
+   * Extra items appended to the composer's model picker dropdown after a
+   * separator below the profile list. Entries with `items` open a nested
+   * submenu. No effect when the picker is hidden.
+   */
+  profilePickerActions?: ProfilePickerAction[];
+  /**
+   * Displays `label` as the picker value while the aliased profile drives
+   * every request — see {@link ProfilePickerAlias}. The alias survives
+   * store rebuilds (entity switches) and thread switches; pass `null` to
+   * drop it.
+   */
+  profilePickerAlias?: ProfilePickerAlias | null;
+  /**
+   * Fired on explicit user picks in the model picker: a plain profile row
+   * (`actionId` undefined) or a profilePickerActions row with `profileId`
+   * (`actionId` = that action's id). Not fired by programmatic changes.
+   */
+  onProfilePickerSelect?: (profile: Profile, actionId?: string) => void;
   composerHeader?: ReactNode;
   composerDisabled?: boolean;
   children: ReactNode;
@@ -181,6 +203,43 @@ const StoresHydrator = () => {
   useProfiles({ isReady: true });
   useThread({ isReady: true });
   useServers({ isReady: true });
+  return null;
+};
+
+/**
+ * Host-driven alias for the composer model picker: the profile is selected
+ * as the session chat profile while the picker displays `label` (e.g. an AI
+ * agent name) instead of the profile's own name.
+ */
+export type ProfilePickerAlias = {
+  profileId: string;
+  label: string;
+};
+
+// Keeps the alias applied across everything that would otherwise drop it:
+// store rebuilds (entity/scope switches recreate the zustand bundle) and
+// thread switches (the threads store restores the thread's profile under
+// its own name). Lives inside StoresProvider to reach the stores context.
+const ProfilePickerAliasBridge = ({
+  alias,
+}: {
+  alias?: ProfilePickerAlias | null;
+}) => {
+  const { useProfilesStore, useThreadsStore } = useStores();
+  const initialized = useProfilesStore((s) => s.initialized);
+  const getProfileById = useProfilesStore((s) => s.getProfileById);
+  const setSessionChatProfile = useProfilesStore(
+    (s) => s.setSessionChatProfile,
+  );
+  const threadId = useThreadsStore((s) => s.threadId);
+
+  useEffect(() => {
+    if (!alias || !initialized) return;
+    const profile = getProfileById(alias.profileId);
+    if (!profile) return;
+    setSessionChatProfile({ ...profile, name: alias.label });
+  }, [alias, initialized, threadId, getProfileById, setSessionChatProfile]);
+
   return null;
 };
 
@@ -216,6 +275,9 @@ const AiAgentProviders = ({
   closeEditorPanel,
   entityId,
   hideProfilePicker = false,
+  profilePickerActions,
+  profilePickerAlias,
+  onProfilePickerSelect,
   composerHeader,
   composerDisabled,
   children,
@@ -353,11 +415,41 @@ const AiAgentProviders = ({
       keys: storeKeys,
       ctx: appCtx,
       api,
+      // Initial scope only — deliberately not a dependency. Scope changes
+      // re-scope the live bundle below instead of re-creating it, which
+      // would blink the whole chat (and every profiles-gated UI).
       entityId,
     });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
-  }, [isStandalone, entityId, platform]);
+  }, [isStandalone, platform]);
+
+  // Live re-scope on entityId changes (room navigation, agent pick): the
+  // bundle — and everything not scope-bound (profiles list, servers UI,
+  // router page) — stays intact; only what the scope owns is reloaded.
+  // Threads re-init themselves through `WidgetConfig.entityId` (the
+  // useThread hydration effect), so they are not touched here.
+  useEffect(() => {
+    if (stores.getEntityId() === entityId) return;
+    stores.setEntityId(entityId);
+
+    const profiles = stores.useProfilesStore.getState();
+    const threads = stores.useThreadsStore.getState();
+    const servers = stores.useServersStore.getState();
+    const attachments = stores.useAttachmentsStore.getState();
+
+    // A scope switch right after an explicit picker selection (agent pick
+    // sets the aliased profile, plain pick sets the profile itself) must
+    // not wipe that selection — the default reset runs AFTER the alias
+    // bridge and would drop it. Only agent rooms (hideProfilePicker) reset
+    // the session so the room's own assignment wins.
+    threads.onSwitchToNewThread({ keepSessionProfile: !hideProfilePicker });
+    void profiles.reloadModelAssignment();
+    void profiles.reloadExtendedThinking();
+    void servers.reload();
+    void attachments.clearAttachmentFiles();
+    void attachments.clearAttachmentImages();
+  }, [entityId, hideProfilePicker, stores]);
 
   const onDropFiles = useCallback(
     (files: File[]) =>
@@ -382,6 +474,8 @@ const AiAgentProviders = ({
       // whenever entityId is set, but here entityId means "current
       // folder/room scope", not "agent chat" — only agents fix the model.
       hideProfilePicker,
+      profilePickerActions,
+      onProfilePickerSelect,
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
@@ -399,6 +493,8 @@ const AiAgentProviders = ({
       composerDisabled,
       entityId,
       hideProfilePicker,
+      profilePickerActions,
+      onProfilePickerSelect,
       onToolCallApproveResult,
       onDropFiles,
     ],
@@ -440,6 +536,9 @@ const AiAgentProviders = ({
                           eventBus={ctx.eventBus}
                         >
                           <StoresHydrator />
+                          <ProfilePickerAliasBridge
+                            alias={profilePickerAlias}
+                          />
                           <AiChatStoreProvider>
                             <AiChatStoresBridge />
                             {getAgentRoomId ? null : <AgentRoomIdSync />}
@@ -468,6 +567,7 @@ export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
 export type {
   ComposerAction,
   Profile,
+  ProfilePickerAction,
   ServerAPIConfig,
 } from "@onlyoffice/ai-chat";
 export type { SaveAsFileHandler } from "./platform";
