@@ -148,6 +148,13 @@ type AiAgentProvidersProps = {
   closeEditorPanel?: () => void;
   entityId?: string;
   /**
+   * Secondary scope for the request context (agent tools, workspace
+   * steering, profile fallback) when talking to an AI agent from outside
+   * its room: threads/history and uploads keep following `entityId`,
+   * only sends carry this value — see `WidgetConfig.contextEntityId`.
+   */
+  contextEntityId?: string;
+  /**
    * Explicitly controls the composer model picker. The chat lib hides the
    * picker whenever `entityId` is set, but DocSpace scopes the chat by the
    * current folder/room, so `entityId` alone no longer means "agent chat".
@@ -274,6 +281,7 @@ const AiAgentProviders = ({
   openResultFile,
   closeEditorPanel,
   entityId,
+  contextEntityId,
   hideProfilePicker = false,
   profilePickerActions,
   profilePickerAlias,
@@ -470,6 +478,7 @@ const AiAgentProviders = ({
       composerHeader,
       composerDisabled,
       entityId,
+      contextEntityId,
       // Host-driven model-picker visibility: the lib falls back to hiding
       // whenever entityId is set, but here entityId means "current
       // folder/room scope", not "agent chat" — only agents fix the model.
@@ -492,6 +501,7 @@ const AiAgentProviders = ({
       composerHeader,
       composerDisabled,
       entityId,
+      contextEntityId,
       hideProfilePicker,
       profilePickerActions,
       onProfilePickerSelect,
