@@ -32,18 +32,22 @@ import classNames from "classnames";
 import { useStores } from "@onlyoffice/ai-chat";
 
 import HistoriesIcon from "../../assets/icons/16/clock.svg";
-// import PlusIcon from "../../assets/icons/16/button.plus.react.svg";
+import PlusIcon from "../../assets/icons/16/button.plus.react.svg";
 
 import { ActionButton } from "../../components/action-button";
 
 import styles from "./ChatToolbar.module.scss";
 
-export const ChatToolbar = () => {
+export interface ChatToolbarProps {
+  className?: string;
+}
+
+export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
   const { t } = useTranslation("Common");
   const stores = useStores();
   const currentPage = stores.useRouter((s) => s.currentPage);
   const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
-  // const startNewChat = stores.useThreadsStore((s) => s.onSwitchToNewThread);
+  const startNewChat = stores.useThreadsStore((s) => s.onSwitchToNewThread);
 
   const isHistoryActive = currentPage === "history";
 
@@ -56,22 +60,22 @@ export const ChatToolbar = () => {
   };
 
   return (
-    <nav className={styles.toolbar}>
+    <nav className={classNames(styles.toolbar, className)}>
       <div className={styles.leftGroup}>
         <ActionButton
           icon={<HistoriesIcon />}
           className={classNames(styles.button, {
             [styles.active]: isHistoryActive,
           })}
-          label={t("Common:ChatHistory")}
+          title={t("Common:ChatHistory")}
           onClick={handleNavigateToHistory}
         />
-        {/* <ActionButton
+        <ActionButton
           icon={<PlusIcon />}
           className={styles.button}
-          label={t("Common:AINewChat")}
+          title={t("Common:AINewChat")}
           onClick={startNewChat}
-        /> */}
+        />
       </div>
     </nav>
   );

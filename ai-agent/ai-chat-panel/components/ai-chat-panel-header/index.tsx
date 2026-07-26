@@ -29,6 +29,7 @@ import classNames from "classnames";
 import { IconButton } from "../../../../components/icon-button";
 import { Text } from "../../../../components/text";
 
+import { ChatToolbar } from "../../../chat-toolbar";
 import NewChatButton from "../../../new-chat-button";
 
 import ExpandIcon from "../../../../assets/icons/17/expand.svg";
@@ -80,7 +81,7 @@ const AiChatPanelHeader = ({
     <div className={classNames(styles.header, className)}>
       <div className={styles.left}>
         {renderTitle()}
-        <NewChatButton />
+        <ChatToolbar className={styles.toolbar} />
         {extras ? <div className={styles.extras}>{extras}</div> : null}
       </div>
 

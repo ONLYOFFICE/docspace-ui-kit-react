@@ -64,7 +64,7 @@ const NewChat: React.FC<ChatProps> = observer(
     const isFullScreen = aiChatStore.effectiveFullscreen;
 
     const showActivationScreen = !!noAccessProps && !aiReady && !threadId;
-    const showToolbar = hasProfiles || showActivationScreen;
+    const showToolbar = (hasProfiles || showActivationScreen) && isAgent;
 
     const chatBody = showActivationScreen ? (
       <ChatNoAccessScreen {...noAccessProps} />
