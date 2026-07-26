@@ -262,6 +262,32 @@
   }
 }
 
+// Drop-target state: the host drags list items over the panel to attach them to
+// the chat composer. The overlay is the only affordance the panel owns — the
+// drag itself is mouse-based and driven entirely by the host.
+.chatPanelDropTarget {
+  position: relative;
+}
+
+.chatPanelDropOverlay {
+  --chat-panel-drop-overlay-bg-v: var(--chat-panel-drop-overlay-background, var(--chat-panel-bg-v));
+  --chat-panel-drop-border-v: var(--chat-panel-drop-border-color, var(--accent-main));
+
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  // The drag is tracked with `elementFromPoint`, so the overlay must never
+  // shadow the panel itself during hit-testing.
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px;
+  border: 2px dashed var(--chat-panel-drop-border-v);
+  border-radius: 16px;
+  background-color: color-mix(in srgb, var(--chat-panel-drop-overlay-bg-v) 85%, transparent);
+}
+
 .spacer {
   display: none;
   min-height: var(--section-mobile-footer-height, 64px);
