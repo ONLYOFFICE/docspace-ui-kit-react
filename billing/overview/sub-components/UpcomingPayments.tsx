@@ -49,8 +49,11 @@ type UpcomingPaymentsProps = {
 
 const UpcomingPayments = ({ onUpcomingDetails }: UpcomingPaymentsProps) => {
   const t = useCommonTranslation();
-  const { upcomingPayments, walletCodeCurrency, formatWalletCurrency } =
-    usePaymentStore();
+  const {
+    upcomingPaymentsCurrentMonth: upcomingPayments,
+    walletCodeCurrency,
+    formatWalletCurrency,
+  } = usePaymentStore();
 
   const upcomingTotal = upcomingPayments.reduce(
     (sum, item) => sum + item.amount,
@@ -80,9 +83,14 @@ const UpcomingPayments = ({ onUpcomingDetails }: UpcomingPaymentsProps) => {
       </Text>
       {upcomingPayments.length === 0 ? (
         <div className={styles.emptyState}>
-          <Text fontSize="14px" className={styles.mutedTitle}>
-            {t("NoUpcomingPayments")}
-          </Text>
+          <div className={styles.emptyContent}>
+            <Text fontSize="12px" fontWeight={600} className={styles.mutedTitle}>
+              {t("NoUpcomingPayments")}
+            </Text>
+            <Text fontSize="12px" className={styles.mutedTitle}>
+              {t("NoUpcomingPaymentsDesc")}
+            </Text>
+          </div>
         </div>
       ) : (
         <div className={styles.upcomingList}>

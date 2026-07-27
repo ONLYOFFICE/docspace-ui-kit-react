@@ -157,6 +157,8 @@ export type TUpcomingPayment = {
   renewalDate: string;
   /** Short, localized "month day" date (no year), e.g. "July 1". */
   renewalDateShort: string;
+  /** Raw ISO due date, used for filtering (e.g. current month). */
+  dueDate: string;
   title: string;
   quantity: number;
   unitOfMeasure: string;

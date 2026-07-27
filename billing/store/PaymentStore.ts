@@ -97,7 +97,7 @@ import {
   getAppTimezone,
   isSameDay,
 } from "../../utils/date";
-import type { DateTime } from "luxon";
+import { DateTime } from "luxon";
 import type {
   TPaymentConfig,
   TPaymentRoutes,
@@ -640,12 +640,23 @@ class PaymentStore {
         locale: this.language,
         timezone: getAppTimezone(),
       }),
+      dueDate: item.dueDate,
       title: item.title,
       quantity: item.quantity,
       unitOfMeasure: item.unitOfMeasure,
       amount: item.amount,
       actionType: item.wallet ? "edit-subscription" : "edit-plan",
     }));
+  }
+
+  /** Upcoming payments due within the current calendar month. */
+  get upcomingPaymentsCurrentMonth(): TUpcomingPayment[] {
+    const now = DateTime.now().setZone(getAppTimezone());
+
+    return this.upcomingPayments.filter((item) => {
+      const due = DateTime.fromISO(item.dueDate).setZone(getAppTimezone());
+      return due.isValid && due.year === now.year && due.month === now.month;
+    });
   }
 
   formatWalletCurrency = (

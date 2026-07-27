@@ -121,7 +121,7 @@ const PaymentMethod = ({ onManagePaymentMethod }: PaymentMethodProps) => {
 
       {!isCardLinkedToPortal ? (
         <div className={styles.emptyState}>
-          <div className={styles.pmEmpty}>
+          <div className={styles.emptyContent}>
             <Text
               fontSize="12px"
               fontWeight={600}
