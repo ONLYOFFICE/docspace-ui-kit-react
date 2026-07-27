@@ -77,9 +77,18 @@ const OverviewLoader = () => {
         </div>
       </div>
 
-      {/* Plan / spend / upcoming */}
-      <div className={styles.grid3}>
-        <InfoCardLoader uniqueKey="ov-plan" />
+      {/* Current plan (full width) */}
+      <div className={`${styles.card} ${styles.planCard}`}>
+        <div className={styles.planInfo}>
+          <RectangleSkeleton uniqueKey="ov-plan-title" width="80px" height="14px" borderRadius={R} />
+          <RectangleSkeleton uniqueKey="ov-plan-name" width="96px" height="20px" borderRadius={R} />
+          <RectangleSkeleton uniqueKey="ov-plan-text" width="200px" height="14px" borderRadius={R} />
+        </div>
+        <RectangleSkeleton uniqueKey="ov-plan-button" width="120px" height="32px" borderRadius={R} />
+      </div>
+
+      {/* Spend / upcoming */}
+      <div className={styles.grid2}>
         <InfoCardLoader uniqueKey="ov-spend" />
         <InfoCardLoader uniqueKey="ov-upcoming" />
       </div>

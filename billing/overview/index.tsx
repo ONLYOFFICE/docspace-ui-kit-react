@@ -100,8 +100,9 @@ const BillingOverview = ({
         <>
           <AvailableCredits isMobile={isMobile} />
 
-          <div className={styles.grid3}>
-            <CurrentPlan onEditPlan={onEditPlan} />
+          <CurrentPlan onEditPlan={onEditPlan} isMobile={isMobile} />
+
+          <div className={styles.grid2}>
             <MonthToDateSpend onViewUsage={onViewUsage} />
             <UpcomingPayments onUpcomingDetails={onUpcomingDetails} />
           </div>
