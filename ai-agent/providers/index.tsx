@@ -180,6 +180,17 @@ type AiAgentProvidersProps = {
    * (`actionId` = that action's id). Not fired by programmatic changes.
    */
   onProfilePickerSelect?: (profile: Profile, actionId?: string) => void;
+  /**
+   * Fired when an opened thread's persisted context settles: the agent
+   * entity the conversation last ran against, or `null` for a plain
+   * conversation. Not fired while the value is unknown (fetch in flight,
+   * local echo of a just-created thread) — the host keeps its own state
+   * then. Use it to restore/drop the picked agent per thread.
+   */
+  onThreadContextChange?: (
+    contextEntityId: string | null,
+    threadId: string,
+  ) => void;
   composerHeader?: ReactNode;
   composerDisabled?: boolean;
   children: ReactNode;
@@ -223,29 +234,55 @@ export type ProfilePickerAlias = {
   label: string;
 };
 
-// Keeps the alias applied across everything that would otherwise drop it:
-// store rebuilds (entity/scope switches recreate the zustand bundle) and
-// thread switches (the threads store restores the thread's profile under
-// its own name). Lives inside StoresProvider to reach the stores context.
+// Applies the alias whenever the host's pick changes (and once profiles
+// hydrate). Deliberately NOT keyed on the thread: a thread switch restores
+// the thread's own profile, and the host re-drives the alias per thread
+// through onThreadContextChange — see ThreadContextBridge.
 const ProfilePickerAliasBridge = ({
   alias,
 }: {
   alias?: ProfilePickerAlias | null;
 }) => {
-  const { useProfilesStore, useThreadsStore } = useStores();
+  const { useProfilesStore } = useStores();
   const initialized = useProfilesStore((s) => s.initialized);
   const getProfileById = useProfilesStore((s) => s.getProfileById);
   const setSessionChatProfile = useProfilesStore(
     (s) => s.setSessionChatProfile,
   );
-  const threadId = useThreadsStore((s) => s.threadId);
 
   useEffect(() => {
     if (!alias || !initialized) return;
     const profile = getProfileById(alias.profileId);
     if (!profile) return;
     setSessionChatProfile({ ...profile, name: alias.label });
-  }, [alias, initialized, threadId, getProfileById, setSessionChatProfile]);
+  }, [alias, initialized, getProfileById, setSessionChatProfile]);
+
+  return null;
+};
+
+// Hands the opened thread's persisted context back to the host: the engine
+// stamps contextEntityId into stored user messages, the message store
+// derives the thread's value on load (`undefined` = not settled — a fetch
+// in flight or the local echo of a just-created thread — never reported;
+// the host's own state is the truth then), and this bridge reports the
+// settled value so the host can restore or drop its per-thread agent state.
+const ThreadContextBridge = ({
+  onThreadContextChange,
+}: {
+  onThreadContextChange?: (
+    contextEntityId: string | null,
+    threadId: string,
+  ) => void;
+}) => {
+  const { useMessageStore, useThreadsStore } = useStores();
+  const threadId = useThreadsStore((s) => s.threadId);
+  const threadContext = useMessageStore((s) => s.threadContextEntityId);
+
+  useEffect(() => {
+    if (!onThreadContextChange || !threadId) return;
+    if (threadContext === undefined) return;
+    onThreadContextChange(threadContext, threadId);
+  }, [onThreadContextChange, threadId, threadContext]);
 
   return null;
 };
@@ -286,6 +323,7 @@ const AiAgentProviders = ({
   profilePickerActions,
   profilePickerAlias,
   onProfilePickerSelect,
+  onThreadContextChange,
   composerHeader,
   composerDisabled,
   children,
@@ -548,6 +586,9 @@ const AiAgentProviders = ({
                           <StoresHydrator />
                           <ProfilePickerAliasBridge
                             alias={profilePickerAlias}
+                          />
+                          <ThreadContextBridge
+                            onThreadContextChange={onThreadContextChange}
                           />
                           <AiChatStoreProvider>
                             <AiChatStoresBridge />
