@@ -78,6 +78,7 @@ type DocsConnectPageProps = {
   onCancelPlan: () => void;
   onRemovePlan: () => void;
   onCancelChange: () => void;
+  isCancelChangeLoading?: boolean;
 };
 
 const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
@@ -91,6 +92,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
   onCancelPlan,
   onRemovePlan,
   onCancelChange,
+  isCancelChangeLoading,
 }) => {
   const t = useCommonTranslation();
   const paymentStore = usePaymentStore();
@@ -238,6 +240,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
                 })
           }
           onCancelChange={onCancelChange}
+          isCancelLoading={isCancelChangeLoading}
         />
       ) : null}
 
