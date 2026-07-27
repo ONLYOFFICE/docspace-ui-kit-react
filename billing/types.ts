@@ -155,6 +155,8 @@ export type TUpcomingPaymentActionType = "edit-plan" | "edit-subscription";
 export type TUpcomingPayment = {
   id: string;
   renewalDate: string;
+  /** Short, localized "month day" date (no year), e.g. "July 1". */
+  renewalDateShort: string;
   title: string;
   quantity: number;
   unitOfMeasure: string;

@@ -204,6 +204,31 @@
   min-height: 140px;
 }
 
+.upcomingList {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: 25px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.upcomingRow {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+  min-height: 48px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--payment-devider-color);
+  }
+}
+
+.upcomingAmount {
+  justify-self: end;
+  white-space: nowrap;
+}
+
 .paymentLinkedCard {
   width: 100%;
   /* 8px card flex-gap + 22px = 30px below the linked card */

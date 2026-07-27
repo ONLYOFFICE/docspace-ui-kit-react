@@ -636,6 +636,10 @@ class PaymentStore {
         locale: this.language,
         timezone: getAppTimezone(),
       }),
+      renewalDateShort: formatDateLocalized(item.dueDate, "DATE_MONTH_DAY", {
+        locale: this.language,
+        timezone: getAppTimezone(),
+      }),
       title: item.title,
       quantity: item.quantity,
       unitOfMeasure: item.unitOfMeasure,
