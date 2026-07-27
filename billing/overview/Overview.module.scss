@@ -247,6 +247,73 @@
   white-space: nowrap;
 }
 
+.pmSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.pmRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 0;
+}
+
+.pmCardIcon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.pmInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.pmErrorTitle {
+  color: var(--payment-error-color);
+}
+
+.pmStatusIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.pmCheckIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  path {
+    fill: var(--payment-credit-color);
+  }
+}
+
+.pmDivider {
+  width: 100%;
+  height: 1px;
+  background: var(--payment-devider-color);
+}
+
+.pmPayerLabel {
+  flex-shrink: 0;
+  color: var(--payment-secondary-text-color);
+}
+
+.pmEmpty {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
 .paymentLinkedCard {
   width: 100%;
   /* 8px card flex-gap + 22px = 30px below the linked card */
