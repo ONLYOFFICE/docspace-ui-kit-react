@@ -196,6 +196,14 @@ const NavMenuItemWrapper = ({
   // navigation-only.
   const showExpandControl = withExpandControl && hasChildren && !iconOnly;
 
+  const useCollapsedBadge =
+    hasChildren && !isExpanded && item.collapsedBadgeComponent != null;
+  const activeBadgeComponent = useCollapsedBadge
+    ? item.collapsedBadgeComponent
+    : item.badgeComponent;
+
+  const showBadge = item.showBadge || activeBadgeComponent != null;
+
   const itemClassName = classNames(styles.item, { [styles.active]: isActive });
 
   const content = (
@@ -207,9 +215,7 @@ const NavMenuItemWrapper = ({
           ) : (
             <ReactSVG className={styles.itemIcon} src={item.icon!} />
           )}
-          {item.showBadge && (
-            <span className={styles.itemSignalDot} />
-          )}
+          {showBadge && <span className={styles.itemSignalDot} />}
         </div>
       ) : null}
       <span className={styles.itemText}>{item.label}</span>
@@ -272,13 +278,13 @@ const NavMenuItemWrapper = ({
             {content}
           </TooltipContainer>
         )}
-        {item.showBadge && (
+        {showBadge && (
           <div
             className={styles.itemBadge}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
           >
-            {item.badgeComponent ?? (
+            {activeBadgeComponent ?? (
               <Badge
                 label={item.labelBadge}
                 onClick={() => item.onClickBadge?.(item.id)}
@@ -417,10 +423,25 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       if (!iconOnly) return items;
       const flat: NavMenuItem[] = [];
       for (const item of items) {
-        flat.push({ ...item, children: undefined });
         const isActiveParent =
           item.id === activeItemId ||
           item.children?.some((sub) => sub.id === activeItemId);
+        // Flattening drops `children`, so the collapsed-badge logic in the item
+        // wrapper (which keys off `hasChildren`) no longer applies. Resolve the
+        // parent's badge here: an inactive parent (children hidden) shows the
+        // aggregated collapsed badge; the active parent — whose children are
+        // flattened right below it — shows its own per-section badge.
+        const hasChildren = !!item.children?.length;
+        const collapsedBadge =
+          hasChildren && !isActiveParent && item.collapsedBadgeComponent != null
+            ? item.collapsedBadgeComponent
+            : item.badgeComponent;
+        flat.push({
+          ...item,
+          children: undefined,
+          collapsedBadgeComponent: undefined,
+          badgeComponent: collapsedBadge,
+        });
         if (isActiveParent) {
           const children = item.children ?? [];
           children.forEach((sub, index) => {
@@ -450,7 +471,11 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
     return (
       <nav
         ref={ref}
-        className={classNames(styles.root, { [styles.iconOnly]: iconOnly }, className)}
+        className={classNames(
+          styles.root,
+          { [styles.iconOnly]: iconOnly },
+          className,
+        )}
       >
         {groups.map((group) => {
           const items = flatten(group.items);
@@ -489,3 +514,4 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
 NavMenuComponent.displayName = "NavMenu";
 
 export { NavMenuComponent as NavMenu };
+
