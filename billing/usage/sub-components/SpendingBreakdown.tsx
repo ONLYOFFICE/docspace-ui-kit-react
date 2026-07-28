@@ -52,9 +52,8 @@ import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import type { TUsagePeriodKey } from "../../types";
 import { AI_TOOLS, BACKUP_SERVICE } from "../../constants";
-import { formatCompactNumber } from "../../utils/common";
 
-import { getServiceQuantity } from "../../wallet/utils";
+import { getServiceUsageSubLabel } from "../../utils/serviceUsage";
 import { getUsageRange } from "../utils";
 import BreakdownRow from "./BreakdownRow";
 import styles from "../styles/Usage.module.scss";
@@ -162,18 +161,8 @@ const SpendingBreakdown = ({
   const normalizeService = (service: string) =>
     (service || "").toLowerCase().replace(/[^a-z]/g, "");
 
-  const getSubLabel = (item: (typeof serviceUsage)[number]) => {
-    if (item.service === BACKUP_SERVICE)
-      return t("BilledBackups", { count: item.totalQuantity });
-
-    if (item.service === AI_TOOLS)
-      return t("UnitCount", {
-        unit: item.serviceUnit,
-        count: formatCompactNumber(item.totalQuantity, language),
-      });
-
-    return getServiceQuantity(t, item.totalQuantity, item.serviceUnit);
-  };
+  const getSubLabel = (item: (typeof serviceUsage)[number]) =>
+    getServiceUsageSubLabel(t, item, language);
 
   const getServiceHandler = (service: string) => {
     const key = normalizeService(service);

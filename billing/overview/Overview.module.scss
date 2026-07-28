@@ -63,6 +63,7 @@
 .grid3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  align-items: start;
   gap: 16px;
 
   @media (max-width: 900px) {
@@ -73,6 +74,7 @@
 .grid2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  align-items: start;
   gap: 16px;
 
   @media (max-width: 900px) {
@@ -312,6 +314,113 @@
   flex-direction: column;
   gap: 8px;
   text-align: center;
+}
+
+.spendRoot {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.spendTop {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.spendBar {
+  display: flex;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--payment-spend-track-color);
+}
+
+.spendBarSubs {
+  height: 100%;
+  background: var(--payment-spend-subscriptions-color);
+}
+
+.spendBarPayg {
+  height: 100%;
+  background: var(--payment-spend-payg-color);
+}
+
+.spendList {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.spendSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-block: 8px 12px;
+
+  &:not(:first-child) {
+    padding-block-start: 20px;
+  }
+}
+
+.spendDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 8px;
+}
+
+.spendDotSubs {
+  background: var(--payment-spend-subscriptions-color);
+}
+
+.spendDotPayg {
+  background: var(--payment-spend-payg-color);
+}
+
+.spendSectionLabel {
+  flex: 1 0 0;
+  min-width: 0;
+  color: var(--payment-secondary-text-color);
+}
+
+.spendSectionTotal {
+  flex-shrink: 0;
+  white-space: nowrap;
+  color: var(--payment-secondary-text-color);
+}
+
+.spendRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding-inline-start: 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.spendRowInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-width: 0;
+  padding-block: 8px;
+}
+
+.spendAmount {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding-inline-start: 25px;
+  padding-block: 8px;
+}
+
+.spendDivider {
+  height: 1px;
+  margin-inline-start: 16px;
+  background: var(--payment-devider-color);
 }
 
 .paymentLinkedCard {
