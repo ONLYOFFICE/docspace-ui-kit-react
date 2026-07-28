@@ -228,14 +228,20 @@ const SpendingBreakdown = ({
       .setLocale(language || "en")
       .toFormat("LLLL yyyy");
 
+  // Never show months past the current one; the newest month comes first.
+  const currentMonth = DateTime.now()
+    .setZone(getAppTimezone())
+    .startOf("month");
   const periodMonths: { year: number; month: number }[] = [];
   let monthCursor = from.startOf("month");
-  const lastMonth = to.startOf("month");
+  const lastMonth = DateTime.min(to.startOf("month"), currentMonth);
 
   while (monthCursor <= lastMonth) {
     periodMonths.push({ year: monthCursor.year, month: monthCursor.month });
     monthCursor = monthCursor.plus({ months: 1 });
   }
+
+  periodMonths.reverse();
 
   const monthlyMap = new Map(
     serviceUsageMonthly.map((item) => [`${item.year}-${item.month}`, item]),
