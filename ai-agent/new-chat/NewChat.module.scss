@@ -250,7 +250,10 @@
 }
 
 :global(.dropdown-menu-item) {
-  svg path {
+  svg path[stroke]:not([stroke="none"]) {
+    stroke: var(--context-menu-header-text-color);
+  }
+  svg path[fill]:not([fill="none"]) {
     fill: var(--context-menu-header-text-color);
   }
 
@@ -258,13 +261,3 @@
     font-weight: 600;
   }
 }
-
-// :global(.icon-button) {
-//   color: var(--icon-button-color);
-
-//   @media (hover: hover) {
-//     &:not(:disabled):hover {
-//       color: var(--icon-button-hover-color);
-//     }
-//   }
-// }
