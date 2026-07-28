@@ -140,6 +140,7 @@ export type TAiToolsPrices = {
     symbol: string;
   };
   chat?: TAiToolsChatModelPrice[];
+  image?: TAiToolsChatModelPrice[];
   embedding?: TAiToolsEmbeddingModelPrice[];
   webSearch?: TAiToolsWebSearchPrice[];
 };
