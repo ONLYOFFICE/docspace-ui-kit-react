@@ -342,12 +342,15 @@
   --aui-font-base: 13px;
 }
 
-// :global(.icon-button) {
-//   color: var(--icon-button-color);
+:global(.dropdown-menu-item) {
+  svg path[stroke]:not([stroke="none"]) {
+    stroke: var(--context-menu-header-text-color);
+  }
+  svg path[fill]:not([fill="none"]) {
+    fill: var(--context-menu-header-text-color);
+  }
 
-//   @media (hover: hover) {
-//     &:not(:disabled):hover {
-//       color: var(--icon-button-hover-color);
-//     }
-//   }
-// }
+  :global([class*="--drop-down-menu-item-color"]) {
+    font-weight: 600;
+  }
+}
