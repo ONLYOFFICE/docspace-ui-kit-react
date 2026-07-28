@@ -249,6 +249,16 @@
   --aui-font-base: 13px;
 }
 
+:global(.dropdown-menu-item) {
+  svg path {
+    fill: var(--context-menu-header-text-color);
+  }
+
+  :global([class*="--drop-down-menu-item-color"]) {
+    font-weight: 600;
+  }
+}
+
 // :global(.icon-button) {
 //   color: var(--icon-button-color);
 
