@@ -36,7 +36,7 @@
 import type { ChatNoAccessScreenProps } from "../chat/components/chat-no-access-screen";
 
 export interface ChatProps {
-  isAgent?: boolean;
+  isAgents?: boolean;
   aiReady?: boolean;
   noAccessProps?: ChatNoAccessScreenProps;
 }

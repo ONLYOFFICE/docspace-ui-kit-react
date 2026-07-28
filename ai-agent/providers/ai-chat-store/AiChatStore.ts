@@ -26,7 +26,8 @@
 
 import { makeAutoObservable } from "mobx";
 
-export type AiChatRouterPage = "chat" | "settings" | "history" | string;
+export type AiChatRouterPage =
+  "chat" | "settings" | "history" | "initial-setup";
 
 // Single source of truth for the AI Chat panel UI: visibility + fullscreen
 // + selected agent + mirrors of the upstream router page and profiles
@@ -68,6 +69,10 @@ class AiChatStore {
     return (
       this.currentPage === "settings" || this.currentPage === "initial-setup"
     );
+  }
+
+  get isOnHistoryPage(): boolean {
+    return this.currentPage === "history";
   }
 
   // Fullscreen is forced when:
@@ -122,4 +127,3 @@ class AiChatStore {
 }
 
 export default AiChatStore;
-
