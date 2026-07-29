@@ -38,6 +38,32 @@ export type AttachFileInput = {
 };
 
 /**
+ * What the backend reported about a freshly attached file, keyed by
+ * attachment id. `addAttachmentFile` keeps only `{id, title, kind, path,
+ * type}` in the store, so anything else the record carried — notably
+ * `canAnalyze` for forms — is available in the attach response alone and has
+ * to be remembered by the caller.
+ */
+export type AttachedFileInfo = {
+  id: string;
+  /** The backend can analyze this file's contents (an analyzable form). */
+  canAnalyze?: boolean;
+};
+
+/** Reports what was attached, so the caller can keep the extra flags. */
+export type OnFilesAttached = (attached: AttachedFileInfo[]) => void;
+
+// The packaged ai-chat (`onlyoffice-ai-chat-0.5.0-docspace.2.tgz`) predates
+// `canAnalyze` on its `Attachment` type, while the backend already returns it.
+// Read it structurally until a build carrying the field is packed.
+const readCanAnalyze = (record: unknown): boolean | undefined => {
+  if (typeof record !== "object" || record === null) return undefined;
+  if (!("canAnalyze" in record)) return undefined;
+  const value = record.canAnalyze;
+  return typeof value === "boolean" ? value : undefined;
+};
+
+/**
  * Attaches host files to the AI chat composer through the attachments
  * store, then re-keys the refs flagged in `imageIndices` to
  * `attachmentImages`. The library hardcodes `kind: "file"` for refs produced
@@ -46,19 +72,29 @@ export type AttachFileInput = {
  *
  * `imageIndices` are positions into `inputs`; the matching freshly-added refs
  * are moved (added refs preserve input order).
+ *
+ * Returns what stayed attached as files, so the caller can keep the record
+ * flags the store drops (see {@link AttachedFileInfo}). Records past the
+ * store's 5-item cap are silently dropped by the library, so the result can be
+ * shorter than `inputs`.
  */
 export const attachFilesToChat = async (
   useAttachmentsStore: AttachmentsStore,
   inputs: AttachFileInput[],
   imageIndices: Set<number>,
-): Promise<void> => {
-  if (inputs.length === 0) return;
+): Promise<AttachedFileInfo[]> => {
+  if (inputs.length === 0) return [];
 
   const before = useAttachmentsStore.getState().attachmentFiles.length;
 
-  await useAttachmentsStore.getState().addAttachmentFile(inputs);
+  const records =
+    (await useAttachmentsStore.getState().addAttachmentFile(inputs)) ?? [];
 
-  if (imageIndices.size === 0) return;
+  const attached = records
+    .filter((_, i) => !imageIndices.has(i))
+    .map((record) => ({ id: record.id, canAnalyze: readCanAnalyze(record) }));
+
+  if (imageIndices.size === 0) return attached;
 
   useAttachmentsStore.setState((s) => {
     const added = s.attachmentFiles.slice(before);
@@ -76,4 +112,6 @@ export const attachFilesToChat = async (
       attachmentImages: [...s.attachmentImages, ...movedImages],
     };
   });
+
+  return attached;
 };

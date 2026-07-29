@@ -33,6 +33,7 @@ import { useStores } from "@onlyoffice/ai-chat";
 import { useApi as useFilesApi } from "../../../providers/api";
 
 import { uploadFilesToChat } from "./upload-files";
+import type { OnFilesAttached } from "./attach-files";
 
 export type DeviceUploaderHandle = {
   // Open the hidden file picker (composer "Upload from device" action).
@@ -43,6 +44,9 @@ type DeviceUploaderProps = {
   // Chat scope (current room/folder id). Device files are uploaded there as
   // real portal files; when absent they land in My documents.
   entityId?: string;
+  // Reports the attached files so the caller can keep the record flags the
+  // attachments store drops (`canAnalyze`).
+  onFilesAttached?: OnFilesAttached;
 };
 
 // Thin React wrapper around the framework-free `uploadFilesToChat` flow (see
@@ -54,7 +58,7 @@ type DeviceUploaderProps = {
 const DeviceUploader = React.forwardRef<
   DeviceUploaderHandle,
   DeviceUploaderProps
->(({ entityId }, ref) => {
+>(({ entityId, onFilesAttached }, ref) => {
   const { t } = useTranslation(["Common"]);
   const { useAttachmentsStore } = useStores();
   const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
@@ -68,6 +72,7 @@ const DeviceUploader = React.forwardRef<
         operationsApi,
         filesSettingsApi,
         useAttachmentsStore,
+        onFilesAttached,
         t,
       }),
     [
@@ -76,6 +81,7 @@ const DeviceUploader = React.forwardRef<
       operationsApi,
       filesSettingsApi,
       entityId,
+      onFilesAttached,
       t,
     ],
   );

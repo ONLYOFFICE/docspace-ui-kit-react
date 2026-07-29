@@ -102,7 +102,7 @@ import {
   type EditorToolsChangedDetail,
 } from "./host-tool-groups";
 import { useApi as useFilesApi } from "../../providers/api";
-import { useFilesIntegration } from "./files";
+import { useFilesIntegration, type AttachedFileInfo } from "./files";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
 
@@ -159,12 +159,52 @@ type AiAgentProvidersProps = {
   composerHeader?: ReactNode;
   composerDisabled?: boolean;
   /**
-   * Welcome-screen suggestion chips. The host builds this list for the current
-   * section (room / folder context) and passes it in ready-made; the provider
-   * just forwards it to the widget.
+   * Welcome-screen suggestion chips. The host builds the lists for the current
+   * section (room / folder context) and passes them in ready-made; which list
+   * is shown depends on what the composer currently holds — see
+   * {@link SuggestionSet}. A bare array is treated as `{ default: [...] }`.
    */
-  suggestions?: Suggestion[];
+  suggestions?: Suggestion[] | SuggestionSet;
   children: ReactNode;
+};
+
+/**
+ * Suggestion chips per composer state. The host owns the texts; picking
+ * between them belongs here, because only the provider sees the attachments
+ * store — files can also arrive by drag-and-drop and be removed chip by chip,
+ * neither of which the host observes.
+ *
+ * Precedence: an analyzable form wins over the plain file lists, and those win
+ * over the section default. Only attached *files* count — images are ignored.
+ */
+export type SuggestionSet = {
+  /** Nothing attached: chips for the current section (room / folder). */
+  default: Suggestion[];
+  /** Exactly one file attached. */
+  singleFile?: Suggestion[];
+  /** Two or more files attached. */
+  multipleFiles?: Suggestion[];
+  /** At least one attached file the backend flagged as analyzable. */
+  analyzableForm?: Suggestion[];
+};
+
+const resolveSuggestions = (
+  suggestions: Suggestion[] | SuggestionSet | undefined,
+  attachedFileIds: string[],
+  analyzableIds: string[],
+): Suggestion[] | undefined => {
+  if (!suggestions || Array.isArray(suggestions)) return suggestions;
+
+  if (attachedFileIds.some((id) => analyzableIds.includes(id))) {
+    return suggestions.analyzableForm ?? suggestions.default;
+  }
+  if (attachedFileIds.length > 1) {
+    return suggestions.multipleFiles ?? suggestions.default;
+  }
+  if (attachedFileIds.length === 1) {
+    return suggestions.singleFile ?? suggestions.default;
+  }
+  return suggestions.default;
 };
 
 // Server-mode API config: backend is mounted at the same origin as the
@@ -236,11 +276,25 @@ const AiAgentProviders = ({
   const aiChatLocale = normalizeAiChatLocale(locale);
   const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
 
+  // Ids of attached files the backend flagged as analyzable. The attachments
+  // store keeps only `{id, title, kind, path, type}` per ref, so `canAnalyze`
+  // exists in the attach response alone and is remembered here. Ids of removed
+  // attachments are harmless — the lookup always intersects with the current
+  // refs.
+  const [analyzableIds, setAnalyzableIds] = useState<string[]>([]);
+
+  const onFilesAttached = useCallback((attached: AttachedFileInfo[]) => {
+    const ids = attached.filter((f) => f.canAnalyze).map((f) => f.id);
+    if (ids.length === 0) return;
+    setAnalyzableIds((prev) => [...prev, ...ids]);
+  }, []);
+
   // File-attachment integration: the composer "attach" actions, the message
   // "Save as file" handler, and the supporting dialogs/device-upload input.
   // Device uploads are stored as portal files in the chat's entity scope.
   const { composerActions, onSaveAsFile, overlay } = useFilesIntegration({
     entityId,
+    onFilesAttached,
   });
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
@@ -379,9 +433,35 @@ const AiAgentProviders = ({
         operationsApi,
         filesSettingsApi,
         useAttachmentsStore: stores.useAttachmentsStore,
+        onFilesAttached,
         t,
       }),
-    [entityId, foldersApi, operationsApi, filesSettingsApi, stores, t],
+    [
+      entityId,
+      foldersApi,
+      operationsApi,
+      filesSettingsApi,
+      stores,
+      onFilesAttached,
+      t,
+    ],
+  );
+
+  // Which chips to show depends on what the composer holds right now, so the
+  // attachment refs are read straight from the store the widget writes to —
+  // that covers drag-and-drop and chip removal, not just the attach dialog.
+  const attachedFileIds = stores.useAttachmentsStore((s) =>
+    s.attachmentFiles.map((f) => f.id).join(","),
+  );
+
+  const resolvedSuggestions = useMemo(
+    () =>
+      resolveSuggestions(
+        suggestions,
+        attachedFileIds === "" ? [] : attachedFileIds.split(","),
+        analyzableIds,
+      ),
+    [suggestions, attachedFileIds, analyzableIds],
   );
 
   const widgetConfig = useMemo<WidgetConfig>(
@@ -401,15 +481,15 @@ const AiAgentProviders = ({
       composerPlaceholder: t("AskAnyQuestion"),
       webSearchSaveMode: "button",
       welcomeDescription: t("Common:WelcomeAiChatDescription"),
-      // Section-specific chips: the host builds the list for the current
-      // section (room / folder context) and passes it in ready-made.
-      suggestions,
+      // Context-specific chips: the host builds the lists for the current
+      // section, and the set is narrowed above by what is attached.
+      suggestions: resolvedSuggestions,
 
       // Route drag-and-drop through the portal-upload + attach flow (same as
       // the "Upload from device" button) instead of the library's in-memory
       // default, so dropped DOCX/PDF/XLSX are supported too.
       onDropFiles,
-      showWelcome: (suggestions?.length ?? 0) > 0,
+      showWelcome: (resolvedSuggestions?.length ?? 0) > 0,
     }),
     [
       composerActions,
@@ -419,7 +499,7 @@ const AiAgentProviders = ({
       hideProfilePicker,
       onToolCallApproveResult,
       onDropFiles,
-      suggestions,
+      resolvedSuggestions,
       t,
     ],
   );

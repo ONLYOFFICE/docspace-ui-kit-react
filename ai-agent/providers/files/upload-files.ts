@@ -31,7 +31,11 @@ import type { TApiContext } from "../../../providers/api";
 import { toastr, type TData } from "../../../components/toast";
 
 import { getOnlyofficeFileType } from "./file-type";
-import { attachFilesToChat, type AttachFileInput } from "./attach-files";
+import {
+  attachFilesToChat,
+  type AttachFileInput,
+  type OnFilesAttached,
+} from "./attach-files";
 
 type AttachmentsStore = ReturnType<typeof useStores>["useAttachmentsStore"];
 
@@ -78,6 +82,9 @@ export type UploadFilesToChatDeps = {
   operationsApi: TApiContext["operationsApi"];
   filesSettingsApi: TApiContext["filesSettingsApi"];
   useAttachmentsStore: AttachmentsStore;
+  // Reports the attached files so the caller can keep the record flags the
+  // attachments store drops (`canAnalyze`).
+  onFilesAttached?: OnFilesAttached;
   t: TFunction;
 };
 
@@ -100,6 +107,7 @@ export const uploadFilesToChat = async (
     operationsApi,
     filesSettingsApi,
     useAttachmentsStore,
+    onFilesAttached,
     t,
   }: UploadFilesToChatDeps,
 ): Promise<void> => {
@@ -242,7 +250,13 @@ export const uploadFilesToChat = async (
   if (inputs.length === 0) return;
 
   try {
-    await attachFilesToChat(useAttachmentsStore, inputs, imageIndices);
+    const attached = await attachFilesToChat(
+      useAttachmentsStore,
+      inputs,
+      imageIndices,
+    );
+
+    onFilesAttached?.(attached);
   } catch (err) {
     toastr.error(toToastData(err));
   }
