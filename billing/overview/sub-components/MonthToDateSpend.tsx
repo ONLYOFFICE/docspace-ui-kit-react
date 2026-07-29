@@ -123,34 +123,53 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
       );
     });
 
-  const renderSection = (
-    items: TServiceUsage[],
-    label: string,
-    sectionTotal: number,
-    dotClass: string,
-  ) =>
-    items.length > 0 ? (
-      <>
-        <div className={styles.spendSectionHeader}>
-          <span className={`${styles.spendDot} ${dotClass}`} />
-          <Text
-            fontSize="14px"
-            fontWeight={600}
-            className={styles.spendSectionLabel}
-          >
-            {label}
+  const renderSection = ({
+    key,
+    items,
+    label,
+    sectionTotal,
+    dotClass,
+    emptyDescription,
+  }: {
+    key: string;
+    items: TServiceUsage[];
+    label: string;
+    sectionTotal: number;
+    dotClass: string;
+    emptyDescription: string;
+  }) => (
+    <Fragment key={key}>
+      <div className={styles.spendSectionHeader}>
+        <span className={`${styles.spendDot} ${dotClass}`} />
+        <Text
+          fontSize="14px"
+          fontWeight={600}
+          className={styles.spendSectionLabel}
+        >
+          {label}
+        </Text>
+        <Text
+          fontSize="12px"
+          fontWeight={600}
+          className={styles.spendSectionTotal}
+        >
+          {formatWalletCurrency(sectionTotal, 2, walletCodeCurrency)}
+        </Text>
+      </div>
+      {items.length > 0 ? (
+        renderRows(items)
+      ) : (
+        <div className={styles.spendSectionEmpty}>
+          <Text fontSize="12px" fontWeight={600} className={styles.mutedTitle}>
+            {t("NoChargesYet")}
           </Text>
-          <Text
-            fontSize="12px"
-            fontWeight={600}
-            className={styles.spendSectionTotal}
-          >
-            {formatWalletCurrency(sectionTotal, 2, walletCodeCurrency)}
+          <Text fontSize="12px" className={styles.mutedTitle}>
+            {emptyDescription}
           </Text>
         </div>
-        {renderRows(items)}
-      </>
-    ) : null;
+      )}
+    </Fragment>
+  );
 
   return (
     <div className={styles.card}>
@@ -193,18 +212,30 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
         </div>
 
         <div className={styles.spendList}>
-          {renderSection(
-            subscriptions,
-            t("Subscriptions"),
-            subscriptionsTotal,
-            styles.spendDotSubs,
-          )}
-          {renderSection(
-            payAsYouGo,
-            t("PayAsYouGo"),
-            payAsYouGoTotal,
-            styles.spendDotPayg,
-          )}
+          {[
+            {
+              key: "subscriptions",
+              items: subscriptions,
+              label: t("Subscriptions"),
+              sectionTotal: subscriptionsTotal,
+              dotClass: styles.spendDotSubs,
+              emptyDescription: t("SubscriptionsEmptyDesc"),
+            },
+            {
+              key: "payAsYouGo",
+              items: payAsYouGo,
+              label: t("PayAsYouGo"),
+              sectionTotal: payAsYouGoTotal,
+              dotClass: styles.spendDotPayg,
+              emptyDescription: t("PayAsYouGoEmptyDesc"),
+            },
+          ]
+            // Empty sections drop to the bottom.
+            .sort(
+              (a, b) =>
+                Number(a.items.length === 0) - Number(b.items.length === 0),
+            )
+            .map(renderSection)}
         </div>
       </div>
     </div>

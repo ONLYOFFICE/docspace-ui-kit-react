@@ -374,6 +374,7 @@
 
 .spendRoot {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 16px;
   width: 100%;
@@ -407,6 +408,7 @@
 
 .spendList {
   display: flex;
+  flex: 1;
   flex-direction: column;
   width: 100%;
 }
@@ -420,6 +422,17 @@
   &:not(:first-child) {
     padding-block-start: 20px;
   }
+}
+
+.spendSectionEmpty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-block: 24px;
 }
 
 .spendDot {
