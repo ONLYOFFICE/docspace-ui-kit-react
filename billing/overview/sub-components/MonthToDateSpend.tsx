@@ -196,47 +196,67 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
           </Text>
         </div>
 
-        <div className={styles.spendBar}>
-          {subscriptionsPct > 0 ? (
-            <div
-              className={styles.spendBarSubs}
-              style={{ width: `${subscriptionsPct}%` }}
-            />
-          ) : null}
-          {payAsYouGoPct > 0 ? (
-            <div
-              className={styles.spendBarPayg}
-              style={{ width: `${payAsYouGoPct}%` }}
-            />
-          ) : null}
-        </div>
+        {serviceUsage.length === 0 ? (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyContent}>
+              <Text
+                fontSize="12px"
+                fontWeight={600}
+                className={styles.mutedTitle}
+              >
+                {t("NoSpendingActivity")}
+              </Text>
+              <Text fontSize="12px" className={styles.mutedTitle}>
+                {t("NoSpendingActivityDescription")}
+              </Text>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className={styles.spendBar}>
+              {subscriptionsPct > 0 ? (
+                <div
+                  className={styles.spendBarSubs}
+                  style={{ width: `${subscriptionsPct}%` }}
+                />
+              ) : null}
+              {payAsYouGoPct > 0 ? (
+                <div
+                  className={styles.spendBarPayg}
+                  style={{ width: `${payAsYouGoPct}%` }}
+                />
+              ) : null}
+            </div>
 
-        <div className={styles.spendList}>
-          {[
-            {
-              key: "subscriptions",
-              items: subscriptions,
-              label: t("Subscriptions"),
-              sectionTotal: subscriptionsTotal,
-              dotClass: styles.spendDotSubs,
-              emptyDescription: t("SubscriptionsEmptyDesc"),
-            },
-            {
-              key: "payAsYouGo",
-              items: payAsYouGo,
-              label: t("PayAsYouGo"),
-              sectionTotal: payAsYouGoTotal,
-              dotClass: styles.spendDotPayg,
-              emptyDescription: t("PayAsYouGoEmptyDesc"),
-            },
-          ]
-            // Empty sections drop to the bottom.
-            .sort(
-              (a, b) =>
-                Number(a.items.length === 0) - Number(b.items.length === 0),
-            )
-            .map(renderSection)}
-        </div>
+            <div className={styles.spendList}>
+              {[
+                {
+                  key: "subscriptions",
+                  items: subscriptions,
+                  label: t("Subscriptions"),
+                  sectionTotal: subscriptionsTotal,
+                  dotClass: styles.spendDotSubs,
+                  emptyDescription: t("SubscriptionsEmptyDesc"),
+                },
+                {
+                  key: "payAsYouGo",
+                  items: payAsYouGo,
+                  label: t("PayAsYouGo"),
+                  sectionTotal: payAsYouGoTotal,
+                  dotClass: styles.spendDotPayg,
+                  emptyDescription: t("PayAsYouGoEmptyDesc"),
+                },
+              ]
+                // Empty sections drop to the bottom.
+                .sort(
+                  (a, b) =>
+                    Number(a.items.length === 0) -
+                    Number(b.items.length === 0),
+                )
+                .map(renderSection)}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
