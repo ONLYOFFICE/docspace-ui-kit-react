@@ -28,7 +28,7 @@
 
 import React from "react";
 
-import { useAiChatStore } from "../../providers/ai-chat-store";
+import { useAiChatStoreOptional } from "../../providers/ai-chat-store";
 
 import AiChatTrigger from "../components/ai-chat-trigger";
 import AiChatPanelHeaderContainer from "../components/ai-chat-panel-header-container";
@@ -51,9 +51,9 @@ export type AiChatPanelBindings = {
 };
 
 // `enabled` lets a section opt out (e.g. private rooms) without a conditional
-// hook call: every hook (here just `useAiChatStore`) runs unconditionally before
-// the guard, so the early `undefined` return is not a Rules-of-Hooks violation —
-// the hook order never changes. The overloads keep callers that always enable AI
+// hook call: every hook (here just `useAiChatStoreOptional`) runs unconditionally
+// before the guard, so the early `undefined` return is not a Rules-of-Hooks
+// violation — the hook order never changes. The overloads keep callers that always enable AI
 // (default / `true`) free of an undefined check, while a dynamic boolean widens
 // the result to `| undefined`. Consumers must be `observer`s so the returned
 // visibility/fullscreen flags stay reactive.
@@ -74,9 +74,17 @@ export function useAiChatPanel(
   enabled = true,
   chatProps?: AiChatPanelBodyProps,
 ): AiChatPanelBindings | undefined {
-  const aiChatStore = useAiChatStore();
+  // Null-safe read: with `enabled=false` the section may not mount the
+  // provider at all (private rooms), and the hook must not throw.
+  const aiChatStore = useAiChatStoreOptional();
 
   if (!enabled) return undefined;
+
+  if (!aiChatStore) {
+    throw new Error(
+      "useAiChatPanel requires an AiChatStoreProvider when enabled",
+    );
+  }
 
   return {
     isChatPanelVisible: aiChatStore.isVisible,
