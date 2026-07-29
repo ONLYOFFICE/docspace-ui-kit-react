@@ -30,7 +30,6 @@ import { IconButton } from "../../../../components/icon-button";
 import { Text } from "../../../../components/text";
 
 import { ChatToolbar } from "../../../chat-toolbar";
-import NewChatButton from "../../../new-chat-button";
 
 import ExpandIcon from "../../../../assets/icons/17/expand.svg";
 import CollapseIcon from "../../../../assets/icons/17/collapse.svg";

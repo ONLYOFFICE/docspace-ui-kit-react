@@ -93,7 +93,6 @@ const ControlButtons = ({
   isPlusButtonVisible,
   contextMenuHeader,
   analyzeResponsesButton,
-  newChatButton,
 }: TControlButtonProps) => {
   const toggleInfoPanelAction = () => {
     toggleInfoPanel?.();
@@ -208,7 +207,6 @@ const ControlButtons = ({
     >
       {isPlusButtonVisible ? renderPlusButton() : null}
       {renderContextButton((isContextButtonVisible && !isPublicRoom) ?? false)}
-      {newChatButton ?? null}
       {renderToggleInfoPanel()}
       {renderContextButton((isPublicRoom && containVisible) ?? false)}
       {renderWarning()}
