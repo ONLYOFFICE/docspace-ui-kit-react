@@ -39,7 +39,7 @@ import SocketHelper, {
   type TOptSocket,
 } from "../../../utils/socket";
 import { CommonTrans } from "../../../utils/i18n/CommonTrans";
-import useGetIcon from "../../chat/hooks/useGetIcon";
+import useGetIcon from "../../hooks/useGetIcon";
 
 import useDeviceType from "./use-device-type";
 

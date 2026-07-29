@@ -180,3 +180,9 @@ export interface UserChatSettingsDto {
   reasoningEffort: ChatReasoningEffort | null;
 }
 
+
+export type TChatPlaylistImage = {
+  fileId: number;
+  title: string;
+  src: string;
+};
