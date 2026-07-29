@@ -131,6 +131,42 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
     !isPaid && !expired && totalDays > 0 && daysLeft / totalDays < 0.5;
   const isCancellation =
     scheduledChange != null && scheduledChange.nextUsers === 0;
+  const devPackDisabling =
+    scheduledChange != null &&
+    !isCancellation &&
+    devPackEnabled &&
+    !scheduledChange.nextDevPackEnabled;
+  const usersAdjusting =
+    scheduledChange != null && scheduledChange.nextUsers !== planUsers;
+
+  const nextMonthlyPrice = formatCurrency(
+    (scheduledChange?.nextUsers ?? 0) *
+      (devPackDisabling ? basePricePerUser : pricePerUser),
+    2,
+  );
+
+  const getScheduledChangeTitle = () => {
+    if (isCancellation) return t("Common:SubscriptionCancellation");
+
+    if (devPackDisabling) {
+      return usersAdjusting
+        ? t("Common:TariffUserAdjustmentDevPackDisableScheduledWithPrice", {
+            fromCount: planUsers,
+            toCount: scheduledChange?.nextUsers,
+            price: nextMonthlyPrice,
+          })
+        : t("Common:TariffDevPackDisableScheduledWithPrice", {
+            price: nextMonthlyPrice,
+          });
+    }
+
+    return t("Common:TariffUserAdjustmentScheduled", {
+      fromCount: planUsers,
+      toCount: scheduledChange?.nextUsers,
+    });
+  };
+
+  const scheduledChangeTitle = getScheduledChangeTitle();
 
   const trialActive = !isPaid && !expired;
   const trialToggleTooltip = trialActive
@@ -209,14 +245,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
 
       {scheduledChange ? (
         <StorageWarning
-          title={
-            isCancellation
-              ? t("Common:SubscriptionCancellation")
-              : t("Common:TariffUserAdjustmentScheduled", {
-                  fromCount: planUsers,
-                  toCount: scheduledChange.nextUsers,
-                })
-          }
+          title={scheduledChangeTitle}
           body={
             isCancellation
               ? t("Common:PlanCancellationBillingPeriodNote", {
@@ -460,10 +489,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
                           "DATE_MED",
                           { locale: language },
                         ),
-                        price: formatCurrency(
-                          scheduledChange.nextUsers * pricePerUser,
-                          2,
-                        ),
+                        price: nextMonthlyPrice,
                         amount: `${t("DocsConnect:PlanUsers")}: ${scheduledChange.nextUsers}`,
                       }}
                       components={{ 1: <Text as="span" fontWeight={600} /> }}
