@@ -409,7 +409,7 @@ const AiAgentProviders = ({
       // the "Upload from device" button) instead of the library's in-memory
       // default, so dropped DOCX/PDF/XLSX are supported too.
       onDropFiles,
-      showWelcome: true,
+      showWelcome: (suggestions?.length ?? 0) > 0,
     }),
     [
       composerActions,
@@ -498,4 +498,3 @@ export {
   useAiChatStore,
 } from "./ai-chat-store";
 export type { AiChatRouterPage } from "./ai-chat-store";
-
