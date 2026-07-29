@@ -35,22 +35,43 @@
 
 import type { TTranslation } from "../../utils/common";
 import type { TServiceUsage } from "../types";
-import { AI_TOOLS, BACKUP_SERVICE } from "../constants";
+import {
+  ADMIN,
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  DISK_STORAGE,
+  DOCS_CONNECT,
+  DOCS_CONNECT_DEVPACK_SERVICE,
+  DOCS_CONNECT_SERVICE,
+  MANAGER,
+  STORAGE_ENUM,
+} from "../constants";
 import { formatCompactNumber } from "./common";
 
-const PAY_AS_YOU_GO_SERVICES = [AI_TOOLS, BACKUP_SERVICE, "aitools", "aisearch"];
-
-const normalizeService = (service: string) =>
-  (service || "").toLowerCase().replace(/[^a-z]/g, "");
-
 /**
- * Whether a usage service is billed pay-as-you-go (metered) rather than a
- * recurring subscription. Derived by service name until the backend exposes a
- * dedicated billing-type flag.
+ * Localized per-unit price label for a service, e.g. "$12.00/user". The unit
+ * word is translated per service so each language localizes it correctly.
+ * Returns an empty string for services without a defined unit rate.
  */
-export const isPayAsYouGoService = (service: string): boolean => {
-  const key = normalizeService(service);
-  return PAY_AS_YOU_GO_SERVICES.some((s) => key.includes(normalizeService(s)));
+export const getServiceUnitRate = (
+  t: TTranslation,
+  service: string,
+  price: string,
+): string => {
+  switch (service) {
+    case ADMIN:
+    case MANAGER:
+      return t("Common:SpendRatePerAdmin", { price });
+    case DISK_STORAGE:
+    case STORAGE_ENUM:
+      return t("Common:SpendRatePerGB", { price });
+    case DOCS_CONNECT:
+    case DOCS_CONNECT_SERVICE:
+    case DOCS_CONNECT_DEVPACK_SERVICE:
+      return t("Common:SpendRatePerUser", { price });
+    default:
+      return "";
+  }
 };
 
 /**

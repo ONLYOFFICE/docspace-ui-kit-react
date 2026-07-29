@@ -187,6 +187,10 @@ export type TServiceUsage = {
   totalAmount: number;
   operationCount: number;
   title: string;
+  /** Per-unit price for the service. */
+  price: number;
+  /** Whether the service is billed as a recurring subscription. */
+  subscription: boolean;
 };
 
 /** A single month bucket from the monthly usage endpoint. */

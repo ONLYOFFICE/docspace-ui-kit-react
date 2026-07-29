@@ -34,6 +34,7 @@
  */
 
 export const MANAGER = "manager";
+export const ADMIN = "admin";
 export const TOTAL_SIZE = "total_size";
 export const ROOM = "room";
 export const YEAR_KEY = "year";

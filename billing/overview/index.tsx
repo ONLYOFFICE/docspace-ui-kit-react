@@ -104,11 +104,11 @@ const BillingOverview = ({
 
           <div className={styles.grid2}>
             <MonthToDateSpend onViewUsage={onViewUsage} />
-            <UpcomingPayments onUpcomingDetails={onUpcomingDetails} />
+            <ActiveAddons onManageAddons={onManageAddons} />
           </div>
 
           <div className={styles.grid2}>
-            <ActiveAddons onManageAddons={onManageAddons} />
+            <UpcomingPayments onUpcomingDetails={onUpcomingDetails} />
             <PaymentMethod onManagePaymentMethod={onManagePaymentMethod} />
           </div>
         </>

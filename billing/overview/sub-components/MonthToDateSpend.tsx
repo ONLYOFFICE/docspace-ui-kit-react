@@ -43,8 +43,8 @@ import { useCommonTranslation } from "../../../utils/i18n";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import {
+  getServiceUnitRate,
   getServiceUsageSubLabel,
-  isPayAsYouGoService,
 } from "../../utils/serviceUsage";
 import type { TServiceUsage } from "../../types";
 
@@ -71,12 +71,8 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
     [language],
   );
 
-  const subscriptions = serviceUsage.filter(
-    (item) => !isPayAsYouGoService(item.service),
-  );
-  const payAsYouGo = serviceUsage.filter((item) =>
-    isPayAsYouGoService(item.service),
-  );
+  const subscriptions = serviceUsage.filter((item) => item.subscription);
+  const payAsYouGo = serviceUsage.filter((item) => !item.subscription);
 
   const subscriptionsTotal = sumAmount(subscriptions);
   const payAsYouGoTotal = sumAmount(payAsYouGo);
@@ -86,28 +82,46 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
   const payAsYouGoPct = total > 0 ? (payAsYouGoTotal / total) * 100 : 0;
 
   const renderRows = (items: TServiceUsage[]) =>
-    items.map((item, index) => (
-      <Fragment key={item.service}>
-        {index > 0 ? <div className={styles.spendDivider} /> : null}
-        <div className={styles.spendRow}>
-          <div className={styles.spendRowInfo}>
-            <Text fontSize="14px" fontWeight={600} truncate>
-              {item.title}
-            </Text>
-            <Text fontSize="12px" className={styles.mutedTitle} truncate>
-              {getServiceUsageSubLabel(t, item, language)}
+    items.map((item, index) => {
+      let subLabel = getServiceUsageSubLabel(t, item, language);
+
+      if (item.subscription) {
+        const unitPrice = formatWalletCurrency(
+          item.price,
+          2,
+          item.currency || walletCodeCurrency,
+        );
+        const rate = getServiceUnitRate(t, item.service, unitPrice);
+        if (rate) subLabel = `${subLabel} | ${rate}`;
+      }
+
+      return (
+        <Fragment key={item.service}>
+          {index > 0 ? <div className={styles.spendDivider} /> : null}
+          <div className={styles.spendRow}>
+            <div className={styles.spendRowInfo}>
+              <Text fontSize="14px" fontWeight={600} truncate>
+                {item.title}
+              </Text>
+              <Text fontSize="12px" className={styles.mutedTitle} truncate>
+                {subLabel}
+              </Text>
+            </div>
+            <Text
+              fontSize="13px"
+              fontWeight={600}
+              className={styles.spendAmount}
+            >
+              {formatWalletCurrency(
+                item.totalAmount,
+                2,
+                item.currency || walletCodeCurrency,
+              )}
             </Text>
           </div>
-          <Text fontSize="13px" fontWeight={600} className={styles.spendAmount}>
-            {formatWalletCurrency(
-              item.totalAmount,
-              2,
-              item.currency || walletCodeCurrency,
-            )}
-          </Text>
-        </div>
-      </Fragment>
-    ));
+        </Fragment>
+      );
+    });
 
   const renderSection = (
     items: TServiceUsage[],
