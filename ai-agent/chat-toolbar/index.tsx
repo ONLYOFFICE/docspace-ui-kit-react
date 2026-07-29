@@ -48,6 +48,9 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
   const currentPage = stores.useRouter((s) => s.currentPage);
   const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
   const startNewChat = stores.useThreadsStore((s) => s.onSwitchToNewThread);
+  const profiles = stores.useProfilesStore((s) => s.profiles);
+
+  const hasProfile = profiles.length > 0;
 
   const isHistoryActive = currentPage === "history";
 
@@ -57,6 +60,13 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
     }
 
     setCurrentPage("history");
+  };
+
+  const handleStartNewChat = () => {
+    if (!hasProfile) return;
+
+    startNewChat();
+    setCurrentPage("chat");
   };
 
   return (
@@ -70,12 +80,14 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
           title={t("Common:ChatHistory")}
           onClick={handleNavigateToHistory}
         />
-        <ActionButton
-          icon={<PlusIcon />}
-          className={styles.button}
-          title={t("Common:AINewChat")}
-          onClick={startNewChat}
-        />
+        {hasProfile ? (
+          <ActionButton
+            icon={<PlusIcon />}
+            className={styles.button}
+            title={t("Common:AINewChat")}
+            onClick={handleStartNewChat}
+          />
+        ) : null}
       </div>
     </nav>
   );
