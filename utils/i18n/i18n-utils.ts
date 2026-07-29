@@ -160,7 +160,9 @@ export const getCommonTranslation = (
     // `lang` is normalized ("en"), so try the raw language first.
     const rawLang =
       i18n.instance?.resolvedLanguage ?? i18n.instance?.language ?? lang;
-    const langsToTry = [...new Set([rawLang, lang, "en"])];
+    const langsToTry = [rawLang, lang, "en"].filter(
+      (value, index, arr) => arr.indexOf(value) === index,
+    );
 
     const loadedUrls = Object.getOwnPropertyNames(i18n.loaded);
 
