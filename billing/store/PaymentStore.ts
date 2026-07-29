@@ -57,7 +57,7 @@ export type WalletOperationDto = Omit<OperationDto, "date"> & {
 
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
-import type { TBalance, TServiceUsage } from "../types";
+import type { TActiveService, TBalance, TServiceUsage } from "../types";
 import { formatCurrencyValue } from "../utils/common";
 import {
   getCardLinkedOnFreeTariff,
@@ -232,6 +232,8 @@ class PaymentStore {
   isTransactionHistoryExist = false;
 
   upcomingPaymentsData: TUpcomingPaymentResponse[] = [];
+
+  activeServices: TActiveService[] = [];
 
   autoPayments: TenantWalletSettings | null = null;
 
@@ -623,6 +625,23 @@ class PaymentStore {
 
       this.upcomingPaymentsData =
         (data?.response as TUpcomingPaymentResponse[]) ?? [];
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
+  fetchActiveServices = async () => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/activeservices",
+        { signal: abortController.signal },
+      );
+
+      this.activeServices = (data?.response as TActiveService[]) ?? [];
     } catch (error: unknown) {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
@@ -1372,6 +1391,7 @@ class PaymentStore {
       await Promise.all([
         this.walletInit(t, integrationUrl),
         this.handleServicesQuotas(),
+        this.fetchActiveServices(),
         this.paymentQuotas.fetchPaymentQuotas(),
         this.quotas.fetchPortalQuota(),
       ]);

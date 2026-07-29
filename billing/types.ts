@@ -193,6 +193,16 @@ export type TServiceUsage = {
   subscription: boolean;
 };
 
+/** A single active service from the active-services endpoint. */
+export type TActiveService = {
+  service: string;
+  serviceUnit: string;
+  subscription: boolean;
+  title: string;
+  limit: number;
+  used: number;
+};
+
 /** A single month bucket from the monthly usage endpoint. */
 export type TServiceUsageMonthly = {
   year: number;
