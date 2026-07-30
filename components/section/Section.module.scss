@@ -56,12 +56,27 @@
   }
 
   // bridge vars — bind public overrides to internal theme tokens
-  --section-header-height-v: var(--section-header-size, var(--section-header-height));
-  --section-header-height-tablet-v: var(--section-header-tablet-size, var(--section-header-height-tablet));
-  --section-header-height-mobile-v: var(--section-header-mobile-size, var(--section-header-height-mobile));
+  --section-header-height-v: var(
+    --section-header-size,
+    var(--section-header-height)
+  );
+  --section-header-height-tablet-v: var(
+    --section-header-tablet-size,
+    var(--section-header-height-tablet)
+  );
+  --section-header-height-mobile-v: var(
+    --section-header-mobile-size,
+    var(--section-header-height-mobile)
+  );
   --section-bg-v: var(--section-bg, var(--section-header-bg));
-  --section-desktop-padding-v: var(--section-content-padding, var(--section-desktop-padding));
-  --section-tablet-padding-v: var(--section-content-tablet-padding, var(--section-tablet-padding));
+  --section-desktop-padding-v: var(
+    --section-content-padding,
+    var(--section-desktop-padding)
+  );
+  --section-tablet-padding-v: var(
+    --section-content-tablet-padding,
+    var(--section-tablet-padding)
+  );
 
   position: relative;
   display: flex;
@@ -147,7 +162,10 @@
   // bridge vars — bind public overrides to internal theme tokens
   --info-panel-blur-v: var(--info-panel-backdrop, var(--info-panel-blur-color));
   --info-panel-bg-v: var(--info-panel-background, var(--info-panel-bg));
-  --info-panel-border-v: var(--info-panel-border-color, var(--info-panel-border));
+  --info-panel-border-v: var(
+    --info-panel-border-color,
+    var(--info-panel-border)
+  );
 
   height: auto;
   width: auto;
@@ -221,8 +239,14 @@
 .chatPanel {
   // bridge vars — bind public overrides to internal theme tokens, with a final
   // fallback to the global background so the panel is never transparent.
-  --chat-panel-bg-v: var(--chat-panel-background, var(--chat-panel-bg, var(--background-color)));
-  --chat-panel-border-v: var(--chat-panel-border-color, var(--chat-panel-border));
+  --chat-panel-bg-v: var(
+    --chat-panel-background,
+    var(--chat-panel-bg, var(--background-color))
+  );
+  --chat-panel-border-v: var(
+    --chat-panel-border-color,
+    var(--chat-panel-border)
+  );
   --chat-panel-width-v: var(--chat-panel-width, 400px);
 
   height: 100%;
@@ -262,6 +286,56 @@
   }
 }
 
+// Drop-target state: the host drags list items over the panel to attach them to
+// the chat composer. The overlay is the only affordance the panel owns — the
+// drag itself is mouse-based and driven entirely by the host.
+.chatPanelDropTarget {
+  position: relative;
+}
+
+.chatPanelDropOverlay {
+  --chat-panel-drop-overlay-bg-v: var(
+    --chat-panel-drop-overlay-background,
+    var(--chat-panel-bg-v)
+  );
+  --chat-panel-drop-border-v: var(
+    --chat-panel-drop-border-color,
+    var(--chat-panel-drop-border, var(--accent-main))
+  );
+  // Frame the chat content only — the panel header (the first child of
+  // `.chatPanel`, a fixed-height row) stays outside the drop zone, so its
+  // title and actions remain readable while dragging. The offset mirrors that
+  // header's own height, which follows the section header sizes.
+  --chat-panel-drop-inset-top-v: var(--chat-panel-drop-inset-top, 69px);
+
+  position: absolute;
+  inset: var(--chat-panel-drop-inset-top-v) 0 0 0;
+  z-index: 1;
+  // The drag is tracked with `elementFromPoint`, so the overlay must never
+  // shadow the panel itself during hit-testing.
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 12px;
+  border: 2px dashed var(--chat-panel-drop-border-v);
+  border-radius: 16px;
+  background-color: color-mix(
+    in srgb,
+    var(--chat-panel-drop-overlay-bg-v) 85%,
+    transparent
+  );
+
+  // The theme class lives on `body`, so match it as an ancestor.
+  :global(.dark) & {
+    --chat-panel-drop-border: #{colors.$white};
+  }
+
+  @include mixins.mobile {
+    --chat-panel-drop-inset-top: 53px;
+  }
+}
+
 .spacer {
   display: none;
   min-height: var(--section-mobile-footer-height, 64px);
@@ -273,8 +347,14 @@
 
 .submenu {
   --section-bg-v: var(--section-bg, var(--section-header-bg));
-  --section-header-height-tablet-v: var(--section-header-tablet-size, var(--section-header-height-tablet));
-  --section-header-height-mobile-v: var(--section-header-mobile-size, var(--section-header-height-mobile));
+  --section-header-height-tablet-v: var(
+    --section-header-tablet-size,
+    var(--section-header-height-tablet)
+  );
+  --section-header-height-mobile-v: var(
+    --section-header-mobile-size,
+    var(--section-header-height-mobile)
+  );
 
   background: var(--section-bg-v);
   width: 100%;
@@ -444,10 +524,16 @@
   }
 
   &.withScroll {
-    margin-inline-start: var(--section-desktop-padding-v, var(--section-desktop-padding));
+    margin-inline-start: var(
+      --section-desktop-padding-v,
+      var(--section-desktop-padding)
+    );
 
     @include mixins.tablet-and-below {
-      margin-inline-start: var(--section-tablet-padding-v, var(--section-tablet-padding));
+      margin-inline-start: var(
+        --section-tablet-padding-v,
+        var(--section-tablet-padding)
+      );
     }
   }
 }
@@ -456,10 +542,16 @@
   max-width: 100vw !important;
 
   &.withScroll {
-    margin-inline-start: var(--section-desktop-padding-v, var(--section-desktop-padding));
+    margin-inline-start: var(
+      --section-desktop-padding-v,
+      var(--section-desktop-padding)
+    );
 
     @include mixins.tablet-and-below {
-      margin-inline-start: var(--section-tablet-padding-v, var(--section-tablet-padding));
+      margin-inline-start: var(
+        --section-tablet-padding-v,
+        var(--section-tablet-padding)
+      );
     }
   }
 
