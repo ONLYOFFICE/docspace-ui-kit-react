@@ -88,6 +88,26 @@ export const getCurrentCommonLanguage = (): string => {
 
 const DEFAULT_NAMESPACES = ["Common"];
 
+// Sentinel returned by i18next when a key is truly missing. Comparing the
+// result against the key itself is not enough: a valid English translation
+// can be identical to its key (e.g. "Search" -> "Search").
+const MISSING_KEY = "\u0000missing\u0000";
+
+type TCommonI18nInstance = {
+  t: (key: string, options?: Record<string, string | number>) => string;
+};
+
+// The host's i18next instance holding Common resources. TranslationProvider
+// keeps a private instance (not the i18next singleton), so during SSR --
+// where window.i18n does not exist -- translations must be read from here.
+let commonI18nInstance: TCommonI18nInstance | undefined;
+
+export const registerCommonI18nInstance = (
+  instance: TCommonI18nInstance,
+): void => {
+  commonI18nInstance = instance;
+};
+
 /**
  * Gets a translation from window.i18n.
  * Uses i18next t function if available (set by TranslationProvider),
@@ -102,16 +122,31 @@ export const getCommonTranslation = (
   interpolation?: Record<string, unknown>,
   namespaces: string[] = DEFAULT_NAMESPACES,
 ): string => {
-  if (typeof window === "undefined") return i18ninstance?.t(key);
+  if (typeof window === "undefined") {
+    const inst = commonI18nInstance ?? (i18ninstance.isInitialized ? i18ninstance : undefined);
+    if (!inst) return "";
+    const result = inst.t(key, {
+      ...(interpolation as Record<string, string | number>),
+      defaultValue: MISSING_KEY,
+    });
+    return result && result !== MISSING_KEY ? result : "";
+  }
 
   const i18n = getWindowI18n();
 
+  // A t() result equal to the key is ambiguous: it is either a valid
+  // identity translation ("Search" -> "Search") or a t() implementation that
+  // echoes unknown keys ignoring defaultValue. Prefer the `loaded` lookup in
+  // that case and keep the echoed value as a last-resort fallback.
+  let identityResult: string | undefined;
+
   if (i18n?.t) {
-    const result = i18n.t(
-      key,
-      interpolation as Record<string, string | number>,
-    );
-    if (result && result !== key) return result;
+    const result = i18n.t(key, {
+      ...(interpolation as Record<string, string | number>),
+      defaultValue: MISSING_KEY,
+    });
+    if (result && result !== MISSING_KEY && result !== key) return result;
+    if (result === key) identityResult = result;
   }
 
   if (i18n?.loaded) {
@@ -121,7 +156,13 @@ export const getCommonTranslation = (
     const searchNamespaces = hasPrefix ? [key.split(":")[0]] : namespaces;
     const bareKey = hasPrefix ? key.split(":").slice(1).join(":") : key;
 
-    const langsToTry = lang !== "en" ? [lang, "en"] : [lang];
+    // Loaded URLs keep the raw language (e.g. "en-GB/Common.json"), while
+    // `lang` is normalized ("en"), so try the raw language first.
+    const rawLang =
+      i18n.instance?.resolvedLanguage ?? i18n.instance?.language ?? lang;
+    const langsToTry = [rawLang, lang, "en"].filter(
+      (value, index, arr) => arr.indexOf(value) === index,
+    );
 
     const loadedUrls = Object.getOwnPropertyNames(i18n.loaded);
 
@@ -162,6 +203,8 @@ export const getCommonTranslation = (
       }
     }
   }
+
+  if (identityResult) return identityResult;
 
   console.error(
     `[i18n] Missing translation for key "${key}". Ensure the TranslationProvider is mounted or window.i18n.loaded contains the required namespaces [${namespaces.join(", ")}].`,

@@ -124,7 +124,7 @@ const useAgentsHelper = ({
       const params = new URLSearchParams({
         page: String(page),
         count: String(PAGE_COUNT),
-        // The new-ai service expects the .NET enum name (the same string
+        // The Node AI service expects the .NET enum name (the same string
         // RoomsFilter sends), not the numeric SearchArea value.
         searchArea: "AiAgents",
       });
@@ -141,7 +141,7 @@ const useAgentsHelper = ({
           total: number;
           count: number;
         };
-      }>(`/api/2.0/new-ai/agents?${params.toString()}`);
+      }>(`/api/2.0/ai/agents?${params.toString()}`);
 
       const { folders, total, count, current } = response;
 
