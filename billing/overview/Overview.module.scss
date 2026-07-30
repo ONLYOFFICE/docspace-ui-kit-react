@@ -136,6 +136,33 @@
   flex-shrink: 0;
 }
 
+.topUpWarning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  background: var(--payment-background-color);
+  border-radius: 6px;
+}
+
+.topUpWarningIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  path {
+    fill: var(--status-warning);
+  }
+}
+
+.topUpWarningText {
+  flex: 1;
+  min-width: 0;
+  color: var(--status-warning);
+}
+
 .autoPaymentWrap {
   margin-top: 12px;
 

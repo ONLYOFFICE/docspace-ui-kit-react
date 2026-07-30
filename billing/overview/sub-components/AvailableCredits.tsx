@@ -37,6 +37,7 @@ import { useState } from "react";
 import { observer } from "mobx-react";
 
 import { Button, ButtonSize } from "../../../components/button";
+import { Text } from "../../../components/text";
 import { toastr } from "../../../components/toast";
 import { useCommonTranslation } from "../../../utils/i18n";
 
@@ -46,6 +47,8 @@ import BalanceAmount from "../../shared/balance-amount";
 import AutoPaymentInfo from "../../wallet/sub-components/AutoPaymentInfo";
 import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import WalletRefilledModal from "../../wallet/WalletRefilledModal";
+
+import WarningIcon from "../../../assets/danger.toast.react.svg";
 
 import styles from "../Overview.module.scss";
 
@@ -68,9 +71,20 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     autoPayments,
     wasFirstTopUp,
     language,
+    formatWalletCurrency,
+    upcomingPayments,
   } = store;
 
   const { isNotPaidPeriod, walletCustomerEmail } = store.tariff;
+
+  const nextPayment = upcomingPayments.length
+    ? [...upcomingPayments].sort((a, b) =>
+        a.dueDate.localeCompare(b.dueDate),
+      )[0]
+    : undefined;
+  const topUpShortfall = nextPayment ? nextPayment.amount - walletBalance : 0;
+
+  const isNextPayment = nextPayment && topUpShortfall > 0;
 
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
@@ -78,10 +92,10 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 
   const isAutoPaymentSetup = Boolean(
     isAutoPaymentExist &&
-      language &&
-      walletCodeCurrency &&
-      autoPayments?.minBalance &&
-      autoPayments?.upToBalance,
+    language &&
+    walletCodeCurrency &&
+    autoPayments?.minBalance &&
+    autoPayments?.upToBalance,
   );
 
   const onRefreshBalance = async () => {
@@ -139,7 +153,29 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
           ) : null}
         </div>
       </div>
-      {isAutoPaymentSetup ? (
+      {isNextPayment ? (
+        <div className={styles.topUpWarning}>
+          <WarningIcon className={styles.topUpWarningIcon} />
+          <Text
+            as="span"
+            fontSize="12px"
+            fontWeight={600}
+            lineHeight="16px"
+            className={styles.topUpWarningText}
+          >
+            {t("TopUpBeforeNextPayment", {
+              amount: formatWalletCurrency(
+                Math.ceil(topUpShortfall),
+                0,
+                walletCodeCurrency,
+              ),
+              date: nextPayment.renewalDateShort,
+            })}
+          </Text>
+        </div>
+      ) : null}
+
+      {isAutoPaymentSetup && !isNextPayment ? (
         <div className={styles.autoPaymentWrap}>
           <AutoPaymentInfo />
         </div>
@@ -165,3 +201,4 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 };
 
 export default observer(AvailableCredits);
+
