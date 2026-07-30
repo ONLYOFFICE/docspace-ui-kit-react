@@ -118,6 +118,8 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
       : `${value}`
     : `${value}`;
 
+  const overflowValue = showPlusSign ? maxValue + 1 : maxValue;
+
   const [error, setError] = useState(false);
   const [draftValue, setDraftValue] = useState<string | null>(null);
 
@@ -183,12 +185,20 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const nextDraft = e.target.value.replace(/\D/g, "");
+    const numberValue = +nextDraft;
+
+    if (nextDraft !== "" && numberValue > maxValue) {
+      setDraftValue(null);
+
+      if (overflowValue !== value) onChange(overflowValue);
+
+      setError(false);
+      return;
+    }
 
     setDraftValue(nextDraft);
 
     if (nextDraft === "") return;
-
-    const numberValue = +nextDraft;
 
     if (!enableZero && numberValue < minValue) return;
 
