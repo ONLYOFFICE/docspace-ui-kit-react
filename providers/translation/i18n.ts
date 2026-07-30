@@ -38,6 +38,8 @@
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import { registerCommonI18nInstance } from "../../utils/i18n/i18n-utils";
+
 // Own instance, not the i18next singleton: @onlyoffice/ai-chat also calls
 // `init()` on the singleton, which would reset `ns`/`defaultNS`/`language`
 // out from under host translations. Keeping a dedicated instance isolates
@@ -91,15 +93,21 @@ export const getI18NInstance = (lng: string, translations: TTranslations) => {
   loadResources(translations);
   const i18n = instance;
 
+  // Expose the private instance for SSR lookups in getCommonTranslation,
+  // where window.i18n is not available.
+  registerCommonI18nInstance(i18n);
+
   if (typeof window !== "undefined") {
     const win = window as unknown as {
       i18n?: {
         t?: typeof i18n.t;
         loaded?: Record<string, { data: Record<string, string> }>;
+        instance?: typeof i18n;
       };
     };
     if (!win.i18n) win.i18n = {};
     win.i18n.t = i18n.t.bind(i18n);
+    win.i18n.instance = i18n;
 
     const loaded: Record<string, { data: Record<string, string> }> = {};
     translations.forEach((nsList, lang) => {

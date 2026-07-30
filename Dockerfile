@@ -34,7 +34,7 @@ COPY packages/client/onlyoffice-docspace-plugin-sdk-*.tgz ./packages/client/
 COPY packages/client/onlyoffice-docspace-sdk-js-*.tgz ./packages/client/
 COPY packages/shared/package.json ./packages/shared/package.json
 COPY libs/ui-kit/package.json ./libs/ui-kit/package.json
-COPY libs/ui-kit/onlyoffice-docspace-api-sdk-*.tgz ./libs/ui-kit/
+COPY libs/ui-kit/*.tgz ./libs/ui-kit/
 
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 

@@ -145,6 +145,15 @@ type AiAgentProvidersProps = {
    * and shared with descendants via context / `useIsAiChatAvailable()`.
    */
   isAvailable?: boolean;
+  /**
+   * Whether the current session may use the AI API at all. `false` for
+   * anonymous sessions (login redirect, public rooms, public preview) and
+   * for users the server bars from AI (guests). The providers still mount
+   * — descendants may call `useStores()` — but store hydration is skipped
+   * and the availability context is forced off, so no /api/2.0/ai requests
+   * fire and no chat UI is offered.
+   */
+  canUseAi?: boolean;
   getAgentRoomId?: () => number | null;
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
@@ -208,9 +217,9 @@ const resolveSuggestions = (
 };
 
 // Server-mode API config: backend is mounted at the same origin as the
-// client under /api/2.0/new-ai. Engines are intentionally not constructed
+// client under /api/2.0/ai. Engines are intentionally not constructed
 // — every method call goes over HTTP via createServerAPI / ApiProvider.
-const SERVER_API_BASE_URL = "/api/2.0/new-ai";
+const SERVER_API_BASE_URL = "/api/2.0/ai";
 
 // Next.js evaluates this useMemo during SSR for "use client" components,
 // where `window` is undefined. Fall back to an empty origin — the actual
@@ -228,10 +237,12 @@ const buildServerApiConfig = (): ServerAPIConfig => ({
 // the server on mount. Lives inside StoresProvider + ToolsProvider so it
 // can read the stores/servers context. Without this, persisted data
 // (like AI profiles) would only appear after the first in-session write.
-const StoresHydrator = () => {
-  useProfiles({ isReady: true });
-  useThread({ isReady: true });
-  useServers({ isReady: true });
+// `enabled: false` (anonymous session) keeps the stores empty instead of
+// firing fetches that would all come back 401.
+const StoresHydrator = ({ enabled }: { enabled: boolean }) => {
+  useProfiles({ isReady: enabled });
+  useThread({ isReady: enabled });
+  useServers({ isReady: enabled });
   return null;
 };
 
@@ -262,6 +273,7 @@ const AiAgentProviders = ({
   callbacks,
   isStandalone,
   isAvailable = false,
+  canUseAi = true,
   getAgentRoomId,
   openResultFile,
   closeEditorPanel,
@@ -521,7 +533,7 @@ const AiAgentProviders = ({
   }, [closeEditorPanel]);
 
   return (
-    <AiChatAvailabilityContext.Provider value={isAvailable}>
+    <AiChatAvailabilityContext.Provider value={isAvailable && canUseAi}>
       <EventsProvider
         callbacksManager={ctx.callbacksManager}
         callbacks={callbacks}
@@ -539,7 +551,7 @@ const AiAgentProviders = ({
                           servers={ctx.servers}
                           eventBus={ctx.eventBus}
                         >
-                          <StoresHydrator />
+                          <StoresHydrator enabled={canUseAi} />
                           <AiChatStoreProvider>
                             <AiChatStoresBridge />
                             {getAgentRoomId ? null : <AgentRoomIdSync />}
