@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) Ascensio System SIA, 2009-2026
  *
  * This program is a free software product. You can redistribute it and/or
@@ -33,10 +33,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { ChatNoAccessScreenProps } from "./components/chat-no-access-screen";
+// Quick-actions tile metrics. Shared so consumers that cap the banner width can
+// derive that cap from the real tile geometry instead of hardcoding a pixel
+// total that silently goes stale when the tile size or gap changes.
+$tile-width: 172px;
+$tile-max-width: 184px;
+$tile-height: 147px;
+$tile-padding: 22px;
+$gap: 8px;
 
-export interface ChatProps {
-  isAgents?: boolean;
-  aiReady?: boolean;
-  noAccessProps?: ChatNoAccessScreenProps;
+// The narrowest a tile may shrink to before the row is allowed to wrap. Tiles
+// squeeze from $tile-width down to this before any tile moves to a second row,
+// so a banner keeps every tile on one row whenever they can physically fit —
+// hiding a tile behind "Show more" while there is still width to squeeze into
+// is the bug this floor prevents. Sized to still hold the icon plus its
+// padding ($icon-width + 2 * $tile-padding = 125px), rounded up for the label.
+$tile-min-width: 132px;
+
+// The widest banner (Rooms: 5 room tiles + AI chat). A consumer capping the
+// banner must fit at least this many tiles on one row, otherwise the last tile
+// wraps at every viewport width and "Show more" shows with space to spare.
+$max-tiles-per-row: 6;
+
+// Width needed for $max-tiles-per-row tiles at their widest, plus the gaps
+// between them.
+@function row-width($tiles: $max-tiles-per-row) {
+  @return $tiles * $tile-max-width + ($tiles - 1) * $gap;
 }
