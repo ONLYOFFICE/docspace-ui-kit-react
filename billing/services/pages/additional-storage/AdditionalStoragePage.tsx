@@ -356,7 +356,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
               <Text className={styles.cardCaption}>
                 {t("PerStorage", {
                   currency: formatWalletCurrency(storagePriceIncrement, 2),
-                  amount: `1 ${t("Gigabyte")}`,
+                  amount: getConvertedSize(t, storageSizeIncrement || 0),
                 })}
               </Text>
             </div>
