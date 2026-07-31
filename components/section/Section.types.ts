@@ -76,6 +76,12 @@ export type ChatPanelProps = {
   isVisible?: boolean;
   currentDeviceType?: DeviceType;
   setIsVisible?: (value: boolean) => void;
+  /**
+   * Label of the "drop to attach" overlay. Set only while the host drags items
+   * from its own list over the panel; omitting it hides the overlay (see
+   * `chatPanelDropTargetLabel` on SectionProps).
+   */
+  dropTargetLabel?: string;
 };
 
 export type SectionBodyContentProps = {
@@ -187,6 +193,13 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     isChatPanelAvailable?: boolean;
     isChatPanelVisible?: boolean;
     setIsChatPanelVisible?: (value: boolean) => void;
+    /**
+     * Overlay label shown while a drag started in the section body hovers the
+     * chat panel; leave unset the rest of the time. The host owns both the
+     * hit-testing (its list drag is mouse-based, not HTML5 DnD) and the
+     * wording — the panel only renders the affordance.
+     */
+    chatPanelDropTargetLabel?: string;
     isEmptyPage?: boolean;
     maintenanceExist?: boolean;
     snackbarExist?: boolean;
