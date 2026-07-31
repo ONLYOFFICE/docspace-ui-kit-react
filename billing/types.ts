@@ -78,6 +78,7 @@ export type TDocsConnectScheduledChange = {
   nextUsers: number;
   dueDate: string;
   nextDevPackEnabled: boolean;
+  scheduledOnDevPack: boolean;
 };
 
 export type TDocsConnectPageState = {

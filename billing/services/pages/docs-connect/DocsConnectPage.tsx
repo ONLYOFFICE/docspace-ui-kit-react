@@ -134,7 +134,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
   const devPackDisabling =
     scheduledChange != null &&
     !isCancellation &&
-    devPackEnabled &&
+    scheduledChange.scheduledOnDevPack &&
     !scheduledChange.nextDevPackEnabled;
   const usersAdjusting =
     scheduledChange != null && scheduledChange.nextUsers !== planUsers;
@@ -159,6 +159,8 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
             price: nextMonthlyPrice,
           });
     }
+
+    if (!usersAdjusting) return t("Common:ChangeShedule");
 
     return t("Common:TariffUserAdjustmentScheduled", {
       fromCount: planUsers,
