@@ -33,7 +33,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { ChangeEvent, MouseEvent, useState } from "react";
+import React, {
+  ChangeEvent,
+  KeyboardEvent,
+  MouseEvent,
+  useState,
+} from "react";
 import classNames from "classnames";
 
 import PlusIcon from "../../assets/payment.plus.react.svg";
@@ -113,7 +118,10 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
       : `${value}`
     : `${value}`;
 
+  const overflowValue = showPlusSign ? maxValue + 1 : maxValue;
+
   const [error, setError] = useState(false);
+  const [draftValue, setDraftValue] = useState<string | null>(null);
 
   const containerClass = classNames(styles.container, className);
   const titleClass = classNames(styles.countTitle, {
@@ -138,12 +146,15 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
 
   const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(e.target.value);
+    setDraftValue(null);
     onChange(newValue);
   };
 
   const handleButtonClick = (e: MouseEvent<HTMLDivElement>) => {
     const operation = e.currentTarget.dataset.operation as "plus" | "minus";
     let newValue = +value;
+
+    setDraftValue(null);
 
     if (operation === "plus") {
       if (value <= maxValue) {
@@ -173,26 +184,45 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { target } = e;
-    let inputValue = target.value;
+    const nextDraft = e.target.value.replace(/\D/g, "");
+    const numberValue = +nextDraft;
 
-    if (!displayValue.includes("+") && value > maxValue) {
-      inputValue = inputValue.slice(0, -1);
-    }
+    if (nextDraft !== "" && numberValue > maxValue) {
+      setDraftValue(null);
 
-    const numberValue = +inputValue;
+      if (overflowValue !== value) onChange(overflowValue);
 
-    if (Number.isNaN(numberValue)) return;
-
-    if (!enableZero && numberValue <= minValue) {
-      onChange(minValue);
       setError(false);
       return;
     }
 
-    onChange(numberValue);
+    setDraftValue(nextDraft);
+
+    if (nextDraft === "") return;
+
+    if (!enableZero && numberValue < minValue) return;
+
+    if (numberValue !== value) onChange(numberValue);
 
     setError(shouldSetIncrementError(numberValue, enableZero, minValue));
+  };
+
+  const commitDraftValue = () => {
+    if (draftValue === null) return;
+
+    const numberValue = draftValue === "" ? 0 : +draftValue;
+    const nextValue =
+      enableZero || numberValue >= minValue ? numberValue : minValue;
+
+    setDraftValue(null);
+
+    if (nextValue !== value) onChange(nextValue);
+
+    setError(shouldSetIncrementError(nextValue, enableZero, minValue));
+  };
+
+  const handleInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") commitDraftValue();
   };
 
   const handleButtonMouseDown = (e: MouseEvent<HTMLDivElement>) => {
@@ -207,7 +237,13 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
     [styles.disabled]: minusDisabled,
   });
   const sliderProps = isDisabled ? {} : { onChange: handleSliderChange };
-  const inputProps = isDisabled ? {} : { onChange: handleInputChange };
+  const inputProps = isDisabled
+    ? {}
+    : {
+        onChange: handleInputChange,
+        onBlur: commitDraftValue,
+        onKeyDown: handleInputKeyDown,
+      };
 
   const createTabItems = () => {
     if (!items || !items.length) return [];
@@ -237,6 +273,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
     const itemValue = Number(e.currentTarget.dataset.value);
     if (itemValue === undefined) return;
 
+    setDraftValue(null);
     onChange(value + itemValue);
     setError(false);
   };
@@ -284,7 +321,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
             isReadOnly={isDisabled}
             withBorder={false}
             className={inputClass}
-            value={displayValue}
+            value={draftValue ?? displayValue}
             style={{ boxShadow: "none" }}
             {...inputProps}
             testId="quantity_picker_input"

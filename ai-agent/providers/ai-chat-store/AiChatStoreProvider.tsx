@@ -54,3 +54,8 @@ export const useAiChatStore = () => {
   }
   return store;
 };
+
+// Null-safe variant for hooks with an `enabled` opt-out: sections without the
+// provider (e.g. private rooms) must be able to call them without throwing.
+export const useAiChatStoreOptional = (): AiChatStore | null =>
+  React.useContext(AiChatStoreContext);

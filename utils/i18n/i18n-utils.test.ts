@@ -62,6 +62,33 @@ describe("getCommonTranslation", () => {
     expect(getCommonTranslation("Greeting", { name: "Bob" })).toBe("Hi Bob");
   });
 
+  it("returns an identity translation from t() when loaded has no entry", () => {
+    // Real i18next honors defaultValue, so a result equal to the key is a
+    // valid identity translation ("Search" -> "Search"), not a missing key.
+    (window as MutableWindow).i18n = {
+      t: (key: string, options?: { defaultValue?: string }) =>
+        key === "Search" ? "Search" : (options?.defaultValue ?? key),
+      instance: { language: "en-GB" },
+      loaded: {},
+    };
+
+    expect(getCommonTranslation("Search")).toBe("Search");
+  });
+
+  it("resolves from the raw-language bundle before normalization", () => {
+    // en-GB is normalized to "en" for lookups, but loaded URLs keep the raw
+    // language segment.
+    (window as MutableWindow).i18n = {
+      t: identityT,
+      instance: { language: "en-GB" },
+      loaded: {
+        "/locales/en-GB/Common.json": { data: { Paid: "Paid (GB)" } },
+      },
+    };
+
+    expect(getCommonTranslation("Paid")).toBe("Paid (GB)");
+  });
+
   it("falls back to the en combined bundle for a non-en language", () => {
     (window as MutableWindow).i18n = {
       t: identityT,

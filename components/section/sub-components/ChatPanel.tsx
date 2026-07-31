@@ -37,6 +37,7 @@ import { useEffect } from "react";
 import classNames from "classnames";
 
 import { DeviceType } from "../../../enums";
+import { Text } from "../../text";
 
 import { ChatPanelProps } from "../Section.types";
 import styles from "../Section.module.scss";
@@ -54,6 +55,7 @@ const ChatPanel = ({
   isVisible,
   currentDeviceType,
   setIsVisible,
+  dropTargetLabel,
 }: ChatPanelProps) => {
   // On tablet/mobile the panel is full-screen, so the browser back button
   // closes it (mirrors InfoPanel). Use addEventListener rather than
@@ -72,10 +74,19 @@ const ChatPanel = ({
 
   return (
     <div
-      className={classNames("chat-panel", styles.chatPanel)}
+      className={classNames("chat-panel", styles.chatPanel, {
+        [styles.chatPanelDropTarget]: !!dropTargetLabel,
+      })}
       id="ChatPanelWrapper"
     >
       {children}
+      {dropTargetLabel ? (
+        <div className={styles.chatPanelDropOverlay}>
+          <Text fontSize="16px" fontWeight={700} noSelect>
+            {dropTargetLabel}
+          </Text>
+        </div>
+      ) : null}
     </div>
   );
 };

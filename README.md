@@ -307,7 +307,6 @@ import type { TFile, TFolder, TUser, TFileSecurity, TFolderSecurity, TRoomSecuri
 | [Button](./components/button/README.md) | Versatile button component with primary/secondary variants, multiple sizes, loading states, and tooltip support |
 | [Calendar](./components/calendar/README.md) | Custom calendar component for date selection |
 | CategoryItem | Navigation link item with optional badge and arrow indicator for menu hierarchies |
-| [Chat](./ai-agent/chat/README.md) | AI chat interface with streaming responses, message history, file attachments, and AI tools integration |
 | [Checkbox](./components/checkbox/README.md) | Customizable checkbox with indeterminate and error states |
 | [CircleSkeleton](./components/circle/README.md) | Circular skeleton loader for avatar and icon placeholders |
 | [ColorInput](./components/color-input/README.md) | Text input for entering and validating color values |
@@ -347,6 +346,7 @@ import type { TFile, TFolder, TUser, TFileSecurity, TFolderSecurity, TRoomSecuri
 | [MCPIcon](./components/mcp-icon/README.md) | Icon component for MCP (Model Context Protocol) with image or text fallback |
 | [ModalDialog](./components/modal-dialog/README.md) | Versatile modal dialog component supporting both modal and aside (side panel) display types with keyboard shortcuts |
 | Navigation | Breadcrumb navigation with expandable hierarchical sections |
+| NewChat | AI chat interface backed by the @onlyoffice/ai-chat package with threads, streaming responses, file attachments, and tool calls |
 | OperationsProgressButton | Operation progress tracker for multiple concurrent operations with error checking |
 | [Paging](./components/paging/README.md) | Pagination controls for navigating through pages of data |
 | [PasswordInput](./components/password-input/README.md) | Password input with strength validation, generator, and reveal/hide toggle |
