@@ -43,14 +43,20 @@ const AiChatStoresBridge = () => {
   const stores = useStores();
   const currentPage = stores.useRouter((s) => s.currentPage);
   const profiles = stores.useProfilesStore((s) => s.profiles);
+  const initialized = stores.useProfilesStore((s) => s.initialized);
 
   useEffect(() => {
     store.setCurrentPage(currentPage);
   }, [store, currentPage]);
 
   useEffect(() => {
+    // A rebuilt store bundle (entity/scope switch) starts with an empty,
+    // not-yet-hydrated profiles list. Mirroring that would flap
+    // hasProfiles → aiReady to false and blink every gated UI across the
+    // app, so the last known value is kept until hydration completes.
+    if (!initialized) return;
     store.setHasProfiles(profiles.length > 0);
-  }, [store, profiles]);
+  }, [store, profiles, initialized]);
 
   return null;
 };

@@ -133,6 +133,7 @@ const ProgressList = ({
           >
             <ProgressBar
               completed={item.completed}
+              stopped={item.stopped}
               label={item.label}
               alert={item.alert}
               open
@@ -166,6 +167,7 @@ const ProgressList = ({
         >
           <ProgressBar
             completed={item.completed}
+            stopped={item.canceled}
             label={item.label}
             alert={item.alert}
             percent={item.percent}
