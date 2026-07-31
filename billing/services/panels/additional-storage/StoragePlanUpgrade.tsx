@@ -228,6 +228,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       localStorage.removeItem(STORAGE_DEACTIVATION_VISITED);
     }
 
+    paymentStore.resetPreviousStorageSubscription();
+
     setIsLoading(false);
   };
 

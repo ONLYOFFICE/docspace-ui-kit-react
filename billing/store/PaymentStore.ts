@@ -84,6 +84,7 @@ import {
   BACKUP_SERVICE,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
+  STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED,
   WEB_SEARCH,
   DOCS_CONNECT_SERVICE,
   DOCS_CONNECT_DEVPACK_SERVICE,
@@ -260,6 +261,8 @@ class PaymentStore {
 
   isStorageDeactivationVisited = false;
 
+  isPreviousStorageSubscriptionRemoved = false;
+
   filterSelectedTypeKey = "allTransactions";
 
   filterStartDate: DateTime = (
@@ -304,6 +307,11 @@ class PaymentStore {
     this.quotas = new CurrentQuotasStore(paymentApi);
     this.paymentQuotas = new PaymentQuotasStore(paymentApi);
     this.paymentQuotas.setCurrentQuotasStore(this.quotas);
+
+    if (typeof window !== "undefined") {
+      this.isPreviousStorageSubscriptionRemoved =
+        localStorage.getItem(STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED) === "true";
+    }
 
     makeAutoObservable(this);
   }
@@ -595,6 +603,16 @@ class PaymentStore {
   setStorageDeactivationVisited = (value: boolean) => {
     this.isStorageDeactivationVisited = value;
     localStorage.setItem(STORAGE_DEACTIVATION_VISITED, "true");
+  };
+
+  removePreviousStorageSubscription = () => {
+    this.isPreviousStorageSubscriptionRemoved = true;
+    localStorage.setItem(STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED, "true");
+  };
+
+  resetPreviousStorageSubscription = () => {
+    this.isPreviousStorageSubscriptionRemoved = false;
+    localStorage.removeItem(STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED);
   };
 
   setPaymentLink = (link: string) => {
@@ -1031,9 +1049,18 @@ class PaymentStore {
 
   isShowStorageTariffDeactivated = () => {
     if (!this.tariff.previousStoragePlanSize) return false;
+    if (this.isPreviousStorageSubscriptionRemoved) return false;
 
     return localStorage.getItem(STORAGE_TARIFF_DEACTIVATED) !== "true";
   };
+
+  get isShowPreviousStoragePlan() {
+    return (
+      !this.tariff.hasStorageSubscription &&
+      !!this.tariff.previousStoragePlanSize &&
+      !this.isPreviousStorageSubscriptionRemoved
+    );
+  }
 
   setPaymentAccount = async () => {
     const abortController = new AbortController();

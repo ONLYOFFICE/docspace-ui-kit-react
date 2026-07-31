@@ -118,6 +118,7 @@ const Services = observer(
       isAiToolsServiceOn,
       isCardMissingOrInactive,
       storageServiceName,
+      isShowPreviousStoragePlan,
     } = paymentStore;
 
     const {
@@ -196,10 +197,15 @@ const Services = observer(
       if (initialOpenDialog) {
         updateDialogVisibility(TOTAL_SIZE, true);
         setPreviousValue(
-          previousStoragePlanSize ? previousStoragePlanSize.toString() : "",
+          isShowPreviousStoragePlan ? previousStoragePlanSize.toString() : "",
         );
       }
-    }, [initialOpenDialog, updateDialogVisibility, previousStoragePlanSize]);
+    }, [
+      initialOpenDialog,
+      updateDialogVisibility,
+      previousStoragePlanSize,
+      isShowPreviousStoragePlan,
+    ]);
 
     const confirmationDialogContent: Record<
       string,
