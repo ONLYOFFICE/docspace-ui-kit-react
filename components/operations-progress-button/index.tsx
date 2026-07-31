@@ -432,6 +432,11 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
 
   const checkError = needErrorChecking && !disableOpenPanel;
 
+  // Both flags mean "aborted by the user": `operationsStopped` comes from the
+  // secondary operations (copy/move/delete...), `operationsCanceled` from the
+  // upload. They are terminal states, so they win over alert/completed.
+  const isStopped = operationsStopped || Boolean(operationsCanceled);
+
   const hideMainButtonHandler = useCallback(
     (flag: boolean) => setHideMainButton(flag),
     [],
@@ -494,6 +499,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
               iconUrl={getIconUrl()}
               alert={operationsAlert}
               completed={operationsCompleted}
+              stopped={isStopped}
               onClick={handleFloatingButtonClick}
               {...(!isSeveralOperations && {
                 showCancelButton,
