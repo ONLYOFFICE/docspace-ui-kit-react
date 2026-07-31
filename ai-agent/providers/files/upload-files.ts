@@ -120,7 +120,36 @@ export const uploadFilesToChat = async (
   const picked = allPicked.filter((f) => !ARCHIVE_EXTENSION.test(f.name));
   if (picked.length === 0) return;
 
+  // Loading chips first: the user sees the file names the instant the picker
+  // closes, long before the chunked upload finishes. The reservation is also
+  // the cap check — the store refuses anything past the attachment limit
+  // (counting chips already in flight), so we never upload a file we would
+  // have to drop at attach. Archives were filtered above, so a rejected
+  // archive never flashes a chip. Ids stay aligned with `accepted` by
+  // slicing the files to the accepted count.
+  // Images reserve `kind: "file"` on purpose: they settle through
+  // `addAttachmentFile` and are re-keyed to images afterwards.
+  const pendingIds = useAttachmentsStore.getState().beginPendingAttachments(
+    picked.map((f) => ({
+      title: f.name,
+      kind: "file" as const,
+      type: getOnlyofficeFileType(f.name),
+    })),
+  );
+  const accepted = picked.slice(0, pendingIds.length);
+  if (accepted.length < picked.length) {
+    toastr.error(
+      t("Common:ChatAttachmentLimitReached", {
+        count: picked.length - accepted.length,
+        defaultValue: "Files skipped — attachment limit reached: {{count}}",
+      }),
+    );
+  }
+  if (accepted.length === 0) return;
+
   const inputs: AttachFileInput[] = [];
+  // Leases of the files that uploaded successfully, aligned with `inputs`.
+  const settledIds: string[] = [];
   const imageIndices = new Set<number>();
   const failed: string[] = [];
 
@@ -206,12 +235,17 @@ export const uploadFilesToChat = async (
   };
 
   // Sequential on purpose: parallel multi-file uploads of large documents gain
-  // little while making partial-failure reporting messier.
-  for (const file of picked) {
+  // little while making partial-failure reporting messier. A failed file
+  // drops its loading chip the moment it fails — the user should not watch
+  // a spinner for a file already lost.
+  for (let i = 0; i < accepted.length; i += 1) {
+    const file = accepted[i];
+    const pendingId = pendingIds[i];
     try {
       const created = await uploadOne(file);
 
       if (created.id === undefined) {
+        useAttachmentsStore.getState().failPendingAttachments([pendingId]);
         failed.push(file.name);
         continue;
       }
@@ -225,7 +259,9 @@ export const uploadFilesToChat = async (
         type: getOnlyofficeFileType(file.name),
         content: "",
       });
+      settledIds.push(pendingId);
     } catch {
+      useAttachmentsStore.getState().failPendingAttachments([pendingId]);
       failed.push(file.name);
     }
   }
@@ -242,8 +278,16 @@ export const uploadFilesToChat = async (
   if (inputs.length === 0) return;
 
   try {
-    await attachFilesToChat(useAttachmentsStore, inputs, imageIndices);
+    await attachFilesToChat(
+      useAttachmentsStore,
+      inputs,
+      imageIndices,
+      settledIds,
+    );
   } catch (err) {
+    // The store fails its own leases on a throw, but be explicit — a
+    // stranded spinner would keep Send blocked forever.
+    useAttachmentsStore.getState().failPendingAttachments(settledIds);
     toastr.error(toToastData(err));
   }
 };

@@ -115,12 +115,33 @@ const AttachDialog: React.FC<AttachDialogProps> = observer(({ onClose }) => {
         if (s.fileType === FileType.Image) imageIndices.add(i);
       });
 
-      // Optimistic close — the chip will appear once saveFilesMany resolves.
+      // Reserve the loading chips before closing so they are already in the
+      // composer when the dialog disappears; the reservation also applies
+      // the attachment cap (extra picks simply get no chip).
+      const pendingIds = useAttachmentsStore
+        .getState()
+        .beginPendingAttachments(
+          inputs.map((input) => ({
+            title: input.title,
+            kind: "file" as const,
+            type: input.type,
+          })),
+        );
+      const accepted = inputs.slice(0, pendingIds.length);
+
       onClose();
+      if (accepted.length === 0) return;
 
       try {
-        await attachFilesToChat(useAttachmentsStore, inputs, imageIndices);
+        // `imageIndices` at or past `accepted.length` are never looked up.
+        await attachFilesToChat(
+          useAttachmentsStore,
+          accepted,
+          imageIndices,
+          pendingIds,
+        );
       } catch (e) {
+        useAttachmentsStore.getState().failPendingAttachments(pendingIds);
         toastr.error(e as TData);
       }
     },
