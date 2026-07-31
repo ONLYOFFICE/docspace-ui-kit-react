@@ -103,6 +103,14 @@ import { FloatingButton, FloatingButtonIcons } from "@docspace/ui-kit/components
         defaultValue: { summary: "false" },
       },
     },
+    stopped: {
+      control: "boolean",
+      description:
+        "Show the stopped state: the operation was aborted by the user. Takes precedence over `alert` and `completed`",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
     color: {
       control: "color",
       description: "Custom background color",
@@ -195,6 +203,27 @@ export const Completed: Story = {
       },
       source: {
         code: `<FloatingButton icon={FloatingButtonIcons.upload} completed percent={100} />`,
+      },
+    },
+  },
+};
+
+const StoppedTemplate = () => {
+  return (
+    <FloatingButton icon={FloatingButtonIcons.trash} completed stopped alert />
+  );
+};
+
+export const Stopped: Story = {
+  render: () => <StoppedTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Floating button in stopped state. Shows the minus status icon when the user aborts a running operation, instead of the success checkmark.",
+      },
+      source: {
+        code: `<FloatingButton icon={FloatingButtonIcons.trash} completed stopped />`,
       },
     },
   },
