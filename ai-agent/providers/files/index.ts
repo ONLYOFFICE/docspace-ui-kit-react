@@ -27,6 +27,12 @@
 export { getOnlyofficeFileType } from "./file-type";
 export { attachFilesToChat, type AttachFileInput } from "./attach-files";
 export {
+  useAttachHostFilesToChat,
+  CHAT_ATTACHMENT_LIMIT,
+  type ChatAttachableItem,
+  type AttachToChatResult,
+} from "./use-attach-to-chat";
+export {
   useFilesIntegration,
   type FilesIntegration,
 } from "./use-integration";

@@ -448,6 +448,9 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             const hasScheduledChange =
               subscribed && !isTrial && scheduledUsers != null;
             const isCancellation = hasScheduledChange && scheduledUsers === 0;
+            const usersAdjusting =
+              hasScheduledChange &&
+              scheduledUsers !== (docsConnectState?.tariffUsers ?? 0);
             const deactivated = docsConnectState?.deactivated ?? false;
             const canceled = docsConnectState?.canceled ?? false;
 
@@ -469,14 +472,16 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
             const scheduledTooltip = hasScheduledChange ? (
               <>
-                <Text fontWeight={600} fontSize="12px">
-                  {isCancellation
-                    ? t("SubscriptionCancellation")
-                    : t("UserAdjustment", {
-                        fromCount: docsConnectState?.tariffUsers ?? 0,
-                        toCount: scheduledUsers,
-                      })}
-                </Text>
+                {isCancellation || usersAdjusting ? (
+                  <Text fontWeight={600} fontSize="12px">
+                    {isCancellation
+                      ? t("SubscriptionCancellation")
+                      : t("UserAdjustment", {
+                          fromCount: docsConnectState?.tariffUsers ?? 0,
+                          toCount: scheduledUsers,
+                        })}
+                  </Text>
+                ) : null}
                 <Text fontSize="12px">
                   {isCancellation
                     ? t("SubscriptionAutoCancellation", {

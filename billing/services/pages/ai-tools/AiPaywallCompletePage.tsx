@@ -43,6 +43,7 @@ import {
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { Text } from "../../../../components/text";
 import { Button, ButtonSize } from "../../../../components/button";
+import { Link, LinkType, LinkTarget } from "../../../../components/link";
 import { Loader, LoaderTypes } from "../../../../components/loader";
 import { useApi } from "../../../../providers";
 
@@ -58,6 +59,7 @@ import {
   BACKUP_SERVICE,
   DISK_STORAGE,
   DOCS_CONNECT,
+  DOCS_CONNECT_ROUTE,
   DOCS_CONNECT_SERVICE,
   DOCS_CONNECT_DEVPACK_PRODUCT,
 } from "../../../constants";
@@ -72,9 +74,6 @@ type Status = "processing" | "success" | "error";
 const BILLING_REDIRECT_URL = "/billing/addons/ai-services";
 const WALLET_REDIRECT_URL = "/billing/wallet";
 const TARIFF_REDIRECT_URL = "/billing/tariff-plan";
-const DOCS_CONNECT_REDIRECT_URL =
-  "/portal-settings/developer-tools/docs-connect";
-
 const TOPUP_RETRY_ATTEMPTS = 10;
 const TOPUP_RETRY_DELAY_MS = 3000;
 
@@ -116,7 +115,13 @@ const withRetry = async <T,>(
   throw lastError;
 };
 
-const AiPaywallCompletePage = () => {
+type AiPaywallCompletePageProps = {
+  docsConnectUrl?: string;
+};
+
+const AiPaywallCompletePage = ({
+  docsConnectUrl,
+}: AiPaywallCompletePageProps) => {
   const t = useCommonTranslation();
   const { paymentApi } = useApi();
 
@@ -283,7 +288,7 @@ const AiPaywallCompletePage = () => {
 
   const onGoToBillingClick = () => {
     if (isDocsConnect) {
-      window.location.href = DOCS_CONNECT_REDIRECT_URL;
+      window.location.href = DOCS_CONNECT_ROUTE;
       return;
     }
     if (admins) {
@@ -502,12 +507,26 @@ const AiPaywallCompletePage = () => {
                     admins
                       ? t("GoToTariffPlan")
                       : isDocsConnect
-                        ? t("DocsConnectGoToStatistics")
+                        ? t("DocsConnectCallbackGoTo")
                         : t("WalletTopUpGoToWallet")
                   }
                   onClick={onGoToBillingClick}
                   testId="ai_paywall_go_to_wallet_button"
                 />
+                {isDocsConnect && docsConnectUrl ? (
+                  <Link
+                    className={styles.docsLink}
+                    type={LinkType.page}
+                    href={docsConnectUrl}
+                    target={LinkTarget.blank}
+                    color="accent"
+                    fontSize="13px"
+                    fontWeight={600}
+                    dataTestId="docs_connect_read_api_docs_link"
+                  >
+                    {t("ReadApiDocumentation")}
+                  </Link>
+                ) : null}
               </div>
             ) : null}
           </>

@@ -59,12 +59,15 @@ import {
   createStores,
   useProfiles,
   useServers,
+  useStores,
   useThread,
   type WidgetConfig,
 } from "@onlyoffice/ai-chat";
 import type {
   ChatCallbacks,
   HostTool,
+  Profile,
+  ProfilePickerAction,
   ProviderType,
   ServerAPIConfig,
   ToolCallApproveContext,
@@ -140,10 +143,26 @@ type AiAgentProvidersProps = {
    * and shared with descendants via context / `useIsAiChatAvailable()`.
    */
   isAvailable?: boolean;
+  /**
+   * Whether the current session may use the AI API at all. `false` for
+   * anonymous sessions (login redirect, public rooms, public preview) and
+   * for users the server bars from AI (guests). The providers still mount
+   * — descendants may call `useStores()` — but store hydration is skipped
+   * and the availability context is forced off, so no /api/2.0/ai requests
+   * fire and no chat UI is offered.
+   */
+  canUseAi?: boolean;
   getAgentRoomId?: () => number | null;
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
   entityId?: string;
+  /**
+   * Secondary scope for the request context (agent tools, workspace
+   * steering, profile fallback) when talking to an AI agent from outside
+   * its room: threads/history and uploads keep following `entityId`,
+   * only sends carry this value — see `WidgetConfig.contextEntityId`.
+   */
+  contextEntityId?: string;
   /**
    * Explicitly controls the composer model picker. The chat lib hides the
    * picker whenever `entityId` is set, but DocSpace scopes the chat by the
@@ -151,15 +170,45 @@ type AiAgentProvidersProps = {
    * Pass `true` only where the model is fixed (AI agent rooms).
    */
   hideProfilePicker?: boolean;
+  /**
+   * Extra items appended to the composer's model picker dropdown after a
+   * separator below the profile list. Entries with `items` open a nested
+   * submenu. No effect when the picker is hidden.
+   */
+  profilePickerActions?: ProfilePickerAction[];
+  /**
+   * Displays `label` as the picker value while the aliased profile drives
+   * every request — see {@link ProfilePickerAlias}. The alias survives
+   * store rebuilds (entity switches) and thread switches; pass `null` to
+   * drop it.
+   */
+  profilePickerAlias?: ProfilePickerAlias | null;
+  /**
+   * Fired on explicit user picks in the model picker: a plain profile row
+   * (`actionId` undefined) or a profilePickerActions row with `profileId`
+   * (`actionId` = that action's id). Not fired by programmatic changes.
+   */
+  onProfilePickerSelect?: (profile: Profile, actionId?: string) => void;
+  /**
+   * Fired when an opened thread's persisted context settles: the agent
+   * entity the conversation last ran against, or `null` for a plain
+   * conversation. Not fired while the value is unknown (fetch in flight,
+   * local echo of a just-created thread) — the host keeps its own state
+   * then. Use it to restore/drop the picked agent per thread.
+   */
+  onThreadContextChange?: (
+    contextEntityId: string | null,
+    threadId: string,
+  ) => void;
   composerHeader?: ReactNode;
   composerDisabled?: boolean;
   children: ReactNode;
 };
 
 // Server-mode API config: backend is mounted at the same origin as the
-// client under /api/2.0/new-ai. Engines are intentionally not constructed
+// client under /api/2.0/ai. Engines are intentionally not constructed
 // — every method call goes over HTTP via createServerAPI / ApiProvider.
-const SERVER_API_BASE_URL = "/api/2.0/new-ai";
+const SERVER_API_BASE_URL = "/api/2.0/ai";
 
 // Next.js evaluates this useMemo during SSR for "use client" components,
 // where `window` is undefined. Fall back to an empty origin — the actual
@@ -177,10 +226,75 @@ const buildServerApiConfig = (): ServerAPIConfig => ({
 // the server on mount. Lives inside StoresProvider + ToolsProvider so it
 // can read the stores/servers context. Without this, persisted data
 // (like AI profiles) would only appear after the first in-session write.
-const StoresHydrator = () => {
-  useProfiles({ isReady: true });
-  useThread({ isReady: true });
-  useServers({ isReady: true });
+// `enabled: false` (anonymous session) keeps the stores empty instead of
+// firing fetches that would all come back 401.
+const StoresHydrator = ({ enabled }: { enabled: boolean }) => {
+  useProfiles({ isReady: enabled });
+  useThread({ isReady: enabled });
+  useServers({ isReady: enabled });
+  return null;
+};
+
+/**
+ * Host-driven alias for the composer model picker: the profile is selected
+ * as the session chat profile while the picker displays `label` (e.g. an AI
+ * agent name) instead of the profile's own name.
+ */
+export type ProfilePickerAlias = {
+  profileId: string;
+  label: string;
+};
+
+// Applies the alias whenever the host's pick changes (and once profiles
+// hydrate). Deliberately NOT keyed on the thread: a thread switch restores
+// the thread's own profile, and the host re-drives the alias per thread
+// through onThreadContextChange — see ThreadContextBridge.
+const ProfilePickerAliasBridge = ({
+  alias,
+}: {
+  alias?: ProfilePickerAlias | null;
+}) => {
+  const { useProfilesStore } = useStores();
+  const initialized = useProfilesStore((s) => s.initialized);
+  const getProfileById = useProfilesStore((s) => s.getProfileById);
+  const setSessionChatProfile = useProfilesStore(
+    (s) => s.setSessionChatProfile,
+  );
+
+  useEffect(() => {
+    if (!alias || !initialized) return;
+    const profile = getProfileById(alias.profileId);
+    if (!profile) return;
+    setSessionChatProfile({ ...profile, name: alias.label });
+  }, [alias, initialized, getProfileById, setSessionChatProfile]);
+
+  return null;
+};
+
+// Hands the opened thread's persisted context back to the host: the engine
+// stamps contextEntityId into stored user messages, the message store
+// derives the thread's value on load (`undefined` = not settled — a fetch
+// in flight or the local echo of a just-created thread — never reported;
+// the host's own state is the truth then), and this bridge reports the
+// settled value so the host can restore or drop its per-thread agent state.
+const ThreadContextBridge = ({
+  onThreadContextChange,
+}: {
+  onThreadContextChange?: (
+    contextEntityId: string | null,
+    threadId: string,
+  ) => void;
+}) => {
+  const { useMessageStore, useThreadsStore } = useStores();
+  const threadId = useThreadsStore((s) => s.threadId);
+  const threadContext = useMessageStore((s) => s.threadContextEntityId);
+
+  useEffect(() => {
+    if (!onThreadContextChange || !threadId) return;
+    if (threadContext === undefined) return;
+    onThreadContextChange(threadContext, threadId);
+  }, [onThreadContextChange, threadId, threadContext]);
+
   return null;
 };
 
@@ -211,11 +325,17 @@ const AiAgentProviders = ({
   callbacks,
   isStandalone,
   isAvailable = false,
+  canUseAi = true,
   getAgentRoomId,
   openResultFile,
   closeEditorPanel,
   entityId,
+  contextEntityId,
   hideProfilePicker = false,
+  profilePickerActions,
+  profilePickerAlias,
+  onProfilePickerSelect,
+  onThreadContextChange,
   composerHeader,
   composerDisabled,
   children,
@@ -353,11 +473,41 @@ const AiAgentProviders = ({
       keys: storeKeys,
       ctx: appCtx,
       api,
+      // Initial scope only — deliberately not a dependency. Scope changes
+      // re-scope the live bundle below instead of re-creating it, which
+      // would blink the whole chat (and every profiles-gated UI).
       entityId,
     });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
-  }, [isStandalone, entityId, platform]);
+  }, [isStandalone, platform]);
+
+  // Live re-scope on entityId changes (room navigation, agent pick): the
+  // bundle — and everything not scope-bound (profiles list, servers UI,
+  // router page) — stays intact; only what the scope owns is reloaded.
+  // Threads re-init themselves through `WidgetConfig.entityId` (the
+  // useThread hydration effect), so they are not touched here.
+  useEffect(() => {
+    if (stores.getEntityId() === entityId) return;
+    stores.setEntityId(entityId);
+
+    const profiles = stores.useProfilesStore.getState();
+    const threads = stores.useThreadsStore.getState();
+    const servers = stores.useServersStore.getState();
+    const attachments = stores.useAttachmentsStore.getState();
+
+    // A scope switch right after an explicit picker selection (agent pick
+    // sets the aliased profile, plain pick sets the profile itself) must
+    // not wipe that selection — the default reset runs AFTER the alias
+    // bridge and would drop it. Only agent rooms (hideProfilePicker) reset
+    // the session so the room's own assignment wins.
+    threads.onSwitchToNewThread({ keepSessionProfile: !hideProfilePicker });
+    void profiles.reloadModelAssignment();
+    void profiles.reloadExtendedThinking();
+    void servers.reload();
+    void attachments.clearAttachmentFiles();
+    void attachments.clearAttachmentImages();
+  }, [entityId, hideProfilePicker, stores]);
 
   const onDropFiles = useCallback(
     (files: File[]) =>
@@ -378,10 +528,13 @@ const AiAgentProviders = ({
       composerHeader,
       composerDisabled,
       entityId,
+      contextEntityId,
       // Host-driven model-picker visibility: the lib falls back to hiding
       // whenever entityId is set, but here entityId means "current
       // folder/room scope", not "agent chat" — only agents fix the model.
       hideProfilePicker,
+      profilePickerActions,
+      onProfilePickerSelect,
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
@@ -398,7 +551,10 @@ const AiAgentProviders = ({
       composerHeader,
       composerDisabled,
       entityId,
+      contextEntityId,
       hideProfilePicker,
+      profilePickerActions,
+      onProfilePickerSelect,
       onToolCallApproveResult,
       onDropFiles,
     ],
@@ -421,7 +577,7 @@ const AiAgentProviders = ({
   }, [closeEditorPanel]);
 
   return (
-    <AiChatAvailabilityContext.Provider value={isAvailable}>
+    <AiChatAvailabilityContext.Provider value={isAvailable && canUseAi}>
       <EventsProvider
         callbacksManager={ctx.callbacksManager}
         callbacks={callbacks}
@@ -439,7 +595,13 @@ const AiAgentProviders = ({
                           servers={ctx.servers}
                           eventBus={ctx.eventBus}
                         >
-                          <StoresHydrator />
+                          <StoresHydrator enabled={canUseAi} />
+                          <ProfilePickerAliasBridge
+                            alias={profilePickerAlias}
+                          />
+                          <ThreadContextBridge
+                            onThreadContextChange={onThreadContextChange}
+                          />
                           <AiChatStoreProvider>
                             <AiChatStoresBridge />
                             {getAgentRoomId ? null : <AgentRoomIdSync />}
@@ -468,6 +630,7 @@ export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
 export type {
   ComposerAction,
   Profile,
+  ProfilePickerAction,
   ServerAPIConfig,
 } from "@onlyoffice/ai-chat";
 export type { SaveAsFileHandler } from "./platform";
@@ -478,3 +641,4 @@ export {
   useAiChatStore,
 } from "./ai-chat-store";
 export type { AiChatRouterPage } from "./ai-chat-store";
+

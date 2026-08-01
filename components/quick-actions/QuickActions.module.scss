@@ -34,21 +34,28 @@
  */
 
 @use "../../styles/variables/colors";
+@use "../../styles/variables/quick-actions" as metrics;
 @use "../../styles/mixins/media-queries";
 
-// Tile size and the gap between tiles.
-$tile-width: 172px;
-$tile-max-width: 184px;
-$tile-height: 172px;
-$gap: 16px;
+// Tile size and the gap between tiles. The tile box is 184x147 at desktop; the
+// 81x75 icon sits inside it with $tile-padding clear on every side, leaving the
+// remainder for the label (centered by the tile's own justify-content).
+// Re-exported from the shared metrics so consumers capping the banner width
+// derive that cap from the same numbers.
+$tile-max-width: metrics.$tile-max-width;
+$tile-min-width: metrics.$tile-min-width;
+$tile-height: metrics.$tile-height;
+$tile-padding: metrics.$tile-padding;
+$gap: metrics.$gap;
 
 // Compact sizing (tablet and below): shorter tiles, tighter icon/gap. Width
 // still stretches; mobile additionally drops to exactly two tiles per row.
 $compact-tile-height: 120px;
+$compact-tile-padding: 12px;
 $compact-gap: 8px;
 
 // How much of the next row peeks out below the first row when collapsed.
-$peek: 86px;
+$peek: 74px;
 $compact-peek: 60px;
 
 .quickActions {
@@ -82,20 +89,29 @@ $compact-peek: 60px;
   }
 }
 
-// Tiles grow to fill the row so there's no empty space, but never shrink below
-// their natural width — when a row can't fit them all at that width they wrap to
-// the next line instead of squashing. useRowOverflow detects that wrap to
-// trigger the collapse (only with >4 tiles). Because every tile grows, a partial
-// last row (e.g. a lone wrapped tile) stretches to fill the width too.
+// Tiles grow to fill the row so there's no empty space, and shrink down to
+// $tile-min-width before the row is allowed to wrap — a tile only moves to a
+// second row once they genuinely cannot fit side by side. That ordering
+// matters: when the flex base was the full $tile-width the row wrapped while
+// every tile still sat at its natural width, so the last tile (e.g. AI chat in
+// the Rooms banner) hid behind "Show more" with width left to squeeze into.
+// useRowOverflow detects a real wrap to trigger the collapse (only with >4
+// tiles). Because every tile grows, a partial last row stretches to fill the
+// width too.
 .tile {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 16px;
-  flex: 1 1 $tile-width;
-  min-width: $tile-width;
+  gap: 4px;
+  padding: $tile-padding;
+  // The flex BASE size decides line breaking — flex-wrap breaks a line by
+  // comparing base sizes, before flex-shrink is ever applied, so a base of
+  // $tile-width would wrap while min-width still allowed shrinking. Basing on
+  // $tile-min-width instead means the row breaks only when the tiles truly
+  // cannot fit; flex-grow then expands them back up to $tile-max-width.
+  flex: 1 1 $tile-min-width;
+  min-width: $tile-min-width;
   max-width: $tile-max-width;
   height: $tile-height;
   background-color: var(--_tile-bg);
@@ -133,8 +149,8 @@ $compact-peek: 60px;
   // grows to fill the row — several reduced tiles per row, no empty space.
   @include media-queries.tablet-and-below {
     height: $compact-tile-height;
-    gap: 8px;
-    padding: 12px;
+    gap: 4px;
+    padding: $compact-tile-padding;
   }
 
   // Mobile only: exactly two tiles per row (allowed to shrink below the desktop
@@ -201,37 +217,62 @@ $compact-peek: 60px;
   pointer-events: none;
 }
 
+// Icon box: 81x75 at desktop, 48x45 at tablet and below. The icons don't all
+// share one intrinsic ratio (81x75, 81x78, 93x87, 110x115 ...), so the SVG is
+// fitted inside the box with `contain` rather than stretched to it — a forced
+// aspect-ratio would distort every icon that isn't authored at 81:75.
 .icon {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 1;
-  height: 100px;
-  aspect-ratio: 108 / 100;
+  width: 81px;
+  height: 75px;
   min-width: 0;
+  // Renders at the full 81x75; only gives ground when a wrapped (two-line)
+  // label would otherwise overflow the fixed tile height.
+  min-height: 0;
 
   svg {
     width: 100%;
     height: 100%;
+    object-fit: contain;
   }
 
   @include media-queries.tablet-and-below {
-    height: 60px;
+    width: 48px;
+    height: 45px;
   }
 }
 
+// The tile height is fixed, and desktop leaves room for a single 20px line
+// (22 + 75 icon + 4 gap + 20 label + 22 = 143 of 147px). English labels fit on
+// one line, but longer translations wrap — cap the label at two lines and
+// ellipsize so a long string can never push the icon out of the padded box.
 .label {
   font-size: 13px;
   font-weight: 400;
   line-height: 20px;
   word-break: break-word;
   user-select: none;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
+// A tooltipped tile is wrapped in this anchor, so the anchor becomes the flex
+// item — it must carry the same grow/shrink range as a bare .tile, otherwise
+// tooltipped tiles would keep the old no-shrink behaviour and wrap early.
 .tileTooltipAnchor {
   display: flex;
-  flex: 1 1 $tile-width;
-  min-width: $tile-width;
+  // The flex BASE size decides line breaking — flex-wrap breaks a line by
+  // comparing base sizes, before flex-shrink is ever applied, so a base of
+  // $tile-width would wrap while min-width still allowed shrinking. Basing on
+  // $tile-min-width instead means the row breaks only when the tiles truly
+  // cannot fit; flex-grow then expands them back up to $tile-max-width.
+  flex: 1 1 $tile-min-width;
+  min-width: $tile-min-width;
   max-width: $tile-max-width;
 
   .tile {

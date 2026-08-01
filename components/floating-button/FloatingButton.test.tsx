@@ -84,6 +84,48 @@ describe("FloatingButton", () => {
     expect(alertIcon).toBeInTheDocument();
   });
 
+  it("displays the stopped status icon when stopped prop is true", () => {
+    renderComponent(<FloatingButton {...defaultProps} stopped />);
+
+    expect(
+      screen.getByTestId("floating-button-stopped-icon"),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the stopped status icon for a completed stopped operation", () => {
+    renderComponent(<FloatingButton {...defaultProps} completed stopped />);
+
+    expect(
+      screen.getByTestId("floating-button-stopped-icon"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("floating-button-tick-icon"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("prefers the stopped status icon over the alert one", () => {
+    renderComponent(
+      <FloatingButton {...defaultProps} completed stopped alert />,
+    );
+
+    expect(
+      screen.getByTestId("floating-button-stopped-icon"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("floating-button-alert-icon"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("hides the stopped status icon when withoutStatus is true", () => {
+    renderComponent(
+      <FloatingButton {...defaultProps} completed stopped withoutStatus />,
+    );
+
+    expect(
+      screen.queryByTestId("floating-button-stopped-icon"),
+    ).not.toBeInTheDocument();
+  });
+
   it("shows progress indicator when percent > 0", () => {
     renderComponent(<FloatingButton {...defaultProps} />);
     const progress = screen.getByTestId("floating-button-progress");
