@@ -73,7 +73,7 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
   };
 
   return (
-    <nav className={classNames(styles.toolbar, className)}>
+    <nav id="chat-toolbar" className={classNames(styles.toolbar, className)}>
       <div className={styles.leftGroup}>
         <ActionButton
           icon={<HistoriesIcon />}
