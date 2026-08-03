@@ -90,7 +90,7 @@ const CurrentPlan = ({ onEditPlan, isMobile }: CurrentPlanProps) => {
       {onEditPlan ? (
         <Button
           size={isMobile ? ButtonSize.normal : ButtonSize.small}
-          label={isFreeTariff ? t("UpgradePlan") : t("EditPlan")}
+          label={t("UpgradePlan")}
           onClick={onEditPlan}
           className={styles.planButton}
           testId="overview_edit_plan_button"

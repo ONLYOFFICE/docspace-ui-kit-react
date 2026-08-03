@@ -104,7 +104,7 @@
 
 .creditsTop {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
@@ -121,6 +121,12 @@
 
 .creditsCard {
   gap: 4px;
+}
+
+.creditsBalance {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .planCard {
@@ -150,7 +156,7 @@
   box-sizing: border-box;
   background: var(--payment-background-color);
   border-radius: 6px;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .topUpWarningIcon {

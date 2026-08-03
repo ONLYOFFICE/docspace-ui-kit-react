@@ -119,10 +119,11 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     <div className={`${styles.card} ${styles.creditsCard}`}>
       <div className={styles.creditsTop}>
         <BalanceAmount
+          className={styles.creditsBalance}
           title={t("AvailableCredits")}
           titleFontSize="14px"
           mainFontSize="28px"
-          fractionFontSize="18px"
+          fractionFontSize="20px"
           showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
           isRefreshing={isRefreshing}
           onRefresh={onRefreshBalance}
