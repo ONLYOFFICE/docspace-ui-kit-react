@@ -78,7 +78,7 @@ const UpcomingPayments = ({ onUpcomingDetails }: UpcomingPaymentsProps) => {
           </Link>
         ) : null}
       </div>
-      <Text fontSize="18px" fontWeight={700}>
+      <Text fontSize="18px" fontWeight={700} className={styles.cardValue}>
         {formatWalletCurrency(upcomingTotal, 2, walletCodeCurrency)}
       </Text>
       {upcomingPayments.length === 0 ? (
@@ -97,7 +97,7 @@ const UpcomingPayments = ({ onUpcomingDetails }: UpcomingPaymentsProps) => {
           {upcomingPayments.map((item) => (
             <div className={styles.upcomingRow} key={item.id}>
               <Text
-                fontSize="11px"
+                fontSize="14px"
                 fontWeight={600}
                 className={styles.mutedTitle}
                 truncate
@@ -105,11 +105,11 @@ const UpcomingPayments = ({ onUpcomingDetails }: UpcomingPaymentsProps) => {
               >
                 {item.renewalDateShort}
               </Text>
-              <Text fontSize="11px" fontWeight={600} truncate>
+              <Text fontSize="14px" fontWeight={600} truncate>
                 {item.title}
               </Text>
               <Text
-                fontSize="11px"
+                fontSize="13px"
                 fontWeight={600}
                 className={styles.upcomingAmount}
               >

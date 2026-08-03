@@ -99,7 +99,7 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
         ) : null}
       </div>
 
-      <Text fontSize="18px" fontWeight={700}>
+      <Text fontSize="18px" fontWeight={700} className={styles.cardValue}>
         {activeServices.length}
       </Text>
 

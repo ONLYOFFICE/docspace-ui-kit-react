@@ -98,6 +98,10 @@
   gap: 8px;
 }
 
+.cardValue {
+  margin-block-start: 6px;
+}
+
 .creditsTop {
   display: flex;
   align-items: flex-end;
@@ -290,6 +294,10 @@
   width: 100%;
   min-width: 0;
   padding: 8px 0;
+
+  &:first-child {
+    padding-block-start: 6px;
+  }
 }
 
 .pmCardIcon {
@@ -412,7 +420,7 @@
 .spendTop {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
 }
 
@@ -446,7 +454,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding-block: 8px 12px;
+  padding-block: 8px 4px;
 
   &:not(:first-child) {
     padding-block-start: 20px;
