@@ -34,8 +34,11 @@
  */
 
 import React from "react";
+import classNames from "classnames";
+
 import { Text } from "../../../components/text";
 import { ToggleButton } from "../../../components/toggle-button";
+import { Tooltip } from "../../../components/tooltip";
 
 import styles from "../styles/ServiceComponents.module.scss";
 
@@ -48,6 +51,7 @@ interface ServiceToggleSectionProps {
   testId?: string;
   isDisabled?: boolean;
   withBottomMargin?: boolean;
+  toggleTooltip?: string;
 }
 
 const ServiceToggleSection: React.FC<ServiceToggleSectionProps> = ({
@@ -59,18 +63,30 @@ const ServiceToggleSection: React.FC<ServiceToggleSectionProps> = ({
   testId,
   isDisabled,
   withBottomMargin,
+  toggleTooltip,
 }) => {
+  const reactId = React.useId().replace(/:/g, "");
+  const tooltipId = toggleTooltip
+    ? `serviceToggleTooltip_${reactId}`
+    : undefined;
+
   return (
     <div
       className={styles.serviceToggleSection}
       style={withBottomMargin ? { marginBottom: "20px" } : undefined}
     >
-      <div className={styles.toggleButton}>
+      <div
+        className={classNames(styles.toggleButton, {
+          [styles.toggleButtonWithTooltip]: !!toggleTooltip,
+        })}
+        {...(tooltipId ? { "data-tooltip-id": tooltipId } : {})}
+      >
         <ToggleButton
           isChecked={isEnabled}
           onChange={onToggle}
           dataTestId={testId}
           isDisabled={isDisabled}
+          className={toggleTooltip ? styles.serviceToggle : undefined}
         />
       </div>
       <div className={styles.textContent}>
@@ -89,6 +105,15 @@ const ServiceToggleSection: React.FC<ServiceToggleSectionProps> = ({
         </div>
         {description ? <Text fontSize="12px">{description}</Text> : null}
       </div>
+      {toggleTooltip && tooltipId ? (
+        <Tooltip
+          id={tooltipId}
+          place="bottom"
+          maxWidth="300px"
+          float
+          getContent={() => toggleTooltip}
+        />
+      ) : null}
     </div>
   );
 };

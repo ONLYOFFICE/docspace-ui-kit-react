@@ -38,6 +38,7 @@ import classNames from "classnames";
 
 import { Link, LinkType } from "../link";
 import { RectangleSkeleton } from "../rectangle";
+import { Tooltip } from "../tooltip";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
 
 import type { QuickActionItem, QuickActionsProps } from "./QuickActions.types";
@@ -86,7 +87,17 @@ const useRowOverflow = (
 };
 
 const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
-  const { icon, label, onClick, href, target, disabled, dataTestId } = item;
+  const {
+    id,
+    icon,
+    label,
+    onClick,
+    href,
+    target,
+    disabled,
+    tooltipContent,
+    dataTestId,
+  } = item;
 
   const content = (
     <>
@@ -101,10 +112,12 @@ const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
     [styles.disabled]: disabled,
   });
 
+  let tile;
+
   if (href && !disabled) {
     const rel = target === "_blank" ? "noopener noreferrer" : undefined;
 
-    return (
+    tile = (
       <a
         className={tileClassName}
         href={href}
@@ -117,19 +130,35 @@ const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
         {content}
       </a>
     );
+  } else {
+    tile = (
+      <button
+        type="button"
+        className={tileClassName}
+        onClick={onClick}
+        disabled={disabled}
+        aria-label={label}
+        data-testid={dataTestId}
+      >
+        {content}
+      </button>
+    );
   }
 
+  if (!tooltipContent) return tile;
+
+  const tooltipAnchorId = `quick-action-tooltip-${id}`;
+
   return (
-    <button
-      type="button"
-      className={tileClassName}
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-      data-testid={dataTestId}
-    >
-      {content}
-    </button>
+    <div id={tooltipAnchorId} className={styles.tileTooltipAnchor}>
+      {tile}
+      <Tooltip
+        id={`${tooltipAnchorId}-instance`}
+        anchorSelect={`#${tooltipAnchorId}`}
+        place="bottom"
+        getContent={() => tooltipContent}
+      />
+    </div>
   );
 };
 
@@ -240,3 +269,4 @@ export const QuickActions = ({
 export type { QuickActionItem, QuickActionsProps };
 
 export * from "./icons";
+

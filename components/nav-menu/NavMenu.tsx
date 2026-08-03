@@ -40,6 +40,7 @@ import classNames from "classnames";
 import { useAnimation } from "../../hooks/useAnimation";
 import { Badge } from "../badge";
 import { TooltipContainer } from "../tooltip";
+import ExpandArrowIcon from "../../assets/arrow.react.svg";
 
 import { NavMenuProps, NavMenuItem, NavSubItem } from "./NavMenu.types";
 import styles from "./NavMenu.module.scss";
@@ -156,8 +157,10 @@ type NavMenuItemWrapperProps = {
   activeItemId?: string;
   withAnimation: boolean;
   iconOnly: boolean;
+  withExpandControl: boolean;
   onItemClick: (item: NavMenuItem) => void;
   onSubItemClick: (sub: NavSubItem) => void;
+  onToggleExpand: (item: NavMenuItem) => void;
   LinkRouter?: NavMenuProps["LinkRouter"];
 };
 
@@ -169,8 +172,10 @@ const NavMenuItemWrapper = ({
   activeItemId,
   withAnimation,
   iconOnly,
+  withExpandControl,
   onItemClick,
   onSubItemClick,
+  onToggleExpand,
   LinkRouter,
 }: NavMenuItemWrapperProps) => {
   const {
@@ -187,6 +192,18 @@ const NavMenuItemWrapper = ({
     if (withAnimation) triggerAnimation();
   };
 
+  // Mobile: a separate chevron owns expand/collapse so the item body can stay
+  // navigation-only.
+  const showExpandControl = withExpandControl && hasChildren && !iconOnly;
+
+  const useCollapsedBadge =
+    hasChildren && !isExpanded && item.collapsedBadgeComponent != null;
+  const activeBadgeComponent = useCollapsedBadge
+    ? item.collapsedBadgeComponent
+    : item.badgeComponent;
+
+  const showBadge = item.showBadge || activeBadgeComponent != null;
+
   const itemClassName = classNames(styles.item, { [styles.active]: isActive });
 
   const content = (
@@ -198,9 +215,7 @@ const NavMenuItemWrapper = ({
           ) : (
             <ReactSVG className={styles.itemIcon} src={item.icon!} />
           )}
-          {item.showBadge && (
-            <span className={styles.itemSignalDot} />
-          )}
+          {showBadge && <span className={styles.itemSignalDot} />}
         </div>
       ) : null}
       <span className={styles.itemText}>{item.label}</span>
@@ -252,26 +267,45 @@ const NavMenuItemWrapper = ({
             type="button"
             className={itemClassName}
             data-item-id={item.id}
-            aria-expanded={hasChildren && !iconOnly ? isExpanded : undefined}
+            aria-expanded={
+              hasChildren && !iconOnly && !withExpandControl
+                ? isExpanded
+                : undefined
+            }
             title={iconOnly ? item.label : undefined}
             onClick={handleClick}
           >
             {content}
           </TooltipContainer>
         )}
-        {item.showBadge && (
+        {showBadge && (
           <div
             className={styles.itemBadge}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
           >
-            {item.badgeComponent ?? (
+            {activeBadgeComponent ?? (
               <Badge
                 label={item.labelBadge}
                 onClick={() => item.onClickBadge?.(item.id)}
               />
             )}
           </div>
+        )}
+        {showExpandControl && (
+          <button
+            type="button"
+            className={styles.expandButton}
+            aria-label={item.label}
+            aria-expanded={isExpanded}
+            onClick={() => onToggleExpand(item)}
+          >
+            <ExpandArrowIcon
+              className={classNames(styles.expandIcon, {
+                [styles.expandIconExpanded]: isExpanded,
+              })}
+            />
+          </button>
         )}
       </div>
       {hasChildren && !iconOnly && (
@@ -308,11 +342,14 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       className,
       LinkRouter,
       iconOnly = false,
+      withExpandControl = false,
     },
     ref,
   ) => {
-    const [expandedId, setExpandedId] = useState<string | null>(
-      defaultExpandedId ?? null,
+    // A set so mobile (withExpandControl) can keep several sections open at
+    // once; desktop keeps at most one entry to preserve single-expand.
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(() =>
+      defaultExpandedId ? new Set([defaultExpandedId]) : new Set(),
     );
 
     // Keep the parent item expanded whenever the active item changes.
@@ -323,33 +360,56 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       const parent = allItems.find((item) =>
         item.children?.some((sub) => sub.id === activeItemId),
       );
+      let target: string | null | undefined;
       if (parent) {
-        setExpandedId(parent.id);
-        return;
+        target = parent.id;
+      } else {
+        const item = allItems.find((i) => i.id === activeItemId);
+        // Active item is a top-level item with children — expand it; a
+        // childless one (e.g. Overview) collapses the open section (desktop).
+        if (item?.children?.length) target = item.id;
+        else if (item) target = null;
+        else return; // unknown id — leave the current state untouched
       }
-      const item = allItems.find((i) => i.id === activeItemId);
-      // Active item is a top-level item with children — expand it.
-      if (item?.children?.length) {
-        setExpandedId(item.id);
-        return;
-      }
-      // Active item is a top-level item with no sub-menu (e.g. Overview) —
-      // collapse any previously expanded section.
-      if (item) setExpandedId(null);
-    }, [activeItemId, groups]);
+
+      setExpandedIds((prev) => {
+        if (withExpandControl) {
+          // Mobile: only ensure the active section is open; never auto-collapse
+          // the sections the user opened manually.
+          if (target == null || prev.has(target)) return prev;
+          return new Set(prev).add(target);
+        }
+        // Desktop: the active section replaces whatever was expanded.
+        return target ? new Set([target]) : new Set();
+      });
+    }, [activeItemId, groups, withExpandControl]);
 
     const handleItemClick = (item: NavMenuItem) => {
       // An onClick that returns `false` handled the interaction itself (e.g.
       // opened a modal) and opts out of the default expand/collapse so the
       // sub-menu doesn't toggle behind the modal.
       const handled = item.onClick?.(item) === false;
-      if (!handled && !iconOnly && item.children?.length) {
-        // Collapse only when the item is also active; non-active expanded
-        // items stay open until another item is clicked (by design).
-        setExpandedId((prev) =>
-          prev === item.id && activeItemId === item.id ? null : item.id,
+      if (handled) return;
+      // Mobile: the body click is navigation-only; the chevron owns expansion.
+      if (withExpandControl) return;
+      if (!iconOnly && item.children?.length) {
+        // Re-clicking the active section must not collapse it; only
+        // clicking a different (non-active) expanded item toggles it shut.
+        setExpandedIds((prev) =>
+          prev.has(item.id) && activeItemId !== item.id
+            ? new Set()
+            : new Set([item.id]),
         );
       }
+    };
+
+    const handleToggleExpand = (item: NavMenuItem) => {
+      setExpandedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(item.id)) next.delete(item.id);
+        else next.add(item.id);
+        return next;
+      });
     };
 
     const handleSubItemClick = (subItem: NavSubItem) => {
@@ -363,10 +423,25 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       if (!iconOnly) return items;
       const flat: NavMenuItem[] = [];
       for (const item of items) {
-        flat.push({ ...item, children: undefined });
         const isActiveParent =
           item.id === activeItemId ||
           item.children?.some((sub) => sub.id === activeItemId);
+        // Flattening drops `children`, so the collapsed-badge logic in the item
+        // wrapper (which keys off `hasChildren`) no longer applies. Resolve the
+        // parent's badge here: an inactive parent (children hidden) shows the
+        // aggregated collapsed badge; the active parent — whose children are
+        // flattened right below it — shows its own per-section badge.
+        const hasChildren = !!item.children?.length;
+        const collapsedBadge =
+          hasChildren && !isActiveParent && item.collapsedBadgeComponent != null
+            ? item.collapsedBadgeComponent
+            : item.badgeComponent;
+        flat.push({
+          ...item,
+          children: undefined,
+          collapsedBadgeComponent: undefined,
+          badgeComponent: collapsedBadge,
+        });
         if (isActiveParent) {
           const children = item.children ?? [];
           children.forEach((sub, index) => {
@@ -396,7 +471,11 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
     return (
       <nav
         ref={ref}
-        className={classNames(styles.root, { [styles.iconOnly]: iconOnly }, className)}
+        className={classNames(
+          styles.root,
+          { [styles.iconOnly]: iconOnly },
+          className,
+        )}
       >
         {groups.map((group) => {
           const items = flatten(group.items);
@@ -411,13 +490,15 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
                     key={item.id}
                     item={item}
                     isActive={item.id === activeItemId}
-                    isExpanded={item.id === expandedId}
+                    isExpanded={expandedIds.has(item.id)}
                     hasChildren={!!item.children?.length}
                     activeItemId={activeItemId}
                     withAnimation={withAnimation}
                     iconOnly={iconOnly}
+                    withExpandControl={withExpandControl}
                     onItemClick={handleItemClick}
                     onSubItemClick={handleSubItemClick}
+                    onToggleExpand={handleToggleExpand}
                     LinkRouter={LinkRouter}
                   />
                 ))}
@@ -433,3 +514,4 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
 NavMenuComponent.displayName = "NavMenu";
 
 export { NavMenuComponent as NavMenu };
+

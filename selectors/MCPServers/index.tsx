@@ -117,7 +117,7 @@ const MCPServersSelector = ({
 
   const isRequestLoading = React.useRef(false);
 
-  // Servers are keyed by name in the new-ai model: system servers come from
+  // Servers are keyed by name in the chat-lib model: system servers come from
   // the service config (list-system-tools groups), the rest are portal-level
   // custom servers (list-custom-servers without an entityId).
   const convertServerToOption = React.useCallback(
@@ -147,10 +147,10 @@ const MCPServersSelector = ({
     try {
       const [systemTools, customServers] = await Promise.all([
         apiClient.request<Record<string, unknown>>(
-          `/api/2.0/new-ai/tools/list-system-tools`,
+          `/api/2.0/ai/tools/list-system-tools`,
         ),
         apiClient.request<Record<string, unknown>>(
-          `/api/2.0/new-ai/tools/list-custom-servers`,
+          `/api/2.0/ai/tools/list-custom-servers`,
         ),
       ]);
 
@@ -186,7 +186,7 @@ const MCPServersSelector = ({
     setIsLoading(false);
   }, [apiClient, convertServerToOption]);
 
-  // The new-ai lists are not paginated — everything arrives in one response.
+  // The tools lists are not paginated — everything arrives in one response.
   const fetchMoreServer = React.useCallback(async () => {}, []);
 
   const onSelect = (item: TSelectorItem) => {

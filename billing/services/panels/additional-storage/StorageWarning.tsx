@@ -43,7 +43,7 @@ import { Text } from "../../../../components/text";
 import { Loader, LoaderTypes } from "../../../../components/loader";
 
 import styles from "../../styles/StorageSummary.module.scss";
-import { useServicesActions } from "../../hooks/useServicesActions";
+import { useCommonTranslation } from "../../../../utils/i18n";
 import { Link } from "../../../../components";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
@@ -66,9 +66,10 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
   isDisabled,
 }) => {
   const paymentStore = usePaymentStore();
-  const { currentStoragePlanSize } = paymentStore.tariff;
+  const currentStoragePlanSize =
+    paymentStore.tariff?.currentStoragePlanSize ?? 0;
 
-  const { t } = useServicesActions();
+  const t = useCommonTranslation();
 
   const isCancellationMode = !!onCancelChange;
 
@@ -85,7 +86,7 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
         )}
       </div>
 
-      <Text>
+      <Text fontSize="12px" className={styles.warningBody}>
         {body ??
           t("StorageWarning", {
             amount: `${currentStoragePlanSize} ${t("Gigabyte")}`,
@@ -120,4 +121,3 @@ const StorageWarning: React.FC<StorageWarningProps> = ({
 };
 
 export default observer(StorageWarning);
-

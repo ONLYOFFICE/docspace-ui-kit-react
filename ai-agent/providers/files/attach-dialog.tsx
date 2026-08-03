@@ -35,7 +35,7 @@ import { useStores } from "@onlyoffice/ai-chat";
 import FilesSelector from "../../../selectors/Files";
 import type { TSelectorItem } from "../../../components/selector";
 import { toastr, type TData } from "../../../components/toast";
-import useGetIcon from "../../chat/hooks/useGetIcon";
+import useGetIcon from "../../hooks/useGetIcon";
 
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat } from "./attach-files";

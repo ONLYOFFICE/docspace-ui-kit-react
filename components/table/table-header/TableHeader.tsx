@@ -1330,10 +1330,7 @@ export const TableHeader = (props: TableHeaderProps) => {
             >
               <TableSettings
                 columns={columns}
-                disableSettings={
-                  (infoPanelVisible || hideColumns || isIndexEditingModeProp) ??
-                  false
-                }
+                disableSettings={hideColumns || Boolean(isIndexEditingModeProp)}
               />
             </TooltipContainer>
           ) : null}

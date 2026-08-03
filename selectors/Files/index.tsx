@@ -774,7 +774,13 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       return;
     }
     if (openRoot && !selectedItemId) {
-      getRootData();
+      // `isRoot` gates the refetch: getRootData itself invalidates deps of
+      // this effect (it resets the recent/favorites folders from every
+      // fresh response, which recreates getRoomList), so an unguarded
+      // call would re-request the root in an endless loop. Navigating
+      // into a folder/room sets isRoot back to false, so returning to
+      // the root still reloads it.
+      if (!isRoot) getRootData();
       return;
     }
 
@@ -788,6 +794,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     selectedItemId,
     getRootData,
     openRoot,
+    isRoot,
     isUserOnly,
     withInit,
   ]);

@@ -43,6 +43,7 @@ export type QuickActionItem = {
   href?: string;
   target?: "_blank" | "_self" | "_parent" | "_top";
   disabled?: boolean;
+  tooltipContent?: ReactNode;
   dataTestId?: string;
 };
 

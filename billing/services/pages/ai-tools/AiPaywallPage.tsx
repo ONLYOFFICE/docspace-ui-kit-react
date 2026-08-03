@@ -49,6 +49,7 @@ import PricingBillingBody from "../../panels/ai-service/PricingBillingBody";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import { toAbsoluteUrl } from "../../../utils/url";
+import { pollUntil } from "../../../utils/stripe-flow";
 import { formatCurrencyValue } from "../../../utils/common";
 import { AI_PAYWALL_START_AMOUNT, AI_TOOLS, AI_ENUM } from "../../../constants";
 
@@ -65,7 +66,10 @@ type WaitingPhase = "idle" | "payment" | "topup" | "completed";
 const START_AMOUNT = AI_PAYWALL_START_AMOUNT;
 const PRESET_AMOUNTS = [AI_PAYWALL_START_AMOUNT, 50, 100];
 const POLL_INTERVAL_MS = 3000;
-const POLL_TIMEOUT_MS = 5 * 60 * 1000;
+const POLL_OPTIONS = {
+  initialIntervalMs: POLL_INTERVAL_MS,
+  maxIntervalMs: POLL_INTERVAL_MS,
+};
 const ANIMATION_STEP_MS = 80;
 const ANIMATION_TARGET_TICKS = 25;
 const POST_ANIMATION_HOLD_MS = 500;
@@ -95,6 +99,7 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
 
   const isWaiting = waitingPhase !== "idle";
   const isMountedRef = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const bootstrap = async () => {
     await aiPaywallInit(t);
@@ -128,6 +133,7 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
 
     return () => {
       isMountedRef.current = false;
+      abortControllerRef.current?.abort();
     };
   }, []);
 
@@ -157,17 +163,6 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
     }
   };
 
-  const pollUntil = async (check: () => Promise<boolean>) => {
-    const startedAt = Date.now();
-    while (isMountedRef.current) {
-      if (await check()) return;
-      if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
-        throw new Error("Polling timeout");
-      }
-      await sleep(POLL_INTERVAL_MS);
-    }
-  };
-
   const animateBalanceTo = async (target: number) => {
     const intTarget = Math.floor(target);
     const step = Math.max(1, Math.ceil(intTarget / ANIMATION_TARGET_TICKS));
@@ -188,6 +183,10 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
   const onEnableAI = async () => {
     if (isWaiting) return;
 
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const { signal } = controller;
+
     setWaitingPhase("payment");
 
     try {
@@ -201,20 +200,28 @@ const AiPaywallPage = ({ integrationUrl, onCompleted }: AiPaywallPageProps) => {
 
       window.open(toAbsoluteUrl(linkUrl), "_blank");
 
-      await pollUntil(async () => {
-        await paymentStore.tariff.fetchCustomerInfo(true);
-        return !!paymentStore.tariff.walletCustomerEmail;
-      });
+      await pollUntil(
+        async () => {
+          await paymentStore.tariff.fetchCustomerInfo(true);
+          return !!paymentStore.tariff.walletCustomerEmail;
+        },
+        signal,
+        POLL_OPTIONS,
+      );
 
       if (!isMountedRef.current) return;
 
       setWaitingPhase("topup");
 
       let balanceValue = 0;
-      await pollUntil(async () => {
-        balanceValue = await fetchAiBalanceRaw();
-        return balanceValue > 0;
-      });
+      await pollUntil(
+        async () => {
+          balanceValue = await fetchAiBalanceRaw();
+          return balanceValue > 0;
+        },
+        signal,
+        POLL_OPTIONS,
+      );
 
       if (!isMountedRef.current) return;
 

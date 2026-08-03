@@ -38,7 +38,7 @@ import {
 import { useIsDesktop } from "../../hooks/use-is-desktop";
 
 import { ChatToolbar } from "../chat-toolbar";
-import { ChatNoAccessScreen } from "../chat/components/chat-no-access-screen";
+import { ChatNoAccessScreen } from "./components/chat-no-access-screen";
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
 
 import styles from "./NewChat.module.scss";
@@ -48,7 +48,7 @@ import type { ChatProps } from "./chat.types";
 const AI_SETTINGS_URL = "/portal-settings/ai-settings";
 
 const NewChat: React.FC<ChatProps> = observer(
-  ({ aiReady = true, noAccessProps, isAgent }) => {
+  ({ aiReady = true, noAccessProps, isAgents }) => {
     const isDesktop = useIsDesktop();
 
     const stores = useStores();
@@ -83,7 +83,7 @@ const NewChat: React.FC<ChatProps> = observer(
 
     // Desktop full-screen / agent view puts the chat list beside the active
     // chat; every other case shows one surface at a time.
-    const isSplitView = (isFullScreen || isAgent) && isDesktop;
+    const isSplitView = (isFullScreen || isAgents) && isDesktop;
 
     React.useEffect(() => {
       // page and reset the internal page so returning to the chat doesn't loop. // "Open settings" actions, etc.), bounce the user to the portal AI settings // Whenever the widget router tries to open the settings page (gear button,
