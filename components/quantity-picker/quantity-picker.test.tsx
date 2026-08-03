@@ -176,7 +176,7 @@ describe("<QuantityPicker />", () => {
     expect(onChange).toHaveBeenLastCalledWith(15);
   });
 
-  it("keeps values above the maximum and shows them with a plus sign", async () => {
+  it("caps typed values above the maximum and shows them with a plus sign", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(
@@ -191,11 +191,75 @@ describe("<QuantityPicker />", () => {
 
     const input = getInput();
     await user.clear(input);
-    await user.keyboard("1500");
+    await user.keyboard("9999");
+
+    expect(input).toHaveValue("999+");
+    expect(onChange).toHaveBeenLastCalledWith(1000);
+  });
+
+  it("does not let the value grow past the cap on further typing", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Harness
+        initialValue={10}
+        minValue={10}
+        maxValue={999}
+        showPlusSign
+        onChange={onChange}
+      />,
+    );
+
+    const input = getInput();
+    await user.clear(input);
+    await user.keyboard("9999999999");
     await user.tab();
 
-    expect(onChange).toHaveBeenLastCalledWith(1500);
     expect(input).toHaveValue("999+");
+    expect(onChange).toHaveBeenLastCalledWith(1000);
+  });
+
+  it("lets the capped value be edited back down with the keyboard", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Harness
+        initialValue={10}
+        minValue={10}
+        maxValue={999}
+        showPlusSign
+        onChange={onChange}
+      />,
+    );
+
+    const input = getInput();
+    await user.clear(input);
+    await user.keyboard("9999");
+    await user.click(input);
+    await user.keyboard("{End}{Backspace}{Backspace}");
+
+    expect(input).toHaveValue("99");
+    expect(onChange).toHaveBeenLastCalledWith(99);
+  });
+
+  it("clamps to the maximum when the plus sign is not used", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Harness
+        initialValue={10}
+        minValue={10}
+        maxValue={999}
+        onChange={onChange}
+      />,
+    );
+
+    const input = getInput();
+    await user.clear(input);
+    await user.keyboard("9999");
+
+    expect(input).toHaveValue("999");
+    expect(onChange).toHaveBeenLastCalledWith(999);
   });
 
   it("allows zero on blur when enableZero is set", async () => {

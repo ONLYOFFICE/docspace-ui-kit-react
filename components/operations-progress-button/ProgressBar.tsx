@@ -38,6 +38,7 @@ import classNames from "classnames";
 import ClearIcon from "../../assets/icons/16/clear.react.svg";
 import AlertIcon from "../../assets/button.alert.react.svg";
 import TickIcon from "../../assets/icons/12/tick.react.svg";
+import StoppedIcon from "../../assets/icons/16/catalog.spam.react.svg";
 import RightArrowIcon from "../../assets/icons/12/right-arrow.react.svg";
 
 import { Text } from "../text";
@@ -51,6 +52,7 @@ import { ProgressBarMobileProps } from "./OperationsProgressButton.types";
 const ProgressBar = ({
 	label,
 	alert,
+	stopped,
 	percent,
 	open,
 	onCancel,
@@ -122,14 +124,21 @@ const ProgressBar = ({
               size={16}
               color="white"
             />
-            {!withoutStatus && (alert || completed) ? (
+            {!withoutStatus && (stopped || alert || completed) ? (
               <div
                 className={classNames(styles.infoIcon, {
-                  [styles.alert]: alert,
-                  [styles.complete]: !alert && completed,
+                  [styles.stopped]: stopped,
+                  [styles.alert]: !stopped && alert,
+                  [styles.complete]: !stopped && !alert && completed,
                 })}
               >
-                {alert ? <AlertIcon /> : <TickIcon />}
+                {stopped ? (
+                  <StoppedIcon />
+                ) : alert ? (
+                  <AlertIcon />
+                ) : (
+                  <TickIcon />
+                )}
               </div>
             ) : null}
           </div>

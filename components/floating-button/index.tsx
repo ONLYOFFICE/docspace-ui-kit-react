@@ -46,6 +46,7 @@ import ExportRoomIndexIcon from "../../assets/icons/24/export-room-index.react.s
 import HorizontalDotsIcon from "../../assets/icons/16/horizontal-dots.react.svg";
 import ArrowIcon from "../../assets/icons/16/top-arrow.react.svg";
 import TickIcon from "../../assets/icons/12/tick.react.svg";
+import StoppedIcon from "../../assets/icons/16/catalog.spam.react.svg";
 import DeletePermanentlyIcon from "../../assets/icons/24/delete-permanently.react.svg";
 import CopyIcon from "../../assets/icons/24/copy.react.svg";
 import DownloadIcon from "../../assets/icons/24/download.react.svg";
@@ -100,6 +101,7 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
       iconUrl,
       alert = false,
       completed = false,
+      stopped = false,
       onClick,
       color,
       clearUploadedFilesHistory,
@@ -196,21 +198,30 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
               >
                 {iconComponent}
               </div>
-              {!withoutStatus && (alert || isCompleted) ? (
+              {!withoutStatus && (stopped || alert || isCompleted) ? (
                 <div
                   data-testid="floating-button-alert"
                   className={classNames(styles.alertIcon, {
-                    [styles.alert]: alert,
-                    [styles.complete]: !alert && isCompleted,
+                    [styles.stopped]: stopped,
+                    [styles.alert]: !stopped && alert,
+                    [styles.complete]: !stopped && !alert && isCompleted,
                   })}
                 >
-                  {alert ? (
+                  {stopped ? (
+                    <StoppedIcon
+                      className="stopped-icon"
+                      data-testid="floating-button-stopped-icon"
+                      style={{ overflow: "hidden", verticalAlign: "middle" }}
+                    />
+                  ) : alert ? (
                     <ButtonAlertIcon
+                      data-testid="floating-button-alert-icon"
                       style={{ overflow: "hidden", verticalAlign: "middle" }}
                     />
                   ) : (
                     <TickIcon
                       className="tick-icon"
+                      data-testid="floating-button-tick-icon"
                       style={{ overflow: "hidden", verticalAlign: "middle" }}
                     />
                   )}

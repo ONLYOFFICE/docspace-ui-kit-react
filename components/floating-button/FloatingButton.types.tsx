@@ -58,6 +58,9 @@ export type FloatingButtonProps = {
   showCancelButton?: boolean;
   showCloseIcon?: boolean;
   completed?: boolean;
+  /** Shows the "stopped" status icon: the operation was aborted by the user.
+   * Takes precedence over `alert` and `completed`. */
+  stopped?: boolean;
   withoutStatus?: boolean;
   /** Loading indicator */
   percent?: number;

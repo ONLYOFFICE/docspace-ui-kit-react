@@ -295,11 +295,13 @@
     :global(.light) & {
       --status-icon-color-positive: #{colors.$light-status-positive};
       --status-icon-color-negative: #{colors.$light-error-status};
+      --status-icon-color-warning: #{colors.$light-status-warning};
     }
 
     :global(.dark) & {
       --status-icon-color-positive: #{colors.$dark-status-positive};
       --status-icon-color-negative: #{colors.$dark-error-status};
+      --status-icon-color-warning: #{colors.$dark-status-warning};
     }
 
     --ops-progress-success-icon-value: var(
@@ -309,6 +311,10 @@
     --ops-progress-error-icon-value: var(
       --ops-progress-error-icon,
       var(--status-icon-color-negative)
+    );
+    --ops-progress-stopped-icon-value: var(
+      --ops-progress-stopped-icon,
+      var(--status-icon-color-warning)
     );
 
     position: absolute;
@@ -341,6 +347,17 @@
         }
         path:not([fill="white"]) {
           fill: var(--status-icon-color-positive) !important;
+        }
+      }
+    }
+
+    &.stopped {
+      svg {
+        path {
+          fill: var(--ops-progress-stopped-icon-value) !important;
+        }
+        path:not([fill="white"]) {
+          fill: var(--ops-progress-stopped-icon-value) !important;
         }
       }
     }
