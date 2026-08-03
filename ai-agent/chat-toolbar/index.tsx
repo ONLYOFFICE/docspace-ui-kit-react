@@ -48,11 +48,14 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
   const currentPage = stores.useRouter((s) => s.currentPage);
   const setCurrentPage = stores.useRouter((s) => s.setCurrentPage);
   const startNewChat = stores.useThreadsStore((s) => s.onSwitchToNewThread);
+  // Empty string while no thread is selected — i.e. an unsaved new chat.
+  const threadId = stores.useThreadsStore((s) => s.threadId);
   const profiles = stores.useProfilesStore((s) => s.profiles);
 
   const hasProfile = profiles.length > 0;
 
   const isHistoryActive = currentPage === "history";
+  const isNewChat = !threadId;
 
   const handleNavigateToHistory = () => {
     if (isHistoryActive) {
@@ -63,7 +66,7 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
   };
 
   const handleStartNewChat = () => {
-    if (!hasProfile) return;
+    if (!hasProfile || isNewChat) return;
 
     startNewChat();
     setCurrentPage("chat");
@@ -86,6 +89,7 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
             className={styles.button}
             title={t("Common:AINewChat")}
             onClick={handleStartNewChat}
+            disabled={isNewChat}
           />
         ) : null}
       </div>
