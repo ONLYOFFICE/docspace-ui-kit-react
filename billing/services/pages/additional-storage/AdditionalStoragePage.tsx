@@ -51,6 +51,7 @@ import BalanceAmount from "../../../shared/balance-amount";
 import SettingsIcon from "../../../../assets/icons/16/catalog-settings-common.svg";
 import PencilIcon from "../../../../assets/pencil.react.svg";
 import RemoveSessionIcon from "../../../../assets/remove.session.svg";
+import AlertIcon from "../../../../assets/plugin.incompatible.react.svg";
 
 import TransactionHistory from "../../../shared/transaction-history";
 import styles from "./AdditionalStoragePage.module.scss";
@@ -71,6 +72,7 @@ import { useServicesActions } from "../../hooks/useServicesActions";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import StorageTariffDeactivated from "../../../dialogs/StorageTariffDeactivated";
+import RemoveStorageSubscription from "../../../dialogs/RemoveStorageSubscription";
 
 type AdditionalStoragePageProps = {
   fetchPortalTariff?: () => Promise<void>;
@@ -95,6 +97,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     setStorageDeactivationVisited,
     isServiceActionDisabled,
     isCardMissingOrInactive,
+    isShowPreviousStoragePlan,
   } = paymentStore;
 
   const {
@@ -119,6 +122,8 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
   const [isGracePeriodModalVisible, setIsGracePeriodModalVisible] =
     useState(false);
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const [isRemovePreviousPlanVisible, setIsRemovePreviousPlanVisible] =
+    useState(false);
 
   useEffect(() => {
     initServiceData(t, DISK_STORAGE, STORAGE_ENUM);
@@ -201,10 +206,11 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
   const onCloseGracePeriod = () => {
     setIsGracePeriodModalVisible(false);
   };
-  const monthlyPrice = calculateTotalPrice(
-    currentStoragePlanSize,
-    storagePriceIncrement,
-  );
+  const planSize = isShowPreviousStoragePlan
+    ? previousStoragePlanSize
+    : currentStoragePlanSize;
+
+  const monthlyPrice = calculateTotalPrice(planSize, storagePriceIncrement);
   const balance = formatWalletCurrency();
 
   const contextMenuItems = [
@@ -249,6 +255,22 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         description={t("AdjustStorageToExactAmount")}
       />
 
+      {isShowPreviousStoragePlan ? (
+        <div className={styles.deactivatedBanner}>
+          <span className={styles.deactivatedBannerIcon} aria-hidden="true">
+            <AlertIcon />
+          </span>
+          <div className={styles.deactivatedBannerText}>
+            <Text className={styles.deactivatedTitle}>
+              {t("SubscriptionDeactivated")}
+            </Text>
+            <Text className={styles.deactivatedDescription}>
+              {t("SubscriptionDeactivatedDescription")}
+            </Text>
+          </div>
+        </div>
+      ) : null}
+
       <WalletInfo
         withoutBackground
         balance={balance}
@@ -273,7 +295,14 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
       ) : null}
 
       <div className={styles.subscriptionSection}>
-        {!hasStorageSubscription ? (
+        {isShowPreviousStoragePlan ? (
+          <div className={styles.subscriptionHeader}>
+            <Text fontWeight={700} fontSize="14px">
+              {t("PreviousSubscription")}
+            </Text>
+            <span className={styles.statusBadge}>{t("Inactive")}</span>
+          </div>
+        ) : !hasStorageSubscription ? (
           <div className={styles.noSubscriptionCard}>
             <Text fontWeight={700} fontSize="14px">
               {t("NoActiveSubscription")}
@@ -306,8 +335,12 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
           </div>
         )}
 
-        {currentStoragePlanSize ? (
-          <div className={styles.summaryGrid}>
+        {planSize ? (
+          <div
+            className={`${styles.summaryGrid} ${
+              isShowPreviousStoragePlan ? styles.summaryGridMuted : ""
+            }`}
+          >
             <div className={styles.summaryCard}>
               <Text className={styles.cardLabel}>{t("MonthlyCharge")}</Text>
               <BalanceAmount
@@ -318,11 +351,12 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
                 withoutMargin
                 mainFontSize="18px"
                 fractionFontSize="12px"
+                className={styles.cardAmount}
               />
               <Text className={styles.cardCaption}>
                 {t("PerStorage", {
                   currency: formatWalletCurrency(storagePriceIncrement, 2),
-                  amount: `1 ${t("Gigabyte")}`,
+                  amount: getConvertedSize(t, storageSizeIncrement || 0),
                 })}
               </Text>
             </div>
@@ -330,7 +364,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
             <div className={styles.summaryCard}>
               <Text className={styles.cardLabel}>{t("StorageAdded")}</Text>
               <Text className={styles.cardValue}>
-                {`${currentStoragePlanSize} ${t("Gigabyte")}`}
+                {`${planSize} ${t("Gigabyte")}`}
               </Text>
               <Text className={styles.cardCaption}>
                 {t("AdditionalDiskSpace")}
@@ -339,7 +373,22 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
           </div>
         ) : null}
 
-        {!isScheduled || currentStoragePlanSize ? (
+        {isShowPreviousStoragePlan ? (
+          <div className={styles.actionRow}>
+            <Button
+              label={t("TopUpAndRenew")}
+              size={ButtonSize.small}
+              primary
+              onClick={openUpgradeDialog}
+              isDisabled={isDisabled}
+            />
+            <Button
+              label={t("RemoveSubscription")}
+              size={ButtonSize.small}
+              onClick={() => setIsRemovePreviousPlanVisible(true)}
+            />
+          </div>
+        ) : !isScheduled || currentStoragePlanSize ? (
           <div className={styles.actionRow}>
             {currentStoragePlanSize && !isScheduled ? (
               <Button
@@ -403,7 +452,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         <StoragePlanUpgrade
           visible={isStorageDialogVisible}
           onClose={onCloseUpgradeStorage}
-          {...(previousStoragePlanSize && {
+          {...(isShowPreviousStoragePlan && {
             previousValue: previousStoragePlanSize.toString(),
           })}
         />
@@ -418,6 +467,12 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         <GracePeriodModal
           visible={isGracePeriodModalVisible}
           onClose={onCloseGracePeriod}
+        />
+      ) : null}
+      {isRemovePreviousPlanVisible ? (
+        <RemoveStorageSubscription
+          visible={isRemovePreviousPlanVisible}
+          onClose={() => setIsRemovePreviousPlanVisible(false)}
         />
       ) : null}
       {isTopUpDialogVisible ? (

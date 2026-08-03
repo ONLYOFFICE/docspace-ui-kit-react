@@ -141,3 +141,19 @@ export const formatCompactNumber = (value: number, language = "en"): string =>
     maximumFractionDigits: 2,
   }).format(value);
 
+export const getCurrencySymbol = (
+  currency?: string,
+  language = "en",
+): string => {
+  if (!currency) return "";
+  try {
+    return (
+      new Intl.NumberFormat(language, { style: "currency", currency })
+        .formatToParts(0)
+        .find((part) => part.type === "currency")?.value ?? currency
+    );
+  } catch {
+    return currency;
+  }
+};
+

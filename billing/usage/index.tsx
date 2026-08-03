@@ -77,6 +77,8 @@ const Usage = ({
     formatDate,
     openOnNewPage,
     isCardLinkedToPortal,
+    setFilterStartDate,
+    setFilterEndDate,
   } = usePaymentStore();
   const { serviceUsage, initUsageData } = useServicesStore();
 
@@ -112,6 +114,16 @@ const Usage = ({
   );
 
   const { from, to } = getUsageRange(period);
+
+  const openWithPeriod = (openServicePage?: () => void) => {
+    if (!openServicePage) return undefined;
+
+    return () => {
+      setFilterStartDate(from);
+      setFilterEndDate(to);
+      openServicePage();
+    };
+  };
 
   const monthText = from.setLocale(language || "en").toFormat("LLLL yyyy");
   const startDate = formatDateLocalized(from, "DATE_MED", {
@@ -284,9 +296,9 @@ const Usage = ({
       <SpendingBreakdown
         period={period}
         isLoading={isLoading}
-        onDiskStorageClick={onDiskStorageClick}
-        onBackupClick={onBackupClick}
-        onAIServicesClick={onAIServicesClick}
+        onDiskStorageClick={openWithPeriod(onDiskStorageClick)}
+        onBackupClick={openWithPeriod(onBackupClick)}
+        onAIServicesClick={openWithPeriod(onAIServicesClick)}
         onDownloadReport={onDownloadReport}
         onViewChange={setBreakdownView}
       />

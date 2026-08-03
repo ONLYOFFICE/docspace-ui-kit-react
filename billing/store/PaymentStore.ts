@@ -57,7 +57,7 @@ export type WalletOperationDto = Omit<OperationDto, "date"> & {
 
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
-import type { TBalance, TServiceUsage } from "../types";
+import type { TActiveService, TBalance, TServiceUsage } from "../types";
 import { formatCurrencyValue } from "../utils/common";
 import {
   getCardLinkedOnFreeTariff,
@@ -84,6 +84,7 @@ import {
   BACKUP_SERVICE,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
+  STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED,
   WEB_SEARCH,
   DOCS_CONNECT_SERVICE,
   DOCS_CONNECT_DEVPACK_SERVICE,
@@ -97,7 +98,7 @@ import {
   getAppTimezone,
   isSameDay,
 } from "../../utils/date";
-import type { DateTime } from "luxon";
+import { DateTime } from "luxon";
 import type {
   TPaymentConfig,
   TPaymentRoutes,
@@ -233,6 +234,8 @@ class PaymentStore {
 
   upcomingPaymentsData: TUpcomingPaymentResponse[] = [];
 
+  activeServices: TActiveService[] = [];
+
   autoPayments: TenantWalletSettings | null = null;
 
   minBalance: string = "";
@@ -257,6 +260,8 @@ class PaymentStore {
   isShowStorageTariffDeactivatedModal = false;
 
   isStorageDeactivationVisited = false;
+
+  isPreviousStorageSubscriptionRemoved = false;
 
   filterSelectedTypeKey = "allTransactions";
 
@@ -302,6 +307,11 @@ class PaymentStore {
     this.quotas = new CurrentQuotasStore(paymentApi);
     this.paymentQuotas = new PaymentQuotasStore(paymentApi);
     this.paymentQuotas.setCurrentQuotasStore(this.quotas);
+
+    if (typeof window !== "undefined") {
+      this.isPreviousStorageSubscriptionRemoved =
+        localStorage.getItem(STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED) === "true";
+    }
 
     makeAutoObservable(this);
   }
@@ -595,6 +605,16 @@ class PaymentStore {
     localStorage.setItem(STORAGE_DEACTIVATION_VISITED, "true");
   };
 
+  removePreviousStorageSubscription = () => {
+    this.isPreviousStorageSubscriptionRemoved = true;
+    localStorage.setItem(STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED, "true");
+  };
+
+  resetPreviousStorageSubscription = () => {
+    this.isPreviousStorageSubscriptionRemoved = false;
+    localStorage.removeItem(STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED);
+  };
+
   setPaymentLink = (link: string) => {
     this.paymentLink = link;
   };
@@ -629,6 +649,23 @@ class PaymentStore {
     }
   };
 
+  fetchActiveServices = async () => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/activeservices",
+        { signal: abortController.signal },
+      );
+
+      this.activeServices = (data?.response as TActiveService[]) ?? [];
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
   get upcomingPayments(): TUpcomingPayment[] {
     return this.upcomingPaymentsData.map((item) => ({
       id: String(item.id),
@@ -636,12 +673,27 @@ class PaymentStore {
         locale: this.language,
         timezone: getAppTimezone(),
       }),
+      renewalDateShort: formatDateLocalized(item.dueDate, "DATE_MONTH_DAY", {
+        locale: this.language,
+        timezone: getAppTimezone(),
+      }),
+      dueDate: item.dueDate,
       title: item.title,
       quantity: item.quantity,
       unitOfMeasure: item.unitOfMeasure,
       amount: item.amount,
       actionType: item.wallet ? "edit-subscription" : "edit-plan",
     }));
+  }
+
+  /** Upcoming payments due within the current calendar month. */
+  get upcomingPaymentsCurrentMonth(): TUpcomingPayment[] {
+    const now = DateTime.now().setZone(getAppTimezone());
+
+    return this.upcomingPayments.filter((item) => {
+      const due = DateTime.fromISO(item.dueDate).setZone(getAppTimezone());
+      return due.isValid && due.year === now.year && due.month === now.month;
+    });
   }
 
   formatWalletCurrency = (
@@ -997,9 +1049,18 @@ class PaymentStore {
 
   isShowStorageTariffDeactivated = () => {
     if (!this.tariff.previousStoragePlanSize) return false;
+    if (this.isPreviousStorageSubscriptionRemoved) return false;
 
     return localStorage.getItem(STORAGE_TARIFF_DEACTIVATED) !== "true";
   };
+
+  get isShowPreviousStoragePlan() {
+    return (
+      !this.tariff.hasStorageSubscription &&
+      !!this.tariff.previousStoragePlanSize &&
+      !this.isPreviousStorageSubscriptionRemoved
+    );
+  }
 
   setPaymentAccount = async () => {
     const abortController = new AbortController();
@@ -1357,6 +1418,7 @@ class PaymentStore {
       await Promise.all([
         this.walletInit(t, integrationUrl),
         this.handleServicesQuotas(),
+        this.fetchActiveServices(),
         this.paymentQuotas.fetchPaymentQuotas(),
         this.quotas.fetchPortalQuota(),
       ]);

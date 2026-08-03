@@ -95,6 +95,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     availableBackupsCount,
     isBackupServiceOn,
     isStorageDeactivationVisited,
+    isShowPreviousStoragePlan,
     isLowWalletBalance,
     language,
   } = paymentStore;
@@ -107,7 +108,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     currentStoragePlanSize,
     nextStoragePlanSize,
     hasStorageSubscription,
-    previousStoragePlanSize,
     storageExpiryDate,
   } = paymentStore.tariff;
 
@@ -190,7 +190,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   ) => {
     switch (serviceName) {
       case TOTAL_SIZE:
-        if (previousStoragePlanSize && !isStorageDeactivationVisited) {
+        if (isShowPreviousStoragePlan && !isStorageDeactivationVisited) {
           return t("SubscriptionDeactivated");
         }
 
@@ -431,7 +431,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 }
                 isWarningColor={hasScheduledStorageChange}
                 isErrorColor={
-                  !!previousStoragePlanSize && !isStorageDeactivationVisited
+                  isShowPreviousStoragePlan && !isStorageDeactivationVisited
                 }
               />
             );

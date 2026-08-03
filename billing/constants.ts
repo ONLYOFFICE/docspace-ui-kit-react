@@ -34,6 +34,7 @@
  */
 
 export const MANAGER = "manager";
+export const ADMIN = "admin";
 export const TOTAL_SIZE = "total_size";
 export const ROOM = "room";
 export const YEAR_KEY = "year";
@@ -53,6 +54,8 @@ export const WEB_SEARCH = "websearch";
 export const FREE_BACKUP = "free_backup";
 export const STORAGE_TARIFF_DEACTIVATED = "storageTariffDeactivated";
 export const STORAGE_DEACTIVATION_VISITED = "storageDeactivationVisited";
+export const STORAGE_PREVIOUS_SUBSCRIPTION_REMOVED =
+  "storagePreviousSubscriptionRemoved";
 
 export const AI_PAYWALL_START_AMOUNT = 20;
 

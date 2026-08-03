@@ -142,6 +142,7 @@ export type TAiToolsPrices = {
     symbol: string;
   };
   chat?: TAiToolsChatModelPrice[];
+  image?: TAiToolsChatModelPrice[];
   embedding?: TAiToolsEmbeddingModelPrice[];
   webSearch?: TAiToolsWebSearchPrice[];
 };
@@ -157,6 +158,10 @@ export type TUpcomingPaymentActionType = "edit-plan" | "edit-subscription";
 export type TUpcomingPayment = {
   id: string;
   renewalDate: string;
+  /** Short, localized "month day" date (no year), e.g. "July 1". */
+  renewalDateShort: string;
+  /** Raw ISO due date, used for filtering (e.g. current month). */
+  dueDate: string;
   title: string;
   quantity: number;
   unitOfMeasure: string;
@@ -184,6 +189,20 @@ export type TServiceUsage = {
   totalAmount: number;
   operationCount: number;
   title: string;
+  /** Per-unit price for the service. */
+  price: number;
+  /** Whether the service is billed as a recurring subscription. */
+  subscription: boolean;
+};
+
+/** A single active service from the active-services endpoint. */
+export type TActiveService = {
+  service: string;
+  serviceUnit: string;
+  subscription: boolean;
+  title: string;
+  limit: number;
+  used: number;
 };
 
 /** A single month bucket from the monthly usage endpoint. */
