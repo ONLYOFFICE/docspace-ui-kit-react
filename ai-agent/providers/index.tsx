@@ -224,14 +224,15 @@ type AiAgentProvidersProps = {
  * neither of which the host observes.
  *
  * Precedence: an analyzable form wins over the plain file lists, and those win
- * over the section default. Only attached *files* count — images are ignored.
+ * over the section default. Files and images both count — an attached image
+ * is what the user is asking about just as much as a document.
  */
 export type SuggestionSet = {
   /** Nothing attached: chips for the current section (room / folder). */
   default: Suggestion[];
-  /** Exactly one file attached. */
+  /** Exactly one file or image attached. */
   singleFile?: Suggestion[];
-  /** Two or more files attached. */
+  /** Two or more files/images attached. */
   multipleFiles?: Suggestion[];
   /** At least one attached file the backend flagged as analyzable. */
   analyzableForm?: Suggestion[];
@@ -600,8 +601,10 @@ const AiAgentProviders = ({
   // Which chips to show depends on what the composer holds right now, so the
   // attachment refs are read straight from the store the widget writes to —
   // that covers drag-and-drop and chip removal, not just the attach dialog.
+  // Images live in their own bucket (attachFilesToChat re-keys them), so
+  // both lists are counted.
   const attachedFileIds = stores.useAttachmentsStore((s) =>
-    s.attachmentFiles.map((f) => f.id).join(","),
+    [...s.attachmentFiles, ...s.attachmentImages].map((f) => f.id).join(","),
   );
 
   const resolvedSuggestions = useMemo(
