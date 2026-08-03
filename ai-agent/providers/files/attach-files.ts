@@ -46,23 +46,41 @@ export type AttachFileInput = {
  *
  * `imageIndices` are positions into `inputs`; the matching freshly-added refs
  * are moved (added refs preserve input order).
+ *
+ * `pendingIds` are loading-chip leases from `beginPendingAttachments`, one
+ * per input in the same order — passing them swaps each placeholder for its
+ * real chip atomically and keeps the reservation from being counted twice
+ * against the attachment cap. Known bounded gap: cancelling a single loading
+ * chip mid-batch shifts the positions the store settles, so `imageIndices`
+ * can tag a neighbouring ref (wrong icon, nothing worse); the proper fix is
+ * a per-input `kind` in `addAttachmentFile` — a library follow-up.
  */
 export const attachFilesToChat = async (
   useAttachmentsStore: AttachmentsStore,
   inputs: AttachFileInput[],
   imageIndices: Set<number>,
+  pendingIds?: string[],
 ): Promise<void> => {
   if (inputs.length === 0) return;
 
-  const before = useAttachmentsStore.getState().attachmentFiles.length;
+  // Identify the freshly added refs by id, not by a pre-await length: the
+  // upload window is long and user-visible now, and deleting an existing
+  // chip meanwhile would shift a positional slice.
+  const beforeIds = new Set(
+    useAttachmentsStore.getState().attachmentFiles.map((f) => f.id),
+  );
 
-  await useAttachmentsStore.getState().addAttachmentFile(inputs);
+  await useAttachmentsStore.getState().addAttachmentFile(inputs, {
+    pendingIds,
+  });
 
   if (imageIndices.size === 0) return;
 
   useAttachmentsStore.setState((s) => {
-    const added = s.attachmentFiles.slice(before);
-    const stayingFiles = s.attachmentFiles.slice(0, before);
+    const added = s.attachmentFiles.filter((ref) => !beforeIds.has(ref.id));
+    const stayingFiles = s.attachmentFiles.filter((ref) =>
+      beforeIds.has(ref.id),
+    );
     const movedImages: typeof s.attachmentImages = [];
     added.forEach((ref, i) => {
       if (imageIndices.has(i)) {
