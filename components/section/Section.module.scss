@@ -565,10 +565,18 @@
     .section-body_header {
       width: 100%;
       position: sticky;
-      top: var(--nav-offset, 0);
+      top: var(--nav-offset, 0px);
       background: var(--section-bg-v, var(--section-header-bg));
       padding-inline-end: 0;
       z-index: 201;
+
+      // iOS Safari repaints sticky elements late during momentum scroll and
+      // while the URL bar animates, which makes the pinned header flicker on
+      // upward scroll. Promoting it to its own compositing layer keeps it
+      // pinned instead of re-laying out on every viewport-resize tick.
+      transform: translateZ(0);
+      will-change: transform;
+      backface-visibility: hidden;
 
       @include mixins.mobile {
         min-width: 100vw;
@@ -599,7 +607,7 @@
   margin: 0 -16px !important;
 
   @include mixins.mobile {
-    top: calc(53px + var(--nav-offset, 0));
+    top: calc(53px + var(--nav-offset, 0px));
   }
 }
 
@@ -613,6 +621,10 @@
 
 .sectionContainer {
   --section-bg-v: var(--section-bg, var(--section-header-bg));
+  // Must carry a unit: a bare `0` is invalid for `top` and inside `calc()`,
+  // so the whole declaration would be dropped and the sticky header would
+  // fall back to `top: auto`.
+  --nav-offset: 0px;
 
   position: relative;
 
