@@ -23,7 +23,12 @@ import type { TTranslations } from "../providers/translation/i18n";
 import { getI18NInstance } from "../providers/translation/i18n";
 import { setBrandLookup } from "../constants/brands";
 import { parseLocaleConstants } from "../utils/parse-locale-constants";
-import brandsData from "../../../public/locales/.constants/brands.json";
+// Brand names come from a local fixture rather than the DocSpace monorepo
+// (../../../public/locales/.constants/brands.json): ui-kit is its own
+// repository and CI checks it out standalone, so parent paths do not exist
+// there. The fixture holds only the keys ui-kit itself resolves via
+// getBrandName() - OrganizationName, ProductName, ProductEditorsName.
+import brandsData from "./fixtures/brands.json";
 
 const { get: getBrand } = parseLocaleConstants(
   brandsData as Record<string, string>,
