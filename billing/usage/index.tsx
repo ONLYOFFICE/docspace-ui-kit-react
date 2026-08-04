@@ -53,6 +53,8 @@ import type { TUsagePeriodKey } from "../types";
 
 import PeriodSelect from "./sub-components/PeriodSelect";
 import SpendingBreakdown from "./sub-components/SpendingBreakdown";
+import SpendAmount from "../shared/spend-amount";
+
 import { getUsageRange } from "./utils";
 import { toastr } from "../../components/toast";
 import styles from "./styles/Usage.module.scss";
@@ -72,7 +74,6 @@ const Usage = ({
   const t = useCommonTranslation();
   const { paymentApi, rawApiClient } = useApi();
   const {
-    formatWalletCurrency,
     language,
     formatDate,
     openOnNewPage,
@@ -286,9 +287,11 @@ const Usage = ({
         {isLoading ? (
           <RectangleSkeleton width="120px" height="24px" borderRadius="3px" />
         ) : (
-          <Text className={styles.totalValue}>
-            {formatWalletCurrency(totalSpend, 2)}
-          </Text>
+          <SpendAmount
+            amount={totalSpend}
+            className={styles.totalValue}
+            tooltipId="usage-total-spend"
+          />
         )}
         <Text className={styles.totalCaption}>{periodCaption[period]}</Text>
       </div>

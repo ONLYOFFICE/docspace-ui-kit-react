@@ -85,7 +85,7 @@ const SpendingBreakdown = ({
 }: SpendingBreakdownProps) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
-  const { formatWalletCurrency, language } = usePaymentStore();
+  const { language } = usePaymentStore();
   const { serviceUsage, serviceUsageMonthly } = useServicesStore();
 
   const [view, setView] = useState<BreakdownView>("services");
@@ -211,7 +211,8 @@ const SpendingBreakdown = ({
           key={item.service}
           title={item.title}
           subLabel={getSubLabel(item)}
-          amount={formatWalletCurrency(item.totalAmount, 2)}
+          amount={item.totalAmount}
+          amountTooltipId={`usage-service-amount-${item.service}`}
           percent={totalSpend > 0 ? (item.totalAmount / totalSpend) * 100 : 0}
           onExpand={getServiceHandler(item.service)}
           onDownload={
@@ -273,7 +274,9 @@ const SpendingBreakdown = ({
           <BreakdownRow
             key={key}
             title={getMonthLabel(item.year, item.month)}
-            amount={formatWalletCurrency(item.totalAmount, 2, item.currency)}
+            amount={item.totalAmount}
+            currency={item.currency}
+            amountTooltipId={`usage-month-amount-${key}`}
             onDownload={
               item.hasData && onDownloadReport
                 ? () => handleMonthDownload(item.year, item.month)
