@@ -49,50 +49,79 @@ type UpcomingPaymentsProps = {
 
 const UpcomingPayments = ({ onUpcomingDetails }: UpcomingPaymentsProps) => {
   const t = useCommonTranslation();
-  const { upcomingPayments, walletCodeCurrency, formatWalletCurrency } =
-    usePaymentStore();
+  const {
+    upcomingPaymentsCurrentMonth: upcomingPayments,
+    walletCodeCurrency,
+    formatWalletCurrency,
+  } = usePaymentStore();
 
   const upcomingTotal = upcomingPayments.reduce(
     (sum, item) => sum + item.amount,
     0,
   );
-  const upcomingTitles = upcomingPayments.map((item) => item.title);
-  const upcomingSummary =
-    upcomingTitles.length <= 2
-      ? upcomingTitles.join(" | ")
-      : `${upcomingTitles.slice(0, 2).join(" | ")} | ${t("CountMore", {
-          count: upcomingTitles.length - 2,
-        })}`;
 
   return (
     <div className={styles.card}>
-      <Text fontSize="12px" fontWeight={600} className={styles.mutedTitle}>
-        {t("UpcomingPayments")}
-      </Text>
-      <Text fontSize="18px" fontWeight={700}>
+      <div className={styles.cardHeader}>
+        <Text fontSize="14px" fontWeight={700}>
+          {t("UpcomingPayments")}
+        </Text>
+        {onUpcomingDetails ? (
+          <Link
+            onClick={onUpcomingDetails}
+            textDecoration="underline"
+            color="accent"
+            fontWeight={600}
+            dataTestId="overview_upcoming_details_link"
+          >
+            {t("Details")}
+          </Link>
+        ) : null}
+      </div>
+      <Text fontSize="18px" fontWeight={700} className={styles.cardValue}>
         {formatWalletCurrency(upcomingTotal, 2, walletCodeCurrency)}
       </Text>
       {upcomingPayments.length === 0 ? (
-        <Text fontSize="12px">{t("NoUpcomingPayments")}</Text>
-      ) : upcomingSummary ? (
-        <Text fontSize="12px" truncate>
-          {upcomingSummary}
-        </Text>
-      ) : null}
-      {onUpcomingDetails ? (
-        <Link
-          onClick={onUpcomingDetails}
-          textDecoration="underline"
-          color="accent"
-          fontWeight={600}
-          className={styles.cardLink}
-          dataTestId="overview_upcoming_details_link"
-        >
-          {t("Details")}
-        </Link>
-      ) : null}
+        <div className={styles.emptyState}>
+          <div className={styles.emptyContent}>
+            <Text fontSize="12px" fontWeight={600} className={styles.mutedTitle}>
+              {t("NoUpcomingPayments")}
+            </Text>
+            <Text fontSize="12px" className={styles.mutedTitle}>
+              {t("NoUpcomingPaymentsDesc")}
+            </Text>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.upcomingList}>
+          {upcomingPayments.map((item) => (
+            <div className={styles.upcomingRow} key={item.id}>
+              <Text
+                fontSize="14px"
+                fontWeight={600}
+                className={styles.mutedTitle}
+                truncate
+                noSelect
+              >
+                {item.renewalDateShort}
+              </Text>
+              <Text fontSize="14px" fontWeight={600} truncate>
+                {item.title}
+              </Text>
+              <Text
+                fontSize="13px"
+                fontWeight={600}
+                className={styles.upcomingAmount}
+              >
+                {formatWalletCurrency(item.amount, 2, walletCodeCurrency)}
+              </Text>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
 export default observer(UpcomingPayments);
+

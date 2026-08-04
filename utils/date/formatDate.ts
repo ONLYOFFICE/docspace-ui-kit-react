@@ -214,6 +214,7 @@ export function formatDateLocalized(
     | "DATE_MED_WITH_WEEKDAY"
     | "DATE_FULL"
     | "DATE_HUGE"
+    | "DATE_MONTH_DAY"
     | "TIME_SIMPLE"
     | "TIME_WITH_SECONDS"
     | "TIME_WITH_SHORT_OFFSET"
@@ -259,6 +260,10 @@ export function formatDateLocalized(
 
   if (options?.locale) {
     dt = dt.setLocale(options.locale);
+  }
+
+  if (preset === "DATE_MONTH_DAY") {
+    return dt.toLocaleString({ month: "long", day: "numeric" });
   }
 
   return dt.toLocaleString(DateTime[preset]);

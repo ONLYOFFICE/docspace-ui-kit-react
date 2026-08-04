@@ -139,6 +139,13 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 
   const t = useCommonTranslation();
 
+  useEffect(
+    () => () => {
+      resetTransactionFilter();
+    },
+    [resetTransactionFilter],
+  );
+
   const typeOfHistoty: TOption[] = [
     {
       key: "allTransactions",
