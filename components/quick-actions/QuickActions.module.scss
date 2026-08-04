@@ -259,6 +259,7 @@ $compact-peek: 60px;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 // A tooltipped tile is wrapped in this anchor, so the anchor becomes the flex
