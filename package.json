@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "DocSpace UI Component Library",
   "private": "true",
+  "engines": {
+    "node": ">=24",
+    "pnpm": ">=11"
+  },
   "scripts": {
     "copy-assets": "node scripts/copy-locales.js && node scripts/copy-images.js",
     "build": "pnpm run copy-assets && rollup -c",
@@ -179,5 +183,6 @@
       "cjs": "dist/cjs/index.js",
       "types": "dist/types/index.d.ts"
     }
-  }
+  },
+  "packageManager": "pnpm@11.19.0"
 }
