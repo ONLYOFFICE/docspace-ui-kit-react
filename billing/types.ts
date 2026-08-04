@@ -70,6 +70,8 @@ export type TDocsConnectCardState = {
   tariffUsers: number;
   scheduledUsers: number | null;
   scheduledDate: string;
+  nextDevPackEnabled: boolean;
+  scheduledOnDevPack: boolean;
   deactivated: boolean;
   canceled: boolean;
 };

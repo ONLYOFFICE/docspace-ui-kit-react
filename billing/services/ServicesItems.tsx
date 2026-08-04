@@ -451,6 +451,11 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             const usersAdjusting =
               hasScheduledChange &&
               scheduledUsers !== (docsConnectState?.tariffUsers ?? 0);
+            const devPackDisabling =
+              hasScheduledChange &&
+              !isCancellation &&
+              (docsConnectState?.scheduledOnDevPack ?? false) &&
+              !(docsConnectState?.nextDevPackEnabled ?? false);
             const deactivated = docsConnectState?.deactivated ?? false;
             const canceled = docsConnectState?.canceled ?? false;
 
@@ -470,27 +475,42 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               { locale: language },
             );
 
+            const getScheduledTitle = () => {
+              if (isCancellation) return t("SubscriptionCancellation");
+
+              if (devPackDisabling) return t("DevPackWillBeDisabled");
+
+              if (usersAdjusting)
+                return t("UserAdjustment", {
+                  fromCount: docsConnectState?.tariffUsers ?? 0,
+                  toCount: scheduledUsers,
+                });
+
+              return null;
+            };
+
+            const scheduledTitle = getScheduledTitle();
+
+            const scheduledDescription = isCancellation
+              ? t("SubscriptionAutoCancellation", {
+                  finalDate: scheduledDateLocalized,
+                })
+              : devPackDisabling
+                ? t("SubscriptionAutoRenewed", {
+                    finalDate: scheduledDateLocalized,
+                  })
+                : t("TariffPlanAutoRenewedWithUpdate", {
+                    date: scheduledDateLocalized,
+                  });
+
             const scheduledTooltip = hasScheduledChange ? (
               <>
-                {isCancellation || usersAdjusting ? (
+                {scheduledTitle ? (
                   <Text fontWeight={600} fontSize="12px">
-                    {isCancellation
-                      ? t("SubscriptionCancellation")
-                      : t("UserAdjustment", {
-                          fromCount: docsConnectState?.tariffUsers ?? 0,
-                          toCount: scheduledUsers,
-                        })}
+                    {scheduledTitle}
                   </Text>
                 ) : null}
-                <Text fontSize="12px">
-                  {isCancellation
-                    ? t("SubscriptionAutoCancellation", {
-                        finalDate: scheduledDateLocalized,
-                      })
-                    : t("TariffPlanAutoRenewedWithUpdate", {
-                        date: scheduledDateLocalized,
-                      })}
-                </Text>
+                <Text fontSize="12px">{scheduledDescription}</Text>
               </>
             ) : undefined;
 
