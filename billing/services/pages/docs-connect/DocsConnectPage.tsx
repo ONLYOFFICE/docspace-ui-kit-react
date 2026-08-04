@@ -56,6 +56,7 @@ import StorageWarning from "../../panels/additional-storage/StorageWarning";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import { DOCS_CONNECT_SERVICE } from "../../../constants";
+import { getDocsConnectScheduleFlags } from "../../../utils/docs-connect";
 import type { TDocsConnectPageState } from "../../../types";
 
 import WalletIcon from "../../../../assets/icons/16/wallet.react.svg";
@@ -129,15 +130,14 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
 
   const trialLow =
     !isPaid && !expired && totalDays > 0 && daysLeft / totalDays < 0.5;
-  const isCancellation =
-    scheduledChange != null && scheduledChange.nextUsers === 0;
-  const devPackDisabling =
-    scheduledChange != null &&
-    !isCancellation &&
-    scheduledChange.scheduledOnDevPack &&
-    !scheduledChange.nextDevPackEnabled;
-  const usersAdjusting =
-    scheduledChange != null && scheduledChange.nextUsers !== planUsers;
+  const { isCancellation, devPackDisabling, usersAdjusting } =
+    getDocsConnectScheduleFlags({
+      hasSubscription: true,
+      currentUsers: planUsers,
+      scheduledUsers: scheduledChange?.nextUsers ?? null,
+      scheduledOnDevPack: scheduledChange?.scheduledOnDevPack ?? false,
+      nextDevPackEnabled: scheduledChange?.nextDevPackEnabled ?? false,
+    });
 
   const nextMonthlyPrice = formatCurrency(
     (scheduledChange?.nextUsers ?? 0) *

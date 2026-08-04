@@ -49,6 +49,7 @@ import {
   TOTAL_SIZE,
 } from "../constants";
 import { calculateTotalPrice, getConvertedSize } from "../utils/common";
+import { getDocsConnectScheduleFlags } from "../utils/docs-connect";
 import { formatDateLocalized } from "../../utils/date";
 import type { TDocsConnectCardState, TServiceFeatureWithPrice } from "../types";
 
@@ -445,17 +446,19 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             const trialExpired = docsConnectState?.trialExpired ?? false;
             const trialActive = subscribed && isTrial && !trialExpired;
             const scheduledUsers = docsConnectState?.scheduledUsers ?? null;
-            const hasScheduledChange =
-              subscribed && !isTrial && scheduledUsers != null;
-            const isCancellation = hasScheduledChange && scheduledUsers === 0;
-            const usersAdjusting =
-              hasScheduledChange &&
-              scheduledUsers !== (docsConnectState?.tariffUsers ?? 0);
-            const devPackDisabling =
-              hasScheduledChange &&
-              !isCancellation &&
-              (docsConnectState?.scheduledOnDevPack ?? false) &&
-              !(docsConnectState?.nextDevPackEnabled ?? false);
+            const {
+              hasScheduledChange,
+              isCancellation,
+              usersAdjusting,
+              devPackDisabling,
+            } = getDocsConnectScheduleFlags({
+              hasSubscription: subscribed && !isTrial,
+              currentUsers: docsConnectState?.tariffUsers ?? 0,
+              scheduledUsers,
+              scheduledOnDevPack: docsConnectState?.scheduledOnDevPack ?? false,
+              nextDevPackEnabled:
+                docsConnectState?.nextDevPackEnabled ?? false,
+            });
             const deactivated = docsConnectState?.deactivated ?? false;
             const canceled = docsConnectState?.canceled ?? false;
 
@@ -475,21 +478,25 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               { locale: language },
             );
 
-            const getScheduledTitle = () => {
-              if (isCancellation) return t("SubscriptionCancellation");
+            const getScheduledTitles = () => {
+              if (isCancellation) return [t("SubscriptionCancellation")];
 
-              if (devPackDisabling) return t("DevPackWillBeDisabled");
+              const titles: string[] = [];
+
+              if (devPackDisabling) titles.push(t("DevPackWillBeDisabled"));
 
               if (usersAdjusting)
-                return t("UserAdjustment", {
-                  fromCount: docsConnectState?.tariffUsers ?? 0,
-                  toCount: scheduledUsers,
-                });
+                titles.push(
+                  t("UserAdjustment", {
+                    fromCount: docsConnectState?.tariffUsers ?? 0,
+                    toCount: scheduledUsers,
+                  }),
+                );
 
-              return null;
+              return titles;
             };
 
-            const scheduledTitle = getScheduledTitle();
+            const scheduledTitles = getScheduledTitles();
 
             const scheduledDescription = isCancellation
               ? t("SubscriptionAutoCancellation", {
@@ -505,11 +512,11 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
 
             const scheduledTooltip = hasScheduledChange ? (
               <>
-                {scheduledTitle ? (
-                  <Text fontWeight={600} fontSize="12px">
-                    {scheduledTitle}
+                {scheduledTitles.map((title) => (
+                  <Text key={title} fontWeight={600} fontSize="12px">
+                    {title}
                   </Text>
-                ) : null}
+                ))}
                 <Text fontSize="12px">{scheduledDescription}</Text>
               </>
             ) : undefined;
