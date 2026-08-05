@@ -37,6 +37,7 @@ import React from "react";
 import { observer } from "mobx-react";
 
 import { Button, ButtonSize } from "../../../../components/button";
+import { Link } from "../../../../components/link";
 
 import { useServicesActions } from "../../hooks/useServicesActions";
 import { usePaymentContext } from "../../context/PaymentContext";
@@ -82,13 +83,17 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
   } = props;
 
   const paymentStore = usePaymentStore();
-  const { hasStorageSubscription, storageExpiryDate } = paymentStore.tariff;
-  const { formatWalletCurrency } = paymentStore;
+  const { hasStorageSubscription, storageExpiryDate, walletCustomerEmail } =
+    paymentStore.tariff;
+  const { formatWalletCurrency, isPayer } = paymentStore;
 
   const { t } = useServicesActions();
   const { isWaitingCalculation } = usePaymentContext();
 
-  const title = isBalanceInsufficient
+  const isTopUpUnavailable = isBalanceInsufficient && !isPayer;
+  const canTopUpAndBuy = isBalanceInsufficient && isPayer;
+
+  const title = canTopUpAndBuy
     ? t("TopUpAndUpgrade")
     : !hasStorageSubscription
       ? t("UpgradeNow")
@@ -116,7 +121,27 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
         </Text>
       ) : null}
 
-      {isBalanceInsufficient ? (
+      {isTopUpUnavailable ? (
+        <Text as="span">
+          <Trans
+            ns="Common"
+            i18nKey="InsufficientCreditsContactPayer"
+            components={{
+              1: (
+                <Link
+                  tag="a"
+                  color="accent"
+                  href={`mailto:${walletCustomerEmail}`}
+                  dataTestId="storage_contact_payer_link"
+                />
+              ),
+            }}
+            values={{ email: walletCustomerEmail }}
+          />
+        </Text>
+      ) : null}
+
+      {canTopUpAndBuy ? (
         <Text as="span">
           <Trans
             ns="Common"
@@ -142,7 +167,7 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
           isLoading={isLoading}
           isDisabled={
             isPaymentBlocked ||
-            (isPaymentBlockedByBalance && !isBalanceInsufficient) ||
+            (isPaymentBlockedByBalance && !canTopUpAndBuy) ||
             isCurrentStoragePlan ||
             isDisabled ||
             isWaitingCalculation
