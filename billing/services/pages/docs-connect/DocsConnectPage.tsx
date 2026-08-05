@@ -51,6 +51,7 @@ import { getBrandName } from "../../../../constants/brands";
 
 import TransactionHistory from "../../../shared/transaction-history";
 import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import StorageWarning from "../../panels/additional-storage/StorageWarning";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
@@ -58,7 +59,6 @@ import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import { DOCS_CONNECT_SERVICE } from "../../../constants";
 import type { TDocsConnectPageState } from "../../../types";
 
-import WalletIcon from "../../../../assets/icons/16/wallet.react.svg";
 import SettingsIcon from "../../../../assets/icons/16/catalog-settings-common.svg";
 import PencilIcon from "../../../../assets/pencil.react.svg";
 import StatisticsIcon from "../../../../assets/icons/16/statistics.react.svg";
@@ -291,27 +291,11 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
         </div>
       ) : null}
 
-      <div className={styles.walletCard}>
-        <div className={styles.walletLeft}>
-          <span className={styles.walletIcon} aria-hidden="true">
-            <WalletIcon />
-          </span>
-          <div className={styles.walletText}>
-            <Text className={styles.walletTitle}>{t("Common:Wallet")}</Text>
-            <Text className={styles.walletCredits}>
-              {t("Common:AvailableCredits")}:{" "}
-              <span className={styles.creditsValue}>
-                {formatCurrency(credits, 2)}
-              </span>
-            </Text>
-          </div>
-        </div>
-        <Button
-          size={ButtonSize.small}
-          label={t("Common:TopUp")}
-          onClick={() => setIsTopUpDialogVisible(true)}
-        />
-      </div>
+      <WalletInfo
+        withoutBackground
+        balance={formatCurrency(credits, 2)}
+        onTopUp={() => setIsTopUpDialogVisible(true)}
+      />
 
       {isPaid && canceled ? (
         <>
