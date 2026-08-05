@@ -82,10 +82,14 @@ const Usage = ({
     isCardLinkedToPortal,
     setFilterStartDate,
     setFilterEndDate,
+    savedUsagePeriod,
+    setSavedUsagePeriod,
   } = usePaymentStore();
   const { serviceUsage, initUsageData } = useServicesStore();
 
-  const [period, setPeriod] = useState<TUsagePeriodKey>("thisMonth");
+  const [period, setPeriod] = useState<TUsagePeriodKey>(
+    () => savedUsagePeriod ?? "thisMonth",
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isReportLoading, setIsReportLoading] = useState(false);
   const [breakdownView, setBreakdownView] = useState<"services" | "month">(
@@ -108,6 +112,7 @@ const Usage = ({
   };
 
   useEffect(() => {
+    setSavedUsagePeriod(null);
     loadUsage(period);
   }, []);
 
@@ -124,6 +129,7 @@ const Usage = ({
     return () => {
       setFilterStartDate(from);
       setFilterEndDate(to);
+      setSavedUsagePeriod(period);
       openServicePage();
     };
   };
