@@ -74,6 +74,7 @@ import {
   parseServicesQuotasMap,
 } from "../utils/parsers";
 import { getUsageRange } from "../usage/utils";
+import { getServiceRoute } from "../utils/url";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
 import { LANGUAGE } from "../../constants";
@@ -166,6 +167,7 @@ class PaymentStore {
     aiSearch: "",
     backup: "",
     diskStorage: "",
+    docsConnect: "",
     wallet: "",
   };
 
@@ -683,6 +685,9 @@ class PaymentStore {
       unitOfMeasure: item.unitOfMeasure,
       amount: item.amount,
       actionType: item.wallet ? "edit-subscription" : "edit-plan",
+      actionRoute: item.wallet
+        ? (getServiceRoute(this.routes, item.name) ?? this.routes.diskStorage)
+        : this.routes.portalPayments,
     }));
   }
 
