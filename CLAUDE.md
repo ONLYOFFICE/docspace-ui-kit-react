@@ -17,7 +17,7 @@
 ## Repository Structure
 
 ```
-components/          — 80+ UI components, each in its own folder:
+components/          — 90+ UI components, each in its own folder:
                         <name>/
                           index.ts
                           <Name>.tsx
@@ -32,7 +32,7 @@ enums/               — Shared enumerations
 errors/              — Error page components (401, 403, 404, etc.)
 hooks/               — Custom React hooks
 providers/           — Root providers composition (Providers.tsx)
-selectors/           — Reusable selector components (People, Room, Files, Groups)
+selectors/           — Reusable selector components (AIAgent, People, Room, Files, Groups, MCPServers)
 styles/              — Global SCSS styles, mixins, variables
 types/               — Shared TypeScript types
 utils/               — Utility functions (cookie, date, device, email, i18n, etc.)
@@ -99,7 +99,7 @@ pnpm tsc
 
 - **Flat component model**: each component is self-contained in its folder; no deep nesting between components
 - **Theme system**: light/dark themes defined in `.storybook/lightTheme.ts` / `darkTheme.ts`; consumed via `ThemeProvider` from `providers/`
-- **Selectors**: complex data-driven selector UIs (People, Room, Files, Groups, MCPServers) live in `selectors/` — they depend on API and MobX stores
+- **Selectors**: complex data-driven selector UIs (AIAgent, People, Room, Files, Groups, MCPServers) live in `selectors/` — they depend on API and MobX stores
 - **Providers**: `Providers.tsx` composes ThemeProvider, i18next, SocketProvider, etc.
 - **API integration**: `utils/api/` and `utils/socket/` provide API client and WebSocket helpers used by selectors
 - **Localization**: `scripts/copy-locales.js` must run before build/test to populate locale files; all commands include it automatically
