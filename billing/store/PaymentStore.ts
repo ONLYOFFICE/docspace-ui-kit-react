@@ -374,8 +374,6 @@ class PaymentStore {
   }
 
   get isServiceActionDisabled() {
-    if (this.isCardLinkedToPortal) return !this.isPayer;
-
     return false;
   }
 
