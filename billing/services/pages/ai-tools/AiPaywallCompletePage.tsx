@@ -74,6 +74,7 @@ type Status = "processing" | "success" | "error";
 const BILLING_REDIRECT_URL = "/billing/addons/ai-services";
 const WALLET_REDIRECT_URL = "/billing/wallet";
 const TARIFF_REDIRECT_URL = "/billing/tariff-plan";
+const BACKUP_REDIRECT_URL = "/billing/addons/backup";
 const TOPUP_RETRY_ATTEMPTS = 10;
 const TOPUP_RETRY_DELAY_MS = 3000;
 
@@ -92,6 +93,9 @@ const resolveWalletService = (
 };
 
 const isAIService = (service: string) => service.includes("ai");
+
+const isBackupService = (service: string) =>
+  service.includes(BACKUP_SERVICE);
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
@@ -184,12 +188,16 @@ const AiPaywallCompletePage = ({
   const activateWalletService =
     service && !isDocsConnect ? resolveWalletService(service) : null;
 
+  const isBackup = isBackupService(service);
+
   const getActivateStepLabel = () =>
     isAIService(service)
       ? t("AIPaywallCallbackStepActivate")
       : isDocsConnect
         ? t("DocsConnectCallbackStepActivate")
-        : "";
+        : isBackup
+          ? t("BackupPaywallCallbackStepActivate")
+          : "";
 
   const isWalletOnly = type === "wallet" && !isDocsConnect;
 
@@ -295,6 +303,10 @@ const AiPaywallCompletePage = ({
       window.location.href = TARIFF_REDIRECT_URL;
       return;
     }
+    if (isBackup) {
+      window.location.href = BACKUP_REDIRECT_URL;
+      return;
+    }
     window.location.href = isWalletOnly
       ? WALLET_REDIRECT_URL
       : serviceRedirectUrl;
@@ -341,16 +353,20 @@ const AiPaywallCompletePage = ({
               <Text fontSize="16px" fontWeight={600} className={styles.title}>
                 {isDocsConnect
                   ? t("DocsConnectCallbackProcessingTitle")
-                  : isWalletOnly
-                    ? t("WalletTopUpCallbackProcessingTitle")
-                    : t("AIPaywallCallbackProcessing")}
+                  : isBackup
+                    ? t("BackupPaywallCallbackProcessingTitle")
+                    : isWalletOnly
+                      ? t("WalletTopUpCallbackProcessingTitle")
+                      : t("AIPaywallCallbackProcessing")}
               </Text>
               <Text lineHeight="20px">
                 {isDocsConnect
                   ? t("DocsConnectCallbackProcessingHint")
-                  : isWalletOnly
-                    ? t("WalletTopUpCallbackProcessingHint")
-                    : t("AIPaywallCallbackProcessingHint")}
+                  : isBackup
+                    ? t("BackupPaywallCallbackProcessingHint")
+                    : isWalletOnly
+                      ? t("WalletTopUpCallbackProcessingHint")
+                      : t("AIPaywallCallbackProcessingHint")}
               </Text>
             </div>
 
@@ -437,9 +453,11 @@ const AiPaywallCompletePage = ({
                   ? t("PlanActivated", { planName: plan })
                   : isDocsConnect
                     ? t("DocsConnectCallbackSuccess")
-                    : isWalletOnly
-                      ? t("WalletTopUpSuccessTitle")
-                      : t("AIPaywallCallbackSuccess")}
+                    : isBackup
+                      ? t("BackupPaywallCallbackSuccess")
+                      : isWalletOnly
+                        ? t("WalletTopUpSuccessTitle")
+                        : t("AIPaywallCallbackSuccess")}
               </Text>
               {admins ? (
                 <>
@@ -508,7 +526,9 @@ const AiPaywallCompletePage = ({
                       ? t("GoToTariffPlan")
                       : isDocsConnect
                         ? t("DocsConnectCallbackGoTo")
-                        : t("WalletTopUpGoToWallet")
+                        : isBackup
+                          ? t("BackupTopUpGoToBackup")
+                          : t("WalletTopUpGoToWallet")
                   }
                   onClick={onGoToBillingClick}
                   testId="ai_paywall_go_to_wallet_button"
