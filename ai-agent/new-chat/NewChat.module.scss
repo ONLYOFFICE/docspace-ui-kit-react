@@ -33,6 +33,7 @@
     --chat-scroll-to-bottom-width: 40px;
     --chat-scroll-to-bottom-height: 40px;
     --chat-scroll-to-bottom-border-radius: 50%;
+    --chat-assistant-message-actions-gap: 20px;
   }
 
   display: flex;
@@ -274,6 +275,8 @@
   flex-direction: column;
   box-sizing: border-box;
 
+  --chat-list-item-height: 36px;
+
   :global([class*="--chat-list-title-font-weight"]) {
     margin-block-start: 12px;
   }
@@ -302,12 +305,6 @@
     height: 32px;
     border-radius: 3px;
     padding: 6px 8px;
-    box-sizing: border-box;
-  }
-
-  :global([class*="min-h-[28px]"]) {
-    height: 36px;
-    padding-block: 4px;
     box-sizing: border-box;
   }
 }

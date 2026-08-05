@@ -39,11 +39,12 @@
   --field-container-header-color: var(--text-color);
   --icon-button-color: currentColor;
 
+  // The widget's content column width is token-driven
+  // (max-w-[var(--model-assignment-max-width,560px)]).
+  --model-assignment-max-width: 700px;
+
   background-color: transparent;
 
-  :global([class*="max-w-[560px]"]) {
-    max-width: 700px;
-  }
   :global([class*="--settings-header-color"]) {
     font-weight: 700;
     font-size: 16px;
@@ -80,7 +81,10 @@
     color: var(--settings-common-description-color);
   }
 
-  :global(.mb-\[12px\]) {
+  // Task override rows. The widget builds them from Tailwind arbitrary-value
+  // utilities (no stable class), so target the margin token baked into the
+  // row's class string (mb-[var(--model-assignment-task-margin-bottom,12px)]).
+  :global([class*="--model-assignment-task-margin-bottom"]) {
     margin-bottom: 0;
     padding-block: 12px;
 
