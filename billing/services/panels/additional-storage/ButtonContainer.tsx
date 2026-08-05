@@ -83,9 +83,16 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
   } = props;
 
   const paymentStore = usePaymentStore();
-  const { hasStorageSubscription, storageExpiryDate, walletCustomerEmail } =
-    paymentStore.tariff;
+  const {
+    hasStorageSubscription,
+    storageExpiryDate,
+    walletCustomerEmail,
+    walletCustomerInfo,
+  } = paymentStore.tariff;
   const { formatWalletCurrency, isPayer } = paymentStore;
+
+  const payerDisplayName = walletCustomerInfo?.displayName;
+  const payerLabel = payerDisplayName || walletCustomerEmail;
 
   const { t } = useServicesActions();
   const { isWaitingCalculation } = usePaymentContext();
@@ -127,16 +134,23 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
             ns="Common"
             i18nKey="InsufficientCreditsContactPayer"
             components={{
-              1: (
-                <Link
-                  tag="a"
-                  color="accent"
-                  href={`mailto:${walletCustomerEmail}`}
-                  dataTestId="storage_contact_payer_link"
-                />
-              ),
+              1:
+                walletCustomerEmail && !payerDisplayName ? (
+                  <Link
+                    tag="a"
+                    color="accent"
+                    href={`mailto:${walletCustomerEmail}`}
+                    dataTestId="storage_contact_payer_link"
+                  />
+                ) : (
+                  <Text
+                    as="span"
+                    fontWeight={600}
+                    dataTestId="storage_contact_payer_name"
+                  />
+                ),
             }}
-            values={{ email: walletCustomerEmail }}
+            values={{ payerContact: payerLabel }}
           />
         </Text>
       ) : null}
