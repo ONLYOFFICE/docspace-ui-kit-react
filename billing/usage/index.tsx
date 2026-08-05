@@ -64,12 +64,14 @@ type UsageProps = {
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
   onAIServicesClick?: () => void;
+  onDocsConnectClick?: () => void;
 };
 
 const Usage = ({
   onDiskStorageClick,
   onBackupClick,
   onAIServicesClick,
+  onDocsConnectClick,
 }: UsageProps) => {
   const t = useCommonTranslation();
   const { paymentApi, rawApiClient } = useApi();
@@ -302,6 +304,7 @@ const Usage = ({
         onDiskStorageClick={openWithPeriod(onDiskStorageClick)}
         onBackupClick={openWithPeriod(onBackupClick)}
         onAIServicesClick={openWithPeriod(onAIServicesClick)}
+        onDocsConnectClick={openWithPeriod(onDocsConnectClick)}
         onDownloadReport={onDownloadReport}
         onViewChange={setBreakdownView}
       />
