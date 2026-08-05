@@ -231,13 +231,15 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
           }
           title={t("DocsConnect:DocsConnect")}
           priceText={
-            devPackEnabled
-              ? t("DocsConnect:PricePerUserMonthDevPackNote", {
-                  price: formatCurrency(pricePerUser, 0),
-                })
-              : t("DocsConnect:FromPricePerUserMonthNote", {
-                  price: formatCurrency(basePricePerUser, 0),
-                })
+            isPaid
+              ? devPackEnabled
+                ? t("DocsConnect:PricePerUserMonthDevPackNote", {
+                    price: formatCurrency(pricePerUser, 0),
+                  })
+                : t("DocsConnect:FromPricePerUserMonthNote", {
+                    price: formatCurrency(basePricePerUser, 0),
+                  })
+              : undefined
           }
           description={t("DocsConnect:ServiceToggleDescription", {
             productName: docsName,
