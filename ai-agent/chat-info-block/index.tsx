@@ -33,7 +33,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { Trans } from "react-i18next";
 import { match } from "ts-pattern";
 
 import InfoIcon from "../../assets/info.outline.react.svg";
@@ -50,10 +49,7 @@ import { getBrandName } from "../../constants/brands";
 export type ChatInfoBlockProps = {
   standalone: boolean;
   isPortalAdmin: boolean;
-  isPayer?: boolean;
   isCardLinkedToPortal?: boolean;
-  walletCustomerEmail?: string | null;
-  walletCustomerDisplayName?: string | null;
   onActivateAI?: () => void;
   onTopUpAndActivateAI?: () => void;
   onShowAIBenefits?: () => void;
@@ -63,16 +59,11 @@ export type ChatInfoBlockProps = {
 export const ChatInfoBlock = ({
   standalone,
   isPortalAdmin,
-  isPayer,
-  walletCustomerEmail,
-  walletCustomerDisplayName,
   onActivateAI,
   // onShowAIBenefits,
   isActivating,
 }: ChatInfoBlockProps) => {
   const t = useCommonTranslation();
-
-  const payerLabel = walletCustomerDisplayName || walletCustomerEmail;
 
   const headerText =
     standalone && isPortalAdmin
@@ -92,68 +83,39 @@ export const ChatInfoBlock = ({
       }),
     )
     // saas admin
-    .with([false, true], () =>
-      isPayer ? (
-        <>
-          {activateIntro}
-          {isActivating ? (
-            <Text
-              as="span"
-              style={{ display: "inline-flex", verticalAlign: "middle" }}
+    .with([false, true], () => (
+      <>
+        {activateIntro}
+        {isActivating ? (
+          <Text
+            as="span"
+            style={{ display: "inline-flex", verticalAlign: "middle" }}
+          >
+            <Loader type={LoaderTypes.track} size="16px" />
+          </Text>
+        ) : (
+          <>
+            <Link
+              type={LinkType.action}
+              color="accent"
+              textDecoration={"underline"}
+              onClick={onActivateAI}
             >
-              <Loader type={LoaderTypes.track} size="16px" />
-            </Text>
-          ) : (
-            <>
-              <Link
-                type={LinkType.action}
-                color="accent"
-                textDecoration={"underline"}
-                onClick={onActivateAI}
-              >
-                {t("Activate")}
-              </Link>
-              {/* {" | "}
-              <Link
-                type={LinkType.action}
-                color="accent"
-                onClick={onShowAIBenefits}
-                textDecoration={"underline"}
-              >
-                {t("Benefits")}
-              </Link> */}
-            </>
-          )}
-        </>
-      ) : (
-        <>
-          {activateIntro}
-          {payerLabel ? (
-            <Trans
-              i18nKey="Common:EmptyAIAgentsNotActiveYetContactPayer"
-              values={{ payerContact: payerLabel }}
-              components={{
-                1:
-                  walletCustomerEmail && !walletCustomerDisplayName ? (
-                    <Link
-                      key="chat-info-payer-link"
-                      type={LinkType.action}
-                      href={`mailto:${walletCustomerEmail}`}
-                      color="accent"
-                    />
-                  ) : (
-                    <Text
-                      key="chat-info-payer-name"
-                      as="span"
-                      fontWeight={600}
-                    />
-                  ),
-              }}
-            />
-          ) : null}
-        </>
-      ),
-    )
+              {t("Activate")}
+            </Link>
+            {/* {" | "}
+            <Link
+              type={LinkType.action}
+              color="accent"
+              onClick={onShowAIBenefits}
+              textDecoration={"underline"}
+            >
+              {t("Benefits")}
+            </Link> */}
+          </>
+        )}
+      </>
+    ))
     // standalone/saas user
     .otherwise(() =>
       t("AIDisabledInfoBlockContactAdminDescription", {
