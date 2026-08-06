@@ -89,7 +89,7 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
     walletCustomerEmail,
     walletCustomerInfo,
   } = paymentStore.tariff;
-  const { formatWalletCurrency, isPayer } = paymentStore;
+  const { formatWalletCurrency, isPayer, isCardLinkedToPortal } = paymentStore;
 
   const payerDisplayName = walletCustomerInfo?.displayName;
   const payerLabel = payerDisplayName || walletCustomerEmail;
@@ -97,8 +97,9 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
   const { t } = useServicesActions();
   const { isWaitingCalculation } = usePaymentContext();
 
-  const isTopUpUnavailable = isBalanceInsufficient && !isPayer;
-  const canTopUpAndBuy = isBalanceInsufficient && isPayer;
+  const isTopUpUnavailable =
+    isBalanceInsufficient && isCardLinkedToPortal && !isPayer;
+  const canTopUpAndBuy = isBalanceInsufficient && !isTopUpUnavailable;
 
   const title = canTopUpAndBuy
     ? t("TopUpAndUpgrade")
