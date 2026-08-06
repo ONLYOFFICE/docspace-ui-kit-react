@@ -33,55 +33,39 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { DateTime } from "luxon";
-
-import type { TUsagePeriodKey } from "../types";
-import { getAppTimezone, now } from "../../utils/date";
-
-export const USAGE_PERIODS: TUsagePeriodKey[] = [
-  "thisMonth",
-  "lastMonth",
-  "last3Months",
-  "last6Months",
-  "last12Months",
-  "thisYear",
-  "lastYear",
-];
-
-export const getUsageRange = (
-  period: TUsagePeriodKey,
-): { from: DateTime; to: DateTime } => {
-
-  const current = now().setZone(getAppTimezone());
-
-  switch (period) {
-    case "lastMonth": {
-      const lastMonth = current.minus({ months: 1 });
-      return { from: lastMonth.startOf("month"), to: lastMonth.endOf("month") };
-    }
-    case "last3Months":
-      return {
-        from: current.minus({ months: 2 }).startOf("month"),
-        to: current.endOf("month"),
-      };
-    case "last6Months":
-      return {
-        from: current.minus({ months: 5 }).startOf("month"),
-        to: current.endOf("month"),
-      };
-    case "last12Months":
-      return {
-        from: current.minus({ months: 11 }).startOf("month"),
-        to: current.endOf("month"),
-      };
-    case "thisYear":
-      return { from: current.startOf("year"), to: current.endOf("year") };
-    case "lastYear": {
-      const lastYear = current.minus({ years: 1 });
-      return { from: lastYear.startOf("year"), to: lastYear.endOf("year") };
-    }
-    default:
-      return { from: current.startOf("month"), to: current.endOf("month") };
-  }
+export type TDocsConnectScheduleInput = {
+  hasSubscription: boolean;
+  currentUsers: number;
+  scheduledUsers: number | null;
+  scheduledOnDevPack: boolean;
+  nextDevPackEnabled: boolean;
 };
 
+export type TDocsConnectScheduleFlags = {
+  hasScheduledChange: boolean;
+  isCancellation: boolean;
+  usersAdjusting: boolean;
+  devPackDisabling: boolean;
+};
+
+export const getDocsConnectScheduleFlags = ({
+  hasSubscription,
+  currentUsers,
+  scheduledUsers,
+  scheduledOnDevPack,
+  nextDevPackEnabled,
+}: TDocsConnectScheduleInput): TDocsConnectScheduleFlags => {
+  const hasScheduledChange = hasSubscription && scheduledUsers != null;
+  const isCancellation = hasScheduledChange && scheduledUsers === 0;
+
+  return {
+    hasScheduledChange,
+    isCancellation,
+    usersAdjusting: hasScheduledChange && scheduledUsers !== currentUsers,
+    devPackDisabling:
+      hasScheduledChange &&
+      !isCancellation &&
+      scheduledOnDevPack &&
+      !nextDevPackEnabled,
+  };
+};

@@ -34,14 +34,12 @@
  */
 
 import React from "react";
-import { Trans } from "react-i18next";
 
 import ChatNoAccessRightsDarkIcon from "../../../../assets/emptyview/empty.chat.access.rights.dark.svg";
 import ChatNoAccessRightsLightIcon from "../../../../assets/emptyview/empty.chat.access.rights.light.svg";
 
 import { EmptyView } from "../../../../components/empty-view";
 import { Text } from "../../../../components/text";
-import { Link, LinkType } from "../../../../components/link";
 import { useTheme } from "../../../../context/ThemeContext";
 import { match, P } from "ts-pattern";
 import { useCommonTranslation } from "../../../../utils/i18n";
@@ -51,10 +49,7 @@ export type ChatNoAccessScreenProps = {
   aiReady: boolean;
   standalone: boolean;
   isPortalAdmin: boolean;
-  isPayer?: boolean;
   isCardLinkedToPortal?: boolean;
-  walletCustomerEmail?: string | null;
-  walletCustomerDisplayName?: string | null;
   goToAISettings?: () => void;
   onActivateAI?: () => void;
   onTopUpAndActivateAI?: () => void;
@@ -66,10 +61,7 @@ export const ChatNoAccessScreen = ({
   aiReady,
   isPortalAdmin,
   standalone,
-  isPayer,
   isCardLinkedToPortal,
-  walletCustomerEmail,
-  walletCustomerDisplayName,
   goToAISettings,
   onActivateAI,
   onTopUpAndActivateAI,
@@ -106,43 +98,14 @@ export const ChatNoAccessScreen = ({
       }),
     )
     // saas admin
-    .with([false, true], () => {
-      const payerLabel = walletCustomerDisplayName || walletCustomerEmail;
-
-      return (
-        <>
-          <Text as="span">{t("EmptyAIAgentsNotActiveYetDescription")}</Text>
-          <Text as="span" style={{ display: "block", marginTop: "8px" }}>
-            {t("EmptyAIAgentsNotActiveYetDescriptionLine2")}
-          </Text>
-          {!isPayer && payerLabel ? (
-            <Text as="span" style={{ display: "block", marginTop: "8px" }}>
-              <Trans
-                i18nKey="Common:EmptyAIAgentsNotActiveYetContactPayer"
-                values={{ payerContact: payerLabel }}
-                components={{
-                  1:
-                    walletCustomerEmail && !walletCustomerDisplayName ? (
-                      <Link
-                        key="chat-no-access-payer-link"
-                        type={LinkType.action}
-                        href={`mailto:${walletCustomerEmail}`}
-                        color="accent"
-                      />
-                    ) : (
-                      <Text
-                        key="chat-no-access-payer-name"
-                        as="span"
-                        fontWeight={600}
-                      />
-                    ),
-                }}
-              />
-            </Text>
-          ) : null}
-        </>
-      );
-    })
+    .with([false, true], () => (
+      <>
+        <Text as="span">{t("EmptyAIAgentsNotActiveYetDescription")}</Text>
+        <Text as="span" style={{ display: "block", marginTop: "8px" }}>
+          {t("EmptyAIAgentsNotActiveYetDescriptionLine2")}
+        </Text>
+      </>
+    ))
     // standalone user
     .with([true, false], () =>
       t("EmptyAIAgentsAIDisabledDescription", {
@@ -190,7 +153,6 @@ export const ChatNoAccessScreen = ({
   // } as const;
 
   const getSaasAdminOptions = () => {
-    if (isCardLinkedToPortal && !isPayer) return [];
     if (!activateOrTopUpAI.onClick) return [];
     return [activateOrTopUpAI]; // aiBenefits
   };

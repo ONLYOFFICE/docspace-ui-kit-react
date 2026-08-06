@@ -41,7 +41,6 @@ import { Text } from "../../../../../components/text";
 import PencilIcon from "../../../../../assets/pencil.react.svg";
 import type { TUpcomingPayment } from "../../../../types";
 
-import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 import styles from "./UpcomingPaymentsRow.module.scss";
 
 type UpcomingPaymentRowProps = {
@@ -51,6 +50,7 @@ type UpcomingPaymentRowProps = {
   details: string;
   amount: string;
   actionType?: TUpcomingPayment["actionType"];
+  actionRoute?: TUpcomingPayment["actionRoute"];
 };
 
 const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
@@ -60,14 +60,10 @@ const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
   details,
   amount,
   actionType,
+  actionRoute,
 }) => {
-  const store = usePaymentStore();
-
   const onAction = () => {
-    if (actionType === "edit-plan")
-      window.DocSpace?.navigate(store.routes.portalPayments);
-    else if (actionType === "edit-subscription")
-      window.DocSpace?.navigate(store.routes.diskStorage);
+    if (actionRoute) window.DocSpace?.navigate(actionRoute);
   };
 
   const getRowChildren = () => [

@@ -41,12 +41,16 @@ import { LoaderTypes } from "../../../components/loader/Loader.enums";
 import ChevronIcon from "../../../assets/icons/12/right-arrow.react.svg";
 import DownloadIcon from "../../../assets/icons/16/download.react.svg";
 
+import SpendAmount from "../../shared/spend-amount";
+
 import styles from "../styles/Usage.module.scss";
 
 type BreakdownRowProps = {
   title: string;
   subLabel?: string;
-  amount: string;
+  amount: number;
+  currency?: string;
+  amountTooltipId: string;
   percent?: number;
   onExpand?: () => void;
   onDownload?: () => void;
@@ -57,6 +61,8 @@ const BreakdownRow = ({
   title,
   subLabel,
   amount,
+  currency,
+  amountTooltipId,
   percent,
   onExpand,
   onDownload,
@@ -117,9 +123,14 @@ const BreakdownRow = ({
         ) : null}
       </div>
 
-      <Text fontSize="14px" fontWeight={700} className={styles.amount}>
-        {amount}
-      </Text>
+      <SpendAmount
+        amount={amount}
+        currency={currency}
+        className={styles.amount}
+        fontSize="14px"
+        fontWeight={700}
+        tooltipId={amountTooltipId}
+      />
 
       {isDownloading ? (
         <div className={styles.download}>

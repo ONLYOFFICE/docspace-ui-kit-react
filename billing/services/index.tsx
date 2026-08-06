@@ -55,6 +55,7 @@ import {
   TOTAL_SIZE,
 } from "../constants";
 import type { TDocsConnectCardState } from "../types";
+import { getServiceRoute } from "../utils/url";
 
 // AI search isn't part of the SDK's TenantWalletService enum yet; the backend
 // identifies it by -18.
@@ -280,15 +281,7 @@ const Services = observer(
         return;
       }
 
-      const { routes } = paymentStore;
-      const routeByService: Record<string, string> = {
-        [AI_ENUM]: routes.aiServices,
-        [AI_SEARCH_ENUM]: routes.aiSearch,
-        [TOTAL_SIZE]: routes.diskStorage,
-        [BACKUP_SERVICE]: routes.backup,
-      };
-
-      const route = routeByService[id];
+      const route = getServiceRoute(paymentStore.routes, id);
       if (route) navigate(route);
     };
 
