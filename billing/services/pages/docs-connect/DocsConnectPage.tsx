@@ -57,6 +57,7 @@ import StorageWarning from "../../panels/additional-storage/StorageWarning";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import { DOCS_CONNECT_SERVICE } from "../../../constants";
+import { getDocsConnectScheduleFlags } from "../../../utils/docs-connect";
 import type { TDocsConnectPageState } from "../../../types";
 
 import SettingsIcon from "../../../../assets/icons/16/catalog-settings-common.svg";
@@ -129,15 +130,14 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
 
   const trialLow =
     !isPaid && !expired && totalDays > 0 && daysLeft / totalDays < 0.5;
-  const isCancellation =
-    scheduledChange != null && scheduledChange.nextUsers === 0;
-  const devPackDisabling =
-    scheduledChange != null &&
-    !isCancellation &&
-    scheduledChange.scheduledOnDevPack &&
-    !scheduledChange.nextDevPackEnabled;
-  const usersAdjusting =
-    scheduledChange != null && scheduledChange.nextUsers !== planUsers;
+  const { isCancellation, devPackDisabling, usersAdjusting } =
+    getDocsConnectScheduleFlags({
+      hasSubscription: true,
+      currentUsers: planUsers,
+      scheduledUsers: scheduledChange?.nextUsers ?? null,
+      scheduledOnDevPack: scheduledChange?.scheduledOnDevPack ?? false,
+      nextDevPackEnabled: scheduledChange?.nextDevPackEnabled ?? false,
+    });
 
   const nextMonthlyPrice = formatCurrency(
     (scheduledChange?.nextUsers ?? 0) *
@@ -231,13 +231,15 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
           }
           title={t("DocsConnect:DocsConnect")}
           priceText={
-            devPackEnabled
-              ? t("DocsConnect:PricePerUserMonthDevPackNote", {
-                  price: formatCurrency(pricePerUser, 0),
-                })
-              : t("DocsConnect:FromPricePerUserMonthNote", {
-                  price: formatCurrency(basePricePerUser, 0),
-                })
+            isPaid
+              ? devPackEnabled
+                ? t("DocsConnect:PricePerUserMonthDevPackNote", {
+                    price: formatCurrency(pricePerUser, 0),
+                  })
+                : t("DocsConnect:FromPricePerUserMonthNote", {
+                    price: formatCurrency(basePricePerUser, 0),
+                  })
+              : undefined
           }
           description={t("DocsConnect:ServiceToggleDescription", {
             productName: docsName,

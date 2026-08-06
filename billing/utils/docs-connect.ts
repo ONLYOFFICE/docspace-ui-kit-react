@@ -33,48 +33,39 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { observer } from "mobx-react";
-
-import { RowContainer } from "../../../../../components/rows";
-import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import { useCommonTranslation } from "../../../../../utils/i18n";
-import { getServiceQuantity } from "../../../utils";
-
-import UpcomingPaymentRow from "./RowBody";
-
-const RowView = ({ sectionWidth }: { sectionWidth: number }) => {
-  const store = usePaymentStore();
-  const t = useCommonTranslation();
-  const { upcomingPayments, formatWalletCurrency } = store;
-
-  return (
-    <RowContainer
-      useReactWindow={false}
-      fetchMoreFiles={() => Promise.resolve()}
-      hasMoreFiles={false}
-      itemCount={upcomingPayments.length}
-      filesLength={upcomingPayments.length}
-      itemHeight={58}
-    >
-      {upcomingPayments.map((payment) => (
-        <UpcomingPaymentRow
-          key={payment.id}
-          sectionWidth={sectionWidth}
-          title={payment.title}
-          renewalDate={payment.renewalDate}
-          details={getServiceQuantity(
-            t,
-            payment.quantity,
-            payment.unitOfMeasure,
-          )}
-          amount={formatWalletCurrency(payment.amount, 2)}
-          actionType={payment.actionType}
-          actionRoute={payment.actionRoute}
-        />
-      ))}
-    </RowContainer>
-  );
+export type TDocsConnectScheduleInput = {
+  hasSubscription: boolean;
+  currentUsers: number;
+  scheduledUsers: number | null;
+  scheduledOnDevPack: boolean;
+  nextDevPackEnabled: boolean;
 };
 
-export default observer(RowView);
+export type TDocsConnectScheduleFlags = {
+  hasScheduledChange: boolean;
+  isCancellation: boolean;
+  usersAdjusting: boolean;
+  devPackDisabling: boolean;
+};
 
+export const getDocsConnectScheduleFlags = ({
+  hasSubscription,
+  currentUsers,
+  scheduledUsers,
+  scheduledOnDevPack,
+  nextDevPackEnabled,
+}: TDocsConnectScheduleInput): TDocsConnectScheduleFlags => {
+  const hasScheduledChange = hasSubscription && scheduledUsers != null;
+  const isCancellation = hasScheduledChange && scheduledUsers === 0;
+
+  return {
+    hasScheduledChange,
+    isCancellation,
+    usersAdjusting: hasScheduledChange && scheduledUsers !== currentUsers,
+    devPackDisabling:
+      hasScheduledChange &&
+      !isCancellation &&
+      scheduledOnDevPack &&
+      !nextDevPackEnabled,
+  };
+};
