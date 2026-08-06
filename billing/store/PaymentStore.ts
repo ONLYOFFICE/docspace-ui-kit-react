@@ -57,7 +57,12 @@ export type WalletOperationDto = Omit<OperationDto, "date"> & {
 
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
-import type { TActiveService, TBalance, TServiceUsage } from "../types";
+import type {
+  TActiveService,
+  TBalance,
+  TServiceUsage,
+  TUsagePeriodKey,
+} from "../types";
 import { formatCurrencyValue } from "../utils/common";
 import {
   getCardLinkedOnFreeTariff,
@@ -275,6 +280,8 @@ class PaymentStore {
 
   filterContact: TTransactionFilterContact | null = null;
 
+  savedUsagePeriod: TUsagePeriodKey | null = null;
+
   isTransactionLoading = false;
 
   lastTransactionServiceName: string | undefined = undefined;
@@ -376,8 +383,6 @@ class PaymentStore {
   }
 
   get isServiceActionDisabled() {
-    if (this.isCardLinkedToPortal) return !this.isPayer;
-
     return false;
   }
 
@@ -826,6 +831,10 @@ class PaymentStore {
 
   setFilterContact = (contact: TTransactionFilterContact | null) => {
     this.filterContact = contact;
+  };
+
+  setSavedUsagePeriod = (period: TUsagePeriodKey | null) => {
+    this.savedUsagePeriod = period;
   };
 
   resetTransactionFilter = () => {
