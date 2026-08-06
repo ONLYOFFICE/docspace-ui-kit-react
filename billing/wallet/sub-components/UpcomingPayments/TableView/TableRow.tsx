@@ -41,7 +41,6 @@ import { Link } from "../../../../../components/link";
 import { useCommonTranslation } from "../../../../../utils/i18n";
 
 import type { TUpcomingPayment } from "../../../../types";
-import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 
 import styles from "./UpcomingPaymentsTable.module.scss";
 
@@ -51,6 +50,7 @@ type UpcomingPaymentRowProps = {
   details: string;
   amount: string;
   actionType?: TUpcomingPayment["actionType"];
+  actionRoute?: TUpcomingPayment["actionRoute"];
 };
 
 const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
@@ -59,8 +59,8 @@ const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
   details,
   amount,
   actionType,
+  actionRoute,
 }) => {
-  const store = usePaymentStore();
   const t = useCommonTranslation();
 
   const actionLabel =
@@ -71,10 +71,7 @@ const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
         : "";
 
   const onAction = () => {
-    if (actionType === "edit-plan")
-      window.DocSpace?.navigate(store.routes.portalPayments);
-    else if (actionType === "edit-subscription")
-      window.DocSpace?.navigate(store.routes.diskStorage);
+    if (actionRoute) window.DocSpace?.navigate(actionRoute);
   };
 
   return (
