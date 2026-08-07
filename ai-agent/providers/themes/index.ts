@@ -400,7 +400,6 @@ const buildTokens = (
   "--chat-user-message-color": "var(--text-normal)",
 
   // Chat message
-  "--chat-message-actions-gap": "20px",
   "--chat-message-analyze-color": "var(--text-normal)",
   "--chat-message-blockquote-color": "var(--border-control-focus)",
   "--chat-message-code-block-background-color":
