@@ -198,21 +198,21 @@
     }
 
     // The single chip row becomes a 2-column grid of equal-width cards.
-    > div {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
+    // > div {
+    //   display: grid;
+    //   grid-template-columns: 1fr 1fr;
+    //   gap: 8px;
+    // }
 
     // Pill → rounded-rectangle card: left-aligned, wrapping text, taller box.
     // A grid item's `inline-flex` computes to `flex`, so it fills its column.
     button {
-      height: auto;
-      min-height: 40px;
-      justify-content: flex-start;
-      border-radius: 8px;
-      padding: 8px 12px;
-      text-align: start;
+      // height: auto;
+      // min-height: 40px;
+      // justify-content: flex-start;
+      // border-radius: 8px;
+      // padding: 8px 12px;
+      // text-align: start;
       cursor: pointer;
       border: 1px solid var(--new-chat-suggestion-border-color);
       transition:
@@ -227,9 +227,10 @@
       }
 
       span {
-        font-size: 13px;
-        line-height: 16px;
+        font-size: 12px;
+        line-height: 18px;
         white-space: normal;
+        font-weight: 600;
       }
     }
   }
@@ -241,21 +242,21 @@
   // spacer][composer]. The viewport, welcome and suggestions auto-flow into
   // rows 1–3; the composer (and its optional header banner) are pinned to the
   // bottom so row 4 stays an empty spacer equal to the top one.
-  :global(.aui-root) > :global(div):has(> :global(.chat-viewport--empty)) {
-    display: grid;
-    grid-template-columns: 100%;
-    grid-template-rows: 1fr auto auto 1fr auto;
+  // :global(.aui-root) > :global(div):has(> :global(.chat-viewport--empty)) {
+  //   display: grid;
+  //   grid-template-columns: 100%;
+  //   grid-template-rows: 1fr auto auto 1fr auto;
 
-    // Optional host banner: hug the bottom of the spacer, right above composer.
-    > :global(.composer-header) {
-      grid-row: 4;
-      align-self: end;
-    }
+  //   // Optional host banner: hug the bottom of the spacer, right above composer.
+  //   > :global(.composer-header) {
+  //     grid-row: 4;
+  //     align-self: end;
+  //   }
 
-    > :global(div):has(> :global(.composer-root)) {
-      grid-row: 5;
-    }
-  }
+  //   > :global(div):has(> :global(.composer-root)) {
+  //     grid-row: 5;
+  //   }
+  // }
 }
 
 .chatListInset {

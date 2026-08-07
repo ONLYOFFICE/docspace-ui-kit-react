@@ -82,6 +82,7 @@ import "@onlyoffice/ai-chat/styles";
 export type { Suggestion } from "@onlyoffice/ai-chat";
 
 import { AiChatAvailabilityContext } from "./availability";
+import { ChatIntro } from "../chat-intro";
 import { storageAdapter } from "./storage";
 import { usePlatformAdapter } from "./platform";
 import { componentOverrides } from "./components-overrides";
@@ -371,6 +372,11 @@ const EDITOR_TOOL_NAME_BY_CHAT_TOOL: Record<string, string> = {
   docspace_generate_presentation: "generatePresentationWithTheme",
 };
 
+// Illustration + tagline above the suggestion chips of an empty chat. Static
+// (it reads its own string through window.i18n), so one element is created
+// once and reused instead of being rebuilt per render.
+const chatIntro = <ChatIntro />;
+
 const AiAgentProviders = ({
   locale,
   theme,
@@ -640,12 +646,14 @@ const AiAgentProviders = ({
       // Context-specific chips: the host builds the lists for the current
       // section, and the set is narrowed above by what is attached.
       suggestions: resolvedSuggestions,
+      // Rendered by the library above the chips, under the same "empty chat"
+      // gate — no chips, no intro.
+      suggestionsHeader: chatIntro,
 
       // Route drag-and-drop through the portal-upload + attach flow (same as
       // the "Upload from device" button) instead of the library's in-memory
       // default, so dropped DOCX/PDF/XLSX are supported too.
       onDropFiles,
-      showWelcome: (resolvedSuggestions?.length ?? 0) > 0,
     }),
     [
       composerActions,
@@ -744,4 +752,3 @@ export {
   useAiChatStore,
 } from "./ai-chat-store";
 export type { AiChatRouterPage } from "./ai-chat-store";
-
