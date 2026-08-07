@@ -57,7 +57,12 @@ export type WalletOperationDto = Omit<OperationDto, "date"> & {
 
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
-import type { TActiveService, TBalance, TServiceUsage } from "../types";
+import type {
+  TActiveService,
+  TBalance,
+  TServiceUsage,
+  TUsagePeriodKey,
+} from "../types";
 import { formatCurrencyValue } from "../utils/common";
 import {
   getCardLinkedOnFreeTariff,
@@ -74,6 +79,7 @@ import {
   parseServicesQuotasMap,
 } from "../utils/parsers";
 import { getUsageRange } from "../usage/utils";
+import { getServiceRoute } from "../utils/url";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
 import { LANGUAGE } from "../../constants";
@@ -166,6 +172,7 @@ class PaymentStore {
     aiSearch: "",
     backup: "",
     diskStorage: "",
+    docsConnect: "",
     wallet: "",
   };
 
@@ -273,6 +280,8 @@ class PaymentStore {
 
   filterContact: TTransactionFilterContact | null = null;
 
+  savedUsagePeriod: TUsagePeriodKey | null = null;
+
   isTransactionLoading = false;
 
   lastTransactionServiceName: string | undefined = undefined;
@@ -374,8 +383,6 @@ class PaymentStore {
   }
 
   get isServiceActionDisabled() {
-    if (this.isCardLinkedToPortal) return !this.isPayer;
-
     return false;
   }
 
@@ -683,6 +690,9 @@ class PaymentStore {
       unitOfMeasure: item.unitOfMeasure,
       amount: item.amount,
       actionType: item.wallet ? "edit-subscription" : "edit-plan",
+      actionRoute: item.wallet
+        ? (getServiceRoute(this.routes, item.name) ?? this.routes.diskStorage)
+        : this.routes.portalPayments,
     }));
   }
 
@@ -821,6 +831,10 @@ class PaymentStore {
 
   setFilterContact = (contact: TTransactionFilterContact | null) => {
     this.filterContact = contact;
+  };
+
+  setSavedUsagePeriod = (period: TUsagePeriodKey | null) => {
+    this.savedUsagePeriod = period;
   };
 
   resetTransactionFilter = () => {

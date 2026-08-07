@@ -83,12 +83,11 @@ describe("<ChatInfoBlock />", () => {
     );
   });
 
-  it("renders activate and benefits links for a saas payer admin", () => {
+  it("renders activate and benefits links for a saas admin", () => {
     render(
       <ChatInfoBlock
         isPortalAdmin={true}
         standalone={false}
-        isPayer={true}
         isCardLinkedToPortal={true}
         onActivateAI={vi.fn()}
         onShowAIBenefits={vi.fn()}

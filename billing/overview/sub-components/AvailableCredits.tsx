@@ -72,13 +72,13 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     wasFirstTopUp,
     language,
     formatWalletCurrency,
-    upcomingPayments,
+    upcomingPaymentsCurrentMonth,
   } = store;
 
   const { isNotPaidPeriod, walletCustomerEmail } = store.tariff;
 
-  const nextPayment = upcomingPayments.length
-    ? [...upcomingPayments].sort((a, b) =>
+  const nextPayment = upcomingPaymentsCurrentMonth.length
+    ? [...upcomingPaymentsCurrentMonth].sort((a, b) =>
         a.dueDate.localeCompare(b.dueDate),
       )[0]
     : undefined;

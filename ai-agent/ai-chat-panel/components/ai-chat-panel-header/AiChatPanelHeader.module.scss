@@ -48,6 +48,13 @@
   }
 }
 
+.toolbar {
+  padding: 0px;
+  button {
+    padding: 4px 8px;
+  }
+}
+
 .left {
   display: flex;
   align-items: center;
@@ -75,10 +82,4 @@
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
-}
-
-.newChatButton {
-  svg path {
-    fill: currentColor;
-  }
 }

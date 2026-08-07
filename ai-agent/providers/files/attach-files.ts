@@ -38,6 +38,32 @@ export type AttachFileInput = {
 };
 
 /**
+ * What the backend reported about a freshly attached file, keyed by
+ * attachment id. `addAttachmentFile` keeps only `{id, title, kind, path,
+ * type}` in the store, so anything else the record carried — notably
+ * `canAnalyze` for forms — is available in the attach response alone and has
+ * to be remembered by the caller.
+ */
+export type AttachedFileInfo = {
+  id: string;
+  /** The backend can analyze this file's contents (an analyzable form). */
+  canAnalyze?: boolean;
+};
+
+/** Reports what was attached, so the caller can keep the extra flags. */
+export type OnFilesAttached = (attached: AttachedFileInfo[]) => void;
+
+// The packaged ai-chat (`onlyoffice-ai-chat-0.5.0-docspace.2.tgz`) predates
+// `canAnalyze` on its `Attachment` type, while the backend already returns it.
+// Read it structurally until a build carrying the field is packed.
+const readCanAnalyze = (record: unknown): boolean | undefined => {
+  if (typeof record !== "object" || record === null) return undefined;
+  if (!("canAnalyze" in record)) return undefined;
+  const value = record.canAnalyze;
+  return typeof value === "boolean" ? value : undefined;
+};
+
+/**
  * Attaches host files to the AI chat composer through the attachments
  * store, then re-keys the refs flagged in `imageIndices` to
  * `attachmentImages`. The library hardcodes `kind: "file"` for refs produced
@@ -46,23 +72,51 @@ export type AttachFileInput = {
  *
  * `imageIndices` are positions into `inputs`; the matching freshly-added refs
  * are moved (added refs preserve input order).
+ *
+ * `pendingIds` are loading-chip leases from `beginPendingAttachments`, one
+ * per input in the same order — passing them swaps each placeholder for its
+ * real chip atomically and keeps the reservation from being counted twice
+ * against the attachment cap. Known bounded gap: cancelling a single loading
+ * chip mid-batch shifts the positions the store settles, so `imageIndices`
+ * can tag a neighbouring ref (wrong icon, nothing worse); the proper fix is
+ * a per-input `kind` in `addAttachmentFile` — a library follow-up.
+ *
+ * Returns what stayed attached as files, so the caller can keep the record
+ * flags the store drops (see {@link AttachedFileInfo}). Records past the
+ * store's cap, or whose lease was revoked mid-flight, are dropped by the
+ * library, so the result can be shorter than `inputs`.
  */
 export const attachFilesToChat = async (
   useAttachmentsStore: AttachmentsStore,
   inputs: AttachFileInput[],
   imageIndices: Set<number>,
-): Promise<void> => {
-  if (inputs.length === 0) return;
+  pendingIds?: string[],
+): Promise<AttachedFileInfo[]> => {
+  if (inputs.length === 0) return [];
 
-  const before = useAttachmentsStore.getState().attachmentFiles.length;
+  // Identify the freshly added refs by id, not by a pre-await length: the
+  // upload window is long and user-visible now, and deleting an existing
+  // chip meanwhile would shift a positional slice.
+  const beforeIds = new Set(
+    useAttachmentsStore.getState().attachmentFiles.map((f) => f.id),
+  );
 
-  await useAttachmentsStore.getState().addAttachmentFile(inputs);
+  const records =
+    (await useAttachmentsStore.getState().addAttachmentFile(inputs, {
+      pendingIds,
+    })) ?? [];
 
-  if (imageIndices.size === 0) return;
+  const attached = records
+    .filter((_, i) => !imageIndices.has(i))
+    .map((record) => ({ id: record.id, canAnalyze: readCanAnalyze(record) }));
+
+  if (imageIndices.size === 0) return attached;
 
   useAttachmentsStore.setState((s) => {
-    const added = s.attachmentFiles.slice(before);
-    const stayingFiles = s.attachmentFiles.slice(0, before);
+    const added = s.attachmentFiles.filter((ref) => !beforeIds.has(ref.id));
+    const stayingFiles = s.attachmentFiles.filter((ref) =>
+      beforeIds.has(ref.id),
+    );
     const movedImages: typeof s.attachmentImages = [];
     added.forEach((ref, i) => {
       if (imageIndices.has(i)) {
@@ -76,4 +130,6 @@ export const attachFilesToChat = async (
       attachmentImages: [...s.attachmentImages, ...movedImages],
     };
   });
+
+  return attached;
 };

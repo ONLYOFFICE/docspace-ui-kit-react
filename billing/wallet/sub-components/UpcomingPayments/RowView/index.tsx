@@ -69,6 +69,7 @@ const RowView = ({ sectionWidth }: { sectionWidth: number }) => {
           )}
           amount={formatWalletCurrency(payment.amount, 2)}
           actionType={payment.actionType}
+          actionRoute={payment.actionRoute}
         />
       ))}
     </RowContainer>

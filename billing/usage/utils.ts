@@ -36,7 +36,7 @@
 import type { DateTime } from "luxon";
 
 import type { TUsagePeriodKey } from "../types";
-import { now } from "../../utils/date";
+import { getAppTimezone, now } from "../../utils/date";
 
 export const USAGE_PERIODS: TUsagePeriodKey[] = [
   "thisMonth",
@@ -51,7 +51,8 @@ export const USAGE_PERIODS: TUsagePeriodKey[] = [
 export const getUsageRange = (
   period: TUsagePeriodKey,
 ): { from: DateTime; to: DateTime } => {
-  const current = now();
+
+  const current = now().setZone(getAppTimezone());
 
   switch (period) {
     case "lastMonth": {

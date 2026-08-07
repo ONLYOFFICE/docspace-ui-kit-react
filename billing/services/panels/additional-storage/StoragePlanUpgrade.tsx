@@ -49,6 +49,7 @@ import {
 import { toastr } from "../../../../components/toast";
 import { useApi } from "../../../../providers";
 import { calculateTotalPrice } from "../../../utils/common";
+import { isInsufficientFundsError } from "../../../utils/insufficientFunds";
 import {
   DISK_STORAGE,
   STORAGE_DEACTIVATION_VISITED,
@@ -105,6 +106,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     formatWalletCurrency,
     walletBalance,
     walletCodeCurrency,
+    isPayer,
   } = paymentStore;
 
   const {
@@ -352,7 +354,16 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
         onClose();
       } catch (e) {
-        toastr.error(e as Error);
+        if (isInsufficientFundsError(e)) {
+          toastr.error(
+            isPayer
+              ? t("InsufficientFundsCheckCredits")
+              : t("InsufficientFundsContactPayerShort"),
+            t("InsufficientFunds"),
+          );
+        } else {
+          toastr.error(e as Error);
+        }
         setIsLoading(false);
       }
     },
@@ -362,6 +373,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       isBalanceInsufficient,
       recommendedAmount,
       walletCodeCurrency,
+      isPayer,
+      t,
     ],
   );
 

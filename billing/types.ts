@@ -70,6 +70,8 @@ export type TDocsConnectCardState = {
   tariffUsers: number;
   scheduledUsers: number | null;
   scheduledDate: string;
+  nextDevPackEnabled: boolean;
+  scheduledOnDevPack: boolean;
   deactivated: boolean;
   canceled: boolean;
 };
@@ -167,6 +169,7 @@ export type TUpcomingPayment = {
   unitOfMeasure: string;
   amount: number;
   actionType?: TUpcomingPaymentActionType;
+  actionRoute?: string;
 };
 
 export type TUpcomingPaymentResponse = {
@@ -231,6 +234,7 @@ export type TPaymentRoutes = {
   aiSearch: string;
   backup: string;
   diskStorage: string;
+  docsConnect?: string;
   wallet?: string;
 };
 
