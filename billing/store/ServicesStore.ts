@@ -43,7 +43,6 @@ import { parseAiPrices } from "../utils/parsers";
 import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
 import type {
   TAiToolsPrices,
-
   TServiceUsageMonthly,
   TUsagePeriodKey,
 } from "../types";
@@ -78,8 +77,6 @@ class ServicesStore {
   featureCountData: number = 0;
 
   confirmActionType: string | null = null;
-
-  aiToolsBalance: TBalance = null;
 
   aiToolsPrices: TAiToolsPrices | null = null;
 
@@ -129,69 +126,6 @@ class ServicesStore {
     return this.paymentStore.language ?? "en";
   }
 
-  private get aiBalanceData() {
-    if (this.aiToolsBalance && typeof this.aiToolsBalance !== "number")
-      return this.aiToolsBalance;
-    return null;
-  }
-
-  get aiServiceBalance(): number {
-    const balance = this.aiBalanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].amount ?? 0;
-
-    return 0.0;
-  }
-
-  // get isAiServiceLowBalance() {
-  //   if (!this.wasFirstAiServiceTopUp) return false;
-
-  //   return this.aiServiceBalance < 1;
-  // }
-
-  get aiServiceCodeCurrency(): string {
-    const balance = this.aiBalanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].currency ?? "USD";
-
-    return "USD";
-  }
-
-  get aiServiceLastCreditAmount() {
-    if (!this.aiToolsBalance || typeof this.aiToolsBalance === "number")
-      return null;
-
-    return this.aiToolsBalance.lastCredit?.amount ?? null;
-  }
-
-  get aiServiceLastCreditCurrency() {
-    if (!this.aiToolsBalance || typeof this.aiToolsBalance === "number")
-      return "";
-
-    return this.aiToolsBalance.lastCredit?.currency ?? "USD";
-  }
-
-  get aiServiceLastCreditDate() {
-    if (!this.aiToolsBalance || typeof this.aiToolsBalance === "number")
-      return null;
-
-    return this.aiToolsBalance.lastCredit?.date ?? null;
-  }
-
-  get aiModelsCurrency() {
-    const currency = this.aiToolsPrices?.currency;
-    if (!currency) return "USD";
-
-    return currency.code ?? "USD";
-  }
-
-  get aiModelsCurrencySymbol() {
-    const currency = this.aiToolsPrices?.currency;
-    if (!currency) return "$";
-
-    return currency.symbol ?? "$";
-  }
-
   get minimumInputPrice() {
     const inputValues: Array<number | undefined> = [];
 
@@ -218,12 +152,6 @@ class ServicesStore {
       .filter((v): v is number => Number.isFinite(v));
 
     return values.length ? Math.min(...values) : 0;
-  }
-
-  get wasFirstAiServiceTopUp() {
-    if (!this.aiToolsBalance) return false;
-
-    return (this.aiBalanceData?.subAccounts?.length ?? 0) !== 0;
   }
 
   setPartialUpgradeFee = (partialUpgradeFee: number) => {
@@ -256,25 +184,6 @@ class ServicesStore {
 
   setFeatureCountData = (featureCountData: number) => {
     this.featureCountData = featureCountData;
-  };
-
-  formatAiModelsCurrency = (amount: number) => {
-    return formatterCurrencyWithoutTranction(
-      this.language,
-      amount,
-      this.aiModelsCurrency,
-      0,
-    );
-  };
-
-  formatAiServiceCurrency = (
-    item: number | null = null,
-    fractionDigits: number = 3,
-    currency: string = this.aiServiceCodeCurrency,
-  ) => {
-    const amount = item ?? this.aiServiceBalance;
-
-    return formatCurrencyValue(this.language, amount, currency, fractionDigits);
   };
 
   fetchAiPrices = async () => {
@@ -379,29 +288,6 @@ class ServicesStore {
     }
   };
 
-  // TODO: Replace with SDK method once it is available in the API SDK
-  fetchAiServiceBalance = async (refresh?: boolean) => {
-    const abortController = new AbortController();
-    this.addAbortController(abortController);
-
-    try {
-      const { data } = await this.#rawApiClient.instance.get(
-        `api/2.0/portal/payment/customer/aibalance`,
-        {
-          params: refresh ? { refresh: true } : {},
-          signal: abortController.signal,
-        },
-      );
-
-      if (!data?.response) return;
-
-      this.aiToolsBalance = data.response as unknown as TBalance;
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
-      console.error(error);
-    }
-  };
-
   fetchBackupsCount = async (from?: DateTime, to?: DateTime) => {
     const abortController = new AbortController();
     this.abortControllers.push(abortController);
@@ -448,8 +334,7 @@ class ServicesStore {
       );
 
       const response = data?.response as
-        | { free?: number; paid?: number }
-        | undefined;
+        { free?: number; paid?: number } | undefined;
 
       if (response == null) return;
 
@@ -621,28 +506,6 @@ class ServicesStore {
     }
   };
 
-  aiPaywallInit = async (t: TTranslation) => {
-    const { initWalletPayerAndBalance } = this.paymentStore;
-
-    try {
-      await Promise.all([
-        initWalletPayerAndBalance(false),
-        this.fetchAiPrices(),
-        this.fetchAiServiceBalance(),
-      ]);
-
-      this.setIsAiPaywallInit(true);
-
-      return this.wasFirstAiServiceTopUp;
-    } catch (error) {
-      if (error instanceof Error && error.name === "CanceledError")
-        return false;
-      console.error(error);
-      toastr.error(t("Common:UnexpectedError"));
-      return false;
-    }
-  };
-
   servicesInit = async (t: TTranslation) => {
     const isRefresh = window.location.href.includes("complete=true");
 
@@ -675,7 +538,7 @@ class ServicesStore {
       }
 
       if (hasAiService) {
-        requests.push(this.fetchAiServiceBalance(), this.fetchAiPrices());
+        requests.push(this.fetchAiPrices());
       }
 
       await Promise.all(requests);
@@ -706,9 +569,9 @@ class ServicesStore {
       this.setIsInitServicesPage(true);
 
       if (!isRefresh) {
-        const actionTypeParam = new URL(
-          window.location.href,
-        ).searchParams.get("actionType");
+        const actionTypeParam = new URL(window.location.href).searchParams.get(
+          "actionType",
+        );
 
         if (actionTypeParam) {
           this.setConfirmActionType(actionTypeParam);
