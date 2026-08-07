@@ -10,7 +10,8 @@
 - **Storybook 8** — component documentation and visual development
 - **Vitest** — unit and component tests
 - **Biome** — linting and formatting (replaces ESLint/Prettier)
-- **styled-components** — CSS-in-JS theming
+- **SCSS Modules** — styling (`*.module.scss` per component); theming via CSS
+  custom properties
 - **Lefthook** — git hooks (lint + tests on pre-push)
 - **pnpm** — package manager
 
@@ -22,7 +23,7 @@ components/          — 90+ UI components, each in its own folder:
                           index.ts
                           <Name>.tsx
                           <Name>.types.ts
-                          <Name>.styled.ts (optional)
+                          <Name>.module.scss (optional)
                           <Name>.stories.tsx
                           <Name>.test.tsx (optional)
 constants/           — Shared constants
@@ -85,7 +86,10 @@ pnpm tsc
 
 - **TypeScript**: strict mode; no `any`; explicit types on all exported symbols
 - **Component file**: `ComponentName.tsx` + `ComponentName.types.ts` + `index.ts`
-- **Theming**: styled-components with theme tokens from `ThemeContext`; no hardcoded colors or sizes
+- **Theming**: SCSS Modules with CSS custom properties (`var(--token)`); the
+  provider stamps `data-theme`/`data-dir` on `<html>`; no hardcoded colors or
+  sizes; use CSS logical properties + mixins from `styles/mixins/_direction.scss`
+  for RTL
 - **Icons**: SVG files in `assets/icons/` imported as React components (`*.react.svg`)
 - **Exports**: all public API through `index.ts` at each folder level; tree-shaking must be preserved
 - **Peer deps**: React and React-DOM are peer dependencies — never bundle them
@@ -98,7 +102,10 @@ pnpm tsc
 ## Architecture Notes
 
 - **Flat component model**: each component is self-contained in its folder; no deep nesting between components
-- **Theme system**: light/dark themes defined in `.storybook/lightTheme.ts` / `darkTheme.ts`; consumed via `ThemeProvider` from `providers/`
+- **Theme system**: theme objects (`TTheme`, `TColorScheme`) live in
+  `providers/theme/themes/` (`base.ts` / `dark.ts`); runtime theming is CSS
+  custom properties set by `ThemeProvider`. `.storybook/lightTheme.ts` /
+  `darkTheme.ts` are Storybook-UI themes only
 - **Selectors**: complex data-driven selector UIs (AIAgent, People, Room, Files, Groups, MCPServers) live in `selectors/` — they depend on API and MobX stores
 - **Providers**: `Providers.tsx` composes ThemeProvider, i18next, SocketProvider, etc.
 - **API integration**: `utils/api/` and `utils/socket/` provide API client and WebSocket helpers used by selectors
