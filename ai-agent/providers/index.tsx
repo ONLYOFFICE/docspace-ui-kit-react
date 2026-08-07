@@ -167,9 +167,33 @@ type AiAgentProvidersProps = {
    * Explicitly controls the composer model picker. The chat lib hides the
    * picker whenever `entityId` is set, but DocSpace scopes the chat by the
    * current folder/room, so `entityId` alone no longer means "agent chat".
-   * Pass `true` only where the model is fixed (AI agent rooms).
+   * Pass `true` to hide the picker entirely (highest priority — it also
+   * suppresses the read-only label). To keep the fixed model visible instead
+   * of hidden — e.g. inside AI agent rooms — leave this `false` and use
+   * {@link profilePickerReadOnly} / {@link isAgentRoom}.
    */
   hideProfilePicker?: boolean;
+  /**
+   * Renders the composer model picker as a read-only label — the current
+   * profile's name as plain static text (secondary color, truncated, no
+   * dropdown) instead of an interactive combo. Forwarded to
+   * `WidgetConfig.profilePickerReadOnly`; it overrides the `entityId`
+   * default-hide heuristic (the label is shown even in entity chats) but
+   * NOT an explicit `hideProfilePicker` `true`, which still hides
+   * everything. Use where the host fixes the profile but still wants to
+   * surface which model answers — e.g. an AI agent room viewer who lacks
+   * the right to change the assignment.
+   */
+  profilePickerReadOnly?: boolean;
+  /**
+   * Marks the current scope as an AI agent room, whose assigned profile
+   * must win over a session pick carried in from another scope. On a scope
+   * switch into such a room the session chat profile is reset so the room's
+   * model assignment drives the chat (and the read-only label). Kept
+   * separate from `hideProfilePicker`/`profilePickerReadOnly` because an
+   * *editable* agent room shows the picker yet still needs this reset.
+   */
+  isAgentRoom?: boolean;
   /**
    * Extra items appended to the composer's model picker dropdown after a
    * separator below the profile list. Entries with `items` open a nested
@@ -332,6 +356,8 @@ const AiAgentProviders = ({
   entityId,
   contextEntityId,
   hideProfilePicker = false,
+  profilePickerReadOnly,
+  isAgentRoom = false,
   profilePickerActions,
   profilePickerAlias,
   onProfilePickerSelect,
@@ -499,15 +525,17 @@ const AiAgentProviders = ({
     // A scope switch right after an explicit picker selection (agent pick
     // sets the aliased profile, plain pick sets the profile itself) must
     // not wipe that selection — the default reset runs AFTER the alias
-    // bridge and would drop it. Only agent rooms (hideProfilePicker) reset
-    // the session so the room's own assignment wins.
-    threads.onSwitchToNewThread({ keepSessionProfile: !hideProfilePicker });
+    // bridge and would drop it. Only agent rooms reset the session so the
+    // room's own assignment wins (their picker may still be shown, as a
+    // read-only label or an editable combo, so this is keyed on
+    // `isAgentRoom`, not on the picker's visibility).
+    threads.onSwitchToNewThread({ keepSessionProfile: !isAgentRoom });
     void profiles.reloadModelAssignment();
     void profiles.reloadExtendedThinking();
     void servers.reload();
     void attachments.clearAttachmentFiles();
     void attachments.clearAttachmentImages();
-  }, [entityId, hideProfilePicker, stores]);
+  }, [entityId, isAgentRoom, stores]);
 
   const onDropFiles = useCallback(
     (files: File[]) =>
@@ -533,6 +561,9 @@ const AiAgentProviders = ({
       // whenever entityId is set, but here entityId means "current
       // folder/room scope", not "agent chat" — only agents fix the model.
       hideProfilePicker,
+      // Read-only label instead of an interactive picker (overrides the
+      // entityId hide-heuristic, deferring to an explicit hideProfilePicker).
+      profilePickerReadOnly,
       profilePickerActions,
       onProfilePickerSelect,
       // Hide "Always allow" only for generate tools (matched by full name).
@@ -553,6 +584,7 @@ const AiAgentProviders = ({
       entityId,
       contextEntityId,
       hideProfilePicker,
+      profilePickerReadOnly,
       profilePickerActions,
       onProfilePickerSelect,
       onToolCallApproveResult,
