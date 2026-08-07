@@ -592,17 +592,21 @@ const AiAgentProviders = ({
     // A scope switch right after an explicit picker selection (agent pick
     // sets the aliased profile, plain pick sets the profile itself) must
     // not wipe that selection — the default reset runs AFTER the alias
-    // bridge and would drop it. Only agent rooms reset the session so the
-    // room's own assignment wins (their picker may still be shown, as a
-    // read-only label or an editable combo, so this is keyed on
-    // `isAgentRoom`, not on the picker's visibility).
-    threads.onSwitchToNewThread({ keepSessionProfile: !isAgentRoom });
+    // bridge and would drop it. Reset the session so the room's own
+    // assignment wins whenever the host fixes the model for the scope:
+    // either an agent room (`isAgentRoom` — its picker may still be shown as
+    // a read-only label or an editable combo) or a fully hidden picker
+    // (`hideProfilePicker`, kept as a fallback so callers that hide the
+    // picker keep the pre-`isAgentRoom` reset behavior).
+    threads.onSwitchToNewThread({
+      keepSessionProfile: !(isAgentRoom || hideProfilePicker),
+    });
     void profiles.reloadModelAssignment();
     void profiles.reloadExtendedThinking();
     void servers.reload();
     void attachments.clearAttachmentFiles();
     void attachments.clearAttachmentImages();
-  }, [entityId, isAgentRoom, stores]);
+  }, [entityId, isAgentRoom, hideProfilePicker, stores]);
 
   const onDropFiles = useCallback(
     (files: File[]) =>
