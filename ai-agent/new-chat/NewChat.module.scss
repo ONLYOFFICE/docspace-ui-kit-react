@@ -124,7 +124,11 @@
     }
   }
 
-  :global([class*="--text-tertiary"]) {
+  // Scope this out of the assistant message subtree: the ai-chat lib renders
+  // its markdown content with utility classes that also match [class*="--text-tertiary"],
+  // and this rule would shrink the answer text. Excluding [data-role="assistant"]
+  // descendants lets the lib's own styles apply untouched.
+  :global([class*="--text-tertiary"]:not([data-role="assistant"] *)) {
     font-weight: 400;
     font-size: 10px;
     leading-trim: none;

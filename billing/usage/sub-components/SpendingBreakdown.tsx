@@ -51,7 +51,13 @@ import NoSpendingDarkIcon from "../../../assets/no.transactions.filter.dark.them
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import type { TUsagePeriodKey } from "../../types";
-import { AI_TOOLS, BACKUP_SERVICE } from "../../constants";
+import {
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  DOCS_CONNECT,
+  DOCS_CONNECT_DEVPACK_SERVICE,
+  DOCS_CONNECT_SERVICE,
+} from "../../constants";
 
 import { getServiceUsageSubLabel } from "../../utils/serviceUsage";
 import { getUsageRange } from "../utils";
@@ -66,6 +72,7 @@ type SpendingBreakdownProps = {
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
   onAIServicesClick?: () => void;
+  onDocsConnectClick?: () => void;
   onDownloadReport?: (
     serviceName?: string,
     range?: { from: DateTime; to: DateTime },
@@ -80,12 +87,13 @@ const SpendingBreakdown = ({
   onDiskStorageClick,
   onBackupClick,
   onAIServicesClick,
+  onDocsConnectClick,
   onDownloadReport,
   onViewChange,
 }: SpendingBreakdownProps) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
-  const { formatWalletCurrency, language } = usePaymentStore();
+  const { language } = usePaymentStore();
   const { serviceUsage, serviceUsageMonthly } = useServicesStore();
 
   const [view, setView] = useState<BreakdownView>("services");
@@ -169,6 +177,12 @@ const SpendingBreakdown = ({
     if (key.includes("storage")) return onDiskStorageClick;
     if (service === BACKUP_SERVICE) return onBackupClick;
     if (service === AI_TOOLS) return onAIServicesClick;
+    if (
+      service === DOCS_CONNECT ||
+      service === DOCS_CONNECT_SERVICE ||
+      service === DOCS_CONNECT_DEVPACK_SERVICE
+    )
+      return onDocsConnectClick;
     return undefined;
   };
 
@@ -211,7 +225,8 @@ const SpendingBreakdown = ({
           key={item.service}
           title={item.title}
           subLabel={getSubLabel(item)}
-          amount={formatWalletCurrency(item.totalAmount, 2)}
+          amount={item.totalAmount}
+          amountTooltipId={`usage-service-amount-${item.service}`}
           percent={totalSpend > 0 ? (item.totalAmount / totalSpend) * 100 : 0}
           onExpand={getServiceHandler(item.service)}
           onDownload={
@@ -273,7 +288,9 @@ const SpendingBreakdown = ({
           <BreakdownRow
             key={key}
             title={getMonthLabel(item.year, item.month)}
-            amount={formatWalletCurrency(item.totalAmount, 2, item.currency)}
+            amount={item.totalAmount}
+            currency={item.currency}
+            amountTooltipId={`usage-month-amount-${key}`}
             onDownload={
               item.hasData && onDownloadReport
                 ? () => handleMonthDownload(item.year, item.month)

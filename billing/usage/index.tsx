@@ -53,6 +53,8 @@ import type { TUsagePeriodKey } from "../types";
 
 import PeriodSelect from "./sub-components/PeriodSelect";
 import SpendingBreakdown from "./sub-components/SpendingBreakdown";
+import SpendAmount from "../shared/spend-amount";
+
 import { getUsageRange } from "./utils";
 import { toastr } from "../../components/toast";
 import styles from "./styles/Usage.module.scss";
@@ -62,27 +64,32 @@ type UsageProps = {
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
   onAIServicesClick?: () => void;
+  onDocsConnectClick?: () => void;
 };
 
 const Usage = ({
   onDiskStorageClick,
   onBackupClick,
   onAIServicesClick,
+  onDocsConnectClick,
 }: UsageProps) => {
   const t = useCommonTranslation();
   const { paymentApi, rawApiClient } = useApi();
   const {
-    formatWalletCurrency,
     language,
     formatDate,
     openOnNewPage,
     isCardLinkedToPortal,
     setFilterStartDate,
     setFilterEndDate,
+    savedUsagePeriod,
+    setSavedUsagePeriod,
   } = usePaymentStore();
   const { serviceUsage, initUsageData } = useServicesStore();
 
-  const [period, setPeriod] = useState<TUsagePeriodKey>("thisMonth");
+  const [period, setPeriod] = useState<TUsagePeriodKey>(
+    () => savedUsagePeriod ?? "thisMonth",
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isReportLoading, setIsReportLoading] = useState(false);
   const [breakdownView, setBreakdownView] = useState<"services" | "month">(
@@ -105,6 +112,7 @@ const Usage = ({
   };
 
   useEffect(() => {
+    setSavedUsagePeriod(null);
     loadUsage(period);
   }, []);
 
@@ -121,6 +129,7 @@ const Usage = ({
     return () => {
       setFilterStartDate(from);
       setFilterEndDate(to);
+      setSavedUsagePeriod(period);
       openServicePage();
     };
   };
@@ -286,9 +295,11 @@ const Usage = ({
         {isLoading ? (
           <RectangleSkeleton width="120px" height="24px" borderRadius="3px" />
         ) : (
-          <Text className={styles.totalValue}>
-            {formatWalletCurrency(totalSpend, 2)}
-          </Text>
+          <SpendAmount
+            amount={totalSpend}
+            className={styles.totalValue}
+            tooltipId="usage-total-spend"
+          />
         )}
         <Text className={styles.totalCaption}>{periodCaption[period]}</Text>
       </div>
@@ -299,6 +310,7 @@ const Usage = ({
         onDiskStorageClick={openWithPeriod(onDiskStorageClick)}
         onBackupClick={openWithPeriod(onBackupClick)}
         onAIServicesClick={openWithPeriod(onAIServicesClick)}
+        onDocsConnectClick={openWithPeriod(onDocsConnectClick)}
         onDownloadReport={onDownloadReport}
         onViewChange={setBreakdownView}
       />

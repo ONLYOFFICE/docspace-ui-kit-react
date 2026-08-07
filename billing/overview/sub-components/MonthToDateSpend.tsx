@@ -46,6 +46,7 @@ import {
   getServiceUnitRate,
   getServiceUsageSubLabel,
 } from "../../utils/serviceUsage";
+import SpendAmount from "../../shared/spend-amount";
 import type { TServiceUsage } from "../../types";
 
 import styles from "../Overview.module.scss";
@@ -107,17 +108,12 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
                 {subLabel}
               </Text>
             </div>
-            <Text
-              fontSize="13px"
-              fontWeight={600}
+            <SpendAmount
+              amount={item.totalAmount}
+              currency={item.currency}
               className={styles.spendAmount}
-            >
-              {formatWalletCurrency(
-                item.totalAmount,
-                2,
-                item.currency || walletCodeCurrency,
-              )}
-            </Text>
+              tooltipId={`spend-amount-${item.service}`}
+            />
           </div>
         </Fragment>
       );
@@ -148,13 +144,12 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
         >
           {label}
         </Text>
-        <Text
-          fontSize="12px"
-          fontWeight={600}
+        <SpendAmount
+          amount={sectionTotal}
           className={styles.spendSectionTotal}
-        >
-          {formatWalletCurrency(sectionTotal, 2, walletCodeCurrency)}
-        </Text>
+          fontSize="12px"
+          tooltipId={`spend-section-total-${key}`}
+        />
       </div>
       {items.length > 0 ? (
         renderRows(items)
