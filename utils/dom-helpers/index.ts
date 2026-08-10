@@ -54,6 +54,27 @@ export default class DomHelpers {
     return { width: 0, height: 0 };
   }
 
+  /**
+   * Size of the layout viewport - the box an absolutely positioned element is
+   * laid out in. Unlike `getViewport`, which reads `window.innerWidth/Height`
+   * (the visual viewport), this is not affected by pinch zoom or by the
+   * zoom-to-fit mobile browsers apply, and it excludes the classic scrollbar.
+   * Use it to keep overlays on screen; `innerWidth` can be noticeably larger
+   * than the layout viewport on mobile browsers.
+   */
+  static getLayoutViewport() {
+    if (typeof window !== "undefined") {
+      const e = document.documentElement;
+      const g = document.getElementsByTagName("body")[0];
+
+      return {
+        width: e?.clientWidth || g?.clientWidth || window.innerWidth || 0,
+        height: e?.clientHeight || g?.clientHeight || window.innerHeight || 0,
+      };
+    }
+    return { width: 0, height: 0 };
+  }
+
   static getOffset(el?: HTMLElement | null) {
     if (el) {
       const rect = el.getBoundingClientRect();
