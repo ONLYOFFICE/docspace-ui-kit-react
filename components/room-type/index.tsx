@@ -60,6 +60,7 @@ const RoomType = ({
   id,
   selectedId,
   disabledFormRoom,
+  disabledPublicRoom,
   isTemplate,
   isTemplateRoom,
   isFormSection,
@@ -78,8 +79,10 @@ const RoomType = ({
   };
 
   const isFormRoom = roomType === RoomsType.FormRoom;
+  const isPublicRoom = roomType === RoomsType.PublicRoom;
 
-  const disabled = isFormRoom && disabledFormRoom;
+  const disabled =
+    (isFormRoom && disabledFormRoom) || (isPublicRoom && disabledPublicRoom);
 
   const arrowClassName =
     type === "dropdownButton"
@@ -119,6 +122,7 @@ const RoomType = ({
       as="div"
       className={classNames(styles.roomType, styles.listItem, {
         [styles.isOpen]: isOpen,
+        [styles.disabled]: disabled,
       })}
       id={id}
       title={disabled ? "" : room.title}
@@ -147,11 +151,13 @@ const RoomType = ({
     <TooltipContainer
       as="div"
       id={id}
-      title={room.title}
+      title={disabled ? "" : room.title}
       onClick={onClick}
       data-selected-id={selectedId}
+      data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
       className={classNames(styles.roomType, styles.dropDownItem, {
         [styles.isOpen]: isOpen,
+        [styles.disabled]: disabled,
       })}
       data-testid="room-type-dropdown-item"
     >

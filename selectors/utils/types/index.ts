@@ -65,6 +65,8 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   isInit: boolean;
   createDefineRoomLabel?: string;
   createDefineRoomType?: RoomType;
+  /** Disables the Public room type in the create-room dropdown */
+  disabledCreatePublicRoom?: boolean;
   onSetBaseFolderPath?: (
     value: number | string | undefined | TBreadCrumb[],
   ) => void;

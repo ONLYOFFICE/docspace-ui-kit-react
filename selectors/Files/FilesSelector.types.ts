@@ -319,6 +319,8 @@ export type FilesSelectorProps = TInfoBar &
     withCreate: boolean;
     createDefineRoomLabel?: string;
     createDefineRoomType?: RoomType;
+    /** Disables the Public room type in the create-room dropdown */
+    disabledCreatePublicRoom?: boolean;
     formProps?: FormPropsType;
     withPadding?: boolean;
     checkCreating?: boolean;
