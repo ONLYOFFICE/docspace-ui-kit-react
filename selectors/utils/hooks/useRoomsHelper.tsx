@@ -46,6 +46,7 @@ import {
 import { useApi } from "../../../providers/api";
 import { RoomsTypeValues } from "../../../utils/common";
 import RoomType from "../../../components/room-type";
+import { Tooltip } from "../../../components/tooltip";
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
 
 import { LoadersContext } from "../contexts/Loaders";
@@ -78,6 +79,7 @@ const useRoomsHelper = ({
   isInit,
   setIsInit,
   withCreate,
+  disabledCreatePublicRoom,
   disableThirdParty,
   excludeItems,
   createDefineRoomLabel,
@@ -122,22 +124,45 @@ const useRoomsHelper = ({
 
   const createDropDownItems = React.useMemo(() => {
     return RoomsTypeValues.map((value) => {
+      const isPublicRoomDisabled =
+        !!disabledCreatePublicRoom && value === ApiRoomType.PublicRoom;
+
       const onClick = () => {
+        if (isPublicRoomDisabled) return;
+
         addInputItem("", "", value as RoomTypeEnum, t("EnterName"));
       };
 
-      return (
+      const roomTypeElement = (
         <RoomType
           key={value}
           roomType={value}
           selectedId={value}
           type="dropdownItem"
           isOpen={false}
+          disabledPublicRoom={disabledCreatePublicRoom}
           onClick={onClick}
         />
       );
+
+      if (!isPublicRoomDisabled) return roomTypeElement;
+
+      const tooltipId = `create-room-type-disabled-${value}`;
+
+      return (
+        <div key={value} id={tooltipId}>
+          {roomTypeElement}
+          <Tooltip
+            id={`${tooltipId}-instance`}
+            anchorSelect={`#${tooltipId}`}
+            place="bottom"
+            float
+            getContent={() => t("PublicRoomCreationDisabled")}
+          />
+        </div>
+      );
     });
-  }, [addInputItem, t]);
+  }, [addInputItem, disabledCreatePublicRoom, t]);
 
   const getRoomList = React.useCallback(
     async (sIndex: number) => {

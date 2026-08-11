@@ -98,6 +98,7 @@ const RoomSelectorComponent = ({
 
   createDefineRoomLabel,
   createDefineRoomType,
+  disabledCreatePublicRoom,
 
   useAside,
   onClose,
@@ -276,6 +277,7 @@ const RoomSelectorComponent = ({
     setIsInit,
     createDefineRoomLabel,
     createDefineRoomType,
+    disabledCreatePublicRoom,
     excludeItems,
     formsSection: isForms,
     roomType,

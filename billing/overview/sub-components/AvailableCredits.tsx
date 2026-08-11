@@ -64,7 +64,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     walletBalance,
     walletCodeCurrency,
     isCardLinkedToPortal,
-    canUpdateTariff,
+    isPayer,
     recommendedAmount,
     fetchBalance,
     isAutoPaymentExist,
@@ -132,27 +132,29 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
           language={language}
           withoutMargin
         />
-        <div className={styles.cardButtons}>
-          <Button
-            size={isMobile ? ButtonSize.normal : ButtonSize.small}
-            primary
-            label={t("TopUp")}
-            onClick={() => setIsTopUpDialogVisible(true)}
-            isDisabled={!canUpdateTariff || isNotPaidPeriod}
-            className={styles.cardButton}
-            testId="overview_top_up_button"
-          />
-          {wasFirstTopUp ? (
+        {isPayer ? (
+          <div className={styles.cardButtons}>
             <Button
               size={isMobile ? ButtonSize.normal : ButtonSize.small}
-              label={t("AutoTopUp")}
-              onClick={() => setIsWalletRefilledOpen(true)}
-              isDisabled={!canUpdateTariff || isNotPaidPeriod}
+              primary
+              label={t("TopUp")}
+              onClick={() => setIsTopUpDialogVisible(true)}
+              isDisabled={isNotPaidPeriod}
               className={styles.cardButton}
-              testId="overview_auto_top_up_button"
+              testId="overview_top_up_button"
             />
-          ) : null}
-        </div>
+            {wasFirstTopUp ? (
+              <Button
+                size={isMobile ? ButtonSize.normal : ButtonSize.small}
+                label={t("AutoTopUp")}
+                onClick={() => setIsWalletRefilledOpen(true)}
+                isDisabled={isNotPaidPeriod}
+                className={styles.cardButton}
+                testId="overview_auto_top_up_button"
+              />
+            ) : null}
+          </div>
+        ) : null}
       </div>
       {isNextPayment ? (
         <div className={styles.topUpWarning}>

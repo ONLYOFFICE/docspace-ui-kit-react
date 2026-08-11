@@ -1358,6 +1358,8 @@ class PaymentStore {
       if (this.isVisibleWalletSettings) this.setVisibleWalletSetting(false);
     }
 
+    this.resetTransactionHistory();
+
     const requests: Promise<unknown>[] = [];
     try {
       await Promise.all([this.initWalletPayerAndBalance(isRefresh)]);
@@ -1375,6 +1377,9 @@ class PaymentStore {
         requests.push(this.fetchAutoPayments(), this.fetchTransactionHistory());
       } else {
         requests.push(this.fetchCardLinked(integrationUrl));
+        runInAction(() => {
+          this.isTransactionLoading = false;
+        });
       }
 
       if (this.isShowStorageTariffDeactivated() && this.isPayer) {
@@ -1422,6 +1427,9 @@ class PaymentStore {
       }
     } catch (error) {
       if (error instanceof Error && error.name === "CanceledError") return;
+      runInAction(() => {
+        this.isTransactionLoading = false;
+      });
       toastr.error(t("Common:UnexpectedError"));
       console.error(error);
     }

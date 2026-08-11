@@ -51,6 +51,7 @@ import FilesSelector from "@docspace/ui-kit/selectors/Files";
 | `footerCheckboxLabel` | `string` | Yes | Label for footer checkbox |
 | `descriptionText` | `string` | Yes | Description text shown in the selector |
 | `withCreate` | `boolean` | Yes | Enable room/folder creation |
+| `disabledCreatePublicRoom` | `boolean` | No | Disable the Public room type in the create-room dropdown |
 | `embedded` | `boolean` | No | Render without Aside wrapper |
 | `treeFolders` | `FolderDtoInteger[]` | No | Tree folder structure for root navigation |
 | `roomType` | `RoomType \| RoomType[]` | No | Filter rooms by type |

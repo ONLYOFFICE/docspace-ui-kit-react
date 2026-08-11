@@ -102,6 +102,13 @@ import { RoomsType } from "@docspace/ui-kit/enums";
         defaultValue: { summary: "false" },
       },
     },
+    disabledPublicRoom: {
+      control: "boolean",
+      description: "Whether the public room type is disabled",
+      table: {
+        defaultValue: { summary: "false" },
+      },
+    },
     isTemplate: {
       control: "boolean",
       description: "Whether to show template variant labels",
