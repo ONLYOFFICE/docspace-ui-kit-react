@@ -80,6 +80,8 @@ export type RoomSelectorProps = TSelectorHeader &
 		withCreate?: boolean;
 		createDefineRoomLabel?: string;
 		createDefineRoomType?: RoomType;
+		/** Disables the Public room type in the create-room dropdown */
+		disabledCreatePublicRoom?: boolean;
 
 		emptyScreenHeader?: string;
 		emptyScreenDescription?: string;

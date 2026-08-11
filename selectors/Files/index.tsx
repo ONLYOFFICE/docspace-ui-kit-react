@@ -114,6 +114,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withCreate,
     createDefineRoomLabel,
     createDefineRoomType,
+    disabledCreatePublicRoom,
 
     shareKey,
     formProps,
@@ -304,6 +305,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withCreate: withCreateState,
     createDefineRoomLabel,
     createDefineRoomType,
+    disabledCreatePublicRoom,
     searchArea,
     isRoomDisabled,
 
