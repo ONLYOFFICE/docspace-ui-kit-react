@@ -194,7 +194,6 @@ const AiPaywallCompletePage = ({
     service && !isDocsConnect ? resolveWalletService(service) : null;
 
   const isBackup = isBackupService(service);
-  const isAi = isAIService(service);
 
   const getActivateStepLabel = () =>
     isAIService(service)
@@ -306,7 +305,7 @@ const AiPaywallCompletePage = ({
   }, []);
 
   React.useEffect(() => {
-    if (status !== "processing") return undefined;
+    if (status !== "processing" || !hasPaymentParams) return undefined;
 
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
@@ -315,7 +314,7 @@ const AiPaywallCompletePage = ({
 
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
-  }, [status]);
+  }, [status, hasPaymentParams]);
 
   const serviceRedirectUrl = service.includes(AI_SEARCH)
     ? "/billing/addons/ai-search"
@@ -336,7 +335,7 @@ const AiPaywallCompletePage = ({
       window.location.href = BACKUP_REDIRECT_URL;
       return;
     }
-    if (isAi) {
+    if (isAIService(service)) {
       window.location.href = serviceRedirectUrl;
       return;
     }
@@ -488,7 +487,7 @@ const AiPaywallCompletePage = ({
                     ? t("DocsConnectCallbackSuccess")
                     : isBackup
                       ? t("BackupPaywallCallbackSuccess")
-                      : isAi
+                      : isAIService(service)
                         ? t("AIPaywallCallbackActivated")
                         : isWalletOnly
                           ? t("WalletTopUpSuccessTitle")
@@ -563,7 +562,7 @@ const AiPaywallCompletePage = ({
                         ? t("DocsConnectCallbackGoTo")
                         : isBackup
                           ? t("BackupTopUpGoToBackup")
-                          : isAi
+                          : isAIService(service)
                             ? t("GoToService")
                             : t("WalletTopUpGoToWallet")
                   }
