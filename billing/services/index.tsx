@@ -49,7 +49,7 @@ import {
   AI_SEARCH_ENUM,
   AI_TOOLS,
   BACKUP_SERVICE,
-  DOCS_CONNECT_SERVICE,
+  DOCS_CONNECT_PRODUCT,
   DISK_STORAGE,
   TOTAL_SIZE,
 } from "../constants";
@@ -203,7 +203,7 @@ const Services = observer(
     const onClick = (id: string) => {
       setConfirmActionType(id);
 
-      if (id === DOCS_CONNECT_SERVICE) {
+      if (id === DOCS_CONNECT_PRODUCT) {
         onDocsConnectClick?.();
         return;
       }

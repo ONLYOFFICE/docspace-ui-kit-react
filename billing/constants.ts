@@ -47,6 +47,7 @@ export const STORAGE_ENUM = "storage";
 export const DISK_STORAGE = "disk-storage";
 export const DOCS_CONNECT_SERVICE = "docscloud";
 export const DOCS_CONNECT_DEVPACK_SERVICE = "docscloud-devpack";
+export const DOCS_CONNECT_PRODUCT = "docscloud";
 export const DOCS_CONNECT_DEVPACK_PRODUCT = "docsclouddevpack";
 export const DOCS_CONNECT = "docs-connect";
 export const DOCS_CONNECT_ROUTE = "/developer-tools/docs-connect";

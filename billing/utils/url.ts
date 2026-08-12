@@ -5,10 +5,10 @@ import {
   AI_TOOLS,
   BACKUP_SERVICE,
   DISK_STORAGE,
-  DOCS_CONNECT_SERVICE,
   STORAGE_ENUM,
   TOTAL_SIZE,
 } from "../constants";
+import { isDocsConnectServiceName } from "./docs-connect";
 import type { TPaymentRoutes } from "../types";
 
 /**
@@ -38,7 +38,7 @@ export const getServiceRoute = (
 ): string | undefined => {
   const key = (service ?? "").toLowerCase();
 
-  if (key.startsWith(DOCS_CONNECT_SERVICE))
+  if (isDocsConnectServiceName(key))
     return routes.docsConnect || routes.services;
 
   const routeKey = ROUTE_KEY_BY_SERVICE[key];

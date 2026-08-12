@@ -45,7 +45,7 @@ import {
   AI_TOOLS,
   BACKUP_SERVICE,
   DISK_STORAGE,
-  DOCS_CONNECT_SERVICE,
+  DOCS_CONNECT_PRODUCT,
   TOTAL_SIZE,
 } from "../constants";
 import { calculateTotalPrice, getConvertedSize } from "../utils/common";
@@ -438,7 +438,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             );
           }
 
-          if (item.serviceName === DOCS_CONNECT_SERVICE) {
+          if (item.id === DOCS_CONNECT_PRODUCT) {
             const subscribed = docsConnectState?.subscribed ?? false;
             const isTrial = docsConnectState?.isTrial ?? false;
             const trialDaysLeft = docsConnectState?.trialDaysLeft ?? 0;
