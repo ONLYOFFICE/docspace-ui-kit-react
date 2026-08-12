@@ -65,10 +65,7 @@ import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { getBrandName } from "../../../constants/brands";
 import { Encoder } from "../../../utils/encoder";
-import {
-  DOCS_CONNECT_SERVICE,
-  DOCS_CONNECT_DEVPACK_SERVICE,
-} from "../../constants";
+import { isDocsConnectServiceName } from "../../utils/docs-connect";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -354,8 +351,8 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     const isDebit = filterSelectedTypeKey !== "credit";
 
     const serviceNames: string | string[] | undefined =
-      serviceName === DOCS_CONNECT_SERVICE
-        ? [DOCS_CONNECT_SERVICE, DOCS_CONNECT_DEVPACK_SERVICE]
+      isDocsConnectServiceName(serviceName)
+        ? store.docsConnectServiceNames
         : serviceName;
 
     try {

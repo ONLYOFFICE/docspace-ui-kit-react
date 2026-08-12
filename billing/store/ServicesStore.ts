@@ -41,6 +41,7 @@ import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "../utils/common";
 import { parseAiPrices } from "../utils/parsers";
 import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
+import { isDocsConnectServiceName } from "../utils/docs-connect";
 import type {
   TAiToolsPrices,
   TServiceUsageMonthly,
@@ -424,11 +425,14 @@ class ServicesStore {
       fetchTransactionHistory,
       initWalletPayerAndBalance,
       setServiceQuota,
+      handleServicesQuotas,
       fetchCardLinked,
       resetTransactionHistory,
     } = this.paymentStore;
 
     resetTransactionHistory();
+
+    const isDocsConnect = isDocsConnectServiceName(serviceName);
 
     try {
       let resolvedServiceName = serviceName;
@@ -438,8 +442,10 @@ class ServicesStore {
           (await setServiceQuota(serviceEnum)) ?? serviceName;
       }
 
+      if (isDocsConnect) await handleServicesQuotas();
+
       const serviceQuotaRequest =
-        serviceEnum !== STORAGE_ENUM
+        serviceEnum !== STORAGE_ENUM && !isDocsConnect
           ? [setServiceQuota(serviceEnum ?? serviceName)]
           : [];
 
