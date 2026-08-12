@@ -374,6 +374,15 @@ const AiPaywallCompletePage = ({
         : []),
   ];
 
+  if (!hasPaymentParams) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.bgCover} aria-hidden="true" />
+        <Loader type={LoaderTypes.track} size="40px" />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       <div className={styles.bgCover} aria-hidden="true" />
