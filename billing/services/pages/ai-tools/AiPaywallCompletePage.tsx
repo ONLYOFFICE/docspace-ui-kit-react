@@ -189,6 +189,7 @@ const AiPaywallCompletePage = ({
     service && !isDocsConnect ? resolveWalletService(service) : null;
 
   const isBackup = isBackupService(service);
+  const isAi = isAIService(service);
 
   const getActivateStepLabel = () =>
     isAIService(service)
@@ -317,6 +318,10 @@ const AiPaywallCompletePage = ({
     }
     if (isBackup) {
       window.location.href = BACKUP_REDIRECT_URL;
+      return;
+    }
+    if (isAi) {
+      window.location.href = serviceRedirectUrl;
       return;
     }
     window.location.href = isWalletOnly
@@ -467,9 +472,11 @@ const AiPaywallCompletePage = ({
                     ? t("DocsConnectCallbackSuccess")
                     : isBackup
                       ? t("BackupPaywallCallbackSuccess")
-                      : isWalletOnly
-                        ? t("WalletTopUpSuccessTitle")
-                        : t("AIPaywallCallbackSuccess")}
+                      : isAi
+                        ? t("AIPaywallCallbackActivated")
+                        : isWalletOnly
+                          ? t("WalletTopUpSuccessTitle")
+                          : t("AIPaywallCallbackSuccess")}
               </Text>
               {admins ? (
                 <>
@@ -540,7 +547,9 @@ const AiPaywallCompletePage = ({
                         ? t("DocsConnectCallbackGoTo")
                         : isBackup
                           ? t("BackupTopUpGoToBackup")
-                          : t("WalletTopUpGoToWallet")
+                          : isAi
+                            ? t("GoToService")
+                            : t("WalletTopUpGoToWallet")
                   }
                   onClick={onGoToBillingClick}
                   testId="ai_paywall_go_to_wallet_button"
