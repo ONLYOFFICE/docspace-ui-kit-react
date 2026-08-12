@@ -40,12 +40,10 @@ import {
   AI_TOOLS,
   BACKUP_SERVICE,
   DISK_STORAGE,
-  DOCS_CONNECT,
-  DOCS_CONNECT_DEVPACK_SERVICE,
-  DOCS_CONNECT_SERVICE,
   MANAGER,
   STORAGE_ENUM,
 } from "../constants";
+import { isDocsConnectServiceName } from "./docs-connect";
 import { formatCompactNumber } from "./common";
 
 /**
@@ -58,6 +56,9 @@ export const getServiceUnitRate = (
   service: string,
   price: string,
 ): string => {
+  if (isDocsConnectServiceName(service))
+    return t("Common:SpendRatePerUser", { price });
+
   switch (service) {
     case ADMIN:
     case MANAGER:
@@ -65,10 +66,6 @@ export const getServiceUnitRate = (
     case DISK_STORAGE:
     case STORAGE_ENUM:
       return t("Common:SpendRatePerGB", { price });
-    case DOCS_CONNECT:
-    case DOCS_CONNECT_SERVICE:
-    case DOCS_CONNECT_DEVPACK_SERVICE:
-      return t("Common:SpendRatePerUser", { price });
     default:
       return "";
   }

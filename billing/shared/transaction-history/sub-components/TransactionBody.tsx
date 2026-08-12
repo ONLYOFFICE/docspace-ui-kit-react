@@ -49,7 +49,7 @@ import NoTransactionsFilterDarkIcon from "../../../../assets/no.transactions.fil
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import useViewEffect from "../../../../hooks/useViewEffect";
 import useDeviceType from "../../../hooks/useDeviceType";
-import { DOCS_CONNECT_SERVICE } from "../../../constants";
+import { isDocsConnectServiceName } from "../../../utils/docs-connect";
 
 import styles from "../styles/TransactionHistory.module.scss";
 
@@ -103,7 +103,7 @@ const TransactionBody = ({
     <NoTransactionsFilterDarkIcon />
   );
 
-  const isDocsConnect = serviceName === DOCS_CONNECT_SERVICE;
+  const isDocsConnect = isDocsConnectServiceName(serviceName);
 
   const title = hasAppliedDateFilter
     ? t("NoFindingsFound2")
