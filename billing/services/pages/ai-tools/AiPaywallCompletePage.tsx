@@ -133,6 +133,7 @@ const AiPaywallCompletePage = ({
   const [stepIndex, setStepIndex] = React.useState(1);
 
   const {
+    hasPaymentParams,
     currency,
     amount,
     type,
@@ -148,6 +149,7 @@ const AiPaywallCompletePage = ({
   } = React.useMemo(() => {
     if (typeof window === "undefined") {
       return {
+        hasPaymentParams: false,
         currency: "USD",
         amount: AI_PAYWALL_START_AMOUNT,
         type: "",
@@ -165,6 +167,9 @@ const AiPaywallCompletePage = ({
     const urlParams = new URLSearchParams(window.location.search);
     const parsedAmount = Number(urlParams.get("amount"));
     return {
+      hasPaymentParams:
+        urlParams.has("amount") &&
+        (urlParams.has("type") || urlParams.has("service")),
       currency: urlParams.get("currency") || "USD",
       amount: parsedAmount > 0 ? parsedAmount : AI_PAYWALL_START_AMOUNT,
       type: urlParams.get("type") || "",
@@ -215,6 +220,17 @@ const AiPaywallCompletePage = ({
   React.useEffect(() => {
     if (hasStartedRef.current) return;
     hasStartedRef.current = true;
+
+    if (!hasPaymentParams) {
+      window.location.replace(WALLET_REDIRECT_URL);
+      return;
+    }
+
+    window.history.replaceState(
+      window.history.state,
+      "",
+      window.location.pathname,
+    );
 
     const run = async () => {
       try {
