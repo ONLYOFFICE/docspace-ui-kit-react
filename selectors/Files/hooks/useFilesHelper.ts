@@ -55,7 +55,11 @@ import useInputItemHelper from "../../utils/hooks/useInputItemHelper";
 import { SettingsContext } from "../../utils/contexts/Settings";
 import { LoadersContext } from "../../utils/contexts/Loaders";
 
-import { PAGE_COUNT } from "../../utils/constants";
+import {
+  PAGE_COUNT,
+  FORMS_ROOT_FOLDER_TYPE,
+  FORMS_SECTION_ID,
+} from "../../utils/constants";
 import type { UseFilesHelpersProps } from "../FilesSelector.types";
 import {
   convertFilesToItems,
@@ -392,9 +396,9 @@ const useFilesHelper = ({
             const insertIndex = breadCrumbs.findIndex((bc) => +bc.id === 0) + 1;
             breadCrumbs.splice(insertIndex, 0, {
               label: t("Forms"),
-              id: "forms-section",
+              id: FORMS_SECTION_ID,
               isRoom: true,
-              rootFolderType: FolderType.FillingFormsRoom,
+              rootFolderType: FORMS_ROOT_FOLDER_TYPE as FolderType,
             });
           }
 
