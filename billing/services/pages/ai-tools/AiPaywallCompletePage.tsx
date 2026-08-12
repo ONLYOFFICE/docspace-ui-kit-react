@@ -288,6 +288,18 @@ const AiPaywallCompletePage = ({
     run();
   }, []);
 
+  React.useEffect(() => {
+    if (status !== "processing") return undefined;
+
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [status]);
+
   const serviceRedirectUrl = service.includes(AI_SEARCH)
     ? "/billing/addons/ai-search"
     : service.includes(DISK_STORAGE)
