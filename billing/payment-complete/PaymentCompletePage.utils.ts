@@ -68,9 +68,10 @@ export type TFlavorContent = {
   successTitle: string;
   successHint: string;
   successButtonLabel: string;
-  errorTitle: string;
-  errorHint: string;
-  errorButtonLabel: string;
+  /** set only when the flavor needs texts different from the wallet ones */
+  errorTitle?: string;
+  errorHint?: string;
+  errorButtonLabel?: string;
   redirectUrl: string;
 };
 
@@ -152,9 +153,6 @@ export const getFlavorContent = (
         successTitle: t("Common:PlanActivated", { planName: plan }),
         successHint: t("Common:WalletTopUpCallbackSuccessHint"),
         successButtonLabel: t("Common:GoToTariffPlan"),
-        errorTitle: t("Common:WalletTopUpErrorTitle"),
-        errorHint: t("Common:WalletTopUpCallbackErrorHint"),
-        errorButtonLabel: t("Common:WalletTopUpErrorRetry"),
         redirectUrl: TARIFF_REDIRECT_URL,
       };
     case PaymentFlavor.DocsConnect:
@@ -178,9 +176,6 @@ export const getFlavorContent = (
         successTitle: t("Common:BackupPaywallCallbackSuccess"),
         successHint: t("Common:WalletTopUpCallbackSuccessHint"),
         successButtonLabel: t("Common:GoToAddon"),
-        errorTitle: t("Common:WalletTopUpErrorTitle"),
-        errorHint: t("Common:WalletTopUpCallbackErrorHint"),
-        errorButtonLabel: t("Common:WalletTopUpErrorRetry"),
         redirectUrl: BACKUP_REDIRECT_URL,
       };
     case PaymentFlavor.Ai:
@@ -191,9 +186,6 @@ export const getFlavorContent = (
         successTitle: t("Common:AIPaywallCallbackActivated"),
         successHint: t("Common:WalletTopUpCallbackSuccessHint"),
         successButtonLabel: t("Common:GoToAddon"),
-        errorTitle: t("Common:WalletTopUpErrorTitle"),
-        errorHint: t("Common:WalletTopUpCallbackErrorHint"),
-        errorButtonLabel: t("Common:WalletTopUpErrorRetry"),
         redirectUrl: service.includes(AI_SEARCH)
           ? AI_SEARCH_REDIRECT_URL
           : AI_SERVICES_REDIRECT_URL,
@@ -208,9 +200,6 @@ export const getFlavorContent = (
         successTitle: t("Common:StoragePaywallCallbackSuccess"),
         successHint: t("Common:WalletTopUpCallbackSuccessHint"),
         successButtonLabel: t("Common:GoToAddon"),
-        errorTitle: t("Common:WalletTopUpErrorTitle"),
-        errorHint: t("Common:WalletTopUpCallbackErrorHint"),
-        errorButtonLabel: t("Common:WalletTopUpErrorRetry"),
         redirectUrl: DISK_STORAGE_REDIRECT_URL,
       };
     default:
@@ -221,9 +210,6 @@ export const getFlavorContent = (
         successTitle: t("Common:WalletTopUpSuccessTitle"),
         successHint: t("Common:WalletTopUpCallbackSuccessHint"),
         successButtonLabel: t("Common:WalletTopUpGoToWallet"),
-        errorTitle: t("Common:WalletTopUpErrorTitle"),
-        errorHint: t("Common:WalletTopUpCallbackErrorHint"),
-        errorButtonLabel: t("Common:WalletTopUpErrorRetry"),
         redirectUrl: WALLET_REDIRECT_URL,
       };
   }

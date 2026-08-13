@@ -94,14 +94,13 @@ type PaymentCompletePageProps = {
   docsConnectUrl?: string;
 };
 
-const PaymentCompletePage = ({
-  docsConnectUrl,
-}: PaymentCompletePageProps) => {
+const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
   const t = useCommonTranslation();
   const { paymentApi } = useApi();
 
   const [status, setStatus] = React.useState<Status>("processing");
   const [stepIndex, setStepIndex] = React.useState(1);
+  const [isActivationError, setIsActivationError] = React.useState(false);
 
   const {
     hasPaymentParams,
@@ -189,13 +188,13 @@ const PaymentCompletePage = ({
     );
 
     const run = async () => {
+      window.dataLayer = window.dataLayer || [];
+
+      window.dataLayer.push({
+        event: AnalyticsEvents.AddPaymentMethod,
+      });
+
       try {
-        window.dataLayer = window.dataLayer || [];
-
-        window.dataLayer.push({
-          event: AnalyticsEvents.AddPaymentMethod,
-        });
-
         await withRetry(
           () =>
             paymentApi.topUpDeposit({
@@ -204,14 +203,22 @@ const PaymentCompletePage = ({
           TOPUP_RETRY_ATTEMPTS,
           TOPUP_RETRY_DELAY_MS,
         );
+      } catch (e) {
+        console.error("[paywall callback] top-up failed", e);
+        toastr.error(e as Error);
+        setStatus("error");
+        return;
+      }
 
-        window.dataLayer.push({
-          event: AnalyticsEvents.WalletTopUp,
-        });
+      window.dataLayer.push({
+        event: AnalyticsEvents.WalletTopUp,
+      });
 
-        setStepIndex(2);
+      setStepIndex(2);
 
-        const walletServicesToActivate = resolveWalletServicesToActivate(service);
+      try {
+        const walletServicesToActivate =
+          resolveWalletServicesToActivate(service);
 
         for (const walletService of walletServicesToActivate) {
           await paymentApi.changeTenantWalletServiceState({
@@ -249,15 +256,17 @@ const PaymentCompletePage = ({
 
           setStepIndex(3);
         }
-
-        await new Promise((resolve) => setTimeout(resolve, 700));
-
-        setStatus("success");
       } catch (e) {
-        console.error("[paywall callback] top-up failed", e);
+        console.error("[paywall callback] activation failed", e);
         toastr.error(e as Error);
+        setIsActivationError(true);
         setStatus("error");
+        return;
       }
+
+      await new Promise((resolve) => setTimeout(resolve, 700));
+
+      setStatus("success");
     };
 
     run();
@@ -326,12 +335,23 @@ const PaymentCompletePage = ({
         ) : null}
 
         {status === "error" ? (
-          <ErrorCard
-            title={pageContent.errorTitle}
-            hint={pageContent.errorHint}
-            buttonLabel={pageContent.errorButtonLabel}
-            onGoToServiceClick={onGoToBillingClick}
-          />
+          isActivationError ? (
+            <ErrorCard
+              title={t("AddonActivationFailed")}
+              hint={t("AddonActivationFailedHint")}
+              buttonLabel={t("TryAgainInAddon")}
+              onGoToServiceClick={onGoToBillingClick}
+            />
+          ) : (
+            <ErrorCard
+              title={pageContent.errorTitle ?? t("WalletTopUpErrorTitle")}
+              hint={pageContent.errorHint ?? t("WalletTopUpCallbackErrorHint")}
+              buttonLabel={
+                pageContent.errorButtonLabel ?? t("WalletTopUpErrorRetry")
+              }
+              onGoToServiceClick={onGoToBillingClick}
+            />
+          )
         ) : null}
       </div>
     </div>
