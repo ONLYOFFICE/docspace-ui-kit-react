@@ -350,15 +350,11 @@ const Services = observer(
       await applyServiceStateChange(confirmActionType, !isCurrentConfirmState);
     };
 
-    const onFirstTopUpConfirmed = async () => {
+    const onFirstTopUpConfirmed = () => {
       if (!confirmActionType) return;
 
-      if (confirmActionType !== BACKUP_SERVICE) {
-        updateDialogVisibility(confirmActionType, true);
-        return;
-      }
-
-      await applyServiceStateChange(confirmActionType, !isCurrentConfirmState);
+      const route = getServiceRoute(paymentStore.routes, confirmActionType);
+      if (route) navigate(route);
     };
 
     const onCloseAiService = () => {
