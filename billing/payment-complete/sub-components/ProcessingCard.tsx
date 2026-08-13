@@ -88,11 +88,16 @@ const ProcessingCard = ({
     </span>
   ) : null;
 
-  const steps: { key: string; label: React.ReactNode }[] = [
+  const steps: {
+    key: string;
+    label: React.ReactNode;
+    doneLabel?: React.ReactNode;
+  }[] = [
     { key: "card", label: t("WalletTopUpStepCardSaved") },
     {
       key: "topup",
       label: t("WalletTopUpCallbackStep", { price: topUpPrice }),
+      doneLabel: t("WalletTopUpCallbackStepDone", { price: topUpPrice }),
     },
     ...(tariffStep
       ? [{ key: "tariff", label: tariffStep }]
@@ -157,7 +162,9 @@ const ProcessingCard = ({
                 fontSize="14px"
                 fontWeight={700}
               >
-                {step.label}
+                {state === "done" && step.doneLabel
+                  ? step.doneLabel
+                  : step.label}
               </Text>
             </li>
           );
