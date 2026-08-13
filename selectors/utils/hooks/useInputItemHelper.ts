@@ -41,6 +41,7 @@ import { useApi } from "../../../providers/api/ApiProvider";
 import type { TSelectorItem } from "../../../components/selector";
 import { toastr } from "../../../components/toast";
 
+import { convertFoldersToItems, convertRoomsToItems } from "..";
 import type { TUseInputItemHelper } from "../types";
 
 const useInputItemHelper = ({
@@ -79,27 +80,62 @@ const useInputItemHelper = ({
       if (!withCreate || (!currentSelectedItemId && !roomType && !isAgent))
         return;
 
+      let createdItem: TSelectorItem | undefined;
+
       try {
         // if (isAgent) await createAIAgent({ title: value });
         // NOTE: currentSelectedItemId can be string but types cannot be fixed right now, using type assertion
-        if (currentSelectedItemId)
-          await foldersApi.createFolder({
+        if (currentSelectedItemId) {
+          const res = await foldersApi.createFolder({
             folderId: Number(currentSelectedItemId),
             createFolder: {
               title: value.trimEnd(),
             },
           });
-        else if (roomType) {
-          await roomsApi.createRoom({
+
+          const created = res.data?.response;
+
+          if (created) [createdItem] = convertFoldersToItems([created], []);
+        } else if (roomType) {
+          const res = await roomsApi.createRoom({
             createRoomRequestDto: { roomType, title: value },
           });
+
+          const created = res.data?.response;
+
+          if (created) [createdItem] = convertRoomsToItems([created]);
         }
       } catch (e) {
         console.log(e);
         toastr.error(e as string);
+        // Drop the input row so it does not hang after a failed request.
+        onCancelInput();
+        return;
       }
+
+      // The socket "folder created" event replaces the input row, but it only
+      // arrives for the folder the selector is subscribed to. At a root
+      // (e.g. the rooms root) there is no subscription, so reconcile locally.
+      // Keyed by id, so the socket handler winning the race is a no-op.
+      setItems?.((value) => {
+        const idx = value.findIndex((item) => item.isInputItem);
+
+        if (idx === -1) return value;
+
+        const newValue = [...value];
+
+        if (!createdItem || value.some((item) => item.id === createdItem!.id)) {
+          newValue.splice(idx, 1);
+
+          return newValue;
+        }
+
+        newValue.splice(idx, 1, createdItem);
+
+        return newValue;
+      });
     },
-    [withCreate, foldersApi, roomsApi],
+    [withCreate, foldersApi, roomsApi, setItems, onCancelInput],
   );
 
   const addInputItem = React.useCallback(
