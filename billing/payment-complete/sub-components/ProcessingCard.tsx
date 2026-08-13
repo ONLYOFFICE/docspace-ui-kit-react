@@ -35,14 +35,14 @@
 
 import React from "react";
 
-import { useCommonTranslation } from "../../../../../utils/i18n";
-import { Text } from "../../../../../components/text";
-import { Loader, LoaderTypes } from "../../../../../components/loader";
+import { useCommonTranslation } from "../../../utils/i18n";
+import { Text } from "../../../components/text";
+import { Loader, LoaderTypes } from "../../../components/loader";
 
-import CheckIcon from "../../../../../assets/check.edit.react.svg";
-import InfoIcon from "../../../../../assets/info.outline.react.svg";
+import CheckIcon from "../../../assets/check.edit.react.svg";
+import InfoIcon from "../../../assets/info.outline.react.svg";
 
-import styles from "../AiPaywallCompletePage.module.scss";
+import styles from "../PaymentCompletePage.module.scss";
 
 type TTariffActivation = {
   plan: string;

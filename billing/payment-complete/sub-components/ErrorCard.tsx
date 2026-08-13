@@ -35,12 +35,12 @@
 
 import React from "react";
 
-import { Text } from "../../../../../components/text";
-import { Button, ButtonSize } from "../../../../../components/button";
+import { Text } from "../../../components/text";
+import { Button, ButtonSize } from "../../../components/button";
 
-import XIcon from "../../../../../assets/x.alert.react.svg";
+import XIcon from "../../../assets/x.alert.react.svg";
 
-import styles from "../AiPaywallCompletePage.module.scss";
+import styles from "../PaymentCompletePage.module.scss";
 
 type ErrorCardProps = {
   title: string;

@@ -37,28 +37,28 @@ import React from "react";
 
 import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 
-import { useCommonTranslation } from "../../../../utils/i18n";
-import { Text } from "../../../../components/text";
-import { Loader, LoaderTypes } from "../../../../components/loader";
-import { useApi } from "../../../../providers";
+import { useCommonTranslation } from "../../utils/i18n";
+import { Text } from "../../components/text";
+import { Loader, LoaderTypes } from "../../components/loader";
+import { useApi } from "../../providers";
 
 import {
   AI_PAYWALL_START_AMOUNT,
   DOCS_CONNECT_PRODUCT,
   DOCS_CONNECT_DEVPACK_PRODUCT,
-} from "../../../constants";
-import { formatCurrencyValue } from "../../../utils/common";
+} from "../constants";
+import { formatCurrencyValue } from "../utils/common";
 
-import styles from "./AiPaywallCompletePage.module.scss";
-import { toastr } from "../../../../components/toast";
-import { AnalyticsEvents } from "../../../../enums";
+import styles from "./PaymentCompletePage.module.scss";
+import { toastr } from "../../components/toast";
+import { AnalyticsEvents } from "../../enums";
 import {
   getFlavorContent,
   resolveDocsConnectParams,
   resolveFlavor,
   resolveWalletService,
   WALLET_REDIRECT_URL,
-} from "./AiPaywallCompletePage.utils";
+} from "./PaymentCompletePage.utils";
 import ProcessingCard from "./sub-components/ProcessingCard";
 import SuccessCard from "./sub-components/SuccessCard";
 import ErrorCard from "./sub-components/ErrorCard";
@@ -90,13 +90,13 @@ const withRetry = async <T,>(
   throw lastError;
 };
 
-type AiPaywallCompletePageProps = {
+type PaymentCompletePageProps = {
   docsConnectUrl?: string;
 };
 
-const AiPaywallCompletePage = ({
+const PaymentCompletePage = ({
   docsConnectUrl,
-}: AiPaywallCompletePageProps) => {
+}: PaymentCompletePageProps) => {
   const t = useCommonTranslation();
   const { paymentApi } = useApi();
 
@@ -338,5 +338,5 @@ const AiPaywallCompletePage = ({
   );
 };
 
-export default AiPaywallCompletePage;
+export default PaymentCompletePage;
 

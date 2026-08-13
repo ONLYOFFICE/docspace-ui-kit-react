@@ -35,7 +35,7 @@
 
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 
-import type { TTranslation } from "../../../../utils/common";
+import type { TTranslation } from "../../utils/common";
 
 import {
   AI_SEARCH,
@@ -43,7 +43,7 @@ import {
   DISK_STORAGE,
   DOCS_CONNECT,
   DOCS_CONNECT_ROUTE,
-} from "../../../constants";
+} from "../constants";
 
 export const AI_SERVICES_REDIRECT_URL = "/billing/addons/ai-services";
 export const AI_SEARCH_REDIRECT_URL = "/billing/addons/ai-search";

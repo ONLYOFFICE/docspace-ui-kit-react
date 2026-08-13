@@ -35,17 +35,17 @@
 
 import React from "react";
 
-import { useCommonTranslation } from "../../../../../utils/i18n";
-import { Text } from "../../../../../components/text";
-import { Button, ButtonSize } from "../../../../../components/button";
-import { Link, LinkType, LinkTarget } from "../../../../../components/link";
+import { useCommonTranslation } from "../../../utils/i18n";
+import { Text } from "../../../components/text";
+import { Button, ButtonSize } from "../../../components/button";
+import { Link, LinkType, LinkTarget } from "../../../components/link";
 
-import CheckIcon from "../../../../../assets/check.edit.react.svg";
+import CheckIcon from "../../../assets/check.edit.react.svg";
 
-import BalanceAmount from "../../../../shared/balance-amount";
+import BalanceAmount from "../../shared/balance-amount";
 
-import { PaymentFlavor } from "../AiPaywallCompletePage.utils";
-import styles from "../AiPaywallCompletePage.module.scss";
+import { PaymentFlavor } from "../PaymentCompletePage.utils";
+import styles from "../PaymentCompletePage.module.scss";
 
 type SuccessCardProps = {
   flavor: PaymentFlavor;
