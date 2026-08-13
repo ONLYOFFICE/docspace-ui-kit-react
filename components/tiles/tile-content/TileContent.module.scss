@@ -53,7 +53,7 @@
 }
 
 .mainContainer {
-  height: 20px;
+  min-height: 20px;
   width: inherit;
 
   @include mixins.tablet {

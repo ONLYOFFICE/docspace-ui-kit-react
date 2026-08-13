@@ -81,6 +81,8 @@ import "@onlyoffice/ai-chat/styles";
 // passes in (the section→chips logic lives in the host, not here).
 export type { Suggestion } from "@onlyoffice/ai-chat";
 
+import { toastr } from "../../components/toast";
+
 import { AiChatAvailabilityContext } from "./availability";
 import { ChatIntro } from "../chat-intro";
 import { storageAdapter } from "./storage";
@@ -396,6 +398,23 @@ const EDITOR_TOOL_NAME_BY_CHAT_TOOL: Record<string, string> = {
   docspace_generate_presentation: "generatePresentationWithTheme",
 };
 
+/**
+ * Reports a failure from one of the scope-switch reloads below. Those are
+ * deliberately not awaited (navigation must not wait on them), so their
+ * rejections have nowhere else to go: the step name is logged for support,
+ * and the user is told that the chat is showing stale data for this room —
+ * on screen it still holds the previous scope's model assignment and tools.
+ *
+ * Not a hook, so the string comes from `getCommonTranslation` (reads
+ * `window.i18n`) rather than `useCommonTranslation`.
+ */
+const logRescopeFailure = (step: string, reload: Promise<unknown>): void => {
+  void reload.catch((error: unknown) => {
+    console.error(`[ai-agent] scope switch: ${step} failed`, error);
+    toastr.error(error as Error);
+  });
+};
+
 // Illustration + tagline above the suggestion chips of an empty chat. Static
 // (it reads its own string through window.i18n), so one element is created
 // once and reused instead of being rebuilt per render.
@@ -607,11 +626,28 @@ const AiAgentProviders = ({
     threads.onSwitchToNewThread({
       keepSessionProfile: !(isAgentRoom || hideProfilePicker),
     });
-    void profiles.reloadModelAssignment();
-    void profiles.reloadExtendedThinking();
-    void servers.reload();
-    void attachments.clearAttachmentFiles();
-    void attachments.clearAttachmentImages();
+    // Fire-and-forget by design — navigation must not wait on these. Each
+    // one is a store action that rejects on a failed read, so they get an
+    // explicit handler: an unhandled rejection on every failed room switch
+    // is noise nobody can act on, and the previous scope's data staying on
+    // screen is a milder failure than the chat refusing to open.
+    logRescopeFailure(
+      "profiles:modelAssignment",
+      profiles.reloadModelAssignment(),
+    );
+    logRescopeFailure(
+      "profiles:extendedThinking",
+      profiles.reloadExtendedThinking(),
+    );
+    logRescopeFailure("servers:reload", servers.reload());
+    logRescopeFailure(
+      "attachments:clearFiles",
+      attachments.clearAttachmentFiles(),
+    );
+    logRescopeFailure(
+      "attachments:clearImages",
+      attachments.clearAttachmentImages(),
+    );
   }, [entityId, isAgentRoom, hideProfilePicker, stores]);
 
   const onDropFiles = useCallback(
