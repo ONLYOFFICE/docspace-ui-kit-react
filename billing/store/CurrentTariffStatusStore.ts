@@ -50,11 +50,8 @@ import {
   now,
 } from "../../utils/date";
 import { daysUntil } from "../utils/common";
-import {
-  DOCS_CONNECT_DEVPACK_SERVICE,
-  DOCS_CONNECT_SERVICE,
-  TOTAL_SIZE,
-} from "../constants";
+import { TOTAL_SIZE } from "../constants";
+import { isDocsConnectService } from "../utils/docs-connect";
 import type { TWalletServiceQuota } from "../types";
 
 class CurrentTariffStatusStore {
@@ -281,11 +278,7 @@ class CurrentTariffStatusStore {
           ),
         )?.id ?? null;
       this._docsConnectServiceIds = services
-        .filter(
-          (service) =>
-            service.serviceName === DOCS_CONNECT_SERVICE ||
-            service.serviceName === DOCS_CONNECT_DEVPACK_SERVICE,
-        )
+        .filter((service) => isDocsConnectService(service))
         .map((service) => service.id);
       this._walletServicesResolved = true;
     } catch {

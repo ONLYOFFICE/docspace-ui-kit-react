@@ -43,6 +43,10 @@ import { useApi } from "../../../providers/api";
 import { useCommonTranslation } from "../../../utils/i18n";
 import type { TSelectorItem } from "../../../components/selector";
 import { getDefaultBreadCrumb } from "../../utils";
+import {
+  FORMS_ROOT_FOLDER_TYPE,
+  FORMS_SECTION_ID,
+} from "../../utils/constants";
 import { LoadersContext } from "../../utils/contexts/Loaders";
 
 import CatalogDocumentsSvg from "../../../assets/icons/16/catalog.documents.react.svg";
@@ -200,9 +204,9 @@ const useRootHelper = ({
         ) {
           newItems.push({
             label: t("Forms"),
-            id: "forms-section",
+            id: FORMS_SECTION_ID,
             parentId: folder.parentId!,
-            rootFolderType: FolderType.FillingFormsRoom,
+            rootFolderType: FORMS_ROOT_FOLDER_TYPE as FolderType,
             filesCount: folder.filesCount!,
             foldersCount: folder.foldersCount!,
             security: folder.security!,

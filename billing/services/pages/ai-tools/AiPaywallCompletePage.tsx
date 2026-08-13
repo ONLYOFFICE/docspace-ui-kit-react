@@ -60,7 +60,7 @@ import {
   DISK_STORAGE,
   DOCS_CONNECT,
   DOCS_CONNECT_ROUTE,
-  DOCS_CONNECT_SERVICE,
+  DOCS_CONNECT_PRODUCT,
   DOCS_CONNECT_DEVPACK_PRODUCT,
 } from "../../../constants";
 import { formatCurrencyValue } from "../../../utils/common";
@@ -266,7 +266,7 @@ const AiPaywallCompletePage = ({
               quantity: {
                 [withDevPack
                   ? DOCS_CONNECT_DEVPACK_PRODUCT
-                  : DOCS_CONNECT_SERVICE]: docsConnectAddUsers,
+                  : DOCS_CONNECT_PRODUCT]: docsConnectAddUsers,
               },
               productQuantityType: ProductQuantityType.Add,
             },

@@ -80,6 +80,7 @@ import {
 } from "../utils/parsers";
 import { getUsageRange } from "../usage/utils";
 import { getServiceRoute } from "../utils/url";
+import { isDocsConnectServiceName } from "../utils/docs-connect";
 import { combineUrl } from "../../utils/combineUrl";
 import { getCookie } from "../../utils/cookie";
 import { LANGUAGE } from "../../constants";
@@ -94,6 +95,8 @@ import {
   WEB_SEARCH,
   DOCS_CONNECT_SERVICE,
   DOCS_CONNECT_DEVPACK_SERVICE,
+  DOCS_CONNECT_PRODUCT,
+  DOCS_CONNECT_DEVPACK_PRODUCT,
 } from "../constants";
 import type { TTranslation } from "../../utils/common";
 import {
@@ -517,6 +520,17 @@ class PaymentStore {
     )?.serviceName;
   }
 
+  get docsConnectServiceNames(): string[] {
+    const resolve = (product: string, fallback: string) =>
+      (this.servicesQuotasFeatures.get(product) as TServiceFeatureWithPrice)
+        ?.serviceName ?? fallback;
+
+    return [
+      resolve(DOCS_CONNECT_PRODUCT, DOCS_CONNECT_SERVICE),
+      resolve(DOCS_CONNECT_DEVPACK_PRODUCT, DOCS_CONNECT_DEVPACK_SERVICE),
+    ];
+  }
+
   get backupServicePrice() {
     return (
       (
@@ -883,8 +897,8 @@ class PaymentStore {
     );
 
     const serviceNames: string | string[] | undefined =
-      serviceName === DOCS_CONNECT_SERVICE
-        ? [DOCS_CONNECT_SERVICE, DOCS_CONNECT_DEVPACK_SERVICE]
+      isDocsConnectServiceName(serviceName)
+        ? this.docsConnectServiceNames
         : serviceName;
 
     try {

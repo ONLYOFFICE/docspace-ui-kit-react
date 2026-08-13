@@ -51,14 +51,9 @@ import NoSpendingDarkIcon from "../../../assets/no.transactions.filter.dark.them
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import type { TUsagePeriodKey } from "../../types";
-import {
-  AI_TOOLS,
-  BACKUP_SERVICE,
-  DOCS_CONNECT,
-  DOCS_CONNECT_DEVPACK_SERVICE,
-  DOCS_CONNECT_SERVICE,
-} from "../../constants";
+import { AI_TOOLS, BACKUP_SERVICE } from "../../constants";
 
+import { isDocsConnectServiceName } from "../../utils/docs-connect";
 import { getServiceUsageSubLabel } from "../../utils/serviceUsage";
 import { getUsageRange } from "../utils";
 import BreakdownRow from "./BreakdownRow";
@@ -177,12 +172,7 @@ const SpendingBreakdown = ({
     if (key.includes("storage")) return onDiskStorageClick;
     if (service === BACKUP_SERVICE) return onBackupClick;
     if (service === AI_TOOLS) return onAIServicesClick;
-    if (
-      service === DOCS_CONNECT ||
-      service === DOCS_CONNECT_SERVICE ||
-      service === DOCS_CONNECT_DEVPACK_SERVICE
-    )
-      return onDocsConnectClick;
+    if (isDocsConnectServiceName(service)) return onDocsConnectClick;
     return undefined;
   };
 

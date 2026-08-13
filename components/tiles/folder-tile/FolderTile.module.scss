@@ -374,9 +374,11 @@
       background: var(--tile-bg, var(--tile-background-color));
       border-radius: 0 0 var(--tile-radius, 12px) var(--tile-radius, 12px);
 
-      padding: 16px 0;
+      padding-block: 11px;
+      padding-inline: 0;
       height: 62px;
       box-sizing: border-box;
+      overflow: hidden;
     }
   }
 }
