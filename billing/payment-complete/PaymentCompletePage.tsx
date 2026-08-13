@@ -56,7 +56,7 @@ import {
   getFlavorContent,
   resolveDocsConnectParams,
   resolveFlavor,
-  resolveWalletService,
+  resolveWalletServicesToActivate,
   WALLET_REDIRECT_URL,
 } from "./PaymentCompletePage.utils";
 import ProcessingCard from "./sub-components/ProcessingCard";
@@ -211,18 +211,18 @@ const PaymentCompletePage = ({
 
         setStepIndex(2);
 
-        const walletServiceToActivate = resolveWalletService(service);
+        const walletServicesToActivate = resolveWalletServicesToActivate(service);
 
-        if (walletServiceToActivate !== null) {
+        for (const walletService of walletServicesToActivate) {
           await paymentApi.changeTenantWalletServiceState({
             changeWalletServiceStateRequestDto: {
-              service: walletServiceToActivate,
+              service: walletService,
               enabled: true,
             },
           });
-
-          setStepIndex(3);
         }
+
+        if (walletServicesToActivate.length > 0) setStepIndex(3);
 
         if (admins) {
           await paymentApi.updateWalletPayment({

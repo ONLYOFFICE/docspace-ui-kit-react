@@ -88,6 +88,17 @@ export const resolveWalletService = (
   return null;
 };
 
+export const resolveWalletServicesToActivate = (
+  service: string,
+): TenantWalletService[] => {
+  const walletService = resolveWalletService(service);
+
+  if (walletService === null) return [];
+  if (walletService === AI_SEARCH_WALLET_SERVICE)
+    return [TenantWalletService.AITools, walletService];
+  return [walletService];
+};
+
 export const resolveDocsConnectParams = ({
   service,
   users,
