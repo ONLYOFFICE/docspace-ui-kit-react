@@ -279,36 +279,6 @@ const AiPaywallCompletePage = ({
     window.location.href = pageContent.redirectUrl;
   };
 
-  const tariffStep =
-    admins && storage ? (
-      <span className={styles.tariffActivation}>
-        <Text as="span" fontSize="14px" fontWeight={700}>
-          {t("ActivatingPlan", { planName: plan })}
-        </Text>
-        <Text
-          as="span"
-          fontSize="12px"
-          fontWeight={400}
-          className={styles.tariffActivationDetails}
-        >
-          {t("TariffActivationDetails", { admins, storage })}
-        </Text>
-      </span>
-    ) : null;
-
-  const steps: { key: string; label: React.ReactNode }[] = [
-    { key: "card", label: t("WalletTopUpStepCardSaved") },
-    {
-      key: "topup",
-      label: t("WalletTopUpCallbackStep", { price: formattedAmount }),
-    },
-    ...(tariffStep
-      ? [{ key: "tariff", label: tariffStep }]
-      : service
-        ? [{ key: "service", label: pageContent.activateStepLabel }]
-        : []),
-  ];
-
   if (!hasPaymentParams) {
     return (
       <div className={styles.page}>
@@ -327,8 +297,12 @@ const AiPaywallCompletePage = ({
           <ProcessingCard
             title={pageContent.processingTitle}
             hint={pageContent.processingHint}
-            steps={steps}
             stepIndex={stepIndex}
+            topUpPrice={formattedAmount}
+            activateStepLabel={pageContent.activateStepLabel}
+            tariffActivation={
+              admins && storage ? { plan, admins, storage } : undefined
+            }
           />
         ) : null}
 

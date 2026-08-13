@@ -44,20 +44,62 @@ import InfoIcon from "../../../../../assets/info.outline.react.svg";
 
 import styles from "../AiPaywallCompletePage.module.scss";
 
+type TTariffActivation = {
+  plan: string;
+  admins: string;
+  storage: string;
+};
+
 type ProcessingCardProps = {
   title: string;
   hint: string;
-  steps: { key: string; label: React.ReactNode }[];
   stepIndex: number;
+  topUpPrice: string;
+  activateStepLabel: string;
+  tariffActivation?: TTariffActivation;
 };
 
 const ProcessingCard = ({
   title,
   hint,
-  steps,
   stepIndex,
+  topUpPrice,
+  activateStepLabel,
+  tariffActivation,
 }: ProcessingCardProps) => {
   const t = useCommonTranslation();
+
+  const tariffStep = tariffActivation ? (
+    <span className={styles.tariffActivation}>
+      <Text as="span" fontSize="14px" fontWeight={700}>
+        {t("ActivatingPlan", { planName: tariffActivation.plan })}
+      </Text>
+      <Text
+        as="span"
+        fontSize="12px"
+        fontWeight={400}
+        className={styles.tariffActivationDetails}
+      >
+        {t("TariffActivationDetails", {
+          admins: tariffActivation.admins,
+          storage: tariffActivation.storage,
+        })}
+      </Text>
+    </span>
+  ) : null;
+
+  const steps: { key: string; label: React.ReactNode }[] = [
+    { key: "card", label: t("WalletTopUpStepCardSaved") },
+    {
+      key: "topup",
+      label: t("WalletTopUpCallbackStep", { price: topUpPrice }),
+    },
+    ...(tariffStep
+      ? [{ key: "tariff", label: tariffStep }]
+      : activateStepLabel
+        ? [{ key: "service", label: activateStepLabel }]
+        : []),
+  ];
 
   return (
     <>
