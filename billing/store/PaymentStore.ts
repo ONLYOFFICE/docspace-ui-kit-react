@@ -437,6 +437,10 @@ class PaymentStore {
     });
   }
 
+  get isStripeCheckoutRequired() {
+    return this.isCardMissingOrInactive;
+  }
+
   get needsWalletMigration() {
     return (
       !this.quotas.isFreeTariff && !this.tariff.hasTariffWalletSubscription

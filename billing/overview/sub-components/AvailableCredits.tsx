@@ -75,7 +75,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     upcomingPaymentsCurrentMonth,
   } = store;
 
-  const { isNotPaidPeriod, walletCustomerEmail } = store.tariff;
+  const { isNotPaidPeriod } = store.tariff;
 
   const nextPayment = upcomingPaymentsCurrentMonth.length
     ? [...upcomingPaymentsCurrentMonth].sort((a, b) =>
@@ -188,7 +188,6 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
-          isFirstTopUp={!walletCustomerEmail}
           recommendedAmount={recommendedAmount}
         />
       ) : null}

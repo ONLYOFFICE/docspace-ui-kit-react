@@ -100,7 +100,6 @@ const Wallet = (props: WalletProps) => {
   const {
     isNotPaidPeriod,
     walletCustomerStatusNotActive,
-    walletCustomerEmail,
   } = store.tariff;
 
   const t = useCommonTranslation();
@@ -311,7 +310,6 @@ const Wallet = (props: WalletProps) => {
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={onClose}
-          isFirstTopUp={!walletCustomerEmail}
           recommendedAmount={recommendedAmount}
         />
       ) : null}
