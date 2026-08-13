@@ -91,12 +91,15 @@ export const resolveWalletService = (
 
 export const resolveWalletServicesToActivate = (
   service: string,
+  skipAiSearch: boolean = false,
 ): TenantWalletService[] => {
   const walletService = resolveWalletService(service);
 
   if (walletService === null) return [];
   if (walletService === AI_SEARCH_WALLET_SERVICE)
     return [TenantWalletService.AITools, walletService];
+  if (walletService === TenantWalletService.AITools && !skipAiSearch)
+    return [walletService, AI_SEARCH_WALLET_SERVICE];
   return [walletService];
 };
 

@@ -441,6 +441,9 @@ const Services = observer(
             onConfirm={onFirstTopUpConfirmed}
             serviceName={topUpServiceName}
             service={topUpServiceName}
+            successParams={
+              topUpServiceName === AI_TOOLS ? { skipAiSearch: "1" } : undefined
+            }
           />
         ) : null}
         {dialogVisibility[AI_SEARCH_ENUM] ? (
@@ -463,6 +466,9 @@ const Services = observer(
             onConfirm={onConfirm}
             serviceName={topUpServiceName}
             service={topUpServiceName}
+            successParams={
+              topUpServiceName === AI_TOOLS ? { skipAiSearch: "1" } : undefined
+            }
           />
         ) : null}
       </>

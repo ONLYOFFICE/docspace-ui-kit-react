@@ -115,6 +115,7 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
     users,
     add,
     devpack,
+    skipAiSearch,
   } = React.useMemo(() => {
     if (typeof window === "undefined") {
       return {
@@ -131,6 +132,7 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
         users: "",
         add: "",
         devpack: "",
+        skipAiSearch: "",
       };
     }
 
@@ -153,6 +155,7 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
       users: urlParams.get("users") || "",
       add: urlParams.get("add") || "",
       devpack: urlParams.get("devpack") || "",
+      skipAiSearch: urlParams.get("skipAiSearch") || "",
     };
   }, []);
 
@@ -217,8 +220,10 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
       setStepIndex(2);
 
       try {
-        const walletServicesToActivate =
-          resolveWalletServicesToActivate(service);
+        const walletServicesToActivate = resolveWalletServicesToActivate(
+          service,
+          skipAiSearch === "1" || skipAiSearch === "true",
+        );
 
         for (const walletService of walletServicesToActivate) {
           await paymentApi.changeTenantWalletServiceState({
