@@ -549,7 +549,6 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
           onConfirm={onTopUpComplete}
-          isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
           recommendedAmount={paymentStore.recommendedAmount}
           serviceName={DOCS_CONNECT_SERVICE}
         />

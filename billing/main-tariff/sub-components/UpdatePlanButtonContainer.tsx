@@ -256,7 +256,6 @@ const UpdatePlanButtonContainer = ({
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
           onConfirm={isCardMissingOrInactive ? undefined : onTopUpConfirm}
-          isFirstTopUp={isCardMissingOrInactive}
           minValue={topUpShortfall > 0 ? `${topUpShortfall}` : undefined}
           successParams={{
             admins: `${managersCount}`,
