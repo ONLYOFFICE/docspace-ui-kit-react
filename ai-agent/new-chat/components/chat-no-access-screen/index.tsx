@@ -43,7 +43,6 @@ import { Text } from "../../../../components/text";
 import { useTheme } from "../../../../context/ThemeContext";
 import { match, P } from "ts-pattern";
 import { useCommonTranslation } from "../../../../utils/i18n";
-import { getBrandName } from "../../../../constants/brands";
 
 export type ChatNoAccessScreenProps = {
   aiReady: boolean;
@@ -93,7 +92,6 @@ export const ChatNoAccessScreen = ({
     // standalone admin
     .with([true, true], () =>
       t("EmptyAIAgentsAIDisabledStandaloneAdminDescription", {
-        productName: getBrandName("ProductName"),
         aiChats: t("AIChats"),
       }),
     )
@@ -109,15 +107,12 @@ export const ChatNoAccessScreen = ({
     // standalone user
     .with([true, false], () =>
       t("EmptyAIAgentsAIDisabledDescription", {
-        productName: getBrandName("ProductName"),
         aiAgents: t("AIAgents"),
       }),
     )
     // saas user
     .otherwise(() =>
-      t("EmptyAIDisabledContactAdminDesc", {
-        productName: getBrandName("ProductName"),
-      }),
+      t("EmptyAIDisabledContactAdminDesc"),
     );
 
   const goToAIProviderSettings = {

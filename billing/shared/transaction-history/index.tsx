@@ -63,7 +63,6 @@ import styles from "./styles/TransactionHistory.module.scss";
 import TableLoader from "./sub-components/TableLoader";
 import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import { getBrandName } from "../../../constants/brands";
 import { Encoder } from "../../../utils/encoder";
 import { isDocsConnectServiceName } from "../../utils/docs-connect";
 
@@ -534,9 +533,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     ? {}
     : {
         withInfo: true as const,
-        infoText: t("OnlyPortalAdminsShown", {
-          productName: getBrandName("ProductName"),
-        }),
+        infoText: t("OnlyPortalAdminsShown"),
       };
 
   const selectorComponent = isSelectorVisible ? (
@@ -556,9 +553,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
       filter={() => filter(withoutRoleFilter)}
       {...infoProps}
       emptyScreenHeader={t("NotFoundMembers")}
-      emptyScreenDescription={t("Common:PeopleSelectorInfo", {
-        productName: getBrandName("ProductName"),
-      })}
+      emptyScreenDescription={t("Common:PeopleSelectorInfo")}
     />
   ) : null;
 
