@@ -48,8 +48,12 @@ import {
 } from "../../../../components/modal-dialog";
 import { toastr } from "../../../../components/toast";
 import { useApi } from "../../../../providers";
-import { calculateTotalPrice } from "../../../utils/common";
+import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
 import { isInsufficientFundsError } from "../../../utils/insufficientFunds";
+import {
+  openStripeCheckout,
+  waitForTopUpCompletion,
+} from "../../../utils/stripe-flow";
 import {
   DISK_STORAGE,
   STORAGE_DEACTIVATION_VISITED,
@@ -96,6 +100,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     currentStoragePlanSize = 0,
     hasScheduledStorageChange,
     fetchPortalTariff,
+    fetchCustomerInfo,
+    walletCustomerEmail,
   } = paymentStore.tariff;
 
   const {
@@ -107,6 +113,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     walletBalance,
     walletCodeCurrency,
     isPayer,
+    isStripeCheckoutRequired,
+    language,
   } = paymentStore;
 
   const {
@@ -291,7 +299,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
   );
 
   const handleStoragePlanChange = useCallback(
-    async (isCancellation: boolean = false) => {
+    async (isCancellation: boolean = false, skipTopUp: boolean = false) => {
       if (isLoading) return;
 
       setIsLoading(true);
@@ -305,7 +313,14 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       const isNewSubscription = !hasStorageSubscription;
 
       try {
-        if (!isCancellation && isBalanceInsufficient && recommendedAmount > 0) {
+        // skipTopUp: the Stripe checkout callback has already deposited the
+        // required amount, re-depositing here would charge the card twice.
+        if (
+          !isCancellation &&
+          !skipTopUp &&
+          isBalanceInsufficient &&
+          recommendedAmount > 0
+        ) {
           await paymentApi.topUpDeposit({
             topUpDepositRequestDto: {
               amount: recommendedAmount,
@@ -378,10 +393,77 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     ],
   );
 
-  const onBuy = useCallback(
-    () => handleStoragePlanChange(),
-    [handleStoragePlanChange],
-  );
+  const stripeAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      stripeAbortRef.current?.abort();
+    };
+  }, []);
+
+  const fetchCardLinkedForCheckout = (backUrl?: string, successUrl?: string) =>
+    paymentStore.fetchCardLinked(backUrl, successUrl, false);
+
+  const fetchBalanceValue = async (isRefresh?: boolean) => {
+    await fetchBalance(isRefresh);
+    return paymentStore.walletBalance ?? 0;
+  };
+
+  const fetchCustomerEmail = async (isRefresh?: boolean) => {
+    const info = await fetchCustomerInfo(isRefresh);
+    return info?.email ?? walletCustomerEmail;
+  };
+
+  const onStripeBuy = async () => {
+    if (isLoading) return;
+
+    const controller = new AbortController();
+    stripeAbortRef.current = controller;
+    const { signal } = controller;
+
+    setIsLoading(true);
+
+    try {
+      const chargeAmount =
+        recommendedAmount > 0 ? recommendedAmount : Math.ceil(totalPrice);
+
+      await openStripeCheckout(
+        {
+          walletCodeCurrency: walletCodeCurrency ?? "",
+          language: language ?? "en",
+          fetchCardLinked: fetchCardLinkedForCheckout,
+        },
+        String(chargeAmount),
+        storageServiceName ?? DISK_STORAGE,
+        {
+          storage: getConvertedSize(t, +debouncedAmount * 1024 ** 3),
+          price: String(totalPrice),
+        },
+      );
+
+      await waitForTopUpCompletion(
+        {
+          walletBalance: walletBalance ?? 0,
+          fetchCustomerInfo: fetchCustomerEmail,
+          fetchBalance: fetchBalanceValue,
+        },
+        signal,
+      );
+
+      if (signal.aborted) return;
+
+      await handleStoragePlanChange(false, true);
+    } catch (e) {
+      console.error("[storage-topup] flow failed", e);
+      if (!signal.aborted) {
+        toastr.error(t("UnexpectedError"));
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const onBuy = () =>
+    isStripeCheckoutRequired ? onStripeBuy() : handleStoragePlanChange();
 
   const onSendRequest = useCallback(() => {
     setIsRequestDialog(true);

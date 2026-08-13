@@ -63,6 +63,7 @@ export type TSimpleTopUpDeps = {
   fetchBalance: (isRefresh?: boolean) => Promise<number>;
   fetchTransactionHistory?: PaymentStore["fetchTransactionHistory"];
   walletCustomerStatusNotActive: boolean;
+  isStripeCheckoutRequired: boolean;
   language: string;
   fetchCardLinked: (
     backUrl?: string,
@@ -78,7 +79,6 @@ type SimpleTopUpDialogBaseProps = {
   visible: boolean;
   onClose: () => void;
   onConfirm?: () => Promise<void> | void;
-  isFirstTopUp?: boolean;
   recommendedAmount?: string;
   /** minimum allowed top-up; also pre-fills the input */
   minValue?: string;
@@ -98,7 +98,7 @@ const SimpleTopUpDialogContent = observer(
     visible,
     onClose,
     onConfirm,
-    isFirstTopUp,
+    isStripeCheckoutRequired,
     minValue,
     paymentApi,
     formatWalletCurrency,
@@ -130,7 +130,7 @@ const SimpleTopUpDialogContent = observer(
 
     const isDisabled = isLoading || !amount || hasError;
 
-    const isStripeFlow = isFirstTopUp || walletCustomerStatusNotActive;
+    const isStripeFlow = isStripeCheckoutRequired;
 
     const onStripeContinue = async () => {
       const controller = new AbortController();

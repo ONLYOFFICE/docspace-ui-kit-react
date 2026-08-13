@@ -233,7 +233,6 @@ const AiSearchPage = (props: AiSearchPageProps) => {
         <SimpleTopUpDialog
           visible={isTopUpVisible}
           onClose={onCloseTopUp}
-          isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
           serviceName={AI_SEARCH}
           service={AI_SEARCH}
         />

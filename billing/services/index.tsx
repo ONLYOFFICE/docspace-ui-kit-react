@@ -115,7 +115,6 @@ const Services = observer(
       changeServiceState,
       isCardLinkedToPortal,
       isAiToolsServiceOn,
-      isCardMissingOrInactive,
       storageServiceName,
       isShowPreviousStoragePlan,
     } = paymentStore;
@@ -209,6 +208,12 @@ const Services = observer(
       }
 
       if (!isCardLinkedToPortal) {
+        // Additional storage starts from the plan-size choice, not from a
+        // plain top-up: the dialog leads the payment itself.
+        if (id === TOTAL_SIZE) {
+          updateDialogVisibility(TOTAL_SIZE, true);
+          return;
+        }
         setIsFirstTopUpDialogVisible(true);
         return;
       }
@@ -229,16 +234,6 @@ const Services = observer(
       setConfirmActionType(id);
       setIsCurrentConfirmState(currentEnabled);
 
-      if (!isCardLinkedToPortal) {
-        setIsFirstTopUpDialogVisible(true);
-        return;
-      }
-
-      if (id === AI_SEARCH_ENUM && !currentEnabled && !isAiToolsServiceOn) {
-        updateDialogVisibility(AI_SEARCH_ENUM, true);
-        return;
-      }
-
       if (id === TOTAL_SIZE) {
         if (isGracePeriod) {
           setIsGracePeriodModalVisible(true);
@@ -249,6 +244,16 @@ const Services = observer(
           return;
         }
         updateDialogVisibility(TOTAL_SIZE, true);
+        return;
+      }
+
+      if (!isCardLinkedToPortal) {
+        setIsFirstTopUpDialogVisible(true);
+        return;
+      }
+
+      if (id === AI_SEARCH_ENUM && !currentEnabled && !isAiToolsServiceOn) {
+        updateDialogVisibility(AI_SEARCH_ENUM, true);
         return;
       }
 
@@ -438,7 +443,6 @@ const Services = observer(
             visible={isFirstTopUpDialogVisible}
             onClose={() => setIsFirstTopUpDialogVisible(false)}
             onConfirm={onFirstTopUpConfirmed}
-            isFirstTopUp={isCardMissingOrInactive}
             serviceName={topUpServiceName}
             service={topUpServiceName}
           />
@@ -471,3 +475,4 @@ const Services = observer(
 );
 
 export default Services;
+
