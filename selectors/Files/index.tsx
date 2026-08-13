@@ -73,6 +73,10 @@ import {
   LoadersContextProvider,
 } from "../utils/contexts/Loaders";
 import { getDefaultBreadCrumb } from "../utils";
+import {
+  FORMS_ROOT_FOLDER_TYPE,
+  FORMS_SECTION_ID,
+} from "../utils/constants";
 
 const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const {
@@ -209,7 +213,15 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     ...withInitProps,
   });
 
-  const [isFormsSection, setIsFormsSection] = React.useState(false);
+  // When the selector opens directly on the room list (isRoomsOnly), the root
+  // tree is skipped, so the Forms section can never be entered by a click.
+  // Seed it from the caller's root instead, otherwise a form opened from the
+  // Forms section would search the Rooms section and find nothing.
+  const [isFormsSection, setIsFormsSection] = React.useState(
+    () =>
+      Number(rootFolderType) === FORMS_ROOT_FOLDER_TYPE ||
+      createDefineRoomType === RoomType.FillingFormsRoom,
+  );
 
   const [recentFolder, setRecentFolder] = React.useState<
     FolderDtoInteger | undefined
@@ -426,7 +438,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             setSelectedItemType("agents");
           } else if (item.isRoom) {
             setIsFormsSection(
-              item.rootFolderType === FolderType.FillingFormsRoom,
+              Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE,
             );
             setSelectedItemType("rooms");
           } else {
@@ -506,7 +518,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
               !isAgent &&
               item.parentId === 0 &&
               (item.rootFolderType === FolderType.VirtualRooms ||
-                item.rootFolderType === FolderType.FillingFormsRoom),
+                Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE),
             isAgent: isAgent,
             roomType: item.roomType,
             shared: item.shared,
@@ -521,11 +533,11 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         if (
           item.parentId === 0 &&
           (item.rootFolderType === FolderType.VirtualRooms ||
-            item.rootFolderType === FolderType.FillingFormsRoom ||
+            Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE ||
             item.rootFolderType === FolderType.AiAgents)
         ) {
           setIsFormsSection(
-            item.rootFolderType === FolderType.FillingFormsRoom,
+            Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE,
           );
           setSelectedItemType(
             item.rootFolderType === FolderType.AiAgents ? "agents" : "rooms",

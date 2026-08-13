@@ -285,6 +285,18 @@ const extractEditorToolArray = (raw: unknown): EditorTool[] | null => {
   return null;
 };
 
+/**
+ * Logs a failure from one of the tool swaps below. Both are triggered from DOM
+ * handlers (a `message` from the editor iframe, a click on the panel's close
+ * button) that can't await them, so their rejections have nowhere else to go.
+ * The swap is best-effort: on failure the chat keeps the tool list it had.
+ */
+const logToolSwapFailure = (step: string, swap: Promise<unknown>): void => {
+  void swap.catch((error: unknown) => {
+    console.error(`[host-tool-groups] ${step} failed`, error);
+  });
+};
+
 const mountEditorDynamicTools = async (data: unknown) => {
   console.log("[host-tool-groups] mountEditorDynamicTools input:", data);
   const editorTools = extractEditorToolArray(data);
@@ -430,7 +442,10 @@ export const openEditorPanel = (fileId: number | string): void => {
       typeof event.data === "object" && event.data !== null
         ? (event.data as { data?: unknown }).data
         : undefined;
-    void mountEditorDynamicTools(payload);
+    logToolSwapFailure(
+      "mountEditorDynamicTools",
+      mountEditorDynamicTools(payload),
+    );
   };
   window.addEventListener("message", onMessage);
 
@@ -451,7 +466,10 @@ export const openEditorPanel = (fileId: number | string): void => {
   closeBtn.addEventListener("click", () => {
     cleanup();
     panel.remove();
-    void restoreFileManagementTools();
+    logToolSwapFailure(
+      "restoreFileManagementTools",
+      restoreFileManagementTools(),
+    );
     closeEditorPanelCallback?.();
   });
 

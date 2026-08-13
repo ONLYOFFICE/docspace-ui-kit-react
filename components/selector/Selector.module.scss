@@ -233,20 +233,27 @@
           color: var(--accent-main, var(--empty-view-link-color));
         }
 
-        svg path {
+        // Scoped to the link's own icon: the create drop-down is rendered
+        // inside this container, and a descendant selector would repaint
+        // every icon in it (e.g. the room type logos) with the accent color.
+        .empty-folder_container-icon svg path {
           fill: var(--accent-main, var(--empty-view-link-color)) !important;
         }
 
         &:hover:not(:active) {
           background: var(--empty-view-link-bg-color-hover);
-          & > * {
+
+          .empty-folder_container-icon,
+          .empty-folder_link {
             opacity: 0.86;
           }
         }
 
         &:active {
           background: var(--empty-view-link-bg-color-press);
-          & > * {
+
+          .empty-folder_container-icon,
+          .empty-folder_link {
             filter: brightness(90%);
           }
         }
