@@ -336,6 +336,13 @@
   }
 }
 
+.chatPanelDropText {
+  text-align: center;
+  text-wrap: pretty;
+  font-size: 16px;
+  font-weight: 700;
+}
+
 .spacer {
   display: none;
   min-height: var(--section-mobile-footer-height, 64px);

@@ -82,7 +82,7 @@ const ChatPanel = ({
       {children}
       {dropTargetLabel ? (
         <div className={styles.chatPanelDropOverlay}>
-          <Text fontSize="16px" fontWeight={700} noSelect>
+          <Text className={styles.chatPanelDropText} noSelect>
             {dropTargetLabel}
           </Text>
         </div>
