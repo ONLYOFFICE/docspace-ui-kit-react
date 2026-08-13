@@ -177,7 +177,7 @@ export const getFlavorContent = (
         activateStepLabel: t("Common:BackupPaywallCallbackStepActivate"),
         successTitle: t("Common:BackupPaywallCallbackSuccess"),
         successHint: t("Common:WalletTopUpCallbackSuccessHint"),
-        successButtonLabel: t("Common:BackupTopUpGoToBackup"),
+        successButtonLabel: t("Common:GoToService"),
         errorTitle: t("Common:WalletTopUpErrorTitle"),
         errorHint: t("Common:WalletTopUpCallbackErrorHint"),
         errorButtonLabel: t("Common:WalletTopUpErrorRetry"),
