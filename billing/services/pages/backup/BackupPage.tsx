@@ -88,7 +88,6 @@ const BackupPage: React.FC<BackupPageProps> = ({
     isBackupServiceOn,
     isServiceActionDisabled,
     language,
-    isCardMissingOrInactive,
   } = paymentStore;
 
   const { isFreeTariff, maxFreeBackups } = paymentStore.quotas;
@@ -348,7 +347,6 @@ const BackupPage: React.FC<BackupPageProps> = ({
         <SimpleTopUpDialog
           visible={isTopUpVisible}
           onClose={onCloseTopUpModal}
-          isFirstTopUp={isCardMissingOrInactive}
           serviceName={BACKUP_SERVICE}
         />
       ) : null}

@@ -96,7 +96,6 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     isShowStorageTariffDeactivatedModal,
     setStorageDeactivationVisited,
     isServiceActionDisabled,
-    isCardMissingOrInactive,
     isShowPreviousStoragePlan,
   } = paymentStore;
 
@@ -479,7 +478,6 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
-          isFirstTopUp={isCardMissingOrInactive}
           serviceName={storageServiceName ?? DISK_STORAGE}
         />
       ) : null}
