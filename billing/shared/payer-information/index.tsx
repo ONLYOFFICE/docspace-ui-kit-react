@@ -50,7 +50,6 @@ import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useApi } from "../../../providers";
 import { Encoder } from "../../../utils/encoder";
 import styles from "./PayerInformation.module.scss";
-import { getBrandName } from "../../../constants/brands";
 
 const PayerInformation = () => {
   const store = usePaymentStore();
@@ -103,21 +102,13 @@ const PayerInformation = () => {
   const unknownPayerDescription = () => {
     if (isNotPaidPeriod) {
       return isOwner
-        ? t("UnknownPayerOwnerUnpaid", {
-            productName: getBrandName("ProductName"),
-          })
-        : t("UnknownPayerAdminUnpaid", {
-            productName: getBrandName("ProductName"),
-          });
+        ? t("UnknownPayerOwnerUnpaid")
+        : t("UnknownPayerAdminUnpaid");
     }
 
     return isOwner
-      ? t("UnknownPayerForOwner", {
-          productName: getBrandName("ProductName"),
-        })
-      : t("UnknownPayerForAdmin", {
-          productName: getBrandName("ProductName"),
-        });
+      ? t("UnknownPayerForOwner")
+      : t("UnknownPayerForAdmin");
   };
 
   const unknownPayerInformation = (

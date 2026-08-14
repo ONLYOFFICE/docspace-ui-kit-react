@@ -147,14 +147,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
             <Text isBold>{t("ManagerTypesDescription")}</Text>
             <br />
             <Text isBold>
-              {t("PortalAdmin", {
-                productName: getBrandName("ProductName"),
-              })}
+              {t("PortalAdmin")}
             </Text>
             <Text>
-              {t("AdministratorDescription", {
-                productName: getBrandName("ProductName"),
-              })}
+              {t("AdministratorDescription")}
             </Text>
             <br />
             <Text isBold>{t("RoomAdmin")}</Text>

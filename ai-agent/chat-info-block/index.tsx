@@ -44,7 +44,6 @@ import { Loader, LoaderTypes } from "../../components/loader";
 
 import styles from "./ChatInfoBlock.module.scss";
 import { useCommonTranslation } from "../../utils/i18n";
-import { getBrandName } from "../../constants/brands";
 
 export type ChatInfoBlockProps = {
   standalone: boolean;
@@ -78,9 +77,7 @@ export const ChatInfoBlock = ({
   const bodyText = match([standalone, isPortalAdmin])
     // standalone admin
     .with([true, true], () =>
-      t("AIDisabledInfoBlockStandaloneDescription", {
-        productName: getBrandName("ProductName"),
-      }),
+      t("AIDisabledInfoBlockStandaloneDescription"),
     )
     // saas admin
     .with([false, true], () => (
@@ -118,9 +115,7 @@ export const ChatInfoBlock = ({
     ))
     // standalone/saas user
     .otherwise(() =>
-      t("AIDisabledInfoBlockContactAdminDescription", {
-        productName: getBrandName("ProductName"),
-      }),
+      t("AIDisabledInfoBlockContactAdminDescription"),
     );
 
   return (
