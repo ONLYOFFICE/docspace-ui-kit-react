@@ -74,7 +74,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     wasFirstTopUp,
     language,
     formatWalletCurrency,
-    upcomingPaymentsCurrentMonth,
+    upcomingPayments,
   } = store;
 
   const { isNotPaidPeriod } = store.tariff;
@@ -82,12 +82,9 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
   const toDueDay = (dueDate: string) =>
     DateTime.fromISO(dueDate).setZone(getAppTimezone()).toISODate();
 
-  const sortedUpcoming = [...upcomingPaymentsCurrentMonth].sort(
-    (a, b) => Date.parse(a.dueDate) - Date.parse(b.dueDate),
-  );
-  const nextPayment = sortedUpcoming[0];
+  const nextPayment = upcomingPayments[0];
   const nextDueDay = nextPayment && toDueDay(nextPayment.dueDate);
-  const nextPaymentsTotal = sortedUpcoming
+  const nextPaymentsTotal = upcomingPayments
     .filter((item) => toDueDay(item.dueDate) === nextDueDay)
     .reduce((sum, item) => sum + item.amount, 0);
   const topUpShortfall = nextPayment ? nextPaymentsTotal - walletBalance : 0;
