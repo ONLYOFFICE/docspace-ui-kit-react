@@ -73,7 +73,8 @@ const BODY_DESCRIPTION_TEXT_HEIGHT = 32;
 const SELECT_ALL_HEIGHT = 61;
 const FOOTER_HEIGHT = 73;
 const FOOTER_WITH_NEW_NAME_HEIGHT = 145;
-const FOOTER_WITH_CHECKBOX_HEIGHT = 181;
+const FOOTER_WITH_CHECKBOX_HEIGHT = 110;
+const FOOTER_WITH_NEW_NAME_AND_CHECKBOX_HEIGHT = 181;
 const ERROR_FOOTER_HEIGHT = 20;
 
 const Body = ({
@@ -283,8 +284,10 @@ const Body = ({
   if (descriptionText) listHeight -= BODY_DESCRIPTION_TEXT_HEIGHT;
 
   const getFooterHeight = () => {
-    if (withErrorFooter && withFooterCheckbox && withFooterInput)
-      return FOOTER_WITH_CHECKBOX_HEIGHT + ERROR_FOOTER_HEIGHT;
+    if (withFooterCheckbox && withFooterInput)
+      return withErrorFooter
+        ? FOOTER_WITH_NEW_NAME_AND_CHECKBOX_HEIGHT + ERROR_FOOTER_HEIGHT
+        : FOOTER_WITH_NEW_NAME_AND_CHECKBOX_HEIGHT;
     if (withFooterCheckbox) return FOOTER_WITH_CHECKBOX_HEIGHT;
     if (withFooterInput) return FOOTER_WITH_NEW_NAME_HEIGHT;
     return FOOTER_HEIGHT;
