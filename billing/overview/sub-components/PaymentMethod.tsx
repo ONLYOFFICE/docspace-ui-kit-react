@@ -34,6 +34,7 @@
  */
 
 import { observer } from "mobx-react";
+import classNames from "classnames";
 
 import { Text } from "../../../components/text";
 import { Link } from "../../../components/link";
@@ -120,7 +121,7 @@ const PaymentMethod = ({ onManagePaymentMethod }: PaymentMethodProps) => {
       </div>
 
       {!isCardLinkedToPortal ? (
-        <div className={styles.emptyState}>
+        <div className={classNames(styles.emptyState, styles.cardBody)}>
           <div className={styles.emptyContent}>
             <Text
               fontSize="12px"
@@ -135,7 +136,7 @@ const PaymentMethod = ({ onManagePaymentMethod }: PaymentMethodProps) => {
           </div>
         </div>
       ) : (
-        <div className={styles.pmSection}>
+        <div className={classNames(styles.pmSection, styles.cardBody)}>
           <div className={styles.pmRow}>
             <CardIcon className={styles.pmCardIcon} />
             <div className={styles.pmInfo}>

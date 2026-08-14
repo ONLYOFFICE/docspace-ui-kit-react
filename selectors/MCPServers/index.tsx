@@ -227,7 +227,6 @@ const MCPServersSelector = ({
       })}
       emptyScreenDescription={t("NoMCPServersDescription", {
         mcpServers: t("MCPSettingTitle"),
-        productName: getBrandName("ProductName"),
         aiAgent: t("AIAgent"),
       })}
       searchEmptyScreenImage={

@@ -88,7 +88,7 @@ const UpcomingPayments = ({ onUpcomingDetails }: UpcomingPaymentsProps) => {
               {t("NoUpcomingPayments")}
             </Text>
             <Text fontSize="12px" className={styles.mutedTitle}>
-              {t("NoUpcomingPaymentsDesc")}
+              {t("NoUpcomingPaymentsDescription")}
             </Text>
           </div>
         </div>
