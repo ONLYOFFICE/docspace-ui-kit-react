@@ -600,32 +600,61 @@ const AiAgentProviders = ({
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
   }, [isStandalone, platform]);
 
+  // Whether the PREVIOUS scope was an agent room — needed to tell a real
+  // thread-scope change from plain folder navigation (see the effect below).
+  // Updated only by that effect, so between entityId changes it holds the
+  // agent-ness of the scope the chat currently shows.
+  const wasAgentRoomRef = useRef(isAgentRoom);
+
   // Live re-scope on entityId changes (room navigation, agent pick): the
   // bundle — and everything not scope-bound (profiles list, servers UI,
   // router page) — stays intact; only what the scope owns is reloaded.
   // Threads re-init themselves through `WidgetConfig.entityId` (the
   // useThread hydration effect), so they are not touched here.
   useEffect(() => {
-    if (stores.getEntityId() === entityId) return;
+    if (stores.getEntityId() === entityId) {
+      // Same scope, but the host may have (re)resolved its agent-ness after
+      // the id (folder data loads progressively) — keep the ref in sync so
+      // the NEXT navigation compares against the correct previous state.
+      wasAgentRoomRef.current = isAgentRoom;
+      return;
+    }
     stores.setEntityId(entityId);
+
+    const wasAgentRoom = wasAgentRoomRef.current;
+    wasAgentRoomRef.current = isAgentRoom;
 
     const profiles = stores.useProfilesStore.getState();
     const threads = stores.useThreadsStore.getState();
     const servers = stores.useServersStore.getState();
     const attachments = stores.useAttachmentsStore.getState();
 
-    // A scope switch right after an explicit picker selection (agent pick
-    // sets the aliased profile, plain pick sets the profile itself) must
-    // not wipe that selection — the default reset runs AFTER the alias
-    // bridge and would drop it. Reset the session so the room's own
-    // assignment wins whenever the host fixes the model for the scope:
-    // either an agent room (`isAgentRoom` — its picker may still be shown as
-    // a read-only label or an editable combo) or a fully hidden picker
-    // (`hideProfilePicker`, kept as a fallback so callers that hide the
-    // picker keep the pre-`isAgentRoom` reset behavior).
-    threads.onSwitchToNewThread({
-      keepSessionProfile: !(isAgentRoom || hideProfilePicker),
-    });
+    // Thread storage knows only two scopes — an agent room or the global
+    // area (the backend folds every non-agent entityId to global). So plain
+    // navigation between folders/rooms never changes which threads the chat
+    // shows, and the open conversation (including a streaming session in the
+    // side panel) must survive it: keep the thread and the composer
+    // attachments, only the send scope (`setEntityId` above) follows the
+    // location. Crossing an agent-room boundary in either direction — or
+    // between two agent rooms — is a real scope change and resets as before.
+    // `hideProfilePicker` hosts predate `isAgentRoom` and treat every
+    // entityId as an agent scope, so they keep the reset unconditionally.
+    const threadScopeChanged = wasAgentRoom || isAgentRoom || hideProfilePicker;
+
+    if (threadScopeChanged) {
+      // A scope switch right after an explicit picker selection (agent pick
+      // sets the aliased profile, plain pick sets the profile itself) must
+      // not wipe that selection — the default reset runs AFTER the alias
+      // bridge and would drop it. Reset the session so the room's own
+      // assignment wins whenever the host fixes the model for the scope:
+      // either an agent room (`isAgentRoom` — its picker may still be shown as
+      // a read-only label or an editable combo) or a fully hidden picker
+      // (`hideProfilePicker`, kept as a fallback so callers that hide the
+      // picker keep the pre-`isAgentRoom` reset behavior).
+      threads.onSwitchToNewThread({
+        keepSessionProfile: !(isAgentRoom || hideProfilePicker),
+      });
+    }
     // Fire-and-forget by design — navigation must not wait on these. Each
     // one is a store action that rejects on a failed read, so they get an
     // explicit handler: an unhandled rejection on every failed room switch
@@ -640,14 +669,16 @@ const AiAgentProviders = ({
       profiles.reloadExtendedThinking(),
     );
     logRescopeFailure("servers:reload", servers.reload());
-    logRescopeFailure(
-      "attachments:clearFiles",
-      attachments.clearAttachmentFiles(),
-    );
-    logRescopeFailure(
-      "attachments:clearImages",
-      attachments.clearAttachmentImages(),
-    );
+    if (threadScopeChanged) {
+      logRescopeFailure(
+        "attachments:clearFiles",
+        attachments.clearAttachmentFiles(),
+      );
+      logRescopeFailure(
+        "attachments:clearImages",
+        attachments.clearAttachmentImages(),
+      );
+    }
   }, [entityId, isAgentRoom, hideProfilePicker, stores]);
 
   const onDropFiles = useCallback(
