@@ -130,9 +130,13 @@
   }
 
   &.withFooterCheckbox {
-    height: 181px;
-    max-height: 181px;
-    min-height: 181px;
+    height: 110px;
+    max-height: 110px;
+    min-height: 110px;
+
+    :global(.selector_footer-checkbox) {
+      padding: 17px 0 1px;
+    }
   }
 
   &.defaultHeight {
