@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import type { DateTime } from "luxon";
 
@@ -58,6 +58,8 @@ import SpendAmount from "../shared/spend-amount";
 import { getUsageRange } from "./utils";
 import { toastr } from "../../components/toast";
 import styles from "./styles/Usage.module.scss";
+
+const LOADER_DELAY_MS = 500;
 
 type UsageProps = {
   /** Open the corresponding service detail page from its breakdown row. */
@@ -96,24 +98,52 @@ const Usage = ({
     "services",
   );
 
-  const loadUsage = async (nextPeriod: TUsagePeriodKey) => {
-    setIsLoading(true);
+  const loaderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestIdRef = useRef(0);
+
+  const clearLoaderTimer = () => {
+    if (loaderTimerRef.current) {
+      clearTimeout(loaderTimerRef.current);
+      loaderTimerRef.current = null;
+    }
+  };
+
+  const loadUsage = async (
+    nextPeriod: TUsagePeriodKey,
+    deferLoader = false,
+  ) => {
+    const requestId = ++requestIdRef.current;
+    clearLoaderTimer();
+
+    if (deferLoader) {
+      loaderTimerRef.current = setTimeout(
+        () => setIsLoading(true),
+        LOADER_DELAY_MS,
+      );
+    } else {
+      setIsLoading(true);
+    }
 
     try {
       await initUsageData(nextPeriod);
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) {
+        clearLoaderTimer();
+        setIsLoading(false);
+      }
     }
   };
 
   const onSelectPeriod = (nextPeriod: TUsagePeriodKey) => {
     setPeriod(nextPeriod);
-    loadUsage(nextPeriod);
+    loadUsage(nextPeriod, true);
   };
 
   useEffect(() => {
     setSavedUsagePeriod(null);
     loadUsage(period);
+
+    return clearLoaderTimer;
   }, []);
 
   const totalSpend = serviceUsage.reduce(

@@ -42,11 +42,9 @@ import { useCommonTranslation } from "../../../utils/i18n";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import { formatCompactNumber, getCurrencySymbol } from "../../utils/common";
-import { AI_TOOLS, DISK_STORAGE } from "../../constants";
+import { AI_TOOLS } from "../../constants";
 
 import styles from "../Overview.module.scss";
-
-const BYTES_IN_GB = 1024 ** 3;
 
 type ActiveAddonsProps = {
   onManageAddons?: () => void;
@@ -58,11 +56,6 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
   const { walletCodeCurrency, formatWalletCurrency, activeServices, language } =
     store;
   const { serviceUsage } = useServicesStore();
-  const {
-    maxTotalSizeByQuota,
-    maxCountManagersByQuota,
-    usedTotalStorageSizeCount,
-  } = store.quotas;
 
   const usageForService = (service: string) =>
     serviceUsage.find(
@@ -71,14 +64,6 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
         (!!u.service &&
           (service.includes(u.service) || u.service.includes(service))),
     );
-
-  const perAdminStorageBytes =
-    maxTotalSizeByQuota > 0 ? maxTotalSizeByQuota : 0;
-  const tariffStorageBytes = perAdminStorageBytes * maxCountManagersByQuota;
-  const additionalStorageUsedGb = Math.max(
-    0,
-    (usedTotalStorageSizeCount - tariffStorageBytes) / BYTES_IN_GB,
-  );
 
   return (
     <div className={styles.card}>
@@ -119,7 +104,7 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
           </div>
         </div>
       ) : (
-        <>
+        <div className={styles.addonsBody}>
           <div className={styles.addonsColumns}>
             <Text fontSize="12px" fontWeight={600}>
               {t("Addon")}
@@ -132,20 +117,18 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
           <div className={styles.addonsList}>
             {activeServices.map((item) => {
               const usage = usageForService(item.service);
-              const isCurrency = item.service === AI_TOOLS;
+              const isCurrencyUsage = item.service === AI_TOOLS;
               const currency = usage?.currency || walletCodeCurrency;
 
-              const unitLabel = isCurrency
+              const unitLabel = isCurrencyUsage
                 ? getCurrencySymbol(currency, language)
                 : item.serviceUnit;
 
-              const usedValue = isCurrency
+              const usedValue = isCurrencyUsage
                 ? (usage?.totalAmount ?? 0)
-                : item.service === DISK_STORAGE
-                  ? additionalStorageUsedGb
-                  : (usage?.totalQuantity ?? 0);
+                : (item.used ?? usage?.totalQuantity ?? 0);
 
-              const usedLabel = isCurrency
+              const usedLabel = isCurrencyUsage
                 ? formatWalletCurrency(usedValue, 2, currency)
                 : formatCompactNumber(usedValue);
 
@@ -174,7 +157,9 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
                       {usedLabel}
                       <span className={styles.addonMuted}>
                         {" / "}
-                        {hasLimit ? formatCompactNumber(item.limit) : "—"}
+                        {hasLimit && usage
+                          ? formatCompactNumber(usage.totalQuantity)
+                          : "—"}
                       </span>
                     </Text>
                   </div>
@@ -190,7 +175,7 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
               );
             })}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
