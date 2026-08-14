@@ -35,11 +35,13 @@
 
 import { useState } from "react";
 import { observer } from "mobx-react";
+import { DateTime } from "luxon";
 
 import { Button, ButtonSize } from "../../../components/button";
 import { Text } from "../../../components/text";
 import { toastr } from "../../../components/toast";
 import { useCommonTranslation } from "../../../utils/i18n";
+import { getAppTimezone } from "../../../utils/date";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { finishRefreshingWithMinCycle } from "../../utils/refreshing";
@@ -77,12 +79,18 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 
   const { isNotPaidPeriod } = store.tariff;
 
-  const nextPayment = upcomingPaymentsCurrentMonth.length
-    ? [...upcomingPaymentsCurrentMonth].sort((a, b) =>
-        a.dueDate.localeCompare(b.dueDate),
-      )[0]
-    : undefined;
-  const topUpShortfall = nextPayment ? nextPayment.amount - walletBalance : 0;
+  const toDueDay = (dueDate: string) =>
+    DateTime.fromISO(dueDate).setZone(getAppTimezone()).toISODate();
+
+  const sortedUpcoming = [...upcomingPaymentsCurrentMonth].sort(
+    (a, b) => Date.parse(a.dueDate) - Date.parse(b.dueDate),
+  );
+  const nextPayment = sortedUpcoming[0];
+  const nextDueDay = nextPayment && toDueDay(nextPayment.dueDate);
+  const nextPaymentsTotal = sortedUpcoming
+    .filter((item) => toDueDay(item.dueDate) === nextDueDay)
+    .reduce((sum, item) => sum + item.amount, 0);
+  const topUpShortfall = nextPayment ? nextPaymentsTotal - walletBalance : 0;
 
   const isNextPayment = nextPayment && topUpShortfall > 0;
 
