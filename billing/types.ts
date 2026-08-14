@@ -205,7 +205,7 @@ export type TActiveService = {
   subscription: boolean;
   title: string;
   limit: number;
-  used: number;
+  used: number | null;
 };
 
 /** A single month bucket from the monthly usage endpoint. */
