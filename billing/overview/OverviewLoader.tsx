@@ -140,7 +140,7 @@ const OverviewLoader = () => {
 
         <div className={styles.card}>
           <HeaderLoader uniqueKey="ov-payment" />
-          <div className={styles.rows}>
+          <div className={`${styles.rows} ${styles.cardBody}`}>
             <RowLoader uniqueKey="ov-payment-1" left="180px" right="40px" icon />
             <RowLoader uniqueKey="ov-payment-2" left="160px" right="40px" icon />
           </div>

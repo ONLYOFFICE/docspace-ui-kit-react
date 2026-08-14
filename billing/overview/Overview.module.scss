@@ -73,11 +73,27 @@
 .grid2 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 432px));
+  grid-template-rows: auto auto 1fr;
   justify-content: space-between;
-  gap: 16px;
+  column-gap: 16px;
+  row-gap: 8px;
+
+  > div {
+    grid-row: span 3;
+    display: grid;
+    grid-template-rows: subgrid;
+  }
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
+    grid-template-rows: none;
+    row-gap: 16px;
+
+    > div {
+      grid-row: auto;
+      display: flex;
+      flex-direction: column;
+    }
   }
 }
 
@@ -96,6 +112,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+
+  > p {
+    flex-shrink: 0;
+  }
+
+  a {
+    text-align: end;
+  }
 }
 
 .cardValue {
@@ -357,6 +381,10 @@
   text-align: center;
 }
 
+.cardBody {
+  grid-row: 3;
+}
+
 .addonsColumns {
   display: flex;
   align-items: center;
@@ -366,6 +394,13 @@
   padding-block: 12px 8px;
   border-bottom: 1px solid var(--payment-devider-color);
   color: var(--payment-secondary-text-color);
+}
+
+.addonsBody {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
 }
 
 .addonsList {
@@ -415,19 +450,12 @@
   background: var(--payment-credit-color);
 }
 
-.spendRoot {
+.spendBody {
   display: flex;
-  flex: 1;
   flex-direction: column;
   gap: 16px;
   width: 100%;
-}
-
-.spendTop {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 100%;
+  min-width: 0;
 }
 
 .spendBar {

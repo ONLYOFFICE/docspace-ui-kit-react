@@ -168,47 +168,40 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
 
   return (
     <div className={styles.card}>
-      <div className={styles.spendRoot}>
-        <div className={styles.spendTop}>
-          <div className={styles.cardHeader}>
-            <Text fontSize="14px" fontWeight={700}>
-              {t("SpendingInMonth", { month: monthLabel })}
-            </Text>
-            {onViewUsage ? (
-              <Link
-                onClick={onViewUsage}
-                textDecoration="underline"
-                color="accent"
-                fontWeight={600}
-                dataTestId="overview_view_usage_link"
-              >
-                {t("ViewUsage")}
-              </Link>
-            ) : null}
-          </div>
-          <Text fontSize="18px" fontWeight={700}>
-            {formatWalletCurrency(total, 2, walletCodeCurrency)}
-          </Text>
-        </div>
+      <div className={styles.cardHeader}>
+        <Text fontSize="14px" fontWeight={700}>
+          {t("SpendingInMonth", { month: monthLabel })}
+        </Text>
+        {onViewUsage ? (
+          <Link
+            onClick={onViewUsage}
+            textDecoration="underline"
+            color="accent"
+            fontWeight={600}
+            dataTestId="overview_view_usage_link"
+          >
+            {t("ViewUsage")}
+          </Link>
+        ) : null}
+      </div>
+      <Text fontSize="18px" fontWeight={700} className={styles.cardValue}>
+        {formatWalletCurrency(total, 2, walletCodeCurrency)}
+      </Text>
 
-        {serviceUsage.length === 0 ? (
-          <div className={styles.emptyState}>
-            <div className={styles.emptyContent}>
-              <Text
-                fontSize="12px"
-                fontWeight={600}
-                className={styles.mutedTitle}
-              >
-                {t("NoSpendingActivity")}
-              </Text>
-              <Text fontSize="12px" className={styles.mutedTitle}>
-                {t("NoSpendingActivityDescription")}
-              </Text>
-            </div>
+      {serviceUsage.length === 0 ? (
+        <div className={styles.emptyState}>
+          <div className={styles.emptyContent}>
+            <Text fontSize="12px" fontWeight={600} className={styles.mutedTitle}>
+              {t("NoSpendingActivity")}
+            </Text>
+            <Text fontSize="12px" className={styles.mutedTitle}>
+              {t("NoSpendingActivityDescription")}
+            </Text>
           </div>
-        ) : (
-          <>
-            <div className={styles.spendBar}>
+        </div>
+      ) : (
+        <div className={styles.spendBody}>
+          <div className={styles.spendBar}>
               {subscriptionsPct > 0 ? (
                 <div
                   className={styles.spendBarSubs}
@@ -250,9 +243,8 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
                 )
                 .map(renderSection)}
             </div>
-          </>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

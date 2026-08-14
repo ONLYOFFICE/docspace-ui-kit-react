@@ -104,7 +104,7 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
           </div>
         </div>
       ) : (
-        <>
+        <div className={styles.addonsBody}>
           <div className={styles.addonsColumns}>
             <Text fontSize="12px" fontWeight={600}>
               {t("Addon")}
@@ -175,7 +175,7 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
               );
             })}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
