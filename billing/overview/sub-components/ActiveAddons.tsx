@@ -157,9 +157,7 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
                       {usedLabel}
                       <span className={styles.addonMuted}>
                         {" / "}
-                        {hasLimit && usage
-                          ? formatCompactNumber(usage.totalQuantity)
-                          : "—"}
+                        {hasLimit ? formatCompactNumber(item.limit) : "—"}
                       </span>
                     </Text>
                   </div>
