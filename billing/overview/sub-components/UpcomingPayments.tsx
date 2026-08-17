@@ -50,7 +50,7 @@ type UpcomingPaymentsProps = {
 const UpcomingPayments = ({ onUpcomingDetails }: UpcomingPaymentsProps) => {
   const t = useCommonTranslation();
   const {
-    upcomingPaymentsCurrentMonth: upcomingPayments,
+    upcomingPayments,
     walletCodeCurrency,
     formatWalletCurrency,
   } = usePaymentStore();

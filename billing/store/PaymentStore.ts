@@ -691,41 +691,38 @@ class PaymentStore {
     }
   };
 
+  /** Upcoming payments in chronological order (the API does not sort them). */
   get upcomingPayments(): TUpcomingPayment[] {
-    return this.upcomingPaymentsData.map((item): TUpcomingPayment => {
-      const serviceRoute = item.wallet
-        ? getServiceRoute(this.routes, item.name)
-        : undefined;
+    return [...this.upcomingPaymentsData]
+      .sort((a, b) => Date.parse(a.dueDate) - Date.parse(b.dueDate))
+      .map((item): TUpcomingPayment => {
+        const serviceRoute = item.wallet
+          ? getServiceRoute(this.routes, item.name)
+          : undefined;
 
-      return {
-        id: String(item.id),
-        renewalDate: formatDateLocalized(item.dueDate, "DATE_FULL", {
-          locale: this.language,
-          timezone: getAppTimezone(),
-        }),
-        renewalDateShort: formatDateLocalized(item.dueDate, "DATE_MONTH_DAY", {
-          locale: this.language,
-          timezone: getAppTimezone(),
-        }),
-        dueDate: item.dueDate,
-        title: item.title,
-        quantity: item.quantity,
-        unitOfMeasure: item.unitOfMeasure,
-        amount: item.amount,
-        actionType: serviceRoute ? "edit-subscription" : "edit-plan",
-        actionRoute: serviceRoute ?? this.routes.portalPayments,
-      };
-    });
-  }
-
-  /** Upcoming payments due within the current calendar month. */
-  get upcomingPaymentsCurrentMonth(): TUpcomingPayment[] {
-    const now = DateTime.now().setZone(getAppTimezone());
-
-    return this.upcomingPayments.filter((item) => {
-      const due = DateTime.fromISO(item.dueDate).setZone(getAppTimezone());
-      return due.isValid && due.year === now.year && due.month === now.month;
-    });
+        return {
+          id: String(item.id),
+          renewalDate: formatDateLocalized(item.dueDate, "DATE_FULL", {
+            locale: this.language,
+            timezone: getAppTimezone(),
+          }),
+          renewalDateShort: formatDateLocalized(
+            item.dueDate,
+            "DATE_MONTH_DAY",
+            {
+              locale: this.language,
+              timezone: getAppTimezone(),
+            },
+          ),
+          dueDate: item.dueDate,
+          title: item.title,
+          quantity: item.quantity,
+          unitOfMeasure: item.unitOfMeasure,
+          amount: item.amount,
+          actionType: serviceRoute ? "edit-subscription" : "edit-plan",
+          actionRoute: serviceRoute ?? this.routes.portalPayments,
+        };
+      });
   }
 
   formatWalletCurrency = (
