@@ -655,6 +655,13 @@ const AiAgentProviders = ({
         keepSessionProfile: !(isAgentRoom || hideProfilePicker),
       });
     }
+    // Sessions barred from AI (anonymous public room / public preview,
+    // guests) must not fire the reloads below: every request would answer
+    // 401 (hydration is off for them too — see `StoresHydrator enabled`).
+    // The local scope sync above still runs so the stores are consistent
+    // if the ability ever flips on.
+    if (!canUseAi) return;
+
     // Fire-and-forget by design — navigation must not wait on these. Each
     // one is a store action that rejects on a failed read, so they get an
     // explicit handler: an unhandled rejection on every failed room switch
@@ -679,7 +686,7 @@ const AiAgentProviders = ({
         attachments.clearAttachmentImages(),
       );
     }
-  }, [entityId, isAgentRoom, hideProfilePicker, stores]);
+  }, [entityId, isAgentRoom, hideProfilePicker, stores, canUseAi]);
 
   const onDropFiles = useCallback(
     (files: File[]) =>
