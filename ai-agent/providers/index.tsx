@@ -408,10 +408,26 @@ const EDITOR_TOOL_NAME_BY_CHAT_TOOL: Record<string, string> = {
  * Not a hook, so the string comes from `getCommonTranslation` (reads
  * `window.i18n`) rather than `useCommonTranslation`.
  */
+// A 403 means the user has no access to this room/agent (e.g. opening an agent
+// created by another admin). The host already surfaces that as a "view-only"
+// notice, so the raw error toast is noise that races it on open (Bug 83181).
+// The chat lib's server API rejects with a plain `Error` whose message is
+// `HTTP <status>` — the status is only in the text, not a `.status` property —
+// so the message is checked alongside the axios-style shapes.
+const isForbiddenError = (error: unknown): boolean => {
+  const e = error as {
+    response?: { status?: number };
+    status?: number;
+    message?: unknown;
+  };
+  if (e?.response?.status === 403 || e?.status === 403) return true;
+  return typeof e?.message === "string" && /\bHTTP\s+403\b/.test(e.message);
+};
+
 const logRescopeFailure = (step: string, reload: Promise<unknown>): void => {
   void reload.catch((error: unknown) => {
     console.error(`[ai-agent] scope switch: ${step} failed`, error);
-    toastr.error(error as Error);
+    if (!isForbiddenError(error)) toastr.error(error as Error);
   });
 };
 
