@@ -61,7 +61,9 @@ function renderCommonTrans(
       const component = components[index];
 
       if (!component) {
-        result.push(content);
+        // No component for this tag — still interpolate {{values}} and
+        // nested tags inside its content instead of emitting it verbatim.
+        result.push(...renderCommonTrans(content, values, components));
       } else {
         result.push(
           cloneElement(component, {
