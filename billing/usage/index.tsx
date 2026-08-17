@@ -66,6 +66,7 @@ type UsageProps = {
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
   onAIServicesClick?: () => void;
+  onAISearchClick?: () => void;
   onDocsConnectClick?: () => void;
 };
 
@@ -73,6 +74,7 @@ const Usage = ({
   onDiskStorageClick,
   onBackupClick,
   onAIServicesClick,
+  onAISearchClick,
   onDocsConnectClick,
 }: UsageProps) => {
   const t = useCommonTranslation();
@@ -340,6 +342,7 @@ const Usage = ({
         onDiskStorageClick={openWithPeriod(onDiskStorageClick)}
         onBackupClick={openWithPeriod(onBackupClick)}
         onAIServicesClick={openWithPeriod(onAIServicesClick)}
+        onAISearchClick={openWithPeriod(onAISearchClick)}
         onDocsConnectClick={openWithPeriod(onDocsConnectClick)}
         onDownloadReport={onDownloadReport}
         onViewChange={setBreakdownView}
