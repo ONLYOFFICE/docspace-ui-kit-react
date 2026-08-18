@@ -42,6 +42,7 @@ export type TOnBackToParenFolder = () => void;
 
 export type TTitles = {
   infoPanel?: string;
+  aiChat?: string;
   actions?: string;
   contextMenu?: string;
   warningText?: string;
@@ -84,6 +85,13 @@ export type TToggleInfoPanelButtonProps = {
   isRootFolder: boolean;
   isInfoPanelVisible: boolean;
   toggleInfoPanel: (e?: React.MouseEvent) => void;
+  id?: string;
+  titles?: TTitles;
+};
+
+export type TAiChatButtonProps = {
+  isChatPanelVisible: boolean;
+  toggleChatPanel: (e?: React.MouseEvent) => void;
   id?: string;
   titles?: TTitles;
 };
@@ -179,6 +187,13 @@ export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
     isEmptyPage?: boolean;
     /** Optional button shown in the header control area (e.g. Analyze responses for SubFolderDone) */
     analyzeResponsesButton?: React.ReactNode;
+    /** Opens/closes the AI chat panel. The button is not rendered without it,
+     * which keeps every host that has no AI chat surface unchanged. */
+    toggleChatPanel?: (e?: React.MouseEvent) => void;
+    /** Drives the pressed state of the AI chat button */
+    isChatPanelVisible?: boolean;
+    /** Hides the AI chat button even when `toggleChatPanel` is passed */
+    hideChatButton?: boolean;
 
     isMobile?: boolean;
     isMobileOnly?: boolean;
