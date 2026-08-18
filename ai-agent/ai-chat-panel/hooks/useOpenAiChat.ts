@@ -28,8 +28,7 @@
 
 import React from "react";
 
-import { useStores } from "../../providers";
-import { useAiChatStore } from "../../providers/ai-chat-store";
+import { useAiChatStoreOptional } from "../../providers/ai-chat-store";
 
 /**
  * Opens the AI chat panel, always starting a fresh conversation when the
@@ -38,21 +37,17 @@ import { useAiChatStore } from "../../providers/ai-chat-store";
  * that drop something into an *open* chat (e.g. "Ask AI") keep the ongoing
  * conversation instead of resetting it.
  *
- * `onSwitchToNewThread` only resets the thread/messages, never the composer
- * attachments, so attaching a file right after calling this is safe in
- * either order.
+ * Null-safe: sections that render without an AiChatStoreProvider (e.g. a
+ * public room opened by an anonymous user, where the chat is never mounted)
+ * get a no-op opener instead of a thrown "must be used within a provider"
+ * (Bug 83210). The thread reset lives on AiChatStore/AiChatStoresBridge, so
+ * this hook depends only on the null-safe chat store — never the library's
+ * throwing `useStores`.
  */
 export const useOpenAiChat = () => {
-  const aiChatStore = useAiChatStore();
-  // `useThreadsStore` is a Zustand store (callable as a hook elsewhere); here we
-  // only need its imperative `.getState()` API, so alias away the `use` prefix
-  // to avoid implying a hook call inside the callback below.
-  const { useThreadsStore: threadsStore } = useStores();
+  const aiChatStore = useAiChatStoreOptional();
 
   return React.useCallback(() => {
-    if (!aiChatStore.isVisible) {
-      threadsStore.getState().onSwitchToNewThread();
-    }
-    aiChatStore.open();
-  }, [aiChatStore, threadsStore]);
+    aiChatStore?.openNewChat();
+  }, [aiChatStore]);
 };

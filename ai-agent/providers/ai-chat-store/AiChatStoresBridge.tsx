@@ -27,6 +27,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { reaction } from "mobx";
 
 import { useStores } from "@onlyoffice/ai-chat";
 
@@ -57,6 +58,23 @@ const AiChatStoresBridge = () => {
     if (!initialized) return;
     store.setHasProfiles(profiles.length > 0);
   }, [store, profiles, initialized]);
+
+  useEffect(
+    () =>
+      // `useOpenAiChat` opens the panel by setting `pendingNewChat` on the
+      // MobX store alone (so a section without this provider can call it as a
+      // no-op). The actual thread reset needs the lib stores, which live here,
+      // so it is performed on this side when the flag is raised.
+      reaction(
+        () => store.pendingNewChat,
+        (pending) => {
+          if (!pending) return;
+          stores.useThreadsStore.getState().onSwitchToNewThread();
+          store.consumePendingNewChat();
+        },
+      ),
+    [store, stores],
+  );
 
   return null;
 };
