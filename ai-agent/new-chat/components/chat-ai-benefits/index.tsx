@@ -79,10 +79,10 @@ export const ChatAiBenefits = () => {
               components={{
                 1: (
                   <Link
-                    fontSize="13px"
+                    fontSize="12px"
                     fontWeight={600}
                     color="accent"
-                    textDecoration="underline dashed"
+                    textDecoration="underline dotted"
                     href={OPENROUTER_PRICING_URL}
                     target={LinkTarget.blank}
                     dataTestId="ai_openrouter_pricing_link"

@@ -42,12 +42,13 @@
   flex-direction: column;
   gap: 12px;
 
-  :global(.light) & {
-    --chat-ai-benefits-intro-color: #{colors.$black};
-    --chat-ai-benefits-bg-color: #{colors.$gray-light};
-    --chat-ai-benefits-text-color: #{colors.$black};
-    --chat-ai-benefits-icon-color: #{colors.$gray-text};
-  }
+  // Overridable card colors. Defaults resolve to the light-theme tokens
+  // and are redefined for `.dark`, so the block still renders correctly
+  // when no theme class sits on an ancestor.
+  --chat-ai-benefits-intro-color: #{colors.$black};
+  --chat-ai-benefits-bg-color: #{colors.$gray-light};
+  --chat-ai-benefits-text-color: #{colors.$black};
+  --chat-ai-benefits-icon-color: #{colors.$gray-text};
 
   :global(.dark) & {
     --chat-ai-benefits-intro-color: #{colors.$white};

@@ -28,12 +28,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-import {
-  ChatPage,
-  SettingsPage,
-  useStores,
-  ChatList,
-} from "@onlyoffice/ai-chat";
+import { ChatPage, useStores, ChatList } from "@onlyoffice/ai-chat";
 
 import { useIsDesktop } from "../../hooks/use-is-desktop";
 
@@ -94,12 +89,15 @@ const NewChat: React.FC<ChatProps> = observer(
     }, [currentPage, setCurrentPage]);
 
     switch (currentPage) {
-      case "settings":
-        // The effect above redirects to portal AI settings; render nothing.
-        return null;
-
       case "initial-setup":
-        return <SettingsPage />;
+        if (noAccessProps)
+          return (
+            <ChatNoAccessScreen {...noAccessProps} isAgents={!!isAgents} />
+          );
+
+        return null;
+      case "settings":
+        return null;
 
       case "history":
         if (!isSplitView) {
