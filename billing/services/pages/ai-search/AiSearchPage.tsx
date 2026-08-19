@@ -106,8 +106,12 @@ const AiSearchPage = (props: AiSearchPageProps) => {
 
   const { language } = paymentStore;
 
-  const { isInitServicesData, initServiceData, aiUsage, isServiceDataPending } =
-    servicesStore;
+  const {
+    isInitServicesData,
+    initServiceData,
+    aiSearchUsage,
+    isServiceDataPending,
+  } = servicesStore;
 
   const t = useCommonTranslation();
 
@@ -224,8 +228,8 @@ const AiSearchPage = (props: AiSearchPageProps) => {
 
   const balance = formatWalletCurrency();
 
-  const monthSpend = aiUsage?.totalAmount ?? 0;
-  const monthTokens = aiUsage?.totalQuantity ?? 0;
+  const monthSpend = aiSearchUsage?.totalAmount ?? 0;
+  const monthTokens = aiSearchUsage?.totalQuantity ?? 0;
   const monthTokensText = formatCompactNumber(monthTokens, language);
   const monthLabel = formatWithTimezone(now(), "LLLL yyyy", {
     locale: language,

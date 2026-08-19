@@ -40,7 +40,13 @@ import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "../utils/common";
 import { parseAiPrices } from "../utils/parsers";
-import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
+import {
+  AI_ENUM,
+  AI_SEARCH,
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  STORAGE_ENUM,
+} from "../constants";
 import { isDocsConnectServiceName } from "../utils/docs-connect";
 import type {
   TAiToolsPrices,
@@ -53,6 +59,9 @@ import { now } from "../../utils/date";
 import type PaymentStore from "./PaymentStore";
 import type { TApiClient } from "../../providers/api/ApiProvider";
 import { formatterCurrencyWithoutTranction } from "../wallet/utils";
+
+/** Service pages that read their own row from the shared usage rows. */
+const USAGE_TRACKED_SERVICES: string[] = [AI_TOOLS, AI_SEARCH, BACKUP_SERVICE];
 
 class ServicesStore {
   private paymentApi: PaymentApi;
@@ -427,6 +436,12 @@ class ServicesStore {
     );
   }
 
+  get aiSearchUsage() {
+    return (
+      this.serviceUsage.find((usage) => usage.service === AI_SEARCH) ?? null
+    );
+  }
+
   initServiceData = async (
     t: TTranslation,
     serviceName: string,
@@ -472,28 +487,21 @@ class ServicesStore {
         initWalletPayerAndBalance(isRefresh),
       ];
 
-      if (serviceName === AI_TOOLS) {
+      const monthStart = now().startOf("month");
+      const monthEnd = now().endOf("month");
+
+      if (USAGE_TRACKED_SERVICES.includes(serviceName)) {
         requests.push(
           this.fetchServiceUsage({
-            serviceName: AI_TOOLS,
-            from: now().startOf("month"),
-            to: now().endOf("month"),
+            serviceName,
+            from: monthStart,
+            to: monthEnd,
           }),
         );
       }
 
       if (serviceName === BACKUP_SERVICE) {
-        requests.push(
-          this.fetchBackupsCountByPaid(
-            now().startOf("month"),
-            now().endOf("month"),
-          ),
-          this.fetchServiceUsage({
-            serviceName: BACKUP_SERVICE,
-            from: now().startOf("month"),
-            to: now().endOf("month"),
-          }),
-        );
+        requests.push(this.fetchBackupsCountByPaid(monthStart, monthEnd));
       }
 
       await Promise.all(requests);
