@@ -60,7 +60,6 @@ import type PaymentStore from "./PaymentStore";
 import type { TApiClient } from "../../providers/api/ApiProvider";
 import { formatterCurrencyWithoutTranction } from "../wallet/utils";
 
-/** Service pages that read their own row from the shared usage rows. */
 const USAGE_TRACKED_SERVICES: string[] = [AI_TOOLS, AI_SEARCH, BACKUP_SERVICE];
 
 class ServicesStore {
