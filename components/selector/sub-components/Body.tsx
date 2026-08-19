@@ -77,14 +77,16 @@ const DimmedEmptyScreen = ({
   displayItems,
   inputItemVisible,
   hideBackButton,
+  height,
 }: {
   emptyScreenCtx: TSelectorEmptyScreen;
   wasSearchActive: boolean;
   displayItems: TSelectorItem[];
   inputItemVisible: boolean;
   hideBackButton?: boolean;
+  height: number;
 }) => (
-  <div className={styles.dimmedEmptyScreen}>
+  <div className={styles.dimmedEmptyScreen} style={{ height }}>
     <EmptyScreenProvider {...emptyScreenCtx}>
       <EmptyScreen
         withSearch={wasSearchActive}
@@ -348,7 +350,8 @@ const Body = ({
   const effectiveIsSearch =
     isSearch || (isDimmed && wasSearchActiveRef.current);
   const showSearch = withSearch && (effectiveIsSearch || itemsCount > 0);
-  const showSelectAll = (isMultiSelect && withSelectAll && !isSearch) || false;
+  const showSelectAll =
+    (isMultiSelect && withSelectAll && !effectiveIsSearch) || false;
 
   if (withPadding) {
     listHeight -= CONTAINER_PADDING;
@@ -466,6 +469,7 @@ const Body = ({
           displayItems={displayItems}
           inputItemVisible={inputItemVisible}
           hideBackButton={hideBackButton}
+          height={listHeight}
         />
       ) : (
         <div

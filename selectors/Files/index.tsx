@@ -392,8 +392,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       if (!isFullLoadActive) {
         afterSearch.current = false;
         setSearchValue("");
-        // Don't dim when navigating to root
-        startFullLoad(+item.id === 0 ? { dim: false } : undefined);
+        startFullLoad();
         if (+item.id === 0) {
           if (pinnedRootId != null) {
             finishFullLoad();
@@ -487,7 +486,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
         const specialScope = item.specialFolderScope;
         if (specialScope) {
-          startFullLoad({ dim: false });
+          navigatingRef.current = true;
+          startFullLoad();
           setActiveSpecialScope(specialScope);
           setBreadCrumbs((value) => [
             ...value,

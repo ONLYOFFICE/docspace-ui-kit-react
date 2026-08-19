@@ -86,7 +86,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   const { isContentLoading, startContentLoading, finishContentLoading } =
     useContentLoading();
 
-  const isFirstLoad = useRef(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const afterSearch = useRef(false);
   const totalRef = useRef(0);
 
@@ -158,24 +158,22 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
           isGroup: true,
         }));
 
-        if (isFirstLoad.current || startIndex === 0) {
+        if (startIndex === 0) {
           totalRef.current = total;
           setItemsList([...convertedItems]);
           setHasNextPage(convertedItems.length < total);
-
-          isFirstLoad.current = false;
         } else {
           setItemsList((value) => {
             const arr = [...value, ...convertedItems];
             setHasNextPage(arr.length < total);
             return arr;
           });
-          isFirstLoad.current = false;
         }
       } catch (error) {
         toastr.error(error as TData);
       } finally {
         setIsNextPageLoading(false);
+        setIsFirstLoad(false);
         finishContentLoading();
       }
     },
@@ -219,14 +217,14 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
       loadNextPage={onLoadNextPage}
-      isLoading={isFirstLoad.current}
+      isLoading={isFirstLoad}
       isContentLoading={isContentLoading}
       searchLoader={<SearchLoader />}
       onSelect={onSelect}
       rowLoader={
         <RowLoader
           isMultiSelect={false}
-          isContainer={isFirstLoad.current}
+          isContainer={isFirstLoad}
           isUser={false}
         />
       }

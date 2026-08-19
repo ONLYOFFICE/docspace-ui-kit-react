@@ -269,7 +269,7 @@ const PeopleSelector = ({
   const [selectedItems, setSelectedItems] = useState<TSelectorItem[]>([]);
   const { isContentLoading, startContentLoading, finishContentLoading } =
     useContentLoading();
-  const isFirstLoadRef = useRef(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const afterSearch = useRef(false);
   const totalRef = useRef(0);
   const searchTab = useRef(PEOPLE_TAB_ID);
@@ -461,7 +461,7 @@ const PeopleSelector = ({
           ? responseTotal - totalDifferent - 1
           : responseTotal - totalDifferent;
 
-        if (isFirstLoadRef.current || startIndex === 0) {
+        if (startIndex === 0) {
           const newItems = withOutCurrentAuthorizedUser
             ? removeCurrentUserFromList(data)
             : moveCurrentUserToTopOfList(data);
@@ -491,7 +491,7 @@ const PeopleSelector = ({
         totalRef.current = newTotal;
 
         setIsNextPageLoading(false);
-        isFirstLoadRef.current = false;
+        setIsFirstLoad(false);
         finishContentLoading();
       } catch (error) {
         // On cancel a superseding request is already running and owns the
@@ -502,6 +502,7 @@ const PeopleSelector = ({
         toastr.error(error as Error);
 
         setIsNextPageLoading(false);
+        setIsFirstLoad(false);
         finishContentLoading();
       }
     },
@@ -595,7 +596,7 @@ const PeopleSelector = ({
     onClearSearch,
     searchLoader: <SearchLoader />,
     isSearchLoading:
-      isFirstLoadRef.current && !searchValue && !afterSearch.current,
+      isFirstLoad && !searchValue && !afterSearch.current,
   };
 
   const infoProps: TSelectorInfo = withInfo
@@ -796,12 +797,12 @@ const PeopleSelector = ({
       loadNextPage={loadNextPage}
       isMultiSelect={isMultiSelect ?? false}
       totalItems={total}
-      isLoading={isFirstLoadRef.current}
+      isLoading={isFirstLoad}
       isContentLoading={isContentLoading}
       rowLoader={
         <RowLoader
           isUser
-          isContainer={isFirstLoadRef.current}
+          isContainer={isFirstLoad}
           isMultiSelect={isMultiSelect}
         />
       }
