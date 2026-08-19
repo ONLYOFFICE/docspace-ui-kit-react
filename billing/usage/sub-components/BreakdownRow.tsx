@@ -33,6 +33,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import classNames from "classnames";
+
 import { Text } from "../../../components/text";
 import { IconButton } from "../../../components/icon-button";
 import { Loader } from "../../../components/loader";
@@ -55,6 +57,7 @@ type BreakdownRowProps = {
   onExpand?: () => void;
   onDownload?: () => void;
   isDownloading?: boolean;
+  isDownloadDisabled?: boolean;
 };
 
 const BreakdownRow = ({
@@ -67,6 +70,7 @@ const BreakdownRow = ({
   onExpand,
   onDownload,
   isDownloading = false,
+  isDownloadDisabled = false,
 }: BreakdownRowProps) => {
   return (
     <div className={styles.row}>
@@ -138,10 +142,13 @@ const BreakdownRow = ({
         </div>
       ) : onDownload ? (
         <IconButton
-          className={styles.download}
+          className={classNames(styles.download, {
+            [styles.downloadDisabled]: isDownloadDisabled,
+          })}
           size={16}
           iconNode={<DownloadIcon />}
           onClick={onDownload}
+          isDisabled={isDownloadDisabled}
           isClickable
           dataTestId="usage_row_download"
         />

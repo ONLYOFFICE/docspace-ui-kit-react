@@ -99,6 +99,7 @@ const Usage = ({
   );
   const [isLoading, setIsLoading] = useState(true);
   const [isReportLoading, setIsReportLoading] = useState(false);
+  const [isReportInProgress, setIsReportInProgress] = useState(false);
   const [breakdownView, setBreakdownView] = useState<"services" | "month">(
     "services",
   );
@@ -227,6 +228,9 @@ const Usage = ({
   ) => {
     const isMainReport = !serviceName && !range;
 
+    if (isReportInProgress) return;
+
+    setIsReportInProgress(true);
     if (isMainReport) setIsReportLoading(true);
 
     const reportPath =
@@ -293,6 +297,7 @@ const Usage = ({
     } catch (e) {
       toastr.error(e as Error);
     } finally {
+      setIsReportInProgress(false);
       if (isMainReport) setIsReportLoading(false);
     }
   };
@@ -310,10 +315,14 @@ const Usage = ({
               fontWeight={600}
               color="accent"
               textDecoration="underline dashed"
-              onClick={isReportLoading ? undefined : () => onDownloadReport()}
+              onClick={
+                isReportInProgress ? undefined : () => onDownloadReport()
+              }
               dataTestId="usage_download_report"
               className={
-                isReportLoading ? styles.downloadReportLinkDisabled : undefined
+                isReportInProgress
+                  ? styles.downloadReportLinkDisabled
+                  : undefined
               }
             >
               {t("DownloadReportBtnText")}
@@ -349,6 +358,7 @@ const Usage = ({
         onAISearchClick={openWithPeriod(onAISearchClick)}
         onDocsConnectClick={openWithPeriod(onDocsConnectClick)}
         onDownloadReport={onDownloadReport}
+        isDownloadBlocked={isReportInProgress}
         onViewChange={setBreakdownView}
       />
     </div>

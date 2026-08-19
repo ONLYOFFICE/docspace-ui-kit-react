@@ -80,6 +80,8 @@ type SpendingBreakdownProps = {
     serviceName?: string,
     range?: { from: DateTime; to: DateTime },
   ) => void;
+  /** A report is already being generated, so no other one may be started. */
+  isDownloadBlocked?: boolean;
   /** Notifies the parent when the services/month view changes. */
   onViewChange?: (view: BreakdownView) => void;
 };
@@ -94,6 +96,7 @@ const SpendingBreakdown = ({
   onAISearchClick,
   onDocsConnectClick,
   onDownloadReport,
+  isDownloadBlocked,
   onViewChange,
 }: SpendingBreakdownProps) => {
   const t = useCommonTranslation();
@@ -110,7 +113,8 @@ const SpendingBreakdown = ({
   );
 
   const handleDownload = async (serviceName: string) => {
-    if (downloadingServices.has(serviceName) || !onDownloadReport) return;
+    if (isDownloadBlocked || !onDownloadReport) return;
+    if (downloadingServices.has(serviceName)) return;
 
     setDownloadingServices((prev) => new Set(prev).add(serviceName));
     try {
@@ -126,7 +130,8 @@ const SpendingBreakdown = ({
 
   const handleMonthDownload = async (year: number, month: number) => {
     const key = `${year}-${month}`;
-    if (downloadingMonths.has(key) || !onDownloadReport) return;
+    if (isDownloadBlocked || !onDownloadReport) return;
+    if (downloadingMonths.has(key)) return;
 
     setDownloadingMonths((prev) => new Set(prev).add(key));
     try {
@@ -235,6 +240,7 @@ const SpendingBreakdown = ({
             onDownloadReport ? () => handleDownload(item.service) : undefined
           }
           isDownloading={downloadingServices.has(item.service)}
+          isDownloadDisabled={isDownloadBlocked}
         />
       ))}
     </div>
@@ -299,6 +305,7 @@ const SpendingBreakdown = ({
                 : undefined
             }
             isDownloading={downloadingMonths.has(key)}
+            isDownloadDisabled={isDownloadBlocked}
           />
         );
       })}
