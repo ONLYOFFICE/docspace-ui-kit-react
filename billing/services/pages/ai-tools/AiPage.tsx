@@ -292,7 +292,7 @@ const AiPage = (props: AiPageProps) => {
               />
             )}
             <Text className={styles.cardCaption}>
-              {t("ChargedFromCredits")}
+              {t("ForPeriod", { period: monthLabel })}
             </Text>
           </div>
 
