@@ -52,6 +52,7 @@ import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
 
 import AiPageLoader from "../ai-tools/AiPageLoader";
 
+import SpendAmount from "../../../shared/spend-amount";
 import styles from "../ai-tools/AiPage.module.scss";
 import {
   now,
@@ -287,9 +288,13 @@ const AiSearchPage = (props: AiSearchPageProps) => {
         <div className={styles.cardsGrid}>
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthSpend")}</Text>
-            <Text className={styles.cardValue}>
-              {formatWalletCurrency(monthSpend, 2)}
-            </Text>
+            <SpendAmount
+              amount={monthSpend}
+              className={styles.cardValue}
+              fontSize="18px"
+              fontWeight={700}
+              tooltipId="ai-search-month-spend"
+            />
             <Text className={styles.cardCaption}>
               {t("AISearchSpendMonth", { month: monthLabel })}
             </Text>
