@@ -103,7 +103,6 @@ const useRoomsHelper = ({
     setIsNextPageLoading,
     hideSectionLoader,
     finishFullLoad,
-    finishContentLoading,
 
     isFullLoadActive,
   } = use(LoadersContext);
@@ -346,13 +345,14 @@ const useRoomsHelper = ({
 
         setIsRoot?.(false);
         setIsInit(false);
-        finishFullLoad();
       } catch (error) {
         toastr.error(error as TData);
       } finally {
         requestRunning.current = false;
         setIsNextPageLoading(false);
-        finishContentLoading();
+        // Also ends the content refresh; skipping it on the error path would
+        // leave the skeleton on screen and hideSectionLoader a permanent no-op
+        finishFullLoad();
       }
     },
     [
@@ -391,7 +391,6 @@ const useRoomsHelper = ({
       roomsFolderId,
       isRoomDisabled,
       finishFullLoad,
-      finishContentLoading,
     ],
   );
 

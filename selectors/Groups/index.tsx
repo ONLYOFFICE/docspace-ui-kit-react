@@ -158,7 +158,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
           isGroup: true,
         }));
 
-        if (isFirstLoad.current) {
+        if (isFirstLoad.current || startIndex === 0) {
           totalRef.current = total;
           setItemsList([...convertedItems]);
           setHasNextPage(convertedItems.length < total);
