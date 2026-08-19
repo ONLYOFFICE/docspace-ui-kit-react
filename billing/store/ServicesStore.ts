@@ -67,6 +67,12 @@ class ServicesStore {
 
   isInitServicesData = false;
 
+  /** Service page whose data is loading right now. */
+  pendingServiceName: string | null = null;
+
+  /** Service the stored service data belongs to; null before the first load. */
+  loadedServiceName: string | null = null;
+
   isAiPaywallInit = false;
 
   isVisibleWalletSettings = false;
@@ -170,6 +176,9 @@ class ServicesStore {
   setIsInitServiceData = (isInitServicesData: boolean) => {
     this.isInitServicesData = isInitServicesData;
   };
+
+  isServiceDataPending = (serviceName: string) =>
+    this.loadedServiceName !== serviceName;
 
   setIsAiPaywallInit = (value: boolean) => {
     this.isAiPaywallInit = value;
@@ -389,6 +398,11 @@ class ServicesStore {
   initUsageData = async (period: TUsagePeriodKey) => {
     const range = getUsageRange(period);
 
+    // The usage page overwrites the shared rows with a whole period. Only rows
+    // of the current month match what a service page requests for itself, so
+    // any other period invalidates them.
+    if (period !== "thisMonth") this.loadedServiceName = null;
+
     await Promise.all([
       this.paymentStore.initWalletPayerAndBalance(false),
       this.fetchServiceUsage(range),
@@ -420,6 +434,8 @@ class ServicesStore {
     integrationUrl?: string,
   ) => {
     const isRefresh = window.location.href.includes("complete=true");
+
+    this.pendingServiceName = serviceName;
 
     const {
       fetchTransactionHistory,
@@ -509,6 +525,9 @@ class ServicesStore {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
       toastr.error(t("Common:UnexpectedError"));
+    } finally {
+      if (this.pendingServiceName === serviceName)
+        this.loadedServiceName = serviceName;
     }
   };
 
