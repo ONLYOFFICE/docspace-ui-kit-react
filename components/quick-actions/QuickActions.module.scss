@@ -1,0 +1,309 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+@use "../../styles/variables/colors";
+@use "../../styles/variables/quick-actions" as metrics;
+@use "../../styles/mixins/media-queries";
+
+// Tile size and the gap between tiles. The tile box is 184x147 at desktop; the
+// 81x75 icon sits inside it with $tile-padding clear on every side, leaving the
+// remainder for the label (centered by the tile's own justify-content).
+// Re-exported from the shared metrics so consumers capping the banner width
+// derive that cap from the same numbers.
+$tile-max-width: metrics.$tile-max-width;
+$tile-min-width: metrics.$tile-min-width;
+$tile-height: metrics.$tile-height;
+$tile-padding: metrics.$tile-padding;
+$gap: metrics.$gap;
+
+// Compact sizing (tablet and below): shorter tiles, tighter icon/gap. Width
+// still stretches; mobile additionally drops to exactly two tiles per row.
+$compact-tile-height: 120px;
+$compact-tile-padding: 12px;
+$compact-gap: 8px;
+
+// How much of the next row peeks out below the first row when collapsed.
+$peek: 74px;
+$compact-peek: 60px;
+
+.quickActions {
+  --_tile-bg: var(--quick-actions-tile-bg, #{colors.$gray-light});
+  --_tile-bg-hover: var(--quick-actions-tile-bg-hover, #{colors.$gray-light-mid});
+  --_tile-color: var(--quick-actions-tile-color, #{colors.$black});
+  // The fade/blur overlay tints toward the surrounding surface; defaults to the
+  // tile background so it reads as the grid dissolving.
+  --_fade-color: var(--quick-actions-tile-bg, #{colors.$white});
+
+  :global(.dark) & {
+    --_tile-bg: var(--quick-actions-tile-bg, #{colors.$dark-gray-light});
+    --_tile-bg-hover: var(--quick-actions-tile-bg-hover, #{colors.$gray-dark-mid});
+    --_tile-color: var(--quick-actions-tile-color, #{colors.$white});
+    --_fade-color: var(--quick-actions-tile-bg, #{colors.$black});
+  }
+
+  position: relative;
+  width: 100%;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: $gap;
+  width: 100%;
+
+  @include media-queries.tablet-and-below {
+    gap: $compact-gap;
+  }
+}
+
+// Tiles grow to fill the row so there's no empty space, and shrink down to
+// $tile-min-width before the row is allowed to wrap — a tile only moves to a
+// second row once they genuinely cannot fit side by side. That ordering
+// matters: when the flex base was the full $tile-width the row wrapped while
+// every tile still sat at its natural width, so the last tile (e.g. AI chat in
+// the Rooms banner) hid behind "Show more" with width left to squeeze into.
+// useRowOverflow detects a real wrap to trigger the collapse (only with >4
+// tiles). Because every tile grows, a partial last row stretches to fill the
+// width too.
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: $tile-padding;
+  // The flex BASE size decides line breaking — flex-wrap breaks a line by
+  // comparing base sizes, before flex-shrink is ever applied, so a base of
+  // $tile-width would wrap while min-width still allowed shrinking. Basing on
+  // $tile-min-width instead means the row breaks only when the tiles truly
+  // cannot fit; flex-grow then expands them back up to $tile-max-width.
+  flex: 1 1 $tile-min-width;
+  min-width: $tile-min-width;
+  max-width: $tile-max-width;
+  height: $tile-height;
+  background-color: var(--_tile-bg);
+  border: none;
+  border-radius: 12px;
+  color: var(--_tile-color);
+  font: inherit;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--_tile-bg-hover);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    background-color: var(--_tile-bg-hover);
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  &.disabled,
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // Tablet and below: smaller tiles (shorter, tighter icon/padding). Width still
+  // grows to fill the row — several reduced tiles per row, no empty space.
+  @include media-queries.tablet-and-below {
+    height: $compact-tile-height;
+    gap: 4px;
+    padding: $compact-tile-padding;
+  }
+
+  // Mobile only: exactly two tiles per row (allowed to shrink below the desktop
+  // minimum so two always fit, even on the narrowest phones).
+  @include media-queries.mobile {
+    flex: 1 1 calc(50% - #{$compact-gap});
+    min-width: 0;
+  }
+}
+
+// Collapsed: clip the grid to the first row plus a peek of the next, and hide
+// the overflow. The .showMore overlay sits on top of the clipped strip. Only
+// reachable with >4 tiles (the component sets .collapsed) and at any width
+// where they wrap.
+.collapsed .grid {
+  max-height: $tile-height + $gap + $peek;
+  overflow: hidden;
+
+  @include media-queries.tablet-and-below {
+    max-height: $compact-tile-height + $compact-gap + $compact-peek;
+  }
+}
+
+// "Show more" overlay: a blurred, fading strip pinned to the bottom of the
+// collapsed grid with the label centered on it. Clicking it expands the grid.
+.showMore {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: $peek + $gap + 24px;
+  padding-bottom: 12px;
+  border: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--_fade-color) 70%, transparent) 55%,
+    var(--_fade-color) 100%
+  );
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  cursor: pointer;
+
+  @include media-queries.tablet-and-below {
+    height: $compact-peek + $compact-gap + 20px;
+    padding-bottom: 8px;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--_tile-color);
+    outline-offset: -2px;
+    border-radius: 12px;
+  }
+}
+
+.showMoreLabel {
+  pointer-events: none;
+}
+
+// Icon box: 81x75 at desktop, 48x45 at tablet and below. The icons don't all
+// share one intrinsic ratio (81x75, 81x78, 93x87, 110x115 ...), so the SVG is
+// fitted inside the box with `contain` rather than stretched to it — a forced
+// aspect-ratio would distort every icon that isn't authored at 81:75.
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 1;
+  width: 81px;
+  height: 75px;
+  min-width: 0;
+  // Renders at the full 81x75; only gives ground when a wrapped (two-line)
+  // label would otherwise overflow the fixed tile height.
+  min-height: 0;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  @include media-queries.tablet-and-below {
+    width: 48px;
+    height: 45px;
+  }
+}
+
+// The tile height is fixed, and desktop leaves room for a single 20px line
+// (22 + 75 icon + 4 gap + 20 label + 22 = 143 of 147px). English labels fit on
+// one line, but longer translations wrap — cap the label at two lines and
+// ellipsize so a long string can never push the icon out of the padded box.
+.label {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  word-break: break-word;
+  user-select: none;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+// A tooltipped tile is wrapped in this anchor, so the anchor becomes the flex
+// item — it must carry the same grow/shrink range as a bare .tile, otherwise
+// tooltipped tiles would keep the old no-shrink behaviour and wrap early.
+.tileTooltipAnchor {
+  display: flex;
+  // The flex BASE size decides line breaking — flex-wrap breaks a line by
+  // comparing base sizes, before flex-shrink is ever applied, so a base of
+  // $tile-width would wrap while min-width still allowed shrinking. Basing on
+  // $tile-min-width instead means the row breaks only when the tiles truly
+  // cannot fit; flex-grow then expands them back up to $tile-max-width.
+  flex: 1 1 $tile-min-width;
+  min-width: $tile-min-width;
+  max-width: $tile-max-width;
+
+  .tile {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+  }
+
+  @include media-queries.mobile {
+    flex: 1 1 calc(50% - #{$compact-gap});
+    min-width: 0;
+  }
+}
+
+// Loading placeholder: keeps the tile's box (size/radius/gap via .tile) but
+// drops the interactive affordances and lets the skeleton fill the whole tile.
+.skeletonTile {
+  padding: 0;
+  background-color: transparent;
+  cursor: default;
+  pointer-events: none;
+  overflow: hidden;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.skeletonIcon {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

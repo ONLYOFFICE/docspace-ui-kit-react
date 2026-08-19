@@ -1,0 +1,25 @@
+.body {
+  display: flex;
+  flex-direction: column;
+
+  --field-container-margin: 0;
+
+  :global([class*="amountContainer"]) {
+    margin-top: 16px;
+  }
+}
+
+.description {
+  color: var(--text-color);
+}
+
+.helperText {
+  color: var(--text-disable-color);
+  margin-top: 6px;
+}
+
+.footerButtons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}

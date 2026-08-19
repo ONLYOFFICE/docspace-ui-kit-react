@@ -331,6 +331,11 @@ export function resizeColumns(isResized: boolean, ctx: OnResizeContext): void {
 
   const containerWidth = container.getBoundingClientRect().width;
 
+  // Bail while the container is collapsed (width 0) — see resetColumns. This
+  // also makes the synthetic resize the host fires on fullscreen enter safe:
+  // it lands here at width 0 and is ignored instead of persisting garbage.
+  if (containerWidth < 1) return;
+
   const storageSize =
     !resetColumnsSizeProp && loadColumnSizes(columnStorageName ?? "", columns);
 

@@ -1,0 +1,40 @@
+services:
+  tests-local:
+    image: ui-kit-tests
+    build:
+      context: ../..
+      dockerfile: libs/ui-kit/Dockerfile
+    ports:
+      - "6007:6007"
+    volumes:
+      - ./__tests__:/app/libs/ui-kit/__tests__
+      - ./playwright.config.ts:/app/libs/ui-kit/playwright.config.ts
+      - ../../playwright-report/ui-kit:/app/playwright-report/ui-kit
+  # Dev mode: mount source code so you can iterate without rebuilding the image.
+  # Usage:
+  #   docker-compose run --rm tests-dev pnpm exec playwright test
+  #   docker-compose run --rm tests-dev pnpm exec playwright test __tests__/button/button.spec.ts
+  #   docker-compose run --rm tests-dev pnpm exec playwright test --update-snapshots
+  tests-dev:
+    image: ui-kit-tests
+    ports:
+      - "6007:6007"
+    volumes:
+      # Source code — edit on host, rebuilt inside container
+      - ./components:/app/libs/ui-kit/components
+      - ./assets:/app/libs/ui-kit/assets
+      - ./constants:/app/libs/ui-kit/constants
+      - ./context:/app/libs/ui-kit/context
+      - ./enums:/app/libs/ui-kit/enums
+      - ./hooks:/app/libs/ui-kit/hooks
+      - ./styles:/app/libs/ui-kit/styles
+      - ./types:/app/libs/ui-kit/types
+      - ./utils:/app/libs/ui-kit/utils
+      - ./providers:/app/libs/ui-kit/providers
+      - ./.storybook:/app/libs/ui-kit/.storybook
+      # Tests and config
+      - ./__tests__:/app/libs/ui-kit/__tests__
+      - ./playwright.config.ts:/app/libs/ui-kit/playwright.config.ts
+      # Reports output
+      - ../../playwright-report/ui-kit:/app/playwright-report/ui-kit
+

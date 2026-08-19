@@ -1,0 +1,358 @@
+// (c) Copyright Ascensio System SIA 2009-2026
+//
+// This program is a free software product.
+// You can redistribute it and/or modify it under the terms
+// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
+// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
+// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
+// any third-party rights.
+//
+// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
+// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+//
+// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
+//
+// The  interactive user interfaces in modified source and object code versions of the Program must
+// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
+//
+// Pursuant to Section 7(b) of the License you must retain the original Product logo when
+// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
+// trademark law for use of our trademarks.
+//
+// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
+// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
+// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+@use "../../styles/variables/colors";
+
+.chatPanel {
+  :global(.aui-root) {
+    --aui-font-base: 15px;
+
+    --chat-scroll-to-bottom-gap: 24px;
+    --chat-scroll-to-bottom-width: 40px;
+    --chat-scroll-to-bottom-height: 40px;
+    --chat-scroll-to-bottom-border-radius: 50%;
+    --chat-assistant-message-actions-gap: 20px;
+  }
+
+  display: flex;
+  flex-direction: column;
+
+  // Rendered directly inside `.infoPanel` (flex column with the chat
+  // header as a fixed-height sibling). `flex: 1; min-height: 0` keeps it
+  // bounded to the remaining space so inner overflow can scroll instead
+  // of pushing the panel past the viewport.
+  flex: 1 1 0;
+  min-height: 0;
+  box-sizing: border-box;
+
+  // Library applies `h-full` (height: 100%) on `.aui-root`; with the
+  // 64px ChatToolbar above it the column overflows the parent by exactly
+  // 64px and the inner Thread.Viewport never gets a bounded height to
+  // scroll inside. Switch to flex-grow so it takes the remainder instead.
+  :global(.aui-root) {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
+    box-sizing: border-box;
+  }
+
+  // `@onlyoffice/ai-chat` is built as a full-viewport widget: its `#app` root
+  // is `h-[100vh]` and the messages/composer row carries an inline
+  // `height: calc(100vh - 56px)`. Embedded in a DocSpace section that's wrong —
+  // it ignores the section height and sizes to the viewport instead. Neutralize
+  // both so the chat fills `.chat` (bounded by the section) and the inner
+  // thread scrolls. The inline height requires `!important` to override.
+  :global(#app) {
+    height: auto !important;
+    min-height: 0;
+    flex: 1 1 0;
+  }
+
+  :global(#app) > :global(.flex-row) {
+    height: auto !important;
+    min-height: 0;
+    flex: 1 1 0;
+  }
+
+  :global(div:has([data-role="user"])),
+  :global(div:has([data-role="assistant"])) {
+    flex: 1;
+    min-height: 0;
+  }
+
+  :global(.composer-root) {
+    max-height: max(30svh, 5rem);
+    padding: 6px 8px;
+    border-radius: 3px !important;
+    border: none;
+    background: var(--chat-input-background-color) !important;
+
+    // padding-block-end: 0px;
+
+    :global([data-testid="model-selector"]) {
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 20px;
+      letter-spacing: 0px;
+      vertical-align: middle;
+
+      :global(.light) :is(&, :global(.combo-buttons_arrow-icon)) {
+        --input-color: #{colors.$light-gray-dark};
+        --icon-normal: var(--input-color);
+      }
+    }
+
+    :global(.composer-input) {
+      line-height: 22px;
+      padding: 0px;
+
+      &::placeholder {
+        color: var(--chat-input-placeholder);
+      }
+    }
+
+    :global([class*="--action-gap"]) {
+      margin-inline-start: 6px;
+    }
+
+    :global([class*="--chat-composer-action-send-background-color"]):disabled {
+      opacity: 0.6;
+    }
+  }
+
+  // Scope this out of the assistant message subtree: the ai-chat lib renders
+  // its markdown content with utility classes that also match [class*="--text-tertiary"],
+  // and this rule would shrink the answer text. Excluding [data-role="assistant"]
+  // descendants lets the lib's own styles apply untouched.
+  :global([class*="--text-tertiary"]:not([data-role="assistant"] *)) {
+    font-weight: 400;
+    font-size: 10px;
+    leading-trim: none;
+    line-height: 14px;
+    letter-spacing: 0px;
+  }
+
+  // The lib's "Analyzing" indicator is the only thread element sized with a
+  // fixed w-[var(--thread-max-width)] (687px) instead of w-full + max-w. In
+  // chat columns narrower than that it inflates the grid track, so the chat
+  // visibly widens while the indicator is shown and snaps back when it goes.
+  // Fill the available width instead; its own max-w utility keeps the cap.
+  :global([class*="w-[var(--thread-max-width)]"]:not([class*="w-full"])) {
+    width: 100%;
+  }
+
+  // Welcome screen (empty new chat) — match the Figma mockup. The library
+  // sizes the title/description for a full-viewport widget (text-fs-32 /
+  // text-fs-20, which resolve to 40px / 25px against this panel's 15px
+  // font-base); scale them down to the panel's compact hierarchy via the
+  // library's stable `welcome-*` classes. Colors stay on the library's
+  // `--chat-welcome-*` tokens.
+  :global(.welcome-title) {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 20px;
+  }
+
+  :global(.welcome-description) {
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 16px;
+  }
+
+  // Tighten the title→description spacing to the mockup (the library stacks
+  // them with a 16px flex gap sized for the larger default type).
+  :global(.welcome-container) > :global(div) {
+    gap: 4px !important;
+  }
+
+  // :global(.text-\[var\(--text-tertiary\)\]) {
+  //   font-size: 10px !important;
+  //   font-weight: 400 !important;
+  //   color: var(--text-color) !important;
+  // }
+
+  :global(.scroll-to-bottom) {
+    :global(.light) :is(&, :global(.scroll-to-bottom_icon)) {
+      --icon-normal: #{colors.$light-gray-dark};
+    }
+
+    justify-content: center;
+  }
+
+  // Suggestion chips → 2-column cards (per the mockup). The library renders
+  // them as pill buttons in a centered flex-wrap row; restyle in place through
+  // the stable `.suggestions` wrapper — no library change. (The mockup's "More"
+  // button is not part of the library's output and can't be added from here.)
+  :global(.suggestions) {
+    // Overridable card colors. Defaults resolve to the light-theme tokens
+    // and are redefined for `.dark`; a host can override the whole set.
+    --new-chat-suggestion-border-color: #{colors.$gray-strong};
+    --new-chat-suggestion-hover-border-color: #{colors.$light-gray-hover};
+    --new-chat-suggestion-hover-background-color: #{colors.$light-gray-hover};
+
+    :global(.dark) & {
+      $hover-dark: colors.$light-dark-gray-hover;
+
+      --new-chat-suggestion-border-color: #{colors.$gray-dark-strong};
+      --new-chat-suggestion-hover-border-color: #{$hover-dark};
+      --new-chat-suggestion-hover-background-color: #{$hover-dark};
+    }
+
+    // The single chip row becomes a 2-column grid of equal-width cards.
+    // > div {
+    //   display: grid;
+    //   grid-template-columns: 1fr 1fr;
+    //   gap: 8px;
+    // }
+
+    // Pill → rounded-rectangle card: left-aligned, wrapping text, taller box.
+    // A grid item's `inline-flex` computes to `flex`, so it fills its column.
+    button {
+      // height: auto;
+      // min-height: 40px;
+      // justify-content: flex-start;
+      // border-radius: 8px;
+      // padding: 8px 12px;
+      // text-align: start;
+      cursor: pointer;
+      border: 1px solid var(--new-chat-suggestion-border-color);
+      transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+
+      @media (hover: hover) {
+        &:hover {
+          border-color: var(--new-chat-suggestion-hover-border-color);
+          background-color: var(--new-chat-suggestion-hover-background-color);
+        }
+      }
+
+      span {
+        font-size: 12px;
+        line-height: 18px;
+        white-space: normal;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Center the welcome + suggestions block in the empty new chat with a grid
+  // on the existing thread column — no extra wrapper. Scoped with :has() to the
+  // empty state (the column is shared with the message view, which must stay a
+  // flex layout). Rows: [1fr top spacer][welcome][suggestions][1fr bottom
+  // spacer][composer]. The viewport, welcome and suggestions auto-flow into
+  // rows 1–3; the composer (and its optional header banner) are pinned to the
+  // bottom so row 4 stays an empty spacer equal to the top one.
+  // :global(.aui-root) > :global(div):has(> :global(.chat-viewport--empty)) {
+  //   display: grid;
+  //   grid-template-columns: 100%;
+  //   grid-template-rows: 1fr auto auto 1fr auto;
+
+  //   // Optional host banner: hug the bottom of the spacer, right above composer.
+  //   > :global(.composer-header) {
+  //     grid-row: 4;
+  //     align-self: end;
+  //   }
+
+  //   > :global(div):has(> :global(.composer-root)) {
+  //     grid-row: 5;
+  //   }
+  // }
+}
+
+.chatListInset {
+  padding-inline-start: 4px;
+}
+
+// ── ChatList: match the design mockup ──────────────────────────────────
+// Scoped to our own wrapper around `<ChatList />` so these overrides can't
+// leak into the chat thread, composer or any portaled dropdowns. The widget
+// builds the list from Tailwind arbitrary-value utilities (no stable class
+// names), so we target the tokens baked into those utility strings.
+.chatListWrapper {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  --chat-list-item-height: 36px;
+
+  :global([class*="--chat-list-title-font-weight"]) {
+    margin-block-start: 12px;
+  }
+
+  :global([class*="--chat-list-group-header-font-size"]) {
+    height: 16px;
+    margin-block: 12px;
+  }
+
+  :global([class*="chat-list-item-active-marker-bg"]) {
+    background-color: var(--chat-list-item-active-background-color);
+    font-weight: 600;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  :global([class*="--chat-list-item-font-size"]) {
+    font-feature-settings:
+      "liga" off,
+      "clig" off;
+  }
+
+  :global([class*="--input-border-color"]) {
+    height: 32px;
+    border-radius: 3px;
+    padding: 6px 8px;
+    box-sizing: border-box;
+  }
+}
+
+.splitView {
+  display: grid;
+  // minmax(0, 1fr), not bare 1fr: a bare fr track has an auto minimum, so
+  // any fixed-width descendant (like the lib's Analyzing row) widens the
+  // chat column past the free space instead of overflowing inside it.
+  grid-template-columns: 380px minmax(0, 1fr);
+  // Without an explicit row track the single implicit row is `auto`: it
+  // sizes to the tallest column's content, so a long chat history makes
+  // the whole grid overflow the section and history + chat scroll
+  // together. `minmax(0, 1fr)` pins the row to the grid height so each
+  // column stays bounded and scrolls internally.
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+
+  .historyColumn {
+    height: 100%;
+    min-height: 0;
+    // The ChatList inside owns the vertical scroll; clip anything else so
+    // the column itself never becomes a second scroller.
+    overflow: hidden;
+    border-inline-end: 1px solid var(--info-panel-border-color);
+  }
+}
+
+:global(.aui-root) {
+  --aui-font-base: 13px;
+}
+
+:global(.dropdown-menu-item) {
+  svg path[stroke]:not([stroke="none"]) {
+    stroke: var(--context-menu-header-text-color);
+  }
+  svg path[fill]:not([fill="none"]) {
+    fill: var(--context-menu-header-text-color);
+  }
+
+  :global([class*="--drop-down-menu-item-color"]) {
+    font-weight: 600;
+  }
+}

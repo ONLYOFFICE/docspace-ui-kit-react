@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 @use "../../styles/mixins";
 @use "../../styles/variables/colors" as *;
 
@@ -81,6 +90,18 @@
     --filter-button-open-fill: #{$white};
     --icon-button-hover-color: #{$white};
   }
+
+  --filter-btn-border-v: var(--filter-btn-border, var(--filter-button-border));
+  --filter-btn-hover-border-v: var(
+    --filter-btn-hover-border,
+    var(--filter-button-hover-border)
+  );
+  --filter-btn-open-fill-v: var(
+    --filter-btn-open-fill,
+    var(--filter-button-open-fill)
+  );
+  --filter-btn-radius-v: var(--filter-btn-radius, 3px);
+
   width: 32px;
   min-width: 32px;
   max-width: 32px;
@@ -88,7 +109,7 @@
 
   position: relative;
 
-  border-radius: 3px;
+  border-radius: var(--filter-btn-radius-v);
 
   box-sizing: border-box;
 
@@ -103,10 +124,10 @@
 
   cursor: pointer;
 
-  border: var(--filter-button-border);
+  border: var(--filter-btn-border-v);
 
   &:hover {
-    border: var(--filter-button-hover-border);
+    border: var(--filter-btn-hover-border-v);
     svg {
       path {
         fill: var(--icon-button-hover-color);
@@ -122,7 +143,7 @@
     pointer-events: none;
     svg {
       path {
-        fill: var(--filter-button-open-fill);
+        fill: var(--filter-btn-open-fill-v);
       }
     }
 
@@ -163,12 +184,15 @@
     --filter-block-background: #{$black};
   }
 
+  --filter-bg-v: var(--filter-bg, var(--filter-block-background));
+  --filter-width-v: var(--filter-width, 480px);
+
   position: fixed;
   top: 0;
 
   inset-inline-end: 0;
 
-  width: 480px;
+  width: var(--filter-width-v);
   height: 100%;
 
   z-index: 400;
@@ -176,7 +200,7 @@
   display: flex;
   flex-direction: column;
 
-  background: var(--filter-block-background);
+  background: var(--filter-bg-v);
 
   @include mixins.tablet-and-below {
     max-width: 100%;
@@ -371,11 +395,17 @@
     --filter-block-item-separator-background: #{$gray-dark-strong};
   }
 
+  // bridge vars
+  --filter-separator-v: var(
+    --filter-separator,
+    var(--filter-block-item-separator-background)
+  );
+
   height: 1px;
   width: calc(100% + 16px);
   margin-inline-end: 16px;
 
-  background: var(--filter-block-item-separator-background);
+  background: var(--filter-separator-v);
 }
 
 .filterBlockItemTag {
@@ -390,8 +420,19 @@
     --filter-block-selected-backgroud-color: #{$white};
   }
 
-  height: 28px;
-  max-height: 28px;
+  --filter-tag-border-v: var(
+    --filter-tag-border,
+    var(--filter-block-item-tag-border)
+  );
+  --filter-tag-selected-bg-v: var(
+    --filter-tag-selected,
+    var(--filter-block-selected-backgroud-color)
+  );
+  --filter-tag-radius-v: var(--filter-tag-radius, 16px);
+  --filter-tag-height-v: var(--filter-tag-height, 28px);
+
+  height: var(--filter-tag-height-v);
+  max-height: var(--filter-tag-height-v);
 
   max-width: 100%;
 
@@ -399,8 +440,8 @@
   flex-direction: row;
   align-items: center;
 
-  border: var(--filter-block-item-tag-border);
-  border-radius: 16px;
+  border: var(--filter-tag-border-v);
+  border-radius: var(--filter-tag-radius-v);
 
   box-sizing: border-box;
 
@@ -409,12 +450,12 @@
   cursor: pointer;
 
   &[data-selected="true"] {
-    background: var(--filter-block-selected-backgroud-color);
-    border-color: var(--filter-block-selected-backgroud-color);
+    background: var(--filter-tag-selected-bg-v);
+    border-color: var(--filter-tag-selected-bg-v);
 
     &:hover {
-      background: var(--filter-block-selected-backgroud-color);
-      border-color: var(--filter-block-selected-backgroud-color);
+      background: var(--filter-tag-selected-bg-v);
+      border-color: var(--filter-tag-selected-bg-v);
     }
   }
 
@@ -436,9 +477,30 @@
     --filter-sort-button-selected-background: #{$gray-dark-strong};
   }
 
+  --filter-sort-bg-v: var(
+    --filter-sort-bg,
+    var(--filter-sort-button-background)
+  );
+  --filter-sort-selected-bg-v: var(
+    --filter-sort-selected-bg,
+    var(--filter-sort-button-selected-background)
+  );
+  --filter-sort-fill-v: var(
+    --filter-sort-fill,
+    var(--filter-sort-button-sort-fill)
+  );
+  --filter-sort-selected-icon-v: var(
+    --filter-sort-selected-icon,
+    var(--filter-sort-button-selected-icon)
+  );
+  --filter-sort-unselected-icon-v: var(
+    --filter-sort-unselected-icon,
+    var(--filter-sort-button-unselected-icon)
+  );
+
   :global {
     .combo-button {
-      background: var(--filter-sort-button-background);
+      background: var(--filter-sort-bg-v);
       padding-inline: 4px !important;
       width: 32px;
       height: 32px;
@@ -519,7 +581,7 @@
             cursor: pointer;
 
             path {
-              fill: var(--filter-sort-button-sort-fill);
+              fill: var(--filter-sort-fill-v);
             }
           }
           &:hover {
@@ -530,7 +592,7 @@
         }
 
         .selected-option-item {
-          background: var(--filter-sort-button-selected-background);
+          background: var(--filter-sort-selected-bg-v);
           cursor: pointer;
 
           .selected-option-item__icon {
@@ -562,7 +624,7 @@
       .view-selector-icon:nth-child(1) {
         svg {
           path {
-            fill: var(--filter-sort-button-selected-icon);
+            fill: var(--filter-sort-selected-icon-v);
           }
         }
       }
@@ -570,7 +632,7 @@
       .view-selector-icon:nth-child(2) {
         svg {
           path {
-            fill: var(--filter-sort-button-unselected-icon);
+            fill: var(--filter-sort-unselected-icon-v);
           }
         }
       }
@@ -582,7 +644,7 @@
       .view-selector-icon:nth-child(1) {
         svg {
           path {
-            fill: var(--filter-sort-button-unselected-icon);
+            fill: var(--filter-sort-unselected-icon-v);
           }
         }
       }
@@ -590,7 +652,7 @@
       .view-selector-icon:nth-child(2) {
         svg {
           path {
-            fill: var(--filter-sort-button-selected-icon);
+            fill: var(--filter-sort-selected-icon-v);
           }
         }
       }
@@ -665,23 +727,30 @@
     --view-selector-icon-button-hover-color: #{$white};
   }
 
+  // bridge vars
+  --filter-view-fill-v: var(--filter-view-fill, var(--view-selector-fill-color));
+  --filter-view-checked-v: var(--filter-view-checked, var(--view-selector-checked-fill-color));
+  --filter-view-border-v: var(--filter-view-border, var(--view-selector-border-color));
+  --filter-view-hover-border-v: var(--filter-view-hover-border, var(--view-selector-hover-border-color));
+  --filter-view-hover-icon-v: var(--filter-view-hover-icon, var(--view-selector-icon-button-hover-color));
+
   position: relative;
   padding: 7px;
   box-sizing: border-box;
   border: 1px solid;
 
-  border-color: var(--view-selector-border-color);
-  background-color: var(--view-selector-fill-color);
+  border-color: var(--filter-view-border-v);
+  background-color: var(--filter-view-fill-v);
 
   &.checked {
     z-index: 1;
 
-    border-color: var(--view-selector-checked-fill-color);
-    background-color: var(--view-selector-checked-fill-color);
+    border-color: var(--filter-view-checked-v);
+    background-color: var(--filter-view-checked-v);
 
     svg {
       path {
-        fill: var(--view-selector-fill-color);
+        fill: var(--filter-view-fill-v);
       }
     }
   }
@@ -709,12 +778,12 @@
   &:hover {
     &:not(.checked or .disabled) {
       cursor: pointer;
-      border: 1px solid var(--view-selector-hover-border-color);
+      border: 1px solid var(--filter-view-hover-border-v);
     }
 
     svg {
       path {
-        fill: var(--view-selector-icon-button-hover-color);
+        fill: var(--filter-view-hover-icon-v);
       }
     }
   }
@@ -729,7 +798,7 @@
     height: 16px;
 
     path {
-      fill: var(--view-selector-checked-fill-color);
+      fill: var(--filter-view-checked-v);
     }
   }
 

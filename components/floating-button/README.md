@@ -25,4 +25,5 @@ import { FloatingButton } from ".";
 | `icon`      |    `oneOf`     |    -     | `upload`, `file`, `trash`, `move`, `duplicate` | `upload` | Sets the icon on the button |
 | `id`        |    `string`    |    -     |                       -                        |    -     | Accepts id                  |
 | `percent`   |    `number`    |    -     |                       -                        |   `0`    | Load fullness               |
+| `stopped`   |     `bool`     |    -     |                       -                        | `false`  | Shows the stopped status icon (operation aborted by the user); wins over `alert` and `completed` |
 | `style`     | `obj`, `array` |    -     |                       -                        |    -     | Accepts css style           |

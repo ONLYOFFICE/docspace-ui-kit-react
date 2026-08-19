@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+// Quick-actions tile metrics. Shared so consumers that cap the banner width can
+// derive that cap from the real tile geometry instead of hardcoding a pixel
+// total that silently goes stale when the tile size or gap changes.
+$tile-width: 172px;
+$tile-max-width: 184px;
+$tile-height: 147px;
+$tile-padding: 22px;
+$gap: 8px;
+
+// The narrowest a tile may shrink to before the row is allowed to wrap. Tiles
+// squeeze from $tile-width down to this before any tile moves to a second row,
+// so a banner keeps every tile on one row whenever they can physically fit —
+// hiding a tile behind "Show more" while there is still width to squeeze into
+// is the bug this floor prevents. Sized to still hold the icon plus its
+// padding ($icon-width + 2 * $tile-padding = 125px), rounded up for the label.
+$tile-min-width: 132px;
+
+// The widest banner (Rooms: 5 room tiles + AI chat). A consumer capping the
+// banner must fit at least this many tiles on one row, otherwise the last tile
+// wraps at every viewport width and "Show more" shows with space to spare.
+$max-tiles-per-row: 6;
+
+// Width needed for $max-tiles-per-row tiles at their widest, plus the gaps
+// between them.
+@function row-width($tiles: $max-tiles-per-row) {
+  @return $tiles * $tile-max-width + ($tiles - 1) * $gap;
+}

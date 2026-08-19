@@ -1,10 +1,13 @@
 @use "../../styles/mixins";
 
 .text {
+  --text-font-size: var(--text-size, 13px);
+  --text-font-weight: var(--text-weight, 400);
+
   outline: 0;
   margin: 0;
-  font-weight: 400;
-  font-size: 13px;
+  font-weight: var(--text-font-weight);
+  font-size: var(--text-font-size);
 
   &.inline {
     display: inline-block;

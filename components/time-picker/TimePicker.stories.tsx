@@ -1,30 +1,39 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
-import type { ComponentProps } from "react";
+import type { ComponentProps, CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { DateTime } from "luxon";
@@ -143,6 +152,78 @@ const Wrapper = (props: { children: React.ReactNode }) => {
   );
 };
 
+const CssCustomizationTemplate = () => {
+  return (
+    <div
+      style={
+        {
+          // === TimePicker — input box ===
+          "--time-input-border": "#0082c9",
+          "--time-input-bg": "#f0f8ff",
+          "--time-input-focus-border": "#004f82",
+          "--time-input-error-border": "#c0392b",
+          "--time-input-radius": "8px",
+          "--time-input-height": "36px",
+          "--time-input-width": "68px",
+          "--time-input-padding": "0px 10px",
+          // === TextInput (inner number inputs) ===
+          "--text-input-color": "#004f82",
+          "--text-input-bg": "#f0f8ff",
+        } as CSSProperties
+      }
+    >
+      <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+        <TimePicker
+          initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
+          onChange={() => {}}
+        />
+        <TimePicker
+          initialTime={createDateTime(2025, 1, 27, 10, 30, 0)}
+          hasError
+          onChange={() => {}}
+        />
+        <TimePicker
+          initialTime={createDateTime(2025, 1, 27, 14, 45, 0)}
+          isTwelveHourFormat
+          meridiem="PM"
+          onChange={() => {}}
+        />
+      </div>
+    </div>
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story: `CSS Custom Properties for external customization:
+
+**TimePicker — input box**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--time-input-border\` | Default border color | theme-based |
+| \`--time-input-bg\` | Background color | theme-based |
+| \`--time-input-focus-border\` | Focus/active border color | theme-based |
+| \`--time-input-error-border\` | Error state border color | theme-based |
+| \`--time-input-width\` | Input box width | \`60px\` |
+| \`--time-input-height\` | Input box height | \`32px\` |
+| \`--time-input-radius\` | Border radius | \`3px\` |
+| \`--time-input-padding\` | Inline padding | \`0px 6px\` |
+
+**TextInput (inner number inputs)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| \`--text-input-color\` | Text color | theme-based |
+| \`--text-input-bg\` | Background color | theme-based |`,
+      },
+    },
+  },
+};
+
 export const Default: Story = {
   render: (args) => <TimePicker {...args} />,
   args: {
@@ -251,3 +332,4 @@ export const FocusOnRender: Story = {
     },
   },
 };
+

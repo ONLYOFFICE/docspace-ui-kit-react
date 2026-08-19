@@ -1,28 +1,37 @@
-// (c) Copyright Ascensio System SIA 2009-2026
-//
-// This program is a free software product.
-// You can redistribute it and/or modify it under the terms
-// of the GNU Affero General Public License (AGPL) version 3 as published by the Free Software
-// Foundation. In accordance with Section 7(a) of the GNU AGPL its Section 15 shall be amended
-// to the effect that Ascensio System SIA expressly excludes the warranty of non-infringement of
-// any third-party rights.
-//
-// This program is distributed WITHOUT ANY WARRANTY, without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For details, see
-// the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
-//
-// You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia, EU, LV-1021.
-//
-// The  interactive user interfaces in modified source and object code versions of the Program must
-// display Appropriate Legal Notices, as required under Section 5 of the GNU AGPL version 3.
-//
-// Pursuant to Section 7(b) of the License you must retain the original Product logo when
-// distributing the program. Pursuant to Section 7(e) we decline to grant you any rights under
-// trademark law for use of our trademarks.
-//
-// All the Product's GUI elements, including illustrations and icon sets, as well as technical writing
-// content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
-// International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 
 import React, { useLayoutEffect, useRef, useState } from "react";
 import InfiniteLoader from "react-window-infinite-loader";
@@ -64,7 +73,8 @@ const BODY_DESCRIPTION_TEXT_HEIGHT = 32;
 const SELECT_ALL_HEIGHT = 61;
 const FOOTER_HEIGHT = 73;
 const FOOTER_WITH_NEW_NAME_HEIGHT = 145;
-const FOOTER_WITH_CHECKBOX_HEIGHT = 181;
+const FOOTER_WITH_CHECKBOX_HEIGHT = 110;
+const FOOTER_WITH_NEW_NAME_AND_CHECKBOX_HEIGHT = 181;
 const ERROR_FOOTER_HEIGHT = 20;
 
 const Body = ({
@@ -126,6 +136,7 @@ const Body = ({
 
   const bodyRef = React.useRef<HTMLDivElement>(null);
   const listOptionsRef = React.useRef<null | InfiniteLoader>(null);
+  const listRef = React.useRef<List | null>(null);
   const resizeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -155,6 +166,10 @@ const Body = ({
       listOptionsRef.current.resetloadMoreItemsCache(true);
     }
   }, []);
+
+  React.useEffect(() => {
+    listRef.current?.resetAfterIndex(0);
+  }, [items]);
 
   const onBodyResize = React.useCallback(() => {
     if (bodyRef && bodyRef.current) {
@@ -269,8 +284,10 @@ const Body = ({
   if (descriptionText) listHeight -= BODY_DESCRIPTION_TEXT_HEIGHT;
 
   const getFooterHeight = () => {
-    if (withErrorFooter && withFooterCheckbox && withFooterInput)
-      return FOOTER_WITH_CHECKBOX_HEIGHT + ERROR_FOOTER_HEIGHT;
+    if (withFooterCheckbox && withFooterInput)
+      return withErrorFooter
+        ? FOOTER_WITH_NEW_NAME_AND_CHECKBOX_HEIGHT + ERROR_FOOTER_HEIGHT
+        : FOOTER_WITH_NEW_NAME_AND_CHECKBOX_HEIGHT;
     if (withFooterCheckbox) return FOOTER_WITH_CHECKBOX_HEIGHT;
     if (withFooterInput) return FOOTER_WITH_NEW_NAME_HEIGHT;
     return FOOTER_HEIGHT;
@@ -284,8 +301,9 @@ const Body = ({
   const cloneProps = { ref: injectedElementRef };
 
   const getItemSize = (index: number): number => {
-    if (items[index]?.isSeparator) {
-      return 16;
+    const item = items[index];
+    if (item?.isSeparator) {
+      return item?.isSectionSeparator ? 25 : 16;
     }
 
     return 48;
@@ -342,12 +360,14 @@ const Body = ({
       {isLoading ? (
         <Scrollbar style={{ height: listHeight }}>{rowLoader}</Scrollbar>
       ) : itemsCount === 0 ? (
-        <EmptyScreen
-          withSearch={isSearch}
-          items={items}
-          inputItemVisible={inputItemVisible}
-          hideBackButton={hideBackButton}
-        />
+        <div style={{ height: listHeight }}>
+          <EmptyScreen
+            withSearch={isSearch}
+            items={items}
+            inputItemVisible={inputItemVisible}
+            hideBackButton={hideBackButton}
+          />
+        </div>
       ) : (
         <>
           {descriptionText ? (
@@ -449,7 +469,12 @@ const Body = ({
                   }}
                   itemSize={getItemSize}
                   onItemsRendered={onItemsRendered}
-                  ref={ref}
+                  ref={(node: List | null) => {
+                    if (typeof ref === "function") {
+                      (ref as (r: List | null) => void)(node);
+                    }
+                    listRef.current = node;
+                  }}
                   outerElementType={VirtualScroll}
                 >
                   {Item}

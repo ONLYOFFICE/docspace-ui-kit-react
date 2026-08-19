@@ -25,17 +25,17 @@ import {
 
 ```typescript
 size = {
-  mobile: 600,    // Mobile max width
-  desktop: 1024,  // Desktop min width
+  mobile: 600, // Mobile max width
+  desktop: 1024, // Desktop min width
   // Tablet is between mobile and desktop (600px - 1024px)
-}
+};
 ```
 
 ### Layout Constants
 
 ```typescript
-INFO_PANEL_WIDTH = 400;              // Width of info panel
-MAX_INFINITE_LOADER_SHIFT = 800;     // Max shift for infinite loader
+INFO_PANEL_WIDTH = 400; // Width of info panel
+MAX_INFINITE_LOADER_SHIFT = 800; // Max shift for infinite loader
 ```
 
 ### Media Query Strings
@@ -43,11 +43,11 @@ MAX_INFINITE_LOADER_SHIFT = 800;     // Max shift for infinite loader
 Pre-defined media query strings for use with styled-components or CSS:
 
 ```typescript
-mobile = "(max-width: 600px)"
-mobileMore = "(min-width: 600px)"
-tablet = "(max-width: 1023.9px)"
-desktop = "(min-width: 1024px)"
-transitionalScreenSize = "(max-width: 1424px)" // desktop + INFO_PANEL_WIDTH
+mobile = "(max-width: 600px)";
+mobileMore = "(min-width: 600px)";
+tablet = "(max-width: 1023.9px)";
+desktop = "(min-width: 1024px)";
+transitionalScreenSize = "(max-width: 1424px)"; // desktop + INFO_PANEL_WIDTH
 ```
 
 ## Functions
@@ -72,9 +72,10 @@ const width = window.innerWidth;
 
 ### `isMobile(width?)`
 
-Checks if the viewport is mobile-sized (≤600px).
+Checks if the viewport is mobile-sized (<=600px).
 
 **Parameters:**
+
 - `width?` (number) - Optional width to check. Defaults to `window.innerWidth`
 
 **Returns:** `boolean` - `true` if mobile-sized
@@ -115,6 +116,7 @@ if (isMobileDevice()) {
 Checks if the viewport is tablet-sized (601px - 1023px).
 
 **Parameters:**
+
 - `width?` (number) - Optional width to check. Defaults to `window.innerWidth`
 
 **Returns:** `boolean` - `true` if tablet-sized
@@ -311,12 +313,12 @@ export function useBreakpoint() {
 
 ## Breakpoint Reference
 
-| Breakpoint | Range | Description |
-|------------|-------|-------------|
-| Mobile | 0 - 600px | Phone screens |
-| Tablet | 601px - 1023px | Tablet screens |
-| Desktop | 1024px+ | Desktop screens |
-| Transitional | Up to 1424px | Desktop with info panel |
+| Breakpoint   | Range          | Description             |
+| ------------ | -------------- | ----------------------- |
+| Mobile       | 0 - 600px      | Phone screens           |
+| Tablet       | 601px - 1023px | Tablet screens          |
+| Desktop      | 1024px+        | Desktop screens         |
+| Transitional | Up to 1424px   | Desktop with info panel |
 
 ## SSR Considerations
 
@@ -343,3 +345,4 @@ When using these utilities in a server-side rendering context:
 - [Styled Components Documentation](https://styled-components.com/docs/advanced#media-templates)
 - [MDN: window.matchMedia](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia)
 - [MDN: Screen Orientation API](https://developer.mozilla.org/en-US/docs/Web/API/Screen/orientation)
+

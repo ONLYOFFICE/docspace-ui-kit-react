@@ -1,0 +1,572 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+.overviewRoot {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 880px;
+  margin: 80px auto 0;
+
+  @media (max-width: 900px) {
+    margin-top: 24px;
+  }
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.headerDescription {
+  max-width: 560px;
+  color: var(--services-text-description);
+}
+
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 432px));
+  grid-template-rows: auto auto 1fr;
+  justify-content: space-between;
+  column-gap: 16px;
+  row-gap: 8px;
+
+  > div {
+    grid-row: span 3;
+    display: grid;
+    grid-template-rows: subgrid;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    row-gap: 16px;
+
+    > div {
+      grid-row: auto;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--payment-card-background-color);
+  border: 1px solid var(--payment-card-border-color);
+  border-radius: 6px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  > p {
+    flex-shrink: 0;
+  }
+
+  a {
+    text-align: end;
+  }
+}
+
+.cardValue {
+  margin-block-start: 6px;
+}
+
+.creditsTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cardButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.cardButton {
+  min-width: 104px;
+}
+
+.creditsCard {
+  gap: 4px;
+}
+
+.creditsBalance {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.planCard {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.planInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.planButton {
+  flex-shrink: 0;
+}
+
+.topUpWarning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  background: var(--payment-background-color);
+  border-radius: 6px;
+  margin-top: 12px;
+}
+
+.topUpWarningIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  path {
+    fill: var(--status-warning);
+  }
+}
+
+.topUpWarningText {
+  flex: 1;
+  min-width: 0;
+  color: var(--status-warning);
+}
+
+.autoPaymentWrap {
+  margin-top: 12px;
+
+  > div {
+    margin-bottom: 0;
+    max-width: none;
+    width: 100%;
+  }
+}
+
+.mutedTitle {
+  color: var(--payment-secondary-text-color);
+}
+
+.cardLink {
+  margin-block-start: auto;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top:12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rowInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.addonLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.addonIcon {
+  display: flex;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  rect {
+    fill: var(--color-scheme-main-buttons);
+    opacity: 0.1;
+  }
+
+  path {
+    fill: var(--color-scheme-main-buttons);
+    opacity: 1;
+  }
+}
+
+.linked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--payment-card-border-color);
+  border-radius: 6px;
+}
+
+.emptyState {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 140px;
+}
+
+.upcomingList {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-content: start;
+  column-gap: 25px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.upcomingRow {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+  min-height: 48px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--payment-devider-color);
+  }
+}
+
+.upcomingAmount {
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.pmSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.pmRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 0;
+
+  &:first-child {
+    padding-block-start: 6px;
+  }
+}
+
+.pmCardIcon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.pmInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.pmErrorTitle {
+  color: var(--payment-error-color);
+}
+
+.pmStatusIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.pmCheckIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  path {
+    fill: var(--payment-credit-color);
+  }
+}
+
+.pmDivider {
+  width: 100%;
+  height: 1px;
+  background: var(--payment-devider-color);
+}
+
+.pmPayerLabel {
+  flex-shrink: 0;
+  color: var(--payment-secondary-text-color);
+}
+
+.emptyContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.cardBody {
+  grid-row: 3;
+}
+
+.addonsColumns {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding-block: 12px 8px;
+  border-bottom: 1px solid var(--payment-devider-color);
+  color: var(--payment-secondary-text-color);
+}
+
+.addonsBody {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.addonsList {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.addonRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-block: 12px;
+}
+
+.addonRowMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.addonName {
+  min-width: 0;
+}
+
+.addonUsage {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.addonMuted {
+  color: var(--payment-secondary-text-color);
+}
+
+.addonBar {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--payment-spend-track-color);
+}
+
+.addonBarFill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--payment-credit-color);
+}
+
+.spendBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.spendBar {
+  display: flex;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--payment-spend-track-color);
+}
+
+.spendBarSubs {
+  height: 100%;
+  background: var(--payment-spend-subscriptions-color);
+}
+
+.spendBarPayg {
+  height: 100%;
+  background: var(--payment-spend-payg-color);
+}
+
+.spendList {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+}
+
+.spendSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-block: 8px 4px;
+
+  &:not(:first-child) {
+    padding-block-start: 20px;
+  }
+}
+
+.spendSectionEmpty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-block: 24px;
+}
+
+.spendDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 8px;
+}
+
+.spendDotSubs {
+  background: var(--payment-spend-subscriptions-color);
+}
+
+.spendDotPayg {
+  background: var(--payment-spend-payg-color);
+}
+
+.spendSectionLabel {
+  flex: 1 0 0;
+  min-width: 0;
+  color: var(--payment-secondary-text-color);
+}
+
+.spendSectionTotal {
+  flex-shrink: 0;
+  white-space: nowrap;
+  color: var(--payment-secondary-text-color);
+}
+
+.spendRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding-inline-start: 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.spendRowInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-width: 0;
+  padding-block: 8px;
+}
+
+.spendAmount {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding-inline-start: 25px;
+  padding-block: 8px;
+}
+
+.spendDivider {
+  height: 1px;
+  margin-inline-start: 16px;
+  background: var(--payment-devider-color);
+}
+
+.paymentLinkedCard {
+  width: 100%;
+  /* 8px card flex-gap + 22px = 30px below the linked card */
+  margin-block-end: 22px;
+  margin-top: 30px;
+}

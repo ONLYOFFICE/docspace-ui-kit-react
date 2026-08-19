@@ -12,6 +12,9 @@ import { globalColors } from "../providers/theme/themes/globalColors";
 import globalTypes from "./globals";
 import withApiProvider from "./decorators/withApiProvider";
 import enCommon from "../locales/en/Common.json";
+import enPayments from "../locales/en/Payments.json";
+import enServices from "../locales/en/Services.json";
+import enSettings from "../locales/en/Settings.json";
 
 import "./styles.css";
 import "../css/fonts.css";
@@ -88,6 +91,7 @@ const preview: Preview = {
           "Components",
           [
             "AI Agent",
+            "Payments",
             "Document Editor",
             "Uploader",
             "Selectors",
@@ -113,7 +117,12 @@ const preview: Preview = {
       const currentColorScheme = isDark ? darkColorScheme : lightColorScheme;
 
       const translations: TTranslations = new Map([
-        ["en", new Map([["Common", enCommon]])],
+        ["en", new Map([
+          ["Common", enCommon],
+          ["Payments", enPayments],
+          ["Services", enServices],
+          ["Settings", enSettings],
+        ])],
       ]);
 
       const isDocs = context.viewMode === "docs";

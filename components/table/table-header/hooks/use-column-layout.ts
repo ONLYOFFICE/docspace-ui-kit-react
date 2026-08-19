@@ -95,6 +95,18 @@ export function useColumnLayout({
       withoutWideColumn,
     } = optionsRef.current;
 
+    // While the container is collapsed (e.g. the host hides #section behind a
+    // fullscreen overlay, giving it width 0), recomputing against a zero width
+    // yields garbage column sizes that would get persisted and corrupt the
+    // layout once the container is restored — skip until it has a real width.
+    const collapsedContainer =
+      containerRef.current ?? document.getElementById("table-container");
+    if (
+      collapsedContainer &&
+      collapsedContainer.getBoundingClientRect().width < 1
+    )
+      return;
+
     clearColumnSizes(
       getColumnStorageKey(
         infoPanelVisible,
@@ -295,9 +307,21 @@ export function useColumnLayout({
 
     window.addEventListener("resize", onWindowResize, { passive: true });
 
+    // Also recompute on container-driven width changes that never fire a window
+    // resize — e.g. a host collapsing/expanding #section for a fullscreen
+    // overlay, or a side panel opening next to the table. Observing the
+    // container makes the table self-sufficient regardless of what moved it; a
+    // collapsed (width 0) container is handled by the guards in resetColumns
+    // and resizeColumns. Setting gridTemplateColumns doesn't change the
+    // container's own box, so this can't feed back into itself.
+    const container = optionsRef.current.containerRef.current;
+    const resizeObserver = new ResizeObserver(onWindowResize);
+    if (container) resizeObserver.observe(container);
+
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener("resize", onWindowResize);
+      resizeObserver.disconnect();
     };
   }, []);
 

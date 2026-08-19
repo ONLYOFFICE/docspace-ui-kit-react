@@ -25,6 +25,9 @@
       ],
       "PUBLIC_DIR/*": [
         "../../public/*"
+      ],
+      "@docspace/shared/*": [
+        "../../packages/shared/*"
       ]
     }
   },

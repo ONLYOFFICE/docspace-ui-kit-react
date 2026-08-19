@@ -1,0 +1,332 @@
+/*
+ * Copyright (C) Ascensio System SIA, 2009-2026
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation, together with the
+ * additional terms provided in the LICENSE file.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
+ * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA by email at info@onlyoffice.com
+ * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
+ * LV-1050, Latvia, European Union.
+ *
+ * The interactive user interfaces in modified versions of the Program
+ * are required to display Appropriate Legal Notices in accordance with
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * No trademark rights are granted under this License.
+ *
+ * All non-code elements of the Product, including illustrations,
+ * icon sets, and technical writing content, are licensed under the
+ * Creative Commons Attribution-ShareAlike 4.0 International License:
+ * https://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ * This license applies only to such non-code elements and does not
+ * modify or replace the licensing terms applicable to the Program's
+ * source code, which remains licensed under the GNU Affero General
+ * Public License v3.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import React, { useState } from "react";
+import { observer } from "mobx-react";
+import { CommonTrans } from "../../../utils/i18n/CommonTrans";
+
+import { Button, ButtonSize } from "../../../components/button";
+import styles from "./UpdatePlanButtonContainer.module.scss";
+import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
+import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
+import { Text } from "../../../components/text";
+import { Link } from "../../../components/link";
+
+import DowngradePlanButtonContainer from "./DowngradePlanButtonContainer";
+import ChangePricingPlanDialog from "../../dialogs/ChangePricingPlanDialog";
+import MigrateToWalletDialog from "./MigrateToWalletDialog";
+import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import { getConvertedSize } from "../../utils/common";
+import { usePaymentStore } from "../../store/PaymentStoreProvider";
+
+type UpdatePlanButtonContainerProps = {
+  isDisabled?: boolean;
+  t: (key: string, options?: Record<string, unknown>) => string;
+};
+
+const UpdatePlanButtonContainer = ({
+  isDisabled,
+  t,
+}: UpdatePlanButtonContainerProps) => {
+  const store = usePaymentStore();
+
+  const {
+    managersCount,
+    isLoading,
+    isLessCountThanAcceptable,
+    canPayTariff,
+    totalPrice,
+    formatPaymentCurrency,
+    canDowngradeTariff,
+    fetchBalance,
+    walletBalance,
+    tariffDueTodayAmount,
+    isTariffDueTodayCalculating,
+    isCardLinkedToPortal,
+    allowedStorageSizeByQuota,
+    isCardMissingOrInactive,
+    needsWalletMigration,
+    getConfirmButtonLabel,
+    executeWalletUpdate,
+    resetTariffContainerToBasic,
+  } = store;
+  const {
+    maxCountManagersByQuota,
+    currentTariffPlanTitle,
+    fetchPortalQuota,
+    isFreeTariff,
+  } = store.quotas;
+  const { tariffPlanTitle, fetchPaymentQuotas } = store.paymentQuotas;
+  const {
+    fetchPortalTariff,
+    hasScheduledTariffAdminsChange,
+    isGracePeriod,
+    isNotPaidPeriod,
+  } = store.tariff;
+
+  const isRepurchase = isFreeTariff || isGracePeriod || isNotPaidPeriod;
+
+  const [isVisiblePaymentConfirm, setIsVisiblePaymentConfirm] = useState(false);
+  const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
+    useState(false);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const [isMigrateDialogVisible, setIsMigrateDialogVisible] = useState(false);
+
+  const onClose = () => {
+    setIsVisiblePaymentConfirm(false);
+  };
+
+  const refreshAfterUpdate = async () => {
+    await Promise.all([
+      fetchPortalTariff(true),
+      fetchBalance(true),
+      fetchPortalQuota(true),
+      fetchPaymentQuotas(),
+    ]);
+
+    resetTariffContainerToBasic();
+  };
+
+  const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
+  const isBalanceInsufficient = walletBalance < dueTodayAmount;
+  const topUpShortfall = Math.max(0, Math.ceil(dueTodayAmount - walletBalance));
+
+  const onUpdateTariff = () => {
+    if (isVisiblePaymentConfirm) onClose();
+
+    return executeWalletUpdate(
+      managersCount - maxCountManagersByQuota,
+      ProductQuantityType.Add,
+      t,
+    );
+  };
+
+  const isPassedByQuota = () => {
+    return isCardLinkedToPortal ? canDowngradeTariff : canPayTariff;
+  };
+
+  const onDowngradeTariff = () => {
+    if (isPassedByQuota()) {
+      executeWalletUpdate(managersCount, ProductQuantityType.Set, t);
+      return;
+    }
+
+    setIsVisibleDowngradePlanDialog(true);
+  };
+
+  const onCloseDowngradePlanDialog = () => {
+    setIsVisibleDowngradePlanDialog(false);
+  };
+
+  const onTopUpConfirm = async () => {
+    setIsTopUpDialogVisible(false);
+
+    await (isRepurchase
+      ? executeWalletUpdate(managersCount, ProductQuantityType.Add, t)
+      : onUpdateTariff());
+  };
+
+  const payTariffButton = () => {
+    const buttonLabel =
+      !isCardLinkedToPortal || isBalanceInsufficient
+        ? t("TopUpAndUpgrade")
+        : t("UpgradeNow");
+
+    const onClick = () => {
+      if (canPayTariff) {
+        isCardLinkedToPortal
+          ? executeWalletUpdate(managersCount, ProductQuantityType.Add, t)
+          : setIsTopUpDialogVisible(true);
+        return;
+      }
+
+      setIsVisibleDowngradePlanDialog(true);
+    };
+
+    return (
+      <Button
+        className={styles.button}
+        label={buttonLabel}
+        size={ButtonSize.medium}
+        primary
+        isDisabled={isLessCountThanAcceptable || isLoading || isDisabled}
+        onClick={onClick}
+        isLoading={isLoading}
+        testId="upgrade_plan_button"
+      />
+    );
+  };
+
+  const updatingCurrentTariffButton = () => {
+    const isDowngradePlan =
+      !isFreeTariff && managersCount < maxCountManagersByQuota;
+    const isTheSameCount =
+      !isFreeTariff && managersCount === maxCountManagersByQuota;
+
+    const confirmLabel = getConfirmButtonLabel(t);
+
+    return isDowngradePlan ? (
+      <DowngradePlanButtonContainer
+        onDowngradeTariff={
+          needsWalletMigration
+            ? () => setIsMigrateDialogVisible(true)
+            : onDowngradeTariff
+        }
+        isDisabled={isDisabled || hasScheduledTariffAdminsChange}
+        buttonLabel={confirmLabel}
+      />
+    ) : (
+      <Button
+        className={styles.button}
+        label={confirmLabel}
+        size={ButtonSize.medium}
+        primary
+        isDisabled={
+          isLessCountThanAcceptable ||
+          isTheSameCount ||
+          isLoading ||
+          isDisabled ||
+          isTariffDueTodayCalculating ||
+          hasScheduledTariffAdminsChange
+        }
+        onClick={
+          needsWalletMigration
+            ? () => setIsMigrateDialogVisible(true)
+            : onUpdateTariff
+        }
+        isLoading={isLoading}
+        testId="upgrade_plan_button"
+      />
+    );
+  };
+
+  return (
+    <div className={styles.body}>
+      {isRepurchase ? payTariffButton() : updatingCurrentTariffButton()}
+
+      {isVisibleDowngradePlanDialog ? (
+        <ChangePricingPlanDialog
+          visible={isVisibleDowngradePlanDialog}
+          onClose={onCloseDowngradePlanDialog}
+        />
+      ) : null}
+
+      {isMigrateDialogVisible ? (
+        <MigrateToWalletDialog
+          visible={isMigrateDialogVisible}
+          onClose={() => setIsMigrateDialogVisible(false)}
+          onMigrated={refreshAfterUpdate}
+        />
+      ) : null}
+
+      {isTopUpDialogVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpDialogVisible}
+          onClose={() => setIsTopUpDialogVisible(false)}
+          onConfirm={isCardMissingOrInactive ? undefined : onTopUpConfirm}
+          minValue={topUpShortfall > 0 ? `${topUpShortfall}` : undefined}
+          successParams={{
+            admins: `${managersCount}`,
+            storage: getConvertedSize(t, allowedStorageSizeByQuota),
+            plan: isFreeTariff ? tariffPlanTitle : currentTariffPlanTitle,
+            price: formatPaymentCurrency(totalPrice, 2),
+          }}
+        />
+      ) : null}
+
+      {isVisiblePaymentConfirm ? (
+        <ModalDialog
+          visible={isVisiblePaymentConfirm}
+          onClose={onClose}
+          displayType={ModalDialogType.modal}
+        >
+          <ModalDialog.Header>{t("PlanUpgrade")}</ModalDialog.Header>
+          <ModalDialog.Body>
+            <div className={styles.modalBody}>
+              <Text>
+                <CommonTrans
+                  i18nKey="SwitchPlan"
+                  values={{ planName: tariffPlanTitle }}
+                  components={{
+                    1: <span style={{ fontWeight: 600 }} />,
+                  }}
+                />
+              </Text>
+              <Text>
+                <CommonTrans
+                  i18nKey="ChargeAmount"
+                  values={{ price: formatPaymentCurrency(totalPrice) }}
+                  components={{
+                    1: <span style={{ fontWeight: 600 }} />,
+                  }}
+                />
+              </Text>
+              <Text className={styles.textWarning}>
+                <CommonTrans
+                  i18nKey="ActionCannotBeUndone"
+                  components={{
+                    1: <span style={{ fontWeight: 600 }} />,
+                  }}
+                />
+              </Text>
+            </div>
+          </ModalDialog.Body>
+          <ModalDialog.Footer>
+            <Button
+              key="OkButton"
+              label={t("ConfirmPayment")}
+              size={ButtonSize.normal}
+              primary
+              scale
+              onClick={onUpdateTariff}
+              testId="confirm_payment_button"
+            />
+            <Button
+              key="CancelButton"
+              label={t("CancelButton")}
+              size={ButtonSize.normal}
+              scale
+              onClick={onClose}
+              testId="cancel_payment_button"
+            />
+          </ModalDialog.Footer>
+        </ModalDialog>
+      ) : null}
+    </div>
+  );
+};
+
+export default observer(UpdatePlanButtonContainer);
+
