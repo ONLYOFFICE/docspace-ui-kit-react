@@ -336,7 +336,7 @@ const AiSearchPage = (props: AiSearchPageProps) => {
             ) : (
               <Text className={styles.cardCaption}>
                 {monthTokens > 0
-                  ? t("BilledAISearch", { count: monthTokens })
+                  ? t("RequestsProcessedInMonth", { month: monthLabel })
                   : t("AISearchUsedInMonth", { month: monthLabel })}
               </Text>
             )}
