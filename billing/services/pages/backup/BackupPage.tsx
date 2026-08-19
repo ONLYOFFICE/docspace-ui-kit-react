@@ -263,11 +263,19 @@ const BackupPage: React.FC<BackupPageProps> = ({
                     {availableBackupsCount}
                   </Text>
                 )}
-                <Text className={styles.cardCaption}>
-                  {t("PerBackup", {
-                    currency: formatWalletCurrency(backupServicePrice, 2),
-                  })}
-                </Text>
+                {isUsageLoading ? (
+                  <RectangleSkeleton
+                    width="100px"
+                    height="16px"
+                    borderRadius="3px"
+                  />
+                ) : (
+                  <Text className={styles.cardCaption}>
+                    {t("PerBackup", {
+                      currency: formatWalletCurrency(backupServicePrice, 2),
+                    })}
+                  </Text>
+                )}
               </>
             ) : (
               <>
@@ -337,7 +345,22 @@ const BackupPage: React.FC<BackupPageProps> = ({
             ) : (
               <Text className={styles.cardValue}>{totalBackupsUsed}</Text>
             )}
-            {totalBackupsUsed > 0 ? (
+            {isUsageLoading ? (
+              <>
+                {!isFreeTariff ? (
+                  <RectangleSkeleton
+                    width="120px"
+                    height="16px"
+                    borderRadius="3px"
+                  />
+                ) : null}
+                <RectangleSkeleton
+                  width="100px"
+                  height="16px"
+                  borderRadius="3px"
+                />
+              </>
+            ) : totalBackupsUsed > 0 ? (
               <>
                 {!isFreeTariff ? (
                   <Text className={styles.cardCaption}>

@@ -327,11 +327,19 @@ const AiSearchPage = (props: AiSearchPageProps) => {
             ) : (
               <Text className={styles.cardValue}>{monthTokensText}</Text>
             )}
-            <Text className={styles.cardCaption}>
-              {monthTokens > 0
-                ? t("BilledAISearch", { count: monthTokens })
-                : t("AISearchUsedInMonth", { month: monthLabel })}
-            </Text>
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="140px"
+                height="16px"
+                borderRadius="3px"
+              />
+            ) : (
+              <Text className={styles.cardCaption}>
+                {monthTokens > 0
+                  ? t("BilledAISearch", { count: monthTokens })
+                  : t("AISearchUsedInMonth", { month: monthLabel })}
+              </Text>
+            )}
           </div>
         </div>
       </div>
