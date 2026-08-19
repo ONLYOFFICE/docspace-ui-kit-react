@@ -182,6 +182,10 @@
 
     justify-content: center;
   }
+  :global(.chat-no-access-screen) {
+    padding-inline: 16px;
+    box-sizing: border-box;
+  }
 
   // Suggestion chips → 2-column cards (per the mockup). The library renders
   // them as pill buttons in a centered flex-wrap row; restyle in place through

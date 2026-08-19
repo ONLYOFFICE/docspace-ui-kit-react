@@ -42,11 +42,14 @@ import { EmptyView } from "../../../../components/empty-view";
 
 // Mock EmptyView to verify props
 vi.mock("../../../../components/empty-view", () => ({
-  EmptyView: vi.fn(({ title, description, options, icon }) => (
+  EmptyView: vi.fn(({ title, description, options, icon, extraContent }) => (
     <div data-testid="empty-view-mock">
       <div data-testid="empty-view-title">{title}</div>
       <div data-testid="empty-view-description">{description}</div>
       <div data-testid="empty-view-icon">{icon}</div>
+      {extraContent ? (
+        <div data-testid="empty-view-extra">{extraContent}</div>
+      ) : null}
       {options && options.length > 0 && (
         <div data-testid="empty-view-options">
           {options.map(
@@ -81,10 +84,13 @@ describe("<ChatNoAccessScreen />", () => {
     vi.clearAllMocks();
   });
 
+  // The agents section keeps its own wording; the AI chat panel copy is
+  // covered by the describe block below.
   const defaultProps = {
     aiReady: false,
     standalone: false,
     isPortalAdmin: false,
+    isAgents: true,
     goToAISettings: vi.fn(),
   };
 
@@ -224,6 +230,78 @@ describe("<ChatNoAccessScreen />", () => {
       />,
     );
 
+    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
+  });
+});
+
+describe("<ChatNoAccessScreen /> chat panel copy", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const chatProps = {
+    aiReady: false,
+    standalone: false,
+    isPortalAdmin: false,
+    goToAISettings: vi.fn(),
+  };
+
+  it("asks a saas user to contact the admin and lists the AI benefits", () => {
+    render(<ChatNoAccessScreen {...chatProps} />);
+
+    expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
+      "EmptyAIChatNotActiveYetTitle",
+    );
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "EmptyAIChatNotActiveYetUserDescription",
+    );
+    expect(screen.getByTestId("chat-ai-benefits")).toBeInTheDocument();
+    expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
+  });
+
+  it("offers a saas admin the top up & activate button next to the benefits", () => {
+    render(
+      <ChatNoAccessScreen
+        {...chatProps}
+        isPortalAdmin={true}
+        isCardLinkedToPortal={false}
+        onTopUpAndActivateAI={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "EmptyAIChatNotActiveYetAdminDescription",
+    );
+    expect(screen.getByTestId("chat-ai-benefits")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("option-top-up-and-activate-ai"),
+    ).toBeInTheDocument();
+  });
+
+  it("sends a standalone admin to the AI settings and drops the benefits", () => {
+    render(
+      <ChatNoAccessScreen {...chatProps} standalone={true} isPortalAdmin />,
+    );
+
+    expect(screen.getByTestId("empty-view-title")).toHaveTextContent(
+      "EmptyAIChatNotAvailableYetTitle",
+    );
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "EmptyAIChatNotAvailableYetAdminDescription",
+    );
+    expect(screen.queryByTestId("chat-ai-benefits")).not.toBeInTheDocument();
+    expect(
+      screen.getByTestId("option-go-to-ai-provider-settings"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a standalone user the read-only copy", () => {
+    render(<ChatNoAccessScreen {...chatProps} standalone={true} />);
+
+    expect(screen.getByTestId("empty-view-description")).toHaveTextContent(
+      "EmptyAIChatNotAvailableYetUserDescription",
+    );
+    expect(screen.queryByTestId("chat-ai-benefits")).not.toBeInTheDocument();
     expect(screen.queryByTestId("empty-view-options")).not.toBeInTheDocument();
   });
 });

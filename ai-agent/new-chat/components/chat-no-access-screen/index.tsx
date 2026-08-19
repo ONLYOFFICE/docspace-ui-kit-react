@@ -35,19 +35,22 @@
 
 import React from "react";
 
-import ChatNoAccessRightsDarkIcon from "../../../../assets/emptyview/empty.chat.access.rights.dark.svg";
-import ChatNoAccessRightsLightIcon from "../../../../assets/emptyview/empty.chat.access.rights.light.svg";
+import ChatNoAccessRightsDarkIcon from "../../../../assets/emptyview/empty.ai-agents.icon.dark.svg";
+import ChatNoAccessRightsLightIcon from "../../../../assets/emptyview/empty.ai-agents.icon.light.svg";
 
 import { EmptyView } from "../../../../components/empty-view";
-import { Text } from "../../../../components/text";
 import { useTheme } from "../../../../context/ThemeContext";
-import { match, P } from "ts-pattern";
 import { useCommonTranslation } from "../../../../utils/i18n";
+
+import { ChatAiBenefits } from "../chat-ai-benefits";
+import { getNoAccessCopy } from "./copy";
 
 export type ChatNoAccessScreenProps = {
   aiReady: boolean;
   standalone: boolean;
   isPortalAdmin: boolean;
+  /** Agents section wording; the AI chat panel gets the chat wording instead. */
+  isAgents?: boolean;
   isCardLinkedToPortal?: boolean;
   goToAISettings?: () => void;
   onActivateAI?: () => void;
@@ -60,6 +63,7 @@ export const ChatNoAccessScreen = ({
   aiReady,
   isPortalAdmin,
   standalone,
+  isAgents = false,
   isCardLinkedToPortal,
   goToAISettings,
   onActivateAI,
@@ -76,44 +80,12 @@ export const ChatNoAccessScreen = ({
     <ChatNoAccessRightsDarkIcon />
   );
 
-  const title = match([standalone, isPortalAdmin])
-    // standalone admin
-    .with([true, true], () =>
-      t("EmptyAIAgentsAIDisabledStandaloneAdminTitle", {
-        aiProvider: t("AIProvider"),
-      }),
-    )
-    // saas (admin + user)
-    .with([false, P._], () => t("EmptyAIAgentsNotActiveYetTitle"))
-    // standalone user
-    .otherwise(() => t("AIFeaturesAreCurrentlyDisabled"));
-
-  const description = match([standalone, isPortalAdmin])
-    // standalone admin
-    .with([true, true], () =>
-      t("EmptyAIAgentsAIDisabledStandaloneAdminDescription", {
-        aiChats: t("AIChats"),
-      }),
-    )
-    // saas admin
-    .with([false, true], () => (
-      <>
-        <Text as="span">{t("EmptyAIAgentsNotActiveYetDescription")}</Text>
-        <Text as="span" style={{ display: "block", marginTop: "8px" }}>
-          {t("EmptyAIAgentsNotActiveYetDescriptionLine2")}
-        </Text>
-      </>
-    ))
-    // standalone user
-    .with([true, false], () =>
-      t("EmptyAIAgentsAIDisabledDescription", {
-        aiAgents: t("AIAgents"),
-      }),
-    )
-    // saas user
-    .otherwise(() =>
-      t("EmptyAIDisabledContactAdminDesc"),
-    );
+  const { title, description, showBenefits } = getNoAccessCopy({
+    isAgents,
+    standalone,
+    isPortalAdmin,
+    t,
+  });
 
   const goToAIProviderSettings = {
     type: "button",
@@ -166,6 +138,7 @@ export const ChatNoAccessScreen = ({
       description={description}
       icon={icon}
       options={options}
+      extraContent={showBenefits ? <ChatAiBenefits /> : null}
       className="chat-no-access-screen"
     />
   );

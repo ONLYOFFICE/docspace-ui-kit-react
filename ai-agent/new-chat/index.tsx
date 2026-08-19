@@ -67,7 +67,7 @@ const NewChat: React.FC<ChatProps> = observer(
     const showToolbar = (hasProfiles || showActivationScreen) && isAgents;
 
     const chatBody = showActivationScreen ? (
-      <ChatNoAccessScreen {...noAccessProps} />
+      <ChatNoAccessScreen {...noAccessProps} isAgents={!!isAgents} />
     ) : (
       <ChatPage />
     );

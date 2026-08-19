@@ -82,11 +82,11 @@ class AiChatStore {
   //   so the CTA isn't cramped into a sidebar).
   // Otherwise the user's toggle wins.
   get effectiveFullscreen(): boolean {
-    return this.userFullscreen || this.isOnSettingsPage || !this.aiReady;
+    return this.userFullscreen;
   }
 
   get isFullscreenToggleDisabled(): boolean {
-    return this.isOnSettingsPage || !this.aiReady;
+    return false;
   }
 
   open = (agentId?: number) => {
