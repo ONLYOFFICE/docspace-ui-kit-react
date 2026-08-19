@@ -62,6 +62,8 @@ import styles from "./styles/Usage.module.scss";
 const LOADER_DELAY_MS = 500;
 
 type UsageProps = {
+  /** Open the tariff plan page from the subscription breakdown row. */
+  onTariffPlanClick?: () => void;
   /** Open the corresponding service detail page from its breakdown row. */
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
@@ -71,6 +73,7 @@ type UsageProps = {
 };
 
 const Usage = ({
+  onTariffPlanClick,
   onDiskStorageClick,
   onBackupClick,
   onAIServicesClick,
@@ -339,6 +342,7 @@ const Usage = ({
       <SpendingBreakdown
         period={period}
         isLoading={isLoading}
+        onTariffPlanClick={onTariffPlanClick}
         onDiskStorageClick={openWithPeriod(onDiskStorageClick)}
         onBackupClick={openWithPeriod(onBackupClick)}
         onAIServicesClick={openWithPeriod(onAIServicesClick)}

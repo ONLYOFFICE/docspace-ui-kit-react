@@ -51,7 +51,13 @@ import NoSpendingDarkIcon from "../../../assets/no.transactions.filter.dark.them
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import type { TUsagePeriodKey } from "../../types";
-import { AI_SEARCH_ENUM, AI_TOOLS, BACKUP_SERVICE } from "../../constants";
+import {
+  ADMIN,
+  AI_SEARCH_ENUM,
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  MANAGER,
+} from "../../constants";
 
 import { isDocsConnectServiceName } from "../../utils/docs-connect";
 import { getServiceUsageSubLabel } from "../../utils/serviceUsage";
@@ -64,6 +70,7 @@ type BreakdownView = "services" | "month";
 type SpendingBreakdownProps = {
   period: TUsagePeriodKey;
   isLoading: boolean;
+  onTariffPlanClick?: () => void;
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
   onAIServicesClick?: () => void;
@@ -80,6 +87,7 @@ type SpendingBreakdownProps = {
 const SpendingBreakdown = ({
   period,
   isLoading,
+  onTariffPlanClick,
   onDiskStorageClick,
   onBackupClick,
   onAIServicesClick,
@@ -171,6 +179,7 @@ const SpendingBreakdown = ({
 
   const getServiceHandler = (service: string) => {
     const key = normalizeService(service);
+    if (service === ADMIN) return onTariffPlanClick;
     if (key.includes("storage")) return onDiskStorageClick;
     if (service === BACKUP_SERVICE) return onBackupClick;
     if (service === AI_TOOLS) return onAIServicesClick;
