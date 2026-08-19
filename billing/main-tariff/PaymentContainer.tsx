@@ -70,7 +70,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     isAlreadyPaid,
     cardLinkedOnFreeTariff,
     formatWalletCurrency,
-    isCardMissingOrInactive,
   } = store;
 
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
@@ -148,14 +147,10 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
             <Text isBold>{t("ManagerTypesDescription")}</Text>
             <br />
             <Text isBold>
-              {t("PortalAdmin", {
-                productName: getBrandName("ProductName"),
-              })}
+              {t("PortalAdmin")}
             </Text>
             <Text>
-              {t("AdministratorDescription", {
-                productName: getBrandName("ProductName"),
-              })}
+              {t("AdministratorDescription")}
             </Text>
             <br />
             <Text isBold>{t("RoomAdmin")}</Text>
@@ -378,7 +373,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           visible={isTopUpVisible}
           onClose={onCloseTopUp}
           onConfirm={onCloseTopUp}
-          isFirstTopUp={isCardMissingOrInactive}
         />
       ) : null}
     </div>

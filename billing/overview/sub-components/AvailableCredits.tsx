@@ -35,10 +35,13 @@
 
 import { useState } from "react";
 import { observer } from "mobx-react";
+import { DateTime } from "luxon";
 
 import { Button, ButtonSize } from "../../../components/button";
+import { Text } from "../../../components/text";
 import { toastr } from "../../../components/toast";
 import { useCommonTranslation } from "../../../utils/i18n";
+import { getAppTimezone } from "../../../utils/date";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { finishRefreshingWithMinCycle } from "../../utils/refreshing";
@@ -46,6 +49,8 @@ import BalanceAmount from "../../shared/balance-amount";
 import AutoPaymentInfo from "../../wallet/sub-components/AutoPaymentInfo";
 import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import WalletRefilledModal from "../../wallet/WalletRefilledModal";
+
+import WarningIcon from "../../../assets/danger.toast.react.svg";
 
 import styles from "../Overview.module.scss";
 
@@ -61,16 +66,30 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     walletBalance,
     walletCodeCurrency,
     isCardLinkedToPortal,
-    canUpdateTariff,
+    isPayer,
     recommendedAmount,
     fetchBalance,
     isAutoPaymentExist,
     autoPayments,
     wasFirstTopUp,
     language,
+    formatWalletCurrency,
+    upcomingPayments,
   } = store;
 
-  const { isNotPaidPeriod, walletCustomerEmail } = store.tariff;
+  const { isNotPaidPeriod } = store.tariff;
+
+  const toDueDay = (dueDate: string) =>
+    DateTime.fromISO(dueDate).setZone(getAppTimezone()).toISODate();
+
+  const nextPayment = upcomingPayments[0];
+  const nextDueDay = nextPayment && toDueDay(nextPayment.dueDate);
+  const nextPaymentsTotal = upcomingPayments
+    .filter((item) => toDueDay(item.dueDate) === nextDueDay)
+    .reduce((sum, item) => sum + item.amount, 0);
+  const topUpShortfall = nextPayment ? nextPaymentsTotal - walletBalance : 0;
+
+  const isNextPayment = nextPayment && topUpShortfall > 0;
 
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
@@ -78,10 +97,10 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 
   const isAutoPaymentSetup = Boolean(
     isAutoPaymentExist &&
-      language &&
-      walletCodeCurrency &&
-      autoPayments?.minBalance &&
-      autoPayments?.upToBalance,
+    language &&
+    walletCodeCurrency &&
+    autoPayments?.minBalance &&
+    autoPayments?.upToBalance,
   );
 
   const onRefreshBalance = async () => {
@@ -105,10 +124,11 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     <div className={`${styles.card} ${styles.creditsCard}`}>
       <div className={styles.creditsTop}>
         <BalanceAmount
+          className={styles.creditsBalance}
           title={t("AvailableCredits")}
           titleFontSize="14px"
           mainFontSize="28px"
-          fractionFontSize="18px"
+          fractionFontSize="20px"
           showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
           isRefreshing={isRefreshing}
           onRefresh={onRefreshBalance}
@@ -117,29 +137,53 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
           language={language}
           withoutMargin
         />
-        <div className={styles.cardButtons}>
-          <Button
-            size={isMobile ? ButtonSize.normal : ButtonSize.small}
-            primary
-            label={t("TopUp")}
-            onClick={() => setIsTopUpDialogVisible(true)}
-            isDisabled={!canUpdateTariff || isNotPaidPeriod}
-            className={styles.cardButton}
-            testId="overview_top_up_button"
-          />
-          {wasFirstTopUp ? (
+        {isPayer ? (
+          <div className={styles.cardButtons}>
             <Button
               size={isMobile ? ButtonSize.normal : ButtonSize.small}
-              label={t("AutoTopUp")}
-              onClick={() => setIsWalletRefilledOpen(true)}
-              isDisabled={!canUpdateTariff || isNotPaidPeriod}
+              primary
+              label={t("TopUp")}
+              onClick={() => setIsTopUpDialogVisible(true)}
+              isDisabled={isNotPaidPeriod}
               className={styles.cardButton}
-              testId="overview_auto_top_up_button"
+              testId="overview_top_up_button"
             />
-          ) : null}
-        </div>
+            {wasFirstTopUp ? (
+              <Button
+                size={isMobile ? ButtonSize.normal : ButtonSize.small}
+                label={t("AutoTopUp")}
+                onClick={() => setIsWalletRefilledOpen(true)}
+                isDisabled={isNotPaidPeriod}
+                className={styles.cardButton}
+                testId="overview_auto_top_up_button"
+              />
+            ) : null}
+          </div>
+        ) : null}
       </div>
-      {isAutoPaymentSetup ? (
+      {isNextPayment ? (
+        <div className={styles.topUpWarning}>
+          <WarningIcon className={styles.topUpWarningIcon} />
+          <Text
+            as="span"
+            fontSize="12px"
+            fontWeight={600}
+            lineHeight="16px"
+            className={styles.topUpWarningText}
+          >
+            {t("TopUpBeforeNextPayment", {
+              amount: formatWalletCurrency(
+                Math.ceil(topUpShortfall),
+                0,
+                walletCodeCurrency,
+              ),
+              date: nextPayment.renewalDateShort,
+            })}
+          </Text>
+        </div>
+      ) : null}
+
+      {isAutoPaymentSetup && !isNextPayment ? (
         <div className={styles.autoPaymentWrap}>
           <AutoPaymentInfo />
         </div>
@@ -149,7 +193,6 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
-          isFirstTopUp={!walletCustomerEmail}
           recommendedAmount={recommendedAmount}
         />
       ) : null}
@@ -165,3 +208,4 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 };
 
 export default observer(AvailableCredits);
+

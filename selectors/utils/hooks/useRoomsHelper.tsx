@@ -46,12 +46,13 @@ import {
 import { useApi } from "../../../providers/api";
 import { RoomsTypeValues } from "../../../utils/common";
 import RoomType from "../../../components/room-type";
+import { Tooltip } from "../../../components/tooltip";
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
 import { toastr, type TData } from "../../../components/toast";
 
 import { LoadersContext } from "../contexts/Loaders";
 
-import { PAGE_COUNT } from "../constants";
+import { PAGE_COUNT, FORMS_SEARCH_AREA } from "../constants";
 import type { UseRoomsHelperProps } from "../types";
 import { useCommonTranslation } from "../../../utils/i18n";
 import {
@@ -79,6 +80,7 @@ const useRoomsHelper = ({
   isInit,
   setIsInit,
   withCreate,
+  disabledCreatePublicRoom,
   disableThirdParty,
   excludeItems,
   createDefineRoomLabel,
@@ -124,22 +126,45 @@ const useRoomsHelper = ({
 
   const createDropDownItems = React.useMemo(() => {
     return RoomsTypeValues.map((value) => {
+      const isPublicRoomDisabled =
+        !!disabledCreatePublicRoom && value === ApiRoomType.PublicRoom;
+
       const onClick = () => {
+        if (isPublicRoomDisabled) return;
+
         addInputItem("", "", value as RoomTypeEnum, t("EnterName"));
       };
 
-      return (
+      const roomTypeElement = (
         <RoomType
           key={value}
           roomType={value}
           selectedId={value}
           type="dropdownItem"
           isOpen={false}
+          disabledPublicRoom={disabledCreatePublicRoom}
           onClick={onClick}
         />
       );
+
+      if (!isPublicRoomDisabled) return roomTypeElement;
+
+      const tooltipId = `create-room-type-disabled-${value}`;
+
+      return (
+        <div key={value} id={tooltipId}>
+          {roomTypeElement}
+          <Tooltip
+            id={`${tooltipId}-instance`}
+            anchorSelect={`#${tooltipId}`}
+            place="bottom"
+            float
+            getContent={() => t("PublicRoomCreationDisabled")}
+          />
+        </div>
+      );
     });
-  }, [addInputItem, t]);
+  }, [addInputItem, disabledCreatePublicRoom, t]);
 
   const getRoomList = React.useCallback(
     async (sIndex: number) => {
@@ -181,9 +206,18 @@ const useRoomsHelper = ({
               );
         }
 
-        const effectiveSearchArea = formsSection
-          ? ("Forms" as unknown as SearchArea)
-          : (searchArea as SearchArea);
+        // Form filling rooms live only in the Forms section, so a listing scoped
+        // to them must ask for that search area - otherwise the server looks
+        // inside the Rooms section and returns nothing.
+        const isFormRoomOnlyFilter =
+          !!typeFilter &&
+          typeFilter.length > 0 &&
+          typeFilter.every((value) => value === ApiRoomType.FillingFormsRoom);
+
+        const effectiveSearchArea =
+          formsSection || isFormRoomOnlyFilter
+            ? (FORMS_SEARCH_AREA as unknown as SearchArea)
+            : (searchArea as SearchArea);
 
         const res = await roomsApi.getRoomsFolder({
           type: typeFilter,
@@ -286,6 +320,8 @@ const useRoomsHelper = ({
               withRecent: withRecentTreeFolder,
               withFavorites: withFavoritesTreeFolder,
               parentId: formsSection ? undefined : roomsFolderId,
+              // Scope filter for Recent/Favorites: the type of the rooms to
+              // keep, not the root section - so this stays FillingFormsRoom (15).
               folderType: formsSection
                 ? FolderType.FillingFormsRoom
                 : undefined,

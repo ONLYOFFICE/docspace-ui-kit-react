@@ -83,6 +83,51 @@ describe("DomHelpers", () => {
     });
   });
 
+  describe("getLayoutViewport", () => {
+    const originalInnerWidth = window.innerWidth;
+
+    afterEach(() => {
+      Reflect.deleteProperty(document.documentElement, "clientWidth");
+      Reflect.deleteProperty(document.documentElement, "clientHeight");
+      Object.defineProperty(window, "innerWidth", {
+        value: originalInnerWidth,
+        writable: true,
+        configurable: true,
+      });
+    });
+
+    it("prefers the layout viewport over the visual one", () => {
+      Object.defineProperty(document.documentElement, "clientWidth", {
+        value: 800,
+        configurable: true,
+      });
+      Object.defineProperty(document.documentElement, "clientHeight", {
+        value: 600,
+        configurable: true,
+      });
+      Object.defineProperty(window, "innerWidth", {
+        value: 1200,
+        writable: true,
+        configurable: true,
+      });
+
+      expect(DomHelpers.getLayoutViewport()).toEqual({
+        width: 800,
+        height: 600,
+      });
+    });
+
+    it("falls back to the window size when the layout viewport is unknown", () => {
+      Object.defineProperty(window, "innerWidth", {
+        value: 1200,
+        writable: true,
+        configurable: true,
+      });
+
+      expect(DomHelpers.getLayoutViewport().width).toBe(1200);
+    });
+  });
+
   describe("getOffset", () => {
     it("returns auto values when element is null", () => {
       const offset = DomHelpers.getOffset(null);

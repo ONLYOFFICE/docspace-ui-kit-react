@@ -52,10 +52,10 @@ const mockTranslations: Record<string, string> = {
   ErrorOfflineText: "You are offline",
   InvalidLink: "Invalid link",
   LinkDoesNotExist: "This link does not exist",
-  ErrorDeactivatedText: "Portal {{productName}} deactivated",
+  ErrorDeactivatedText: "This workspace is deactivated",
   ProductName: "DocSpace",
   AccessDenied: "Access denied",
-  PortalRestriction: "Access to {{productName}} is restricted",
+  PortalRestriction: "Access to this workspace is restricted",
 };
 
 const setupI18n = (data: Record<string, string> = {}) => {
@@ -161,10 +161,10 @@ describe("Error Pages", () => {
       expect(screen.getByTestId("ErrorContainer")).toBeInTheDocument();
     });
 
-    it("displays interpolated header text", () => {
+    it("displays header text", () => {
       render(<ErrorUnavailable />);
       expect(
-        screen.getByText("Portal DocSpace deactivated"),
+        screen.getByText("This workspace is deactivated"),
       ).toBeInTheDocument();
     });
 
@@ -182,11 +182,11 @@ describe("Error Pages", () => {
       expect(screen.getByTestId("ErrorContainer")).toBeInTheDocument();
     });
 
-    it("displays header and interpolated body text", () => {
+    it("displays header and body text", () => {
       render(<AccessRestricted />);
       expect(screen.getByText("Access denied")).toBeInTheDocument();
       expect(
-        screen.getByText("Access to DocSpace is restricted"),
+        screen.getByText("Access to this workspace is restricted"),
       ).toBeInTheDocument();
     });
 

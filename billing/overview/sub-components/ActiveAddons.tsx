@@ -41,8 +41,8 @@ import { useCommonTranslation } from "../../../utils/i18n";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
-import { formatCompactNumber } from "../../utils/common";
-import type { TServiceFeatureWithPrice } from "../../types";
+import { formatCompactNumber, getCurrencySymbol } from "../../utils/common";
+import { AI_TOOLS } from "../../constants";
 
 import styles from "../Overview.module.scss";
 
@@ -52,29 +52,23 @@ type ActiveAddonsProps = {
 
 const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
   const t = useCommonTranslation();
-  const { walletCodeCurrency, formatWalletCurrency, servicesQuotasFeatures } =
-    usePaymentStore();
+  const store = usePaymentStore();
+  const { walletCodeCurrency, formatWalletCurrency, activeServices, language } =
+    store;
   const { serviceUsage } = useServicesStore();
 
-  const enabledAddons = (
-    Array.from(
-      servicesQuotasFeatures?.values() ?? [],
-    ) as TServiceFeatureWithPrice[]
-  ).filter((f) => f.value && f.title && f.image);
-
-  const usageForService = (serviceName?: string) =>
+  const usageForService = (service: string) =>
     serviceUsage.find(
       (u) =>
-        u.service === serviceName ||
-        (!!serviceName &&
-          !!u.service &&
-          (serviceName.includes(u.service) || u.service.includes(serviceName))),
+        u.service === service ||
+        (!!u.service &&
+          (service.includes(u.service) || u.service.includes(service))),
     );
 
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
-        <Text fontSize="16px" fontWeight={600}>
+        <Text fontSize="14px" fontWeight={700}>
           {t("ActiveAddons")}
         </Text>
         {onManageAddons ? (
@@ -89,50 +83,96 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
           </Link>
         ) : null}
       </div>
-      {enabledAddons.length === 0 ? (
+
+      <Text fontSize="18px" fontWeight={700} className={styles.cardValue}>
+        {activeServices.length}
+      </Text>
+
+      {activeServices.length === 0 ? (
         <div className={styles.emptyState}>
-          <Text fontSize="12px" className={styles.mutedTitle}>
-            {t("NoActiveAddons")}
-          </Text>
+          <div className={styles.emptyContent}>
+            <Text
+              fontSize="12px"
+              fontWeight={600}
+              className={styles.mutedTitle}
+            >
+              {t("NoActiveAddons")}
+            </Text>
+            <Text fontSize="12px" className={styles.mutedTitle}>
+              {t("NoActiveAddonsDesc")}
+            </Text>
+          </div>
         </div>
       ) : (
-        <div className={styles.rows}>
-          {enabledAddons.map((feature) => {
-            const usage = usageForService(feature.serviceName);
-            return (
-              <div className={styles.row} key={feature.id}>
-                <div className={styles.addonLeft}>
-                  <div
-                    className={styles.addonIcon}
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: service icon markup comes from the payment API
-                    dangerouslySetInnerHTML={{ __html: feature.image ?? "" }}
-                  />
-                  <div className={styles.rowInfo}>
-                    <Text fontSize="14px" fontWeight={600} truncate>
-                      {feature.title}
+        <div className={styles.addonsBody}>
+          <div className={styles.addonsColumns}>
+            <Text fontSize="12px" fontWeight={600}>
+              {t("Addon")}
+            </Text>
+            <Text fontSize="12px" fontWeight={600}>
+              {t("UsedLimits")}
+            </Text>
+          </div>
+
+          <div className={styles.addonsList}>
+            {activeServices.map((item) => {
+              const usage = usageForService(item.service);
+              const isCurrencyUsage = item.service === AI_TOOLS;
+              const currency = usage?.currency || walletCodeCurrency;
+
+              const unitLabel = isCurrencyUsage
+                ? getCurrencySymbol(currency, language)
+                : item.serviceUnit;
+
+              const usedValue = isCurrencyUsage
+                ? (usage?.totalAmount ?? 0)
+                : (item.used ?? usage?.totalQuantity ?? 0);
+
+              const usedLabel = isCurrencyUsage
+                ? formatWalletCurrency(usedValue, 2, currency)
+                : formatCompactNumber(usedValue);
+
+              const hasLimit = item.limit > 0;
+              const percent = hasLimit
+                ? Math.min(100, (usedValue / item.limit) * 100)
+                : 0;
+
+              return (
+                <div className={styles.addonRow} key={item.service}>
+                  <div className={styles.addonRowMain}>
+                    <Text
+                      fontSize="14px"
+                      fontWeight={600}
+                      truncate
+                      className={styles.addonName}
+                    >
+                      {item.title}
+                      <span className={styles.addonMuted}>, {unitLabel}</span>
                     </Text>
-                    {usage ? (
-                      <Text
-                        fontSize="12px"
-                        truncate
-                        className={styles.mutedTitle}
-                      >
-                        {formatCompactNumber(usage.totalQuantity)}{" "}
-                        {usage.serviceUnit}
-                      </Text>
-                    ) : null}
+                    <Text
+                      fontSize="13px"
+                      fontWeight={600}
+                      className={styles.addonUsage}
+                    >
+                      {usedLabel}
+                      <span className={styles.addonMuted}>
+                        {" / "}
+                        {hasLimit ? formatCompactNumber(item.limit) : "—"}
+                      </span>
+                    </Text>
                   </div>
+                  {hasLimit ? (
+                    <div className={styles.addonBar}>
+                      <div
+                        className={styles.addonBarFill}
+                        style={{ width: `${percent}%` }}
+                      />
+                    </div>
+                  ) : null}
                 </div>
-                <Text fontSize="14px" fontWeight={700}>
-                  {formatWalletCurrency(
-                    usage?.totalAmount ?? 0,
-                    2,
-                    usage?.currency || walletCodeCurrency,
-                  )}
-                </Text>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -140,3 +180,4 @@ const ActiveAddons = ({ onManageAddons }: ActiveAddonsProps) => {
 };
 
 export default observer(ActiveAddons);
+

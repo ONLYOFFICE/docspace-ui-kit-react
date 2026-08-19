@@ -100,6 +100,7 @@ const TableView = ({ sectionWidth }: UpcomingPaymentsTableViewProps) => {
               )}
               amount={formatWalletCurrency(payment.amount, 2)}
               actionType={payment.actionType}
+              actionRoute={payment.actionRoute}
             />
           ))}
         </TableBody>

@@ -65,7 +65,6 @@ import BackupPageLoader from "./BackupPageLoader";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
-import { getBrandName } from "../../../../constants/brands";
 
 type BackupPageProps = {
   withBottomMargin?: boolean;
@@ -88,7 +87,6 @@ const BackupPage: React.FC<BackupPageProps> = ({
     isBackupServiceOn,
     isServiceActionDisabled,
     language,
-    isCardMissingOrInactive,
   } = paymentStore;
 
   const { isFreeTariff, maxFreeBackups } = paymentStore.quotas;
@@ -148,16 +146,10 @@ const BackupPage: React.FC<BackupPageProps> = ({
     title: t("Confirmation"),
 
     body: !isBackupServiceOn
-      ? t("EnableBackupConfirm", {
-          productName: getBrandName("ProductName"),
-        })
+      ? t("EnableBackupConfirm")
       : isFreeTariff
-        ? t("DisableBackupConfirmWithoutQuota", {
-            productName: getBrandName("ProductName"),
-          })
-        : t("DisableBackupConfirm", {
-            productName: getBrandName("ProductName"),
-          }),
+        ? t("DisableBackupConfirmWithoutQuota")
+        : t("DisableBackupConfirm"),
   };
 
   const onTopUp = () => {
@@ -348,7 +340,6 @@ const BackupPage: React.FC<BackupPageProps> = ({
         <SimpleTopUpDialog
           visible={isTopUpVisible}
           onClose={onCloseTopUpModal}
-          isFirstTopUp={isCardMissingOrInactive}
           serviceName={BACKUP_SERVICE}
         />
       ) : null}

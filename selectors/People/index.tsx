@@ -33,7 +33,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-
 import EmptyScreenPersonsLight from "../../assets/emptyFilter/empty.filter.people.light.svg";
 import EmptyScreenPersonsDark from "../../assets/emptyFilter/empty.filter.people.dark.svg";
 
@@ -77,7 +76,6 @@ import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
 import styles from "./PeopleSelector.module.scss";
 import { Encoder } from "../../utils/encoder";
-import { getBrandName } from "../../constants/brands";
 
 const PEOPLE_TAB_ID = "0";
 const GROUP_TAB_ID = "1";
@@ -775,9 +773,7 @@ const PeopleSelector = ({
             ? t("NotFoundGuestsDescriptionAgent")
             : t("NotFoundGuestsDescription")
           : activeTabId === PEOPLE_TAB_ID
-            ? t("EmptyDescription", {
-                productName: getBrandName("ProductName"),
-              })
+            ? t("EmptyDescription")
             : t("GroupsNotFoundDescription"))
       }
       searchEmptyScreenImage={emptyScreenImage}

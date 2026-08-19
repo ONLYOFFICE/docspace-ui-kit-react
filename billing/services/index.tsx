@@ -33,10 +33,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { useCommonTranslation } from "../../utils/i18n";
-import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { useNavigate } from "react-router";
 import {
   type ChangeWalletServiceStateRequestDto,
@@ -50,11 +49,12 @@ import {
   AI_SEARCH_ENUM,
   AI_TOOLS,
   BACKUP_SERVICE,
-  DOCS_CONNECT_SERVICE,
+  DOCS_CONNECT_PRODUCT,
   DISK_STORAGE,
   TOTAL_SIZE,
 } from "../constants";
 import type { TDocsConnectCardState } from "../types";
+import { getServiceRoute } from "../utils/url";
 
 // AI search isn't part of the SDK's TenantWalletService enum yet; the backend
 // identifies it by -18.
@@ -80,7 +80,6 @@ import StoragePlanCancel from "./panels/additional-storage/StoragePlanCancel";
 import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
-import { getBrandName } from "../../constants/brands";
 
 const AI_FEATURES_DIALOG_SHOWN_KEY = "aiFeaturesDialogShown";
 
@@ -116,8 +115,8 @@ const Services = observer(
       changeServiceState,
       isCardLinkedToPortal,
       isAiToolsServiceOn,
-      isCardMissingOrInactive,
       storageServiceName,
+      isShowPreviousStoragePlan,
     } = paymentStore;
 
     const {
@@ -126,13 +125,10 @@ const Services = observer(
       setConfirmActionType,
       confirmActionType,
       setVisibleWalletSetting,
-      formatAiServiceCurrency,
       servicesInit,
     } = servicesStore;
 
     const { isGracePeriod, previousStoragePlanSize } = paymentStore.tariff;
-    const { isFreeTariff } = paymentStore.quotas;
-    const { logoText } = paymentStore;
 
     const t = useCommonTranslation();
 
@@ -160,7 +156,6 @@ const Services = observer(
       [],
     );
 
-    const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
     const [isCurrentConfirmState, setIsCurrentConfirmState] = useState(false);
     const [isStorageCancellation, setIsStorageCancellation] = useState(false);
     const [isGracePeriodModalVisible, setIsGracePeriodModalVisible] =
@@ -172,8 +167,6 @@ const Services = observer(
       useState(false);
 
     const shouldShowLoader = !isInitServicesPage;
-
-    const previousDialogRef = useRef<boolean>(false);
 
     useEffect(() => {
       if (!isVisibleWalletSettings || !isInitServicesPage) return;
@@ -196,93 +189,36 @@ const Services = observer(
       if (initialOpenDialog) {
         updateDialogVisibility(TOTAL_SIZE, true);
         setPreviousValue(
-          previousStoragePlanSize ? previousStoragePlanSize.toString() : "",
+          isShowPreviousStoragePlan ? previousStoragePlanSize.toString() : "",
         );
       }
-    }, [initialOpenDialog, updateDialogVisibility, previousStoragePlanSize]);
-
-    const confirmationDialogContent: Record<
-      string,
-      { title: string; body: string | React.ReactNode[] }
-    > = {
-      [BACKUP_SERVICE]: {
-        title: t("Confirmation"),
-        body: !isCurrentConfirmState
-          ? t("EnableBackupConfirm", {
-              productName: getBrandName("ProductName"),
-            })
-          : isFreeTariff
-            ? t("DisableBackupConfirmWithoutQuota", {
-                productName: getBrandName("ProductName"),
-              })
-            : t("DisableBackupConfirm", {
-                productName: getBrandName("ProductName"),
-              }),
-      },
-      [AI_ENUM]: {
-        title: t("Confirmation"),
-        body: isCurrentConfirmState
-          ? [
-              t("DisableAIToolsConfirm", {
-                organizationName: logoText,
-              }),
-              <CommonTrans
-                key="DisableAIToolsConfirmBalance"
-                i18nKey="DisableAIToolsConfirmBalance"
-                values={{ balance: formatAiServiceCurrency() }}
-                components={{
-                  1: <span style={{ fontWeight: 600 }} />,
-                }}
-              />,
-              t("DisableAIToolsConfirmReEnable"),
-            ]
-          : [
-              t("AIToolsDescription", {
-                productName: getBrandName("ProductName"),
-                organizationName: logoText,
-              }),
-              <CommonTrans
-                key="CurrentBalance"
-                i18nKey="CurrentBalance"
-                values={{ balance: formatAiServiceCurrency() }}
-                components={{
-                  1: <span style={{ fontWeight: 600 }} />,
-                }}
-              />,
-              t("WantToContinue"),
-            ],
-      },
-    };
-
-    const getDialogContent = (actionType: string | null) => {
-      if (!actionType || !(actionType in confirmationDialogContent)) {
-        return { title: "", body: "" };
-      }
-      return confirmationDialogContent[actionType];
-    };
+    }, [
+      initialOpenDialog,
+      updateDialogVisibility,
+      previousStoragePlanSize,
+      isShowPreviousStoragePlan,
+    ]);
 
     const onClick = (id: string) => {
       setConfirmActionType(id);
 
-      if (id === DOCS_CONNECT_SERVICE) {
+      if (id === DOCS_CONNECT_PRODUCT) {
         onDocsConnectClick?.();
         return;
       }
 
       if (!isCardLinkedToPortal) {
+        // Additional storage starts from the plan-size choice, not from a
+        // plain top-up: the dialog leads the payment itself.
+        if (id === TOTAL_SIZE) {
+          updateDialogVisibility(TOTAL_SIZE, true);
+          return;
+        }
         setIsFirstTopUpDialogVisible(true);
         return;
       }
 
-      const { routes } = paymentStore;
-      const routeByService: Record<string, string> = {
-        [AI_ENUM]: routes.aiServices,
-        [AI_SEARCH_ENUM]: routes.aiSearch,
-        [TOTAL_SIZE]: routes.diskStorage,
-        [BACKUP_SERVICE]: routes.backup,
-      };
-
-      const route = routeByService[id];
+      const route = getServiceRoute(paymentStore.routes, id);
       if (route) navigate(route);
     };
 
@@ -298,16 +234,6 @@ const Services = observer(
       setConfirmActionType(id);
       setIsCurrentConfirmState(currentEnabled);
 
-      if (!isCardLinkedToPortal) {
-        setIsFirstTopUpDialogVisible(true);
-        return;
-      }
-
-      if (id === AI_SEARCH_ENUM && !currentEnabled && !isAiToolsServiceOn) {
-        updateDialogVisibility(AI_SEARCH_ENUM, true);
-        return;
-      }
-
       if (id === TOTAL_SIZE) {
         if (isGracePeriod) {
           setIsGracePeriodModalVisible(true);
@@ -321,16 +247,14 @@ const Services = observer(
         return;
       }
 
-      // if (id === AI_ENUM) {
-      //   if (!currentEnabled) {
-      //     localStorage.setItem(AI_FEATURES_DIALOG_SHOWN_KEY, AI_ENUM);
-      //   }
-      // }
+      if (!isCardLinkedToPortal) {
+        setIsFirstTopUpDialogVisible(true);
+        return;
+      }
 
-      if (id !== TOTAL_SIZE) {
-        if (dialogVisibility[id]) {
-          previousDialogRef.current = true;
-        }
+      if (id === AI_SEARCH_ENUM && !currentEnabled && !isAiToolsServiceOn) {
+        updateDialogVisibility(AI_SEARCH_ENUM, true);
+        return;
       }
 
       const raw: ChangeWalletServiceStateRequestDto = {
@@ -370,17 +294,6 @@ const Services = observer(
       if (!aiToolsEnabled) return;
 
       await applyServiceStateChange(AI_SEARCH_ENUM, true);
-    };
-
-    const onCloseConfirmDialog = () => {
-      const isDialogVisible = previousDialogRef.current;
-      previousDialogRef.current = false;
-
-      if (isDialogVisible && confirmActionType) {
-        updateDialogVisibility(confirmActionType, true);
-      }
-
-      setIsConfirmDialogVisible(false);
     };
 
     const getServiceSuccessMessage = (id: string) => {
@@ -429,8 +342,6 @@ const Services = observer(
     const onConfirm = async () => {
       if (!confirmActionType) return;
 
-      setIsConfirmDialogVisible(false);
-
       if (confirmActionType === BACKUP_SERVICE && !isCardLinkedToPortal) {
         setIsTopUpBalanceVisible(true);
         return;
@@ -439,15 +350,11 @@ const Services = observer(
       await applyServiceStateChange(confirmActionType, !isCurrentConfirmState);
     };
 
-    const onFirstTopUpConfirmed = async () => {
+    const onFirstTopUpConfirmed = () => {
       if (!confirmActionType) return;
 
-      if (confirmActionType !== BACKUP_SERVICE) {
-        updateDialogVisibility(confirmActionType, true);
-        return;
-      }
-
-      await applyServiceStateChange(confirmActionType, !isCurrentConfirmState);
+      const route = getServiceRoute(paymentStore.routes, confirmActionType);
+      if (route) navigate(route);
     };
 
     const onCloseAiService = () => {
@@ -467,12 +374,9 @@ const Services = observer(
       setIsFirstTopUpDialogVisible(true);
     };
 
-    const onCloseTopUpModal = (isTopUp: boolean | Event) => {
+    const onCloseTopUpModal = () => {
       setIsTopUpBalanceVisible(false);
       setVisibleWalletSetting(false);
-      if (isTopUp) {
-        setIsConfirmDialogVisible(true);
-      }
     };
 
     const serviceNameByToggle: Record<string, string> = {
@@ -535,9 +439,11 @@ const Services = observer(
             visible={isFirstTopUpDialogVisible}
             onClose={() => setIsFirstTopUpDialogVisible(false)}
             onConfirm={onFirstTopUpConfirmed}
-            isFirstTopUp={isCardMissingOrInactive}
             serviceName={topUpServiceName}
             service={topUpServiceName}
+            successParams={
+              topUpServiceName === AI_TOOLS ? { skipAiSearch: "1" } : undefined
+            }
           />
         ) : null}
         {dialogVisibility[AI_SEARCH_ENUM] ? (
@@ -553,22 +459,16 @@ const Services = observer(
             acceptLabel={t("Activate")}
           />
         ) : null}
-        {isConfirmDialogVisible && confirmActionType ? (
-          <ConfirmationDialog
-            visible={isConfirmDialogVisible}
-            onClose={onCloseConfirmDialog}
-            onConfirm={onConfirm}
-            title={getDialogContent(confirmActionType).title}
-            bodyText={getDialogContent(confirmActionType).body}
-          />
-        ) : null}
         {isTopUpBalanceVisible ? (
           <SimpleTopUpDialog
             visible={isTopUpBalanceVisible}
-            onClose={() => onCloseTopUpModal(false)}
+            onClose={onCloseTopUpModal}
             onConfirm={onConfirm}
             serviceName={topUpServiceName}
             service={topUpServiceName}
+            successParams={
+              topUpServiceName === AI_TOOLS ? { skipAiSearch: "1" } : undefined
+            }
           />
         ) : null}
       </>
@@ -577,3 +477,4 @@ const Services = observer(
 );
 
 export default Services;
+

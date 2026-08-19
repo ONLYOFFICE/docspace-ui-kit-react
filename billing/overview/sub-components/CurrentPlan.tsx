@@ -36,7 +36,7 @@
 import { observer } from "mobx-react";
 
 import { Text } from "../../../components/text";
-import { Link } from "../../../components/link";
+import { Button, ButtonSize } from "../../../components/button";
 import { useCommonTranslation } from "../../../utils/i18n";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
@@ -47,9 +47,10 @@ import styles from "../Overview.module.scss";
 
 type CurrentPlanProps = {
   onEditPlan?: () => void;
+  isMobile?: boolean;
 };
 
-const CurrentPlan = ({ onEditPlan }: CurrentPlanProps) => {
+const CurrentPlan = ({ onEditPlan, isMobile }: CurrentPlanProps) => {
   const t = useCommonTranslation();
   const store = usePaymentStore();
 
@@ -65,36 +66,35 @@ const CurrentPlan = ({ onEditPlan }: CurrentPlanProps) => {
     quotaCharacteristics.find((f) => f.id === id)?.value ?? 0;
 
   return (
-    <div className={styles.card}>
-      <Text fontSize="12px" fontWeight={600} className={styles.mutedTitle}>
-        {t("CurrentPlan")}
-      </Text>
-      <Text fontSize="18px" fontWeight={700}>
-        {currentTariffPlanTitle}
-      </Text>
-      <Text fontSize="13px">
-        {isFreeTariff
-          ? t("PlanLimits", {
-              admins: limitValue(MANAGER),
-              rooms: limitValue(ROOM),
-              storage: getConvertedSize(t, limitValue(TOTAL_SIZE)),
-            })
-          : t("PlanCost", {
-              admins: limitValue(MANAGER),
-              price: formatPaymentCurrency(currentPlanCost?.value ?? 0, 2),
-            })}
-      </Text>
+    <div className={`${styles.card} ${styles.planCard}`}>
+      <div className={styles.planInfo}>
+        <Text fontSize="14px" fontWeight={700}>
+          {t("CurrentPlan")}
+        </Text>
+        <Text fontSize="18px" fontWeight={700}>
+          {currentTariffPlanTitle}
+        </Text>
+        <Text fontSize="12px">
+          {isFreeTariff
+            ? t("PlanLimits", {
+                admins: limitValue(MANAGER),
+                rooms: limitValue(ROOM),
+                storage: getConvertedSize(t, limitValue(TOTAL_SIZE)),
+              })
+            : t("PlanCost", {
+                admins: limitValue(MANAGER),
+                price: formatPaymentCurrency(currentPlanCost?.value ?? 0, 2),
+              })}
+        </Text>
+      </div>
       {onEditPlan ? (
-        <Link
+        <Button
+          size={isMobile ? ButtonSize.normal : ButtonSize.small}
+          label={t("UpgradePlan")}
           onClick={onEditPlan}
-          textDecoration="underline"
-          color="accent"
-          fontWeight={600}
-          className={styles.cardLink}
-          dataTestId="overview_edit_plan_link"
-        >
-          {isFreeTariff ? t("UpgradePlan") : t("EditPlan")}
-        </Link>
+          className={styles.planButton}
+          testId="overview_edit_plan_button"
+        />
       ) : null}
     </div>
   );

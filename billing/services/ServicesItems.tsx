@@ -45,10 +45,11 @@ import {
   AI_TOOLS,
   BACKUP_SERVICE,
   DISK_STORAGE,
-  DOCS_CONNECT_SERVICE,
+  DOCS_CONNECT_PRODUCT,
   TOTAL_SIZE,
 } from "../constants";
 import { calculateTotalPrice, getConvertedSize } from "../utils/common";
+import { getDocsConnectScheduleFlags } from "../utils/docs-connect";
 import { formatDateLocalized } from "../../utils/date";
 import type { TDocsConnectCardState, TServiceFeatureWithPrice } from "../types";
 
@@ -95,6 +96,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     availableBackupsCount,
     isBackupServiceOn,
     isStorageDeactivationVisited,
+    isShowPreviousStoragePlan,
     isLowWalletBalance,
     language,
   } = paymentStore;
@@ -107,7 +109,6 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     currentStoragePlanSize,
     nextStoragePlanSize,
     hasStorageSubscription,
-    previousStoragePlanSize,
     storageExpiryDate,
   } = paymentStore.tariff;
 
@@ -190,7 +191,7 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
   ) => {
     switch (serviceName) {
       case TOTAL_SIZE:
-        if (previousStoragePlanSize && !isStorageDeactivationVisited) {
+        if (isShowPreviousStoragePlan && !isStorageDeactivationVisited) {
           return t("SubscriptionDeactivated");
         }
 
@@ -431,13 +432,13 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
                 }
                 isWarningColor={hasScheduledStorageChange}
                 isErrorColor={
-                  !!previousStoragePlanSize && !isStorageDeactivationVisited
+                  isShowPreviousStoragePlan && !isStorageDeactivationVisited
                 }
               />
             );
           }
 
-          if (item.serviceName === DOCS_CONNECT_SERVICE) {
+          if (item.id === DOCS_CONNECT_PRODUCT) {
             const subscribed = docsConnectState?.subscribed ?? false;
             const isTrial = docsConnectState?.isTrial ?? false;
             const trialDaysLeft = docsConnectState?.trialDaysLeft ?? 0;
@@ -445,12 +446,19 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
             const trialExpired = docsConnectState?.trialExpired ?? false;
             const trialActive = subscribed && isTrial && !trialExpired;
             const scheduledUsers = docsConnectState?.scheduledUsers ?? null;
-            const hasScheduledChange =
-              subscribed && !isTrial && scheduledUsers != null;
-            const isCancellation = hasScheduledChange && scheduledUsers === 0;
-            const usersAdjusting =
-              hasScheduledChange &&
-              scheduledUsers !== (docsConnectState?.tariffUsers ?? 0);
+            const {
+              hasScheduledChange,
+              isCancellation,
+              usersAdjusting,
+              devPackDisabling,
+            } = getDocsConnectScheduleFlags({
+              hasSubscription: subscribed && !isTrial,
+              currentUsers: docsConnectState?.tariffUsers ?? 0,
+              scheduledUsers,
+              scheduledOnDevPack: docsConnectState?.scheduledOnDevPack ?? false,
+              nextDevPackEnabled:
+                docsConnectState?.nextDevPackEnabled ?? false,
+            });
             const deactivated = docsConnectState?.deactivated ?? false;
             const canceled = docsConnectState?.canceled ?? false;
 
@@ -470,27 +478,46 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
               { locale: language },
             );
 
+            const getScheduledTitles = () => {
+              if (isCancellation) return [t("SubscriptionCancellation")];
+
+              const titles: string[] = [];
+
+              if (devPackDisabling) titles.push(t("DevPackWillBeDisabled"));
+
+              if (usersAdjusting)
+                titles.push(
+                  t("UserAdjustment", {
+                    fromCount: docsConnectState?.tariffUsers ?? 0,
+                    toCount: scheduledUsers,
+                  }),
+                );
+
+              return titles;
+            };
+
+            const scheduledTitles = getScheduledTitles();
+
+            const scheduledDescription = isCancellation
+              ? t("SubscriptionAutoCancellation", {
+                  finalDate: scheduledDateLocalized,
+                })
+              : devPackDisabling
+                ? t("SubscriptionAutoRenewed", {
+                    finalDate: scheduledDateLocalized,
+                  })
+                : t("TariffPlanAutoRenewedWithUpdate", {
+                    date: scheduledDateLocalized,
+                  });
+
             const scheduledTooltip = hasScheduledChange ? (
               <>
-                {isCancellation || usersAdjusting ? (
-                  <Text fontWeight={600} fontSize="12px">
-                    {isCancellation
-                      ? t("SubscriptionCancellation")
-                      : t("UserAdjustment", {
-                          fromCount: docsConnectState?.tariffUsers ?? 0,
-                          toCount: scheduledUsers,
-                        })}
+                {scheduledTitles.map((title) => (
+                  <Text key={title} fontWeight={600} fontSize="12px">
+                    {title}
                   </Text>
-                ) : null}
-                <Text fontSize="12px">
-                  {isCancellation
-                    ? t("SubscriptionAutoCancellation", {
-                        finalDate: scheduledDateLocalized,
-                      })
-                    : t("TariffPlanAutoRenewedWithUpdate", {
-                        date: scheduledDateLocalized,
-                      })}
-                </Text>
+                ))}
+                <Text fontSize="12px">{scheduledDescription}</Text>
               </>
             ) : undefined;
 

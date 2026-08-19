@@ -66,7 +66,6 @@ import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
-import { getBrandName } from "../../../../constants/brands";
 
 type AiPageProps = {
   currentDeviceType?: string;
@@ -99,24 +98,15 @@ const AiPage = (props: AiPageProps) => {
     isServiceActionDisabled,
     formatWalletCurrency,
     isLowWalletBalance,
-    isCardMissingOrInactive,
   } = paymentStore;
 
   const { logoText, language } = paymentStore;
 
-  const {
-    aiServiceCodeCurrency,
-    aiServiceBalance,
-    formatAiServiceCurrency,
-    isInitServicesData,
-    initServiceData,
-    aiUsage,
-  } = servicesStore;
+  const { isInitServicesData, initServiceData, aiUsage } = servicesStore;
 
   const t = useCommonTranslation();
 
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
-  const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
   const [isTopUpConfirmVisible, setIsTopUpConfirmVisible] = useState(false);
 
   const isDisabled = isServiceActionDisabled!;
@@ -153,13 +143,7 @@ const AiPage = (props: AiPageProps) => {
     onConfirm();
   };
 
-  const onCloseConfirmDialog = () => {
-    setIsConfirmDialogVisible(false);
-  };
-
   const onConfirm = async () => {
-    setIsConfirmDialogVisible(false);
-
     const raw = {
       service: TenantWalletService.AITools,
       enabled: !isAiToolsServiceOn,
@@ -187,41 +171,6 @@ const AiPage = (props: AiPageProps) => {
       changeServiceState(AI_ENUM);
     }
   };
-
-  const confirmationDialogContent = isAiToolsServiceOn
-    ? {
-        title: t("Confirmation"),
-        body: [
-          t("DisableAIToolsConfirm", {
-            organizationName: logoText,
-          }),
-          <CommonTrans
-            key="DisableAIToolsConfirmBalance"
-            i18nKey="DisableAIToolsConfirmBalance"
-            values={{
-              balance: formatAiServiceCurrency(
-                aiServiceBalance ?? 0,
-                3,
-                aiServiceCodeCurrency,
-              ),
-            }}
-            components={{
-              1: <span style={{ fontWeight: 600 }} />,
-            }}
-          />,
-          t("DisableAIToolsConfirmReEnable"),
-        ],
-      }
-    : {
-        title: t("Confirmation"),
-        body: [
-          t("AIToolsDescription", {
-            productName: getBrandName("ProductName"),
-            organizationName: logoText,
-          }),
-          t("WantToContinue"),
-        ],
-      };
 
   const onOpenTopUp = () => {
     // if (!isAiToolsServiceOn && !simpleTopUp) {
@@ -263,7 +212,6 @@ const AiPage = (props: AiPageProps) => {
         <SimpleTopUpDialog
           visible={isTopUpVisible}
           onClose={onCloseTopUp}
-          isFirstTopUp={isCardMissingOrInactive}
           serviceName={AI_TOOLS}
         />
       ) : null}
@@ -377,16 +325,6 @@ const AiPage = (props: AiPageProps) => {
           hideTypeFilter
         />
       </div>
-
-      {isConfirmDialogVisible ? (
-        <ConfirmationDialog
-          visible={isConfirmDialogVisible}
-          onClose={onCloseConfirmDialog}
-          onConfirm={onConfirm}
-          title={confirmationDialogContent.title}
-          bodyText={confirmationDialogContent.body}
-        />
-      ) : null}
 
       {isTopUpConfirmVisible ? (
         <ConfirmationDialog

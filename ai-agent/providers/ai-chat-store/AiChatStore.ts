@@ -51,6 +51,15 @@ class AiChatStore {
   // `useProfilesStore` by AiChatStoresBridge.
   hasProfiles = false;
 
+  // Set when `openNewChat` opens the panel from a closed state. The thread
+  // reset itself needs the lib stores, which only exist inside the provider,
+  // so it is performed by AiChatStoresBridge, which consumes this flag. Keeping
+  // it here lets the opener (`useOpenAiChat`) depend on this store alone — a
+  // section without an AiChatStoreProvider (e.g. a public room opened
+  // anonymously) can then call the opener as a no-op instead of throwing on the
+  // library's `useStores` (Bug 83210).
+  pendingNewChat = false;
+
   constructor() {
     makeAutoObservable(this);
   }
@@ -92,6 +101,19 @@ class AiChatStore {
   open = (agentId?: number) => {
     if (agentId !== undefined) this.agentId = agentId;
     this.isVisible = true;
+  };
+
+  // Open the panel, starting a fresh conversation when it was closed (an
+  // already-open panel keeps its thread — flows that drop something into an
+  // open chat must not reset it). The thread reset is deferred to
+  // AiChatStoresBridge via `pendingNewChat`, so this needs no lib stores.
+  openNewChat = () => {
+    if (!this.isVisible) this.pendingNewChat = true;
+    this.isVisible = true;
+  };
+
+  consumePendingNewChat = () => {
+    this.pendingNewChat = false;
   };
 
   close = () => {

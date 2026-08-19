@@ -25,7 +25,12 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 export { getOnlyofficeFileType } from "./file-type";
-export { attachFilesToChat, type AttachFileInput } from "./attach-files";
+export {
+  attachFilesToChat,
+  type AttachFileInput,
+  type AttachedFileInfo,
+  type OnFilesAttached,
+} from "./attach-files";
 export {
   useAttachHostFilesToChat,
   CHAT_ATTACHMENT_LIMIT,

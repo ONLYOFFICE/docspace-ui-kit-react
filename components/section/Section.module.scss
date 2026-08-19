@@ -336,6 +336,13 @@
   }
 }
 
+.chatPanelDropText {
+  text-align: center;
+  text-wrap: pretty;
+  font-size: 16px;
+  font-weight: 700;
+}
+
 .spacer {
   display: none;
   min-height: var(--section-mobile-footer-height, 64px);
@@ -565,7 +572,10 @@
     .section-body_header {
       width: 100%;
       position: sticky;
-      top: var(--nav-offset, 0);
+      // The fallback must carry a unit: a bare `0` is invalid for `top`, so the
+      // whole declaration would be dropped and this would fall back to
+      // `top: auto` — not sticking at all — whenever --nav-offset is unset.
+      top: var(--nav-offset, 0px);
       background: var(--section-bg-v, var(--section-header-bg));
       padding-inline-end: 0;
       z-index: 201;
@@ -599,7 +609,8 @@
   margin: 0 -16px !important;
 
   @include mixins.mobile {
-    top: calc(53px + var(--nav-offset, 0));
+    // Unit required inside calc() too — see .section-body_header above.
+    top: calc(53px + var(--nav-offset, 0px));
   }
 }
 

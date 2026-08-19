@@ -43,6 +43,7 @@ import styles from "../Navigation.module.scss";
 import { TControlButtonProps } from "../Navigation.types";
 
 import ToggleInfoPanelButton from "./ToggleInfoPanelBtn";
+import AiChatButton from "./AiChatBtn";
 import PlusButton from "./PlusBtn";
 import ContextButton from "./ContextBtn";
 import WarningComponent from "./WarningComponent";
@@ -93,7 +94,11 @@ const ControlButtons = ({
   isPlusButtonVisible,
   contextMenuHeader,
   analyzeResponsesButton,
-  newChatButton,
+
+  // AI chat button props
+  toggleChatPanel,
+  isChatPanelVisible,
+  hideChatButton,
 }: TControlButtonProps) => {
   const toggleInfoPanelAction = () => {
     toggleInfoPanel?.();
@@ -188,6 +193,22 @@ const ControlButtons = ({
     );
   };
 
+  // Desktop keeps the AI chat button in Navigation's right-hand button row,
+  // next to the info panel toggle; below that breakpoint the row is not
+  // rendered, so the button joins the control buttons instead.
+  const renderAiChatButton = () => {
+    if (isDesktop || !toggleChatPanel || hideChatButton) return null;
+
+    return (
+      <AiChatButton
+        id="ai-chat-button"
+        toggleChatPanel={toggleChatPanel}
+        isChatPanelVisible={isChatPanelVisible ?? false}
+        titles={titles}
+      />
+    );
+  };
+
   const renderWarning = () => {
     if (!isDesktop || !titles?.warningText) return null;
 
@@ -206,9 +227,14 @@ const ControlButtons = ({
       data-is-frame={isFrame}
       data-show-title={showTitle}
     >
+      {/* First child: below the desktop breakpoint this row is `row-reverse`,
+          so DOM order runs right-to-left and the first child lands on the
+          header's trailing edge. That keeps the AI chat button aligned with
+          the other trailing-edge controls instead of being pushed inwards by
+          buttons that reserve width while rendering nothing visible. */}
+      {renderAiChatButton()}
       {isPlusButtonVisible ? renderPlusButton() : null}
       {renderContextButton((isContextButtonVisible && !isPublicRoom) ?? false)}
-      {newChatButton ?? null}
       {renderToggleInfoPanel()}
       {renderContextButton((isPublicRoom && containVisible) ?? false)}
       {renderWarning()}
