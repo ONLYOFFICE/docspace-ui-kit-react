@@ -222,6 +222,10 @@
   color: var(--text-color);
 }
 
+.downloadDisabled {
+  opacity: 0.5;
+}
+
 .download {
   display: flex;
   align-items: center;
