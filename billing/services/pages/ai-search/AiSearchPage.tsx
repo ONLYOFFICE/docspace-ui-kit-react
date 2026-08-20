@@ -40,6 +40,7 @@ import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
 import { Link, LinkTarget } from "../../../../components/link";
+import { RectangleSkeleton } from "../../../../components/rectangle";
 
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { AI_ENUM, AI_SEARCH, AI_SEARCH_ENUM } from "../../../constants";
@@ -52,6 +53,7 @@ import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
 
 import AiPageLoader from "../ai-tools/AiPageLoader";
 
+import SpendAmount from "../../../shared/spend-amount";
 import styles from "../ai-tools/AiPage.module.scss";
 import {
   now,
@@ -104,9 +106,16 @@ const AiSearchPage = (props: AiSearchPageProps) => {
 
   const { language } = paymentStore;
 
-  const { isInitServicesData, initServiceData, aiUsage } = servicesStore;
+  const {
+    isInitServicesData,
+    initServiceData,
+    aiSearchUsage,
+    isServiceDataPending,
+  } = servicesStore;
 
   const t = useCommonTranslation();
+
+  const isUsageLoading = isServiceDataPending(AI_SEARCH);
 
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
   const [isEnableAIToolsDialogVisible, setIsEnableAIToolsDialogVisible] =
@@ -219,8 +228,8 @@ const AiSearchPage = (props: AiSearchPageProps) => {
 
   const balance = formatWalletCurrency();
 
-  const monthSpend = aiUsage?.totalAmount ?? 0;
-  const monthTokens = aiUsage?.totalQuantity ?? 0;
+  const monthSpend = aiSearchUsage?.totalAmount ?? 0;
+  const monthTokens = aiSearchUsage?.totalQuantity ?? 0;
   const monthTokensText = formatCompactNumber(monthTokens, language);
   const monthLabel = formatWithTimezone(now(), "LLLL yyyy", {
     locale: language,
@@ -287,9 +296,21 @@ const AiSearchPage = (props: AiSearchPageProps) => {
         <div className={styles.cardsGrid}>
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthSpend")}</Text>
-            <Text className={styles.cardValue}>
-              {formatWalletCurrency(monthSpend, 2)}
-            </Text>
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="80px"
+                height="24px"
+                borderRadius="3px"
+              />
+            ) : (
+              <SpendAmount
+                amount={monthSpend}
+                className={styles.cardValue}
+                fontSize="18px"
+                fontWeight={700}
+                tooltipId="ai-search-month-spend"
+              />
+            )}
             <Text className={styles.cardCaption}>
               {t("AISearchSpendMonth", { month: monthLabel })}
             </Text>
@@ -297,12 +318,28 @@ const AiSearchPage = (props: AiSearchPageProps) => {
 
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthUsage")}</Text>
-            <Text className={styles.cardValue}>{monthTokensText}</Text>
-            <Text className={styles.cardCaption}>
-              {monthTokens > 0
-                ? t("BilledAISearch", { count: monthTokens })
-                : t("AISearchUsedInMonth", { month: monthLabel })}
-            </Text>
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="80px"
+                height="24px"
+                borderRadius="3px"
+              />
+            ) : (
+              <Text className={styles.cardValue}>{monthTokensText}</Text>
+            )}
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="140px"
+                height="16px"
+                borderRadius="3px"
+              />
+            ) : (
+              <Text className={styles.cardCaption}>
+                {monthTokens > 0
+                  ? t("RequestsProcessedInMonth", { month: monthLabel })
+                  : t("AISearchUsedInMonth", { month: monthLabel })}
+              </Text>
+            )}
           </div>
         </div>
       </div>

@@ -69,7 +69,6 @@ const AiChatPanelHeaderContainer: React.FC = observer(() => {
       onClose={handleClose}
       isFullscreen={store.effectiveFullscreen}
       onToggleFullscreen={isDesktop ? store.toggleFullscreen : undefined}
-      isFullscreenToggleDisabled={store.isFullscreenToggleDisabled}
     />
   );
 });
