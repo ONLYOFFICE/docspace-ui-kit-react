@@ -37,7 +37,6 @@
 import React from "react";
 import { match, P } from "ts-pattern";
 
-import { getBrandName } from "../../../../constants/brands";
 import { Text } from "../../../../components/text";
 
 type Translate = (key: string, values?: Record<string, unknown>) => string;
@@ -108,7 +107,6 @@ const getChatCopy = ({
   t,
 }: Omit<NoAccessCopyProps, "isAgents">): NoAccessCopy => {
   const aiChat = t("AIChat");
-  const productName = getBrandName("ProductName");
 
   const title = standalone
     ? t("EmptyAIChatNotAvailableYetTitle", { aiChat })
@@ -121,7 +119,7 @@ const getChatCopy = ({
     )
     // standalone user: nothing to connect without admin rights
     .with([true, false], () =>
-      t("EmptyAIChatNotAvailableYetUserDescription", { aiChat, productName }),
+      t("EmptyAIChatNotAvailableYetUserDescription", { aiChat }),
     )
     // saas admin: activation is one click (or a top-up) away
     .with([false, true], () =>
@@ -129,7 +127,7 @@ const getChatCopy = ({
     )
     // saas user
     .otherwise(() =>
-      t("EmptyAIChatNotActiveYetUserDescription", { aiChat, productName }),
+      t("EmptyAIChatNotActiveYetUserDescription", { aiChat }),
     );
 
   // The OpenRouter models / pricing / wallet rows only describe the SaaS
