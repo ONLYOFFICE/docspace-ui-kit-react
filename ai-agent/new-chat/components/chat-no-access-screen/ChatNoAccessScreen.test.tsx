@@ -87,7 +87,6 @@ describe("<ChatNoAccessScreen />", () => {
   // The agents section keeps its own wording; the AI chat panel copy is
   // covered by the describe block below.
   const defaultProps = {
-    aiReady: false,
     standalone: false,
     isPortalAdmin: false,
     isAgents: true,
@@ -160,9 +159,8 @@ describe("<ChatNoAccessScreen />", () => {
     );
   });
 
-  it("renders saas admin with activate and benefits buttons", () => {
+  it("renders saas admin with the activate button and no benefits option", () => {
     const onActivateAI = vi.fn();
-    const onShowAIBenefits = vi.fn();
 
     render(
       <ChatNoAccessScreen
@@ -171,7 +169,6 @@ describe("<ChatNoAccessScreen />", () => {
         standalone={false}
         isCardLinkedToPortal={true}
         onActivateAI={onActivateAI}
-        onShowAIBenefits={onShowAIBenefits}
       />,
     );
 
@@ -196,7 +193,6 @@ describe("<ChatNoAccessScreen />", () => {
         standalone={false}
         isCardLinkedToPortal={false}
         onTopUpAndActivateAI={vi.fn()}
-        onShowAIBenefits={vi.fn()}
       />,
     );
 
@@ -214,7 +210,6 @@ describe("<ChatNoAccessScreen />", () => {
         standalone={false}
         isCardLinkedToPortal={true}
         onActivateAI={vi.fn()}
-        onShowAIBenefits={vi.fn()}
       />,
     );
 
@@ -240,7 +235,6 @@ describe("<ChatNoAccessScreen /> chat panel copy", () => {
   });
 
   const chatProps = {
-    aiReady: false,
     standalone: false,
     isPortalAdmin: false,
     goToAISettings: vi.fn(),

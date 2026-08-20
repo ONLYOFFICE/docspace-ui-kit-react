@@ -70,11 +70,10 @@ describe("AiChatStore fullscreen", () => {
   );
 
   it("does not force fullscreen while AI is unconfigured", () => {
-    expect(store.aiReady).toBe(false);
+    expect(store.hasProfiles).toBe(false);
     expect(store.effectiveFullscreen).toBe(false);
 
     store.setHasProfiles(true);
-    expect(store.aiReady).toBe(true);
     expect(store.effectiveFullscreen).toBe(false);
   });
 

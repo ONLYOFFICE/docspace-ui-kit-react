@@ -46,8 +46,10 @@ class AiChatStore {
 
   agentId: number | null = null;
 
-  // Mirror of upstream profiles count > 0. Bridged from the Zustand
-  // `useProfilesStore` by AiChatStoresBridge.
+  // Mirror of upstream profiles count > 0 — the authoritative "AI is
+  // configured" signal exposed by the upstream chat package. Bridged from the
+  // Zustand `useProfilesStore` by AiChatStoresBridge; read by the panel header
+  // to decide where the close button goes.
   hasProfiles = false;
 
   // Set when `openNewChat` opens the panel from a closed state. The thread
@@ -61,13 +63,6 @@ class AiChatStore {
 
   constructor() {
     makeAutoObservable(this);
-  }
-
-  // Ready when the user has at least one configured AI profile. Replaces
-  // the older `aiConfig.aiReady` check — profiles is the authoritative
-  // signal exposed by the upstream chat package.
-  get aiReady(): boolean {
-    return this.hasProfiles;
   }
 
   // Both `settings` and `initial-setup` are settings-like flows; the close

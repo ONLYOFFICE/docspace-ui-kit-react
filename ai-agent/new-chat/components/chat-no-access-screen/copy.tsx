@@ -33,7 +33,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-
 import React from "react";
 import { match, P } from "ts-pattern";
 
@@ -126,9 +125,7 @@ const getChatCopy = ({
       t("EmptyAIChatNotActiveYetAdminDescription", { aiChat }),
     )
     // saas user
-    .otherwise(() =>
-      t("EmptyAIChatNotActiveYetUserDescription", { aiChat }),
-    );
+    .otherwise(() => t("EmptyAIChatNotActiveYetUserDescription", { aiChat }));
 
   // The OpenRouter models / pricing / wallet rows only describe the SaaS
   // offering; a standalone portal pays its own AI provider directly.

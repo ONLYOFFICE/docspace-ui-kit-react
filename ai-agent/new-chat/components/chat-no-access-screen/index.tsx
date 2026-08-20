@@ -46,7 +46,6 @@ import { ChatAiBenefits } from "../chat-ai-benefits";
 import { getNoAccessCopy } from "./copy";
 
 export type ChatNoAccessScreenProps = {
-  aiReady: boolean;
   standalone: boolean;
   isPortalAdmin: boolean;
   /** Agents section wording; the AI chat panel gets the chat wording instead. */
@@ -55,12 +54,10 @@ export type ChatNoAccessScreenProps = {
   goToAISettings?: () => void;
   onActivateAI?: () => void;
   onTopUpAndActivateAI?: () => void;
-  onShowAIBenefits?: () => void;
   isActivating?: boolean;
 };
 
 export const ChatNoAccessScreen = ({
-  aiReady,
   isPortalAdmin,
   standalone,
   isAgents = false,
@@ -68,7 +65,6 @@ export const ChatNoAccessScreen = ({
   goToAISettings,
   onActivateAI,
   onTopUpAndActivateAI,
-  onShowAIBenefits,
   isActivating,
 }: ChatNoAccessScreenProps) => {
   const { isBase } = useTheme();
@@ -107,17 +103,9 @@ export const ChatNoAccessScreen = ({
         onClick: onTopUpAndActivateAI,
       } as const);
 
-  // const aiBenefits = {
-  //   type: "button",
-  //   title: t("Benefits"),
-  //   key: "ai-benefits",
-  //   primary: false,
-  //   onClick: onShowAIBenefits,
-  // } as const;
-
   const getSaasAdminOptions = () => {
     if (!activateOrTopUpAI.onClick) return [];
-    return [activateOrTopUpAI]; // aiBenefits
+    return [activateOrTopUpAI];
   };
 
   const options = !isPortalAdmin

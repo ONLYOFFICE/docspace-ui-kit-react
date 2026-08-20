@@ -81,7 +81,6 @@ vi.mock("../providers/ai-chat-store/AiChatStoreProvider", () => ({
 }));
 
 const noAccessProps: ChatNoAccessScreenProps = {
-  aiReady: false,
   standalone: false,
   isPortalAdmin: true,
 };

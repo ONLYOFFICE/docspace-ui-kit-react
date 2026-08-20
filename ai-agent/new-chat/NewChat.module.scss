@@ -177,12 +177,6 @@
     gap: 4px !important;
   }
 
-  // :global(.text-\[var\(--text-tertiary\)\]) {
-  //   font-size: 10px !important;
-  //   font-weight: 400 !important;
-  //   color: var(--text-color) !important;
-  // }
-
   :global(.scroll-to-bottom) {
     :global(.light) :is(&, :global(.scroll-to-bottom_icon)) {
       --icon-normal: #{colors.$light-gray-dark};
