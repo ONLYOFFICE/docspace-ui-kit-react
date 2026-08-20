@@ -211,10 +211,11 @@ const useRoomsHelper = ({
         typeFilter.length > 0 &&
         typeFilter.every((value) => value === ApiRoomType.FillingFormsRoom);
 
-      const effectiveSearchArea =
-        formsSection || isFormRoomOnlyFilter
+      const effectiveSearchArea = searchArea
+        ? (searchArea as SearchArea)
+        : formsSection || isFormRoomOnlyFilter
           ? (FORMS_SEARCH_AREA as unknown as SearchArea)
-          : (searchArea as SearchArea);
+          : undefined;
 
       const res = await roomsApi.getRoomsFolder({
         type: typeFilter,
