@@ -37,18 +37,19 @@ export type AiChatRouterPage =
 class AiChatStore {
   isVisible = false;
 
-  // User-explicit fullscreen toggle. The *effective* fullscreen value can
-  // additionally be forced on by `isOnSettingsPage` or `!aiReady` — those
-  // forcings don't mutate this field so the user's preference is preserved
-  // when the forcing condition goes away.
+  // User-explicit fullscreen toggle. It is the only input to the effective
+  // fullscreen value: no view forces the panel open any more, so the user's
+  // preference holds across pages.
   userFullscreen = false;
 
   currentPage: AiChatRouterPage = "chat";
 
   agentId: number | null = null;
 
-  // Mirror of upstream profiles count > 0. Bridged from the Zustand
-  // `useProfilesStore` by AiChatStoresBridge.
+  // Mirror of upstream profiles count > 0 — the authoritative "AI is
+  // configured" signal exposed by the upstream chat package. Bridged from the
+  // Zustand `useProfilesStore` by AiChatStoresBridge; read by the panel header
+  // to decide where the close button goes.
   hasProfiles = false;
 
   // Set when `openNewChat` opens the panel from a closed state. The thread
@@ -64,16 +65,9 @@ class AiChatStore {
     makeAutoObservable(this);
   }
 
-  // Ready when the user has at least one configured AI profile. Replaces
-  // the older `aiConfig.aiReady` check — profiles is the authoritative
-  // signal exposed by the upstream chat package.
-  get aiReady(): boolean {
-    return this.hasProfiles;
-  }
-
-  // Both `settings` and `initial-setup` are settings-like flows that
-  // must occupy the full panel and disable the user-facing fullscreen
-  // toggle.
+  // Both `settings` and `initial-setup` are settings-like flows; the close
+  // button routes out of them instead of shutting the panel (see
+  // AiChatPanelHeaderContainer).
   get isOnSettingsPage(): boolean {
     return (
       this.currentPage === "settings" || this.currentPage === "initial-setup"
@@ -84,18 +78,11 @@ class AiChatStore {
     return this.currentPage === "history";
   }
 
-  // Fullscreen is forced when:
-  // - upstream router is on the settings page (no room for the rest of the
-  //   docs layout), or
-  // - AI is not configured yet (the empty/setup state needs the whole panel
-  //   so the CTA isn't cramped into a sidebar).
-  // Otherwise the user's toggle wins.
+  // The user's toggle always wins: settings flows fit the narrow panel and
+  // the not-configured state now renders a compact empty view, so neither
+  // needs to force fullscreen on.
   get effectiveFullscreen(): boolean {
-    return this.userFullscreen || this.isOnSettingsPage || !this.aiReady;
-  }
-
-  get isFullscreenToggleDisabled(): boolean {
-    return this.isOnSettingsPage || !this.aiReady;
+    return this.userFullscreen;
   }
 
   open = (agentId?: number) => {

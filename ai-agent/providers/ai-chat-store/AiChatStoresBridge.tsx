@@ -35,7 +35,7 @@ import { useAiChatStore } from "./AiChatStoreProvider";
 
 // Sole Zustand → MobX sync point. Mirrors upstream router page and
 // profiles presence into AiChatStore so every consumer can derive
-// fullscreen/header/aiReady through computed getters on a single
+// fullscreen/header state through computed getters on a single
 // observable store.
 //
 // Mounted inside <AiAgentProviders> (which owns <StoresProvider>).
@@ -53,8 +53,8 @@ const AiChatStoresBridge = () => {
   useEffect(() => {
     // A rebuilt store bundle (entity/scope switch) starts with an empty,
     // not-yet-hydrated profiles list. Mirroring that would flap
-    // hasProfiles → aiReady to false and blink every gated UI across the
-    // app, so the last known value is kept until hydration completes.
+    // hasProfiles to false and blink every gated UI across the app, so the
+    // last known value is kept until hydration completes.
     if (!initialized) return;
     store.setHasProfiles(profiles.length > 0);
   }, [store, profiles, initialized]);

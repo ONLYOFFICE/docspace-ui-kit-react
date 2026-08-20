@@ -177,18 +177,16 @@
     gap: 4px !important;
   }
 
-  // :global(.text-\[var\(--text-tertiary\)\]) {
-  //   font-size: 10px !important;
-  //   font-weight: 400 !important;
-  //   color: var(--text-color) !important;
-  // }
-
   :global(.scroll-to-bottom) {
     :global(.light) :is(&, :global(.scroll-to-bottom_icon)) {
       --icon-normal: #{colors.$light-gray-dark};
     }
 
     justify-content: center;
+  }
+  :global(.chat-no-access-screen) {
+    padding-inline: 16px;
+    box-sizing: border-box;
   }
 
   // Suggestion chips → 2-column cards (per the mockup). The library renders
