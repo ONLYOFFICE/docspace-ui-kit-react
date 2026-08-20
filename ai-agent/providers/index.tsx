@@ -222,6 +222,12 @@ type AiAgentProvidersProps = {
    */
   onProfilePickerSelect?: (profile: Profile, actionId?: string) => void;
   /**
+   * Host override for the chat error box content (title / description /
+   * action) by normalized error code — see {@link WidgetConfig.formatChatError}.
+   * Return `null` to keep the library default (localized text + Retry).
+   */
+  formatChatError?: WidgetConfig["formatChatError"];
+  /**
    * Fired when an opened thread's persisted context settles: the agent
    * entity the conversation last ran against, or `null` for a plain
    * conversation. Not fired while the value is unknown (fetch in flight,
@@ -454,6 +460,7 @@ const AiAgentProviders = ({
   profilePickerActions,
   profilePickerAlias,
   onProfilePickerSelect,
+  formatChatError,
   onThreadContextChange,
   composerHeader,
   composerDisabled,
@@ -761,6 +768,7 @@ const AiAgentProviders = ({
       profilePickerReadOnly,
       profilePickerActions,
       onProfilePickerSelect,
+      formatChatError,
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
@@ -790,6 +798,7 @@ const AiAgentProviders = ({
       profilePickerReadOnly,
       profilePickerActions,
       onProfilePickerSelect,
+      formatChatError,
       onToolCallApproveResult,
       onDropFiles,
       resolvedSuggestions,
