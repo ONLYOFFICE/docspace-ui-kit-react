@@ -31,6 +31,7 @@ import classNames from "classnames";
 import { ChatPage, useStores, ChatList } from "@onlyoffice/ai-chat";
 
 import { useIsDesktop } from "../../hooks/use-is-desktop";
+import { useVirtualKeyboardInset } from "../../hooks/useVirtualKeyboardInset";
 
 import { ChatToolbar } from "../chat-toolbar";
 import { ChatNoAccessScreen } from "./components/chat-no-access-screen";
@@ -57,6 +58,14 @@ const NewChat: React.FC<ChatProps> = observer(
     const aiChatStore = useAiChatStore();
 
     const isFullScreen = aiChatStore.effectiveFullscreen;
+
+    // On mobile/tablet the virtual keyboard covers the bottom of the layout
+    // viewport, hiding the composer. Reserve the covered height inside the
+    // chat pane so the composer (and the thread above it) stays visible.
+    const keyboardInset = useVirtualKeyboardInset(!isDesktop);
+    const keyboardInsetStyle = keyboardInset
+      ? { paddingBottom: keyboardInset }
+      : undefined;
 
     const showActivationScreen = !!noAccessProps && !aiReady && !threadId;
     const showToolbar = (hasProfiles || showActivationScreen) && isAgents;
@@ -127,7 +136,11 @@ const NewChat: React.FC<ChatProps> = observer(
       // "initial-setup" here would unmount that screen and strand the user on
       // an empty panel with no way back (hosts without `noAccessProps`).
       default:
-        return <section className={styles.chatPanel}>{chatPanel}</section>;
+        return (
+          <section className={styles.chatPanel} style={keyboardInsetStyle}>
+            {chatPanel}
+          </section>
+        );
     }
   },
 );
