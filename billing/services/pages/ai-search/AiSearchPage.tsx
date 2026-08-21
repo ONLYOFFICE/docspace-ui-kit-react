@@ -139,7 +139,8 @@ const AiSearchPage = (props: AiSearchPageProps) => {
       paymentStore.isCardLinkedToPortal &&
       !paymentStore.isServiceActionDisabled
     ) {
-      onConfirm();
+      // Not onConfirm: the toggle handler asks to enable AI features first.
+      onToggleChange();
     }
 
     params.delete("activate");
