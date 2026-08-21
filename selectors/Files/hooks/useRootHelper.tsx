@@ -77,9 +77,9 @@ const catalogIcons: Partial<Record<FolderType, React.FC>> = {
 
 // Canonical display order of root folders, matching the left-side Article menu.
 const rootFolderDisplayOrder: FolderType[] = [
-  FolderType.AiAgents,
   FolderType.USER,
   FolderType.VirtualRooms,
+  FolderType.AiAgents,
   FolderType.SHARE,
   FolderType.Favorites,
   FolderType.Recent,
