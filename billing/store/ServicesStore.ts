@@ -479,6 +479,11 @@ class ServicesStore {
           ? [setServiceQuota(serviceEnum ?? serviceName)]
           : [];
 
+      // The AI search enable flow checks the AI tools state.
+      if (serviceName === AI_SEARCH) {
+        serviceQuotaRequest.push(setServiceQuota(AI_ENUM));
+      }
+
       const requests: Promise<unknown>[] = [
         ...serviceQuotaRequest,
         this.paymentStore.tariff.fetchPortalTariff(),
