@@ -33,36 +33,38 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { createContext, type ReactNode } from "react";
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
-import useLoadersHelper from "../hooks/useLoadersHelper";
+import useContentLoading from "./useContentLoading";
 
-type TLoaderContext = ReturnType<typeof useLoadersHelper>;
+describe("useContentLoading", () => {
+  it("ignores startContentLoading until the initial load settles", () => {
+    const { result } = renderHook(() => useContentLoading());
 
-export const LoadersContext = createContext<TLoaderContext>({
-  isFullLoadActive: true,
-  isNextPageLoading: false,
-  isContentLoading: false,
-  showBreadCrumbsLoader: true,
-  showSearchLoader: true,
-  showBodyLoader: true,
+    act(() => result.current.startContentLoading());
 
-  startFullLoad: () => {},
-  finishFullLoad: () => {},
-  startContentLoading: () => {},
-  finishContentLoading: () => {},
-  hideSectionLoader: () => {},
-  setIsNextPageLoading: () => {},
+    expect(result.current.isContentLoading).toBe(false);
+  });
+
+  it("dims and undims once the initial load has finished", () => {
+    const { result } = renderHook(() => useContentLoading());
+
+    act(() => result.current.finishContentLoading());
+    act(() => result.current.startContentLoading());
+    expect(result.current.isContentLoading).toBe(true);
+
+    act(() => result.current.finishContentLoading());
+    expect(result.current.isContentLoading).toBe(false);
+  });
+
+  it("allows dimming immediately when mounted with preloaded data", () => {
+    const { result } = renderHook(() =>
+      useContentLoading({ initiallyLoaded: true }),
+    );
+
+    act(() => result.current.startContentLoading());
+
+    expect(result.current.isContentLoading).toBe(true);
+  });
 });
-
-export const LoadersContextProvider = ({
-  children,
-  withInit,
-}: {
-  children: ReactNode;
-  withInit?: boolean;
-}) => {
-  const value = useLoadersHelper({ withInit });
-
-  return <LoadersContext value={value}>{children}</LoadersContext>;
-};

@@ -233,7 +233,10 @@ type TSelectorPagination = {
   hasNextPage: boolean;
   isNextPageLoading: boolean;
   totalItems: number;
+  /** Initial load: the body is replaced with a skeleton loader */
   isLoading: boolean;
+  /** Content refresh: the current body stays on screen dimmed; wins over isLoading */
+  isContentLoading?: boolean;
 };
 
 // NewItem

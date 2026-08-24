@@ -70,6 +70,7 @@ import { globalColors } from "../../providers/theme";
 
 import { toastr } from "../../components/toast";
 import { useTheme } from "../../context/ThemeContext";
+import useContentLoading from "../utils/hooks/useContentLoading";
 
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
@@ -266,7 +267,9 @@ const PeopleSelector = ({
   const [hasNextPage, setHasNextPage] = useState(true);
   const [isNextPageLoading, setIsNextPageLoading] = useState(false);
   const [selectedItems, setSelectedItems] = useState<TSelectorItem[]>([]);
-  const isFirstLoadRef = useRef(true);
+  const { isContentLoading, startContentLoading, finishContentLoading } =
+    useContentLoading();
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const afterSearch = useRef(false);
   const totalRef = useRef(0);
   const searchTab = useRef(PEOPLE_TAB_ID);
@@ -458,7 +461,7 @@ const PeopleSelector = ({
           ? responseTotal - totalDifferent - 1
           : responseTotal - totalDifferent;
 
-        if (isFirstLoadRef.current) {
+        if (startIndex === 0) {
           const newItems = withOutCurrentAuthorizedUser
             ? removeCurrentUserFromList(data)
             : moveCurrentUserToTopOfList(data);
@@ -488,12 +491,19 @@ const PeopleSelector = ({
         totalRef.current = newTotal;
 
         setIsNextPageLoading(false);
-        isFirstLoadRef.current = false;
+        setIsFirstLoad(false);
+        finishContentLoading();
       } catch (error) {
+        // On cancel a superseding request is already running and owns the
+        // loading flags, so they must not be reset here
         if (axios.isCancel(error)) return;
 
         console.error(error);
         toastr.error(error as Error);
+
+        setIsNextPageLoading(false);
+        setIsFirstLoad(false);
+        finishContentLoading();
       }
     },
     [
@@ -524,8 +534,8 @@ const PeopleSelector = ({
     setHasNextPage(true);
     setTotal(-1);
     totalRef.current = 0;
-    isFirstLoadRef.current = true;
-  }, []);
+    startContentLoading();
+  }, [startContentLoading]);
 
   const onSearch = useCallback(
     (value: string, callback?: VoidFunction) => {
@@ -549,12 +559,9 @@ const PeopleSelector = ({
         return "";
       });
 
-      // Trigger initial load after clearing search
-      loadNextPage(0);
-
       callback?.();
     },
-    [resetSelectorList, loadNextPage],
+    [resetSelectorList],
   );
 
   const emptyScreenImage = isBase ? (
@@ -589,7 +596,7 @@ const PeopleSelector = ({
     onClearSearch,
     searchLoader: <SearchLoader />,
     isSearchLoading:
-      isFirstLoadRef.current && !searchValue && !afterSearch.current,
+      isFirstLoad && !searchValue && !afterSearch.current,
   };
 
   const infoProps: TSelectorInfo = withInfo
@@ -672,9 +679,8 @@ const PeopleSelector = ({
       if (setActiveTab) setActiveTab(`${tab}`);
       setActiveTabId(`${tab}`);
       onSearch("");
-      resetSelectorList();
     },
-    [onSearch, resetSelectorList, setActiveTab],
+    [onSearch, setActiveTab],
   );
 
   const withTabsProps: TSelectorTabs =
@@ -791,11 +797,12 @@ const PeopleSelector = ({
       loadNextPage={loadNextPage}
       isMultiSelect={isMultiSelect ?? false}
       totalItems={total}
-      isLoading={isFirstLoadRef.current}
+      isLoading={isFirstLoad}
+      isContentLoading={isContentLoading}
       rowLoader={
         <RowLoader
           isUser
-          isContainer={isFirstLoadRef.current}
+          isContainer={isFirstLoad}
           isMultiSelect={isMultiSelect}
         />
       }

@@ -284,7 +284,7 @@ export type FilesSelectorProps = TInfoBar &
       isInsidePrivateRoom?: boolean,
     ) => void | Promise<void>;
     getIsDisabled: (
-      isFirstLoad: boolean,
+      isLoading: boolean,
       isSelectedParentFolder: boolean,
       selectedItemId: string | number | undefined,
       selectedItemType: "rooms" | "files" | "agents" | undefined,

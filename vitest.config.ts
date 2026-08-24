@@ -41,6 +41,7 @@ export default defineConfig({
     setupFiles: ["./test/setup.ts"],
     include: [
       "components/**/*.test.{ts,tsx}",
+      "selectors/**/*.test.{ts,tsx}",
       "ai-agent/**/*.test.{ts,tsx}",
       "errors/**/*.test.{ts,tsx}",
       "ui/**/*.test.{ts,tsx}",

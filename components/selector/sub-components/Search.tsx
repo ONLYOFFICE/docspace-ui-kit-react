@@ -38,7 +38,6 @@ import { SearchInput } from "../../search-input";
 import { InputSize } from "../../text-input";
 
 import { SearchContext, SearchDispatchContext } from "../contexts/Search";
-import { BreadCrumbsContext } from "../contexts/BreadCrumbs";
 import type { SearchProps } from "../Selector.types";
 
 const Search = React.memo(({ isSearch }: SearchProps) => {
@@ -52,8 +51,6 @@ const Search = React.memo(({ isSearch }: SearchProps) => {
     onSearch,
   } = use(SearchContext);
   const setIsSearch = use(SearchDispatchContext);
-
-  const { isBreadCrumbsLoading, bodyIsLoading } = use(BreadCrumbsContext);
 
   const onClearSearchAction = useCallback(() => {
     onClearSearch?.(() => setIsSearch(false));
@@ -70,7 +67,7 @@ const Search = React.memo(({ isSearch }: SearchProps) => {
     [onClearSearchAction, onSearch, setIsSearch],
   );
 
-  if (isBreadCrumbsLoading || isSearchLoading || (!isSearch && bodyIsLoading))
+  if (isSearchLoading)
     return searchLoader;
 
   if (!withSearch || !isSearch) return null;
