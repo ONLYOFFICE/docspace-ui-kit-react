@@ -286,6 +286,15 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
               values={{ finalDate: paymentDate }}
             />
           )}
+          &nbsp;
+          <HelpButton
+            className="payment-tooltip"
+            offsetRight={0}
+            iconNode={<HelpReactSvg />}
+            style={{ display: "inline-block", verticalAlign: "middle" }}
+            tooltipContent={<Text>{t("RenewalChargeOrderTooltip")}</Text>}
+            dataTestId="renewal_charge_order_help_button"
+          />
         </Text>
       );
   };
