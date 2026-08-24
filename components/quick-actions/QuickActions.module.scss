@@ -62,6 +62,10 @@ $compact-peek: 60px;
   --_tile-bg: var(--quick-actions-tile-bg, #{colors.$gray-light});
   --_tile-bg-hover: var(--quick-actions-tile-bg-hover, #{colors.$gray-light-mid});
   --_tile-color: var(--quick-actions-tile-color, #{colors.$black});
+  // Cap on a single tile's width. Consumers that want the tiles to fill the
+  // whole banner width instead of stopping at the design width set this to
+  // `none` (the tile height stays fixed either way).
+  --_tile-max-width: var(--quick-actions-tile-max-width, #{$tile-max-width});
   // The fade/blur overlay tints toward the surrounding surface; defaults to the
   // tile background so it reads as the grid dissolving.
   --_fade-color: var(--quick-actions-tile-bg, #{colors.$white});
@@ -112,7 +116,7 @@ $compact-peek: 60px;
   // cannot fit; flex-grow then expands them back up to $tile-max-width.
   flex: 1 1 $tile-min-width;
   min-width: $tile-min-width;
-  max-width: $tile-max-width;
+  max-width: var(--_tile-max-width);
   height: $tile-height;
   background-color: var(--_tile-bg);
   border: none;
@@ -274,7 +278,7 @@ $compact-peek: 60px;
   // cannot fit; flex-grow then expands them back up to $tile-max-width.
   flex: 1 1 $tile-min-width;
   min-width: $tile-min-width;
-  max-width: $tile-max-width;
+  max-width: var(--_tile-max-width);
 
   .tile {
     flex: 1 1 auto;
