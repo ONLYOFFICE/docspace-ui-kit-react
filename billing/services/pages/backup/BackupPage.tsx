@@ -40,6 +40,7 @@ import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
 import { Button, ButtonSize } from "../../../../components/button";
+import { RectangleSkeleton } from "../../../../components/rectangle";
 import { Link } from "../../../../components/link";
 
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
@@ -96,9 +97,12 @@ const BackupPage: React.FC<BackupPageProps> = ({
     backupUsage,
     isInitServicesData,
     initServiceData,
+    isServiceDataPending,
   } = servicesStore;
 
   const t = useCommonTranslation();
+
+  const isUsageLoading = isServiceDataPending(BACKUP_SERVICE);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
@@ -225,9 +229,17 @@ const BackupPage: React.FC<BackupPageProps> = ({
               <Text className={styles.cardLabel}>
                 {t("FreeMonthlyBackups")}
               </Text>
-              <Text className={styles.cardValue}>
-                {`${freeBackupsUsed}/${maxFreeBackups}`}
-              </Text>
+              {isUsageLoading ? (
+                <RectangleSkeleton
+                  width="80px"
+                  height="24px"
+                  borderRadius="3px"
+                />
+              ) : (
+                <Text className={styles.cardValue}>
+                  {`${freeBackupsUsed}/${maxFreeBackups}`}
+                </Text>
+              )}
               <Text className={styles.cardCaption}>
                 {t("RenewsOnDate", { date: renewsDate })}
               </Text>
@@ -240,14 +252,30 @@ const BackupPage: React.FC<BackupPageProps> = ({
                 <Text className={styles.cardLabel}>
                   {t("AdditionalBackups")}
                 </Text>
-                <Text className={styles.cardValue}>
-                  {availableBackupsCount}
-                </Text>
-                <Text className={styles.cardCaption}>
-                  {t("PerBackup", {
-                    currency: formatWalletCurrency(backupServicePrice, 2),
-                  })}
-                </Text>
+                {isUsageLoading ? (
+                  <RectangleSkeleton
+                    width="80px"
+                    height="24px"
+                    borderRadius="3px"
+                  />
+                ) : (
+                  <Text className={styles.cardValue}>
+                    {availableBackupsCount}
+                  </Text>
+                )}
+                {isUsageLoading ? (
+                  <RectangleSkeleton
+                    width="100px"
+                    height="16px"
+                    borderRadius="3px"
+                  />
+                ) : (
+                  <Text className={styles.cardCaption}>
+                    {t("PerBackup", {
+                      currency: formatWalletCurrency(backupServicePrice, 2),
+                    })}
+                  </Text>
+                )}
               </>
             ) : (
               <>
@@ -290,9 +318,17 @@ const BackupPage: React.FC<BackupPageProps> = ({
         <div className={styles.cardsGrid}>
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthSpend")}</Text>
-            <Text className={styles.cardValue}>
-              {formatWalletCurrency(monthSpend, 2)}
-            </Text>
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="80px"
+                height="24px"
+                borderRadius="3px"
+              />
+            ) : (
+              <Text className={styles.cardValue}>
+                {formatWalletCurrency(monthSpend, 2)}
+              </Text>
+            )}
             <Text className={styles.cardCaption}>
               {t("ForPeriod", { period: monthLabel })}
             </Text>
@@ -300,8 +336,31 @@ const BackupPage: React.FC<BackupPageProps> = ({
 
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthUsage")}</Text>
-            <Text className={styles.cardValue}>{totalBackupsUsed}</Text>
-            {totalBackupsUsed > 0 ? (
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="80px"
+                height="24px"
+                borderRadius="3px"
+              />
+            ) : (
+              <Text className={styles.cardValue}>{totalBackupsUsed}</Text>
+            )}
+            {isUsageLoading ? (
+              <>
+                {!isFreeTariff ? (
+                  <RectangleSkeleton
+                    width="120px"
+                    height="16px"
+                    borderRadius="3px"
+                  />
+                ) : null}
+                <RectangleSkeleton
+                  width="100px"
+                  height="16px"
+                  borderRadius="3px"
+                />
+              </>
+            ) : totalBackupsUsed > 0 ? (
               <>
                 {!isFreeTariff ? (
                   <Text className={styles.cardCaption}>

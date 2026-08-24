@@ -47,7 +47,6 @@ const AiChatPanelHeader = ({
   rightExtras,
   isFullscreen = false,
   onToggleFullscreen,
-  isFullscreenToggleDisabled = false,
   onClose,
   enterFullscreenTooltip,
   exitFullscreenTooltip,
@@ -90,22 +89,11 @@ const AiChatPanelHeader = ({
           <IconButton
             iconNode={isFullscreen ? <CollapseIcon /> : <ExpandIcon />}
             size={17}
-            className={classNames(styles.fullscreenToggle, {
-              [styles.disabled]: isFullscreenToggleDisabled,
-            })}
+            className={styles.fullscreenToggle}
             onClick={onToggleFullscreen}
-            isDisabled={isFullscreenToggleDisabled}
-            tooltipId={
-              isFullscreenToggleDisabled
-                ? undefined
-                : "ai-chat-panel-fullscreen-tooltip"
-            }
+            tooltipId="ai-chat-panel-fullscreen-tooltip"
             tooltipContent={
-              isFullscreenToggleDisabled
-                ? undefined
-                : isFullscreen
-                  ? exitFullscreenTooltip
-                  : enterFullscreenTooltip
+              isFullscreen ? exitFullscreenTooltip : enterFullscreenTooltip
             }
             dataTestId="ai-chat-panel-fullscreen"
           />

@@ -32,55 +32,67 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+@use "../../../../styles/variables/colors";
 
-import type { DateTime } from "luxon";
+.benefits {
+  box-sizing: border-box;
+  width: 100%;
 
-import type { TUsagePeriodKey } from "../types";
-import { getAppTimezone, now } from "../../utils/date";
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 
-export const USAGE_PERIODS: TUsagePeriodKey[] = [
-  "thisMonth",
-  "lastMonth",
-  "last3Months",
-  "last6Months",
-  "last12Months",
-  "thisYear",
-  "lastYear",
-];
+  // Overridable card colors. Defaults resolve to the light-theme tokens
+  // and are redefined for `.dark`, so the block still renders correctly
+  // when no theme class sits on an ancestor.
+  --chat-ai-benefits-intro-color: #{colors.$black};
+  --chat-ai-benefits-bg-color: #{colors.$gray-light};
+  --chat-ai-benefits-text-color: #{colors.$black};
+  --chat-ai-benefits-icon-color: #{colors.$gray-text};
 
-export const getUsageRange = (
-  period: TUsagePeriodKey,
-): { from: DateTime; to: DateTime } => {
-  const current = now().setZone(getAppTimezone());
-
-  switch (period) {
-    case "lastMonth": {
-      const lastMonth = current.minus({ months: 1 });
-      return { from: lastMonth.startOf("month"), to: lastMonth.endOf("month") };
-    }
-    case "last3Months":
-      return {
-        from: current.minus({ months: 2 }).startOf("month"),
-        to: current,
-      };
-    case "last6Months":
-      return {
-        from: current.minus({ months: 5 }).startOf("month"),
-        to: current,
-      };
-    case "last12Months":
-      return {
-        from: current.minus({ months: 11 }).startOf("month"),
-        to: current,
-      };
-    case "thisYear":
-      return { from: current.startOf("year"), to: current };
-    case "lastYear": {
-      const lastYear = current.minus({ years: 1 });
-      return { from: lastYear.startOf("year"), to: lastYear.endOf("year") };
-    }
-    default:
-      return { from: current.startOf("month"), to: current };
+  :global(.dark) & {
+    --chat-ai-benefits-intro-color: #{colors.$white};
+    --chat-ai-benefits-bg-color: #{colors.$dark-gray-light};
+    --chat-ai-benefits-text-color: #{colors.$white};
+    --chat-ai-benefits-icon-color: #{colors.$dark-gray-dark};
   }
-};
+}
+
+.intro {
+  color: var(--chat-ai-benefits-intro-color);
+}
+
+.list {
+  margin: 0;
+  padding-block: 12px;
+
+  padding-inline: 12px 8px;
+
+  list-style: none;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  border-radius: 6px;
+  background-color: var(--chat-ai-benefits-bg-color);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--chat-ai-benefits-text-color);
+}
+
+.icon {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+
+  path {
+    fill: var(--chat-ai-benefits-icon-color);
+  }
+}
 

@@ -51,7 +51,13 @@ import NoSpendingDarkIcon from "../../../assets/no.transactions.filter.dark.them
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import type { TUsagePeriodKey } from "../../types";
-import { AI_SEARCH_ENUM, AI_TOOLS, BACKUP_SERVICE } from "../../constants";
+import {
+  ADMIN,
+  AI_SEARCH_ENUM,
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  MANAGER,
+} from "../../constants";
 
 import { isDocsConnectServiceName } from "../../utils/docs-connect";
 import { getServiceUsageSubLabel } from "../../utils/serviceUsage";
@@ -64,6 +70,7 @@ type BreakdownView = "services" | "month";
 type SpendingBreakdownProps = {
   period: TUsagePeriodKey;
   isLoading: boolean;
+  onTariffPlanClick?: () => void;
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
   onAIServicesClick?: () => void;
@@ -73,6 +80,8 @@ type SpendingBreakdownProps = {
     serviceName?: string,
     range?: { from: DateTime; to: DateTime },
   ) => void;
+  /** A report is already being generated, so no other one may be started. */
+  isDownloadBlocked?: boolean;
   /** Notifies the parent when the services/month view changes. */
   onViewChange?: (view: BreakdownView) => void;
 };
@@ -80,12 +89,14 @@ type SpendingBreakdownProps = {
 const SpendingBreakdown = ({
   period,
   isLoading,
+  onTariffPlanClick,
   onDiskStorageClick,
   onBackupClick,
   onAIServicesClick,
   onAISearchClick,
   onDocsConnectClick,
   onDownloadReport,
+  isDownloadBlocked,
   onViewChange,
 }: SpendingBreakdownProps) => {
   const t = useCommonTranslation();
@@ -102,7 +113,8 @@ const SpendingBreakdown = ({
   );
 
   const handleDownload = async (serviceName: string) => {
-    if (downloadingServices.has(serviceName) || !onDownloadReport) return;
+    if (isDownloadBlocked || !onDownloadReport) return;
+    if (downloadingServices.has(serviceName)) return;
 
     setDownloadingServices((prev) => new Set(prev).add(serviceName));
     try {
@@ -118,7 +130,8 @@ const SpendingBreakdown = ({
 
   const handleMonthDownload = async (year: number, month: number) => {
     const key = `${year}-${month}`;
-    if (downloadingMonths.has(key) || !onDownloadReport) return;
+    if (isDownloadBlocked || !onDownloadReport) return;
+    if (downloadingMonths.has(key)) return;
 
     setDownloadingMonths((prev) => new Set(prev).add(key));
     try {
@@ -171,6 +184,7 @@ const SpendingBreakdown = ({
 
   const getServiceHandler = (service: string) => {
     const key = normalizeService(service);
+    if (service === ADMIN) return onTariffPlanClick;
     if (key.includes("storage")) return onDiskStorageClick;
     if (service === BACKUP_SERVICE) return onBackupClick;
     if (service === AI_TOOLS) return onAIServicesClick;
@@ -226,6 +240,7 @@ const SpendingBreakdown = ({
             onDownloadReport ? () => handleDownload(item.service) : undefined
           }
           isDownloading={downloadingServices.has(item.service)}
+          isDownloadDisabled={isDownloadBlocked}
         />
       ))}
     </div>
@@ -290,6 +305,7 @@ const SpendingBreakdown = ({
                 : undefined
             }
             isDownloading={downloadingMonths.has(key)}
+            isDownloadDisabled={isDownloadBlocked}
           />
         );
       })}

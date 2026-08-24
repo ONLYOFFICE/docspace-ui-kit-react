@@ -40,6 +40,7 @@ import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
 import { Link, LinkTarget } from "../../../../components/link";
+import { RectangleSkeleton } from "../../../../components/rectangle";
 
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { AI_ENUM, AI_TOOLS } from "../../../constants";
@@ -52,6 +53,7 @@ import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
 
 import AiPageLoader from "./AiPageLoader";
 
+import SpendAmount from "../../../shared/spend-amount";
 import styles from "./AiPage.module.scss";
 import {
   now,
@@ -102,9 +104,12 @@ const AiPage = (props: AiPageProps) => {
 
   const { logoText, language } = paymentStore;
 
-  const { isInitServicesData, initServiceData, aiUsage } = servicesStore;
+  const { isInitServicesData, initServiceData, aiUsage, isServiceDataPending } =
+    servicesStore;
 
   const t = useCommonTranslation();
+
+  const isUsageLoading = isServiceDataPending(AI_TOOLS);
 
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
   const [isTopUpConfirmVisible, setIsTopUpConfirmVisible] = useState(false);
@@ -271,17 +276,37 @@ const AiPage = (props: AiPageProps) => {
         <div className={styles.cardsGrid}>
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthSpend")}</Text>
-            <Text className={styles.cardValue}>
-              {formatWalletCurrency(monthSpend, 2)}
-            </Text>
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="80px"
+                height="24px"
+                borderRadius="3px"
+              />
+            ) : (
+              <SpendAmount
+                amount={monthSpend}
+                className={styles.cardValue}
+                fontSize="18px"
+                fontWeight={700}
+                tooltipId="ai-tools-month-spend"
+              />
+            )}
             <Text className={styles.cardCaption}>
-              {t("ChargedFromCredits")}
+              {t("ForPeriod", { period: monthLabel })}
             </Text>
           </div>
 
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthUsage")}</Text>
-            <Text className={styles.cardValue}>{monthTokensText}</Text>
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="80px"
+                height="24px"
+                borderRadius="3px"
+              />
+            ) : (
+              <Text className={styles.cardValue}>{monthTokensText}</Text>
+            )}
             <Text className={styles.cardCaption}>
               {t("TokensProcessedInMonth", { month: monthLabel })}
             </Text>

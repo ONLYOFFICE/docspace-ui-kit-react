@@ -25,19 +25,30 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 @use "../../styles/variables/colors";
 
+:global(.aui-root) {
+  --chat-scroll-to-bottom-gap: 24px;
+  --chat-scroll-to-bottom-width: 40px;
+  --chat-scroll-to-bottom-height: 40px;
+  --chat-scroll-to-bottom-border-radius: 50%;
+  --chat-assistant-message-actions-gap: 20px;
+
+  --dropdown-item-height: 32px;
+  --dropdown-menu-padding-y: 4px;
+  --dropdown-item-padding-start-icon: 8px;
+  --dropdown-item-content-gap: 4px;
+  --dropdown-item-padding-end-control: 12px;
+}
+
 .chatPanel {
   :global(.aui-root) {
     --aui-font-base: 15px;
-
-    --chat-scroll-to-bottom-gap: 24px;
-    --chat-scroll-to-bottom-width: 40px;
-    --chat-scroll-to-bottom-height: 40px;
-    --chat-scroll-to-bottom-border-radius: 50%;
-    --chat-assistant-message-actions-gap: 20px;
   }
 
   display: flex;
   flex-direction: column;
+  // The virtual-keyboard inset is applied as inline padding-bottom; keep it
+  // inside the pane's bounded height instead of growing past the parent.
+  box-sizing: border-box;
 
   // Rendered directly inside `.infoPanel` (flex column with the chat
   // header as a fixed-height sibling). `flex: 1; min-height: 0` keeps it
@@ -169,18 +180,16 @@
     gap: 4px !important;
   }
 
-  // :global(.text-\[var\(--text-tertiary\)\]) {
-  //   font-size: 10px !important;
-  //   font-weight: 400 !important;
-  //   color: var(--text-color) !important;
-  // }
-
   :global(.scroll-to-bottom) {
     :global(.light) :is(&, :global(.scroll-to-bottom_icon)) {
       --icon-normal: #{colors.$light-gray-dark};
     }
 
     justify-content: center;
+  }
+  :global(.chat-no-access-screen) {
+    padding-inline: 16px;
+    box-sizing: border-box;
   }
 
   // Suggestion chips → 2-column cards (per the mockup). The library renders

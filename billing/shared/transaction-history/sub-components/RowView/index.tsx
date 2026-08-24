@@ -62,7 +62,7 @@ const RowView = ({
       {history.map((transaction, index) => (
         <TransactionRowView
           transaction={transaction}
-          key={`transaction-row-${transaction.date || index}`}
+          key={`transaction-row-${index}-${transaction.date ?? ""}`}
           sectionWidth={sectionWidth}
           serviceName={serviceName}
         />

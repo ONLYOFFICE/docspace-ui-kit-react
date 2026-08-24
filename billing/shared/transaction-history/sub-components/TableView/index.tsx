@@ -86,7 +86,7 @@ const TableView = ({ sectionWidth, serviceName }: TransactionHistoryProps) => {
           {history.map((transaction, index) => (
             <TransactionRow
               transaction={transaction}
-              key={`transaction-${transaction.date || index}`}
+              key={`transaction-${index}-${transaction.date ?? ""}`}
               serviceName={serviceName}
             />
           ))}

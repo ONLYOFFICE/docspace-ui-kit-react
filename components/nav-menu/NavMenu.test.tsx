@@ -155,12 +155,34 @@ describe("<NavMenu />", () => {
       expect(button).toHaveAttribute("aria-expanded", "true");
     });
 
-    it("collapses already-expanded item on second click when it is not active", async () => {
+    it("keeps the section expanded when clicking the parent of the active sub-item", async () => {
+      // The selection sits on a sub-item, so its parent is still the active
+      // section: clicking it must not collapse the section. Collapsing here
+      // used to flicker - the navigation that follows re-expands it.
       render(
         <NavMenu
           groups={groups}
           defaultExpandedId="ai-files"
           activeItemId="shared"
+        />,
+      );
+      const button = screen.getByRole("button", { name: "AI Files" });
+
+      expect(button).toHaveAttribute("aria-expanded", "true");
+
+      await userEvent.click(button);
+
+      expect(button).toHaveAttribute("aria-expanded", "true");
+    });
+
+    it("collapses already-expanded item on second click when it is not active", async () => {
+      // Active selection is outside this section (an id the menu does not
+      // know, so the auto-expand effect leaves the expanded state alone).
+      render(
+        <NavMenu
+          groups={groups}
+          defaultExpandedId="ai-files"
+          activeItemId="somewhere-else"
         />,
       );
       const button = screen.getByRole("button", { name: "AI Files" });

@@ -40,7 +40,13 @@ import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "../utils/common";
 import { parseAiPrices } from "../utils/parsers";
-import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
+import {
+  AI_ENUM,
+  AI_SEARCH,
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  STORAGE_ENUM,
+} from "../constants";
 import { isDocsConnectServiceName } from "../utils/docs-connect";
 import type {
   TAiToolsPrices,
@@ -54,6 +60,8 @@ import type PaymentStore from "./PaymentStore";
 import type { TApiClient } from "../../providers/api/ApiProvider";
 import { formatterCurrencyWithoutTranction } from "../wallet/utils";
 
+const USAGE_TRACKED_SERVICES: string[] = [AI_TOOLS, AI_SEARCH, BACKUP_SERVICE];
+
 class ServicesStore {
   private paymentApi: PaymentApi;
 
@@ -66,6 +74,12 @@ class ServicesStore {
   isInitServicesPage = false;
 
   isInitServicesData = false;
+
+  /** Service page whose data is loading right now. */
+  pendingServiceName: string | null = null;
+
+  /** Service the stored service data belongs to; null before the first load. */
+  loadedServiceName: string | null = null;
 
   isAiPaywallInit = false;
 
@@ -170,6 +184,9 @@ class ServicesStore {
   setIsInitServiceData = (isInitServicesData: boolean) => {
     this.isInitServicesData = isInitServicesData;
   };
+
+  isServiceDataPending = (serviceName: string) =>
+    this.loadedServiceName !== serviceName;
 
   setIsAiPaywallInit = (value: boolean) => {
     this.isAiPaywallInit = value;
@@ -389,6 +406,11 @@ class ServicesStore {
   initUsageData = async (period: TUsagePeriodKey) => {
     const range = getUsageRange(period);
 
+    // The usage page overwrites the shared rows with a whole period. Only rows
+    // of the current month match what a service page requests for itself, so
+    // any other period invalidates them.
+    if (period !== "thisMonth") this.loadedServiceName = null;
+
     await Promise.all([
       this.paymentStore.initWalletPayerAndBalance(false),
       this.fetchServiceUsage(range),
@@ -413,6 +435,12 @@ class ServicesStore {
     );
   }
 
+  get aiSearchUsage() {
+    return (
+      this.serviceUsage.find((usage) => usage.service === AI_SEARCH) ?? null
+    );
+  }
+
   initServiceData = async (
     t: TTranslation,
     serviceName: string,
@@ -420,6 +448,8 @@ class ServicesStore {
     integrationUrl?: string,
   ) => {
     const isRefresh = window.location.href.includes("complete=true");
+
+    this.pendingServiceName = serviceName;
 
     const {
       fetchTransactionHistory,
@@ -449,6 +479,11 @@ class ServicesStore {
           ? [setServiceQuota(serviceEnum ?? serviceName)]
           : [];
 
+      // The AI search enable flow checks the AI tools state.
+      if (serviceName === AI_SEARCH) {
+        serviceQuotaRequest.push(setServiceQuota(AI_ENUM));
+      }
+
       const requests: Promise<unknown>[] = [
         ...serviceQuotaRequest,
         this.paymentStore.tariff.fetchPortalTariff(),
@@ -456,28 +491,21 @@ class ServicesStore {
         initWalletPayerAndBalance(isRefresh),
       ];
 
-      if (serviceName === AI_TOOLS) {
+      const monthStart = now().startOf("month");
+      const monthEnd = now().endOf("month");
+
+      if (USAGE_TRACKED_SERVICES.includes(serviceName)) {
         requests.push(
           this.fetchServiceUsage({
-            serviceName: AI_TOOLS,
-            from: now().startOf("month"),
-            to: now().endOf("month"),
+            serviceName,
+            from: monthStart,
+            to: monthEnd,
           }),
         );
       }
 
       if (serviceName === BACKUP_SERVICE) {
-        requests.push(
-          this.fetchBackupsCountByPaid(
-            now().startOf("month"),
-            now().endOf("month"),
-          ),
-          this.fetchServiceUsage({
-            serviceName: BACKUP_SERVICE,
-            from: now().startOf("month"),
-            to: now().endOf("month"),
-          }),
-        );
+        requests.push(this.fetchBackupsCountByPaid(monthStart, monthEnd));
       }
 
       await Promise.all(requests);
@@ -509,6 +537,9 @@ class ServicesStore {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
       toastr.error(t("Common:UnexpectedError"));
+    } finally {
+      if (this.pendingServiceName === serviceName)
+        this.loadedServiceName = serviceName;
     }
   };
 
