@@ -33,36 +33,36 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { createContext, type ReactNode } from "react";
+import React from "react";
 
-import useLoadersHelper from "../hooks/useLoadersHelper";
+/**
+ * Owns the "content refresh" (dimming) state of a selector: while a reload
+ * of already-displayed content is in progress, the stale content stays on
+ * screen dimmed instead of being replaced with a skeleton.
+ *
+ * `startContentLoading` is a no-op until the initial load has settled —
+ * dimming needs content behind it, and before that the skeleton owns the
+ * screen. Pass `initiallyLoaded` when the selector mounts with preloaded
+ * data (`withInit`) and never runs an initial load.
+ */
+const useContentLoading = ({
+  initiallyLoaded,
+}: { initiallyLoaded?: boolean } = {}) => {
+  const [isContentLoading, setIsContentLoadingState] = React.useState(false);
 
-type TLoaderContext = ReturnType<typeof useLoadersHelper>;
+  const initialLoadDoneRef = React.useRef(Boolean(initiallyLoaded));
 
-export const LoadersContext = createContext<TLoaderContext>({
-  isFullLoadActive: true,
-  isNextPageLoading: false,
-  isContentLoading: false,
-  showBreadCrumbsLoader: true,
-  showSearchLoader: true,
-  showBodyLoader: true,
+  const startContentLoading = React.useCallback(() => {
+    if (!initialLoadDoneRef.current) return;
+    setIsContentLoadingState(true);
+  }, []);
 
-  startFullLoad: () => {},
-  finishFullLoad: () => {},
-  startContentLoading: () => {},
-  finishContentLoading: () => {},
-  hideSectionLoader: () => {},
-  setIsNextPageLoading: () => {},
-});
+  const finishContentLoading = React.useCallback(() => {
+    initialLoadDoneRef.current = true;
+    setIsContentLoadingState(false);
+  }, []);
 
-export const LoadersContextProvider = ({
-  children,
-  withInit,
-}: {
-  children: ReactNode;
-  withInit?: boolean;
-}) => {
-  const value = useLoadersHelper({ withInit });
-
-  return <LoadersContext value={value}>{children}</LoadersContext>;
+  return { isContentLoading, startContentLoading, finishContentLoading };
 };
+
+export default useContentLoading;

@@ -414,6 +414,22 @@ export const Default: Story = {
   },
 };
 
+export const ContentLoading: Story = {
+  render: (args) => <Template {...args} />,
+  args: {
+    ...Default.args,
+    isContentLoading: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Content refresh state: while new data is loading (search, tab change or folder navigation), the current list stays on screen dimmed and non-interactive instead of being replaced with a skeleton.",
+      },
+    },
+  },
+};
+
 export const BreadCrumbs: Story = {
   render: (args) => <Template {...args} />,
   args: {

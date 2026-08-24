@@ -88,8 +88,13 @@ const AIAgentSelectorComponent = ({
   const t = useCommonTranslation();
   const { isBase } = useTheme();
 
-  const { isFirstLoad, isNextPageLoading, setIsFirstLoad } =
-    React.useContext(LoadersContext);
+  const {
+    isFullLoadActive,
+    isNextPageLoading,
+    isContentLoading,
+    startContentLoading,
+    showBodyLoader,
+  } = React.useContext(LoadersContext);
 
   const [searchValue, setSearchValue] = React.useState(() =>
     withInit ? initSearchValue : "",
@@ -152,19 +157,19 @@ const AIAgentSelectorComponent = ({
   };
 
   useEffect(() => {
-    setIsDataReady?.(!isFirstLoad);
-  }, [setIsDataReady, isFirstLoad]);
+    setIsDataReady?.(!isFullLoadActive);
+  }, [setIsDataReady, isFullLoadActive]);
 
   const onSearchAction = React.useCallback(
     (value: string, callback?: VoidFunction) => {
       afterSearch.current = true;
-      setIsFirstLoad(true);
+      startContentLoading();
       setSearchValue(() => {
         return value;
       });
       callback?.();
     },
-    [setIsFirstLoad],
+    [startContentLoading],
   );
 
   const { subscribe } = useSocketHelper({
@@ -177,14 +182,14 @@ const AIAgentSelectorComponent = ({
 
   const onClearSearchAction = React.useCallback(
     (callback?: VoidFunction) => {
-      setIsFirstLoad(true);
       afterSearch.current = true;
+      startContentLoading();
       setSearchValue(() => {
         return "";
       });
       callback?.();
     },
-    [setIsFirstLoad],
+    [startContentLoading],
   );
 
   const { getAgentList: onLoadNextPage } = useAgentsHelper({
@@ -237,7 +242,7 @@ const AIAgentSelectorComponent = ({
     onSearch: onSearchAction,
     onClearSearch: onClearSearchAction,
     searchLoader: <SearchLoader />,
-    isSearchLoading: isFirstLoad && !searchValue && !afterSearch.current,
+    isSearchLoading: isFullLoadActive && !searchValue && !afterSearch.current,
   };
 
   const infoBarData = useMemo(() => {
@@ -293,13 +298,14 @@ const AIAgentSelectorComponent = ({
       hasNextPage={hasNextPage}
       isNextPageLoading={isNextPageLoading}
       loadNextPage={onLoadNextPage}
-      isLoading={isFirstLoad}
+      isLoading={showBodyLoader}
+      isContentLoading={isContentLoading}
       disableSubmitButton={!selectedItem}
       alwaysShowFooter={items.length !== 0 || Boolean(searchValue)}
       rowLoader={
         <RowLoader
           isMultiSelect={false}
-          isContainer={isFirstLoad}
+          isContainer={showBodyLoader}
           isUser={false}
         />
       }

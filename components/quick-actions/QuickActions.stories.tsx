@@ -372,6 +372,7 @@ export const CssCustomization: Story = {
 | \`--quick-actions-tile-bg\` | Tile background color | \`colors.$gray-light\` |
 | \`--quick-actions-tile-bg-hover\` | Tile background on hover / focus | \`colors.$gray-light-mid\` |
 | \`--quick-actions-tile-color\` | Tile text and icon color | \`colors.$black\` |
+| \`--quick-actions-tile-max-width\` | Cap on one tile's width; set to \`none\` to let the tiles fill the banner width | \`184px\` |
 
 Set the variables on any ancestor element — they cascade down to all tiles:
 

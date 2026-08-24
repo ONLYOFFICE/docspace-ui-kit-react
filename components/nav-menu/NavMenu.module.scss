@@ -39,7 +39,7 @@
 :global(.light) {
   :local {
     .root {
-      --nav-menu-group-label-color: #{colors.$gray};
+      --nav-menu-group-label-color: #{colors.$gray-text};
       --nav-menu-item-text-color: #{colors.$gray-text};
       --nav-menu-item-text-active-color: var(
         --color-scheme-main-accent,
@@ -64,7 +64,7 @@
 :global(.dark) {
   :local {
     .root {
-      --nav-menu-group-label-color: #{colors.$gray-dark};
+      --nav-menu-group-label-color: #{colors.$dark-gray-dark};
       --nav-menu-item-text-color: #{colors.$dark-gray-dark};
       --nav-menu-item-text-active-color: #{colors.$white};
       --nav-menu-item-icon-color: #{colors.$dark-gray-dark};
@@ -92,11 +92,9 @@
 .groupLabel {
   display: block;
   padding: 8px 12px 4px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  line-height: 14px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  line-height: 16px;
   color: var(--nav-menu-group-label-color);
   user-select: none;
 }

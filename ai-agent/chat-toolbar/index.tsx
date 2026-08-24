@@ -35,8 +35,12 @@ import HistoriesIcon from "../../assets/icons/16/clock.svg";
 import PlusIcon from "../../assets/icons/16/button.plus.react.svg";
 
 import { ActionButton } from "../../components/action-button";
+import { Tooltip } from "../../components/tooltip";
+import { isDesktop } from "../../utils/device";
 
 import styles from "./ChatToolbar.module.scss";
+
+const TOOLBAR_TOOLTIP_ID = "chat-toolbar-tooltip";
 
 export interface ChatToolbarProps {
   className?: string;
@@ -80,19 +84,24 @@ export const ChatToolbar: React.FC<ChatToolbarProps> = ({ className }) => {
           className={classNames(styles.button, {
             [styles.active]: isHistoryActive,
           })}
-          title={t("Common:ChatHistory")}
+          aria-label={t("Common:ChatHistory")}
+          data-tooltip-id={TOOLBAR_TOOLTIP_ID}
+          data-tooltip-content={t("Common:ChatHistory")}
           onClick={handleNavigateToHistory}
         />
         {hasProfile ? (
           <ActionButton
             icon={<PlusIcon />}
             className={styles.button}
-            title={t("Common:AINewChat")}
+            aria-label={t("Common:AINewChat")}
+            data-tooltip-id={TOOLBAR_TOOLTIP_ID}
+            data-tooltip-content={t("Common:AINewChat")}
             onClick={handleStartNewChat}
             disabled={isNewChat}
           />
         ) : null}
       </div>
+      <Tooltip float={isDesktop()} id={TOOLBAR_TOOLTIP_ID} place="bottom" />
     </nav>
   );
 };

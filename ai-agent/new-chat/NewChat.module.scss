@@ -46,6 +46,9 @@
 
   display: flex;
   flex-direction: column;
+  // The virtual-keyboard inset is applied as inline padding-bottom; keep it
+  // inside the pane's bounded height instead of growing past the parent.
+  box-sizing: border-box;
 
   // Rendered directly inside `.infoPanel` (flex column with the chat
   // header as a fixed-height sibling). `flex: 1; min-height: 0` keeps it

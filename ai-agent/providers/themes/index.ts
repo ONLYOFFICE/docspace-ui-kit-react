@@ -91,6 +91,7 @@ type BasePalette = {
   tooltipShadow: string;
 
   chatListGroupHeaderColor: string;
+  chatMessageErrorBackgroundColor: string;
   dropdownTriggerColor: string;
   dropdownTriggerHoverColor: string;
   attachmentButtonColor: string;
@@ -409,8 +410,12 @@ const buildTokens = (
   "--chat-message-code-block-pre-background-color": "var(--background-normal)",
   "--chat-message-color": "var(--text-normal)",
   "--chat-message-divider-color": "var(--border-divider)",
-  "--chat-message-error-border-color": "var(--border-error)",
-  "--chat-message-error-color": "var(--text-negative)",
+  // Error box (ai-chat 0.5.54 redesign): a per-theme tinted background
+  // carries the error signal; the text stays at the normal reading color —
+  // `--text-negative` blends into the tinted background.
+  "--chat-message-error-background-color": p.chatMessageErrorBackgroundColor,
+  "--chat-message-error-border-color": "transparent",
+  "--chat-message-error-color": "var(--text-normal)",
   "--chat-message-link-color": "var(--text-link)",
   "--chat-message-td-color": "var(--text-normal)",
   "--chat-message-th-color": "var(--text-normal)",
@@ -511,6 +516,8 @@ const portalBasePalette: BasePalette = {
 
   iconSecondary: globalColors.gray,
   chatListGroupHeaderColor: globalColors.gray,
+  // ai-chat theme-light.css error box background.
+  chatMessageErrorBackgroundColor: "#faeae6",
 
   // IconButton.module.scss (light): rest = gray, hover = lightGrayDark.
   iconButtonColor: globalColors.gray,
@@ -599,6 +606,9 @@ const portalDarkPalette: BasePalette = {
 
   iconSecondary: globalColors.gray,
   chatListGroupHeaderColor: globalColors.gray,
+  // darkErrorStatus (#E06451) at 20% — a dark-surface error tint instead of
+  // the light theme's pink.
+  chatMessageErrorBackgroundColor: "rgba(224, 100, 81, 0.2)",
 
   // IconButton.module.scss (dark): rest = grayDark, hover = white.
   iconButtonColor: globalColors.grayDark,
