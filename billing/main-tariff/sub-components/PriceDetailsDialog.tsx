@@ -72,6 +72,7 @@ const PriceDetailsDialog = observer(
     const store = usePaymentStore();
     const {
       isLoading,
+      isCardMissingOrInactive,
       managersCount,
       totalPrice,
       tariffDueTodayAmount,
@@ -236,7 +237,8 @@ const PriceDetailsDialog = observer(
             isDisabled={
               isLoading ||
               isTariffDueTodayCalculating ||
-              tariffDueTodayAmount === null
+              tariffDueTodayAmount === null ||
+              isCardMissingOrInactive
             }
             isLoading={isSubmitting}
             onClick={onConfirm}
