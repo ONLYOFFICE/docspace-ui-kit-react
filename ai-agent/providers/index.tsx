@@ -126,15 +126,18 @@ import { openAttachedFile } from "./files/open-file";
 // keeps using DocSpace translations.
 const AiChatI18nIsolator = ({
   locale,
+  translations,
   children,
 }: {
   locale: string;
+  /** Per-key overrides of the chat lib's own strings (host-translated). */
+  translations?: React.ComponentProps<typeof I18nProvider>["translations"];
   children: ReactNode;
 }) => {
   const { i18n: hostI18n } = useTranslation();
   return (
     <ReactI18nextProvider i18n={i18nextSingleton}>
-      <I18nProvider locale={locale}>
+      <I18nProvider locale={locale} translations={translations}>
         <ReactI18nextProvider i18n={hostI18n}>{children}</ReactI18nextProvider>
       </I18nProvider>
     </ReactI18nextProvider>
@@ -470,6 +473,18 @@ const AiAgentProviders = ({
   const { t } = useTranslation("Common");
   const aiChatLocale = normalizeAiChatLocale(locale);
   const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
+
+  // The chat lib's own "Enable web search in settings" tooltip is right for
+  // standalone (Web Search lives in AI settings) but wrong on SaaS, where
+  // the feature is activated in Billing (Bug 83226) — override the key with
+  // a host-translated string there.
+  const aiChatTranslations = useMemo(
+    () =>
+      isStandalone
+        ? undefined
+        : { EnableWebSearch: t("Common:EnableWebSearchInBilling") },
+    [isStandalone, t],
+  );
 
   // Ids of attached files the backend flagged as analyzable. The attachments
   // store keeps only `{id, title, kind, path, type}` per ref, so `canAnalyze`
@@ -829,7 +844,10 @@ const AiAgentProviders = ({
         callbacks={callbacks}
       >
         <PlatformProvider platform={platform}>
-          <AiChatI18nIsolator locale={aiChatLocale}>
+          <AiChatI18nIsolator
+            locale={aiChatLocale}
+            translations={aiChatTranslations}
+          >
             <ComponentsProvider overrides={componentOverrides}>
               <WidgetConfigProvider config={widgetConfig}>
                 <ApiProvider config={serverApiConfig}>
