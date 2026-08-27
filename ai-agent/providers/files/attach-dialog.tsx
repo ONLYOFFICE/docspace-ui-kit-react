@@ -38,18 +38,22 @@ import { toastr, type TData } from "../../../components/toast";
 import useGetIcon from "../../hooks/useGetIcon";
 
 import { getOnlyofficeFileType } from "./file-type";
-import { attachFilesToChat } from "./attach-files";
+import { attachFilesToChat, type OnFilesAttached } from "./attach-files";
 import useDeviceType from "./use-device-type";
 
 type AttachDialogProps = {
   onClose: () => void;
+  // Reports the attached files so the caller can keep the record flags the
+  // attachments store drops (`canAnalyze`).
+  onFilesAttached?: OnFilesAttached;
 };
 
 // Rendered inside <AiAgentProviders> so `useStores()` resolves the
 // AttachmentsStore from the widget's context. `addAttachmentFile` round-trips
 // to the AI backend, which resolves the entryId server-side — `content` here
 // is a placeholder and is ignored by the host integration.
-const AttachDialog: React.FC<AttachDialogProps> = observer(({ onClose }) => {
+const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
+  const { onClose, onFilesAttached } = props;
   const { t } = useTranslation(["Common"]);
   const { currentDeviceType } = useDeviceType();
   const { getIcon } = useGetIcon();
@@ -115,16 +119,38 @@ const AttachDialog: React.FC<AttachDialogProps> = observer(({ onClose }) => {
         if (s.fileType === FileType.Image) imageIndices.add(i);
       });
 
-      // Optimistic close — the chip will appear once saveFilesMany resolves.
+      // Reserve the loading chips before closing so they are already in the
+      // composer when the dialog disappears; the reservation also applies
+      // the attachment cap (extra picks simply get no chip).
+      const pendingIds = useAttachmentsStore
+        .getState()
+        .beginPendingAttachments(
+          inputs.map((input) => ({
+            title: input.title,
+            kind: "file" as const,
+            type: input.type,
+          })),
+        );
+      const accepted = inputs.slice(0, pendingIds.length);
+
       onClose();
+      if (accepted.length === 0) return;
 
       try {
-        await attachFilesToChat(useAttachmentsStore, inputs, imageIndices);
+        // `imageIndices` at or past `accepted.length` are never looked up.
+        const attached = await attachFilesToChat(
+          useAttachmentsStore,
+          accepted,
+          imageIndices,
+          pendingIds,
+        );
+        onFilesAttached?.(attached);
       } catch (e) {
+        useAttachmentsStore.getState().failPendingAttachments(pendingIds);
         toastr.error(e as TData);
       }
     },
-    [onClose, useAttachmentsStore],
+    [onClose, onFilesAttached, useAttachmentsStore],
   );
 
   const getIsDisabled = React.useCallback<

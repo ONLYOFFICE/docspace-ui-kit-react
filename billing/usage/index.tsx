@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import type { DateTime } from "luxon";
 
@@ -53,57 +53,103 @@ import type { TUsagePeriodKey } from "../types";
 
 import PeriodSelect from "./sub-components/PeriodSelect";
 import SpendingBreakdown from "./sub-components/SpendingBreakdown";
+import SpendAmount from "../shared/spend-amount";
+
 import { getUsageRange } from "./utils";
 import { toastr } from "../../components/toast";
 import styles from "./styles/Usage.module.scss";
 
+const LOADER_DELAY_MS = 500;
+
 type UsageProps = {
+  /** Open the tariff plan page from the subscription breakdown row. */
+  onTariffPlanClick?: () => void;
   /** Open the corresponding service detail page from its breakdown row. */
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
   onAIServicesClick?: () => void;
+  onAISearchClick?: () => void;
+  onDocsConnectClick?: () => void;
 };
 
 const Usage = ({
+  onTariffPlanClick,
   onDiskStorageClick,
   onBackupClick,
   onAIServicesClick,
+  onAISearchClick,
+  onDocsConnectClick,
 }: UsageProps) => {
   const t = useCommonTranslation();
   const { paymentApi, rawApiClient } = useApi();
   const {
-    formatWalletCurrency,
     language,
     formatDate,
     openOnNewPage,
     isCardLinkedToPortal,
+    setFilterStartDate,
+    setFilterEndDate,
+    savedUsagePeriod,
+    setSavedUsagePeriod,
   } = usePaymentStore();
   const { serviceUsage, initUsageData } = useServicesStore();
 
-  const [period, setPeriod] = useState<TUsagePeriodKey>("thisMonth");
+  const [period, setPeriod] = useState<TUsagePeriodKey>(
+    () => savedUsagePeriod ?? "thisMonth",
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isReportLoading, setIsReportLoading] = useState(false);
+  const [isReportInProgress, setIsReportInProgress] = useState(false);
   const [breakdownView, setBreakdownView] = useState<"services" | "month">(
     "services",
   );
 
-  const loadUsage = async (nextPeriod: TUsagePeriodKey) => {
-    setIsLoading(true);
+  const loaderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestIdRef = useRef(0);
+
+  const clearLoaderTimer = () => {
+    if (loaderTimerRef.current) {
+      clearTimeout(loaderTimerRef.current);
+      loaderTimerRef.current = null;
+    }
+  };
+
+  const loadUsage = async (
+    nextPeriod: TUsagePeriodKey,
+    deferLoader = false,
+  ) => {
+    const requestId = ++requestIdRef.current;
+    clearLoaderTimer();
+
+    if (deferLoader) {
+      loaderTimerRef.current = setTimeout(
+        () => setIsLoading(true),
+        LOADER_DELAY_MS,
+      );
+    } else {
+      setIsLoading(true);
+    }
 
     try {
       await initUsageData(nextPeriod);
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) {
+        clearLoaderTimer();
+        setIsLoading(false);
+      }
     }
   };
 
   const onSelectPeriod = (nextPeriod: TUsagePeriodKey) => {
     setPeriod(nextPeriod);
-    loadUsage(nextPeriod);
+    loadUsage(nextPeriod, true);
   };
 
   useEffect(() => {
+    setSavedUsagePeriod(null);
     loadUsage(period);
+
+    return clearLoaderTimer;
   }, []);
 
   const totalSpend = serviceUsage.reduce(
@@ -112,6 +158,17 @@ const Usage = ({
   );
 
   const { from, to } = getUsageRange(period);
+
+  const openWithPeriod = (openServicePage?: () => void) => {
+    if (!openServicePage) return undefined;
+
+    return () => {
+      setFilterStartDate(from);
+      setFilterEndDate(to);
+      setSavedUsagePeriod(period);
+      openServicePage();
+    };
+  };
 
   const monthText = from.setLocale(language || "en").toFormat("LLLL yyyy");
   const startDate = formatDateLocalized(from, "DATE_MED", {
@@ -171,6 +228,9 @@ const Usage = ({
   ) => {
     const isMainReport = !serviceName && !range;
 
+    if (isReportInProgress) return;
+
+    setIsReportInProgress(true);
     if (isMainReport) setIsReportLoading(true);
 
     const reportPath =
@@ -237,6 +297,7 @@ const Usage = ({
     } catch (e) {
       toastr.error(e as Error);
     } finally {
+      setIsReportInProgress(false);
       if (isMainReport) setIsReportLoading(false);
     }
   };
@@ -254,10 +315,14 @@ const Usage = ({
               fontWeight={600}
               color="accent"
               textDecoration="underline dashed"
-              onClick={isReportLoading ? undefined : () => onDownloadReport()}
+              onClick={
+                isReportInProgress ? undefined : () => onDownloadReport()
+              }
               dataTestId="usage_download_report"
               className={
-                isReportLoading ? styles.downloadReportLinkDisabled : undefined
+                isReportInProgress
+                  ? styles.downloadReportLinkDisabled
+                  : undefined
               }
             >
               {t("DownloadReportBtnText")}
@@ -274,9 +339,11 @@ const Usage = ({
         {isLoading ? (
           <RectangleSkeleton width="120px" height="24px" borderRadius="3px" />
         ) : (
-          <Text className={styles.totalValue}>
-            {formatWalletCurrency(totalSpend, 2)}
-          </Text>
+          <SpendAmount
+            amount={totalSpend}
+            className={styles.totalValue}
+            tooltipId="usage-total-spend"
+          />
         )}
         <Text className={styles.totalCaption}>{periodCaption[period]}</Text>
       </div>
@@ -284,10 +351,14 @@ const Usage = ({
       <SpendingBreakdown
         period={period}
         isLoading={isLoading}
-        onDiskStorageClick={onDiskStorageClick}
-        onBackupClick={onBackupClick}
-        onAIServicesClick={onAIServicesClick}
+        onTariffPlanClick={onTariffPlanClick}
+        onDiskStorageClick={openWithPeriod(onDiskStorageClick)}
+        onBackupClick={openWithPeriod(onBackupClick)}
+        onAIServicesClick={openWithPeriod(onAIServicesClick)}
+        onAISearchClick={openWithPeriod(onAISearchClick)}
+        onDocsConnectClick={openWithPeriod(onDocsConnectClick)}
         onDownloadReport={onDownloadReport}
+        isDownloadBlocked={isReportInProgress}
         onViewChange={setBreakdownView}
       />
     </div>

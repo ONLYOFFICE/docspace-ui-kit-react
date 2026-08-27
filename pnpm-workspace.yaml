@@ -1,0 +1,23 @@
+# Dependency install/postinstall scripts (pnpm >= 11 requires an explicit
+# decision per package; unreviewed packages fail the install).
+allowBuilds:
+  # No-op preinstall echo only
+  '@google/genai': false
+  # Native file watcher, built from source
+  '@parcel/watcher': true
+  # postinstall links the platform-specific binary
+  esbuild: true
+  # postinstall installs the git-hook binary used by `prepare`
+  lefthook: true
+  # postinstall only prints a version-scheme advisory to stderr, no artifacts
+  protobufjs: false
+minimumReleaseAgeExclude:
+  # Vendored tarball (onlyoffice-ai-chat-*.tgz), never published to npm, so the
+  # age check 404s on the registry. Listed without a version so it survives
+  # tarball bumps; the artifact is committed and reviewed in this repo.
+  - '@onlyoffice/ai-chat'
+  - '@rolldown/binding-android-arm64@1.2.2'
+  - '@rolldown/binding-linux-arm-gnueabihf@1.2.2'
+  - '@rolldown/binding-linux-arm64-musl@1.2.2'
+  - '@rolldown/binding-linux-s390x-gnu@1.2.2'
+  - '@rolldown/binding-linux-x64-musl@1.2.2'

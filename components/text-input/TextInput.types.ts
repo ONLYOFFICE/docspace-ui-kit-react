@@ -106,6 +106,8 @@ export type TextInputProps = HTMLInputProps & {
 	hasWarning?: boolean;
 	/** Used as HTML `autocomplete` property */
 	autoComplete?: string;
+	/** Used as HTML `spellcheck` property */
+	spellCheck?: boolean;
 	/** CSS class name */
 	className?: string;
 	/** Inline CSS styles */

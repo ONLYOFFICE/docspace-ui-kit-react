@@ -356,7 +356,7 @@ const MigrateToWalletDialog = observer(
                   fontSize="13px"
                   color="var(--payment-benefits-icons-color)"
                 >
-                  {t("MigrateAutoRenews", {
+                  {t("MigrateAutoRenewsBalanceFirst", {
                     price: formatFuturePaymentCurrency(newSubscriptionAmount),
                   })}
                 </Text>,

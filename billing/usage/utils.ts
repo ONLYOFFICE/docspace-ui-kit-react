@@ -36,7 +36,7 @@
 import type { DateTime } from "luxon";
 
 import type { TUsagePeriodKey } from "../types";
-import { now } from "../../utils/date";
+import { getAppTimezone, now } from "../../utils/date";
 
 export const USAGE_PERIODS: TUsagePeriodKey[] = [
   "thisMonth",
@@ -51,7 +51,7 @@ export const USAGE_PERIODS: TUsagePeriodKey[] = [
 export const getUsageRange = (
   period: TUsagePeriodKey,
 ): { from: DateTime; to: DateTime } => {
-  const current = now();
+  const current = now().setZone(getAppTimezone());
 
   switch (period) {
     case "lastMonth": {
@@ -61,26 +61,26 @@ export const getUsageRange = (
     case "last3Months":
       return {
         from: current.minus({ months: 2 }).startOf("month"),
-        to: current.endOf("month"),
+        to: current,
       };
     case "last6Months":
       return {
         from: current.minus({ months: 5 }).startOf("month"),
-        to: current.endOf("month"),
+        to: current,
       };
     case "last12Months":
       return {
         from: current.minus({ months: 11 }).startOf("month"),
-        to: current.endOf("month"),
+        to: current,
       };
     case "thisYear":
-      return { from: current.startOf("year"), to: current.endOf("year") };
+      return { from: current.startOf("year"), to: current };
     case "lastYear": {
       const lastYear = current.minus({ years: 1 });
       return { from: lastYear.startOf("year"), to: lastYear.endOf("year") };
     }
     default:
-      return { from: current.startOf("month"), to: current.endOf("month") };
+      return { from: current.startOf("month"), to: current };
   }
 };
 

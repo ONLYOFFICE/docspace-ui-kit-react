@@ -163,7 +163,7 @@ const StorageTariffDeactivated = observer(
           <Button
             className="send-button"
             label={
-              onOpenPanel ? t("BuyStorage") : t("GoToService")
+              onOpenPanel ? t("BuyStorage") : t("GoToAddon")
             }
             size={ButtonSize.normal}
             primary

@@ -243,7 +243,11 @@ const ContextMenu = (props: ContextMenuProps) => {
       const height = menuRef.current?.offsetParent
         ? menuRef.current.offsetHeight
         : DomHelpers.getHiddenElementOuterHeight(menuRef.current);
-      const viewport = DomHelpers.getViewport();
+      // The menu is laid out in the layout viewport, so it has to be clamped
+      // against that box. Mobile Firefox reports a visual viewport (the source
+      // of `getViewport`) wider than the layout one, which made the flip below
+      // never fire and pushed the menu off the screen.
+      const viewport = DomHelpers.getLayoutViewport();
 
       const borderWidth = menuRef.current
         ? +window
@@ -322,6 +326,16 @@ const ContextMenu = (props: ContextMenuProps) => {
           menuRef.current.style.minWidth = "210px";
         }
       }
+      // fit: the flip above falls short when the pointer itself lands outside
+      // the layout viewport, so clamp the menu to the visible box as well
+      if (left + width > viewport.width) {
+        left = Math.max(MARGIN_BORDER, viewport.width - width);
+      }
+
+      if (top + height > viewport.height) {
+        top = Math.max(MARGIN_BORDER, viewport.height - height);
+      }
+
       if (menuRef.current) {
         menuRef.current.style.left = `${left || MARGIN_BORDER}px`;
         menuRef.current.style.top = `${top}px`;

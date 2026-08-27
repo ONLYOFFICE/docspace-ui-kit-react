@@ -51,10 +51,16 @@ import NoSpendingDarkIcon from "../../../assets/no.transactions.filter.dark.them
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../store/ServicesStoreProvider";
 import type { TUsagePeriodKey } from "../../types";
-import { AI_TOOLS, BACKUP_SERVICE } from "../../constants";
-import { formatCompactNumber } from "../../utils/common";
+import {
+  ADMIN,
+  AI_SEARCH_ENUM,
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  MANAGER,
+} from "../../constants";
 
-import { getServiceQuantity } from "../../wallet/utils";
+import { isDocsConnectServiceName } from "../../utils/docs-connect";
+import { getServiceUsageSubLabel } from "../../utils/serviceUsage";
 import { getUsageRange } from "../utils";
 import BreakdownRow from "./BreakdownRow";
 import styles from "../styles/Usage.module.scss";
@@ -64,13 +70,18 @@ type BreakdownView = "services" | "month";
 type SpendingBreakdownProps = {
   period: TUsagePeriodKey;
   isLoading: boolean;
+  onTariffPlanClick?: () => void;
   onDiskStorageClick?: () => void;
   onBackupClick?: () => void;
   onAIServicesClick?: () => void;
+  onAISearchClick?: () => void;
+  onDocsConnectClick?: () => void;
   onDownloadReport?: (
     serviceName?: string,
     range?: { from: DateTime; to: DateTime },
   ) => void;
+  /** A report is already being generated, so no other one may be started. */
+  isDownloadBlocked?: boolean;
   /** Notifies the parent when the services/month view changes. */
   onViewChange?: (view: BreakdownView) => void;
 };
@@ -78,15 +89,19 @@ type SpendingBreakdownProps = {
 const SpendingBreakdown = ({
   period,
   isLoading,
+  onTariffPlanClick,
   onDiskStorageClick,
   onBackupClick,
   onAIServicesClick,
+  onAISearchClick,
+  onDocsConnectClick,
   onDownloadReport,
+  isDownloadBlocked,
   onViewChange,
 }: SpendingBreakdownProps) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
-  const { formatWalletCurrency, language } = usePaymentStore();
+  const { language } = usePaymentStore();
   const { serviceUsage, serviceUsageMonthly } = useServicesStore();
 
   const [view, setView] = useState<BreakdownView>("services");
@@ -98,7 +113,8 @@ const SpendingBreakdown = ({
   );
 
   const handleDownload = async (serviceName: string) => {
-    if (downloadingServices.has(serviceName) || !onDownloadReport) return;
+    if (isDownloadBlocked || !onDownloadReport) return;
+    if (downloadingServices.has(serviceName)) return;
 
     setDownloadingServices((prev) => new Set(prev).add(serviceName));
     try {
@@ -114,7 +130,8 @@ const SpendingBreakdown = ({
 
   const handleMonthDownload = async (year: number, month: number) => {
     const key = `${year}-${month}`;
-    if (downloadingMonths.has(key) || !onDownloadReport) return;
+    if (isDownloadBlocked || !onDownloadReport) return;
+    if (downloadingMonths.has(key)) return;
 
     setDownloadingMonths((prev) => new Set(prev).add(key));
     try {
@@ -162,24 +179,17 @@ const SpendingBreakdown = ({
   const normalizeService = (service: string) =>
     (service || "").toLowerCase().replace(/[^a-z]/g, "");
 
-  const getSubLabel = (item: (typeof serviceUsage)[number]) => {
-    if (item.service === BACKUP_SERVICE)
-      return t("BilledBackups", { count: item.totalQuantity });
-
-    if (item.service === AI_TOOLS)
-      return t("UnitCount", {
-        unit: item.serviceUnit,
-        count: formatCompactNumber(item.totalQuantity, language),
-      });
-
-    return getServiceQuantity(t, item.totalQuantity, item.serviceUnit);
-  };
+  const getSubLabel = (item: (typeof serviceUsage)[number]) =>
+    getServiceUsageSubLabel(t, item, language);
 
   const getServiceHandler = (service: string) => {
     const key = normalizeService(service);
+    if (service === ADMIN) return onTariffPlanClick;
     if (key.includes("storage")) return onDiskStorageClick;
     if (service === BACKUP_SERVICE) return onBackupClick;
     if (service === AI_TOOLS) return onAIServicesClick;
+    if (key === AI_SEARCH_ENUM) return onAISearchClick;
+    if (isDocsConnectServiceName(service)) return onDocsConnectClick;
     return undefined;
   };
 
@@ -222,13 +232,15 @@ const SpendingBreakdown = ({
           key={item.service}
           title={item.title}
           subLabel={getSubLabel(item)}
-          amount={formatWalletCurrency(item.totalAmount, 2)}
+          amount={item.totalAmount}
+          amountTooltipId={`usage-service-amount-${item.service}`}
           percent={totalSpend > 0 ? (item.totalAmount / totalSpend) * 100 : 0}
           onExpand={getServiceHandler(item.service)}
           onDownload={
             onDownloadReport ? () => handleDownload(item.service) : undefined
           }
           isDownloading={downloadingServices.has(item.service)}
+          isDownloadDisabled={isDownloadBlocked}
         />
       ))}
     </div>
@@ -239,14 +251,20 @@ const SpendingBreakdown = ({
       .setLocale(language || "en")
       .toFormat("LLLL yyyy");
 
+  // Never show months past the current one; the newest month comes first.
+  const currentMonth = DateTime.now()
+    .setZone(getAppTimezone())
+    .startOf("month");
   const periodMonths: { year: number; month: number }[] = [];
   let monthCursor = from.startOf("month");
-  const lastMonth = to.startOf("month");
+  const lastMonth = DateTime.min(to.startOf("month"), currentMonth);
 
   while (monthCursor <= lastMonth) {
     periodMonths.push({ year: monthCursor.year, month: monthCursor.month });
     monthCursor = monthCursor.plus({ months: 1 });
   }
+
+  periodMonths.reverse();
 
   const monthlyMap = new Map(
     serviceUsageMonthly.map((item) => [`${item.year}-${item.month}`, item]),
@@ -278,13 +296,16 @@ const SpendingBreakdown = ({
           <BreakdownRow
             key={key}
             title={getMonthLabel(item.year, item.month)}
-            amount={formatWalletCurrency(item.totalAmount, 2, item.currency)}
+            amount={item.totalAmount}
+            currency={item.currency}
+            amountTooltipId={`usage-month-amount-${key}`}
             onDownload={
               item.hasData && onDownloadReport
                 ? () => handleMonthDownload(item.year, item.month)
                 : undefined
             }
             isDownloading={downloadingMonths.has(key)}
+            isDownloadDisabled={isDownloadBlocked}
           />
         );
       })}

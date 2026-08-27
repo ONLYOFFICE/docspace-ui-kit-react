@@ -460,6 +460,14 @@
 
   gap: 16px;
   margin-inline-start: 20px;
+
+  // The AI chat slot carries an inline width (its measured labelled width), so
+  // this row's automatic min-content floor would otherwise be that full width
+  // and flex would refuse to squeeze it - the label could never collapse no
+  // matter how narrow the header got. Releasing the floor lets the deficit
+  // reach the slot once .container has bottomed out; the slot's own
+  // `min-width: 32px` is what actually stops the shrink, at the bare icon.
+  min-width: 0;
 }
 
 .infoPanelToggleWrapper {
@@ -473,24 +481,27 @@
   padding: 0;
 
   :global {
-    .info-panel-toggle {
-      margin-inline-end: 8px;
+    // One constant 32x32 footprint (30px box + 1px border) for both states.
+    // The active state used to be the only one with a box, so switching the
+    // info panel on grew this wrapper by 8px and shoved the controls beside
+    // it sideways. Centring the icon here puts it in exactly the same place
+    // the old 8px trailing margin did, so the icon itself does not move.
+    .info-panel-toggle-bg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 30px;
+      width: 30px;
+      border: 1px solid transparent;
+      border-radius: 50%;
     }
   }
 
   &[data-visible="true"] {
     :global {
       .info-panel-toggle-bg {
-        height: 30px;
-        width: 30px;
         background: var(--navigation-info-panel-bg-v);
-        border: 1px solid var(--navigation-info-panel-bg-v);
-        border-radius: 50%;
-
-        .info-panel-toggle {
-          margin: auto;
-          margin-top: 25%;
-        }
+        border-color: var(--navigation-info-panel-bg-v);
 
         path {
           fill: var(--accent-main) !important;
@@ -513,6 +524,97 @@
       margin-inline-start: auto;
     }
   }
+}
+
+// "AI chat" button. The slot always asks the row for the full labelled width
+// (set inline from the measured mirror) and is allowed to shrink to the bare
+// icon, so AiChatBtn can read "the label no longer fits" straight off
+// `clientWidth`. Collapsing never changes what the slot requests, so the
+// measurement cannot feed back into itself. See AiChatBtn.tsx.
+.aiChatSlot {
+  --navigation-chat-radius-v: var(--navigation-chat-radius, 6px);
+
+  position: relative;
+  align-self: center;
+  display: flex;
+  align-items: center;
+
+  // Keeping the request at the full labelled width is what stops the collapse
+  // from feeding back into its own measurement, but it means a collapsed
+  // button is narrower than the space the slot still holds. Park it at the
+  // trailing edge so that leftover sits behind the preceding controls instead
+  // of opening a gap between the button and the edge of the header.
+  justify-content: flex-end;
+
+  // Shrink target: the bare 32px icon button.
+  flex: 0 1 auto;
+  min-width: 32px;
+  overflow: hidden;
+
+  :global {
+    .ai-chat-button {
+      flex: 0 0 auto;
+      height: 32px;
+      padding: 6px 10px;
+      border-radius: var(--navigation-chat-radius-v);
+      white-space: nowrap;
+
+      .button-content {
+        gap: 8px;
+      }
+
+      .icon {
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  // No room for the label: keep the icon only. The label stays in the DOM so
+  // Button's aria-label still names the control.
+  &[data-collapsed="true"] {
+    :global {
+      // Must not match the mirror. The mirror is what `naturalWidth` is
+      // measured from, so collapsing it would shrink the measurement to the
+      // icon width, which immediately un-collapses the button, which
+      // re-expands the mirror - the two states then alternate every frame and
+      // the button visibly flickers.
+      .ai-chat-button:not(.ai-chat-button_mirror) {
+        padding-inline: 8px;
+
+        // Button renders `div.icon` + the label span as siblings; drop only
+        // the label. `:not(.icon)` keeps this correct even if the icon
+        // wrapper ever changes element type.
+        .button-content > span:not(.icon) {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // Panel open: the design system's pressed accent tint.
+  &[data-open="true"] {
+    :global {
+      .ai-chat-button {
+        background-color: var(--button-background-accent-active);
+      }
+    }
+  }
+}
+
+.aiChatMirror {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+  // Intrinsic width regardless of how narrow the slot has been squeezed.
+  width: max-content;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.aiChatIconSpacer {
+  display: block;
+  width: 16px;
+  height: 16px;
 }
 
 .box {
@@ -582,6 +684,16 @@
   display: grid;
   align-items: center;
   height: 100%;
+
+  // The header row splits any width deficit between this grid and
+  // .buttonsContainer. Flex hands that deficit out in proportion to base
+  // sizes, and this grid's base is the whole row, so the AI chat button would
+  // otherwise lose ~17px - and drop its label - while the title still had
+  // plenty of room to truncate. A far larger shrink factor makes this side
+  // give up space first; .buttonsContainer is only squeezed once the title
+  // and control buttons have bottomed out at their min-content widths.
+  // No-op for hosts whose .buttonsContainer cannot shrink at all.
+  flex-shrink: 1000;
 
   &[data-is-drop-box-component="false"][data-is-desktop="true"][data-is-public-room="false"] {
     width: 100%;

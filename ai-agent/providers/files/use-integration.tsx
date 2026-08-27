@@ -38,6 +38,7 @@ import UploadIcon from "../../../assets/icons/16/upload.react.svg";
 import type { SaveAsFileHandler } from "../platform";
 
 import DeviceUploader, { type DeviceUploaderHandle } from "./device-uploader";
+import type { OnFilesAttached } from "./attach-files";
 import AttachDialog from "./attach-dialog";
 import SaveDialog from "./save-dialog";
 import styles from "./styles.module.scss";
@@ -61,8 +62,13 @@ export type FilesIntegration = {
 // uploads land as portal files.
 export const useFilesIntegration = ({
   entityId,
+  onFilesAttached,
 }: {
   entityId?: string;
+  // Reports every file attached through the dialog or a device upload, so the
+  // caller can keep the record flags the attachments store drops
+  // (`canAnalyze`).
+  onFilesAttached?: OnFilesAttached;
 } = {}): FilesIntegration => {
   const { t, i18n } = useTranslation(["Common"]);
 
@@ -120,7 +126,12 @@ export const useFilesIntegration = ({
 
   const overlay = (
     <>
-      {pickerVisible ? <AttachDialog onClose={closePicker} /> : null}
+      {pickerVisible ? (
+        <AttachDialog
+          onClose={closePicker}
+          onFilesAttached={onFilesAttached}
+        />
+      ) : null}
       {saveRequest ? (
         <SaveDialog
           content={saveRequest.content}
@@ -128,7 +139,11 @@ export const useFilesIntegration = ({
           onFinish={finishSave}
         />
       ) : null}
-      <DeviceUploader ref={deviceUploaderRef} entityId={entityId} />
+      <DeviceUploader
+        ref={deviceUploaderRef}
+        entityId={entityId}
+        onFilesAttached={onFilesAttached}
+      />
     </>
   );
 

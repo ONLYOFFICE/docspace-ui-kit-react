@@ -40,6 +40,7 @@ import type {
   FileEntryDtoIntegerAllOfSecurity,
 } from "@onlyoffice/docspace-api-sdk";
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
+import { toastr, type TData } from "../../../components/toast";
 
 import { useApi } from "../../../providers/api/ApiProvider";
 import { LoadersContext } from "../contexts/Loaders";
@@ -49,8 +50,6 @@ import type { UseAgentsHelperProps } from "../types";
 import { convertRoomsToItems, buildSpecialFolderItems } from "..";
 import { useCommonTranslation } from "../../../utils/i18n";
 
-// import useInputItemHelper from "./useInputItemHelper";
-
 const useAgentsHelper = ({
   setHasNextPage,
   setTotal,
@@ -58,18 +57,12 @@ const useAgentsHelper = ({
   setBreadCrumbs,
   setIsRoot,
   onSetBaseFolderPath,
-  // createDefineLabel,
 
   searchValue,
-  // isRoomsOnly,
 
   isInit,
   setIsInit,
-  // withCreate all time false for agent without billing
-  // withCreate = false,
   excludeItems,
-  // getRootData,
-  // setSelectedItemType,
   subscribe,
   setSelectedItemSecurity,
   setSelectedTreeNode,
@@ -84,21 +77,19 @@ const useAgentsHelper = ({
   const { apiClient } = useApi();
   const {
     setIsNextPageLoading,
-    setIsBreadCrumbsLoading,
-    setIsFirstLoad,
+    hideSectionLoader,
+    finishFullLoad,
 
-    isFirstLoad,
+    isFullLoadActive,
   } = use(LoadersContext);
-
-  // const { addInputItem } = useInputItemHelper({ withCreate, setItems });
 
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
-  const firstLoadRef = React.useRef(isFirstLoad);
+  const firstLoadRef = React.useRef(isFullLoadActive);
 
   React.useEffect(() => {
-    firstLoadRef.current = isFirstLoad;
-  }, [isFirstLoad]);
+    firstLoadRef.current = isFullLoadActive;
+  }, [isFullLoadActive]);
 
   React.useEffect(() => {
     initRef.current = isInit;
@@ -111,153 +102,120 @@ const useAgentsHelper = ({
       requestRunning.current = true;
       setIsNextPageLoading(true);
 
-      const startIndex = sIndex;
+      try {
+        const startIndex = sIndex;
 
-      // if (withCreate) {
-      //   startIndex -= startIndex % 100;
-      // }
+        const filterValue = searchValue || "";
 
-      const filterValue = searchValue || "";
+        const page = startIndex / PAGE_COUNT;
 
-      const page = startIndex / PAGE_COUNT;
-
-      const params = new URLSearchParams({
-        page: String(page),
-        count: String(PAGE_COUNT),
-        // The Node AI service expects the .NET enum name (the same string
-        // RoomsFilter sends), not the numeric SearchArea value.
-        searchArea: "AiAgents",
-      });
-
-      if (filterValue) {
-        params.set("filterValue", filterValue);
-      }
-
-      const { response } = await apiClient.request<{
-        response: {
-          folders: FolderDtoInteger[];
-          current: FolderDtoInteger;
-          pathParts: { folderType?: number }[];
-          total: number;
-          count: number;
-        };
-      }>(`/api/2.0/ai/agents?${params.toString()}`);
-
-      const { folders, total, count, current } = response;
-
-      if (initRef.current) {
-        const { title, id } = current;
-
-        subscribe(id!);
-
-        const breadCrumbs: TBreadCrumb[] = [
-          { label: title ?? "", id: id!, isRoom: false, isAgent: true },
-        ];
-
-        // if (!isRoomsOnly) breadCrumbs.unshift({ ...getDefaultBreadCrumb() });
-
-        onSetBaseFolderPath?.(breadCrumbs);
-
-        setBreadCrumbs?.(breadCrumbs);
-
-        setIsBreadCrumbsLoading(false);
-      }
-
-      const itemList: TSelectorItem[] = convertRoomsToItems(folders, t)
-        .filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true))
-        .map((item) => {
-          const security = item.security as
-            | FileEntryDtoIntegerAllOfSecurity
-            | undefined;
-          const isDisabledBySecurity = disableBySecurity
-            ? !security?.[
-                disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity
-              ]
-            : false;
-          return {
-            ...item,
-            isDisabled: item.isDisabled || isDisabledBySecurity,
-          };
+        const params = new URLSearchParams({
+          page: String(page),
+          count: String(PAGE_COUNT),
+          // The Node AI service expects the .NET enum name (the same string
+          // RoomsFilter sends), not the numeric SearchArea value.
+          searchArea: "AiAgents",
         });
 
-      setHasNextPage(count === PAGE_COUNT);
-
-      setSelectedItemSecurity?.(current.security ?? undefined);
-
-      setSelectedTreeNode?.({
-        ...current,
-        path: response.pathParts,
-      } as typeof current & { path: typeof response.pathParts });
-
-      if (firstLoadRef.current || startIndex === 0) {
-        // const { security } = current;
-
-        // if (withCreate && security.Create) {
-        //   setTotal(total + 1);
-        //   const createItem: TSelectorItem = {
-        //     isCreateNewItem: true,
-        //     label: createDefineLabel ?? t("NewAgent"),
-        //     id: "create-room-item",
-        //     key: "create-room-item",
-        //     hotkey: "r",
-        //     // isRoomsOnly,
-
-        //     onBackClick: () => {
-        //       setIsRoot?.(true);
-        //       setSelectedItemType?.(undefined);
-        //       setBreadCrumbs?.((val) => {
-        //         const newVal = [...val];
-
-        //         newVal.pop();
-
-        //         return newVal;
-        //       });
-        //       getRootData?.();
-        //     },
-        //   };
-
-        //   createItem.onCreateClick = () =>
-        //     addInputItem("", "", undefined, createDefineLabel, true);
-
-        //   itemList.unshift(createItem);
-        // } else {
-        setTotal(total);
-        // }
-
-        if (
-          startIndex === 0 &&
-          !searchValue &&
-          (withRecentTreeFolder || withFavoritesTreeFolder)
-        ) {
-          const specialItems = buildSpecialFolderItems({
-            section: "agents",
-            recentFolder,
-            favoritesFolder,
-            withRecent: withRecentTreeFolder,
-            withFavorites: withFavoritesTreeFolder,
-            withSeparator: itemList.length > 0,
-            t,
-          });
-
-          if (specialItems.length) {
-            itemList.unshift(...specialItems);
-            setTotal(total + specialItems.length);
-          }
+        if (filterValue) {
+          params.set("filterValue", filterValue);
         }
 
-        setItems?.(itemList);
-      } else {
-        setItems?.((prevState) => {
-          if (prevState) return [...prevState, ...itemList];
-          return [...itemList];
-        });
-      }
+        const { response } = await apiClient.request<{
+          response: {
+            folders: FolderDtoInteger[];
+            current: FolderDtoInteger;
+            pathParts: { folderType?: number }[];
+            total: number;
+            count: number;
+          };
+        }>(`/api/2.0/ai/agents?${params.toString()}`);
+        const { folders, total, count, current } = response;
 
-      requestRunning.current = false;
-      setIsNextPageLoading(false);
-      setIsRoot?.(false);
-      setIsInit(false);
-      setIsFirstLoad(false);
+        if (initRef.current) {
+          const { title, id } = current;
+
+          subscribe(id!);
+
+          const breadCrumbs: TBreadCrumb[] = [
+            { label: title ?? "", id: id!, isRoom: false, isAgent: true },
+          ];
+
+          onSetBaseFolderPath?.(breadCrumbs);
+
+          setBreadCrumbs?.(breadCrumbs);
+
+          hideSectionLoader("breadcrumbs");
+        }
+
+        const itemList: TSelectorItem[] = convertRoomsToItems(folders, t)
+          .filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true))
+          .map((item) => {
+            const security = item.security as
+              FileEntryDtoIntegerAllOfSecurity | undefined;
+            const isDisabledBySecurity = disableBySecurity
+              ? !security?.[
+                  disableBySecurity as keyof FileEntryDtoIntegerAllOfSecurity
+                ]
+              : false;
+            return {
+              ...item,
+              isDisabled: item.isDisabled || isDisabledBySecurity,
+            };
+          });
+
+        setHasNextPage(count === PAGE_COUNT);
+
+        setSelectedItemSecurity?.(current.security ?? undefined);
+
+        setSelectedTreeNode?.({
+          ...current,
+          path: response.pathParts,
+        } as typeof current & { path: typeof response.pathParts });
+
+        if (firstLoadRef.current || startIndex === 0) {
+          setTotal(total);
+
+          if (
+            startIndex === 0 &&
+            !searchValue &&
+            (withRecentTreeFolder || withFavoritesTreeFolder)
+          ) {
+            const specialItems = buildSpecialFolderItems({
+              section: "agents",
+              recentFolder,
+              favoritesFolder,
+              withRecent: withRecentTreeFolder,
+              withFavorites: withFavoritesTreeFolder,
+              withSeparator: itemList.length > 0,
+              t,
+            });
+
+            if (specialItems.length) {
+              itemList.unshift(...specialItems);
+              setTotal(total + specialItems.length);
+            }
+          }
+
+          setItems?.(itemList);
+        } else {
+          setItems?.((prevState) => {
+            if (prevState) return [...prevState, ...itemList];
+            return [...itemList];
+          });
+        }
+
+        setIsRoot?.(false);
+        setIsInit(false);
+      } catch (error) {
+        toastr.error(error as TData);
+      } finally {
+        requestRunning.current = false;
+        setIsNextPageLoading(false);
+        // Also ends the content refresh; skipping it on the error path would
+        // leave the skeleton on screen and hideSectionLoader a permanent no-op
+        finishFullLoad();
+      }
     },
     [
       apiClient,
@@ -266,12 +224,11 @@ const useAgentsHelper = ({
       setSelectedItemSecurity,
       setIsRoot,
       setIsInit,
-      setIsFirstLoad,
       setIsNextPageLoading,
       subscribe,
       onSetBaseFolderPath,
       setBreadCrumbs,
-      setIsBreadCrumbsLoading,
+      hideSectionLoader,
       setItems,
       setTotal,
       excludeItems,
@@ -282,6 +239,7 @@ const useAgentsHelper = ({
       favoritesFolder,
       withRecentTreeFolder,
       withFavoritesTreeFolder,
+      finishFullLoad,
     ],
   );
 

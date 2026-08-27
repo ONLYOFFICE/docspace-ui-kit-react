@@ -284,7 +284,7 @@ export type FilesSelectorProps = TInfoBar &
       isInsidePrivateRoom?: boolean,
     ) => void | Promise<void>;
     getIsDisabled: (
-      isFirstLoad: boolean,
+      isLoading: boolean,
       isSelectedParentFolder: boolean,
       selectedItemId: string | number | undefined,
       selectedItemType: "rooms" | "files" | "agents" | undefined,
@@ -319,6 +319,8 @@ export type FilesSelectorProps = TInfoBar &
     withCreate: boolean;
     createDefineRoomLabel?: string;
     createDefineRoomType?: RoomType;
+    /** Disables the Public room type in the create-room dropdown */
+    disabledCreatePublicRoom?: boolean;
     formProps?: FormPropsType;
     withPadding?: boolean;
     checkCreating?: boolean;

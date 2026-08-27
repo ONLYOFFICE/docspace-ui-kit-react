@@ -55,7 +55,11 @@ import useInputItemHelper from "../../utils/hooks/useInputItemHelper";
 import { SettingsContext } from "../../utils/contexts/Settings";
 import { LoadersContext } from "../../utils/contexts/Loaders";
 
-import { PAGE_COUNT } from "../../utils/constants";
+import {
+  PAGE_COUNT,
+  FORMS_ROOT_FOLDER_TYPE,
+  FORMS_SECTION_ID,
+} from "../../utils/constants";
 import type { UseFilesHelpersProps } from "../FilesSelector.types";
 import {
   convertFilesToItems,
@@ -120,10 +124,11 @@ const useFilesHelper = ({
 }: UseFilesHelpersProps) => {
   const t = useCommonTranslation();
   const {
-    isFirstLoad,
-    setIsFirstLoad,
+    isFullLoadActive,
+    finishFullLoad,
+    finishContentLoading,
     setIsNextPageLoading,
-    setIsBreadCrumbsLoading,
+    hideSectionLoader,
   } = use(LoadersContext);
 
   const { getIcon, extsWebEdited, filesSettingsLoading } = use(SettingsContext);
@@ -138,7 +143,7 @@ const useFilesHelper = ({
 
   const requestRunning = React.useRef(false);
   const initRef = React.useRef(isInit);
-  const firstLoadRef = React.useRef(isFirstLoad);
+  const firstLoadRef = React.useRef(isFullLoadActive);
   const disabledItemsRef = React.useRef(disabledItems);
   const formsSectionRef = React.useRef(formsSection);
   const privateRoomCacheRef = React.useRef<Map<number | string, boolean>>(
@@ -154,8 +159,8 @@ const useFilesHelper = ({
   }, [formsSection]);
 
   React.useEffect(() => {
-    firstLoadRef.current = isFirstLoad;
-  }, [isFirstLoad]);
+    firstLoadRef.current = isFullLoadActive;
+  }, [isFullLoadActive]);
 
   React.useEffect(() => {
     initRef.current = isInit;
@@ -206,6 +211,7 @@ const useFilesHelper = ({
               toastr.error(error);
 
               requestRunning.current = false;
+              finishContentLoading();
               return;
             }
 
@@ -217,6 +223,7 @@ const useFilesHelper = ({
               toastr.error(error);
             }
             requestRunning.current = false;
+            finishContentLoading();
             return;
           }
         }
@@ -392,16 +399,16 @@ const useFilesHelper = ({
             const insertIndex = breadCrumbs.findIndex((bc) => +bc.id === 0) + 1;
             breadCrumbs.splice(insertIndex, 0, {
               label: t("Forms"),
-              id: "forms-section",
+              id: FORMS_SECTION_ID,
               isRoom: true,
-              rootFolderType: FolderType.FillingFormsRoom,
+              rootFolderType: FORMS_ROOT_FOLDER_TYPE as FolderType,
             });
           }
 
           onSetBaseFolderPath?.(isErrorPath ? [] : breadCrumbs);
 
           setBreadCrumbs(breadCrumbs);
-          setIsBreadCrumbsLoading(false);
+          hideSectionLoader("breadcrumbs");
         }
 
         if (firstLoadRef.current || startIndex === 0) {
@@ -474,7 +481,7 @@ const useFilesHelper = ({
         setIsRoot(false);
         setIsInit(false);
         setIsNextPageLoading(false);
-        setIsFirstLoad(false);
+        finishFullLoad();
       };
 
       try {
@@ -484,18 +491,30 @@ const useFilesHelper = ({
       } catch (e) {
         sessionStorage.removeItem("filesSelectorPath");
         if (isThirdParty && rootThirdPartyId) {
-          await setSettings(rootThirdPartyId, true);
+          try {
+            await setSettings(rootThirdPartyId, true);
+          } catch (fallbackError) {
+            toastr.error(fallbackError as TData);
+          } finally {
+            requestRunning.current = false;
+            finishFullLoad();
+          }
 
           toastr.error(e as TData);
-          requestRunning.current = false;
           return;
         }
 
         if (isRoomsOnly && getRoomList) {
-          await getRoomList(0, null, true, true);
+          try {
+            await getRoomList(0, null, true, true);
+          } catch (fallbackError) {
+            toastr.error(fallbackError as TData);
+          } finally {
+            requestRunning.current = false;
+            finishFullLoad();
+          }
 
           toastr.error(e as TData);
-          requestRunning.current = false;
           return;
         }
 
@@ -507,7 +526,7 @@ const useFilesHelper = ({
         if (onSetBaseFolderPath) {
           onSetBaseFolderPath([]);
         }
-        setIsFirstLoad(false);
+        finishFullLoad();
         toastr.error(e as TData);
       }
     },
@@ -534,14 +553,15 @@ const useFilesHelper = ({
       setSelectedTreeNode,
       setIsRoot,
       setIsInit,
-      setIsFirstLoad,
+      finishFullLoad,
+      finishContentLoading,
       isRoomsOnly,
       getRoomList,
       onSetBaseFolderPath,
       getFilesArchiveError,
       isThirdParty,
       setBreadCrumbs,
-      setIsBreadCrumbsLoading,
+      hideSectionLoader,
       roomsFolderId,
       setIsSelectedParentFolder,
       setItems,

@@ -28,14 +28,10 @@ import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
 
-import {
-  ChatPage,
-  SettingsPage,
-  useStores,
-  ChatList,
-} from "@onlyoffice/ai-chat";
+import { ChatPage, useStores, ChatList } from "@onlyoffice/ai-chat";
 
 import { useIsDesktop } from "../../hooks/use-is-desktop";
+import { useVirtualKeyboardInset } from "../../hooks/useVirtualKeyboardInset";
 
 import { ChatToolbar } from "../chat-toolbar";
 import { ChatNoAccessScreen } from "./components/chat-no-access-screen";
@@ -63,11 +59,19 @@ const NewChat: React.FC<ChatProps> = observer(
 
     const isFullScreen = aiChatStore.effectiveFullscreen;
 
+    // On mobile/tablet the virtual keyboard covers the bottom of the layout
+    // viewport, hiding the composer. Reserve the covered height inside the
+    // chat pane so the composer (and the thread above it) stays visible.
+    const keyboardInset = useVirtualKeyboardInset(!isDesktop);
+    const keyboardInsetStyle = keyboardInset
+      ? { paddingBottom: keyboardInset }
+      : undefined;
+
     const showActivationScreen = !!noAccessProps && !aiReady && !threadId;
-    const showToolbar = hasProfiles || showActivationScreen;
+    const showToolbar = (hasProfiles || showActivationScreen) && isAgents;
 
     const chatBody = showActivationScreen ? (
-      <ChatNoAccessScreen {...noAccessProps} />
+      <ChatNoAccessScreen {...noAccessProps} isAgents={!!isAgents} />
     ) : (
       <ChatPage />
     );
@@ -86,7 +90,10 @@ const NewChat: React.FC<ChatProps> = observer(
     const isSplitView = (isFullScreen || isAgents) && isDesktop;
 
     React.useEffect(() => {
-      // page and reset the internal page so returning to the chat doesn't loop. // "Open settings" actions, etc.), bounce the user to the portal AI settings // Whenever the widget router tries to open the settings page (gear button,
+      // Whenever the widget router tries to open the settings page (gear
+      // button, "Open settings" actions, etc.), bounce the user to the portal
+      // AI settings page and reset the internal page so returning to the chat
+      // doesn't loop.
       if (currentPage === "settings") {
         setCurrentPage("chat");
         window.DocSpace?.navigate(AI_SETTINGS_URL);
@@ -95,11 +102,8 @@ const NewChat: React.FC<ChatProps> = observer(
 
     switch (currentPage) {
       case "settings":
-        // The effect above redirects to portal AI settings; render nothing.
+        // The effect above redirects to the portal AI settings; render nothing.
         return null;
-
-      case "initial-setup":
-        return <SettingsPage />;
 
       case "history":
         if (!isSplitView) {
@@ -126,8 +130,17 @@ const NewChat: React.FC<ChatProps> = observer(
           </section>
         );
 
+      // "chat" and "initial-setup" both render the chat pane: with no AI
+      // profiles <ChatPage /> shows the widget's own setup screen, and it
+      // flips the router back to "chat" once a profile appears. Short-cutting
+      // "initial-setup" here would unmount that screen and strand the user on
+      // an empty panel with no way back (hosts without `noAccessProps`).
       default:
-        return <section className={styles.chatPanel}>{chatPanel}</section>;
+        return (
+          <section className={styles.chatPanel} style={keyboardInsetStyle}>
+            {chatPanel}
+          </section>
+        );
     }
   },
 );

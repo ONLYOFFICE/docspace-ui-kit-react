@@ -40,10 +40,16 @@ import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
 import { formatCurrencyValue } from "../utils/common";
 import { parseAiPrices } from "../utils/parsers";
-import { AI_ENUM, AI_TOOLS, BACKUP_SERVICE, STORAGE_ENUM } from "../constants";
+import {
+  AI_ENUM,
+  AI_SEARCH,
+  AI_TOOLS,
+  BACKUP_SERVICE,
+  STORAGE_ENUM,
+} from "../constants";
+import { isDocsConnectServiceName } from "../utils/docs-connect";
 import type {
   TAiToolsPrices,
-
   TServiceUsageMonthly,
   TUsagePeriodKey,
 } from "../types";
@@ -53,6 +59,8 @@ import { now } from "../../utils/date";
 import type PaymentStore from "./PaymentStore";
 import type { TApiClient } from "../../providers/api/ApiProvider";
 import { formatterCurrencyWithoutTranction } from "../wallet/utils";
+
+const USAGE_TRACKED_SERVICES: string[] = [AI_TOOLS, AI_SEARCH, BACKUP_SERVICE];
 
 class ServicesStore {
   private paymentApi: PaymentApi;
@@ -67,6 +75,12 @@ class ServicesStore {
 
   isInitServicesData = false;
 
+  /** Service page whose data is loading right now. */
+  pendingServiceName: string | null = null;
+
+  /** Service the stored service data belongs to; null before the first load. */
+  loadedServiceName: string | null = null;
+
   isAiPaywallInit = false;
 
   isVisibleWalletSettings = false;
@@ -78,8 +92,6 @@ class ServicesStore {
   featureCountData: number = 0;
 
   confirmActionType: string | null = null;
-
-  aiToolsBalance: TBalance = null;
 
   aiToolsPrices: TAiToolsPrices | null = null;
 
@@ -129,69 +141,6 @@ class ServicesStore {
     return this.paymentStore.language ?? "en";
   }
 
-  private get aiBalanceData() {
-    if (this.aiToolsBalance && typeof this.aiToolsBalance !== "number")
-      return this.aiToolsBalance;
-    return null;
-  }
-
-  get aiServiceBalance(): number {
-    const balance = this.aiBalanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].amount ?? 0;
-
-    return 0.0;
-  }
-
-  // get isAiServiceLowBalance() {
-  //   if (!this.wasFirstAiServiceTopUp) return false;
-
-  //   return this.aiServiceBalance < 1;
-  // }
-
-  get aiServiceCodeCurrency(): string {
-    const balance = this.aiBalanceData;
-    if (balance?.subAccounts && balance.subAccounts.length > 0)
-      return balance.subAccounts[0].currency ?? "USD";
-
-    return "USD";
-  }
-
-  get aiServiceLastCreditAmount() {
-    if (!this.aiToolsBalance || typeof this.aiToolsBalance === "number")
-      return null;
-
-    return this.aiToolsBalance.lastCredit?.amount ?? null;
-  }
-
-  get aiServiceLastCreditCurrency() {
-    if (!this.aiToolsBalance || typeof this.aiToolsBalance === "number")
-      return "";
-
-    return this.aiToolsBalance.lastCredit?.currency ?? "USD";
-  }
-
-  get aiServiceLastCreditDate() {
-    if (!this.aiToolsBalance || typeof this.aiToolsBalance === "number")
-      return null;
-
-    return this.aiToolsBalance.lastCredit?.date ?? null;
-  }
-
-  get aiModelsCurrency() {
-    const currency = this.aiToolsPrices?.currency;
-    if (!currency) return "USD";
-
-    return currency.code ?? "USD";
-  }
-
-  get aiModelsCurrencySymbol() {
-    const currency = this.aiToolsPrices?.currency;
-    if (!currency) return "$";
-
-    return currency.symbol ?? "$";
-  }
-
   get minimumInputPrice() {
     const inputValues: Array<number | undefined> = [];
 
@@ -220,12 +169,6 @@ class ServicesStore {
     return values.length ? Math.min(...values) : 0;
   }
 
-  get wasFirstAiServiceTopUp() {
-    if (!this.aiToolsBalance) return false;
-
-    return (this.aiBalanceData?.subAccounts?.length ?? 0) !== 0;
-  }
-
   setPartialUpgradeFee = (partialUpgradeFee: number) => {
     this.partialUpgradeFee = partialUpgradeFee;
   };
@@ -242,6 +185,9 @@ class ServicesStore {
     this.isInitServicesData = isInitServicesData;
   };
 
+  isServiceDataPending = (serviceName: string) =>
+    this.loadedServiceName !== serviceName;
+
   setIsAiPaywallInit = (value: boolean) => {
     this.isAiPaywallInit = value;
   };
@@ -256,25 +202,6 @@ class ServicesStore {
 
   setFeatureCountData = (featureCountData: number) => {
     this.featureCountData = featureCountData;
-  };
-
-  formatAiModelsCurrency = (amount: number) => {
-    return formatterCurrencyWithoutTranction(
-      this.language,
-      amount,
-      this.aiModelsCurrency,
-      0,
-    );
-  };
-
-  formatAiServiceCurrency = (
-    item: number | null = null,
-    fractionDigits: number = 3,
-    currency: string = this.aiServiceCodeCurrency,
-  ) => {
-    const amount = item ?? this.aiServiceBalance;
-
-    return formatCurrencyValue(this.language, amount, currency, fractionDigits);
   };
 
   fetchAiPrices = async () => {
@@ -379,29 +306,6 @@ class ServicesStore {
     }
   };
 
-  // TODO: Replace with SDK method once it is available in the API SDK
-  fetchAiServiceBalance = async (refresh?: boolean) => {
-    const abortController = new AbortController();
-    this.addAbortController(abortController);
-
-    try {
-      const { data } = await this.#rawApiClient.instance.get(
-        `api/2.0/portal/payment/customer/aibalance`,
-        {
-          params: refresh ? { refresh: true } : {},
-          signal: abortController.signal,
-        },
-      );
-
-      if (!data?.response) return;
-
-      this.aiToolsBalance = data.response as unknown as TBalance;
-    } catch (error: unknown) {
-      if (error instanceof Error && error.name === "CanceledError") return;
-      console.error(error);
-    }
-  };
-
   fetchBackupsCount = async (from?: DateTime, to?: DateTime) => {
     const abortController = new AbortController();
     this.abortControllers.push(abortController);
@@ -448,8 +352,7 @@ class ServicesStore {
       );
 
       const response = data?.response as
-        | { free?: number; paid?: number }
-        | undefined;
+        { free?: number; paid?: number } | undefined;
 
       if (response == null) return;
 
@@ -503,6 +406,11 @@ class ServicesStore {
   initUsageData = async (period: TUsagePeriodKey) => {
     const range = getUsageRange(period);
 
+    // The usage page overwrites the shared rows with a whole period. Only rows
+    // of the current month match what a service page requests for itself, so
+    // any other period invalidates them.
+    if (period !== "thisMonth") this.loadedServiceName = null;
+
     await Promise.all([
       this.paymentStore.initWalletPayerAndBalance(false),
       this.fetchServiceUsage(range),
@@ -527,6 +435,12 @@ class ServicesStore {
     );
   }
 
+  get aiSearchUsage() {
+    return (
+      this.serviceUsage.find((usage) => usage.service === AI_SEARCH) ?? null
+    );
+  }
+
   initServiceData = async (
     t: TTranslation,
     serviceName: string,
@@ -535,15 +449,20 @@ class ServicesStore {
   ) => {
     const isRefresh = window.location.href.includes("complete=true");
 
+    this.pendingServiceName = serviceName;
+
     const {
       fetchTransactionHistory,
       initWalletPayerAndBalance,
       setServiceQuota,
+      handleServicesQuotas,
       fetchCardLinked,
       resetTransactionHistory,
     } = this.paymentStore;
 
     resetTransactionHistory();
+
+    const isDocsConnect = isDocsConnectServiceName(serviceName);
 
     try {
       let resolvedServiceName = serviceName;
@@ -553,10 +472,17 @@ class ServicesStore {
           (await setServiceQuota(serviceEnum)) ?? serviceName;
       }
 
+      if (isDocsConnect) await handleServicesQuotas();
+
       const serviceQuotaRequest =
-        serviceEnum !== STORAGE_ENUM
+        serviceEnum !== STORAGE_ENUM && !isDocsConnect
           ? [setServiceQuota(serviceEnum ?? serviceName)]
           : [];
+
+      // The AI search enable flow checks the AI tools state.
+      if (serviceName === AI_SEARCH) {
+        serviceQuotaRequest.push(setServiceQuota(AI_ENUM));
+      }
 
       const requests: Promise<unknown>[] = [
         ...serviceQuotaRequest,
@@ -565,28 +491,21 @@ class ServicesStore {
         initWalletPayerAndBalance(isRefresh),
       ];
 
-      if (serviceName === AI_TOOLS) {
+      const monthStart = now().startOf("month");
+      const monthEnd = now().endOf("month");
+
+      if (USAGE_TRACKED_SERVICES.includes(serviceName)) {
         requests.push(
           this.fetchServiceUsage({
-            serviceName: AI_TOOLS,
-            from: now().startOf("month"),
-            to: now().endOf("month"),
+            serviceName,
+            from: monthStart,
+            to: monthEnd,
           }),
         );
       }
 
       if (serviceName === BACKUP_SERVICE) {
-        requests.push(
-          this.fetchBackupsCountByPaid(
-            now().startOf("month"),
-            now().endOf("month"),
-          ),
-          this.fetchServiceUsage({
-            serviceName: BACKUP_SERVICE,
-            from: now().startOf("month"),
-            to: now().endOf("month"),
-          }),
-        );
+        requests.push(this.fetchBackupsCountByPaid(monthStart, monthEnd));
       }
 
       await Promise.all(requests);
@@ -618,28 +537,9 @@ class ServicesStore {
       if (error instanceof Error && error.name === "CanceledError") return;
       console.error(error);
       toastr.error(t("Common:UnexpectedError"));
-    }
-  };
-
-  aiPaywallInit = async (t: TTranslation) => {
-    const { initWalletPayerAndBalance } = this.paymentStore;
-
-    try {
-      await Promise.all([
-        initWalletPayerAndBalance(false),
-        this.fetchAiPrices(),
-        this.fetchAiServiceBalance(),
-      ]);
-
-      this.setIsAiPaywallInit(true);
-
-      return this.wasFirstAiServiceTopUp;
-    } catch (error) {
-      if (error instanceof Error && error.name === "CanceledError")
-        return false;
-      console.error(error);
-      toastr.error(t("Common:UnexpectedError"));
-      return false;
+    } finally {
+      if (this.pendingServiceName === serviceName)
+        this.loadedServiceName = serviceName;
     }
   };
 
@@ -675,7 +575,7 @@ class ServicesStore {
       }
 
       if (hasAiService) {
-        requests.push(this.fetchAiServiceBalance(), this.fetchAiPrices());
+        requests.push(this.fetchAiPrices());
       }
 
       await Promise.all(requests);
@@ -706,9 +606,9 @@ class ServicesStore {
       this.setIsInitServicesPage(true);
 
       if (!isRefresh) {
-        const actionTypeParam = new URL(
-          window.location.href,
-        ).searchParams.get("actionType");
+        const actionTypeParam = new URL(window.location.href).searchParams.get(
+          "actionType",
+        );
 
         if (actionTypeParam) {
           this.setConfirmActionType(actionTypeParam);

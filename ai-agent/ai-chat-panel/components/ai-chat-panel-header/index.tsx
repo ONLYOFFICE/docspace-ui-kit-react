@@ -29,7 +29,7 @@ import classNames from "classnames";
 import { IconButton } from "../../../../components/icon-button";
 import { Text } from "../../../../components/text";
 
-import NewChatButton from "../../../new-chat-button";
+import { ChatToolbar } from "../../../chat-toolbar";
 
 import ExpandIcon from "../../../../assets/icons/17/expand.svg";
 import CollapseIcon from "../../../../assets/icons/17/collapse.svg";
@@ -47,7 +47,6 @@ const AiChatPanelHeader = ({
   rightExtras,
   isFullscreen = false,
   onToggleFullscreen,
-  isFullscreenToggleDisabled = false,
   onClose,
   enterFullscreenTooltip,
   exitFullscreenTooltip,
@@ -80,7 +79,7 @@ const AiChatPanelHeader = ({
     <div className={classNames(styles.header, className)}>
       <div className={styles.left}>
         {renderTitle()}
-        <NewChatButton />
+        <ChatToolbar className={styles.toolbar} />
         {extras ? <div className={styles.extras}>{extras}</div> : null}
       </div>
 
@@ -90,22 +89,11 @@ const AiChatPanelHeader = ({
           <IconButton
             iconNode={isFullscreen ? <CollapseIcon /> : <ExpandIcon />}
             size={17}
-            className={classNames(styles.fullscreenToggle, {
-              [styles.disabled]: isFullscreenToggleDisabled,
-            })}
+            className={styles.fullscreenToggle}
             onClick={onToggleFullscreen}
-            isDisabled={isFullscreenToggleDisabled}
-            tooltipId={
-              isFullscreenToggleDisabled
-                ? undefined
-                : "ai-chat-panel-fullscreen-tooltip"
-            }
+            tooltipId="ai-chat-panel-fullscreen-tooltip"
             tooltipContent={
-              isFullscreenToggleDisabled
-                ? undefined
-                : isFullscreen
-                  ? exitFullscreenTooltip
-                  : enterFullscreenTooltip
+              isFullscreen ? exitFullscreenTooltip : enterFullscreenTooltip
             }
             dataTestId="ai-chat-panel-fullscreen"
           />

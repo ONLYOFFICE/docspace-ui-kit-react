@@ -45,6 +45,11 @@ import AiChatPanelBody, {
 export type AiChatPanelBindings = {
   isChatPanelVisible: boolean;
   isChatPanelFullscreen: boolean;
+  // Docked width driven by the panel's edge resizer, and its setter. Session
+  // state: it lives in the store and resets to the default on every open, so
+  // hosts pass it straight to Section without persisting anything.
+  chatPanelWidth: number;
+  setChatPanelWidth: (value: number) => void;
   chatButton: React.ReactNode;
   chatPanelContent: React.ReactNode;
   closeChatPanel: () => void;
@@ -62,6 +67,12 @@ export type AiChatPanelBindings = {
 // derived from a per-route value like `isPrivate`). Flipping it after mount is
 // unsupported — the panel/button would mount or unmount mid-session, which no
 // host currently does.
+//
+// `chatProps` is optional on purpose. A host that can route the user to portal
+// AI settings (the DocSpace client) passes them and gets the branded
+// not-available empty view; a host that cannot (the embedded sdk layouts) omits
+// them and the panel falls back to the chat widget's own setup screen, which
+// configures an AI profile in place.
 export function useAiChatPanel(
   enabled?: true,
   chatProps?: AiChatPanelBodyProps,
@@ -89,6 +100,8 @@ export function useAiChatPanel(
   return {
     isChatPanelVisible: aiChatStore.isVisible,
     isChatPanelFullscreen: aiChatStore.effectiveFullscreen,
+    chatPanelWidth: aiChatStore.panelWidth,
+    setChatPanelWidth: aiChatStore.setPanelWidth,
     chatButton: <AiChatTrigger />,
     chatPanelContent: (
       <>

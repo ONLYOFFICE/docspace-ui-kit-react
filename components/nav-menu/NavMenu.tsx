@@ -393,10 +393,17 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       // Mobile: the body click is navigation-only; the chevron owns expansion.
       if (withExpandControl) return;
       if (!iconOnly && item.children?.length) {
-        // Re-clicking the active section must not collapse it; only
-        // clicking a different (non-active) expanded item toggles it shut.
+        // Re-clicking the active section must not collapse it - neither when
+        // the item itself is active, nor when the selection sits on one of its
+        // sub-items (clicking the parent of the selected sub-item would
+        // otherwise collapse the section, only for the effect below to expand
+        // it again once the navigation lands, which reads as a flicker).
+        // Only a different (non-active) expanded item toggles shut.
+        const isActiveSection =
+          activeItemId === item.id ||
+          item.children.some((sub) => sub.id === activeItemId);
         setExpandedIds((prev) =>
-          prev.has(item.id) && activeItemId !== item.id
+          prev.has(item.id) && !isActiveSection
             ? new Set()
             : new Set([item.id]),
         );

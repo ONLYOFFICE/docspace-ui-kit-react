@@ -37,6 +37,7 @@ import React from "react";
 import { observer } from "mobx-react";
 
 import { Button, ButtonSize } from "../../../../components/button";
+import { Link } from "../../../../components/link";
 
 import { useServicesActions } from "../../hooks/useServicesActions";
 import { usePaymentContext } from "../../context/PaymentContext";
@@ -82,13 +83,25 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
   } = props;
 
   const paymentStore = usePaymentStore();
-  const { hasStorageSubscription, storageExpiryDate } = paymentStore.tariff;
-  const { formatWalletCurrency } = paymentStore;
+  const {
+    hasStorageSubscription,
+    storageExpiryDate,
+    walletCustomerEmail,
+    walletCustomerInfo,
+  } = paymentStore.tariff;
+  const { formatWalletCurrency, isPayer, isCardLinkedToPortal } = paymentStore;
+
+  const payerDisplayName = walletCustomerInfo?.displayName;
+  const payerLabel = payerDisplayName || walletCustomerEmail;
 
   const { t } = useServicesActions();
   const { isWaitingCalculation } = usePaymentContext();
 
-  const title = isBalanceInsufficient
+  const isTopUpUnavailable =
+    isBalanceInsufficient && isCardLinkedToPortal && !isPayer;
+  const canTopUpAndBuy = isBalanceInsufficient && !isTopUpUnavailable;
+
+  const title = canTopUpAndBuy
     ? t("TopUpAndUpgrade")
     : !hasStorageSubscription
       ? t("UpgradeNow")
@@ -116,7 +129,34 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
         </Text>
       ) : null}
 
-      {isBalanceInsufficient ? (
+      {isTopUpUnavailable ? (
+        <Text as="span">
+          <Trans
+            ns="Common"
+            i18nKey="InsufficientCreditsContactPayer"
+            components={{
+              1:
+                walletCustomerEmail && !payerDisplayName ? (
+                  <Link
+                    tag="a"
+                    color="accent"
+                    href={`mailto:${walletCustomerEmail}`}
+                    dataTestId="storage_contact_payer_link"
+                  />
+                ) : (
+                  <Text
+                    as="span"
+                    fontWeight={600}
+                    dataTestId="storage_contact_payer_name"
+                  />
+                ),
+            }}
+            values={{ payerContact: payerLabel }}
+          />
+        </Text>
+      ) : null}
+
+      {canTopUpAndBuy ? (
         <Text as="span">
           <Trans
             ns="Common"
@@ -142,7 +182,7 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
           isLoading={isLoading}
           isDisabled={
             isPaymentBlocked ||
-            (isPaymentBlockedByBalance && !isBalanceInsufficient) ||
+            (isPaymentBlockedByBalance && !canTopUpAndBuy) ||
             isCurrentStoragePlan ||
             isDisabled ||
             isWaitingCalculation

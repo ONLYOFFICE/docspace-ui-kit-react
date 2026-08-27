@@ -40,14 +40,18 @@ import useLoadersHelper from "../hooks/useLoadersHelper";
 type TLoaderContext = ReturnType<typeof useLoadersHelper>;
 
 export const LoadersContext = createContext<TLoaderContext>({
-  isFirstLoad: true,
-  isBreadCrumbsLoading: true,
+  isFullLoadActive: true,
   isNextPageLoading: false,
+  isContentLoading: false,
   showBreadCrumbsLoader: true,
-  showLoader: true,
+  showSearchLoader: true,
+  showBodyLoader: true,
 
-  setIsBreadCrumbsLoading: () => {},
-  setIsFirstLoad: () => {},
+  startFullLoad: () => {},
+  finishFullLoad: () => {},
+  startContentLoading: () => {},
+  finishContentLoading: () => {},
+  hideSectionLoader: () => {},
   setIsNextPageLoading: () => {},
 });
 

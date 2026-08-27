@@ -29,6 +29,11 @@ import { makeAutoObservable } from "mobx";
 export type AiChatRouterPage =
   "chat" | "settings" | "history" | "initial-setup";
 
+// Docked (non-fullscreen) panel width on desktop. Matches the CSS default of
+// `--chat-panel-width` in Section.module.scss: the panel renders at this width
+// until the user drags the resizer, and every open starts from it again.
+export const DEFAULT_CHAT_PANEL_WIDTH = 400;
+
 // Single source of truth for the AI Chat panel UI: visibility + fullscreen
 // + selected agent + mirrors of the upstream router page and profiles
 // presence. Computed getters express every derived UI decision so
@@ -37,34 +42,44 @@ export type AiChatRouterPage =
 class AiChatStore {
   isVisible = false;
 
-  // User-explicit fullscreen toggle. The *effective* fullscreen value can
-  // additionally be forced on by `isOnSettingsPage` or `!aiReady` — those
-  // forcings don't mutate this field so the user's preference is preserved
-  // when the forcing condition goes away.
+  // User-explicit fullscreen toggle. It is the only input to the effective
+  // fullscreen value: no view forces the panel open any more, so the user's
+  // preference holds across pages.
   userFullscreen = false;
 
   currentPage: AiChatRouterPage = "chat";
 
+  // Width of the docked panel in px, driven by the edge resizer. Session-only
+  // by design: it is deliberately not persisted and every open resets it to
+  // `DEFAULT_CHAT_PANEL_WIDTH`, so a fresh panel always has the familiar size.
+  // Ignored in fullscreen and on tablet/mobile, where the panel is not
+  // resizable and its width comes from the layout instead.
+  panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
+
   agentId: number | null = null;
 
-  // Mirror of upstream profiles count > 0. Bridged from the Zustand
-  // `useProfilesStore` by AiChatStoresBridge.
+  // Mirror of upstream profiles count > 0 — the authoritative "AI is
+  // configured" signal exposed by the upstream chat package. Bridged from the
+  // Zustand `useProfilesStore` by AiChatStoresBridge; read by the panel header
+  // to decide where the close button goes.
   hasProfiles = false;
+
+  // Set when `openNewChat` opens the panel from a closed state. The thread
+  // reset itself needs the lib stores, which only exist inside the provider,
+  // so it is performed by AiChatStoresBridge, which consumes this flag. Keeping
+  // it here lets the opener (`useOpenAiChat`) depend on this store alone — a
+  // section without an AiChatStoreProvider (e.g. a public room opened
+  // anonymously) can then call the opener as a no-op instead of throwing on the
+  // library's `useStores` (Bug 83210).
+  pendingNewChat = false;
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  // Ready when the user has at least one configured AI profile. Replaces
-  // the older `aiConfig.aiReady` check — profiles is the authoritative
-  // signal exposed by the upstream chat package.
-  get aiReady(): boolean {
-    return this.hasProfiles;
-  }
-
-  // Both `settings` and `initial-setup` are settings-like flows that
-  // must occupy the full panel and disable the user-facing fullscreen
-  // toggle.
+  // Both `settings` and `initial-setup` are settings-like flows; the close
+  // button routes out of them instead of shutting the panel (see
+  // AiChatPanelHeaderContainer).
   get isOnSettingsPage(): boolean {
     return (
       this.currentPage === "settings" || this.currentPage === "initial-setup"
@@ -75,34 +90,47 @@ class AiChatStore {
     return this.currentPage === "history";
   }
 
-  // Fullscreen is forced when:
-  // - upstream router is on the settings page (no room for the rest of the
-  //   docs layout), or
-  // - AI is not configured yet (the empty/setup state needs the whole panel
-  //   so the CTA isn't cramped into a sidebar).
-  // Otherwise the user's toggle wins.
+  // The user's toggle always wins: settings flows fit the narrow panel and
+  // the not-configured state now renders a compact empty view, so neither
+  // needs to force fullscreen on.
   get effectiveFullscreen(): boolean {
-    return this.userFullscreen || this.isOnSettingsPage || !this.aiReady;
-  }
-
-  get isFullscreenToggleDisabled(): boolean {
-    return this.isOnSettingsPage || !this.aiReady;
+    return this.userFullscreen;
   }
 
   open = (agentId?: number) => {
     if (agentId !== undefined) this.agentId = agentId;
+    if (!this.isVisible) this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
     this.isVisible = true;
+  };
+
+  // Open the panel, starting a fresh conversation when it was closed (an
+  // already-open panel keeps its thread — flows that drop something into an
+  // open chat must not reset it). The thread reset is deferred to
+  // AiChatStoresBridge via `pendingNewChat`, so this needs no lib stores.
+  openNewChat = () => {
+    if (!this.isVisible) {
+      this.pendingNewChat = true;
+      this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
+    }
+    this.isVisible = true;
+  };
+
+  consumePendingNewChat = () => {
+    this.pendingNewChat = false;
   };
 
   close = () => {
     this.agentId = null;
     this.isVisible = false;
     this.userFullscreen = false;
+    this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
   };
 
   toggle = () => {
     this.isVisible = !this.isVisible;
     if (!this.isVisible) this.userFullscreen = false;
+    // Both directions reset: closing clears the drag, opening starts fresh.
+    this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
   };
 
   setAgentId = (agentId: number | null) => {
@@ -119,6 +147,10 @@ class AiChatStore {
 
   setCurrentPage = (page: AiChatRouterPage) => {
     this.currentPage = page;
+  };
+
+  setPanelWidth = (value: number) => {
+    this.panelWidth = value;
   };
 
   setHasProfiles = (value: boolean) => {

@@ -33,6 +33,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import classNames from "classnames";
+
 import { Text } from "../../../components/text";
 import { IconButton } from "../../../components/icon-button";
 import { Loader } from "../../../components/loader";
@@ -41,26 +43,34 @@ import { LoaderTypes } from "../../../components/loader/Loader.enums";
 import ChevronIcon from "../../../assets/icons/12/right-arrow.react.svg";
 import DownloadIcon from "../../../assets/icons/16/download.react.svg";
 
+import SpendAmount from "../../shared/spend-amount";
+
 import styles from "../styles/Usage.module.scss";
 
 type BreakdownRowProps = {
   title: string;
   subLabel?: string;
-  amount: string;
+  amount: number;
+  currency?: string;
+  amountTooltipId: string;
   percent?: number;
   onExpand?: () => void;
   onDownload?: () => void;
   isDownloading?: boolean;
+  isDownloadDisabled?: boolean;
 };
 
 const BreakdownRow = ({
   title,
   subLabel,
   amount,
+  currency,
+  amountTooltipId,
   percent,
   onExpand,
   onDownload,
   isDownloading = false,
+  isDownloadDisabled = false,
 }: BreakdownRowProps) => {
   return (
     <div className={styles.row}>
@@ -117,9 +127,14 @@ const BreakdownRow = ({
         ) : null}
       </div>
 
-      <Text fontSize="14px" fontWeight={700} className={styles.amount}>
-        {amount}
-      </Text>
+      <SpendAmount
+        amount={amount}
+        currency={currency}
+        className={styles.amount}
+        fontSize="14px"
+        fontWeight={700}
+        tooltipId={amountTooltipId}
+      />
 
       {isDownloading ? (
         <div className={styles.download}>
@@ -127,10 +142,13 @@ const BreakdownRow = ({
         </div>
       ) : onDownload ? (
         <IconButton
-          className={styles.download}
+          className={classNames(styles.download, {
+            [styles.downloadDisabled]: isDownloadDisabled,
+          })}
           size={16}
           iconNode={<DownloadIcon />}
           onClick={onDownload}
+          isDisabled={isDownloadDisabled}
           isClickable
           dataTestId="usage_row_download"
         />

@@ -99,8 +99,10 @@ export enum SocketEvents {
   ExternalDbSettings = "s:external-db-settings",
   ChangeWebPlugin = "s:change-web-plugin",
   ChangeAiConfig = "s:change-ai-config",
+  ChangeAiAccessSettings = "s:change-ai-access-settings",
   ChangeAppEnabled = "s:change-app-enabled",
   TopUpWallet = "s:top-up-wallet",
+  WalletLowBalance = "s:wallet-low-balance",
   UpdateExternalShareSettings = "s:change-external-sharing-settings",
 }
 
@@ -294,6 +296,12 @@ export type TTopUpWalletData = {
   auto: boolean;
 };
 
+/** Balance left on the wallet when the backend decides it is running low. */
+export type TWalletLowBalanceData = {
+  amount?: number;
+  currency?: string;
+};
+
 export type TListenEventCallbackMap = {
   [SocketEvents.LogoutSession]: (data: {
     loginEventId: unknown;
@@ -386,8 +394,10 @@ export type TListenEventCallbackMap = {
   ) => void;
   [SocketEvents.ChangeWebPlugin]: (data: TChangeWebPluginData) => void;
   [SocketEvents.ChangeAiConfig]: () => void;
+  [SocketEvents.ChangeAiAccessSettings]: () => void;
   [SocketEvents.ChangeAppEnabled]: (data: TChangeAppEnabledData) => void;
   [SocketEvents.TopUpWallet]: (data: TTopUpWalletData) => void;
+  [SocketEvents.WalletLowBalance]: (data: TWalletLowBalanceData) => void;
 };
 
 /**

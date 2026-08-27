@@ -130,9 +130,13 @@
   }
 
   &.withFooterCheckbox {
-    height: 181px;
-    max-height: 181px;
-    min-height: 181px;
+    height: 110px;
+    max-height: 110px;
+    min-height: 110px;
+
+    :global(.selector_footer-checkbox) {
+      padding: 17px 0 1px;
+    }
   }
 
   &.defaultHeight {
@@ -233,20 +237,27 @@
           color: var(--accent-main, var(--empty-view-link-color));
         }
 
-        svg path {
+        // Scoped to the link's own icon: the create drop-down is rendered
+        // inside this container, and a descendant selector would repaint
+        // every icon in it (e.g. the room type logos) with the accent color.
+        .empty-folder_container-icon svg path {
           fill: var(--accent-main, var(--empty-view-link-color)) !important;
         }
 
         &:hover:not(:active) {
           background: var(--empty-view-link-bg-color-hover);
-          & > * {
+
+          .empty-folder_container-icon,
+          .empty-folder_link {
             opacity: 0.86;
           }
         }
 
         &:active {
           background: var(--empty-view-link-bg-color-press);
-          & > * {
+
+          .empty-folder_container-icon,
+          .empty-folder_link {
             filter: brightness(90%);
           }
         }
@@ -652,4 +663,33 @@
   line-height: 1px;
   height: 1px;
   width: calc(100% - 32px);
+}
+
+.bodyContentWrapper {
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.bodyContentDimmed {
+  opacity: 0.5;
+  pointer-events: none;
+  transition-delay: 0.2s;
+}
+
+// Mount-time dim with the same delay/duration as .bodyContentDimmed,
+// so fast loads don't flash
+.dimmedEmptyScreen {
+  pointer-events: none;
+  animation: dim-fade 0.3s ease-in-out 0.2s both;
+}
+
+@keyframes dim-fade {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.5;
+  }
 }

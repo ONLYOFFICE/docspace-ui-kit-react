@@ -155,8 +155,13 @@ const useSelectorBody = ({
   const t = useCommonTranslation();
   const { isBase } = useTheme();
 
-  const { showBreadCrumbsLoader, isNextPageLoading, showLoader } =
-    use(LoadersContext);
+  const {
+    showBreadCrumbsLoader,
+    showSearchLoader,
+    isNextPageLoading,
+    showBodyLoader,
+    isContentLoading,
+  } = use(LoadersContext);
   const { displayFileExtension } = use(SettingsContext);
 
   const headerSelectorProps: TSelectorHeader = withHeader
@@ -176,7 +181,7 @@ const useSelectorBody = ({
         searchLoader: <SearchLoader />,
         searchPlaceholder: t("Search"),
         searchValue,
-        isSearchLoading: showBreadCrumbsLoader,
+        isSearchLoading: showSearchLoader,
         onSearch: onSearch!,
         onClearSearch: onClearSearch!,
       }
@@ -221,7 +226,7 @@ const useSelectorBody = ({
         isBreadCrumbsLoading: showBreadCrumbsLoader,
         withBreadCrumbs: true,
         onSelectBreadCrumb: onSelectBreadCrumb!,
-        bodyIsLoading: showLoader,
+        bodyIsLoading: showBodyLoader,
       }
     : {};
 
@@ -278,12 +283,13 @@ const useSelectorBody = ({
       }
       searchEmptyScreenHeader={t("NotFoundTitle")}
       searchEmptyScreenDescription={t("EmptyFilterDescriptionText")}
-      isLoading={showLoader}
+      isLoading={showBodyLoader}
+      isContentLoading={isContentLoading}
       rowLoader={
         <RowLoader
           isMultiSelect={false}
           isUser={isRoot}
-          isContainer={showLoader}
+          isContainer={showBodyLoader}
         />
       }
       alwaysShowFooter

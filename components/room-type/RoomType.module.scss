@@ -40,6 +40,7 @@
       --room-type-list-item-background: none;
       --room-type-list-item-border: #{$gray-light-mid};
       --room-type-list-item-hover-background: #{$gray-light};
+      --room-type-list-item-disabled-background: #{$gray-light};
       --room-type-list-item-description-text: #{$gray};
 
       --room-type-dropdown-button-background: none;
@@ -49,6 +50,7 @@
 
       --room-type-dropdown-item-background: #{$white};
       --room-type-dropdown-item-hover-background: #{$gray-light};
+      --room-type-dropdown-item-disabled-background: #{$gray-light};
       --room-type-dropdown-item-description-text: #{$gray};
 
       --room-type-display-item-background: #{$gray-light};
@@ -64,6 +66,7 @@
       --room-type-list-item-background: none;
       --room-type-list-item-border: #{$gray-dark-strong};
       --room-type-list-item-hover-background: #{$dark-gray-light};
+      --room-type-list-item-disabled-background: #{$dark-gray-light};
       --room-type-list-item-description-text: #{$gray};
 
       --room-type-dropdown-button-background: none;
@@ -73,6 +76,7 @@
 
       --room-type-dropdown-item-background: #{$black};
       --room-type-dropdown-item-hover-background: #{$dark-gray-light};
+      --room-type-dropdown-item-disabled-background: #{$dark-gray-light};
       --room-type-dropdown-item-description-text: #{$gray};
 
       --room-type-display-item-background: #{$dark-gray-light};
@@ -170,6 +174,19 @@
       color: var(--room-type-description-color-value);
     }
   }
+
+  &.disabled {
+    cursor: default;
+    background-color: var(--room-type-list-item-disabled-background);
+
+    &:hover:not(:active) {
+      background-color: var(--room-type-list-item-disabled-background);
+    }
+
+    &:active {
+      border-color: var(--room-type-item-border-value);
+    }
+  }
 }
 
 .dropDownButton {
@@ -223,6 +240,22 @@
 
     .choose_room-forward_btn {
       display: none;
+    }
+  }
+
+  &.disabled {
+    cursor: default;
+    background-color: var(--room-type-dropdown-item-disabled-background);
+
+    &:hover {
+      background-color: var(--room-type-dropdown-item-disabled-background);
+    }
+
+    :global {
+      .choose_room-logo_wrapper,
+      .choose_room-info_wrapper {
+        opacity: 0.5;
+      }
     }
   }
 }

@@ -51,8 +51,9 @@ export type ChatAttachableItem = {
 
 /**
  * Composer attachment cap. Mirrors `ATTACHMENT_LIMIT` in the widget's
- * attachments store, which drops anything past it *silently* — hosts need the
- * number to tell the user why some files did not make it.
+ * attachments store. The store's `beginPendingAttachments` is the actual
+ * enforcement point (it also counts uploads still in flight); this constant
+ * exists for user-facing copy that quotes the number.
  */
 export const CHAT_ATTACHMENT_LIMIT = 5;
 
@@ -80,33 +81,52 @@ export const useAttachHostFilesToChat = () => {
     async (items: ChatAttachableItem[]): Promise<AttachToChatResult> => {
       const files = items.filter((item) => !item.isFolder);
 
-      // Images are re-keyed out of `attachmentFiles` afterwards, so the free
-      // slots are measured against that list only (see attachFilesToChat).
-      const free = Math.max(
-        0,
-        CHAT_ATTACHMENT_LIMIT -
-          useAttachmentsStore.getState().attachmentFiles.length,
-      );
-      const accepted = files.slice(0, free);
-      const skipped = items.length - accepted.length;
-
-      if (accepted.length === 0) return { attached: 0, skipped };
-
-      const inputs = accepted.map((file) => ({
+      const inputsAll = files.map((file) => ({
         path: String(file.id),
         title: file.title,
         type: getOnlyofficeFileType(file.fileExst || file.title),
         content: "",
       }));
 
+      // The store owns the cap: the reservation counts the refs already
+      // attached *and* the loading chips of uploads still in flight, which
+      // a local free-slot computation could not see. Everything reserves
+      // `kind: "file"` because images are re-keyed out of `attachmentFiles`
+      // only after the attach (see attachFilesToChat).
+      const pendingIds = useAttachmentsStore
+        .getState()
+        .beginPendingAttachments(
+          inputsAll.map((input) => ({
+            title: input.title,
+            kind: "file" as const,
+            type: input.type,
+          })),
+        );
+      const inputs = inputsAll.slice(0, pendingIds.length);
+      const skipped = items.length - inputs.length;
+
+      if (inputs.length === 0) return { attached: 0, skipped };
+
       const imageIndices = new Set<number>();
-      accepted.forEach((file, i) => {
+      files.slice(0, inputs.length).forEach((file, i) => {
         if (file.fileType === FileType.Image) imageIndices.add(i);
       });
 
-      await attachFilesToChat(useAttachmentsStore, inputs, imageIndices);
+      try {
+        await attachFilesToChat(
+          useAttachmentsStore,
+          inputs,
+          imageIndices,
+          pendingIds,
+        );
+      } catch (err) {
+        // Callers own the toast (documented); the leases must not outlive
+        // the failure or Send stays blocked.
+        useAttachmentsStore.getState().failPendingAttachments(pendingIds);
+        throw err;
+      }
 
-      return { attached: accepted.length, skipped };
+      return { attached: inputs.length, skipped };
     },
     [useAttachmentsStore],
   );

@@ -40,6 +40,7 @@ import { observer } from "mobx-react";
 
 import { Text } from "../../../../components/text";
 import { Link, LinkTarget } from "../../../../components/link";
+import { RectangleSkeleton } from "../../../../components/rectangle";
 
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { AI_ENUM, AI_TOOLS } from "../../../constants";
@@ -52,6 +53,7 @@ import ConfirmationDialog from "../../sub-components/ConfirmationDialog";
 
 import AiPageLoader from "./AiPageLoader";
 
+import SpendAmount from "../../../shared/spend-amount";
 import styles from "./AiPage.module.scss";
 import {
   now,
@@ -66,7 +68,6 @@ import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
-import { getBrandName } from "../../../../constants/brands";
 
 type AiPageProps = {
   currentDeviceType?: string;
@@ -99,24 +100,18 @@ const AiPage = (props: AiPageProps) => {
     isServiceActionDisabled,
     formatWalletCurrency,
     isLowWalletBalance,
-    isCardMissingOrInactive,
   } = paymentStore;
 
   const { logoText, language } = paymentStore;
 
-  const {
-    aiServiceCodeCurrency,
-    aiServiceBalance,
-    formatAiServiceCurrency,
-    isInitServicesData,
-    initServiceData,
-    aiUsage,
-  } = servicesStore;
+  const { isInitServicesData, initServiceData, aiUsage, isServiceDataPending } =
+    servicesStore;
 
   const t = useCommonTranslation();
 
+  const isUsageLoading = isServiceDataPending(AI_TOOLS);
+
   const [isTopUpVisible, setIsTopUpVisible] = useState(false);
-  const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
   const [isTopUpConfirmVisible, setIsTopUpConfirmVisible] = useState(false);
 
   const isDisabled = isServiceActionDisabled!;
@@ -153,13 +148,7 @@ const AiPage = (props: AiPageProps) => {
     onConfirm();
   };
 
-  const onCloseConfirmDialog = () => {
-    setIsConfirmDialogVisible(false);
-  };
-
   const onConfirm = async () => {
-    setIsConfirmDialogVisible(false);
-
     const raw = {
       service: TenantWalletService.AITools,
       enabled: !isAiToolsServiceOn,
@@ -187,41 +176,6 @@ const AiPage = (props: AiPageProps) => {
       changeServiceState(AI_ENUM);
     }
   };
-
-  const confirmationDialogContent = isAiToolsServiceOn
-    ? {
-        title: t("Confirmation"),
-        body: [
-          t("DisableAIToolsConfirm", {
-            organizationName: logoText,
-          }),
-          <CommonTrans
-            key="DisableAIToolsConfirmBalance"
-            i18nKey="DisableAIToolsConfirmBalance"
-            values={{
-              balance: formatAiServiceCurrency(
-                aiServiceBalance ?? 0,
-                3,
-                aiServiceCodeCurrency,
-              ),
-            }}
-            components={{
-              1: <span style={{ fontWeight: 600 }} />,
-            }}
-          />,
-          t("DisableAIToolsConfirmReEnable"),
-        ],
-      }
-    : {
-        title: t("Confirmation"),
-        body: [
-          t("AIToolsDescription", {
-            productName: getBrandName("ProductName"),
-            organizationName: logoText,
-          }),
-          t("WantToContinue"),
-        ],
-      };
 
   const onOpenTopUp = () => {
     // if (!isAiToolsServiceOn && !simpleTopUp) {
@@ -263,7 +217,6 @@ const AiPage = (props: AiPageProps) => {
         <SimpleTopUpDialog
           visible={isTopUpVisible}
           onClose={onCloseTopUp}
-          isFirstTopUp={isCardMissingOrInactive}
           serviceName={AI_TOOLS}
         />
       ) : null}
@@ -323,17 +276,37 @@ const AiPage = (props: AiPageProps) => {
         <div className={styles.cardsGrid}>
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthSpend")}</Text>
-            <Text className={styles.cardValue}>
-              {formatWalletCurrency(monthSpend, 2)}
-            </Text>
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="80px"
+                height="24px"
+                borderRadius="3px"
+              />
+            ) : (
+              <SpendAmount
+                amount={monthSpend}
+                className={styles.cardValue}
+                fontSize="18px"
+                fontWeight={700}
+                tooltipId="ai-tools-month-spend"
+              />
+            )}
             <Text className={styles.cardCaption}>
-              {t("ChargedFromCredits")}
+              {t("ForPeriod", { period: monthLabel })}
             </Text>
           </div>
 
           <div className={styles.card}>
             <Text className={styles.cardLabel}>{t("MonthUsage")}</Text>
-            <Text className={styles.cardValue}>{monthTokensText}</Text>
+            {isUsageLoading ? (
+              <RectangleSkeleton
+                width="80px"
+                height="24px"
+                borderRadius="3px"
+              />
+            ) : (
+              <Text className={styles.cardValue}>{monthTokensText}</Text>
+            )}
             <Text className={styles.cardCaption}>
               {t("TokensProcessedInMonth", { month: monthLabel })}
             </Text>
@@ -377,16 +350,6 @@ const AiPage = (props: AiPageProps) => {
           hideTypeFilter
         />
       </div>
-
-      {isConfirmDialogVisible ? (
-        <ConfirmationDialog
-          visible={isConfirmDialogVisible}
-          onClose={onCloseConfirmDialog}
-          onConfirm={onConfirm}
-          title={confirmationDialogContent.title}
-          bodyText={confirmationDialogContent.body}
-        />
-      ) : null}
 
       {isTopUpConfirmVisible ? (
         <ConfirmationDialog

@@ -51,14 +51,15 @@ import { getBrandName } from "../../../../constants/brands";
 
 import TransactionHistory from "../../../shared/transaction-history";
 import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import ServiceToggleSection from "../../sub-components/ServiceToggleSection";
 import StorageWarning from "../../panels/additional-storage/StorageWarning";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 import { useServicesStore } from "../../../store/ServicesStoreProvider";
 import { DOCS_CONNECT_SERVICE } from "../../../constants";
+import { getDocsConnectScheduleFlags } from "../../../utils/docs-connect";
 import type { TDocsConnectPageState } from "../../../types";
 
-import WalletIcon from "../../../../assets/icons/16/wallet.react.svg";
 import SettingsIcon from "../../../../assets/icons/16/catalog-settings-common.svg";
 import PencilIcon from "../../../../assets/pencil.react.svg";
 import StatisticsIcon from "../../../../assets/icons/16/statistics.react.svg";
@@ -78,6 +79,7 @@ type DocsConnectPageProps = {
   onCancelPlan: () => void;
   onRemovePlan: () => void;
   onCancelChange: () => void;
+  isCancelChangeLoading?: boolean;
 };
 
 const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
@@ -91,6 +93,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
   onCancelPlan,
   onRemovePlan,
   onCancelChange,
+  isCancelChangeLoading,
 }) => {
   const t = useCommonTranslation();
   const paymentStore = usePaymentStore();
@@ -127,8 +130,45 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
 
   const trialLow =
     !isPaid && !expired && totalDays > 0 && daysLeft / totalDays < 0.5;
-  const isCancellation =
-    scheduledChange != null && scheduledChange.nextUsers === 0;
+  const { isCancellation, devPackDisabling, usersAdjusting } =
+    getDocsConnectScheduleFlags({
+      hasSubscription: true,
+      currentUsers: planUsers,
+      scheduledUsers: scheduledChange?.nextUsers ?? null,
+      scheduledOnDevPack: scheduledChange?.scheduledOnDevPack ?? false,
+      nextDevPackEnabled: scheduledChange?.nextDevPackEnabled ?? false,
+    });
+
+  const nextMonthlyPrice = formatCurrency(
+    (scheduledChange?.nextUsers ?? 0) *
+      (devPackDisabling ? basePricePerUser : pricePerUser),
+    2,
+  );
+
+  const getScheduledChangeTitle = () => {
+    if (isCancellation) return t("Common:SubscriptionCancellation");
+
+    if (devPackDisabling) {
+      return usersAdjusting
+        ? t("Common:TariffUserAdjustmentDevPackDisableScheduledWithPrice", {
+            fromCount: planUsers,
+            toCount: scheduledChange?.nextUsers,
+            price: nextMonthlyPrice,
+          })
+        : t("Common:TariffDevPackDisableScheduledWithPrice", {
+            price: nextMonthlyPrice,
+          });
+    }
+
+    if (!usersAdjusting) return t("Common:ChangeShedule");
+
+    return t("Common:TariffUserAdjustmentScheduled", {
+      fromCount: planUsers,
+      toCount: scheduledChange?.nextUsers,
+    });
+  };
+
+  const scheduledChangeTitle = getScheduledChangeTitle();
 
   const trialActive = !isPaid && !expired;
   const trialToggleTooltip = trialActive
@@ -191,13 +231,15 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
           }
           title={t("DocsConnect:DocsConnect")}
           priceText={
-            devPackEnabled
-              ? t("DocsConnect:PricePerUserMonthDevPackNote", {
-                  price: formatCurrency(pricePerUser, 0),
-                })
-              : t("DocsConnect:FromPricePerUserMonthNote", {
-                  price: formatCurrency(basePricePerUser, 0),
-                })
+            isPaid
+              ? devPackEnabled
+                ? t("DocsConnect:PricePerUserMonthDevPackNote", {
+                    price: formatCurrency(pricePerUser, 0),
+                  })
+                : t("DocsConnect:FromPricePerUserMonthNote", {
+                    price: formatCurrency(basePricePerUser, 0),
+                  })
+              : undefined
           }
           description={t("DocsConnect:ServiceToggleDescription", {
             productName: docsName,
@@ -207,14 +249,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
 
       {scheduledChange ? (
         <StorageWarning
-          title={
-            isCancellation
-              ? t("Common:SubscriptionCancellation")
-              : t("Common:TariffUserAdjustmentScheduled", {
-                  fromCount: planUsers,
-                  toCount: scheduledChange.nextUsers,
-                })
-          }
+          title={scheduledChangeTitle}
           body={
             isCancellation
               ? t("Common:PlanCancellationBillingPeriodNote", {
@@ -238,6 +273,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
                 })
           }
           onCancelChange={onCancelChange}
+          isCancelLoading={isCancelChangeLoading}
         />
       ) : null}
 
@@ -257,27 +293,11 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
         </div>
       ) : null}
 
-      <div className={styles.walletCard}>
-        <div className={styles.walletLeft}>
-          <span className={styles.walletIcon} aria-hidden="true">
-            <WalletIcon />
-          </span>
-          <div className={styles.walletText}>
-            <Text className={styles.walletTitle}>{t("Common:Wallet")}</Text>
-            <Text className={styles.walletCredits}>
-              {t("Common:AvailableCredits")}:{" "}
-              <span className={styles.creditsValue}>
-                {formatCurrency(credits, 2)}
-              </span>
-            </Text>
-          </div>
-        </div>
-        <Button
-          size={ButtonSize.small}
-          label={t("Common:TopUp")}
-          onClick={() => setIsTopUpDialogVisible(true)}
-        />
-      </div>
+      <WalletInfo
+        withoutBackground
+        balance={formatCurrency(credits, 2)}
+        onTopUp={() => setIsTopUpDialogVisible(true)}
+      />
 
       {isPaid && canceled ? (
         <>
@@ -457,10 +477,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
                           "DATE_MED",
                           { locale: language },
                         ),
-                        price: formatCurrency(
-                          scheduledChange.nextUsers * pricePerUser,
-                          2,
-                        ),
+                        price: nextMonthlyPrice,
                         amount: `${t("DocsConnect:PlanUsers")}: ${scheduledChange.nextUsers}`,
                       }}
                       components={{ 1: <Text as="span" fontWeight={600} /> }}
@@ -532,7 +549,6 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
           onConfirm={onTopUpComplete}
-          isFirstTopUp={!paymentStore.tariff.walletCustomerEmail}
           recommendedAmount={paymentStore.recommendedAmount}
           serviceName={DOCS_CONNECT_SERVICE}
         />

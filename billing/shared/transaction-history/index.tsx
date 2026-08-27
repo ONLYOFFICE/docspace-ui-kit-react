@@ -63,12 +63,8 @@ import styles from "./styles/TransactionHistory.module.scss";
 import TableLoader from "./sub-components/TableLoader";
 import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import { getBrandName } from "../../../constants/brands";
 import { Encoder } from "../../../utils/encoder";
-import {
-  DOCS_CONNECT_SERVICE,
-  DOCS_CONNECT_DEVPACK_SERVICE,
-} from "../../constants";
+import { isDocsConnectServiceName } from "../../utils/docs-connect";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -138,6 +134,13 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
   const { isNotPaidPeriod } = store.tariff;
 
   const t = useCommonTranslation();
+
+  useEffect(
+    () => () => {
+      resetTransactionFilter();
+    },
+    [resetTransactionFilter],
+  );
 
   const typeOfHistoty: TOption[] = [
     {
@@ -347,8 +350,8 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     const isDebit = filterSelectedTypeKey !== "credit";
 
     const serviceNames: string | string[] | undefined =
-      serviceName === DOCS_CONNECT_SERVICE
-        ? [DOCS_CONNECT_SERVICE, DOCS_CONNECT_DEVPACK_SERVICE]
+      isDocsConnectServiceName(serviceName)
+        ? store.docsConnectServiceNames
         : serviceName;
 
     try {
@@ -530,9 +533,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     ? {}
     : {
         withInfo: true as const,
-        infoText: t("OnlyPortalAdminsShown", {
-          productName: getBrandName("ProductName"),
-        }),
+        infoText: t("OnlyPortalAdminsShown"),
       };
 
   const selectorComponent = isSelectorVisible ? (
@@ -552,9 +553,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
       filter={() => filter(withoutRoleFilter)}
       {...infoProps}
       emptyScreenHeader={t("NotFoundMembers")}
-      emptyScreenDescription={t("Common:PeopleSelectorInfo", {
-        productName: getBrandName("ProductName"),
-      })}
+      emptyScreenDescription={t("Common:PeopleSelectorInfo")}
     />
   ) : null;
 

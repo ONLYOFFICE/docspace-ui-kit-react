@@ -44,3 +44,11 @@
   // }
 }
 
+// Glyphs the widget paints with a theme token through `<Icon color>` — the very
+// prop it drops for component overrides. Carry the token here instead, so a
+// DocSpace shape drawn with `currentColor` matches what the bundled icon would
+// have looked like in both themes.
+.tertiary {
+  color: var(--text-tertiary);
+}
+

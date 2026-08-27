@@ -88,6 +88,7 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
       fetchBalance={fetchBalance}
       fetchTransactionHistory={fetchTransactionHistory}
       walletCustomerStatusNotActive={walletCustomerStatusNotActive}
+      isStripeCheckoutRequired={store.isStripeCheckoutRequired}
       language={language ?? "en"}
       fetchCardLinked={fetchCardLinked}
       walletBalance={walletBalance ?? 0}

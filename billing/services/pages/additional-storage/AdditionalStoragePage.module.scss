@@ -66,6 +66,14 @@
   }
 }
 
+.summaryGridMuted {
+  .cardValue,
+  .cardCaption,
+  .cardAmount * {
+    color: var(--payment-inactive-color);
+  }
+}
+
 .summaryCard {
   display: flex;
   flex-direction: column;
@@ -118,4 +126,58 @@
 
 .unlinkedBanner {
   margin-top: 10px;
+}
+
+.deactivatedBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  box-sizing: border-box;
+  max-width: 660px;
+  margin-top: 4px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 6px;
+  background-color: var(--payment-backgroud-color-warning);
+}
+
+.deactivatedBannerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+
+  svg path {
+    fill: var(--payment-error-color);
+  }
+}
+
+.deactivatedBannerText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.deactivatedTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--payment-error-color);
+}
+
+.deactivatedDescription {
+  font-size: 12px;
+  color: var(--payment-tariff-text);
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  color: var(--payment-error-color);
+  background: color-mix(in srgb, var(--payment-error-color) 12%, transparent);
 }
