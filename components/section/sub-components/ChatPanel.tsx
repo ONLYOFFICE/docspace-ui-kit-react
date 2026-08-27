@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import classNames from "classnames";
 
 import { DeviceType } from "../../../enums";
@@ -42,6 +42,26 @@ import { Text } from "../../text";
 import { ChatPanelProps } from "../Section.types";
 import styles from "../Section.module.scss";
 
+// Resize bounds for the docked panel. The lower bound keeps the chat composer
+// usable; the upper one is derived per drag from how much width the section can
+// give up before its own content (table columns / tiles) stops fitting.
+const MIN_CHAT_PANEL_WIDTH = 360;
+const MIN_SECTION_WIDTH = 416;
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
+// Width of the content the panel sits next to — `#section` in the Section
+// layouts, the preceding sibling for hosts that render the panel on their own
+// (the dashboard). Both the drag bounds and the reflow clamp are derived from
+// it, so the panel never has to know the host's row structure.
+const contentWidth = (panel: HTMLElement) => {
+  const content = document.getElementById("section") ?? panel.previousElementSibling;
+  return content
+    ? content.getBoundingClientRect().width
+    : Number.POSITIVE_INFINITY;
+};
+
 /**
  * Right-side region dedicated to the AI Chat panel. Unlike `InfoPanel` it never
  * switches into the portal-based "Aside" overlay on tablet/mobile: it always
@@ -49,6 +69,11 @@ import styles from "../Section.module.scss";
  * resize) and the full-screen layout on tablet/mobile is handled purely in CSS
  * (`.chatPanel`). Desktop width — windowed vs. full — is driven by the host via
  * the `--chat-panel-width` CSS variable.
+ *
+ * In the docked desktop layout the host can additionally opt into a drag
+ * resizer on the panel's inline-start edge (`isResizable` + `width`/`onResize`).
+ * It is desktop-only on purpose: on tablet/mobile — and in fullscreen — the
+ * panel's width belongs to the layout, not to the user.
  */
 const ChatPanel = ({
   children,
@@ -56,7 +81,16 @@ const ChatPanel = ({
   currentDeviceType,
   setIsVisible,
   dropTargetLabel,
+  isResizable,
+  width,
+  onResize,
 }: ChatPanelProps) => {
+  const panelRef = useRef<HTMLDivElement>(null);
+  // Set while a drag is in flight so an unmount mid-drag still detaches the
+  // window listeners and un-freezes the body cursor. Its presence also marks
+  // "a drag is in progress" for the reflow clamp below.
+  const stopDragRef = useRef<(() => void) | null>(null);
+
   // On tablet/mobile the panel is full-screen, so the browser back button
   // closes it (mirrors InfoPanel). Use addEventListener rather than
   // window.onpopstate so it doesn't clobber InfoPanel's own handler.
@@ -70,15 +104,144 @@ const ChatPanel = ({
     return () => window.removeEventListener("popstate", onPopState);
   }, [currentDeviceType, isVisible, setIsVisible]);
 
+  useEffect(() => () => stopDragRef.current?.(), []);
+
+  const canResize = !!isResizable && currentDeviceType === DeviceType.desktop;
+
+  // Hand the width back to the layout the moment resizing is off (fullscreen,
+  // or a narrower device): a value left over from a previous drag was written
+  // straight to the DOM below, so React's own style diffing cannot clear it.
+  useEffect(() => {
+    if (!canResize) panelRef.current?.style.removeProperty("--chat-panel-width");
+  }, [canResize]);
+
+  // A dragged width is an absolute pixel value on a `flex-shrink: 0` element, so
+  // every later loss of row width (window resize, the article sidebar
+  // expanding) is absorbed by the section alone — far enough and its navigation
+  // header collapses. Give the width back as the row shrinks, down to the
+  // panel's own minimum. Shrink-only: growing the window again leaves the width
+  // the user last chose alone.
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!canResize || !onResize || !panel) return undefined;
+
+    let frame = 0;
+    const clampToRow = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        // A drag already keeps itself inside the same bound, and its live width
+        // lives only in the DOM — correcting it from here would fight the
+        // pointer and snap the panel back to the last committed width.
+        if (stopDragRef.current) return;
+
+        const deficit = MIN_SECTION_WIDTH - contentWidth(panel);
+        // Sub-pixel rounding of the flex row is not a deficit worth acting on.
+        if (deficit < 1) return;
+
+        const current = panel.getBoundingClientRect().width;
+        const next = Math.max(MIN_CHAT_PANEL_WIDTH, Math.round(current - deficit));
+        if (next < current) onResize(next);
+      });
+    };
+
+    const content = document.getElementById("section") ?? panel.previousElementSibling;
+    const observer = new ResizeObserver(clampToRow);
+    if (content) observer.observe(content);
+    // The observer covers in-page layout changes; the window listener covers a
+    // content element swapped out from under it by a route change.
+    window.addEventListener("resize", clampToRow);
+    clampToRow();
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", clampToRow);
+    };
+  }, [canResize, onResize]);
+
+  const onResizerMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const panel = panelRef.current;
+      if (!panel || e.button !== 0) return;
+
+      // Suppress the text selection the drag would otherwise start.
+      e.preventDefault();
+
+      const startX = e.clientX;
+      const startWidth = panel.getBoundingClientRect().width;
+
+      // The handle sits on the panel's inline-start edge, so in LTR moving the
+      // pointer left widens the panel — and the other way round in RTL, where
+      // the whole panel is mirrored to the left of the section.
+      const direction =
+        window.getComputedStyle(panel).direction === "rtl" ? 1 : -1;
+
+      // Grow only into the slack the content next to the panel still has above
+      // its own minimum.
+      const slack = contentWidth(panel) - MIN_SECTION_WIDTH;
+      const maxWidth = Math.max(startWidth, startWidth + slack);
+
+      let nextWidth = startWidth;
+
+      const onMouseMove = (event: MouseEvent) => {
+        nextWidth = Math.round(
+          clamp(
+            startWidth + direction * (event.clientX - startX),
+            MIN_CHAT_PANEL_WIDTH,
+            maxWidth,
+          ),
+        );
+        // Drive the DOM directly while the pointer is down: routing every frame
+        // through the host store would re-render the whole section tree (list,
+        // table header, chat) on each mousemove. The committed value goes to
+        // the store once, on mouse up.
+        panel.style.setProperty("--chat-panel-width", `${nextWidth}px`);
+      };
+
+      const stopDrag = () => {
+        stopDragRef.current = null;
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseup", onMouseUp);
+        document.body.classList.remove(styles.resizingCursor);
+      };
+
+      function onMouseUp() {
+        stopDrag();
+        onResize?.(nextWidth);
+        // Section re-measures itself through a throttled ResizeObserver; nudge
+        // the resize listeners so table columns and tiles settle right away.
+        window.dispatchEvent(new Event("resize"));
+      }
+
+      stopDragRef.current = stopDrag;
+      document.body.classList.add(styles.resizingCursor);
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+    [onResize],
+  );
+
   if (!isVisible) return null;
 
   return (
     <div
-      className={classNames("chat-panel", styles.chatPanel, {
-        [styles.chatPanelDropTarget]: !!dropTargetLabel,
-      })}
+      ref={panelRef}
+      className={classNames("chat-panel", styles.chatPanel)}
       id="ChatPanelWrapper"
+      style={
+        canResize && width
+          ? ({ "--chat-panel-width": `${width}px` } as React.CSSProperties)
+          : undefined
+      }
     >
+      {canResize ? (
+        <div
+          role="presentation"
+          className={classNames(styles.chatPanelResizer, "not-selectable")}
+          onMouseDown={onResizerMouseDown}
+          data-testid="chat-panel-resizer"
+        />
+      ) : null}
       {children}
       {dropTargetLabel ? (
         <div className={styles.chatPanelDropOverlay}>
