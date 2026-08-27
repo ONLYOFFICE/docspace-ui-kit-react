@@ -29,6 +29,11 @@ import { makeAutoObservable } from "mobx";
 export type AiChatRouterPage =
   "chat" | "settings" | "history" | "initial-setup";
 
+// Docked (non-fullscreen) panel width on desktop. Matches the CSS default of
+// `--chat-panel-width` in Section.module.scss: the panel renders at this width
+// until the user drags the resizer, and every open starts from it again.
+export const DEFAULT_CHAT_PANEL_WIDTH = 400;
+
 // Single source of truth for the AI Chat panel UI: visibility + fullscreen
 // + selected agent + mirrors of the upstream router page and profiles
 // presence. Computed getters express every derived UI decision so
@@ -43,6 +48,13 @@ class AiChatStore {
   userFullscreen = false;
 
   currentPage: AiChatRouterPage = "chat";
+
+  // Width of the docked panel in px, driven by the edge resizer. Session-only
+  // by design: it is deliberately not persisted and every open resets it to
+  // `DEFAULT_CHAT_PANEL_WIDTH`, so a fresh panel always has the familiar size.
+  // Ignored in fullscreen and on tablet/mobile, where the panel is not
+  // resizable and its width comes from the layout instead.
+  panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
 
   agentId: number | null = null;
 
@@ -87,6 +99,7 @@ class AiChatStore {
 
   open = (agentId?: number) => {
     if (agentId !== undefined) this.agentId = agentId;
+    if (!this.isVisible) this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
     this.isVisible = true;
   };
 
@@ -95,7 +108,10 @@ class AiChatStore {
   // open chat must not reset it). The thread reset is deferred to
   // AiChatStoresBridge via `pendingNewChat`, so this needs no lib stores.
   openNewChat = () => {
-    if (!this.isVisible) this.pendingNewChat = true;
+    if (!this.isVisible) {
+      this.pendingNewChat = true;
+      this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
+    }
     this.isVisible = true;
   };
 
@@ -107,11 +123,14 @@ class AiChatStore {
     this.agentId = null;
     this.isVisible = false;
     this.userFullscreen = false;
+    this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
   };
 
   toggle = () => {
     this.isVisible = !this.isVisible;
     if (!this.isVisible) this.userFullscreen = false;
+    // Both directions reset: closing clears the drag, opening starts fresh.
+    this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
   };
 
   setAgentId = (agentId: number | null) => {
@@ -128,6 +147,10 @@ class AiChatStore {
 
   setCurrentPage = (page: AiChatRouterPage) => {
     this.currentPage = page;
+  };
+
+  setPanelWidth = (value: number) => {
+    this.panelWidth = value;
   };
 
   setHasProfiles = (value: boolean) => {

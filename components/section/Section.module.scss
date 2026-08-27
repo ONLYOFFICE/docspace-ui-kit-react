@@ -251,6 +251,16 @@
 
   height: 100%;
   width: var(--chat-panel-width-v);
+  // Anchors the edge resizer and the drop overlay.
+  position: relative;
+  // Above the section's own sticky/fixed internals (200-201). The table header
+  // is `position: fixed` with an imperatively set pixel width that only catches
+  // up on a throttled resize, so between the section narrowing and that
+  // recompute it hangs over this panel — most visibly while the edge resizer is
+  // being dragged, but on any width change (info panel, window resize). Sitting
+  // above the section makes the stale header paint behind the panel instead of
+  // across its border and content.
+  z-index: 202;
   // Hold the desktop width firm (400px by default) — as a flex child it would
   // otherwise shrink when the section needs room. The host overrides
   // `--chat-panel-width` to 100vw for fullscreen, where #section is collapsed.
@@ -286,13 +296,44 @@
   }
 }
 
+// Drag handle on the panel's inline-start edge (desktop, docked layout only).
+// It straddles the 1px border so the grab area is comfortable without moving
+// the border itself, and paints the border in the accent colour while hovered
+// or dragged. `inset-block` leaves the panel header grabbable too — the handle
+// spans the full height, matching how the border reads.
+.chatPanelResizer {
+  --chat-panel-resizer-hover-v: var(
+    --chat-panel-resizer-hover-color,
+    var(--accent-main)
+  );
+
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -3px;
+  width: 6px;
+  z-index: 2;
+  cursor: ew-resize;
+  // The visible affordance is the panel border, redrawn on this element so a
+  // hover never shifts layout.
+  border-inline-start: 1px solid transparent;
+
+  &:hover,
+  &:active {
+    border-inline-start-color: var(--chat-panel-resizer-hover-v);
+  }
+}
+
+// Applied to `body` for the duration of a resize drag: keeps the resize cursor
+// while the pointer travels over the section, and stops the drag from selecting
+// text in the list it passes over.
+.resizingCursor {
+  cursor: ew-resize !important;
+  user-select: none !important;
+}
+
 // Drop-target state: the host drags list items over the panel to attach them to
 // the chat composer. The overlay is the only affordance the panel owns — the
 // drag itself is mouse-based and driven entirely by the host.
-.chatPanelDropTarget {
-  position: relative;
-}
-
 .chatPanelDropOverlay {
   --chat-panel-drop-overlay-bg-v: var(
     --chat-panel-drop-overlay-background,

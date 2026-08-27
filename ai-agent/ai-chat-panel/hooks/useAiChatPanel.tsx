@@ -45,6 +45,11 @@ import AiChatPanelBody, {
 export type AiChatPanelBindings = {
   isChatPanelVisible: boolean;
   isChatPanelFullscreen: boolean;
+  // Docked width driven by the panel's edge resizer, and its setter. Session
+  // state: it lives in the store and resets to the default on every open, so
+  // hosts pass it straight to Section without persisting anything.
+  chatPanelWidth: number;
+  setChatPanelWidth: (value: number) => void;
   chatButton: React.ReactNode;
   chatPanelContent: React.ReactNode;
   closeChatPanel: () => void;
@@ -95,6 +100,8 @@ export function useAiChatPanel(
   return {
     isChatPanelVisible: aiChatStore.isVisible,
     isChatPanelFullscreen: aiChatStore.effectiveFullscreen,
+    chatPanelWidth: aiChatStore.panelWidth,
+    setChatPanelWidth: aiChatStore.setPanelWidth,
     chatButton: <AiChatTrigger />,
     chatPanelContent: (
       <>

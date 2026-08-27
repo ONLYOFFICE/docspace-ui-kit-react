@@ -44,6 +44,7 @@ import ClearIcon from "../../../assets/icons/16/clear.react.svg";
 import OpenIcon from "../../../assets/external.link.svg";
 import DropdownIcon from "../../../assets/triangle.down.react.svg";
 import ArrowDownIcon from "../../../assets/icons/16/output-tokens.svg";
+import CodeIcon from "../../../assets/icons/16/code.react.svg";
 
 import styles from "./Icon.module.scss";
 
@@ -61,13 +62,15 @@ const getSize = (size?: number): number | undefined => {
 
 const makeIcon = (
   Svg: FC<SVGProps<SVGSVGElement>>,
+  // Extra class for glyphs that have to carry their own color (see `.tertiary`).
+  colorClassName?: string,
 ): FC<{ size?: number; className?: string }> =>
   function ChatIcon({ size, className }) {
     return (
       <Svg
         width={getSize(size)}
         height={getSize(size)}
-        className={classNames(styles.icon, className)}
+        className={classNames(styles.icon, colorClassName, className)}
       />
     );
   };
@@ -97,4 +100,8 @@ export const imageOverrides: ImageOverrides = {
   "btn-open": makeIcon(OpenIcon),
   arrow: makeIcon(DropdownIcon),
   "dropdown-toggle": makeIcon(ArrowDownIcon),
+  // Tool-call header in the thread. The widget draws its own stroked glyph
+  // colored with `--text-tertiary`; DocSpace has the same `</>` mark, so use it
+  // and reproduce that color through `.tertiary`.
+  code: makeIcon(CodeIcon, styles.tertiary),
 };
