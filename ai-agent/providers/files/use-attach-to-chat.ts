@@ -32,7 +32,7 @@ import { useStores } from "@onlyoffice/ai-chat";
 import { FileType } from "../../../enums";
 
 import { getOnlyofficeFileType } from "./file-type";
-import { attachFilesToChat } from "./attach-files";
+import { attachFilesToChat, selectNewAttachmentIndices } from "./attach-files";
 
 // The subset of a host file/folder view-model the composer needs. Folders are
 // accepted (and skipped) so callers can hand over a raw selection without
@@ -61,6 +61,8 @@ export type AttachToChatResult = {
   attached: number;
   /** Files left out: folders, or everything past `CHAT_ATTACHMENT_LIMIT`. */
   skipped: number;
+  /** Files left out because that host file is already in the composer. */
+  duplicates: number;
 };
 
 /**
@@ -69,8 +71,10 @@ export type AttachToChatResult = {
  * dialog produces. Use it for the shortcuts that bypass the picker: the
  * "Ask AI" context action and the drag-and-drop drop zone.
  *
- * Folders are ignored. The cap is applied here rather than left to the store so
- * the caller learns how many files were dropped and can say so. The promise
+ * Folders are ignored, and so are host files already sitting in the composer
+ * — the result reports those separately as `duplicates`. The cap is applied
+ * here rather than left to the store so the caller learns how many files were
+ * dropped and can say so. The promise
  * resolves once the AI backend has echoed the attachment records back (rejects
  * if that round-trip fails, so callers own the error toast).
  */
@@ -79,14 +83,22 @@ export const useAttachHostFilesToChat = () => {
 
   return React.useCallback(
     async (items: ChatAttachableItem[]): Promise<AttachToChatResult> => {
-      const files = items.filter((item) => !item.isFolder);
+      const allFiles = items.filter((item) => !item.isFolder);
 
-      const inputsAll = files.map((file) => ({
+      const picked = allFiles.map((file) => ({
         path: String(file.id),
         title: file.title,
         type: getOnlyofficeFileType(file.fileExst || file.title),
         content: "",
       }));
+
+      // The shortcuts have no picker to gray out what is already attached, so
+      // a second "Ask AI" (or re-drop) on the same file must be a no-op rather
+      // than a duplicate chip.
+      const newIndices = selectNewAttachmentIndices(useAttachmentsStore, picked);
+      const duplicates = picked.length - newIndices.length;
+      const files = newIndices.map((i) => allFiles[i]);
+      const inputsAll = newIndices.map((i) => picked[i]);
 
       // The store owns the cap: the reservation counts the refs already
       // attached *and* the loading chips of uploads still in flight, which
@@ -103,9 +115,11 @@ export const useAttachHostFilesToChat = () => {
           })),
         );
       const inputs = inputsAll.slice(0, pendingIds.length);
-      const skipped = items.length - inputs.length;
+      // Duplicates are reported on their own, so they must not read as
+      // "the limit was reached" to the caller that toasts about `skipped`.
+      const skipped = items.length - inputs.length - duplicates;
 
-      if (inputs.length === 0) return { attached: 0, skipped };
+      if (inputs.length === 0) return { attached: 0, skipped, duplicates };
 
       const imageIndices = new Set<number>();
       files.slice(0, inputs.length).forEach((file, i) => {
@@ -126,7 +140,7 @@ export const useAttachHostFilesToChat = () => {
         throw err;
       }
 
-      return { attached: inputs.length, skipped };
+      return { attached: inputs.length, skipped, duplicates };
     },
     [useAttachmentsStore],
   );

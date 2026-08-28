@@ -38,7 +38,11 @@ import { toastr, type TData } from "../../../components/toast";
 import useGetIcon from "../../hooks/useGetIcon";
 
 import { getOnlyofficeFileType } from "./file-type";
-import { attachFilesToChat, type OnFilesAttached } from "./attach-files";
+import {
+  attachFilesToChat,
+  selectNewAttachmentIndices,
+  type OnFilesAttached,
+} from "./attach-files";
 import useDeviceType from "./use-device-type";
 
 type AttachDialogProps = {
@@ -107,16 +111,26 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
               ]
             : [];
 
-      const inputs = sources.map((s) => ({
+      const picked = sources.map((s) => ({
         path: String(s.id),
         title: s.fileExst ? `${s.title}${s.fileExst}` : s.title,
         type: getOnlyofficeFileType(s.fileExst || s.title),
         content: "",
       }));
 
+      // A file already in the composer must not get a second chip: the
+      // dialog can be reopened with the same pick, and the picker itself
+      // knows nothing about what is attached.
+      const newIndices = selectNewAttachmentIndices(
+        useAttachmentsStore,
+        picked,
+      );
+      const inputs = newIndices.map((i) => picked[i]);
+      const duplicates = picked.length - inputs.length;
+
       const imageIndices = new Set<number>();
-      sources.forEach((s, i) => {
-        if (s.fileType === FileType.Image) imageIndices.add(i);
+      newIndices.forEach((source, i) => {
+        if (sources[source].fileType === FileType.Image) imageIndices.add(i);
       });
 
       // Reserve the loading chips before closing so they are already in the
@@ -134,6 +148,21 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
       const accepted = inputs.slice(0, pendingIds.length);
 
       onClose();
+      // Say why a pick produced no chip — otherwise the file just seems to
+      // vanish. Reported after the dialog closes so the toast is not covered.
+      if (duplicates > 0) {
+        toastr.info(
+          duplicates === 1
+            ? t("Common:AttachFilesAlreadyAttached_one", {
+                count: duplicates,
+                defaultValue: "This file is already attached",
+              })
+            : t("Common:AttachFilesAlreadyAttached_other", {
+                count: duplicates,
+                defaultValue: "{{count}} files are already attached",
+              }),
+        );
+      }
       if (accepted.length === 0) return;
 
       try {
@@ -150,7 +179,7 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
         toastr.error(e as TData);
       }
     },
-    [onClose, onFilesAttached, useAttachmentsStore],
+    [onClose, onFilesAttached, useAttachmentsStore, t],
   );
 
   const getIsDisabled = React.useCallback<

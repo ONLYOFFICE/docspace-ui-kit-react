@@ -27,6 +27,7 @@
 export { getOnlyofficeFileType } from "./file-type";
 export {
   attachFilesToChat,
+  selectNewAttachmentIndices,
   type AttachFileInput,
   type AttachedFileInfo,
   type OnFilesAttached,

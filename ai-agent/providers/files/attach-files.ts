@@ -28,6 +28,18 @@ import { useStores } from "@onlyoffice/ai-chat";
 
 type AttachmentsStore = ReturnType<typeof useStores>["useAttachmentsStore"];
 
+/**
+ * The slice of the attachments store the duplicate check reads. Structural
+ * on purpose: the real store satisfies it, and a caller (or a test) can hand
+ * over anything that can list the current refs.
+ */
+type AttachedRefsSource = {
+  getState: () => Pick<
+    ReturnType<AttachmentsStore["getState"]>,
+    "attachmentFiles" | "attachmentImages"
+  >;
+};
+
 export type AttachFileInput = {
   // Host entryId; the AI backend resolves the record server-side.
   path: string;
@@ -132,4 +144,57 @@ export const attachFilesToChat = async (
   });
 
   return attached;
+};
+
+/**
+ * The host entry id an attached ref came from.
+ *
+ * We send the bare entry id as `AttachFileInput.path`, but what comes back
+ * on the ref is `${entryId}/${title}` — the AI backend composes it that way
+ * so the widget's history chip can render the file name via `basename(path)`.
+ * Take the first segment back, exactly as the backend does when it matches a
+ * response to its request.
+ */
+const toEntryId = (path: string): string => path.split("/", 1)[0] ?? path;
+
+/**
+ * Host entry ids already present in the composer — files and images alike,
+ * since images are re-keyed out of `attachmentFiles` once they settle.
+ */
+const getAttachedEntryIds = (
+  useAttachmentsStore: AttachedRefsSource,
+): Set<string> => {
+  const { attachmentFiles, attachmentImages } = useAttachmentsStore.getState();
+  return new Set(
+    [...attachmentFiles, ...attachmentImages]
+      .map((ref) => ref.path)
+      .filter((path): path is string => !!path)
+      .map(toEntryId),
+  );
+};
+
+/**
+ * Positions of `inputs` that are not attached yet, in input order — drops
+ * host files already sitting in the composer and collapses repeats inside
+ * the batch itself. Call it *before* `beginPendingAttachments` so duplicates
+ * never take a cap slot and never produce a loading chip.
+ *
+ * Known bounded gap: a loading chip ({@link TPendingAttachment}) carries no
+ * host path, so a second pick of the same file while the first one is still
+ * in flight is not caught. Closing it needs a `path` on the placeholder — a
+ * library follow-up.
+ */
+export const selectNewAttachmentIndices = (
+  useAttachmentsStore: AttachedRefsSource,
+  inputs: AttachFileInput[],
+): number[] => {
+  const seen = getAttachedEntryIds(useAttachmentsStore);
+  const kept: number[] = [];
+  inputs.forEach((input, index) => {
+    const entryId = toEntryId(input.path);
+    if (seen.has(entryId)) return;
+    seen.add(entryId);
+    kept.push(index);
+  });
+  return kept;
 };
