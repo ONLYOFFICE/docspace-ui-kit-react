@@ -28,6 +28,8 @@ import type { TFunction } from "i18next";
 
 import { toastr } from "../../../components/toast";
 
+import { CHAT_ATTACHMENT_LIMIT } from "./limits";
+
 /**
  * A pick that produced no chip must not look like the action did nothing.
  * Both reasons are silent by design in the stores — the duplicate filter
@@ -59,13 +61,21 @@ export const notifyAlreadyAttached = (t: TFunction, count: number) => {
   );
 };
 
-/** `count` host files were left out because the composer is full. */
+/**
+ * `count` host files were left out because the composer is full.
+ *
+ * The copy states the rule rather than the number: what the user cannot see
+ * is the cap, while the chips already show how many made it. It also keeps
+ * the message free of `{{count}}` — with the locale scanner forcing literal
+ * plural keys, any counted wording would read wrong for 2-4 items in the
+ * Slavic locales.
+ */
 export const notifyAttachmentLimit = (t: TFunction, count: number) => {
   if (count <= 0) return;
   toastr.warning(
-    t("Common:ChatAttachmentLimitReached", {
-      count,
-      defaultValue: "Files skipped — attachment limit reached: {{count}}",
+    t("Common:AttachFilesLimit", {
+      limit: CHAT_ATTACHMENT_LIMIT,
+      defaultValue: "You can attach up to {{limit}} files",
     }),
   );
 };

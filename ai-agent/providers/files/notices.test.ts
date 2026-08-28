@@ -40,8 +40,8 @@ import { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
 
 // Stand-in for i18next: echo the key so the assertions can name it, and keep
 // the interpolation values for the plural checks.
-const t = ((key: string, options?: { count?: number }) =>
-  `${key}:${options?.count}`) as unknown as Parameters<
+const t = ((key: string, options?: { count?: number; limit?: number }) =>
+  `${key}:${options?.count ?? options?.limit}`) as unknown as Parameters<
   typeof notifyAlreadyAttached
 >[0];
 
@@ -79,8 +79,8 @@ describe("attachment notices", () => {
     );
   });
 
-  it("warns once about the attachment cap", () => {
+  it("warns about the cap by quoting the rule, not the count", () => {
     notifyAttachmentLimit(t, 2);
-    expect(warning).toHaveBeenCalledWith("Common:ChatAttachmentLimitReached:2");
+    expect(warning).toHaveBeenCalledWith("Common:AttachFilesLimit:5");
   });
 });

@@ -49,13 +49,7 @@ export type ChatAttachableItem = {
   isFolder?: boolean;
 };
 
-/**
- * Composer attachment cap. Mirrors `ATTACHMENT_LIMIT` in the widget's
- * attachments store. The store's `beginPendingAttachments` is the actual
- * enforcement point (it also counts uploads still in flight); this constant
- * exists for user-facing copy that quotes the number.
- */
-export const CHAT_ATTACHMENT_LIMIT = 5;
+export { CHAT_ATTACHMENT_LIMIT } from "./limits";
 
 export type AttachToChatResult = {
   attached: number;
