@@ -99,8 +99,15 @@ export const rememberAttachedPaths = (
  * `basename(path)` renders the file name (it splits on "/" for its own entry
  * lookups too). The host sends the bare entry id. Both forms have to reduce to
  * the same key, or the same file attaches again.
+ *
+ * That composition is the backend's convention, not a contract this repo can
+ * enforce, so be forgiving about the shapes around it — a leading slash must
+ * not turn into an empty key that matches nothing.
  */
-const entryIdOf = (path: string) => path.split("/", 1)[0] || path;
+const entryIdOf = (path: string) => {
+  const trimmed = path.replace(/^\/+/, "");
+  return trimmed.split("/", 1)[0] || trimmed;
+};
 
 /**
  * Host entry ids already spoken for in the current draft: the refs standing in

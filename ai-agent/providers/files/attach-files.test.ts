@@ -118,6 +118,23 @@ describe("attachFilesToChat duplicates", () => {
     expect(addAttachmentFile).not.toHaveBeenCalled();
   });
 
+  it("matches a path that picked up a leading slash", async () => {
+    // The composition is the backend's convention, not a contract this repo
+    // enforces — a stray leading slash must not reduce to an empty key.
+    const { store, addAttachmentFile } = makeStore([
+      {
+        id: "att-0",
+        title: "New document.docx",
+        kind: "file",
+        path: "/11/New document.docx",
+      },
+    ]);
+
+    await attachFilesToChat(asStore(store), [input("11")], new Set());
+
+    expect(addAttachmentFile).not.toHaveBeenCalled();
+  });
+
   it("falls back to the remembered path when the record echoes none", async () => {
     const attachmentFiles: Ref[] = [];
     const { store, addAttachmentFile } = makeStore(attachmentFiles);

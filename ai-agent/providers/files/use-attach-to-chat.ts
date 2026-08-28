@@ -34,6 +34,7 @@ import { FileType } from "../../../enums";
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat } from "./attach-files";
 import { splitDuplicateAttachments } from "./duplicate-attachments";
+import { reserveAttachmentChips } from "./limits";
 import { hasFormResults } from "./form-attachments";
 
 // The subset of a host file/folder view-model the composer needs. Folders are
@@ -56,19 +57,21 @@ export type ChatAttachableItem = {
   externalDbTableName?: string | null;
 };
 
-/**
- * Composer attachment cap. Mirrors `ATTACHMENT_LIMIT` in the widget's
- * attachments store. The store's `beginPendingAttachments` is the actual
- * enforcement point (it also counts uploads still in flight); this constant
- * exists for user-facing copy that quotes the number.
- */
-export const CHAT_ATTACHMENT_LIMIT = 5;
 
+/**
+ * Why each item did not end up on the message. Every reason is counted
+ * apart: they read differently to the user, and a caller that lumps them
+ * together ends up telling someone who dropped a folder that the attachment
+ * limit is full. `attached + duplicates + skippedFolders + skippedOverLimit`
+ * always equals the number of items handed in.
+ */
 export type AttachToChatResult = {
   attached: number;
-  /** Files left out: folders, or everything past `CHAT_ATTACHMENT_LIMIT`. */
-  skipped: number;
-  /** Files already attached to the message — counted apart from `skipped`. */
+  /** Folders — the composer takes files only. */
+  skippedFolders: number;
+  /** Files past `CHAT_ATTACHMENT_LIMIT`: the composer had no room left. */
+  skippedOverLimit: number;
+  /** Files already attached to the message — one chip per entryId. */
   duplicates: number;
 };
 
@@ -79,11 +82,12 @@ export type AttachToChatResult = {
  * "Ask AI" context action and the drag-and-drop drop zone.
  *
  * Folders are ignored, and so are files already attached to the message — one
- * chip per entryId — which come back as `duplicates`. The cap is applied here
- * rather than left to the store so the caller learns how many files were
- * dropped and can say so. The promise resolves once the AI backend has echoed
- * the attachment records back (rejects if that round-trip fails, so callers
- * own the error toast).
+ * chip per entryId. The cap is applied here rather than left to the store so
+ * the caller learns what was dropped and why: the result counts each reason
+ * separately (see {@link AttachToChatResult}), so a caller can hand a raw
+ * selection over and still say the right thing. The promise resolves once the
+ * AI backend has echoed the attachment records back (rejects if that
+ * round-trip fails, so callers own the error toast).
  */
 export const useAttachHostFilesToChat = () => {
   const { useAttachmentsStore } = useStores();
@@ -91,6 +95,7 @@ export const useAttachHostFilesToChat = () => {
   return React.useCallback(
     async (items: ChatAttachableItem[]): Promise<AttachToChatResult> => {
       const notFolders = items.filter((item) => !item.isFolder);
+      const skippedFolders = items.length - notFolders.length;
 
       // A file goes on a message once. Drop the repeats before reserving
       // chips, so a duplicate never flashes a loading chip and the counts
@@ -115,19 +120,20 @@ export const useAttachHostFilesToChat = () => {
       // a local free-slot computation could not see. Everything reserves
       // `kind: "file"` because images are re-keyed out of `attachmentFiles`
       // only after the attach (see attachFilesToChat).
-      const pendingIds = useAttachmentsStore
-        .getState()
-        .beginPendingAttachments(
-          inputsAll.map((input) => ({
-            title: input.title,
-            kind: "file" as const,
-            type: input.type,
-          })),
-        );
+      const pendingIds = reserveAttachmentChips(
+        useAttachmentsStore,
+        inputsAll.map((input) => ({
+          title: input.title,
+          kind: "file" as const,
+          type: input.type,
+        })),
+      );
       const inputs = inputsAll.slice(0, pendingIds.length);
-      const skipped = items.length - inputs.length - duplicates;
+      // The reservation is the cap: whatever it refused had no room.
+      const skippedOverLimit = inputsAll.length - inputs.length;
+      const counts = { skippedFolders, skippedOverLimit, duplicates };
 
-      if (inputs.length === 0) return { attached: 0, skipped, duplicates };
+      if (inputs.length === 0) return { attached: 0, ...counts };
 
       const imageIndices = new Set<number>();
       files.slice(0, inputs.length).forEach((file, i) => {
@@ -148,7 +154,7 @@ export const useAttachHostFilesToChat = () => {
         throw err;
       }
 
-      return { attached: inputs.length, skipped, duplicates };
+      return { attached: inputs.length, ...counts };
     },
     [useAttachmentsStore],
   );
