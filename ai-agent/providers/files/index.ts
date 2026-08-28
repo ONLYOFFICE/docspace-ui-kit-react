@@ -25,9 +25,11 @@
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
 export { getOnlyofficeFileType } from "./file-type";
+// `selectNewAttachmentIndices` stays internal on purpose: `attachFilesToChat`
+// applies it itself for callers that did not reserve leases, so a host never
+// has to remember the duplicate check.
 export {
   attachFilesToChat,
-  selectNewAttachmentIndices,
   type AttachFileInput,
   type AttachedFileInfo,
   type OnFilesAttached,
