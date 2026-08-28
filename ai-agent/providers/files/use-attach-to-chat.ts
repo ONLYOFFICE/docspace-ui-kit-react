@@ -34,7 +34,7 @@ import { FileType } from "../../../enums";
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat } from "./attach-files";
 import { splitDuplicateAttachments } from "./duplicate-attachments";
-import { warnOnAttachmentLimitDrift } from "./limits";
+import { reserveAttachmentChips } from "./limits";
 import { hasFormResults } from "./form-attachments";
 
 // The subset of a host file/folder view-model the composer needs. Folders are
@@ -110,21 +110,15 @@ export const useAttachHostFilesToChat = () => {
       // a local free-slot computation could not see. Everything reserves
       // `kind: "file"` because images are re-keyed out of `attachmentFiles`
       // only after the attach (see attachFilesToChat).
-      const pendingIds = useAttachmentsStore
-        .getState()
-        .beginPendingAttachments(
-          inputsAll.map((input) => ({
-            title: input.title,
-            kind: "file" as const,
-            type: input.type,
-          })),
-        );
+      const pendingIds = reserveAttachmentChips(
+        useAttachmentsStore,
+        inputsAll.map((input) => ({
+          title: input.title,
+          kind: "file" as const,
+          type: input.type,
+        })),
+      );
       const inputs = inputsAll.slice(0, pendingIds.length);
-      if (pendingIds.length < inputsAll.length) {
-        // The reservation was truncated, so the store just told us the real
-        // cap — check it still matches the number the toast quotes.
-        warnOnAttachmentLimitDrift(useAttachmentsStore.getState());
-      }
       const skipped = items.length - inputs.length - duplicates;
 
       if (inputs.length === 0) return { attached: 0, skipped, duplicates };

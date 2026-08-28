@@ -52,11 +52,14 @@ const beginPendingAttachments = vi.fn((inputs: { title: string }[]): string[] =>
 );
 const failPendingAttachments = vi.fn();
 
+// `pendingAttachments` is what the cap-drift check reads back off the store
+// when a reservation comes back short (see limits.reserveAttachmentChips).
 const makeStore = () => ({
   getState: () => ({
     beginPendingAttachments,
     failPendingAttachments,
     attachmentFiles: [],
+    pendingAttachments: [] as { kind: "file" | "image" }[],
   }),
 });
 
@@ -102,6 +105,10 @@ const makeFile = (name: string, content = "data", type = "text/plain") =>
 beforeEach(() => {
   vi.clearAllMocks();
   mockToastWarning.mockClear();
+  // The fake store enforces whatever a test tells it to, so a truncated
+  // reservation legitimately reports cap drift here. Silence it: the check
+  // has its own test in use-attach-to-chat.test.ts.
+  vi.spyOn(console, "warn").mockImplementation(() => {});
   nextLease = 0;
   nextFileId = 0;
 });

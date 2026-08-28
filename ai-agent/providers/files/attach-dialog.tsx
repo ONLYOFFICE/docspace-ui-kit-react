@@ -42,6 +42,7 @@ import { attachFilesToChat, type OnFilesAttached } from "./attach-files";
 import { splitDuplicateAttachments } from "./duplicate-attachments";
 import { hasFormResults } from "./form-attachments";
 import { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
+import { reserveAttachmentChips } from "./limits";
 import useDeviceType from "./use-device-type";
 
 type AttachDialogProps = {
@@ -142,15 +143,14 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
       // Reserve the loading chips before closing so they are already in the
       // composer when the dialog disappears; the reservation also applies
       // the attachment cap (extra picks simply get no chip).
-      const pendingIds = useAttachmentsStore
-        .getState()
-        .beginPendingAttachments(
-          inputs.map((input) => ({
-            title: input.title,
-            kind: "file" as const,
-            type: input.type,
-          })),
-        );
+      const pendingIds = reserveAttachmentChips(
+        useAttachmentsStore,
+        inputs.map((input) => ({
+          title: input.title,
+          kind: "file" as const,
+          type: input.type,
+        })),
+      );
       const accepted = inputs.slice(0, pendingIds.length);
 
       onClose();

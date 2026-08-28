@@ -37,6 +37,7 @@ import {
   type OnFilesAttached,
 } from "./attach-files";
 import { notifyAttachmentLimit } from "./notices";
+import { reserveAttachmentChips } from "./limits";
 
 type AttachmentsStore = ReturnType<typeof useStores>["useAttachmentsStore"];
 
@@ -138,7 +139,8 @@ export const uploadFilesToChat = async (
   // slicing the files to the accepted count.
   // Images reserve `kind: "file"` on purpose: they settle through
   // `addAttachmentFile` and are re-keyed to images afterwards.
-  const pendingIds = useAttachmentsStore.getState().beginPendingAttachments(
+  const pendingIds = reserveAttachmentChips(
+    useAttachmentsStore,
     picked.map((f) => ({
       title: f.name,
       kind: "file" as const,

@@ -62,7 +62,7 @@ const readEnforcedFileLimit = (state: {
  * ticket. Call it only after a reservation that was truncated.
  */
 let driftReported = false;
-export const warnOnAttachmentLimitDrift = (state: {
+const warnOnAttachmentLimitDrift = (state: {
   attachmentFiles: unknown[];
   pendingAttachments: { kind: "file" | "image" }[];
 }) => {
@@ -75,4 +75,45 @@ export const warnOnAttachmentLimitDrift = (state: {
       `CHAT_ATTACHMENT_LIMIT says ${CHAT_ATTACHMENT_LIMIT}. The cap toast ` +
       `is quoting the wrong number — update limits.ts.`,
   );
+};
+
+/** What a loading-chip reservation asks for. */
+type PendingInput = {
+  title: string;
+  kind: "file" | "image";
+  type?: number;
+};
+
+type ReservableStore = {
+  getState: () => {
+    attachmentFiles: unknown[];
+    pendingAttachments: { kind: "file" | "image" }[];
+    beginPendingAttachments: (inputs: PendingInput[]) => string[];
+  };
+};
+
+/**
+ * Reserve loading chips, and check the cap the store enforced while we are
+ * standing on the one moment that reveals it.
+ *
+ * Every attach path reserves before it uploads, and each of them quotes
+ * {@link CHAT_ATTACHMENT_LIMIT} back to the user when the reservation comes
+ * back short. Going through here means the check cannot be forgotten at a new
+ * call site — which is the only way this kind of guard stays true.
+ *
+ * Returns the accepted leases, in input order, exactly as
+ * `beginPendingAttachments` does: fewer ids than inputs means the tail was
+ * refused for lack of room.
+ */
+export const reserveAttachmentChips = (
+  useAttachmentsStore: ReservableStore,
+  inputs: PendingInput[],
+): string[] => {
+  const pendingIds = useAttachmentsStore
+    .getState()
+    .beginPendingAttachments(inputs);
+  if (pendingIds.length < inputs.length) {
+    warnOnAttachmentLimitDrift(useAttachmentsStore.getState());
+  }
+  return pendingIds;
 };
