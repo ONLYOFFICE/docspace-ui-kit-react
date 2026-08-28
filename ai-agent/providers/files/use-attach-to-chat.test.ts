@@ -93,28 +93,39 @@ describe("useAttachHostFilesToChat accounting", () => {
   it("counts nothing when every file is new", async () => {
     expect(await attach([file(1), file(2)])).toEqual({
       attached: 2,
-      skipped: 0,
+      skippedFolders: 0,
+      skippedOverLimit: 0,
       duplicates: 0,
     });
   });
 
-  it("reports folders as skipped, not as duplicates", async () => {
+  it("counts a folder as a folder, not as a duplicate or a cap skip", async () => {
     const result = await attach([
       { id: 1, title: "folder", isFolder: true },
       file(2),
     ]);
-    expect(result).toEqual({ attached: 1, skipped: 1, duplicates: 0 });
+    expect(result).toEqual({
+      attached: 1,
+      skippedFolders: 1,
+      skippedOverLimit: 0,
+      duplicates: 0,
+    });
   });
 
   it("counts an already-attached file as a duplicate", async () => {
     storeState.attachmentFiles = [attachedRef("2")];
     const result = await attach([file(2)]);
-    expect(result).toEqual({ attached: 0, skipped: 0, duplicates: 1 });
+    expect(result).toEqual({
+      attached: 0,
+      skippedFolders: 0,
+      skippedOverLimit: 0,
+      duplicates: 1,
+    });
     // Nothing to attach: the round trip must not run at all.
     expect(attachFilesToChat).not.toHaveBeenCalled();
   });
 
-  it("keeps the two reasons apart in one batch", async () => {
+  it("keeps every reason apart in one batch", async () => {
     // 1 folder + 1 duplicate + 3 new, but the composer holds 3 of the 5
     // slots already (one of them the duplicate), so only 2 get through.
     storeState.attachmentFiles = [
@@ -130,7 +141,12 @@ describe("useAttachHostFilesToChat accounting", () => {
       file(4),
       file(5),
     ]);
-    expect(result).toEqual({ attached: 2, skipped: 2, duplicates: 1 });
+    expect(result).toEqual({
+      attached: 2,
+      skippedFolders: 1,
+      skippedOverLimit: 1,
+      duplicates: 1,
+    });
   });
 
   // `CHAT_ATTACHMENT_LIMIT` is a hand-kept copy of a cap that lives inside
@@ -153,7 +169,8 @@ describe("useAttachHostFilesToChat accounting", () => {
     storeState.attachmentImages = [{ ...attachedRef("7"), kind: "image" }];
     expect(await attach([file(7)])).toEqual({
       attached: 0,
-      skipped: 0,
+      skippedFolders: 0,
+      skippedOverLimit: 0,
       duplicates: 1,
     });
   });

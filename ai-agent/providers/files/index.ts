@@ -36,10 +36,10 @@ export {
 export { useHasFormAttached } from "./use-has-form-attached";
 export {
   useAttachHostFilesToChat,
-  CHAT_ATTACHMENT_LIMIT,
   type ChatAttachableItem,
   type AttachToChatResult,
 } from "./use-attach-to-chat";
+export { CHAT_ATTACHMENT_LIMIT } from "./limits";
 export {
   useFilesIntegration,
   type FilesIntegration,
