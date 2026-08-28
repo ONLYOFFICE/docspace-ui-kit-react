@@ -575,6 +575,7 @@ export type TSelectorItemFile = MergeTypes<
     fileExst: string;
     fileType: FileType;
     isForm?: boolean;
+    externalDbTableName?: string | null;
     parentId: string | number;
     rootFolderType: string | number;
     security: FileEntryDtoIntegerAllOfSecurity;

@@ -24,96 +24,256 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  selectNewAttachmentIndices,
-  type AttachFileInput,
-} from "./attach-files";
+import { attachFilesToChat } from "./attach-files";
+import { getFormRegistry, hasFormResults } from "./form-attachments";
 
-type Ref = { id: string; title: string; kind: "file" | "image"; path?: string };
+// ---------------------------------------------------------------------------
+// Fake attachments store: the refs the dedupe reads, plus the lease surface.
+// A ref lands in `attachmentFiles` the moment `addAttachmentFile` resolves,
+// exactly as the real store does.
+// ---------------------------------------------------------------------------
 
-const makeStore = (attachmentFiles: Ref[], attachmentImages: Ref[] = []) => ({
-  getState: () => ({ attachmentFiles, attachmentImages }),
-});
+type Ref = { id: string; title: string; kind: "file"; path?: string };
 
-const input = (path: string): AttachFileInput => ({
+const makeStore = (attachmentFiles: Ref[] = []) => {
+  const failPendingAttachments = vi.fn();
+  let nextId = 0;
+  const addAttachmentFile = vi.fn(
+    async (
+      inputs: { path: string; title: string }[],
+      _options?: { pendingIds?: string[] },
+    ) => {
+      const records = inputs.map((input) => ({
+        id: `att-${++nextId}`,
+        title: input.title,
+        kind: "file" as const,
+        path: input.path,
+      }));
+      attachmentFiles.push(...records);
+      return records;
+    },
+  );
+
+  const store = {
+    getState: () => ({
+      attachmentFiles,
+      attachmentImages: [] as Ref[],
+      addAttachmentFile,
+      failPendingAttachments,
+    }),
+    setState: vi.fn(),
+  };
+
+  return { store, addAttachmentFile, failPendingAttachments, attachmentFiles };
+};
+
+const input = (path: string, hasFormResults = false) => ({
   path,
-  title: `file-${path}.docx`,
-  type: 1,
+  title: hasFormResults ? `${path}.pdf` : `${path}.docx`,
+  type: 7,
   content: "",
+  hasFormResults,
 });
 
-// The backend composes the ref path as `${entryId}/${title}` so the history
-// chip can render the file name from it — refs never carry the bare entry id.
-const ref = (
-  id: string,
-  entryId: string,
-  kind: "file" | "image" = "file",
-): Ref => ({
-  id,
-  title: `file-${entryId}.docx`,
-  kind,
-  path: `${entryId}/file-${entryId}.docx`,
+// The helper is typed against the widget's store; the fake carries only the
+// slice it touches.
+const asStore = (store: unknown) =>
+  store as Parameters<typeof attachFilesToChat>[0];
+
+describe("attachFilesToChat duplicates", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("drops a file already attached to the message", async () => {
+    const { store, addAttachmentFile } = makeStore([
+      { id: "att-0", title: "a.docx", kind: "file", path: "11" },
+    ]);
+
+    const attached = await attachFilesToChat(
+      asStore(store),
+      [input("11"), input("22")],
+      new Set(),
+    );
+
+    expect(addAttachmentFile).toHaveBeenCalledTimes(1);
+    expect(addAttachmentFile.mock.calls[0][0]).toEqual([input("22")]);
+    expect(attached).toHaveLength(1);
+  });
+
+  it("matches the `entryId/title` path the backend echoes back", async () => {
+    // dtoToAttachment composes path as `${entryId}/${title}`, while the host
+    // sends the bare entry id.
+    const { store, addAttachmentFile } = makeStore([
+      {
+        id: "att-0",
+        title: "New document.docx",
+        kind: "file",
+        path: "11/New document.docx",
+      },
+    ]);
+
+    await attachFilesToChat(asStore(store), [input("11")], new Set());
+
+    expect(addAttachmentFile).not.toHaveBeenCalled();
+  });
+
+  it("matches a path that picked up a leading slash", async () => {
+    // The composition is the backend's convention, not a contract this repo
+    // enforces — a stray leading slash must not reduce to an empty key.
+    const { store, addAttachmentFile } = makeStore([
+      {
+        id: "att-0",
+        title: "New document.docx",
+        kind: "file",
+        path: "/11/New document.docx",
+      },
+    ]);
+
+    await attachFilesToChat(asStore(store), [input("11")], new Set());
+
+    expect(addAttachmentFile).not.toHaveBeenCalled();
+  });
+
+  it("falls back to the remembered path when the record echoes none", async () => {
+    const attachmentFiles: Ref[] = [];
+    const { store, addAttachmentFile } = makeStore(attachmentFiles);
+    // The first attach lands a ref the backend returned without a path.
+    await attachFilesToChat(asStore(store), [input("11")], new Set());
+    attachmentFiles.forEach((ref) => {
+      ref.path = undefined;
+    });
+
+    await attachFilesToChat(asStore(store), [input("11")], new Set());
+
+    expect(addAttachmentFile).toHaveBeenCalledTimes(1);
+  });
+
+  it("attaches a file repeated inside one batch only once", async () => {
+    const { store, addAttachmentFile } = makeStore();
+
+    await attachFilesToChat(
+      asStore(store),
+      [input("11"), input("11"), input("22")],
+      new Set(),
+    );
+
+    expect(addAttachmentFile.mock.calls[0][0]).toEqual([
+      input("11"),
+      input("22"),
+    ]);
+  });
+
+  it("releases the loading chips of the dropped duplicates", async () => {
+    const { store, failPendingAttachments, addAttachmentFile } = makeStore([
+      { id: "att-0", title: "a.docx", kind: "file", path: "11" },
+    ]);
+
+    await attachFilesToChat(
+      asStore(store),
+      [input("11"), input("22")],
+      new Set(),
+      ["pnd-1", "pnd-2"],
+    );
+
+    expect(failPendingAttachments).toHaveBeenCalledWith(["pnd-1"]);
+    // The surviving input keeps its own lease, not the duplicate's.
+    expect(addAttachmentFile.mock.calls[0][1]).toEqual({
+      pendingIds: ["pnd-2"],
+    });
+  });
+
+  it("keeps the image flags aligned after dropping a duplicate", async () => {
+    const { store } = makeStore([
+      { id: "att-0", title: "a.docx", kind: "file", path: "11" },
+    ]);
+
+    // Inputs: [11 (duplicate), 22, 33 (image)] -> after the drop the image
+    // sits at index 1, so only the second record must be re-keyed.
+    const attached = await attachFilesToChat(
+      asStore(store),
+      [input("11"), input("22"), input("33")],
+      new Set([2]),
+    );
+
+    expect(attached.map((a) => a.id)).toEqual(["att-1"]);
+    expect(store.setState).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not attach the same file twice while the first attach is in flight", async () => {
+    const { store, addAttachmentFile } = makeStore();
+
+    const first = attachFilesToChat(asStore(store), [input("11")], new Set());
+    const second = attachFilesToChat(asStore(store), [input("11")], new Set());
+
+    await Promise.all([first, second]);
+
+    expect(addAttachmentFile).toHaveBeenCalledTimes(1);
+  });
+
+  it("frees the path again when the attach fails", async () => {
+    const attachmentFiles: Ref[] = [];
+    const { store } = makeStore(attachmentFiles);
+    const failing = {
+      ...store,
+      getState: () => ({
+        ...store.getState(),
+        addAttachmentFile: vi.fn(async () => {
+          throw new Error("network");
+        }),
+      }),
+    };
+
+    await expect(
+      attachFilesToChat(asStore(failing), [input("11")], new Set()),
+    ).rejects.toThrow("network");
+
+    // A retry of the same file must not be mistaken for a duplicate.
+    await attachFilesToChat(asStore(store), [input("11")], new Set());
+    expect(attachmentFiles.map((f) => f.path)).toEqual(["11"]);
+  });
 });
 
-describe("selectNewAttachmentIndices", () => {
-  it("keeps everything when the composer is empty", () => {
-    const store = makeStore([]);
-    const kept = selectNewAttachmentIndices(store, [input("1"), input("2")]);
-    expect(kept).toEqual([0, 1]);
-  });
+describe("attachFilesToChat form flags", () => {
+  beforeEach(() => vi.clearAllMocks());
 
-  it("drops host files already attached as files", () => {
-    const store = makeStore([ref("a", "2")]);
+  it("remembers which refs came from a form with a results table", async () => {
+    const { store } = makeStore();
+
+    await attachFilesToChat(
+      asStore(store),
+      [input("11"), input("22", true)],
+      new Set(),
+    );
+
+    // Ids are assigned in input order by the fake store.
+    const registry = getFormRegistry(asStore(store));
+    expect(registry.ids.has("att-2")).toBe(true);
+    expect(registry.ids.has("att-1")).toBe(false);
+  });
+});
+
+describe("hasFormResults", () => {
+  it("takes a form whose responses are collected in a table", () => {
     expect(
-      selectNewAttachmentIndices(store, [input("1"), input("2"), input("3")]),
-    ).toEqual([0, 2]);
+      hasFormResults({ isForm: true, externalDbTableName: "form_42" }),
+    ).toBe(true);
   });
 
-  it("drops host files already attached as images", () => {
-    // Images are re-keyed out of `attachmentFiles` once they settle, so the
-    // file bucket alone would not see them.
-    const store = makeStore([], [ref("a", "7", "image")]);
-    const kept = selectNewAttachmentIndices(store, [input("7"), input("8")]);
-    expect(kept).toEqual([1]);
-  });
-
-  it("collapses repeats inside the batch itself", () => {
-    const store = makeStore([]);
+  it("leaves out a form with no results table", () => {
+    expect(hasFormResults({ isForm: true })).toBe(false);
+    expect(hasFormResults({ isForm: true, externalDbTableName: "" })).toBe(
+      false,
+    );
     expect(
-      selectNewAttachmentIndices(store, [input("1"), input("1"), input("2")]),
-    ).toEqual([0, 2]);
+      hasFormResults({ isForm: true, externalDbTableName: null }),
+    ).toBe(false);
   });
 
-  it("ignores refs without a host path", () => {
-    const store = makeStore([{ id: "a", title: "typed.txt", kind: "file" }]);
-    expect(selectNewAttachmentIndices(store, [input("1")])).toEqual([0]);
-  });
-
-  it("matches on the entry id, not on the composed ref path", () => {
-    // A bare `path` comparison would miss this and let the duplicate through.
-    const store = makeStore([
-      { id: "a", title: "report.docx", kind: "file", path: "42/report.docx" },
-    ]);
-    expect(selectNewAttachmentIndices(store, [input("42")])).toEqual([]);
-  });
-
-  it("still matches a ref whose path picked up a leading slash", () => {
-    const store = makeStore([
-      { id: "a", title: "report.docx", kind: "file", path: "/42/report.docx" },
-    ]);
-    expect(selectNewAttachmentIndices(store, [input("42")])).toEqual([]);
-  });
-
-  it("still matches a ref that carries the bare entry id", () => {
-    // `${entryId}/${title}` is what the AI backend composes today, but that
-    // shape is not part of any contract we own. A ref that carries the entry
-    // id alone must keep deduplicating, so a backend that stops composing
-    // the title in does not silently bring the duplicates back.
-    const store = makeStore([
-      { id: "a", title: "report.docx", kind: "file", path: "42" },
-    ]);
-    expect(selectNewAttachmentIndices(store, [input("42")])).toEqual([]);
+  it("leaves out an ordinary file", () => {
+    expect(
+      hasFormResults({ isForm: false, externalDbTableName: "form_42" }),
+    ).toBe(false);
+    expect(hasFormResults({})).toBe(false);
   });
 });
