@@ -99,6 +99,13 @@ describe("selectNewAttachmentIndices", () => {
     expect(selectNewAttachmentIndices(store, [input("42")])).toEqual([]);
   });
 
+  it("still matches a ref whose path picked up a leading slash", () => {
+    const store = makeStore([
+      { id: "a", title: "report.docx", kind: "file", path: "/42/report.docx" },
+    ]);
+    expect(selectNewAttachmentIndices(store, [input("42")])).toEqual([]);
+  });
+
   it("still matches a ref that carries the bare entry id", () => {
     // `${entryId}/${title}` is what the AI backend composes today, but that
     // shape is not part of any contract we own. A ref that carries the entry

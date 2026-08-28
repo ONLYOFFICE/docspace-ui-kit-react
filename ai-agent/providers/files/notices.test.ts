@@ -69,7 +69,9 @@ describe("attachment notices", () => {
 
   it("uses the singular key for one duplicate", () => {
     notifyAlreadyAttached(t, 1);
-    expect(info).toHaveBeenCalledWith("Common:AttachFilesAlreadyAttached_one:1");
+    expect(info).toHaveBeenCalledWith(
+      "Common:AttachFilesAlreadyAttached_one:1",
+    );
   });
 
   it("uses the plural key for more than one", () => {

@@ -34,6 +34,7 @@ type FakeRef = { id: string; title: string; kind: string; path?: string };
 const storeState = {
   attachmentFiles: [] as FakeRef[],
   attachmentImages: [] as FakeRef[],
+  pendingAttachments: [] as { kind: "file" | "image" }[],
   beginPendingAttachments: vi.fn(),
   failPendingAttachments: vi.fn(),
 };
@@ -60,11 +61,16 @@ const attachedRef = (entryId: string) => ({
 
 const file = (id: number) => ({ id, title: `file-${id}.docx` });
 
-// Cap the leases at `free` slots, mirroring the store's own truncation.
+// Cap the leases at `free` slots, mirroring the store's own truncation —
+// placeholders included, since the enforced cap is read back off them.
 const leases = (free: number) =>
-  vi.fn((inputs: unknown[]) =>
-    inputs.slice(0, free).map((_, i) => `pnd-${i + 1}`),
-  );
+  vi.fn((inputs: unknown[]) => {
+    const accepted = inputs.slice(0, free);
+    accepted.forEach(() =>
+      storeState.pendingAttachments.push({ kind: "file" }),
+    );
+    return accepted.map((_, i) => `pnd-${i + 1}`);
+  });
 
 type AttachItems = Parameters<
   ReturnType<typeof useAttachHostFilesToChat>
@@ -79,6 +85,7 @@ describe("useAttachHostFilesToChat accounting", () => {
   beforeEach(() => {
     storeState.attachmentFiles = [];
     storeState.attachmentImages = [];
+    storeState.pendingAttachments = [];
     storeState.beginPendingAttachments = leases(5);
     attachFilesToChat.mockClear();
   });
@@ -108,8 +115,13 @@ describe("useAttachHostFilesToChat accounting", () => {
   });
 
   it("keeps the two reasons apart in one batch", async () => {
-    // 1 folder + 1 duplicate + 3 new, but only 2 slots are free.
-    storeState.attachmentFiles = [attachedRef("2")];
+    // 1 folder + 1 duplicate + 3 new, but the composer holds 3 of the 5
+    // slots already (one of them the duplicate), so only 2 get through.
+    storeState.attachmentFiles = [
+      attachedRef("2"),
+      attachedRef("90"),
+      attachedRef("91"),
+    ];
     storeState.beginPendingAttachments = leases(2);
     const result = await attach([
       { id: 9, title: "folder", isFolder: true },
@@ -119,6 +131,22 @@ describe("useAttachHostFilesToChat accounting", () => {
       file(5),
     ]);
     expect(result).toEqual({ attached: 2, skipped: 2, duplicates: 1 });
+  });
+
+  // `CHAT_ATTACHMENT_LIMIT` is a hand-kept copy of a cap that lives inside
+  // `@onlyoffice/ai-chat` and is not exported, while the toast quotes it to
+  // the user. A truncated reservation reveals the real cap, so drift has to
+  // surface there instead of silently showing a wrong number.
+  it("shouts when the widget enforces a different cap", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    // The composer holds one file and the store refuses the second — an
+    // enforced cap of 2, not the 5 the copy promises.
+    storeState.attachmentFiles = [attachedRef("90")];
+    storeState.beginPendingAttachments = leases(1);
+    await attach([file(1), file(2)]);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0]?.[0])).toContain("attachment cap drift");
+    warn.mockRestore();
   });
 
   it("matches duplicates against the image bucket too", async () => {

@@ -83,8 +83,16 @@ const readCanAnalyze = (record: unknown): boolean | undefined => {
  * so the widget's history chip can render the file name via `basename(path)`.
  * Take the first segment back, exactly as the backend does when it matches a
  * response to its request.
+ *
+ * That composition is the backend's convention, not a contract this repo can
+ * enforce, so be forgiving about the shapes around it: a bare entry id and a
+ * leading slash both reduce to the same key. A wholesale change of the format
+ * would still slip through — the tests below pin the shapes we know.
  */
-const toEntryId = (path: string): string => path.split("/", 1)[0] ?? path;
+const toEntryId = (path: string): string => {
+  const trimmed = path.replace(/^\/+/, "");
+  return trimmed.split("/", 1)[0] || trimmed;
+};
 
 /**
  * Host entry ids already present in the composer — files and images alike,

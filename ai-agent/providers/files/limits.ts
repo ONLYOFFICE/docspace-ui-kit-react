@@ -34,3 +34,45 @@
  * widget (and its CSS side effects) into every importer.
  */
 export const CHAT_ATTACHMENT_LIMIT = 5;
+
+/**
+ * The cap the widget actually enforced, read back from the store.
+ *
+ * `ATTACHMENT_LIMIT` is module-private inside `@onlyoffice/ai-chat` — not on
+ * the store state, not on the package's exports — so {@link
+ * CHAT_ATTACHMENT_LIMIT} can only ever be a copy of it. It is a copy the user
+ * sees (the cap toast quotes it), so a silent drift would put a wrong number
+ * on screen while the store keeps enforcing the real one.
+ *
+ * `beginPendingAttachments` accepts inputs while the bucket is below the cap,
+ * so the moment it refuses one, the bucket is exactly full: the refs plus the
+ * placeholders standing in that bucket *are* the cap. Valid only right after
+ * a truncated reservation — at any other time this is just the current count.
+ */
+const readEnforcedFileLimit = (state: {
+  attachmentFiles: unknown[];
+  pendingAttachments: { kind: "file" | "image" }[];
+}): number =>
+  state.attachmentFiles.length +
+  state.pendingAttachments.filter((p) => p.kind === "file").length;
+
+/**
+ * Complain loudly (once per session) when the copy's number and the enforced
+ * one part ways, so the mismatch surfaces here instead of in a support
+ * ticket. Call it only after a reservation that was truncated.
+ */
+let driftReported = false;
+export const warnOnAttachmentLimitDrift = (state: {
+  attachmentFiles: unknown[];
+  pendingAttachments: { kind: "file" | "image" }[];
+}) => {
+  if (driftReported) return;
+  const enforced = readEnforcedFileLimit(state);
+  if (enforced === CHAT_ATTACHMENT_LIMIT) return;
+  driftReported = true;
+  console.warn(
+    `[ai-chat] attachment cap drift: the widget enforces ${enforced}, ` +
+      `CHAT_ATTACHMENT_LIMIT says ${CHAT_ATTACHMENT_LIMIT}. The cap toast ` +
+      `is quoting the wrong number — update limits.ts.`,
+  );
+};

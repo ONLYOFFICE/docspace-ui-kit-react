@@ -49,6 +49,8 @@ export type ChatAttachableItem = {
   isFolder?: boolean;
 };
 
+import { warnOnAttachmentLimitDrift } from "./limits";
+
 export { CHAT_ATTACHMENT_LIMIT } from "./limits";
 
 export type AttachToChatResult = {
@@ -112,6 +114,11 @@ export const useAttachHostFilesToChat = () => {
           })),
         );
       const inputs = inputsAll.slice(0, pendingIds.length);
+      if (pendingIds.length < inputsAll.length) {
+        // The reservation was truncated, so the store just told us the real
+        // cap — check it still matches the number the toast quotes.
+        warnOnAttachmentLimitDrift(useAttachmentsStore.getState());
+      }
       // Duplicates are reported on their own, so they must not read as
       // "the limit was reached" to the caller that toasts about `skipped`.
       const skipped = items.length - inputs.length - duplicates;
