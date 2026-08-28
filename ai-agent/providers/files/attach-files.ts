@@ -26,6 +26,13 @@
 
 import { useStores } from "@onlyoffice/ai-chat";
 
+import { rememberFormAttachments } from "./form-attachments";
+import {
+  holdAttachPaths,
+  rememberAttachedPaths,
+  splitDuplicateAttachments,
+} from "./duplicate-attachments";
+
 type AttachmentsStore = ReturnType<typeof useStores>["useAttachmentsStore"];
 
 export type AttachFileInput = {
@@ -35,6 +42,13 @@ export type AttachFileInput = {
   // ONLYOFFICE c_oAscFileType code (see getOnlyofficeFileType).
   type: number;
   content: string;
+  /**
+   * The host file is a DocSpace PDF form (`isForm` on the file row). Local
+   * metadata only: the attachments API maps the fields it sends explicitly,
+   * so this never reaches the backend — it is remembered per ref (see
+   * {@link rememberFormAttachments}) for the in-chat form hints.
+   */
+  isForm?: boolean;
 };
 
 /**
@@ -81,17 +95,54 @@ const readCanAnalyze = (record: unknown): boolean | undefined => {
  * can tag a neighbouring ref (wrong icon, nothing worse); the proper fix is
  * a per-input `kind` in `addAttachmentFile` — a library follow-up.
  *
+ * A file may be attached to a message only once: inputs whose `path` (the host
+ * entryId) is already attached — or repeated within the batch — are dropped
+ * here and their loading chips released, so every entry point gets the rule
+ * without repeating it.
+ *
  * Returns what stayed attached as files, so the caller can keep the record
- * flags the store drops (see {@link AttachedFileInfo}). Records past the
- * store's cap, or whose lease was revoked mid-flight, are dropped by the
- * library, so the result can be shorter than `inputs`.
+ * flags the store drops (see {@link AttachedFileInfo}). Duplicates, records
+ * past the store's cap, or those whose lease was revoked mid-flight are
+ * dropped, so the result can be shorter than `inputs`.
  */
 export const attachFilesToChat = async (
   useAttachmentsStore: AttachmentsStore,
-  inputs: AttachFileInput[],
-  imageIndices: Set<number>,
-  pendingIds?: string[],
+  allInputs: AttachFileInput[],
+  allImageIndices: Set<number>,
+  allPendingIds?: string[],
 ): Promise<AttachedFileInfo[]> => {
+  if (allInputs.length === 0) return [];
+
+  // One file, one chip: drop the inputs whose entryId is already on the
+  // message (or repeated inside this very batch) and hand their loading chips
+  // back, then re-index the parallel arrays onto what is left.
+  const { keep, duplicates } = splitDuplicateAttachments(
+    useAttachmentsStore,
+    allInputs.map((input) => input.path),
+  );
+
+  if (duplicates.length > 0 && allPendingIds) {
+    useAttachmentsStore
+      .getState()
+      .failPendingAttachments(
+        duplicates
+          .map((index) => allPendingIds[index])
+          .filter((id): id is string => Boolean(id)),
+      );
+  }
+
+  const inputs = keep.map((index) => allInputs[index]);
+  const imageIndices = new Set(
+    keep
+      .map((index, position) => (allImageIndices.has(index) ? position : -1))
+      .filter((position) => position >= 0),
+  );
+  const pendingIds = allPendingIds
+    ? keep
+        .map((index) => allPendingIds[index])
+        .filter((id): id is string => Boolean(id))
+    : undefined;
+
   if (inputs.length === 0) return [];
 
   // Identify the freshly added refs by id, not by a pre-await length: the
@@ -101,10 +152,38 @@ export const attachFilesToChat = async (
     useAttachmentsStore.getState().attachmentFiles.map((f) => f.id),
   );
 
+  // Claim the paths for the whole round trip, so a second attach started
+  // before the refs land sees them as taken.
+  const releasePaths = holdAttachPaths(
+    useAttachmentsStore,
+    inputs.map((input) => input.path),
+  );
+
   const records =
-    (await useAttachmentsStore.getState().addAttachmentFile(inputs, {
-      pendingIds,
-    })) ?? [];
+    (await useAttachmentsStore
+      .getState()
+      .addAttachmentFile(inputs, { pendingIds })
+      .finally(releasePaths)) ?? [];
+
+  // Remember which host file each ref came from: `path` is optional on the
+  // attachment record, so the duplicate check must not depend on the backend
+  // echoing it back. Records line up with `inputs` — the same assumption the
+  // image re-keying below already makes.
+  rememberAttachedPaths(
+    useAttachmentsStore,
+    records
+      .map((record, i) => ({ id: record.id, path: inputs[i]?.path }))
+      .filter((entry): entry is { id: string; path: string } =>
+        Boolean(entry.path),
+      ),
+  );
+
+  rememberFormAttachments(
+    useAttachmentsStore,
+    records
+      .filter((_record, i) => inputs[i]?.isForm)
+      .map((record) => record.id),
+  );
 
   const attached = records
     .filter((_, i) => !imageIndices.has(i))
