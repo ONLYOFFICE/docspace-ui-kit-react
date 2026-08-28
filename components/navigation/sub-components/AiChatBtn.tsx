@@ -46,22 +46,78 @@ import { TAiChatButtonProps } from "../Navigation.types";
 // Layout rounding must not be able to flip the collapsed state on its own.
 const SUBPIXEL_SLACK = 1;
 
+/** The collapsed slot: the bare 32px icon button, per Navigation.module.scss. */
+const COLLAPSED_WIDTH = 32;
+
+/**
+ * The header row the button competes for width in, whichever of the two places
+ * it is rendered: on desktop it sits in the trailing button row, a sibling of
+ * `.container`; from tablet down that row is dropped and the button joins the
+ * control buttons *inside* `.container`. Going up to `.container` first and
+ * only then to its parent lands on the same row in both cases, without this
+ * component having to know the host's own class names.
+ */
+const rowOf = (slot: HTMLElement) =>
+  slot.closest(`.${styles.container}`)?.parentElement ??
+  slot.parentElement?.parentElement ??
+  null;
+
+/**
+ * Is anything else in the header row already having to shorten its text?
+ *
+ * "The header has run out of space" cannot be read off the slot's own width:
+ * the header's left-hand side is a grid whose children truncate happily, so it
+ * never reports a flex deficit to this side of the row no matter how cramped it
+ * gets. What it does do is put an ellipsis in - so the room title, the share
+ * button's label and the tariff line each become the signal.
+ *
+ * Only elements that clip their own text with an ellipsis count, which is why
+ * this walks the row instead of naming selectors: the room title and the share
+ * button belong to this component's own markup, the tariff line is a host-
+ * supplied node, and all three are recognised by the same two computed
+ * properties without Navigation having to know which is which.
+ */
+const isRowCrowded = (slot: HTMLElement) => {
+  const row = rowOf(slot);
+  if (!row) return false;
+
+  // The row itself has more content than it can show. Catches the layouts whose
+  // neighbours have no ellipsis to give - the tablet header, where the button
+  // joins the control buttons and would otherwise be pushed past the edge.
+  if (row.scrollWidth > row.clientWidth + SUBPIXEL_SLACK) return true;
+
+  return Array.from(row.querySelectorAll<HTMLElement>("*")).some((node) => {
+    // The button's own label is not evidence about the row it sits in.
+    if (slot.contains(node)) return false;
+    if (node.scrollWidth <= node.clientWidth + SUBPIXEL_SLACK) return false;
+
+    const style = getComputedStyle(node);
+    return (
+      style.textOverflow === "ellipsis" &&
+      (style.overflowX === "hidden" || style.overflowX === "clip")
+    );
+  });
+};
+
 /**
  * Opens the AI chat panel. Keeps the "AI chat" label next to the icon for as
- * long as the header row can fit it, and collapses to the bare icon only when
- * it genuinely cannot.
+ * long as the header row can fit it, and collapses to the bare icon as soon as
+ * anything else in the row has started shortening its own text.
  *
- * The slot always *asks* the row for the full labelled width and is allowed to
- * shrink down to the icon, so `clientWidth < naturalWidth` is exactly the
- * "no room left" signal. Collapsing never changes what the slot requests, so
- * the measurement cannot feed back into itself and oscillate - no hysteresis
- * is needed.
+ * The label is the first thing in the header to go, not the last: a collapsed
+ * button is still named by its icon, while a room title cut to "Sales and mar..."
+ * or a share button cut to "Sha..." tells the reader nothing. Collapsing hands
+ * the ~60px back to them.
  *
- * `.container` carries a much larger flex-shrink than the button row (see
- * Navigation.module.scss), so the room title and control buttons truncate all
- * the way down to their min-content widths before any pressure reaches this
- * slot. The label is therefore the last thing in the header to go, not the
- * first.
+ * Two things have to be true for that to work without the button flickering:
+ *
+ *  - the slot's width follows the state, so collapsing actually releases space
+ *    (a slot that always asks for the labelled width would decide correctly and
+ *    change nothing);
+ *  - the decision is read while the slot is asking for its *expanded* width, so
+ *    it never depends on the state it is about to set. `measure` writes that
+ *    width, reads the row, and only then commits - all inside one layout pass,
+ *    so nothing is painted in between and the two states cannot alternate.
  *
  * The label stays in the DOM when collapsed and is hidden in CSS, which keeps
  * the `aria-label` Button derives from it, so the collapsed button is still
@@ -101,12 +157,25 @@ const AiChatButton = ({
     const slot = slotRef.current;
     if (!slot || !naturalWidth || typeof ResizeObserver === "undefined") return;
 
-    const check = () =>
-      setIsCollapsed(slot.clientWidth < naturalWidth - SUBPIXEL_SLACK);
-    check();
+    const measure = () => {
+      // Ask expanded, read the row, then commit. Reading while expanded is what
+      // keeps the decision independent of the state it sets.
+      slot.style.width = `${naturalWidth}px`;
+      const crowded = isRowCrowded(slot);
 
-    const observer = new ResizeObserver(check);
-    observer.observe(slot);
+      slot.style.width = `${crowded ? COLLAPSED_WIDTH : naturalWidth}px`;
+      setIsCollapsed(crowded);
+    };
+
+    measure();
+
+    // The row, not the slot: the slot's width is this effect's own output, so
+    // observing it would feed the measurement back into itself. The row changes
+    // width for every reason that matters here - the window, the info panel,
+    // the chat panel.
+    const row = rowOf(slot) ?? slot;
+    const observer = new ResizeObserver(measure);
+    observer.observe(row);
 
     return () => observer.disconnect();
   }, [naturalWidth]);
@@ -115,6 +184,7 @@ const AiChatButton = ({
     <div
       ref={slotRef}
       className={styles.aiChatSlot}
+      // Only the first paint's width; `measure` owns it from then on.
       style={naturalWidth ? { width: naturalWidth } : undefined}
       data-collapsed={isCollapsed ? "true" : "false"}
       data-open={isChatPanelVisible ? "true" : "false"}
