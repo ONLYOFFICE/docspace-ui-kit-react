@@ -76,77 +76,6 @@ const readCanAnalyze = (record: unknown): boolean | undefined => {
 };
 
 /**
- * Attaches host files to the AI chat composer through the attachments
- * store, then re-keys the refs flagged in `imageIndices` to
- * `attachmentImages`. The library hardcodes `kind: "file"` for refs produced
- * by `addAttachmentFile` even when the backend resolved an image, so without
- * this the chip would show the unknown-format icon instead of a preview.
- *
- * `imageIndices` are positions into `inputs`; the matching freshly-added refs
- * are moved (added refs preserve input order).
- *
- * `pendingIds` are loading-chip leases from `beginPendingAttachments`, one
- * per input in the same order — passing them swaps each placeholder for its
- * real chip atomically and keeps the reservation from being counted twice
- * against the attachment cap. Known bounded gap: cancelling a single loading
- * chip mid-batch shifts the positions the store settles, so `imageIndices`
- * can tag a neighbouring ref (wrong icon, nothing worse); the proper fix is
- * a per-input `kind` in `addAttachmentFile` — a library follow-up.
- *
- * Returns what stayed attached as files, so the caller can keep the record
- * flags the store drops (see {@link AttachedFileInfo}). Records past the
- * store's cap, or whose lease was revoked mid-flight, are dropped by the
- * library, so the result can be shorter than `inputs`.
- */
-export const attachFilesToChat = async (
-  useAttachmentsStore: AttachmentsStore,
-  inputs: AttachFileInput[],
-  imageIndices: Set<number>,
-  pendingIds?: string[],
-): Promise<AttachedFileInfo[]> => {
-  if (inputs.length === 0) return [];
-
-  // Identify the freshly added refs by id, not by a pre-await length: the
-  // upload window is long and user-visible now, and deleting an existing
-  // chip meanwhile would shift a positional slice.
-  const beforeIds = new Set(
-    useAttachmentsStore.getState().attachmentFiles.map((f) => f.id),
-  );
-
-  const records =
-    (await useAttachmentsStore.getState().addAttachmentFile(inputs, {
-      pendingIds,
-    })) ?? [];
-
-  const attached = records
-    .filter((_, i) => !imageIndices.has(i))
-    .map((record) => ({ id: record.id, canAnalyze: readCanAnalyze(record) }));
-
-  if (imageIndices.size === 0) return attached;
-
-  useAttachmentsStore.setState((s) => {
-    const added = s.attachmentFiles.filter((ref) => !beforeIds.has(ref.id));
-    const stayingFiles = s.attachmentFiles.filter((ref) =>
-      beforeIds.has(ref.id),
-    );
-    const movedImages: typeof s.attachmentImages = [];
-    added.forEach((ref, i) => {
-      if (imageIndices.has(i)) {
-        movedImages.push({ ...ref, kind: "image" });
-      } else {
-        stayingFiles.push(ref);
-      }
-    });
-    return {
-      attachmentFiles: stayingFiles,
-      attachmentImages: [...s.attachmentImages, ...movedImages],
-    };
-  });
-
-  return attached;
-};
-
-/**
  * The host entry id an attached ref came from.
  *
  * We send the bare entry id as `AttachFileInput.path`, but what comes back
@@ -197,4 +126,95 @@ export const selectNewAttachmentIndices = (
     kept.push(index);
   });
   return kept;
+};
+
+/**
+ * Attaches host files to the AI chat composer through the attachments
+ * store, then re-keys the refs flagged in `imageIndices` to
+ * `attachmentImages`. The library hardcodes `kind: "file"` for refs produced
+ * by `addAttachmentFile` even when the backend resolved an image, so without
+ * this the chip would show the unknown-format icon instead of a preview.
+ *
+ * `imageIndices` are positions into `inputs`; the matching freshly-added refs
+ * are moved (added refs preserve input order).
+ *
+ * `pendingIds` are loading-chip leases from `beginPendingAttachments`, one
+ * per input in the same order — passing them swaps each placeholder for its
+ * real chip atomically and keeps the reservation from being counted twice
+ * against the attachment cap. Known bounded gap: cancelling a single loading
+ * chip mid-batch shifts the positions the store settles, so `imageIndices`
+ * can tag a neighbouring ref (wrong icon, nothing worse); the proper fix is
+ * a per-input `kind` in `addAttachmentFile` — a library follow-up.
+ *
+ * Callers that did not reserve leases get the duplicate filter applied here
+ * (see {@link selectNewAttachmentIndices}); the reserve-first ones must run
+ * it themselves before `beginPendingAttachments`, so the reservation matches
+ * what is actually going to be attached.
+ *
+ * Returns what stayed attached as files, so the caller can keep the record
+ * flags the store drops (see {@link AttachedFileInfo}). Records past the
+ * store's cap, or whose lease was revoked mid-flight, are dropped by the
+ * library, so the result can be shorter than `inputs`.
+ */
+export const attachFilesToChat = async (
+  useAttachmentsStore: AttachmentsStore,
+  rawInputs: AttachFileInput[],
+  rawImageIndices: Set<number>,
+  pendingIds?: string[],
+): Promise<AttachedFileInfo[]> => {
+  // With leases the caller has already filtered (it had to, to reserve the
+  // right number of chips). Without them nobody has, so drop the duplicates
+  // here: a direct caller must not be able to put a second chip on a host
+  // file the composer already holds.
+  const kept = pendingIds
+    ? null
+    : selectNewAttachmentIndices(useAttachmentsStore, rawInputs);
+  const inputs = kept ? kept.map((i) => rawInputs[i]) : rawInputs;
+  // `imageIndices` are positions into the inputs, so they move with them.
+  const imageIndices = kept
+    ? new Set(
+        kept.flatMap((source, i) => (rawImageIndices.has(source) ? [i] : [])),
+      )
+    : rawImageIndices;
+
+  if (inputs.length === 0) return [];
+
+  // Identify the freshly added refs by id, not by a pre-await length: the
+  // upload window is long and user-visible now, and deleting an existing
+  // chip meanwhile would shift a positional slice.
+  const beforeIds = new Set(
+    useAttachmentsStore.getState().attachmentFiles.map((f) => f.id),
+  );
+
+  const records =
+    (await useAttachmentsStore.getState().addAttachmentFile(inputs, {
+      pendingIds,
+    })) ?? [];
+
+  const attached = records
+    .filter((_, i) => !imageIndices.has(i))
+    .map((record) => ({ id: record.id, canAnalyze: readCanAnalyze(record) }));
+
+  if (imageIndices.size === 0) return attached;
+
+  useAttachmentsStore.setState((s) => {
+    const added = s.attachmentFiles.filter((ref) => !beforeIds.has(ref.id));
+    const stayingFiles = s.attachmentFiles.filter((ref) =>
+      beforeIds.has(ref.id),
+    );
+    const movedImages: typeof s.attachmentImages = [];
+    added.forEach((ref, i) => {
+      if (imageIndices.has(i)) {
+        movedImages.push({ ...ref, kind: "image" });
+      } else {
+        stayingFiles.push(ref);
+      }
+    });
+    return {
+      attachmentFiles: stayingFiles,
+      attachmentImages: [...s.attachmentImages, ...movedImages],
+    };
+  });
+
+  return attached;
 };

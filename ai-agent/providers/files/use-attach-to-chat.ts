@@ -74,9 +74,9 @@ export type AttachToChatResult = {
  * Folders are ignored, and so are host files already sitting in the composer
  * — the result reports those separately as `duplicates`. The cap is applied
  * here rather than left to the store so the caller learns how many files were
- * dropped and can say so. The promise
- * resolves once the AI backend has echoed the attachment records back (rejects
- * if that round-trip fails, so callers own the error toast).
+ * dropped and can say so. The promise resolves once the AI backend has echoed
+ * the attachment records back (rejects if that round-trip fails, so callers
+ * own the error toast).
  */
 export const useAttachHostFilesToChat = () => {
   const { useAttachmentsStore } = useStores();

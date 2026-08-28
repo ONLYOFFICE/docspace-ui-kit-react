@@ -42,3 +42,4 @@ export {
   useFilesIntegration,
   type FilesIntegration,
 } from "./use-integration";
+export { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";

@@ -43,6 +43,7 @@ import {
   selectNewAttachmentIndices,
   type OnFilesAttached,
 } from "./attach-files";
+import { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
 import useDeviceType from "./use-device-type";
 
 type AttachDialogProps = {
@@ -148,21 +149,11 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
       const accepted = inputs.slice(0, pendingIds.length);
 
       onClose();
-      // Say why a pick produced no chip — otherwise the file just seems to
-      // vanish. Reported after the dialog closes so the toast is not covered.
-      if (duplicates > 0) {
-        toastr.info(
-          duplicates === 1
-            ? t("Common:AttachFilesAlreadyAttached_one", {
-                count: duplicates,
-                defaultValue: "This file is already attached",
-              })
-            : t("Common:AttachFilesAlreadyAttached_other", {
-                count: duplicates,
-                defaultValue: "{{count}} files are already attached",
-              }),
-        );
-      }
+      // Say why a pick produced no chip — otherwise the files just seem to
+      // vanish. Reported after the dialog closes so the toasts are not
+      // covered by it.
+      notifyAlreadyAttached(t, duplicates);
+      notifyAttachmentLimit(t, inputs.length - accepted.length);
       if (accepted.length === 0) return;
 
       try {
