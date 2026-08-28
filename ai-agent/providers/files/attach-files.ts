@@ -43,12 +43,12 @@ export type AttachFileInput = {
   type: number;
   content: string;
   /**
-   * The host file is a DocSpace PDF form (`isForm` on the file row). Local
-   * metadata only: the attachments API maps the fields it sends explicitly,
-   * so this never reaches the backend — it is remembered per ref (see
-   * {@link rememberFormAttachments}) for the in-chat form hints.
+   * The host file is a form with a results table (see `hasFormResults`).
+   * Local metadata only: the attachments API maps the fields it sends
+   * explicitly, so this never reaches the backend — it is remembered per ref
+   * (see {@link rememberFormAttachments}) for the in-chat form hints.
    */
-  isForm?: boolean;
+  hasFormResults?: boolean;
 };
 
 /**
@@ -181,7 +181,7 @@ export const attachFilesToChat = async (
   rememberFormAttachments(
     useAttachmentsStore,
     records
-      .filter((_record, i) => inputs[i]?.isForm)
+      .filter((_record, i) => inputs[i]?.hasFormResults)
       .map((record) => record.id),
   );
 

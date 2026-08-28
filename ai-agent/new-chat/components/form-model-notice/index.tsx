@@ -48,10 +48,12 @@ import styles from "./FormModelNotice.module.scss";
  * In-chat notice recommending the model the portal tested for form results,
  * shown above the conversation while the composer carries a DocSpace form.
  *
- * Form-ness comes from the host file row (`isForm`), remembered per
- * attachment by the attach helpers — the attachment record itself carries no
- * such flag in this topology (`canAnalyze` is never populated by the DocSpace
- * backend). The rest of the wiring — which model is recommended, whether the
+ * Form-ness comes from the host file row — `isForm` together with the
+ * results table the responses land in (`externalDbTableName`) — and is
+ * remembered per attachment by the attach helpers: the attachment record
+ * itself carries no such flag in this topology (`canAnalyze` is never
+ * populated by the DocSpace backend). A form nobody has answered has nothing
+ * to discuss, hence the table. The rest of the wiring — which model is recommended, whether the
  * user may change the agent's model, and whether the user already dismissed
  * the notice — is host state, supplied through `formsRecommendation` on
  * `AiAgentProviders`.

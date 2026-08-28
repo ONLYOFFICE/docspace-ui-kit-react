@@ -27,7 +27,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { attachFilesToChat } from "./attach-files";
-import { getFormRegistry } from "./form-attachments";
+import { getFormRegistry, hasFormResults } from "./form-attachments";
 
 // ---------------------------------------------------------------------------
 // Fake attachments store: the refs the dedupe reads, plus the lease surface.
@@ -69,12 +69,12 @@ const makeStore = (attachmentFiles: Ref[] = []) => {
   return { store, addAttachmentFile, failPendingAttachments, attachmentFiles };
 };
 
-const input = (path: string, isForm = false) => ({
+const input = (path: string, hasFormResults = false) => ({
   path,
-  title: isForm ? `${path}.pdf` : `${path}.docx`,
+  title: hasFormResults ? `${path}.pdf` : `${path}.docx`,
   type: 7,
   content: "",
-  isForm,
+  hasFormResults,
 });
 
 // The helper is typed against the widget's store; the fake carries only the
@@ -220,7 +220,7 @@ describe("attachFilesToChat duplicates", () => {
 describe("attachFilesToChat form flags", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("remembers which refs came from a DocSpace form", async () => {
+  it("remembers which refs came from a form with a results table", async () => {
     const { store } = makeStore();
 
     await attachFilesToChat(
@@ -233,5 +233,30 @@ describe("attachFilesToChat form flags", () => {
     const registry = getFormRegistry(asStore(store));
     expect(registry.ids.has("att-2")).toBe(true);
     expect(registry.ids.has("att-1")).toBe(false);
+  });
+});
+
+describe("hasFormResults", () => {
+  it("takes a form whose responses are collected in a table", () => {
+    expect(
+      hasFormResults({ isForm: true, externalDbTableName: "form_42" }),
+    ).toBe(true);
+  });
+
+  it("leaves out a form with no results table", () => {
+    expect(hasFormResults({ isForm: true })).toBe(false);
+    expect(hasFormResults({ isForm: true, externalDbTableName: "" })).toBe(
+      false,
+    );
+    expect(
+      hasFormResults({ isForm: true, externalDbTableName: null }),
+    ).toBe(false);
+  });
+
+  it("leaves out an ordinary file", () => {
+    expect(
+      hasFormResults({ isForm: false, externalDbTableName: "form_42" }),
+    ).toBe(false);
+    expect(hasFormResults({})).toBe(false);
   });
 });

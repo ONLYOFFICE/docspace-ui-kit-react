@@ -34,6 +34,7 @@ import { FileType } from "../../../enums";
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat } from "./attach-files";
 import { splitDuplicateAttachments } from "./duplicate-attachments";
+import { hasFormResults } from "./form-attachments";
 
 // The subset of a host file/folder view-model the composer needs. Folders are
 // accepted (and skipped) so callers can hand over a raw selection without
@@ -48,9 +49,11 @@ export type ChatAttachableItem = {
   // union) — only the numeric value matters here.
   fileType?: number;
   isFolder?: boolean;
-  // The row is a DocSpace PDF form. Carried into the attachment so the chat
-  // can offer the form-specific hints (see `useHasFormAttached`).
+  // The row is a DocSpace PDF form, and the table its responses are collected
+  // in. Together they decide whether the chat offers the form-specific hints
+  // (see `hasFormResults` / `useHasFormAttached`).
   isForm?: boolean;
+  externalDbTableName?: string | null;
 };
 
 /**
@@ -104,7 +107,7 @@ export const useAttachHostFilesToChat = () => {
         title: file.title,
         type: getOnlyofficeFileType(file.fileExst || file.title),
         content: "",
-        isForm: file.isForm,
+        hasFormResults: hasFormResults(file),
       }));
 
       // The store owns the cap: the reservation counts the refs already

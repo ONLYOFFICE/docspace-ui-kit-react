@@ -40,6 +40,7 @@ import useGetIcon from "../../hooks/useGetIcon";
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat, type OnFilesAttached } from "./attach-files";
 import { splitDuplicateAttachments } from "./duplicate-attachments";
+import { hasFormResults } from "./form-attachments";
 import useDeviceType from "./use-device-type";
 
 type AttachDialogProps = {
@@ -97,6 +98,8 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
               fileType: "fileType" in f ? f.fileType : undefined,
               fileExst: "fileExst" in f ? (f.fileExst ?? "") : "",
               isForm: "isForm" in f ? f.isForm : undefined,
+              externalDbTableName:
+                "externalDbTableName" in f ? f.externalDbTableName : undefined,
             }))
           : selectedFileInfo
             ? [
@@ -106,6 +109,9 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
                   fileType: selectedFileInfo.fileType,
                   fileExst: selectedFileInfo.fileExst ?? "",
                   isForm: (selectedFileInfo as { isForm?: boolean }).isForm,
+                  externalDbTableName: (
+                    selectedFileInfo as { externalDbTableName?: string | null }
+                  ).externalDbTableName,
                 },
               ]
             : [];
@@ -123,7 +129,7 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
         title: s.fileExst ? `${s.title}${s.fileExst}` : s.title,
         type: getOnlyofficeFileType(s.fileExst || s.title),
         content: "",
-        isForm: s.isForm,
+        hasFormResults: hasFormResults(s),
       }));
 
       const imageIndices = new Set<number>();
