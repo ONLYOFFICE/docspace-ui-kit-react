@@ -82,6 +82,16 @@ export type ChatPanelProps = {
    * `chatPanelDropTargetLabel` on SectionProps).
    */
   dropTargetLabel?: string;
+  /**
+   * Enables the drag resizer on the panel's inline-start edge. Honoured on
+   * desktop only — the host is expected to pass `false` in fullscreen, where
+   * the width belongs to the layout.
+   */
+  isResizable?: boolean;
+  /** Current docked width in px; applied as `--chat-panel-width`. */
+  width?: number;
+  /** Called once per drag, on mouse up, with the committed width in px. */
+  onResize?: (value: number) => void;
 };
 
 export type SectionBodyContentProps = {
@@ -200,6 +210,13 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
      * wording — the panel only renders the affordance.
      */
     chatPanelDropTargetLabel?: string;
+    /**
+     * Opt-in edge resizer for the docked chat panel (desktop only). Pass the
+     * width the host stores plus a setter; leave unset for a fixed-width panel.
+     */
+    isChatPanelResizable?: boolean;
+    chatPanelWidth?: number;
+    setChatPanelWidth?: (value: number) => void;
     isEmptyPage?: boolean;
     maintenanceExist?: boolean;
     snackbarExist?: boolean;

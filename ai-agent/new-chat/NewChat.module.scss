@@ -147,6 +147,29 @@
     letter-spacing: 0px;
   }
 
+  // Markdown tables: give a wide one its own horizontal scroll instead of
+  // letting it push the whole conversation sideways. The library renders a
+  // bare `<table class="w-full ... overflow-y-auto">` with no scroll wrapper,
+  // and `overflow` does nothing on a `display: table` box — so a table wider
+  // than the column (a handful of columns is enough in the 400px docked
+  // panel) forces its min-content width onto every ancestor up to the chat
+  // panel, and the user scrolls the entire thread to read it.
+  //
+  // `display: block` turns the element itself into the scroll container; the
+  // rows are laid out by an anonymous table box inside it, which is free to
+  // exceed the block and scroll. `min-width: 100%` keeps a table that does fit
+  // spanning the column, matching the library's own `w-full` intent.
+  //
+  // Scoped to `.aui-md` (the library's markdown wrapper) so nothing else in
+  // the chat — least of all a real UI table — is affected.
+  :global(.aui-md table) {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
   // The lib's "Analyzing" indicator is the only thread element sized with a
   // fixed w-[var(--thread-max-width)] (687px) instead of w-full + max-w. In
   // chat columns narrower than that it inflates the grid track, so the chat

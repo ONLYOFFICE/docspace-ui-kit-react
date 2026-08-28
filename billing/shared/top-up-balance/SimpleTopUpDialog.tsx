@@ -88,6 +88,10 @@ type SimpleTopUpDialogBaseProps = {
   serviceName?: string;
   /** optional extra query params appended to the success/callback URL */
   successParams?: Record<string, string>;
+  /** overrides the default description under the header */
+  descriptionText?: React.ReactNode;
+  /** overrides the default helper text under the amount input */
+  helperText?: React.ReactNode;
 };
 
 export type SimpleTopUpDialogProps = SimpleTopUpDialogBaseProps &
@@ -113,6 +117,8 @@ const SimpleTopUpDialogContent = observer(
     service,
     serviceName,
     successParams,
+    descriptionText,
+    helperText,
   }: SimpleTopUpDialogProps) => {
     const t = useCommonTranslation();
 
@@ -220,9 +226,10 @@ const SimpleTopUpDialogContent = observer(
         <ModalDialog.Body>
           <div className={styles.body}>
             <Text className={styles.description}>
-              {isStripeFlow
-                ? t("TopUpCreditsDescription")
-                : t("TopUpCreditsAmountDescription")}
+              {descriptionText ??
+                (isStripeFlow
+                  ? t("TopUpCreditsDescription")
+                  : t("TopUpCreditsAmountDescription"))}
             </Text>
 
             <Amount
@@ -233,15 +240,12 @@ const SimpleTopUpDialogContent = observer(
               withoutCustomerCheck
             />
 
-            {isStripeFlow ? (
-              <Text fontSize="12px" className={styles.helperText}>
-                {t("TopUpCreditsChargeHint")}
-              </Text>
-            ) : (
-              <Text fontSize="12px" className={styles.helperText}>
-                {t("TopUpTakeSomeTimeToComplete")}
-              </Text>
-            )}
+            <Text fontSize="12px" className={styles.helperText}>
+              {helperText ??
+                (isStripeFlow
+                  ? t("TopUpCreditsChargeHint")
+                  : t("TopUpTakeSomeTimeToComplete"))}
+            </Text>
           </div>
         </ModalDialog.Body>
 

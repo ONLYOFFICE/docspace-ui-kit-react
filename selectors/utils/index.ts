@@ -177,6 +177,11 @@ export const convertFilesToItems: (
       // isForm isn't declared on the SDK file DTO yet, but the backend returns
       // it for PDF forms — surface it so consumers (e.g. chat) can detect forms.
       isForm: (file as { isForm?: boolean }).isForm,
+      // The form's results table in the external database, when the form has
+      // one. Tells a form whose responses can be discussed apart from a form
+      // that merely exists.
+      externalDbTableName: (file as { externalDbTableName?: string | null })
+        .externalDbTableName,
       viewUrl,
     } as TSelectorItem;
   });

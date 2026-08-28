@@ -123,6 +123,9 @@ const Section = (props: SectionProps) => {
     isChatPanelVisible,
     setIsChatPanelVisible,
     chatPanelDropTargetLabel,
+    isChatPanelResizable,
+    chatPanelWidth,
+    setChatPanelWidth,
     inert,
     isMobileHidden,
     canDisplay,
@@ -473,6 +476,9 @@ const Section = (props: SectionProps) => {
           setIsVisible={setIsChatPanelVisible}
           dropTargetLabel={chatPanelDropTargetLabel}
           currentDeviceType={currentDeviceType}
+          isResizable={isChatPanelResizable}
+          width={chatPanelWidth}
+          onResize={setChatPanelWidth}
         >
           {chatPanelContent}
         </ChatPanelView>

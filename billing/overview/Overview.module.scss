@@ -175,6 +175,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
   width: 100%;
   padding: 12px 16px;
   box-sizing: border-box;
@@ -199,10 +200,24 @@
   color: var(--status-warning);
 }
 
-.autoPaymentWrap {
+.unlinkedBannerWrap {
+  display: flex;
+  flex: 1;
   margin-top: 12px;
 
   > div {
+    flex: 1;
+    max-width: none;
+  }
+}
+
+.autoPaymentWrap {
+  display: flex;
+  flex: 1;
+  margin-top: 12px;
+
+  > div {
+    flex: 1;
     margin-bottom: 0;
     max-width: none;
     width: 100%;

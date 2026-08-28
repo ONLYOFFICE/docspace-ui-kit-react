@@ -33,22 +33,47 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-// DocSpace SVGs ship hardcoded fills, and the widget's <Icon> drops the
-// `color` prop for component overrides (it only recolors bundled/URL icons).
-// So recolor the visible shapes here to the chat's icon color. A presentation
-// `fill` attribute loses to this CSS rule, so no `!important` is needed;
-// `white` knockouts and `none` are left intact.
-.icon {
-  // path:not([fill="white"]):not([fill="none"]) {
-  //   fill: currentColor;
-  // }
-}
+"use client";
 
-// Glyphs the widget paints with a theme token through `<Icon color>` — the very
-// prop it drops for component overrides. Carry the token here instead, so a
-// DocSpace shape drawn with `currentColor` matches what the bundled icon would
-// have looked like in both themes.
-.tertiary {
-  color: var(--text-tertiary);
-}
+import React from "react";
+import { useStores } from "@onlyoffice/ai-chat";
 
+import { getFormRegistry } from "./form-attachments";
+
+/**
+ * Whether the message being composed carries at least one form.
+ *
+ * Recomputed both when the draft's refs change (the store is a zustand hook)
+ * and when a new form lands in the registry — the two arrive separately,
+ * because the ref is added by the library and the flag by the attach helper.
+ */
+export const useHasFormAttached = (): boolean => {
+  const { useAttachmentsStore } = useStores();
+
+  const files = useAttachmentsStore((s) => s.attachmentFiles);
+  const images = useAttachmentsStore((s) => s.attachmentImages);
+  const registry = getFormRegistry(useAttachmentsStore);
+
+  const subscribe = React.useCallback(
+    (onChange: () => void) => {
+      registry.listeners.add(onChange);
+      return () => {
+        registry.listeners.delete(onChange);
+      };
+    },
+    [registry],
+  );
+
+  const version = React.useSyncExternalStore(
+    subscribe,
+    () => registry.version,
+    () => 0,
+  );
+
+  return React.useMemo(
+    () =>
+      [...files, ...images].some((ref) => registry.ids.has(ref.id)),
+    // `version` is the registry's change signal, not a value read here.
+    [files, images, registry, version],
+  );
+};

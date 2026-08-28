@@ -31,6 +31,7 @@ export {
   type AttachedFileInfo,
   type OnFilesAttached,
 } from "./attach-files";
+export { useHasFormAttached } from "./use-has-form-attached";
 export {
   useAttachHostFilesToChat,
   CHAT_ATTACHMENT_LIMIT,

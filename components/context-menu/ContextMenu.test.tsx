@@ -124,4 +124,47 @@ describe("<ContextMenu />", () => {
 		expect(left).toBeLessThanOrEqual(800 - ITEM_WIDTH);
 		expect(left).toBeGreaterThanOrEqual(0);
 	});
+
+	/**
+	 * Bug 83459 - an open menu must survive a re-render of whatever holds it.
+	 *
+	 * Consumers hand `onHide` over as a plain arrow function, so it is a new
+	 * value on every parent render. The teardown that reports "the menu went
+	 * away" used to hang off it and therefore ran on those renders too, closing
+	 * a menu that was still open - which is why the profile menu could not show
+	 * its "Live chat" switch changing.
+	 */
+	it("stays open when its parent re-renders with a fresh onHide", () => {
+		const ref = React.createRef<ContextMenuRefType>();
+		let rerender: () => void = () => {};
+		const hidden: number[] = [];
+
+		const Parent = () => {
+			const [renders, setRenders] = React.useState(0);
+
+			rerender = () => setRenders((value) => value + 1);
+
+			return (
+				<ContextMenu
+					ref={ref}
+					model={[{ key: "open", label: `Open ${renders}` }]}
+					withHotkeys={false}
+					// A new function each render, the way every real parent passes it.
+					onHide={() => hidden.push(renders)}
+				/>
+			);
+		};
+
+		render(<Parent />);
+		showAt(ref, 100);
+
+		expect(screen.getByText("Open 0")).toBeInTheDocument();
+
+		act(() => {
+			rerender();
+		});
+
+		expect(screen.getByText("Open 1")).toBeInTheDocument();
+		expect(hidden).toEqual([]);
+	});
 });

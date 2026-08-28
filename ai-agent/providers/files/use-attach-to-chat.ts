@@ -33,6 +33,8 @@ import { FileType } from "../../../enums";
 
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat } from "./attach-files";
+import { splitDuplicateAttachments } from "./duplicate-attachments";
+import { hasFormResults } from "./form-attachments";
 
 // The subset of a host file/folder view-model the composer needs. Folders are
 // accepted (and skipped) so callers can hand over a raw selection without
@@ -47,6 +49,11 @@ export type ChatAttachableItem = {
   // union) — only the numeric value matters here.
   fileType?: number;
   isFolder?: boolean;
+  // The row is a DocSpace PDF form, and the table its responses are collected
+  // in. Together they decide whether the chat offers the form-specific hints
+  // (see `hasFormResults` / `useHasFormAttached`).
+  isForm?: boolean;
+  externalDbTableName?: string | null;
 };
 
 /**
@@ -61,6 +68,8 @@ export type AttachToChatResult = {
   attached: number;
   /** Files left out: folders, or everything past `CHAT_ATTACHMENT_LIMIT`. */
   skipped: number;
+  /** Files already attached to the message — counted apart from `skipped`. */
+  duplicates: number;
 };
 
 /**
@@ -69,23 +78,36 @@ export type AttachToChatResult = {
  * dialog produces. Use it for the shortcuts that bypass the picker: the
  * "Ask AI" context action and the drag-and-drop drop zone.
  *
- * Folders are ignored. The cap is applied here rather than left to the store so
- * the caller learns how many files were dropped and can say so. The promise
- * resolves once the AI backend has echoed the attachment records back (rejects
- * if that round-trip fails, so callers own the error toast).
+ * Folders are ignored, and so are files already attached to the message — one
+ * chip per entryId — which come back as `duplicates`. The cap is applied here
+ * rather than left to the store so the caller learns how many files were
+ * dropped and can say so. The promise resolves once the AI backend has echoed
+ * the attachment records back (rejects if that round-trip fails, so callers
+ * own the error toast).
  */
 export const useAttachHostFilesToChat = () => {
   const { useAttachmentsStore } = useStores();
 
   return React.useCallback(
     async (items: ChatAttachableItem[]): Promise<AttachToChatResult> => {
-      const files = items.filter((item) => !item.isFolder);
+      const notFolders = items.filter((item) => !item.isFolder);
+
+      // A file goes on a message once. Drop the repeats before reserving
+      // chips, so a duplicate never flashes a loading chip and the counts
+      // below tell the caller what really happened.
+      const { keep } = splitDuplicateAttachments(
+        useAttachmentsStore,
+        notFolders.map((file) => String(file.id)),
+      );
+      const files = keep.map((index) => notFolders[index]);
+      const duplicates = notFolders.length - files.length;
 
       const inputsAll = files.map((file) => ({
         path: String(file.id),
         title: file.title,
         type: getOnlyofficeFileType(file.fileExst || file.title),
         content: "",
+        hasFormResults: hasFormResults(file),
       }));
 
       // The store owns the cap: the reservation counts the refs already
@@ -103,9 +125,9 @@ export const useAttachHostFilesToChat = () => {
           })),
         );
       const inputs = inputsAll.slice(0, pendingIds.length);
-      const skipped = items.length - inputs.length;
+      const skipped = items.length - inputs.length - duplicates;
 
-      if (inputs.length === 0) return { attached: 0, skipped };
+      if (inputs.length === 0) return { attached: 0, skipped, duplicates };
 
       const imageIndices = new Set<number>();
       files.slice(0, inputs.length).forEach((file, i) => {
@@ -126,7 +148,7 @@ export const useAttachHostFilesToChat = () => {
         throw err;
       }
 
-      return { attached: inputs.length, skipped };
+      return { attached: inputs.length, skipped, duplicates };
     },
     [useAttachmentsStore],
   );

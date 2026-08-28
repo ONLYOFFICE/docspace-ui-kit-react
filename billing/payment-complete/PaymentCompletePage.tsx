@@ -35,7 +35,12 @@
 
 import React from "react";
 
-import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
+import {
+  PaymentMethodStatus,
+  ProductQuantityType,
+  type CustomerInfoDto,
+  type PaymentApi,
+} from "@onlyoffice/docspace-api-sdk";
 
 import { useCommonTranslation } from "../../utils/i18n";
 import { Text } from "../../components/text";
@@ -65,29 +70,28 @@ import ErrorCard from "./sub-components/ErrorCard";
 
 type Status = "processing" | "success" | "error";
 
-const TOPUP_RETRY_ATTEMPTS = 10;
-const TOPUP_RETRY_DELAY_MS = 3000;
+const CUSTOMER_INFO_RETRY_ATTEMPTS = 10;
+const CUSTOMER_INFO_RETRY_DELAY_MS = 3000;
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
   });
 
-const withRetry = async <T,>(
-  task: () => Promise<T>,
-  attempts: number,
-  delayMs: number,
-): Promise<T> => {
-  let lastError: unknown;
-  for (let i = 0; i < attempts; i += 1) {
+const waitForCustomerPaymentMethod = async (paymentApi: PaymentApi) => {
+  for (let i = 0; i < CUSTOMER_INFO_RETRY_ATTEMPTS; i += 1) {
     try {
-      return await task();
+      const res = await paymentApi.getCustomerInfo({ refresh: true });
+      const info = res?.data?.response as unknown as CustomerInfoDto;
+
+      if (info?.paymentMethodStatus === PaymentMethodStatus.Set) return;
     } catch (error) {
-      lastError = error;
-      if (i < attempts - 1) await sleep(delayMs);
+      console.error("[paywall callback] customer info fetch failed", error);
     }
+
+    if (i < CUSTOMER_INFO_RETRY_ATTEMPTS - 1)
+      await sleep(CUSTOMER_INFO_RETRY_DELAY_MS);
   }
-  throw lastError;
 };
 
 type PaymentCompletePageProps = {
@@ -198,14 +202,11 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
       });
 
       try {
-        await withRetry(
-          () =>
-            paymentApi.topUpDeposit({
-              topUpDepositRequestDto: { amount, currency },
-            }),
-          TOPUP_RETRY_ATTEMPTS,
-          TOPUP_RETRY_DELAY_MS,
-        );
+        await waitForCustomerPaymentMethod(paymentApi);
+
+        await paymentApi.topUpDeposit({
+          topUpDepositRequestDto: { amount, currency },
+        });
       } catch (e) {
         console.error("[paywall callback] top-up failed", e);
         toastr.error(e as Error);

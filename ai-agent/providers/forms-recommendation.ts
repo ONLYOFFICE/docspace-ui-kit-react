@@ -33,22 +33,41 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-// DocSpace SVGs ship hardcoded fills, and the widget's <Icon> drops the
-// `color` prop for component overrides (it only recolors bundled/URL icons).
-// So recolor the visible shapes here to the chat's icon color. A presentation
-// `fill` attribute loses to this CSS rule, so no `!important` is needed;
-// `white` knockouts and `none` are left intact.
-.icon {
-  // path:not([fill="white"]):not([fill="none"]) {
-  //   fill: currentColor;
-  // }
-}
+"use client";
 
-// Glyphs the widget paints with a theme token through `<Icon color>` — the very
-// prop it drops for component overrides. Carry the token here instead, so a
-// DocSpace shape drawn with `currentColor` matches what the bundled icon would
-// have looked like in both themes.
-.tertiary {
-  color: var(--text-tertiary);
-}
+import { createContext, useContext } from "react";
 
+/**
+ * Host-supplied wiring for the in-chat "use the tested model for form
+ * results" notice. Everything here is optional: without a recommended model
+ * the notice never shows, and without the dismissal pair it lasts for the
+ * session only.
+ */
+export type FormsRecommendation = {
+  /**
+   * Model id the portal recommends for form-related tasks
+   * (`TAIConfig.recommendedModelForForms`). Empty/undefined switches the
+   * notice off.
+   */
+  recommendedModel?: string;
+  /** The current user may change the agent's model — picks the admin copy. */
+  canEditAgent?: boolean;
+  /** Opens the agent's settings, where the model is chosen. */
+  onOpenAgentEdit?: () => void;
+  /**
+   * Host-persisted dismissal (`chatRecommendedModelVisible` on the AI user
+   * config). `false` hides the notice for good; omitted means the host does
+   * not persist it and the close button only lasts the session.
+   */
+  noticeVisible?: boolean;
+  /** Called when the user closes the notice, so the host can persist it. */
+  onCloseNotice?: () => void;
+};
+
+export const FormsRecommendationContext = createContext<FormsRecommendation>(
+  {},
+);
+
+/** Read the host wiring for the form model notice. */
+export const useFormsRecommendation = (): FormsRecommendation =>
+  useContext(FormsRecommendationContext);
