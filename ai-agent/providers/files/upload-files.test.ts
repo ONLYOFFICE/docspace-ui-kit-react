@@ -27,8 +27,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockToastError = vi.fn();
+const mockToastWarning = vi.fn();
 vi.mock("../../../components/toast", () => ({
-  toastr: { error: (...args: unknown[]) => mockToastError(...args) },
+  toastr: {
+    error: (...args: unknown[]) => mockToastError(...args),
+    warning: (...args: unknown[]) => mockToastWarning(...args),
+  },
 }));
 
 const mockAttachFilesToChat = vi.fn(async (..._args: unknown[]) => undefined);
@@ -97,6 +101,7 @@ const makeFile = (name: string, content = "data", type = "text/plain") =>
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockToastWarning.mockClear();
   nextLease = 0;
   nextFileId = 0;
 });
@@ -133,8 +138,9 @@ describe("uploadFilesToChat", () => {
     expect(createUploadSessionInFolder).toHaveBeenCalledTimes(1);
     const [, inputs] = mockAttachFilesToChat.mock.calls[0] as unknown[];
     expect(inputs).toHaveLength(1);
-    // The refused tail was reported.
-    expect(mockToastError).toHaveBeenCalledTimes(1);
+    // The refused tail was reported through the shared limit notice.
+    expect(mockToastWarning).toHaveBeenCalledTimes(1);
+    expect(mockToastError).not.toHaveBeenCalled();
   });
 
   it("fails exactly the lease of a file whose upload threw", async () => {

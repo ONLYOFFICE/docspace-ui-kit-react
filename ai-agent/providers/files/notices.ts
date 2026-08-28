@@ -30,10 +30,11 @@ import { toastr } from "../../../components/toast";
 
 /**
  * A pick that produced no chip must not look like the action did nothing.
- * Both reasons are silent by design in the stores — the duplicate filter drops
- * the input before it is reserved, and the cap truncates the reservation — so
- * every attach entry point (picker, "Ask AI", drag-and-drop) reports them here,
- * with one wording for all of them.
+ * Both reasons are silent by design in the stores — the duplicate filter
+ * drops the input before it is reserved, and the cap truncates the
+ * reservation — so every attach entry point (picker, "Ask AI", device
+ * upload, drag-and-drop) reports them here, with one wording and one
+ * severity for all of them.
  */
 
 /**

@@ -95,7 +95,10 @@ export const useAttachHostFilesToChat = () => {
       // The shortcuts have no picker to gray out what is already attached, so
       // a second "Ask AI" (or re-drop) on the same file must be a no-op rather
       // than a duplicate chip.
-      const newIndices = selectNewAttachmentIndices(useAttachmentsStore, picked);
+      const newIndices = selectNewAttachmentIndices(
+        useAttachmentsStore,
+        picked,
+      );
       const duplicates = picked.length - newIndices.length;
       const files = newIndices.map((i) => allFiles[i]);
       const inputsAll = newIndices.map((i) => picked[i]);

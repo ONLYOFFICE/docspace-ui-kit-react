@@ -29,9 +29,11 @@ import { renderHook } from "@testing-library/react";
 
 // The hook resolves the attachments store through the widget context; give it
 // a fake so the accounting can be driven from the test.
+type FakeRef = { id: string; title: string; kind: string; path?: string };
+
 const storeState = {
-  attachmentFiles: [] as { id: string; title: string; kind: string; path?: string }[],
-  attachmentImages: [] as { id: string; title: string; kind: string; path?: string }[],
+  attachmentFiles: [] as FakeRef[],
+  attachmentImages: [] as FakeRef[],
   beginPendingAttachments: vi.fn(),
   failPendingAttachments: vi.fn(),
 };
@@ -64,7 +66,11 @@ const leases = (free: number) =>
     inputs.slice(0, free).map((_, i) => `pnd-${i + 1}`),
   );
 
-const attach = async (items: Parameters<ReturnType<typeof useAttachHostFilesToChat>>[0]) => {
+type AttachItems = Parameters<
+  ReturnType<typeof useAttachHostFilesToChat>
+>[0];
+
+const attach = async (items: AttachItems) => {
   const { result } = renderHook(() => useAttachHostFilesToChat());
   return result.current(items);
 };
@@ -93,7 +99,7 @@ describe("useAttachHostFilesToChat accounting", () => {
     expect(result).toEqual({ attached: 1, skipped: 1, duplicates: 0 });
   });
 
-  it("reports an already-attached file as a duplicate, not as skipped", async () => {
+  it("counts an already-attached file as a duplicate", async () => {
     storeState.attachmentFiles = [attachedRef("2")];
     const result = await attach([file(2)]);
     expect(result).toEqual({ attached: 0, skipped: 0, duplicates: 1 });

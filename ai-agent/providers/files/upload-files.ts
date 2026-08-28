@@ -36,6 +36,7 @@ import {
   type AttachFileInput,
   type OnFilesAttached,
 } from "./attach-files";
+import { notifyAttachmentLimit } from "./notices";
 
 type AttachmentsStore = ReturnType<typeof useStores>["useAttachmentsStore"];
 
@@ -145,14 +146,7 @@ export const uploadFilesToChat = async (
     })),
   );
   const accepted = picked.slice(0, pendingIds.length);
-  if (accepted.length < picked.length) {
-    toastr.error(
-      t("Common:ChatAttachmentLimitReached", {
-        count: picked.length - accepted.length,
-        defaultValue: "Files skipped — attachment limit reached: {{count}}",
-      }),
-    );
-  }
+  notifyAttachmentLimit(t, picked.length - accepted.length);
   if (accepted.length === 0) return;
 
   const inputs: AttachFileInput[] = [];

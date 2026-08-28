@@ -26,7 +26,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { selectNewAttachmentIndices, type AttachFileInput } from "./attach-files";
+import {
+  selectNewAttachmentIndices,
+  type AttachFileInput,
+} from "./attach-files";
 
 type Ref = { id: string; title: string; kind: "file" | "image"; path?: string };
 
@@ -43,7 +46,11 @@ const input = (path: string): AttachFileInput => ({
 
 // The backend composes the ref path as `${entryId}/${title}` so the history
 // chip can render the file name from it — refs never carry the bare entry id.
-const ref = (id: string, entryId: string, kind: "file" | "image" = "file"): Ref => ({
+const ref = (
+  id: string,
+  entryId: string,
+  kind: "file" | "image" = "file",
+): Ref => ({
   id,
   title: `file-${entryId}.docx`,
   kind,
@@ -53,9 +60,8 @@ const ref = (id: string, entryId: string, kind: "file" | "image" = "file"): Ref 
 describe("selectNewAttachmentIndices", () => {
   it("keeps everything when the composer is empty", () => {
     const store = makeStore([]);
-    expect(selectNewAttachmentIndices(store, [input("1"), input("2")])).toEqual([
-      0, 1,
-    ]);
+    const kept = selectNewAttachmentIndices(store, [input("1"), input("2")]);
+    expect(kept).toEqual([0, 1]);
   });
 
   it("drops host files already attached as files", () => {
@@ -69,9 +75,8 @@ describe("selectNewAttachmentIndices", () => {
     // Images are re-keyed out of `attachmentFiles` once they settle, so the
     // file bucket alone would not see them.
     const store = makeStore([], [ref("a", "7", "image")]);
-    expect(selectNewAttachmentIndices(store, [input("7"), input("8")])).toEqual([
-      1,
-    ]);
+    const kept = selectNewAttachmentIndices(store, [input("7"), input("8")]);
+    expect(kept).toEqual([1]);
   });
 
   it("collapses repeats inside the batch itself", () => {
@@ -90,6 +95,17 @@ describe("selectNewAttachmentIndices", () => {
     // A bare `path` comparison would miss this and let the duplicate through.
     const store = makeStore([
       { id: "a", title: "report.docx", kind: "file", path: "42/report.docx" },
+    ]);
+    expect(selectNewAttachmentIndices(store, [input("42")])).toEqual([]);
+  });
+
+  it("still matches a ref that carries the bare entry id", () => {
+    // `${entryId}/${title}` is what the AI backend composes today, but that
+    // shape is not part of any contract we own. A ref that carries the entry
+    // id alone must keep deduplicating, so a backend that stops composing
+    // the title in does not silently bring the duplicates back.
+    const store = makeStore([
+      { id: "a", title: "report.docx", kind: "file", path: "42" },
     ]);
     expect(selectNewAttachmentIndices(store, [input("42")])).toEqual([]);
   });
