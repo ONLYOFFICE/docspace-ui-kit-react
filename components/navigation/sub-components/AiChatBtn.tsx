@@ -46,8 +46,14 @@ import { TAiChatButtonProps } from "../Navigation.types";
 // Layout rounding must not be able to flip the collapsed state on its own.
 const SUBPIXEL_SLACK = 1;
 
-/** The collapsed slot: the bare 32px icon button, per Navigation.module.scss. */
-const COLLAPSED_WIDTH = 32;
+/**
+ * The collapsed slot: the bare icon button, per Navigation.module.scss. Button
+ * is `box-sizing: border-box`, so its 16px icon plus `padding-inline: 8px` and
+ * its 1px border come out at 34px - not the 32px the icon-plus-padding
+ * arithmetic suggests. Under-measuring it by those 2px is enough to have the
+ * slot clip the icon, because the slot hides its overflow.
+ */
+const COLLAPSED_WIDTH = 34;
 
 /**
  * The header row the button competes for width in, whichever of the two places
@@ -102,7 +108,8 @@ const isRowCrowded = (slot: HTMLElement) => {
 /**
  * Opens the AI chat panel. Keeps the "AI chat" label next to the icon for as
  * long as the header row can fit it, and collapses to the bare icon as soon as
- * anything else in the row has started shortening its own text.
+ * either the row hands the slot less width than it asked for or anything else
+ * in the row has started shortening its own text.
  *
  * The label is the first thing in the header to go, not the last: a collapsed
  * button is still named by its icon, while a room title cut to "Sales and mar..."
@@ -161,7 +168,17 @@ const AiChatButton = ({
       // Ask expanded, read the row, then commit. Reading while expanded is what
       // keeps the decision independent of the state it sets.
       slot.style.width = `${naturalWidth}px`;
-      const crowded = isRowCrowded(slot);
+
+      // Reading a layout property flushes the write above, so this is the width
+      // the row actually granted - not the one just asked for. A host that
+      // hands back less has nowhere to put the label, and the slot hides its
+      // overflow, so leaving the button expanded would slice its leading edge
+      // off rather than shrink it. `isRowCrowded` cannot see this on its own:
+      // the slot's own `overflow: hidden` absorbs the deficit, so the row never
+      // reports one and the neighbours never truncate.
+      const squeezed = slot.clientWidth < naturalWidth - SUBPIXEL_SLACK;
+
+      const crowded = squeezed || isRowCrowded(slot);
 
       slot.style.width = `${crowded ? COLLAPSED_WIDTH : naturalWidth}px`;
       setIsCollapsed(crowded);

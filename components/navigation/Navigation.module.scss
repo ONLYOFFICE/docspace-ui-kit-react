@@ -546,9 +546,11 @@
   // of opening a gap between the button and the edge of the header.
   justify-content: flex-end;
 
-  // Shrink target: the bare 32px icon button.
+  // Shrink target: the bare icon button, 34px wide - see COLLAPSED_WIDTH in
+  // AiChatBtn.tsx for where the 34 comes from. Shrinking below it would clip
+  // the icon itself.
   flex: 0 1 auto;
-  min-width: 32px;
+  min-width: 34px;
   overflow: hidden;
 
   :global {
