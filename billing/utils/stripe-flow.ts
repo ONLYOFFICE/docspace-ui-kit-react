@@ -33,6 +33,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { isIOS } from "react-device-detect";
+
 import { toAbsoluteUrl } from "./url";
 
 export const PAYMENT_CALLBACK_PATH = "/billing/payment-complete";
@@ -103,6 +105,8 @@ export const openStripeCheckout = async (
   service?: string,
   successParams?: Record<string, string>,
 ) => {
+  const useSameTab = isIOS;
+
   const currency = walletCodeCurrency || "USD";
   const lang = language || "en";
   const backUrl = `${window.location.origin}${window.location.pathname}`;
@@ -119,7 +123,10 @@ export const openStripeCheckout = async (
 
   if (!linkUrl) throw new Error("Missing Stripe checkout URL");
 
-  window.open(toAbsoluteUrl(linkUrl), "_blank");
+  const checkoutUrl = toAbsoluteUrl(linkUrl);
+
+  if (useSameTab) window.location.href = checkoutUrl;
+  else window.open(checkoutUrl, "_blank");
 };
 
 export type TTopUpCompletionDeps = {
@@ -146,3 +153,4 @@ export const waitForTopUpCompletion = async (
     return newBalance > initialBalance;
   }, signal);
 };
+
