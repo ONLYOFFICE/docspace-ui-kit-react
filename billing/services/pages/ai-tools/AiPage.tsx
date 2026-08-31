@@ -100,6 +100,7 @@ const AiPage = (props: AiPageProps) => {
     isServiceActionDisabled,
     formatWalletCurrency,
     isLowWalletBalance,
+    showUnlinkedCardBanner,
   } = paymentStore;
 
   const { logoText, language } = paymentStore;
@@ -244,8 +245,7 @@ const AiPage = (props: AiPageProps) => {
             balance={balance}
             onTopUp={onOpenTopUp}
           />
-          {!paymentStore.tariff.isNotPaidPeriod &&
-          paymentStore.tariff.walletCustomerStatusNotActive ? (
+          {showUnlinkedCardBanner ? (
             <div className={styles.unlinkedBanner}>
               <UnlinkedCardBanner />
             </div>

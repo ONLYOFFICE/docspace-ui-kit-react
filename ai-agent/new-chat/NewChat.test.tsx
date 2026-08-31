@@ -80,6 +80,12 @@ vi.mock("../providers/ai-chat-store/AiChatStoreProvider", () => ({
   useAiChatStore: () => ({ effectiveFullscreen: false }),
 }));
 
+// The in-chat form notice reads the attachments store and the host wiring;
+// both are exercised by their own tests.
+vi.mock("./components/form-model-notice", () => ({
+  FormModelNotice: () => null,
+}));
+
 const noAccessProps: ChatNoAccessScreenProps = {
   standalone: false,
   isPortalAdmin: true,

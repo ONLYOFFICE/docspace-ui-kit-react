@@ -97,6 +97,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     setStorageDeactivationVisited,
     isServiceActionDisabled,
     isShowPreviousStoragePlan,
+    showUnlinkedCardBanner,
   } = paymentStore;
 
   const {
@@ -275,8 +276,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         balance={balance}
         onTopUp={() => setIsTopUpDialogVisible(true)}
       />
-      {!paymentStore.tariff.isNotPaidPeriod &&
-      paymentStore.tariff.walletCustomerStatusNotActive ? (
+      {showUnlinkedCardBanner ? (
         <div className={styles.unlinkedBanner}>
           <UnlinkedCardBanner />
         </div>

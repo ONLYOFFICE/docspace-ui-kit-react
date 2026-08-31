@@ -96,6 +96,7 @@ const Wallet = (props: WalletProps) => {
     isAutoPaymentExist,
     language,
     wasFirstTopUp,
+    showUnlinkedCardBanner,
   } = store;
 
   const isAutoPaymentSetup = Boolean(
@@ -106,10 +107,7 @@ const Wallet = (props: WalletProps) => {
     autoPayments?.upToBalance,
   );
 
-  const {
-    isNotPaidPeriod,
-    walletCustomerStatusNotActive,
-  } = store.tariff;
+  const { isNotPaidPeriod } = store.tariff;
 
   const t = useCommonTranslation();
 
@@ -309,7 +307,7 @@ const Wallet = (props: WalletProps) => {
         </div>
       </div>
 
-      {!isNotPaidPeriod && walletCustomerStatusNotActive ? (
+      {showUnlinkedCardBanner ? (
         <UnlinkedCardBanner />
       ) : isAutoPaymentSetup ? (
         <AutoPaymentInfo />

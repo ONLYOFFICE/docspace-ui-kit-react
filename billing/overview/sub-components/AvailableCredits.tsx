@@ -41,11 +41,13 @@ import { Button, ButtonSize } from "../../../components/button";
 import { Text } from "../../../components/text";
 import { toastr } from "../../../components/toast";
 import { useCommonTranslation } from "../../../utils/i18n";
+import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { getAppTimezone } from "../../../utils/date";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { finishRefreshingWithMinCycle } from "../../utils/refreshing";
 import BalanceAmount from "../../shared/balance-amount";
+import UnlinkedCardBanner from "../../shared/unlinked-card-banner";
 import AutoPaymentInfo from "../../wallet/sub-components/AutoPaymentInfo";
 import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import WalletRefilledModal from "../../wallet/WalletRefilledModal";
@@ -63,6 +65,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
   const store = usePaymentStore();
 
   const {
+    formatPaymentCurrency,
     walletBalance,
     walletCodeCurrency,
     isCardLinkedToPortal,
@@ -75,9 +78,13 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     language,
     formatWalletCurrency,
     upcomingPayments,
+    showUnlinkedCardBanner,
+    isLoading,
   } = store;
 
-  const { isNotPaidPeriod } = store.tariff;
+  const { isNotPaidPeriod, isGracePeriod, gracePeriodEndDate } = store.tariff;
+  const overduePlanCost = store.quotas.currentPlanCost?.value ?? 0;
+  const graceShortfall = overduePlanCost - walletBalance;
 
   const toDueDay = (dueDate: string) =>
     DateTime.fromISO(dueDate).setZone(getAppTimezone()).toISODate();
@@ -109,7 +116,10 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     const startTime = Date.now();
 
     try {
-      await fetchBalance?.(true);
+      await Promise.all([
+        fetchBalance?.(true),
+        store.tariff.fetchCustomerInfo(true),
+      ]);
     } catch (e) {
       toastr.error(e as Error);
     } finally {
@@ -118,6 +128,66 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
         setRefreshing: setIsRefreshing,
       });
     }
+  };
+
+  const renderStatusBanner = () => {
+    if (showUnlinkedCardBanner)
+      return (
+        <div className={styles.unlinkedBannerWrap}>
+          <UnlinkedCardBanner />
+        </div>
+      );
+
+    if (isGracePeriod && graceShortfall > 0 && !isLoading)
+      return (
+        <div className={styles.topUpWarning}>
+          <WarningIcon className={styles.topUpWarningIcon} />
+          <Text
+            as="span"
+            fontSize="12px"
+            fontWeight={600}
+            lineHeight="16px"
+            className={styles.topUpWarningText}
+          >
+            {t("InsufficientCreditsTopUpToday", {
+              amount: formatPaymentCurrency(graceShortfall, 2),
+              date: gracePeriodEndDate,
+            })}
+          </Text>
+        </div>
+      );
+
+    if (isNextPayment && !isLoading)
+      return (
+        <div className={styles.topUpWarning}>
+          <WarningIcon className={styles.topUpWarningIcon} />
+          <Text
+            as="span"
+            fontSize="12px"
+            fontWeight={600}
+            lineHeight="16px"
+            className={styles.topUpWarningText}
+          >
+            {t("TopUpBeforeNextPayment", {
+              amount: formatWalletCurrency(
+                Math.ceil(topUpShortfall),
+                0,
+                walletCodeCurrency,
+              ),
+              date: nextPayment.renewalDateShort,
+            })}
+          </Text>
+        </div>
+      );
+
+    if (isAutoPaymentSetup)
+      return (
+        <div className={styles.autoPaymentWrap}>
+          <AutoPaymentInfo />
+        </div>
+      );
+
+    return null;
   };
 
   return (
@@ -148,7 +218,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
               className={styles.cardButton}
               testId="overview_top_up_button"
             />
-            {wasFirstTopUp ? (
+            {wasFirstTopUp && !isGracePeriod ? (
               <Button
                 size={isMobile ? ButtonSize.normal : ButtonSize.small}
                 label={t("AutoTopUp")}
@@ -161,39 +231,27 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
           </div>
         ) : null}
       </div>
-      {isNextPayment ? (
-        <div className={styles.topUpWarning}>
-          <WarningIcon className={styles.topUpWarningIcon} />
-          <Text
-            as="span"
-            fontSize="12px"
-            fontWeight={600}
-            lineHeight="16px"
-            className={styles.topUpWarningText}
-          >
-            {t("TopUpBeforeNextPayment", {
-              amount: formatWalletCurrency(
-                Math.ceil(topUpShortfall),
-                0,
-                walletCodeCurrency,
-              ),
-              date: nextPayment.renewalDateShort,
-            })}
-          </Text>
-        </div>
-      ) : null}
 
-      {isAutoPaymentSetup && !isNextPayment ? (
-        <div className={styles.autoPaymentWrap}>
-          <AutoPaymentInfo />
-        </div>
-      ) : null}
+      {renderStatusBanner()}
 
       {isTopUpDialogVisible ? (
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={() => setIsTopUpDialogVisible(false)}
           recommendedAmount={recommendedAmount}
+          minValue={isGracePeriod ? String(overduePlanCost) : undefined}
+          descriptionText={
+            isGracePeriod ? t("TopUpCoverOverdueDescription") : undefined
+          }
+          helperText={
+            isGracePeriod ? (
+              <CommonTrans
+                i18nKey="TopUpCoverOverdueHint"
+                values={{ price: formatPaymentCurrency(overduePlanCost, 2) }}
+                components={{ 1: <Text as="span" fontWeight={600} /> }}
+              />
+            ) : undefined
+          }
         />
       ) : null}
 

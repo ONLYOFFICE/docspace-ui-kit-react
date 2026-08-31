@@ -39,6 +39,10 @@ import useGetIcon from "../../hooks/useGetIcon";
 
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat, type OnFilesAttached } from "./attach-files";
+import { splitDuplicateAttachments } from "./duplicate-attachments";
+import { hasFormResults } from "./form-attachments";
+import { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
+import { reserveAttachmentChips } from "./limits";
 import useDeviceType from "./use-device-type";
 
 type AttachDialogProps = {
@@ -95,6 +99,9 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
               title: f.label,
               fileType: "fileType" in f ? f.fileType : undefined,
               fileExst: "fileExst" in f ? (f.fileExst ?? "") : "",
+              isForm: "isForm" in f ? f.isForm : undefined,
+              externalDbTableName:
+                "externalDbTableName" in f ? f.externalDbTableName : undefined,
             }))
           : selectedFileInfo
             ? [
@@ -103,37 +110,56 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
                   title: selectedFileInfo.title,
                   fileType: selectedFileInfo.fileType,
                   fileExst: selectedFileInfo.fileExst ?? "",
+                  isForm: (selectedFileInfo as { isForm?: boolean }).isForm,
+                  externalDbTableName: (
+                    selectedFileInfo as { externalDbTableName?: string | null }
+                  ).externalDbTableName,
                 },
               ]
             : [];
 
-      const inputs = sources.map((s) => ({
+      // One chip per file: a pick that is already on the message (or picked
+      // twice across folders) is dropped before any chip is reserved.
+      const { keep } = splitDuplicateAttachments(
+        useAttachmentsStore,
+        sources.map((s) => String(s.id)),
+      );
+      const picked = keep.map((index) => sources[index]);
+      const duplicates = sources.length - picked.length;
+
+      const inputs = picked.map((s) => ({
         path: String(s.id),
         title: s.fileExst ? `${s.title}${s.fileExst}` : s.title,
         type: getOnlyofficeFileType(s.fileExst || s.title),
         content: "",
+        hasFormResults: hasFormResults(s),
       }));
 
       const imageIndices = new Set<number>();
-      sources.forEach((s, i) => {
+      picked.forEach((s, i) => {
         if (s.fileType === FileType.Image) imageIndices.add(i);
       });
 
       // Reserve the loading chips before closing so they are already in the
       // composer when the dialog disappears; the reservation also applies
       // the attachment cap (extra picks simply get no chip).
-      const pendingIds = useAttachmentsStore
-        .getState()
-        .beginPendingAttachments(
-          inputs.map((input) => ({
-            title: input.title,
-            kind: "file" as const,
-            type: input.type,
-          })),
-        );
+      const pendingIds = reserveAttachmentChips(
+        useAttachmentsStore,
+        inputs.map((input) => ({
+          title: input.title,
+          kind: "file" as const,
+          type: input.type,
+        })),
+      );
       const accepted = inputs.slice(0, pendingIds.length);
 
       onClose();
+      // Both drops are silent by design — the duplicate filter runs before
+      // the reservation, the cap truncates it — so a pick that produced no
+      // chip would just look like nothing happened. Reported after the
+      // dialog closes so the toasts are not covered by it.
+      notifyAlreadyAttached(t, duplicates);
+      notifyAttachmentLimit(t, inputs.length - accepted.length);
       if (accepted.length === 0) return;
 
       try {
@@ -150,7 +176,7 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
         toastr.error(e as TData);
       }
     },
-    [onClose, onFilesAttached, useAttachmentsStore],
+    [onClose, onFilesAttached, useAttachmentsStore, t],
   );
 
   const getIsDisabled = React.useCallback<

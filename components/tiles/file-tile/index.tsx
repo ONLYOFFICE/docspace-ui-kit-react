@@ -158,11 +158,12 @@ const FileTile = ({
   };
 
   const getIconFile = () => {
-    const icon = item.isPlugin
-      ? item.fileTileIcon
-      : thumbnail && !errorLoadSrc
-        ? thumbnail
-        : temporaryIcon;
+    const icon =
+      item.isPlugin && item.fileTileIcon
+        ? item.fileTileIcon
+        : thumbnail && !errorLoadSrc
+          ? thumbnail
+          : temporaryIcon;
 
     const isIconElement = React.isValidElement(icon);
 
