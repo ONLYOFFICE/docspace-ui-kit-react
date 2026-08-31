@@ -38,7 +38,10 @@ import React, { use } from "react";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { RoomsType } from "../../../enums";
+import type { TSelectorItem } from "../../../components/selector";
 import { LoadersContext, LoadersContextProvider } from "../contexts/Loaders";
+import type { UseRoomsHelperProps } from "../types";
 import useRoomsHelper from "./useRoomsHelper";
 
 const mocks = vi.hoisted(() => {
@@ -60,7 +63,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   <LoadersContextProvider>{children}</LoadersContextProvider>
 );
 
-const setup = () =>
+const setup = (props: Partial<UseRoomsHelperProps> = {}) =>
   renderHook(
     () => ({
       loaders: use(LoadersContext),
@@ -74,6 +77,7 @@ const setup = () =>
         setBreadCrumbs: vi.fn(),
         setIsRoot: vi.fn(),
         subscribe: vi.fn(),
+        ...props,
       }),
     }),
     { wrapper },
@@ -125,5 +129,38 @@ describe("useRoomsHelper", () => {
     });
 
     expect(mocks.getRoomsFolder).toHaveBeenCalledTimes(2);
+  });
+
+  it("omits the form filling room from the create-room type dropdown", async () => {
+    mocks.getRoomsFolder.mockResolvedValue({
+      data: {
+        response: {
+          folders: [],
+          total: 0,
+          count: 0,
+          current: { id: 1, title: "Rooms", security: { Create: true } },
+        },
+      },
+    });
+
+    const setItems = vi.fn();
+
+    const { result } = setup({ withCreate: true, setItems });
+
+    await act(async () => {
+      await result.current.rooms.getRoomList(0);
+    });
+
+    const items = setItems.mock.calls[0][0] as TSelectorItem[];
+    const createItem = items.find((item) => item.id === "create-room-item");
+
+    const roomTypeKeys = (
+      createItem?.dropDownItems as React.ReactElement[]
+    ).map((element) => element.key);
+
+    // Form filling rooms live in the Forms section - the Rooms section must
+    // not offer them, so a form restored into a new room cannot land in one.
+    expect(roomTypeKeys).not.toContain(String(RoomsType.FormRoom));
+    expect(roomTypeKeys).toContain(String(RoomsType.CustomRoom));
   });
 });

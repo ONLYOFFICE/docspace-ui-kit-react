@@ -123,8 +123,13 @@ const useRoomsHelper = ({
     initRef.current = isInit;
   }, [isInit]);
 
+  // The type dropdown only opens outside the Forms section (a forms-scoped
+  // listing gets createRoomType and creates the room straight away), and form
+  // filling rooms cannot be created from the Rooms section.
   const createDropDownItems = React.useMemo(() => {
-    return RoomsTypeValues.map((value) => {
+    return RoomsTypeValues.filter(
+      (value) => value !== ApiRoomType.FillingFormsRoom,
+    ).map((value) => {
       const isPublicRoomDisabled =
         !!disabledCreatePublicRoom && value === ApiRoomType.PublicRoom;
 
