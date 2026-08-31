@@ -885,18 +885,35 @@
   @include mixins.tablet-and-below {
     width: 100%;
 
-    grid-template-columns: 49px 1fr auto;
+    // The title takes what it needs and the trailing controls take the rest -
+    // the same shape as the desktop rules above and as the
+    // `[data-show-navigation-button="true"]` rule, which is the one layout in
+    // this file that already got the tablet header right.
+    //
+    // `1fr` on the title was the other way round, and `1fr` is greedy: it took
+    // every pixel the title's own `auto` neighbour did not claim, leaving the
+    // control column at the 90px `min-width` of `.controlButtonContainer` no
+    // matter how empty the header was. That column carries the tariff line,
+    // so on a 1023px header the line came out 40px wide - "Try the Bus..." -
+    // with 750px of nothing beside it. The floor keeps the controls whole the
+    // other way too: a long folder name now truncates instead of squeezing
+    // them, which is the order the header is supposed to degrade in.
+    grid-template-columns: 49px auto minmax(186px, 1fr);
 
     &[data-is-root-folder="true"][data-with-logo="true"] {
-      grid-template-columns: 59px 1fr auto;
+      grid-template-columns: 59px auto minmax(186px, 1fr);
     }
 
     &[data-is-root-folder="true"][data-with-logo="false"] {
-      grid-template-columns: 1fr auto;
+      grid-template-columns: auto minmax(186px, 1fr);
     }
 
+    // Same flip as above. This one is the framed/SDK header, which the client
+    // E2E suite cannot reach, so it follows the other three by symmetry rather
+    // than from a measurement - leaving it inverted would just park the same
+    // bug where nothing here can see it.
     &[data-with-logo="true"] {
-      grid-template-columns: 43px 49px 1fr auto;
+      grid-template-columns: 43px 49px auto minmax(186px, 1fr);
     }
 
     // &[data-with-chat="true"] {
