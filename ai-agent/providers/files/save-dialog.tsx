@@ -201,6 +201,10 @@ const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
       isPanelVisible
       openRoot
       isRoomsOnly={false}
+      // The Forms section only accepts PDF forms, which a chat message can
+      // never produce, so a save target inside it does not exist (Bug 83486).
+      // The attach dialog keeps the section — reading forms is legitimate.
+      withFormsTreeFolder={false}
       isThirdParty={false}
       withCreate={false}
       withSearch
