@@ -88,6 +88,7 @@ const BackupPage: React.FC<BackupPageProps> = ({
     isBackupServiceOn,
     isServiceActionDisabled,
     language,
+    showUnlinkedCardBanner,
   } = paymentStore;
 
   const { isFreeTariff, maxFreeBackups } = paymentStore.quotas;
@@ -207,8 +208,7 @@ const BackupPage: React.FC<BackupPageProps> = ({
         isDisabled={isDisabled || isLoading}
       />
       <WalletInfo withoutBackground balance={balance} onTopUp={onTopUp} />
-      {!paymentStore.tariff.isNotPaidPeriod &&
-      paymentStore.tariff.walletCustomerStatusNotActive ? (
+      {showUnlinkedCardBanner ? (
         <div className={styles.unlinkedBanner}>
           <UnlinkedCardBanner />
         </div>

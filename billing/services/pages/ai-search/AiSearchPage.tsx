@@ -102,6 +102,7 @@ const AiSearchPage = (props: AiSearchPageProps) => {
     isAiToolsServiceOn,
     isServiceActionDisabled,
     formatWalletCurrency,
+    showUnlinkedCardBanner,
   } = paymentStore;
 
   const { language } = paymentStore;
@@ -265,8 +266,7 @@ const AiSearchPage = (props: AiSearchPageProps) => {
             balance={balance}
             onTopUp={onOpenTopUp}
           />
-          {!paymentStore.tariff.isNotPaidPeriod &&
-          paymentStore.tariff.walletCustomerStatusNotActive ? (
+          {showUnlinkedCardBanner ? (
             <div className={styles.unlinkedBanner}>
               <UnlinkedCardBanner />
             </div>

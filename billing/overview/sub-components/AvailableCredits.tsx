@@ -78,7 +78,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     language,
     formatWalletCurrency,
     upcomingPayments,
-    isCardMissingOrInactive,
+    showUnlinkedCardBanner,
     isLoading,
   } = store;
 
@@ -131,7 +131,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
   };
 
   const renderStatusBanner = () => {
-    if (isCardMissingOrInactive)
+    if (showUnlinkedCardBanner)
       return (
         <div className={styles.unlinkedBannerWrap}>
           <UnlinkedCardBanner />

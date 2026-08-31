@@ -99,9 +99,8 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     currentTariffAdminsCount,
     nextTariffAdminsCount,
     fetchPortalTariff,
-    walletCustomerStatusNotActive,
   } = store.tariff;
-  const { fetchBalance } = store;
+  const { fetchBalance, showUnlinkedCardBanner } = store;
   const { tariffPlanTitle, planCost } = store.paymentQuotas;
 
   const startValue = planCost.value;
@@ -364,7 +363,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
         </div>
       ) : null}
 
-      {!isNonProfit && !isNotPaidPeriod && walletCustomerStatusNotActive ? (
+      {!isNonProfit && showUnlinkedCardBanner ? (
         <div className={styles.unlinkedBanner}>
           <UnlinkedCardBanner />
         </div>

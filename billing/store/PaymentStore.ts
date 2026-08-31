@@ -441,6 +441,13 @@ class PaymentStore {
     return this.isCardMissingOrInactive;
   }
 
+  get showUnlinkedCardBanner() {
+    return (
+      !this.tariff.isNotPaidPeriod &&
+      !!this.tariff.walletCustomerStatusNotActive
+    );
+  }
+
   get needsWalletMigration() {
     return (
       !this.quotas.isFreeTariff && !this.tariff.hasTariffWalletSubscription
