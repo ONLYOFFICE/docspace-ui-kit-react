@@ -136,6 +136,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     initHasNextPage,
 
     applyFilterOption,
+    isMultiSelect,
     onSelectItem,
     isPortalView,
 
@@ -584,6 +585,17 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           }
         }
       } else if (item.id && item.label) {
+        // In multi-select mode a click on an already selected file
+        // DEselects it (the Selector toggles by the pre-click `isSelected`),
+        // so mirror the removal: keeping the previous value here leaves the
+        // footer's submit button enabled after the last checkbox is cleared
+        // (Bug 83477).
+        if (isMultiSelect && item.isSelected) {
+          selectedFileInfoRef.current = null;
+          setSelectedFileInfo(null);
+          return;
+        }
+
         const inPublic =
           breadCrumbs.findIndex(
             (f) =>
@@ -620,6 +632,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       breadCrumbs,
       setSelectedItemType,
       setIsDisabledFolder,
+      isMultiSelect,
       onSelectItem,
       filesApi,
       t,
