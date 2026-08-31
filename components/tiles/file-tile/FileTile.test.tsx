@@ -409,6 +409,18 @@ describe("FileTile", () => {
     expect(svgMock.getAttribute("src")).toBe("plugin.png");
   });
 
+  it("falls back to the extension icon when a plugin item has no tile icon", () => {
+    const pluginItem = { ...mockItem, isPlugin: true };
+    render(
+      <FileTile {...defaultProps} item={pluginItem} temporaryIcon="md-96.svg">
+        <FileContent />
+      </FileTile>,
+    );
+
+    const svgMock = screen.getByTestId("file-thumbnail");
+    expect(svgMock.getAttribute("src")).toBe("md-96.svg");
+  });
+
   it("constructs context menu header correctly from first child item", () => {
     const childItem = { title: "Custom Title", icon: "custom-icon" };
     const FileChild = ({ item }: { item: typeof childItem }) => <div data-testid="child" />;

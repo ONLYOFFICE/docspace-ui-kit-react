@@ -35,8 +35,6 @@
 
 import React from "react";
 
-import { ProviderType } from "../../enums/ai";
-
 import CrossIcon from "../../assets/icons/12/cross.react.svg";
 import AiAgentsIcon from "../../assets/icons/16/ai-agents.svg";
 
@@ -52,9 +50,14 @@ export type RecomendedModelProps = {
   isAdmin: boolean;
   isChat: boolean;
   selectedModel: string;
-  providerType?: ProviderType;
-  availableProviders?: ProviderType[];
-  modelList?: string[];
+  /**
+   * Whether the recommended model can be selected right here — the host's
+   * call, because where it may come from differs per portal: OpenRouter on a
+   * standalone installation, the portal's own (billed) AI on SaaS. Only the
+   * non-chat states branch on it: available turns the notice into "select it",
+   * otherwise it explains that the model has to be connected first.
+   */
+  isAvailable?: boolean;
   recomendedModel: string;
   onClose?: () => void;
   onOpenSettings?: () => void;
@@ -66,9 +69,7 @@ export const RecomendedModel = ({
   isAdmin,
   isChat,
   selectedModel,
-  providerType,
-  availableProviders,
-  modelList,
+  isAvailable,
   recomendedModel,
   onClose,
   onOpenSettings,
@@ -80,16 +81,7 @@ export const RecomendedModel = ({
   // The recommended model is already selected — nothing to recommend.
   if (selectedModel === recomendedModel) return null;
 
-  const hasOpenRouterProvider = !!availableProviders?.includes(
-    ProviderType.OpenRouter,
-  );
-  const isCurrentOpenRouter = providerType === ProviderType.OpenRouter;
-  const hasRecomendedInModelList = !!modelList?.includes(recomendedModel);
-
-  // The recommended model can be selected: OpenRouter is among the available
-  // providers, or it's the current provider and its model list contains one.
-  const isRecomendedAvailable =
-    hasOpenRouterProvider || (isCurrentOpenRouter && hasRecomendedInModelList);
+  const isRecomendedAvailable = !!isAvailable;
 
   // Chat states (branch by role only).
   const isChatAdminState = isChat && isAdmin;
