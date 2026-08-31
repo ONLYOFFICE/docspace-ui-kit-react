@@ -201,6 +201,11 @@ const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
       isPanelVisible
       openRoot
       isRoomsOnly={false}
+      // The legacy chat's save picker listed the AI agents section (an
+      // agent's storage the user can Create in is a valid save target); the
+      // prop was lost when the picker was rewritten for the chat-lib
+      // integration.
+      withAIAgentsTreeFolder
       // The Forms section only accepts PDF forms, which a chat message can
       // never produce, so a save target inside it does not exist (Bug 83486).
       // The attach dialog keeps the section — reading forms is legitimate.
