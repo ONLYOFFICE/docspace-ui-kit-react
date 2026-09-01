@@ -92,6 +92,13 @@ export type ChatPanelProps = {
   width?: number;
   /** Called once per drag, on mouse up, with the committed width in px. */
   onResize?: (value: number) => void;
+  /**
+   * Called when the resize drag is pushed past the widest docked width, i.e.
+   * the user asks for fullscreen with the same gesture that widens the panel.
+   * The host is expected to turn fullscreen on (as its header button does);
+   * omitting the handler keeps the drag clamped at the limit instead.
+   */
+  onRequestFullscreen?: () => void;
 };
 
 export type SectionBodyContentProps = {
@@ -217,6 +224,12 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     isChatPanelResizable?: boolean;
     chatPanelWidth?: number;
     setChatPanelWidth?: (value: number) => void;
+    /**
+     * Turns the chat panel fullscreen on. Called when the edge resizer is
+     * dragged past the widest docked width; leave unset to keep that drag
+     * clamped at the limit.
+     */
+    setChatPanelFullscreen?: () => void;
     isEmptyPage?: boolean;
     maintenanceExist?: boolean;
     snackbarExist?: boolean;

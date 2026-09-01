@@ -126,6 +126,7 @@ const Section = (props: SectionProps) => {
     isChatPanelResizable,
     chatPanelWidth,
     setChatPanelWidth,
+    setChatPanelFullscreen,
     inert,
     isMobileHidden,
     canDisplay,
@@ -479,6 +480,7 @@ const Section = (props: SectionProps) => {
           isResizable={isChatPanelResizable}
           width={chatPanelWidth}
           onResize={setChatPanelWidth}
+          onRequestFullscreen={setChatPanelFullscreen}
         >
           {chatPanelContent}
         </ChatPanelView>

@@ -47,6 +47,10 @@ import styles from "../Section.module.scss";
 // give up before its own content (table columns / tiles) stops fitting.
 const MIN_CHAT_PANEL_WIDTH = 360;
 const MIN_SECTION_WIDTH = 416;
+// How far past the widest docked width the pointer has to be pushed before the
+// drag flips the panel into fullscreen. Small enough to feel like "keep going",
+// large enough that landing exactly on the limit doesn't trigger it.
+const FULLSCREEN_OVERSHOOT = 80;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
@@ -73,7 +77,9 @@ const contentWidth = (panel: HTMLElement) => {
  * In the docked desktop layout the host can additionally opt into a drag
  * resizer on the panel's inline-start edge (`isResizable` + `width`/`onResize`).
  * It is desktop-only on purpose: on tablet/mobile — and in fullscreen — the
- * panel's width belongs to the layout, not to the user.
+ * panel's width belongs to the layout, not to the user. Pushing that drag past
+ * the widest docked width hands the panel to `onRequestFullscreen`, i.e. the
+ * same state the header's fullscreen button produces.
  */
 const ChatPanel = ({
   children,
@@ -84,6 +90,7 @@ const ChatPanel = ({
   isResizable,
   width,
   onResize,
+  onRequestFullscreen,
 }: ChatPanelProps) => {
   const panelRef = useRef<HTMLDivElement>(null);
   // Set while a drag is in flight so an unmount mid-drag still detaches the
@@ -184,12 +191,28 @@ const ChatPanel = ({
       let nextWidth = startWidth;
 
       const onMouseMove = (event: MouseEvent) => {
+        const desiredWidth = startWidth + direction * (event.clientX - startX);
+
+        // Once the panel is pinned at its widest docked width, dragging further
+        // in the same direction is a request for fullscreen — the drag ends
+        // there and the host takes over, exactly as if the header button had
+        // been clicked. Without a host handler the width just stays clamped.
+        if (
+          onRequestFullscreen &&
+          desiredWidth - maxWidth >= FULLSCREEN_OVERSHOOT
+        ) {
+          stopDrag();
+          // Commit the width the panel actually reached, so leaving fullscreen
+          // restores the wide panel the user dragged out rather than jumping
+          // back to the width the drag started from.
+          onResize?.(Math.round(maxWidth));
+          onRequestFullscreen();
+          settleLayout();
+          return;
+        }
+
         nextWidth = Math.round(
-          clamp(
-            startWidth + direction * (event.clientX - startX),
-            MIN_CHAT_PANEL_WIDTH,
-            maxWidth,
-          ),
+          clamp(desiredWidth, MIN_CHAT_PANEL_WIDTH, maxWidth),
         );
         // Drive the DOM directly while the pointer is down: routing every frame
         // through the host store would re-render the whole section tree (list,
@@ -205,12 +228,14 @@ const ChatPanel = ({
         document.body.classList.remove(styles.resizingCursor);
       };
 
+      // Section re-measures itself through a throttled ResizeObserver; nudge the
+      // resize listeners so table columns and tiles settle right away.
+      const settleLayout = () => window.dispatchEvent(new Event("resize"));
+
       function onMouseUp() {
         stopDrag();
         onResize?.(nextWidth);
-        // Section re-measures itself through a throttled ResizeObserver; nudge
-        // the resize listeners so table columns and tiles settle right away.
-        window.dispatchEvent(new Event("resize"));
+        settleLayout();
       }
 
       stopDragRef.current = stopDrag;
@@ -218,7 +243,7 @@ const ChatPanel = ({
       window.addEventListener("mousemove", onMouseMove);
       window.addEventListener("mouseup", onMouseUp);
     },
-    [onResize],
+    [onResize, onRequestFullscreen],
   );
 
   if (!isVisible) return null;

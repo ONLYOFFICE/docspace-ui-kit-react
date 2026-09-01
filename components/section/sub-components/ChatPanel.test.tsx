@@ -95,6 +95,46 @@ describe("ChatPanel resizer", () => {
     expect(onResize).toHaveBeenLastCalledWith(984);
   });
 
+  it("goes fullscreen when the drag is pushed past the widest docked width", () => {
+    const onResize = vi.fn();
+    const onRequestFullscreen = vi.fn();
+    renderPanel({ onResize, onRequestFullscreen });
+
+    fireEvent.mouseDown(screen.getByTestId("chat-panel-resizer"), {
+      clientX: 800,
+      button: 0,
+    });
+    // 584px of slack takes the panel to its 984px limit; 80px more is the
+    // overshoot that asks for fullscreen.
+    fireEvent.mouseMove(window, { clientX: 800 - 584 - 80 });
+
+    expect(onRequestFullscreen).toHaveBeenCalledTimes(1);
+    // The width the panel reached is committed, so leaving fullscreen restores
+    // the wide panel rather than the width the drag started from.
+    expect(onResize).toHaveBeenCalledWith(984);
+
+    // The drag is over: later pointer movement neither resizes the panel (the
+    // width now belongs to the fullscreen layout) nor asks again.
+    const panel = document.getElementById("ChatPanelWrapper");
+    fireEvent.mouseMove(window, { clientX: 900 });
+    expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("400px");
+    expect(onRequestFullscreen).toHaveBeenCalledTimes(1);
+  });
+
+  it("stays clamped at the limit without a fullscreen handler", () => {
+    const onResize = vi.fn();
+    renderPanel({ onResize });
+
+    fireEvent.mouseDown(screen.getByTestId("chat-panel-resizer"), {
+      clientX: 800,
+      button: 0,
+    });
+    fireEvent.mouseMove(window, { clientX: -1600 });
+    fireEvent.mouseUp(window);
+
+    expect(onResize).toHaveBeenCalledWith(984);
+  });
+
   it("hands width back when the row shrinks below the section minimum", async () => {
     // The section is 300px — 116px short of its 416px minimum — so a panel the
     // user had dragged out to 900px has to give that much back.
