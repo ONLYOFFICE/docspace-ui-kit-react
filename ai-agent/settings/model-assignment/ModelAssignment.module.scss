@@ -55,10 +55,8 @@
 
   :global(.default-ai-setup) {
     box-sizing: border-box;
-    padding: 20px;
     margin-bottom: 20px;
 
-    border: 1px solid var(--payment-card-border-color);
     border-radius: 6px;
 
     :global([class*="--field-container-header-color"]) {
@@ -114,4 +112,3 @@
     }
   }
 }
-
