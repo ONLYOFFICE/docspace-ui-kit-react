@@ -84,8 +84,8 @@ export type ChatPanelProps = {
   dropTargetLabel?: string;
   /**
    * Enables the drag resizer on the panel's inline-start edge. Honoured on
-   * desktop only — the host is expected to pass `false` in fullscreen, where
-   * the width belongs to the layout.
+   * desktop only. It stays enabled in fullscreen — see `isFullscreen`, where
+   * the same handle only serves as the way back out.
    */
   isResizable?: boolean;
   /** Current docked width in px; applied as `--chat-panel-width`. */
@@ -93,12 +93,24 @@ export type ChatPanelProps = {
   /** Called once per drag, on mouse up, with the committed width in px. */
   onResize?: (value: number) => void;
   /**
+   * Whether the host currently renders the panel fullscreen. The width then
+   * belongs to the layout — the resizer sets none, and only listens for the
+   * drag back inwards that leaves fullscreen.
+   */
+  isFullscreen?: boolean;
+  /**
    * Called when the resize drag is pushed past the widest docked width, i.e.
    * the user asks for fullscreen with the same gesture that widens the panel.
    * The host is expected to turn fullscreen on (as its header button does);
    * omitting the handler keeps the drag clamped at the limit instead.
    */
   onRequestFullscreen?: () => void;
+  /**
+   * Called when the drag comes back inwards in fullscreen: the host turns
+   * fullscreen off and the same drag carries on resizing the docked panel.
+   * Omitting it makes fullscreen a one-way trip for the resizer.
+   */
+  onExitFullscreen?: () => void;
 };
 
 export type SectionBodyContentProps = {
@@ -230,6 +242,13 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
      * clamped at the limit.
      */
     setChatPanelFullscreen?: () => void;
+    /**
+     * Turns the chat panel fullscreen off. Called when the resizer is dragged
+     * back inwards in fullscreen, which then continues as a normal resize.
+     */
+    unsetChatPanelFullscreen?: () => void;
+    /** Whether the host renders the chat panel fullscreen right now. */
+    isChatPanelFullscreen?: boolean;
     isEmptyPage?: boolean;
     maintenanceExist?: boolean;
     snackbarExist?: boolean;

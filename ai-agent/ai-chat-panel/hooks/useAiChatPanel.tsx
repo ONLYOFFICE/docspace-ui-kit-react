@@ -50,10 +50,11 @@ export type AiChatPanelBindings = {
   // hosts pass it straight to Section without persisting anything.
   chatPanelWidth: number;
   setChatPanelWidth: (value: number) => void;
-  // Turns fullscreen on without toggling it off — the resizer reaches for it
-  // when the widening drag is pushed past the widest docked width, and the
-  // header button stays the only way back out.
+  // Explicit on/off rather than a toggle: the edge resizer reaches for them
+  // from a known state — fullscreen on when the widening drag is pushed past
+  // the widest docked width, off when it is dragged back inwards.
   setChatPanelFullscreen: () => void;
+  unsetChatPanelFullscreen: () => void;
   chatButton: React.ReactNode;
   chatPanelContent: React.ReactNode;
   closeChatPanel: () => void;
@@ -107,6 +108,7 @@ export function useAiChatPanel(
     chatPanelWidth: aiChatStore.panelWidth,
     setChatPanelWidth: aiChatStore.setPanelWidth,
     setChatPanelFullscreen: () => aiChatStore.setFullscreen(true),
+    unsetChatPanelFullscreen: () => aiChatStore.setFullscreen(false),
     chatButton: <AiChatTrigger />,
     chatPanelContent: (
       <>

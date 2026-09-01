@@ -178,6 +178,68 @@ describe("ChatPanel resizer", () => {
     fireEvent.mouseUp(window);
   });
 
+  it("leaves fullscreen when the drag comes back inwards, and keeps resizing", () => {
+    const onResize = vi.fn();
+    const onExitFullscreen = vi.fn();
+    // In fullscreen the section is collapsed, so the panel fills the row: the
+    // docked limit is derived from that row (1400 - 416 = 984).
+    mockLayout(0, 1400);
+    renderPanel({
+      isFullscreen: true,
+      width: 984,
+      onResize,
+      onExitFullscreen,
+    });
+
+    const panel = document.getElementById("ChatPanelWrapper");
+    // The width belongs to the layout while fullscreen, not to the host value.
+    expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("");
+
+    fireEvent.mouseDown(screen.getByTestId("chat-panel-resizer"), {
+      clientX: 100,
+      button: 0,
+    });
+
+    // Not far enough in yet — still fullscreen, still no width of its own.
+    fireEvent.mouseMove(window, { clientX: 140 });
+    expect(onExitFullscreen).not.toHaveBeenCalled();
+    expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("");
+
+    fireEvent.mouseMove(window, { clientX: 180 });
+    expect(onExitFullscreen).toHaveBeenCalledTimes(1);
+    expect(onResize).toHaveBeenCalledWith(984);
+
+    // The same drag carries on docked, re-anchored to that limit.
+    fireEvent.mouseMove(window, { clientX: 280 });
+    expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("884px");
+
+    fireEvent.mouseUp(window);
+    expect(onResize).toHaveBeenLastCalledWith(884);
+    expect(onExitFullscreen).toHaveBeenCalledTimes(1);
+  });
+
+  it("commits nothing when a fullscreen drag never leaves fullscreen", () => {
+    const onResize = vi.fn();
+    const onExitFullscreen = vi.fn();
+    mockLayout(0, 1400);
+    renderPanel({
+      isFullscreen: true,
+      width: 984,
+      onResize,
+      onExitFullscreen,
+    });
+
+    const resizer = screen.getByTestId("chat-panel-resizer");
+    fireEvent.mouseDown(resizer, { clientX: 100, button: 0 });
+    fireEvent.mouseMove(window, { clientX: 140 });
+    // Outwards there is nowhere left to go either.
+    fireEvent.mouseMove(window, { clientX: -400 });
+    fireEvent.mouseUp(window);
+
+    expect(onExitFullscreen).not.toHaveBeenCalled();
+    expect(onResize).not.toHaveBeenCalled();
+  });
+
   it("is not rendered on mobile or when the host disables it", () => {
     const { rerender } = renderPanel({ currentDeviceType: DeviceType.mobile });
     expect(screen.queryByTestId("chat-panel-resizer")).toBeNull();
