@@ -664,6 +664,13 @@ const AiAgentProviders = ({
       // re-scope the live bundle below instead of re-creating it, which
       // would blink the whole chat (and every profiles-gated UI).
       entityId,
+      // Cursor pagination for threads and messages: the sidebar loads 100
+      // threads and infinite-scrolls, and every full-history read is paged
+      // instead of one unbounded request. The portal backend honors the
+      // `count`/`cursor` params. This bundle is host-created, so the flag
+      // has to be set here — `WidgetConfig.enablePagination` only reaches
+      // the stores the library builds for itself.
+      enablePagination: true,
     });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
