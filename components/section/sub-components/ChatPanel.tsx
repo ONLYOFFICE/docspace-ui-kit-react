@@ -200,12 +200,16 @@ const ChatPanel = ({
       // Grow only into the slack the content next to the panel still has above
       // its own minimum. In fullscreen that content is collapsed to zero, so the
       // docked limit is derived from the row the panel currently fills instead.
-      const maxWidth = fullscreen
-        ? Math.max(MIN_CHAT_PANEL_WIDTH, anchorWidth - MIN_SECTION_WIDTH)
-        : Math.max(
-            anchorWidth,
-            anchorWidth + (contentWidth(panel) - MIN_SECTION_WIDTH),
-          );
+      // Rounded once here: it is committed as-is by both fullscreen paths, and
+      // a fractional rect width would otherwise reach the store.
+      const maxWidth = Math.round(
+        fullscreen
+          ? Math.max(MIN_CHAT_PANEL_WIDTH, anchorWidth - MIN_SECTION_WIDTH)
+          : Math.max(
+              anchorWidth,
+              anchorWidth + (contentWidth(panel) - MIN_SECTION_WIDTH),
+            ),
+      );
 
       let nextWidth = anchorWidth;
       let committed = false;
@@ -223,8 +227,11 @@ const ChatPanel = ({
             return;
 
           // Leave fullscreen and keep the very same drag going, now docked and
-          // re-anchored to the widest docked width the row allows — so the
-          // panel picks up under the pointer instead of needing a re-grab.
+          // re-anchored to the widest docked width the row allows, so no
+          // re-grab is needed. The panel edge necessarily lands inboard of the
+          // pointer — a docked panel cannot be as wide as the whole row — but
+          // the drag keeps tracking the pointer from there, in the same
+          // direction the user is already moving.
           fullscreen = false;
           anchorX = event.clientX;
           anchorWidth = maxWidth;
@@ -248,7 +255,7 @@ const ChatPanel = ({
           // Commit the width the panel actually reached, so leaving fullscreen
           // restores the wide panel the user dragged out rather than jumping
           // back to the width the drag started from.
-          onResize?.(Math.round(maxWidth));
+          onResize?.(maxWidth);
           onRequestFullscreen();
           settleLayout();
           return;
