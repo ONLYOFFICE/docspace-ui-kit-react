@@ -147,6 +147,7 @@ const DropDownItem = ({
   onExternalLinkClick,
   testId,
   tooltip,
+  description,
   truncateText,
   stopMouseDownPropagation,
   betaLabel,
@@ -161,6 +162,18 @@ const DropDownItem = ({
   const resolvedPaidLabel = paidLabel || t("Paid") || "";
 
   const withDisabledTooltip = disabled && tooltip;
+  const hasDescription = Boolean(description);
+
+  const labelNode = (
+    <TooltipContainer
+      as="span"
+      dir="auto"
+      title={!withDisabledTooltip && typeof label === "string" ? label : undefined}
+      className={truncateText ? styles.truncateText : undefined}
+    >
+      {label}
+    </TooltipContainer>
+  );
 
   const handleMouseDown = (e: React.MouseEvent<HTMLElement>) => {
     // Stop propagation to prevent click-outside detection from closing dropdown
@@ -204,6 +217,7 @@ const DropDownItem = ({
           [styles.activeDescendant]: isActiveDescendant && !disabled,
           [styles.textOverflow]: textOverflow,
           [styles.modern]: isModern,
+          [styles.withDescription]: hasDescription,
           // [styles.disabled]: disabled && !isSelected,
           [styles.disabled]: disabled,
         },
@@ -242,20 +256,9 @@ const DropDownItem = ({
         </div>
       ) : null}
 
-      {isSeparator ? (
-        "\u00A0"
-      ) : label ? (
-        <TooltipContainer
-          as="span"
-          dir="auto"
-          title={!withDisabledTooltip && typeof label === "string" ? label : undefined}
-          className={truncateText ? styles.truncateText : undefined}
-        >
-          {label}
-        </TooltipContainer>
-      ) : (
-        children
-      )}
+      {isSeparator ? "\u00A0" : null}
+      {!isSeparator && label ? labelNode : null}
+      {!isSeparator && !label ? children : null}
 
       {isSubMenu ? (
         <div
@@ -333,6 +336,16 @@ const DropDownItem = ({
 
       {additionalElement ? (
         <div className={styles.elementWrapper}>{additionalElement}</div>
+      ) : null}
+
+      {/* last, so badges and toggles stay on the label row */}
+      {!isSeparator && label && hasDescription ? (
+        <>
+          {/* full-width and zero-height: forces the description below the row
+              even when the item is wide enough to fit both side by side */}
+          <div className={styles.lineBreak} />
+          <div className={styles.itemDescription}>{description}</div>
+        </>
       ) : null}
     </div>
   );

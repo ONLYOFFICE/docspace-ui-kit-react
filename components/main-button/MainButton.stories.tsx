@@ -306,6 +306,69 @@ export const WithAction: Story = {
   },
 };
 
+const userTypesModel = [
+  {
+    key: 0,
+    label: "Full admin",
+    icon: CatalogFolderReactSvgUrl,
+    description:
+      "Full admins manage the whole workspace: create/archive rooms, invite users, create/configure AI agents, assign roles below their own. Full access to Files.",
+  },
+  {
+    key: 1,
+    label: "Room admin",
+    icon: CatalogFolderReactSvgUrl,
+    description:
+      "Room admins manage their assigned rooms, invite users, create/manage AI agents, assign roles below their own. Full access to Files.",
+  },
+  {
+    key: 2,
+    label: "User",
+    icon: CatalogFolderReactSvgUrl,
+    description:
+      "Users can only access rooms they're invited to, view AI agent results and shared chats if invited, but can't create rooms or start AI chats.",
+  },
+];
+
+const WithItemDescriptionsTemplate = () => {
+  return (
+    <Wrapper>
+      <MainButton text="Invite" model={userTypesModel} />
+    </Wrapper>
+  );
+};
+
+export const WithItemDescriptions: Story = {
+  render: () => <WithItemDescriptionsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Dropdown items carrying `description` are laid out as two lines - the label row and an always-visible description under it. The menu is sized by its content instead of the button width.",
+      },
+      source: {
+        code: `<MainButton
+  text="Invite"
+  model={[
+    {
+      key: 0,
+      label: "Full admin",
+      icon: FolderIcon,
+      description: "Full admins manage the whole workspace...",
+    },
+    {
+      key: 1,
+      label: "Room admin",
+      icon: FolderIcon,
+      description: "Room admins manage their assigned rooms...",
+    },
+  ]}
+/>`,
+      },
+    },
+  },
+};
+
 const WithDropdownTemplate = () => {
   return (
     <Wrapper>

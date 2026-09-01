@@ -96,6 +96,9 @@ export type ContextMenuType = {
   dataTestId?: string;
   tooltipTarget?: "item" | "toggle";
   getTooltipContent?: () => React.ReactNode;
+  /** Secondary line rendered under the item label and always visible - what
+   * choosing this item means. The item grows to fit it. */
+  description?: React.ReactNode;
   withMCPIcon?: boolean;
   iconNode?: React.ReactNode;
   disabledStylesType?: "default" | "toggle";
