@@ -312,21 +312,21 @@ const userTypesModel = [
     label: "Full admin",
     icon: CatalogFolderReactSvgUrl,
     description:
-      "Full admins manage the whole workspace: create/archive rooms, invite users, create/configure AI agents, assign roles below their own. Full access to Files.",
+      "Manage the workspace: create/archive rooms, invite users, configure AI agents, assign lower roles. Full Files access.",
   },
   {
     key: 1,
     label: "Room admin",
     icon: CatalogFolderReactSvgUrl,
     description:
-      "Room admins manage their assigned rooms, invite users, create/manage AI agents, assign roles below their own. Full access to Files.",
+      "Manage assigned rooms, invite users, create/manage AI agents, assign lower roles. Full Files access.",
   },
   {
     key: 2,
     label: "User",
     icon: CatalogFolderReactSvgUrl,
     description:
-      "Users can only access rooms they're invited to, view AI agent results and shared chats if invited, but can't create rooms or start AI chats.",
+      "Access only invited rooms, view AI agent results and shared chats. Can't create rooms/AI agents. Full Files access.",
   },
 ];
 
@@ -354,13 +354,13 @@ export const WithItemDescriptions: Story = {
       key: 0,
       label: "Full admin",
       icon: FolderIcon,
-      description: "Full admins manage the whole workspace...",
+      description: "Manage the workspace: create/archive rooms, invite users...",
     },
     {
       key: 1,
       label: "Room admin",
       icon: FolderIcon,
-      description: "Room admins manage their assigned rooms...",
+      description: "Manage assigned rooms, invite users, create/manage AI agents...",
     },
   ]}
 />`,

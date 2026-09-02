@@ -524,8 +524,10 @@
     --context-menu-item-description-color: #{colors.$gray-dark};
   }
 
-  /* a fixed width, so the menu itself is sized by the description */
+  /* a fixed width, so the menu itself is sized by the description - but never
+     wider than the screen, which is what the mobile sheet is */
   width: var(--context-menu-item-description-width, 330px);
+  max-width: calc(100vw - 24px);
 
   font-size: 12px;
   font-weight: 400;

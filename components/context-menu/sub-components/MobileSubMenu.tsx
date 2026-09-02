@@ -111,13 +111,48 @@ const MenuItem = ({
 		);
 	}
 
+	const itemRow = (
+		<>
+			{renderIcon()}
+			{item.label ? (
+				<span className="p-menuitem-text not-selectable">{item.label}</span>
+			) : null}
+			{item.items ? <ArrowIcon className="p-submenu-icon" /> : null}
+			{item.isPaidBadge ? (
+				<Badge
+					label={item.badgeLabel}
+					className={`${subMenuIconClassName} p-submenu-badge`}
+					style={{ marginInlineStart: "10px" }}
+					backgroundColor={
+						item.isPaidBadge
+							? isBase
+								? globalColors.favoritesStatus
+								: globalColors.favoriteStatusDark
+							: globalColors.lightBlueMain
+					}
+					fontSize="9px"
+					fontWeight={700}
+					borderRadius="50px"
+					noHover
+					isPaidBadge={item.isPaidBadge}
+					isHovered={false}
+				/>
+			) : null}
+		</>
+	);
+
+	// An item that explains itself is laid out as two lines, same as on desktop.
+	const hasDescription = Boolean(item.description);
+
 	return (
 		<li
 			id={item.id}
 			key={item.key}
 			data-testid={item.dataTestId ?? item.key}
 			role="none"
-			className={className}
+			className={classNames(className, {
+				[styles.menuItemWithDescription]: hasDescription,
+			})}
 			style={{ ...item.style, ...style }}
 		>
 			<a
@@ -128,31 +163,14 @@ const MenuItem = ({
 				onClick={onClick}
 				role="menuitem"
 			>
-				{renderIcon()}
-				{item.label ? (
-					<span className="p-menuitem-text not-selectable">{item.label}</span>
-				) : null}
-				{item.items ? <ArrowIcon className="p-submenu-icon" /> : null}
-				{item.isPaidBadge ? (
-					<Badge
-						label={item.badgeLabel}
-						className={`${subMenuIconClassName} p-submenu-badge`}
-						style={{ marginInlineStart: "10px" }}
-						backgroundColor={
-							item.isPaidBadge
-								? isBase
-									? globalColors.favoritesStatus
-									: globalColors.favoriteStatusDark
-								: globalColors.lightBlueMain
-						}
-						fontSize="9px"
-						fontWeight={700}
-						borderRadius="50px"
-						noHover
-						isPaidBadge={item.isPaidBadge}
-						isHovered={false}
-					/>
-				) : null}
+				{hasDescription ? (
+					<>
+						<span className={styles.itemRow}>{itemRow}</span>
+						<span className={styles.itemDescription}>{item.description}</span>
+					</>
+				) : (
+					itemRow
+				)}
 			</a>
 		</li>
 	);
@@ -181,6 +199,7 @@ export const MobileSubMenu = ({
 	onMobileItemClick,
 }: MobileSubMenuProps) => {
 	const [submenu, setSubmenu] = useState<ContextMenuModel[] | null>(null);
+	const [measuredRowsHeight, setMeasuredRowsHeight] = useState(0);
 	const subMenuRef = useRef<HTMLUListElement>(null);
 
 	const position = useCallback(() => {
@@ -223,6 +242,29 @@ export const MobileSubMenu = ({
 		position();
 	}, [mobileSubMenuItems, position]);
 
+	// Items carrying a description are two lines tall and how tall exactly
+	// depends on where their text wraps, so the fixed row height below cannot
+	// size the list: those rows are measured once they are on screen.
+	const hasItemDescriptions = submenu?.some(
+		(item: ContextMenuModel) =>
+			item && !item.isSeparator && "description" in item && !!item.description,
+	);
+
+	useEffect(() => {
+		if (!hasItemDescriptions || !isActive()) return;
+
+		const list = subMenuRef.current;
+		if (!list) return;
+
+		const rows = Array.from(list.querySelectorAll<HTMLElement>("li")).filter(
+			(row) => row.parentElement?.closest("ul") === list,
+		);
+
+		const total = rows.reduce((sum, row) => sum + row.offsetHeight, 0);
+
+		if (total > 0) setMeasuredRowsHeight(total);
+	}, [hasItemDescriptions, isActive, submenu]);
+
 	const handleItemClick = useCallback(
 		(e: React.MouseEvent, item: ContextMenuType) => {
 			if (item.disabled) {
@@ -259,7 +301,9 @@ export const MobileSubMenu = ({
 				!item ? 0 : item.isSeparator ? 13 : 36,
 			);
 
-			const totalHeight: number = rowHeights.reduce((a, b) => a + b, 0);
+			const totalHeight: number =
+				(hasItemDescriptions && measuredRowsHeight) ||
+				rowHeights.reduce((a, b) => a + b, 0);
 			const viewport = DomHelpers.getViewport();
 			const listHeight =
 				totalHeight + 61 > viewport.height - 64
@@ -293,7 +337,7 @@ export const MobileSubMenu = ({
 				</Scrollbar>
 			);
 		},
-		[handleItemClick],
+		[handleItemClick, hasItemDescriptions, measuredRowsHeight],
 	);
 
 	const className = classNames({ "p-submenu-list": !root });

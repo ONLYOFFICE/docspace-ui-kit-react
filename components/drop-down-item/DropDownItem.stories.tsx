@@ -238,17 +238,17 @@ const WithDescriptionTemplate = () => {
       <DropDownItem
         label="Full admin"
         icon={SettingsReactSvgUrl}
-        description="Full admins manage the whole workspace: create/archive rooms, invite users, create/configure AI agents, assign roles below their own. Full access to Files."
+        description="Manage the workspace: create/archive rooms, invite users, configure AI agents, assign lower roles. Full Files access."
       />
       <DropDownItem
         label="Room admin"
         icon={SettingsReactSvgUrl}
-        description="Room admins manage their assigned rooms, invite users, create/manage AI agents, assign roles below their own. Full access to Files."
+        description="Manage assigned rooms, invite users, create/manage AI agents, assign lower roles. Full Files access."
       />
       <DropDownItem
         label="User"
         icon={SettingsReactSvgUrl}
-        description="Users can only access rooms they're invited to, view AI agent results and shared chats if invited, but can't create rooms or start AI chats."
+        description="Access only invited rooms, view AI agent results and shared chats. Can't create rooms/AI agents. Full Files access."
       />
     </Wrapper>
   );
