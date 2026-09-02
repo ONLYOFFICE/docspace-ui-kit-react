@@ -111,6 +111,11 @@ export const usePlatformAdapter = ({
         () => openFileEvent,
       ),
       process: null,
+      // Registered MCP servers are executed by the Node AI service (their
+      // tools come back via api.tools.listSystemTools); the widget must not
+      // also start them in the browser — that connected each server twice
+      // and rendered a duplicate permission card.
+      customServersExecutedByHost: true,
       hostTools: null,
       clouds: null,
       env: {
