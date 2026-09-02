@@ -503,26 +503,9 @@
     display: block;
   }
 
-  // Render the group label as a thin divider line; hide first group's divider.
+  // No caption in the collapsed rail — groups are set apart by the 16px
+  // margin between them alone.
   .groupLabel {
-    display: flex;
-    justify-content: center;
-    padding: 16px 12px 4px;
-    color: transparent;
-    user-select: none;
-    pointer-events: none;
-    font-size: 0;
-    line-height: 0;
-
-    &::before {
-      content: "";
-      width: 20px;
-      height: 1px;
-      background: var(--nav-menu-group-label-color);
-    }
-  }
-
-  .group:first-child .groupLabel {
     display: none;
   }
 
