@@ -375,6 +375,59 @@ export const WithIcons: Story = {
   },
 };
 
+const WithOptionDescriptionsTemplate = () => {
+  return (
+    <Wrapper>
+      <ComboBox
+        options={[
+          {
+            key: 1,
+            label: "Full admin",
+            icon: MoveReactSvgUrl,
+            description:
+              "Manage the workspace: create/archive rooms, invite users, configure AI agents, assign lower roles. Full Files access.",
+          },
+          {
+            key: 2,
+            label: "Room admin",
+            icon: MoveReactSvgUrl,
+            description:
+              "Manage assigned rooms, invite users, create/manage AI agents, assign lower roles. Full Files access.",
+          },
+          {
+            key: 3,
+            label: "User",
+            icon: MoveReactSvgUrl,
+            description:
+              "Access only invited rooms, view AI agent results and shared chats. Can't create rooms/AI agents. Full Files access.",
+          },
+        ]}
+        selectedOption={{ key: 3, label: "User" }}
+        directionY="bottom"
+        fixedDirection
+        isDefaultMode={false}
+        size={ComboBoxSize.content}
+        manualWidth="354px"
+        displaySelectedOption
+        modernView
+        scaled={false}
+      />
+    </Wrapper>
+  );
+};
+
+export const WithOptionDescriptions: Story = {
+  render: () => <WithOptionDescriptionsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An option carrying `description` is rendered as two lines - the label and the description under it. Used by the user type selector, where the choice needs explaining.",
+      },
+    },
+  },
+};
+
 const DisabledTemplate = () => {
   return (
     <Wrapper>

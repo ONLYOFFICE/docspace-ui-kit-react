@@ -47,6 +47,7 @@ import styles from "./GroupMenuItem.module.scss";
 const DESKTOP_WIDTH = 1024;
 const ITEM_HEIGHT_DESKTOP = 32;
 const ITEM_HEIGHT_TABLET_MOBILE = 36;
+const DESCRIPTIVE_DROPDOWN_WIDTH = "354px";
 
 const GroupMenuItem = React.memo(
   ({
@@ -80,6 +81,12 @@ const GroupMenuItem = React.memo(
       fixedDropdownStyles &&
       typeof window !== "undefined" &&
       window.innerWidth < DESKTOP_WIDTH;
+
+    // Options carrying a description are two lines tall; such a menu is sized
+    // by the design instead of hugging its widest row.
+    const withOptionDescriptions = options?.some(
+      (option) => "description" in option && Boolean(option.description),
+    );
 
     const onClickOutside = () => {
       setOpen(false);
@@ -141,7 +148,9 @@ const GroupMenuItem = React.memo(
             style={
               fixedDropdownStyles && !isMobileView
                 ? { width: "161px" }
-                : undefined
+                : withOptionDescriptions && !isMobileView
+                  ? { width: DESCRIPTIVE_DROPDOWN_WIDTH }
+                  : undefined
             }
           >
             {options?.map((option) => {

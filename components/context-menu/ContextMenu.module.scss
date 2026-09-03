@@ -489,6 +489,57 @@
   }
 }
 
+/* Two-line item: the regular row plus an always-visible description under it.
+   The selectors repeat the .contextMenu > :global nesting of the item styles
+   above, otherwise those win on specificity. */
+.contextMenu :global(.p-contextmenu) .menuItemWithDescription {
+  /* the base item truncates a single line; this one wraps instead */
+  overflow: visible;
+  white-space: normal;
+
+  :global(.p-menuitem-link) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    overflow: visible;
+
+    padding: var(--context-menu-item-with-description-padding, 8px 12px);
+  }
+
+  :global(.p-menuitem-text) {
+    line-height: 16px;
+  }
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.itemDescription {
+  --context-menu-item-description-color: #{colors.$gray};
+
+  :global(.dark) & {
+    --context-menu-item-description-color: #{colors.$gray-dark};
+  }
+
+  /* a fixed width, so the menu itself is sized by the description - but never
+     wider than the screen, which is what the mobile sheet is */
+  width: var(--context-menu-item-description-width, 330px);
+  max-width: calc(100vw - 24px);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  white-space: pre-line;
+
+  color: var(
+    --context-menu-item-description,
+    var(--context-menu-item-description-color)
+  );
+}
+
 .activeDescendant {
   background-color: var(
     --context-menu-active-item-bg,

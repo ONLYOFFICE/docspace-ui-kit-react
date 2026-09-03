@@ -232,6 +232,40 @@ export const Default: Story = {
   },
 };
 
+const WithDescriptionTemplate = () => {
+  return (
+    <Wrapper>
+      <DropDownItem
+        label="Full admin"
+        icon={SettingsReactSvgUrl}
+        description="Manage the workspace: create/archive rooms, invite users, configure AI agents, assign lower roles. Full Files access."
+      />
+      <DropDownItem
+        label="Room admin"
+        icon={SettingsReactSvgUrl}
+        description="Manage assigned rooms, invite users, create/manage AI agents, assign lower roles. Full Files access."
+      />
+      <DropDownItem
+        label="User"
+        icon={SettingsReactSvgUrl}
+        description="Access only invited rooms, view AI agent results and shared chats. Can't create rooms/AI agents. Full Files access."
+      />
+    </Wrapper>
+  );
+};
+
+export const WithDescription: Story = {
+  render: () => <WithDescriptionTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An item with `description` is laid out as two lines - the label and an always-visible description under it. Used for the user type menus, where picking an item has to be an informed choice.",
+      },
+    },
+  },
+};
+
 const ItemTypesTemplate = () => {
   return (
     <Wrapper>

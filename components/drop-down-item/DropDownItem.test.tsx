@@ -110,6 +110,15 @@ describe("<DropDownItem />", () => {
     expect(onChange).toHaveBeenCalled();
   });
 
+  it("renders a description under the label and still fires the item click", () => {
+    render(<DropDownItem {...baseProps} description="Role description" />);
+
+    expect(screen.getByText("Role description")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("drop-down-item"));
+    expect(baseProps.onClick).toHaveBeenCalled();
+  });
+
   it("renders with beta badge", () => {
     render(<DropDownItem {...baseProps} isBeta />);
     const badge = screen.getByTestId("badge-text");

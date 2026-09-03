@@ -34,8 +34,8 @@
  */
 
 import React from "react";
-import { describe, it, expect, afterEach } from "vitest";
-import { screen, render, act } from "@testing-library/react";
+import { describe, it, expect, afterEach, vi } from "vitest";
+import { screen, render, act, fireEvent } from "@testing-library/react";
 import { ContextMenu } from ".";
 import type { ContextMenuRefType } from "./ContextMenu.types";
 import styles from "./ContextMenu.module.scss";
@@ -98,6 +98,35 @@ describe("<ContextMenu />", () => {
 	it("has base contextMenu class", () => {
 		render(<ContextMenu model={[]} />);
 		expect(screen.getByTestId("context-menu")).toHaveClass(styles.contextMenu);
+	});
+
+	it("renders an item description under its label", () => {
+		const ref = React.createRef<ContextMenuRefType>();
+		const onClick = vi.fn();
+
+		render(
+			<ContextMenu
+				ref={ref}
+				model={[
+					{
+						key: "roomAdmin",
+						label: "Room admin",
+						onClick,
+						description: "Room admins manage their assigned rooms.",
+					},
+				]}
+				withHotkeys={false}
+			/>,
+		);
+
+		showAt(ref, 100);
+
+		expect(
+			screen.getByText("Room admins manage their assigned rooms."),
+		).toBeInTheDocument();
+
+		fireEvent.click(screen.getByText("Room admin"));
+		expect(onClick).toHaveBeenCalled();
 	});
 
 	it("keeps the menu inside the layout viewport when opened near its edge", () => {

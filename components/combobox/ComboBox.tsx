@@ -332,6 +332,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         disabled,
         label,
         icon,
+        description,
         isBeta,
         withExternalLink,
         externalLinkPath,
@@ -364,6 +365,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
           }
           label={label}
           icon={icon}
+          description={description}
           isBeta={isBeta}
           data-focused={isOpen ? isActiveOption : undefined}
           data-is-separator={option.isSeparator || undefined}

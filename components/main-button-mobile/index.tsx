@@ -281,6 +281,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
 									onClick={optionOnClickAction}
 									icon={option.icon ? option.icon : ""}
 									noHover={noHover}
+									description={option.description}
 								/>
 							);
 						})}

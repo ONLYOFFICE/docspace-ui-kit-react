@@ -485,15 +485,13 @@ const AiAgentProviders = ({
   const aiChatLocale = normalizeAiChatLocale(locale);
   const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
 
-  // The chat lib's own "Enable web search in settings" tooltip is right for
-  // standalone (Web Search lives in AI settings) but wrong on SaaS, where
-  // the feature is activated in Billing (Bug 83226) — override the key with
-  // a host-translated string there.
   const aiChatTranslations = useMemo(
-    () =>
-      isStandalone
-        ? undefined
-        : { EnableWebSearch: t("Common:EnableWebSearchInBilling") },
+    () => ({
+      ModelAssignmentDescription: t("Common:ModelAssignmentDescription"),
+      ...(isStandalone
+        ? null
+        : { EnableWebSearch: t("Common:EnableWebSearchInBilling") }),
+    }),
     [isStandalone, t],
   );
 

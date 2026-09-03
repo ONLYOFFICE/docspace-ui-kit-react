@@ -55,20 +55,9 @@
 
   :global(.default-ai-setup) {
     box-sizing: border-box;
-    padding: 20px;
     margin-bottom: 20px;
 
-    border: 1px solid var(--payment-card-border-color);
     border-radius: 6px;
-
-    :global([class*="--field-container-header-color"]) {
-      font-family: Arial;
-      font-weight: 600;
-      font-style: Regular;
-      font-size: 13px;
-      line-height: 13px;
-      letter-spacing: 0%;
-    }
   }
 
   .defaultSetupTitle {
@@ -76,7 +65,7 @@
   }
 
   .defaultSetupDescription {
-    margin-bottom: 20px;
+    margin-bottom: 4px;
 
     color: var(--settings-common-description-color);
   }
@@ -114,4 +103,3 @@
     }
   }
 }
-
