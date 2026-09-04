@@ -66,20 +66,24 @@ type QuickActionsCloseProps =
     }
   | { onClose?: never; closeLabel?: never };
 
-export type QuickActionsProps = QuickActionsCloseProps & {
-  items: QuickActionItem[];
-  className?: string;
-  dataTestId?: string;
+/**
+ * The arrow labels are required rather than defaulted: a built-in English
+ * fallback would hide a missing translation from every consumer, which is
+ * exactly how the old "Show more" label shipped unlocalized.
+ *
+ * A banner pinned to `isLoading` is the one exception — it renders skeleton
+ * tiles and no controls at all, so a pure loader need not reach for
+ * translations it would never show. Anything that can leave the loading state,
+ * including a banner whose `isLoading` is a running flag, names its arrows.
+ */
+type QuickActionsControlProps =
+  | { isLoading: true; prevLabel?: never; nextLabel?: never }
+  | { isLoading?: boolean; prevLabel: string; nextLabel: string };
 
-  /**
-   * Accessible names for the carousel arrows. Required rather than defaulted:
-   * a built-in English fallback would hide a missing translation from every
-   * consumer, which is exactly how the old "Show more" label shipped
-   * unlocalized.
-   */
-  prevLabel: string;
-  nextLabel: string;
-
-  isLoading?: boolean;
-};
+export type QuickActionsProps = QuickActionsCloseProps &
+  QuickActionsControlProps & {
+    items: QuickActionItem[];
+    className?: string;
+    dataTestId?: string;
+  };
 
