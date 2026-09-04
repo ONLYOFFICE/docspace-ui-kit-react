@@ -84,19 +84,26 @@ const preview: Preview = {
     },
     options: {
       storySort: {
+        // A nested array orders the children of the entry before it. Two of
+        // the names below used to be wrong: "AI Agent" and "Payments" are not
+        // sections that exist, while "Billing" -- which does -- was missing.
+        // "UI" was absent from the order entirely, leaving the largest section
+        // (112 of the 138 stories, across 13 groups) unpositioned. It is
+        // placed before "Components" because it is the published core, while
+        // "Components" holds the portal-coupled composites.
         order: [
           "Getting started",
           ["Welcome", "Structure", "Translation", "Themes", "API"],
           "Samples",
+          "UI",
           "Components",
           [
-            "AI Agent",
-            "Payments",
-            "Document Editor",
-            "Uploader",
             "Selectors",
+            "Uploader",
+            "Document Editor",
+            "Billing",
             "Providers",
-            "Errors"
+            "Errors",
           ],
         ],
       },

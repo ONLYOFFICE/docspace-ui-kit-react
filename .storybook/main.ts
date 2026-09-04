@@ -8,7 +8,18 @@ const __dirname = path.dirname(__filename);
 
 const config: StorybookConfig = {
   stories: [
-    "../**/*.mdx",
+    // Scoped per directory rather than "../**/*.mdx": the recursive form also
+    // matches dist/, storybook-static/ and node_modules/, and every .mdx in
+    // this package lives under one of the directories listed below.
+    "../docs/**/*.mdx",
+    "../components/**/*.mdx",
+    "../errors/**/*.mdx",
+    "../providers/**/*.mdx",
+    "../selectors/**/*.mdx",
+    "../document-editor/**/*.mdx",
+    "../uploader/**/*.mdx",
+    "../ai-agent/**/*.mdx",
+    "../billing/**/*.mdx",
     "../docs/**/*.stories.@(js|jsx|ts|tsx)",
     "../components/**/*.stories.@(js|jsx|ts|tsx)",
     "../errors/**/*.stories.@(js|jsx|ts|tsx)",
