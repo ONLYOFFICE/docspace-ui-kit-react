@@ -12,14 +12,22 @@ import { globalColors } from "../../providers/theme";
 import { AvatarRole } from "../avatar";
 import { Selector } from "./Selector";
 
-function makeName() {
-  let result = "";
+// Deterministic on purpose. This used to call Math.random(), which gave every
+// item a different label on every render -- fine to look at, impossible to
+// screenshot, so the visual-regression spec for Selector could never match its
+// own baseline. A simple index-seeded sequence keeps the labels looking varied
+// while making the story reproducible.
+function makeName(seed: number) {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const charactersLength = characters.length;
+  let result = "";
+  let state = (seed + 1) * 2654435761;
+
   for (let i = 0; i < 15; i += 1) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    state = (state * 1103515245 + 12345) % 2147483648;
+    result += characters.charAt(state % characters.length);
   }
+
   return result;
 }
 
@@ -47,7 +55,7 @@ const getItems = (count: number) => {
   });
 
   for (let i = 0; i < count; i += 1) {
-    const label = makeName();
+    const label = makeName(i);
     items.push({
       key: `${label} ${i}`,
       id: `${label} ${i}`,
