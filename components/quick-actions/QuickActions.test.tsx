@@ -37,8 +37,16 @@ import React from "react";
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
+// A render-counting stand-in: tooltipped tiles create a fresh <Tooltip> element
+// on every render of the banner, so its call count is the banner's render
+// count as far as the tiles are concerned.
+vi.mock("../tooltip", () => ({ Tooltip: vi.fn(() => null) }));
+
+import { Tooltip } from "../tooltip";
 import { QuickActions } from "./index";
 import type { QuickActionItem } from "./QuickActions.types";
+
+const LABELS = { prevLabel: "Previous", nextLabel: "Next" };
 
 const buildItems = (overrides: Partial<QuickActionItem>[] = []) => {
   const base: QuickActionItem[] = [
@@ -67,20 +75,23 @@ describe("QuickActions", () => {
   });
 
   it("renders one tile per item", () => {
-    render(<QuickActions items={buildItems()} dataTestId="qa" />);
+    render(<QuickActions {...LABELS} items={buildItems()} dataTestId="qa" />);
 
     expect(screen.getByText("Document")).toBeInTheDocument();
     expect(screen.getByText("Spreadsheet")).toBeInTheDocument();
     expect(screen.getByText("Presentation")).toBeInTheDocument();
     expect(screen.getByText("PDF")).toBeInTheDocument();
 
-    // The wrapper holds a single .grid child that contains one tile per item.
-    const grid = screen.getByTestId("qa").firstChild as HTMLElement;
-    expect(grid.children).toHaveLength(4);
+    // The strip carries a name of its own, so a host (the client's tour) can
+    // reach the scroll port without knowing where it sits among the banner's
+    // children.
+    const track = screen.getByTestId("quick-actions-track");
+    expect(track.parentElement).toBe(screen.getByTestId("qa"));
+    expect(track.children).toHaveLength(4);
   });
 
   it("renders the provided icon for each tile", () => {
-    render(<QuickActions items={buildItems()} />);
+    render(<QuickActions {...LABELS} items={buildItems()} />);
 
     expect(screen.getByTestId("icon-doc")).toBeInTheDocument();
     expect(screen.getByTestId("icon-xls")).toBeInTheDocument();
@@ -89,7 +100,7 @@ describe("QuickActions", () => {
   });
 
   it("renders nothing when items array is empty", () => {
-    const { container } = render(<QuickActions items={[]} />);
+    const { container } = render(<QuickActions {...LABELS} items={[]} />);
 
     expect(container.firstChild).toBeNull();
   });
@@ -100,7 +111,7 @@ describe("QuickActions", () => {
       { id: "action", icon: <svg />, label: "Action", onClick },
     ];
 
-    render(<QuickActions items={items} />);
+    render(<QuickActions {...LABELS} items={items} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Action" }));
 
@@ -118,7 +129,7 @@ describe("QuickActions", () => {
       },
     ];
 
-    render(<QuickActions items={items} />);
+    render(<QuickActions {...LABELS} items={items} />);
 
     const link = screen.getByRole("link", { name: "Open" });
     expect(link).toHaveAttribute("href", "https://example.com");
@@ -129,7 +140,7 @@ describe("QuickActions", () => {
   it("renders a button when no href is provided", () => {
     const items: QuickActionItem[] = [{ id: "run", icon: <svg />, label: "Run" }];
 
-    render(<QuickActions items={items} />);
+    render(<QuickActions {...LABELS} items={items} />);
 
     expect(screen.getByRole("button", { name: "Run" })).toBeInTheDocument();
   });
@@ -140,7 +151,7 @@ describe("QuickActions", () => {
       { id: "tile-b", icon: <svg />, label: "Tile B", dataTestId: "tile-b" },
     ];
 
-    render(<QuickActions items={items} />);
+    render(<QuickActions {...LABELS} items={items} />);
 
     expect(screen.getByTestId("tile-a")).toBeInTheDocument();
     expect(screen.getByTestId("tile-b")).toBeInTheDocument();
@@ -186,7 +197,7 @@ describe("QuickActions", () => {
 
     it("offers only the next arrow at the start of the strip", () => {
       simulateTrack({ scrollLeft: 0 });
-      render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+      render(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
 
       expect(screen.queryByTestId(PREV_TESTID)).not.toBeInTheDocument();
       expect(screen.getByTestId(NEXT_TESTID)).toBeInTheDocument();
@@ -194,7 +205,7 @@ describe("QuickActions", () => {
 
     it("offers only the prev arrow at the end of the strip", () => {
       simulateTrack({ scrollLeft: 600 });
-      render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+      render(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
 
       expect(screen.getByTestId(PREV_TESTID)).toBeInTheDocument();
       expect(screen.queryByTestId(NEXT_TESTID)).not.toBeInTheDocument();
@@ -202,7 +213,7 @@ describe("QuickActions", () => {
 
     it("offers both arrows midway through the strip", () => {
       simulateTrack({ scrollLeft: 300 });
-      render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+      render(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
 
       expect(screen.getByTestId(PREV_TESTID)).toBeInTheDocument();
       expect(screen.getByTestId(NEXT_TESTID)).toBeInTheDocument();
@@ -210,7 +221,7 @@ describe("QuickActions", () => {
 
     it("offers no arrows when every tile already fits", () => {
       simulateTrack({ scrollWidth: 600, clientWidth: 600 });
-      render(<QuickActions items={buildItems()} dataTestId="qa" />);
+      render(<QuickActions {...LABELS} items={buildItems()} dataTestId="qa" />);
 
       expect(screen.queryByTestId(PREV_TESTID)).not.toBeInTheDocument();
       expect(screen.queryByTestId(NEXT_TESTID)).not.toBeInTheDocument();
@@ -240,11 +251,11 @@ describe("QuickActions", () => {
       const writes = recordScrollWrites(600);
 
       const { rerender } = render(
-        <QuickActions items={buildFiveItems()} dataTestId="qa" />,
+        <QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />,
       );
       writes.length = 0;
 
-      rerender(<QuickActions items={buildItems()} dataTestId="qa" />);
+      rerender(<QuickActions {...LABELS} items={buildItems()} dataTestId="qa" />);
 
       expect(writes).toContain(0);
     });
@@ -256,11 +267,11 @@ describe("QuickActions", () => {
       const writes = recordScrollWrites(600);
 
       const { rerender } = render(
-        <QuickActions items={buildFiveItems()} dataTestId="qa" />,
+        <QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />,
       );
       writes.length = 0;
 
-      rerender(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+      rerender(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
 
       expect(writes).toHaveLength(0);
     });
@@ -273,12 +284,12 @@ describe("QuickActions", () => {
       // and restored, which remounts it with the tiles already in place.
       simulateTrack({ scrollLeft: 300 });
       const { rerender } = render(
-        <QuickActions items={buildFiveItems()} isLoading dataTestId="qa" />,
+        <QuickActions {...LABELS} items={buildFiveItems()} isLoading dataTestId="qa" />,
       );
 
       expect(screen.queryByTestId(NEXT_TESTID)).not.toBeInTheDocument();
 
-      rerender(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+      rerender(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
 
       expect(screen.getByTestId(PREV_TESTID)).toBeInTheDocument();
       expect(screen.getByTestId(NEXT_TESTID)).toBeInTheDocument();
@@ -292,7 +303,7 @@ describe("QuickActions", () => {
         value: scrollBy,
       });
 
-      render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+      render(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
 
       fireEvent.click(screen.getByTestId(NEXT_TESTID));
       expect(scrollBy).toHaveBeenCalledWith(
@@ -303,20 +314,57 @@ describe("QuickActions", () => {
       fireEvent.click(screen.getByTestId(PREV_TESTID));
       expect(scrollBy.mock.calls[1][0].left).toBeLessThan(0);
     });
+
+    it("does not re-render the tiles while a scroll changes nothing", () => {
+      // Every scroll event re-measures the strip. Midway through, both arrows
+      // stay on, so the measurement must not produce a new state object: that
+      // would re-render every tile (and every tooltip) for the whole of a
+      // smooth scroll.
+      simulateTrack({ scrollLeft: 300 });
+      const items = buildFiveItems().map((item) => ({
+        ...item,
+        tooltipContent: item.label,
+      }));
+      render(<QuickActions {...LABELS} items={items} dataTestId="qa" />);
+      const track = screen.getByTestId("quick-actions-track");
+
+      const rendersBefore = vi.mocked(Tooltip).mock.calls.length;
+      fireEvent.scroll(track);
+      fireEvent.scroll(track);
+
+      expect(vi.mocked(Tooltip).mock.calls.length).toBe(rendersBefore);
+
+      // Reaching the start does change the state, and that render must still
+      // happen, or the prev arrow would never be dropped.
+      simulateTrack({ scrollLeft: 0 });
+      fireEvent.scroll(track);
+
+      expect(vi.mocked(Tooltip).mock.calls.length).toBeGreaterThan(
+        rendersBefore,
+      );
+      expect(screen.queryByTestId(PREV_TESTID)).not.toBeInTheDocument();
+    });
   });
 
   describe("close control", () => {
     const CLOSE_TESTID = "quick-actions-close";
 
     it("renders no close control without onClose", () => {
-      render(<QuickActions items={buildItems()} dataTestId="qa" />);
+      render(<QuickActions {...LABELS} items={buildItems()} dataTestId="qa" />);
 
       expect(screen.queryByTestId(CLOSE_TESTID)).not.toBeInTheDocument();
     });
 
     it("invokes onClose when the close control is clicked", () => {
       const onClose = vi.fn();
-      render(<QuickActions items={buildItems()} onClose={onClose} />);
+      render(
+        <QuickActions
+          {...LABELS}
+          items={buildItems()}
+          onClose={onClose}
+          closeLabel="Close"
+        />,
+      );
 
       fireEvent.click(screen.getByTestId(CLOSE_TESTID));
 
@@ -326,6 +374,7 @@ describe("QuickActions", () => {
     it("names the close control with the provided label", () => {
       render(
         <QuickActions
+          {...LABELS}
           items={buildItems()}
           onClose={vi.fn()}
           closeLabel="Disable Quick Actions on all pages"
@@ -337,6 +386,35 @@ describe("QuickActions", () => {
           name: "Disable Quick Actions on all pages",
         }),
       ).toBeInTheDocument();
+    });
+
+    it("gives every instance a close anchor of its own that a selector can hit", () => {
+      render(
+        <>
+          <QuickActions
+            {...LABELS}
+            items={buildItems()}
+            onClose={vi.fn()}
+            closeLabel="Close"
+          />
+          <QuickActions
+            {...LABELS}
+            items={buildFiveItems()}
+            onClose={vi.fn()}
+            closeLabel="Close"
+          />
+        </>,
+      );
+
+      const ids = screen.getAllByTestId(CLOSE_TESTID).map((button) => button.id);
+
+      expect(ids).toHaveLength(2);
+      expect(ids[0]).not.toBe(ids[1]);
+      // `useId` values carry colons, which would break the tooltip's `#id`
+      // anchor selector unless they are escaped away.
+      ids.forEach((id) => {
+        expect(document.querySelector(`#${id}`)).not.toBeNull();
+      });
     });
   });
 });

@@ -57,11 +57,6 @@ const SCROLL_EPSILON = 1;
 // edge is not scrolled past unseen.
 const PAGE_OVERLAP = 64;
 
-// Only one banner is on screen at a time, so the tooltip anchor is a constant —
-// the same shape the tiles use for theirs, and a valid CSS selector, which a
-// `useId` value is not without escaping.
-const CLOSE_ANCHOR_ID = "quick-actions-close-anchor";
-
 // Scrolling toward the end raises scrollLeft in LTR and lowers it (through
 // negative values) in RTL. Read the resolved direction from the element rather
 // than the document so a subtree that overrides `dir` still pages correctly.
@@ -104,11 +99,18 @@ const useScrollAffordance = (
       // Distance travelled from the start, sign-independent: RTL counts down
       // from zero into negative values.
       const offset = Math.abs(track.scrollLeft);
+      const canScrollPrev = offset > SCROLL_EPSILON;
+      const canScrollNext = offset < maxOffset - SCROLL_EPSILON;
 
-      setAffordance({
-        canScrollPrev: offset > SCROLL_EPSILON,
-        canScrollNext: offset < maxOffset - SCROLL_EPSILON,
-      });
+      // Keep the previous object while nothing changed: this runs on every
+      // scroll event, and a fresh object each time would re-render the whole
+      // banner for the length of the scroll.
+      setAffordance((prev) =>
+        prev.canScrollPrev === canScrollPrev &&
+        prev.canScrollNext === canScrollNext
+          ? prev
+          : { canScrollPrev, canScrollNext },
+      );
     };
 
     measure();
@@ -238,6 +240,10 @@ export const QuickActions = ({
   // that replaced the placeholder.
   const [track, setTrack] = React.useState<HTMLDivElement | null>(null);
 
+  // `useId` values carry colons, which a bare `#id` selector cannot hold.
+  const instanceId = React.useId().replace(/:/g, "-");
+  const closeAnchorId = `quick-actions-close-${instanceId}`;
+
   // The ids, not the array identity: the consumer rebuilds `items` on every
   // render, so identity would rewind the strip continuously. The count alone
   // is too coarse — two sections can offer the same number of tiles.
@@ -281,7 +287,11 @@ export const QuickActions = ({
       className={classNames(styles.quickActions, className)}
       data-testid={dataTestId}
     >
-      <div ref={setTrack} className={styles.grid}>
+      <div
+        ref={setTrack}
+        className={styles.grid}
+        data-testid="quick-actions-track"
+      >
         {items.map((item) => (
           <QuickActionTile key={item.id} item={item} />
         ))}
@@ -314,7 +324,7 @@ export const QuickActions = ({
 
         {onClose ? (
           <button
-            id={CLOSE_ANCHOR_ID}
+            id={closeAnchorId}
             type="button"
             className={classNames(styles.control, styles.close)}
             onClick={onClose}
@@ -326,10 +336,10 @@ export const QuickActions = ({
         ) : null}
       </div>
 
-      {onClose && closeLabel ? (
+      {onClose ? (
         <Tooltip
-          id={`${CLOSE_ANCHOR_ID}-instance`}
-          anchorSelect={`#${CLOSE_ANCHOR_ID}`}
+          id={`${closeAnchorId}-instance`}
+          anchorSelect={`#${closeAnchorId}`}
           place="bottom"
           getContent={() => closeLabel}
         />

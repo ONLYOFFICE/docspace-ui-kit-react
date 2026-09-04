@@ -127,7 +127,10 @@ $control-inset: 8px;
 // Tiles hold their design width and overflow the strip rather than shrinking or
 // wrapping: a carousel's whole premise is that the row is allowed to be wider
 // than its container. flex-shrink must be 0, or flex would compress the tiles
-// to fit and there would be nothing to scroll.
+// to fit and there would be nothing to scroll. flex-grow stays on: it is inert
+// while the strip overflows (there is no free space to hand out) and only takes
+// effect for a consumer that lifts `--quick-actions-tile-max-width` to `none`
+// to fill a fixed column, which is what the Dashboard does.
 .tile {
   display: flex;
   flex-direction: column;
@@ -135,7 +138,7 @@ $control-inset: 8px;
   justify-content: center;
   gap: 4px;
   padding: $tile-padding;
-  flex: 0 0 $tile-max-width;
+  flex: 1 0 $tile-max-width;
   min-width: $tile-min-width;
   max-width: var(--_tile-max-width);
   height: $tile-height;
@@ -180,7 +183,7 @@ $control-inset: 8px;
   // Mobile: narrow enough that the third tile is partly visible, so the strip
   // reads as scrollable without needing the arrows to say so.
   @include media-queries.mobile {
-    flex: 0 0 $mobile-tile-width;
+    flex: 1 0 $mobile-tile-width;
     min-width: 0;
   }
 }
@@ -341,9 +344,9 @@ $control-inset: 8px;
 .tileTooltipAnchor {
   display: flex;
   // This wrapper is the flex item for a tooltipped tile, so it must carry the
-  // same non-shrinking basis as a bare .tile. If it shrank, tooltipped tiles
-  // would compress while their neighbours held their width.
-  flex: 0 0 $tile-max-width;
+  // same flex basis as a bare .tile. If it shrank, tooltipped tiles would
+  // compress while their neighbours held their width.
+  flex: 1 0 $tile-max-width;
   min-width: $tile-min-width;
   max-width: var(--_tile-max-width);
 
@@ -354,7 +357,7 @@ $control-inset: 8px;
   }
 
   @include media-queries.mobile {
-    flex: 0 0 $mobile-tile-width;
+    flex: 1 0 $mobile-tile-width;
     min-width: 0;
   }
 }

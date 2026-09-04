@@ -80,7 +80,7 @@ const meta = {
 - Each tile exposes its label via \`aria-label\`.
 - Icons are marked \`aria-hidden\` to avoid duplicate announcement.
 - Buttons receive \`type="button"\` to avoid accidental form submission.
-- \`prevLabel\`, \`nextLabel\` and \`closeLabel\` name the floating controls; the consumer supplies them localized.
+- \`prevLabel\` and \`nextLabel\` name the arrows and are required; \`closeLabel\` names the close control and is required whenever \`onClose\` is passed. The consumer supplies them localized — there are no built-in English fallbacks, so a missing translation fails at the type level instead of shipping.
 
 ### Usage
 
@@ -240,6 +240,8 @@ export const Default: Story = {
   ),
   args: {
     items: documentItems,
+    prevLabel: "Previous",
+    nextLabel: "Next",
   },
   parameters: {
     docs: {
@@ -269,6 +271,8 @@ export const InAIForms: Story = {
   ),
   args: {
     items: aiFormsItems,
+    prevLabel: "Previous",
+    nextLabel: "Next",
   },
   parameters: {
     docs: {
@@ -297,6 +301,8 @@ export const InAIChat: Story = {
   ),
   args: {
     items: aiChatItems,
+    prevLabel: "Previous",
+    nextLabel: "Next",
   },
   parameters: {
     docs: {
@@ -398,7 +404,11 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <QuickActions items={documentItems} />
+      <QuickActions
+        items={documentItems}
+        prevLabel="Previous"
+        nextLabel="Next"
+      />
     </div>
   ),
   parameters: {

@@ -47,24 +47,38 @@ export type QuickActionItem = {
   dataTestId?: string;
 };
 
-export type QuickActionsProps = {
+/**
+ * The close control is opt-in and comes with its label or not at all: an
+ * icon-only button with no accessible name is worse than no button, so the
+ * types refuse `onClose` without `closeLabel`.
+ */
+type QuickActionsCloseProps =
+  | {
+      /**
+       * Hides the whole banner. When omitted no close control is rendered, so
+       * a consumer that has nowhere to persist the choice keeps a carousel
+       * without an affordance that would appear to do nothing on the next
+       * load.
+       */
+      onClose: () => void;
+      /** Tooltip and accessible name for the close control. */
+      closeLabel: string;
+    }
+  | { onClose?: never; closeLabel?: never };
+
+export type QuickActionsProps = QuickActionsCloseProps & {
   items: QuickActionItem[];
   className?: string;
   dataTestId?: string;
 
   /**
-   * Hides the whole banner. When omitted no close control is rendered, so a
-   * consumer that has nowhere to persist the choice keeps a carousel without
-   * an affordance that would appear to do nothing on the next load.
+   * Accessible names for the carousel arrows. Required rather than defaulted:
+   * a built-in English fallback would hide a missing translation from every
+   * consumer, which is exactly how the old "Show more" label shipped
+   * unlocalized.
    */
-  onClose?: () => void;
-
-  /** Tooltip and accessible name for the close control. */
-  closeLabel?: string;
-
-  /** Accessible names for the carousel arrows. */
-  prevLabel?: string;
-  nextLabel?: string;
+  prevLabel: string;
+  nextLabel: string;
 
   isLoading?: boolean;
 };
