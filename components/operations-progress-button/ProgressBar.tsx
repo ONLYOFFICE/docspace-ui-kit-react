@@ -50,20 +50,20 @@ import styles from "./OperationsProgressButton.module.scss";
 import { ProgressBarMobileProps } from "./OperationsProgressButton.types";
 
 const ProgressBar = ({
-	label,
-	alert,
-	stopped,
-	percent,
-	open,
-	onCancel,
-	withoutProgress,
-	icon,
-	completed,
-	onClearProgress,
-	operationId,
-	operation,
-	onOpenPanel,
-	withoutStatus,
+  label,
+  alert,
+  stopped,
+  percent,
+  open,
+  onCancel,
+  withoutProgress,
+  icon,
+  completed,
+  onClearProgress,
+  operationId,
+  operation,
+  onOpenPanel,
+  withoutStatus,
 }: ProgressBarMobileProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
