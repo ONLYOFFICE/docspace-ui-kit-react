@@ -47,7 +47,7 @@ import { Text } from "../../../components/text";
 import { ComboBox, ComboBoxSize, TOption } from "../../../components/combobox";
 import { DatePicker } from "../../../components/date-picker";
 import { toastr } from "../../../components/toast";
-import { useApi } from "../../../providers";
+import { useApi } from "../../../providers/api";
 import { EmployeeStatus } from "@onlyoffice/docspace-api-sdk";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import FilterIcon from "../../../components/filter/sub-components/FilterIcon";

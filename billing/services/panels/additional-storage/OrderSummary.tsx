@@ -45,7 +45,7 @@ import { toastr } from "../../../../components/toast";
 import { HelpButton } from "../../../../components/help-button";
 import { now, formatDateLocalized } from "../../../../utils/date";
 
-import { useApi } from "../../../../providers";
+import { useApi } from "../../../../providers/api";
 
 import { useServicesActions } from "../../hooks/useServicesActions";
 import { usePaymentContext } from "../../context/PaymentContext";

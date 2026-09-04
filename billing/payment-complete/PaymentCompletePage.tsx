@@ -45,7 +45,7 @@ import {
 import { useCommonTranslation } from "../../utils/i18n";
 import { Text } from "../../components/text";
 import { Loader, LoaderTypes } from "../../components/loader";
-import { useApi } from "../../providers";
+import { useApi } from "../../providers/api";
 
 import {
   AI_PAYWALL_START_AMOUNT,

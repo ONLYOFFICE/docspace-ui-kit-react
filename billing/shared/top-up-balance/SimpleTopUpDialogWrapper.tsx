@@ -35,7 +35,7 @@
 
 import React from "react";
 
-import { useApi } from "../../../providers";
+import { useApi } from "../../../providers/api";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import SimpleTopUpDialog, {
   type SimpleTopUpDialogProps,

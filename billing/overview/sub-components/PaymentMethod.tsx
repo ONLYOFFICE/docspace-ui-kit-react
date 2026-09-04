@@ -41,7 +41,7 @@ import { Link } from "../../../components/link";
 import { Avatar, AvatarRole, AvatarSize } from "../../../components/avatar";
 import { useCommonTranslation } from "../../../utils/i18n";
 import { Encoder } from "../../../utils/encoder";
-import { useApi } from "../../../providers";
+import { useApi } from "../../../providers/api";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 

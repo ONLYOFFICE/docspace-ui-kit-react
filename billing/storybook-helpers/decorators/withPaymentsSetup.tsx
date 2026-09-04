@@ -37,7 +37,7 @@ import React from "react";
 import type { Decorator } from "@storybook/react-vite";
 import { MemoryRouter } from "react-router";
 
-import { useApi } from "../../../providers";
+import { useApi } from "../../../providers/api";
 import { Provider } from "../../../utils/context";
 import BillingRoot from "../../BillingRoot";
 import type { TPaymentConfig } from "../../types";

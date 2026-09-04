@@ -42,7 +42,7 @@ import {
   ModalDialogType,
 } from "../../../../components/modal-dialog";
 import { toastr } from "../../../../components/toast";
-import { useApi } from "../../../../providers";
+import { useApi } from "../../../../providers/api";
 import { Button, ButtonSize } from "../../../../components/button";
 import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
 import { Text } from "../../../../components/text";

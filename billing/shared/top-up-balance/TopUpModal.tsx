@@ -46,7 +46,7 @@ import TopUpButtons from "./sub-components/TopUpButtons";
 import AutomaticPaymentsBlock from "./sub-components/AutoPayments";
 import { AmountProvider } from "../../wallet/context";
 import styles from "./styles/TopUpModal.module.scss";
-import { useApi } from "../../../providers";
+import { useApi } from "../../../providers/api";
 import type { DateTime } from "luxon";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 

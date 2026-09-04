@@ -32,12 +32,12 @@ being reachable. That is the enforcement this document defines.
 |---|---|---|
 | `components` | 98 component folders | The bulk of the value. Includes the generic `selector` component (distinct from `selectors/`) |
 | `utils` | Helpers re-exported from `utils/index.ts` | The barrel only. `utils/socket` is **not** public — see below |
-| `hooks` | 11 hooks | 64 deep imports today, no barrel export. Decision: add a barrel and make it public |
+| `hooks` | 11 hooks | Barrelled in `hooks/index.ts` and exported from the root. `useViewEffect` is a default export, re-exported by name |
 | `context` | `ThemeContext`, `InterfaceDirectionContext` | |
 | `enums`, `constants`, `types` | Shared enums, constants, type definitions | |
 | `errors` | Error page components (401, 403, 404, …) | Self-contained, no portal coupling |
 | `styles` | Global SCSS, mixins, variables | Needed by consumers who extend the design system |
-| `assets` | Icon set as React components | 37 deep imports. Licensing of the assets themselves is a separate question — see `LICENSING.md` |
+| `assets` | Icon set as React components | **Subpath-only, deliberately.** Hundreds of SVG modules; a barrel would defeat tree-shaking and force every consumer to parse the whole set. Licensing of the assets themselves is a separate question (D12) |
 | `providers/theme` | `ThemeProvider`, theme objects, `useTheme` | |
 | `providers/translation` | `TranslationProvider`, i18n wiring | |
 | `providers/error-boundary` | `ErrorBoundary` | |
@@ -48,6 +48,11 @@ being reachable. That is the enforcement this document defines.
 ThemeProvider **and ApiProvider**, and calls `fetchProvidersData()` to load portal settings on
 mount. It is portal-shaped by construction: an external consumer has no such endpoint. Publish
 the three providers individually and let consumers compose their own root.
+
+Removing `./api` from the barrel is not enough on its own: `Providers.tsx` imports
+`ApiProvider`, so while it stayed exported the root barrel still dragged `axios` into the core
+through it. Both had to leave `providers/index.ts` for `axios` to become a portal-only
+dependency. Both remain importable by subpath.
 
 **`utils/socket`.** The only importer of `socket.io-client` and
 `@socket.io/component-emitter` in the whole library, and meaningful only against a DocSpace

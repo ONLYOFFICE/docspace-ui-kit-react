@@ -60,7 +60,7 @@ import {
   formatWithTimezone,
   getAppTimezone,
 } from "../../../../utils/date";
-import { useApi } from "../../../../providers";
+import { useApi } from "../../../../providers/api";
 import { toastr } from "../../../../components";
 import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";

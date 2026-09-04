@@ -50,7 +50,7 @@ import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 import { BACKUP_SERVICE } from "../../../constants";
 import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo";
 import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
-import { useApi } from "../../../../providers";
+import { useApi } from "../../../../providers/api";
 import {
   now,
   formatDateLocalized,

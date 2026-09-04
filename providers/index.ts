@@ -33,9 +33,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-export * from "./api";
+// Public providers only. `./api` (portal REST client, sole importer of axios) and
+// `./Providers` (the composed root, which pulls ApiProvider and fetches portal
+// settings) are portal-internal -- import them by subpath. See docs/public-api.md.
 export * from "./error-boundary";
 export * from "./theme";
 export * from "./translation";
-export * from "./Providers";
-export { default as Providers } from "./Providers";

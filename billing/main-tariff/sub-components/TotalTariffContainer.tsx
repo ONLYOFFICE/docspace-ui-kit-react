@@ -47,7 +47,7 @@ import { observer } from "mobx-react";
 import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 import type { TTranslation } from "../../../utils/common";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import { useApi } from "../../../providers";
+import { useApi } from "../../../providers/api";
 import styles from "./SubComponents.module.scss";
 
 const TotalTariffContainer = observer(

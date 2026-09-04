@@ -45,7 +45,7 @@ import { Loader, LoaderTypes } from "../../../components/loader";
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import { toastr } from "../../../components/toast";
 
-import { useApi } from "../../../providers";
+import { useApi } from "../../../providers/api";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { getBrandName } from "../../../constants/brands";
 import WalletInfo from "../../shared/top-up-balance/sub-components/WalletInfo";

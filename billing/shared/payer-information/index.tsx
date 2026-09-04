@@ -47,7 +47,7 @@ import { Link, LinkTarget } from "../../../components/link";
 import { useState } from "react";
 import { Loader, LoaderTypes } from "../../../components/loader";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import { useApi } from "../../../providers";
+import { useApi } from "../../../providers/api";
 import { Encoder } from "../../../utils/encoder";
 import styles from "./PayerInformation.module.scss";
 

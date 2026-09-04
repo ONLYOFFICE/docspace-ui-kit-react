@@ -35,7 +35,7 @@
 
 import React from "react";
 import PaymentStore from "./PaymentStore";
-import { useApi } from "../../providers";
+import { useApi } from "../../providers/api";
 import type { TPaymentConfig } from "../types";
 
 type TPaymentStoreProviderProps = {

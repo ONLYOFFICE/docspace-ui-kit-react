@@ -33,61 +33,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React from "react";
-import ServicesStore from "./ServicesStore";
-import { useApi } from "../../providers/api";
-import { usePaymentStore } from "./PaymentStoreProvider";
+export * from "./use-is-desktop";
 
-type TServicesStoreProviderProps = {
-  children: React.ReactNode;
-};
+export * from "./use-is-mobile";
 
-const ServicesStoreContext = React.createContext<ServicesStore | null>(null);
+export * from "./useAnimation";
 
-export const useServicesStore = () => {
-  const store = React.useContext(ServicesStoreContext);
+export * from "./useCloseOnAnchorCovered";
 
-  if (!store) {
-    throw new Error(
-      "useServicesStore must be used within a ServicesStoreProvider",
-    );
-  }
+export * from "./useDebounce";
 
-  return store;
-};
+export * from "./useEventListener";
 
-const ServicesStoreProviderInner = ({
-  children,
-}: TServicesStoreProviderProps) => {
-  const { paymentApi, rawApiClient } = useApi();
-  const paymentStore = usePaymentStore();
+export * from "./useIsomorphicLayoutEffect";
 
-  const store = React.useMemo(
-    () => new ServicesStore(paymentApi, paymentStore, rawApiClient),
-    [paymentApi, paymentStore, rawApiClient],
-  );
+export * from "./useKeyboardAwareSheet";
 
-  React.useEffect(() => {
-    return () => {
-      store.dispose();
-    };
-  }, [store]);
+export * from "./useUnmount";
 
-  return (
-    <ServicesStoreContext.Provider value={store}>
-      {children}
-    </ServicesStoreContext.Provider>
-  );
-};
+export { default as useViewEffect } from "./useViewEffect";
 
-export const ServicesStoreProvider = ({
-  children,
-}: TServicesStoreProviderProps) => {
-  const existingStore = React.useContext(ServicesStoreContext);
-
-  if (existingStore) {
-    return <>{children}</>;
-  }
-
-  return <ServicesStoreProviderInner>{children}</ServicesStoreProviderInner>;
-};
+export * from "./useVirtualKeyboardInset";

@@ -40,7 +40,7 @@ import classNames from "classnames";
 import { now, formatDateLocalized } from "../../../../utils/date";
 
 import { Text } from "../../../../components/text";
-import { useApi } from "../../../../providers";
+import { useApi } from "../../../../providers/api";
 import { toastr } from "../../../../components/toast";
 import { Loader, LoaderTypes } from "../../../../components/loader";
 import { useInterfaceDirection } from "../../../../context/InterfaceDirectionContext";

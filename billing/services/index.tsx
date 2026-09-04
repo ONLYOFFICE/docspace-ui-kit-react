@@ -69,7 +69,7 @@ const toWalletService = (id: string): TenantWalletService => {
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
-import { useApi } from "../../providers";
+import { useApi } from "../../providers/api";
 import AIFeaturesDialog from "./panels/ai-service/AIFeaturesDialog";
 
 import ServicesItems from "./ServicesItems";

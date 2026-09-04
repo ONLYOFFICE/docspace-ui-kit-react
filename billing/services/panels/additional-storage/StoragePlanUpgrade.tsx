@@ -47,7 +47,7 @@ import {
   ModalDialogType,
 } from "../../../../components/modal-dialog";
 import { toastr } from "../../../../components/toast";
-import { useApi } from "../../../../providers";
+import { useApi } from "../../../../providers/api";
 import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
 import { isInsufficientFundsError } from "../../../utils/insufficientFunds";
 import {

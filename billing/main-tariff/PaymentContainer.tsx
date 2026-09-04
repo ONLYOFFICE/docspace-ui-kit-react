@@ -45,7 +45,7 @@ import { HelpButton } from "../../components/help-button";
 import type { TTranslation } from "../../utils/common";
 
 import { usePaymentStore } from "../store/PaymentStoreProvider";
-import { useApi } from "../../providers";
+import { useApi } from "../../providers/api";
 import { toastr } from "../../components/toast";
 import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 

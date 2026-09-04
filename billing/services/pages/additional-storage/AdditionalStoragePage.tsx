@@ -60,7 +60,7 @@ import WalletInfo from "../../../shared/top-up-balance/sub-components/WalletInfo
 import UnlinkedCardBanner from "../../../shared/unlinked-card-banner";
 import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import { calculateTotalPrice, getConvertedSize } from "../../../utils/common";
-import { useApi } from "../../../../providers";
+import { useApi } from "../../../../providers/api";
 import { toastr } from "../../../../components/toast";
 import StoragePlanUpgrade from "../../panels/additional-storage/StoragePlanUpgrade";
 import StoragePlanCancel from "../../panels/additional-storage/StoragePlanCancel";

@@ -46,7 +46,7 @@ import { useCommonTranslation } from "../../utils/i18n";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 import { formatDateLocalized, getAppTimezone } from "../../utils/date";
 
-import { useApi } from "../../providers";
+import { useApi } from "../../providers/api";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import type { TUsagePeriodKey } from "../types";
