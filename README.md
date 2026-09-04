@@ -870,4 +870,4 @@ Issues and feature requests are tracked in the [DocSpace-client repository](http
 
 ## License
 
-This library is distributed under the [GNU AGPL v3](http://www.gnu.org/licenses/agpl-3.0.html) license. See the source files for the full license text.
+MIT. See [LICENSE](LICENSE).

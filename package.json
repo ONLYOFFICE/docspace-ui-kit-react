@@ -2,6 +2,7 @@
   "name": "@docspace/ui-kit",
   "version": "0.0.1",
   "description": "DocSpace UI Component Library",
+  "license": "MIT",
   "private": "true",
   "engines": {
     "node": ">=24",

@@ -228,7 +228,13 @@ The contract is machine-checked, not merely written down:
 1. ~~Does the published package ship the portal-internal modules?~~ **Answered: yes.** They
    ship; `ai-agent` works through optional peer dependencies until `@onlyoffice/ai-chat` can be
    published.
-2. **Do the icon assets keep CC BY-SA 4.0 or move to Apache-2.0 with the code?** (D12)
+2. ~~Should the ONLYOFFICE icons move to MIT with the code?~~ **Answered: no — non-code
+   elements keep CC BY-SA 4.0.** `LICENSE` carries three sets of terms: MIT for the code,
+   CC BY-SA 4.0 for illustrations, icon sets and technical writing, and an exclusion for the
+   four third-party brand marks in `assets/thirdparties/` (Box, GitHub), which are not
+   Ascensio System SIA's to license. This keeps the assets' terms unchanged by the relicense,
+   and keeps the 246 icons mirrored into the client repository under identical terms on both
+   sides.
 3. **Should the core drop `@onlyoffice/docspace-api-sdk`** by inlining the handful of enums and
    types it uses, rather than depending on the portal's API SDK? Not required for publication.
 4. **`@babel/runtime`** — required by the build output, or removable?
