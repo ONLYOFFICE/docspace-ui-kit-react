@@ -38,11 +38,19 @@ COPY libs/ui-kit/*.tgz ./libs/ui-kit/
 
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 
-RUN pnpm install --frozen-lockfile
+# CI=true is scoped to this one command on purpose. It skips the
+# `lefthook install` in the workspace prepare scripts, which cannot work
+# because the image has no .git. A persistent `ENV CI=true` would be wrong
+# here twice over: it flips Playwright's runtime defaults (retries,
+# workers, forbidOnly) and it makes copy-locales emit empty locale stubs
+# and copy-images skip altogether, so the image would build without assets.
+RUN CI=true pnpm install --frozen-lockfile
 
 # Install Playwright browsers
 RUN npm uninstall -g playwright playwright-core @playwright/test
-RUN cd /app/libs/ui-kit && pnpm exec playwright install chromium --with-deps
+# CI=true only silences the prepare scripts of the dependency check pnpm
+# runs before exec; it does not reach Playwright's own config here.
+RUN cd /app/libs/ui-kit && CI=true pnpm exec playwright install chromium --with-deps
 
 # Copy source code
 COPY common/ ./common/
@@ -52,6 +60,9 @@ COPY libs/ui-kit/ ./libs/ui-kit/
 COPY public/ ./public/
 
 # Copy locales needed by Storybook
+# Deliberately no CI=true here: copy-locales writes empty locale stubs and
+# copy-images exits early when CI is set, which would ship the image
+# without any assets.
 RUN pnpm --filter @docspace/ui-kit run copy-assets
 
 WORKDIR /app/libs/ui-kit
