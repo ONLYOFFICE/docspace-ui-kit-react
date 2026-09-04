@@ -98,7 +98,24 @@ try {
 
   console.log(`=== attw ===`);
   try {
-    console.log(run("npx", ["--yes", "@arethetypeswrong/cli", tarball]));
+    // styles.css is excluded, not ignored globally: a CSS entry point has
+    // neither types nor JavaScript, so attw reports NoResolution for it in all
+    // four resolution modes. Verified to be a tool limitation rather than a
+    // defect here -- react-toastify, correctly published and widely used, gets
+    // the identical result for its own CSS exports. Excluding the entry keeps
+    // `no-resolution` active for every other export, which `--ignore-rules`
+    // would not.
+    console.log(
+      // The tarball goes first: --exclude-entrypoints is variadic and would
+      // otherwise swallow the path as another entry point name.
+      run("npx", [
+        "--yes",
+        "@arethetypeswrong/cli",
+        tarball,
+        "--exclude-entrypoints",
+        "styles.css",
+      ]),
+    );
   } catch (error) {
     console.log(error.stdout ?? String(error));
     process.exitCode = 1;
