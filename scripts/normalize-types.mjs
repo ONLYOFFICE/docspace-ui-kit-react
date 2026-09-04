@@ -117,8 +117,68 @@ for (const file of files) {
   if (next !== original) fs.writeFileSync(file, next);
 }
 
+// A second, ESM-flavoured copy of every declaration, so the package can offer
+// per-condition types: `.d.ts` for `require`, `.d.mts` for `import`. Without it
+// the types resolve as CommonJS while the JavaScript is ESM, which publint
+// reports as ambiguous and attw as "masquerading as CJS".
+//
+// A plain copy is not enough. Declarations use extensionless relative
+// specifiers, and `export * from "./components"` is a *directory* import: legal
+// under CommonJS resolution, which falls back to index, and invalid under ESM,
+// which needs an explicit file. Each specifier is therefore resolved against
+// the emitted tree and rewritten to point at a real .d.mts file.
+const RELATIVE_SPECIFIER = /(from\s*|import\s*\(\s*)"(\.[^"]*)"/g;
+
+const toEsmSpecifier = (fromFile, specifier) => {
+  const base = path.resolve(path.dirname(fromFile), specifier);
+  const asFile = `${base}.d.mts`;
+  const asDir = path.join(base, "index.d.mts");
+
+  const target = fs.existsSync(asFile)
+    ? asFile
+    : fs.existsSync(asDir)
+      ? asDir
+      : null;
+
+  if (!target) return null;
+
+  const rel = path
+    .relative(path.dirname(fromFile), target)
+    .split(path.sep)
+    .join("/");
+
+  return rel.startsWith(".") ? rel : `./${rel}`;
+};
+
+let mjsWritten = 0;
+let rewritten = 0;
+
+// Two passes: every .d.mts must exist before specifiers can be resolved.
+for (const file of files) {
+  fs.copyFileSync(file, `${file.slice(0, -".d.ts".length)}.d.mts`);
+  mjsWritten += 1;
+}
+
+for (const file of files) {
+  const mts = `${file.slice(0, -".d.ts".length)}.d.mts`;
+  const original = fs.readFileSync(mts, "utf8");
+  const next = original.replace(
+    RELATIVE_SPECIFIER,
+    (match, prefix, specifier) => {
+      const resolved = toEsmSpecifier(mts, specifier);
+      return resolved ? `${prefix}"${resolved}"` : match;
+    },
+  );
+
+  if (next !== original) {
+    fs.writeFileSync(mts, next);
+    rewritten += 1;
+  }
+}
+
 console.log(
   `Normalized ${files.length} declaration files: ` +
     `stripped stylesheet imports from ${stripped}, ` +
-    `referenced ambient SVG types from ${referenced}.`,
+    `referenced ambient SVG types from ${referenced}; ` +
+    `wrote ${mjsWritten} .d.mts copies, rewrote specifiers in ${rewritten}.`,
 );
