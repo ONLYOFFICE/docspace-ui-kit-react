@@ -7,22 +7,3 @@ body {
   padding: 0;
   margin: 0;
 }
-
-/*
- * The selector below is an Emotion-generated class name from Storybook's own
- * UI. Those hashes change whenever Storybook's internals change, so the rule
- * silently stops applying on a version bump -- it is pinned to an
- * implementation detail of a dependency.
- *
- * Three sibling rules targeting `.css-1cvjpgl` and `.sb-main-padded` were
- * already commented out and dead, and have been removed. This one is still
- * live, so whether it still matches anything under Storybook 10 needs checking
- * against a built Storybook before it can be removed or rewritten against a
- * stable selector. Tracked as debt.
- */
-.css-1ofkq6d {
-  float: left !important;
-  padding-right: 10px !important;
-  margin-left: 0 !important;
-  line-height: inherit !important;
-}
