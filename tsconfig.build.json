@@ -43,6 +43,8 @@
     "test",
     ".storybook",
     "scripts",
-    "**/storybook-helpers/**"
+    "**/storybook-helpers/**",
+    "*.config.ts",
+    "**/*.config.ts"
   ]
 }
