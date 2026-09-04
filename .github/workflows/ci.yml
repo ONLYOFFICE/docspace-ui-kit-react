@@ -39,3 +39,47 @@ jobs:
 
       - name: Run Tests
         run: pnpm test
+
+  package:
+    name: "Build & verify the package"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # The build also runs the dist checks: no bundled dependencies, a single
+      # extracted stylesheet, per-format type markers, and a report on any
+      # "use client" directives rollup dropped.
+      - name: Build
+        run: pnpm build
+
+      # Packs with pnpm and runs publint and attw against the real tarball.
+      # This is what catches the defects the lint/tsc/test gate cannot see --
+      # a broken build, entry points missing because publishConfig was not
+      # applied, types that misrepresent the JavaScript.
+      #
+      # Reporting only for now: two known problems still fail it, the
+      # `@onlyoffice/ai-chat` file: dependency and the SVG re-exports in the
+      # two icons modules. Drop `continue-on-error` once those are closed --
+      # the whole point of the step is to become blocking.
+      - name: Verify the package (publint + attw)
+        run: pnpm verify:package
+        continue-on-error: true
+
+      # Under CI the locale copy step short-circuits and writes empty stubs,
+      # so this job validates the *shape* of the package, not that it carries
+      # real translations. Vendoring the locales is tracked separately.
+      - name: Show what would be published
+        run: pnpm pack --dry-run
