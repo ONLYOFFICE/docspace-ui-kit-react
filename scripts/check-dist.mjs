@@ -93,3 +93,52 @@ if (offenders.length > 0) {
 }
 
 console.log("dist/ carries no bundled dependencies.");
+
+// "use client" is a module-level directive, and rollup drops it while bundling:
+// it warns "Module level directives cause errors when bundled" once per file,
+// which is invisible among hundreds of lines of build output. Without the
+// directive, every Next.js App Router consumer breaks on the first interactive
+// component. Reported rather than enforced, because the fix is still an open
+// decision (debt B-10); enforcing it now would leave the build permanently red.
+const countDirective = (dir, exts) => {
+  let n = 0;
+
+  const walk = (d) => {
+    for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+      const full = path.join(d, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(full);
+        continue;
+      }
+
+      if (!exts.some((ext) => entry.name.endsWith(ext))) continue;
+      if (fs.readFileSync(full, "utf8").includes('"use client"')) n += 1;
+    }
+  };
+
+  walk(dir);
+
+  return n;
+};
+
+const SOURCE_ROOT = path.resolve(DIST, "..");
+const SKIP = ["node_modules", "dist", ".git", "storybook-static", "locales"];
+
+const inSource = fs
+  .readdirSync(SOURCE_ROOT, { withFileTypes: true })
+  .filter((e) => e.isDirectory() && !SKIP.includes(e.name))
+  .reduce(
+    (sum, e) => sum + countDirective(path.join(SOURCE_ROOT, e.name), [".ts", ".tsx"]),
+    0,
+  );
+const inDist = countDirective(DIST, [".js"]);
+
+if (inDist < inSource) {
+  console.warn(
+    `\n  WARNING: "use client" is in ${inSource} source files and ${inDist} ` +
+      "built files.\n  Rollup strips module-level directives, so Next.js App " +
+      "Router consumers will\n  break on the first interactive component. " +
+      "See debt B-10.\n",
+  );
+}
