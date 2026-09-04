@@ -129,8 +129,24 @@ three public providers actually import. Notably including:
 **`@onlyoffice/docspace-api-sdk`**, imported by 15 core files — `components/selector` (5),
 `providers/theme` (2), `providers/translation`, `utils/common` and others — almost entirely for
 types and enums such as `RoomType`, `FolderType` and `CustomColorThemesSettingsItem`. Currently
-a `file:` tarball, which is unpublishable; **version 3.7.0 is on public npm, the exact version
-vendored here**, so switching to `^3.7.0` removes the blocker.
+a `file:` tarball, which is unpublishable. Version 3.7.0 **is** on public npm, so switching to
+`^3.7.0` removes the blocker — but the two are **not the same artifact**, and that is worth
+knowing:
+
+| | npm 3.7.0 | vendored 3.7.0 |
+|---|---|---|
+| Files | 2 649 | 2 622 |
+| Differing by content | 83 files, incl. `LICENSE`, `README`, `chat-api`, `settings-api`, `files-settings-api` | |
+| Present only on the other side | 27 model files (`ai-user-settings-*`, `external-sharing-settings-*`, `generated-file-*`, …) | **none** |
+
+The npm build is a strict superset by file presence — nothing is lost by switching — and the
+two enums the core actually imports, `room-type.js` and `folder-type.js`, are byte-identical.
+Both manifests declare version 3.7.0, Apache-2.0 and a single dependency.
+
+So the switch is safe in the ways that matter here, but it is **not a no-op**: one version
+number currently designates two different builds. That is a publishing-hygiene problem on the
+API SDK side, and it means the vendored tarball was never a reliable record of what 3.7.0 is.
+Reproducible builds (WP-5) depend on this not recurring.
 
 ### `peerDependencies`, required
 

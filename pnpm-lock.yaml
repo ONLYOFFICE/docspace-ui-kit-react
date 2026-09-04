@@ -33,8 +33,8 @@ importers:
         specifier: file:onlyoffice-ai-chat-0.5.82.tgz
         version: file:onlyoffice-ai-chat-0.5.82.tgz(ff8a8879ceca9ff74a4cda0e24074a55)
       '@onlyoffice/docspace-api-sdk':
-        specifier: file:onlyoffice-docspace-api-sdk-3.7.0.tgz
-        version: file:onlyoffice-docspace-api-sdk-3.7.0.tgz(debug@4.4.3(supports-color@7.2.0))
+        specifier: ^3.7.0
+        version: 3.7.0(debug@4.4.3(supports-color@7.2.0))
       '@onlyoffice/document-editor-react':
         specifier: 2.1.1
         version: 2.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1512,9 +1512,8 @@ packages:
       zustand:
         optional: true
 
-  '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-3.7.0.tgz':
-    resolution: {integrity: sha512-QllfkKJOZzgVmN+VMD9+r/vCwY2xHmxdFIZN9TNpg7Ea7fi9Q3UNAZQPmnTMu6DlEuBb0Ztc188Bca2RK0nhrg==, tarball: file:onlyoffice-docspace-api-sdk-3.7.0.tgz}
-    version: 3.7.0
+  '@onlyoffice/docspace-api-sdk@3.7.0':
+    resolution: {integrity: sha512-zzhvkBZj7RelLDxGg/OnonG2vFwurlI2FaPSSHPiYXosu5y4lopQnSkoxoZ1uXgnWAKREjt1d0p+nkdtTH5xkA==}
 
   '@onlyoffice/document-editor-react@2.1.1':
     resolution: {integrity: sha512-b0SnFPmT+OEyJons18PPHpwtFABVCI4nr3gPtAAImar1PhN9tNc9703Yo5KPYsHhIgVq+FqHSWgunI9GJnKa5w==}
@@ -3904,10 +3903,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-
-  form-data@4.0.5:
-    resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
-    engines: {node: '>= 6'}
 
   form-data@4.0.6:
     resolution: {integrity: sha512-vKatAh4SlVfgbv+YtmhiRjhEMJsYpsG1Y2rMQtR+SVSbytsSD1YGzDIcrAJmdFec88u/+VoGmxnl+80gL1tRCQ==}
@@ -7415,7 +7410,7 @@ snapshots:
       tailwind-merge: 3.6.0
       zustand: 5.0.14(@types/react@19.2.10)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
 
-  '@onlyoffice/docspace-api-sdk@file:onlyoffice-docspace-api-sdk-3.7.0.tgz(debug@4.4.3(supports-color@7.2.0))':
+  '@onlyoffice/docspace-api-sdk@3.7.0(debug@4.4.3(supports-color@7.2.0))':
     dependencies:
       axios: 1.13.5(debug@4.4.3(supports-color@7.2.0))
     transitivePeerDependencies:
@@ -8978,7 +8973,7 @@ snapshots:
   axios@1.13.5(debug@4.4.3(supports-color@7.2.0)):
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3(supports-color@7.2.0))
-      form-data: 4.0.5
+      form-data: 4.0.6
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -9611,14 +9606,6 @@ snapshots:
   follow-redirects@1.16.0(debug@4.4.3(supports-color@7.2.0)):
     optionalDependencies:
       debug: 4.4.3(supports-color@7.2.0)
-
-  form-data@4.0.5:
-    dependencies:
-      asynckit: 0.4.0
-      combined-stream: 1.0.8
-      es-set-tostringtag: 2.1.0
-      hasown: 2.0.2
-      mime-types: 2.1.18
 
   form-data@4.0.6:
     dependencies:
