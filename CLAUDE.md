@@ -1,15 +1,24 @@
 ## Project Overview
 
-`@docspace/ui-kit` — shared React component library used across all DocSpace frontend products (client, login, doceditor, management, sdk). Not published to npm; consumed as a local workspace dependency.
+`@docspace/ui-kit` — shared React component library used across all DocSpace frontend
+products (client, login, doceditor, management, sdk). Consumed as a local workspace
+dependency: the six apps resolve it to the **source root**, not to `dist`.
+
+Being separated for publication as `@onlyoffice/docspace-ui-kit`. That work is in progress
+on `feature/ui-kit-separation` and changes several things this file used to state as
+permanent — see `docs/public-api.md` for the published surface and the tiering of public
+versus portal-internal modules.
 
 ## Tech Stack
 
 - **React 19** (peer dependency)
 - **TypeScript 5** (strict mode, `tsconfig.json`)
 - **Rollup** — library build (`rollup.config.mjs`), outputs ESM/CJS
-- **Storybook 8** — component documentation and visual development
+- **Storybook 10** — component documentation and visual development
 - **Vitest** — unit and component tests
-- **Biome** — linting and formatting (replaces ESLint/Prettier)
+- **Biome** — linting only. Its **formatter is disabled**
+  (`biome.json`: `formatter.enabled: false`); formatting is Prettier, via `pnpm format`,
+  which is **not** in any gate. Files can be Prettier-nonconforming with everything green
 - **SCSS Modules** — styling (`*.module.scss` per component); theming via CSS
   custom properties
 - **Lefthook** — git hooks (lint + tests on pre-push)
@@ -18,7 +27,7 @@
 ## Repository Structure
 
 ```
-components/          — 90+ UI components, each in its own folder:
+components/          — 98 UI components, each in its own folder:
                         <name>/
                           index.ts
                           <Name>.tsx
@@ -28,19 +37,38 @@ components/          — 90+ UI components, each in its own folder:
                           <Name>.test.tsx (optional)
 constants/           — Shared constants
 context/             — React contexts (ThemeContext, InterfaceDirectionContext)
-document-editor/     — DocumentEditor wrapper component
 enums/               — Shared enumerations
 errors/              — Error page components (401, 403, 404, etc.)
-hooks/               — Custom React hooks
-providers/           — Root providers composition (Providers.tsx)
-selectors/           — Reusable selector components (AIAgent, People, Room, Files, Groups, MCPServers)
+hooks/               — 11 custom React hooks (barrelled in hooks/index.ts)
+providers/           — theme, translation, error-boundary (public) and api (portal-only)
 styles/              — Global SCSS styles, mixins, variables
 types/               — Shared TypeScript types
 utils/               — Utility functions (cookie, date, device, email, i18n, etc.)
-assets/icons/        — SVG icons as React components (*.react.svg)
+assets/              — SVG icons as React components (*.react.svg); assets/icons/ is
+                       committed and refreshed from public/images/icons by copy-images.js
+
+Portal-coupled modules -- they ship in the package but are not public API
+(docs/public-api.md):
+
+ai-agent/            — AI chat panel and settings; needs @onlyoffice/ai-chat
+api/                 — Portal REST client
+billing/             — Tariff, payment and services flows; MobX stores
+document-editor/     — DocumentEditor wrapper around @onlyoffice/document-editor-react
+selectors/           — Data-driven selectors (AIAgent, People, Room, Files, Groups,
+                       MCPServers) -- depend on the API layer and MobX stores
+uploader/            — Upload UI; depends on selectors/Files and providers/api
+
+biome-plugins/       — GENERATED copy of the client's i18n Grit plugins. Regenerate with
+                       `pnpm biome-plugins:generate` in DocSpace-client and commit here;
+                       nothing checks that it is fresh
+docs/                — Storybook .mdx pages, plus public-api.md
+scripts/             — copy-locales, copy-images, and the dist checks run by `pnpm build`
 .storybook/          — Storybook configuration
 test/                — Test setup and mocks
+__tests__/           — Playwright visual-regression specs (83, run against Storybook)
 index.ts             — Main library entry point
+
+Generated, gitignored, absent from a fresh clone: locales/, css/, fonts/, dist/
 ```
 
 ## Common Commands
@@ -49,8 +77,14 @@ index.ts             — Main library entry point
 # Install dependencies
 pnpm install
 
-# Library build
+# Library build: rollup -> tsc declarations -> normalize types -> single
+# stylesheet -> assert no bundled dependencies
 pnpm build
+
+# Pack with pnpm and run publint + attw against the real tarball.
+# Must be pnpm: publishConfig field overrides are a pnpm feature, and an
+# npm-packed tarball has no exports/main at all.
+pnpm verify:package
 
 # Watch mode build
 pnpm build:watch
@@ -97,7 +131,10 @@ pnpm tsc
 - **Accessibility**: WCAG 2.1 AA — `aria-*` attributes, keyboard navigation, focus management
 - **Biome**: 80-char line width, double quotes, trailing commas, CRLF line endings
 - **Tests**: Vitest + React Testing Library, setup in `test/setup.ts`
-- **Stories**: every component must have a `.stories.tsx` file
+- **Stories**: every component must have a story. It may live in a subdirectory rather
+  than beside `index.ts` — `table`, `rows` and `tiles` all do — so check recursively
+  before concluding one is missing. Four components currently have none:
+  `avatar-editor-dialog`, `quantity-picker`, `room-logo-cover-dialog`, `theme-provider`
 
 ## Architecture Notes
 
@@ -107,6 +144,18 @@ pnpm tsc
   custom properties set by `ThemeProvider`. `.storybook/lightTheme.ts` /
   `darkTheme.ts` are Storybook-UI themes only
 - **Selectors**: complex data-driven selector UIs (AIAgent, People, Room, Files, Groups, MCPServers) live in `selectors/` — they depend on API and MobX stores
-- **Providers**: `Providers.tsx` composes ThemeProvider, i18next, SocketProvider, etc.
-- **API integration**: `utils/api/` and `utils/socket/` provide API client and WebSocket helpers used by selectors
-- **Localization**: `scripts/copy-locales.js` must run before build/test to populate locale files; all commands include it automatically
+- **Providers**: `Providers.tsx` composes ErrorBoundary, TranslationProvider,
+  ThemeProvider **and ApiProvider**, and fetches portal settings on mount. It is
+  therefore portal-specific and is **not** exported from `providers/index.ts` — nor is
+  `providers/api`. Import either by subpath.
+- **API integration**: the top-level `api/` and `utils/socket/` provide the API client and
+  WebSocket helpers used by selectors. (`utils/api/` does not exist.)
+- **Localization**: `scripts/copy-locales.js` must run before build/test to populate
+  locale files; every command includes it automatically. **It writes a derived subset**,
+  not a copy — 662 of the 2 392 `Common.json` keys, chosen by regex-scanning this
+  package for used keys (which is why `no-dynamic-i18n-key` matters).
+  **Trap: under `CI=true` it fabricates four empty locale stubs and copies neither
+  `css/fonts.css` nor `fonts/`, then exits 0.** So CI builds silently produce a
+  package with no translations, and `storybook-build` fails outright on the missing
+  stylesheet. `copy-images.js` likewise skips entirely under CI — harmless, since
+  `assets/icons/` is committed.
