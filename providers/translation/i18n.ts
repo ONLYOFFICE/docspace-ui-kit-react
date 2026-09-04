@@ -35,7 +35,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import i18next from "i18next";
+import i18next, { type i18n } from "i18next";
 import { initReactI18next } from "react-i18next";
 
 import { registerCommonI18nInstance } from "../../utils/i18n/i18n-utils";
@@ -61,7 +61,10 @@ function loadResources(translations: TTranslations) {
   });
 }
 
-export const getI18NInstance = (lng: string, translations: TTranslations) => {
+export const getI18NInstance = (
+  lng: string,
+  translations: TTranslations,
+): i18n => {
   if (!instance) {
     instance = i18next.createInstance();
   }

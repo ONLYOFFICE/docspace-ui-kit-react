@@ -9,7 +9,7 @@
   },
   "scripts": {
     "copy-assets": "node scripts/copy-locales.js && node scripts/copy-images.js",
-    "build": "pnpm run copy-assets && rollup -c",
+    "build": "pnpm run copy-assets && rollup -c && tsc -p tsconfig.build.json && node scripts/normalize-types.mjs && node scripts/finalize-dist.mjs && node scripts/check-dist.mjs",
     "build:watch": "rollup -c -w",
     "clean": "rm -rf dist",
     "storybook": "pnpm run copy-assets && storybook dev -p 6006",
@@ -144,7 +144,6 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "rollup": "^4.62.4",
-    "rollup-plugin-dts": "^6.4.1",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-polyfill-node": "^0.13.0",
     "rollup-plugin-postcss": "^4.0.2",
@@ -169,21 +168,36 @@
   },
   "files": [
     "dist",
-    "locales"
+    "locales",
+    "LICENSE"
   ],
   "sideEffects": [
     "**/*.scss",
     "**/*.css"
   ],
+  "packageManager": "pnpm@11.19.0",
   "publishConfig": {
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",
     "types": "./dist/types/index.d.ts",
-    ".": {
-      "esm": "dist/esm/index.js",
-      "cjs": "dist/cjs/index.js",
-      "types": "dist/types/index.d.ts"
+    "exports": {
+      ".": {
+        "types": "./dist/types/index.d.ts",
+        "import": "./dist/esm/index.js",
+        "require": "./dist/cjs/index.js"
+      },
+      "./styles.css": "./dist/styles.css",
+      "./package.json": "./package.json",
+      "./*": {
+        "types": "./dist/types/*/index.d.ts",
+        "import": "./dist/esm/*/index.js",
+        "require": "./dist/cjs/*/index.js"
+      },
+      "./*.js": {
+        "types": "./dist/types/*.d.ts",
+        "import": "./dist/esm/*.js",
+        "require": "./dist/cjs/*.js"
+      }
     }
-  },
-  "packageManager": "pnpm@11.19.0"
+  }
 }

@@ -1,0 +1,48 @@
+{
+  "//": "Declaration emit only. Deliberately does NOT extend tsconfig.json: that config sets baseUrl, which makes TypeScript emit baseUrl-relative module specifiers such as import(\"node_modules/i18next\") into the .d.ts files -- unresolvable for any consumer. Its `paths` mappings are only needed by tests and Storybook, which are excluded here.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2023"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    "outDir": "dist/types",
+    "rootDir": "."
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.stories.ts",
+    "**/*.stories.tsx",
+    "**/*.story.helper.ts",
+    "**/*.story.helper.tsx",
+    "__tests__",
+    "test",
+    ".storybook",
+    "scripts",
+    "**/storybook-helpers/**"
+  ]
+}
