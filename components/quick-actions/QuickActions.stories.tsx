@@ -56,7 +56,10 @@ import {
 } from "./icons";
 
 import { QuickActions } from "./index";
-import type { QuickActionItem } from "./QuickActions.types";
+import type {
+  QuickActionItem,
+  QuickActionsProps,
+} from "./QuickActions.types";
 
 const meta = {
   title: "UI/Data display/QuickActions",
@@ -233,7 +236,7 @@ const aiChatItems: QuickActionItem[] = [
 ];
 
 export const Default: Story = {
-  render: (args) => (
+  render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
     </Wrapper>
@@ -264,7 +267,7 @@ export const Default: Story = {
 };
 
 export const InAIForms: Story = {
-  render: (args) => (
+  render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
     </Wrapper>
@@ -294,7 +297,7 @@ export const InAIForms: Story = {
 };
 
 export const InAIChat: Story = {
-  render: (args) => (
+  render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
     </Wrapper>
@@ -323,7 +326,7 @@ export const InAIChat: Story = {
 };
 
 export const Carousel: Story = {
-  render: (args) => (
+  render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
     </Wrapper>
@@ -360,7 +363,7 @@ Narrow the canvas (or use the Viewport toolbar) to see the strip start scrolling
 };
 
 export const Dismissible: Story = {
-  render: (args) => (
+  render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
     </Wrapper>
