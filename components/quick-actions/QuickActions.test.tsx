@@ -34,53 +34,11 @@
  */
 
 import React from "react";
-import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
 import { QuickActions } from "./index";
 import type { QuickActionItem } from "./QuickActions.types";
-
-// jsdom performs no layout, so every element's offsetTop is 0. The collapse
-// logic measures wrapping by comparing tile offsetTop values, so these tests
-// simulate row layout by overriding the offsetTop getter: each tile's row is
-// derived from its index among its siblings and a configurable tiles-per-row.
-// `perRow >= tile count` ⇒ single row (no overflow); a smaller value ⇒ the
-// later tiles land on row 2+ (overflow ⇒ collapse).
-let originalOffsetTop: PropertyDescriptor | undefined;
-
-const ROW_HEIGHT = 172;
-
-const simulateLayout = (perRow: number) => {
-  Object.defineProperty(HTMLElement.prototype, "offsetTop", {
-    configurable: true,
-    get(this: HTMLElement) {
-      const parent = this.parentElement;
-      if (!parent) return 0;
-      const index = Array.prototype.indexOf.call(parent.children, this);
-      if (index < 0) return 0;
-      return Math.floor(index / perRow) * ROW_HEIGHT;
-    },
-  });
-};
-
-beforeEach(() => {
-  originalOffsetTop = Object.getOwnPropertyDescriptor(
-    HTMLElement.prototype,
-    "offsetTop",
-  );
-});
-
-afterEach(() => {
-  if (originalOffsetTop) {
-    Object.defineProperty(HTMLElement.prototype, "offsetTop", originalOffsetTop);
-  } else {
-    // jsdom's default is a value of 0 on the prototype; restore that.
-    Object.defineProperty(HTMLElement.prototype, "offsetTop", {
-      configurable: true,
-      value: 0,
-    });
-  }
-});
 
 const buildItems = (overrides: Partial<QuickActionItem>[] = []) => {
   const base: QuickActionItem[] = [
@@ -93,8 +51,8 @@ const buildItems = (overrides: Partial<QuickActionItem>[] = []) => {
   return base.map((item, i) => ({ ...item, ...overrides[i] }));
 };
 
-// Five tiles — one past the collapse threshold, so the grid collapses on
-// tablet/mobile but not on desktop.
+// Five tiles — more than fit a narrow strip, so the carousel has somewhere to
+// scroll.
 const buildFiveItems = (): QuickActionItem[] => [
   { id: "vdr", icon: <svg data-testid="icon-vdr" />, label: "VDR room" },
   { id: "collab", icon: <svg data-testid="icon-collab" />, label: "Collaboration room" },
@@ -104,12 +62,6 @@ const buildFiveItems = (): QuickActionItem[] => [
 ];
 
 describe("QuickActions", () => {
-  beforeEach(() => {
-    // Default every test to a layout where all tiles fit on one row, so the
-    // grid does not collapse unless a test opts into a wrapped layout.
-    simulateLayout(100);
-  });
-
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -194,78 +146,197 @@ describe("QuickActions", () => {
     expect(screen.getByTestId("tile-b")).toBeInTheDocument();
   });
 
-  describe("collapse behavior", () => {
-    const SHOW_MORE_TESTID = "quick-actions-show-more";
+  describe("carousel", () => {
+    const PREV_TESTID = "quick-actions-prev";
+    const NEXT_TESTID = "quick-actions-next";
 
-    // Collapse is driven by the tiles wrapping onto more than one row, not by a
-    // fixed breakpoint. CSS clips the overflow, so every tile stays in the DOM;
-    // these assertions check the collapsed wrapper + the "Show more" affordance.
-    it("collapses with a Show more affordance when tiles wrap (3 per row)", () => {
-      simulateLayout(3);
-      render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+    // The arrows are driven by the track's scroll metrics, which jsdom reports
+    // as 0 because it performs no layout. `simulateTrack` fakes a strip of
+    // `scrollWidth` inside a `clientWidth` port, parked at `scrollLeft`, so
+    // each end of the range can be asserted independently.
+    const simulateTrack = ({
+      scrollWidth = 1200,
+      clientWidth = 600,
+      scrollLeft = 0,
+    } = {}) => {
+      Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+        configurable: true,
+        get: () => scrollWidth,
+      });
+      Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+        configurable: true,
+        get: () => clientWidth,
+      });
+      Object.defineProperty(HTMLElement.prototype, "scrollLeft", {
+        configurable: true,
+        get: () => scrollLeft,
+        set: () => {},
+      });
+    };
 
-      const showMore = screen.getByTestId(SHOW_MORE_TESTID);
-      expect(showMore).toHaveTextContent("Show more");
-      expect(screen.getByTestId("qa")).toHaveClass("collapsed");
-      // All five tiles are present (clipped, not removed).
-      expect(screen.getByText("VDR room")).toBeInTheDocument();
-      expect(screen.getByText("Room template")).toBeInTheDocument();
-      // Wrapper holds the grid + the show-more overlay.
-      expect(screen.getByTestId("qa").children).toHaveLength(2);
+    afterEach(() => {
+      ["scrollWidth", "clientWidth", "scrollLeft"].forEach((prop) => {
+        Object.defineProperty(HTMLElement.prototype, prop, {
+          configurable: true,
+          value: 0,
+          writable: true,
+        });
+      });
     });
 
-    it("collapses with a Show more affordance when tiles wrap (2 per row)", () => {
-      simulateLayout(2);
+    it("offers only the next arrow at the start of the strip", () => {
+      simulateTrack({ scrollLeft: 0 });
       render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
 
-      expect(screen.getByTestId(SHOW_MORE_TESTID)).toHaveTextContent(
-        "Show more",
-      );
-      expect(screen.getByTestId("qa")).toHaveClass("collapsed");
+      expect(screen.queryByTestId(PREV_TESTID)).not.toBeInTheDocument();
+      expect(screen.getByTestId(NEXT_TESTID)).toBeInTheDocument();
     });
 
-    it("does not collapse when every tile fits on one row", () => {
-      simulateLayout(100);
+    it("offers only the prev arrow at the end of the strip", () => {
+      simulateTrack({ scrollLeft: 600 });
       render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
 
-      expect(screen.getByText("Custom room")).toBeInTheDocument();
-      expect(screen.getByText("Room template")).toBeInTheDocument();
-      expect(screen.queryByTestId(SHOW_MORE_TESTID)).not.toBeInTheDocument();
-      expect(screen.getByTestId("qa")).not.toHaveClass("collapsed");
+      expect(screen.getByTestId(PREV_TESTID)).toBeInTheDocument();
+      expect(screen.queryByTestId(NEXT_TESTID)).not.toBeInTheDocument();
     });
 
-    it("does not collapse when few tiles wrap but still fit one row", () => {
-      // 4 tiles, 4 per row → single row → no overflow even though wrapping is
-      // allowed. Confirms collapse keys off actual overflow, not tile count.
-      simulateLayout(4);
+    it("offers both arrows midway through the strip", () => {
+      simulateTrack({ scrollLeft: 300 });
+      render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+
+      expect(screen.getByTestId(PREV_TESTID)).toBeInTheDocument();
+      expect(screen.getByTestId(NEXT_TESTID)).toBeInTheDocument();
+    });
+
+    it("offers no arrows when every tile already fits", () => {
+      simulateTrack({ scrollWidth: 600, clientWidth: 600 });
       render(<QuickActions items={buildItems()} dataTestId="qa" />);
 
-      expect(screen.getByText("PDF")).toBeInTheDocument();
-      expect(screen.queryByTestId(SHOW_MORE_TESTID)).not.toBeInTheDocument();
-      expect(screen.getByTestId("qa")).not.toHaveClass("collapsed");
+      expect(screen.queryByTestId(PREV_TESTID)).not.toBeInTheDocument();
+      expect(screen.queryByTestId(NEXT_TESTID)).not.toBeInTheDocument();
     });
 
-    it("expands on click and stays expanded (no show less)", () => {
-      simulateLayout(3);
+    // The setter `simulateTrack` installs swallows writes, so a test that cares
+    // where the strip was sent has to record them itself.
+    const recordScrollWrites = (offset: number) => {
+      const writes: number[] = [];
+
+      Object.defineProperty(HTMLElement.prototype, "scrollLeft", {
+        configurable: true,
+        get: () => offset,
+        set: (value: number) => {
+          writes.push(value);
+        },
+      });
+
+      return writes;
+    };
+
+    it("rewinds the strip when the section's tiles change", () => {
+      // Navigating between sections swaps the tiles without remounting the
+      // banner, so the DOM keeps the previous section's offset and the new
+      // section opens with its first tile scrolled out of sight.
+      simulateTrack({ scrollLeft: 600 });
+      const writes = recordScrollWrites(600);
+
+      const { rerender } = render(
+        <QuickActions items={buildFiveItems()} dataTestId="qa" />,
+      );
+      writes.length = 0;
+
+      rerender(<QuickActions items={buildItems()} dataTestId="qa" />);
+
+      expect(writes).toContain(0);
+    });
+
+    it("leaves the offset alone while the tiles stay the same", () => {
+      // The consumer rebuilds `items` on every render, so a rewind keyed on
+      // array identity would drag the strip back under the reader mid-scroll.
+      simulateTrack({ scrollLeft: 600 });
+      const writes = recordScrollWrites(600);
+
+      const { rerender } = render(
+        <QuickActions items={buildFiveItems()} dataTestId="qa" />,
+      );
+      writes.length = 0;
+
+      rerender(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+
+      expect(writes).toHaveLength(0);
+    });
+
+    it("measures the real track after the loading placeholder makes way", () => {
+      // The placeholder renders a track of its own that carries no ref, so the
+      // real one only arrives on a later render. Keying the measurement on a
+      // ref object meant it was never taken: the banner kept its arrows off
+      // for the whole of a first load, and only got them after being hidden
+      // and restored, which remounts it with the tiles already in place.
+      simulateTrack({ scrollLeft: 300 });
+      const { rerender } = render(
+        <QuickActions items={buildFiveItems()} isLoading dataTestId="qa" />,
+      );
+
+      expect(screen.queryByTestId(NEXT_TESTID)).not.toBeInTheDocument();
+
+      rerender(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
+
+      expect(screen.getByTestId(PREV_TESTID)).toBeInTheDocument();
+      expect(screen.getByTestId(NEXT_TESTID)).toBeInTheDocument();
+    });
+
+    it("scrolls the track when an arrow is clicked", () => {
+      simulateTrack({ scrollLeft: 300 });
+      const scrollBy = vi.fn();
+      Object.defineProperty(HTMLElement.prototype, "scrollBy", {
+        configurable: true,
+        value: scrollBy,
+      });
+
       render(<QuickActions items={buildFiveItems()} dataTestId="qa" />);
 
-      fireEvent.click(screen.getByTestId(SHOW_MORE_TESTID));
+      fireEvent.click(screen.getByTestId(NEXT_TESTID));
+      expect(scrollBy).toHaveBeenCalledWith(
+        expect.objectContaining({ left: expect.any(Number) }),
+      );
+      expect(scrollBy.mock.calls[0][0].left).toBeGreaterThan(0);
 
-      // The affordance is gone, the clip is removed, and tiles remain visible.
-      expect(screen.queryByTestId(SHOW_MORE_TESTID)).not.toBeInTheDocument();
-      expect(screen.getByTestId("qa")).not.toHaveClass("collapsed");
-      expect(screen.getByText("Room template")).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId(PREV_TESTID));
+      expect(scrollBy.mock.calls[1][0].left).toBeLessThan(0);
+    });
+  });
+
+  describe("close control", () => {
+    const CLOSE_TESTID = "quick-actions-close";
+
+    it("renders no close control without onClose", () => {
+      render(<QuickActions items={buildItems()} dataTestId="qa" />);
+
+      expect(screen.queryByTestId(CLOSE_TESTID)).not.toBeInTheDocument();
     });
 
-    it("uses the provided show more label", () => {
-      simulateLayout(3);
+    it("invokes onClose when the close control is clicked", () => {
+      const onClose = vi.fn();
+      render(<QuickActions items={buildItems()} onClose={onClose} />);
+
+      fireEvent.click(screen.getByTestId(CLOSE_TESTID));
+
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("names the close control with the provided label", () => {
       render(
-        <QuickActions items={buildFiveItems()} showMoreLabel="Развернуть" />,
+        <QuickActions
+          items={buildItems()}
+          onClose={vi.fn()}
+          closeLabel="Disable Quick Actions on all pages"
+        />,
       );
 
-      expect(screen.getByTestId(SHOW_MORE_TESTID)).toHaveTextContent(
-        "Развернуть",
-      );
+      expect(
+        screen.getByRole("button", {
+          name: "Disable Quick Actions on all pages",
+        }),
+      ).toBeInTheDocument();
     });
   });
 });

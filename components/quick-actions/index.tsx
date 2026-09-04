@@ -36,54 +36,101 @@
 import React from "react";
 import classNames from "classnames";
 
-import { Link, LinkType } from "../link";
 import { RectangleSkeleton } from "../rectangle";
 import { Tooltip } from "../tooltip";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
+
+import ArrowLeftIcon from "../../assets/arrow-left.react.svg";
+import ArrowRightIcon from "../../assets/icons/16/right.arrow.react.svg";
+import CrossIcon from "../../assets/icons/16/cross.react.svg";
 
 import type { QuickActionItem, QuickActionsProps } from "./QuickActions.types";
 
 import styles from "./QuickActions.module.scss";
 
-// The collapse affordance only applies past this many tiles. With 4 or fewer
-// the grid keeps its original single-row layout and never collapses.
-const COLLAPSE_THRESHOLD = 4;
+// Sub-pixel slack: scrollWidth/clientWidth are rounded independently, so an
+// unscrollable track can report a maximum offset of a fraction of a pixel and
+// light up both arrows on a strip that cannot move.
+const SCROLL_EPSILON = 1;
 
-// Returns whether the tiles inside `gridRef` wrap onto more than one row, and
-// keeps it in sync on resize. Rows are detected by comparing each tile's
-// offsetTop to the first tile's — clipping the container (overflow:hidden)
-// doesn't change the tiles' natural layout positions, so this holds while
-// collapsed too. Desktop lays the tiles out with flex-wrap:nowrap (they shrink
-// instead of wrapping), so this stays false there and the grid never collapses.
-const useRowOverflow = (
-  gridRef: React.RefObject<HTMLDivElement | null>,
-  itemCount: number,
+// How much of the current view stays on screen after paging, so the tile at the
+// edge is not scrolled past unseen.
+const PAGE_OVERLAP = 64;
+
+// Only one banner is on screen at a time, so the tooltip anchor is a constant —
+// the same shape the tiles use for theirs, and a valid CSS selector, which a
+// `useId` value is not without escaping.
+const CLOSE_ANCHOR_ID = "quick-actions-close-anchor";
+
+// Scrolling toward the end raises scrollLeft in LTR and lowers it (through
+// negative values) in RTL. Read the resolved direction from the element rather
+// than the document so a subtree that overrides `dir` still pages correctly.
+const getDirectionSign = (track: HTMLElement) =>
+  getComputedStyle(track).direction === "rtl" ? -1 : 1;
+
+// Whether the track can still move in either direction, kept in sync with
+// scrolling and resizing. Both ends are reported independently so each arrow
+// can be dropped at its own extreme.
+const useScrollAffordance = (
+  track: HTMLDivElement | null,
+  itemsKey: string,
 ) => {
-  const [overflows, setOverflows] = React.useState(false);
+  const [affordance, setAffordance] = React.useState({
+    canScrollPrev: false,
+    canScrollNext: false,
+  });
 
   useIsomorphicLayoutEffect(() => {
-    const grid = gridRef.current;
-    if (!grid) return undefined;
+    if (!track) {
+      setAffordance({ canScrollPrev: false, canScrollNext: false });
+      return undefined;
+    }
+
+    // A different set of tiles means a different section. The component is not
+    // remounted on that navigation, so the DOM would keep the offset the last
+    // section was left at and open the new one with its first tile out of
+    // sight. Assignment rather than `scrollTo`, so the jump is instant and
+    // needs no support beyond the property itself.
+    track.scrollLeft = 0;
 
     const measure = () => {
-      const tiles = grid.children;
-      if (tiles.length < 2) {
-        setOverflows(false);
+      const maxOffset = track.scrollWidth - track.clientWidth;
+
+      if (maxOffset <= SCROLL_EPSILON) {
+        setAffordance({ canScrollPrev: false, canScrollNext: false });
         return;
       }
-      const firstTop = (tiles[0] as HTMLElement).offsetTop;
-      const lastTop = (tiles[tiles.length - 1] as HTMLElement).offsetTop;
-      setOverflows(lastTop > firstTop);
+
+      // Distance travelled from the start, sign-independent: RTL counts down
+      // from zero into negative values.
+      const offset = Math.abs(track.scrollLeft);
+
+      setAffordance({
+        canScrollPrev: offset > SCROLL_EPSILON,
+        canScrollNext: offset < maxOffset - SCROLL_EPSILON,
+      });
     };
 
     measure();
 
-    const ro = new ResizeObserver(measure);
-    ro.observe(grid);
-    return () => ro.disconnect();
-  }, [gridRef, itemCount]);
+    track.addEventListener("scroll", measure, { passive: true });
 
-  return overflows;
+    const ro = new ResizeObserver(measure);
+    ro.observe(track);
+
+    // The track is full-width and its height is fixed by the tiles, so its own
+    // box does not change when the content that overflows it does. Observing
+    // the tiles as well is what catches a late layout pass — otherwise the
+    // first measurement is the only one that ever runs.
+    Array.from(track.children).forEach((tile) => ro.observe(tile));
+
+    return () => {
+      track.removeEventListener("scroll", measure);
+      ro.disconnect();
+    };
+  }, [track, itemsKey]);
+
+  return affordance;
 };
 
 const QuickActionTile = ({ item }: { item: QuickActionItem }) => {
@@ -179,35 +226,33 @@ export const QuickActions = ({
   items,
   className,
   dataTestId,
-  showMoreLabel = "Show more",
+  onClose,
+  closeLabel,
+  prevLabel,
+  nextLabel,
   isLoading = false,
 }: QuickActionsProps) => {
-  const gridRef = React.useRef<HTMLDivElement>(null);
-  const [expanded, setExpanded] = React.useState(false);
+  // State rather than a ref: the loading placeholder renders a track of its own
+  // without one, so the real track arrives on a later render. A ref object is
+  // stable, so an effect keyed on it would never re-run to measure the node
+  // that replaced the placeholder.
+  const [track, setTrack] = React.useState<HTMLDivElement | null>(null);
 
-  // Tiles never squash — they keep their width and wrap (handled in CSS via
-  // container queries on the banner's own width). The "Show more" collapse,
-  // however, only applies past the threshold: with 4 or fewer tiles they just
-  // wrap and all stay visible, with no overlay.
-  const aboveThreshold = items.length > COLLAPSE_THRESHOLD;
+  // The ids, not the array identity: the consumer rebuilds `items` on every
+  // render, so identity would rewind the strip continuously. The count alone
+  // is too coarse — two sections can offer the same number of tiles.
+  const itemsKey = items.map((item) => item.id).join("|");
 
-  // Detect whether the tiles actually wrap onto more than one row (measured, not
-  // a fixed breakpoint — a wide banner may fit them all on one line). Collapse
-  // only when there are enough tiles AND they overflow.
-  const overflows = useRowOverflow(gridRef, items.length);
-  const collapsible = aboveThreshold && overflows;
+  const { canScrollPrev, canScrollNext } = useScrollAffordance(track, itemsKey);
 
-  // Once expanded the tiles stay expanded (no "show less"). Reset only when the
-  // grid stops being collapsible — e.g. the container grows so everything fits
-  // on one row again — so a later overflow starts collapsed.
-  React.useEffect(() => {
-    if (!collapsible) setExpanded(false);
-  }, [collapsible]);
+  const scrollByPage = (towardEnd: boolean) => {
+    if (!track) return;
 
-  // Collapsed: clip the grid so only the first row plus a peek shows, with the
-  // blurred "Show more" overlay on top. Expanding removes the clip. Every tile
-  // stays mounted either way (the clip is purely visual).
-  const isCollapsed = collapsible && !expanded;
+    const page = Math.max(track.clientWidth - PAGE_OVERLAP, PAGE_OVERLAP);
+    const distance = page * getDirectionSign(track) * (towardEnd ? 1 : -1);
+
+    track.scrollBy({ left: distance, behavior: "smooth" });
+  };
 
   if (isLoading) {
     const count = items.length || 4;
@@ -225,42 +270,69 @@ export const QuickActions = ({
     );
   }
 
-  const grid = (
-    <div ref={gridRef} className={styles.grid}>
-      {items.map((item) => (
-        <QuickActionTile key={item.id} item={item} />
-      ))}
-    </div>
-  );
-
   if (items.length === 0) return null;
 
+  // The controls layer is a sibling of the track, absolutely positioned and
+  // transparent to the pointer except on the buttons themselves, so nothing
+  // here takes part in layout: the tiles and the content below keep their
+  // positions whether the controls are on screen or not.
   return (
     <div
-      className={classNames(styles.quickActions, className, {
-        [styles.collapsed]: isCollapsed,
-      })}
+      className={classNames(styles.quickActions, className)}
       data-testid={dataTestId}
     >
-      {grid}
-      {isCollapsed ? (
-        <button
-          type="button"
-          className={styles.showMore}
-          onClick={() => setExpanded(true)}
-          data-testid="quick-actions-show-more"
-        >
-          <Link
-            className={styles.showMoreLabel}
-            type={LinkType.action}
-            isHovered
-            // The wrapping <button> owns the click; render the link as plain
-            // styled text so it doesn't nest an interactive control.
-            tabIndex={-1}
+      <div ref={setTrack} className={styles.grid}>
+        {items.map((item) => (
+          <QuickActionTile key={item.id} item={item} />
+        ))}
+      </div>
+
+      <div className={styles.controls}>
+        {canScrollPrev ? (
+          <button
+            type="button"
+            className={classNames(styles.control, styles.prev)}
+            onClick={() => scrollByPage(false)}
+            aria-label={prevLabel}
+            data-testid="quick-actions-prev"
           >
-            {showMoreLabel}
-          </Link>
-        </button>
+            <ArrowLeftIcon />
+          </button>
+        ) : null}
+
+        {canScrollNext ? (
+          <button
+            type="button"
+            className={classNames(styles.control, styles.next)}
+            onClick={() => scrollByPage(true)}
+            aria-label={nextLabel}
+            data-testid="quick-actions-next"
+          >
+            <ArrowRightIcon />
+          </button>
+        ) : null}
+
+        {onClose ? (
+          <button
+            id={CLOSE_ANCHOR_ID}
+            type="button"
+            className={classNames(styles.control, styles.close)}
+            onClick={onClose}
+            aria-label={closeLabel}
+            data-testid="quick-actions-close"
+          >
+            <CrossIcon />
+          </button>
+        ) : null}
+      </div>
+
+      {onClose && closeLabel ? (
+        <Tooltip
+          id={`${CLOSE_ANCHOR_ID}-instance`}
+          anchorSelect={`#${CLOSE_ANCHOR_ID}`}
+          place="bottom"
+          getContent={() => closeLabel}
+        />
       ) : null}
     </div>
   );

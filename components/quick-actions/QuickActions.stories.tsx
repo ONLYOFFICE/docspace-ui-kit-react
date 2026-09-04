@@ -64,21 +64,23 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `QuickActions renders a responsive grid of tile cards. Each tile shows an icon and a label, and can trigger a click handler or navigate via an href. The number of rendered tiles matches the length of the \`items\` array.
+        component: `QuickActions renders a horizontal carousel of tile cards. Each tile shows an icon and a label, and can trigger a click handler or navigate via an href. The number of rendered tiles matches the length of the \`items\` array.
 
 ### Features
 
 - **Icon + label**: Each tile accepts a custom icon (any \`ReactNode\`) and a string label.
 - **Action or link**: Pass \`onClick\` to render a \`<button>\`, or \`href\` to render an \`<a>\`. When \`target="_blank"\` is set, \`rel="noopener noreferrer"\` is added automatically.
-- **Responsive layout**: Tiles are laid out using flex (no wrapping) with a 16px gap — they shrink proportionally and always stay in a single row.
-- **Overflow collapse**: When there are **more than 4** tiles, the grid collapses on smaller screens — it clips to the first row, the next row peeks through behind a blurred fade, and a centered "Show more" reveals the rest. Expanding is one-way (there is no "Show less"). Desktop always shows every tile in a single row. The label is consumer-provided via \`showMoreLabel\` (default "Show more") so the host app can localize it.
-- **16px padding**: Each tile has 16px padding on all sides.
+- **Carousel**: Tiles keep their design width and the strip scrolls horizontally once they no longer fit. Native overflow drives wheel, trackpad and touch-swipe; the arrows page the same scroll port.
+- **Floating controls**: The arrows and the close control are layered over the strip and are out of flow entirely, so nothing shifts when they appear. Each arrow is dropped at its own end of the scroll range.
+- **Arrows are a pointer affordance**: they exist only where hover and a fine pointer do, fading in with the banner. A touch device drags the strip directly, so it gets no arrows at all — only the close control, which has no gesture of its own and therefore stays visible there.
+- **Optional dismissal**: Pass \`onClose\` to render the close control; without it no close affordance appears. Persisting and reversing the choice belongs to the host.
 
 ### Accessibility
 
 - Each tile exposes its label via \`aria-label\`.
 - Icons are marked \`aria-hidden\` to avoid duplicate announcement.
 - Buttons receive \`type="button"\` to avoid accidental form submission.
+- \`prevLabel\`, \`nextLabel\` and \`closeLabel\` name the floating controls; the consumer supplies them localized.
 
 ### Usage
 
@@ -174,8 +176,8 @@ const aiFormsItems: QuickActionItem[] = [
   },
 ];
 
-// Five room-type tiles — one past the collapse threshold, so the grid collapses
-// on tablet/mobile. Mirrors the Rooms banner in the client.
+// Five room-type tiles — more than fit a narrow strip, so the carousel has
+// somewhere to scroll. Mirrors the Rooms banner in the client.
 const roomItems: QuickActionItem[] = [
   {
     id: "vdr-room",
@@ -314,7 +316,7 @@ export const InAIChat: Story = {
   },
 };
 
-export const Collapsible: Story = {
+export const Carousel: Story = {
   render: (args) => (
     <Wrapper>
       <QuickActions {...args} />
@@ -322,18 +324,22 @@ export const Collapsible: Story = {
   ),
   args: {
     items: roomItems,
-    showMoreLabel: "Show more",
+    prevLabel: "Previous",
+    nextLabel: "Next",
   },
   parameters: {
     docs: {
       description: {
-        story: `The Rooms banner with more than 4 tiles. On smaller viewports the grid collapses to its first row, the next row peeks through behind a blurred fade, and a centered "Show more" reveals the rest. Expanding is one-way (no "Show less"). Desktop shows every tile in a single row with no overlay.
+        story: `The Rooms banner. The tiles hold their width and the strip scrolls horizontally once they no longer fit; wheel, trackpad and touch-swipe all drive the same scroll port.
 
-Resize the canvas (or use the Viewport toolbar) below 1024px (tablet) and below 600px (mobile) to see the collapsed peek. \`showMoreLabel\` is supplied by the consumer for localization.`,
+The arrows float over the strip and never take part in layout, so nothing moves when they appear. Each one is dropped at its own end of the range, so the first tile shows only a forward arrow. They fade in with the banner on a device with hover, and are withheld entirely on touch, where the strip is dragged directly instead.
+
+Narrow the canvas (or use the Viewport toolbar) to see the strip start scrolling.`,
       },
       source: {
         code: `<QuickActions
-  showMoreLabel={t("Common:ShowMore")}
+  prevLabel={t("Common:Previous")}
+  nextLabel={t("Common:Next")}
   items={[
     { icon: <QuickVdrRoomIcon />, label: "VDR room", onClick: () => {} },
     { icon: <QuickCollaborationRoomIcon />, label: "Collaboration room", onClick: () => {} },
@@ -341,6 +347,39 @@ Resize the canvas (or use the Viewport toolbar) below 1024px (tablet) and below 
     { icon: <QuickCustomRoomIcon />, label: "Custom room", onClick: () => {} },
     { icon: <UseRoomTemplateIllustrationIcon />, label: "Room template", onClick: () => {} },
   ]}
+/>`,
+      },
+    },
+  },
+};
+
+export const Dismissible: Story = {
+  render: (args) => (
+    <Wrapper>
+      <QuickActions {...args} />
+    </Wrapper>
+  ),
+  args: {
+    items: roomItems,
+    prevLabel: "Previous",
+    nextLabel: "Next",
+    closeLabel: "Disable Quick Actions on all pages",
+    onClose: () => console.log("close"),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `Passing \`onClose\` adds the close control in the top corner, with \`closeLabel\` as both its tooltip and its accessible name.
+
+The control is only rendered when \`onClose\` is given: a consumer with nowhere to persist the choice would otherwise offer a button that undoes itself on the next load. Hiding the banner is the host's decision to store and to reverse — the component only reports the click.`,
+      },
+      source: {
+        code: `<QuickActions
+  onClose={hideQuickActions}
+  closeLabel={t("Common:DisableQuickActionsOnAllPages")}
+  prevLabel={t("Common:Previous")}
+  nextLabel={t("Common:Next")}
+  items={roomItems}
 />`,
       },
     },

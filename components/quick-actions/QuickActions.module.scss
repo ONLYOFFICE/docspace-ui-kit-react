@@ -36,6 +36,7 @@
 @use "../../styles/variables/colors";
 @use "../../styles/variables/quick-actions" as metrics;
 @use "../../styles/mixins/media-queries";
+@use "../../styles/mixins/direction";
 
 // Tile size and the gap between tiles. The tile box is 184x147 at desktop; the
 // 81x75 icon sits inside it with $tile-padding clear on every side, leaving the
@@ -48,15 +49,19 @@ $tile-height: metrics.$tile-height;
 $tile-padding: metrics.$tile-padding;
 $gap: metrics.$gap;
 
-// Compact sizing (tablet and below): shorter tiles, tighter icon/gap. Width
-// still stretches; mobile additionally drops to exactly two tiles per row.
+// Compact sizing (tablet and below): shorter tiles, tighter icon/gap. Tiles
+// keep a fixed width and the strip scrolls; mobile narrows them so roughly two
+// and a half fit, which is what makes the strip read as scrollable at a glance.
 $compact-tile-height: 120px;
 $compact-tile-padding: 12px;
 $compact-gap: 8px;
+$mobile-tile-width: 152px;
 
-// How much of the next row peeks out below the first row when collapsed.
-$peek: 74px;
-$compact-peek: 60px;
+// Floating controls: round buttons layered over the strip. They never occupy
+// flow space, so the tiles and the content below do not move when they appear.
+$control-size: 32px;
+$control-icon-size: 16px;
+$control-inset: 8px;
 
 .quickActions {
   --_tile-bg: var(--quick-actions-tile-bg, #{colors.$gray-light});
@@ -66,42 +71,63 @@ $compact-peek: 60px;
   // whole banner width instead of stopping at the design width set this to
   // `none` (the tile height stays fixed either way).
   --_tile-max-width: var(--quick-actions-tile-max-width, #{$tile-max-width});
-  // The fade/blur overlay tints toward the surrounding surface; defaults to the
-  // tile background so it reads as the grid dissolving.
-  --_fade-color: var(--quick-actions-tile-bg, #{colors.$white});
+  // The floating controls read as buttons sitting on top of the strip, so they
+  // take the surrounding surface rather than the tile fill they overlap.
+  --_control-bg: #{colors.$white};
+  --_control-bg-hover: #{colors.$gray-light-mid};
+  --_control-color: #{colors.$black};
+  --_control-shadow: #{colors.$box-shadow-dark-color};
 
   :global(.dark) & {
     --_tile-bg: var(--quick-actions-tile-bg, #{colors.$dark-gray-light});
     --_tile-bg-hover: var(--quick-actions-tile-bg-hover, #{colors.$gray-dark-mid});
     --_tile-color: var(--quick-actions-tile-color, #{colors.$white});
-    --_fade-color: var(--quick-actions-tile-bg, #{colors.$black});
+    --_control-bg: #{colors.$dark-gray-light};
+    --_control-bg-hover: #{colors.$gray-dark-mid};
+    --_control-color: #{colors.$white};
+    --_control-shadow: #{colors.$box-shadow-black-color};
   }
 
   position: relative;
   width: 100%;
 }
 
+// The tiles sit on one non-wrapping row that scrolls horizontally. Native
+// overflow gives wheel, trackpad and touch-swipe for free; the arrows drive the
+// same scroll port. The scrollbar itself is hidden — the arrows are the
+// affordance, and a visible bar would sit under the floating controls.
 .grid {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  // Centred while the tiles fit, start-aligned once they overflow. Plain
+  // `center` on a scroll container makes the overflowing start unreachable,
+  // which `safe` is exactly the fix for; the unprefixed value stays as the
+  // fallback for engines that do not parse it.
   justify-content: center;
+  justify-content: safe center;
   gap: $gap;
   width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  // No `scroll-behavior: smooth` here: the arrows ask for smooth themselves,
+  // and a blanket rule would also animate the rewind on a section change into
+  // a visible slide across tiles the user never chose to look at.
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   @include media-queries.tablet-and-below {
     gap: $compact-gap;
   }
 }
 
-// Tiles grow to fill the row so there's no empty space, and shrink down to
-// $tile-min-width before the row is allowed to wrap — a tile only moves to a
-// second row once they genuinely cannot fit side by side. That ordering
-// matters: when the flex base was the full $tile-width the row wrapped while
-// every tile still sat at its natural width, so the last tile (e.g. AI chat in
-// the Rooms banner) hid behind "Show more" with width left to squeeze into.
-// useRowOverflow detects a real wrap to trigger the collapse (only with >4
-// tiles). Because every tile grows, a partial last row stretches to fill the
-// width too.
+// Tiles hold their design width and overflow the strip rather than shrinking or
+// wrapping: a carousel's whole premise is that the row is allowed to be wider
+// than its container. flex-shrink must be 0, or flex would compress the tiles
+// to fit and there would be nothing to scroll.
 .tile {
   display: flex;
   flex-direction: column;
@@ -109,12 +135,7 @@ $compact-peek: 60px;
   justify-content: center;
   gap: 4px;
   padding: $tile-padding;
-  // The flex BASE size decides line breaking — flex-wrap breaks a line by
-  // comparing base sizes, before flex-shrink is ever applied, so a base of
-  // $tile-width would wrap while min-width still allowed shrinking. Basing on
-  // $tile-min-width instead means the row breaks only when the tiles truly
-  // cannot fit; flex-grow then expands them back up to $tile-max-width.
-  flex: 1 1 $tile-min-width;
+  flex: 0 0 $tile-max-width;
   min-width: $tile-min-width;
   max-width: var(--_tile-max-width);
   height: $tile-height;
@@ -149,61 +170,72 @@ $compact-peek: 60px;
     pointer-events: none;
   }
 
-  // Tablet and below: smaller tiles (shorter, tighter icon/padding). Width still
-  // grows to fill the row — several reduced tiles per row, no empty space.
+  // Tablet and below: smaller tiles (shorter, tighter icon/padding).
   @include media-queries.tablet-and-below {
     height: $compact-tile-height;
     gap: 4px;
     padding: $compact-tile-padding;
   }
 
-  // Mobile only: exactly two tiles per row (allowed to shrink below the desktop
-  // minimum so two always fit, even on the narrowest phones).
+  // Mobile: narrow enough that the third tile is partly visible, so the strip
+  // reads as scrollable without needing the arrows to say so.
   @include media-queries.mobile {
-    flex: 1 1 calc(50% - #{$compact-gap});
+    flex: 0 0 $mobile-tile-width;
     min-width: 0;
   }
 }
 
-// Collapsed: clip the grid to the first row plus a peek of the next, and hide
-// the overflow. The .showMore overlay sits on top of the clipped strip. Only
-// reachable with >4 tiles (the component sets .collapsed) and at any width
-// where they wrap.
-.collapsed .grid {
-  max-height: $tile-height + $gap + $peek;
-  overflow: hidden;
+// The controls layer covers the strip but is transparent to the pointer, so the
+// tiles underneath stay clickable everywhere except on the buttons themselves.
+// Being absolutely positioned it is out of flow entirely: showing and hiding it
+// moves nothing.
+.controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
 
-  @include media-queries.tablet-and-below {
-    max-height: $compact-tile-height + $compact-gap + $compact-peek;
+// Desktop reveals the controls on hover, or whenever focus is inside the banner
+// so they stay reachable by keyboard. Touch devices have no hover to reveal
+// them with, so the close control is always on screen there.
+@include media-queries.can-hover {
+  .controls {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .quickActions:hover .controls,
+  .quickActions:focus-within .controls {
+    opacity: 1;
   }
 }
 
-// "Show more" overlay: a blurred, fading strip pinned to the bottom of the
-// collapsed grid with the label centered on it. Clicking it expands the grid.
-.showMore {
+.control {
   position: absolute;
-  inset-inline: 0;
-  bottom: 0;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  width: 100%;
-  height: $peek + $gap + 24px;
-  padding-bottom: 12px;
+  width: $control-size;
+  height: $control-size;
+  padding: 0;
   border: none;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    color-mix(in srgb, var(--_fade-color) 70%, transparent) 55%,
-    var(--_fade-color) 100%
-  );
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  border-radius: 50%;
+  background-color: var(--_control-bg);
+  box-shadow: 0 2px 8px var(--_control-shadow);
   cursor: pointer;
+  pointer-events: auto;
 
-  @include media-queries.tablet-and-below {
-    height: $compact-peek + $compact-gap + 20px;
-    padding-bottom: 8px;
+  svg {
+    width: $control-icon-size;
+    height: $control-icon-size;
+
+    path {
+      fill: var(--_control-color);
+    }
+  }
+
+  &:hover {
+    background-color: var(--_control-bg-hover);
   }
 
   &:focus {
@@ -211,14 +243,51 @@ $compact-peek: 60px;
   }
 
   &:focus-visible {
-    outline: 2px solid var(--_tile-color);
-    outline-offset: -2px;
-    border-radius: 12px;
+    outline: 2px solid var(--_control-color);
+    outline-offset: 2px;
   }
 }
 
-.showMoreLabel {
-  pointer-events: none;
+// Arrows sit centred on the tile row at the inline edges. `inset-inline` keeps
+// prev on the side the strip scrolls back towards in both directions, and the
+// glyphs are mirrored in RTL so they keep pointing the way they move.
+//
+// They are a pointer affordance only. A touch device drags the strip directly,
+// which is both quicker and less cluttered than reaching for a button, so the
+// arrows are withheld there rather than sitting permanently on top of the
+// tiles. Hidden by default and restored inside `can-hover` so the two rules
+// stay exact complements: a device that matches neither keeps the simpler of
+// the two behaviours.
+.prev,
+.next {
+  display: none;
+  top: 50%;
+  transform: translateY(-50%);
+
+  svg {
+    @include direction.flip-in-rtl;
+  }
+}
+
+@include media-queries.can-hover {
+  .prev,
+  .next {
+    display: flex;
+  }
+}
+
+.prev {
+  inset-inline-start: $control-inset;
+}
+
+.next {
+  inset-inline-end: $control-inset;
+}
+
+// Close sits in the top inline-end corner, clear of the next arrow beneath it.
+.close {
+  top: 0;
+  inset-inline-end: $control-inset;
 }
 
 // Icon box: 81x75 at desktop, 48x45 at tablet and below. The icons don't all
@@ -271,12 +340,10 @@ $compact-peek: 60px;
 // tooltipped tiles would keep the old no-shrink behaviour and wrap early.
 .tileTooltipAnchor {
   display: flex;
-  // The flex BASE size decides line breaking — flex-wrap breaks a line by
-  // comparing base sizes, before flex-shrink is ever applied, so a base of
-  // $tile-width would wrap while min-width still allowed shrinking. Basing on
-  // $tile-min-width instead means the row breaks only when the tiles truly
-  // cannot fit; flex-grow then expands them back up to $tile-max-width.
-  flex: 1 1 $tile-min-width;
+  // This wrapper is the flex item for a tooltipped tile, so it must carry the
+  // same non-shrinking basis as a bare .tile. If it shrank, tooltipped tiles
+  // would compress while their neighbours held their width.
+  flex: 0 0 $tile-max-width;
   min-width: $tile-min-width;
   max-width: var(--_tile-max-width);
 
@@ -287,7 +354,7 @@ $compact-peek: 60px;
   }
 
   @include media-queries.mobile {
-    flex: 1 1 calc(50% - #{$compact-gap});
+    flex: 0 0 $mobile-tile-width;
     min-width: 0;
   }
 }

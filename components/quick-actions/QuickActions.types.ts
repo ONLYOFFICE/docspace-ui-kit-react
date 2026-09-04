@@ -51,13 +51,20 @@ export type QuickActionsProps = {
   items: QuickActionItem[];
   className?: string;
   dataTestId?: string;
+
   /**
-   * Label for the "show more" affordance that reveals the hidden tiles. Only
-   * shown when the grid collapses (more than 4 items on tablet/mobile).
-   * Expanding is one-way — there is no "show less". The consumer supplies the
-   * localized string; defaults to "Show more".
+   * Hides the whole banner. When omitted no close control is rendered, so a
+   * consumer that has nowhere to persist the choice keeps a carousel without
+   * an affordance that would appear to do nothing on the next load.
    */
-  showMoreLabel?: string;
+  onClose?: () => void;
+
+  /** Tooltip and accessible name for the close control. */
+  closeLabel?: string;
+
+  /** Accessible names for the carousel arrows. */
+  prevLabel?: string;
+  nextLabel?: string;
 
   isLoading?: boolean;
 };
