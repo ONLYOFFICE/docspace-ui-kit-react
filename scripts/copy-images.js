@@ -56,5 +56,5 @@ for (const size of SIZES) {
 }
 
 console.log(
-  `Copied ${copied} icons into assets/images/icons/${missing > 0 ? ` (${missing} missing in some sizes)` : ""}`,
+  `Copied ${copied} icons into assets/icons/${missing > 0 ? ` (${missing} missing in some sizes)` : ""}`,
 );
