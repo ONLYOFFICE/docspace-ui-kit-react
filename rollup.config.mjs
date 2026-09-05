@@ -69,7 +69,11 @@ const collectEntries = (dir, found = []) => {
 			continue;
 		}
 
-		if (entry.name === "index.ts" || entry.name === "index.tsx") found.push(full);
+		if (!/\.tsx?$/.test(entry.name) || entry.name.endsWith(".d.ts")) continue;
+		if (NON_SOURCE.test(full)) continue;
+		if (!VALUE_EXPORT.test(readFileSync(full, "utf8"))) continue;
+
+		found.push(full);
 	}
 
 	return found;
@@ -80,6 +84,11 @@ const collectEntries = (dir, found = []) => {
 // simply unreachable from the barrel before, which is why the defect never
 // surfaced. Excluded here so the rest of the entry points can be built and
 // measured; tracked as debt.
+// Files that are not library modules: test and story support, and anything
+// exporting only types (which produces no JavaScript by definition).
+const NON_SOURCE = /(\.(test|spec|stories)\.|story\.helper|stories\.utils|storybook-helpers)/;
+const VALUE_EXPORT = /^export\s+(?!type\b|interface\b)/m;
+
 const UNBUILDABLE = ["selectors/MCPServers"];
 
 const entryPoints = [

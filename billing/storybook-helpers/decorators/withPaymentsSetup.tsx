@@ -15,6 +15,7 @@ const defaultConfig: TPaymentConfig = {
     portalPayments: "/billing/tariff-plan",
     services: "/billing/addons",
     aiServices: "/billing/addons/ai-services",
+    aiSearch: "/billing/addons/ai-search",
     backup: "/billing/addons/backup",
     diskStorage: "/billing/addons/disk-storage",
   },

@@ -12,7 +12,9 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["vite/client"],
+    "types": [
+      "vite/client"
+    ],
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -47,7 +49,12 @@
     "selectors/**/*",
     "document-editor",
     "uploader",
-    "ai-agent/**/*"
+    "ai-agent/**/*",
+    "enums/**/*",
+    "constants/**/*",
+    "errors/**/*",
+    "api/**/*",
+    "billing/**/*"
   ],
   "exclude": [
     "node_modules",

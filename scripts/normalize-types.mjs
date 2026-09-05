@@ -71,7 +71,32 @@ declare module "*.svg?url" {
 `;
 
 const SIDE_EFFECT_STYLE = /^import\s+"[^"]+\.(?:s?css)";?\s*$/gm;
-const REFERENCES_SVG = /(?:from|module)\s+"[^"]+\.svg"/;
+
+// `export { default as Icon } from "../../assets/x.react.svg"` cannot stand in
+// a published declaration: `assets/` is not in `files`, and the built code
+// re-exports the svgr-compiled `x.react.svg.js` instead, which has no
+// declaration of its own. attw reports the mismatch as the types
+// misrepresenting the JavaScript. Rewriting each re-export to a concrete React
+// component type removes the unresolvable specifier and says what the module
+// actually provides.
+const SVG_REEXPORT =
+  /export\s*\{\s*default as (\w+)\s*\}\s*from\s*"[^"]+\.svg";?/g;
+
+const SVG_COMPONENT_TYPE =
+  'React.FunctionComponent<React.SVGProps<SVGSVGElement> & { title?: string }>';
+
+const rewriteSvgReexports = (text) => {
+  if (!SVG_REEXPORT.test(text)) return null;
+
+  SVG_REEXPORT.lastIndex = 0;
+
+  const body = text.replace(
+    SVG_REEXPORT,
+    (_match, name) => `export declare const ${name}: ${SVG_COMPONENT_TYPE};`,
+  );
+
+  return `import type * as React from "react";\n${body}`;
+};
 
 const walk = (dir, out = []) => {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -101,17 +126,11 @@ for (const file of files) {
 
   if (next !== original) stripped += 1;
 
-  if (REFERENCES_SVG.test(next)) {
-    const rel = path
-      .relative(path.dirname(file), path.join(TYPES, GLOBALS))
-      .split(path.sep)
-      .join("/");
-    const ref = `/// <reference path="${rel.startsWith(".") ? rel : `./${rel}`}" />\n`;
+  const svgRewritten = rewriteSvgReexports(next);
 
-    if (!next.startsWith("/// <reference")) {
-      next = ref + next;
-      referenced += 1;
-    }
+  if (svgRewritten !== null) {
+    next = svgRewritten;
+    referenced += 1;
   }
 
   if (next !== original) fs.writeFileSync(file, next);
@@ -179,6 +198,6 @@ for (const file of files) {
 console.log(
   `Normalized ${files.length} declaration files: ` +
     `stripped stylesheet imports from ${stripped}, ` +
-    `referenced ambient SVG types from ${referenced}; ` +
+    `inlined SVG component types in ${referenced}; ` +
     `wrote ${mjsWritten} .d.mts copies, rewrote specifiers in ${rewritten}.`,
 );
