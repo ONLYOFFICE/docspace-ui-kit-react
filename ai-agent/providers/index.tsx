@@ -82,6 +82,7 @@ import "@onlyoffice/ai-chat/styles";
 export type { Suggestion } from "@onlyoffice/ai-chat";
 
 import { toastr } from "../../components/toast";
+import { Link, LinkType } from "../../components/link";
 
 import { AiChatAvailabilityContext } from "./availability";
 import {
@@ -111,6 +112,11 @@ import {
   openGeneratedFileWithToolCall,
   type EditorToolsChangedDetail,
 } from "./host-tool-groups";
+import {
+  releaseGeneratedFileWindow,
+  reserveGeneratedFileWindow,
+} from "./host-tool-groups/generated-file-window";
+import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer/submit-interceptors";
 import { useApi as useFilesApi } from "../../providers/api";
 import { useFilesIntegration, type AttachedFileInfo } from "./files";
 import { uploadFilesToChat } from "./files/upload-files";
@@ -421,6 +427,54 @@ const EDITOR_TOOL_NAME_BY_CHAT_TOOL: Record<string, string> = {
 // (one-off confirmation only) and open the generated file once approved.
 const GENERATE_TOOL_NAMES = Object.keys(EDITOR_TOOL_NAME_BY_CHAT_TOOL);
 
+// The chat tool name of the tool-call the approval dialog is currently
+// showing, or undefined when no call is pending.
+const getPendingToolName = (
+  manageToolData: ReturnType<
+    ReturnType<typeof useStores>["useServersStore"]["getState"]
+  >["manageToolData"],
+): string | undefined => {
+  if (!manageToolData) return undefined;
+  const part: unknown = manageToolData.message.content[manageToolData.idx];
+  if (!part || typeof part !== "object") return undefined;
+  const { type, toolName } = part as { type?: unknown; toolName?: unknown };
+  return type === "tool-call" && typeof toolName === "string"
+    ? toolName
+    : undefined;
+};
+
+// Reserves the editor tab INSIDE the "Allow" click of a generate tool. The
+// generated file is opened only when the tool result streams back, which is
+// outside the user gesture — so the popup blocker would veto `window.open`
+// there (Chrome allows it for roughly 5 s after the click, a slow backend
+// loses the race). While a generate tool awaits approval, the dialog's
+// submit runs `reserveGeneratedFileWindow`; `openGeneratedFileWithToolCall`
+// then navigates that tab. When the pending call goes away without the tab
+// being used (deny, failed stream, no file id) the blank tab is closed.
+const GenerateToolApprovalBridge = () => {
+  const { useServersStore } = useStores();
+  const pendingToolName = useServersStore((s) =>
+    getPendingToolName(s.manageToolData),
+  );
+  const isGeneratePending =
+    pendingToolName !== undefined &&
+    GENERATE_TOOL_NAMES.includes(pendingToolName);
+
+  useEffect(() => {
+    if (!isGeneratePending) return;
+    const remove = addDialogSubmitInterceptor(reserveGeneratedFileWindow);
+    return () => {
+      remove();
+      // The dialog is gone: either the tab was consumed by
+      // openGeneratedFileWithToolCall (then this is a no-op) or the call did
+      // not produce a file — drop the spare tab.
+      releaseGeneratedFileWindow();
+    };
+  }, [isGeneratePending]);
+
+  return null;
+};
+
 /**
  * Reports a failure from one of the scope-switch reloads below. Those are
  * deliberately not awaited (navigation must not wait on them), so their
@@ -632,9 +686,36 @@ const AiAgentProviders = ({
       console.log(
         `[ai-agent] opening generated file ${rawId} with editor tool "${editorToolName}"`,
       );
-      openGeneratedFileWithToolCall(rawId, editorToolName, ctx.toolArgs);
+      const opened = openGeneratedFileWithToolCall(
+        rawId,
+        editorToolName,
+        ctx.toolArgs,
+      );
+      if (opened) return;
+
+      // The tab was blocked (no reservation and the gesture had expired, or
+      // popups are blocked outright). Offer a click — a fresh user gesture —
+      // that opens the file and runs the generation tool in it.
+      const toastId = toastr.info(
+        <Link
+          type={LinkType.action}
+          isHovered
+          onClick={() => {
+            if (
+              openGeneratedFileWithToolCall(rawId, editorToolName, ctx.toolArgs)
+            ) {
+              toastr.dismiss(toastId);
+            }
+          }}
+        >
+          {t("Common:OpenGeneratedDocument")}
+        </Link>,
+        null,
+        0,
+        true,
+      );
     },
-    [],
+    [t],
   );
 
   const { stores, ctx, serverApiConfig } = useMemo(() => {
@@ -916,6 +997,7 @@ const AiAgentProviders = ({
                             <ThreadContextBridge
                               onThreadContextChange={onThreadContextChange}
                             />
+                            <GenerateToolApprovalBridge />
                             <AiChatStoreProvider>
                               <AiChatStoresBridge />
                               {getAgentRoomId ? null : <AgentRoomIdSync />}
