@@ -134,16 +134,47 @@ const preserveUseClient = () => ({
 // original source is gone. This runs before the typescript plugin strips it.
 //
 // Many source files still open with a long copyright comment, so the directive
-// is not at byte 0 -- leading line and block comments are skipped before
+// is not at byte 0 -- leading comments and blank lines are skipped before
 // looking for it. It must still precede any real statement to count.
-const USE_CLIENT = new RegExp(
-	String.raw`^(?:\s*(?://[^\n]*|/\*[\s\S]*?\*/)\s*)*["']use client["']`,
-);
+//
+// Scanned line by line rather than with one regex over the whole file: the
+// obvious pattern for "leading comments, then the directive" nests a quantifier
+// inside a quantified group, which backtracks catastrophically on a 25-line
+// header and hangs the build instead of failing.
+const hasUseClient = (code) => {
+	let inBlockComment = false;
+
+	for (const rawLine of code.split("\n")) {
+		const line = rawLine.trim();
+
+		if (inBlockComment) {
+			const end = line.indexOf("*/");
+			if (end === -1) continue;
+			inBlockComment = false;
+			// Anything after the close on the same line still has to be checked.
+			const rest = line.slice(end + 2).trim();
+			if (rest === "") continue;
+			return /^["']use client["']/.test(rest);
+		}
+
+		if (line === "" || line.startsWith("//")) continue;
+
+		if (line.startsWith("/*")) {
+			if (!line.includes("*/")) inBlockComment = true;
+			continue;
+		}
+
+		// First line that is neither blank nor a comment decides it.
+		return /^["']use client["']/.test(line);
+	}
+
+	return false;
+};
 
 const detectUseClient = () => ({
 	name: "detect-use-client",
 	transform(code) {
-		if (USE_CLIENT.test(code)) {
+		if (hasUseClient(code)) {
 			return { code, map: null, meta: { hasUseClient: true } };
 		}
 
