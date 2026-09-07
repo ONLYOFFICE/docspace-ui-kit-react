@@ -113,6 +113,7 @@ import {
 } from "./host-tool-groups";
 import { useApi as useFilesApi } from "../../providers/api";
 import { useFilesIntegration, type AttachedFileInfo } from "./files";
+import { OnFilesAttachedContext } from "./files/attached-report";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
 
@@ -906,7 +907,16 @@ const AiAgentProviders = ({
                             <AiChatStoreProvider>
                               <AiChatStoresBridge />
                               {getAgentRoomId ? null : <AgentRoomIdSync />}
-                              {children}
+                              {/* The host subtree attaches files too (the
+                                  "Ask AI" action, the chat-panel drop zone):
+                                  hand it the same reporter the dialogs get as
+                                  a prop, so `canAnalyze` survives every
+                                  entry point. */}
+                              <OnFilesAttachedContext.Provider
+                                value={onFilesAttached}
+                              >
+                                {children}
+                              </OnFilesAttachedContext.Provider>
                               {overlay}
                             </AiChatStoreProvider>
                           </ToolsProvider>

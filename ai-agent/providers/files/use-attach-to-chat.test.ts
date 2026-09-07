@@ -24,6 +24,7 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
 
@@ -43,12 +44,15 @@ vi.mock("@onlyoffice/ai-chat", () => ({
   useStores: () => ({ useAttachmentsStore }),
 }));
 
-const attachFilesToChat = vi.fn(async () => []);
+const attachFilesToChat = vi.fn(
+  async (): Promise<{ id: string; canAnalyze?: boolean }[]> => [],
+);
 vi.mock("./attach-files", async (importOriginal) => ({
   ...(await importOriginal<typeof import("./attach-files")>()),
   attachFilesToChat: () => attachFilesToChat(),
 }));
 
+import { OnFilesAttachedContext } from "./attached-report";
 import { useAttachHostFilesToChat } from "./use-attach-to-chat";
 
 // Refs carry `${entryId}/${title}`, the shape the AI backend composes.
@@ -78,6 +82,23 @@ type AttachItems = Parameters<
 
 const attach = async (items: AttachItems) => {
   const { result } = renderHook(() => useAttachHostFilesToChat());
+  return result.current(items);
+};
+
+// Same call, but under the provider's attach reporter — the context the chat
+// providers put around the host subtree.
+const attachUnderReporter = async (
+  items: AttachItems,
+  onFilesAttached: (attached: { id: string; canAnalyze?: boolean }[]) => void,
+) => {
+  const { result } = renderHook(() => useAttachHostFilesToChat(), {
+    wrapper: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(
+        OnFilesAttachedContext.Provider,
+        { value: onFilesAttached },
+        children,
+      ),
+  });
   return result.current(items);
 };
 
@@ -163,6 +184,33 @@ describe("useAttachHostFilesToChat accounting", () => {
     expect(warn).toHaveBeenCalledTimes(1);
     expect(String(warn.mock.calls[0]?.[0])).toContain("attachment cap drift");
     warn.mockRestore();
+  });
+
+  // The drop zone and the "Ask AI" action attach through this hook, and
+  // `canAnalyze` lives in the attach response alone — unreported, the chat
+  // would offer the analyze suggestions only for files picked in the dialog.
+  it("reports what the backend echoed back to the provider's reporter", async () => {
+    const records = [
+      { id: "att-1", canAnalyze: true },
+      { id: "att-2", canAnalyze: false },
+    ];
+    attachFilesToChat.mockResolvedValueOnce(records);
+    const onFilesAttached = vi.fn();
+
+    await attachUnderReporter([file(1), file(2)], onFilesAttached);
+
+    expect(onFilesAttached).toHaveBeenCalledTimes(1);
+    expect(onFilesAttached).toHaveBeenCalledWith(records);
+  });
+
+  it("reports nothing when the round trip fails", async () => {
+    attachFilesToChat.mockRejectedValueOnce(new Error("boom"));
+    const onFilesAttached = vi.fn();
+
+    await expect(
+      attachUnderReporter([file(1)], onFilesAttached),
+    ).rejects.toThrow("boom");
+    expect(onFilesAttached).not.toHaveBeenCalled();
   });
 
   it("matches duplicates against the image bucket too", async () => {

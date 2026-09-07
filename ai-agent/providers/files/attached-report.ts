@@ -24,30 +24,25 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { getOnlyofficeFileType } from "./file-type";
-// The duplicate check stays internal on purpose: `attachFilesToChat` applies
-// it itself, so a host never has to remember it (see duplicate-attachments).
-export {
-  attachFilesToChat,
-  type AttachFileInput,
-  type AttachedFileInfo,
-  type OnFilesAttached,
-} from "./attach-files";
-export { useHasFormAttached } from "./use-has-form-attached";
-// Provided by AiAgentProviders around the host subtree; consumed by
-// `useAttachHostFilesToChat`, so hosts never pass it themselves.
-export {
-  OnFilesAttachedContext,
-  useOnFilesAttached,
-} from "./attached-report";
-export {
-  useAttachHostFilesToChat,
-  type ChatAttachableItem,
-  type AttachToChatResult,
-} from "./use-attach-to-chat";
-export { CHAT_ATTACHMENT_LIMIT } from "./limits";
-export {
-  useFilesIntegration,
-  type FilesIntegration,
-} from "./use-integration";
-export { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
+import { createContext, useContext } from "react";
+
+import type { OnFilesAttached } from "./attach-files";
+
+/**
+ * Carries AiAgentProviders' own attach reporter down the tree, so the attach
+ * entry points a host triggers from outside the chat — the "Ask AI" context
+ * action and the drag-and-drop drop zone, both going through
+ * `useAttachHostFilesToChat` — report what they attached exactly like the
+ * picker dialog and the device upload do (those get the callback as a prop).
+ *
+ * The provider owns the reporter (it remembers the record flags the
+ * attachments store drops, `canAnalyze`), so the callers must not have to know
+ * about it: undefined outside the provider makes the report a no-op.
+ */
+export const OnFilesAttachedContext = createContext<
+  OnFilesAttached | undefined
+>(undefined);
+
+/** The provider's attach reporter, or undefined when rendered without it. */
+export const useOnFilesAttached = (): OnFilesAttached | undefined =>
+  useContext(OnFilesAttachedContext);

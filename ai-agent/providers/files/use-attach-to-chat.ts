@@ -33,6 +33,7 @@ import { FileType } from "../../../enums";
 
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat } from "./attach-files";
+import { useOnFilesAttached } from "./attached-report";
 import { splitDuplicateAttachments } from "./duplicate-attachments";
 import { reserveAttachmentChips } from "./limits";
 import { hasFormResults } from "./form-attachments";
@@ -88,9 +89,17 @@ export type AttachToChatResult = {
  * selection over and still say the right thing. The promise resolves once the
  * AI backend has echoed the attachment records back (rejects if that
  * round-trip fails, so callers own the error toast).
+ *
+ * What the backend reported about those records is passed on to the provider's
+ * reporter (see {@link useOnFilesAttached}) — the same one the picker dialog
+ * and the device upload call — so the flags the attachments store drops
+ * (`canAnalyze`) are kept no matter which entry point attached the file.
  */
 export const useAttachHostFilesToChat = () => {
   const { useAttachmentsStore } = useStores();
+  // Reported to the provider, not to the caller: `canAnalyze` is a chat-side
+  // flag, and a host triggering this from a row action has no use for it.
+  const onFilesAttached = useOnFilesAttached();
 
   return React.useCallback(
     async (items: ChatAttachableItem[]): Promise<AttachToChatResult> => {
@@ -141,12 +150,13 @@ export const useAttachHostFilesToChat = () => {
       });
 
       try {
-        await attachFilesToChat(
+        const attached = await attachFilesToChat(
           useAttachmentsStore,
           inputs,
           imageIndices,
           pendingIds,
         );
+        onFilesAttached?.(attached);
       } catch (err) {
         // Callers own the toast (documented); the leases must not outlive
         // the failure or Send stays blocked.
@@ -156,6 +166,6 @@ export const useAttachHostFilesToChat = () => {
 
       return { attached: inputs.length, ...counts };
     },
-    [useAttachmentsStore],
+    [useAttachmentsStore, onFilesAttached],
   );
 };
