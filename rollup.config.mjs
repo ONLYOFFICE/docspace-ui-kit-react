@@ -79,17 +79,16 @@ const collectEntries = (dir, found = []) => {
 	return found;
 };
 
-// selectors/MCPServers imports assets/favicon.ico and nothing in this config
-// can parse a binary asset, so rollup fails on it outright. The module was
-// simply unreachable from the barrel before, which is why the defect never
-// surfaced. Excluded here so the rest of the entry points can be built and
-// measured; tracked as debt.
 // Files that are not library modules: test and story support, and anything
 // exporting only types (which produces no JavaScript by definition).
 const NON_SOURCE = /(\.(test|spec|stories)\.|story\.helper|stories\.utils|storybook-helpers)/;
 const VALUE_EXPORT = /^export\s+(?!type\b|interface\b)/m;
 
-const UNBUILDABLE = ["selectors/MCPServers"];
+// Entry points rollup cannot build. Empty: selectors/MCPServers used to be
+// here because it imported assets/favicon.ico, which nothing in this config
+// can parse. It now uses the canonical utils/ai/getServerIcon instead, so the
+// binary import is gone and the subpath builds like any other.
+const UNBUILDABLE = [];
 
 const entryPoints = [
 	"index.ts",
@@ -104,6 +103,53 @@ const entryPoints = [
 const isExternal = (id) =>
 	nodeBuiltins.has(id) ||
 	declaredPackages.some((name) => id === name || id.startsWith(`${name}/`));
+
+// Rollup strips module-level directives while bundling ("Module level
+// directives cause errors when bundled"), so all 56 "use client" markers in
+// the source vanished from dist. Every Next.js App Router consumer -- four of
+// the six monorepo apps -- then breaks on the first interactive component.
+//
+// preserveModules keeps a 1:1 module mapping, so the directive is restored per
+// chunk from the directive rollup already parsed off its own source module.
+// Reading `chunk.moduleIds` rather than re-scanning files keeps this correct
+// for re-exported modules: a chunk earns the directive when any module that
+// composes it declared one.
+const preserveUseClient = () => ({
+	name: "preserve-use-client",
+	renderChunk(code, chunk, outputOptions) {
+		const needsDirective = chunk.moduleIds.some((id) => {
+			const info = this.getModuleInfo(id);
+			return info?.meta?.hasUseClient === true;
+		});
+
+		if (!needsDirective || /^\s*["']use client["']/.test(code)) return null;
+
+		// Must be the very first statement in both formats to be honoured by
+		// consuming bundlers, ahead of any CJS interop preamble.
+		return { code: `"use client";\n${code}`, map: null };
+	},
+});
+
+// The directive has to be recorded at transform time: by renderChunk the
+// original source is gone. This runs before the typescript plugin strips it.
+//
+// Many source files still open with a long copyright comment, so the directive
+// is not at byte 0 -- leading line and block comments are skipped before
+// looking for it. It must still precede any real statement to count.
+const USE_CLIENT = new RegExp(
+	String.raw`^(?:\s*(?://[^\n]*|/\*[\s\S]*?\*/)\s*)*["']use client["']`,
+);
+
+const detectUseClient = () => ({
+	name: "detect-use-client",
+	transform(code) {
+		if (USE_CLIENT.test(code)) {
+			return { code, map: null, meta: { hasUseClient: true } };
+		}
+
+		return null;
+	},
+});
 
 export default [
 	{
@@ -125,6 +171,8 @@ export default [
 			},
 		],
 		plugins: [
+			detectUseClient(),
+			preserveUseClient(),
 			peerDepsExternal(),
 			resolve({
 				extensions: [".ts", ".tsx", ".js", ".jsx"],

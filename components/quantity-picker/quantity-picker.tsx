@@ -36,9 +36,9 @@ type QuantityPickerProps = {
   className?: string;
   items?: Array<number | TabItemObject>;
   isLarge?: boolean;
-  withoutContorls?: boolean;
+  withoutControls?: boolean;
   disableValue?: string;
-  underContorlsTitle?: string | React.ReactNode;
+  underControlsTitle?: string | React.ReactNode;
   isZeroAllowed?: boolean;
   enableZero?: boolean;
   minusTooltipId?: string;
@@ -70,9 +70,9 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
   className,
   items,
   isLarge,
-  withoutContorls,
+  withoutControls,
   disableValue,
-  underContorlsTitle,
+  underControlsTitle,
   enableZero = false,
   minusTooltipId,
   minusDisabled,
@@ -266,7 +266,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
       ) : null}
 
       <div className={styles.countControls}>
-        {withoutContorls ? null : (
+        {withoutControls ? null : (
           <div
             className={minusCircleClass}
             {...minusButtonProps}
@@ -293,7 +293,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
           />
         )}
 
-        {withoutContorls ? null : (
+        {withoutControls ? null : (
           <div
             className={`${circleClass} ${styles.plusIcon}`}
             {...buttonProps}
@@ -305,7 +305,7 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
         )}
       </div>
 
-      <Text className={titleUnderControlsClass}>{underContorlsTitle}</Text>
+      <Text className={titleUnderControlsClass}>{underControlsTitle}</Text>
       {showSlider ? (
         <div className={styles.sliderWrapper}>
           <Slider

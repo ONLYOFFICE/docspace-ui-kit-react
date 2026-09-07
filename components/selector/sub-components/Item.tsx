@@ -243,7 +243,13 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
         data-testid={`selector-item-${index}`}
       >
         {isMCP ? (
-          <MCPIcon title={label} imgSrc={icon} size={MCPIconSize.Big} />
+          <MCPIcon
+            title={label}
+            {...(typeof icon === "string"
+              ? { imgSrc: icon }
+              : { imgNode: icon })}
+            size={MCPIconSize.Big}
+          />
         ) : avatar || isGroup ? (
           <Avatar
             className={styles.userAvatar}

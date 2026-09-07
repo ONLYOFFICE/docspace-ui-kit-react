@@ -2,7 +2,6 @@ import React from "react";
 
 import EmptyScreenRoomSelectorLight from "../../assets/emptyview/empty.room.selector.light.svg";
 import EmptyScreenRoomSelectorDark from "../../assets/emptyview/empty.room.selector.dark.svg";
-import faviconUrl from "../../assets/favicon.ico";
 
 import { useCommonTranslation } from "../../utils/i18n";
 import {
@@ -14,22 +13,10 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 import { useApi } from "../../providers/api/ApiProvider";
 import { getBrandName } from "../../constants/brands";
+import { ServerType } from "../../enums";
+import { getServerIcon } from "../../utils/ai/getServerIcon";
 
-const getServerIcon = (type: ServerType, _isBase: boolean) => {
-  switch (type) {
-    case ServerType.Portal:
-      return faviconUrl;
-    default:
-      return null;
-  }
-};
-
-export enum ServerType {
-  Custom,
-  Portal,
-  GitHub,
-  Box,
-}
+export { ServerType };
 
 export type TServer = {
   id: string;
@@ -93,6 +80,9 @@ const MCPServersSelector = ({
         label: isSystem
           ? `${getBrandName("OrganizationName")} ${getBrandName("ProductName")}`
           : name,
+        // portalUrl is left empty on purpose: the resulting "/logo.ashx?..."
+        // is relative, so the browser resolves it against the portal origin
+        // the app is already served from.
         icon:
           getServerIcon(isSystem ? ServerType.Portal : ServerType.Custom, isBase) ??
           "",

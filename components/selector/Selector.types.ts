@@ -596,7 +596,9 @@ export type TSelectorItemMCP = MergeTypes<
   TSelectorItemEmpty,
   {
     isMCP: boolean;
-    icon?: string;
+    // A URL for remotely hosted icons, or a rendered element for the ones
+    // bundled as SVG components (see utils/ai/getServerIcon).
+    icon?: string | React.ReactElement;
   }
 >;
 
