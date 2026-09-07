@@ -55,6 +55,7 @@ export type ChatNoAccessScreenProps = {
   onActivateAI?: () => void;
   onTopUpAndActivateAI?: () => void;
   isActivating?: boolean;
+  aiToolsFeePercent?: string | null;
 };
 
 export const ChatNoAccessScreen = ({
@@ -66,6 +67,7 @@ export const ChatNoAccessScreen = ({
   onActivateAI,
   onTopUpAndActivateAI,
   isActivating,
+  aiToolsFeePercent,
 }: ChatNoAccessScreenProps) => {
   const { isBase } = useTheme();
   const t = useCommonTranslation();
@@ -122,7 +124,11 @@ export const ChatNoAccessScreen = ({
       description={description}
       icon={icon}
       options={options}
-      extraContent={showBenefits ? <ChatAiBenefits /> : null}
+      extraContent={
+        showBenefits ? (
+          <ChatAiBenefits serviceFeePercent={aiToolsFeePercent} />
+        ) : null
+      }
       className="chat-no-access-screen"
     />
   );

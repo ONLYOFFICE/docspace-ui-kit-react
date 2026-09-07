@@ -208,6 +208,21 @@ export type TActiveService = {
   used: number | null;
 };
 
+/** A price record of a wallet service from the accounting service. */
+export type TAccountingPrice = {
+  id: number;
+  accountNumber: number;
+  serviceId: number;
+  timeUnit: string;
+  costPrice: number;
+  /** Markup on top of the cost price, in percent. */
+  extraCharge: number;
+  servicePrice: number;
+  timeBound?: { startDate?: string; endDate?: string };
+  status: "Draft" | "Approved" | "Rejected";
+  created: string;
+};
+
 /** A single month bucket from the monthly usage endpoint. */
 export type TServiceUsageMonthly = {
   year: number;

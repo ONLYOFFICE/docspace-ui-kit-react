@@ -491,6 +491,10 @@ class ServicesStore {
         initWalletPayerAndBalance(isRefresh),
       ];
 
+      if (serviceName === AI_TOOLS || serviceName === AI_SEARCH) {
+        requests.push(this.paymentStore.fetchServiceFeePercent(serviceName));
+      }
+
       const monthStart = now().startOf("month");
       const monthEnd = now().endOf("month");
 
@@ -562,7 +566,10 @@ class ServicesStore {
       const quotas = await handleServicesQuotas();
 
       const hasAiService = quotas?.some(
-        (service) => service.serviceName === AI_ENUM,
+        (service) => service.serviceName === AI_TOOLS,
+      );
+      const hasAiSearchService = quotas?.some(
+        (service) => service.serviceName === AI_SEARCH,
       );
 
       const requests: Promise<unknown>[] = [
@@ -575,7 +582,14 @@ class ServicesStore {
       }
 
       if (hasAiService) {
-        requests.push(this.fetchAiPrices());
+        requests.push(
+          this.fetchAiPrices(),
+          this.paymentStore.fetchServiceFeePercent(AI_TOOLS),
+        );
+      }
+
+      if (hasAiSearchService) {
+        requests.push(this.paymentStore.fetchServiceFeePercent(AI_SEARCH));
       }
 
       await Promise.all(requests);
