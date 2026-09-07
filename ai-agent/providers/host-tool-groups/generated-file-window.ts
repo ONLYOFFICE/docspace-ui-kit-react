@@ -39,8 +39,127 @@ type ReservedWindow = {
 
 let reserved: ReservedWindow | null = null;
 
-// Reserve a blank tab inside the current user gesture. Call from the click
-// handler that approves a generate tool; the reservation is consumed by
+// Standalone copy of `AppLoader` (the full-page "rombs" loader the editor
+// shows while it boots) for the reserved tab. It has to be self-contained:
+// the tab is `about:blank` with no stylesheet, and it lives only until the
+// editor URL replaces it. Colors are the resolved values of
+// styles/variables/_colors.scss; the animation is Rombs.module.scss verbatim.
+// The real loader's dark block uses a selector that never matches, so the
+// rombs keep their light palette in both themes — only the page background
+// follows the theme, exactly like the live component.
+const escapeHtml = (value: string): string =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+const buildPlaceholderHtml = (isDark: boolean, title: string): string => `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(title)}</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { background: ${isDark ? "#333333" : "#ffffff"}; }
+  .loader-container {
+    position: fixed; inset: 0; display: flex; align-items: center;
+    justify-content: center; overflow: hidden;
+  }
+  .rombs {
+    position: fixed; top: 35%; left: calc(50% - 20px);
+    width: 40px; height: 40px;
+  }
+  .romb {
+    --rombs-loader-blue: #5dc0e8;
+    --rombs-loader-green: #95c038;
+    --rombs-loader-red: #ff6f3d;
+    --rombs-loader-blue-colorStep_1: #f2cbbf;
+    --rombs-loader-blue-colorStep_2: #ffffff;
+    --rombs-loader-blue-colorStep_3: #e6e4e4;
+    --rombs-loader-blue-colorStep_4: #d2d2d2;
+    --rombs-loader-red-colorStep_1: #bfe8f8;
+    --rombs-loader-red-colorStep_2: #ffffff;
+    --rombs-loader-red-colorStep_3: #efefef;
+    --rombs-loader-green-colorStep_1: #cbe0ac;
+    --rombs-loader-green-colorStep_2: #ffffff;
+    --rombs-loader-green-colorStep_3: #efefef;
+    --rombs-loader-green-colorStep_4: #e6e4e4;
+    position: absolute; width: 40px; height: 40px;
+    transform: rotate(135deg) skew(20deg, 20deg);
+    background: rgb(255, 0, 0); border-radius: 6px;
+  }
+  .romb.blue { background: var(--rombs-loader-blue); z-index: 1; animation: keyFrameBlue 2s ease-in-out 0s infinite; }
+  .romb.green { background: var(--rombs-loader-green); z-index: 2; animation: keyFrameGreen 2s ease-in-out 0s infinite; }
+  .romb.red { background: var(--rombs-loader-red); z-index: 3; animation: keyFrameRed 2s ease-in-out 0s infinite; }
+  @keyframes keyFrameBlue {
+    0% { background: var(--rombs-loader-red); top: 120px; }
+    10% { background: var(--rombs-loader-blue-colorStep_1); top: 120px; }
+    14% { background: var(--rombs-loader-blue-colorStep_2); top: 120px; }
+    15% { background: var(--rombs-loader-blue-colorStep_2); top: 0; }
+    20% { background: var(--rombs-loader-blue-colorStep_3); }
+    30% { background: var(--rombs-loader-blue-colorStep_4); }
+    40% { top: 120px; }
+    100% { background: var(--rombs-loader-red); top: 120px; }
+  }
+  @keyframes keyFrameRed {
+    0% { background: var(--rombs-loader-blue); top: 100px; opacity: 1; }
+    10% { background: var(--rombs-loader-red-colorStep_1); top: 100px; opacity: 1; }
+    14% { background: var(--rombs-loader-red-colorStep_2); top: 100px; opacity: 1; }
+    15% { background: var(--rombs-loader-red-colorStep_2); top: 0; opacity: 1; }
+    20% { background: var(--rombs-loader-red-colorStep_2); top: 0; opacity: 0; }
+    45% { background: var(--rombs-loader-red-colorStep_3); top: 0; }
+    100% { background: var(--rombs-loader-blue); top: 100px; }
+  }
+  @keyframes keyFrameGreen {
+    0% { background: var(--rombs-loader-green); top: 110px; opacity: 1; }
+    10% { background: var(--rombs-loader-green-colorStep_1); top: 110px; opacity: 1; }
+    14% { background: var(--rombs-loader-green-colorStep_2); top: 110px; opacity: 1; }
+    15% { background: var(--rombs-loader-green-colorStep_2); top: 0; opacity: 1; }
+    20% { background: var(--rombs-loader-green-colorStep_2); top: 0; opacity: 0; }
+    25% { background: var(--rombs-loader-green-colorStep_3); top: 0; opacity: 1; }
+    30% { background: var(--rombs-loader-green-colorStep_4); }
+    70% { top: 110px; }
+    100% { background: var(--rombs-loader-green); top: 110px; }
+  }
+</style>
+</head>
+<body>
+<div class="loader-container" data-testid="app-loader">
+  <div class="rombs">
+    <div class="romb blue"></div>
+    <div class="romb green"></div>
+    <div class="romb red"></div>
+  </div>
+</div>
+</body>
+</html>`;
+
+// Paint the loader into the still-blank reserved tab. Same-origin
+// `about:blank` opened by us, so its document is writable; a failure here
+// (a browser that refuses, a closed tab) is not worth aborting the
+// reservation for — the tab just stays blank until the editor URL lands.
+const renderPlaceholder = (win: Window): void => {
+  try {
+    const isDark =
+      document.documentElement.getAttribute("data-theme") === "dark";
+    const doc = win.document;
+    doc.open();
+    doc.write(buildPlaceholderHtml(isDark, document.title));
+    doc.close();
+  } catch (error) {
+    console.warn(
+      "[host-tool-groups] reserveGeneratedFileWindow: could not render the placeholder",
+      error,
+    );
+  }
+};
+
+// Reserve a tab inside the current user gesture and paint the editor's
+// boot loader into it, so the user sees "the document is coming" rather than
+// a blank page until the file id arrives. Call from the click handler that
+// approves a generate tool; the reservation is consumed by
 // `takeReservedGeneratedFileWindow` or discarded by
 // `releaseGeneratedFileWindow`. Re-reserving replaces (and closes) a stale,
 // still-blank reservation so at most one spare tab exists.
@@ -54,6 +173,7 @@ export const reserveGeneratedFileWindow = (): void => {
     );
     return;
   }
+  renderPlaceholder(win);
   reserved = { win, reservedAt: Date.now() };
   console.log("[host-tool-groups] reserved a tab for the generated file");
 };

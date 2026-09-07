@@ -38,7 +38,11 @@ import {
   runDialogSubmitInterceptors,
 } from "../components-overrides/dialog-footer/submit-interceptors";
 
-type FakeWindow = { closed: boolean; close: () => void };
+type FakeWindow = {
+  closed: boolean;
+  close: () => void;
+  document: { open: () => void; write: (html: string) => void; close: () => void };
+};
 
 const makeWindow = (): FakeWindow => {
   const win: FakeWindow = {
@@ -46,6 +50,7 @@ const makeWindow = (): FakeWindow => {
     close: vi.fn(() => {
       win.closed = true;
     }),
+    document: { open: vi.fn(), write: vi.fn(), close: vi.fn() },
   };
   return win;
 };
@@ -77,6 +82,33 @@ describe("generated-file window reservation", () => {
     expect(win).toBe(open.mock.results[0].value);
     expect(takeReservedGeneratedFileWindow()).toBeNull();
     expect(hasReservedGeneratedFileWindow()).toBe(false);
+  });
+
+  // The tab takes focus the moment it opens, so it must not be blank: the
+  // editor's boot loader is painted into it, in the portal's theme.
+  it("paints the app loader into the reserved tab, following the theme", () => {
+    document.documentElement.setAttribute("data-theme", "dark");
+    reserveGeneratedFileWindow();
+    const { document: doc } = open.mock.results[0].value as FakeWindow;
+    expect(doc.open).toHaveBeenCalled();
+    expect(doc.close).toHaveBeenCalled();
+    const html = (doc.write as ReturnType<typeof vi.fn>).mock
+      .calls[0][0] as string;
+    expect(html).toContain('data-testid="app-loader"');
+    expect(html).toContain("keyFrameBlue");
+    expect(html).toContain("background: #333333");
+    document.documentElement.removeAttribute("data-theme");
+  });
+
+  // Rendering trouble must not cost the reservation itself.
+  it("keeps the reservation when the placeholder cannot be written", () => {
+    const win = makeWindow();
+    win.document.write = vi.fn(() => {
+      throw new Error("denied");
+    });
+    open.mockReturnValueOnce(win);
+    reserveGeneratedFileWindow();
+    expect(hasReservedGeneratedFileWindow()).toBe(true);
   });
 
   // A denied call or a failed stream must not leave a blank tab behind.
