@@ -418,13 +418,13 @@ describe("QuickActions", () => {
           {...LABELS}
           items={buildItems()}
           onClose={vi.fn()}
-          closeLabel="Disable Quick Actions on all pages"
+          closeLabel="Hide quick actions on all pages"
         />,
       );
 
       expect(
         screen.getByRole("button", {
-          name: "Disable Quick Actions on all pages",
+          name: "Hide quick actions on all pages",
         }),
       ).toBeInTheDocument();
     });

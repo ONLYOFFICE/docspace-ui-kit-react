@@ -372,7 +372,7 @@ export const Dismissible: Story = {
     items: roomItems,
     prevLabel: "Previous",
     nextLabel: "Next",
-    closeLabel: "Disable Quick Actions on all pages",
+    closeLabel: "Hide quick actions on all pages",
     onClose: () => console.log("close"),
   },
   parameters: {
