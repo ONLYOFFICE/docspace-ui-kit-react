@@ -13,6 +13,7 @@ $font-size: 13px;
   --payment-callback-error-color: #{$main-red};
   --payment-callback-error-bg: rgba(242, 103, 90, 0.1);
   --payment-callback-callout-bg: #{$gray-light};
+  --payment-callback-warning-color: #{$light-status-warning};
 }
 
 .dark {
@@ -26,6 +27,7 @@ $font-size: 13px;
   --payment-callback-error-color: #{$main-red};
   --payment-callback-error-bg: rgba(242, 103, 90, 0.1);
   --payment-callback-callout-bg: #{$dark-gray-light};
+  --payment-callback-warning-color: #{$dark-status-warning};
 }
 
 html,
