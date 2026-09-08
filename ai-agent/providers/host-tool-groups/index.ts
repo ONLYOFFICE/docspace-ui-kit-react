@@ -24,6 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import { takeReservedGeneratedFileWindow } from "./generated-file-window";
+
 import type {
   ChatEventBus,
   HostTool,
@@ -491,12 +493,17 @@ export const openEditorPanel = (fileId: number | string): void => {
 // here lives in a separate top-level window, so it posts readiness / results
 // to `window.opener` instead of `window.parent` — we listen for the ready
 // message scoped to this exact window and reply to it directly.
+//
+// The tab is normally reserved inside the "Allow" click (see
+// generated-file-window.ts) and only navigated here; without a reservation
+// we fall back to `window.open`, which the popup blocker may veto — the
+// caller gets `false` and can offer a click-to-open fallback.
 export const openGeneratedFileWithToolCall = (
   fileId: number | string,
   toolName: string,
   toolArgs: Record<string, unknown>,
-): void => {
-  if (typeof window === "undefined") return;
+): boolean => {
+  if (typeof window === "undefined") return false;
 
   // Trace the flow with tool names / file ids only — tool args may carry
   // user content and must not be dumped to the console.
@@ -507,12 +514,19 @@ export const openGeneratedFileWithToolCall = (
   const url = `${window.location.origin}/doceditor?fileId=${encodeURIComponent(
     String(fileId),
   )}`;
-  const editorWindow = window.open(url, "_blank");
+  const reservedWindow = takeReservedGeneratedFileWindow();
+  let editorWindow: Window | null;
+  if (reservedWindow) {
+    reservedWindow.location.href = url;
+    editorWindow = reservedWindow;
+  } else {
+    editorWindow = window.open(url, "_blank");
+  }
   if (!editorWindow) {
     console.warn(
       "[host-tool-groups] openGeneratedFileWithToolCall: window.open blocked",
     );
-    return;
+    return false;
   }
   console.log(
     `[host-tool-groups] editor tab opened for file ${fileId}, waiting for editorDocumentReady`,
@@ -564,5 +578,6 @@ export const openGeneratedFileWithToolCall = (
     }
     finish();
   }, EDITOR_READY_TIMEOUT_MS);
+  return true;
 };
 

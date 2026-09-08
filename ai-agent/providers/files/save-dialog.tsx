@@ -210,6 +210,17 @@ const SaveDialog = ({ content, defaultName, onFinish }: SaveDialogProps) => {
       // never produce, so a save target inside it does not exist (Bug 83486).
       // The attach dialog keeps the section — reading forms is legitimate.
       withFormsTreeFolder={false}
+      // Form-filling rooms are still reachable through the Rooms section and
+      // pass the security.Create check, but the md → docx export into them
+      // dies silently in the AI Worker. Block entering them with the
+      // selector's own warning toast instead (Bug 83615).
+      formProps={{
+        isRoomFormAccessible: false,
+        message: t("Common:ChatMessageNotAllowedInFormRoom", {
+          defaultValue:
+            "The chat message cannot be saved to the Form Filling space since this space type can only contain PDF forms.",
+        }),
+      }}
       isThirdParty={false}
       withCreate={false}
       withSearch
