@@ -1,5 +1,6 @@
 {
   "//": "Declaration emit only. Deliberately does NOT extend tsconfig.json: that config sets baseUrl, which makes TypeScript emit baseUrl-relative module specifiers such as import(\"node_modules/i18next\") into the .d.ts files -- unresolvable for any consumer. Its `paths` mappings are only needed by tests and Storybook, which are excluded here.",
+  "//declarationMap": "Off deliberately. `files` ships dist, locales and LICENSE -- no .ts sources -- so every emitted map pointed at a path outside the package (sources: [\"../../index.ts\"]) and resolved to nothing for a consumer. It was 834 dead files and 3.3 MB. Turning it on again requires shipping the sources too, otherwise the maps are worse than absent: tooling follows them and finds nothing.",
   "compilerOptions": {
     "target": "ES2022",
     "lib": [
@@ -24,7 +25,7 @@
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "outDir": "dist/types",
     "rootDir": "."
   },
