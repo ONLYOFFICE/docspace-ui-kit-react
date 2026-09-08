@@ -61,6 +61,11 @@ $mobile-tile-width: 152px;
 $control-size: 32px;
 $control-icon-size: 16px;
 $control-inset: 8px;
+// How far past the tile row the controls layer reaches: the button itself plus
+// a gap on either side of it. Wide enough and the controls clear the tiles
+// instead of sitting on the last one; the layer is capped at the banner width,
+// so once the row fills the banner they fall back inside its edge.
+$control-outset: $control-inset + $control-size + $control-inset;
 
 .quickActions {
   --_tile-bg: var(--quick-actions-tile-bg, #{colors.$gray-light});
@@ -70,6 +75,11 @@ $control-inset: 8px;
   // whole banner width instead of stopping at the design width set this to
   // `none` (the tile height stays fixed either way).
   --_tile-max-width: var(--quick-actions-tile-max-width, #{$tile-max-width});
+  // Cap on the tile row, which the banner itself does not take: the banner
+  // spans its container so the controls have somewhere to sit clear of the
+  // tiles. Defaulting to the full width leaves a consumer that sets no cap
+  // with the row and the banner one and the same.
+  --_row-max-width: var(--quick-actions-row-max-width, 100%);
   // The floating controls read as buttons sitting on top of the strip, so they
   // take the surrounding surface rather than the tile fill they overlap.
   --_control-bg: #{colors.$white};
@@ -109,6 +119,8 @@ $control-inset: 8px;
   justify-content: flex-start;
   gap: $gap;
   width: 100%;
+  max-width: var(--_row-max-width);
+  margin-inline: auto;
   overflow-x: auto;
   overflow-y: hidden;
   // No `scroll-behavior: smooth` here: the arrows ask for smooth themselves,
@@ -201,9 +213,18 @@ $control-inset: 8px;
 // tiles underneath stay clickable everywhere except on the buttons themselves.
 // Being absolutely positioned it is out of flow entirely: showing and hiding it
 // moves nothing.
+// Sized to the row plus one control's worth of room on either side, centred
+// over it the way the row is centred in the banner, and never wider than the
+// banner: on a container too narrow to spare that room the layer collapses
+// back onto the row and the controls sit inside its edge, as they must once
+// the strip overflows and there is no clear space left anywhere.
 .controls {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  inset-inline: 0;
+  width: min(100%, calc(var(--_row-max-width) + #{2 * $control-outset}));
+  margin-inline: auto;
   pointer-events: none;
 }
 
