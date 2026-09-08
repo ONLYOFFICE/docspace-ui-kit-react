@@ -48,6 +48,7 @@ import {
 } from "../../utils/stripe-flow";
 import { AnalyticsEvents } from "../../../enums";
 
+import WarningIcon from "../../../assets/danger.toast.react.svg";
 import Amount from "./sub-components/Amount";
 import { AmountProvider, useAmountValue } from "../../wallet/context";
 
@@ -63,6 +64,8 @@ export type TSimpleTopUpDeps = {
   fetchBalance: (isRefresh?: boolean) => Promise<number>;
   fetchTransactionHistory?: PaymentStore["fetchTransactionHistory"];
   walletCustomerStatusNotActive: boolean;
+  /** the saved method credits the wallet only once the transfer settles */
+  isDelayedPaymentMethod: boolean;
   isStripeCheckoutRequired: boolean;
   language: string;
   fetchCardLinked: (
@@ -110,6 +113,7 @@ const SimpleTopUpDialogContent = observer(
     fetchBalance,
     fetchTransactionHistory,
     walletCustomerStatusNotActive,
+    isDelayedPaymentMethod,
     language,
     fetchCardLinked,
     walletBalance,
@@ -225,6 +229,24 @@ const SimpleTopUpDialogContent = observer(
 
         <ModalDialog.Body>
           <div className={styles.body}>
+            {isDelayedPaymentMethod ? (
+              <div
+                className={styles.warning}
+                data-testid="top_up_delayed_payment_method_warning"
+              >
+                <WarningIcon className={styles.warningIcon} />
+                <Text
+                  as="span"
+                  fontSize="12px"
+                  fontWeight={600}
+                  lineHeight="16px"
+                  className={styles.warningText}
+                >
+                  {t("TopUpDelayedPaymentMethodWarning")}
+                </Text>
+              </div>
+            ) : null}
+
             <Text className={styles.description}>
               {descriptionText ??
                 (isStripeFlow

@@ -61,6 +61,7 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
   } = store;
   const {
     walletCustomerStatusNotActive,
+    isDelayedPaymentMethod,
     fetchCustomerInfo: fetchCustomerInfoTariff,
     walletCustomerEmail,
   } = store.tariff;
@@ -88,6 +89,7 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
       fetchBalance={fetchBalance}
       fetchTransactionHistory={fetchTransactionHistory}
       walletCustomerStatusNotActive={walletCustomerStatusNotActive}
+      isDelayedPaymentMethod={isDelayedPaymentMethod}
       isStripeCheckoutRequired={store.isStripeCheckoutRequired}
       language={language ?? "en"}
       fetchCardLinked={fetchCardLinked}
