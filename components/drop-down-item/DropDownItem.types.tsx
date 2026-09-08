@@ -131,6 +131,9 @@ export type DropDownItemProps = {
   testId?: string;
 
   tooltip?: string;
+  /** Secondary line rendered under the item label and always visible - what
+   * choosing this item means. The item grows to fit it. */
+  description?: React.ReactNode;
 
   betaLabel?: string;
   paidLabel?: string;

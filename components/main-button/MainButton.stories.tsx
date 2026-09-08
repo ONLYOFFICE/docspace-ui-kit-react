@@ -306,6 +306,69 @@ export const WithAction: Story = {
   },
 };
 
+const userTypesModel = [
+  {
+    key: 0,
+    label: "Full admin",
+    icon: CatalogFolderReactSvgUrl,
+    description:
+      "Manage the workspace: create/archive rooms, invite users, configure AI agents, assign lower roles. Full Files access.",
+  },
+  {
+    key: 1,
+    label: "Room admin",
+    icon: CatalogFolderReactSvgUrl,
+    description:
+      "Manage assigned rooms, invite users, create/manage AI agents, assign lower roles. Full Files access.",
+  },
+  {
+    key: 2,
+    label: "User",
+    icon: CatalogFolderReactSvgUrl,
+    description:
+      "Access only invited rooms, view AI agent results and shared chats. Can't create rooms/AI agents. Full Files access.",
+  },
+];
+
+const WithItemDescriptionsTemplate = () => {
+  return (
+    <Wrapper>
+      <MainButton text="Invite" model={userTypesModel} />
+    </Wrapper>
+  );
+};
+
+export const WithItemDescriptions: Story = {
+  render: () => <WithItemDescriptionsTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Dropdown items carrying `description` are laid out as two lines - the label row and an always-visible description under it. The menu is sized by its content instead of the button width.",
+      },
+      source: {
+        code: `<MainButton
+  text="Invite"
+  model={[
+    {
+      key: 0,
+      label: "Full admin",
+      icon: FolderIcon,
+      description: "Manage the workspace: create/archive rooms, invite users...",
+    },
+    {
+      key: 1,
+      label: "Room admin",
+      icon: FolderIcon,
+      description: "Manage assigned rooms, invite users, create/manage AI agents...",
+    },
+  ]}
+/>`,
+      },
+    },
+  },
+};
+
 const WithDropdownTemplate = () => {
   return (
     <Wrapper>

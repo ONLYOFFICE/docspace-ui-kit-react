@@ -113,6 +113,12 @@ const MainButton = (props: MainButtonProps) => {
     }
   };
 
+  // A menu whose items explain themselves is wider than the button, so it is
+  // sized by its content instead of being clamped to the button width.
+  const hasItemDescriptions = model?.some(
+    (item) => "description" in item && Boolean(item.description),
+  );
+
   const buttonClasses = classNames(styles.mainButton, className, {
     [styles.disabled]: isDisabled,
     [styles.dropdown]: isDropdown,
@@ -148,7 +154,11 @@ const MainButton = (props: MainButtonProps) => {
               containerRef={positionRef as React.RefObject<HTMLDivElement>}
               style={{
                 position: "fixed",
-                width: buttonWidth ? `${buttonWidth}px` : "auto",
+                ...(hasItemDescriptions
+                  ? {
+                      minWidth: buttonWidth ? `${buttonWidth}px` : undefined,
+                    }
+                  : { width: buttonWidth ? `${buttonWidth}px` : "auto" }),
               }}
             />
           </>

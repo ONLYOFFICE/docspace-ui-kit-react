@@ -53,6 +53,8 @@ import styles from "./ContextMenuButton.module.scss";
 import type { ContextMenuButtonProps } from "./ContextMenuButton.types";
 import { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
+const OUTSIDE_CLICK_EVENTS = ["click", "mousedown"];
+
 const ContextMenuButtonPure = ({
   opened = false,
   data = [],
@@ -144,8 +146,15 @@ const ContextMenuButtonPure = ({
     }));
   }, []);
 
+  const isOpenRef = React.useRef(state.isOpen);
+  isOpenRef.current = state.isOpen;
+
   const onCloseAction = React.useCallback(() => {
-    setState((s) => ({ ...s, isOpen: !s.isOpen }));
+    if (!isOpenRef.current) return;
+
+    isOpenRef.current = false;
+
+    setState((s) => ({ ...s, isOpen: false }));
     onClose?.();
   }, [onClose]);
 
@@ -253,7 +262,7 @@ const ContextMenuButtonPure = ({
           withoutBackground
           zIndex={zIndex}
           isDefaultMode={usePortal}
-          eventTypes={["click"]}
+          eventTypes={OUTSIDE_CLICK_EVENTS}
         >
           {state.data?.map((item: ContextMenuModel, index: number) => {
             if (!item) return null;

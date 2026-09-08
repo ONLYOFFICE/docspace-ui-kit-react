@@ -41,7 +41,11 @@ const ModelAssignment = () => {
       hideHeader
       noPadding
       className={styles.modelAssignment}
-      defaultModelLabel={t("Common:Model")}
+      // The field sits right under the "Default AI model" heading, so its own
+      // caption is redundant. `FieldContainer` requires a `header`, and the
+      // page falls back to its own label only on `undefined` — an empty
+      // string is the supported way to render the row without a caption.
+      defaultModelLabel=""
       defaultSetupHeader={
         <>
           <Heading

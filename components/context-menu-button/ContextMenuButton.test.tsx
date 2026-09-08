@@ -34,7 +34,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 
 import { globalColors } from "../../providers/theme";
 
@@ -68,5 +68,27 @@ describe("<ContextMenuButton />", () => {
 	it("renders without error", () => {
 		render(<ContextMenuButton {...baseProps} />);
 		expect(screen.getByTestId("context-menu-button")).toBeInTheDocument();
+	});
+
+	it("closes the dropdown on an outside mousedown whose click is swallowed", () => {
+		const onClose = vi.fn();
+
+		render(<ContextMenuButton {...baseProps} opened onClose={onClose} />);
+
+		const dropDown = screen.getByTestId("dropdown");
+
+		expect(dropDown).toHaveClass("open");
+
+		const outside = document.createElement("div");
+		outside.addEventListener("click", (e) => e.stopPropagation());
+		document.body.appendChild(outside);
+
+		fireEvent.mouseDown(outside);
+		fireEvent.click(outside);
+
+		expect(dropDown).not.toHaveClass("open");
+		expect(onClose).toHaveBeenCalledTimes(1);
+
+		outside.remove();
 	});
 });

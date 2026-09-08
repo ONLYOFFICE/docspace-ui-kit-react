@@ -54,7 +54,11 @@ const OPENROUTER_PRICING_URL = "https://openrouter.ai/models";
  * Standalone portals bring their own AI service, so the pricing/wallet rows do
  * not apply there and the screen omits this block entirely.
  */
-export const ChatAiBenefits = () => {
+type ChatAiBenefitsProps = {
+  serviceFeePercent?: string | null;
+};
+
+export const ChatAiBenefits = ({ serviceFeePercent }: ChatAiBenefitsProps) => {
   const t = useCommonTranslation();
 
   return (
@@ -71,27 +75,30 @@ export const ChatAiBenefits = () => {
           </Text>
         </li>
 
-        <li className={styles.item}>
-          <PriceIcon className={styles.icon} />
-          <Text as="span" fontSize="12px" fontWeight="600" lineHeight="16px">
-            <CommonTrans
-              i18nKey="AIOpenRouterPricingNote"
-              components={{
-                1: (
-                  <Link
-                    fontSize="12px"
-                    fontWeight={600}
-                    color="accent"
-                    textDecoration="underline dotted"
-                    href={OPENROUTER_PRICING_URL}
-                    target={LinkTarget.blank}
-                    dataTestId="ai_openrouter_pricing_link"
-                  />
-                ),
-              }}
-            />
-          </Text>
-        </li>
+        {serviceFeePercent != null ? (
+          <li className={styles.item}>
+            <PriceIcon className={styles.icon} />
+            <Text as="span" fontSize="12px" fontWeight="600" lineHeight="16px">
+              <CommonTrans
+                i18nKey="AIOpenRouterPricingNote"
+                values={{ percent: serviceFeePercent }}
+                components={{
+                  1: (
+                    <Link
+                      fontSize="12px"
+                      fontWeight={600}
+                      color="accent"
+                      textDecoration="underline dotted"
+                      href={OPENROUTER_PRICING_URL}
+                      target={LinkTarget.blank}
+                      dataTestId="ai_openrouter_pricing_link"
+                    />
+                  ),
+                }}
+              />
+            </Text>
+          </li>
+        ) : null}
 
         <li className={styles.item}>
           <WalletIcon className={styles.icon} />

@@ -137,6 +137,7 @@ const SubMenu = (props: SubMenuProps) => {
   const [model, setModel] = useState(props?.model);
   const [isLoading, setIsLoading] = useState(false);
   const [widthSubMenu, setWidthSubMenu] = useState<null | number>(null);
+  const [measuredRowsHeight, setMeasuredRowsHeight] = useState(0);
 
   const prevWidthSubMenu = useRef<number | null>(null);
   const subMenuRef = useRef<HTMLUListElement>(null);
@@ -376,6 +377,34 @@ const SubMenu = (props: SubMenuProps) => {
     }
   }, [props.model]);
 
+  // Items carrying a description are two lines tall and how tall exactly
+  // depends on where their text wraps - which differs per language. The fixed
+  // row height the list is sized by cannot know that, so those rows are
+  // measured once they are on screen.
+  const hasItemDescriptions = model?.some(
+    (item: ContextMenuModel) =>
+      item && !item.isSeparator && "description" in item && !!item.description,
+  );
+
+  // A submenu list only exists in the DOM once it is open, so this has to run
+  // again when that happens - and again when the width it wraps at changes.
+  const isMenuOpen = isActive();
+
+  useEffect(() => {
+    if (!hasItemDescriptions || !isMenuOpen) return;
+
+    const list = subMenuRef.current;
+    if (!list) return;
+
+    const rows = Array.from(list.querySelectorAll<HTMLElement>("li")).filter(
+      (row) => row.parentElement?.closest("ul") === list,
+    );
+
+    const total = rows.reduce((sum, row) => sum + row.offsetHeight, 0);
+
+    if (total > 0) setMeasuredRowsHeight(total);
+  }, [hasItemDescriptions, isMenuOpen, model, widthSubMenu]);
+
   const renderSeparator = (index: number, style: React.CSSProperties) => (
     <li
       key={`separator_${index}`}
@@ -463,6 +492,10 @@ const SubMenu = (props: SubMenuProps) => {
 
     const icon = renderIcon();
 
+    // An item that explains itself is laid out as two lines: the regular row
+    // and the description under it.
+    const hasDescription = Boolean(item.description);
+
     const label = item.label && (
       <span
         className="p-menuitem-text not-selectable"
@@ -506,14 +539,8 @@ const SubMenu = (props: SubMenuProps) => {
         />
       ) : null;
 
-    let content = (
-      <a
-        href={item.url || "#"}
-        className={linkClassName || ""}
-        target={item.target}
-        {...dataKeys}
-        role="menuitem"
-      >
+    const itemRow = (
+      <>
         {icon}
         {label}
         {checked}
@@ -540,6 +567,25 @@ const SubMenu = (props: SubMenuProps) => {
             isHovered={false}
           />
         ) : null}
+      </>
+    );
+
+    let content = (
+      <a
+        href={item.url || "#"}
+        className={linkClassName || ""}
+        target={item.target}
+        {...dataKeys}
+        role="menuitem"
+      >
+        {hasDescription ? (
+          <>
+            <span className={styles.itemRow}>{itemRow}</span>
+            <span className={styles.itemDescription}>{item.description}</span>
+          </>
+        ) : (
+          itemRow
+        )}
       </a>
     );
 
@@ -586,6 +632,7 @@ const SubMenu = (props: SubMenuProps) => {
               })
             : classNames(className, {
                 [styles.activeDescendant]: isActiveDescendant,
+                [styles.menuItemWithDescription]: hasDescription,
               })
         }
         style={{ ...item.style, ...style }}
@@ -726,7 +773,9 @@ const SubMenu = (props: SubMenuProps) => {
       return 36;
     });
 
-    const height = rowHeights.reduce((a, b) => a + b, 0);
+    const height =
+      (hasItemDescriptions && measuredRowsHeight) ||
+      rowHeights.reduce((a, b) => a + b, 0);
     const viewport = DomHelpers.getViewport();
     const paddingList = 12;
     const marginsList = 32;

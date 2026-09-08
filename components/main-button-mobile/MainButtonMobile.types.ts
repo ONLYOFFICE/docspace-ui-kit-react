@@ -98,6 +98,8 @@ export type ButtonOption = {
     withoutIcon?: boolean;
     /** If true, submenu is open by default */
     openByDefault?: boolean;
+    /** Secondary line rendered under the item label */
+    description?: React.ReactNode;
   };
   
   export type MainButtonMobileProps = {
