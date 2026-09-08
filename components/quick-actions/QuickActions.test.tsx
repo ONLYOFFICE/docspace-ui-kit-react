@@ -315,6 +315,47 @@ describe("QuickActions", () => {
       expect(scrollBy.mock.calls[1][0].left).toBeLessThan(0);
     });
 
+    it("pages the other way round in RTL", () => {
+      // RTL counts scrollLeft down from zero into negative values, so moving
+      // toward the end has to subtract where LTR adds. The sign is read off the
+      // track's own resolved direction rather than the document, so a subtree
+      // that flips `dir` still pages the way it reads.
+      simulateTrack({ scrollLeft: -300 });
+      const scrollBy = vi.fn();
+      Object.defineProperty(HTMLElement.prototype, "scrollBy", {
+        configurable: true,
+        value: scrollBy,
+      });
+
+      render(<QuickActions {...LABELS} items={buildFiveItems()} dataTestId="qa" />);
+      screen.getByTestId("quick-actions-track").style.direction = "rtl";
+
+      fireEvent.click(screen.getByTestId(NEXT_TESTID));
+      expect(scrollBy.mock.calls[0][0].left).toBeLessThan(0);
+
+      fireEvent.click(screen.getByTestId(PREV_TESTID));
+      expect(scrollBy.mock.calls[1][0].left).toBeGreaterThan(0);
+    });
+
+    it("names both arrows with the provided labels", () => {
+      simulateTrack({ scrollLeft: 300 });
+      render(
+        <QuickActions
+          items={buildFiveItems()}
+          prevLabel="Previous"
+          nextLabel="Next"
+          dataTestId="qa"
+        />,
+      );
+
+      expect(screen.getByRole("button", { name: "Previous" })).toBe(
+        screen.getByTestId(PREV_TESTID),
+      );
+      expect(screen.getByRole("button", { name: "Next" })).toBe(
+        screen.getByTestId(NEXT_TESTID),
+      );
+    });
+
     it("does not re-render the tiles while a scroll changes nothing", () => {
       // Every scroll event re-measures the strip. Midway through, both arrows
       // stay on, so the measurement must not produce a new state object: that

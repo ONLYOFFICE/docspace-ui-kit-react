@@ -44,7 +44,6 @@
 // Re-exported from the shared metrics so consumers capping the banner width
 // derive that cap from the same numbers.
 $tile-max-width: metrics.$tile-max-width;
-$tile-min-width: metrics.$tile-min-width;
 $tile-height: metrics.$tile-height;
 $tile-padding: metrics.$tile-padding;
 $gap: metrics.$gap;
@@ -99,12 +98,15 @@ $control-inset: 8px;
 .grid {
   display: flex;
   flex-wrap: nowrap;
-  // Centred while the tiles fit, start-aligned once they overflow. Plain
-  // `center` on a scroll container makes the overflowing start unreachable,
-  // which `safe` is exactly the fix for; the unprefixed value stays as the
-  // fallback for engines that do not parse it.
-  justify-content: center;
-  justify-content: safe center;
+  // Centred while the tiles fit, start-aligned once they overflow, done with
+  // auto margins rather than `justify-content: center`: centring a scroll
+  // container puts the overflow on both sides, and the start half lands
+  // outside the scrollable area where nothing can reach it. Auto margins take
+  // free space only while there is some and collapse to 0 on overflow, which
+  // is the same behaviour as `safe center` on the browsers old enough to
+  // matter here (`safe` needs Chrome 115+ / Safari 17+, browserDetector.js
+  // still admits Chrome 109 and Safari 15).
+  justify-content: flex-start;
   gap: $gap;
   width: 100%;
   overflow-x: auto;
@@ -117,6 +119,14 @@ $control-inset: 8px;
 
   &::-webkit-scrollbar {
     display: none;
+  }
+
+  > :first-child {
+    margin-inline-start: auto;
+  }
+
+  > :last-child {
+    margin-inline-end: auto;
   }
 
   @include media-queries.tablet-and-below {
@@ -139,7 +149,6 @@ $control-inset: 8px;
   gap: 4px;
   padding: $tile-padding;
   flex: 1 0 $tile-max-width;
-  min-width: $tile-min-width;
   max-width: var(--_tile-max-width);
   height: $tile-height;
   background-color: var(--_tile-bg);
@@ -347,7 +356,6 @@ $control-inset: 8px;
   // same flex basis as a bare .tile. If it shrank, tooltipped tiles would
   // compress while their neighbours held their width.
   flex: 1 0 $tile-max-width;
-  min-width: $tile-min-width;
   max-width: var(--_tile-max-width);
 
   .tile {
