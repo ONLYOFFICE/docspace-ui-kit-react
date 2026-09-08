@@ -182,9 +182,39 @@ const detectUseClient = () => ({
 	},
 });
 
+// Two warning codes are expected on every build of this package and drown out
+// anything new -- 55 + 1 lines of the ~380 the build prints. Both are answered
+// by the config itself, so they are suppressed by code (never blanket-muted)
+// and everything else still reaches the log.
+//
+// MODULE_LEVEL_DIRECTIVE: rollup strips "use client" while bundling and says
+// so once per file. `preserveUseClient` above puts the directive back per
+// chunk, and `scripts/check-dist.mjs` (run by `pnpm build`) compares the
+// source and dist counts -- so the warning reports a step this build
+// deliberately undoes, and the real regression would be a check-dist warning.
+//
+// MIXED_EXPORTS: 19 entry modules export a default next to named exports, the
+// normal shape for a component index. The fix rollup suggests --
+// `output.exports: "named"` -- is wrong here: with preserveModules it also
+// rewrites every default-ONLY module (each *.module.scss proxy, every icon)
+// from `module.exports = x` to `exports.default = x`, so
+// `require(".../components/text")` would start returning `{ default: ... }`.
+// That is a breaking change to the published CJS surface, so keep rollup's
+// current per-module interop and silence the notice.
+const SILENCED_WARNINGS = new Set([
+	"MODULE_LEVEL_DIRECTIVE",
+	"MIXED_EXPORTS",
+]);
+
+const onwarn = (warning, warn) => {
+	if (SILENCED_WARNINGS.has(warning.code)) return;
+	warn(warning);
+};
+
 export default [
 	{
 		input: entryPoints,
+		onwarn,
 		output: [
 			{
 				dir: "dist/esm",
