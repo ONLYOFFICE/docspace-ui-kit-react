@@ -92,6 +92,28 @@ type MCPServersSelectorProps = TSelectorWithAside & {
   initedSelectedServers?: string[];
 };
 
+// `tools/list-system-tools` answers either as the legacy flat
+// `serverType -> tools` map or as `{ groups, errors, system }`. `groups`
+// also carries the registered custom servers' tools, so only the explicit
+// `system` list says which names are host-configured servers; deriving that
+// from the keys labelled a custom server with the product name and the
+// portal logo. Without `system` (an older service) the keys are the best
+// available guess.
+const normalizeSystemListing = (
+  raw: Record<string, unknown> | undefined,
+): { groups: Record<string, unknown>; system: string[] } => {
+  const nested = raw?.groups;
+  if (nested && typeof nested === "object" && !Array.isArray(nested)) {
+    const groups = nested as Record<string, unknown>;
+    const system = Array.isArray(raw?.system)
+      ? raw.system.filter((name): name is string => typeof name === "string")
+      : Object.keys(groups);
+    return { groups, system };
+  }
+  const groups = raw ?? {};
+  return { groups, system: Object.keys(groups) };
+};
+
 const MCPServersSelector = ({
   initedSelectedServers,
   onSubmit,
@@ -154,12 +176,16 @@ const MCPServersSelector = ({
         ),
       ]);
 
+      const listing = normalizeSystemListing(systemTools);
       // A system server that failed tool enumeration (down, misconfigured)
       // still gets a group in the response — just an empty one (the lib's
       // listTools returns [] on error). Hide those: a server with no tools
-      // is useless to attach.
-      const systemNames = Object.keys(systemTools ?? {}).filter((name) => {
-        const tools = systemTools?.[name];
+      // is useless to attach. A name that is also a portal-level custom
+      // server is a custom server, whatever the listing says: system
+      // servers never appear in the portal's custom map.
+      const systemNames = listing.system.filter((name) => {
+        if (name in (customServers ?? {})) return false;
+        const tools = listing.groups[name];
         return Array.isArray(tools) && tools.length > 0;
       });
       const customNames = Object.keys(customServers ?? {}).filter(
