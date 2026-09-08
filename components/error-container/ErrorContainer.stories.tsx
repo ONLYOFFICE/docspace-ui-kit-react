@@ -22,7 +22,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import ErrorContainer from "@docspace/ui-kit/components/error-container";
+import { ErrorContainer } from "@docspace/ui-kit/components/error-container";
 
 // Basic error page
 <ErrorContainer

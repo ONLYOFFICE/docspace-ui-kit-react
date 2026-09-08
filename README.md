@@ -64,7 +64,7 @@ function App() {
 ### Using the Color Palette
 
 ```tsx
-import { globalColors } from "@docspace/ui-kit/themes/globalColors";
+import { globalColors } from "@docspace/ui-kit/providers/theme";
 
 const primaryBlue = globalColors.lightBlueMain;
 const errorRed = globalColors.mainRed;
@@ -550,12 +550,12 @@ Key TypeScript types from `@docspace/ui-kit/types`:
 
 ## Theming
 
-The library ships with `globalColors` - 100+ named color tokens. It can be imported directly or via the themes entry point:
+The library ships with `globalColors` - 100+ named color tokens. It can be imported from the root barrel or from the theme provider entry point:
 
 ```tsx
-import { globalColors } from "@docspace/ui-kit/themes/globalColors";
+import { globalColors } from "@docspace/ui-kit";
 // or
-import { globalColors } from "@docspace/ui-kit/themes";
+import { globalColors } from "@docspace/ui-kit/providers/theme";
 
 // Base
 const white = globalColors.white; // "#ffffff"

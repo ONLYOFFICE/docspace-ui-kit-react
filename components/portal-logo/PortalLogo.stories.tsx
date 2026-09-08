@@ -20,7 +20,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import PortalLogo from "@docspace/ui-kit/components/portal-logo";
+import { PortalLogo } from "@docspace/ui-kit/components/portal-logo";
 
 // Basic portal logo
 <PortalLogo />
