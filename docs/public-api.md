@@ -228,6 +228,15 @@ The contract is machine-checked, not merely written down:
 1. ~~Does the published package ship the portal-internal modules?~~ **Answered: yes.** They
    ship; `ai-agent` works through optional peer dependencies until `@onlyoffice/ai-chat` can be
    published.
+   ~~The 15 packages nobody imports~~ **Done: moved to optional peers.** `mobx`, `mobx-react`,
+   `axios`, `socket.io-client`, `@socket.io/component-emitter`, `react-router`,
+   `react-markdown`, `react-syntax-highlighter`, `rehype-katex`, `rehype-raw`, `remark-gfm`,
+   `remark-math`, `@onlyoffice/document-editor-react` and `ai-chat`'s own peer list (including
+   the two required-but-accidental `@assistant-ui/react` and `assistant-stream`) are now
+   declared in `peerDependencies` with `peerDependenciesMeta.optional: true`, mirrored into
+   `devDependencies` so the monorepo workspace still resolves them for local builds/tests.
+   `react-virtualized-auto-sizer` (unused, not an `ai-chat` peer) was dropped outright.
+   `publint` now passes clean against the packed tarball.
 2. ~~Should the ONLYOFFICE icons move to MIT with the code?~~ **Answered: no — non-code
    elements keep CC BY-SA 4.0.** `LICENSE` carries three sets of terms: MIT for the code,
    CC BY-SA 4.0 for illustrations, icon sets and technical writing, and an exclusion for the
