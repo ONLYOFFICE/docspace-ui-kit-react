@@ -172,8 +172,8 @@ const UpdatePlanButtonContainer = ({
   };
 
   const getUpdateTariffAction = () => {
-    if (isDelayedPaymentTopUp) return openTopUpDialog;
     if (needsWalletMigration) return openMigrateDialog;
+    if (isDelayedPaymentTopUp) return openTopUpDialog;
     return onUpdateTariff;
   };
 
