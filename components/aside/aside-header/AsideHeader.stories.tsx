@@ -93,12 +93,12 @@ export const WithIcons: Story = {
     headerIcons: [
       {
         key: "settings",
-        url: "/static/images/settings.react.svg",
+        url: "/static/settings.react.svg",
         onClick: () => console.log("Settings clicked"),
       },
       {
         key: "info",
-        url: "/static/images/info.outline.react.svg",
+        url: "/static/info.outline.react.svg",
         onClick: () => console.log("Info clicked"),
       },
     ],

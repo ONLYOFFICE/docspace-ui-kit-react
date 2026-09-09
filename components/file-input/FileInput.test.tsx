@@ -5,13 +5,6 @@ import { InputSize } from "../text-input";
 import { FileInput } from "./FileInput";
 import styles from "./FileInput.module.scss";
 
-// Mock images
-vi.mock(
-  "PUBLIC_DIR/images/icons/16/catalog.folder.react.svg?url",
-  () => "test-file-stub",
-);
-vi.mock("PUBLIC_DIR/images/document.react.svg?url", () => "test-file-stub");
-
 // Mock react-i18next
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (key: string) => key }),

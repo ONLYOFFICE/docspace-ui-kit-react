@@ -31,7 +31,7 @@ const config: StorybookConfig = {
     "../billing/**/*.stories.@(js|jsx|ts|tsx)",
   ],
 
-  staticDirs: [{ from: "../../../public", to: "/static" }],
+  staticDirs: [{ from: "../assets", to: "/static" }],
 
   addons: [
     "@storybook/addon-links",
@@ -71,24 +71,6 @@ const config: StorybookConfig = {
         include: "**/*.svg",
       }),
     );
-
-    config.resolve = config.resolve || {};
-    const existingAlias = config.resolve.alias ?? [];
-    const aliasArray = Array.isArray(existingAlias)
-      ? existingAlias
-      : Object.entries(existingAlias).map(([find, replacement]) => ({
-          find,
-          replacement,
-        }));
-    config.resolve.alias = [
-      ...aliasArray,
-      // PUBLIC_DIR is a Webpack alias pointing to the repo root /public directory.
-      // Vite/Storybook does not know about it, so resolve it here.
-      {
-        find: "PUBLIC_DIR",
-        replacement: path.resolve(__dirname, "../../../public"),
-      },
-    ];
 
     return config;
   },

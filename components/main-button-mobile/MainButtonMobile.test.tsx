@@ -5,11 +5,6 @@ import { screen, fireEvent, render } from "@testing-library/react";
 import { MainButtonMobile } from ".";
 import { ButtonOption } from "./MainButtonMobile.types";
 
-vi.mock("PUBLIC_DIR/images/button.alert.react.svg", () => ({
-  __esModule: true,
-  default: () => <div className="alertIcon" data-testid="alert-icon" />,
-}));
-
 describe("<MainButtonMobile />", () => {
   const mockOnClick = vi.fn();
 

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
-// The module calls require(`PUBLIC_DIR/...`) at the top level which only
-// resolves under Webpack.  We fully mock the module, reproducing its Map-
-// building logic but replacing require() with a path-returning stub.
+// Reproduces the module's Map-building logic with a path-returning stub
+// instead of the real icon components, so this test stays independent of
+// the SVGR-imported assets in icons-map.ts.
 vi.mock(".", () => {
   const iconsMap: Record<string, string[]> = {
     "word.svg": [".docx", ".dotx", ".docm", ".dotm"],
@@ -59,7 +59,7 @@ vi.mock(".", () => {
     new Map(
       entries.map(([format, iconName]) => {
         const svg = `${format.replace(/^\./, "")}.svg`;
-        const url = `PUBLIC_DIR/images/icons/${size}/${iconName}?url`;
+        const url = `assets/icons/${size}/${iconName}?url`;
         return [svg, url];
       }),
     );
