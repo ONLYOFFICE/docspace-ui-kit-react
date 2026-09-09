@@ -4,7 +4,7 @@
   "type": "commonjs",
   "description": "DocSpace UI Component Library",
   "license": "MIT",
-  "private": "true",
+  "private": false,
   "engines": {
     "node": ">=22"
   },
@@ -201,6 +201,7 @@
       },
       "./styles.css": "./dist/styles.css",
       "./package.json": "./package.json",
+      "./locales/*": "./locales/*",
       "./*": {
         "import": {
           "types": "./dist/types/*/index.d.mts",
