@@ -89,7 +89,7 @@ export enum EmployeeType {
  * Enum for files selector filter.
  * @readonly
  */
-export const enum FilesSelectorFilterTypes {
+export enum FilesSelectorFilterTypes {
   DOCX = "DOCX",
   PPTX = "PPTX",
   PDF = "PDF",
@@ -106,7 +106,7 @@ export const enum FilesSelectorFilterTypes {
  * Enum for file type.
  * @readonly
  */
-export const enum FileType {
+export enum FileType {
   Unknown = 0,
   Archive = 1,
   Video = 2,
@@ -125,7 +125,7 @@ export const enum FileType {
  * Enum for root folders type.
  * @readonly
  */
-export const enum FolderType {
+export enum FolderType {
   DEFAULT = 0,
   COMMON = 1,
   BUNCH = 2,
@@ -181,7 +181,7 @@ export enum DeviceType {
  * Enum for white label logo type.
  * @readonly
  */
-export const enum WhiteLabelLogoType {
+export enum WhiteLabelLogoType {
   LightSmall = 1,
   LoginPage = 2,
   Favicon = 3,
@@ -204,7 +204,7 @@ export const enum WhiteLabelLogoType {
  * Enum for employee activation status.
  * @readonly
  */
-export const enum EmployeeActivationStatus {
+export enum EmployeeActivationStatus {
   NotActivated = 0,
   Activated = 1,
   Pending = 2,
@@ -215,7 +215,7 @@ export const enum EmployeeActivationStatus {
  * Enum for theme keys.
  * @readonly
  */
-export const enum ThemeKeys {
+export enum ThemeKeys {
   Base = "0",
   BaseStr = "Base",
   Dark = "1",
@@ -224,18 +224,18 @@ export const enum ThemeKeys {
   SystemStr = "System",
 }
 
-export const enum ParseErrorTypes {
+export enum ParseErrorTypes {
   None = 0,
   EmptyRecipients = 1,
   IncorrectEmail = 2,
 }
 
-export const enum PortalFeaturesLimitations {
+export enum PortalFeaturesLimitations {
   Limitless = -1,
   Unavailable = 0,
 }
 
-export const enum ErrorKeys {
+export enum ErrorKeys {
   LocalDomain = "LocalDomain",
   IncorrectDomain = "IncorrectDomain",
   DomainIpAddress = "DomainIpAddress",
@@ -253,7 +253,7 @@ export const enum ErrorKeys {
  * Enum for sort by field name
  * @readonly
  */
-export const enum SortByFieldName {
+export enum SortByFieldName {
   Name = "AZ",
   ModifiedDate = "DateAndTime",
   CreationDate = "DateAndTimeCreation",
@@ -271,7 +271,7 @@ export const enum SortByFieldName {
  * Enum for file status.
  * @readonly
  */
-export const enum FileStatus {
+export enum FileStatus {
   None = 0,
   IsEditing = 1,
   IsNew = 2,
@@ -283,7 +283,7 @@ export const enum FileStatus {
   IsFillFormDraft = 128,
 }
 
-export const enum ShareRights {
+export enum ShareRights {
   None = "None",
   ReadWrite = "ReadWrite",
   Read = "Read",
@@ -313,13 +313,13 @@ export enum VectorizationStatus {
   Failed,
 }
 
-export const enum VDRIndexingAction {
+export enum VDRIndexingAction {
   HigherIndex = "HigherIndex",
   LowerIndex = "LowerIndex",
   MoveIndex = "MoveIndex",
 }
 
-export const enum FilterGroups {
+export enum FilterGroups {
   filterType = "filter-filterType",
   filterAuthor = "filter-author",
   filterSharedBy = "filter-sharedBy",
@@ -345,7 +345,7 @@ export const enum FilterGroups {
   filterLocation = "filter-location",
 }
 
-export const enum FilterKeys {
+export enum FilterKeys {
   withSubfolders = "withSubfolders",
   excludeSubfolders = "excludeSubfolders",
   withContent = "withContent",
@@ -359,13 +359,13 @@ export const enum FilterKeys {
   defaultQuota = "1",
 }
 
-export const enum FilterSelectorTypes {
+export enum FilterSelectorTypes {
   people = "people-selector",
   rooms = "rooms-selector",
   groups = "groups-selector",
 }
 
-export const enum Events {
+export enum Events {
   CREATE = "create",
   RENAME = "rename",
   ROOM_CREATE = "create_room",

@@ -1,4 +1,4 @@
-export const enum ModalDialogType {
+export enum ModalDialogType {
   modal = "modal",
   aside = "aside",
 }

@@ -9,7 +9,7 @@ import type {
 
 import { addLog } from "../add-log";
 
-export const enum SocketCommandsRoomParts {
+export enum SocketCommandsRoomParts {
   ExternalDbSettings = "external-db-settings",
   StorageEncryption = "storage-encryption",
   Restore = "restore",

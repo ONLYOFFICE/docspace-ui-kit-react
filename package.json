@@ -236,6 +236,7 @@
   "files": [
     "dist",
     "locales",
+    "styles",
     "LICENSE",
     "components/**/README.md",
     "context/**/README.md",
@@ -265,14 +266,46 @@
       "./styles.css": "./dist/styles.css",
       "./package.json": "./package.json",
       "./locales/*": "./locales/*",
-      "./*": {
+      "./styles/*": "./styles/*",
+      "./*.scss": "./styles/*.scss",
+      "./*.types": {
         "import": {
-          "types": "./dist/types/*/index.d.mts",
-          "default": "./dist/esm/*/index.js"
+          "types": "./dist/types/*.types.d.mts",
+          "default": "./dist/types/*.types.d.mts"
         },
         "require": {
-          "types": "./dist/types/*/index.d.ts",
-          "default": "./dist/cjs/*/index.js"
+          "types": "./dist/types/*.types.d.ts",
+          "default": "./dist/types/*.types.d.ts"
+        }
+      },
+      "./*.svg": {
+        "import": {
+          "types": "./dist/types/*.svg.d.mts",
+          "default": "./dist/esm/*.svg.js"
+        },
+        "require": {
+          "types": "./dist/types/*.svg.d.ts",
+          "default": "./dist/cjs/*.svg.js"
+        }
+      },
+      "./*": {
+        "import": {
+          "types": ["./dist/types/*/index.d.mts", "./dist/types/*.d.mts"],
+          "default": [
+            "./dist/esm/*/index.js",
+            "./dist/esm/*.js",
+            "./dist/types/*/index.d.mts",
+            "./dist/types/*.d.mts"
+          ]
+        },
+        "require": {
+          "types": ["./dist/types/*/index.d.ts", "./dist/types/*.d.ts"],
+          "default": [
+            "./dist/cjs/*/index.js",
+            "./dist/cjs/*.js",
+            "./dist/types/*/index.d.ts",
+            "./dist/types/*.d.ts"
+          ]
         }
       },
       "./*.js": {
