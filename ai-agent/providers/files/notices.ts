@@ -69,13 +69,39 @@ export const notifyAlreadyAttached = (t: TFunction, count: number) => {
  * the message free of `{{count}}` — with the locale scanner forcing literal
  * plural keys, any counted wording would read wrong for 2-4 items in the
  * Slavic locales.
+ *
+ * `limit` is the cap that actually applied, which in the Forms section is one
+ * (see `AttachmentLimitContext`) — a "up to 1 files" sentence would be its
+ * own bug, so that case has its own wording.
  */
-export const notifyAttachmentLimit = (t: TFunction, count: number) => {
+/**
+ * `count` form picks were left out because the message already carries a
+ * form. States the rule rather than the number, like the cap notice above:
+ * the chips show what made it, the rule is what the user cannot see.
+ */
+export const notifyOneFormOnly = (t: TFunction, count: number) => {
+  if (count <= 0) return;
+  toastr.info(
+    t("Common:AttachFilesOneFormOnly", {
+      defaultValue: "You can attach only one form at a time",
+    }),
+  );
+};
+
+export const notifyAttachmentLimit = (
+  t: TFunction,
+  count: number,
+  limit: number = CHAT_ATTACHMENT_LIMIT,
+) => {
   if (count <= 0) return;
   toastr.warning(
-    t("Common:AttachFilesLimit", {
-      limit: CHAT_ATTACHMENT_LIMIT,
-      defaultValue: "You can attach up to {{limit}} files",
-    }),
+    limit === 1
+      ? t("Common:AttachFilesLimitOne", {
+          defaultValue: "You can attach only one file here",
+        })
+      : t("Common:AttachFilesLimit", {
+          limit,
+          defaultValue: "You can attach up to {{limit}} files",
+        }),
   );
 };

@@ -129,6 +129,8 @@ import {
 } from "./files";
 import { resolveSuggestions, type SuggestionSet } from "./suggestions";
 import { OnFilesAttachedContext } from "./files/attached-report";
+import { AttachmentLimitContext } from "./files/attachment-limit";
+import { CHAT_ATTACHMENT_LIMIT } from "./files/limits";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
 
@@ -276,6 +278,15 @@ type AiAgentProvidersProps = {
    * {@link SuggestionSet}. A bare array is treated as `{ default: [...] }`.
    */
   suggestions?: Suggestion[] | SuggestionSet;
+  /**
+   * How many attachments the composer accepts in the section the host is
+   * showing. Defaults to the widget's own `CHAT_ATTACHMENT_LIMIT`; the Forms
+   * section passes 1, because a question there is about a single form and its
+   * responses. Values above the widget's cap are ignored (it enforces its
+   * own), and every attach entry point honors it — picker, device upload,
+   * "Ask AI" row action, drag-and-drop.
+   */
+  attachmentLimit?: number;
   children: ReactNode;
 };
 
@@ -507,6 +518,7 @@ const AiAgentProviders = ({
   composerHeader,
   composerDisabled,
   suggestions,
+  attachmentLimit,
   children,
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
@@ -576,6 +588,13 @@ const AiAgentProviders = ({
       formsRecommendation?.noticeVisible,
       formsRecommendation?.onCloseNotice,
     ],
+  );
+
+  // Never above what the widget itself enforces: a host asking for more would
+  // only make the cap toast quote a number the store does not honor.
+  const effectiveAttachmentLimit = Math.min(
+    Math.max(1, attachmentLimit ?? CHAT_ATTACHMENT_LIMIT),
+    CHAT_ATTACHMENT_LIMIT,
   );
 
   // File-attachment integration: the composer "attach" actions, the message
@@ -855,6 +874,7 @@ const AiAgentProviders = ({
         filesSettingsApi,
         useAttachmentsStore: stores.useAttachmentsStore,
         onFilesAttached,
+        attachmentLimit: effectiveAttachmentLimit,
         t,
       }),
     [
@@ -864,6 +884,7 @@ const AiAgentProviders = ({
       filesSettingsApi,
       stores,
       onFilesAttached,
+      effectiveAttachmentLimit,
       t,
     ],
   );
@@ -992,17 +1013,25 @@ const AiAgentProviders = ({
                             <AiChatStoreProvider>
                               <AiChatStoresBridge />
                               {getAgentRoomId ? null : <AgentRoomIdSync />}
-                              {/* The host subtree attaches files too (the
-                                  "Ask AI" action, the chat-panel drop zone):
-                                  hand it the same reporter the dialogs get as
-                                  a prop, so `canAnalyze` survives every
-                                  entry point. */}
-                              <OnFilesAttachedContext.Provider
-                                value={onFilesAttached}
+                              {/* The per-section attachment cap covers the
+                                  host subtree and the chat's own dialogs
+                                  alike — picker, device upload, "Ask AI" row
+                                  action, drop zone. */}
+                              <AttachmentLimitContext.Provider
+                                value={effectiveAttachmentLimit}
                               >
-                                {children}
-                              </OnFilesAttachedContext.Provider>
-                              {overlay}
+                                {/* The host subtree attaches files too (the
+                                    "Ask AI" action, the chat-panel drop
+                                    zone): hand it the same reporter the
+                                    dialogs get as a prop, so `canAnalyze`
+                                    survives every entry point. */}
+                                <OnFilesAttachedContext.Provider
+                                  value={onFilesAttached}
+                                >
+                                  {children}
+                                </OnFilesAttachedContext.Provider>
+                                {overlay}
+                              </AttachmentLimitContext.Provider>
                             </AiChatStoreProvider>
                           </ToolsProvider>
                         </ImagesProvider>

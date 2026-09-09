@@ -50,5 +50,15 @@ export {
   useFilesIntegration,
   type FilesIntegration,
 } from "./use-integration";
-export { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
+export {
+  notifyAlreadyAttached,
+  notifyAttachmentLimit,
+  notifyOneFormOnly,
+} from "./notices";
+// Provided by AiAgentProviders from its `attachmentLimit` prop; the host
+// subtree reads it through the attach hook's result, not directly.
+export {
+  AttachmentLimitContext,
+  useAttachmentLimit,
+} from "./attachment-limit";
 export type { SuggestedQuestion } from "./suggested-questions";

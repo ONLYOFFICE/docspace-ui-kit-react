@@ -87,6 +87,12 @@ export type UploadFilesToChatDeps = {
   // Reports the attached files so the caller can keep the record flags the
   // attachments store drops (`canAnalyze`).
   onFilesAttached?: OnFilesAttached;
+  /**
+   * How many attachments the composer accepts here — one in the Forms
+   * section, the widget's own limit elsewhere (see `AttachmentLimitContext`).
+   * This module stays framework-free, so the caller reads the context.
+   */
+  attachmentLimit?: number;
   t: TFunction;
 };
 
@@ -110,6 +116,7 @@ export const uploadFilesToChat = async (
     filesSettingsApi,
     useAttachmentsStore,
     onFilesAttached,
+    attachmentLimit,
     t,
   }: UploadFilesToChatDeps,
 ): Promise<void> => {
@@ -146,9 +153,10 @@ export const uploadFilesToChat = async (
       kind: "file" as const,
       type: getOnlyofficeFileType(f.name),
     })),
+    attachmentLimit,
   );
   const accepted = picked.slice(0, pendingIds.length);
-  notifyAttachmentLimit(t, picked.length - accepted.length);
+  notifyAttachmentLimit(t, picked.length - accepted.length, attachmentLimit);
   if (accepted.length === 0) return;
 
   const inputs: AttachFileInput[] = [];

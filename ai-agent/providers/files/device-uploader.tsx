@@ -32,6 +32,7 @@ import { useStores } from "@onlyoffice/ai-chat";
 
 import { useApi as useFilesApi } from "../../../providers/api";
 
+import { useAttachmentLimit } from "./attachment-limit";
 import { uploadFilesToChat } from "./upload-files";
 import type { OnFilesAttached } from "./attach-files";
 
@@ -62,6 +63,8 @@ const DeviceUploader = React.forwardRef<
   const { t } = useTranslation(["Common"]);
   const { useAttachmentsStore } = useStores();
   const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
+  // Per-section cap: the Forms section takes a single attachment.
+  const attachmentLimit = useAttachmentLimit();
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const uploadFiles = React.useCallback(
@@ -73,6 +76,7 @@ const DeviceUploader = React.forwardRef<
         filesSettingsApi,
         useAttachmentsStore,
         onFilesAttached,
+        attachmentLimit,
         t,
       }),
     [
@@ -82,6 +86,7 @@ const DeviceUploader = React.forwardRef<
       filesSettingsApi,
       entityId,
       onFilesAttached,
+      attachmentLimit,
       t,
     ],
   );

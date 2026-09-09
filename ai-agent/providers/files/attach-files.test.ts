@@ -75,6 +75,19 @@ const input = (path: string, hasFormResults = false) => ({
   type: 7,
   content: "",
   hasFormResults,
+  // A form whose responses land in a table is a PDF form too.
+  isPdfForm: hasFormResults,
+});
+
+// A DocSpace PDF form nobody wired to an external database: `isForm` on the
+// row, no results table. It still counts against the one-form cap.
+const pdfFormInput = (path: string) => ({
+  path,
+  title: `${path}.pdf`,
+  type: 7,
+  content: "",
+  hasFormResults: false,
+  isPdfForm: true,
 });
 
 // The helper is typed against the widget's store; the fake carries only the
@@ -250,6 +263,160 @@ describe("attachFilesToChat form flags", () => {
     const registry = getFormRegistry(asStore(store));
     expect(registry.ids.has("att-2")).toBe(true);
     expect(registry.ids.has("att-1")).toBe(false);
+  });
+});
+
+// A message talks about one form at a time: the analysis is about that form's
+// fields and responses, so a second form would silently mix two schemas.
+describe("attachFilesToChat form cap", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("keeps the first form of a batch and refuses the rest", async () => {
+    const { store, addAttachmentFile, failPendingAttachments } = makeStore();
+
+    const attached = await attachFilesToChat(
+      asStore(store),
+      [input("11", true), input("22", true)],
+      new Set(),
+      ["pnd-1", "pnd-2"],
+    );
+
+    expect(addAttachmentFile).toHaveBeenCalledWith(
+      [input("11", true)],
+      expect.objectContaining({ pendingIds: ["pnd-1"] }),
+    );
+    // The refused form must not keep its loading chip, or Send stays blocked.
+    expect(failPendingAttachments).toHaveBeenCalledWith(["pnd-2"]);
+    expect(attached).toHaveLength(1);
+  });
+
+  it("lets the plain files of the same batch through", async () => {
+    const { store, addAttachmentFile } = makeStore();
+
+    await attachFilesToChat(
+      asStore(store),
+      [input("11", true), input("22", true), input("33")],
+      new Set(),
+      ["pnd-1", "pnd-2", "pnd-3"],
+    );
+
+    expect(addAttachmentFile).toHaveBeenCalledWith(
+      [input("11", true), input("33")],
+      expect.objectContaining({ pendingIds: ["pnd-1", "pnd-3"] }),
+    );
+  });
+
+  it("refuses a form when the draft already carries one", async () => {
+    const { store, addAttachmentFile } = makeStore();
+
+    await attachFilesToChat(asStore(store), [input("11", true)], new Set());
+    expect(getFormRegistry(asStore(store)).ids.size).toBe(1);
+
+    const attached = await attachFilesToChat(
+      asStore(store),
+      [input("22", true)],
+      new Set(),
+      ["pnd-2"],
+    );
+
+    expect(attached).toEqual([]);
+    expect(addAttachmentFile).toHaveBeenCalledTimes(1);
+  });
+
+  // The case the results-table-only check used to let through: two PDF forms
+  // straight out of the Forms section, neither wired to an external database.
+  it("counts a PDF form with no results table", async () => {
+    const { store, addAttachmentFile, failPendingAttachments } = makeStore();
+
+    const attached = await attachFilesToChat(
+      asStore(store),
+      [pdfFormInput("11"), pdfFormInput("22")],
+      new Set(),
+      ["pnd-1", "pnd-2"],
+    );
+
+    expect(addAttachmentFile.mock.calls[0][0]).toEqual([pdfFormInput("11")]);
+    expect(failPendingAttachments).toHaveBeenCalledWith(["pnd-2"]);
+    expect(attached).toHaveLength(1);
+  });
+
+  it("counts a plain form against a results-table one", async () => {
+    const { store, addAttachmentFile } = makeStore();
+
+    await attachFilesToChat(asStore(store), [pdfFormInput("11")], new Set());
+    const attached = await attachFilesToChat(
+      asStore(store),
+      [input("22", true)],
+      new Set(),
+    );
+
+    expect(attached).toEqual([]);
+    expect(addAttachmentFile).toHaveBeenCalledTimes(1);
+  });
+
+  // Two entry points can attach at once (a pick in the dialog while a drop is
+  // uploading). The first form is invisible to the cap until its ref lands, so
+  // the slot has to be held for the round trip.
+  it("refuses a second form while the first attach is in flight", async () => {
+    const { store, addAttachmentFile } = makeStore();
+
+    const first = attachFilesToChat(
+      asStore(store),
+      [pdfFormInput("11")],
+      new Set(),
+    );
+    const second = attachFilesToChat(
+      asStore(store),
+      [pdfFormInput("22")],
+      new Set(),
+    );
+
+    const [, attached] = await Promise.all([first, second]);
+
+    expect(addAttachmentFile).toHaveBeenCalledTimes(1);
+    expect(attached).toEqual([]);
+  });
+
+  it("frees the form slot again when the attach fails", async () => {
+    const { store } = makeStore();
+    const failing = {
+      ...store,
+      getState: () => ({
+        ...store.getState(),
+        addAttachmentFile: vi.fn(async () => {
+          throw new Error("network");
+        }),
+      }),
+    };
+
+    await expect(
+      attachFilesToChat(asStore(failing), [pdfFormInput("11")], new Set()),
+    ).rejects.toThrow("network");
+
+    // The failed attach must not leave the only form slot claimed.
+    const attached = await attachFilesToChat(
+      asStore(store),
+      [pdfFormInput("22")],
+      new Set(),
+    );
+    expect(attached).toHaveLength(1);
+  });
+
+  it("frees the slot once the attached form's chip is gone", async () => {
+    const { store, attachmentFiles } = makeStore();
+
+    await attachFilesToChat(asStore(store), [input("11", true)], new Set());
+    // The user removed the form's chip: the registry still knows the id, but
+    // the ref is gone, so the next form is allowed in.
+    attachmentFiles.length = 0;
+
+    const attached = await attachFilesToChat(
+      asStore(store),
+      [input("22", true)],
+      new Set(),
+    );
+
+    expect(attached).toHaveLength(1);
   });
 });
 

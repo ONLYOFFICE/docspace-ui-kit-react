@@ -53,6 +53,7 @@ vi.mock("./attach-files", async (importOriginal) => ({
 }));
 
 import { OnFilesAttachedContext } from "./attached-report";
+import { AttachmentLimitContext } from "./attachment-limit";
 import { useAttachHostFilesToChat } from "./use-attach-to-chat";
 
 // Refs carry `${entryId}/${title}`, the shape the AI backend composes.
@@ -82,6 +83,20 @@ type AttachItems = Parameters<
 
 const attach = async (items: AttachItems) => {
   const { result } = renderHook(() => useAttachHostFilesToChat());
+  return result.current(items);
+};
+
+// Same call, but under a per-section attachment cap — what the Forms section
+// puts around the host subtree.
+const attachUnderLimit = async (items: AttachItems, limit: number) => {
+  const { result } = renderHook(() => useAttachHostFilesToChat(), {
+    wrapper: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(
+        AttachmentLimitContext.Provider,
+        { value: limit },
+        children,
+      ),
+  });
   return result.current(items);
 };
 
@@ -116,6 +131,8 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 2,
       skippedFolders: 0,
       skippedOverLimit: 0,
+      skippedExtraForms: 0,
+      limit: 5,
       duplicates: 0,
     });
   });
@@ -129,6 +146,8 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 1,
       skippedFolders: 1,
       skippedOverLimit: 0,
+      skippedExtraForms: 0,
+      limit: 5,
       duplicates: 0,
     });
   });
@@ -140,6 +159,8 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 0,
       skippedFolders: 0,
       skippedOverLimit: 0,
+      skippedExtraForms: 0,
+      limit: 5,
       duplicates: 1,
     });
     // Nothing to attach: the round trip must not run at all.
@@ -166,8 +187,47 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 2,
       skippedFolders: 1,
       skippedOverLimit: 1,
+      skippedExtraForms: 0,
+      limit: 5,
       duplicates: 1,
     });
+  });
+
+  // The Forms section allows a single attachment, and the widget's store
+  // knows nothing about that — so the cap has to be applied before the
+  // reservation, or a lease we then dropped would strand a loading chip.
+  it("applies the section cap of one and reports it", async () => {
+    const result = await attachUnderLimit([file(1), file(2)], 1);
+
+    expect(result).toEqual({
+      attached: 1,
+      skippedFolders: 0,
+      skippedOverLimit: 1,
+      skippedExtraForms: 0,
+      limit: 1,
+      duplicates: 0,
+    });
+    // One lease asked for, so no chip is left without a payload.
+    expect(storeState.beginPendingAttachments).toHaveBeenCalledWith([
+      expect.objectContaining({ title: "file-1.docx" }),
+    ]);
+  });
+
+  it("refuses everything when the single slot is taken", async () => {
+    storeState.attachmentFiles = [attachedRef("90")];
+
+    const result = await attachUnderLimit([file(1)], 1);
+
+    expect(result).toEqual({
+      attached: 0,
+      skippedFolders: 0,
+      skippedOverLimit: 1,
+      skippedExtraForms: 0,
+      limit: 1,
+      duplicates: 0,
+    });
+    expect(storeState.beginPendingAttachments).not.toHaveBeenCalled();
+    expect(attachFilesToChat).not.toHaveBeenCalled();
   });
 
   // `CHAT_ATTACHMENT_LIMIT` is a hand-kept copy of a cap that lives inside
@@ -219,6 +279,8 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 0,
       skippedFolders: 0,
       skippedOverLimit: 0,
+      skippedExtraForms: 0,
+      limit: 5,
       duplicates: 1,
     });
   });
