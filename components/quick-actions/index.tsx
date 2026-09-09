@@ -66,6 +66,11 @@ const getDirectionSign = (track: HTMLElement) =>
 // Whether the track can still move in either direction, kept in sync with
 // scrolling and resizing. Both ends are reported independently so each arrow
 // can be dropped at its own extreme.
+// The width of the tiles themselves is reported alongside. The track is as wide
+// as the banner lets it be and the tiles are centred inside it, so anchoring the
+// controls to the track would put them at the edge of the empty box rather than
+// at the edge of the row on every section that offers fewer tiles than the
+// widest one.
 const useScrollAffordance = (
   track: HTMLDivElement | null,
   itemsKey: string,
@@ -73,11 +78,16 @@ const useScrollAffordance = (
   const [affordance, setAffordance] = React.useState({
     canScrollPrev: false,
     canScrollNext: false,
+    rowWidth: 0,
   });
 
   useIsomorphicLayoutEffect(() => {
     if (!track) {
-      setAffordance({ canScrollPrev: false, canScrollNext: false });
+      setAffordance({
+        canScrollPrev: false,
+        canScrollNext: false,
+        rowWidth: 0,
+      });
       return undefined;
     }
 
@@ -90,26 +100,42 @@ const useScrollAffordance = (
 
     const measure = () => {
       const maxOffset = track.scrollWidth - track.clientWidth;
-
-      if (maxOffset <= SCROLL_EPSILON) {
-        setAffordance({ canScrollPrev: false, canScrollNext: false });
-        return;
-      }
+      const scrollable = maxOffset > SCROLL_EPSILON;
 
       // Distance travelled from the start, sign-independent: RTL counts down
       // from zero into negative values.
       const offset = Math.abs(track.scrollLeft);
-      const canScrollPrev = offset > SCROLL_EPSILON;
-      const canScrollNext = offset < maxOffset - SCROLL_EPSILON;
+      const canScrollPrev = scrollable && offset > SCROLL_EPSILON;
+      const canScrollNext = scrollable && offset < maxOffset - SCROLL_EPSILON;
+
+      // Taken from the outer edges of the row rather than from `scrollWidth`,
+      // which never reports less than the track's own box and so would hand
+      // back the empty width again. Read as min/max so the pair works in RTL,
+      // where the first tile is the rightmost one. Rounded because it is
+      // recomputed on every scroll event and sub-pixel drift alone would
+      // re-render the banner for the length of the scroll.
+      const first = track.firstElementChild;
+      const last = track.lastElementChild;
+      let rowWidth = 0;
+
+      if (first && last) {
+        const start = first.getBoundingClientRect();
+        const end = last.getBoundingClientRect();
+
+        rowWidth = Math.round(
+          Math.max(start.right, end.right) - Math.min(start.left, end.left),
+        );
+      }
 
       // Keep the previous object while nothing changed: this runs on every
       // scroll event, and a fresh object each time would re-render the whole
       // banner for the length of the scroll.
       setAffordance((prev) =>
         prev.canScrollPrev === canScrollPrev &&
-        prev.canScrollNext === canScrollNext
+        prev.canScrollNext === canScrollNext &&
+        prev.rowWidth === rowWidth
           ? prev
-          : { canScrollPrev, canScrollNext },
+          : { canScrollPrev, canScrollNext, rowWidth },
       );
     };
 
@@ -249,7 +275,18 @@ export const QuickActions = ({
   // is too coarse — two sections can offer the same number of tiles.
   const itemsKey = items.map((item) => item.id).join("|");
 
-  const { canScrollPrev, canScrollNext } = useScrollAffordance(track, itemsKey);
+  const { canScrollPrev, canScrollNext, rowWidth } = useScrollAffordance(
+    track,
+    itemsKey,
+  );
+
+  // Handed to the stylesheet rather than applied here: the controls layer is
+  // built from it together with values only the stylesheet knows. Left unset
+  // until the row has been measured, so the declaration's own fallback covers
+  // the first paint and any environment without layout.
+  const rowWidthVar = rowWidth
+    ? ({ "--_measured-row-width": `${rowWidth}px` } as React.CSSProperties)
+    : undefined;
 
   const scrollByPage = (towardEnd: boolean) => {
     if (!track) return;
@@ -285,6 +322,7 @@ export const QuickActions = ({
   return (
     <div
       className={classNames(styles.quickActions, className)}
+      style={rowWidthVar}
       data-testid={dataTestId}
     >
       <div
@@ -296,6 +334,14 @@ export const QuickActions = ({
           <QuickActionTile key={item.id} item={item} />
         ))}
       </div>
+
+      {canScrollPrev ? (
+        <div className={classNames(styles.fade, styles.fadeStart)} />
+      ) : null}
+
+      {canScrollNext ? (
+        <div className={classNames(styles.fade, styles.fadeEnd)} />
+      ) : null}
 
       <div className={styles.controls}>
         {canScrollPrev ? (
