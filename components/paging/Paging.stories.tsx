@@ -25,7 +25,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Paging } from "@docspace/ui-kit/components/paging";
+import { Paging } from "@onlyoffice/apps-ui-kit/components/paging";
 
 <Paging
   previousLabel="Previous"

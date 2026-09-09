@@ -33,7 +33,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TableBody } from "@docspace/ui-kit/components/table/table-body";
+import { TableBody } from "@onlyoffice/apps-ui-kit/components/table/table-body";
 
 <TableBody
   columnStorageName="my-table-columns"

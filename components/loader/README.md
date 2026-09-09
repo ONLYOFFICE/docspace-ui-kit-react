@@ -5,7 +5,7 @@ Loader component is used for displaying loading states and animations in the app
 ### Usage
 
 ```js
-import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
+import { Loader, LoaderTypes } from "@onlyoffice/apps-ui-kit/components/loader";
 ```
 
 ```jsx

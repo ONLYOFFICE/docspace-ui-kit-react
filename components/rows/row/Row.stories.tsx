@@ -33,7 +33,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Row } from "@docspace/ui-kit/components/rows/row";
+import { Row } from "@onlyoffice/apps-ui-kit/components/rows/row";
 
 // Basic row with checkbox
 <Row checked={false} contextOptions={[{ key: "edit", label: "Edit" }]}>

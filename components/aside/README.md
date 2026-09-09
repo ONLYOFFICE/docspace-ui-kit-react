@@ -5,7 +5,7 @@ Sliding panel component for displaying side content like settings, details, or f
 ## Usage
 
 ```tsx
-import { Aside } from "@docspace/ui-kit/components/aside";
+import { Aside } from "@onlyoffice/apps-ui-kit/components/aside";
 
 const [visible, setVisible] = useState(false);
 

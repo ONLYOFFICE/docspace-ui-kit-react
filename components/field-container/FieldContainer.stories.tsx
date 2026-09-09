@@ -28,7 +28,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { FieldContainer } from "@docspace/ui-kit/components/field-container";
+import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-container";
 
 // Horizontal layout with tooltip
 <FieldContainer

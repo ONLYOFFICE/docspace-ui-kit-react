@@ -40,7 +40,7 @@ const meta: Meta<StoryArgs> = {
 ### Usage
 
 \`\`\`tsx
-import MCPServersSelector from "@docspace/ui-kit/selectors/MCPServers";
+import MCPServersSelector from "@onlyoffice/apps-ui-kit/selectors/MCPServers";
 
 <MCPServersSelector
   initedSelectedServers={["server-id-1"]}

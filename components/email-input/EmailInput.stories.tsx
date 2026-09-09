@@ -29,8 +29,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { EmailInput } from "@docspace/ui-kit/components/email-input";
-import { EmailSettings } from "@docspace/ui-kit/utils/email";
+import { EmailInput } from "@onlyoffice/apps-ui-kit/components/email-input";
+import { EmailSettings } from "@onlyoffice/apps-ui-kit/utils/email";
 
 const settings = EmailSettings.parse({ allowStrictLocalPart: true });
 

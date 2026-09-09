@@ -31,7 +31,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ContextMenu } from "@docspace/ui-kit/components/context-menu";
+import { ContextMenu } from "@onlyoffice/apps-ui-kit/components/context-menu";
 
 const menuRef = useRef<ContextMenuRefType>(null);
 

@@ -22,7 +22,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { CategoryItem } from "@docspace/ui-kit/components/category-item";
+import { CategoryItem } from "@onlyoffice/apps-ui-kit/components/category-item";
 
 <CategoryItem
   title="Security"

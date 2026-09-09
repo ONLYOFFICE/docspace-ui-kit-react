@@ -24,7 +24,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { AccessRestricted } from "@docspace/ui-kit/errors";
+import { AccessRestricted } from "@onlyoffice/apps-ui-kit/errors";
 
 <AccessRestricted />
 \`\`\``,

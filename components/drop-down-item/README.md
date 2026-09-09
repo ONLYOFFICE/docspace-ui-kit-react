@@ -5,7 +5,7 @@ A versatile dropdown item component used for menus, lists, and selection interfa
 ## Usage
 
 ```jsx
-import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
+import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item";
 import SettingsIcon from "PUBLIC_DIR/images/settings.react.svg?url";
 
 const MyComponent = () => {

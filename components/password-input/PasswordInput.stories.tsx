@@ -29,7 +29,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { PasswordInput } from "@docspace/ui-kit/components/password-input";
+import { PasswordInput } from "@onlyoffice/apps-ui-kit/components/password-input";
 
 <PasswordInput
   inputValue={value}

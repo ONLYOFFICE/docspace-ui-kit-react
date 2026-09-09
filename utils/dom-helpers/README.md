@@ -5,7 +5,7 @@ Utility class for common DOM manipulation operations including viewport measurem
 ## Installation
 
 ```typescript
-import DomHelpers from "@docspace/ui-kit/utils/dom-helpers";
+import DomHelpers from "@onlyoffice/apps-ui-kit/utils/dom-helpers";
 ```
 
 ## Methods
@@ -172,7 +172,7 @@ console.log(`Current z-index: ${currentZ}`);
 ### Positioning a Dropdown
 
 ```typescript
-import DomHelpers from "@docspace/ui-kit/utils/dom-helpers";
+import DomHelpers from "@onlyoffice/apps-ui-kit/utils/dom-helpers";
 
 function positionDropdown(trigger: HTMLElement, dropdown: HTMLElement) {
   const triggerOffset = DomHelpers.getOffset(trigger);
@@ -195,7 +195,7 @@ function positionDropdown(trigger: HTMLElement, dropdown: HTMLElement) {
 ### Managing Modal z-index Stack
 
 ```typescript
-import DomHelpers from "@docspace/ui-kit/utils/dom-helpers";
+import DomHelpers from "@onlyoffice/apps-ui-kit/utils/dom-helpers";
 
 class ModalManager {
   private modals: Map<string, number> = new Map();
@@ -218,7 +218,7 @@ class ModalManager {
 ### Responsive Layout Calculations
 
 ```typescript
-import DomHelpers from "@docspace/ui-kit/utils/dom-helpers";
+import DomHelpers from "@onlyoffice/apps-ui-kit/utils/dom-helpers";
 
 function calculateGridColumns(containerWidth: number, minItemWidth: number) {
   const scrollbarWidth = DomHelpers.calculateScrollbarWidth();
@@ -236,7 +236,7 @@ function updateLayout() {
 ### Measuring Hidden Content
 
 ```typescript
-import DomHelpers from "@docspace/ui-kit/utils/dom-helpers";
+import DomHelpers from "@onlyoffice/apps-ui-kit/utils/dom-helpers";
 
 function animateHeight(element: HTMLElement, show: boolean) {
   if (show) {

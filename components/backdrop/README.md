@@ -14,7 +14,7 @@ A flexible backdrop component that provides a customizable overlay for modals, d
 ## Usage
 
 ```tsx
-import { Backdrop } from "@docspace/ui-kit/components/backdrop";
+import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
 
 // Basic usage
 <Backdrop visible onClick={handleBackdropClick} />
@@ -71,7 +71,7 @@ Theme values:
 
 ```tsx
 import { useState } from "react";
-import { Backdrop } from "@docspace/ui-kit/components/backdrop";
+import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
 
 const ModalExample = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -99,7 +99,7 @@ const ModalExample = () => {
 
 ```tsx
 import { useState } from "react";
-import { Backdrop } from "@docspace/ui-kit/components/backdrop";
+import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
 
 const AsideExample = () => {
   const [isFirstOpen, setFirstOpen] = useState(false);

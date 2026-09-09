@@ -35,7 +35,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { DatePicker } from "@docspace/ui-kit/components/date-picker";
+import { DatePicker } from "@onlyoffice/apps-ui-kit/components/date-picker";
 
 <DatePicker
   locale="en"

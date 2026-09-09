@@ -5,7 +5,7 @@ Button component for adding items with optional label, loading state, and accent
 ## Usage
 
 ```tsx
-import { AddButton } from "@docspace/ui-kit/components/add-button";
+import { AddButton } from "@onlyoffice/apps-ui-kit/components/add-button";
 
 <AddButton title="Add item" onClick={() => console.log("clicked")} />
 ```

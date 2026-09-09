@@ -5,7 +5,7 @@ The `RadioButton` component allows you to create radio buttons with customizable
 ### Usage
 
 ```js
-import { RadioButton } from "@docspace/ui-kit/components/radio-button";
+import { RadioButton } from "@onlyoffice/apps-ui-kit/components/radio-button";
 ```
 
 ```jsx

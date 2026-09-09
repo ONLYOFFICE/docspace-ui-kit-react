@@ -101,7 +101,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
+import { RectangleSkeleton } from "@onlyoffice/apps-ui-kit/components/rectangle";
 
 <RectangleSkeleton width="200px" height="100px" />
 \`\`\``,

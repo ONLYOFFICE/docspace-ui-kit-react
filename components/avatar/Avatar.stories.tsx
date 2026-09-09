@@ -25,7 +25,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Avatar, AvatarSize, AvatarRole } from "@docspace/ui-kit/components/avatar";
+import { Avatar, AvatarSize, AvatarRole } from "@onlyoffice/apps-ui-kit/components/avatar";
 
 // Avatar with image
 <Avatar

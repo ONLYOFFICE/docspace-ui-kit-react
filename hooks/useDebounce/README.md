@@ -10,7 +10,7 @@ React hook for debouncing callback functions with automatic cleanup.
 
 ```tsx
 import { useState } from 'react';
-import { useDebounce } from '@docspace/ui-kit/hooks/useDebounce';
+import { useDebounce } from '@onlyoffice/apps-ui-kit/hooks/useDebounce';
 
 function SearchComponent() {
   const [searchResults, setSearchResults] = useState([]);

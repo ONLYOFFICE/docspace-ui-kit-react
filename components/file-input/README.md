@@ -5,7 +5,7 @@ File entry field
 ### Usage
 
 ```js
-import { FileInput } from "@docspace/ui-kit/components/file-input";
+import { FileInput } from "@onlyoffice/apps-ui-kit/components/file-input";
 ```
 
 ```jsx

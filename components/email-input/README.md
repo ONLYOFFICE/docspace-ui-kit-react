@@ -5,8 +5,8 @@ Email validation component with RFC 5322 support and customizable settings.
 ### Usage
 
 ```js
-import { EmailInput } from "@docspace/ui-kit/components/email-input";
-import { EmailSettings } from "@docspace/ui-kit/utils/email";
+import { EmailInput } from "@onlyoffice/apps-ui-kit/components/email-input";
+import { EmailSettings } from "@onlyoffice/apps-ui-kit/utils/email";
 
 const settings = new EmailSettings();
 
@@ -74,8 +74,8 @@ const emailSettings = {
 or instance of `EmailSettings` class:
 
 ```js
-import { EmailInput } from "@docspace/ui-kit/components/email-input";
-import { EmailSettings } from "@docspace/ui-kit/utils/email";
+import { EmailInput } from "@onlyoffice/apps-ui-kit/components/email-input";
+import { EmailSettings } from "@onlyoffice/apps-ui-kit/utils/email";
 
 const emailSettings = new EmailSettings();
 
@@ -124,7 +124,7 @@ Base colors:
 
 ```js
 import React from "react";
-import { EmailInput } from "@docspace/ui-kit/components/email-input";
+import { EmailInput } from "@onlyoffice/apps-ui-kit/components/email-input";
 
 const onChange = (e) => {
   // your event handling

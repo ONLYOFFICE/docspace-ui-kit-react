@@ -26,7 +26,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { DragAndDrop } from "@docspace/ui-kit/components/drag-and-drop";
+import { DragAndDrop } from "@onlyoffice/apps-ui-kit/components/drag-and-drop";
 
 // Basic drop zone
 <DragAndDrop

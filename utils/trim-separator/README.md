@@ -5,7 +5,7 @@ Utility function for cleaning up context menu arrays by removing redundant separ
 ## Usage
 
 ```ts
-import { trimSeparator } from "@docspace/ui-kit/utils/trim-separator";
+import { trimSeparator } from "@onlyoffice/apps-ui-kit/utils/trim-separator";
 
 const menuItems = [
   { key: "edit", label: "Edit" },

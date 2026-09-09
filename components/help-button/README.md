@@ -5,7 +5,7 @@ HelpButton is used for a action on a page
 ### Usage
 
 ```js
-import { HelpButton } from "@docspace/ui-kit";
+import { HelpButton } from "@onlyoffice/apps-ui-kit";
 ```
 
 ```jsx

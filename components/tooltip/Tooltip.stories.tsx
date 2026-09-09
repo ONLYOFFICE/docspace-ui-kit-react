@@ -27,7 +27,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Tooltip } from "@docspace/ui-kit/components/tooltip";
+import { Tooltip } from "@onlyoffice/apps-ui-kit/components/tooltip";
 
 // Basic tooltip
 <Link data-tooltip-id="my-tooltip" data-tooltip-content="Hello!">

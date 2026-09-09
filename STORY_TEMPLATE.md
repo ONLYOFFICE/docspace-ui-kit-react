@@ -41,7 +41,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ComponentName } from "@docspace/ui-kit/components/component-name";
+import { ComponentName } from "@onlyoffice/apps-ui-kit/components/component-name";
 
 // Example usage
 <ComponentName prop1="value" prop2={true} />

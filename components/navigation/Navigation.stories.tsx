@@ -28,7 +28,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import Navigation from "@docspace/ui-kit/components/navigation/Navigation";
+import Navigation from "@onlyoffice/apps-ui-kit/components/navigation/Navigation";
 
 <Navigation
   title="My Documents"

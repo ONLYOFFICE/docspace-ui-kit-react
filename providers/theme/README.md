@@ -15,8 +15,8 @@ Resolves the active theme (light, dark, or system) and provides it to child comp
 ## Usage
 
 ```tsx
-import { ThemeProvider } from "@docspace/ui-kit/providers/theme";
-import { ThemeKeys } from "@docspace/ui-kit/enums";
+import { ThemeProvider } from "@onlyoffice/apps-ui-kit/providers/theme";
+import { ThemeKeys } from "@onlyoffice/apps-ui-kit/enums";
 
 <ThemeProvider initialTheme={ThemeKeys.BaseStr} locale="en">
   <App />

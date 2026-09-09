@@ -16,8 +16,8 @@ A flexible dropdown component for displaying menus, options, and contextual cont
 ## Installation
 
 ```tsx
-import { DropDown } from "@docspace/ui-kit/components/drop-down";
-import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
+import { DropDown } from "@onlyoffice/apps-ui-kit/components/drop-down";
+import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item";
 ```
 
 ## Usage

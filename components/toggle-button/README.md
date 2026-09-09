@@ -5,7 +5,7 @@ A customizable toggle button component that supports various states and styling 
 ## Usage
 
 ```jsx
-import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
+import { ToggleButton } from "@onlyoffice/apps-ui-kit/components/toggle-button";
 
 const MyComponent = () => {
   const [isChecked, setIsChecked] = React.useState(false);

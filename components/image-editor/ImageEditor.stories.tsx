@@ -29,7 +29,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ImageEditor } from "@docspace/ui-kit/components/image-editor";
+import { ImageEditor } from "@onlyoffice/apps-ui-kit/components/image-editor";
 
 // Basic usage
 <ImageEditor

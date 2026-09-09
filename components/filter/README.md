@@ -5,7 +5,7 @@ A compound filter bar component that combines search input, sort controls, view 
 ## Usage
 
 ```tsx
-import { Filter } from "@docspace/ui-kit/components/filter";
+import { Filter } from "@onlyoffice/apps-ui-kit/components/filter";
 
 <Filter
   onSearch={handleSearch}

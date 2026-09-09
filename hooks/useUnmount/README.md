@@ -9,7 +9,7 @@ React hook for executing cleanup functions when a component unmounts.
 ## Usage
 
 ```tsx
-import { useUnmount } from '@docspace/ui-kit/hooks/useUnmount';
+import { useUnmount } from '@onlyoffice/apps-ui-kit/hooks/useUnmount';
 
 function Component() {
   useUnmount(() => {

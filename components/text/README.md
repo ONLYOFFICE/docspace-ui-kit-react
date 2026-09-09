@@ -5,7 +5,7 @@ A flexible and customizable text component for rendering text content with vario
 ## Installation
 
 ```js
-import { Text } from "@docspace/ui-kit";
+import { Text } from "@onlyoffice/apps-ui-kit";
 ```
 
 ## Basic Usage

@@ -24,8 +24,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TableRow } from "@docspace/ui-kit/components/table/table-row";
-import { TableCell } from "@docspace/ui-kit/components/table/sub-components/table-cell";
+import { TableRow } from "@onlyoffice/apps-ui-kit/components/table/table-row";
+import { TableCell } from "@onlyoffice/apps-ui-kit/components/table/sub-components/table-cell";
 
 <TableRow
   checked={isSelected}

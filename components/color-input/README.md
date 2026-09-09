@@ -5,7 +5,7 @@ Color input
 ### Usage
 
 ```js
-import { ColorInput } from "@docspace/ui-kit/components/color-input";
+import { ColorInput } from "@onlyoffice/apps-ui-kit/components/color-input";
 ```
 
 ```jsx

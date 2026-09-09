@@ -22,7 +22,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { CollapsibleCard } from "@docspace/ui-kit/components/collapsible-card";
+import { CollapsibleCard } from "@onlyoffice/apps-ui-kit/components/collapsible-card";
 
 <CollapsibleCard
   title="Already using another platform?"

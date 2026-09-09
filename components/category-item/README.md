@@ -5,7 +5,7 @@ A navigation card component used in settings pages to represent a category with 
 ## Usage
 
 ```tsx
-import { CategoryItem } from "@docspace/ui-kit/components/category-item";
+import { CategoryItem } from "@onlyoffice/apps-ui-kit/components/category-item";
 
 <CategoryItem
   title="General"

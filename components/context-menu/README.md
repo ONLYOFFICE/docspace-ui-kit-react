@@ -5,8 +5,8 @@ Context menu component for displaying contextual actions. Supports submenus, hea
 ## Usage
 
 ```tsx
-import { ContextMenu } from "@docspace/ui-kit/components/context-menu";
-import type { ContextMenuModel, ContextMenuRefType } from "@docspace/ui-kit/components/context-menu";
+import { ContextMenu } from "@onlyoffice/apps-ui-kit/components/context-menu";
+import type { ContextMenuModel, ContextMenuRefType } from "@onlyoffice/apps-ui-kit/components/context-menu";
 
 const menuRef = useRef<ContextMenuRefType>(null);
 

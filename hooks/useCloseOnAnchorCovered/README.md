@@ -7,7 +7,7 @@ Uses a continuous `requestAnimationFrame` loop — catches any cause of position
 ## Basic Usage
 
 ```tsx
-import { useCloseOnAnchorCovered } from "@docspace/ui-kit/hooks/useCloseOnAnchorCovered";
+import { useCloseOnAnchorCovered } from "@onlyoffice/apps-ui-kit/hooks/useCloseOnAnchorCovered";
 
 const MyPopup = ({ anchorRef, onClose }) => {
   useCloseOnAnchorCovered({
@@ -22,7 +22,7 @@ const MyPopup = ({ anchorRef, onClose }) => {
 ## Advanced Usage with Custom Coverage Check
 
 ```tsx
-import { useCloseOnAnchorCovered, isElementCovered } from "@docspace/ui-kit/hooks/useCloseOnAnchorCovered";
+import { useCloseOnAnchorCovered, isElementCovered } from "@onlyoffice/apps-ui-kit/hooks/useCloseOnAnchorCovered";
 
 const MyPopup = ({ anchorRef, onClose }) => {
   const customCoverageCheck = (element: HTMLElement) => {

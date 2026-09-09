@@ -11,7 +11,7 @@ React hook for declaratively managing event listeners with automatic cleanup and
 ### Window Events
 
 ```tsx
-import { useEventListener } from '@docspace/ui-kit/hooks/useEventListener';
+import { useEventListener } from '@onlyoffice/apps-ui-kit/hooks/useEventListener';
 
 function ScrollTracker() {
   useEventListener('scroll', (event) => {
@@ -25,7 +25,7 @@ function ScrollTracker() {
 ### Element Events
 
 ```tsx
-import { useEventListener } from '@docspace/ui-kit/hooks/useEventListener';
+import { useEventListener } from '@onlyoffice/apps-ui-kit/hooks/useEventListener';
 import { useRef } from 'react';
 
 function ClickableBox() {
@@ -46,7 +46,7 @@ function ClickableBox() {
 ### Document Events
 
 ```tsx
-import { useEventListener } from '@docspace/ui-kit/hooks/useEventListener';
+import { useEventListener } from '@onlyoffice/apps-ui-kit/hooks/useEventListener';
 import { useRef } from 'react';
 
 function KeyboardHandler() {
@@ -69,7 +69,7 @@ function KeyboardHandler() {
 ### MediaQueryList Events
 
 ```tsx
-import { useEventListener } from '@docspace/ui-kit/hooks/useEventListener';
+import { useEventListener } from '@onlyoffice/apps-ui-kit/hooks/useEventListener';
 import { useRef, useEffect, useState } from 'react';
 
 function DarkModeDetector() {
@@ -96,7 +96,7 @@ function DarkModeDetector() {
 ### Custom Events
 
 ```tsx
-import { useEventListener } from '@docspace/ui-kit/hooks/useEventListener';
+import { useEventListener } from '@onlyoffice/apps-ui-kit/hooks/useEventListener';
 import { useRef } from 'react';
 
 function CustomEventHandler() {

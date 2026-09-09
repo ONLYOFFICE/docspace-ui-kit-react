@@ -43,7 +43,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TableHeader } from "@docspace/ui-kit/components/table/table-header";
+import { TableHeader } from "@onlyoffice/apps-ui-kit/components/table/table-header";
 
 const ref = useRef<HTMLDivElement>(null);
 

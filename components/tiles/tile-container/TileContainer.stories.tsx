@@ -63,8 +63,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TileContainer } from "@docspace/ui-kit/components/tiles/tile-container";
-import { FileTile } from "@docspace/ui-kit/components/tiles/file-tile";
+import { TileContainer } from "@onlyoffice/apps-ui-kit/components/tiles/tile-container";
+import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
 
 <TileContainer useReactWindow={false} headingFiles="Files">
   <FileTile item={file} element={<WordIcon />} contextOptions={options}>

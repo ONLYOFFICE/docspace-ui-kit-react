@@ -28,7 +28,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { EmptyScreenContainer } from "@docspace/ui-kit/components/empty-screen-container";
+import { EmptyScreenContainer } from "@onlyoffice/apps-ui-kit/components/empty-screen-container";
 
 // With filter reset button
 <EmptyScreenContainer

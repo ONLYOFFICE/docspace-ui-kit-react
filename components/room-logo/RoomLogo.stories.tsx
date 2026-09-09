@@ -23,8 +23,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { RoomLogo } from "@docspace/ui-kit/components/room-logo";
-import { RoomsType } from "@docspace/ui-kit/enums";
+import { RoomLogo } from "@onlyoffice/apps-ui-kit/components/room-logo";
+import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 
 // Basic room logo
 <RoomLogo type={RoomsType.CustomRoom} />

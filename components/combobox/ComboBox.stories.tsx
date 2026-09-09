@@ -43,7 +43,7 @@ The ComboBox component includes the following ARIA attributes:
 ### Usage
 
 \`\`\`tsx
-import { ComboBox, ComboBoxSize } from "@docspace/ui-kit/components/combobox";
+import { ComboBox, ComboBoxSize } from "@onlyoffice/apps-ui-kit/components/combobox";
 
 <ComboBox
   options={[

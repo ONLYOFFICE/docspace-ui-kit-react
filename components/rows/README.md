@@ -5,7 +5,7 @@ A set of components for rendering items in a row-based list layout. Provides `Ro
 ## Usage
 
 ```tsx
-import { Row, RowContent, RowContainer } from "@docspace/ui-kit/components/rows";
+import { Row, RowContent, RowContainer } from "@onlyoffice/apps-ui-kit/components/rows";
 
 <RowContainer>
   <Row
@@ -73,7 +73,7 @@ import { Row, RowContent, RowContainer } from "@docspace/ui-kit/components/rows"
 ### Loading State
 
 ```tsx
-import { RowsSkeleton } from "@docspace/ui-kit/components/rows";
+import { RowsSkeleton } from "@onlyoffice/apps-ui-kit/components/rows";
 
 <RowsSkeleton count={5} />
 ```

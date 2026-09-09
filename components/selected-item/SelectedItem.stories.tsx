@@ -24,7 +24,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { SelectedItem } from "@docspace/ui-kit/components/selected-item";
+import { SelectedItem } from "@onlyoffice/apps-ui-kit/components/selected-item";
 
 // Inline selected item
 <SelectedItem label="Finance" propKey="finance" isInline onClose={handleRemove} />

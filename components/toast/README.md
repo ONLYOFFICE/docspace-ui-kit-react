@@ -9,7 +9,7 @@ Toast allow you to add notification to your page with ease.
 ### Usage
 
 ```js
-import { Toast, toastr } from "@docspace/ui-kit";
+import { Toast, toastr } from "@onlyoffice/apps-ui-kit";
 ```
 
 ```jsx

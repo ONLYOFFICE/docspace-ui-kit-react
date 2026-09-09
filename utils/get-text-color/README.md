@@ -5,7 +5,7 @@ Utility function that determines the optimal text color (black or white) for a g
 ## Usage
 
 ```ts
-import { getTextColor } from "@docspace/ui-kit/utils/get-text-color";
+import { getTextColor } from "@onlyoffice/apps-ui-kit/utils/get-text-color";
 
 // Returns "#333333" (black) for light backgrounds
 const textOnWhite = getTextColor("#ffffff");

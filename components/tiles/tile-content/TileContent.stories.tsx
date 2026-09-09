@@ -35,8 +35,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
-import { BaseTile } from "@docspace/ui-kit/components/tiles/base-tile";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
+import { BaseTile } from "@onlyoffice/apps-ui-kit/components/tiles/base-tile";
 
 <BaseTile item={item} element={icon} topContent={
   <TileContent>

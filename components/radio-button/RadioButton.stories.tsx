@@ -31,7 +31,7 @@ The RadioButton component uses a native \`<input type="radio">\` element for scr
 ### Usage
 
 \`\`\`tsx
-import { RadioButton } from "@docspace/ui-kit/components/radio-button";
+import { RadioButton } from "@onlyoffice/apps-ui-kit/components/radio-button";
 
 // Basic radio button
 <RadioButton name="group" value="option1" label="Option 1" />

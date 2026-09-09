@@ -5,7 +5,7 @@ A component that renders children into a DOM node outside the parent component's
 ## Usage
 
 ```js
-import { Portal } from "@docspace/ui-kit";
+import { Portal } from "@onlyoffice/apps-ui-kit";
 ```
 
 ### Basic Example

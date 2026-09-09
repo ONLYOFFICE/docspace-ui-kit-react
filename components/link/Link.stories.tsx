@@ -28,7 +28,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
+import { Link, LinkType, LinkTarget } from "@onlyoffice/apps-ui-kit/components/link";
 
 // Page link
 <Link type={LinkType.page} href="https://example.com" target={LinkTarget.blank}>

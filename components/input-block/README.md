@@ -5,7 +5,7 @@ A versatile input component that combines a text input with optional icon and ch
 ### Usage
 
 ```js
-import { InputBlock } from "@docspace/ui-kit/components/input-block";
+import { InputBlock } from "@onlyoffice/apps-ui-kit/components/input-block";
 import SearchReactSvgUrl from "PUBLIC_DIR/images/search.react.svg?url";
 ```
 

@@ -22,7 +22,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { LoaderWrapper } from "@docspace/ui-kit/components/loader-wrapper";
+import { LoaderWrapper } from "@onlyoffice/apps-ui-kit/components/loader-wrapper";
 
 <LoaderWrapper isLoading={isLoading}>
   <SectionContent />

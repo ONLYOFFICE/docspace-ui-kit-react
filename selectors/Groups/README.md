@@ -14,7 +14,7 @@ A selector component for choosing user groups from the DocSpace system. Provides
 ## Import
 
 ```tsx
-import GroupsSelector from "@docspace/ui-kit/selectors/Groups";
+import GroupsSelector from "@onlyoffice/apps-ui-kit/selectors/Groups";
 ```
 
 ## Props
@@ -34,7 +34,7 @@ import GroupsSelector from "@docspace/ui-kit/selectors/Groups";
 ## Usage
 
 ```tsx
-import GroupsSelector from "@docspace/ui-kit/selectors/Groups";
+import GroupsSelector from "@onlyoffice/apps-ui-kit/selectors/Groups";
 
 const AssignGroupDialog = () => {
   const handleSubmit = (items) => {

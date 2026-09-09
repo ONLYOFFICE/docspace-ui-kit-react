@@ -5,7 +5,7 @@ A customizable range slider component that supports RTL direction, custom stylin
 ## Usage
 
 ```jsx
-import { Slider } from "@docspace/ui-kit/components/slider";
+import { Slider } from "@onlyoffice/apps-ui-kit/components/slider";
 
 const MyComponent = () => {
   const [value, setValue] = React.useState(50);

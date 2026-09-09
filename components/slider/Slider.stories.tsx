@@ -31,7 +31,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Slider } from "@docspace/ui-kit/components/slider";
+import { Slider } from "@onlyoffice/apps-ui-kit/components/slider";
 
 <Slider min={0} max={100} value={50} onChange={handleChange} />
 

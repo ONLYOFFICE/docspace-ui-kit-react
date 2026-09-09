@@ -9,7 +9,7 @@ React hook for managing CSS-based animation states with custom event dispatching
 ## Usage
 
 ```tsx
-import { useAnimation, AnimationEvents } from '@docspace/ui-kit/hooks/useAnimation';
+import { useAnimation, AnimationEvents } from '@onlyoffice/apps-ui-kit/hooks/useAnimation';
 
 function AnimatedComponent({ isActive }: { isActive: boolean }) {
   const {

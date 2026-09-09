@@ -5,7 +5,7 @@ A versatile label component for form fields that supports required indicators, e
 ## Usage
 
 ```js
-import { Label } from "@docspace/ui-kit";
+import { Label } from "@onlyoffice/apps-ui-kit";
 ```
 
 ### Basic Example

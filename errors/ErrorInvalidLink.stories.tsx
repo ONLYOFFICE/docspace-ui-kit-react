@@ -24,7 +24,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ErrorInvalidLink } from "@docspace/ui-kit/errors";
+import { ErrorInvalidLink } from "@onlyoffice/apps-ui-kit/errors";
 
 <ErrorInvalidLink />
 \`\`\``,

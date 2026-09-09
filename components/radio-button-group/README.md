@@ -5,7 +5,7 @@ The `RadioButtonGroup` component allows you to create a group of radio buttons w
 ### Usage
 
 ```js
-import { RadioButtonGroup } from "@docspace/ui-kit/components/radio-button-group";
+import { RadioButtonGroup } from "@onlyoffice/apps-ui-kit/components/radio-button-group";
 ```
 
 ```jsx

@@ -85,7 +85,7 @@ const meta: Meta<StoryArgs> = {
 ### Usage
 
 \`\`\`tsx
-import RoomSelector from "@docspace/ui-kit/selectors/Room";
+import RoomSelector from "@onlyoffice/apps-ui-kit/selectors/Room";
 
 // Basic single-select
 <RoomSelector

@@ -26,7 +26,7 @@ Inspired by Ant Design Card — all slots accept React nodes, no business logic 
 ### Usage
 
 \`\`\`tsx
-import { Card } from "@docspace/ui-kit/components/card";
+import { Card } from "@onlyoffice/apps-ui-kit/components/card";
 
 <Card
   title="Card title"

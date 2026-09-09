@@ -25,8 +25,8 @@ const meta: Meta<typeof ThemeProvider> = {
 ### Usage
 
 \`\`\`tsx
-import { ThemeProvider } from "@docspace/ui-kit/providers/theme";
-import { ThemeKeys } from "@docspace/ui-kit/enums";
+import { ThemeProvider } from "@onlyoffice/apps-ui-kit/providers/theme";
+import { ThemeKeys } from "@onlyoffice/apps-ui-kit/enums";
 
 <ThemeProvider initialTheme={ThemeKeys.BaseStr}>
   <App />

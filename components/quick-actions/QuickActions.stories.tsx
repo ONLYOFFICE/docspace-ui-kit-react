@@ -48,7 +48,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { QuickActions } from "@docspace/ui-kit/components/quick-actions";
+import { QuickActions } from "@onlyoffice/apps-ui-kit/components/quick-actions";
 
 <QuickActions
   items={[

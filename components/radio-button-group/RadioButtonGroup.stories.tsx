@@ -24,7 +24,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { RadioButtonGroup } from "@docspace/ui-kit/components/radio-button-group";
+import { RadioButtonGroup } from "@onlyoffice/apps-ui-kit/components/radio-button-group";
 
 const options = [
   { value: "option1", label: "Option 1" },

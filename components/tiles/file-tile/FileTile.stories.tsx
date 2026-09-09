@@ -93,8 +93,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { FileTile } from "@docspace/ui-kit/components/tiles/file-tile";
-import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+import { FileTile } from "@onlyoffice/apps-ui-kit/components/tiles/file-tile";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
 
 <FileTile
   item={{ id: "1", title: "Document.docx", fileExst: ".docx", fileType: FileType.Document }}

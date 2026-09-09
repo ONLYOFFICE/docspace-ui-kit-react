@@ -5,7 +5,7 @@ Responsive form field container
 ### Usage
 
 ```js
-import { FieldContainer } from "@docspace/ui-kit/components/field-container";
+import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-container";
 ```
 
 ```jsx

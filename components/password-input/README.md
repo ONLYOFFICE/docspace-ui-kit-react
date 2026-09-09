@@ -5,7 +5,7 @@ Password entry field with advanced capabilities for displaying, validation of co
 ### Usage
 
 ```js
-import { PasswordInput } from "@docspace/ui-kit/components/password-input";
+import { PasswordInput } from "@onlyoffice/apps-ui-kit/components/password-input";
 ```
 
 ```js

@@ -11,7 +11,7 @@ Wrapper component that dims its children and blocks pointer events while an asyn
 ## Usage
 
 ```tsx
-import { LoaderWrapper } from "@docspace/ui-kit/components/loader-wrapper";
+import { LoaderWrapper } from "@onlyoffice/apps-ui-kit/components/loader-wrapper";
 
 <LoaderWrapper isLoading>
   <SectionContent />

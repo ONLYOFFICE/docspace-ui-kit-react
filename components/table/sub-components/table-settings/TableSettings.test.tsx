@@ -16,7 +16,7 @@ const mockColumns = [
   },
 ];
 
-vi.mock("@docspace/ui-kit/components/drop-down", () => ({
+vi.mock("@onlyoffice/apps-ui-kit/components/drop-down", () => ({
   __esModule: true,
   DropDown: ({ open }: { open?: boolean }) => (
     <div data-testid="drop-down" data-open={open}>

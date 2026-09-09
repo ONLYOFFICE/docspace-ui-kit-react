@@ -27,7 +27,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ColorPicker } from "@docspace/ui-kit/components/color-picker";
+import { ColorPicker } from "@onlyoffice/apps-ui-kit/components/color-picker";
 
 // Full picker with buttons
 <ColorPicker

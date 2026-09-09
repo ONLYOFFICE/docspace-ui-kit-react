@@ -35,9 +35,9 @@ If `settings` or `user` are not provided as props, they are fetched automaticall
 ## Usage
 
 ```tsx
-import { Providers } from "@docspace/ui-kit/providers";
-import enCommon from "@docspace/ui-kit/locales/en/Common.json";
-import type { TTranslations } from "@docspace/ui-kit/providers/translation";
+import { Providers } from "@onlyoffice/apps-ui-kit/providers";
+import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
+import type { TTranslations } from "@onlyoffice/apps-ui-kit/providers/translation";
 
 const translations: TTranslations = new Map([
   ["en", new Map([["Common", enCommon]])],

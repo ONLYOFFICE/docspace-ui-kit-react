@@ -5,8 +5,8 @@ A versatile and accessible combo box component that combines a text input with a
 ## Usage
 
 ```tsx
-import { ComboBox, ComboBoxSize, ComboBoxDisplayType } from "@docspace/ui-kit/components/combobox";
-import type { TOption, TComboboxProps } from "@docspace/ui-kit/components/combobox";
+import { ComboBox, ComboBoxSize, ComboBoxDisplayType } from "@onlyoffice/apps-ui-kit/components/combobox";
+import type { TOption, TComboboxProps } from "@onlyoffice/apps-ui-kit/components/combobox";
 
 const options: TOption[] = [
   { key: 1, label: "Option 1" },

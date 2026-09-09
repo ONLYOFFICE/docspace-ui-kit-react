@@ -15,7 +15,7 @@ A versatile button component that displays an icon and handles various interacti
 ## Usage
 
 ```js
-import { IconButton } from "@docspace/ui-kit/components/icon-button";
+import { IconButton } from "@onlyoffice/apps-ui-kit/components/icon-button";
 import SearchReactSvgUrl from "PUBLIC_DIR/images/search.react.svg?url";
 ```
 

@@ -5,7 +5,7 @@ An icon component for MCP (Model Context Protocol) with configurable size option
 ## Usage
 
 ```tsx
-import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
+import { MCPIcon, MCPIconSize } from "@onlyoffice/apps-ui-kit/components/mcp-icon";
 
 // Icon with text fallback
 <MCPIcon

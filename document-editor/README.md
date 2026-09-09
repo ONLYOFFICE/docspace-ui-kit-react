@@ -13,8 +13,8 @@ A React wrapper component for integrating ONLYOFFICE Document Editor into your a
 ## Installation
 
 ```tsx
-import { DocumentEditor } from "@docspace/ui-kit/document-editor";
-import type { IConfig } from "@docspace/ui-kit/document-editor";
+import { DocumentEditor } from "@onlyoffice/apps-ui-kit/document-editor";
+import type { IConfig } from "@onlyoffice/apps-ui-kit/document-editor";
 ```
 
 ## Usage

@@ -5,7 +5,7 @@ Drag And Drop component can be used as Dropzone
 #### See documentation: https://github.com/react-dropzone/react-dropzone
 
 ```js
-import { DragAndDrop } from "@docspace/ui-kit/components/drag-and-drop";
+import { DragAndDrop } from "@onlyoffice/apps-ui-kit/components/drag-and-drop";
 ```
 
 ```jsx

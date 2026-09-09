@@ -5,7 +5,7 @@ Input field for single-line strings with various styling options and features in
 ### Usage
 
 ```js
-import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
+import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/components/text-input";
 ```
 
 ```jsx

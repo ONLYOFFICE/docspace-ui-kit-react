@@ -63,7 +63,7 @@ COPY public/ ./public/
 # Deliberately no CI=true here: copy-locales writes empty locale stubs and
 # copy-images exits early when CI is set, which would ship the image
 # without any assets.
-RUN pnpm --filter @docspace/ui-kit run copy-assets
+RUN pnpm --filter @onlyoffice/apps-ui-kit run copy-assets
 
 WORKDIR /app/libs/ui-kit
 

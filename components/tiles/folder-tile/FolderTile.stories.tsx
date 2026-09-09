@@ -70,8 +70,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { FolderTile } from "@docspace/ui-kit/components/tiles/folder-tile";
-import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+import { FolderTile } from "@onlyoffice/apps-ui-kit/components/tiles/folder-tile";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
 
 <FolderTile
   item={{ id: "1", title: "My Folder", isFolder: true }}

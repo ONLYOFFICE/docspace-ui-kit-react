@@ -27,7 +27,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ProgressBar } from "@docspace/ui-kit/components/progress-bar";
+import { ProgressBar } from "@onlyoffice/apps-ui-kit/components/progress-bar";
 
 // Basic progress
 <ProgressBar percent={50} label="Uploading file..." />

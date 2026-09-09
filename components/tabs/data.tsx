@@ -1,8 +1,8 @@
 import { TTabItem } from "./Tabs.types";
 // import { FileInput } from "../file-input";
 // import { Row } from "../rows";
-// import { Text } from "@docspace/ui-kit/components/text";
-// import { InputSize } from "@docspace/ui-kit/components/text-input";
+// import { Text } from "@onlyoffice/apps-ui-kit/components/text";
+// import { InputSize } from "@onlyoffice/apps-ui-kit/components/text-input";
 
 export const data: TTabItem[] = [
   {

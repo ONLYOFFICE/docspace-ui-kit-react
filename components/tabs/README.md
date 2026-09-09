@@ -3,7 +3,7 @@
 ### Usage
 
 ```js
-import { Tabs } from "@docspace/ui-kit/components/tabs";
+import { Tabs } from "@onlyoffice/apps-ui-kit/components/tabs";
 ```
 
 ```js

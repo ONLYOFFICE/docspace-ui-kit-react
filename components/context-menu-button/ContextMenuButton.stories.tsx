@@ -40,7 +40,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ContextMenuButton, ContextMenuButtonDisplayType } from "@docspace/ui-kit/components/context-menu-button";
+import { ContextMenuButton, ContextMenuButtonDisplayType } from "@onlyoffice/apps-ui-kit/components/context-menu-button";
 
 // Basic context menu button
 <ContextMenuButton

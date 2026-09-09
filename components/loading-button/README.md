@@ -5,7 +5,7 @@ A circular progress button that displays upload/conversion progress as an animat
 ## Usage
 
 ```tsx
-import { LoadingButton } from "@docspace/ui-kit/components/loading-button";
+import { LoadingButton } from "@onlyoffice/apps-ui-kit/components/loading-button";
 
 <LoadingButton
   percent={45}

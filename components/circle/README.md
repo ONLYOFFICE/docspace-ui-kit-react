@@ -5,7 +5,7 @@ Circular skeleton loader component for displaying loading placeholders. Ideal fo
 ## Usage
 
 ```tsx
-import { CircleSkeleton } from "@docspace/ui-kit/components/circle";
+import { CircleSkeleton } from "@onlyoffice/apps-ui-kit/components/circle";
 
 <CircleSkeleton />
 

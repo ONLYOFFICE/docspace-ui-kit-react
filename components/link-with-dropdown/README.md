@@ -18,7 +18,7 @@ Key features:
 ### Usage
 
 ```js
-import { LinkWithDropdown } from "@docspace/ui-kit/components/link-with-dropdown";
+import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-dropdown";
 ```
 
 ```jsx

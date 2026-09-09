@@ -21,7 +21,7 @@ A feature-rich selector component for choosing users and groups from the DocSpac
 ## Import
 
 ```tsx
-import PeopleSelector from "@docspace/ui-kit/selectors/People";
+import PeopleSelector from "@onlyoffice/apps-ui-kit/selectors/People";
 ```
 
 ## Props
@@ -74,7 +74,7 @@ import PeopleSelector from "@docspace/ui-kit/selectors/People";
 ## Usage
 
 ```tsx
-import PeopleSelector from "@docspace/ui-kit/selectors/People";
+import PeopleSelector from "@onlyoffice/apps-ui-kit/selectors/People";
 
 const InviteUsersDialog = () => {
   const handleSubmit = (items, access) => {

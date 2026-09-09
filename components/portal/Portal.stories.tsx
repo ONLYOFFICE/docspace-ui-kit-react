@@ -25,7 +25,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Portal } from "@docspace/ui-kit/components/portal";
+import { Portal } from "@onlyoffice/apps-ui-kit/components/portal";
 
 // Render into document.body
 <Portal element={<div>Portal content</div>} />

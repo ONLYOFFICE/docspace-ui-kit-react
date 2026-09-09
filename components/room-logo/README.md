@@ -13,8 +13,8 @@ Displays a room logo icon based on room type. Supports different room types, arc
 ## Installation
 
 ```tsx
-import { RoomLogo } from "@docspace/ui-kit";
-import { RoomsType } from "@docspace/ui-kit/enums";
+import { RoomLogo } from "@onlyoffice/apps-ui-kit";
+import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 ```
 
 ## Usage
@@ -62,7 +62,7 @@ import { RoomsType } from "@docspace/ui-kit/enums";
 The `RoomsType` enum provides the following room types:
 
 ```tsx
-import { RoomsType } from "@docspace/ui-kit/enums";
+import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 
 RoomsType.EditingRoom     // Collaboration/editing room
 RoomsType.CustomRoom      // Custom room
@@ -77,8 +77,8 @@ RoomsType.AIRoom          // AI room
 ### Room List with Selection
 
 ```tsx
-import { RoomLogo } from "@docspace/ui-kit";
-import { RoomsType } from "@docspace/ui-kit/enums";
+import { RoomLogo } from "@onlyoffice/apps-ui-kit";
+import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 
 const RoomList = ({ rooms, selectedIds, onSelect }) => (
   <ul>

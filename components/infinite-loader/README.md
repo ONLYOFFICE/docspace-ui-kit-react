@@ -5,7 +5,7 @@ A virtualized infinite-scrolling component that renders children in either a lis
 ## Usage
 
 ```tsx
-import { InfiniteLoaderComponent } from "@docspace/ui-kit/components/infinite-loader";
+import { InfiniteLoaderComponent } from "@onlyoffice/apps-ui-kit/components/infinite-loader";
 
 <InfiniteLoaderComponent
   viewAs="row"

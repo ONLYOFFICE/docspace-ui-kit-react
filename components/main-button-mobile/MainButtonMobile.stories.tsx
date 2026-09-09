@@ -76,7 +76,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { MainButtonMobile } from "@docspace/ui-kit/components/main-button-mobile";
+import { MainButtonMobile } from "@onlyoffice/apps-ui-kit/components/main-button-mobile";
 
 // Basic mobile button with dropdown
 <MainButtonMobile

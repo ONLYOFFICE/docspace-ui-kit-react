@@ -16,7 +16,7 @@ A versatile button component for triggering actions on a page. Supports multiple
 ## Installation
 
 ```tsx
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
+import { Button, ButtonSize } from "@onlyoffice/apps-ui-kit/components/button";
 ```
 
 ## Usage

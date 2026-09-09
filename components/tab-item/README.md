@@ -5,7 +5,7 @@ A component used for creating tab navigation interfaces with support for active 
 ## Installation
 
 ```bash
-import { TabItem } from "@docspace/ui-kit/components/tab-item";
+import { TabItem } from "@onlyoffice/apps-ui-kit/components/tab-item";
 ```
 
 ## Usage

@@ -24,7 +24,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import ErrorUnavailable from "@docspace/ui-kit/errors/ErrorUnavailable";
+import ErrorUnavailable from "@onlyoffice/apps-ui-kit/errors/ErrorUnavailable";
 
 <ErrorUnavailable />
 \`\`\``,

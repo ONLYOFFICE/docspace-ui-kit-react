@@ -48,8 +48,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { SearchInput } from "@docspace/ui-kit/components/search-input";
-import { InputSize } from "@docspace/ui-kit/components/text-input";
+import { SearchInput } from "@onlyoffice/apps-ui-kit/components/search-input";
+import { InputSize } from "@onlyoffice/apps-ui-kit/components/text-input";
 
 <SearchInput
   size={InputSize.base}

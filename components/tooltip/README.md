@@ -5,7 +5,7 @@ A customizable tooltip component built on top of [react-tooltip](https://react-t
 ## Usage
 
 ```js
-import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
+import { Tooltip, TooltipContainer, withTooltip } from "@onlyoffice/apps-ui-kit/components/tooltip";
 ```
 
 ### Basic Usage
@@ -62,7 +62,7 @@ import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/compone
 The `withTooltip` higher-order component wraps any component to add tooltip functionality.
 
 ```jsx
-import { withTooltip } from "@docspace/ui-kit/components/tooltip";
+import { withTooltip } from "@onlyoffice/apps-ui-kit/components/tooltip";
 
 const MyButton = React.forwardRef((props, ref) => (
   <button ref={ref} {...props}>
@@ -81,7 +81,7 @@ const ButtonWithTooltip = withTooltip(MyButton);
 For global tooltip support, add `RootTooltip` to your app root.
 
 ```jsx
-import { RootTooltip } from "@docspace/ui-kit/components/tooltip";
+import { RootTooltip } from "@onlyoffice/apps-ui-kit/components/tooltip";
 
 function App() {
   return (
@@ -162,5 +162,5 @@ import type {
   TFallbackAxisSideDirection,
   TGetTooltipContent,
   WithTooltipProps,
-} from "@docspace/ui-kit/components/tooltip";
+} from "@onlyoffice/apps-ui-kit/components/tooltip";
 ```

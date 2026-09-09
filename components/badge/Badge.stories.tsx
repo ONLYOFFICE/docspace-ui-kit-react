@@ -33,7 +33,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Badge } from "@docspace/ui-kit/components/badge";
+import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
 
 // Notification count
 <Badge label={5} />

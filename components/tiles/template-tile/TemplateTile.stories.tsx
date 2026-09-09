@@ -181,8 +181,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TemplateTile } from "@docspace/ui-kit/components/tiles/template-tile";
-import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+import { TemplateTile } from "@onlyoffice/apps-ui-kit/components/tiles/template-tile";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
 
 <TemplateTile
   item={{ id: "1", title: "Sample Template", createdBy: { id: "u1", displayName: "John" } }}

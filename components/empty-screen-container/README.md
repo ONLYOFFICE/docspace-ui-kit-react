@@ -13,7 +13,7 @@ A component for displaying empty states in the application. Use it to show infor
 ## Installation
 
 ```tsx
-import { EmptyScreenContainer } from "@docspace/ui-kit";
+import { EmptyScreenContainer } from "@onlyoffice/apps-ui-kit";
 ```
 
 ## Usage
@@ -75,8 +75,8 @@ import { EmptyScreenContainer } from "@docspace/ui-kit";
 ### Filter Empty State
 
 ```tsx
-import { EmptyScreenContainer } from "@docspace/ui-kit";
-import { Link, LinkType } from "@docspace/ui-kit";
+import { EmptyScreenContainer } from "@onlyoffice/apps-ui-kit";
+import { Link, LinkType } from "@onlyoffice/apps-ui-kit";
 import CrossIcon from "PUBLIC_DIR/images/icons/12/cross.react.svg";
 
 const FilterEmptyState = () => (
@@ -101,8 +101,8 @@ const FilterEmptyState = () => (
 ### Welcome Empty State
 
 ```tsx
-import { EmptyScreenContainer } from "@docspace/ui-kit";
-import { Button } from "@docspace/ui-kit";
+import { EmptyScreenContainer } from "@onlyoffice/apps-ui-kit";
+import { Button } from "@onlyoffice/apps-ui-kit";
 
 const WelcomeEmptyState = () => (
   <EmptyScreenContainer

@@ -5,7 +5,7 @@ Time input
 ### Usage
 
 ```js
-import { TimePicker } from "@docspace/ui-kit";
+import { TimePicker } from "@onlyoffice/apps-ui-kit";
 ```
 
 ```jsx

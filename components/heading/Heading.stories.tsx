@@ -25,7 +25,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
+import { Heading, HeadingLevel, HeadingSize } from "@onlyoffice/apps-ui-kit/components/heading";
 
 // Basic heading
 <Heading level={HeadingLevel.h1} size={HeadingSize.large}>Page Title</Heading>

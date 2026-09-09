@@ -5,7 +5,7 @@ A file upload area that supports drag-and-drop. Built on top of `react-dropzone`
 ## Usage
 
 ```tsx
-import Dropzone from "@docspace/ui-kit/components/dropzone";
+import Dropzone from "@onlyoffice/apps-ui-kit/components/dropzone";
 
 <Dropzone
   isLoading={false}

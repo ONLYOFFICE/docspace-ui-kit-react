@@ -26,7 +26,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { SelectionArea } from "@docspace/ui-kit/components/selection-area";
+import { SelectionArea } from "@onlyoffice/apps-ui-kit/components/selection-area";
 
 <SelectionArea
   viewAs="tile"

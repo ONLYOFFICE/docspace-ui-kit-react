@@ -22,7 +22,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { GroupMenuItem } from "@docspace/ui-kit/components/table/sub-components/group-menu-item";
+import { GroupMenuItem } from "@onlyoffice/apps-ui-kit/components/table/sub-components/group-menu-item";
 
 <GroupMenuItem
   item={{

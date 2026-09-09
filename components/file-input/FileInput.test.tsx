@@ -18,7 +18,7 @@ vi.mock("react-i18next", () => ({
 }));
 
 // Mock toastr
-vi.mock("@docspace/ui-kit/components/toast", () => ({
+vi.mock("@onlyoffice/apps-ui-kit/components/toast", () => ({
   toastr: {
     error: vi.fn(),
   },

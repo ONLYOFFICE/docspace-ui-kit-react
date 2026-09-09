@@ -258,7 +258,7 @@ export default [
 				// One stylesheet, not styles injected by JS at import time.
 				// Injection has no SSR story -- four of the monorepo apps are
 				// Next.js -- and it is what pulled `style-inject` into dist.
-				// Consumers import "@onlyoffice/docspace-ui-kit/styles.css".
+				// Consumers import "@onlyoffice/apps-ui-kit/styles.css".
 				extract: STYLESHEET,
 				minimize: true,
 				use: [
@@ -276,7 +276,7 @@ export default [
 	// Declarations are emitted by `tsc -p tsconfig.build.json`, not bundled by
 	// rollup-plugin-dts. The bundled form collapsed the whole library into a
 	// single dist/types/index.d.ts, so a deep import such as
-	// "@onlyoffice/docspace-ui-kit/components/text" resolved JavaScript but no
+	// "@onlyoffice/apps-ui-kit/components/text" resolved JavaScript but no
 	// types at all. tsc mirrors the source tree instead, matching the
 	// preserveModules layout the JS output already uses.
 ];

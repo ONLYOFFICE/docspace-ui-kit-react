@@ -26,7 +26,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Tags } from "@docspace/ui-kit/components/tags";
+import { Tags } from "@onlyoffice/apps-ui-kit/components/tags";
 
 // Simple string tags
 <Tags tags={["Design", "Development"]} columnCount={2} onSelectTag={handleSelect} />

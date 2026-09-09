@@ -101,7 +101,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import Filter from "@docspace/ui-kit/components/filter";
+import Filter from "@onlyoffice/apps-ui-kit/components/filter";
 
 <Filter
   placeholder="Search..."

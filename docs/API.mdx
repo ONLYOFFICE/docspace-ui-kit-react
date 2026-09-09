@@ -10,7 +10,7 @@ It wraps the `@onlyoffice/docspace-api-sdk` and authenticates requests with a Be
 ## Setting up ApiProvider
 
 ```tsx
-import { ApiProvider } from "@docspace/ui-kit/providers/api";
+import { ApiProvider } from "@onlyoffice/apps-ui-kit/providers/api";
 
 <ApiProvider url="https://your-docspace.com/api" apiKey="your-api-key">
   <App />
@@ -20,7 +20,7 @@ import { ApiProvider } from "@docspace/ui-kit/providers/api";
 Or use the composite `Providers` component that includes API, translation, and theme providers:
 
 ```tsx
-import { Providers } from "@docspace/ui-kit/providers";
+import { Providers } from "@onlyoffice/apps-ui-kit/providers";
 
 <Providers url="https://your-docspace.com/api" apiKey="your-api-key" locale="en">
   <App />
@@ -37,7 +37,7 @@ import { Providers } from "@docspace/ui-kit/providers";
 Use the `useApi` hook to access API services:
 
 ```tsx
-import { useApi } from "@docspace/ui-kit/providers/api";
+import { useApi } from "@onlyoffice/apps-ui-kit/providers/api";
 
 function MyComponent() {
   const { profilesApi, commonSettingsApi } = useApi();

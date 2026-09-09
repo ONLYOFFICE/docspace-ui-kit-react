@@ -25,7 +25,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { AddButton } from "@docspace/ui-kit/components/add-button";
+import { AddButton } from "@onlyoffice/apps-ui-kit/components/add-button";
 
 // Basic add button
 <AddButton title="Add item" onClick={handleAdd} />

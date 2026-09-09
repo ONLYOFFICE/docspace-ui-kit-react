@@ -37,7 +37,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ModalDialog } from "@docspace/ui-kit/components/modal-dialog";
+import { ModalDialog } from "@onlyoffice/apps-ui-kit/components/modal-dialog";
 
 <ModalDialog visible={isVisible} onClose={handleClose}>
   <ModalDialog.Header>Title</ModalDialog.Header>

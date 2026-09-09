@@ -19,7 +19,7 @@ A selector component for choosing rooms from the DocSpace system. Supports singl
 ## Import
 
 ```tsx
-import RoomSelector from "@docspace/ui-kit/selectors/Room";
+import RoomSelector from "@onlyoffice/apps-ui-kit/selectors/Room";
 ```
 
 ## Props
@@ -67,7 +67,7 @@ import RoomSelector from "@docspace/ui-kit/selectors/Room";
 ### Single Select
 
 ```tsx
-import RoomSelector from "@docspace/ui-kit/selectors/Room";
+import RoomSelector from "@onlyoffice/apps-ui-kit/selectors/Room";
 
 const SelectRoomDialog = () => {
   const handleSubmit = (items) => {
@@ -98,7 +98,7 @@ const SelectRoomDialog = () => {
 ### Multi Select with Pre-selection
 
 ```tsx
-import RoomSelector from "@docspace/ui-kit/selectors/Room";
+import RoomSelector from "@onlyoffice/apps-ui-kit/selectors/Room";
 
 const GroupingPanel = () => {
   return (

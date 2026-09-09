@@ -5,7 +5,7 @@ A component for displaying animated status messages with error and warning style
 ## Installation
 
 ```js
-import { StatusMessage } from "@docspace/ui-kit";
+import { StatusMessage } from "@onlyoffice/apps-ui-kit";
 ```
 
 ## Basic Usage

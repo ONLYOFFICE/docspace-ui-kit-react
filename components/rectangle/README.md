@@ -5,7 +5,7 @@ Rectangular skeleton loader component for displaying loading placeholders. Ideal
 ## Usage
 
 ```tsx
-import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
+import { RectangleSkeleton } from "@onlyoffice/apps-ui-kit/components/rectangle";
 
 <RectangleSkeleton />
 

@@ -27,7 +27,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ColorInput } from "@docspace/ui-kit/components/color-input";
+import { ColorInput } from "@onlyoffice/apps-ui-kit/components/color-input";
 
 <ColorInput
   defaultColor="#4781D1"

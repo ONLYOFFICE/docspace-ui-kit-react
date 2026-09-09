@@ -24,7 +24,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Error401 } from "@docspace/ui-kit/errors";
+import { Error401 } from "@onlyoffice/apps-ui-kit/errors";
 
 <Error401 />
 \`\`\``,

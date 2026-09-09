@@ -26,7 +26,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { HelpButton } from "@docspace/ui-kit/components/help-button";
+import { HelpButton } from "@onlyoffice/apps-ui-kit/components/help-button";
 
 // Basic help button
 <HelpButton tooltipContent={<div>Help text here</div>} />

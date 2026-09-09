@@ -22,7 +22,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TableHeaderCell } from "@docspace/ui-kit/components/table/sub-components/table-header-cell";
+import { TableHeaderCell } from "@onlyoffice/apps-ui-kit/components/table/sub-components/table-header-cell";
 
 <TableHeaderCell
   column={{

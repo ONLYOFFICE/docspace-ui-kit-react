@@ -32,7 +32,7 @@ const meta: Meta<StoryArgs> = {
 ### Usage
 
 \`\`\`tsx
-import AIAgentSelector from "@docspace/ui-kit/selectors/AIAgent";
+import AIAgentSelector from "@onlyoffice/apps-ui-kit/selectors/AIAgent";
 
 // Live API mode
 <AIAgentSelector

@@ -5,7 +5,7 @@ A versatile badge component used for displaying notifications, status markers, o
 ## Usage
 
 ```jsx
-import { Badge } from "@docspace/ui-kit/components/badge";
+import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
 
 const MyComponent = () => {
   return (

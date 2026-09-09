@@ -27,7 +27,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { RoomIcon } from "@docspace/ui-kit/components/room-icon";
+import { RoomIcon } from "@onlyoffice/apps-ui-kit/components/room-icon";
 
 // Basic room icon
 <RoomIcon title="My Room" color="4781D1" size="48px" showDefault />

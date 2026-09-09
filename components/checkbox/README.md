@@ -5,7 +5,7 @@ A customizable checkbox input component with support for checked, indeterminate,
 ### Usage
 
 ```js
-import { Checkbox } from "@docspace/ui-kit/components/checkbox";
+import { Checkbox } from "@onlyoffice/apps-ui-kit/components/checkbox";
 ```
 
 Basic usage:

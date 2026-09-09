@@ -26,7 +26,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import OperationsProgressButton from "@docspace/ui-kit/components/operations-progress-button";
+import OperationsProgressButton from "@onlyoffice/apps-ui-kit/components/operations-progress-button";
 
 // Single upload operation
 <OperationsProgressButton

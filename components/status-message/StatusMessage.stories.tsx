@@ -27,7 +27,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import StatusMessage from "@docspace/ui-kit/components/status-message";
+import StatusMessage from "@onlyoffice/apps-ui-kit/components/status-message";
 
 // Error message
 <StatusMessage message="Invalid email address" />

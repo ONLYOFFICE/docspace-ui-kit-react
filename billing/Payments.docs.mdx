@@ -50,7 +50,7 @@ Handles tariff plans, wallet operations, payment methods, and service subscripti
 Every payment page must be wrapped in `BillingRoot`, which provides the store context:
 
 ```tsx
-import { BillingRoot, MainTariff } from "@docspace/ui-kit/billing";
+import { BillingRoot, MainTariff } from "@onlyoffice/apps-ui-kit/billing";
 
 <BillingRoot
   config={{
@@ -77,7 +77,7 @@ Main billing page. Shows the current tariff plan with a pricing slider for adjus
 **Non-payer admins:** the pricing slider is disabled and upgrade/downgrade actions are hidden. The page is read-only — only the payer can modify the tariff.
 
 ```tsx
-import { BillingRoot, MainTariff } from "@docspace/ui-kit/billing";
+import { BillingRoot, MainTariff } from "@onlyoffice/apps-ui-kit/billing";
 
 <BillingRoot config={config}>
   <MainTariff />
@@ -95,7 +95,7 @@ Portal wallet — the central balance used to pay for all DocSpace services (AI 
 <Story of={PaymentsStories.Wallet} />
 
 ```tsx
-import { BillingRoot, Wallet } from "@docspace/ui-kit/billing";
+import { BillingRoot, Wallet } from "@onlyoffice/apps-ui-kit/billing";
 
 <BillingRoot config={config}>
   <Wallet showPortalSettingsLoader={false} />
@@ -124,7 +124,7 @@ Payment card and payer management page. Adapts to multiple states:
 <Story of={PaymentsStories.Method} />
 
 ```tsx
-import { BillingRoot, PaymentMethod } from "@docspace/ui-kit/billing";
+import { BillingRoot, PaymentMethod } from "@onlyoffice/apps-ui-kit/billing";
 
 <BillingRoot config={config}>
   <PaymentMethod />
@@ -148,7 +148,7 @@ Service subscription management with three service cards:
 <Story of={PaymentsStories.Services} />
 
 ```tsx
-import { BillingRoot, ServicesList } from "@docspace/ui-kit/billing";
+import { BillingRoot, ServicesList } from "@onlyoffice/apps-ui-kit/billing";
 
 <BillingRoot config={config}>
   <ServicesList

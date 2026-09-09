@@ -5,11 +5,11 @@ Sidebar navigation menu with collapsible groups and sub-items. Supports light/da
 ## Usage
 
 ```tsx
-import { NavMenu } from "@docspace/ui-kit/components/nav-menu";
-import type { NavMenuGroup } from "@docspace/ui-kit/components/nav-menu";
+import { NavMenu } from "@onlyoffice/apps-ui-kit/components/nav-menu";
+import type { NavMenuGroup } from "@onlyoffice/apps-ui-kit/components/nav-menu";
 
-import FolderIconUrl from "@docspace/ui-kit/assets/icons/16/catalog.folder.react.svg?url";
-import TrashIconUrl from "@docspace/ui-kit/assets/icons/16/catalog.trash.react.svg?url";
+import FolderIconUrl from "@onlyoffice/apps-ui-kit/assets/icons/16/catalog.folder.react.svg?url";
+import TrashIconUrl from "@onlyoffice/apps-ui-kit/assets/icons/16/catalog.trash.react.svg?url";
 
 const groups: NavMenuGroup[] = [
   {

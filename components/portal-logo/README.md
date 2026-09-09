@@ -5,7 +5,7 @@ The Portal Logo component is a reusable React component responsible for renderin
 ## Usage
 
 ```js
-import PortalLogo from "@docspace/ui-kit/components/portal-logo";
+import PortalLogo from "@onlyoffice/apps-ui-kit/components/portal-logo";
 ```
 
 ```jsx

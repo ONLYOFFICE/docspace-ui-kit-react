@@ -34,8 +34,8 @@ The Tabs component supports keyboard navigation for switching between tabs using
 ### Usage
 
 \`\`\`tsx
-import { Tabs } from "@docspace/ui-kit/components/tabs";
-import { TabsTypes } from "@docspace/ui-kit/components/tabs/Tabs.enums";
+import { Tabs } from "@onlyoffice/apps-ui-kit/components/tabs";
+import { TabsTypes } from "@onlyoffice/apps-ui-kit/components/tabs/Tabs.enums";
 
 // Primary tabs
 <Tabs

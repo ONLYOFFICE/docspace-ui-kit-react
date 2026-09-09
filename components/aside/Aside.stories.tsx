@@ -32,7 +32,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Aside } from "@docspace/ui-kit/components/aside";
+import { Aside } from "@onlyoffice/apps-ui-kit/components/aside";
 
 <Aside visible={isVisible} header="Panel Title" onClose={handleClose}>
   <div>Panel content here</div>

@@ -5,7 +5,7 @@ A styled container component that wraps form content with consistent padding, ba
 ## Usage
 
 ```tsx
-import { FormWrapper } from "@docspace/ui-kit/components/form-wrapper";
+import { FormWrapper } from "@onlyoffice/apps-ui-kit/components/form-wrapper";
 
 <FormWrapper>
   <Input placeholder="Email" />

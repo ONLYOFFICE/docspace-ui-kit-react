@@ -28,7 +28,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Label } from "@docspace/ui-kit/components/label";
+import { Label } from "@onlyoffice/apps-ui-kit/components/label";
 
 // Basic label
 <Label text="First name" htmlFor="firstName" />

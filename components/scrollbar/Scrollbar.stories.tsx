@@ -23,7 +23,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
+import { Scrollbar } from "@onlyoffice/apps-ui-kit/components/scrollbar";
 
 <Scrollbar style={{ width: 300, height: 200 }}>
   <p>Scrollable content here...</p>

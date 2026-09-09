@@ -5,7 +5,7 @@ A customizable search input component that provides various features like auto-r
 ## Usage
 
 ```js
-import { SearchInput } from "@docspace/ui-kit/components/search-input";
+import { SearchInput } from "@onlyoffice/apps-ui-kit/components/search-input";
 ```
 
 ### Basic Example

@@ -12,7 +12,7 @@ You can change the CSS styles in the theme, and they will be applied to all chil
 ### Usage
 
 ```tsx
-import ThemeProvider from "@docspace/ui-kit/components/theme-provider";
+import ThemeProvider from "@onlyoffice/apps-ui-kit/components/theme-provider";
 import { Base, Dark } from "@docspace/shared/themes";
 
 // Basic usage with default theme

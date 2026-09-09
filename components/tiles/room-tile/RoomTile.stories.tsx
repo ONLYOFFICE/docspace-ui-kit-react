@@ -69,8 +69,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { RoomTile } from "@docspace/ui-kit/components/tiles/room-tile";
-import { TileContent } from "@docspace/ui-kit/components/tiles/tile-content";
+import { RoomTile } from "@onlyoffice/apps-ui-kit/components/tiles/room-tile";
+import { TileContent } from "@onlyoffice/apps-ui-kit/components/tiles/tile-content";
 
 <RoomTile
   item={{ id: "1", title: "Sample Room", roomType: "collaboration", tags: [] }}

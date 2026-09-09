@@ -27,7 +27,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TimePicker } from "@docspace/ui-kit/components/time-picker";
+import { TimePicker } from "@onlyoffice/apps-ui-kit/components/time-picker";
 
 // Basic usage
 <TimePicker

@@ -28,7 +28,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { SnackBar } from "@docspace/ui-kit/components/snackbar";
+import { SnackBar } from "@onlyoffice/apps-ui-kit/components/snackbar";
 
 // Basic snackbar
 <SnackBar

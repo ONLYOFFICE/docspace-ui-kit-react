@@ -25,7 +25,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Dropzone } from "@docspace/ui-kit/components/dropzone";
+import { Dropzone } from "@onlyoffice/apps-ui-kit/components/dropzone";
 
 // Basic file upload
 <Dropzone

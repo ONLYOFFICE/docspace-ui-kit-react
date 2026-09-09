@@ -3,7 +3,7 @@
 ### Usage
 
 ```js
-import { SelectedItem } from "@docspace/ui-kit/components/selected-item";
+import { SelectedItem } from "@onlyoffice/apps-ui-kit/components/selected-item";
 ```
 
 ```jsx

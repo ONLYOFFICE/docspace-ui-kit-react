@@ -31,7 +31,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { LinkWithDropdown } from "@docspace/ui-kit/components/link-with-dropdown";
+import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-dropdown";
 
 <LinkWithDropdown
   data={[

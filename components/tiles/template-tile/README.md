@@ -5,7 +5,7 @@ Template tile component for displaying template information in a tile format wit
 ## Usage
 
 ```tsx
-import { TemplateTile } from "@docspace/ui-kit/components/tiles/template-tile";
+import { TemplateTile } from "@onlyoffice/apps-ui-kit/components/tiles/template-tile";
 
 <TemplateTile
   item={{

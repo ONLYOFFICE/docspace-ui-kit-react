@@ -5,7 +5,7 @@ The top navigation bar component that displays the current folder path with brea
 ## Usage
 
 ```tsx
-import { Navigation } from "@docspace/ui-kit/components/navigation";
+import { Navigation } from "@onlyoffice/apps-ui-kit/components/navigation";
 
 <Navigation
   title="My Documents"

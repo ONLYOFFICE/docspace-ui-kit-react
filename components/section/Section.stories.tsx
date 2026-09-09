@@ -37,7 +37,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import Section from "@docspace/ui-kit/components/section";
+import Section from "@onlyoffice/apps-ui-kit/components/section";
 
 <Section currentDeviceType={DeviceType.desktop} withBodyScroll>
   <Section.SectionHeader>

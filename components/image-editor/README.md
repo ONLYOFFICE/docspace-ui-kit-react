@@ -5,7 +5,7 @@ A component for uploading, cropping, and previewing images. Combines an image cr
 ## Usage
 
 ```tsx
-import { ImageEditor } from "@docspace/ui-kit/components/image-editor";
+import { ImageEditor } from "@onlyoffice/apps-ui-kit/components/image-editor";
 
 <ImageEditor
   t={t}

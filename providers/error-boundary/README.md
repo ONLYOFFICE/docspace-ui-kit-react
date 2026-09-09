@@ -17,7 +17,7 @@ Catches JavaScript errors anywhere in the child component tree and renders a fal
 When no `fallback` is provided, a built-in `ErrorContainer` is rendered with the error message.
 
 ```tsx
-import { ErrorBoundary } from "@docspace/ui-kit/providers/error-boundary";
+import { ErrorBoundary } from "@onlyoffice/apps-ui-kit/providers/error-boundary";
 
 <ErrorBoundary>
   <App />

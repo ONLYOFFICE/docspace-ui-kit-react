@@ -38,11 +38,11 @@ Translation files live in `locales/<lang>/Common.json`. Import the ones you need
 
 ```ts
 // Single language
-import enCommon from "@docspace/ui-kit/locales/en/Common.json";
+import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
 
 // Multiple languages
-import frCommon from "@docspace/ui-kit/locales/fr/Common.json";
-import deCommon from "@docspace/ui-kit/locales/de/Common.json";
+import frCommon from "@onlyoffice/apps-ui-kit/locales/fr/Common.json";
+import deCommon from "@onlyoffice/apps-ui-kit/locales/de/Common.json";
 ```
 
 Available locales: `ar-SA`, `az`, `bg`, `cs`, `de`, `el-GR`, `en`, `es`, `fi`, `fr`, `hy-AM`, `it`, `ja-JP`, `ko-KR`, `lo-LA`, `lv`, `nl`, `pl`, `pt`, `pt-BR`, `ro`, `ru`, `si`, `sk`, `sl`, `sq-AL`, `sr-Cyrl-RS`, `sr-Latn-RS`, `tr`, `uk-UA`, `vi`, `zh-CN`.
@@ -50,7 +50,7 @@ Available locales: `ar-SA`, `az`, `bg`, `cs`, `de`, `el-GR`, `en`, `es`, `fi`, `
 ### Step 2 — Import the `TTranslations` type
 
 ```ts
-import type { TTranslations } from "@docspace/ui-kit/providers/translation";
+import type { TTranslations } from "@onlyoffice/apps-ui-kit/providers/translation";
 ```
 
 ### Step 3 — Build the translations Map
@@ -74,7 +74,7 @@ const translations: TTranslations = new Map([
 ### Step 4 — Pass translations to the provider
 
 ```tsx
-import { TranslationProvider } from "@docspace/ui-kit/providers/translation";
+import { TranslationProvider } from "@onlyoffice/apps-ui-kit/providers/translation";
 
 <TranslationProvider translations={translations} locale="en">
   <App />
@@ -84,12 +84,12 @@ import { TranslationProvider } from "@docspace/ui-kit/providers/translation";
 ### Full example
 
 ```tsx
-import { TranslationProvider } from "@docspace/ui-kit/providers/translation";
-import type { TTranslations } from "@docspace/ui-kit/providers/translation";
+import { TranslationProvider } from "@onlyoffice/apps-ui-kit/providers/translation";
+import type { TTranslations } from "@onlyoffice/apps-ui-kit/providers/translation";
 import { useTranslation } from "react-i18next";
 
-import enCommon from "@docspace/ui-kit/locales/en/Common.json";
-import frCommon from "@docspace/ui-kit/locales/fr/Common.json";
+import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
+import frCommon from "@onlyoffice/apps-ui-kit/locales/fr/Common.json";
 
 const translations: TTranslations = new Map([
   ["en", new Map([["Common", enCommon]])],

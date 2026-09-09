@@ -29,8 +29,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { DropDown } from "@docspace/ui-kit/components/drop-down";
-import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
+import { DropDown } from "@onlyoffice/apps-ui-kit/components/drop-down";
+import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item";
 
 const [isOpen, setIsOpen] = useState(false);
 const buttonRef = useRef<HTMLButtonElement>(null);

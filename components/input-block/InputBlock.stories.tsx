@@ -31,8 +31,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { InputBlock } from "@docspace/ui-kit/components/input-block";
-import { InputSize, InputType } from "@docspace/ui-kit/components/text-input";
+import { InputBlock } from "@onlyoffice/apps-ui-kit/components/input-block";
+import { InputSize, InputType } from "@onlyoffice/apps-ui-kit/components/text-input";
 
 <InputBlock
   type={InputType.text}

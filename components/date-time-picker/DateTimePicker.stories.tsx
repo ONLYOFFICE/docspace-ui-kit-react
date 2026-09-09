@@ -57,7 +57,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { DateTimePicker } from "@docspace/ui-kit/components/date-time-picker";
+import { DateTimePicker } from "@onlyoffice/apps-ui-kit/components/date-time-picker";
 
 // Basic usage
 <DateTimePicker

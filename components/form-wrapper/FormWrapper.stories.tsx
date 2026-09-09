@@ -22,7 +22,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { FormWrapper } from "@docspace/ui-kit/components/form-wrapper";
+import { FormWrapper } from "@onlyoffice/apps-ui-kit/components/form-wrapper";
 
 <FormWrapper>
   <Input placeholder="Email" />

@@ -22,7 +22,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
+import { MCPIcon, MCPIconSize } from "@onlyoffice/apps-ui-kit/components/mcp-icon";
 
 // With title initial
 <MCPIcon title="DocSpace MCP" size={MCPIconSize.Large} />

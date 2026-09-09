@@ -22,7 +22,7 @@ The current state is persisted in \`localStorage\` under the key \`useDocSpace\`
 ### Usage
 
 \`\`\`tsx
-import { HomeViewToggle } from "@docspace/ui-kit/components/home-view-toggle";
+import { HomeViewToggle } from "@onlyoffice/apps-ui-kit/components/home-view-toggle";
 
 // In a React Router context — pass navigate to avoid a full reload
 <HomeViewToggle onNavigate={(url) => navigate(url)} />

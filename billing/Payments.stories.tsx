@@ -78,7 +78,7 @@ import {
   Wallet,
   PaymentMethod,
   ServicesList,
-} from "@docspace/ui-kit/billing";
+} from "@onlyoffice/apps-ui-kit/billing";
 
 // Wrap any payment page in BillingRoot
 <BillingRoot config={{

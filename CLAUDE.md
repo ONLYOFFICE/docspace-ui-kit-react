@@ -1,10 +1,10 @@
 ## Project Overview
 
-`@docspace/ui-kit` — shared React component library used across all DocSpace frontend
+`@onlyoffice/apps-ui-kit` — shared React component library used across all DocSpace frontend
 products (client, login, doceditor, management, sdk). Consumed as a local workspace
 dependency: the six apps resolve it to the **source root**, not to `dist`.
 
-Being separated for publication as `@onlyoffice/docspace-ui-kit`. That work is in progress
+Being separated for publication as `@onlyoffice/apps-ui-kit`. That work is in progress
 on `feature/ui-kit-separation` and changes several things this file used to state as
 permanent — see `docs/public-api.md` for the published surface and the tiering of public
 versus portal-internal modules.

@@ -38,7 +38,7 @@ These attributes help users of assistive technologies better understand the butt
 ### Usage
 
 \`\`\`tsx
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
+import { Button, ButtonSize } from "@onlyoffice/apps-ui-kit/components/button";
 
 // Primary button
 <Button primary size={ButtonSize.normal} label="Save" onClick={handleSave} />

@@ -22,7 +22,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import AppLoader from "@docspace/ui-kit/components/app-loader";
+import AppLoader from "@onlyoffice/apps-ui-kit/components/app-loader";
 
 <AppLoader />
 \`\`\``,

@@ -5,7 +5,7 @@ Base DatePicker component
 ### Usage
 
 ```js
-import { DatePicker } from "@docspace/ui-kit";
+import { DatePicker } from "@onlyoffice/apps-ui-kit";
 ```
 
 ```jsx

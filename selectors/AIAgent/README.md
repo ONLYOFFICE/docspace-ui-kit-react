@@ -15,7 +15,7 @@ A selector component for choosing AI Agents from the DocSpace system. Provides a
 ## Import
 
 ```tsx
-import AIAgentSelector from "@docspace/ui-kit/selectors/AIAgent";
+import AIAgentSelector from "@onlyoffice/apps-ui-kit/selectors/AIAgent";
 ```
 
 ## Props
@@ -40,7 +40,7 @@ import AIAgentSelector from "@docspace/ui-kit/selectors/AIAgent";
 ## Usage
 
 ```tsx
-import AIAgentSelector from "@docspace/ui-kit/selectors/AIAgent";
+import AIAgentSelector from "@onlyoffice/apps-ui-kit/selectors/AIAgent";
 
 const MyComponent = () => {
   const handleSubmit = (items) => {

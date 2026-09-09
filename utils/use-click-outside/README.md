@@ -13,7 +13,7 @@ A React hook for detecting clicks outside a specified element. Commonly used for
 ## Installation
 
 ```tsx
-import { useClickOutside } from "@docspace/ui-kit/utils/useClickOutside";
+import { useClickOutside } from "@onlyoffice/apps-ui-kit/utils/useClickOutside";
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ import { useClickOutside } from "@docspace/ui-kit/utils/useClickOutside";
 
 ```tsx
 import { useRef } from "react";
-import { useClickOutside } from "@docspace/ui-kit/utils/useClickOutside";
+import { useClickOutside } from "@onlyoffice/apps-ui-kit/utils/useClickOutside";
 
 function Dropdown() {
   const [isOpen, setIsOpen] = useState(true);
@@ -48,7 +48,7 @@ You can pass additional dependencies that will cause the effect to re-run:
 
 ```tsx
 import { useRef, useState } from "react";
-import { useClickOutside } from "@docspace/ui-kit/utils/useClickOutside";
+import { useClickOutside } from "@onlyoffice/apps-ui-kit/utils/useClickOutside";
 
 function Modal({ onClose, enabled }: { onClose: () => void; enabled: boolean }) {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -111,7 +111,7 @@ function useClickOutside<T extends HTMLElement>(
 
 ```tsx
 import { useRef, useState } from "react";
-import { useClickOutside } from "@docspace/ui-kit/utils/useClickOutside";
+import { useClickOutside } from "@onlyoffice/apps-ui-kit/utils/useClickOutside";
 
 function DropdownMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -142,7 +142,7 @@ function DropdownMenu() {
 
 ```tsx
 import { useRef } from "react";
-import { useClickOutside } from "@docspace/ui-kit/utils/useClickOutside";
+import { useClickOutside } from "@onlyoffice/apps-ui-kit/utils/useClickOutside";
 
 function Modal({ isOpen, onClose, children }) {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -165,7 +165,7 @@ function Modal({ isOpen, onClose, children }) {
 
 ```tsx
 import { useRef, useState } from "react";
-import { useClickOutside } from "@docspace/ui-kit/utils/useClickOutside";
+import { useClickOutside } from "@onlyoffice/apps-ui-kit/utils/useClickOutside";
 
 function Popover({ canClose = true }) {
   const [isVisible, setIsVisible] = useState(true);
@@ -195,7 +195,7 @@ function Popover({ canClose = true }) {
 
 ```tsx
 import { useRef, useState, useEffect } from "react";
-import { useClickOutside } from "@docspace/ui-kit/utils/useClickOutside";
+import { useClickOutside } from "@onlyoffice/apps-ui-kit/utils/useClickOutside";
 
 function ContextMenu() {
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);

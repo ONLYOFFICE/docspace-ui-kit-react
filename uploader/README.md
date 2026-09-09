@@ -5,7 +5,7 @@ A complete file upload component with chunked upload support, progress tracking,
 ## Usage
 
 ```tsx
-import { Uploader } from "@docspace/ui-kit/uploader";
+import { Uploader } from "@onlyoffice/apps-ui-kit/uploader";
 
 <Uploader
   targetId="12345"
@@ -109,5 +109,5 @@ import { Uploader } from "@docspace/ui-kit/uploader";
 - **Parallel Upload**: Multiple chunks and files can be uploaded in parallel. Configure via `filesSettings.maxUploadThreadCount` and `filesSettings.maxUploadFilesCount`.
 - **Folder Structure**: When uploading folders, the component preserves the folder structure by creating necessary directories on the server.
 - **Size Validation**: Use `maxPerUploadSize` and `maxTotalUploadSize` to limit file sizes. Supports formats like `10MB`, `1GB`, `500KB`.
-- **API Provider Required**: This component requires `ApiProvider` from `@docspace/ui-kit/providers/api` to be present in the component tree.
+- **API Provider Required**: This component requires `ApiProvider` from `@onlyoffice/apps-ui-kit/providers/api` to be present in the component tree.
 - **Toast Notifications**: The component shows toast notifications for success and error states. Ensure `Toast` component is rendered in your app.

@@ -23,7 +23,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { LoadingButton } from "@docspace/ui-kit/components/loading-button";
+import { LoadingButton } from "@onlyoffice/apps-ui-kit/components/loading-button";
 
 // Basic loading button
 <LoadingButton percent={45} />

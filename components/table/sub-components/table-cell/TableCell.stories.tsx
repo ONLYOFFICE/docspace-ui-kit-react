@@ -23,7 +23,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TableCell } from "@docspace/ui-kit/components/table/sub-components/table-cell";
+import { TableCell } from "@onlyoffice/apps-ui-kit/components/table/sub-components/table-cell";
 
 // Simple text cell
 <TableCell>Cell Content</TableCell>

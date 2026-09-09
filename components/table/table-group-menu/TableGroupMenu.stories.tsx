@@ -30,7 +30,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TableGroupMenu } from "@docspace/ui-kit/components/table/table-group-menu";
+import { TableGroupMenu } from "@onlyoffice/apps-ui-kit/components/table/table-group-menu";
 
 <TableGroupMenu
   isChecked={allSelected}

@@ -24,7 +24,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import PublicRoomBar from "@docspace/ui-kit/components/public-room-bar";
+import PublicRoomBar from "@onlyoffice/apps-ui-kit/components/public-room-bar";
 
 <PublicRoomBar
   headerText="Public Room"

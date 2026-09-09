@@ -32,7 +32,7 @@ The Checkbox component includes the following for improved accessibility:
 ### Usage
 
 \`\`\`tsx
-import { Checkbox } from "@docspace/ui-kit/components/checkbox";
+import { Checkbox } from "@onlyoffice/apps-ui-kit/components/checkbox";
 
 // Basic checkbox
 <Checkbox label="Accept terms" onChange={handleChange} />

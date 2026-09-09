@@ -24,7 +24,7 @@ Throws an error if used outside of `ApiProvider`.
 ## Usage
 
 ```tsx
-import { ApiProvider, useApi } from "@docspace/ui-kit/providers/api";
+import { ApiProvider, useApi } from "@onlyoffice/apps-ui-kit/providers/api";
 
 function App() {
   return (

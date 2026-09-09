@@ -18,7 +18,7 @@ This hook eliminates that warning by using `useEffect` during SSR and `useLayout
 ## Usage
 
 ```tsx
-import { useIsomorphicLayoutEffect } from '@docspace/ui-kit/hooks/useIsomorphicLayoutEffect';
+import { useIsomorphicLayoutEffect } from '@onlyoffice/apps-ui-kit/hooks/useIsomorphicLayoutEffect';
 import { useRef } from 'react';
 
 function Component() {

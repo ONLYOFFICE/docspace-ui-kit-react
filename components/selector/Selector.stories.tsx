@@ -214,7 +214,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Selector } from "@docspace/ui-kit/components/selector";
+import { Selector } from "@onlyoffice/apps-ui-kit/components/selector";
 
 <Selector
   headerLabel="Select users"

@@ -25,7 +25,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Textarea } from "@docspace/ui-kit/components/textarea";
+import { Textarea } from "@onlyoffice/apps-ui-kit/components/textarea";
 
 // Basic textarea
 <Textarea value={value} onChange={handleChange} placeholder="Enter text" />

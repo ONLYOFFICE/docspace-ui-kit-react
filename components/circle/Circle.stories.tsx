@@ -100,7 +100,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { CircleSkeleton } from "@docspace/ui-kit/components/circle";
+import { CircleSkeleton } from "@onlyoffice/apps-ui-kit/components/circle";
 
 <CircleSkeleton width="50" height="50" radius="20" x="25" y="25" />
 \`\`\``,

@@ -13,7 +13,7 @@ Information bar component for displaying public room notifications with header t
 ## Installation
 
 ```tsx
-import { PublicRoomBar } from "@docspace/ui-kit";
+import { PublicRoomBar } from "@onlyoffice/apps-ui-kit";
 ```
 
 ## Usage

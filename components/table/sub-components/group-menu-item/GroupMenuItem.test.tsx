@@ -31,7 +31,7 @@ const mockItemWithDropDown = {
   ],
 };
 
-vi.mock("@docspace/ui-kit/components/drop-down", () => ({
+vi.mock("@onlyoffice/apps-ui-kit/components/drop-down", () => ({
   __esModule: true,
   DropDown: () => <div data-testid="dropdown" />,
 }));

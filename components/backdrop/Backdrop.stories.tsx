@@ -27,7 +27,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Backdrop } from "@docspace/ui-kit/components/backdrop";
+import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
 
 <Backdrop visible={isVisible} onClick={handleClose} withBackground />
 \`\`\``,

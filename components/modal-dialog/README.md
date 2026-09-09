@@ -5,7 +5,7 @@ A versatile modal dialog component that supports both modal and aside (side pane
 ## Usage
 
 ```js
-import { ModalDialog } from "@docspace/ui-kit/components/modal-dialog";
+import { ModalDialog } from "@onlyoffice/apps-ui-kit/components/modal-dialog";
 ```
 
 ### Basic Example

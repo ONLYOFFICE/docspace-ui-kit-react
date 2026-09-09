@@ -5,7 +5,7 @@ Textarea is used for displaying custom textarea and beautified JSON object. It s
 ### Usage
 
 ```js
-import { Textarea } from "@docspace/ui-kit/components/textarea";
+import { Textarea } from "@onlyoffice/apps-ui-kit/components/textarea";
 ```
 
 ```jsx

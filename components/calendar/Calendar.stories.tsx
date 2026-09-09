@@ -58,7 +58,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Calendar } from "@docspace/ui-kit/components/calendar";
+import { Calendar } from "@onlyoffice/apps-ui-kit/components/calendar";
 
 // Basic usage
 <Calendar

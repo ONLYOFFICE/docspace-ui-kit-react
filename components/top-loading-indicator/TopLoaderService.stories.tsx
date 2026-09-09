@@ -24,7 +24,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TopLoaderService } from "@docspace/ui-kit/components/top-loading-indicator";
+import { TopLoaderService } from "@onlyoffice/apps-ui-kit/components/top-loading-indicator";
 
 // Prerequisite: add <div id="ipl-progress-indicator" /> to your HTML
 

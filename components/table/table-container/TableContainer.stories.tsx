@@ -115,7 +115,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TableContainer } from "@docspace/ui-kit/components/table/table-container";
+import { TableContainer } from "@onlyoffice/apps-ui-kit/components/table/table-container";
 
 const ref = useRef<HTMLDivElement>(null);
 

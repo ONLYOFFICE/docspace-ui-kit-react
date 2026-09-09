@@ -29,7 +29,7 @@ const meta: Meta<StoryArgs> = {
 ### Usage
 
 \`\`\`tsx
-import GroupsSelector from "@docspace/ui-kit/selectors/Groups";
+import GroupsSelector from "@onlyoffice/apps-ui-kit/selectors/Groups";
 
 // Inline mode
 <GroupsSelector

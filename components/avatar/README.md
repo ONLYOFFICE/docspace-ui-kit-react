@@ -15,7 +15,7 @@ A component for displaying user or group avatars with support for images, initia
 ## Installation
 
 ```tsx
-import { Avatar, AvatarSize, AvatarRole } from "@docspace/ui-kit/components/avatar";
+import { Avatar, AvatarSize, AvatarRole } from "@onlyoffice/apps-ui-kit/components/avatar";
 ```
 
 ## Usage

@@ -5,7 +5,7 @@ Utilities for standardizing icon sizing across the UI Kit.
 ## Installation
 
 ```typescript
-import { IconSizeType, isIconSizeType } from "@docspace/ui-kit/utils/common-icons-style";
+import { IconSizeType, isIconSizeType } from "@onlyoffice/apps-ui-kit/utils/common-icons-style";
 ```
 
 ## IconSizeType Enum
@@ -46,7 +46,7 @@ Type guard function to check if a value is a valid IconSizeType.
 **Example:**
 
 ```typescript
-import { isIconSizeType, IconSizeType } from "@docspace/ui-kit/utils/common-icons-style";
+import { isIconSizeType, IconSizeType } from "@onlyoffice/apps-ui-kit/utils/common-icons-style";
 
 const size = "medium";
 if (isIconSizeType(size)) {
@@ -64,7 +64,7 @@ isIconSizeType(16);        // false
 ### Dynamic Icon Size
 
 ```typescript
-import { IconSizeType, isIconSizeType } from "@docspace/ui-kit/utils/common-icons-style";
+import { IconSizeType, isIconSizeType } from "@onlyoffice/apps-ui-kit/utils/common-icons-style";
 
 interface IconProps {
   size?: IconSizeType | number;
@@ -79,7 +79,7 @@ function DynamicIcon({ size = IconSizeType.medium }: IconProps) {
 ### Icon with Fallback Size
 
 ```typescript
-import { IconSizeType, isIconSizeType } from "@docspace/ui-kit/utils/common-icons-style";
+import { IconSizeType, isIconSizeType } from "@onlyoffice/apps-ui-kit/utils/common-icons-style";
 
 interface IconComponentProps {
   size?: string | number;

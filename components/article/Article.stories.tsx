@@ -34,7 +34,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import Article from "@docspace/ui-kit/components/article";
+import Article from "@onlyoffice/apps-ui-kit/components/article";
 
 <Article showText articleOpen currentDeviceType={DeviceType.desktop}>
   <Article.Header>

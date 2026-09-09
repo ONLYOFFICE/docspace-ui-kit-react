@@ -10,7 +10,7 @@ import {
   FileTile,
   FolderTile,
   RoomTile,
-} from "@docspace/ui-kit/components/tiles";
+} from "@onlyoffice/apps-ui-kit/components/tiles";
 
 <TileContainer>
   <RoomTile item={room} />

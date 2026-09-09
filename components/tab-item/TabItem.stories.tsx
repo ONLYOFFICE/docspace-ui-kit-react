@@ -30,7 +30,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TabItem } from "@docspace/ui-kit/components/tab-item";
+import { TabItem } from "@onlyoffice/apps-ui-kit/components/tab-item";
 
 <TabItem label="Documents" isActive onSelect={handleSelect} />
 

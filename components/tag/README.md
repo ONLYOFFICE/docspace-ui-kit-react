@@ -5,7 +5,7 @@ Tag allow you display virtual room tag
 ### Usage
 
 ```js
-import { Tag } from "@docspace/ui-kit";
+import { Tag } from "@onlyoffice/apps-ui-kit";
 ```
 
 ```jsx

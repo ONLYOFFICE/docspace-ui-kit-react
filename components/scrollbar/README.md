@@ -5,7 +5,7 @@ Scrollbar is used for displaying custom scrollbar
 ### Usage
 
 ```js
-import {Scrollbar} from "@docspace/ui-kit/components";
+import {Scrollbar} from "@onlyoffice/apps-ui-kit/components";
 ```
 
 Basic usage:

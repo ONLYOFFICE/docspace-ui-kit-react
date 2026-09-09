@@ -5,7 +5,7 @@ Wrapper around `Row` items that optionally virtualizes scrolling lists via `reac
 ## Import
 
 ```ts
-import { RowContainer } from "@docspace/ui-kit/components/rows";
+import { RowContainer } from "@onlyoffice/apps-ui-kit/components/rows";
 ```
 
 ## Usage

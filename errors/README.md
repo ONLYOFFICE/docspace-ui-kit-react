@@ -5,7 +5,7 @@ Pre-built error page components that wrap `ErrorContainer` with common error mes
 ### Usage
 
 ```js
-import { Error401, Error403, Error404, ErrorOfflineContainer, ErrorInvalidLink, ErrorUnavailable, AccessRestricted } from "@docspace/ui-kit/errors";
+import { Error401, Error403, Error404, ErrorOfflineContainer, ErrorInvalidLink, ErrorUnavailable, AccessRestricted } from "@onlyoffice/apps-ui-kit/errors";
 ```
 
 ```jsx

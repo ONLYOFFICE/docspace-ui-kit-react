@@ -23,7 +23,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ColumnarInfoBar } from "@docspace/ui-kit/components/columnar-info-bar";
+import { ColumnarInfoBar } from "@onlyoffice/apps-ui-kit/components/columnar-info-bar";
 
 // With close button (e.g. profile welcome bar)
 <ColumnarInfoBar

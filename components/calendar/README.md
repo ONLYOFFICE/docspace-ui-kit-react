@@ -5,7 +5,7 @@ Used to display custom calendar
 ### Usage
 
 ```js
-import { Calendar } from "@docspace/ui-kit";
+import { Calendar } from "@onlyoffice/apps-ui-kit";
 ```
 
 ```jsx

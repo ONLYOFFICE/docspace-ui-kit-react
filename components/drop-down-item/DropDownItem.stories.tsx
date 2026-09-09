@@ -29,7 +29,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
+import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item";
 
 // Regular item with icon
 <DropDownItem label="Settings" icon={SettingsIcon} onClick={handleClick} />

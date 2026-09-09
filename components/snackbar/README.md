@@ -5,7 +5,7 @@ A notification bar component displayed at the top of a section. Supports timed a
 ## Usage
 
 ```tsx
-import { Snackbar } from "@docspace/ui-kit/components/snackbar";
+import { Snackbar } from "@onlyoffice/apps-ui-kit/components/snackbar";
 
 <Snackbar
   headerText="Update Available"

@@ -3,7 +3,7 @@
 ### Usage
 
 ```js
-import { Selector } from "@docspace/ui-kit/components/selector";
+import { Selector } from "@onlyoffice/apps-ui-kit/components/selector";
 ```
 
 ### i18n Setup
@@ -41,8 +41,8 @@ document.cookie = "asc_language=en";
 You can pass a custom translation function to components that support it:
 
 ```js
-import { getUserTypeTranslation } from "@docspace/ui-kit/utils";
-import { EmployeeType } from "@docspace/ui-kit/enums";
+import { getUserTypeTranslation } from "@onlyoffice/apps-ui-kit/utils";
+import { EmployeeType } from "@onlyoffice/apps-ui-kit/enums";
 
 // With i18next
 import { useTranslation } from "react-i18next";

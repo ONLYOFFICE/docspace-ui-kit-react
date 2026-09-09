@@ -26,7 +26,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Toast, toastr } from "@docspace/ui-kit/components/toast";
+import { Toast, toastr } from "@onlyoffice/apps-ui-kit/components/toast";
 
 // Mount the Toast container once
 <Toast />

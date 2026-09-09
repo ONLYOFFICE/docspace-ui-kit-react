@@ -15,7 +15,7 @@ A selector component for choosing available MCP (Model Context Protocol) servers
 ## Import
 
 ```tsx
-import MCPServersSelector from "@docspace/ui-kit/selectors/MCPServers";
+import MCPServersSelector from "@onlyoffice/apps-ui-kit/selectors/MCPServers";
 ```
 
 ## Props
@@ -30,7 +30,7 @@ import MCPServersSelector from "@docspace/ui-kit/selectors/MCPServers";
 ## Usage
 
 ```tsx
-import MCPServersSelector from "@docspace/ui-kit/selectors/MCPServers";
+import MCPServersSelector from "@onlyoffice/apps-ui-kit/selectors/MCPServers";
 
 const AIAgentSettings = () => {
   const handleSubmit = (servers) => {

@@ -27,7 +27,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
+import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/components/text-input";
 
 // Basic text input
 <TextInput value={value} onChange={handleChange} placeholder="Enter text" />

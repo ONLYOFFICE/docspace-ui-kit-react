@@ -46,7 +46,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { IconButton } from "@docspace/ui-kit/components/icon-button";
+import { IconButton } from "@onlyoffice/apps-ui-kit/components/icon-button";
 
 // Basic icon button
 <IconButton size={25} iconName={SearchIcon} onClick={handleClick} />

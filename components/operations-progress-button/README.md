@@ -5,7 +5,7 @@ A floating button that displays the progress of background operations (file uplo
 ## Usage
 
 ```tsx
-import { OperationsProgress } from "@docspace/ui-kit/components/operations-progress-button";
+import { OperationsProgress } from "@onlyoffice/apps-ui-kit/components/operations-progress-button";
 
 <OperationsProgress
   operations={operations}

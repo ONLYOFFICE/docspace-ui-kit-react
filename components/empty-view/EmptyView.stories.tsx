@@ -38,7 +38,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { EmptyView } from "@docspace/ui-kit/components/empty-view";
+import { EmptyView } from "@onlyoffice/apps-ui-kit/components/empty-view";
 
 // With link options
 <EmptyView

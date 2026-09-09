@@ -95,7 +95,7 @@ const meta: Meta<StoryArgs> = {
 ### Usage
 
 \`\`\`tsx
-import PeopleSelector from "@docspace/ui-kit/selectors/People";
+import PeopleSelector from "@onlyoffice/apps-ui-kit/selectors/People";
 
 // Basic single-select
 <PeopleSelector

@@ -24,7 +24,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ApiProvider, useApi } from "@docspace/ui-kit/providers/api";
+import { ApiProvider, useApi } from "@onlyoffice/apps-ui-kit/providers/api";
 
 // Wrap your app with ApiProvider
 <ApiProvider url="https://docspace.example.com" apiKey="your-api-key">

@@ -1,6 +1,6 @@
 # Public API
 
-What `@onlyoffice/docspace-ui-kit` promises to external consumers, what it keeps for the
+What `@onlyoffice/apps-ui-kit` promises to external consumers, what it keeps for the
 DocSpace portal, and what it guarantees about neither.
 
 **Status:** proposed. This document is the contract the `exports` map, the dependency list and
@@ -10,7 +10,7 @@ agreed. Verified against `feature/ui-kit-separation`.
 ## Why this exists
 
 Today nothing distinguishes public API from internals. All six monorepo apps resolve
-`@docspace/ui-kit` to the **source root** — a `node_modules` symlink plus an explicit webpack
+`@onlyoffice/apps-ui-kit` to the **source root** — a `node_modules` symlink plus an explicit webpack
 alias in the Next.js apps — so with no `exports` map, any path inside the package is
 importable. The result is 3 609 deep-subpath imports across 1 364 files reaching arbitrary
 internals, and no way to change anything without guessing who depends on it.
@@ -94,7 +94,7 @@ exception to the "externalize everything" build rule.
   (`peerDependenciesMeta`).
 - The build keeps it **external**; `dist/ai-agent/**` ships with a bare
   `@onlyoffice/ai-chat` specifier.
-- `npm i @onlyoffice/docspace-ui-kit` installs cleanly for everyone: an unsatisfied optional
+- `npm i @onlyoffice/apps-ui-kit` installs cleanly for everyone: an unsatisfied optional
   peer is neither fetched nor an error.
 - Consumers who never import `ai-agent/*` — every external consumer, for now — are unaffected.
 - The monorepo supplies `ai-chat` itself: the tarball declaration moves to the consuming
@@ -117,7 +117,7 @@ into the rule:
 > The public core's requirements are `dependencies`. Anything needed *only* by portal-internal
 > modules is an **optional peer dependency**.
 
-That way `npm i @onlyoffice/docspace-ui-kit` pulls what a component library legitimately needs
+That way `npm i @onlyoffice/apps-ui-kit` pulls what a component library legitimately needs
 (~32 packages instead of 68), while the portal — which does import those modules — supplies the
 rest from its own manifest.
 

@@ -5,7 +5,7 @@ Used to display full page error
 ### Usage
 
 ```js
-import ErrorContainer from "@docspace/ui-kit/components/ErrorContainer";
+import ErrorContainer from "@onlyoffice/apps-ui-kit/components/ErrorContainer";
 ```
 
 ```jsx

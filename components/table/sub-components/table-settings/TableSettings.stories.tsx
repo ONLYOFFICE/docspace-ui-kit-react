@@ -22,7 +22,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { TableSettings } from "@docspace/ui-kit/components/table/sub-components/table-settings";
+import { TableSettings } from "@onlyoffice/apps-ui-kit/components/table/sub-components/table-settings";
 
 <TableSettings
   columns={[

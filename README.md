@@ -1,4 +1,4 @@
-# @docspace/ui-kit
+# @onlyoffice/apps-ui-kit
 
 > React UI component library extracted from the [ONLYOFFICE DocSpace client](https://github.com/ONLYOFFICE/DocSpace-client) codebase.
 
@@ -6,7 +6,7 @@
 
 ## About This Library
 
-`@docspace/ui-kit` provides React components and a color system extracted from the [DocSpace-client monorepo](https://github.com/ONLYOFFICE/DocSpace-client) (`libs/ui-kit`).
+`@onlyoffice/apps-ui-kit` provides React components and a color system extracted from the [DocSpace-client monorepo](https://github.com/ONLYOFFICE/DocSpace-client) (`libs/ui-kit`).
 
 <p align="center">
   <a href="https://github.com/ONLYOFFICE/DocSpace">
@@ -34,13 +34,13 @@
 
 ```bash
 # pnpm
-pnpm add @docspace/ui-kit
+pnpm add @onlyoffice/apps-ui-kit
 
 # npm
-npm install @docspace/ui-kit
+npm install @onlyoffice/apps-ui-kit
 
 # yarn
-yarn add @docspace/ui-kit
+yarn add @onlyoffice/apps-ui-kit
 ```
 
 **Peer dependencies:** `react` and `react-dom` ≥ 18.0.0
@@ -50,7 +50,7 @@ yarn add @docspace/ui-kit
 ### Using a Component
 
 ```tsx
-import { Text } from "@docspace/ui-kit";
+import { Text } from "@onlyoffice/apps-ui-kit";
 
 function App() {
   return (
@@ -64,7 +64,7 @@ function App() {
 ### Using the Color Palette
 
 ```tsx
-import { globalColors } from "@docspace/ui-kit/providers/theme";
+import { globalColors } from "@onlyoffice/apps-ui-kit/providers/theme";
 
 const primaryBlue = globalColors.lightBlueMain;
 const errorRed = globalColors.mainRed;
@@ -149,146 +149,146 @@ import {
   TemplateTile,
   TileContainer,
   TileContent,
-} from "@docspace/ui-kit";
+} from "@onlyoffice/apps-ui-kit";
 ```
 
 ### Import specific components
 
 ```js
-import { AccessRightSelect } from "@docspace/ui-kit/components/access-right-select";
-import { Aside, AsideHeader } from "@docspace/ui-kit/components/aside";
-import { Avatar } from "@docspace/ui-kit/components/avatar";
-import { Backdrop } from "@docspace/ui-kit/components/backdrop";
-import { Badge } from "@docspace/ui-kit/components/badge";
-import { Button, ButtonSize } from "@docspace/ui-kit/components/button";
-import { Calendar } from "@docspace/ui-kit/components/calendar";
-import { CategoryItem } from "@docspace/ui-kit/components/category-item";
-import { Checkbox } from "@docspace/ui-kit/components/checkbox";
-import { CircleSkeleton } from "@docspace/ui-kit/components/circle";
-import { ColorInput } from "@docspace/ui-kit/components/color-input";
-import { ColorPicker } from "@docspace/ui-kit/components/color-picker";
-import { ComboBox } from "@docspace/ui-kit/components/combobox";
-import { ContextMenu } from "@docspace/ui-kit/components/context-menu";
-import { ContextMenuButton, ContextMenuButtonDisplayType } from "@docspace/ui-kit/components/context-menu-button";
-import { DatePicker } from "@docspace/ui-kit/components/date-picker";
-import { DateTimePicker } from "@docspace/ui-kit/components/date-time-picker";
-import { DragAndDrop } from "@docspace/ui-kit/components/drag-and-drop";
-import { DropDown } from "@docspace/ui-kit/components/drop-down";
-import { DropDownItem } from "@docspace/ui-kit/components/drop-down-item";
-import { Dropzone } from "@docspace/ui-kit/components/dropzone";
-import { EmailInput } from "@docspace/ui-kit/components/email-input";
-import { EmptyScreenContainer } from "@docspace/ui-kit/components/empty-screen-container";
-import { EmptyView } from "@docspace/ui-kit/components/empty-view";
-import { ErrorContainer } from "@docspace/ui-kit/components/error-container";
-import { FieldContainer } from "@docspace/ui-kit/components/field-container";
-import { FileInput } from "@docspace/ui-kit/components/file-input";
-import { FilterInput } from "@docspace/ui-kit/components/filter";
-import { FloatingButton, FloatingButtonIcons } from "@docspace/ui-kit/components/floating-button";
-import { FormWrapper } from "@docspace/ui-kit/components/form-wrapper";
-import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
-import { HelpButton } from "@docspace/ui-kit/components/help-button";
-import { IconButton } from "@docspace/ui-kit/components/icon-button";
-import { ImageEditor } from "@docspace/ui-kit/components/image-editor";
-import { InfiniteLoaderComponent } from "@docspace/ui-kit/components/infinite-loader";
-import { InputBlock } from "@docspace/ui-kit/components/input-block";
-import { Label } from "@docspace/ui-kit/components/label";
-import { Link, LinkType, LinkTarget } from "@docspace/ui-kit/components/link";
-import { LinkWithDropdown } from "@docspace/ui-kit/components/link-with-dropdown";
-import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
-import { LoaderWrapper } from "@docspace/ui-kit/components/loader-wrapper";
-import { LoadingButton } from "@docspace/ui-kit/components/loading-button";
-import { MainButton } from "@docspace/ui-kit/components/main-button";
-import { MainButtonMobile } from "@docspace/ui-kit/components/main-button-mobile";
-import { MCPIcon, MCPIconSize } from "@docspace/ui-kit/components/mcp-icon";
-import { ModalDialog, ModalDialogType } from "@docspace/ui-kit/components/modal-dialog";
-import { Navigation } from "@docspace/ui-kit/components/navigation";
-import { OperationsProgressButton } from "@docspace/ui-kit/components/operations-progress-button";
-import { Paging } from "@docspace/ui-kit/components/paging";
-import { PasswordInput } from "@docspace/ui-kit/components/password-input";
-import { Portal } from "@docspace/ui-kit/components/portal";
-import { PortalLogo } from "@docspace/ui-kit/components/portal-logo";
-import { ProgressBar, PreparationPortalProgress } from "@docspace/ui-kit/components/progress-bar";
-import { PublicRoomBar } from "@docspace/ui-kit/components/public-room-bar";
-import { RadioButton } from "@docspace/ui-kit/components/radio-button";
-import { RadioButtonGroup } from "@docspace/ui-kit/components/radio-button-group";
-import { RectangleSkeleton } from "@docspace/ui-kit/components/rectangle";
-import { RoomIcon } from "@docspace/ui-kit/components/room-icon";
-import { RoomLogo } from "@docspace/ui-kit/components/room-logo";
-import { Row, RowContainer, RowContent } from "@docspace/ui-kit/components/rows";
-import { Scrollbar } from "@docspace/ui-kit/components/scrollbar";
-import { SearchInput } from "@docspace/ui-kit/components/search-input";
-import { Section } from "@docspace/ui-kit/components/section";
-import { SelectedItem } from "@docspace/ui-kit/components/selected-item";
-import { SelectionArea } from "@docspace/ui-kit/components/selection-area";
-import { Selector, SelectorAccessRightsMode } from "@docspace/ui-kit/components/selector";
-import { Slider } from "@docspace/ui-kit/components/slider";
-import { SnackBar } from "@docspace/ui-kit/components/snackbar";
-import { StatusMessage } from "@docspace/ui-kit/components/status-message";
-import { TabItem } from "@docspace/ui-kit/components/tab-item";
-import { TableContainer, TableBody, TableRow, TableHeader, TableGroupMenu, TableCell } from "@docspace/ui-kit/components/table";
-import { Tabs, TabsTypes } from "@docspace/ui-kit/components/tabs";
-import { Tag } from "@docspace/ui-kit/components/tag";
-import { Tags } from "@docspace/ui-kit/components/tags";
-import { Text } from "@docspace/ui-kit/components/text";
-import { TextInput, InputSize, InputType } from "@docspace/ui-kit/components/text-input";
-import { Textarea } from "@docspace/ui-kit/components/textarea";
-import { ThemeProvider } from "@docspace/ui-kit/components/theme-provider";
-import { TimePicker } from "@docspace/ui-kit/components/time-picker";
-import { Toast, toastr } from "@docspace/ui-kit/components/toast";
-import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
-import { Tooltip, TooltipContainer, withTooltip } from "@docspace/ui-kit/components/tooltip";
-import { TopLoaderService } from "@docspace/ui-kit/components/top-loading-indicator";
-import { BaseTile, FileTile, FolderTile, RoomTile, TemplateTile, TileContainer, TileContent } from "@docspace/ui-kit/components/tiles";
+import { AccessRightSelect } from "@onlyoffice/apps-ui-kit/components/access-right-select";
+import { Aside, AsideHeader } from "@onlyoffice/apps-ui-kit/components/aside";
+import { Avatar } from "@onlyoffice/apps-ui-kit/components/avatar";
+import { Backdrop } from "@onlyoffice/apps-ui-kit/components/backdrop";
+import { Badge } from "@onlyoffice/apps-ui-kit/components/badge";
+import { Button, ButtonSize } from "@onlyoffice/apps-ui-kit/components/button";
+import { Calendar } from "@onlyoffice/apps-ui-kit/components/calendar";
+import { CategoryItem } from "@onlyoffice/apps-ui-kit/components/category-item";
+import { Checkbox } from "@onlyoffice/apps-ui-kit/components/checkbox";
+import { CircleSkeleton } from "@onlyoffice/apps-ui-kit/components/circle";
+import { ColorInput } from "@onlyoffice/apps-ui-kit/components/color-input";
+import { ColorPicker } from "@onlyoffice/apps-ui-kit/components/color-picker";
+import { ComboBox } from "@onlyoffice/apps-ui-kit/components/combobox";
+import { ContextMenu } from "@onlyoffice/apps-ui-kit/components/context-menu";
+import { ContextMenuButton, ContextMenuButtonDisplayType } from "@onlyoffice/apps-ui-kit/components/context-menu-button";
+import { DatePicker } from "@onlyoffice/apps-ui-kit/components/date-picker";
+import { DateTimePicker } from "@onlyoffice/apps-ui-kit/components/date-time-picker";
+import { DragAndDrop } from "@onlyoffice/apps-ui-kit/components/drag-and-drop";
+import { DropDown } from "@onlyoffice/apps-ui-kit/components/drop-down";
+import { DropDownItem } from "@onlyoffice/apps-ui-kit/components/drop-down-item";
+import { Dropzone } from "@onlyoffice/apps-ui-kit/components/dropzone";
+import { EmailInput } from "@onlyoffice/apps-ui-kit/components/email-input";
+import { EmptyScreenContainer } from "@onlyoffice/apps-ui-kit/components/empty-screen-container";
+import { EmptyView } from "@onlyoffice/apps-ui-kit/components/empty-view";
+import { ErrorContainer } from "@onlyoffice/apps-ui-kit/components/error-container";
+import { FieldContainer } from "@onlyoffice/apps-ui-kit/components/field-container";
+import { FileInput } from "@onlyoffice/apps-ui-kit/components/file-input";
+import { FilterInput } from "@onlyoffice/apps-ui-kit/components/filter";
+import { FloatingButton, FloatingButtonIcons } from "@onlyoffice/apps-ui-kit/components/floating-button";
+import { FormWrapper } from "@onlyoffice/apps-ui-kit/components/form-wrapper";
+import { Heading, HeadingLevel, HeadingSize } from "@onlyoffice/apps-ui-kit/components/heading";
+import { HelpButton } from "@onlyoffice/apps-ui-kit/components/help-button";
+import { IconButton } from "@onlyoffice/apps-ui-kit/components/icon-button";
+import { ImageEditor } from "@onlyoffice/apps-ui-kit/components/image-editor";
+import { InfiniteLoaderComponent } from "@onlyoffice/apps-ui-kit/components/infinite-loader";
+import { InputBlock } from "@onlyoffice/apps-ui-kit/components/input-block";
+import { Label } from "@onlyoffice/apps-ui-kit/components/label";
+import { Link, LinkType, LinkTarget } from "@onlyoffice/apps-ui-kit/components/link";
+import { LinkWithDropdown } from "@onlyoffice/apps-ui-kit/components/link-with-dropdown";
+import { Loader, LoaderTypes } from "@onlyoffice/apps-ui-kit/components/loader";
+import { LoaderWrapper } from "@onlyoffice/apps-ui-kit/components/loader-wrapper";
+import { LoadingButton } from "@onlyoffice/apps-ui-kit/components/loading-button";
+import { MainButton } from "@onlyoffice/apps-ui-kit/components/main-button";
+import { MainButtonMobile } from "@onlyoffice/apps-ui-kit/components/main-button-mobile";
+import { MCPIcon, MCPIconSize } from "@onlyoffice/apps-ui-kit/components/mcp-icon";
+import { ModalDialog, ModalDialogType } from "@onlyoffice/apps-ui-kit/components/modal-dialog";
+import { Navigation } from "@onlyoffice/apps-ui-kit/components/navigation";
+import { OperationsProgressButton } from "@onlyoffice/apps-ui-kit/components/operations-progress-button";
+import { Paging } from "@onlyoffice/apps-ui-kit/components/paging";
+import { PasswordInput } from "@onlyoffice/apps-ui-kit/components/password-input";
+import { Portal } from "@onlyoffice/apps-ui-kit/components/portal";
+import { PortalLogo } from "@onlyoffice/apps-ui-kit/components/portal-logo";
+import { ProgressBar, PreparationPortalProgress } from "@onlyoffice/apps-ui-kit/components/progress-bar";
+import { PublicRoomBar } from "@onlyoffice/apps-ui-kit/components/public-room-bar";
+import { RadioButton } from "@onlyoffice/apps-ui-kit/components/radio-button";
+import { RadioButtonGroup } from "@onlyoffice/apps-ui-kit/components/radio-button-group";
+import { RectangleSkeleton } from "@onlyoffice/apps-ui-kit/components/rectangle";
+import { RoomIcon } from "@onlyoffice/apps-ui-kit/components/room-icon";
+import { RoomLogo } from "@onlyoffice/apps-ui-kit/components/room-logo";
+import { Row, RowContainer, RowContent } from "@onlyoffice/apps-ui-kit/components/rows";
+import { Scrollbar } from "@onlyoffice/apps-ui-kit/components/scrollbar";
+import { SearchInput } from "@onlyoffice/apps-ui-kit/components/search-input";
+import { Section } from "@onlyoffice/apps-ui-kit/components/section";
+import { SelectedItem } from "@onlyoffice/apps-ui-kit/components/selected-item";
+import { SelectionArea } from "@onlyoffice/apps-ui-kit/components/selection-area";
+import { Selector, SelectorAccessRightsMode } from "@onlyoffice/apps-ui-kit/components/selector";
+import { Slider } from "@onlyoffice/apps-ui-kit/components/slider";
+import { SnackBar } from "@onlyoffice/apps-ui-kit/components/snackbar";
+import { StatusMessage } from "@onlyoffice/apps-ui-kit/components/status-message";
+import { TabItem } from "@onlyoffice/apps-ui-kit/components/tab-item";
+import { TableContainer, TableBody, TableRow, TableHeader, TableGroupMenu, TableCell } from "@onlyoffice/apps-ui-kit/components/table";
+import { Tabs, TabsTypes } from "@onlyoffice/apps-ui-kit/components/tabs";
+import { Tag } from "@onlyoffice/apps-ui-kit/components/tag";
+import { Tags } from "@onlyoffice/apps-ui-kit/components/tags";
+import { Text } from "@onlyoffice/apps-ui-kit/components/text";
+import { TextInput, InputSize, InputType } from "@onlyoffice/apps-ui-kit/components/text-input";
+import { Textarea } from "@onlyoffice/apps-ui-kit/components/textarea";
+import { ThemeProvider } from "@onlyoffice/apps-ui-kit/components/theme-provider";
+import { TimePicker } from "@onlyoffice/apps-ui-kit/components/time-picker";
+import { Toast, toastr } from "@onlyoffice/apps-ui-kit/components/toast";
+import { ToggleButton } from "@onlyoffice/apps-ui-kit/components/toggle-button";
+import { Tooltip, TooltipContainer, withTooltip } from "@onlyoffice/apps-ui-kit/components/tooltip";
+import { TopLoaderService } from "@onlyoffice/apps-ui-kit/components/top-loading-indicator";
+import { BaseTile, FileTile, FolderTile, RoomTile, TemplateTile, TileContainer, TileContent } from "@onlyoffice/apps-ui-kit/components/tiles";
 ```
 
 ### Import contexts and hooks
 
 ```js
-import { ThemeProvider, useTheme } from "@docspace/ui-kit/context/ThemeContext";
-import { InterfaceDirectionProvider, useInterfaceDirection } from "@docspace/ui-kit/context/InterfaceDirectionContext";
+import { ThemeProvider, useTheme } from "@onlyoffice/apps-ui-kit/context/ThemeContext";
+import { InterfaceDirectionProvider, useInterfaceDirection } from "@onlyoffice/apps-ui-kit/context/InterfaceDirectionContext";
 
-import { useAnimation } from "@docspace/ui-kit/hooks/useAnimation";
-import { useDebounce } from "@docspace/ui-kit/hooks/useDebounce";
-import { useEventListener } from "@docspace/ui-kit/hooks/useEventListener";
-import { useIsomorphicLayoutEffect } from "@docspace/ui-kit/hooks/useIsomorphicLayoutEffect";
+import { useAnimation } from "@onlyoffice/apps-ui-kit/hooks/useAnimation";
+import { useDebounce } from "@onlyoffice/apps-ui-kit/hooks/useDebounce";
+import { useEventListener } from "@onlyoffice/apps-ui-kit/hooks/useEventListener";
+import { useIsomorphicLayoutEffect } from "@onlyoffice/apps-ui-kit/hooks/useIsomorphicLayoutEffect";
 ```
 
 ### Import providers
 
 ```js
-import { Providers } from "@docspace/ui-kit/providers";
-import { ApiProvider, useApi } from "@docspace/ui-kit/providers/api";
-import { ErrorBoundary } from "@docspace/ui-kit/providers/error-boundary";
-import { TranslationProvider, useI18N } from "@docspace/ui-kit/providers/translation";
-import { ThemeProvider } from "@docspace/ui-kit/providers/theme";
-import type { TTranslations } from "@docspace/ui-kit/providers/translation";
+import { Providers } from "@onlyoffice/apps-ui-kit/providers";
+import { ApiProvider, useApi } from "@onlyoffice/apps-ui-kit/providers/api";
+import { ErrorBoundary } from "@onlyoffice/apps-ui-kit/providers/error-boundary";
+import { TranslationProvider, useI18N } from "@onlyoffice/apps-ui-kit/providers/translation";
+import { ThemeProvider } from "@onlyoffice/apps-ui-kit/providers/theme";
+import type { TTranslations } from "@onlyoffice/apps-ui-kit/providers/translation";
 ```
 
 ### Import errors
 
 ```js
-import { Error401, Error403, Error404, ErrorOfflineContainer, ErrorInvalidLink, ErrorUnavailable, AccessRestricted } from "@docspace/ui-kit/errors";
+import { Error401, Error403, Error404, ErrorOfflineContainer, ErrorInvalidLink, ErrorUnavailable, AccessRestricted } from "@onlyoffice/apps-ui-kit/errors";
 ```
 
 ### Import utilities
 
 ```js
-import { isMobile, isTablet, isDesktop, checkIsSSR } from "@docspace/ui-kit/utils";
-import { IconSizeType, isIconSizeType } from "@docspace/ui-kit/utils/common-icons-style";
-import DomHelpers from "@docspace/ui-kit/utils/dom-helpers";
-import { useClickOutside } from "@docspace/ui-kit/utils/use-click-outside";
-import { getCommonTranslation } from "@docspace/ui-kit/utils/i18n";
-import { combineUrl } from "@docspace/ui-kit/utils/combineUrl";
-import { getCookie, setCookie, deleteCookie } from "@docspace/ui-kit/utils/cookie";
-import { parseAddress, parseAddresses, EmailSettings } from "@docspace/ui-kit/utils/email";
+import { isMobile, isTablet, isDesktop, checkIsSSR } from "@onlyoffice/apps-ui-kit/utils";
+import { IconSizeType, isIconSizeType } from "@onlyoffice/apps-ui-kit/utils/common-icons-style";
+import DomHelpers from "@onlyoffice/apps-ui-kit/utils/dom-helpers";
+import { useClickOutside } from "@onlyoffice/apps-ui-kit/utils/use-click-outside";
+import { getCommonTranslation } from "@onlyoffice/apps-ui-kit/utils/i18n";
+import { combineUrl } from "@onlyoffice/apps-ui-kit/utils/combineUrl";
+import { getCookie, setCookie, deleteCookie } from "@onlyoffice/apps-ui-kit/utils/cookie";
+import { parseAddress, parseAddresses, EmailSettings } from "@onlyoffice/apps-ui-kit/utils/email";
 ```
 
 ### Import enums, constants, and types
 
 ```js
-import { ShareAccessRights, EmployeeType, RoomsType, ThemeKeys, FileType, FolderType } from "@docspace/ui-kit/enums";
-import { LOADER_STYLE, OPERATIONS_NAME, EMPTY_ARRAY, EMPTY_OBJECT } from "@docspace/ui-kit/constants";
-import type { TFile, TFolder, TUser, TFileSecurity, TFolderSecurity, TRoomSecurity } from "@docspace/ui-kit/types";
+import { ShareAccessRights, EmployeeType, RoomsType, ThemeKeys, FileType, FolderType } from "@onlyoffice/apps-ui-kit/enums";
+import { LOADER_STYLE, OPERATIONS_NAME, EMPTY_ARRAY, EMPTY_OBJECT } from "@onlyoffice/apps-ui-kit/constants";
+import type { TFile, TFolder, TUser, TFileSecurity, TFolderSecurity, TRoomSecurity } from "@onlyoffice/apps-ui-kit/types";
 ```
 
 ## Components
@@ -424,9 +424,9 @@ Composed providers that wrap your application with error handling, API access, t
 ### Quick Start
 
 ```tsx
-import { Providers } from "@docspace/ui-kit/providers";
-import enCommon from "@docspace/ui-kit/locales/en/Common.json";
-import type { TTranslations } from "@docspace/ui-kit/providers/translation";
+import { Providers } from "@onlyoffice/apps-ui-kit/providers";
+import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
+import type { TTranslations } from "@onlyoffice/apps-ui-kit/providers/translation";
 
 const translations: TTranslations = new Map([
   ["en", new Map([["Common", enCommon]])],
@@ -459,7 +459,7 @@ Pre-built error page components that wrap `ErrorContainer` with localized messag
 | AccessRestricted | `AccessDenied`, `PortalRestriction` | Access restricted error |
 
 ```js
-import { Error401, Error403, Error404 } from "@docspace/ui-kit/errors";
+import { Error401, Error403, Error404 } from "@onlyoffice/apps-ui-kit/errors";
 ```
 
 ## Utilities
@@ -495,7 +495,7 @@ import { Error401, Error403, Error404 } from "@docspace/ui-kit/errors";
 
 ## Enums
 
-Shared enums available from `@docspace/ui-kit/enums`:
+Shared enums available from `@onlyoffice/apps-ui-kit/enums`:
 
 | Enum | Values |
 |------|--------|
@@ -509,7 +509,7 @@ Shared enums available from `@docspace/ui-kit/enums`:
 
 ## Constants
 
-Shared constants from `@docspace/ui-kit/constants`:
+Shared constants from `@onlyoffice/apps-ui-kit/constants`:
 
 | Constant | Description |
 |----------|-------------|
@@ -523,7 +523,7 @@ Shared constants from `@docspace/ui-kit/constants`:
 
 ## Types
 
-Key TypeScript types from `@docspace/ui-kit/types`:
+Key TypeScript types from `@onlyoffice/apps-ui-kit/types`:
 
 | Type | Description |
 |------|-------------|
@@ -553,9 +553,9 @@ Key TypeScript types from `@docspace/ui-kit/types`:
 The library ships with `globalColors` - 100+ named color tokens. It can be imported from the root barrel or from the theme provider entry point:
 
 ```tsx
-import { globalColors } from "@docspace/ui-kit";
+import { globalColors } from "@onlyoffice/apps-ui-kit";
 // or
-import { globalColors } from "@docspace/ui-kit/providers/theme";
+import { globalColors } from "@onlyoffice/apps-ui-kit/providers/theme";
 
 // Base
 const white = globalColors.white; // "#ffffff"
@@ -643,7 +643,7 @@ Components read the language from the `asc_language` cookie. The language mappin
 You can import and use the `getCommonTranslation` utility directly:
 
 ```typescript
-import { getCommonTranslation } from "@docspace/ui-kit/utils";
+import { getCommonTranslation } from "@onlyoffice/apps-ui-kit/utils";
 
 const title = getCommonTranslation("Done"); // Returns localized "Done" or undefined
 const label = getCommonTranslation("BetaLabel"); // Returns localized "BetaLabel" or undefined
@@ -677,13 +677,13 @@ type TTranslations = Map<
 
 #### 1. Import locale files
 
-The library ships with locale files for 32 languages under `@docspace/ui-kit/locales/`:
+The library ships with locale files for 32 languages under `@onlyoffice/apps-ui-kit/locales/`:
 
 ```typescript
-import enCommon from "@docspace/ui-kit/locales/en/Common.json";
-import ruCommon from "@docspace/ui-kit/locales/ru/Common.json";
-import deCommon from "@docspace/ui-kit/locales/de/Common.json";
-import frCommon from "@docspace/ui-kit/locales/fr/Common.json";
+import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
+import ruCommon from "@onlyoffice/apps-ui-kit/locales/ru/Common.json";
+import deCommon from "@onlyoffice/apps-ui-kit/locales/de/Common.json";
+import frCommon from "@onlyoffice/apps-ui-kit/locales/fr/Common.json";
 // ... add as many languages as you need
 ```
 
@@ -692,7 +692,7 @@ Available locales: `ar-SA`, `az`, `bg`, `cs`, `de`, `el-GR`, `en`, `es`, `fi`, `
 #### 2. Build the translations map
 
 ```typescript
-import type { TTranslations } from "@docspace/ui-kit/providers/translation";
+import type { TTranslations } from "@onlyoffice/apps-ui-kit/providers/translation";
 
 const translations: TTranslations = new Map([
   ["en", new Map([["Common", enCommon]])],
@@ -705,7 +705,7 @@ const translations: TTranslations = new Map([
 #### 3. Wrap your app with Providers
 
 ```tsx
-import { Providers } from "@docspace/ui-kit/providers";
+import { Providers } from "@onlyoffice/apps-ui-kit/providers";
 
 function App() {
   return (
@@ -777,10 +777,10 @@ If `settings` and `user` are not passed as props, they are fetched automatically
 You can also use sub-providers individually for more control:
 
 ```tsx
-import { ApiProvider } from "@docspace/ui-kit/providers/api";
-import { TranslationProvider } from "@docspace/ui-kit/providers/translation";
-import { ThemeProvider } from "@docspace/ui-kit/providers/theme";
-import { ErrorBoundary } from "@docspace/ui-kit/providers/error-boundary";
+import { ApiProvider } from "@onlyoffice/apps-ui-kit/providers/api";
+import { TranslationProvider } from "@onlyoffice/apps-ui-kit/providers/translation";
+import { ThemeProvider } from "@onlyoffice/apps-ui-kit/providers/theme";
+import { ErrorBoundary } from "@onlyoffice/apps-ui-kit/providers/error-boundary";
 
 <ErrorBoundary fallback={<ErrorPage />}>
   <ApiProvider url="https://your-docspace.com" apiKey="your-api-key">
@@ -803,7 +803,7 @@ import { ErrorBoundary } from "@docspace/ui-kit/providers/error-boundary";
 Inside `ApiProvider`, access API clients via the `useApi` hook:
 
 ```tsx
-import { useApi } from "@docspace/ui-kit/providers/api";
+import { useApi } from "@onlyoffice/apps-ui-kit/providers/api";
 
 function MyComponent() {
   const { profilesApi, commonSettingsApi } = useApi();

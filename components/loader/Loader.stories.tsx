@@ -23,7 +23,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Loader, LoaderTypes } from "@docspace/ui-kit/components/loader";
+import { Loader, LoaderTypes } from "@onlyoffice/apps-ui-kit/components/loader";
 
 // Oval loader
 <Loader type={LoaderTypes.oval} size="40px" color="#333" />

@@ -5,7 +5,7 @@ A service class that controls a thin progress bar at the very top of the page (s
 ## Usage
 
 ```ts
-import { TopLoaderService } from "@docspace/ui-kit/components/top-loading-indicator";
+import { TopLoaderService } from "@onlyoffice/apps-ui-kit/components/top-loading-indicator";
 
 // Start the progress bar (e.g., on route change)
 TopLoaderService.start();

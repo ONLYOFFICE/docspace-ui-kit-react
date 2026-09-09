@@ -31,7 +31,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ActionButton } from "@docspace/ui-kit/components/action-button";
+import { ActionButton } from "@onlyoffice/apps-ui-kit/components/action-button";
 
 <ActionButton onClick={handleClick}>Clear filter</ActionButton>
 

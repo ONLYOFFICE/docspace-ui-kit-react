@@ -30,7 +30,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { Tag } from "@docspace/ui-kit/components/tag";
+import { Tag } from "@onlyoffice/apps-ui-kit/components/tag";
 
 // Basic tag
 <Tag tag="category" label="Design" />

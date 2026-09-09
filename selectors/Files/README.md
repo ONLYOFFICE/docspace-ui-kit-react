@@ -19,7 +19,7 @@ A comprehensive file and folder browser selector for navigating the DocSpace fil
 ## Import
 
 ```tsx
-import FilesSelector from "@docspace/ui-kit/selectors/Files";
+import FilesSelector from "@onlyoffice/apps-ui-kit/selectors/Files";
 ```
 
 ## Props
@@ -63,7 +63,7 @@ import FilesSelector from "@docspace/ui-kit/selectors/Files";
 ## Usage
 
 ```tsx
-import FilesSelector from "@docspace/ui-kit/selectors/Files";
+import FilesSelector from "@onlyoffice/apps-ui-kit/selectors/Files";
 
 const MoveDialog = () => {
   const handleSubmit = (

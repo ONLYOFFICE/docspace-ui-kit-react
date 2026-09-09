@@ -25,8 +25,8 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import RoomType from "@docspace/ui-kit/components/room-type";
-import { RoomsType } from "@docspace/ui-kit/enums";
+import RoomType from "@onlyoffice/apps-ui-kit/components/room-type";
+import { RoomsType } from "@onlyoffice/apps-ui-kit/enums";
 
 <RoomType
   roomType={RoomsType.EditingRoom}

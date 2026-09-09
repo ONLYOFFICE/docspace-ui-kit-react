@@ -5,7 +5,7 @@ The sidebar (article) panel component used as the main navigation area of the ap
 ## Usage
 
 ```tsx
-import { Article } from "@docspace/ui-kit/components/article";
+import { Article } from "@onlyoffice/apps-ui-kit/components/article";
 
 <Article
   showText={true}

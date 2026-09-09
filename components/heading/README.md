@@ -5,7 +5,7 @@ Heading text structured in levels.
 ## Usage
 
 ```js
-import { Heading, HeadingLevel, HeadingSize } from "@docspace/ui-kit/components/heading";
+import { Heading, HeadingLevel, HeadingSize } from "@onlyoffice/apps-ui-kit/components/heading";
 ```
 
 ```jsx

@@ -5,7 +5,7 @@ Layout helper for the `Row` component. It arranges nested elements into a main s
 ## Import
 
 ```ts
-import { RowContent } from "@docspace/ui-kit/components/rows";
+import { RowContent } from "@onlyoffice/apps-ui-kit/components/rows";
 ```
 
 ## Usage

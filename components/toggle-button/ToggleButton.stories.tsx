@@ -26,7 +26,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ToggleButton } from "@docspace/ui-kit/components/toggle-button";
+import { ToggleButton } from "@onlyoffice/apps-ui-kit/components/toggle-button";
 
 // Basic toggle
 <ToggleButton label="Enable notifications" isChecked={isEnabled} onChange={handleChange} />

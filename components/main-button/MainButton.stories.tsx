@@ -73,7 +73,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { MainButton } from "@docspace/ui-kit/components/main-button";
+import { MainButton } from "@onlyoffice/apps-ui-kit/components/main-button";
 
 // With dropdown menu
 <MainButton

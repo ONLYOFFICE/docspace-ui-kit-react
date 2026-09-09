@@ -5,7 +5,7 @@ The `Tags` component is used to display a collection of tags with automatic over
 ## Usage
 
 ```tsx
-import { Tags } from "@docspace/ui-kit";
+import { Tags } from "@onlyoffice/apps-ui-kit";
 
 function MyComponent() {
   const handleTagSelect = (tag) => {

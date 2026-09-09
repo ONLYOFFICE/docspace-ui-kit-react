@@ -5,7 +5,7 @@ Date-time input
 ### Usage
 
 ```js
-import { DateTimePicker } from "@docspace/ui-kit";
+import { DateTimePicker } from "@onlyoffice/apps-ui-kit";
 ```
 
 ```jsx

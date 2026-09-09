@@ -5,7 +5,7 @@ Displays a single line of structured content with an optional checkbox, leading 
 ## Import
 
 ```ts
-import { Row } from "@docspace/ui-kit/components/rows";
+import { Row } from "@onlyoffice/apps-ui-kit/components/rows";
 ```
 
 ## Usage

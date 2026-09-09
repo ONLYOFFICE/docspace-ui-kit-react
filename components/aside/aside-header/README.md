@@ -5,7 +5,7 @@ Header component for aside panels with optional back/close buttons, custom icons
 ## Usage
 
 ```tsx
-import { AsideHeader } from "@docspace/ui-kit/components/aside";
+import { AsideHeader } from "@onlyoffice/apps-ui-kit/components/aside";
 
 <AsideHeader
   header="Settings"

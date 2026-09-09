@@ -23,7 +23,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { ErrorBoundary } from "@docspace/ui-kit/providers/error-boundary";
+import { ErrorBoundary } from "@onlyoffice/apps-ui-kit/providers/error-boundary";
 
 // With default fallback
 <ErrorBoundary>

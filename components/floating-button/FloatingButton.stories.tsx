@@ -23,7 +23,7 @@ const meta = {
 ### Usage
 
 \`\`\`tsx
-import { FloatingButton, FloatingButtonIcons } from "@docspace/ui-kit/components/floating-button";
+import { FloatingButton, FloatingButtonIcons } from "@onlyoffice/apps-ui-kit/components/floating-button";
 
 // Basic floating button
 <FloatingButton icon={FloatingButtonIcons.upload} />

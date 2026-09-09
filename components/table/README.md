@@ -12,7 +12,7 @@ import {
   TableRow,
   TableCell,
   TableGroupMenu,
-} from "@docspace/ui-kit/components/table";
+} from "@onlyoffice/apps-ui-kit/components/table";
 
 <TableContainer forwardedRef={containerRef} useReactWindow>
   <TableHeader

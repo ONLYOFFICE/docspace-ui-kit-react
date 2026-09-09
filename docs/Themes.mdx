@@ -10,8 +10,8 @@ The UI Kit ships with Base (light) and Dark themes built on **styled-components*
 ## Setting up ThemeProvider
 
 ```tsx
-import { ThemeProvider } from "@docspace/ui-kit/providers/theme";
-import { ThemeKeys } from "@docspace/ui-kit/enums";
+import { ThemeProvider } from "@onlyoffice/apps-ui-kit/providers/theme";
+import { ThemeKeys } from "@onlyoffice/apps-ui-kit/enums";
 
 <ThemeProvider initialTheme={ThemeKeys.BaseStr} locale="en">
   <App />
@@ -21,7 +21,7 @@ import { ThemeKeys } from "@docspace/ui-kit/enums";
 Or use the composite `Providers` component:
 
 ```tsx
-import { Providers } from "@docspace/ui-kit/providers";
+import { Providers } from "@onlyoffice/apps-ui-kit/providers";
 
 <Providers
   url="https://your-docspace.com/api"
@@ -43,7 +43,7 @@ import { Providers } from "@docspace/ui-kit/providers";
 ### ThemeKeys enum
 
 ```ts
-import { ThemeKeys } from "@docspace/ui-kit/enums";
+import { ThemeKeys } from "@onlyoffice/apps-ui-kit/enums";
 
 ThemeKeys.BaseStr    // "Base" — light theme
 ThemeKeys.DarkStr    // "Dark" — dark theme
@@ -106,7 +106,7 @@ The theme object contains 100+ nested categories for component-specific tokens:
 Read the current theme state from any component:
 
 ```tsx
-import { useTheme } from "@docspace/ui-kit/context/ThemeContext";
+import { useTheme } from "@onlyoffice/apps-ui-kit/context/ThemeContext";
 
 function MyComponent() {
   const { theme, isBase, currentColorScheme } = useTheme();
@@ -195,7 +195,7 @@ import {
   getDirectionByLanguage,
   getCorrectTextAlign,
   getCorrectBorderRadius,
-} from "@docspace/ui-kit/providers/theme";
+} from "@onlyoffice/apps-ui-kit/providers/theme";
 
 isLanguageRtl("ar");           // true
 getDirectionByLanguage("en");  // "ltr"
@@ -217,10 +217,10 @@ getCorrectFourValuesStyle("0 8px 0 0", "rtl");  // "0 0 0 8px"
 
 ## Global color tokens
 
-Available in `@docspace/ui-kit/providers/theme`:
+Available in `@onlyoffice/apps-ui-kit/providers/theme`:
 
 ```ts
-import { globalColors } from "@docspace/ui-kit/providers/theme";
+import { globalColors } from "@onlyoffice/apps-ui-kit/providers/theme";
 
 globalColors.white           // "#ffffff"
 globalColors.black           // "#333333"

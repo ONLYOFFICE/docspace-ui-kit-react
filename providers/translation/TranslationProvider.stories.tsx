@@ -37,9 +37,9 @@ const meta: Meta<typeof TranslationProvider> = {
 ### Usage
 
 \`\`\`tsx
-import { TranslationProvider } from "@docspace/ui-kit/providers/translation";
-import type { TTranslations } from "@docspace/ui-kit/providers/translation";
-import enCommon from "@docspace/ui-kit/locales/en/Common.json";
+import { TranslationProvider } from "@onlyoffice/apps-ui-kit/providers/translation";
+import type { TTranslations } from "@onlyoffice/apps-ui-kit/providers/translation";
+import enCommon from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
 
 const translations: TTranslations = new Map([
   ["en", new Map([["Common", enCommon]])],

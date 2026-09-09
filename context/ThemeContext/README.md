@@ -13,7 +13,7 @@ React Context for managing application theme state and color schemes in DocSpace
 ## Installation
 
 ```tsx
-import { ThemeProvider, useTheme, type TTheme, type TColorScheme } from "@docspace/ui-kit/context";
+import { ThemeProvider, useTheme, type TTheme, type TColorScheme } from "@onlyoffice/apps-ui-kit/context";
 ```
 
 ## Usage
@@ -23,7 +23,7 @@ import { ThemeProvider, useTheme, type TTheme, type TColorScheme } from "@docspa
 Wrap your application with the `ThemeProvider`:
 
 ```tsx
-import { ThemeProvider } from "@docspace/ui-kit/context";
+import { ThemeProvider } from "@onlyoffice/apps-ui-kit/context";
 
 function App() {
   return (
@@ -39,7 +39,7 @@ function App() {
 Access the current theme in any component:
 
 ```tsx
-import { useTheme } from "@docspace/ui-kit/context";
+import { useTheme } from "@onlyoffice/apps-ui-kit/context";
 
 function MyComponent() {
   const { theme, isBase } = useTheme();
@@ -57,7 +57,7 @@ function MyComponent() {
 Provide a custom color scheme for brand customization:
 
 ```tsx
-import { ThemeProvider, type TColorScheme } from "@docspace/ui-kit/context";
+import { ThemeProvider, type TColorScheme } from "@onlyoffice/apps-ui-kit/context";
 
 const customColorScheme: TColorScheme = {
   id: 1,
@@ -173,7 +173,7 @@ if (currentColorScheme) {
 
 ```tsx
 import { useState } from "react";
-import { ThemeProvider, type TTheme } from "@docspace/ui-kit/context";
+import { ThemeProvider, type TTheme } from "@onlyoffice/apps-ui-kit/context";
 
 function App() {
   const [theme, setTheme] = useState<TTheme>("Base");
@@ -196,7 +196,7 @@ function App() {
 ### Conditional Styling Based on Theme
 
 ```tsx
-import { useTheme } from "@docspace/ui-kit/context";
+import { useTheme } from "@onlyoffice/apps-ui-kit/context";
 
 function Card() {
   const { isBase } = useTheme();
@@ -217,8 +217,8 @@ function Card() {
 ### Using Color Scheme in Components
 
 ```tsx
-import { useTheme } from "@docspace/ui-kit/context";
-import { Button } from "@docspace/ui-kit/components/button";
+import { useTheme } from "@onlyoffice/apps-ui-kit/context";
+import { Button } from "@onlyoffice/apps-ui-kit/components/button";
 
 function CustomButton() {
   const { currentColorScheme } = useTheme();
@@ -240,7 +240,7 @@ function CustomButton() {
 
 ```tsx
 import { useState } from "react";
-import { ThemeProvider, type TColorScheme } from "@docspace/ui-kit/context";
+import { ThemeProvider, type TColorScheme } from "@onlyoffice/apps-ui-kit/context";
 
 const colorSchemes: TColorScheme[] = [
   {
