@@ -115,8 +115,11 @@ const MainButton = (props: MainButtonProps) => {
 
   // A menu whose items explain themselves is wider than the button, so it is
   // sized by its content instead of being clamped to the button width.
+  // A caller may leave holes in the model for options it decided not to offer
+  // (an upload-folder entry a tablet has no picker for), so an item is only
+  // asked about its description once it is known to be one.
   const hasItemDescriptions = model?.some(
-    (item) => "description" in item && Boolean(item.description),
+    (item) => item && "description" in item && Boolean(item.description),
   );
 
   const buttonClasses = classNames(styles.mainButton, className, {
