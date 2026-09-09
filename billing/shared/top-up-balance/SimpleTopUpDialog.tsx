@@ -157,6 +157,11 @@ const SimpleTopUpDialogContent = observer(
           successParams,
         );
 
+        if (isDelayedPaymentMethod) {
+          onClose();
+          return;
+        }
+
         await waitForTopUpCompletion(
           { walletBalance, fetchCustomerInfo, fetchBalance },
           signal,
@@ -198,9 +203,12 @@ const SimpleTopUpDialogContent = observer(
           requests.push(fetchTransactionHistory(serviceName));
         await Promise.allSettled(requests);
 
-        toastr.success(t("WalletToppedUp"));
-
-        await onConfirm?.();
+        if (isDelayedPaymentMethod) {
+          toastr.success(t("WalletDelayedPaymentMethodBanner"));
+        } else {
+          toastr.success(t("WalletToppedUp"));
+          await onConfirm?.();
+        }
 
         onClose();
       } catch (error) {

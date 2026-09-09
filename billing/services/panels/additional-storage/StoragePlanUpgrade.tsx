@@ -71,6 +71,7 @@ import CurrentSubscription from "./CurrentSubscription";
 import OrderSummary from "./OrderSummary";
 import WalletContainer from "./WalletContainer";
 import TopUpContainer from "./TopUpContainer";
+import SimpleTopUpDialog from "../../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import StorageWarning from "./StorageWarning";
 
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
@@ -102,6 +103,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     fetchPortalTariff,
     fetchCustomerInfo,
     walletCustomerEmail,
+    isDelayedPaymentMethod,
   } = paymentStore.tariff;
 
   const {
@@ -139,6 +141,9 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     isVisibleWalletSettings,
   );
   const [isRequestDialog, setIsRequestDialog] = useState(false);
+  const [isWalletTopUpVisible, setIsWalletTopUpVisible] = useState(false);
+  const openWalletTopUp = () => setIsWalletTopUpVisible(true);
+  const closeWalletTopUp = () => setIsWalletTopUpVisible(false);
   const [debouncedAmount, setDebouncedAmount] = useState(amount);
 
   const navigate = useNavigate();
@@ -318,6 +323,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         if (
           !isCancellation &&
           !skipTopUp &&
+          !isDelayedPaymentMethod &&
           isBalanceInsufficient &&
           recommendedAmount > 0
         ) {
@@ -507,7 +513,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
   return (
     <PaymentProvider>
       <ModalDialog
-        visible={visible}
+        visible={visible && !isWalletTopUpVisible}
+        hideContent={isWalletTopUpVisible}
         onClose={onClose}
         displayType={ModalDialogType.aside}
         containerVisible={isVisibleContainer}
@@ -613,6 +620,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
             isLoading={isLoading}
             onBuy={onBuy}
             onSendRequest={onSendRequest}
+            onTopUpWallet={openWalletTopUp}
             isPaymentBlockedByBalance={isPaymentBlockedByBalance}
             isBalanceInsufficient={isBalanceInsufficient}
             recommendedAmount={recommendedAmount}
@@ -621,6 +629,15 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
           />
         </ModalDialog.Footer>
       </ModalDialog>
+
+      {isWalletTopUpVisible ? (
+        <SimpleTopUpDialog
+          visible={isWalletTopUpVisible}
+          onClose={closeWalletTopUp}
+          minValue={recommendedAmount > 0 ? `${recommendedAmount}` : undefined}
+          serviceName={storageServiceName ?? DISK_STORAGE}
+        />
+      ) : null}
     </PaymentProvider>
   );
 };

@@ -40,7 +40,6 @@ import { Text } from "../../../components/text";
 import CheckRoundSvg from "../../../assets/icons/16/check.round.react.svg";
 import styles from "../styles/Wallet.module.scss";
 
-// Same look as the auto top-up banner: the funds of a delayed method are on their way.
 const DelayedPaymentMethodBanner = () => {
   const t = useCommonTranslation();
 
@@ -63,3 +62,4 @@ const DelayedPaymentMethodBanner = () => {
 };
 
 export default DelayedPaymentMethodBanner;
+
