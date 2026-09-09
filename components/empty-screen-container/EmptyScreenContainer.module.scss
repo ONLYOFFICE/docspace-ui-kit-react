@@ -128,6 +128,14 @@
     span {
       color: var(--empty-content-button-text-value);
     }
+
+    // A Button renders its label as a span, so the rule above used to repaint
+    // it with the plain-text color of this area - a primary button ended up
+    // blue with black text. The label belongs to the button and takes its
+    // color: white on primary, the base color on the rest, in both themes.
+    button span {
+      color: inherit;
+    }
   }
 
   @include mixins.transitional-screen-size {
