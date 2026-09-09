@@ -44,6 +44,7 @@ import { toastr } from "../../../components/toast";
 import { useCommonTranslation } from "../../../utils/i18n";
 import {
   openStripeCheckout,
+  type TTopUpCompletionDeps,
   waitForTopUpCompletion,
 } from "../../utils/stripe-flow";
 import { AnalyticsEvents } from "../../../enums";
@@ -73,7 +74,7 @@ export type TSimpleTopUpDeps = {
     successUrl?: string,
   ) => Promise<string | null | undefined>;
   walletBalance: number;
-  fetchCustomerInfo: (refresh?: boolean) => Promise<string | null | undefined>;
+  fetchCustomerInfo: TTopUpCompletionDeps["fetchCustomerInfo"];
 };
 
 const MIN_AMOUNT = "10";
@@ -162,14 +163,14 @@ const SimpleTopUpDialogContent = observer(
           return;
         }
 
-        await waitForTopUpCompletion(
+        const completion = await waitForTopUpCompletion(
           { walletBalance, fetchCustomerInfo, fetchBalance },
           signal,
         );
 
         if (signal.aborted) return;
 
-        await onConfirm?.();
+        if (!completion.isDelayedPaymentMethod) await onConfirm?.();
 
         if (signal.aborted) return;
 

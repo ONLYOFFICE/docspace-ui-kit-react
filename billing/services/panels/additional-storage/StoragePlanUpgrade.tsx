@@ -102,7 +102,6 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     hasScheduledStorageChange,
     fetchPortalTariff,
     fetchCustomerInfo,
-    walletCustomerEmail,
     isDelayedPaymentMethod,
   } = paymentStore.tariff;
 
@@ -415,11 +414,6 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     return paymentStore.walletBalance ?? 0;
   };
 
-  const fetchCustomerEmail = async (isRefresh?: boolean) => {
-    const info = await fetchCustomerInfo(isRefresh);
-    return info?.email ?? walletCustomerEmail;
-  };
-
   const onStripeBuy = async () => {
     if (isLoading) return;
 
@@ -447,16 +441,22 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         },
       );
 
-      await waitForTopUpCompletion(
+      const completion = await waitForTopUpCompletion(
         {
           walletBalance: walletBalance ?? 0,
-          fetchCustomerInfo: fetchCustomerEmail,
+          fetchCustomerInfo,
           fetchBalance: fetchBalanceValue,
         },
         signal,
       );
 
       if (signal.aborted) return;
+
+      if (completion.isDelayedPaymentMethod) {
+        setIsLoading(false);
+        onClose();
+        return;
+      }
 
       await handleStoragePlanChange(false, true);
     } catch (e) {
