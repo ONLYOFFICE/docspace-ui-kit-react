@@ -24,31 +24,33 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-export { getOnlyofficeFileType } from "./file-type";
-// The duplicate check stays internal on purpose: `attachFilesToChat` applies
-// it itself, so a host never has to remember it (see duplicate-attachments).
-export {
-  attachFilesToChat,
-  type AttachFileInput,
-  type AttachedFileInfo,
-  type OnFilesAttached,
-} from "./attach-files";
-export { useHasFormAttached } from "./use-has-form-attached";
-// Provided by AiAgentProviders around the host subtree; consumed by
-// `useAttachHostFilesToChat`, so hosts never pass it themselves.
-export {
-  OnFilesAttachedContext,
-  useOnFilesAttached,
-} from "./attached-report";
-export {
-  useAttachHostFilesToChat,
-  type ChatAttachableItem,
-  type AttachToChatResult,
-} from "./use-attach-to-chat";
-export { CHAT_ATTACHMENT_LIMIT } from "./limits";
-export {
-  useFilesIntegration,
-  type FilesIntegration,
-} from "./use-integration";
-export { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
-export type { SuggestedQuestion } from "./suggested-questions";
+import { describe, expect, it } from "vitest";
+
+import { readSuggestedQuestions } from "./suggested-questions";
+
+const QUESTION = {
+  question: "How many people picked each payment method?",
+  prompt: "Count the responses per value of the payment method field.",
+};
+
+describe("readSuggestedQuestions", () => {
+  it("reads the field off a record that carries it", () => {
+    expect(
+      readSuggestedQuestions({ id: "a", suggestedQuestions: [QUESTION] }),
+    ).toEqual([QUESTION]);
+  });
+
+  it("returns undefined when the record has no such field", () => {
+    expect(readSuggestedQuestions({ id: "a" })).toBeUndefined();
+    expect(readSuggestedQuestions(null)).toBeUndefined();
+    expect(readSuggestedQuestions("nope")).toBeUndefined();
+  });
+
+  it("drops malformed entries instead of the whole array", () => {
+    expect(
+      readSuggestedQuestions({
+        suggestedQuestions: [QUESTION, { question: "no prompt" }, 42, null],
+      }),
+    ).toEqual([QUESTION]);
+  });
+});

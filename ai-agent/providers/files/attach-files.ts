@@ -28,6 +28,10 @@ import { useStores } from "@onlyoffice/ai-chat";
 
 import { rememberFormAttachments } from "./form-attachments";
 import {
+  readSuggestedQuestions,
+  type SuggestedQuestion,
+} from "./suggested-questions";
+import {
   holdAttachPaths,
   rememberAttachedPaths,
   splitDuplicateAttachments,
@@ -62,20 +66,16 @@ export type AttachedFileInfo = {
   id: string;
   /** The backend can analyze this file's contents (an analyzable form). */
   canAnalyze?: boolean;
+  /**
+   * Starter questions the backend already had for this form (a cache hit on
+   * an earlier attach of the same form, version and language). Empty while
+   * the generation is still running — see {@link SuggestedQuestion}.
+   */
+  suggestedQuestions?: SuggestedQuestion[];
 };
 
 /** Reports what was attached, so the caller can keep the extra flags. */
 export type OnFilesAttached = (attached: AttachedFileInfo[]) => void;
-
-// The packaged ai-chat (`onlyoffice-ai-chat-0.5.0-docspace.2.tgz`) predates
-// `canAnalyze` on its `Attachment` type, while the backend already returns it.
-// Read it structurally until a build carrying the field is packed.
-const readCanAnalyze = (record: unknown): boolean | undefined => {
-  if (typeof record !== "object" || record === null) return undefined;
-  if (!("canAnalyze" in record)) return undefined;
-  const value = record.canAnalyze;
-  return typeof value === "boolean" ? value : undefined;
-};
 
 /**
  * Attaches host files to the AI chat composer through the attachments
@@ -187,7 +187,11 @@ export const attachFilesToChat = async (
 
   const attached = records
     .filter((_, i) => !imageIndices.has(i))
-    .map((record) => ({ id: record.id, canAnalyze: readCanAnalyze(record) }));
+    .map((record) => ({
+      id: record.id,
+      canAnalyze: record.canAnalyze,
+      suggestedQuestions: readSuggestedQuestions(record),
+    }));
 
   if (imageIndices.size === 0) return attached;
 

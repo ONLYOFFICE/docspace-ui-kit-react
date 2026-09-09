@@ -80,6 +80,10 @@ import "@onlyoffice/ai-chat/styles";
 // Re-exported so the host can type the `suggestions` array it builds and
 // passes in (the section→chips logic lives in the host, not here).
 export type { Suggestion } from "@onlyoffice/ai-chat";
+// The per-composer-state chip lists the host fills in, and the switching
+// between them, live in ./suggestions — re-exported so the prop's type stays
+// importable from the provider module the host already imports.
+export type { SuggestionSet } from "./suggestions";
 
 import { toastr } from "../../components/toast";
 import { Link, LinkType } from "../../components/link";
@@ -118,7 +122,12 @@ import {
 } from "./host-tool-groups/generated-file-window";
 import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer/submit-interceptors";
 import { useApi as useFilesApi } from "../../providers/api";
-import { useFilesIntegration, type AttachedFileInfo } from "./files";
+import {
+  useFilesIntegration,
+  type AttachedFileInfo,
+  type SuggestedQuestion,
+} from "./files";
+import { resolveSuggestions, type SuggestionSet } from "./suggestions";
 import { OnFilesAttachedContext } from "./files/attached-report";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
@@ -268,46 +277,6 @@ type AiAgentProvidersProps = {
    */
   suggestions?: Suggestion[] | SuggestionSet;
   children: ReactNode;
-};
-
-/**
- * Suggestion chips per composer state. The host owns the texts; picking
- * between them belongs here, because only the provider sees the attachments
- * store — files can also arrive by drag-and-drop and be removed chip by chip,
- * neither of which the host observes.
- *
- * Precedence: an analyzable form wins over the plain file lists, and those win
- * over the section default. Files and images both count — an attached image
- * is what the user is asking about just as much as a document.
- */
-export type SuggestionSet = {
-  /** Nothing attached: chips for the current section (room / folder). */
-  default: Suggestion[];
-  /** Exactly one file or image attached. */
-  singleFile?: Suggestion[];
-  /** Two or more files/images attached. */
-  multipleFiles?: Suggestion[];
-  /** At least one attached file the backend flagged as analyzable. */
-  analyzableForm?: Suggestion[];
-};
-
-const resolveSuggestions = (
-  suggestions: Suggestion[] | SuggestionSet | undefined,
-  attachedFileIds: string[],
-  analyzableIds: string[],
-): Suggestion[] | undefined => {
-  if (!suggestions || Array.isArray(suggestions)) return suggestions;
-
-  if (attachedFileIds.some((id) => analyzableIds.includes(id))) {
-    return suggestions.analyzableForm ?? suggestions.default;
-  }
-  if (attachedFileIds.length > 1) {
-    return suggestions.multipleFiles ?? suggestions.default;
-  }
-  if (attachedFileIds.length === 1) {
-    return suggestions.singleFile ?? suggestions.default;
-  }
-  return suggestions.default;
 };
 
 // Server-mode API config: backend is mounted at the same origin as the
@@ -561,10 +530,32 @@ const AiAgentProviders = ({
   // refs.
   const [analyzableIds, setAnalyzableIds] = useState<string[]>([]);
 
+  // Starter questions the backend generated from an attached form's own
+  // schema, per attachment id. They ride along with the attach response when
+  // the backend already has them (its cache is keyed by form, version and
+  // language); a form attached for the first time comes back without them and
+  // keeps the static chips.
+  const [questionsById, setQuestionsById] = useState<
+    Record<string, SuggestedQuestion[]>
+  >({});
+
   const onFilesAttached = useCallback((attached: AttachedFileInfo[]) => {
-    const ids = attached.filter((f) => f.canAnalyze).map((f) => f.id);
-    if (ids.length === 0) return;
-    setAnalyzableIds((prev) => [...prev, ...ids]);
+    const analyzable = attached.filter((f) => f.canAnalyze);
+    if (analyzable.length === 0) return;
+
+    setAnalyzableIds((prev) => [...prev, ...analyzable.map((f) => f.id)]);
+
+    const withQuestions = analyzable.filter(
+      (f) => f.suggestedQuestions && f.suggestedQuestions.length > 0,
+    );
+    if (withQuestions.length === 0) return;
+
+    setQuestionsById((prev) => ({
+      ...prev,
+      ...Object.fromEntries(
+        withQuestions.map((f) => [f.id, f.suggestedQuestions ?? []]),
+      ),
+    }));
   }, []);
 
   // Context value for the in-chat form-model notice. Memoized on the fields so
@@ -892,8 +883,9 @@ const AiAgentProviders = ({
         suggestions,
         attachedFileIds === "" ? [] : attachedFileIds.split(","),
         analyzableIds,
+        questionsById,
       ),
-    [suggestions, attachedFileIds, analyzableIds],
+    [suggestions, attachedFileIds, analyzableIds, questionsById],
   );
 
   const widgetConfig = useMemo<WidgetConfig>(

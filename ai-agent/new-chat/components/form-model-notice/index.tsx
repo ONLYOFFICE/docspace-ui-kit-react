@@ -50,13 +50,15 @@ import styles from "./FormModelNotice.module.scss";
  *
  * Form-ness comes from the host file row — `isForm` together with the
  * results table the responses land in (`externalDbTableName`) — and is
- * remembered per attachment by the attach helpers: the attachment record
- * itself carries no such flag in this topology (`canAnalyze` is never
- * populated by the DocSpace backend). A form nobody has answered has nothing
- * to discuss, hence the table. The rest of the wiring — which model is recommended, whether the
- * user may change the agent's model, and whether the user already dismissed
- * the notice — is host state, supplied through `formsRecommendation` on
- * `AiAgentProviders`.
+ * remembered per attachment by the attach helpers. A form nobody has answered
+ * has nothing to discuss, hence the table. The backend's own `canAnalyze` on
+ * the attachment record is deliberately not used here: it drives the chips of
+ * an analyzable form (see `SuggestionSet.analyzableForm`), while this notice
+ * is about the host file the user picked, and it must show the moment the
+ * chip appears rather than after the attach round trip. The rest of the
+ * wiring — which model is recommended, whether the user may change the
+ * agent's model, and whether the user already dismissed the notice — is host
+ * state, supplied through `formsRecommendation` on `AiAgentProviders`.
  */
 export const FormModelNotice = () => {
   const hasFormAttached = useHasFormAttached();
