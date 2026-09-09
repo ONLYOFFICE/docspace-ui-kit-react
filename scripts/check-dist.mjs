@@ -98,8 +98,8 @@ console.log("dist/ carries no bundled dependencies.");
 // it warns "Module level directives cause errors when bundled" once per file,
 // which is invisible among hundreds of lines of build output. Without the
 // directive, every Next.js App Router consumer breaks on the first interactive
-// component. Reported rather than enforced, because the fix is still an open
-// decision (debt B-10); enforcing it now would leave the build permanently red.
+// component. `preserveUseClient` in rollup.config.mjs restores it per chunk, so
+// this is enforced: every source occurrence must have a matching one in dist.
 const countDirective = (dir, exts) => {
   let n = 0;
 
@@ -132,13 +132,20 @@ const inSource = fs
     (sum, e) => sum + countDirective(path.join(SOURCE_ROOT, e.name), [".ts", ".tsx"]),
     0,
   );
+// Each source file compiles to both dist/esm and dist/cjs, so the built count
+// must be exactly double the source count -- not just "at least as many".
 const inDist = countDirective(DIST, [".js"]);
+const expectedInDist = inSource * 2;
 
-if (inDist < inSource) {
-  console.warn(
-    `\n  WARNING: "use client" is in ${inSource} source files and ${inDist} ` +
-      "built files.\n  Rollup strips module-level directives, so Next.js App " +
-      "Router consumers will\n  break on the first interactive component. " +
-      "See debt B-10.\n",
+if (inDist !== expectedInDist) {
+  console.error(
+    `\n  "use client" is in ${inSource} source files but ${inDist} built files ` +
+      `(expected ${expectedInDist} -- one per module per output format).\n  ` +
+      "Rollup strips module-level directives, so Next.js App Router consumers " +
+      "will\n  break on the first interactive component. Check preserveUseClient " +
+      "in rollup.config.mjs.\n",
   );
+  process.exit(1);
 }
+
+console.log(`"use client" preserved: ${inSource} source files, ${inDist} built files.`);
