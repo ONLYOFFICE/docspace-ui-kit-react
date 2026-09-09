@@ -467,30 +467,30 @@ import { Error401, Error403, Error404 } from "@docspace/ui-kit/errors";
 | Utility | Description |
 |---------|-------------|
 | [common-icons-style](./utils/common-icons-style/README.md) | Styled-components CSS helper for consistent icon sizing with `IconSizeType` enum |
-| [combineUrl](./utils/combineUrl) | Merges base URL with path segments, handling trailing/leading slashes |
-| [common](./utils/common.ts) | `getUserTypeTranslation` for employee role types, `RoomsTypeValues`, `RoomsTypes` helpers |
-| [context](./utils/context.ts) | React context with optional `sectionWidth` and `sectionHeight` |
-| [cookie](./utils/cookie) | `getCookie`, `setCookie`, `deleteCookie` — cookie management with `asc_language` special handling |
-| [date](./utils/date) | Date utilities: formatting, arithmetic, comparison, duration, timezone, and parsing |
+| [combineUrl](./utils/combineUrl/README.md) | Merges base URL with path segments, handling trailing/leading slashes |
+| [common](./utils/common) | `getUserTypeTranslation` for employee role types, `RoomsTypeValues`, `RoomsTypes` helpers |
+| [context](./utils/context) | React context with optional `sectionWidth` and `sectionHeight` |
+| [cookie](./utils/cookie/README.md) | `getCookie`, `setCookie`, `deleteCookie` — cookie management with `asc_language` special handling |
+| [date](./utils/date/README.md) | Date utilities: formatting, arithmetic, comparison, duration, timezone, and parsing |
 | [device](./utils/device/README.md) | Device detection utilities: `isMobile`, `isTablet`, `isDesktop`, `checkIsSSR` |
 | [dom-helpers](./utils/dom-helpers/README.md) | DOM utilities for viewport, element positioning, scrollbar width, and z-index management |
-| [edge-scrolling](./utils/edge-scrolling) | Auto-scrolls when mouse is near viewport edges — used for drag-and-drop operations |
-| [email](./utils/email) | Email parsing and validation: `parseAddress`, `parseAddresses`, `EmailSettings`, `isValidDomainName` |
-| [get-system-theme](./utils/get-system-theme) | Returns system theme preference (Dark or Base) from AscDesktopEditor or `prefers-color-scheme` |
+| [edge-scrolling](./utils/edge-scrolling/README.md) | Auto-scrolls when mouse is near viewport edges — used for drag-and-drop operations |
+| [email](./utils/email/README.md) | Email parsing and validation: `parseAddress`, `parseAddresses`, `EmailSettings`, `isValidDomainName` |
+| [get-system-theme](./utils/get-system-theme/README.md) | Returns system theme preference (Dark or Base) from AscDesktopEditor or `prefers-color-scheme` |
 | [get-text-color](./utils/get-text-color/README.md) | Determines optimal text color (black/white) for a background based on perceived brightness |
-| [getFilesFromEvent](./utils/getFilesFromEvent) | Converts drag/drop/paste/input events to File arrays with recursive directory handling |
-| [getLogoUrl](./utils/getLogoUrl) | Generates logo URL using `WhiteLabelLogoType` enum with culture and theme parameters |
-| [hasOwnProperty](./utils/hasOwnProperty) | Safe `Object.hasOwn` check with try-catch that handles null/undefined |
-| [i18n](./utils/i18n) | `getCommonTranslation(key)` — retrieves localized strings from `window.i18n` |
-| [openingNewTab](./utils/openingNewTab) | Detects middle-click / Ctrl+Click / Cmd+Click to open URLs in new tabs |
+| [getFilesFromEvent](./utils/getFilesFromEvent/README.md) | Converts drag/drop/paste/input events to File arrays with recursive directory handling |
+| [getLogoUrl](./utils/getLogoUrl/README.md) | Generates logo URL using `WhiteLabelLogoType` enum with culture and theme parameters |
+| [hasOwnProperty](./utils/hasOwnProperty/README.md) | Safe `Object.hasOwn` check with try-catch that handles null/undefined |
+| [i18n](./utils/i18n/README.md) | `getCommonTranslation(key)` — retrieves localized strings from `window.i18n` |
+| [openingNewTab](./utils/openingNewTab/README.md) | Detects middle-click / Ctrl+Click / Cmd+Click to open URLs in new tabs |
 | [trim-separator](./utils/trim-separator/README.md) | Cleans up context menu arrays by removing redundant separators and disabled items |
 | [use-click-outside](./utils/use-click-outside/README.md) | React hook for detecting clicks outside an element, useful for dropdowns and modals |
 | [uuid](./utils/uuid/README.md) | UUID v4 generation utility for unique identifiers |
-| [add-log](./utils/add-log) | Conditionally logs to the browser console or accumulates messages in `window.logs` based on `ClientConfig` settings |
+| [add-log](./utils/add-log/README.md) | Conditionally logs to the browser console or accumulates messages in `window.logs` based on `ClientConfig` settings |
 | [getTitleWithoutExtension](./utils/getTitleWithoutExtension) | Strips the file extension from a title string, returning the bare name |
 | [image-helpers](./utils/image-helpers) | Generates Maps of file extension → SVG icon URL for 24 / 32 / 64 / 96 px icon sizes across document and folder types |
 | [presentInArray](./utils/presentInArray) | Checks whether a string exists in an array with optional case-insensitive comparison |
-| [socket](./utils/socket) | `SocketHelper` singleton for managing WebSocket connections, event subscriptions, and message emission with typed event/command enums |
+| [socket](./utils/socket/README.md) | `SocketHelper` singleton for managing WebSocket connections, event subscriptions, and message emission with typed event/command enums |
 | [typeGuards](./utils/typeGuards) | Type guard that checks whether a value is a Next.js `StaticImageData` object (`src`, `height`, `width`) |
 
 ## Enums

@@ -177,7 +177,11 @@
   "files": [
     "dist",
     "locales",
-    "LICENSE"
+    "LICENSE",
+    "components/**/README.md",
+    "context/**/README.md",
+    "providers/**/README.md",
+    "utils/**/README.md"
   ],
   "sideEffects": [
     "**/*.scss",
