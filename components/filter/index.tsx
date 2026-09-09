@@ -140,7 +140,8 @@ const FilterInput = React.memo(
     roomGroups,
     onFilterByGroup,
     currentGroupId,
-    isRoomsFolder,
+    withRoomGroups,
+    isFormsSection,
     organizeRoomsGrouping,
     isFilterOrSearchActive,
 
@@ -196,7 +197,7 @@ const FilterInput = React.memo(
       } else {
         setIsRoomGroupsLoaded(true);
       }
-    }, [getAllRoomGroups, organizeRoomsGrouping]);
+    }, [getAllRoomGroups, organizeRoomsGrouping, isFormsSection]);
 
     const mountRef = React.useRef(true);
 
@@ -592,10 +593,10 @@ const FilterInput = React.memo(
 
     const overflowContextMenuHeader = React.useMemo(
       () => ({
-        title: t("RoomGroups"),
+        title: isFormsSection ? t("SpaceGroups") : t("RoomGroups"),
         icon: "",
       }),
-      [t],
+      [t, isFormsSection],
     );
 
     const onOverflowContextMenu = React.useCallback((e: React.MouseEvent) => {
@@ -717,7 +718,7 @@ const FilterInput = React.memo(
           </div>
         ) : null}
 
-        {isRoomsFolder &&
+        {withRoomGroups &&
           isRoomGroupsLoaded &&
           organizeRoomsGrouping &&
           !isFilterOrSearchActive && (
@@ -726,7 +727,7 @@ const FilterInput = React.memo(
                 <div className="group-tags">
                   <SelectedItem
                     propKey="all-rooms"
-                    label={t("AllRooms")}
+                    label={isFormsSection ? t("AllSpaces") : t("AllRooms")}
                     onClick={() => handleFilterByGroup(null)}
                     onClose={() => {}}
                     hideCross
@@ -830,7 +831,7 @@ const FilterInput = React.memo(
               <div className={styles.groupTagsMeasure} aria-hidden>
                 <SelectedItem
                   propKey="m-all"
-                  label={t("AllRooms")}
+                  label={isFormsSection ? t("AllSpaces") : t("AllRooms")}
                   onClick={() => {}}
                   onClose={() => {}}
                   hideCross
@@ -863,7 +864,11 @@ const FilterInput = React.memo(
                 <TooltipContainer
                   as="div"
                   className={styles.groupManagementButton}
-                  title={t("ManageGroupRooms")}
+                  title={
+                    isFormsSection
+                      ? t("ManageGroupSpaces")
+                      : t("ManageGroupRooms")
+                  }
                   onClick={onCreateGroup}
                 >
                   <IconButton
