@@ -205,7 +205,7 @@ const SimpleTopUpDialogContent = observer(
         await Promise.allSettled(requests);
 
         if (isDelayedPaymentMethod) {
-          toastr.success(t("WalletDelayedPaymentMethodBanner"));
+          toastr.success(t("TopUpDelayedPaymentMethodWarning"));
         } else {
           toastr.success(t("WalletToppedUp"));
           await onConfirm?.();
