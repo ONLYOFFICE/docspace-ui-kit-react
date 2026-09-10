@@ -7,9 +7,11 @@ import nodePolyfills from "rollup-plugin-polyfill-node";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
 import postcss from "rollup-plugin-postcss";
 
-import { builtinModules } from "node:module";
+import { builtinModules, createRequire } from "node:module";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import path from "node:path";
+
+const require = createRequire(import.meta.url);
 // A bare filename: rollup rejects absolute or relative asset names, so the
 // plugin emits one stylesheet per output format and a post-build step promotes
 // a single copy to dist/styles.css.
@@ -103,6 +105,77 @@ const entryPoints = [
 const isExternal = (id) =>
 	nodeBuiltins.has(id) ||
 	declaredPackages.some((name) => id === name || id.startsWith(`${name}/`));
+
+// Node's strict ESM resolver never guesses an extension for a bare specifier
+// -- that fallback only exists for CJS `require`. A deep import into a
+// package with no `exports` field (`lodash/throttle`, `fast-deep-equal/react`,
+// `react-syntax-highlighter/dist/cjs/styles/prism`) therefore only resolves
+// under `require()`, and breaks `import` once this package is actually
+// installed rather than symlinked into a bundler-resolved workspace. This
+// only matters for the ESM output -- CJS already works, and adding `.js`
+// there would be wrong syntax for a `require()` callsite in some loaders.
+//
+// A package that ships a real `exports` map (`react-dom/client`) must be left
+// alone: appending `.js` there produces a specifier (`react-dom/client.js`)
+// the map does not define, breaking a subpath that already resolves
+// correctly. So the rule is keyed on whether the *package root* declares
+// `exports`, not on the subpath's own file extension.
+const packageHasExportsMap = new Map();
+
+const hasExportsMap = (packageName) => {
+	if (packageHasExportsMap.has(packageName)) {
+		return packageHasExportsMap.get(packageName);
+	}
+
+	let result = false;
+
+	try {
+		const pkgJsonPath = require.resolve(`${packageName}/package.json`);
+		result = "exports" in JSON.parse(readFileSync(pkgJsonPath, "utf8"));
+	} catch {
+		// Package without its own package.json entry (e.g. a Node builtin
+		// reached through a non-builtin name) -- treat as no exports map.
+	}
+
+	packageHasExportsMap.set(packageName, result);
+
+	return result;
+};
+
+const HAS_EXTENSION = /\.[a-zA-Z0-9]+$/;
+
+// Only rewrites a deep import (`pkg/sub/path`) into a *declared* dependency
+// that has no `exports` map and no extension yet. Bare package roots
+// (`import x from "lodash"`) and Node builtins are untouched.
+const addJsExtensionToDeepImports = () => ({
+	name: "add-js-extension-to-deep-imports",
+	renderChunk(code, chunk, outputOptions) {
+		// Rollup normalises the "esm" format alias to "es" by the time it
+		// reaches a plugin hook -- the output config below still says "esm".
+		if (outputOptions.format !== "es") return null;
+
+		let changed = false;
+
+		const nextCode = code.replace(
+			/(from\s+["'])([^"']+)(["'])/g,
+			(full, prefix, id, suffix) => {
+				const pkgMatch = declaredPackages.find(
+					(name) => id.startsWith(`${name}/`) && id !== name,
+				);
+
+				if (!pkgMatch || HAS_EXTENSION.test(id) || hasExportsMap(pkgMatch)) {
+					return full;
+				}
+
+				changed = true;
+
+				return `${prefix}${id}.js${suffix}`;
+			},
+		);
+
+		return changed ? { code: nextCode, map: null } : null;
+	},
+});
 
 // Rollup strips module-level directives while bundling ("Module level
 // directives cause errors when bundled"), so all 56 "use client" markers in
@@ -270,6 +343,7 @@ export default [
 					],
 				],
 			}),
+			addJsExtensionToDeepImports(),
 		],
 		external: isExternal,
 	},
