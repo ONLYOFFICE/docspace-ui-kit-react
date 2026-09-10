@@ -26,11 +26,7 @@
 
 import { useStores } from "@onlyoffice/ai-chat";
 
-import {
-  holdFormSlot,
-  rememberFormAttachments,
-  splitExtraFormAttachments,
-} from "./form-attachments";
+import { rememberFormAttachments } from "./form-attachments";
 import {
   readSuggestedQuestions,
   type SuggestedQuestion,
@@ -58,12 +54,12 @@ export type AttachFileInput = {
    */
   hasFormResults?: boolean;
   /**
-   * The host file is a DocSpace PDF form (the row's own `isForm`), whether or
-   * not its responses go to a table. Local metadata like `hasFormResults`,
-   * and what the one-form-per-message cap counts
-   * (see {@link splitExtraFormAttachments}).
+   * This attachment is the subject of the message: while it is on the draft
+   * the composer takes nothing else (see `useAnalyzeLock`). Set by the
+   * "Analyze responses" entry point, which is about this one form's
+   * responses.
    */
-  isPdfForm?: boolean;
+  analyzeOnly?: boolean;
 };
 
 /**
@@ -142,34 +138,14 @@ export const attachFilesToChat = async (
       );
   }
 
-  // One form per message, applied on the same terms: the callers refuse the
-  // extra form picks so they can toast, this is the choke point that keeps a
-  // path which forgot to do so from landing a second form.
-  const { keep: keepForms, extraForms } = splitExtraFormAttachments(
-    useAttachmentsStore,
-    keep.map((index) => Boolean(allInputs[index].isPdfForm)),
-  );
-
-  if (extraForms.length > 0 && allPendingIds) {
-    useAttachmentsStore
-      .getState()
-      .failPendingAttachments(
-        extraForms
-          .map((position) => allPendingIds[keep[position]])
-          .filter((id): id is string => Boolean(id)),
-      );
-  }
-
-  const kept = keepForms.map((position) => keep[position]);
-
-  const inputs = kept.map((index) => allInputs[index]);
+  const inputs = keep.map((index) => allInputs[index]);
   const imageIndices = new Set(
-    kept
+    keep
       .map((index, position) => (allImageIndices.has(index) ? position : -1))
       .filter((position) => position >= 0),
   );
   const pendingIds = allPendingIds
-    ? kept
+    ? keep
         .map((index) => allPendingIds[index])
         .filter((id): id is string => Boolean(id))
     : undefined;
@@ -184,26 +160,16 @@ export const attachFilesToChat = async (
   );
 
   // Claim the paths for the whole round trip, so a second attach started
-  // before the refs land sees them as taken. The form slot is claimed the same
-  // way — a form is invisible to the cap until its ref and its registry entry
-  // are both in place.
+  // before the refs land sees them as taken.
   const releasePaths = holdAttachPaths(
     useAttachmentsStore,
     inputs.map((input) => input.path),
   );
-  const releaseFormSlot = inputs.some((input) => input.isPdfForm)
-    ? holdFormSlot(useAttachmentsStore)
-    : undefined;
-  const release = () => {
-    releasePaths();
-    releaseFormSlot?.();
-  };
-
   const records =
     (await useAttachmentsStore
       .getState()
       .addAttachmentFile(inputs, { pendingIds })
-      .finally(release)) ?? [];
+      .finally(releasePaths)) ?? [];
 
   // Remember which host file each ref came from: `path` is optional on the
   // attachment record, so the duplicate check must not depend on the backend
@@ -222,8 +188,8 @@ export const attachFilesToChat = async (
     withResults: records
       .filter((_record, i) => inputs[i]?.hasFormResults)
       .map((record) => record.id),
-    pdfForms: records
-      .filter((_record, i) => inputs[i]?.isPdfForm)
+    analyzeOnly: records
+      .filter((_record, i) => inputs[i]?.analyzeOnly)
       .map((record) => record.id),
   });
 

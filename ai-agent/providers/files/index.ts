@@ -34,6 +34,9 @@ export {
   type OnFilesAttached,
 } from "./attach-files";
 export { useHasFormAttached } from "./use-has-form-attached";
+// The composer lock a subject attachment ("Analyze responses") puts on the
+// draft. Consumed by the chat providers, which own the store bundle.
+export { useAnalyzeLock } from "./use-analyze-lock";
 // Provided by AiAgentProviders around the host subtree; consumed by
 // `useAttachHostFilesToChat`, so hosts never pass it themselves.
 export {
@@ -50,15 +53,13 @@ export {
   useFilesIntegration,
   type FilesIntegration,
 } from "./use-integration";
-export {
-  notifyAlreadyAttached,
-  notifyAttachmentLimit,
-  notifyOneFormOnly,
-} from "./notices";
+export { notifyAlreadyAttached, notifyAttachmentLimit } from "./notices";
 // Provided by AiAgentProviders from its `attachmentLimit` prop; the host
 // subtree reads it through the attach hook's result, not directly.
 export {
   AttachmentLimitContext,
+  DEFAULT_ATTACHMENT_CAP,
   useAttachmentLimit,
+  type AttachmentCap,
 } from "./attachment-limit";
 export type { SuggestedQuestion } from "./suggested-questions";

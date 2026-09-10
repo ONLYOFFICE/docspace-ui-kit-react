@@ -37,6 +37,7 @@ import {
   type OnFilesAttached,
 } from "./attach-files";
 import { notifyAttachmentLimit } from "./notices";
+import type { AttachmentCap } from "./attachment-limit";
 import { reserveAttachmentChips } from "./limits";
 
 type AttachmentsStore = ReturnType<typeof useStores>["useAttachmentsStore"];
@@ -88,11 +89,12 @@ export type UploadFilesToChatDeps = {
   // attachments store drops (`canAnalyze`).
   onFilesAttached?: OnFilesAttached;
   /**
-   * How many attachments the composer accepts here — one in the Forms
-   * section, the widget's own limit elsewhere (see `AttachmentLimitContext`).
-   * This module stays framework-free, so the caller reads the context.
+   * What the composer accepts here and why — one file in the Forms section,
+   * one while a form is being analyzed, the widget's own limit otherwise
+   * (see `AttachmentCap`). This module stays framework-free, so the caller
+   * reads the context.
    */
-  attachmentLimit?: number;
+  attachmentCap?: AttachmentCap;
   t: TFunction;
 };
 
@@ -116,7 +118,7 @@ export const uploadFilesToChat = async (
     filesSettingsApi,
     useAttachmentsStore,
     onFilesAttached,
-    attachmentLimit,
+    attachmentCap,
     t,
   }: UploadFilesToChatDeps,
 ): Promise<void> => {
@@ -153,10 +155,10 @@ export const uploadFilesToChat = async (
       kind: "file" as const,
       type: getOnlyofficeFileType(f.name),
     })),
-    attachmentLimit,
+    attachmentCap?.limit,
   );
   const accepted = picked.slice(0, pendingIds.length);
-  notifyAttachmentLimit(t, picked.length - accepted.length, attachmentLimit);
+  notifyAttachmentLimit(t, picked.length - accepted.length, attachmentCap);
   if (accepted.length === 0) return;
 
   const inputs: AttachFileInput[] = [];

@@ -58,12 +58,12 @@ type FormRegistry = {
    */
   ids: Set<string>;
   /**
-   * Ids of every ref that came from a DocSpace PDF form, results table or
-   * not. This is what the one-form-per-message cap counts: a form the user
-   * has not wired to an external database is still a form, and the two chips
-   * would still put two schemas into one question.
+   * Ids of refs attached as "the subject of this message" — today the form a
+   * user picked "Analyze responses" on. While one of them is in the draft the
+   * composer takes nothing else: the answer is about that form's responses,
+   * and a second file would only muddy it. See `useAnalyzeLock`.
    */
-  pdfFormIds: Set<string>;
+  analyzeOnlyIds: Set<string>;
   /** Bumped on every change so `useSyncExternalStore` re-reads. */
   version: number;
   listeners: Set<() => void>;
@@ -90,7 +90,7 @@ const getRegistry = (useAttachmentsStore: AttachmentsStore): FormRegistry => {
   if (!registry) {
     registry = {
       ids: new Set<string>(),
-      pdfFormIds: new Set<string>(),
+      analyzeOnlyIds: new Set<string>(),
       version: 0,
       listeners: new Set(),
     };
@@ -100,124 +100,54 @@ const getRegistry = (useAttachmentsStore: AttachmentsStore): FormRegistry => {
 };
 
 /**
- * Form attaches whose round trip is still in flight, per attachments store.
- *
- * A form is only visible to {@link countAttachedForms} once its ref is in the
- * store and its id in the registry. Until then two attaches started from two
- * entry points (a pick in the dialog while a drop is uploading) would both see
- * a free slot and land two forms — the same window `holdAttachPaths` closes
- * for duplicate paths.
- */
-const inFlightForms = new WeakMap<object, number>();
-
-/**
- * Claims the form slot for a round trip and returns its release. Hold it until
- * the refs are in the store (or the attach failed) — releasing earlier reopens
- * the window a second form could slip through.
- */
-export const holdFormSlot = (
-  useAttachmentsStore: AttachmentsStore,
-): (() => void) => {
-  inFlightForms.set(
-    useAttachmentsStore,
-    (inFlightForms.get(useAttachmentsStore) ?? 0) + 1,
-  );
-
-  let released = false;
-  return () => {
-    if (released) return;
-    released = true;
-    const count = (inFlightForms.get(useAttachmentsStore) ?? 0) - 1;
-    if (count > 0) inFlightForms.set(useAttachmentsStore, count);
-    else inFlightForms.delete(useAttachmentsStore);
-  };
-};
-
-/**
- * How many PDF forms the current draft is spoken for: the refs standing in it
- * plus the attaches still in flight.
- *
- * The registry side is intersected with the live refs on purpose — it keeps
- * the ids of every form ever attached to this store, and a form whose chip the
- * user removed must stop counting.
- */
-export const countAttachedForms = (
-  useAttachmentsStore: AttachmentsStore,
-): number => {
-  const inFlight = inFlightForms.get(useAttachmentsStore) ?? 0;
-  const registry = getRegistry(useAttachmentsStore);
-  if (registry.pdfFormIds.size === 0) return inFlight;
-
-  const { attachmentFiles, attachmentImages } = useAttachmentsStore.getState();
-  const attached = [...attachmentFiles, ...attachmentImages].filter((ref) =>
-    registry.pdfFormIds.has(ref.id),
-  ).length;
-
-  return attached + inFlight;
-};
-
-/**
- * Splits a batch into what may be attached and the form picks that must be
- * refused, because a message carries **one** form at most.
- *
- * `isForm` flags the inputs that are DocSpace PDF forms, positionally — the
- * host row's own `isForm`, not the narrower {@link hasFormResults}: a form
- * with no results table yet is still one form's worth of schema. A form is
- * refused when the draft already holds one, or when an earlier input in the
- * same batch is a form — the first occurrence claims the slot. Non-form
- * inputs are never refused here; they have their own cap.
- *
- * One form per message because the analysis is about that form's own fields
- * and responses: two forms in one question produce answers that silently mix
- * two schemas, and the per-form starter questions could only describe one of
- * them anyway.
- *
- * Both results are positions into `isForm`, in input order, so callers can
- * carry their parallel arrays (inputs, leases, image flags) along — same
- * contract as `splitDuplicateAttachments`.
- */
-export const splitExtraFormAttachments = (
-  useAttachmentsStore: AttachmentsStore,
-  isForm: boolean[],
-): { keep: number[]; extraForms: number[] } => {
-  const keep: number[] = [];
-  const extraForms: number[] = [];
-  let formsTaken = countAttachedForms(useAttachmentsStore);
-
-  isForm.forEach((flag, index) => {
-    if (flag && formsTaken > 0) {
-      extraForms.push(index);
-      return;
-    }
-    if (flag) formsTaken += 1;
-    keep.push(index);
-  });
-
-  return { keep, extraForms };
-};
-
-/**
  * Records the freshly attached refs that are DocSpace forms.
  *
  * `withResults` are the ids the in-chat model recommendation is about (a form
- * whose responses land in a table); `pdfForms` every id that came from a PDF
- * form, which is what the one-form cap counts. The narrower set is a subset of
- * the wider one, but callers pass both explicitly rather than having this
- * infer it.
+ * whose responses land in a table); `analyzeOnly` the ones attached as the
+ * subject of the message, which lock the composer to themselves. The second
+ * set is narrower than the first, but callers pass both explicitly rather
+ * than having this infer one from the other.
  */
 export const rememberFormAttachments = (
   useAttachmentsStore: AttachmentsStore,
-  { withResults, pdfForms }: { withResults: string[]; pdfForms: string[] },
+  {
+    withResults,
+    analyzeOnly = [],
+  }: { withResults: string[]; analyzeOnly?: string[] },
 ) => {
-  if (withResults.length === 0 && pdfForms.length === 0) return;
-
   const registry = getRegistry(useAttachmentsStore);
-  const addedResults = withResults.filter((id) => !registry.ids.has(id));
-  const addedForms = pdfForms.filter((id) => !registry.pdfFormIds.has(id));
-  if (addedResults.length === 0 && addedForms.length === 0) return;
 
-  addedResults.forEach((id) => registry.ids.add(id));
-  addedForms.forEach((id) => registry.pdfFormIds.add(id));
+  let changed = false;
+  const add = (ids: string[], into: Set<string>) => {
+    ids.forEach((id) => {
+      if (into.has(id)) return;
+      into.add(id);
+      changed = true;
+    });
+  };
+
+  add(withResults, registry.ids);
+  add(analyzeOnly, registry.analyzeOnlyIds);
+
+  if (!changed) return;
+
   registry.version += 1;
   registry.listeners.forEach((listener) => listener());
+};
+
+/**
+ * Whether the draft carries an attachment that owns the message — a form the
+ * user asked to analyze. Intersected with the live refs, so removing the chip
+ * (or sending the message, which clears the draft) lifts the lock on its own.
+ */
+export const hasAnalyzeAttachment = (
+  useAttachmentsStore: AttachmentsStore,
+): boolean => {
+  const registry = getRegistry(useAttachmentsStore);
+  if (registry.analyzeOnlyIds.size === 0) return false;
+
+  const { attachmentFiles, attachmentImages } = useAttachmentsStore.getState();
+  return [...attachmentFiles, ...attachmentImages].some((ref) =>
+    registry.analyzeOnlyIds.has(ref.id),
+  );
 };

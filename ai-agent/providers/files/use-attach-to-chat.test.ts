@@ -32,12 +32,23 @@ import { renderHook } from "@testing-library/react";
 // a fake so the accounting can be driven from the test.
 type FakeRef = { id: string; title: string; kind: string; path?: string };
 
+// An analyze attach empties the draft first, so the fake clears mirror the
+// store's own: they drop the refs and resolve.
+const clearAttachmentFiles = vi.fn(async () => {
+  storeState.attachmentFiles = [];
+});
+const clearAttachmentImages = vi.fn(async () => {
+  storeState.attachmentImages = [];
+});
+
 const storeState = {
   attachmentFiles: [] as FakeRef[],
   attachmentImages: [] as FakeRef[],
   pendingAttachments: [] as { kind: "file" | "image" }[],
   beginPendingAttachments: vi.fn(),
   failPendingAttachments: vi.fn(),
+  clearAttachmentFiles,
+  clearAttachmentImages,
 };
 const useAttachmentsStore = { getState: () => storeState };
 vi.mock("@onlyoffice/ai-chat", () => ({
@@ -54,6 +65,7 @@ vi.mock("./attach-files", async (importOriginal) => ({
 
 import { OnFilesAttachedContext } from "./attached-report";
 import { AttachmentLimitContext } from "./attachment-limit";
+import { rememberFormAttachments } from "./form-attachments";
 import { useAttachHostFilesToChat } from "./use-attach-to-chat";
 
 // Refs carry `${entryId}/${title}`, the shape the AI backend composes.
@@ -93,7 +105,7 @@ const attachUnderLimit = async (items: AttachItems, limit: number) => {
     wrapper: ({ children }: { children: React.ReactNode }) =>
       React.createElement(
         AttachmentLimitContext.Provider,
-        { value: limit },
+        { value: { limit, reason: "section" as const } },
         children,
       ),
   });
@@ -124,6 +136,8 @@ describe("useAttachHostFilesToChat accounting", () => {
     storeState.pendingAttachments = [];
     storeState.beginPendingAttachments = leases(5);
     attachFilesToChat.mockClear();
+    clearAttachmentFiles.mockClear();
+    clearAttachmentImages.mockClear();
   });
 
   it("counts nothing when every file is new", async () => {
@@ -131,8 +145,7 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 2,
       skippedFolders: 0,
       skippedOverLimit: 0,
-      skippedExtraForms: 0,
-      limit: 5,
+      cap: { limit: 5, reason: "widget" },
       duplicates: 0,
     });
   });
@@ -146,8 +159,7 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 1,
       skippedFolders: 1,
       skippedOverLimit: 0,
-      skippedExtraForms: 0,
-      limit: 5,
+      cap: { limit: 5, reason: "widget" },
       duplicates: 0,
     });
   });
@@ -159,8 +171,7 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 0,
       skippedFolders: 0,
       skippedOverLimit: 0,
-      skippedExtraForms: 0,
-      limit: 5,
+      cap: { limit: 5, reason: "widget" },
       duplicates: 1,
     });
     // Nothing to attach: the round trip must not run at all.
@@ -187,10 +198,67 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 2,
       skippedFolders: 1,
       skippedOverLimit: 1,
-      skippedExtraForms: 0,
-      limit: 5,
+      cap: { limit: 5, reason: "widget" },
       duplicates: 1,
     });
+  });
+
+  // "Analyze responses" owns the message: whatever the user had picked before
+  // is dropped, so the form does not end up competing for the single slot.
+  it("empties the draft before attaching an analyze subject", async () => {
+    storeState.attachmentFiles = [attachedRef("90")];
+    storeState.attachmentImages = [{ ...attachedRef("91"), kind: "image" }];
+
+    const result = await attach([{ ...file(1), analyzeOnly: true }]);
+
+    expect(clearAttachmentFiles).toHaveBeenCalledTimes(1);
+    expect(clearAttachmentImages).toHaveBeenCalledTimes(1);
+    expect(result.attached).toBe(1);
+  });
+
+  // Clicking "Analyze responses" again on the form the message already
+  // carries changes nothing, so it must say "already attached" rather than
+  // silently mint a second record — the clear would otherwise hide the
+  // duplicate from the filter.
+  it("reports the subject as a duplicate instead of re-attaching it", async () => {
+    storeState.attachmentFiles = [attachedRef("1")];
+    rememberFormAttachments(useAttachmentsStore as never, {
+      withResults: [],
+      analyzeOnly: ["att-1"],
+    });
+
+    const result = await attach([{ ...file(1), analyzeOnly: true }]);
+
+    expect(result).toEqual({
+      attached: 0,
+      skippedFolders: 0,
+      skippedOverLimit: 0,
+      duplicates: 1,
+      cap: { limit: 5, reason: "widget" },
+    });
+    expect(clearAttachmentFiles).not.toHaveBeenCalled();
+    expect(attachFilesToChat).not.toHaveBeenCalled();
+  });
+
+  // The same form attached as an ordinary file is not the subject yet, so
+  // the analyze request has to go through and make it one.
+  it("re-attaches a form that is attached but not the subject", async () => {
+    storeState.attachmentFiles = [attachedRef("2")];
+
+    const result = await attach([{ ...file(2), analyzeOnly: true }]);
+
+    expect(clearAttachmentFiles).toHaveBeenCalledTimes(1);
+    expect(result.attached).toBe(1);
+    expect(result.duplicates).toBe(0);
+  });
+
+  it("leaves the draft alone for an ordinary attach", async () => {
+    storeState.attachmentFiles = [attachedRef("90")];
+
+    await attach([file(1)]);
+
+    expect(clearAttachmentFiles).not.toHaveBeenCalled();
+    expect(clearAttachmentImages).not.toHaveBeenCalled();
   });
 
   // The Forms section allows a single attachment, and the widget's store
@@ -203,8 +271,7 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 1,
       skippedFolders: 0,
       skippedOverLimit: 1,
-      skippedExtraForms: 0,
-      limit: 1,
+      cap: { limit: 1, reason: "section" },
       duplicates: 0,
     });
     // One lease asked for, so no chip is left without a payload.
@@ -222,8 +289,7 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 0,
       skippedFolders: 0,
       skippedOverLimit: 1,
-      skippedExtraForms: 0,
-      limit: 1,
+      cap: { limit: 1, reason: "section" },
       duplicates: 0,
     });
     expect(storeState.beginPendingAttachments).not.toHaveBeenCalled();
@@ -279,8 +345,7 @@ describe("useAttachHostFilesToChat accounting", () => {
       attached: 0,
       skippedFolders: 0,
       skippedOverLimit: 0,
-      skippedExtraForms: 0,
-      limit: 5,
+      cap: { limit: 5, reason: "widget" },
       duplicates: 1,
     });
   });

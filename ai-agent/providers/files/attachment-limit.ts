@@ -40,22 +40,41 @@ import { createContext, useContext } from "react";
 import { CHAT_ATTACHMENT_LIMIT } from "./limits";
 
 /**
- * How many attachments the composer accepts in the current section, carried
- * down so the attach entry points outside the chat — the "Ask AI" action and
- * the drop zone, both going through `useAttachHostFilesToChat` — apply the
- * same cap as the picker dialog and the device upload (those get it as a
- * prop).
+ * The cap in force, and what put it there.
  *
- * The host sets it per section: the Forms section takes a single attachment,
- * because a question there is about one form and its responses, while
- * everywhere else the widget's own {@link CHAT_ATTACHMENT_LIMIT} stands. The
- * default is that limit, so a subtree rendered without the provider behaves
- * exactly as before.
+ * The reason is carried alongside the number because it is the only thing
+ * that makes the refusal explainable: "one file" reads as an arbitrary rule
+ * unless the message can say the composer is analyzing a form's responses,
+ * or that this section works a file at a time.
  */
-export const AttachmentLimitContext = createContext<number>(
-  CHAT_ATTACHMENT_LIMIT,
+export type AttachmentCap = {
+  limit: number;
+  reason:
+    | /** The widget's own cap — nothing narrower applies. */ "widget"
+    | /** The section the chat is rendered in takes fewer. */ "section"
+    | /** The draft carries the form a message is about. */ "analyze";
+};
+
+export const DEFAULT_ATTACHMENT_CAP: AttachmentCap = {
+  limit: CHAT_ATTACHMENT_LIMIT,
+  reason: "widget",
+};
+
+/**
+ * How many attachments the composer accepts here, carried down so the attach
+ * entry points outside the chat — the "Ask AI" action and the drop zone, both
+ * going through `useAttachHostFilesToChat` — apply the same cap as the picker
+ * dialog and the device upload (those get it as a prop).
+ *
+ * Two things narrow it: the host's section (the Forms section takes a single
+ * attachment, because a question there is about one form and its responses)
+ * and an analyze subject on the draft. The default is the widget's own cap,
+ * so a subtree rendered without the provider behaves exactly as before.
+ */
+export const AttachmentLimitContext = createContext<AttachmentCap>(
+  DEFAULT_ATTACHMENT_CAP,
 );
 
 /** The cap in force here — never above the widget's own. */
-export const useAttachmentLimit = (): number =>
+export const useAttachmentLimit = (): AttachmentCap =>
   useContext(AttachmentLimitContext);

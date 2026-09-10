@@ -28,7 +28,10 @@ import type { TFunction } from "i18next";
 
 import { toastr } from "../../../components/toast";
 
-import { CHAT_ATTACHMENT_LIMIT } from "./limits";
+import {
+  DEFAULT_ATTACHMENT_CAP,
+  type AttachmentCap,
+} from "./attachment-limit";
 
 /**
  * A pick that produced no chip must not look like the action did nothing.
@@ -70,38 +73,43 @@ export const notifyAlreadyAttached = (t: TFunction, count: number) => {
  * plural keys, any counted wording would read wrong for 2-4 items in the
  * Slavic locales.
  *
- * `limit` is the cap that actually applied, which in the Forms section is one
- * (see `AttachmentLimitContext`) — a "up to 1 files" sentence would be its
- * own bug, so that case has its own wording.
+ * Which rule is in force decides the wording, because "only one file" on its
+ * own reads as arbitrary. A one-file cap is either the message being about a
+ * form's responses or the section working a file at a time, and each says so
+ * and names the way out (send, or remove the chip). The default cap just
+ * quotes its number.
  */
-/**
- * `count` form picks were left out because the message already carries a
- * form. States the rule rather than the number, like the cap notice above:
- * the chips show what made it, the rule is what the user cannot see.
- */
-export const notifyOneFormOnly = (t: TFunction, count: number) => {
-  if (count <= 0) return;
-  toastr.info(
-    t("Common:AttachFilesOneFormOnly", {
-      defaultValue: "You can attach only one form at a time",
-    }),
-  );
-};
-
 export const notifyAttachmentLimit = (
   t: TFunction,
   count: number,
-  limit: number = CHAT_ATTACHMENT_LIMIT,
+  cap: AttachmentCap = DEFAULT_ATTACHMENT_CAP,
 ) => {
   if (count <= 0) return;
+
+  if (cap.reason === "analyze") {
+    toastr.info(
+      t("Common:AttachFilesAnalyzingForm", {
+        defaultValue:
+          "This message analyzes the attached form, so it takes no other files. Send it, or remove the form to start over.",
+      }),
+    );
+    return;
+  }
+
+  if (cap.limit === 1) {
+    toastr.warning(
+      t("Common:AttachFilesLimitOne", {
+        defaultValue:
+          "This chat works with one file at a time. Remove the attached file to add another.",
+      }),
+    );
+    return;
+  }
+
   toastr.warning(
-    limit === 1
-      ? t("Common:AttachFilesLimitOne", {
-          defaultValue: "You can attach only one file here",
-        })
-      : t("Common:AttachFilesLimit", {
-          limit,
-          defaultValue: "You can attach up to {{limit}} files",
-        }),
+    t("Common:AttachFilesLimit", {
+      limit: cap.limit,
+      defaultValue: "You can attach up to {{limit}} files",
+    }),
   );
 };

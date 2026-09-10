@@ -63,8 +63,8 @@ const DeviceUploader = React.forwardRef<
   const { t } = useTranslation(["Common"]);
   const { useAttachmentsStore } = useStores();
   const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
-  // Per-section cap: the Forms section takes a single attachment.
-  const attachmentLimit = useAttachmentLimit();
+  // What the composer accepts here, and why (see `AttachmentCap`).
+  const attachmentCap = useAttachmentLimit();
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const uploadFiles = React.useCallback(
@@ -76,7 +76,7 @@ const DeviceUploader = React.forwardRef<
         filesSettingsApi,
         useAttachmentsStore,
         onFilesAttached,
-        attachmentLimit,
+        attachmentCap,
         t,
       }),
     [
@@ -86,7 +86,7 @@ const DeviceUploader = React.forwardRef<
       filesSettingsApi,
       entityId,
       onFilesAttached,
-      attachmentLimit,
+      attachmentCap,
       t,
     ],
   );

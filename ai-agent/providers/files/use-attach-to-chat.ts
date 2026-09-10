@@ -34,13 +34,13 @@ import { FileType } from "../../../enums";
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat } from "./attach-files";
 import { useOnFilesAttached } from "./attached-report";
-import { useAttachmentLimit } from "./attachment-limit";
+import {
+  useAttachmentLimit,
+  type AttachmentCap,
+} from "./attachment-limit";
 import { splitDuplicateAttachments } from "./duplicate-attachments";
 import { reserveAttachmentChips } from "./limits";
-import {
-  hasFormResults,
-  splitExtraFormAttachments,
-} from "./form-attachments";
+import { hasAnalyzeAttachment, hasFormResults } from "./form-attachments";
 
 // The subset of a host file/folder view-model the composer needs. Folders are
 // accepted (and skipped) so callers can hand over a raw selection without
@@ -60,6 +60,13 @@ export type ChatAttachableItem = {
   // (see `hasFormResults` / `useHasFormAttached`).
   isForm?: boolean;
   externalDbTableName?: string | null;
+  /**
+   * Attach this file as the subject of the message: the draft is emptied
+   * first and, while the file is on it, the composer takes nothing else (see
+   * `useAnalyzeLock`). Used by "Analyze responses", whose answer is about
+   * this one form's responses.
+   */
+  analyzeOnly?: boolean;
 };
 
 
@@ -68,7 +75,7 @@ export type ChatAttachableItem = {
  * apart: they read differently to the user, and a caller that lumps them
  * together ends up telling someone who dropped a folder that the attachment
  * limit is full. `attached + duplicates + skippedFolders + skippedOverLimit
- * + skippedExtraForms` always equals the number of items handed in.
+ *` always equals the number of items handed in.
  */
 export type AttachToChatResult = {
   attached: number;
@@ -79,16 +86,11 @@ export type AttachToChatResult = {
   /** Files already attached to the message — one chip per entryId. */
   duplicates: number;
   /**
-   * Forms refused because the message already carries one — see
-   * `splitExtraFormAttachments`.
-   */
-  skippedExtraForms: number;
-  /**
-   * The cap that applied, so the caller's toast quotes the number the user
-   * actually hit (the Forms section allows a single attachment — see
+   * The cap that applied and what put it there, so the caller's toast can
+   * explain the refusal rather than just quote a number (see
    * `AttachmentLimitContext`).
    */
-  limit: number;
+  cap: AttachmentCap;
 };
 
 /**
@@ -115,14 +117,51 @@ export const useAttachHostFilesToChat = () => {
   // Reported to the provider, not to the caller: `canAnalyze` is a chat-side
   // flag, and a host triggering this from a row action has no use for it.
   const onFilesAttached = useOnFilesAttached();
-  // Per-section cap: one attachment in the Forms section, the widget's own
-  // limit elsewhere.
-  const limit = useAttachmentLimit();
+  // What the composer accepts here, and why: the caller quotes the reason
+  // back to the user when something is refused.
+  const cap = useAttachmentLimit();
 
   return React.useCallback(
     async (items: ChatAttachableItem[]): Promise<AttachToChatResult> => {
       const notFolders = items.filter((item) => !item.isFolder);
       const skippedFolders = items.length - notFolders.length;
+
+      const subject = notFolders.find((item) => item.analyzeOnly);
+
+      if (subject) {
+        // Asking to analyze the form the message already carries changes
+        // nothing — say so instead of re-attaching it. The check has to run
+        // before the clear below, which would otherwise hide the duplicate
+        // from the filter and make every repeated click mint a new record.
+        const { duplicates: subjectDuplicate } = splitDuplicateAttachments(
+          useAttachmentsStore,
+          [String(subject.id)],
+        );
+
+        if (
+          subjectDuplicate.length > 0 &&
+          hasAnalyzeAttachment(useAttachmentsStore)
+        ) {
+          return {
+            attached: 0,
+            skippedFolders,
+            skippedOverLimit: 0,
+            duplicates: notFolders.length,
+            cap,
+          };
+        }
+
+        // An analyze attach owns the message, so it starts from an empty
+        // draft: whatever the user had picked before is dropped (chips and
+        // storage records alike) rather than silently competing with the
+        // form for the single slot. That includes the same form attached as
+        // an ordinary file — re-attaching is what turns it into the subject.
+        const store = useAttachmentsStore.getState();
+        await Promise.all([
+          store.clearAttachmentFiles(),
+          store.clearAttachmentImages(),
+        ]);
+      }
 
       // A file goes on a message once. Drop the repeats before reserving
       // chips, so a duplicate never flashes a loading chip and the counts
@@ -131,17 +170,9 @@ export const useAttachHostFilesToChat = () => {
         useAttachmentsStore,
         notFolders.map((file) => String(file.id)),
       );
-      const notDuplicates = keep.map((index) => notFolders[index]);
-      const duplicates = notFolders.length - notDuplicates.length;
+      const files = keep.map((index) => notFolders[index]);
+      const duplicates = notFolders.length - files.length;
 
-      // A message carries one form at most, so a second form is refused
-      // before it takes a chip; the plain files of the same batch stay.
-      const { keep: keepForms, extraForms } = splitExtraFormAttachments(
-        useAttachmentsStore,
-        notDuplicates.map((file) => Boolean(file.isForm)),
-      );
-      const files = keepForms.map((index) => notDuplicates[index]);
-      const skippedExtraForms = extraForms.length;
 
       const inputsAll = files.map((file) => ({
         path: String(file.id),
@@ -149,7 +180,7 @@ export const useAttachHostFilesToChat = () => {
         type: getOnlyofficeFileType(file.fileExst || file.title),
         content: "",
         hasFormResults: hasFormResults(file),
-        isPdfForm: Boolean(file.isForm),
+        analyzeOnly: Boolean(file.analyzeOnly),
       }));
 
       // The store owns the cap: the reservation counts the refs already
@@ -164,7 +195,7 @@ export const useAttachHostFilesToChat = () => {
           kind: "file" as const,
           type: input.type,
         })),
-        limit,
+        cap.limit,
       );
       const inputs = inputsAll.slice(0, pendingIds.length);
       // The reservation is the cap: whatever it refused had no room.
@@ -173,8 +204,7 @@ export const useAttachHostFilesToChat = () => {
         skippedFolders,
         skippedOverLimit,
         duplicates,
-        skippedExtraForms,
-        limit,
+        cap,
       };
 
       if (inputs.length === 0) return { attached: 0, ...counts };
@@ -201,6 +231,6 @@ export const useAttachHostFilesToChat = () => {
 
       return { attached: inputs.length, ...counts };
     },
-    [useAttachmentsStore, onFilesAttached, limit],
+    [useAttachmentsStore, onFilesAttached, cap],
   );
 };

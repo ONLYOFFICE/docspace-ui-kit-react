@@ -123,13 +123,17 @@ import {
 import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer/submit-interceptors";
 import { useApi as useFilesApi } from "../../providers/api";
 import {
+  useAnalyzeLock,
   useFilesIntegration,
   type AttachedFileInfo,
   type SuggestedQuestion,
 } from "./files";
 import { resolveSuggestions, type SuggestionSet } from "./suggestions";
 import { OnFilesAttachedContext } from "./files/attached-report";
-import { AttachmentLimitContext } from "./files/attachment-limit";
+import {
+  AttachmentLimitContext,
+  type AttachmentCap,
+} from "./files/attachment-limit";
 import { CHAT_ATTACHMENT_LIMIT } from "./files/limits";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
@@ -592,7 +596,7 @@ const AiAgentProviders = ({
 
   // Never above what the widget itself enforces: a host asking for more would
   // only make the cap toast quote a number the store does not honor.
-  const effectiveAttachmentLimit = Math.min(
+  const sectionAttachmentLimit = Math.min(
     Math.max(1, attachmentLimit ?? CHAT_ATTACHMENT_LIMIT),
     CHAT_ATTACHMENT_LIMIT,
   );
@@ -600,7 +604,11 @@ const AiAgentProviders = ({
   // File-attachment integration: the composer "attach" actions, the message
   // "Save as file" handler, and the supporting dialogs/device-upload input.
   // Device uploads are stored as portal files in the chat's entity scope.
-  const { composerActions, onSaveAsFile, overlay } = useFilesIntegration({
+  const {
+    composerActions: attachActions,
+    onSaveAsFile,
+    overlay,
+  } = useFilesIntegration({
     entityId,
     onFilesAttached,
   });
@@ -777,6 +785,29 @@ const AiAgentProviders = ({
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
   }, [isStandalone, platform]);
 
+  // "Analyze responses" attaches the form as the subject of the message, and
+  // while it is on the draft the message is about that form alone: the cap
+  // drops to one and the composer's attach actions go away, so the "+" menu
+  // stops offering something the cap would then refuse. Derived from the
+  // draft, so removing the chip or sending the message lifts it — see
+  // `useAnalyzeLock`.
+  const analyzeLocked = useAnalyzeLock(stores.useAttachmentsStore);
+
+  // The cap and what put it there: an analyze subject beats the section,
+  // which beats the widget's own limit. The reason travels with the number
+  // because it is what the refusal toast explains.
+  const attachmentCap = useMemo<AttachmentCap>(() => {
+    if (analyzeLocked) return { limit: 1, reason: "analyze" };
+    return sectionAttachmentLimit < CHAT_ATTACHMENT_LIMIT
+      ? { limit: sectionAttachmentLimit, reason: "section" }
+      : { limit: sectionAttachmentLimit, reason: "widget" };
+  }, [analyzeLocked, sectionAttachmentLimit]);
+
+  const composerActions = useMemo(
+    () => (analyzeLocked ? [] : attachActions),
+    [analyzeLocked, attachActions],
+  );
+
   // Whether the PREVIOUS scope was an agent room — needed to tell a real
   // thread-scope change from plain folder navigation (see the effect below).
   // Updated only by that effect, so between entityId changes it holds the
@@ -874,7 +905,7 @@ const AiAgentProviders = ({
         filesSettingsApi,
         useAttachmentsStore: stores.useAttachmentsStore,
         onFilesAttached,
-        attachmentLimit: effectiveAttachmentLimit,
+        attachmentCap,
         t,
       }),
     [
@@ -884,7 +915,7 @@ const AiAgentProviders = ({
       filesSettingsApi,
       stores,
       onFilesAttached,
-      effectiveAttachmentLimit,
+      attachmentCap,
       t,
     ],
   );
@@ -1018,7 +1049,7 @@ const AiAgentProviders = ({
                                   alike — picker, device upload, "Ask AI" row
                                   action, drop zone. */}
                               <AttachmentLimitContext.Provider
-                                value={effectiveAttachmentLimit}
+                                value={attachmentCap}
                               >
                                 {/* The host subtree attaches files too (the
                                     "Ask AI" action, the chat-panel drop
