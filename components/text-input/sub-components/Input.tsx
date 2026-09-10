@@ -1,8 +1,13 @@
 import { memo } from "react";
-import MaskedInput from "react-text-mask";
+import * as ReactTextMaskNamespace from "react-text-mask";
 
+import { interopDefault } from "../../../utils/interop-default";
 import type { TextInputProps } from "../TextInput.types";
 import { InputType } from "../TextInput.enums";
+
+// See utils/interop-default: react-text-mask's default export is broken
+// under Node's ESM resolver (Vitest, Next.js SSR).
+const MaskedInput = interopDefault(ReactTextMaskNamespace);
 
 type InputComponentProps = TextInputProps & {
   className?: string;

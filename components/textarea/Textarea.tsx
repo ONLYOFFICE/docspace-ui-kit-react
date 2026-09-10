@@ -1,10 +1,11 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import copy from "copy-to-clipboard";
 import classNames from "classnames";
-import TextareaAutosize from "react-autosize-textarea";
+import * as ReactAutosizeTextareaNamespace from "react-autosize-textarea";
 
 import CopyIconUrl from "../../assets/icons/16/copy.react.svg";
 
+import { interopDefault } from "../../utils/interop-default";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 import { IconButton } from "../icon-button";
 import { Scrollbar } from "../scrollbar";
@@ -12,6 +13,10 @@ import { toastr } from "../toast";
 import { jsonify, isJSON } from "./Textarea.utils";
 import type { TextareaProps } from "./Textarea.types";
 import styles from "./Textarea.module.scss";
+
+// See utils/interop-default: react-autosize-textarea's default export is
+// broken under Node's ESM resolver (Vitest, Next.js SSR).
+const TextareaAutosize = interopDefault(ReactAutosizeTextareaNamespace);
 
 const Textarea = ({
   className,

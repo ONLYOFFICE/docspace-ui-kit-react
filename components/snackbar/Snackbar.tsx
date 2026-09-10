@@ -3,15 +3,21 @@ import InfoReactSvg from "../../assets/danger.toast.react.svg";
 
 import React from "react";
 import ReactDOM from "react-dom/client";
-import Countdown, { zeroPad } from "react-countdown";
+import * as ReactCountdownNamespace from "react-countdown";
+import { zeroPad } from "react-countdown";
 import classNames from "classnames";
 import xss from "xss";
 
+import { interopDefault } from "../../utils/interop-default";
 import { Heading, HeadingSize } from "../heading";
 import { Text } from "../text";
 
 import { BarConfig, SnackbarProps } from "./Snackbar.types";
 import styles from "./Snackbar.module.scss";
+
+// See utils/interop-default: react-countdown's default export is broken
+// under Node's ESM resolver (Vitest, Next.js SSR).
+const Countdown = interopDefault(ReactCountdownNamespace);
 
 declare global {
   interface Window {
