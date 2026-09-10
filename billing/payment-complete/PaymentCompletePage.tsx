@@ -38,7 +38,6 @@ import React from "react";
 import {
   PaymentMethodStatus,
   ProductQuantityType,
-  type CustomerInfoDto,
   type PaymentApi,
 } from "@onlyoffice/docspace-api-sdk";
 
@@ -53,11 +52,13 @@ import {
   DOCS_CONNECT_DEVPACK_PRODUCT,
 } from "../constants";
 import { formatCurrencyValue } from "../utils/common";
+import type { TCustomerInfo } from "../types";
 
 import styles from "./PaymentCompletePage.module.scss";
 import { toastr } from "../../components/toast";
 import { AnalyticsEvents } from "../../enums";
 import {
+  getDelayedContent,
   getFlavorContent,
   resolveDocsConnectParams,
   resolveFlavor,
@@ -65,10 +66,11 @@ import {
   WALLET_REDIRECT_URL,
 } from "./PaymentCompletePage.utils";
 import ProcessingCard from "./sub-components/ProcessingCard";
+import DelayedCard from "./sub-components/DelayedCard";
 import SuccessCard from "./sub-components/SuccessCard";
 import ErrorCard from "./sub-components/ErrorCard";
 
-type Status = "processing" | "success" | "error";
+type Status = "loading" | "processing" | "delayed" | "success" | "error";
 
 const CUSTOMER_INFO_RETRY_ATTEMPTS = 10;
 const CUSTOMER_INFO_RETRY_DELAY_MS = 3000;
@@ -78,13 +80,15 @@ const sleep = (ms: number) =>
     setTimeout(resolve, ms);
   });
 
-const waitForCustomerPaymentMethod = async (paymentApi: PaymentApi) => {
+const waitForCustomerPaymentMethod = async (
+  paymentApi: PaymentApi,
+): Promise<TCustomerInfo | undefined> => {
   for (let i = 0; i < CUSTOMER_INFO_RETRY_ATTEMPTS; i += 1) {
     try {
       const res = await paymentApi.getCustomerInfo({ refresh: true });
-      const info = res?.data?.response as unknown as CustomerInfoDto;
+      const info = res?.data?.response as unknown as TCustomerInfo | undefined;
 
-      if (info?.paymentMethodStatus === PaymentMethodStatus.Set) return;
+      if (info?.paymentMethodStatus === PaymentMethodStatus.Set) return info;
     } catch (error) {
       console.error("[paywall callback] customer info fetch failed", error);
     }
@@ -92,6 +96,8 @@ const waitForCustomerPaymentMethod = async (paymentApi: PaymentApi) => {
     if (i < CUSTOMER_INFO_RETRY_ATTEMPTS - 1)
       await sleep(CUSTOMER_INFO_RETRY_DELAY_MS);
   }
+
+  return undefined;
 };
 
 type PaymentCompletePageProps = {
@@ -102,9 +108,10 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
   const t = useCommonTranslation();
   const { paymentApi } = useApi();
 
-  const [status, setStatus] = React.useState<Status>("processing");
+  const [status, setStatus] = React.useState<Status>("loading");
   const [stepIndex, setStepIndex] = React.useState(1);
   const [isActivationError, setIsActivationError] = React.useState(false);
+  const [isDelayed, setIsDelayed] = React.useState(false);
 
   const {
     hasPaymentParams,
@@ -168,6 +175,7 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
 
   const flavor = resolveFlavor(service, admins);
   const pageContent = getFlavorContent(t, flavor, { plan, service, storage });
+  const delayedContent = getDelayedContent(t);
 
   const formattedAmount = formatCurrencyValue(language, amount, currency, 2);
   const formattedMonthlyPrice = formatCurrencyValue(
@@ -201,8 +209,14 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
         event: AnalyticsEvents.AddPaymentMethod,
       });
 
+      let isDelayedPaymentMethod = false;
+
       try {
-        await waitForCustomerPaymentMethod(paymentApi);
+        const customerInfo = await waitForCustomerPaymentMethod(paymentApi);
+
+        isDelayedPaymentMethod = customerInfo?.isDelayedPaymentMethod === true;
+        setIsDelayed(isDelayedPaymentMethod);
+        setStatus("processing");
 
         await paymentApi.topUpDeposit({
           topUpDepositRequestDto: { amount, currency },
@@ -217,6 +231,11 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
       window.dataLayer.push({
         event: AnalyticsEvents.WalletTopUp,
       });
+
+      if (isDelayedPaymentMethod) {
+        setStatus("delayed");
+        return;
+      }
 
       setStepIndex(2);
 
@@ -270,7 +289,7 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
         return;
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 700));
+      await sleep(700);
 
       setStatus("success");
     };
@@ -278,8 +297,10 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
     run();
   }, []);
 
+  const isBusy = status === "loading" || status === "processing";
+
   React.useEffect(() => {
-    if (status !== "processing" || !hasPaymentParams) return undefined;
+    if (!isBusy || !hasPaymentParams) return undefined;
 
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
@@ -288,13 +309,17 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
 
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
-  }, [status, hasPaymentParams]);
+  }, [isBusy, hasPaymentParams]);
 
   const onGoToBillingClick = () => {
     window.location.href = pageContent.redirectUrl;
   };
 
-  if (!hasPaymentParams) {
+  const onBackToBillingClick = () => {
+    window.location.href = delayedContent.redirectUrl;
+  };
+
+  if (!hasPaymentParams || status === "loading") {
     return (
       <div className={styles.page}>
         <div className={styles.bgCover} aria-hidden="true" />
@@ -308,7 +333,7 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
       <div className={styles.bgCover} aria-hidden="true" />
 
       <div className={styles.card} data-status={status}>
-        {status === "processing" ? (
+        {status === "processing" && !isDelayed ? (
           <ProcessingCard
             title={pageContent.processingTitle}
             hint={pageContent.processingHint}
@@ -318,6 +343,14 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
             tariffActivation={
               admins && storage ? { plan, admins, storage } : undefined
             }
+          />
+        ) : null}
+
+        {(status === "processing" && isDelayed) || status === "delayed" ? (
+          <DelayedCard
+            content={delayedContent}
+            isProcessing={status === "processing"}
+            onGoToBillingClick={onBackToBillingClick}
           />
         ) : null}
 
