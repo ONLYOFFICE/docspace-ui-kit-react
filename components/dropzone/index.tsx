@@ -1,5 +1,5 @@
 import React from "react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone } from "../../utils/react-dropzone-interop";
 import classNames from "classnames";
 
 import TriangleDownIcon from "../../assets/triangle.down.react.svg";

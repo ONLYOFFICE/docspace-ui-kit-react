@@ -1,5 +1,5 @@
 import React from "react";
-import Dropzone from "react-dropzone";
+import { Dropzone } from "../../utils/react-dropzone-interop";
 import equal from "fast-deep-equal/react";
 
 import CatalogFolderReactSvgUrl from "../../assets/icons/16/catalog.folder.react.svg";

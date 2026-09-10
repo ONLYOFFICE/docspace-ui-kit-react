@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 import equal from "fast-deep-equal";
-import { useDropzone } from "react-dropzone";
+import { useDropzone } from "../../utils/react-dropzone-interop";
 
 import getFilesFromEvent from "../../utils/getFilesFromEvent";
 
