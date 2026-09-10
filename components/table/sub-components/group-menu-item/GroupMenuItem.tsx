@@ -85,7 +85,7 @@ const GroupMenuItem = React.memo(
     // Options carrying a description are two lines tall; such a menu is sized
     // by the design instead of hugging its widest row.
     const withOptionDescriptions = options?.some(
-      (option) => "description" in option && Boolean(option.description),
+      (option) => option && "description" in option && Boolean(option.description),
     );
 
     const onClickOutside = () => {

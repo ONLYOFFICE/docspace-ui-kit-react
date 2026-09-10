@@ -697,12 +697,22 @@
     padding-inline-start: 16px;
   }
 
+  // Published as variables so a banner that has to reach the section's own
+  // edges can cancel them without restating the numbers, and stays in step with
+  // them when they change. The bleed is the whole distance from those edges to
+  // the banner's content: this padding plus the scroll body's own, which is why
+  // it is not simply the padding above - cancelling only that lands the banner
+  // on the scroll body's content box, still short of the list beside it.
   :global(.section-banner) {
-    padding-inline: 20px;
+    --section-banner-padding-inline: 20px;
+    --section-banner-bleed-inline: 40px;
+
+    padding-inline: var(--section-banner-padding-inline);
     flex-shrink: 0;
 
     @include mixins.tablet-and-below {
-      padding-inline: 16px;
+      --section-banner-padding-inline: 16px;
+      --section-banner-bleed-inline: 32px;
     }
   }
 
