@@ -117,6 +117,52 @@ if (collisions.length > 0) {
 
 const toPosix = (p) => p.split(path.sep).join("/");
 
+// A module can be types-only: tsc emits declarations for the whole source
+// tree regardless of rollup's SHIPPING_DIRS entry-point list, so
+// `types/index.ts` and `types/ai.ts` (re-exported portal type declarations,
+// never containing a runtime value) have a `.d.ts` in dist/types but no `.js`
+// anywhere in dist/esm or dist/cjs. `import type { X } from
+// "@onlyoffice/apps-ui-kit/types"` is a real, used subpath, so it still needs
+// an exports entry -- just one with no `default` target.
+const listTypeOnlyModules = (dir, knownFiles, knownDirs) => {
+  const files = new Set();
+  const dirsWithIndex = new Set();
+
+  const walk = (current) => {
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const full = path.join(current, entry.name);
+      const rel = path.relative(dir, full);
+
+      if (entry.isDirectory()) {
+        walk(full);
+        continue;
+      }
+
+      if (!entry.name.endsWith(".d.ts") || isSvgFile(rel)) continue;
+      // *.types.d.ts is already served by the static "./*.types" pattern.
+      if (entry.name.endsWith(".types.d.ts")) continue;
+
+      if (entry.name === "index.d.ts") {
+        const subpath = toPosix(path.dirname(rel));
+        if (!knownDirs.has(subpath)) dirsWithIndex.add(subpath);
+      } else {
+        const subpath = toPosix(rel.slice(0, -".d.ts".length));
+        if (!knownFiles.has(subpath)) files.add(subpath);
+      }
+    }
+  };
+
+  walk(dir);
+
+  return { files, dirsWithIndex };
+};
+
+const typesOnly = listTypeOnlyModules(
+  path.join(DIST, "types"),
+  new Set([...allFiles].map(toPosix)),
+  new Set([...allDirs].map(toPosix)),
+);
+
 const entryForFile = (subpath) =>
   `      "./${subpath}": {
         "import": {
@@ -141,11 +187,28 @@ const entryForDir = (subpath) =>
         }
       },\n`;
 
+const entryForTypesOnlyFile = (subpath) =>
+  `      "./${subpath}": {
+        "import": "./dist/types/${subpath}.d.mts",
+        "require": "./dist/types/${subpath}.d.ts"
+      },\n`;
+
+const entryForTypesOnlyDir = (subpath) =>
+  `      "./${subpath}": {
+        "import": "./dist/types/${subpath}/index.d.mts",
+        "require": "./dist/types/${subpath}/index.d.ts"
+      },\n`;
+
 const sortedFiles = [...allFiles].map(toPosix).sort();
 const sortedDirs = [...allDirs].map(toPosix).sort();
+const sortedTypesOnlyFiles = [...typesOnly.files].sort();
+const sortedTypesOnlyDirs = [...typesOnly.dirsWithIndex].sort();
 
 const generatedBlock =
-  sortedFiles.map(entryForFile).join("") + sortedDirs.map(entryForDir).join("");
+  sortedFiles.map(entryForFile).join("") +
+  sortedDirs.map(entryForDir).join("") +
+  sortedTypesOnlyFiles.map(entryForTypesOnlyFile).join("") +
+  sortedTypesOnlyDirs.map(entryForTypesOnlyDir).join("");
 
 const pkgText = fs.readFileSync(PKG_PATH, "utf8");
 
@@ -176,7 +239,15 @@ JSON.parse(nextText);
 
 fs.writeFileSync(PKG_PATH, nextText);
 
+const total =
+  sortedFiles.length +
+  sortedDirs.length +
+  sortedTypesOnlyFiles.length +
+  sortedTypesOnlyDirs.length;
+
 console.log(
-  `Generated ${sortedFiles.length + sortedDirs.length} exact export entries ` +
-    `(${sortedFiles.length} files, ${sortedDirs.length} folders) in publishConfig.exports.`,
+  `Generated ${total} exact export entries ` +
+    `(${sortedFiles.length} files, ${sortedDirs.length} folders, ` +
+    `${sortedTypesOnlyFiles.length + sortedTypesOnlyDirs.length} types-only) ` +
+    "in publishConfig.exports.",
 );
