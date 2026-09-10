@@ -48,11 +48,21 @@ import type {
   OperationDto,
 } from "@onlyoffice/docspace-api-sdk";
 
-/** SDK types date as ApiDateTime but API returns an ISO string. */
-export type WalletOperationDto = Omit<OperationDto, "date"> & {
+export type TransactionSourceType =
+  | "Agent"
+  | "File"
+  | "Folder"
+  | "Room"
+  | "Form";
+
+export type WalletOperationDto = Omit<
+  OperationDto,
+  "date" | "agentId" | "agentTitle"
+> & {
   date?: string;
-  agentId?: string | null;
-  agentTitle?: string | null;
+  sourceId?: string | null;
+  sourceTitle?: string | null;
+  sourceType?: TransactionSourceType | null;
 };
 
 import { toastr } from "../../components/toast";
