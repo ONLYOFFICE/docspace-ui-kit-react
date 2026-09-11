@@ -1,16 +1,13 @@
+// Refreshes locales/ from a DocSpace client checkout. Run by hand via
+// `pnpm sync-locales`, never as part of build, test or lint -- this package has
+// to build standalone, and locales/en is committed for exactly that reason.
+//
+// It used to short-circuit under CI and write four empty {} stubs, exiting 0.
+// That made every CI build silently produce a package with no translations
+// while reporting success. Now the script simply is not in CI's path, and when
+// it is run without a DocSpace checkout it fails loudly instead.
 const fs = require("node:fs");
 const path = require("node:path");
-
-if (process.env.CI) {
-  const dest = path.resolve(__dirname, "../locales/en");
-  fs.mkdirSync(dest, { recursive: true });
-  fs.writeFileSync(path.join(dest, "Common.json"), "{}\n");
-  fs.writeFileSync(path.join(dest, "Payments.json"), "{}\n");
-  fs.writeFileSync(path.join(dest, "Services.json"), "{}\n");
-  fs.writeFileSync(path.join(dest, "Settings.json"), "{}\n");
-  console.log("CI detected - created stub locale files");
-  process.exit(0);
-}
 
 const DOCSPACE_CLIENT_ROOT = path.resolve(
   __dirname,
@@ -115,12 +112,16 @@ console.log(
   `Copied Common.json (${USED_KEYS.size} keys) for ${langs.length} locales into locales/`,
 );
 
-// --- Copy Payments.json, Services.json, Settings.json (full files, no key filtering) ---
+// --- Copy Payments.json and Settings.json (full files, no key filtering) ---
+// `Services` used to be listed here and never existed: no DocSpace locale ships
+// a Services.json, and no `t("Services:...")` call exists in this package. The
+// only thing keeping it alive was the CI stub writer above, which fabricated an
+// empty one -- so outside CI the Storybook build failed on the missing import.
 const CLIENT_LOCALES = path.join(
   DOCSPACE_CLIENT_ROOT,
   "packages/client/public/locales",
 );
-const EXTRA_NS = ["Payments", "Services", "Settings"];
+const EXTRA_NS = ["Payments", "Settings"];
 for (const ns of EXTRA_NS) {
   let copiedCount = 0;
   for (const lang of langs) {

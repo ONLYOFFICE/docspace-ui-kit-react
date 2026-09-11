@@ -13,7 +13,6 @@ import globalTypes from "./globals";
 import withApiProvider from "./decorators/withApiProvider";
 import enCommon from "../locales/en/Common.json";
 import enPayments from "../locales/en/Payments.json";
-import enServices from "../locales/en/Services.json";
 import enSettings from "../locales/en/Settings.json";
 
 import "./styles.css";
@@ -127,7 +126,6 @@ const preview: Preview = {
         ["en", new Map([
           ["Common", enCommon],
           ["Payments", enPayments],
-          ["Services", enServices],
           ["Settings", enSettings],
         ])],
       ]);

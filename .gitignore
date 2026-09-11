@@ -4,7 +4,11 @@ coverage
 .idea
 .DS_Store
 storybook-static
-locales
+# locales/en is committed so the package builds, tests and runs Storybook with
+# no DocSpace checkout next to it. Every other language is produced on demand by
+# `pnpm sync-locales` and stays out of git.
+locales/*
+!locales/en
 css
 fonts
 debug-storybook.log
