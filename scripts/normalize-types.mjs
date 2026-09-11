@@ -112,6 +112,130 @@ if (!fs.existsSync(TYPES)) {
   process.exit(1);
 }
 
+// Match the JavaScript layout: every module is `<subpath>/index.d.ts`.
+//
+// rollup normalises its own two output trees via `entryFileNames` (see
+// rollup.config.mjs), but declarations come from `tsc -p tsconfig.build.json`,
+// which mirrors the source tree and therefore still emits the flat shape. Left
+// alone, `dist/types` would disagree with `dist/esm` and `dist/cjs` about where
+// every former flat module lives, and the single `exports` wildcard -- which
+// points all three conditions at `<subpath>/index.*` -- would resolve
+// JavaScript but no types.
+//
+// Relative specifiers inside declarations are extensionless, so a file moving
+// one directory deeper invalidates every `../` in it and every specifier
+// pointing at it. Both are repaired here by resolving each specifier against
+// the pre-move tree and re-relativising it to the post-move location.
+//
+// `globals.d.ts` stays at the root: it is an ambient module declaration
+// referenced by path, not an importable subpath.
+const moveToIndexShape = () => {
+  const flat = walk(TYPES).filter(
+    (file) =>
+      path.basename(file) !== "index.d.ts" &&
+      // Written by this script after the reshape, so on a dirty tree the
+      // previous run's copy is still here. It is an ambient declaration
+      // referenced by path, never an importable subpath -- moving it to
+      // globals/index.d.ts would both break that reference and make the
+      // reshape non-idempotent.
+      path.basename(file) !== GLOBALS,
+  );
+
+  // Old absolute path -> new absolute path, for specifier repair below.
+  const moved = new Map();
+
+  for (const file of flat) {
+    const target = path.join(file.slice(0, -".d.ts".length), "index.d.ts");
+
+    if (fs.existsSync(target)) {
+      // Two very different situations produce an occupied target.
+      //
+      // The common one is a rebuild: `pnpm build` does not clean dist/, so tsc
+      // re-emits the flat declaration next to the directory this script
+      // created on the previous run. That leftover is ours to replace.
+      // It is identifiable because a .d.mts sits beside it -- tsc never emits
+      // one, only the .d.mts pass at the end of this script does.
+      //
+      // The real hazard is a source tree that genuinely holds both `x.ts` and
+      // `x/index.ts`. Then the directory's index is a different module that
+      // would be silently overwritten, and the build must stop. rollup has the
+      // same conflict and resolves it by quietly emitting index2.js, so
+      // scripts/check-dist.mjs looks for that too.
+      const isStaleFromPreviousRun = fs.existsSync(
+        path.join(path.dirname(target), "index.d.mts"),
+      );
+
+      if (!isStaleFromPreviousRun) {
+        console.error(
+          `Cannot normalise ${path.relative(TYPES, file)}: ` +
+            `${path.relative(TYPES, target)} is a different module. ` +
+            "A source tree cannot hold both `x.ts` and `x/index.ts` -- " +
+            "rename one.",
+        );
+        process.exit(1);
+      }
+
+      fs.rmSync(target);
+    }
+
+    moved.set(file, target);
+  }
+
+  for (const [from, to] of moved) {
+    fs.mkdirSync(path.dirname(to), { recursive: true });
+    fs.renameSync(from, to);
+  }
+
+  // Resolve a specifier the way TypeScript would against the ORIGINAL tree,
+  // then express it relative to where both files now live.
+  const SPECIFIER = /(from\s*|import\s*\(\s*)"(\.[^"]*)"/g;
+
+  for (const file of walk(TYPES)) {
+    // Where this file used to be, so its own `../` still mean what they meant.
+    const wasAt =
+      [...moved].find(([, to]) => to === file)?.[0] ?? file;
+
+    const original = fs.readFileSync(file, "utf8");
+
+    const next = original.replace(SPECIFIER, (match, prefix, specifier) => {
+      const base = path.resolve(path.dirname(wasAt), specifier);
+
+      // A specifier resolves either to a flat file (which may have moved) or
+      // to a directory index (which did not).
+      const oldFile = `${base}.d.ts`;
+      const target = moved.get(oldFile) ?? oldFile;
+
+      const finalTarget = fs.existsSync(target)
+        ? target
+        : fs.existsSync(path.join(base, "index.d.ts"))
+          ? path.join(base, "index.d.ts")
+          : null;
+
+      if (!finalTarget) return match;
+
+      // Point at the directory, not at its index: declarations use
+      // extensionless specifiers, and `./x` reads better than `./x/index`.
+      const dir = path.dirname(finalTarget);
+
+      let rel = path
+        .relative(path.dirname(file), dir)
+        .split(path.sep)
+        .join("/");
+
+      if (rel === "") rel = ".";
+      if (!rel.startsWith(".")) rel = `./${rel}`;
+
+      return `${prefix}"${rel}"`;
+    });
+
+    if (next !== original) fs.writeFileSync(file, next);
+  }
+
+  return moved.size;
+};
+
+const reshaped = moveToIndexShape();
+
 fs.writeFileSync(path.join(TYPES, GLOBALS), AMBIENT);
 
 const files = walk(TYPES);
@@ -197,6 +321,7 @@ for (const file of files) {
 
 console.log(
   `Normalized ${files.length} declaration files: ` +
+    `reshaped ${reshaped} to <subpath>/index.d.ts, ` +
     `stripped stylesheet imports from ${stripped}, ` +
     `inlined SVG component types in ${referenced}; ` +
     `wrote ${mjsWritten} .d.mts copies, rewrote specifiers in ${rewritten}.`,

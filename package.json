@@ -10,7 +10,7 @@
   },
   "scripts": {
     "copy-assets": "node scripts/copy-locales.js && node scripts/copy-images.js",
-    "build": "pnpm run copy-assets && rollup -c && tsc -p tsconfig.build.json && node scripts/normalize-types.mjs && node scripts/finalize-dist.mjs && node scripts/generate-exports-map.mjs && node scripts/check-dist.mjs",
+    "build": "pnpm run clean && pnpm run copy-assets && rollup -c && tsc -p tsconfig.build.json && node scripts/normalize-types.mjs && node scripts/finalize-dist.mjs && node scripts/check-dist.mjs",
     "build:watch": "rollup -c -w",
     "clean": "rm -rf dist",
     "storybook": "pnpm run copy-assets && storybook dev -p 6006",
@@ -201,6 +201,7 @@
     "**/*.css"
   ],
   "packageManager": "pnpm@11.19.0",
+  "//publishConfig.exports": "One wildcard serves every module subpath, including the *.types and *.svg ones that used to need patterns of their own. The build emits a single shape -- rollup via `entryFileNames`, tsc declarations via scripts/normalize-types.mjs -- so `<subpath>/index.*` is the only layout there is. This replaced 916 generated entries and the script that wrote them; see the comment in rollup.config.mjs for why a mixed-shape tree cannot be served by a wildcard at all. Note: this note cannot live inside `exports` itself -- Node rejects an exports object that mixes subpath keys with non-'.' keys (ERR_INVALID_PACKAGE_CONFIG), since a key not starting with '.' marks the whole object as a conditions-only main entry. There is deliberately no `./*.scss` pattern: rollup compiles every component-local CSS module into a class-name map, so `components/article/Article.module.scss` is a *directory* holding an index.js in dist and the plain `./*` wildcard serves it -- dist ships no .scss file at all. Raw Sass sources stay reachable through `./styles/*`, which is the form every `@use` in the portal writes.",
   "publishConfig": {
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",
@@ -220,36 +221,14 @@
       "./package.json": "./package.json",
       "./locales/*": "./locales/*",
       "./styles/*": "./styles/*",
-      "./*.scss": "./styles/*.scss",
-      "./*.types": {
+      "./*": {
         "import": {
-          "types": "./dist/types/*.types.d.mts",
-          "default": "./dist/types/*.types.d.mts"
+          "types": "./dist/types/*/index.d.mts",
+          "default": "./dist/esm/*/index.js"
         },
         "require": {
-          "types": "./dist/types/*.types.d.ts",
-          "default": "./dist/types/*.types.d.ts"
-        }
-      },
-      "./*.svg": {
-        "import": {
-          "types": "./dist/types/*.svg.d.mts",
-          "default": "./dist/esm/*.svg.js"
-        },
-        "require": {
-          "types": "./dist/types/*.svg.d.ts",
-          "default": "./dist/cjs/*.svg.js"
-        }
-      },
-      "./__generated_exports_placeholder__": "See scripts/generate-exports-map.mjs -- this key is removed and replaced with one exact entry per real dist/ module subpath on every `pnpm build`.",
-      "./*.js": {
-        "import": {
-          "types": "./dist/types/*.d.mts",
-          "default": "./dist/esm/*.js"
-        },
-        "require": {
-          "types": "./dist/types/*.d.ts",
-          "default": "./dist/cjs/*.js"
+          "types": "./dist/types/*/index.d.ts",
+          "default": "./dist/cjs/*/index.js"
         }
       }
     }

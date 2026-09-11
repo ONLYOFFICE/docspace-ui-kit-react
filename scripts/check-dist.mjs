@@ -149,3 +149,97 @@ if (inDist !== expectedInDist) {
 }
 
 console.log(`"use client" preserved: ${inSource} source files, ${inDist} built files.`);
+
+// The `exports` map is a single wildcard pointing at `<subpath>/index.*`, so
+// every emitted module must actually be an index file. Two ways that can break:
+//
+//   1. A stray non-index chunk -- unreachable, because no exports pattern
+//      matches it.
+//   2. A collision. `entryFileNames` maps `x.ts` to `x/index.js`, so a source
+//      tree containing both `x.ts` and `x/index.ts` would have them land on the
+//      same path. Rollup does not fail on that: it silently renames the loser
+//      to `index2.js`, which no subpath resolves to. The dist check is the
+//      only thing that would notice, so it looks for exactly that.
+//
+// Declarations are checked too: `dist/types` is produced by tsc, which mirrors
+// the source tree, and is reshaped separately by scripts/normalize-types.mjs.
+// If that step is skipped or fails, the types keep the flat layout while the
+// JavaScript does not, and every deep import resolves code but no types.
+const collectShapeOffenders = (root, ext) => {
+  const stray = [];
+  const collided = [];
+
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(full);
+        continue;
+      }
+
+      if (!entry.name.endsWith(ext)) continue;
+
+      const rel = path.relative(root, full);
+
+      if (/^index\d+\./.test(entry.name)) {
+        collided.push(rel);
+        continue;
+      }
+
+      if (entry.name !== `index${ext}`) stray.push(rel);
+    }
+  };
+
+  walk(root);
+
+  return { stray, collided };
+};
+
+const SHAPE_TREES = [
+  ["esm", ".js"],
+  ["cjs", ".js"],
+  // .d.mts copies live beside each .d.ts; checking .d.ts covers both.
+  ["types", ".d.ts"],
+];
+
+let shapeFailed = false;
+
+for (const [tree, ext] of SHAPE_TREES) {
+  const root = path.join(DIST, tree);
+
+  if (!fs.existsSync(root)) continue;
+
+  const { stray, collided } = collectShapeOffenders(root, ext);
+
+  // globals.d.ts is an ambient declaration referenced by path, not an
+  // importable subpath, so it is exempt from the index-only rule.
+  const realStray = stray.filter((rel) => rel !== "globals.d.ts");
+
+  if (collided.length > 0) {
+    shapeFailed = true;
+    console.error(
+      `\n  dist/${tree}: ${collided.length} module(s) collided on the same ` +
+        "normalised path and were renamed by rollup, making them\n  " +
+        "unreachable. A source tree cannot hold both `x.ts` and " +
+        "`x/index.ts` -- rename one:\n",
+    );
+    for (const rel of collided.slice(0, 10)) console.error(`    ${rel}`);
+  }
+
+  if (realStray.length > 0) {
+    shapeFailed = true;
+    console.error(
+      `\n  dist/${tree}: ${realStray.length} module(s) are not index${ext}, ` +
+        "so the `exports` wildcard does not resolve them:\n",
+    );
+    for (const rel of realStray.slice(0, 10)) console.error(`    ${rel}`);
+    if (realStray.length > 10) {
+      console.error(`    ... and ${realStray.length - 10} more`);
+    }
+  }
+}
+
+if (shapeFailed) process.exit(1);
+
+console.log("dist/ module shape is uniform: every module is an index file.");

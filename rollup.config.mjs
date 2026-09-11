@@ -284,6 +284,35 @@ const onwarn = (warning, warn) => {
 	warn(warning);
 };
 
+// Every module is emitted as `<subpath>/index.js`, so the whole package has a
+// single shape and `exports` can be one wildcard instead of a generated entry
+// per module.
+//
+// The source tree mixes two shapes -- `billing/utils/common.ts` (flat file) and
+// `context/InterfaceDirectionContext/index.tsx` (folder-with-index) both occur
+// throughout components/, billing/, selectors/, utils/ and hooks/. Node cannot
+// serve both from one wildcard: per the ES module spec an exports *array*
+// (`["./dist/esm/*.js", "./dist/esm/*/index.js"]`) only skips an entry on a
+// condition mismatch, never on a missing file, so whichever pattern comes first
+// must exist for every subpath -- verified with a minimal Node repro, where
+// each ordering broke the other shape. Normalising the output sidesteps the
+// limitation entirely: one shape, one pattern.
+//
+// This rewrites only where a chunk is *written*. Rollup rewrites the relative
+// specifiers between chunks to match, so the 2 582 internal imports that point
+// at a flat module need no post-processing -- which is what makes this safe to
+// do here rather than by moving files around afterwards.
+//
+// `scripts/check-dist.mjs` asserts the result: every emitted chunk is an
+// index.js, and nothing collided. A collision is the one real hazard, because
+// rollup resolves it silently by emitting `index2.js` (a module that would then
+// be unreachable) rather than failing -- `collectEntries` currently yields 717
+// entry points and 717 distinct normalised subpaths, so there are none.
+const normaliseToIndex = (chunk) =>
+	chunk.name === "index" || chunk.name.endsWith("/index")
+		? `${chunk.name}.js`
+		: `${chunk.name}/index.js`;
+
 export default [
 	{
 		input: entryPoints,
@@ -295,6 +324,7 @@ export default [
 				sourcemap: false,
 				preserveModules: true,
 				preserveModulesRoot: ".",
+				entryFileNames: normaliseToIndex,
 			},
 			{
 				dir: "dist/cjs",
@@ -302,6 +332,7 @@ export default [
 				sourcemap: false,
 				preserveModules: true,
 				preserveModulesRoot: ".",
+				entryFileNames: normaliseToIndex,
 			},
 		],
 		plugins: [
