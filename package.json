@@ -148,7 +148,7 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@biomejs/biome": "2.4.16",
-    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.82.tgz",
+    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.108.tgz",
     "@onlyoffice/document-editor-react": "2.1.1",
     "@anthropic-ai/sdk": "0.60.0",
     "@assistant-ui/react": "^0.11.58",
