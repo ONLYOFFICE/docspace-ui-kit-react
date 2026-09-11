@@ -33,21 +33,33 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-// Quick-actions tile metrics. Shared so consumers that cap the banner width can
-// derive that cap from the real tile geometry instead of hardcoding a pixel
-// total that silently goes stale when the tile size or gap changes.
-$tile-max-width: 184px;
-$tile-height: 147px;
-$tile-padding: 22px;
-$gap: 8px;
+import React from "react";
 
-// The widest banner (Rooms: 5 room tiles + AI chat). A consumer capping the
-// banner sizes the cap from this, so the whole set is reachable without
-// scrolling whenever the viewport is wide enough to hold it.
-$max-tiles-per-row: 6;
+import { useCommonTranslation } from "../../../utils/i18n";
+import { Text } from "../../../components/text";
+import CheckRoundSvg from "../../../assets/icons/16/check.round.react.svg";
+import styles from "../styles/Wallet.module.scss";
 
-// Width needed for $max-tiles-per-row tiles at their widest, plus the gaps
-// between them.
-@function row-width($tiles: $max-tiles-per-row) {
-  @return $tiles * $tile-max-width + ($tiles - 1) * $gap;
-}
+const DelayedPaymentMethodBanner = () => {
+  const t = useCommonTranslation();
+
+  return (
+    <div
+      className={styles.autoPaymentBanner}
+      data-testid="delayed_payment_method_banner"
+    >
+      <CheckRoundSvg className={styles.autoPaymentBannerIcon} />
+      <Text
+        as="span"
+        fontSize="12px"
+        lineHeight="16px"
+        className={styles.autoPaymentBannerText}
+      >
+        {t("WalletDelayedPaymentMethodBanner")}
+      </Text>
+    </div>
+  );
+};
+
+export default DelayedPaymentMethodBanner;
+

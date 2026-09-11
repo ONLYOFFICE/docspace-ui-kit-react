@@ -51,6 +51,7 @@ import TransactionHistory from "../shared/transaction-history";
 import UpcomingPayments from "./sub-components/UpcomingPayments";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
+import DelayedPaymentMethodBanner from "./sub-components/DelayedPaymentMethodBanner";
 import UnlinkedCardBanner from "../shared/unlinked-card-banner";
 import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
@@ -107,7 +108,7 @@ const Wallet = (props: WalletProps) => {
     autoPayments?.upToBalance,
   );
 
-  const { isNotPaidPeriod } = store.tariff;
+  const { isNotPaidPeriod, isDelayedPaymentMethod } = store.tariff;
 
   const t = useCommonTranslation();
 
@@ -257,7 +258,7 @@ const Wallet = (props: WalletProps) => {
               className={styles.cardButton}
               testId="top_up_balance_button"
             />
-            {wasFirstTopUp ? (
+            {wasFirstTopUp && !isDelayedPaymentMethod ? (
               <Button
                 size={isMobile ? ButtonSize.normal : ButtonSize.small}
                 label={t("AutoTopUp")}
@@ -309,6 +310,8 @@ const Wallet = (props: WalletProps) => {
 
       {showUnlinkedCardBanner ? (
         <UnlinkedCardBanner />
+      ) : isDelayedPaymentMethod ? (
+        <DelayedPaymentMethodBanner />
       ) : isAutoPaymentSetup ? (
         <AutoPaymentInfo />
       ) : null}
@@ -321,7 +324,7 @@ const Wallet = (props: WalletProps) => {
         />
       ) : null}
 
-      {wasChangeBalance || isWalletRefilledOpen ? (
+      {(wasChangeBalance || isWalletRefilledOpen) && !isDelayedPaymentMethod ? (
         <WalletRefilledModal
           visible={wasChangeBalance || isWalletRefilledOpen}
           onClose={() => setIsWalletRefilledOpen(false)}

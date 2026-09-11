@@ -100,6 +100,8 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
   const { initServiceData } = useServicesStore();
   const contextMenuRef = useRef<ContextMenuRefType>(null);
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const openTopUpDialog = () => setIsTopUpDialogVisible(true);
+  const closeTopUpDialog = () => setIsTopUpDialogVisible(false);
 
   useEffect(() => {
     initServiceData(t, DOCS_CONNECT_SERVICE);
@@ -125,6 +127,15 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
   } = state;
 
   const language = paymentStore.language;
+  const { isDelayedPaymentMethod } = paymentStore.tariff;
+  const renewalShortfall = Math.max(0, Math.ceil(monthlyCharge - credits));
+  const isDelayedPaymentTopUp = isDelayedPaymentMethod && renewalShortfall > 0;
+
+  const getRenewLabel = () => {
+    if (renewalShortfall <= 0) return t("Common:RenewSubscription");
+    if (isDelayedPaymentMethod) return t("Common:TopUpWallet");
+    return t("Common:TopUpAndRenew");
+  };
   const formatCurrency = (value: number, digits: number) =>
     paymentStore.formatWalletCurrency(value, digits, currency);
 
@@ -296,7 +307,7 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
       <WalletInfo
         withoutBackground
         balance={formatCurrency(credits, 2)}
-        onTopUp={() => setIsTopUpDialogVisible(true)}
+        onTopUp={openTopUpDialog}
       />
 
       {isPaid && canceled ? (
@@ -430,8 +441,12 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
                 <Button
                   primary
                   size={ButtonSize.small}
-                  label={t("Common:TopUpAndRenew")}
-                  onClick={onEditPlan}
+                  label={getRenewLabel()}
+                  onClick={
+                    isDelayedPaymentTopUp
+                      ? openTopUpDialog
+                      : onEditPlan
+                  }
                 />
                 <Button
                   size={ButtonSize.small}
@@ -547,9 +562,10 @@ const DocsConnectPage: React.FC<DocsConnectPageProps> = ({
       {isTopUpDialogVisible ? (
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
-          onClose={() => setIsTopUpDialogVisible(false)}
+          onClose={closeTopUpDialog}
           onConfirm={onTopUpComplete}
           recommendedAmount={paymentStore.recommendedAmount}
+          minValue={isDelayedPaymentTopUp ? `${renewalShortfall}` : undefined}
           serviceName={DOCS_CONNECT_SERVICE}
         />
       ) : null}

@@ -129,9 +129,16 @@ export const openStripeCheckout = async (
   else window.open(checkoutUrl, "_blank");
 };
 
+export type TTopUpCustomerInfo = {
+  email?: string | null;
+  isDelayedPaymentMethod?: boolean;
+};
+
 export type TTopUpCompletionDeps = {
   walletBalance: number;
-  fetchCustomerInfo: (refresh?: boolean) => Promise<string | null | undefined>;
+  fetchCustomerInfo: (
+    refresh?: boolean,
+  ) => Promise<TTopUpCustomerInfo | null | undefined>;
   fetchBalance: (isRefresh?: boolean) => Promise<number>;
 };
 
@@ -143,14 +150,21 @@ export const waitForTopUpCompletion = async (
   }: TTopUpCompletionDeps,
   signal: AbortSignal,
 ) => {
+  let isDelayedPaymentMethod = false;
+
   await pollUntil(async () => {
-    const email = await fetchCustomerInfo(true);
-    return !!email;
+    const info = await fetchCustomerInfo(true);
+    isDelayedPaymentMethod = info?.isDelayedPaymentMethod === true;
+    return !!info?.email;
   }, signal);
+
+  if (isDelayedPaymentMethod) return { isDelayedPaymentMethod };
 
   await pollUntil(async () => {
     const newBalance = await fetchBalance(true);
     return newBalance > initialBalance;
   }, signal);
+
+  return { isDelayedPaymentMethod };
 };
 
