@@ -19,27 +19,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "PUBLIC_DIR/*": [
-        "../../public/*"
-      ],
-      "@docspace/shared/*": [
-        "../../packages/shared/*"
-      ]
-    }
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "index.ts",
     "components/**/*",
     "context/**/*",
     "hooks/**/*",
-    "ui/**/*",
-    "themes/**/*",
     "types/**/*",
     "test/**/*",
     "assets/**/*",
