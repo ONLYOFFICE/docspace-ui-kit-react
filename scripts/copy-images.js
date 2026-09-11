@@ -6,7 +6,11 @@ if (process.env.CI) {
 const fs = require("node:fs");
 const path = require("node:path");
 
-const SOURCE = path.resolve(__dirname, "../../../public/images/icons");
+const DOCSPACE_CLIENT_ROOT = path.resolve(
+  __dirname,
+  process.env.DOCSPACE_CLIENT_ROOT || "../../DocSpace/client",
+);
+const SOURCE = path.join(DOCSPACE_CLIENT_ROOT, "public/images/icons");
 const DEST = path.resolve(__dirname, "../assets/icons");
 const SIZES = [24, 32, 64, 96];
 const SUBFOLDERS = ["room", "template"];

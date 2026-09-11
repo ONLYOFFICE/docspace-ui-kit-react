@@ -12,7 +12,11 @@ if (process.env.CI) {
   process.exit(0);
 }
 
-const SOURCE = path.resolve(__dirname, "../../../public/locales");
+const DOCSPACE_CLIENT_ROOT = path.resolve(
+  __dirname,
+  process.env.DOCSPACE_CLIENT_ROOT || "../../DocSpace/client",
+);
+const SOURCE = path.join(DOCSPACE_CLIENT_ROOT, "public/locales");
 const DEST = path.resolve(__dirname, "../locales");
 const UI_KIT_ROOT = path.resolve(__dirname, "..");
 
@@ -112,9 +116,9 @@ console.log(
 );
 
 // --- Copy Payments.json, Services.json, Settings.json (full files, no key filtering) ---
-const CLIENT_LOCALES = path.resolve(
-  __dirname,
-  "../../../packages/client/public/locales",
+const CLIENT_LOCALES = path.join(
+  DOCSPACE_CLIENT_ROOT,
+  "packages/client/public/locales",
 );
 const EXTRA_NS = ["Payments", "Services", "Settings"];
 for (const ns of EXTRA_NS) {
@@ -131,9 +135,9 @@ for (const ns of EXTRA_NS) {
   console.log(`Copied ${ns}.json for ${copiedCount} locales into locales/`);
 }
 // --- Copy fonts ---
-const FONTS_CSS_SRC = path.resolve(__dirname, "../../../public/css/fonts.css");
+const FONTS_CSS_SRC = path.join(DOCSPACE_CLIENT_ROOT, "public/css/fonts.css");
 const FONTS_CSS_DEST = path.resolve(__dirname, "../css");
-const FONTS_DIR_SRC = path.resolve(__dirname, "../../../public/fonts");
+const FONTS_DIR_SRC = path.join(DOCSPACE_CLIENT_ROOT, "public/fonts");
 const FONTS_DIR_DEST = path.resolve(__dirname, "../fonts");
 
 function copyDirSync(src, dest) {
