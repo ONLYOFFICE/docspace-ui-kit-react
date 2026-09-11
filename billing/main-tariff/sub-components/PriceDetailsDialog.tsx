@@ -12,6 +12,7 @@ import { ModalDialog } from "../../../components/modal-dialog";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import WalletInfo from "../../shared/top-up-balance/sub-components/WalletInfo";
+import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import StorageWarning from "../../services/panels/additional-storage/StorageWarning";
 import { formatRemainingDays } from "../../utils/common";
 
@@ -23,7 +24,6 @@ type PriceDetailsDialogProps = {
   visible: boolean;
   onClose: () => void;
   isDowngradePlan: boolean;
-  confirmLabel: string;
 };
 
 const PriceDetailsDialog = observer(
@@ -31,7 +31,6 @@ const PriceDetailsDialog = observer(
     visible,
     onClose,
     isDowngradePlan: isDowngradePlanProp,
-    confirmLabel: confirmLabelProp,
   }: PriceDetailsDialogProps) => {
     const t = useCommonTranslation();
     const store = usePaymentStore();
@@ -45,15 +44,21 @@ const PriceDetailsDialog = observer(
       formatPaymentCurrency,
       formatWalletCurrency,
       language,
+      walletBalance,
+      getConfirmButtonLabel,
     } = store;
     const { maxCountManagersByQuota } = store.quotas;
     const { planCost } = store.paymentQuotas;
-    const { paymentDate, daysUntilPayment } = store.tariff;
+    const { paymentDate, daysUntilPayment, isDelayedPaymentMethod } =
+      store.tariff;
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isTopUpVisible, setIsTopUpVisible] = useState(false);
+    const openTopUpDialog = () => setIsTopUpVisible(true);
+    const closeTopUpDialog = () => setIsTopUpVisible(false);
 
     const isDowngradePlan = useRef(isDowngradePlanProp).current;
-    const confirmLabel = useRef(confirmLabelProp).current;
+    const confirmLabel = getConfirmButtonLabel(t);
     const currentAdmins = useRef(maxCountManagersByQuota).current;
     const newAdmins = useRef(managersCount).current;
     const pricePerAdmin = useRef(planCost.value).current;
@@ -68,7 +73,16 @@ const PriceDetailsDialog = observer(
       t,
     );
 
+    const topUpShortfall = Math.max(0, Math.ceil(dueToday - walletBalance));
+    const isDelayedPaymentTopUp =
+      !isDowngradePlan && isDelayedPaymentMethod && topUpShortfall > 0;
+
     const onConfirm = async () => {
+      if (isDelayedPaymentTopUp) {
+        openTopUpDialog();
+        return;
+      }
+
       setIsSubmitting(true);
 
       const isSuccess = await store.executeWalletUpdate(
@@ -94,7 +108,14 @@ const PriceDetailsDialog = observer(
     );
 
     return (
-      <ModalDialog visible={visible} onClose={onClose} autoMaxHeight isLarge>
+      <>
+      <ModalDialog
+        visible={visible && !isTopUpVisible}
+        hideContent={isTopUpVisible}
+        onClose={onClose}
+        autoMaxHeight
+        isLarge
+      >
         <ModalDialog.Header>
           {isDowngradePlan ? t("Confirmation") : t("PriceDetails")}
         </ModalDialog.Header>
@@ -219,6 +240,15 @@ const PriceDetailsDialog = observer(
           />
         </ModalDialog.Footer>
       </ModalDialog>
+
+      {isTopUpVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpVisible}
+          onClose={closeTopUpDialog}
+          minValue={`${topUpShortfall}`}
+        />
+      ) : null}
+      </>
     );
   },
 );

@@ -30,7 +30,6 @@ const TotalTariffContainer = observer(
       isTariffDueTodayCalculating,
       setIsTariffDueTodayCalculating,
       needsWalletMigration,
-      getConfirmButtonLabel,
     } = store;
     const { isYearTariff, maxCountManagersByQuota, isFreeTariff } =
       store.quotas;
@@ -49,8 +48,6 @@ const TotalTariffContainer = observer(
       !isDowngradePlan &&
       !isTheSameCount &&
       !needsWalletMigration;
-
-    const confirmLabel = getConfirmButtonLabel(t);
 
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const controllerRef = useRef<AbortController | null>(null);
@@ -218,7 +215,6 @@ const TotalTariffContainer = observer(
             visible={isPriceDetailsVisible}
             onClose={() => setIsPriceDetailsVisible(false)}
             isDowngradePlan={isDowngradePlan}
-            confirmLabel={confirmLabel}
           />
         ) : null}
       </div>

@@ -6,6 +6,7 @@ import type { DialogFooterProps } from "@onlyoffice/ai-chat";
 import { Button, ButtonSize } from "../../../../components/button";
 
 import styles from "./DialogFooter.module.scss";
+import { runDialogSubmitInterceptors } from "./submit-interceptors";
 
 const DialogFooterOverride: React.FC<DialogFooterProps> = ({
   cancelLabel,
@@ -20,6 +21,13 @@ const DialogFooterOverride: React.FC<DialogFooterProps> = ({
   className,
   buttonClassName,
 }) => {
+  // Interceptors must run inside the click's user gesture, so they go first
+  // and synchronously — `onSubmit` may be async.
+  const handleSubmit = React.useCallback(() => {
+    runDialogSubmitInterceptors();
+    onSubmit?.();
+  }, [onSubmit]);
+
   // Rendered as a <footer> (not a <div>) on purpose: the DocSpace
   // `DialogContent` override styles legacy inline footers via a
   // `.body div:has(> button)` rule. Using a non-div element keeps this
@@ -34,7 +42,7 @@ const DialogFooterOverride: React.FC<DialogFooterProps> = ({
         size={ButtonSize.normal}
         isDisabled={submitDisabled}
         isLoading={submitLoading}
-        onClick={onSubmit}
+        onClick={handleSubmit}
         className={buttonClassName}
       />
       <Button

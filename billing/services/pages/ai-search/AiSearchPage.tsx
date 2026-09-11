@@ -310,24 +310,27 @@ const AiSearchPage = (props: AiSearchPageProps) => {
         </div>
       </div>
 
-      <Text as="span" fontSize="13px" className={styles.pricingRow}>
-        <CommonTrans
-          i18nKey="AIExaPricingNote"
-          components={{
-            1: (
-              <Link
-                fontSize="13px"
-                fontWeight={600}
-                color="accent"
-                textDecoration="underline dotted"
-                href="https://exa.ai/pricing"
-                dataTestId="ai_search_exa_pricing_link"
-                target={LinkTarget.blank}
-              />
-            ),
-          }}
-        />
-      </Text>
+      {paymentStore.aiSearchFeePercent != null ? (
+        <Text as="span" fontSize="13px" className={styles.pricingRow}>
+          <CommonTrans
+            i18nKey="AIExaPricingNote"
+            values={{ percent: paymentStore.aiSearchFeePercent }}
+            components={{
+              1: (
+                <Link
+                  fontSize="13px"
+                  fontWeight={600}
+                  color="accent"
+                  textDecoration="underline dotted"
+                  href="https://exa.ai/pricing"
+                  dataTestId="ai_search_exa_pricing_link"
+                  target={LinkTarget.blank}
+                />
+              ),
+            }}
+          />
+        </Text>
+      ) : null}
 
       <div>
         <TransactionHistory

@@ -24,6 +24,8 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
+import { takeReservedGeneratedFileWindow } from "./generated-file-window";
+
 import type {
   ChatEventBus,
   HostTool,
@@ -176,6 +178,13 @@ const generateCallId = () => `editor-tool-call-${Date.now()}-${nextCallId++}`;
 
 const EDITOR_TOOL_TIMEOUT_MS = 10_000;
 const EDITOR_READY_TIMEOUT_MS = 60_000;
+// The generated-file tab is a whole editor boot in a fresh window: a cold
+// document server, a slow network and the doceditor's own profile requests
+// (`editorDocumentReady` is posted only after they resolve) all add up, and
+// once this listener is gone a late ready signal leaves the file empty. So
+// the tab gets a much longer fail-safe than the in-panel iframe, whose wait
+// blocks the model's reply.
+const GENERATED_FILE_READY_TIMEOUT_MS = 5 * 60_000;
 
 const callEditorTool = async (
   name: string,
@@ -491,12 +500,17 @@ export const openEditorPanel = (fileId: number | string): void => {
 // here lives in a separate top-level window, so it posts readiness / results
 // to `window.opener` instead of `window.parent` — we listen for the ready
 // message scoped to this exact window and reply to it directly.
+//
+// The tab is normally reserved inside the "Allow" click (see
+// generated-file-window.ts) and only navigated here; without a reservation
+// we fall back to `window.open`, which the popup blocker may veto — the
+// caller gets `false` and can offer a click-to-open fallback.
 export const openGeneratedFileWithToolCall = (
   fileId: number | string,
   toolName: string,
   toolArgs: Record<string, unknown>,
-): void => {
-  if (typeof window === "undefined") return;
+): boolean => {
+  if (typeof window === "undefined") return false;
 
   // Trace the flow with tool names / file ids only — tool args may carry
   // user content and must not be dumped to the console.
@@ -507,12 +521,19 @@ export const openGeneratedFileWithToolCall = (
   const url = `${window.location.origin}/doceditor?fileId=${encodeURIComponent(
     String(fileId),
   )}`;
-  const editorWindow = window.open(url, "_blank");
+  const reservedWindow = takeReservedGeneratedFileWindow();
+  let editorWindow: Window | null;
+  if (reservedWindow) {
+    reservedWindow.location.href = url;
+    editorWindow = reservedWindow;
+  } else {
+    editorWindow = window.open(url, "_blank");
+  }
   if (!editorWindow) {
     console.warn(
       "[host-tool-groups] openGeneratedFileWithToolCall: window.open blocked",
     );
-    return;
+    return false;
   }
   console.log(
     `[host-tool-groups] editor tab opened for file ${fileId}, waiting for editorDocumentReady`,
@@ -558,11 +579,12 @@ export const openGeneratedFileWithToolCall = (
     if (!settled) {
       console.warn(
         "[host-tool-groups] openGeneratedFileWithToolCall: editor never " +
-          `signaled readiness within ${EDITOR_READY_TIMEOUT_MS}ms — giving up`,
+          `signaled readiness within ${GENERATED_FILE_READY_TIMEOUT_MS}ms — giving up`,
         { fileId, toolName },
       );
     }
     finish();
-  }, EDITOR_READY_TIMEOUT_MS);
+  }, GENERATED_FILE_READY_TIMEOUT_MS);
+  return true;
 };
 

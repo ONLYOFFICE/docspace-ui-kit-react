@@ -197,7 +197,8 @@ const toastr = {
   error: createToastMethod(ToastType.error),
   warning: createToastMethod(ToastType.warning),
   info: createToastMethod(ToastType.info),
-  clear: () => toast.dismiss(),
+  clear: (id?: Id) => toast.dismiss(id),
+  dismiss: (id: Id) => toast.dismiss(id),
   isActive: (id: Id) => toast.isActive(id),
 } as const;
 

@@ -279,34 +279,37 @@ const AiPage = (props: AiPageProps) => {
         </div>
       </div>
 
-      <Text as="span" fontSize="13px" className={styles.pricingRow}>
-        <CommonTrans
-          i18nKey="AIUsagePricingNote"
-          components={{
-            1: (
-              <Link
-                fontSize="13px"
-                fontWeight={600}
-                color="accent"
-                textDecoration="underline dotted"
-                href="https://openrouter.ai/models"
-                dataTestId="ai_openrouter_pricing_link"
-                target={LinkTarget.blank}
-              />
-            ),
-            2: (
-              <Link
-                fontSize="13px"
-                fontWeight={600}
-                color="accent"
-                textDecoration="underline dotted"
-                onClick={onOpenSupportedModels}
-                dataTestId="ai_supported_models_link"
-              />
-            ),
-          }}
-        />
-      </Text>
+      {paymentStore.aiToolsFeePercent != null ? (
+        <Text as="span" fontSize="13px" className={styles.pricingRow}>
+          <CommonTrans
+            i18nKey="AIUsagePricingNote"
+            values={{ percent: paymentStore.aiToolsFeePercent }}
+            components={{
+              1: (
+                <Link
+                  fontSize="13px"
+                  fontWeight={600}
+                  color="accent"
+                  textDecoration="underline dotted"
+                  href="https://openrouter.ai/models"
+                  dataTestId="ai_openrouter_pricing_link"
+                  target={LinkTarget.blank}
+                />
+              ),
+              2: (
+                <Link
+                  fontSize="13px"
+                  fontWeight={600}
+                  color="accent"
+                  textDecoration="underline dotted"
+                  onClick={onOpenSupportedModels}
+                  dataTestId="ai_supported_models_link"
+                />
+              ),
+            }}
+          />
+        </Text>
+      ) : null}
 
       <div>
         <TransactionHistory

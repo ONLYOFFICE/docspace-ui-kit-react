@@ -16,6 +16,7 @@ import {
 } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 import { AI_TOOLS } from "../../../../constants";
+import { getTransactionSourceLabel } from "../../utils";
 
 type TransactionRowViewProps = {
   transaction: WalletOperationDto;
@@ -74,10 +75,15 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
       </Text>,
     ];
 
-    if (serviceName === AI_TOOLS && transaction.agentTitle) {
+    const sourceLabel =
+      serviceName === AI_TOOLS
+        ? getTransactionSourceLabel(t, transaction)
+        : null;
+
+    if (sourceLabel) {
       children.push(
         <Text key="source" fontWeight={600} fontSize="11px">
-          {t("AIAgentName", { AgentName: transaction.agentTitle })}
+          {sourceLabel}
         </Text>,
       );
     }

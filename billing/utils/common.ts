@@ -100,6 +100,10 @@ export const formatCurrencyValue = (
   return formatter.format(truncated);
 };
 
+/** Formats a fee percent with the locale's decimal separator, e.g. 5.5 → "5,5". */
+export const formatPercentValue = (language: string, value: number) =>
+  new Intl.NumberFormat(language, { maximumFractionDigits: 2 }).format(value);
+
 export const formatCompactNumber = (value: number, language = "en"): string =>
   new Intl.NumberFormat(language, {
     notation: value >= 1_000_000 ? "compact" : "standard",

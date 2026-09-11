@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { observer } from "mobx-react";
 import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 
@@ -6,6 +7,7 @@ import { Button, ButtonSize } from "../../../components/button";
 import { useCommonTranslation } from "../../../utils/i18n";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import { getConvertedSize } from "../../utils/common";
 import { MANAGER, ROOM, TOTAL_SIZE } from "../../constants";
 
@@ -35,7 +37,11 @@ const CurrentPlan = ({ onEditPlan, isMobile }: CurrentPlanProps) => {
     quotaCharacteristics,
     maxCountManagersByQuota,
   } = store.quotas;
-  const { isGracePeriod, gracePeriodEndDate } = store.tariff;
+  const { isGracePeriod, gracePeriodEndDate, isDelayedPaymentMethod } =
+    store.tariff;
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const openTopUpDialog = () => setIsTopUpDialogVisible(true);
+  const closeTopUpDialog = () => setIsTopUpDialogVisible(false);
 
   const limitValue = (id: string) =>
     quotaCharacteristics.find((f) => f.id === id)?.value ?? 0;
@@ -45,10 +51,28 @@ const CurrentPlan = ({ onEditPlan, isMobile }: CurrentPlanProps) => {
 
   const isBalanceInsufficient =
     isGracePeriod && walletBalance < overduePlanCost;
+  const isDelayedPaymentTopUp = isBalanceInsufficient && isDelayedPaymentMethod;
+  const topUpShortfall = Math.max(
+    0,
+    Math.ceil(overduePlanCost - walletBalance),
+  );
 
   const onRenewPlan = () => {
     setBasicTariffContainer();
     executeWalletUpdate(maxCountManagersByQuota, ProductQuantityType.Add, t);
+  };
+
+  const getPlanButtonLabel = () => {
+    if (!isGracePeriod) return t("UpgradePlan");
+    if (isDelayedPaymentTopUp) return t("TopUpWallet");
+    if (isBalanceInsufficient) return t("TopUpAndRenew");
+    return t("PayNow");
+  };
+
+  const getPlanButtonAction = () => {
+    if (isDelayedPaymentTopUp) return openTopUpDialog;
+    if (isGracePeriod) return onRenewPlan;
+    return onEditPlan;
   };
 
   const planDetails = isFreeTariff
@@ -78,18 +102,20 @@ const CurrentPlan = ({ onEditPlan, isMobile }: CurrentPlanProps) => {
       {onEditPlan ? (
         <Button
           size={isMobile ? ButtonSize.normal : ButtonSize.small}
-          label={
-            isGracePeriod
-              ? isBalanceInsufficient
-                ? t("TopUpAndRenew")
-                : t("PayNow")
-              : t("UpgradePlan")
-          }
-          onClick={isGracePeriod ? onRenewPlan : onEditPlan}
+          label={getPlanButtonLabel()}
+          onClick={getPlanButtonAction()}
           isDisabled={isGracePeriod && isCardMissingOrInactive}
           isLoading={isLoading}
           className={styles.planButton}
           testId="overview_edit_plan_button"
+        />
+      ) : null}
+
+      {isTopUpDialogVisible ? (
+        <SimpleTopUpDialog
+          visible={isTopUpDialogVisible}
+          onClose={closeTopUpDialog}
+          minValue={topUpShortfall > 0 ? `${topUpShortfall}` : undefined}
         />
       ) : null}
     </div>

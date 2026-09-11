@@ -38,6 +38,14 @@ export type LinkProps = TextProps & {
   dataTestId?: string;
   /** Sets a callback function that is triggered when the link is clicked. Only for 'action' type of link */
   onClick?: (e: React.MouseEvent<Element>) => void;
+  /** Sets a callback function that is triggered on a key press. An action link
+   * carries no href, so it is not activated by Enter on its own - a link that
+   * has to work from the keyboard handles the key here and takes a tabIndex. */
+  onKeyDown?: (e: React.KeyboardEvent<Element>) => void;
+  /** ARIA role. An anchor with no href has no implicit role at all, so an
+   * action link is invisible to assistive technology until it is named one -
+   * "button", since it acts rather than navigates. */
+  role?: React.AriaRole;
   /** Used as HTML `rel` property */
   rel?: string;
   /** Used as HTML `tabindex` property */

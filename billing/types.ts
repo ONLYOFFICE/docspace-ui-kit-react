@@ -1,6 +1,7 @@
 import type {
   TenantQuotaFeatureDto,
   Balance,
+  CustomerInfoDto,
   QuotaDto,
 } from "@onlyoffice/docspace-api-sdk";
 
@@ -15,6 +16,12 @@ export type TBalance = Balance | 0 | null;
 
 /** QuotaDto extended with serviceName (returned by wallet service endpoints). */
 export type TWalletServiceQuota = QuotaDto & { serviceName?: string };
+
+/** CustomerInfoDto with the payment method fields the SDK does not declare yet. */
+export type TCustomerInfo = CustomerInfoDto & {
+  paymentMethodType?: string | null;
+  isDelayedPaymentMethod?: boolean;
+};
 
 export type TServiceFeatureWithPrice = TNumericPaymentFeature & {
   price: {
@@ -171,6 +178,21 @@ export type TActiveService = {
   title: string;
   limit: number;
   used: number | null;
+};
+
+/** A price record of a wallet service from the accounting service. */
+export type TAccountingPrice = {
+  id: number;
+  accountNumber: number;
+  serviceId: number;
+  timeUnit: string;
+  costPrice: number;
+  /** Markup on top of the cost price, in percent. */
+  extraCharge: number;
+  servicePrice: number;
+  timeBound?: { startDate?: string; endDate?: string };
+  status: "Draft" | "Approved" | "Rejected";
+  created: string;
 };
 
 /** A single month bucket from the monthly usage endpoint. */

@@ -64,6 +64,8 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
     isShowPreviousStoragePlan,
     isLowWalletBalance,
     language,
+    aiToolsFeePercent,
+    aiSearchFeePercent,
   } = paymentStore;
 
   const { isFreeTariff } = paymentStore.quotas;
@@ -221,9 +223,12 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
           );
         }
 
+        if (aiToolsFeePercent == null) return "";
+
         return (
           <CommonTrans
             i18nKey="AIUsagePricingNote"
+            values={{ percent: aiToolsFeePercent }}
             components={{
               1: (
                 <Link
@@ -251,9 +256,12 @@ const ServicesItems: React.FC<ServicesItemsProps> = ({
           />
         );
       case AI_SEARCH_ENUM:
+        if (aiSearchFeePercent == null) return "";
+
         return (
           <CommonTrans
             i18nKey="AIExaPricingNote"
+            values={{ percent: aiSearchFeePercent }}
             components={{
               1: (
                 <Link

@@ -25,7 +25,7 @@ const GracePeriodModal: React.FC<GracePeriodModalProps> = ({
   const paymentStore = usePaymentStore();
   const { paymentDate, gracePeriodEndDate, delayDaysCount } =
     paymentStore.tariff;
-  const { tariffPlanTitle } = paymentStore.paymentQuotas;
+  const { currentTariffPlanTitle: tariffPlanTitle } = paymentStore.quotas;
 
   const t = useCommonTranslation();
   const navigate = useNavigate();

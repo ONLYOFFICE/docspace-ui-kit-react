@@ -13,22 +13,33 @@ import type {
   OperationDto,
 } from "@onlyoffice/docspace-api-sdk";
 
-/** SDK types date as ApiDateTime but API returns an ISO string. */
-export type WalletOperationDto = Omit<OperationDto, "date"> & {
+export type TransactionSourceType =
+  | "Agent"
+  | "File"
+  | "Folder"
+  | "Room"
+  | "Form";
+
+export type WalletOperationDto = Omit<
+  OperationDto,
+  "date" | "agentId" | "agentTitle"
+> & {
   date?: string;
-  agentId?: string | null;
-  agentTitle?: string | null;
+  sourceId?: string | null;
+  sourceTitle?: string | null;
+  sourceType?: TransactionSourceType | null;
 };
 
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
 import type {
+  TAccountingPrice,
   TActiveService,
   TBalance,
   TServiceUsage,
   TUsagePeriodKey,
 } from "../types";
-import { formatCurrencyValue } from "../utils/common";
+import { formatCurrencyValue, formatPercentValue } from "../utils/common";
 import {
   getCardLinkedOnFreeTariff,
   getCardLinkedOnNonProfit,
@@ -52,7 +63,9 @@ import { LANGUAGE } from "../../constants";
 import { AnalyticsEvents } from "../../enums";
 import {
   AI_ENUM,
+  AI_SEARCH,
   AI_SEARCH_ENUM,
+  AI_TOOLS,
   BACKUP_SERVICE,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
@@ -132,6 +145,24 @@ class PaymentStore {
   onServicesInit: (() => Promise<unknown>) | undefined = undefined;
 
   utcOffset = "";
+
+  /** Accounting service fee percents by wallet service name. */
+  serviceFeePercents = new Map<string, number>();
+
+  get aiToolsFeePercent() {
+    return this.formatServiceFeePercent(AI_TOOLS);
+  }
+
+  get aiSearchFeePercent() {
+    return this.formatServiceFeePercent(AI_SEARCH);
+  }
+
+  formatServiceFeePercent = (serviceName: string) => {
+    const value = this.serviceFeePercents.get(serviceName);
+    if (value === undefined) return;
+
+    return formatPercentValue(this.language, value);
+  };
 
   routes: TPaymentRoutes = {
     portalPayments: "",
@@ -553,6 +584,10 @@ class PaymentStore {
     this.isInitPaymentPage = value;
   };
 
+  setServiceFeePercent = (serviceName: string, value: number) => {
+    this.serviceFeePercents.set(serviceName, value);
+  };
+
   setMinBalance = (value: string) => {
     this.minBalance = value;
   };
@@ -663,6 +698,26 @@ class PaymentStore {
     }
   };
 
+  fetchServiceFeePercent = async (serviceName: string) => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        `api/2.0/portal/payment/accounting/prices/${serviceName}`,
+        { params: { active: true }, signal: abortController.signal },
+      );
+
+      const prices = data?.response as TAccountingPrice[] | undefined;
+      const percent = prices?.[0]?.extraCharge;
+      if (percent !== undefined)
+        this.setServiceFeePercent(serviceName, percent);
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      console.error(error);
+    }
+  };
+
   /** Upcoming payments in chronological order (the API does not sort them). */
   get upcomingPayments(): TUpcomingPayment[] {
     return [...this.upcomingPaymentsData]
@@ -724,10 +779,7 @@ class PaymentStore {
     );
   };
 
-  formatFuturePaymentCurrency = (
-    item?: number,
-    fractionDigits: number = 0,
-  ) => {
+  formatFuturePaymentCurrency = (item?: number, fractionDigits: number = 0) => {
     const amount = item ?? this.walletBalance;
     const { isoCurrencySymbol } = this.paymentQuotas.futurePlanCost;
 
@@ -1502,8 +1554,14 @@ class PaymentStore {
       const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
       const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
 
-      if (type === ProductQuantityType.Add && isBalanceInsufficient) {
-        const recommendedAmount = Math.ceil(dueTodayAmount - this.walletBalance);
+      if (
+        type === ProductQuantityType.Add &&
+        isBalanceInsufficient &&
+        !this.tariff.isDelayedPaymentMethod
+      ) {
+        const recommendedAmount = Math.ceil(
+          dueTodayAmount - this.walletBalance,
+        );
         if (recommendedAmount > 0) {
           await this.paymentApi.topUpDeposit({
             topUpDepositRequestDto: {
@@ -1565,12 +1623,16 @@ class PaymentStore {
     const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
     const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
 
+    if (this.isTariffDueTodayCalculating) return t("UpgradeNow");
+
     if (this.tariffDueTodayAmount !== null && !isTheSameCount) {
-      return isBalanceInsufficient
-        ? t("TopUpAndUpgrade")
-        : t("PayAndUpgrade", {
-            amount: this.formatPaymentCurrency(dueTodayAmount),
-          });
+      if (isBalanceInsufficient)
+        return this.tariff.isDelayedPaymentMethod
+          ? t("TopUpWallet")
+          : t("TopUpAndUpgrade");
+      return t("PayAndUpgrade", {
+        amount: this.formatPaymentCurrency(dueTodayAmount),
+      });
     }
 
     return t("UpgradeNow");
