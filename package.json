@@ -5,7 +5,7 @@
   "private": "true",
   "engines": {
     "node": ">=24",
-    "pnpm": ">=11"
+    "pnpm": ">=12"
   },
   "scripts": {
     "copy-assets": "node scripts/copy-locales.js && node scripts/copy-images.js",
@@ -185,5 +185,5 @@
       "types": "dist/types/index.d.ts"
     }
   },
-  "packageManager": "pnpm@11.19.0"
+  "packageManager": "pnpm@12.3.4"
 }
