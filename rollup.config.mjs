@@ -345,7 +345,7 @@ export default [
 				preferBuiltins: false,
 			}),
 			nodePolyfills(),
-			svgr(),
+			svgr({ svgo: false }),
 			json(),
 			commonjs(),
 			typescript({
