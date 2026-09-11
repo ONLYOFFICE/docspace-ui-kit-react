@@ -1,13 +1,21 @@
 ## Project Overview
 
-`@onlyoffice/apps-ui-kit` — shared React component library used across all DocSpace frontend
-products (client, login, doceditor, management, sdk). Consumed as a local workspace
-dependency: the six apps resolve it to the **source root**, not to `dist`.
+`@onlyoffice/apps-ui-kit` — shared React component library used across all DocSpace
+frontend products (client, login, doceditor, management, sdk).
 
-Being separated for publication as `@onlyoffice/apps-ui-kit`. That work is in progress
-on `feature/ui-kit-separation` and changes several things this file used to state as
-permanent — see `docs/public-api.md` for the published surface and the tiering of public
-versus portal-internal modules.
+**This is now a standalone repository, not a submodule of DocSpace-client.** It builds,
+tests and runs Storybook on its own, with no DocSpace checkout beside it. Consumers
+depend on the **published package** — they resolve it to `dist`, not to the source root
+as they did under the monorepo. DocSpace-client currently consumes a packed tarball;
+publication to npm has not happened yet (`version` is still `0.0.1`).
+
+The separation work lives on `feature/ui-kit-separation`. See `docs/public-api.md` for
+the published surface and the tiering of public versus portal-internal modules.
+
+**Consequence worth keeping in mind:** there is no longer a client build compiling these
+sources, so packaging defects (`exports` subpaths, peer deps, missing assets) are only
+caught by `pnpm build` + `pnpm verify:package` here, or by a consumer. Prefer Storybook
+for component work and reach for the packed tarball when verifying the package itself.
 
 ## Tech Stack
 
@@ -58,17 +66,23 @@ selectors/           — Data-driven selectors (AIAgent, People, Room, Files, Gr
                        MCPServers) -- depend on the API layer and MobX stores
 uploader/            — Upload UI; depends on selectors/Files and providers/api
 
-biome-plugins/       — GENERATED copy of the client's i18n Grit plugins. Regenerate with
-                       `pnpm biome-plugins:generate` in DocSpace-client and commit here;
-                       nothing checks that it is fresh
+biome-plugins/       — Vendored copy of the client's i18n Grit plugins, committed here.
+                       Refreshed by hand from DocSpace-client; nothing checks that it is
+                       fresh
 docs/                — Storybook .mdx pages, plus public-api.md
-scripts/             — copy-locales, copy-images, and the dist checks run by `pnpm build`
+scripts/             — copy-locales, copy-images, relicense-mit, verify-package, and the
+                       build pipeline steps (normalize-types, finalize-dist, check-dist)
 .storybook/          — Storybook configuration
 test/                — Test setup and mocks
-__tests__/           — Playwright visual-regression specs (83, run against Storybook)
+__tests__/           — Playwright visual-regression specs (94, run against Storybook);
+                       not run in CI
+locales/en/          — COMMITTED, so the package builds standalone. Other languages are
+                       gitignored and produced on demand by `pnpm sync-locales`
 index.ts             — Main library entry point
 
-Generated, gitignored, absent from a fresh clone: locales/, css/, fonts/, dist/
+Gitignored, absent from a fresh clone: dist/, css/, fonts/, locales/* except locales/en.
+`pnpm sync-locales` produces css/ and fonts/ — Storybook needs them, the library build
+does not.
 ```
 
 ## Common Commands
@@ -114,7 +128,29 @@ pnpm format:fix
 
 # TypeScript check
 pnpm tsc
+
+# Refresh non-English locales, css/fonts.css and fonts/ from a DocSpace client
+# checkout. Run by hand, never part of build/test. Needs DOCSPACE_CLIENT_ROOT
+# (default ../../DocSpace/client) and fails loudly without it.
+pnpm sync-locales
 ```
+
+## Working with DocSpace
+
+Since the split there is no submodule and no source-root resolution, so the old
+"edit component -> check in the client -> commit the submodule" loop no longer
+applies. Three levels, fastest first:
+
+1. **Storybook** — the default environment for component work. Covers most changes
+   (styles, props, isolated behaviour) with hot reload and no client checkout.
+2. **Client integration** — point DocSpace-client at this checkout (a local `link:`
+   override plus a bundler alias) to get hot reload against real screens. The override
+   is local and must not be committed. Watch for a duplicated React: both React and
+   React-DOM are peer deps, so dedupe them in the client's bundler config.
+3. **Real package** — `pnpm build && pnpm verify:package`, or pack a tarball and
+   install it in the client. This is the only level that exercises `exports`,
+   `publishConfig` and peer deps as a consumer sees them. Do it before merging, not
+   on every edit.
 
 ## Coding Conventions
 
@@ -150,12 +186,16 @@ pnpm tsc
   `providers/api`. Import either by subpath.
 - **API integration**: the top-level `api/` and `utils/socket/` provide the API client and
   WebSocket helpers used by selectors. (`utils/api/` does not exist.)
-- **Localization**: `scripts/copy-locales.js` must run before build/test to populate
-  locale files; every command includes it automatically. **It writes a derived subset**,
-  not a copy — 662 of the 2 392 `Common.json` keys, chosen by regex-scanning this
-  package for used keys (which is why `no-dynamic-i18n-key` matters).
-  **Trap: under `CI=true` it fabricates four empty locale stubs and copies neither
-  `css/fonts.css` nor `fonts/`, then exits 0.** So CI builds silently produce a
-  package with no translations, and `storybook-build` fails outright on the missing
-  stylesheet. `copy-images.js` likewise skips entirely under CI — harmless, since
-  `assets/icons/` is committed.
+- **Localization**: `locales/en` is **committed**, so the package builds, tests and
+  runs Storybook with no DocSpace checkout next to it. `scripts/copy-locales.js` is
+  run **by hand** (`pnpm sync-locales`) to refresh the other languages from a client
+  checkout — it is deliberately not part of build, test or lint, and not in CI's path.
+  It resolves the client via `DOCSPACE_CLIENT_ROOT` (default `../../DocSpace/client`)
+  and **fails loudly** when that checkout is missing, rather than fabricating stubs.
+  **It writes a derived subset** of `Common.json`, not a copy — the keys it finds by
+  regex-scanning this package, plus a hardcoded list of five the regexes miss (which is
+  why `no-dynamic-i18n-key` matters); `Payments.json` and `Settings.json` are copied
+  whole. The same script also copies `css/fonts.css` and `fonts/` from the client —
+  both are gitignored, so **a fresh clone has no fonts stylesheet and `storybook-build`
+  will fail on it** until `pnpm sync-locales` runs. `copy-images.js` skips under CI —
+  harmless, since `assets/icons/` is committed.

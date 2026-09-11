@@ -1,12 +1,12 @@
 # @onlyoffice/apps-ui-kit
 
-> React UI component library extracted from the [ONLYOFFICE DocSpace client](https://github.com/ONLYOFFICE/DocSpace-client) codebase.
+> React UI component library behind [ONLYOFFICE DocSpace](https://github.com/ONLYOFFICE/DocSpace-client).
 
-[![React](https://img.shields.io/badge/react-%3E%3D18.0.0-blue)](https://react.dev)
+[![React](https://img.shields.io/badge/react-19-blue)](https://react.dev)
 
 ## About This Library
 
-`@onlyoffice/apps-ui-kit` provides React components and a color system extracted from the [DocSpace-client monorepo](https://github.com/ONLYOFFICE/DocSpace-client) (`libs/ui-kit`).
+`@onlyoffice/apps-ui-kit` provides the React components and color system used across the ONLYOFFICE DocSpace frontend products. It began life inside the [DocSpace-client monorepo](https://github.com/ONLYOFFICE/DocSpace-client) and is now developed as a standalone package.
 
 <p align="center">
   <a href="https://github.com/ONLYOFFICE/DocSpace">
@@ -14,7 +14,9 @@
   </a>
 </p>
 
-> **Note:** This library is currently in early development (`v0.0.1`). The API may change before a stable release.
+> **Note:** This library is currently in early development (`v0.0.1`) and is **not yet published to npm**. The API may change before a stable release.
+
+> **Scope:** not every directory in this package is public API. Modules coupled to a DocSpace portal — `api/`, `billing/`, `selectors/`, `uploader/`, `ai-agent/`, `document-editor/` and `providers/api` — ship in the package but are intended for ONLYOFFICE's own products. See [`docs/public-api.md`](docs/public-api.md).
 
 ## Features ✨
 
@@ -27,10 +29,12 @@
 
 ## Requirements
 
-- React >= 18.0.0
-- React DOM >= 18.0.0
+- React ^19.0.0
+- React DOM ^19.0.0
 
 ## Installation
+
+Once published:
 
 ```bash
 # pnpm
@@ -43,7 +47,24 @@ npm install @onlyoffice/apps-ui-kit
 yarn add @onlyoffice/apps-ui-kit
 ```
 
-**Peer dependencies:** `react` and `react-dom` ≥ 18.0.0
+Until then, install a packed tarball built from this repository:
+
+```bash
+pnpm build && pnpm pack
+pnpm add file:../path/to/onlyoffice-apps-ui-kit-0.0.1.tgz
+```
+
+**Peer dependencies:** `react` and `react-dom` ^19.0.0 are required. A number of further
+peers are optional and only needed by the modules that use them — `i18next` and
+`react-i18next` for translated components, `mobx` / `mobx-react` and `axios` for the
+portal-coupled modules, `@onlyoffice/document-editor-react` for `document-editor/`, and
+`@onlyoffice/ai-chat` for `ai-agent/`. See `peerDependencies` in `package.json`.
+
+The stylesheet is shipped separately and must be imported once:
+
+```tsx
+import "@onlyoffice/apps-ui-kit/styles.css";
+```
 
 ## Quick Start
 
@@ -818,7 +839,14 @@ function MyComponent() {
 
 ## Development
 
-Clone this repository or work within the [DocSpace-client monorepo](https://github.com/ONLYOFFICE/DocSpace-client) and run:
+This package is developed standalone — clone it and run `pnpm install`. No DocSpace
+checkout is required for development, Storybook or tests; `locales/en` is committed so
+everything works out of the box.
+
+> The one exception: Storybook needs `css/fonts.css`, which is gitignored and copied
+> from a DocSpace client checkout by `pnpm sync-locales`. Run it once (with
+> `DOCSPACE_CLIENT_ROOT` pointing at your checkout) if `pnpm storybook-build` complains
+> about the missing stylesheet. The same command refreshes the non-English locales.
 
 ### Storybook - interactive component explorer
 
@@ -844,14 +872,33 @@ pnpm build          # production build (ESM + CJS + type declarations)
 pnpm build:watch    # rebuild on file changes
 ```
 
+The build also runs a set of checks against `dist/`: no bundled dependencies, a single
+extracted stylesheet, and per-format type markers.
+
+### Verifying the package
+
+```bash
+pnpm verify:package # pack, then run publint + attw against the real tarball
+pnpm pack --dry-run # list exactly what would be published
+```
+
+`verify:package` is what catches defects the lint/tsc/test gate cannot see — a broken
+build, entry points missing because `publishConfig` was not applied, or types that
+misrepresent the JavaScript. It must be run with pnpm: `publishConfig` field overrides
+are a pnpm feature, and an npm-packed tarball has no `exports`/`main` at all.
+
 ### Lint & Format
 
 ```bash
-pnpm lint           # check for lint issues
-pnpm lint:fix       # auto-fix lint issues
-pnpm format         # check lint and formatting
-pnpm format:fix     # auto-fix lint and formatting
+pnpm lint           # Biome - check for lint issues
+pnpm lint:fix       # Biome - auto-fix lint issues
+pnpm format         # Prettier - check formatting
+pnpm format:fix     # Prettier - rewrite files
 ```
+
+Linting is Biome and formatting is Prettier: Biome's own formatter is disabled in
+`biome.json`. Only `lint`, `tsc` and `test` run on pre-push and in CI, so formatting is
+not enforced by any gate.
 
 ## Useful Links
 
