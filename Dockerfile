@@ -19,7 +19,7 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PNPM
-RUN npm install -g pnpm@12.3.4
+RUN npm install -g pnpm@12.4.1
 
 WORKDIR /app
 
