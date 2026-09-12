@@ -33,6 +33,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { TSuggestedQuestionsResponse } from "../../../api/ai";
+
 /**
  * A starter question the backend generated for an analyzable form, from that
  * form's own schema and in the user's language.
@@ -73,4 +75,82 @@ export const readSuggestedQuestions = (
   const value = record.suggestedQuestions;
   if (!Array.isArray(value)) return undefined;
   return value.filter(isSuggestedQuestion);
+};
+
+/** Reads one long-poll answer (`POST ai/attachments/suggested-questions`). */
+export type PollSuggestedQuestions = (
+  entryId: string,
+  signal: AbortSignal,
+) => Promise<TSuggestedQuestionsResponse>;
+
+/**
+ * Breather between two polls.
+ *
+ * The endpoint normally holds the request open while the model works, so this
+ * pause is invisible — but a `pending` that comes back at once (the wait
+ * already spent upstream, a proxy cutting the connection short) would
+ * otherwise spin into a request flood.
+ */
+export const SUGGESTED_QUESTIONS_RETRY_DELAY_MS = 2000;
+
+const wait = (ms: number, signal: AbortSignal) =>
+  new Promise<void>((resolve) => {
+    const done = () => {
+      clearTimeout(timer);
+      signal.removeEventListener("abort", done);
+      resolve();
+    };
+    const timer = setTimeout(done, ms);
+    signal.addEventListener("abort", done, { once: true });
+  });
+
+/**
+ * Waits for the questions of one form, re-asking while the server says it is
+ * still working.
+ *
+ * The endpoint is itself a long poll — it holds each request for up to 25
+ * seconds — so `pending` means that wait elapsed while the generation is
+ * still running, and the next call simply waits again, after a
+ * {@link SUGGESTED_QUESTIONS_RETRY_DELAY_MS} breather.
+ *
+ * It ends on `ready` (the questions), on `unavailable` (there will never be
+ * any), on a failed request, or when `signal` is aborted — the caller aborts
+ * on typing, on the form leaving the draft, and on unmount. The wait between
+ * polls is aborted too, so none of those has to sit through it.
+ *
+ * Resolves to `null` whenever no questions arrived, so a caller cannot mistake
+ * "gave up" for "generated nothing".
+ */
+export const pollSuggestedQuestions = async (
+  poll: PollSuggestedQuestions,
+  entryId: string,
+  signal: AbortSignal,
+): Promise<SuggestedQuestion[] | null> => {
+  while (!signal.aborted) {
+    let answer: TSuggestedQuestionsResponse;
+    try {
+      answer = await poll(entryId, signal);
+    } catch {
+      // An aborted fetch lands here too; either way there is nothing to wait
+      // for any more.
+      return null;
+    }
+
+    if (signal.aborted) return null;
+
+    if (answer?.status === "ready") {
+      const questions = Array.isArray(answer.questions)
+        ? answer.questions.filter(isSuggestedQuestion)
+        : [];
+      return questions.length > 0 ? questions : null;
+    }
+
+    // Anything that is not an explicit "still working" is final: an
+    // `unavailable` verdict, or a body we cannot read.
+    if (answer?.status !== "pending") return null;
+
+    await wait(SUGGESTED_QUESTIONS_RETRY_DELAY_MS, signal);
+  }
+
+  return null;
 };

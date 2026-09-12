@@ -35,6 +35,21 @@
 
 import { BaseCustomApi } from "../base-custom-api";
 
+/**
+ * State of the starter-question generation for a form.
+ *
+ * - `pending` — still working, poll again;
+ * - `ready` — `questions` carries the result;
+ * - `unavailable` — nothing to wait for: not an analyzable form, no external
+ *   database, no access, or the generation failed.
+ */
+export type TSuggestedQuestionsStatus = "pending" | "ready" | "unavailable";
+
+export type TSuggestedQuestionsResponse = {
+  status: TSuggestedQuestionsStatus;
+  questions: { question: string; prompt: string }[];
+};
+
 // The legacy chat REST surface (/ai/chats/*, /ai/rooms/*/servers/*) was
 // removed together with the C# AI service; the AI chat now talks to the
 // Node AI service through the @onlyoffice/ai-chat engines. Only the
@@ -51,5 +66,26 @@ export class AiApi extends BaseCustomApi {
       method: "POST",
       data: { folderId, title, content },
     });
+  }
+
+  /**
+   * Starter questions generated from a PDF form's own schema and responses.
+   *
+   * A long poll: the request is held open for up to 25 seconds while the
+   * model works, then answers `pending` if it is still going, `ready` with
+   * the questions, or `unavailable` when there will never be any (the file is
+   * not an analyzable form, the external database is off, or the generation
+   * failed). Keep calling while `pending`; `signal` aborts the wait.
+   *
+   * `entryId` is the DocSpace file id of the form, not the chat attachment id.
+   * The public route is the AI service's POST with the id in the body, like
+   * its other attachment routes (`common/ASC.NewAi/app/apiCatalog.ts`); the
+   * `GET .../{id}/suggested-questions` it forwards to is internal.
+   */
+  getSuggestedQuestions(entryId: string | number, signal?: AbortSignal) {
+    return this.request<TSuggestedQuestionsResponse>(
+      `/ai/attachments/suggested-questions`,
+      { method: "POST", data: { id: String(entryId) }, signal },
+    );
   }
 }

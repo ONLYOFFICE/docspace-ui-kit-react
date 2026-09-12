@@ -37,6 +37,8 @@ export { useHasFormAttached } from "./use-has-form-attached";
 // The composer lock a subject attachment ("Analyze responses") puts on the
 // draft. Consumed by the chat providers, which own the store bundle.
 export { useAnalyzeLock } from "./use-analyze-lock";
+export { useAnalyzeQuestions } from "./use-analyze-questions";
+export { useComposerTyping } from "./use-composer-typing";
 // Provided by AiAgentProviders around the host subtree; consumed by
 // `useAttachHostFilesToChat`, so hosts never pass it themselves.
 export {
@@ -62,4 +64,7 @@ export {
   useAttachmentLimit,
   type AttachmentCap,
 } from "./attachment-limit";
-export type { SuggestedQuestion } from "./suggested-questions";
+export type {
+  PollSuggestedQuestions,
+  SuggestedQuestion,
+} from "./suggested-questions";

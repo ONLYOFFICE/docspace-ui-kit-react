@@ -101,3 +101,39 @@ describe("resolveSuggestions", () => {
     expect(resolveSuggestions(undefined, [], [], {})).toBeUndefined();
   });
 });
+
+// "Analyze responses" makes the message about one form's answers: the chips
+// are that form's generated questions, or nothing at all — the static list
+// asks about the document, which is not what the user chose.
+describe("resolveSuggestions in analyze mode", () => {
+  const analyzeQuestions = [
+    { question: "Per payment method?", prompt: "Count per value." },
+  ];
+
+  it("shows the generated questions instead of any static list", () => {
+    expect(
+      resolveSuggestions(SET, ["att-1"], ["att-1"], {}, {
+        active: true,
+        questions: analyzeQuestions,
+      }),
+    ).toEqual([{ name: "Per payment method?", prompt: "Count per value." }]);
+  });
+
+  it("shows nothing while the questions are still being generated", () => {
+    expect(
+      resolveSuggestions(SET, ["att-1"], ["att-1"], QUESTIONS, {
+        active: true,
+        questions: null,
+      }),
+    ).toEqual([]);
+  });
+
+  it("falls back to the ordinary rules once the lock is gone", () => {
+    expect(
+      resolveSuggestions(SET, ["att-1"], ["att-1"], {}, {
+        active: false,
+        questions: null,
+      }),
+    ).toEqual(SET.analyzableForm);
+  });
+});

@@ -71,6 +71,14 @@ export type AttachFileInput = {
  */
 export type AttachedFileInfo = {
   id: string;
+  /**
+   * Host entry id the ref came from (`AttachFileInput.path`). The starter
+   * questions are fetched by it, not by the attachment id — the endpoint
+   * looks the form up in DocSpace.
+   */
+  entryId: string;
+  /** Attached as the subject of the message (see `AttachFileInput`). */
+  analyzeOnly?: boolean;
   /** The backend can analyze this file's contents (an analyzable form). */
   canAnalyze?: boolean;
   /**
@@ -193,10 +201,15 @@ export const attachFilesToChat = async (
       .map((record) => record.id),
   });
 
+  // Pair each record with the input it came from before dropping the images,
+  // or the filtered array's positions would no longer line up with `inputs`.
   const attached = records
-    .filter((_, i) => !imageIndices.has(i))
-    .map((record) => ({
+    .map((record, index) => ({ record, input: inputs[index] }))
+    .filter((_, index) => !imageIndices.has(index))
+    .map(({ record, input }) => ({
       id: record.id,
+      entryId: input?.path ?? "",
+      analyzeOnly: input?.analyzeOnly,
       canAnalyze: record.canAnalyze,
       suggestedQuestions: readSuggestedQuestions(record),
     }));

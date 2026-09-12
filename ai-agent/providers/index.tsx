@@ -124,8 +124,11 @@ import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer
 import { useApi as useFilesApi } from "../../providers/api";
 import {
   useAnalyzeLock,
+  useAnalyzeQuestions,
+  useComposerTyping,
   useFilesIntegration,
   type AttachedFileInfo,
+  type PollSuggestedQuestions,
   type SuggestedQuestion,
 } from "./files";
 import { resolveSuggestions, type SuggestionSet } from "./suggestions";
@@ -527,7 +530,8 @@ const AiAgentProviders = ({
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
   const aiChatLocale = normalizeAiChatLocale(locale);
-  const { foldersApi, operationsApi, filesSettingsApi } = useFilesApi();
+  const { foldersApi, operationsApi, filesSettingsApi, aiApi } =
+    useFilesApi();
 
   const aiChatTranslations = useMemo(
     () => ({
@@ -555,7 +559,15 @@ const AiAgentProviders = ({
     Record<string, SuggestedQuestion[]>
   >({});
 
+  // The form the current message is about, as the questions endpoint wants it
+  // — by DocSpace entry id, not by attachment id. Kept until another analyze
+  // attach replaces it; whether it is still in force is `analyzeLocked`.
+  const [analyzeEntryId, setAnalyzeEntryId] = useState<string | undefined>();
+
   const onFilesAttached = useCallback((attached: AttachedFileInfo[]) => {
+    const subject = attached.find((f) => f.analyzeOnly && f.entryId);
+    if (subject) setAnalyzeEntryId(subject.entryId);
+
     const analyzable = attached.filter((f) => f.canAnalyze);
     if (analyzable.length === 0) return;
 
@@ -808,6 +820,24 @@ const AiAgentProviders = ({
     [analyzeLocked, attachActions],
   );
 
+  // The starter questions of the form being analyzed. The endpoint long-polls
+  // (25s per call) while the model works, so this waits for it rather than
+  // showing the static chips: in this mode the message is about this form's
+  // answers, and a generic chip would ask the wrong question.
+  const pollSuggestedQuestions = useCallback<PollSuggestedQuestions>(
+    (entryId, signal) => aiApi.getSuggestedQuestions(entryId, signal),
+    [aiApi],
+  );
+
+  const { questions: analyzeQuestions, onTyping } = useAnalyzeQuestions(
+    pollSuggestedQuestions,
+    analyzeLocked ? analyzeEntryId : undefined,
+  );
+
+  // Writing your own question makes the suggestions moot — stop waiting for
+  // them (and let the wait end for good, the chips are not coming back).
+  useComposerTyping(analyzeLocked, onTyping);
+
   // Whether the PREVIOUS scope was an agent room — needed to tell a real
   // thread-scope change from plain folder navigation (see the effect below).
   // Updated only by that effect, so between entityId changes it holds the
@@ -936,8 +966,16 @@ const AiAgentProviders = ({
         attachedFileIds === "" ? [] : attachedFileIds.split(","),
         analyzableIds,
         questionsById,
+        { active: analyzeLocked, questions: analyzeQuestions },
       ),
-    [suggestions, attachedFileIds, analyzableIds, questionsById],
+    [
+      suggestions,
+      attachedFileIds,
+      analyzableIds,
+      questionsById,
+      analyzeLocked,
+      analyzeQuestions,
+    ],
   );
 
   const widgetConfig = useMemo<WidgetConfig>(

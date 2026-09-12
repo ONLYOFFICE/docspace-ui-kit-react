@@ -63,6 +63,15 @@ export type SuggestionSet = {
 };
 
 /**
+ * The form the composer is analyzing, and the questions generated for it —
+ * `null` while the long poll is still waiting, or once it gave up.
+ */
+export type AnalyzeState = {
+  active: boolean;
+  questions: SuggestedQuestion[] | null;
+};
+
+/**
  * The chips to show right now.
  *
  * `attachedFileIds` are the refs the composer holds (files and images alike),
@@ -77,8 +86,20 @@ export const resolveSuggestions = (
   attachedFileIds: string[],
   analyzableIds: string[],
   questionsById: Record<string, SuggestedQuestion[]>,
+  analyze?: AnalyzeState,
 ): Suggestion[] | undefined => {
   if (!suggestions || Array.isArray(suggestions)) return suggestions;
+
+  // A message about one form's responses gets that form's own questions and
+  // nothing else: the static chips ask about the document, which is not what
+  // was asked for. Until the generation answers (or gives up) there is simply
+  // nothing to show.
+  if (analyze?.active) {
+    return (analyze.questions ?? []).map(({ question, prompt }) => ({
+      name: question,
+      prompt,
+    }));
+  }
 
   const analyzableAttachedIds = attachedFileIds.filter((id) =>
     analyzableIds.includes(id),
