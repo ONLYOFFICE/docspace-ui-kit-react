@@ -380,8 +380,6 @@ const CssCustomizationTemplate = () => (
   <div
     style={
       {
-        height: "400px",
-        position: "relative",
         // === Aside — panel background and size ===
         "--aside-bg": "#e6f3fb",
         "--aside-width": "360px",
