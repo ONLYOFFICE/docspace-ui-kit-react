@@ -237,8 +237,14 @@ const CustomStylingTemplate = () => {
   );
 };
 
-export const CssCustomization: Story = {
-  render: () => (
+const CssCustomizationTemplate = () => {
+  const [selected, setSelected] = useState("1");
+
+  const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelected(e.target.value);
+  };
+
+  return (
     <div
       style={
         {
@@ -252,11 +258,33 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <RadioButton name="custom" value="1" label="Custom option 1" isChecked />
-      <RadioButton name="custom" value="2" label="Custom option 2" />
-      <RadioButton name="custom" value="3" label="Custom option 3" />
+      <RadioButton
+        name="custom"
+        value="1"
+        label="Custom option 1"
+        isChecked={selected === "1"}
+        onChange={onChangeHandler}
+      />
+      <RadioButton
+        name="custom"
+        value="2"
+        label="Custom option 2"
+        isChecked={selected === "2"}
+        onChange={onChangeHandler}
+      />
+      <RadioButton
+        name="custom"
+        value="3"
+        label="Custom option 3"
+        isChecked={selected === "3"}
+        onChange={onChangeHandler}
+      />
     </div>
-  ),
+  );
+};
+
+export const CssCustomization: Story = {
+  render: () => <CssCustomizationTemplate />,
   parameters: {
     docs: {
       description: {
