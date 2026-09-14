@@ -39,6 +39,7 @@ import { observer } from "mobx-react";
 
 import AnalyzeIllustration from "../../../../assets/analyzeResponsesIllustration.svg";
 
+import { Heading, HeadingLevel } from "../../../../components/heading";
 import { Text } from "../../../../components/text";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { useAiChatStoreOptional } from "../../../providers/ai-chat-store/AiChatStoreProvider";
@@ -65,20 +66,34 @@ export const AnalyzeIntro = observer(() => {
   return (
     <div className={styles.analyzeIntro} data-testid="analyze-intro">
       <AnalyzeIllustration className={styles.illustration} />
-      <Text fontSize="13px" fontWeight="600" lineHeight="16px" noSelect>
-        {t("AnalyzeResponsesMode")}
-      </Text>
-      <Text
-        fontSize="12px"
-        lineHeight="16px"
-        className={styles.hint}
-        title={fileName}
-        noSelect
-      >
-        {t("AnalyzeModeSuggestionsHeader", { fileName })}
-      </Text>
+      {/* One block, so the container's gap separates the artwork from the
+          copy exactly as it does in the welcome intro. */}
+      <div className={styles.copy}>
+        {/* A heading, not styled text: this names the state the chat is in,
+            and the line under it belongs to it. */}
+        <Heading
+          level={HeadingLevel.h3}
+          fontSize="14px"
+          fontWeight={600}
+          lineHeight="20px"
+          className={styles.title}
+          noSelect
+        >
+          {t("AnalyzeResponsesMode")}
+        </Heading>
+        <Text
+          fontSize="12px"
+          lineHeight="16px"
+          className={`${styles.text} ${styles.hint}`}
+          title={fileName}
+          noSelect
+        >
+          {t("AnalyzeModeSuggestionsHeader", { fileName })}
+        </Text>
+      </div>
     </div>
   );
 });
 
 export default AnalyzeIntro;
+

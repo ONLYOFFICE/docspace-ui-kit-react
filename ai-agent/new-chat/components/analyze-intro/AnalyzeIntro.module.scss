@@ -33,34 +33,74 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-// Sits above the generated chips in an empty analyze chat, in place of the
-// ordinary welcome intro: the same illustration-over-text block, saying which
-// mode this is and which form it is about.
+// The analyze mode's opening block, shown in place of the welcome intro, so
+// it is built exactly like it: illustration over centered text, the same
+// overridable metrics, the same theme token for the copy.
 .analyzeIntro {
-  --analyze-intro-gap: 8px;
+  // Overridable metrics/colors, so a host embedding the chat in a tighter
+  // panel can scale the block without touching the markup.
+  --analyze-intro-gap: 13px;
+  --analyze-intro-padding-block: 8px;
+  --analyze-intro-illustration-inset: 14px;
 
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  text-align: center;
-  padding-block-end: 8px;
+
+  width: 100%;
+  padding-block: var(--analyze-intro-padding-block);
+  gap: var(--analyze-intro-gap);
 }
 
-// No width/height here on purpose: the artwork carries its own 112x83 in the
-// SVG, so resizing it is a one-file change in the asset.
+// No width/height here on purpose: unlike the welcome artwork this one is a
+// landscape card, and it carries its own size in the SVG — resizing it is a
+// one-file change in the asset.
+//
+// The margin is what the welcome illustration gets for free: its card is
+// inset in its canvas (11 of 86 units above and below, ~14px once drawn at
+// 112), while this card fills its own canvas edge to edge. Without it the
+// artwork sits visibly higher under the panel header than the welcome one.
 .illustration {
   flex: none;
-  margin-block-end: var(--analyze-intro-gap);
+  margin-block: var(--analyze-intro-illustration-inset);
 }
 
-// The form name can be long and the panel is narrow; two lines at most, with
-// the full name kept in the title attribute.
+// The two lines are one paragraph, so they sit closer to each other than the
+// block's own gap, which belongs between the artwork and the copy.
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+// Type sizes are not set here: `Text` and `Heading` write `fontSize` and
+// `lineHeight` as inline styles, which beat any class, so the components'
+// props are the single source of truth for them. These classes carry what is
+// left — alignment and colour.
+
+// The mode's name carries the block, so it takes the plain text colour —
+// black on a light portal, white on a dark one.
+.title {
+  text-align: center;
+  color: var(--text-color);
+}
+
+.text {
+  text-align: center;
+
+  // Same token the library uses for the welcome screen's description, so both
+  // intros follow the portal theme together in light and dark.
+  color: var(--chat-welcome-description-color, var(--text-secondary));
+}
+
+// The mode's line and the form's name read as one paragraph, so the name only
+// steps down in size — the colour stays the copy's. It can be long and the
+// panel is narrow: two lines at most, with the full name in the title.
 .hint {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: var(--text-secondary);
 }

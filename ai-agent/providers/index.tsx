@@ -536,8 +536,7 @@ const AiAgentProviders = ({
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
   const aiChatLocale = normalizeAiChatLocale(locale);
-  const { foldersApi, operationsApi, filesSettingsApi, aiApi } =
-    useFilesApi();
+  const { foldersApi, operationsApi, filesSettingsApi, aiApi } = useFilesApi();
 
   const aiChatTranslations = useMemo(
     () => ({
