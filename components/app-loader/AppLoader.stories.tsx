@@ -28,6 +28,7 @@ import AppLoader from "@onlyoffice/apps-ui-kit/components/app-loader";
 \`\`\``,
       },
     },
+    layout: "fullscreen",
   },
 } satisfies Meta<typeof AppLoader>;
 
@@ -45,9 +46,7 @@ export const CssCustomization: Story = {
         } as CSSProperties
       }
     >
-      <div style={{ width: "500px", height: "500px", position: "relative" }}>
-        <AppLoader />
-      </div>
+      <AppLoader />
     </div>
   ),
   parameters: {
@@ -65,16 +64,12 @@ export const CssCustomization: Story = {
 };
 
 export const Default: Story = {
-  render: () => (
-    <div style={{ width: "500px", height: "500px", position: "relative" }}>
-      <AppLoader />
-    </div>
-  ),
+  render: () => <AppLoader />,
   parameters: {
     docs: {
       description: {
         story:
-          "Full-screen application loader with rombs animation, rendered inside a constrained container for demonstration.",
+          "Full-screen application loader with rombs animation. The component uses fixed positioning and always covers the full viewport, regardless of its container.",
       },
       source: {
         code: `<AppLoader />`,
