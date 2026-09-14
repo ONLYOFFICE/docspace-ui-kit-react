@@ -208,23 +208,34 @@ const IconVariantsTemplate = () => {
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(3, 80px)",
-        gridGap: "24px",
-        alignItems: "center",
+        gridTemplateColumns: "repeat(3, 100px)",
+        rowGap: "8px",
+        columnGap: "24px",
       }}
     >
       {icons.map(({ icon, label }) => (
         <div
           key={label}
           style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "8px",
+            position: "relative",
+            width: 100,
+            height: 70,
           }}
         >
           <FloatingButton icon={icon} />
-          <span style={{ fontSize: "11px", color: "#666" }}>{label}</span>
+          <span
+            style={{
+              position: "absolute",
+              top: 56,
+              insetInlineStart: 0,
+              width: 48,
+              textAlign: "center",
+              fontSize: "11px",
+              color: "#666",
+            }}
+          >
+            {label}
+          </span>
         </div>
       ))}
     </div>
