@@ -140,21 +140,27 @@ const renderElementComboBox = (onSelect?: (option?: TOption) => void) => (
 );
 
 const Template = ({ ...args }: RowProps) => {
-  const { checked } = args;
-  const getElementProps = (element: string) =>
-    element === "Avatar"
+  const { checked, element } = args;
+  const getElementProps = (elementName?: string) =>
+    elementName === "Avatar"
       ? { element: elementAvatar }
-      : element === "Icon"
+      : elementName === "Icon"
         ? { element: elementIcon }
-        : element === "ComboBox"
+        : elementName === "ComboBox"
           ? { element: renderElementComboBox() }
           : {};
 
-  const elementProps = getElementProps("Avatar");
+  // The Controls-panel `element` argType is a select of option names, not a
+  // real ReactElement -- Storybook injects the raw string control value at
+  // runtime, overriding the RowProps.element (ReactElement) static type.
+  const elementProps = getElementProps(element as unknown as string);
   const checkedProps = { checked };
+  // Exclude the raw select-control string from the spread below -- only the
+  // resolved ReactElement in `elementProps` should reach <Row>.
+  const { element: _elementArg, ...restArgs } = args;
   return (
     <Row
-      {...args}
+      {...restArgs}
       key="1"
       style={{ width: "20%" }}
       {...checkedProps}
@@ -180,6 +186,10 @@ export const Default: Story = {
   args: {
     checked: true,
     isIndexEditingMode: false,
+    // Cast: the `element` argType is a Controls-panel select of option
+    // names ("Avatar" | "Icon" | "ComboBox"), not a ReactElement -- see
+    // Template, which resolves the selected name to the actual element.
+    element: "Avatar" as unknown as RowProps["element"],
   },
   parameters: {
     docs: {
