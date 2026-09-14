@@ -17,7 +17,7 @@ const TableHeaderWrapper = (args: Omit<TableHeaderProps, "containerRef">) => {
     <div
       id="table-container"
       ref={containerRef}
-      style={{ marginInline: "40px" }}
+      style={{ marginInline: "40px", position: "relative" }}
     >
       <TableHeader {...args} containerRef={containerRef} />
     </div>

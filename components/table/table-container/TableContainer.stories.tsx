@@ -152,15 +152,17 @@ const ref = useRef<HTMLDivElement>(null);
               it sets specific styles to properly contain virtualized content.
             </p>
           </div>
-          <Scrollbar
-            id="sectionScroll"
-            style={{ height: "400px" }}
-            autoHide={false}
-          >
-            <div style={{ marginTop: "25px" }}>
-              <Story />
-            </div>
-          </Scrollbar>
+          <div style={{ position: "relative" }}>
+            <Scrollbar
+              id="sectionScroll"
+              style={{ height: "400px" }}
+              autoHide={false}
+            >
+              <div style={{ marginTop: "25px" }}>
+                <Story />
+              </div>
+            </Scrollbar>
+          </div>
         </div>
       );
     },
