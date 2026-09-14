@@ -33,11 +33,11 @@ const meta = {
 \`\`\`tsx
 import { ActionButton } from "@onlyoffice/apps-ui-kit/components/action-button";
 
-<ActionButton onClick={handleClick}>Clear filter</ActionButton>
+<ActionButton label="Clear filter" onClick={handleClick} />
 
-<ActionButton icon={<FilterIcon />} onClick={handleClick}>Clear filter</ActionButton>
+<ActionButton icon={<FilterIcon />} label="Clear filter" onClick={handleClick} />
 
-<ActionButton as="a" href="/about">Go to page</ActionButton>
+<ActionButton as="a" href="/about" label="Go to page" />
 \`\`\``,
       },
     },
@@ -46,27 +46,25 @@ import { ActionButton } from "@onlyoffice/apps-ui-kit/components/action-button";
     icon: { control: false },
     as: { control: false },
   },
+  args: {
+    label: "Clear filter",
+  },
 } satisfies Meta<typeof ActionButton>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  args: {
-    children: "Clear filter",
-  },
-};
+export const Default: Story = {};
 
 export const WithIcon: Story = {
   args: {
-    children: "Clear filter",
     icon: <FilterIcon />,
   },
 };
 
 export const TextOnly: Story = {
   args: {
-    children: "Text",
+    label: "Text",
   },
 };
 
@@ -74,6 +72,6 @@ export const AsLink: Story = {
   args: {
     as: "a",
     href: "#",
-    children: "Go to page",
+    label: "Go to page",
   },
 };
