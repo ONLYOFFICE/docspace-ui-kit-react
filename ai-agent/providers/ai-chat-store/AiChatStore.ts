@@ -243,4 +243,25 @@ class AiChatStore {
   };
 }
 
+/**
+ * Backing out of the analyze mode by taking the form's chip off the draft.
+ *
+ * Before the first message the form is still on the composer, so removing it
+ * is how a user leaves the mode. After the send the draft is empty by design
+ * (the widget clears it as soon as the send is approved), and that empty draft
+ * must not read as the same gesture — which is what the phase is for: the send
+ * middleware flips it to `active` synchronously, ahead of the clear.
+ *
+ * Lives here, beside the store, rather than inside the effect that calls it
+ * (`AiChatStoresBridge`): that module pulls in the whole widget, and the order
+ * this depends on — send marker, then clear, then this — is exactly what a
+ * test needs to be able to replay (see `analyze-mode.test.ts`).
+ */
+export const endAnalyzeOnChipRemoval = (
+  store: AiChatStore,
+  hasAnalyzeChip: boolean,
+) => {
+  if (!hasAnalyzeChip && store.isAnalyzePending) store.endAnalyzeMode();
+};
+
 export default AiChatStore;

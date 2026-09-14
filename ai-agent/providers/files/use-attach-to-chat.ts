@@ -74,8 +74,8 @@ export type ChatAttachableItem = {
  * Why each item did not end up on the message. Every reason is counted
  * apart: they read differently to the user, and a caller that lumps them
  * together ends up telling someone who dropped a folder that the attachment
- * limit is full. `attached + duplicates + skippedFolders + skippedOverLimit
- *` always equals the number of items handed in.
+ * limit is full. The four counts always add up to the number of items handed
+ * in: `attached`, `duplicates`, `skippedFolders`, `skippedOverLimit`.
  */
 export type AttachToChatResult = {
   attached: number;
@@ -173,6 +173,12 @@ export const useAttachHostFilesToChat = () => {
       const files = keep.map((index) => notFolders[index]);
       const duplicates = notFolders.length - files.length;
 
+      // A new subject replaces the mode rather than joining it, so it is not
+      // what the analyze cap is there to refuse: that cap drops to zero once
+      // the first message is sent, which would otherwise make "Analyze
+      // responses" on a second form do nothing at all. The draft was just
+      // emptied above, so the one slot asked for here is genuinely free.
+      const effectiveLimit = subject ? Math.max(cap.limit, 1) : cap.limit;
 
       const inputsAll = files.map((file) => ({
         path: String(file.id),
@@ -195,7 +201,7 @@ export const useAttachHostFilesToChat = () => {
           kind: "file" as const,
           type: input.type,
         })),
-        cap.limit,
+        effectiveLimit,
       );
       const inputs = inputsAll.slice(0, pendingIds.length);
       // The reservation is the cap: whatever it refused had no room.

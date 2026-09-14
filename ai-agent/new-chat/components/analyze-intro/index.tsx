@@ -51,9 +51,12 @@ import styles from "./AnalyzeIntro.module.scss";
  * the ordinary welcome intro: which mode the chat is in, which form it is
  * about, and that other files stay out of it.
  *
- * The widget draws this only while the thread is empty and at least one chip
- * exists (`WidgetConfig.suggestionsHeader`), so it introduces the first
- * question rather than standing for the whole conversation.
+ * The widget draws this while the thread is empty
+ * (`WidgetConfig.suggestionsHeader`), whether or not any chip is there — which
+ * is what this mode needs: the questions are generated on the server and the
+ * block has to name the mode through the whole wait, with nothing under it.
+ * Once the first message goes out the thread is no longer empty and the panel
+ * title carries the mode alone.
  */
 export const AnalyzeIntro = observer(() => {
   const t = useCommonTranslation();

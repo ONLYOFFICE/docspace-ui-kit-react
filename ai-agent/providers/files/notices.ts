@@ -87,12 +87,20 @@ export const notifyAttachmentLimit = (
   if (count <= 0) return;
 
   if (cap.reason === "analyze") {
+    // The name is what makes this explainable, so when the host sent none
+    // (an attach that reported no title) the sentence drops the slot rather
+    // than printing a hole where the form should be.
     toastr.info(
-      t("Common:AttachFilesAnalyzingForm", {
-        fileName: cap.fileName ?? "",
-        defaultValue:
-          "Analyze responses is on: this chat works with {{fileName}} only. Start a new chat to attach other files.",
-      }),
+      cap.fileName
+        ? t("Common:AttachFilesAnalyzingForm", {
+            fileName: cap.fileName,
+            defaultValue:
+              "Analyze responses is on: this chat works with {{fileName}} only. Start a new chat to attach other files.",
+          })
+        : t("Common:AttachFilesAnalyzingFormUnnamed", {
+            defaultValue:
+              "Analyze responses is on: this chat works with one form only. Start a new chat to attach other files.",
+          }),
     );
     return;
   }

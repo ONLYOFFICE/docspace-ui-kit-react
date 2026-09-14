@@ -84,3 +84,45 @@ export const AttachmentLimitContext = createContext<AttachmentCap>(
 /** The cap in force here — never above the widget's own. */
 export const useAttachmentLimit = (): AttachmentCap =>
   useContext(AttachmentLimitContext);
+
+/** What the chat's state says the composer may take right now. */
+export type AttachmentCapInput = {
+  /** The chat is in "Analyze responses". */
+  analyzeActive: boolean;
+  /** ...and its first message has not gone out yet. */
+  analyzePending: boolean;
+  /** Name of the analyzed form, for the refusal. */
+  analyzeFileName?: string;
+  /** What the host's section allows, already clamped to the widget's cap. */
+  sectionLimit: number;
+};
+
+/**
+ * The cap and what put it there: an analyze subject beats the section, which
+ * beats the widget's own limit.
+ *
+ * The analyze mode gets one slot before the first message and none after it.
+ * The single slot is the form's own — it is already on the draft, so nothing
+ * else fits anyway — and the send empties the draft without ending the mode,
+ * which would hand that slot to the next file dropped on the panel. Hiding the
+ * "+" menu does not cover it: drag-and-drop and the host's "Ask AI" row action
+ * attach through this cap, so this is what has to say no. Attaching another
+ * form as the new subject goes around it — see `useAttachHostFilesToChat`.
+ */
+export const resolveAttachmentCap = ({
+  analyzeActive,
+  analyzePending,
+  analyzeFileName,
+  sectionLimit,
+}: AttachmentCapInput): AttachmentCap => {
+  if (analyzeActive) {
+    return {
+      limit: analyzePending ? 1 : 0,
+      reason: "analyze",
+      fileName: analyzeFileName,
+    };
+  }
+  return sectionLimit < CHAT_ATTACHMENT_LIMIT
+    ? { limit: sectionLimit, reason: "section" }
+    : { limit: sectionLimit, reason: "widget" };
+};

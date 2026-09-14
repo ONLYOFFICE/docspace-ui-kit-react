@@ -112,6 +112,22 @@ const attachUnderLimit = async (items: AttachItems, limit: number) => {
   return result.current(items);
 };
 
+// Same call, but under the cap an active analyze mode puts up: no slots at
+// all, because the mode outlives the message that emptied the draft.
+const attachUnderAnalyzeCap = async (items: AttachItems) => {
+  const { result } = renderHook(() => useAttachHostFilesToChat(), {
+    wrapper: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(
+        AttachmentLimitContext.Provider,
+        {
+          value: { limit: 0, reason: "analyze" as const, fileName: "S.pdf" },
+        },
+        children,
+      ),
+  });
+  return result.current(items);
+};
+
 // Same call, but under the provider's attach reporter — the context the chat
 // providers put around the host subtree.
 const attachUnderReporter = async (
@@ -278,6 +294,35 @@ describe("useAttachHostFilesToChat accounting", () => {
     expect(storeState.beginPendingAttachments).toHaveBeenCalledWith([
       expect.objectContaining({ title: "file-1.docx" }),
     ]);
+  });
+
+  // After the first message of an analyze chat the draft is empty, so a
+  // cap of one would happily let the next dropped file take the free slot —
+  // the mode is still on, and the chat is still about the form.
+  it("refuses an ordinary file while a sent analyze mode is on", async () => {
+    const result = await attachUnderAnalyzeCap([file(1)]);
+
+    expect(result).toEqual({
+      attached: 0,
+      skippedFolders: 0,
+      skippedOverLimit: 1,
+      cap: { limit: 0, reason: "analyze", fileName: "S.pdf" },
+      duplicates: 0,
+    });
+    expect(storeState.beginPendingAttachments).not.toHaveBeenCalled();
+    expect(attachFilesToChat).not.toHaveBeenCalled();
+  });
+
+  // ...but the mode moving to another form is not something that cap is
+  // there to refuse, or "Analyze responses" on a second form would do nothing.
+  it("lets a new analyze subject through the same cap", async () => {
+    const result = await attachUnderAnalyzeCap([
+      { ...file(2), analyzeOnly: true },
+    ]);
+
+    expect(clearAttachmentFiles).toHaveBeenCalledTimes(1);
+    expect(result.attached).toBe(1);
+    expect(result.skippedOverLimit).toBe(0);
   });
 
   it("refuses everything when the single slot is taken", async () => {

@@ -131,7 +131,6 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
       const picked = keep.map((index) => sources[index]);
       const duplicates = sources.length - picked.length;
 
-
       const inputs = picked.map((s) => ({
         path: String(s.id),
         title: s.fileExst ? `${s.title}${s.fileExst}` : s.title,

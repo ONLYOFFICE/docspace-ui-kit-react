@@ -135,10 +135,14 @@ import {
 } from "./files";
 import { resolveSuggestions, type SuggestionSet } from "./suggestions";
 import { composeCallbacks } from "./compose-callbacks";
-import { analyzeSentMiddleware } from "./analyze-sent-middleware";
+import {
+  analyzeModeCallbacks,
+  analyzeSentMiddleware,
+} from "./analyze-sent-middleware";
 import { OnFilesAttachedContext } from "./files/attached-report";
 import {
   AttachmentLimitContext,
+  resolveAttachmentCap,
   type AttachmentCap,
 } from "./files/attachment-limit";
 import { CHAT_ATTACHMENT_LIMIT } from "./files/limits";
@@ -552,15 +556,15 @@ const AiAgentProviders = ({
   // below, because the analyze mode lives on it and everything this body
   // assembles — the attachment cap, the composer actions, the chips — is
   // derived from that mode. Only the flat fields are observed, never the mode
-  // object itself, so the phase flip on send re-renders nothing.
+  // object itself.
   const aiChatStore = useMemo(() => new AiChatStore(), []);
-  const { analyzeActive, analyzeEntryId, analyzeFileName } = useObserver(
-    () => ({
+  const { analyzeActive, analyzePending, analyzeEntryId, analyzeFileName } =
+    useObserver(() => ({
       analyzeActive: aiChatStore.isAnalyzeMode,
+      analyzePending: aiChatStore.isAnalyzePending,
       analyzeEntryId: aiChatStore.analyzeEntryId,
       analyzeFileName: aiChatStore.analyzeFormTitle,
-    }),
-  );
+    }));
 
   // Ids of attached files the backend flagged as analyzable. The attachments
   // store keeps only `{id, title, kind, path, type}` per ref, so `canAnalyze`
@@ -830,17 +834,19 @@ const AiAgentProviders = ({
   // the panel store, not a property of the draft — it outlives the message
   // that takes the form off the composer (see `AiChatStore.analyzeMode`).
 
-  // The cap and what put it there: an analyze subject beats the section,
-  // which beats the widget's own limit. The reason travels with the number
-  // because it is what the refusal toast explains.
-  const attachmentCap = useMemo<AttachmentCap>(() => {
-    if (analyzeActive) {
-      return { limit: 1, reason: "analyze", fileName: analyzeFileName };
-    }
-    return sectionAttachmentLimit < CHAT_ATTACHMENT_LIMIT
-      ? { limit: sectionAttachmentLimit, reason: "section" }
-      : { limit: sectionAttachmentLimit, reason: "widget" };
-  }, [analyzeActive, analyzeFileName, sectionAttachmentLimit]);
+  // The number the composer enforces and the reason the refusal quotes — see
+  // `resolveAttachmentCap` for why the analyze mode ends up with no slots at
+  // all once its first message is out.
+  const attachmentCap = useMemo<AttachmentCap>(
+    () =>
+      resolveAttachmentCap({
+        analyzeActive,
+        analyzePending,
+        analyzeFileName,
+        sectionLimit: sectionAttachmentLimit,
+      }),
+    [analyzeActive, analyzePending, analyzeFileName, sectionAttachmentLimit],
+  );
 
   const composerActions = useMemo(
     () => (analyzeActive ? [] : attachActions),
@@ -1005,15 +1011,8 @@ const AiAgentProviders = ({
     ],
   );
 
-  // A thread the user switched to is a different conversation, so the analyze
-  // mode does not follow it. The thread our own first message creates is not:
-  // that arrives as "created", which is exactly what tells the two apart.
   const ownCallbacks = useMemo<ChatCallbacks>(
-    () => ({
-      onThreadsUpdated: ({ kind }) => {
-        if (kind === "switched") aiChatStore.endAnalyzeMode();
-      },
-    }),
+    () => analyzeModeCallbacks(aiChatStore),
     [aiChatStore],
   );
 
