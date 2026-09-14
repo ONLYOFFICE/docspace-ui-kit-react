@@ -41,9 +41,27 @@ const ScrollStructureWrapper = ({ children }: { children: ReactNode }) => (
   </div>
 );
 
-const InfiniteLoaderDemo = () => {
+type InfiniteLoaderDemoProps = {
+  viewAs?: TViewAs;
+  itemCount?: number;
+  itemSize?: number;
+  countTilesInRow?: number;
+  isLoading?: boolean;
+  infoPanelVisible?: boolean;
+  hasMoreFiles?: boolean;
+};
+
+const InfiniteLoaderDemo = ({
+  viewAs = "tile" as TViewAs,
+  itemCount: itemCountProp = 100,
+  itemSize = 20,
+  countTilesInRow = 4,
+  isLoading = false,
+  infoPanelVisible,
+  hasMoreFiles: hasMoreFilesProp,
+}: InfiniteLoaderDemoProps = {}) => {
   const [items, setItems] = useState<React.ReactNode[]>(generateItems(20, 0));
-  const [itemCount] = useState(100);
+  const [itemCount] = useState(itemCountProp);
   const [loadedCount, setLoadedCount] = useState(20);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -81,14 +99,15 @@ const InfiniteLoaderDemo = () => {
 
   return (
     <InfiniteLoaderComponent
-      viewAs={"tile" as TViewAs}
+      viewAs={viewAs}
       itemCount={itemCount}
       filesLength={loadedCount}
-      hasMoreFiles={loadedCount < itemCount}
+      hasMoreFiles={hasMoreFilesProp ?? loadedCount < itemCount}
       loadMoreItems={loadMoreItems}
-      itemSize={20}
-      countTilesInRow={4}
-      isLoading={false}
+      itemSize={itemSize}
+      countTilesInRow={countTilesInRow}
+      isLoading={isLoading}
+      infoPanelVisible={infoPanelVisible}
     >
       {items}
     </InfiniteLoaderComponent>
@@ -225,8 +244,16 @@ export const CssCustomization: Story = {
 };
 
 export const Default: Story = {
-  args: {},
-  render: () => <InfiniteLoaderDemo />,
+  args: {
+    viewAs: "tile" as TViewAs,
+    itemCount: 100,
+    itemSize: 20,
+    countTilesInRow: 4,
+    isLoading: false,
+    infoPanelVisible: false,
+    hasMoreFiles: true,
+  },
+  render: (args) => <InfiniteLoaderDemo {...args} />,
   parameters: {
     docs: {
       description: {
