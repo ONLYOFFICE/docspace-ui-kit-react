@@ -46,11 +46,15 @@ type Story = StoryObj;
 
 export default meta;
 
-// Helper that mounts a styled #ipl-progress-indicator and cleans up on unmount
+// Helper that mounts a styled static demo bar and cleans up on unmount.
+// Uses its own id (not "ipl-progress-indicator") since this demo is purely
+// visual and never driven by TopLoaderService — reusing the service's id
+// would collide with the Default story's live element when both stories
+// render together under autodocs.
 const useProgressBar = (styles: Partial<CSSStyleDeclaration>) => {
   useEffect(() => {
     const bar = document.createElement("div");
-    bar.id = "ipl-progress-indicator";
+    bar.id = "top-loader-css-customization-demo";
     Object.assign(bar.style, styles);
     document.body.appendChild(bar);
     return () => {
@@ -80,8 +84,10 @@ const CssCustomizationTemplate = () => {
   return (
     <div style={{ padding: "40px 20px" }}>
       <p style={{ margin: 0, fontSize: "13px", color: "#555" }}>
-        Progress bar at 65% — styled via inline CSS on{" "}
-        <code>#ipl-progress-indicator</code>
+        Progress bar at 65% — a static visual demo of the styles you would
+        apply to <code>#ipl-progress-indicator</code> (rendered here under a
+        different id so it doesn't collide with the live bar in the Default
+        story)
       </p>
       <p style={{ marginTop: "8px", fontSize: "12px", color: "#888" }}>
         Customizable properties: <strong>height</strong>,{" "}
@@ -100,6 +106,7 @@ export const CssCustomization: Story = {
       description: {
         story: `\`TopLoaderService\` uses direct DOM manipulation on \`#ipl-progress-indicator\`.
 Style the element freely via CSS — the service only sets \`width\` and ARIA attributes at runtime.
+This story renders a static demo bar under a different id, purely for visual reference — it is not driven by \`TopLoaderService\`.
 
 **Recommended inline style properties:**
 
