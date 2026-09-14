@@ -84,9 +84,19 @@ import Navigation from "@onlyoffice/apps-ui-kit/components/navigation/Navigation
     },
     isDesktop: {
       control: "boolean",
-      description: "Desktop mode (shows info panel toggle)",
+      description:
+        "Cosmetic desktop-client flag (sets data-is-desktop-client); does not affect responsive layout. Use currentDeviceType for that.",
       table: {
         defaultValue: { summary: "true" },
+      },
+    },
+    currentDeviceType: {
+      control: "select",
+      options: [DeviceType.desktop, DeviceType.tablet, DeviceType.mobile],
+      description:
+        "Drives responsive layout: shows/hides the info panel toggle, AI chat button, and root folder title, and switches ControlButtons between desktop/mobile/mobile-only rendering.",
+      table: {
+        defaultValue: { summary: "DeviceType.desktop" },
       },
     },
     isInfoPanelVisible: {
