@@ -231,7 +231,7 @@ const MultiplePortalsTemplate = () => {
         <>
           <Portal
             element={
-              <div className={`${styles.popup} ${styles.blue}`}>
+              <div className={`${styles.popup} ${styles.blue} ${styles.top30}`}>
                 First Portal
               </div>
             }
@@ -239,7 +239,7 @@ const MultiplePortalsTemplate = () => {
           />
           <Portal
             element={
-              <div className={`${styles.popup} ${styles.purple}`}>
+              <div className={`${styles.popup} ${styles.purple} ${styles.top50}`}>
                 Second Portal
               </div>
             }
@@ -247,7 +247,7 @@ const MultiplePortalsTemplate = () => {
           />
           <Portal
             element={
-              <div className={`${styles.popup} ${styles.green}`}>
+              <div className={`${styles.popup} ${styles.green} ${styles.top70}`}>
                 Third Portal
               </div>
             }
