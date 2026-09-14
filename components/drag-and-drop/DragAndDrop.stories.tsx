@@ -144,6 +144,7 @@ const InteractiveDropZone = (args: ComponentProps<typeof DragAndDrop>) => {
   return (
     <DragAndDrop
       {...args}
+      dragging={args.dragging ?? isDragging}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
