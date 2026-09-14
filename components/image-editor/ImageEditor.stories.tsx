@@ -6,7 +6,7 @@ import { useCallback, useState } from "react";
 
 import type { TImage } from "./ImageEditor.types";
 
-import "../../assets/selector.form.room.empty.screen.light.react.svg";
+import SelectorPreviewSvgUrl from "../../assets/selector.form.room.empty.screen.light.react.svg?url";
 import { ImageEditor } from "./index";
 
 const meta = {
@@ -109,8 +109,7 @@ const ImageEditorDemo = ({
   maxImageSize?: number;
 }) => {
   const [image, setImage] = useState<TImage>({
-    uploadedFile:
-      "../../assets/selector.form.room.empty.screen.light.react.svg",
+    uploadedFile: SelectorPreviewSvgUrl,
     zoom: 0.5,
     x: 0.5,
     y: 0,

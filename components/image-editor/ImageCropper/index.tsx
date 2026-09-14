@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import throttle from "lodash/throttle";
 import AvatarEditor, { Position } from "react-avatar-editor";
 import classNames from "classnames";
@@ -74,24 +74,26 @@ const ImageCropper = ({
     }
   };
 
-  const handleImageChange = throttle(() => {
-    try {
-      if (!editorRef.current) return;
-      const newPreviewImage = editorRef.current
-        .getImageScaledToCanvas()
-        ?.toDataURL();
-      setPreviewImage(newPreviewImage);
-    } catch {
-      // console.error(e);
-    }
-  }, 300);
+  const setPreviewImageRef = useRef(setPreviewImage);
+  setPreviewImageRef.current = setPreviewImage;
+
+  const handleImageChangeRef = useRef(
+    throttle(() => {
+      try {
+        if (!editorRef.current) return;
+        const newPreviewImage = editorRef.current
+          .getImageScaledToCanvas()
+          ?.toDataURL();
+        setPreviewImageRef.current(newPreviewImage);
+      } catch {
+        // console.error(e);
+      }
+    }, 300),
+  );
 
   useEffect(() => {
-    handleImageChange();
-    return () => {
-      // setPreviewImage("");
-    };
-  }, [handleImageChange, image, setPreviewImage]);
+    handleImageChangeRef.current();
+  }, [image.zoom, image.x, image.y, uploadedFile]);
 
   return (
     <div
@@ -116,7 +118,7 @@ const ImageCropper = ({
           borderRadius={editorBorderRadius}
           style={{ width: "368px", height: "368px" }}
           onPositionChange={handlePositionChange}
-          onImageReady={handleImageChange}
+          onImageReady={() => handleImageChangeRef.current()}
           disableHiDPIScaling={false}
           crossOrigin="anonymous"
         />
