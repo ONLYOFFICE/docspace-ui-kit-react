@@ -100,7 +100,11 @@ const RoomLogoPure = ({
       data-testid="room-logo"
     >
       <div
-        className={classNames("room-logo_icon-container", styles.container)}
+        className={classNames(
+          "room-logo_icon-container",
+          styles.container,
+          styles.logoContainer,
+        )}
         onClick={onSelect}
       >
         {Icon ? <Icon className="room-logo_icon" /> : null}
