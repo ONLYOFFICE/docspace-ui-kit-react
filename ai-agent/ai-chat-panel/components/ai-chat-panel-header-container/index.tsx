@@ -65,7 +65,11 @@ const AiChatPanelHeaderContainer: React.FC = observer(() => {
 
   return (
     <AiChatPanelHeader
-      title={t("Common:AIChatButton")}
+      title={
+          store.isAnalyzeMode
+            ? t("Common:AnalyzeResponsesMode")
+            : t("Common:AIChatButton")
+        }
       onClose={handleClose}
       isFullscreen={store.effectiveFullscreen}
       onToggleFullscreen={isDesktop ? store.toggleFullscreen : undefined}

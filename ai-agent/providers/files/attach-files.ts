@@ -79,6 +79,12 @@ export type AttachedFileInfo = {
   entryId: string;
   /** Attached as the subject of the message (see `AttachFileInput`). */
   analyzeOnly?: boolean;
+  /**
+   * File name as the host sent it. The attachment record carries a title too,
+   * but this is the one the user saw in the file list — it is what the
+   * analyze banner names.
+   */
+  title: string;
   /** The backend can analyze this file's contents (an analyzable form). */
   canAnalyze?: boolean;
   /**
@@ -209,6 +215,7 @@ export const attachFilesToChat = async (
     .map(({ record, input }) => ({
       id: record.id,
       entryId: input?.path ?? "",
+      title: input?.title ?? record.title,
       analyzeOnly: input?.analyzeOnly,
       canAnalyze: record.canAnalyze,
       suggestedQuestions: readSuggestedQuestions(record),

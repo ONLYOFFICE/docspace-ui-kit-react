@@ -29,6 +29,23 @@ import { makeAutoObservable } from "mobx";
 export type AiChatRouterPage =
   "chat" | "settings" | "history" | "initial-setup";
 
+/**
+ * The "Analyze responses" mode: the chat is about one PDF form's collected
+ * answers until an explicit edge ends it.
+ *
+ * `phase` is what tells the two ways the form can leave the composer apart —
+ * `pending` means the form is still on the draft and removing its chip exits
+ * the mode, `active` means the first message took it and the mode now stands
+ * on its own.
+ */
+export type AnalyzeMode = {
+  /** DocSpace file id of the form. */
+  entryId: string;
+  /** File name, shown in the banner and the chips header. */
+  title: string;
+  phase: "pending" | "active";
+};
+
 // Docked (non-fullscreen) panel width on desktop. Matches the CSS default of
 // `--chat-panel-width` in Section.module.scss: the panel renders at this width
 // until the user drags the resizer, and every open starts from it again.
@@ -73,8 +90,42 @@ class AiChatStore {
   // library's `useStores` (Bug 83210).
   pendingNewChat = false;
 
+  /**
+   * The chat is analyzing one PDF form's responses ("Analyze responses"), or
+   * `null` for an ordinary chat.
+   *
+   * A mode rather than a one-off action: it survives sending a message, which
+   * is what the chip on the composer draft cannot do (the widget empties the
+   * draft on send). While it is set the composer takes no other file, the
+   * panel says so in its title, and the chips are that form's own questions.
+   */
+  analyzeMode: AnalyzeMode | null = null;
+
   constructor() {
     makeAutoObservable(this);
+  }
+
+  get isAnalyzeMode(): boolean {
+    return this.analyzeMode !== null;
+  }
+
+  /** DocSpace file id of the analyzed form — the questions endpoint's key. */
+  get analyzeEntryId(): string | undefined {
+    return this.analyzeMode?.entryId;
+  }
+
+  /** File name of the analyzed form, for the banner and the chips header. */
+  get analyzeFormTitle(): string {
+    return this.analyzeMode?.title ?? "";
+  }
+
+  /**
+   * Before the first message the form still sits on the draft, so removing
+   * its chip is a way out of the mode; afterwards there is no chip and the
+   * mode is held by this store alone.
+   */
+  get isAnalyzePending(): boolean {
+    return this.analyzeMode?.phase === "pending";
   }
 
   // Both `settings` and `initial-setup` are settings-like flows; the close
@@ -112,6 +163,10 @@ class AiChatStore {
       this.pendingNewChat = true;
       this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
     }
+    // A fresh conversation is not the one that was analyzing a form. The
+    // analyze entry point opens the chat through here too, but it starts its
+    // mode afterwards, once the form is attached.
+    this.endAnalyzeMode();
     this.isVisible = true;
   };
 
@@ -124,11 +179,16 @@ class AiChatStore {
     this.isVisible = false;
     this.userFullscreen = false;
     this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
+    // Closing the panel is one of the explicit ways out of the analyze mode.
+    this.endAnalyzeMode();
   };
 
   toggle = () => {
     this.isVisible = !this.isVisible;
-    if (!this.isVisible) this.userFullscreen = false;
+    if (!this.isVisible) {
+      this.userFullscreen = false;
+      this.endAnalyzeMode();
+    }
     // Both directions reset: closing clears the drag, opening starts fresh.
     this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
   };
@@ -155,6 +215,31 @@ class AiChatStore {
 
   setHasProfiles = (value: boolean) => {
     this.hasProfiles = value;
+  };
+
+  /**
+   * Enter the mode for `form`, or move it to another form — a second
+   * "Analyze responses" is a new subject, not a second mode.
+   */
+  startAnalyzeMode = (form: { entryId: string; title: string }) => {
+    // Without an entry id the questions endpoint has nothing to ask about and
+    // the banner nothing to name, so there is no mode to enter.
+    if (!form.entryId) return;
+    this.analyzeMode = { ...form, phase: "pending" };
+  };
+
+  /**
+   * The first message of the mode is on its way. Called from the send
+   * middleware rather than from `onMessageSent`, because the draft is emptied
+   * before that event fires and the empty draft must not read as "the user
+   * removed the form".
+   */
+  markAnalyzeSent = () => {
+    if (this.analyzeMode) this.analyzeMode.phase = "active";
+  };
+
+  endAnalyzeMode = () => {
+    this.analyzeMode = null;
   };
 }
 

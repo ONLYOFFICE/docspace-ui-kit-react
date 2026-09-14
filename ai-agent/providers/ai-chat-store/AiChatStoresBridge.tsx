@@ -31,6 +31,8 @@ import { reaction } from "mobx";
 
 import { useStores } from "@onlyoffice/ai-chat";
 
+import { useAnalyzeLock } from "../files/use-analyze-lock";
+
 import { useAiChatStore } from "./AiChatStoreProvider";
 
 // Sole Zustand → MobX sync point. Mirrors upstream router page and
@@ -58,6 +60,17 @@ const AiChatStoresBridge = () => {
     if (!initialized) return;
     store.setHasProfiles(profiles.length > 0);
   }, [store, profiles, initialized]);
+
+  // Before the first message the analyze form is still on the draft, so
+  // taking its chip off is how a user backs out of the mode. After the send
+  // the draft is empty by design (the widget clears it), which is why this
+  // only looks at the `pending` phase — the send middleware flips it to
+  // `active` before that clear happens.
+  const hasAnalyzeChip = useAnalyzeLock(stores.useAttachmentsStore);
+
+  useEffect(() => {
+    if (!hasAnalyzeChip && store.isAnalyzePending) store.endAnalyzeMode();
+  }, [store, hasAnalyzeChip]);
 
   useEffect(
     () =>

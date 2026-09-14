@@ -89,8 +89,9 @@ export const notifyAttachmentLimit = (
   if (cap.reason === "analyze") {
     toastr.info(
       t("Common:AttachFilesAnalyzingForm", {
+        fileName: cap.fileName ?? "",
         defaultValue:
-          "This message analyzes the attached form, so it takes no other files. Send it, or remove the form to start over.",
+          "Analyze responses is on: this chat works with {{fileName}} only. Start a new chat to attach other files.",
       }),
     );
     return;

@@ -34,6 +34,7 @@ import {
 } from "react";
 
 import i18nextSingleton from "i18next";
+import { useObserver } from "mobx-react";
 import {
   I18nextProvider as ReactI18nextProvider,
   useTranslation,
@@ -94,6 +95,7 @@ import {
   type FormsRecommendation,
 } from "./forms-recommendation";
 import { ChatIntro } from "../chat-intro";
+import { AnalyzeIntro } from "../new-chat/components/analyze-intro";
 import { storageAdapter } from "./storage";
 import { usePlatformAdapter } from "./platform";
 import { componentOverrides } from "./components-overrides";
@@ -103,6 +105,7 @@ import { normalizeAiChatLocale } from "./locale";
 import { portalThemes } from "./themes";
 import {
   AgentRoomIdSync,
+  AiChatStore,
   AiChatStoreProvider,
   AiChatStoresBridge,
 } from "./ai-chat-store";
@@ -123,7 +126,6 @@ import {
 import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer/submit-interceptors";
 import { useApi as useFilesApi } from "../../providers/api";
 import {
-  useAnalyzeLock,
   useAnalyzeQuestions,
   useComposerTyping,
   useFilesIntegration,
@@ -132,6 +134,8 @@ import {
   type SuggestedQuestion,
 } from "./files";
 import { resolveSuggestions, type SuggestionSet } from "./suggestions";
+import { composeCallbacks } from "./compose-callbacks";
+import { analyzeSentMiddleware } from "./analyze-sent-middleware";
 import { OnFilesAttachedContext } from "./files/attached-report";
 import {
   AttachmentLimitContext,
@@ -500,6 +504,8 @@ const logRescopeFailure = (step: string, reload: Promise<unknown>): void => {
 // (it reads its own string through window.i18n), so one element is created
 // once and reused instead of being rebuilt per render.
 const chatIntro = <ChatIntro />;
+// Static, so it never invalidates the widget config memo.
+const analyzeIntro = <AnalyzeIntro />;
 
 const AiAgentProviders = ({
   locale,
@@ -543,6 +549,20 @@ const AiAgentProviders = ({
     [isStandalone, t],
   );
 
+  // The panel store is created here rather than by `AiChatStoreProvider`
+  // below, because the analyze mode lives on it and everything this body
+  // assembles — the attachment cap, the composer actions, the chips — is
+  // derived from that mode. Only the flat fields are observed, never the mode
+  // object itself, so the phase flip on send re-renders nothing.
+  const aiChatStore = useMemo(() => new AiChatStore(), []);
+  const { analyzeActive, analyzeEntryId, analyzeFileName } = useObserver(
+    () => ({
+      analyzeActive: aiChatStore.isAnalyzeMode,
+      analyzeEntryId: aiChatStore.analyzeEntryId,
+      analyzeFileName: aiChatStore.analyzeFormTitle,
+    }),
+  );
+
   // Ids of attached files the backend flagged as analyzable. The attachments
   // store keeps only `{id, title, kind, path, type}` per ref, so `canAnalyze`
   // exists in the attach response alone and is remembered here. Ids of removed
@@ -559,32 +579,38 @@ const AiAgentProviders = ({
     Record<string, SuggestedQuestion[]>
   >({});
 
-  // The form the current message is about, as the questions endpoint wants it
-  // — by DocSpace entry id, not by attachment id. Kept until another analyze
-  // attach replaces it; whether it is still in force is `analyzeLocked`.
-  const [analyzeEntryId, setAnalyzeEntryId] = useState<string | undefined>();
+  const onFilesAttached = useCallback(
+    (attached: AttachedFileInfo[]) => {
+      // "Analyze responses" enters the mode here — the one point every entry
+      // route passes through (context menu, the results folder's button,
+      // drag-and-drop). A second analyze attach moves the mode to that form.
+      const subject = attached.find((f) => f.analyzeOnly && f.entryId);
+      if (subject) {
+        aiChatStore.startAnalyzeMode({
+          entryId: subject.entryId,
+          title: subject.title,
+        });
+      }
 
-  const onFilesAttached = useCallback((attached: AttachedFileInfo[]) => {
-    const subject = attached.find((f) => f.analyzeOnly && f.entryId);
-    if (subject) setAnalyzeEntryId(subject.entryId);
+      const analyzable = attached.filter((f) => f.canAnalyze);
+      if (analyzable.length === 0) return;
 
-    const analyzable = attached.filter((f) => f.canAnalyze);
-    if (analyzable.length === 0) return;
+      setAnalyzableIds((prev) => [...prev, ...analyzable.map((f) => f.id)]);
 
-    setAnalyzableIds((prev) => [...prev, ...analyzable.map((f) => f.id)]);
+      const withQuestions = analyzable.filter(
+        (f) => f.suggestedQuestions && f.suggestedQuestions.length > 0,
+      );
+      if (withQuestions.length === 0) return;
 
-    const withQuestions = analyzable.filter(
-      (f) => f.suggestedQuestions && f.suggestedQuestions.length > 0,
-    );
-    if (withQuestions.length === 0) return;
-
-    setQuestionsById((prev) => ({
-      ...prev,
-      ...Object.fromEntries(
-        withQuestions.map((f) => [f.id, f.suggestedQuestions ?? []]),
-      ),
-    }));
-  }, []);
+      setQuestionsById((prev) => ({
+        ...prev,
+        ...Object.fromEntries(
+          withQuestions.map((f) => [f.id, f.suggestedQuestions ?? []]),
+        ),
+      }));
+    },
+    [aiChatStore],
+  );
 
   // Context value for the in-chat form-model notice. Memoized on the fields so
   // a host passing a fresh object literal every render does not re-render the
@@ -750,7 +776,9 @@ const AiAgentProviders = ({
   const { stores, ctx, serverApiConfig } = useMemo(() => {
     const eventBus = new ChatEventBus();
     const callbacksManager = new CallbacksManager();
-    const middlewareRunner = new MiddlewareRunner([]);
+    const middlewareRunner = new MiddlewareRunner([
+      analyzeSentMiddleware(aiChatStore),
+    ]);
     const servers = new Servers(platform, eventBus);
 
     const appCtx = {
@@ -795,29 +823,29 @@ const AiAgentProviders = ({
     });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
-  }, [isStandalone, platform]);
+  }, [isStandalone, platform, aiChatStore]);
 
-  // "Analyze responses" attaches the form as the subject of the message, and
-  // while it is on the draft the message is about that form alone: the cap
+  // While "Analyze responses" is on, the chat is about that one form: the cap
   // drops to one and the composer's attach actions go away, so the "+" menu
-  // stops offering something the cap would then refuse. Derived from the
-  // draft, so removing the chip or sending the message lifts it — see
-  // `useAnalyzeLock`.
-  const analyzeLocked = useAnalyzeLock(stores.useAttachmentsStore);
+  // stops offering something the cap would then refuse. The mode is state on
+  // the panel store, not a property of the draft — it outlives the message
+  // that takes the form off the composer (see `AiChatStore.analyzeMode`).
 
   // The cap and what put it there: an analyze subject beats the section,
   // which beats the widget's own limit. The reason travels with the number
   // because it is what the refusal toast explains.
   const attachmentCap = useMemo<AttachmentCap>(() => {
-    if (analyzeLocked) return { limit: 1, reason: "analyze" };
+    if (analyzeActive) {
+      return { limit: 1, reason: "analyze", fileName: analyzeFileName };
+    }
     return sectionAttachmentLimit < CHAT_ATTACHMENT_LIMIT
       ? { limit: sectionAttachmentLimit, reason: "section" }
       : { limit: sectionAttachmentLimit, reason: "widget" };
-  }, [analyzeLocked, sectionAttachmentLimit]);
+  }, [analyzeActive, analyzeFileName, sectionAttachmentLimit]);
 
   const composerActions = useMemo(
-    () => (analyzeLocked ? [] : attachActions),
-    [analyzeLocked, attachActions],
+    () => (analyzeActive ? [] : attachActions),
+    [analyzeActive, attachActions],
   );
 
   // The starter questions of the form being analyzed. The endpoint long-polls
@@ -831,12 +859,12 @@ const AiAgentProviders = ({
 
   const { questions: analyzeQuestions, onTyping } = useAnalyzeQuestions(
     pollSuggestedQuestions,
-    analyzeLocked ? analyzeEntryId : undefined,
+    analyzeEntryId,
   );
 
   // Writing your own question makes the suggestions moot — stop waiting for
   // them (and let the wait end for good, the chips are not coming back).
-  useComposerTyping(analyzeLocked, onTyping);
+  useComposerTyping(analyzeActive, onTyping);
 
   // Whether the PREVIOUS scope was an agent room — needed to tell a real
   // thread-scope change from plain folder navigation (see the effect below).
@@ -966,16 +994,33 @@ const AiAgentProviders = ({
         attachedFileIds === "" ? [] : attachedFileIds.split(","),
         analyzableIds,
         questionsById,
-        { active: analyzeLocked, questions: analyzeQuestions },
+        { active: analyzeActive, questions: analyzeQuestions },
       ),
     [
       suggestions,
       attachedFileIds,
       analyzableIds,
       questionsById,
-      analyzeLocked,
+      analyzeActive,
       analyzeQuestions,
     ],
+  );
+
+  // A thread the user switched to is a different conversation, so the analyze
+  // mode does not follow it. The thread our own first message creates is not:
+  // that arrives as "created", which is exactly what tells the two apart.
+  const ownCallbacks = useMemo<ChatCallbacks>(
+    () => ({
+      onThreadsUpdated: ({ kind }) => {
+        if (kind === "switched") aiChatStore.endAnalyzeMode();
+      },
+    }),
+    [aiChatStore],
+  );
+
+  const chatCallbacks = useMemo(
+    () => composeCallbacks(callbacks, ownCallbacks),
+    [callbacks, ownCallbacks],
   );
 
   const widgetConfig = useMemo<WidgetConfig>(
@@ -1007,7 +1052,7 @@ const AiAgentProviders = ({
       suggestions: resolvedSuggestions,
       // Rendered by the library above the chips, under the same "empty chat"
       // gate — no chips, no intro.
-      suggestionsHeader: chatIntro,
+      suggestionsHeader: analyzeActive ? analyzeIntro : chatIntro,
 
       // Route drag-and-drop through the portal-upload + attach flow (same as
       // the "Upload from device" button) instead of the library's in-memory
@@ -1020,6 +1065,7 @@ const AiAgentProviders = ({
       composerDisabled,
       entityId,
       contextEntityId,
+      analyzeActive,
       hideProfilePicker,
       profilePickerReadOnly,
       profilePickerActions,
@@ -1053,7 +1099,7 @@ const AiAgentProviders = ({
       <FormsRecommendationContext.Provider value={formsRecommendationValue}>
         <EventsProvider
           callbacksManager={ctx.callbacksManager}
-          callbacks={callbacks}
+          callbacks={chatCallbacks}
         >
           <PlatformProvider platform={platform}>
             <AiChatI18nIsolator
@@ -1079,7 +1125,7 @@ const AiAgentProviders = ({
                               onThreadContextChange={onThreadContextChange}
                             />
                             <GenerateToolApprovalBridge />
-                            <AiChatStoreProvider>
+                            <AiChatStoreProvider store={aiChatStore}>
                               <AiChatStoresBridge />
                               {getAgentRoomId ? null : <AgentRoomIdSync />}
                               {/* The per-section attachment cap covers the

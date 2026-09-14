@@ -49,6 +49,12 @@ import { CHAT_ATTACHMENT_LIMIT } from "./limits";
  */
 export type AttachmentCap = {
   limit: number;
+  /**
+   * The form the chat is analyzing, when that is what narrowed the cap. The
+   * refusal names it, because "one file only" without the name reads as an
+   * arbitrary rule.
+   */
+  fileName?: string;
   reason:
     | /** The widget's own cap — nothing narrower applies. */ "widget"
     | /** The section the chat is rendered in takes fewer. */ "section"
