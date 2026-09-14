@@ -129,7 +129,7 @@ type Story = StoryObj<ComponentProps<typeof DropDown>>;
 
 export default meta;
 
-const BasicTemplate = () => {
+const BasicTemplate = (args: ComponentProps<typeof DropDown>) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const parentRef = React.useRef<HTMLButtonElement>(null);
 
@@ -141,7 +141,8 @@ const BasicTemplate = () => {
         onClick={() => setIsOpen(true)}
       />
       <DropDown
-        open={isOpen}
+        {...args}
+        open={args.open ?? isOpen}
         forwardedRef={parentRef}
         clickOutsideAction={() => setIsOpen(false)}
       >
@@ -154,7 +155,7 @@ const BasicTemplate = () => {
 };
 
 export const Default: Story = {
-  render: () => <BasicTemplate />,
+  render: (args) => <BasicTemplate {...args} />,
   args: {
     directionX: "right",
     directionY: "bottom",
