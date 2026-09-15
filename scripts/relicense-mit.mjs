@@ -1,39 +1,3 @@
-/*
- * Copyright (C) Ascensio System SIA, 2009-2026
- *
- * This program is a free software product. You can redistribute it and/or
- * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation, together with the
- * additional terms provided in the LICENSE file.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. For
- * details, see the GNU AGPL at: https://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA by email at info@onlyoffice.com
- * or by postal mail at 20A-6 Ernesta Birznieka-Upisha Street, Riga,
- * LV-1050, Latvia, European Union.
- *
- * The interactive user interfaces in modified versions of the Program
- * are required to display Appropriate Legal Notices in accordance with
- * Section 5 of the GNU AGPL version 3.
- *
- * No trademark rights are granted under this License.
- *
- * All non-code elements of the Product, including illustrations,
- * icon sets, and technical writing content, are licensed under the
- * Creative Commons Attribution-ShareAlike 4.0 International License:
- * https://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
- * This license applies only to such non-code elements and does not
- * modify or replace the licensing terms applicable to the Program's
- * source code, which remains licensed under the GNU Affero General
- * Public License v3.
- *
- * SPDX-License-Identifier: AGPL-3.0-only
- */
-
-
 // Removes the per-file AGPL headers, so this package declares its licence the
 // way @onlyoffice/ai-chat does: once in package.json, once in LICENSE, once in
 // the README, and not in 1285 source files.
@@ -47,8 +11,18 @@
 // client-side bulk tool (common/scripts/update-license-headers.py) must not be
 // pointed at this directory.
 //
-// Every header here is the same block form -- `/* ... */`, occasionally
-// preceded by a "use client" directive -- so one pattern covers all of them.
+// Two header forms exist, and both have to go:
+//
+//   1. The current block form, `/* ... */` carrying an SPDX marker,
+//      occasionally preceded by a "use client" directive. It can appear twice
+//      in one file (image-editor/ButtonDelete did).
+//   2. An older run of `//` lines with no SPDX marker, opening either with
+//      "(c) Copyright Ascensio System SIA" or straight into "This program is
+//      a free software product." 78 files still carried this one after the
+//      first sweep, because the sweep only knew about form 1.
+//
+// Both are recognised by the licence grant itself rather than by their
+// opening line, so a third punctuation variant would still be caught.
 // CRLF is preserved, since biome.json specifies it.
 //
 //   node scripts/relicense-mit.mjs --dry-run
@@ -73,14 +47,24 @@ const SKIP_DIRS = new Set([
   "coverage",
 ]);
 
-const EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".scss"];
+const EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".scss"];
 
-const OLD_MARKER = "SPDX-License-Identifier: AGPL-3.0-only";
+// This file spells the grant out in GRANT and in AGPL_BLOCK, so the "still
+// carries the grant after replacement" guard below would always fire on it.
+// Its own header was removed by hand.
+const SKIP_FILES = new Set([path.resolve(ROOT, "scripts", "relicense-mit.mjs")]);
 
-// Any block comment carrying the AGPL marker, plus the blank line that
+const GRANT = "GNU Affero General Public License";
+
+// Any block comment carrying the licence grant, plus the blank line that
 // follows it. Non-greedy on both sides so a file with the header duplicated
 // (image-editor/ButtonDelete has it twice) loses both, not one giant span.
-const AGPL_BLOCK = /\/\*(?:(?!\*\/)[\s\S])*?SPDX-License-Identifier: AGPL-3\.0-only(?:(?!\*\/)[\s\S])*?\*\/\n?\n?/g;
+const AGPL_BLOCK =
+  /\/\*(?:(?!\*\/)[\s\S])*?GNU Affero General Public License(?:(?!\*\/)[\s\S])*?\*\/\n?\n?/g;
+
+// A leading run of `//` lines. Only removed when the run carries the grant,
+// so an ordinary explanatory comment at the top of a file is left alone.
+const LEADING_LINE_COMMENTS = /^(?:[ \t]*\/\/[^\n]*\n)+/;
 
 
 const walk = (dir, found = []) => {
@@ -91,8 +75,10 @@ const walk = (dir, found = []) => {
       continue;
     }
 
-    if (EXTENSIONS.some((ext) => entry.name.endsWith(ext))) {
-      found.push(path.join(dir, entry.name));
+    const full = path.join(dir, entry.name);
+
+    if (EXTENSIONS.some((ext) => entry.name.endsWith(ext)) && !SKIP_FILES.has(full)) {
+      found.push(full);
     }
   }
 
@@ -110,16 +96,23 @@ for (const file of walk(ROOT)) {
   const crlf = raw.includes("\r\n");
   const text = raw.toString("utf8").split("\r\n").join("\n");
 
-  if (!text.includes(OLD_MARKER)) {
+  if (!text.includes(GRANT)) {
     skipped += 1;
     continue;
   }
 
-  const next = text.replace(AGPL_BLOCK, "").replace(/^\n+/, "");
+  let next = text.replace(AGPL_BLOCK, "");
 
-  // A file that still carries the old marker means the block pattern missed
-  // it -- report rather than leave it half-converted.
-  if (next.includes(OLD_MARKER)) {
+  const leading = next.match(LEADING_LINE_COMMENTS);
+  if (leading && leading[0].includes(GRANT)) {
+    next = next.slice(leading[0].length);
+  }
+
+  next = next.replace(/^\n+/, "");
+
+  // A file that still carries the grant means neither pattern matched it --
+  // report rather than leave it half-converted.
+  if (next.includes(GRANT)) {
     unexpected.push(path.relative(ROOT, file));
     continue;
   }
