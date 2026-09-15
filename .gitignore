@@ -14,3 +14,6 @@ fonts
 debug-storybook.log
 .env
 .env.local
+# Pack output. The tarball is a build artifact; it is copied into the
+# DocSpace client repository and committed there, never here.
+onlyoffice-apps-ui-kit-*.tgz

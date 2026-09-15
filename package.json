@@ -1,6 +1,6 @@
 {
   "name": "@onlyoffice/apps-ui-kit",
-  "version": "0.0.1",
+  "version": "4.0.0",
   "type": "commonjs",
   "description": "DocSpace UI Component Library",
   "license": "MIT",
@@ -64,21 +64,51 @@
   },
   "//peerDependenciesMeta": "react, react-dom, i18next and react-i18next are required -- the core components do not work without them. The rest are optional because they back a portal-internal module a consumer may never import: ai-agent (ai-chat, markdown/katex stack), billing and selectors (mobx, react-router), providers/api (axios), utils/socket (socket.io), document-editor.",
   "peerDependenciesMeta": {
-    "@onlyoffice/ai-chat": { "optional": true },
-    "@onlyoffice/document-editor-react": { "optional": true },
-    "axios": { "optional": true },
-    "katex": { "optional": true },
-    "mobx": { "optional": true },
-    "mobx-react": { "optional": true },
-    "react-markdown": { "optional": true },
-    "react-router": { "optional": true },
-    "react-syntax-highlighter": { "optional": true },
-    "rehype-katex": { "optional": true },
-    "rehype-raw": { "optional": true },
-    "remark-gfm": { "optional": true },
-    "remark-math": { "optional": true },
-    "socket.io-client": { "optional": true },
-    "@socket.io/component-emitter": { "optional": true }
+    "@onlyoffice/ai-chat": {
+      "optional": true
+    },
+    "@onlyoffice/document-editor-react": {
+      "optional": true
+    },
+    "axios": {
+      "optional": true
+    },
+    "katex": {
+      "optional": true
+    },
+    "mobx": {
+      "optional": true
+    },
+    "mobx-react": {
+      "optional": true
+    },
+    "react-markdown": {
+      "optional": true
+    },
+    "react-router": {
+      "optional": true
+    },
+    "react-syntax-highlighter": {
+      "optional": true
+    },
+    "rehype-katex": {
+      "optional": true
+    },
+    "rehype-raw": {
+      "optional": true
+    },
+    "remark-gfm": {
+      "optional": true
+    },
+    "remark-math": {
+      "optional": true
+    },
+    "socket.io-client": {
+      "optional": true
+    },
+    "@socket.io/component-emitter": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@floating-ui/dom": "1.6.13",
