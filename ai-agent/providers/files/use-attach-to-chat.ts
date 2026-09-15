@@ -115,7 +115,7 @@ export type AttachToChatResult = {
  * (`canAnalyze`) are kept no matter which entry point attached the file.
  */
 export const useAttachHostFilesToChat = () => {
-  const { useAttachmentsStore } = useStores();
+  const { useAttachmentsStore, useMessageStore } = useStores();
   // Reported to the provider, not to the caller: `canAnalyze` is a chat-side
   // flag, and a host triggering this from a row action has no use for it.
   const onFilesAttached = useOnFilesAttached();
@@ -142,6 +142,56 @@ export const useAttachHostFilesToChat = () => {
       const skippedBesideSubject = notFolders.length - candidates.length;
 
       if (subject) {
+        // Not while the analyzing chat is waiting on its answer. Starting a
+        // subject empties the draft and re-points the whole chat — panel
+        // title, chips, the poll for the new form's questions — at a moment
+        // when a reply about the previous form is still arriving, and that
+        // reply would land in a chat that no longer says what it is about.
+        // Read at click time rather than subscribed to: this hook would
+        // otherwise re-render on every token of every stream.
+        if (
+          aiChatStore?.isAnalyzeMode &&
+          useMessageStore.getState().isRequestRunning
+        ) {
+          return {
+            attached: 0,
+            skippedFolders,
+            skippedOverLimit: notFolders.length,
+            duplicates: 0,
+            cap: { ...cap, limit: 0, reason: "busy" },
+          };
+        }
+
+        // An analyzing chat keeps the form it was opened on. Another form is
+        // another subject, and this chat only has one — so the request is
+        // refused outright: nothing is attached, the form on the draft stays
+        // where it is, and the mode keeps pointing at it. The toast names
+        // that form and offers the way out (a new chat), exactly as the cap
+        // refusal does for an ordinary file.
+        //
+        // The same holds once the message is sent: the mode outlives the
+        // chip, so a second "Analyze responses" then has the same answer.
+        // Clicking it on the form the chat is already analyzing is refused
+        // through the same door — there is nothing to change either way.
+        if (aiChatStore?.isAnalyzeMode) {
+          return {
+            attached: 0,
+            skippedFolders,
+            skippedOverLimit: notFolders.length,
+            duplicates: 0,
+            // Described from the store, not from the cap in context: the mode
+            // is what refuses this, and it is the mode that knows which form
+            // the toast has to name. The context cap says the same thing
+            // while the providers are wired, but that is a second source of
+            // truth for one fact — and the wrong one to trust here.
+            cap: {
+              limit: 0,
+              reason: "analyze",
+              fileName: aiChatStore.analyzeFormTitle,
+            },
+          };
+        }
+
         // Enter the mode now, not when the round trip below comes back with
         // the records: the cap and the composer's attach actions are derived
         // from it, and until it is set they still advertise the ordinary
@@ -214,12 +264,12 @@ export const useAttachHostFilesToChat = () => {
       const files = keep.map((index) => candidates[index]);
       const duplicates = candidates.length - files.length;
 
-      // A new subject replaces the mode rather than joining it, so it is not
-      // what the analyze cap is there to refuse: that cap drops to zero once
-      // the first message is sent, which would otherwise make "Analyze
-      // responses" on a second form do nothing at all. Exactly one slot, never
-      // the cap's own number — the draft was just emptied above, so that slot
-      // is genuinely free, and the batch is the subject alone.
+      // A subject that got this far is entering a chat with no mode on, so
+      // the analyze cap left over from a previous one is not what should
+      // judge it — that cap is zero once a message has been sent, and would
+      // refuse the very first form of the next mode. Exactly one slot: the
+      // draft was just emptied above, so it is genuinely free, and the batch
+      // is the subject alone.
       const effectiveLimit = subject ? 1 : cap.limit;
 
       const inputsAll = files.map((file) => ({
@@ -287,6 +337,6 @@ export const useAttachHostFilesToChat = () => {
 
       return { attached: inputs.length, ...counts };
     },
-    [useAttachmentsStore, onFilesAttached, cap, aiChatStore],
+    [useAttachmentsStore, useMessageStore, onFilesAttached, cap, aiChatStore],
   );
 };

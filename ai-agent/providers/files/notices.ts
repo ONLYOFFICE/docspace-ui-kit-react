@@ -86,6 +86,19 @@ export const notifyAttachmentLimit = (
 ) => {
   if (count <= 0) return;
 
+  // Not a cap at all, but the same refusal from the user's side: the chat is
+  // mid-answer about the form it is analyzing, and picking a new subject now
+  // would re-point it under the reply still arriving.
+  if (cap.reason === "busy") {
+    toastr.info(
+      t("Common:AttachFilesAnalyzingBusy", {
+        defaultValue:
+          "Wait for the current answer to finish before analyzing another form.",
+      }),
+    );
+    return;
+  }
+
   if (cap.reason === "analyze") {
     // The name is what makes this explainable, so when the host sent none
     // (an attach that reported no title) the sentence drops the slot rather

@@ -249,8 +249,15 @@ class AiChatStore {
   };
 
   /**
-   * Enter the mode for `form`, or move it to another form — a second
-   * "Analyze responses" is a new subject, not a second mode.
+   * Enter the mode for `form`.
+   *
+   * Replacing the subject of a mode that is already on is refused before it
+   * reaches this store (`useAttachHostFilesToChat`): an analyzing chat keeps
+   * the form it was opened on for its whole life, and a second "Analyze
+   * responses" is answered with a toast instead. Handing a different form to
+   * a live mode is therefore not something any caller does today — it still
+   * replaces the subject rather than stacking a second mode, because half a
+   * mode is worse than a wrong one.
    *
    * Called when the attach starts, so the mode begins in `attaching`: the
    * draft is emptied for the form before its record comes back, and that gap

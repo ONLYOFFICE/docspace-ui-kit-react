@@ -58,7 +58,8 @@ export type AttachmentCap = {
   reason:
     | /** The widget's own cap — nothing narrower applies. */ "widget"
     | /** The section the chat is rendered in takes fewer. */ "section"
-    | /** The draft carries the form a message is about. */ "analyze";
+    | /** The draft carries the form a message is about. */ "analyze"
+    | /** The analyzing chat is waiting on an answer. */ "busy";
 };
 
 export const DEFAULT_ATTACHMENT_CAP: AttachmentCap = {
@@ -106,8 +107,9 @@ export type AttachmentCapInput = {
  * else fits anyway — and the send empties the draft without ending the mode,
  * which would hand that slot to the next file dropped on the panel. Hiding the
  * "+" menu does not cover it: drag-and-drop and the host's "Ask AI" row action
- * attach through this cap, so this is what has to say no. Attaching another
- * form as the new subject goes around it — see `useAttachHostFilesToChat`.
+ * attach through this cap, so this is what has to say no. A second "Analyze
+ * responses" never gets this far — the mode itself refuses another subject
+ * (see `useAttachHostFilesToChat`).
  */
 export const resolveAttachmentCap = ({
   analyzeActive,

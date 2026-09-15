@@ -51,8 +51,14 @@ const storeState = {
   clearAttachmentImages,
 };
 const useAttachmentsStore = { getState: () => storeState };
+
+// Only the flag the hook reads at click time: whether the chat is waiting on
+// an answer.
+const messageState = { isRequestRunning: false };
+const useMessageStore = { getState: () => messageState };
+
 vi.mock("@onlyoffice/ai-chat", () => ({
-  useStores: () => ({ useAttachmentsStore }),
+  useStores: () => ({ useAttachmentsStore, useMessageStore }),
 }));
 
 const attachFilesToChat = vi.fn(
@@ -166,6 +172,7 @@ describe("useAttachHostFilesToChat accounting", () => {
     attachFilesToChat.mockClear();
     clearAttachmentFiles.mockClear();
     clearAttachmentImages.mockClear();
+    messageState.isRequestRunning = false;
   });
 
   it("counts nothing when every file is new", async () => {
@@ -370,6 +377,70 @@ describe("useAttachHostFilesToChat accounting", () => {
   // first, and raising it ends the mode — so if this call returns early as a
   // duplicate without re-entering, the click the user meant as "yes, this
   // form" is what takes the mode, the panel title and the chips away.
+  // A sent analyze chat is still about its form while the answer streams in.
+  // Pointing it at another one now would swap the panel title, the chips and
+  // the question poll out from under a reply that is still arriving.
+  it("refuses a new subject while the answer is still coming", async () => {
+    const store = new AiChatStore();
+    store.startAnalyzeMode({ entryId: "7", title: "file-7.docx" });
+    store.markAnalyzeAttached("7");
+    store.markAnalyzeSent();
+    messageState.isRequestRunning = true;
+
+    const result = await attachUnderStore(
+      [{ ...file(8), analyzeOnly: true }],
+      store,
+    );
+
+    expect(result.attached).toBe(0);
+    expect(result.skippedOverLimit).toBe(1);
+    expect(result.cap.reason).toBe("busy");
+    // The chat is left exactly as it was — still analyzing the first form.
+    expect(store.analyzeEntryId).toBe("7");
+    expect(clearAttachmentFiles).not.toHaveBeenCalled();
+    expect(attachFilesToChat).not.toHaveBeenCalled();
+  });
+
+  // An analyzing chat is about one form for its whole life: another form is
+  // another subject, and this chat has room for neither a second one nor a
+  // swap. Before the send the form is on the draft, after it the mode holds
+  // on alone — the answer is the same refusal either way.
+  it.each([
+    ["before the first message", false],
+    ["after the message is sent", true],
+  ])("refuses another form %s", async (_case, sent) => {
+    const store = new AiChatStore();
+    storeState.attachmentFiles = [attachedRef("7")];
+    rememberFormAttachments(useAttachmentsStore as never, {
+      withResults: [],
+      analyzeOnly: ["att-7"],
+    });
+    store.startAnalyzeMode({ entryId: "7", title: "file-7.docx" });
+    store.markAnalyzeAttached("7");
+    if (sent) {
+      store.markAnalyzeSent();
+      storeState.attachmentFiles = [];
+    }
+
+    const result = await attachUnderStore(
+      [{ ...file(8), analyzeOnly: true }],
+      store,
+    );
+
+    expect(result.attached).toBe(0);
+    expect(result.skippedOverLimit).toBe(1);
+    // The toast names the form the chat is analyzing, not the one refused.
+    expect(result.cap).toEqual(
+      expect.objectContaining({ reason: "analyze", fileName: "file-7.docx" }),
+    );
+    // Nothing about the chat moved: same subject, same draft, no round trip.
+    expect(store.analyzeEntryId).toBe("7");
+    expect(store.analyzeFormTitle).toBe("file-7.docx");
+    expect(storeState.attachmentFiles).toEqual(sent ? [] : [attachedRef("7")]);
+    expect(clearAttachmentFiles).not.toHaveBeenCalled();
+    expect(attachFilesToChat).not.toHaveBeenCalled();
+  });
+
   it("re-enters the mode when the same form is asked for again", async () => {
     const store = new AiChatStore();
     storeState.attachmentFiles = [attachedRef("7")];
@@ -441,9 +512,11 @@ describe("useAttachHostFilesToChat accounting", () => {
     expect(attachFilesToChat).not.toHaveBeenCalled();
   });
 
-  // ...but the mode moving to another form is not something that cap is
-  // there to refuse, or "Analyze responses" on a second form would do nothing.
-  it("lets a new analyze subject through the same cap", async () => {
+  // The cap is not what decides an analyze attach — the mode is (see the
+  // "refuses another form" cases). With no mode on the store, the subject
+  // takes the single slot it is entitled to even under the zero cap that a
+  // sent mode leaves behind.
+  it("lets a subject through the cap when no mode is on", async () => {
     const result = await attachUnderAnalyzeCap([
       { ...file(2), analyzeOnly: true },
     ]);
