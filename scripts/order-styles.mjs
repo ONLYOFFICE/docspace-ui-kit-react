@@ -40,8 +40,9 @@
 //     build's own and needs no guessing from file names -- three basenames
 //     (Tabs, Amount, PaymentMethod) exist twice in this repo and only the hash
 //     suffix tells their classes apart;
-//   - modules are ranked by a deterministic post-order walk over every entry,
-//     and the rules are stable-sorted by that rank.
+//   - the stylesheets are then topologically sorted against each other -- a
+//     stylesheet follows every stylesheet its importers build on -- and the
+//     rules are stable-sorted by that rank.
 //
 // `check-dist.mjs` asserts the result, so a regression fails the build rather
 // than showing up as a screenshot diff.
@@ -86,26 +87,85 @@ const importsOf = (id) => {
   return out;
 };
 
+const isStylesheet = (id) => id.includes(".module.scss");
+
 /**
- * Deterministic post-order walk: a module is ranked after everything it
- * imports. Entry order is the sorted module list, so the result does not depend
- * on how rollup happened to traverse the graph.
+ * Ranks the stylesheets, which is all the sort needs -- every rule is
+ * attributed to a `.module.scss`, never to a `.tsx`.
+ *
+ * A post-order walk over the module graph does not answer this on its own. A
+ * stylesheet is a leaf: it imports nothing, so a plain walk ranks it the moment
+ * the first importer reaches it, and which importer that is depends on
+ * alphabetical order. `TransactionHistory.module.scss` has seven importers;
+ * the first one visited is `TableLoader.tsx`, which pulls in only the skeleton
+ * component -- so the stylesheet landed 13 KB ahead of `SelectedItem`, and its
+ * `.selectedContactItem { margin-bottom: 0 }` lost to `.selectedItem`'s 4px at
+ * equal specificity. The contact chip then made the filter row 4px taller and
+ * pushed the whole transaction table down.
+ *
+ * A stylesheet has to sit after every stylesheet belonging to a component that
+ * *any* of its importers builds on, because those are exactly the components
+ * its rules may override. So the order is a topological sort over the
+ * stylesheets themselves: S depends on T when some importer of S reaches T.
+ * Ties and cycles resolve by path, so the result is the same on every machine.
  */
 const rankModules = (ids) => {
   const graph = new Map(ids.map((id) => [id, importsOf(id)]));
+
+  const importers = new Map();
+  for (const id of ids) {
+    if (isStylesheet(id)) continue;
+    for (const dep of graph.get(id)) {
+      if (!isStylesheet(dep) || !graph.has(dep)) continue;
+      if (!importers.has(dep)) importers.set(dep, []);
+      importers.get(dep).push(id);
+    }
+  }
+
+  // Stylesheets reachable from a set of modules. One breadth-first sweep per
+  // stylesheet, sharing a visited set across its importers -- the graph is
+  // small enough that this is cheaper than getting memoisation right across
+  // the cycles the import graph does contain.
+  const stylesFrom = (roots) => {
+    const seen = new Set(roots);
+    const queue = [...roots];
+    const found = new Set();
+
+    while (queue.length > 0) {
+      const id = queue.pop();
+      if (!graph.has(id)) continue;
+      if (isStylesheet(id)) found.add(id);
+      for (const dep of graph.get(id)) {
+        if (seen.has(dep)) continue;
+        seen.add(dep);
+        queue.push(dep);
+      }
+    }
+
+    return found;
+  };
+
+  const stylesheets = ids.filter(isStylesheet).sort();
+  const deps = new Map(
+    stylesheets.map((id) => {
+      const found = stylesFrom(importers.get(id) ?? []);
+      found.delete(id);
+      return [id, [...found].sort()];
+    }),
+  );
+
   const rank = new Map();
   const onStack = new Set();
 
   const visit = (id) => {
     if (rank.has(id) || onStack.has(id)) return; // second term breaks cycles
-    if (!graph.has(id)) return; // an id that resolved outside the tree
     onStack.add(id);
-    for (const dep of graph.get(id)) visit(dep);
+    for (const dep of deps.get(id) ?? []) visit(dep);
     onStack.delete(id);
     rank.set(id, rank.size);
   };
 
-  for (const id of ids) visit(id);
+  for (const id of stylesheets) visit(id);
 
   return rank;
 };
