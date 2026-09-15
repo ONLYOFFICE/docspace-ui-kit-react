@@ -46,7 +46,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-i18next": "^14.0.1",
-    "@onlyoffice/ai-chat": "0.5.108",
+    "@onlyoffice/ai-chat": "0.5.110",
     "@onlyoffice/document-editor-react": "2.1.1",
     "axios": "^1.19.0",
     "katex": "^0.16.47",
@@ -147,7 +147,7 @@
   "//devDependencies": "Mirrors every non-required peerDependency: pnpm does not install peers, so the build, tests and Storybook need a concrete copy here. Transitive peers of @onlyoffice/ai-chat are deliberately absent -- pnpm resolves those into ai-chat's own node_modules from the declarations in its package.json.",
   "devDependencies": {
     "@biomejs/biome": "2.4.16",
-    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.108.tgz",
+    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.110.tgz",
     "@onlyoffice/document-editor-react": "2.1.1",
     "axios": "^1.19.0",
     "katex": "^0.16.47",
@@ -233,7 +233,7 @@
     "**/*.scss",
     "**/*.css"
   ],
-  "packageManager": "pnpm@11.19.0",
+  "packageManager": "pnpm@12.4.1",
   "//publishConfig.exports": "One wildcard serves every module subpath, including the *.types and *.svg ones that used to need patterns of their own. The build emits a single shape -- rollup via `entryFileNames`, tsc declarations via scripts/normalize-types.mjs -- so `<subpath>/index.*` is the only layout there is. This replaced 916 generated entries and the script that wrote them; see the comment in rollup.config.mjs for why a mixed-shape tree cannot be served by a wildcard at all. Note: this note cannot live inside `exports` itself -- Node rejects an exports object that mixes subpath keys with non-'.' keys (ERR_INVALID_PACKAGE_CONFIG), since a key not starting with '.' marks the whole object as a conditions-only main entry. There is deliberately no `./*.scss` pattern: rollup compiles every component-local CSS module into a class-name map, so `components/article/Article.module.scss` is a *directory* holding an index.js in dist and the plain `./*` wildcard serves it -- dist ships no .scss file at all. Raw Sass sources stay reachable through `./styles/*`, which is the form every `@use` in the portal writes.",
   "publishConfig": {
     "main": "./dist/cjs/index.js",
