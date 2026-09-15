@@ -390,6 +390,10 @@ describe("useAttachHostFilesToChat accounting", () => {
 
     expect(store.isAnalyzeMode).toBe(true);
     expect(store.analyzeEntryId).toBe("7");
+    // And in the phase the draft actually is in: the chip is on it, which is
+    // what the duplicate check proved. Left in `attaching`, the mode would
+    // never accept the chip's removal as a way out of it.
+    expect(store.isAnalyzeOnDraft).toBe(true);
     // Still a duplicate: the chip is not minted twice.
     expect(result.duplicates).toBe(1);
     expect(attachFilesToChat).not.toHaveBeenCalled();

@@ -174,6 +174,13 @@ export const useAttachHostFilesToChat = () => {
           subjectDuplicate.length > 0 &&
           hasAnalyzeAttachment(useAttachmentsStore)
         ) {
+          // Nothing is attached here, but the check above just proved the
+          // chip is on the draft — so the mode entered a moment ago is past
+          // its attaching phase already. Without this it would stay there for
+          // good (only an attach report promotes it), and a mode that never
+          // reaches `pending` cannot be left by taking the chip off.
+          aiChatStore?.markAnalyzeAttached(String(subject.id));
+
           return {
             attached: 0,
             skippedFolders,
