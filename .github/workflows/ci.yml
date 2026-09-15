@@ -78,8 +78,9 @@ jobs:
         run: pnpm verify:package
         continue-on-error: true
 
-      # Under CI the locale copy step short-circuits and writes empty stubs,
-      # so this job validates the *shape* of the package, not that it carries
-      # real translations. Vendoring the locales is tracked separately.
+      # locales/ is vendored and committed, and `pnpm build` no longer runs
+      # the copy scripts, so what this prints is what a publish would ship --
+      # translations included. `pnpm sync-locales` is a manual refresh from a
+      # DocSpace checkout and never runs here.
       - name: Show what would be published
         run: pnpm pack --dry-run
