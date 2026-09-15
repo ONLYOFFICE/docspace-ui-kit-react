@@ -100,15 +100,15 @@ const inSource = fs
     (sum, e) => sum + countDirective(path.join(SOURCE_ROOT, e.name), [".ts", ".tsx"]),
     0,
   );
-// Each source file compiles to both dist/esm and dist/cjs, so the built count
-// must be exactly double the source count -- not just "at least as many".
+// The package ships one output tree, so the built count must equal the source
+// count exactly -- not just "at least as many".
 const inDist = countDirective(DIST, [".js"]);
-const expectedInDist = inSource * 2;
+const expectedInDist = inSource;
 
 if (inDist !== expectedInDist) {
   console.error(
     `\n  "use client" is in ${inSource} source files but ${inDist} built files ` +
-      `(expected ${expectedInDist} -- one per module per output format).\n  ` +
+      `(expected ${expectedInDist} -- one per module).\n  ` +
       "Rollup strips module-level directives, so Next.js App Router consumers " +
       "will\n  break on the first interactive component. Check preserveUseClient " +
       "in rollup.config.mjs.\n",
@@ -166,7 +166,6 @@ const collectShapeOffenders = (root, ext) => {
 
 const SHAPE_TREES = [
   ["esm", ".js"],
-  ["cjs", ".js"],
   // .d.mts copies live beside each .d.ts; checking .d.ts covers both.
   ["types", ".d.ts"],
 ];

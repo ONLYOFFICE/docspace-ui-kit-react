@@ -1,7 +1,6 @@
-// The postcss plugin emits one stylesheet per output format, because rollup
-// rejects an asset name that is an absolute or relative path. Both copies are
-// byte-identical, so this promotes one to dist/styles.css -- the single path
-// the package exports -- and drops the duplicates.
+// The postcss plugin emits the stylesheet next to the bundle, because rollup
+// rejects an asset name that is an absolute or relative path. This promotes it
+// to dist/styles.css -- the single path the package exports.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -12,9 +11,7 @@ const DIST = path.resolve(
   "../dist",
 );
 
-const FORMAT_COPIES = ["esm/styles.css", "cjs/styles.css"].map((rel) =>
-  path.join(DIST, rel),
-);
+const FORMAT_COPIES = ["esm/styles.css"].map((rel) => path.join(DIST, rel));
 const TARGET = path.join(DIST, "styles.css");
 
 const present = FORMAT_COPIES.filter((p) => fs.existsSync(p));
@@ -24,8 +21,7 @@ const present = FORMAT_COPIES.filter((p) => fs.existsSync(p));
 if (present.length === 0 && !fs.existsSync(TARGET)) {
   console.error(
     "No stylesheet found. Expected the postcss plugin to emit " +
-      "dist/{esm,cjs}/styles.css -- check the `extract` option in " +
-      "rollup.config.mjs.",
+      "dist/esm/styles.css -- check the `extract` option in rollup.config.mjs.",
   );
   process.exit(1);
 }
@@ -49,14 +45,11 @@ if (present.length > 0) {
   for (const copy of present.slice(1)) fs.rmSync(copy);
 }
 
-// Node decides a .js file's format from the nearest package.json "type". Both
-// output trees use the .js extension, so without these markers every ESM file
-// under dist/esm is parsed as CommonJS -- publint flagged all 849 of them.
-// A per-directory marker is the standard fix and needs no renaming.
-const FORMAT_MARKERS = [
-  ["esm", "module"],
-  ["cjs", "commonjs"],
-];
+// Node decides a .js file's format from the nearest package.json "type". The
+// output tree uses the .js extension, so without this marker every file under
+// dist/esm is parsed as CommonJS -- publint flagged all 849 of them. A
+// per-directory marker is the standard fix and needs no renaming.
+const FORMAT_MARKERS = [["esm", "module"]];
 
 for (const [dir, type] of FORMAT_MARKERS) {
   const target = path.join(DIST, dir, "package.json");
@@ -76,5 +69,5 @@ const dropped = Math.max(present.length - 1, 0);
 console.log(
   `dist/styles.css ready (${kb} KB)` +
     (dropped > 0 ? `, ${dropped} duplicate dropped` : "") +
-    "; esm/cjs format markers written.",
+    "; esm format marker written.",
 );

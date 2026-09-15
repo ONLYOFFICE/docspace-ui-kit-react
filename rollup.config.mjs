@@ -347,18 +347,18 @@ export default [
 	{
 		input: entryPoints,
 		onwarn,
+		// ESM only, on purpose. `@onlyoffice/ai-chat` -- the optional peer that
+		// the `ai-agent/*` and `api/ai` subpaths import -- ships no CommonJS and
+		// declares only an `import` condition, so a CJS build of those subpaths
+		// emits `require("@onlyoffice/ai-chat")` against a package that cannot
+		// answer it. Next.js resolves the `require` condition and the consumer
+		// fails to compile; the sdk app did. Nothing consumed the CJS output
+		// before this package was split out of the client either: as a workspace
+		// member it declared no entry points at all and apps built it from source.
 		output: [
 			{
 				dir: "dist/esm",
 				format: "esm",
-				sourcemap: false,
-				preserveModules: true,
-				preserveModulesRoot: ".",
-				entryFileNames: normaliseToIndex,
-			},
-			{
-				dir: "dist/cjs",
-				format: "cjs",
 				sourcemap: false,
 				preserveModules: true,
 				preserveModulesRoot: ".",

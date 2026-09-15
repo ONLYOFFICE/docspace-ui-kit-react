@@ -83,7 +83,7 @@ if (!fs.existsSync(TYPES)) {
 // rollup normalises its own two output trees via `entryFileNames` (see
 // rollup.config.mjs), but declarations come from `tsc -p tsconfig.build.json`,
 // which mirrors the source tree and therefore still emits the flat shape. Left
-// alone, `dist/types` would disagree with `dist/esm` and `dist/cjs` about where
+// alone, `dist/types` would disagree with `dist/esm` about where
 // every former flat module lives, and the single `exports` wildcard -- which
 // points all three conditions at `<subpath>/index.*` -- would resolve
 // JavaScript but no types.
