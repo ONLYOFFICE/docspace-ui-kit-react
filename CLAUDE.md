@@ -172,6 +172,11 @@ applies. Three levels, fastest first:
   before concluding one is missing. Four components currently have none:
   `avatar-editor-dialog`, `quantity-picker`, `room-logo-cover-dialog`, `theme-provider`
 
+## Commit messages
+
+Do not add `Co-Authored-By` trailers or any other AI-attribution lines to
+commit messages. Same rule as the DocSpace client repository.
+
 ## Architecture Notes
 
 - **Flat component model**: each component is self-contained in its folder; no deep nesting between components
