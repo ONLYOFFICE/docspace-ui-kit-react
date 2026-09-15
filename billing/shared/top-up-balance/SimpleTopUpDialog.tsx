@@ -44,10 +44,12 @@ import { toastr } from "../../../components/toast";
 import { useCommonTranslation } from "../../../utils/i18n";
 import {
   openStripeCheckout,
+  type TTopUpCompletionDeps,
   waitForTopUpCompletion,
 } from "../../utils/stripe-flow";
 import { AnalyticsEvents } from "../../../enums";
 
+import WarningIcon from "../../../assets/danger.toast.react.svg";
 import Amount from "./sub-components/Amount";
 import { AmountProvider, useAmountValue } from "../../wallet/context";
 
@@ -63,6 +65,8 @@ export type TSimpleTopUpDeps = {
   fetchBalance: (isRefresh?: boolean) => Promise<number>;
   fetchTransactionHistory?: PaymentStore["fetchTransactionHistory"];
   walletCustomerStatusNotActive: boolean;
+  /** the saved method credits the wallet only once the transfer settles */
+  isDelayedPaymentMethod: boolean;
   isStripeCheckoutRequired: boolean;
   language: string;
   fetchCardLinked: (
@@ -70,7 +74,7 @@ export type TSimpleTopUpDeps = {
     successUrl?: string,
   ) => Promise<string | null | undefined>;
   walletBalance: number;
-  fetchCustomerInfo: (refresh?: boolean) => Promise<string | null | undefined>;
+  fetchCustomerInfo: TTopUpCompletionDeps["fetchCustomerInfo"];
 };
 
 const MIN_AMOUNT = "10";
@@ -110,6 +114,7 @@ const SimpleTopUpDialogContent = observer(
     fetchBalance,
     fetchTransactionHistory,
     walletCustomerStatusNotActive,
+    isDelayedPaymentMethod,
     language,
     fetchCardLinked,
     walletBalance,
@@ -153,14 +158,19 @@ const SimpleTopUpDialogContent = observer(
           successParams,
         );
 
-        await waitForTopUpCompletion(
+        if (isDelayedPaymentMethod) {
+          onClose();
+          return;
+        }
+
+        const completion = await waitForTopUpCompletion(
           { walletBalance, fetchCustomerInfo, fetchBalance },
           signal,
         );
 
         if (signal.aborted) return;
 
-        await onConfirm?.();
+        if (!completion.isDelayedPaymentMethod) await onConfirm?.();
 
         if (signal.aborted) return;
 
@@ -194,9 +204,12 @@ const SimpleTopUpDialogContent = observer(
           requests.push(fetchTransactionHistory(serviceName));
         await Promise.allSettled(requests);
 
-        toastr.success(t("WalletToppedUp"));
-
-        await onConfirm?.();
+        if (isDelayedPaymentMethod) {
+          toastr.success(t("TopUpDelayedPaymentMethodWarning"));
+        } else {
+          toastr.success(t("WalletToppedUp"));
+          await onConfirm?.();
+        }
 
         onClose();
       } catch (error) {
@@ -225,6 +238,24 @@ const SimpleTopUpDialogContent = observer(
 
         <ModalDialog.Body>
           <div className={styles.body}>
+            {isDelayedPaymentMethod ? (
+              <div
+                className={styles.warning}
+                data-testid="top_up_delayed_payment_method_warning"
+              >
+                <WarningIcon className={styles.warningIcon} />
+                <Text
+                  as="span"
+                  fontSize="12px"
+                  fontWeight={600}
+                  lineHeight="16px"
+                  className={styles.warningText}
+                >
+                  {t("TopUpDelayedPaymentMethodWarning")}
+                </Text>
+              </div>
+            ) : null}
+
             <Text className={styles.description}>
               {descriptionText ??
                 (isStripeFlow

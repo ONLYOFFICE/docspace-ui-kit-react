@@ -178,6 +178,13 @@ const generateCallId = () => `editor-tool-call-${Date.now()}-${nextCallId++}`;
 
 const EDITOR_TOOL_TIMEOUT_MS = 10_000;
 const EDITOR_READY_TIMEOUT_MS = 60_000;
+// The generated-file tab is a whole editor boot in a fresh window: a cold
+// document server, a slow network and the doceditor's own profile requests
+// (`editorDocumentReady` is posted only after they resolve) all add up, and
+// once this listener is gone a late ready signal leaves the file empty. So
+// the tab gets a much longer fail-safe than the in-panel iframe, whose wait
+// blocks the model's reply.
+const GENERATED_FILE_READY_TIMEOUT_MS = 5 * 60_000;
 
 const callEditorTool = async (
   name: string,
@@ -572,12 +579,12 @@ export const openGeneratedFileWithToolCall = (
     if (!settled) {
       console.warn(
         "[host-tool-groups] openGeneratedFileWithToolCall: editor never " +
-          `signaled readiness within ${EDITOR_READY_TIMEOUT_MS}ms — giving up`,
+          `signaled readiness within ${GENERATED_FILE_READY_TIMEOUT_MS}ms — giving up`,
         { fileId, toolName },
       );
     }
     finish();
-  }, EDITOR_READY_TIMEOUT_MS);
+  }, GENERATED_FILE_READY_TIMEOUT_MS);
   return true;
 };
 

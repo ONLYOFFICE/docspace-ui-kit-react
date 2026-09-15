@@ -42,7 +42,8 @@
   padding: 32px;
 }
 
-.card[data-status="processing"] {
+.card[data-status="processing"],
+.card[data-status="delayed"] {
   gap: 32px;
 }
 
@@ -250,12 +251,36 @@
     }
   }
 
-  .timelineConnector {
-    background: var(--payment-callback-success-color);
-  }
-
   .timelineLabel {
     color: var(--text-color);
+  }
+}
+
+.timelineConnector[data-state="done"] {
+  background: var(--payment-callback-success-color);
+}
+
+.timelineItem[data-state="pending"] .timelineDot,
+.timelineItem[data-state="current"] .timelineDot {
+  color: var(--text-disable-color);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+// a one-off flash marks the step the flow has just moved to
+.timelineItem[data-state="current"] .timelineDot {
+  animation: stepReached 0.8s ease-out both;
+}
+
+@keyframes stepReached {
+  0%,
+  25% {
+    border-color: var(--color-scheme-main-buttons);
+    color: var(--color-scheme-main-buttons);
+  }
+  100% {
+    border-color: var(--aside-header-border-color);
+    color: var(--text-disable-color);
   }
 }
 
@@ -281,7 +306,7 @@
   color: var(--text-disable-color);
 }
 
-.keepOpenCallout {
+.callout {
   width: 100%;
   padding: 12px 14px;
   border-radius: 6px;
@@ -296,15 +321,19 @@
   gap: 10px;
 }
 
-.keepOpenCalloutIcon {
+.calloutIcon {
   flex-shrink: 0;
   width: 18px;
   height: 18px;
   margin-top: 1px;
 
   path {
-    fill: var(--status-warning);
+    fill: var(--payment-callback-warning-color);
   }
+}
+
+.calloutWarning {
+  color: var(--payment-callback-warning-color);
 }
 
 .actions {
@@ -313,6 +342,36 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition:
+    opacity 0.4s ease,
+    visibility 0.4s ease;
+}
+
+.actionsPending {
+  opacity: 0;
+  visibility: hidden;
+}
+
+// the row grows from nothing, so the card stretches to reveal the button
+.actionsReveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  width: 100%;
+  transition:
+    grid-template-rows 0.4s ease,
+    margin-top 0.4s ease;
+
+  > .actions {
+    margin-top: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+.actionsRevealPending {
+  grid-template-rows: 0fr;
+  // cancels the card gap above the collapsed row
+  margin-top: -32px;
 }
 
 .docsLink {

@@ -36,6 +36,7 @@
 import { TenantWalletService } from "@onlyoffice/docspace-api-sdk";
 
 import type { TTranslation } from "../../utils/common";
+import type { TTimelineStep } from "./sub-components/StepsTimeline";
 
 import {
   AI_SEARCH,
@@ -49,6 +50,7 @@ export const AI_SERVICES_REDIRECT_URL = "/billing/addons/ai-services";
 export const AI_SEARCH_REDIRECT_URL = "/billing/addons/ai-search";
 export const DISK_STORAGE_REDIRECT_URL = "/billing/addons/disk-storage";
 export const WALLET_REDIRECT_URL = "/billing/wallet";
+export const BILLING_OVERVIEW_REDIRECT_URL = "/billing/overview";
 export const TARIFF_REDIRECT_URL = "/billing/tariff-plan";
 export const BACKUP_REDIRECT_URL = "/billing/addons/backup";
 
@@ -101,6 +103,36 @@ export const resolveWalletServicesToActivate = (
   if (walletService === TenantWalletService.AITools && !skipAiSearch)
     return [walletService, AI_SEARCH_WALLET_SERVICE];
   return [walletService];
+};
+
+export type TDelayedContent = {
+  title: string;
+  hint: string;
+  callout: string;
+  steps: TTimelineStep[];
+  buttonLabel: string;
+  footerNote: string;
+  redirectUrl: string;
+};
+
+export const getDelayedContent = (t: TTranslation): TDelayedContent => {
+  return {
+    title: t("Common:WalletTopUpStepCardSaved"),
+    hint: t("Common:WalletTopUpDelayedHint"),
+    callout: t("Common:WalletTopUpDelayedCallout"),
+    steps: [
+      { key: "card", label: t("Common:WalletTopUpStepCardSaved") },
+      {
+        key: "transfer",
+        label: t("Common:WalletTopUpDelayedStepSepaSending"),
+        doneLabel: t("Common:WalletTopUpDelayedStepSepaSent"),
+      },
+      { key: "funds", label: t("Common:WalletTopUpDelayedStepFunds") },
+    ],
+    buttonLabel: t("Common:BackToBilling"),
+    footerNote: t("Common:PaymentMethodSepa"),
+    redirectUrl: BILLING_OVERVIEW_REDIRECT_URL,
+  };
 };
 
 export const resolveDocsConnectParams = ({

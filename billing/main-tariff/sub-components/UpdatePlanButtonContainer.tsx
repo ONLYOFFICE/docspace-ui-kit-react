@@ -94,6 +94,7 @@ const UpdatePlanButtonContainer = ({
     hasScheduledTariffAdminsChange,
     isGracePeriod,
     isNotPaidPeriod,
+    isDelayedPaymentMethod,
   } = store.tariff;
 
   const isRepurchase = isFreeTariff || isGracePeriod || isNotPaidPeriod;
@@ -102,7 +103,11 @@ const UpdatePlanButtonContainer = ({
   const [isVisibleDowngradePlanDialog, setIsVisibleDowngradePlanDialog] =
     useState(false);
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const openTopUpDialog = () => setIsTopUpDialogVisible(true);
+  const closeTopUpDialog = () => setIsTopUpDialogVisible(false);
   const [isMigrateDialogVisible, setIsMigrateDialogVisible] = useState(false);
+  const openMigrateDialog = () => setIsMigrateDialogVisible(true);
+  const closeMigrateDialog = () => setIsMigrateDialogVisible(false);
 
   const onClose = () => {
     setIsVisiblePaymentConfirm(false);
@@ -122,6 +127,7 @@ const UpdatePlanButtonContainer = ({
   const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
   const isBalanceInsufficient = walletBalance < dueTodayAmount;
   const topUpShortfall = Math.max(0, Math.ceil(dueTodayAmount - walletBalance));
+  const isDelayedPaymentTopUp = isDelayedPaymentMethod && isBalanceInsufficient;
 
   const onUpdateTariff = () => {
     if (isVisiblePaymentConfirm) onClose();
@@ -151,24 +157,39 @@ const UpdatePlanButtonContainer = ({
   };
 
   const onTopUpConfirm = async () => {
-    setIsTopUpDialogVisible(false);
+    closeTopUpDialog();
 
     await (isRepurchase
       ? executeWalletUpdate(managersCount, ProductQuantityType.Add, t)
       : onUpdateTariff());
   };
 
+  const getPayTariffLabel = () => {
+    if (isDelayedPaymentTopUp) return t("TopUpWallet");
+    if (!isCardLinkedToPortal || isBalanceInsufficient)
+      return t("TopUpAndUpgrade");
+    return t("UpgradeNow");
+  };
+
+  const getUpdateTariffAction = () => {
+    if (needsWalletMigration) return openMigrateDialog;
+    if (isDelayedPaymentTopUp) return openTopUpDialog;
+    return onUpdateTariff;
+  };
+
   const payTariffButton = () => {
-    const buttonLabel =
-      !isCardLinkedToPortal || isBalanceInsufficient
-        ? t("TopUpAndUpgrade")
-        : t("UpgradeNow");
+    const buttonLabel = getPayTariffLabel();
 
     const onClick = () => {
+      if (isDelayedPaymentTopUp) {
+        openTopUpDialog();
+        return;
+      }
+
       if (canPayTariff) {
         isCardLinkedToPortal
           ? executeWalletUpdate(managersCount, ProductQuantityType.Add, t)
-          : setIsTopUpDialogVisible(true);
+          : openTopUpDialog();
         return;
       }
 
@@ -201,7 +222,7 @@ const UpdatePlanButtonContainer = ({
       <DowngradePlanButtonContainer
         onDowngradeTariff={
           needsWalletMigration
-            ? () => setIsMigrateDialogVisible(true)
+            ? openMigrateDialog
             : onDowngradeTariff
         }
         isDisabled={isDisabled || hasScheduledTariffAdminsChange}
@@ -221,11 +242,7 @@ const UpdatePlanButtonContainer = ({
           isTariffDueTodayCalculating ||
           hasScheduledTariffAdminsChange
         }
-        onClick={
-          needsWalletMigration
-            ? () => setIsMigrateDialogVisible(true)
-            : onUpdateTariff
-        }
+        onClick={getUpdateTariffAction()}
         isLoading={isLoading}
         testId="upgrade_plan_button"
       />
@@ -246,7 +263,7 @@ const UpdatePlanButtonContainer = ({
       {isMigrateDialogVisible ? (
         <MigrateToWalletDialog
           visible={isMigrateDialogVisible}
-          onClose={() => setIsMigrateDialogVisible(false)}
+          onClose={closeMigrateDialog}
           onMigrated={refreshAfterUpdate}
         />
       ) : null}
@@ -254,7 +271,7 @@ const UpdatePlanButtonContainer = ({
       {isTopUpDialogVisible ? (
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
-          onClose={() => setIsTopUpDialogVisible(false)}
+          onClose={closeTopUpDialog}
           onConfirm={isCardMissingOrInactive ? undefined : onTopUpConfirm}
           minValue={topUpShortfall > 0 ? `${topUpShortfall}` : undefined}
           successParams={{

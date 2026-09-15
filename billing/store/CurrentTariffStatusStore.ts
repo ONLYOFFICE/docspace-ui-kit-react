@@ -39,7 +39,6 @@ import {
   type PortalQuotaApi,
   type Tariff,
   type Quota,
-  type CustomerInfoDto,
   PaymentMethodStatus,
 } from "@onlyoffice/docspace-api-sdk";
 import {
@@ -52,7 +51,7 @@ import {
 import { daysUntil } from "../utils/common";
 import { TOTAL_SIZE } from "../constants";
 import { isDocsConnectService } from "../utils/docs-connect";
-import type { TWalletServiceQuota } from "../types";
+import type { TCustomerInfo, TWalletServiceQuota } from "../types";
 
 class CurrentTariffStatusStore {
   private portalQuotaApi: PortalQuotaApi;
@@ -75,9 +74,10 @@ class CurrentTariffStatusStore {
 
   private _walletServicesResolved = false;
 
-  payerInfo: CustomerInfoDto = {
+  payerInfo: TCustomerInfo = {
     portalId: null,
     paymentMethodStatus: 0,
+    isDelayedPaymentMethod: false,
     email: null,
     payer: undefined,
   };
@@ -263,6 +263,10 @@ class CurrentTariffStatusStore {
     return this.payerInfo.payer ?? null;
   }
 
+  get isDelayedPaymentMethod() {
+    return this.payerInfo.isDelayedPaymentMethod === true;
+  }
+
   private resolveWalletServiceIds = async () => {
     if (this._walletServicesResolved) return;
 
@@ -273,9 +277,7 @@ class CurrentTariffStatusStore {
 
       this._storageServiceId =
         services.find((service) =>
-          (service.features ?? []).some(
-            (feature) => feature.id === TOTAL_SIZE,
-          ),
+          (service.features ?? []).some((feature) => feature.id === TOTAL_SIZE),
         )?.id ?? null;
       this._docsConnectServiceIds = services
         .filter((service) => isDocsConnectService(service))
@@ -368,11 +370,12 @@ class CurrentTariffStatusStore {
 
       if (!res?.data?.response) return;
 
-      const info = res.data.response as unknown as CustomerInfoDto;
+      const info = res.data.response as unknown as TCustomerInfo;
 
       this.payerInfo = {
         portalId: null,
         paymentMethodStatus: info.paymentMethodStatus ?? 0,
+        isDelayedPaymentMethod: info.isDelayedPaymentMethod ?? false,
         email: info.email ?? null,
         payer: info.payer,
       };

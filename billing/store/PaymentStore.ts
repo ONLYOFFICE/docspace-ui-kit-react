@@ -48,11 +48,21 @@ import type {
   OperationDto,
 } from "@onlyoffice/docspace-api-sdk";
 
-/** SDK types date as ApiDateTime but API returns an ISO string. */
-export type WalletOperationDto = Omit<OperationDto, "date"> & {
+export type TransactionSourceType =
+  | "Agent"
+  | "File"
+  | "Folder"
+  | "Room"
+  | "Form";
+
+export type WalletOperationDto = Omit<
+  OperationDto,
+  "date" | "agentId" | "agentTitle"
+> & {
   date?: string;
-  agentId?: string | null;
-  agentTitle?: string | null;
+  sourceId?: string | null;
+  sourceTitle?: string | null;
+  sourceType?: TransactionSourceType | null;
 };
 
 import { toastr } from "../../components/toast";
@@ -1584,7 +1594,11 @@ class PaymentStore {
       const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
       const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
 
-      if (type === ProductQuantityType.Add && isBalanceInsufficient) {
+      if (
+        type === ProductQuantityType.Add &&
+        isBalanceInsufficient &&
+        !this.tariff.isDelayedPaymentMethod
+      ) {
         const recommendedAmount = Math.ceil(
           dueTodayAmount - this.walletBalance,
         );
@@ -1649,12 +1663,16 @@ class PaymentStore {
     const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
     const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
 
+    if (this.isTariffDueTodayCalculating) return t("UpgradeNow");
+
     if (this.tariffDueTodayAmount !== null && !isTheSameCount) {
-      return isBalanceInsufficient
-        ? t("TopUpAndUpgrade")
-        : t("PayAndUpgrade", {
-            amount: this.formatPaymentCurrency(dueTodayAmount),
-          });
+      if (isBalanceInsufficient)
+        return this.tariff.isDelayedPaymentMethod
+          ? t("TopUpWallet")
+          : t("TopUpAndUpgrade");
+      return t("PayAndUpgrade", {
+        amount: this.formatPaymentCurrency(dueTodayAmount),
+      });
     }
 
     return t("UpgradeNow");

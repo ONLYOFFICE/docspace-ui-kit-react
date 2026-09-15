@@ -59,6 +59,7 @@ interface ButtonContainerProps {
   recommendedAmount: number;
   isCurrentStoragePlan?: boolean;
   isPaymentBlocked?: boolean;
+  onTopUpWallet: () => void;
   totalPrice?: number;
   isDisabled?: boolean;
   currentStoragePlanSize?: number;
@@ -72,6 +73,7 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
     isLoading,
     onBuy,
     onSendRequest,
+    onTopUpWallet,
     isPaymentBlockedByBalance,
     isBalanceInsufficient,
     recommendedAmount,
@@ -88,6 +90,7 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
     storageExpiryDate,
     walletCustomerEmail,
     walletCustomerInfo,
+    isDelayedPaymentMethod,
   } = paymentStore.tariff;
   const { formatWalletCurrency, isPayer, isCardLinkedToPortal } = paymentStore;
 
@@ -99,15 +102,40 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
 
   const isTopUpUnavailable =
     isBalanceInsufficient && isCardLinkedToPortal && !isPayer;
-  const canTopUpAndBuy = isBalanceInsufficient && !isTopUpUnavailable;
+  const isDelayedPaymentTopUp =
+    isBalanceInsufficient && !isTopUpUnavailable && isDelayedPaymentMethod;
+  const canTopUpAndBuy =
+    isBalanceInsufficient && !isTopUpUnavailable && !isDelayedPaymentTopUp;
 
-  const title = canTopUpAndBuy
-    ? t("TopUpAndUpgrade")
-    : !hasStorageSubscription
-      ? t("UpgradeNow")
-      : isExceedingStorageLimit
-        ? t("SendRequest")
-        : t("Update");
+  const getTitle = () => {
+    if (isExceedingStorageLimit) return t("SendRequest");
+
+    if (isDelayedPaymentTopUp) return t("TopUpWallet");
+
+    if (canTopUpAndBuy) return t("TopUpAndUpgrade");
+
+    if (!hasStorageSubscription) return t("UpgradeNow");
+
+    return t("Update");
+  };
+
+  const getOnClick = () => {
+    if (isExceedingStorageLimit) return onSendRequest;
+
+    if (isDelayedPaymentTopUp) return onTopUpWallet;
+
+    return onBuy;
+  };
+
+  const isBlockedByBalance =
+    isPaymentBlockedByBalance && !canTopUpAndBuy && !isDelayedPaymentTopUp;
+
+  const isOkDisabled =
+    isPaymentBlocked ||
+    isBlockedByBalance ||
+    isCurrentStoragePlan ||
+    isDisabled ||
+    isWaitingCalculation;
 
   const showNextBillHint =
     hasStorageSubscription &&
@@ -156,6 +184,21 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
         </Text>
       ) : null}
 
+      {isDelayedPaymentTopUp ? (
+        <Text as="span">
+          <Trans
+            ns="Common"
+            i18nKey="TopUpWalletStorageHint"
+            components={{
+              1: <Text fontWeight="600" as="span"></Text>,
+            }}
+            values={{
+              currency: formatWalletCurrency(recommendedAmount, 2),
+            }}
+          />
+        </Text>
+      ) : null}
+
       {canTopUpAndBuy ? (
         <Text as="span">
           <Trans
@@ -174,19 +217,13 @@ const ButtonContainer: React.FC<ButtonContainerProps> = (props) => {
       <div className={styles.buttonContainer}>
         <Button
           key="OkButton"
-          label={title}
+          label={getTitle()}
           size={ButtonSize.normal}
           primary
           scale
-          onClick={isExceedingStorageLimit ? onSendRequest : onBuy}
+          onClick={getOnClick()}
           isLoading={isLoading}
-          isDisabled={
-            isPaymentBlocked ||
-            (isPaymentBlockedByBalance && !canTopUpAndBuy) ||
-            isCurrentStoragePlan ||
-            isDisabled ||
-            isWaitingCalculation
-          }
+          isDisabled={isOkDisabled}
           testId="storage_plan_upgrade_ok_button"
         />
         <Button

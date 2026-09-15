@@ -98,6 +98,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     isServiceActionDisabled,
     isShowPreviousStoragePlan,
     showUnlinkedCardBanner,
+    walletBalance = 0,
   } = paymentStore;
 
   const {
@@ -108,7 +109,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     previousStoragePlanSize,
     isGracePeriod,
     hasStorageSubscription = false,
-
+    isDelayedPaymentMethod,
     fetchPortalTariff,
   } = paymentStore.tariff;
 
@@ -122,6 +123,8 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
   const [isGracePeriodModalVisible, setIsGracePeriodModalVisible] =
     useState(false);
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const openTopUpDialog = () => setIsTopUpDialogVisible(true);
+  const closeTopUpDialog = () => setIsTopUpDialogVisible(false);
   const [isRemovePreviousPlanVisible, setIsRemovePreviousPlanVisible] =
     useState(false);
 
@@ -211,6 +214,14 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     : currentStoragePlanSize;
 
   const monthlyPrice = calculateTotalPrice(planSize, storagePriceIncrement);
+  const renewalShortfall = Math.max(0, Math.ceil(monthlyPrice - walletBalance));
+  const isDelayedPaymentTopUp = isDelayedPaymentMethod && renewalShortfall > 0;
+
+  const getRenewLabel = () => {
+    if (renewalShortfall <= 0) return t("RenewSubscription");
+    if (isDelayedPaymentMethod) return t("TopUpWallet");
+    return t("TopUpAndRenew");
+  };
   const balance = formatWalletCurrency();
 
   const contextMenuItems = [
@@ -274,7 +285,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
       <WalletInfo
         withoutBackground
         balance={balance}
-        onTopUp={() => setIsTopUpDialogVisible(true)}
+        onTopUp={openTopUpDialog}
       />
       {showUnlinkedCardBanner ? (
         <div className={styles.unlinkedBanner}>
@@ -375,10 +386,14 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
         {isShowPreviousStoragePlan ? (
           <div className={styles.actionRow}>
             <Button
-              label={t("TopUpAndRenew")}
+              label={getRenewLabel()}
               size={ButtonSize.small}
               primary
-              onClick={openUpgradeDialog}
+              onClick={
+                isDelayedPaymentTopUp
+                  ? openTopUpDialog
+                  : openUpgradeDialog
+              }
               isDisabled={isDisabled}
             />
             <Button
@@ -477,7 +492,8 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
       {isTopUpDialogVisible ? (
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
-          onClose={() => setIsTopUpDialogVisible(false)}
+          onClose={closeTopUpDialog}
+          minValue={isDelayedPaymentTopUp ? `${renewalShortfall}` : undefined}
           serviceName={storageServiceName ?? DISK_STORAGE}
         />
       ) : null}

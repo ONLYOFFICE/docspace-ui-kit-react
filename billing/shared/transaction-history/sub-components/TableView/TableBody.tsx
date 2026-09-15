@@ -51,6 +51,7 @@ import {
 } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 import { AI_TOOLS } from "../../../../constants";
+import { getTransactionSourceLabel } from "../../utils";
 
 interface TransactionRowProps {
   transaction: WalletOperationDto;
@@ -89,9 +90,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
       {serviceName === AI_TOOLS ? (
         <TableCell>
           <Text fontWeight={600} fontSize="11px">
-            {transaction.agentTitle
-              ? t("AIAgentName", { AgentName: transaction.agentTitle })
-              : "—"}
+            {getTransactionSourceLabel(t, transaction) ?? "—"}
           </Text>
         </TableCell>
       ) : null}

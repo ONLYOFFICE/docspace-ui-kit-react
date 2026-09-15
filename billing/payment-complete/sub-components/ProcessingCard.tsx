@@ -37,12 +37,11 @@ import React from "react";
 
 import { useCommonTranslation } from "../../../utils/i18n";
 import { Text } from "../../../components/text";
-import { Loader, LoaderTypes } from "../../../components/loader";
 
-import CheckIcon from "../../../assets/check.edit.react.svg";
 import InfoIcon from "../../../assets/info.outline.react.svg";
 
 import styles from "../PaymentCompletePage.module.scss";
+import StepsTimeline, { type TTimelineStep } from "./StepsTimeline";
 
 type TTariffActivation = {
   plan: string;
@@ -88,11 +87,7 @@ const ProcessingCard = ({
     </span>
   ) : null;
 
-  const steps: {
-    key: string;
-    label: React.ReactNode;
-    doneLabel?: React.ReactNode;
-  }[] = [
+  const steps: TTimelineStep[] = [
     { key: "card", label: t("WalletTopUpStepCardSaved") },
     {
       key: "topup",
@@ -115,61 +110,14 @@ const ProcessingCard = ({
         <Text lineHeight="20px">{hint}</Text>
       </div>
 
-      <div className={styles.keepOpenCallout} role="status">
-        <InfoIcon className={styles.keepOpenCalloutIcon} aria-hidden="true" />
+      <div className={styles.callout} role="status">
+        <InfoIcon className={styles.calloutIcon} aria-hidden="true" />
         <Text fontSize="12px" fontWeight={600} lineHeight="16px">
           {t("WalletTopUpKeepOpen")}
         </Text>
       </div>
 
-      <ol className={styles.timeline}>
-        {steps.map((step, index) => {
-          const state =
-            index < stepIndex
-              ? "done"
-              : index === stepIndex
-                ? "active"
-                : "pending";
-          const isLast = index === steps.length - 1;
-
-          return (
-            <li
-              key={step.key}
-              className={styles.timelineItem}
-              data-state={state}
-            >
-              {!isLast ? (
-                <Text
-                  className={styles.timelineConnector}
-                  aria-hidden="true"
-                  as="span"
-                />
-              ) : null}
-              <Text
-                className={styles.timelineDot}
-                aria-hidden="true"
-                as="span"
-                data-state={state}
-              >
-                {state === "done" ? <CheckIcon /> : null}
-                {state === "active" ? (
-                  <Loader type={LoaderTypes.track} size="20px" />
-                ) : null}
-              </Text>
-              <Text
-                className={styles.timelineLabel}
-                as="span"
-                fontSize="14px"
-                fontWeight={700}
-              >
-                {state === "done" && step.doneLabel
-                  ? step.doneLabel
-                  : step.label}
-              </Text>
-            </li>
-          );
-        })}
-      </ol>
+      <StepsTimeline steps={steps} stepIndex={stepIndex} />
 
       <Text className={styles.footerNote}>
         {t("WalletTopUpSecuredByStripe")}

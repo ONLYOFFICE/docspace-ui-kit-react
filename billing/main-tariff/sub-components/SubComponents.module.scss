@@ -1,7 +1,10 @@
 // ===== CurrentUsersCountContainer =====
 
 .currentUsersContainer {
-  height: fit-content;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   .currentAdminsNumber {
     &.isDisabled {

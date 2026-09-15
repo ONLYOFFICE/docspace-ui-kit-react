@@ -36,6 +36,7 @@
 import type {
   TenantQuotaFeatureDto,
   Balance,
+  CustomerInfoDto,
   QuotaDto,
 } from "@onlyoffice/docspace-api-sdk";
 
@@ -50,6 +51,12 @@ export type TBalance = Balance | 0 | null;
 
 /** QuotaDto extended with serviceName (returned by wallet service endpoints). */
 export type TWalletServiceQuota = QuotaDto & { serviceName?: string };
+
+/** CustomerInfoDto with the payment method fields the SDK does not declare yet. */
+export type TCustomerInfo = CustomerInfoDto & {
+  paymentMethodType?: string | null;
+  isDelayedPaymentMethod?: boolean;
+};
 
 export type TServiceFeatureWithPrice = TNumericPaymentFeature & {
   price: {
