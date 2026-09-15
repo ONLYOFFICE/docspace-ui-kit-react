@@ -31,6 +31,8 @@ import { useStores } from "@onlyoffice/ai-chat";
 
 import { FileType } from "../../../enums";
 
+import { useAiChatStoreOptional } from "../ai-chat-store/AiChatStoreProvider";
+
 import { getOnlyofficeFileType } from "./file-type";
 import { attachFilesToChat } from "./attach-files";
 import { useOnFilesAttached } from "./attached-report";
@@ -120,6 +122,9 @@ export const useAttachHostFilesToChat = () => {
   // What the composer accepts here, and why: the caller quotes the reason
   // back to the user when something is refused.
   const cap = useAttachmentLimit();
+  // Null outside the chat providers (a host subtree rendered without them),
+  // where there is no mode to enter.
+  const aiChatStore = useAiChatStoreOptional();
 
   return React.useCallback(
     async (items: ChatAttachableItem[]): Promise<AttachToChatResult> => {
@@ -127,6 +132,14 @@ export const useAttachHostFilesToChat = () => {
       const skippedFolders = items.length - notFolders.length;
 
       const subject = notFolders.find((item) => item.analyzeOnly);
+
+      // An analyze attach is about one form, so it takes that form and
+      // nothing else — the rest of the batch is refused rather than riding
+      // along on the cap that the subject itself is exempt from. No caller
+      // mixes them today (every analyze entry point hands over a single row),
+      // which is exactly why this has to be stated here instead of relied on.
+      const candidates = subject ? [subject] : notFolders;
+      const skippedBesideSubject = notFolders.length - candidates.length;
 
       if (subject) {
         // Asking to analyze the form the message already carries changes
@@ -145,11 +158,25 @@ export const useAttachHostFilesToChat = () => {
           return {
             attached: 0,
             skippedFolders,
-            skippedOverLimit: 0,
-            duplicates: notFolders.length,
+            // Anything handed in beside the subject had no room either, and
+            // the counts have to keep adding up to what the caller passed.
+            skippedOverLimit: skippedBesideSubject,
+            duplicates: candidates.length,
             cap,
           };
         }
+
+        // Enter the mode now, not when the round trip below comes back with
+        // the records: the cap and the composer's attach actions are derived
+        // from it, and until it is set they still advertise the ordinary
+        // chat. The reservation a few lines down then fills the single slot,
+        // so a file dropped on the panel while this attach is in flight is
+        // refused instead of landing beside the form. The provider starts the
+        // mode again from the attach report — same subject, same phase.
+        aiChatStore?.startAnalyzeMode({
+          entryId: String(subject.id),
+          title: subject.title,
+        });
 
         // An analyze attach owns the message, so it starts from an empty
         // draft: whatever the user had picked before is dropped (chips and
@@ -168,17 +195,18 @@ export const useAttachHostFilesToChat = () => {
       // below tell the caller what really happened.
       const { keep } = splitDuplicateAttachments(
         useAttachmentsStore,
-        notFolders.map((file) => String(file.id)),
+        candidates.map((file) => String(file.id)),
       );
-      const files = keep.map((index) => notFolders[index]);
-      const duplicates = notFolders.length - files.length;
+      const files = keep.map((index) => candidates[index]);
+      const duplicates = candidates.length - files.length;
 
       // A new subject replaces the mode rather than joining it, so it is not
       // what the analyze cap is there to refuse: that cap drops to zero once
       // the first message is sent, which would otherwise make "Analyze
-      // responses" on a second form do nothing at all. The draft was just
-      // emptied above, so the one slot asked for here is genuinely free.
-      const effectiveLimit = subject ? Math.max(cap.limit, 1) : cap.limit;
+      // responses" on a second form do nothing at all. Exactly one slot, never
+      // the cap's own number — the draft was just emptied above, so that slot
+      // is genuinely free, and the batch is the subject alone.
+      const effectiveLimit = subject ? 1 : cap.limit;
 
       const inputsAll = files.map((file) => ({
         path: String(file.id),
@@ -204,8 +232,11 @@ export const useAttachHostFilesToChat = () => {
         effectiveLimit,
       );
       const inputs = inputsAll.slice(0, pendingIds.length);
-      // The reservation is the cap: whatever it refused had no room.
-      const skippedOverLimit = inputsAll.length - inputs.length;
+      // The reservation is the cap: whatever it refused had no room. So were
+      // the files handed in beside an analyze subject — the message has room
+      // for the form only, which is the same answer from the user's side.
+      const skippedOverLimit =
+        inputsAll.length - inputs.length + skippedBesideSubject;
       const counts = {
         skippedFolders,
         skippedOverLimit,
@@ -232,11 +263,16 @@ export const useAttachHostFilesToChat = () => {
         // Callers own the toast (documented); the leases must not outlive
         // the failure or Send stays blocked.
         useAttachmentsStore.getState().failPendingAttachments(pendingIds);
+        // Neither may the mode entered a moment ago: the form never made it
+        // onto the message, so a chat locked to it would be locked to
+        // nothing. A mode that was running for another form is gone too — it
+        // lost its draft to the clear above either way.
+        if (subject) aiChatStore?.endAnalyzeMode();
         throw err;
       }
 
       return { attached: inputs.length, ...counts };
     },
-    [useAttachmentsStore, onFilesAttached, cap],
+    [useAttachmentsStore, onFilesAttached, cap, aiChatStore],
   );
 };

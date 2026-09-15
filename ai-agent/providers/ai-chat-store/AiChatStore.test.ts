@@ -161,6 +161,28 @@ describe("AiChatStore analyze mode", () => {
     expect(store.isAnalyzeMode).toBe(false);
   });
 
+  // `open` is the entry point that leaves an ongoing conversation alone, so
+  // it only ends the mode when it switches to another agent — whose chat the
+  // analyzed form has nothing to do with.
+  it("ends when the panel is opened for a different agent", () => {
+    store.open(1);
+    store.startAnalyzeMode(form);
+
+    store.open(2);
+
+    expect(store.isAnalyzeMode).toBe(false);
+  });
+
+  it("keeps the mode when opened for the same agent, or for none", () => {
+    store.open(1);
+    store.startAnalyzeMode(form);
+
+    store.open(1);
+    store.open();
+
+    expect(store.isAnalyzeMode).toBe(true);
+  });
+
   it("ends when a new chat is opened", () => {
     store.startAnalyzeMode(form);
 

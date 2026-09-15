@@ -63,6 +63,9 @@ vi.mock("./attach-files", async (importOriginal) => ({
   attachFilesToChat: () => attachFilesToChat(),
 }));
 
+import AiChatStore from "../ai-chat-store/AiChatStore";
+import { AiChatStoreProvider } from "../ai-chat-store/AiChatStoreProvider";
+
 import { OnFilesAttachedContext } from "./attached-report";
 import { AttachmentLimitContext } from "./attachment-limit";
 import { rememberFormAttachments } from "./form-attachments";
@@ -89,12 +92,21 @@ const leases = (free: number) =>
     return accepted.map((_, i) => `pnd-${i + 1}`);
   });
 
-type AttachItems = Parameters<
-  ReturnType<typeof useAttachHostFilesToChat>
->[0];
+type AttachItems = Parameters<ReturnType<typeof useAttachHostFilesToChat>>[0];
 
 const attach = async (items: AttachItems) => {
   const { result } = renderHook(() => useAttachHostFilesToChat());
+  return result.current(items);
+};
+
+// Same call, but under the panel store — the analyze mode lives there, and
+// this test file wires no provider reporter, so anything the mode knows
+// afterwards came from the hook itself.
+const attachUnderStore = async (items: AttachItems, store: AiChatStore) => {
+  const { result } = renderHook(() => useAttachHostFilesToChat(), {
+    wrapper: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(AiChatStoreProvider, { store, children }),
+  });
   return result.current(items);
 };
 
@@ -311,6 +323,56 @@ describe("useAttachHostFilesToChat accounting", () => {
     });
     expect(storeState.beginPendingAttachments).not.toHaveBeenCalled();
     expect(attachFilesToChat).not.toHaveBeenCalled();
+  });
+
+  // The subject owns the message on its own. Nothing else handed in with it
+  // may ride along on the slot it is exempt from — and the counts still have
+  // to add up to what the caller passed.
+  it("takes the subject alone when the batch carries more", async () => {
+    const result = await attach([
+      { ...file(1), analyzeOnly: true },
+      file(2),
+      file(3),
+    ]);
+
+    expect(result).toEqual({
+      attached: 1,
+      skippedFolders: 0,
+      skippedOverLimit: 2,
+      cap: { limit: 5, reason: "widget" },
+      duplicates: 0,
+    });
+    expect(storeState.beginPendingAttachments).toHaveBeenCalledWith([
+      expect.objectContaining({ title: "file-1.docx" }),
+    ]);
+  });
+
+  // The mode has to be on before the round trip comes back, or the cap and
+  // the "+" menu still describe an ordinary chat while the attach is in
+  // flight — long enough for a dropped file to slip in beside the form.
+  it("enters the analyze mode before the round trip resolves", async () => {
+    const store = new AiChatStore();
+    let modeDuringAttach = false;
+    attachFilesToChat.mockImplementationOnce(async () => {
+      modeDuringAttach = store.isAnalyzeMode;
+      return [];
+    });
+
+    await attachUnderStore([{ ...file(7), analyzeOnly: true }], store);
+
+    expect(modeDuringAttach).toBe(true);
+    expect(store.analyzeEntryId).toBe("7");
+    expect(store.analyzeFormTitle).toBe("file-7.docx");
+  });
+
+  it("leaves no mode behind when the analyze attach fails", async () => {
+    const store = new AiChatStore();
+    attachFilesToChat.mockRejectedValueOnce(new Error("boom"));
+
+    await expect(
+      attachUnderStore([{ ...file(7), analyzeOnly: true }], store),
+    ).rejects.toThrow("boom");
+    expect(store.isAnalyzeMode).toBe(false);
   });
 
   // ...but the mode moving to another form is not something that cap is

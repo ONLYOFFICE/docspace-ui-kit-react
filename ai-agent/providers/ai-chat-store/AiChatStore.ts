@@ -149,6 +149,14 @@ class AiChatStore {
   }
 
   open = (agentId?: number) => {
+    // Opening the panel for a different agent is a different conversation,
+    // and the form the old one was analyzing does not belong to it. Opening
+    // it for the same agent (or for none) keeps the mode, because this is the
+    // entry point that deliberately leaves an ongoing chat alone — unlike
+    // `openNewChat`, which ends the mode whatever it was.
+    if (agentId !== undefined && agentId !== this.agentId) {
+      this.endAnalyzeMode();
+    }
     if (agentId !== undefined) this.agentId = agentId;
     if (!this.isVisible) this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
     this.isVisible = true;
