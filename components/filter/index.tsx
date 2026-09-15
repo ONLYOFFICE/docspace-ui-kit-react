@@ -197,7 +197,7 @@ const FilterInput = React.memo(
       } else {
         setIsRoomGroupsLoaded(true);
       }
-    }, [getAllRoomGroups, organizeRoomsGrouping, isFormsSection]);
+    }, [getAllRoomGroups, organizeRoomsGrouping]);
 
     const mountRef = React.useRef(true);
 
