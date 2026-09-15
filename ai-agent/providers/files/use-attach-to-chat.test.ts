@@ -365,6 +365,36 @@ describe("useAttachHostFilesToChat accounting", () => {
     expect(store.analyzeFormTitle).toBe("file-7.docx");
   });
 
+  // Clicking "Analyze responses" on the form the chat is already analyzing
+  // must leave the chat exactly as it is. Every entry point raises the panel
+  // first, and raising it ends the mode — so if this call returns early as a
+  // duplicate without re-entering, the click the user meant as "yes, this
+  // form" is what takes the mode, the panel title and the chips away.
+  it("re-enters the mode when the same form is asked for again", async () => {
+    const store = new AiChatStore();
+    storeState.attachmentFiles = [attachedRef("7")];
+    rememberFormAttachments(useAttachmentsStore as never, {
+      withResults: [],
+      analyzeOnly: ["att-7"],
+    });
+    store.startAnalyzeMode({ entryId: "7", title: "file-7.docx" });
+
+    // What `useOpenAiChat` does on the way in.
+    store.openNewChat();
+    expect(store.isAnalyzeMode).toBe(false);
+
+    const result = await attachUnderStore(
+      [{ ...file(7), analyzeOnly: true }],
+      store,
+    );
+
+    expect(store.isAnalyzeMode).toBe(true);
+    expect(store.analyzeEntryId).toBe("7");
+    // Still a duplicate: the chip is not minted twice.
+    expect(result.duplicates).toBe(1);
+    expect(attachFilesToChat).not.toHaveBeenCalled();
+  });
+
   it("leaves no mode behind when the analyze attach fails", async () => {
     const store = new AiChatStore();
     attachFilesToChat.mockRejectedValueOnce(new Error("boom"));
@@ -373,6 +403,38 @@ describe("useAttachHostFilesToChat accounting", () => {
       attachUnderStore([{ ...file(7), analyzeOnly: true }], store),
     ).rejects.toThrow("boom");
     expect(store.isAnalyzeMode).toBe(false);
+  });
+
+  // "Ask AI" on another row while a form is being analyzed: the form still
+  // holds the draft's only slot, so the other file is refused and the chat
+  // the user set up is left alone — chips, title and all.
+  it("refuses a plain attach while the form still holds the draft", async () => {
+    storeState.attachmentFiles = [attachedRef("7")];
+    rememberFormAttachments(useAttachmentsStore as never, {
+      withResults: [],
+      analyzeOnly: ["att-7"],
+    });
+
+    const { result } = renderHook(() => useAttachHostFilesToChat(), {
+      wrapper: ({ children }: { children: React.ReactNode }) =>
+        React.createElement(
+          AttachmentLimitContext.Provider,
+          {
+            value: {
+              limit: 1,
+              reason: "analyze" as const,
+              fileName: "file-7.docx",
+            },
+          },
+          children,
+        ),
+    });
+    const attached = await result.current([file(8)]);
+
+    expect(attached.attached).toBe(0);
+    expect(attached.skippedOverLimit).toBe(1);
+    expect(attached.cap.reason).toBe("analyze");
+    expect(attachFilesToChat).not.toHaveBeenCalled();
   });
 
   // ...but the mode moving to another form is not something that cap is

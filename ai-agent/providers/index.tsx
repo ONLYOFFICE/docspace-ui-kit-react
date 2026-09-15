@@ -584,15 +584,18 @@ const AiAgentProviders = ({
 
   const onFilesAttached = useCallback(
     (attached: AttachedFileInfo[]) => {
-      // "Analyze responses" enters the mode here — the one point every entry
-      // route passes through (context menu, the results folder's button,
-      // drag-and-drop). A second analyze attach moves the mode to that form.
+      // The form's chip is on the draft now. `useAttachHostFilesToChat`
+      // entered the mode when the attach started — this is the other half:
+      // from here an empty draft means the user removed the chip, not that
+      // the attach is still in flight. Started again as well, for the entry
+      // routes that report an attach without having gone through the hook.
       const subject = attached.find((f) => f.analyzeOnly && f.entryId);
       if (subject) {
         aiChatStore.startAnalyzeMode({
           entryId: subject.entryId,
           title: subject.title,
         });
+        aiChatStore.markAnalyzeAttached(subject.entryId);
       }
 
       const analyzable = attached.filter((f) => f.canAnalyze);

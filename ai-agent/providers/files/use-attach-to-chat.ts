@@ -142,9 +142,28 @@ export const useAttachHostFilesToChat = () => {
       const skippedBesideSubject = notFolders.length - candidates.length;
 
       if (subject) {
+        // Enter the mode now, not when the round trip below comes back with
+        // the records: the cap and the composer's attach actions are derived
+        // from it, and until it is set they still advertise the ordinary
+        // chat. The reservation further down then fills the single slot, so a
+        // file dropped on the panel while this attach is in flight is refused
+        // instead of landing beside the form. The provider starts the mode
+        // again from the attach report — same subject, same phase.
+        //
+        // It has to happen before the duplicate check below, not after: every
+        // entry point raises the panel first, and raising it ends the mode
+        // (`openNewChat`). A repeat click on the form the chat is already
+        // analyzing would otherwise take that exit and then return early as a
+        // duplicate, leaving the chat with no mode, no title and no chips —
+        // the very state the user asked to be in.
+        aiChatStore?.startAnalyzeMode({
+          entryId: String(subject.id),
+          title: subject.title,
+        });
+
         // Asking to analyze the form the message already carries changes
-        // nothing — say so instead of re-attaching it. The check has to run
-        // before the clear below, which would otherwise hide the duplicate
+        // nothing more — say so instead of re-attaching it. The check has to
+        // run before the clear below, which would otherwise hide the duplicate
         // from the filter and make every repeated click mint a new record.
         const { duplicates: subjectDuplicate } = splitDuplicateAttachments(
           useAttachmentsStore,
@@ -165,18 +184,6 @@ export const useAttachHostFilesToChat = () => {
             cap,
           };
         }
-
-        // Enter the mode now, not when the round trip below comes back with
-        // the records: the cap and the composer's attach actions are derived
-        // from it, and until it is set they still advertise the ordinary
-        // chat. The reservation a few lines down then fills the single slot,
-        // so a file dropped on the panel while this attach is in flight is
-        // refused instead of landing beside the form. The provider starts the
-        // mode again from the attach report — same subject, same phase.
-        aiChatStore?.startAnalyzeMode({
-          entryId: String(subject.id),
-          title: subject.title,
-        });
 
         // An analyze attach owns the message, so it starts from an empty
         // draft: whatever the user had picked before is dropped (chips and

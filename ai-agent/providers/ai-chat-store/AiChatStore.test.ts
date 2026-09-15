@@ -183,12 +183,28 @@ describe("AiChatStore analyze mode", () => {
     expect(store.isAnalyzeMode).toBe(true);
   });
 
-  it("ends when a new chat is opened", () => {
+  it("ends when a new chat is opened on a closed panel", () => {
     store.startAnalyzeMode(form);
 
     store.openNewChat();
 
+    expect(store.pendingNewChat).toBe(true);
     expect(store.isAnalyzeMode).toBe(false);
+  });
+
+  // Raising a panel that is already open starts no conversation — it keeps
+  // the thread, and the mode is part of that thread. Every attach entry point
+  // (plain "Ask AI", a repeat of "Analyze responses") comes through here
+  // first, so ending the mode unconditionally would take it away from the
+  // chat the user is looking at, chips and panel title included.
+  it("keeps the mode when the panel is already open", () => {
+    store.open();
+    store.startAnalyzeMode(form);
+
+    store.openNewChat();
+
+    expect(store.pendingNewChat).toBe(false);
+    expect(store.isAnalyzeMode).toBe(true);
   });
 
   it("is idempotent to end, and reports nothing when off", () => {

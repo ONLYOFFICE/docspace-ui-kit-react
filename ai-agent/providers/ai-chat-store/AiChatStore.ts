@@ -33,17 +33,23 @@ export type AiChatRouterPage =
  * The "Analyze responses" mode: the chat is about one PDF form's collected
  * answers until an explicit edge ends it.
  *
- * `phase` is what tells the two ways the form can leave the composer apart —
- * `pending` means the form is still on the draft and removing its chip exits
- * the mode, `active` means the first message took it and the mode now stands
- * on its own.
+ * `phase` exists because "the composer holds no form" means three different
+ * things, and only the order of events tells them apart:
+ *
+ * - `attaching` — the mode is entered, the draft has been emptied for the
+ *   form and its record has not come back yet. An empty draft here is this
+ *   attach in flight.
+ * - `pending` — the form is on the draft. An empty draft now is the user
+ *   taking its chip off, which exits the mode.
+ * - `active` — the first message took the form off the draft. An empty draft
+ *   is how the mode looks from here on, and the mode stands on its own.
  */
 export type AnalyzeMode = {
   /** DocSpace file id of the form. */
   entryId: string;
   /** File name, shown in the banner and the chips header. */
   title: string;
-  phase: "pending" | "active";
+  phase: "attaching" | "pending" | "active";
 };
 
 // Docked (non-fullscreen) panel width on desktop. Matches the CSS default of
@@ -120,11 +126,21 @@ class AiChatStore {
   }
 
   /**
-   * Before the first message the form still sits on the draft, so removing
-   * its chip is a way out of the mode; afterwards there is no chip and the
-   * mode is held by this store alone.
+   * The form still owns a slot on the draft — it is on it, or on its way
+   * there. Until the first message goes out, that slot is the one thing the
+   * composer accepts (see `resolveAttachmentCap`).
    */
   get isAnalyzePending(): boolean {
+    return this.isAnalyzeMode && this.analyzeMode?.phase !== "active";
+  }
+
+  /**
+   * The form's chip is on the draft, so an empty draft means the user took it
+   * off — the one reading of "no form on the composer" that exits the mode.
+   * False while the attach is still in flight, when the draft is empty
+   * because this very mode emptied it.
+   */
+  get isAnalyzeOnDraft(): boolean {
     return this.analyzeMode?.phase === "pending";
   }
 
@@ -170,11 +186,18 @@ class AiChatStore {
     if (!this.isVisible) {
       this.pendingNewChat = true;
       this.panelWidth = DEFAULT_CHAT_PANEL_WIDTH;
+      // A fresh conversation is not the one that was analyzing a form.
+      //
+      // Only here, inside the branch that actually starts one. An already
+      // open chat keeps its thread (that is the whole point of this entry
+      // point), and the analyze mode is part of that thread's state: ending
+      // it for a panel that is merely being raised would take the mode away
+      // on every "Ask AI" and every repeat of "Analyze responses", since both
+      // come through here before they attach anything. The new-thread paths
+      // that must end it still do, through `onThreadsUpdated` — the reset
+      // this flag triggers arrives as a "switched" thread event.
+      this.endAnalyzeMode();
     }
-    // A fresh conversation is not the one that was analyzing a form. The
-    // analyze entry point opens the chat through here too, but it starts its
-    // mode afterwards, once the form is attached.
-    this.endAnalyzeMode();
     this.isVisible = true;
   };
 
@@ -228,12 +251,34 @@ class AiChatStore {
   /**
    * Enter the mode for `form`, or move it to another form — a second
    * "Analyze responses" is a new subject, not a second mode.
+   *
+   * Called when the attach starts, so the mode begins in `attaching`: the
+   * draft is emptied for the form before its record comes back, and that gap
+   * must not read as the user removing the chip. Re-entering the mode for the
+   * form it is already on leaves the phase alone, so a repeated click cannot
+   * push a sent mode back to the start.
    */
   startAnalyzeMode = (form: { entryId: string; title: string }) => {
     // Without an entry id the questions endpoint has nothing to ask about and
     // the banner nothing to name, so there is no mode to enter.
     if (!form.entryId) return;
-    this.analyzeMode = { ...form, phase: "pending" };
+    if (this.analyzeMode?.entryId === form.entryId) {
+      this.analyzeMode.title = form.title;
+      return;
+    }
+    this.analyzeMode = { ...form, phase: "attaching" };
+  };
+
+  /**
+   * The form's chip is on the draft now — the attach reported its record.
+   * From here an empty draft is the user backing out (see
+   * {@link endAnalyzeOnChipRemoval}).
+   */
+  markAnalyzeAttached = (entryId: string) => {
+    if (this.analyzeMode?.entryId !== entryId) return;
+    if (this.analyzeMode.phase === "attaching") {
+      this.analyzeMode.phase = "pending";
+    }
   };
 
   /**
@@ -254,11 +299,12 @@ class AiChatStore {
 /**
  * Backing out of the analyze mode by taking the form's chip off the draft.
  *
- * Before the first message the form is still on the composer, so removing it
- * is how a user leaves the mode. After the send the draft is empty by design
- * (the widget clears it as soon as the send is approved), and that empty draft
- * must not read as the same gesture — which is what the phase is for: the send
- * middleware flips it to `active` synchronously, ahead of the clear.
+ * Between the chip landing and the first message, removing it is how a user
+ * leaves the mode. The other two times the draft is empty are not that
+ * gesture, and the phase is what tells them apart: the attach clears the
+ * draft before the form's record arrives (`attaching`), and the send clears
+ * it on the way out (`active`, flipped by the send middleware synchronously,
+ * ahead of the clear).
  *
  * Lives here, beside the store, rather than inside the effect that calls it
  * (`AiChatStoresBridge`): that module pulls in the whole widget, and the order
@@ -269,7 +315,7 @@ export const endAnalyzeOnChipRemoval = (
   store: AiChatStore,
   hasAnalyzeChip: boolean,
 ) => {
-  if (!hasAnalyzeChip && store.isAnalyzePending) store.endAnalyzeMode();
+  if (!hasAnalyzeChip && store.isAnalyzeOnDraft) store.endAnalyzeMode();
 };
 
 export default AiChatStore;

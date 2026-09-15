@@ -46,7 +46,10 @@ describe("analyze mode edges", () => {
 
   beforeEach(() => {
     store = new AiChatStore();
+    // The two halves of entering the mode: the attach starts it, and the
+    // records coming back put the chip on the draft.
     store.startAnalyzeMode({ entryId: "42", title: "Survey.pdf" });
+    store.markAnalyzeAttached("42");
   });
 
   // What `useMessages` does on send: the middleware chain runs first
@@ -54,8 +57,8 @@ describe("analyze mode edges", () => {
   // do the effects watching the draft get to see it.
   const send = () => {
     analyzeSentMiddleware(store).beforeSend?.({} as never);
-    const chipGone = false;
-    endAnalyzeOnChipRemoval(store, chipGone);
+    const draftIsEmpty = false;
+    endAnalyzeOnChipRemoval(store, draftIsEmpty);
   };
 
   it("survives the send that empties the composer", () => {
@@ -78,6 +81,37 @@ describe("analyze mode edges", () => {
 
   it("keeps the mode while the chip is still on the draft", () => {
     endAnalyzeOnChipRemoval(store, true);
+
+    expect(store.isAnalyzeMode).toBe(true);
+  });
+
+  // Switching to another form empties the draft for it and only then asks the
+  // backend for its record. The chip is gone for that whole round trip, and
+  // reading it as "the user backed out" is what made the panel title fall
+  // back to the plain chat name and back again — a visible flicker on every
+  // second "Analyze responses".
+  it("holds the mode while the next form is still being attached", () => {
+    store.startAnalyzeMode({ entryId: "77", title: "Other.pdf" });
+
+    endAnalyzeOnChipRemoval(store, false);
+
+    expect(store.isAnalyzeMode).toBe(true);
+    expect(store.analyzeEntryId).toBe("77");
+
+    // And once its chip lands, removing it exits as usual.
+    store.markAnalyzeAttached("77");
+    endAnalyzeOnChipRemoval(store, false);
+
+    expect(store.isAnalyzeMode).toBe(false);
+  });
+
+  // The records of the form that was replaced mid-flight must not promote the
+  // mode that has already moved on.
+  it("ignores an attach report from a form it no longer analyzes", () => {
+    store.startAnalyzeMode({ entryId: "77", title: "Other.pdf" });
+
+    store.markAnalyzeAttached("42");
+    endAnalyzeOnChipRemoval(store, false);
 
     expect(store.isAnalyzeMode).toBe(true);
   });
