@@ -78,9 +78,14 @@ export const readSuggestedQuestions = (
   return value.filter(isSuggestedQuestion);
 };
 
-/** Reads one long-poll answer (`POST ai/attachments/suggested-questions`). */
+/**
+ * Reads one long-poll answer (`POST ai/attachments/suggested-questions`).
+ *
+ * Keyed by the attachment id the attach round trip minted, not by the host
+ * file id: the questions belong to the record the form became in this chat.
+ */
 export type PollSuggestedQuestions = (
-  entryId: string,
+  attachmentId: string,
   signal: AbortSignal,
 ) => Promise<TSuggestedQuestionsResponse>;
 
@@ -124,13 +129,13 @@ const wait = (ms: number, signal: AbortSignal) =>
  */
 export const pollSuggestedQuestions = async (
   poll: PollSuggestedQuestions,
-  entryId: string,
+  attachmentId: string,
   signal: AbortSignal,
 ): Promise<SuggestedQuestion[] | null> => {
   while (!signal.aborted) {
     let answer: TSuggestedQuestionsResponse;
     try {
-      answer = await poll(entryId, signal);
+      answer = await poll(attachmentId, signal);
     } catch {
       // An aborted fetch lands here too; either way there is nothing to wait
       // for any more.

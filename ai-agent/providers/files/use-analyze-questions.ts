@@ -47,14 +47,16 @@ import {
  * The starter questions of the form the composer is analyzing, fetched while
  * the user waits.
  *
- * `entryId` is the DocSpace file id of that form, or `undefined` when no form
- * owns the message — passing `undefined` is how the caller says "stop": the
- * poll in flight is aborted and its answer discarded. The same happens when
- * the id changes (another form became the subject) and on unmount.
+ * `attachmentId` is the id the attach round trip minted for that form — the
+ * questions are generated per attachment record, not per host file. It is
+ * `undefined` while no form owns the message *and* while one is still being
+ * attached, and passing `undefined` is how the caller says "stop": the poll in
+ * flight is aborted and its answer discarded. The same happens when the id
+ * changes (another form became the subject) and on unmount.
  *
- * One poll per form, ever: a form that has answered — with questions or with
- * "there will be none" — is not asked again, and re-rendering while a poll
- * runs does not start a second one.
+ * One poll per attachment, ever: an attachment that has answered — with
+ * questions or with "there will be none" — is not asked again, and
+ * re-rendering while a poll runs does not start a second one.
  *
  * `onTyping` is returned rather than watched here: the moment the user writes
  * their own question the suggestions are moot, so the caller wires it to the
@@ -62,7 +64,7 @@ import {
  */
 export const useAnalyzeQuestions = (
   poll: PollSuggestedQuestions,
-  entryId: string | undefined,
+  attachmentId: string | undefined,
 ): {
   questions: SuggestedQuestion[] | null;
   /** Call when the user starts typing: aborts the wait for good. */
@@ -73,8 +75,8 @@ export const useAnalyzeQuestions = (
   );
 
   const controllerRef = React.useRef<AbortController | null>(null);
-  // The form this hook is already committed to, so a re-render cannot start a
-  // second poll for it.
+  // The attachment this hook is already committed to, so a re-render cannot
+  // start a second poll for it.
   const polledRef = React.useRef<string | null>(null);
 
   const abort = React.useCallback(() => {
@@ -83,31 +85,34 @@ export const useAnalyzeQuestions = (
   }, []);
 
   React.useEffect(() => {
-    if (!entryId) {
-      // The form left the draft (chip removed, message sent, thread
-      // switched): drop the questions with it, so the next form starts clean.
+    if (!attachmentId) {
+      // No attachment to ask about: the mode ended, or its form is still on
+      // its way in. Drop the questions either way, so the next one starts
+      // clean.
       abort();
       polledRef.current = null;
       setQuestions(null);
       return;
     }
 
-    if (polledRef.current === entryId) return;
+    if (polledRef.current === attachmentId) return;
 
     // A different form took over mid-flight — the previous answer must not
     // land on this one.
     abort();
-    polledRef.current = entryId;
+    polledRef.current = attachmentId;
     setQuestions(null);
 
     const controller = new AbortController();
     controllerRef.current = controller;
 
-    pollSuggestedQuestions(poll, entryId, controller.signal).then((result) => {
-      if (controller.signal.aborted) return;
-      setQuestions(result);
-    });
-  }, [entryId, poll, abort]);
+    pollSuggestedQuestions(poll, attachmentId, controller.signal).then(
+      (result) => {
+        if (controller.signal.aborted) return;
+        setQuestions(result);
+      },
+    );
+  }, [attachmentId, poll, abort]);
 
   React.useEffect(() => () => abort(), [abort]);
 

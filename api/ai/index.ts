@@ -77,15 +77,18 @@ export class AiApi extends BaseCustomApi {
    * not an analyzable form, the external database is off, or the generation
    * failed). Keep calling while `pending`; `signal` aborts the wait.
    *
-   * `entryId` is the DocSpace file id of the form, not the chat attachment id.
-   * The public route is the AI service's POST with the id in the body, like
-   * its other attachment routes (`common/ASC.NewAi/app/apiCatalog.ts`); the
+   * `attachmentId` is the id `attachments/save-files-many` minted when the
+   * form was attached to the chat — not the DocSpace file id. The questions
+   * are generated per attachment, so only that id identifies the record they
+   * belong to. The public route is the AI service's POST with the id in the
+   * body, like its other attachment routes
+   * (`common/ASC.NewAi/app/apiCatalog.ts`); the
    * `GET .../{id}/suggested-questions` it forwards to is internal.
    */
-  getSuggestedQuestions(entryId: string | number, signal?: AbortSignal) {
+  getSuggestedQuestions(attachmentId: string | number, signal?: AbortSignal) {
     return this.request<TSuggestedQuestionsResponse>(
       `/ai/attachments/suggested-questions`,
-      { method: "POST", data: { id: String(entryId) }, signal },
+      { method: "POST", data: { id: String(attachmentId) }, signal },
     );
   }
 }

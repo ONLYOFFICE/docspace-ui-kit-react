@@ -136,18 +136,27 @@ export const rememberFormAttachments = (
 };
 
 /**
- * Whether the draft carries an attachment that owns the message — a form the
- * user asked to analyze. Intersected with the live refs, so removing the chip
- * (or sending the message, which clears the draft) lifts the lock on its own.
+ * The id of the attachment that owns the message — a form the user asked to
+ * analyze — or undefined when the draft carries none.
+ *
+ * That id is what `attachments/save-files-many` minted for the file, and what
+ * the starter-questions endpoint is keyed by. Intersected with the live refs,
+ * so removing the chip (or sending the message, which clears the draft) drops
+ * it on its own.
  */
-export const hasAnalyzeAttachment = (
+export const findAnalyzeAttachmentId = (
   useAttachmentsStore: AttachmentsStore,
-): boolean => {
+): string | undefined => {
   const registry = getRegistry(useAttachmentsStore);
-  if (registry.analyzeOnlyIds.size === 0) return false;
+  if (registry.analyzeOnlyIds.size === 0) return undefined;
 
   const { attachmentFiles, attachmentImages } = useAttachmentsStore.getState();
-  return [...attachmentFiles, ...attachmentImages].some((ref) =>
+  return [...attachmentFiles, ...attachmentImages].find((ref) =>
     registry.analyzeOnlyIds.has(ref.id),
-  );
+  )?.id;
 };
+
+/** Whether the draft carries such an attachment at all. */
+export const hasAnalyzeAttachment = (
+  useAttachmentsStore: AttachmentsStore,
+): boolean => findAnalyzeAttachmentId(useAttachmentsStore) !== undefined;

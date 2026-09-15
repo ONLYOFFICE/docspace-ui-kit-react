@@ -558,13 +558,17 @@ const AiAgentProviders = ({
   // derived from that mode. Only the flat fields are observed, never the mode
   // object itself.
   const aiChatStore = useMemo(() => new AiChatStore(), []);
-  const { analyzeActive, analyzePending, analyzeEntryId, analyzeFileName } =
-    useObserver(() => ({
-      analyzeActive: aiChatStore.isAnalyzeMode,
-      analyzePending: aiChatStore.isAnalyzePending,
-      analyzeEntryId: aiChatStore.analyzeEntryId,
-      analyzeFileName: aiChatStore.analyzeFormTitle,
-    }));
+  const {
+    analyzeActive,
+    analyzePending,
+    analyzeAttachmentId,
+    analyzeFileName,
+  } = useObserver(() => ({
+    analyzeActive: aiChatStore.isAnalyzeMode,
+    analyzePending: aiChatStore.isAnalyzePending,
+    analyzeAttachmentId: aiChatStore.analyzeAttachmentId,
+    analyzeFileName: aiChatStore.analyzeFormTitle,
+  }));
 
   // Ids of attached files the backend flagged as analyzable. The attachments
   // store keeps only `{id, title, kind, path, type}` per ref, so `canAnalyze`
@@ -595,7 +599,10 @@ const AiAgentProviders = ({
           entryId: subject.entryId,
           title: subject.title,
         });
-        aiChatStore.markAnalyzeAttached(subject.entryId);
+        // `subject.id` is what `attachments/save-files-many` minted for the
+        // form; the starter questions are asked for by that, not by the host
+        // file id, so this report is the first moment the poll can start.
+        aiChatStore.markAnalyzeAttached(subject.entryId, subject.id);
       }
 
       const analyzable = attached.filter((f) => f.canAnalyze);
@@ -861,13 +868,15 @@ const AiAgentProviders = ({
   // showing the static chips: in this mode the message is about this form's
   // answers, and a generic chip would ask the wrong question.
   const pollSuggestedQuestions = useCallback<PollSuggestedQuestions>(
-    (entryId, signal) => aiApi.getSuggestedQuestions(entryId, signal),
+    (attachmentId, signal) => aiApi.getSuggestedQuestions(attachmentId, signal),
     [aiApi],
   );
 
+  // Asked for by the attachment the form became, so the wait starts only once
+  // the attach has reported it back.
   const { questions: analyzeQuestions, onTyping } = useAnalyzeQuestions(
     pollSuggestedQuestions,
-    analyzeEntryId,
+    analyzeAttachmentId,
   );
 
   // Writing your own question makes the suggestions moot — stop waiting for

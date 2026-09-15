@@ -45,8 +45,15 @@ export type AiChatRouterPage =
  *   is how the mode looks from here on, and the mode stands on its own.
  */
 export type AnalyzeMode = {
-  /** DocSpace file id of the form. */
+  /** DocSpace file id of the form — what the entry points hand over. */
   entryId: string;
+  /**
+   * Id `attachments/save-files-many` minted for the form when it was
+   * attached, and the key the starter-questions endpoint answers by. Absent
+   * until the attach reports back, which is why the questions can only be
+   * asked for from `attaching` onwards.
+   */
+  attachmentId?: string;
   /** File name, shown in the banner and the chips header. */
   title: string;
   phase: "attaching" | "pending" | "active";
@@ -115,9 +122,17 @@ class AiChatStore {
     return this.analyzeMode !== null;
   }
 
-  /** DocSpace file id of the analyzed form — the questions endpoint's key. */
+  /** DocSpace file id of the analyzed form. */
   get analyzeEntryId(): string | undefined {
     return this.analyzeMode?.entryId;
+  }
+
+  /**
+   * The attachment the form became — the key the starter questions are asked
+   * for. Undefined until the attach reports it back.
+   */
+  get analyzeAttachmentId(): string | undefined {
+    return this.analyzeMode?.attachmentId;
   }
 
   /** File name of the analyzed form, for the banner and the chips header. */
@@ -277,12 +292,13 @@ class AiChatStore {
   };
 
   /**
-   * The form's chip is on the draft now — the attach reported its record.
-   * From here an empty draft is the user backing out (see
-   * {@link endAnalyzeOnChipRemoval}).
+   * The form's chip is on the draft now — the attach reported its record,
+   * and with it the attachment id the questions are asked for. From here an
+   * empty draft is the user backing out (see {@link endAnalyzeOnChipRemoval}).
    */
-  markAnalyzeAttached = (entryId: string) => {
+  markAnalyzeAttached = (entryId: string, attachmentId?: string) => {
     if (this.analyzeMode?.entryId !== entryId) return;
+    if (attachmentId) this.analyzeMode.attachmentId = attachmentId;
     if (this.analyzeMode.phase === "attaching") {
       this.analyzeMode.phase = "pending";
     }

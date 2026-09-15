@@ -42,7 +42,11 @@ import {
 } from "./attachment-limit";
 import { splitDuplicateAttachments } from "./duplicate-attachments";
 import { reserveAttachmentChips } from "./limits";
-import { hasAnalyzeAttachment, hasFormResults } from "./form-attachments";
+import {
+  findAnalyzeAttachmentId,
+  hasAnalyzeAttachment,
+  hasFormResults,
+} from "./form-attachments";
 
 // The subset of a host file/folder view-model the composer needs. Folders are
 // accepted (and skipped) so callers can hand over a raw selection without
@@ -228,8 +232,13 @@ export const useAttachHostFilesToChat = () => {
           // chip is on the draft — so the mode entered a moment ago is past
           // its attaching phase already. Without this it would stay there for
           // good (only an attach report promotes it), and a mode that never
-          // reaches `pending` cannot be left by taking the chip off.
-          aiChatStore?.markAnalyzeAttached(String(subject.id));
+          // reaches `pending` cannot be left by taking the chip off. The
+          // attachment id comes off that existing chip, which is also what
+          // the starter questions are asked for.
+          aiChatStore?.markAnalyzeAttached(
+            String(subject.id),
+            findAnalyzeAttachmentId(useAttachmentsStore),
+          );
 
           return {
             attached: 0,

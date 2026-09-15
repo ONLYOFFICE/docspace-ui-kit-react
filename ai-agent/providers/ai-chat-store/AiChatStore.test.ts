@@ -122,6 +122,27 @@ describe("AiChatStore analyze mode", () => {
     expect(store.isAnalyzePending).toBe(true);
   });
 
+  // The starter questions are generated per attachment record, so the id the
+  // attach minted is the key they are asked for — the host file id cannot
+  // stand in for it.
+  it("remembers the attachment id the attach reported", () => {
+    store.startAnalyzeMode(form);
+    expect(store.analyzeAttachmentId).toBeUndefined();
+
+    store.markAnalyzeAttached("42", "att-42");
+
+    expect(store.analyzeAttachmentId).toBe("att-42");
+    expect(store.isAnalyzeOnDraft).toBe(true);
+  });
+
+  it("ignores an attachment id reported for another form", () => {
+    store.startAnalyzeMode(form);
+
+    store.markAnalyzeAttached("77", "att-77");
+
+    expect(store.analyzeAttachmentId).toBeUndefined();
+  });
+
   it("refuses to start without an entry id", () => {
     // Nothing to ask the questions endpoint about, nothing to name.
     store.startAnalyzeMode({ entryId: "", title: "Survey.pdf" });
