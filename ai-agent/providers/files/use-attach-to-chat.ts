@@ -146,13 +146,45 @@ export const useAttachHostFilesToChat = () => {
       const skippedBesideSubject = notFolders.length - candidates.length;
 
       if (subject) {
-        // Not while the analyzing chat is waiting on its answer. Starting a
-        // subject empties the draft and re-points the whole chat — panel
-        // title, chips, the poll for the new form's questions — at a moment
-        // when a reply about the previous form is still arriving, and that
-        // reply would land in a chat that no longer says what it is about.
-        // Read at click time rather than subscribed to: this hook would
-        // otherwise re-render on every token of every stream.
+        const subjectId = String(subject.id);
+
+        // Clicking "Analyze responses" on the form this chat is already
+        // analyzing asks for the state it is in, so it changes nothing and
+        // refuses nothing: the answer is "that one is already here", the same
+        // one a second pick of an attached file gets. Saying "this chat works
+        // with X only" instead would name the very file the user just clicked
+        // and send them to a new chat for no reason.
+        //
+        // It cannot re-attach either, not even once the message has taken the
+        // chip: the mode outlives it, and minting a second record for the
+        // same form mid-conversation is the thing the subject rule exists to
+        // prevent.
+        if (aiChatStore?.isAnalyzeMode && aiChatStore.analyzeEntryId === subjectId) {
+          // The chip is on the draft whenever the message has not gone out,
+          // so this is also the moment a mode still stuck in `attaching` (its
+          // records reported to nobody) can be promoted — and the attachment
+          // id the starter questions are asked for picked up with it.
+          aiChatStore.markAnalyzeAttached(
+            subjectId,
+            findAnalyzeAttachmentId(useAttachmentsStore),
+          );
+
+          return {
+            attached: 0,
+            skippedFolders,
+            skippedOverLimit: skippedBesideSubject,
+            duplicates: candidates.length,
+            cap,
+          };
+        }
+
+        // Not while the analyzing chat is waiting on its answer. Taking on
+        // another subject empties the draft and re-points the whole chat —
+        // panel title, chips, the poll for the new form's questions — at a
+        // moment when a reply about the previous form is still arriving, and
+        // that reply would land in a chat that no longer says what it is
+        // about. Read at click time rather than subscribed to: this hook
+        // would otherwise re-render on every token of every stream.
         if (
           aiChatStore?.isAnalyzeMode &&
           useMessageStore.getState().isRequestRunning
@@ -162,7 +194,11 @@ export const useAttachHostFilesToChat = () => {
             skippedFolders,
             skippedOverLimit: notFolders.length,
             duplicates: 0,
-            cap: { ...cap, limit: 0, reason: "busy" },
+            // Built here rather than spread from the ambient cap: that one
+            // carries an `analyze` fileName which means nothing under this
+            // reason, and a cap that reports a file it is not about is a trap
+            // for the next reader of the toast code.
+            cap: { limit: 0, reason: "busy" },
           };
         }
 
@@ -174,9 +210,7 @@ export const useAttachHostFilesToChat = () => {
         // refusal does for an ordinary file.
         //
         // The same holds once the message is sent: the mode outlives the
-        // chip, so a second "Analyze responses" then has the same answer.
-        // Clicking it on the form the chat is already analyzing is refused
-        // through the same door — there is nothing to change either way.
+        // chip, so a second form is refused then too.
         if (aiChatStore?.isAnalyzeMode) {
           return {
             attached: 0,
@@ -211,17 +245,18 @@ export const useAttachHostFilesToChat = () => {
         // duplicate, leaving the chat with no mode, no title and no chips —
         // the very state the user asked to be in.
         aiChatStore?.startAnalyzeMode({
-          entryId: String(subject.id),
+          entryId: subjectId,
           title: subject.title,
         });
 
-        // Asking to analyze the form the message already carries changes
-        // nothing more — say so instead of re-attaching it. The check has to
-        // run before the clear below, which would otherwise hide the duplicate
-        // from the filter and make every repeated click mint a new record.
+        // The mode was off, yet this form may still be on the draft from one
+        // that ended without clearing it. Re-attaching would mint a second
+        // record for a chip that is already there, so the check has to run
+        // before the clear below — which would otherwise hide the duplicate
+        // from the filter.
         const { duplicates: subjectDuplicate } = splitDuplicateAttachments(
           useAttachmentsStore,
-          [String(subject.id)],
+          [subjectId],
         );
 
         if (
@@ -236,7 +271,7 @@ export const useAttachHostFilesToChat = () => {
           // attachment id comes off that existing chip, which is also what
           // the starter questions are asked for.
           aiChatStore?.markAnalyzeAttached(
-            String(subject.id),
+            subjectId,
             findAnalyzeAttachmentId(useAttachmentsStore),
           );
 

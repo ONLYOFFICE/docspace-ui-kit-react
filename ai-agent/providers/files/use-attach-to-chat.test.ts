@@ -377,6 +377,47 @@ describe("useAttachHostFilesToChat accounting", () => {
   // first, and raising it ends the mode — so if this call returns early as a
   // duplicate without re-entering, the click the user meant as "yes, this
   // form" is what takes the mode, the panel title and the chips away.
+  // Asking for the form the chat is already analyzing asks for the state it
+  // is in. It is answered like a second pick of an attached file — "already
+  // there" — not like a rejected subject: naming the clicked file in a "this
+  // chat works with X only" toast and sending the user to a new chat would
+  // answer a question nobody asked.
+  it.each([
+    ["before the first message", false],
+    ["after the message is sent", true],
+  ])("reports the form it is already analyzing as a duplicate %s", async (
+    _case,
+    sent,
+  ) => {
+    const store = new AiChatStore();
+    storeState.attachmentFiles = [attachedRef("7")];
+    rememberFormAttachments(useAttachmentsStore as never, {
+      withResults: [],
+      analyzeOnly: ["att-7"],
+    });
+    store.startAnalyzeMode({ entryId: "7", title: "file-7.docx" });
+    store.markAnalyzeAttached("7", "att-7");
+    if (sent) {
+      store.markAnalyzeSent();
+      storeState.attachmentFiles = [];
+    }
+
+    const result = await attachUnderStore(
+      [{ ...file(7), analyzeOnly: true }],
+      store,
+    );
+
+    expect(result.duplicates).toBe(1);
+    expect(result.attached).toBe(0);
+    expect(result.skippedOverLimit).toBe(0);
+    // No second record for a form this chat is already about, and the draft
+    // is left exactly as the send (or the attach) left it.
+    expect(attachFilesToChat).not.toHaveBeenCalled();
+    expect(clearAttachmentFiles).not.toHaveBeenCalled();
+    expect(store.analyzeEntryId).toBe("7");
+    expect(store.isAnalyzePending).toBe(!sent);
+  });
+
   // A sent analyze chat is still about its form while the answer streams in.
   // Pointing it at another one now would swap the panel title, the chips and
   // the question poll out from under a reply that is still arriving.
