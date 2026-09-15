@@ -144,6 +144,27 @@ const hasExportsMap = (packageName) => {
 
 const HAS_EXTENSION = /\.[a-zA-Z0-9]+$/;
 
+// What the specifier actually points at on disk -- `.js` is only the right
+// suffix for a file. `react-syntax-highlighter/dist/cjs/styles/prism` is a
+// directory, so rewriting it to `prism.js` produced a specifier that resolves
+// nowhere and broke every consumer that took the ESM build of
+// `ai-agent/markdown/code-block`.
+const suffixFor = (id, packageName) => {
+	let root;
+	try {
+		root = path.dirname(require.resolve(`${packageName}/package.json`));
+	} catch {
+		return null; // not resolvable here: leave the specifier as the author wrote it
+	}
+
+	const target = path.join(root, id.slice(packageName.length + 1));
+
+	if (existsSync(`${target}.js`)) return ".js";
+	if (existsSync(path.join(target, "index.js"))) return "/index.js";
+
+	return null;
+};
+
 // Only rewrites a deep import (`pkg/sub/path`) into a *declared* dependency
 // that has no `exports` map and no extension yet. Bare package roots
 // (`import x from "lodash"`) and Node builtins are untouched.
@@ -167,9 +188,18 @@ const addJsExtensionToDeepImports = () => ({
 					return full;
 				}
 
+				const ending = suffixFor(id, pkgMatch);
+
+				if (!ending) {
+					this.warn(
+						`${id} resolves to neither a .js file nor a directory with an index.js; left as is.`,
+					);
+					return full;
+				}
+
 				changed = true;
 
-				return `${prefix}${id}.js${suffix}`;
+				return `${prefix}${id}${ending}${suffix}`;
 			},
 		);
 
