@@ -9,6 +9,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { analyseStylesheet } from "./order-styles.mjs";
+
 const DIST = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../dist",
@@ -209,3 +211,28 @@ for (const [tree, ext] of SHAPE_TREES) {
 if (shapeFailed) process.exit(1);
 
 console.log("dist/ module shape is uniform: every module is an index file.");
+
+// The cascade in the extracted stylesheet has to match the order the modules
+// would have injected their styles in: a module's rules after everything it
+// imports. rollup-plugin-postcss gets this wrong (see scripts/order-styles.mjs)
+// and scripts/order-styles.mjs repairs it, so a non-zero count here means the
+// repair did not run, or ran before the stylesheet was rewritten.
+//
+// This is not cosmetic. 420 cross-module `:global` overrides in this package
+// resolve on order alone -- the override and the rule it overrides have equal
+// specificity -- so an inverted pair silently restyles a component in every
+// consumer, and only a visual test would catch it.
+const { inverted, ruleCount, moduleCount } = analyseStylesheet();
+
+if (inverted > 0) {
+  console.error(
+    `\n  dist/styles.css: ${inverted} rule(s) are placed ahead of a module ` +
+      "they depend on, so any equal-specificity override among them loses.\n  " +
+      "Run `node scripts/order-styles.mjs` after finalize-dist.\n",
+  );
+  process.exit(1);
+}
+
+console.log(
+  `dist/styles.css cascade follows the module graph: ${ruleCount} rules, ${moduleCount} modules.`,
+);

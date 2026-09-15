@@ -364,7 +364,15 @@ export default [
 				// Next.js -- and it is what pulled `style-inject` into dist.
 				// Consumers import "@onlyoffice/apps-ui-kit/styles.css".
 				extract: STYLESHEET,
-				minimize: true,
+				// Minification happens in scripts/order-styles.mjs instead, after
+				// the rules have been put in dependency order. Left on here it
+				// runs first, and cssnano merges rules that are *adjacent* in the
+				// wrong order it was handed -- producing selectors that span two
+				// modules, which no longer belong to either. Two builds of this
+				// commit then disagreed on the rule count (4170 / 4171 / 4172).
+				// Ordering an already-merged stylesheet cannot be correct, so the
+				// two steps have to run in this order.
+				minimize: false,
 				use: [
 					[
 						"sass",
