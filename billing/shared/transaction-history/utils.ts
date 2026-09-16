@@ -3,6 +3,10 @@ import type {
   TransactionSourceType,
   WalletOperationDto,
 } from "../../store/PaymentStore";
+import { AI_SEARCH, AI_TOOLS } from "../../constants";
+
+export const hasTransactionSource = (serviceName?: string) =>
+  serviceName === AI_TOOLS || serviceName === AI_SEARCH;
 
 const getSourceTypeLabel = (t: TTranslation, type: TransactionSourceType) => {
   switch (type) {

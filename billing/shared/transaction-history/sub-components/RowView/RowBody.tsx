@@ -15,8 +15,7 @@ import {
   getServiceQuantity,
 } from "../../../../wallet/utils";
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
-import { AI_TOOLS } from "../../../../constants";
-import { getTransactionSourceLabel } from "../../utils";
+import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
 
 type TransactionRowViewProps = {
   transaction: WalletOperationDto;
@@ -75,10 +74,9 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
       </Text>,
     ];
 
-    const sourceLabel =
-      serviceName === AI_TOOLS
-        ? getTransactionSourceLabel(t, transaction)
-        : null;
+    const sourceLabel = hasTransactionSource(serviceName)
+      ? getTransactionSourceLabel(t, transaction)
+      : null;
 
     if (sourceLabel) {
       children.push(
