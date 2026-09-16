@@ -68,8 +68,15 @@ console.log("dist/ carries no bundled dependencies.");
 // directive, every Next.js App Router consumer breaks on the first interactive
 // component. `preserveUseClient` in rollup.config.mjs restores it per chunk, so
 // this is enforced: every source occurrence must have a matching one in dist.
-const countDirective = (dir, exts) => {
-  let n = 0;
+// Matched at the top of the file, where a directive has to be, and only as a
+// statement. Searching the whole text for the quoted string counts a mention
+// in a comment or in documentation as a real directive, which fails the build
+// for no reason.
+const DIRECTIVE = /^\s*(?:\/\*[\s\S]*?\*\/\s*|\/\/[^\n]*\n\s*)*["']use client["']\s*;?/;
+
+/** Module ids (paths relative to `dir`, extension stripped) carrying the directive. */
+const modulesWithDirective = (dir, exts) => {
+  const found = new Set();
 
   const walk = (d) => {
     for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
@@ -81,42 +88,64 @@ const countDirective = (dir, exts) => {
       }
 
       if (!exts.some((ext) => entry.name.endsWith(ext))) continue;
-      if (fs.readFileSync(full, "utf8").includes('"use client"')) n += 1;
+      if (!DIRECTIVE.test(fs.readFileSync(full, "utf8"))) continue;
+
+      found.add(
+        path
+          .relative(dir, full)
+          .replace(/\\/g, "/")
+          .replace(/\.(tsx?|jsx?)$/, ""),
+      );
     }
   };
 
   walk(dir);
 
-  return n;
+  return found;
 };
 
 const SOURCE_ROOT = path.resolve(DIST, "..");
 const SKIP = ["node_modules", "dist", ".git", "storybook-static", "locales"];
 
-const inSource = fs
-  .readdirSync(SOURCE_ROOT, { withFileTypes: true })
-  .filter((e) => e.isDirectory() && !SKIP.includes(e.name))
-  .reduce(
-    (sum, e) => sum + countDirective(path.join(SOURCE_ROOT, e.name), [".ts", ".tsx"]),
-    0,
-  );
-// The package ships one output tree, so the built count must equal the source
-// count exactly -- not just "at least as many".
-const inDist = countDirective(DIST, [".js"]);
-const expectedInDist = inSource;
+// `components/button/Button.tsx` and `dist/esm/components/button/Button/index.js`
+// name the same module: preserveModules keeps the tree and `entryFileNames`
+// appends the `/index.js`. Dropping a trailing `index` from both sides makes
+// them comparable, and also collapses `context/index.ts` onto `context`.
+const moduleId = (id) => id.replace(/(^|\/)index$/, "");
 
-if (inDist !== expectedInDist) {
+const inSource = new Set(
+  fs
+    .readdirSync(SOURCE_ROOT, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && !SKIP.includes(e.name))
+    .flatMap((e) =>
+      [...modulesWithDirective(path.join(SOURCE_ROOT, e.name), [".ts", ".tsx"])].map(
+        (id) => moduleId(`${e.name}/${id}`),
+      ),
+    ),
+);
+
+const inDist = new Set(
+  [...modulesWithDirective(path.join(DIST, "esm"), [".js"])].map(moduleId),
+);
+
+// Name the modules rather than compare two totals. Equal counts can hide a
+// mismatch -- one module losing the directive while another gains it reads as
+// success -- and an unequal count says nothing about which module to look at.
+const missing = [...inSource].filter((id) => !inDist.has(id)).sort();
+
+if (missing.length > 0) {
   console.error(
-    `\n  "use client" is in ${inSource} source files but ${inDist} built files ` +
-      `(expected ${expectedInDist} -- one per module).\n  ` +
-      "Rollup strips module-level directives, so Next.js App Router consumers " +
+    `\n  "use client" is missing from ${missing.length} built module(s):\n` +
+      missing.slice(0, 10).map((id) => `    ${id}`).join("\n") +
+      (missing.length > 10 ? `\n    ... and ${missing.length - 10} more` : "") +
+      "\n\n  Rollup strips module-level directives, so Next.js App Router consumers " +
       "will\n  break on the first interactive component. Check preserveUseClient " +
       "in rollup.config.mjs.\n",
   );
   process.exit(1);
 }
 
-console.log(`"use client" preserved: ${inSource} source files, ${inDist} built files.`);
+console.log(`"use client" preserved: ${inSource.size} modules.`);
 
 // The `exports` map is a single wildcard pointing at `<subpath>/index.*`, so
 // every emitted module must actually be an index file. Two ways that can break:
