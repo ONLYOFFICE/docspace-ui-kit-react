@@ -144,7 +144,7 @@
     "xss": "^1.0.15",
     "zoom-level": "2.5.0"
   },
-  "//devDependencies": "Mirrors every non-required peerDependency: pnpm does not install peers, so the build, tests and Storybook need a concrete copy here. Transitive peers of @onlyoffice/ai-chat are deliberately absent -- pnpm resolves those into ai-chat's own node_modules from the declarations in its package.json.",
+  "//devDependencies": "Mirrors every non-required peerDependency: pnpm does not install peers, so the build, tests and Storybook need a concrete copy here. The optional peers of @onlyoffice/ai-chat (assistant-ui, radix, codemirror, the LLM vendor SDKs) are deliberately absent: nothing in this package imports them, and pnpm does not install optional peers either, so a copy here would only pretend otherwise. They are the consumer's to declare -- the DocSpace client carries the list for the apps that render the AI agent (its pnpm-workspace.yaml catalog) -- and the ai-agent tests here do not reach the code paths that load them.",
   "devDependencies": {
     "@biomejs/biome": "2.4.16",
     "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.113.tgz",
