@@ -2,9 +2,9 @@ name: CI
 
 "on":
   push:
-    branches: [main, develop, release/v*, hotfix/v*]
+    branches: [master, develop, release/v*, hotfix/v*, feature/*, bugfix/*]
   pull_request:
-    branches: [main, develop, release/v*, hotfix/v*]
+    branches: [master, develop, release/v*, hotfix/v*, feature/*, bugfix/*]
 
 env:
   NODE_VERSION: 24.x
@@ -70,13 +70,13 @@ jobs:
       # a broken build, entry points missing because publishConfig was not
       # applied, types that misrepresent the JavaScript.
       #
-      # Reporting only for now: two known problems still fail it, the
-      # `@onlyoffice/ai-chat` file: dependency and the SVG re-exports in the
-      # two icons modules. Drop `continue-on-error` once those are closed --
-      # the whole point of the step is to become blocking.
+      # Blocking. It reported only for a long time because two known problems
+      # failed it; both are closed, publint and attw are clean, and a
+      # reporting-only packaging gate had already let a real defect through --
+      # the package declared `type: commonjs` while `main` pointed at ESM, and
+      # nobody saw the warning.
       - name: Verify the package (publint + attw)
         run: pnpm verify:package
-        continue-on-error: true
 
       # locales/ is vendored and committed, and `pnpm build` no longer runs
       # the copy scripts, so what this prints is what a publish would ship --

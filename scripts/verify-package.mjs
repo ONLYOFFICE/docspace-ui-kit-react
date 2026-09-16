@@ -22,8 +22,15 @@ const PKG_DIR = path.resolve(
   "..",
 );
 
+// shell on win32: pnpm and npx are .CMD shims there, and Node will not spawn
+// one directly -- without this the script fails with ENOENT before it checks
+// anything, on the platform where nobody would think to look.
 const run = (cmd, args, opts = {}) =>
-  execFileSync(cmd, args, { encoding: "utf8", ...opts });
+  execFileSync(cmd, args, {
+    encoding: "utf8",
+    shell: process.platform === "win32",
+    ...opts,
+  });
 
 const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "ui-kit-verify-"));
 
@@ -80,6 +87,14 @@ try {
         tarball,
         "--exclude-entrypoints",
         "styles.css",
+        // cjs-resolves-to-esm states a fact about this package rather than a
+        // defect: it ships ESM only (see rollup.config.mjs for why -- the
+        // ai-chat peer has no CommonJS build), so a `require()` of it does
+        // resolve to ESM and a CommonJS consumer does need a dynamic import.
+        // The rule cannot be satisfied without shipping CJS again, and leaving
+        // it active would mean this step can never become blocking.
+        "--ignore-rules",
+        "cjs-resolves-to-esm",
       ]),
     );
   } catch (error) {
