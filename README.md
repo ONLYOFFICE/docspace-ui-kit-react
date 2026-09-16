@@ -917,4 +917,4 @@ Issues and feature requests are tracked in the [DocSpace-client repository](http
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+AGPL-3.0-only. See [LICENSE](LICENSE).
