@@ -147,7 +147,7 @@
   "//devDependencies": "Mirrors every non-required peerDependency: pnpm does not install peers, so the build, tests and Storybook need a concrete copy here. Transitive peers of @onlyoffice/ai-chat are deliberately absent -- pnpm resolves those into ai-chat's own node_modules from the declarations in its package.json.",
   "devDependencies": {
     "@biomejs/biome": "2.4.16",
-    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.110.tgz",
+    "@onlyoffice/ai-chat": "file:onlyoffice-ai-chat-0.5.113.tgz",
     "@onlyoffice/document-editor-react": "2.1.1",
     "@playwright/test": "1.58.1",
     "@rollup/plugin-commonjs": "^28.0.9",
