@@ -41,17 +41,13 @@ export const getI18NInstance = (
       debug: false,
       interpolation: {
         escapeValue: false,
-        format(value, format) {
-          if (format === "lowercase") return value.toLowerCase();
-          return value;
-        },
       },
       ns: ["Common"],
       defaultNS: "Common",
       react: {
         useSuspense: false,
       },
-      initImmediate: false,
+      initAsync: false,
     });
     isInitialized = true;
   } else if (instance.language !== lng) {
