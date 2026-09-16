@@ -9,7 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { analyseStylesheet } from "./order-styles.mjs";
+import { analyseStylesheet, collect, orderedStylesheets } from "./order-styles.mjs";
 
 const DIST = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -240,11 +240,46 @@ if (shapeFailed) process.exit(1);
 
 console.log("dist/ module shape is uniform: every module is an index file.");
 
-// The cascade in the extracted stylesheet has to match the order the modules
-// would have injected their styles in: a module's rules after everything it
-// imports. rollup-plugin-postcss gets this wrong (see scripts/order-styles.mjs)
-// and scripts/order-styles.mjs repairs it, so a non-zero count here means the
-// repair did not run, or ran before the stylesheet was rewritten.
+// Every emitted stylesheet is imported by at least one chunk, and a CSS
+// Module's is imported by its own proxy: that import is how a consumer gets a
+// component's styles at all now, so a stylesheet nothing imports is a
+// component that renders unstyled.
+const stylesheets = orderedStylesheets();
+const cssImports = new Set();
+const CSS_IMPORT_RE = /^import\s+["'](\.[^"']+\.css)["'];?/gm;
+
+for (const id of collect(path.join(DIST, "esm"))) {
+  const code = fs.readFileSync(path.join(DIST, "esm", id), "utf8");
+  for (const m of code.matchAll(CSS_IMPORT_RE)) {
+    cssImports.add(path.posix.normalize(path.posix.join(path.posix.dirname(id), m[1])));
+  }
+}
+
+let detached = 0;
+
+for (const file of stylesheets) {
+  const proxy = file.replace(/index\.css$/, "index.js");
+  const ownProxy = fs.existsSync(path.join(DIST, "esm", proxy));
+  const importedByOwnProxy =
+    ownProxy && fs.readFileSync(path.join(DIST, "esm", proxy), "utf8").startsWith('import "./index.css";');
+
+  if ((ownProxy && !importedByOwnProxy) || !cssImports.has(file)) {
+    detached += 1;
+    console.error(`  ${file}: ${ownProxy ? "not imported by its proxy" : "imported by no chunk"}`);
+  }
+}
+
+if (detached > 0) {
+  console.error(`\n  ${detached} stylesheet(s) are detached from the modules that need them.\n`);
+  process.exit(1);
+}
+
+console.log(`Per-module CSS: ${stylesheets.length} stylesheets, every one imported by the modules that use it.`);
+
+// The cascade in the assembled dist/styles.css has to match the order the
+// modules would have injected their styles in: a module's rules after
+// everything it imports. scripts/order-styles.mjs writes it that way, so a
+// non-zero count here means it did not run, or ran on a stale tree.
 //
 // This is not cosmetic. 420 cross-module `:global` overrides in this package
 // resolve on order alone -- the override and the rule it overrides have equal
@@ -256,7 +291,7 @@ if (inverted > 0) {
   console.error(
     `\n  dist/styles.css: ${inverted} rule(s) are placed ahead of a module ` +
       "they depend on, so any equal-specificity override among them loses.\n  " +
-      "Run `node scripts/order-styles.mjs` after finalize-dist.\n",
+      "Run `node scripts/order-styles.mjs` again.\n",
   );
   process.exit(1);
 }

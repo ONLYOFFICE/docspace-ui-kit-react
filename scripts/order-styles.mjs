@@ -1,7 +1,9 @@
-// Reorders dist/styles.css so a module's rules always follow its dependencies'.
+// Assembles dist/styles.css -- the whole-library stylesheet kept for consumers
+// that import it -- from the per-module CSS files the build emits, in the
+// order the cascade needs, and asserts that order for check-dist.
 //
-// Why this exists
-// ---------------
+// Why the order matters
+// ---------------------
 // The package used to inject each CSS module as its own <style> at import time
 // (`postcss({ inject: true })`). Injection order is ES module execution order,
 // which is depth-first *post*-order: a module's imports run before its own
@@ -9,43 +11,32 @@
 // Navigation's `.aiChatSlot :global(.ai-chat-button) { padding: 6px 10px }`
 // beat Button's `.button.small { padding: 0 28px }` on order, exactly as the
 // author intended -- the two selectors have identical specificity (0,2,0), so
-// order is the only thing separating them.
+// order is the only thing separating them. 420 cross-module `:global`
+// overrides in this package sit on the same cascade.
 //
-// Extracting to one stylesheet changed that, and rollup-plugin-postcss 4.0.2
-// gets the replacement order wrong twice over (see its `getExtracted`):
-//
-//   1. It seeds the walk from ONE entry chunk -- `Object.keys(bundle).find(f =>
-//      bundle[f].isEntry)`. This package has 717 entry points, so that pick is
-//      arbitrary; every CSS module not reachable from it sorts at index -1 and
-//      keeps whatever order rollup happened to transform it in. Two builds of
-//      the same commit emit different stylesheets.
-//   2. `getRecursiveImportOrder` is pre-order: it pushes a module before
-//      recursing into its imports. So for the modules it *does* reach, a
-//      component's rules land BEFORE the rules of the components it builds on
-//      -- the exact inverse of what injection did.
-//
-// Together those put Navigation's override 289 KB ahead of Button's base rule,
-// so Button won and the AI chat button in the portal header rendered 36px wider
-// than its baseline. 420 cross-module `:global` overrides in this package sit on
-// the same cascade, so this was never about one button.
+// Consumers that import components now get each module's CSS through the
+// module itself (see scripts/rollup/per-module-css.mjs) and their bundler
+// emits it in that same post-order. The bundle built here has to reproduce
+// it by hand, and the first extraction did not: rollup-plugin-postcss seeded
+// its walk from one arbitrary entry of 717 and ranked modules pre-order, which
+// put Navigation's override 289 KB ahead of Button's base rule and rendered
+// the AI chat button in the portal header 36px wider than its baseline.
 //
 // What it does
 // ------------
-// Recomputes a correct order and rewrites the stylesheet:
-//
 //   - the module graph comes from `dist/esm`, which mirrors the source tree 1:1
 //     thanks to `preserveModules`;
-//   - every rule is attributed to the module that owns it through the compiled
-//     class maps (`dist/esm/**/X.module.scss/index.js`), so the mapping is the
-//     build's own and needs no guessing from file names -- three basenames
-//     (Tabs, Amount, PaymentMethod) exist twice in this repo and only the hash
-//     suffix tells their classes apart;
-//   - the stylesheets are then topologically sorted against each other -- a
-//     stylesheet follows every stylesheet its importers build on -- and the
-//     rules are stable-sorted by that rank.
+//   - the stylesheets are topologically sorted against each other -- a
+//     stylesheet follows every stylesheet its importers build on;
+//   - the non-module stylesheets (the `.light` / `.dark` custom-property
+//     blocks, `.aui-root`) go first: they declare variables the components
+//     read and belong to no component's cascade;
+//   - the files are concatenated in that order and minified once, at the end,
+//     because cssnano merges *adjacent* rules and must only ever see rules that
+//     are already adjacent in the correct cascade.
 //
-// `check-dist.mjs` asserts the result, so a regression fails the build rather
-// than showing up as a screenshot diff.
+// `check-dist.mjs` asserts the result through `analyseStylesheet`, so a
+// regression fails the build rather than showing up as a screenshot diff.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -59,7 +50,7 @@ const ESM = path.join(DIST, "esm");
 const STYLESHEET = path.join(DIST, "styles.css");
 
 /** Every .js under a directory, as paths relative to it, sorted. */
-const collect = (root, dir = root, found = []) => {
+export const collect = (root, dir = root, found = []) => {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) collect(root, full, found);
@@ -87,7 +78,18 @@ const importsOf = (id) => {
   return out;
 };
 
+/** A CSS Module: the only stylesheets that own component rules and take part in the ranking. */
 const isStylesheet = (id) => id.includes(".module.scss");
+
+/** Every emitted stylesheet, as `<stylesheet>/index.css` paths relative to dist/esm, sorted. */
+const collectCss = (root, dir = root, found = []) => {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) collectCss(root, full, found);
+    else if (entry.name === "index.css") found.push(path.relative(root, full));
+  }
+  return found;
+};
 
 /**
  * Ranks the stylesheets, which is all the sort needs -- every rule is
@@ -231,8 +233,8 @@ const topLevelRules = (css) => {
 
 /**
  * Attributes every rule in dist/styles.css to its module and counts how many
- * sit ahead of a module they depend on. Exported so check-dist can assert the
- * count is zero without duplicating any of this.
+ * sit ahead of a rule of a module they depend on. Exported so check-dist can
+ * assert the count is zero without duplicating any of this.
  */
 export const analyseStylesheet = () => {
   const ids = collect(ESM);
@@ -269,28 +271,25 @@ export const analyseStylesheet = () => {
     return { text, index, owner };
   });
 
-  // What is left carries no module class at all: the `.light` / `.dark` custom
-  // property blocks and `.aui-root`. They declare variables the components then
-  // read, so the head of the file is both the correct place and a fixed one --
-  // inheriting the preceding rule's module would make their position depend on
-  // the very input order this script exists to normalise.
-  const rankOf = (owner) => (owner === null ? -1 : (rank.get(owner) ?? Number.MAX_SAFE_INTEGER));
+  // A rule with no module class at all -- the `.light` / `.dark` custom
+  // property blocks, `.aui-root`, hashed @keyframes -- takes part in no
+  // cross-module override and stays wherever its own stylesheet put it, so
+  // the check below skips it and compares each attributed rule with the
+  // attributed rule before it.
+  const rankOf = (owner) => rank.get(owner) ?? Number.MAX_SAFE_INTEGER;
 
-  const sorted = [...items].sort(
-    (a, b) => rankOf(a.owner) - rankOf(b.owner) || (a.owner === null ? a.text.localeCompare(b.text) : a.index - b.index),
-  );
-
-  // Pairs that were in the wrong relative order before the sort -- i.e. how
-  // much cascade the extract step had actually inverted.
   let inverted = 0;
-  for (let i = 1; i < items.length; i += 1) {
-    if (rankOf(items[i].owner) < rankOf(items[i - 1].owner)) inverted += 1;
+  let previous = null;
+
+  for (const item of items) {
+    if (item.owner === null) continue;
+    if (previous !== null && rankOf(item.owner) < rankOf(previous.owner)) inverted += 1;
+    previous = item;
   }
 
   return {
     charset,
     items,
-    sorted,
     inverted,
     unattributed,
     ruleCount: rules.length,
@@ -298,35 +297,60 @@ export const analyseStylesheet = () => {
   };
 };
 
+/**
+ * The emitted CSS files in cascade order: the plain stylesheets first, by path
+ * (they declare the `.light` / `.dark` variables the components read and take
+ * part in no override), then the CSS Modules by rank. Exported so check-dist
+ * can assert the emitted tree matches.
+ */
+export const orderedStylesheets = () => {
+  const ids = collect(ESM);
+  const rank = rankModules(ids);
+  const files = collectCss(ESM);
+  const rankOf = (file) => {
+    const chunk = file.replace(/index\.css$/, "index.js");
+    return isStylesheet(chunk) ? rank.get(chunk) ?? Number.MAX_SAFE_INTEGER : -1;
+  };
+
+  return files.sort((a, b) => rankOf(a) - rankOf(b) || a.localeCompare(b));
+};
+
 const main = async () => {
-  if (!fs.existsSync(STYLESHEET)) {
-    console.error(`${path.relative(DIST, STYLESHEET)} not found -- run finalize-dist first.`);
+  const files = orderedStylesheets();
+
+  if (files.length === 0) {
+    console.error("No stylesheets under dist/esm -- did the build run?");
     process.exit(1);
   }
 
-  const before = fs.statSync(STYLESHEET).size;
-  const { charset, sorted, inverted, unattributed, ruleCount, moduleCount } = analyseStylesheet();
-  const ordered = charset + sorted.map((r) => r.text).join("");
+  let charset = "";
+  const parts = [];
 
-  // Minify only now. cssnano merges rules that sit next to each other, so on
-  // the ordered stylesheet every merge it makes is between rules that were
-  // already adjacent in the correct cascade -- which cannot change the outcome.
-  // Run before the sort (rollup-plugin-postcss's own `minimize`) it merged
-  // across module boundaries instead, welding selectors from two modules into
-  // one rule that then belonged to neither.
+  for (const file of files) {
+    let css = fs.readFileSync(path.join(ESM, file), "utf8");
+    // One @charset, and only at the very first byte of the bundle.
+    const m = css.match(/^@charset[^;]*;\s*/);
+    if (m) {
+      charset ||= m[0].trim();
+      css = css.slice(m[0].length);
+    }
+    parts.push(css);
+  }
+
+  const ordered = (charset ? `${charset}\n` : "") + parts.join("\n");
+
   const { css } = await postcss([cssnano({ preset: "default" })]).process(ordered, {
-    from: STYLESHEET,
+    from: undefined,
     to: STYLESHEET,
   });
 
   fs.writeFileSync(STYLESHEET, css);
 
-  const after = fs.statSync(STYLESHEET).size;
+  const { inverted, ruleCount, moduleCount } = analyseStylesheet();
 
   console.log(
-    `dist/styles.css ordered and minified: ${ruleCount} rules across ${moduleCount} modules; ` +
-      `${inverted} were behind a module they depend on, ${unattributed} global rules hoisted to the head; ` +
-      `${Math.round(before / 1024)} KB -> ${Math.round(after / 1024)} KB.`,
+    `dist/styles.css assembled from ${files.length} stylesheets: ${ruleCount} rules across ${moduleCount} modules, ` +
+      `${inverted} out of cascade order; ${Math.round(Buffer.byteLength(ordered) / 1024)} KB -> ${Math.round(fs.statSync(STYLESHEET).size / 1024)} KB.`,
   );
 };
 

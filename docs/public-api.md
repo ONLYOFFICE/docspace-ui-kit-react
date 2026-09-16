@@ -206,7 +206,7 @@ Deep imports stay supported — 2 694 of the 3 609 import sites are `components/
 them is not on the table. The `exports` map therefore declares:
 
 - `.` — the barrel
-- `./styles.css` — extracted stylesheet
+- `./styles.css` — the whole-library stylesheet, for consumers that cannot take the per-module CSS each component imports itself
 - `./<module>` and `./<module>/*` for every public module above
 - portal-internal paths, resolvable but undocumented
 

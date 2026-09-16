@@ -5,17 +5,13 @@ import typescript from "@rollup/plugin-typescript";
 import svgr from "@svgr/rollup";
 import nodePolyfills from "rollup-plugin-polyfill-node";
 import peerDepsExternal from "rollup-plugin-peer-deps-external";
-import postcss from "rollup-plugin-postcss";
+import { perModuleCss } from "./scripts/rollup/per-module-css.mjs";
 
 import { builtinModules, createRequire } from "node:module";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import path from "node:path";
 
 const require = createRequire(import.meta.url);
-// A bare filename: rollup rejects absolute or relative asset names, so the
-// plugin emits one stylesheet per output format and a post-build step promotes
-// a single copy to dist/styles.css.
-const STYLESHEET = "styles.css";
 
 const pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url)));
 
@@ -383,34 +379,14 @@ export default [
 				declaration: false,
 				declarationDir: undefined,
 			}),
-			postcss({
-				modules: {
-					// Readable, greppable and overridable by consumers. A bare
-					// hash makes a reported style bug untraceable to a component.
-					generateScopedName: "dsui-[name]__[local]--[hash:base64:5]",
-				},
-				// One stylesheet, not styles injected by JS at import time.
-				// Injection has no SSR story -- four of the monorepo apps are
-				// Next.js -- and it is what pulled `style-inject` into dist.
-				// Consumers import "@onlyoffice/apps-ui-kit/styles.css".
-				extract: STYLESHEET,
-				// Minification happens in scripts/order-styles.mjs instead, after
-				// the rules have been put in dependency order. Left on here it
-				// runs first, and cssnano merges rules that are *adjacent* in the
-				// wrong order it was handed -- producing selectors that span two
-				// modules, which no longer belong to either. Two builds of this
-				// commit then disagreed on the rule count (4170 / 4171 / 4172).
-				// Ordering an already-merged stylesheet cannot be correct, so the
-				// two steps have to run in this order.
-				minimize: false,
-				use: [
-					[
-						"sass",
-						{
-							silenceDeprecations: ["legacy-js-api"],
-						},
-					],
-				],
+			// One CSS file per stylesheet, beside its module, imported by it; see
+			// scripts/rollup/per-module-css.mjs. dist/styles.css, the whole-library
+			// bundle, is assembled from those files afterwards by
+			// scripts/order-styles.mjs for consumers that still import it.
+			perModuleCss({
+				// Readable, greppable and overridable by consumers. A bare hash makes
+				// a reported style bug untraceable to a component.
+				generateScopedName: "dsui-[name]__[local]--[hash:base64:5]",
 			}),
 			addJsExtensionToDeepImports(),
 		],

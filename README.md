@@ -60,7 +60,11 @@ peers are optional and only needed by the modules that use them — `i18next` an
 portal-coupled modules, `@onlyoffice/document-editor-react` for `document-editor/`, and
 `@onlyoffice/ai-chat` for `ai-agent/`. See `peerDependencies` in `package.json`.
 
-The stylesheet is shipped separately and must be imported once:
+Styles come with the components: every module imports its own CSS file, so a
+bundler ships exactly the styles of the components you import, split along the
+same chunks as the code. Nothing has to be imported by hand. The whole-library
+stylesheet is still published for setups that cannot process CSS imports from
+`node_modules`; importing it loads every component's styles at once:
 
 ```tsx
 import "@onlyoffice/apps-ui-kit/styles.css";
