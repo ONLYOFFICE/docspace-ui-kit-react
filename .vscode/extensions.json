@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    // Drives the status-bar buttons defined in ui-kit.code-workspace.
+    // Without it the tasks still run from the command palette, the buttons
+    // just do not appear.
+    "spencerwmiles.vscode-task-buttons",
+    // Lints. Its formatter is off in this repo -- biome.json sets
+    // formatter.enabled to false -- so Prettier owns formatting.
+    "biomejs.biome",
+    "esbenp.prettier-vscode",
+    "vitest.explorer",
+    "syler.sass-indented",
+    "wix.vscode-import-cost"
+  ]
+}

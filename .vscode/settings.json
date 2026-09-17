@@ -1,0 +1,49 @@
+{
+  // Folder-level settings. The workspace file carries the buttons and the
+  // formatter bindings; these are the ones worth having even when the folder
+  // is opened directly rather than through ui-kit.code-workspace.
+
+  // dist/ and storybook-static/ are build output, css/ and fonts/ are produced
+  // by `pnpm sync-locales`, and locales holds vendored translations. Searching
+  // them buries every real hit -- dist alone mirrors the whole source tree.
+  "search.exclude": {
+    "**/dist": true,
+    "**/storybook-static": true,
+    "**/coverage": true,
+    "**/node_modules": true,
+    "css": true,
+    "fonts": true,
+    "locales/**": true,
+    "pnpm-lock.yaml": true
+  },
+  "files.watcherExclude": {
+    "**/dist/**": true,
+    "**/storybook-static/**": true,
+    "**/coverage/**": true,
+    "**/node_modules/**": true
+  },
+
+  // The repo is strict-mode TypeScript with the workspace copy pinned in
+  // devDependencies; VS Code's bundled version drifts from it.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // SCSS modules use CSS custom properties the portal defines, so the built-in
+  // validator reports unknown-variable noise on correct files.
+  "scss.validate": true,
+  "css.lint.unknownProperties": "ignore",
+
+  "editor.formatOnSave": true,
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[scss]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[json]": { "editor.defaultFormatter": "vscode.json-language-features" },
+  "[jsonc]": { "editor.defaultFormatter": "vscode.json-language-features" },
+
+  // Biome lints, it does not format here.
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "never",
+    "quickfix.biome": "never"
+  }
+}

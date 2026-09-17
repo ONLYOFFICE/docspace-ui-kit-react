@@ -29,6 +29,7 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 | `theming.md` | which layer a `var(--x)` comes from, undefined tokens failing silently, RTL |
 | `packaging.md` | `exports`, `publishConfig`, ESM-only dist, dependency placement, per-module CSS, `"use client"` |
 | `source-checks.md` | the hidden gate enforced from DocSpace-client -- hex, ASCII, indentation, assets, deps, licence |
+| `vscode-tasks.md` | the three layers behind the status-bar buttons in `ui-kit.code-workspace` |
 
 ## Tech Stack
 

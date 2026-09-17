@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Debug the test file that is open. Runs the workspace's own vitest so
+      // the config, the jsdom environment and test/setup.ts all apply.
+      "name": "Vitest: the open file",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+      "args": ["run", "${relativeFile}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "smartStep": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/vitest/**"]
+    },
+    {
+      "name": "Vitest: everything",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+      "args": ["run"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "smartStep": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/vitest/**"]
+    },
+    {
+      // Attach to a Storybook already started by the Storybook button. Launching
+      // it from here instead would fight the task over port 6006.
+      "name": "Storybook: attach a browser",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:6006",
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}
