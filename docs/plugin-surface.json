@@ -1,0 +1,1832 @@
+{
+  "entry": "index.ts",
+  "package": "@onlyoffice/apps-ui-kit",
+  "total": 449,
+  "values": 311,
+  "exports": {
+    "AIChatIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "ASIDE_PADDING_AFTER_LAST_ITEM": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "AccessRestricted": {
+      "kind": "variable",
+      "origin": "errors"
+    },
+    "ActionButton": {
+      "kind": "function",
+      "origin": "components/action-button"
+    },
+    "ActionButtonProps": {
+      "kind": "type",
+      "origin": "components/action-button"
+    },
+    "AddButton": {
+      "kind": "variable",
+      "origin": "components/add-button"
+    },
+    "AddButtonProps": {
+      "kind": "type",
+      "origin": "components/add-button"
+    },
+    "AnalyticsEvents": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "AnimationEvents": {
+      "kind": "variable",
+      "origin": "hooks/useAnimation"
+    },
+    "ArticleHideMenuIcon": {
+      "kind": "variable",
+      "origin": "components/nav-menu",
+      "external": "assets (*.react.svg)"
+    },
+    "Aside": {
+      "kind": "variable",
+      "origin": "components/aside"
+    },
+    "AsideHeader": {
+      "kind": "variable",
+      "origin": "components/aside/aside-header"
+    },
+    "AsideHeaderProps": {
+      "kind": "type",
+      "origin": "components/aside/aside-header"
+    },
+    "Avatar": {
+      "kind": "variable",
+      "origin": "components/avatar"
+    },
+    "AvatarActionKeys": {
+      "kind": "enum",
+      "origin": "components/avatar"
+    },
+    "AvatarEditorDialog": {
+      "kind": "variable",
+      "origin": "components/avatar-editor-dialog"
+    },
+    "AvatarEditorDialogProps": {
+      "kind": "type",
+      "origin": "components/avatar-editor-dialog"
+    },
+    "AvatarProps": {
+      "kind": "type",
+      "origin": "components/avatar"
+    },
+    "AvatarPure": {
+      "kind": "variable",
+      "origin": "components/avatar"
+    },
+    "AvatarRole": {
+      "kind": "enum",
+      "origin": "components/avatar"
+    },
+    "AvatarSize": {
+      "kind": "enum",
+      "origin": "components/avatar"
+    },
+    "Backdrop": {
+      "kind": "variable",
+      "origin": "components/backdrop"
+    },
+    "Badge": {
+      "kind": "variable",
+      "origin": "components/badge"
+    },
+    "BadgeProps": {
+      "kind": "type",
+      "origin": "components/badge"
+    },
+    "BarConfig": {
+      "kind": "type",
+      "origin": "components/snackbar"
+    },
+    "Base": {
+      "kind": "variable",
+      "origin": "providers/theme/themes"
+    },
+    "BaseTile": {
+      "kind": "variable",
+      "origin": "components/tiles/base-tile"
+    },
+    "BillingOverview": {
+      "kind": "other",
+      "origin": "billing/overview"
+    },
+    "BillingRoot": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "BlankPdfIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "Button": {
+      "kind": "variable",
+      "origin": "components/button"
+    },
+    "ButtonKeys": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "ButtonProps": {
+      "kind": "type",
+      "origin": "components/button"
+    },
+    "ButtonSize": {
+      "kind": "enum",
+      "origin": "components/button"
+    },
+    "Calendar": {
+      "kind": "variable",
+      "origin": "components/calendar"
+    },
+    "CalendarProps": {
+      "kind": "interface",
+      "origin": "components/calendar"
+    },
+    "Card": {
+      "kind": "variable",
+      "origin": "components/card"
+    },
+    "CardProps": {
+      "kind": "interface",
+      "origin": "components/card"
+    },
+    "CatalogSettingsPaymentIcon": {
+      "kind": "variable",
+      "origin": "components/nav-menu",
+      "external": "assets (*.react.svg)"
+    },
+    "ChatReasoningEffort": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "Checkbox": {
+      "kind": "variable",
+      "origin": "components/checkbox"
+    },
+    "CheckboxProps": {
+      "kind": "type",
+      "origin": "components/checkbox"
+    },
+    "CircleSkeleton": {
+      "kind": "variable",
+      "origin": "components/circle"
+    },
+    "CircleSkeletonProps": {
+      "kind": "type",
+      "origin": "components/circle"
+    },
+    "CollapsibleCard": {
+      "kind": "variable",
+      "origin": "components/collapsible-card"
+    },
+    "CollapsibleCardProps": {
+      "kind": "interface",
+      "origin": "components/collapsible-card"
+    },
+    "ComboBox": {
+      "kind": "variable",
+      "origin": "components/combobox"
+    },
+    "ComboBoxDisplayType": {
+      "kind": "enum",
+      "origin": "components/combobox"
+    },
+    "ComboBoxSize": {
+      "kind": "enum",
+      "origin": "components/combobox"
+    },
+    "ComboButton": {
+      "kind": "variable",
+      "origin": "components/combobox/sub-components"
+    },
+    "ComponentProps": {
+      "kind": "type",
+      "origin": "components/tooltip"
+    },
+    "Consumer": {
+      "kind": "variable",
+      "origin": "utils/context"
+    },
+    "ContentType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "Context": {
+      "kind": "variable",
+      "origin": "utils/context"
+    },
+    "ContextMenu": {
+      "kind": "variable",
+      "origin": "components/context-menu"
+    },
+    "ContextMenuButton": {
+      "kind": "variable",
+      "origin": "components/context-menu-button"
+    },
+    "ContextMenuButtonDisplayType": {
+      "kind": "enum",
+      "origin": "components/context-menu-button"
+    },
+    "ContextMenuButtonProps": {
+      "kind": "interface",
+      "origin": "components/context-menu-button"
+    },
+    "ContextMenuModel": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "ContextMenuProps": {
+      "kind": "interface",
+      "origin": "components/context-menu"
+    },
+    "ContextMenuRefType": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "ContextMenuType": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "ContextMenuTypeOnClick": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "CreateAgentIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "CreateCustomRoomIllustrationIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "CreateDocumentIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "CreateFormIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "CreateFromTemplateIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "CreateFromTextIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "CreatePresentationIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "CreateRoomIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "CreateSpreadsheetIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "DEFAULT_CHUNK_UPLOAD_SIZE": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "DEFAULT_FONT_FAMILY": {
+      "kind": "variable",
+      "origin": "providers/theme/themes"
+    },
+    "DEFAULT_MAX_UPLOAD_FILES_COUNT": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "DEFAULT_MAX_UPLOAD_THREAD_COUNT": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "Dark": {
+      "kind": "variable",
+      "origin": "providers/theme/themes"
+    },
+    "DatePicker": {
+      "kind": "variable",
+      "origin": "components/date-picker"
+    },
+    "DatePickerProps": {
+      "kind": "type",
+      "origin": "components/date-picker"
+    },
+    "DateTimePicker": {
+      "kind": "variable",
+      "origin": "components/date-time-picker"
+    },
+    "DateTimePickerProps": {
+      "kind": "type",
+      "origin": "components/date-time-picker"
+    },
+    "DateTimePickerTranslations": {
+      "kind": "type",
+      "origin": "components/date-time-picker"
+    },
+    "DeviceType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "DialogAsideSkeleton": {
+      "kind": "variable",
+      "origin": "components/modal-dialog/sub-components/skeletons"
+    },
+    "DialogModalSkeleton": {
+      "kind": "variable",
+      "origin": "components/modal-dialog/sub-components/skeletons"
+    },
+    "DialogReassignmentSkeleton": {
+      "kind": "variable",
+      "origin": "components/modal-dialog/sub-components/skeletons"
+    },
+    "DistributedTaskStatus": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "DomHelpers": {
+      "kind": "class",
+      "origin": "utils/dom-helpers"
+    },
+    "DropDown": {
+      "kind": "variable",
+      "origin": "components/drop-down"
+    },
+    "DropDownItem": {
+      "kind": "variable",
+      "origin": "components/drop-down-item"
+    },
+    "DropDownItemProps": {
+      "kind": "type",
+      "origin": "components/drop-down-item"
+    },
+    "EBOOK_EXST": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "EMPTY_ARRAY": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "EMPTY_OBJECT": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "Email": {
+      "kind": "class",
+      "origin": "utils/email"
+    },
+    "EmailInput": {
+      "kind": "variable",
+      "origin": "components/email-input"
+    },
+    "EmailInputProps": {
+      "kind": "type",
+      "origin": "components/email-input"
+    },
+    "EmailSettings": {
+      "kind": "class",
+      "origin": "utils/email"
+    },
+    "EmployeeActivationStatus": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "EmployeeFullDto": {
+      "kind": "type",
+      "origin": "types",
+      "external": "@onlyoffice/docspace-api-sdk"
+    },
+    "EmployeeStatus": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "EmployeeType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "EmptyScreenContainer": {
+      "kind": "variable",
+      "origin": "components/empty-screen-container"
+    },
+    "EmptyView": {
+      "kind": "variable",
+      "origin": "components/empty-view"
+    },
+    "EmptyViewButtonType": {
+      "kind": "type",
+      "origin": "components/empty-view"
+    },
+    "EmptyViewItemType": {
+      "kind": "type",
+      "origin": "components/empty-view"
+    },
+    "EmptyViewLinkType": {
+      "kind": "type",
+      "origin": "components/empty-view"
+    },
+    "EmptyViewOptionsType": {
+      "kind": "type",
+      "origin": "components/empty-view"
+    },
+    "EmptyViewProps": {
+      "kind": "type",
+      "origin": "components/empty-view"
+    },
+    "EmptyViewSeparatorType": {
+      "kind": "type",
+      "origin": "components/empty-view"
+    },
+    "Encoder": {
+      "kind": "variable",
+      "origin": "utils/encoder"
+    },
+    "Error401": {
+      "kind": "variable",
+      "origin": "errors"
+    },
+    "Error403": {
+      "kind": "variable",
+      "origin": "errors"
+    },
+    "Error404": {
+      "kind": "variable",
+      "origin": "errors"
+    },
+    "ErrorBoundary": {
+      "kind": "class",
+      "origin": "providers/error-boundary"
+    },
+    "ErrorInvalidLink": {
+      "kind": "variable",
+      "origin": "errors"
+    },
+    "ErrorKeys": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "ErrorOfflineContainer": {
+      "kind": "variable",
+      "origin": "errors"
+    },
+    "ErrorUnavailable": {
+      "kind": "variable",
+      "origin": "errors"
+    },
+    "ErrorUnavailableProps": {
+      "kind": "type",
+      "origin": "errors"
+    },
+    "EventType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "Events": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "FOLDER_FORM_VALIDATION": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "FUNCTION_EMPTY": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "FieldContainer": {
+      "kind": "variable",
+      "origin": "components/field-container"
+    },
+    "FieldContainerProps": {
+      "kind": "type",
+      "origin": "components/field-container"
+    },
+    "FileDtoInteger": {
+      "kind": "type",
+      "origin": "types",
+      "external": "@onlyoffice/docspace-api-sdk"
+    },
+    "FileFillingFormStatus": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "FileInput": {
+      "kind": "variable",
+      "origin": "components/file-input"
+    },
+    "FileStatus": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "FileTile": {
+      "kind": "variable",
+      "origin": "components/tiles/file-tile"
+    },
+    "FileType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "FilesSelectorFilterTypes": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "FilterGroups": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "FilterKeys": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "FilterSelectorTypes": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "FolderTile": {
+      "kind": "variable",
+      "origin": "components/tiles/folder-tile"
+    },
+    "FolderType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "GeneratePdfAiIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "GenerateWithAiIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "GroupDto": {
+      "kind": "interface",
+      "origin": "types",
+      "external": "@onlyoffice/docspace-api-sdk"
+    },
+    "GuidanceRefKey": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "HTML_EXST": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "HeaderType": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "Heading": {
+      "kind": "variable",
+      "origin": "components/heading"
+    },
+    "HeadingLevel": {
+      "kind": "enum",
+      "origin": "components/heading"
+    },
+    "HeadingPure": {
+      "kind": "variable",
+      "origin": "components/heading"
+    },
+    "HeadingSize": {
+      "kind": "enum",
+      "origin": "components/heading"
+    },
+    "HeadingWithTooltip": {
+      "kind": "variable",
+      "origin": "components/heading"
+    },
+    "HelpButton": {
+      "kind": "variable",
+      "origin": "components/help-button"
+    },
+    "HelpButtonProps": {
+      "kind": "type",
+      "origin": "components/help-button"
+    },
+    "ICover": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "INFO_PANEL_WIDTH": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "IconButton": {
+      "kind": "variable",
+      "origin": "components/icon-button"
+    },
+    "IconButtonProps": {
+      "kind": "type",
+      "origin": "components/icon-button"
+    },
+    "IconSizeType": {
+      "kind": "enum",
+      "origin": "utils/common-icons-style"
+    },
+    "IndexIconButtons": {
+      "kind": "variable",
+      "origin": "components/rows/row/sub-components/index-icon-buttons"
+    },
+    "InputBlock": {
+      "kind": "variable",
+      "origin": "components/input-block"
+    },
+    "InputBlockProps": {
+      "kind": "type",
+      "origin": "components/input-block"
+    },
+    "InputSize": {
+      "kind": "enum",
+      "origin": "components/text-input"
+    },
+    "InputType": {
+      "kind": "enum",
+      "origin": "components/text-input"
+    },
+    "InterfaceDirectionContext": {
+      "kind": "variable",
+      "origin": "context/InterfaceDirectionContext"
+    },
+    "InterfaceDirectionProvider": {
+      "kind": "variable",
+      "origin": "context/InterfaceDirectionContext"
+    },
+    "LANGUAGE": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "LIVE_CHAT_LOCAL_STORAGE_KEY": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "LOADER_STYLE": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "Label": {
+      "kind": "variable",
+      "origin": "components/label"
+    },
+    "Link": {
+      "kind": "variable",
+      "origin": "components/link"
+    },
+    "LinkProps": {
+      "kind": "type",
+      "origin": "components/link"
+    },
+    "LinkRouterProps": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "LinkTarget": {
+      "kind": "enum",
+      "origin": "components/link"
+    },
+    "LinkType": {
+      "kind": "enum",
+      "origin": "components/link"
+    },
+    "LinkUi": {
+      "kind": "variable",
+      "origin": "components/link"
+    },
+    "Loader": {
+      "kind": "variable",
+      "origin": "components/loader"
+    },
+    "LoaderTypes": {
+      "kind": "enum",
+      "origin": "components/loader"
+    },
+    "LoadingButton": {
+      "kind": "variable",
+      "origin": "components/loading-button"
+    },
+    "LoadingButtonProps": {
+      "kind": "interface",
+      "origin": "components/loading-button"
+    },
+    "MAX_INFINITE_LOADER_SHIFT": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "MAX_VISIBLE_EXTENSIONS": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "MCPIcon": {
+      "kind": "variable",
+      "origin": "components/mcp-icon"
+    },
+    "MCPIconSize": {
+      "kind": "enum",
+      "origin": "components/mcp-icon"
+    },
+    "MainTariff": {
+      "kind": "variable",
+      "origin": "billing/main-tariff"
+    },
+    "MergeTypes": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "ModalDialog": {
+      "kind": "variable",
+      "origin": "components/modal-dialog"
+    },
+    "ModalDialogType": {
+      "kind": "enum",
+      "origin": "components/modal-dialog"
+    },
+    "MouseEventHandler": {
+      "kind": "type",
+      "origin": "components/tooltip"
+    },
+    "NavMenu": {
+      "kind": "variable",
+      "origin": "components/nav-menu"
+    },
+    "NavMenuGroup": {
+      "kind": "type",
+      "origin": "components/nav-menu"
+    },
+    "NavMenuItem": {
+      "kind": "type",
+      "origin": "components/nav-menu"
+    },
+    "NavMenuLinkData": {
+      "kind": "type",
+      "origin": "components/nav-menu"
+    },
+    "NavMenuProps": {
+      "kind": "type",
+      "origin": "components/nav-menu"
+    },
+    "NavSubItem": {
+      "kind": "type",
+      "origin": "components/nav-menu"
+    },
+    "Nullable": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "OPERATIONS_NAME": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "OmitTooltipProps": {
+      "kind": "type",
+      "origin": "components/tooltip"
+    },
+    "ParseErrorTypes": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "PathObject": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "PaymentMethod": {
+      "kind": "other",
+      "origin": "billing/payment-method"
+    },
+    "PaymentStoreProvider": {
+      "kind": "variable",
+      "origin": "billing/store"
+    },
+    "Portal": {
+      "kind": "variable",
+      "origin": "components/portal"
+    },
+    "PortalFeaturesLimitations": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "PortalProps": {
+      "kind": "type",
+      "origin": "components/portal"
+    },
+    "PreparationPortalProgress": {
+      "kind": "variable",
+      "origin": "components/progress-bar"
+    },
+    "PreparationPortalProgressProps": {
+      "kind": "type",
+      "origin": "components/progress-bar"
+    },
+    "ProgressBar": {
+      "kind": "variable",
+      "origin": "components/progress-bar"
+    },
+    "ProgressBarProps": {
+      "kind": "type",
+      "origin": "components/progress-bar"
+    },
+    "Provider": {
+      "kind": "variable",
+      "origin": "utils/context"
+    },
+    "ProviderType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "QuickActionItem": {
+      "kind": "type",
+      "origin": "components/quick-actions"
+    },
+    "QuickActions": {
+      "kind": "variable",
+      "origin": "components/quick-actions"
+    },
+    "QuickActionsProps": {
+      "kind": "type",
+      "origin": "components/quick-actions"
+    },
+    "QuickCollaborationRoomIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "QuickCustomRoomIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "QuickFormRoomIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "QuickPublicRoomIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "QuickVdrRoomIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "ROOM_ACTION_KEYS": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "RTL_LANGUAGES": {
+      "kind": "variable",
+      "origin": "providers/theme/rtl-utils"
+    },
+    "RadioButton": {
+      "kind": "variable",
+      "origin": "components/radio-button"
+    },
+    "RadioButtonGroup": {
+      "kind": "variable",
+      "origin": "components/radio-button-group"
+    },
+    "RectangleSkeleton": {
+      "kind": "variable",
+      "origin": "components/rectangle"
+    },
+    "RectangleSkeletonProps": {
+      "kind": "type",
+      "origin": "components/rectangle"
+    },
+    "RoleType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "RoomIcon": {
+      "kind": "variable",
+      "origin": "components/room-icon"
+    },
+    "RoomIconProps": {
+      "kind": "type",
+      "origin": "components/room-icon"
+    },
+    "RoomLogoCover": {
+      "kind": "variable",
+      "origin": "components/room-logo-cover-dialog"
+    },
+    "RoomLogoCoverDialog": {
+      "kind": "variable",
+      "origin": "components/room-logo-cover-dialog"
+    },
+    "RoomLogoCoverDialogProps": {
+      "kind": "type",
+      "origin": "components/room-logo-cover-dialog"
+    },
+    "RoomLogoCoverProps": {
+      "kind": "type",
+      "origin": "components/room-logo-cover-dialog"
+    },
+    "RoomTile": {
+      "kind": "variable",
+      "origin": "components/tiles/room-tile"
+    },
+    "RoomsType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "RoomsTypeValues": {
+      "kind": "variable",
+      "origin": "utils/common"
+    },
+    "RoomsTypes": {
+      "kind": "variable",
+      "origin": "utils/common"
+    },
+    "RootTooltip": {
+      "kind": "variable",
+      "origin": "components/tooltip"
+    },
+    "Row": {
+      "kind": "variable",
+      "origin": "components/rows/row"
+    },
+    "RowContainer": {
+      "kind": "variable",
+      "origin": "components/rows/row-container"
+    },
+    "RowContent": {
+      "kind": "variable",
+      "origin": "components/rows/row-content"
+    },
+    "RowSkeleton": {
+      "kind": "variable",
+      "origin": "components/rows/skeletons"
+    },
+    "RowsSkeleton": {
+      "kind": "variable",
+      "origin": "components/rows/skeletons"
+    },
+    "SYSTEM_FONT_FAMILY": {
+      "kind": "variable",
+      "origin": "providers/theme/themes"
+    },
+    "SYSTEM_THEME_KEY": {
+      "kind": "variable",
+      "origin": "providers/theme/themes"
+    },
+    "Scrollbar": {
+      "kind": "variable",
+      "origin": "components/scrollbar"
+    },
+    "ScrollbarContext": {
+      "kind": "variable",
+      "origin": "components/scrollbar/custom-scrollbar"
+    },
+    "ScrollbarProps": {
+      "kind": "type",
+      "origin": "components/scrollbar"
+    },
+    "ScrollbarType": {
+      "kind": "class",
+      "origin": "components/scrollbar/custom-scrollbar"
+    },
+    "SdkDateToAutoCleanUp": {
+      "kind": "variable",
+      "origin": "enums",
+      "external": "@onlyoffice/docspace-api-sdk"
+    },
+    "SdkFilesSettingsDtoDefaultSharingAccessRightsEnum": {
+      "kind": "variable",
+      "origin": "enums",
+      "external": "@onlyoffice/docspace-api-sdk"
+    },
+    "SdkSortedByType": {
+      "kind": "variable",
+      "origin": "enums",
+      "external": "@onlyoffice/docspace-api-sdk"
+    },
+    "SearchInput": {
+      "kind": "variable",
+      "origin": "components/search-input"
+    },
+    "SelectedItem": {
+      "kind": "variable",
+      "origin": "components/selected-item"
+    },
+    "SelectedItemProps": {
+      "kind": "interface",
+      "origin": "components/selected-item"
+    },
+    "SelectedItemPure": {
+      "kind": "variable",
+      "origin": "components/selected-item"
+    },
+    "SelectionArea": {
+      "kind": "variable",
+      "origin": "components/selection-area"
+    },
+    "SeparatorType": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "ServerType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "ServicesList": {
+      "kind": "variable",
+      "origin": "billing/services"
+    },
+    "ServicesStoreProvider": {
+      "kind": "variable",
+      "origin": "billing/store"
+    },
+    "ShareAccessRights": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "ShareRights": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "Slider": {
+      "kind": "variable",
+      "origin": "components/slider"
+    },
+    "SnackBar": {
+      "kind": "class",
+      "origin": "components/snackbar"
+    },
+    "SnackbarProps": {
+      "kind": "type",
+      "origin": "components/snackbar"
+    },
+    "SortByFieldName": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "TAiToolsPrices": {
+      "kind": "type",
+      "origin": "billing"
+    },
+    "TArrayTypes": {
+      "kind": "type",
+      "origin": "components/selection-area"
+    },
+    "TAvailableShareRights": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TAvatarModel": {
+      "kind": "type",
+      "origin": "components/avatar"
+    },
+    "TColorScheme": {
+      "kind": "type",
+      "origin": "context/ThemeContext"
+    },
+    "TComboboxProps": {
+      "kind": "type",
+      "origin": "components/combobox"
+    },
+    "TContextMenuRef": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "TContextMenuValueTypeOnClick": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "TCreatedBy": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TData": {
+      "kind": "type",
+      "origin": "components/toast"
+    },
+    "TDirectionX": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TDirectionY": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TEMPLATE_GALLERY_FORMATS": {
+      "kind": "variable",
+      "origin": "constants"
+    },
+    "TErrorBoundaryProps": {
+      "kind": "type",
+      "origin": "providers/error-boundary"
+    },
+    "TFallbackAxisSideDirection": {
+      "kind": "type",
+      "origin": "components/tooltip"
+    },
+    "TFile": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TFileSecurity": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TFileViewAccessibility": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TFolder": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TFolderSecurity": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TGetContextMenuModel": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "TGetIcon": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TGetTooltipContent": {
+      "kind": "type",
+      "origin": "components/tooltip"
+    },
+    "TInterfaceDirection": {
+      "kind": "type",
+      "origin": "context/InterfaceDirectionContext"
+    },
+    "TLogo": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TMobileMenuStackItem": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "TModel": {
+      "kind": "type",
+      "origin": "components/room-icon"
+    },
+    "TOnMobileItemClick": {
+      "kind": "type",
+      "origin": "components/context-menu"
+    },
+    "TOnMove": {
+      "kind": "type",
+      "origin": "components/selection-area"
+    },
+    "TOption": {
+      "kind": "type",
+      "origin": "components/combobox"
+    },
+    "TPathParts": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TPaymentNavigationEvent": {
+      "kind": "type",
+      "origin": "billing"
+    },
+    "TRoomLogoParams": {
+      "kind": "type",
+      "origin": "utils/calculateRoomLogoParams"
+    },
+    "TRoomSecurity": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TServiceFeatureWithPrice": {
+      "kind": "type",
+      "origin": "billing"
+    },
+    "TShareRightsType": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TShareSettings": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TSortBy": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TSortOrder": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TTabItem": {
+      "kind": "type",
+      "origin": "components/tabs"
+    },
+    "TTheme": {
+      "kind": "type",
+      "origin": "providers/theme/themes"
+    },
+    "TThemeProvider": {
+      "kind": "type",
+      "origin": "providers/theme"
+    },
+    "TTooltipPlace": {
+      "kind": "type",
+      "origin": "components/tooltip"
+    },
+    "TTranslation": {
+      "kind": "type",
+      "origin": "utils/common"
+    },
+    "TTranslationProvider": {
+      "kind": "type",
+      "origin": "providers/translation"
+    },
+    "TTranslations": {
+      "kind": "type",
+      "origin": "providers/translation"
+    },
+    "TUser": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TUserGroup": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TValidate": {
+      "kind": "type",
+      "origin": "components/email-input"
+    },
+    "TViewAs": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TabItem": {
+      "kind": "variable",
+      "origin": "components/tab-item"
+    },
+    "Tabs": {
+      "kind": "variable",
+      "origin": "components/tabs"
+    },
+    "TabsProps": {
+      "kind": "type",
+      "origin": "components/tabs"
+    },
+    "TabsTypes": {
+      "kind": "enum",
+      "origin": "components/tabs"
+    },
+    "Tag": {
+      "kind": "variable",
+      "origin": "components/tag"
+    },
+    "TagClickEvent": {
+      "kind": "type",
+      "origin": "components/tag"
+    },
+    "TagProps": {
+      "kind": "type",
+      "origin": "components/tag"
+    },
+    "TagType": {
+      "kind": "type",
+      "origin": "components/tag"
+    },
+    "Tags": {
+      "kind": "variable",
+      "origin": "components/tags"
+    },
+    "TemplateTile": {
+      "kind": "variable",
+      "origin": "components/tiles/template-tile"
+    },
+    "Text": {
+      "kind": "variable",
+      "origin": "components/text"
+    },
+    "TextAlignValue": {
+      "kind": "type",
+      "origin": "components/snackbar"
+    },
+    "TextInput": {
+      "kind": "variable",
+      "origin": "components/text-input"
+    },
+    "TextInputProps": {
+      "kind": "type",
+      "origin": "components/text-input"
+    },
+    "TextInputPure": {
+      "kind": "variable",
+      "origin": "components/text-input"
+    },
+    "TextProps": {
+      "kind": "type",
+      "origin": "components/text"
+    },
+    "TextUi": {
+      "kind": "variable",
+      "origin": "components/text"
+    },
+    "Textarea": {
+      "kind": "variable",
+      "origin": "components/textarea"
+    },
+    "TextareaProps": {
+      "kind": "type",
+      "origin": "components/textarea"
+    },
+    "ThemeContext": {
+      "kind": "variable",
+      "origin": "context/ThemeContext"
+    },
+    "ThemeContextProvider": {
+      "kind": "variable",
+      "origin": "context/ThemeContext"
+    },
+    "ThemeKeys": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "ThemeProvider": {
+      "kind": "variable",
+      "origin": "providers/theme"
+    },
+    "ThemeProviderComponent": {
+      "kind": "variable",
+      "origin": "components/theme-provider"
+    },
+    "ThemeProviderProps": {
+      "kind": "type",
+      "origin": "components/theme-provider"
+    },
+    "TileContainer": {
+      "kind": "variable",
+      "origin": "components/tiles/tile-container"
+    },
+    "TileContent": {
+      "kind": "variable",
+      "origin": "components/tiles/tile-content"
+    },
+    "TimePicker": {
+      "kind": "variable",
+      "origin": "components/time-picker"
+    },
+    "TimePickerProps": {
+      "kind": "type",
+      "origin": "components/time-picker"
+    },
+    "To": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "Toast": {
+      "kind": "variable",
+      "origin": "components/toast"
+    },
+    "ToastProps": {
+      "kind": "type",
+      "origin": "components/toast"
+    },
+    "ToastType": {
+      "kind": "enum",
+      "origin": "components/toast"
+    },
+    "ToggleButton": {
+      "kind": "variable",
+      "origin": "components/toggle-button"
+    },
+    "ToolsPermission": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "Tooltip": {
+      "kind": "variable",
+      "origin": "components/tooltip"
+    },
+    "TooltipContainer": {
+      "kind": "variable",
+      "origin": "components/tooltip/sub-components"
+    },
+    "TooltipHandlers": {
+      "kind": "type",
+      "origin": "components/tooltip"
+    },
+    "TooltipProps": {
+      "kind": "type",
+      "origin": "components/tooltip"
+    },
+    "TopLoaderService": {
+      "kind": "class",
+      "origin": "components/top-loading-indicator"
+    },
+    "TranslationProvider": {
+      "kind": "variable",
+      "origin": "providers/translation"
+    },
+    "TwoStateToggle": {
+      "kind": "variable",
+      "origin": "components/two-state-toggle"
+    },
+    "TwoStateToggleProps": {
+      "kind": "type",
+      "origin": "components/two-state-toggle"
+    },
+    "Uploader": {
+      "kind": "variable",
+      "origin": "uploader"
+    },
+    "Usage": {
+      "kind": "other",
+      "origin": "billing/usage"
+    },
+    "UseAnimationReturn": {
+      "kind": "type",
+      "origin": "hooks/useAnimation"
+    },
+    "UseI18NProps": {
+      "kind": "type",
+      "origin": "providers/translation"
+    },
+    "UseRoomTemplateIllustrationIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "UseTemplateIcon": {
+      "kind": "variable",
+      "origin": "components/quick-actions",
+      "external": "assets (*.react.svg)"
+    },
+    "UseThemeProps": {
+      "kind": "type",
+      "origin": "providers/theme"
+    },
+    "VDRIndexingAction": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "ValueOf": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "VectorizationStatus": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "Wallet": {
+      "kind": "variable",
+      "origin": "billing/wallet"
+    },
+    "WhiteLabelLogoType": {
+      "kind": "enum",
+      "origin": "enums"
+    },
+    "WindowI18n": {
+      "kind": "type",
+      "origin": "utils/i18n"
+    },
+    "WithFlag": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "WithTooltipProps": {
+      "kind": "interface",
+      "origin": "components/tooltip"
+    },
+    "beautifyJSON": {
+      "kind": "function",
+      "origin": "components/textarea"
+    },
+    "calculateRoomLogoParams": {
+      "kind": "variable",
+      "origin": "utils/calculateRoomLogoParams"
+    },
+    "checkIsSSR": {
+      "kind": "function",
+      "origin": "utils/device"
+    },
+    "clearEdgeScrollingTimer": {
+      "kind": "variable",
+      "origin": "utils/edge-scrolling"
+    },
+    "createChunks": {
+      "kind": "variable",
+      "origin": "uploader/utils"
+    },
+    "delay": {
+      "kind": "variable",
+      "origin": "utils/pipe"
+    },
+    "desktop": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "encodeToBase64": {
+      "kind": "variable",
+      "origin": "components/room-icon"
+    },
+    "getCommonTranslation": {
+      "kind": "variable",
+      "origin": "utils/i18n"
+    },
+    "getCookie": {
+      "kind": "variable",
+      "origin": "utils/i18n"
+    },
+    "getCorrectBorderRadius": {
+      "kind": "variable",
+      "origin": "providers/theme/rtl-utils"
+    },
+    "getCorrectFourValuesStyle": {
+      "kind": "variable",
+      "origin": "providers/theme/rtl-utils"
+    },
+    "getCorrectTextAlign": {
+      "kind": "variable",
+      "origin": "providers/theme/rtl-utils"
+    },
+    "getCurrentCommonLanguage": {
+      "kind": "variable",
+      "origin": "utils/i18n"
+    },
+    "getDirectionByLanguage": {
+      "kind": "variable",
+      "origin": "providers/theme/rtl-utils"
+    },
+    "getErrorMessage": {
+      "kind": "variable",
+      "origin": "utils/getErrorMessage"
+    },
+    "getFontFamilyDependingOnLanguage": {
+      "kind": "variable",
+      "origin": "providers/theme/rtl-utils"
+    },
+    "getI18NInstance": {
+      "kind": "variable",
+      "origin": "providers/translation"
+    },
+    "getIconPathByFolderType": {
+      "kind": "variable",
+      "origin": "utils/common"
+    },
+    "getLifetimePeriodTranslation": {
+      "kind": "variable",
+      "origin": "utils/common"
+    },
+    "getParts": {
+      "kind": "variable",
+      "origin": "utils/email"
+    },
+    "getRoomTitle": {
+      "kind": "variable",
+      "origin": "components/room-icon"
+    },
+    "getTextColor": {
+      "kind": "variable",
+      "origin": "utils/get-text-color"
+    },
+    "getTranslationReady": {
+      "kind": "variable",
+      "origin": "utils/i18n"
+    },
+    "getUserAvatarRoleByType": {
+      "kind": "variable",
+      "origin": "utils/common"
+    },
+    "getUserType": {
+      "kind": "variable",
+      "origin": "utils/common"
+    },
+    "getUserTypeTranslation": {
+      "kind": "variable",
+      "origin": "utils/common"
+    },
+    "globalColors": {
+      "kind": "variable",
+      "origin": "providers/theme/themes"
+    },
+    "hasOwnProperty": {
+      "kind": "variable",
+      "origin": "utils/hasOwnProperty"
+    },
+    "isDesktop": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "isElementCovered": {
+      "kind": "function",
+      "origin": "hooks/useCloseOnAnchorCovered"
+    },
+    "isEqualEmail": {
+      "kind": "variable",
+      "origin": "utils/email"
+    },
+    "isIconSizeType": {
+      "kind": "variable",
+      "origin": "utils/common-icons-style"
+    },
+    "isJSON": {
+      "kind": "function",
+      "origin": "components/textarea"
+    },
+    "isLanguageRtl": {
+      "kind": "variable",
+      "origin": "providers/theme/rtl-utils"
+    },
+    "isManagement": {
+      "kind": "variable",
+      "origin": "utils/common"
+    },
+    "isMobile": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "isMobileDevice": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "isReliableAndroidViewport": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "isTablet": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "isTouchDevice": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "isValidDomainName": {
+      "kind": "variable",
+      "origin": "utils/email"
+    },
+    "jsonify": {
+      "kind": "function",
+      "origin": "components/textarea"
+    },
+    "mobile": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "mobileMore": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "omitTooltipProps": {
+      "kind": "function",
+      "origin": "components/tooltip"
+    },
+    "onEdgeScrolling": {
+      "kind": "variable",
+      "origin": "utils/edge-scrolling"
+    },
+    "parseAddress": {
+      "kind": "variable",
+      "origin": "utils/email"
+    },
+    "parseAddresses": {
+      "kind": "variable",
+      "origin": "utils/email"
+    },
+    "parseLocaleConstants": {
+      "kind": "function",
+      "origin": "utils/parse-locale-constants"
+    },
+    "pipe": {
+      "kind": "variable",
+      "origin": "utils/pipe"
+    },
+    "runWithConcurrency": {
+      "kind": "variable",
+      "origin": "uploader/utils"
+    },
+    "size": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "stopWhen": {
+      "kind": "variable",
+      "origin": "utils/pipe"
+    },
+    "tablet": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "toastr": {
+      "kind": "variable",
+      "origin": "components/toast/sub-components"
+    },
+    "transitionalScreenSize": {
+      "kind": "variable",
+      "origin": "utils/device"
+    },
+    "trimSeparator": {
+      "kind": "function",
+      "origin": "utils/trim-separator"
+    },
+    "useAnimation": {
+      "kind": "variable",
+      "origin": "hooks/useAnimation"
+    },
+    "useClickOutside": {
+      "kind": "variable",
+      "origin": "utils/use-click-outside"
+    },
+    "useCloseOnAnchorCovered": {
+      "kind": "variable",
+      "origin": "hooks/useCloseOnAnchorCovered"
+    },
+    "useCommonTranslation": {
+      "kind": "variable",
+      "origin": "utils/i18n"
+    },
+    "useDebounce": {
+      "kind": "variable",
+      "origin": "hooks/useDebounce"
+    },
+    "useEventListener": {
+      "kind": "function",
+      "origin": "hooks/useEventListener"
+    },
+    "useI18N": {
+      "kind": "variable",
+      "origin": "providers/translation"
+    },
+    "useInterfaceDirection": {
+      "kind": "variable",
+      "origin": "context/InterfaceDirectionContext"
+    },
+    "useIsDesktop": {
+      "kind": "function",
+      "origin": "hooks/use-is-desktop"
+    },
+    "useIsMobile": {
+      "kind": "function",
+      "origin": "hooks/use-is-mobile"
+    },
+    "useIsomorphicLayoutEffect": {
+      "kind": "variable",
+      "origin": "hooks/useIsomorphicLayoutEffect"
+    },
+    "useKeyboardAwareSheet": {
+      "kind": "function",
+      "origin": "hooks/useKeyboardAwareSheet"
+    },
+    "usePaymentStore": {
+      "kind": "variable",
+      "origin": "billing/store"
+    },
+    "useServicesStore": {
+      "kind": "variable",
+      "origin": "billing/store"
+    },
+    "useTheme": {
+      "kind": "variable",
+      "origin": "context/ThemeContext"
+    },
+    "useUnmount": {
+      "kind": "variable",
+      "origin": "hooks/useUnmount"
+    },
+    "useViewEffect": {
+      "kind": "variable",
+      "origin": "hooks/useViewEffect"
+    },
+    "useVirtualKeyboardInset": {
+      "kind": "function",
+      "origin": "hooks/useVirtualKeyboardInset"
+    },
+    "uuid": {
+      "kind": "variable",
+      "origin": "utils/uuid"
+    },
+    "withTooltip": {
+      "kind": "function",
+      "origin": "components/tooltip/sub-components"
+    }
+  }
+}
