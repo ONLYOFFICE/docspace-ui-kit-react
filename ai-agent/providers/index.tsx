@@ -130,7 +130,7 @@ import {
   useComposerTyping,
   useFilesIntegration,
   type AttachedFileInfo,
-  type PollSuggestedQuestions,
+  type ReadSuggestedQuestions,
   type SuggestedQuestion,
 } from "./files";
 import { resolveSuggestions, type SuggestionSet } from "./suggestions";
@@ -577,15 +577,6 @@ const AiAgentProviders = ({
   // refs.
   const [analyzableIds, setAnalyzableIds] = useState<string[]>([]);
 
-  // Starter questions the backend generated from an attached form's own
-  // schema, per attachment id. They ride along with the attach response when
-  // the backend already has them (its cache is keyed by form, version and
-  // language); a form attached for the first time comes back without them and
-  // keeps the static chips.
-  const [questionsById, setQuestionsById] = useState<
-    Record<string, SuggestedQuestion[]>
-  >({});
-
   const onFilesAttached = useCallback(
     (attached: AttachedFileInfo[]) => {
       // The form's chip is on the draft now. `useAttachHostFilesToChat`
@@ -609,18 +600,6 @@ const AiAgentProviders = ({
       if (analyzable.length === 0) return;
 
       setAnalyzableIds((prev) => [...prev, ...analyzable.map((f) => f.id)]);
-
-      const withQuestions = analyzable.filter(
-        (f) => f.suggestedQuestions && f.suggestedQuestions.length > 0,
-      );
-      if (withQuestions.length === 0) return;
-
-      setQuestionsById((prev) => ({
-        ...prev,
-        ...Object.fromEntries(
-          withQuestions.map((f) => [f.id, f.suggestedQuestions ?? []]),
-        ),
-      }));
     },
     [aiChatStore],
   );
@@ -863,11 +842,11 @@ const AiAgentProviders = ({
     [analyzeActive, attachActions],
   );
 
-  // The starter questions of the form being analyzed. The endpoint long-polls
-  // (25s per call) while the model works, so this waits for it rather than
-  // showing the static chips: in this mode the message is about this form's
-  // answers, and a generic chip would ask the wrong question.
-  const pollSuggestedQuestions = useCallback<PollSuggestedQuestions>(
+  // The starter questions of the form being analyzed: asked for once, then
+  // waited for on the socket. In this mode the message is about this form's
+  // answers, so the static chips are not shown in the meantime — a generic
+  // chip would ask the wrong question.
+  const readSuggestedQuestions = useCallback<ReadSuggestedQuestions>(
     (attachmentId, signal) => aiApi.getSuggestedQuestions(attachmentId, signal),
     [aiApi],
   );
@@ -875,7 +854,7 @@ const AiAgentProviders = ({
   // Asked for by the attachment the form became, so the wait starts only once
   // the attach has reported it back.
   const { questions: analyzeQuestions, onTyping } = useAnalyzeQuestions(
-    pollSuggestedQuestions,
+    readSuggestedQuestions,
     analyzeAttachmentId,
   );
 
@@ -1010,14 +989,12 @@ const AiAgentProviders = ({
         suggestions,
         attachedFileIds === "" ? [] : attachedFileIds.split(","),
         analyzableIds,
-        questionsById,
         { active: analyzeActive, questions: analyzeQuestions },
       ),
     [
       suggestions,
       attachedFileIds,
       analyzableIds,
-      questionsById,
       analyzeActive,
       analyzeQuestions,
     ],

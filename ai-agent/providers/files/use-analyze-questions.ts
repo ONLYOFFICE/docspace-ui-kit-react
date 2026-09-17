@@ -38,36 +38,47 @@
 import React from "react";
 
 import {
-  pollSuggestedQuestions,
-  type PollSuggestedQuestions,
+  requestSuggestedQuestions,
+  subscribeToSuggestedQuestions,
+  type ReadSuggestedQuestions,
   type SuggestedQuestion,
+  type Unsubscribe,
 } from "./suggested-questions";
 
 /**
- * The starter questions of the form the composer is analyzing, fetched while
- * the user waits.
+ * The starter questions of the form the composer is analyzing, waited for
+ * while the user reads the intro.
  *
  * `attachmentId` is the id the attach round trip minted for that form — the
  * questions are generated per attachment record, not per host file. It is
  * `undefined` while no form owns the message *and* while one is still being
- * attached, and passing `undefined` is how the caller says "stop": the poll in
- * flight is aborted and its answer discarded. The same happens when the id
- * changes (another form became the subject) and on unmount.
+ * attached, and passing `undefined` is how the caller says "stop": the request
+ * in flight is aborted, the socket room is left and any answer is discarded.
+ * The same happens when the id changes (another form became the subject) and
+ * on unmount.
  *
- * One poll per attachment, ever: an attachment that has answered — with
- * questions or with "there will be none" — is not asked again, and
- * re-rendering while a poll runs does not start a second one.
+ * Two ways in, in this order, because the generation is asynchronous and can
+ * finish at any point:
+ *
+ * 1. subscribe to the attachment's room, so an event that fires during the
+ *    request below is still caught;
+ * 2. ask once — a form analyzed before is a cache hit and answers `ready`
+ *    immediately, which is the common case and shows the chips with no wait;
+ * 3. otherwise sit on the subscription until the backend emits.
+ *
+ * One wait per attachment, ever: re-rendering does not open a second
+ * subscription or send a second request.
  *
  * `onTyping` is returned rather than watched here: the moment the user writes
  * their own question the suggestions are moot, so the caller wires it to the
  * composer and this stops waiting for them.
  */
 export const useAnalyzeQuestions = (
-  poll: PollSuggestedQuestions,
+  read: ReadSuggestedQuestions,
   attachmentId: string | undefined,
 ): {
   questions: SuggestedQuestion[] | null;
-  /** Call when the user starts typing: aborts the wait for good. */
+  /** Call when the user starts typing: ends the wait for good. */
   onTyping: () => void;
 } => {
   const [questions, setQuestions] = React.useState<SuggestedQuestion[] | null>(
@@ -75,13 +86,16 @@ export const useAnalyzeQuestions = (
   );
 
   const controllerRef = React.useRef<AbortController | null>(null);
+  const unsubscribeRef = React.useRef<Unsubscribe | null>(null);
   // The attachment this hook is already committed to, so a re-render cannot
-  // start a second poll for it.
-  const polledRef = React.useRef<string | null>(null);
+  // start a second wait for it.
+  const waitedRef = React.useRef<string | null>(null);
 
-  const abort = React.useCallback(() => {
+  const stopWaiting = React.useCallback(() => {
     controllerRef.current?.abort();
     controllerRef.current = null;
+    unsubscribeRef.current?.();
+    unsubscribeRef.current = null;
   }, []);
 
   React.useEffect(() => {
@@ -89,32 +103,47 @@ export const useAnalyzeQuestions = (
       // No attachment to ask about: the mode ended, or its form is still on
       // its way in. Drop the questions either way, so the next one starts
       // clean.
-      abort();
-      polledRef.current = null;
+      stopWaiting();
+      waitedRef.current = null;
       setQuestions(null);
       return;
     }
 
-    if (polledRef.current === attachmentId) return;
+    if (waitedRef.current === attachmentId) return;
 
     // A different form took over mid-flight — the previous answer must not
     // land on this one.
-    abort();
-    polledRef.current = attachmentId;
+    stopWaiting();
+    waitedRef.current = attachmentId;
     setQuestions(null);
 
     const controller = new AbortController();
     controllerRef.current = controller;
 
-    pollSuggestedQuestions(poll, attachmentId, controller.signal).then(
-      (result) => {
+    // Before the request, not after: the generation may finish while it is in
+    // flight, and that event is the only one there will be.
+    unsubscribeRef.current = subscribeToSuggestedQuestions(
+      attachmentId,
+      (arrived) => {
         if (controller.signal.aborted) return;
-        setQuestions(result);
+        // Nothing usable in the event is not an answer — the socket said its
+        // piece, so stop holding the room open for it.
+        stopWaiting();
+        if (arrived) setQuestions(arrived);
       },
     );
-  }, [attachmentId, poll, abort]);
 
-  React.useEffect(() => () => abort(), [abort]);
+    requestSuggestedQuestions(read, attachmentId, controller.signal).then(
+      (cached) => {
+        if (controller.signal.aborted || !cached) return;
+        // Already generated: the socket has nothing left to deliver.
+        stopWaiting();
+        setQuestions(cached);
+      },
+    );
+  }, [attachmentId, read, stopWaiting]);
 
-  return { questions, onTyping: abort };
+  React.useEffect(() => () => stopWaiting(), [stopWaiting]);
+
+  return { questions, onTyping: stopWaiting };
 };

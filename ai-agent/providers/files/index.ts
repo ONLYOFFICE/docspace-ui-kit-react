@@ -65,6 +65,6 @@ export {
   type AttachmentCap,
 } from "./attachment-limit";
 export type {
-  PollSuggestedQuestions,
+  ReadSuggestedQuestions,
   SuggestedQuestion,
 } from "./suggested-questions";

@@ -28,10 +28,6 @@ import { useStores } from "@onlyoffice/ai-chat";
 
 import { rememberFormAttachments } from "./form-attachments";
 import {
-  readSuggestedQuestions,
-  type SuggestedQuestion,
-} from "./suggested-questions";
-import {
   holdAttachPaths,
   rememberAttachedPaths,
   splitDuplicateAttachments,
@@ -87,12 +83,6 @@ export type AttachedFileInfo = {
   title: string;
   /** The backend can analyze this file's contents (an analyzable form). */
   canAnalyze?: boolean;
-  /**
-   * Starter questions the backend already had for this form (a cache hit on
-   * an earlier attach of the same form, version and language). Empty while
-   * the generation is still running — see {@link SuggestedQuestion}.
-   */
-  suggestedQuestions?: SuggestedQuestion[];
 };
 
 /** Reports what was attached, so the caller can keep the extra flags. */
@@ -218,7 +208,6 @@ export const attachFilesToChat = async (
       title: input?.title ?? record.title,
       analyzeOnly: input?.analyzeOnly,
       canAnalyze: record.canAnalyze,
-      suggestedQuestions: readSuggestedQuestions(record),
     }));
 
   if (imageIndices.size === 0) return attached;

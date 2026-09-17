@@ -74,9 +74,8 @@ export type AnalyzeState = {
 /**
  * The chips to show right now.
  *
- * `attachedFileIds` are the refs the composer holds (files and images alike),
- * `analyzableIds` those of them the backend flagged as analyzable forms, and
- * `questionsById` the per-form questions it generated for them.
+ * `attachedFileIds` are the refs the composer holds (files and images alike)
+ * and `analyzableIds` those of them the backend flagged as analyzable forms.
  *
  * A bare array is the host saying "these chips, whatever is attached", so it
  * is returned untouched — the set form is what opts into the switching.
@@ -85,7 +84,6 @@ export const resolveSuggestions = (
   suggestions: Suggestion[] | SuggestionSet | undefined,
   attachedFileIds: string[],
   analyzableIds: string[],
-  questionsById: Record<string, SuggestedQuestion[]>,
   analyze?: AnalyzeState,
 ): Suggestion[] | undefined => {
   if (!suggestions || Array.isArray(suggestions)) return suggestions;
@@ -101,25 +99,11 @@ export const resolveSuggestions = (
     }));
   }
 
-  const analyzableAttachedIds = attachedFileIds.filter((id) =>
-    analyzableIds.includes(id),
-  );
-
-  if (analyzableAttachedIds.length > 0) {
-    // Questions generated from this very form beat the static chips: they
-    // name the form's own fields. Whichever analyzable attachment answered
-    // first wins — the chips ask about one form, not about a mix of them.
-    const questions = analyzableAttachedIds
-      .map((id) => questionsById[id])
-      .find((entry) => entry && entry.length > 0);
-
-    if (questions) {
-      return questions.map(({ question, prompt }) => ({
-        name: question,
-        prompt,
-      }));
-    }
-
+  // An analyzable form attached to an ordinary chat gets the host's static
+  // form chips. Its generated questions belong to the analyze mode alone:
+  // they are asked for per attachment and arrive over the socket, which is a
+  // wait that only that mode explains to the user.
+  if (attachedFileIds.some((id) => analyzableIds.includes(id))) {
     return suggestions.analyzableForm ?? suggestions.default;
   }
   if (attachedFileIds.length > 1) {

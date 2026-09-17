@@ -24,12 +24,26 @@
 // content are licensed under the terms of the Creative Commons Attribution-ShareAlike 4.0
 // International. See the License terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// The socket helper is a singleton built against a live connection; only the
+// three calls this module makes are needed, and they are what the tests read.
+// Hoisted, because the factory below runs before the module body.
+const mocks = vi.hoisted(() => ({
+  socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() },
+}));
+const socket = mocks.socket;
+
+vi.mock("../../../utils/socket", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../../utils/socket")>()),
+  default: mocks.socket,
+}));
+
+import { SocketCommands, SocketEvents } from "../../../utils/socket";
 
 import {
-  SUGGESTED_QUESTIONS_RETRY_DELAY_MS,
-  pollSuggestedQuestions,
-  readSuggestedQuestions,
+  requestSuggestedQuestions,
+  subscribeToSuggestedQuestions,
 } from "./suggested-questions";
 
 const QUESTION = {
@@ -37,119 +51,121 @@ const QUESTION = {
   prompt: "Count the responses per value of the payment method field.",
 };
 
-describe("readSuggestedQuestions", () => {
-  it("reads the field off a record that carries it", () => {
-    expect(
-      readSuggestedQuestions({ id: "a", suggestedQuestions: [QUESTION] }),
-    ).toEqual([QUESTION]);
+describe("subscribeToSuggestedQuestions", () => {
+  beforeEach(() => {
+    socket.emit.mockClear();
+    socket.on.mockClear();
+    socket.off.mockClear();
   });
 
-  it("returns undefined when the record has no such field", () => {
-    expect(readSuggestedQuestions({ id: "a" })).toBeUndefined();
-    expect(readSuggestedQuestions(null)).toBeUndefined();
-    expect(readSuggestedQuestions("nope")).toBeUndefined();
+  // The room the backend emits into is `{tenantId}-form-analysis-{id}`; the
+  // socket server prepends the tenant half itself, so only the tail is sent.
+  it("joins the attachment's room and leaves it on unsubscribe", () => {
+    const stop = subscribeToSuggestedQuestions("att-1", vi.fn());
+
+    expect(socket.emit).toHaveBeenCalledWith(SocketCommands.Subscribe, {
+      roomParts: "form-analysis-att-1",
+    });
+    expect(socket.on).toHaveBeenCalledWith(
+      SocketEvents.FormSuggestedQuestions,
+      expect.any(Function),
+    );
+
+    stop();
+
+    expect(socket.off).toHaveBeenCalledWith(
+      SocketEvents.FormSuggestedQuestions,
+      socket.on.mock.calls[0][1],
+    );
+    expect(socket.emit).toHaveBeenLastCalledWith(SocketCommands.Unsubscribe, {
+      roomParts: "form-analysis-att-1",
+    });
   });
 
-  it("drops malformed entries instead of the whole array", () => {
-    expect(
-      readSuggestedQuestions({
-        suggestedQuestions: [QUESTION, { question: "no prompt" }, 42, null],
-      }),
-    ).toEqual([QUESTION]);
+  const emitEvent = (data: unknown) => {
+    const handle = socket.on.mock.calls[0][1] as (payload: unknown) => void;
+    handle(data);
+  };
+
+  it("hands over the questions of its own attachment", () => {
+    const onQuestions = vi.fn();
+    subscribeToSuggestedQuestions("att-1", onQuestions);
+
+    emitEvent({ attachmentId: "att-1", questions: [QUESTION] });
+
+    expect(onQuestions).toHaveBeenCalledWith([QUESTION]);
+  });
+
+  // One socket carries every room the session joined, so an event for another
+  // form arrives here too.
+  it("ignores an event for another attachment", () => {
+    const onQuestions = vi.fn();
+    subscribeToSuggestedQuestions("att-1", onQuestions);
+
+    emitEvent({ attachmentId: "att-2", questions: [QUESTION] });
+
+    expect(onQuestions).not.toHaveBeenCalled();
+  });
+
+  it("reports nothing usable as nothing", () => {
+    const onQuestions = vi.fn();
+    subscribeToSuggestedQuestions("att-1", onQuestions);
+
+    emitEvent({ attachmentId: "att-1", questions: [{ question: 1 }] });
+
+    expect(onQuestions).toHaveBeenCalledWith(null);
   });
 });
 
-// The endpoint is a long poll of its own (the server holds each call for up
-// to 25s), so this loop only decides whether to ask again.
-describe("pollSuggestedQuestions", () => {
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
+// One request, not a loop: it only asks whether the backend already has the
+// questions cached. Everything else is the socket's job.
+describe("requestSuggestedQuestions", () => {
   const run = (
-    poll: (entryId: string, signal: AbortSignal) => Promise<unknown>,
+    read: (attachmentId: string, signal: AbortSignal) => Promise<unknown>,
     controller = new AbortController(),
-  ) => pollSuggestedQuestions(poll as never, "42", controller.signal);
+  ) => requestSuggestedQuestions(read as never, "att-1", controller.signal);
 
-  it("keeps asking while the server says pending, a breather apart", async () => {
-    vi.useFakeTimers();
-    const poll = vi
+  it("returns the questions of a cache hit", async () => {
+    const read = vi
       .fn()
-      .mockResolvedValueOnce({ status: "pending", questions: [] })
-      .mockResolvedValueOnce({ status: "pending", questions: [] })
       .mockResolvedValue({ status: "ready", questions: [QUESTION] });
 
-    const polled = run(poll);
-
-    // The first answer lands at once; the second only after the pause.
-    await vi.advanceTimersByTimeAsync(0);
-    expect(poll).toHaveBeenCalledTimes(1);
-    await vi.advanceTimersByTimeAsync(SUGGESTED_QUESTIONS_RETRY_DELAY_MS - 1);
-    expect(poll).toHaveBeenCalledTimes(1);
-
-    await vi.advanceTimersByTimeAsync(SUGGESTED_QUESTIONS_RETRY_DELAY_MS * 2);
-    await expect(polled).resolves.toEqual([QUESTION]);
-    expect(poll).toHaveBeenCalledTimes(3);
-    expect(poll).toHaveBeenLastCalledWith("42", expect.any(AbortSignal));
+    await expect(run(read)).resolves.toEqual([QUESTION]);
+    expect(read).toHaveBeenCalledTimes(1);
+    expect(read).toHaveBeenCalledWith("att-1", expect.any(AbortSignal));
   });
 
-  // Aborting must not have to sit through the pause: the user removed the
-  // form or started typing, and the answer is no longer wanted.
-  it("gives up mid-breather when aborted", async () => {
-    vi.useFakeTimers();
+  it("asks once and gives up on pending, leaving it to the socket", async () => {
+    const read = vi.fn().mockResolvedValue({ status: "pending", questions: [] });
+
+    await expect(run(read)).resolves.toBeNull();
+    expect(read).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns nothing on unavailable, and on a failed request", async () => {
+    await expect(
+      run(vi.fn().mockResolvedValue({ status: "unavailable", questions: [] })),
+    ).resolves.toBeNull();
+    await expect(
+      run(vi.fn().mockRejectedValue(new Error("network"))),
+    ).resolves.toBeNull();
+  });
+
+  it("does not report an answer that arrived after the abort", async () => {
     const controller = new AbortController();
-    const poll = vi.fn().mockResolvedValue({ status: "pending", questions: [] });
-
-    const polled = run(poll, controller);
-    await vi.advanceTimersByTimeAsync(0);
-    expect(poll).toHaveBeenCalledTimes(1);
-
-    controller.abort();
-    await expect(polled).resolves.toBeNull();
-    expect(poll).toHaveBeenCalledTimes(1);
-  });
-
-  it("stops on unavailable — there will never be questions", async () => {
-    const poll = vi
-      .fn()
-      .mockResolvedValue({ status: "unavailable", questions: [] });
-
-    await expect(run(poll)).resolves.toBeNull();
-    expect(poll).toHaveBeenCalledTimes(1);
-  });
-
-  it("stops when the request fails", async () => {
-    const poll = vi.fn().mockRejectedValue(new Error("network"));
-
-    await expect(run(poll)).resolves.toBeNull();
-    expect(poll).toHaveBeenCalledTimes(1);
-  });
-
-  it("stops once aborted, and does not report what arrived after", async () => {
-    const controller = new AbortController();
-    const poll = vi.fn(async () => {
+    const read = vi.fn(async () => {
       controller.abort();
       return { status: "ready", questions: [QUESTION] };
     });
 
-    await expect(run(poll, controller)).resolves.toBeNull();
-    expect(poll).toHaveBeenCalledTimes(1);
-  });
-
-  it("does not ask at all when already aborted", async () => {
-    const controller = new AbortController();
-    controller.abort();
-    const poll = vi.fn();
-
-    await expect(run(poll, controller)).resolves.toBeNull();
-    expect(poll).not.toHaveBeenCalled();
+    await expect(run(read, controller)).resolves.toBeNull();
   });
 
   it("treats a ready answer with no usable questions as nothing", async () => {
-    const poll = vi
+    const read = vi
       .fn()
       .mockResolvedValue({ status: "ready", questions: [{ question: 1 }] });
 
-    await expect(run(poll)).resolves.toBeNull();
+    await expect(run(read)).resolves.toBeNull();
   });
 });

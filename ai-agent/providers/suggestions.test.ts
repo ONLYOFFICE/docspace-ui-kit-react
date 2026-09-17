@@ -37,68 +37,47 @@ const SET: SuggestionSet = {
   analyzableForm: [chip("form")],
 };
 
-const QUESTIONS = {
-  "att-1": [{ question: "Per payment method?", prompt: "Count per value." }],
-};
-
 describe("resolveSuggestions", () => {
   it("shows the section chips with an empty composer", () => {
-    expect(resolveSuggestions(SET, [], [], {})).toEqual(SET.default);
+    expect(resolveSuggestions(SET, [], [])).toEqual(SET.default);
   });
 
   it("switches on how many files are attached", () => {
-    expect(resolveSuggestions(SET, ["a"], [], {})).toEqual(SET.singleFile);
-    expect(resolveSuggestions(SET, ["a", "b"], [], {})).toEqual(
-      SET.multipleFiles,
-    );
+    expect(resolveSuggestions(SET, ["a"], [])).toEqual(SET.singleFile);
+    expect(resolveSuggestions(SET, ["a", "b"], [])).toEqual(SET.multipleFiles);
   });
 
   it("prefers the analyzable-form chips over the file lists", () => {
     // Two files attached, one of them an analyzable form: the form wins.
-    expect(resolveSuggestions(SET, ["a", "att-1"], ["att-1"], {})).toEqual(
+    expect(resolveSuggestions(SET, ["a", "att-1"], ["att-1"])).toEqual(
       SET.analyzableForm,
     );
   });
 
-  it("prefers the form's own generated questions over every static list", () => {
-    expect(
-      resolveSuggestions(SET, ["a", "att-1"], ["att-1"], QUESTIONS),
-    ).toEqual([
-      { name: "Per payment method?", prompt: "Count per value." },
-    ]);
-  });
-
-  it("ignores questions of an attachment that is no longer attached", () => {
-    // The user removed the form's chip: its questions must not outlive it.
-    expect(resolveSuggestions(SET, ["a"], ["att-1"], QUESTIONS)).toEqual(
-      SET.singleFile,
-    );
-  });
-
-  it("ignores an analyzable id that has no questions yet", () => {
-    expect(resolveSuggestions(SET, ["att-2"], ["att-2"], QUESTIONS)).toEqual(
+  // The form's own generated questions belong to the analyze mode: they are
+  // asked for per attachment and waited for on the socket, so an ordinary
+  // chat with a form attached keeps the host's static list.
+  it("keeps the static form chips for an analyzable form outside the mode", () => {
+    expect(resolveSuggestions(SET, ["att-1"], ["att-1"])).toEqual(
       SET.analyzableForm,
     );
-    expect(
-      resolveSuggestions(SET, ["att-2"], ["att-2"], { "att-2": [] }),
-    ).toEqual(SET.analyzableForm);
+  });
+
+  it("ignores an analyzable id that is no longer attached", () => {
+    expect(resolveSuggestions(SET, ["a"], ["att-1"])).toEqual(SET.singleFile);
   });
 
   it("falls back to the section chips when a list is not provided", () => {
     const sparse: SuggestionSet = { default: [chip("section")] };
-    expect(resolveSuggestions(sparse, ["a"], [], {})).toEqual(sparse.default);
-    expect(resolveSuggestions(sparse, ["a", "b"], [], {})).toEqual(
-      sparse.default,
-    );
-    expect(resolveSuggestions(sparse, ["a"], ["a"], {})).toEqual(
-      sparse.default,
-    );
+    expect(resolveSuggestions(sparse, ["a"], [])).toEqual(sparse.default);
+    expect(resolveSuggestions(sparse, ["a", "b"], [])).toEqual(sparse.default);
+    expect(resolveSuggestions(sparse, ["a"], ["a"])).toEqual(sparse.default);
   });
 
   it("passes a bare array and an absent value through untouched", () => {
     const bare = [chip("fixed")];
-    expect(resolveSuggestions(bare, ["a"], ["a"], QUESTIONS)).toBe(bare);
-    expect(resolveSuggestions(undefined, [], [], {})).toBeUndefined();
+    expect(resolveSuggestions(bare, ["a"], ["a"])).toBe(bare);
+    expect(resolveSuggestions(undefined, [], [])).toBeUndefined();
   });
 });
 
@@ -112,7 +91,7 @@ describe("resolveSuggestions in analyze mode", () => {
 
   it("shows the generated questions instead of any static list", () => {
     expect(
-      resolveSuggestions(SET, ["att-1"], ["att-1"], {}, {
+      resolveSuggestions(SET, ["att-1"], ["att-1"], {
         active: true,
         questions: analyzeQuestions,
       }),
@@ -121,16 +100,16 @@ describe("resolveSuggestions in analyze mode", () => {
 
   it("shows nothing while the questions are still being generated", () => {
     expect(
-      resolveSuggestions(SET, ["att-1"], ["att-1"], QUESTIONS, {
+      resolveSuggestions(SET, ["att-1"], ["att-1"], {
         active: true,
         questions: null,
       }),
     ).toEqual([]);
   });
 
-  it("falls back to the ordinary rules once the lock is gone", () => {
+  it("falls back to the ordinary rules once the mode is gone", () => {
     expect(
-      resolveSuggestions(SET, ["att-1"], ["att-1"], {}, {
+      resolveSuggestions(SET, ["att-1"], ["att-1"], {
         active: false,
         questions: null,
       }),
