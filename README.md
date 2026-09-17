@@ -14,7 +14,9 @@
   </a>
 </p>
 
-> **Note:** This library is currently in early development (`v0.0.1`) and is **not yet published to npm**. The API may change before a stable release.
+> **Note:** version `4.0.0`, **not yet published to npm**. DocSpace consumes a packed tarball
+> built from this repository. See [CHANGELOG.md](CHANGELOG.md) — 4.0.0 renamed the package,
+> made it ESM-only and put an `exports` map in front of every subpath.
 
 > **Scope:** not every directory in this package is public API. Modules coupled to a DocSpace portal — `api/`, `billing/`, `selectors/`, `uploader/`, `ai-agent/`, `document-editor/` and `providers/api` — ship in the package but are intended for ONLYOFFICE's own products. See [`docs/public-api.md`](docs/public-api.md).
 
@@ -23,7 +25,7 @@
 - **TypeScript-first** - Full type definitions included out of the box
 - **Color system** - Built-in `globalColors` palette with named color tokens for light and dark UI states
 - **Interactive docs** - Every component is documented with [Storybook](https://storybook.js.org/) stories and controls
-- **Tree-shakeable** - Ships both ESM and CJS builds; import only what you use
+- **Tree-shakeable** - ESM only, one module per source file; import only what you use
 - **Well-tested** - Components are tested with [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 - **Modern tooling** - Built with Rollup, linted and formatted with [Biome](https://biomejs.dev/)
 
@@ -51,14 +53,21 @@ Until then, install a packed tarball built from this repository:
 
 ```bash
 pnpm build && pnpm pack
-pnpm add file:../path/to/onlyoffice-apps-ui-kit-0.0.1.tgz
+pnpm add file:../path/to/onlyoffice-apps-ui-kit-4.0.0.tgz
 ```
 
-**Peer dependencies:** `react` and `react-dom` ^19.0.0 are required. A number of further
-peers are optional and only needed by the modules that use them — `i18next` and
-`react-i18next` for translated components, `mobx` / `mobx-react` and `axios` for the
-portal-coupled modules, `@onlyoffice/document-editor-react` for `document-editor/`, and
-`@onlyoffice/ai-chat` for `ai-agent/`. See `peerDependencies` in `package.json`.
+**Peer dependencies:** four are required — `react` and `react-dom` ^19.0.0, plus `i18next`
+and `react-i18next`, which the translated components need and which break silently if a
+second copy ends up in the tree. Fifteen more are optional and only matter to the modules
+that use them: `mobx` / `mobx-react` and `react-router` for the portal-coupled modules,
+`axios` for `providers/api`, `socket.io-client` for `utils/socket`,
+`@onlyoffice/document-editor-react` for `document-editor/`, and `@onlyoffice/ai-chat` with
+the markdown and KaTeX stack for `ai-agent/`. An install downloads none of the optional
+set. See `peerDependencies` in `package.json`.
+
+> `axios` is the exception worth knowing about: the main entry reaches it through
+> `uploader` and `billing`, so a consumer that bundles the barrel has to install it even
+> though it is declared optional. Tracked in [`docs/public-api.md`](docs/public-api.md).
 
 Styles come with the components: every module imports its own CSS file, so a
 bundler ships exactly the styles of the components you import, split along the
@@ -122,7 +131,6 @@ import {
   EmptyView,
   FieldContainer,
   FileInput,
-  FilterInput,
   Heading,
   HelpButton,
   IconButton,
@@ -130,18 +138,15 @@ import {
   Label,
   Link,
   Loader,
-  LoaderWrapper,
   LoadingButton,
   MCPIcon,
   ModalDialog,
   Portal,
   ProgressBar,
-  PublicRoomBar,
   RadioButton,
   RadioButtonGroup,
   RectangleSkeleton,
   RoomIcon,
-  RoomLogo,
   Row,
   RowContainer,
   RowContent,
@@ -149,10 +154,8 @@ import {
   SearchInput,
   SelectedItem,
   SelectionArea,
-  Selector,
   Slider,
   SnackBar,
-  StatusMessage,
   TabItem,
   Tabs,
   Tag,
@@ -176,6 +179,15 @@ import {
   TileContent,
 } from "@onlyoffice/apps-ui-kit";
 ```
+
+> Six components that look like they belong in this list are **not** reachable from the main
+> entry today: `FilterInput`, `LoaderWrapper`, `PublicRoomBar`, `RoomLogo`, `Selector` and
+> `StatusMessage`. Three are default exports, which `export *` does not re-export; the other
+> folders are not registered in `components/index.ts`. Import them by subpath —
+> `import { Selector } from "@onlyoffice/apps-ui-kit/components/selector"`,
+> `import FilterInput from "@onlyoffice/apps-ui-kit/components/filter"` — and note that a
+> DocSpace plugin cannot reach them at all, since the portal gives plugins the main entry and
+> refuses every subpath.
 
 ### Import specific components
 
@@ -852,6 +864,36 @@ everything works out of the box.
 > `DOCSPACE_CLIENT_ROOT` pointing at your checkout) if `pnpm storybook-build` complains
 > about the missing stylesheet. The same command refreshes the non-English locales.
 
+### Running any of this from VS Code
+
+Open [`ui-kit.code-workspace`](ui-kit.code-workspace) rather than the folder. It adds six
+grouped buttons to the status bar, each opening a list of tasks:
+
+| Button | What it runs |
+|---|---|
+| 📖 **Storybook** | dev server, static build, serve the built site |
+| ✅ **Check** | the whole pre-push gate in one go, or `tsc` / Biome / Vitest / Prettier on their own |
+| 📦 **Package** | `build`, `verify:package`, both together, `pack --dry-run`, `clean` |
+| 🔍 **Audit** | the checks nothing else runs — plugin API surface, drift against the plugin skill, undefined tokens and hardcoded hex, manifest invariants, missing docs — plus the component scaffolder |
+| 📸 **E2E** | Playwright locally or in Docker, and the screenshot update |
+| 🔄 **Sync** | `pnpm install`, and refreshing locales, fonts and icons from a client checkout |
+
+The buttons come from the **VsCodeTaskButtons** extension
+(`spencerwmiles.vscode-task-buttons`), which VS Code offers on first open — it is in
+[`.vscode/extensions.json`](.vscode/extensions.json). Without it nothing is lost: the same
+tasks are in **Terminal → Run Task…**, and every one of them is a `pnpm` script or a
+`node .claude/scripts/…` command you can type yourself.
+
+[`.vscode/launch.json`](.vscode/launch.json) adds debuggers for Vitest — the open file or
+the whole suite — and a browser attached to a Storybook the Storybook button has already
+started.
+
+Adding a button means editing three files, and missing one leaves a button that appears and
+does nothing: the script in `package.json`, the task in
+[`.vscode/tasks.json`](.vscode/tasks.json), and the button in `ui-kit.code-workspace`, whose
+`task` field must match the task's label exactly. `.claude/rules/vscode-tasks.md` has the
+detail and a one-liner that checks the three agree.
+
 ### Storybook - interactive component explorer
 
 ```bash
@@ -872,12 +914,15 @@ pnpm test:ui        # Vitest UI dashboard
 ### Build
 
 ```bash
-pnpm build          # production build (ESM + CJS + type declarations)
+pnpm build          # production build (ESM + type declarations; no CJS)
 pnpm build:watch    # rebuild on file changes
 ```
 
-The build also runs a set of checks against `dist/`: no bundled dependencies, a single
-extracted stylesheet, and per-format type markers.
+The build also runs a set of checks against `dist/`: no bundled dependency compiled into
+the output, every emitted module an `index` file (the `exports` map is one `./*` wildcard,
+and nothing else would resolve), and a `"use client"` directive preserved for each of the
+55 modules that declare one — rollup drops module-level directives while bundling, and
+without them every Next.js App Router consumer breaks on the first interactive component.
 
 ### Verifying the package
 
