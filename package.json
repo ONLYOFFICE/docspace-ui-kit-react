@@ -225,6 +225,8 @@
     "locales",
     "styles",
     "LICENSE",
+    "CHANGELOG.md",
+    "AUTHORS.md",
     "components/**/README.md",
     "context/**/README.md",
     "providers/**/README.md",

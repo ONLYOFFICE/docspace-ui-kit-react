@@ -919,6 +919,15 @@ not enforced by any gate.
 
 Issues and feature requests are tracked in the [DocSpace-client repository](https://github.com/ONLYOFFICE/DocSpace-client/issues). Contributions are welcome - please open an issue or PR there, or start a discussion on the [community forum](https://community.onlyoffice.com).
 
+## Changelog
+
+Release notes are in [CHANGELOG.md](CHANGELOG.md). Start there before upgrading: 4.0.0 renamed
+the package, made it ESM-only and put an `exports` map in front of every subpath.
+
+## Authors
+
+[AUTHORS.md](AUTHORS.md).
+
 ## License
 
 AGPL-3.0-only. See [LICENSE](LICENSE).
