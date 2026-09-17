@@ -7,7 +7,8 @@ frontend products (client, login, doceditor, management, sdk).
 tests and runs Storybook on its own, with no DocSpace checkout beside it. Consumers
 depend on the **published package** — they resolve it to `dist`, not to the source root
 as they did under the monorepo. DocSpace-client currently consumes a packed tarball;
-publication to npm has not happened yet (`version` is still `0.0.1`).
+publication to npm has not happened yet; the manifest is at `4.0.0` and the package is
+`@onlyoffice/apps-ui-kit`, AGPL-3.0-only.
 
 The separation work lives on `feature/ui-kit-separation`. See `docs/public-api.md` for
 the published surface and the tiering of public versus portal-internal modules.
@@ -17,11 +18,24 @@ sources, so packaging defects (`exports` subpaths, peer deps, missing assets) ar
 caught by `pnpm build` + `pnpm verify:package` here, or by a consumer. Prefer Storybook
 for component work and reach for the packed tarball when verifying the package itself.
 
+## Rules in `.claude/rules/`
+
+Path-scoped detail that does not belong here, loaded when the matching files are touched:
+
+| Rule | Covers |
+|---|---|
+| `plugin-api.md` | the root barrel **is** the DocSpace plugin UI API; the portal shim, subpath imports that throw, and the `agent-skills` skill that documents it |
+| `component-authoring.md` | folder layout, props and JSDoc, `ref` as a prop, stories, what `vitest.config.ts` actually collects |
+| `theming.md` | which layer a `var(--x)` comes from, undefined tokens failing silently, RTL |
+| `packaging.md` | `exports`, `publishConfig`, ESM-only dist, dependency placement, per-module CSS, `"use client"` |
+| `source-checks.md` | the hidden gate enforced from DocSpace-client -- hex, ASCII, indentation, assets, deps, licence |
+
 ## Tech Stack
 
 - **React 19** (peer dependency)
 - **TypeScript 5** (strict mode, `tsconfig.json`)
-- **Rollup** — library build (`rollup.config.mjs`), outputs ESM/CJS
+- **Rollup** — library build (`rollup.config.mjs`), **ESM only** (`dist/esm`, `dist/types`);
+  there is no CJS output
 - **Storybook 10** — component documentation and visual development
 - **Vitest** — unit and component tests
 - **Biome** — linting only. Its **formatter is disabled**
@@ -91,8 +105,9 @@ does not.
 # Install dependencies
 pnpm install
 
-# Library build: rollup -> tsc declarations -> normalize types -> single
-# stylesheet -> assert no bundled dependencies
+# Library build: rollup -> tsc declarations -> normalize types -> per-directory
+# package.json markers -> assemble dist/styles.css -> assert no bundled
+# dependencies, no non-index chunks, no lost "use client"
 pnpm build
 
 # Pack with pnpm and run publint + attw against the real tarball.
@@ -163,14 +178,14 @@ applies. Three levels, fastest first:
 - **Icons**: SVG files in `assets/icons/` imported as React components (`*.react.svg`)
 - **Exports**: all public API through `index.ts` at each folder level; tree-shaking must be preserved
 - **Peer deps**: React and React-DOM are peer dependencies — never bundle them
-- **`forwardRef`**: required on all interactive/input elements
+- **`ref` as a prop**: React 19, so `ref?: React.Ref<HTMLElement>` in the props type. Do not
+  add `forwardRef` to new components; the 20 that still use it are legacy
 - **Accessibility**: WCAG 2.1 AA — `aria-*` attributes, keyboard navigation, focus management
 - **Biome**: 80-char line width, double quotes, trailing commas, CRLF line endings
 - **Tests**: Vitest + React Testing Library, setup in `test/setup.ts`
 - **Stories**: every component must have a story. It may live in a subdirectory rather
   than beside `index.ts` — `table`, `rows` and `tiles` all do — so check recursively
-  before concluding one is missing. Four components currently have none:
-  `avatar-editor-dialog`, `quantity-picker`, `room-logo-cover-dialog`, `theme-provider`
+  before concluding one is missing. `theme-provider` is the only one currently without
 
 ## Commit messages
 
