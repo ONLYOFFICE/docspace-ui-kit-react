@@ -3,20 +3,31 @@
 What `@onlyoffice/apps-ui-kit` promises to external consumers, what it keeps for the
 DocSpace portal, and what it guarantees about neither.
 
-**Status:** proposed. This document is the contract the `exports` map, the dependency list and
-the compatibility policy are derived from — nothing downstream can be written until it is
-agreed. Verified against `feature/ui-kit-separation`.
+**Status:** largely landed. The `exports` map, the dependency split and the build that serves
+them are in the tree; what remains open is listed at the end, and one thing this document
+claimed has turned out not to be true — see *Dependency consequences*. Counts verified against
+`feature/ui-kit-separation` and a DocSpace-client checkout on the same branch.
 
 ## Why this exists
 
-Today nothing distinguishes public API from internals. All six monorepo apps resolve
-`@onlyoffice/apps-ui-kit` to the **source root** — a `node_modules` symlink plus an explicit webpack
-alias in the Next.js apps — so with no `exports` map, any path inside the package is
-importable. The result is 3 609 deep-subpath imports across 1 364 files reaching arbitrary
-internals, and no way to change anything without guessing who depends on it.
+Nothing used to distinguish public API from internals. All six monorepo apps resolved
+`@onlyoffice/apps-ui-kit` to the **source root** — a `node_modules` symlink plus an explicit
+webpack alias in the Next.js apps — so with no `exports` map, any path inside the package was
+importable, and there was no way to change anything without guessing who depended on it.
 
-Publishing forces the question. An `exports` map declares what resolves; everything else stops
-being reachable. That is the enforcement this document defines.
+Publishing forced the question. An `exports` map declares what resolves; everything else stops
+being reachable. The client now consumes a packed tarball
+(`file:../../onlyoffice-apps-ui-kit.tgz`, declared by both `packages/client` and
+`packages/shared`), so that enforcement is live: 4 060 deep-subpath import sites across 1 575
+files resolve through the map rather than through a symlink.
+
+**The barrel is a second contract, and a stricter one.** DocSpace plugins never install this
+package: the portal re-exports the root barrel to them in one line and refuses every subpath,
+so `index.ts` is the whole plugin UI API and dropping a name from it breaks plugins with no
+compile error in either repository. The client barely uses the barrel — 11 import sites against
+4 060 subpath ones — which is why a barrel change can look harmless here and in the client and
+still be breaking. `docs/plugin-surface.json` records that surface name by name;
+`.claude/rules/plugin-api.md` has the mechanism.
 
 ## Tiers
 
@@ -49,19 +60,48 @@ ThemeProvider **and ApiProvider**, and calls `fetchProvidersData()` to load port
 mount. It is portal-shaped by construction: an external consumer has no such endpoint. Publish
 the three providers individually and let consumers compose their own root.
 
-Removing `./api` from the barrel is not enough on its own: `Providers.tsx` imports
-`ApiProvider`, so while it stayed exported the root barrel still dragged `axios` into the core
-through it. Both had to leave `providers/index.ts` for `axios` to become a portal-only
-dependency. Both remain importable by subpath.
+Removing `./api` from the barrel was not enough on its own: `Providers.tsx` imports
+`ApiProvider`, so while it stayed exported the root barrel dragged `axios` into the core
+through it. Both left `providers/index.ts`, and both remain importable by subpath.
+
+**That did not make `axios` portal-only, and this document claimed otherwise until now.** The
+root `index.ts` also exports `uploader` and `billing`, and each reaches `axios` by another
+route:
+
+```
+index.js -> uploader/index.js        -> providers/api/ApiProvider/index.js -> axios
+index.js -> billing/wallet/...       -> selectors/People/index.js          -> axios
+```
+
+Since `axios` is an *optional* peer, `npm i @onlyoffice/apps-ui-kit` does not install it, and a
+bare `import { Button } from "@onlyoffice/apps-ui-kit"` then fails to resolve for anyone who
+bundles the barrel themselves. Observed, not inferred: the DocSpace plugin preview harness
+reports `Could not resolve "axios" imported by "@onlyoffice/apps-ui-kit"` on a freshly generated
+plugin. The portal is unaffected, because it supplies `axios` and hands plugins its own mounted
+copy of the kit at runtime.
+
+The cause is not `axios`. It is that `billing` and `uploader` are filed as portal-internal below
+and exported from the root barrel anyway, so the "public core" is not what the barrel actually
+pulls. Two ways out, and they are not equivalent:
+
+- **Drop `billing` and `uploader` from `index.ts`**, leaving them on subpaths like the other
+  portal-internal modules. Consistent with the tiering, and it makes the optional-peer split
+  true — but it removes both from the plugin API, which is barrel-only.
+- **Promote `axios` to a `dependency`.** Keeps every consumer working and costs external
+  consumers one package they will not call, but it gives up the goal this section states.
+
+Unresolved; tracked as open question 6.
 
 **`utils/socket`.** The only importer of `socket.io-client` and
 `@socket.io/component-emitter` in the whole library, and meaningful only against a DocSpace
-portal's socket server. Keeping it out of the public surface removes both dependencies from the
-published package.
+portal's socket server. Keeping it out of the public surface moves both dependencies to
+optional peers rather than removing them: the module still ships (`dist/esm/utils/socket`), and
+it is reachable by subpath, but an external install downloads neither package. Unlike `axios`
+above, nothing in the root barrel reaches it.
 
 ## Portal-internal
 
-These **ship in the published package** and resolve normally — the monorepo depends on them 223
+These **ship in the published package** and resolve normally — the monorepo depends on them 227
 times and must be able to consume the built artifact uniformly (WP-12). What they lack is a
 *contract*: no semver promise, no documentation for external use, no support.
 
@@ -71,14 +111,20 @@ resolution alone.
 
 | Module | Client imports | Why not public API |
 |---|---|---|
-| `ai-agent` | 71 | Depends on `@onlyoffice/ai-chat`, which cannot currently be published. Ships anyway, via optional peer dependencies — see below |
-| `billing` | 69 | Portal tariff/payment flows; depends on the API layer and MobX stores |
-| `selectors` | 74 | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX |
+| `ai-agent` | 80 | Depends on `@onlyoffice/ai-chat`, which cannot currently be published. Ships anyway, via optional peer dependencies — see below |
+| `billing` | 68 | Portal tariff/payment flows; depends on the API layer and MobX stores |
+| `selectors` | 70 | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX |
 | `uploader` | 7 | Depends on `selectors/Files` and `providers/api` |
 | `document-editor` | 2 | Wrapper around `@onlyoffice/document-editor-react`; external consumers should use that package directly |
 | `api` | — | Portal REST client |
 | `providers/api` | — | Portal API provider; sole importer of `axios` |
 | `utils/socket` | — | See above |
+
+**Two of them are in the root barrel**: `index.ts` exports `uploader` and `billing` alongside
+the public modules, so they are portal-internal by tiering and public by resolution — and, since
+the barrel is the plugin API, they are plugin API too. The others (`ai-agent`, `api`,
+`selectors`, `document-editor`, `providers/api`, `utils/socket`) are subpath-only and therefore
+unreachable from a plugin. That inconsistency is what leaks `axios` into the core; see above.
 
 Any of these could be promoted to public later if there is external demand (D5). Promotion is
 cheap — it means documenting and committing to semver, not moving code.
@@ -128,10 +174,9 @@ three public providers actually import. Notably including:
 
 **`@onlyoffice/docspace-api-sdk`**, imported by 15 core files — `components/selector` (5),
 `providers/theme` (2), `providers/translation`, `utils/common` and others — almost entirely for
-types and enums such as `RoomType`, `FolderType` and `CustomColorThemesSettingsItem`. Currently
-a `file:` tarball, which is unpublishable. Version 3.7.0 **is** on public npm, so switching to
-`^3.7.0` removes the blocker — but the two are **not the same artifact**, and that is worth
-knowing:
+types and enums such as `RoomType`, `FolderType` and `CustomColorThemesSettingsItem`. It was a
+`file:` tarball, which is unpublishable; it is now `^3.7.0` from public npm. The switch is done,
+but it was **not** a swap of identical artifacts, and the reason to record that is below:
 
 | | npm 3.7.0 | vendored 3.7.0 |
 |---|---|---|
@@ -143,10 +188,11 @@ The npm build is a strict superset by file presence — nothing is lost by switc
 two enums the core actually imports, `room-type.js` and `folder-type.js`, are byte-identical.
 Both manifests declare version 3.7.0, Apache-2.0 and a single dependency.
 
-So the switch is safe in the ways that matter here, but it is **not a no-op**: one version
-number currently designates two different builds. That is a publishing-hygiene problem on the
-API SDK side, and it means the vendored tarball was never a reliable record of what 3.7.0 is.
-Reproducible builds (WP-5) depend on this not recurring.
+So the switch was safe in the ways that matter here, but it was **not a no-op**: one version
+number designated two different builds. That is a publishing-hygiene problem on the API SDK
+side, and it means the vendored tarball was never a reliable record of what 3.7.0 is.
+Reproducible builds (WP-5) depend on this not recurring — which is a reason to keep this note
+after the switch, not to delete it with the blocker.
 
 ### `peerDependencies`, required
 
@@ -156,72 +202,95 @@ translation silently. Peer, never bundled.
 
 ### `peerDependencies`, optional — portal-internal only
 
-Declared so the portal can satisfy them and external consumers never download them:
+Declared so the portal can satisfy them and external consumers never download them. Fifteen,
+and this is the whole list — every one is verified to be imported somewhere under this package
+root:
 
 | Package(s) | Needed by |
 |---|---|
 | `@onlyoffice/ai-chat` | `ai-agent` |
-| `@anthropic-ai/sdk`, `openai`, `@google/genai`, `@mistralai/mistralai`, `@assistant-ui/react-markdown`, `@codemirror/lang-json`, `codemirror`, `katex`, `react-shiki`, `class-variance-authority`, `tailwind-merge`, `@radix-ui/react-{dialog,switch,tabs,tooltip}` | **`ai-chat`'s own optional peers** — see below |
-| `mobx`, `mobx-react` (77 importers, all portal) | `selectors`, `billing` |
-| `axios` | `providers/api` |
+| `mobx`, `mobx-react` (84 importers, all portal) | `selectors`, `billing` |
+| `axios` | `providers/api` — but see *Dependency consequences*: the barrel reaches it |
 | `socket.io-client`, `@socket.io/component-emitter` | `utils/socket` |
 | `react-router` | portal navigation |
-| `react-markdown`, `react-syntax-highlighter`, `rehype-katex`, `rehype-raw`, `remark-gfm`, `remark-math` | `ai-agent` markdown rendering |
+| `react-markdown`, `react-syntax-highlighter`, `rehype-katex`, `rehype-raw`, `remark-gfm`, `remark-math`, `katex` | `ai-agent` markdown rendering |
 | `@onlyoffice/document-editor-react` | `document-editor` |
 
-### The 15 packages nobody imports, and why they must stay
+**`ai-chat`'s own optional peers are deliberately not here.** An earlier revision of this
+document said they were, and they were declared for a while: the LLM vendor SDKs, the
+assistant-ui packages, codemirror, radix and the rest. They were removed again, because nothing
+in this package imports them and pnpm installs neither peers nor optional peers — so declaring
+them satisfied nothing and only duplicated a list nobody kept in sync. `ai-chat` declares its
+own peers; supplying them is the consuming app's job, and the DocSpace client carries the list
+in its `pnpm-workspace.yaml` catalog for the apps that render the AI agent.
 
-Fifteen of ui-kit's current `dependencies` have **zero imports** anywhere in the library. They
-are not dead weight: `@onlyoffice/ai-chat` declares **32 peer dependencies, 28 of them
-optional**, and these entries exist purely to satisfy them. Removing them would not break the
-build — it would silently switch off `ai-chat` features, since that is exactly what an
-unsatisfied optional peer does.
+### The 15 packages nobody imported — resolved
 
-They therefore move from `dependencies` to **optional peers**, keeping their satisfying role
-while leaving external installs alone.
+Fifteen of ui-kit's `dependencies` once had **zero imports** anywhere in the library. They were
+not dead weight: `@onlyoffice/ai-chat` declares **32 peer dependencies, 28 of them optional**,
+and those entries existed purely to satisfy them.
 
-Two entries are *not* explained by `ai-chat`'s peer list and need separate decisions:
+That whole arrangement is gone. `dependencies` now holds 32 packages, all imported;
+`react-virtualized-auto-sizer` was dropped outright; `@babel/runtime` is gone too, and the build
+does not miss it. What remains is `ai-chat`'s peer list, which this package deliberately no
+longer mirrors — see the note above.
 
-- **`react-virtualized-auto-sizer`** — no import, not an `ai-chat` peer. Genuinely removable.
-- **`@babel/runtime`** — no source-level import, but Babel injects `@babel/runtime/helpers/*`
-  into transpiled output. Verify against the build before deleting.
-
-### Two of `ai-chat`'s *required* peers are satisfied by accident
-
-`@assistant-ui/react` and `assistant-stream` are **required** (non-optional) peers of `ai-chat`
-and are declared nowhere in ui-kit. They resolve today only because ui-kit declares
-`@assistant-ui/react-markdown`, which drags `@assistant-ui/react@0.11.58` in transitively
-(`pnpm why` confirms the chain). If that package ever changes its own requirement, a required
-peer of `ai-chat` breaks with no declaration anywhere pointing at the cause. Declare both
-explicitly.
-
-Six of the 28 optional peers are also unsatisfied — `@codemirror/state`, `@codemirror/view`,
-`@radix-ui/react-dropdown-menu`, `@radix-ui/react-slot`, `clsx`, `zustand` — so some `ai-chat`
-functionality is presumably inactive today. Whether that is intended belongs to whoever owns
-`ai-agent`.
+The consequence is worth stating plainly rather than leaving as a worry: **an app that renders
+`ai-agent` must satisfy `ai-chat`'s peers itself.** Anything it misses switches an `ai-chat`
+feature off silently, which is what an unsatisfied optional peer does. Two of them
+(`@assistant-ui/react`, `assistant-stream`) are *required* peers of `ai-chat`, so those fail
+loudly instead. Nothing here checks either; the `ai-agent` tests do not reach the code paths
+that load them.
 
 ## Subpath contract
 
-Deep imports stay supported — 2 694 of the 3 609 import sites are `components/*`, and breaking
-them is not on the table. The `exports` map therefore declares:
+Deep imports stay supported — 2 974 of the 4 060 import sites are `components/*`, and breaking
+them is not on the table. The `exports` map is deliberately small:
 
-- `.` — the barrel
-- `./styles.css` — the whole-library stylesheet, for consumers that cannot take the per-module CSS each component imports itself
-- `./<module>` and `./<module>/*` for every public module above
-- portal-internal paths, resolvable but undocumented
+| Key | Serves |
+|---|---|
+| `.` | the barrel |
+| `./styles.css` | the whole-library stylesheet, for consumers that cannot take the per-module CSS each component imports itself |
+| `./package.json` | required by tooling |
+| `./locales/*` | the vendored translations |
+| `./styles/*` | raw Sass sources, the form every `@use` in the portal writes |
+| `./*` | **one wildcard for every module subpath**, public and portal-internal alike |
 
-The barrel currently omits `hooks` and `assets` while both are deep-imported 101 times
-combined. Adding them makes the barrel match the documented surface.
+There is no per-module list. The build emits a single shape — `<subpath>/index.js` for the
+JavaScript, `<subpath>/index.d.mts` for the types — so one wildcard serves all of it, which is
+what replaced 916 generated entries and the script that wrote them. The cost is that the
+wildcard cannot serve anything that is not an `index` file: a plain (non-module) stylesheet is
+emitted as `<Name>.scss/index.css` with no `index.js` beside it, so it has no subpath at all and
+has to be reached through the module that imports it. `scripts/check-dist.mjs` enforces the
+shape the wildcard depends on.
+
+`hooks` is in the barrel. `assets` is not, and deliberately: hundreds of SVG modules, where a
+barrel would defeat tree-shaking. Twenty-two icons reach the barrel anyway, re-exported by name
+from `components/quick-actions/icons.ts` and `components/nav-menu/icons.ts` — a leak rather than
+a decision, and plugin API by accident, since the barrel is all a plugin can import. Six types
+from `@onlyoffice/docspace-api-sdk` arrive the same way through `types/` and `enums/`.
 
 ## Enforcement
 
-The contract is machine-checked, not merely written down:
+Partly machine-checked. What runs:
 
-- `exports` map — anything undeclared stops resolving
-- `publint` and `attw --pack` in CI — catches malformed maps and unresolvable types
-- clean-install smoke tests against bare Vite and Next.js apps — catches what the monorepo's
-  own resolution hides
-- an API-surface snapshot, so a change to the public surface shows up in review as a diff
+- **The `exports` map** — anything undeclared stops resolving.
+- **`publint` and `attw` against the packed tarball**, in the blocking `package` CI job
+  (`pnpm verify:package`). Note it is `attw <tarball>`, not `attw --pack .`: `publishConfig`
+  field overrides are a pnpm feature, and an npm-packed tarball has no `exports` and no `main`,
+  so `--pack` reports total failure for the wrong reason.
+- **`scripts/check-dist.mjs`**, at the end of `pnpm build` — no bundled dependencies, every
+  emitted module an `index` file, and a `"use client"` in `dist` for each of the 55 modules that
+  declare one.
+- **An API-surface snapshot** — `docs/plugin-surface.json`, written and diffed by
+  `.claude/scripts/plugin-surface/surface.mjs`. It fails on a removed or re-kinded export, which
+  is the change no compiler reports.
+
+What does not exist yet, though an earlier revision of this section listed it as if it did:
+**clean-install smoke tests against bare Vite and Next.js apps.** Nothing exercises the package
+from outside a pnpm workspace, which is exactly where the monorepo's own resolution hides
+defects — the `axios` case above is one such defect, and it was found by a plugin preview
+harness in another repository rather than by anything here.
 
 ## Open questions
 
@@ -237,15 +306,28 @@ The contract is machine-checked, not merely written down:
    `devDependencies` so the monorepo workspace still resolves them for local builds/tests.
    `react-virtualized-auto-sizer` (unused, not an `ai-chat` peer) was dropped outright.
    `publint` now passes clean against the packed tarball.
-2. ~~Should the ONLYOFFICE icons move to MIT with the code?~~ **Answered: no — non-code
-   elements keep CC BY-SA 4.0.** `LICENSE` carries three sets of terms: MIT for the code,
-   CC BY-SA 4.0 for illustrations, icon sets and technical writing, and an exclusion for the
-   four third-party brand marks in `assets/thirdparties/` (Box, GitHub), which are not
-   Ascensio System SIA's to license. This keeps the assets' terms unchanged by the relicense,
-   and keeps the 246 icons mirrored into the client repository under identical terms on both
-   sides.
+   **Amended:** `ai-chat`'s own peer list was subsequently removed again — nothing here imports
+   those packages and pnpm installs neither peers nor optional peers, so declaring them
+   satisfied nothing. The fifteen optional peers that remain are listed under
+   *`peerDependencies`, optional*.
+2. ~~Should the ONLYOFFICE icons move to MIT with the code?~~ **Answered: no — the package was
+   briefly relicensed under MIT and that was reverted; everything here is AGPL-3.0-only.**
+   `LICENSE` is the verbatim AGPL-3.0 text and nothing else: the same file the umbrella
+   `DocSpace` repository carries, with no ONLYOFFICE addendum and no per-file headers, so the
+   declaration rests on `package.json`, `LICENSE` and the README. The supplemental terms that
+   cover non-code elements — CC BY-SA 4.0 for illustrations, icon sets and technical writing,
+   plus the trademark exclusion — are stated in DocSpace-client's own `LICENSE`, not in this
+   repository; the 246 icons mirrored into that repository are governed by it there.
 3. **Should the core drop `@onlyoffice/docspace-api-sdk`** by inlining the handful of enums and
-   types it uses, rather than depending on the portal's API SDK? Not required for publication.
-4. **`@babel/runtime`** — required by the build output, or removable?
-5. **Are the six unsatisfied `ai-chat` optional peers intentional?** Owner: whoever maintains
-   `ai-agent`.
+   types it uses, rather than depending on the portal's API SDK? Not required for publication —
+   but note that six of its types now reach the root barrel, so a plugin author inherits the
+   package without ever naming it.
+4. ~~**`@babel/runtime`** — required by the build output, or removable?~~ **Answered:
+   removable.** It is no longer in `dependencies` and the build does not miss it.
+5. **Are the unsatisfied `ai-chat` optional peers intentional?** Owner: whoever maintains
+   `ai-agent`. Now a question for the consuming app rather than for this package, since the
+   peer list is no longer mirrored here.
+6. **`axios` is not portal-only, and cannot be while `billing` and `uploader` are in the root
+   barrel.** The two ways out are in *Dependency consequences*; they trade the tiering against
+   the plugin API, so this is a product decision, not a packaging one. Until it is taken, an
+   external consumer who bundles the barrel must install `axios` themselves.
