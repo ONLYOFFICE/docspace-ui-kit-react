@@ -78,10 +78,10 @@ export const perModuleCss = ({ generateScopedName, root = ROOT }) => {
     },
 
     async transform(code, id) {
-      if (
-        !STYLE_RE.test(id) ||
-        id.includes(`${path.sep}node_modules${path.sep}`)
-      )
+      // Matched on the POSIX form for the same reason ids are keyed by it: a
+      // `path.sep` here reads the running platform's separator, not the one the
+      // id was built with.
+      if (!STYLE_RE.test(id) || toPosix(id).includes("/node_modules/"))
         return null;
 
       let css = code;

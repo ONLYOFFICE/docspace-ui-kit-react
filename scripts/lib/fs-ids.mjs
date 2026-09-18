@@ -10,8 +10,17 @@
 import fs from "node:fs";
 import path from "node:path";
 
-/** A filesystem path as a POSIX id. Identity on POSIX, where `path.sep` is already `/`. */
-export const toPosix = (id) => id.split(path.sep).join("/");
+/**
+ * A filesystem path as a POSIX id. Identity on a path that is already POSIX.
+ *
+ * It replaces `\` rather than `path.sep`, which is the same thing on the
+ * platform that produced the path and not the same thing anywhere else: keyed
+ * off `path.sep`, this was a no-op on a Windows-shaped id whenever it ran on
+ * POSIX, so nothing could exercise the Windows branch of a caller except
+ * Windows itself. A backslash is a legal filename character on POSIX, but not
+ * in an id here -- `assertPosixIds` below rejects one outright.
+ */
+export const toPosix = (id) => id.replaceAll("\\", "/");
 
 /**
  * Every entry under `root`, files and directories alike, as `{ id, name, full,
