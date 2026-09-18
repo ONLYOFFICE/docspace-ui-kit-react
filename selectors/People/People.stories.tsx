@@ -78,11 +78,11 @@ const meta: Meta<StoryArgs> = {
   parameters: {
     docs: {
       description: {
-        component: `PeopleSelector is a searchable, paginated selector for choosing users and groups from the DocSpace system.
+        component: `PeopleSelector is a searchable, paginated selector for choosing users and groups from the ONLYOFFICE Apps system.
 
 ### Features
 
-- **Live API mode**: Fetches members, groups, and guests from the DocSpace Search API with infinite scroll
+- **Live API mode**: Fetches members, groups, and guests from the ONLYOFFICE Apps Search API with infinite scroll
 - **Tabs**: Toggle Members, Groups, and Guests tabs via \`withGroups\` and \`withGuests\`
 - **Single / multi-select**: Controlled by \`isMultiSelect\`
 - **Room scope**: Pass \`roomId\` to filter users with access to a specific room
@@ -317,7 +317,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default single-select mode. Fetches all members from the DocSpace API.",
+          "Default single-select mode. Fetches all members from the ONLYOFFICE Apps API.",
       },
       source: {
         code: `<PeopleSelector

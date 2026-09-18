@@ -270,7 +270,7 @@ export const WithNumeration: Story = {
 
 const sampleJSON = JSON.stringify(
   {
-    name: "DocSpace",
+    name: "ONLYOFFICE Apps",
     version: "1.0.0",
     features: ["collaboration", "sharing", "editing"],
   },
@@ -301,7 +301,7 @@ export const JSONField: Story = {
       },
       source: {
         code: `<Textarea
-  value='{"name": "DocSpace", "version": "1.0.0"}'
+  value='{"name": "ONLYOFFICE Apps", "version": "1.0.0"}'
   isJSONField
   hasNumeration
 />`,

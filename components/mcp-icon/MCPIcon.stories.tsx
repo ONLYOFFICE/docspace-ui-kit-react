@@ -25,7 +25,7 @@ const meta = {
 import { MCPIcon, MCPIconSize } from "@onlyoffice/apps-ui-kit/components/mcp-icon";
 
 // With title initial
-<MCPIcon title="DocSpace MCP" size={MCPIconSize.Large} />
+<MCPIcon title="ONLYOFFICE Apps MCP" size={MCPIconSize.Large} />
 
 // With image
 <MCPIcon title="My Server" size={MCPIconSize.Medium} imgSrc="/path/to/icon.svg" />
@@ -166,7 +166,7 @@ export const CssCustomization: Story = {
 export const Default: Story = {
   render: (args) => <MCPIcon {...args} />,
   args: {
-    title: "DocSpace MCP",
+    title: "ONLYOFFICE Apps MCP",
     size: MCPIconSize.Large,
   },
 };
@@ -197,7 +197,7 @@ const AllSizesTemplate = () => {
       {(Object.keys(MCPIconSize) as Array<keyof typeof MCPIconSize>).map(
         (key) => (
           <LabeledItem key={key} label={key}>
-            <MCPIcon title="DocSpace" size={MCPIconSize[key]} />
+            <MCPIcon title="ONLYOFFICE Apps" size={MCPIconSize[key]} />
           </LabeledItem>
         ),
       )}
@@ -213,10 +213,10 @@ export const AllSizes: Story = {
         story: "All available MCP icon sizes: Small, Medium, Big, and Large.",
       },
       source: {
-        code: `<MCPIcon title="DocSpace" size={MCPIconSize.Small} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Medium} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Big} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Large} />`,
+        code: `<MCPIcon title="ONLYOFFICE Apps" size={MCPIconSize.Small} />
+<MCPIcon title="ONLYOFFICE Apps" size={MCPIconSize.Medium} />
+<MCPIcon title="ONLYOFFICE Apps" size={MCPIconSize.Big} />
+<MCPIcon title="ONLYOFFICE Apps" size={MCPIconSize.Large} />`,
       },
     },
   },
@@ -229,7 +229,7 @@ const AllSizesWithImageTemplate = () => {
         (key) => (
           <LabeledItem key={key} label={key}>
             <MCPIcon
-              title="DocSpace"
+              title="ONLYOFFICE Apps"
               size={MCPIconSize[key]}
               imgSrc={LogoUrl}
             />
@@ -248,10 +248,10 @@ export const AllSizesWithImage: Story = {
         story: "All sizes with a custom image instead of the title initial.",
       },
       source: {
-        code: `<MCPIcon title="DocSpace" size={MCPIconSize.Small} imgSrc={logoUrl} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Medium} imgSrc={logoUrl} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Big} imgSrc={logoUrl} />
-<MCPIcon title="DocSpace" size={MCPIconSize.Large} imgSrc={logoUrl} />`,
+        code: `<MCPIcon title="ONLYOFFICE Apps" size={MCPIconSize.Small} imgSrc={logoUrl} />
+<MCPIcon title="ONLYOFFICE Apps" size={MCPIconSize.Medium} imgSrc={logoUrl} />
+<MCPIcon title="ONLYOFFICE Apps" size={MCPIconSize.Big} imgSrc={logoUrl} />
+<MCPIcon title="ONLYOFFICE Apps" size={MCPIconSize.Large} imgSrc={logoUrl} />`,
       },
     },
   },

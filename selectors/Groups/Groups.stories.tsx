@@ -19,7 +19,7 @@ const meta: Meta<StoryArgs> = {
 
 ### Features
 
-- **Live API mode**: Fetches groups from the DocSpace Groups API in batches of 100 with infinite scroll
+- **Live API mode**: Fetches groups from the ONLYOFFICE Apps Groups API in batches of 100 with infinite scroll
 - **Single-select**: The user can pick exactly one group at a time
 - **Search**: Filters groups by name; resets and re-fetches the list automatically
 - **Header**: Optional configurable header with a close button via \`withHeader\` / \`headerProps\`
@@ -151,7 +151,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default story using a live DocSpace API. Groups are fetched and filtered via the search field.",
+          "Default story using a live ONLYOFFICE Apps API. Groups are fetched and filtered via the search field.",
       },
       source: {
         code: `<GroupsSelector

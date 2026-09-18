@@ -344,11 +344,11 @@ export const Default: Story = {
     emptyScreenImage: EmptyScreenFilter,
     emptyScreenHeader: "No other accounts here yet",
     emptyScreenDescription:
-      "The list of users previously invited to DocSpace or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
+      "The list of users previously invited to ONLYOFFICE Apps or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
     searchEmptyScreenImage: EmptyScreenFilter,
     searchEmptyScreenHeader: "No other accounts here yet search",
     searchEmptyScreenDescription:
-      " SEARCH !!! The list of users previously invited to DocSpace or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
+      " SEARCH !!! The list of users previously invited to ONLYOFFICE Apps or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
     totalItems,
     hasNextPage: true,
     isNextPageLoading: false,
@@ -430,18 +430,18 @@ export const BreadCrumbs: Story = {
     emptyScreenImage: EmptyScreenFilter,
     emptyScreenHeader: "No other accounts here yet",
     emptyScreenDescription:
-      "The list of users previously invited to DocSpace or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
+      "The list of users previously invited to ONLYOFFICE Apps or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
     searchEmptyScreenImage: EmptyScreenFilter,
     searchEmptyScreenHeader: "No other accounts here yet search",
     searchEmptyScreenDescription:
-      " SEARCH !!! The list of users previously invited to DocSpace or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
+      " SEARCH !!! The list of users previously invited to ONLYOFFICE Apps or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
     totalItems,
     hasNextPage: true,
     isNextPageLoading: false,
     isLoading: false,
     withBreadCrumbs: true,
     breadCrumbs: [
-      { id: 1, label: "DocSpace" },
+      { id: 1, label: "ONLYOFFICE Apps" },
       { id: 2, label: "1111111" },
       { id: 3, label: "21222222222" },
       { id: 4, label: "32222222222222222222222222222222222222" },
@@ -472,7 +472,7 @@ export const BreadCrumbs: Story = {
   items={items}
   withBreadCrumbs
   breadCrumbs={[
-    { id: 1, label: "DocSpace" },
+    { id: 1, label: "ONLYOFFICE Apps" },
     { id: 2, label: "Folder A" },
     { id: 3, label: "Subfolder B" },
   ]}
@@ -513,18 +513,18 @@ export const NewName: Story = {
     emptyScreenImage: EmptyScreenFilter,
     emptyScreenHeader: "No other accounts here yet",
     emptyScreenDescription:
-      "The list of users previously invited to DocSpace or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
+      "The list of users previously invited to ONLYOFFICE Apps or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
     searchEmptyScreenImage: EmptyScreenFilter,
     searchEmptyScreenHeader: "No other accounts here yet search",
     searchEmptyScreenDescription:
-      " SEARCH !!! The list of users previously invited to DocSpace or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
+      " SEARCH !!! The list of users previously invited to ONLYOFFICE Apps or separate rooms will appear here. You will be able to invite these users for collaboration at any time.",
     totalItems,
     hasNextPage: true,
     isNextPageLoading: false,
     isLoading: false,
     withBreadCrumbs: true,
     breadCrumbs: [
-      { id: 1, label: "DocSpace" },
+      { id: 1, label: "ONLYOFFICE Apps" },
       { id: 2, label: "1111111" },
       { id: 3, label: "21222222222" },
     ],

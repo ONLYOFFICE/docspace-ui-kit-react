@@ -55,7 +55,7 @@ import MCPServersSelector from "@onlyoffice/apps-ui-kit/selectors/MCPServers";
 \`\`\`tsx
 enum ServerType {
   Custom,  // Custom MCP server
-  Portal,  // DocSpace portal server (uses portal logo)
+  Portal,  // ONLYOFFICE Apps portal server (uses portal logo)
   GitHub,  // GitHub integration
   Box,     // Box integration
 }
@@ -144,7 +144,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default story using a live DocSpace API. Available MCP servers are fetched and displayed for multi-selection.",
+          "Default story using a live ONLYOFFICE Apps API. Available MCP servers are fetched and displayed for multi-selection.",
       },
       source: {
         code: `<MCPServersSelector

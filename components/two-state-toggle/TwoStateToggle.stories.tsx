@@ -9,7 +9,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `HomeViewToggle is a pill-shaped toggle that switches between the new Dashboard view and the classic DocSpace view.
+        component: `HomeViewToggle is a pill-shaped toggle that switches between the new Dashboard view and the classic ONLYOFFICE Apps view.
 
 The current state is persisted in \`localStorage\` under the key \`useDocSpace\` (\`"new"\` | \`"old"\`).
 
@@ -45,11 +45,11 @@ import { HomeViewToggle } from "@onlyoffice/apps-ui-kit/components/home-view-tog
     title: {
       control: "text",
       description: "Text label shown to the left of the toggle",
-      table: { defaultValue: { summary: "DocSpace design" } },
+      table: { defaultValue: { summary: "ONLYOFFICE Apps design" } },
     },
     labelOld: {
       control: "text",
-      description: "Label for the classic DocSpace view (left side of pill)",
+      description: "Label for the classic ONLYOFFICE Apps view (left side of pill)",
       table: { defaultValue: { summary: "OLD" } },
     },
     labelNew: {
@@ -104,7 +104,7 @@ export default meta;
 
 export const Default: Story = {
   args: {
-    title: "DocSpace design",
+    title: "ONLYOFFICE Apps design",
     labelOld: "OLD",
     labelNew: "NEW",
   },
@@ -118,7 +118,7 @@ export const ShowingOldState: Story = {
     },
   ],
   args: {
-    title: "DocSpace design",
+    title: "ONLYOFFICE Apps design",
   },
   parameters: {
     docs: {

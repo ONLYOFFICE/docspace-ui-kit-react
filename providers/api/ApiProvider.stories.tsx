@@ -11,7 +11,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Provides API client context to all child components using the DocSpace API SDK.
+        component: `Provides API client context to all child components using the ONLYOFFICE Apps API SDK.
 
 ### Features
 
@@ -43,7 +43,7 @@ const MyComponent = () => {
   argTypes: {
     url: {
       control: "text",
-      description: "Base URL of the DocSpace API server",
+      description: "Base URL of the ONLYOFFICE Apps API server",
     },
     apiKey: {
       control: "text",

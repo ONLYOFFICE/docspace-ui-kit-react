@@ -68,11 +68,11 @@ const meta: Meta<StoryArgs> = {
   parameters: {
     docs: {
       description: {
-        component: `RoomSelector is a searchable, paginated selector for choosing rooms from the DocSpace system.
+        component: `RoomSelector is a searchable, paginated selector for choosing rooms from the ONLYOFFICE Apps system.
 
 ### Features
 
-- **Live API mode**: Fetches rooms from the DocSpace API with infinite scroll
+- **Live API mode**: Fetches rooms from the ONLYOFFICE Apps API with infinite scroll
 - **Single / multi-select**: Controlled by \`isMultiSelect\`
 - **Room type filter**: Pass \`roomType\` to restrict the list to specific room types
 - **Search**: Enable with \`withSearch\`
@@ -324,7 +324,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Default single-select mode with search. Fetches all rooms from the DocSpace API.",
+          "Default single-select mode with search. Fetches all rooms from the ONLYOFFICE Apps API.",
       },
       source: {
         code: `<RoomSelector

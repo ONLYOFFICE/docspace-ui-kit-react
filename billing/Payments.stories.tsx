@@ -37,7 +37,7 @@ const meta: Meta = {
     layout: "fullscreen",
     docs: {
       description: {
-        component: `Payments is the complete billing and subscription management system for DocSpace SaaS. It consists of four self-contained pages, each handling a specific area of payment operations, all sharing a common store layer provided by \`BillingRoot\`.
+        component: `Payments is the complete billing and subscription management system for ONLYOFFICE Apps SaaS. It consists of four self-contained pages, each handling a specific area of payment operations, all sharing a common store layer provided by \`BillingRoot\`.
 
 ### Architecture
 
@@ -140,7 +140,7 @@ export const Wallet: StoryObj = {
     docs: {
       description: {
         story:
-          "Portal wallet — the central balance used to pay for all DocSpace services (AI tools, backup, disk storage). Shows the current balance with locale-aware currency formatting. Includes a full transaction history with filtering by date range, type (all/credit/debit), and participant, plus report export. In service pages the transaction history is scoped to the specific service with date and participant filters only.\n\n**Non-payer admins:** the top-up button and auto-payment settings are hidden. The page shows balance and transaction history in read-only mode.",
+          "Portal wallet — the central balance used to pay for all ONLYOFFICE Apps services (AI tools, backup, disk storage). Shows the current balance with locale-aware currency formatting. Includes a full transaction history with filtering by date range, type (all/credit/debit), and participant, plus report export. In service pages the transaction history is scoped to the specific service with date and participant filters only.\n\n**Non-payer admins:** the top-up button and auto-payment settings are hidden. The page shows balance and transaction history in read-only mode.",
       },
       source: {
         code: `<div style={{ maxHeight: 1500, overflow: "hidden" }}>
@@ -204,7 +204,7 @@ export const AITools: StoryObj = {
     docs: {
       description: {
         story:
-          "AI tools service page. Manages a separate AI credits balance (sub-account of the portal wallet) used to pay for AI model usage across DocSpace.\n\n**Features:** service toggle, dedicated AI balance with top-up, low balance indicator, pricing & billing link with per-model token costs. Two tabs: **Usage** (transaction history scoped to AI) and **Model Settings** (enable/disable individual AI models).",
+          "AI tools service page. Manages a separate AI credits balance (sub-account of the portal wallet) used to pay for AI model usage across ONLYOFFICE Apps.\n\n**Features:** service toggle, dedicated AI balance with top-up, low balance indicator, pricing & billing link with per-model token costs. Two tabs: **Usage** (transaction history scoped to AI) and **Model Settings** (enable/disable individual AI models).",
       },
     },
   },

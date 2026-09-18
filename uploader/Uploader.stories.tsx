@@ -208,7 +208,7 @@ const meta: Meta<StoryArgs> = {
     docs: {
       description: {
         component:
-          "A file uploader component that supports chunked uploads, folder uploads, and file size validation. Uses the DocSpace API SDK for upload operations.",
+          "A file uploader component that supports chunked uploads, folder uploads, and file size validation. Uses the ONLYOFFICE Apps API SDK for upload operations.",
       },
     },
   },

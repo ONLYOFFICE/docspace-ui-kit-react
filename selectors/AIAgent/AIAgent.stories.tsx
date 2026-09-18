@@ -22,7 +22,7 @@ const meta: Meta<StoryArgs> = {
 
 ### Features
 
-- **Live API mode**: Fetches AI agent rooms from the DocSpace API with infinite scroll
+- **Live API mode**: Fetches AI agent rooms from the ONLYOFFICE Apps API with infinite scroll
 - **Init data mode**: Accepts pre-loaded items for SSR or offline scenarios via \`withInit\`
 - **Security filtering**: Disable items that lack the \`UseChat\` permission via \`disableBySecurity\`
 - **Exclusion list**: Skip already-selected agents via \`excludeItems\`
@@ -164,7 +164,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Default story using a live DocSpace API to load agent rooms.",
+        story: "Default story using a live ONLYOFFICE Apps API to load agent rooms.",
       },
       source: {
         code: `<AIAgentSelector

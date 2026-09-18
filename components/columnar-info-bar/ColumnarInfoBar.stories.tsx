@@ -29,7 +29,7 @@ import { ColumnarInfoBar } from "@onlyoffice/apps-ui-kit/components/columnar-inf
 <ColumnarInfoBar
   headerText="Your profile details"
   columns={[
-    { label: "DocSpace name", value: "my-portal.onlyoffice.com" },
+    { label: "ONLYOFFICE Apps name", value: "my-portal.onlyoffice.com" },
     { label: "Name", value: "John Smith" },
     { label: "Email", value: "john@example.com" },
     { label: "Generated password", value: "••••••••" },
@@ -73,7 +73,7 @@ export const ProfileDetails: Story = {
   args: {
     headerText: "Your profile details",
     columns: [
-      { label: "DocSpace name", value: "my-portal.onlyoffice.com" },
+      { label: "ONLYOFFICE Apps name", value: "my-portal.onlyoffice.com" },
       { label: "Name", value: "John Smith" },
       { label: "Email", value: "john@example.com" },
       { label: "Generated password", value: "••••••••" },
@@ -96,7 +96,7 @@ export const CssCustomization: Story = {
     <ColumnarInfoBar
       headerText="Custom styled bar"
       columns={[
-        { label: "Project", value: "DocSpace" },
+        { label: "Project", value: "ONLYOFFICE Apps" },
         { label: "Version", value: "2.6.0" },
         { label: "Region", value: "EU West" },
       ]}
