@@ -114,8 +114,6 @@ const preview: Preview = {
         order: [
           "Getting started",
           ["Welcome", "Structure", "Translation", "Themes", "API"],
-          "Samples",
-          "UI",
           "Components",
           [
             "Selectors",
@@ -125,6 +123,8 @@ const preview: Preview = {
             "Providers",
             "Errors",
           ],
+          "UI",
+          "Samples",
         ],
       },
     },
