@@ -45,6 +45,8 @@ import { fileURLToPath } from "node:url";
 import cssnano from "cssnano";
 import postcss from "postcss";
 
+import { assertPosixIds, walk } from "./lib/fs-ids.mjs";
+
 const DIST = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../dist",
@@ -52,17 +54,14 @@ const DIST = path.resolve(
 const ESM = path.join(DIST, "esm");
 const STYLESHEET = path.join(DIST, "styles.css");
 
-/** Every .js under a directory, as paths relative to it, sorted. */
-export const collect = (root, dir = root, found = []) => {
-  for (const entry of fs
-    .readdirSync(dir, { withFileTypes: true })
-    .sort((a, b) => a.name.localeCompare(b.name))) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) collect(root, full, found);
-    else if (entry.name.endsWith(".js")) found.push(path.relative(root, full));
-  }
-  return found;
-};
+/** Every .js under a directory, as POSIX ids relative to it, sorted. */
+export const collect = (root) =>
+  assertPosixIds(
+    [...walk(root, { sort: true })]
+      .filter((e) => !e.isDir && e.name.endsWith(".js"))
+      .map((e) => e.id),
+    "collect",
+  );
 
 /**
  * Relative import specifiers of one built module, resolved to module ids.
@@ -78,7 +77,7 @@ const importsOf = (id) => {
   for (const m of code.matchAll(IMPORT_RE)) {
     const spec = m[1] ?? m[2];
     if (!spec || !spec.startsWith(".")) continue;
-    out.push(path.normalize(path.join(path.dirname(id), spec)));
+    out.push(path.posix.join(path.posix.dirname(id), spec));
   }
 
   return out;
@@ -87,17 +86,14 @@ const importsOf = (id) => {
 /** A CSS Module: the only stylesheets that own component rules and take part in the ranking. */
 const isStylesheet = (id) => id.includes(".module.scss");
 
-/** Every emitted stylesheet, as `<stylesheet>/index.css` paths relative to dist/esm, sorted. */
-const collectCss = (root, dir = root, found = []) => {
-  for (const entry of fs
-    .readdirSync(dir, { withFileTypes: true })
-    .sort((a, b) => a.name.localeCompare(b.name))) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) collectCss(root, full, found);
-    else if (entry.name === "index.css") found.push(path.relative(root, full));
-  }
-  return found;
-};
+/** Every emitted stylesheet, as POSIX `<stylesheet>/index.css` ids relative to dist/esm, sorted. */
+const collectCss = (root) =>
+  assertPosixIds(
+    [...walk(root, { sort: true })]
+      .filter((e) => !e.isDir && e.name === "index.css")
+      .map((e) => e.id),
+    "collectCss",
+  );
 
 /**
  * Ranks the stylesheets, which is all the sort needs -- every rule is
@@ -203,7 +199,7 @@ const attribution = (ids) => {
     // generateScopedName is "dsui-[name]__[local]--[hash]" and [name] is the
     // file name without its extension, dots turned into dashes:
     // Button.module.scss -> "dsui-Button-module__".
-    const prefix = `dsui-${path.basename(path.dirname(id), ".scss").replace(/\./g, "-")}__`;
+    const prefix = `dsui-${path.posix.basename(path.posix.dirname(id), ".scss").replace(/\./g, "-")}__`;
     if (!byPrefix.has(prefix)) byPrefix.set(prefix, []);
     byPrefix.get(prefix).push(id);
 
@@ -325,7 +321,10 @@ export const orderedStylesheets = () => {
       : -1;
   };
 
-  return files.sort((a, b) => rankOf(a) - rankOf(b) || a.localeCompare(b));
+  return assertPosixIds(
+    files.sort((a, b) => rankOf(a) - rankOf(b) || a.localeCompare(b)),
+    "orderedStylesheets",
+  );
 };
 
 const main = async () => {

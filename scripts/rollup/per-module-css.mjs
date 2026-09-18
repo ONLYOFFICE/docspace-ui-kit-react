@@ -31,6 +31,8 @@ import postcss from "postcss";
 import postcssModules from "postcss-modules";
 import * as sass from "sass";
 
+import { toPosix } from "../lib/fs-ids.mjs";
+
 const STYLE_RE = /\.(?:scss|css)$/;
 const MODULE_RE = /\.module\.(?:scss|css)$/;
 
@@ -57,11 +59,10 @@ const ROOT = path.resolve(".");
 // stylesheet that was never compiled" for the first module it reached. POSIX
 // separators are what rollup emits in `fileName` anyway, so normalising here
 // makes the key, the marker and the emitted path the same string everywhere.
-const posixId = (id) => id.replace(/\\/g, "/");
 
 /** Where a stylesheet's CSS is emitted: <path relative to the root>/index.css, mirroring the module layout. */
 const cssFileForRoot = (root, id) =>
-  `${path.posix.relative(posixId(root), id)}/index.css`;
+  `${path.posix.relative(toPosix(root), id)}/index.css`;
 
 export const perModuleCss = ({ generateScopedName, root = ROOT }) => {
   const cssFileFor = (id) => cssFileForRoot(root, id);
@@ -108,11 +109,11 @@ export const perModuleCss = ({ generateScopedName, root = ROOT }) => {
         css = result.css;
       }
 
-      cssById.set(posixId(id), css);
+      cssById.set(toPosix(id), css);
 
       return {
         code:
-          `import ${JSON.stringify(MARKER + posixId(id))};\n` +
+          `import ${JSON.stringify(MARKER + toPosix(id))};\n` +
           (classes === null
             ? ""
             : `export default ${JSON.stringify(classes)};\n`),
