@@ -33,7 +33,6 @@ export {
   type AttachedFileInfo,
   type OnFilesAttached,
 } from "./attach-files";
-export { useHasFormAttached } from "./use-has-form-attached";
 // The composer lock a subject attachment ("Analyze responses") puts on the
 // draft. Consumed by the chat providers, which own the store bundle.
 export { useAnalyzeLock } from "./use-analyze-lock";

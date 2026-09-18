@@ -90,10 +90,6 @@ import { toastr } from "../../components/toast";
 import { Link, LinkType } from "../../components/link";
 
 import { AiChatAvailabilityContext } from "./availability";
-import {
-  FormsRecommendationContext,
-  type FormsRecommendation,
-} from "./forms-recommendation";
 import { ChatIntro } from "../chat-intro";
 import { AnalyzeIntro } from "../new-chat/components/analyze-intro";
 import { storageAdapter } from "./storage";
@@ -200,12 +196,6 @@ type AiAgentProvidersProps = {
    * fire and no chat UI is offered.
    */
   canUseAi?: boolean;
-  /**
-   * Wiring for the in-chat notice that recommends the model tested for form
-   * results. Shown above the chat while the composer carries a DocSpace form;
-   * omit it and the notice never appears.
-   */
-  formsRecommendation?: FormsRecommendation;
   getAgentRoomId?: () => number | null;
   openResultFile?: (fileId: number | string) => void;
   closeEditorPanel?: () => void;
@@ -518,7 +508,6 @@ const AiAgentProviders = ({
   isStandalone,
   isAvailable = false,
   canUseAi = true,
-  formsRecommendation,
   getAgentRoomId,
   openResultFile,
   closeEditorPanel,
@@ -602,26 +591,6 @@ const AiAgentProviders = ({
       setAnalyzableIds((prev) => [...prev, ...analyzable.map((f) => f.id)]);
     },
     [aiChatStore],
-  );
-
-  // Context value for the in-chat form-model notice. Memoized on the fields so
-  // a host passing a fresh object literal every render does not re-render the
-  // whole chat tree.
-  const formsRecommendationValue = useMemo<FormsRecommendation>(
-    () => ({
-      recommendedModel: formsRecommendation?.recommendedModel,
-      canEditAgent: formsRecommendation?.canEditAgent,
-      onOpenAgentEdit: formsRecommendation?.onOpenAgentEdit,
-      noticeVisible: formsRecommendation?.noticeVisible,
-      onCloseNotice: formsRecommendation?.onCloseNotice,
-    }),
-    [
-      formsRecommendation?.recommendedModel,
-      formsRecommendation?.canEditAgent,
-      formsRecommendation?.onOpenAgentEdit,
-      formsRecommendation?.noticeVisible,
-      formsRecommendation?.onCloseNotice,
-    ],
   );
 
   // Never above what the widget itself enforces: a host asking for more would
@@ -1083,69 +1052,65 @@ const AiAgentProviders = ({
 
   return (
     <AiChatAvailabilityContext.Provider value={isAvailable && canUseAi}>
-      <FormsRecommendationContext.Provider value={formsRecommendationValue}>
-        <EventsProvider
-          callbacksManager={ctx.callbacksManager}
-          callbacks={chatCallbacks}
-        >
-          <PlatformProvider platform={platform}>
-            <AiChatI18nIsolator
-              locale={aiChatLocale}
-              translations={aiChatTranslations}
-            >
-              <ComponentsProvider overrides={componentOverrides}>
-                <WidgetConfigProvider config={widgetConfig}>
-                  <ApiProvider config={serverApiConfig}>
-                    <StoresProvider stores={stores}>
-                      <ThemeProvider theme={theme} customThemes={portalThemes}>
-                        <ImagesProvider overrides={imageOverrides}>
-                          <ToolsProvider
-                            hostToolGroups={hostToolGroups}
-                            servers={ctx.servers}
-                            eventBus={ctx.eventBus}
-                          >
-                            <StoresHydrator enabled={canUseAi} />
-                            <ProfilePickerAliasBridge
-                              alias={profilePickerAlias}
-                            />
-                            <ThreadContextBridge
-                              onThreadContextChange={onThreadContextChange}
-                            />
-                            <GenerateToolApprovalBridge />
-                            <AiChatStoreProvider store={aiChatStore}>
-                              <AiChatStoresBridge />
-                              {getAgentRoomId ? null : <AgentRoomIdSync />}
-                              {/* The per-section attachment cap covers the
-                                  host subtree and the chat's own dialogs
-                                  alike — picker, device upload, "Ask AI" row
-                                  action, drop zone. */}
-                              <AttachmentLimitContext.Provider
-                                value={attachmentCap}
+      <EventsProvider
+        callbacksManager={ctx.callbacksManager}
+        callbacks={chatCallbacks}
+      >
+        <PlatformProvider platform={platform}>
+          <AiChatI18nIsolator
+            locale={aiChatLocale}
+            translations={aiChatTranslations}
+          >
+            <ComponentsProvider overrides={componentOverrides}>
+              <WidgetConfigProvider config={widgetConfig}>
+                <ApiProvider config={serverApiConfig}>
+                  <StoresProvider stores={stores}>
+                    <ThemeProvider theme={theme} customThemes={portalThemes}>
+                      <ImagesProvider overrides={imageOverrides}>
+                        <ToolsProvider
+                          hostToolGroups={hostToolGroups}
+                          servers={ctx.servers}
+                          eventBus={ctx.eventBus}
+                        >
+                          <StoresHydrator enabled={canUseAi} />
+                          <ProfilePickerAliasBridge alias={profilePickerAlias} />
+                          <ThreadContextBridge
+                            onThreadContextChange={onThreadContextChange}
+                          />
+                          <GenerateToolApprovalBridge />
+                          <AiChatStoreProvider store={aiChatStore}>
+                            <AiChatStoresBridge />
+                            {getAgentRoomId ? null : <AgentRoomIdSync />}
+                            {/* The per-section attachment cap covers the
+                                host subtree and the chat's own dialogs
+                                alike — picker, device upload, "Ask AI" row
+                                action, drop zone. */}
+                            <AttachmentLimitContext.Provider
+                              value={attachmentCap}
+                            >
+                              {/* The host subtree attaches files too (the
+                                  "Ask AI" action, the chat-panel drop
+                                  zone): hand it the same reporter the
+                                  dialogs get as a prop, so `canAnalyze`
+                                  survives every entry point. */}
+                              <OnFilesAttachedContext.Provider
+                                value={onFilesAttached}
                               >
-                                {/* The host subtree attaches files too (the
-                                    "Ask AI" action, the chat-panel drop
-                                    zone): hand it the same reporter the
-                                    dialogs get as a prop, so `canAnalyze`
-                                    survives every entry point. */}
-                                <OnFilesAttachedContext.Provider
-                                  value={onFilesAttached}
-                                >
-                                  {children}
-                                </OnFilesAttachedContext.Provider>
-                                {overlay}
-                              </AttachmentLimitContext.Provider>
-                            </AiChatStoreProvider>
-                          </ToolsProvider>
-                        </ImagesProvider>
-                      </ThemeProvider>
-                    </StoresProvider>
-                  </ApiProvider>
-                </WidgetConfigProvider>
-              </ComponentsProvider>
-            </AiChatI18nIsolator>
-          </PlatformProvider>
-        </EventsProvider>
-      </FormsRecommendationContext.Provider>
+                                {children}
+                              </OnFilesAttachedContext.Provider>
+                              {overlay}
+                            </AttachmentLimitContext.Provider>
+                          </AiChatStoreProvider>
+                        </ToolsProvider>
+                      </ImagesProvider>
+                    </ThemeProvider>
+                  </StoresProvider>
+                </ApiProvider>
+              </WidgetConfigProvider>
+            </ComponentsProvider>
+          </AiChatI18nIsolator>
+        </PlatformProvider>
+      </EventsProvider>
     </AiChatAvailabilityContext.Provider>
   );
 };
@@ -1153,10 +1118,6 @@ const AiAgentProviders = ({
 export default AiAgentProviders;
 
 export { useIsAiChatAvailable } from "./availability";
-export {
-  useFormsRecommendation,
-  type FormsRecommendation,
-} from "./forms-recommendation";
 export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
 export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
 export type {
