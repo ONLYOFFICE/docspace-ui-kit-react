@@ -16,8 +16,11 @@ The wiring is three layers, and **a change touches all three**:
 1. **`package.json`** — the pnpm script, or a script under `.claude/scripts/`. This is the
    source of truth and the thing that also works from a terminal and from CI.
 2. **`.vscode/tasks.json`** — a task whose `command` runs it, in the form
-   `cd ${workspaceFolder} ; pnpm run <script>`. Its `label` is what a button references, and the
-   labels are namespaced by group (`Check | Tsc`, `Audit | manifest invariants`).
+   `pnpm run <script>`, with no `cd` in front: the file sets
+   `"options": { "cwd": "${workspaceFolder}" }` once at the top level, so every task starts at
+   the repository root on every shell (see `cross-platform.md`). Its `label` is what a button
+   references, and the labels are namespaced by group (`Check | Tsc`,
+   `Audit | manifest invariants`).
 3. **`ui-kit.code-workspace`** → `settings > VsCodeTaskButtons.tasks` — a button whose `task`
    field must match a `tasks.json` label **exactly**. A typo is silent: the button appears and
    does nothing.

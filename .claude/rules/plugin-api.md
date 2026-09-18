@@ -89,8 +89,10 @@ is what to run when a change touches a barrel.
 
 ## The skill that teaches this lives in another repository
 
-`/Users/alexeysafronov/Git/Gitea/agent-skills` (`skills/plugin-sdk`) is the Claude skill that
-generates and validates DocSpace plugins. Its knowledge of the kit is a **snapshot**, and
+`agent-skills` (`skills/plugin-sdk`) is the Claude skill that generates and validates DocSpace
+plugins. It is a separate checkout, expected at `../agent-skills` — a sibling of this
+repository — or wherever `AGENT_SKILLS_ROOT` / `--skills <path>` points; the scripts refuse to
+guess rather than reading the wrong tree. Its knowledge of the kit is a **snapshot**, and
 nothing checks that the snapshot is fresh —
 `node .claude/scripts/ui-kit-reference/check-drift.mjs` is what checks the checkable part of it.
 
