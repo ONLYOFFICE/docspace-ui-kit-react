@@ -9,6 +9,9 @@ import type { TTranslations } from "../providers/translation";
 import type { TColorScheme } from "../context/ThemeContext";
 
 import { globalColors } from "../providers/theme/themes/globalColors";
+import { setBrandLookup } from "../constants/brands";
+import { parseLocaleConstants } from "../utils/parse-locale-constants";
+import brandsData from "../test/fixtures/brands.json";
 import globalTypes from "./globals";
 import withApiProvider from "./decorators/withApiProvider";
 import enCommon from "../locales/en/Common.json";
@@ -21,6 +24,24 @@ import "../css/fonts.css";
 import lightTheme from "./lightTheme";
 import darkTheme from "./darkTheme";
 import { DocsContainer } from "./DocsContainer";
+
+// The library ships an identity brand lookup on purpose: getBrandName("Foo")
+// returns "Foo" until a consuming application calls setBrandLookup(), which is
+// what @docspace/shared does at module load. Storybook has no such consumer, so
+// without this every brand name rendered as its own key -- the Files selector
+// breadcrumb read "ProductName" rather than the product. test/setup.ts does the
+// same for Vitest.
+//
+// `ProductName` is overridden rather than taken from the fixture: the fixture
+// mirrors the portal's own brands.json, which still says "DocSpace", and
+// test/setup.ts plus the expectations in utils/common, errors/Errors.test.tsx
+// and errors/stories.utils.ts are pinned to that value. Storybook shows the
+// product under its current name; everything else still comes from the fixture.
+const { get: getBrand } = parseLocaleConstants({
+  ...(brandsData as Record<string, string>),
+  ProductName: "ONLYOFFICE",
+});
+setBrandLookup(getBrand);
 
 const lightColorScheme: TColorScheme = {
   id: 1,
