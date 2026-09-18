@@ -10,11 +10,11 @@ export const setupErrorI18n = () => {
           InvalidLink: "Invalid link",
           LinkDoesNotExist: "This link does not exist or has expired",
           ErrorDeactivatedText:
-            "This {{productName}} portal has been deactivated",
-          ProductName: "DocSpace",
+            "This ONLYOFFICE workspace has been deactivated",
+          ProductName: "ONLYOFFICE",
           AccessDenied: "Access denied",
           PortalRestriction:
-            "Access to {{productName}} is restricted for your account",
+            "Access to ONLYOFFICE workspace is restricted for your account",
         },
       },
     },
