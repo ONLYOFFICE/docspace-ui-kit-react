@@ -130,13 +130,13 @@ must be committed here. **Nothing checks that it is fresh.**
 **Do not add a license header to files here, and do not remove the AGPL declaration from
 `package.json`, `LICENSE` or the README.**
 
-The package is **AGPL-3.0-only**. It briefly was not: `scripts/relicense-mit.mjs` stripped the
-1 285 per-file AGPL headers and the manifest was switched to MIT, then commit `c2da2207` ("Put
-the UI kit back under AGPL-3.0-only") reverted the manifest and the `LICENSE` file. **The
-headers were not restored**, so the current, intended state is a package that declares AGPL
-three times -- `package.json`, `LICENSE`, `README.md` -- and zero times in its 881 source
-files. `scripts/relicense-mit.mjs` is kept for reference; its own comments still describe the
-MIT move and are stale in that respect.
+The package is **AGPL-3.0-only**. It briefly was not: `b18a37e5` ("Relicense the UI kit under
+MIT") and `9542b432` ("Finish the MIT relicense") stripped the 1 285 per-file AGPL headers and
+switched the manifest to MIT, then `c2da2207` ("Put the UI kit back under AGPL-3.0-only")
+reverted the manifest and the `LICENSE` file. **The headers were not restored**, so the
+current, intended state is a package that declares AGPL three times -- `package.json`,
+`LICENSE`, `README.md` -- and zero times in its 881 source files. The script that stripped
+them is gone with its job; those three commits are the record.
 
 The monorepo's license-header check does **not** apply to this package. It used to take an
 opt-out -- `getSourceFiles()` in `common/tests/utils/license.js` called

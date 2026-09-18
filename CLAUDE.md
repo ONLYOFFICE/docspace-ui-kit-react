@@ -28,7 +28,7 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 | `component-authoring.md` | folder layout, props and JSDoc, `ref` as a prop, stories, what `vitest.config.ts` actually collects |
 | `theming.md` | which layer a `var(--x)` comes from, undefined tokens failing silently, RTL |
 | `packaging.md` | `exports`, `publishConfig`, ESM-only dist, dependency placement, per-module CSS, `"use client"` |
-| `source-checks.md` | the hidden gate enforced from DocSpace-client -- hex, ASCII, indentation, assets, deps, licence |
+| `source-checks.md` | the client-side checks that used to cover this source (hex, ASCII, indentation, assets, deps, licence headers), why none of them run here now, and AGPL-3.0-only without per-file headers |
 | `vscode-tasks.md` | the three layers behind the status-bar buttons in `ui-kit.code-workspace` |
 
 ## Tech Stack
@@ -85,7 +85,7 @@ biome-plugins/       — Vendored copy of the client's i18n Grit plugins, commit
                        Refreshed by hand from DocSpace-client; nothing checks that it is
                        fresh
 docs/                — Storybook .mdx pages, plus public-api.md
-scripts/             — copy-locales, copy-images, relicense-mit, verify-package, and the
+scripts/             — copy-locales, copy-images, verify-package, and the
                        build pipeline steps (normalize-types, finalize-dist, check-dist)
 .storybook/          — Storybook configuration
 test/                — Test setup and mocks

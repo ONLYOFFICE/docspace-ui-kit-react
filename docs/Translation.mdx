@@ -8,18 +8,19 @@ The UI Kit uses **i18next** and **react-i18next** for internationalization. Tran
 
 ## Translation files
 
-Translation JSON files live in `locales/` directories, organized by language and namespace:
+The package ships English only, one file per namespace:
 
 ```
 locales/
-├── en/
-│   └── Common.json
-├── fr/
-│   └── Common.json
-├── de/
-│   └── Common.json
-└── ...
+└── en/
+    ├── Common.json
+    ├── Payments.json
+    └── Settings.json
 ```
+
+Every other language comes from the host application: it loads its own resources and
+hands them to `TranslationProvider`, which is why the same component reads Russian in
+the portal and English in Storybook without the package carrying either.
 
 Each JSON file is a flat key-value map. Keys use PascalCase:
 
